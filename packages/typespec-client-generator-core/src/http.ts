@@ -793,7 +793,7 @@ function findMappingWithPath(
     if (
       methodParam.__raw &&
       serviceParam.__raw &&
-      compareModelProperties(context, methodParam.__raw, serviceParam.__raw)
+      compareModelProperties(context.program, methodParam.__raw, serviceParam.__raw)
     ) {
       return buildPathFromParentMap(methodParam, parentMap);
     }

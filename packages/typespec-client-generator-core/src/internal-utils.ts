@@ -41,10 +41,16 @@ import {
 import { $ } from "@typespec/compiler/typekit";
 import {
   Authentication,
+  getHeaderFieldOptions,
+  getPathParamOptions,
+  getQueryParamOptions,
   HttpOperation,
   HttpOperationResponseContent,
   HttpPayloadBody,
   HttpServer,
+  isHeader,
+  isPathParam,
+  isQueryParam,
 } from "@typespec/http";
 import {
   getAddedOnVersions,
@@ -61,7 +67,6 @@ import {
   getOverriddenClientMethod,
   getParamAlias,
 } from "./decorators.js";
-import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
 import {
   DecoratorInfo,
   ExternalTypeInfo,
@@ -1029,19 +1034,37 @@ export function getClientDoc(context: TCGCContext, target: Type): string | undef
 }
 
 export function compareModelProperties(
-  context: TCGCContext | undefined,
+  program: Program,
   modelPropA: ModelProperty | undefined,
   modelPropB: ModelProperty | undefined,
 ): boolean {
   if (!modelPropA || !modelPropB) return false;
   if (modelPropA.name !== modelPropB.name || modelPropA.type !== modelPropB.type) return false;
-  if (!context) return true; // if we don't have a context, we can't further compare the types. Assume true.
-  // compare serialized names if they are http parameters
-  if (!isSdkHttpParameter(context, modelPropA) || !isSdkHttpParameter(context, modelPropB))
-    return true;
-  const sdkA = ignoreDiagnostics(getSdkHttpParameter(context, modelPropA));
-  const sdkB = ignoreDiagnostics(getSdkHttpParameter(context, modelPropB));
-  return sdkA.kind === sdkB.kind && sdkA.serializedName === sdkB.serializedName;
+  if (
+    isQueryParam(program, modelPropA) &&
+    isQueryParam(program, modelPropB) &&
+    getQueryParamOptions(program, modelPropA)?.name !==
+      getQueryParamOptions(program, modelPropB)?.name
+  ) {
+    return false;
+  }
+  if (
+    isHeader(program, modelPropA) &&
+    isHeader(program, modelPropB) &&
+    getHeaderFieldOptions(program, modelPropA)?.name !==
+      getHeaderFieldOptions(program, modelPropB)?.name
+  ) {
+    return false;
+  }
+  if (
+    isPathParam(program, modelPropA) &&
+    isPathParam(program, modelPropB) &&
+    getPathParamOptions(program, modelPropA)?.name !==
+      getPathParamOptions(program, modelPropB)?.name
+  ) {
+    return false;
+  }
+  return true;
 }
 
 export function* filterMapValuesIterator<V>(
