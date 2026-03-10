@@ -16,6 +16,7 @@ export const knownEncodingRule = createRule({
   name: "known-encoding",
   description: "Check for supported encodings.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/known-encoding",
   messages: {
     default: paramMessage`Encoding "${"encoding"}" is not supported for Azure Services. Known encodings are: ${"knownEncodings"}`,
   },

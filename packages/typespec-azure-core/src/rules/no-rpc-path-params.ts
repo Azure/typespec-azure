@@ -6,6 +6,7 @@ export const noRpcPathParamsRule = createRule({
   name: "no-rpc-path-params",
   description: "Operations defined using RpcOperation should not have path parameters.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-rpc-path-params",
   messages: {
     default:
       "Operations defined using RpcOperation should not have path parameters. Consider using ResourceAction or ResourceCollectionAction instead.",

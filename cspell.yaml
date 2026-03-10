@@ -21,6 +21,7 @@ ignorePaths:
   - .vscode/**
   - .editorconfig
   - .github/CODEOWNERS
+  - "*.lock.yml"
 useGitignore: true
 enableFiletypes:
   - tsp
@@ -44,6 +45,7 @@ words:
   - fhir
   - foos
   - français
+  - healthdataaiservices
   - horiz
   - Howtos
   - infile

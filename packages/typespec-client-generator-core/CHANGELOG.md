@@ -1,5 +1,26 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.65.4
+
+### Bug Fixes
+
+- [#3977](https://github.com/Azure/typespec-azure/pull/3977) Fix wrong cross-ns naming collision check.
+
+
+## 0.65.3
+
+### Bug Fixes
+
+- [#3954](https://github.com/Azure/typespec-azure/pull/3954) Fix namespace duplication when `@clientNamespace` extends the namespace flag (e.g. `@clientNamespace("Azure.Search.Documents.Indexes")` with namespace flag `Azure.Search.Documents`)
+
+
+## 0.65.2
+
+### Bug Fixes
+
+- [#3945](https://github.com/Azure/typespec-azure/pull/3945) Fix duplicate client name error when using generic union or model templates with different type parameters.
+
+
 ## 0.65.1
 
 ### Bug Fixes
