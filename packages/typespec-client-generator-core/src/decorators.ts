@@ -733,7 +733,7 @@ function collectParams(
 ): ModelProperty[] {
   properties.forEach((value, key) => {
     // If the property is of type 'model', recurse into its properties
-    if (params.filter((x) => compareModelProperties(program, x, value)).length === 0) {
+    if (!params.some((x) => compareModelProperties(program, x, value))) {
       if (value.type.kind === "Model") {
         collectParams(program, value.type.properties, params);
       } else {

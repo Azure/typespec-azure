@@ -1040,25 +1040,37 @@ export function compareModelProperties(
 ): boolean {
   if (!modelPropA || !modelPropB) return false;
   if (modelPropA.name !== modelPropB.name || modelPropA.type !== modelPropB.type) return false;
+  const aIsQuery = isQueryParam(program, modelPropA);
+  const aIsHeader = isHeader(program, modelPropA);
+  const aIsPath = isPathParam(program, modelPropA);
+  const bIsQuery = isQueryParam(program, modelPropB);
+  const bIsHeader = isHeader(program, modelPropB);
+  const bIsPath = isPathParam(program, modelPropB);
+  // Return false when both have explicit HTTP parameter kinds but they differ
+  const aHasHttpKind = aIsQuery || aIsHeader || aIsPath;
+  const bHasHttpKind = bIsQuery || bIsHeader || bIsPath;
+  if (aHasHttpKind && bHasHttpKind) {
+    if (aIsQuery !== bIsQuery || aIsHeader !== bIsHeader || aIsPath !== bIsPath) return false;
+  }
   if (
-    isQueryParam(program, modelPropA) &&
-    isQueryParam(program, modelPropB) &&
+    aIsQuery &&
+    bIsQuery &&
     getQueryParamOptions(program, modelPropA)?.name !==
       getQueryParamOptions(program, modelPropB)?.name
   ) {
     return false;
   }
   if (
-    isHeader(program, modelPropA) &&
-    isHeader(program, modelPropB) &&
+    aIsHeader &&
+    bIsHeader &&
     getHeaderFieldOptions(program, modelPropA)?.name !==
       getHeaderFieldOptions(program, modelPropB)?.name
   ) {
     return false;
   }
   if (
-    isPathParam(program, modelPropA) &&
-    isPathParam(program, modelPropB) &&
+    aIsPath &&
+    bIsPath &&
     getPathParamOptions(program, modelPropA)?.name !==
       getPathParamOptions(program, modelPropB)?.name
   ) {

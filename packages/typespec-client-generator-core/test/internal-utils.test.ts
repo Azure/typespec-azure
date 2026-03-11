@@ -205,4 +205,52 @@ describe("compareModelProperties", () => {
       false,
     );
   });
+
+  it("should return false for different header names", async () => {
+    const { program, A, B } = await SimpleTesterWithService.compile(t.code`
+      model ${t.model("A")} {
+        @header("x-a") a: string;
+      }
+
+      model ${t.model("B")} {
+        @header("x-b") a: string;
+      }
+    `);
+    strictEqual(
+      compareModelProperties(program, A.properties.get("a"), B.properties.get("a")),
+      false,
+    );
+  });
+
+  it("should return false for different path names", async () => {
+    const { program, A, B } = await SimpleTesterWithService.compile(t.code`
+      model ${t.model("A")} {
+        @path("idA") a: string;
+      }
+
+      model ${t.model("B")} {
+        @path("idB") a: string;
+      }
+    `);
+    strictEqual(
+      compareModelProperties(program, A.properties.get("a"), B.properties.get("a")),
+      false,
+    );
+  });
+
+  it("should return false for mixed HTTP parameter kinds", async () => {
+    const { program, A, B } = await SimpleTesterWithService.compile(t.code`
+      model ${t.model("A")} {
+        @query("a") a: string;
+      }
+
+      model ${t.model("B")} {
+        @header("a") a: string;
+      }
+    `);
+    strictEqual(
+      compareModelProperties(program, A.properties.get("a"), B.properties.get("a")),
+      false,
+    );
+  });
 });
