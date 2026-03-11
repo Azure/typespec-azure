@@ -1,6 +1,6 @@
-# How TCGC Handles Namespace for Clients and Types
+# How TCGC and Language SDK Handle Namespace for Clients and Types
 
-This document describes how the TypeSpec Client Generator Core (TCGC) resolves and assigns namespaces for clients and types.
+This document describes how the TypeSpec Client Generator Core (TCGC) resolves and assigns namespaces for clients and types, and how this namespace information is used to organize the generated SDK package structure across different languages' SDKs.
 
 ## Overview
 
@@ -112,80 +112,27 @@ TCGC produces:
 
 ### Python
 
-Python maps each namespace segment to a Python package (directory with `__init__.py`). Models within a namespace become classes in that package's module files.
-
-```
-azure-petstore/
-└── azure/
-    └── petstore/
-        ├── __init__.py
-        ├── _client.py              # PetStoreClient
-        ├── models.py               # Dog
-        └── models/
-            ├── __init__.py
-            └── _models.py          # Cat
-```
+TODO
 
 ### .NET (C#)
 
-C# maps namespaces directly — each TCGC namespace becomes a C# namespace. Types are organized into files per namespace.
-
-```
-Azure.PetStore/
-├── PetStoreClient.cs               # namespace Azure.PetStore
-├── Dog.cs                          # namespace Azure.PetStore
-└── Models/
-    └── Cat.cs                      # namespace Azure.PetStore.Models
-```
-
-- The dotted namespace string maps 1:1 to C# `namespace` declarations.
-- Sub-namespaces typically become sub-folders in the project.
+TODO
 
 ### Java
 
-Java maps each namespace segment to a Java package. Types within a namespace become classes in that package.
-
-```
-com/azure/petstore/
-├── PetStoreClient.java             # package com.azure.petstore
-├── Dog.java                        # package com.azure.petstore
-└── models/
-    └── Cat.java                    # package com.azure.petstore.models
-```
-
-- Dotted namespace segments become nested directory/package levels.
-- Java package names are typically lowercased.
+TODO
 
 ### JavaScript / TypeScript
 
-TypeScript maps namespaces to module structure. Types within a namespace are exported from the corresponding module path.
-
-```
-azure-petstore/
-├── src/
-│   ├── index.ts                    # re-exports
-│   ├── petStoreClient.ts           # PetStoreClient
-│   ├── models.ts                   # Dog
-│   └── models/
-│       └── index.ts                # Cat
-```
-
-- Sub-namespaces may become sub-directories or separate export paths.
-- Flat namespace structures are common; deeper nesting depends on the emitter configuration.
+TODO
 
 ### Go
 
-Go maps each namespace to a Go package. Since Go packages are directory-based, each namespace segment becomes a directory.
+TODO
 
-```
-petstore/
-├── client.go                       # PetStoreClient, Dog
-└── models/
-    └── models.go                   # Cat
-```
+### Rust
 
-- Go has a flat package model — all types in the same namespace share a single package directory.
-- Sub-namespaces become separate packages in sub-directories.
+TODO
 
 Example 2: Two root namespaces at the same level but only one has a client
 
@@ -221,60 +168,27 @@ The `Shared` namespace has no client — it only exists to organize types that a
 
 #### Python
 
-```
-azure-petstore/
-└── azure/
-    └── petstore/
-        ├── __init__.py
-        ├── _client.py              # PetStoreClient
-        ├── _models.py              # Dog
-        └── shared/
-            ├── __init__.py
-            └── _models.py          # CommonError
-```
+TODO
 
 #### .NET (C#)
 
-```
-Azure.PetStore/
-├── PetStoreClient.cs               # namespace Azure.PetStore
-├── Dog.cs                          # namespace Azure.PetStore
-└── Shared/
-    └── CommonError.cs              # namespace Azure.PetStore.Shared
-```
+TODO
 
 #### Java
 
-```
-com/azure/petstore/
-├── PetStoreClient.java             # package com.azure.petstore
-├── Dog.java                        # package com.azure.petstore
-└── shared/
-    └── CommonError.java            # package com.azure.petstore.shared
-```
+TODO
 
 #### JavaScript / TypeScript
 
-```
-azure-petstore/
-└── src/
-    ├── index.ts
-    ├── petStoreClient.ts           # PetStoreClient
-    ├── models.ts                   # Dog
-    └── shared/
-        └── index.ts                # CommonError
-```
+TODO
 
 #### Go
 
-```
-petstore/
-├── client.go                       # PetStoreClient, Dog
-└── shared/
-    └── models.go                   # CommonError
-```
+TODO
 
-The client-less namespace is folded into the client package as a sub-namespace in most languages, since it doesn't warrant a standalone package on its own.
+#### Rust
+
+TODO
 
 Example 3: Two root namespaces at the same level and each have clients
 
@@ -296,80 +210,26 @@ Each language handles two root namespaces differently:
 
 #### Python
 
-Two sibling root namespaces typically result in two separate packages:
-
-```
-azure-petstore/
-└── azure/
-    └── petstore/
-        ├── __init__.py
-        ├── _client.py              # PetStoreClient
-        └── _models.py              # Dog
-
-azure-toystore/
-└── azure/
-    └── toystore/
-        ├── __init__.py
-        ├── _client.py              # ToyStoreClient
-        └── _models.py              # Car
-```
+TODO
 
 #### .NET (C#)
 
-Two root namespaces become two separate C# namespaces, typically in separate projects:
-
-```
-Azure.PetStore/
-├── PetStoreClient.cs               # namespace Azure.PetStore
-└── Dog.cs                          # namespace Azure.PetStore
-
-Azure.ToyStore/
-├── ToyStoreClient.cs               # namespace Azure.ToyStore
-└── Car.cs                          # namespace Azure.ToyStore
-```
+TODO
 
 #### Java
 
-Two root namespaces become two separate Java packages:
-
-```
-com/azure/petstore/
-├── PetStoreClient.java             # package com.azure.petstore
-└── Dog.java                        # package com.azure.petstore
-
-com/azure/toystore/
-├── ToyStoreClient.java             # package com.azure.toystore
-└── Car.java                        # package com.azure.toystore
-```
+TODO
 
 #### JavaScript / TypeScript
 
-Two root namespaces typically result in two separate npm packages:
-
-```
-azure-petstore/
-└── src/
-    ├── index.ts
-    ├── petStoreClient.ts           # PetStoreClient
-    └── models.ts                   # Dog
-
-azure-toystore/
-└── src/
-    ├── index.ts
-    ├── toyStoreClient.ts           # ToyStoreClient
-    └── models.ts                   # Car
-```
+TODO
 
 #### Go
 
-Two root namespaces become two separate Go packages:
+TODO
 
-```
-petstore/
-└── client.go                       # PetStoreClient, Dog
+#### Rust
 
-toystore/
-└── client.go                       # ToyStoreClient, Car
-```
+TODO
 
 ---
