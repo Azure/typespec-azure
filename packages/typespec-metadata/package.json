@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-metadata",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "TypeSpec emitter that produces structured metadata snapshots for APIView and other tooling.",
   "type": "module",
   "license": "MIT",

@@ -1,5 +1,28 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.66.1
+
+### Bug Fixes
+
+- [#4020](https://github.com/Azure/typespec-azure/pull/4020) Optimize `findMappingWithPath` in `getMethodParameterSegments` for better performance with deeply nested models. Replace O(n) `Array.shift()` with O(1) index-based dequeue, and use parent pointer map instead of O(depth) path copying per node.
+- [#4024](https://github.com/Azure/typespec-azure/pull/4024) Refine orphan model logic to reduce the efforts for model calculations
+
+
+## 0.66.0
+
+### Features
+
+- [#3867](https://github.com/Azure/typespec-azure/pull/3867) Add `.streamMetadata` for sse events streamed in or out
+
+### Bump dependencies
+
+- [#3986](https://github.com/Azure/typespec-azure/pull/3986) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3953](https://github.com/Azure/typespec-azure/pull/3953) Fix namespace duplication when `@clientNamespace` extends the namespace flag (e.g. `@clientNamespace("Azure.Search.Documents.Indexes")` with namespace flag `Azure.Search.Documents`)
+
+
 ## 0.65.4
 
 ### Bug Fixes
