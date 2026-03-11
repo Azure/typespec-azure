@@ -919,7 +919,7 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
   for (const serviceNs of servicesNs) {
     const versions = getVersions(context.program, serviceNs)[1]?.getVersions();
     // If the service has no versioning, no mutation needed
-    if (!versions) return globalNamespace;
+    if (!versions || versions.length === 0) return globalNamespace;
 
     // Single service needs to filter versions based on `apiVersion` config
     if (servicesNs.size === 1) {

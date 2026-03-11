@@ -49,7 +49,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   for (const serviceNs of servicesNs) {
     const versions = getVersions(context.program, serviceNs)[1]?.getVersions();
     // If the service has no versioning, set empty
-    if (!versions) {
+    if (!versions || versions.length === 0) {
       context.__packageVersions!.set(serviceNs, []);
       continue;
     }
