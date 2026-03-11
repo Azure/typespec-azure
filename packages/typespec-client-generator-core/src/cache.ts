@@ -7,8 +7,7 @@ import {
   Namespace,
   Operation,
 } from "@typespec/compiler";
-import { unsafe_Realm } from "@typespec/compiler/experimental";
-import { getVersions } from "@typespec/versioning";
+import { getVersionDependencies, getVersions } from "@typespec/versioning";
 import { getClientLocation, getClientNameOverride, isInScope } from "./decorators.js";
 import { SdkClient, TCGCContext } from "./interfaces.js";
 import {
@@ -16,6 +15,8 @@ import {
   clientLocationKey,
   findServiceForOperation,
   getScopedDecoratorData,
+  hasExplicitClientOrOperationGroup,
+  isTypeNeedsHandling,
   listAllUserDefinedNamespaces,
   listScopedDecoratorData,
   omitOperation,
@@ -151,10 +152,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
     const newOperationGroupWithServices = new Map<string, Namespace[]>();
     listScopedDecoratorData(context, clientLocationKey).forEach((v, k) => {
       // only deal with mutated types or without mutation
-      if (
-        (!context.__mutatedRealm && !unsafe_Realm.realmForType.has(k)) ||
-        (context.__mutatedRealm && context.__mutatedRealm.hasType(k))
-      ) {
+      if (isTypeNeedsHandling(context, k)) {
         // If the target operation group already exists, handle the multiple services case
         if (typeof v === "string") {
           // Check if an operation group with this name already exists, only check first level og for string target
