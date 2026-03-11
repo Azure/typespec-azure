@@ -215,3 +215,18 @@ describe("other unions", () => {
     expect(res.definitions?.Pet.properties?.name).toEqual({});
   });
 });
+
+describe("regression tests for 0.66.0", () => {
+  it("'one' | integer should trigger union-unsupported warning", async () => {
+    const diagnostics = await diagnoseOpenApiFor(`
+      model Foo {
+        bar: "one" | integer;
+      }
+    `);
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-autorest/union-unsupported",
+      message:
+        "Unions cannot be emitted to OpenAPI v2 unless all options are literals of the same type.",
+    });
+  });
+});
