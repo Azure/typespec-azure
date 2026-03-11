@@ -424,8 +424,9 @@ export function listOperationsInOperationGroup(
 
   const groups: SdkOperationGroup[] = [...group.subOperationGroups];
   const operations: Operation[] = [...context.getOperationsForClient(group)];
-  while (groups.length > 0) {
-    const operationGroup = groups.shift()!;
+  let groupIdx = 0;
+  while (groupIdx < groups.length) {
+    const operationGroup = groups[groupIdx++];
     if (operationGroup.subOperationGroups) {
       groups.push(...operationGroup.subOperationGroups);
     }
@@ -726,14 +727,15 @@ export function getClientNameOverride(
 
 // Recursive function to collect parameter names
 function collectParams(
+  program: Program,
   properties: RekeyableMap<string, ModelProperty>,
   params: ModelProperty[] = [],
 ): ModelProperty[] {
   properties.forEach((value, key) => {
     // If the property is of type 'model', recurse into its properties
-    if (params.filter((x) => compareModelProperties(undefined, x, value)).length === 0) {
+    if (!params.some((x) => compareModelProperties(program, x, value))) {
       if (value.type.kind === "Model") {
-        collectParams(value.type.properties, params);
+        collectParams(program, value.type.properties, params);
       } else {
         params.push(findRootSourceProperty(value));
       }
@@ -753,11 +755,11 @@ export const $override = (
   context.program.stateMap(omitOperation).set(override, true);
 
   // Extract and sort parameter names
-  const originalParams = collectParams(original.parameters.properties).sort((a, b) =>
-    a.name.localeCompare(b.name),
+  const originalParams = collectParams(context.program, original.parameters.properties).sort(
+    (a, b) => a.name.localeCompare(b.name),
   );
-  const overrideParams = collectParams(override.parameters.properties).sort((a, b) =>
-    a.name.localeCompare(b.name),
+  const overrideParams = collectParams(context.program, override.parameters.properties).sort(
+    (a, b) => a.name.localeCompare(b.name),
   );
 
   // Check if the sorted parameter names arrays are equal, omit optional parameters
@@ -774,7 +776,7 @@ export const $override = (
         continue;
       }
     }
-    if (!compareModelProperties(undefined, originalParam, overrideParams[index])) {
+    if (!compareModelProperties(context.program, originalParam, overrideParams[index])) {
       if (!originalParam.optional) {
         parametersMatch = false;
         checkParameter = originalParam;

@@ -356,8 +356,9 @@ export function getPropertySegmentsFromModelOrParameters(
     }
   }
 
-  while (queue.length > 0) {
-    const { model, path } = queue.shift()!;
+  let queueIdx = 0;
+  while (queueIdx < queue.length) {
+    const { model, path } = queue[queueIdx++];
     for (const prop of model.properties.values()) {
       if (predicate(prop)) {
         return path.concat(prop);
