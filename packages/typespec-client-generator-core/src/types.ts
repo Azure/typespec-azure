@@ -1987,6 +1987,7 @@ function handleServiceOrphanTypes(context: TCGCContext): [void, readonly Diagnos
     // add serialization options to model type
     updateSerializationOptions(context, sdkType, []);
   }
+
   return diagnostics.wrap(undefined);
 }
 
