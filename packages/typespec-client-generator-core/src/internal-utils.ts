@@ -123,6 +123,8 @@ export const operationGroupKey = createStateSymbol("operationGroup");
 export const clientLocationKey = createStateSymbol("clientLocation");
 export const omitOperation = createStateSymbol("omitOperation");
 export const overrideKey = createStateSymbol("override");
+export const usageKey = createStateSymbol("usage");
+export const legacyHierarchyBuildingKey = createStateSymbol("legacyHierarchyBuilding");
 
 export function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
   // Multiple services case is not considered explicit client. It is auto-merged.
@@ -1285,4 +1287,11 @@ export function isSameAuth(left: Authentication, right: Authentication): boolean
     }
   }
   return true;
+}
+
+export function isTypeNeedsHandling(context: TCGCContext, type: Type): boolean {
+  return (
+    (context.__mutatedRealm === undefined && !unsafe_Realm.realmForType.has(type)) ||
+    (context.__mutatedRealm !== undefined && context.__mutatedRealm.hasType(type))
+  );
 }
