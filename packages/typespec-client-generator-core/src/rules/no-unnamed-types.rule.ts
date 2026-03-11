@@ -27,7 +27,8 @@ export const noUnnamedTypesRule = createRule({
         mutateNamespace: false,
       },
     );
-    // we create the package to see if the model is used in the final output
+    // Run the type-handling pass to populate __referencedTypeCache so we can
+    // determine which types are referenced and how they are used in the final output.
     handleAllTypes(tcgcContext);
     return {
       model: (model: Model) => {
