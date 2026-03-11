@@ -68,8 +68,9 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
 
   // iterate all clients and build a map of operations
   const queue: SdkClient[] = [...clients];
-  while (queue.length > 0) {
-    const client = queue.shift()!;
+  let queueIdx = 0;
+  while (queueIdx < queue.length) {
+    const client = queue[queueIdx++];
 
     // operations directly under the client
     const operations = [];

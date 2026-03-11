@@ -105,9 +105,12 @@ import {
   isHttpBodySpread,
   isNeverOrVoidType,
   isOnClient,
-  listAllUserDefinedNamespaces,
+  isTypeNeedsHandling,
+  legacyHierarchyBuildingKey,
+  listScopedDecoratorData,
   resolveConflictGeneratedName,
   updateWithApiVersionInformation,
+  usageKey,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import {
@@ -1973,19 +1976,53 @@ interface UsageFilteringOptions {
   output?: boolean;
 }
 
-function handleServiceOrphanType(
-  context: TCGCContext,
-  type: Model | Enum | Union,
-): [void, readonly Diagnostic[]] {
+function handleServiceOrphanTypes(context: TCGCContext): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  // skip template types
-  if ((type.kind === "Model" || type.kind === "Union") && isTemplateDeclaration(type)) {
-    return diagnostics.wrap(undefined);
+
+  function handleServiceOrphanType(context: TCGCContext, type: Model | Enum | Union) {
+    // skip template types
+    if ((type.kind === "Model" || type.kind === "Union") && isTemplateDeclaration(type)) {
+      return;
+    }
+    // skip if already processed
+    if (context.__referencedTypeCache!.has(type)) {
+      return;
+    }
+    const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type));
+    diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.None, sdkType));
+    // add serialization options to model type
+    updateSerializationOptions(context, sdkType, []);
   }
-  const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type));
-  diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.None, sdkType));
-  // add serialization options to model type
-  updateSerializationOptions(context, sdkType, []);
+
+  listScopedDecoratorData(context, usageKey).forEach((_, type) => {
+    // only deal with mutated types or without mutation
+    if (isTypeNeedsHandling(context, type)) {
+      if (type.kind === "Namespace") {
+        // orphan models
+        for (const model of type.models.values()) {
+          handleServiceOrphanType(context, model);
+        }
+        // orphan enums
+        for (const enumType of type.enums.values()) {
+          handleServiceOrphanType(context, enumType);
+        }
+        // orphan unions
+        for (const unionType of type.unions.values()) {
+          handleServiceOrphanType(context, unionType);
+        }
+      } else if (type.kind === "Model" || type.kind === "Enum" || type.kind === "Union") {
+        handleServiceOrphanType(context, type);
+      }
+    }
+  });
+
+  listScopedDecoratorData(context, legacyHierarchyBuildingKey).forEach((_, type) => {
+    // only deal with mutated types or without mutation
+    if (isTypeNeedsHandling(context, type)) {
+      handleServiceOrphanType(context, type as Model);
+    }
+  });
+
   return diagnostics.wrap(undefined);
 }
 
@@ -2092,26 +2129,7 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
     }
   }
   // update for orphan models/enums/unions
-  const userDefinedNamespaces = listAllUserDefinedNamespaces(context);
-  for (const currNamespace of userDefinedNamespaces) {
-    const namespaces = [currNamespace];
-    while (namespaces.length) {
-      const namespace = namespaces.pop()!;
-      // orphan models
-      for (const model of namespace.models.values()) {
-        diagnostics.pipe(handleServiceOrphanType(context, model));
-      }
-      // orphan enums
-      for (const enumType of namespace.enums.values()) {
-        diagnostics.pipe(handleServiceOrphanType(context, enumType));
-      }
-      // orphan unions
-      for (const unionType of namespace.unions.values()) {
-        diagnostics.pipe(handleServiceOrphanType(context, unionType));
-      }
-      namespaces.push(...namespace.namespaces.values());
-    }
-  }
+  diagnostics.pipe(handleServiceOrphanTypes(context));
   // update access
   diagnostics.pipe(updateAccessOverride(context));
   // update usage

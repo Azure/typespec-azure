@@ -82,12 +82,14 @@ import {
   getScopedDecoratorData,
   isSameAuth,
   isSameServers,
+  legacyHierarchyBuildingKey,
   listAllUserDefinedNamespaces,
   negationScopesKey,
   omitOperation,
   overrideKey,
   parseScopes,
   scopeKey,
+  usageKey,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
@@ -306,21 +308,22 @@ export function listSubClients(
 /**
  * List operations inside a client or sub client. If ignoreHierarchy is true, the result will include all nested operations.
  * @param context TCGCContext
- * @param group Client to list operations
+ * @param client Client to list operations
  * @param ignoreHierarchy Whether to get all nested operations
  * @returns
  */
 export function listOperationsInClient(
   context: TCGCContext,
-  group: SdkClient,
+  client: SdkClient,
   ignoreHierarchy = false,
 ): Operation[] {
-  if (!ignoreHierarchy) return context.getOperationsForClient(group);
+  if (!ignoreHierarchy) return context.getOperationsForClient(client);
 
-  const subClients: SdkClient[] = [...group.subClients];
-  const operations: Operation[] = [...context.getOperationsForClient(group)];
-  while (subClients.length > 0) {
-    const subClient = subClients.shift()!;
+  const subClients: SdkClient[] = [...client.subClients];
+  const operations: Operation[] = [...context.getOperationsForClient(client)];
+  let groupIdx = 0;
+  while (groupIdx < subClients.length) {
+    const subClient = subClients[groupIdx++];
     if (subClient.subClients) {
       subClients.push(...subClient.subClients);
     }
@@ -393,8 +396,6 @@ export function shouldGenerateConvenient(context: TCGCContext, entity: Operation
   const value = getConvenientOrProtocolValue(context, convenientAPIKey, entity);
   return value ?? Boolean(context.generateConvenienceMethods);
 }
-
-const usageKey = createStateSymbol("usage");
 
 export const $usage: UsageDecorator = (
   context: DecoratorContext,
@@ -621,14 +622,15 @@ export function getClientNameOverride(
 
 // Recursive function to collect parameter names
 function collectParams(
+  program: Program,
   properties: RekeyableMap<string, ModelProperty>,
   params: ModelProperty[] = [],
 ): ModelProperty[] {
   properties.forEach((value, key) => {
     // If the property is of type 'model', recurse into its properties
-    if (params.filter((x) => compareModelProperties(undefined, x, value)).length === 0) {
+    if (!params.some((x) => compareModelProperties(program, x, value))) {
       if (value.type.kind === "Model") {
-        collectParams(value.type.properties, params);
+        collectParams(program, value.type.properties, params);
       } else {
         params.push(findRootSourceProperty(value));
       }
@@ -648,11 +650,11 @@ export const $override = (
   context.program.stateMap(omitOperation).set(override, true);
 
   // Extract and sort parameter names
-  const originalParams = collectParams(original.parameters.properties).sort((a, b) =>
-    a.name.localeCompare(b.name),
+  const originalParams = collectParams(context.program, original.parameters.properties).sort(
+    (a, b) => a.name.localeCompare(b.name),
   );
-  const overrideParams = collectParams(override.parameters.properties).sort((a, b) =>
-    a.name.localeCompare(b.name),
+  const overrideParams = collectParams(context.program, override.parameters.properties).sort(
+    (a, b) => a.name.localeCompare(b.name),
   );
 
   // Check if the sorted parameter names arrays are equal, omit optional parameters
@@ -669,7 +671,7 @@ export const $override = (
         continue;
       }
     }
-    if (!compareModelProperties(undefined, originalParam, overrideParams[index])) {
+    if (!compareModelProperties(context.program, originalParam, overrideParams[index])) {
       if (!originalParam.optional) {
         parametersMatch = false;
         checkParameter = originalParam;
@@ -1425,8 +1427,6 @@ export function getClientLocation(
 ): Namespace | Interface | Operation | string | undefined {
   return getScopedDecoratorData(context, clientLocationKey, input);
 }
-
-const legacyHierarchyBuildingKey = createStateSymbol("legacyHierarchyBuilding");
 
 interface PropertyConflict {
   propertyName: string;
