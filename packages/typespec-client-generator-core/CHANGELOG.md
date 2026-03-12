@@ -1,22 +1,5 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
-## 0.66.4
-
-### Bug Fixes
-
-- [#4101](https://github.com/Azure/typespec-azure/pull/4101) Fix `getLroMetadata` to correctly handle scalar types (e.g., `string`) as LRO final results. Previously, scalar result types in status monitor `@lroResult` properties were not recognized, causing incorrect metadata.
-- [#4103](https://github.com/Azure/typespec-azure/pull/4103) Fix `@clientOption` diagnostic target to report on the decorator instead of the target model, enabling proper suppression
-- [#4112](https://github.com/Azure/typespec-azure/pull/4112) Allow `@access` overrides for types only used in scoped-out parameters
-- [#4111](https://github.com/Azure/typespec-azure/pull/4111) Add support to use `@scope` to specify generation of parameters for certain languages
-
-
-## 0.66.3
-
-### Bug Fixes
-
-- [#4068](https://github.com/Azure/typespec-azure/pull/4068) Add support for `@clientOption("omitSlashFromEmptyRoute", true)` to handle legacy compatibility for operations with empty routes.
-
-
 ## 0.66.2
 
 ### Bug Fixes
