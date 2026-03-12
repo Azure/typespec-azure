@@ -394,7 +394,7 @@ export async function runAgentSession(
         for (const [model, metrics] of Object.entries(modelMetrics)) {
           const u = metrics.usage;
           log(
-            `   Model ${model}: ${metrics.requests.count} reqs | in: ${fmtTokens(u.inputTokens)} out: ${fmtTokens(u.outputTokens)}`,
+            `   Model ${model}: ${metrics.requests.count} requests | in: ${fmtTokens(u.inputTokens)} out: ${fmtTokens(u.outputTokens)}`,
           );
         }
       }

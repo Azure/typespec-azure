@@ -53,9 +53,11 @@ ${paths}
 
 Write the knowledge base to: \`${knowledgePath}\`
 
+After writing, run \`pnpm format:dir ${knowledgePath}\` to format the file.
+
 ## Context
 
-A separate documentation update agent will use this knowledge base as its only reference when updating documentation. That agent will read what you write here first to reduce the efforts of reading full source code.
+A separate documentation update agent will use this knowledge base as its reference when updating documentation. That agent will read what you write here first to reduce the efforts of reading all source code.
 
 Below are the instructions the doc-update agent will follow. Read them carefully to understand what information it will need:
 
@@ -67,7 +69,7 @@ ${docUpdatePrompt}
 
 Analyze the source code and existing documentation. Then write a knowledge base that contains everything the doc-update agent would need to carry out those instructions effectively.
 
-You decide the structure and what to include. Think about what the doc-update agent will need to look up, cross-reference, or verify — and make sure that information is in the knowledge base so it doesn't have to read source code itself.`;
+You decide the structure and what to include. Think about what the doc-update agent will need to look up, cross-reference, or verify — and make sure that information is in the knowledge base.`;
 }
 
 /**
@@ -93,15 +95,17 @@ ${config.description}
 
 ${paths}
 
-## Doc-Update Instructions
+## Context
 
-The doc-update agent that consumes this knowledge base follows these instructions. Use them to judge whether a commit affects information the knowledge base should capture:
+A separate documentation update agent will use this knowledge base as its reference when updating documentation. That agent will read what you write here first to reduce the efforts of reading all source code.
+
+Below are the instructions the doc-update agent will follow. Read them carefully to understand what information it will need:
 
 <doc-update-instructions>
 ${docUpdatePrompt}
 </doc-update-instructions>
 
-## Commits to Analyze
+## Instructions
 
 The following commits (oldest first) need to be reviewed:
 
@@ -109,17 +113,18 @@ ${commits}
 
 **Repository:** \`Azure/typespec-azure\`
 
-Use GitHub MCP tools to inspect each commit. Determine whether the changes affect anything the knowledge base should capture. Skip commits that are irrelevant (pure refactors, CI, formatting, dependency bumps).
+Use GitHub MCP tools to inspect each commit. Analyze the changes and update the knowledge base accordingly to make sure the knowledge base contains everything the doc-update agent would need to carry out those instructions effectively.
+
+Skip commits that are irrelevant (pure refactors, CI, formatting, dependency bumps).
 
 ## Output
 
 Write the updated knowledge base to: \`${knowledgePath}\`
 
+After writing, run \`pnpm format:dir ${knowledgePath}\` to format the file.
+
 **Important:** Preserve sections not affected by these commits. Only update what the commits actually change.
-
-## Current Knowledge Base
-
-${existingKnowledge}`;
+`;
 }
 
 // ---------------------------------------------------------------------------
@@ -182,6 +187,8 @@ Review the human changes and comments. Update the knowledge base to reflect what
 ## Output
 
 Write the updated knowledge base to: \`${knowledgePath}\`
+
+After writing, run \`pnpm format:dir ${knowledgePath}\` to format the file.
 
 Preserve sections not affected by the feedback. Only update what the human corrections inform.
 
