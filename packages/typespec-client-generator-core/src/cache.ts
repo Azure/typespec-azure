@@ -8,7 +8,6 @@ import {
   Namespace,
   Operation,
 } from "@typespec/compiler";
-import { unsafe_Realm } from "@typespec/compiler/experimental";
 import { getVersionDependencies, getVersions } from "@typespec/versioning";
 import { getClientLocation, getClientNameOverride, isInScope } from "./decorators.js";
 import { SdkClient, SdkOperationGroup, TCGCContext } from "./interfaces.js";
@@ -18,6 +17,7 @@ import {
   findServiceForOperation,
   getScopedDecoratorData,
   hasExplicitClientOrOperationGroup,
+  isTypeNeedsHandling,
   listAllUserDefinedNamespaces,
   listScopedDecoratorData,
   omitOperation,
@@ -187,10 +187,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
     const newOperationGroupWithServices = new Map<string, Namespace[]>();
     listScopedDecoratorData(context, clientLocationKey).forEach((v, k) => {
       // only deal with mutated types or without mutation
-      if (
-        (!context.__mutatedRealm && !unsafe_Realm.realmForType.has(k)) ||
-        (context.__mutatedRealm && context.__mutatedRealm.hasType(k))
-      ) {
+      if (isTypeNeedsHandling(context, k)) {
         // If the target operation group already exists, handle the multiple services case
         if (typeof v === "string") {
           // Check if an operation group with this name already exists, only check first level og for string target
@@ -248,8 +245,9 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
 
   // iterate all clients and operation groups and build a map of operations
   const queue: (SdkClient | SdkOperationGroup)[] = [...clients];
-  while (queue.length > 0) {
-    const group = queue.shift()!;
+  let queueIdx = 0;
+  while (queueIdx < queue.length) {
+    const group = queue[queueIdx++];
 
     // operations directly under the group
     const operations = [];
@@ -276,8 +274,9 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
     // should be placed in the first accessor client or operation group
     if (group.type?.kind === "Namespace" && hasExplicitClientOrOperationGroup(context)) {
       const innerQueue: Namespace[] = [group.type];
-      while (innerQueue.length > 0) {
-        const ns = innerQueue.shift()!;
+      let innerIdx = 0;
+      while (innerIdx < innerQueue.length) {
+        const ns = innerQueue[innerIdx++];
         for (const subNs of ns.namespaces.values()) {
           if (!context.__rawClientsOperationGroupsCache.has(subNs)) {
             operations.push(...subNs.operations.values());
@@ -394,7 +393,7 @@ function getOrCreateClients(context: TCGCContext): SdkClient[] {
         target: ns,
       });
     });
-    let originalName = service.name;
+    let originalName;
     const clientNameOverride = getClientNameOverride(context, service);
     if (clientNameOverride) {
       originalName = clientNameOverride;

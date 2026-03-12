@@ -12,6 +12,7 @@ export const compositionOverInheritanceRule = createRule({
   description:
     "Check that if a model is used in an operation and has derived models that it has a discriminator or recommend to use composition via spread or `is`.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/composition-over-inheritance",
   messages: {
     default: paramMessage`Model '${"name"}' is extending '${"baseModel"}' that doesn't define a discriminator. If '${"baseModel"}' is meant to be used:
  - For composition consider using spread \`...\` or \`model is\` instead.

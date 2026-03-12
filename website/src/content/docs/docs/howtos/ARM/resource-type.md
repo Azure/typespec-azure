@@ -83,26 +83,130 @@ You can find samples of Tenant Resources [in the TenantResource sample](https://
 
 ### Extension Resource
 
-Extension resources use the `ExtensionResource<TProperties/>` as their base resource type, where `TProperties` is the properties model for the rp-specific properties of the resource. Here is an example:
+Extension resources use the `ExtensionResource<TProperties/>` as their base resource type, where `TProperties` is the properties model for the rp-specific properties of the resource. Extension resources augment or alter the functionality of other resources, and can be scoped to specific target resource types using the templates in the `Extension` namespace.
+
+#### Defining the Resource Model
 
 ```typespec
-model EmployeeResource is ExtensionResource<EmployeeProperties> {
-  /** The employee name, using 'Firstname Lastname' notation */
-  @segment("employees")
-  @key("employeeName")
-  @visibility(Lifecycle.Read)
-  @path
-  name: string;
+model Employee is ExtensionResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
 }
 ```
 
-`@doc`: provides documentation for the 'name' property of the resource.
-`@segment(employees)`: provides the resource type name for this resource.
-`@key(employeeName)`: provides the parameter name for the name of the resource in operations that use this resource.
-`@visibility(read)`: indicates that this property is returned in the body of responses to operations over this resource, but does not appear in the body of requests. Later sections describe the [usage of property visibility](#property-visibility-and-other-constraints).
-`@path`: indicates that this property corresponds to the last segment of the url path to the resource (otherwise known as the resource identity).
+`ExtensionResource<EmployeeProperties>`: defines the resource as an extension resource with the given properties.
+`...ResourceNameParameter<Employee>`: spreads in the standard resource name parameter, which defines the resource type name, the name of the resource name parameter, and provides a default pattern constraint for resource names.
 
-You can find samples of Extension Resources [in the TenantResource sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/tenantResource/main.tsp).
+#### Defining Operations with Scope Parameters
+
+The `Extension` namespace provides operation templates that take a scope parameter, allowing you to define a single set of operations that can be reused across different target scopes. Define a parameterized interface for your operations like this:
+
+```typespec
+interface EmplOps<Scope extends Azure.ResourceManager.Foundations.SimpleResource> {
+  get is Extension.Read<Scope, Employee>;
+  create is Extension.CreateOrReplaceAsync<Scope, Employee>;
+  update is Extension.CustomPatchSync<
+    Scope,
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
+  >;
+  delete is Extension.DeleteWithoutOkAsync<Scope, Employee>;
+  list is Extension.ListByTarget<Scope, Employee>;
+  move is Extension.ActionSync<Scope, Employee, MoveRequest, MoveResponse>;
+}
+```
+
+The available operation templates in the Extension namespace include:
+
+| Template                         | Description                                   |
+| -------------------------------- | --------------------------------------------- |
+| `Extension.Read`                 | GET operation for the resource                |
+| `Extension.CreateOrReplaceAsync` | Recommended asynchronous PUT operation        |
+| `Extension.CreateOrUpdateAsync`  | Asynchronous PUT operation (create or update) |
+| `Extension.CreateOrReplaceSync`  | Synchronous PUT operation                     |
+| `Extension.CustomPatchAsync`     | Asynchronous PATCH with a custom payload      |
+| `Extension.CustomPatchSync`      | Synchronous PATCH with a custom payload       |
+| `Extension.DeleteWithoutOkAsync` | Asynchronous DELETE operation                 |
+| `Extension.DeleteSync`           | Synchronous DELETE operation                  |
+| `Extension.ListByTarget`         | List resources at the given target scope      |
+| `Extension.ActionSync`           | Synchronous POST action                       |
+| `Extension.ActionAsync`          | Asynchronous POST action                      |
+| `Extension.CheckExistence`       | HEAD operation to check resource existence    |
+
+#### Built-in Scopes
+
+You can instantiate the operations interface for several built-in scopes:
+
+```typespec
+/** Operations over any scope */
+@armResourceOperations
+interface Employees extends EmplOps<Extension.ScopeParameter> {}
+
+/** Tenant-level operations */
+@armResourceOperations
+interface Tenants extends EmplOps<Extension.Tenant> {}
+
+/** Subscription-level operations */
+@armResourceOperations
+interface Subscriptions extends EmplOps<Extension.Subscription> {}
+
+/** Resource group-level operations */
+@armResourceOperations
+interface ResourceGroups extends EmplOps<Extension.ResourceGroup> {}
+
+/** Management group-level operations */
+@armResourceOperations
+interface ManagementGroups extends EmplOps<Extension.ManagementGroup> {}
+```
+
+| Scope                       | Description                               |
+| --------------------------- | ----------------------------------------- |
+| `Extension.ScopeParameter`  | Any scope (uses a generic scope uri path) |
+| `Extension.Tenant`          | Tenant-level scope                        |
+| `Extension.Subscription`    | Subscription-level scope                  |
+| `Extension.ResourceGroup`   | Resource group-level scope                |
+| `Extension.ManagementGroup` | Management group-level scope              |
+
+#### Targeting External Resources
+
+If the extension resource targets a specific resource from another provider namespace, use `Extension.ExternalResource` to define the target:
+
+```typespec
+alias VirtualMachine = Extension.ExternalResource<
+  "Microsoft.Compute",
+  "virtualMachines",
+  "vmName",
+  NamePattern = "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$",
+  Description = "The name of the virtual machine"
+>;
+
+@armResourceOperations
+interface VirtualMachines extends EmplOps<VirtualMachine> {}
+```
+
+For child resources of external providers, use `Extension.ExternalChildResource`:
+
+```typespec
+alias Scaleset = Extension.ExternalResource<
+  "Microsoft.Compute",
+  "virtualMachineScaleSets",
+  "scaleSetName",
+  NamePattern = "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$",
+  Description = "The name of the virtual machine scale set"
+>;
+
+alias VirtualMachineScaleSetVm = Extension.ExternalChildResource<
+  Scaleset,
+  "virtualMachineScaleSetVms",
+  "scaleSetVmName",
+  NamePattern = "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$",
+  Description = "The name of the virtual machine scale set VM"
+>;
+
+@armResourceOperations
+interface ScaleSetVms extends EmplOps<VirtualMachineScaleSetVm> {}
+```
+
+You can find the complete sample of Extension Resources [in the specific-extension sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/resource-types/specific-extension/main.tsp).
 
 ### Child Resource
 

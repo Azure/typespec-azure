@@ -24,6 +24,7 @@ export const friendlyNameRule = createRule({
   name: "friendly-name",
   description: "Ensures that @friendlyName is used as intended.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/friendly-name",
   messages: {
     scope: paramMessage`@friendlyName should not decorate ${"kind"}.`,
     template: paramMessage`@friendlyName should decorate template and use template parameter's properties in friendly name.`,
