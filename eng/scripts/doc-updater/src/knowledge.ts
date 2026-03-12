@@ -115,7 +115,7 @@ export function knowledgeExists(configName: string): boolean {
  * Returns true on any error (fail-open → triggers a knowledge rebuild).
  */
 export function hasChangesSince(sourcePaths: string[], lastCommit: string): boolean {
-  const paths = sourcePaths.join(" ");
+  const paths = sourcePaths.map((p) => `"${p}"`).join(" ");
   try {
     const result = execSync(`git rev-list --count ${lastCommit}..HEAD -- ${paths}`, {
       encoding: "utf-8",
@@ -148,7 +148,7 @@ const DOC_UPDATER_GREP_PATTERN = "\\[Automated\\]";
  * Returns empty array if no commits found or on error.
  */
 export function listCommitsSince(sourcePaths: string[], lastCommit: string): string[] {
-  const paths = sourcePaths.join(" ");
+  const paths = sourcePaths.map((p) => `"${p}"`).join(" ");
   try {
     const result = execSync(
       `git rev-list --invert-grep --grep=${DOC_UPDATER_GREP_PATTERN} ${lastCommit}..HEAD -- ${paths}`,
