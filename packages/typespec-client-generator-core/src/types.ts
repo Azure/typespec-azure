@@ -107,7 +107,6 @@ import {
   listOrphanTypes,
   resolveConflictGeneratedName,
   updateWithApiVersionInformation,
-  usageKey,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import {
