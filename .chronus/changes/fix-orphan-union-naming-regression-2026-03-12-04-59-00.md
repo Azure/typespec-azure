@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Fix regression where orphan unions were not searched in `getGeneratedName`, causing duplicate client name errors and unstable enum naming with versioned services
+Consolidate orphan type discovery into shared `listOrphanTypes` generator used by both `handleServiceOrphanTypes` and `getGeneratedName`, fixing duplicate client name errors for orphan unions and unstable enum naming with versioned services
