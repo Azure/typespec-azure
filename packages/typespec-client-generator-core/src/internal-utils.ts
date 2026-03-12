@@ -9,6 +9,7 @@ import {
   compilerAssert,
   createDiagnosticCollector,
   Diagnostic,
+  Enum,
   getDeprecationDetails,
   getDoc,
   getLifecycleVisibilityEnum,
@@ -19,6 +20,7 @@ import {
   Interface,
   isNeverType,
   isNullType,
+  isTemplateDeclaration,
   isVoidType,
   listServices,
   Model,
@@ -63,9 +65,11 @@ import {
   getAlternateType,
   getClientDocExplicit,
   getClientLocation,
+  getLegacyHierarchyBuilding,
   getMarkAsLro,
   getOverriddenClientMethod,
   getParamAlias,
+  getUsageOverride,
 } from "./decorators.js";
 import {
   DecoratorInfo,
@@ -1004,6 +1008,7 @@ export function resolveConflictGeneratedName(context: TCGCContext) {
     .filter((x) => !x.isGeneratedName)
     .map((x) => x.name);
   const generatedNames = [...context.__generatedNames.values()];
+
   for (const sdkType of context.__referencedTypeCache.values()) {
     if (sdkType.__raw && sdkType.isGeneratedName && userDefinedNames.includes(sdkType.name)) {
       const rawName = sdkType.name;
@@ -1294,4 +1299,39 @@ export function isTypeNeedsHandling(context: TCGCContext, type: Type): boolean {
     (context.__mutatedRealm === undefined && !unsafe_Realm.realmForType.has(type)) ||
     (context.__mutatedRealm !== undefined && context.__mutatedRealm.hasType(type))
   );
+}
+
+export function listOrphanTypes(context: TCGCContext): (Model | Enum | Union)[] {
+  if (context.__orphanTypesCache) return context.__orphanTypesCache;
+  const result: (Model | Enum | Union)[] = [];
+  const userDefinedNamespaces = listAllUserDefinedNamespaces(context);
+  for (const currNamespace of userDefinedNamespaces) {
+    const namespaces = [currNamespace];
+    let currentIndex = 0;
+    while (currentIndex < namespaces.length) {
+      const namespace = namespaces[currentIndex];
+      // orphan models
+      for (const model of namespace.models.values()) {
+        if (isTemplateDeclaration(model)) continue;
+        if (!getUsageOverride(context, model) && !getLegacyHierarchyBuilding(context, model))
+          continue;
+        result.push(model);
+      }
+      // orphan enums
+      for (const enumType of namespace.enums.values()) {
+        if (!getUsageOverride(context, enumType)) continue;
+        result.push(enumType);
+      }
+      // orphan unions
+      for (const unionType of namespace.unions.values()) {
+        if (isTemplateDeclaration(unionType)) continue;
+        if (!getUsageOverride(context, unionType)) continue;
+        result.push(unionType);
+      }
+      namespaces.push(...namespace.namespaces.values());
+      currentIndex++;
+    }
+  }
+  context.__orphanTypesCache = result;
+  return result;
 }
