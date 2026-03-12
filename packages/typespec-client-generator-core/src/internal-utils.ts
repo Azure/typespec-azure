@@ -1301,7 +1301,9 @@ export function isTypeNeedsHandling(context: TCGCContext, type: Type): boolean {
   );
 }
 
-export function* listOrphanTypes(context: TCGCContext): Generator<Model | Enum | Union> {
+export function listOrphanTypes(context: TCGCContext): (Model | Enum | Union)[] {
+  if (context.__orphanTypesCache) return context.__orphanTypesCache;
+  const result: (Model | Enum | Union)[] = [];
   const userDefinedNamespaces = listAllUserDefinedNamespaces(context);
   for (const currNamespace of userDefinedNamespaces) {
     const namespaces = [currNamespace];
@@ -1313,21 +1315,23 @@ export function* listOrphanTypes(context: TCGCContext): Generator<Model | Enum |
         if (isTemplateDeclaration(model)) continue;
         if (!getUsageOverride(context, model) && !getLegacyHierarchyBuilding(context, model))
           continue;
-        yield model;
+        result.push(model);
       }
       // orphan enums
       for (const enumType of namespace.enums.values()) {
         if (!getUsageOverride(context, enumType)) continue;
-        yield enumType;
+        result.push(enumType);
       }
       // orphan unions
       for (const unionType of namespace.unions.values()) {
         if (isTemplateDeclaration(unionType)) continue;
         if (!getUsageOverride(context, unionType)) continue;
-        yield unionType;
+        result.push(unionType);
       }
       namespaces.push(...namespace.namespaces.values());
       currentIndex++;
     }
   }
+  context.__orphanTypesCache = result;
+  return result;
 }
