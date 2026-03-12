@@ -696,9 +696,10 @@ function buildNameFromContextPaths(
   // 1. find the last non-anonymous model node
   const lastNonAnonymousNodeIndex = findLastNonAnonymousNode(contextPath);
   // 2. build name
+  // When all nodes are anonymous (e.g. types inside orphan unions), lastNonAnonymousNodeIndex is -1.
+  // Use 0 as the start index to avoid accessing contextPath[-1].
   let createName: string = "";
-  const startIndex = Math.max(0, lastNonAnonymousNodeIndex);
-  for (let j = startIndex; j < contextPath.length; j++) {
+  for (let j = Math.max(0, lastNonAnonymousNodeIndex); j < contextPath.length; j++) {
     const currContextPathType = contextPath[j]?.type;
     if (
       currContextPathType?.kind === "String" ||

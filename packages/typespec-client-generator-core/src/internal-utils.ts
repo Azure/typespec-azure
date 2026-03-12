@@ -1009,6 +1009,14 @@ export function resolveConflictGeneratedName(context: TCGCContext) {
   // When a non-literal type (enum/model/union) has a suffixed generated name because
   // a literal type (string/number/boolean) took the base name first, swap names to
   // give priority to the non-literal type.
+  // Build a reverse lookup: generated name → raw type (only for literal types)
+  const literalNameToType = new Map<string, Type>();
+  for (const [rawType, genName] of context.__generatedNames.entries()) {
+    if (rawType.kind === "String" || rawType.kind === "Number" || rawType.kind === "Boolean") {
+      literalNameToType.set(genName, rawType);
+    }
+  }
+
   for (const sdkType of context.__referencedTypeCache.values()) {
     if (!sdkType.__raw || !sdkType.isGeneratedName) continue;
     if (sdkType.kind !== "enum" && sdkType.kind !== "union" && sdkType.kind !== "model") continue;
@@ -1019,18 +1027,16 @@ export function resolveConflictGeneratedName(context: TCGCContext) {
     if (!match) continue;
 
     const baseName = match[1];
-    // Check if the base name is taken by a literal type in __generatedNames
-    for (const [rawType, genName] of context.__generatedNames.entries()) {
-      if (
-        genName === baseName &&
-        (rawType.kind === "String" || rawType.kind === "Number" || rawType.kind === "Boolean")
-      ) {
-        // Swap: give the base name to the non-literal type, and the suffixed name to the literal
-        context.__generatedNames.set(rawType, currentName);
-        context.__generatedNames.set(sdkType.__raw, baseName);
-        sdkType.name = baseName;
-        break;
-      }
+    // Check if the base name is taken by a literal type
+    const literalType = literalNameToType.get(baseName);
+    if (literalType) {
+      // Swap: give the base name to the non-literal type, and the suffixed name to the literal
+      context.__generatedNames.set(literalType, currentName);
+      context.__generatedNames.set(sdkType.__raw, baseName);
+      sdkType.name = baseName;
+      // Update the reverse lookup
+      literalNameToType.delete(baseName);
+      literalNameToType.set(currentName, literalType);
     }
   }
 
