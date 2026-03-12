@@ -372,11 +372,13 @@ function findContextPath(
 ): ContextNode[] {
   // orphan models and unions
   for (const orphan of listOrphanTypes(context)) {
+    // skip models without non-metadata properties, as they cannot contain anonymous types
     if (
       orphan.kind === "Model" &&
       [...orphan.properties.values()].filter((p) => !isMetadata(context.program, p)).length === 0
     )
       continue;
+    // skip enums because they cannot contain anonymous types that need generated names
     if (orphan.kind === "Enum") continue;
     const result = getContextPath(context, orphan, type);
     if (result.length > 0) {
