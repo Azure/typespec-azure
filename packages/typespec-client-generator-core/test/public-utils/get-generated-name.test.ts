@@ -695,8 +695,7 @@ describe("orphan model with anonymous model", () => {
     const context = await createSdkContextForTester(program);
     const duplicateDiags =
       context.diagnostics?.filter(
-        (d) =>
-          d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+        (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
       ) ?? [];
     strictEqual(duplicateDiags.length, 0, "Should not have duplicate client name diagnostics");
   });
