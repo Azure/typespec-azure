@@ -25,7 +25,6 @@ import {
   HttpVerb,
   Visibility,
 } from "@typespec/http";
-import type { ContextNode } from "./internal-utils.js";
 
 // Types for TCGC lib
 
@@ -72,7 +71,6 @@ export interface TCGCContext {
   __clientApiVersionDefaultValueCache: Map<SdkClient, string | undefined>;
   __httpOperationExamples: Map<HttpOperation, SdkHttpOperationExample[]>;
   __pagedResultSet: Set<SdkType>;
-  __namingContextPath: ContextNode[]; // Stack tracking the current traversal position for naming anonymous types.
   __orphanTypesCache?: (Model | Enum | Union)[]; // cached result of listOrphanTypes to avoid repeated namespace traversals
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
   __mutatedRealm?: unsafe_Realm; // the realm that contains all mutated types for this instance
