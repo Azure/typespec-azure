@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.66.2
+
+### Bug Fixes
+
+- [#4041](https://github.com/Azure/typespec-azure/pull/4041) Consolidate orphan type discovery into shared cached `listOrphanTypes` used by both `handleServiceOrphanTypes` and `getGeneratedName`, fixing duplicate client name errors for orphan unions and unstable enum naming with versioned services
+
+
 ## 0.66.1
 
 ### Bug Fixes
