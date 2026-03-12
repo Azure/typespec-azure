@@ -9,6 +9,7 @@ import {
   compilerAssert,
   createDiagnosticCollector,
   Diagnostic,
+  Enum,
   getDeprecationDetails,
   getDoc,
   getLifecycleVisibilityEnum,
@@ -19,6 +20,7 @@ import {
   Interface,
   isNeverType,
   isNullType,
+  isTemplateDeclaration,
   isVoidType,
   listServices,
   Model,
@@ -63,9 +65,11 @@ import {
   getAlternateType,
   getClientDocExplicit,
   getClientLocation,
+  getLegacyHierarchyBuilding,
   getMarkAsLro,
   getOverriddenClientMethod,
   getParamAlias,
+  getUsageOverride,
 } from "./decorators.js";
 import {
   DecoratorInfo,
@@ -1005,41 +1009,6 @@ export function resolveConflictGeneratedName(context: TCGCContext) {
     .map((x) => x.name);
   const generatedNames = [...context.__generatedNames.values()];
 
-  // First, resolve priority conflicts between literal types and non-literal types.
-  // When a non-literal type (enum/model/union) has a suffixed generated name because
-  // a literal type (string/number/boolean) took the base name first, swap names to
-  // give priority to the non-literal type.
-  // Build a reverse lookup: generated name → raw type (only for literal types)
-  const literalNameToType = new Map<string, Type>();
-  for (const [rawType, genName] of context.__generatedNames.entries()) {
-    if (rawType.kind === "String" || rawType.kind === "Number" || rawType.kind === "Boolean") {
-      literalNameToType.set(genName, rawType);
-    }
-  }
-
-  for (const sdkType of context.__referencedTypeCache.values()) {
-    if (!sdkType.__raw || !sdkType.isGeneratedName) continue;
-    if (sdkType.kind !== "enum" && sdkType.kind !== "union" && sdkType.kind !== "model") continue;
-
-    const currentName = sdkType.name;
-    // Check if this name has a numeric suffix
-    const match = currentName.match(/^(.+?)(\d+)$/);
-    if (!match) continue;
-
-    const baseName = match[1];
-    // Check if the base name is taken by a literal type
-    const literalType = literalNameToType.get(baseName);
-    if (literalType) {
-      // Swap: give the base name to the non-literal type, and the suffixed name to the literal
-      context.__generatedNames.set(literalType, currentName);
-      context.__generatedNames.set(sdkType.__raw, baseName);
-      sdkType.name = baseName;
-      // Update the reverse lookup
-      literalNameToType.delete(baseName);
-      literalNameToType.set(currentName, literalType);
-    }
-  }
-
   for (const sdkType of context.__referencedTypeCache.values()) {
     if (sdkType.__raw && sdkType.isGeneratedName && userDefinedNames.includes(sdkType.name)) {
       const rawName = sdkType.name;
@@ -1330,4 +1299,35 @@ export function isTypeNeedsHandling(context: TCGCContext, type: Type): boolean {
     (context.__mutatedRealm === undefined && !unsafe_Realm.realmForType.has(type)) ||
     (context.__mutatedRealm !== undefined && context.__mutatedRealm.hasType(type))
   );
+}
+
+export function* listOrphanTypes(context: TCGCContext): Generator<Model | Enum | Union> {
+  const userDefinedNamespaces = listAllUserDefinedNamespaces(context);
+  for (const currNamespace of userDefinedNamespaces) {
+    const namespaces = [currNamespace];
+    let currentIndex = 0;
+    while (currentIndex < namespaces.length) {
+      const namespace = namespaces[currentIndex];
+      // orphan models
+      for (const model of namespace.models.values()) {
+        if (isTemplateDeclaration(model)) continue;
+        if (!getUsageOverride(context, model) && !getLegacyHierarchyBuilding(context, model))
+          continue;
+        yield model;
+      }
+      // orphan enums
+      for (const enumType of namespace.enums.values()) {
+        if (!getUsageOverride(context, enumType)) continue;
+        yield enumType;
+      }
+      // orphan unions
+      for (const unionType of namespace.unions.values()) {
+        if (isTemplateDeclaration(unionType)) continue;
+        if (!getUsageOverride(context, unionType)) continue;
+        yield unionType;
+      }
+      namespaces.push(...namespace.namespaces.values());
+      currentIndex++;
+    }
+  }
 }

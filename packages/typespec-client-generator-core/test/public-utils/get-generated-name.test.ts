@@ -700,7 +700,8 @@ describe("orphan model with anonymous model", () => {
     strictEqual(duplicateDiags.length, 0, "Should not have duplicate client name diagnostics");
   });
 
-  it("discriminator model enum should keep stable name with versioning", async () => {
+  it("discriminator model enum name problem", async () => {
+    // The root cause of the `EouDetectionModel1` name is the orphan model handling sequence, which cause the constant (will later be replaced by enum value, so not in code model) name collide with the enum name.
     const { program } = await SimpleTester.compile(
       `
         @service

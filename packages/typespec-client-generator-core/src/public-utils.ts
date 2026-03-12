@@ -69,6 +69,7 @@ import {
   hasNoneVisibility,
   isAzureCoreTspModel,
   listAllUserDefinedNamespaces,
+  listOrphanTypes,
   removeVersionsLargerThanExplicitlySpecified,
   resolveDuplicateGenearatedName,
 } from "./internal-utils.js";
@@ -370,22 +371,16 @@ function findContextPath(
   type: Model | Union | TspLiteralType,
 ): ContextNode[] {
   // orphan models and unions
-  for (const currNamespace of listAllUserDefinedNamespaces(context)) {
-    for (const model of currNamespace.models.values()) {
-      if (
-        [...model.properties.values()].filter((p) => !isMetadata(context.program, p)).length === 0
-      )
-        continue;
-      const result = getContextPath(context, model, type);
-      if (result.length > 0) {
-        return result;
-      }
-    }
-    for (const union of currNamespace.unions.values()) {
-      const result = getContextPath(context, union, type);
-      if (result.length > 0) {
-        return result;
-      }
+  for (const orphan of listOrphanTypes(context)) {
+    if (
+      orphan.kind === "Model" &&
+      [...orphan.properties.values()].filter((p) => !isMetadata(context.program, p)).length === 0
+    )
+      continue;
+    if (orphan.kind === "Enum") continue;
+    const result = getContextPath(context, orphan, type);
+    if (result.length > 0) {
+      return result;
     }
   }
   for (const client of listClients(context)) {
