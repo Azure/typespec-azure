@@ -360,7 +360,7 @@ export function getGeneratedName(
 }
 
 /**
- * Traverse each operation and model to find one possible context path for the given type.
+ * Traverse each operation, model, and union to find one possible context path for the given type.
  * @param context
  * @param type
  * @returns
@@ -369,7 +369,7 @@ function findContextPath(
   context: TCGCContext,
   type: Model | Union | TspLiteralType,
 ): ContextNode[] {
-  // orphan models
+  // orphan models and unions
   for (const currNamespace of listAllUserDefinedNamespaces(context)) {
     for (const model of currNamespace.models.values()) {
       if (
@@ -377,6 +377,12 @@ function findContextPath(
       )
         continue;
       const result = getContextPath(context, model, type);
+      if (result.length > 0) {
+        return result;
+      }
+    }
+    for (const union of currNamespace.unions.values()) {
+      const result = getContextPath(context, union, type);
       if (result.length > 0) {
         return result;
       }
@@ -407,7 +413,7 @@ interface ContextNode {
 }
 
 /**
- * Find one possible context path for the given type in the given operation or model.
+ * Find one possible context path for the given type in the given operation, model, or union.
  * @param context
  * @param root
  * @param typeToFind
@@ -415,7 +421,7 @@ interface ContextNode {
  */
 function getContextPath(
   context: TCGCContext,
-  root: Operation | Model,
+  root: Operation | Model | Union,
   typeToFind: Model | Union | TspLiteralType,
 ): ContextNode[] {
   // use visited set to avoid cycle model reference
@@ -523,7 +529,7 @@ function getContextPath(
   } else {
     visited.clear();
     result = [];
-    if (dfsModelProperties(typeToFind, root, root.name)) {
+    if (dfsModelProperties(typeToFind, root, root.name ?? "")) {
       return result;
     }
   }
@@ -691,7 +697,8 @@ function buildNameFromContextPaths(
   const lastNonAnonymousNodeIndex = findLastNonAnonymousNode(contextPath);
   // 2. build name
   let createName: string = "";
-  for (let j = lastNonAnonymousNodeIndex; j < contextPath.length; j++) {
+  const startIndex = Math.max(0, lastNonAnonymousNodeIndex);
+  for (let j = startIndex; j < contextPath.length; j++) {
     const currContextPathType = contextPath[j]?.type;
     if (
       currContextPathType?.kind === "String" ||

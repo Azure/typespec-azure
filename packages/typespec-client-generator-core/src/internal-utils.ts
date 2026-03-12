@@ -1004,6 +1004,36 @@ export function resolveConflictGeneratedName(context: TCGCContext) {
     .filter((x) => !x.isGeneratedName)
     .map((x) => x.name);
   const generatedNames = [...context.__generatedNames.values()];
+
+  // First, resolve priority conflicts between literal types and non-literal types.
+  // When a non-literal type (enum/model/union) has a suffixed generated name because
+  // a literal type (string/number/boolean) took the base name first, swap names to
+  // give priority to the non-literal type.
+  for (const sdkType of context.__referencedTypeCache.values()) {
+    if (!sdkType.__raw || !sdkType.isGeneratedName) continue;
+    if (sdkType.kind !== "enum" && sdkType.kind !== "union" && sdkType.kind !== "model") continue;
+
+    const currentName = sdkType.name;
+    // Check if this name has a numeric suffix
+    const match = currentName.match(/^(.+?)(\d+)$/);
+    if (!match) continue;
+
+    const baseName = match[1];
+    // Check if the base name is taken by a literal type in __generatedNames
+    for (const [rawType, genName] of context.__generatedNames.entries()) {
+      if (
+        genName === baseName &&
+        (rawType.kind === "String" || rawType.kind === "Number" || rawType.kind === "Boolean")
+      ) {
+        // Swap: give the base name to the non-literal type, and the suffixed name to the literal
+        context.__generatedNames.set(rawType, currentName);
+        context.__generatedNames.set(sdkType.__raw, baseName);
+        sdkType.name = baseName;
+        break;
+      }
+    }
+  }
+
   for (const sdkType of context.__referencedTypeCache.values()) {
     if (sdkType.__raw && sdkType.isGeneratedName && userDefinedNames.includes(sdkType.name)) {
       const rawName = sdkType.name;
