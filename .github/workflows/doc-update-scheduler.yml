@@ -182,15 +182,16 @@ jobs:
 
       - name: Record PR number in metadata
         if: steps.create-pr.outputs.pull-request-number
-        working-directory: eng/scripts/doc-updater
+        env:
+          PR_BRANCH: automated/doc-update-${{ matrix.config }}-${{ steps.date.outputs.value }}-${{ github.run_number }}
         run: |
-          META_FILE="knowledge/${{ matrix.config }}.meta.json"
+          META_FILE="eng/scripts/doc-updater/knowledge/${{ matrix.config }}.meta.json"
           if [ -f "$META_FILE" ]; then
-            # Update lastPrNumber in existing metadata
+            git checkout "$PR_BRANCH"
             jq '.lastPrNumber = ${{ steps.create-pr.outputs.pull-request-number }}' "$META_FILE" > tmp.json && mv tmp.json "$META_FILE"
             git add "$META_FILE"
-            git commit --amend --no-edit
-            git push --force-with-lease
+            git commit -m "chore: record PR number in metadata"
+            git push
           fi
 
       - name: Job Summary
