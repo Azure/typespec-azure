@@ -684,7 +684,7 @@ describe("orphan model with anonymous model", () => {
         }
 
         union ReasoningEffort {
-          "none" | "minimal" | "low" | "medium" | "high" | "xhigh",
+          "none" | "minimal" | "low" | "medium" | "high",
           null,
         }
 
