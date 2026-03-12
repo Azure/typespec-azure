@@ -71,6 +71,7 @@
           "type": "string",
           "description": "Product token (JWT) identifying a specific version of the product.",
           "x-ms-mutability": [
+            "update",
             "create"
           ]
         },
@@ -94,6 +95,7 @@
           "type": "string",
           "description": "Billing token (JWT) representing additional billing context.",
           "x-ms-mutability": [
+            "update",
             "create"
           ]
         },
@@ -182,8 +184,7 @@
           "default": "Renewal",
           "enum": [
             "AbsoluteDate",
-            "Renewal",
-            "NextCycle"
+            "Renewal"
           ],
           "x-ms-enum": {
             "name": "BillingScheduleChangeEffectiveType",
@@ -198,11 +199,6 @@
                 "name": "Renewal",
                 "value": "Renewal",
                 "description": "At time of term renewal."
-              },
-              {
-                "name": "NextCycle",
-                "value": "NextCycle",
-                "description": "When the next billing plan cycle charge occurs."
               }
             ]
           }
@@ -244,7 +240,11 @@
         },
         "productToken": {
           "type": "string",
-          "description": "Product token (JWT) identifying a specific version of the scheduled product. Can only be\nspecified when productCode is specified also."
+          "description": "Product token (JWT) identifying a specific version of the scheduled product. Can only be\nspecified when productCode is specified also.",
+          "x-ms-mutability": [
+            "update",
+            "create"
+          ]
         },
         "quantity": {
           "type": "integer",
@@ -258,7 +258,11 @@
         },
         "billingToken": {
           "type": "string",
-          "description": "Billing token (JWT) representing additional billing context."
+          "description": "Billing token (JWT) representing additional billing context.",
+          "x-ms-mutability": [
+            "update",
+            "create"
+          ]
         }
       },
       "required": [
@@ -271,8 +275,7 @@
       "description": "When a scheduled change is expected to become effective.",
       "enum": [
         "AbsoluteDate",
-        "Renewal",
-        "NextCycle"
+        "Renewal"
       ],
       "x-ms-enum": {
         "name": "BillingScheduleChangeEffectiveType",
@@ -287,11 +290,6 @@
             "name": "Renewal",
             "value": "Renewal",
             "description": "At time of term renewal."
-          },
-          {
-            "name": "NextCycle",
-            "value": "NextCycle",
-            "description": "When the next billing plan cycle charge occurs."
           }
         ]
       }

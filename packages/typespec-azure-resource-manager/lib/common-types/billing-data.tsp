@@ -34,7 +34,7 @@ model BillingData {
   /**
    * Product token (JWT) identifying a specific version of the product.
    */
-  @visibility(Lifecycle.Create)
+  @visibility(Lifecycle.Create, Lifecycle.Update)
   productToken?: string;
 
   /**
@@ -55,7 +55,7 @@ model BillingData {
   /**
    * Billing token (JWT) representing additional billing context.
    */
-  @visibility(Lifecycle.Create)
+  @visibility(Lifecycle.Create, Lifecycle.Update)
   billingToken?: string;
 
   /**
@@ -109,6 +109,7 @@ model BillingScheduleChange {
    * Product token (JWT) identifying a specific version of the scheduled product. Can only be
    * specified when productCode is specified also.
    */
+  @visibility(Lifecycle.Create, Lifecycle.Update)
   productToken?: string;
 
   /**
@@ -126,6 +127,7 @@ model BillingScheduleChange {
   /**
    * Billing token (JWT) representing additional billing context.
    */
+  @visibility(Lifecycle.Create, Lifecycle.Update)
   billingToken?: string;
 }
 
@@ -190,9 +192,6 @@ union BillingScheduleChangeEffectiveType {
 
   /** At time of term renewal. */
   Renewal: "Renewal",
-
-  /** When the next billing plan cycle charge occurs. */
-  NextCycle: "NextCycle",
 
   string,
 }
