@@ -488,9 +488,9 @@ export function registerArmResource(
     return;
   }
 
-  let keyName: string | undefined = undefined;
-  let collectionName: string | undefined = undefined;
-  let kind: ArmResourceKind | undefined = undefined;
+  let keyName: string | undefined;
+  let collectionName: string | undefined;
+  let kind: ArmResourceKind | undefined;
 
   if (type !== undefined && nameParameter !== undefined) {
     keyName = nameParameter;

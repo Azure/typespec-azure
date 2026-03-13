@@ -674,6 +674,69 @@ describe("orphan model with anonymous model", () => {
     // not a defined type in tsp, so no crossLanguageDefinitionId
     strictEqual(unionEnum.crossLanguageDefinitionId, "TestService.A.status.anonymous");
   });
+
+  it("orphan union with null variant should not produce empty generated name", async () => {
+    const { program } = await SimpleTesterWithService.compile(
+      `
+        union Verbosity {
+          "low" | "medium" | "high",
+          null,
+        }
+
+        union ReasoningEffort {
+          "none" | "minimal" | "low" | "medium" | "high",
+          null,
+        }
+
+        @@usage(ReasoningEffort, Usage.input);
+        @@usage(Verbosity, Usage.input);
+      `,
+    );
+    const context = await createSdkContextForTester(program);
+    const duplicateDiags =
+      context.diagnostics?.filter(
+        (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      ) ?? [];
+    strictEqual(duplicateDiags.length, 0, "Should not have duplicate client name diagnostics");
+  });
+
+  it("discriminator model enum name problem", async () => {
+    // The root cause of the `EouDetectionModel1` name is the orphan model handling sequence, which cause the constant (will later be replaced by enum value, so not in code model) name collide with the enum name.
+    const { program } = await SimpleTester.compile(
+      `
+        @service
+        @versioned(Versions)
+        namespace VoiceLive;
+
+        enum Versions {
+          v1,
+        }
+
+        @discriminator("model")
+        @usage(Usage.input)
+        model EouDetection {
+          \`model\`:
+            | "semantic_detection_v1"
+            | "semantic_detection_v1_en"
+            | "semantic_detection_v1_multilingual"
+            | string;
+        }
+
+        @usage(Usage.input)
+        model AzureSemanticDetection extends EouDetection {
+          \`model\`: "semantic_detection_v1";
+
+          @minValue(0)
+          timeout_ms?: int32;
+        }
+      `,
+    );
+    const context = await createSdkContextForTester(program);
+    const eouModel = context.sdkPackage.models.find((m) => m.name === "EouDetection");
+    ok(eouModel, "EouDetection model should exist");
+    const eouEnum = context.sdkPackage.enums.find((e) => e.name === "EouDetectionModel");
+    ok(eouEnum, "Enum should be named 'EouDetectionModel' without numeric suffix");
+  });
 });
 
 describe("corner case", () => {

@@ -104,7 +104,7 @@ import {
   isHttpBodySpread,
   isNeverOrVoidType,
   isOnClient,
-  listAllUserDefinedNamespaces,
+  listOrphanTypes,
   resolveConflictGeneratedName,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
@@ -1079,7 +1079,7 @@ export function getClientTypeWithDiagnostics(
   operation?: Operation,
 ): [SdkType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  let retval: SdkType | undefined = undefined;
+  let retval: SdkType | undefined;
   switch (type.kind) {
     case "String":
     case "Number":
@@ -1972,19 +1972,17 @@ interface UsageFilteringOptions {
   output?: boolean;
 }
 
-function handleServiceOrphanType(
-  context: TCGCContext,
-  type: Model | Enum | Union,
-): [void, readonly Diagnostic[]] {
+function handleServiceOrphanTypes(context: TCGCContext): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  // skip template types
-  if ((type.kind === "Model" || type.kind === "Union") && isTemplateDeclaration(type)) {
-    return diagnostics.wrap(undefined);
+  for (const t of listOrphanTypes(context)) {
+    // skip if already processed
+    if (context.__referencedTypeCache!.has(t)) {
+      continue;
+    }
+    const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, t));
+    // add serialization options to model type
+    updateSerializationOptions(context, sdkType, []);
   }
-  const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type));
-  diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.None, sdkType));
-  // add serialization options to model type
-  updateSerializationOptions(context, sdkType, []);
   return diagnostics.wrap(undefined);
 }
 
@@ -2091,26 +2089,7 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
     }
   }
   // update for orphan models/enums/unions
-  const userDefinedNamespaces = listAllUserDefinedNamespaces(context);
-  for (const currNamespace of userDefinedNamespaces) {
-    const namespaces = [currNamespace];
-    while (namespaces.length) {
-      const namespace = namespaces.pop()!;
-      // orphan models
-      for (const model of namespace.models.values()) {
-        diagnostics.pipe(handleServiceOrphanType(context, model));
-      }
-      // orphan enums
-      for (const enumType of namespace.enums.values()) {
-        diagnostics.pipe(handleServiceOrphanType(context, enumType));
-      }
-      // orphan unions
-      for (const unionType of namespace.unions.values()) {
-        diagnostics.pipe(handleServiceOrphanType(context, unionType));
-      }
-      namespaces.push(...namespace.namespaces.values());
-    }
-  }
+  diagnostics.pipe(handleServiceOrphanTypes(context));
   // update access
   diagnostics.pipe(updateAccessOverride(context));
   // update usage

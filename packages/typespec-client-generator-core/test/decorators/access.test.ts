@@ -614,6 +614,7 @@ it("access conflict from other override", async () => {
 it("access conflict from multiple override", async () => {
   const { program } = await SimpleTesterWithService.compile(
     `
+    @usage(Usage.input)
     model A {
       x: X;
     }
@@ -635,7 +636,7 @@ it("access conflict from multiple override", async () => {
   );
   const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
-  strictEqual(models.length, 2);
+  strictEqual(models.length, 3);
   strictEqual(models.find((m) => m.name === "B")?.access, "internal");
   strictEqual(models.find((m) => m.name === "X")?.access, "public");
   expectDiagnostics(context.diagnostics, {
