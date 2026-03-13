@@ -10,5 +10,6 @@ using Versioning;
 
 @client({
   service: [Service.MultiService.ServiceA, Service.MultiService.ServiceB],
+  autoMergeService: true,
 })
 namespace Service.MultiService.Combined;
