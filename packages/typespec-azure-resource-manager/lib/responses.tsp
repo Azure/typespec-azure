@@ -180,6 +180,50 @@ model ArmOperationStatus<
 }
 
 /**
+ * Standard Azure Resource Manager operation status response, used as the response
+ * body for `GetResourceOperationStatus`. The `id` property is not marked as a path
+ * parameter, so the full value is always present in the response body.
+ *
+ * @template Properties Optional resource-specific properties
+ * @template StatusValues The set of allowed values for operation status
+ */
+model ResourceOperationStatus<
+  Properties extends {} = never,
+  StatusValues extends TypeSpec.Reflection.Union = ResourceProvisioningState
+> {
+  /** RP-specific properties for the operationStatus resource, only appears when operation ended with Succeeded status */
+  @visibility(Lifecycle.Read)
+  properties?: Properties;
+
+  /** The operation status */
+  @Azure.Core.lroStatus
+  status: StatusValues;
+
+  /** The unique identifier for the operationStatus resource */
+  id: string;
+
+  /** The name of the operationStatus resource */
+  @visibility(Lifecycle.Read)
+  name?: string;
+
+  /** Operation start time */
+  @visibility(Lifecycle.Read)
+  startTime?: utcDateTime;
+
+  /** Operation complete time */
+  @visibility(Lifecycle.Read)
+  endTime?: utcDateTime;
+
+  /** The progress made toward completing the operation */
+  @visibility(Lifecycle.Read)
+  percentComplete?: float64;
+
+  /** Errors that occurred if the operation ended with Canceled or Failed status */
+  @visibility(Lifecycle.Read)
+  error?: ErrorDetail;
+}
+
+/**
  * The standard header for asynchronous operation polling
  *  @template StatusMonitor The status monitor type for lro polling
  *  @template UrlValue The value type of the Azure-AsyncOperation header

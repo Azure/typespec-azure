@@ -1021,6 +1021,23 @@ op Azure.ResourceManager.ArmProviderActionSync(apiVersion: string, subscriptionI
 | Error               | Optional. The error response, if non-standard.                                                        |
 | OptionalRequestBody | Optional. Indicates whether the request body is optional.                                             |
 
+### `GetResourceOperationStatus` {#Azure.ResourceManager.GetResourceOperationStatus}
+
+Get the status of an async operation.
+
+```typespec
+op Azure.ResourceManager.GetResourceOperationStatus(apiVersion: string, provider: "Microsoft.ThisWillBeReplaced", operationId: string): Azure.ResourceManager.ArmResponse<Response> | Error
+```
+
+#### Template Parameters
+
+| Name       | Description                                                                             |
+| ---------- | --------------------------------------------------------------------------------------- |
+| Response   | The type of the response body. Defaults to ResourceOperationStatus.                     |
+| Scope      | The scope of the operation. Defaults to TenantActionScope.                              |
+| Parameters | Optional. Additional non-path parameters (e.g. query or header parameters).             |
+| Error      | Optional. The error response, if non-standard.                                          |
+
 ### `ArmResourceActionAsync` {#Azure.ResourceManager.ArmResourceActionAsync}
 
 ```typespec
