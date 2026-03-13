@@ -384,6 +384,36 @@ model Azure.ResourceManager.ArmOperationStatus<Properties, StatusValues>
 | percentComplete? | `float64`                                                                      | The progress made toward completing the operation                                                                |
 | error?           | [`ErrorDetail`](./data-types.md#Azure.ResourceManager.CommonTypes.ErrorDetail) | Errors that occurred if the operation ended with Canceled or Failed status                                       |
 
+### `ResourceOperationStatus` {#Azure.ResourceManager.ResourceOperationStatus}
+
+Standard Azure Resource Manager operation status response, used as the response
+body for `GetResourceOperationStatus`. The `id` property is not marked as a path
+parameter, so the full value is always present in the response body.
+
+```typespec
+model Azure.ResourceManager.ResourceOperationStatus<Properties, StatusValues>
+```
+
+#### Template Parameters
+
+| Name         | Description                                    |
+| ------------ | ---------------------------------------------- |
+| Properties   | Optional resource-specific properties          |
+| StatusValues | The set of allowed values for operation status |
+
+#### Properties
+
+| Name             | Type                                                                           | Description                                                                                                      |
+| ---------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| properties?      | `Properties`                                                                   | RP-specific properties for the operationStatus resource, only appears when operation ended with Succeeded status |
+| status           | `StatusValues`                                                                 | The operation status                                                                                             |
+| id               | `string`                                                                       | The unique identifier for the operationStatus resource                                                           |
+| name?            | `string`                                                                       | The name of the operationStatus resource                                                                         |
+| startTime?       | `utcDateTime`                                                                  | Operation start time                                                                                             |
+| endTime?         | `utcDateTime`                                                                  | Operation complete time                                                                                          |
+| percentComplete? | `float64`                                                                      | The progress made toward completing the operation                                                                |
+| error?           | [`ErrorDetail`](./data-types.md#Azure.ResourceManager.CommonTypes.ErrorDetail) | Errors that occurred if the operation ended with Canceled or Failed status                                       |
+
 ### `ArmResourceCreatedResponse` {#Azure.ResourceManager.ArmResourceCreatedResponse}
 
 ```typespec
@@ -1327,6 +1357,28 @@ op action is ArmProviderActionSync<Response = Employee, Scope = SubscriptionActi
 | ---- | -------- | ---------------------- |
 | name | `string` | Symbolic name of scope |
 
+### `SubscriptionLocationActionScope` {#Azure.ResourceManager.SubscriptionLocationActionScope}
+
+Scope for operation status endpoints at the subscription level with a location path segment.
+Use with `GetResourceOperationStatus` to produce:
+`GET /subscriptions/{subscriptionId}/providers/{providerNamespace}/locations/{location}/operationStatuses/{operationId}`
+
+```typespec
+model Azure.ResourceManager.SubscriptionLocationActionScope
+```
+
+#### Examples
+
+```typespec
+op getStatus is GetResourceOperationStatus<ResourceOperationStatus, SubscriptionLocationActionScope>;
+```
+
+#### Properties
+
+| Name     | Type                 | Description                   |
+| -------- | -------------------- | ----------------------------- |
+| location | `Core.azureLocation` | The name of the Azure region. |
+
 ### `SubscriptionLocationResource` {#Azure.ResourceManager.SubscriptionLocationResource}
 
 The location resource for subscription-based locations. This can be used as a parent
@@ -1370,6 +1422,28 @@ op action is ArmProviderActionSync<Response = Employee, Scope = TenantActionScop
 | Name | Type     | Description            |
 | ---- | -------- | ---------------------- |
 | name | `string` | Symbolic name of scope |
+
+### `TenantLocationActionScope` {#Azure.ResourceManager.TenantLocationActionScope}
+
+Scope for operation status endpoints at the tenant level with a location path segment.
+Use with `GetResourceOperationStatus` to produce:
+`GET /providers/{providerNamespace}/locations/{location}/operationStatuses/{operationId}`
+
+```typespec
+model Azure.ResourceManager.TenantLocationActionScope
+```
+
+#### Examples
+
+```typespec
+op getStatus is GetResourceOperationStatus<ResourceOperationStatus, TenantLocationActionScope>;
+```
+
+#### Properties
+
+| Name     | Type                 | Description                   |
+| -------- | -------------------- | ----------------------------- |
+| location | `Core.azureLocation` | The name of the Azure region. |
 
 ### `TenantLocationResource` {#Azure.ResourceManager.TenantLocationResource}
 

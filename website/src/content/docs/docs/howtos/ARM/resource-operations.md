@@ -404,14 +404,15 @@ model ResourceOperationStatus<
 ### GetResourceOperationStatus
 
 `GetResourceOperationStatus` is a `GET` operation template for operation status endpoints. It supports
-all four standard ARM path patterns through its `Scope` and `LocationScope` parameters:
+all four standard ARM path patterns through its `Scope` parameter. Use the appropriate scope model to
+select the desired path:
 
-| Scope                     | LocationScope               | Path pattern                                                                                          |
-| ------------------------- | --------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `TenantActionScope`       | _(none)_                    | `GET /providers/{ns}/operationStatuses/{operationId}`                                                 |
-| `SubscriptionActionScope` | _(none)_                    | `GET /subscriptions/{sub}/providers/{ns}/operationStatuses/{operationId}`                             |
-| `TenantActionScope`       | `LocationResourceParameter` | `GET /providers/{ns}/locations/{loc}/operationStatuses/{operationId}`                                 |
-| `SubscriptionActionScope` | `LocationResourceParameter` | `GET /subscriptions/{sub}/providers/{ns}/locations/{loc}/operationStatuses/{operationId}`             |
+| Scope                         | Path pattern                                                                                              |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `TenantActionScope` (default) | `GET /providers/{ns}/operationStatuses/{operationId}`                                                     |
+| `SubscriptionActionScope`     | `GET /subscriptions/{sub}/providers/{ns}/operationStatuses/{operationId}`                                 |
+| `TenantLocationActionScope`   | `GET /providers/{ns}/locations/{loc}/operationStatuses/{operationId}`                                     |
+| `SubscriptionLocationActionScope` | `GET /subscriptions/{sub}/providers/{ns}/locations/{loc}/operationStatuses/{operationId}`             |
 
 ### Example
 
@@ -425,17 +426,12 @@ interface OperationStatuses {
   getSubscriptionStatus is GetResourceOperationStatus<ResourceOperationStatus, SubscriptionActionScope>;
 
   // Tenant + location scope
-  getTenantLocationStatus is GetResourceOperationStatus<
-    ResourceOperationStatus,
-    TenantActionScope,
-    LocationResourceParameter
-  >;
+  getTenantLocationStatus is GetResourceOperationStatus<ResourceOperationStatus, TenantLocationActionScope>;
 
   // Subscription + location scope
   getSubscriptionLocationStatus is GetResourceOperationStatus<
     ResourceOperationStatus,
-    SubscriptionActionScope,
-    LocationResourceParameter
+    SubscriptionLocationActionScope
   >;
 }
 ```
