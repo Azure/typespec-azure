@@ -23,8 +23,8 @@ import {
   Type,
 } from "@typespec/compiler";
 
-import { $ } from "@typespec/compiler/typekit";
 import { unsafe_Realm } from "@typespec/compiler/experimental";
+import { $ } from "@typespec/compiler/typekit";
 import { useStateMap } from "@typespec/compiler/utils";
 import { $bodyRoot, getHttpOperation } from "@typespec/http";
 import {

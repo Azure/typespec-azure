@@ -1,8 +1,8 @@
+import { resolveArmResources } from "@azure-tools/typespec-azure-resource-manager";
 import { resolveVirtualPath } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { parse } from "yaml";
-import { resolveArmResources } from "@azure-tools/typespec-azure-resource-manager";
 import { createSdkContext } from "../src/context.js";
 import { listClients } from "../src/decorators.js";
 import { SdkTestLibrary } from "../src/testing/index.js";
