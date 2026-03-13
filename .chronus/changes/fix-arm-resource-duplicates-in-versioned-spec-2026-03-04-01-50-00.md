@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-azure-resource-manager"
 ---
 
-Add regression tests confirming that `resolveArmResources` returns the correct number of resources (no duplicates) when called on a versioned spec, regardless of whether TCGC's `createSdkContext` has been called first.
+Fix `resolveArmResources` returning duplicate resources for versioned specs. ARM resources that are in a mutation realm (created by versioning projections from TCGC's `createSdkContext` or the autorest emitter's per-version snapshots) are now filtered out from `listArmResources`. This prevents duplicates in the resource list while keeping realm types registered so that direct lookups (e.g., `getArmResourceInfo`) continue to work correctly.

@@ -24,6 +24,7 @@ import {
 } from "@typespec/compiler";
 
 import { $ } from "@typespec/compiler/typekit";
+import { unsafe_Realm } from "@typespec/compiler/experimental";
 import { useStateMap } from "@typespec/compiler/utils";
 import { $bodyRoot, getHttpOperation } from "@typespec/http";
 import {
@@ -575,7 +576,14 @@ const [getArmResource, setArmResource, armResourceStateMap] = useStateMap<
 export { getArmResource };
 
 export function listArmResources(program: Program): ArmResourceDetails[] {
-  return [...armResourceStateMap(program).values()];
+  // Filter out realm types created by versioning mutations (e.g., from TCGC's createSdkContext
+  // or autorest's per-version snapshots). These realm copies have decorators re-applied which
+  // registers them in the state map alongside the originals, causing duplicates. We keep them
+  // registered so that getArmResource() direct lookups still work (used by getArmResourceInfo),
+  // but exclude them here so that resolveArmResources returns only the canonical resource list.
+  return [...armResourceStateMap(program).values()].filter(
+    (r) => !unsafe_Realm.realmForType.has(r.typespecType),
+  );
 }
 
 function getProperty(model: Model, propertyName: string): ModelProperty | undefined {

@@ -3805,6 +3805,8 @@ namespace Microsoft.ContosoProviderHub;
 enum Versions {
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   \`2021-10-01-preview\`,
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  \`2022-01-01\`,
 }
 
 model EmployeeParent is TrackedResource<EmployeeParentProperties> {

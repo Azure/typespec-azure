@@ -229,6 +229,7 @@ it("export TCGC output with emitter name from context", async () => {
 it("calling createSdkContext does not cause resolveArmResources to return duplicate resources", async () => {
   // Regression test: createSdkContext runs versioning mutation which re-applies decorators on
   // realm types. resolveArmResources must skip realm types so that duplicates are not registered.
+  // Using 2 versions is the key condition that reproduces the issue.
   const { program } = await ArmTester.compile(`
     @armProviderNamespace
     @service(#{ title: "Azure Management emitter Testing" })
@@ -238,6 +239,8 @@ it("calling createSdkContext does not cause resolveArmResources to return duplic
     enum Versions {
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       \`2021-10-01-preview\`,
+      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+      \`2022-01-01\`,
     }
 
     model EmployeeParent is TrackedResource<EmployeeParentProperties> {
