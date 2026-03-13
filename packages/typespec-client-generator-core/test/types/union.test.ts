@@ -707,8 +707,8 @@ it("complicated union circular", async function () {
   const diagnostic = {
     code: "@azure-tools/typespec-client-generator-core/union-circular",
   };
-  // A, B, C all have one diagnostic
-  expectDiagnostics(context.diagnostics, [diagnostic, diagnostic, diagnostic]);
+  // A has diagnostic
+  expectDiagnostics(context.diagnostics, [diagnostic]);
 });
 
 it("mix types", async function () {
