@@ -13,5 +13,5 @@ import "./versions.tsp";
 import "./mobo-ref.tsp";
 import "./network-security-perimeter-ref.tsp";
 import "./nsp-operations.tsp";
-
+import "./billing-data-ref.tsp";
 namespace Azure.ResourceManager.CommonTypes;
