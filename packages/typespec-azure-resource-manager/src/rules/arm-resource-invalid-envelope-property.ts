@@ -7,6 +7,7 @@ export const armResourceEnvelopeProperties = createRule({
   name: "arm-resource-invalid-envelope-property",
   severity: "warning",
   description: "Check for invalid resource envelope properties.",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-invalid-envelope-property",
   messages: {
     default: paramMessage`Property "${"propertyName"}" is not valid in the resource envelope.  Please remove this property, or add it to the resource-specific property bag.`,
   },

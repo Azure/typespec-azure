@@ -6,6 +6,7 @@ export const patchEnvelopePropertiesRules = createRule({
   name: "patch-envelope",
   severity: "warning",
   description: "Patch envelope properties should match the resource properties.",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/patch-envelope",
   messages: {
     default: paramMessage`The Resource PATCH request for resource '${"resourceName"}' is missing envelope properties:  [${"propertyName"}]. Since these properties are supported in the resource, they must also be updatable via PATCH.`,
   },
