@@ -58,3 +58,4 @@ for specific scenarios:
 
 - [**@azure-tools/typespec-azure-core:**](https://github.com/Azure/typespec-azure/tree/main/packages/typespec-azure-core) Provides core models and interfaces for Azure service modelling
 - [**@azure-tools/typespec-azure-resource-manager:**](https://github.com/Azure/typespec-azure/tree/main/packages/typespec-azure-resource-manager) Provides additional models and interfaces for modelling Azure Resource Manager services
+
