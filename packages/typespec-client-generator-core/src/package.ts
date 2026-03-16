@@ -140,14 +140,14 @@ function getSdkNamespace<TServiceOperation extends SdkServiceOperation>(
 }
 
 function populateApiVersionInformation(context: TCGCContext): void {
-  if (context.__rawClientsOperationGroupsCache === undefined) {
+  if (context.__rawClientsCache === undefined) {
     prepareClientAndOperationCache(context);
   }
 
   // Get the package versions map once (this handles both single and multi-service scenarios)
   const packageVersions = context.getPackageVersions();
 
-  for (const client of context.__rawClientsOperationGroupsCache!.values()) {
+  for (const client of context.__rawClientsCache!.values()) {
     const clientType = getActualClientType(client);
 
     // Multiple service case. Set empty result.
