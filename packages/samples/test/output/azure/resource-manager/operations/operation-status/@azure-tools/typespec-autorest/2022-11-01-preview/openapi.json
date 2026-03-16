@@ -46,13 +46,13 @@
     }
   ],
   "paths": {
-    "/providers/Microsoft.OperationStatusSample/locations/{location}/operationStatuses/{id}": {
+    "/providers/Microsoft.OperationStatusSample/locations/{location}/operationStatuses/{operationId}": {
       "get": {
-        "operationId": "OperationStatuses_GetStatus",
+        "operationId": "OperationStatuses_GetTenantLocationStatus",
         "tags": [
           "OperationStatuses"
         ],
-        "description": "Get a MyOpStatus",
+        "description": "Tenant+Location scope: GET /providers/{ns}/locations/{loc}/operationStatuses/{operationId}",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -61,9 +61,9 @@
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/LocationParameter"
           },
           {
-            "name": "id",
+            "name": "operationId",
             "in": "path",
-            "description": "The unique identifier for the operationStatus resource",
+            "description": "The operation ID.",
             "required": true,
             "type": "string"
           }
@@ -72,7 +72,128 @@
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "#/definitions/MyOpStatus"
+              "type": "object",
+              "description": "Standard Azure Resource Manager operation status response, used as the response\nbody for `GetResourceOperationStatus`. The `id` property is not marked as a path\nparameter, so the full value is always present in the response body.",
+              "properties": {
+                "status": {
+                  "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+                  "description": "The operation status"
+                },
+                "id": {
+                  "type": "string",
+                  "description": "The unique identifier for the operationStatus resource"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "The name of the operationStatus resource",
+                  "readOnly": true
+                },
+                "startTime": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Operation start time",
+                  "readOnly": true
+                },
+                "endTime": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Operation complete time",
+                  "readOnly": true
+                },
+                "percentComplete": {
+                  "type": "number",
+                  "format": "double",
+                  "description": "The progress made toward completing the operation",
+                  "readOnly": true
+                },
+                "error": {
+                  "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorDetail",
+                  "description": "Errors that occurred if the operation ended with Canceled or Failed status",
+                  "readOnly": true
+                }
+              },
+              "required": [
+                "status",
+                "id"
+              ]
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/providers/Microsoft.OperationStatusSample/operationStatuses/{operationId}": {
+      "get": {
+        "operationId": "OperationStatuses_GetTenantStatus",
+        "tags": [
+          "OperationStatuses"
+        ],
+        "description": "Tenant scope: GET /providers/{ns}/operationStatuses/{operationId}",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "operationId",
+            "in": "path",
+            "description": "The operation ID.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "type": "object",
+              "description": "Standard Azure Resource Manager operation status response, used as the response\nbody for `GetResourceOperationStatus`. The `id` property is not marked as a path\nparameter, so the full value is always present in the response body.",
+              "properties": {
+                "status": {
+                  "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+                  "description": "The operation status"
+                },
+                "id": {
+                  "type": "string",
+                  "description": "The unique identifier for the operationStatus resource"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "The name of the operationStatus resource",
+                  "readOnly": true
+                },
+                "startTime": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Operation start time",
+                  "readOnly": true
+                },
+                "endTime": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Operation complete time",
+                  "readOnly": true
+                },
+                "percentComplete": {
+                  "type": "number",
+                  "format": "double",
+                  "description": "The progress made toward completing the operation",
+                  "readOnly": true
+                },
+                "error": {
+                  "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorDetail",
+                  "description": "Errors that occurred if the operation ended with Canceled or Failed status",
+                  "readOnly": true
+                }
+              },
+              "required": [
+                "status",
+                "id"
+              ]
             }
           },
           "default": {
@@ -115,13 +236,13 @@
         }
       }
     },
-    "/subscriptions/{subscriptionId}/providers/Microsoft.OperationStatusSample/locations/{location}/operationStatuses/{id}": {
+    "/subscriptions/{subscriptionId}/providers/Microsoft.OperationStatusSample/locations/{location}/operationStatuses/{operationId}": {
       "get": {
-        "operationId": "OperationStatuses_GetSubscriptionStatus",
+        "operationId": "OperationStatuses_GetSubscriptionLocationStatus",
         "tags": [
           "OperationStatuses"
         ],
-        "description": "Get a MySubOpStatus",
+        "description": "Subscription+Location scope: GET /subscriptions/{sub}/providers/{ns}/locations/{loc}/operationStatuses/{operationId}",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -133,9 +254,9 @@
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/LocationParameter"
           },
           {
-            "name": "id",
+            "name": "operationId",
             "in": "path",
-            "description": "The unique identifier for the operationStatus resource",
+            "description": "The operation ID.",
             "required": true,
             "type": "string"
           }
@@ -144,7 +265,50 @@
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "#/definitions/MySubOpStatus"
+              "type": "object",
+              "description": "Standard Azure Resource Manager operation status response, used as the response\nbody for `GetResourceOperationStatus`. The `id` property is not marked as a path\nparameter, so the full value is always present in the response body.",
+              "properties": {
+                "status": {
+                  "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+                  "description": "The operation status"
+                },
+                "id": {
+                  "type": "string",
+                  "description": "The unique identifier for the operationStatus resource"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "The name of the operationStatus resource",
+                  "readOnly": true
+                },
+                "startTime": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Operation start time",
+                  "readOnly": true
+                },
+                "endTime": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Operation complete time",
+                  "readOnly": true
+                },
+                "percentComplete": {
+                  "type": "number",
+                  "format": "double",
+                  "description": "The progress made toward completing the operation",
+                  "readOnly": true
+                },
+                "error": {
+                  "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorDetail",
+                  "description": "Errors that occurred if the operation ended with Canceled or Failed status",
+                  "readOnly": true
+                }
+              },
+              "required": [
+                "status",
+                "id"
+              ]
             }
           },
           "default": {
@@ -156,13 +320,13 @@
         }
       }
     },
-    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationStatusSample/locations/{location}/operationStatuses/{id}": {
+    "/subscriptions/{subscriptionId}/providers/Microsoft.OperationStatusSample/operationStatuses/{operationId}": {
       "get": {
-        "operationId": "OperationStatuses_GetRgStatus",
+        "operationId": "OperationStatuses_GetSubscriptionStatus",
         "tags": [
           "OperationStatuses"
         ],
-        "description": "Get a MyResourceGroupStatus",
+        "description": "Subscription scope: GET /subscriptions/{sub}/providers/{ns}/operationStatuses/{operationId}",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -171,15 +335,9 @@
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
-          },
-          {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/LocationParameter"
-          },
-          {
-            "name": "id",
+            "name": "operationId",
             "in": "path",
-            "description": "The unique identifier for the operationStatus resource",
+            "description": "The operation ID.",
             "required": true,
             "type": "string"
           }
@@ -188,7 +346,50 @@
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "#/definitions/MyResourceGroupStatus"
+              "type": "object",
+              "description": "Standard Azure Resource Manager operation status response, used as the response\nbody for `GetResourceOperationStatus`. The `id` property is not marked as a path\nparameter, so the full value is always present in the response body.",
+              "properties": {
+                "status": {
+                  "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+                  "description": "The operation status"
+                },
+                "id": {
+                  "type": "string",
+                  "description": "The unique identifier for the operationStatus resource"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "The name of the operationStatus resource",
+                  "readOnly": true
+                },
+                "startTime": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Operation start time",
+                  "readOnly": true
+                },
+                "endTime": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Operation complete time",
+                  "readOnly": true
+                },
+                "percentComplete": {
+                  "type": "number",
+                  "format": "double",
+                  "description": "The progress made toward completing the operation",
+                  "readOnly": true
+                },
+                "error": {
+                  "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorDetail",
+                  "description": "Errors that occurred if the operation ended with Canceled or Failed status",
+                  "readOnly": true
+                }
+              },
+              "required": [
+                "status",
+                "id"
+              ]
             }
           },
           "default": {
@@ -232,144 +433,6 @@
         ]
       },
       "readOnly": true
-    },
-    "MyOpStatus": {
-      "type": "object",
-      "description": "The standard operation status",
-      "properties": {
-        "status": {
-          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The operation status"
-        },
-        "id": {
-          "type": "string",
-          "description": "The unique identifier for the operationStatus resource"
-        },
-        "name": {
-          "type": "string",
-          "description": "The name of the  operationStatus resource",
-          "readOnly": true
-        },
-        "startTime": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Operation start time",
-          "readOnly": true
-        },
-        "endTime": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Operation complete time",
-          "readOnly": true
-        },
-        "percentComplete": {
-          "type": "number",
-          "format": "double",
-          "description": "The progress made toward completing the operation",
-          "readOnly": true
-        },
-        "error": {
-          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorDetail",
-          "description": "Errors that occurred if the operation ended with Canceled or Failed status",
-          "readOnly": true
-        }
-      },
-      "required": [
-        "status",
-        "id"
-      ]
-    },
-    "MyResourceGroupStatus": {
-      "type": "object",
-      "description": "Standard Azure Resource Manager operation status response",
-      "properties": {
-        "status": {
-          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The operation status"
-        },
-        "id": {
-          "type": "string",
-          "description": "The unique identifier for the operationStatus resource"
-        },
-        "name": {
-          "type": "string",
-          "description": "The name of the  operationStatus resource",
-          "readOnly": true
-        },
-        "startTime": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Operation start time",
-          "readOnly": true
-        },
-        "endTime": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Operation complete time",
-          "readOnly": true
-        },
-        "percentComplete": {
-          "type": "number",
-          "format": "double",
-          "description": "The progress made toward completing the operation",
-          "readOnly": true
-        },
-        "error": {
-          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorDetail",
-          "description": "Errors that occurred if the operation ended with Canceled or Failed status",
-          "readOnly": true
-        }
-      },
-      "required": [
-        "status",
-        "id"
-      ]
-    },
-    "MySubOpStatus": {
-      "type": "object",
-      "description": "The standard operation status at the subscription level]",
-      "properties": {
-        "status": {
-          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "The operation status"
-        },
-        "id": {
-          "type": "string",
-          "description": "The unique identifier for the operationStatus resource"
-        },
-        "name": {
-          "type": "string",
-          "description": "The name of the  operationStatus resource",
-          "readOnly": true
-        },
-        "startTime": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Operation start time",
-          "readOnly": true
-        },
-        "endTime": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Operation complete time",
-          "readOnly": true
-        },
-        "percentComplete": {
-          "type": "number",
-          "format": "double",
-          "description": "The progress made toward completing the operation",
-          "readOnly": true
-        },
-        "error": {
-          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorDetail",
-          "description": "Errors that occurred if the operation ended with Canceled or Failed status",
-          "readOnly": true
-        }
-      },
-      "required": [
-        "status",
-        "id"
-      ]
     }
   },
   "parameters": {}
