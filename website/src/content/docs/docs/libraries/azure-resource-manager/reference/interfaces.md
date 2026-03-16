@@ -1021,23 +1021,6 @@ op Azure.ResourceManager.ArmProviderActionSync(apiVersion: string, subscriptionI
 | Error               | Optional. The error response, if non-standard.                                                        |
 | OptionalRequestBody | Optional. Indicates whether the request body is optional.                                             |
 
-### `GetResourceOperationStatus` {#Azure.ResourceManager.GetResourceOperationStatus}
-
-Get the status of an async operation.
-
-```typespec
-op Azure.ResourceManager.GetResourceOperationStatus(apiVersion: string, provider: "Microsoft.ThisWillBeReplaced", operationId: string): Azure.ResourceManager.ArmResponse<Response> | Error
-```
-
-#### Template Parameters
-
-| Name       | Description                                                                             |
-| ---------- | --------------------------------------------------------------------------------------- |
-| Response   | The type of the response body. Defaults to ResourceOperationStatus.                     |
-| Scope      | The scope of the operation. Defaults to TenantActionScope.                              |
-| Parameters | Optional. Additional non-path parameters (e.g. query or header parameters).             |
-| Error      | Optional. The error response, if non-standard.                                          |
-
 ### `ArmResourceActionAsync` {#Azure.ResourceManager.ArmResourceActionAsync}
 
 ```typespec
@@ -1462,6 +1445,29 @@ op Azure.ResourceManager.checkLocalNameAvailability(apiVersion: string, subscrip
 | Request          | the availability request, defaults to the standard request, containing name and resource type |
 | Response         | the availability response, default to the standard response                                   |
 | AdditionalParams | A model specifying additional non-path parameters to the availability request                 |
+
+### `GetResourceOperationStatus` {#Azure.ResourceManager.GetResourceOperationStatus}
+
+A resource GET operation template for an Azure Resource Manager Operation Status endpoint.
+The path is determined by the `Scope` parameter. Use one of the four standard scope models:
+
+- `TenantActionScope` (default): `GET /providers/{providerNamespace}/operationStatuses/{operationId}`
+- `SubscriptionActionScope`: `GET /subscriptions/{subscriptionId}/providers/{providerNamespace}/operationStatuses/{operationId}`
+- `TenantLocationActionScope`: `GET /providers/{providerNamespace}/locations/{location}/operationStatuses/{operationId}`
+- `SubscriptionLocationActionScope`: `GET /subscriptions/{subscriptionId}/providers/{providerNamespace}/locations/{location}/operationStatuses/{operationId}`
+
+```typespec
+op Azure.ResourceManager.GetResourceOperationStatus(apiVersion: string, subscriptionId: Azure.Core.uuid, location: string, resourceGroupName: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced", operationId: string): Azure.ResourceManager.ArmResponse<ResponseBody> | Error
+```
+
+#### Template Parameters
+
+| Name       | Description                                                                 |
+| ---------- | --------------------------------------------------------------------------- |
+| Response   | The type of the response body. Defaults to ResourceOperationStatus.         |
+| Scope      | The scope of the operation. Defaults to TenantActionScope.                  |
+| Parameters | Optional. Additional non-path parameters (e.g. query or header parameters). |
+| Error      | Optional. The error response, if non-standard.                              |
 
 ## Azure.ResourceManager.CommonTypes
 

@@ -24,9 +24,11 @@ model Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders>
 ```typespec
 @post
 op post(
-  ...ResourceInstanceParameters<Employee>,
-): ArmAcceptedLroResponse<LroHeaders = ArmLroLocationHeader<FinalResult = Employee> &
-  Azure.Core.Foundations.RetryAfterHeader> | ErrorResponse;
+ ...ResourceInstanceParameters<Employee>,
+): ArmAcceptedLroResponse<
+   LroHeaders = ArmLroLocationHeader<FinalResult = Employee> &
+   Azure.Core.Foundations.RetryAfterHeader
+> | ErrorResponse;
 ```
 
 #### Properties
@@ -52,9 +54,9 @@ model Azure.ResourceManager.ArmAcceptedResponse<Message, ExtraHeaders>
 
 ```typespec
 op post is ArmProviderActionSync<
-  Request = Employee,
-  Response = ArmAcceptedResponse<ExtraHeaders = ArmLroLocationHeader>,
-  Scope = SubscriptionActionScope
+ Request = Employee,
+ Response = ArmAcceptedResponse<ExtraHeaders = ArmLroLocationHeader>,
+ Scope = SubscriptionActionScope
 >;
 ```
 
@@ -84,10 +86,10 @@ model Azure.ResourceManager.ArmAsyncOperationHeader<StatusMonitor, UrlValue, Fin
 
 ```typespec
 op changeWidget is ArmResourceActionAsync<
-  WidgetResource,
-  WidgetResourceRequest,
-  WidgetResourceResponse,
-  LroHeaders = ArmAsyncOperationHeader<FinalResult = WidgetResource>
+ WidgetResource,
+ WidgetResourceRequest,
+ WidgetResourceResponse,
+ LroHeaders = ArmAsyncOperationHeader<FinalResult = WidgetResource>
 >;
 ```
 
@@ -117,10 +119,10 @@ model Azure.ResourceManager.ArmCombinedLroHeaders<StatusMonitor, FinalResult, Po
 #### Examples
 
 ```typespec
-op delete is ArmResourceDeleteWithoutOkAsync<
-  Employee,
-  LroHeaders = ArmCombinedLroHeaders<ArmOperationStatus, Employee>
->;
+ op delete is ArmResourceDeleteWithoutOkAsync<
+   Employee,
+   LroHeaders = ArmCombinedLroHeaders<ArmOperationStatus, Employee>
+ >;
 ```
 
 #### Properties
@@ -151,9 +153,7 @@ model Azure.ResourceManager.ArmCreatedResponse<ResponseBody, ExtraHeaders>
 @post
 op post(...ResourceInstanceParameters<Employee>): ArmCreatedResponse<
   Employee,
-  ExtraHeaders = {
-    @header("x-ms-client-request-id") clientRequestId: string;
-  }
+  ExtraHeaders = {@header("x-ms-client-request-id") clientRequestId: string}
 >;
 ```
 
@@ -180,8 +180,8 @@ model Azure.ResourceManager.ArmDeleteAcceptedLroResponse<LroHeaders>
 
 ```typespec
 op delete is ArmResourceDeleteWithoutOkAsync<
-  Employee,
-  Response = ArmDeleteAcceptedLroResponse | ArmDeletedNoContentResponse
+ Employee,
+ Response = ArmDeleteAcceptedLroResponse | ArmDeletedNoContentResponse
 >;
 ```
 
@@ -214,8 +214,8 @@ model Azure.ResourceManager.ArmDeletedNoContentResponse
 
 ```typespec
 op delete is ArmResourceDeleteWithoutOkAsync<
-  Employee,
-  Response = ArmDeleteAcceptedLroResponse | ArmDeletedNoContentResponse
+ Employee,
+ Response = ArmDeleteAcceptedLroResponse | ArmDeletedNoContentResponse
 >;
 ```
 
@@ -236,11 +236,11 @@ model Azure.ResourceManager.ArmDeletedResponse
 #### Examples
 
 ```typespec
-@delete
-@armResourceDelete(Employee)
+ @delete
+ @armResourceDelete(Employee)
 op delete(
-  ...ResourceInstanceParameters<Employee>,
-): ArmDeletedResponse | ArmDeletedNoContentResponse | ErrorResponse;
+   ...ResourceInstanceParameters<Employee>,
+ ): ArmDeletedResponse | ArmDeletedNoContentResponse | ErrorResponse;
 ```
 
 #### Properties
@@ -283,7 +283,7 @@ model Azure.ResourceManager.ArmLocationResource<BaseType>
 ```typespec
 @parentResource(ArmLocationResource<"ResourceGroup">)
 model Employee is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<Employee>;
+ ...ResourceNameParameter<Employee>;
 }
 ```
 
@@ -313,14 +313,14 @@ model Azure.ResourceManager.ArmLroLocationHeader<LroPollingOptions, FinalResult,
 
 ```typespec
 op update is ArmResourceActionAsync<
-  Employee,
-  Employee,
-  OkResponse,
-  LroHeaders = ArmLroLocationHeader<
-    Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
-    Employee
-  >
->;
+ Employee,
+ Employee,
+ OkResponse,
+ LroHeaders = ArmLroLocationHeader<
+   Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
+   Employee
+ >
+  >;
 ```
 
 #### Properties
@@ -384,36 +384,6 @@ model Azure.ResourceManager.ArmOperationStatus<Properties, StatusValues>
 | percentComplete? | `float64`                                                                      | The progress made toward completing the operation                                                                |
 | error?           | [`ErrorDetail`](./data-types.md#Azure.ResourceManager.CommonTypes.ErrorDetail) | Errors that occurred if the operation ended with Canceled or Failed status                                       |
 
-### `ResourceOperationStatus` {#Azure.ResourceManager.ResourceOperationStatus}
-
-Standard Azure Resource Manager operation status response, used as the response
-body for `GetResourceOperationStatus`. The `id` property is not marked as a path
-parameter, so the full value is always present in the response body.
-
-```typespec
-model Azure.ResourceManager.ResourceOperationStatus<Properties, StatusValues>
-```
-
-#### Template Parameters
-
-| Name         | Description                                    |
-| ------------ | ---------------------------------------------- |
-| Properties   | Optional resource-specific properties          |
-| StatusValues | The set of allowed values for operation status |
-
-#### Properties
-
-| Name             | Type                                                                           | Description                                                                                                      |
-| ---------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
-| properties?      | `Properties`                                                                   | RP-specific properties for the operationStatus resource, only appears when operation ended with Succeeded status |
-| status           | `StatusValues`                                                                 | The operation status                                                                                             |
-| id               | `string`                                                                       | The unique identifier for the operationStatus resource                                                           |
-| name?            | `string`                                                                       | The name of the operationStatus resource                                                                         |
-| startTime?       | `utcDateTime`                                                                  | Operation start time                                                                                             |
-| endTime?         | `utcDateTime`                                                                  | Operation complete time                                                                                          |
-| percentComplete? | `float64`                                                                      | The progress made toward completing the operation                                                                |
-| error?           | [`ErrorDetail`](./data-types.md#Azure.ResourceManager.CommonTypes.ErrorDetail) | Errors that occurred if the operation ended with Canceled or Failed status                                       |
-
 ### `ArmResourceCreatedResponse` {#Azure.ResourceManager.ArmResourceCreatedResponse}
 
 ```typespec
@@ -434,8 +404,7 @@ op createOrUpdate is ArmResourceCreateOrReplaceAsync<
   Employee,
   Response = ArmResponse<Employee> | ArmResourceCreatedResponse<
     Employee,
-    LroHeaders = ArmLroLocationHeader<FinalResult = Employee> &
-      Azure.Core.Foundations.RetryAfterHeader
+    LroHeaders = ArmLroLocationHeader<FinalResult = Employee> & Azure.Core.Foundations.RetryAfterHeader
   >
 >;
 ```
@@ -463,8 +432,8 @@ model Azure.ResourceManager.ArmResourceCreatedSyncResponse<Resource>
 
 ```typespec
 op createOrUpdate is ArmResourceCreateOrReplaceSync<
-  Employee,
-  Response = ArmResponse<Employee> | ArmResourceCreatedSyncResponse<Employee>
+ Employee,
+ Response = ArmResponse<Employee> | ArmResourceCreatedSyncResponse<Employee>
 >;
 ```
 
@@ -522,7 +491,9 @@ model Azure.ResourceManager.ArmResourceUpdatedResponse<Resource>
 
 ```typespec
 @put
-op update(...ResourceInstanceParameters<Employee>): ArmResourceUpdatedResponse<Employee>;
+op update(
+ ...ResourceInstanceParameters<Employee>,
+): ArmResourceUpdatedResponse<Employee>;
 ```
 
 #### Properties
@@ -549,7 +520,7 @@ model Azure.ResourceManager.ArmResponse<ResponseBody>
 #### Examples
 
 ```typespec
-op get is ArmResourceRead<Employee, Response = ArmResponse<Employee>>;
+ op get is ArmResourceRead<Employee, Response = ArmResponse<Employee>>;
 ```
 
 #### Properties
@@ -600,7 +571,7 @@ model Azure.ResourceManager.AvailabilityZonesProperty
 
 ```typespec
 model Foo is TrackedResource<FooProperties> {
-  ...AvailabilityZonesProperty;
+ ...AvailabilityZonesProperty;
 }
 ```
 
@@ -624,7 +595,7 @@ model Azure.ResourceManager.DefaultProvisioningStateProperty
 ```typespec
 model FooProperties {
   // Only have standard Succeeded, Failed, Cancelled states
-  ...DefaultProvisioningStateProperty;
+  ...DefaultProvisioningStateProperty,
 }
 ```
 
@@ -693,8 +664,8 @@ model Azure.ResourceManager.ExtendedLocationProperty
 
 ```typespec
 model Employee is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<Employee>;
-  ...ExtendedLocationProperty;
+...ResourceNameParameter<Employee>;
+...ExtendedLocationProperty;
 }
 ```
 
@@ -746,12 +717,12 @@ model Azure.ResourceManager.ExtensionResource<Properties, PropertiesOptional>
 
 ```typespec
 model PetInstance is ExtensionResource<PetProperties> {
-  @key
-  @path
-  @segment("petInstances")
-  @pattern("^[a-zA-Z0-9-]{3,24}$")
-  @visibility(Lifecycle.Read)
-  name: string;
+ @key
+ @path
+ @segment("petInstances")
+ @pattern("^[a-zA-Z0-9-]{3,24}$")
+ @visibility(Lifecycle.Read)
+ name: string;
 }
 ```
 
@@ -1039,7 +1010,7 @@ model Azure.ResourceManager.ProxyResource<Properties, PropertiesOptional>
 
 ```typespec
 model Employee is ProxyResource<EmployeeProperties> {
-  ...ResourceNameParameter<Employee>;
+ ...ResourceNameParameter<Employee>;
 }
 ```
 
@@ -1083,7 +1054,9 @@ model Azure.ResourceManager.ResourceInstanceParameters<Resource, BaseParameters>
 #### Examples
 
 ```typespec
-op get(...ResourceInstanceParameters<Employee>): ArmResponse<EmployeeResponse> | ErrorResponse;
+op get(
+ ...ResourceInstanceParameters<Employee>,
+): ArmResponse<EmployeeResponse> | ErrorResponse;
 ```
 
 #### Properties
@@ -1161,9 +1134,9 @@ model Azure.ResourceManager.ResourceListResult<Resource>
 
 ```typespec
 op list is ArmResourceActionSync<
-  Resource = Employee,
-  Request = void,
-  Response = ResourceListResult<Employee>
+ Resource = Employee,
+ Request = void,
+ Response = ResourceListResult<Employee>
 >;
 ```
 
@@ -1200,12 +1173,12 @@ model Azure.ResourceManager.ResourceNameParameter<Resource, KeyName, SegmentName
 
 ```typespec
 model Employee is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<
-    Resource = Employee,
-    KeyName = "employeeName",
-    SegmentName = "employees",
-    NamePattern = "^[^<>%&:?#/\\\\]+$"
-  >;
+ ...ResourceNameParameter<
+   Resource = Employee,
+   KeyName = "employeeName",
+   SegmentName = "employees",
+   NamePattern = "^[^<>%&:?#/\\\\]+$"
+ >;
 }
 ```
 
@@ -1230,6 +1203,36 @@ model Azure.ResourceManager.ResourceOperationOptions
 | resourceType?      | `Model`   | The resource type for the operations in the interface                                                                                      |
 | allowStaticRoutes? | `boolean` | If true, turns off autoRoute for the interface, so individual operations can choose static (`@route`) or automatic (`@autoRoute`) routing. |
 | omitTags?          | `boolean` | If true, turns off the default tagging of operations in the interface, so that individual operations must be individually tagged           |
+
+### `ResourceOperationStatus` {#Azure.ResourceManager.ResourceOperationStatus}
+
+Standard Azure Resource Manager operation status response, used as the response
+body for `GetResourceOperationStatus`. The `id` property is not marked as a path
+parameter, so the full value is always present in the response body.
+
+```typespec
+model Azure.ResourceManager.ResourceOperationStatus<Properties, StatusValues>
+```
+
+#### Template Parameters
+
+| Name         | Description                                    |
+| ------------ | ---------------------------------------------- |
+| Properties   | Optional resource-specific properties          |
+| StatusValues | The set of allowed values for operation status |
+
+#### Properties
+
+| Name             | Type                                                                           | Description                                                                                                      |
+| ---------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| properties?      | `Properties`                                                                   | RP-specific properties for the operationStatus resource, only appears when operation ended with Succeeded status |
+| status           | `StatusValues`                                                                 | The operation status                                                                                             |
+| id               | `string`                                                                       | The unique identifier for the operationStatus resource                                                           |
+| name?            | `string`                                                                       | The name of the operationStatus resource                                                                         |
+| startTime?       | `utcDateTime`                                                                  | Operation start time                                                                                             |
+| endTime?         | `utcDateTime`                                                                  | Operation complete time                                                                                          |
+| percentComplete? | `float64`                                                                      | The progress made toward completing the operation                                                                |
+| error?           | [`ErrorDetail`](./data-types.md#Azure.ResourceManager.CommonTypes.ErrorDetail) | Errors that occurred if the operation ended with Canceled or Failed status                                       |
 
 ### `ResourceParentParameters` {#Azure.ResourceManager.ResourceParentParameters}
 
@@ -1313,7 +1316,7 @@ model Azure.ResourceManager.ResourceUriParameter
 
 ```typespec
 model Employee {
-  ...ResourceUriParameter;
+ ...ResourceUriParameter;
 }
 ```
 
@@ -1393,7 +1396,7 @@ model Azure.ResourceManager.SubscriptionLocationResource
 ```typespec
 @parentResource(SubscriptionLocationResource)
 model Employee is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<Employee>;
+ ...ResourceNameParameter<Employee>;
 }
 ```
 
@@ -1459,7 +1462,7 @@ model Azure.ResourceManager.TenantLocationResource
 ```typespec
 @parentResource(TenantLocationResource)
 model Employee is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<Employee>;
+ ...ResourceNameParameter<Employee>
 }
 ```
 
@@ -1490,7 +1493,7 @@ model Azure.ResourceManager.TrackedResource<Properties, PropertiesOptional>
 
 ```typespec
 model Employee is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<Employee>;
+ ...ResourceNameParameter<Employee>
 }
 ```
 
@@ -1513,7 +1516,7 @@ union Azure.ResourceManager.ResourceProvisioningState
 
 ```typespec
 union FooProvisioningState {
-  ResourceProvisioningState, // include standard provisioning states
+  ResourceProvisioningState,  // include standard provisioning states
   starting: "starting",
   started: "started",
   stopping: "stopping",
@@ -1570,7 +1573,7 @@ model Azure.ResourceManager.CommonTypes.ApiVersionParameter
 
 ```typespec
 model Employee is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<Employee>;
+ ...ResourceNameParameter<Employee>;
 }
 ```
 
@@ -1878,10 +1881,10 @@ model Azure.ResourceManager.CommonTypes.LocationParameter
 
 ```typespec
 op employee is ArmProviderActionSync<
-  Request = Employee,
-  Response = Employee,
-  Scope = SubscriptionActionScope,
-  Parameters = LocationParameter
+ Request = Employee,
+ Response = Employee,
+ Scope = SubscriptionActionScope,
+ Parameters = LocationParameter
 >;
 ```
 
@@ -3058,6 +3061,7 @@ model Azure.ResourceManager.Extension.ExternalChildResource<ParentModel, Resourc
 
 ```typespec
 alias VirtualMachine = ExternalResource<"Microsoft.Compute", "virtualMachines", "vmName">;
+
 ```
 
 ```typespec
@@ -3072,6 +3076,7 @@ alias VirtualMachineScaleSetVm = Extension.ExternalChildResource<
   "virtualMachineScaleSetVms",
   "scaleSetVmName"
 >;
+
 ```
 
 #### Properties
@@ -3104,6 +3109,7 @@ model Azure.ResourceManager.Extension.ExternalResource<TargetNamespace, Resource
 
 ```typespec
 alias VirtualMachine = ExternalResource<"Microsoft.Compute", "virtualMachines", "vmName">;
+
 ```
 
 ```typespec
@@ -3112,6 +3118,7 @@ alias Scaleset = Extension.ExternalResource<
   "virtualMachineScaleSets",
   "scaleSetName"
 >;
+
 ```
 
 #### Properties
@@ -3170,7 +3177,7 @@ model Azure.ResourceManager.Extension.ScopeParameter<Type>
 
 ```typespec
 model Employee {
-  ...ResourceUriParameter;
+ ...ResourceUriParameter;
 }
 ```
 
@@ -3691,11 +3698,11 @@ model Azure.ResourceManager.Legacy.DiscriminatedExtensionResource<KindType, Desc
 #### Examples
 
 ```typespec
-model Pet is DiscriminatedExtensionResource;
+model Pet is DiscriminatedExtensionResource {}
 
 model Dog extends Pet {
-  kind: "dog";
-  properties: DogProperties;
+ kind: "dog";
+ properties: DogProperties;
 }
 ```
 
@@ -3725,11 +3732,11 @@ model Azure.ResourceManager.Legacy.DiscriminatedProxyResource<KindType, Descript
 #### Examples
 
 ```typespec
-model Pet is DiscriminatedProxyResource;
+model Pet is DiscriminatedProxyResource {}
 
 model Dog extends Pet {
-  kind: "dog";
-  properties: DogProperties;
+ kind: "dog";
+ properties: DogProperties;
 }
 ```
 
@@ -3759,11 +3766,11 @@ model Azure.ResourceManager.Legacy.DiscriminatedTrackedResource<KindType, Descri
 #### Examples
 
 ```typespec
-model Pet is DiscriminatedTrackedResource;
+model Pet is DiscriminatedTrackedResource {}
 
 model Dog extends Pet {
-  kind: "dog";
-  properties: DogProperties;
+ kind: "dog";
+ properties: DogProperties;
 }
 ```
 
@@ -3801,8 +3808,8 @@ model Azure.ResourceManager.Legacy.ExtendedLocationOptionalProperty
 
 ```typespec
 model Employee is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<Employee>;
-  ...ExtendedLocationOptionalProperty;
+...ResourceNameParameter<Employee>;
+...ExtendedLocationOptionalProperty;
 }
 ```
 
@@ -3957,7 +3964,7 @@ model Azure.ResourceManager.Legacy.TrackedResourceWithOptionalLocation<Propertie
 
 ```typespec
 model Employee is TrackedResourceWithOptionalLocation<EmployeeProperties> {
-  ...ResourceNameParameter<Employee>;
+ ...ResourceNameParameter<Employee>
 }
 ```
 
