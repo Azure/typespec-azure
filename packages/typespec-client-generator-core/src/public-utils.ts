@@ -24,7 +24,16 @@ import { HttpOperation, Visibility, getHttpOperation, isMetadata, isVisible } fr
 import { getOperationId } from "@typespec/openapi";
 import { Version, getVersions } from "@typespec/versioning";
 import { pascalCase } from "change-case";
-import { getClientLocation, getClientNameOverride, getIsApiVersion } from "./decorators.js";
+import pluralize from "pluralize";
+import {
+  getClientLocation,
+  getClientNameOverride,
+  getIsApiVersion,
+  getOverriddenClientMethod,
+  listClients,
+  listOperationsInClient,
+  listSubClients,
+} from "./decorators.js";
 import {
   DecoratedType,
   SdkBodyParameter,
@@ -47,6 +56,8 @@ import {
   AllScopes,
   ContextNode,
   TspLiteralType,
+  getHttpBodyType,
+  getHttpOperationResponseHeaders,
   hasNoneVisibility,
   isAzureCoreTspModel,
   listAllUserDefinedNamespaces,
@@ -371,14 +382,14 @@ function findContextPath(
     }
   }
   for (const client of listClients(context)) {
-    for (const operation of listOperationsInOperationGroup(context, client)) {
+    for (const operation of listOperationsInClient(context, client)) {
       const result = getContextPath(context, operation, type);
       if (result.length > 0) {
         return result;
       }
     }
-    for (const og of listOperationGroups(context, client, true)) {
-      for (const operation of listOperationsInOperationGroup(context, og)) {
+    for (const subClient of listSubClients(context, client, true)) {
+      for (const operation of listOperationsInClient(context, subClient)) {
         const result = getContextPath(context, operation, type);
         if (result.length > 0) {
           return result;

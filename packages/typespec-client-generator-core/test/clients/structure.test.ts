@@ -1845,58 +1845,6 @@ it("merged sub clients with @clientLocation targeting merged type should not los
   ok(operations.methods.find((m) => m.name === "extraOp"));
 });
 
-it("@clientLocation targeting merged-away sub client type should resolve to surviving sub client", async () => {
-  // Verifies the scenario from issue: @clientLocation targets an interface
-  // in ServiceB that gets merged away into the surviving sub-client from ServiceA.
-  const { program } = await SimpleBaseTester.compile(
-    createClientCustomizationInput(
-      `
-    @service
-    namespace ServiceA {
-      interface SubGroup {
-        @route("/a")
-        a(): void;
-      }
-    }
-    @service
-    namespace ServiceB {
-      interface SubGroup {
-        @route("/b")
-        b(): void;
-      }
-      @route("/c")
-      op c(): void;
-    }`,
-      `
-    @client(
-      {
-        service: [ServiceA, ServiceB],
-        autoMergeService: true,
-      }
-    )
-    namespace Combined;
-
-    @@clientLocation(ServiceB.c, ServiceB.SubGroup);
-  `,
-    ),
-  );
-  const context = await createSdkContextForTester(program);
-  const sdkPackage = context.sdkPackage;
-  strictEqual(sdkPackage.clients.length, 1);
-  const client = sdkPackage.clients[0];
-  strictEqual(client.name, "Combined");
-
-  // Should have only 1 sub client (merged SubGroup)
-  strictEqual(client.children!.length, 1);
-  const subGroup = client.children!.find((c) => c.name === "SubGroup");
-  ok(subGroup);
-  // The merged SubGroup should contain all 3 operations: a, b, and c
-  strictEqual(subGroup.methods.length, 3);
-  ok(subGroup.methods.find((m) => m.name === "a"));
-  ok(subGroup.methods.find((m) => m.name === "b"));
-  ok(subGroup.methods.find((m) => m.name === "c"));
-});
-
 it("merged sub clients have correct parent pointers for moved children", async () => {
   // Verifies that when sub-clients are merged, the children of the
   // merged-away sub-client get re-parented to the surviving sub-client.

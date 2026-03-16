@@ -12,7 +12,10 @@ using Spector;
 @doc("""
   Test that we can grow up a service spec and service deployment into a multi-versioned service with full client support.
   """)
-@clientName("ResiliencyServiceDrivenClient")
+@client({
+  name: "ResiliencyServiceDrivenClient",
+  service: Resiliency.ServiceDriven,
+})
 @service
 @server(
   "{endpoint}/resiliency/service-driven/client:v1/service:{serviceDeploymentVersion}/api-version:{apiVersion}",

@@ -319,13 +319,13 @@ export function listOperationsInClient(
 ): Operation[] {
   if (!ignoreHierarchy) return context.getOperationsForClient(client);
 
-  const groups: SdkOperationGroup[] = [...group.subOperationGroups];
-  const operations: Operation[] = [...context.getOperationsForClient(group)];
+  const subClients: SdkClient[] = [...client.subClients];
+  const operations: Operation[] = [...context.getOperationsForClient(client)];
   let groupIdx = 0;
-  while (groupIdx < groups.length) {
-    const operationGroup = groups[groupIdx++];
-    if (operationGroup.subOperationGroups) {
-      groups.push(...operationGroup.subOperationGroups);
+  while (groupIdx < subClients.length) {
+    const subClient = subClients[groupIdx++];
+    if (subClient.subClients) {
+      subClients.push(...subClient.subClients);
     }
     operations.push(...context.getOperationsForClient(subClient));
   }

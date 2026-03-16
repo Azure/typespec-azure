@@ -863,7 +863,7 @@ describe("corner case", () => {
   });
 
   it("anonymous model naming in multi layer sub client", async () => {
-    const { program } = await SimpleTester.compile(t.code`
+    const { program, TestModel } = await SimpleTester.compile(t.code`
       @service
       namespace MyService {
         namespace Test {

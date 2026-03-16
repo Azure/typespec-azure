@@ -21,7 +21,10 @@ using Spector;
   - A client generated from the second service spec can call the second deployment of a service with api version v1
   - A client generated from the second service spec can call the second deployment of a service with api version v2
   """)
-@clientName("ResiliencyServiceDrivenClient")
+@client({
+  name: "ResiliencyServiceDrivenClient",
+  service: Resiliency.ServiceDriven,
+})
 @service
 @server(
   "{endpoint}/resiliency/service-driven/client:v2/service:{serviceDeploymentVersion}/api-version:{apiVersion}",

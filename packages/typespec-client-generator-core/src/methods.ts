@@ -26,7 +26,7 @@ import {
   getNextLinkVerb,
   getOverriddenClientMethod,
   getResponseAsBool,
-  isInScope,
+  listOperationsInClient,
   shouldGenerateConvenient,
   shouldGenerateProtocol,
 } from "./decorators.js";
