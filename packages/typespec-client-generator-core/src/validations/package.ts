@@ -17,7 +17,10 @@ function validateNamespaces(context: TCGCContext) {
 }
 function validateDecoratorsAppliedToVersionedService(context: TCGCContext, namespace: Namespace) {
   const versions = getVersions(context.program, namespace)[1];
-  if (versions === undefined && getExplicitClientApiVersions(context, namespace)) {
+  if (
+    (versions === undefined || versions.getVersions().length === 0) &&
+    getExplicitClientApiVersions(context, namespace)
+  ) {
     reportDiagnostic(context.program, {
       code: "require-versioned-service",
       format: {
@@ -34,7 +37,7 @@ function validateClientApiVersionsIncludesAllServiceVersions(
   namespace: Namespace,
 ) {
   const versions = getVersions(context.program, namespace)[1];
-  if (versions === undefined) {
+  if (versions === undefined || versions.getVersions().length === 0) {
     return;
   }
   const clientApiVersionsEnum = getExplicitClientApiVersions(context, namespace);

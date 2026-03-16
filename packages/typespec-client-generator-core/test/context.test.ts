@@ -20,7 +20,7 @@ it("multiple call with versioning", async () => {
       v1,
     }
 
-    @client({name: "TestClient"})
+    @client({name: "TestClient", service: Contoso.WidgetManager})
     @test
     interface Test {}
   `;
