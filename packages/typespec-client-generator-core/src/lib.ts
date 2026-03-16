@@ -128,13 +128,6 @@ const TCGCEmitterOptionsSchema: JSONSchemaType<TCGCEmitterOptions> = {
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-client-generator-core",
   diagnostics: {
-    "multiple-services": {
-      severity: "warning",
-      messages: {
-        default:
-          "Multiple services found. Only the first service will be used; others will be ignored.",
-      },
-    },
     "client-service": {
       severity: "warning",
       messages: {
@@ -186,7 +179,7 @@ export const $lib = createTypeSpecLibrary({
     "wrong-client-decorator": {
       severity: "warning",
       messages: {
-        default: "@client or @operationGroup should decorate namespace or interface in client.tsp",
+        default: "@client should decorate namespace or interface in client.tsp",
       },
     },
     "unsupported-kind": {
@@ -388,7 +381,7 @@ export const $lib = createTypeSpecLibrary({
       severity: "warning",
       messages: {
         default:
-          "When there is `@client` or `@operationGroup` decorator, `@clientLocation` decorator will be ignored.",
+          "@clientLocation with string target could not be used for multiple root clients scenario",
         operationToOperation:
           "`@clientLocation` cannot be used to move an operation to another operation. Operations can only be moved to interfaces or namespaces.",
         modelPropertyToClientInitialization: paramMessage`There is already a parameter called '${"parameterName"}' in the client initialization.`,
@@ -470,10 +463,10 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`The API version specified in the config: "${"version"}" is not defined in service versioning list. Fall back to the latest version.`,
       },
     },
-    "multiple-explicit-clients-multiple-services": {
+    "root-client-missing-service": {
       severity: "error",
       messages: {
-        default: "Can not define multiple explicit clients with multiple services.",
+        default: "Root namespace decorated with @client must have service config.",
       },
     },
     "invalid-client-service-multiple": {
@@ -500,6 +493,19 @@ export const $lib = createTypeSpecLibrary({
       messages: {
         default:
           "@clientOption should be applied with a specific language scope since it is highly likely this is language-specific.",
+      },
+    },
+    "nested-client-service-not-subset": {
+      severity: "error",
+      messages: {
+        default:
+          "Nested client's services must be a subset of the parent client's services. If no service is needed, omit the `service` property to inherit from the parent.",
+      },
+    },
+    "auto-merge-service-conflict": {
+      severity: "error",
+      messages: {
+        default: "Auto-merging service client must be empty.",
       },
     },
   },

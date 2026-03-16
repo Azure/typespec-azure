@@ -14,6 +14,7 @@ using Spector;
   """)
 @client({
   name: "ResiliencyServiceDrivenClient",
+  service: Resiliency.ServiceDriven,
 })
 @service
 @server(
