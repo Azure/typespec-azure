@@ -11,6 +11,7 @@ import samples from "../samples/dist/samples.js";
 
 import { MANIFEST } from "@typespec/compiler";
 import "@typespec/playground/style.css";
+import { ImportToolbarButton } from "./import.js";
 import "./style.css";
 
 registerMonacoDefaultWorkersForVite();
@@ -54,6 +55,7 @@ await renderReactPlayground({
     useShim: true,
   },
   footer: <PlaygroundFooter />,
+  commandBarButtons: <ImportToolbarButton />,
   onFileBug: () => {
     const bodyPayload = encodeURIComponent(`\n\n\n[Playground Link](${document.location.href})`);
     const url = `https://github.com/Azure/typespec-azure/issues/new?body=${bodyPayload}`;
