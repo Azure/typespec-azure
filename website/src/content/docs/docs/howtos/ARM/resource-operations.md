@@ -407,12 +407,12 @@ model ResourceOperationStatus<
 all four standard ARM path patterns through its `Scope` parameter. Use the appropriate scope model to
 select the desired path:
 
-| Scope                         | Path pattern                                                                                              |
-| ----------------------------- | --------------------------------------------------------------------------------------------------------- |
-| `TenantActionScope` (default) | `GET /providers/{ns}/operationStatuses/{operationId}`                                                     |
-| `SubscriptionActionScope`     | `GET /subscriptions/{sub}/providers/{ns}/operationStatuses/{operationId}`                                 |
-| `TenantLocationActionScope`   | `GET /providers/{ns}/locations/{loc}/operationStatuses/{operationId}`                                     |
-| `SubscriptionLocationActionScope` | `GET /subscriptions/{sub}/providers/{ns}/locations/{loc}/operationStatuses/{operationId}`             |
+| Scope                             | Path pattern                                                                              |
+| --------------------------------- | ----------------------------------------------------------------------------------------- |
+| `TenantActionScope` (default)     | `GET /providers/{ns}/operationStatuses/{operationId}`                                     |
+| `SubscriptionActionScope`         | `GET /subscriptions/{sub}/providers/{ns}/operationStatuses/{operationId}`                 |
+| `TenantLocationActionScope`       | `GET /providers/{ns}/locations/{loc}/operationStatuses/{operationId}`                     |
+| `SubscriptionLocationActionScope` | `GET /subscriptions/{sub}/providers/{ns}/locations/{loc}/operationStatuses/{operationId}` |
 
 ### Example
 
@@ -423,10 +423,16 @@ interface OperationStatuses {
   getTenantStatus is GetResourceOperationStatus;
 
   // Subscription scope
-  getSubscriptionStatus is GetResourceOperationStatus<ResourceOperationStatus, SubscriptionActionScope>;
+  getSubscriptionStatus is GetResourceOperationStatus<
+    ResourceOperationStatus,
+    SubscriptionActionScope
+  >;
 
   // Tenant + location scope
-  getTenantLocationStatus is GetResourceOperationStatus<ResourceOperationStatus, TenantLocationActionScope>;
+  getTenantLocationStatus is GetResourceOperationStatus<
+    ResourceOperationStatus,
+    TenantLocationActionScope
+  >;
 
   // Subscription + location scope
   getSubscriptionLocationStatus is GetResourceOperationStatus<

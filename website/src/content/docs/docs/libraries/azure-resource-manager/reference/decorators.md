@@ -47,7 +47,7 @@ None
 
 ```typespec
 @armLibraryNamespace
- namespace Microsoft.Contoso;
+namespace Microsoft.Contoso;
 ```
 
 ### `@armProviderNamespace` {#@Azure.ResourceManager.armProviderNamespace}
@@ -73,12 +73,12 @@ Namespace element value unless an override value is specified.
 
 ```typespec
 @armProviderNamespace
- namespace Microsoft.Contoso;
+namespace Microsoft.Contoso;
 ```
 
 ```typespec
 @armProviderNamespace("Microsoft.Contoso")
- namespace Microsoft.ContosoService;
+namespace Microsoft.ContosoService;
 ```
 
 ### `@armProviderNameValue` {#@Azure.ResourceManager.armProviderNameValue}
@@ -333,8 +333,8 @@ The properties that are used as identifiers for the object needs to be provided 
 
 ```typespec
 model Pet {
- @identifiers(#["size"])
- dog: Dog;
+  @identifiers(#["size"])
+  dog: Dog;
 }
 ```
 

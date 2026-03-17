@@ -31,7 +31,10 @@ interface OperationStatuses {
   getTenantStatus is GetResourceOperationStatus;
 
   /** Subscription scope: GET /subscriptions/{sub}/providers/{ns}/operationStatuses/{operationId} */
-  getSubscriptionStatus is GetResourceOperationStatus<ResourceOperationStatus, SubscriptionActionScope>;
+  getSubscriptionStatus is GetResourceOperationStatus<
+    ResourceOperationStatus,
+    SubscriptionActionScope
+  >;
 
   /** Tenant+Location scope: GET /providers/{ns}/locations/{loc}/operationStatuses/{operationId} */
   getTenantLocationStatus is GetResourceOperationStatus<
