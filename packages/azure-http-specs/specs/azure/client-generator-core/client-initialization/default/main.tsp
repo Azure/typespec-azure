@@ -90,6 +90,7 @@ model BlobQueryParam {
 @doc("Client for testing header parameter moved to client level.")
 @global.Azure.ClientGenerator.Core.client({
   name: "HeaderParamClient",
+  service: global._Specs_.Azure.ClientGenerator.Core.ClientInitialization.DefaultClient,
 })
 @global.Azure.ClientGenerator.Core.clientInitialization(HeaderParamClientOptions)
 @route("/header-param")
@@ -126,6 +127,7 @@ interface HeaderParam {
 @doc("Client for testing multiple parameters (header and query) moved to client level.")
 @global.Azure.ClientGenerator.Core.client({
   name: "MultipleParamsClient",
+  service: global._Specs_.Azure.ClientGenerator.Core.ClientInitialization.DefaultClient,
 })
 @global.Azure.ClientGenerator.Core.clientInitialization(MultipleParamsClientOptions)
 @route("/multiple-params")
@@ -163,6 +165,7 @@ interface MultipleParams {
 @doc("Client for testing a mix of client-level and method-level parameters.")
 @global.Azure.ClientGenerator.Core.client({
   name: "MixedParamsClient",
+  service: global._Specs_.Azure.ClientGenerator.Core.ClientInitialization.DefaultClient,
 })
 @global.Azure.ClientGenerator.Core.clientInitialization(MixedParamsClientOptions)
 @route("/mixed-params")
@@ -205,6 +208,7 @@ interface MixedParams {
 @doc("Blob operations with path parameter that should be moved to client level")
 @global.Azure.ClientGenerator.Core.client({
   name: "PathParamClient",
+  service: global._Specs_.Azure.ClientGenerator.Core.ClientInitialization.DefaultClient,
 })
 @global.Azure.ClientGenerator.Core.clientInitialization(PathParamClientOptions)
 @route("/path")
@@ -244,6 +248,7 @@ interface PathParam {
 @doc("Operations demonstrating the @paramAlias decorator for renaming parameters in client code")
 @global.Azure.ClientGenerator.Core.client({
   name: "ParamAliasClient",
+  service: global._Specs_.Azure.ClientGenerator.Core.ClientInitialization.DefaultClient,
 })
 @global.Azure.ClientGenerator.Core.clientInitialization(ParamAliasClientOptions)
 @route("/param-alias")
@@ -294,6 +299,7 @@ model BlobProperties {
 @doc("Blob operations with query parameter that should be moved to client level")
 @global.Azure.ClientGenerator.Core.client({
   name: "QueryParamClient",
+  service: global._Specs_.Azure.ClientGenerator.Core.ClientInitialization.DefaultClient,
 })
 @global.Azure.ClientGenerator.Core.clientInitialization(BlobQueryParamClientOptions)
 @route("/query")
