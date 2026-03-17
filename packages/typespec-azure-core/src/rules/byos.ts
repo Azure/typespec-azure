@@ -12,6 +12,7 @@ export const byosRule = createRule({
   name: "byos",
   description: "Use the BYOS pattern recommended for Azure Services.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/byos",
   messages: {
     default: paramMessage`The content type "${"contentType"}" indicates this operation is storing or retrieving binary data. It is recommended to use the BYOS pattern for Azure Services. https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#bring-your-own-storage-byos`,
   },

@@ -26,7 +26,7 @@ import {
   getNextLinkVerb,
   getOverriddenClientMethod,
   getResponseAsBool,
-  listOperationsInOperationGroup,
+  listOperationsInClient,
   shouldGenerateConvenient,
   shouldGenerateProtocol,
 } from "./decorators.js";
@@ -48,7 +48,6 @@ import {
   SdkModelType,
   SdkNextOperationLink,
   SdkNextOperationReference,
-  SdkOperationGroup,
   SdkOperationLink,
   SdkOperationReference,
   SdkPagingServiceMethod,
@@ -356,8 +355,9 @@ export function getPropertySegmentsFromModelOrParameters(
     }
   }
 
-  while (queue.length > 0) {
-    const { model, path } = queue.shift()!;
+  let queueIdx = 0;
+  while (queueIdx < queue.length) {
+    const { model, path } = queue[queueIdx++];
     for (const prop of model.properties.values()) {
       if (predicate(prop)) {
         return path.concat(prop);
@@ -790,12 +790,12 @@ export function getSdkMethodParameter(
 
 export function createSdkMethods<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
-  client: SdkClient | SdkOperationGroup,
+  client: SdkClient,
   sdkClientType: SdkClientType<TServiceOperation>,
 ): [SdkMethod<TServiceOperation>[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const retval: SdkMethod<TServiceOperation>[] = [];
-  for (const operation of listOperationsInOperationGroup(context, client)) {
+  for (const operation of listOperationsInClient(context, client)) {
     retval.push(
       diagnostics.pipe(getSdkServiceMethod<TServiceOperation>(context, operation, sdkClientType)),
     );

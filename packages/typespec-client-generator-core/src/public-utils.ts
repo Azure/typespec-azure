@@ -39,8 +39,8 @@ import {
   getIsApiVersion,
   getOverriddenClientMethod,
   listClients,
-  listOperationGroups,
-  listOperationsInOperationGroup,
+  listOperationsInClient,
+  listSubClients,
 } from "./decorators.js";
 import {
   DecoratedType,
@@ -53,10 +53,10 @@ import {
   SdkHttpOperationExample,
   SdkMethodParameter,
   SdkModelPropertyType,
-  SdkOperationGroup,
   SdkPathParameter,
   SdkQueryParameter,
   SdkServiceMethod,
+  SdkServiceOperation,
   SdkType,
   TCGCContext,
 } from "./interfaces.js";
@@ -65,10 +65,10 @@ import {
   TspLiteralType,
   getHttpBodyType,
   getHttpOperationResponseHeaders,
-  hasExplicitClientOrOperationGroup,
   hasNoneVisibility,
   isAzureCoreTspModel,
   listAllUserDefinedNamespaces,
+  listOrphanTypes,
   removeVersionsLargerThanExplicitlySpecified,
   resolveDuplicateGenearatedName,
 } from "./internal-utils.js";
@@ -360,7 +360,7 @@ export function getGeneratedName(
 }
 
 /**
- * Traverse each operation and model to find one possible context path for the given type.
+ * Traverse each operation, model, and union to find one possible context path for the given type.
  * @param context
  * @param type
  * @returns
@@ -369,28 +369,30 @@ function findContextPath(
   context: TCGCContext,
   type: Model | Union | TspLiteralType,
 ): ContextNode[] {
-  // orphan models
-  for (const currNamespace of listAllUserDefinedNamespaces(context)) {
-    for (const model of currNamespace.models.values()) {
-      if (
-        [...model.properties.values()].filter((p) => !isMetadata(context.program, p)).length === 0
-      )
-        continue;
-      const result = getContextPath(context, model, type);
-      if (result.length > 0) {
-        return result;
-      }
+  // orphan models and unions
+  for (const orphan of listOrphanTypes(context)) {
+    // skip models without non-metadata properties, as they cannot contain anonymous types
+    if (
+      orphan.kind === "Model" &&
+      [...orphan.properties.values()].filter((p) => !isMetadata(context.program, p)).length === 0
+    )
+      continue;
+    // skip enums because they cannot contain anonymous types that need generated names
+    if (orphan.kind === "Enum") continue;
+    const result = getContextPath(context, orphan, type);
+    if (result.length > 0) {
+      return result;
     }
   }
   for (const client of listClients(context)) {
-    for (const operation of listOperationsInOperationGroup(context, client)) {
+    for (const operation of listOperationsInClient(context, client)) {
       const result = getContextPath(context, operation, type);
       if (result.length > 0) {
         return result;
       }
     }
-    for (const og of listOperationGroups(context, client, true)) {
-      for (const operation of listOperationsInOperationGroup(context, og)) {
+    for (const subClient of listSubClients(context, client, true)) {
+      for (const operation of listOperationsInClient(context, subClient)) {
         const result = getContextPath(context, operation, type);
         if (result.length > 0) {
           return result;
@@ -407,7 +409,7 @@ interface ContextNode {
 }
 
 /**
- * Find one possible context path for the given type in the given operation or model.
+ * Find one possible context path for the given type in the given operation, model, or union.
  * @param context
  * @param root
  * @param typeToFind
@@ -415,7 +417,7 @@ interface ContextNode {
  */
 function getContextPath(
   context: TCGCContext,
-  root: Operation | Model,
+  root: Operation | Model | Union,
   typeToFind: Model | Union | TspLiteralType,
 ): ContextNode[] {
   // use visited set to avoid cycle model reference
@@ -523,7 +525,7 @@ function getContextPath(
   } else {
     visited.clear();
     result = [];
-    if (dfsModelProperties(typeToFind, root, root.name)) {
+    if (dfsModelProperties(typeToFind, root, root.name ?? "")) {
       return result;
     }
   }
@@ -690,8 +692,10 @@ function buildNameFromContextPaths(
   // 1. find the last non-anonymous model node
   const lastNonAnonymousNodeIndex = findLastNonAnonymousNode(contextPath);
   // 2. build name
+  // When all nodes are anonymous (e.g. types inside orphan unions), lastNonAnonymousNodeIndex is -1.
+  // Use 0 as the start index to avoid accessing contextPath[-1].
   let createName: string = "";
-  for (let j = lastNonAnonymousNodeIndex; j < contextPath.length; j++) {
+  for (let j = Math.max(0, lastNonAnonymousNodeIndex); j < contextPath.length; j++) {
     const currContextPathType = contextPath[j]?.type;
     if (
       currContextPathType?.kind === "String" ||
@@ -872,7 +876,7 @@ export function resolveOperationId(
 
   const clientLocation = getClientLocation(context, operation);
 
-  if (!hasExplicitClientOrOperationGroup(context) && clientLocation) {
+  if (clientLocation) {
     if (typeof clientLocation === "string") {
       return `${clientLocation}_${operationName}`;
     }
@@ -899,6 +903,26 @@ export function resolveOperationId(
 }
 
 /**
+ * Get the path of a client in the client hierarchy.
+ * For root clients, this returns just the client name.
+ * For sub clients, this returns the full path like "RootClient.SubClient.NestedClient".
+ *
+ * @param client The SdkClientType to get the path for
+ * @returns The client path string
+ */
+export function getClientPath<TServiceOperation extends SdkServiceOperation>(
+  client: SdkClientType<TServiceOperation>,
+): string {
+  const parts: string[] = [client.name];
+  let current = client.parent;
+  while (current) {
+    parts.unshift(current.name);
+    current = current.parent;
+  }
+  return parts.join(".");
+}
+
+/**
  * Judge whether a model's property is an HTTP metadata.
  * @param context TCGC context
  * @param property
@@ -908,13 +932,11 @@ export function isHttpMetadata(context: TCGCContext, property: SdkModelPropertyT
   return property.__raw !== undefined && isMetadata(context.program, property.__raw);
 }
 
-export function getNamespaceFromType(
-  type: Type | SdkClient | SdkOperationGroup | undefined,
-): Namespace | undefined {
+export function getNamespaceFromType(type: Type | SdkClient | undefined): Namespace | undefined {
   if (type === undefined) {
     return undefined;
   }
-  if (type.kind === "SdkOperationGroup" || type.kind === "SdkClient") {
+  if (type.kind === "SdkClient") {
     const rawType = type.type;
     if (rawType === undefined) {
       return undefined;

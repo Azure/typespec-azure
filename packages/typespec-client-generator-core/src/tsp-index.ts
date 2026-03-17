@@ -45,6 +45,7 @@ export const $decorators = {
     convenientAPI: $convenientAPI,
     protocolAPI: $protocolAPI,
     client: $client,
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     operationGroup: $operationGroup,
     usage: $usage,
     access: $access,

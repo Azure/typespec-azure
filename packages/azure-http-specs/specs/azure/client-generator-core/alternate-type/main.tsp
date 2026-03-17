@@ -11,7 +11,6 @@ using Spector;
 @service
 namespace _Specs_.Azure.ClientGenerator.Core.AlternateType;
 
-@global.Azure.ClientGenerator.Core.operationGroup
 @route("/external")
 @doc("Test using language-idiomatic external types for defined TypeSpec types")
 namespace ExternalType {

@@ -257,6 +257,7 @@ it("nested property inheritance", async () => {
 it("circular inheritance", async () => {
   const { program } = await SimpleTester.compile(`
       @service
+      @usage(Usage.input)
       namespace TestService;
 
       model A extends B {
