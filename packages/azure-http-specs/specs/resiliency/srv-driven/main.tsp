@@ -56,6 +56,7 @@ model PostInput {
 }
 
 @route("/add-optional-param")
+@client
 interface AddOptionalParam {
   @scenario
   @scenarioDoc("""
