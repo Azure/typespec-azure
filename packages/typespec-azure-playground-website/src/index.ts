@@ -15,6 +15,8 @@ export const TypeSpecPlaygroundConfig = {
     "@typespec/streams",
     "@typespec/versioning",
     "@typespec/xml",
+    "http-client-js",
+    "http-client-csharp",
     "@azure-tools/typespec-azure-core",
     "@azure-tools/typespec-azure-resource-manager",
     "@azure-tools/typespec-autorest",
