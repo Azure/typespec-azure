@@ -6,7 +6,7 @@ title: "arm-resource-operation"
 @azure-tools/typespec-azure-resource-manager/arm-resource-operation
 ```
 
-Validate ARM Resource operations. All resource operations must be defined inside an interface, include an `api-version` parameter, and use the correct decorator for the HTTP verb.
+Validate that all ARM Resource operations are defined inside an interface, include an `api-version` parameter, and use the correct decorator for the HTTP verb.
 
 #### ❌ Incorrect
 

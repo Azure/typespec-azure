@@ -6,7 +6,7 @@ title: arm-common-types-version
 @azure-tools/typespec-azure-resource-manager/arm-common-types-version
 ```
 
-ARM services must specify the ARM common-types version using the `@armCommonTypesVersion` decorator. This decorator should be applied either on the service namespace or on each version enum member.
+ARM services must specify the ARM common-types version using the `@armCommonTypesVersion` decorator. If the same common types version is used across all service versions, this decorator should be applied either on the service namespace.  If the common types version is updated in later versions, the decorator should appear on each version enum member.
 
 #### ❌ Incorrect
 
