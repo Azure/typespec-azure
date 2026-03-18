@@ -215,12 +215,14 @@ function computeCrossLanguageVersion<TServiceOperation extends SdkServiceOperati
       methods: client.methods.map((method) => ({
         id: method.crossLanguageDefinitionId,
         kind: method.kind,
-        verb: "operation" in method && method.operation && "verb" in method.operation
-          ? method.operation.verb
-          : undefined,
-        path: "operation" in method && method.operation && "path" in method.operation
-          ? method.operation.path
-          : undefined,
+        verb:
+          "operation" in method && method.operation && "verb" in method.operation
+            ? method.operation.verb
+            : undefined,
+        path:
+          "operation" in method && method.operation && "path" in method.operation
+            ? method.operation.path
+            : undefined,
         parameters: method.parameters.map((p) => ({
           id: p.crossLanguageDefinitionId,
           optional: p.optional,
@@ -236,7 +238,10 @@ function computeCrossLanguageVersion<TServiceOperation extends SdkServiceOperati
               }))
             : undefined,
         bodyParam:
-          "operation" in method && method.operation && "bodyParam" in method.operation && method.operation.bodyParam
+          "operation" in method &&
+          method.operation &&
+          "bodyParam" in method.operation &&
+          method.operation.bodyParam
             ? {
                 id: method.operation.bodyParam.crossLanguageDefinitionId,
                 optional: method.operation.bodyParam.optional,
