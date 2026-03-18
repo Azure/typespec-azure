@@ -73,7 +73,7 @@
             "description": "Azure operation completed successfully.",
             "schema": {
               "type": "object",
-              "description": "Standard Azure Resource Manager operation status response, used as the response\nbody for `GetResourceOperationStatus`. The `id` property is not marked as a path\nparameter, so the full value is always present in the response body.",
+              "description": "Standard Azure Resource Manager operation status response, used as the response\nbody for `GetResourceOperationStatus`.",
               "properties": {
                 "status": {
                   "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
@@ -151,7 +151,7 @@
             "description": "Azure operation completed successfully.",
             "schema": {
               "type": "object",
-              "description": "Standard Azure Resource Manager operation status response, used as the response\nbody for `GetResourceOperationStatus`. The `id` property is not marked as a path\nparameter, so the full value is always present in the response body.",
+              "description": "Standard Azure Resource Manager operation status response, used as the response\nbody for `GetResourceOperationStatus`.",
               "properties": {
                 "status": {
                   "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
@@ -266,7 +266,7 @@
             "description": "Azure operation completed successfully.",
             "schema": {
               "type": "object",
-              "description": "Standard Azure Resource Manager operation status response, used as the response\nbody for `GetResourceOperationStatus`. The `id` property is not marked as a path\nparameter, so the full value is always present in the response body.",
+              "description": "Standard Azure Resource Manager operation status response, used as the response\nbody for `GetResourceOperationStatus`.",
               "properties": {
                 "status": {
                   "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
@@ -347,7 +347,7 @@
             "description": "Azure operation completed successfully.",
             "schema": {
               "type": "object",
-              "description": "Standard Azure Resource Manager operation status response, used as the response\nbody for `GetResourceOperationStatus`. The `id` property is not marked as a path\nparameter, so the full value is always present in the response body.",
+              "description": "Standard Azure Resource Manager operation status response, used as the response\nbody for `GetResourceOperationStatus`.",
               "properties": {
                 "status": {
                   "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
