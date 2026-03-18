@@ -444,7 +444,7 @@ interface OperationStatuses {
 
 ### Custom response properties
 
-To add custom properties to the operation status response, extend `ResourceOperationStatus`:
+To add custom properties to the operation status response, use the `ResourceOperationStatus` template:
 
 ```typespec
 model WidgetOperationStatus is ResourceOperationStatus<WidgetOperationStatusProperties>;

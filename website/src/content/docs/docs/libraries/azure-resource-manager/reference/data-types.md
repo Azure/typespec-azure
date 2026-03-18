@@ -1204,8 +1204,7 @@ model Azure.ResourceManager.ResourceOperationOptions
 ### `ResourceOperationStatus` {#Azure.ResourceManager.ResourceOperationStatus}
 
 Standard Azure Resource Manager operation status response, used as the response
-body for `GetResourceOperationStatus`. The `id` property is not marked as a path
-parameter, so the full value is always present in the response body.
+body for `GetResourceOperationStatus`.
 
 ```typespec
 model Azure.ResourceManager.ResourceOperationStatus<Properties, StatusValues>

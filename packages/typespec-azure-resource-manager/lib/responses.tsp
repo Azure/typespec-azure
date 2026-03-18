@@ -181,8 +181,7 @@ model ArmOperationStatus<
 
 /**
  * Standard Azure Resource Manager operation status response, used as the response
- * body for `GetResourceOperationStatus`. The `id` property is not marked as a path
- * parameter, so the full value is always present in the response body.
+ * body for `GetResourceOperationStatus`.
  *
  * @template Properties Optional resource-specific properties
  * @template StatusValues The set of allowed values for operation status
