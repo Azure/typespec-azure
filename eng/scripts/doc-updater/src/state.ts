@@ -1,12 +1,11 @@
 /**
- * Knowledge base management for the doc-updater system.
+ * Pipeline state management for the doc-updater system.
  *
  * Handles reading/writing knowledge files and metadata, computing git diffs
- * for incremental updates, and resolving knowledge file paths.
+ * for incremental updates, resolving file paths, and detecting human feedback.
  */
 
 import { execSync } from "node:child_process";
-import { existsSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 
@@ -97,44 +96,15 @@ export async function readKnowledge(configName: string): Promise<string | null> 
   }
 }
 
-/** Check whether a knowledge base exists for a package. */
-export function knowledgeExists(configName: string): boolean {
-  return existsSync(getKnowledgePath(configName));
-}
-
 // ---------------------------------------------------------------------------
 // Git operations
 // ---------------------------------------------------------------------------
-
-/**
- * Check whether there are any commits affecting the given source paths
- * since the specified commit. This is a lightweight check (no diff content)
- * used to decide whether to start an agent session at all.
- *
- * Returns true if there are changes, false if nothing has changed.
- * Returns true on any error (fail-open → triggers a knowledge rebuild).
- */
-export function hasChangesSince(sourcePaths: string[], lastCommit: string): boolean {
-  const paths = sourcePaths.map((p) => `"${p}"`).join(" ");
-  try {
-    const result = execSync(`git rev-list --count ${lastCommit}..HEAD -- ${paths}`, {
-      encoding: "utf-8",
-      cwd: REPO_ROOT,
-    }).trim();
-    return parseInt(result, 10) > 0;
-  } catch {
-    // If the command fails (e.g. commit not found), assume changes exist
-    // so we fall through to a full rebuild
-    return true;
-  }
-}
 
 /** Get the current HEAD commit hash. */
 export function getCurrentCommit(): string {
   return execSync("git rev-parse HEAD", { encoding: "utf-8", cwd: REPO_ROOT }).trim();
 }
 
-/**
 /**
  * Commit message pattern used by the doc-updater workflow after squash merge.
  * The PR title becomes the commit message: "[Automated]"
@@ -156,16 +126,16 @@ export function listCommitsSince(sourcePaths: string[], lastCommit: string): str
   const filteredCmd = `git rev-list --invert-grep --grep="${DOC_UPDATER_GREP_PATTERN}" ${lastCommit}..HEAD -- ${paths}`;
   try {
     const totalCount = execSync(countCmd, { encoding: "utf-8", cwd: REPO_ROOT }).trim();
-    console.log(`[knowledge] Total commits since ${lastCommit.slice(0, 8)}: ${totalCount}`);
+    console.log(`[state] Total commits since ${lastCommit.slice(0, 8)}: ${totalCount}`);
     const result = execSync(filteredCmd, { encoding: "utf-8", cwd: REPO_ROOT }).trim();
     const filtered = result ? result.split("\n") : [];
-    console.log(`[knowledge] After filtering [Automated]: ${filtered.length}`);
+    console.log(`[state] After filtering [Automated]: ${filtered.length}`);
     if (!result) return [];
     return filtered.reverse(); // oldest first
   } catch (e) {
     const stderr = (e as { stderr?: string }).stderr ?? String(e);
     console.error(
-      `[knowledge] listCommitsSince failed:\n  countCmd: ${countCmd}\n  filteredCmd: ${filteredCmd}\n  cwd: ${REPO_ROOT}\n  error: ${stderr}`,
+      `[state] listCommitsSince failed:\n  countCmd: ${countCmd}\n  filteredCmd: ${filteredCmd}\n  cwd: ${REPO_ROOT}\n  error: ${stderr}`,
     );
     return [];
   }

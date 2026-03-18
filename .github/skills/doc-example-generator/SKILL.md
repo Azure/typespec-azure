@@ -43,7 +43,6 @@ This skill operates in a **temporary working directory** to compile and generate
    - For `@azure-typespec/http-client-csharp` emitter, you need to add an empty `metadata.json` file in the output directory to trigger code generation. Create an empty file at `tsp-output/@azure-typespec/http-client-csharp/metadata.json` before running compilation.
    - If compilation fails, fix the `.tsp` files and re-compile until it passes
    - Do NOT proceed to Step 3 until compilation is clean
-   
 
 ### Step 3: Generate Language Code
 

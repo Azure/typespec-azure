@@ -5,7 +5,7 @@
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import type { DocUpdateConfig } from "./config.js";
-import { getKnowledgeRelativePath, readKnowledge, type HumanFeedback } from "./knowledge.js";
+import { getKnowledgeRelativePath, readKnowledge, type HumanFeedback } from "./state.js";
 
 /** Directory containing per-package prompt files, relative to this source file. */
 const PROMPTS_DIR = resolve(import.meta.dirname ?? ".", "../prompts");

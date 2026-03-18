@@ -113,11 +113,10 @@ function describeToolCall(toolName: string, args: unknown): { icon: string; desc
 // ---------------------------------------------------------------------------
 
 /**
- * Build the GitHub MCP server configuration for the knowledge-build phase.
+ * Build the GitHub MCP server configuration.
  *
- * This gives the agent access to git/GitHub tools so it can interactively
- * explore commit history, diffs, and file contents instead of having the
- * full diff injected into the prompt.
+ * Gives the agent access to GitHub tools for exploring commit history,
+ * diffs, and file contents via the GitHub MCP endpoint.
  */
 export function buildGitHubMcpConfig(): Record<string, MCPServerConfig> {
   const token = process.env.COPILOT_GITHUB_TOKEN ?? process.env.GITHUB_TOKEN ?? "";

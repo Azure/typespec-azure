@@ -13,6 +13,8 @@ import { CopilotClient } from "@github/copilot-sdk";
 import { resolve } from "node:path";
 import { parseArgs } from "./cli.js";
 import { loadConfig } from "./config.js";
+import { buildDocUpdatePrompt, buildFeedbackPrompt, loadPromptFile } from "./prompts.js";
+import { buildGitHubMcpConfig, log, runAgentSession } from "./session.js";
 import {
   getCurrentCommit,
   getHumanFeedback,
@@ -20,9 +22,7 @@ import {
   readKnowledge,
   readMeta,
   writeMeta,
-} from "./knowledge.js";
-import { buildDocUpdatePrompt, buildFeedbackPrompt, loadPromptFile } from "./prompts.js";
-import { buildGitHubMcpConfig, log, runAgentSession } from "./session.js";
+} from "./state.js";
 
 // ---------------------------------------------------------------------------
 // Main
