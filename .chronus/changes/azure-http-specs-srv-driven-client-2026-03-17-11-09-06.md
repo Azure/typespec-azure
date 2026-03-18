@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/azure-http-specs"
 ---
 
-Add `@client` on interface `AddOptionalParam` in resiliency srv-driven specs.
+Add `@clientLocation` on operations in interface `AddOptionalParam` in resiliency srv-driven specs. To keep the client hierachy unchanged after TCGC update.
