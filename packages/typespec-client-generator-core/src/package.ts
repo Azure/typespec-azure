@@ -80,8 +80,9 @@ function organizeNamespaces<TServiceOperation extends SdkServiceOperation>(
   sdkPackage: SdkPackage<TServiceOperation>,
 ) {
   const clients = [...sdkPackage.clients];
-  while (clients.length > 0) {
-    const client = clients.shift()!;
+  let clientIdx = 0;
+  while (clientIdx < clients.length) {
+    const client = clients[clientIdx++];
     getSdkNamespace(context, sdkPackage, client).clients.push(client);
     if (client.children && client.children.length > 0) {
       clients.push(...client.children);
@@ -139,14 +140,14 @@ function getSdkNamespace<TServiceOperation extends SdkServiceOperation>(
 }
 
 function populateApiVersionInformation(context: TCGCContext): void {
-  if (context.__rawClientsOperationGroupsCache === undefined) {
+  if (context.__rawClientsCache === undefined) {
     prepareClientAndOperationCache(context);
   }
 
   // Get the package versions map once (this handles both single and multi-service scenarios)
   const packageVersions = context.getPackageVersions();
 
-  for (const client of context.__rawClientsOperationGroupsCache!.values()) {
+  for (const client of context.__rawClientsCache!.values()) {
     const clientType = getActualClientType(client);
 
     // Multiple service case. Set empty result.

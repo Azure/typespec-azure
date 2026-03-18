@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/azure-http-specs"
 ---
 
-Fix wrong location of clientNamespace
+Migrate `@operationGroup` to `@client`

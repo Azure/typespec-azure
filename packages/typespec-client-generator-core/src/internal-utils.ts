@@ -9,6 +9,7 @@ import {
   compilerAssert,
   createDiagnosticCollector,
   Diagnostic,
+  Enum,
   getDeprecationDetails,
   getDoc,
   getLifecycleVisibilityEnum,
@@ -19,6 +20,7 @@ import {
   Interface,
   isNeverType,
   isNullType,
+  isTemplateDeclaration,
   isVoidType,
   listServices,
   Model,
@@ -41,10 +43,16 @@ import {
 import { $ } from "@typespec/compiler/typekit";
 import {
   Authentication,
+  getHeaderFieldOptions,
+  getPathParamOptions,
+  getQueryParamOptions,
   HttpOperation,
   HttpOperationResponseContent,
   HttpPayloadBody,
   HttpServer,
+  isHeader,
+  isPathParam,
+  isQueryParam,
 } from "@typespec/http";
 import {
   getAddedOnVersions,
@@ -57,11 +65,12 @@ import {
   getAlternateType,
   getClientDocExplicit,
   getClientLocation,
+  getLegacyHierarchyBuilding,
   getMarkAsLro,
   getOverriddenClientMethod,
   getParamAlias,
+  getUsageOverride,
 } from "./decorators.js";
-import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
 import {
   DecoratorInfo,
   ExternalTypeInfo,
@@ -71,7 +80,6 @@ import {
   SdkEnumType,
   SdkHeaderParameter,
   SdkMethodParameter,
-  SdkOperationGroup,
   SdkServiceOperation,
   SdkType,
   TCGCContext,
@@ -114,25 +122,14 @@ export const clientNamespaceKey = createStateSymbol("clientNamespace");
 export const negationScopesKey = createStateSymbol("negationScopes");
 export const scopeKey = createStateSymbol("scope");
 export const clientKey = createStateSymbol("client");
-export const operationGroupKey = createStateSymbol("operationGroup");
 export const clientLocationKey = createStateSymbol("clientLocation");
 export const omitOperation = createStateSymbol("omitOperation");
 export const overrideKey = createStateSymbol("override");
+export const usageKey = createStateSymbol("usage");
+export const legacyHierarchyBuildingKey = createStateSymbol("legacyHierarchyBuilding");
 
-export function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
-  // Multiple services case is not considered explicit client. It is auto-merged.
-  const explicitClients = listScopedDecoratorData(context, clientKey);
-  let multiServices = false;
-  explicitClients.forEach((value) => {
-    if ((value as SdkClient).services.length > 1) {
-      multiServices = true;
-    }
-  });
-
-  return (
-    (explicitClients.size > 0 && !multiServices) ||
-    listScopedDecoratorData(context, operationGroupKey).size > 0
-  );
+export function hasExplicitClient(context: TCGCContext): boolean {
+  return listScopedDecoratorData(context, clientKey).size > 0;
 }
 
 export function listScopedDecoratorData(
@@ -296,12 +293,20 @@ export function parseEmitterName(
  * @returns The service namespace that contains the operation
  */
 export function findServiceForOperation(services: Namespace[], operation: Operation): Namespace {
-  let namespace = operation.namespace;
-  while (namespace) {
-    if (services.includes(namespace)) {
-      return namespace;
+  // Follow the sourceOperation chain to find the original service namespace.
+  // This is needed when operations are defined using `is` in customization interfaces
+  // (e.g., `opB is ServiceB.Operations.opB`), where the operation's namespace is the
+  // customization namespace rather than the original service namespace.
+  let current: Operation | undefined = operation;
+  while (current) {
+    let namespace = current.namespace;
+    while (namespace) {
+      if (services.includes(namespace)) {
+        return namespace;
+      }
+      namespace = namespace.namespace;
     }
-    namespace = namespace.namespace;
+    current = current.sourceOperation;
   }
   // Fallback to the first service. This can happen when an operation is defined outside
   // of any service namespace (e.g., in Azure.ResourceManager or other shared namespaces)
@@ -314,14 +319,14 @@ export function findServiceForOperation(services: Namespace[], operation: Operat
  *
  * @param context
  * @param type The type that we are adding api version information onto
- * @param client The client or operation group that contains the operation
- * @param operation The operation that contains the api version parameter (needed for multi-service operation groups)
+ * @param client The client or sub clients that contains the operation
+ * @param operation The operation that contains the api version parameter (needed for multi-service sub clients)
  * @returns Whether the type is the api version parameter and the default value for the client
  */
 export function updateWithApiVersionInformation(
   context: TCGCContext,
   type: ModelProperty,
-  client?: SdkClient | SdkOperationGroup,
+  client?: SdkClient,
   operation?: Operation,
 ): {
   isApiVersionParam: boolean;
@@ -340,7 +345,7 @@ export function updateWithApiVersionInformation(
     };
   }
 
-  // For multi-service clients/operation groups, we need to find the api version
+  // For multi-service clients/sub clients, we need to find the api version
   // from the operation's specific service
   if (operation) {
     const service = findServiceForOperation(client.services, operation);
@@ -784,13 +789,13 @@ export function getCorrespondingClientParam(
   operation: Operation,
 ): SdkMethodParameter | undefined {
   const clientParams = [];
-  let client: SdkClient | SdkOperationGroup | undefined = context.getClientForOperation(operation);
+  let client: SdkClient | undefined = context.getClientForOperation(operation);
   while (client) {
     const clientParamsForClient = context.__clientParametersCache.get(client);
     if (clientParamsForClient) {
       clientParams.push(...clientParamsForClient);
     }
-    if (client.kind === "SdkClient") {
+    if (!client.parent) {
       break;
     }
     client = client.parent;
@@ -898,79 +903,69 @@ function getVersioningMutator(
 
 export function handleVersioningMutationForGlobalNamespace(context: TCGCContext): Namespace {
   const globalNamespace = context.program.getGlobalNamespaceType();
-  const services = listServices(context.program);
+
+  // First consider explicit clients
+  const servicesNs = new Set<Namespace>();
+  listScopedDecoratorData(context, clientKey).forEach((v, k) => {
+    // See all explicit clients that in TypeSpec program
+    if (!unsafe_Realm.realmForType.has(k)) {
+      (v as SdkClient).services.forEach((s) => servicesNs.add(s));
+    }
+  });
+
+  // Then see the original services
+  if (servicesNs.size === 0) {
+    listServices(context.program).map((v) => servicesNs.add(v.type));
+  }
 
   // No service, thus no versioning mutation needed
-  if (services.length === 0) return globalNamespace;
+  if (servicesNs.size === 0) return globalNamespace;
 
   // Explicit all API version setting, thus no versioning mutation needed
   if (context.apiVersion === "all") return globalNamespace;
 
-  const explicitClientNamespaces: Namespace[] = [];
-  const explicitServices = new Set<Namespace>();
-  listScopedDecoratorData(context, clientKey).forEach((v, k) => {
-    // See all explicit clients that in TypeSpec program
-    if (!unsafe_Realm.realmForType.has(k)) {
-      const sdkClient = v as SdkClient;
-      explicitClientNamespaces.push(k as Namespace);
-      sdkClient.services.forEach((s) => explicitServices.add(s));
+  // Compose service mutators
+  const mutators: unsafe_MutatorWithNamespace[] = [];
+
+  for (const serviceNs of servicesNs) {
+    const versions = getVersions(context.program, serviceNs)[1]?.getVersions();
+    // If the service has no versioning, no mutation needed
+    if (!versions || versions.length === 0) return globalNamespace;
+
+    // Single service needs to filter versions based on `apiVersion` config
+    if (servicesNs.size === 1) {
+      removeVersionsLargerThanExplicitlySpecified(context, versions);
     }
-  });
 
-  let mutator: unsafe_MutatorWithNamespace | undefined;
-
-  // No explicit clients (choose first service) or explicit client with one service
-  if (explicitClientNamespaces.length === 0 || explicitServices.size === 1) {
-    const serviceNamespace =
-      explicitClientNamespaces.length === 0
-        ? services[0].type
-        : explicitServices.values().next().value!;
-    const versions = getVersions(context.program, serviceNamespace)[1]?.getVersions();
-    // If the single service has no versioning, no mutation needed
-    if (!versions) return globalNamespace;
-
-    // Filter versions based on `apiVersion` config
-    removeVersionsLargerThanExplicitlySpecified(context, versions);
     const versionsValues = versions.map((v) => v.value);
 
     // Fix apiVersion setting problem only if there's only one service
-    if (
-      context.apiVersion !== undefined &&
-      context.apiVersion !== "latest" &&
-      context.apiVersion !== "all" &&
-      !versionsValues.includes(context.apiVersion)
-    ) {
-      reportDiagnostic(context.program, {
-        code: "api-version-undefined",
-        format: { version: context.apiVersion },
-        target: services[0].type,
-      });
-      context.apiVersion = versionsValues[versionsValues.length - 1];
+    if (servicesNs.size === 1) {
+      if (
+        context.apiVersion !== undefined &&
+        context.apiVersion !== "latest" &&
+        context.apiVersion !== "all" &&
+        !versionsValues.includes(context.apiVersion)
+      ) {
+        reportDiagnostic(context.program, {
+          code: "api-version-undefined",
+          format: { version: context.apiVersion },
+          target: serviceNs,
+        });
+        context.apiVersion = versionsValues[versionsValues.length - 1];
+      }
     }
 
-    mutator = getVersioningMutator(
+    // Get service mutator according to the version setting
+    const mutator = getVersioningMutator(
       context,
-      serviceNamespace,
+      serviceNs,
       versionsValues[versionsValues.length - 1],
     );
+    if (mutator) mutators.push(mutator);
   }
-  // Explicit clients with multiple services
-  else {
-    // Currently we do not support multiple explicit clients with multiple services
-    if (explicitClientNamespaces.length > 1 && explicitServices.size > 1) {
-      reportDiagnostic(context.program, {
-        code: "multiple-explicit-clients-multiple-services",
-        format: {},
-        target: services[0].type,
-      });
-      return globalNamespace;
-    }
-
-    mutator = getVersioningMutator(context, explicitClientNamespaces[0]);
-  }
-
-  if (!mutator) return globalNamespace;
-  const subgraph = unsafe_mutateSubgraphWithNamespace(context.program, [mutator], globalNamespace);
+  if (mutators.length === 0) return globalNamespace;
+  const subgraph = unsafe_mutateSubgraphWithNamespace(context.program, mutators, globalNamespace);
   compilerAssert(subgraph.type.kind === "Namespace", "Should not have mutated to another type");
   compilerAssert(subgraph.realm !== null, "Should have a realm after mutation");
   context.__mutatedRealm = subgraph.realm;
@@ -997,6 +992,7 @@ export function resolveConflictGeneratedName(context: TCGCContext) {
     .filter((x) => !x.isGeneratedName)
     .map((x) => x.name);
   const generatedNames = [...context.__generatedNames.values()];
+
   for (const sdkType of context.__referencedTypeCache.values()) {
     if (sdkType.__raw && sdkType.isGeneratedName && userDefinedNames.includes(sdkType.name)) {
       const rawName = sdkType.name;
@@ -1029,19 +1025,49 @@ export function getClientDoc(context: TCGCContext, target: Type): string | undef
 }
 
 export function compareModelProperties(
-  context: TCGCContext | undefined,
+  program: Program,
   modelPropA: ModelProperty | undefined,
   modelPropB: ModelProperty | undefined,
 ): boolean {
   if (!modelPropA || !modelPropB) return false;
   if (modelPropA.name !== modelPropB.name || modelPropA.type !== modelPropB.type) return false;
-  if (!context) return true; // if we don't have a context, we can't further compare the types. Assume true.
-  // compare serialized names if they are http parameters
-  if (!isSdkHttpParameter(context, modelPropA) || !isSdkHttpParameter(context, modelPropB))
-    return true;
-  const sdkA = ignoreDiagnostics(getSdkHttpParameter(context, modelPropA));
-  const sdkB = ignoreDiagnostics(getSdkHttpParameter(context, modelPropB));
-  return sdkA.kind === sdkB.kind && sdkA.serializedName === sdkB.serializedName;
+  const aIsQuery = isQueryParam(program, modelPropA);
+  const aIsHeader = isHeader(program, modelPropA);
+  const aIsPath = isPathParam(program, modelPropA);
+  const bIsQuery = isQueryParam(program, modelPropB);
+  const bIsHeader = isHeader(program, modelPropB);
+  const bIsPath = isPathParam(program, modelPropB);
+  // Return false when both have explicit HTTP parameter kinds but they differ
+  const aHasHttpKind = aIsQuery || aIsHeader || aIsPath;
+  const bHasHttpKind = bIsQuery || bIsHeader || bIsPath;
+  if (aHasHttpKind && bHasHttpKind) {
+    if (aIsQuery !== bIsQuery || aIsHeader !== bIsHeader || aIsPath !== bIsPath) return false;
+  }
+  if (
+    aIsQuery &&
+    bIsQuery &&
+    getQueryParamOptions(program, modelPropA)?.name !==
+      getQueryParamOptions(program, modelPropB)?.name
+  ) {
+    return false;
+  }
+  if (
+    aIsHeader &&
+    bIsHeader &&
+    getHeaderFieldOptions(program, modelPropA)?.name !==
+      getHeaderFieldOptions(program, modelPropB)?.name
+  ) {
+    return false;
+  }
+  if (
+    aIsPath &&
+    bIsPath &&
+    getPathParamOptions(program, modelPropA)?.name !==
+      getPathParamOptions(program, modelPropB)?.name
+  ) {
+    return false;
+  }
+  return true;
 }
 
 export function* filterMapValuesIterator<V>(
@@ -1134,10 +1160,9 @@ export function getTcgcLroMetadata<TServiceOperation extends SdkServiceOperation
   return undefined;
 }
 
-export function getActualClientType(client: SdkClient | SdkOperationGroup): Namespace | Interface {
-  if (client.kind === "SdkClient") return client.type;
+export function getActualClientType(client: SdkClient): Namespace | Interface {
   if (client.type) return client.type;
-  // Created operation group from `@clientLocation`. May have single or multiple services. Choose the first service for multi-service case.
+  // For merged multi-service sub clients where type is cleared or sub client created by string client location, fall back to the first service
   return client.services[0];
 }
 
@@ -1250,4 +1275,46 @@ export function isSameAuth(left: Authentication, right: Authentication): boolean
     }
   }
   return true;
+}
+
+export function isTypeNeedsHandling(context: TCGCContext, type: Type): boolean {
+  return (
+    (context.__mutatedRealm === undefined && !unsafe_Realm.realmForType.has(type)) ||
+    (context.__mutatedRealm !== undefined && context.__mutatedRealm.hasType(type))
+  );
+}
+
+export function listOrphanTypes(context: TCGCContext): (Model | Enum | Union)[] {
+  if (context.__orphanTypesCache) return context.__orphanTypesCache;
+  const result: (Model | Enum | Union)[] = [];
+  const userDefinedNamespaces = listAllUserDefinedNamespaces(context);
+  for (const currNamespace of userDefinedNamespaces) {
+    const namespaces = [currNamespace];
+    let currentIndex = 0;
+    while (currentIndex < namespaces.length) {
+      const namespace = namespaces[currentIndex];
+      // orphan models
+      for (const model of namespace.models.values()) {
+        if (isTemplateDeclaration(model)) continue;
+        if (!getUsageOverride(context, model) && !getLegacyHierarchyBuilding(context, model))
+          continue;
+        result.push(model);
+      }
+      // orphan enums
+      for (const enumType of namespace.enums.values()) {
+        if (!getUsageOverride(context, enumType)) continue;
+        result.push(enumType);
+      }
+      // orphan unions
+      for (const unionType of namespace.unions.values()) {
+        if (isTemplateDeclaration(unionType)) continue;
+        if (!getUsageOverride(context, unionType)) continue;
+        result.push(unionType);
+      }
+      namespaces.push(...namespace.namespaces.values());
+      currentIndex++;
+    }
+  }
+  context.__orphanTypesCache = result;
+  return result;
 }
