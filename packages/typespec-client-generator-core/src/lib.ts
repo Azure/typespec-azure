@@ -415,6 +415,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`@scope decorator should be applied with ${"decoratorName"} since it is highly likely this is language-specific`,
       },
     },
+    "required-parameter-scoped-out": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Required parameter "${"paramName"}" is scoped out for emitter "${"scope"}". This may cause runtime errors unless the parameter is provided through other means (e.g., custom headers).`,
+      },
+    },
     "external-library-version-mismatch": {
       severity: "warning",
       messages: {

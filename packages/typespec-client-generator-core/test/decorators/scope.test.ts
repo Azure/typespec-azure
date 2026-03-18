@@ -1,4 +1,4 @@
-import { t } from "@typespec/compiler/testing";
+import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { getAccess } from "../../src/decorators.js";
@@ -825,5 +825,156 @@ describe("model property scope", () => {
     strictEqual(pythonProp, undefined);
     strictEqual(javaProp, undefined);
     ok(commonProp);
+  });
+});
+
+describe("http parameter scope", () => {
+  it("exclude header parameter with negation scope", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      op func(
+        @header("X-Custom-Header")
+        @scope("!python")
+        customHeader: string;
+      ): void;
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const sdkPackage = context.sdkPackage;
+    const client = sdkPackage.clients[0];
+    ok(client);
+    const method = client.methods[0];
+    ok(method);
+    ok(method.kind === "basic");
+    const httpOp = method.operation;
+    const headerParam = httpOp.parameters.find(
+      (x) => x.kind === "header" && x.serializedName === "X-Custom-Header",
+    );
+    strictEqual(headerParam, undefined);
+  });
+
+  it("include header parameter for matching scope", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      op func(
+        @header("X-Custom-Header")
+        @scope("python")
+        customHeader: string;
+      ): void;
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const sdkPackage = context.sdkPackage;
+    const client = sdkPackage.clients[0];
+    ok(client);
+    const method = client.methods[0];
+    ok(method);
+    ok(method.kind === "basic");
+    const httpOp = method.operation;
+    const headerParam = httpOp.parameters.find(
+      (x) => x.kind === "header" && x.serializedName === "X-Custom-Header",
+    );
+    ok(headerParam);
+  });
+
+  it("exclude query parameter with negation scope", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      op func(
+        @query("customQuery")
+        @scope("!python")
+        customQuery: string;
+      ): void;
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const sdkPackage = context.sdkPackage;
+    const client = sdkPackage.clients[0];
+    ok(client);
+    const method = client.methods[0];
+    ok(method);
+    ok(method.kind === "basic");
+    const httpOp = method.operation;
+    const queryParam = httpOp.parameters.find(
+      (x) => x.kind === "query" && x.serializedName === "customQuery",
+    );
+    strictEqual(queryParam, undefined);
+  });
+
+  it("include query parameter for matching scope", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      op func(
+        @query("customQuery")
+        @scope("python")
+        customQuery: string;
+      ): void;
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const sdkPackage = context.sdkPackage;
+    const client = sdkPackage.clients[0];
+    ok(client);
+    const method = client.methods[0];
+    ok(method);
+    ok(method.kind === "basic");
+    const httpOp = method.operation;
+    const queryParam = httpOp.parameters.find(
+      (x) => x.kind === "query" && x.serializedName === "customQuery",
+    );
+    ok(queryParam);
+  });
+
+  it("warn when required header parameter is scoped out", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      op func(
+        @header("X-Required-Header")
+        @scope("!python")
+        requiredHeader: string;
+      ): void;
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    expectDiagnostics(context.diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/required-parameter-scoped-out",
+      message: `Required parameter "requiredHeader" is scoped out for emitter "python". This may cause runtime errors unless the parameter is provided through other means (e.g., custom headers).`,
+    });
+    // Parameter should still be excluded
+    const sdkPackage = context.sdkPackage;
+    const client = sdkPackage.clients[0];
+    ok(client);
+    const method = client.methods[0];
+    ok(method);
+    ok(method.kind === "basic");
+    const httpOp = method.operation;
+    const headerParam = httpOp.parameters.find(
+      (x) => x.kind === "header" && x.serializedName === "X-Required-Header",
+    );
+    strictEqual(headerParam, undefined);
+  });
+
+  it("no warning when optional header parameter is scoped out", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      op func(
+        @header("X-Optional-Header")
+        @scope("!python")
+        optionalHeader?: string;
+      ): void;
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    // No warning for optional parameters
+    const scopedOutWarnings = context.diagnostics.filter(
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/required-parameter-scoped-out",
+    );
+    strictEqual(scopedOutWarnings.length, 0);
   });
 });
