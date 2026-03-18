@@ -55,7 +55,13 @@ await renderReactPlayground({
     useShim: true,
   },
   footer: <PlaygroundFooter />,
-  commandBarButtons: <ImportToolbarButton />,
+  commandBarItems: [
+    {
+      id: "import",
+      label: "Import remote TypeSpec",
+      toolbarItem: <ImportToolbarButton />,
+    },
+  ],
   onFileBug: () => {
     const bodyPayload = encodeURIComponent(`\n\n\n[Playground Link](${document.location.href})`);
     const url = `https://github.com/Azure/typespec-azure/issues/new?body=${bodyPayload}`;
