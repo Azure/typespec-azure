@@ -19,11 +19,11 @@ function cloneOperation(
 
   // Copy decorators from the original operation
   if (operation.decorators) {
-    (newOp as any).decorators = [...operation.decorators];
+    newOp.decorators = [...operation.decorators];
   }
 
   // Set the source operation for tracing
-  (newOp as any).sourceOperation = operation.sourceOperation ?? operation;
+  newOp.sourceOperation = operation.sourceOperation ?? operation;
 
   return newOp;
 }
@@ -38,7 +38,7 @@ function cloneModelProperty(tk: ReturnType<typeof $>, prop: ModelProperty): Mode
   });
   // Copy decorators from the original property
   if (prop.decorators) {
-    (clonedProp as any).decorators = [...prop.decorators];
+    clonedProp.decorators = [...prop.decorators];
   }
   return clonedProp;
 }
