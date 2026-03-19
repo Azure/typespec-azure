@@ -94,34 +94,6 @@ export function replaceParameter(
 }
 
 /**
- * Replace the return type of an operation with a new type.
- *
- * @param context The function context provided by TypeSpec
- * @param operation The operation to transform
- * @param returnType The new return type for the operation
- * @returns A new operation with the return type replaced
- */
-export function replaceResponse(
-  context: FunctionContext,
-  operation: Operation,
-  returnType: Type,
-): Operation {
-  const program = context.program;
-  const tk = $(program);
-
-  // Clone all parameters
-  const newProperties: ModelProperty[] = [];
-  for (const prop of operation.parameters.properties.values()) {
-    newProperties.push(cloneModelProperty(tk, prop));
-  }
-
-  return cloneOperation(tk, operation, {
-    parameters: newProperties,
-    returnType: returnType,
-  });
-}
-
-/**
  * Add a new parameter to an operation.
  *
  * @param context The function context provided by TypeSpec
@@ -143,6 +115,61 @@ export function addParameter(
     newProperties.push(cloneModelProperty(tk, prop));
   }
   newProperties.push(cloneModelProperty(tk, parameter));
+
+  return cloneOperation(tk, operation, { parameters: newProperties });
+}
+
+/**
+ * Reorder parameters of an operation according to the specified order.
+ *
+ * @param context The function context provided by TypeSpec
+ * @param operation The operation to transform
+ * @param order An array of parameter names specifying the desired order
+ * @returns A new operation with parameters reordered
+ */
+export function reorderParameters(
+  context: FunctionContext,
+  operation: Operation,
+  order: string[],
+): Operation {
+  const program = context.program;
+  const tk = $(program);
+
+  const paramMap = new Map<string, ModelProperty>();
+  for (const prop of operation.parameters.properties.values()) {
+    paramMap.set(prop.name, prop);
+  }
+
+  // Validate that all parameters in the order list exist in the operation
+  for (const paramName of order) {
+    if (!paramMap.has(paramName)) {
+      reportDiagnostic(program, {
+        code: "reorder-parameter-not-found",
+        format: { paramName, operationName: operation.name },
+        target: context.functionCallTarget,
+      });
+      return operation;
+    }
+  }
+
+  // Validate that all parameters in the operation are in the order list
+  for (const paramName of paramMap.keys()) {
+    if (!order.includes(paramName)) {
+      reportDiagnostic(program, {
+        code: "reorder-parameter-missing",
+        format: { paramName, operationName: operation.name },
+        target: context.functionCallTarget,
+      });
+      return operation;
+    }
+  }
+
+  // Build parameters in the specified order
+  const newProperties: ModelProperty[] = [];
+  for (const paramName of order) {
+    const prop = paramMap.get(paramName)!;
+    newProperties.push(cloneModelProperty(tk, prop));
+  }
 
   return cloneOperation(tk, operation, { parameters: newProperties });
 }

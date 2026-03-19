@@ -1165,35 +1165,6 @@ export type ReplaceParameterFunctionImplementation = (
 ) => Operation;
 
 /**
- * Replace the return type of an operation with a new type.
- * This function creates a new operation with the return type replaced,
- * enabling composable transformations without mutating the original operation.
- *
- * @param operation The operation to transform.
- * @param returnType The new return type for the operation.
- * @returns A new operation with the return type replaced.
- * @example Changing the return type to a custom model
- * ```typespec
- * model CustomResponse {
- *   data: string;
- *   metadata: Record<string>;
- * }
- *
- * @@override(MyService.getData, replaceResponse(MyService.getData, CustomResponse));
- * ```
- * @example Chaining with replaceParameter
- * ```typespec
- * alias Step1 = replaceParameter(MyService.myOp, "oldParam", NewParams.newParam);
- * @@override(MyService.myOp, replaceResponse(Step1, CustomResponse));
- * ```
- */
-export type ReplaceResponseFunctionImplementation = (
-  context: FunctionContext,
-  operation: Operation,
-  returnType: Type,
-) => Operation;
-
-/**
  * Add a new parameter to an operation.
  * This function creates a new operation with the additional parameter appended,
  * enabling composable transformations without mutating the original operation.
@@ -1221,8 +1192,38 @@ export type AddParameterFunctionImplementation = (
   parameter: ModelProperty,
 ) => Operation;
 
+/**
+ * Reorder parameters of an operation according to the specified order.
+ * This function creates a new operation with parameters reordered as specified,
+ * enabling control over the parameter order in generated client SDK methods.
+ *
+ * @param operation The operation to transform.
+ * @param order An array of parameter names specifying the desired order. All parameters must be included.
+ * @returns A new operation with parameters reordered.
+ * @example Reordering parameters
+ * ```typespec
+ * @service
+ * namespace MyService;
+ *
+ * op myOp(a: string, b: string, c: string): void;
+ *
+ * // Reorder to put 'c' first, then 'a', then 'b'
+ * @@override(MyService.myOp, reorderParameters(MyService.myOp, #["c", "a", "b"]));
+ * ```
+ * @example Chaining with other transformations
+ * ```typespec
+ * alias Step1 = addParameter(MyService.myOp, NewParams.newParam);
+ * @@override(MyService.myOp, reorderParameters(Step1, #["newParam", "existingParam"]));
+ * ```
+ */
+export type ReorderParametersFunctionImplementation = (
+  context: FunctionContext,
+  operation: Operation,
+  order: readonly string[],
+) => Operation;
+
 export type AzureClientGeneratorCoreFunctions = {
   replaceParameter: ReplaceParameterFunctionImplementation;
-  replaceResponse: ReplaceResponseFunctionImplementation;
   addParameter: AddParameterFunctionImplementation;
+  reorderParameters: ReorderParametersFunctionImplementation;
 };

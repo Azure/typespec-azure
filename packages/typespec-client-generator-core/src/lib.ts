@@ -495,6 +495,18 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Parameter "${"paramName"}" not found in operation "${"operationName"}".`,
       },
     },
+    "reorder-parameter-not-found": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Parameter "${"paramName"}" specified in reorder list not found in operation "${"operationName"}".`,
+      },
+    },
+    "reorder-parameter-missing": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Parameter "${"paramName"}" from operation "${"operationName"}" is missing in reorder list.`,
+      },
+    },
     "nested-client-service-not-subset": {
       severity: "error",
       messages: {

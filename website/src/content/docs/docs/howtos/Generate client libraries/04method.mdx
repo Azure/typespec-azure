@@ -1999,14 +1999,14 @@ public void uploadFile(byte[] content, String requestId);
 </ClientTabItem>
 </ClientTabs>
 
-#### `replaceResponse`
+#### `reorderParameters`
 
-Replace the return type of an operation:
+Reorder parameters of an operation according to a specified order:
 
 ```typespec
-extern fn replaceResponse(
+extern fn reorderParameters(
   operation: Reflection.Operation,
-  returnType: unknown
+  order: valueof string[]
 ): Reflection.Operation;
 ```
 
@@ -2017,28 +2017,21 @@ extern fn replaceResponse(
 @service
 namespace MyService;
 
-op getData(): string;
+op myOp(@query a: string, @query b: int32, @query c: boolean): void;
 ```
 
 ```typespec title="client.tsp"
-model RichResponse {
-  data: string;
-  metadata: Record<string>;
-}
-
-#suppress "experimental-feature" "using replaceResponse"
-@@override(getData, replaceResponse(getData, RichResponse));
+// Reorder parameters: put 'c' first, then 'a', then 'b'
+#suppress "experimental-feature" "using reorderParameters"
+@@override(MyService.myOp, reorderParameters(MyService.myOp, #["c", "a", "b"]));
 ```
 
 </ClientTabItem>
 <ClientTabItem lang="python">
 
 ```python
-class RichResponse:
-    data: str
-    metadata: Dict[str, str]
-
-def get_data(self) -> RichResponse:
+# Parameters are now in the order: c, a, b
+def my_op(self, c: bool, a: str, b: int) -> None:
     ...
 ```
 
@@ -2046,37 +2039,24 @@ def get_data(self) -> RichResponse:
 <ClientTabItem lang="csharp">
 
 ```csharp
-public partial class RichResponse
-{
-    public string Data { get; }
-    public IDictionary<string, string> Metadata { get; }
-}
-
-public virtual Response<RichResponse> GetData(CancellationToken cancellationToken = default)
+// Parameters are now in the order: c, a, b
+public virtual Response MyOp(bool c, string a, int b, CancellationToken cancellationToken = default)
 ```
 
 </ClientTabItem>
 <ClientTabItem lang="typescript">
 
 ```typescript
-interface RichResponse {
-  data: string;
-  metadata: Record<string, string>;
-}
-
-export async function getData(): Promise<RichResponse>;
+// Parameters are now in the order: c, a, b
+export async function myOp(c: boolean, a: string, b: number): Promise<void>;
 ```
 
 </ClientTabItem>
 <ClientTabItem lang="java">
 
 ```java
-public final class RichResponse {
-    public String getData();
-    public Map<String, String> getMetadata();
-}
-
-public RichResponse getData();
+// Parameters are now in the order: c, a, b
+public void myOp(boolean c, String a, int b);
 ```
 
 </ClientTabItem>
@@ -2107,30 +2087,21 @@ model RequiredParams {
   limit: int32;
 }
 
-model EnrichedResponse {
-  results: string[];
-  totalCount: int32;
-}
-
-// Chain: make query required -> make limit required -> change response
+// Chain: make query required -> make limit required -> reorder parameters
 #suppress "experimental-feature" "using replaceParameter"
 alias step1 = replaceParameter(search, "query", RequiredParams.query);
 #suppress "experimental-feature" "using replaceParameter"
 alias step2 = replaceParameter(step1, "limit", RequiredParams.limit);
-#suppress "experimental-feature" "using replaceResponse"
-@@override(search, replaceResponse(step2, EnrichedResponse));
+#suppress "experimental-feature" "using reorderParameters"
+@@override(search, reorderParameters(step2, #["limit", "query"]));
 ```
 
 </ClientTabItem>
 <ClientTabItem lang="python">
 
 ```python
-class EnrichedResponse:
-    results: List[str]
-    total_count: int
-
-# Both query and limit are now required, response is EnrichedResponse
-def search(self, query: str, limit: int) -> EnrichedResponse:
+# Both query and limit are now required, and limit comes before query
+def search(self, limit: int, query: str) -> str:
     ...
 ```
 
@@ -2138,40 +2109,24 @@ def search(self, query: str, limit: int) -> EnrichedResponse:
 <ClientTabItem lang="csharp">
 
 ```csharp
-public partial class EnrichedResponse
-{
-    public IList<string> Results { get; }
-    public int TotalCount { get; }
-}
-
-// Both parameters required, returns EnrichedResponse
-public virtual Response<EnrichedResponse> Search(string query, int limit, CancellationToken cancellationToken = default)
+// Both parameters required, limit comes before query
+public virtual Response<string> Search(int limit, string query, CancellationToken cancellationToken = default)
 ```
 
 </ClientTabItem>
 <ClientTabItem lang="typescript">
 
 ```typescript
-interface EnrichedResponse {
-  results: string[];
-  totalCount: number;
-}
-
-// Both parameters required, returns EnrichedResponse
-export async function search(query: string, limit: number): Promise<EnrichedResponse>;
+// Both parameters required, limit comes before query
+export async function search(limit: number, query: string): Promise<string>;
 ```
 
 </ClientTabItem>
 <ClientTabItem lang="java">
 
 ```java
-public final class EnrichedResponse {
-    public List<String> getResults();
-    public int getTotalCount();
-}
-
-// Both parameters required, returns EnrichedResponse
-public EnrichedResponse search(String query, int limit);
+// Both parameters required, limit comes before query
+public String search(int limit, String query);
 ```
 
 </ClientTabItem>
