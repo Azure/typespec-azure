@@ -162,7 +162,7 @@ describe("reorderParameters", () => {
 
   describe("error handling", () => {
     it("reports error when order list contains non-existent parameter", async () => {
-      const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+      const diagnostics = await SimpleBaseTester.diagnose(
         createClientCustomizationInput(
           `
           @service
@@ -184,7 +184,7 @@ describe("reorderParameters", () => {
     });
 
     it("reports error when order list is missing a parameter", async () => {
-      const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+      const diagnostics = await SimpleBaseTester.diagnose(
         createClientCustomizationInput(
           `
           @service
