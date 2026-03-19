@@ -119,4 +119,56 @@ describe("@clientOption omitSlashFromEmptyRoute", () => {
     strictEqual(createBlobMethod?.kind, "basic");
     strictEqual(createBlobMethod?.operation.path, "");
   });
+
+  it("operation-level false overrides namespace-level true", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      #suppress "@azure-tools/typespec-client-generator-core/client-option" "testing"
+      #suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope" "testing"
+      @clientOption("omitSlashFromEmptyRoute", true)
+      namespace BlobService {
+        #suppress "@azure-tools/typespec-client-generator-core/client-option" "testing"
+        #suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope" "testing"
+        @clientOption("omitSlashFromEmptyRoute", false)
+        @put
+        op createBlob(): void;
+      }
+    `);
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
+
+    // Namespace creates a child client
+    const mainClient = sdkPackage.clients[0];
+    const childClient = mainClient.children?.[0];
+    const createBlobMethod = childClient?.methods.find((m) => m.name === "createBlob");
+
+    // Operation-level false should override namespace-level true
+    strictEqual(createBlobMethod?.kind, "basic");
+    strictEqual(createBlobMethod?.operation.path, "/");
+  });
+
+  it("operation-level false overrides interface-level true", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      #suppress "@azure-tools/typespec-client-generator-core/client-option" "testing"
+      #suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope" "testing"
+      @clientOption("omitSlashFromEmptyRoute", true)
+      interface BlobOperations {
+        #suppress "@azure-tools/typespec-client-generator-core/client-option" "testing"
+        #suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope" "testing"
+        @clientOption("omitSlashFromEmptyRoute", false)
+        @put
+        createBlob(): void;
+      }
+    `);
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
+
+    // Interface creates a child client
+    const mainClient = sdkPackage.clients[0];
+    const childClient = mainClient.children?.[0];
+    const createBlobMethod = childClient?.methods.find((m) => m.name === "createBlob");
+
+    // Operation-level false should override interface-level true
+    strictEqual(createBlobMethod?.kind, "basic");
+    strictEqual(createBlobMethod?.operation.path, "/");
+  });
 });
