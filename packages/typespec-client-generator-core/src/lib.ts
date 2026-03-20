@@ -507,6 +507,18 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Parameter "${"paramName"}" from operation "${"operationName"}" is missing in reorder list.`,
       },
     },
+    "add-parameter-duplicate": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Parameter "${"paramName"}" already exists in operation "${"operationName"}".`,
+      },
+    },
+    "reorder-parameter-duplicate": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Parameter "${"paramName"}" appears more than once in the reorder list for operation "${"operationName"}".`,
+      },
+    },
     "nested-client-service-not-subset": {
       severity: "error",
       messages: {

@@ -109,6 +109,16 @@ export function addParameter(
   const program = context.program;
   const tk = $(program);
 
+  // Check if a parameter with the same name already exists
+  if (operation.parameters.properties.has(parameter.name)) {
+    reportDiagnostic(program, {
+      code: "add-parameter-duplicate",
+      format: { paramName: parameter.name, operationName: operation.name },
+      target: context.functionCallTarget,
+    });
+    return operation;
+  }
+
   // Clone all existing parameters and add the new one
   const newProperties: ModelProperty[] = [];
   for (const prop of operation.parameters.properties.values()) {
@@ -140,8 +150,22 @@ export function reorderParameters(
     paramMap.set(prop.name, prop);
   }
 
-  // Validate that all parameters in the order list exist in the operation
+  // Build a Set from order to detect duplicates and enable O(1) lookups
+  const orderSet = new Set<string>();
   for (const paramName of order) {
+    if (orderSet.has(paramName)) {
+      reportDiagnostic(program, {
+        code: "reorder-parameter-duplicate",
+        format: { paramName, operationName: operation.name },
+        target: context.functionCallTarget,
+      });
+      return operation;
+    }
+    orderSet.add(paramName);
+  }
+
+  // Validate that all parameters in the order list exist in the operation
+  for (const paramName of orderSet) {
     if (!paramMap.has(paramName)) {
       reportDiagnostic(program, {
         code: "reorder-parameter-not-found",
@@ -154,7 +178,7 @@ export function reorderParameters(
 
   // Validate that all parameters in the operation are in the order list
   for (const paramName of paramMap.keys()) {
-    if (!order.includes(paramName)) {
+    if (!orderSet.has(paramName)) {
       reportDiagnostic(program, {
         code: "reorder-parameter-missing",
         format: { paramName, operationName: operation.name },

@@ -1,3 +1,4 @@
+import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import {
@@ -211,6 +212,34 @@ describe("addParameter", () => {
       const thirdIndex = paramNames.indexOf("third");
       ok(thirdIndex > firstIndex, "third should come after first");
       ok(thirdIndex > secondIndex, "third should come after second");
+    });
+  });
+
+  describe("error handling", () => {
+    it("reports error when adding a parameter that already exists", async () => {
+      const diagnostics = await SimpleBaseTester.diagnose(
+        createClientCustomizationInput(
+          `
+          @service
+          namespace MyService;
+
+          op myOp(@query existingParam: string): void;
+          `,
+          `
+          model ExtraParams {
+            existingParam: int32;
+          }
+
+          #suppress "experimental-feature" "testing addParameter"
+          @@override(MyService.myOp, addParameter(MyService.myOp, ExtraParams.existingParam));
+          `,
+        ),
+      );
+
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/add-parameter-duplicate",
+        message: /Parameter "existingParam" already exists in operation "myOp"/,
+      });
     });
   });
 });

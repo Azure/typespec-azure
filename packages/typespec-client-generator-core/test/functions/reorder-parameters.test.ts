@@ -204,5 +204,27 @@ describe("reorderParameters", () => {
         message: /Parameter "b" from operation "myOp" is missing in reorder list/,
       });
     });
+
+    it("reports error when order list contains duplicate parameter names", async () => {
+      const diagnostics = await SimpleBaseTester.diagnose(
+        createClientCustomizationInput(
+          `
+          @service
+          namespace MyService;
+
+          op myOp(@query a: string, @query b: int32): void;
+          `,
+          `
+          #suppress "experimental-feature" "testing reorderParameters"
+          @@override(MyService.myOp, reorderParameters(MyService.myOp, #["a", "a", "b"]));
+          `,
+        ),
+      );
+
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/reorder-parameter-duplicate",
+        message: /Parameter "a" appears more than once in the reorder list for operation "myOp"/,
+      });
+    });
   });
 });
