@@ -196,10 +196,13 @@ export type ClientDecorator = (
 ) => DecoratorValidatorCallbacks | void;
 
 /**
+ *
+ *
+ *
+ * @deprecated Use `@client` instead. The `@operationGroup` decorator is deprecated. Sub clients should be represented using `@client`.
  * Define the sub client generated in the client SDK.
  * If there is any `@client` definition or `@operationGroup` definition, then each `@client` is a root client and each `@operationGroup` is a sub client with hierarchy.
  * This decorator cannot be used along with `@clientLocation`. This decorator cannot be used as augmentation.
- *
  * @param target The target namespace or interface that you want to define as a sub client.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  *

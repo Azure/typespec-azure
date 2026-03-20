@@ -35,6 +35,8 @@ configuration:
                     label: ide
                 - hasLabel:
                     label: cli/psh
+                - hasLabel:
+                    label: meta:website
         then:
           - addLabel:
               label: needs-area
@@ -63,6 +65,8 @@ configuration:
                   label: ide
               - labelAdded:
                   label: cli/psh
+              - labelAdded:
+                  label: meta:website
         then:
           - removeLabel:
               label: needs-area
@@ -92,6 +96,8 @@ configuration:
                   label: ide
               - labelRemoved:
                   label: cli/psh
+              - labelRemoved:
+                  label: meta:website
           - not:
               or:
                 - hasLabel:
@@ -112,6 +118,8 @@ configuration:
                     label: ide
                 - hasLabel:
                     label: cli/psh
+                - hasLabel:
+                    label: meta:website
         then:
           - addLabel:
               label: needs-area
