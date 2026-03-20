@@ -1,0 +1,6 @@
+title: Location Resource
+description: Sample configuration for location resource in resource-types.
+
+llmstxt: true
+
+order: 4

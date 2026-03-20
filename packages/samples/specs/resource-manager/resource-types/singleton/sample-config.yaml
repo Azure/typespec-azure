@@ -1,0 +1,6 @@
+title: Singleton Resource
+description: Sample configuration for singleton resource in resource-types.
+
+llmstxt: true
+
+order: 6

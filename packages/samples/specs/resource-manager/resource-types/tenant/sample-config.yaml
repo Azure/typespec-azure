@@ -1,0 +1,6 @@
+title: Tenant Resource
+description: Sample configuration for tenant resource in resource-types.
+
+llmstxt: true
+
+order: 3

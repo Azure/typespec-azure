@@ -1,0 +1,6 @@
+title: Network Security Perimeter
+description: Sample configuration for network security perimeter in resource-types.
+
+llmstxt: true
+
+order: 9

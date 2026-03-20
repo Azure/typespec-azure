@@ -1,0 +1,6 @@
+title: Private Endpoints
+description: Sample configuration for private endpoints in resource-types.
+
+llmstxt: true
+
+order: 8

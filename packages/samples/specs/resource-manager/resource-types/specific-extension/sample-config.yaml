@@ -1,0 +1,6 @@
+title: Specific Extension Resource
+description: Sample configuration for specific extension resource in resource-types.
+
+llmstxt: true
+
+order: 5

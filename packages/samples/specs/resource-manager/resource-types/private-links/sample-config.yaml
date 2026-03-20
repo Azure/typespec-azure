@@ -1,0 +1,6 @@
+title: Private Links
+description: Sample configuration for private links in resource-types.
+
+llmstxt: true
+
+order: 7
