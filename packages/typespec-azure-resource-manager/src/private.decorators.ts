@@ -23,7 +23,6 @@ import {
   Type,
 } from "@typespec/compiler";
 
-import { unsafe_Realm } from "@typespec/compiler/experimental";
 import { $ } from "@typespec/compiler/typekit";
 import { useStateMap } from "@typespec/compiler/utils";
 import { $bodyRoot, getHttpOperation } from "@typespec/http";
@@ -576,14 +575,18 @@ const [getArmResource, setArmResource, armResourceStateMap] = useStateMap<
 export { getArmResource };
 
 export function listArmResources(program: Program): ArmResourceDetails[] {
-  // Filter out realm types created by versioning mutations (e.g., from TCGC's createSdkContext
-  // or autorest's per-version snapshots). These realm copies have decorators re-applied which
-  // registers them in the state map alongside the originals, causing duplicates. We keep them
-  // registered so that getArmResource() direct lookups still work (used by getArmResourceInfo),
-  // but exclude them here so that resolveArmResources returns only the canonical resource list.
-  return [...armResourceStateMap(program).values()].filter(
-    (r) => !unsafe_Realm.realmForType.has(r.typespecType),
-  );
+  // Deduplicate by namespace-qualified name. Versioning mutations (from TCGC's
+  // createSdkContext or autorest's per-version snapshots) re-apply decorators on
+  // realm copies, registering them alongside the originals. By keeping only the
+  // first entry per qualified name, we ensure each resource appears exactly once.
+  const seen = new Map<string, ArmResourceDetails>();
+  for (const resource of armResourceStateMap(program).values()) {
+    const qualifiedName = getTypeName(resource.typespecType);
+    if (!seen.has(qualifiedName)) {
+      seen.set(qualifiedName, resource);
+    }
+  }
+  return [...seen.values()];
 }
 
 function getProperty(model: Model, propertyName: string): ModelProperty | undefined {
