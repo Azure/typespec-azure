@@ -93,6 +93,7 @@ model BlobQueryParam {
 @doc("Operations for nested default -> individually")
 @global.Azure.ClientGenerator.Core.client({
   name: "IndividuallyNestedWithPathClient",
+  service: global._Specs_.Azure.ClientGenerator.Core.ClientInitialization.IndividuallyClient,
 })
 @global.Azure.ClientGenerator.Core.clientInitialization({
   parameters: PathParamClientOptions,
@@ -141,6 +142,7 @@ interface IndividuallyNestedWithPath {
 @doc("Operations for nested default -> individually with query parameters")
 @global.Azure.ClientGenerator.Core.client({
   name: "IndividuallyNestedWithQueryClient",
+  service: global._Specs_.Azure.ClientGenerator.Core.ClientInitialization.IndividuallyClient,
 })
 @global.Azure.ClientGenerator.Core.clientInitialization({
   parameters: BlobQueryParamClientOptions,
@@ -189,6 +191,7 @@ interface IndividuallyNestedWithQuery {
 @doc("Operations for nested default -> individually header parameters")
 @global.Azure.ClientGenerator.Core.client({
   name: "IndividuallyNestedWithHeaderClient",
+  service: global._Specs_.Azure.ClientGenerator.Core.ClientInitialization.IndividuallyClient,
 })
 @global.Azure.ClientGenerator.Core.clientInitialization({
   parameters: HeaderParamClientOptions,
@@ -239,6 +242,7 @@ interface IndividuallyNestedWithHeader {
 @doc("Operations for nested default -> individually multiple parameters")
 @global.Azure.ClientGenerator.Core.client({
   name: "IndividuallyNestedWithMultipleClient",
+  service: global._Specs_.Azure.ClientGenerator.Core.ClientInitialization.IndividuallyClient,
 })
 @global.Azure.ClientGenerator.Core.clientInitialization({
   parameters: MultipleParamsClientOptions,
@@ -290,6 +294,7 @@ interface IndividuallyNestedWithMultiple {
 @doc("Operations for nested default -> individually mixed parameters")
 @global.Azure.ClientGenerator.Core.client({
   name: "IndividuallyNestedWithMixedClient",
+  service: global._Specs_.Azure.ClientGenerator.Core.ClientInitialization.IndividuallyClient,
 })
 @global.Azure.ClientGenerator.Core.clientInitialization({
   parameters: MixedParamsClientOptions,
@@ -337,6 +342,7 @@ interface IndividuallyNestedWithMixed {
 @doc("Operations for nested default -> individually param alias")
 @global.Azure.ClientGenerator.Core.client({
   name: "IndividuallyNestedWithParamAliasClient",
+  service: global._Specs_.Azure.ClientGenerator.Core.ClientInitialization.IndividuallyClient,
 })
 @global.Azure.ClientGenerator.Core.clientInitialization({
   parameters: ParamAliasClientOptions,

@@ -1797,3 +1797,53 @@ export const $clientOption: ClientOptionDecorator = (
   // The decorator info will be exposed via the decorators array on SDK types
   setScopedDecoratorData(context, $clientOption, clientOptionKey, target, { name, value }, scope);
 };
+
+/**
+ * Gets the value of a specific client option for a target.
+ * Checks the target itself and walks up the namespace/interface hierarchy.
+ */
+export function getClientOptionValue(
+  context: TCGCContext,
+  target: Operation,
+  optionName: string,
+): unknown | undefined {
+  // Check operation directly
+  const opOption = getScopedDecoratorData(context, clientOptionKey, target) as
+    | { name: string; value: unknown }
+    | undefined;
+  if (opOption?.name === optionName) {
+    return opOption.value;
+  }
+
+  // Check interface if operation is in one
+  if (target.interface) {
+    const ifaceOption = getScopedDecoratorData(context, clientOptionKey, target.interface) as
+      | { name: string; value: unknown }
+      | undefined;
+    if (ifaceOption?.name === optionName) {
+      return ifaceOption.value;
+    }
+  }
+
+  // Check namespace hierarchy
+  let ns = target.namespace;
+  while (ns) {
+    const nsOption = getScopedDecoratorData(context, clientOptionKey, ns) as
+      | { name: string; value: unknown }
+      | undefined;
+    if (nsOption?.name === optionName) {
+      return nsOption.value;
+    }
+    ns = ns.namespace;
+  }
+
+  return undefined;
+}
+
+/**
+ * Known client option: omitSlashFromEmptyRoute
+ * When set to true, operations with empty routes ("/") will have their path set to "".
+ */
+export function shouldOmitSlashFromEmptyRoute(context: TCGCContext, target: Operation): boolean {
+  return getClientOptionValue(context, target, "omitSlashFromEmptyRoute") === true;
+}
