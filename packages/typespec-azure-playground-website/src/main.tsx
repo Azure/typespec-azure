@@ -1,17 +1,18 @@
+import { FluentProvider, webLightTheme } from "@fluentui/react-components";
+import { MANIFEST } from "@typespec/compiler";
 import { registerMonacoDefaultWorkersForVite } from "@typespec/playground";
 import PlaygroundManifest from "@typespec/playground/manifest";
 import {
   Footer,
   FooterItem,
   FooterVersionItem,
-  renderReactPlayground,
+  StandalonePlayground,
 } from "@typespec/playground/react";
 import { SwaggerUIViewer } from "@typespec/playground/react/viewers";
+import "@typespec/playground/styles.css";
+import { createRoot } from "react-dom/client";
 import samples from "../samples/dist/samples.js";
-
-import { MANIFEST } from "@typespec/compiler";
-import "@typespec/playground/style.css";
-import { ImportToolbarButton } from "./import.js";
+import { useImportCommandBarItem } from "./import.js";
 import "./style.css";
 
 registerMonacoDefaultWorkersForVite();
@@ -43,22 +44,35 @@ const PlaygroundFooter = () => {
   );
 };
 
-await renderReactPlayground({
-  ...PlaygroundManifest,
-  samples,
-  emitterViewers: {
-    "@typespec/openapi3": [SwaggerUIViewer],
-    "@azure-tools/typespec-autorest": [SwaggerUIViewer],
-    "@azure-tools/typespec-client-generator-core": [SwaggerUIViewer],
-  },
-  importConfig: {
-    useShim: true,
-  },
-  footer: <PlaygroundFooter />,
-  commandBarButtons: <ImportToolbarButton />,
-  onFileBug: () => {
-    const bodyPayload = encodeURIComponent(`\n\n\n[Playground Link](${document.location.href})`);
-    const url = `https://github.com/Azure/typespec-azure/issues/new?body=${bodyPayload}`;
-    window.open(url, "_blank");
-  },
-});
+const onFileBug = () => {
+  const bodyPayload = encodeURIComponent(`\n\n\n[Playground Link](${document.location.href})`);
+  const url = `https://github.com/Azure/typespec-azure/issues/new?body=${bodyPayload}`;
+  window.open(url, "_blank");
+};
+
+const App = () => {
+  const importItem = useImportCommandBarItem();
+
+  return (
+    <StandalonePlayground
+      {...PlaygroundManifest}
+      samples={samples}
+      emitterViewers={{
+        "@typespec/openapi3": [SwaggerUIViewer],
+        "@azure-tools/typespec-autorest": [SwaggerUIViewer],
+        "@azure-tools/typespec-client-generator-core": [SwaggerUIViewer],
+      }}
+      importConfig={{ useShim: true }}
+      footer={<PlaygroundFooter />}
+      commandBarItems={[importItem]}
+      onFileBug={onFileBug}
+    />
+  );
+};
+
+const root = createRoot(document.getElementById("root")!);
+root.render(
+  <FluentProvider theme={webLightTheme} style={{ height: "100vh" }}>
+    <App />
+  </FluentProvider>,
+);

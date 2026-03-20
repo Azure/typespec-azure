@@ -177,39 +177,18 @@ for (const decorator of clientOptionDecorators) {
 }
 ```
 
-## Supported Client Options by Language
+## Supported Client Options
 
-Language emitters should document which client options they support. The following sections list the supported options for each language.
+| Option Name               | Value Type | Target                          | Languages | Description                                                                                              |
+| ------------------------- | ---------- | ------------------------------- | --------- | -------------------------------------------------------------------------------------------------------- |
+| `omitSlashFromEmptyRoute` | `boolean`  | Operation, Interface, Namespace | All       | When `true`, operations with empty routes (path `"/"`) will use `""` instead. Only affects empty routes. |
 
-### Python
-
-| Option Name   | Value Type | Target | Description |
-| ------------- | ---------- | ------ | ----------- |
-| _Coming soon_ |            |        |             |
-
-### C# (.NET)
-
-| Option Name   | Value Type | Target | Description |
-| ------------- | ---------- | ------ | ----------- |
-| _Coming soon_ |            |        |             |
-
-### Java
-
-| Option Name   | Value Type | Target | Description |
-| ------------- | ---------- | ------ | ----------- |
-| _Coming soon_ |            |        |             |
-
-### TypeScript/JavaScript
-
-| Option Name   | Value Type | Target | Description |
-| ------------- | ---------- | ------ | ----------- |
-| _Coming soon_ |            |        |             |
-
-### Go
-
-| Option Name   | Value Type | Target | Description |
-| ------------- | ---------- | ------ | ----------- |
-| _Coming soon_ |            |        |             |
+```typespec
+#suppress "@azure-tools/typespec-client-generator-core/client-option" "legacy storage usage"
+@clientOption("omitSlashFromEmptyRoute", true, "python")
+@put
+op createBlob(): void;
+```
 
 ## Best Practices
 

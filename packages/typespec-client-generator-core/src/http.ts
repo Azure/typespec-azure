@@ -31,7 +31,7 @@ import {
 } from "@typespec/http";
 import { StreamMetadata, getStreamMetadata } from "@typespec/http/experimental";
 import { camelCase } from "change-case";
-import { getResponseAsBool, isInScope } from "./decorators.js";
+import { getResponseAsBool, isInScope, shouldOmitSlashFromEmptyRoute } from "./decorators.js";
 import {
   CollectionFormat,
   SdkBodyParameter,
@@ -157,10 +157,17 @@ export function getSdkHttpOperation(
   );
   filterOutUselessPathParameters(context, httpOperation, methodParameters);
   filterOutReadOnlyParameters(methodParameters);
+
+  // Check if empty route should be treated as empty string
+  let path = httpOperation.path;
+  if (path === "/" && shouldOmitSlashFromEmptyRoute(context, httpOperation.operation)) {
+    path = "";
+  }
+
   return diagnostics.wrap({
     __raw: httpOperation,
     kind: "http",
-    path: httpOperation.path,
+    path,
     uriTemplate: httpOperation.uriTemplate,
     verb: httpOperation.verb,
     ...parameters,
