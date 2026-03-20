@@ -1884,7 +1884,7 @@ model RequiredMaxResults {
 }
 
 #suppress "experimental-feature" "using replaceParameter"
-@@override(getSecrets, replaceParameter(getSecrets, "maxResults", RequiredMaxResults.maxResults));
+@@override(KeyVault.getSecrets, replaceParameter(KeyVault.getSecrets, "maxResults", RequiredMaxResults.maxResults));
 ```
 
 </ClientTabItem>
