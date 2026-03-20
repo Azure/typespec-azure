@@ -1,5 +1,5 @@
 title: Tracked Resource
-description: Sample configuration for tracked resource in resource-types.
+description: Sample specification for a tracked resource.
 
 llmstxt: true
 

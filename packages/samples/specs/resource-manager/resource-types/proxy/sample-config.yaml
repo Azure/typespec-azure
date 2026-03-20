@@ -1,5 +1,5 @@
 title: Proxy Resource
-description: Sample configuration for proxy resource in resource-types.
+description: Sample specification for a proxy resource.
 
 llmstxt: true
 

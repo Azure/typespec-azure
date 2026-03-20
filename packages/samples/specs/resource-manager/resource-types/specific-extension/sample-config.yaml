@@ -1,5 +1,5 @@
 title: Specific Extension Resource
-description: Sample configuration for specific extension resource in resource-types.
+description: Sample specification for an extension resource at multiple scopes.
 
 llmstxt: true
 

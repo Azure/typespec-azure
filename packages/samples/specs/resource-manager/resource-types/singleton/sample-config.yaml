@@ -1,5 +1,5 @@
 title: Singleton Resource
-description: Sample configuration for singleton resource in resource-types.
+description: Sample specification for a singleton resource.
 
 llmstxt: true
 

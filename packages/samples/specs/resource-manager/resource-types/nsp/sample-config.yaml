@@ -1,5 +1,5 @@
 title: Network Security Perimeter
-description: Sample configuration for network security perimeter in resource-types.
+description: Sample specification for a network security perimeter resource.
 
 llmstxt: true
 
