@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.66.3
+
+### Bug Fixes
+
+- [#4068](https://github.com/Azure/typespec-azure/pull/4068) Add support for `@clientOption("omitSlashFromEmptyRoute", true)` to handle legacy compatibility for operations with empty routes.
+
+
 ## 0.66.2
 
 ### Bug Fixes
