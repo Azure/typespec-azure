@@ -579,14 +579,13 @@ export function listArmResources(program: Program): ArmResourceDetails[] {
   // createSdkContext or autorest's per-version snapshots) re-apply decorators on
   // realm copies, registering them alongside the originals. By keeping only the
   // first entry per qualified name, we ensure each resource appears exactly once.
-  const seen = new Map<string, ArmResourceDetails>();
-  for (const resource of armResourceStateMap(program).values()) {
-    const qualifiedName = getTypeName(resource.typespecType);
-    if (!seen.has(qualifiedName)) {
-      seen.set(qualifiedName, resource);
-    }
-  }
-  return [...seen.values()];
+  const seen = new Set<string>();
+  return [...armResourceStateMap(program).values()].filter((r) => {
+    const name = getTypeName(r.typespecType);
+    if (seen.has(name)) return false;
+    seen.add(name);
+    return true;
+  });
 }
 
 function getProperty(model: Model, propertyName: string): ModelProperty | undefined {
