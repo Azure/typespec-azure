@@ -3792,4 +3792,138 @@ model MoveResponse {
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Provider.B/foos/{name}",
     );
   });
+
+  it("preserves segment casing from ResourceTypeParameter for list operations", async () => {
+    const { program } = await Tester.compile(`
+
+using Azure.Core;
+
+/** Contoso Resource Provider management API. */
+@armProviderNamespace
+@service(#{ title: "ContosoProviderHubClient" })
+@versioned(Versions)
+namespace Microsoft.ContosoProviderHub;
+
+/** Contoso API versions */
+enum Versions {
+  /** 2021-10-01-preview version */
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  v2021_20_01_preview: "2021-10-01-preview",
+}
+
+/** A ContosoProviderHub resource */
+model SBNamespace is TrackedResource<SBNamespaceProperties> {
+  ...ResourceNameParameter<SBNamespace>;
+}
+
+/** SBNamespace properties */
+model SBNamespaceProperties {
+  /** Display name */
+  displayName?: string;
+}
+
+/** A ContosoProviderHub authorization rule resource */
+model SBAuthorizationRule is ProxyResource<SBAuthorizationRuleProperties> {
+  ...ResourceNameParameter<
+    Resource = SBAuthorizationRule,
+    KeyName = "authorizationRuleName",
+    SegmentName = "authorizationRules",
+    NamePattern = ""
+  >;
+}
+
+/** SBAuthorizationRule properties */
+model SBAuthorizationRuleProperties {
+  /** The rights */
+  rights?: string[];
+}
+
+@armResourceOperations
+interface SBNamespaces {
+  get is ArmResourceRead<SBNamespace>;
+  create is ArmResourceCreateOrReplaceAsync<SBNamespace>;
+  delete is ArmResourceDeleteWithoutOkAsync<SBNamespace>;
+  list is ArmResourceListByParent<SBNamespace>;
+}
+
+alias SBAuthorizationRuleOps = Azure.ResourceManager.Legacy.LegacyOperations<
+  {
+    ...ApiVersionParameter;
+    ...SubscriptionIdParameter;
+    ...ResourceGroupParameter;
+    ...Azure.ResourceManager.Legacy.Provider;
+
+    /** The namespace name */
+    @path
+    @segment("namespaces")
+    namespaceName: string;
+  },
+  {
+    /** The authorization rule name. */
+    @path
+    @segment("AuthorizationRules")
+    authorizationRuleName: string;
+  }
+>;
+
+@armResourceOperations
+interface SBAuthorizationRules {
+  get is SBAuthorizationRuleOps.Read<SBAuthorizationRule>;
+  create is SBAuthorizationRuleOps.CreateOrUpdateSync<SBAuthorizationRule>;
+  delete is SBAuthorizationRuleOps.DeleteSync<SBAuthorizationRule>;
+  list is SBAuthorizationRuleOps.List<SBAuthorizationRule>;
+}
+
+interface Operations extends Azure.ResourceManager.Operations {}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    ok(provider.resources);
+
+    // Find the SBAuthorizationRule resource
+    const authRule = provider.resources.find((r) => r.type?.name === "SBAuthorizationRule");
+    ok(authRule);
+
+    // The list operation should use "AuthorizationRules" (PascalCase from ResourceTypeParameter),
+    // not "authorizationRules" (from the resource model's segment)
+    checkResolvedOperations(authRule, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            {
+              operationGroup: "SBAuthorizationRules",
+              name: "create",
+              kind: "createOrUpdate",
+            },
+          ],
+          delete: [
+            { operationGroup: "SBAuthorizationRules", name: "delete", kind: "delete" },
+          ],
+          read: [
+            {
+              operationGroup: "SBAuthorizationRules",
+              name: "get",
+              kind: "read",
+              path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/namespaces/{namespaceName}/AuthorizationRules/{authorizationRuleName}",
+            },
+          ],
+        },
+        lists: [
+          {
+            operationGroup: "SBAuthorizationRules",
+            name: "list",
+            kind: "list",
+            path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/namespaces/{namespaceName}/AuthorizationRules",
+          },
+        ],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["namespaces", "AuthorizationRules"],
+      },
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/namespaces/{namespaceName}/AuthorizationRules/{authorizationRuleName}",
+    });
+  });
 });

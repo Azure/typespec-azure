@@ -262,6 +262,28 @@ const $defaultResourceKeySegmentName: DefaultResourceKeySegmentNameDecorator = (
   }
 };
 
+/**
+ * Sets the segment of an operation based on the first @segment found on a property of the model.
+ * This handles the case where the model doesn't have a @key property (like anonymous models used
+ * as ResourceTypeParameter in LegacyOperations/RoutedOperations).
+ */
+const $armSegmentOfProperty = (
+  context: DecoratorContext,
+  entity: Operation,
+  resourceType: Model,
+) => {
+  if ((resourceType.kind as string) === "TemplateParameter") {
+    return;
+  }
+  for (const prop of resourceType.properties.values()) {
+    const segment = getSegment(context.program, prop);
+    if (segment) {
+      context.call($segment, entity, segment);
+      return;
+    }
+  }
+};
+
 export function getResourceParameterBases(
   program: Program,
   property: ModelProperty,
@@ -1008,6 +1030,7 @@ export const $decorators = {
     legacyResourceOperation: $legacyResourceOperation,
     builtInResourceOperation: $builtInResourceOperation,
     validateCommonTypesVersionForResource: $validateCommonTypesVersionForResource,
+    armSegmentOfProperty: $armSegmentOfProperty,
   } satisfies AzureResourceManagerPrivateDecorators,
   "Azure.ResourceManager.Extension.Private": {
     builtInResource: $builtInResource,

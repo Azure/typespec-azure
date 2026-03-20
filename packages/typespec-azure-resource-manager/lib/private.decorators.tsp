@@ -119,6 +119,14 @@ extern dec armResourcePropertiesOptionality(target: ModelProperty, isOptional: v
 /** designates a parameter as an explicit bodyRoot and sets the optionality of the parameter */
 extern dec armBodyRoot(target: ModelProperty, isOptional: valueof boolean);
 
+/**
+ * Sets the segment of an operation based on the first @segment found on a model property.
+ * Unlike @segmentOf from @typespec/rest, this does not require the model to have a @key property.
+ * Used to correctly set the collection segment for list operations in LegacyOperations/RoutedOperations.
+ * @param resourceType The model containing a property with @segment
+ */
+extern dec armSegmentOfProperty(target: Operation, resourceType: Model);
+
 /** designates a type as a legacy type and emits a warning diagnostic when used */
 extern dec legacyType(target: Model | Operation | Interface | Scalar);
 

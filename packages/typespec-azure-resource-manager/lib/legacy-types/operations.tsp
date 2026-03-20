@@ -305,7 +305,7 @@ interface RoutedOperations<
    * @template OverrideRouteOptions Optional. The route options for the operation.
    * @template OverrideResourceName Optional. The name of the resource type being acted upon.
    */
-  @segmentOf(ResourceTypeParameter)
+  @Private.armSegmentOfProperty(ResourceTypeParameter)
   @doc("List a {name}", Resource)
   @get
   @list
@@ -331,7 +331,7 @@ interface RoutedOperations<
    * @template OverrideRouteOptions Optional. The route options for the operation.
    * @template OverrideResourceName Optional. The name of the resource type being acted upon.
    */
-  @segmentOf(ResourceTypeParameter)
+  @Private.armSegmentOfProperty(ResourceTypeParameter)
   @doc("List a {name}", Resource)
   @get
   @listsResource(Resource)
