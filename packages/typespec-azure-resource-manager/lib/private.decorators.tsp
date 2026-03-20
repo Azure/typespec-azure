@@ -120,10 +120,11 @@ extern dec armResourcePropertiesOptionality(target: ModelProperty, isOptional: v
 extern dec armBodyRoot(target: ModelProperty, isOptional: valueof boolean);
 
 /**
- * Sets the segment of an operation based on the first @segment found on a model property.
- * Unlike @segmentOf from @typespec/rest, this does not require the model to have a @key property.
- * Used to correctly set the collection segment for list operations in LegacyOperations/RoutedOperations.
- * @param resourceType The model containing a property with @segment
+ * Sets the segment of an operation based on the first segment decorator found on a model property.
+ * Unlike the segmentOf decorator from the rest library, this does not require the model to have
+ * a key property. Used to correctly set the collection segment for list operations in
+ * LegacyOperations/RoutedOperations.
+ * @param resourceType The model containing a property with a segment decorator
  */
 extern dec armSegmentOfProperty(target: Operation, resourceType: Model);
 

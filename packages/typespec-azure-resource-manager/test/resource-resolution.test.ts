@@ -3897,9 +3897,7 @@ interface Operations extends Azure.ResourceManager.Operations {}
               kind: "createOrUpdate",
             },
           ],
-          delete: [
-            { operationGroup: "SBAuthorizationRules", name: "delete", kind: "delete" },
-          ],
+          delete: [{ operationGroup: "SBAuthorizationRules", name: "delete", kind: "delete" }],
           read: [
             {
               operationGroup: "SBAuthorizationRules",

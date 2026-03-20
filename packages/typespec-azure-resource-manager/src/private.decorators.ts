@@ -263,8 +263,8 @@ const $defaultResourceKeySegmentName: DefaultResourceKeySegmentNameDecorator = (
 };
 
 /**
- * Sets the segment of an operation based on the first @segment found on a property of the model.
- * This handles the case where the model doesn't have a @key property (like anonymous models used
+ * Sets the segment of an operation based on the first segment decorator found on a property of the model.
+ * This handles the case where the model doesn't have a key property (like anonymous models used
  * as ResourceTypeParameter in LegacyOperations/RoutedOperations).
  */
 const $armSegmentOfProperty = (
