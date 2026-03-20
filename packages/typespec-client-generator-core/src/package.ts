@@ -75,9 +75,9 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
   };
   organizeNamespaces(context, sdkPackage);
 
-  // Compute cross-language version hash after package is fully constructed
+  // Compute cross-language version hash from source files
   (sdkPackage as { crossLanguageVersion: string }).crossLanguageVersion =
-    computeCrossLanguageVersion(sdkPackage);
+    computeCrossLanguageVersion(context);
 
   return diagnostics.wrap(sdkPackage);
 }
@@ -185,100 +185,13 @@ function populateApiVersionInformation(context: TCGCContext): void {
  * - Unions
  * - HTTP operation details (verb, path, parameter locations)
  */
-function computeCrossLanguageVersion<TServiceOperation extends SdkServiceOperation>(
-  sdkPackage: SdkPackage<TServiceOperation>,
-): string {
-  // Helper to get a type reference for hashing (avoids circular refs)
-  function getTypeRef(type: SdkType): unknown {
-    switch (type.kind) {
-      case "array":
-        return { kind: "array", valueType: getTypeRef(type.valueType) };
-      case "dict":
-        return { kind: "dict", valueType: getTypeRef(type.valueType) };
-      case "nullable":
-        return { kind: "nullable", type: getTypeRef(type.type) };
-      case "model":
-      case "enum":
-      case "union":
-        return { kind: type.kind, id: type.crossLanguageDefinitionId };
-      case "enumvalue":
-        return { kind: "enumvalue", id: type.crossLanguageDefinitionId };
-      default:
-        return { kind: type.kind };
-    }
-  }
+function computeCrossLanguageVersion(context: TCGCContext): string {
+  // Concatenate all source file contents
+  const content = [...context.program.sourceFiles.values()]
+    .map((script) => script.file.text)
+    .join("");
 
-  // Build API snapshot for clients
-  function snapshotClient(client: SdkClientType<TServiceOperation>): unknown {
-    return {
-      id: client.crossLanguageDefinitionId,
-      methods: client.methods.map((method) => ({
-        id: method.crossLanguageDefinitionId,
-        kind: method.kind,
-        verb:
-          "operation" in method && method.operation && "verb" in method.operation
-            ? method.operation.verb
-            : undefined,
-        path:
-          "operation" in method && method.operation && "path" in method.operation
-            ? method.operation.path
-            : undefined,
-        parameters: method.parameters.map((p) => ({
-          id: p.crossLanguageDefinitionId,
-          optional: p.optional,
-          type: getTypeRef(p.type),
-        })),
-        httpParams:
-          "operation" in method && method.operation && "parameters" in method.operation
-            ? method.operation.parameters.map((p) => ({
-                id: p.crossLanguageDefinitionId,
-                kind: p.kind,
-                optional: p.optional,
-                type: getTypeRef(p.type),
-              }))
-            : undefined,
-        bodyParam:
-          "operation" in method &&
-          method.operation &&
-          "bodyParam" in method.operation &&
-          method.operation.bodyParam
-            ? {
-                id: method.operation.bodyParam.crossLanguageDefinitionId,
-                optional: method.operation.bodyParam.optional,
-                type: getTypeRef(method.operation.bodyParam.type),
-              }
-            : undefined,
-      })),
-      children: client.children?.map(snapshotClient),
-    };
-  }
-
-  // Build the full API snapshot
-  const snapshot = {
-    clients: sdkPackage.clients.map(snapshotClient),
-    models: sdkPackage.models.map((m) => ({
-      id: m.crossLanguageDefinitionId,
-      properties: m.properties.map((p) => ({
-        id: p.crossLanguageDefinitionId,
-        optional: p.optional,
-        type: getTypeRef(p.type),
-      })),
-    })),
-    enums: sdkPackage.enums.map((e) => ({
-      id: e.crossLanguageDefinitionId,
-      isFixed: e.isFixed,
-      values: e.values.map((v) => ({
-        id: v.crossLanguageDefinitionId,
-        value: v.value,
-      })),
-    })),
-    unions: sdkPackage.unions.map((u) => ({
-      id: u.crossLanguageDefinitionId,
-    })),
-  };
-
-  // Serialize and hash
-  const json = JSON.stringify(snapshot);
-  const hash = createHash("sha256").update(json).digest("hex");
+  // Hash the combined content
+  const hash = createHash("sha256").update(content).digest("hex");
   return hash.substring(0, 12);
 }

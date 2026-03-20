@@ -77,7 +77,7 @@ it("changes when model property is added", async () => {
   );
 });
 
-it("does NOT change when doc comment changes", async () => {
+it("changes when doc comment changes", async () => {
   const { program: program1 } = await SimpleTester.compile(`
     @service namespace MyService {
       /** Gets a widget */
@@ -94,7 +94,10 @@ it("does NOT change when doc comment changes", async () => {
   `);
   const context2 = await createSdkContextForTester(program2);
 
-  strictEqual(context1.sdkPackage.crossLanguageVersion, context2.sdkPackage.crossLanguageVersion);
+  notStrictEqual(
+    context1.sdkPackage.crossLanguageVersion,
+    context2.sdkPackage.crossLanguageVersion,
+  );
 });
 
 it("changes when enum value is added", async () => {
