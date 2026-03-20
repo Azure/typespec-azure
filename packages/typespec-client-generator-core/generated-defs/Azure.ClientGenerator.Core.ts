@@ -1131,14 +1131,16 @@ export type AzureClientGeneratorCoreDecorators = {
 };
 
 /**
- * Replace a parameter in an operation with a new parameter definition or remove it entirely.
- * This function creates a new operation with the specified parameter replaced or removed,
+ * Replace a parameter in an operation with a new parameter definition.
+ * This function creates a new operation with the specified parameter replaced,
  * enabling composable transformations without mutating the original operation.
+ *
+ * Note: Parameter removal (using `void` as replacement) is not supported when used with `@@override`.
  *
  * @param operation The operation to transform.
  * @param selector The parameter to replace, specified either by name (string) or by direct reference (ModelProperty).
- * @param replacement The replacement parameter. Use `void` to remove the parameter entirely.
- * @returns A new operation with the parameter replaced or removed.
+ * @param replacement The replacement parameter.
+ * @returns A new operation with the parameter replaced.
  * @example Making an optional parameter required
  * ```typespec
  * model RequiredMaxResults {
@@ -1147,14 +1149,10 @@ export type AzureClientGeneratorCoreDecorators = {
  *
  * @@override(KeyVault.getSecrets, replaceParameter(KeyVault.getSecrets, "maxResults", RequiredMaxResults.maxResults));
  * ```
- * @example Removing a parameter
- * ```typespec
- * op getSecretsWithoutMaxResults is replaceParameter(KeyVault.getSecrets, "maxResults", void);
- * ```
  * @example Chaining transformations
  * ```typespec
- * alias Step1 = replaceParameter(MyService.myOp, "unwantedParam", void);
- * alias Step2 = replaceParameter(Step1, "oldParam", NewParams.newParam);
+ * alias Step1 = replaceParameter(MyService.myOp, "oldParam", NewParams.newParam);
+ * @@override(MyService.myOp, replaceParameter(Step1, "anotherParam", NewParams.anotherParam));
  * ```
  */
 export type ReplaceParameterFunctionImplementation = (
@@ -1182,7 +1180,12 @@ export type ReplaceParameterFunctionImplementation = (
  * ```
  * @example Chaining with replaceParameter
  * ```typespec
- * alias Step1 = replaceParameter(MyService.myOp, "oldParam", void);
+ * model NewParams {
+ *   oldParam: string;  // make required
+ *   newParam: int32;
+ * }
+ *
+ * alias Step1 = replaceParameter(MyService.myOp, "oldParam", NewParams.oldParam);
  * @@override(MyService.myOp, addParameter(Step1, NewParams.newParam));
  * ```
  */

@@ -1851,15 +1851,17 @@ These functions are experimental and require suppressing the `experimental-featu
 
 #### `replaceParameter`
 
-Replace or remove a parameter in an operation:
+Replace a parameter in an operation with a new parameter definition:
 
 ```typespec
 extern fn replaceParameter(
   operation: Reflection.Operation,
   selector: valueof string | Reflection.ModelProperty,
-  replacement: Reflection.ModelProperty | void
+  replacement: Reflection.ModelProperty
 ): Reflection.Operation;
 ```
+
+Note: Parameter removal (using `void` as replacement) is not supported when used with `@@override`.
 
 ##### Making a parameter required
 
