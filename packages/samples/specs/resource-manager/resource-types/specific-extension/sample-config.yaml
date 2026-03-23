@@ -1,0 +1,6 @@
+title: Specific Extension Resource
+description: Sample specification for an extension resource at multiple scopes.
+
+llmstxt: true
+
+order: 5
