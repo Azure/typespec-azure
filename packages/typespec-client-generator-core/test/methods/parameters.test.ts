@@ -890,7 +890,7 @@ it("ensure accept is a constant if only one possibility (json)", async () => {
   strictEqual(method.response.type, sdkPackage.models[0]);
 });
 
-it("ensure accept is a constant if only one possibility (non-json)", async () => {
+it("ensure accept is string for non-standard content type (non-file body)", async () => {
   const { program } = await SimpleTesterWithService.compile(`
     @get op default(): {
       @header
@@ -914,9 +914,7 @@ it("ensure accept is a constant if only one possibility (non-json)", async () =>
   strictEqual(serviceContentTypeParam.name, "accept");
   strictEqual(serviceContentTypeParam.serializedName, "Accept");
   strictEqual(serviceContentTypeParam.clientDefaultValue, undefined);
-  strictEqual(serviceContentTypeParam.type.kind, "constant");
-  strictEqual(serviceContentTypeParam.type.value, "image/png");
-  strictEqual(serviceContentTypeParam.type.valueType.kind, "string");
+  strictEqual(serviceContentTypeParam.type.kind, "string");
 
   strictEqual(serviceOperation.responses.length, 1);
   const response = serviceOperation.responses.find((x) => x.statusCodes === 200);
