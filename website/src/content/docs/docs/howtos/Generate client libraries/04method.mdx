@@ -1861,8 +1861,6 @@ extern fn replaceParameter(
 ): Reflection.Operation;
 ```
 
-Note: Parameter removal (using `void` as replacement) is not supported when used with `@@override`.
-
 ##### Making a parameter required
 
 <ClientTabs>
@@ -1922,6 +1920,82 @@ export async function getSecrets(maxResults: number): Promise<void>;
 ```java
 // maxResults is now required
 public void getSecrets(int maxResults);
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go">
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+#### `removeParameter`
+
+Remove a parameter from an operation:
+
+```typespec
+extern fn removeParameter(
+  operation: Reflection.Operation,
+  selector: valueof string | Reflection.ModelProperty
+): Reflection.Operation;
+```
+
+When used with `@@override`, only optional parameters can be removed. Attempting to remove a required parameter will result in an error.
+
+<ClientTabs>
+<ClientTabItem lang="typespec">
+
+```typespec title="main.tsp"
+@service
+namespace KeyVault;
+
+op getSecrets(@query maxResults?: int32): void;
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+#suppress "experimental-feature" "using removeParameter"
+@@override(KeyVault.getSecrets, removeParameter(KeyVault.getSecrets, "maxResults"));
+```
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+# maxResults parameter is removed
+def get_secrets(self) -> None:
+    ...
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp">
+
+```csharp
+// maxResults parameter is removed
+public virtual Response GetSecrets(CancellationToken cancellationToken = default)
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript">
+
+```typescript
+// maxResults parameter is removed
+export async function getSecrets(): Promise<void>;
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java">
+
+```java
+// maxResults parameter is removed
+public void getSecrets();
 ```
 
 </ClientTabItem>

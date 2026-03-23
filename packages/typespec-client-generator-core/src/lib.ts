@@ -525,6 +525,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Parameter "${"paramName"}" appears more than once in the reorder list for operation "${"operationName"}".`,
       },
     },
+    "remove-parameter-not-found": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Parameter "${"paramName"}" not found in operation "${"operationName"}".`,
+      },
+    },
     "nested-client-service-not-subset": {
       severity: "error",
       messages: {

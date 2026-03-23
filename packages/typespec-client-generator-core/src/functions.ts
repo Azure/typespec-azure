@@ -56,7 +56,7 @@ export function replaceParameter(
   context: FunctionContext,
   operation: Operation,
   selector: string | ModelProperty,
-  replacement: ModelProperty | undefined,
+  replacement: ModelProperty,
 ): Operation {
   const program = context.program;
   const tk = $(program);
@@ -80,12 +80,49 @@ export function replaceParameter(
 
   for (const [name, prop] of operation.parameters.properties) {
     if (name === selectorName) {
-      // If replacement is provided (not void/undefined), add it
-      if (replacement !== undefined) {
-        newProperties.push(cloneModelProperty(tk, replacement));
-      }
-      // If replacement is undefined (void), we skip adding this parameter (removal)
+      newProperties.push(cloneModelProperty(tk, replacement));
     } else {
+      newProperties.push(cloneModelProperty(tk, prop));
+    }
+  }
+
+  return cloneOperation(tk, operation, { parameters: newProperties });
+}
+
+/**
+ * Remove a parameter from an operation.
+ *
+ * @param context The function context provided by TypeSpec
+ * @param operation The operation to transform
+ * @param selector The parameter to remove - either a string name or a ModelProperty reference
+ * @returns A new operation with the parameter removed
+ */
+export function removeParameter(
+  context: FunctionContext,
+  operation: Operation,
+  selector: string | ModelProperty,
+): Operation {
+  const program = context.program;
+  const tk = $(program);
+
+  // Find the parameter to remove
+  const selectorName = typeof selector === "string" ? selector : selector.name;
+  const existingParam = operation.parameters.properties.get(selectorName);
+
+  if (!existingParam) {
+    reportDiagnostic(program, {
+      code: "remove-parameter-not-found",
+      format: { paramName: selectorName, operationName: operation.name },
+      target: context.functionCallTarget,
+    });
+    return operation;
+  }
+
+  // Build the new parameters, excluding the one to remove
+  const newProperties: ModelProperty[] = [];
+
+  for (const [name, prop] of operation.parameters.properties) {
+    if (name !== selectorName) {
       newProperties.push(cloneModelProperty(tk, prop));
     }
   }

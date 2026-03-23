@@ -1135,8 +1135,6 @@ export type AzureClientGeneratorCoreDecorators = {
  * This function creates a new operation with the specified parameter replaced,
  * enabling composable transformations without mutating the original operation.
  *
- * Note: Parameter removal (using `void` as replacement) is not supported when used with `@@override`.
- *
  * @param operation The operation to transform.
  * @param selector The parameter to replace, specified either by name (string) or by direct reference (ModelProperty).
  * @param replacement The replacement parameter.
@@ -1159,7 +1157,34 @@ export type ReplaceParameterFunctionImplementation = (
   context: FunctionContext,
   operation: Operation,
   selector: string | unknown,
-  replacement: Type,
+  replacement: ModelProperty,
+) => Operation;
+
+/**
+ * Remove a parameter from an operation.
+ * This function creates a new operation with the specified parameter removed,
+ * enabling composable transformations without mutating the original operation.
+ *
+ * Note: When used with `@@override`, only optional parameters can be removed. Attempting to
+ * remove a required parameter will result in an `override-parameters-mismatch` error.
+ *
+ * @param operation The operation to transform.
+ * @param selector The parameter to remove, specified either by name (string) or by direct reference (ModelProperty).
+ * @returns A new operation with the parameter removed.
+ * @example Removing an optional parameter
+ * ```typespec
+ * @@override(KeyVault.getSecrets, removeParameter(KeyVault.getSecrets, "maxResults"));
+ * ```
+ * @example Chaining with other transformations
+ * ```typespec
+ * alias Step1 = removeParameter(MyService.myOp, "unwantedParam");
+ * @@override(MyService.myOp, addParameter(Step1, NewParams.newParam));
+ * ```
+ */
+export type RemoveParameterFunctionImplementation = (
+  context: FunctionContext,
+  operation: Operation,
+  selector: string | unknown,
 ) => Operation;
 
 /**
@@ -1227,6 +1252,7 @@ export type ReorderParametersFunctionImplementation = (
 
 export type AzureClientGeneratorCoreFunctions = {
   replaceParameter: ReplaceParameterFunctionImplementation;
+  removeParameter: RemoveParameterFunctionImplementation;
   addParameter: AddParameterFunctionImplementation;
   reorderParameters: ReorderParametersFunctionImplementation;
 };
