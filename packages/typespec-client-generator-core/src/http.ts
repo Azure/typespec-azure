@@ -72,7 +72,6 @@ import {
   isSubscriptionId,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
-import { isMediaTypeJson, isMediaTypeOctetStream, isMediaTypeTextPlain } from "./media-types.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -378,29 +377,9 @@ function createContentTypeOrAcceptHeader(
   const name = bodyObject.kind === "body" ? "contentType" : "accept";
   const stringType: SdkBuiltInType = getTypeSpecBuiltInType(context, "string");
   let type: SdkType = stringType;
-  // for contentType, we treat it as a constant IFF there's one value and it's one of:
-  //  - application/json
-  //  - text/plain
-  //  - application/octet-stream
-  //  - body is a File type (the content type is constrained by the File type itself)
-  // this is to prevent a breaking change when a service adds more content types in the future.
-  // e.g. the service accepting image/png then later image/jpeg should _not_ be a breaking change.
-  //
-  // for accept, we treat it as a constant IFF there's a single value. adding more content types
-  // for this case is considered a breaking change for SDKs so we want to surface it as such.
-  // e.g. the service returns image/png then later provides the option to return image/jpeg.
-  // when there are multiple accept content types, we create an enum to represent the valid values.
-  const isFileBody =
-    name === "contentType" && httpOperation.parameters.body?.bodyKind === "file";
-  if (
-    bodyObject.contentTypes &&
-    bodyObject.contentTypes.length === 1 &&
-    (isMediaTypeJson(bodyObject.contentTypes[0]) ||
-      isMediaTypeTextPlain(bodyObject.contentTypes[0]) ||
-      isMediaTypeOctetStream(bodyObject.contentTypes[0]) ||
-      name === "accept" ||
-      isFileBody)
-  ) {
+  // If there's only a single content type, we treat it as a constant.
+  // If there are multiple content types, we create an enum to represent the valid values.
+  if (bodyObject.contentTypes && bodyObject.contentTypes.length === 1) {
     type = {
       kind: "constant",
       value: bodyObject.contentTypes[0],
