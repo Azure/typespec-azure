@@ -2368,8 +2368,8 @@ op createJob(
       deepStrictEqual(metadata.finalResultPath, "result");
 
       // logicalResult should be the Scalar type
-      strictEqual((metadata.logicalResult as any).kind, "Scalar");
-      strictEqual((metadata.logicalResult as any).name, "string");
+      strictEqual((metadata.logicalResult as Scalar).kind, "Scalar");
+      strictEqual((metadata.logicalResult as Scalar).name, "string");
 
       // finalStep should be pollingSuccessProperty
       ok(metadata.finalStep);
