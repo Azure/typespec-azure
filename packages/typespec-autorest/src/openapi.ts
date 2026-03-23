@@ -482,9 +482,16 @@ export async function getOpenAPIForService(
       metadata.finalResult !== "void" &&
       metadata.finalResult.name.length > 0
     ) {
-      // Scalar types (e.g., string) are emitted inline and don't have a definitions entry
+      // Scalar types (e.g., string) need a schema definition entry
       if (metadata.finalResult.kind === "Scalar") {
-        return undefined;
+        const pending = pendingSchemas.getOrAdd(metadata.finalResult, Visibility.Read, () => ({
+          type: metadata.finalResult as Scalar,
+          visibility: Visibility.Read,
+          ref: refs.getOrAdd(metadata.finalResult as Scalar, Visibility.Read, () =>
+            proxy.createLocalRef(metadata.finalResult as Scalar),
+          ),
+        }));
+        return { "final-state-schema": pending.ref };
       }
 
       const model: Model | IntrinsicType = metadata.finalResult;

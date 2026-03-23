@@ -2367,9 +2367,8 @@ op createJob(
       deepStrictEqual((metadata.finalEnvelopeResult as Model).name, "PollingStatus");
       deepStrictEqual(metadata.finalResultPath, "result");
 
-      // logicalResult should be the Scalar type
-      strictEqual((metadata.logicalResult as Scalar).kind, "Scalar");
-      strictEqual((metadata.logicalResult as Scalar).name, "string");
+      // logicalResult should be the polling response model when the actual result is a scalar
+      strictEqual(metadata.logicalResult.name, "PollingStatus");
 
       // finalStep should be pollingSuccessProperty
       ok(metadata.finalStep);

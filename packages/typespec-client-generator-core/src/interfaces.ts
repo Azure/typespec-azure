@@ -1083,7 +1083,7 @@ export interface SdkLroServiceMetadata {
 
   /** extra metadata */
   operation: SdkServiceOperation;
-  logicalResult: SdkModelType | SdkBuiltInType;
+  logicalResult: SdkModelType;
   statusMonitorStep?: SdkNextOperationLink | SdkNextOperationReference;
   pollingInfo: SdkPollingOperationStep;
   envelopeResult: SdkModelType;
@@ -1145,7 +1145,7 @@ export interface SdkOperationLink {
 
 interface SdkLogicalOperationStep {
   /** The TypeSpec type that is returned by following a link or calling a lined operation */
-  responseModel?: SdkModelType | SdkBuiltInType;
+  responseModel?: SdkModelType;
 }
 
 export interface SdkPropertyMap {
@@ -1190,7 +1190,7 @@ interface SdkFinalOperationReference extends SdkLogicalOperationStep {
 
 interface SdkPollingSuccessProperty extends SdkLogicalOperationStep {
   kind: "pollingSuccessProperty";
-  responseModel: SdkModelType | SdkBuiltInType;
+  responseModel: SdkModelType;
   /** The property containing the results of success */
   target: SdkModelPropertyType;
   /** The property in the response that contained a url to the status monitor */
