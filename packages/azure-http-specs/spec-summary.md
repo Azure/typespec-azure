@@ -227,11 +227,25 @@ Expected response body:
 }
 ```
 
-### Azure_ClientGenerator_Core_ClientInitialization_HeaderParam
+### Azure_ClientGenerator_Core_ClientDoc_ReplaceDoc
+
+- Endpoint: `get /azure/client-generator-core/client-doc/replaceDoc/get`
+
+This scenario tests @clientDoc with DocumentationMode.replace on a model.
+The generated client model documentation should be replaced with the client-specific documentation.
+Expected response body:
+
+```json
+{
+  "name": "sample"
+}
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_HeaderParam
 
 - Endpoints:
-  - `get /azure/client-generator-core/client-initialization/header-param/with-query`
-  - `get /azure/client-generator-core/client-initialization/header-param/with-body`
+  - `get /azure/client-generator-core/client-initialization/default/header-param/with-query`
+  - `get /azure/client-generator-core/client-initialization/default/header-param/with-body`
 
 Client for testing header parameter moved to client level.
 
@@ -250,36 +264,38 @@ client.withQuery(id: "test-id");  // No need to pass name here
 client.withBody({ name: "test-name" });  // No need to pass name here
 ```
 
-### Azure_ClientGenerator_Core_ClientInitialization_MixedParams
+### Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_MixedParams
 
 - Endpoints:
-  - `get /azure/client-generator-core/client-initialization/mixed-params/with-query`
-  - `get /azure/client-generator-core/client-initialization/mixed-params/with-body`
+  - `get /azure/client-generator-core/client-initialization/default/mixed-params/with-query`
+  - `get /azure/client-generator-core/client-initialization/default/mixed-params/with-body`
 
-  Client for testing a mix of client-level and method-level parameters.
+Client for testing a mix of client-level and method-level parameters.
 
-  Parameters elevated to client level:
-  - name: "test-name-value" (header parameter)
+Parameters elevated to client level:
 
-  Parameters remaining at method level:
-  - region: "us-west" (query parameter)
+- name: "test-name-value" (header parameter)
 
-  Expected client usage:
+Parameters remaining at method level:
 
-  ```ts
-  const client = new MixedParamsClient({
-    name: "test-name-value"
-  });
+- region: "us-west" (query parameter)
 
-  client.withQuery(region: "us-west", id: "test-id");  // region stays as method param
-  client.withBody( region: "us-west", body: { name: "test-name" });  // region stays as method param
-  ```
+Expected client usage:
 
-### Azure_ClientGenerator_Core_ClientInitialization_MultipleParams
+```ts
+const client = new MixedParamsClient({
+  name: "test-name-value"
+});
+
+client.withQuery(region: "us-west", id: "test-id");  // region stays as method param
+client.withBody(region: "us-west", body: { name: "test-name" });  // region stays as method param
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_MultipleParams
 
 - Endpoints:
-  - `get /azure/client-generator-core/client-initialization/multiple-params/with-query`
-  - `get /azure/client-generator-core/client-initialization/multiple-params/with-body`
+  - `get /azure/client-generator-core/client-initialization/default/multiple-params/with-query`
+  - `get /azure/client-generator-core/client-initialization/default/multiple-params/with-body`
 
 Client for testing multiple parameters (header and query) moved to client level.
 
@@ -300,68 +316,36 @@ client.withQuery(id: "test-id");  // No need to pass name or region here
 client.withBody({ name: "test-name" });  // No need to pass name or region here
 ```
 
-### Azure_ClientGenerator_Core_ClientInitialization_ParamAlias
+### Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_ParamAlias
 
 - Endpoints:
-  - `get /azure/client-generator-core/client-initialization/param-alias/{blob}/with-aliased-name`
-  - `get /azure/client-generator-core/client-initialization/param-alias/{blobName}/with-original-name`
+  - `get /azure/client-generator-core/client-initialization/default/param-alias/{blob}/with-aliased-name`
+  - `get /azure/client-generator-core/client-initialization/default/param-alias/{blobName}/with-original-name`
 
 Client for testing the @paramAlias decorator for renaming parameters in client code.
 
 Parameters elevated to client level:
 
-- blobName: "sample-blob" (path parameter)
+- blobName: "sample-blob" (path parameter with @paramAlias("blob"))
 
 Expected client usage:
 
 ```ts
-// Elevated to client level via alias
-client.withAliasedName();
+const client = new ParamAliasClient({
+  blobName: "sample-blob",
+});
 
-// Elevated to client level via original name
+// Operations don't need blob/blobName parameter
+client.withAliasedName();
 client.withOriginalName();
 ```
 
-### Azure_ClientGenerator_Core_ClientInitialization_ParentClient_ChildClient
+### Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_PathParam
 
 - Endpoints:
-  - `get /azure/client-generator-core/client-initialization/child-client/{blobName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/child-client/{blobName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/child-client/{blobName}`
-
-Client for testing a path parameter (blobName) moved to client level, in child client.
-
-The child client can be initialized individually, or via its parent client.
-
-Parameters elevated to client level:
-
-- blobName: "sample-blob" (path parameter)
-
-Expected client usage:
-
-```ts
-// via ParentClient
-const client = new ParentClient.getChildClient({
-  blobName: "sample-blob"
-});
-
-// directly
-const client = new ChildClient({
-  blobName: "sample-blob"
-});
-
-// No need to pass blobName to any operations
-client.withQuery(format: "text");
-client.getStandalone();
-client.deleteStandalone();
-```
-
-### Azure_ClientGenerator_Core_ClientInitialization_PathParam
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/path/{blobName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/path/{blobName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/path/{blobName}`
+  - `get /azure/client-generator-core/client-initialization/default/path/{blobName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/default/path/{blobName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/default/path/{blobName}`
 
 Client for testing a path parameter (blobName) moved to client level.
 
@@ -377,6 +361,431 @@ const client = new PathParamClient({
 });
 
 // No need to pass blobName to any operations
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_QueryParam
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/default/query/with-query`
+  - `get /azure/client-generator-core/client-initialization/default/query/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/default/query/delete-resource`
+
+Client for testing query parameter moved to client level.
+
+Parameters elevated to client level:
+
+- blobName: "test-blob" (query parameter)
+
+Expected client usage:
+
+```ts
+const client = new QueryParamClient({
+  blobName: "test-blob"
+});
+
+// Operations don't need blobName parameter
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithHeader
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually-header/with-query`
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually-header/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually-header/delete-standalone`
+
+Client for testing default -> individually header parameter nested initialization.
+
+The parent client uses default initialization behavior,
+and the child client moves header parameters to client level and uses individually initialization.
+
+Parameters elevated to client level:
+
+- name: "test-name-value" (header parameter)
+
+Expected client usage:
+
+```ts
+// directly (individually initialized)
+const client = new IndividuallyNestedWithHeaderClient({
+  name: "test-name-value"
+});
+
+// Operations don't need name header parameter
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithMixed
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually-mixed/with-query`
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually-mixed/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually-mixed/delete-standalone`
+
+Client for testing default -> individually mixed parameters nested initialization.
+
+The parent client uses default initialization behavior,
+and the child client moves some parameters to client level while keeping others at method level with individually initialization.
+
+Parameters elevated to client level:
+
+- name: "test-name-value" (header parameter)
+
+Parameters remaining at method level:
+
+- region: "us-west" (query parameter)
+
+Expected client usage:
+
+```ts
+// directly (individually initialized)
+const client = new IndividuallyNestedWithMixedClient({
+  name: "test-name-value"
+});
+
+// Operations still need region parameter
+client.withQuery(region: "us-west", format: "text");
+client.getStandalone(region: "us-west");
+client.deleteStandalone(region: "us-west");
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithMultiple
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually-multiple/with-query`
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually-multiple/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually-multiple/delete-standalone`
+
+Client for testing default -> individually multiple parameters nested initialization.
+
+The parent client uses default initialization behavior,
+and the child client moves multiple parameters (header and query) to client level with individually initialization.
+
+Parameters elevated to client level:
+
+- name: "test-name-value" (header parameter)
+- region: "us-west" (query parameter)
+
+Expected client usage:
+
+```ts
+// directly (individually initialized)
+const client = new IndividuallyNestedWithMultipleClient({
+  name: "test-name-value",
+  region: "us-west"
+});
+
+// Operations don't need name or region parameters
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithParamAlias
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually-param-alias/{blob}/with-aliased-name`
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually-param-alias/{blobName}/with-original-name`
+
+Client for testing default -> individually param alias nested initialization.
+
+The parent client uses default initialization behavior,
+and the child client uses individually initialization with param alias.
+
+Parameters elevated to client level:
+
+- blobName: "sample-blob" (path parameter with @paramAlias("blob"))
+
+Expected client usage:
+
+```ts
+// directly (individually initialized)
+const client = new IndividuallyNestedWithParamAliasClient({
+  blobName: "sample-blob",
+});
+
+// Operations don't need blob/blobName parameter
+client.withAliasedName();
+client.withOriginalName();
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithPath
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually/{blobName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually/{blobName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually/{blobName}`
+
+Client for testing default -> individually nested initialization.
+
+The parent client uses default initialization behavior,
+and the child client uses individually initialization behavior.
+
+Parameters elevated to client level:
+
+- blobName: "test-resource" (path parameter)
+
+Expected client usage:
+
+```ts
+// directly (individually initialized)
+const client = new IndividuallyNestedWithPathClient({
+  blobName: "test-resource"
+});
+
+// Operations don't need blobName parameter
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithQuery
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually-query/with-query`
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually-query/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/individually/nested-default-individually-query/delete-resource`
+
+Client for testing default -> individually nested initialization.
+
+The parent client uses default initialization behavior,
+and the child client uses individually initialization behavior.
+
+Parameters elevated to client level:
+
+- blobName: "test-blob" (query parameter)
+
+Expected client usage:
+
+```ts
+// directly (individually initialized)
+const client = new IndividuallyNestedWithQueryClient({
+  blobName: "test-blob"
+});
+
+// Operations don't need blobName parameter
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClient_IndividuallyParentNestedWithHeaderClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-header/with-query`
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-header/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-header/delete-standalone`
+
+Client for testing default -> individually and parent header parameter nested initialization.
+
+The parent client uses default initialization behavior,
+and the child client moves header parameters to client level and uses both individually and parent initialization.
+
+Parameters elevated to client level:
+
+- name: "test-name-value" (header parameter)
+
+Expected client usage:
+
+```ts
+// via IndividuallyParentClient (parent initialization)
+const client = IndividuallyParentClient.getIndividuallyParentNestedWithHeaderClient({
+  name: "test-name-value"
+});
+
+// directly (individually initialized)
+const client = new IndividuallyParentNestedWithHeaderClient({
+  name: "test-name-value"
+});
+
+// Operations don't need name header parameter
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClient_IndividuallyParentNestedWithMixedClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-mixed/with-query`
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-mixed/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-mixed/delete-standalone`
+
+Client for testing default -> individually and parent mixed parameters nested initialization.
+
+The parent client uses default initialization behavior,
+and the child client moves some parameters to client level while keeping others at method level with both individually and parent initialization.
+
+Parameters elevated to client level:
+
+- name: "test-name-value" (header parameter)
+
+Parameters remaining at method level:
+
+- region: "us-west" (query parameter)
+
+Expected client usage:
+
+```ts
+// via IndividuallyParentClient (parent initialization)
+const client = IndividuallyParentClient.getIndividuallyParentNestedWithMixedClient({
+  name: "test-name-value"
+});
+
+// directly (individually initialized)
+const client = new IndividuallyParentNestedWithMixedClient({
+  name: "test-name-value"
+});
+
+// Operations still need region parameter
+client.withQuery(region: "us-west", format: "text");
+client.getStandalone(region: "us-west");
+client.deleteStandalone(region: "us-west");
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClient_IndividuallyParentNestedWithMultipleClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-multiple/with-query`
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-multiple/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-multiple/delete-standalone`
+
+Client for testing default -> individually and parent multiple parameters nested initialization.
+
+The parent client uses default initialization behavior,
+and the child client moves multiple parameters (header and query) to client level with both individually and parent initialization.
+
+Parameters elevated to client level:
+
+- name: "test-name-value" (header parameter)
+- region: "us-west" (query parameter)
+
+Expected client usage:
+
+```ts
+// via IndividuallyParentClient (parent initialization)
+const client = IndividuallyParentClient.getIndividuallyParentNestedWithMultipleClient({
+  name: "test-name-value",
+  region: "us-west"
+});
+
+// directly (individually initialized)
+const client = new IndividuallyParentNestedWithMultipleClient({
+  name: "test-name-value",
+  region: "us-west"
+});
+
+// Operations don't need name or region parameters
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClient_IndividuallyParentNestedWithParamAliasClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-param-alias/{blob}/with-aliased-name`
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-param-alias/{blobName}/with-original-name`
+
+Client for testing default -> individually and parent parameter alias nested initialization.
+
+The parent client uses default initialization behavior,
+and the child client renames parameters at client level using @paramAlias with both individually and parent initialization.
+
+Parameters elevated to client level:
+
+- blobName: "test-blob" → renamed to "renamedBlobName" using @paramAlias (query parameter)
+
+Expected client usage:
+
+```ts
+// via IndividuallyParentClient (parent initialization)
+const client = IndividuallyParentClient.getIndividuallyParentNestedWithParamAliasClient({
+  renamedBlobName: "test-blob"  // Renamed from blobName
+});
+
+// directly (individually initialized)
+const client = new IndividuallyParentNestedWithParamAliasClient({
+  renamedBlobName: "test-blob"  // Renamed from blobName
+});
+
+// Operations use blob or blobName at method level
+client.withAliasedName(blob: "test-blob-path");
+client.withOriginalName(blobName: "test-blob-path");
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClient_IndividuallyParentNestedWithPathClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent/{blobName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent/{blobName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent/{blobName}`
+
+Client for testing default -> individually and parent nested initialization.
+
+The parent client uses default initialization behavior,
+and the child client uses both individually and parent initialization behavior.
+
+Parameters elevated to client level:
+
+- blobName: "test-resource" (path parameter)
+
+Expected client usage:
+
+```ts
+// via IndividuallyParentClient (parent initialization)
+const client = IndividuallyParentClient.getIndividuallyParentNestedWithPathClient({
+  blobName: "test-resource"
+});
+
+// directly (individually initialized)
+const client = new IndividuallyParentNestedWithPathClient({
+  blobName: "test-resource"
+});
+
+// Operations don't need blobName parameter
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClient_IndividuallyParentNestedWithQueryClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-query/with-query`
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-query/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-query/delete-resource`
+
+Client for testing default -> individually and parent nested initialization.
+
+The parent client uses default initialization behavior,
+and the child client uses both individually and parent initialization behavior.
+
+Parameters elevated to client level:
+
+- blobName: "test-blob" (query parameter)
+
+Expected client usage:
+
+```ts
+// via IndividuallyParentClient (parent initialization)
+const client = IndividuallyParentClient.getIndividuallyParentNestedWithQueryClient({
+  blobName: "test-blob"
+});
+
+// directly (individually initialized)
+const client = new IndividuallyParentNestedWithQueryClient({
+  blobName: "test-blob"
+});
+
+// Operations don't need blobName parameter
 client.withQuery(format: "text");
 client.getStandalone();
 client.deleteStandalone();
@@ -482,6 +891,73 @@ Expected response body:
   "properties": {
     "description": "test",
     "age": 1
+  }
+}
+```
+
+### Azure_ClientGenerator_Core_FlattenProperty_putFlattenReadOnlyModel
+
+- Endpoint: `put /azure/client-generator-core/flatten-property/flattenReadOnlyModel`
+
+Test model with flatten property containing all read-only properties.
+
+Expected behavior: When flattening a property that contains only read-only properties:
+
+- For input (write): Read-only properties should not appear in the input model, regardless of flattening
+
+The `properties` and `propertiesOptional` fields contain only read-only properties (`solutionId`,
+`title`, `content`). These should be flattened into the parent `Solution` model in the response.
+
+Expected input body:
+
+```json
+{
+  "name": "foo"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "name": "foo",
+  "properties": {
+    "solutionId": "solution1",
+    "title": "Solution Title",
+    "content": "Solution Content"
+  }
+}
+```
+
+### Azure_ClientGenerator_Core_FlattenProperty_putFlattenUnknownModel
+
+- Endpoint: `put /azure/client-generator-core/flatten-property/flattenUnknownModel`
+
+Update and receive model with flatten property of unknown type.
+
+Note: `unknown` is a non-model type. The flatten decorator should be ignored for non-model types,
+so whether flattened or not, the behavior should be the same. This test verifies that SDKs correctly
+ignore flatten for non-model types.
+
+Expected behavior: The `properties` field should NOT be flattened and should remain as-is in the model,
+since flatten only applies to model types.
+
+Expected input body:
+
+```json
+{
+  "name": "foo"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "name": "test",
+  "properties": {
+    "key1": "value1",
+    "key2": "value2"
   }
 }
 ```
@@ -742,6 +1218,68 @@ param1: param1
 param2: param2
 
 Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_ParamAlias_download
+
+- Endpoint: `get /azure/client-generator-core/param-alias/download/{blob}`
+
+This scenario tests the @paramAlias decorator with @clientInitialization.
+The 'blob' operation parameter should be elevated to client initialization with the alias 'blobName'.
+Expected path parameter blob="sample"
+Expected response: 200 with body "hello"
+
+### Azure_ClientGenerator_Core_ProtocolAndConvenient_Both
+
+- Endpoint: `get /azure/client-generator-core/protocol-and-convenient/both/get`
+
+This scenario tests an operation with both @protocolAPI(true) and @convenientAPI(true) (the default).
+The operation should generate both protocol and convenience methods.
+Expected query parameter: name="sample"
+Expected response body:
+
+```json
+{
+  "name": "sample"
+}
+```
+
+### Azure_ClientGenerator_Core_ProtocolAndConvenient_OnlyConvenient
+
+- Endpoint: `get /azure/client-generator-core/protocol-and-convenient/onlyConvenient/get`
+
+This scenario tests an operation with @convenientAPI(true) and @protocolAPI(false).
+The operation should only generate a convenience method, not a protocol method.
+Expected query parameter: name="sample"
+Expected response body:
+
+```json
+{
+  "name": "sample"
+}
+```
+
+### Azure_ClientGenerator_Core_ProtocolAndConvenient_OnlyProtocol
+
+- Endpoint: `get /azure/client-generator-core/protocol-and-convenient/onlyProtocol/get`
+
+This scenario tests an operation with @protocolAPI(true) and @convenientAPI(false).
+The operation should only generate a protocol method, not a convenience method.
+Expected query parameter: name="sample"
+Expected response body:
+
+```json
+{
+  "name": "sample"
+}
+```
+
+### Azure_ClientGenerator_Core_ResponseAsBool_Exists
+
+- Endpoint: `head /azure/client-generator-core/response-as-bool/exists/{name}`
+
+This scenario tests the @responseAsBool decorator on a HEAD operation.
+The operation should return a boolean: true for 204 (resource exists) and false for 404 (resource not found).
+Expected response: 204 No Content (maps to true)
 
 ### Azure_ClientGenerator_Core_Usage_ModelInOperation
 
@@ -1274,6 +1812,50 @@ This scenario is to test two operations with two different page item types.
   ```
 
   Note that the nextLink preserves the original filter and select parameters.
+
+### Azure_Core_Page_withRelativeNextLink
+
+- Endpoint: `get /azure/core/page/with-relative-next-link`
+
+  This scenario tests pagination where the nextLink is a relative URL instead of an absolute URL.
+  When a relative URL is used, the client must resolve it against the endpoint base URL for subsequent requests.
+
+  Expected query parameter on initial request:
+  - api-version=2022-12-01-preview
+
+  Expected response body (first page):
+
+  ```json
+  {
+    "value": [
+      {
+        "id": 1,
+        "name": "User1",
+        "etag": "11bdc430-65e8-45ad-81d9-8ffa60d55b59"
+      }
+    ],
+    "nextLink": "/azure/core/page/with-relative-next-link/page/2"
+  }
+  ```
+
+  Expected query parameter on next link request:
+  - api-version=2022-12-01-preview
+
+  Expected response body (second page):
+
+  ```json
+  {
+    "value": [
+      {
+        "id": 2,
+        "name": "User2",
+        "etag": "11bdc430-65e8-45ad-81d9-8ffa60d55b59"
+      }
+    ]
+  }
+  ```
+
+  Note: The nextLink is a relative URL, not an absolute URL. The client must resolve it against the service endpoint.
 
 ### Azure_Core_Scalar_AzureLocationScalar_get
 
@@ -2163,126 +2745,6 @@ Expected response body:
   "location": "eastus",
   "properties": {
     "provisioningState": "Succeeded"
-  }
-}
-```
-
-### Azure_ResourceManager_MultiServiceOlderVersions_Compute_VirtualMachines_createOrUpdate
-
-- Endpoint: `put https://management.azure.com`
-
-Test that a client can expose operations from multiple services using older API versions. This operation should be called like this: `client.virtualMachines.createOrUpdate(...)`.
-
-PUT (create or update) a Virtual Machine.
-Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachinesOld/vm-old1
-Expected query parameter: api-version=2024-11-01
-Expected request body:
-
-```json
-{
-  "location": "eastus",
-  "properties": {
-    "size": "Standard_D2s_v3"
-  }
-}
-```
-
-Expected response body:
-
-```json
-{
-  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachinesOld/vm-old1",
-  "name": "vm-old1",
-  "type": "Microsoft.Compute/virtualMachinesOld",
-  "location": "eastus",
-  "properties": {
-    "provisioningState": "Succeeded",
-    "size": "Standard_D2s_v3"
-  }
-}
-```
-
-### Azure_ResourceManager_MultiServiceOlderVersions_Compute_VirtualMachines_get
-
-- Endpoint: `get https://management.azure.com`
-
-Test that a client can expose operations from multiple services using older API versions. This operation should be called like this: `client.virtualMachines.get(...)`.
-
-GET a Virtual Machine.
-Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachinesOld/vm-old1
-Expected query parameter: api-version=2024-11-01
-
-Expected response body:
-
-```json
-{
-  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachinesOld/vm-old1",
-  "name": "vm-old1",
-  "type": "Microsoft.Compute/virtualMachinesOld",
-  "location": "eastus",
-  "properties": {
-    "provisioningState": "Succeeded",
-    "size": "Standard_D2s_v3"
-  }
-}
-```
-
-### Azure_ResourceManager_MultiServiceOlderVersions_ComputeDisk_Disks_createOrUpdate
-
-- Endpoint: `put https://management.azure.com`
-
-Test that a client can expose operations from multiple services using older API versions. This operation should be called like this: `client.disks.createOrUpdate(...)`.
-
-PUT (create or update) a Disk resource.
-Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/disksOld/disk-old1
-Expected query parameter: api-version=2024-03-02
-Expected request body:
-
-```json
-{
-  "location": "eastus",
-  "properties": {
-    "diskSizeGB": 128
-  }
-}
-```
-
-Expected response body:
-
-```json
-{
-  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/disksOld/disk-old1",
-  "name": "disk-old1",
-  "type": "Microsoft.Compute/disksOld",
-  "location": "eastus",
-  "properties": {
-    "provisioningState": "Succeeded",
-    "diskSizeGB": 128
-  }
-}
-```
-
-### Azure_ResourceManager_MultiServiceOlderVersions_ComputeDisk_Disks_get
-
-- Endpoint: `get https://management.azure.com`
-
-Test that a client can expose operations from multiple services using older API versions. This operation should be called like this: `client.disks.get(...)`.
-
-GET a Disk resource.
-Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/disksOld/disk-old1
-Expected query parameter: api-version=2024-03-02
-
-Expected response body:
-
-```json
-{
-  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/disksOld/disk-old1",
-  "name": "disk-old1",
-  "type": "Microsoft.Compute/disksOld",
-  "location": "eastus",
-  "properties": {
-    "provisioningState": "Succeeded",
-    "diskSizeGB": 128
   }
 }
 ```

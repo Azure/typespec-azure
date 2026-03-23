@@ -1751,3 +1751,154 @@ public final class ContosoProviderHubClient {
 ```
 
 </ClientTabs>
+
+## Return a boolean from HEAD operations
+
+The `@responseAsBool` decorator transforms a HEAD operation to return a `boolean` instead of `void`.
+This is commonly used for existence-check operations where 2xx responses map to `true` and 404 responses map to `false`.
+
+<ClientTabs>
+
+```typespec title=main.tsp
+import "@typespec/http";
+import "@azure-tools/typespec-client-generator-core";
+
+using TypeSpec.Http;
+using Azure.ClientGenerator.Core;
+
+@service
+namespace PetStore;
+
+model Pet {
+  name: string;
+}
+
+@route("/pets/{name}")
+@head
+@responseAsBool
+op exists(@path name: string): void;
+
+@route("/pets")
+@get
+op get(): Pet;
+```
+
+```python
+class PetStoreClient:
+    def exists(self, name: str, **kwargs: Any) -> bool:
+        """Check if a pet exists.
+
+        :param name: Required.
+        :type name: str
+        :return: bool
+        :rtype: bool
+        """
+        ...
+
+    def get(self, **kwargs: Any) -> Pet:
+        ...
+```
+
+```csharp
+public partial class PetStoreClient
+{
+    // Convenience method returns bool
+    public virtual Response<bool> Exists(string name, CancellationToken cancellationToken = default);
+    public virtual async Task<Response<bool>> ExistsAsync(string name, CancellationToken cancellationToken = default);
+}
+```
+
+```typescript
+export type ExistsResponse = { body: boolean };
+
+export async function exists(
+  context: Client,
+  name: string,
+  options?: ExistsOptionalParams,
+): Promise<ExistsResponse>;
+```
+
+```java
+// Java does not yet generate a boolean convenience method for @responseAsBool
+public Response<BinaryData> existsWithResponse(String name, RequestOptions requestOptions);
+```
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabs>
+
+## Filtering operations by language scope
+
+The `@scope` decorator controls whether an operation is included in generated client SDKs for specific languages.
+This is useful when certain operations should only appear in specific language SDKs.
+
+<ClientTabs>
+
+```typespec title=main.tsp
+import "@typespec/http";
+import "@azure-tools/typespec-client-generator-core";
+
+using TypeSpec.Http;
+using Azure.ClientGenerator.Core;
+
+@service
+namespace PetStore;
+
+model Pet {
+  name: string;
+}
+
+@route("/pets")
+@get
+op listPets(): Pet[];
+
+@route("/pets")
+@post
+@scope("python")
+op createPet(@body pet: Pet): Pet;
+```
+
+```python
+# Python includes both operations (createPet is scoped to python)
+class PetStoreClient:
+    def list_pets(self, **kwargs: Any) -> list[Pet]:
+        ...
+
+    def create_pet(self, pet: Union[Pet, JSON, IO[bytes]], **kwargs: Any) -> Pet:
+        ...
+```
+
+```csharp
+// C# only includes listPets (createPet is excluded by @scope("python"))
+public partial class PetStoreClient
+{
+    public virtual Response<IReadOnlyList<Pet>> ListPets(CancellationToken cancellationToken = default);
+}
+```
+
+```typescript
+// TypeScript includes both operations (scope filtering may vary by emitter)
+export class PetStoreClient {
+  listPets(options?: ListPetsOptionalParams): Promise<Pet[]>;
+  createPet(pet: Pet, options?: CreatePetOptionalParams): Promise<Pet>;
+}
+```
+
+```java
+public final class PetStoreClient {
+    // Java only includes listPets (createPet is excluded by @scope("python"))
+    public List<Pet> listPets();
+}
+```
+
+```go
+// Go only includes ListPets (CreatePet is excluded by @scope("python"))
+func (client *PetStoreClient) ListPets(
+    ctx context.Context,
+    options *PetStoreClientListPetsOptions,
+) (PetStoreClientListPetsResponse, error)
+```
+
+</ClientTabs>

@@ -2628,3 +2628,89 @@ jsonWriter.writeStringField("prop", Objects.toString(this.value, null));
 </ClientTabItem>
 </ClientTabs>
 ```
+
+## Deserialize empty strings as null
+
+The `@deserializeEmptyStringAsNull` decorator specifies that a string-typed model property should deserialize empty strings (`""`) as `null`.
+This is useful when APIs return empty strings but the client should treat them as absent values.
+
+:::caution
+This decorator only applies to properties of type `string` or scalar types derived from `string`.
+:::
+
+<ClientTabs>
+<ClientTabItem lang="typespec">
+
+```typespec
+import "@typespec/http";
+import "@azure-tools/typespec-client-generator-core";
+
+using TypeSpec.Http;
+using Azure.ClientGenerator.Core;
+
+@service
+namespace MyService;
+
+model Resource {
+  name: string;
+
+  @deserializeEmptyStringAsNull
+  description: string;
+}
+
+@route("/resources")
+@get
+op get(): Resource;
+```
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+class Resource:
+    name: str = rest_field()
+    # Empty string "" from the API will be deserialized as None
+    description: Optional[str] = rest_field()
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp">
+
+```csharp
+// The emitter uses the decorator metadata to convert empty strings to null during deserialization
+public partial class Resource
+{
+    public string Name { get; }
+    public string Description { get; }  // "" deserialized as null
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript">
+
+```typescript
+export interface Resource {
+  name: string;
+  description: string; // Empty string deserialized as null at runtime
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java">
+
+```java
+public final class Resource {
+    public String getName();
+    public String getDescription();  // "" deserialized as null
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go">
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabItem>
+</ClientTabs>

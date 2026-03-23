@@ -185,7 +185,7 @@ clients:
     name: PetStoreClient
     clientInitialization:
       kind: clientinitialization
-      properties:
+      parameters:
         - kind: endpoint
           name: endpoint
           isGeneratedName: true
@@ -200,7 +200,7 @@ clients:
         children: []
         clientInitialization:
           kind: clientinitialization
-          properties:
+          parameters:
             - kind: endpoint
               name: endpoint
               isGeneratedName: true
@@ -214,7 +214,7 @@ clients:
         children: []
         clientInitialization:
           kind: clientinitialization
-          properties:
+          parameters:
             - kind: endpoint
               name: endpoint
               isGeneratedName: true
@@ -227,7 +227,7 @@ clients:
     name: ToyStoreClient
     clientInitialization:
       kind: clientinitialization
-      properties:
+      parameters:
         - kind: endpoint
           name: endpoint
           isGeneratedName: true
@@ -242,7 +242,7 @@ clients:
         children: []
         clientInitialization:
           kind: clientinitialization
-          properties:
+          parameters:
             - kind: endpoint
               name: endpoint
               isGeneratedName: true
@@ -256,7 +256,7 @@ clients:
         children: []
         clientInitialization:
           kind: clientinitialization
-          properties:
+          parameters:
             - kind: endpoint
               name: endpoint
               isGeneratedName: true
@@ -275,7 +275,7 @@ clients:
     name: DogsClient
     clientInitialization:
       kind: clientinitialization
-      properties:
+      parameters:
         - kind: endpoint
           name: endpoint
           isGeneratedName: true
@@ -290,7 +290,7 @@ clients:
         children: []
         clientInitialization:
           kind: clientinitialization
-          properties:
+          parameters:
             - kind: endpoint
               name: endpoint
               isGeneratedName: true
@@ -304,7 +304,7 @@ clients:
         children: []
         clientInitialization:
           kind: clientinitialization
-          properties:
+          parameters:
             - kind: endpoint
               name: endpoint
               isGeneratedName: true
@@ -317,7 +317,7 @@ clients:
     name: CatsClient
     clientInitialization:
       kind: clientinitialization
-      properties:
+      parameters:
         - kind: endpoint
           name: endpoint
           isGeneratedName: true
@@ -332,7 +332,7 @@ clients:
         children: []
         clientInitialization:
           kind: clientinitialization
-          properties:
+          parameters:
             - kind: endpoint
               name: endpoint
               isGeneratedName: true
@@ -346,7 +346,7 @@ clients:
         children: []
         clientInitialization:
           kind: clientinitialization
-          properties:
+          parameters:
             - kind: endpoint
               name: endpoint
               isGeneratedName: true
@@ -408,7 +408,7 @@ clients:
           kind: clientinitialization
           name: InnerGroupClientOptions
           isGeneratedName: false
-          properties:
+          parameters:
             - kind: method
               name: blobName
               isGeneratedName: false
@@ -421,7 +421,7 @@ clients:
         parent: *a3
     clientInitialization:
       kind: clientinitialization
-      properties:
+      parameters:
         - kind: endpoint
           name: endpoint
           isGeneratedName: true
@@ -495,7 +495,7 @@ namespace TestClient {
 
 @@clientInitialization(TestClient.SubClient,
   {
-    intializedBy: InitializedBy.individually | InitializedBy.parent,
+    initializedBy: InitializedBy.individually | InitializedBy.parent,
   }
 );
 ```
@@ -519,7 +519,7 @@ model SubClientOptions {
 @@clientInitialization(TestClient.SubClient,
   {
     parameters: SubClientOptions,
-    intializedBy: InitializedBy.individually | InitializedBy.parent,
+    initializedBy: InitializedBy.individually | InitializedBy.parent,
   }
 );
 ```

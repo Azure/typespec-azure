@@ -944,3 +944,97 @@ func (client *ServiceClient) Get(ctx context.Context, version Versions, options 
 ```
 
 </ClientTabs>
+
+## Customizing client API versions
+
+The `@clientApiVersions` decorator lets you define a custom set of API versions for the client that may differ from the service's `@versioned` enum. This is useful when you want clients to list additional historical versions or preview versions not in the service spec.
+
+Use the spread syntax (`...ServiceName.Versions`) to inherit the service versions and add your own.
+
+<ClientTabs>
+
+```typespec title=main.tsp
+import "@typespec/http";
+import "@typespec/versioning";
+
+using TypeSpec.Http;
+using TypeSpec.Versioning;
+
+@service
+@versioned(Versions)
+namespace MyService;
+
+enum Versions {
+  v2024_01_01: "2024-01-01",
+  v2024_07_01: "2024-07-01",
+}
+
+model Resource {
+  name: string;
+}
+
+@route("/resources")
+@get
+op list(@query apiVersion: string): Resource[];
+```
+
+```typespec title=client.tsp
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+// Add a historical version v2023_06_01 before the service versions
+enum ClientApiVersions {
+  v2023_06_01: "2023-06-01",
+  ...MyService.Versions,
+}
+
+@@clientApiVersions(MyService, ClientApiVersions);
+```
+
+```python
+# Python picks up the service versions for runtime use
+# Default api_version is "2024-07-01" (latest)
+client = MyServiceClient(endpoint=..., credential=...)
+client.list()  # Uses api_version="2024-07-01"
+```
+
+```csharp
+// C# generates a ServiceVersion enum with all client API versions
+public partial class MyServiceClientOptions : ClientOptions
+{
+    public enum ServiceVersion
+    {
+        V2023_06_01 = 1,  // Added by @clientApiVersions
+        V2024_01_01 = 2,  // From service Versions
+        V2024_07_01 = 3,  // From service Versions (latest)
+    }
+}
+```
+
+```typescript
+// NOT_SUPPORTED
+```
+
+```java
+// Java generates a ServiceVersion enum with service versions
+public enum MyServiceVersion implements ServiceVersion {
+    V2024_01_01("2024-01-01"),
+    V2024_07_01("2024-07-01");
+
+    public static MyServiceVersion getLatest() {
+        return V2024_07_01;
+    }
+}
+```
+
+```go
+// Go uses the latest version by default
+func NewMyServiceClientWithNoCredential(
+    endpoint string,
+    options *MyServiceClientOptions,
+) (*MyServiceClient, error)
+```
+
+</ClientTabs>

@@ -905,7 +905,7 @@ The nested `@client` approach works alongside existing customization decorators:
 
 - **`@clientInitialization`**: Still controls how each client is initialized. Can be applied to both auto-merged and explicitly defined clients.
 - **`@clientLocation`**: Can move operations between clients regardless of namespace content. When operations from different services are moved to the same sub-client, it becomes a multi-service sub-client with empty `apiVersions` and `string` type for the API version parameter.
-- **`@operationGroup`**: Functions as an alias for `@client` — it creates a sub-client (the `SdkOperationGroup` type has been consolidated into `SdkClient`). The same nested `@client` patterns apply.
+- **`@operationGroup`**: Deprecated alias for `@client` — both create clients represented by the `SdkClient` type. The same nested `@client` patterns apply.
 
 ### Validation Rules
 

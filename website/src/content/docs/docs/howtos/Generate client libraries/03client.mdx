@@ -597,7 +597,7 @@ Customizations SHOULD always be made in a file named `client.tsp` alongside `mai
 There are two ways to customize the client hierarchy: using `@clientLocation` to change the location of the operations, or use `@client` to restructure the client hierarchy.
 Be careful when you use both of them since `@clientLocation` could not move the client that is no longer exist with `@client` customization.
 
-The `@clientLocaton` decorator allows you to change the location of the operations in the client hierarchy.
+The `@clientLocation` decorator allows you to change the location of the operations in the client hierarchy.
 It can be used to move operations to an existed sub client defined by `Interface` or `Namespace`, or move the the root client of namespace with `@service` decorator.
 This decorator is useful when you want to keep the default client hierarchy but need to change the location of some operations.
 
@@ -2695,6 +2695,103 @@ serviceAOnly.SubOpA(context.Background(), &ServiceAOnlyClientSubOpAOptions{})
 // Access ServiceB-only operations
 serviceBOnly := customClient.NewServiceBOnlyClient()
 serviceBOnly.SubOpB(context.Background(), &ServiceBOnlyClientSubOpBOptions{})
+```
+
+</ClientTabs>
+
+### Parameter Aliasing
+
+The `@paramAlias` decorator lets you use a different name for a parameter in client initialization than its name in the operation.
+This is useful when elevating operation parameters to client level via `@clientInitialization` and you want a more descriptive client-level name.
+
+<ClientTabs>
+
+```typespec title=main.tsp
+import "@typespec/http";
+
+using TypeSpec.Http;
+
+@service
+namespace MyService;
+
+@route("/files/{blob}")
+@get
+op download(@path blob: string): bytes;
+```
+
+```typespec title=client.tsp
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+namespace MyCustomizations;
+
+model MyClientInitialization {
+  @paramAlias("blob")
+  blobName: string;
+}
+
+@@clientInitialization(MyService,
+  {
+    parameters: MyCustomizations.MyClientInitialization,
+  }
+);
+```
+
+```python
+# The 'blob' operation parameter is elevated to client init as 'blob_name'
+class MyServiceClient:
+    def __init__(self, endpoint: str, blob_name: str, **kwargs: Any) -> None:
+        ...
+
+    def download(self, **kwargs: Any) -> Iterator[bytes]:
+        ...
+```
+
+```csharp
+public partial class MyServiceClient
+{
+    // The 'blob' operation parameter is elevated to client init as 'blobName'
+    public MyServiceClient(Uri endpoint, string blobName);
+
+    public virtual Response Download(CancellationToken cancellationToken = default);
+}
+```
+
+```typescript
+export class MyServiceClient {
+  // The 'blob' operation parameter is elevated to client init as 'blobName'
+  constructor(endpointParam: string, blobName: string, options?: MyServiceClientOptionalParams);
+
+  download(options?: DownloadOptionalParams): Promise<DownloadResponse>;
+}
+```
+
+```java
+public final class MyServiceClientBuilder {
+    // The 'blob' operation parameter is elevated to client init as 'blobName'
+    public MyServiceClientBuilder blobName(String blobName);
+    public MyServiceClient buildClient();
+}
+
+public final class MyServiceClient {
+    public BinaryData download();
+}
+```
+
+```go
+// The 'blob' operation parameter is elevated to client init as 'blobName'
+func NewMyServiceClientWithNoCredential(
+    endpoint string,
+    blobName string,
+    options *MyServiceClientOptions,
+) (*MyServiceClient, error)
+
+func (client *MyServiceClient) Download(
+    ctx context.Context,
+    options *MyServiceClientDownloadOptions,
+) (MyServiceClientDownloadResponse, error)
 ```
 
 </ClientTabs>
