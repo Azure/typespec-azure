@@ -1991,13 +1991,15 @@ function filterOutTypes(
   context: TCGCContext,
   filter: number,
 ): (SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType)[] {
+  const seen = new Set<SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>();
   const result = new Array<SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>();
   for (const sdkType of context.__referencedTypeCache.values()) {
     // filter models with unexpected usage
     if ((sdkType.usage & filter) === 0) {
       continue;
     }
-    if (!result.includes(sdkType)) {
+    if (!seen.has(sdkType)) {
+      seen.add(sdkType);
       result.push(sdkType);
     }
   }
