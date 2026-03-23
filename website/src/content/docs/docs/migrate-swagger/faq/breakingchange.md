@@ -29,7 +29,23 @@ This produces the route:
 
 ### Customizing Request Payload Parameter Names
 
-For operations with request bodies (PUT, POST, PATCH), TypeSpec operation templates provide default names for request parameters. You can use augment decorators to customize these parameter names and other parts of the operation signature.
+For operations with request bodies (PUT, POST, PATCH), TypeSpec operation templates provide **standardized request body names** by default. You can use augment decorators to customize these parameter names and other parts of the operation signature.
+
+#### Migration Decision: Preserving vs. Standardizing Parameter Names
+
+Request body parameter names affect generated SDK method signatures. Changing them constitutes a **client-visible breaking change** and may break existing SDK consumers.
+
+When migrating from Swagger with named body parameters, use the following guidance to make your **migration decision**:
+
+- **Preserve existing names to avoid breaking changes (recommended for SDK backward compatibility):** If your SDK is already released, use `@@clientName` to keep the original Swagger named body parameters. This ensures SDK compatibility for existing consumers.
+- **Use standardized TypeSpec names:** Acceptable only when a breaking change is already planned, or the SDK surface is new.
+
+**Example:** If your Swagger defined a `createOrUpdate` operation on the `Widgets` resource interface with a body parameter named `widget` (instead of the TypeSpec default `resource`), preserve the original Swagger named body parameter to maintain SDK compatibility:
+
+```tsp
+// In your client.tsp - preserve the original Swagger parameter name to avoid a breaking change
+@@clientName(Widgets.createOrUpdate::parameters.resource, "widget");
+```
 
 The following sections show how to do this for each operation template.
 
