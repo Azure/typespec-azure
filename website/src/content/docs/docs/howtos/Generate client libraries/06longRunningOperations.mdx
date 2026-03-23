@@ -268,3 +268,24 @@ func (c *Client) BeginExportUser(ctx context.Context, name string, format string
 ```
 
 </ClientTabs>
+
+## Legacy LRO Decorator
+
+:::caution
+The `@markAsLro` decorator is legacy functionality from `Azure.ClientGenerator.Core.Legacy`. It should **only** be used when standard TypeSpec LRO patterns are not sufficient and you have explicit permission from SDK architects.
+:::
+
+### `@markAsLro`
+
+Forces an operation to be treated as a long-running operation by SDK generators, even if it doesn't follow standard LRO patterns. When applied, the generated client will produce poller/LRO method signatures for the operation.
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+@markAsLro
+@route("/long-operation")
+@post
+op startLongOperation(): void;
+```

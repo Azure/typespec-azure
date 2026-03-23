@@ -944,3 +944,55 @@ func (client *ServiceClient) Get(ctx context.Context, version Versions, options 
 ```
 
 </ClientTabs>
+
+## Overriding Client API Versions with `@clientApiVersions`
+
+The `@clientApiVersions` decorator allows you to explicitly specify which API versions a client should support, overriding the versions inferred from the `@versioned` decorator. This is useful when:
+
+- You want to add additional preview versions that clients should be able to target
+- You need to restrict which versions the client exposes compared to the service's full version history
+- You're building a client that should support versions not yet reflected in the spec's `@versioned` enum
+
+```typespec
+import "@typespec/versioning";
+import "@typespec/http";
+import "@azure-tools/typespec-client-generator-core";
+
+using TypeSpec.Versioning;
+using TypeSpec.Http;
+using Azure.ClientGenerator.Core;
+
+@versioned(PetStore.Versions)
+@service(#{ title: "Pet Store" })
+namespace PetStore;
+
+enum Versions {
+  v1: "v1",
+  v2: "v2",
+  v3: "v3",
+}
+
+@route("/pets")
+@get
+op list(@query("api-version") apiVersion: string): void;
+```
+
+```typespec
+// client.tsp
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+// Override the client's API version list with a custom enum
+enum ClientVersions {
+  v1: "v1",
+  v2: "v2",
+  v3: "v3",
+  v4: "v4",
+}
+
+@@clientApiVersions(PetStore, ClientVersions);
+```
+
+The `@clientApiVersions` decorator primarily affects the TCGC type graph used by emitter developers. The client's API version parameter will reflect the versions from the provided enum, and emitters can use this information to generate appropriate version handling code.

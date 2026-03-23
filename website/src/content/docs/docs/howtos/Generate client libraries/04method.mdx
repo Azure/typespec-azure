@@ -1751,3 +1751,180 @@ public final class ContosoProviderHubClient {
 ```
 
 </ClientTabs>
+
+## Using `@scope` to limit operations to specific languages
+
+The `@scope` decorator allows you to include or exclude operations and model properties from specific language emitters. By default, all elements are emitted for all languages.
+
+You can use `@scope` to:
+
+- Target specific languages: `@scope("python, java")` — only emit for Python and Java
+- Exclude specific languages: `@scope("!csharp")` — emit for all except C#
+- Exclude multiple languages: `@scope("!(java, python)")` — emit for all except Java and Python
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/http";
+import "@typespec/rest";
+import "@azure-tools/typespec-azure-core";
+
+using TypeSpec.Http;
+using TypeSpec.Rest;
+
+@service(#{ title: "Pet Store" })
+@server("https://example.com", "The service endpoint")
+namespace PetStore;
+
+model Pet {
+  name: string;
+  age: int32;
+}
+
+@route("/pets")
+@get
+op list(): Pet[];
+
+@route("/pets")
+@post
+op create(@body pet: Pet): Pet;
+
+@route("/pets/{name}")
+@get
+op read(@path name: string): Pet;
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+// Only generate the `create` operation for Python and Java
+@@scope(PetStore.create, "python, java");
+```
+
+```python
+class PetStoreClient:
+    # The `create` operation IS generated for Python
+    def list(self, **kwargs: Any) -> List[Pet]: ...
+    def create(self, pet: Pet, **kwargs: Any) -> Pet: ...
+    def read(self, name: str, **kwargs: Any) -> Pet: ...
+```
+
+```csharp
+// The `Create` operation is NOT generated for C#
+public partial class PetStoreClient
+{
+    public virtual Response<IReadOnlyList<Pet>> GetAll(CancellationToken cancellationToken = default);
+    // No Create method — excluded by @scope
+    public virtual Response<Pet> Read(string name, CancellationToken cancellationToken = default);
+}
+```
+
+```typescript
+// NOT_SUPPORTED
+```
+
+```java
+public final class PetStoreClient {
+    // The `create` operation IS generated for Java
+    public List<Pet> list();
+    public Pet create(Pet pet);
+    public Pet read(String name);
+}
+```
+
+```go
+// The `Create` operation is NOT generated for Go
+func NewPetStoreClientWithNoCredential(endpoint string, options *PetStoreClientOptions) (*PetStoreClient, error)
+func (client *PetStoreClient) List(ctx context.Context, options *PetStoreClientListOptions) (PetStoreClientListResponse, error)
+// No Create method — excluded by @scope
+func (client *PetStoreClient) Read(ctx context.Context, name string, options *PetStoreClientReadOptions) (PetStoreClientReadResponse, error)
+```
+
+</ClientTabs>
+
+The `@scope` decorator can also be applied to model properties to include or exclude them from specific languages:
+
+```typespec
+model TestModel {
+  @scope("csharp")
+  csharpOnlyProp: string;
+}
+```
+
+## Using `@responseAsBool` for HEAD operations
+
+The `@responseAsBool` decorator indicates that a HEAD operation should return a boolean value instead of the raw HTTP response. When applied:
+
+- A `2xx` response returns `true`
+- A `404` response returns `false` (instead of raising an error)
+- All other status codes still raise errors
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/http";
+import "@typespec/rest";
+import "@azure-tools/typespec-azure-core";
+
+using TypeSpec.Http;
+using TypeSpec.Rest;
+
+@service(#{ title: "Pet Store" })
+@server("https://example.com", "The service endpoint")
+namespace PetStore;
+
+model Pet {
+  name: string;
+  age: int32;
+}
+
+@route("/pets/{name}")
+@head
+op exists(@path name: string): void;
+
+@route("/pets")
+@get
+op list(): Pet[];
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@@responseAsBool(PetStore.exists);
+```
+
+```python
+class PetStoreClient:
+    # Returns bool instead of None — True if pet exists, False if 404
+    def exists(self, name: str, **kwargs: Any) -> bool: ...
+    def list(self, **kwargs: Any) -> List[Pet]: ...
+```
+
+```csharp
+public partial class PetStoreClient
+{
+    // Returns bool — true if pet exists, false if 404
+    public virtual Response<bool> Exists(string name, CancellationToken cancellationToken = default);
+    public virtual Response<IReadOnlyList<Pet>> GetAll(CancellationToken cancellationToken = default);
+}
+```
+
+```typescript
+// NOT_SUPPORTED
+```
+
+```java
+// TODO: fill in Java example manually — @responseAsBool convenience not fully reflected in Java output
+```
+
+```go
+// NOT_SUPPORTED — Go emitter does not yet support @responseAsBool
+```
+
+</ClientTabs>

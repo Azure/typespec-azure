@@ -464,6 +464,30 @@ The `@clientDoc` decorator can be used on everything that the `@doc` decorator c
 When both `@doc` and `@clientDoc` are present, the generated code outputs the final documentation depending on the mode that you called `@clientDoc` with.
 If called with `replace`, `@clientDoc` replaces `@doc` completely. If called with `append`, `@clientDoc` is appended onto `@doc`.
 
+## Deserializing Empty Strings as Null
+
+The `@deserializeEmptyStringAsNull` decorator indicates that a model property of type `string` (or a scalar derived from `string`) should be deserialized as `null` when its value is an empty string (`""`). This is useful when a service sends empty strings to represent missing or unset values.
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+model Pet {
+  name: string;
+  age: int32;
+
+  @deserializeEmptyStringAsNull
+  nickname: string;
+}
+```
+
+When the service returns `{ "nickname": "" }`, the generated client will deserialize the `nickname` property as `null` instead of an empty string.
+
+:::note
+The `@deserializeEmptyStringAsNull` decorator only affects deserialization behavior at runtime — it does not change the model declaration in generated code. The property type remains `string` in all languages, but the deserialization logic will convert empty strings to null values.
+:::
+
 ## Using `@alternateType` to Reference External Types
 
 The `@alternateType` decorator allows you to override the emitted type for a model, union, or enum in generated client libraries. With recent updates, you can now reference types defined in external namespaces or imported libraries.

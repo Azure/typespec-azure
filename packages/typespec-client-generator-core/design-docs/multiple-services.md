@@ -90,7 +90,7 @@ When TCGC detects multiple services in one client with `autoMergeService: true`,
 2. Create sub-clients for each service's nested namespaces or interfaces. Each sub-client will have its own `apiVersions` array and `apiVersion` initialization parameter with a `clientDefaultValue` set to the latest version of its service.
 3. If multiple services have nested namespaces or interfaces with the same name, TCGC will automatically merge them into a single sub-client. The merged sub-client will have empty `apiVersions` and a `string` type for the API version parameter (with `clientDefaultValue: undefined`), and will contain operations from all the services.
 4. Operations directly under each service's namespace are placed under the root client. Operations under nested namespaces or interfaces are placed under the corresponding sub-clients.
-5. Decorators such as `@clientLocation`, `@convenientAPI`, `@protocolAPI`, `@moveTo`, and `@scope` work as usual. When using `@clientLocation` to move operations from different services to a new sub-client, the resulting sub-client will have empty `apiVersions` and a `string` type for the API version parameter.
+5. Decorators such as `@clientLocation`, `@convenientAPI`, `@protocolAPI`, and `@scope` work as usual. When using `@clientLocation` to move operations from different services to a new sub-client, the resulting sub-client will have empty `apiVersions` and a `string` type for the API version parameter.
 6. All other TCGC logic remains unchanged.
 7. Since TCGC only merges sub-clients with the same name, emitters must still handle conflicts for models, operations, or other types appropriately. Empty sub-clients (no operations and no children) are automatically pruned unless they are explicitly defined.
 
