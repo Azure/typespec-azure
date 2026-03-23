@@ -1,5 +1,27 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.66.3
+
+### Bug Fixes
+
+- [#4068](https://github.com/Azure/typespec-azure/pull/4068) Add support for `@clientOption("omitSlashFromEmptyRoute", true)` to handle legacy compatibility for operations with empty routes.
+
+
+## 0.66.2
+
+### Bug Fixes
+
+- [#4041](https://github.com/Azure/typespec-azure/pull/4041) Consolidate orphan type discovery into shared cached `listOrphanTypes` used by both `handleServiceOrphanTypes` and `getGeneratedName`, fixing duplicate client name errors for orphan unions and unstable enum naming with versioned services
+
+
+## 0.66.1
+
+### Bug Fixes
+
+- [#4020](https://github.com/Azure/typespec-azure/pull/4020) Optimize `findMappingWithPath` in `getMethodParameterSegments` for better performance with deeply nested models. Replace O(n) `Array.shift()` with O(1) index-based dequeue, and use parent pointer map instead of O(depth) path copying per node.
+- [#4024](https://github.com/Azure/typespec-azure/pull/4024) Refine orphan model logic to reduce the efforts for model calculations
+
+
 ## 0.66.0
 
 ### Features
