@@ -319,6 +319,35 @@ it("file download with json content type should have correct contentType respons
   strictEqual(contentTypeHeader.serializedName, "Content-Type");
 });
 
+it("file download with single content type should have constant accept header", async () => {
+  const { program } = await SimpleTester.compile(
+    `
+      @service
+      namespace TestService {
+        op downloadFileSingleContentType(): File<"image/png">;
+      }
+    `,
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  const method = sdkPackage.clients[0].methods[0];
+  strictEqual(method.name, "downloadFileSingleContentType");
+  // The accept method parameter should be constant, not string
+  const acceptMethodParam = method.parameters.find((p) => p.name === "accept");
+  ok(acceptMethodParam);
+  strictEqual(acceptMethodParam.type.kind, "constant");
+  strictEqual(acceptMethodParam.type.value, "image/png");
+  // The Accept header should also be constant
+  const httpOperation = method.operation;
+  const acceptHeader = httpOperation.parameters.find(
+    (p) => p.kind === "header" && p.name === "accept",
+  );
+  ok(acceptHeader);
+  strictEqual(acceptHeader.type.kind, "constant");
+  strictEqual(acceptHeader.type.value, "image/png");
+  strictEqual(acceptHeader.serializedName, "Accept");
+});
+
 it("file download with multiple content types should have enum accept header", async () => {
   const { program } = await SimpleTester.compile(
     `
