@@ -376,70 +376,83 @@ function createContentTypeOrAcceptHeader(
   bodyObject: SdkBodyParameter | SdkHttpResponse | SdkHttpErrorResponse,
 ): Omit<SdkMethodParameter, "kind"> {
   const name = bodyObject.kind === "body" ? "contentType" : "accept";
-  const stringType: SdkBuiltInType = getTypeSpecBuiltInType(context, "string");
-  let type: SdkType = stringType;
-  // We treat a single content type as a constant IFF it's one of:
+  let type: SdkType = getTypeSpecBuiltInType(context, "string");
+  // for contentType, we treat it as a constant IFF there's one value and it's one of:
   //  - application/json
   //  - text/plain
   //  - application/octet-stream
-  //  - body is a File type (the content type is constrained by the File type itself)
   // this is to prevent a breaking change when a service adds more content types in the future.
   // e.g. the service accepting image/png then later image/jpeg should _not_ be a breaking change.
   //
-  // when there are multiple accept content types, we create an enum to represent the valid values.
-  const isFileBody =
-    name === "contentType"
-      ? httpOperation.parameters.body?.bodyKind === "file"
-      : httpOperation.responses.some((r) =>
-          r.responses.some((rc) => rc.body?.bodyKind === "file"),
-        );
+  // for accept, we treat it as a constant IFF there's a single value. adding more content types
+  // for this case is considered a breaking change for SDKs so we want to surface it as such.
+  // e.g. the service returns image/png then later provides the option to return image/jpeg.
   if (
     bodyObject.contentTypes &&
     bodyObject.contentTypes.length === 1 &&
     (isMediaTypeJson(bodyObject.contentTypes[0]) ||
       isMediaTypeTextPlain(bodyObject.contentTypes[0]) ||
       isMediaTypeOctetStream(bodyObject.contentTypes[0]) ||
-      isFileBody)
+      name === "accept")
   ) {
+    // in this case, we just want a content type of application/json
     type = {
       kind: "constant",
       value: bodyObject.contentTypes[0],
-      valueType: stringType,
+      valueType: type,
       name: `${httpOperation.operation.name}ContentType`,
       isGeneratedName: true,
       decorators: [],
     };
-  } else if (
-    bodyObject.contentTypes &&
-    bodyObject.contentTypes.length > 1 &&
-    name === "accept"
-  ) {
-    const enumType: SdkEnumType = {
-      kind: "enum",
-      name: `${httpOperation.operation.name}ContentType`,
-      isGeneratedName: true,
-      namespace: "",
-      valueType: stringType,
-      values: [],
-      isFixed: true,
-      isFlags: false,
-      usage: UsageFlags.None,
-      access: "public",
-      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
-      apiVersions: bodyObject.apiVersions,
-      isUnionAsEnum: false,
-      decorators: [],
-    };
-    enumType.values = bodyObject.contentTypes.map((ct) => ({
-      kind: "enumvalue" as const,
-      name: ct,
-      value: ct,
-      enumType,
-      valueType: stringType,
-      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}.${ct}`,
-      decorators: [],
-    }));
-    type = enumType;
+  } else if (bodyObject.contentTypes) {
+    // For File type bodies, the content type is constrained by the File type itself.
+    // Follow the content type to add a constant (single) or enum (multiple) param.
+    const isFileBody =
+      name === "contentType"
+        ? httpOperation.parameters.body?.bodyKind === "file"
+        : httpOperation.responses.some((r) =>
+            r.responses.some((rc) => rc.body?.bodyKind === "file"),
+          );
+    if (isFileBody) {
+      const stringType: SdkBuiltInType = getTypeSpecBuiltInType(context, "string");
+      if (bodyObject.contentTypes.length === 1) {
+        type = {
+          kind: "constant",
+          value: bodyObject.contentTypes[0],
+          valueType: stringType,
+          name: `${httpOperation.operation.name}ContentType`,
+          isGeneratedName: true,
+          decorators: [],
+        };
+      } else if (bodyObject.contentTypes.length > 1) {
+        const enumType: SdkEnumType = {
+          kind: "enum",
+          name: `${httpOperation.operation.name}ContentType`,
+          isGeneratedName: true,
+          namespace: "",
+          valueType: stringType,
+          values: [],
+          isFixed: true,
+          isFlags: false,
+          usage: UsageFlags.None,
+          access: "public",
+          crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
+          apiVersions: bodyObject.apiVersions,
+          isUnionAsEnum: false,
+          decorators: [],
+        };
+        enumType.values = bodyObject.contentTypes.map((ct) => ({
+          kind: "enumvalue" as const,
+          name: ct,
+          value: ct,
+          enumType,
+          valueType: stringType,
+          crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}.${ct}`,
+          decorators: [],
+        }));
+        type = enumType;
+      }
+    }
   }
   const optional = bodyObject.kind === "body" ? bodyObject.optional : false;
   // No need for clientDefaultValue because it's a constant, it only has one value
