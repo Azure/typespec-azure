@@ -64,6 +64,59 @@ interface EmitterRegistration {
   parser: LanguageParser;
 }
 
+/**
+ * Known Azure Java namespace prefixes in order of specificity.
+ * Used to strip and replace prefixes based on service type and flavor.
+ */
+const JAVA_AZURE_PREFIXES = [
+  "com.azure.resourcemanager.v2.",
+  "com.azure.v2.",
+  "com.azure.resourcemanager.",
+  "com.azure.",
+] as const;
+
+/**
+ * Determines the correct Java namespace prefix based on service type and flavor.
+ * - com.azure.            : current data plane
+ * - com.azure.resourcemanager. : current ARM/management
+ * - com.azure.v2.         : next-gen data plane (flavor: azurev2)
+ * - com.azure.resourcemanager.v2. : next-gen ARM (flavor: azurev2)
+ */
+function getJavaNamespacePrefix(isManagement: boolean, isAzureV2: boolean): string {
+  if (isManagement) {
+    return isAzureV2 ? "com.azure.resourcemanager.v2." : "com.azure.resourcemanager.";
+  }
+  return isAzureV2 ? "com.azure.v2." : "com.azure.";
+}
+
+/**
+ * Applies the correct Java namespace prefix based on service type and flavor.
+ * If the namespace already has a known Azure prefix, it is replaced with the correct one.
+ * If the namespace does not start with a known Azure prefix, the correct prefix is prepended.
+ */
+function applyJavaNamespacePrefix(
+  namespace: string,
+  isManagement: boolean,
+  isAzureV2: boolean,
+): string {
+  const targetPrefix = getJavaNamespacePrefix(isManagement, isAzureV2);
+
+  // If namespace already has the correct prefix, no change needed
+  if (namespace.startsWith(targetPrefix)) {
+    return namespace;
+  }
+
+  // Strip any existing Azure prefix and replace with the correct one
+  for (const prefix of JAVA_AZURE_PREFIXES) {
+    if (namespace.startsWith(prefix)) {
+      return targetPrefix + namespace.substring(prefix.length);
+    }
+  }
+
+  // No known Azure prefix found — prepend the correct prefix
+  return targetPrefix + namespace;
+}
+
 const EMITTER_REGISTRY: Record<string, EmitterRegistration> = {
   "@azure-tools/typespec-csharp": { language: "csharp", parser: parseCSharp },
   "@azure-tools/typespec-java": { language: "java", parser: parseJava },
@@ -86,6 +139,7 @@ interface LanguageParserResult {
 type LanguageParser = (
   options: Record<string, unknown>,
   params: Record<string, unknown>,
+  typespecType?: "data" | "management",
 ) => LanguageParserResult;
 
 /**
@@ -120,19 +174,32 @@ function parsePython(
 
 /**
  * Java-specific metadata parser.
- * Strips 'com.' prefix from namespace if present for package name derivation.
+ * Applies the correct Azure Java namespace prefix based on service type and flavor:
+ * - com.azure.            : current data plane
+ * - com.azure.resourcemanager. : current ARM/management
+ * - com.azure.v2.         : next-gen data plane (flavor: azurev2)
+ * - com.azure.resourcemanager.v2. : next-gen ARM (flavor: azurev2)
  */
 function parseJava(
   options: Record<string, unknown>,
   params: Record<string, unknown>,
+  typespecType?: "data" | "management",
 ): LanguageParserResult {
   let packageName = options["package-name"] ?? options["package_name"];
-  const namespace = options["namespace"];
+  const rawNamespace = options["namespace"];
 
-  if (namespace && !packageName) {
-    const ns = String(namespace);
-    const stripped = ns.startsWith("com.") ? ns.substring(4) : ns;
-    packageName = stripped.replace(/\./g, "-");
+  const flavor = options["flavor"];
+  const isAzureV2 = flavor === "azurev2";
+  const isManagement = typespecType === "management";
+
+  let namespace: string | undefined;
+  if (rawNamespace) {
+    namespace = applyJavaNamespacePrefix(String(rawNamespace), isManagement, isAzureV2);
+
+    if (!packageName) {
+      const stripped = namespace.startsWith("com.") ? namespace.substring(4) : namespace;
+      packageName = stripped.replace(/\./g, "-");
+    }
   }
 
   return {
@@ -257,6 +324,7 @@ export interface LanguageCollectionResult {
 export async function collectLanguagePackages(
   program: Program,
   baseOutputDir: string,
+  typespecType?: "data" | "management",
 ): Promise<LanguageCollectionResult> {
   const optionMap = program.compilerOptions.options ?? {};
   const params = extractParameters(optionMap);
@@ -272,7 +340,7 @@ export async function collectLanguagePackages(
   }
 
   return {
-    languages: buildLanguageMetadata(optionMap, params, baseOutputDir, defaultServiceDir),
+    languages: buildLanguageMetadata(optionMap, params, baseOutputDir, defaultServiceDir, typespecType),
     sourceConfigPath: program.compilerOptions.config,
   };
 }
@@ -419,6 +487,7 @@ export function buildLanguageMetadata(
   params: Record<string, unknown>,
   baseOutputDir: string,
   defaultServiceDir?: string,
+  typespecType?: "data" | "management",
 ): Record<string, LanguagePackageMetadata> {
   const languagesDict: Record<string, LanguagePackageMetadata> = {};
 
@@ -429,6 +498,7 @@ export function buildLanguageMetadata(
       params,
       baseOutputDir,
       defaultServiceDir,
+      typespecType,
     );
     const language = inferLanguageFromEmitterName(emitterName);
     languagesDict[language] = metadata;
@@ -443,6 +513,7 @@ function createLanguageMetadata(
   params: Record<string, unknown>,
   baseOutputDir: string,
   defaultServiceDir?: string,
+  typespecType?: "data" | "management",
 ): LanguagePackageMetadata {
   const normalizedOptions = normalizeOptionsObject(emitterOptions);
 
@@ -463,7 +534,7 @@ function createLanguageMetadata(
   const registration = EMITTER_REGISTRY[normalizedEmitterName];
 
   if (registration) {
-    const result = registration.parser(normalizedOptions, params);
+    const result = registration.parser(normalizedOptions, params, typespecType);
     packageName = result.packageName;
     namespace = result.namespace;
   } else {

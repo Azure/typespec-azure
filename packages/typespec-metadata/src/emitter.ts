@@ -18,7 +18,7 @@ export async function $onEmit(context: EmitContext<MetadataEmitterOptions>): Pro
   // Get the common tsp-output directory (parent of this emitter's output dir)
   const commonOutputDir = getDirectoryPath(getDirectoryPath(context.emitterOutputDir));
 
-  const languageResult = await collectLanguagePackages(context.program, commonOutputDir);
+  const languageResult = await collectLanguagePackages(context.program, commonOutputDir, typespecMetadata.type);
 
   const snapshot: MetadataSnapshot = {
     emitterVersion: SNAPSHOT_VERSION,

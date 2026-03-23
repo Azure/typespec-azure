@@ -183,6 +183,131 @@ describe("language-specific parsers", () => {
   });
 });
 
+describe("Java namespace prefix handling", () => {
+  it("should keep data-plane namespace with com.azure. prefix unchanged when no flavor", () => {
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-tools/typespec-java": {
+        namespace: "com.azure.security.keyvault.secrets",
+      },
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "/output", undefined, "data");
+    expect(result["java"].namespace).toBe("com.azure.security.keyvault.secrets");
+    expect(result["java"].packageName).toBe("azure-security-keyvault-secrets");
+  });
+
+  it("should keep management-plane namespace with com.azure.resourcemanager. prefix unchanged when no flavor", () => {
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-tools/typespec-java": {
+        namespace: "com.azure.resourcemanager.contoso",
+      },
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "/output", undefined, "management");
+    expect(result["java"].namespace).toBe("com.azure.resourcemanager.contoso");
+    expect(result["java"].packageName).toBe("azure-resourcemanager-contoso");
+  });
+
+  it("should update data-plane namespace to com.azure.v2. when flavor is azurev2", () => {
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-tools/typespec-java": {
+        namespace: "com.azure.security.keyvault.secrets",
+        flavor: "azurev2",
+      },
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "/output", undefined, "data");
+    expect(result["java"].namespace).toBe("com.azure.v2.security.keyvault.secrets");
+    expect(result["java"].packageName).toBe("azure-v2-security-keyvault-secrets");
+  });
+
+  it("should update management-plane namespace to com.azure.resourcemanager.v2. when flavor is azurev2", () => {
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-tools/typespec-java": {
+        namespace: "com.azure.resourcemanager.contoso",
+        flavor: "azurev2",
+      },
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "/output", undefined, "management");
+    expect(result["java"].namespace).toBe("com.azure.resourcemanager.v2.contoso");
+    expect(result["java"].packageName).toBe("azure-resourcemanager-v2-contoso");
+  });
+
+  it("should update data-plane namespace to com.azure.resourcemanager. when typespecType is management", () => {
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-tools/typespec-java": {
+        namespace: "com.azure.contoso",
+      },
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "/output", undefined, "management");
+    expect(result["java"].namespace).toBe("com.azure.resourcemanager.contoso");
+  });
+
+  it("should not change namespace if it already has the correct v2 prefix", () => {
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-tools/typespec-java": {
+        namespace: "com.azure.v2.security.keyvault.secrets",
+        flavor: "azurev2",
+      },
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "/output", undefined, "data");
+    expect(result["java"].namespace).toBe("com.azure.v2.security.keyvault.secrets");
+  });
+
+  it("should not change namespace if it already has the correct resourcemanager.v2 prefix", () => {
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-tools/typespec-java": {
+        namespace: "com.azure.resourcemanager.v2.contoso",
+        flavor: "azurev2",
+      },
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "/output", undefined, "management");
+    expect(result["java"].namespace).toBe("com.azure.resourcemanager.v2.contoso");
+  });
+
+  it("should prepend correct prefix to namespace without any Azure prefix (data plane)", () => {
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-tools/typespec-java": {
+        namespace: "security.keyvault.secrets",
+      },
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "/output", undefined, "data");
+    expect(result["java"].namespace).toBe("com.azure.security.keyvault.secrets");
+  });
+
+  it("should prepend correct prefix to namespace without any Azure prefix (management plane, azurev2)", () => {
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-tools/typespec-java": {
+        namespace: "contoso",
+        flavor: "azurev2",
+      },
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "/output", undefined, "management");
+    expect(result["java"].namespace).toBe("com.azure.resourcemanager.v2.contoso");
+  });
+
+  it("should preserve explicit package-name when namespace is updated", () => {
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-tools/typespec-java": {
+        "package-name": "azure-security-keyvault-secrets",
+        namespace: "com.azure.security.keyvault.secrets",
+        flavor: "azurev2",
+      },
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "/output", undefined, "data");
+    expect(result["java"].namespace).toBe("com.azure.v2.security.keyvault.secrets");
+    // Explicit package-name should be preserved
+    expect(result["java"].packageName).toBe("azure-security-keyvault-secrets");
+  });
+});
+
 describe("service-dir handling", () => {
   it("should use language-specific service-dir if present", () => {
     const languageServiceDir = "sdk/security/keyvault";
