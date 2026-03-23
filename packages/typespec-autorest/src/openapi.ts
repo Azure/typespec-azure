@@ -482,6 +482,11 @@ export async function getOpenAPIForService(
       metadata.finalResult !== "void" &&
       metadata.finalResult.name.length > 0
     ) {
+      // Scalar types (e.g., string) are emitted inline and don't have a definitions entry
+      if (metadata.finalResult.kind === "Scalar") {
+        return undefined;
+      }
+
       const model: Model | IntrinsicType = metadata.finalResult;
       const schemaOrRef = resolveExternalRef(metadata.finalResult);
       let overrideName: ((name: string, visibility: Visibility) => string) | undefined = undefined;

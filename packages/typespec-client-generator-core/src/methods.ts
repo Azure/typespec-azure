@@ -429,7 +429,12 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     },
     operation: diagnostics.pipe(getSdkBasicServiceMethod(context, rawMetadata.operation, client))
       .operation,
-    logicalResult: diagnostics.pipe(getSdkModelWithDiagnostics(context, rawMetadata.logicalResult)),
+    logicalResult:
+      rawMetadata.logicalResult.kind === "Scalar"
+        ? (diagnostics.pipe(
+            getClientTypeWithDiagnostics(context, rawMetadata.logicalResult),
+          ) as SdkBuiltInType)
+        : diagnostics.pipe(getSdkModelWithDiagnostics(context, rawMetadata.logicalResult)),
     statusMonitorStep: getStatusMonitorStep(context, rawMetadata.statusMonitorStep),
     pollingInfo: getPollingInfo(context, rawMetadata.pollingInfo),
     envelopeResult: diagnostics.pipe(
@@ -461,7 +466,12 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
       case "pollingSuccessProperty": {
         return {
           kind: "pollingSuccessProperty",
-          responseModel: getSdkModel(context, step.responseModel),
+          responseModel:
+            step.responseModel.kind === "Scalar"
+              ? (diagnostics.pipe(
+                  getClientTypeWithDiagnostics(context, step.responseModel),
+                ) as SdkBuiltInType)
+              : getSdkModel(context, step.responseModel),
           target: diagnostics.pipe(getSdkModelPropertyType(context, step.target)),
           sourceProperty: step.sourceProperty
             ? diagnostics.pipe(getSdkModelPropertyType(context, step.sourceProperty))
@@ -579,11 +589,11 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     }
     const envelopeResult = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, rawMetadata.finalEnvelopeResult),
-    ) as SdkModelType | SdkArrayType | SdkBuiltInType<"unknown">;
+    ) as SdkModelType | SdkArrayType | SdkBuiltInType;
 
     const result = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, rawMetadata.finalResult),
-    ) as SdkModelType | SdkArrayType | SdkBuiltInType<"unknown">;
+    ) as SdkModelType | SdkArrayType | SdkBuiltInType;
 
     // find the property inside the envelope result using the final result path
     let sdkProperty: SdkModelPropertyType | undefined = undefined;
