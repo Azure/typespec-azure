@@ -1,4 +1,4 @@
-import type { Model, StringLiteral } from "@typespec/compiler";
+import type { Model, Scalar, StringLiteral } from "@typespec/compiler";
 import {
   expectDiagnosticEmpty,
   expectDiagnostics,
@@ -2315,6 +2315,65 @@ op createJob(
       deepStrictEqual(metadata.pollingInfo.terminationStatus.canceledState, ["Canceled"]);
       deepStrictEqual(metadata.pollingInfo.terminationStatus.failedState, ["Failed"]);
       deepStrictEqual(metadata.pollingInfo.terminationStatus.succeededState, ["Succeeded"]);
+    });
+
+    it("Gets Lro for status monitor with scalar result type", async () => {
+      const [_, metadata] = await compileLroOperation(
+        `
+        model PollingStatus {
+          @doc("PollingLocation")
+          @header location?: ResourceLocation<PollingStatus>;
+
+          @doc("The status of the operation")
+          @Azure.Core.lroStatus
+          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+
+          @doc("The result")
+          @Azure.Core.lroResult
+          result?: string;
+        }
+
+        @doc("get lro status")
+        @route("/scalarResult/operations/{operationId}")
+        @get op getScalarStatus(@doc("The operation") @path operationId: string): PollingStatus;
+
+        @doc("Start operation")
+        @pollingOperation(getScalarStatus, {operationId: ResponseProperty<"operationId">})
+        @route("/scalarResult")
+        @post @test op startScalarOp(@body body: {}): {
+          @statusCode _: 202;
+          @header("operation-id") operationId: string;
+        };
+        `,
+        "startScalarOp",
+      );
+      ok(metadata);
+      deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationReference");
+      deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "PollingStatus");
+
+      deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
+      deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
+      deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "result");
+
+      deepStrictEqual(metadata.envelopeResult.name, "PollingStatus");
+      deepStrictEqual(metadata.logicalPath, "result");
+
+      // The final result should be a Scalar type (string), not "void"
+      ok(metadata.finalResult !== "void");
+      ok(metadata.finalResult !== undefined);
+      strictEqual((metadata.finalResult as Scalar).kind, "Scalar");
+      strictEqual((metadata.finalResult as Scalar).name, "string");
+
+      deepStrictEqual((metadata.finalEnvelopeResult as Model).name, "PollingStatus");
+      deepStrictEqual(metadata.finalResultPath, "result");
+
+      // logicalResult should be the Scalar type
+      strictEqual((metadata.logicalResult as any).kind, "Scalar");
+      strictEqual((metadata.logicalResult as any).name, "string");
+
+      // finalStep should be pollingSuccessProperty
+      ok(metadata.finalStep);
+      deepStrictEqual(metadata.finalStep.kind, "pollingSuccessProperty");
     });
 
     it("ignores bad lro operation links with Operation-Location", async () => {
