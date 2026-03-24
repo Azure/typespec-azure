@@ -26,6 +26,7 @@ import {
   getNextLinkVerb,
   getOverriddenClientMethod,
   getResponseAsBool,
+  isInScope,
   listOperationsInClient,
   shouldGenerateConvenient,
   shouldGenerateProtocol,
@@ -700,6 +701,8 @@ export function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOpe
 
   for (const param of params) {
     if (isNeverOrVoidType(param.type)) continue;
+    // Skip parameters that are not in scope for this emitter
+    if (!isInScope(context, param)) continue;
     const sdkMethodParam = diagnostics.pipe(getSdkMethodParameter(context, param, operation));
     if (sdkMethodParam.onClient) {
       // add API version and subscription ID parameters to the client parameters
