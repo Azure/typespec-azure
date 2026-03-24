@@ -96,12 +96,12 @@ interface Missing {
 function main() {
   const mode = process.argv[2];
 
-  if (mode !== "check" && mode !== "sync") {
-    console.error("Usage: sync-catalog <check|sync>");
+  if (mode !== "check" && mode !== "fix") {
+    console.error("Usage: sync-catalog <check|fix>");
     console.error(
       "  check  - Report mismatches between core and this repo's catalog (exits non-zero if any)",
     );
-    console.error("  sync   - Update this repo's catalog with versions from core");
+    console.error("  fix    - Update this repo's catalog with versions from core");
     process.exit(1);
   }
 
@@ -156,11 +156,11 @@ function main() {
   }
 
   if (mode === "check") {
-    console.log(`\nRun with ${pc.cyan("sync")} to apply these changes.`);
+    console.log(`\nRun with ${pc.cyan("fix")} to apply these changes.`);
     process.exit(1);
   }
 
-  // Sync mode: apply changes
+  // Fix mode: apply changes
   const updatedCatalog = { ...repoCatalog };
   for (const { dep, coreVersion } of mismatches) {
     updatedCatalog[dep] = coreVersion;
