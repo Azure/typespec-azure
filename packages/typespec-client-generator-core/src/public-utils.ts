@@ -393,7 +393,11 @@ function buildContextPathIndex(context: TCGCContext): void {
   // Helper to add a type and its path to the cache
   const addToCache = (type: Type, path: ContextNode[]) => {
     if (
-      (type.kind === "Model" || type.kind === "Union" || type.kind === "String" || type.kind === "Number" || type.kind === "Boolean") &&
+      (type.kind === "Model" ||
+        type.kind === "Union" ||
+        type.kind === "String" ||
+        type.kind === "Number" ||
+        type.kind === "Boolean") &&
       !context.__contextPathCache!.has(type)
     ) {
       context.__contextPathCache!.set(type, [...path]);
@@ -421,7 +425,10 @@ function buildContextPathIndex(context: TCGCContext): void {
     // Record this type's path if it's anonymous (no name or symbol name)
     const typeName = (currentType as Model | Union).name;
     if (!typeName || typeof typeName === "symbol") {
-      const newPath = [...path, { name: displayName, type: currentType as Model | Union | TspLiteralType }];
+      const newPath = [
+        ...path,
+        { name: displayName, type: currentType as Model | Union | TspLiteralType },
+      ];
       addToCache(currentType, newPath);
     }
 
@@ -460,8 +467,16 @@ function buildContextPathIndex(context: TCGCContext): void {
       }
 
       // Handle additional properties
-      if (effectiveModel.sourceModel?.kind === "Model" && effectiveModel.sourceModel?.name === "Record") {
-        visitType(effectiveModel.sourceModel.indexer!.value!, newPath, "AdditionalProperty", visited);
+      if (
+        effectiveModel.sourceModel?.kind === "Model" &&
+        effectiveModel.sourceModel?.name === "Record"
+      ) {
+        visitType(
+          effectiveModel.sourceModel.indexer!.value!,
+          newPath,
+          "AdditionalProperty",
+          visited,
+        );
       }
       if (effectiveModel.indexer) {
         visitType(effectiveModel.indexer.value, newPath, "AdditionalProperty", visited);
