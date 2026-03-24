@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
 import pc from "picocolors";
-import { repoRoot, coreRepoRoot } from "./helpers.js";
+import { coreRepoRoot, repoRoot } from "./helpers.js";
 
 const WorkspaceYamlFile = "pnpm-workspace.yaml";
 
@@ -98,7 +98,9 @@ function main() {
 
   if (mode !== "check" && mode !== "sync") {
     console.error("Usage: sync-catalog <check|sync>");
-    console.error("  check  - Report mismatches between core and this repo's catalog (exits non-zero if any)");
+    console.error(
+      "  check  - Report mismatches between core and this repo's catalog (exits non-zero if any)",
+    );
     console.error("  sync   - Update this repo's catalog with versions from core");
     process.exit(1);
   }
@@ -138,9 +140,7 @@ function main() {
   }
 
   if (mismatches.length > 0) {
-    console.log(
-      `Found ${pc.yellow(String(mismatches.length))} version mismatch(es) with core:\n`,
-    );
+    console.log(`Found ${pc.yellow(String(mismatches.length))} version mismatch(es) with core:\n`);
     for (const { dep, repoVersion, coreVersion } of mismatches) {
       console.log(`  ${pc.cyan(dep)}: ${pc.red(repoVersion)} → ${pc.green(coreVersion)}`);
     }
