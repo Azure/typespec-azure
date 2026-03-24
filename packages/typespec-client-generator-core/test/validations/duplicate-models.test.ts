@@ -55,14 +55,14 @@ describe("duplicate models in sdkPackage.models", () => {
 
     // Check if duplicate-client-name-warning is emitted for cross-namespace duplicates
     const duplicateDiagnostics = context.diagnostics.filter(
-      (d) =>
-        d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning",
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning",
     );
 
     expectDiagnostics(duplicateDiagnostics, [
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning",
-        message: /Client name: "KeyEncryptionKeyIdentity" is defined somewhere causing naming conflicts/,
+        message:
+          /Client name: "KeyEncryptionKeyIdentity" in namespace .* conflicts with same name in namespace/,
       },
     ]);
   });
@@ -88,8 +88,7 @@ describe("duplicate models in sdkPackage.models", () => {
 
     // Check that no duplicate-client-name-warning is emitted when @clientName differentiates
     const duplicateDiagnostics = context.diagnostics.filter(
-      (d) =>
-        d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning",
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning",
     );
 
     expectDiagnosticEmpty(duplicateDiagnostics);
@@ -118,14 +117,14 @@ describe("duplicate models in sdkPackage.models", () => {
 
     // Check if duplicate-client-name-warning is emitted for cross-namespace union duplicates
     const duplicateDiagnostics = context.diagnostics.filter(
-      (d) =>
-        d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning",
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning",
     );
 
     expectDiagnostics(duplicateDiagnostics, [
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning",
-        message: /Client name: "KeyEncryptionKeyIdentityType" is defined somewhere causing naming conflicts/,
+        message:
+          /Client name: "KeyEncryptionKeyIdentityType" in namespace .* conflicts with same name in namespace/,
       },
     ]);
   });
@@ -151,14 +150,45 @@ describe("user-defined duplicate names across namespaces", () => {
     const context = await createSdkContextForTester(program);
 
     const duplicateDiagnostics = context.diagnostics.filter(
-      (d) =>
-        d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning",
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning",
     );
 
     expectDiagnostics(duplicateDiagnostics, [
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning",
-        message: /Client name: "Foo" is defined somewhere causing naming conflicts/,
+        message:
+          /Client name: "Foo" in namespace "TestService\.SubB" conflicts with same name in namespace "TestService\.SubA"/,
+      },
+    ]);
+  });
+
+  it("should emit warning for model and enum with same name in different namespaces (cross-kind)", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      namespace SubA {
+        model Foo { a: string; }
+      }
+      namespace SubB {
+        enum Foo { A, B }
+      }
+
+      @route("/model")
+      op getModel(): SubA.Foo;
+
+      @route("/enum")
+      op getEnum(@query foo: SubB.Foo): void;
+    `);
+
+    const context = await createSdkContextForTester(program);
+
+    const duplicateDiagnostics = context.diagnostics.filter(
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning",
+    );
+
+    expectDiagnostics(duplicateDiagnostics, [
+      {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning",
+        message:
+          /Client name: "Foo" in namespace "TestService\.SubB" conflicts with same name in namespace "TestService\.SubA"/,
       },
     ]);
   });
@@ -182,14 +212,14 @@ describe("user-defined duplicate names across namespaces", () => {
     const context = await createSdkContextForTester(program);
 
     const duplicateDiagnostics = context.diagnostics.filter(
-      (d) =>
-        d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning",
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning",
     );
 
     expectDiagnostics(duplicateDiagnostics, [
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning",
-        message: /Client name: "Status" is defined somewhere causing naming conflicts/,
+        message:
+          /Client name: "Status" in namespace "TestService\.SubB" conflicts with same name in namespace "TestService\.SubA"/,
       },
     ]);
   });
@@ -226,8 +256,7 @@ describe("user-defined duplicate names across namespaces", () => {
 
     // Should NOT get warning since namespace flag handles it
     const warningDiagnostics = context.diagnostics.filter(
-      (d) =>
-        d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning",
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning",
     );
     expectDiagnosticEmpty(warningDiagnostics);
   });

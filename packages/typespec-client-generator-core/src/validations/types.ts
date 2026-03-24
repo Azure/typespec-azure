@@ -242,7 +242,12 @@ function reportDuplicateClientNames(
           // .NET support operations with same name with overloads
           reportDiagnostic(program, {
             code: "duplicate-client-name-warning",
-            format: { name, scope: scopeStr },
+            format: {
+              name,
+              scope: scopeStr,
+              namespace: "same namespace",
+              existingNamespace: "same namespace",
+            },
             target: item[1],
           });
         } else {
@@ -257,8 +262,12 @@ function reportDuplicateClientNames(
           // .NET support operations with same name with overloads
           reportDiagnostic(program, {
             code: "duplicate-client-name-warning",
-            messageId: "nonDecorator",
-            format: { name, scope: scopeStr },
+            format: {
+              name,
+              scope: scopeStr,
+              namespace: "same namespace",
+              existingNamespace: "same namespace",
+            },
             target: item,
           });
         } else {

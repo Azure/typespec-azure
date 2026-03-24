@@ -252,9 +252,12 @@ function validateNamesUnderNamespaces(context: SdkContext) {
   };
 
   const validateNamespace = (namespace: SdkContext["sdkPackage"]["namespaces"][number]) => {
-    validateItems(namespace.models);
-    validateItems(namespace.enums.filter((e) => (e.usage & UsageFlags.ApiVersionEnum) === 0));
-    validateItems(namespace.unions.filter((u): u is SdkUnionType => u.kind === "union"));
+    // Validate all types together to catch cross-kind conflicts (e.g., model and enum with same name)
+    validateItems([
+      ...namespace.models,
+      ...namespace.enums.filter((e) => (e.usage & UsageFlags.ApiVersionEnum) === 0),
+      ...namespace.unions.filter((u): u is SdkUnionType => u.kind === "union"),
+    ]);
     for (const nestedNamespace of namespace.namespaces) {
       validateNamespace(nestedNamespace);
     }
@@ -272,7 +275,7 @@ function validateNamesUnderNamespaces(context: SdkContext) {
  * sdkPackage.models, sdkPackage.enums, and sdkPackage.unions arrays.
  * This catches cross-namespace name collisions that would cause issues for emitters
  * using the flat lists (e.g., two models named "KeyEncryptionKeyIdentity" in different namespaces).
- * 
+ *
  * Raises linter warnings, not errors.
  */
 function validateNamesAcrossNamespaces(context: SdkContext) {
@@ -302,10 +305,12 @@ function validateNamesAcrossNamespaces(context: SdkContext) {
             diagnostics.add(
               createDiagnostic({
                 code: "duplicate-client-name-warning",
-                messageId: "nonDecorator",
+                messageId: "crossNamespace",
                 format: {
                   name,
                   scope: context.emitterName,
+                  namespace: item.namespace,
+                  existingNamespace: firstItem.namespace,
                 },
                 target: item.__raw!,
               }),
@@ -316,9 +321,12 @@ function validateNamesAcrossNamespaces(context: SdkContext) {
     }
   };
 
-  validateItems(context.sdkPackage.models);
-  validateItems(context.sdkPackage.enums.filter((e) => (e.usage & UsageFlags.ApiVersionEnum) === 0));
-  validateItems(context.sdkPackage.unions.filter((u): u is SdkUnionType => u.kind === "union"));
+  // Validate all types together to catch cross-kind conflicts (e.g., model and enum with same name)
+  validateItems([
+    ...context.sdkPackage.models,
+    ...context.sdkPackage.enums.filter((e) => (e.usage & UsageFlags.ApiVersionEnum) === 0),
+    ...context.sdkPackage.unions.filter((u): u is SdkUnionType => u.kind === "union"),
+  ]);
 
   return diagnostics.wrap(undefined);
 }
