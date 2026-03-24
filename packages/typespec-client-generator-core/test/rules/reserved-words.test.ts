@@ -20,6 +20,7 @@ function expectedMessage(name: string, context: string, language: string): strin
 const testWords: LanguageReservedWords = {
   model: new Set(["reserved"]),
   property: new Set(["reserved"]),
+  parameter: new Set(["reserved"]),
   operation: new Set(["reserved"]),
   enumType: new Set(["reserved"]),
   enumMember: new Set(["reserved"]),
@@ -30,6 +31,7 @@ const testRule = createReservedWordRule("test", "Test", testWords);
 const contextIsolatedWords: LanguageReservedWords = {
   model: new Set(["modelonly"]),
   property: new Set(["proponly"]),
+  parameter: new Set(["paramonly"]),
   operation: new Set(["oponly"]),
   enumType: new Set(["enumtypeonly"]),
   enumMember: new Set(["enummemberonly"]),
@@ -67,6 +69,13 @@ describe("reserved word rule factory", () => {
     await tester.expect(`op reserved(): void;`).toEmitDiagnostics({
       code: "@azure-tools/typespec-client-generator-core/reserved-words-test",
       message: expectedMessage("reserved", "operation", "Test"),
+    });
+  });
+
+  it("emits warning for reserved parameter name", async () => {
+    await tester.expect(`op foo(reserved: string): void;`).toEmitDiagnostics({
+      code: "@azure-tools/typespec-client-generator-core/reserved-words-test",
+      message: expectedMessage("reserved", "parameter", "Test"),
     });
   });
 
@@ -199,6 +208,27 @@ describe("context isolation", () => {
     await tester.expect(`model oponly { name: string; }`).toBeValid();
   });
 
+  // -- parameter-only word --
+
+  it("warns when parameter-only reserved word is used as a parameter name", async () => {
+    await tester.expect(`op foo(paramonly: string): void;`).toEmitDiagnostics({
+      code: "@azure-tools/typespec-client-generator-core/reserved-words-isolated",
+      message: expectedMessage("paramonly", "parameter", "Isolated"),
+    });
+  });
+
+  it("does not warn when parameter-only reserved word is used as a property name", async () => {
+    await tester.expect(`model Foo { paramonly: string; }`).toBeValid();
+  });
+
+  it("does not warn when parameter-only reserved word is used as an operation name", async () => {
+    await tester.expect(`op paramonly(): void;`).toBeValid();
+  });
+
+  it("does not warn when parameter-only reserved word is used as a model name", async () => {
+    await tester.expect(`model paramonly { name: string; }`).toBeValid();
+  });
+
   // -- enumType-only word --
 
   it("warns when enumType-only reserved word is used as an enum type name", async () => {
@@ -280,6 +310,28 @@ describe("python reserved words", () => {
       code: "@azure-tools/typespec-client-generator-core/reserved-words-python",
       message: expectedMessage("enum", "model", "Python"),
     });
+  });
+
+  it("emits warning for 'keys' used as property name (Python dict method conflict)", async () => {
+    await tester.expect(`model Foo { keys: string; }`).toEmitDiagnostics({
+      code: "@azure-tools/typespec-client-generator-core/reserved-words-python",
+      message: expectedMessage("keys", "property", "Python"),
+    });
+  });
+
+  it("'keys' does not warn as an operation name (property-only reserved word)", async () => {
+    await tester.expect(`op keys(): void;`).toBeValid();
+  });
+
+  it("emits warning for 'stream' used as parameter name (Python TSP-specific)", async () => {
+    await tester.expect(`op foo(stream: string): void;`).toEmitDiagnostics({
+      code: "@azure-tools/typespec-client-generator-core/reserved-words-python",
+      message: expectedMessage("stream", "parameter", "Python"),
+    });
+  });
+
+  it("'stream' does not warn as a property name (parameter-only reserved word)", async () => {
+    await tester.expect(`model Foo { stream: string; }`).toBeValid();
   });
 
   it("is valid when @clientName resolves conflict for python scope", async () => {

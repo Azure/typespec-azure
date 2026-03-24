@@ -61,10 +61,21 @@ export function createReservedWordRule(
         }
       }
 
+      const parameterModels = new WeakSet<Model>();
+
       return {
         model: (node: Model) => check(node, reservedWords.model, "model"),
-        modelProperty: (node: ModelProperty) => check(node, reservedWords.property, "property"),
-        operation: (node: Operation) => check(node, reservedWords.operation, "operation"),
+        modelProperty: (node: ModelProperty) => {
+          if (node.model && parameterModels.has(node.model)) {
+            check(node, reservedWords.parameter, "parameter");
+          } else {
+            check(node, reservedWords.property, "property");
+          }
+        },
+        operation: (node: Operation) => {
+          check(node, reservedWords.operation, "operation");
+          parameterModels.add(node.parameters);
+        },
         enum: (node: Enum) => {
           check(node, reservedWords.enumType, "enum");
           for (const member of node.members.values()) {
