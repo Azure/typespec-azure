@@ -5,7 +5,8 @@ packages:
 ---
 
 Add experimental extern functions for operation transformations:
-- `replaceParameter`: Replace or remove a parameter in an operation
+- `replaceParameter`: Replace a parameter in an operation
+- `removeParameter`: Remove a parameter from an operation
 - `addParameter`: Add a new parameter to an operation
 - `reorderParameters`: Reorder parameters of an operation according to a specified order
 
