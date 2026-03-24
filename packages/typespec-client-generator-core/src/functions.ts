@@ -177,7 +177,7 @@ export function addParameter(
 export function reorderParameters(
   context: FunctionContext,
   operation: Operation,
-  order: string[],
+  order: readonly string[],
 ): Operation {
   const program = context.program;
   const tk = $(program);
