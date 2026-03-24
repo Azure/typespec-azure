@@ -71,11 +71,11 @@
     "@typespec/streams": "workspace:^",
     "@typespec/versioning": "workspace:^",
     "@typespec/xml": "workspace:^",
-    "@vitejs/plugin-react": "~5.1.2",
+    "@vitejs/plugin-react": "~6.0.1",
     "es-module-shims": "~2.8.0",
     "react": "~19.2.4",
     "react-dom": "~19.2.4",
-    "vite": "^7.2.7"
+    "vite": "^8.0.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
