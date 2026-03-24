@@ -1,5 +1,5 @@
 import { paramMessage } from "@typespec/compiler";
-import { deepStrictEqual, ok } from "assert";
+import { deepStrictEqual } from "assert";
 import { describe, it } from "vitest";
 import { compileOpenAPI } from "./test-host.js";
 
@@ -529,8 +529,8 @@ describe("typespec-autorest: Long-running Operations", () => {
     // Both should have distinct, specifically-named schema references
     deepStrictEqual(moveSchema, "#/definitions/Ns1.CustomResult");
     deepStrictEqual(transferSchema, "#/definitions/Ns2.CustomResult");
-    // Both schemas should exist in definitions
-    ok(openapi.definitions["Ns1.CustomResult"], "Expected definition for Ns1.CustomResult");
-    ok(openapi.definitions["Ns2.CustomResult"], "Expected definition for Ns2.CustomResult");
+    // Both schemas should exist with correct types
+    deepStrictEqual(openapi.definitions["Ns1.CustomResult"], { type: "string" });
+    deepStrictEqual(openapi.definitions["Ns2.CustomResult"], { type: "integer", format: "int32" });
   });
 });
