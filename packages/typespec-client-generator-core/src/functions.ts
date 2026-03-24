@@ -44,13 +44,13 @@ function cloneModelProperty(tk: ReturnType<typeof $>, prop: ModelProperty): Mode
 }
 
 /**
- * Replace a parameter in an operation with a new parameter definition or remove it entirely.
+ * Replace a parameter in an operation with a new parameter definition.
  *
  * @param context The function context provided by TypeSpec
  * @param operation The operation to transform
  * @param selector The parameter to replace - either a string name or a ModelProperty reference
- * @param replacement The replacement parameter, or undefined to remove the parameter
- * @returns A new operation with the parameter replaced or removed
+ * @param replacement The replacement parameter
+ * @returns A new operation with the parameter replaced
  */
 export function replaceParameter(
   context: FunctionContext,
