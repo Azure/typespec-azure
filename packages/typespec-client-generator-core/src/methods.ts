@@ -461,7 +461,12 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
       case "pollingSuccessProperty": {
         return {
           kind: "pollingSuccessProperty",
-          responseModel: getSdkModel(context, step.responseModel),
+          responseModel:
+            step.responseModel.kind === "Scalar"
+              ? (diagnostics.pipe(
+                  getClientTypeWithDiagnostics(context, step.responseModel),
+                ) as SdkBuiltInType)
+              : getSdkModel(context, step.responseModel),
           target: diagnostics.pipe(getSdkModelPropertyType(context, step.target)),
           sourceProperty: step.sourceProperty
             ? diagnostics.pipe(getSdkModelPropertyType(context, step.sourceProperty))

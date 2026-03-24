@@ -2370,9 +2370,13 @@ op createJob(
       // logicalResult should be the polling response model when the actual result is a scalar
       strictEqual(metadata.logicalResult.name, "PollingStatus");
 
-      // finalStep should be pollingSuccessProperty
+      // finalStep should be pollingSuccessProperty with scalar responseModel
       ok(metadata.finalStep);
       deepStrictEqual(metadata.finalStep.kind, "pollingSuccessProperty");
+      if (metadata.finalStep.kind === "pollingSuccessProperty") {
+        strictEqual(metadata.finalStep.responseModel.kind, "Scalar");
+        strictEqual((metadata.finalStep.responseModel as Scalar).name, "string");
+      }
     });
 
     it("ignores bad lro operation links with Operation-Location", async () => {

@@ -482,11 +482,14 @@ export async function getOpenAPIForService(
       metadata.finalResult !== "void" &&
       metadata.finalResult.name.length > 0
     ) {
-      // Scalar types (e.g., string) need a schema definition entry
+      // Scalar types (e.g., string) need a schema definition entry with a PascalCase name
       if (metadata.finalResult.kind === "Scalar") {
+        const scalarName = metadata.finalResult.name;
+        const pascalName = scalarName.charAt(0).toUpperCase() + scalarName.slice(1);
         const pending = pendingSchemas.getOrAdd(metadata.finalResult, Visibility.Read, () => ({
           type: metadata.finalResult as Scalar,
           visibility: Visibility.Read,
+          getSchemaNameOverride: () => pascalName,
           ref: refs.getOrAdd(metadata.finalResult as Scalar, Visibility.Read, () =>
             proxy.createLocalRef(metadata.finalResult as Scalar),
           ),

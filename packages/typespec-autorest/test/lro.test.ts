@@ -303,4 +303,25 @@ describe("typespec-autorest: Long-running Operations", () => {
       "final-state-schema": "#/definitions/Widget",
     });
   });
+
+  it("Creates a named final-state-schema definition for scalar final results", async () => {
+    const openapi = await compileOpenAPI(
+      armCode.apply(armCode, [
+        {
+          putOp: "move is ArmResourceActionAsync<Widget, void, string>;",
+        },
+      ]),
+      { preset: "azure", options: { "emit-lro-options": "all" } },
+    );
+
+    const itemPath =
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}/move";
+    deepStrictEqual(openapi.paths[itemPath].post?.["x-ms-long-running-operation"], true);
+    deepStrictEqual(openapi.paths[itemPath].post["x-ms-long-running-operation-options"], {
+      "final-state-via": "location",
+      "final-state-schema": "#/definitions/String",
+    });
+    // Verify the schema definition is created
+    deepStrictEqual(openapi.definitions["String"], { type: "string" });
+  });
 });
