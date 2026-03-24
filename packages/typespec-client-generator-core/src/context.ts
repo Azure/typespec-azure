@@ -216,14 +216,8 @@ export async function createSdkContext<
   for (const client of sdkContext.sdkPackage.clients) {
     diagnostics.pipe(await handleClientExamples(sdkContext, client));
   }
-  // Validate duplicate names within each type kind in each namespace (cross-kind duplicates are allowed).
+  // Validate duplicate names within each namespace (raises errors for same-namespace duplicates)
   diagnostics.pipe(validateNamesUnderNamespaces(sdkContext));
-  // Validate duplicate names across all namespaces only when --namespace flag is NOT set
-  // Raises linter WARNINGS, not ERRORS.
-  // (when flag is set, types collapse into one namespace and per-namespace validation handles it and throws errors)
-  if (!sdkContext.namespaceFlag) {
-    diagnostics.pipe(validateNamesAcrossNamespaces(sdkContext));
-  }
   sdkContext.diagnostics = [...sdkContext.diagnostics, ...diagnostics.diagnostics];
 
   if (options?.exportTCGCoutput) {
@@ -266,67 +260,6 @@ function validateNamesUnderNamespaces(context: SdkContext) {
   for (const namespace of context.sdkPackage.namespaces) {
     validateNamespace(namespace);
   }
-
-  return diagnostics.wrap(undefined);
-}
-
-/**
- * Validates that there are no duplicate names across all namespaces in the flat
- * sdkPackage.models, sdkPackage.enums, and sdkPackage.unions arrays.
- * This catches cross-namespace name collisions that would cause issues for emitters
- * using the flat lists (e.g., two models named "KeyEncryptionKeyIdentity" in different namespaces).
- *
- * Raises linter warnings, not errors.
- */
-function validateNamesAcrossNamespaces(context: SdkContext) {
-  const diagnostics = createDiagnosticCollector();
-
-  const validateItems = (items: (SdkModelType | SdkEnumType | SdkUnionType)[]) => {
-    // Map from name to list of items with that name
-    const nameToItems = new Map<string, (SdkModelType | SdkEnumType | SdkUnionType)[]>();
-    for (const item of items) {
-      const existing = nameToItems.get(item.name);
-      if (existing) {
-        existing.push(item);
-      } else {
-        nameToItems.set(item.name, [item]);
-      }
-    }
-
-    // Report diagnostics for names that appear more than once in DIFFERENT namespaces
-    // (same-namespace duplicates are handled by validateNamesUnderNamespaces)
-    for (const [name, itemList] of nameToItems) {
-      if (itemList.length > 1) {
-        const firstItem = itemList[0];
-        for (let i = 1; i < itemList.length; i++) {
-          const item = itemList[i];
-          // Only warn if the namespaces are actually different
-          if (item.namespace !== firstItem.namespace) {
-            diagnostics.add(
-              createDiagnostic({
-                code: "duplicate-client-name-warning",
-                messageId: "crossNamespace",
-                format: {
-                  name,
-                  scope: context.emitterName,
-                  namespace: item.namespace,
-                  existingNamespace: firstItem.namespace,
-                },
-                target: item.__raw!,
-              }),
-            );
-          }
-        }
-      }
-    }
-  };
-
-  // Validate all types together to catch cross-kind conflicts (e.g., model and enum with same name)
-  validateItems([
-    ...context.sdkPackage.models,
-    ...context.sdkPackage.enums.filter((e) => (e.usage & UsageFlags.ApiVersionEnum) === 0),
-    ...context.sdkPackage.unions.filter((u): u is SdkUnionType => u.kind === "union"),
-  ]);
 
   return diagnostics.wrap(undefined);
 }

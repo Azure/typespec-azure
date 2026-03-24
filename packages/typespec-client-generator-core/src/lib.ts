@@ -252,8 +252,8 @@ export const $lib = createTypeSpecLibrary({
     "duplicate-client-name-warning": {
       severity: "warning",
       messages: {
-        default: paramMessage`Client name: "${"name"}" is duplicated in language scope: "${"scope"}" (namespaces: "${"namespace"}", "${"existingNamespace"}")`,
-        crossNamespace: paramMessage`Client name: "${"name"}" in namespace "${"namespace"}" conflicts with same name in namespace "${"existingNamespace"}" (scope: "${"scope"}")`,
+        default: paramMessage`Client name: "${"name"}" is duplicated in language scope: "${"scope"}"`,
+        nonDecorator: paramMessage`Client name: "${"name"}" is defined somewhere causing naming conflicts in language scope: "${"scope"}"`,
       },
     },
     "client-name-ineffective": {
