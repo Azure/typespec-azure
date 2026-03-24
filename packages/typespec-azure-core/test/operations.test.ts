@@ -3023,7 +3023,7 @@ op createJob(
         {
           code: `@azure-tools/typespec-azure-core/lro-status-monitor-invalid-result-property-type`,
           message:
-            /Property 'result' marked with '@lroResult' has an invalid type '.*MyStatus'. The property type must be a Model, Scalar, or 'unknown'./,
+            /Property 'result' used as the final result of a long-running operation has an invalid type '.*MyStatus'. The property type must be a Model, Scalar, or 'unknown'./,
         },
       ]);
     });

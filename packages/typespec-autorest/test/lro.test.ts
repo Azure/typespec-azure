@@ -526,12 +526,11 @@ describe("typespec-autorest: Long-running Operations", () => {
       openapi.paths[`${basePath}/transfer`].post["x-ms-long-running-operation-options"][
         "final-state-schema"
       ];
-    // They must be different references since the scalars are different types
-    ok(moveSchema !== transferSchema, "Expected different schema references for different types");
+    // Both should have distinct, specifically-named schema references
+    deepStrictEqual(moveSchema, "#/definitions/Ns1.CustomResult");
+    deepStrictEqual(transferSchema, "#/definitions/Ns2.CustomResult");
     // Both schemas should exist in definitions
-    const moveName = decodeURIComponent(moveSchema.replace("#/definitions/", ""));
-    const transferName = decodeURIComponent(transferSchema.replace("#/definitions/", ""));
-    ok(openapi.definitions[moveName], `Expected definition for ${moveName}`);
-    ok(openapi.definitions[transferName], `Expected definition for ${transferName}`);
+    ok(openapi.definitions["Ns1.CustomResult"], "Expected definition for Ns1.CustomResult");
+    ok(openapi.definitions["Ns2.CustomResult"], "Expected definition for Ns2.CustomResult");
   });
 });

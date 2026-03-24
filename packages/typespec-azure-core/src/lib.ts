@@ -30,7 +30,7 @@ export const $lib = createTypeSpecLibrary({
     "lro-status-monitor-invalid-result-property-type": {
       severity: "warning",
       messages: {
-        default: paramMessage`Property '${"propertyName"}' marked with '@lroResult' has an invalid type '${"typeName"}'. The property type must be a Model, Scalar, or 'unknown'.`,
+        default: paramMessage`Property '${"propertyName"}' used as the final result of a long-running operation has an invalid type '${"typeName"}'. The property type must be a Model, Scalar, or 'unknown'.`,
       },
     },
     "invalid-polling-operation-parameter": {
