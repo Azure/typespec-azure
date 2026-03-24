@@ -1,11 +1,11 @@
 import { defineLinter } from "@typespec/compiler";
 import { noUnnamedTypesRule } from "./rules/no-unnamed-types.rule.js";
 import { propertyNameConflictRule } from "./rules/property-name-conflict.rule.js";
+import { requireClientSuffixRule } from "./rules/require-client-suffix.rule.js";
 import { csharpReservedWordsRule } from "./rules/reserved-words/csharp.rule.js";
 import { javaReservedWordsRule } from "./rules/reserved-words/java.rule.js";
 import { javascriptReservedWordsRule } from "./rules/reserved-words/javascript.rule.js";
 import { pythonReservedWordsRule } from "./rules/reserved-words/python.rule.js";
-import { requireClientSuffixRule } from "./rules/require-client-suffix.rule.js";
 
 const rules = [
   requireClientSuffixRule,
@@ -26,10 +26,7 @@ function createRuleSet(langRules: typeof rules) {
   return {
     enable: {
       ...Object.fromEntries(
-        langRules.map((rule) => [
-          `@azure-tools/typespec-client-generator-core/${rule.name}`,
-          true,
-        ]),
+        langRules.map((rule) => [`@azure-tools/typespec-client-generator-core/${rule.name}`, true]),
       ),
     },
   };

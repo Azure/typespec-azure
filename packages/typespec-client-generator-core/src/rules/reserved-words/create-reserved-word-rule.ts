@@ -72,7 +72,8 @@ export function createReservedWordRule(
           }
         },
         union: (node: Union) => check(node, reservedWords.enumType, "union"),
-        unionVariant: (node: UnionVariant) => check(node, reservedWords.enumMember, "union variant"),
+        unionVariant: (node: UnionVariant) =>
+          check(node, reservedWords.enumMember, "union variant"),
       };
     },
   });
