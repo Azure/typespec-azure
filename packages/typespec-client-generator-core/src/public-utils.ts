@@ -369,38 +369,229 @@ function findContextPath(
   context: TCGCContext,
   type: Model | Union | TspLiteralType,
 ): ContextNode[] {
-  // orphan models and unions
-  for (const orphan of listOrphanTypes(context)) {
-    // skip models without non-metadata properties, as they cannot contain anonymous types
-    if (
-      orphan.kind === "Model" &&
-      [...orphan.properties.values()].filter((p) => !isMetadata(context.program, p)).length === 0
-    )
-      continue;
-    // skip enums because they cannot contain anonymous types that need generated names
-    if (orphan.kind === "Enum") continue;
-    const result = getContextPath(context, orphan, type);
-    if (result.length > 0) {
-      return result;
-    }
+  // Check if we have a cached result
+  if (context.__contextPathCache?.has(type)) {
+    return context.__contextPathCache.get(type)! as ContextNode[];
   }
-  for (const client of listClients(context)) {
-    for (const operation of listOperationsInClient(context, client)) {
-      const result = getContextPath(context, operation, type);
-      if (result.length > 0) {
-        return result;
+
+  // Build the index if it doesn't exist yet
+  if (!context.__contextPathCache) {
+    buildContextPathIndex(context);
+  }
+
+  // Return from cache (may be empty array if type was not found)
+  return (context.__contextPathCache?.get(type) ?? []) as ContextNode[];
+}
+
+/**
+ * Build a reverse index mapping anonymous types to their context paths.
+ * This is done once and cached on the context to avoid repeated traversals.
+ */
+function buildContextPathIndex(context: TCGCContext): void {
+  context.__contextPathCache = new Map();
+
+  // Helper to add a type and its path to the cache
+  const addToCache = (type: Type, path: ContextNode[]) => {
+    if (
+      (type.kind === "Model" || type.kind === "Union" || type.kind === "String" || type.kind === "Number" || type.kind === "Boolean") &&
+      !context.__contextPathCache!.has(type)
+    ) {
+      context.__contextPathCache!.set(type, [...path]);
+    }
+  };
+
+  // DFS visitor that records paths to all anonymous types
+  const visitType = (
+    currentType: Type,
+    path: ContextNode[],
+    displayName: string,
+    visited: Set<Type>,
+    needFindEffectiveType: boolean = false,
+  ): void => {
+    if (currentType == null || visited.has(currentType)) {
+      return;
+    }
+
+    if (!["Model", "Union", "String", "Number", "Boolean"].includes(currentType.kind)) {
+      return;
+    }
+
+    visited.add(currentType);
+
+    // Record this type's path if it's anonymous (no name or symbol name)
+    const typeName = (currentType as Model | Union).name;
+    if (!typeName || typeof typeName === "symbol") {
+      const newPath = [...path, { name: displayName, type: currentType as Model | Union | TspLiteralType }];
+      addToCache(currentType, newPath);
+    }
+
+    if (currentType.kind === "Model") {
+      const model = currentType as Model;
+
+      // Peel off HttpPart<MyRealType> to get "MyRealType"
+      const typeWrappedByHttpPart = getHttpPart(context.program, model);
+      if (typeWrappedByHttpPart) {
+        visitType(typeWrappedByHttpPart.type, path, displayName, visited);
+        return;
+      }
+
+      // Handle array or dict
+      if (
+        model.indexer &&
+        model.properties.size === 0 &&
+        ((model.indexer.key.name === "string" && model.name === "Record") ||
+          model.indexer.key.name === "integer")
+      ) {
+        visitType(model.indexer.value, path, pluralize.singular(displayName), visited);
+        return;
+      }
+
+      // Handle model
+      let effectiveModel = model;
+      if (needFindEffectiveType) {
+        effectiveModel = getEffectiveModelType(context.program, model);
+      }
+
+      const newPath: ContextNode[] = [...path, { name: displayName, type: effectiveModel }];
+
+      // Traverse properties
+      for (const property of effectiveModel.properties.values()) {
+        visitType(property.type, newPath, property.name, visited);
+      }
+
+      // Handle additional properties
+      if (effectiveModel.sourceModel?.kind === "Model" && effectiveModel.sourceModel?.name === "Record") {
+        visitType(effectiveModel.sourceModel.indexer!.value!, newPath, "AdditionalProperty", visited);
+      }
+      if (effectiveModel.indexer) {
+        visitType(effectiveModel.indexer.value, newPath, "AdditionalProperty", visited);
+      }
+
+      // Handle base model
+      const baseModel = effectiveModel.baseModel;
+      if (baseModel) {
+        if (baseModel.name === "Record" && baseModel.indexer) {
+          visitType(baseModel.indexer.value!, newPath, "AdditionalProperty", visited);
+        }
+        visitType(baseModel, path, baseModel.name ?? "Base", visited);
+      }
+
+      // Handle derived models
+      for (const derivedModel of effectiveModel.derivedModels) {
+        visitType(derivedModel, path, derivedModel.name ?? "Derived", visited);
+      }
+    } else if (currentType.kind === "Union") {
+      const union = currentType as Union;
+      for (const variant of union.variants.values()) {
+        visitType(variant.type, path, displayName, visited);
       }
     }
-    for (const subClient of listSubClients(context, client, true)) {
-      for (const operation of listOperationsInClient(context, subClient)) {
-        const result = getContextPath(context, operation, type);
-        if (result.length > 0) {
-          return result;
+  };
+
+  // Visit operation to record all types accessible from it
+  const visitOperation = (operation: Operation, basePath: ContextNode[]) => {
+    const visited = new Set<Type>();
+    const httpOperation = getHttpOperationWithCache(context, operation);
+
+    // Request body
+    if (httpOperation.parameters.body) {
+      visited.clear();
+      const bodyType = getHttpBodyType(httpOperation.parameters.body);
+      visitType(bodyType, basePath, "Request", visited);
+
+      if (httpOperation.parameters.body.bodyKind === "multipart") {
+        for (const part of httpOperation.parameters.body.parts) {
+          visited.clear();
+          if (part.partKind === "model") {
+            visitType(part.body.type, basePath, `Request${pascalCase(part.name)}`, visited);
+          }
         }
       }
     }
+
+    // Parameters
+    for (const parameter of Object.values(httpOperation.parameters.parameters)) {
+      visited.clear();
+      visitType(parameter.param.type, basePath, `Request${pascalCase(parameter.name)}`, visited);
+    }
+
+    // Responses
+    for (const response of httpOperation.responses) {
+      for (const innerResponse of response.responses) {
+        if (innerResponse.body?.type) {
+          visited.clear();
+          visitType(innerResponse.body.type, basePath, "Response", visited, true);
+
+          if (innerResponse.body?.bodyKind === "multipart") {
+            for (const part of innerResponse.body.parts) {
+              visited.clear();
+              if (part.partKind === "model") {
+                visitType(part.body.type, basePath, `Response${pascalCase(part.name)}`, visited);
+              }
+            }
+          }
+        }
+
+        const headers = getHttpOperationResponseHeaders(innerResponse);
+        if (headers) {
+          for (const header of Object.values(headers)) {
+            visited.clear();
+            visitType(header.type, basePath, `Response${pascalCase(header.name)}`, visited);
+          }
+        }
+      }
+    }
+
+    // LRO metadata
+    const lroMetadata = getLroMetadata(context.program, operation);
+    if (lroMetadata) {
+      const anonymousCandidates = [
+        { lroResultType: lroMetadata.finalResult, label: "FinalResult" },
+        { lroResultType: lroMetadata.logicalResult, label: "LogicalResult" },
+        { lroResultType: lroMetadata.envelopeResult, label: "EnvelopeResult" },
+        { lroResultType: lroMetadata.finalEnvelopeResult, label: "FinalEnvelopeResult" },
+      ];
+
+      for (const { lroResultType, label } of anonymousCandidates) {
+        if (!lroResultType || lroResultType === "void") {
+          continue;
+        }
+        visited.clear();
+        visitType(lroResultType, basePath, label, visited);
+      }
+    }
+
+    // Overridden client method parameters
+    const overriddenClientMethod = getOverriddenClientMethod(context, operation);
+    visited.clear();
+    visitType(overriddenClientMethod ?? operation.parameters, basePath, "Parameter", visited);
+  };
+
+  // Build index from orphan types
+  for (const orphan of listOrphanTypes(context)) {
+    if (
+      orphan.kind === "Model" &&
+      [...orphan.properties.values()].filter((p) => !isMetadata(context.program, p)).length === 0
+    ) {
+      continue;
+    }
+    if (orphan.kind === "Enum") continue;
+
+    const visited = new Set<Type>();
+    visitType(orphan, [], orphan.name ?? "", visited);
   }
-  return [];
+
+  // Build index from all operations
+  for (const client of listClients(context)) {
+    for (const operation of listOperationsInClient(context, client)) {
+      visitOperation(operation, [{ name: operation.name, type: operation }]);
+    }
+    for (const subClient of listSubClients(context, client, true)) {
+      for (const operation of listOperationsInClient(context, subClient)) {
+        visitOperation(operation, [{ name: operation.name, type: operation }]);
+      }
+    }
+  }
 }
 
 interface ContextNode {
