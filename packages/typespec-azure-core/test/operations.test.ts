@@ -2979,6 +2979,55 @@ op createJob(
       ]);
     });
 
+    it("emits diagnostic for invalid @lroResult property type (enum)", async () => {
+      const [_ops, diagnostics, _runner] = await getOperations(
+        `
+        enum MyStatus {
+          Active,
+          Inactive,
+        }
+
+        model PollingStatus {
+          @header location?: ResourceLocation<PollingStatus>;
+
+          @Azure.Core.lroStatus
+          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+
+          @Azure.Core.lroResult
+          result?: MyStatus;
+        }
+
+        model SimpleWidget {
+          @key
+          @segment("simpleWidgets")
+          @visibility(Lifecycle.Read)
+          @path
+          id: string;
+
+          value: string;
+        }
+
+        @route("/simpleWidgets/{id}")
+        @get op getWidget(@path id: string): SimpleWidget;
+
+        @finalOperation(getWidget)
+        @pollingOperation(getStatus, {id: ResponseProperty<"id">; operationId: ResponseProperty<"operation">})
+        @route("/simpleWidgets/{id}")
+        @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operation: string};
+
+        @route("/simpleWidgets/{id}/operations/{operationId}")
+        @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
+        `,
+      );
+      expectDiagnostics(diagnostics, [
+        {
+          code: `@azure-tools/typespec-azure-core/lro-status-monitor-invalid-result-property-type`,
+          message:
+            /Property 'result' marked with '@lroResult' has an invalid type '.*MyStatus'. The property type must be a Model, Scalar, or 'unknown'./,
+        },
+      ]);
+    });
+
     it("Gets Lro undefined for sync operation", async () => {
       const [_, metadata] = await compileLroOperation(
         `// Reuse CustomParameters and CustomResponseProperties in the "normal" TParams and TResponse fields

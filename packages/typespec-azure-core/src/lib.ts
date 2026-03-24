@@ -27,6 +27,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`StatusMonitor has more than one ${"resultType"} property marked with '${"decorator"}'.  Ensure that only one property in the model is marked with this decorator.`,
       },
     },
+    "lro-status-monitor-invalid-result-property-type": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Property '${"propertyName"}' marked with '@lroResult' has an invalid type '${"typeName"}'. The property type must be a Model, Scalar, or 'unknown'.`,
+      },
+    },
     "invalid-polling-operation-parameter": {
       severity: "error",
       messages: {
