@@ -157,6 +157,8 @@ export interface ResolvedResourceInfo {
   resourceInstancePath: string;
   /** The name of the resource at this instance path  */
   resourceName: string;
+  /** Whether the resource name was explicitly provided as a parameter */
+  resourceNameIsExplicit?: boolean;
 }
 
 interface ResolvedResourceOperations {
@@ -165,6 +167,8 @@ interface ResolvedResourceOperations {
   associatedOperations?: ArmResourceOperation[];
   /** The name of the resource at this instance path  */
   resourceName: string;
+  /** Whether the resource name was explicitly provided as a parameter */
+  resourceNameIsExplicit?: boolean;
   /** The resource type (The actual resource type string will be "${provider}/${types.join("/")}) */
   resourceType: ResourceType;
   /** The path to the instance of a resource */
@@ -631,6 +635,30 @@ function isVariableSegment(segment: string): boolean {
   return (segment.startsWith("{") && segment.endsWith("}")) || segment === "default";
 }
 
+/**
+ * Extracts the scope prefix from a resource instance path.
+ * The scope prefix is the portion of the path before the last `/providers/` occurrence.
+ * For example:
+ *   - `/subscriptions/{id}/providers/Microsoft.Foo/bars/{name}` → `/subscriptions/{id}`
+ *   - `/providers/Microsoft.Foo/bars/{name}` → `` (empty)
+ */
+function getScopePrefix(resourceInstancePath: string): string {
+  const lastProviders = resourceInstancePath.lastIndexOf("/providers/");
+  if (lastProviders <= 0) return "";
+  return resourceInstancePath.slice(0, lastProviders);
+}
+
+/**
+ * Normalizes a path for scope comparison by lowercasing static segments
+ * and replacing variable segments with a placeholder.
+ */
+function normalizePathForScopeComparison(path: string): string {
+  return path
+    .split("/")
+    .map((s) => (isVariableSegment(s) ? "{}" : s.toLowerCase()))
+    .join("/");
+}
+
 function getResourceInfo(
   program: Program,
   operation: ArmResourceOperation,
@@ -844,11 +872,13 @@ export function isResourceOperationMatch(
     resourceType: ResourceType;
     resourceInstancePath: string;
     resourceName?: string;
+    resourceNameIsExplicit?: boolean;
   },
   target: {
     resourceType: ResourceType;
     resourceInstancePath: string;
     resourceName?: string;
+    resourceNameIsExplicit?: boolean;
   },
 ): boolean {
   if (
@@ -864,17 +894,18 @@ export function isResourceOperationMatch(
     if (source.resourceType.types[i].toLowerCase() !== target.resourceType.types[i].toLowerCase())
       return false;
   }
-  /*const sourceSegments = source.resourceInstancePath.split("/");
-  const targetSegments = target.resourceInstancePath.split("/");
-  if (sourceSegments.length !== targetSegments.length) return false;
-  for (let i = 0; i < sourceSegments.length; i++) {
-    if (!isVariableSegment(sourceSegments[i])) {
-      if (isVariableSegment(targetSegments[i])) {
-        return false;
-      }
-      if (sourceSegments[i].toLowerCase() !== targetSegments[i].toLowerCase()) return false;
-    } else if (!isVariableSegment(targetSegments[i])) return false;
-  }*/
+
+  // When neither resource has an explicitly provided resource name, also compare
+  // the scope prefix of the instance path to prevent merging cross-scope operations
+  if (!source.resourceNameIsExplicit && !target.resourceNameIsExplicit) {
+    const sourceScope = getScopePrefix(source.resourceInstancePath);
+    const targetScope = getScopePrefix(target.resourceInstancePath);
+    if (
+      normalizePathForScopeComparison(sourceScope) !== normalizePathForScopeComparison(targetScope)
+    )
+      return false;
+  }
+
   return true;
 }
 
@@ -974,10 +1005,12 @@ export function resolveArmResourceOperations(
     if (resourceInfo === undefined) continue;
     armOperation.name = operation.name;
     armOperation.resourceKind = operation.resourceKind;
+    const resourceNameIsExplicit = operation.resourceName !== undefined;
     resourceInfo.resourceName =
       operation.resourceName ??
       getResourceNameForOperation(program, armOperation, resourceInfo.resourceInstancePath) ??
       armOperation.resourceModelName;
+    resourceInfo.resourceNameIsExplicit = resourceNameIsExplicit;
     armOperation.resourceName = resourceInfo.resourceName;
 
     let matched = false;
@@ -999,6 +1032,7 @@ export function resolveArmResourceOperations(
       resourceType: resourceInfo.resourceType,
       resourceInstancePath: resourceInfo.resourceInstancePath,
       resourceName: resourceInfo.resourceName,
+      resourceNameIsExplicit: resourceNameIsExplicit,
       operations: {
         lifecycle: {
           read: undefined,
