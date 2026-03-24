@@ -84,6 +84,12 @@ When set to `true`, the generated SDK uses stream style serialization. Default v
 
 When set to `true`, the emitter generates Java `Object` for TypeSpec `unknown`; otherwise, the emitter generates `BinaryData`. Default value is `false`. This option is for backward-compatibility.
 
+### `client-side-validations`
+
+**Type:** `boolean`
+
+When set to `true`, the model classes would be generated with a `validate()` API for validating required properties, during REST API invocation. Default value is `false`. This option is for backward-compatibility.
+
 ### `float32-as-double`
 
 **Type:** `boolean`
