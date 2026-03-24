@@ -461,7 +461,8 @@ describe("ARM common types conflicts", () => {
         {
           code: "@azure-tools/typespec-client-generator-core/duplicate-names",
           severity: "warning",
-          message: /Client name "KeyEncryptionKeyIdentity" in namespace .* conflicts with same name in namespace/,
+          message:
+            /Client name "KeyEncryptionKeyIdentity" in namespace .* conflicts with same name in namespace/,
         },
       ]);
   });
