@@ -635,12 +635,86 @@ function getResourceInfo(
   program: Program,
   operation: ArmResourceOperation,
 ): ResolvedResourceInfo | undefined {
+  // First, try to get resource info from the path when it contains /providers/
   const pathInfo = getResourcePathElements(operation.httpOperation.path, operation.kind);
-  if (pathInfo === undefined) return undefined;
+  if (pathInfo !== undefined) {
+    return {
+      ...pathInfo,
+      resourceName: operation.resourceName ?? operation.operationGroup,
+    };
+  }
+
+  // If the path does not contain /providers/, we can still identify the resource
+  // because an ARM operations decorator was executed on this operation (e.g.
+  // @armResourceRead, @armResourceCreateOrUpdate, etc.). Use the ARM provider
+  // namespace and the path structure to construct resource info.
+  const fallback = getResourceInfoFromArmOperation(
+    program,
+    operation.httpOperation.path,
+    operation.kind,
+    operation.operation,
+  );
+  if (fallback === undefined) return undefined;
   return {
-    ...pathInfo,
+    ...fallback,
     resourceName: operation.resourceName ?? operation.operationGroup,
   };
+}
+
+/**
+ * Construct resource path info for an ARM resource operation whose path does not
+ * contain a /providers/ segment. This relies on the fact that an ARM operations
+ * decorator was executed on the operation, so we know it belongs to a resource.
+ * The provider namespace is resolved from the operation's namespace.
+ */
+function getResourceInfoFromArmOperation(
+  program: Program,
+  path: string,
+  kind: ArmOperationKind,
+  operation: Operation,
+): ResourcePathInfo | undefined {
+  const provider = operation.namespace
+    ? getArmProviderNamespace(program, operation.namespace)
+    : undefined;
+  if (provider === undefined) return undefined;
+
+  const segments = path.split("/").filter((s) => s.length > 0);
+
+  // Walk from the end of the path to find the last resource type segment(s).
+  // A resource type segment is a static segment followed by a variable segment,
+  // e.g. "resourceGroups/{resourceGroupName}".
+  const typeSegments: string[] = [];
+  const instancePath = path.replace(/\/+$/, "");
+
+  // Scan the path for static/variable pairs working backwards
+  for (let i = segments.length - 1; i >= 0; i--) {
+    if (isVariableSegment(segments[i]) && i > 0 && !isVariableSegment(segments[i - 1])) {
+      typeSegments.unshift(segments[i - 1]);
+      i--; // skip the static segment we just consumed
+    } else if (!isVariableSegment(segments[i]) && i === segments.length - 1 && kind === "list") {
+      // For list operations, the last segment is a static type name without an instance variable
+      typeSegments.unshift(segments[i]);
+    } else {
+      break;
+    }
+  }
+
+  if (typeSegments.length > 0) {
+    // For list operations where the path ends with a static segment, append {name}
+    const resolvedInstancePath =
+      kind === "list" && !isVariableSegment(segments[segments.length - 1])
+        ? `${instancePath}/{name}`
+        : instancePath;
+    return {
+      resourceType: {
+        provider: provider,
+        types: typeSegments,
+      },
+      resourceInstancePath: resolvedInstancePath,
+    };
+  }
+
+  return undefined;
 }
 
 export function getResourcePathElements(
