@@ -1,4 +1,4 @@
-import type { Model, StringLiteral } from "@typespec/compiler";
+import type { Model, Scalar, StringLiteral } from "@typespec/compiler";
 import {
   expectDiagnosticEmpty,
   expectDiagnostics,
@@ -2317,6 +2317,68 @@ op createJob(
       deepStrictEqual(metadata.pollingInfo.terminationStatus.succeededState, ["Succeeded"]);
     });
 
+    it("Gets Lro for status monitor with scalar result type", async () => {
+      const [_, metadata] = await compileLroOperation(
+        `
+        model PollingStatus {
+          @doc("PollingLocation")
+          @header location?: ResourceLocation<PollingStatus>;
+
+          @doc("The status of the operation")
+          @Azure.Core.lroStatus
+          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+
+          @doc("The result")
+          @Azure.Core.lroResult
+          result?: string;
+        }
+
+        @doc("get lro status")
+        @route("/scalarResult/operations/{operationId}")
+        @get op getScalarStatus(@doc("The operation") @path operationId: string): PollingStatus;
+
+        @doc("Start operation")
+        @pollingOperation(getScalarStatus, {operationId: ResponseProperty<"operationId">})
+        @route("/scalarResult")
+        @post @test op startScalarOp(@body body: {}): {
+          @statusCode _: 202;
+          @header("operation-id") operationId: string;
+        };
+        `,
+        "startScalarOp",
+      );
+      ok(metadata);
+      deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationReference");
+      deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "PollingStatus");
+
+      deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
+      deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
+      deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "result");
+
+      deepStrictEqual(metadata.envelopeResult.name, "PollingStatus");
+      deepStrictEqual(metadata.logicalPath, "result");
+
+      // The final result should be a Scalar type (string), not "void"
+      ok(metadata.finalResult !== "void");
+      ok(metadata.finalResult !== undefined);
+      strictEqual((metadata.finalResult as Scalar).kind, "Scalar");
+      strictEqual((metadata.finalResult as Scalar).name, "string");
+
+      deepStrictEqual((metadata.finalEnvelopeResult as Model).name, "PollingStatus");
+      deepStrictEqual(metadata.finalResultPath, "result");
+
+      // logicalResult should be the polling response model when the actual result is a scalar
+      strictEqual(metadata.logicalResult.name, "PollingStatus");
+
+      // finalStep should be pollingSuccessProperty with scalar responseModel
+      ok(metadata.finalStep);
+      deepStrictEqual(metadata.finalStep.kind, "pollingSuccessProperty");
+      if (metadata.finalStep.kind === "pollingSuccessProperty") {
+        strictEqual(metadata.finalStep.responseModel.kind, "Scalar");
+        strictEqual((metadata.finalStep.responseModel as Scalar).name, "string");
+      }
+    });
+
     it("ignores bad lro operation links with Operation-Location", async () => {
       const [_, metadata] = await compileLroOperation(
         `
@@ -2913,6 +2975,55 @@ op createJob(
         {
           code: `@azure-tools/typespec-azure-core/lro-status-monitor-invalid-result-property`,
           message: `StatusMonitor has more than one error property marked with '@lroErrorResult'.  Ensure that only one property in the model is marked with this decorator.`,
+        },
+      ]);
+    });
+
+    it("emits diagnostic for invalid @lroResult property type (enum)", async () => {
+      const [_ops, diagnostics, _runner] = await getOperations(
+        `
+        enum MyStatus {
+          Active,
+          Inactive,
+        }
+
+        model PollingStatus {
+          @header location?: ResourceLocation<PollingStatus>;
+
+          @Azure.Core.lroStatus
+          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+
+          @Azure.Core.lroResult
+          result?: MyStatus;
+        }
+
+        model SimpleWidget {
+          @key
+          @segment("simpleWidgets")
+          @visibility(Lifecycle.Read)
+          @path
+          id: string;
+
+          value: string;
+        }
+
+        @route("/simpleWidgets/{id}")
+        @get op getWidget(@path id: string): SimpleWidget;
+
+        @finalOperation(getWidget)
+        @pollingOperation(getStatus, {id: ResponseProperty<"id">; operationId: ResponseProperty<"operation">})
+        @route("/simpleWidgets/{id}")
+        @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operation: string};
+
+        @route("/simpleWidgets/{id}/operations/{operationId}")
+        @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
+        `,
+      );
+      expectDiagnostics(diagnostics, [
+        {
+          code: `@azure-tools/typespec-azure-core/lro-status-monitor-invalid-result-property-type`,
+          message:
+            /Property 'result' used as the final result of a long-running operation has an invalid type '.*MyStatus'. The property type must be a Model, Scalar, or 'unknown'./,
         },
       ]);
     });
