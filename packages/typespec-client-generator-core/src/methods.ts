@@ -26,8 +26,7 @@ import {
   getNextLinkVerb,
   getOverriddenClientMethod,
   getResponseAsBool,
-  isInScope,
-  listOperationsInClient,
+  listOperationsInOperationGroup,
   shouldGenerateConvenient,
   shouldGenerateProtocol,
 } from "./decorators.js";
@@ -49,6 +48,7 @@ import {
   SdkModelType,
   SdkNextOperationLink,
   SdkNextOperationReference,
+  SdkOperationGroup,
   SdkOperationLink,
   SdkOperationReference,
   SdkPagingServiceMethod,
@@ -706,8 +706,6 @@ export function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOpe
 
   for (const param of params) {
     if (isNeverOrVoidType(param.type)) continue;
-    // Skip parameters that are not in scope for this emitter
-    if (!isInScope(context, param)) continue;
     const sdkMethodParam = diagnostics.pipe(getSdkMethodParameter(context, param, operation));
     if (sdkMethodParam.onClient) {
       // add API version and subscription ID parameters to the client parameters
@@ -798,12 +796,12 @@ export function getSdkMethodParameter(
 
 export function createSdkMethods<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
-  client: SdkClient,
+  client: SdkClient | SdkOperationGroup,
   sdkClientType: SdkClientType<TServiceOperation>,
 ): [SdkMethod<TServiceOperation>[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const retval: SdkMethod<TServiceOperation>[] = [];
-  for (const operation of listOperationsInClient(context, client)) {
+  for (const operation of listOperationsInOperationGroup(context, client)) {
     retval.push(
       diagnostics.pipe(getSdkServiceMethod<TServiceOperation>(context, operation, sdkClientType)),
     );

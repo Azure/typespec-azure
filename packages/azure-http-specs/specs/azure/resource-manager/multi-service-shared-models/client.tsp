@@ -12,6 +12,5 @@ using Azure.ClientGenerator.Core;
     Azure.ResourceManager.MultiServiceSharedModels.Compute,
     Azure.ResourceManager.MultiServiceSharedModels.Storage
   ],
-  autoMergeService: true,
 })
 namespace Azure.ResourceManager.MultiServiceSharedModels.Combined;

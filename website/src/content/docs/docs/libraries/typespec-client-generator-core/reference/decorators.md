@@ -846,6 +846,10 @@ model MyModel {
 
 ### `@operationGroup` {#@Azure.ClientGenerator.Core.operationGroup}
 
+Define the sub client generated in the client SDK.
+If there is any `@client` definition or `@operationGroup` definition, then each `@client` is a root client and each `@operationGroup` is a sub client with hierarchy.
+This decorator cannot be used along with `@clientLocation`. This decorator cannot be used as augmentation.
+
 ```typespec
 @Azure.ClientGenerator.Core.operationGroup(scope?: valueof string)
 ```

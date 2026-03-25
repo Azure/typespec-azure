@@ -7,4 +7,4 @@ export * from "./public-utils.js";
 export * from "./types.js";
 
 /** @internal */
-export { $decorators, $functions } from "./tsp-index.js";
+export { $decorators } from "./tsp-index.js";

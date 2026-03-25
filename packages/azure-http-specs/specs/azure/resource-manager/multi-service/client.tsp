@@ -12,6 +12,5 @@ using Azure.ClientGenerator.Core;
     Azure.ResourceManager.MultiService.Compute,
     Azure.ResourceManager.MultiService.ComputeDisk
   ],
-  autoMergeService: true,
 })
 namespace Azure.ResourceManager.MultiService.Combined;

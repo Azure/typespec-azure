@@ -240,6 +240,7 @@
     },
     "PersonMergePatchUpdate": {
       "type": "object",
+      "description": "",
       "properties": {
         "name": {
           "type": "string"

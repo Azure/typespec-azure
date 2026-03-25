@@ -32,6 +32,7 @@ import {
   SdkModelPropertyType,
   SdkModelType,
   SdkNullableType,
+  SdkOperationGroup,
   SdkServiceOperation,
   SdkServiceResponseHeader,
   SdkUnionType,
@@ -122,30 +123,28 @@ export function createTCGCContext(
       return this.__packageVersionEnum!;
     },
     getClients(): SdkClient[] {
-      if (!this.__rawClientsCache) {
+      if (!this.__rawClientsOperationGroupsCache) {
         prepareClientAndOperationCache(this);
       }
-      return Array.from(this.__rawClientsCache!.values());
+      return Array.from(this.__rawClientsOperationGroupsCache!.values()).filter(
+        (item) => item.kind === "SdkClient",
+      );
     },
-    getRootClients(): SdkClient[] {
-      if (!this.__rawClientsCache) {
+    getClientOrOperationGroup(
+      type: Namespace | Interface,
+    ): SdkClient | SdkOperationGroup | undefined {
+      if (!this.__rawClientsOperationGroupsCache) {
         prepareClientAndOperationCache(this);
       }
-      return Array.from(this.__rawClientsCache!.values()).filter((item) => !item.parent);
+      return this.__rawClientsOperationGroupsCache!.get(type);
     },
-    getClient(type: Namespace | Interface): SdkClient | undefined {
-      if (!this.__rawClientsCache) {
-        prepareClientAndOperationCache(this);
-      }
-      return this.__rawClientsCache!.get(type);
-    },
-    getOperationsForClient(client: SdkClient): Operation[] {
+    getOperationsForClient(client: SdkClient | SdkOperationGroup): Operation[] {
       if (!this.__clientToOperationsCache) {
         prepareClientAndOperationCache(this);
       }
       return this.__clientToOperationsCache!.get(client)!;
     },
-    getClientForOperation(operation: Operation): SdkClient {
+    getClientForOperation(operation: Operation): SdkClient | SdkOperationGroup {
       if (!this.__operationToClientCache) {
         prepareClientAndOperationCache(this);
       }

@@ -9,7 +9,6 @@ import {
   IntrinsicType,
   Model,
   ModelProperty,
-  Namespace,
   NumericLiteral,
   Operation,
   Scalar,
@@ -56,8 +55,8 @@ import {
   getUsageOverride,
   isInScope,
   listClients,
-  listOperationsInClient,
-  listSubClients,
+  listOperationGroups,
+  listOperationsInOperationGroup,
   shouldFlattenProperty,
   shouldGenerateConvenient,
 } from "./decorators.js";
@@ -1991,15 +1990,13 @@ function filterOutTypes(
   context: TCGCContext,
   filter: number,
 ): (SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType)[] {
-  const seen = new Set<SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>();
   const result = new Array<SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>();
   for (const sdkType of context.__referencedTypeCache.values()) {
     // filter models with unexpected usage
     if ((sdkType.usage & filter) === 0) {
       continue;
     }
-    if (!seen.has(sdkType)) {
-      seen.add(sdkType);
+    if (!result.includes(sdkType)) {
       result.push(sdkType);
     }
   }
@@ -2050,15 +2047,14 @@ export function getAllReferencedTypes(
 
 export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const services = new Set<Namespace>();
   for (const client of listClients(context)) {
-    for (const operation of listOperationsInClient(context, client)) {
+    for (const operation of listOperationsInOperationGroup(context, client)) {
       // operations on a client
       diagnostics.pipe(updateTypesFromOperation(context, operation));
     }
-    for (const sc of listSubClients(context, client, true)) {
-      for (const operation of listOperationsInClient(context, sc)) {
-        // operations on sub clients
+    for (const sc of listOperationGroups(context, client, true)) {
+      for (const operation of listOperationsInOperationGroup(context, sc)) {
+        // operations on operation groups
         diagnostics.pipe(updateTypesFromOperation(context, operation));
       }
     }
@@ -2071,24 +2067,25 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
         diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
       }
     }
-    client.services.map((s) => services.add(s));
-  }
-  for (const service of services) {
-    // versioned enums
-    const versionEnum = context.getPackageVersionEnum().get(service);
-    const versions = context.getPackageVersions().get(service);
-    if (versionEnum) {
-      // create sdk enum for versions enum
-      let sdkVersionsEnum: SdkEnumType;
-      const explicitApiVersions = getExplicitClientApiVersions(context, service);
-      if (explicitApiVersions) {
-        // add additional api versions to the enum
-        sdkVersionsEnum = diagnostics.pipe(getSdkEnumWithDiagnostics(context, explicitApiVersions));
-      } else {
-        sdkVersionsEnum = diagnostics.pipe(getSdkEnumWithDiagnostics(context, versionEnum));
+    for (const service of client.services) {
+      // versioned enums
+      const versionEnum = context.getPackageVersionEnum().get(service);
+      const versions = context.getPackageVersions().get(service);
+      if (versionEnum) {
+        // create sdk enum for versions enum
+        let sdkVersionsEnum: SdkEnumType;
+        const explicitApiVersions = getExplicitClientApiVersions(context, service);
+        if (explicitApiVersions) {
+          // add additional api versions to the enum
+          sdkVersionsEnum = diagnostics.pipe(
+            getSdkEnumWithDiagnostics(context, explicitApiVersions),
+          );
+        } else {
+          sdkVersionsEnum = diagnostics.pipe(getSdkEnumWithDiagnostics(context, versionEnum));
+        }
+        filterPreviewVersion(context, sdkVersionsEnum, versions?.at(-1) || "");
+        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum));
       }
-      filterPreviewVersion(context, sdkVersionsEnum, versions?.at(-1) || "");
-      diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum));
     }
   }
   // update for orphan models/enums/unions

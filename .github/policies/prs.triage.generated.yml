@@ -49,7 +49,7 @@ configuration:
           - if:
               - includesModifiedFiles:
                   files:
-                    - packages/azure-http-specs/**/*
+                    - packages/typespec-azure-http-specs/**/*
             then:
               - addLabel:
                   label: lib:azure-http-specs
@@ -71,10 +71,3 @@ configuration:
             then:
               - addLabel:
                   label: emitter:client:all
-          - if:
-              - includesModifiedFiles:
-                  files:
-                    - website/**/*
-            then:
-              - addLabel:
-                  label: meta:website

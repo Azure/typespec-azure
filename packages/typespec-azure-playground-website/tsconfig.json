@@ -10,7 +10,7 @@
     "outDir": "dist-dev",
     "rootDir": ".",
     "tsBuildInfoFile": "temp/tsconfig.tsbuildinfo",
-    "types": ["node", "vite/client"],
+    "types": ["node"],
     "checkJs": true,
     "allowJs": true,
     "jsxImportSource": "@emotion/react",

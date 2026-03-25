@@ -16,7 +16,6 @@ ignorePaths:
   - pnpm-lock.yaml
   - eng/feeds/**/examples/**
   - packages/samples/test/output/**
-  - eng/scripts/doc-updater/knowledge/**
   - .git/**
   - .gitignore
   - .vscode/**
