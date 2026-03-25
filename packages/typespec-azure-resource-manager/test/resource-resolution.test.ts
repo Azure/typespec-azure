@@ -3929,6 +3929,62 @@ interface ResourceGroups {
     expect(resourceGroup.resourceType.types).toEqual(["resourceGroups"]);
   });
 
+  it("versioned spec with parent-child resources does not produce duplicate resources", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+@service(#{ title: "Azure Management emitter Testing" })
+@versioned(Versions)
+namespace Microsoft.ContosoProviderHub;
+
+enum Versions {
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  \`2021-10-01-preview\`,
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  \`2022-01-01\`,
+}
+
+model EmployeeParent is TrackedResource<EmployeeParentProperties> {
+  ...ResourceNameParameter<EmployeeParent>;
+}
+
+model EmployeeParentProperties {
+  age?: int32;
+}
+
+@parentResource(EmployeeParent)
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+  age?: int32;
+}
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+@armResourceOperations
+interface EmployeesParent {
+  get is ArmResourceRead<EmployeeParent>;
+}
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    ok(provider.resources);
+    // Should have exactly 2 resources (EmployeeParent and Employee), no duplicates
+    expect(provider.resources).toHaveLength(2);
+    const resourceNames = provider.resources.map((r) => r.resourceName);
+    expect(resourceNames).toContain("EmployeeParent");
+    expect(resourceNames).toContain("Employee");
+  });
+
   it("separates cross-scope LegacyOperations with default resource names into distinct resources", async () => {
     const { program } = await Tester.compile(`
 
