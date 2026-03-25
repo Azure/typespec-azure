@@ -1,23 +1,23 @@
 // @ts-check
 /* eslint-disable no-console */
-import { execSync } from "child_process";
 import dotenv from "dotenv";
 import { cpSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "fs";
 import path, { dirname, join, resolve } from "path";
 import { fileURLToPath } from "url";
-import { repoRoot, run } from "../../eng/scripts/helpers.js";
+import { repoRoot, coreRepoRoot, run } from "../../eng/scripts/helpers.js";
 
 const e2eTestDir = join(repoRoot, "packages/e2e-tests");
 const npmCmd = process.platform === "win32" ? "npm.cmd" : "npm";
+const npxCmd = process.platform === "win32" ? "npx.cmd" : "npx";
 
 loadDotenv();
 
 function main() {
   printInfo();
-  const packages = getPackagesPath();
+  const packages = packPackages();
 
   console.log("Check cli is working");
-  runTypeSpec(["--help"], { cwd: e2eTestDir });
+  runTypeSpec(packages["@typespec/compiler"], ["--help"], { cwd: e2eTestDir });
   console.log("Cli is working");
 
   testAzureHttpSpecs(packages);
@@ -31,55 +31,61 @@ function printInfo() {
   console.log("-".repeat(100));
 }
 
-function getPackagesPath() {
-  function resolveLocalPackage(path) {
-    return `file://${repoRoot}/${path}`;
+function packPackages() {
+  console.log("Packing core packages...");
+  run("pnpm", ["-w", "pack:all"], { cwd: coreRepoRoot });
+
+  console.log("Packing azure packages...");
+  run("pnpm", ["-w", "pack:all"], { cwd: repoRoot });
+
+  const coreOutputFolder = join(coreRepoRoot, "temp/artifacts");
+  const azureOutputFolder = join(repoRoot, "temp/artifacts");
+
+  const coreFiles = readdirSync(coreOutputFolder);
+  const azureFiles = readdirSync(azureOutputFolder);
+
+  console.log("Core packages:", coreFiles);
+  console.log("Azure packages:", azureFiles);
+
+  function resolvePackage(start) {
+    let pkgName = azureFiles.find((x) => x.startsWith(start));
+    if (pkgName) return join(azureOutputFolder, pkgName);
+
+    pkgName = coreFiles.find((x) => x.startsWith(start));
+    if (pkgName) return join(coreOutputFolder, pkgName);
+
+    throw new Error(`Cannot resolve package starting with "${start}"`);
   }
 
   return {
-    "@typespec/compiler": resolveLocalPackage("core/packages/compiler"),
-    "@typespec/openapi": resolveLocalPackage("core/packages/openapi"),
-    "@typespec/http": resolveLocalPackage("core/packages/http"),
-    "@typespec/rest": resolveLocalPackage("core/packages/rest"),
-    "@typespec/xml": resolveLocalPackage("core/packages/xml"),
-    "@typespec/versioning": resolveLocalPackage("core/packages/versioning"),
-    "@azure-tools/typespec-azure-core": resolveLocalPackage("packages/typespec-azure-core"),
-    "@azure-tools/typespec-azure-resource-manager": resolveLocalPackage(
-      "packages/typespec-azure-resource-manager",
+    "@typespec/compiler": resolvePackage("typespec-compiler-"),
+    "@typespec/openapi": resolvePackage("typespec-openapi-"),
+    "@typespec/openapi3": resolvePackage("typespec-openapi3-"),
+    "@typespec/http": resolvePackage("typespec-http-"),
+    "@typespec/rest": resolvePackage("typespec-rest-"),
+    "@typespec/xml": resolvePackage("typespec-xml-"),
+    "@typespec/versioning": resolvePackage("typespec-versioning-"),
+    "@typespec/http-specs": resolvePackage("typespec-http-specs-"),
+    "@typespec/spector": resolvePackage("typespec-spector-"),
+    "@typespec/spec-api": resolvePackage("typespec-spec-api-"),
+    "@azure-tools/typespec-azure-core": resolvePackage("azure-tools-typespec-azure-core-"),
+    "@azure-tools/typespec-azure-resource-manager": resolvePackage(
+      "azure-tools-typespec-azure-resource-manager-",
     ),
-    "@azure-tools/typespec-client-generator-core": resolveLocalPackage(
-      "packages/typespec-client-generator-core",
+    "@azure-tools/typespec-client-generator-core": resolvePackage(
+      "azure-tools-typespec-client-generator-core-",
     ),
-    "@azure-tools/azure-http-specs": resolveLocalPackage("packages/azure-http-specs"),
-    "@typespec/http-specs": resolveLocalPackage("core/packages/http-specs"),
-    "@typespec/spector": resolveLocalPackage("core/packages/spector"),
+    "@azure-tools/azure-http-specs": resolvePackage("azure-tools-azure-http-specs-"),
   };
 }
 
-function runTypeSpec(args, options) {
-  const cmd = `node ${repoRoot}/core/packages/compiler/entrypoints/cli.js ${args.join(" ")}`;
-  try {
-    const result = execSync(cmd, options).toString();
-    console.log(result);
-  } catch (err) {
-    console.error(err.output.toString());
-    console.error(`Compile failed in directory: ${options.cwd}`);
-    process.exit(1);
-  }
+function runTypeSpec(compilerTgz, args, options) {
+  run(npxCmd, ["-y", "-p", compilerTgz, "tsp", ...args], options);
 }
 
 function readPackageJson(dir) {
   const content = readFileSync(join(dir, "package.json")).toString();
   return JSON.parse(content);
-}
-
-function updatePackageJson(wsDir, value) {
-  writeFileSync(join(wsDir, "package.json"), JSON.stringify(value, null, 2));
-  console.log("Generated package.json for basic-current");
-
-  console.log("Installing dependencies");
-  run(npmCmd, ["install", "--force", "--no-package-lock"], { cwd: wsDir });
-  console.log("Installed  dependencies");
 }
 
 function testAzureHttpSpecs(packages) {
@@ -89,12 +95,7 @@ function testAzureHttpSpecs(packages) {
   rmSync(wsDir, { recursive: true, force: true });
   mkdirSync(wsDir);
 
-  const outputDir = join(wsDir, "tsp-output");
-  console.log("Clearing basic-current");
-  rmSync(outputDir, { recursive: true, force: true });
-  console.log("Cleared basic-current");
-
-  console.log("Generating package.json for basic-current");
+  console.log("Generating package.json for azure-http-specs");
   const originalPackageJson = readPackageJson(testDir);
 
   const packageJson = {
@@ -107,29 +108,33 @@ function testAzureHttpSpecs(packages) {
       "@typespec/openapi3": packages["@typespec/openapi3"],
       "@typespec/xml": packages["@typespec/xml"],
       "@typespec/versioning": packages["@typespec/versioning"],
+      "@typespec/http-specs": packages["@typespec/http-specs"],
+      "@typespec/spector": packages["@typespec/spector"],
+      "@typespec/spec-api": packages["@typespec/spec-api"],
       "@azure-tools/typespec-azure-core": packages["@azure-tools/typespec-azure-core"],
       "@azure-tools/typespec-azure-resource-manager":
         packages["@azure-tools/typespec-azure-resource-manager"],
       "@azure-tools/typespec-client-generator-core":
         packages["@azure-tools/typespec-client-generator-core"],
       "@azure-tools/azure-http-specs": packages["@azure-tools/azure-http-specs"],
-      "@typespec/http-specs": packages["@typespec/http-specs"],
-      "@typespec/spector": packages["@typespec/spector"],
     },
   };
 
-  updatePackageJson(wsDir, packageJson);
-  // Have to do 2 steps because of bug in npm when installing mixed file:// and regular versions https://github.com/npm/cli/issues/4367
-  const updatedPackageJson = {
-    ...packageJson,
-    dependencies: {
-      ...packageJson.dependencies,
-    },
-  };
-  updatePackageJson(wsDir, updatedPackageJson);
+  writeFileSync(join(wsDir, "package.json"), JSON.stringify(packageJson, null, 2));
+  console.log("Generated package.json for azure-http-specs");
+
+  console.log("Installing dependencies");
+  run(npmCmd, ["install", "--force", "--no-package-lock"], { cwd: wsDir });
+  console.log("Installed dependencies");
 
   const coreSpecsFolder = join(wsDir, "node_modules", "@typespec", "http-specs", "specs");
-  const azureSpecsFolder = join(wsDir, "node_modules", "@azure-tools", "azure-http-specs", "specs");
+  const azureSpecsFolder = join(
+    wsDir,
+    "node_modules",
+    "@azure-tools",
+    "azure-http-specs",
+    "specs",
+  );
   const wsSpecsFolder = join(wsDir, "specs");
   cpSync(coreSpecsFolder, wsSpecsFolder, { recursive: true });
   cpSync(azureSpecsFolder, wsSpecsFolder, { recursive: true });
@@ -138,7 +143,7 @@ function testAzureHttpSpecs(packages) {
 
   for (const file of specs) {
     console.log(`Running tsp compile . in "${dirname(file)}"`);
-    runTypeSpec(["compile", ".", "--warn-as-error"], {
+    runTypeSpec(packages["@typespec/compiler"], ["compile", ".", "--warn-as-error"], {
       cwd: dirname(file),
     });
     console.log("  Completed tsp compile .");
