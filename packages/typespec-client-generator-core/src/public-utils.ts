@@ -293,6 +293,12 @@ export function getCrossLanguageDefinitionId(
         if (type.model === operation?.parameters) {
           retval = `${getCrossLanguageDefinitionId(context, operation, undefined, false)}.${retval}`;
         } else {
+          // Use cached SDK model's crossLanguageDefinitionId if available to avoid stack context issues
+          const cachedSdkModel = context.__referencedTypeCache.get(type.model);
+          if (cachedSdkModel?.crossLanguageDefinitionId) {
+            // Cached ID already includes namespace, return directly
+            return `${cachedSdkModel.crossLanguageDefinitionId}.${retval}`;
+          }
           retval = `${getCrossLanguageDefinitionId(context, type.model, operation, false)}.${retval}`;
         }
       }
@@ -352,7 +358,9 @@ function findLastNonAnonymousNode(contextPath: ContextNode[]): number {
   let lastNonAnonymousModelNodeIndex = contextPath.length - 1;
   while (lastNonAnonymousModelNodeIndex >= 0) {
     const currType = contextPath[lastNonAnonymousModelNodeIndex].type;
+    // If type is undefined, treat as anonymous (continue looking)
     if (
+      currType &&
       (currType.kind === "Model" || currType.kind === "Union" || currType.kind === "Operation") &&
       currType.name
     ) {

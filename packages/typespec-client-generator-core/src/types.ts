@@ -1415,7 +1415,15 @@ function addPropertiesToModelType(
     ) {
       continue;
     }
-    pushNamingContext(context, property.name, property.type as ContextNode["type"]);
+    // For naming context, pass undefined for named unions so that anonymous types
+    // inside the union get named relative to the property (e.g., "TestModelProp")
+    // rather than relative to the union (e.g., "TestNullable1").
+    // For models, we still want to pass the type so nested anonymous types
+    // get named relative to the intermediate model (e.g., "BP2ForB").
+    const propType = property.type;
+    const contextType =
+      propType.kind === "Union" && propType.name ? undefined : (propType as ContextNode["type"]);
+    pushNamingContext(context, property.name, contextType);
     const clientProperty = diagnostics.pipe(getSdkModelPropertyType(context, property, operation));
     popNamingContext(context);
     sdkType.properties.push(clientProperty);
@@ -1441,6 +1449,8 @@ function addMultipartPropertiesToModelType(
 
     // set the type of the client property based on the part body type
     const bodyType = getHttpBodyType(part.body);
+    // Push naming context for the part so nested types get proper names
+    pushNamingContext(context, pascalCase(part.name!), bodyType as ContextNode["type"]);
     if (clientProperty.type.kind === "array") {
       clientProperty.type.valueType = diagnostics.pipe(
         getClientTypeWithDiagnostics(context, bodyType, operation),
@@ -1450,6 +1460,7 @@ function addMultipartPropertiesToModelType(
         getClientTypeWithDiagnostics(context, bodyType, operation),
       );
     }
+    popNamingContext(context);
 
     clientProperty.serializationOptions.multipart = {
       isFilePart: isFilePart(context, clientProperty.type),
@@ -1672,7 +1683,11 @@ function updateTypesFromOperation(
       // Otherwise use the body type directly
       const bodyTypeOrProperty = httpBody.property ?? getHttpBodyType(httpBody);
       const bodyType = getHttpBodyType(httpBody);
-      pushNamingContext(context, "Request", bodyType as ContextNode["type"]);
+      // For named unions, pass undefined so anonymous types inside get named relative
+      // to the operation (e.g., "PostRequest") rather than the union (e.g., "A1")
+      const bodyContextType =
+        bodyType.kind === "Union" && bodyType.name ? undefined : (bodyType as ContextNode["type"]);
+      pushNamingContext(context, "Request", bodyContextType);
       const sdkType = diagnostics.pipe(
         getClientTypeWithDiagnostics(context, bodyTypeOrProperty, operation),
       );
@@ -1782,12 +1797,40 @@ function updateTypesFromOperation(
     const lroMetaData = getLroMetadata(program, operation);
     for (const response of httpOperation.responses) {
       for (const innerResponse of response.responses) {
+        // Process headers BEFORE body so header types get cached with header naming context first.
+        // This ensures anonymous types in headers use the operation-based path (e.g., "TestResponseRepeatabilityResult")
+        // rather than the model-property path (e.g., "ResponseWithAnonymousUnionRepeatabilityResult")
+        const headers = getHttpOperationResponseHeaders(innerResponse);
+        if (headers) {
+          for (const header of Object.values(headers)) {
+            if (isNeverOrVoidType(header.type)) continue;
+            pushNamingContext(
+              context,
+              `Response${pascalCase(header.name)}`,
+              header.type as ContextNode["type"],
+            );
+            const sdkType = diagnostics.pipe(
+              getClientTypeWithDiagnostics(context, header.type, operation),
+            );
+            popNamingContext(context);
+            if (generateConvenient) {
+              diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkType));
+            }
+            const access = getAccessOverride(context, operation) ?? "public";
+            diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
+          }
+        }
+        // Process body AFTER headers
         if (innerResponse.body?.type && !isNeverOrVoidType(innerResponse.body.type)) {
           const body =
             innerResponse.body.type.kind === "Model"
               ? getEffectivePayloadType(context, innerResponse.body.type, Visibility.Read)
               : innerResponse.body.type;
-          pushNamingContext(context, "Response", body as ContextNode["type"]);
+          // For named unions, pass undefined so anonymous types inside get named relative
+          // to the operation rather than the union
+          const bodyContextType =
+            body.kind === "Union" && body.name ? undefined : (body as ContextNode["type"]);
+          pushNamingContext(context, "Response", bodyContextType);
           const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, body, operation));
           popNamingContext(context);
           if (generateConvenient) {
@@ -1840,26 +1883,6 @@ function updateTypesFromOperation(
           }
           const access = getAccessOverride(context, operation) ?? "public";
           diagnostics.pipe(updateUsageOrAccess(context, access, sdkStreamType));
-        }
-        const headers = getHttpOperationResponseHeaders(innerResponse);
-        if (headers) {
-          for (const header of Object.values(headers)) {
-            if (isNeverOrVoidType(header.type)) continue;
-            pushNamingContext(
-              context,
-              `Response${pascalCase(header.name)}`,
-              header.type as ContextNode["type"],
-            );
-            const sdkType = diagnostics.pipe(
-              getClientTypeWithDiagnostics(context, header.type, operation),
-            );
-            popNamingContext(context);
-            if (generateConvenient) {
-              diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkType));
-            }
-            const access = getAccessOverride(context, operation) ?? "public";
-            diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
-          }
         }
       }
     }
