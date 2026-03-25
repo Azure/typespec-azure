@@ -20,8 +20,8 @@ export const interfacesRule = createRule({
           if (
             !interfaceContext.decorators.some(
               (d) =>
-                d.decorator.name === "$armResourceOperations" ||
-                d.decorator.name === "$armResourceRoute",
+                d.definition?.name === "@armResourceOperations" ||
+                d.definition?.name === "@armResourceRoute",
             )
           ) {
             context.reportDiagnostic({
