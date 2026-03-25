@@ -62,6 +62,7 @@ import {
 } from "./interfaces.js";
 import {
   AllScopes,
+  ContextNode,
   TspLiteralType,
   getHttpBodyType,
   getHttpOperationResponseHeaders,
@@ -273,9 +274,16 @@ export function getCrossLanguageDefinitionId(
       if (type.name) {
         break;
       }
-      const contextPath = operation
-        ? getContextPath(context, operation, type)
-        : findContextPath(context, type);
+      // Use the naming context stack if the last segment's type matches the type being named.
+      // This ensures we only use the stack when it was built for this specific anonymous type.
+      const stackPath = context.__namingContextPath;
+      const lastSegment = stackPath.length > 0 ? stackPath[stackPath.length - 1] : undefined;
+      const contextPath =
+        lastSegment && lastSegment.type === type
+          ? [...stackPath]
+          : operation
+            ? getContextPath(context, operation, type)
+            : findContextPath(context, type);
       const namingPart = contextPath.slice(findLastNonAnonymousNode(contextPath));
       if (
         namingPart[0]?.type?.kind === "Model" ||
@@ -352,9 +360,15 @@ export function getGeneratedName(
   const generatedName = context.__generatedNames.get(type);
   if (generatedName) return generatedName;
 
-  const contextPath = operation
-    ? getContextPath(context, operation, type)
-    : findContextPath(context, type);
+  // Use the naming context stack if the last segment's type matches the type being named.
+  const stackPath = context.__namingContextPath;
+  const lastSegment = stackPath.length > 0 ? stackPath[stackPath.length - 1] : undefined;
+  const contextPath =
+    lastSegment && lastSegment.type === type
+      ? [...stackPath]
+      : operation
+        ? getContextPath(context, operation, type)
+        : findContextPath(context, type);
   const createdName = buildNameFromContextPaths(context, type, contextPath);
   return createdName;
 }
@@ -401,11 +415,6 @@ function findContextPath(
     }
   }
   return [];
-}
-
-interface ContextNode {
-  name: string;
-  type: Model | Union | TspLiteralType | Operation;
 }
 
 /**

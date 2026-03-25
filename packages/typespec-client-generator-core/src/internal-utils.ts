@@ -609,6 +609,12 @@ export function isHttpOperation(context: TCGCContext, obj: any): obj is HttpOper
 
 export type TspLiteralType = StringLiteral | NumericLiteral | BooleanLiteral;
 
+/** A node in a context path that tracks the traversal position for naming anonymous types. */
+export interface ContextNode {
+  name: string;
+  type: Model | Union | TspLiteralType | Operation;
+}
+
 export function getNonNullOptions(type: Union): Type[] {
   return [...type.variants.values()].map((x) => x.type).filter((t) => !isNullType(t));
 }
