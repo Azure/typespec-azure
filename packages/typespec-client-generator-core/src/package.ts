@@ -76,8 +76,7 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
   organizeNamespaces(context, sdkPackage);
 
   // Compute cross-language version hash from source files
-  (sdkPackage as { crossLanguageVersion: string }).crossLanguageVersion =
-    computeCrossLanguageVersion(context);
+  sdkPackage.crossLanguageVersion = computeCrossLanguageVersion(context);
 
   return diagnostics.wrap(sdkPackage);
 }
@@ -188,6 +187,10 @@ function populateApiVersionInformation(context: TCGCContext): void {
 function computeCrossLanguageVersion(context: TCGCContext): string {
   // Concatenate all source file contents
   const content = [...context.program.sourceFiles.values()]
+    .filter((script) => {
+      const locationContext = context.program.getSourceFileLocationContext(script.file);
+      return locationContext.type === "project";
+    })
     .map((script) => script.file.text)
     .join("");
 
