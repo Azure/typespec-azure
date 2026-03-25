@@ -1088,8 +1088,8 @@ export interface SdkLroServiceMetadata {
   pollingInfo: SdkPollingOperationStep;
   envelopeResult: SdkModelType;
   logicalPath?: string;
-  finalResult?: SdkModelType | SdkArrayType | SdkBuiltInType | "void";
-  finalEnvelopeResult?: SdkModelType | SdkArrayType | SdkBuiltInType | "void";
+  finalResult?: SdkModelType | SdkArrayType | SdkBuiltInType<"unknown"> | "void";
+  finalEnvelopeResult?: SdkModelType | SdkArrayType | SdkBuiltInType<"unknown"> | "void";
   finalResultPath?: string;
 }
 
@@ -1145,7 +1145,7 @@ export interface SdkOperationLink {
 
 interface SdkLogicalOperationStep {
   /** The TypeSpec type that is returned by following a link or calling a lined operation */
-  responseModel?: SdkModelType | SdkBuiltInType;
+  responseModel?: SdkModelType;
 }
 
 export interface SdkPropertyMap {
@@ -1190,7 +1190,7 @@ interface SdkFinalOperationReference extends SdkLogicalOperationStep {
 
 interface SdkPollingSuccessProperty extends SdkLogicalOperationStep {
   kind: "pollingSuccessProperty";
-  responseModel: SdkModelType | SdkBuiltInType;
+  responseModel: SdkModelType;
   /** The property containing the results of success */
   target: SdkModelPropertyType;
   /** The property in the response that contained a url to the status monitor */
@@ -1207,9 +1207,9 @@ interface SdkNoPollingSuccessProperty extends SdkLogicalOperationStep {
  */
 export interface SdkLroServiceFinalResponse {
   /** Intact response type */
-  envelopeResult: SdkModelType | SdkArrayType | SdkBuiltInType;
+  envelopeResult: SdkModelType | SdkArrayType | SdkBuiltInType<"unknown">;
   /** Meaningful result type */
-  result: SdkModelType | SdkArrayType | SdkBuiltInType;
+  result: SdkModelType | SdkArrayType | SdkBuiltInType<"unknown">;
   /** An array of properties to fetch {result} from the {envelopeResult} model. */
   resultSegments?: SdkModelPropertyType[];
 }

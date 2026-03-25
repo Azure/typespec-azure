@@ -3,7 +3,6 @@ import {
   isNeverType,
   isUnknownType,
   isVoidType,
-  Scalar,
   type DecoratorContext,
   type Model,
   type ModelProperty,
@@ -15,7 +14,7 @@ import { AzureCoreStateKeys } from "../lib.js";
 
 export const [getFinalLocationValue, setFinalLocationValue] = useStateMap<
   ModelProperty,
-  Model | Scalar | IntrinsicType
+  Model | IntrinsicType
 >(AzureCoreStateKeys.finalLocationResults);
 
 export const [
@@ -36,9 +35,6 @@ export const $finalLocation: FinalLocationDecorator = (
   markFinalLocationProperty(program, entity);
   switch (finalResult?.kind) {
     case "Model":
-      setFinalLocationValue(program, entity, finalResult);
-      break;
-    case "Scalar":
       setFinalLocationValue(program, entity, finalResult);
       break;
     case "Intrinsic":
