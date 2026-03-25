@@ -31,7 +31,7 @@ import {
 } from "@typespec/http";
 import { StreamMetadata, getStreamMetadata } from "@typespec/http/experimental";
 import { camelCase } from "change-case";
-import { getResponseAsBool, shouldOmitSlashFromEmptyRoute } from "./decorators.js";
+import { getResponseAsBool, isInScope, shouldOmitSlashFromEmptyRoute } from "./decorators.js";
 import {
   CollectionFormat,
   SdkBodyParameter,
@@ -211,11 +211,33 @@ function getSdkHttpParameters(
     }
   });
 
-  retval.parameters = httpOperation.parameters.parameters
-    .filter((x) => !isNeverOrVoidType(x.param.type))
-    .map((x) =>
-      diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type)),
-    ) as (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter | SdkCookieParameter)[];
+  // Filter parameters by type and scope, warning if required parameters are scoped out
+  const filteredParams: HttpOperationParameter[] = [];
+  for (const x of httpOperation.parameters.parameters) {
+    if (isNeverOrVoidType(x.param.type)) {
+      continue;
+    }
+    if (!isInScope(context, x.param)) {
+      // Warn if a required parameter is being scoped out
+      if (!x.param.optional) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "required-parameter-scoped-out",
+            target: x.param,
+            format: {
+              paramName: x.param.name,
+              scope: context.emitterName,
+            },
+          }),
+        );
+      }
+      continue;
+    }
+    filteredParams.push(x);
+  }
+  retval.parameters = filteredParams.map((x) =>
+    diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type)),
+  ) as (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter | SdkCookieParameter)[];
   const headerParams = retval.parameters.filter(
     (x): x is SdkHeaderParameter => x.kind === "header",
   );

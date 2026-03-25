@@ -1,4 +1,4 @@
-import { t } from "@typespec/compiler/testing";
+import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { getAccess } from "../../src/decorators.js";
@@ -828,8 +828,311 @@ describe("model property scope", () => {
   });
 });
 
-describe("@scope parameter removal should not propagate usage to excluded types", () => {
-  it("type used only by scope-excluded parameter has no usage", async () => {
+describe("http parameter scope", () => {
+  it("exclude header parameter with negation scope", async () => {
+    const mainCode = `
+      op func(
+        @header("X-Custom-Header")
+        @scope("!python")
+        customHeader: string;
+      ): void;
+    `;
+
+    // Python: parameter should be excluded from both method and http operation
+    const { program: pythonProgram } = await SimpleTesterWithService.compile(mainCode);
+    const pythonContext = await createSdkContextForTester(pythonProgram, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const pythonClient = pythonContext.sdkPackage.clients[0];
+    ok(pythonClient);
+    const pythonMethod = pythonClient.methods[0];
+    ok(pythonMethod);
+    ok(pythonMethod.kind === "basic");
+    // Method parameter should be excluded
+    const pythonMethodParam = pythonMethod.parameters.find((x) => x.name === "customHeader");
+    strictEqual(pythonMethodParam, undefined);
+    // HTTP parameter should be excluded
+    const pythonHeaderParam = pythonMethod.operation.parameters.find(
+      (x) => x.kind === "header" && x.serializedName === "X-Custom-Header",
+    );
+    strictEqual(pythonHeaderParam, undefined);
+
+    // C#: parameter should be included in both method and http operation
+    const { program: csharpProgram } = await SimpleTesterWithService.compile(mainCode);
+    const csharpContext = await createSdkContextForTester(csharpProgram, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    const csharpClient = csharpContext.sdkPackage.clients[0];
+    ok(csharpClient);
+    const csharpMethod = csharpClient.methods[0];
+    ok(csharpMethod);
+    ok(csharpMethod.kind === "basic");
+    // Method parameter should be included
+    const csharpMethodParam = csharpMethod.parameters.find((x) => x.name === "customHeader");
+    ok(csharpMethodParam);
+    // HTTP parameter should be included
+    const csharpHeaderParam = csharpMethod.operation.parameters.find(
+      (x) => x.kind === "header" && x.serializedName === "X-Custom-Header",
+    );
+    ok(csharpHeaderParam);
+  });
+
+  it("include header parameter for matching scope", async () => {
+    const mainCode = `
+      op func(
+        @header("X-Custom-Header")
+        @scope("python")
+        customHeader: string;
+      ): void;
+    `;
+
+    // Python: parameter should be included in both method and http operation
+    const { program: pythonProgram } = await SimpleTesterWithService.compile(mainCode);
+    const pythonContext = await createSdkContextForTester(pythonProgram, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const pythonClient = pythonContext.sdkPackage.clients[0];
+    ok(pythonClient);
+    const pythonMethod = pythonClient.methods[0];
+    ok(pythonMethod);
+    ok(pythonMethod.kind === "basic");
+    // Method parameter should be included
+    const pythonMethodParam = pythonMethod.parameters.find((x) => x.name === "customHeader");
+    ok(pythonMethodParam);
+    // HTTP parameter should be included
+    const pythonHeaderParam = pythonMethod.operation.parameters.find(
+      (x) => x.kind === "header" && x.serializedName === "X-Custom-Header",
+    );
+    ok(pythonHeaderParam);
+
+    // C#: parameter should be excluded from both method and http operation
+    const { program: csharpProgram } = await SimpleTesterWithService.compile(mainCode);
+    const csharpContext = await createSdkContextForTester(csharpProgram, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    const csharpClient = csharpContext.sdkPackage.clients[0];
+    ok(csharpClient);
+    const csharpMethod = csharpClient.methods[0];
+    ok(csharpMethod);
+    ok(csharpMethod.kind === "basic");
+    // Method parameter should be excluded
+    const csharpMethodParam = csharpMethod.parameters.find((x) => x.name === "customHeader");
+    strictEqual(csharpMethodParam, undefined);
+    // HTTP parameter should be excluded
+    const csharpHeaderParam = csharpMethod.operation.parameters.find(
+      (x) => x.kind === "header" && x.serializedName === "X-Custom-Header",
+    );
+    strictEqual(csharpHeaderParam, undefined);
+  });
+
+  it("exclude query parameter with negation scope", async () => {
+    const mainCode = `
+      op func(
+        @query("customQuery")
+        @scope("!python")
+        customQuery: string;
+      ): void;
+    `;
+
+    // Python: parameter should be excluded from both method and http operation
+    const { program: pythonProgram } = await SimpleTesterWithService.compile(mainCode);
+    const pythonContext = await createSdkContextForTester(pythonProgram, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const pythonClient = pythonContext.sdkPackage.clients[0];
+    ok(pythonClient);
+    const pythonMethod = pythonClient.methods[0];
+    ok(pythonMethod);
+    ok(pythonMethod.kind === "basic");
+    // Method parameter should be excluded
+    const pythonMethodParam = pythonMethod.parameters.find((x) => x.name === "customQuery");
+    strictEqual(pythonMethodParam, undefined);
+    // HTTP parameter should be excluded
+    const pythonQueryParam = pythonMethod.operation.parameters.find(
+      (x) => x.kind === "query" && x.serializedName === "customQuery",
+    );
+    strictEqual(pythonQueryParam, undefined);
+
+    // C#: parameter should be included in both method and http operation
+    const { program: csharpProgram } = await SimpleTesterWithService.compile(mainCode);
+    const csharpContext = await createSdkContextForTester(csharpProgram, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    const csharpClient = csharpContext.sdkPackage.clients[0];
+    ok(csharpClient);
+    const csharpMethod = csharpClient.methods[0];
+    ok(csharpMethod);
+    ok(csharpMethod.kind === "basic");
+    // Method parameter should be included
+    const csharpMethodParam = csharpMethod.parameters.find((x) => x.name === "customQuery");
+    ok(csharpMethodParam);
+    // HTTP parameter should be included
+    const csharpQueryParam = csharpMethod.operation.parameters.find(
+      (x) => x.kind === "query" && x.serializedName === "customQuery",
+    );
+    ok(csharpQueryParam);
+  });
+
+  it("include query parameter for matching scope", async () => {
+    const mainCode = `
+      op func(
+        @query("customQuery")
+        @scope("python")
+        customQuery: string;
+      ): void;
+    `;
+
+    // Python: parameter should be included in both method and http operation
+    const { program: pythonProgram } = await SimpleTesterWithService.compile(mainCode);
+    const pythonContext = await createSdkContextForTester(pythonProgram, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const pythonClient = pythonContext.sdkPackage.clients[0];
+    ok(pythonClient);
+    const pythonMethod = pythonClient.methods[0];
+    ok(pythonMethod);
+    ok(pythonMethod.kind === "basic");
+    // Method parameter should be included
+    const pythonMethodParam = pythonMethod.parameters.find((x) => x.name === "customQuery");
+    ok(pythonMethodParam);
+    // HTTP parameter should be included
+    const pythonQueryParam = pythonMethod.operation.parameters.find(
+      (x) => x.kind === "query" && x.serializedName === "customQuery",
+    );
+    ok(pythonQueryParam);
+
+    // C#: parameter should be excluded from both method and http operation
+    const { program: csharpProgram } = await SimpleTesterWithService.compile(mainCode);
+    const csharpContext = await createSdkContextForTester(csharpProgram, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    const csharpClient = csharpContext.sdkPackage.clients[0];
+    ok(csharpClient);
+    const csharpMethod = csharpClient.methods[0];
+    ok(csharpMethod);
+    ok(csharpMethod.kind === "basic");
+    // Method parameter should be excluded
+    const csharpMethodParam = csharpMethod.parameters.find((x) => x.name === "customQuery");
+    strictEqual(csharpMethodParam, undefined);
+    // HTTP parameter should be excluded
+    const csharpQueryParam = csharpMethod.operation.parameters.find(
+      (x) => x.kind === "query" && x.serializedName === "customQuery",
+    );
+    strictEqual(csharpQueryParam, undefined);
+  });
+
+  it("warn when required header parameter is scoped out", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      op func(
+        @header("X-Required-Header")
+        @scope("!python")
+        requiredHeader: string;
+      ): void;
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    expectDiagnostics(context.diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/required-parameter-scoped-out",
+      message: `Required parameter "requiredHeader" is scoped out for emitter "python". This may cause runtime errors unless the parameter is provided through other means (e.g., custom headers).`,
+    });
+    // Parameter should still be excluded from both method and http operation
+    const sdkPackage = context.sdkPackage;
+    const client = sdkPackage.clients[0];
+    ok(client);
+    const method = client.methods[0];
+    ok(method);
+    ok(method.kind === "basic");
+    // Method parameter should be excluded
+    const methodParam = method.parameters.find((x) => x.name === "requiredHeader");
+    strictEqual(methodParam, undefined);
+    // HTTP parameter should be excluded
+    const headerParam = method.operation.parameters.find(
+      (x) => x.kind === "header" && x.serializedName === "X-Required-Header",
+    );
+    strictEqual(headerParam, undefined);
+  });
+
+  it("no warning when optional header parameter is scoped out", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      op func(
+        @header("X-Optional-Header")
+        @scope("!python")
+        optionalHeader?: string;
+      ): void;
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    // No warning for optional parameters
+    const scopedOutWarnings = context.diagnostics.filter(
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/required-parameter-scoped-out",
+    );
+    strictEqual(scopedOutWarnings.length, 0);
+    // But parameter should still be excluded from both method and http operation
+    const client = context.sdkPackage.clients[0];
+    ok(client);
+    const method = client.methods[0];
+    ok(method);
+    ok(method.kind === "basic");
+    // Method parameter should be excluded
+    const methodParam = method.parameters.find((x) => x.name === "optionalHeader");
+    strictEqual(methodParam, undefined);
+    // HTTP parameter should be excluded
+    const headerParam = method.operation.parameters.find(
+      (x) => x.kind === "header" && x.serializedName === "X-Optional-Header",
+    );
+    strictEqual(headerParam, undefined);
+  });
+
+  it("scope out spread body parameter", async () => {
+    const mainCode = `
+      op func(
+        @scope("python")
+        a: string;
+        b: string;
+        c: string;
+      ): void;
+    `;
+
+    // Python: all parameters should be present
+    const { program: pythonProgram } = await SimpleTesterWithService.compile(mainCode);
+    const pythonContext = await createSdkContextForTester(pythonProgram, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const pythonClient = pythonContext.sdkPackage.clients[0];
+    ok(pythonClient);
+    const pythonMethod = pythonClient.methods[0];
+    ok(pythonMethod);
+    ok(pythonMethod.kind === "basic");
+    // All method parameters should be present for Python
+    ok(pythonMethod.parameters.find((x) => x.name === "a"));
+    ok(pythonMethod.parameters.find((x) => x.name === "b"));
+    ok(pythonMethod.parameters.find((x) => x.name === "c"));
+
+    // C#: parameter 'a' should be excluded, 'b' and 'c' should be present
+    const { program: csharpProgram } = await SimpleTesterWithService.compile(mainCode);
+    const csharpContext = await createSdkContextForTester(csharpProgram, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    const csharpClient = csharpContext.sdkPackage.clients[0];
+    ok(csharpClient);
+    const csharpMethod = csharpClient.methods[0];
+    ok(csharpMethod);
+    ok(csharpMethod.kind === "basic");
+    // Parameter 'a' should be excluded for C#
+    strictEqual(
+      csharpMethod.parameters.find((x) => x.name === "a"),
+      undefined,
+    );
+    // Parameters 'b' and 'c' should still be present
+    ok(csharpMethod.parameters.find((x) => x.name === "b"));
+    ok(csharpMethod.parameters.find((x) => x.name === "c"));
+  });
+
+  it("scope-excluded parameter type has no usage when only used by excluded param", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       union OptInKeys {
         key1: "key1",
@@ -852,7 +1155,7 @@ describe("@scope parameter removal should not propagate usage to excluded types"
     strictEqual(optInType, undefined);
   });
 
-  it("type used only by scope-excluded parameter can be set to internal via @access", async () => {
+  it("scope-excluded parameter type respects @access(internal)", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       @access(Access.internal, "python")
       union OptInKeys {
@@ -871,7 +1174,7 @@ describe("@scope parameter removal should not propagate usage to excluded types"
       emitterName: "@azure-tools/typespec-python",
     });
     const sdkPackage = context.sdkPackage;
-    // OptInKeys should not appear at all since it's excluded from scope and has no other usage
+    // OptInKeys should not appear since it's excluded from scope and has no other usage
     const optInType = sdkPackage.enums.find((x) => x.name === "OptInKeys");
     strictEqual(optInType, undefined);
   });
