@@ -1810,7 +1810,7 @@ function updateTypesFromOperation(
   return diagnostics.wrap(undefined);
 
   function updateUsageOrAccessForLroComponent(
-    model: Model | "void" | IntrinsicType | undefined,
+    model: Model | Scalar | "void" | IntrinsicType | undefined,
     usage: UsageFlags,
   ) {
     if (model === undefined || model === "void") return;

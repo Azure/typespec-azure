@@ -462,7 +462,12 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
       case "pollingSuccessProperty": {
         return {
           kind: "pollingSuccessProperty",
-          responseModel: getSdkModel(context, step.responseModel),
+          responseModel:
+            step.responseModel.kind === "Scalar"
+              ? (diagnostics.pipe(
+                  getClientTypeWithDiagnostics(context, step.responseModel),
+                ) as SdkBuiltInType)
+              : getSdkModel(context, step.responseModel),
           target: diagnostics.pipe(getSdkModelPropertyType(context, step.target)),
           sourceProperty: step.sourceProperty
             ? diagnostics.pipe(getSdkModelPropertyType(context, step.sourceProperty))
@@ -580,11 +585,11 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     }
     const envelopeResult = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, rawMetadata.finalEnvelopeResult),
-    ) as SdkModelType | SdkArrayType | SdkBuiltInType<"unknown">;
+    ) as SdkModelType | SdkArrayType | SdkBuiltInType;
 
     const result = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, rawMetadata.finalResult),
-    ) as SdkModelType | SdkArrayType | SdkBuiltInType<"unknown">;
+    ) as SdkModelType | SdkArrayType | SdkBuiltInType;
 
     // find the property inside the envelope result using the final result path
     let sdkProperty: SdkModelPropertyType | undefined = undefined;
