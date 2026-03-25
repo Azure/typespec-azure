@@ -224,6 +224,38 @@ model TenantActionScope {
 }
 
 /**
+ * Scope for operation status endpoints at the tenant level with a location path segment.
+ * Use with `GetResourceOperationStatus` to produce:
+ * `GET /providers/{providerNamespace}/locations/{location}/operationStatuses/{operationId}`
+ *
+ * @example
+ * ```typespec
+ * op getStatus is GetResourceOperationStatus<ArmOperationStatus, TenantLocationActionScope>;
+ * ```
+ */
+@armVirtualResource
+@tenantResource
+model TenantLocationActionScope {
+  ...LocationResourceParameter;
+}
+
+/**
+ * Scope for operation status endpoints at the subscription level with a location path segment.
+ * Use with `GetResourceOperationStatus` to produce:
+ * `GET /subscriptions/{subscriptionId}/providers/{providerNamespace}/locations/{location}/operationStatuses/{operationId}`
+ *
+ * @example
+ * ```typespec
+ * op getStatus is GetResourceOperationStatus<ArmOperationStatus, SubscriptionLocationActionScope>;
+ * ```
+ */
+@armVirtualResource
+@subscriptionResource
+model SubscriptionLocationActionScope {
+  ...LocationResourceParameter;
+}
+
+/**
  * Template used by ArmProviderAction templates. This produces following action route:
  * `/{resourceUri}/providers/Microsoft.SomeRP/someAction`
  */
