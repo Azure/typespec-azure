@@ -1601,6 +1601,8 @@ function updateTypesFromOperation(
     if (isNeverOrVoidType(param.type)) continue;
     // if it is a body model, skip
     if (httpOperation.parameters.body?.property === param) continue;
+    // skip parameters that are out of scope
+    if (!isInScope(context, param)) continue;
     // if it is a stream model, skip the wrapper but register the streamed payload type
     if (param.type.kind === "Model" && isStream(program, param.type)) {
       const streamOf = getStreamOf(program, param.type);
@@ -1627,6 +1629,8 @@ function updateTypesFromOperation(
   }
   for (const param of httpOperation.parameters.parameters) {
     if (isNeverOrVoidType(param.param.type)) continue;
+    // skip parameters that are out of scope
+    if (!isInScope(context, param.param)) continue;
     const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param.param, operation));
     // Always update input usage for HTTP operation parameters (header, query, path)
     // even when generateConvenient is false, so that types like enums are included
