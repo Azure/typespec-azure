@@ -3927,8 +3927,65 @@ interface ResourceGroups {
     ok(resourceGroup, "ResourceGroup resource should exist in resolved ARM resources");
     expect(resourceGroup.resourceType.provider).toEqual("Microsoft.Resources");
     expect(resourceGroup.resourceType.types).toEqual(["resourceGroups"]);
-    it("separates cross-scope LegacyOperations with default resource names into distinct resources", async () => {
-      const { program } = await Tester.compile(`
+  });
+  it("versioned spec with parent-child resources does not produce duplicate resources", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+@service(#{ title: "Azure Management emitter Testing" })
+@versioned(Versions)
+namespace Microsoft.ContosoProviderHub;
+
+enum Versions {
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  \`2021-10-01-preview\`,
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  \`2022-01-01\`,
+}
+
+model EmployeeParent is TrackedResource<EmployeeParentProperties> {
+  ...ResourceNameParameter<EmployeeParent>;
+}
+
+model EmployeeParentProperties {
+  age?: int32;
+}
+
+@parentResource(EmployeeParent)
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+  age?: int32;
+}
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+@armResourceOperations
+interface EmployeesParent {
+  get is ArmResourceRead<EmployeeParent>;
+}
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    ok(provider.resources);
+    // Should have exactly 2 resources (EmployeeParent and Employee), no duplicates
+    expect(provider.resources).toHaveLength(2);
+    const resourceNames = provider.resources.map((r) => r.resourceName);
+    expect(resourceNames).toContain("EmployeeParent");
+    expect(resourceNames).toContain("Employee");
+  });
+
+  it("separates cross-scope LegacyOperations with default resource names into distinct resources", async () => {
+    const { program } = await Tester.compile(`
 
 using Azure.Core;
 
@@ -4002,62 +4059,62 @@ interface SupportTicketsNoSubscription {
   list is TenantTicketOps.List<SupportTicketDetails>;
 }
 `);
-      const provider = resolveArmResources(program);
-      expect(provider).toBeDefined();
-      expect(provider.resources).toBeDefined();
-      ok(provider.resources);
-      // Should produce 2 separate resources: one subscription-scoped, one tenant-scoped
-      expect(provider.resources).toHaveLength(2);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    ok(provider.resources);
+    // Should produce 2 separate resources: one subscription-scoped, one tenant-scoped
+    expect(provider.resources).toHaveLength(2);
 
-      const subResource = provider.resources.find(
-        (r) =>
-          r.resourceInstancePath ===
-          "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/supportTickets/{supportTicketName}",
-      );
-      ok(subResource);
-      expect(subResource.scope).toEqual("Subscription");
+    const subResource = provider.resources.find(
+      (r) =>
+        r.resourceInstancePath ===
+        "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/supportTickets/{supportTicketName}",
+    );
+    ok(subResource);
+    expect(subResource.scope).toEqual("Subscription");
 
-      checkResolvedOperations(subResource, {
-        operations: {
-          lifecycle: {
-            read: [{ operationGroup: "SupportTickets", name: "get", kind: "read" }],
-          },
-          lists: [{ operationGroup: "SupportTickets", name: "list", kind: "list" }],
+    checkResolvedOperations(subResource, {
+      operations: {
+        lifecycle: {
+          read: [{ operationGroup: "SupportTickets", name: "get", kind: "read" }],
         },
-        resourceType: {
-          provider: "Microsoft.ContosoProviderHub",
-          types: ["supportTickets"],
-        },
-        resourceInstancePath:
-          "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/supportTickets/{supportTicketName}",
-      });
+        lists: [{ operationGroup: "SupportTickets", name: "list", kind: "list" }],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["supportTickets"],
+      },
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/supportTickets/{supportTicketName}",
+    });
 
-      const tenantResource = provider.resources.find(
-        (r) =>
-          r.resourceInstancePath ===
-          "/providers/Microsoft.ContosoProviderHub/supportTickets/{supportTicketName}",
-      );
-      ok(tenantResource);
-      expect(tenantResource.scope).toEqual("Tenant");
+    const tenantResource = provider.resources.find(
+      (r) =>
+        r.resourceInstancePath ===
+        "/providers/Microsoft.ContosoProviderHub/supportTickets/{supportTicketName}",
+    );
+    ok(tenantResource);
+    expect(tenantResource.scope).toEqual("Tenant");
 
-      checkResolvedOperations(tenantResource, {
-        operations: {
-          lifecycle: {
-            read: [{ operationGroup: "SupportTicketsNoSubscription", name: "get", kind: "read" }],
-          },
-          lists: [{ operationGroup: "SupportTicketsNoSubscription", name: "list", kind: "list" }],
+    checkResolvedOperations(tenantResource, {
+      operations: {
+        lifecycle: {
+          read: [{ operationGroup: "SupportTicketsNoSubscription", name: "get", kind: "read" }],
         },
-        resourceType: {
-          provider: "Microsoft.ContosoProviderHub",
-          types: ["supportTickets"],
-        },
-        resourceInstancePath:
-          "/providers/Microsoft.ContosoProviderHub/supportTickets/{supportTicketName}",
-      });
+        lists: [{ operationGroup: "SupportTicketsNoSubscription", name: "list", kind: "list" }],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["supportTickets"],
+      },
+      resourceInstancePath:
+        "/providers/Microsoft.ContosoProviderHub/supportTickets/{supportTicketName}",
     });
   });
-  it("merges cross-scope LegacyOperations with explicit same resource name into one resource", async () => {
-    const { program } = await Tester.compile(`
+});
+it("merges cross-scope LegacyOperations with explicit same resource name into one resource", async () => {
+  const { program } = await Tester.compile(`
 
 using Azure.Core;
 
@@ -4133,23 +4190,22 @@ interface SupportTicketsNoSubscription {
   list is TenantTicketOps.List<SupportTicketDetails>;
 }
 `);
-    const provider = resolveArmResources(program);
-    expect(provider).toBeDefined();
-    expect(provider.resources).toBeDefined();
-    ok(provider.resources);
-    // Should produce 1 merged resource since both have the same explicit resource name
-    expect(provider.resources).toHaveLength(1);
+  const provider = resolveArmResources(program);
+  expect(provider).toBeDefined();
+  expect(provider.resources).toBeDefined();
+  ok(provider.resources);
+  // Should produce 1 merged resource since both have the same explicit resource name
+  expect(provider.resources).toHaveLength(1);
 
-    const resource = provider.resources[0];
-    ok(resource);
-    expect(resource.resourceName).toEqual("SupportTickets");
+  const resource = provider.resources[0];
+  ok(resource);
+  expect(resource.resourceName).toEqual("SupportTickets");
 
-    // Both read operations should be present
-    expect(resource.operations.lifecycle.read).toBeDefined();
-    expect(resource.operations.lifecycle.read).toHaveLength(2);
+  // Both read operations should be present
+  expect(resource.operations.lifecycle.read).toBeDefined();
+  expect(resource.operations.lifecycle.read).toHaveLength(2);
 
-    // Both list operations should be present
-    expect(resource.operations.lists).toBeDefined();
-    expect(resource.operations.lists).toHaveLength(2);
-  });
+  // Both list operations should be present
+  expect(resource.operations.lists).toBeDefined();
+  expect(resource.operations.lists).toHaveLength(2);
 });
