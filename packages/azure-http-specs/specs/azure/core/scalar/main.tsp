@@ -27,6 +27,7 @@ model AzureLocationModel {
   location: azureLocation;
 }
 
+@operationGroup
 @route("/azureLocation")
 interface AzureLocationScalar {
   #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "For testing"

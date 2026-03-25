@@ -358,8 +358,7 @@ op delete(@path id: string): ArmNoContentResponse;
 
 ### `ArmOperationStatus` {#Azure.ResourceManager.ArmOperationStatus}
 
-Standard Azure Resource Manager operation status response, used as the response
-body for `GetResourceOperationStatus`.
+Standard Azure Resource Manager operation status response
 
 ```typespec
 model Azure.ResourceManager.ArmOperationStatus<Properties, StatusValues>
@@ -1328,28 +1327,6 @@ op action is ArmProviderActionSync<Response = Employee, Scope = SubscriptionActi
 | ---- | -------- | ---------------------- |
 | name | `string` | Symbolic name of scope |
 
-### `SubscriptionLocationActionScope` {#Azure.ResourceManager.SubscriptionLocationActionScope}
-
-Scope for operation status endpoints at the subscription level with a location path segment.
-Use with `GetResourceOperationStatus` to produce:
-`GET /subscriptions/{subscriptionId}/providers/{providerNamespace}/locations/{location}/operationStatuses/{operationId}`
-
-```typespec
-model Azure.ResourceManager.SubscriptionLocationActionScope
-```
-
-#### Examples
-
-```typespec
-op getStatus is GetResourceOperationStatus<ArmOperationStatus, SubscriptionLocationActionScope>;
-```
-
-#### Properties
-
-| Name     | Type                 | Description                   |
-| -------- | -------------------- | ----------------------------- |
-| location | `Core.azureLocation` | The name of the Azure region. |
-
 ### `SubscriptionLocationResource` {#Azure.ResourceManager.SubscriptionLocationResource}
 
 The location resource for subscription-based locations. This can be used as a parent
@@ -1393,28 +1370,6 @@ op action is ArmProviderActionSync<Response = Employee, Scope = TenantActionScop
 | Name | Type     | Description            |
 | ---- | -------- | ---------------------- |
 | name | `string` | Symbolic name of scope |
-
-### `TenantLocationActionScope` {#Azure.ResourceManager.TenantLocationActionScope}
-
-Scope for operation status endpoints at the tenant level with a location path segment.
-Use with `GetResourceOperationStatus` to produce:
-`GET /providers/{providerNamespace}/locations/{location}/operationStatuses/{operationId}`
-
-```typespec
-model Azure.ResourceManager.TenantLocationActionScope
-```
-
-#### Examples
-
-```typespec
-op getStatus is GetResourceOperationStatus<ArmOperationStatus, TenantLocationActionScope>;
-```
-
-#### Properties
-
-| Name     | Type                 | Description                   |
-| -------- | -------------------- | ----------------------------- |
-| location | `Core.azureLocation` | The name of the Azure region. |
 
 ### `TenantLocationResource` {#Azure.ResourceManager.TenantLocationResource}
 

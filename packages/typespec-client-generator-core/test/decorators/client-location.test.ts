@@ -12,6 +12,56 @@ import {
 } from "../tester.js";
 
 describe("Operation", () => {
+  it("@clientLocation along with @client", async () => {
+    const [, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+      createClientCustomizationInput(
+        `
+    @service
+    namespace MyService;
+
+    op test(): string;
+    `,
+        `
+    @client({service: MyService})
+    namespace MyServiceClient;
+
+    @clientLocation("Inner")
+    op test is MyService.test;
+    `,
+      ),
+    );
+
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/client-location-conflict",
+    });
+  });
+
+  it("@clientLocation along with @operationGroup", async () => {
+    const [, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+      createClientCustomizationInput(
+        `
+      @service
+      namespace MyService;
+
+      op test(): string;
+      `,
+        `
+      namespace Customization;
+
+      @operationGroup
+      interface MyOperationGroup {
+        @clientLocation("Inner")
+        op test is MyService.test;
+      }
+      `,
+      ),
+    );
+
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/client-location-conflict",
+    });
+  });
+
   it("@clientLocation client-location-wrong-type", async () => {
     const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
       `
@@ -77,7 +127,7 @@ describe("Operation", () => {
     strictEqual(bClient.methods[1].name, "b");
   });
 
-  it("move an operation to another sub client", async () => {
+  it("move an operation to another operation group", async () => {
     const { program } = await SimpleTesterWithService.compile(
       `
     interface A {
@@ -112,7 +162,7 @@ describe("Operation", () => {
     strictEqual(bClient.methods[1].name, "a2");
   });
 
-  it("move an operation to another sub client and omit the original sub client", async () => {
+  it("move an operation to another operation group and omit the original operation group", async () => {
     const { program } = await SimpleTesterWithService.compile(
       `
     interface A {
@@ -169,7 +219,7 @@ describe("Operation", () => {
     strictEqual(bClient.methods[0].name, "a2");
   });
 
-  it("move an operation to a new sub client and omit the original sub client", async () => {
+  it("move an operation to a new operation group and omit the original operation group", async () => {
     const { program } = await SimpleTesterWithService.compile(
       `
     interface A {
@@ -218,7 +268,7 @@ describe("Operation", () => {
     strictEqual(rootClient.methods[0].name, "a2");
   });
 
-  it("move an operation to root client and omit the original sub client", async () => {
+  it("move an operation to root client and omit the original operation group", async () => {
     const { program } = await SimpleTesterWithService.compile(
       `
     interface A {
@@ -238,7 +288,7 @@ describe("Operation", () => {
     strictEqual(rootClient.methods[0].name, "a");
   });
 
-  it("move an operation to another sub client with api version", async () => {
+  it("move an operation to another operation group with api version", async () => {
     const { program } = await SimpleTester.compile(
       `
     @service
@@ -869,7 +919,7 @@ describe("Parameter", () => {
     strictEqual(subIdParam.methodParameterSegments[0][0], subIdMethodParam);
   });
 
-  it("subscriptionId on client when clientLocation moves it to method level for some operations in nested sub clients", async () => {
+  it("subscriptionId on client when clientLocation moves it to method level for some operations in nested operation groups", async () => {
     const { program } = await ArmTester.compile(
       `
       @armProviderNamespace("Microsoft.Contoso")
@@ -926,21 +976,21 @@ describe("Parameter", () => {
     );
     ok(subIdClientParam);
 
-    // Check the AnotherLayer sub client
+    // Check the AnotherLayer operation group
     const anotherLayer = client.children?.find((c) => c.name === "AnotherLayer");
     ok(anotherLayer);
 
-    // The sub client should also have subscriptionId in its parameters
+    // The operation group should also have subscriptionId in its parameters
     const subIdNsParam = anotherLayer.clientInitialization.parameters.find(
       (p) => p.name === "subscriptionId",
     );
     ok(subIdNsParam);
 
-    // Check the Employees sub client
+    // Check the Employees operation group
     const employees = anotherLayer.children?.find((c) => c.name === "Employees");
     ok(employees);
 
-    // The sub client should also have subscriptionId in its parameters
+    // The operation group should also have subscriptionId in its parameters
     const subIdOgParam = employees.clientInitialization.parameters.find(
       (p) => p.name === "subscriptionId",
     );

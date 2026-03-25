@@ -204,7 +204,7 @@ it("decorator on template parameter", async function () {
 it("apply with @client decorator to namespace client", async () => {
   const { program } = await SimpleTester.compile(`
     @service
-    @client({service: MyService})
+    @client
     @clientName("MyServiceClient")
     namespace MyService;
     op test(): void;
@@ -219,7 +219,7 @@ it("apply with @client decorator to interface client", async () => {
     @service
     namespace MyService;
 
-    @client({service: MyService})
+    @client
     @clientName("MyInterfaceClient")
     interface MyInterface {
       op test(): void;
@@ -230,11 +230,12 @@ it("apply with @client decorator to interface client", async () => {
   strictEqual(context.sdkPackage.clients[0].name, "MyInterfaceClient");
 });
 
-it("apply to interface client", async () => {
+it("apply with @operationGroup decorator to interface client", async () => {
   const { program } = await SimpleTester.compile(`
     @service
     namespace MyService;
 
+    @operationGroup
     @clientName("MyOperationGroup")
     interface MyInterface {
       op test(): void;
@@ -256,7 +257,7 @@ it("overrides client name from @client definition", async () => {
     @service
     namespace MyService;
 
-    @client({"name": "DoNotUseThisName", "service": MyService})
+    @client({"name": "DoNotUseThisName"})
     @clientName("MyInterfaceClient")
     interface MyInterface {
       op test(): void;

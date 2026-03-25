@@ -32,7 +32,7 @@ op renamedThree is Client.Structure.Service.Foo.three;
 op renamedFive is Client.Structure.Service.Bar.five;
 
 // Those operations are renamed inside an operation group
-@client
+@operationGroup
 interface Group {
   renamedTwo is Client.Structure.Service.two;
   renamedFour is Client.Structure.Service.Foo.four;

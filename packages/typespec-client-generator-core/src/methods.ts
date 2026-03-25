@@ -27,7 +27,7 @@ import {
   getOverriddenClientMethod,
   getResponseAsBool,
   isInScope,
-  listOperationsInClient,
+  listOperationsInOperationGroup,
   shouldGenerateConvenient,
   shouldGenerateProtocol,
 } from "./decorators.js";
@@ -49,6 +49,7 @@ import {
   SdkModelType,
   SdkNextOperationLink,
   SdkNextOperationReference,
+  SdkOperationGroup,
   SdkOperationLink,
   SdkOperationReference,
   SdkPagingServiceMethod,
@@ -461,7 +462,12 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
       case "pollingSuccessProperty": {
         return {
           kind: "pollingSuccessProperty",
-          responseModel: getSdkModel(context, step.responseModel),
+          responseModel:
+            step.responseModel.kind === "Scalar"
+              ? (diagnostics.pipe(
+                  getClientTypeWithDiagnostics(context, step.responseModel),
+                ) as SdkBuiltInType)
+              : getSdkModel(context, step.responseModel),
           target: diagnostics.pipe(getSdkModelPropertyType(context, step.target)),
           sourceProperty: step.sourceProperty
             ? diagnostics.pipe(getSdkModelPropertyType(context, step.sourceProperty))
@@ -579,11 +585,11 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     }
     const envelopeResult = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, rawMetadata.finalEnvelopeResult),
-    ) as SdkModelType | SdkArrayType | SdkBuiltInType<"unknown">;
+    ) as SdkModelType | SdkArrayType | SdkBuiltInType;
 
     const result = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, rawMetadata.finalResult),
-    ) as SdkModelType | SdkArrayType | SdkBuiltInType<"unknown">;
+    ) as SdkModelType | SdkArrayType | SdkBuiltInType;
 
     // find the property inside the envelope result using the final result path
     let sdkProperty: SdkModelPropertyType | undefined = undefined;
@@ -793,12 +799,12 @@ export function getSdkMethodParameter(
 
 export function createSdkMethods<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
-  client: SdkClient,
+  client: SdkClient | SdkOperationGroup,
   sdkClientType: SdkClientType<TServiceOperation>,
 ): [SdkMethod<TServiceOperation>[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const retval: SdkMethod<TServiceOperation>[] = [];
-  for (const operation of listOperationsInClient(context, client)) {
+  for (const operation of listOperationsInOperationGroup(context, client)) {
     retval.push(
       diagnostics.pipe(getSdkServiceMethod<TServiceOperation>(context, operation, sdkClientType)),
     );
