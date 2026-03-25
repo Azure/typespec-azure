@@ -207,7 +207,7 @@ model DiscriminatedExtensionResource<
 model CustomAzureResource<isResource extends valueof boolean = true> {}
 
 /**
- * Model representing a custom Azure Resource Manager Proxy Resource.
+ * Model representing a custom resource that extends ProxyResource.
  * Use this template with 'is' to create a custom proxy resource.
  * @template isResource Optional. A boolean flag indicating whether the resource should be marked as an Azure resource. Default false.
  */

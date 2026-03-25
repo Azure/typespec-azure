@@ -3611,7 +3611,7 @@ model Azure.ResourceManager.Legacy.ArmOperationOptions
 
 ### `CustomAzureProxyResource` {#Azure.ResourceManager.Legacy.CustomAzureProxyResource}
 
-Model representing a custom Azure Resource Manager Proxy Resource.
+Model representing a custom resource that extends ProxyResource.
 Use this template with 'is' to create a custom proxy resource.
 
 ```typespec
