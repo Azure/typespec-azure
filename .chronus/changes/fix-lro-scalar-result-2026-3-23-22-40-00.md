@@ -2,7 +2,6 @@
 changeKind: fix
 packages:
   - "@azure-tools/typespec-azure-core"
-  - "@azure-tools/typespec-client-generator-core"
   - "@azure-tools/typespec-autorest"
 ---
 
