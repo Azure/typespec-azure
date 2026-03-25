@@ -33,7 +33,7 @@ For operations with request bodies (PUT, POST, PATCH), TypeSpec operation templa
 
 #### Migration Decision: Preserving vs. Standardizing Parameter Names
 
-Request body parameter names affect generated SDK method signatures. Changing them constitutes a **client-visible breaking change** and may break existing SDK consumers.
+Request body parameter names affect generated SDK method signatures. While parameter names do not impact the API, changing them is an SDK breaking change, which may break existing SDK consumers.
 
 When migrating from Swagger with named body parameters, use the following guidance to make your **migration decision**:
 
