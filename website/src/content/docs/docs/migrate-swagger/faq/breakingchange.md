@@ -38,7 +38,7 @@ Request body parameter names affect generated SDK method signatures. While param
 When migrating from Swagger with named body parameters, use the following guidance to make your **migration decision**:
 
 - **Preserve existing names to avoid breaking changes (recommended for SDK backward compatibility):** If your SDK is already released, use `@@clientName` to keep the original Swagger named body parameters. This ensures SDK compatibility for existing consumers.
-- **Use standardized TypeSpec names:** Acceptable only when a breaking change is already planned, or the SDK surface is new.
+- **Use standardized TypeSpec names:** Acceptable only when a breaking change is already planned, or the SDK surface is unreleased or in preview.
 
 The following sections show how to do this for each operation template.
 
