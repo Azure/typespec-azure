@@ -4,6 +4,585 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@alloy-js/cli':
+      specifier: ^0.22.0
+      version: 0.22.0
+    '@alloy-js/core':
+      specifier: ^0.22.0
+      version: 0.22.0
+    '@alloy-js/csharp':
+      specifier: ^0.22.0
+      version: 0.22.0
+    '@alloy-js/markdown':
+      specifier: ^0.22.0
+      version: 0.22.0
+    '@alloy-js/python':
+      specifier: ^0.3.0
+      version: 0.3.0
+    '@alloy-js/rollup-plugin':
+      specifier: ^0.1.0
+      version: 0.1.0
+    '@alloy-js/typescript':
+      specifier: ^0.22.0
+      version: 0.22.0
+    '@astrojs/check':
+      specifier: ^0.9.7
+      version: 0.9.7
+    '@astrojs/react':
+      specifier: ^5.0.0
+      version: 5.0.0
+    '@astrojs/starlight':
+      specifier: ^0.38.1
+      version: 0.38.1
+    '@azure/identity':
+      specifier: ~4.13.0
+      version: 4.13.0
+    '@azure/storage-blob':
+      specifier: ~12.31.0
+      version: 12.31.0
+    '@babel/code-frame':
+      specifier: ~7.29.0
+      version: 7.29.0
+    '@babel/core':
+      specifier: ^7.29.0
+      version: 7.29.0
+    '@chronus/chronus':
+      specifier: ^1.3.1
+      version: 1.3.1
+    '@chronus/github':
+      specifier: ^1.0.6
+      version: 1.0.6
+    '@chronus/github-pr-commenter':
+      specifier: ^1.0.6
+      version: 1.0.6
+    '@docsearch/css':
+      specifier: ^4.6.0
+      version: 4.6.0
+    '@docsearch/js':
+      specifier: ^4.6.0
+      version: 4.6.0
+    '@emotion/react':
+      specifier: ^11.14.0
+      version: 11.14.0
+    '@eslint/js':
+      specifier: ^10.0.1
+      version: 10.0.1
+    '@expressive-code/core':
+      specifier: ^0.41.7
+      version: 0.41.7
+    '@fluentui/react-components':
+      specifier: ~9.73.3
+      version: 9.73.3
+    '@fluentui/react-icons':
+      specifier: ^2.0.321
+      version: 2.0.321
+    '@fluentui/react-list':
+      specifier: ^9.6.11
+      version: 9.6.11
+    '@inquirer/prompts':
+      specifier: ^8.3.0
+      version: 8.3.0
+    '@microsoft/api-extractor':
+      specifier: ^7.57.7
+      version: 7.57.7
+    '@microsoft/api-extractor-model':
+      specifier: ^7.33.4
+      version: 7.33.4
+    '@microsoft/tsdoc':
+      specifier: ^0.16.0
+      version: 0.16.0
+    '@microsoft/tsdoc-config':
+      specifier: ^0.18.1
+      version: 0.18.1
+    '@octokit/core':
+      specifier: ^7.0.6
+      version: 7.0.6
+    '@octokit/plugin-paginate-graphql':
+      specifier: ^6.0.0
+      version: 6.0.0
+    '@octokit/plugin-rest-endpoint-methods':
+      specifier: ^17.0.0
+      version: 17.0.0
+    '@playwright/test':
+      specifier: ^1.58.2
+      version: 1.58.2
+    '@pnpm/workspace.find-packages':
+      specifier: ^1000.0.64
+      version: 1000.0.64
+    '@scalar/json-magic':
+      specifier: ^0.11.5
+      version: 0.11.7
+    '@scalar/openapi-parser':
+      specifier: ^0.24.1
+      version: 0.24.17
+    '@scalar/openapi-types':
+      specifier: ^0.5.0
+      version: 0.5.4
+    '@storybook/cli':
+      specifier: ^10.1.8
+      version: 10.2.19
+    '@storybook/react-vite':
+      specifier: ^10.1.8
+      version: 10.2.19
+    '@testing-library/dom':
+      specifier: ^10.4.1
+      version: 10.4.1
+    '@testing-library/jest-dom':
+      specifier: ^6.9.1
+      version: 6.9.1
+    '@testing-library/react':
+      specifier: ^16.3.2
+      version: 16.3.2
+    '@types/babel__code-frame':
+      specifier: ~7.27.0
+      version: 7.27.0
+    '@types/body-parser':
+      specifier: ^1.19.6
+      version: 1.19.6
+    '@types/cross-spawn':
+      specifier: ~6.0.6
+      version: 6.0.6
+    '@types/debounce':
+      specifier: ~1.2.4
+      version: 1.2.4
+    '@types/deep-equal':
+      specifier: ^1.0.4
+      version: 1.0.4
+    '@types/express':
+      specifier: ^5.0.6
+      version: 5.0.6
+    '@types/hast':
+      specifier: ^3.0.4
+      version: 3.0.4
+    '@types/micromatch':
+      specifier: ^4.0.10
+      version: 4.0.10
+    '@types/mocha':
+      specifier: ^10.0.10
+      version: 10.0.10
+    '@types/morgan':
+      specifier: ^1.9.10
+      version: 1.9.10
+    '@types/multer':
+      specifier: ^2.1.0
+      version: 2.1.0
+    '@types/mustache':
+      specifier: ~4.2.6
+      version: 4.2.6
+    '@types/node':
+      specifier: ~25.5.0
+      version: 25.5.0
+    '@types/plist':
+      specifier: ~3.0.5
+      version: 3.0.5
+    '@types/pluralize':
+      specifier: ^0.0.33
+      version: 0.0.33
+    '@types/react':
+      specifier: ~19.2.14
+      version: 19.2.14
+    '@types/react-dom':
+      specifier: ~19.2.3
+      version: 19.2.3
+    '@types/remark-heading-id':
+      specifier: ^1.0.0
+      version: 1.0.0
+    '@types/semver':
+      specifier: ^7.7.1
+      version: 7.7.1
+    '@types/swagger-ui':
+      specifier: ~5.21.1
+      version: 5.21.1
+    '@types/swagger-ui-dist':
+      specifier: ~3.30.6
+      version: 3.30.6
+    '@types/swagger-ui-express':
+      specifier: ^4.1.8
+      version: 4.1.8
+    '@types/which':
+      specifier: ^3.0.4
+      version: 3.0.4
+    '@types/xml2js':
+      specifier: ^0.4.14
+      version: 0.4.14
+    '@types/yargs':
+      specifier: ~17.0.35
+      version: 17.0.35
+    '@typescript-eslint/parser':
+      specifier: ^8.57.0
+      version: 8.57.0
+    '@typescript-eslint/rule-tester':
+      specifier: ^8.57.0
+      version: 8.57.0
+    '@typescript-eslint/types':
+      specifier: ^8.57.0
+      version: 8.57.0
+    '@typescript-eslint/utils':
+      specifier: ^8.57.0
+      version: 8.57.0
+    '@typespec/ts-http-runtime':
+      specifier: 0.3.4
+      version: 0.3.4
+    '@vitejs/plugin-react':
+      specifier: ~6.0.1
+      version: 6.0.1
+    '@vitest/coverage-v8':
+      specifier: ^4.1.0
+      version: 4.1.0
+    '@vitest/eslint-plugin':
+      specifier: ^1.6.12
+      version: 1.6.12
+    '@vitest/ui':
+      specifier: ^4.1.0
+      version: 4.1.0
+    '@vscode/extension-telemetry':
+      specifier: ^1.5.1
+      version: 1.5.1
+    '@vscode/test-electron':
+      specifier: ^2.5.2
+      version: 2.5.2
+    '@vscode/test-web':
+      specifier: ^0.0.80
+      version: 0.0.80
+    '@vscode/vsce':
+      specifier: ~3.7.1
+      version: 3.7.1
+    '@yarnpkg/core':
+      specifier: ^4.5.0
+      version: 4.5.0
+    '@yarnpkg/fslib':
+      specifier: ^3.1.4
+      version: 3.1.4
+    '@yarnpkg/plugin-nm':
+      specifier: ^4.0.8
+      version: 4.0.8
+    '@yarnpkg/plugin-npm':
+      specifier: ^3.4.0
+      version: 3.4.0
+    '@yarnpkg/plugin-pnp':
+      specifier: ^4.1.3
+      version: 4.1.3
+    ajv:
+      specifier: ~8.18.0
+      version: 8.18.0
+    ajv-formats:
+      specifier: ~3.0.1
+      version: 3.0.1
+    astro:
+      specifier: ^6.0.4
+      version: 6.0.4
+    astro-expressive-code:
+      specifier: ^0.41.7
+      version: 0.41.7
+    astro-rehype-relative-markdown-links:
+      specifier: ^0.18.1
+      version: 0.18.1
+    autorest:
+      specifier: ~3.7.1
+      version: 3.7.2
+    body-parser:
+      specifier: ^2.2.2
+      version: 2.2.2
+    c8:
+      specifier: ^11.0.0
+      version: 11.0.0
+    change-case:
+      specifier: ~5.4.4
+      version: 5.4.4
+    chokidar:
+      specifier: ~5.0.0
+      version: 5.0.0
+    clsx:
+      specifier: ^2.1.1
+      version: 2.1.1
+    concurrently:
+      specifier: ^9.2.1
+      version: 9.2.1
+    cross-env:
+      specifier: ~10.1.0
+      version: 10.1.0
+    cross-spawn:
+      specifier: ^7.0.6
+      version: 7.0.6
+    cspell:
+      specifier: ^9.7.0
+      version: 9.7.0
+    debounce:
+      specifier: ~3.0.0
+      version: 3.0.0
+    decimal.js:
+      specifier: ^10.6.0
+      version: 10.6.0
+    deep-equal:
+      specifier: ^2.2.3
+      version: 2.2.3
+    dotenv:
+      specifier: ^17.2.3
+      version: 17.3.1
+    ecmarkup:
+      specifier: ~23.0.2
+      version: 23.0.2
+    env-paths:
+      specifier: ^4.0.0
+      version: 4.0.0
+    es-module-shims:
+      specifier: ~2.8.0
+      version: 2.8.0
+    esbuild:
+      specifier: ^0.27.4
+      version: 0.27.4
+    esbuild-plugins-node-modules-polyfill:
+      specifier: ^1.8.1
+      version: 1.8.1
+    eslint:
+      specifier: ^10.0.3
+      version: 10.0.3
+    eslint-plugin-import:
+      specifier: ^2.31.0
+      version: 2.32.0
+    eslint-plugin-react-hooks:
+      specifier: 7.0.1
+      version: 7.0.1
+    eslint-plugin-unicorn:
+      specifier: ^63.0.0
+      version: 63.0.0
+    execa:
+      specifier: ^9.6.1
+      version: 9.6.1
+    express:
+      specifier: ^5.2.1
+      version: 5.2.1
+    fs-extra:
+      specifier: ^11.3.4
+      version: 11.3.4
+    globby:
+      specifier: ~16.1.1
+      version: 16.1.1
+    grammarkdown:
+      specifier: ~3.3.2
+      version: 3.3.2
+    happy-dom:
+      specifier: ^20.8.4
+      version: 20.8.4
+    hast-util-to-html:
+      specifier: ^9.0.5
+      version: 9.0.5
+    inquirer:
+      specifier: ^13.3.0
+      version: 13.3.0
+    is-unicode-supported:
+      specifier: ^2.1.0
+      version: 2.1.0
+    json5:
+      specifier: ^2.2.3
+      version: 2.2.3
+    log-symbols:
+      specifier: ^7.0.1
+      version: 7.0.1
+    lzutf8:
+      specifier: 0.6.3
+      version: 0.6.3
+    micromatch:
+      specifier: ^4.0.8
+      version: 4.0.8
+    mocha:
+      specifier: ^11.7.5
+      version: 11.7.5
+    monaco-editor:
+      specifier: ~0.55.1
+      version: 0.55.1
+    monaco-editor-core:
+      specifier: ^0.55.1
+      version: 0.55.1
+    morgan:
+      specifier: ^1.10.1
+      version: 1.10.1
+    multer:
+      specifier: ^2.1.1
+      version: 2.1.1
+    mustache:
+      specifier: ~4.2.0
+      version: 4.2.0
+    node-stdlib-browser:
+      specifier: ~1.3.1
+      version: 1.3.1
+    onigasm:
+      specifier: ~2.2.5
+      version: 2.2.5
+    ora:
+      specifier: ^9.3.0
+      version: 9.3.0
+    p-limit:
+      specifier: ^7.3.0
+      version: 7.3.0
+    pathe:
+      specifier: ^2.0.3
+      version: 2.0.3
+    picocolors:
+      specifier: ~1.1.1
+      version: 1.1.1
+    playwright:
+      specifier: ^1.58.2
+      version: 1.58.2
+    plist:
+      specifier: ~3.1.0
+      version: 3.1.0
+    pluralize:
+      specifier: ^8.0.0
+      version: 8.0.0
+    postject:
+      specifier: 1.0.0-alpha.6
+      version: 1.0.0-alpha.6
+    prettier:
+      specifier: ~3.8.1
+      version: 3.8.1
+    prettier-plugin-astro:
+      specifier: ^0.14.1
+      version: 0.14.1
+    prettier-plugin-organize-imports:
+      specifier: ~4.3.0
+      version: 4.3.0
+    prettier-plugin-sh:
+      specifier: ^0.18.0
+      version: 0.18.0
+    react:
+      specifier: ~19.2.4
+      version: 19.2.4
+    react-dom:
+      specifier: ~19.2.4
+      version: 19.2.4
+    react-error-boundary:
+      specifier: ^6.1.1
+      version: 6.1.1
+    react-hotkeys-hook:
+      specifier: ^5.2.4
+      version: 5.2.4
+    react-markdown:
+      specifier: ^10.1.0
+      version: 10.1.0
+    rehype:
+      specifier: ^13.0.2
+      version: 13.0.2
+    remark-heading-id:
+      specifier: ^1.0.1
+      version: 1.0.1
+    rimraf:
+      specifier: ~6.1.3
+      version: 6.1.3
+    rollup-plugin-visualizer:
+      specifier: 6.0.4
+      version: 6.0.4
+    semver:
+      specifier: ^7.7.4
+      version: 7.7.4
+    sharp:
+      specifier: ^0.34.5
+      version: 0.34.5
+    simple-git:
+      specifier: ^3.33.0
+      version: 3.33.0
+    source-map-support:
+      specifier: ~0.5.21
+      version: 0.5.21
+    storybook:
+      specifier: ^10.2.19
+      version: 10.2.19
+    strip-json-comments:
+      specifier: ~5.0.3
+      version: 5.0.3
+    swagger-ui-dist:
+      specifier: ^5.32.0
+      version: 5.32.0
+    swagger-ui-express:
+      specifier: ^5.0.1
+      version: 5.0.1
+    tar:
+      specifier: ^7.5.11
+      version: 7.5.11
+    temporal-polyfill:
+      specifier: ^0.3.2
+      version: 0.3.2
+    tree-sitter-c-sharp:
+      specifier: ^0.23.1
+      version: 0.23.1
+    tree-sitter-java:
+      specifier: ^0.23.5
+      version: 0.23.5
+    tree-sitter-javascript:
+      specifier: ^0.25.0
+      version: 0.25.0
+    tree-sitter-python:
+      specifier: ^0.25.0
+      version: 0.25.0
+    tree-sitter-typescript:
+      specifier: ^0.23.2
+      version: 0.23.2
+    tsx:
+      specifier: ^4.21.0
+      version: 4.21.0
+    typedoc:
+      specifier: ^0.28.17
+      version: 0.28.17
+    typedoc-plugin-markdown:
+      specifier: ^4.10.0
+      version: 4.10.0
+    typescript:
+      specifier: ~5.9.3
+      version: 5.9.3
+    typescript-eslint:
+      specifier: ^8.57.0
+      version: 8.57.0
+    unist-util-visit:
+      specifier: ^5.0.0
+      version: 5.1.0
+    uri-template:
+      specifier: ^2.0.0
+      version: 2.0.0
+    vite:
+      specifier: ^8.0.1
+      version: 8.0.1
+    vite-plugin-checker:
+      specifier: ^0.12.0
+      version: 0.12.0
+    vite-plugin-dts:
+      specifier: 4.5.4
+      version: 4.5.4
+    vitest:
+      specifier: ^4.1.0
+      version: 4.1.0
+    vscode-languageclient:
+      specifier: ~9.0.1
+      version: 9.0.1
+    vscode-languageserver:
+      specifier: ~9.0.1
+      version: 9.0.1
+    vscode-languageserver-textdocument:
+      specifier: ~1.0.12
+      version: 1.0.12
+    vscode-oniguruma:
+      specifier: ~2.0.1
+      version: 2.0.1
+    vscode-textmate:
+      specifier: ~9.3.2
+      version: 9.3.2
+    web-tree-sitter:
+      specifier: ^0.26.7
+      version: 0.26.7
+    which:
+      specifier: ^6.0.1
+      version: 6.0.1
+    xml2js:
+      specifier: ^0.6.2
+      version: 0.6.2
+    yaml:
+      specifier: ~2.8.2
+      version: 2.8.2
+    yargs:
+      specifier: ~18.0.0
+      version: 18.0.0
+
 overrides:
   cross-spawn@>=7.0.0 <7.0.5: ^7.0.5
   rollup: 4.49.0
@@ -13,310 +592,304 @@ importers:
   .:
     dependencies:
       picocolors:
-        specifier: ~1.1.1
+        specifier: 'catalog:'
         version: 1.1.1
     devDependencies:
       '@chronus/chronus':
-        specifier: ^1.3.1
+        specifier: 'catalog:'
         version: 1.3.1
       '@chronus/github':
-        specifier: ^1.0.6
+        specifier: 'catalog:'
         version: 1.0.6
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 'catalog:'
         version: 10.0.1(eslint@10.0.3)
       '@pnpm/workspace.find-packages':
-        specifier: ^1000.0.64
+        specifier: 'catalog:'
         version: 1000.0.64(@pnpm/logger@1001.0.1)(@pnpm/worker@1000.6.6(@pnpm/logger@1001.0.1)(@types/node@25.5.0))(typanion@3.14.0)
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/eslint-plugin':
-        specifier: ^1.6.12
+        specifier: 'catalog:'
         version: 1.6.12(eslint@10.0.3)(typescript@5.9.3)(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       cspell:
-        specifier: ^9.7.0
+        specifier: 'catalog:'
         version: 9.7.0
       eslint:
-        specifier: ^10.0.3
+        specifier: 'catalog:'
         version: 10.0.3
       eslint-plugin-import:
-        specifier: ^2.31.0
+        specifier: 'catalog:'
         version: 2.32.0(@typescript-eslint/parser@8.57.0(eslint@10.0.3)(typescript@5.9.3))(eslint@10.0.3)
       eslint-plugin-unicorn:
-        specifier: ^63.0.0
+        specifier: 'catalog:'
         version: 63.0.0(eslint@10.0.3)
       playwright:
-        specifier: ^1.58.2
+        specifier: 'catalog:'
         version: 1.58.2
       prettier:
-        specifier: ~3.8.1
+        specifier: 'catalog:'
         version: 3.8.1
       prettier-plugin-astro:
-        specifier: ^0.14.1
+        specifier: 'catalog:'
         version: 0.14.1
       prettier-plugin-organize-imports:
-        specifier: ~4.3.0
+        specifier: 'catalog:'
         version: 4.3.0(prettier@3.8.1)(typescript@5.9.3)
       prettier-plugin-sh:
-        specifier: ^0.18.0
+        specifier: 'catalog:'
         version: 0.18.0(prettier@3.8.1)
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
-      syncpack:
-        specifier: ^13.0.3
-        version: 13.0.4(typescript@5.9.3)
       tsx:
-        specifier: ^4.21.0
+        specifier: 'catalog:'
         version: 4.21.0
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.57.0
+        specifier: 'catalog:'
         version: 8.57.0(eslint@10.0.3)(typescript@5.9.3)
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core:
     devDependencies:
       '@chronus/chronus':
-        specifier: ^1.3.1
+        specifier: 'catalog:'
         version: 1.3.1
       '@chronus/github':
-        specifier: ^1.0.6
+        specifier: 'catalog:'
         version: 1.0.6
       '@chronus/github-pr-commenter':
-        specifier: ^1.0.6
+        specifier: 'catalog:'
         version: 1.0.6
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 'catalog:'
         version: 10.0.1(eslint@10.0.3)
       '@microsoft/api-extractor':
-        specifier: ^7.57.7
+        specifier: 'catalog:'
         version: 7.57.7(@types/node@25.5.0)
       '@octokit/core':
-        specifier: ^7.0.6
+        specifier: 'catalog:'
         version: 7.0.6
       '@octokit/plugin-paginate-graphql':
-        specifier: ^6.0.0
+        specifier: 'catalog:'
         version: 6.0.0(@octokit/core@7.0.6)
       '@octokit/plugin-rest-endpoint-methods':
-        specifier: ^17.0.0
+        specifier: 'catalog:'
         version: 17.0.0(@octokit/core@7.0.6)
       '@types/micromatch':
-        specifier: ^4.0.10
+        specifier: 'catalog:'
         version: 4.0.10
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/eslint-plugin':
-        specifier: ^1.6.12
+        specifier: 'catalog:'
         version: 1.6.12(eslint@10.0.3)(typescript@5.9.3)(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       cspell:
-        specifier: ^9.7.0
+        specifier: 'catalog:'
         version: 9.7.0
       eslint:
-        specifier: ^10.0.3
+        specifier: 'catalog:'
         version: 10.0.3
       eslint-plugin-react-hooks:
-        specifier: 7.0.1
+        specifier: 'catalog:'
         version: 7.0.1(eslint@10.0.3)
       eslint-plugin-unicorn:
-        specifier: ^63.0.0
+        specifier: 'catalog:'
         version: 63.0.0(eslint@10.0.3)
       micromatch:
-        specifier: ^4.0.8
+        specifier: 'catalog:'
         version: 4.0.8
       picocolors:
-        specifier: ~1.1.1
+        specifier: 'catalog:'
         version: 1.1.1
       playwright:
-        specifier: ^1.58.2
+        specifier: 'catalog:'
         version: 1.58.2
       prettier:
-        specifier: ~3.8.1
+        specifier: 'catalog:'
         version: 3.8.1
       prettier-plugin-astro:
-        specifier: ^0.14.1
+        specifier: 'catalog:'
         version: 0.14.1
       prettier-plugin-organize-imports:
-        specifier: ~4.3.0
+        specifier: 'catalog:'
         version: 4.3.0(prettier@3.8.1)(typescript@5.9.3)
       prettier-plugin-sh:
-        specifier: ^0.18.0
+        specifier: 'catalog:'
         version: 0.18.0(prettier@3.8.1)
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
-      syncpack:
-        specifier: ^13.0.3
-        version: 13.0.4(typescript@5.9.3)
       tsx:
-        specifier: ^4.21.0
+        specifier: 'catalog:'
         version: 4.21.0
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.57.0
+        specifier: 'catalog:'
         version: 8.57.0(eslint@10.0.3)(typescript@5.9.3)
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
       yaml:
-        specifier: ~2.8.2
+        specifier: 'catalog:'
         version: 2.8.2
 
   core/packages/asset-emitter:
     devDependencies:
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@typespec/compiler':
         specifier: workspace:^
         version: link:../compiler
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/astro-utils:
     dependencies:
       '@astrojs/check':
-        specifier: ^0.9.7
+        specifier: 'catalog:'
         version: 0.9.7(prettier-plugin-astro@0.14.1)(prettier@3.8.1)(typescript@5.9.3)
       '@astrojs/starlight':
-        specifier: ^0.38.1
+        specifier: 'catalog:'
         version: 0.38.1(astro@6.0.4(@azure/identity@4.13.0)(@azure/storage-blob@12.31.0)(@types/node@25.5.0)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
       '@expressive-code/core':
-        specifier: ^0.41.7
+        specifier: 'catalog:'
         version: 0.41.7
       '@typespec/playground':
         specifier: workspace:^
         version: link:../playground
       astro-expressive-code:
-        specifier: ^0.41.7
+        specifier: 'catalog:'
         version: 0.41.7(astro@6.0.4(@azure/identity@4.13.0)(@azure/storage-blob@12.31.0)(@types/node@25.5.0)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
       pathe:
-        specifier: ^2.0.3
+        specifier: 'catalog:'
         version: 2.0.3
       react:
-        specifier: ~19.2.4
+        specifier: 'catalog:'
         version: 19.2.4
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
     devDependencies:
       '@types/react':
-        specifier: ~19.2.14
+        specifier: 'catalog:'
         version: 19.2.14
       astro:
-        specifier: ^6.0.4
+        specifier: 'catalog:'
         version: 6.0.4(@azure/identity@4.13.0)(@azure/storage-blob@12.31.0)(@types/node@25.5.0)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
 
   core/packages/best-practices:
     devDependencies:
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@typespec/compiler':
         specifier: workspace:^
         version: link:../compiler
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/bundle-uploader:
     dependencies:
       '@azure/identity':
-        specifier: ~4.13.0
+        specifier: 'catalog:'
         version: 4.13.0
       '@azure/storage-blob':
-        specifier: ~12.31.0
+        specifier: 'catalog:'
         version: 12.31.0
       '@pnpm/workspace.find-packages':
-        specifier: ^1000.0.64
+        specifier: 'catalog:'
         version: 1000.0.64(@pnpm/logger@1001.0.1)(@pnpm/worker@1000.6.6(@pnpm/logger@1001.0.1)(@types/node@25.5.0))(typanion@3.14.0)
       '@typespec/bundler':
         specifier: workspace:^
         version: link:../bundler
       json5:
-        specifier: ^2.2.3
+        specifier: 'catalog:'
         version: 2.2.3
       picocolors:
-        specifier: ~1.1.1
+        specifier: 'catalog:'
         version: 1.1.1
       semver:
-        specifier: ^7.7.4
+        specifier: 'catalog:'
         version: 7.7.4
     devDependencies:
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@types/semver':
-        specifier: ^7.7.1
+        specifier: 'catalog:'
         version: 7.7.1
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/bundler:
@@ -325,260 +898,260 @@ importers:
         specifier: workspace:^
         version: link:../compiler
       esbuild:
-        specifier: ^0.27.4
+        specifier: 'catalog:'
         version: 0.27.4
       esbuild-plugins-node-modules-polyfill:
-        specifier: ^1.8.1
+        specifier: 'catalog:'
         version: 1.8.1(esbuild@0.27.4)
       node-stdlib-browser:
-        specifier: ~1.3.1
+        specifier: 'catalog:'
         version: 1.3.1
       picocolors:
-        specifier: ~1.1.1
+        specifier: 'catalog:'
         version: 1.1.1
       yargs:
-        specifier: ~18.0.0
+        specifier: 'catalog:'
         version: 18.0.0
     devDependencies:
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@types/yargs':
-        specifier: ~17.0.35
+        specifier: 'catalog:'
         version: 17.0.35
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vite:
-        specifier: ^8.0.1
+        specifier: 'catalog:'
         version: 8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/compiler:
     dependencies:
       '@babel/code-frame':
-        specifier: ~7.29.0
+        specifier: 'catalog:'
         version: 7.29.0
       '@inquirer/prompts':
-        specifier: ^8.3.0
+        specifier: 'catalog:'
         version: 8.3.0(@types/node@25.5.0)
       ajv:
-        specifier: ~8.18.0
+        specifier: 'catalog:'
         version: 8.18.0
       change-case:
-        specifier: ~5.4.4
+        specifier: 'catalog:'
         version: 5.4.4
       env-paths:
-        specifier: ^4.0.0
+        specifier: 'catalog:'
         version: 4.0.0
       globby:
-        specifier: ~16.1.1
+        specifier: 'catalog:'
         version: 16.1.1
       is-unicode-supported:
-        specifier: ^2.1.0
+        specifier: 'catalog:'
         version: 2.1.0
       mustache:
-        specifier: ~4.2.0
+        specifier: 'catalog:'
         version: 4.2.0
       picocolors:
-        specifier: ~1.1.1
+        specifier: 'catalog:'
         version: 1.1.1
       prettier:
-        specifier: ~3.8.1
+        specifier: 'catalog:'
         version: 3.8.1
       semver:
-        specifier: ^7.7.4
+        specifier: 'catalog:'
         version: 7.7.4
       tar:
-        specifier: ^7.5.11
+        specifier: 'catalog:'
         version: 7.5.11
       temporal-polyfill:
-        specifier: ^0.3.2
+        specifier: 'catalog:'
         version: 0.3.2
       vscode-languageserver:
-        specifier: ~9.0.1
+        specifier: 'catalog:'
         version: 9.0.1
       vscode-languageserver-textdocument:
-        specifier: ~1.0.12
+        specifier: 'catalog:'
         version: 1.0.12
       yaml:
-        specifier: ~2.8.2
+        specifier: 'catalog:'
         version: 2.8.2
       yargs:
-        specifier: ~18.0.0
+        specifier: 'catalog:'
         version: 18.0.0
     devDependencies:
       '@types/babel__code-frame':
-        specifier: ~7.27.0
+        specifier: 'catalog:'
         version: 7.27.0
       '@types/mustache':
-        specifier: ~4.2.6
+        specifier: 'catalog:'
         version: 4.2.6
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@types/semver':
-        specifier: ^7.7.1
+        specifier: 'catalog:'
         version: 7.7.1
       '@types/yargs':
-        specifier: ~17.0.35
+        specifier: 'catalog:'
         version: 17.0.35
       '@typespec/internal-build-utils':
         specifier: workspace:^
         version: link:../internal-build-utils
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       grammarkdown:
-        specifier: ~3.3.2
+        specifier: 'catalog:'
         version: 3.3.2
       pathe:
-        specifier: ^2.0.3
+        specifier: 'catalog:'
         version: 2.0.3
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       source-map-support:
-        specifier: ~0.5.21
+        specifier: 'catalog:'
         version: 0.5.21
       tmlanguage-generator:
         specifier: workspace:^
         version: link:../tmlanguage-generator
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
       vscode-oniguruma:
-        specifier: ~2.0.1
+        specifier: 'catalog:'
         version: 2.0.1
       vscode-textmate:
-        specifier: ~9.3.2
+        specifier: 'catalog:'
         version: 9.3.2
 
   core/packages/emitter-framework:
     dependencies:
       '@alloy-js/csharp':
-        specifier: ^0.22.0
+        specifier: 'catalog:'
         version: 0.22.0
     devDependencies:
       '@alloy-js/cli':
-        specifier: ^0.22.0
+        specifier: 'catalog:'
         version: 0.22.0
       '@alloy-js/core':
-        specifier: ^0.22.0
+        specifier: 'catalog:'
         version: 0.22.0
       '@alloy-js/python':
-        specifier: ^0.3.0
+        specifier: 'catalog:'
         version: 0.3.0
       '@alloy-js/rollup-plugin':
-        specifier: ^0.1.0
+        specifier: 'catalog:'
         version: 0.1.0(@babel/core@7.29.0)(@types/babel__core@7.20.5)(rollup@4.49.0)
       '@alloy-js/typescript':
-        specifier: ^0.22.0
+        specifier: 'catalog:'
         version: 0.22.0
       '@typespec/compiler':
         specifier: workspace:^
         version: link:../compiler
       concurrently:
-        specifier: ^9.2.1
+        specifier: 'catalog:'
         version: 9.2.1
       pathe:
-        specifier: ^2.0.3
+        specifier: 'catalog:'
         version: 2.0.3
       prettier:
-        specifier: ~3.8.1
+        specifier: 'catalog:'
         version: 3.8.1
       tree-sitter-c-sharp:
-        specifier: ^0.23.1
+        specifier: 'catalog:'
         version: 0.23.1
       tree-sitter-java:
-        specifier: ^0.23.5
+        specifier: 'catalog:'
         version: 0.23.5
       tree-sitter-javascript:
-        specifier: ^0.25.0
+        specifier: 'catalog:'
         version: 0.25.0
       tree-sitter-python:
-        specifier: ^0.25.0
+        specifier: 'catalog:'
         version: 0.25.0
       tree-sitter-typescript:
-        specifier: ^0.23.2
+        specifier: 'catalog:'
         version: 0.23.2
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
       web-tree-sitter:
-        specifier: ^0.26.7
+        specifier: 'catalog:'
         version: 0.26.7
 
   core/packages/eslint-plugin-typespec:
     dependencies:
       '@typescript-eslint/utils':
-        specifier: ^8.57.0
+        specifier: 'catalog:'
         version: 8.57.0(eslint@10.0.3)(typescript@5.9.3)
     devDependencies:
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@typescript-eslint/parser':
-        specifier: ^8.57.0
+        specifier: 'catalog:'
         version: 8.57.0(eslint@10.0.3)(typescript@5.9.3)
       '@typescript-eslint/rule-tester':
-        specifier: ^8.57.0
+        specifier: 'catalog:'
         version: 8.57.0(eslint@10.0.3)(typescript@5.9.3)
       '@typescript-eslint/types':
-        specifier: ^8.57.0
+        specifier: 'catalog:'
         version: 8.57.0
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       eslint:
-        specifier: ^10.0.3
+        specifier: 'catalog:'
         version: 10.0.3
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/events:
     devDependencies:
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@typespec/compiler':
         specifier: workspace:^
@@ -590,65 +1163,65 @@ importers:
         specifier: workspace:^
         version: link:../tspd
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/html-program-viewer:
     dependencies:
       '@fluentui/react-components':
-        specifier: ~9.73.3
+        specifier: 'catalog:'
         version: 9.73.3(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(scheduler@0.27.0)
       '@fluentui/react-icons':
-        specifier: ^2.0.321
+        specifier: 'catalog:'
         version: 2.0.321(react@19.2.4)
       '@fluentui/react-list':
-        specifier: ^9.6.11
+        specifier: 'catalog:'
         version: 9.6.11(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(scheduler@0.27.0)
       react:
-        specifier: ~19.2.4
+        specifier: 'catalog:'
         version: 19.2.4
       react-dom:
-        specifier: ~19.2.4
+        specifier: 'catalog:'
         version: 19.2.4(react@19.2.4)
       react-hotkeys-hook:
-        specifier: ^5.2.4
+        specifier: 'catalog:'
         version: 5.2.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
     devDependencies:
       '@babel/core':
-        specifier: ^7.29.0
+        specifier: 'catalog:'
         version: 7.29.0
       '@testing-library/dom':
-        specifier: ^10.4.1
+        specifier: 'catalog:'
         version: 10.4.1
       '@testing-library/jest-dom':
-        specifier: ^6.9.1
+        specifier: 'catalog:'
         version: 6.9.1
       '@testing-library/react':
-        specifier: ^16.3.2
+        specifier: 'catalog:'
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@types/react':
-        specifier: ~19.2.14
+        specifier: 'catalog:'
         version: 19.2.14
       '@types/react-dom':
-        specifier: ~19.2.3
+        specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.14)
       '@typespec/compiler':
         specifier: workspace:^
@@ -657,40 +1230,40 @@ importers:
         specifier: workspace:^
         version: link:../react-components
       '@vitejs/plugin-react':
-        specifier: ~6.0.1
+        specifier: 'catalog:'
         version: 6.0.1(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vite:
-        specifier: ^8.0.1
+        specifier: 'catalog:'
         version: 8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-checker:
-        specifier: ^0.12.0
+        specifier: 'catalog:'
         version: 0.12.0(eslint@10.0.3)(optionator@0.9.4)(typescript@5.9.3)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
       vite-plugin-dts:
-        specifier: 4.5.4
+        specifier: 'catalog:'
         version: 4.5.4(@types/node@25.5.0)(rollup@4.49.0)(typescript@5.9.3)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/http:
     devDependencies:
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@typespec/compiler':
         specifier: workspace:^
@@ -705,22 +1278,22 @@ importers:
         specifier: workspace:^
         version: link:../tspd
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/http-canonicalization:
@@ -739,31 +1312,31 @@ importers:
         version: link:../mutator-framework
     devDependencies:
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       concurrently:
-        specifier: ^9.2.1
+        specifier: 'catalog:'
         version: 9.2.1
       prettier:
-        specifier: ~3.8.1
+        specifier: 'catalog:'
         version: 3.8.1
 
   core/packages/http-client:
     devDependencies:
       '@alloy-js/cli':
-        specifier: ^0.22.0
+        specifier: 'catalog:'
         version: 0.22.0
       '@alloy-js/core':
-        specifier: ^0.22.0
+        specifier: 'catalog:'
         version: 0.22.0
       '@alloy-js/rollup-plugin':
-        specifier: ^0.1.0
+        specifier: 'catalog:'
         version: 0.1.0(@babel/core@7.29.0)(@types/babel__core@7.20.5)(rollup@4.49.0)
       '@alloy-js/typescript':
-        specifier: ^0.22.0
+        specifier: 'catalog:'
         version: 0.22.0
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@typespec/compiler':
         specifier: workspace:^
@@ -781,19 +1354,19 @@ importers:
         specifier: workspace:^
         version: link:../tspd
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/http-client-js:
     dependencies:
       '@alloy-js/core':
-        specifier: ^0.22.0
+        specifier: 'catalog:'
         version: 0.22.0
       '@alloy-js/typescript':
-        specifier: ^0.22.0
+        specifier: 'catalog:'
         version: 0.22.0
       '@typespec/compiler':
         specifier: workspace:^
@@ -808,17 +1381,17 @@ importers:
         specifier: workspace:^
         version: link:../rest
       prettier:
-        specifier: ~3.8.1
+        specifier: 'catalog:'
         version: 3.8.1
     devDependencies:
       '@alloy-js/cli':
-        specifier: ^0.22.0
+        specifier: 'catalog:'
         version: 0.22.0
       '@alloy-js/rollup-plugin':
-        specifier: ^0.1.0
+        specifier: 'catalog:'
         version: 0.1.0(@babel/core@7.29.0)(@types/babel__core@7.20.5)(rollup@4.49.0)
       '@types/yargs':
-        specifier: ~17.0.35
+        specifier: 'catalog:'
         version: 17.0.35
       '@typespec/http':
         specifier: workspace:^
@@ -830,7 +1403,7 @@ importers:
         specifier: workspace:^
         version: link:../spector
       '@typespec/ts-http-runtime':
-        specifier: 0.3.4
+        specifier: 'catalog:'
         version: 0.3.4
       '@typespec/tspd':
         specifier: workspace:^
@@ -839,49 +1412,49 @@ importers:
         specifier: workspace:^
         version: link:../versioning
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       change-case:
-        specifier: ~5.4.4
+        specifier: 'catalog:'
         version: 5.4.4
       concurrently:
-        specifier: ^9.2.1
+        specifier: 'catalog:'
         version: 9.2.1
       cross-env:
-        specifier: ~10.1.0
+        specifier: 'catalog:'
         version: 10.1.0
       execa:
-        specifier: ^9.6.1
+        specifier: 'catalog:'
         version: 9.6.1
       fs-extra:
-        specifier: ^11.3.4
+        specifier: 'catalog:'
         version: 11.3.4
       globby:
-        specifier: ~16.1.1
+        specifier: 'catalog:'
         version: 16.1.1
       inquirer:
-        specifier: ^13.3.0
+        specifier: 'catalog:'
         version: 13.3.0(@types/node@25.5.0)
       ora:
-        specifier: ^9.3.0
+        specifier: 'catalog:'
         version: 9.3.0
       p-limit:
-        specifier: ^7.3.0
+        specifier: 'catalog:'
         version: 7.3.0
       picocolors:
-        specifier: ~1.1.1
+        specifier: 'catalog:'
         version: 1.1.1
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       uri-template:
-        specifier: ^2.0.0
+        specifier: 'catalog:'
         version: 2.0.0
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
       yargs:
-        specifier: ~18.0.0
+        specifier: 'catalog:'
         version: 18.0.0
 
   core/packages/http-server-csharp:
@@ -890,29 +1463,29 @@ importers:
         specifier: workspace:^
         version: link:../asset-emitter
       change-case:
-        specifier: ~5.4.4
+        specifier: 'catalog:'
         version: 5.4.4
       cross-spawn:
-        specifier: ^7.0.6
+        specifier: 'catalog:'
         version: 7.0.6
       picocolors:
-        specifier: ~1.1.1
+        specifier: 'catalog:'
         version: 1.1.1
       yaml:
-        specifier: ~2.8.2
+        specifier: 'catalog:'
         version: 2.8.2
       yargs:
-        specifier: ~18.0.0
+        specifier: 'catalog:'
         version: 18.0.0
     devDependencies:
       '@types/cross-spawn':
-        specifier: ~6.0.6
+        specifier: 'catalog:'
         version: 6.0.6
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@types/yargs':
-        specifier: ~17.0.35
+        specifier: 'catalog:'
         version: 17.0.35
       '@typespec/compiler':
         specifier: workspace:^
@@ -948,56 +1521,56 @@ importers:
         specifier: workspace:^
         version: link:../versioning
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       fs-extra:
-        specifier: ^11.3.4
+        specifier: 'catalog:'
         version: 11.3.4
       globby:
-        specifier: ~16.1.1
+        specifier: 'catalog:'
         version: 16.1.1
       inquirer:
-        specifier: ^13.3.0
+        specifier: 'catalog:'
         version: 13.3.0(@types/node@25.5.0)
       ora:
-        specifier: ^9.3.0
+        specifier: 'catalog:'
         version: 9.3.0
       p-limit:
-        specifier: ^7.3.0
+        specifier: 'catalog:'
         version: 7.3.0
       pathe:
-        specifier: ^2.0.3
+        specifier: 'catalog:'
         version: 2.0.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/http-server-js:
     dependencies:
       prettier:
-        specifier: ~3.8.1
+        specifier: 'catalog:'
         version: 3.8.1
       yaml:
-        specifier: ~2.8.2
+        specifier: 'catalog:'
         version: 2.8.2
     devDependencies:
       '@types/express':
-        specifier: ^5.0.6
+        specifier: 'catalog:'
         version: 5.0.6
       '@types/morgan':
-        specifier: ^1.9.10
+        specifier: 'catalog:'
         version: 1.9.10
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@types/swagger-ui-express':
-        specifier: ^4.1.8
+        specifier: 'catalog:'
         version: 4.1.8
       '@typespec/compiler':
         specifier: workspace:^
@@ -1021,58 +1594,58 @@ importers:
         specifier: workspace:^
         version: link:../tspd
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       decimal.js:
-        specifier: ^10.6.0
+        specifier: 'catalog:'
         version: 10.6.0
       express:
-        specifier: ^5.2.1
+        specifier: 'catalog:'
         version: 5.2.1
       fs-extra:
-        specifier: ^11.3.4
+        specifier: 'catalog:'
         version: 11.3.4
       globby:
-        specifier: ~16.1.1
+        specifier: 'catalog:'
         version: 16.1.1
       inquirer:
-        specifier: ^13.3.0
+        specifier: 'catalog:'
         version: 13.3.0(@types/node@25.5.0)
       morgan:
-        specifier: ^1.10.1
+        specifier: 'catalog:'
         version: 1.10.1
       ora:
-        specifier: ^9.3.0
+        specifier: 'catalog:'
         version: 9.3.0
       p-limit:
-        specifier: ^7.3.0
+        specifier: 'catalog:'
         version: 7.3.0
       pathe:
-        specifier: ^2.0.3
+        specifier: 'catalog:'
         version: 2.0.3
       picocolors:
-        specifier: ~1.1.1
+        specifier: 'catalog:'
         version: 1.1.1
       swagger-ui-express:
-        specifier: ^5.0.1
+        specifier: 'catalog:'
         version: 5.0.1(express@5.2.1)
       temporal-polyfill:
-        specifier: ^0.3.2
+        specifier: 'catalog:'
         version: 0.3.2
       tsx:
-        specifier: ^4.21.0
+        specifier: 'catalog:'
         version: 4.21.0
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
       yargs:
-        specifier: ~18.0.0
+        specifier: 'catalog:'
         version: 18.0.0
 
   core/packages/http-specs:
@@ -1099,17 +1672,17 @@ importers:
         specifier: workspace:^
         version: link:../xml
       deep-equal:
-        specifier: ^2.2.3
+        specifier: 'catalog:'
         version: 2.2.3
     devDependencies:
       '@types/deep-equal':
-        specifier: ^1.0.4
+        specifier: 'catalog:'
         version: 1.0.4
       '@types/multer':
-        specifier: ^2.1.0
+        specifier: 'catalog:'
         version: 2.1.0
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@typespec/json-schema':
         specifier: workspace:^
@@ -1121,68 +1694,68 @@ importers:
         specifier: workspace:^
         version: link:../openapi3
       concurrently:
-        specifier: ^9.2.1
+        specifier: 'catalog:'
         version: 9.2.1
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
 
   core/packages/internal-build-utils:
     dependencies:
       '@pnpm/workspace.find-packages':
-        specifier: ^1000.0.64
+        specifier: 'catalog:'
         version: 1000.0.64(@pnpm/logger@1001.0.1)(@pnpm/worker@1000.6.6(@pnpm/logger@1001.0.1)(@types/node@25.5.0))(typanion@3.14.0)
       cross-spawn:
-        specifier: ^7.0.6
+        specifier: 'catalog:'
         version: 7.0.6
       cspell:
-        specifier: ^9.7.0
+        specifier: 'catalog:'
         version: 9.7.0
       semver:
-        specifier: ^7.7.4
+        specifier: 'catalog:'
         version: 7.7.4
       strip-json-comments:
-        specifier: ~5.0.3
+        specifier: 'catalog:'
         version: 5.0.3
       yargs:
-        specifier: ~18.0.0
+        specifier: 'catalog:'
         version: 18.0.0
     devDependencies:
       '@types/cross-spawn':
-        specifier: ~6.0.6
+        specifier: 'catalog:'
         version: 6.0.6
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@types/semver':
-        specifier: ^7.7.1
+        specifier: 'catalog:'
         version: 7.7.1
       '@types/yargs':
-        specifier: ~17.0.35
+        specifier: 'catalog:'
         version: 17.0.35
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       chokidar:
-        specifier: ~5.0.0
+        specifier: 'catalog:'
         version: 5.0.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/json-schema:
@@ -1191,11 +1764,11 @@ importers:
         specifier: workspace:^
         version: link:../asset-emitter
       yaml:
-        specifier: ~2.8.2
+        specifier: 'catalog:'
         version: 2.8.2
     devDependencies:
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@typespec/compiler':
         specifier: workspace:^
@@ -1210,107 +1783,107 @@ importers:
         specifier: workspace:^
         version: link:../tspd
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       ajv:
-        specifier: ~8.18.0
+        specifier: 'catalog:'
         version: 8.18.0
       ajv-formats:
-        specifier: ~3.0.1
+        specifier: 'catalog:'
         version: 3.0.1(ajv@8.18.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/library-linter:
     devDependencies:
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@typespec/compiler':
         specifier: workspace:^
         version: link:../compiler
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/monarch:
     dependencies:
       monaco-editor-core:
-        specifier: ^0.55.1
+        specifier: 'catalog:'
         version: 0.55.1
     devDependencies:
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       happy-dom:
-        specifier: ^20.8.4
+        specifier: 'catalog:'
         version: 20.8.4
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/mutator-framework:
     devDependencies:
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@typespec/compiler':
         specifier: workspace:^
         version: link:../compiler
       concurrently:
-        specifier: ^9.2.1
+        specifier: 'catalog:'
         version: 9.2.1
       prettier:
-        specifier: ~3.8.1
+        specifier: 'catalog:'
         version: 3.8.1
 
   core/packages/openapi:
     devDependencies:
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@typespec/compiler':
         specifier: workspace:^
@@ -1328,47 +1901,47 @@ importers:
         specifier: workspace:^
         version: link:../tspd
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/openapi3:
     dependencies:
       '@scalar/json-magic':
-        specifier: ^0.11.5
+        specifier: 'catalog:'
         version: 0.11.7
       '@scalar/openapi-parser':
-        specifier: ^0.24.1
+        specifier: 'catalog:'
         version: 0.24.17
       '@scalar/openapi-types':
-        specifier: ^0.5.0
+        specifier: 'catalog:'
         version: 0.5.4
       '@typespec/asset-emitter':
         specifier: workspace:^
         version: link:../asset-emitter
       yaml:
-        specifier: ~2.8.2
+        specifier: 'catalog:'
         version: 2.8.2
     devDependencies:
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@types/yargs':
-        specifier: ~17.0.35
+        specifier: 'catalog:'
         version: 17.0.35
       '@typespec/compiler':
         specifier: workspace:^
@@ -1407,25 +1980,25 @@ importers:
         specifier: workspace:^
         version: link:../xml
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       cross-env:
-        specifier: ~10.1.0
+        specifier: 'catalog:'
         version: 10.1.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/pack:
@@ -1434,44 +2007,44 @@ importers:
         specifier: workspace:^
         version: link:../compiler
       picocolors:
-        specifier: ~1.1.1
+        specifier: 'catalog:'
         version: 1.1.1
     devDependencies:
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       source-map-support:
-        specifier: ~0.5.21
+        specifier: 'catalog:'
         version: 0.5.21
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vite:
-        specifier: ^8.0.1
+        specifier: 'catalog:'
         version: 8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/playground:
     dependencies:
       '@fluentui/react-components':
-        specifier: ~9.73.3
+        specifier: 'catalog:'
         version: 9.73.3(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(scheduler@0.27.0)
       '@fluentui/react-icons':
-        specifier: ^2.0.321
+        specifier: 'catalog:'
         version: 2.0.321(react@19.2.4)
       '@typespec/bundler':
         specifier: workspace:^
@@ -1501,119 +2074,119 @@ importers:
         specifier: workspace:^
         version: link:../versioning
       clsx:
-        specifier: ^2.1.1
+        specifier: 'catalog:'
         version: 2.1.1
       debounce:
-        specifier: ~3.0.0
+        specifier: 'catalog:'
         version: 3.0.0
       lzutf8:
-        specifier: 0.6.3
+        specifier: 'catalog:'
         version: 0.6.3
       monaco-editor:
-        specifier: ~0.55.1
+        specifier: 'catalog:'
         version: 0.55.1
       react:
-        specifier: ~19.2.4
+        specifier: 'catalog:'
         version: 19.2.4
       react-dom:
-        specifier: ~19.2.4
+        specifier: 'catalog:'
         version: 19.2.4(react@19.2.4)
       react-error-boundary:
-        specifier: ^6.1.1
+        specifier: 'catalog:'
         version: 6.1.1(react@19.2.4)
       swagger-ui-dist:
-        specifier: ^5.32.0
+        specifier: 'catalog:'
         version: 5.32.0
       vscode-languageserver:
-        specifier: ~9.0.1
+        specifier: 'catalog:'
         version: 9.0.1
       vscode-languageserver-textdocument:
-        specifier: ~1.0.12
+        specifier: 'catalog:'
         version: 1.0.12
       yaml:
-        specifier: ~2.8.2
+        specifier: 'catalog:'
         version: 2.8.2
     devDependencies:
       '@babel/core':
-        specifier: ^7.29.0
+        specifier: 'catalog:'
         version: 7.29.0
       '@playwright/test':
-        specifier: ^1.58.2
+        specifier: 'catalog:'
         version: 1.58.2
       '@storybook/cli':
-        specifier: ^10.1.8
+        specifier: 'catalog:'
         version: 10.2.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@storybook/react-vite':
-        specifier: ^10.1.8
+        specifier: 'catalog:'
         version: 10.2.19(esbuild@0.27.4)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(rollup@4.49.0)(storybook@10.2.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(typescript@5.9.3)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
       '@testing-library/dom':
-        specifier: ^10.4.1
+        specifier: 'catalog:'
         version: 10.4.1
       '@testing-library/jest-dom':
-        specifier: ^6.9.1
+        specifier: 'catalog:'
         version: 6.9.1
       '@testing-library/react':
-        specifier: ^16.3.2
+        specifier: 'catalog:'
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@types/debounce':
-        specifier: ~1.2.4
+        specifier: 'catalog:'
         version: 1.2.4
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@types/react':
-        specifier: ~19.2.14
+        specifier: 'catalog:'
         version: 19.2.14
       '@types/react-dom':
-        specifier: ~19.2.3
+        specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.14)
       '@types/swagger-ui-dist':
-        specifier: ~3.30.6
+        specifier: 'catalog:'
         version: 3.30.6
       '@typespec/react-components':
         specifier: workspace:^
         version: link:../react-components
       '@vitejs/plugin-react':
-        specifier: ~6.0.1
+        specifier: 'catalog:'
         version: 6.0.1(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       cross-env:
-        specifier: ~10.1.0
+        specifier: 'catalog:'
         version: 10.1.0
       es-module-shims:
-        specifier: ~2.8.0
+        specifier: 'catalog:'
         version: 2.8.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       storybook:
-        specifier: ^10.2.19
+        specifier: 'catalog:'
         version: 10.2.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vite:
-        specifier: ^8.0.1
+        specifier: 'catalog:'
         version: 8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-checker:
-        specifier: ^0.12.0
+        specifier: 'catalog:'
         version: 0.12.0(eslint@10.0.3)(optionator@0.9.4)(typescript@5.9.3)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
       vite-plugin-dts:
-        specifier: 4.5.4
+        specifier: 'catalog:'
         version: 4.5.4(@types/node@25.5.0)(rollup@4.49.0)(typescript@5.9.3)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/playground-website:
     dependencies:
       '@fluentui/react-components':
-        specifier: ~9.73.3
+        specifier: 'catalog:'
         version: 9.73.3(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(scheduler@0.27.0)
       '@fluentui/react-icons':
-        specifier: ^2.0.321
+        specifier: 'catalog:'
         version: 2.0.321(react@19.2.4)
       '@typespec/compiler':
         specifier: workspace:^
@@ -1661,74 +2234,74 @@ importers:
         specifier: workspace:^
         version: link:../xml
       es-module-shims:
-        specifier: ~2.8.0
+        specifier: 'catalog:'
         version: 2.8.0
       react:
-        specifier: ~19.2.4
+        specifier: 'catalog:'
         version: 19.2.4
       react-dom:
-        specifier: ~19.2.4
+        specifier: 'catalog:'
         version: 19.2.4(react@19.2.4)
     devDependencies:
       '@babel/core':
-        specifier: ^7.29.0
+        specifier: 'catalog:'
         version: 7.29.0
       '@playwright/test':
-        specifier: ^1.58.2
+        specifier: 'catalog:'
         version: 1.58.2
       '@types/debounce':
-        specifier: ~1.2.4
+        specifier: 'catalog:'
         version: 1.2.4
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@types/react':
-        specifier: ~19.2.14
+        specifier: 'catalog:'
         version: 19.2.14
       '@types/react-dom':
-        specifier: ~19.2.3
+        specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.14)
       '@types/swagger-ui':
-        specifier: ~5.21.1
+        specifier: 'catalog:'
         version: 5.21.1
       '@vitejs/plugin-react':
-        specifier: ~6.0.1
+        specifier: 'catalog:'
         version: 6.0.1(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       cross-env:
-        specifier: ~10.1.0
+        specifier: 'catalog:'
         version: 10.1.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       rollup-plugin-visualizer:
-        specifier: 6.0.4
+        specifier: 'catalog:'
         version: 6.0.4(rolldown@1.0.0-rc.10)(rollup@4.49.0)
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vite:
-        specifier: ^8.0.1
+        specifier: 'catalog:'
         version: 8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
-        specifier: 4.5.4
+        specifier: 'catalog:'
         version: 4.5.4(@types/node@25.5.0)(rollup@4.49.0)(typescript@5.9.3)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/prettier-plugin-typespec:
     dependencies:
       prettier:
-        specifier: ~3.8.1
+        specifier: 'catalog:'
         version: 3.8.1
     devDependencies:
       '@typespec/compiler':
@@ -1738,19 +2311,19 @@ importers:
         specifier: workspace:^
         version: link:../internal-build-utils
       esbuild:
-        specifier: ^0.27.4
+        specifier: 'catalog:'
         version: 0.27.4
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/protobuf:
     devDependencies:
       '@types/micromatch':
-        specifier: ^4.0.10
+        specifier: 'catalog:'
         version: 4.0.10
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@typespec/compiler':
         specifier: workspace:^
@@ -1759,98 +2332,98 @@ importers:
         specifier: workspace:^
         version: link:../tspd
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       micromatch:
-        specifier: ^4.0.8
+        specifier: 'catalog:'
         version: 4.0.8
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/react-components:
     dependencies:
       '@fluentui/react-components':
-        specifier: ~9.73.3
+        specifier: 'catalog:'
         version: 9.73.3(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(scheduler@0.27.0)
       '@fluentui/react-icons':
-        specifier: ^2.0.321
+        specifier: 'catalog:'
         version: 2.0.321(react@19.2.4)
       react:
-        specifier: ~19.2.4
+        specifier: 'catalog:'
         version: 19.2.4
       react-dom:
-        specifier: ~19.2.4
+        specifier: 'catalog:'
         version: 19.2.4(react@19.2.4)
     devDependencies:
       '@babel/core':
-        specifier: ^7.29.0
+        specifier: 'catalog:'
         version: 7.29.0
       '@testing-library/dom':
-        specifier: ^10.4.1
+        specifier: 'catalog:'
         version: 10.4.1
       '@testing-library/jest-dom':
-        specifier: ^6.9.1
+        specifier: 'catalog:'
         version: 6.9.1
       '@testing-library/react':
-        specifier: ^16.3.2
+        specifier: 'catalog:'
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@types/react':
-        specifier: ~19.2.14
+        specifier: 'catalog:'
         version: 19.2.14
       '@types/react-dom':
-        specifier: ~19.2.3
+        specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.14)
       '@vitejs/plugin-react':
-        specifier: ~6.0.1
+        specifier: 'catalog:'
         version: 6.0.1(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vite:
-        specifier: ^8.0.1
+        specifier: 'catalog:'
         version: 8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-checker:
-        specifier: ^0.12.0
+        specifier: 'catalog:'
         version: 0.12.0(eslint@10.0.3)(optionator@0.9.4)(typescript@5.9.3)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
       vite-plugin-dts:
-        specifier: 4.5.4
+        specifier: 'catalog:'
         version: 4.5.4(@types/node@25.5.0)(rollup@4.49.0)(typescript@5.9.3)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/rest:
     devDependencies:
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@typespec/compiler':
         specifier: workspace:^
@@ -1865,22 +2438,22 @@ importers:
         specifier: workspace:^
         version: link:../tspd
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/samples:
@@ -1932,163 +2505,163 @@ importers:
         version: link:../versioning
     devDependencies:
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@typespec/internal-build-utils':
         specifier: workspace:^
         version: link:../internal-build-utils
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       cross-env:
-        specifier: ~10.1.0
+        specifier: 'catalog:'
         version: 10.1.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/spec:
     devDependencies:
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@typespec/internal-build-utils':
         specifier: workspace:^
         version: link:../internal-build-utils
       ecmarkup:
-        specifier: ~23.0.2
+        specifier: 'catalog:'
         version: 23.0.2
 
   core/packages/spec-api:
     dependencies:
       deep-equal:
-        specifier: ^2.2.3
+        specifier: 'catalog:'
         version: 2.2.3
       express:
-        specifier: ^5.2.1
+        specifier: 'catalog:'
         version: 5.2.1
       xml2js:
-        specifier: ^0.6.2
+        specifier: 'catalog:'
         version: 0.6.2
     devDependencies:
       '@types/deep-equal':
-        specifier: ^1.0.4
+        specifier: 'catalog:'
         version: 1.0.4
       '@types/express':
-        specifier: ^5.0.6
+        specifier: 'catalog:'
         version: 5.0.6
       '@types/multer':
-        specifier: ^2.1.0
+        specifier: 'catalog:'
         version: 2.1.0
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@types/xml2js':
-        specifier: ^0.4.14
+        specifier: 'catalog:'
         version: 0.4.14
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/spec-coverage-sdk:
     dependencies:
       '@azure/identity':
-        specifier: ~4.13.0
+        specifier: 'catalog:'
         version: 4.13.0
       '@azure/storage-blob':
-        specifier: ~12.31.0
+        specifier: 'catalog:'
         version: 12.31.0
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@types/semver':
-        specifier: ^7.7.1
+        specifier: 'catalog:'
         version: 7.7.1
       semver:
-        specifier: ^7.7.4
+        specifier: 'catalog:'
         version: 7.7.4
     devDependencies:
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
 
   core/packages/spec-dashboard:
     dependencies:
       '@fluentui/react-components':
-        specifier: ~9.73.3
+        specifier: 'catalog:'
         version: 9.73.3(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(scheduler@0.27.0)
       '@fluentui/react-icons':
-        specifier: ^2.0.321
+        specifier: 'catalog:'
         version: 2.0.321(react@19.2.4)
       '@typespec/spec-coverage-sdk':
         specifier: workspace:^
         version: link:../spec-coverage-sdk
       react:
-        specifier: ~19.2.4
+        specifier: 'catalog:'
         version: 19.2.4
       react-dom:
-        specifier: ~19.2.4
+        specifier: 'catalog:'
         version: 19.2.4(react@19.2.4)
       react-markdown:
-        specifier: ^10.1.0
+        specifier: 'catalog:'
         version: 10.1.0(@types/react@19.2.14)(react@19.2.4)
     devDependencies:
       '@types/react':
-        specifier: ~19.2.14
+        specifier: 'catalog:'
         version: 19.2.14
       '@types/react-dom':
-        specifier: ~19.2.3
+        specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.14)
       '@vitejs/plugin-react':
-        specifier: ~6.0.1
+        specifier: 'catalog:'
         version: 6.0.1(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       rollup-plugin-visualizer:
-        specifier: 6.0.4
+        specifier: 'catalog:'
         version: 6.0.4(rolldown@1.0.0-rc.10)(rollup@4.49.0)
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vite:
-        specifier: ^8.0.1
+        specifier: 'catalog:'
         version: 8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-checker:
-        specifier: ^0.12.0
+        specifier: 'catalog:'
         version: 0.12.0(eslint@10.0.3)(optionator@0.9.4)(typescript@5.9.3)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
       vite-plugin-dts:
-        specifier: 4.5.4
+        specifier: 'catalog:'
         version: 4.5.4(@types/node@25.5.0)(rollup@4.49.0)(typescript@5.9.3)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/spector:
     dependencies:
       '@azure/identity':
-        specifier: ~4.13.0
+        specifier: 'catalog:'
         version: 4.13.0
       '@typespec/compiler':
         specifier: workspace:^
@@ -2109,86 +2682,86 @@ importers:
         specifier: workspace:^
         version: link:../versioning
       ajv:
-        specifier: ~8.18.0
+        specifier: 'catalog:'
         version: 8.18.0
       body-parser:
-        specifier: ^2.2.2
+        specifier: 'catalog:'
         version: 2.2.2
       deep-equal:
-        specifier: ^2.2.3
+        specifier: 'catalog:'
         version: 2.2.3
       express:
-        specifier: ^5.2.1
+        specifier: 'catalog:'
         version: 5.2.1
       globby:
-        specifier: ~16.1.1
+        specifier: 'catalog:'
         version: 16.1.1
       micromatch:
-        specifier: ^4.0.8
+        specifier: 'catalog:'
         version: 4.0.8
       morgan:
-        specifier: ^1.10.1
+        specifier: 'catalog:'
         version: 1.10.1
       multer:
-        specifier: ^2.1.1
+        specifier: 'catalog:'
         version: 2.1.1
       picocolors:
-        specifier: ~1.1.1
+        specifier: 'catalog:'
         version: 1.1.1
       source-map-support:
-        specifier: ~0.5.21
+        specifier: 'catalog:'
         version: 0.5.21
       xml2js:
-        specifier: ^0.6.2
+        specifier: 'catalog:'
         version: 0.6.2
       yaml:
-        specifier: ~2.8.2
+        specifier: 'catalog:'
         version: 2.8.2
       yargs:
-        specifier: ~18.0.0
+        specifier: 'catalog:'
         version: 18.0.0
     devDependencies:
       '@types/body-parser':
-        specifier: ^1.19.6
+        specifier: 'catalog:'
         version: 1.19.6
       '@types/deep-equal':
-        specifier: ^1.0.4
+        specifier: 'catalog:'
         version: 1.0.4
       '@types/express':
-        specifier: ^5.0.6
+        specifier: 'catalog:'
         version: 5.0.6
       '@types/micromatch':
-        specifier: ^4.0.10
+        specifier: 'catalog:'
         version: 4.0.10
       '@types/morgan':
-        specifier: ^1.9.10
+        specifier: 'catalog:'
         version: 1.9.10
       '@types/multer':
-        specifier: ^2.1.0
+        specifier: 'catalog:'
         version: 2.1.0
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@types/xml2js':
-        specifier: ^0.4.14
+        specifier: 'catalog:'
         version: 0.4.14
       '@types/yargs':
-        specifier: ~17.0.35
+        specifier: 'catalog:'
         version: 17.0.35
       '@typespec/tspd':
         specifier: workspace:^
         version: link:../tspd
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
 
   core/packages/sse:
     devDependencies:
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@typespec/compiler':
         specifier: workspace:^
@@ -2209,83 +2782,83 @@ importers:
         specifier: workspace:^
         version: link:../tspd
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/standalone:
     dependencies:
       '@yarnpkg/core':
-        specifier: ^4.5.0
+        specifier: 'catalog:'
         version: 4.5.0(typanion@3.14.0)
       '@yarnpkg/fslib':
-        specifier: ^3.1.4
+        specifier: 'catalog:'
         version: 3.1.4
       '@yarnpkg/plugin-nm':
-        specifier: ^4.0.8
+        specifier: 'catalog:'
         version: 4.0.8(@yarnpkg/cli@4.12.0(@types/react@19.2.14)(@yarnpkg/core@4.5.0(typanion@3.14.0)))(@yarnpkg/core@4.5.0(typanion@3.14.0))(typanion@3.14.0)
       '@yarnpkg/plugin-npm':
-        specifier: ^3.4.0
+        specifier: 'catalog:'
         version: 3.4.0(@yarnpkg/core@4.5.0(typanion@3.14.0))(@yarnpkg/plugin-pack@4.0.4(@yarnpkg/cli@4.12.0(@types/react@19.2.14)(@yarnpkg/core@4.5.0(typanion@3.14.0)))(@yarnpkg/core@4.5.0(typanion@3.14.0))(typanion@3.14.0))
       '@yarnpkg/plugin-pnp':
-        specifier: ^4.1.3
+        specifier: 'catalog:'
         version: 4.1.3(@yarnpkg/cli@4.12.0(@types/react@19.2.14)(@yarnpkg/core@4.5.0(typanion@3.14.0)))(@yarnpkg/core@4.5.0(typanion@3.14.0))(typanion@3.14.0)
     devDependencies:
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       esbuild:
-        specifier: ^0.27.4
+        specifier: 'catalog:'
         version: 0.27.4
       execa:
-        specifier: ^9.6.1
+        specifier: 'catalog:'
         version: 9.6.1
       ora:
-        specifier: ^9.3.0
+        specifier: 'catalog:'
         version: 9.3.0
       postject:
-        specifier: 1.0.0-alpha.6
+        specifier: 'catalog:'
         version: 1.0.0-alpha.6
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       tsx:
-        specifier: ^4.21.0
+        specifier: 'catalog:'
         version: 4.21.0
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/streams:
     devDependencies:
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@typespec/compiler':
         specifier: workspace:^
@@ -2297,166 +2870,166 @@ importers:
         specifier: workspace:^
         version: link:../tspd
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/tmlanguage-generator:
     dependencies:
       onigasm:
-        specifier: ~2.2.5
+        specifier: 'catalog:'
         version: 2.2.5
       plist:
-        specifier: ~3.1.0
+        specifier: 'catalog:'
         version: 3.1.0
     devDependencies:
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@types/plist':
-        specifier: ~3.0.5
+        specifier: 'catalog:'
         version: 3.0.5
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
 
   core/packages/tsp-integration:
     dependencies:
       '@pnpm/workspace.find-packages':
-        specifier: ^1000.0.64
+        specifier: 'catalog:'
         version: 1000.0.64(@pnpm/logger@1001.0.1)(@pnpm/worker@1000.6.6(@pnpm/logger@1001.0.1)(@types/node@25.5.0))(typanion@3.14.0)
       execa:
-        specifier: ^9.6.1
+        specifier: 'catalog:'
         version: 9.6.1
       globby:
-        specifier: ~16.1.1
+        specifier: 'catalog:'
         version: 16.1.1
       log-symbols:
-        specifier: ^7.0.1
+        specifier: 'catalog:'
         version: 7.0.1
       ora:
-        specifier: ^9.3.0
+        specifier: 'catalog:'
         version: 9.3.0
       pathe:
-        specifier: ^2.0.3
+        specifier: 'catalog:'
         version: 2.0.3
       picocolors:
-        specifier: ~1.1.1
+        specifier: 'catalog:'
         version: 1.1.1
       simple-git:
-        specifier: ^3.33.0
+        specifier: 'catalog:'
         version: 3.33.0
       tar:
-        specifier: ^7.5.11
+        specifier: 'catalog:'
         version: 7.5.11
       yaml:
-        specifier: ~2.8.2
+        specifier: 'catalog:'
         version: 2.8.2
     devDependencies:
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/tspd:
     dependencies:
       '@alloy-js/core':
-        specifier: ^0.22.0
+        specifier: 'catalog:'
         version: 0.22.0
       '@alloy-js/markdown':
-        specifier: ^0.22.0
+        specifier: 'catalog:'
         version: 0.22.0
       '@alloy-js/typescript':
-        specifier: ^0.22.0
+        specifier: 'catalog:'
         version: 0.22.0
       '@microsoft/api-extractor':
-        specifier: ^7.57.7
+        specifier: 'catalog:'
         version: 7.57.7(@types/node@25.5.0)
       '@microsoft/api-extractor-model':
-        specifier: ^7.33.4
+        specifier: 'catalog:'
         version: 7.33.4(@types/node@25.5.0)
       '@microsoft/tsdoc':
-        specifier: ^0.16.0
+        specifier: 'catalog:'
         version: 0.16.0
       '@microsoft/tsdoc-config':
-        specifier: ^0.18.1
+        specifier: 'catalog:'
         version: 0.18.1
       '@typespec/compiler':
         specifier: workspace:^
         version: link:../compiler
       picocolors:
-        specifier: ~1.1.1
+        specifier: 'catalog:'
         version: 1.1.1
       prettier:
-        specifier: ~3.8.1
+        specifier: 'catalog:'
         version: 3.8.1
       typedoc:
-        specifier: ^0.28.17
+        specifier: 'catalog:'
         version: 0.28.17(typescript@5.9.3)
       typedoc-plugin-markdown:
-        specifier: ^4.10.0
+        specifier: 'catalog:'
         version: 4.10.0(typedoc@0.28.17(typescript@5.9.3))
       yaml:
-        specifier: ~2.8.2
+        specifier: 'catalog:'
         version: 2.8.2
       yargs:
-        specifier: ~18.0.0
+        specifier: 'catalog:'
         version: 18.0.0
     devDependencies:
       '@alloy-js/cli':
-        specifier: ^0.22.0
+        specifier: 'catalog:'
         version: 0.22.0
       '@alloy-js/rollup-plugin':
-        specifier: ^0.1.0
+        specifier: 'catalog:'
         version: 0.1.0(@babel/core@7.29.0)(@types/babel__core@7.20.5)(rollup@4.49.0)
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@types/yargs':
-        specifier: ~17.0.35
+        specifier: 'catalog:'
         version: 17.0.35
       '@typespec/prettier-plugin-typespec':
         specifier: workspace:^
         version: link:../prettier-plugin-typespec
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       source-map-support:
-        specifier: ~0.5.21
+        specifier: 'catalog:'
         version: 0.5.21
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/typespec-vs:
@@ -2471,22 +3044,22 @@ importers:
   core/packages/typespec-vscode:
     devDependencies:
       '@types/cross-spawn':
-        specifier: ~6.0.6
+        specifier: 'catalog:'
         version: 6.0.6
       '@types/mocha':
-        specifier: ^10.0.10
+        specifier: 'catalog:'
         version: 10.0.10
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@types/semver':
-        specifier: ^7.7.1
+        specifier: 'catalog:'
         version: 7.7.1
       '@types/vscode':
         specifier: ~1.110.0
         version: 1.110.0
       '@types/which':
-        specifier: ^3.0.4
+        specifier: 'catalog:'
         version: 3.0.4
       '@typespec/compiler':
         specifier: workspace:^
@@ -2495,70 +3068,70 @@ importers:
         specifier: workspace:^
         version: link:../internal-build-utils
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vscode/extension-telemetry':
-        specifier: ^1.5.1
+        specifier: 'catalog:'
         version: 1.5.1(tslib@2.8.1)
       '@vscode/test-electron':
-        specifier: ^2.5.2
+        specifier: 'catalog:'
         version: 2.5.2
       '@vscode/test-web':
-        specifier: ^0.0.80
+        specifier: 'catalog:'
         version: 0.0.80
       '@vscode/vsce':
-        specifier: ~3.7.1
+        specifier: 'catalog:'
         version: 3.7.1
       ajv:
-        specifier: ~8.18.0
+        specifier: 'catalog:'
         version: 8.18.0
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       cross-spawn:
-        specifier: ^7.0.6
+        specifier: 'catalog:'
         version: 7.0.6
       esbuild:
-        specifier: ^0.27.4
+        specifier: 'catalog:'
         version: 0.27.4
       mocha:
-        specifier: ^11.7.5
+        specifier: 'catalog:'
         version: 11.7.5
       playwright:
-        specifier: ^1.58.2
+        specifier: 'catalog:'
         version: 1.58.2
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       semver:
-        specifier: ^7.7.4
+        specifier: 'catalog:'
         version: 7.7.4
       swagger-ui-dist:
-        specifier: ^5.32.0
+        specifier: 'catalog:'
         version: 5.32.0
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
       vscode-languageclient:
-        specifier: ~9.0.1
+        specifier: 'catalog:'
         version: 9.0.1
       which:
-        specifier: ^6.0.1
+        specifier: 'catalog:'
         version: 6.0.1
       yaml:
-        specifier: ~2.8.2
+        specifier: 'catalog:'
         version: 2.8.2
 
   core/packages/versioning:
     devDependencies:
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@typespec/compiler':
         specifier: workspace:^
@@ -2570,28 +3143,28 @@ importers:
         specifier: workspace:^
         version: link:../tspd
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   core/packages/xml:
     devDependencies:
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@typespec/compiler':
         specifier: workspace:^
@@ -2603,22 +3176,22 @@ importers:
         specifier: workspace:^
         version: link:../tspd
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   eng/feeds:
@@ -2627,7 +3200,7 @@ importers:
         specifier: workspace:^
         version: link:../../core/packages/compiler
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/azure-http-specs:
@@ -2667,10 +3240,10 @@ importers:
         specifier: workspace:^
         version: link:../typespec-client-generator-core
       '@types/multer':
-        specifier: ^2.1.0
+        specifier: 'catalog:'
         version: 2.1.0
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@typespec/openapi':
         specifier: workspace:^
@@ -2679,13 +3252,13 @@ importers:
         specifier: workspace:^
         version: link:../../core/packages/openapi3
       concurrently:
-        specifier: ^9.2.1
+        specifier: 'catalog:'
         version: 9.2.1
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
 
   packages/e2e-tests:
@@ -2694,10 +3267,10 @@ importers:
         specifier: workspace:^
         version: link:../../core/packages/compiler
       dotenv:
-        specifier: ^17.2.3
+        specifier: 'catalog:'
         version: 17.3.1
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
 
   packages/samples:
@@ -2740,7 +3313,7 @@ importers:
         version: link:../../core/packages/xml
     devDependencies:
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@typespec/internal-build-utils':
         specifier: workspace:^
@@ -2749,25 +3322,25 @@ importers:
         specifier: workspace:^
         version: link:../../core/packages/samples
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       autorest:
-        specifier: ~3.7.1
+        specifier: 'catalog:'
         version: 3.7.2
       cross-env:
-        specifier: ~10.1.0
+        specifier: 'catalog:'
         version: 10.1.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/typespec-autorest:
@@ -2786,7 +3359,7 @@ importers:
         specifier: workspace:^
         version: link:../typespec-client-generator-core
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@typespec/compiler':
         specifier: workspace:^
@@ -2813,22 +3386,22 @@ importers:
         specifier: workspace:^
         version: link:../../core/packages/versioning
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/typespec-autorest-canonical:
@@ -2846,7 +3419,7 @@ importers:
         specifier: workspace:^
         version: link:../typespec-client-generator-core
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@typespec/compiler':
         specifier: workspace:^
@@ -2870,28 +3443,28 @@ importers:
         specifier: workspace:^
         version: link:../../core/packages/versioning
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/typespec-azure-core:
     devDependencies:
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@typespec/compiler':
         specifier: workspace:^
@@ -2915,22 +3488,22 @@ importers:
         specifier: workspace:^
         version: link:../../core/packages/versioning
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/typespec-azure-playground-website:
@@ -2951,13 +3524,13 @@ importers:
         specifier: workspace:^
         version: link:../typespec-client-generator-core
       '@emotion/react':
-        specifier: ^11.14.0
+        specifier: 'catalog:'
         version: 11.14.0(@types/react@19.2.14)(react@19.2.4)
       '@fluentui/react-components':
-        specifier: ~9.73.3
+        specifier: 'catalog:'
         version: 9.73.3(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(scheduler@0.27.0)
       '@fluentui/react-icons':
-        specifier: ^2.0.321
+        specifier: 'catalog:'
         version: 2.0.321(react@19.2.4)
       '@typespec/compiler':
         specifier: workspace:^
@@ -2996,32 +3569,32 @@ importers:
         specifier: workspace:^
         version: link:../../core/packages/xml
       '@vitejs/plugin-react':
-        specifier: ~6.0.1
+        specifier: 'catalog:'
         version: 6.0.1(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
       es-module-shims:
-        specifier: ~2.8.0
+        specifier: 'catalog:'
         version: 2.8.0
       react:
-        specifier: ~19.2.4
+        specifier: 'catalog:'
         version: 19.2.4
       react-dom:
-        specifier: ~19.2.4
+        specifier: 'catalog:'
         version: 19.2.4(react@19.2.4)
       vite:
-        specifier: ^8.0.1
+        specifier: 'catalog:'
         version: 8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2)
     devDependencies:
       '@playwright/test':
-        specifier: ^1.58.2
+        specifier: 'catalog:'
         version: 1.58.2
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@types/react':
-        specifier: ~19.2.14
+        specifier: 'catalog:'
         version: 19.2.14
       '@types/react-dom':
-        specifier: ~19.2.3
+        specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.14)
       '@typespec/bundler':
         specifier: workspace:^
@@ -3030,22 +3603,22 @@ importers:
         specifier: workspace:^
         version: link:../../core/packages/playground
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       cross-env:
-        specifier: ~10.1.0
+        specifier: 'catalog:'
         version: 10.1.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/typespec-azure-portal-core:
@@ -3063,7 +3636,7 @@ importers:
         specifier: workspace:^
         version: link:../typespec-client-generator-core
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@typespec/compiler':
         specifier: workspace:^
@@ -3087,41 +3660,41 @@ importers:
         specifier: workspace:^
         version: link:../../core/packages/versioning
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       source-map-support:
-        specifier: ~0.5.21
+        specifier: 'catalog:'
         version: 0.5.21
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/typespec-azure-resource-manager:
     dependencies:
       change-case:
-        specifier: ~5.4.4
+        specifier: 'catalog:'
         version: 5.4.4
       pluralize:
-        specifier: ^8.0.0
+        specifier: 'catalog:'
         version: 8.0.0
     devDependencies:
       '@azure-tools/typespec-azure-core':
         specifier: workspace:^
         version: link:../typespec-azure-core
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@types/pluralize':
-        specifier: ^0.0.33
+        specifier: 'catalog:'
         version: 0.0.33
       '@typespec/compiler':
         specifier: workspace:^
@@ -3145,22 +3718,22 @@ importers:
         specifier: workspace:^
         version: link:../../core/packages/versioning
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/typespec-azure-rulesets:
@@ -3175,7 +3748,7 @@ importers:
         specifier: workspace:^
         version: link:../typespec-client-generator-core
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@typespec/compiler':
         specifier: workspace:^
@@ -3184,25 +3757,25 @@ importers:
         specifier: workspace:^
         version: link:../../core/packages/tspd
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       change-case:
-        specifier: ~5.4.4
+        specifier: 'catalog:'
         version: 5.4.4
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/typespec-client-generator-core:
@@ -3211,13 +3784,13 @@ importers:
         specifier: workspace:^
         version: link:../../core/packages/versioning
       change-case:
-        specifier: ~5.4.4
+        specifier: 'catalog:'
         version: 5.4.4
       pluralize:
-        specifier: ^8.0.0
+        specifier: 'catalog:'
         version: 8.0.0
       yaml:
-        specifier: ~2.8.2
+        specifier: 'catalog:'
         version: 2.8.2
     devDependencies:
       '@azure-tools/typespec-azure-core':
@@ -3227,10 +3800,10 @@ importers:
         specifier: workspace:^
         version: link:../typespec-azure-resource-manager
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@types/pluralize':
-        specifier: ^0.0.33
+        specifier: 'catalog:'
         version: 0.0.33
       '@typespec/compiler':
         specifier: workspace:^
@@ -3266,95 +3839,95 @@ importers:
         specifier: workspace:^
         version: link:../../core/packages/xml
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/typespec-metadata:
     dependencies:
       yaml:
-        specifier: ~2.8.2
+        specifier: 'catalog:'
         version: 2.8.2
     devDependencies:
       '@types/node':
-        specifier: ~25.5.0
+        specifier: 'catalog:'
         version: 25.5.0
       '@typespec/compiler':
         specifier: workspace:^
         version: link:../../core/packages/compiler
       '@vitest/coverage-v8':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       '@vitest/ui':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(vitest@4.1.0)
       c8:
-        specifier: ^11.0.0
+        specifier: 'catalog:'
         version: 11.0.0
       rimraf:
-        specifier: ~6.1.3
+        specifier: 'catalog:'
         version: 6.1.3
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(jsdom@25.0.1)(vite@8.0.1(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0)(yaml@2.8.2))
 
   website:
     dependencies:
       '@astrojs/check':
-        specifier: ^0.9.7
+        specifier: 'catalog:'
         version: 0.9.7(prettier-plugin-astro@0.14.1)(prettier@3.8.1)(typescript@5.9.3)
       '@astrojs/react':
-        specifier: ^5.0.0
+        specifier: 'catalog:'
         version: 5.0.0(@types/node@25.5.0)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(lightningcss@1.32.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(yaml@2.8.2)
       '@astrojs/starlight':
-        specifier: ^0.38.1
+        specifier: 'catalog:'
         version: 0.38.1(astro@6.0.4(@azure/identity@4.13.0)(@azure/storage-blob@12.31.0)(@types/node@25.5.0)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
       '@docsearch/css':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.6.0
       '@docsearch/js':
-        specifier: ^4.1.0
+        specifier: 'catalog:'
         version: 4.6.0
       '@fluentui/react-components':
-        specifier: ~9.73.3
+        specifier: 'catalog:'
         version: 9.73.3(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(scheduler@0.27.0)
       '@typespec/playground':
         specifier: workspace:^
         version: link:../core/packages/playground
       astro:
-        specifier: ^6.0.4
+        specifier: 'catalog:'
         version: 6.0.4(@azure/identity@4.13.0)(@azure/storage-blob@12.31.0)(@types/node@25.5.0)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
       es-module-shims:
-        specifier: ~2.8.0
+        specifier: 'catalog:'
         version: 2.8.0
       react:
-        specifier: ~19.2.4
+        specifier: 'catalog:'
         version: 19.2.4
       react-dom:
-        specifier: ~19.2.4
+        specifier: 'catalog:'
         version: 19.2.4(react@19.2.4)
       sharp:
-        specifier: ^0.34.1
+        specifier: 'catalog:'
         version: 0.34.5
       typescript:
-        specifier: ~5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
     devDependencies:
       '@azure-tools/typespec-autorest':
@@ -3382,16 +3955,16 @@ importers:
         specifier: workspace:^
         version: link:../packages/typespec-client-generator-core
       '@types/hast':
-        specifier: ^3.0.4
+        specifier: 'catalog:'
         version: 3.0.4
       '@types/react':
-        specifier: ~19.2.14
+        specifier: 'catalog:'
         version: 19.2.14
       '@types/react-dom':
-        specifier: ~19.2.3
+        specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.14)
       '@types/remark-heading-id':
-        specifier: ^1.0.0
+        specifier: 'catalog:'
         version: 1.0.0
       '@typespec/astro-utils':
         specifier: workspace:^
@@ -3403,25 +3976,25 @@ importers:
         specifier: workspace:^
         version: link:../core/packages/spec-dashboard
       astro-expressive-code:
-        specifier: ^0.41.7
+        specifier: 'catalog:'
         version: 0.41.7(astro@6.0.4(@azure/identity@4.13.0)(@azure/storage-blob@12.31.0)(@types/node@25.5.0)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
       astro-rehype-relative-markdown-links:
-        specifier: ^0.18.1
+        specifier: 'catalog:'
         version: 0.18.1(astro@6.0.4(@azure/identity@4.13.0)(@azure/storage-blob@12.31.0)(@types/node@25.5.0)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
       hast-util-to-html:
-        specifier: ^9.0.5
+        specifier: 'catalog:'
         version: 9.0.5
       rehype:
-        specifier: ^13.0.2
+        specifier: 'catalog:'
         version: 13.0.2
       remark-heading-id:
-        specifier: ^1.0.1
+        specifier: 'catalog:'
         version: 1.0.1
       unist-util-visit:
-        specifier: ^5.0.0
+        specifier: 'catalog:'
         version: 5.1.0
       yaml:
-        specifier: ~2.8.2
+        specifier: 'catalog:'
         version: 2.8.2
 
 packages:
@@ -8351,10 +8924,6 @@ packages:
     resolution: {integrity: sha512-Vw8qHK3bZM9y/P10u3Vib8o/DdkvA2OtPtZvD871QKjy74Wj1WSKFILMPRPSdUSx5RFK1arlJzEtA4PkFgnbuA==}
     engines: {node: '>=18'}
 
-  commander@13.1.0:
-    resolution: {integrity: sha512-/rFeCpNJQbhSZjGVwO9RFV3xPqbnERS8MmIQzCtD/zl6gpJuV/bMLuN92oG3F7d8oDEHHRrujSXNUr8fpjntKw==}
-    engines: {node: '>=18'}
-
   commander@14.0.3:
     resolution: {integrity: sha512-H+y0Jo/T1RZ9qPP4Eh1pkcQcLRglraJaSLoyOtHxu6AapkjWVCy2Sit1QQ4x3Dng8qDlSsZEet7g5Pq06MvTgw==}
     engines: {node: '>=20'}
@@ -8454,15 +9023,6 @@ packages:
   cosmiconfig@7.1.0:
     resolution: {integrity: sha512-AdmX6xUzdNASswsFtmwSt7Vj8po9IuqXm0UXz7QKPuEUmPB4XyjGfaAr2PSuELMwkRMVH1EpIkX5bTZGRB3eCA==}
     engines: {node: '>=10'}
-
-  cosmiconfig@9.0.1:
-    resolution: {integrity: sha512-hr4ihw+DBqcvrsEDioRO31Z17x71pUYoNe/4h6Z0wB72p7MU7/9gH8Q3s12NFhHPfYBBOV3qyfUxmr/Yn3shnQ==}
-    engines: {node: '>=14'}
-    peerDependencies:
-      typescript: '>=4.9.5'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
 
   create-ecdh@4.0.4:
     resolution: {integrity: sha512-mf+TCx8wWc9VpuxfP2ht0iSISLZnt0JgWlrOKZiNqyUZWnjIaCIVNQArMHnCZKfEYRg6IM7A+NeJoN8gf/Ws0A==}
@@ -8853,9 +9413,6 @@ packages:
   ee-first@1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
 
-  effect@3.19.19:
-    resolution: {integrity: sha512-Yc8U/SVXo2dHnaP7zNBlAo83h/nzSJpi7vph6Hzyl4ulgMBIgPmz3UzOjb9sBgpFE00gC0iETR244sfXDNLHRg==}
-
   electron-to-chromium@1.5.313:
     resolution: {integrity: sha512-QBMrTWEf00GXZmJyx2lbYD45jpI3TUFnNIzJ5BBc8piGUDwMPa1GV6HJWTZVvY/eiN3fSopl7NRbgGp9sZ9LTA==}
 
@@ -9202,10 +9759,6 @@ packages:
 
   extend@3.0.2:
     resolution: {integrity: sha512-fjquC59cD7CyW6urNXK0FBufkZcoiGG80wTuPujX590cB5Ttln20E2UB4S/WARVqhXffZl2LNgS+gQdPIIim/g==}
-
-  fast-check@3.23.2:
-    resolution: {integrity: sha512-h5+1OzzfCC3Ef7VbtKdcv7zsstUQwUDlYpUTvjeUsJAssPgLn7QzbboPtL5ro04Mq0rPOsMzl7q5hIbRs2wD1A==}
-    engines: {node: '>=8.0.0'}
 
   fast-content-type-parse@3.0.0:
     resolution: {integrity: sha512-ZvLdcY8P+N8mGQJahJV5G4U88CSvT1rP8ApL6uETe88MBXrBHAkZlSEySdUlyztF7ccb+Znos3TFqaepHxdhBg==}
@@ -10929,10 +11482,6 @@ packages:
     resolution: {integrity: sha512-7o1wEA2RyMP7Iu7GNba9vc0RWWGACJOCZBJX2GJWip0ikV+wcOsgVuY9uE8CPiyQhkGFSlhuSkZPavN7u1c2Fw==}
     engines: {node: '>=10'}
 
-  minimatch@9.0.5:
-    resolution: {integrity: sha512-G6T0ZX48xgozx7587koeX9Ys2NYy6Gmv//P89sEte9V9whIapMNF4idKxnW2QtCcLiTWlb/wfCabAtAFWhhBow==}
-    engines: {node: '>=16 || 14 >=14.17'}
-
   minimatch@9.0.9:
     resolution: {integrity: sha512-OBwBN9AL4dqmETlpS2zasx+vTeWclWzkblfZk7KTA5j3jeOONz/tRCnZomUyvNg83wL5Zv9Ss6HMJXAgL8R2Yg==}
     engines: {node: '>=16 || 14 >=14.17'}
@@ -11181,10 +11730,6 @@ packages:
   npm-normalize-package-bin@5.0.0:
     resolution: {integrity: sha512-CJi3OS4JLsNMmr2u07OJlhcrPxCeOeP/4xq67aWNai6TNWWbTrlNDgl8NcFKVlcBKp18GPj+EzbNIgrBfZhsag==}
     engines: {node: ^20.17.0 || >=22.9.0}
-
-  npm-package-arg@12.0.2:
-    resolution: {integrity: sha512-f1NpFjNI9O4VbKMOlA5QoBq/vSQPORHcTZ2feJpFkTHJ9eQkdlmZEKSjcAhxTGInC7RlEyScT9ui67NaOsjFWA==}
-    engines: {node: ^18.17.0 || >=20.5.0}
 
   npm-package-arg@13.0.2:
     resolution: {integrity: sha512-IciCE3SY3uE84Ld8WZU23gAPPV9rIYod4F+rc+vJ7h7cwAJt9Vk6TVsK60ry7Uj3SRS3bqRRIGuTp9YVlk6WNA==}
@@ -11806,9 +12351,6 @@ packages:
   punycode@2.3.1:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
-
-  pure-rand@6.1.0:
-    resolution: {integrity: sha512-bVWawvoZoBYpp6yIoQtQXHZjmz35RSVHnUOTefl8Vcjr8snTPY1wnpSPMWekcFwbxI6gtmT7rSYPFvz71ldiOA==}
 
   qs@6.15.0:
     resolution: {integrity: sha512-mAZTtNCeetKMH+pSjrb76NAM8V9a05I9aBZOHztWy/UqcJdQYNsf59vrRKWnojAT9Y+GbIvoTBC++CPHqpDBhQ==}
@@ -12750,11 +13292,6 @@ packages:
     engines: {node: '>=18.12'}
     hasBin: true
 
-  syncpack@13.0.4:
-    resolution: {integrity: sha512-kJ9VlRxNCsBD5pJAE29oXeBYbPLhEySQmK4HdpsLv81I6fcDDW17xeJqMwiU3H7/woAVsbgq25DJNS8BeiN5+w==}
-    engines: {node: '>=18.18.0'}
-    hasBin: true
-
   table-layout@1.0.2:
     resolution: {integrity: sha512-qd/R7n5rQTRFi+Zf2sk5XVVd9UQl6ZkduPFC3S7WEGJAmetDTjY3qPN50eSKzwuzEyQKy5TN2TiZdkIjos2L6A==}
     engines: {node: '>=8.0.0'}
@@ -12832,10 +13369,6 @@ packages:
 
   through2@2.0.5:
     resolution: {integrity: sha512-/mrRod8xqpA+IHSLyGCQ2s8SPHiCDEeQJSep1jqLYeEUClOFG2Qsh+4FU6G9VeqpZnGW/Su8LQGc4YKni5rYSQ==}
-
-  tightrope@0.2.0:
-    resolution: {integrity: sha512-Kw36UHxJEELq2VUqdaSGR2/8cAsPgMtvX8uGVU6Jk26O66PhXec0A5ZnRYs47btbtwPDpXXF66+Fo3vimCM9aQ==}
-    engines: {node: '>=16'}
 
   timers-browserify@2.0.12:
     resolution: {integrity: sha512-9phl76Cqm6FhSX9Xe1ZUAMLtm1BLkKj2Qd5ApyWkXzsMRaA7dgr81kf4wJmQf/hAvg8EEyJxDo3du/0KlhPiKQ==}
@@ -12997,9 +13530,6 @@ packages:
   ts-dedent@2.2.0:
     resolution: {integrity: sha512-q5W7tVM71e2xjHZTlgfTDoPF/SmqKG5hddq9SzR49CH2hayqRKJtQ4mtRlSxKaJlR/+9rEM+mnBHf7I2/BQcpQ==}
     engines: {node: '>=6.10'}
-
-  ts-toolbelt@9.6.0:
-    resolution: {integrity: sha512-nsZd8ZeNUzukXPlJmTBwUAuABDe/9qtVDelJeT/qW0ow3ZS3BsQJtNkan1802aM9Uf68/Y8ljw86Hu0h5IUW3w==}
 
   tsconfck@3.1.6:
     resolution: {integrity: sha512-ks6Vjr/jEw0P1gmOVwutM3B7fWxoWBL2KRDb1JfqGVawBmO5UsvmWOQFGHBPl5yxYz4eERr19E6L7NMv+Fej4w==}
@@ -13407,10 +13937,6 @@ packages:
   validate-npm-package-name@5.0.0:
     resolution: {integrity: sha512-YuKoXDAhBYxY7SfOKxHBDoSyENFeW5VvIIQp2TGQuit8gpK6MnWaQelBKxso72DoxTZfZdcP3W90LqpSkgPzLQ==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
-
-  validate-npm-package-name@6.0.2:
-    resolution: {integrity: sha512-IUoow1YUtvoBBC06dXs8bR8B9vuA3aJfmQNKMoaPG/OFsPmoQvw8xh+6Ye25Gx9DQhoEom3Pcu9MKHerm/NpUQ==}
-    engines: {node: ^18.17.0 || >=20.5.0}
 
   validate-npm-package-name@7.0.2:
     resolution: {integrity: sha512-hVDIBwsRruT73PbK7uP5ebUt+ezEtCmzZz3F59BSr2F6OVFnJ/6h8liuvdLrQ88Xmnk6/+xGGuq+pG9WwTuy3A==}
@@ -20933,8 +21459,6 @@ snapshots:
 
   commander@12.1.0: {}
 
-  commander@13.1.0: {}
-
   commander@14.0.3: {}
 
   commander@7.2.0: {}
@@ -21019,15 +21543,6 @@ snapshots:
       parse-json: 5.2.0
       path-type: 4.0.0
       yaml: 1.10.2
-
-  cosmiconfig@9.0.1(typescript@5.9.3):
-    dependencies:
-      env-paths: 2.2.1
-      import-fresh: 3.3.1
-      js-yaml: 4.1.1
-      parse-json: 5.2.0
-    optionalDependencies:
-      typescript: 5.9.3
 
   create-ecdh@4.0.4:
     dependencies:
@@ -21502,11 +22017,6 @@ snapshots:
       version-range: 4.15.0
 
   ee-first@1.1.1: {}
-
-  effect@3.19.19:
-    dependencies:
-      '@standard-schema/spec': 1.1.0
-      fast-check: 3.23.2
 
   electron-to-chromium@1.5.313: {}
 
@@ -22036,10 +22546,6 @@ snapshots:
       is-extendable: 0.1.1
 
   extend@3.0.2: {}
-
-  fast-check@3.23.2:
-    dependencies:
-      pure-rand: 6.1.0
 
   fast-content-type-parse@3.0.0: {}
 
@@ -23713,7 +24219,7 @@ snapshots:
 
   md5.js@1.3.5:
     dependencies:
-      hash-base: 3.0.5
+      hash-base: 3.1.2
       inherits: 2.0.4
       safe-buffer: 5.2.1
 
@@ -24256,10 +24762,6 @@ snapshots:
     dependencies:
       brace-expansion: 2.0.2
 
-  minimatch@9.0.5:
-    dependencies:
-      brace-expansion: 2.0.2
-
   minimatch@9.0.9:
     dependencies:
       brace-expansion: 2.0.2
@@ -24553,13 +25055,6 @@ snapshots:
   npm-normalize-package-bin@3.0.1: {}
 
   npm-normalize-package-bin@5.0.0: {}
-
-  npm-package-arg@12.0.2:
-    dependencies:
-      hosted-git-info: 8.1.0
-      proc-log: 5.0.0
-      semver: 7.7.4
-      validate-npm-package-name: 6.0.2
 
   npm-package-arg@13.0.2:
     dependencies:
@@ -25244,8 +25739,6 @@ snapshots:
   punycode@1.4.1: {}
 
   punycode@2.3.1: {}
-
-  pure-rand@6.1.0: {}
 
   qs@6.15.0:
     dependencies:
@@ -26473,28 +26966,6 @@ snapshots:
       better-path-resolve: 1.0.0
       rename-overwrite: 6.0.6
 
-  syncpack@13.0.4(typescript@5.9.3):
-    dependencies:
-      chalk: 5.6.2
-      chalk-template: 1.1.2
-      commander: 13.1.0
-      cosmiconfig: 9.0.1(typescript@5.9.3)
-      effect: 3.19.19
-      enquirer: 2.4.1
-      fast-check: 3.23.2
-      globby: 14.1.0
-      jsonc-parser: 3.3.1
-      minimatch: 9.0.5
-      npm-package-arg: 12.0.2
-      ora: 8.2.0
-      prompts: 2.4.2
-      read-yaml-file: 2.1.0
-      semver: 7.7.4
-      tightrope: 0.2.0
-      ts-toolbelt: 9.6.0
-    transitivePeerDependencies:
-      - typescript
-
   table-layout@1.0.2:
     dependencies:
       array-back: 4.0.2
@@ -26633,8 +27104,6 @@ snapshots:
       readable-stream: 2.3.8
       xtend: 4.0.2
 
-  tightrope@0.2.0: {}
-
   timers-browserify@2.0.12:
     dependencies:
       setimmediate: 1.0.5
@@ -26751,8 +27220,6 @@ snapshots:
       typescript: 5.9.3
 
   ts-dedent@2.2.0: {}
-
-  ts-toolbelt@9.6.0: {}
 
   tsconfck@3.1.6(typescript@5.9.3):
     optionalDependencies:
@@ -27130,8 +27597,6 @@ snapshots:
   validate-npm-package-name@5.0.0:
     dependencies:
       builtins: 5.1.0
-
-  validate-npm-package-name@6.0.2: {}
 
   validate-npm-package-name@7.0.2: {}
 
