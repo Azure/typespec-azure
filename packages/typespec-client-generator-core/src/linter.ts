@@ -1,26 +1,20 @@
 import { defineLinter } from "@typespec/compiler";
+import { noReservedWordsRule } from "./rules/no-reserved-words.rule.js";
 import { noUnnamedTypesRule } from "./rules/no-unnamed-types.rule.js";
 import { propertyNameConflictRule } from "./rules/property-name-conflict.rule.js";
 import { requireClientSuffixRule } from "./rules/require-client-suffix.rule.js";
-import { csharpReservedWordsRule } from "./rules/reserved-words/csharp.rule.js";
-import { javaReservedWordsRule } from "./rules/reserved-words/java.rule.js";
-import { javascriptReservedWordsRule } from "./rules/reserved-words/javascript.rule.js";
-import { pythonReservedWordsRule } from "./rules/reserved-words/python.rule.js";
 
 const rules = [
   requireClientSuffixRule,
   propertyNameConflictRule,
   noUnnamedTypesRule,
-  csharpReservedWordsRule,
-  pythonReservedWordsRule,
-  javaReservedWordsRule,
-  javascriptReservedWordsRule,
+  noReservedWordsRule,
 ];
 
-const csharpRules = [propertyNameConflictRule, csharpReservedWordsRule];
-const pythonRules = [pythonReservedWordsRule];
-const javaRules = [javaReservedWordsRule];
-const javascriptRules = [javascriptReservedWordsRule];
+const csharpRules = [propertyNameConflictRule, noReservedWordsRule];
+const pythonRules = [noReservedWordsRule];
+const javaRules = [noReservedWordsRule];
+const javascriptRules = [noReservedWordsRule];
 
 function createRuleSet(langRules: typeof rules) {
   return {
