@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import { cpSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "fs";
 import path, { dirname, join, resolve } from "path";
 import { fileURLToPath } from "url";
-import { repoRoot, coreRepoRoot, run } from "../../eng/scripts/helpers.js";
+import { coreRepoRoot, repoRoot, run } from "../../eng/scripts/helpers.js";
 
 const e2eTestDir = join(repoRoot, "packages/e2e-tests");
 const npmCmd = process.platform === "win32" ? "npm.cmd" : "npm";
@@ -128,13 +128,7 @@ function testAzureHttpSpecs(packages) {
   console.log("Installed dependencies");
 
   const coreSpecsFolder = join(wsDir, "node_modules", "@typespec", "http-specs", "specs");
-  const azureSpecsFolder = join(
-    wsDir,
-    "node_modules",
-    "@azure-tools",
-    "azure-http-specs",
-    "specs",
-  );
+  const azureSpecsFolder = join(wsDir, "node_modules", "@azure-tools", "azure-http-specs", "specs");
   const wsSpecsFolder = join(wsDir, "specs");
   cpSync(coreSpecsFolder, wsSpecsFolder, { recursive: true });
   cpSync(azureSpecsFolder, wsSpecsFolder, { recursive: true });
