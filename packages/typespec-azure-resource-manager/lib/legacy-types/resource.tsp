@@ -36,7 +36,7 @@ model TrackedResourceWithOptionalLocation<
 
   /** The geo-location where the resource lives */
   @visibility(Lifecycle.Read, Lifecycle.Create)
-  location?: string;
+  location?: Azure.Core.azureLocation;
 }
 
 /**

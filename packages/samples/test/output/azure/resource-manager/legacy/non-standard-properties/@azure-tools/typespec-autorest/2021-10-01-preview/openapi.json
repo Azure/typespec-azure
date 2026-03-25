@@ -370,6 +370,10 @@
     }
   },
   "definitions": {
+    "Azure.Core.azureLocation": {
+      "type": "string",
+      "description": "Represents an Azure geography region where supported resource providers live."
+    },
     "Employee": {
       "type": "object",
       "description": "A ContosoProviderHub resource",
@@ -386,7 +390,7 @@
           }
         },
         "location": {
-          "type": "string",
+          "$ref": "#/definitions/Azure.Core.azureLocation",
           "description": "The geo-location where the resource lives",
           "x-ms-mutability": [
             "read",

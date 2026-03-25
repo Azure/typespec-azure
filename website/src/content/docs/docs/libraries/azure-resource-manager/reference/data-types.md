@@ -3934,11 +3934,11 @@ model Employee is TrackedResourceWithOptionalLocation<EmployeeProperties> {
 
 #### Properties
 
-| Name        | Type             | Description                               |
-| ----------- | ---------------- | ----------------------------------------- |
-| properties? | `Properties`     |                                           |
-| tags?       | `Record<string>` | Resource tags.                            |
-| location?   | `string`         | The geo-location where the resource lives |
+| Name        | Type                 | Description                               |
+| ----------- | -------------------- | ----------------------------------------- |
+| properties? | `Properties`         |                                           |
+| tags?       | `Record<string>`     | Resource tags.                            |
+| location?   | `Core.azureLocation` | The geo-location where the resource lives |
 
 ### `ManagedServiceIdentityType` {#Azure.ResourceManager.Legacy.ManagedServiceIdentityType}
 
