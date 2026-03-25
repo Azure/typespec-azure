@@ -1114,12 +1114,10 @@ describe("Arm LRO templates", () => {
     strictEqual(metadata.finalResponse.result.kind, "string");
     strictEqual(metadata.finalResponse.envelopeResult.kind, "string");
 
-    // finalEnvelopeResult should be SdkBuiltInType string
-    ok(metadata.finalEnvelopeResult);
+    // finalEnvelopeResult should be SdkBuiltInType string (not "void")
+    assert.exists(metadata.finalEnvelopeResult);
     assert.notStrictEqual(metadata.finalEnvelopeResult, "void");
-    if (metadata.finalEnvelopeResult !== "void") {
-      strictEqual(metadata.finalEnvelopeResult.kind, "string");
-    }
+    strictEqual((metadata.finalEnvelopeResult as { kind: string }).kind, "string");
 
     // The method response type should be the scalar string type
     const responseType = method.response.type;
