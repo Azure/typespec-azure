@@ -1,3 +1,5 @@
+import { t } from "@typespec/compiler/testing";
+import { getHttpOperation } from "@typespec/http";
 import { ok } from "assert";
 import { describe, expect, it } from "vitest";
 import { ArmOperationKind, ArmResourceOperation } from "../src/operations.js";
@@ -4153,5 +4155,190 @@ interface SupportTicketsNoSubscription {
     // Both list operations should be present
     expect(resource.operations.lists).toBeDefined();
     expect(resource.operations.lists).toHaveLength(2);
+  });
+  it("generates correct paths for subscription resource without provider using empty Provider", async () => {
+    const { get, createOrUpdate, update, del, list, program } = await Tester.compile(t.code`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.Resources;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+@subscriptionResource
+model ResourceGroup is TrackedResource<ResourceGroupProperties> {
+  @key("resourceGroupName")
+  @segment("resourceGroups")
+  @path
+  name: string;
+}
+
+model ResourceGroupProperties {
+  @visibility(Lifecycle.Read)
+  provisioningState?: ResourceProvisioningState;
+}
+
+@armResourceOperations
+interface ResourceGroups {
+  ${t.op("get")} is ArmResourceRead<
+    ResourceGroup,
+    Azure.ResourceManager.Foundations.SubscriptionBaseParameters,
+    {},
+    ArmResponse<ResourceGroup>,
+    ErrorResponse,
+    {}
+  >;
+  ${t.op("createOrUpdate")} is ArmResourceCreateOrReplaceAsync<
+    ResourceGroup,
+    Azure.ResourceManager.Foundations.SubscriptionBaseParameters,
+    ArmAsyncOperationHeader<FinalResult = ResourceGroup> &
+      Azure.Core.Foundations.RetryAfterHeader,
+    {},
+    ArmResourceUpdatedResponse<ResourceGroup> | ArmResourceCreatedResponse<
+      ResourceGroup,
+      ArmAsyncOperationHeader<FinalResult = ResourceGroup> &
+        Azure.Core.Foundations.RetryAfterHeader
+    >,
+    ErrorResponse,
+    {}
+  >;
+  ${t.op("update")} is ArmCustomPatchSync<
+    ResourceGroup,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<ResourceGroup, ResourceGroupProperties>,
+    Azure.ResourceManager.Foundations.SubscriptionBaseParameters,
+    {},
+    ArmResponse<ResourceGroup>,
+    ErrorResponse,
+    {}
+  >;
+  ${t.op("del")} is ArmResourceDeleteWithoutOkAsync<
+    ResourceGroup,
+    Azure.ResourceManager.Foundations.SubscriptionBaseParameters,
+    ArmLroLocationHeader<FinalResult = void> &
+      Azure.Core.Foundations.RetryAfterHeader,
+    {},
+    ArmDeleteAcceptedLroResponse<ArmLroLocationHeader<FinalResult = void> &
+      Azure.Core.Foundations.RetryAfterHeader> | ArmDeletedNoContentResponse,
+    ErrorResponse,
+    {}
+  >;
+  ${t.op("list")} is ArmResourceListByParent<
+    ResourceGroup,
+    Azure.ResourceManager.Foundations.SubscriptionBaseParameters,
+    "",
+    "",
+    {},
+    ArmResponse<ResourceListResult<ResourceGroup>>,
+    ErrorResponse,
+    {}
+  >;
+}
+    `);
+
+    expect(getHttpOperation(program, get)[0].path).toBe(
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}",
+    );
+    expect(getHttpOperation(program, createOrUpdate)[0].path).toBe(
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}",
+    );
+    expect(getHttpOperation(program, update)[0].path).toBe(
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}",
+    );
+    expect(getHttpOperation(program, del)[0].path).toBe(
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}",
+    );
+    expect(getHttpOperation(program, list)[0].path).toBe(
+      "/subscriptions/{subscriptionId}/resourceGroups",
+    );
+  });
+  it("resolveArmResources correctly identifies subscription resource without provider", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.Resources;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+@subscriptionResource
+model ResourceGroup is TrackedResource<ResourceGroupProperties> {
+  @key("resourceGroupName")
+  @segment("resourceGroups")
+  @path
+  name: string;
+}
+
+model ResourceGroupProperties {
+  @visibility(Lifecycle.Read)
+  provisioningState?: ResourceProvisioningState;
+}
+
+@armResourceOperations
+interface ResourceGroups {
+  get is ArmResourceRead<
+    ResourceGroup,
+    Azure.ResourceManager.Foundations.SubscriptionBaseParameters,
+    {},
+    ArmResponse<ResourceGroup>,
+    ErrorResponse,
+    {}
+  >;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<
+    ResourceGroup,
+    Azure.ResourceManager.Foundations.SubscriptionBaseParameters,
+    ArmAsyncOperationHeader<FinalResult = ResourceGroup> &
+      Azure.Core.Foundations.RetryAfterHeader,
+    {},
+    ArmResourceUpdatedResponse<ResourceGroup> | ArmResourceCreatedResponse<
+      ResourceGroup,
+      ArmAsyncOperationHeader<FinalResult = ResourceGroup> &
+        Azure.Core.Foundations.RetryAfterHeader
+    >,
+    ErrorResponse,
+    {}
+  >;
+  update is ArmCustomPatchSync<
+    ResourceGroup,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<ResourceGroup, ResourceGroupProperties>,
+    Azure.ResourceManager.Foundations.SubscriptionBaseParameters,
+    {},
+    ArmResponse<ResourceGroup>,
+    ErrorResponse,
+    {}
+  >;
+  delete is ArmResourceDeleteWithoutOkAsync<
+    ResourceGroup,
+    Azure.ResourceManager.Foundations.SubscriptionBaseParameters,
+    ArmLroLocationHeader<FinalResult = void> &
+      Azure.Core.Foundations.RetryAfterHeader,
+    {},
+    ArmDeleteAcceptedLroResponse<ArmLroLocationHeader<FinalResult = void> &
+      Azure.Core.Foundations.RetryAfterHeader> | ArmDeletedNoContentResponse,
+    ErrorResponse,
+    {}
+  >;
+  list is ArmResourceListByParent<
+    ResourceGroup,
+    Azure.ResourceManager.Foundations.SubscriptionBaseParameters,
+    "",
+    "",
+    {},
+    ArmResponse<ResourceListResult<ResourceGroup>>,
+    ErrorResponse,
+    {}
+  >;
+}
+    `);
+
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    expect(provider.resources.length).toBeGreaterThanOrEqual(1);
+    const resourceGroup = provider.resources.find((r) => r.resourceName === "ResourceGroup");
+    ok(resourceGroup);
+    expect(resourceGroup).toBeDefined();
+    expect(resourceGroup.resourceInstancePath).toEqual(
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}",
+    );
   });
 });
