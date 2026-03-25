@@ -123,17 +123,17 @@ it("Generates GetResourceOperationStatus paths correctly", async () => {
 
     @armResourceOperations
     interface SubscriptionOps {
-      ${t.op("subscriptionOp")} is GetResourceOperationStatus<ResourceOperationStatus, SubscriptionActionScope>;
+      ${t.op("subscriptionOp")} is GetResourceOperationStatus<ArmOperationStatus, SubscriptionActionScope>;
     }
 
     @armResourceOperations
     interface TenantLocationOps {
-      ${t.op("tenantLocationOp")} is GetResourceOperationStatus<ResourceOperationStatus, TenantLocationActionScope>;
+      ${t.op("tenantLocationOp")} is GetResourceOperationStatus<ArmOperationStatus, TenantLocationActionScope>;
     }
 
     @armResourceOperations
     interface SubscriptionLocationOps {
-      ${t.op("subscriptionLocationOp")} is GetResourceOperationStatus<ResourceOperationStatus, SubscriptionLocationActionScope>;
+      ${t.op("subscriptionLocationOp")} is GetResourceOperationStatus<ArmOperationStatus, SubscriptionLocationActionScope>;
     }
   `);
 

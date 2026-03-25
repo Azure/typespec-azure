@@ -385,17 +385,16 @@ interface MyResourceOperations {
 
 ARM long-running operations (LROs) use operation status endpoints to allow clients to poll for the
 status of an async operation. The `GetResourceOperationStatus` operation template provides a
-standard way to expose these endpoints, and `ResourceOperationStatus` provides the response model.
+standard way to expose these endpoints, and `ArmOperationStatus` provides the response model.
 
-### ResourceOperationStatus
+### ArmOperationStatus
 
-`ResourceOperationStatus` is a response model that represents the status of an async operation. Unlike
-the older `ArmOperationStatus`, the `id` field is **not** marked as a path parameter, so it is always
-included in the response body. This makes it suitable for use as both the status monitor type and as
-the final LRO result.
+`ArmOperationStatus` is a response model that represents the status of an async operation. The `id`
+field is not marked as a path parameter, so it is always included in the response body. This makes
+it suitable for use as both the status monitor type and as the final LRO result.
 
 ```typespec
-model ResourceOperationStatus<
+model ArmOperationStatus<
   Properties extends {} = never,
   StatusValues extends TypeSpec.Reflection.Union = ResourceProvisioningState
 >
@@ -423,20 +422,17 @@ interface OperationStatuses {
   getTenantStatus is GetResourceOperationStatus;
 
   // Subscription scope
-  getSubscriptionStatus is GetResourceOperationStatus<
-    ResourceOperationStatus,
-    SubscriptionActionScope
-  >;
+  getSubscriptionStatus is GetResourceOperationStatus<ArmOperationStatus, SubscriptionActionScope>;
 
   // Tenant + location scope
   getTenantLocationStatus is GetResourceOperationStatus<
-    ResourceOperationStatus,
+    ArmOperationStatus,
     TenantLocationActionScope
   >;
 
   // Subscription + location scope
   getSubscriptionLocationStatus is GetResourceOperationStatus<
-    ResourceOperationStatus,
+    ArmOperationStatus,
     SubscriptionLocationActionScope
   >;
 }
@@ -444,10 +440,10 @@ interface OperationStatuses {
 
 ### Custom response properties
 
-To add custom properties to the operation status response, use the `ResourceOperationStatus` template:
+To add custom properties to the operation status response, use the `ArmOperationStatus` template:
 
 ```typespec
-model WidgetOperationStatus is ResourceOperationStatus<WidgetOperationStatusProperties>;
+model WidgetOperationStatus is ArmOperationStatus<WidgetOperationStatusProperties>;
 
 model WidgetOperationStatusProperties {
   widgetId: string;

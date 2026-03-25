@@ -226,7 +226,7 @@ model TenantActionScope {
  *
  * @example
  * ```typespec
- * op getStatus is GetResourceOperationStatus<ResourceOperationStatus, TenantLocationActionScope>;
+ * op getStatus is GetResourceOperationStatus<ArmOperationStatus, TenantLocationActionScope>;
  * ```
  */
 @armVirtualResource
@@ -242,7 +242,7 @@ model TenantLocationActionScope {
  *
  * @example
  * ```typespec
- * op getStatus is GetResourceOperationStatus<ResourceOperationStatus, SubscriptionLocationActionScope>;
+ * op getStatus is GetResourceOperationStatus<ArmOperationStatus, SubscriptionLocationActionScope>;
  * ```
  */
 @armVirtualResource

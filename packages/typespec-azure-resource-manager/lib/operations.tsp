@@ -145,7 +145,7 @@ op ArmResourceCheckExistence<
  * - `TenantLocationActionScope`: `GET /providers/{providerNamespace}/locations/{location}/operationStatuses/{operationId}`
  * - `SubscriptionLocationActionScope`: `GET /subscriptions/{subscriptionId}/providers/{providerNamespace}/locations/{location}/operationStatuses/{operationId}`
  *
- * @template Response The type of the response body. Defaults to ResourceOperationStatus.
+ * @template Response The type of the response body. Defaults to ArmOperationStatus.
  * @template Scope The scope of the operation. Defaults to TenantActionScope.
  * @template Parameters Optional. Additional non-path parameters (e.g. query or header parameters).
  * @template Error Optional. The error response, if non-standard.
@@ -156,7 +156,7 @@ op ArmResourceCheckExistence<
 @armResourceCollectionAction
 @Private.armUpdateProviderNamespace
 op GetResourceOperationStatus<
-  Response extends {} = ResourceOperationStatus,
+  Response extends {} = ArmOperationStatus,
   Scope extends {} = TenantActionScope,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse

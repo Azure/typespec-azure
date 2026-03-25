@@ -1464,7 +1464,7 @@ op Azure.ResourceManager.GetResourceOperationStatus(apiVersion: string, subscrip
 
 | Name       | Description                                                                 |
 | ---------- | --------------------------------------------------------------------------- |
-| Response   | The type of the response body. Defaults to ResourceOperationStatus.         |
+| Response   | The type of the response body. Defaults to ArmOperationStatus.              |
 | Scope      | The scope of the operation. Defaults to TenantActionScope.                  |
 | Parameters | Optional. Additional non-path parameters (e.g. query or header parameters). |
 | Error      | Optional. The error response, if non-standard.                              |

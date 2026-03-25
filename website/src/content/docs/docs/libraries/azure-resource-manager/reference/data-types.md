@@ -358,7 +358,8 @@ op delete(@path id: string): ArmNoContentResponse;
 
 ### `ArmOperationStatus` {#Azure.ResourceManager.ArmOperationStatus}
 
-Standard Azure Resource Manager operation status response
+Standard Azure Resource Manager operation status response, used as the response
+body for `GetResourceOperationStatus`.
 
 ```typespec
 model Azure.ResourceManager.ArmOperationStatus<Properties, StatusValues>
@@ -1201,35 +1202,6 @@ model Azure.ResourceManager.ResourceOperationOptions
 | allowStaticRoutes? | `boolean` | If true, turns off autoRoute for the interface, so individual operations can choose static (`@route`) or automatic (`@autoRoute`) routing. |
 | omitTags?          | `boolean` | If true, turns off the default tagging of operations in the interface, so that individual operations must be individually tagged           |
 
-### `ResourceOperationStatus` {#Azure.ResourceManager.ResourceOperationStatus}
-
-Standard Azure Resource Manager operation status response, used as the response
-body for `GetResourceOperationStatus`.
-
-```typespec
-model Azure.ResourceManager.ResourceOperationStatus<Properties, StatusValues>
-```
-
-#### Template Parameters
-
-| Name         | Description                                    |
-| ------------ | ---------------------------------------------- |
-| Properties   | Optional resource-specific properties          |
-| StatusValues | The set of allowed values for operation status |
-
-#### Properties
-
-| Name             | Type                                                                           | Description                                                                                                      |
-| ---------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
-| properties?      | `Properties`                                                                   | RP-specific properties for the operationStatus resource, only appears when operation ended with Succeeded status |
-| status           | `StatusValues`                                                                 | The operation status                                                                                             |
-| id               | `string`                                                                       | The unique identifier for the operationStatus resource                                                           |
-| name?            | `string`                                                                       | The name of the operationStatus resource                                                                         |
-| startTime?       | `utcDateTime`                                                                  | Operation start time                                                                                             |
-| endTime?         | `utcDateTime`                                                                  | Operation complete time                                                                                          |
-| percentComplete? | `float64`                                                                      | The progress made toward completing the operation                                                                |
-| error?           | [`ErrorDetail`](./data-types.md#Azure.ResourceManager.CommonTypes.ErrorDetail) | Errors that occurred if the operation ended with Canceled or Failed status                                       |
-
 ### `ResourceParentParameters` {#Azure.ResourceManager.ResourceParentParameters}
 
 The dynamic parameters of a list call for a resource instance - pass in the proper base type to indicate
@@ -1369,10 +1341,7 @@ model Azure.ResourceManager.SubscriptionLocationActionScope
 #### Examples
 
 ```typespec
-op getStatus is GetResourceOperationStatus<
-  ResourceOperationStatus,
-  SubscriptionLocationActionScope
->;
+op getStatus is GetResourceOperationStatus<ArmOperationStatus, SubscriptionLocationActionScope>;
 ```
 
 #### Properties
@@ -1438,7 +1407,7 @@ model Azure.ResourceManager.TenantLocationActionScope
 #### Examples
 
 ```typespec
-op getStatus is GetResourceOperationStatus<ResourceOperationStatus, TenantLocationActionScope>;
+op getStatus is GetResourceOperationStatus<ArmOperationStatus, TenantLocationActionScope>;
 ```
 
 #### Properties
