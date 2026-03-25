@@ -173,7 +173,7 @@ export function getScopedDecoratorData(
   }
   if (languageScope === undefined || typeof languageScope === "string") {
     const scope = languageScope ?? context.emitterName;
-    if (Object.keys(retval).includes(scope)) return retval[scope];
+    if (scope in retval) return retval[scope];
 
     // if the scope is negated, we should return undefined
     // if the scope is not negated, we should return the value for AllScopes

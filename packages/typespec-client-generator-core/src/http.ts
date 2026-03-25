@@ -31,12 +31,14 @@ import {
 } from "@typespec/http";
 import { StreamMetadata, getStreamMetadata } from "@typespec/http/experimental";
 import { camelCase } from "change-case";
-import { getResponseAsBool, shouldOmitSlashFromEmptyRoute } from "./decorators.js";
+import { getResponseAsBool, isInScope, shouldOmitSlashFromEmptyRoute } from "./decorators.js";
 import {
   CollectionFormat,
   SdkBodyParameter,
+  SdkBuiltInType,
   SdkClientType,
   SdkCookieParameter,
+  SdkEnumType,
   SdkHeaderParameter,
   SdkHttpErrorResponse,
   SdkHttpOperation,
@@ -51,6 +53,7 @@ import {
   SdkStreamMetadata,
   SdkType,
   TCGCContext,
+  UsageFlags,
 } from "./interfaces.js";
 import {
   compareModelProperties,
@@ -211,11 +214,33 @@ function getSdkHttpParameters(
     }
   });
 
-  retval.parameters = httpOperation.parameters.parameters
-    .filter((x) => !isNeverOrVoidType(x.param.type))
-    .map((x) =>
-      diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type)),
-    ) as (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter | SdkCookieParameter)[];
+  // Filter parameters by type and scope, warning if required parameters are scoped out
+  const filteredParams: HttpOperationParameter[] = [];
+  for (const x of httpOperation.parameters.parameters) {
+    if (isNeverOrVoidType(x.param.type)) {
+      continue;
+    }
+    if (!isInScope(context, x.param)) {
+      // Warn if a required parameter is being scoped out
+      if (!x.param.optional) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "required-parameter-scoped-out",
+            target: x.param,
+            format: {
+              paramName: x.param.name,
+              scope: context.emitterName,
+            },
+          }),
+        );
+      }
+      continue;
+    }
+    filteredParams.push(x);
+  }
+  retval.parameters = filteredParams.map((x) =>
+    diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type)),
+  ) as (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter | SdkCookieParameter)[];
   const headerParams = retval.parameters.filter(
     (x): x is SdkHeaderParameter => x.kind === "header",
   );
@@ -401,6 +426,55 @@ function createContentTypeOrAcceptHeader(
       isGeneratedName: true,
       decorators: [],
     };
+  } else if (bodyObject.contentTypes) {
+    // For File type bodies, the content type is constrained by the File type itself.
+    // Follow the content type to add a constant (single) or enum (multiple) param.
+    const isFileBody =
+      name === "contentType"
+        ? httpOperation.parameters.body?.bodyKind === "file"
+        : httpOperation.responses.some((r) =>
+            r.responses.some((rc) => rc.body?.bodyKind === "file"),
+          );
+    if (isFileBody) {
+      const stringType: SdkBuiltInType = getTypeSpecBuiltInType(context, "string");
+      if (bodyObject.contentTypes.length === 1) {
+        type = {
+          kind: "constant",
+          value: bodyObject.contentTypes[0],
+          valueType: stringType,
+          name: `${httpOperation.operation.name}ContentType`,
+          isGeneratedName: true,
+          decorators: [],
+        };
+      } else if (bodyObject.contentTypes.length > 1) {
+        const enumType: SdkEnumType = {
+          kind: "enum",
+          name: `${httpOperation.operation.name}ContentType`,
+          isGeneratedName: true,
+          namespace: "",
+          valueType: stringType,
+          values: [],
+          isFixed: true,
+          isFlags: false,
+          usage: UsageFlags.None,
+          access: "public",
+          crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
+          apiVersions: bodyObject.apiVersions,
+          isUnionAsEnum: false,
+          decorators: [],
+        };
+        enumType.values = bodyObject.contentTypes.map((ct) => ({
+          kind: "enumvalue" as const,
+          name: ct,
+          value: ct,
+          enumType,
+          valueType: stringType,
+          crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}.${ct}`,
+          decorators: [],
+        }));
+        type = enumType;
+      }
+    }
   }
   const optional = bodyObject.kind === "body" ? bodyObject.optional : false;
   // No need for clientDefaultValue because it's a constant, it only has one value
@@ -582,7 +656,9 @@ function getSdkHttpResponseAndExceptions(
           ),
           __raw: header,
           kind: "responseheader",
-          serializedName: getHeaderFieldName(context.program, header),
+          serializedName:
+            getHeaderFieldName(context.program, header) ??
+            (header === innerResponse.body?.contentTypeProperty ? "Content-Type" : header.name),
         });
         context.__responseHeaderCache.set(header, headers[headers.length - 1]);
       }
