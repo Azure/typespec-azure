@@ -30,10 +30,10 @@ export function createReservedWordRule(
   reservedWords: LanguageReservedWords,
 ) {
   return createRule({
-    name: `reserved-words-${language}`,
+    name: `no-reserved-words-${language}`,
     description: `Warns when identifiers conflict with ${displayName} reserved words.`,
     severity: "warning",
-    url: `https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/reserved-words-${language}`,
+    url: `https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/no-reserved-words-${language}`,
     messages: {
       default: paramMessage`'${"name"}' cannot be used as a ${"context"} name since it is a reserved word in ${"language"}. Consider using the @clientName decorator to rename it for ${"language"} code generation.`,
     },

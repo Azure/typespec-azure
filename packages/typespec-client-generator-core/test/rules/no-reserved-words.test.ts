@@ -53,56 +53,56 @@ describe("reserved word rule factory", () => {
 
   it("emits warning for reserved model name", async () => {
     await tester.expect(`model reserved { name: string; }`).toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/reserved-words-test",
+      code: "@azure-tools/typespec-client-generator-core/no-reserved-words-test",
       message: expectedMessage("reserved", "model", "Test"),
     });
   });
 
   it("emits warning for reserved property name", async () => {
     await tester.expect(`model Foo { reserved: string; }`).toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/reserved-words-test",
+      code: "@azure-tools/typespec-client-generator-core/no-reserved-words-test",
       message: expectedMessage("reserved", "property", "Test"),
     });
   });
 
   it("emits warning for reserved operation name", async () => {
     await tester.expect(`op reserved(): void;`).toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/reserved-words-test",
+      code: "@azure-tools/typespec-client-generator-core/no-reserved-words-test",
       message: expectedMessage("reserved", "operation", "Test"),
     });
   });
 
   it("emits warning for reserved parameter name", async () => {
     await tester.expect(`op foo(reserved: string): void;`).toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/reserved-words-test",
+      code: "@azure-tools/typespec-client-generator-core/no-reserved-words-test",
       message: expectedMessage("reserved", "parameter", "Test"),
     });
   });
 
   it("emits warning for reserved enum type name", async () => {
     await tester.expect(`enum reserved { a, b }`).toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/reserved-words-test",
+      code: "@azure-tools/typespec-client-generator-core/no-reserved-words-test",
       message: expectedMessage("reserved", "enum", "Test"),
     });
   });
 
   it("emits warning for reserved enum member name", async () => {
     await tester.expect(`enum Foo { reserved }`).toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/reserved-words-test",
+      code: "@azure-tools/typespec-client-generator-core/no-reserved-words-test",
       message: expectedMessage("reserved", "enum member", "Test"),
     });
   });
 
   it("emits warning for reserved union type name", async () => {
     await tester.expect(`union reserved { a: string, b: int32 }`).toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/reserved-words-test",
+      code: "@azure-tools/typespec-client-generator-core/no-reserved-words-test",
       message: expectedMessage("reserved", "union", "Test"),
     });
   });
 
   it("emits warning for reserved union variant name", async () => {
     await tester.expect(`union Foo { reserved: string }`).toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/reserved-words-test",
+      code: "@azure-tools/typespec-client-generator-core/no-reserved-words-test",
       message: expectedMessage("reserved", "union variant", "Test"),
     });
   });
@@ -130,7 +130,7 @@ describe("reserved word rule factory", () => {
     await tester
       .expect(`model Foo { @clientName("notReserved", "otherlang") reserved: string; }`)
       .toEmitDiagnostics({
-        code: "@azure-tools/typespec-client-generator-core/reserved-words-test",
+        code: "@azure-tools/typespec-client-generator-core/no-reserved-words-test",
         message: expectedMessage("reserved", "property", "Test"),
       });
   });
@@ -157,7 +157,7 @@ describe("context isolation", () => {
 
   it("warns when model-only reserved word is used as a model name", async () => {
     await tester.expect(`model modelonly { name: string; }`).toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/reserved-words-isolated",
+      code: "@azure-tools/typespec-client-generator-core/no-reserved-words-isolated",
       message: expectedMessage("modelonly", "model", "Isolated"),
     });
   });
@@ -178,7 +178,7 @@ describe("context isolation", () => {
 
   it("warns when property-only reserved word is used as a property name", async () => {
     await tester.expect(`model Foo { proponly: string; }`).toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/reserved-words-isolated",
+      code: "@azure-tools/typespec-client-generator-core/no-reserved-words-isolated",
       message: expectedMessage("proponly", "property", "Isolated"),
     });
   });
@@ -195,7 +195,7 @@ describe("context isolation", () => {
 
   it("warns when operation-only reserved word is used as an operation name", async () => {
     await tester.expect(`op oponly(): void;`).toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/reserved-words-isolated",
+      code: "@azure-tools/typespec-client-generator-core/no-reserved-words-isolated",
       message: expectedMessage("oponly", "operation", "Isolated"),
     });
   });
@@ -212,7 +212,7 @@ describe("context isolation", () => {
 
   it("warns when parameter-only reserved word is used as a parameter name", async () => {
     await tester.expect(`op foo(paramonly: string): void;`).toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/reserved-words-isolated",
+      code: "@azure-tools/typespec-client-generator-core/no-reserved-words-isolated",
       message: expectedMessage("paramonly", "parameter", "Isolated"),
     });
   });
@@ -233,14 +233,14 @@ describe("context isolation", () => {
 
   it("warns when enumType-only reserved word is used as an enum type name", async () => {
     await tester.expect(`enum enumtypeonly { a, b }`).toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/reserved-words-isolated",
+      code: "@azure-tools/typespec-client-generator-core/no-reserved-words-isolated",
       message: expectedMessage("enumtypeonly", "enum", "Isolated"),
     });
   });
 
   it("warns when enumType-only reserved word is used as a union type name", async () => {
     await tester.expect(`union enumtypeonly { a: string, b: int32 }`).toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/reserved-words-isolated",
+      code: "@azure-tools/typespec-client-generator-core/no-reserved-words-isolated",
       message: expectedMessage("enumtypeonly", "union", "Isolated"),
     });
   });
@@ -257,14 +257,14 @@ describe("context isolation", () => {
 
   it("warns when enumMember-only reserved word is used as an enum member name", async () => {
     await tester.expect(`enum Foo { enummemberonly }`).toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/reserved-words-isolated",
+      code: "@azure-tools/typespec-client-generator-core/no-reserved-words-isolated",
       message: expectedMessage("enummemberonly", "enum member", "Isolated"),
     });
   });
 
   it("warns when enumMember-only reserved word is used as a union variant name", async () => {
     await tester.expect(`union Foo { enummemberonly: string }`).toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/reserved-words-isolated",
+      code: "@azure-tools/typespec-client-generator-core/no-reserved-words-isolated",
       message: expectedMessage("enummemberonly", "union variant", "Isolated"),
     });
   });
@@ -293,28 +293,28 @@ describe("python reserved words", () => {
 
   it("emits warning for Python keyword used as property name", async () => {
     await tester.expect(`model Foo { \`yield\`: string; }`).toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/reserved-words-python",
+      code: "@azure-tools/typespec-client-generator-core/no-reserved-words-python",
       message: expectedMessage("yield", "property", "Python"),
     });
   });
 
   it("emits warning for 'self' used as property name (Python-specific)", async () => {
     await tester.expect(`model Foo { self: string; }`).toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/reserved-words-python",
+      code: "@azure-tools/typespec-client-generator-core/no-reserved-words-python",
       message: expectedMessage("self", "property", "Python"),
     });
   });
 
   it("emits warning for 'enum' used as model name (Python-specific)", async () => {
     await tester.expect(`model \`enum\` { name: string; }`).toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/reserved-words-python",
+      code: "@azure-tools/typespec-client-generator-core/no-reserved-words-python",
       message: expectedMessage("enum", "model", "Python"),
     });
   });
 
   it("emits warning for 'keys' used as property name (Python dict method conflict)", async () => {
     await tester.expect(`model Foo { keys: string; }`).toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/reserved-words-python",
+      code: "@azure-tools/typespec-client-generator-core/no-reserved-words-python",
       message: expectedMessage("keys", "property", "Python"),
     });
   });
@@ -325,7 +325,7 @@ describe("python reserved words", () => {
 
   it("emits warning for 'stream' used as parameter name (Python TSP-specific)", async () => {
     await tester.expect(`op foo(stream: string): void;`).toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/reserved-words-python",
+      code: "@azure-tools/typespec-client-generator-core/no-reserved-words-python",
       message: expectedMessage("stream", "parameter", "Python"),
     });
   });
@@ -356,14 +356,14 @@ describe("csharp reserved words", () => {
 
   it("emits warning for C# keyword used as property name", async () => {
     await tester.expect(`model Foo { \`namespace\`: string; }`).toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/reserved-words-csharp",
+      code: "@azure-tools/typespec-client-generator-core/no-reserved-words-csharp",
       message: expectedMessage("namespace", "property", "C#"),
     });
   });
 
   it("emits warning for C# contextual keyword", async () => {
     await tester.expect(`model Foo { \`var\`: string; }`).toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/reserved-words-csharp",
+      code: "@azure-tools/typespec-client-generator-core/no-reserved-words-csharp",
       message: expectedMessage("var", "property", "C#"),
     });
   });
@@ -384,7 +384,7 @@ describe("java reserved words", () => {
 
   it("emits warning for Java keyword used as property name", async () => {
     await tester.expect(`model Foo { \`synchronized\`: string; }`).toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/reserved-words-java",
+      code: "@azure-tools/typespec-client-generator-core/no-reserved-words-java",
       message: expectedMessage("synchronized", "property", "Java"),
     });
   });
@@ -405,7 +405,7 @@ describe("javascript reserved words", () => {
 
   it("emits warning for JS keyword used as operation name", async () => {
     await tester.expect(`op \`function\`(): void;`).toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/reserved-words-javascript",
+      code: "@azure-tools/typespec-client-generator-core/no-reserved-words-javascript",
       message: expectedMessage("function", "operation", "JavaScript"),
     });
   });
@@ -472,7 +472,7 @@ describe("diagnostic message format", () => {
       "@azure-tools/typespec-client-generator-core",
     );
     await tester.expect(`model Foo { \`yield\`: string; }`).toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/reserved-words-python",
+      code: "@azure-tools/typespec-client-generator-core/no-reserved-words-python",
       severity: "warning",
       message: expectedMessage("yield", "property", "Python"),
     });
@@ -495,8 +495,8 @@ describe("multiple reserved words in same spec", () => {
         }`,
       )
       .toEmitDiagnostics([
-        { code: "@azure-tools/typespec-client-generator-core/reserved-words-python" },
-        { code: "@azure-tools/typespec-client-generator-core/reserved-words-python" },
+        { code: "@azure-tools/typespec-client-generator-core/no-reserved-words-python" },
+        { code: "@azure-tools/typespec-client-generator-core/no-reserved-words-python" },
       ]);
   });
 });
