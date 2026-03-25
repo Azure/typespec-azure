@@ -108,3 +108,58 @@ it("Generates tenant paths correctly", async () => {
 
   strictEqual(getHttpOperation(program, getCores)[0].path, "/providers/Microsoft.Contoso/getCores");
 });
+
+
+it("Supports unknown request and response for ArmProviderActionSync", async () => {
+  const { calculateTemplateHash, program } = await Tester.compile(t.code`
+    @armProviderNamespace
+    @service
+    namespace Microsoft.Contoso;
+
+    model TemplateHashResult {
+      minifiedTemplate: string;
+      templateHash: string;
+    }
+
+    @armResourceOperations
+    interface ProviderOperations {
+      @autoRoute
+      ${t.op("calculateTemplateHash")} is ArmProviderActionSync<
+        Request = unknown,
+        Response = TemplateHashResult
+      >;
+    }
+  `);
+
+  strictEqual(
+    getHttpOperation(program, calculateTemplateHash)[0].path,
+    "/providers/Microsoft.Contoso/calculateTemplateHash",
+  );
+});
+
+it("Supports unknown request and response for ArmProviderActionAsync", async () => {
+  const { calculateTemplateHash, program } = await Tester.compile(t.code`
+    @armProviderNamespace
+    @service
+    namespace Microsoft.Contoso;
+
+    model TemplateHashResult {
+      minifiedTemplate: string;
+      templateHash: string;
+    }
+
+    @armResourceOperations
+    interface ProviderOperations {
+      @autoRoute
+      ${t.op("calculateTemplateHash")} is ArmProviderActionAsync<
+        Request = unknown,
+        Response = TemplateHashResult
+      >;
+    }
+  `);
+
+  strictEqual(
+    getHttpOperation(program, calculateTemplateHash)[0].path,
+    "/providers/Microsoft.Contoso/calculateTemplateHash",
+  );
+});
