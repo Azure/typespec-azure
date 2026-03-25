@@ -7,3 +7,4 @@ packages:
 ---
 
 Fix `getLroMetadata` to correctly handle scalar types (e.g., `string`) as LRO final results. Previously, scalar result types in status monitor `@lroResult` properties were not recognized, causing incorrect metadata.
+
