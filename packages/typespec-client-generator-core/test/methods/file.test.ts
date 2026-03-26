@@ -408,7 +408,7 @@ it("file upload with multiple content types should have enum contentType header"
   strictEqual(contentTypeHeader.serializedName, "Content-Type");
 });
 
-it("file upload with default content type should have constant contentType header", async () => {
+it("file upload with default content type should have string contentType header", async () => {
   const { program } = await SimpleTester.compile(
     `
       @service
@@ -421,23 +421,21 @@ it("file upload with default content type should have constant contentType heade
   const sdkPackage = context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0];
   strictEqual(method.name, "uploadFileDefault");
-  // The contentType method parameter should be a constant "*/*"
+  // The contentType method parameter should be string since */* is a wildcard
   const contentTypeMethodParam = method.parameters.find((p) => p.name === "contentType");
   ok(contentTypeMethodParam);
-  strictEqual(contentTypeMethodParam.type.kind, "constant");
-  strictEqual(contentTypeMethodParam.type.value, "*/*");
-  // The Content-Type header should also be a constant
+  strictEqual(contentTypeMethodParam.type.kind, "string");
+  // The Content-Type header should also be string
   const httpOperation = method.operation;
   const contentTypeHeader = httpOperation.parameters.find(
     (p) => p.kind === "header" && p.name === "contentType",
   );
   ok(contentTypeHeader);
-  strictEqual(contentTypeHeader.type.kind, "constant");
-  strictEqual(contentTypeHeader.type.value, "*/*");
+  strictEqual(contentTypeHeader.type.kind, "string");
   strictEqual(contentTypeHeader.serializedName, "Content-Type");
 });
 
-it("file download with default content type should have constant accept header", async () => {
+it("file download with default content type should have string accept header", async () => {
   const { program } = await SimpleTester.compile(
     `
       @service
@@ -450,18 +448,16 @@ it("file download with default content type should have constant accept header",
   const sdkPackage = context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0];
   strictEqual(method.name, "downloadFileDefault");
-  // The accept method parameter should be a constant "*/*"
+  // The accept method parameter should be string since */* is a wildcard
   const acceptMethodParam = method.parameters.find((p) => p.name === "accept");
   ok(acceptMethodParam);
-  strictEqual(acceptMethodParam.type.kind, "constant");
-  strictEqual(acceptMethodParam.type.value, "*/*");
-  // The Accept header should also be a constant
+  strictEqual(acceptMethodParam.type.kind, "string");
+  // The Accept header should also be string
   const httpOperation = method.operation;
   const acceptHeader = httpOperation.parameters.find(
     (p) => p.kind === "header" && p.name === "accept",
   );
   ok(acceptHeader);
-  strictEqual(acceptHeader.type.kind, "constant");
-  strictEqual(acceptHeader.type.value, "*/*");
+  strictEqual(acceptHeader.type.kind, "string");
   strictEqual(acceptHeader.serializedName, "Accept");
 });

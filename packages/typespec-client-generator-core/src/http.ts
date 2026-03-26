@@ -402,7 +402,11 @@ function createContentTypeOrAcceptHeader(
   // For a single content type, create a constant. For multiple content types, create an enum.
   // For File type bodies, the content type is constrained by the File type itself;
   // treat it the same as a user-defined content type/accept parameter.
-  if (bodyObject.contentTypes && bodyObject.contentTypes.length === 1) {
+  if (
+    bodyObject.contentTypes &&
+    bodyObject.contentTypes.length === 1 &&
+    bodyObject.contentTypes[0] !== "*/*"
+  ) {
     type = {
       kind: "constant",
       value: bodyObject.contentTypes[0],
