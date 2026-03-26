@@ -4177,11 +4177,11 @@ model ResourceGroupProperties {
 
 @armResourceOperations
 interface ResourceGroups {
+  list is ArmResourceListByParent<ResourceGroup, Provider = {}>;
   get is ArmResourceRead<ResourceGroup, Provider = {}>;
   createOrUpdate is ArmResourceCreateOrReplaceAsync<ResourceGroup, Provider = {}>;
   update is ArmCustomPatchSync<ResourceGroup, Provider = {}>;
   delete is ArmResourceDeleteWithoutOkAsync<ResourceGroup, Provider = {}>;
-  list is ArmResourceListByParent<ResourceGroup, Provider = {}>;
 }
   `;
 

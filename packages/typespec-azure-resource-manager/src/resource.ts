@@ -662,6 +662,7 @@ function normalizePathForScopeComparison(path: string): string {
 function getResourceInfo(
   program: Program,
   operation: ArmResourceOperation,
+  resourceModel?: Model,
 ): ResolvedResourceInfo | undefined {
   // First, try to get resource info from the path when it contains /providers/
   const pathInfo = getResourcePathElements(operation.httpOperation.path, operation.kind);
@@ -681,6 +682,7 @@ function getResourceInfo(
     operation.httpOperation.path,
     operation.kind,
     operation.operation,
+    resourceModel,
   );
   if (fallback === undefined) return undefined;
   return {
@@ -700,6 +702,7 @@ function getResourceInfoFromArmOperation(
   path: string,
   kind: ArmOperationKind,
   operation: Operation,
+  resourceModel?: Model,
 ): ResourcePathInfo | undefined {
   const provider = operation.namespace
     ? getArmProviderNamespace(program, operation.namespace)
@@ -714,25 +717,60 @@ function getResourceInfoFromArmOperation(
   const typeSegments: string[] = [];
   const instancePath = path.replace(/\/+$/, "");
 
-  // Scan the path for static/variable pairs working backwards
-  for (let i = segments.length - 1; i >= 0; i--) {
-    if (isVariableSegment(segments[i]) && i > 0 && !isVariableSegment(segments[i - 1])) {
-      typeSegments.unshift(segments[i - 1]);
-      i--; // skip the static segment we just consumed
-    } else if (!isVariableSegment(segments[i]) && i === segments.length - 1 && kind === "list") {
-      // For list operations, the last segment is a static type name without an instance variable
-      typeSegments.unshift(segments[i]);
-    } else {
-      break;
-    }
+  // Scan the path forward to collect resource type segments (static/variable pairs)
+  // after the scope prefix.  Walk forward so that we can use the same approach as
+  // getResourcePathElements: consume pairs of (typeName, {instanceName}) from the
+  // END of the segment list.  We identify the resource portion by searching backwards
+  // for at most one resource-type group (the innermost resource).
+  //
+  // For an instance path like /subscriptions/{id}/resourceGroups/{name}
+  //   → type segment: "resourceGroups"
+  // For a list path like /subscriptions/{id}/resourceGroups
+  //   → type segment: "resourceGroups", instance path gets /{name} appended
+
+  // Find the start of resource type segments by scanning backwards from the end
+  let resourceStart = segments.length;
+  if (kind === "list" && segments.length > 0 && !isVariableSegment(segments[segments.length - 1])) {
+    // List: last segment is the collection name (static)
+    resourceStart = segments.length - 1;
+  } else if (
+    segments.length >= 2 &&
+    isVariableSegment(segments[segments.length - 1]) &&
+    !isVariableSegment(segments[segments.length - 2])
+  ) {
+    // Instance: last two segments are typeName/{instanceName}
+    resourceStart = segments.length - 2;
+  }
+
+  // Collect type segments walking forward from resourceStart
+  for (let i = resourceStart; i < segments.length; i += 2) {
+    if (isVariableSegment(segments[i])) break;
+    typeSegments.push(segments[i]);
+    // skip the instance variable if present
   }
 
   if (typeSegments.length > 0) {
-    // For list operations where the path ends with a static segment, append {name}
-    const resolvedInstancePath =
-      kind === "list" && !isVariableSegment(segments[segments.length - 1])
-        ? `${instancePath}/{name}`
-        : instancePath;
+    // For list operations where the path ends with a static segment, derive the
+    // instance variable name from the resource model's @key property if available,
+    // otherwise fall back to {name}.
+    let resolvedInstancePath = instancePath;
+    if (kind === "list" && !isVariableSegment(segments[segments.length - 1])) {
+      let keyName = "name";
+      if (resourceModel) {
+        // Search the model's direct properties for the @key property.
+        // We must use model.properties directly rather than getAllProperties() because
+        // the base model chain may contain a property with the same name that lacks
+        // the @key decorator, which would shadow the decorated one.
+        for (const prop of resourceModel.properties.values()) {
+          const k = getKeyName(program, prop);
+          if (k !== undefined) {
+            keyName = k;
+            break;
+          }
+        }
+      }
+      resolvedInstancePath = `${instancePath}/{${keyName}}`;
+    }
     return {
       resourceType: {
         provider: provider,
@@ -975,7 +1013,7 @@ export function resolveArmResourceOperations(
     armOperation.kind = operation.kind;
 
     armOperation.resourceModelName = operation.resource?.name ?? resourceType.name;
-    const resourceInfo = getResourceInfo(program, armOperation);
+    const resourceInfo = getResourceInfo(program, armOperation, operation.resource ?? resourceType);
     if (resourceInfo === undefined) continue;
     armOperation.name = operation.name;
     armOperation.resourceKind = operation.resourceKind;
