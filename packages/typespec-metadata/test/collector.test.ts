@@ -148,15 +148,92 @@ describe("language-specific parsers", () => {
   });
 
   it("should parse Java package metadata correctly", () => {
-    const options = {
-      namespace: "com.azure.security.keyvault.secrets",
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-tools/typespec-java": {
+        namespace: "com.azure.security.keyvault.secrets",
+      },
     };
 
-    const ns = String(options.namespace);
-    const stripped = ns.startsWith("com.") ? ns.substring(4) : ns;
-    const packageName = stripped.replace(/\./g, "-");
+    const result = buildLanguageMetadata(optionMap, {}, "/repos/tsp-output");
+    const lang = result["java"];
 
-    expect(packageName).toBe("azure-security-keyvault-secrets");
+    // Package name should include the Maven groupId prefix
+    expect(lang.packageName).toBe("com.azure:azure-security-keyvault-secrets");
+    expect(lang.namespace).toBe("com.azure.security.keyvault.secrets");
+  });
+
+  it("should parse Java management-plane package metadata correctly", () => {
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-tools/typespec-java": {
+        namespace: "com.azure.resourcemanager.frontdoor",
+      },
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "/repos/tsp-output");
+    const lang = result["java"];
+
+    expect(lang.packageName).toBe("com.azure.resourcemanager:azure-resourcemanager-frontdoor");
+    expect(lang.namespace).toBe("com.azure.resourcemanager.frontdoor");
+  });
+
+  it("should parse Java v2 data-plane package metadata correctly", () => {
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-tools/typespec-java": {
+        namespace: "com.azure.ai.agents",
+        flavor: "azurev2",
+      },
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "/repos/tsp-output");
+    const lang = result["java"];
+
+    expect(lang.packageName).toBe("com.azure.v2:azure-ai-agents");
+    expect(lang.namespace).toBe("com.azure.ai.agents");
+  });
+
+  it("should parse Java v2 management-plane package metadata correctly", () => {
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-tools/typespec-java": {
+        namespace: "com.azure.resourcemanager.cdn",
+        flavor: "azurev2",
+      },
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "/repos/tsp-output");
+    const lang = result["java"];
+
+    expect(lang.packageName).toBe("com.azure.resourcemanager.v2:azure-resourcemanager-cdn");
+    expect(lang.namespace).toBe("com.azure.resourcemanager.cdn");
+  });
+
+  it("should use explicit package-name with groupId prefix for Java", () => {
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-tools/typespec-java": {
+        "package-name": "azure-storage-blobs",
+        namespace: "com.azure.storage.blobs",
+      },
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "/repos/tsp-output");
+    const lang = result["java"];
+
+    // Explicit package-name should also get the groupId prefix
+    expect(lang.packageName).toBe("com.azure:azure-storage-blobs");
+  });
+
+  it("should preserve existing Maven coordinate format in Java package-name", () => {
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-tools/typespec-java": {
+        "package-name": "com.azure.spring:azure-spring-data-cosmos",
+        namespace: "com.azure.spring.data.cosmos",
+      },
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "/repos/tsp-output");
+    const lang = result["java"];
+
+    // Already has groupId:artifactId format – should not be modified
+    expect(lang.packageName).toBe("com.azure.spring:azure-spring-data-cosmos");
   });
 
   it("should parse Go module path correctly", () => {
