@@ -376,7 +376,7 @@ function buildNameFromContextPaths(
   type: Union | Model | TspLiteralType,
   contextPath: ContextNode[],
 ): string {
-  // fallback: when no context path, use "Anonymous" + type kind with dedup suffix
+  // fallback: when no context path, use "Anonymous" + type kind with deduplicating suffix
   if (contextPath.length === 0) {
     return resolveDuplicateGenearatedName(context, type, `Anonymous${type.kind}`);
   }
