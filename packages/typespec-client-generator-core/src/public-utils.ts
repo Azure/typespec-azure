@@ -20,21 +20,11 @@ import {
   isService,
   resolveEncodedName,
 } from "@typespec/compiler";
-import {
-  HttpOperation,
-  Visibility,
-  getHttpOperation,
-  isMetadata,
-  isVisible,
-} from "@typespec/http";
+import { HttpOperation, Visibility, getHttpOperation, isMetadata, isVisible } from "@typespec/http";
 import { getOperationId } from "@typespec/openapi";
 import { Version, getVersions } from "@typespec/versioning";
 import { pascalCase } from "change-case";
-import {
-  getClientLocation,
-  getClientNameOverride,
-  getIsApiVersion,
-} from "./decorators.js";
+import { getClientLocation, getClientNameOverride, getIsApiVersion } from "./decorators.js";
 import {
   DecoratedType,
   SdkBodyParameter,
@@ -386,9 +376,9 @@ function buildNameFromContextPaths(
   type: Union | Model | TspLiteralType,
   contextPath: ContextNode[],
 ): string {
-  // fallback to empty name for corner case
+  // fallback: when no context path, use "Anonymous" + type kind with dedup suffix
   if (contextPath.length === 0) {
-    return "";
+    return resolveDuplicateGenearatedName(context, type, `Anonymous${type.kind}`);
   }
 
   // 1. find the last non-anonymous model node
