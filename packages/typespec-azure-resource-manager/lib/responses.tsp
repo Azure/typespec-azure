@@ -136,7 +136,9 @@ model ArmAcceptedLroResponse<
 }
 
 /**
- * Standard Azure Resource Manager operation status response
+ * Standard Azure Resource Manager operation status response, used as the response
+ * body for `GetResourceOperationStatus`.
+ *
  * @template Properties Optional resource-specific properties
  * @template StatusValues The set of allowed values for operation status
  */
@@ -153,12 +155,9 @@ model ArmOperationStatus<
   status: StatusValues;
 
   /** The unique identifier for the operationStatus resource */
-  @key
-  @path
-  @segment("operationStatuses")
   id: string;
 
-  /** The name of the  operationStatus resource */
+  /** The name of the operationStatus resource */
   @visibility(Lifecycle.Read)
   name?: string;
 
