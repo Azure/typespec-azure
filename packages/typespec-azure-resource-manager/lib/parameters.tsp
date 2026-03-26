@@ -131,7 +131,7 @@ model ResourceUriParameter {
  * where the resource is based.  The default is in a resource group
  * @template Resource The resource to get parameters for
  * @template BaseParameters The parameters representing the base Uri of the resource
- * @template Provider The provider namespace model for the resource. Defaults to `ProviderNamespace<Resource>`. Use `{}` to omit the provider namespace from the path.
+ * @template Provider Optional. The provider namespace model for the resource.
  *
  * @example
  * ```typespec
@@ -155,7 +155,7 @@ model ResourceInstanceParameters<
  * where the list should take place.  The default is in a resource group
  * @template Resource The resource to get parameters for
  * @template BaseParameters The parameters representing the base Uri of the resource
- * @template Provider The provider namespace model for the resource. Defaults to `ProviderNamespace<Resource>`. Use `{}` to omit the provider namespace from the path.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 model ResourceParentParameters<
   Resource extends Foundations.SimpleResource,

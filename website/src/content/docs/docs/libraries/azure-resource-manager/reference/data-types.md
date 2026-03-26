@@ -1046,11 +1046,11 @@ model Azure.ResourceManager.ResourceInstanceParameters<Resource, BaseParameters,
 
 #### Template Parameters
 
-| Name           | Description                                                                                                                                      |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Resource       | The resource to get parameters for                                                                                                               |
-| BaseParameters | The parameters representing the base Uri of the resource                                                                                         |
-| Provider       | The provider namespace model for the resource. Defaults to `ProviderNamespace<Resource>`. Use `{}` to omit the provider namespace from the path. |
+| Name           | Description                                              |
+| -------------- | -------------------------------------------------------- |
+| Resource       | The resource to get parameters for                       |
+| BaseParameters | The parameters representing the base Uri of the resource |
+| Provider       | Optional. The provider namespace model for the resource. |
 
 #### Examples
 
@@ -1212,11 +1212,11 @@ model Azure.ResourceManager.ResourceParentParameters<Resource, BaseParameters, P
 
 #### Template Parameters
 
-| Name           | Description                                                                                                                                      |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Resource       | The resource to get parameters for                                                                                                               |
-| BaseParameters | The parameters representing the base Uri of the resource                                                                                         |
-| Provider       | The provider namespace model for the resource. Defaults to `ProviderNamespace<Resource>`. Use `{}` to omit the provider namespace from the path. |
+| Name           | Description                                              |
+| -------------- | -------------------------------------------------------- |
+| Resource       | The resource to get parameters for                       |
+| BaseParameters | The parameters representing the base Uri of the resource |
+| Provider       | Optional. The provider namespace model for the resource. |
 
 #### Properties
 

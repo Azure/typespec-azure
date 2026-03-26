@@ -919,17 +919,17 @@ op Azure.ResourceManager.ActionAsync(body: Request): Azure.ResourceManager.ArmAc
 
 #### Template Parameters
 
-| Name                | Description                                                                                                     |
-| ------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Resource            | The resource being acted upon                                                                                   |
-| Request             | The request model for the action                                                                                |
-| Response            | The response model for the action, returned after polling the long-running operation                            |
-| BaseParameters      | Optional. Allows overriding the parameters for the operation                                                    |
-| LroHeaders          | Optional. Allows overriding the headers returned in the Accepted response                                       |
-| Parameters          | Optional. Additional parameters after the path parameters                                                       |
-| Error               | Optional. The error response, if non-standard.                                                                  |
-| OptionalRequestBody | Optional. Indicates whether the body parameter is optional.                                                     |
-| Provider            | Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path. |
+| Name                | Description                                                                          |
+| ------------------- | ------------------------------------------------------------------------------------ |
+| Resource            | The resource being acted upon                                                        |
+| Request             | The request model for the action                                                     |
+| Response            | The response model for the action, returned after polling the long-running operation |
+| BaseParameters      | Optional. Allows overriding the parameters for the operation                         |
+| LroHeaders          | Optional. Allows overriding the headers returned in the Accepted response            |
+| Parameters          | Optional. Additional parameters after the path parameters                            |
+| Error               | Optional. The error response, if non-standard.                                       |
+| OptionalRequestBody | Optional. Indicates whether the body parameter is optional.                          |
+| Provider            | Optional. The provider namespace model for the resource.                             |
 
 ### `ArmCustomPatchAsync` {#Azure.ResourceManager.ArmCustomPatchAsync}
 
@@ -941,16 +941,16 @@ op Azure.ResourceManager.ArmCustomPatchAsync(properties: PatchModel): Response |
 
 #### Template Parameters
 
-| Name           | Description                                                                                                     |
-| -------------- | --------------------------------------------------------------------------------------------------------------- |
-| Resource       | the resource being patched                                                                                      |
-| PatchModel     | The input model for the PATCH request                                                                           |
-| BaseParameters | Optional. Allows overriding the operation parameters                                                            |
-| LroHeaders     | Optional. Allows overriding the lro headers returned in the Accepted response                                   |
-| Parameters     | Optional. Additional parameters after the path parameters                                                       |
-| Response       | Optional. The success response for the patch operation                                                          |
-| Error          | Optional. The error response, if non-standard.                                                                  |
-| Provider       | Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path. |
+| Name           | Description                                                                   |
+| -------------- | ----------------------------------------------------------------------------- |
+| Resource       | the resource being patched                                                    |
+| PatchModel     | The input model for the PATCH request                                         |
+| BaseParameters | Optional. Allows overriding the operation parameters                          |
+| LroHeaders     | Optional. Allows overriding the lro headers returned in the Accepted response |
+| Parameters     | Optional. Additional parameters after the path parameters                     |
+| Response       | Optional. The success response for the patch operation                        |
+| Error          | Optional. The error response, if non-standard.                                |
+| Provider       | Optional. The provider namespace model for the resource.                      |
 
 ### `ArmCustomPatchSync` {#Azure.ResourceManager.ArmCustomPatchSync}
 
@@ -962,15 +962,15 @@ op Azure.ResourceManager.ArmCustomPatchSync(properties: PatchModel): Response | 
 
 #### Template Parameters
 
-| Name           | Description                                                                                                     |
-| -------------- | --------------------------------------------------------------------------------------------------------------- |
-| Resource       | the resource being patched                                                                                      |
-| PatchModel     | The input model for the PATCH request                                                                           |
-| BaseParameters | Optional. Allows overriding the operation parameters                                                            |
-| Parameters     | Optional. Additional parameters after the path parameters                                                       |
-| Response       | Optional. The success response for the patch operation                                                          |
-| Error          | Optional. The error response, if non-standard.                                                                  |
-| Provider       | Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path. |
+| Name           | Description                                               |
+| -------------- | --------------------------------------------------------- |
+| Resource       | the resource being patched                                |
+| PatchModel     | The input model for the PATCH request                     |
+| BaseParameters | Optional. Allows overriding the operation parameters      |
+| Parameters     | Optional. Additional parameters after the path parameters |
+| Response       | Optional. The success response for the patch operation    |
+| Error          | Optional. The error response, if non-standard.            |
+| Provider       | Optional. The provider namespace model for the resource.  |
 
 ### `ArmListBySubscription` {#Azure.ResourceManager.ArmListBySubscription}
 
@@ -1032,17 +1032,17 @@ op Azure.ResourceManager.ArmResourceActionAsync(body: Request): Azure.ResourceMa
 
 #### Template Parameters
 
-| Name                | Description                                                                                                     |
-| ------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Resource            | The resource being acted upon                                                                                   |
-| Request             | The request model for the action                                                                                |
-| Response            | The response model for the action                                                                               |
-| BaseParameters      | Optional. Allows overriding the parameters for the operation                                                    |
-| LroHeaders          | Optional. Allows overriding the headers returned in the Accepted response                                       |
-| Parameters          | Optional. Additional parameters after the path parameters                                                       |
-| Error               | Optional. The error response, if non-standard.                                                                  |
-| OptionalRequestBody | Optional. Indicates whether the body parameter is optional.                                                     |
-| Provider            | Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path. |
+| Name                | Description                                                               |
+| ------------------- | ------------------------------------------------------------------------- |
+| Resource            | The resource being acted upon                                             |
+| Request             | The request model for the action                                          |
+| Response            | The response model for the action                                         |
+| BaseParameters      | Optional. Allows overriding the parameters for the operation              |
+| LroHeaders          | Optional. Allows overriding the headers returned in the Accepted response |
+| Parameters          | Optional. Additional parameters after the path parameters                 |
+| Error               | Optional. The error response, if non-standard.                            |
+| OptionalRequestBody | Optional. Indicates whether the body parameter is optional.               |
+| Provider            | Optional. The provider namespace model for the resource.                  |
 
 ### `ArmResourceActionAsyncBase` {#Azure.ResourceManager.ArmResourceActionAsyncBase}
 
@@ -1054,16 +1054,16 @@ op Azure.ResourceManager.ArmResourceActionAsyncBase(body: Request): Response | E
 
 #### Template Parameters
 
-| Name                | Description                                                                                                     |
-| ------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Resource            | The resource being acted upon                                                                                   |
-| Request             | The request model for the action                                                                                |
-| Response            | The response type for the action                                                                                |
-| BaseParameters      | Optional. Allows overriding the parameters for the operation                                                    |
-| Parameters          | Optional. Additional parameters after the path parameters                                                       |
-| Error               | Optional. The error response, if non-standard.                                                                  |
-| OptionalRequestBody | Optional. Indicates whether the request body is optional.                                                       |
-| Provider            | Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path. |
+| Name                | Description                                                  |
+| ------------------- | ------------------------------------------------------------ |
+| Resource            | The resource being acted upon                                |
+| Request             | The request model for the action                             |
+| Response            | The response type for the action                             |
+| BaseParameters      | Optional. Allows overriding the parameters for the operation |
+| Parameters          | Optional. Additional parameters after the path parameters    |
+| Error               | Optional. The error response, if non-standard.               |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional.    |
+| Provider            | Optional. The provider namespace model for the resource.     |
 
 ### `ArmResourceActionNoContentAsync` {#Azure.ResourceManager.ArmResourceActionNoContentAsync}
 
@@ -1073,16 +1073,16 @@ op Azure.ResourceManager.ArmResourceActionNoContentAsync(body: Request): Azure.R
 
 #### Template Parameters
 
-| Name                | Description                                                                                                     |
-| ------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Resource            | The resource being acted upon                                                                                   |
-| Request             | The request model for the action                                                                                |
-| BaseParameters      | Optional. Allows overriding the parameters for the operation                                                    |
-| LroHeaders          | Optional. Allows overriding the headers returned in the Accepted response                                       |
-| Parameters          | Optional. Additional parameters after the path parameters                                                       |
-| Error               | Optional. The error response, if non-standard.                                                                  |
-| OptionalRequestBody | Optional. Indicates whether the body parameter is optional.                                                     |
-| Provider            | Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path. |
+| Name                | Description                                                               |
+| ------------------- | ------------------------------------------------------------------------- |
+| Resource            | The resource being acted upon                                             |
+| Request             | The request model for the action                                          |
+| BaseParameters      | Optional. Allows overriding the parameters for the operation              |
+| LroHeaders          | Optional. Allows overriding the headers returned in the Accepted response |
+| Parameters          | Optional. Additional parameters after the path parameters                 |
+| Error               | Optional. The error response, if non-standard.                            |
+| OptionalRequestBody | Optional. Indicates whether the body parameter is optional.               |
+| Provider            | Optional. The provider namespace model for the resource.                  |
 
 ### `ArmResourceActionNoContentSync` {#Azure.ResourceManager.ArmResourceActionNoContentSync}
 
@@ -1094,15 +1094,15 @@ op Azure.ResourceManager.ArmResourceActionNoContentSync(body: Request): Azure.Re
 
 #### Template Parameters
 
-| Name                | Description                                                                                                     |
-| ------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Resource            | The resource being acted upon                                                                                   |
-| Request             | The request model for the action                                                                                |
-| BaseParameters      | Optional. Allows overriding the parameters for the operation                                                    |
-| Parameters          | Optional. Additional parameters after the path parameters                                                       |
-| Error               | Optional. The error response, if non-standard.                                                                  |
-| OptionalRequestBody | Optional. Indicates whether the request body is optional.                                                       |
-| Provider            | Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path. |
+| Name                | Description                                                  |
+| ------------------- | ------------------------------------------------------------ |
+| Resource            | The resource being acted upon                                |
+| Request             | The request model for the action                             |
+| BaseParameters      | Optional. Allows overriding the parameters for the operation |
+| Parameters          | Optional. Additional parameters after the path parameters    |
+| Error               | Optional. The error response, if non-standard.               |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional.    |
+| Provider            | Optional. The provider namespace model for the resource.     |
 
 ### `ArmResourceActionNoResponseContentAsync` {#Azure.ResourceManager.ArmResourceActionNoResponseContentAsync}
 
@@ -1112,16 +1112,16 @@ op Azure.ResourceManager.ArmResourceActionNoResponseContentAsync(body: Request):
 
 #### Template Parameters
 
-| Name                | Description                                                                                                     |
-| ------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Resource            | The resource being acted upon                                                                                   |
-| Request             | The request model for the action                                                                                |
-| BaseParameters      | Optional. Allows overriding the parameters for the operation                                                    |
-| LroHeaders          | Optional. Allows overriding the headers returned in the Accepted response                                       |
-| Parameters          | Optional. Additional parameters after the path parameters                                                       |
-| Error               | Optional. The error response, if non-standard.                                                                  |
-| OptionalRequestBody | Optional. Indicates whether the body parameter is optional.                                                     |
-| Provider            | Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path. |
+| Name                | Description                                                               |
+| ------------------- | ------------------------------------------------------------------------- |
+| Resource            | The resource being acted upon                                             |
+| Request             | The request model for the action                                          |
+| BaseParameters      | Optional. Allows overriding the parameters for the operation              |
+| LroHeaders          | Optional. Allows overriding the headers returned in the Accepted response |
+| Parameters          | Optional. Additional parameters after the path parameters                 |
+| Error               | Optional. The error response, if non-standard.                            |
+| OptionalRequestBody | Optional. Indicates whether the body parameter is optional.               |
+| Provider            | Optional. The provider namespace model for the resource.                  |
 
 ### `ArmResourceActionSync` {#Azure.ResourceManager.ArmResourceActionSync}
 
@@ -1133,16 +1133,16 @@ op Azure.ResourceManager.ArmResourceActionSync(body: Request): Response | Error
 
 #### Template Parameters
 
-| Name                | Description                                                                                                     |
-| ------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Resource            | The resource being acted upon                                                                                   |
-| Request             | The request model for the action                                                                                |
-| Response            | The response model for the action                                                                               |
-| BaseParameters      | Optional. Allows overriding the parameters for the operation                                                    |
-| Parameters          | Optional. Additional parameters after the path parameters                                                       |
-| Error               | Optional. The error response, if non-standard.                                                                  |
-| OptionalRequestBody | Optional. Indicates whether the body parameter is optional.                                                     |
-| Provider            | Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path. |
+| Name                | Description                                                  |
+| ------------------- | ------------------------------------------------------------ |
+| Resource            | The resource being acted upon                                |
+| Request             | The request model for the action                             |
+| Response            | The response model for the action                            |
+| BaseParameters      | Optional. Allows overriding the parameters for the operation |
+| Parameters          | Optional. Additional parameters after the path parameters    |
+| Error               | Optional. The error response, if non-standard.               |
+| OptionalRequestBody | Optional. Indicates whether the body parameter is optional.  |
+| Provider            | Optional. The provider namespace model for the resource.     |
 
 ### `ArmResourceCheckExistence` {#Azure.ResourceManager.ArmResourceCheckExistence}
 
@@ -1154,14 +1154,14 @@ op Azure.ResourceManager.ArmResourceCheckExistence(): Response | Error
 
 #### Template Parameters
 
-| Name           | Description                                                                                                     |
-| -------------- | --------------------------------------------------------------------------------------------------------------- |
-| Resource       | the resource being checked                                                                                      |
-| BaseParameters | Optional. Allows overriding the operation parameters                                                            |
-| Parameters     | Optional. Additional parameters after the path parameters                                                       |
-| Response       | Optional. The success response for the read operation                                                           |
-| Error          | Optional. The error response, if non-standard.                                                                  |
-| Provider       | Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path. |
+| Name           | Description                                               |
+| -------------- | --------------------------------------------------------- |
+| Resource       | the resource being checked                                |
+| BaseParameters | Optional. Allows overriding the operation parameters      |
+| Parameters     | Optional. Additional parameters after the path parameters |
+| Response       | Optional. The success response for the read operation     |
+| Error          | Optional. The error response, if non-standard.            |
+| Provider       | Optional. The provider namespace model for the resource.  |
 
 ### `ArmResourceCreateOrReplaceAsync` {#Azure.ResourceManager.ArmResourceCreateOrReplaceAsync}
 
@@ -1171,15 +1171,15 @@ op Azure.ResourceManager.ArmResourceCreateOrReplaceAsync(resource: Resource): Re
 
 #### Template Parameters
 
-| Name           | Description                                                                                                     |
-| -------------- | --------------------------------------------------------------------------------------------------------------- |
-| Resource       | the resource being created or replaced                                                                          |
-| BaseParameters | Optional. Allows overriding the operation parameters                                                            |
-| LroHeaders     | Optional. Allows overriding the lro headers returned on resource create                                         |
-| Parameters     | Optional. Additional parameters after the path parameters                                                       |
-| Response       | Optional. The success response for the createOrReplace operation                                                |
-| Error          | Optional. The error response, if non-standard.                                                                  |
-| Provider       | Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path. |
+| Name           | Description                                                             |
+| -------------- | ----------------------------------------------------------------------- |
+| Resource       | the resource being created or replaced                                  |
+| BaseParameters | Optional. Allows overriding the operation parameters                    |
+| LroHeaders     | Optional. Allows overriding the lro headers returned on resource create |
+| Parameters     | Optional. Additional parameters after the path parameters               |
+| Response       | Optional. The success response for the createOrReplace operation        |
+| Error          | Optional. The error response, if non-standard.                          |
+| Provider       | Optional. The provider namespace model for the resource.                |
 
 ### `ArmResourceCreateOrReplaceSync` {#Azure.ResourceManager.ArmResourceCreateOrReplaceSync}
 
@@ -1191,14 +1191,14 @@ op Azure.ResourceManager.ArmResourceCreateOrReplaceSync(resource: Resource): Res
 
 #### Template Parameters
 
-| Name           | Description                                                                                                     |
-| -------------- | --------------------------------------------------------------------------------------------------------------- |
-| Resource       | the resource being created or replaced                                                                          |
-| BaseParameters | Optional. Allows overriding the operation parameters                                                            |
-| Parameters     | Optional. Additional parameters after the path parameters                                                       |
-| Response       | Optional. The success response for the createOrUpdate operation                                                 |
-| Error          | Optional. The error response, if non-standard.                                                                  |
-| Provider       | Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path. |
+| Name           | Description                                                     |
+| -------------- | --------------------------------------------------------------- |
+| Resource       | the resource being created or replaced                          |
+| BaseParameters | Optional. Allows overriding the operation parameters            |
+| Parameters     | Optional. Additional parameters after the path parameters       |
+| Response       | Optional. The success response for the createOrUpdate operation |
+| Error          | Optional. The error response, if non-standard.                  |
+| Provider       | Optional. The provider namespace model for the resource.        |
 
 ### `ArmResourceCreateOrUpdateAsync` {#Azure.ResourceManager.ArmResourceCreateOrUpdateAsync}
 
@@ -1210,15 +1210,15 @@ op Azure.ResourceManager.ArmResourceCreateOrUpdateAsync(resource: Resource): Res
 
 #### Template Parameters
 
-| Name           | Description                                                                                                     |
-| -------------- | --------------------------------------------------------------------------------------------------------------- |
-| Resource       | the resource being created or updated                                                                           |
-| BaseParameters | Optional. Allows overriding the operation parameters                                                            |
-| LroHeaders     | Optional. Allows overriding the lro headers returned on resource create                                         |
-| Parameters     | Optional. Additional parameters after the path parameters                                                       |
-| Response       | Optional. The success response for the createOrUpdate operation                                                 |
-| Error          | Optional. The error response, if non-standard.                                                                  |
-| Provider       | Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path. |
+| Name           | Description                                                             |
+| -------------- | ----------------------------------------------------------------------- |
+| Resource       | the resource being created or updated                                   |
+| BaseParameters | Optional. Allows overriding the operation parameters                    |
+| LroHeaders     | Optional. Allows overriding the lro headers returned on resource create |
+| Parameters     | Optional. Additional parameters after the path parameters               |
+| Response       | Optional. The success response for the createOrUpdate operation         |
+| Error          | Optional. The error response, if non-standard.                          |
+| Provider       | Optional. The provider namespace model for the resource.                |
 
 ### `ArmResourceCreateOrUpdateSync` {#Azure.ResourceManager.ArmResourceCreateOrUpdateSync}
 
@@ -1234,14 +1234,14 @@ op Azure.ResourceManager.ArmResourceCreateOrUpdateSync(resource: Resource): Resp
 
 #### Template Parameters
 
-| Name           | Description                                                                                                     |
-| -------------- | --------------------------------------------------------------------------------------------------------------- |
-| Resource       | the resource being created or updated                                                                           |
-| BaseParameters | Optional. Allows overriding the operation parameters                                                            |
-| Parameters     | Optional. Additional parameters after the path parameters                                                       |
-| Response       | Optional. The success response for the createOrUpdate operation                                                 |
-| Error          | Optional. The error response, if non-standard.                                                                  |
-| Provider       | Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path. |
+| Name           | Description                                                     |
+| -------------- | --------------------------------------------------------------- |
+| Resource       | the resource being created or updated                           |
+| BaseParameters | Optional. Allows overriding the operation parameters            |
+| Parameters     | Optional. Additional parameters after the path parameters       |
+| Response       | Optional. The success response for the createOrUpdate operation |
+| Error          | Optional. The error response, if non-standard.                  |
+| Provider       | Optional. The provider namespace model for the resource.        |
 
 ### `ArmResourceDeleteAsync` {#Azure.ResourceManager.ArmResourceDeleteAsync}
 
@@ -1255,15 +1255,15 @@ op Azure.ResourceManager.ArmResourceDeleteAsync(): Response | Error
 
 #### Template Parameters
 
-| Name           | Description                                                                                                     |
-| -------------- | --------------------------------------------------------------------------------------------------------------- |
-| Resource       | The resource being deleted                                                                                      |
-| BaseParameters | Optional. Allows overriding the parameters for the operation                                                    |
-| LroHeaders     | Optional. Allows overriding the headers in the Accepted response                                                |
-| Parameters     | Optional. Additional parameters after the path parameters                                                       |
-| Response       | Optional. The success response(s) for the delete operation                                                      |
-| Error          | Optional. The error response, if non-standard.                                                                  |
-| Provider       | Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path. |
+| Name           | Description                                                      |
+| -------------- | ---------------------------------------------------------------- |
+| Resource       | The resource being deleted                                       |
+| BaseParameters | Optional. Allows overriding the parameters for the operation     |
+| LroHeaders     | Optional. Allows overriding the headers in the Accepted response |
+| Parameters     | Optional. Additional parameters after the path parameters        |
+| Response       | Optional. The success response(s) for the delete operation       |
+| Error          | Optional. The error response, if non-standard.                   |
+| Provider       | Optional. The provider namespace model for the resource.         |
 
 ### `ArmResourceDeleteAsyncBase` {#Azure.ResourceManager.ArmResourceDeleteAsyncBase}
 
@@ -1273,14 +1273,14 @@ op Azure.ResourceManager.ArmResourceDeleteAsyncBase(): Response | Error
 
 #### Template Parameters
 
-| Name           | Description                                                                                                     |
-| -------------- | --------------------------------------------------------------------------------------------------------------- |
-| Resource       | The resource being deleted                                                                                      |
-| Response       | The response type for the operation                                                                             |
-| BaseParameters | Optional. Allows overriding the parameters for the operation                                                    |
-| Parameters     | Optional. Additional parameters after the path parameters                                                       |
-| Error          | Optional. The error response, if non-standard.                                                                  |
-| Provider       | Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path. |
+| Name           | Description                                                  |
+| -------------- | ------------------------------------------------------------ |
+| Resource       | The resource being deleted                                   |
+| Response       | The response type for the operation                          |
+| BaseParameters | Optional. Allows overriding the parameters for the operation |
+| Parameters     | Optional. Additional parameters after the path parameters    |
+| Error          | Optional. The error response, if non-standard.               |
+| Provider       | Optional. The provider namespace model for the resource.     |
 
 ### `ArmResourceDeleteSync` {#Azure.ResourceManager.ArmResourceDeleteSync}
 
@@ -1292,14 +1292,14 @@ op Azure.ResourceManager.ArmResourceDeleteSync(): Response | Error
 
 #### Template Parameters
 
-| Name           | Description                                                                                                     |
-| -------------- | --------------------------------------------------------------------------------------------------------------- |
-| Resource       | The resource being deleted                                                                                      |
-| BaseParameters | Optional. Allows overriding the parameters for the operation                                                    |
-| Parameters     | Optional. Additional parameters after the path parameters                                                       |
-| Response       | Optional. The success response(s) for the delete operation                                                      |
-| Error          | Optional. The error response, if non-standard.                                                                  |
-| Provider       | Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path. |
+| Name           | Description                                                  |
+| -------------- | ------------------------------------------------------------ |
+| Resource       | The resource being deleted                                   |
+| BaseParameters | Optional. Allows overriding the parameters for the operation |
+| Parameters     | Optional. Additional parameters after the path parameters    |
+| Response       | Optional. The success response(s) for the delete operation   |
+| Error          | Optional. The error response, if non-standard.               |
+| Provider       | Optional. The provider namespace model for the resource.     |
 
 ### `ArmResourceDeleteWithoutOkAsync` {#Azure.ResourceManager.ArmResourceDeleteWithoutOkAsync}
 
@@ -1309,15 +1309,15 @@ op Azure.ResourceManager.ArmResourceDeleteWithoutOkAsync(): Response | Error
 
 #### Template Parameters
 
-| Name           | Description                                                                                                     |
-| -------------- | --------------------------------------------------------------------------------------------------------------- |
-| Resource       | The resource being deleted                                                                                      |
-| BaseParameters | Optional. Allows overriding the parameters for the operation                                                    |
-| LroHeaders     | Optional. Allows overriding the headers returned in the Accepted response                                       |
-| Parameters     | Optional. Additional parameters after the path parameters                                                       |
-| Response       | Optional. The success response(s) for the delete operation                                                      |
-| Error          | Optional. The error response, if non-standard.                                                                  |
-| Provider       | Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path. |
+| Name           | Description                                                               |
+| -------------- | ------------------------------------------------------------------------- |
+| Resource       | The resource being deleted                                                |
+| BaseParameters | Optional. Allows overriding the parameters for the operation              |
+| LroHeaders     | Optional. Allows overriding the headers returned in the Accepted response |
+| Parameters     | Optional. Additional parameters after the path parameters                 |
+| Response       | Optional. The success response(s) for the delete operation                |
+| Error          | Optional. The error response, if non-standard.                            |
+| Provider       | Optional. The provider namespace model for the resource.                  |
 
 ### `ArmResourceListAtScope` {#Azure.ResourceManager.ArmResourceListAtScope}
 
@@ -1329,14 +1329,14 @@ op Azure.ResourceManager.ArmResourceListAtScope(): Response | Error
 
 #### Template Parameters
 
-| Name           | Description                                                                                                     |
-| -------------- | --------------------------------------------------------------------------------------------------------------- |
-| Resource       | the resource being patched                                                                                      |
-| BaseParameters | Optional. Allows overriding the operation parameters                                                            |
-| Parameters     | Optional. Additional parameters after the path parameters                                                       |
-| Response       | Optional. The success response for the list operation                                                           |
-| Error          | Optional. The error response, if non-standard.                                                                  |
-| Provider       | Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path. |
+| Name           | Description                                               |
+| -------------- | --------------------------------------------------------- |
+| Resource       | the resource being patched                                |
+| BaseParameters | Optional. Allows overriding the operation parameters      |
+| Parameters     | Optional. Additional parameters after the path parameters |
+| Response       | Optional. The success response for the list operation     |
+| Error          | Optional. The error response, if non-standard.            |
+| Provider       | Optional. The provider namespace model for the resource.  |
 
 ### `ArmResourceListByParent` {#Azure.ResourceManager.ArmResourceListByParent}
 
@@ -1348,16 +1348,16 @@ op Azure.ResourceManager.ArmResourceListByParent(): Response | Error
 
 #### Template Parameters
 
-| Name               | Description                                                                                                     |
-| ------------------ | --------------------------------------------------------------------------------------------------------------- |
-| Resource           | the resource being patched                                                                                      |
-| BaseParameters     | Optional. Allows overriding the operation parameters                                                            |
-| ParentName         | Optional. The name of the parent resource                                                                       |
-| ParentFriendlyName | Optional. The friendly name of the parent resource                                                              |
-| Parameters         | Optional. Additional parameters after the path parameters                                                       |
-| Response           | Optional. The success response for the list operation                                                           |
-| Error              | Optional. The error response, if non-standard.                                                                  |
-| Provider           | Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path. |
+| Name               | Description                                               |
+| ------------------ | --------------------------------------------------------- |
+| Resource           | the resource being patched                                |
+| BaseParameters     | Optional. Allows overriding the operation parameters      |
+| ParentName         | Optional. The name of the parent resource                 |
+| ParentFriendlyName | Optional. The friendly name of the parent resource        |
+| Parameters         | Optional. Additional parameters after the path parameters |
+| Response           | Optional. The success response for the list operation     |
+| Error              | Optional. The error response, if non-standard.            |
+| Provider           | Optional. The provider namespace model for the resource.  |
 
 ### `ArmResourcePatchAsync` {#Azure.ResourceManager.ArmResourcePatchAsync}
 
@@ -1367,14 +1367,14 @@ op Azure.ResourceManager.ArmResourcePatchAsync(properties: Resource): Azure.Reso
 
 #### Template Parameters
 
-| Name           | Description                                                                                                     |
-| -------------- | --------------------------------------------------------------------------------------------------------------- |
-| Resource       | the resource being patched                                                                                      |
-| Properties     | The model type of the resource properties                                                                       |
-| BaseParameters | Optional. Allows overriding the operation parameters                                                            |
-| LroHeaders     | Optional. Allows overriding the lro headers returned in the Accepted response                                   |
-| Parameters     | Optional. Additional parameters after the path parameters                                                       |
-| Provider       | Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path. |
+| Name           | Description                                                                   |
+| -------------- | ----------------------------------------------------------------------------- |
+| Resource       | the resource being patched                                                    |
+| Properties     | The model type of the resource properties                                     |
+| BaseParameters | Optional. Allows overriding the operation parameters                          |
+| LroHeaders     | Optional. Allows overriding the lro headers returned in the Accepted response |
+| Parameters     | Optional. Additional parameters after the path parameters                     |
+| Provider       | Optional. The provider namespace model for the resource.                      |
 
 ### `ArmResourcePatchSync` {#Azure.ResourceManager.ArmResourcePatchSync}
 
@@ -1384,13 +1384,13 @@ op Azure.ResourceManager.ArmResourcePatchSync(properties: Resource): Azure.Resou
 
 #### Template Parameters
 
-| Name           | Description                                                                                                     |
-| -------------- | --------------------------------------------------------------------------------------------------------------- |
-| Resource       | the resource being patched                                                                                      |
-| Properties     | The model type of the resource properties                                                                       |
-| BaseParameters | Optional. Allows overriding the operation parameters                                                            |
-| Parameters     | Optional. Additional parameters after the path parameters                                                       |
-| Provider       | Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path. |
+| Name           | Description                                               |
+| -------------- | --------------------------------------------------------- |
+| Resource       | the resource being patched                                |
+| Properties     | The model type of the resource properties                 |
+| BaseParameters | Optional. Allows overriding the operation parameters      |
+| Parameters     | Optional. Additional parameters after the path parameters |
+| Provider       | Optional. The provider namespace model for the resource.  |
 
 ### `ArmResourceRead` {#Azure.ResourceManager.ArmResourceRead}
 
@@ -1402,14 +1402,14 @@ op Azure.ResourceManager.ArmResourceRead(): Response | Error
 
 #### Template Parameters
 
-| Name           | Description                                                                                                     |
-| -------------- | --------------------------------------------------------------------------------------------------------------- |
-| Resource       | the resource being read                                                                                         |
-| BaseParameters | Optional. Allows overriding the operation parameters                                                            |
-| Parameters     | Optional. Additional parameters after the path parameters                                                       |
-| Response       | Optional. The success response for the read operation                                                           |
-| Error          | Optional. The error response, if non-standard.                                                                  |
-| Provider       | Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path. |
+| Name           | Description                                               |
+| -------------- | --------------------------------------------------------- |
+| Resource       | the resource being read                                   |
+| BaseParameters | Optional. Allows overriding the operation parameters      |
+| Parameters     | Optional. Additional parameters after the path parameters |
+| Response       | Optional. The success response for the read operation     |
+| Error          | Optional. The error response, if non-standard.            |
+| Provider       | Optional. The provider namespace model for the resource.  |
 
 ### `ArmTagsPatchAsync` {#Azure.ResourceManager.ArmTagsPatchAsync}
 
@@ -1419,14 +1419,14 @@ op Azure.ResourceManager.ArmTagsPatchAsync(properties: Azure.ResourceManager.Fou
 
 #### Template Parameters
 
-| Name           | Description                                                                                                     |
-| -------------- | --------------------------------------------------------------------------------------------------------------- |
-| Resource       | the resource being patched                                                                                      |
-| Properties     | Optional. Exists for parallelism with ArmResourcePatch.                                                         |
-| BaseParameters | Optional. Allows overriding the operation parameters                                                            |
-| LroHeaders     | Optional. Allows overriding the lro headers that appear in the Accepted response                                |
-| Parameters     | Optional. Additional parameters after the path parameters                                                       |
-| Provider       | Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path. |
+| Name           | Description                                                                      |
+| -------------- | -------------------------------------------------------------------------------- |
+| Resource       | the resource being patched                                                       |
+| Properties     | Optional. Exists for parallelism with ArmResourcePatch.                          |
+| BaseParameters | Optional. Allows overriding the operation parameters                             |
+| LroHeaders     | Optional. Allows overriding the lro headers that appear in the Accepted response |
+| Parameters     | Optional. Additional parameters after the path parameters                        |
+| Provider       | Optional. The provider namespace model for the resource.                         |
 
 ### `ArmTagsPatchSync` {#Azure.ResourceManager.ArmTagsPatchSync}
 
@@ -1436,12 +1436,12 @@ op Azure.ResourceManager.ArmTagsPatchSync(properties: Azure.ResourceManager.Foun
 
 #### Template Parameters
 
-| Name           | Description                                                                                                     |
-| -------------- | --------------------------------------------------------------------------------------------------------------- |
-| Resource       | the resource being patched                                                                                      |
-| BaseParameters | Optional. Allows overriding the operation parameters                                                            |
-| Parameters     | Optional. Additional parameters after the path parameters                                                       |
-| Provider       | Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path. |
+| Name           | Description                                               |
+| -------------- | --------------------------------------------------------- |
+| Resource       | the resource being patched                                |
+| BaseParameters | Optional. Allows overriding the operation parameters      |
+| Parameters     | Optional. Additional parameters after the path parameters |
+| Provider       | Optional. The provider namespace model for the resource.  |
 
 ### `checkGlobalNameAvailability` {#Azure.ResourceManager.checkGlobalNameAvailability}
 

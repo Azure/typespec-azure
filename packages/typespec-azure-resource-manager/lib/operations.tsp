@@ -38,7 +38,7 @@ op ArmListBySubscription<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the list operation
  * @template Error Optional. The error response, if non-standard.
- * @template Provider Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @get
 @autoRoute
@@ -70,7 +70,7 @@ op ArmResourceListByParent<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the list operation
  * @template Error Optional. The error response, if non-standard.
- * @template Provider Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @get
 @autoRoute
@@ -100,7 +100,7 @@ op ArmResourceListAtScope<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the read operation
  * @template Error Optional. The error response, if non-standard.
- * @template Provider Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @autoRoute
 @doc("Get a {name}", Resource)
@@ -126,7 +126,7 @@ op ArmResourceRead<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the read operation
  * @template Error Optional. The error response, if non-standard.
- * @template Provider Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @autoRoute
 @doc("Check for the existence of a {name}", Resource)
@@ -189,7 +189,7 @@ op GetResourceOperationStatus<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the createOrUpdate operation
  * @template Error Optional. The error response, if non-standard.
- * @template Provider Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @autoRoute
 @doc("Create a {name}", Resource)
@@ -223,7 +223,7 @@ op ArmResourceCreateOrUpdateAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the createOrUpdate operation
  * @template Error Optional. The error response, if non-standard.
- * @template Provider Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 #deprecated "Please use ArmResourceCreateOrReplaceSync instead"
 @autoRoute
@@ -252,7 +252,7 @@ op ArmResourceCreateOrUpdateSync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the createOrUpdate operation
  * @template Error Optional. The error response, if non-standard.
- * @template Provider Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @autoRoute
 @doc("Create a {name}", Resource)
@@ -281,7 +281,7 @@ op ArmResourceCreateOrReplaceSync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the createOrReplace operation
  * @template Error Optional. The error response, if non-standard.
- * @template Provider Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourceCreateOrReplaceAsync<
@@ -313,7 +313,7 @@ op ArmResourceCreateOrReplaceAsync<
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template LroHeaders Optional.  Allows overriding the lro headers that appear in the Accepted response
  * @template Parameters Optional. Additional parameters after the path parameters
- * @template Provider Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @patch(#{ implicitOptionality: true })
 @Private.enforceConstraint(Resource, Foundations.Resource)
@@ -347,7 +347,7 @@ op ArmTagsPatchAsync<
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template LroHeaders Optional.  Allows overriding the lro headers returned in the Accepted response
  * @template Parameters Optional. Additional parameters after the path parameters
- * @template Provider Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @patch(#{ implicitOptionality: true })
 @Private.enforceConstraint(Resource, Foundations.Resource)
@@ -383,7 +383,7 @@ op ArmResourcePatchAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the patch operation
  * @template Error Optional. The error response, if non-standard.
- * @template Provider Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @autoRoute
 @doc("Update a {name}", Resource)
@@ -419,7 +419,7 @@ op ArmCustomPatchAsync<
  * @template Resource the resource being patched
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template Parameters Optional. Additional parameters after the path parameters
- * @template Provider Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @patch(#{ implicitOptionality: true })
 @Private.enforceConstraint(Resource, Foundations.Resource)
@@ -444,7 +444,7 @@ op ArmTagsPatchSync<
  * @template Properties The model type of the resource properties
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template Parameters Optional. Additional parameters after the path parameters
- * @template Provider Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @patch(#{ implicitOptionality: true })
 @Private.enforceConstraint(Resource, Foundations.Resource)
@@ -472,7 +472,7 @@ op ArmResourcePatchSync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the patch operation
  * @template Error Optional. The error response, if non-standard.
- * @template Provider Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @autoRoute
 @doc("Update a {name}", Resource)
@@ -501,7 +501,7 @@ op ArmCustomPatchSync<
  * @template BaseParameters Optional. Allows overriding the parameters for the operation
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
- * @template Provider Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @autoRoute
 @doc("Delete a {name}", Resource)
@@ -528,7 +528,7 @@ op ArmResourceDeleteAsyncBase<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response(s) for the delete operation
  * @template Error Optional. The error response, if non-standard.
- * @template Provider Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 #deprecated "Use 'ArmResourceDeleteWithoutOkAsync' instead"
 @Private.enforceConstraint(Resource, Foundations.Resource)
@@ -551,7 +551,7 @@ op ArmResourceDeleteAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response(s) for the delete operation
  * @template Error Optional. The error response, if non-standard.
- * @template Provider Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourceDeleteWithoutOkAsync<
@@ -572,7 +572,7 @@ op ArmResourceDeleteWithoutOkAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response(s) for the delete operation
  * @template Error Optional. The error response, if non-standard.
- * @template Provider Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @autoRoute
 @doc("Delete a {name}", Resource)
@@ -600,7 +600,7 @@ op ArmResourceDeleteSync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
  * @template OptionalRequestBody Optional. Indicates whether the request body is optional.
- * @template Provider Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @autoRoute
 @armResourceAction(Resource)
@@ -634,7 +634,7 @@ op ArmResourceActionAsyncBase<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
  * @template OptionalRequestBody Optional. Indicates whether the body parameter is optional.
- * @template Provider Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @returnsDoc("Azure operation completed successfully.")
 @Private.enforceConstraint(Resource, Foundations.Resource)
@@ -674,7 +674,7 @@ op ArmResourceActionAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
  * @template OptionalRequestBody Optional. Indicates whether the body parameter is optional.
- * @template Provider Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @returnsDoc("Azure operation completed successfully.")
 @Private.enforceConstraint(Resource, Foundations.Resource)
@@ -713,7 +713,7 @@ op ActionAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
  * @template OptionalRequestBody Optional. Indicates whether the body parameter is optional.
- * @template Provider Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @autoRoute
 @armResourceAction(Resource)
@@ -747,7 +747,7 @@ op ArmResourceActionSync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
  * @template OptionalRequestBody Optional. Indicates whether the body parameter is optional.
- * @template Provider Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourceActionNoContentAsync<
@@ -783,7 +783,7 @@ op ArmResourceActionNoContentAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
  * @template OptionalRequestBody Optional. Indicates whether the body parameter is optional.
- * @template Provider Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourceActionNoResponseContentAsync<
@@ -819,7 +819,7 @@ op ArmResourceActionNoResponseContentAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
  * @template OptionalRequestBody Optional. Indicates whether the request body is optional.
- * @template Provider Optional. The provider namespace model for the resource. Use `{}` to omit the provider namespace from the path.
+ * @template Provider Optional. The provider namespace model for the resource.
  */
 @autoRoute
 @armResourceAction(Resource)
