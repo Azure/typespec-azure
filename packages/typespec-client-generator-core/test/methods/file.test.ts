@@ -377,3 +377,91 @@ it("file download with multiple content types should have enum accept header", a
   strictEqual(acceptHeader.type.kind, "enum");
   strictEqual(acceptHeader.serializedName, "Accept");
 });
+
+it("file upload with multiple content types should have enum contentType header", async () => {
+  const { program } = await SimpleTester.compile(
+    `
+      @service
+      namespace TestService {
+        op uploadFileMultipleContentTypes(@body file: File<"image/png" | "image/jpeg">): void;
+      }
+    `,
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  const method = sdkPackage.clients[0].methods[0];
+  strictEqual(method.name, "uploadFileMultipleContentTypes");
+  // The contentType method parameter should be an enum
+  const contentTypeMethodParam = method.parameters.find((p) => p.name === "contentType");
+  ok(contentTypeMethodParam);
+  strictEqual(contentTypeMethodParam.type.kind, "enum");
+  strictEqual(contentTypeMethodParam.type.values.length, 2);
+  ok(contentTypeMethodParam.type.values.find((v) => v.value === "image/png"));
+  ok(contentTypeMethodParam.type.values.find((v) => v.value === "image/jpeg"));
+  // The Content-Type header should also be an enum
+  const httpOperation = method.operation;
+  const contentTypeHeader = httpOperation.parameters.find(
+    (p) => p.kind === "header" && p.name === "contentType",
+  );
+  ok(contentTypeHeader);
+  strictEqual(contentTypeHeader.type.kind, "enum");
+  strictEqual(contentTypeHeader.serializedName, "Content-Type");
+});
+
+it("file upload with default content type should have constant contentType header", async () => {
+  const { program } = await SimpleTester.compile(
+    `
+      @service
+      namespace TestService {
+        op uploadFileDefault(@body file: File): void;
+      }
+    `,
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  const method = sdkPackage.clients[0].methods[0];
+  strictEqual(method.name, "uploadFileDefault");
+  // The contentType method parameter should be a constant "*/*"
+  const contentTypeMethodParam = method.parameters.find((p) => p.name === "contentType");
+  ok(contentTypeMethodParam);
+  strictEqual(contentTypeMethodParam.type.kind, "constant");
+  strictEqual(contentTypeMethodParam.type.value, "*/*");
+  // The Content-Type header should also be a constant
+  const httpOperation = method.operation;
+  const contentTypeHeader = httpOperation.parameters.find(
+    (p) => p.kind === "header" && p.name === "contentType",
+  );
+  ok(contentTypeHeader);
+  strictEqual(contentTypeHeader.type.kind, "constant");
+  strictEqual(contentTypeHeader.type.value, "*/*");
+  strictEqual(contentTypeHeader.serializedName, "Content-Type");
+});
+
+it("file download with default content type should have constant accept header", async () => {
+  const { program } = await SimpleTester.compile(
+    `
+      @service
+      namespace TestService {
+        op downloadFileDefault(): File;
+      }
+    `,
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  const method = sdkPackage.clients[0].methods[0];
+  strictEqual(method.name, "downloadFileDefault");
+  // The accept method parameter should be a constant "*/*"
+  const acceptMethodParam = method.parameters.find((p) => p.name === "accept");
+  ok(acceptMethodParam);
+  strictEqual(acceptMethodParam.type.kind, "constant");
+  strictEqual(acceptMethodParam.type.value, "*/*");
+  // The Accept header should also be a constant
+  const httpOperation = method.operation;
+  const acceptHeader = httpOperation.parameters.find(
+    (p) => p.kind === "header" && p.name === "accept",
+  );
+  ok(acceptHeader);
+  strictEqual(acceptHeader.type.kind, "constant");
+  strictEqual(acceptHeader.type.value, "*/*");
+  strictEqual(acceptHeader.serializedName, "Accept");
+});
