@@ -44,10 +44,6 @@ export const AreaLabels = defineLabels({
     color: "9EB120",
     description: "Issues for Azure CLI/PSH features",
   },
-  "meta:website": {
-    color: "007dc8",
-    description: "TypeSpec.io updates",
-  },
 });
 
 /**
@@ -59,11 +55,10 @@ export const AreaPaths: Record<keyof typeof AreaLabels, string[]> = {
   "lib:azure-resource-manager": ["packages/typespec-azure-resource-manager/"],
   "emitter:autorest": ["packages/typespec-autorest/"],
   "lib:tcgc": ["packages/typespec-client-generator-core/"],
-  "lib:azure-http-specs": ["packages/azure-http-specs/"],
+  "lib:azure-http-specs": ["packages/typespec-azure-http-specs/"],
   ide: [],
   "cli/psh": [],
   "emitter:client:all": [],
-  "meta:website": ["website/"],
 };
 
 export default defineConfig({

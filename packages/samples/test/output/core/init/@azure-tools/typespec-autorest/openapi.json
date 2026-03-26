@@ -262,6 +262,7 @@
     },
     "WidgetMergePatchUpdate": {
       "type": "object",
+      "description": "",
       "properties": {
         "weight": {
           "type": "integer",

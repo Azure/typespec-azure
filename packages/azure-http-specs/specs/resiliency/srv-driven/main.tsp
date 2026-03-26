@@ -21,7 +21,9 @@ using Spector;
   - A client generated from the second service spec can call the second deployment of a service with api version v1
   - A client generated from the second service spec can call the second deployment of a service with api version v2
   """)
-@clientName("ResiliencyServiceDrivenClient")
+@client({
+  name: "ResiliencyServiceDrivenClient",
+})
 @service
 @server(
   "{endpoint}/resiliency/service-driven/client:v2/service:{serviceDeploymentVersion}/api-version:{apiVersion}",
@@ -143,10 +145,6 @@ interface AddOptionalParam {
     `new-parameter`?: string,
   ): NoContentResponse;
 }
-
-@@clientLocation(AddOptionalParam.fromNone, Resiliency.ServiceDriven);
-@@clientLocation(AddOptionalParam.fromOneRequired, Resiliency.ServiceDriven);
-@@clientLocation(AddOptionalParam.fromOneOptional, Resiliency.ServiceDriven);
 
 @scenario
 @scenarioDoc("""

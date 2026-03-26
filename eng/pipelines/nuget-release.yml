@@ -18,7 +18,7 @@ extends:
         value: $(System.DefaultWorkingDirectory)/_artifacts/packages
       - name: TYPESPEC_VS_CI_BUILD
         value: true # Enable official Visual Studio extension build
-      - name: TYPESPEC_SKIP_WEBSITE_BUILD
+      - name: TYPESPEC_SKIP_DOCUSAURUS_BUILD
         value: true # Disable docusaurus build
 
     stages:

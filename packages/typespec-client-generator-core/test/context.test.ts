@@ -1,4 +1,3 @@
-import { resolveArmResources } from "@azure-tools/typespec-azure-resource-manager";
 import { resolveVirtualPath } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
@@ -20,7 +19,7 @@ it("multiple call with versioning", async () => {
       v1,
     }
 
-    @client({name: "TestClient", service: Contoso.WidgetManager})
+    @client({name: "TestClient"})
     @test
     interface Test {}
   `;
@@ -224,64 +223,4 @@ it("export TCGC output with emitter name from context", async () => {
   ok(output);
   const codeModel = parse(output);
   strictEqual(codeModel["models"][0]["name"], "Test");
-});
-
-it("calling createSdkContext does not cause resolveArmResources to return duplicate resources", async () => {
-  // Regression test: createSdkContext runs versioning mutation which re-applies decorators on
-  // realm types. resolveArmResources must skip realm types so that duplicates are not registered.
-  // Using 2 versions is the key condition that reproduces the issue.
-  const { program } = await ArmTester.compile(`
-    @armProviderNamespace
-    @service(#{ title: "Azure Management emitter Testing" })
-    @versioned(Versions)
-    namespace Microsoft.ContosoProviderHub;
-
-    enum Versions {
-      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-      \`2021-10-01-preview\`,
-      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-      \`2022-01-01\`,
-    }
-
-    model EmployeeParent is TrackedResource<EmployeeParentProperties> {
-      ...ResourceNameParameter<EmployeeParent>;
-    }
-
-    model EmployeeParentProperties {
-      age?: int32;
-    }
-
-    @parentResource(EmployeeParent)
-    model Employee is TrackedResource<EmployeeProperties> {
-      ...ResourceNameParameter<Employee>;
-    }
-
-    model EmployeeProperties {
-      age?: int32;
-    }
-
-    interface Operations extends Azure.ResourceManager.Operations {}
-
-    @armResourceOperations
-    interface EmployeesParent {
-      get is ArmResourceRead<EmployeeParent>;
-    }
-
-    @armResourceOperations
-    interface Employees {
-      get is ArmResourceRead<Employee>;
-      createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
-    }
-  `);
-
-  // Calling createSdkContext before resolveArmResources previously caused duplicates
-  await createSdkContextForTester(program);
-
-  const provider = resolveArmResources(program);
-  ok(provider.resources);
-  // Should have exactly 2 resources (EmployeeParent and Employee), no duplicates
-  strictEqual(provider.resources.length, 2);
-  const resourceNames = provider.resources.map((r) => r.resourceName);
-  ok(resourceNames.includes("EmployeeParent"));
-  ok(resourceNames.includes("Employee"));
 });

@@ -1,10 +1,10 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
-import { ok, strictEqual } from "assert";
+import { strictEqual } from "assert";
 import { it } from "vitest";
 import { listClients } from "../../src/decorators.js";
 import { createSdkContextForTester, SimpleTester } from "../tester.js";
 
-it("multiple-services without explicit @client creates separate root clients", async () => {
+it("multiple-services", async () => {
   const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
     `
       @service
@@ -20,21 +20,19 @@ it("multiple-services without explicit @client creates separate root clients", a
 
   const context = await createSdkContextForTester(program);
 
-  // No diagnostics - multiple services without explicit @client is now supported
-  expectDiagnostics(diagnostics, []);
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/multiple-services",
+    },
+  ]);
 
-  strictEqual(listClients(context).length, 2);
-  strictEqual(context.sdkPackage.clients.length, 2);
+  strictEqual(listClients(context).length, 1);
+  strictEqual(context.sdkPackage.clients.length, 1);
 
-  const client1 = context.sdkPackage.clients.find((c) => c.name === "Test1Client");
-  ok(client1);
-  strictEqual(client1.methods.length, 1);
-  strictEqual(client1.methods[0].name, "x");
-
-  const client2 = context.sdkPackage.clients.find((c) => c.name === "Test2Client");
-  ok(client2);
-  strictEqual(client2.methods.length, 1);
-  strictEqual(client2.methods[0].name, "y");
+  const client = context.sdkPackage.clients[0];
+  strictEqual(client.name, "Test1Client");
+  strictEqual(client.methods.length, 1);
+  strictEqual(client.methods[0].name, "x");
 });
 
 it("require-versioned-service", async () => {

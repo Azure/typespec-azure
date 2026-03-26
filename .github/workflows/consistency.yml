@@ -98,7 +98,7 @@ jobs:
       - run: pnpm run lint
         name: Lint
 
-  # Check catalog is in sync with core
+  # Check version mismatch
   version-consistency:
     name: Versions consistency
     runs-on: ubuntu-latest
@@ -113,7 +113,7 @@ jobs:
         name: Install dependencies
 
       - run: pnpm run check-version-mismatch
-        name: Check catalog is in sync
+        name: Check version mismatch
 
   # Verify Arm OpenAPI common types are up to date
   common-types-up-to-date:

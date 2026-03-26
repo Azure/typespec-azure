@@ -358,8 +358,7 @@ op delete(@path id: string): ArmNoContentResponse;
 
 ### `ArmOperationStatus` {#Azure.ResourceManager.ArmOperationStatus}
 
-Standard Azure Resource Manager operation status response, used as the response
-body for `GetResourceOperationStatus`.
+Standard Azure Resource Manager operation status response
 
 ```typespec
 model Azure.ResourceManager.ArmOperationStatus<Properties, StatusValues>

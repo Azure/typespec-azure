@@ -11,15 +11,15 @@ This page documents the client behavior as well as how to customize clients.
 
 ### Basic Rules
 
-By default, each namespace with the `@service` decorator is generated as a separate root client. The client name is the namespace name with `Client` appended as a suffix.
+By default, the first namespace with the `@service` decorator is generated as a root client. The client name is the namespace name with `Client` appended as a suffix.
 
-Sub-namespaces and interfaces under each root client are generated as sub clients with a hierarchical structure. The sequence of sub clients is determined by the order of namespace declarations, followed by interface declarations.
+Sub-namespaces and interfaces under each root client are generated as operation groups with a hierarchical structure. The sequence of operation groups is determined by the order of namespace declarations, followed by interface declarations.
 
-The root client's SDK namespace corresponds to the namespace decorated with `@service`. If a sub client originates from a sub-namespace, its SDK namespace corresponds to that sub-namespace. If it originates from an interface, its SDK namespace corresponds to the namespace containing the interface.
+The root client's SDK namespace corresponds to the namespace decorated with `@service`. If an operation group originates from a sub-namespace, its SDK namespace corresponds to that sub-namespace. If it originates from an interface, its SDK namespace corresponds to the namespace containing the interface.
 
-By default, sub clients can only be initialized by the root client or their parent sub client.
+By default, operation groups can only be initialized by the root client or their parent operation group.
 
-Different languages organize clients and sub clients differently. Refer to the examples below for details.
+Different languages organize clients and operation groups differently. Refer to the examples below for details.
 
 ### Single Client
 
@@ -145,9 +145,9 @@ petStoreClient.Pet(context.Background(), &PetStoreClientPetOptions{})
 
 </ClientTabs>
 
-### Client with One-Layer Child Sub Clients
+### Client with One-Layer Child Operation Groups
 
-The PetStore includes two sub clients: `Dogs`, which belongs to a subnamespace, and `Cats`, which is part of an interface.
+The PetStore includes two operation groups: `Dogs`, which belongs to a subnamespace, and `Cats`, which is part of an interface.
 
 <ClientTabs>
 
@@ -316,9 +316,9 @@ petStoreDogsClient.Pet(context.Background(), &PetStoreDogsClientPetOptions{})
 
 </ClientTabs>
 
-### Client with Multi-Layer Child Sub Clients
+### Client with Multi-Layer Child Operation Groups
 
-`PetStore` has three sub clients: `Billings` (from an interface), `Pets` (from a sub-namespace), and `Actions` (from an interface). `Pets` also contains a nested sub client, `Actions`, from an interface.
+`PetStore` has three operation groups: `Billings` (from an interface), `Pets` (from a sub-namespace), and `Actions` (from an interface). `Pets` also contains a nested operation group, `Actions`, from an interface.
 
 <ClientTabs>
 
@@ -384,10 +384,10 @@ class PetsOperations:
 class PetsActionsOperations:
 
     @distributed_trace
-    def feed(self, **kwargs: Any) -> None:
+    def open(self, **kwargs: Any) -> None:
 
     @distributed_trace
-    def pet(self, **kwargs: Any) -> None:
+    def close(self, **kwargs: Any) -> None:
 
 #usage sample
 from pet_store import PetStoreClient
@@ -594,22 +594,22 @@ petStorePetsActionsClient.Pet(context.Background(), &PetStorePetsActionsClientPe
 
 Customizations SHOULD always be made in a file named `client.tsp` alongside `main.tsp`.
 
-There are two ways to customize the client hierarchy: using `@clientLocation` to change the location of the operations, or use `@client` to restructure the client hierarchy.
-Be careful when you use both of them since `@clientLocation` could not move the client that is no longer exist with `@client` customization.
+There are two ways to customize the client hierarchy: using `@clientLocation` to change the location of the operations, or use `@client` and `@operationGroup` to restructure the client hierarchy.
+These two ways should not be used together. If so, `@client` and `@operationGroup` will take precedence over `@clientLocation`.
 
 The `@clientLocaton` decorator allows you to change the location of the operations in the client hierarchy.
 It can be used to move operations to an existed sub client defined by `Interface` or `Namespace`, or move the the root client of namespace with `@service` decorator.
 This decorator is useful when you want to keep the default client hierarchy but need to change the location of some operations.
 
-The `@client` decorator allows you to totally restructure the client hierarchy.
+The `@client` and `@operationGroup` decorators allow you to totally restructure the client hierarchy.
 However, if any customizations are made, the client hierarchy will only reflect those customizations. The default behavior logic will no longer apply.
 
 If customizations are made, the client's SDK namespace will follow the namespace decorated with `@client` or the namespace containing the interface decorated with `@client`.
-You can override this using `@clientNamespace` if needed.
+Similarly, the operation group's SDK namespace follows the same logic for `@operationGroup`. You can override this using `@clientNamespace` if needed.
 
-The sequence of clients and sub clients is determined by the order of the `@client` decorators.
+The sequence of clients and operation groups is determined by the order of the `@client` and `@operationGroup` decorators.
 
-### Move All Operations to Root Client
+### Move All Operations to Root client
 
 This can be achieved with the augment decorator: `@clientLocation` from `typespec-client-generator-core`.
 
@@ -707,8 +707,8 @@ client.pet();
 // generated petstore_client.go
 type PetStoreClient struct {}
 
-func NewPetStoreClient() *PetStoreClient{
-  return &PetStoreClient{}
+func NewPetStorePetsActionsClient() *PetStorePetsActionsClient{
+  return &PetStorePetsActionsClient{}
 }
 
 func (client *PetStoreClient) Feed(ctx context.Context, options *PetStoreClientFeedOptions) (PetStoreClientFeedResponse, error) {}
@@ -964,7 +964,7 @@ import "@azure-tools/typespec-client-generator-core";
 
 using Azure.ClientGenerator.Core;
 
-namespace PetStoreRenamed; // this namespace will be the namespace of the clients and sub clients defined in this customization file
+namespace PetStoreRenamed; // this namespace will be the namespace of the clients and operation groups defined in this customization file
 
 @client({
   name: "FoodClient",
@@ -1110,9 +1110,9 @@ petActionClient.Pet(context.Background(), &PetActionClientPetOptions{})
 
 </ClientTabs>
 
-### One Client and Two Sub Clients
+### One Client and Two Operation Groups
 
-Two sub clients that separate the operations can be declared using the `@client` decorator (or the `@operationGroup` decorator, which is an alias) from `typespec-client-generator-core`:
+Two clients that separate the operations can be declared using the `@client` decorator and the `@operationGroup` decorator from `typespec-client-generator-core`:
 
 <ClientTabs>
 
@@ -1135,7 +1135,7 @@ using Azure.ClientGenerator.Core;
   name: "PetStoreClient",
   service: PetStore,
 })
-namespace PetStoreRenamed; // this namespace will be the namespace of the clients and sub clients defined in this customization file
+namespace PetStoreRenamed; // this namespace will be the namespace of the clients and operation groups defined in this customization file
 
 @operationGroup
 interface OpGrp1 {
@@ -1445,7 +1445,7 @@ petClient.Pet(context.Background(), &PetActionClientPetOptions{})
 
 ### Splitting the Operations into Two Clients and Having Clients in Different Namespaces
 
-Two clients that separate the operations can be declared using the `@client` decorator of `typespec-client-generator-core`:
+Two clients that separate the operations can be declared using the `client` decorator of `typespec-client-generator-core`:
 
 <ClientTabs>
 
@@ -1464,7 +1464,7 @@ import "@azure-tools/typespec-client-generator-core";
 
 using Azure.ClientGenerator.Core;
 
-namespace PetStoreRenamed; // this namespace will be the namespace of the clients and sub clients defined in this customization file
+namespace PetStoreRenamed; // this namespace will be the namespace of the clients and operation groups defined in this customization file
 
 @client({
   name: "FoodClient",
@@ -1933,10 +1933,10 @@ client.Download(context.Background(), &StorageClientDownloadOptions{})
 
 </ClientTabs>
 
-### Change Sub Client Initialization Way
+### Change Operation Group Initialization Way
 
-By default, all the nested sub clients could only be initialized by parent client or sub client.
-There are cases where spec authors would like their sub clients could both be initialized by parent as well as individually.
+By default, all the nested operation group could only be initialized by parent client or operation group.
+There are cases where spec authors would like their operation groups could both be initialized by parent as well as individually.
 
 With `@clientInitialization`, you can change the initialization way, by passing in `initializedBy` option of `InitializedBy.individually | InitializedBy.parent` value.
 
@@ -2004,19 +2004,17 @@ You could define a single client that combines operations from multiple services
 
 1. **Service Array**: Set all the services that you want to merge in to the `@client` decorator's `service` property (e.g., `service: [ServiceA, ServiceB]`).
 
-2. **Auto-Merge with `autoMergeService: true`**: Set `autoMergeService: true` on the `@client` decorator to automatically merge all operations and sub clients from every listed service into the single client. `autoMergeService` defaults to `false`. When `false` or omitted, the client will have no auto-populated operations — you would need to define child `@client` decorators or use `is` to map operations explicitly.
+2. **Version Dependencies**: If you want to specify each service's API version used in the single client, you could use `@useDependency` to declare which version of each service the client supports. Otherwise, the latest version of each service will be used by default.
 
-3. **Versioning**: Each service's API versions are resolved independently from its own `@versioned` definition. TCGC always uses the latest version for each service. No `@useDependency` is needed.
+3. **Operation Group Structure**: Operations and operation groups will be auto merged into the single client (based on operation, interfaces or namespaces from the original services).
 
-4. **Sub client Structure**: When `autoMergeService: true` is set, operations and sub clients will be auto merged into the single client (based on operations, interfaces, or namespaces from the original services).
+4. **Operation Group Merging**: If multiple services have nested namespaces or interfaces with the same name, TCGC will automatically merge them into a single operation group. The merged operation group will have empty `apiVersions` and a `string` type for the API version parameter, and will contain operations from all the services.
 
-5. **Sub client Merging**: If multiple services have nested namespaces or interfaces with the same name, TCGC will automatically merge them into a single sub client. The merged sub client will have empty `apiVersions` and a `string` type for the API version parameter, and will contain operations from all the services.
-
-6. **@clientLocation with Multiple Services**: You can use `@clientLocation` to move operations from different services to the same sub client. The resulting sub client will have empty `apiVersions` and a `string` type for the API version parameter, allowing it to handle operations with different API versions.
+5. **@clientLocation with Multiple Services**: You can use `@clientLocation` to move operations from different services to the same operation group. The resulting operation group will have empty `apiVersions` and a `string` type for the API version parameter, allowing it to handle operations with different API versions.
 
 :::caution
 All services being merged must share the same endpoint and authentication method. If not, you will get diagnostics error.
-TCGC automatically merges sub clients with the same name, but you still need to ensure that there are no naming conflicts between models, enums, and other types in the services being merged. If there are conflicts, you may need to rename the types in the original services to avoid collisions.
+TCGC automatically merges operation groups with the same name, but you still need to ensure that there are no naming conflicts between models, enums, and other types in the services being merged. If there are conflicts, you may need to rename the types in the original services to avoid collisions.
 :::
 
 <ClientTabs>
@@ -2058,8 +2056,8 @@ using Azure.ClientGenerator.Core;
 @client({
   name: "CombineClient",
   service: [ServiceA, ServiceB],
-  autoMergeService: true,
 })
+@useDependency(ServiceA.VersionsA.av1, ServiceB.VersionsB.bv2)
 namespace CombineClient;
 ```
 
@@ -2072,7 +2070,7 @@ class CombineClient:
 
 # generated operations/_operations.py
 class AIOperations:
-    def __init__(self, client, api_version: str = "av2") -> None: ...
+    def __init__(self, client, api_version: str = "av1") -> None: ...
 
     @distributed_trace
     def a_test(self, **kwargs: Any) -> None: ...
@@ -2087,17 +2085,17 @@ class BIOperations:
 from combine_client import CombineClient
 
 client = CombineClient(endpoint="<my-endpoint>")
-client.ai.a_test()  # uses api-version av2
+client.ai.a_test()  # uses api-version av1
 client.bi.b_test()  # uses api-version bv2
 ```
 
 ```csharp
 using CombineClient;
 
-// The combined client with sub clients for each service
+// The combined client with operation groups for each service
 CombineClient client = new CombineClient(new Uri("<my-endpoint>"));
 
-// AI operations use ServiceA's api-version (av2)
+// AI operations use ServiceA's api-version (av1)
 client.GetAIClient().ATest();
 
 // BI operations use ServiceB's api-version (bv2)
@@ -2109,7 +2107,7 @@ import { CombineClient } from "@azure/package-name";
 
 const client = new CombineClient("<my-endpoint>");
 
-// AI operations use ServiceA's api-version (av2)
+// AI operations use ServiceA's api-version (av1)
 client.ai.aTest();
 
 // BI operations use ServiceB's api-version (bv2)
@@ -2138,7 +2136,7 @@ public final class CombineClientBuilder implements HttpTrait<CombineClientBuilde
 // Client classes
 @ServiceClient(builder = CombineClientBuilder.class)
 public final class AIClient {
-    // Uses ServiceA's api-version (av2)
+    // Uses ServiceA's api-version (av1)
     public void aTest();
 }
 
@@ -2153,7 +2151,7 @@ CombineClientBuilder builder = new CombineClientBuilder()
     .endpoint("<my-endpoint>");
 
 AIClient aiClient = builder.buildAIClient();
-aiClient.aTest();  // uses api-version av2
+aiClient.aTest();  // uses api-version av1
 
 BIClient biClient = builder.buildBIClient();
 biClient.bTest();  // uses api-version bv2
@@ -2178,7 +2176,7 @@ func (client *CombineClient) NewBIClient() *BIClient {
 // generated ai_client.go
 type AIClient struct {}
 
-// Uses ServiceA's api-version (av2)
+// Uses ServiceA's api-version (av1)
 func (client *AIClient) ATest(ctx context.Context, options *AIClientATestOptions) (AIClientATestResponse, error) {}
 
 // generated bi_client.go
@@ -2198,503 +2196,9 @@ type BIClientBTestResponse struct {}
 // Usage Sample
 combineClient := NewCombineClient("<my-endpoint>")
 aiClient := combineClient.NewAIClient()
-aiClient.ATest(context.Background(), &AIClientATestOptions{})  // uses api-version av2
+aiClient.ATest(context.Background(), &AIClientATestOptions{})  // uses api-version av1
 biClient := combineClient.NewBIClient()
 biClient.BTest(context.Background(), &BIClientBTestOptions{})  // uses api-version bv2
-```
-
-</ClientTabs>
-
-### Mixing Multi-Service and Single-Service Clients
-
-You can combine multiple services into one client while keeping another service as a separate client. This is useful when some services are closely related and should be accessed through a unified client, while others are independent enough to warrant their own client.
-
-Set `autoMergeService: true` on any client that should automatically pull in all operations from its service(s). A multi-service client uses `service: [ServiceA, ServiceB]` with `autoMergeService: true` to merge everything, while a single-service client uses `service: ServiceC` with `autoMergeService: true` to get default behavior.
-
-<ClientTabs>
-
-```typespec title="main.tsp"
-@service
-@versioned(VersionsA)
-namespace ServiceA {
-  enum VersionsA {
-    av1,
-    av2,
-  }
-
-  interface Operations {
-    opA(): void;
-  }
-}
-
-@service
-@versioned(VersionsB)
-namespace ServiceB {
-  enum VersionsB {
-    bv1,
-    bv2,
-  }
-
-  interface Operations {
-    opB(): void;
-  }
-}
-
-@service
-@versioned(VersionsC)
-namespace ServiceC {
-  enum VersionsC {
-    cv1,
-    cv2,
-  }
-
-  interface Operations {
-    opC(): void;
-  }
-}
-```
-
-```typespec title="client.tsp"
-import "./main.tsp";
-import "@azure-tools/typespec-client-generator-core";
-
-using Azure.ClientGenerator.Core;
-
-// Multi-service client combining ServiceA and ServiceB
-@client({
-  name: "CombinedABClient",
-  service: [ServiceA, ServiceB],
-  autoMergeService: true,
-})
-namespace CombinedABClient;
-
-// Single-service client for ServiceC
-@client({
-  name: "ServiceCClient",
-  service: ServiceC,
-  autoMergeService: true,
-})
-namespace ServiceCClient;
-```
-
-```python
-# generated _client.py
-class CombinedABClient:
-    def __init__(self, endpoint: str, **kwargs: Any) -> None:
-      self.operations = OperationsOperations(endpoint=endpoint, **kwargs)
-
-class ServiceCClient:
-    def __init__(self, endpoint: str, **kwargs: Any) -> None:
-      self.operations = OperationsOperations(endpoint=endpoint, **kwargs)
-
-# usage sample
-from combined_ab_client import CombinedABClient
-from service_c_client import ServiceCClient
-
-# Combined client for ServiceA and ServiceB
-combined_client = CombinedABClient(endpoint="<my-endpoint>")
-combined_client.operations.op_a()  # From ServiceA
-combined_client.operations.op_b()  # From ServiceB
-
-# Separate client for ServiceC
-service_c_client = ServiceCClient(endpoint="<my-endpoint>")
-service_c_client.operations.op_c()
-```
-
-```csharp
-// Combined client for ServiceA and ServiceB
-CombinedABClient combinedClient = new CombinedABClient(new Uri("<my-endpoint>"));
-combinedClient.GetOperationsClient().OpA();  // From ServiceA
-combinedClient.GetOperationsClient().OpB();  // From ServiceB
-
-// Separate client for ServiceC
-ServiceCClient serviceCClient = new ServiceCClient(new Uri("<my-endpoint>"));
-serviceCClient.GetOperationsClient().OpC();
-```
-
-```typescript
-import { CombinedABClient } from "@azure/combined-ab";
-import { ServiceCClient } from "@azure/service-c";
-
-// Combined client for ServiceA and ServiceB
-const combinedClient = new CombinedABClient("<my-endpoint>");
-combinedClient.operations.opA(); // From ServiceA
-combinedClient.operations.opB(); // From ServiceB
-
-// Separate client for ServiceC
-const serviceCClient = new ServiceCClient("<my-endpoint>");
-serviceCClient.operations.opC();
-```
-
-```java
-// Combined client builder for ServiceA and ServiceB
-CombinedABClientBuilder combinedBuilder = new CombinedABClientBuilder()
-    .endpoint("<my-endpoint>");
-
-OperationsClient operationsClient = combinedBuilder.buildOperationsClient();
-operationsClient.opA();  // From ServiceA
-operationsClient.opB();  // From ServiceB
-
-// Separate client for ServiceC
-ServiceCClientBuilder serviceCBuilder = new ServiceCClientBuilder()
-    .endpoint("<my-endpoint>");
-
-ServiceCOperationsClient serviceCOps = serviceCBuilder.buildOperationsClient();
-serviceCOps.opC();
-```
-
-```go
-// Combined client for ServiceA and ServiceB
-combinedClient := NewCombinedABClient("<my-endpoint>")
-opsClient := combinedClient.NewOperationsClient()
-opsClient.OpA(context.Background(), &OperationsClientOpAOptions{})  // From ServiceA
-opsClient.OpB(context.Background(), &OperationsClientOpBOptions{})  // From ServiceB
-
-// Separate client for ServiceC
-serviceCClient := NewServiceCClient("<my-endpoint>")
-serviceCOps := serviceCClient.NewOperationsClient()
-serviceCOps.OpC(context.Background(), &OperationsClientOpCOptions{})
-```
-
-</ClientTabs>
-
-### Services as Direct Children (No Deep Auto-Merge)
-
-When combining multiple services, instead of auto-merging all sub clients at the root level, you can keep each service as a direct child of the root client.
-
-The key is to **omit `autoMergeService`** (or set it to `false`) on the **root** client so it does NOT merge everything at the top level. Then, set `autoMergeService: true` on each **child** `@client` so that each child auto-populates from its own service. This creates a hierarchy where services remain separated under the root client.
-
-:::caution
-All services being merged must share the same endpoint and authentication method. If not, you will get a diagnostic error.
-:::
-
-<ClientTabs>
-
-```typespec title="main.tsp"
-@service
-@versioned(VersionsA)
-namespace ServiceA {
-  enum VersionsA {
-    av1,
-    av2,
-  }
-
-  interface Operations {
-    opA(): void;
-  }
-
-  namespace SubNamespace {
-    op subOpA(): void;
-  }
-}
-
-@service
-@versioned(VersionsB)
-namespace ServiceB {
-  enum VersionsB {
-    bv1,
-    bv2,
-  }
-
-  interface Operations {
-    opB(): void;
-  }
-
-  namespace SubNamespace {
-    op subOpB(): void;
-  }
-}
-```
-
-```typespec title="client.tsp"
-import "./main.tsp";
-import "@azure-tools/typespec-client-generator-core";
-
-using Azure.ClientGenerator.Core;
-
-@client({
-  name: "CombineClient",
-  service: [ServiceA, ServiceB],
-})
-namespace CombineClient {
-  @client({
-    name: "ComputeClient",
-    service: ServiceA,
-    autoMergeService: true,
-  })
-  namespace Compute;
-
-  @client({
-    name: "DiskClient",
-    service: ServiceB,
-    autoMergeService: true,
-  })
-  namespace Disk;
-}
-```
-
-```python
-# generated _client.py
-class CombineClient:
-    def __init__(self, endpoint: str, **kwargs: Any) -> None:
-      self.compute = ComputeClient(endpoint=endpoint, **kwargs)
-      self.disk = DiskClient(endpoint=endpoint, **kwargs)
-
-# usage sample
-from combine_client import CombineClient
-
-client = CombineClient(endpoint="<my-endpoint>")
-
-# Access ServiceA operations via ComputeClient
-client.compute.operations.op_a()
-client.compute.sub_namespace.sub_op_a()
-
-# Access ServiceB operations via DiskClient
-client.disk.operations.op_b()
-client.disk.sub_namespace.sub_op_b()
-```
-
-```csharp
-CombineClient client = new CombineClient(new Uri("<my-endpoint>"));
-
-// Access ServiceA operations via ComputeClient
-client.GetComputeClient().GetOperationsClient().OpA();
-client.GetComputeClient().GetSubNamespaceClient().SubOpA();
-
-// Access ServiceB operations via DiskClient
-client.GetDiskClient().GetOperationsClient().OpB();
-client.GetDiskClient().GetSubNamespaceClient().SubOpB();
-```
-
-```typescript
-import { CombineClient } from "@azure/package-name";
-
-const client = new CombineClient("<my-endpoint>");
-
-// Access ServiceA operations via ComputeClient
-client.compute.operations.opA();
-client.compute.subNamespace.subOpA();
-
-// Access ServiceB operations via DiskClient
-client.disk.operations.opB();
-client.disk.subNamespace.subOpB();
-```
-
-```java
-CombineClientBuilder builder = new CombineClientBuilder()
-    .endpoint("<my-endpoint>");
-
-// Access ServiceA operations via ComputeClient
-ComputeOperationsClient computeOps = builder.buildComputeOperationsClient();
-computeOps.opA();
-
-ComputeSubNamespaceClient computeSub = builder.buildComputeSubNamespaceClient();
-computeSub.subOpA();
-
-// Access ServiceB operations via DiskClient
-DiskOperationsClient diskOps = builder.buildDiskOperationsClient();
-diskOps.opB();
-
-DiskSubNamespaceClient diskSub = builder.buildDiskSubNamespaceClient();
-diskSub.subOpB();
-```
-
-```go
-combineClient := NewCombineClient("<my-endpoint>")
-
-// Access ServiceA operations via ComputeClient
-computeClient := combineClient.NewComputeClient()
-computeOps := computeClient.NewOperationsClient()
-computeOps.OpA(context.Background(), &OperationsClientOpAOptions{})
-computeSub := computeClient.NewSubNamespaceClient()
-computeSub.SubOpA(context.Background(), &SubNamespaceClientSubOpAOptions{})
-
-// Access ServiceB operations via DiskClient
-diskClient := combineClient.NewDiskClient()
-diskOps := diskClient.NewOperationsClient()
-diskOps.OpB(context.Background(), &OperationsClientOpBOptions{})
-diskSub := diskClient.NewSubNamespaceClient()
-diskSub.SubOpB(context.Background(), &SubNamespaceClientSubOpBOptions{})
-```
-
-</ClientTabs>
-
-### Fully Customized Client Hierarchy from Multiple Services
-
-For maximum flexibility, you can fully customize how operations from different services are organized into a client hierarchy. This uses nested `@client` decorators with explicit operation mapping via the `is` keyword.
-
-In this approach, `autoMergeService` is **not set** (defaults to `false`) on any client — neither the root nor the children. Instead of auto-populating from services, each child `@client` explicitly declares its operations using `is` references (e.g., `opA is ServiceA.Operations.opA`). This gives you full control over which operations go where, including the ability to mix operations from different services into a single sub client.
-
-:::caution
-All services being merged must share the same endpoint and authentication method. If not, you will get a diagnostic error.
-:::
-
-<ClientTabs>
-
-```typespec title="main.tsp"
-@service
-@versioned(VersionsA)
-namespace ServiceA {
-  enum VersionsA {
-    av1,
-    av2,
-  }
-
-  interface Operations {
-    opA(): void;
-  }
-
-  namespace SubNamespace {
-    op subOpA(): void;
-  }
-}
-
-@service
-@versioned(VersionsB)
-namespace ServiceB {
-  enum VersionsB {
-    bv1,
-    bv2,
-  }
-
-  interface Operations {
-    opB(): void;
-  }
-
-  namespace SubNamespace {
-    op subOpB(): void;
-  }
-}
-```
-
-```typespec title="client.tsp"
-import "./main.tsp";
-import "@azure-tools/typespec-client-generator-core";
-
-using Azure.ClientGenerator.Core;
-
-@client({
-  name: "CustomClient",
-  service: [ServiceA, ServiceB],
-})
-namespace CustomClient {
-  // Custom sub client combining operations from both services
-  @client({
-    name: "SharedOperations",
-    service: [ServiceA, ServiceB],
-  })
-  interface SharedOperations {
-    opA is ServiceA.Operations.opA;
-    opB is ServiceB.Operations.opB;
-  }
-
-  // Custom sub client with operations from ServiceA only
-  @client({
-    name: "ServiceAOnly",
-    service: ServiceA,
-  })
-  interface ServiceAOnly {
-    subOpA is ServiceA.SubNamespace.subOpA;
-  }
-
-  // Custom sub client with operations from ServiceB only
-  @client({
-    name: "ServiceBOnly",
-    service: ServiceB,
-  })
-  interface ServiceBOnly {
-    subOpB is ServiceB.SubNamespace.subOpB;
-  }
-}
-```
-
-```python
-# generated _client.py
-class CustomClient:
-    def __init__(self, endpoint: str, **kwargs: Any) -> None:
-      self.shared_operations = SharedOperationsOperations(endpoint=endpoint, **kwargs)
-      self.service_a_only = ServiceAOnlyOperations(endpoint=endpoint, **kwargs)
-      self.service_b_only = ServiceBOnlyOperations(endpoint=endpoint, **kwargs)
-
-# usage sample
-from custom_client import CustomClient
-
-client = CustomClient(endpoint="<my-endpoint>")
-
-# Access shared operations from both services
-client.shared_operations.op_a()  # Uses ServiceA's API version
-client.shared_operations.op_b()  # Uses ServiceB's API version
-
-# Access ServiceA-only operations
-client.service_a_only.sub_op_a()
-
-# Access ServiceB-only operations
-client.service_b_only.sub_op_b()
-```
-
-```csharp
-CustomClient client = new CustomClient(new Uri("<my-endpoint>"));
-
-// Access shared operations from both services
-client.GetSharedOperationsClient().OpA();  // Uses ServiceA's API version
-client.GetSharedOperationsClient().OpB();  // Uses ServiceB's API version
-
-// Access ServiceA-only operations
-client.GetServiceAOnlyClient().SubOpA();
-
-// Access ServiceB-only operations
-client.GetServiceBOnlyClient().SubOpB();
-```
-
-```typescript
-import { CustomClient } from "@azure/package-name";
-
-const client = new CustomClient("<my-endpoint>");
-
-// Access shared operations from both services
-client.sharedOperations.opA(); // Uses ServiceA's API version
-client.sharedOperations.opB(); // Uses ServiceB's API version
-
-// Access ServiceA-only operations
-client.serviceAOnly.subOpA();
-
-// Access ServiceB-only operations
-client.serviceBOnly.subOpB();
-```
-
-```java
-CustomClientBuilder builder = new CustomClientBuilder()
-    .endpoint("<my-endpoint>");
-
-// Access shared operations from both services
-SharedOperationsClient sharedOps = builder.buildSharedOperationsClient();
-sharedOps.opA();  // Uses ServiceA's API version
-sharedOps.opB();  // Uses ServiceB's API version
-
-// Access ServiceA-only operations
-ServiceAOnlyClient serviceAOnly = builder.buildServiceAOnlyClient();
-serviceAOnly.subOpA();
-
-// Access ServiceB-only operations
-ServiceBOnlyClient serviceBOnly = builder.buildServiceBOnlyClient();
-serviceBOnly.subOpB();
-```
-
-```go
-customClient := NewCustomClient("<my-endpoint>")
-
-// Access shared operations from both services
-sharedOps := customClient.NewSharedOperationsClient()
-sharedOps.OpA(context.Background(), &SharedOperationsClientOpAOptions{})  // Uses ServiceA's API version
-sharedOps.OpB(context.Background(), &SharedOperationsClientOpBOptions{})  // Uses ServiceB's API version
-
-// Access ServiceA-only operations
-serviceAOnly := customClient.NewServiceAOnlyClient()
-serviceAOnly.SubOpA(context.Background(), &ServiceAOnlyClientSubOpAOptions{})
-
-// Access ServiceB-only operations
-serviceBOnly := customClient.NewServiceBOnlyClient()
-serviceBOnly.SubOpB(context.Background(), &ServiceBOnlyClientSubOpBOptions{})
 ```
 
 </ClientTabs>

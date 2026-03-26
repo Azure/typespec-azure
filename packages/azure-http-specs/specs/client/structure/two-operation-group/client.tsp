@@ -27,14 +27,14 @@ using Spector;
 @scenario
 namespace Client.Structure.TwoOperationGroup;
 
-@client
+@operationGroup
 interface Group1 {
   one is Client.Structure.Service.one;
   three is Client.Structure.Service.Foo.three;
   four is Client.Structure.Service.Foo.four;
 }
 
-@client
+@operationGroup
 interface Group2 {
   two is Client.Structure.Service.two;
   five is Client.Structure.Service.Bar.five;
