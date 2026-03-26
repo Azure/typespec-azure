@@ -327,7 +327,16 @@ op ArmResourcePatchAsync<
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Provider extends {} = ProviderNamespace<Resource>
-> is ArmCustomPatchAsync<Resource, Resource, BaseParameters, LroHeaders, Parameters, ArmResponse<Resource> | ArmAcceptedLroResponse<"Resource update request accepted.", LroHeaders>, ErrorResponse, Provider>;
+> is ArmCustomPatchAsync<
+  Resource,
+  Resource,
+  BaseParameters,
+  LroHeaders,
+  Parameters,
+  ArmResponse<Resource> | ArmAcceptedLroResponse<"Resource update request accepted.", LroHeaders>,
+  ErrorResponse,
+  Provider
+>;
 
 /**
  * A long-running resource update using a custom PATCH payload (Asynchronous)
@@ -383,7 +392,15 @@ op ArmTagsPatchSync<
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Provider extends {} = ProviderNamespace<Resource>
-> is ArmCustomPatchSync<Resource, TagsUpdateModel<Resource>, BaseParameters, Parameters, ArmResponse<Resource>, ErrorResponse, Provider>;
+> is ArmCustomPatchSync<
+  Resource,
+  TagsUpdateModel<Resource>,
+  BaseParameters,
+  Parameters,
+  ArmResponse<Resource>,
+  ErrorResponse,
+  Provider
+>;
 
 /**
  * @dev A resource update using the items from the resource marked with Lifecycle.Update visibility
@@ -401,7 +418,15 @@ op ArmResourcePatchSync<
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Provider extends {} = ProviderNamespace<Resource>
-> is ArmCustomPatchSync<Resource, Resource, BaseParameters, Parameters, ArmResponse<Resource>, ErrorResponse, Provider>;
+> is ArmCustomPatchSync<
+  Resource,
+  Resource,
+  BaseParameters,
+  Parameters,
+  ArmResponse<Resource>,
+  ErrorResponse,
+  Provider
+>;
 
 /**
  * A resource update using a custom PATCH payload (synchronous)
@@ -454,7 +479,10 @@ op ArmResourceDeleteAsyncBase<
   Parameters extends {} = {},
   Error extends {} = ErrorResponse,
   Provider extends {} = ProviderNamespace<Resource>
->(...ResourceInstanceParameters<Resource, BaseParameters, Provider>, ...Parameters): Response | Error;
+>(
+  ...ResourceInstanceParameters<Resource, BaseParameters, Provider>,
+  ...Parameters,
+): Response | Error;
 
 /**
  * @dev Delete a resource asynchronously.  DEPRECATED: Use ArmResourceDeleteWithoutOkAsync instead
@@ -522,7 +550,10 @@ op ArmResourceDeleteSync<
   Response extends {} = ArmDeletedResponse | ArmDeletedNoContentResponse,
   Error = ErrorResponse,
   Provider extends {} = ProviderNamespace<Resource>
->(...ResourceInstanceParameters<Resource, BaseParameters, Provider>, ...Parameters): Response | Error;
+>(
+  ...ResourceInstanceParameters<Resource, BaseParameters, Provider>,
+  ...Parameters,
+): Response | Error;
 
 /**
  * A long-running resource action.
