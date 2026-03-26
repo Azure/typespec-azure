@@ -120,23 +120,60 @@ function parsePython(
 
 /**
  * Java-specific metadata parser.
- * Strips 'com.' prefix from namespace if present for package name derivation.
+ * Derives the Maven artifact ID from namespace and prepends the appropriate
+ * Maven groupId based on the flavor and whether this is a management-plane service.
+ *
+ * GroupId prefix rules:
+ *   - data plane, no v2 flavor  → com.azure
+ *   - management plane, no v2   → com.azure.resourcemanager
+ *   - data plane, azurev2 flavor → com.azure.v2
+ *   - management plane, azurev2  → com.azure.resourcemanager.v2
+ *
+ * The final package name is formatted as `{groupId}:{artifactId}`.
  */
 function parseJava(
   options: Record<string, unknown>,
   params: Record<string, unknown>,
 ): LanguageParserResult {
-  let packageName = options["package-name"] ?? options["package_name"];
+  const rawPackageName = options["package-name"] ?? options["package_name"];
   const namespace = options["namespace"];
+  const flavor = options["flavor"];
+  const isV2 = flavor === "azurev2";
 
-  if (namespace && !packageName) {
+  // Derive the artifact ID (the part after the colon in Maven coordinates)
+  let artifactId: string | undefined;
+  if (rawPackageName) {
+    artifactId = String(fillVars(rawPackageName, params));
+  } else if (namespace) {
     const ns = String(namespace);
     const stripped = ns.startsWith("com.") ? ns.substring(4) : ns;
-    packageName = stripped.replace(/\./g, "-");
+    artifactId = stripped.replace(/\./g, "-");
+  }
+
+  let packageName: string | undefined;
+  if (artifactId) {
+    // If the artifact ID already contains a colon it is already in Maven coordinate
+    // format (groupId:artifactId); use it as-is.
+    if (artifactId.includes(":")) {
+      packageName = artifactId;
+    } else {
+      const isManagement = namespace
+        ? String(namespace).startsWith("com.azure.resourcemanager")
+        : false;
+
+      let groupId: string;
+      if (isManagement) {
+        groupId = isV2 ? "com.azure.resourcemanager.v2" : "com.azure.resourcemanager";
+      } else {
+        groupId = isV2 ? "com.azure.v2" : "com.azure";
+      }
+
+      packageName = `${groupId}:${artifactId}`;
+    }
   }
 
   return {
-    packageName: packageName ? String(fillVars(packageName, params)) : undefined,
+    packageName,
     namespace: namespace ? String(fillVars(namespace, params)) : undefined,
   };
 }

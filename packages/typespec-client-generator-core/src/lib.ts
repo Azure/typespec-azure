@@ -495,6 +495,42 @@ export const $lib = createTypeSpecLibrary({
           "@clientOption should be applied with a specific language scope since it is highly likely this is language-specific.",
       },
     },
+    "replace-parameter-not-found": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Parameter "${"paramName"}" not found in operation "${"operationName"}".`,
+      },
+    },
+    "reorder-parameter-not-found": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Parameter "${"paramName"}" specified in reorder list not found in operation "${"operationName"}".`,
+      },
+    },
+    "reorder-parameter-missing": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Parameter "${"paramName"}" from operation "${"operationName"}" is missing in reorder list.`,
+      },
+    },
+    "add-parameter-duplicate": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Parameter "${"paramName"}" already exists in operation "${"operationName"}".`,
+      },
+    },
+    "reorder-parameter-duplicate": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Parameter "${"paramName"}" appears more than once in the reorder list for operation "${"operationName"}".`,
+      },
+    },
+    "remove-parameter-not-found": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Parameter "${"paramName"}" not found in operation "${"operationName"}".`,
+      },
+    },
     "nested-client-service-not-subset": {
       severity: "error",
       messages: {
