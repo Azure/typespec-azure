@@ -1040,7 +1040,7 @@ The dynamic parameters of a resource instance - pass in the proper base type to 
 where the resource is based. The default is in a resource group
 
 ```typespec
-model Azure.ResourceManager.ResourceInstanceParameters<Resource, BaseParameters, Provider>
+model Azure.ResourceManager.ResourceInstanceParameters<Resource, BaseParameters>
 ```
 
 #### Template Parameters
@@ -1049,7 +1049,6 @@ model Azure.ResourceManager.ResourceInstanceParameters<Resource, BaseParameters,
 | -------------- | -------------------------------------------------------- |
 | Resource       | The resource to get parameters for                       |
 | BaseParameters | The parameters representing the base Uri of the resource |
-| Provider       | Optional. The provider namespace model for the resource. |
 
 #### Examples
 
@@ -1059,7 +1058,9 @@ op get(...ResourceInstanceParameters<Employee>): ArmResponse<EmployeeResponse> |
 
 #### Properties
 
-None
+| Name     | Type                             | Description |
+| -------- | -------------------------------- | ----------- |
+| provider | `"Microsoft.ThisWillBeReplaced"` |             |
 
 ### `ResourceKindProperty` {#Azure.ResourceManager.ResourceKindProperty}
 
@@ -1206,7 +1207,7 @@ The dynamic parameters of a list call for a resource instance - pass in the prop
 where the list should take place. The default is in a resource group
 
 ```typespec
-model Azure.ResourceManager.ResourceParentParameters<Resource, BaseParameters, Provider>
+model Azure.ResourceManager.ResourceParentParameters<Resource, BaseParameters>
 ```
 
 #### Template Parameters
@@ -1215,11 +1216,12 @@ model Azure.ResourceManager.ResourceParentParameters<Resource, BaseParameters, P
 | -------------- | -------------------------------------------------------- |
 | Resource       | The resource to get parameters for                       |
 | BaseParameters | The parameters representing the base Uri of the resource |
-| Provider       | Optional. The provider namespace model for the resource. |
 
 #### Properties
 
-None
+| Name     | Type                             | Description |
+| -------- | -------------------------------- | ----------- |
+| provider | `"Microsoft.ThisWillBeReplaced"` |             |
 
 ### `ResourcePlanProperty` {#Azure.ResourceManager.ResourcePlanProperty}
 
@@ -1325,28 +1327,6 @@ op action is ArmProviderActionSync<Response = Employee, Scope = SubscriptionActi
 | ---- | -------- | ---------------------- |
 | name | `string` | Symbolic name of scope |
 
-### `SubscriptionLocationActionScope` {#Azure.ResourceManager.SubscriptionLocationActionScope}
-
-Scope for operation status endpoints at the subscription level with a location path segment.
-Use with `GetResourceOperationStatus` to produce:
-`GET /subscriptions/{subscriptionId}/providers/{providerNamespace}/locations/{location}/operationStatuses/{operationId}`
-
-```typespec
-model Azure.ResourceManager.SubscriptionLocationActionScope
-```
-
-#### Examples
-
-```typespec
-op getStatus is GetResourceOperationStatus<ArmOperationStatus, SubscriptionLocationActionScope>;
-```
-
-#### Properties
-
-| Name     | Type                 | Description                   |
-| -------- | -------------------- | ----------------------------- |
-| location | `Core.azureLocation` | The name of the Azure region. |
-
 ### `SubscriptionLocationResource` {#Azure.ResourceManager.SubscriptionLocationResource}
 
 The location resource for subscription-based locations. This can be used as a parent
@@ -1390,28 +1370,6 @@ op action is ArmProviderActionSync<Response = Employee, Scope = TenantActionScop
 | Name | Type     | Description            |
 | ---- | -------- | ---------------------- |
 | name | `string` | Symbolic name of scope |
-
-### `TenantLocationActionScope` {#Azure.ResourceManager.TenantLocationActionScope}
-
-Scope for operation status endpoints at the tenant level with a location path segment.
-Use with `GetResourceOperationStatus` to produce:
-`GET /providers/{providerNamespace}/locations/{location}/operationStatuses/{operationId}`
-
-```typespec
-model Azure.ResourceManager.TenantLocationActionScope
-```
-
-#### Examples
-
-```typespec
-op getStatus is GetResourceOperationStatus<ArmOperationStatus, TenantLocationActionScope>;
-```
-
-#### Properties
-
-| Name     | Type                 | Description                   |
-| -------- | -------------------- | ----------------------------- |
-| location | `Core.azureLocation` | The name of the Azure region. |
 
 ### `TenantLocationResource` {#Azure.ResourceManager.TenantLocationResource}
 

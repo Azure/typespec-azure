@@ -157,8 +157,6 @@ export interface ResolvedResourceInfo {
   resourceInstancePath: string;
   /** The name of the resource at this instance path  */
   resourceName: string;
-  /** Whether the resource name was explicitly provided as a parameter */
-  resourceNameIsExplicit?: boolean;
 }
 
 interface ResolvedResourceOperations {
@@ -167,8 +165,6 @@ interface ResolvedResourceOperations {
   associatedOperations?: ArmResourceOperation[];
   /** The name of the resource at this instance path  */
   resourceName: string;
-  /** Whether the resource name was explicitly provided as a parameter */
-  resourceNameIsExplicit?: boolean;
   /** The resource type (The actual resource type string will be "${provider}/${types.join("/")}) */
   resourceType: ResourceType;
   /** The path to the instance of a resource */
@@ -635,152 +631,16 @@ function isVariableSegment(segment: string): boolean {
   return (segment.startsWith("{") && segment.endsWith("}")) || segment === "default";
 }
 
-/**
- * Extracts the scope prefix from a resource instance path.
- * The scope prefix is the portion of the path before the last `/providers/` occurrence.
- * For example:
- *   - `/subscriptions/{id}/providers/Microsoft.Foo/bars/{name}` → `/subscriptions/{id}`
- *   - `/providers/Microsoft.Foo/bars/{name}` → `` (empty)
- */
-function getScopePrefix(resourceInstancePath: string): string {
-  const lastProviders = resourceInstancePath.lastIndexOf("/providers/");
-  if (lastProviders <= 0) return "";
-  return resourceInstancePath.slice(0, lastProviders);
-}
-
-/**
- * Normalizes a path for scope comparison by lowercasing static segments
- * and replacing variable segments with a placeholder.
- */
-function normalizePathForScopeComparison(path: string): string {
-  return path
-    .split("/")
-    .map((s) => (isVariableSegment(s) ? "{}" : s.toLowerCase()))
-    .join("/");
-}
-
 function getResourceInfo(
   program: Program,
   operation: ArmResourceOperation,
-  resourceModel?: Model,
 ): ResolvedResourceInfo | undefined {
-  // First, try to get resource info from the path when it contains /providers/
   const pathInfo = getResourcePathElements(operation.httpOperation.path, operation.kind);
-  if (pathInfo !== undefined) {
-    return {
-      ...pathInfo,
-      resourceName: operation.resourceName ?? operation.operationGroup,
-    };
-  }
-
-  // If the path does not contain /providers/, we can still identify the resource
-  // because an ARM operations decorator was executed on this operation (e.g.
-  // @armResourceRead, @armResourceCreateOrUpdate, etc.). Use the ARM provider
-  // namespace and the path structure to construct resource info.
-  const fallback = getResourceInfoFromArmOperation(
-    program,
-    operation.httpOperation.path,
-    operation.kind,
-    operation.operation,
-    resourceModel,
-  );
-  if (fallback === undefined) return undefined;
+  if (pathInfo === undefined) return undefined;
   return {
-    ...fallback,
+    ...pathInfo,
     resourceName: operation.resourceName ?? operation.operationGroup,
   };
-}
-
-/**
- * Construct resource path info for an ARM resource operation whose path does not
- * contain a /providers/ segment. This relies on the fact that an ARM operations
- * decorator was executed on the operation, so we know it belongs to a resource.
- * The provider namespace is resolved from the operation's namespace.
- */
-function getResourceInfoFromArmOperation(
-  program: Program,
-  path: string,
-  kind: ArmOperationKind,
-  operation: Operation,
-  resourceModel?: Model,
-): ResourcePathInfo | undefined {
-  const provider = operation.namespace
-    ? getArmProviderNamespace(program, operation.namespace)
-    : undefined;
-  if (provider === undefined) return undefined;
-
-  const segments = path.split("/").filter((s) => s.length > 0);
-
-  // Walk from the end of the path to find the last resource type segment(s).
-  // A resource type segment is a static segment followed by a variable segment,
-  // e.g. "resourceGroups/{resourceGroupName}".
-  const typeSegments: string[] = [];
-  const instancePath = path.replace(/\/+$/, "");
-
-  // Scan the path forward to collect resource type segments (static/variable pairs)
-  // after the scope prefix.  Walk forward so that we can use the same approach as
-  // getResourcePathElements: consume pairs of (typeName, {instanceName}) from the
-  // END of the segment list.  We identify the resource portion by searching backwards
-  // for at most one resource-type group (the innermost resource).
-  //
-  // For an instance path like /subscriptions/{id}/resourceGroups/{name}
-  //   → type segment: "resourceGroups"
-  // For a list path like /subscriptions/{id}/resourceGroups
-  //   → type segment: "resourceGroups", instance path gets /{name} appended
-
-  // Find the start of resource type segments by scanning backwards from the end
-  let resourceStart = segments.length;
-  if (kind === "list" && segments.length > 0 && !isVariableSegment(segments[segments.length - 1])) {
-    // List: last segment is the collection name (static)
-    resourceStart = segments.length - 1;
-  } else if (
-    segments.length >= 2 &&
-    isVariableSegment(segments[segments.length - 1]) &&
-    !isVariableSegment(segments[segments.length - 2])
-  ) {
-    // Instance: last two segments are typeName/{instanceName}
-    resourceStart = segments.length - 2;
-  }
-
-  // Collect type segments walking forward from resourceStart
-  for (let i = resourceStart; i < segments.length; i += 2) {
-    if (isVariableSegment(segments[i])) break;
-    typeSegments.push(segments[i]);
-    // skip the instance variable if present
-  }
-
-  if (typeSegments.length > 0) {
-    // For list operations where the path ends with a static segment, derive the
-    // instance variable name from the resource model's @key property if available,
-    // otherwise fall back to {name}.
-    let resolvedInstancePath = instancePath;
-    if (kind === "list" && !isVariableSegment(segments[segments.length - 1])) {
-      let keyName = "name";
-      if (resourceModel) {
-        // Search the model's direct properties for the @key property.
-        // We must use model.properties directly rather than getAllProperties() because
-        // the base model chain may contain a property with the same name that lacks
-        // the @key decorator, which would shadow the decorated one.
-        for (const prop of resourceModel.properties.values()) {
-          const k = getKeyName(program, prop);
-          if (k !== undefined) {
-            keyName = k;
-            break;
-          }
-        }
-      }
-      resolvedInstancePath = `${instancePath}/{${keyName}}`;
-    }
-    return {
-      resourceType: {
-        provider: provider,
-        types: typeSegments,
-      },
-      resourceInstancePath: resolvedInstancePath,
-    };
-  }
-
-  return undefined;
 }
 
 export function getResourcePathElements(
@@ -884,13 +744,11 @@ export function isResourceOperationMatch(
     resourceType: ResourceType;
     resourceInstancePath: string;
     resourceName?: string;
-    resourceNameIsExplicit?: boolean;
   },
   target: {
     resourceType: ResourceType;
     resourceInstancePath: string;
     resourceName?: string;
-    resourceNameIsExplicit?: boolean;
   },
 ): boolean {
   if (
@@ -906,18 +764,17 @@ export function isResourceOperationMatch(
     if (source.resourceType.types[i].toLowerCase() !== target.resourceType.types[i].toLowerCase())
       return false;
   }
-
-  // When neither resource has an explicitly provided resource name, also compare
-  // the scope prefix of the instance path to prevent merging cross-scope operations
-  if (!source.resourceNameIsExplicit && !target.resourceNameIsExplicit) {
-    const sourceScope = getScopePrefix(source.resourceInstancePath);
-    const targetScope = getScopePrefix(target.resourceInstancePath);
-    if (
-      normalizePathForScopeComparison(sourceScope) !== normalizePathForScopeComparison(targetScope)
-    )
-      return false;
-  }
-
+  /*const sourceSegments = source.resourceInstancePath.split("/");
+  const targetSegments = target.resourceInstancePath.split("/");
+  if (sourceSegments.length !== targetSegments.length) return false;
+  for (let i = 0; i < sourceSegments.length; i++) {
+    if (!isVariableSegment(sourceSegments[i])) {
+      if (isVariableSegment(targetSegments[i])) {
+        return false;
+      }
+      if (sourceSegments[i].toLowerCase() !== targetSegments[i].toLowerCase()) return false;
+    } else if (!isVariableSegment(targetSegments[i])) return false;
+  }*/
   return true;
 }
 
@@ -1013,16 +870,14 @@ export function resolveArmResourceOperations(
     armOperation.kind = operation.kind;
 
     armOperation.resourceModelName = operation.resource?.name ?? resourceType.name;
-    const resourceInfo = getResourceInfo(program, armOperation, operation.resource ?? resourceType);
+    const resourceInfo = getResourceInfo(program, armOperation);
     if (resourceInfo === undefined) continue;
     armOperation.name = operation.name;
     armOperation.resourceKind = operation.resourceKind;
-    const resourceNameIsExplicit = operation.resourceName !== undefined;
     resourceInfo.resourceName =
       operation.resourceName ??
       getResourceNameForOperation(program, armOperation, resourceInfo.resourceInstancePath) ??
       armOperation.resourceModelName;
-    resourceInfo.resourceNameIsExplicit = resourceNameIsExplicit;
     armOperation.resourceName = resourceInfo.resourceName;
 
     let matched = false;
@@ -1044,7 +899,6 @@ export function resolveArmResourceOperations(
       resourceType: resourceInfo.resourceType,
       resourceInstancePath: resourceInfo.resourceInstancePath,
       resourceName: resourceInfo.resourceName,
-      resourceNameIsExplicit: resourceNameIsExplicit,
       operations: {
         lifecycle: {
           read: undefined,

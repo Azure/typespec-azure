@@ -131,7 +131,6 @@ model ResourceUriParameter {
  * where the resource is based.  The default is in a resource group
  * @template Resource The resource to get parameters for
  * @template BaseParameters The parameters representing the base Uri of the resource
- * @template Provider Optional. The provider namespace model for the resource.
  *
  * @example
  * ```typespec
@@ -142,11 +141,10 @@ model ResourceUriParameter {
  */
 model ResourceInstanceParameters<
   Resource extends {},
-  BaseParameters = DefaultBaseParameters<Resource>,
-  Provider extends {} = ProviderNamespace<Resource>
+  BaseParameters = DefaultBaseParameters<Resource>
 > {
   ...BaseParameters;
-  ...Provider;
+  ...ProviderNamespace<Resource>;
   ...KeysOf<Resource>;
 }
 
@@ -155,15 +153,13 @@ model ResourceInstanceParameters<
  * where the list should take place.  The default is in a resource group
  * @template Resource The resource to get parameters for
  * @template BaseParameters The parameters representing the base Uri of the resource
- * @template Provider Optional. The provider namespace model for the resource.
  */
 model ResourceParentParameters<
   Resource extends Foundations.SimpleResource,
-  BaseParameters = DefaultBaseParameters<Resource>,
-  Provider extends {} = ProviderNamespace<Resource>
+  BaseParameters = DefaultBaseParameters<Resource>
 > {
   ...BaseParameters;
-  ...Provider;
+  ...ProviderNamespace<Resource>;
   ...ParentKeysOf<Resource>;
 }
 
@@ -221,38 +217,6 @@ model TenantActionScope {
   @key
   @segment("tenant")
   name: string;
-}
-
-/**
- * Scope for operation status endpoints at the tenant level with a location path segment.
- * Use with `GetResourceOperationStatus` to produce:
- * `GET /providers/{providerNamespace}/locations/{location}/operationStatuses/{operationId}`
- *
- * @example
- * ```typespec
- * op getStatus is GetResourceOperationStatus<ArmOperationStatus, TenantLocationActionScope>;
- * ```
- */
-@armVirtualResource
-@tenantResource
-model TenantLocationActionScope {
-  ...LocationResourceParameter;
-}
-
-/**
- * Scope for operation status endpoints at the subscription level with a location path segment.
- * Use with `GetResourceOperationStatus` to produce:
- * `GET /subscriptions/{subscriptionId}/providers/{providerNamespace}/locations/{location}/operationStatuses/{operationId}`
- *
- * @example
- * ```typespec
- * op getStatus is GetResourceOperationStatus<ArmOperationStatus, SubscriptionLocationActionScope>;
- * ```
- */
-@armVirtualResource
-@subscriptionResource
-model SubscriptionLocationActionScope {
-  ...LocationResourceParameter;
 }
 
 /**

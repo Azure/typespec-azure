@@ -146,42 +146,6 @@ op ArmResourceCheckExistence<
 >;
 
 /**
- * A resource GET operation template for an Azure Resource Manager Operation Status endpoint.
- * The path is determined by the `Scope` parameter. Use one of the four standard scope models:
- * - `TenantActionScope` (default): `GET /providers/{providerNamespace}/operationStatuses/{operationId}`
- * - `SubscriptionActionScope`: `GET /subscriptions/{subscriptionId}/providers/{providerNamespace}/operationStatuses/{operationId}`
- * - `TenantLocationActionScope`: `GET /providers/{providerNamespace}/locations/{location}/operationStatuses/{operationId}`
- * - `SubscriptionLocationActionScope`: `GET /subscriptions/{subscriptionId}/providers/{providerNamespace}/locations/{location}/operationStatuses/{operationId}`
- *
- * @template Response The type of the response body. Defaults to ArmOperationStatus.
- * @template Scope The scope of the operation. Defaults to TenantActionScope.
- * @template Parameters Optional. Additional non-path parameters (e.g. query or header parameters).
- * @template Error Optional. The error response, if non-standard.
- */
-@autoRoute
-@doc("Get the status of an async operation.")
-@get
-@armResourceCollectionAction
-@Private.armUpdateProviderNamespace
-op GetResourceOperationStatus<
-  Response extends {} = ArmOperationStatus,
-  Scope extends {} = TenantActionScope,
-  Parameters extends {} = {},
-  Error extends {} = ErrorResponse
->(
-  ...Azure.ResourceManager.Foundations.DefaultBaseParameters<Scope>,
-  ...ProviderNamespace<Scope>,
-  ...Scope,
-
-  @path
-  @segment("operationStatuses")
-  @doc("The operation ID.")
-  operationId: string,
-
-  ...Parameters,
-): ArmResponse<Response> | Error;
-
-/**
  * A long-running resource CreateOrUpdate (PUT)
  * @template Resource the resource being created or updated
  * @template BaseParameters Optional. Allows overriding the operation parameters
@@ -363,16 +327,7 @@ op ArmResourcePatchAsync<
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Provider extends {} = ProviderNamespace<Resource>
-> is ArmCustomPatchAsync<
-  Resource,
-  Resource,
-  BaseParameters,
-  LroHeaders,
-  Parameters,
-  ArmResponse<Resource> | ArmAcceptedLroResponse<"Resource update request accepted.", LroHeaders>,
-  ErrorResponse,
-  Provider
->;
+> is ArmCustomPatchAsync<Resource, Resource, BaseParameters, LroHeaders, Parameters, ArmResponse<Resource> | ArmAcceptedLroResponse<"Resource update request accepted.", LroHeaders>, ErrorResponse, Provider>;
 
 /**
  * A long-running resource update using a custom PATCH payload (Asynchronous)
@@ -428,15 +383,7 @@ op ArmTagsPatchSync<
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Provider extends {} = ProviderNamespace<Resource>
-> is ArmCustomPatchSync<
-  Resource,
-  TagsUpdateModel<Resource>,
-  BaseParameters,
-  Parameters,
-  ArmResponse<Resource>,
-  ErrorResponse,
-  Provider
->;
+> is ArmCustomPatchSync<Resource, TagsUpdateModel<Resource>, BaseParameters, Parameters, ArmResponse<Resource>, ErrorResponse, Provider>;
 
 /**
  * @dev A resource update using the items from the resource marked with Lifecycle.Update visibility
@@ -454,15 +401,7 @@ op ArmResourcePatchSync<
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Provider extends {} = ProviderNamespace<Resource>
-> is ArmCustomPatchSync<
-  Resource,
-  Resource,
-  BaseParameters,
-  Parameters,
-  ArmResponse<Resource>,
-  ErrorResponse,
-  Provider
->;
+> is ArmCustomPatchSync<Resource, Resource, BaseParameters, Parameters, ArmResponse<Resource>, ErrorResponse, Provider>;
 
 /**
  * A resource update using a custom PATCH payload (synchronous)
@@ -515,10 +454,7 @@ op ArmResourceDeleteAsyncBase<
   Parameters extends {} = {},
   Error extends {} = ErrorResponse,
   Provider extends {} = ProviderNamespace<Resource>
->(
-  ...ResourceInstanceParameters<Resource, BaseParameters, Provider>,
-  ...Parameters,
-): Response | Error;
+>(...ResourceInstanceParameters<Resource, BaseParameters, Provider>, ...Parameters): Response | Error;
 
 /**
  * @dev Delete a resource asynchronously.  DEPRECATED: Use ArmResourceDeleteWithoutOkAsync instead
@@ -586,10 +522,7 @@ op ArmResourceDeleteSync<
   Response extends {} = ArmDeletedResponse | ArmDeletedNoContentResponse,
   Error = ErrorResponse,
   Provider extends {} = ProviderNamespace<Resource>
->(
-  ...ResourceInstanceParameters<Resource, BaseParameters, Provider>,
-  ...Parameters,
-): Response | Error;
+>(...ResourceInstanceParameters<Resource, BaseParameters, Provider>, ...Parameters): Response | Error;
 
 /**
  * A long-running resource action.
@@ -896,8 +829,8 @@ op checkLocalNameAvailability<
 @armResourceCollectionAction
 @Private.armUpdateProviderNamespace
 op ArmProviderActionSync<
-  Request extends {} | void = void,
-  Response extends {} | void = void,
+  Request extends {} | unknown | void = void,
+  Response extends {} | unknown | void = void,
   Scope extends {} = TenantActionScope,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse,
@@ -927,7 +860,7 @@ op ArmProviderActionSync<
 @armResourceCollectionAction
 @Private.armUpdateProviderNamespace
 op ArmProviderActionAsync<
-  Request extends {} | void = void,
+  Request extends {} | unknown | void = void,
   Response extends TypeSpec.Reflection.Model | unknown | void = void,
   Scope extends {} = TenantActionScope,
   Parameters extends {} = {},
