@@ -16,7 +16,6 @@ import {
   Type,
   Union,
 } from "@typespec/compiler";
-import type { ContextNode } from "./internal-utils.js";
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import {
   HttpAuth,
@@ -26,6 +25,7 @@ import {
   HttpVerb,
   Visibility,
 } from "@typespec/http";
+import type { ContextNode } from "./internal-utils.js";
 
 // Types for TCGC lib
 

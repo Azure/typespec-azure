@@ -20,21 +20,11 @@ import {
   isService,
   resolveEncodedName,
 } from "@typespec/compiler";
-import {
-  HttpOperation,
-  Visibility,
-  getHttpOperation,
-  isMetadata,
-  isVisible,
-} from "@typespec/http";
+import { HttpOperation, Visibility, getHttpOperation, isMetadata, isVisible } from "@typespec/http";
 import { getOperationId } from "@typespec/openapi";
 import { Version, getVersions } from "@typespec/versioning";
 import { pascalCase } from "change-case";
-import {
-  getClientLocation,
-  getClientNameOverride,
-  getIsApiVersion,
-} from "./decorators.js";
+import { getClientLocation, getClientNameOverride, getIsApiVersion } from "./decorators.js";
 import {
   DecoratedType,
   SdkBodyParameter,
