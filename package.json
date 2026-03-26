@@ -14,7 +14,7 @@
     "clean": "pnpm run-all run clean",
     "cspell": "cspell --no-progress .",
     "dogfood": "pnpm install && pnpm build && pnpm run-all dogfood",
-    "fix-version-mismatch": "tsx eng/scripts/sync-catalog.ts fix",
+    "sync-catalog": "tsx eng/scripts/sync-catalog.ts fix",
     "format": "prettier --write .",
     "format:check": "prettier . --check",
     "format:dir": "prettier --write",
