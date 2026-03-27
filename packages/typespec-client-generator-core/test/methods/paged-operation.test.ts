@@ -614,7 +614,7 @@ it("getPropertySegmentsFromModelOrParameters test for nested case", async () => 
     }
   `);
   const context = await createSdkContextForTester(program);
-  const testModel = context.sdkPackage.models[0];
+  const testModel = context.sdkPackage.models.find((m) => m.name === "Test")!;
   const aProperty = testModel.properties[0];
   const bProperty = testModel.properties[1];
   strictEqual(aProperty.type.kind, "model");
@@ -649,7 +649,7 @@ it("getPropertySegmentsFromModelOrParameters test for nested case of parameter",
     }
   `);
   const context = await createSdkContextForTester(program);
-  const testModel = context.sdkPackage.models[0];
+  const testModel = context.sdkPackage.models.find((m) => m.name === "Test")!;
   const aProperty = testModel.properties[0];
   const bProperty = testModel.properties[1];
   strictEqual(aProperty.type.kind, "model");
