@@ -3,6 +3,7 @@ name: Sync Core Submodule Update
 on:
   pull_request:
     branches: ["main"]
+    types: [opened]
 
 permissions: {}
 
