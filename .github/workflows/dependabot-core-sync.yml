@@ -1,0 +1,42 @@
+name: Sync Core Submodule Update
+
+on:
+  pull_request:
+    branches: ["main"]
+
+permissions: {}
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          submodules: recursive
+
+      - uses: ./.github/actions/setup
+
+      - run: pnpm install
+        name: Install dependencies
+
+      - run: pnpm sync-catalog
+        name: Sync catalog versions from core
+
+      - run: pnpm install
+        name: Update lockfile after catalog sync
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Sync catalog and update lockfile"
+            git push
+          fi
