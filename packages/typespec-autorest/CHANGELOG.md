@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.66.1
+
+### Bug Fixes
+
+- [#4101](https://github.com/Azure/typespec-azure/pull/4101) Fix `getLroMetadata` to correctly handle scalar types (e.g., `string`) as LRO final results. Previously, scalar result types in status monitor `@lroResult` properties were not recognized, causing incorrect metadata.
+
+
 ## 0.66.0
 
 ### Bump dependencies

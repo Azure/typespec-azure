@@ -1782,14 +1782,14 @@ export const $clientOption: ClientOptionDecorator = (
   // Always emit warning that this is experimental
   reportDiagnostic(context.program, {
     code: "client-option",
-    target: target,
+    target: context.decoratorTarget,
   });
 
   // Emit additional warning if scope is not provided
   if (scope === undefined) {
     reportDiagnostic(context.program, {
       code: "client-option-requires-scope",
-      target: target,
+      target: context.decoratorTarget,
     });
   }
 
