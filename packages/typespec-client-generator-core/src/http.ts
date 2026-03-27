@@ -446,8 +446,7 @@ function createContentTypeOrAcceptHeader(
   }
   const optional = bodyObject.kind === "body" ? bodyObject.optional : false;
   // For */* wildcard, provide a sensible client default value
-  const isWildcard =
-    bodyObject.contentTypes?.length === 1 && bodyObject.contentTypes[0] === "*/*";
+  const isWildcard = bodyObject.contentTypes?.length === 1 && bodyObject.contentTypes[0] === "*/*";
   // No need for clientDefaultValue when it's a constant, it only has one value
   return {
     type,
