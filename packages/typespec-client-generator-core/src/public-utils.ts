@@ -273,18 +273,7 @@ export function getCrossLanguageDefinitionId(
       if (type.name) {
         break;
       }
-      const namingCtx = context.__namingContext.get(type);
-      let contextPath: ContextNode[];
-      if (namingCtx) {
-        contextPath = [
-          { name: namingCtx.operation.name, type: namingCtx.operation },
-          { name: namingCtx.label, type },
-        ];
-      } else {
-        contextPath = operation
-          ? getContextPath(context, operation, type)
-          : findContextPath(context, type);
-      }
+      const contextPath = resolveContextPath(context, type, operation);
       const namingPart = contextPath.slice(findLastNonAnonymousNode(contextPath));
       if (
         namingPart[0]?.type?.kind === "Model" ||
@@ -361,20 +350,7 @@ export function getGeneratedName(
   const generatedName = context.__generatedNames.get(type);
   if (generatedName) return generatedName;
 
-  // Check if naming context was explicitly pushed for this type
-  const namingCtx = context.__namingContext.get(type);
-  if (namingCtx) {
-    const contextPath: ContextNode[] = [
-      { name: namingCtx.operation.name, type: namingCtx.operation },
-      { name: namingCtx.label, type },
-    ];
-    const createdName = buildNameFromContextPaths(context, type, contextPath);
-    return createdName;
-  }
-
-  const contextPath = operation
-    ? getContextPath(context, operation, type)
-    : findContextPath(context, type);
+  const contextPath = resolveContextPath(context, type, operation);
   const createdName = buildNameFromContextPaths(context, type, contextPath);
   return createdName;
 }
@@ -395,6 +371,24 @@ export function pushNamingContext(
   label: string,
 ): void {
   context.__namingContext.set(type, { operation, label });
+}
+
+/**
+ * Resolve context path for a type, checking pushed naming context first.
+ */
+function resolveContextPath(
+  context: TCGCContext,
+  type: Model | Union | TspLiteralType,
+  operation?: Operation,
+): ContextNode[] {
+  const namingCtx = context.__namingContext.get(type);
+  if (namingCtx) {
+    return [
+      { name: namingCtx.operation.name, type: namingCtx.operation },
+      { name: namingCtx.label, type },
+    ];
+  }
+  return operation ? getContextPath(context, operation, type) : findContextPath(context, type);
 }
 
 /**
