@@ -1751,3 +1751,483 @@ public final class ContosoProviderHubClient {
 ```
 
 </ClientTabs>
+
+## Customizing method signatures with `@override`
+
+The `@override` decorator allows you to customize method signatures in generated client SDKs. This is useful when you need to:
+
+- Make optional parameters required for certain languages
+- Add language-specific convenience parameters
+- Change the return type for better developer experience
+- Group parameters into option bags
+- Remove parameters that shouldn't be exposed in the client
+
+### Basic usage
+
+The `@override` decorator takes a target operation and a custom operation that defines the new signature:
+
+```typespec
+@@override(OriginalOperation, CustomOperation);
+@@override(OriginalOperation, CustomOperation, "python"); // Language-specific
+```
+
+When applied, the method parameters come from the override operation while the underlying HTTP operation remains unchanged. TCGC maps method parameters to operation parameters based on name matching.
+
+### Simple parameter customization
+
+<ClientTabs>
+<ClientTabItem lang="typespec">
+
+```typespec title="main.tsp"
+@service
+namespace MyService;
+
+op getSecrets(@query maxResults?: int32): void;
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+// Define operation with required parameter
+op getSecretsCustom(@query maxResults: int32): void;
+
+// Apply the override
+@@override(MyService.getSecrets, getSecretsCustom);
+```
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+# maxResults is now required instead of optional
+def get_secrets(self, max_results: int) -> None:
+    ...
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp">
+
+```csharp
+// maxResults is now required
+public virtual Response GetSecrets(int maxResults, CancellationToken cancellationToken = default)
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript">
+
+```typescript
+// maxResults is now required
+export async function getSecrets(maxResults: number): Promise<void>;
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java">
+
+```java
+// maxResults is now required
+public void getSecrets(int maxResults);
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go">
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+### Transformation functions (Experimental)
+
+For composable customizations, TCGC provides experimental transformation functions that enable chainable modifications without manually defining custom operations.
+
+:::caution
+These functions are experimental and require suppressing the `experimental-feature` diagnostic.
+:::
+
+#### `replaceParameter`
+
+Replace a parameter in an operation with a new parameter definition:
+
+```typespec
+extern fn replaceParameter(
+  operation: Reflection.Operation,
+  selector: valueof string | Reflection.ModelProperty,
+  replacement: Reflection.ModelProperty
+): Reflection.Operation;
+```
+
+##### Making a parameter required
+
+<ClientTabs>
+<ClientTabItem lang="typespec">
+
+```typespec title="main.tsp"
+@service
+namespace KeyVault;
+
+op getSecrets(@query maxResults?: int32): void;
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+model RequiredMaxResults {
+  maxResults: int32;
+}
+
+#suppress "experimental-feature" "using replaceParameter"
+@@override(KeyVault.getSecrets,
+  replaceParameter(KeyVault.getSecrets, "maxResults", RequiredMaxResults.maxResults)
+);
+```
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+# maxResults is now required
+def get_secrets(self, max_results: int) -> None:
+    ...
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp">
+
+```csharp
+// maxResults is now required
+public virtual Response GetSecrets(int maxResults, CancellationToken cancellationToken = default)
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript">
+
+```typescript
+// maxResults is now required
+export async function getSecrets(maxResults: number): Promise<void>;
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java">
+
+```java
+// maxResults is now required
+public void getSecrets(int maxResults);
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go">
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+#### `removeParameter`
+
+Remove a parameter from an operation:
+
+```typespec
+extern fn removeParameter(
+  operation: Reflection.Operation,
+  selector: valueof string | Reflection.ModelProperty
+): Reflection.Operation;
+```
+
+When used with `@@override`, only optional parameters can be removed. Attempting to remove a required parameter will result in an error.
+
+<ClientTabs>
+<ClientTabItem lang="typespec">
+
+```typespec title="main.tsp"
+@service
+namespace KeyVault;
+
+op getSecrets(@query maxResults?: int32): void;
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+#suppress "experimental-feature" "using removeParameter"
+@@override(KeyVault.getSecrets, removeParameter(KeyVault.getSecrets, "maxResults"));
+```
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+# maxResults parameter is removed
+def get_secrets(self) -> None:
+    ...
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp">
+
+```csharp
+// maxResults parameter is removed
+public virtual Response GetSecrets(CancellationToken cancellationToken = default)
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript">
+
+```typescript
+// maxResults parameter is removed
+export async function getSecrets(): Promise<void>;
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java">
+
+```java
+// maxResults parameter is removed
+public void getSecrets();
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go">
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+#### `addParameter`
+
+Add a new parameter to an operation:
+
+```typespec
+extern fn addParameter(
+  operation: Reflection.Operation,
+  parameter: Reflection.ModelProperty
+): Reflection.Operation;
+```
+
+<ClientTabs>
+<ClientTabItem lang="typespec">
+
+```typespec title="client.tsp"
+model ConvenienceParams {
+  @header("X-Request-Id") requestId?: string;
+}
+
+#suppress "experimental-feature" "using addParameter"
+@@override(uploadFile, addParameter(uploadFile, ConvenienceParams.requestId));
+```
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+# requestId parameter is added
+def upload_file(self, content: bytes, *, request_id: Optional[str] = None) -> None:
+    ...
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp">
+
+```csharp
+// requestId parameter is added
+public virtual Response UploadFile(BinaryData content, string requestId = null, CancellationToken cancellationToken = default)
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript">
+
+```typescript
+// requestId parameter is added in options
+export interface UploadFileOptions {
+  requestId?: string;
+}
+export async function uploadFile(content: Uint8Array, options?: UploadFileOptions): Promise<void>;
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java">
+
+```java
+// requestId parameter is added
+public void uploadFile(byte[] content, String requestId);
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go">
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+#### `reorderParameters`
+
+Reorder parameters of an operation according to a specified order:
+
+```typespec
+extern fn reorderParameters(
+  operation: Reflection.Operation,
+  order: valueof string[]
+): Reflection.Operation;
+```
+
+<ClientTabs>
+<ClientTabItem lang="typespec">
+
+```typespec title="main.tsp"
+@service
+namespace MyService;
+
+op myOp(@query a: string, @query b: int32, @query c: boolean): void;
+```
+
+```typespec title="client.tsp"
+// Reorder parameters: put 'c' first, then 'a', then 'b'
+#suppress "experimental-feature" "using reorderParameters"
+@@override(MyService.myOp, reorderParameters(MyService.myOp, #["c", "a", "b"]));
+```
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+# Parameters are now in the order: c, a, b
+def my_op(self, c: bool, a: str, b: int) -> None:
+    ...
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp">
+
+```csharp
+// Parameters are now in the order: c, a, b
+public virtual Response MyOp(bool c, string a, int b, CancellationToken cancellationToken = default)
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript">
+
+```typescript
+// Parameters are now in the order: c, a, b
+export async function myOp(c: boolean, a: string, b: number): Promise<void>;
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java">
+
+```java
+// Parameters are now in the order: c, a, b
+public void myOp(boolean c, String a, int b);
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go">
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+### Chaining transformations
+
+Transformation functions can be chained together. Each function returns a new operation that can be passed to the next transformation:
+
+<ClientTabs>
+<ClientTabItem lang="typespec">
+
+```typespec title="client.tsp"
+@service
+namespace MyService;
+
+op search(@query query?: string, @query limit?: int32): string;
+
+model RequiredParams {
+  query: string;
+  limit: int32;
+}
+
+// Chain: make query required -> make limit required -> reorder parameters
+#suppress "experimental-feature" "using replaceParameter"
+alias step1 = replaceParameter(search, "query", RequiredParams.query);
+#suppress "experimental-feature" "using replaceParameter"
+alias step2 = replaceParameter(step1, "limit", RequiredParams.limit);
+#suppress "experimental-feature" "using reorderParameters"
+@@override(search, reorderParameters(step2, #["limit", "query"]));
+```
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+# Both query and limit are now required, and limit comes before query
+def search(self, limit: int, query: str) -> str:
+    ...
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp">
+
+```csharp
+// Both parameters required, limit comes before query
+public virtual Response<string> Search(int limit, string query, CancellationToken cancellationToken = default)
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript">
+
+```typescript
+// Both parameters required, limit comes before query
+export async function search(limit: number, query: string): Promise<string>;
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java">
+
+```java
+// Both parameters required, limit comes before query
+public String search(int limit, String query);
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go">
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+### Language-specific customizations
+
+Use the `scope` parameter to apply customizations only to specific language emitters:
+
+```typespec
+// Only apply to Python - maxResults will be required in Python but remain optional in other languages
+#suppress "experimental-feature" "using replaceParameter"
+@@override(getSecrets,
+  replaceParameter(getSecrets, "maxResults", RequiredMaxResults.maxResults),
+  "python"
+);
+```
+
+Supported scope values include: `"python"`, `"csharp"`, `"java"`, `"javascript"`, `"go"`.

@@ -485,7 +485,7 @@ describe("@clientOption with getClientOptions getter", () => {
     strictEqual(getClientOptions(sdkNamespace, "namespaceFlag"), "nsValue");
   });
 
-  it("should return client option value for interface (operation group)", async () => {
+  it("should return client option value for interface (sub client)", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("interfaceFlag", true, "python")

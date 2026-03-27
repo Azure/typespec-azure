@@ -106,7 +106,7 @@ describe("LanguagePackageMetadata structure", () => {
       },
       java: {
         emitterName: "@azure-tools/typespec-java",
-        packageName: "azure-security-keyvault-secrets",
+        packageName: "com.azure:azure-security-keyvault-secrets",
         namespace: "com.azure.security.keyvault.secrets",
         outputDir: "{output-dir}/sdk/keyvault/azure-security-keyvault-secrets",
         flavor: "azure",
@@ -189,7 +189,7 @@ describe("Complete snapshot example", () => {
         },
         java: {
           emitterName: "@azure-tools/typespec-java",
-          packageName: "azure-security-keyvault-secrets",
+          packageName: "com.azure:azure-security-keyvault-secrets",
           namespace: "com.azure.security.keyvault.secrets",
           outputDir: "{output-dir}/sdk/keyvault/azure-security-keyvault-secrets",
           flavor: "azure",
