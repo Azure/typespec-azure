@@ -1,5 +1,5 @@
 import { paramMessage } from "@typespec/compiler";
-import { deepStrictEqual } from "assert";
+import { deepStrictEqual, ok } from "assert";
 import { describe, it } from "vitest";
 import { compileOpenAPI } from "./test-host.js";
 
@@ -322,6 +322,7 @@ describe("typespec-autorest: Long-running Operations", () => {
       "final-state-schema": "#/definitions/String",
     });
     // Verify the schema definition is created
+    ok(openapi.definitions);
     deepStrictEqual(openapi.definitions["String"], { type: "string" });
   });
 
@@ -372,19 +373,19 @@ describe("typespec-autorest: Long-running Operations", () => {
     const basePath =
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}";
     // Both operations should reference the same schema
-    deepStrictEqual(openapi.paths[`${basePath}/move`].post["x-ms-long-running-operation-options"], {
+    const paths = openapi.paths as any;
+    ok(paths[`${basePath}/move`].post["x-ms-long-running-operation-options"]);
+    deepStrictEqual(paths[`${basePath}/move`].post["x-ms-long-running-operation-options"], {
       "final-state-via": "location",
       "final-state-schema": "#/definitions/String",
     });
-    deepStrictEqual(
-      openapi.paths[`${basePath}/transfer`].post["x-ms-long-running-operation-options"],
-      {
-        "final-state-via": "location",
-        "final-state-schema": "#/definitions/String",
-      },
-    );
+    deepStrictEqual(paths[`${basePath}/transfer`].post["x-ms-long-running-operation-options"], {
+      "final-state-via": "location",
+      "final-state-schema": "#/definitions/String",
+    });
     // Only one String schema should exist
-    deepStrictEqual(openapi.definitions["String"], { type: "string" });
+    const definitions = openapi.definitions as any;
+    deepStrictEqual(definitions["String"], { type: "string" });
   });
 
   it("Creates separate schemas for two custom scalars with different names", async () => {
@@ -436,20 +437,19 @@ describe("typespec-autorest: Long-running Operations", () => {
 
     const basePath =
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}";
-    deepStrictEqual(openapi.paths[`${basePath}/move`].post["x-ms-long-running-operation-options"], {
+    const paths = openapi.paths as any;
+    deepStrictEqual(paths[`${basePath}/move`].post["x-ms-long-running-operation-options"], {
       "final-state-via": "location",
       "final-state-schema": "#/definitions/widgetId",
     });
-    deepStrictEqual(
-      openapi.paths[`${basePath}/transfer`].post["x-ms-long-running-operation-options"],
-      {
-        "final-state-via": "location",
-        "final-state-schema": "#/definitions/widgetTag",
-      },
-    );
+    deepStrictEqual(paths[`${basePath}/transfer`].post["x-ms-long-running-operation-options"], {
+      "final-state-via": "location",
+      "final-state-schema": "#/definitions/widgetTag",
+    });
     // Both schemas should exist separately
-    deepStrictEqual(openapi.definitions["widgetId"], { type: "string" });
-    deepStrictEqual(openapi.definitions["widgetTag"], { type: "string" });
+    const defs = openapi.definitions as any;
+    deepStrictEqual(defs["widgetId"], { type: "string" });
+    deepStrictEqual(defs["widgetTag"], { type: "string" });
   });
 
   it("Preserves camelCase in custom scalar names for final-state-schema", async () => {
@@ -499,12 +499,14 @@ describe("typespec-autorest: Long-running Operations", () => {
 
     const basePath =
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}";
-    deepStrictEqual(openapi.paths[`${basePath}/move`].post["x-ms-long-running-operation-options"], {
+    const paths = openapi.paths as any;
+    deepStrictEqual(paths[`${basePath}/move`].post["x-ms-long-running-operation-options"], {
       "final-state-via": "location",
       "final-state-schema": "#/definitions/myCustomResult",
     });
+    const defs = openapi.definitions as any;
     // Verify the schema definition preserves the camelCase name
-    deepStrictEqual(openapi.definitions["myCustomResult"], { type: "string" });
+    deepStrictEqual(defs["myCustomResult"], { type: "string" });
   });
 
   it("Creates separate schemas for custom scalars with the same name in different namespaces", async () => {
@@ -560,32 +562,29 @@ describe("typespec-autorest: Long-running Operations", () => {
 
     const basePath =
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}";
+    const paths = openapi.paths as any;
     deepStrictEqual(
-      openapi.paths[`${basePath}/move`].post["x-ms-long-running-operation-options"][
-        "final-state-via"
-      ],
+      paths[`${basePath}/move`].post["x-ms-long-running-operation-options"]["final-state-via"],
       "location",
     );
     deepStrictEqual(
-      openapi.paths[`${basePath}/transfer`].post["x-ms-long-running-operation-options"][
-        "final-state-via"
-      ],
+      paths[`${basePath}/transfer`].post["x-ms-long-running-operation-options"]["final-state-via"],
       "location",
     );
     // Both should have distinct final-state-schema references
     const moveSchema =
-      openapi.paths[`${basePath}/move`].post["x-ms-long-running-operation-options"][
-        "final-state-schema"
-      ];
+      paths[`${basePath}/move`].post["x-ms-long-running-operation-options"]["final-state-schema"];
     const transferSchema =
-      openapi.paths[`${basePath}/transfer`].post["x-ms-long-running-operation-options"][
+      paths[`${basePath}/transfer`].post["x-ms-long-running-operation-options"][
         "final-state-schema"
       ];
     // Both should have distinct, specifically-named schema references
     deepStrictEqual(moveSchema, "#/definitions/Ns1.customResult");
     deepStrictEqual(transferSchema, "#/definitions/Ns2.customResult");
+
+    const defs = openapi.definitions as any;
     // Both schemas should exist with correct types
-    deepStrictEqual(openapi.definitions["Ns1.customResult"], { type: "string" });
-    deepStrictEqual(openapi.definitions["Ns2.customResult"], { type: "integer", format: "int32" });
+    deepStrictEqual(defs["Ns1.customResult"], { type: "string" });
+    deepStrictEqual(defs["Ns2.customResult"], { type: "integer", format: "int32" });
   });
 });
