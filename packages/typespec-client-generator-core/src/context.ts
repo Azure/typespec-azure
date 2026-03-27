@@ -78,6 +78,7 @@ export function createTCGCContext(
     __modelPropertyCache: new Map<ModelProperty, SdkModelPropertyType>(),
     __responseHeaderCache: new Map<ModelProperty, SdkServiceResponseHeader>(),
     __generatedNames: new Map<Union | Model | TspLiteralType, string>(),
+    __namingContext: new Map(),
     __httpOperationCache: new Map<Operation, HttpOperation>(),
     __clientParametersCache: new Map(),
     __tspTypeToApiVersions: new Map(),

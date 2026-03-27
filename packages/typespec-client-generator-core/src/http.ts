@@ -3,7 +3,6 @@ import {
   ModelProperty,
   Operation,
   Type,
-  Union,
   compilerAssert,
   createDiagnosticCollector,
   getEncode,
@@ -31,7 +30,7 @@ import {
   isQueryParam,
 } from "@typespec/http";
 import { StreamMetadata, getStreamMetadata } from "@typespec/http/experimental";
-import { camelCase, pascalCase } from "change-case";
+import { camelCase } from "change-case";
 import { getResponseAsBool, isInScope, shouldOmitSlashFromEmptyRoute } from "./decorators.js";
 import {
   CollectionFormat,
@@ -71,7 +70,6 @@ import {
   isHttpBodySpread,
   isNeverOrVoidType,
   isSubscriptionId,
-  resolveDuplicateGenearatedName,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import { isMediaTypeJson, isMediaTypeOctetStream, isMediaTypeTextPlain } from "./media-types.js";
@@ -80,6 +78,7 @@ import {
   getEffectivePayloadType,
   getWireName,
   isApiVersion,
+  pushNamingContext,
 } from "./public-utils.js";
 import {
   addEncodeInfo,
@@ -641,11 +640,12 @@ function getSdkHttpResponseAndExceptions(
   const exceptions: SdkHttpErrorResponse[] = [];
   for (const response of httpOperation.responses) {
     const headers: SdkServiceResponseHeader[] = [];
-    let body: Type | undefined;
+    const bodyTypes: Type[] = [];
     let type: SdkType | undefined;
     let contentTypes: string[] = [];
     let streamMetadata: SdkStreamMetadata | undefined;
-    let bodyIsCreatedUnion = false;
+    let lastBodyProperty: ModelProperty | undefined;
+    let lastDefaultContentType: string | undefined;
 
     for (const innerResponse of response.responses) {
       const defaultContentType = innerResponse.body?.contentTypes.includes("application/json")
@@ -666,7 +666,7 @@ function getSdkHttpResponseAndExceptions(
         context.__responseHeaderCache.set(header, headers[headers.length - 1]);
       }
       if (innerResponse.body && !isNeverOrVoidType(innerResponse.body.type)) {
-        if (body && body !== innerResponse.body.type) {
+        if (bodyTypes.length > 0 && !bodyTypes.includes(innerResponse.body.type)) {
           diagnostics.add(
             createDiagnostic({
               code: "multiple-response-types",
@@ -676,22 +676,13 @@ function getSdkHttpResponseAndExceptions(
               },
             }),
           );
-          if (bodyIsCreatedUnion && body.kind === "Union") {
-            // Body is already a synthetic union we created; add new type as a variant
-            // instead of wrapping the union with another union
-            context.__generatedNames.delete(body);
-            const existingTypes = [...(body as Union).variants.values()].map((v) => v.type);
-            body = tk.union.create([...existingTypes, innerResponse.body.type]);
-          } else {
-            body = tk.union.create([body, innerResponse.body.type]);
-          }
-          bodyIsCreatedUnion = true;
-        } else if (!body) {
-          body = innerResponse.body.type;
+        }
+        if (!bodyTypes.includes(innerResponse.body.type)) {
+          bodyTypes.push(innerResponse.body.type);
         }
         contentTypes = contentTypes.concat(innerResponse.body.contentTypes);
-        body =
-          body.kind === "Model" ? getEffectivePayloadType(context, body, Visibility.Read) : body;
+        lastBodyProperty = innerResponse.body.property;
+        lastDefaultContentType = defaultContentType;
         const responseStreamMeta = getStreamMetadata(context.program, innerResponse);
         if (responseStreamMeta) {
           // map stream response body type to bytes, but preserve stream metadata
@@ -699,22 +690,24 @@ function getSdkHttpResponseAndExceptions(
           streamMetadata = diagnostics.pipe(
             buildSdkStreamMetadata(context, responseStreamMeta, httpOperation.operation),
           );
-        } else {
-          if (bodyIsCreatedUnion && body.kind === "Union") {
-            // Provide context for the generated name of the synthetic union
-            resolveDuplicateGenearatedName(
-              context,
-              body,
-              pascalCase(httpOperation.operation.name) + "Response",
-            );
-          }
-          type = diagnostics.pipe(
-            getClientTypeWithDiagnostics(context, body, httpOperation.operation),
-          );
-          if (innerResponse.body.property) {
-            addEncodeInfo(context, innerResponse.body.property, type, defaultContentType);
-          }
         }
+      }
+    }
+
+    // Create SDK type from collected body types after iteration
+    let body: Type | undefined;
+    if (!type && bodyTypes.length > 0) {
+      if (bodyTypes.length === 1) {
+        body = bodyTypes[0];
+      } else {
+        const createdUnion = tk.union.create(bodyTypes);
+        pushNamingContext(context, createdUnion, httpOperation.operation, "Response");
+        body = createdUnion;
+      }
+      body = body.kind === "Model" ? getEffectivePayloadType(context, body, Visibility.Read) : body;
+      type = diagnostics.pipe(getClientTypeWithDiagnostics(context, body, httpOperation.operation));
+      if (lastBodyProperty) {
+        addEncodeInfo(context, lastBodyProperty, type, lastDefaultContentType);
       }
     }
     const sdkResponse = {
@@ -737,7 +730,7 @@ function getSdkHttpResponseAndExceptions(
     if (
       response.statusCodes === "*" ||
       isErrorModel(context.program, response.type) ||
-      (body && isErrorModel(context.program, body))
+      (bodyTypes.length > 0 && bodyTypes.some((b) => isErrorModel(context.program, b)))
     ) {
       exceptions.push({
         ...sdkResponse,

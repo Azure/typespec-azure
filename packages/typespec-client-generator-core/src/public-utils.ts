@@ -273,9 +273,18 @@ export function getCrossLanguageDefinitionId(
       if (type.name) {
         break;
       }
-      const contextPath = operation
-        ? getContextPath(context, operation, type)
-        : findContextPath(context, type);
+      const namingCtx = context.__namingContext.get(type);
+      let contextPath: ContextNode[];
+      if (namingCtx) {
+        contextPath = [
+          { name: namingCtx.operation.name, type: namingCtx.operation },
+          { name: namingCtx.label, type },
+        ];
+      } else {
+        contextPath = operation
+          ? getContextPath(context, operation, type)
+          : findContextPath(context, type);
+      }
       const namingPart = contextPath.slice(findLastNonAnonymousNode(contextPath));
       if (
         namingPart[0]?.type?.kind === "Model" ||
@@ -352,11 +361,40 @@ export function getGeneratedName(
   const generatedName = context.__generatedNames.get(type);
   if (generatedName) return generatedName;
 
+  // Check if naming context was explicitly pushed for this type
+  const namingCtx = context.__namingContext.get(type);
+  if (namingCtx) {
+    const contextPath: ContextNode[] = [
+      { name: namingCtx.operation.name, type: namingCtx.operation },
+      { name: namingCtx.label, type },
+    ];
+    const createdName = buildNameFromContextPaths(context, type, contextPath);
+    return createdName;
+  }
+
   const contextPath = operation
     ? getContextPath(context, operation, type)
     : findContextPath(context, type);
   const createdName = buildNameFromContextPaths(context, type, contextPath);
   return createdName;
+}
+
+/**
+ * Push naming context for a type that was programmatically created (e.g. synthetic unions).
+ * This allows getGeneratedName to find a proper context path for types that don't exist
+ * in the original operation type graph.
+ * @param context
+ * @param type The type to register naming context for
+ * @param operation The operation this type belongs to
+ * @param label The label for the type in the naming path (e.g. "Response")
+ */
+export function pushNamingContext(
+  context: TCGCContext,
+  type: Model | Union,
+  operation: Operation,
+  label: string,
+): void {
+  context.__namingContext.set(type, { operation, label });
 }
 
 /**
