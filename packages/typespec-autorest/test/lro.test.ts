@@ -305,14 +305,14 @@ describe("typespec-autorest: Long-running Operations", () => {
   });
 
   it("Creates a named final-state-schema definition for scalar final results", async () => {
-    const openapi = await compileOpenAPI(
+    const openapi = (await compileOpenAPI(
       armCode.apply(armCode, [
         {
           putOp: "move is ArmResourceActionAsync<Widget, void, string>;",
         },
       ]),
       { preset: "azure", options: { "emit-lro-options": "all" } },
-    );
+    )) as any;
 
     const itemPath =
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}/move";
@@ -326,7 +326,7 @@ describe("typespec-autorest: Long-running Operations", () => {
   });
 
   it("Reuses the same schema when string is the finalResult in two operations", async () => {
-    const openapi = await compileOpenAPI(
+    const openapi = (await compileOpenAPI(
       `
       @armProviderNamespace
       namespace Microsoft.Test;
@@ -367,7 +367,7 @@ describe("typespec-autorest: Long-running Operations", () => {
       }
       `,
       { preset: "azure", options: { "emit-lro-options": "all" } },
-    );
+    )) as any;
 
     const basePath =
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}";
@@ -388,7 +388,7 @@ describe("typespec-autorest: Long-running Operations", () => {
   });
 
   it("Creates separate schemas for two custom scalars with different names", async () => {
-    const openapi = await compileOpenAPI(
+    const openapi = (await compileOpenAPI(
       `
       @armProviderNamespace
       namespace Microsoft.Test;
@@ -432,7 +432,7 @@ describe("typespec-autorest: Long-running Operations", () => {
       }
       `,
       { preset: "azure", options: { "emit-lro-options": "all" } },
-    );
+    )) as any;
 
     const basePath =
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}";
@@ -453,7 +453,7 @@ describe("typespec-autorest: Long-running Operations", () => {
   });
 
   it("Preserves camelCase in custom scalar names for final-state-schema", async () => {
-    const openapi = await compileOpenAPI(
+    const openapi = (await compileOpenAPI(
       `
       @armProviderNamespace
       namespace Microsoft.Test;
@@ -495,7 +495,7 @@ describe("typespec-autorest: Long-running Operations", () => {
       }
       `,
       { preset: "azure", options: { "emit-lro-options": "all" } },
-    );
+    )) as any;
 
     const basePath =
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}";
@@ -508,7 +508,7 @@ describe("typespec-autorest: Long-running Operations", () => {
   });
 
   it("Creates separate schemas for custom scalars with the same name in different namespaces", async () => {
-    const openapi = await compileOpenAPI(
+    const openapi = (await compileOpenAPI(
       `
       @armProviderNamespace
       namespace Microsoft.Test;
@@ -556,7 +556,7 @@ describe("typespec-autorest: Long-running Operations", () => {
       }
       `,
       { preset: "azure", options: { "emit-lro-options": "all" } },
-    );
+    )) as any;
 
     const basePath =
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}";
