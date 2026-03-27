@@ -3562,6 +3562,25 @@ model Azure.ResourceManager.Legacy.ArmOperationOptions
 | useStaticRoute? | `boolean` | Should a static route be used          |
 | route?          | `string`  | The status route for operations to use |
 
+### `CustomAzureProxyResource` {#Azure.ResourceManager.Legacy.CustomAzureProxyResource}
+
+Model representing a custom resource that extends ProxyResource.
+Use this template with 'is' to create a custom proxy resource.
+
+```typespec
+model Azure.ResourceManager.Legacy.CustomAzureProxyResource<isResource>
+```
+
+#### Template Parameters
+
+| Name       | Description                                                                                                    |
+| ---------- | -------------------------------------------------------------------------------------------------------------- |
+| isResource | Optional. A boolean flag indicating whether the resource should be marked as an Azure resource. Default false. |
+
+#### Properties
+
+None
+
 ### `CustomAzureResource` {#Azure.ResourceManager.Legacy.CustomAzureResource}
 
 Model representing a custom Azure Resource Manager Resource.
