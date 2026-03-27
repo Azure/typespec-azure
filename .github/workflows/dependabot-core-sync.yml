@@ -3,7 +3,7 @@ name: Sync Core Submodule Update
 on:
   pull_request:
     branches: ["main"]
-    types: [opened]
+    # types: [opened]
 
 permissions: {}
 
@@ -21,13 +21,13 @@ jobs:
 
       - uses: ./.github/actions/setup
 
-      - run: pnpm install
+      - run: pnpm install --no-frozen-lockfile
         name: Install dependencies
 
       - run: pnpm sync-catalog
         name: Sync catalog versions from core
 
-      - run: pnpm install
+      - run: pnpm install --no-frozen-lockfile
         name: Update lockfile after catalog sync
 
       - name: Commit and push changes
