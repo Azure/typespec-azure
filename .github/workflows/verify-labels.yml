@@ -1,4 +1,8 @@
 name: Verify labels
+
+permissions:
+  contents: read
+
 on:
   pull_request:
     branches:
