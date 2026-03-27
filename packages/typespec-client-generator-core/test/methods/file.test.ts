@@ -425,6 +425,7 @@ it("file upload with default content type should have string contentType header"
   const contentTypeMethodParam = method.parameters.find((p) => p.name === "contentType");
   ok(contentTypeMethodParam);
   strictEqual(contentTypeMethodParam.type.kind, "string");
+  strictEqual(contentTypeMethodParam.clientDefaultValue, "application/octet-stream");
   // The Content-Type header should also be string
   const httpOperation = method.operation;
   const contentTypeHeader = httpOperation.parameters.find(
@@ -433,6 +434,7 @@ it("file upload with default content type should have string contentType header"
   ok(contentTypeHeader);
   strictEqual(contentTypeHeader.type.kind, "string");
   strictEqual(contentTypeHeader.serializedName, "Content-Type");
+  strictEqual(contentTypeHeader.clientDefaultValue, "application/octet-stream");
 });
 
 it("file download with default content type should have string accept header", async () => {
@@ -452,6 +454,7 @@ it("file download with default content type should have string accept header", a
   const acceptMethodParam = method.parameters.find((p) => p.name === "accept");
   ok(acceptMethodParam);
   strictEqual(acceptMethodParam.type.kind, "string");
+  strictEqual(acceptMethodParam.clientDefaultValue, "application/octet-stream");
   // The Accept header should also be string
   const httpOperation = method.operation;
   const acceptHeader = httpOperation.parameters.find(
@@ -460,4 +463,5 @@ it("file download with default content type should have string accept header", a
   ok(acceptHeader);
   strictEqual(acceptHeader.type.kind, "string");
   strictEqual(acceptHeader.serializedName, "Accept");
+  strictEqual(acceptHeader.clientDefaultValue, "application/octet-stream");
 });

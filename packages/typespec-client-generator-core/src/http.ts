@@ -445,7 +445,10 @@ function createContentTypeOrAcceptHeader(
     type = enumType;
   }
   const optional = bodyObject.kind === "body" ? bodyObject.optional : false;
-  // No need for clientDefaultValue because it's a constant, it only has one value
+  // For */* wildcard, provide a sensible client default value
+  const isWildcard =
+    bodyObject.contentTypes?.length === 1 && bodyObject.contentTypes[0] === "*/*";
+  // No need for clientDefaultValue when it's a constant, it only has one value
   return {
     type,
     name,
@@ -454,6 +457,7 @@ function createContentTypeOrAcceptHeader(
     isApiVersionParam: false,
     onClient: false,
     optional: optional,
+    ...(isWildcard && { clientDefaultValue: "application/octet-stream" }),
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
     decorators: [],
     access: "public",
