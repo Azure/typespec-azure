@@ -1661,6 +1661,8 @@ function updateTypesFromOperation(
   try {
     for (const param of httpOperation.parameters.parameters) {
       if (isNeverOrVoidType(param.param.type)) continue;
+      // skip parameters that are out of scope
+      if (!isInScope(context, param.param)) continue;
       pushNamingContext(
         context,
         `Request${pascalCase(param.name)}`,
@@ -1766,6 +1768,8 @@ function updateTypesFromOperation(
       if (isNeverOrVoidType(param.type)) continue;
       // if it is a body model, skip
       if (httpOperation.parameters.body?.property === param) continue;
+      // skip parameters that are out of scope
+      if (!isInScope(context, param)) continue;
       // if it is a stream model, skip the wrapper but register the streamed payload type
       if (param.type.kind === "Model" && isStream(program, param.type)) {
         const streamOf = getStreamOf(program, param.type);
@@ -1911,7 +1915,7 @@ function updateTypesFromOperation(
   return diagnostics.wrap(undefined);
 
   function updateUsageOrAccessForLroComponent(
-    model: Model | "void" | IntrinsicType | undefined,
+    model: Model | Scalar | "void" | IntrinsicType | undefined,
     usage: UsageFlags,
     label: string,
   ) {

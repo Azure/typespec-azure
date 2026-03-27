@@ -14,6 +14,7 @@ interface Operations extends Azure.ResourceManager.Operations {}
 
 enum Versions {
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  @Azure.Core.previewVersion
   `2025-01-01-preview`,
 }
 /** The resource-specific properties of a Widget */
