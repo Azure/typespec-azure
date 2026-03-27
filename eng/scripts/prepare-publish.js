@@ -201,7 +201,7 @@ async function getProjectVersions() {
 async function rebuildAndRegenSamplesToBumpTemplateVersions() {
   await typespecAzureRunWithRetries(3, "pnpm", "install");
   await typespecAzureRunWithOptions(
-    { env: { ...process.env, TYPESPEC_SKIP_DOCUSAURUS_BUILD: true } },
+    { env: { ...process.env, TYPESPEC_SKIP_WEBSITE_BUILD: true } },
     "pnpm",
     "build",
   );

@@ -63,14 +63,12 @@ export interface TCGCContext {
   __generatedNames: Map<Type, string>;
   __httpOperationCache: Map<Operation, HttpOperation>;
   __tspTypeToApiVersions: Map<Type, string[]>;
-  __rawClientsOperationGroupsCache?: Map<
-    Namespace | Interface | string,
-    SdkClient | SdkOperationGroup
-  >;
-  __clientToOperationsCache?: Map<SdkClient | SdkOperationGroup, Operation[]>;
-  __operationToClientCache?: Map<Operation, SdkClient | SdkOperationGroup>;
-  __clientParametersCache: Map<SdkClient | SdkOperationGroup, SdkMethodParameter[]>;
-  __clientApiVersionDefaultValueCache: Map<SdkClient | SdkOperationGroup, string | undefined>;
+  __explicitClients?: Set<SdkClient>;
+  __rawClientsCache?: Map<Namespace | Interface | string, SdkClient>;
+  __clientToOperationsCache?: Map<SdkClient, Operation[]>;
+  __operationToClientCache?: Map<Operation, SdkClient>;
+  __clientParametersCache: Map<SdkClient, SdkMethodParameter[]>;
+  __clientApiVersionDefaultValueCache: Map<SdkClient, string | undefined>;
   __httpOperationExamples: Map<HttpOperation, SdkHttpOperationExample[]>;
   __pagedResultSet: Set<SdkType>;
   __orphanTypesCache?: (Model | Enum | Union)[]; // cached result of listOrphanTypes to avoid repeated namespace traversals
@@ -86,9 +84,10 @@ export interface TCGCContext {
   getPackageVersions(): Map<Namespace, string[]>;
   getPackageVersionEnum(): Map<Namespace, Enum | undefined>;
   getClients(): SdkClient[];
-  getClientOrOperationGroup(type: Namespace | Interface): SdkClient | SdkOperationGroup | undefined;
-  getOperationsForClient(client: SdkClient | SdkOperationGroup): Operation[];
-  getClientForOperation(operation: Operation): SdkClient | SdkOperationGroup;
+  getRootClients(): SdkClient[];
+  getClient(type: Namespace | Interface): SdkClient | undefined;
+  getOperationsForClient(client: SdkClient): Operation[];
+  getClientForOperation(operation: Operation): SdkClient;
 }
 
 export interface SdkContext<
@@ -104,27 +103,17 @@ export interface SdkContext<
 export interface SdkClient {
   kind: "SdkClient";
   name: string;
-  /**
-   * @deprecated Use `services` instead. This property will be removed in a future release.
-   */
-  service: Namespace | Namespace[];
   services: Namespace[];
-  type: Namespace | Interface;
-  subOperationGroups: SdkOperationGroup[];
-}
-
-export interface SdkOperationGroup {
-  kind: "SdkOperationGroup";
+  /** The type associated with this client. If it is created from string client location, or is a merged client, this will be undefined. */
   type?: Namespace | Interface;
-  subOperationGroups: SdkOperationGroup[];
-  groupPath: string;
-  /**
-   * @deprecated Use `services` instead. This property will be removed in a future release.
-   */
-  service: Namespace;
-  services: Namespace[];
-  /** Parent operation group or client. */
-  parent?: SdkClient | SdkOperationGroup;
+  /** Sub clients of this client. */
+  subClients: SdkClient[];
+  /** The path of this client in the client hierarchy. For example, "MyClient.SubClient". */
+  clientPath: string;
+  /** The parent client. Only set for sub clients. */
+  parent?: SdkClient;
+  /** Whether to auto-merge service's things into current client. */
+  autoMergeService?: boolean;
 }
 
 export type AccessFlags = "internal" | "public";
@@ -213,7 +202,7 @@ export interface DecoratorInfo {
 export interface SdkClientType<
   TServiceOperation extends SdkServiceOperation,
 > extends DecoratedType {
-  __raw: SdkClient | SdkOperationGroup;
+  __raw: SdkClient;
   kind: "client";
   /** Name of the client. */
   name: string;
@@ -233,7 +222,7 @@ export interface SdkClientType<
   crossLanguageDefinitionId: string;
   /** The parent client of this client. The structure follows the definition hierarchy. */
   parent?: SdkClientType<TServiceOperation>;
-  /** The children of this client. The structure follows the definition hierarchy. */
+  /** The sub clients of this client. */
   children?: SdkClientType<TServiceOperation>[];
 }
 
@@ -1267,6 +1256,8 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   unions: (SdkUnionType | SdkNullableType)[];
   /** Unique ID for the package. */
   crossLanguagePackageId: string;
+  /** Hash of API-affecting elements for cross-language SDK comparison. */
+  crossLanguageVersion: string;
   /** Hierarchical structure for the package based on namespaces. */
   namespaces: SdkNamespace<TServiceOperation>[];
   /** License details for client code comments or license file generation. */

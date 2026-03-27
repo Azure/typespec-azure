@@ -373,6 +373,7 @@ Area of the codebase
 | `eng`                        | #65bfff |                                                                                     |
 | `ide`                        | #846da1 | Issues for Azure specific ide features                                              |
 | `cli/psh`                    | #9EB120 | Issues for Azure CLI/PSH features                                                   |
+| `meta:website`               | #007dc8 | TypeSpec.io updates                                                                 |
 
 #### issue_kinds
 

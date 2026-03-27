@@ -66,8 +66,7 @@ TCGC provides flags to control the client type graph style, such as enabling or 
 
 In order to introduce the client concept, TCGC introduces some new raw types and helper functions.
 
-[`SdkClient`](../reference/js-api/interfaces/sdkclient/) represents a client and [`SdkOperationGroup`](../reference/js-api/interfaces/sdkoperationgroup/) represents a sub client.
-Emitters can use [`listClients`](../reference/js-api/functions/listclients/) to get all the root clients calculated from the current spec. Then emitters can use [`listOperationGroups`](../reference/js-api/functions/listoperationgroups/) to get all the sub clients under one root client or sub client. Finally, emitters can use [`listOperationsInOperationGroup`](../reference/js-api/functions/listoperationsinoperationgroup/) to get all the operations under one client or sub client.
+[`SdkClient`](../reference/js-api/interfaces/sdkclient/) represents a client. Sub clients are also represented as `SdkClient` with the `subClients` property providing the client hierarchy. Emitters can use [`listClients`](../reference/js-api/functions/listclients/) to get all the root clients calculated from the current spec. Each `SdkClient` has a `subClients` array containing its child clients.
 
 For these helper functions, the return type is either TCGC raw types or TypeSpec core types.
 
@@ -228,11 +227,11 @@ For [`SdkModelExampleValue`](../reference/js-api/interfaces/sdkmodelexamplevalue
 
 ### Client Detection
 
-The clients depend on the combination usage of `Namespace`, `Interface`, `@service`, `@client`, `@operationGroup` and `@moveTo`.
+The clients depend on the combination usage of `Namespace`, `Interface`, `@service`, `@client`, and `@moveTo`.
 
-If there is no explicitly defined `@client` or `@operationGroup`, then the first namespace with `@service` is a root client. The nested namespaces and interfaces under that namespace are sub clients with hierarchy. Meanwhile, any operations with `@moveTo` a `string` type target, is a sub client under the root client.
+If there is no explicitly defined `@client`, then each namespace with `@service` is a separate root client. The nested namespaces and interfaces under each service namespace are sub clients with hierarchy. Meanwhile, any operations with `@moveTo` a `string` type target, is a sub client under the root client.
 
-If there is any `@client` definition or `@operationGroup` definition, then each `@client` is a root client and each `@operationGroup` is a sub client with hierarchy.
+If there is any `@client` definition, then each top-level `@client` is a root client and each nested `@client` is a sub client with hierarchy.
 
 If a detected client or sub client does not contain any sub client or operation, then this client is ignored.
 
