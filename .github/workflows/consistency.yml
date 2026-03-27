@@ -101,6 +101,16 @@ jobs:
       - run: pnpm run lint
         name: Lint
 
+      # cspell:ignore rhysd
+      # Content copied from https://raw.githubusercontent.com/rhysd/actionlint/2ab3a12c7848f6c15faca9a92612ef4261d0e370/.github/actionlint-matcher.json
+      - name: Add ActionLint Problem Matcher
+        run: echo "::add-matcher::.github/matchers/actionlint.json"
+
+      - name: Lint GitHub Actions workflows
+        uses: docker://rhysd/actionlint:1.7.11
+        with:
+          args: -color -verbose
+
   # Check catalog is in sync with core
   version-consistency:
     name: Versions consistency
