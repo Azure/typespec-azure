@@ -817,3 +817,46 @@ it("allows action requests with optional body parameters", async () => {
     },
   });
 });
+
+it("allows sync and async provider actions with unknown body", async () => {
+  const openApi = await compileOpenAPI(
+    `@armProviderNamespace
+    namespace Microsoft.Contoso;
+    
+    @armResourceOperations
+    interface ProviderOperations {
+      calculateSync is ArmProviderActionSync<
+        Request = unknown,
+        Response = unknown,
+      >;
+      calculateAsync is ArmProviderActionAsync<
+        Request = unknown,
+        Response = unknown,
+      >;
+    }
+  `,
+    { preset: "azure" },
+  );
+
+  const syncOp = openApi.paths["/providers/Microsoft.Contoso/calculateSync"].post;
+  const asyncOp = openApi.paths["/providers/Microsoft.Contoso/calculateAsync"].post;
+
+  ok(syncOp);
+  ok(asyncOp);
+
+  deepStrictEqual(syncOp.parameters[1], {
+    name: "body",
+    in: "body",
+    description: "The request body",
+    required: true,
+    schema: {},
+  });
+
+  deepStrictEqual(asyncOp.parameters[1], {
+    name: "body",
+    in: "body",
+    description: "The request body",
+    required: true,
+    schema: {},
+  });
+});

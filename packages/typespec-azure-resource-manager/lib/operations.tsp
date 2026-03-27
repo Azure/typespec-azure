@@ -771,8 +771,8 @@ op checkLocalNameAvailability<
 @armResourceCollectionAction
 @Private.armUpdateProviderNamespace
 op ArmProviderActionSync<
-  Request extends {} | void = void,
-  Response extends {} | void = void,
+  Request extends {} | unknown | void = void,
+  Response extends {} | unknown | void = void,
   Scope extends {} = TenantActionScope,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse,
@@ -802,7 +802,7 @@ op ArmProviderActionSync<
 @armResourceCollectionAction
 @Private.armUpdateProviderNamespace
 op ArmProviderActionAsync<
-  Request extends {} | void = void,
+  Request extends {} | unknown | void = void,
   Response extends TypeSpec.Reflection.Model | unknown | void = void,
   Scope extends {} = TenantActionScope,
   Parameters extends {} = {},
