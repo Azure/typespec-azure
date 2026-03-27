@@ -3,6 +3,7 @@ import {
   ModelProperty,
   Operation,
   Type,
+  Union,
   compilerAssert,
   createDiagnosticCollector,
   getEncode,
@@ -30,7 +31,7 @@ import {
   isQueryParam,
 } from "@typespec/http";
 import { StreamMetadata, getStreamMetadata } from "@typespec/http/experimental";
-import { camelCase } from "change-case";
+import { camelCase, pascalCase } from "change-case";
 import { getResponseAsBool, isInScope, shouldOmitSlashFromEmptyRoute } from "./decorators.js";
 import {
   CollectionFormat,
@@ -70,6 +71,7 @@ import {
   isHttpBodySpread,
   isNeverOrVoidType,
   isSubscriptionId,
+  resolveDuplicateGenearatedName,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import { isMediaTypeJson, isMediaTypeOctetStream, isMediaTypeTextPlain } from "./media-types.js";
@@ -643,6 +645,7 @@ function getSdkHttpResponseAndExceptions(
     let type: SdkType | undefined;
     let contentTypes: string[] = [];
     let streamMetadata: SdkStreamMetadata | undefined;
+    let bodyIsCreatedUnion = false;
 
     for (const innerResponse of response.responses) {
       const defaultContentType = innerResponse.body?.contentTypes.includes("application/json")
@@ -673,7 +676,16 @@ function getSdkHttpResponseAndExceptions(
               },
             }),
           );
-          body = tk.union.create([body, innerResponse.body.type]);
+          if (bodyIsCreatedUnion && body.kind === "Union") {
+            // Body is already a synthetic union we created; add new type as a variant
+            // instead of wrapping the union with another union
+            context.__generatedNames.delete(body);
+            const existingTypes = [...(body as Union).variants.values()].map((v) => v.type);
+            body = tk.union.create([...existingTypes, innerResponse.body.type]);
+          } else {
+            body = tk.union.create([body, innerResponse.body.type]);
+          }
+          bodyIsCreatedUnion = true;
         } else if (!body) {
           body = innerResponse.body.type;
         }
@@ -688,6 +700,14 @@ function getSdkHttpResponseAndExceptions(
             buildSdkStreamMetadata(context, responseStreamMeta, httpOperation.operation),
           );
         } else {
+          if (bodyIsCreatedUnion && body.kind === "Union") {
+            // Provide context for the generated name of the synthetic union
+            resolveDuplicateGenearatedName(
+              context,
+              body,
+              pascalCase(httpOperation.operation.name) + "Response",
+            );
+          }
           type = diagnostics.pipe(
             getClientTypeWithDiagnostics(context, body, httpOperation.operation),
           );
