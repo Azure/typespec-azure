@@ -9,7 +9,7 @@ permissions: {}
 jobs:
   sync:
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]'
+    if: github.actor == 'dependabot[bot]' && startsWith(github.head_ref, 'dependabot/submodules/core')
     permissions:
       contents: write
     steps:
