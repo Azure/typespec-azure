@@ -1256,6 +1256,8 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   unions: (SdkUnionType | SdkNullableType)[];
   /** Unique ID for the package. */
   crossLanguagePackageId: string;
+  /** Hash of API-affecting elements for cross-language SDK comparison. */
+  crossLanguageVersion: string;
   /** Hierarchical structure for the package based on namespaces. */
   namespaces: SdkNamespace<TServiceOperation>[];
   /** License details for client code comments or license file generation. */
