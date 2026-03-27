@@ -1,6 +1,67 @@
 import { deepEqual, deepStrictEqual, ok, strictEqual } from "assert";
-import { expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { compileOpenAPI } from "../test-host.js";
+
+describe("CustomAzureProxyResource", () => {
+  it("emits correct paths and schemas for subscription resource with standard CRUD operations", async () => {
+    const openApi = await compileOpenAPI(
+      `
+      @armProviderNamespace
+        namespace Microsoft.Contoso;
+
+      #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "legacy test"
+      @subscriptionResource
+      model Widget is Azure.ResourceManager.Legacy.CustomAzureProxyResource {
+         ...ResourceNameParameter<Widget>;
+         /** The widget color */
+         color?: string;
+      }
+
+      @@visibility(Widget.name, Lifecycle.Read);
+
+      interface Widgets {
+        get is ArmResourceRead<Widget>;
+        put is ArmResourceCreateOrReplaceSync<Widget>;
+        update is ArmCustomPatchSync<Widget, Azure.ResourceManager.Foundations.TagsUpdateModel<Widget>>;
+        delete is ArmResourceDeleteSync<Widget>;
+        list is ArmListBySubscription<Widget>;
+      }
+  `,
+      { preset: "azure" },
+    );
+
+    const widgetPath =
+      "/subscriptions/{subscriptionId}/providers/Microsoft.Contoso/widgets/{widgetName}";
+    const listPath = "/subscriptions/{subscriptionId}/providers/Microsoft.Contoso/widgets";
+    const opApi = openApi as any;
+
+    // Validate that all expected paths exist
+    ok(opApi.paths[widgetPath], `Expected path ${widgetPath} to exist`);
+    ok(opApi.paths[listPath], `Expected path ${listPath} to exist`);
+
+    // Validate GET 200 response references the resource schema
+    expect(opApi.paths[widgetPath].get.responses["200"].schema).toStrictEqual({
+      $ref: "#/definitions/Widget",
+    });
+
+    // Validate PUT 200 response references the resource schema
+    expect(opApi.paths[widgetPath].put.responses["200"].schema).toStrictEqual({
+      $ref: "#/definitions/Widget",
+    });
+
+    // Validate PATCH 200 response references the resource schema
+    expect(opApi.paths[widgetPath].patch.responses["200"].schema).toStrictEqual({
+      $ref: "#/definitions/Widget",
+    });
+
+    // Validate PUT request body parameter references the resource schema
+    const putBodyParam = opApi.paths[widgetPath].put.parameters.find((p: any) => p.in === "body");
+    ok(putBodyParam, "Expected PUT to have a body parameter");
+    expect(putBodyParam.schema).toStrictEqual({
+      $ref: "#/definitions/Widget",
+    });
+  });
+});
 
 it("emits correct paths for tenant resources", async () => {
   const openApi = await compileOpenAPI(
