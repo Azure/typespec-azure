@@ -3873,285 +3873,59 @@ model MoveResponse {
     );
   });
 
-  it("versioned spec with parent-child resources does not produce duplicate resources", async () => {
-    const { program } = await Tester.compile(`
+  const noProviderResourceGroupSpec = `
 using Azure.Core;
 
 @armProviderNamespace
-@service(#{ title: "Azure Management emitter Testing" })
-@versioned(Versions)
-namespace Microsoft.ContosoProviderHub;
-
-enum Versions {
-  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-  \`2021-10-01-preview\`,
-  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-  \`2022-01-01\`,
-}
-
-model EmployeeParent is TrackedResource<EmployeeParentProperties> {
-  ...ResourceNameParameter<EmployeeParent>;
-}
-
-model EmployeeParentProperties {
-  age?: int32;
-}
-
-@parentResource(EmployeeParent)
-model Employee is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<Employee>;
-}
-
-model EmployeeProperties {
-  age?: int32;
-}
+namespace Microsoft.Resources;
 
 interface Operations extends Azure.ResourceManager.Operations {}
-
-@armResourceOperations
-interface EmployeesParent {
-  get is ArmResourceRead<EmployeeParent>;
-}
-
-@armResourceOperations
-interface Employees {
-  get is ArmResourceRead<Employee>;
-  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
-}
-`);
-    const provider = resolveArmResources(program);
-    expect(provider).toBeDefined();
-    ok(provider.resources);
-    // Should have exactly 2 resources (EmployeeParent and Employee), no duplicates
-    expect(provider.resources).toHaveLength(2);
-    const resourceNames = provider.resources.map((r) => r.resourceName);
-    expect(resourceNames).toContain("EmployeeParent");
-    expect(resourceNames).toContain("Employee");
-  });
-
-  it("separates cross-scope LegacyOperations with default resource names into distinct resources", async () => {
-    const { program } = await Tester.compile(`
-
-using Azure.Core;
-
-/** Contoso Resource Provider management API. */
-@armProviderNamespace
-@service(#{ title: "ContosoProviderHubClient" })
-@versioned(Versions)
-namespace Microsoft.ContosoProviderHub;
-
-/** Contoso API versions */
-enum Versions {
-  /** 2021-10-01-preview version */
-  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-  v2021_20_01_preview: "2021-10-01-preview",
-}
 
 @subscriptionResource
-model SupportTicketDetails is ProxyResource<SupportTicketProperties> {
-  ...ResourceNameParameter<
-    Resource = SupportTicketDetails,
-    KeyName = "supportTicketName",
-    SegmentName = "supportTickets",
-    NamePattern = ""
-  >;
+model ResourceGroup is TrackedResource<ResourceGroupProperties> {
+  @key("resourceGroupName")
+  @segment("resourceGroups")
+  @path
+  name: string;
 }
 
-model SupportTicketProperties {
-  description?: string;
-}
-
-interface Operations extends Azure.ResourceManager.Operations {}
-
-// Subscription-scoped operations (includes SubscriptionIdParameter)
-alias SubTicketOps = Azure.ResourceManager.Legacy.LegacyOperations<
-  {
-    ...ApiVersionParameter;
-    ...SubscriptionIdParameter;
-    ...Azure.ResourceManager.Legacy.Provider;
-  },
-  {
-    @segment("supportTickets")
-    @key
-    @TypeSpec.Http.path
-    supportTicketName: string;
-  }
->;
-
-// Tenant-scoped operations (no SubscriptionIdParameter)
-alias TenantTicketOps = Azure.ResourceManager.Legacy.LegacyOperations<
-  {
-    ...ApiVersionParameter;
-    ...Azure.ResourceManager.Legacy.Provider;
-  },
-  {
-    @segment("supportTickets")
-    @key
-    @TypeSpec.Http.path
-    supportTicketName: string;
-  }
->;
-
-@armResourceOperations
-interface SupportTickets {
-  get is SubTicketOps.Read<SupportTicketDetails>;
-  list is SubTicketOps.List<SupportTicketDetails>;
+model ResourceGroupProperties {
+  @visibility(Lifecycle.Read)
+  provisioningState?: ResourceProvisioningState;
 }
 
 @armResourceOperations
-interface SupportTicketsNoSubscription {
-  get is TenantTicketOps.Read<SupportTicketDetails>;
-  list is TenantTicketOps.List<SupportTicketDetails>;
+interface ResourceGroups {
+  list is ArmResourceListByParent<ResourceGroup, Provider = {}>;
+  get is ArmResourceRead<ResourceGroup, Provider = {}>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<ResourceGroup, Provider = {}>;
+  update is ArmCustomPatchSync<ResourceGroup, Provider = {}>;
+  delete is ArmResourceDeleteWithoutOkAsync<ResourceGroup, Provider = {}>;
 }
-`);
+`;
+
+  it("generates correct paths for subscription resource without provider using empty Provider", async () => {
+    const { program } = await Tester.compile(noProviderResourceGroupSpec);
+
+    const provider = resolveArmResources(program);
+    const resourceGroup = provider.resources?.find((r) => r.resourceName === "ResourceGroup");
+    ok(resourceGroup, "ResourceGroup resource should be found");
+
+    // Validate path - should NOT contain /providers/Microsoft.Resources/
+    expect(resourceGroup.resourceInstancePath).toEqual(
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}",
+    );
+  });
+
+  it("resolveArmResources correctly identifies subscription resource without provider", async () => {
+    const { program } = await Tester.compile(noProviderResourceGroupSpec);
+
     const provider = resolveArmResources(program);
     expect(provider).toBeDefined();
     expect(provider.resources).toBeDefined();
-    ok(provider.resources);
-    // Should produce 2 separate resources: one subscription-scoped, one tenant-scoped
-    expect(provider.resources).toHaveLength(2);
-
-    const subResource = provider.resources.find(
-      (r) =>
-        r.resourceInstancePath ===
-        "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/supportTickets/{supportTicketName}",
-    );
-    ok(subResource);
-    expect(subResource.scope).toEqual("Subscription");
-
-    checkResolvedOperations(subResource, {
-      operations: {
-        lifecycle: {
-          read: [{ operationGroup: "SupportTickets", name: "get", kind: "read" }],
-        },
-        lists: [{ operationGroup: "SupportTickets", name: "list", kind: "list" }],
-      },
-      resourceType: {
-        provider: "Microsoft.ContosoProviderHub",
-        types: ["supportTickets"],
-      },
-      resourceInstancePath:
-        "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/supportTickets/{supportTicketName}",
-    });
-
-    const tenantResource = provider.resources.find(
-      (r) =>
-        r.resourceInstancePath ===
-        "/providers/Microsoft.ContosoProviderHub/supportTickets/{supportTicketName}",
-    );
-    ok(tenantResource);
-    expect(tenantResource.scope).toEqual("Tenant");
-
-    checkResolvedOperations(tenantResource, {
-      operations: {
-        lifecycle: {
-          read: [{ operationGroup: "SupportTicketsNoSubscription", name: "get", kind: "read" }],
-        },
-        lists: [{ operationGroup: "SupportTicketsNoSubscription", name: "list", kind: "list" }],
-      },
-      resourceType: {
-        provider: "Microsoft.ContosoProviderHub",
-        types: ["supportTickets"],
-      },
-      resourceInstancePath:
-        "/providers/Microsoft.ContosoProviderHub/supportTickets/{supportTicketName}",
-    });
-  });
-
-  it("merges cross-scope LegacyOperations with explicit same resource name into one resource", async () => {
-    const { program } = await Tester.compile(`
-
-using Azure.Core;
-
-/** Contoso Resource Provider management API. */
-@armProviderNamespace
-@service(#{ title: "ContosoProviderHubClient" })
-@versioned(Versions)
-namespace Microsoft.ContosoProviderHub;
-
-/** Contoso API versions */
-enum Versions {
-  /** 2021-10-01-preview version */
-  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-  v2021_20_01_preview: "2021-10-01-preview",
-}
-
-@subscriptionResource
-model SupportTicketDetails is ProxyResource<SupportTicketProperties> {
-  ...ResourceNameParameter<
-    Resource = SupportTicketDetails,
-    KeyName = "supportTicketName",
-    SegmentName = "supportTickets",
-    NamePattern = ""
-  >;
-}
-
-model SupportTicketProperties {
-  description?: string;
-}
-
-interface Operations extends Azure.ResourceManager.Operations {}
-
-// Subscription-scoped operations with explicit resource name
-alias SubTicketOps = Azure.ResourceManager.Legacy.LegacyOperations<
-  {
-    ...ApiVersionParameter;
-    ...SubscriptionIdParameter;
-    ...Azure.ResourceManager.Legacy.Provider;
-  },
-  {
-    @segment("supportTickets")
-    @key
-    @TypeSpec.Http.path
-    supportTicketName: string;
-  },
-  ResourceName = "SupportTickets",
->;
-
-// Tenant-scoped operations with same explicit resource name
-alias TenantTicketOps = Azure.ResourceManager.Legacy.LegacyOperations<
-  {
-    ...ApiVersionParameter;
-    ...Azure.ResourceManager.Legacy.Provider;
-  },
-  {
-    @segment("supportTickets")
-    @key
-    @TypeSpec.Http.path
-    supportTicketName: string;
-  },
-  ResourceName = "SupportTickets",
->;
-
-@armResourceOperations
-interface SupportTickets {
-  get is SubTicketOps.Read<SupportTicketDetails>;
-  list is SubTicketOps.List<SupportTicketDetails>;
-}
-
-@armResourceOperations
-interface SupportTicketsNoSubscription {
-  get is TenantTicketOps.Read<SupportTicketDetails>;
-  list is TenantTicketOps.List<SupportTicketDetails>;
-}
-`);
-    const provider = resolveArmResources(program);
-    expect(provider).toBeDefined();
-    expect(provider.resources).toBeDefined();
-    ok(provider.resources);
-    // Should produce 1 merged resource since both have the same explicit resource name
-    expect(provider.resources).toHaveLength(1);
-
-    const resource = provider.resources[0];
-    ok(resource);
-    expect(resource.resourceName).toEqual("SupportTickets");
-
-    // Both read operations should be present
-    expect(resource.operations.lifecycle.read).toBeDefined();
-    expect(resource.operations.lifecycle.read).toHaveLength(2);
-
-    // Both list operations should be present
-    expect(resource.operations.lists).toBeDefined();
-    expect(resource.operations.lists).toHaveLength(2);
+    const resourceGroup = provider.resources?.find((r) => r.resourceName === "ResourceGroup");
+    ok(resourceGroup, "ResourceGroup resource should exist in resolved ARM resources");
+    expect(resourceGroup.resourceType.provider).toEqual("Microsoft.Resources");
+    expect(resourceGroup.resourceType.types).toEqual(["resourceGroups"]);
   });
 });

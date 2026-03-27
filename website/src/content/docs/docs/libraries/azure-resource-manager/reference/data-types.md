@@ -1041,7 +1041,7 @@ The dynamic parameters of a resource instance - pass in the proper base type to 
 where the resource is based. The default is in a resource group
 
 ```typespec
-model Azure.ResourceManager.ResourceInstanceParameters<Resource, BaseParameters>
+model Azure.ResourceManager.ResourceInstanceParameters<Resource, BaseParameters, Provider>
 ```
 
 #### Template Parameters
@@ -1050,6 +1050,7 @@ model Azure.ResourceManager.ResourceInstanceParameters<Resource, BaseParameters>
 | -------------- | -------------------------------------------------------- |
 | Resource       | The resource to get parameters for                       |
 | BaseParameters | The parameters representing the base Uri of the resource |
+| Provider       | Optional. The provider namespace model for the resource. |
 
 #### Examples
 
@@ -1059,9 +1060,7 @@ op get(...ResourceInstanceParameters<Employee>): ArmResponse<EmployeeResponse> |
 
 #### Properties
 
-| Name     | Type                             | Description |
-| -------- | -------------------------------- | ----------- |
-| provider | `"Microsoft.ThisWillBeReplaced"` |             |
+None
 
 ### `ResourceKindProperty` {#Azure.ResourceManager.ResourceKindProperty}
 
@@ -1208,7 +1207,7 @@ The dynamic parameters of a list call for a resource instance - pass in the prop
 where the list should take place. The default is in a resource group
 
 ```typespec
-model Azure.ResourceManager.ResourceParentParameters<Resource, BaseParameters>
+model Azure.ResourceManager.ResourceParentParameters<Resource, BaseParameters, Provider>
 ```
 
 #### Template Parameters
@@ -1217,12 +1216,11 @@ model Azure.ResourceManager.ResourceParentParameters<Resource, BaseParameters>
 | -------------- | -------------------------------------------------------- |
 | Resource       | The resource to get parameters for                       |
 | BaseParameters | The parameters representing the base Uri of the resource |
+| Provider       | Optional. The provider namespace model for the resource. |
 
 #### Properties
 
-| Name     | Type                             | Description |
-| -------- | -------------------------------- | ----------- |
-| provider | `"Microsoft.ThisWillBeReplaced"` |             |
+None
 
 ### `ResourcePlanProperty` {#Azure.ResourceManager.ResourcePlanProperty}
 
