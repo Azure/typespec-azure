@@ -634,11 +634,31 @@ function isVariableSegment(segment: string): boolean {
 function getResourceInfo(
   program: Program,
   operation: ArmResourceOperation,
+  resourceModel?: Model,
 ): ResolvedResourceInfo | undefined {
   const pathInfo = getResourcePathElements(operation.httpOperation.path, operation.kind);
-  if (pathInfo === undefined) return undefined;
+  // First, try to get resource info from the path when it contains /providers/
+  if (pathInfo !== undefined) {
+    return {
+      ...pathInfo,
+      resourceName: operation.resourceName ?? operation.operationGroup,
+    };
+  }
+
+  // If the path does not contain /providers/, we can still identify the resource
+  // because an ARM operations decorator was executed on this operation (e.g.
+  // @armResourceRead, @armResourceCreateOrUpdate, etc.). Use the ARM provider
+  // namespace and the path structure to construct resource info.
+  const fallback = getResourceInfoFromArmOperation(
+    program,
+    operation.httpOperation.path,
+    operation.kind,
+    operation.operation,
+    resourceModel,
+  );
+  if (fallback === undefined) return undefined;
   return {
-    ...pathInfo,
+    ...fallback,
     resourceName: operation.resourceName ?? operation.operationGroup,
   };
 }
@@ -685,6 +705,86 @@ export function getResourcePathElements(
     };
   }
   return undefined;
+}
+
+/**
+ * Construct resource path info for an ARM resource operation whose path does not
+ * contain a /providers/ segment. This relies on the fact that an ARM operations
+ * decorator was executed on the operation, so we know it belongs to a resource.
+ * The provider namespace is resolved from the operation's namespace.
+ */
+function getResourceInfoFromArmOperation(
+  program: Program,
+  path: string,
+  kind: ArmOperationKind,
+  operation: Operation,
+  resourceModel?: Model,
+): ResourcePathInfo | undefined {
+  const provider = operation.namespace
+    ? getArmProviderNamespace(program, operation.namespace)
+    : undefined;
+  if (provider === undefined) return undefined;
+
+  const segments = path.split("/").filter((s) => s.length > 0);
+
+  // Find the innermost resource type segment by scanning forward.
+  // The resource type segment is a non-variable segment followed by either
+  // a variable segment (instance path) or end-of-path (list operation).
+  let resourceTypeIndex = -1;
+  for (let i = 0; i < segments.length; i++) {
+    if (!isVariableSegment(segments[i])) {
+      if (i + 1 < segments.length && isVariableSegment(segments[i + 1])) {
+        // Non-variable followed by variable: this is a resource type/instance pair
+        resourceTypeIndex = i;
+      } else if (i + 1 === segments.length && kind === "list") {
+        // Terminal non-variable segment in a list operation: this is the resource type
+        resourceTypeIndex = i;
+      }
+    }
+  }
+
+  if (resourceTypeIndex === -1) return undefined;
+
+  const resourceTypeName = segments[resourceTypeIndex];
+  const typeSegments = [resourceTypeName];
+
+  // Build the instance path: all segments up to and including the resource type,
+  // plus the instance variable
+  const instanceSegments = segments.slice(0, resourceTypeIndex + 1);
+
+  // For list operations (no instance variable in path), derive the variable name
+  // from the resource model's @key property
+  if (
+    resourceTypeIndex + 1 < segments.length &&
+    isVariableSegment(segments[resourceTypeIndex + 1])
+  ) {
+    instanceSegments.push(segments[resourceTypeIndex + 1]);
+  } else if (kind === "list" && resourceModel) {
+    // Derive instance path variable name from the resource model's @key property
+    let keyPropName: string | undefined;
+    for (const [, prop] of resourceModel.properties) {
+      const keyName = getKeyName(program, prop);
+      if (keyName !== undefined) {
+        keyPropName = keyName;
+        break;
+      }
+    }
+    if (keyPropName) {
+      instanceSegments.push(`{${keyPropName}}`);
+    } else {
+      instanceSegments.push("{name}");
+    }
+  } else {
+    instanceSegments.push("{name}");
+  }
+
+  return {
+    resourceType: {
+      provider: provider,
+      types: typeSegments,
+    },
+    resourceInstancePath: `/${instanceSegments.join("/")}`,
+  };
 }
 
 function tryAddLifecycleOperation(
@@ -870,7 +970,7 @@ export function resolveArmResourceOperations(
     armOperation.kind = operation.kind;
 
     armOperation.resourceModelName = operation.resource?.name ?? resourceType.name;
-    const resourceInfo = getResourceInfo(program, armOperation);
+    const resourceInfo = getResourceInfo(program, armOperation, operation.resource ?? resourceType);
     if (resourceInfo === undefined) continue;
     armOperation.name = operation.name;
     armOperation.resourceKind = operation.resourceKind;
