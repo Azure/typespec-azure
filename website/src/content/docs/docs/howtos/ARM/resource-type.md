@@ -260,28 +260,25 @@ You can find samples of Subscription Resources [in the OperationTemplates sample
 
 ### Location-based Resource
 
-Location-based resources usually use the `ProxyResource<TProperties/>` as their base resource type, where `TProperties` is the properties model for the rp-specific properties of the resource. Here is an example:
+Location-based resources have REST API paths like:
+`/subscriptions/{subscriptionId}/providers/Microsoft.Contoso/locations/{location}/employees/{employeeName}`
+
+Use `@parentResource(ArmLocationResource<"ResourceGroup">)` to define a location-based resource. The `ArmLocationResource` template accepts a base type parameter which can be `"Tenant"`, `"Subscription"`, `"ResourceGroup"`, or `"Extension"`. Here is an example:
 
 ```typespec
-@locationResource
-model EmployeeResource is ProxyResource<EmployeeProperties> {
-  /** The employee name, using 'Firstname Lastname' notation */
-  @segment("employees")
-  @key("employeeName")
-  @visibility(Lifecycle.Read)
-  @path
-  name: string;
+@parentResource(ArmLocationResource<"ResourceGroup">)
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
 }
 ```
 
-`@locationResource`: designates this resource as being a cross-location resource, with scope across a location within a subscription.
-`@doc`: provides documentation for the 'name' property of the resource.
-`@segment(employees)`: provides the resource type name for this resource.
-`@key(employeeName)`: provides the parameter name for the name of the resource in operations that use this resource.
-`@visibility(read)`: indicates that this property is returned in the body of responses to operations over this resource, but does not appear in the body of requests. Later sections describe the [usage of property visibility](#property-visibility-and-other-constraints).
-`@path`: indicates that this property corresponds to the last segment of the url path to the resource (otherwise known as the resource identity).
+`@parentResource(ArmLocationResource<"ResourceGroup">)`: designates this resource as being a location-scoped resource under a resource group.
 
-You can find samples of Location Resources [in the OperationTemplates sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/operationsTest/opTemplates.tsp).
+:::caution
+The `@locationResource` decorator is deprecated. Use `@parentResource(ArmLocationResource<...>)` instead.
+:::
+
+You can find samples of Location Resources [in the Location Resource sample](/docs/samples/resource-manager/resource-types/location/).
 
 ### Singleton Resource
 
