@@ -41,7 +41,11 @@ export const noRouteParameterNameMismatchRule = createRule({
         const normalizedPath = path.replace(/\{[^}]+\}/g, "{}");
 
         // Extract parameter names in order from the path
-        const paramNames = [...path.matchAll(/\{([^}]+)\}/g)].map((m) => m[1]);
+        // Note: httpOp.path is the legacy path which strips URI template operators,
+        // but we defensively strip any leading +/. /; /# characters for robustness
+        const paramNames = [...path.matchAll(/\{([^}]+)\}/g)].map((m) =>
+          m[1].replace(/^[+.;#/]/, ""),
+        );
 
         const existing = pathMap.get(normalizedPath);
         if (existing) {
