@@ -1,9 +1,55 @@
-import { Model, Program, createRule } from "@typespec/compiler";
+import {
+  CodeFix,
+  Model,
+  Operation,
+  Program,
+  createRule,
+  getSourceLocation,
+} from "@typespec/compiler";
+import {
+  type OperationSignatureReferenceNode,
+  type OperationStatementNode,
+  SyntaxKind,
+  type TemplateArgumentNode,
+} from "@typespec/compiler/ast";
 
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import { HttpOperationResponse, HttpPayloadBody } from "@typespec/http";
 import { ArmResourceOperation } from "../operations.js";
 import { getArmResources } from "../resource.js";
+
+function createLroHeadersCodeFix(op: Operation, responseTypeName: string): CodeFix | undefined {
+  const node = op.node;
+  if (node === undefined || node.kind !== SyntaxKind.OperationStatement) {
+    return undefined;
+  }
+
+  const opNode = node as OperationStatementNode;
+  const signature = opNode.signature;
+  if (signature.kind !== SyntaxKind.OperationSignatureReference) {
+    return undefined;
+  }
+
+  const sigRef = signature as OperationSignatureReferenceNode;
+  const templateArgs: readonly TemplateArgumentNode[] = sigRef.baseOperation.arguments;
+  const lroHeadersArg = templateArgs.find((arg) => arg.name?.sv === "LroHeaders");
+
+  if (lroHeadersArg === undefined) {
+    return undefined;
+  }
+
+  return {
+    id: "arm-post-lro-set-final-result",
+    label: `Set FinalResult to ${responseTypeName} in LroHeaders`,
+    fix(context) {
+      const argValueLocation = getSourceLocation(lroHeadersArg.argument);
+      return context.replaceText(
+        argValueLocation,
+        `ArmLroLocationHeader<Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>, ${responseTypeName}>`,
+      );
+    },
+  };
+}
 
 /**
  * Verify that the final result of an ARM LRO POST operation matches the 200 response body.
@@ -68,8 +114,15 @@ export const armPostLroResponseMismatchRule = createRule({
 
             // If the final result is "void" but there is a 200 response body, this is a mismatch
             if (lroMetadata.finalResult === "void") {
+              const responseTypeName = responseBodyType.name;
+              const codefixes: CodeFix[] = [];
+              const codeFix = createLroHeadersCodeFix(op.operation, responseTypeName);
+              if (codeFix !== undefined) {
+                codefixes.push(codeFix);
+              }
               context.reportDiagnostic({
                 target: op.operation,
+                codefixes,
               });
             }
           }

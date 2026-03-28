@@ -210,3 +210,66 @@ describe("does not emit warning", () => {
       .toBeValid();
   });
 });
+
+describe("codefix", () => {
+  it("suggests setting FinalResult in LroHeaders to match Response type", async () => {
+    await tester
+      .expect(
+        `
+      @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+      model Employee is ProxyResource<{}> {
+        @pattern("^[a-zA-Z0-9-]{3,24}$")
+        @key("employeeName")
+        @path
+        @segment("employees")
+        name: string;
+      }
+
+      model GenerateResponse {
+        message: string;
+      }
+
+      @armResourceOperations
+      interface Employees {
+        generate is ArmResourceActionAsync<
+          Employee,
+          void,
+          GenerateResponse,
+          LroHeaders = ArmLroLocationHeader
+        >;
+      }
+      `,
+      )
+      .applyCodeFix("arm-post-lro-set-final-result")
+      .toEqual(
+        `
+      @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+      model Employee is ProxyResource<{}> {
+        @pattern("^[a-zA-Z0-9-]{3,24}$")
+        @key("employeeName")
+        @path
+        @segment("employees")
+        name: string;
+      }
+
+      model GenerateResponse {
+        message: string;
+      }
+
+      @armResourceOperations
+      interface Employees {
+        generate is ArmResourceActionAsync<
+          Employee,
+          void,
+          GenerateResponse,
+          LroHeaders = ArmLroLocationHeader<Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>, GenerateResponse>
+        >;
+      }
+      `,
+      );
+  });
+});
