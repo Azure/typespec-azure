@@ -78,7 +78,6 @@ import {
   getEffectivePayloadType,
   getWireName,
   isApiVersion,
-  pushNamingContext,
 } from "./public-utils.js";
 import {
   addEncodeInfo,
@@ -701,11 +700,22 @@ function getSdkHttpResponseAndExceptions(
         body = bodyTypes[0];
       } else {
         const createdUnion = tk.union.create(bodyTypes);
-        pushNamingContext(context, createdUnion, httpOperation.operation, "Response");
         body = createdUnion;
       }
       body = body.kind === "Model" ? getEffectivePayloadType(context, body, Visibility.Read) : body;
+      if (bodyTypes.length > 1) {
+        // Push naming context for the synthetic union so it gets a proper generated name
+        context.__namingContextPath.push({
+          name: httpOperation.operation.name,
+          type: httpOperation.operation,
+        });
+        context.__namingContextPath.push({ name: "Response", type: body });
+      }
       type = diagnostics.pipe(getClientTypeWithDiagnostics(context, body, httpOperation.operation));
+      if (bodyTypes.length > 1) {
+        context.__namingContextPath.pop();
+        context.__namingContextPath.pop();
+      }
       if (lastBodyProperty) {
         addEncodeInfo(context, lastBodyProperty, type, lastDefaultContentType);
       }
