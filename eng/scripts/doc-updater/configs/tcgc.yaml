@@ -9,3 +9,14 @@ sourceCodePaths:
   - packages/typespec-client-generator-core/src
   - packages/typespec-client-generator-core/lib
   - packages/typespec-client-generator-core/test
+
+# File path prefixes the agent is allowed to modify.
+# Enforced by the agentic workflow's post-step validation — not just a prompt hint.
+allowedPaths:
+  - website/src/content/docs/docs/howtos/Generate client libraries/
+  - website/src/content/docs/docs/libraries/typespec-client-generator-core/guideline.md
+  - packages/typespec-client-generator-core/design-docs/
+  - packages/azure-http-specs/specs/
+  - packages/azure-http-specs/spec-summary.md
+  - eng/scripts/doc-updater/knowledge/
+  - cspell.yaml
