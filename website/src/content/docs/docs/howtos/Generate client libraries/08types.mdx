@@ -2628,3 +2628,93 @@ jsonWriter.writeStringField("prop", Objects.toString(this.value, null));
 </ClientTabItem>
 </ClientTabs>
 ```
+
+## Using `@deserializeEmptyStringAsNull` for null handling
+
+The `@deserializeEmptyStringAsNull` decorator indicates that a `string` model property (or a scalar derived from `string`) should be deserialized as `null` when its value is an empty string (`""`).
+
+This is useful when a service returns empty strings to represent absent values, but your client SDK should treat them as `null`.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/http";
+
+using TypeSpec.Http;
+
+@service
+namespace EmptyStringDemo;
+
+model UserProfile {
+  name: string;
+  nickname?: string;
+  bio?: string;
+}
+
+@route("/users/{name}")
+@get
+op getUser(@path name: string): UserProfile;
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@@deserializeEmptyStringAsNull(EmptyStringDemo.UserProfile.nickname);
+@@deserializeEmptyStringAsNull(EmptyStringDemo.UserProfile.bio);
+```
+
+```python
+class UserProfile:
+    # When the service returns "" for nickname or bio,
+    # the deserialized value will be None instead of ""
+    name: str
+    nickname: Optional[str]
+    bio: Optional[str]
+```
+
+```csharp
+public partial class UserProfile
+{
+    public string Name { get; }
+    // When the service returns "" for Nickname or Bio,
+    // the deserialized value will be null instead of ""
+    public string Nickname { get; }
+    public string Bio { get; }
+}
+```
+
+```typescript
+export interface UserProfile {
+  name: string;
+  // When the service returns "" for nickname or bio,
+  // the deserialized value will be null/undefined instead of ""
+  nickname?: string;
+  bio?: string;
+}
+```
+
+```java
+public final class UserProfile {
+    // When the service returns "" for nickname or bio,
+    // the deserialized value will be null instead of ""
+    public String getName();
+    public String getNickname();
+    public String getBio();
+}
+```
+
+```go
+type UserProfile struct {
+	// REQUIRED
+	Name     *string
+	// When the service returns "" for Nickname or Bio,
+	// the deserialized value will be nil instead of ""
+	Bio      *string
+	Nickname *string
+}
+```
+
+</ClientTabs>

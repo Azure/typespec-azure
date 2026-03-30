@@ -255,6 +255,8 @@ By default, the code generator will infer the usage based on the TypeSpec. If th
 correspond to expectation, this can be customized with the `usage` decorator. Possible values are
 `input` and `output`, and can be combined with `Usage.input | Usage.output`.
 
+You can also specify the serialization format with `Usage.json` and `Usage.xml` to indicate the content type contexts where a model is used.
+
 > **NOTE:** If a model is never used, it will not be generated. Assigning a usage will force generation.
 
 <ClientTabs>
@@ -2231,3 +2233,163 @@ Use the `scope` parameter to apply customizations only to specific language emit
 ```
 
 Supported scope values include: `"python"`, `"csharp"`, `"java"`, `"javascript"`, `"go"`.
+
+## Using `@scope` to restrict operations to specific languages
+
+The `@scope` decorator restricts an operation or model property so it is only generated for specific language emitters. Unlike the `scope` parameter on other decorators (which scopes the _customization_), `@scope` scopes the _element itself_.
+
+Use `@scope` when an operation or property should only exist in certain language SDKs. For example, a language-specific helper operation that doesn't make sense in every SDK.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/http";
+
+using TypeSpec.Http;
+
+@service
+namespace ScopeDemo;
+
+@route("/common")
+@get
+op commonOp(): void;
+
+@route("/data")
+@get
+op getData(): { @body data: string };
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+// This operation will only be generated for Python clients
+@@scope(ScopeDemo.getData, "python");
+```
+
+```python
+class ScopeDemoClient:
+    # Python gets BOTH operations because getData is scoped to Python
+    def common_op(self, **kwargs: Any) -> None: ...
+    def get_data(self, **kwargs: Any) -> str: ...
+```
+
+```csharp
+// C# only gets commonOp — getData is excluded by @scope("python")
+public class ScopeDemoClient
+{
+    public virtual Response CommonOp(RequestContext context);
+    public virtual async Task<Response> CommonOpAsync(RequestContext context);
+}
+```
+
+```typescript
+export class ScopeDemoClient {
+  getData(options?: GetDataOptionalParams): Promise<GetDataResponse>;
+  commonOp(options?: CommonOpOptionalParams): Promise<void>;
+}
+```
+
+```java
+public final class ScopeDemoClient {
+    // Java only gets commonOp — getData is excluded by @scope("python")
+    public void commonOp();
+}
+```
+
+```go
+// Go only gets CommonOp — GetData is excluded by @scope("python")
+func (client *ScopeDemoClient) CommonOp(ctx context.Context, options *ScopeDemoClientCommonOpOptions) (ScopeDemoClientCommonOpResponse, error)
+```
+
+</ClientTabs>
+
+You can also use negation to exclude specific languages:
+
+```typespec
+// This operation will be generated for all languages EXCEPT C#
+@@scope(ScopeDemo.getData, "!csharp");
+```
+
+The `@scope` decorator also works on model properties:
+
+```typespec
+model TestModel {
+  @scope("csharp")
+  csharpOnlyProp: string;
+}
+```
+
+## Using `@responseAsBool` for HEAD operations
+
+The `@responseAsBool` decorator changes a HEAD operation so that the generated client method returns a `boolean` instead of the raw response. A 2xx status code returns `true`, a 404 returns `false`, and all other status codes raise an error.
+
+This is useful for "exists" checks where you want a simple boolean result.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/http";
+
+using TypeSpec.Http;
+
+@service
+namespace ResourceService;
+
+model Resource {
+  name: string;
+  id: string;
+}
+
+@route("/resources/{name}")
+@head
+op checkResourceExists(@path name: string): {
+  @statusCode statusCode: 200 | 404;
+};
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@@responseAsBool(ResourceService.checkResourceExists);
+```
+
+```python
+class ResourceServiceClient:
+    # Returns bool: True for 2xx, False for 404
+    def check_resource_exists(self, name: str, **kwargs: Any) -> bool: ...
+```
+
+```csharp
+public class ResourceServiceClient
+{
+    // Convenience method returns Response<bool>
+    public virtual Response<bool> CheckResourceExists(string name, ...);
+    public virtual async Task<Response<bool>> CheckResourceExistsAsync(string name, ...);
+}
+```
+
+```typescript
+export type CheckResourceExistsResponse = { body: boolean };
+
+export class ResourceServiceClient {
+  checkResourceExists(name: string, options?: CheckResourceExistsOptionalParams): Promise<CheckResourceExistsResponse>;
+}
+```
+
+```java
+public final class ResourceServiceClient {
+    public Response<BinaryData> checkResourceExistsWithResponse(String name, RequestOptions requestOptions);
+}
+```
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabs>

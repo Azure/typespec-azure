@@ -944,3 +944,90 @@ func (client *ServiceClient) Get(ctx context.Context, version Versions, options 
 ```
 
 </ClientTabs>
+
+## Using `@clientApiVersions` to extend available API versions
+
+The `@clientApiVersions` decorator allows you to define additional API versions that the client can support beyond those declared in the service's `@versioned` decorator. This is useful when you want the generated client to expose a complete API version enum without requiring every version to be annotated in the service specification.
+
+The enum you pass to `@clientApiVersions` should include both the extra versions and the service's existing versions (using the spread operator `...`).
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/http";
+import "@typespec/versioning";
+
+using TypeSpec.Http;
+using TypeSpec.Versioning;
+
+@versioned(Versions)
+@service
+namespace VersionedService;
+
+enum Versions {
+  v2024_01_01: "2024-01-01",
+  v2024_06_01: "2024-06-01",
+}
+
+@route("/resources")
+@get
+op listResources(): { @body items: string[] };
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+enum AllApiVersions {
+  v2023_01_01: "2023-01-01",
+  v2023_06_01: "2023-06-01",
+  ...VersionedService.Versions,
+}
+
+@@clientApiVersions(VersionedService, AllApiVersions);
+```
+
+```python
+# Python does not generate an explicit version enum in this scenario.
+# The client uses the latest version by default.
+class VersionedServiceClient:
+    def __init__(self, endpoint: str, **kwargs: Any) -> None: ...
+```
+
+```csharp
+// The ServiceVersion enum now includes all four versions
+public class VersionedServiceClientOptions
+{
+    public enum ServiceVersion
+    {
+        V2023_01_01 = 1,
+        V2023_06_01 = 2,
+        V2024_01_01 = 3,
+        V2024_06_01 = 4,
+    }
+}
+```
+
+```typescript
+export enum KnownAllApiVersions {
+  V20230101 = "2023-01-01",
+  V20230601 = "2023-06-01",
+  V20240101 = "2024-01-01",
+  V20240601 = "2024-06-01",
+}
+```
+
+```java
+public enum VersionedServiceVersion implements ServiceVersion {
+    V2024_01_01("2024-01-01"),
+    V2024_06_01("2024-06-01");
+}
+```
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabs>

@@ -1112,7 +1112,11 @@ petActionClient.Pet(context.Background(), &PetActionClientPetOptions{})
 
 ### One Client and Two Sub Clients
 
-Two sub clients that separate the operations can be declared using the `@client` decorator (or the `@operationGroup` decorator, which is an alias) from `typespec-client-generator-core`:
+Two sub clients that separate the operations can be declared using the `@client` decorator from `typespec-client-generator-core`:
+
+:::caution
+The `@operationGroup` decorator is deprecated. Use `@client` instead to define sub clients.
+:::
 
 <ClientTabs>
 
