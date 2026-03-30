@@ -22,7 +22,9 @@ function parseArgs(): { config: string } {
   }
 
   if (!config) {
-    console.error("Usage: npx tsx eng/scripts/doc-updater/src/print-allowed-paths.ts --config <name>");
+    console.error(
+      "Usage: npx tsx eng/scripts/doc-updater/src/print-allowed-paths.ts --config <name>",
+    );
     process.exit(1);
   }
 

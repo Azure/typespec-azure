@@ -16,8 +16,8 @@ import { loadConfig } from "./config.js";
 import {
   getCommitDiff,
   getHumanFeedback,
-  getLatestMergedAutomatedPr,
   getKnowledgeRelativePath,
+  getLatestMergedAutomatedPr,
   listCommitsSince,
   readKnowledge,
   readMeta,
