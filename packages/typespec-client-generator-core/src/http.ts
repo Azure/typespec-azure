@@ -3,6 +3,7 @@ import {
   ModelProperty,
   Operation,
   Type,
+  Union,
   compilerAssert,
   createDiagnosticCollector,
   getEncode,
@@ -699,8 +700,7 @@ function getSdkHttpResponseAndExceptions(
       if (bodyTypes.length === 1) {
         body = bodyTypes[0];
       } else {
-        const createdUnion = tk.union.create(bodyTypes);
-        body = createdUnion;
+        body = tk.union.create(bodyTypes);
       }
       body = body.kind === "Model" ? getEffectivePayloadType(context, body, Visibility.Read) : body;
       if (bodyTypes.length > 1) {
@@ -709,7 +709,10 @@ function getSdkHttpResponseAndExceptions(
           name: httpOperation.operation.name,
           type: httpOperation.operation,
         });
-        context.__namingContextPath.push({ name: "Response", type: body });
+        context.__namingContextPath.push({
+          name: "Response",
+          type: body as Union,
+        });
       }
       type = diagnostics.pipe(getClientTypeWithDiagnostics(context, body, httpOperation.operation));
       if (bodyTypes.length > 1) {
