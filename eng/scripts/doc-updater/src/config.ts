@@ -25,6 +25,9 @@ export interface DocUpdateConfig {
 
   /** Source code paths to analyze for cross-referencing */
   sourceCodePaths: string[];
+
+  /** File path prefixes the agent is allowed to modify (enforced by post-step validation) */
+  allowedPaths?: string[];
 }
 
 /** Directory containing YAML config files, relative to this source file. */
