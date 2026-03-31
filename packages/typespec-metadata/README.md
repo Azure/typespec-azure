@@ -75,7 +75,7 @@ languages:
     serviceDir: sdk/keyvault
   java:
     emitterName: "@azure-tools/typespec-java"
-    packageName: azure-security-keyvault-keys
+    packageName: "com.azure:azure-security-keyvault-keys"
     namespace: com.azure.security.keyvault.keys
     outputDir: "{output-dir}/sdk/keyvault/azure-security-keyvault-keys"
     flavor: azure

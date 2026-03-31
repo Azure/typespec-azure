@@ -20,7 +20,7 @@ export interface KnowledgeMeta {
   lastUpdated: string;
   /** Source code glob patterns that were analyzed */
   analyzedPaths: string[];
-  /** PR number of the last doc-update PR (used for feedback detection) */
+  /** Last merged automated doc-update PR already processed for feedback learning */
   lastPrNumber?: number;
 }
 
@@ -138,6 +138,60 @@ export function listCommitsSince(sourcePaths: string[], lastCommit: string): str
       `[state] listCommitsSince failed:\n  countCmd: ${countCmd}\n  filteredCmd: ${filteredCmd}\n  cwd: ${REPO_ROOT}\n  error: ${stderr}`,
     );
     return [];
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Diff extraction
+// ---------------------------------------------------------------------------
+
+/** Maximum diff size per commit (100 KB). Larger diffs are truncated. */
+const MAX_DIFF_SIZE = 100 * 1024;
+
+/**
+ * Get the unified diff for a specific commit, optionally filtered to paths.
+ * Returns empty string if the commit doesn't exist or on error.
+ * Truncates output to MAX_DIFF_SIZE to prevent context blowup.
+ */
+export function getCommitDiff(sha: string, paths?: string[]): string {
+  const pathFilter = paths && paths.length > 0 ? " -- " + paths.map((p) => `"${p}"`).join(" ") : "";
+  try {
+    let diff = execSync(`git diff-tree -p --no-commit-id ${sha}${pathFilter}`, {
+      encoding: "utf-8",
+      cwd: REPO_ROOT,
+      maxBuffer: 5 * 1024 * 1024,
+    }).trim();
+    if (diff.length > MAX_DIFF_SIZE) {
+      diff = diff.slice(0, MAX_DIFF_SIZE) + "\n\n[... diff truncated at 100KB ...]";
+    }
+    return diff;
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * Find the latest merged automated doc-update PR for a config.
+ *
+ * Uses the PR title prefix added by the agentic workflow safe output:
+ *   [Automated][<config>] ...
+ *
+ * Returns null if no matching merged PR is found or on error.
+ */
+export function getLatestMergedAutomatedPr(configName: string): number | null {
+  const search = `\\"[Automated][${configName}]\\" in:title is:pr is:merged`;
+  try {
+    const result = execSync(
+      `gh pr list --state merged --search "${search}" --limit 1 --json number --jq ".[0].number"`,
+      {
+        encoding: "utf-8",
+        cwd: REPO_ROOT,
+        stdio: ["pipe", "pipe", "pipe"],
+      },
+    ).trim();
+    return result ? Number(result) : null;
+  } catch {
+    return null;
   }
 }
 

@@ -4,7 +4,9 @@ import {
   type ModelProperty,
   type Program,
   createDiagnosticCollector,
+  getTypeName,
   isNeverType,
+  isUnknownType,
   walkPropertiesInherited,
 } from "@typespec/compiler";
 import type { LroResultDecorator } from "../../generated-defs/Azure.Core.js";
@@ -58,5 +60,26 @@ export function getLroResult(
 
   if (resultProperty === undefined && useDefault) resultProperty = defaultProperty;
   if (resultProperty && isNeverType(resultProperty.type)) resultProperty = undefined;
+
+  // Validate that the result property type is valid (Model, Scalar, or unknown)
+  if (
+    resultProperty &&
+    !isNeverType(resultProperty.type) &&
+    resultProperty.type.kind !== "Model" &&
+    resultProperty.type.kind !== "Scalar" &&
+    !(resultProperty.type.kind === "Intrinsic" && isUnknownType(resultProperty.type))
+  ) {
+    diagnostics.add(
+      createDiagnostic({
+        code: "lro-status-monitor-invalid-result-property-type",
+        target: resultProperty,
+        format: {
+          propertyName: resultProperty.name,
+          typeName: getTypeName(resultProperty.type),
+        },
+      }),
+    );
+  }
+
   return diagnostics.wrap(resultProperty);
 }
