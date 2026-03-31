@@ -92,7 +92,7 @@ describe("typespec-azure-core: no-route-parameter-name-mismatch", () => {
       .toBeValid();
   });
 
-  it("does not emit a warning when operations use allowReserved path parameters", async () => {
+  it("emit a warning when operations with allowReserved path parameters have different names", async () => {
     await tester
       .expect(
         `
@@ -103,6 +103,57 @@ describe("typespec-azure-core: no-route-parameter-name-mismatch", () => {
 
         @route("/{+resourceUri}/providers/Microsoft.Contoso/foos/{name}")
         op updateFoo(@path resourceUri: string, @path name: string): void;
+        `,
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch",
+          severity: "warning",
+          message: `Path "/{resourceUri}/providers/Microsoft.Contoso/foos/{name}" has inconsistent parameter name "resourceUri" which should be "scope" to match existing operation with path "/{scope}/providers/Microsoft.Contoso/foos/{fooName}"`,
+        },
+        {
+          code: "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch",
+          severity: "warning",
+          message: `Path "/{resourceUri}/providers/Microsoft.Contoso/foos/{name}" has inconsistent parameter name "name" which should be "fooName" to match existing operation with path "/{scope}/providers/Microsoft.Contoso/foos/{fooName}"`,
+        },
+      ]);
+  });
+
+  it("emit a warning when allowReserved differs between matching path parameters", async () => {
+    await tester
+      .expect(
+        `
+        @service namespace TestService;
+
+        @route("/{+scope}/providers/Microsoft.Contoso/foos/{fooName}")
+        op getFoo(@path scope: string, @path fooName: string): void;
+
+        @put
+        @route("/{scope}/providers/Microsoft.Contoso/foos/{fooName}")
+        op updateFoo(@path scope: string, @path fooName: string): void;
+        `,
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch",
+          severity: "warning",
+          message: `Path "/{scope}/providers/Microsoft.Contoso/foos/{fooName}" has parameter "scope" which should have allowReserved=true to match existing operation with path "/{scope}/providers/Microsoft.Contoso/foos/{fooName}"`,
+        },
+      ]);
+  });
+
+  it("does not emit a warning when allowReserved operations have consistent names", async () => {
+    await tester
+      .expect(
+        `
+        @service namespace TestService;
+
+        @route("/{+scope}/providers/Microsoft.Contoso/foos/{fooName}")
+        op getFoo(@path scope: string, @path fooName: string): void;
+
+        @put
+        @route("/{+scope}/providers/Microsoft.Contoso/foos/{fooName}")
+        op updateFoo(@path scope: string, @path fooName: string): void;
         `,
       )
       .toBeValid();

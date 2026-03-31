@@ -2,10 +2,15 @@ import { createRule, ignoreDiagnostics, Operation, paramMessage } from "@typespe
 import { getHttpOperation, HttpOperationPathParameter } from "@typespec/http";
 import { isExcludedCoreType, isTemplatedInterfaceOperation } from "./utils.js";
 
+interface PathParamInfo {
+  name: string;
+  allowReserved: boolean;
+}
+
 interface OperationPathInfo {
   path: string;
   operation: Operation;
-  paramNames: string[];
+  params: PathParamInfo[];
 }
 
 export const noRouteParameterNameMismatchRule = createRule({
@@ -14,7 +19,8 @@ export const noRouteParameterNameMismatchRule = createRule({
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-route-parameter-name-mismatch",
   messages: {
-    default: paramMessage`Path "${"path"}" has inconsistent parameter name "${"paramName"}" which should be "${"expectedParamName"}" to match existing operation with path "${"existingPath"}"`,
+    default: paramMessage`Path "${"path"}" has inconsistent parameter name "${"paramName"}" which should be "${"expected"}" to match existing operation with path "${"existingPath"}"`,
+    allowReservedMismatch: paramMessage`Path "${"path"}" has parameter "${"paramName"}" which should have allowReserved=${"expected"} to match existing operation with path "${"existingPath"}"`,
   },
   create(context) {
     // Map from normalized path (params replaced with {}) to first operation seen
@@ -32,9 +38,6 @@ export const noRouteParameterNameMismatchRule = createRule({
           (p): p is HttpOperationPathParameter => p.type === "path",
         );
 
-        // Skip operations with any allowReserved path parameter per issue guidance
-        if (pathParams.some((p) => p.allowReserved)) return;
-
         const path = httpOp.path;
 
         // Normalize path by replacing {paramName} with {}
@@ -47,16 +50,33 @@ export const noRouteParameterNameMismatchRule = createRule({
           m[1].replace(/^[+.;#/]/, ""),
         );
 
+        // Build params info with allowReserved status
+        const params: PathParamInfo[] = paramNames.map((name) => {
+          const httpParam = pathParams.find((p) => p.name === name);
+          return { name, allowReserved: httpParam?.allowReserved ?? false };
+        });
+
         const existing = pathMap.get(normalizedPath);
         if (existing) {
-          // Compare parameter names at each position
-          for (let i = 0; i < paramNames.length && i < existing.paramNames.length; i++) {
-            if (paramNames[i] !== existing.paramNames[i]) {
+          // Compare parameter names and allowReserved at each position
+          for (let i = 0; i < params.length && i < existing.params.length; i++) {
+            if (params[i].name !== existing.params[i].name) {
               context.reportDiagnostic({
                 format: {
                   path,
-                  paramName: paramNames[i],
-                  expectedParamName: existing.paramNames[i],
+                  paramName: params[i].name,
+                  expected: existing.params[i].name,
+                  existingPath: existing.path,
+                },
+                target: operation,
+              });
+            } else if (params[i].allowReserved !== existing.params[i].allowReserved) {
+              context.reportDiagnostic({
+                messageId: "allowReservedMismatch",
+                format: {
+                  path,
+                  paramName: params[i].name,
+                  expected: String(existing.params[i].allowReserved),
                   existingPath: existing.path,
                 },
                 target: operation,
@@ -64,7 +84,7 @@ export const noRouteParameterNameMismatchRule = createRule({
             }
           }
         } else {
-          pathMap.set(normalizedPath, { path, operation, paramNames });
+          pathMap.set(normalizedPath, { path, operation, params });
         }
       },
     };
