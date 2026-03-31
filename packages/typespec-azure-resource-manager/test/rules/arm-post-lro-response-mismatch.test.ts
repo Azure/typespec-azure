@@ -21,7 +21,7 @@ beforeEach(async () => {
 });
 
 describe("emits warning", () => {
-  it("when LroHeaders is overridden with ArmLroLocationHeader and Response is non-void but FinalResult is void", async () => {
+  it("when LroHeaders are overridden with ArmLroLocationHeader and Response is non-void but FinalResult is void", async () => {
     await tester
       .expect(
         `
@@ -56,7 +56,7 @@ describe("emits warning", () => {
       });
   });
 
-  it("when LroHeaders is overridden with ArmAsyncOperationHeader & ArmLroLocationHeader and Response is non-void but FinalResult is void", async () => {
+  it("when LroHeaders are overridden with ArmAsyncOperationHeader & ArmLroLocationHeader and Response is non-void but FinalResult is void", async () => {
     await tester
       .expect(
         `
@@ -82,6 +82,76 @@ describe("emits warning", () => {
           void,
           GenerateResponse,
           LroHeaders = ArmAsyncOperationHeader & ArmLroLocationHeader
+        >;
+      }
+      `,
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
+      });
+  });
+
+  it("when ActionAsync has LroHeaders overridden and finalResult does not match Response parameter", async () => {
+    await tester
+      .expect(
+        `
+      @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+      model Employee is ProxyResource<{}> {
+        @pattern("^[a-zA-Z0-9-]{3,24}$")
+        @key("employeeName")
+        @path
+        @segment("employees")
+        name: string;
+      }
+
+      model GenerateResponse {
+        message: string;
+      }
+
+      @armResourceOperations
+      interface Employees {
+        generate is ActionAsync<
+          Employee,
+          void,
+          GenerateResponse,
+          LroHeaders = ArmLroLocationHeader
+        >;
+      }
+      `,
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
+      });
+  });
+
+  it("when ArmProviderActionAsync has LroHeaders overridden and finalResult does not match Response parameter", async () => {
+    await tester
+      .expect(
+        `
+      @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+      model Employee is ProxyResource<{}> {
+        @pattern("^[a-zA-Z0-9-]{3,24}$")
+        @key("employeeName")
+        @path
+        @segment("employees")
+        name: string;
+      }
+
+      model GenerateResponse {
+        message: string;
+      }
+
+      @armResourceOperations
+      interface Employees {
+        generate is ArmProviderActionAsync<
+          void,
+          GenerateResponse,
+          SubscriptionActionScope,
+          LroHeaders = ArmLroLocationHeader
         >;
       }
       `,
@@ -204,6 +274,34 @@ describe("does not emit warning", () => {
           @statusCode _: 200;
           result: boolean;
         } | ErrorResponse;
+      }
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("when ActionAsync uses default LroHeaders (FinalResult matches Response)", async () => {
+    await tester
+      .expect(
+        `
+      @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+      model Employee is ProxyResource<{}> {
+        @pattern("^[a-zA-Z0-9-]{3,24}$")
+        @key("employeeName")
+        @path
+        @segment("employees")
+        name: string;
+      }
+
+      model GenerateResponse {
+        message: string;
+      }
+
+      @armResourceOperations
+      interface Employees {
+        generate is ActionAsync<Employee, void, GenerateResponse>;
       }
       `,
       )

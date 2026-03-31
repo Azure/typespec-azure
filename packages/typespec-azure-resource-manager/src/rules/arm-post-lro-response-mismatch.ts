@@ -5,6 +5,7 @@ import {
   Program,
   createRule,
   getSourceLocation,
+  isVoidType,
 } from "@typespec/compiler";
 import {
   type OperationSignatureReferenceNode,
@@ -14,9 +15,8 @@ import {
 } from "@typespec/compiler/ast";
 
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
-import { HttpOperationResponse, HttpPayloadBody } from "@typespec/http";
 import { ArmResourceOperation } from "../operations.js";
-import { getArmResources } from "../resource.js";
+import { getArmResources, resolveArmResources } from "../resource.js";
 
 function createLroHeadersCodeFix(op: Operation, responseTypeName: string): CodeFix | undefined {
   const node = op.node;
@@ -52,79 +52,107 @@ function createLroHeadersCodeFix(op: Operation, responseTypeName: string): CodeF
 }
 
 /**
- * Verify that the final result of an ARM LRO POST operation matches the 200 response body.
+ * Get the Response type from an operation's template parameter.
+ * Looks at the operation's immediate sourceOperation to find a template parameter named "Response"
+ * and returns the resolved type if it's a non-void Model.
+ * Only checks the first level of template indirection to avoid picking up internal
+ * template parameters (e.g., ArmResourceActionAsyncBase's Response parameter).
+ */
+function getResponseTemplateParam(op: Operation): Model | undefined {
+  // The operation itself is a resolved instance, so we need to look at the
+  // sourceOperation (the template). The templateMapper on sourceOperation
+  // contains the resolved template arguments.
+  const sourceOp: Operation | undefined = op.sourceOperation;
+  const mapper = sourceOp?.templateMapper;
+  if (sourceOp === undefined || mapper === undefined) {
+    return undefined;
+  }
+
+  const templateParams = sourceOp.node?.templateParameters;
+  if (templateParams === undefined) {
+    return undefined;
+  }
+
+  for (let i = 0; i < templateParams.length; i++) {
+    if (templateParams[i].id.sv === "Response") {
+      const resolvedType = mapper.args[i];
+      if (
+        typeof resolvedType === "object" &&
+        "kind" in resolvedType &&
+        resolvedType.kind === "Model" &&
+        !isVoidType(resolvedType)
+      ) {
+        return resolvedType as Model;
+      }
+      return undefined;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Verify that the final result of an ARM LRO POST operation matches the Response parameter.
  */
 export const armPostLroResponseMismatchRule = createRule({
   name: "arm-post-lro-response-mismatch",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/post-lro-response-mismatch",
   description:
-    "Ensure that the final result of a long-running POST operation matches the 200 response body.",
+    "Ensure that the final result of a long-running POST operation matches the Response parameter.",
   messages: {
-    default: `The final result type of a long-running POST operation does not match the 200 response body. Specify the FinalResult in the LroHeaders parameter to match the response type. For example: 'LroHeaders = ArmLroLocationHeader<Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>, ResponseType>'.`,
+    default: `The final result type of a long-running POST operation does not match the Response parameter. Specify the FinalResult in the LroHeaders parameter to match the response type. For example: 'LroHeaders = ArmLroLocationHeader<Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>, ResponseType>'.`,
   },
   create(context) {
-    function getResponseBody(
-      response: HttpOperationResponse | undefined,
-    ): HttpPayloadBody | undefined {
-      if (response === undefined) return undefined;
-      if (response.responses.length > 1) {
-        return undefined;
+    function validateOperation(op: ArmResourceOperation) {
+      if (op.httpOperation.verb !== "post") {
+        return;
       }
-      if (response.responses[0].body !== undefined) {
-        return response.responses[0].body;
+      const lroMetadata = getLroMetadata(context.program, op.operation);
+      if (lroMetadata === undefined) {
+        return;
       }
-      return undefined;
-    }
 
-    function getResponseBodyType(op: ArmResourceOperation): Model | undefined {
-      const response200 = op.httpOperation.responses.find((r) => r.statusCodes === 200);
-      const body200 = getResponseBody(response200);
-      if (body200 === undefined) return undefined;
-      const bodyType = body200.type;
-      if (bodyType.kind === "Model") {
-        return bodyType;
+      // Get the Response type from the template parameter
+      const responseType = getResponseTemplateParam(op.operation);
+      if (responseType === undefined) {
+        // No non-void Response template parameter - nothing to check
+        return;
       }
-      return undefined;
+
+      // If the final result is "void" but there is a non-void Response parameter, this is a mismatch
+      if (lroMetadata.finalResult === "void") {
+        const responseTypeName = responseType.name;
+        const codefixes: CodeFix[] = [];
+        const codeFix = createLroHeadersCodeFix(op.operation, responseTypeName);
+        if (codeFix !== undefined) {
+          codefixes.push(codeFix);
+        }
+        context.reportDiagnostic({
+          target: op.operation,
+          codefixes,
+        });
+      }
     }
 
     return {
       root: (program: Program) => {
+        // Check resource-level actions
         const resources = getArmResources(program);
         for (const resource of resources) {
-          const operations = [
-            resource.operations.lifecycle.createOrUpdate,
-            resource.operations.lifecycle.update,
-            ...Object.values(resource.operations.actions),
-          ];
+          const operations = [...Object.values(resource.operations.actions)];
           for (const op of operations) {
-            if (op === undefined || op.httpOperation.verb !== "post") {
+            if (op === undefined) {
               continue;
             }
-            const lroMetadata = getLroMetadata(context.program, op.operation);
-            if (lroMetadata === undefined) {
-              continue;
-            }
+            validateOperation(op);
+          }
+        }
 
-            const responseBodyType = getResponseBodyType(op);
-            if (responseBodyType === undefined) {
-              // No 200 response body - nothing to check
-              continue;
-            }
-
-            // If the final result is "void" but there is a 200 response body, this is a mismatch
-            if (lroMetadata.finalResult === "void") {
-              const responseTypeName = responseBodyType.name;
-              const codefixes: CodeFix[] = [];
-              const codeFix = createLroHeadersCodeFix(op.operation, responseTypeName);
-              if (codeFix !== undefined) {
-                codefixes.push(codeFix);
-              }
-              context.reportDiagnostic({
-                target: op.operation,
-                codefixes,
-              });
-            }
+        // Check provider-level actions
+        const provider = resolveArmResources(program);
+        if (provider.providerOperations) {
+          for (const op of provider.providerOperations) {
+            validateOperation(op);
           }
         }
       },
