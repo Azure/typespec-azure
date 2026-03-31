@@ -3,6 +3,7 @@ import {
   ModelProperty,
   Operation,
   Type,
+  Union,
   compilerAssert,
   createDiagnosticCollector,
   getEncode,
@@ -610,10 +611,12 @@ function getSdkHttpResponseAndExceptions(
   const exceptions: SdkHttpErrorResponse[] = [];
   for (const response of httpOperation.responses) {
     const headers: SdkServiceResponseHeader[] = [];
-    let body: Type | undefined;
+    const bodyTypes: Type[] = [];
     let type: SdkType | undefined;
     let contentTypes: string[] = [];
     let streamMetadata: SdkStreamMetadata | undefined;
+    let lastBodyProperty: ModelProperty | undefined;
+    let lastDefaultContentType: string | undefined;
 
     for (const innerResponse of response.responses) {
       const defaultContentType = innerResponse.body?.contentTypes.includes("application/json")
@@ -634,7 +637,7 @@ function getSdkHttpResponseAndExceptions(
         context.__responseHeaderCache.set(header, headers[headers.length - 1]);
       }
       if (innerResponse.body && !isNeverOrVoidType(innerResponse.body.type)) {
-        if (body && body !== innerResponse.body.type) {
+        if (bodyTypes.length > 0 && !bodyTypes.includes(innerResponse.body.type)) {
           diagnostics.add(
             createDiagnostic({
               code: "multiple-response-types",
@@ -644,13 +647,13 @@ function getSdkHttpResponseAndExceptions(
               },
             }),
           );
-          body = tk.union.create([body, innerResponse.body.type]);
-        } else if (!body) {
-          body = innerResponse.body.type;
+        }
+        if (!bodyTypes.includes(innerResponse.body.type)) {
+          bodyTypes.push(innerResponse.body.type);
         }
         contentTypes = contentTypes.concat(innerResponse.body.contentTypes);
-        body =
-          body.kind === "Model" ? getEffectivePayloadType(context, body, Visibility.Read) : body;
+        lastBodyProperty = innerResponse.body.property;
+        lastDefaultContentType = defaultContentType;
         const responseStreamMeta = getStreamMetadata(context.program, innerResponse);
         if (responseStreamMeta) {
           // map stream response body type to bytes, but preserve stream metadata
@@ -658,14 +661,37 @@ function getSdkHttpResponseAndExceptions(
           streamMetadata = diagnostics.pipe(
             buildSdkStreamMetadata(context, responseStreamMeta, httpOperation.operation),
           );
-        } else {
-          type = diagnostics.pipe(
-            getClientTypeWithDiagnostics(context, body, httpOperation.operation),
-          );
-          if (innerResponse.body.property) {
-            addEncodeInfo(context, innerResponse.body.property, type, defaultContentType);
-          }
         }
+      }
+    }
+
+    // Create SDK type from collected body types after iteration
+    let body: Type | undefined;
+    if (!type && bodyTypes.length > 0) {
+      if (bodyTypes.length === 1) {
+        body = bodyTypes[0];
+      } else {
+        body = tk.union.create(bodyTypes);
+      }
+      body = body.kind === "Model" ? getEffectivePayloadType(context, body, Visibility.Read) : body;
+      if (bodyTypes.length > 1) {
+        // Push naming context for the synthetic union so it gets a proper generated name
+        context.__namingContextPath.push({
+          name: httpOperation.operation.name,
+          type: httpOperation.operation,
+        });
+        context.__namingContextPath.push({
+          name: "Response",
+          type: body as Union,
+        });
+      }
+      type = diagnostics.pipe(getClientTypeWithDiagnostics(context, body, httpOperation.operation));
+      if (bodyTypes.length > 1) {
+        context.__namingContextPath.pop();
+        context.__namingContextPath.pop();
+      }
+      if (lastBodyProperty) {
+        addEncodeInfo(context, lastBodyProperty, type, lastDefaultContentType);
       }
     }
     const sdkResponse = {
@@ -688,7 +714,7 @@ function getSdkHttpResponseAndExceptions(
     if (
       response.statusCodes === "*" ||
       isErrorModel(context.program, response.type) ||
-      (body && isErrorModel(context.program, body))
+      (bodyTypes.length > 0 && bodyTypes.some((b) => isErrorModel(context.program, b)))
     ) {
       exceptions.push({
         ...sdkResponse,
