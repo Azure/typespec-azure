@@ -129,6 +129,10 @@ function parsePython(
  *   - data plane, azurev2 flavor → com.azure.v2
  *   - management plane, azurev2  → com.azure.resourcemanager.v2
  *
+ * When flavor is azurev2, the namespace may already contain 'v2' as a path segment
+ * (e.g. com.azure.v2.security.keyvault.keys). The 'v2' segment is stripped when
+ * deriving the artifact ID to avoid duplication (azure-v2-... → azure-...).
+ *
  * The final package name is formatted as `{groupId}:{artifactId}`.
  */
 function parseJava(
@@ -146,7 +150,16 @@ function parseJava(
     artifactId = String(fillVars(rawPackageName, params));
   } else if (namespace) {
     const ns = String(namespace);
-    const stripped = ns.startsWith("com.") ? ns.substring(4) : ns;
+    let stripped = ns.startsWith("com.") ? ns.substring(4) : ns;
+    // When the flavor is azurev2, the namespace may contain 'v2' as a segment
+    // (e.g. com.azure.v2.security.keyvault.keys or com.azure.resourcemanager.v2.cdn).
+    // The 'v2' is already encoded in the Maven groupId, so strip it from the
+    // artifact ID portion to avoid duplication (e.g. azure-v2-security-... → azure-security-...).
+    if (isV2) {
+      stripped = stripped
+        .replace(/^(azure\.resourcemanager\.)v2\./, "$1")
+        .replace(/^(azure\.)v2\./, "$1");
+    }
     artifactId = stripped.replace(/\./g, "-");
   }
 
