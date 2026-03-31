@@ -263,16 +263,16 @@ You can find samples of Subscription Resources [in the OperationTemplates sample
 Location-based resources have REST API paths like:
 `/subscriptions/{subscriptionId}/providers/Microsoft.Contoso/locations/{location}/employees/{employeeName}`
 
-Use `@parentResource(ArmLocationResource<"ResourceGroup">)` to define a location-based resource. The `ArmLocationResource` template accepts a base type parameter which can be `"Tenant"`, `"Subscription"`, `"ResourceGroup"`, or `"Extension"`. Here is an example:
+Use `@parentResource(ArmLocationResource<"Subscription">)` to define a location-based resource with location a child of the subscription. The `ArmLocationResource` template accepts a base type parameter which can be `"Tenant"`, `"Subscription"`, `"ResourceGroup"`, or `"Extension"`. Here is an example:
 
 ```typespec
-@parentResource(ArmLocationResource<"ResourceGroup">)
+@parentResource(ArmLocationResource<"Subscription">)
 model Employee is TrackedResource<EmployeeProperties> {
   ...ResourceNameParameter<Employee>;
 }
 ```
 
-`@parentResource(ArmLocationResource<"ResourceGroup">)`: designates this resource as being a location-scoped resource under a resource group.
+`@parentResource(ArmLocationResource<"Subscription">)`: designates this resource as being a location-scoped resource under a subscription.
 
 :::caution
 The `@locationResource` decorator is deprecated. Use `@parentResource(ArmLocationResource<...>)` instead.
