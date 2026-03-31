@@ -137,6 +137,7 @@ interface ProviderOperations {
   >;
 
   /** Operation to generate an extension resource based POST action */
+  #suppress "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch" "Extension scopes legitimately use different parameter names"
   @post
   @list
   @action("append")

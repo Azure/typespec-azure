@@ -92,7 +92,7 @@ describe("typespec-azure-core: no-route-parameter-name-mismatch", () => {
       .toBeValid();
   });
 
-  it("emit a warning when operations have non-allowReserved params mismatched alongside allowReserved params", async () => {
+  it("emit warnings when both allowReserved and non-allowReserved params are mismatched", async () => {
     await tester
       .expect(
         `
@@ -109,12 +109,17 @@ describe("typespec-azure-core: no-route-parameter-name-mismatch", () => {
         {
           code: "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch",
           severity: "warning",
+          message: `Path "/{resourceUri}/providers/Microsoft.Contoso/foos/{name}" has inconsistent parameter name "resourceUri" which should be "scope" to match existing operation with path "/{scope}/providers/Microsoft.Contoso/foos/{fooName}"`,
+        },
+        {
+          code: "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch",
+          severity: "warning",
           message: `Path "/{resourceUri}/providers/Microsoft.Contoso/foos/{name}" has inconsistent parameter name "name" which should be "fooName" to match existing operation with path "/{scope}/providers/Microsoft.Contoso/foos/{fooName}"`,
         },
       ]);
   });
 
-  it("does not emit a warning when allowReserved path parameters have different names", async () => {
+  it("emit a warning when both allowReserved path parameters have different names", async () => {
     await tester
       .expect(
         `
@@ -128,7 +133,13 @@ describe("typespec-azure-core: no-route-parameter-name-mismatch", () => {
         op updateFoo(@path scope: string, @path fooName: string): void;
         `,
       )
-      .toBeValid();
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch",
+          severity: "warning",
+          message: `Path "/{scope}/providers/Microsoft.Contoso/foos/{fooName}" has inconsistent parameter name "scope" which should be "resourceUri" to match existing operation with path "/{resourceUri}/providers/Microsoft.Contoso/foos/{fooName}"`,
+        },
+      ]);
   });
 
   it("does not emit a warning when allowReserved differs between matching path parameters", async () => {

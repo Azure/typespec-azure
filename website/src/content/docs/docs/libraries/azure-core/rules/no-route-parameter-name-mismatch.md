@@ -6,9 +6,7 @@ title: "no-route-parameter-name-mismatch"
 @azure-tools/typespec-azure-core/no-route-parameter-name-mismatch
 ```
 
-Operations that share the same route path (ignoring parameter names) should use consistent path parameter names. When two operations resolve to the same path structure but use different names for corresponding path parameters, it typically indicates a misconfiguration, such as mixing legacy templates with standard templates.
-
-Parameters that use `allowReserved` are excluded from name comparison, since they represent scope parameters that may legitimately use different names (e.g., `{resourceUri}` vs `{scope}`).
+Operations over the same resource or using the same path structure should use consistent path parameter names. When two operations resolve to the same resource or path structure but use different names for corresponding path parameters, it typically indicates an inadvertent mismatch in path parameter names.
 
 #### ❌ Incorrect
 
@@ -53,15 +51,4 @@ op getFoo(@path fooName: string): void;
 
 @route("/providers/Microsoft.Contoso/bars/{barName}")
 op getBar(@path barName: string): void;
-```
-
-Parameters with `allowReserved` using different scope names are not compared:
-
-```tsp
-@route("/{+resourceUri}/providers/Microsoft.Contoso/foos/{fooName}")
-op getFoo(@path resourceUri: string, @path fooName: string): void;
-
-@put
-@route("/{+scope}/providers/Microsoft.Contoso/foos/{fooName}")
-op updateFoo(@path scope: string, @path fooName: string): void;
 ```
