@@ -5200,8 +5200,8 @@ Tests that we can grow up an operation from accepting one required parameter to 
 
 - Endpoint: `get /service/multiple-services/service-a/aTest`
 
-  Test that multiple services without explicit @client create separate root clients.
-  This operation should be accessible under ServiceA > Operations.
+  Test that multiple services without explicit `@client` create separate root clients.
+  This operation should be accessible under `ServiceAClient` > `Operations`.
 
   Expected path: /service/multiple-services/service-a/aTest
   Expected query parameter: api-version=av2
@@ -5212,7 +5212,7 @@ Tests that we can grow up an operation from accepting one required parameter to 
 - Endpoint: `get /service/multiple-services/service-a/aSubTest`
 
   Test that sub-namespaces are preserved per service when using multiple services.
-  This operation should be accessible under ServiceA > SubNamespace.
+  This operation should be accessible under `ServiceAClient` > `SubNamespace`.
 
   Expected path: /service/multiple-services/service-a/aSubTest
   Expected query parameter: api-version=av2
@@ -5222,8 +5222,8 @@ Tests that we can grow up an operation from accepting one required parameter to 
 
 - Endpoint: `get /service/multiple-services/service-b/bTest`
 
-  Test that multiple services without explicit @client create separate root clients.
-  This operation should be accessible under ServiceB > Operations.
+  Test that multiple services without explicit `@client` create separate root clients.
+  This operation should be accessible under `ServiceBClient` > `Operations`.
 
   Expected path: /service/multiple-services/service-b/bTest
   Expected query parameter: api-version=bv2
@@ -5234,7 +5234,7 @@ Tests that we can grow up an operation from accepting one required parameter to 
 - Endpoint: `get /service/multiple-services/service-b/bSubTest`
 
   Test that sub-namespaces are preserved per service when using multiple services.
-  This operation should be accessible under ServiceB > SubNamespace.
+  This operation should be accessible under `ServiceBClient` > `SubNamespace`.
 
   Expected path: /service/multiple-services/service-b/bSubTest
   Expected query parameter: api-version=bv2
