@@ -5198,45 +5198,45 @@ Tests that we can grow up an operation from accepting one required parameter to 
 
 ### Service_MultipleServices_ServiceA_Operations_opA
 
-- Endpoint: `get /service/multiple-services/service-a/aTest`
+- Endpoint: `get /service/multiple-services/service-a/a-test`
 
   Test that multiple services without explicit `@client` create separate root clients.
   This operation should be accessible under `ServiceAClient` > `Operations`.
 
-  Expected path: /service/multiple-services/service-a/aTest
+  Expected path: /service/multiple-services/service-a/a-test
   Expected query parameter: api-version=av2
   Expected 204 response.
 
 ### Service_MultipleServices_ServiceA_SubNamespace_subOpA
 
-- Endpoint: `get /service/multiple-services/service-a/aSubTest`
+- Endpoint: `get /service/multiple-services/service-a/a-sub-test`
 
   Test that sub-namespaces are preserved per service when using multiple services.
   This operation should be accessible under `ServiceAClient` > `SubNamespace`.
 
-  Expected path: /service/multiple-services/service-a/aSubTest
+  Expected path: /service/multiple-services/service-a/a-sub-test
   Expected query parameter: api-version=av2
   Expected 204 response.
 
 ### Service_MultipleServices_ServiceB_Operations_opB
 
-- Endpoint: `get /service/multiple-services/service-b/bTest`
+- Endpoint: `get /service/multiple-services/service-b/b-test`
 
   Test that multiple services without explicit `@client` create separate root clients.
   This operation should be accessible under `ServiceBClient` > `Operations`.
 
-  Expected path: /service/multiple-services/service-b/bTest
+  Expected path: /service/multiple-services/service-b/b-test
   Expected query parameter: api-version=bv2
   Expected 204 response.
 
 ### Service_MultipleServices_ServiceB_SubNamespace_subOpB
 
-- Endpoint: `get /service/multiple-services/service-b/bSubTest`
+- Endpoint: `get /service/multiple-services/service-b/b-sub-test`
 
   Test that sub-namespaces are preserved per service when using multiple services.
   This operation should be accessible under `ServiceBClient` > `SubNamespace`.
 
-  Expected path: /service/multiple-services/service-b/bSubTest
+  Expected path: /service/multiple-services/service-b/b-sub-test
   Expected query parameter: api-version=bv2
   Expected 204 response.
 

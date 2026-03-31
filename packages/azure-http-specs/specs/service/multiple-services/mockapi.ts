@@ -3,7 +3,7 @@ import { passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
 Scenarios.Service_MultipleServices_ServiceA_Operations_opA = passOnSuccess({
-  uri: "/service/multiple-services/service-a/aTest",
+  uri: "/service/multiple-services/service-a/a-test",
   method: "get",
   request: {
     query: {
@@ -15,7 +15,7 @@ Scenarios.Service_MultipleServices_ServiceA_Operations_opA = passOnSuccess({
 });
 
 Scenarios.Service_MultipleServices_ServiceA_SubNamespace_subOpA = passOnSuccess({
-  uri: "/service/multiple-services/service-a/aSubTest",
+  uri: "/service/multiple-services/service-a/a-sub-test",
   method: "get",
   request: {
     query: {
@@ -27,7 +27,7 @@ Scenarios.Service_MultipleServices_ServiceA_SubNamespace_subOpA = passOnSuccess(
 });
 
 Scenarios.Service_MultipleServices_ServiceB_Operations_opB = passOnSuccess({
-  uri: "/service/multiple-services/service-b/bTest",
+  uri: "/service/multiple-services/service-b/b-test",
   method: "get",
   request: {
     query: {
@@ -39,7 +39,7 @@ Scenarios.Service_MultipleServices_ServiceB_Operations_opB = passOnSuccess({
 });
 
 Scenarios.Service_MultipleServices_ServiceB_SubNamespace_subOpB = passOnSuccess({
-  uri: "/service/multiple-services/service-b/bSubTest",
+  uri: "/service/multiple-services/service-b/b-sub-test",
   method: "get",
   request: {
     query: {
