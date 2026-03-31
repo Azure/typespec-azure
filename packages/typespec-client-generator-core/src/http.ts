@@ -72,7 +72,6 @@ import {
   isSubscriptionId,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
-import { isMediaTypeJson, isMediaTypeOctetStream, isMediaTypeTextPlain } from "./media-types.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -399,25 +398,15 @@ function createContentTypeOrAcceptHeader(
 ): Omit<SdkMethodParameter, "kind"> {
   const name = bodyObject.kind === "body" ? "contentType" : "accept";
   let type: SdkType = getTypeSpecBuiltInType(context, "string");
-  // for contentType, we treat it as a constant IFF there's one value and it's one of:
-  //  - application/json
-  //  - text/plain
-  //  - application/octet-stream
-  // this is to prevent a breaking change when a service adds more content types in the future.
-  // e.g. the service accepting image/png then later image/jpeg should _not_ be a breaking change.
-  //
-  // for accept, we treat it as a constant IFF there's a single value. adding more content types
-  // for this case is considered a breaking change for SDKs so we want to surface it as such.
-  // e.g. the service returns image/png then later provides the option to return image/jpeg.
+  // Honor the content types from the HTTP library result.
+  // For a single content type, create a constant. For multiple content types, create an enum.
+  // For File type bodies, the content type is constrained by the File type itself;
+  // treat it the same as a user-defined content type/accept parameter.
   if (
     bodyObject.contentTypes &&
     bodyObject.contentTypes.length === 1 &&
-    (isMediaTypeJson(bodyObject.contentTypes[0]) ||
-      isMediaTypeTextPlain(bodyObject.contentTypes[0]) ||
-      isMediaTypeOctetStream(bodyObject.contentTypes[0]) ||
-      name === "accept")
+    bodyObject.contentTypes[0] !== "*/*"
   ) {
-    // in this case, we just want a content type of application/json
     type = {
       kind: "constant",
       value: bodyObject.contentTypes[0],
@@ -426,58 +415,39 @@ function createContentTypeOrAcceptHeader(
       isGeneratedName: true,
       decorators: [],
     };
-  } else if (bodyObject.contentTypes) {
-    // For File type bodies, the content type is constrained by the File type itself.
-    // Follow the content type to add a constant (single) or enum (multiple) param.
-    const isFileBody =
-      name === "contentType"
-        ? httpOperation.parameters.body?.bodyKind === "file"
-        : httpOperation.responses.some((r) =>
-            r.responses.some((rc) => rc.body?.bodyKind === "file"),
-          );
-    if (isFileBody) {
-      const stringType: SdkBuiltInType = getTypeSpecBuiltInType(context, "string");
-      if (bodyObject.contentTypes.length === 1) {
-        type = {
-          kind: "constant",
-          value: bodyObject.contentTypes[0],
-          valueType: stringType,
-          name: `${httpOperation.operation.name}ContentType`,
-          isGeneratedName: true,
-          decorators: [],
-        };
-      } else if (bodyObject.contentTypes.length > 1) {
-        const enumType: SdkEnumType = {
-          kind: "enum",
-          name: `${httpOperation.operation.name}ContentType`,
-          isGeneratedName: true,
-          namespace: "",
-          valueType: stringType,
-          values: [],
-          isFixed: true,
-          isFlags: false,
-          usage: UsageFlags.None,
-          access: "public",
-          crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
-          apiVersions: bodyObject.apiVersions,
-          isUnionAsEnum: false,
-          decorators: [],
-        };
-        enumType.values = bodyObject.contentTypes.map((ct) => ({
-          kind: "enumvalue" as const,
-          name: ct,
-          value: ct,
-          enumType,
-          valueType: stringType,
-          crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}.${ct}`,
-          decorators: [],
-        }));
-        type = enumType;
-      }
-    }
+  } else if (bodyObject.contentTypes && bodyObject.contentTypes.length > 1) {
+    const stringType: SdkBuiltInType = getTypeSpecBuiltInType(context, "string");
+    const enumType: SdkEnumType = {
+      kind: "enum",
+      name: `${httpOperation.operation.name}ContentType`,
+      isGeneratedName: true,
+      namespace: "",
+      valueType: stringType,
+      values: [],
+      isFixed: true,
+      isFlags: false,
+      usage: UsageFlags.None,
+      access: "public",
+      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
+      apiVersions: bodyObject.apiVersions,
+      isUnionAsEnum: false,
+      decorators: [],
+    };
+    enumType.values = bodyObject.contentTypes.map((ct) => ({
+      kind: "enumvalue" as const,
+      name: ct,
+      value: ct,
+      enumType,
+      valueType: stringType,
+      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}.${ct}`,
+      decorators: [],
+    }));
+    type = enumType;
   }
   const optional = bodyObject.kind === "body" ? bodyObject.optional : false;
-  // No need for clientDefaultValue because it's a constant, it only has one value
+  // For */* wildcard, provide a sensible client default value
+  const isWildcard = bodyObject.contentTypes?.length === 1 && bodyObject.contentTypes[0] === "*/*";
+  // No need for clientDefaultValue when it's a constant, it only has one value
   return {
     type,
     name,
@@ -486,6 +456,7 @@ function createContentTypeOrAcceptHeader(
     isApiVersionParam: false,
     onClient: false,
     optional: optional,
+    ...(isWildcard && { clientDefaultValue: "application/octet-stream" }),
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
     decorators: [],
     access: "public",
