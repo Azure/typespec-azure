@@ -1,15 +1,14 @@
 {
   "name": "@typespec-azure/doc-updater",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
-  "description": "Automated documentation updater using GitHub Copilot SDK",
+  "description": "Automated documentation updater for GitHub Agentic Workflows",
   "scripts": {
-    "start": "tsx src/index.ts",
-    "check": "tsx src/index.ts --dry-run"
+    "precompute": "tsx src/precompute.ts",
+    "update-meta": "tsx src/update-meta.ts"
   },
   "dependencies": {
-    "@github/copilot-sdk": "^0.1.0",
     "js-yaml": "^4.1.0"
   },
   "devDependencies": {

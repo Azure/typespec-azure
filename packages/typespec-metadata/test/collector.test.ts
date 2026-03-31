@@ -191,6 +191,23 @@ describe("language-specific parsers", () => {
     expect(lang.namespace).toBe("com.azure.ai.agents");
   });
 
+  it("should parse Java v2 data-plane package metadata with v2 embedded in namespace correctly", () => {
+    // When the namespace already contains 'v2' as a segment (com.azure.v2.xxx),
+    // the artifact ID should NOT repeat 'v2' since the groupId already encodes it.
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-tools/typespec-java": {
+        namespace: "com.azure.v2.security.keyvault.administration",
+        flavor: "azurev2",
+      },
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "/repos/tsp-output");
+    const lang = result["java"];
+
+    expect(lang.packageName).toBe("com.azure.v2:azure-security-keyvault-administration");
+    expect(lang.namespace).toBe("com.azure.v2.security.keyvault.administration");
+  });
+
   it("should parse Java v2 management-plane package metadata correctly", () => {
     const optionMap: Record<string, Record<string, unknown>> = {
       "@azure-tools/typespec-java": {
@@ -204,6 +221,23 @@ describe("language-specific parsers", () => {
 
     expect(lang.packageName).toBe("com.azure.resourcemanager.v2:azure-resourcemanager-cdn");
     expect(lang.namespace).toBe("com.azure.resourcemanager.cdn");
+  });
+
+  it("should parse Java v2 management-plane package metadata with v2 embedded in namespace correctly", () => {
+    // When the namespace already contains 'v2' as a segment (com.azure.resourcemanager.v2.xxx),
+    // the artifact ID should NOT repeat 'v2' since the groupId already encodes it.
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-tools/typespec-java": {
+        namespace: "com.azure.resourcemanager.v2.cdn",
+        flavor: "azurev2",
+      },
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "/repos/tsp-output");
+    const lang = result["java"];
+
+    expect(lang.packageName).toBe("com.azure.resourcemanager.v2:azure-resourcemanager-cdn");
+    expect(lang.namespace).toBe("com.azure.resourcemanager.v2.cdn");
   });
 
   it("should use explicit package-name with groupId prefix for Java", () => {

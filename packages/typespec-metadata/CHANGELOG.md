@@ -1,5 +1,8 @@
 # @azure-tools/typespec-metadata
 
+## 0.1.3
+- Fixes issue with azurev2 flavored package names.
+
 ## 0.1.2
 
 Java package name now includes the Maven groupId prefix based on flavor and management/data plane.
