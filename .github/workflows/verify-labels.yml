@@ -1,4 +1,8 @@
 name: Verify labels
+
+permissions:
+  contents: read
+
 on:
   pull_request:
     branches:
@@ -14,7 +18,7 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: recursive
       - uses: ./.github/actions/setup
