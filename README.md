@@ -32,7 +32,7 @@ npm install @typespec/rest @typespec/openapi3 @azure-tools/typespec-azure-core @
 
 ## Build Pipelines
 
-Information on using TypeSpec within build pipelines [can be found here](https://azure.github.io/typespec-azure/docs/howtos/rest-api-publish/buildpipelines)
+Information on using TypeSpec within build pipelines [can be found here](./docs/howtos/rest-api-publish/buildpipelines.md)
 
 ## Packages
 

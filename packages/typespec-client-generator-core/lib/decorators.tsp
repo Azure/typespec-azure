@@ -187,7 +187,7 @@ extern dec client(target: Namespace | Interface, options?: ClientOptions, scope?
  */
 model ClientOptions {
   /**
-   * The services that this client is generated for. The root explicit client must have `service` config.
+   * The services that this client is generated for. If not specified, TCGC will look up the first parent namespace decorated with `@service` for the target.
    * The namespace should be decorated with `@service`.
    */
   service?: Namespace | Namespace[];
@@ -196,15 +196,9 @@ model ClientOptions {
    * The name of the client. If not specified, the default name will be `<Name of the target>Client`.
    */
   name?: string;
-
-  /**
-   * Auto-merge service's things into current client.
-   */
-  autoMergeService?: boolean;
 }
 
 /**
- * @deprecated Use `@client` instead. The `@operationGroup` decorator is deprecated. Sub clients should be represented using `@client`.
  * Define the sub client generated in the client SDK.
  * If there is any `@client` definition or `@operationGroup` definition, then each `@client` is a root client and each `@operationGroup` is a sub client with hierarchy.
  * This decorator cannot be used along with `@clientLocation`. This decorator cannot be used as augmentation.

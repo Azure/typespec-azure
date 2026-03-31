@@ -358,8 +358,7 @@ op delete(@path id: string): ArmNoContentResponse;
 
 ### `ArmOperationStatus` {#Azure.ResourceManager.ArmOperationStatus}
 
-Standard Azure Resource Manager operation status response, used as the response
-body for `GetResourceOperationStatus`.
+Standard Azure Resource Manager operation status response
 
 ```typespec
 model Azure.ResourceManager.ArmOperationStatus<Properties, StatusValues>
@@ -1041,7 +1040,7 @@ The dynamic parameters of a resource instance - pass in the proper base type to 
 where the resource is based. The default is in a resource group
 
 ```typespec
-model Azure.ResourceManager.ResourceInstanceParameters<Resource, BaseParameters>
+model Azure.ResourceManager.ResourceInstanceParameters<Resource, BaseParameters, Provider>
 ```
 
 #### Template Parameters
@@ -1050,6 +1049,7 @@ model Azure.ResourceManager.ResourceInstanceParameters<Resource, BaseParameters>
 | -------------- | -------------------------------------------------------- |
 | Resource       | The resource to get parameters for                       |
 | BaseParameters | The parameters representing the base Uri of the resource |
+| Provider       | Optional. The provider namespace model for the resource. |
 
 #### Examples
 
@@ -1059,9 +1059,7 @@ op get(...ResourceInstanceParameters<Employee>): ArmResponse<EmployeeResponse> |
 
 #### Properties
 
-| Name     | Type                             | Description |
-| -------- | -------------------------------- | ----------- |
-| provider | `"Microsoft.ThisWillBeReplaced"` |             |
+None
 
 ### `ResourceKindProperty` {#Azure.ResourceManager.ResourceKindProperty}
 
@@ -1208,7 +1206,7 @@ The dynamic parameters of a list call for a resource instance - pass in the prop
 where the list should take place. The default is in a resource group
 
 ```typespec
-model Azure.ResourceManager.ResourceParentParameters<Resource, BaseParameters>
+model Azure.ResourceManager.ResourceParentParameters<Resource, BaseParameters, Provider>
 ```
 
 #### Template Parameters
@@ -1217,12 +1215,11 @@ model Azure.ResourceManager.ResourceParentParameters<Resource, BaseParameters>
 | -------------- | -------------------------------------------------------- |
 | Resource       | The resource to get parameters for                       |
 | BaseParameters | The parameters representing the base Uri of the resource |
+| Provider       | Optional. The provider namespace model for the resource. |
 
 #### Properties
 
-| Name     | Type                             | Description |
-| -------- | -------------------------------- | ----------- |
-| provider | `"Microsoft.ThisWillBeReplaced"` |             |
+None
 
 ### `ResourcePlanProperty` {#Azure.ResourceManager.ResourcePlanProperty}
 
@@ -1328,28 +1325,6 @@ op action is ArmProviderActionSync<Response = Employee, Scope = SubscriptionActi
 | ---- | -------- | ---------------------- |
 | name | `string` | Symbolic name of scope |
 
-### `SubscriptionLocationActionScope` {#Azure.ResourceManager.SubscriptionLocationActionScope}
-
-Scope for operation status endpoints at the subscription level with a location path segment.
-Use with `GetResourceOperationStatus` to produce:
-`GET /subscriptions/{subscriptionId}/providers/{providerNamespace}/locations/{location}/operationStatuses/{operationId}`
-
-```typespec
-model Azure.ResourceManager.SubscriptionLocationActionScope
-```
-
-#### Examples
-
-```typespec
-op getStatus is GetResourceOperationStatus<ArmOperationStatus, SubscriptionLocationActionScope>;
-```
-
-#### Properties
-
-| Name     | Type                 | Description                   |
-| -------- | -------------------- | ----------------------------- |
-| location | `Core.azureLocation` | The name of the Azure region. |
-
 ### `SubscriptionLocationResource` {#Azure.ResourceManager.SubscriptionLocationResource}
 
 The location resource for subscription-based locations. This can be used as a parent
@@ -1393,28 +1368,6 @@ op action is ArmProviderActionSync<Response = Employee, Scope = TenantActionScop
 | Name | Type     | Description            |
 | ---- | -------- | ---------------------- |
 | name | `string` | Symbolic name of scope |
-
-### `TenantLocationActionScope` {#Azure.ResourceManager.TenantLocationActionScope}
-
-Scope for operation status endpoints at the tenant level with a location path segment.
-Use with `GetResourceOperationStatus` to produce:
-`GET /providers/{providerNamespace}/locations/{location}/operationStatuses/{operationId}`
-
-```typespec
-model Azure.ResourceManager.TenantLocationActionScope
-```
-
-#### Examples
-
-```typespec
-op getStatus is GetResourceOperationStatus<ArmOperationStatus, TenantLocationActionScope>;
-```
-
-#### Properties
-
-| Name     | Type                 | Description                   |
-| -------- | -------------------- | ----------------------------- |
-| location | `Core.azureLocation` | The name of the Azure region. |
 
 ### `TenantLocationResource` {#Azure.ResourceManager.TenantLocationResource}
 
@@ -3608,6 +3561,25 @@ model Azure.ResourceManager.Legacy.ArmOperationOptions
 | --------------- | --------- | -------------------------------------- |
 | useStaticRoute? | `boolean` | Should a static route be used          |
 | route?          | `string`  | The status route for operations to use |
+
+### `CustomAzureProxyResource` {#Azure.ResourceManager.Legacy.CustomAzureProxyResource}
+
+Model representing a custom resource that extends ProxyResource.
+Use this template with 'is' to create a custom proxy resource.
+
+```typespec
+model Azure.ResourceManager.Legacy.CustomAzureProxyResource<isResource>
+```
+
+#### Template Parameters
+
+| Name       | Description                                                                                                    |
+| ---------- | -------------------------------------------------------------------------------------------------------------- |
+| isResource | Optional. A boolean flag indicating whether the resource should be marked as an Azure resource. Default false. |
+
+#### Properties
+
+None
 
 ### `CustomAzureResource` {#Azure.ResourceManager.Legacy.CustomAzureResource}
 

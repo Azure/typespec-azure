@@ -1,3 +1,4 @@
+import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import {
   Diagnostic,
   Enum,
@@ -20,11 +21,27 @@ import {
   isService,
   resolveEncodedName,
 } from "@typespec/compiler";
-import { HttpOperation, Visibility, getHttpOperation, isMetadata, isVisible } from "@typespec/http";
+import {
+  HttpOperation,
+  Visibility,
+  getHttpOperation,
+  getHttpPart,
+  isMetadata,
+  isVisible,
+} from "@typespec/http";
 import { getOperationId } from "@typespec/openapi";
 import { Version, getVersions } from "@typespec/versioning";
 import { pascalCase } from "change-case";
-import { getClientLocation, getClientNameOverride, getIsApiVersion } from "./decorators.js";
+import pluralize from "pluralize";
+import {
+  getClientLocation,
+  getClientNameOverride,
+  getIsApiVersion,
+  getOverriddenClientMethod,
+  listClients,
+  listOperationGroups,
+  listOperationsInOperationGroup,
+} from "./decorators.js";
 import {
   DecoratedType,
   SdkBodyParameter,
@@ -36,20 +53,23 @@ import {
   SdkHttpOperationExample,
   SdkMethodParameter,
   SdkModelPropertyType,
+  SdkOperationGroup,
   SdkPathParameter,
   SdkQueryParameter,
   SdkServiceMethod,
-  SdkServiceOperation,
   SdkType,
   TCGCContext,
 } from "./interfaces.js";
 import {
   AllScopes,
-  ContextNode,
   TspLiteralType,
+  getHttpBodyType,
+  getHttpOperationResponseHeaders,
+  hasExplicitClientOrOperationGroup,
   hasNoneVisibility,
   isAzureCoreTspModel,
   listAllUserDefinedNamespaces,
+  listOrphanTypes,
   removeVersionsLargerThanExplicitlySpecified,
   resolveDuplicateGenearatedName,
 } from "./internal-utils.js";
@@ -254,8 +274,9 @@ export function getCrossLanguageDefinitionId(
       if (type.name) {
         break;
       }
-      // Use the naming context stack to determine the path for this anonymous type
-      const contextPath = [...context.__namingContextPath];
+      const contextPath = operation
+        ? getContextPath(context, operation, type)
+        : findContextPath(context, type);
       const namingPart = contextPath.slice(findLastNonAnonymousNode(contextPath));
       if (
         namingPart[0]?.type?.kind === "Model" ||
@@ -283,12 +304,6 @@ export function getCrossLanguageDefinitionId(
         if (type.model === operation?.parameters) {
           retval = `${getCrossLanguageDefinitionId(context, operation, undefined, false)}.${retval}`;
         } else {
-          // Use cached SDK model's crossLanguageDefinitionId if available to avoid stack context issues
-          const cachedSdkModel = context.__referencedTypeCache.get(type.model);
-          if (cachedSdkModel?.crossLanguageDefinitionId) {
-            // Cached ID already includes namespace, return directly
-            return `${cachedSdkModel.crossLanguageDefinitionId}.${retval}`;
-          }
           retval = `${getCrossLanguageDefinitionId(context, type.model, operation, false)}.${retval}`;
         }
       }
@@ -333,24 +348,318 @@ export function getCrossLanguagePackageId(context: TCGCContext): [string, readon
 export function getGeneratedName(
   context: TCGCContext,
   type: Model | Union | TspLiteralType,
-  _operation?: Operation,
+  operation?: Operation,
 ): string {
   const generatedName = context.__generatedNames.get(type);
   if (generatedName) return generatedName;
 
-  // Use the naming context stack to determine the path for this anonymous type
-  const contextPath = [...context.__namingContextPath];
+  const contextPath = operation
+    ? getContextPath(context, operation, type)
+    : findContextPath(context, type);
   const createdName = buildNameFromContextPaths(context, type, contextPath);
   return createdName;
+}
+
+/**
+ * Traverse each operation, model, and union to find one possible context path for the given type.
+ * @param context
+ * @param type
+ * @returns
+ */
+function findContextPath(
+  context: TCGCContext,
+  type: Model | Union | TspLiteralType,
+): ContextNode[] {
+  // orphan models and unions
+  for (const orphan of listOrphanTypes(context)) {
+    // skip models without non-metadata properties, as they cannot contain anonymous types
+    if (
+      orphan.kind === "Model" &&
+      [...orphan.properties.values()].filter((p) => !isMetadata(context.program, p)).length === 0
+    )
+      continue;
+    // skip enums because they cannot contain anonymous types that need generated names
+    if (orphan.kind === "Enum") continue;
+    const result = getContextPath(context, orphan, type);
+    if (result.length > 0) {
+      return result;
+    }
+  }
+  for (const client of listClients(context)) {
+    for (const operation of listOperationsInOperationGroup(context, client)) {
+      const result = getContextPath(context, operation, type);
+      if (result.length > 0) {
+        return result;
+      }
+    }
+    for (const og of listOperationGroups(context, client, true)) {
+      for (const operation of listOperationsInOperationGroup(context, og)) {
+        const result = getContextPath(context, operation, type);
+        if (result.length > 0) {
+          return result;
+        }
+      }
+    }
+  }
+  return [];
+}
+
+interface ContextNode {
+  name: string;
+  type: Model | Union | TspLiteralType | Operation;
+}
+
+/**
+ * Find one possible context path for the given type in the given operation, model, or union.
+ * @param context
+ * @param root
+ * @param typeToFind
+ * @returns
+ */
+function getContextPath(
+  context: TCGCContext,
+  root: Operation | Model | Union,
+  typeToFind: Model | Union | TspLiteralType,
+): ContextNode[] {
+  // use visited set to avoid cycle model reference
+  const visited: Set<Type> = new Set<Type>();
+  let result: ContextNode[];
+
+  if (root.kind === "Operation") {
+    const httpOperation = getHttpOperationWithCache(context, root);
+
+    if (httpOperation.parameters.body) {
+      visited.clear();
+      result = [{ name: root.name, type: root }];
+      const bodyType = getHttpBodyType(httpOperation.parameters.body);
+      if (dfsModelProperties(typeToFind, bodyType, "Request")) {
+        return result;
+      }
+
+      if (httpOperation.parameters.body.bodyKind === "multipart") {
+        for (const part of httpOperation.parameters.body.parts) {
+          visited.clear();
+          result = [{ name: root.name, type: root }];
+          if (
+            part.partKind === "model" &&
+            dfsModelProperties(typeToFind, part.body.type, `Request${pascalCase(part.name)}`)
+          ) {
+            return result;
+          }
+        }
+      }
+    }
+
+    for (const parameter of Object.values(httpOperation.parameters.parameters)) {
+      visited.clear();
+      result = [{ name: root.name, type: root }];
+      if (
+        dfsModelProperties(typeToFind, parameter.param.type, `Request${pascalCase(parameter.name)}`)
+      ) {
+        return result;
+      }
+    }
+
+    for (const response of httpOperation.responses) {
+      for (const innerResponse of response.responses) {
+        if (innerResponse.body?.type) {
+          visited.clear();
+          result = [{ name: root.name, type: root }];
+          if (dfsModelProperties(typeToFind, innerResponse.body.type, "Response", true)) {
+            return result;
+          }
+
+          if (innerResponse.body?.bodyKind === "multipart") {
+            for (const part of innerResponse.body.parts) {
+              visited.clear();
+              result = [{ name: root.name, type: root }];
+              if (
+                part.partKind === "model" &&
+                dfsModelProperties(typeToFind, part.body.type, `Request${pascalCase(part.name)}`)
+              ) {
+                return result;
+              }
+            }
+          }
+        }
+
+        const headers = getHttpOperationResponseHeaders(innerResponse);
+        if (headers) {
+          for (const header of Object.values(headers)) {
+            visited.clear();
+            result = [{ name: root.name, type: root }];
+            if (dfsModelProperties(typeToFind, header.type, `Response${pascalCase(header.name)}`)) {
+              return result;
+            }
+          }
+        }
+      }
+    }
+
+    const lroMetadata = getLroMetadata(context.program, root);
+    if (lroMetadata) {
+      const anonymousCandidates = [
+        { lroResultType: lroMetadata.finalResult, label: "FinalResult" },
+        { lroResultType: lroMetadata.logicalResult, label: "LogicalResult" },
+        { lroResultType: lroMetadata.envelopeResult, label: "EnvelopeResult" },
+        { lroResultType: lroMetadata.finalEnvelopeResult, label: "FinalEnvelopeResult" },
+      ];
+
+      for (const { lroResultType, label } of anonymousCandidates) {
+        if (!lroResultType || lroResultType === "void") {
+          continue;
+        }
+        visited.clear();
+        result = [{ name: root.name, type: root }];
+        if (dfsModelProperties(typeToFind, lroResultType, label)) {
+          return result;
+        }
+      }
+    }
+
+    const overriddenClientMethod = getOverriddenClientMethod(context, root);
+    visited.clear();
+    result = [{ name: root.name, type: root }];
+    if (dfsModelProperties(typeToFind, overriddenClientMethod ?? root.parameters, "Parameter")) {
+      return result;
+    }
+  } else {
+    visited.clear();
+    result = [];
+    if (dfsModelProperties(typeToFind, root, root.name ?? "")) {
+      return result;
+    }
+  }
+  return [];
+
+  /**
+   * Traverse each node, if it is not model or union, no need to traverse anymore.
+   * If it is the expected type just return.
+   * If it is array or dict, traverse the array/dict item node. e.g. {name: string}[] case.
+   * If it is model, add the current node to the path and traverse each property node.
+   * If it is model, traverse the base and derived model node if existed.
+   * @param expectedType
+   * @param currentType
+   * @param displayName
+   * @param currentContextPath
+   * @param contextPaths
+   * @param visited
+   * @returns
+   */
+  function dfsModelProperties(
+    expectedType: Model | Union | TspLiteralType,
+    currentType: Type,
+    displayName: string,
+    needFindEffectiveType: boolean = false,
+  ): boolean {
+    if (currentType == null || visited.has(currentType)) {
+      // cycle reference detected
+      return false;
+    }
+
+    if (!["Model", "Union", "String", "Number", "Boolean"].includes(currentType.kind)) {
+      return false;
+    }
+
+    visited.add(currentType);
+
+    if (currentType === expectedType) {
+      result.push({ name: displayName, type: currentType });
+      return true;
+    } else if (currentType.kind === "Model") {
+      // Peel off HttpPart<MyRealType> to get "MyRealType"
+      const typeWrappedByHttpPart = getHttpPart(context.program, currentType);
+      if (typeWrappedByHttpPart) {
+        return dfsModelProperties(expectedType, typeWrappedByHttpPart.type, displayName);
+      }
+
+      if (
+        currentType.indexer &&
+        currentType.properties.size === 0 &&
+        ((currentType.indexer.key.name === "string" && currentType.name === "Record") ||
+          currentType.indexer.key.name === "integer")
+      ) {
+        // handle array or dict
+        const dictOrArrayItemType: Type = currentType.indexer.value;
+        return dfsModelProperties(
+          expectedType,
+          dictOrArrayItemType,
+          pluralize.singular(displayName),
+        );
+      }
+
+      // handle model
+      if (needFindEffectiveType) {
+        currentType = getEffectiveModelType(context.program, currentType);
+      }
+      result.push({ name: displayName, type: currentType });
+      for (const property of currentType.properties.values()) {
+        // traverse model property
+        // use property.name as displayName
+        const result = dfsModelProperties(expectedType, property.type, property.name);
+        if (result) return true;
+      }
+      // handle additional properties type: model MyModel is Record<> {}
+      if (currentType.sourceModel?.kind === "Model" && currentType.sourceModel?.name === "Record") {
+        const result = dfsModelProperties(
+          expectedType,
+          currentType.sourceModel!.indexer!.value!,
+          "AdditionalProperty",
+        );
+        if (result) return true;
+      }
+      // handle additional properties type: model MyModel { ...Record<>}
+      if (currentType.indexer) {
+        const result = dfsModelProperties(
+          expectedType,
+          currentType.indexer.value,
+          "AdditionalProperty",
+        );
+        if (result) return true;
+      }
+      // handle additional properties type: model MyModel extends Record<> {}
+      const baseModel = currentType.baseModel;
+      if (baseModel) {
+        if (baseModel.name === "Record") {
+          const result = dfsModelProperties(
+            expectedType,
+            baseModel.indexer!.value!,
+            "AdditionalProperty",
+          );
+          if (result) return true;
+        }
+      }
+      result.pop();
+      if (baseModel) {
+        const result = dfsModelProperties(expectedType, baseModel, baseModel.name);
+        if (result) return true;
+      }
+      // TODO: come back and see if derived models are needed to change
+      for (const derivedModel of currentType.derivedModels) {
+        const result = dfsModelProperties(expectedType, derivedModel, derivedModel.name);
+        if (result) return true;
+      }
+      return false;
+    } else if (currentType.kind === "Union") {
+      // handle union
+      for (const unionType of currentType.variants.values()) {
+        // traverse union type
+        // use unionType.name as displayName
+        const result = dfsModelProperties(expectedType, unionType.type, displayName);
+        if (result) return true;
+      }
+      return false;
+    } else {
+      return false;
+    }
+  }
 }
 
 function findLastNonAnonymousNode(contextPath: ContextNode[]): number {
   let lastNonAnonymousModelNodeIndex = contextPath.length - 1;
   while (lastNonAnonymousModelNodeIndex >= 0) {
     const currType = contextPath[lastNonAnonymousModelNodeIndex].type;
-    // If type is undefined, treat as anonymous (continue looking)
     if (
-      currType &&
       (currType.kind === "Model" || currType.kind === "Union" || currType.kind === "Operation") &&
       currType.name
     ) {
@@ -376,9 +685,9 @@ function buildNameFromContextPaths(
   type: Union | Model | TspLiteralType,
   contextPath: ContextNode[],
 ): string {
-  // fallback: when no context path, use "Anonymous" + type kind with deduplicating suffix
+  // fallback to empty name for corner case
   if (contextPath.length === 0) {
-    return resolveDuplicateGenearatedName(context, type, `Anonymous${type.kind}`);
+    return "";
   }
 
   // 1. find the last non-anonymous model node
@@ -568,7 +877,7 @@ export function resolveOperationId(
 
   const clientLocation = getClientLocation(context, operation);
 
-  if (clientLocation) {
+  if (!hasExplicitClientOrOperationGroup(context) && clientLocation) {
     if (typeof clientLocation === "string") {
       return `${clientLocation}_${operationName}`;
     }
@@ -595,26 +904,6 @@ export function resolveOperationId(
 }
 
 /**
- * Get the path of a client in the client hierarchy.
- * For root clients, this returns just the client name.
- * For sub clients, this returns the full path like "RootClient.SubClient.NestedClient".
- *
- * @param client The SdkClientType to get the path for
- * @returns The client path string
- */
-export function getClientPath<TServiceOperation extends SdkServiceOperation>(
-  client: SdkClientType<TServiceOperation>,
-): string {
-  const parts: string[] = [client.name];
-  let current = client.parent;
-  while (current) {
-    parts.unshift(current.name);
-    current = current.parent;
-  }
-  return parts.join(".");
-}
-
-/**
  * Judge whether a model's property is an HTTP metadata.
  * @param context TCGC context
  * @param property
@@ -624,11 +913,13 @@ export function isHttpMetadata(context: TCGCContext, property: SdkModelPropertyT
   return property.__raw !== undefined && isMetadata(context.program, property.__raw);
 }
 
-export function getNamespaceFromType(type: Type | SdkClient | undefined): Namespace | undefined {
+export function getNamespaceFromType(
+  type: Type | SdkClient | SdkOperationGroup | undefined,
+): Namespace | undefined {
   if (type === undefined) {
     return undefined;
   }
-  if (type.kind === "SdkClient") {
+  if (type.kind === "SdkOperationGroup" || type.kind === "SdkClient") {
     const rawType = type.type;
     if (rawType === undefined) {
       return undefined;

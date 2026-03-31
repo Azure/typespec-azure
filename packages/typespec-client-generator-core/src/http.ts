@@ -3,7 +3,6 @@ import {
   ModelProperty,
   Operation,
   Type,
-  Union,
   compilerAssert,
   createDiagnosticCollector,
   getEncode,
@@ -36,10 +35,8 @@ import { getResponseAsBool, isInScope, shouldOmitSlashFromEmptyRoute } from "./d
 import {
   CollectionFormat,
   SdkBodyParameter,
-  SdkBuiltInType,
   SdkClientType,
   SdkCookieParameter,
-  SdkEnumType,
   SdkHeaderParameter,
   SdkHttpErrorResponse,
   SdkHttpOperation,
@@ -54,7 +51,6 @@ import {
   SdkStreamMetadata,
   SdkType,
   TCGCContext,
-  UsageFlags,
 } from "./interfaces.js";
 import {
   compareModelProperties,
@@ -73,6 +69,7 @@ import {
   isSubscriptionId,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
+import { isMediaTypeJson, isMediaTypeOctetStream, isMediaTypeTextPlain } from "./media-types.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -399,15 +396,25 @@ function createContentTypeOrAcceptHeader(
 ): Omit<SdkMethodParameter, "kind"> {
   const name = bodyObject.kind === "body" ? "contentType" : "accept";
   let type: SdkType = getTypeSpecBuiltInType(context, "string");
-  // Honor the content types from the HTTP library result.
-  // For a single content type, create a constant. For multiple content types, create an enum.
-  // For File type bodies, the content type is constrained by the File type itself;
-  // treat it the same as a user-defined content type/accept parameter.
+  // for contentType, we treat it as a constant IFF there's one value and it's one of:
+  //  - application/json
+  //  - text/plain
+  //  - application/octet-stream
+  // this is to prevent a breaking change when a service adds more content types in the future.
+  // e.g. the service accepting image/png then later image/jpeg should _not_ be a breaking change.
+  //
+  // for accept, we treat it as a constant IFF there's a single value. adding more content types
+  // for this case is considered a breaking change for SDKs so we want to surface it as such.
+  // e.g. the service returns image/png then later provides the option to return image/jpeg.
   if (
     bodyObject.contentTypes &&
     bodyObject.contentTypes.length === 1 &&
-    bodyObject.contentTypes[0] !== "*/*"
+    (isMediaTypeJson(bodyObject.contentTypes[0]) ||
+      isMediaTypeTextPlain(bodyObject.contentTypes[0]) ||
+      isMediaTypeOctetStream(bodyObject.contentTypes[0]) ||
+      name === "accept")
   ) {
+    // in this case, we just want a content type of application/json
     type = {
       kind: "constant",
       value: bodyObject.contentTypes[0],
@@ -416,39 +423,9 @@ function createContentTypeOrAcceptHeader(
       isGeneratedName: true,
       decorators: [],
     };
-  } else if (bodyObject.contentTypes && bodyObject.contentTypes.length > 1) {
-    const stringType: SdkBuiltInType = getTypeSpecBuiltInType(context, "string");
-    const enumType: SdkEnumType = {
-      kind: "enum",
-      name: `${httpOperation.operation.name}ContentType`,
-      isGeneratedName: true,
-      namespace: "",
-      valueType: stringType,
-      values: [],
-      isFixed: true,
-      isFlags: false,
-      usage: UsageFlags.None,
-      access: "public",
-      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
-      apiVersions: bodyObject.apiVersions,
-      isUnionAsEnum: false,
-      decorators: [],
-    };
-    enumType.values = bodyObject.contentTypes.map((ct) => ({
-      kind: "enumvalue" as const,
-      name: ct,
-      value: ct,
-      enumType,
-      valueType: stringType,
-      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}.${ct}`,
-      decorators: [],
-    }));
-    type = enumType;
   }
   const optional = bodyObject.kind === "body" ? bodyObject.optional : false;
-  // For */* wildcard, provide a sensible client default value
-  const isWildcard = bodyObject.contentTypes?.length === 1 && bodyObject.contentTypes[0] === "*/*";
-  // No need for clientDefaultValue when it's a constant, it only has one value
+  // No need for clientDefaultValue because it's a constant, it only has one value
   return {
     type,
     name,
@@ -457,7 +434,6 @@ function createContentTypeOrAcceptHeader(
     isApiVersionParam: false,
     onClient: false,
     optional: optional,
-    ...(isWildcard && { clientDefaultValue: "application/octet-stream" }),
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
     decorators: [],
     access: "public",
@@ -611,12 +587,10 @@ function getSdkHttpResponseAndExceptions(
   const exceptions: SdkHttpErrorResponse[] = [];
   for (const response of httpOperation.responses) {
     const headers: SdkServiceResponseHeader[] = [];
-    const bodyTypes: Type[] = [];
+    let body: Type | undefined;
     let type: SdkType | undefined;
     let contentTypes: string[] = [];
     let streamMetadata: SdkStreamMetadata | undefined;
-    let lastBodyProperty: ModelProperty | undefined;
-    let lastDefaultContentType: string | undefined;
 
     for (const innerResponse of response.responses) {
       const defaultContentType = innerResponse.body?.contentTypes.includes("application/json")
@@ -630,14 +604,12 @@ function getSdkHttpResponseAndExceptions(
           ),
           __raw: header,
           kind: "responseheader",
-          serializedName:
-            getHeaderFieldName(context.program, header) ??
-            (header === innerResponse.body?.contentTypeProperty ? "Content-Type" : header.name),
+          serializedName: getHeaderFieldName(context.program, header),
         });
         context.__responseHeaderCache.set(header, headers[headers.length - 1]);
       }
       if (innerResponse.body && !isNeverOrVoidType(innerResponse.body.type)) {
-        if (bodyTypes.length > 0 && !bodyTypes.includes(innerResponse.body.type)) {
+        if (body && body !== innerResponse.body.type) {
           diagnostics.add(
             createDiagnostic({
               code: "multiple-response-types",
@@ -647,13 +619,13 @@ function getSdkHttpResponseAndExceptions(
               },
             }),
           );
-        }
-        if (!bodyTypes.includes(innerResponse.body.type)) {
-          bodyTypes.push(innerResponse.body.type);
+          body = tk.union.create([body, innerResponse.body.type]);
+        } else if (!body) {
+          body = innerResponse.body.type;
         }
         contentTypes = contentTypes.concat(innerResponse.body.contentTypes);
-        lastBodyProperty = innerResponse.body.property;
-        lastDefaultContentType = defaultContentType;
+        body =
+          body.kind === "Model" ? getEffectivePayloadType(context, body, Visibility.Read) : body;
         const responseStreamMeta = getStreamMetadata(context.program, innerResponse);
         if (responseStreamMeta) {
           // map stream response body type to bytes, but preserve stream metadata
@@ -661,37 +633,14 @@ function getSdkHttpResponseAndExceptions(
           streamMetadata = diagnostics.pipe(
             buildSdkStreamMetadata(context, responseStreamMeta, httpOperation.operation),
           );
+        } else {
+          type = diagnostics.pipe(
+            getClientTypeWithDiagnostics(context, body, httpOperation.operation),
+          );
+          if (innerResponse.body.property) {
+            addEncodeInfo(context, innerResponse.body.property, type, defaultContentType);
+          }
         }
-      }
-    }
-
-    // Create SDK type from collected body types after iteration
-    let body: Type | undefined;
-    if (!type && bodyTypes.length > 0) {
-      if (bodyTypes.length === 1) {
-        body = bodyTypes[0];
-      } else {
-        body = tk.union.create(bodyTypes);
-      }
-      body = body.kind === "Model" ? getEffectivePayloadType(context, body, Visibility.Read) : body;
-      if (bodyTypes.length > 1) {
-        // Push naming context for the synthetic union so it gets a proper generated name
-        context.__namingContextPath.push({
-          name: httpOperation.operation.name,
-          type: httpOperation.operation,
-        });
-        context.__namingContextPath.push({
-          name: "Response",
-          type: body as Union,
-        });
-      }
-      type = diagnostics.pipe(getClientTypeWithDiagnostics(context, body, httpOperation.operation));
-      if (bodyTypes.length > 1) {
-        context.__namingContextPath.pop();
-        context.__namingContextPath.pop();
-      }
-      if (lastBodyProperty) {
-        addEncodeInfo(context, lastBodyProperty, type, lastDefaultContentType);
       }
     }
     const sdkResponse = {
@@ -714,7 +663,7 @@ function getSdkHttpResponseAndExceptions(
     if (
       response.statusCodes === "*" ||
       isErrorModel(context.program, response.type) ||
-      (bodyTypes.length > 0 && bodyTypes.some((b) => isErrorModel(context.program, b)))
+      (body && isErrorModel(context.program, body))
     ) {
       exceptions.push({
         ...sdkResponse,

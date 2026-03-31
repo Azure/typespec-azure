@@ -69,9 +69,9 @@ it("multiple services should populate apiVersions map with all services", async 
         {
           name: "CombineClient",
           service: [ServiceA, ServiceB],
-          autoMergeService: true,
         }
       )
+      @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
       namespace CombineClient;
     `,
     ),

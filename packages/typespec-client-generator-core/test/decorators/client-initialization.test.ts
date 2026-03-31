@@ -413,12 +413,13 @@ it("multiple client params", async () => {
   strictEqual(containerNameOpParam.correspondingMethodParams[0], containerName);
 });
 
-it("Sub client with same model on parent client", async () => {
+it("@operationGroup with same model on parent client", async () => {
   const { program } = await SimpleTester.compile(
     `
       @service
       namespace MyService;
 
+      @operationGroup
       interface MyInterface {
         op download(@path blobName: string, @path containerName: string): void;
       }
@@ -534,7 +535,7 @@ it("redefine client structure", async () => {
   );
   const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
-  strictEqual(sdkPackage.clients.length, 1);
+  strictEqual(sdkPackage.clients.length, 2);
 
   const containerClient = sdkPackage.clients.find((x) => x.name === "ContainerClient");
   ok(containerClient);
@@ -567,9 +568,9 @@ it("redefine client structure", async () => {
   strictEqual(methods[0].operation.parameters.length, 1);
   strictEqual(methods[0].operation.parameters[0].correspondingMethodParams[0], containerName);
 
-  const blobClient = containerClient.children?.find((x) => x.name === "BlobClient");
+  const blobClient = sdkPackage.clients.find((x) => x.name === "BlobClient");
   ok(blobClient);
-  strictEqual(blobClient.clientInitialization.initializedBy, InitializedByFlags.Default);
+  strictEqual(blobClient.clientInitialization.initializedBy, InitializedByFlags.Individually);
   strictEqual(blobClient.clientInitialization.parameters.length, 3);
 
   const endpointOnBlobClient = blobClient.clientInitialization.parameters.find(

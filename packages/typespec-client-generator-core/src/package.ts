@@ -4,7 +4,6 @@ import {
   getNamespaceFullName,
   ignoreDiagnostics,
 } from "@typespec/compiler";
-import { createHash } from "node:crypto";
 import { prepareClientAndOperationCache } from "./cache.js";
 import { createSdkClientType } from "./clients.js";
 import { listClients } from "./decorators.js";
@@ -60,7 +59,6 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
       (x): x is SdkUnionType | SdkNullableType => x.kind === "union" || x.kind === "nullable",
     ),
     crossLanguagePackageId,
-    crossLanguageVersion: "", // Placeholder, computed after package is fully built
     namespaces: [],
     licenseInfo: getLicenseInfo(context),
     metadata: {
@@ -74,10 +72,6 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
     },
   };
   organizeNamespaces(context, sdkPackage);
-
-  // Compute cross-language version hash from source files
-  sdkPackage.crossLanguageVersion = computeCrossLanguageVersion(context);
-
   return diagnostics.wrap(sdkPackage);
 }
 
@@ -146,14 +140,14 @@ function getSdkNamespace<TServiceOperation extends SdkServiceOperation>(
 }
 
 function populateApiVersionInformation(context: TCGCContext): void {
-  if (context.__rawClientsCache === undefined) {
+  if (context.__rawClientsOperationGroupsCache === undefined) {
     prepareClientAndOperationCache(context);
   }
 
   // Get the package versions map once (this handles both single and multi-service scenarios)
   const packageVersions = context.getPackageVersions();
 
-  for (const client of context.__rawClientsCache!.values()) {
+  for (const client of context.__rawClientsOperationGroupsCache!.values()) {
     const clientType = getActualClientType(client);
 
     // Multiple service case. Set empty result.
@@ -171,30 +165,4 @@ function populateApiVersionInformation(context: TCGCContext): void {
       context.__clientApiVersionDefaultValueCache.set(client, versions[versions.length - 1]);
     }
   }
-}
-
-/**
- * Computes a cross-language version hash from all API-affecting elements in the package.
- * The hash is a SHA256 digest truncated to 12 hex characters.
- *
- * Creates a normalized API snapshot capturing:
- * - Clients, methods, and parameters (with optionality and types)
- * - Models and properties (with optionality and types)
- * - Enums and their values
- * - Unions
- * - HTTP operation details (verb, path, parameter locations)
- */
-function computeCrossLanguageVersion(context: TCGCContext): string {
-  // Concatenate all source file contents
-  const content = [...context.program.sourceFiles.values()]
-    .filter((script) => {
-      const locationContext = context.program.getSourceFileLocationContext(script.file);
-      return locationContext.type === "project";
-    })
-    .map((script) => script.file.text)
-    .join("");
-
-  // Hash the combined content
-  const hash = createHash("sha256").update(content).digest("hex");
-  return hash.substring(0, 12);
 }

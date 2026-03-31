@@ -17,16 +17,3 @@ updates:
     schedule:
       interval: "daily"
     labels: [] # conflict with our labels in labels.ts
-
-  # GitHub Actions
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    exclude-paths:
-      - ".github/workflows/*.lock.{yaml,yml}"
-    labels: [] # conflict with our labels in labels.ts
-    groups:
-      actions:
-        patterns:
-          - "*"

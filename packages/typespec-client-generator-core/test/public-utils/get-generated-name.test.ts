@@ -862,13 +862,13 @@ describe("corner case", () => {
     );
   });
 
-  it("anonymous model naming in multi layer sub client", async () => {
-    const { program } = await SimpleTester.compile(t.code`
+  it("anonymous model naming in multi layer operation group", async () => {
+    const { program, TestModel } = await SimpleTester.compile(t.code`
       @service
       namespace MyService {
         namespace Test {
           namespace InnerTest {
-            model TestModel {
+            model ${t.model("TestModel")} {
               anonymousProp: {prop: string}
             }
             op test(): TestModel;
@@ -878,13 +878,9 @@ describe("corner case", () => {
     `);
     const context = await createSdkContextForTester(program);
 
-    // Check the generated name from the SDK package
-    const models = context.sdkPackage.models;
-    const testModel = models.find((m) => m.name === "TestModel");
-    ok(testModel);
-    const anonymousPropType = testModel.properties.find((p) => p.name === "anonymousProp")?.type;
-    strictEqual(anonymousPropType?.kind, "model");
-    strictEqual(anonymousPropType?.name, "TestModelAnonymousProp");
+    context.__generatedNames?.clear();
+    const name = getGeneratedName(context, [...TestModel.properties.values()][0].type as Model);
+    strictEqual(name, "TestModelAnonymousProp");
   });
 
   it("anonymous model in response", async () => {

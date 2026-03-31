@@ -80,6 +80,7 @@ import {
   SdkEnumType,
   SdkHeaderParameter,
   SdkMethodParameter,
+  SdkOperationGroup,
   SdkServiceOperation,
   SdkType,
   TCGCContext,
@@ -122,14 +123,27 @@ export const clientNamespaceKey = createStateSymbol("clientNamespace");
 export const negationScopesKey = createStateSymbol("negationScopes");
 export const scopeKey = createStateSymbol("scope");
 export const clientKey = createStateSymbol("client");
+export const operationGroupKey = createStateSymbol("operationGroup");
 export const clientLocationKey = createStateSymbol("clientLocation");
 export const omitOperation = createStateSymbol("omitOperation");
 export const overrideKey = createStateSymbol("override");
 export const usageKey = createStateSymbol("usage");
 export const legacyHierarchyBuildingKey = createStateSymbol("legacyHierarchyBuilding");
 
-export function hasExplicitClient(context: TCGCContext): boolean {
-  return listScopedDecoratorData(context, clientKey).size > 0;
+export function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
+  // Multiple services case is not considered explicit client. It is auto-merged.
+  const explicitClients = listScopedDecoratorData(context, clientKey);
+  let multiServices = false;
+  explicitClients.forEach((value) => {
+    if ((value as SdkClient).services.length > 1) {
+      multiServices = true;
+    }
+  });
+
+  return (
+    (explicitClients.size > 0 && !multiServices) ||
+    listScopedDecoratorData(context, operationGroupKey).size > 0
+  );
 }
 
 export function listScopedDecoratorData(
@@ -173,7 +187,7 @@ export function getScopedDecoratorData(
   }
   if (languageScope === undefined || typeof languageScope === "string") {
     const scope = languageScope ?? context.emitterName;
-    if (scope in retval) return retval[scope];
+    if (Object.keys(retval).includes(scope)) return retval[scope];
 
     // if the scope is negated, we should return undefined
     // if the scope is not negated, we should return the value for AllScopes
@@ -293,20 +307,12 @@ export function parseEmitterName(
  * @returns The service namespace that contains the operation
  */
 export function findServiceForOperation(services: Namespace[], operation: Operation): Namespace {
-  // Follow the sourceOperation chain to find the original service namespace.
-  // This is needed when operations are defined using `is` in customization interfaces
-  // (e.g., `opB is ServiceB.Operations.opB`), where the operation's namespace is the
-  // customization namespace rather than the original service namespace.
-  let current: Operation | undefined = operation;
-  while (current) {
-    let namespace = current.namespace;
-    while (namespace) {
-      if (services.includes(namespace)) {
-        return namespace;
-      }
-      namespace = namespace.namespace;
+  let namespace = operation.namespace;
+  while (namespace) {
+    if (services.includes(namespace)) {
+      return namespace;
     }
-    current = current.sourceOperation;
+    namespace = namespace.namespace;
   }
   // Fallback to the first service. This can happen when an operation is defined outside
   // of any service namespace (e.g., in Azure.ResourceManager or other shared namespaces)
@@ -319,14 +325,14 @@ export function findServiceForOperation(services: Namespace[], operation: Operat
  *
  * @param context
  * @param type The type that we are adding api version information onto
- * @param client The client or sub clients that contains the operation
- * @param operation The operation that contains the api version parameter (needed for multi-service sub clients)
+ * @param client The client or operation group that contains the operation
+ * @param operation The operation that contains the api version parameter (needed for multi-service operation groups)
  * @returns Whether the type is the api version parameter and the default value for the client
  */
 export function updateWithApiVersionInformation(
   context: TCGCContext,
   type: ModelProperty,
-  client?: SdkClient,
+  client?: SdkClient | SdkOperationGroup,
   operation?: Operation,
 ): {
   isApiVersionParam: boolean;
@@ -345,7 +351,7 @@ export function updateWithApiVersionInformation(
     };
   }
 
-  // For multi-service clients/sub clients, we need to find the api version
+  // For multi-service clients/operation groups, we need to find the api version
   // from the operation's specific service
   if (operation) {
     const service = findServiceForOperation(client.services, operation);
@@ -609,13 +615,6 @@ export function isHttpOperation(context: TCGCContext, obj: any): obj is HttpOper
 
 export type TspLiteralType = StringLiteral | NumericLiteral | BooleanLiteral;
 
-/** A node in a context path that tracks the traversal position for naming anonymous types. */
-export interface ContextNode {
-  name: string;
-  // Type can be undefined to indicate "anonymous" context (e.g., when property type is a named union)
-  type: Model | Union | TspLiteralType | Operation | undefined;
-}
-
 export function getNonNullOptions(type: Union): Type[] {
   return [...type.variants.values()].map((x) => x.type).filter((t) => !isNullType(t));
 }
@@ -796,13 +795,13 @@ export function getCorrespondingClientParam(
   operation: Operation,
 ): SdkMethodParameter | undefined {
   const clientParams = [];
-  let client: SdkClient | undefined = context.getClientForOperation(operation);
+  let client: SdkClient | SdkOperationGroup | undefined = context.getClientForOperation(operation);
   while (client) {
     const clientParamsForClient = context.__clientParametersCache.get(client);
     if (clientParamsForClient) {
       clientParams.push(...clientParamsForClient);
     }
-    if (!client.parent) {
+    if (client.kind === "SdkClient") {
       break;
     }
     client = client.parent;
@@ -910,69 +909,79 @@ function getVersioningMutator(
 
 export function handleVersioningMutationForGlobalNamespace(context: TCGCContext): Namespace {
   const globalNamespace = context.program.getGlobalNamespaceType();
-
-  // First consider explicit clients
-  const servicesNs = new Set<Namespace>();
-  listScopedDecoratorData(context, clientKey).forEach((v, k) => {
-    // See all explicit clients that in TypeSpec program
-    if (!unsafe_Realm.realmForType.has(k)) {
-      (v as SdkClient).services.forEach((s) => servicesNs.add(s));
-    }
-  });
-
-  // Then see the original services
-  if (servicesNs.size === 0) {
-    listServices(context.program).map((v) => servicesNs.add(v.type));
-  }
+  const services = listServices(context.program);
 
   // No service, thus no versioning mutation needed
-  if (servicesNs.size === 0) return globalNamespace;
+  if (services.length === 0) return globalNamespace;
 
   // Explicit all API version setting, thus no versioning mutation needed
   if (context.apiVersion === "all") return globalNamespace;
 
-  // Compose service mutators
-  const mutators: unsafe_MutatorWithNamespace[] = [];
-
-  for (const serviceNs of servicesNs) {
-    const versions = getVersions(context.program, serviceNs)[1]?.getVersions();
-    // If the service has no versioning, no mutation needed
-    if (!versions || versions.length === 0) return globalNamespace;
-
-    // Single service needs to filter versions based on `apiVersion` config
-    if (servicesNs.size === 1) {
-      removeVersionsLargerThanExplicitlySpecified(context, versions);
+  const explicitClientNamespaces: Namespace[] = [];
+  const explicitServices = new Set<Namespace>();
+  listScopedDecoratorData(context, clientKey).forEach((v, k) => {
+    // See all explicit clients that in TypeSpec program
+    if (!unsafe_Realm.realmForType.has(k)) {
+      const sdkClient = v as SdkClient;
+      explicitClientNamespaces.push(k as Namespace);
+      sdkClient.services.forEach((s) => explicitServices.add(s));
     }
+  });
 
+  let mutator: unsafe_MutatorWithNamespace | undefined;
+
+  // No explicit clients (choose first service) or explicit client with one service
+  if (explicitClientNamespaces.length === 0 || explicitServices.size === 1) {
+    const serviceNamespace =
+      explicitClientNamespaces.length === 0
+        ? services[0].type
+        : explicitServices.values().next().value!;
+    const versions = getVersions(context.program, serviceNamespace)[1]?.getVersions();
+    // If the single service has no versioning, no mutation needed
+    if (!versions) return globalNamespace;
+
+    // Filter versions based on `apiVersion` config
+    removeVersionsLargerThanExplicitlySpecified(context, versions);
     const versionsValues = versions.map((v) => v.value);
 
     // Fix apiVersion setting problem only if there's only one service
-    if (servicesNs.size === 1) {
-      if (
-        context.apiVersion !== undefined &&
-        context.apiVersion !== "latest" &&
-        context.apiVersion !== "all" &&
-        !versionsValues.includes(context.apiVersion)
-      ) {
-        reportDiagnostic(context.program, {
-          code: "api-version-undefined",
-          format: { version: context.apiVersion },
-          target: serviceNs,
-        });
-        context.apiVersion = versionsValues[versionsValues.length - 1];
-      }
+    if (
+      context.apiVersion !== undefined &&
+      context.apiVersion !== "latest" &&
+      context.apiVersion !== "all" &&
+      !versionsValues.includes(context.apiVersion)
+    ) {
+      reportDiagnostic(context.program, {
+        code: "api-version-undefined",
+        format: { version: context.apiVersion },
+        target: services[0].type,
+      });
+      context.apiVersion = versionsValues[versionsValues.length - 1];
     }
 
-    // Get service mutator according to the version setting
-    const mutator = getVersioningMutator(
+    mutator = getVersioningMutator(
       context,
-      serviceNs,
+      serviceNamespace,
       versionsValues[versionsValues.length - 1],
     );
-    if (mutator) mutators.push(mutator);
   }
-  if (mutators.length === 0) return globalNamespace;
-  const subgraph = unsafe_mutateSubgraphWithNamespace(context.program, mutators, globalNamespace);
+  // Explicit clients with multiple services
+  else {
+    // Currently we do not support multiple explicit clients with multiple services
+    if (explicitClientNamespaces.length > 1 && explicitServices.size > 1) {
+      reportDiagnostic(context.program, {
+        code: "multiple-explicit-clients-multiple-services",
+        format: {},
+        target: services[0].type,
+      });
+      return globalNamespace;
+    }
+
+    mutator = getVersioningMutator(context, explicitClientNamespaces[0]);
+  }
+
+  if (!mutator) return globalNamespace;
+  const subgraph = unsafe_mutateSubgraphWithNamespace(context.program, [mutator], globalNamespace);
   compilerAssert(subgraph.type.kind === "Namespace", "Should not have mutated to another type");
   compilerAssert(subgraph.realm !== null, "Should have a realm after mutation");
   context.__mutatedRealm = subgraph.realm;
@@ -1167,9 +1176,10 @@ export function getTcgcLroMetadata<TServiceOperation extends SdkServiceOperation
   return undefined;
 }
 
-export function getActualClientType(client: SdkClient): Namespace | Interface {
+export function getActualClientType(client: SdkClient | SdkOperationGroup): Namespace | Interface {
+  if (client.kind === "SdkClient") return client.type;
   if (client.type) return client.type;
-  // For merged multi-service sub clients where type is cleared or sub client created by string client location, fall back to the first service
+  // Created operation group from `@clientLocation`. May have single or multiple services. Choose the first service for multi-service case.
   return client.services[0];
 }
 

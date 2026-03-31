@@ -120,73 +120,23 @@ function parsePython(
 
 /**
  * Java-specific metadata parser.
- * Derives the Maven artifact ID from namespace and prepends the appropriate
- * Maven groupId based on the flavor and whether this is a management-plane service.
- *
- * GroupId prefix rules:
- *   - data plane, no v2 flavor  → com.azure
- *   - management plane, no v2   → com.azure.resourcemanager
- *   - data plane, azurev2 flavor → com.azure.v2
- *   - management plane, azurev2  → com.azure.resourcemanager.v2
- *
- * When flavor is azurev2, the namespace may already contain 'v2' as a path segment
- * (e.g. com.azure.v2.security.keyvault.keys). The 'v2' segment is stripped when
- * deriving the artifact ID to avoid duplication (azure-v2-... → azure-...).
- *
- * The final package name is formatted as `{groupId}:{artifactId}`.
+ * Strips 'com.' prefix from namespace if present for package name derivation.
  */
 function parseJava(
   options: Record<string, unknown>,
   params: Record<string, unknown>,
 ): LanguageParserResult {
-  const rawPackageName = options["package-name"] ?? options["package_name"];
+  let packageName = options["package-name"] ?? options["package_name"];
   const namespace = options["namespace"];
-  const flavor = options["flavor"];
-  const isV2 = flavor === "azurev2";
 
-  // Derive the artifact ID (the part after the colon in Maven coordinates)
-  let artifactId: string | undefined;
-  if (rawPackageName) {
-    artifactId = String(fillVars(rawPackageName, params));
-  } else if (namespace) {
+  if (namespace && !packageName) {
     const ns = String(namespace);
-    let stripped = ns.startsWith("com.") ? ns.substring(4) : ns;
-    // When the flavor is azurev2, the namespace may contain 'v2' as a segment
-    // (e.g. com.azure.v2.security.keyvault.keys or com.azure.resourcemanager.v2.cdn).
-    // The 'v2' is already encoded in the Maven groupId, so strip it from the
-    // artifact ID portion to avoid duplication (e.g. azure-v2-security-... → azure-security-...).
-    if (isV2) {
-      stripped = stripped
-        .replace(/^(azure\.resourcemanager\.)v2\./, "$1")
-        .replace(/^(azure\.)v2\./, "$1");
-    }
-    artifactId = stripped.replace(/\./g, "-");
-  }
-
-  let packageName: string | undefined;
-  if (artifactId) {
-    // If the artifact ID already contains a colon it is already in Maven coordinate
-    // format (groupId:artifactId); use it as-is.
-    if (artifactId.includes(":")) {
-      packageName = artifactId;
-    } else {
-      const isManagement = namespace
-        ? String(namespace).startsWith("com.azure.resourcemanager")
-        : false;
-
-      let groupId: string;
-      if (isManagement) {
-        groupId = isV2 ? "com.azure.resourcemanager.v2" : "com.azure.resourcemanager";
-      } else {
-        groupId = isV2 ? "com.azure.v2" : "com.azure";
-      }
-
-      packageName = `${groupId}:${artifactId}`;
-    }
+    const stripped = ns.startsWith("com.") ? ns.substring(4) : ns;
+    packageName = stripped.replace(/\./g, "-");
   }
 
   return {
-    packageName,
+    packageName: packageName ? String(fillVars(packageName, params)) : undefined,
     namespace: namespace ? String(fillVars(namespace, params)) : undefined,
   };
 }

@@ -29,7 +29,8 @@ it("error for same model name across namespaces with namespace flag", async () =
       }
       `,
       `
-      @client({ name: "CombineClient", service: [ServiceA, ServiceB], autoMergeService: true })
+      @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+      @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
       namespace CombineClient;
       `,
     ),
@@ -68,7 +69,8 @@ it("error for same enum name across namespaces with namespace flag", async () =>
       }
       `,
       `
-      @client({ name: "CombineClient", service: [ServiceA, ServiceB], autoMergeService: true })
+      @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+      @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
       namespace CombineClient;
       `,
     ),
@@ -107,7 +109,8 @@ it("error for same union name across namespaces with namespace flag", async () =
       }
       `,
       `
-      @client({ name: "CombineClient", service: [ServiceA, ServiceB], autoMergeService: true })
+      @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+      @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
       namespace CombineClient;
       `,
     ),
@@ -145,7 +148,8 @@ it("no error for different names across namespaces with namespace flag", async (
       }
       `,
       `
-      @client({ name: "CombineClient", service: [ServiceA, ServiceB], autoMergeService: true })
+      @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+      @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
       namespace CombineClient;
       `,
     ),
@@ -181,7 +185,8 @@ it("error for @clientName same name across namespaces with namespace flag", asyn
       }
       `,
       `
-      @client({ name: "CombineClient", service: [ServiceA, ServiceB], autoMergeService: true })
+      @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+      @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
       namespace CombineClient;
       `,
     ),
@@ -224,7 +229,8 @@ it("error for nested namespace type with same name with namespace flag", async (
       }
       `,
       `
-      @client({ name: "CombineClient", service: [ServiceA, ServiceB], autoMergeService: true })
+      @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+      @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
       namespace CombineClient;
       `,
     ),
@@ -285,7 +291,8 @@ it("no error for same API version enum name across namespaces with namespace fla
       }
       `,
       `
-      @client({ name: "CombineClient", service: [ServiceA, ServiceB], autoMergeService: true })
+      @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+      @useDependency(ServiceA.Versions.v1, ServiceB.Versions.v1)
       namespace CombineClient;
       `,
     ),
@@ -322,7 +329,8 @@ it("no error for same model name across services in multi-service client without
       }
       `,
       `
-      @client({ name: "CombineClient", service: [ServiceA, ServiceB], autoMergeService: true })
+      @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+      @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
       namespace CombineClient;
       `,
     ),
@@ -357,7 +365,8 @@ it("no error for same enum name across services in multi-service client without 
       }
       `,
       `
-      @client({ name: "CombineClient", service: [ServiceA, ServiceB], autoMergeService: true })
+      @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+      @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
       namespace CombineClient;
       `,
     ),
@@ -392,7 +401,8 @@ it("no error for same API version enum name across services in multi-service cli
       }
       `,
       `
-      @client({ name: "CombineClient", service: [ServiceA, ServiceB], autoMergeService: true })
+      @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+      @useDependency(ServiceA.Versions.v1, ServiceB.Versions.v1)
       namespace CombineClient;
       `,
     ),

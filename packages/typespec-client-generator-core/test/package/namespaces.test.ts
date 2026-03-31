@@ -62,7 +62,7 @@ describe("no namespace flag", () => {
     strictEqual(bazNamespace.namespaces.length, 0);
   });
 
-  it("separate defined clients and sub clients", async () => {
+  it("separate defined clients and operation groups", async () => {
     const { program } = await SimpleTester.compile(`
       @server("http://localhost:3000", "endpoint")
       @service
@@ -224,7 +224,7 @@ describe("no namespace flag", () => {
         op pet(): void;
       `,
         `
-        namespace PetStoreRenamed; // this namespace will be the namespace of the clients and sub clients defined in this customization file
+        namespace PetStoreRenamed; // this namespace will be the namespace of the clients and operation groups defined in this customization file
   
         @client({
           name: "FoodClient",
