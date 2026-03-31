@@ -17,7 +17,7 @@ import {
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import { HttpOperationResponse, HttpPayloadBody } from "@typespec/http";
 import { ArmResourceOperation } from "../operations.js";
-import { getArmResources, resolveArmResources } from "../resource.js";
+import { resolveArmResources } from "../resource.js";
 
 function createLroHeadersCodeFix(op: Operation, responseTypeName: string): CodeFix | undefined {
   const node = op.node;
@@ -158,24 +158,18 @@ export const armPostLroResponseMismatchRule = createRule({
 
     return {
       root: (program: Program) => {
+        const provider = resolveArmResources(program);
+
         // Check resource-level actions
-        const resources = getArmResources(program);
-        for (const resource of resources) {
-          const operations = [...Object.values(resource.operations.actions)];
-          for (const op of operations) {
-            if (op === undefined) {
-              continue;
-            }
+        for (const resource of provider.resources ?? []) {
+          for (const op of resource.operations.actions) {
             validateOperation(op);
           }
         }
 
         // Check provider-level actions
-        const provider = resolveArmResources(program);
-        if (provider.providerOperations) {
-          for (const op of provider.providerOperations) {
-            validateOperation(op);
-          }
+        for (const op of provider.providerOperations ?? []) {
+          validateOperation(op);
         }
       },
     };
