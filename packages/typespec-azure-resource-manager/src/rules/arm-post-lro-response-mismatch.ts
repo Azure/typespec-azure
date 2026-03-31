@@ -15,6 +15,7 @@ import {
 } from "@typespec/compiler/ast";
 
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
+import { HttpOperationResponse, HttpPayloadBody } from "@typespec/http";
 import { ArmResourceOperation } from "../operations.js";
 import { getArmResources, resolveArmResources } from "../resource.js";
 
@@ -91,6 +92,20 @@ function getResponseTemplateParam(op: Operation): Model | undefined {
 }
 
 /**
+ * Get the body payload from an HTTP response, if present.
+ */
+function getResponseBody(response: HttpOperationResponse | undefined): HttpPayloadBody | undefined {
+  if (response === undefined) return undefined;
+  if (response.responses.length > 1) {
+    throw new Error("Multiple responses are not supported.");
+  }
+  if (response.responses[0].body !== undefined) {
+    return response.responses[0].body;
+  }
+  return undefined;
+}
+
+/**
  * Verify that the final result of an ARM LRO POST operation matches the Response parameter.
  */
 export const armPostLroResponseMismatchRule = createRule({
@@ -114,23 +129,30 @@ export const armPostLroResponseMismatchRule = createRule({
 
       // Get the Response type from the template parameter
       const responseType = getResponseTemplateParam(op.operation);
-      if (responseType === undefined) {
-        // No non-void Response template parameter - nothing to check
-        return;
-      }
 
-      // If the final result is "void" but there is a non-void Response parameter, this is a mismatch
-      if (lroMetadata.finalResult === "void") {
-        const responseTypeName = responseType.name;
-        const codefixes: CodeFix[] = [];
-        const codeFix = createLroHeadersCodeFix(op.operation, responseTypeName);
-        if (codeFix !== undefined) {
-          codefixes.push(codeFix);
+      if (responseType !== undefined) {
+        // Template-based detection: Response template param is non-void but finalResult is void
+        if (lroMetadata.finalResult === "void") {
+          const responseTypeName = responseType.name;
+          const codefixes: CodeFix[] = [];
+          const codeFix = createLroHeadersCodeFix(op.operation, responseTypeName);
+          if (codeFix !== undefined) {
+            codefixes.push(codeFix);
+          }
+          context.reportDiagnostic({
+            target: op.operation,
+            codefixes,
+          });
         }
-        context.reportDiagnostic({
-          target: op.operation,
-          codefixes,
-        });
+      } else {
+        // Fallback for non-template operations: check the 200 response body
+        const response200 = op.httpOperation.responses.find((r) => r.statusCodes === 200);
+        const body200 = getResponseBody(response200);
+        if (body200 !== undefined && lroMetadata.finalResult === "void") {
+          context.reportDiagnostic({
+            target: op.operation,
+          });
+        }
       }
     }
 

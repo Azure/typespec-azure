@@ -160,6 +160,49 @@ describe("emits warning", () => {
         code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
       });
   });
+
+  it("when a non-template LRO POST has a 200 response body but finalResult is void", async () => {
+    await tester
+      .expect(
+        `
+      using Azure.Core;
+
+      @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+      model PollingStatus {
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+      }
+
+      model Widget is TrackedResource<{}> {
+        @key("widgetName")
+        @segment("widgets")
+        @path
+        name: string;
+      }
+
+      @armResourceOperations
+      interface Widgets {
+        @get getStatus(...KeysOf<Widget>, @path @segment("statuses") statusId: string): PollingStatus | ErrorResponse;
+
+        @pollingOperation(Widgets.getStatus, {widgetName: RequestParameter<"name">, statusId: ResponseProperty<"operationId">})
+        @armResourceAction(Widget)
+        @post create(...KeysOf<Widget>, @bodyRoot body: Widget): {
+          @statusCode code: "202";
+          @header("x-ms-operation-id") operationId: string;
+        } | {
+          @statusCode code: "200";
+          @header("x-ms-operation-id") operationId: string;
+          @body result: Widget;
+        } | ErrorResponse;
+      }
+      `,
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
+      });
+  });
 });
 
 describe("does not emit warning", () => {
@@ -302,6 +345,43 @@ describe("does not emit warning", () => {
       @armResourceOperations
       interface Employees {
         generate is ActionAsync<Employee, void, GenerateResponse>;
+      }
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("when a non-template LRO POST has no 200 response body", async () => {
+    await tester
+      .expect(
+        `
+      using Azure.Core;
+
+      @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+      model PollingStatus {
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+      }
+
+      model Widget is TrackedResource<{}> {
+        @key("widgetName")
+        @segment("widgets")
+        @path
+        name: string;
+      }
+
+      @armResourceOperations
+      interface Widgets {
+        @get getStatus(...KeysOf<Widget>, @path @segment("statuses") statusId: string): PollingStatus | ErrorResponse;
+
+        @pollingOperation(Widgets.getStatus, {widgetName: RequestParameter<"name">, statusId: ResponseProperty<"operationId">})
+        @armResourceAction(Widget)
+        @post create(...KeysOf<Widget>, @bodyRoot body: Widget): {
+          @statusCode code: "202";
+          @header("x-ms-operation-id") operationId: string;
+        } | ErrorResponse;
       }
       `,
       )
