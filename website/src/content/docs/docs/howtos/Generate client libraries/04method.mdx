@@ -2231,3 +2231,145 @@ Use the `scope` parameter to apply customizations only to specific language emit
 ```
 
 Supported scope values include: `"python"`, `"csharp"`, `"java"`, `"javascript"`, `"go"`.
+
+## Scoping operations to specific languages
+
+Use the `@scope` decorator to include an operation or model property only for certain language emitters. By default, all operations are generated for every language. `@scope` lets you restrict an element so it appears only in the specified languages.
+
+**Supported scope patterns:**
+
+- Single language: `"python"`
+- Multiple languages: `"python, java"`
+- Negation (exclude): `"!csharp"` or `"!(java, python)"`
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/http";
+import "@typespec/rest";
+
+using TypeSpec.Http;
+using TypeSpec.Rest;
+
+@service(#{ title: "Pet Store" })
+namespace PetStore {
+  model Pet {
+    name: string;
+  }
+
+  @route("/pets/{petId}")
+  op getPet(@path petId: string): Pet;
+
+  @route("/pets/{petId}/diagnostics")
+  op internalDiagnostics(@path petId: string): string;
+}
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+// Only generate internalDiagnostics for Python and Java
+@@scope(PetStore.internalDiagnostics, "python, java");
+```
+
+```python
+class PetStoreClient:
+    # Both operations are generated for Python (in scope)
+    def get_pet(self, pet_id: str, **kwargs: Any) -> Pet: ...
+    def internal_diagnostics(self, pet_id: str, **kwargs: Any) -> str: ...
+```
+
+```csharp
+public class PetStoreClient
+{
+    // Only getPet is generated — internalDiagnostics is excluded from C#
+    public virtual Response<Pet> GetPet(string petId, CancellationToken cancellationToken = default);
+}
+```
+
+```typescript
+// NOT_SUPPORTED
+```
+
+```java
+public class PetStoreClient {
+    // Both operations are generated for Java (in scope)
+    public Pet getPet(String petId);
+    public String internalDiagnostics(String petId);
+}
+```
+
+```go
+// Only GetPet is generated — InternalDiagnostics is excluded from Go
+func (client *PetStoreClient) GetPet(ctx context.Context, petID string, options *PetStoreClientGetPetOptions) (PetStoreClientGetPetResponse, error)
+```
+
+</ClientTabs>
+
+## HEAD operations as boolean response
+
+Use `@responseAsBool` to model a HEAD operation as returning a boolean value. When applied, a `404` response returns `false`, a `2xx` response returns `true`, and all other status codes raise an error.
+
+This decorator can only be applied to operations decorated with `@head`.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/http";
+import "@typespec/rest";
+
+using TypeSpec.Http;
+using TypeSpec.Rest;
+
+@service(#{ title: "Pet Store" })
+namespace PetStore {
+  model Pet {
+    name: string;
+  }
+
+  @route("/pets/{petId}")
+  @head
+  op checkPetExists(@path petId: string): OkResponse;
+}
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@@responseAsBool(PetStore.checkPetExists);
+```
+
+```python
+class PetStoreClient:
+    # Returns bool: True if pet exists (2xx), False if not found (404)
+    def check_pet_exists(self, pet_id: str, **kwargs: Any) -> bool: ...
+```
+
+```csharp
+public class PetStoreClient
+{
+    public virtual Response CheckPetExists(string petId, RequestContext context);
+}
+```
+
+```typescript
+// NOT_SUPPORTED
+```
+
+```java
+public class PetStoreClient {
+    public Response<BinaryData> checkPetExistsWithResponse(String petId, String accept, RequestOptions requestOptions);
+}
+```
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabs>

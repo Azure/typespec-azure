@@ -2628,3 +2628,82 @@ jsonWriter.writeStringField("prop", Objects.toString(this.value, null));
 </ClientTabItem>
 </ClientTabs>
 ```
+
+## Deserializing empty strings as null
+
+Use `@deserializeEmptyStringAsNull` to indicate that a string property should be deserialized as `null` when the service returns an empty string (`""`). This is useful for brownfield services where an empty string response is semantically equivalent to a missing value.
+
+This decorator can only be applied to model properties of type `string` or a scalar derived from `string`.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/http";
+import "@typespec/rest";
+
+using TypeSpec.Http;
+using TypeSpec.Rest;
+
+@service(#{ title: "Widget Service" })
+namespace WidgetService {
+  model Widget {
+    name: string;
+    description?: string;
+  }
+
+  @route("/widgets/{name}")
+  op getWidget(@path name: string): Widget;
+}
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+// When the service returns "" for description, deserialize it as null
+@@deserializeEmptyStringAsNull(WidgetService.Widget.description);
+```
+
+```python
+class Widget(Model):
+    name: str
+    description: Optional[str]
+    # When the service returns "" for description, it is deserialized as None
+```
+
+```csharp
+public partial class Widget
+{
+    public string Name { get; }
+    // When the service returns "" for Description, it is deserialized as null
+    public string Description { get; }
+}
+```
+
+```typescript
+export interface Widget {
+  name: string;
+  // When the service returns "" for description, it is deserialized as undefined
+  description?: string;
+}
+```
+
+```java
+public final class Widget {
+    public String getName();
+    // When the service returns "" for description, it is deserialized as null
+    public String getDescription();
+}
+```
+
+```go
+type Widget struct {
+	Name        *string
+	// When the service returns "" for Description, it is deserialized as nil
+	Description *string
+}
+```
+
+</ClientTabs>

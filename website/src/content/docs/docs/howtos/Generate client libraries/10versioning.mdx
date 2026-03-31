@@ -827,6 +827,93 @@ func (client *ServiceClient) GetUserInfo(ctx context.Context, userInfo UserInfo,
 
 </ClientTabs>
 
+## Extending the client API version enum
+
+Use `@clientApiVersions` to extend the set of API versions exposed by the client SDK without requiring the full specification to be annotated with `@versioned` for each version. This is useful when you want the client SDK to support additional API versions beyond those defined in the `@versioned` enum.
+
+The decorator takes an enum whose members represent the full set of API versions the client should expose. It must include all versions defined in the service's `@versioned` enum plus any additional versions.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/http";
+import "@typespec/rest";
+import "@typespec/versioning";
+
+using TypeSpec.Http;
+using TypeSpec.Rest;
+using TypeSpec.Versioning;
+
+enum Versions {
+  v2023_11_01: "2023-11-01",
+}
+
+@versioned(Versions)
+@service(#{ title: "Widget Service" })
+namespace WidgetService {
+  model Widget {
+    name: string;
+    color: string;
+  }
+
+  @route("/widgets/{name}")
+  op getWidget(@path name: string, @query("api-version") apiVersion: string): Widget;
+}
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+// Extend the client version enum with additional versions.
+// Must include all versions from @versioned plus any new ones.
+enum AdditionalVersions {
+  v2023_11_01: "2023-11-01",
+  v2024_01_01: "2024-01-01",
+  v2024_07_01: "2024-07-01",
+}
+
+@@clientApiVersions(WidgetService, AdditionalVersions);
+```
+
+```python
+# Python uses the version from @versioned for the default
+# Additional versions may be passed as overrides
+class WidgetServiceClient:
+    def __init__(self, endpoint: str, *, api_version: str = "2023-11-01", **kwargs) -> None: ...
+```
+
+```csharp
+// C# generates a ServiceVersion enum with all versions including extended ones
+public partial class WidgetServiceClientOptions : ClientOptions
+{
+    public enum ServiceVersion
+    {
+        V2023_11_01 = 1,
+        V2024_01_01 = 2,
+        V2024_07_01 = 3,
+    }
+}
+```
+
+```typescript
+// NOT_SUPPORTED
+```
+
+```java
+public enum WidgetServiceVersion implements ServiceVersion {
+    V2023_11_01("2023-11-01");
+}
+```
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabs>
+
 ## Overriding the Client Api Version Parameter
 
 By default, we find api version parameters in specs based off of names. There is special logic we do with api version parameters:

@@ -143,7 +143,7 @@ TCGC supports four kinds of methods: [`SdkBasicServiceMethod`](../reference/js-a
 
 `SdkBasicServiceMethod.parameters` is the method's input. Its type [`SdkMethodParameter`](../reference/js-api/interfaces/sdkmethodparameter/) contains the type of the parameter along with some attributes of the parameter.
 
-`SdkBasicServiceMethod.response` is the method's normal response while `SdkBasicServiceMethod.exceptions` contains the method's error responses.
+`SdkBasicServiceMethod.response` is the method's normal response while `SdkBasicServiceMethod.exception` contains the method's error response.
 
 **SdkPagingServiceMethod** is a paging method that has pageable responses. It extends `SdkBasicServiceMethod` and contains extra paging information.
 
