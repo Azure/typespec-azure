@@ -46,7 +46,7 @@ steps:
       wget -q "https://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz"
       tar -xzf "apache-maven-${MAVEN_VERSION}-bin.tar.gz" -C "$HOME"
       rm -f "apache-maven-${MAVEN_VERSION}-bin.tar.gz"
-      echo "$HOME/apache-maven-${MAVEN_VERSION}/bin" >> $GITHUB_PATH
+      echo "$HOME/apache-maven-${MAVEN_VERSION}/bin" >> "$GITHUB_PATH"
 
   - name: Install repo dependencies
     run: pnpm install
@@ -69,7 +69,7 @@ steps:
       npx tsx eng/scripts/doc-updater/src/precompute.ts \
         --config "$CONFIG_INPUT" \
         --output /tmp/gh-aw/agent/context.json \
-        $REBUILD_FLAG
+        ${REBUILD_FLAG:+"$REBUILD_FLAG"}
 
 tools:
   edit:
