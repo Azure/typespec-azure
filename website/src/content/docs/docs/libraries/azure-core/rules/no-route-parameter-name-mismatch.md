@@ -8,9 +8,7 @@ title: "no-route-parameter-name-mismatch"
 
 Operations that share the same route path (ignoring parameter names) should use consistent path parameter names. When two operations resolve to the same path structure but use different names for corresponding path parameters, it typically indicates a misconfiguration, such as mixing legacy templates with standard templates.
 
-This rule also detects when matching path parameters differ in their `allowReserved` setting. If one operation uses `allowReserved` for a path parameter and another does not, this is flagged as a separate diagnostic.
-
-When both parameters at the same position use `allowReserved` (e.g., extension resources using `{resourceUri}` and `{scope}`), name differences are allowed since this is a legitimate ARM pattern.
+Parameters that use `allowReserved` are excluded from name comparison, since they represent scope parameters that may legitimately use different names (e.g., `{resourceUri}` vs `{scope}`).
 
 #### ❌ Incorrect
 
@@ -32,16 +30,6 @@ op getBar(@path fooName: string, @path barName: string): void;
 
 @route("/providers/Microsoft.Contoso/foos/{name}/bars/{barName}")
 op updateBar(@path name: string, @path barName: string): void;
-```
-
-Matching path parameters with different `allowReserved` settings:
-
-```tsp
-@route("/{+scope}/providers/Microsoft.Contoso/foos/{fooName}")
-op getFoo(@path scope: string, @path fooName: string): void;
-
-@route("/{scope}/providers/Microsoft.Contoso/foos/{fooName}")
-op updateFoo(@path scope: string, @path fooName: string): void;
 ```
 
 #### ✅ Correct
@@ -67,7 +55,7 @@ op getFoo(@path fooName: string): void;
 op getBar(@path barName: string): void;
 ```
 
-Extension resources with both `allowReserved` using different scope names (legitimate pattern):
+Parameters with `allowReserved` using different scope names are not compared:
 
 ```tsp
 @route("/{+resourceUri}/providers/Microsoft.Contoso/foos/{fooName}")

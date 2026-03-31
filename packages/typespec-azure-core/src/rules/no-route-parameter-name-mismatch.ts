@@ -20,7 +20,6 @@ export const noRouteParameterNameMismatchRule = createRule({
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-route-parameter-name-mismatch",
   messages: {
     default: paramMessage`Path "${"path"}" has inconsistent parameter name "${"paramName"}" which should be "${"expected"}" to match existing operation with path "${"existingPath"}"`,
-    allowReservedMismatch: paramMessage`Path "${"path"}" has parameter "${"paramName"}" which should have allowReserved=${"expected"} to match existing operation with path "${"existingPath"}"`,
   },
   create(context) {
     // Map from normalized path (params replaced with {}) to first operation seen
@@ -58,31 +57,20 @@ export const noRouteParameterNameMismatchRule = createRule({
 
         const existing = pathMap.get(normalizedPath);
         if (existing) {
-          // Compare parameter names and allowReserved at each position
+          // Compare parameter names at each position
           for (let i = 0; i < params.length && i < existing.params.length; i++) {
+            // Skip comparison when either parameter uses allowReserved, since
+            // allowReserved parameters (e.g. scope/resourceUri) represent different
+            // scope types and legitimately use different names
+            if (params[i].allowReserved || existing.params[i].allowReserved) {
+              continue;
+            }
             if (params[i].name !== existing.params[i].name) {
-              // Skip name mismatch when both parameters use allowReserved (e.g. extension
-              // resources legitimately use different scope parameter names like {resourceUri}
-              // and {scope})
-              if (params[i].allowReserved && existing.params[i].allowReserved) {
-                continue;
-              }
               context.reportDiagnostic({
                 format: {
                   path,
                   paramName: params[i].name,
                   expected: existing.params[i].name,
-                  existingPath: existing.path,
-                },
-                target: operation,
-              });
-            } else if (params[i].allowReserved !== existing.params[i].allowReserved) {
-              context.reportDiagnostic({
-                messageId: "allowReservedMismatch",
-                format: {
-                  path,
-                  paramName: params[i].name,
-                  expected: String(existing.params[i].allowReserved),
                   existingPath: existing.path,
                 },
                 target: operation,

@@ -92,7 +92,7 @@ describe("typespec-azure-core: no-route-parameter-name-mismatch", () => {
       .toBeValid();
   });
 
-  it("emit a warning when operations with allowReserved path parameters have non-reserved params mismatched", async () => {
+  it("emit a warning when operations have non-allowReserved params mismatched alongside allowReserved params", async () => {
     await tester
       .expect(
         `
@@ -114,7 +114,7 @@ describe("typespec-azure-core: no-route-parameter-name-mismatch", () => {
       ]);
   });
 
-  it("does not emit a warning when both allowReserved path parameters have different names", async () => {
+  it("does not emit a warning when allowReserved path parameters have different names", async () => {
     await tester
       .expect(
         `
@@ -131,7 +131,7 @@ describe("typespec-azure-core: no-route-parameter-name-mismatch", () => {
       .toBeValid();
   });
 
-  it("emit a warning when allowReserved differs between matching path parameters", async () => {
+  it("does not emit a warning when allowReserved differs between matching path parameters", async () => {
     await tester
       .expect(
         `
@@ -145,13 +145,7 @@ describe("typespec-azure-core: no-route-parameter-name-mismatch", () => {
         op updateFoo(@path scope: string, @path fooName: string): void;
         `,
       )
-      .toEmitDiagnostics([
-        {
-          code: "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch",
-          severity: "warning",
-          message: `Path "/{scope}/providers/Microsoft.Contoso/foos/{fooName}" has parameter "scope" which should have allowReserved=true to match existing operation with path "/{scope}/providers/Microsoft.Contoso/foos/{fooName}"`,
-        },
-      ]);
+      .toBeValid();
   });
 
   it("does not emit a warning when allowReserved operations have consistent names", async () => {
