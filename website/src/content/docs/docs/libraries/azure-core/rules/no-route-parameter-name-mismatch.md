@@ -10,6 +10,8 @@ Operations that share the same route path (ignoring parameter names) should use 
 
 This rule also detects when matching path parameters differ in their `allowReserved` setting. If one operation uses `allowReserved` for a path parameter and another does not, this is flagged as a separate diagnostic.
 
+When both parameters at the same position use `allowReserved` (e.g., extension resources using `{resourceUri}` and `{scope}`), name differences are allowed since this is a legitimate ARM pattern.
+
 #### ❌ Incorrect
 
 Two operations with the same path structure but different parameter names:
@@ -63,4 +65,15 @@ op getFoo(@path fooName: string): void;
 
 @route("/providers/Microsoft.Contoso/bars/{barName}")
 op getBar(@path barName: string): void;
+```
+
+Extension resources with both `allowReserved` using different scope names (legitimate pattern):
+
+```tsp
+@route("/{+resourceUri}/providers/Microsoft.Contoso/foos/{fooName}")
+op getFoo(@path resourceUri: string, @path fooName: string): void;
+
+@put
+@route("/{+scope}/providers/Microsoft.Contoso/foos/{fooName}")
+op updateFoo(@path scope: string, @path fooName: string): void;
 ```

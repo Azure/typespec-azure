@@ -61,6 +61,12 @@ export const noRouteParameterNameMismatchRule = createRule({
           // Compare parameter names and allowReserved at each position
           for (let i = 0; i < params.length && i < existing.params.length; i++) {
             if (params[i].name !== existing.params[i].name) {
+              // Skip name mismatch when both parameters use allowReserved (e.g. extension
+              // resources legitimately use different scope parameter names like {resourceUri}
+              // and {scope})
+              if (params[i].allowReserved && existing.params[i].allowReserved) {
+                continue;
+              }
               context.reportDiagnostic({
                 format: {
                   path,
