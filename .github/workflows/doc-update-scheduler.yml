@@ -1,12 +1,15 @@
 name: Documentation Update Scheduler
 
-# This workflow uses the GitHub Copilot SDK to automatically update documentation
-# for any configured package. Configs are defined in eng/scripts/doc-updater/configs/.
+# This workflow dispatches the doc-update agentic workflow for each configured
+# package. Configs are defined in eng/scripts/doc-updater/configs/.
+#
+# The actual documentation update is performed by .github/workflows/doc-update.md
+# (an agentic workflow compiled to doc-update.md.lock.yml).
 #
 # To add a new package:
 #   1. Create a YAML config in eng/scripts/doc-updater/configs/
 #   2. Create prompt files in eng/scripts/doc-updater/prompts/<name>/
-#   3. The workflow will auto-discover it — no changes needed here.
+#   3. The scheduler will auto-discover and dispatch it.
 
 on:
   schedule:
@@ -24,15 +27,10 @@ on:
         required: false
         default: false
         type: boolean
-      model:
-        description: "Model to use for the agent"
-        required: false
-        default: "claude-opus-4.6"
-        type: string
 
 permissions:
-  contents: write
-  pull-requests: write
+  actions: write
+  contents: read
 
 jobs:
   # -----------------------------------------------------------------------
@@ -44,7 +42,7 @@ jobs:
       matrix: ${{ steps.resolve.outputs.matrix }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Resolve config matrix
         id: resolve
@@ -54,145 +52,47 @@ jobs:
 
           if [ "$CONFIG_INPUT" = "all" ]; then
             # Discover all YAML config files
-            CONFIGS=$(ls "$CONFIGS_DIR"/*.yaml 2>/dev/null | xargs -I{} basename {} .yaml | jq -R -s -c 'split("\n") | map(select(. != ""))')
+            CONFIGS=$(find "$CONFIGS_DIR" -maxdepth 1 -name '*.yaml' -exec basename {} .yaml \; | jq -R -s -c 'split("\n") | map(select(. != ""))')
           else
             # Single config or comma-separated list
             CONFIGS=$(echo "$CONFIG_INPUT" | tr ',' '\n' | jq -R -s -c 'split("\n") | map(select(. != ""))')
           fi
 
           echo "Resolved configs: $CONFIGS"
-          echo "matrix=$CONFIGS" >> $GITHUB_OUTPUT
+          echo "matrix=$CONFIGS" >> "$GITHUB_OUTPUT"
 
   # -----------------------------------------------------------------------
-  # Job 2: Run doc-updater for each config (parallel via matrix)
+  # Job 2: Dispatch the agentic workflow for each config
   # -----------------------------------------------------------------------
-  update-docs:
+  dispatch:
     needs: discover
     runs-on: ubuntu-latest
-    timeout-minutes: 120
     strategy:
       matrix:
         config: ${{ fromJson(needs.discover.outputs.matrix) }}
       fail-fast: false
-    env:
-      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
-      GH_TOKEN: ${{ github.token }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          submodules: recursive
-
-      - name: Configure git identity
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: "1.22"
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: "adopt"
-          java-version: "21"
-
-      - name: Setup Maven
-        run: |
-          MAVEN_VERSION="3.9.9"
-          wget -q "https://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz"
-          tar -xzf "apache-maven-${MAVEN_VERSION}-bin.tar.gz" -C "$HOME"
-          rm -f "apache-maven-${MAVEN_VERSION}-bin.tar.gz"
-          echo "$HOME/apache-maven-${MAVEN_VERSION}/bin" >> $GITHUB_PATH
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: "10.0.x"
-
-      - name: Install repo dependencies
-        run: pnpm install
-
-      - name: Install Copilot CLI
-        run: npm install -g @github/copilot
-
-      - name: Install doc-updater dependencies
-        working-directory: eng/scripts/doc-updater
-        run: npm install
-
-      - name: Run doc-updater
-        working-directory: eng/scripts/doc-updater
+      - name: Dispatch doc-update agentic workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           FULL_REBUILD="${{ github.event.inputs.full_rebuild || 'false' }}"
-          MODEL="${{ github.event.inputs.model || 'claude-opus-4.6' }}"
 
-          REBUILD_FLAG=""
-          if [ "$FULL_REBUILD" = "true" ]; then
-            REBUILD_FLAG="--full-rebuild"
-          fi
+          echo "Dispatching doc-update for config: ${{ matrix.config }}"
+          echo "  Full rebuild: $FULL_REBUILD"
 
-          npx tsx src/index.ts \
-            --config "${{ matrix.config }}" \
-            --model "$MODEL" \
-            $REBUILD_FLAG
-
-      - name: Set run date
-        id: date
-        run: echo "value=$(date +%Y-%m-%d)" >> $GITHUB_OUTPUT
-
-      - name: Create Pull Request
-        id: create-pr
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ github.token }}
-          branch: automated/doc-update-${{ matrix.config }}-${{ steps.date.outputs.value }}-${{ github.run_number }}
-          title: "[Automated] Update ${{ matrix.config }} documentation (${{ steps.date.outputs.value }})"
-          body: |
-            Automated documentation update via Copilot SDK.
-
-            **Config:** ${{ matrix.config }}
-            **Full rebuild:** ${{ github.event.inputs.full_rebuild || 'false' }}
-            **Model:** ${{ github.event.inputs.model || 'claude-opus-4.6' }}
-            **Date:** ${{ steps.date.outputs.value }}
-
-            This PR was created by the [doc-update-scheduler workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
-          commit-message: "docs: automated ${{ matrix.config }} update (${{ steps.date.outputs.value }})"
-          delete-branch: true
-
-      - name: Record PR number in metadata
-        if: steps.create-pr.outputs.pull-request-number
-        env:
-          PR_BRANCH: automated/doc-update-${{ matrix.config }}-${{ steps.date.outputs.value }}-${{ github.run_number }}
-        run: |
-          git checkout "$PR_BRANCH"
-          META_FILE="eng/scripts/doc-updater/knowledge/${{ matrix.config }}.meta.json"
-          if [ -f "$META_FILE" ]; then
-            jq '.lastPrNumber = ${{ steps.create-pr.outputs.pull-request-number }}' "$META_FILE" > tmp.json && mv tmp.json "$META_FILE"
-            git add "$META_FILE"
-            git commit -m "chore: record PR number in metadata"
-            git push origin HEAD
-          fi
+          gh workflow run doc-update.lock.yml \
+            --repo "${{ github.repository }}" \
+            -f config="${{ matrix.config }}" \
+            -f full_rebuild="$FULL_REBUILD"
 
       - name: Job Summary
         run: |
-          echo "## Documentation Update Complete" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Config:** ${{ matrix.config }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Full Rebuild:** ${{ github.event.inputs.full_rebuild || 'false' }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Model:** ${{ github.event.inputs.model || 'claude-opus-4.6' }}" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "## Documentation Update Dispatched"
+            echo ""
+            echo "**Config:** ${{ matrix.config }}"
+            echo "**Full Rebuild:** ${{ github.event.inputs.full_rebuild || 'false' }}"
+            echo ""
+            echo "The agentic workflow has been dispatched. Check the Actions tab for the doc-update run."
+          } >> "$GITHUB_STEP_SUMMARY"
