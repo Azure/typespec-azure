@@ -1,0 +1,160 @@
+name: Build
+
+on:
+  pull_request:
+    branches:
+      - main
+      - release/*
+  merge_group:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: "Build (${{ matrix.os }}, Node ${{ matrix.node-version }})"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node-version: ["20.x", "22.x", "24.x"]
+        exclude:
+          # Node 22.x temporarily skipped on Windows for flaky vitest issue
+          - os: windows-latest
+            node-version: "22.x"
+    env:
+      TYPESPEC_VS_CI_BUILD: true
+      TYPESPEC_SKIP_WEBSITE_BUILD: true
+    steps:
+      - name: Enable long paths in git
+        if: runner.os == 'Windows'
+        run: git config --global core.longpaths true
+
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Restore .NET dependencies
+        run: dotnet restore core/packages/typespec-vs
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Test
+        run: pnpm vitest run --config ./vitest.config.fast.ts --coverage --reporter=github-actions --reporter=default
+
+      - name: Regen samples
+        run: pnpm run regen-samples
+
+      - name: Check Git Status For Changed Files
+        run: node eng/scripts/check-for-changed-files.js
+
+  website:
+    name: Website
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: ./.github/actions/setup
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Install browsers
+        run: pnpm exec playwright install
+
+      - name: Build website
+        run: pnpm --filter "@azure-tools/typespec-azure-website..." run build
+
+      - name: Check Git Status For Changed Files
+        run: node eng/scripts/check-for-changed-files.js
+
+  e2e:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    env:
+      TYPESPEC_VS_CI_BUILD: true
+      TYPESPEC_SKIP_WEBSITE_BUILD: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: ./.github/actions/setup
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Restore .NET dependencies
+        run: dotnet restore core/packages/typespec-vs
+
+      - name: Install playwright browsers
+        run: |
+          sudo dpkg --configure -a
+          npx playwright install --with-deps
+        working-directory: packages/typespec-azure-playground-website
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Azure Http Specs e2e tests
+        run: node packages/e2e-tests/e2e-tests.mjs
+
+      - name: E2E Tests
+        # Skip on merge queue from publish branches and on publish/* PR source branches
+        if: ${{ !startsWith(github.ref, 'refs/heads/gh-readonly-queue/') && !startsWith(github.head_ref, 'publish/') }}
+        run: pnpm test:e2e
+
+  autorest-checks:
+    name: Autorest Checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: ./.github/actions/setup
+        with:
+          node-version: "20.x"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build internal tools
+        run: pnpm --filter "@typespec/internal-build-utils..." run build
+
+      - name: Install autorest & script dependencies
+        run: npm install -g autorest && cd eng/scripts && npm install
+
+      - name: Swagger - Resource Manager Linting
+        run: node eng/scripts/lint-resourcemanager.js "packages/samples/test/output/azure/resource-manager"
+
+      - name: Swagger - Generate Python SDK
+        run: node eng/scripts/gen-sdk.js python "packages/samples/test/output/azure/resource-manager"
+
+      - name: Swagger - Generate JavaScript SDK
+        run: node eng/scripts/gen-sdk.js javascript "packages/samples/test/output/azure/resource-manager"
