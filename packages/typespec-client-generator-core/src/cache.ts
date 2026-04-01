@@ -467,8 +467,9 @@ function handleMultipleServicesSubClientNameConflict(
         types.push(sc.type);
       }
 
-      // Remove orphaned cache entries for the merged-away sub client
-      context.__rawClientsCache!.delete(sc.type!);
+      // Redirect the merged-away sub client's type to the surviving sub client
+      // so that @clientLocation lookups still resolve correctly.
+      context.__rawClientsCache!.set(sc.type!, existingSc);
       context.__clientToOperationsCache!.delete(sc);
 
       return true;
@@ -515,9 +516,10 @@ function mergeChildrenRecursively(
         types.push(incoming.type);
       }
 
-      // Remove orphaned cache entries for the merged-away child
+      // Redirect the merged-away child's type to the surviving child
+      // so that @clientLocation lookups still resolve correctly.
       if (incoming.type) {
-        context.__rawClientsCache!.delete(incoming.type);
+        context.__rawClientsCache!.set(incoming.type, existing);
       }
       context.__clientToOperationsCache!.delete(incoming);
     } else {

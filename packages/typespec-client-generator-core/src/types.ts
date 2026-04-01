@@ -1655,58 +1655,45 @@ function updateTypesFromOperation(
   const httpOperation = getHttpOperationWithCache(context, operation);
   const generateConvenient = shouldGenerateConvenient(context, operation);
   const overriddenClientMethod = getOverriddenClientMethod(context, operation);
-  for (const param of (overriddenClientMethod ?? operation).parameters.properties.values()) {
-    if (isNeverOrVoidType(param.type)) continue;
-    // if it is a body model, skip
-    if (httpOperation.parameters.body?.property === param) continue;
-    // skip parameters that are out of scope
-    if (!isInScope(context, param)) continue;
-    // if it is a stream model, skip the wrapper but register the streamed payload type
-    if (param.type.kind === "Model" && isStream(program, param.type)) {
-      const streamOf = getStreamOf(program, param.type);
-      if (streamOf && generateConvenient) {
-        const sdkStreamType = diagnostics.pipe(
-          getClientTypeWithDiagnostics(context, streamOf, operation),
-        );
-        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkStreamType));
-        const paramStreamMeta = getStreamMetadata(program, httpOperation.parameters);
-        if (paramStreamMeta?.contentTypes.some((x) => isMediaTypeJson(x))) {
-          diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkStreamType));
-        }
-        const access = getAccessOverride(context, operation) ?? "public";
-        diagnostics.pipe(updateUsageOrAccess(context, access, sdkStreamType));
-      }
-      continue;
-    }
-    const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param, operation));
-    if (generateConvenient) {
+
+  // Push operation as naming root
+  pushNamingContext(context, operation.name, operation);
+  try {
+    for (const param of httpOperation.parameters.parameters) {
+      if (isNeverOrVoidType(param.param.type)) continue;
+      // skip parameters that are out of scope
+      if (!isInScope(context, param.param)) continue;
+      pushNamingContext(
+        context,
+        `Request${pascalCase(param.name)}`,
+        param.param.type as ContextNode["type"],
+      );
+      const sdkType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, param.param, operation),
+      );
+      popNamingContext(context);
+      // Always update input usage for HTTP operation parameters (header, query, path)
+      // even when generateConvenient is false, so that types like enums are included
       diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
       const access = getAccessOverride(context, operation) ?? "public";
       diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
     }
-    const access = getAccessOverride(context, operation) ?? "public";
-    diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
-  }
-  for (const param of httpOperation.parameters.parameters) {
-    if (isNeverOrVoidType(param.param.type)) continue;
-    // skip parameters that are out of scope
-    if (!isInScope(context, param.param)) continue;
-    const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param.param, operation));
-    // Always update input usage for HTTP operation parameters (header, query, path)
-    // even when generateConvenient is false, so that types like enums are included
-    diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
-    const access = getAccessOverride(context, operation) ?? "public";
-    diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
-  }
-  const httpBody = httpOperation.parameters.body;
-  if (httpBody && !isNeverOrVoidType(httpBody.type)) {
-    const spread = isHttpBodySpread(httpBody);
-    // If the body has a property (from @body decorator), use it to check for alternateType
-    // Otherwise use the body type directly
-    const bodyTypeOrProperty = httpBody.property ?? getHttpBodyType(httpBody);
-    const sdkType = diagnostics.pipe(
-      getClientTypeWithDiagnostics(context, bodyTypeOrProperty, operation),
-    );
+    const httpBody = httpOperation.parameters.body;
+    if (httpBody && !isNeverOrVoidType(httpBody.type)) {
+      const spread = isHttpBodySpread(httpBody);
+      // If the body has a property (from @body decorator), use it to check for alternateType
+      // Otherwise use the body type directly
+      const bodyTypeOrProperty = httpBody.property ?? getHttpBodyType(httpBody);
+      const bodyType = getHttpBodyType(httpBody);
+      // For named unions, pass undefined so anonymous types inside get named relative
+      // to the operation (e.g., "PostRequest") rather than the union (e.g., "A1")
+      const bodyContextType =
+        bodyType.kind === "Union" && bodyType.name ? undefined : (bodyType as ContextNode["type"]);
+      pushNamingContext(context, "Request", bodyContextType);
+      const sdkType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, bodyTypeOrProperty, operation),
+      );
+      popNamingContext(context);
 
       const multipartRequest = httpBody.bodyKind === "multipart";
       if (generateConvenient) {
@@ -2104,7 +2091,13 @@ function handleServiceOrphanTypes(context: TCGCContext): [void, readonly Diagnos
     if (context.__referencedTypeCache!.has(t)) {
       continue;
     }
+    if (t.kind !== "Enum") {
+      pushNamingContext(context, t.name ?? "", t);
+    }
     const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, t));
+    if (t.kind !== "Enum") {
+      popNamingContext(context);
+    }
     // add serialization options to model type
     updateSerializationOptions(context, sdkType, []);
   }
