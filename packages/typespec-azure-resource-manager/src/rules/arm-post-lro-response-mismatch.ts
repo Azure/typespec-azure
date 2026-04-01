@@ -3,6 +3,7 @@ import {
   Model,
   Operation,
   Program,
+  Type,
   createRule,
   getSourceLocation,
   isVoidType,
@@ -13,6 +14,7 @@ import {
   SyntaxKind,
   type TemplateArgumentNode,
 } from "@typespec/compiler/ast";
+import { $ } from "@typespec/compiler/typekit";
 
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import { HttpOperationResponse, HttpPayloadBody } from "@typespec/http";
@@ -46,7 +48,7 @@ function createLroHeadersCodeFix(op: Operation, responseTypeName: string): CodeF
       const argValueLocation = getSourceLocation(lroHeadersArg.argument);
       return context.replaceText(
         argValueLocation,
-        `ArmLroLocationHeader<Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>, ${responseTypeName}>`,
+        `ArmLroLocationHeader<FinalResult = ${responseTypeName}>`,
       );
     },
   };
@@ -92,15 +94,14 @@ function getResponseTemplateParam(op: Operation): Model | undefined {
 }
 
 /**
- * Get the body payload from an HTTP response, if present.
+ * Get the body payload from an HTTP response's 200 status code, if present.
  */
-function getResponseBody(response: HttpOperationResponse | undefined): HttpPayloadBody | undefined {
-  if (response === undefined) return undefined;
-  if (response.responses.length > 1) {
-    throw new Error("Multiple responses are not supported.");
-  }
-  if (response.responses[0].body !== undefined) {
-    return response.responses[0].body;
+function getResponseBody(responses: HttpOperationResponse[]): HttpPayloadBody | undefined {
+  const response200 = responses.find((r) => r.statusCodes === 200);
+  if (response200 === undefined) return undefined;
+  if (response200.responses.length === 0) return undefined;
+  if (response200.responses[0].body !== undefined) {
+    return response200.responses[0].body;
   }
   return undefined;
 }
@@ -115,9 +116,21 @@ export const armPostLroResponseMismatchRule = createRule({
   description:
     "Ensure that the final result of a long-running POST operation matches the Response parameter.",
   messages: {
-    default: `The final result type of a long-running POST operation does not match the Response parameter. Specify the FinalResult in the LroHeaders parameter to match the response type. For example: 'LroHeaders = ArmLroLocationHeader<Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>, ResponseType>'.`,
+    default: `The final result type of a long-running POST operation does not match the Response parameter. Specify the FinalResult in the LroHeaders parameter to match the response type. For example: 'LroHeaders = ArmLroLocationHeader<FinalResult = ResponseType>'.`,
   },
   create(context) {
+    /**
+     * Checks if the finalResult type matches the expected response type.
+     * Returns true if they match or if the comparison is not applicable.
+     * Returns false if there is a mismatch.
+     */
+    function doesFinalResultMatch(finalResult: Type | "void", expectedResponseType: Type): boolean {
+      if (finalResult === "void") {
+        return false;
+      }
+      return $(context.program).type.isAssignableTo(finalResult, expectedResponseType, finalResult);
+    }
+
     function validateOperation(op: ArmResourceOperation) {
       if (op.httpOperation.verb !== "post") {
         return;
@@ -127,12 +140,17 @@ export const armPostLroResponseMismatchRule = createRule({
         return;
       }
 
+      const { finalResult } = lroMetadata;
+      if (finalResult === undefined) {
+        return;
+      }
+
       // Get the Response type from the template parameter
       const responseType = getResponseTemplateParam(op.operation);
 
       if (responseType !== undefined) {
-        // Template-based detection: Response template param is non-void but finalResult is void
-        if (lroMetadata.finalResult === "void") {
+        // Template-based detection: Response template param is non-void but finalResult doesn't match
+        if (!doesFinalResultMatch(finalResult, responseType)) {
           const responseTypeName = responseType.name;
           const codefixes: CodeFix[] = [];
           const codeFix = createLroHeadersCodeFix(op.operation, responseTypeName);
@@ -146,9 +164,8 @@ export const armPostLroResponseMismatchRule = createRule({
         }
       } else {
         // Fallback for non-template operations: check the 200 response body
-        const response200 = op.httpOperation.responses.find((r) => r.statusCodes === 200);
-        const body200 = getResponseBody(response200);
-        if (body200 !== undefined && lroMetadata.finalResult === "void") {
+        const body200 = getResponseBody(op.httpOperation.responses);
+        if (body200 !== undefined && !doesFinalResultMatch(finalResult, body200.type)) {
           context.reportDiagnostic({
             target: op.operation,
           });

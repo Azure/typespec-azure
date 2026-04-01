@@ -160,6 +160,45 @@ describe("emits warning", () => {
         code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
       });
   });
+
+  it("when LroHeaders set FinalResult to a type that does not match the Response parameter", async () => {
+    await tester
+      .expect(
+        `
+      @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+      model Employee is ProxyResource<{}> {
+        @pattern("^[a-zA-Z0-9-]{3,24}$")
+        @key("employeeName")
+        @path
+        @segment("employees")
+        name: string;
+      }
+
+      model GenerateResponse {
+        message: string;
+      }
+
+      model OtherResponse {
+        value: int32;
+      }
+
+      @armResourceOperations
+      interface Employees {
+        generate is ArmResourceActionAsync<
+          Employee,
+          void,
+          GenerateResponse,
+          LroHeaders = ArmLroLocationHeader<FinalResult = OtherResponse>
+        >;
+      }
+      `,
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
+      });
+  });
 });
 
 describe("does not emit warning", () => {
@@ -364,7 +403,7 @@ describe("codefix", () => {
           Employee,
           void,
           GenerateResponse,
-          LroHeaders = ArmLroLocationHeader<Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>, GenerateResponse>
+          LroHeaders = ArmLroLocationHeader<FinalResult = GenerateResponse>
         >;
       }
       `,
