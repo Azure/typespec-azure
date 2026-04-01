@@ -32,7 +32,6 @@ import {
   SdkModelPropertyType,
   SdkModelType,
   SdkNullableType,
-  SdkOperationGroup,
   SdkServiceOperation,
   SdkServiceResponseHeader,
   SdkUnionType,
@@ -85,6 +84,7 @@ export function createTCGCContext(
     __clientApiVersionDefaultValueCache: new Map(),
     __httpOperationExamples: new Map(),
     __pagedResultSet: new Set(),
+    __namingContextPath: [],
 
     getMutatedGlobalNamespace(): Namespace {
       if (options?.mutateNamespace === false) {
@@ -123,28 +123,30 @@ export function createTCGCContext(
       return this.__packageVersionEnum!;
     },
     getClients(): SdkClient[] {
-      if (!this.__rawClientsOperationGroupsCache) {
+      if (!this.__rawClientsCache) {
         prepareClientAndOperationCache(this);
       }
-      return Array.from(this.__rawClientsOperationGroupsCache!.values()).filter(
-        (item) => item.kind === "SdkClient",
-      );
+      return Array.from(this.__rawClientsCache!.values());
     },
-    getClientOrOperationGroup(
-      type: Namespace | Interface,
-    ): SdkClient | SdkOperationGroup | undefined {
-      if (!this.__rawClientsOperationGroupsCache) {
+    getRootClients(): SdkClient[] {
+      if (!this.__rawClientsCache) {
         prepareClientAndOperationCache(this);
       }
-      return this.__rawClientsOperationGroupsCache!.get(type);
+      return Array.from(this.__rawClientsCache!.values()).filter((item) => !item.parent);
     },
-    getOperationsForClient(client: SdkClient | SdkOperationGroup): Operation[] {
+    getClient(type: Namespace | Interface): SdkClient | undefined {
+      if (!this.__rawClientsCache) {
+        prepareClientAndOperationCache(this);
+      }
+      return this.__rawClientsCache!.get(type);
+    },
+    getOperationsForClient(client: SdkClient): Operation[] {
       if (!this.__clientToOperationsCache) {
         prepareClientAndOperationCache(this);
       }
       return this.__clientToOperationsCache!.get(client)!;
     },
-    getClientForOperation(operation: Operation): SdkClient | SdkOperationGroup {
+    getClientForOperation(operation: Operation): SdkClient {
       if (!this.__operationToClientCache) {
         prepareClientAndOperationCache(this);
       }

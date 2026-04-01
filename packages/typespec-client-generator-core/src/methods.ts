@@ -26,7 +26,8 @@ import {
   getNextLinkVerb,
   getOverriddenClientMethod,
   getResponseAsBool,
-  listOperationsInOperationGroup,
+  isInScope,
+  listOperationsInClient,
   shouldGenerateConvenient,
   shouldGenerateProtocol,
 } from "./decorators.js";
@@ -48,7 +49,6 @@ import {
   SdkModelType,
   SdkNextOperationLink,
   SdkNextOperationReference,
-  SdkOperationGroup,
   SdkOperationLink,
   SdkOperationReference,
   SdkPagingServiceMethod,
@@ -356,8 +356,9 @@ export function getPropertySegmentsFromModelOrParameters(
     }
   }
 
-  while (queue.length > 0) {
-    const { model, path } = queue.shift()!;
+  let queueIdx = 0;
+  while (queueIdx < queue.length) {
+    const { model, path } = queue[queueIdx++];
     for (const prop of model.properties.values()) {
       if (predicate(prop)) {
         return path.concat(prop);
@@ -460,7 +461,12 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
       case "pollingSuccessProperty": {
         return {
           kind: "pollingSuccessProperty",
-          responseModel: getSdkModel(context, step.responseModel),
+          responseModel:
+            step.responseModel.kind === "Scalar"
+              ? (diagnostics.pipe(
+                  getClientTypeWithDiagnostics(context, step.responseModel),
+                ) as SdkBuiltInType)
+              : getSdkModel(context, step.responseModel),
           target: diagnostics.pipe(getSdkModelPropertyType(context, step.target)),
           sourceProperty: step.sourceProperty
             ? diagnostics.pipe(getSdkModelPropertyType(context, step.sourceProperty))
@@ -578,11 +584,11 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     }
     const envelopeResult = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, rawMetadata.finalEnvelopeResult),
-    ) as SdkModelType | SdkArrayType | SdkBuiltInType<"unknown">;
+    ) as SdkModelType | SdkArrayType | SdkBuiltInType;
 
     const result = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, rawMetadata.finalResult),
-    ) as SdkModelType | SdkArrayType | SdkBuiltInType<"unknown">;
+    ) as SdkModelType | SdkArrayType | SdkBuiltInType;
 
     // find the property inside the envelope result using the final result path
     let sdkProperty: SdkModelPropertyType | undefined = undefined;
@@ -700,6 +706,8 @@ export function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOpe
 
   for (const param of params) {
     if (isNeverOrVoidType(param.type)) continue;
+    // Skip parameters that are not in scope for this emitter
+    if (!isInScope(context, param)) continue;
     const sdkMethodParam = diagnostics.pipe(getSdkMethodParameter(context, param, operation));
     if (sdkMethodParam.onClient) {
       // add API version and subscription ID parameters to the client parameters
@@ -790,12 +798,12 @@ export function getSdkMethodParameter(
 
 export function createSdkMethods<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
-  client: SdkClient | SdkOperationGroup,
+  client: SdkClient,
   sdkClientType: SdkClientType<TServiceOperation>,
 ): [SdkMethod<TServiceOperation>[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const retval: SdkMethod<TServiceOperation>[] = [];
-  for (const operation of listOperationsInOperationGroup(context, client)) {
+  for (const operation of listOperationsInClient(context, client)) {
     retval.push(
       diagnostics.pipe(getSdkServiceMethod<TServiceOperation>(context, operation, sdkClientType)),
     );

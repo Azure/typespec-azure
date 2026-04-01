@@ -14,6 +14,7 @@ import {
   PagingOperation,
   Program,
   Type,
+  Union,
 } from "@typespec/compiler";
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import {
@@ -24,6 +25,7 @@ import {
   HttpVerb,
   Visibility,
 } from "@typespec/http";
+import type { ContextNode } from "./internal-utils.js";
 
 // Types for TCGC lib
 
@@ -62,16 +64,16 @@ export interface TCGCContext {
   __generatedNames: Map<Type, string>;
   __httpOperationCache: Map<Operation, HttpOperation>;
   __tspTypeToApiVersions: Map<Type, string[]>;
-  __rawClientsOperationGroupsCache?: Map<
-    Namespace | Interface | string,
-    SdkClient | SdkOperationGroup
-  >;
-  __clientToOperationsCache?: Map<SdkClient | SdkOperationGroup, Operation[]>;
-  __operationToClientCache?: Map<Operation, SdkClient | SdkOperationGroup>;
-  __clientParametersCache: Map<SdkClient | SdkOperationGroup, SdkMethodParameter[]>;
-  __clientApiVersionDefaultValueCache: Map<SdkClient | SdkOperationGroup, string | undefined>;
+  __explicitClients?: Set<SdkClient>;
+  __rawClientsCache?: Map<Namespace | Interface | string, SdkClient>;
+  __clientToOperationsCache?: Map<SdkClient, Operation[]>;
+  __operationToClientCache?: Map<Operation, SdkClient>;
+  __clientParametersCache: Map<SdkClient, SdkMethodParameter[]>;
+  __clientApiVersionDefaultValueCache: Map<SdkClient, string | undefined>;
   __httpOperationExamples: Map<HttpOperation, SdkHttpOperationExample[]>;
   __pagedResultSet: Set<SdkType>;
+  __namingContextPath: ContextNode[]; // Stack tracking the current traversal position for naming anonymous types.
+  __orphanTypesCache?: (Model | Enum | Union)[]; // cached result of listOrphanTypes to avoid repeated namespace traversals
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
   __mutatedRealm?: unsafe_Realm; // the realm that contains all mutated types for this instance
   __packageVersions?: Map<Namespace, string[]>; // the package versions (for each service) from the service versioning config and api version setting in tspconfig.
@@ -84,9 +86,10 @@ export interface TCGCContext {
   getPackageVersions(): Map<Namespace, string[]>;
   getPackageVersionEnum(): Map<Namespace, Enum | undefined>;
   getClients(): SdkClient[];
-  getClientOrOperationGroup(type: Namespace | Interface): SdkClient | SdkOperationGroup | undefined;
-  getOperationsForClient(client: SdkClient | SdkOperationGroup): Operation[];
-  getClientForOperation(operation: Operation): SdkClient | SdkOperationGroup;
+  getRootClients(): SdkClient[];
+  getClient(type: Namespace | Interface): SdkClient | undefined;
+  getOperationsForClient(client: SdkClient): Operation[];
+  getClientForOperation(operation: Operation): SdkClient;
 }
 
 export interface SdkContext<
@@ -102,27 +105,17 @@ export interface SdkContext<
 export interface SdkClient {
   kind: "SdkClient";
   name: string;
-  /**
-   * @deprecated Use `services` instead. This property will be removed in a future release.
-   */
-  service: Namespace | Namespace[];
   services: Namespace[];
-  type: Namespace | Interface;
-  subOperationGroups: SdkOperationGroup[];
-}
-
-export interface SdkOperationGroup {
-  kind: "SdkOperationGroup";
+  /** The type associated with this client. If it is created from string client location, or is a merged client, this will be undefined. */
   type?: Namespace | Interface;
-  subOperationGroups: SdkOperationGroup[];
-  groupPath: string;
-  /**
-   * @deprecated Use `services` instead. This property will be removed in a future release.
-   */
-  service: Namespace;
-  services: Namespace[];
-  /** Parent operation group or client. */
-  parent?: SdkClient | SdkOperationGroup;
+  /** Sub clients of this client. */
+  subClients: SdkClient[];
+  /** The path of this client in the client hierarchy. For example, "MyClient.SubClient". */
+  clientPath: string;
+  /** The parent client. Only set for sub clients. */
+  parent?: SdkClient;
+  /** Whether to auto-merge service's things into current client. */
+  autoMergeService?: boolean;
 }
 
 export type AccessFlags = "internal" | "public";
@@ -211,7 +204,7 @@ export interface DecoratorInfo {
 export interface SdkClientType<
   TServiceOperation extends SdkServiceOperation,
 > extends DecoratedType {
-  __raw: SdkClient | SdkOperationGroup;
+  __raw: SdkClient;
   kind: "client";
   /** Name of the client. */
   name: string;
@@ -231,7 +224,7 @@ export interface SdkClientType<
   crossLanguageDefinitionId: string;
   /** The parent client of this client. The structure follows the definition hierarchy. */
   parent?: SdkClientType<TServiceOperation>;
-  /** The children of this client. The structure follows the definition hierarchy. */
+  /** The sub clients of this client. */
   children?: SdkClientType<TServiceOperation>[];
 }
 
@@ -1097,8 +1090,8 @@ export interface SdkLroServiceMetadata {
   pollingInfo: SdkPollingOperationStep;
   envelopeResult: SdkModelType;
   logicalPath?: string;
-  finalResult?: SdkModelType | SdkArrayType | SdkBuiltInType<"unknown"> | "void";
-  finalEnvelopeResult?: SdkModelType | SdkArrayType | SdkBuiltInType<"unknown"> | "void";
+  finalResult?: SdkModelType | SdkArrayType | SdkBuiltInType | "void";
+  finalEnvelopeResult?: SdkModelType | SdkArrayType | SdkBuiltInType | "void";
   finalResultPath?: string;
 }
 
@@ -1154,7 +1147,7 @@ export interface SdkOperationLink {
 
 interface SdkLogicalOperationStep {
   /** The TypeSpec type that is returned by following a link or calling a lined operation */
-  responseModel?: SdkModelType;
+  responseModel?: SdkModelType | SdkBuiltInType;
 }
 
 export interface SdkPropertyMap {
@@ -1199,7 +1192,7 @@ interface SdkFinalOperationReference extends SdkLogicalOperationStep {
 
 interface SdkPollingSuccessProperty extends SdkLogicalOperationStep {
   kind: "pollingSuccessProperty";
-  responseModel: SdkModelType;
+  responseModel: SdkModelType | SdkBuiltInType;
   /** The property containing the results of success */
   target: SdkModelPropertyType;
   /** The property in the response that contained a url to the status monitor */
@@ -1216,9 +1209,9 @@ interface SdkNoPollingSuccessProperty extends SdkLogicalOperationStep {
  */
 export interface SdkLroServiceFinalResponse {
   /** Intact response type */
-  envelopeResult: SdkModelType | SdkArrayType | SdkBuiltInType<"unknown">;
+  envelopeResult: SdkModelType | SdkArrayType | SdkBuiltInType;
   /** Meaningful result type */
-  result: SdkModelType | SdkArrayType | SdkBuiltInType<"unknown">;
+  result: SdkModelType | SdkArrayType | SdkBuiltInType;
   /** An array of properties to fetch {result} from the {envelopeResult} model. */
   resultSegments?: SdkModelPropertyType[];
 }
@@ -1265,6 +1258,8 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   unions: (SdkUnionType | SdkNullableType)[];
   /** Unique ID for the package. */
   crossLanguagePackageId: string;
+  /** Hash of API-affecting elements for cross-language SDK comparison. */
+  crossLanguageVersion: string;
   /** Hierarchical structure for the package based on namespaces. */
   namespaces: SdkNamespace<TServiceOperation>[];
   /** License details for client code comments or license file generation. */

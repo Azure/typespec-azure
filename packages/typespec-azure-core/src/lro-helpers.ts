@@ -59,7 +59,6 @@ import {
   type PollingLocationInfo,
   pollingOptionsKind,
   type StatusMonitorMetadata,
-  type StatusMonitorPollingLocationInfo,
 } from "./decorators/polling-location.js";
 import { PollingOperationKey } from "./decorators/polling-operation.js";
 import type { PropertyMap } from "./lro-info.js";
@@ -128,7 +127,7 @@ export interface OperationReference {
  */
 export interface LogicalOperationStep {
   /** The TypeSpec type that is returned by following a link or calling a lined operation */
-  responseModel: Model | UnknownType | VoidType;
+  responseModel: Model | Scalar | UnknownType | VoidType;
 }
 
 /** Information on how to get to the StatusMonitor */
@@ -214,7 +213,7 @@ export interface FinalOperationReference extends LogicalOperationStep {
  */
 export interface PollingSuccessProperty extends LogicalOperationStep {
   kind: "pollingSuccessProperty";
-  responseModel: Model;
+  responseModel: Model | Scalar;
   /** The property containing the results of success */
   target: ModelProperty;
   /** The property in the response that contained a url to the status monitor */
@@ -272,10 +271,10 @@ export interface LroMetadata {
   /** The model representing important data returned on a success - clients will want to return this model. If undefined,
    *  then clients would want to return nothing.
    */
-  finalResult?: Model | UnknownType | "void";
+  finalResult?: Model | Scalar | UnknownType | "void";
 
   /** The TypeSpec type of the object that contains the 'finalResult'. */
-  finalEnvelopeResult?: Model | UnknownType | "void";
+  finalEnvelopeResult?: Model | Scalar | UnknownType | "void";
 
   /** The path to the field in the 'finalEnvelopeResult' that contains the 'finalResult'. */
   finalResultPath?: string;
@@ -341,7 +340,7 @@ interface StatusMonitorInfo {
   /** The TypeSpec Model type of the StatusMonitor */
   monitorType: Model;
   /** The type fo the 'results' field, if one exists */
-  successType?: Model | UnknownType | VoidType;
+  successType?: Model | Scalar | UnknownType | VoidType;
   /** The property reference for the 'results' field, if one exists  */
   successProperty?: ModelProperty;
   /** The type of the error field, if one exists */
@@ -370,7 +369,7 @@ interface StatusMonitorLinkData {
   /** If another operation call is required after polling ends to get the results of the operation, a link to that 'final' operation */
   final?: OperationLink;
   /** If another operation call is required after polling ends to get the results of the operation, The model type that operation returns */
-  finalModel?: Model | UnknownType | VoidType;
+  finalModel?: Model | Scalar | UnknownType | VoidType;
 }
 
 function createFinalOperationLink(
@@ -412,10 +411,18 @@ function createLroMetadata(
       ? context.finalStep.target.name
       : undefined;
 
-  let finalResult: Model | UnknownType | "void" =
-    model.kind === "Model" || (model.kind === "Intrinsic" && !isVoidType(model)) ? model : "void";
-  let finalEnvelopeResult: Model | UnknownType | "void" =
-    model.kind === "Model" || (model.kind === "Intrinsic" && !isVoidType(model)) ? model : "void";
+  let finalResult: Model | Scalar | UnknownType | "void" =
+    model.kind === "Model" ||
+    model.kind === "Scalar" ||
+    (model.kind === "Intrinsic" && !isVoidType(model))
+      ? model
+      : "void";
+  let finalEnvelopeResult: Model | Scalar | UnknownType | "void" =
+    model.kind === "Model" ||
+    model.kind === "Scalar" ||
+    (model.kind === "Intrinsic" && !isVoidType(model))
+      ? model
+      : "void";
   if (context.finalStep && context.finalStep.kind === "pollingSuccessProperty") {
     finalEnvelopeResult = context.pollingStep.responseModel;
   } else if (context.finalStep && context.finalStep.kind === "noPollingResult") {
@@ -424,7 +431,10 @@ function createLroMetadata(
   }
   return {
     operation: operation,
-    logicalResult: model.kind === "Intrinsic" ? context.pollingStep.responseModel : model,
+    logicalResult:
+      model.kind === "Intrinsic" || model.kind === "Scalar"
+        ? context.pollingStep.responseModel
+        : model,
     finalStateVia: finalState,
     statusMonitorStep: context.statusMonitorStep,
     pollingInfo: context.pollingStep,
@@ -559,9 +569,9 @@ function getFinalStateVia(
   program: Program,
   operation: Operation,
   context: LroContext,
-): [FinalStateValue, Model | UnknownType | VoidType | undefined] {
+): [FinalStateValue, Model | Scalar | UnknownType | VoidType | undefined] {
   const operationAction = getActionDetails(program, operation);
-  let model: Model | UnknownType | VoidType | undefined =
+  let model: Model | Scalar | UnknownType | VoidType | undefined =
     context.originalModel?.name !== undefined ? context.originalModel : undefined;
   let finalState: FinalStateValue = FinalStateValue.originalUri;
   const finalStateOverride = getFinalStateOverride(program, operation);
@@ -757,9 +767,10 @@ function getStatusFromLinkOrReference(
 
 function filterSuccessType(
   program: Program,
-  type: IntrinsicType | Model,
-): Model | UnknownType | VoidType | undefined {
+  type: IntrinsicType | Model | Scalar,
+): Model | Scalar | UnknownType | VoidType | undefined {
   if (type.kind === "Model") return type;
+  if (type.kind === "Scalar") return type;
   if (isNeverType(type)) return $(program).intrinsic.void;
   if (isUnknownType(type)) return type;
   if (isVoidType(type)) return type;
@@ -786,7 +797,12 @@ function getStatusMonitorInfo(
   if (modelOrLink.kind === "link") {
     if (modelOrLink.property === undefined) return undefined;
     const statusMonitorType = resolveOperationLocation(program, modelOrLink.property);
-    if (statusMonitorType === undefined || statusMonitorType.kind === "Intrinsic") return undefined;
+    if (
+      statusMonitorType === undefined ||
+      statusMonitorType.kind === "Intrinsic" ||
+      statusMonitorType.kind === "Scalar"
+    )
+      return undefined;
     modelOrLink = statusMonitorType;
   }
 
@@ -841,7 +857,6 @@ function getStatusMonitorLinksFromModel(
   program: Program,
   model: Model,
 ): StatusMonitorLinkData | undefined {
-  let pollingData: StatusMonitorPollingLocationInfo | undefined = undefined;
   let pollingLinks: ModelProperty[] | undefined = filterModelProperties(model, (prop) =>
     isPollingLocation(program, prop),
   );
@@ -851,7 +866,7 @@ function getStatusMonitorLinksFromModel(
     pollingLinks = pollingLinks.filter((p) => !isBody(program, p) && !isBodyRoot(program, p));
   }
   const pollingProperty = pollingLinks[0];
-  pollingData = getPollingLocationInfo(program, pollingProperty);
+  const pollingData = getPollingLocationInfo(program, pollingProperty);
   const pollingLink = createOperationLink(program, pollingProperty);
   const monitorInfo = getStatusMonitorInfo(program, pollingLink, pollingData);
   if (monitorInfo === undefined) return undefined;
@@ -867,7 +882,7 @@ function getStatusMonitorLinksFromModel(
     finalLinks === undefined || finalLinks.length !== 1
       ? undefined
       : createOperationLink(program, finalLinks[0]);
-  let finalTarget: Model | UnknownType | VoidType | undefined;
+  let finalTarget: Model | Scalar | UnknownType | VoidType | undefined;
   if (finalLink !== undefined && finalLink.property !== undefined) {
     finalTarget = resolveOperationLocation(program, finalLink.property);
   }
@@ -889,7 +904,7 @@ function getStatusMonitorLinksFromModel(
 function getTargetModelInformation(
   program: Program,
   modelOrLink: OperationLink | Model | IntrinsicType,
-): [Model | VoidType | UnknownType, ModelProperty | undefined] | undefined {
+): [Model | Scalar | VoidType | UnknownType, ModelProperty | undefined] | undefined {
   if (modelOrLink.kind === "Intrinsic") {
     if (!isUnknownType(modelOrLink)) return undefined;
     return [modelOrLink, undefined];
@@ -900,6 +915,9 @@ function getTargetModelInformation(
     if (linkModel === undefined) return undefined;
     if (linkModel.kind === "Intrinsic") {
       if (!isUnknownType(linkModel)) return undefined;
+      return [linkModel, modelOrLink.property];
+    }
+    if (linkModel.kind === "Scalar") {
       return [linkModel, modelOrLink.property];
     }
     modelOrLink = linkModel;
@@ -917,6 +935,7 @@ function getTargetModelInformation(
 
   if (
     (resultProps && !isNeverType(resultProps.type) && resultProps.type.kind === "Model") ||
+    (resultProps && !isNeverType(resultProps.type) && resultProps.type.kind === "Scalar") ||
     (resultProps?.type.kind === "Intrinsic" && isUnknownType(resultProps.type))
   ) {
     return [resultProps.type, resultProps];
@@ -1002,17 +1021,19 @@ function processFinalReference(program: Program, operation: Operation, context: 
 }
 
 function createStatusMonitorPollingData(data: StatusMonitorMetadata): StatusMonitorInfo {
-  function getModel(property: ModelProperty | undefined) {
-    return property?.type.kind === "Model" ? property.type : undefined;
+  function getModelOrScalar(property: ModelProperty | undefined) {
+    if (property?.type.kind === "Model") return property.type;
+    if (property?.type.kind === "Scalar") return property.type;
+    return undefined;
   }
   return {
     lroStates: data.lroStates,
     monitorType: data.monitorType,
     statusProperty: data.statusProperty,
     errorProperty: data.errorProperty,
-    errorType: getModel(data.errorProperty),
+    errorType: data.errorProperty?.type.kind === "Model" ? data.errorProperty.type : undefined,
     successProperty: data.successProperty,
-    successType: getModel(data.successProperty),
+    successType: getModelOrScalar(data.successProperty),
   };
 }
 
@@ -1119,7 +1140,8 @@ function processStatusMonitorReference(
   if (
     context.finalStep === undefined &&
     pollingData.result?.statusMonitor?.successProperty !== undefined &&
-    pollingData.result.statusMonitor.successProperty.type.kind === "Model"
+    (pollingData.result.statusMonitor.successProperty.type.kind === "Model" ||
+      pollingData.result.statusMonitor.successProperty.type.kind === "Scalar")
   ) {
     context.finalStep = {
       kind: "pollingSuccessProperty",
@@ -1150,7 +1172,7 @@ function processStatusMonitorReference(
 function resolveOperationLocation(
   program: Program,
   property: ModelProperty,
-): Model | UnknownType | VoidType | undefined {
+): Model | Scalar | UnknownType | VoidType | undefined {
   const override = getFinalLocationValue(program, property);
   if (override) {
     return filterSuccessType(program, override);

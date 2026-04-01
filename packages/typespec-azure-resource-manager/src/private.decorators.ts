@@ -487,9 +487,9 @@ export function registerArmResource(
     return;
   }
 
-  let keyName: string | undefined = undefined;
-  let collectionName: string | undefined = undefined;
-  let kind: ArmResourceKind | undefined = undefined;
+  let keyName: string | undefined;
+  let collectionName: string | undefined;
+  let kind: ArmResourceKind | undefined;
 
   if (type !== undefined && nameParameter !== undefined) {
     keyName = nameParameter;
@@ -575,7 +575,17 @@ const [getArmResource, setArmResource, armResourceStateMap] = useStateMap<
 export { getArmResource };
 
 export function listArmResources(program: Program): ArmResourceDetails[] {
-  return [...armResourceStateMap(program).values()];
+  // Deduplicate by namespace-qualified name. Versioning mutations (from TCGC's
+  // createSdkContext or autorest's per-version snapshots) re-apply decorators on
+  // realm copies, registering them alongside the originals. By keeping only the
+  // first entry per qualified name, we ensure each resource appears exactly once.
+  const seen = new Set<string>();
+  return [...armResourceStateMap(program).values()].filter((r) => {
+    const name = getTypeName(r.typespecType);
+    if (seen.has(name)) return false;
+    seen.add(name);
+    return true;
+  });
 }
 
 function getProperty(model: Model, propertyName: string): ModelProperty | undefined {

@@ -19,7 +19,7 @@ import {
 
 it("name", async () => {
   const { program } = await SimpleTester.compile(`
-        @client({name: "MyClient"})
+        @client({name: "MyClient", service: NotMyClient})
         @service
         namespace NotMyClient;
         op myOp(): void;

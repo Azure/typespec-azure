@@ -59,16 +59,23 @@ function extractParameters(
   return params;
 }
 
-const LANGUAGE_ALIASES: Record<string, string> = {
-  "@azure-tools/typespec-csharp": "csharp",
-  "@azure-tools/typespec-java": "java",
-  "@azure-tools/typespec-python": "python",
-  "@azure-tools/typespec-typescript": "typescript",
-  "@azure-tools/typespec-ts": "typescript",
-  "@azure-tools/typespec-js": "javascript",
-  "@azure-tools/typespec-swift": "swift",
-  "@azure-tools/typespec-go": "go",
-  "@azure-tools/typespec-rust": "rust",
+interface EmitterRegistration {
+  language: string;
+  parser: LanguageParser;
+}
+
+const EMITTER_REGISTRY: Record<string, EmitterRegistration> = {
+  "@azure-tools/typespec-csharp": { language: "csharp", parser: parseCSharp },
+  "@azure-tools/typespec-java": { language: "java", parser: parseJava },
+  "@azure-tools/typespec-python": { language: "python", parser: parsePython },
+  "@azure-tools/typespec-ts": { language: "typescript", parser: parseTypeScript },
+  "@azure-tools/typespec-go": { language: "go", parser: parseGo },
+  "@azure-tools/typespec-rust": { language: "rust", parser: parseRust },
+  "@azure-typespec/http-client-csharp": { language: "http-client-csharp", parser: parseCSharp },
+  "@azure-typespec/http-client-csharp-mgmt": {
+    language: "http-client-csharp-mgmt",
+    parser: parseCSharp,
+  },
 };
 
 interface LanguageParserResult {
@@ -113,23 +120,73 @@ function parsePython(
 
 /**
  * Java-specific metadata parser.
- * Strips 'com.' prefix from namespace if present for package name derivation.
+ * Derives the Maven artifact ID from namespace and prepends the appropriate
+ * Maven groupId based on the flavor and whether this is a management-plane service.
+ *
+ * GroupId prefix rules:
+ *   - data plane, no v2 flavor  → com.azure
+ *   - management plane, no v2   → com.azure.resourcemanager
+ *   - data plane, azurev2 flavor → com.azure.v2
+ *   - management plane, azurev2  → com.azure.resourcemanager.v2
+ *
+ * When flavor is azurev2, the namespace may already contain 'v2' as a path segment
+ * (e.g. com.azure.v2.security.keyvault.keys). The 'v2' segment is stripped when
+ * deriving the artifact ID to avoid duplication (azure-v2-... → azure-...).
+ *
+ * The final package name is formatted as `{groupId}:{artifactId}`.
  */
 function parseJava(
   options: Record<string, unknown>,
   params: Record<string, unknown>,
 ): LanguageParserResult {
-  let packageName = options["package-name"] ?? options["package_name"];
+  const rawPackageName = options["package-name"] ?? options["package_name"];
   const namespace = options["namespace"];
+  const flavor = options["flavor"];
+  const isV2 = flavor === "azurev2";
 
-  if (namespace && !packageName) {
+  // Derive the artifact ID (the part after the colon in Maven coordinates)
+  let artifactId: string | undefined;
+  if (rawPackageName) {
+    artifactId = String(fillVars(rawPackageName, params));
+  } else if (namespace) {
     const ns = String(namespace);
-    const stripped = ns.startsWith("com.") ? ns.substring(4) : ns;
-    packageName = stripped.replace(/\./g, "-");
+    let stripped = ns.startsWith("com.") ? ns.substring(4) : ns;
+    // When the flavor is azurev2, the namespace may contain 'v2' as a segment
+    // (e.g. com.azure.v2.security.keyvault.keys or com.azure.resourcemanager.v2.cdn).
+    // The 'v2' is already encoded in the Maven groupId, so strip it from the
+    // artifact ID portion to avoid duplication (e.g. azure-v2-security-... → azure-security-...).
+    if (isV2) {
+      stripped = stripped
+        .replace(/^(azure\.resourcemanager\.)v2\./, "$1")
+        .replace(/^(azure\.)v2\./, "$1");
+    }
+    artifactId = stripped.replace(/\./g, "-");
+  }
+
+  let packageName: string | undefined;
+  if (artifactId) {
+    // If the artifact ID already contains a colon it is already in Maven coordinate
+    // format (groupId:artifactId); use it as-is.
+    if (artifactId.includes(":")) {
+      packageName = artifactId;
+    } else {
+      const isManagement = namespace
+        ? String(namespace).startsWith("com.azure.resourcemanager")
+        : false;
+
+      let groupId: string;
+      if (isManagement) {
+        groupId = isV2 ? "com.azure.resourcemanager.v2" : "com.azure.resourcemanager";
+      } else {
+        groupId = isV2 ? "com.azure.v2" : "com.azure";
+      }
+
+      packageName = `${groupId}:${artifactId}`;
+    }
   }
 
   return {
-    packageName: packageName ? String(fillVars(packageName, params)) : undefined,
+    packageName,
     namespace: namespace ? String(fillVars(namespace, params)) : undefined,
   };
 }
@@ -241,19 +298,6 @@ function parseRust(
     namespace: namespace ? String(fillVars(namespace, params)) : undefined,
   };
 }
-
-/**
- * Map of language-specific parsers.
- */
-const LANGUAGE_PARSERS: Record<string, LanguageParser> = {
-  "@azure-tools/typespec-python": parsePython,
-  "@azure-tools/typespec-java": parseJava,
-  "@azure-tools/typespec-csharp": parseCSharp,
-  "@azure-tools/typespec-typescript": parseTypeScript,
-  "@azure-tools/typespec-ts": parseTypeScript,
-  "@azure-tools/typespec-go": parseGo,
-  "@azure-tools/typespec-rust": parseRust,
-};
 
 export interface LanguageCollectionResult {
   languages: Record<string, LanguagePackageMetadata>;
@@ -420,7 +464,7 @@ function checkIfManagementPlane(program: Program, ns: Namespace): boolean {
   return false;
 }
 
-function buildLanguageMetadata(
+export function buildLanguageMetadata(
   optionMap: Record<string, Record<string, unknown>>,
   params: Record<string, unknown>,
   baseOutputDir: string,
@@ -466,10 +510,10 @@ function createLanguageMetadata(
   let namespace: string | undefined;
 
   const normalizedEmitterName = emitterName.toLowerCase();
-  const parser = LANGUAGE_PARSERS[normalizedEmitterName];
+  const registration = EMITTER_REGISTRY[normalizedEmitterName];
 
-  if (parser) {
-    const result = parser(normalizedOptions, params);
+  if (registration) {
+    const result = registration.parser(normalizedOptions, params);
     packageName = result.packageName;
     namespace = result.namespace;
   } else {
@@ -495,6 +539,11 @@ function createLanguageMetadata(
       // If it doesn't start with base, keep as-is
       relativeOutputDir = absolutePath;
     }
+  }
+
+  // Resolve {namespace} placeholder in output directory
+  if (relativeOutputDir && namespace) {
+    relativeOutputDir = relativeOutputDir.replace(/\{namespace\}/g, namespace);
   }
 
   return {
@@ -540,36 +589,14 @@ function normalizeKey(key: string): string {
   return key.replace(/[^a-z0-9]/gi, "").toLowerCase();
 }
 
-function inferLanguageFromEmitterName(emitterName: string): string {
+export function inferLanguageFromEmitterName(emitterName: string): string {
   const normalized = emitterName.toLowerCase();
-  if (LANGUAGE_ALIASES[normalized]) {
-    return LANGUAGE_ALIASES[normalized];
+  const registration = EMITTER_REGISTRY[normalized];
+  if (registration) {
+    return registration.language;
   }
 
-  const basename = normalized.split(/[\\/]/).pop() ?? normalized;
-  const cadlIndex = basename.lastIndexOf("cadl-");
-  if (cadlIndex >= 0) {
-    const suffix = basename.substring(cadlIndex + "cadl-".length);
-    if (suffix) {
-      return suffix;
-    }
-  }
-
-  const typespecIndex = basename.lastIndexOf("typespec-");
-  if (typespecIndex >= 0) {
-    const suffix = basename.substring(typespecIndex + "typespec-".length);
-    if (suffix) {
-      return suffix;
-    }
-  }
-
-  const lastDash = basename.lastIndexOf("-");
-  if (lastDash >= 0 && lastDash < basename.length - 1) {
-    return basename.substring(lastDash + 1);
-  }
-
-  const sanitized = basename.replace(/[^a-z]/g, "");
-  return sanitized || "unknown";
+  return emitterName;
 }
 
 function trimOrUndefined(value: string | undefined): string | undefined {

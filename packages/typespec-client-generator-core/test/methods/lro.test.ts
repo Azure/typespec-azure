@@ -574,7 +574,7 @@ describe("data plane LRO templates", () => {
       namespace TestClient {
         enum Versions {
           v1: "v1",
-                  v2: "v2",
+          v2: "v2",
         }
       
         alias ResourceOperations = global.Azure.Core.ResourceOperations<NoConditionalRequests &
@@ -856,6 +856,7 @@ interface DocumentIntelligenceClient {
         errorMessage: string[];
       }
 
+      @usage(Usage.input)
       model UpdateFinalResult {
         id2: string;
       }
@@ -878,7 +879,7 @@ interface DocumentIntelligenceClient {
     assert.isTrue(response.isGeneratedName);
     const generatedName = response.name;
     // duplicate with existing model named "UpdateFinalResult" so the generated name will be "UpdateFinalResult1"
-    assert.strictEqual("UpdateFinalResult1", generatedName);
+    assert.strictEqual(generatedName, "UpdateFinalResult1");
     const crossLanguageId = response.crossLanguageDefinitionId;
     assert.isFalse(crossLanguageId.includes(".."));
     const lroMetadata = method.lroMetadata;
@@ -1081,6 +1082,47 @@ describe("Arm LRO templates", () => {
     );
 
     assert.isUndefined(metadata.finalResponse);
+  });
+
+  it("ArmResourceActionAsync with scalar final result", async () => {
+    const { program } = await ArmVersionedServiceTester.compile(`
+      model Employee is TrackedResource<EmployeeProperties> {
+        ...ResourceNameParameter<Employee>;
+      }
+
+      model EmployeeProperties {
+        /** Age of employee */
+        age?: int32;
+      }
+
+      op actionAsync is ArmResourceActionAsync<Employee, void, string>;
+  `);
+    const context = await createSdkContextForTester(program);
+    const methods = context.sdkPackage.clients[0].methods;
+    strictEqual(methods.length, 1);
+    const method = methods[0];
+    strictEqual(method.kind, "lro");
+    strictEqual(method.name, "actionAsync");
+
+    const metadata = method.lroMetadata;
+    ok(metadata);
+    strictEqual(metadata.finalStateVia, FinalStateValue.location);
+    strictEqual(metadata.finalStep?.kind, "finalOperationLink");
+
+    // finalResponse should be defined with scalar result
+    ok(metadata.finalResponse);
+    strictEqual(metadata.finalResponse.result.kind, "string");
+    strictEqual(metadata.finalResponse.envelopeResult.kind, "string");
+
+    // finalEnvelopeResult should be SdkBuiltInType string (not "void")
+    assert.exists(metadata.finalEnvelopeResult);
+    assert.notStrictEqual(metadata.finalEnvelopeResult, "void");
+    strictEqual((metadata.finalEnvelopeResult as { kind: string }).kind, "string");
+
+    // The method response type should be the scalar string type
+    const responseType = method.response.type;
+    ok(responseType);
+    strictEqual(responseType.kind, "string");
   });
 });
 it("customized lro delete", async () => {

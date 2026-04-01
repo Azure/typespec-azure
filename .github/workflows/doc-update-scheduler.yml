@@ -1,0 +1,98 @@
+name: Documentation Update Scheduler
+
+# This workflow dispatches the doc-update agentic workflow for each configured
+# package. Configs are defined in eng/scripts/doc-updater/configs/.
+#
+# The actual documentation update is performed by .github/workflows/doc-update.md
+# (an agentic workflow compiled to doc-update.md.lock.yml).
+#
+# To add a new package:
+#   1. Create a YAML config in eng/scripts/doc-updater/configs/
+#   2. Create prompt files in eng/scripts/doc-updater/prompts/<name>/
+#   3. The scheduler will auto-discover and dispatch it.
+
+on:
+  schedule:
+    # Run weekly on Monday at 9:00 AM UTC
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+    inputs:
+      config:
+        description: "Package config to run ('all' runs every config in parallel)"
+        required: false
+        default: "all"
+        type: string
+      full_rebuild:
+        description: "Force full knowledge rebuild (ignore incremental cache)"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  # -----------------------------------------------------------------------
+  # Job 1: Discover which configs to run
+  # -----------------------------------------------------------------------
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.resolve.outputs.matrix }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Resolve config matrix
+        id: resolve
+        run: |
+          CONFIG_INPUT="${{ github.event.inputs.config || 'all' }}"
+          CONFIGS_DIR="eng/scripts/doc-updater/configs"
+
+          if [ "$CONFIG_INPUT" = "all" ]; then
+            # Discover all YAML config files
+            CONFIGS=$(find "$CONFIGS_DIR" -maxdepth 1 -name '*.yaml' -exec basename {} .yaml \; | jq -R -s -c 'split("\n") | map(select(. != ""))')
+          else
+            # Single config or comma-separated list
+            CONFIGS=$(echo "$CONFIG_INPUT" | tr ',' '\n' | jq -R -s -c 'split("\n") | map(select(. != ""))')
+          fi
+
+          echo "Resolved configs: $CONFIGS"
+          echo "matrix=$CONFIGS" >> "$GITHUB_OUTPUT"
+
+  # -----------------------------------------------------------------------
+  # Job 2: Dispatch the agentic workflow for each config
+  # -----------------------------------------------------------------------
+  dispatch:
+    needs: discover
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        config: ${{ fromJson(needs.discover.outputs.matrix) }}
+      fail-fast: false
+    steps:
+      - name: Dispatch doc-update agentic workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          FULL_REBUILD="${{ github.event.inputs.full_rebuild || 'false' }}"
+
+          echo "Dispatching doc-update for config: ${{ matrix.config }}"
+          echo "  Full rebuild: $FULL_REBUILD"
+
+          gh workflow run doc-update.lock.yml \
+            --repo "${{ github.repository }}" \
+            -f config="${{ matrix.config }}" \
+            -f full_rebuild="$FULL_REBUILD"
+
+      - name: Job Summary
+        run: |
+          {
+            echo "## Documentation Update Dispatched"
+            echo ""
+            echo "**Config:** ${{ matrix.config }}"
+            echo "**Full Rebuild:** ${{ github.event.inputs.full_rebuild || 'false' }}"
+            echo ""
+            echo "The agentic workflow has been dispatched. Check the Actions tab for the doc-update run."
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -58,6 +58,7 @@
   "prettier.prettierPath": "./core/packages/compiler/node_modules/prettier/index.cjs",
   "prettier.documentSelectors": ["**/*.tsp"],
   "typespec.tsp-server.path": "${workspaceRoot}/core/packages/compiler",
+  "eslint.rules.customizations": [{ "rule": "*", "severity": "warn" }],
   "cSpell.words": ["autorest", "typespec"],
   "dotnet.defaultSolution": "disable",
   "eslint.useFlatConfig": true

@@ -3,6 +3,7 @@ import {
   ModelProperty,
   Operation,
   Type,
+  Union,
   compilerAssert,
   createDiagnosticCollector,
   getEncode,
@@ -31,12 +32,14 @@ import {
 } from "@typespec/http";
 import { StreamMetadata, getStreamMetadata } from "@typespec/http/experimental";
 import { camelCase } from "change-case";
-import { getResponseAsBool } from "./decorators.js";
+import { getResponseAsBool, isInScope, shouldOmitSlashFromEmptyRoute } from "./decorators.js";
 import {
   CollectionFormat,
   SdkBodyParameter,
+  SdkBuiltInType,
   SdkClientType,
   SdkCookieParameter,
+  SdkEnumType,
   SdkHeaderParameter,
   SdkHttpErrorResponse,
   SdkHttpOperation,
@@ -51,6 +54,7 @@ import {
   SdkStreamMetadata,
   SdkType,
   TCGCContext,
+  UsageFlags,
 } from "./interfaces.js";
 import {
   compareModelProperties,
@@ -69,7 +73,6 @@ import {
   isSubscriptionId,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
-import { isMediaTypeJson, isMediaTypeOctetStream, isMediaTypeTextPlain } from "./media-types.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -157,10 +160,17 @@ export function getSdkHttpOperation(
   );
   filterOutUselessPathParameters(context, httpOperation, methodParameters);
   filterOutReadOnlyParameters(methodParameters);
+
+  // Check if empty route should be treated as empty string
+  let path = httpOperation.path;
+  if (path === "/" && shouldOmitSlashFromEmptyRoute(context, httpOperation.operation)) {
+    path = "";
+  }
+
   return diagnostics.wrap({
     __raw: httpOperation,
     kind: "http",
-    path: httpOperation.path,
+    path,
     uriTemplate: httpOperation.uriTemplate,
     verb: httpOperation.verb,
     ...parameters,
@@ -204,11 +214,33 @@ function getSdkHttpParameters(
     }
   });
 
-  retval.parameters = httpOperation.parameters.parameters
-    .filter((x) => !isNeverOrVoidType(x.param.type))
-    .map((x) =>
-      diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type)),
-    ) as (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter | SdkCookieParameter)[];
+  // Filter parameters by type and scope, warning if required parameters are scoped out
+  const filteredParams: HttpOperationParameter[] = [];
+  for (const x of httpOperation.parameters.parameters) {
+    if (isNeverOrVoidType(x.param.type)) {
+      continue;
+    }
+    if (!isInScope(context, x.param)) {
+      // Warn if a required parameter is being scoped out
+      if (!x.param.optional) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "required-parameter-scoped-out",
+            target: x.param,
+            format: {
+              paramName: x.param.name,
+              scope: context.emitterName,
+            },
+          }),
+        );
+      }
+      continue;
+    }
+    filteredParams.push(x);
+  }
+  retval.parameters = filteredParams.map((x) =>
+    diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type)),
+  ) as (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter | SdkCookieParameter)[];
   const headerParams = retval.parameters.filter(
     (x): x is SdkHeaderParameter => x.kind === "header",
   );
@@ -367,25 +399,15 @@ function createContentTypeOrAcceptHeader(
 ): Omit<SdkMethodParameter, "kind"> {
   const name = bodyObject.kind === "body" ? "contentType" : "accept";
   let type: SdkType = getTypeSpecBuiltInType(context, "string");
-  // for contentType, we treat it as a constant IFF there's one value and it's one of:
-  //  - application/json
-  //  - text/plain
-  //  - application/octet-stream
-  // this is to prevent a breaking change when a service adds more content types in the future.
-  // e.g. the service accepting image/png then later image/jpeg should _not_ be a breaking change.
-  //
-  // for accept, we treat it as a constant IFF there's a single value. adding more content types
-  // for this case is considered a breaking change for SDKs so we want to surface it as such.
-  // e.g. the service returns image/png then later provides the option to return image/jpeg.
+  // Honor the content types from the HTTP library result.
+  // For a single content type, create a constant. For multiple content types, create an enum.
+  // For File type bodies, the content type is constrained by the File type itself;
+  // treat it the same as a user-defined content type/accept parameter.
   if (
     bodyObject.contentTypes &&
     bodyObject.contentTypes.length === 1 &&
-    (isMediaTypeJson(bodyObject.contentTypes[0]) ||
-      isMediaTypeTextPlain(bodyObject.contentTypes[0]) ||
-      isMediaTypeOctetStream(bodyObject.contentTypes[0]) ||
-      name === "accept")
+    bodyObject.contentTypes[0] !== "*/*"
   ) {
-    // in this case, we just want a content type of application/json
     type = {
       kind: "constant",
       value: bodyObject.contentTypes[0],
@@ -394,9 +416,39 @@ function createContentTypeOrAcceptHeader(
       isGeneratedName: true,
       decorators: [],
     };
+  } else if (bodyObject.contentTypes && bodyObject.contentTypes.length > 1) {
+    const stringType: SdkBuiltInType = getTypeSpecBuiltInType(context, "string");
+    const enumType: SdkEnumType = {
+      kind: "enum",
+      name: `${httpOperation.operation.name}ContentType`,
+      isGeneratedName: true,
+      namespace: "",
+      valueType: stringType,
+      values: [],
+      isFixed: true,
+      isFlags: false,
+      usage: UsageFlags.None,
+      access: "public",
+      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
+      apiVersions: bodyObject.apiVersions,
+      isUnionAsEnum: false,
+      decorators: [],
+    };
+    enumType.values = bodyObject.contentTypes.map((ct) => ({
+      kind: "enumvalue" as const,
+      name: ct,
+      value: ct,
+      enumType,
+      valueType: stringType,
+      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}.${ct}`,
+      decorators: [],
+    }));
+    type = enumType;
   }
   const optional = bodyObject.kind === "body" ? bodyObject.optional : false;
-  // No need for clientDefaultValue because it's a constant, it only has one value
+  // For */* wildcard, provide a sensible client default value
+  const isWildcard = bodyObject.contentTypes?.length === 1 && bodyObject.contentTypes[0] === "*/*";
+  // No need for clientDefaultValue when it's a constant, it only has one value
   return {
     type,
     name,
@@ -405,6 +457,7 @@ function createContentTypeOrAcceptHeader(
     isApiVersionParam: false,
     onClient: false,
     optional: optional,
+    ...(isWildcard && { clientDefaultValue: "application/octet-stream" }),
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
     decorators: [],
     access: "public",
@@ -558,10 +611,12 @@ function getSdkHttpResponseAndExceptions(
   const exceptions: SdkHttpErrorResponse[] = [];
   for (const response of httpOperation.responses) {
     const headers: SdkServiceResponseHeader[] = [];
-    let body: Type | undefined;
+    const bodyTypes: Type[] = [];
     let type: SdkType | undefined;
     let contentTypes: string[] = [];
     let streamMetadata: SdkStreamMetadata | undefined;
+    let lastBodyProperty: ModelProperty | undefined;
+    let lastDefaultContentType: string | undefined;
 
     for (const innerResponse of response.responses) {
       const defaultContentType = innerResponse.body?.contentTypes.includes("application/json")
@@ -575,12 +630,14 @@ function getSdkHttpResponseAndExceptions(
           ),
           __raw: header,
           kind: "responseheader",
-          serializedName: getHeaderFieldName(context.program, header),
+          serializedName:
+            getHeaderFieldName(context.program, header) ??
+            (header === innerResponse.body?.contentTypeProperty ? "Content-Type" : header.name),
         });
         context.__responseHeaderCache.set(header, headers[headers.length - 1]);
       }
       if (innerResponse.body && !isNeverOrVoidType(innerResponse.body.type)) {
-        if (body && body !== innerResponse.body.type) {
+        if (bodyTypes.length > 0 && !bodyTypes.includes(innerResponse.body.type)) {
           diagnostics.add(
             createDiagnostic({
               code: "multiple-response-types",
@@ -590,13 +647,13 @@ function getSdkHttpResponseAndExceptions(
               },
             }),
           );
-          body = tk.union.create([body, innerResponse.body.type]);
-        } else if (!body) {
-          body = innerResponse.body.type;
+        }
+        if (!bodyTypes.includes(innerResponse.body.type)) {
+          bodyTypes.push(innerResponse.body.type);
         }
         contentTypes = contentTypes.concat(innerResponse.body.contentTypes);
-        body =
-          body.kind === "Model" ? getEffectivePayloadType(context, body, Visibility.Read) : body;
+        lastBodyProperty = innerResponse.body.property;
+        lastDefaultContentType = defaultContentType;
         const responseStreamMeta = getStreamMetadata(context.program, innerResponse);
         if (responseStreamMeta) {
           // map stream response body type to bytes, but preserve stream metadata
@@ -604,14 +661,37 @@ function getSdkHttpResponseAndExceptions(
           streamMetadata = diagnostics.pipe(
             buildSdkStreamMetadata(context, responseStreamMeta, httpOperation.operation),
           );
-        } else {
-          type = diagnostics.pipe(
-            getClientTypeWithDiagnostics(context, body, httpOperation.operation),
-          );
-          if (innerResponse.body.property) {
-            addEncodeInfo(context, innerResponse.body.property, type, defaultContentType);
-          }
         }
+      }
+    }
+
+    // Create SDK type from collected body types after iteration
+    let body: Type | undefined;
+    if (!type && bodyTypes.length > 0) {
+      if (bodyTypes.length === 1) {
+        body = bodyTypes[0];
+      } else {
+        body = tk.union.create(bodyTypes);
+      }
+      body = body.kind === "Model" ? getEffectivePayloadType(context, body, Visibility.Read) : body;
+      if (bodyTypes.length > 1) {
+        // Push naming context for the synthetic union so it gets a proper generated name
+        context.__namingContextPath.push({
+          name: httpOperation.operation.name,
+          type: httpOperation.operation,
+        });
+        context.__namingContextPath.push({
+          name: "Response",
+          type: body as Union,
+        });
+      }
+      type = diagnostics.pipe(getClientTypeWithDiagnostics(context, body, httpOperation.operation));
+      if (bodyTypes.length > 1) {
+        context.__namingContextPath.pop();
+        context.__namingContextPath.pop();
+      }
+      if (lastBodyProperty) {
+        addEncodeInfo(context, lastBodyProperty, type, lastDefaultContentType);
       }
     }
     const sdkResponse = {
@@ -634,7 +714,7 @@ function getSdkHttpResponseAndExceptions(
     if (
       response.statusCodes === "*" ||
       isErrorModel(context.program, response.type) ||
-      (body && isErrorModel(context.program, body))
+      (bodyTypes.length > 0 && bodyTypes.some((b) => isErrorModel(context.program, b)))
     ) {
       exceptions.push({
         ...sdkResponse,
@@ -773,28 +853,34 @@ function findMappingWithPath(
   if (serviceParam.__raw && methodParametersMap.has(serviceParam.__raw)) {
     return [methodParametersMap.get(serviceParam.__raw)!];
   }
-  // Use a queue of tuples: [current parameter, path to reach it]
-  const queue: [
-    SdkMethodParameter | SdkModelPropertyType,
-    (SdkMethodParameter | SdkModelPropertyType)[],
-  ][] = methodParameters.map((p) => [p, [p]]);
-  const visited: Set<SdkModelType> = new Set();
 
-  while (queue.length > 0) {
-    const [methodParam, path] = queue.shift()!;
+  // BFS with index-based traversal (O(1) dequeue) and parent pointers (avoid path copying per node)
+  const queue: (SdkMethodParameter | SdkModelPropertyType)[] = [...methodParameters];
+  const parentMap = new Map<
+    SdkMethodParameter | SdkModelPropertyType,
+    SdkMethodParameter | SdkModelPropertyType | undefined
+  >();
+  for (const p of methodParameters) {
+    parentMap.set(p, undefined);
+  }
+  const visited: Set<SdkModelType> = new Set();
+  let front = 0;
+
+  while (front < queue.length) {
+    const methodParam = queue[front++];
 
     // HTTP operation parameter/body parameter/property of body parameter could either from an operation parameter directly or from a property of an operation parameter.
     if (
       methodParam.__raw &&
       serviceParam.__raw &&
-      compareModelProperties(context, methodParam.__raw, serviceParam.__raw)
+      compareModelProperties(context.program, methodParam.__raw, serviceParam.__raw)
     ) {
-      return path;
+      return buildPathFromParentMap(methodParam, parentMap);
     }
 
     // If the service parameter is a body parameter, try to see if we could find a method parameter with same type of the body parameter.
     if (serviceParam.kind === "body" && serviceParam.type === methodParam.type) {
-      return path;
+      return buildPathFromParentMap(methodParam, parentMap);
     }
 
     // BFS to explore nested properties
@@ -803,13 +889,30 @@ function findMappingWithPath(
       let current: SdkModelType | undefined = methodParam.type;
       while (current) {
         for (const prop of current.properties) {
-          queue.push([prop, [...path, prop]]);
+          parentMap.set(prop, methodParam);
+          queue.push(prop);
         }
         current = current.baseModel;
       }
     }
   }
   return undefined;
+}
+
+function buildPathFromParentMap(
+  node: SdkMethodParameter | SdkModelPropertyType,
+  parentMap: Map<
+    SdkMethodParameter | SdkModelPropertyType,
+    SdkMethodParameter | SdkModelPropertyType | undefined
+  >,
+): (SdkMethodParameter | SdkModelPropertyType)[] {
+  const path: (SdkMethodParameter | SdkModelPropertyType)[] = [];
+  let current: SdkMethodParameter | SdkModelPropertyType | undefined = node;
+  while (current !== undefined) {
+    path.push(current);
+    current = parentMap.get(current);
+  }
+  return path.reverse();
 }
 
 function filterOutUselessPathParameters(

@@ -45,7 +45,6 @@ describe("@protocolAPI on interface", () => {
       @service
       namespace MyService {
         @protocolAPI(false)
-        @operationGroup
         interface MyOperations {
           @route("/test1")
           op ${t.op("test1")}(): void;
