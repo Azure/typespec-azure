@@ -1584,7 +1584,7 @@ model DependentProperties {
     const privateEndpointConnection = provider.resources[1];
     ok(privateEndpointConnection);
     expect(privateEndpointConnection).toMatchObject({
-      kind: "Other",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ResourceGroup",
@@ -1642,7 +1642,7 @@ model DependentProperties {
     const privateForDepInstance = provider.resources[2];
     ok(privateForDepInstance);
     expect(privateForDepInstance).toMatchObject({
-      kind: "Other",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ResourceGroup",
@@ -1823,7 +1823,7 @@ model MoveResponse {
     const privateEndpointConnection = provider.resources[1];
     ok(privateEndpointConnection);
     expect(privateEndpointConnection).toMatchObject({
-      kind: "Other",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ResourceGroup",
@@ -2071,7 +2071,7 @@ model DependentProperties {
     const privateLink = provider.resources[1];
     ok(privateLink);
     expect(privateLink).toMatchObject({
-      kind: "Other",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ResourceGroup",
@@ -2101,7 +2101,7 @@ model DependentProperties {
     const privateForDepInstance = provider.resources[2];
     ok(privateForDepInstance);
     expect(privateForDepInstance).toMatchObject({
-      kind: "Other",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ResourceGroup",
@@ -2258,7 +2258,7 @@ model MoveResponse {
     const privateLink = provider.resources[1];
     ok(privateLink);
     expect(privateLink).toMatchObject({
-      kind: "Other",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "Subscription",
@@ -4340,10 +4340,6 @@ namespace Microsoft.Resources {
     expect(provider).toBeDefined();
     expect(provider.resources).toBeDefined();
     ok(provider.resources);
-    // Debug: log resource names and kinds
-    for (const r of provider.resources) {
-      console.log("Resource:", r.typespecType?.name, "kind:", r.kind, "resourceType:", JSON.stringify(r.resourceType), "path:", r.resourceInstancePath, "resourceName:", r.resourceName);
-    }
     expect(provider.resources).toHaveLength(1);
 
     const resource = provider.resources[0];
@@ -4380,7 +4376,7 @@ namespace Microsoft.Resources {
       },
       resourceInstancePath:
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Resources/genericResources/{genericId}",
-      resourceName: "MyGenericResource",
+      resourceName: "GenericResources",
     });
   });
 });

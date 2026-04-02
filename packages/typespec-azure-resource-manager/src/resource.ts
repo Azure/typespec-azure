@@ -458,6 +458,19 @@ export function getPublicResourceKind(
   }
 }
 
+function mapResourceKind(kind: ArmResourceKind): "Tracked" | "Proxy" | "Extension" | "Other" {
+  switch (kind) {
+    case "Tracked":
+      return "Tracked";
+    case "Proxy":
+      return "Proxy";
+    case "Extension":
+      return "Extension";
+    default:
+      return "Other";
+  }
+}
+
 export function resolveArmResources(program: Program): Provider {
   const provider = resolveProviderNamespace(program);
   if (provider === undefined) return {};
@@ -475,9 +488,7 @@ export function resolveArmResources(program: Program): Provider {
       const fullResource: ResolvedResource = {
         ...op,
         type: resource.typespecType,
-        kind:
-          getPublicResourceKind(resource.typespecType) ??
-          (operations.length > 0 ? "Tracked" : "Other"),
+        kind: mapResourceKind(resource.kind),
         providerNamespace: resource.armProviderNamespace,
       };
       resources.push(fullResource);

@@ -250,6 +250,10 @@ export function addArmResourceOperation(
   operationData: ArmOperationIdentifier,
 ): void {
   const operations = getArmResourceOperationList(program, resourceType);
+  // Skip if an operation with the same Operation reference is already registered
+  for (const existing of operations) {
+    if (existing.operation === operationData.operation) return;
+  }
   operations.add(operationData);
   setArmOperationList(program, resourceType, operations);
 }
