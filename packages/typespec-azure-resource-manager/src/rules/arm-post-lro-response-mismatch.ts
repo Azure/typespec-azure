@@ -2,7 +2,6 @@ import {
   CodeFix,
   Operation,
   Program,
-  Scalar,
   Type,
   createRule,
   getSourceLocation,
@@ -113,7 +112,7 @@ function getTypeName(type: Type): string | undefined {
     case "Model":
       return type.name;
     case "Scalar":
-      return (type as Scalar).name;
+      return type.name;
     case "Intrinsic":
       return type.name;
     default:
