@@ -1,5 +1,14 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.66.1
+
+### Bug Fixes
+
+- [#4131](https://github.com/Azure/typespec-azure/pull/4131) Add `CustomAzureProxyResource` template to `Azure.ResourceManager.Legacy` namespace for custom proxy resources that extend `Foundations.ProxyResource`.
+- [#4116](https://github.com/Azure/typespec-azure/pull/4116) Allow `unknown` type for Request and Response parameters in `ArmProviderActionSync` and `ArmProviderActionAsync` templates
+- [#4130](https://github.com/Azure/typespec-azure/pull/4130) Add settable provider to standard templates
+
+
 ## 0.66.0
 
 ### Bump dependencies
