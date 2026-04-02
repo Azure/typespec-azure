@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.66.2
+
+### Bug Fixes
+
+- [#4166](https://github.com/Azure/typespec-azure/pull/4166) Preserve casing in custom scalars used as lro final-result
+
+
 ## 0.66.1
 
 ### Bug Fixes
