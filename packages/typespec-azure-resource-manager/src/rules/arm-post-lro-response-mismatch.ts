@@ -1,8 +1,8 @@
 import {
   CodeFix,
-  Model,
   Operation,
   Program,
+  Scalar,
   Type,
   createRule,
   getSourceLocation,
@@ -57,11 +57,11 @@ function createLroHeadersCodeFix(op: Operation, responseTypeName: string): CodeF
 /**
  * Get the Response type from an operation's template parameter.
  * Looks at the operation's immediate sourceOperation to find a template parameter named "Response"
- * and returns the resolved type if it's a non-void Model.
+ * and returns the resolved type if it's a non-void Type (Model, Scalar, or UnknownType).
  * Only checks the first level of template indirection to avoid picking up internal
  * template parameters (e.g., ArmResourceActionAsyncBase's Response parameter).
  */
-function getResponseTemplateParam(op: Operation): Model | undefined {
+function getResponseTemplateParam(op: Operation): Type | undefined {
   // The operation itself is a resolved instance, so we need to look at the
   // sourceOperation (the template). The templateMapper on sourceOperation
   // contains the resolved template arguments.
@@ -82,10 +82,9 @@ function getResponseTemplateParam(op: Operation): Model | undefined {
       if (
         typeof resolvedType === "object" &&
         "kind" in resolvedType &&
-        resolvedType.kind === "Model" &&
-        !isVoidType(resolvedType)
+        !isVoidType(resolvedType as Type)
       ) {
-        return resolvedType as Model;
+        return resolvedType as Type;
       }
       return undefined;
     }
@@ -104,6 +103,22 @@ function getResponseBody(responses: HttpOperationResponse[]): HttpPayloadBody | 
     return response200.responses[0].body;
   }
   return undefined;
+}
+
+/**
+ * Get a printable name for a type, if available.
+ */
+function getTypeName(type: Type): string | undefined {
+  switch (type.kind) {
+    case "Model":
+      return type.name;
+    case "Scalar":
+      return (type as Scalar).name;
+    case "Intrinsic":
+      return type.name;
+    default:
+      return undefined;
+  }
 }
 
 /**
@@ -151,11 +166,13 @@ export const armPostLroResponseMismatchRule = createRule({
       if (responseType !== undefined) {
         // Template-based detection: Response template param is non-void but finalResult doesn't match
         if (!doesFinalResultMatch(finalResult, responseType)) {
-          const responseTypeName = responseType.name;
+          const responseTypeName = getTypeName(responseType);
           const codefixes: CodeFix[] = [];
-          const codeFix = createLroHeadersCodeFix(op.operation, responseTypeName);
-          if (codeFix !== undefined) {
-            codefixes.push(codeFix);
+          if (responseTypeName !== undefined) {
+            const codeFix = createLroHeadersCodeFix(op.operation, responseTypeName);
+            if (codeFix !== undefined) {
+              codefixes.push(codeFix);
+            }
           }
           context.reportDiagnostic({
             target: op.operation,

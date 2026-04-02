@@ -199,6 +199,68 @@ describe("emits warning", () => {
         code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
       });
   });
+
+  it("when Response template parameter is unknown type but FinalResult is void", async () => {
+    await tester
+      .expect(
+        `
+      @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+      model Employee is ProxyResource<{}> {
+        @pattern("^[a-zA-Z0-9-]{3,24}$")
+        @key("employeeName")
+        @path
+        @segment("employees")
+        name: string;
+      }
+
+      @armResourceOperations
+      interface Employees {
+        generate is ArmResourceActionAsync<
+          Employee,
+          void,
+          unknown,
+          LroHeaders = ArmLroLocationHeader
+        >;
+      }
+      `,
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
+      });
+  });
+
+  it("when Response template parameter is a scalar type but FinalResult is void", async () => {
+    await tester
+      .expect(
+        `
+      @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+      model Employee is ProxyResource<{}> {
+        @pattern("^[a-zA-Z0-9-]{3,24}$")
+        @key("employeeName")
+        @path
+        @segment("employees")
+        name: string;
+      }
+
+      @armResourceOperations
+      interface Employees {
+        generate is ArmResourceActionAsync<
+          Employee,
+          void,
+          string,
+          LroHeaders = ArmLroLocationHeader
+        >;
+      }
+      `,
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
+      });
+  });
 });
 
 describe("does not emit warning", () => {
@@ -373,6 +435,63 @@ describe("does not emit warning", () => {
             string
           > & Azure.Core.Foundations.RetryAfterHeader
         >;
+      }
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("when Response template parameter is unknown and FinalResult matches unknown", async () => {
+    await tester
+      .expect(
+        `
+      @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+      model Employee is ProxyResource<{}> {
+        @pattern("^[a-zA-Z0-9-]{3,24}$")
+        @key("employeeName")
+        @path
+        @segment("employees")
+        name: string;
+      }
+
+      @armResourceOperations
+      interface Employees {
+        generate is ArmResourceActionAsync<
+          Employee,
+          void,
+          unknown,
+          LroHeaders = ArmLroLocationHeader<
+            Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
+            unknown,
+            string
+          > & Azure.Core.Foundations.RetryAfterHeader
+        >;
+      }
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("when Response template parameter is a scalar and FinalResult matches the scalar", async () => {
+    await tester
+      .expect(
+        `
+      @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+      model Employee is ProxyResource<{}> {
+        @pattern("^[a-zA-Z0-9-]{3,24}$")
+        @key("employeeName")
+        @path
+        @segment("employees")
+        name: string;
+      }
+
+      @armResourceOperations
+      interface Employees {
+        generate is ArmResourceActionAsync<Employee, void, string>;
       }
       `,
       )
