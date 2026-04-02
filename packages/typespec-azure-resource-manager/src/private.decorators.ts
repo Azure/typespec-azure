@@ -539,7 +539,7 @@ export function registerArmResource(
 
     kind = getArmResourceKind(resourceType);
     if (isArmVirtualResource(program, resourceType)) kind = "Virtual";
-    if (isCustomAzureResource(program, resourceType)) kind = "Custom";
+    if (isCustomAzureResource(program, resourceType) && kind === undefined) kind = "Custom";
   }
   if (!kind) {
     reportDiagnostic(program, {

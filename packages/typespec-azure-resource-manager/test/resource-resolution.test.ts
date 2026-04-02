@@ -4210,4 +4210,175 @@ interface SupportTicketsNoSubscription {
     expect(resource.operations.lists).toBeDefined();
     expect(resource.operations.lists).toHaveLength(2);
   });
+
+  it("collects operation information for generic CustomAzureProxyResource with RoutedOperations", async () => {
+    const { program } = await Tester.compile(`
+
+using Azure.Core;
+
+/** Contoso Resource Provider management API. */
+@armProviderNamespace
+@service(#{ title: "ContosoProviderHubClient" })
+@versioned(Versions)
+namespace Microsoft.Resources {
+  /** Contoso API versions */
+  enum Versions {
+    /** 2021-10-01-preview version */
+    @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+    v2021_20_01_preview: "2021-10-01-preview",
+  }
+
+  /** A generic resource */
+  #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "legacy test"
+  model GenericResource
+    is Azure.ResourceManager.Legacy.CustomAzureProxyResource<false> {
+    ...ResourceNameParameter<GenericResource>;
+  }
+
+  /** RP-specific properties */
+  model GenericResourceProperties {
+    /** placeholder */
+    placeholder?: {};
+  }
+
+  alias genericOps = Azure.ResourceManager.Legacy.RoutedOperations<
+    {
+      ...ApiVersionParameter;
+      ...SubscriptionIdParameter;
+      ...ResourceGroupParameter;
+      ...Azure.ResourceManager.Legacy.Provider;
+
+      @path
+      @segment("genericResources")
+      @key
+      @doc("The resource id")
+      genericId: string;
+    },
+    {}
+  >;
+
+  /** The provisioning state of a resource. */
+  @lroStatus
+  union ProvisioningState {
+    ResourceProvisioningState,
+
+    /** The resource create request has been accepted */
+    Accepted: "Accepted",
+
+    /** The resource is being provisioned */
+    InProgress: "InProgress",
+
+    /** The resource was updated */
+    Updated: "Updated",
+
+    /** Succeeded */
+    Succeeded: "Succeeded",
+
+    /** Failed */
+    Failed: "Failed",
+
+    /** The resource was canceled */
+    Canceled: "Canceled",
+
+    /** The resource is being deleted */
+    Deleted: "Deleted",
+
+    string,
+  }
+
+  /** Employee update request body */
+  model EmployeeUpdate {
+    /** tags */
+    ...Azure.ResourceManager.Foundations.ArmTagsProperty;
+
+    /** RP-specific properties */
+    properties?: EmployeeUpdateProperties;
+  }
+
+  /** Employee update properties */
+  model EmployeeUpdateProperties {
+    /** Age of employee */
+    age?: int32;
+
+    /** City of employee */
+    city?: string;
+
+    /** Profile of employee */
+    @encode("base64url")
+    profile?: bytes;
+  }
+
+  /** Employee move request */
+  model MoveRequest {
+    /** The moving from location */
+    from: string;
+
+    /** The moving to location */
+    to: string;
+  }
+
+  /** Employee move response */
+  model MoveResponse {
+    /** The status of the move */
+    movingStatus: string;
+  }
+
+  interface Operations extends Azure.ResourceManager.Operations {}
+
+  @armResourceOperations
+  interface GenericResourceOps {
+    get is genericOps.Read<GenericResource>;
+    createOrUpdate is genericOps.CreateOrUpdateAsync<GenericResource>;
+    update is genericOps.CustomPatchSync<GenericResource, GenericResource>;
+    delete is genericOps.DeleteWithoutOkAsync<GenericResource>;
+    /** A sample resource action that moves employee to different location */
+    move is genericOps.ActionAsync<GenericResource, MoveRequest, MoveResponse>;
+    /** A sample HEAD to check resource existence */
+    checkExistence is genericOps.CheckExistence<GenericResource>;
+  }
+}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    ok(provider.resources);
+    expect(provider.resources).toHaveLength(1);
+
+    const resource = provider.resources[0];
+    ok(resource);
+    expect(resource).toMatchObject({
+      kind: "Proxy",
+      providerNamespace: "Microsoft.Resources",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+    });
+
+    checkResolvedOperations(resource, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            {
+              operationGroup: "GenericResourceOps",
+              name: "createOrUpdate",
+              kind: "createOrUpdate",
+            },
+          ],
+          delete: [{ operationGroup: "GenericResourceOps", name: "delete", kind: "delete" }],
+          read: [{ operationGroup: "GenericResourceOps", name: "get", kind: "read" }],
+          update: [{ operationGroup: "GenericResourceOps", name: "update", kind: "update" }],
+          checkExistence: [
+            { operationGroup: "GenericResourceOps", name: "checkExistence", kind: "checkExistence" },
+          ],
+        },
+        actions: [{ operationGroup: "GenericResourceOps", name: "move", kind: "action" }],
+      },
+      resourceType: {
+        provider: "Microsoft.Resources",
+        types: ["genericResources"],
+      },
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Resources/genericResources/{genericId}",
+      resourceName: "GenericResource",
+    });
+  });
 });
