@@ -111,6 +111,63 @@ it("service without versioning should have empty apiVersions map", async () => {
   strictEqual(sdkPackage.metadata.apiVersions.size, 0);
 });
 
+it("multiple services should ignore api-version config", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+      @service
+      @versioned(VersionsA)
+      namespace ServiceA {
+        enum VersionsA {
+          av1,
+          av2,
+        }
+        interface AI {
+          @route("/aTest")
+          aTest(@query("api-version") apiVersion: VersionsA): void;
+        }
+      }
+      @service
+      @versioned(VersionsB)
+      namespace ServiceB {
+        enum VersionsB {
+          bv1,
+          bv2,
+        }
+        interface BI {
+          @route("/bTest")
+          bTest(@query("api-version") apiVersion: VersionsB): void;
+        }
+      }`,
+      `
+      @client(
+        {
+          name: "CombineClient",
+          service: [ServiceA, ServiceB],
+          autoMergeService: true,
+        }
+      )
+      namespace CombineClient;
+    `,
+    ),
+  );
+
+  // Even with api-version set, multi-service should still use latest versions
+  const context = await createSdkContextForTester(program, {
+    "api-version": "av1",
+  });
+  const sdkPackage = context.sdkPackage;
+
+  // For multi-service, deprecated apiVersion should be undefined
+  strictEqual(sdkPackage.metadata.apiVersion, undefined);
+
+  // api-version config should be ignored, so all services use their latest versions
+  ok(sdkPackage.metadata.apiVersions);
+  strictEqual(sdkPackage.metadata.apiVersions.size, 2);
+  strictEqual(sdkPackage.metadata.apiVersions.get("ServiceA"), "av2");
+  strictEqual(sdkPackage.metadata.apiVersions.get("ServiceB"), "bv2");
+});
+
 it("apiVersion 'all' should populate apiVersions with 'all'", async () => {
   const { program } = await SimpleTester.compile(`
     @service(#{

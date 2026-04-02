@@ -42,6 +42,16 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   const servicesNs = new Set<Namespace>();
   clients.forEach((c) => c.services.forEach((s) => servicesNs.add(s)));
 
+  // Multi services' client should not honor the specific api-version set in config
+  if (
+    servicesNs.size > 1 &&
+    context.apiVersion !== undefined &&
+    context.apiVersion !== "latest" &&
+    context.apiVersion !== "all"
+  ) {
+    context.apiVersion = undefined;
+  }
+
   // handle versioning with mutated types
   context.__packageVersions = new Map<Namespace, string[]>();
   context.__packageVersionEnum = new Map<Namespace, Enum | undefined>();
