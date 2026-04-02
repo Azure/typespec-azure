@@ -192,6 +192,22 @@ describe("typespec-azure-core: no-route-parameter-name-mismatch", () => {
       .toBeValid();
   });
 
+  it("does not emit a warning for paths with consecutive path variables", async () => {
+    await tester
+      .expect(
+        `
+        @service namespace TestService;
+
+        @route("/providers/Microsoft.Contoso/{foo}/{bar}")
+        op getBar(@path foo: string, @path bar: string): void;
+
+        @route("/providers/Microsoft.Contoso/{name}/{id}")
+        op updateBar(@path name: string, @path id: string): void;
+        `,
+      )
+      .toBeValid();
+  });
+
   it("emit warnings when third operation also mismatches", async () => {
     await tester
       .expect(

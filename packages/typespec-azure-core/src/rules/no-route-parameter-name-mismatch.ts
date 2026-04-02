@@ -43,8 +43,10 @@ export const noRouteParameterNameMismatchRule = createRule({
         const normalizedPath = path.replace(/\{[^}]+\}/g, "{}");
 
         // Skip paths that have no static segments (only parameters and separators),
-        // since these are too generic to meaningfully compare parameter names
-        if (normalizedPath.replace(/[{}/]/g, "") === "") {
+        // since these are too generic to meaningfully compare parameter names.
+        // Also skip paths where two path variables occur in a row with no static
+        // segment between them, since it is difficult to reason about such paths.
+        if (normalizedPath.replace(/[{}/]/g, "") === "" || normalizedPath.includes("{}/{}")) {
           return;
         }
 
