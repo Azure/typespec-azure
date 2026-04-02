@@ -4342,7 +4342,7 @@ namespace Microsoft.Resources {
     ok(provider.resources);
     // Debug: log resource names and kinds
     for (const r of provider.resources) {
-      console.log("Resource:", r.typespecType?.name, "kind:", r.kind, "type:", r.type);
+      console.log("Resource:", r.typespecType?.name, "kind:", r.kind, "resourceType:", JSON.stringify(r.resourceType), "path:", r.resourceInstancePath, "resourceName:", r.resourceName);
     }
     expect(provider.resources).toHaveLength(1);
 
