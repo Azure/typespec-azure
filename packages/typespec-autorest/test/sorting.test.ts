@@ -80,6 +80,42 @@ describe("typespec-autorest: OpenAPI output should be determinstic", () => {
     ]);
   });
 
+  it("sorts x-ms-paths with query-only paths", () => {
+    const sorted = sortOpenAPIDocument({
+      swagger: "2.0",
+      info: {} as any,
+      paths: {},
+      "x-ms-paths": {
+        "?b=1": {},
+        "?a=1": {},
+        "?c=1": {},
+      },
+    });
+
+    deepStrictEqual(Object.keys(sorted["x-ms-paths"]!), ["?a=1", "?b=1", "?c=1"]);
+  });
+
+  it("sorts x-ms-paths with mixed path and query-only entries", () => {
+    const sorted = sortOpenAPIDocument({
+      swagger: "2.0",
+      info: {} as any,
+      paths: {},
+      "x-ms-paths": {
+        "/b?_overload=op1": {},
+        "?b=1": {},
+        "/a?_overload=op2": {},
+        "?a=1": {},
+      },
+    });
+
+    deepStrictEqual(Object.keys(sorted["x-ms-paths"]!), [
+      "?a=1",
+      "?b=1",
+      "/a?_overload=op2",
+      "/b?_overload=op1",
+    ]);
+  });
+
   it("header already in lexical order", async () => {
     const res = await openApiFor(
       `
