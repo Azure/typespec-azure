@@ -229,3 +229,15 @@ extern dec validateCommonTypesVersionForResource(
   version: valueof string,
   resourceName: valueof string
 );
+
+/**
+ * This decorator is used to identify a generic Azure Resource Manager resource type
+ * that does not require name, key, or segment properties on the model itself.
+ * The resource type and path information comes from the operations (e.g. RoutedOperations).
+ *
+ * It is *not* meant to be used directly by a spec author, it instead
+ * gets implicitly applied when the spec author defines a model type in this form:
+ *
+ *   `model MyResource is GenericProxyResource;`
+ */
+extern dec genericResourceInternal(target: Model);

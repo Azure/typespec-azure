@@ -87,9 +87,9 @@ export interface ArmResourceDetailsBase {
   /** The RP namespace */
   armProviderNamespace: string;
   /** The name parameter for the resource */
-  keyName: string;
+  keyName?: string;
   /** The type name / collection name of the resource */
-  collectionName: string;
+  collectionName?: string;
   /** A reference to the TypeSpec type */
   typespecType: Model;
 }
@@ -388,10 +388,14 @@ function getResourceTypePath(
   // To do so, we need to:
   // 1) Cut out the resource name from the item path
   let temporaryPath;
-  const index = itemPath.indexOf(resource.collectionName);
-  if (index !== -1) {
-    const truncatedPath = itemPath.slice(0, index + resource.collectionName.length);
-    temporaryPath = truncatedPath;
+  if (resource.collectionName) {
+    const index = itemPath.indexOf(resource.collectionName);
+    if (index !== -1) {
+      const truncatedPath = itemPath.slice(0, index + resource.collectionName.length);
+      temporaryPath = truncatedPath;
+    } else {
+      temporaryPath = itemPath;
+    }
   } else {
     temporaryPath = itemPath;
   }
@@ -1089,8 +1093,9 @@ export function getArmResourceInfo(
 }
 
 export function getArmResourceKind(resourceType: Model): ArmResourceKind | undefined {
-  if (resourceType.baseModel) {
-    const coreType = resourceType.baseModel;
+  let current: Model | undefined = resourceType;
+  while (current?.baseModel) {
+    const coreType = current.baseModel;
     const coreTypeNamespace = coreType.namespace ? getNamespaceFullName(coreType.namespace) : "";
     if (
       coreType.name.startsWith("TrackedResource") ||
@@ -1107,6 +1112,7 @@ export function getArmResourceKind(resourceType: Model): ArmResourceKind | undef
     } else if (coreTypeNamespace === "Azure.ResourceManager.CommonTypes") {
       return "BuiltIn";
     }
+    current = coreType;
   }
 
   return undefined;

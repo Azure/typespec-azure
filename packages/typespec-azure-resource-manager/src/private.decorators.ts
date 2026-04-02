@@ -487,6 +487,9 @@ export function registerArmResource(
     return;
   }
 
+  // Check if already registered
+  if (getArmResource(program, resourceType)) return;
+
   let keyName: string | undefined;
   let collectionName: string | undefined;
   let kind: ArmResourceKind | undefined;
@@ -499,47 +502,53 @@ export function registerArmResource(
     // Ensure the resource type has defined a name property that has a segment
     const primaryKeyProperty = getPrimaryKeyProperty(program, resourceType);
     if (!primaryKeyProperty) {
-      reportDiagnostic(program, {
-        code: "arm-resource-missing-name-property",
-        target: resourceType,
-      });
-      return;
-    }
+      // Custom resources (via @customAzureResource) may not have key properties.
+      // They rely on RoutedOperations to define their paths.
+      if (isCustomAzureResource(program, resourceType)) {
+        kind = getArmResourceKind(resourceType) ?? "Custom";
+      } else {
+        reportDiagnostic(program, {
+          code: "arm-resource-missing-name-property",
+          target: resourceType,
+        });
+        return;
+      }
+    } else {
+      // Set the name property to be read only
+      if (primaryKeyProperty.name === "name") {
+        const Lifecycle = getLifecycleVisibilityEnum(program);
+        clearVisibilityModifiersForClass(program, primaryKeyProperty, Lifecycle, context);
+        addVisibilityModifiers(
+          program,
+          primaryKeyProperty,
+          [Lifecycle.members.get("Read")!],
+          context,
+        );
+        sealVisibilityModifiers(program, primaryKeyProperty, Lifecycle);
+      }
 
-    // Set the name property to be read only
-    if (primaryKeyProperty.name === "name") {
-      const Lifecycle = getLifecycleVisibilityEnum(program);
-      clearVisibilityModifiersForClass(program, primaryKeyProperty, Lifecycle, context);
-      addVisibilityModifiers(
-        program,
-        primaryKeyProperty,
-        [Lifecycle.members.get("Read")!],
-        context,
-      );
-      sealVisibilityModifiers(program, primaryKeyProperty, Lifecycle);
-    }
+      keyName = getKeyName(program, primaryKeyProperty);
+      if (!keyName) {
+        reportDiagnostic(program, {
+          code: "arm-resource-missing-name-key-decorator",
+          target: resourceType,
+        });
+        return;
+      }
 
-    keyName = getKeyName(program, primaryKeyProperty);
-    if (!keyName) {
-      reportDiagnostic(program, {
-        code: "arm-resource-missing-name-key-decorator",
-        target: resourceType,
-      });
-      return;
-    }
+      collectionName = getSegment(program, primaryKeyProperty);
+      if (!collectionName) {
+        reportDiagnostic(program, {
+          code: "arm-resource-missing-name-segment-decorator",
+          target: resourceType,
+        });
+        return;
+      }
 
-    collectionName = getSegment(program, primaryKeyProperty);
-    if (!collectionName) {
-      reportDiagnostic(program, {
-        code: "arm-resource-missing-name-segment-decorator",
-        target: resourceType,
-      });
-      return;
+      kind = getArmResourceKind(resourceType);
+      if (isArmVirtualResource(program, resourceType)) kind = "Virtual";
+      if (isCustomAzureResource(program, resourceType) && kind === undefined) kind = "Custom";
     }
-
-    kind = getArmResourceKind(resourceType);
-    if (isArmVirtualResource(program, resourceType)) kind = "Virtual";
-    if (isCustomAzureResource(program, resourceType) && kind === undefined) kind = "Custom";
   }
   if (!kind) {
     reportDiagnostic(program, {
