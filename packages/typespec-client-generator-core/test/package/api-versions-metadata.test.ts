@@ -1,4 +1,4 @@
-import { ok, strictEqual } from "assert";
+import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
 import {
   createClientCustomizationInput,
@@ -166,6 +166,24 @@ it("multiple services should ignore api-version config", async () => {
   strictEqual(sdkPackage.metadata.apiVersions.size, 2);
   strictEqual(sdkPackage.metadata.apiVersions.get("ServiceA"), "av2");
   strictEqual(sdkPackage.metadata.apiVersions.get("ServiceB"), "bv2");
+
+  // Validate all clients and sub-clients have the correct apiVersions
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+  strictEqual(client.apiVersions.length, 0);
+
+  const aiClient = client.children!.find((c) => c.name === "AI");
+  ok(aiClient);
+  deepStrictEqual(aiClient.apiVersions, ["av1", "av2"]);
+  strictEqual(aiClient.clientInitialization.parameters[1].name, "apiVersion");
+  strictEqual(aiClient.clientInitialization.parameters[1].clientDefaultValue, "av2");
+
+  const biClient = client.children!.find((c) => c.name === "BI");
+  ok(biClient);
+  deepStrictEqual(biClient.apiVersions, ["bv1", "bv2"]);
+  strictEqual(biClient.clientInitialization.parameters[1].name, "apiVersion");
+  strictEqual(biClient.clientInitialization.parameters[1].clientDefaultValue, "bv2");
 });
 
 it("apiVersion 'all' should populate apiVersions with 'all'", async () => {
