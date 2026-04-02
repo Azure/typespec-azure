@@ -346,6 +346,38 @@ describe("does not emit warning", () => {
       )
       .toBeValid();
   });
+
+  it("when both Response and FinalResult are void (ArmResourceActionNoResponseContentAsync with custom LroHeaders)", async () => {
+    await tester
+      .expect(
+        `
+      @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+      model Employee is ProxyResource<{}> {
+        @pattern("^[a-zA-Z0-9-]{3,24}$")
+        @key("employeeName")
+        @path
+        @segment("employees")
+        name: string;
+      }
+
+      @armResourceOperations
+      interface Employees {
+        restart is ArmResourceActionNoResponseContentAsync<
+          Employee,
+          void,
+          LroHeaders = ArmLroLocationHeader<
+            Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
+            void,
+            string
+          > & Azure.Core.Foundations.RetryAfterHeader
+        >;
+      }
+      `,
+      )
+      .toBeValid();
+  });
 });
 
 describe("codefix", () => {

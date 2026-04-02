@@ -126,7 +126,7 @@ export const armPostLroResponseMismatchRule = createRule({
      */
     function doesFinalResultMatch(finalResult: Type | "void", expectedResponseType: Type): boolean {
       if (finalResult === "void") {
-        return false;
+        return isVoidType(expectedResponseType);
       }
       return $(context.program).type.isAssignableTo(finalResult, expectedResponseType, finalResult);
     }
