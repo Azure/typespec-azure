@@ -8,6 +8,14 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const samplesSpecsDir = resolve(__dirname, "../../samples/specs");
 const outputFile = resolve(__dirname, "dist/samples.ts");
 
+/** Convert a directory name like "data-plane" or "resource-manager" to a display label. */
+function formatCategory(dirName: string): string {
+  return dirName
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
 interface SampleConfig {
   title?: string;
   description?: string;
@@ -135,10 +143,15 @@ for (const configPath of configPaths) {
   // Compute relative path from specs dir for the sample identifier
   const sampleRelPath = sampleDir.slice(samplesSpecsDir.length + 1);
 
+  // Derive category from directory structure (e.g., "data-plane/widget-manager" → "Data Plane")
+  const pathParts = sampleRelPath.split("/");
+  const category = formatCategory(pathParts[0]);
+
   samples[config.title] = {
     filename: `../samples/specs/${sampleRelPath}/main.tsp`,
     content,
     preferredEmitter,
+    category,
     description: config.description ?? "",
     ...(compilerOptions ? { compilerOptions } : {}),
   };
