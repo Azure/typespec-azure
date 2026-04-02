@@ -21,28 +21,29 @@ Azure TypeSpec Author helps you write and update Azure API specifications using 
 
 ### API Versioning 
 
-- "Add a new preview API version 2026-01-01-preview for widget resource manager"
-- "Add a new stable API version 2026-01-01 for widget resource manager"
-- "Change visibility of provisioningState to Read+Create in 2025-05-04-preview only"
-- "Change property age from required to optional for 2025-05-04-preview"
+- "In specification/widget/resource-manager/Microsoft.Widget, Add a new preview API version 2026-01-01-preview"
+- "In specification/widget/resource-manager/Microsoft.Widget, Add a new stable API version 2026-01-01"
+- "In specification/widget/resource-manager/Microsoft.Widget, Change visibility of provisioningState to Read+Create in 2025-05-04-preview only"
+- "In specification/widget/resource-manager/Microsoft.Widget, Change property age from required to optional in 2025-05-04-preview only"
+- "In specification/widget/resource-manager/Microsoft.Widget, change visibility of provisioningState to Read+Create in 2025-05-04-preview only"
 
 ### Resource Definitions
 
-- "Add an ARM resource named Asset with CRUD operations for widget resource manager"
-- "Add a child resource named Component under the Asset resource for widget resource manager"
-- "Add a proxy resource named Config under the Asset resource for widget resource manager"
-- "change resource Employee as extension resource"
+- "In specification/widget/resource-manager/Microsoft.Widget, Add an ARM resource named Asset with CRUD operations"
+- "In specification/widget/resource-manager/Microsoft.Widget, Add a child resource named Component under the Asset resource"
+- "In specification/widget/resource-manager/Microsoft.Widget, Add a proxy resource named Config under the Asset resource"
+- "In specification/widget/resource-manager/Microsoft.Widget, change resource Employee as extension resource"
 
 ### Resource Operations
 
-- "Add a custom action restartAsset to the Asset resource for widget resource manager"
-- "Add an async/LRO operation to export data from the Asset resource for widget resource manager"
-- "Add a PATCH operation to the Asset resource for widget resource manager"
-- "Modify the LRO createOrUpdate PUT operation in interface employees so that it returns Azure-AsyncOperation header but NOT Retry-After header in the 201 response."
-- "Add 'top' and 'skip' query parameters to the ListBySubscription operation in interface employees"
+- "In specification/widget/resource-manager/Microsoft.Widget, Add a custom action restartAsset to the Asset resource"
+- "In specification/widget/resource-manager/Microsoft.Widget, Add an async/LRO operation to export data from the Asset resource"
+- "In specification/widget/resource-manager/Microsoft.Widget, Add a PATCH operation to the Asset resource"
+- "In specification/widget/resource-manager/Microsoft.Widget, Modify the LRO createOrUpdate PUT operation in interface employees so that it returns Azure-AsyncOperation header but NOT Retry-After header in the 201 response."
+- "In specification/widget/resource-manager/Microsoft.Widget, Add 'top' and 'skip' query parameters to the ListBySubscription operation in interface employees"
 
 ### Models & Types
 
-- "Add an enum named AssetStatus with values Active, Inactive, and Deprecated for widget resource manager"
-- "Add a new property tags to the Asset resource for widget resource manager"
- change visibility of provisioningState to Read+Create in 2025-05-04-preview only
+- "In specification/widget/resource-manager/Microsoft.Widget, Add an enum named AssetStatus with values Active, Inactive, and Deprecated"
+- "In specification/widget/resource-manager/Microsoft.Widget, Add a new property tags to the Asset resource"
+
