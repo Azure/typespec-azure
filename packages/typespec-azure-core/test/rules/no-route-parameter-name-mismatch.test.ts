@@ -176,6 +176,22 @@ describe("typespec-azure-core: no-route-parameter-name-mismatch", () => {
       .toBeValid();
   });
 
+  it("does not emit a warning for paths with no static segments", async () => {
+    await tester
+      .expect(
+        `
+        @service namespace TestService;
+
+        @route("/{scope}")
+        op getByScope(@path scope: string): void;
+
+        @route("/{resourceUri}")
+        op getByResourceUri(@path resourceUri: string): void;
+        `,
+      )
+      .toBeValid();
+  });
+
   it("emit warnings when third operation also mismatches", async () => {
     await tester
       .expect(
