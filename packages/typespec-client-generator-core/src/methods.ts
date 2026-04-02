@@ -21,7 +21,6 @@ import {
 import { $ } from "@typespec/compiler/typekit";
 import {
   getAccess,
-  getClientLocation,
   getDisablePageable,
   getMarkAsPageable,
   getNextLinkVerb,
@@ -74,7 +73,6 @@ import {
   getTcgcLroMetadata,
   getTypeDecorators,
   isNeverOrVoidType,
-  isOnClient,
   isSubscriptionId,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -781,45 +779,20 @@ export function getSdkMethodParameter(
 
   let property = context.__methodParameterCache?.get(type);
 
-  if (property) {
-    // When @clientLocation is set, the onClient value may differ per operation context
-    // (e.g., subscriptionId moved to method level for one operation but not another).
-    // Re-check and create a new instance if the cached value is incorrect.
-    if (operation && getClientLocation(context, type) !== undefined) {
-      const apiVersions = getAvailableApiVersions(context, type, operation || type.model);
-      const correctOnClient = isOnClient(context, type, operation, apiVersions.length > 0);
-      if (property.onClient !== correctOnClient) {
-        return diagnostics.wrap({
-          ...property,
-          onClient: correctOnClient,
-        });
-      }
-    }
-    return diagnostics.wrap(property);
-  }
-
-  // for parameter that has elevated to client or parent client, we will use the client parameter directly
-  if (operation) {
-    // When @clientLocation explicitly targets this operation, the parameter should stay at
-    // the method level and not be mapped to an existing client parameter.
-    const clientLocation = getClientLocation(context, type);
-    if (
-      !(
-        clientLocation &&
-        clientLocation === (getOverriddenClientMethod(context, operation) ?? operation)
-      )
-    ) {
+  if (!property) {
+    // for parameter that has elevated to client or parent client, we will use the client parameter directly
+    if (operation) {
       const correspondingClientParam = getCorrespondingClientParam(context, type, operation);
       if (correspondingClientParam) return diagnostics.wrap(correspondingClientParam);
     }
+
+    property = {
+      ...diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation)),
+      kind: "method",
+    };
+
+    context.__methodParameterCache.set(type, property);
   }
-
-  property = {
-    ...diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation)),
-    kind: "method",
-  };
-
-  context.__methodParameterCache.set(type, property);
   return diagnostics.wrap(property);
 }
 
