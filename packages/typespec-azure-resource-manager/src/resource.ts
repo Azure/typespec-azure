@@ -1095,7 +1095,7 @@ export function getArmResourceInfo(
 export function getArmResourceKind(resourceType: Model): ArmResourceKind | undefined {
   let current: Model | undefined = resourceType;
   while (current?.baseModel) {
-    const coreType = current.baseModel;
+    const coreType: Model = current.baseModel;
     const coreTypeNamespace = coreType.namespace ? getNamespaceFullName(coreType.namespace) : "";
     if (
       coreType.name.startsWith("TrackedResource") ||

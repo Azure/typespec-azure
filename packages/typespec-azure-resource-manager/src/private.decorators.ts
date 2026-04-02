@@ -60,6 +60,7 @@ import {
   DefaultResourceKeySegmentNameDecorator,
   EnforceConstraintDecorator,
   ExtensionResourceOperationDecorator,
+  GenericResourceInternalDecorator,
   LegacyExtensionResourceOperationDecorator,
   LegacyResourceOperationDecorator,
   LegacyTypeDecorator,
@@ -131,6 +132,24 @@ const $builtInResourceGroupResource: BuiltInResourceGroupResourceDecorator = (
 
   setResourceBaseType(program, resourceType, ResourceBaseType.BuiltInResourceGroup);
 };
+
+const [getGenericResourceInternal, setGenericResourceInternal] = useStateMap<Model, boolean>(
+  ArmStateKeys.genericResource,
+);
+
+const $genericResourceInternal: GenericResourceInternalDecorator = (
+  context: DecoratorContext,
+  target: Model,
+) => {
+  setGenericResourceInternal(context.program, target, true);
+};
+
+export function isGenericResource(program: Program, target: Model): boolean {
+  if (getGenericResourceInternal(program, target)) return true;
+  if (target.baseModel) return isGenericResource(program, target.baseModel);
+  return false;
+}
+
 const $omitIfEmpty: OmitIfEmptyDecorator = (
   context: DecoratorContext,
   entity: Model,
@@ -186,6 +205,7 @@ const $enforceConstraint: EnforceConstraintDecorator = (
       if (
         baseType === constraintType ||
         isCustomAzureResource(context.program, baseType) ||
+        isGenericResource(context.program, baseType) ||
         isBuiltIn(getResourceBaseType(context.program, baseType)) ||
         checkAllowedVirtualResource(context.program, entity, baseType)
       )
@@ -502,9 +522,15 @@ export function registerArmResource(
     // Ensure the resource type has defined a name property that has a segment
     const primaryKeyProperty = getPrimaryKeyProperty(program, resourceType);
     if (!primaryKeyProperty) {
-      // Custom resources (via @customAzureResource) may not have key properties.
+      // Generic resources (via GenericResource template) and custom resources
+      // (via @customAzureResource) may not have key properties.
       // They rely on RoutedOperations to define their paths.
-      if (isCustomAzureResource(program, resourceType)) {
+      if (isGenericResource(program, resourceType)) {
+        kind = getArmResourceKind(resourceType);
+        // GenericResource extends Resource directly; getArmResourceKind returns "BuiltIn"
+        // but the actual kind should default to "Proxy" for generic resources
+        if (kind === "BuiltIn" || kind === undefined) kind = "Proxy";
+      } else if (isCustomAzureResource(program, resourceType)) {
         kind = getArmResourceKind(resourceType) ?? "Custom";
       } else {
         reportDiagnostic(program, {
@@ -1027,6 +1053,7 @@ export const $decorators = {
     legacyResourceOperation: $legacyResourceOperation,
     builtInResourceOperation: $builtInResourceOperation,
     validateCommonTypesVersionForResource: $validateCommonTypesVersionForResource,
+    genericResourceInternal: $genericResourceInternal,
   } satisfies AzureResourceManagerPrivateDecorators,
   "Azure.ResourceManager.Extension.Private": {
     builtInResource: $builtInResource,

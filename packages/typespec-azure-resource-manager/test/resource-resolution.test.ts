@@ -4211,7 +4211,7 @@ interface SupportTicketsNoSubscription {
     expect(resource.operations.lists).toHaveLength(2);
   });
 
-  it("collects operation information for generic CustomAzureProxyResource with RoutedOperations", async () => {
+  it("collects operation information for GenericResource with RoutedOperations", async () => {
     const { program } = await Tester.compile(`
 
 using Azure.Core;
@@ -4228,17 +4228,15 @@ namespace Microsoft.Resources {
     v2021_20_01_preview: "2021-10-01-preview",
   }
 
-  /** A generic resource */
-  #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "legacy test"
-  model GenericResource
-    is Azure.ResourceManager.Legacy.CustomAzureProxyResource<false> {
-    ...ResourceNameParameter<GenericResource>;
-  }
-
   /** RP-specific properties */
   model GenericResourceProperties {
     /** placeholder */
     placeholder?: {};
+  }
+
+  /** A generic resource */
+  model MyGenericResource
+    is Azure.ResourceManager.GenericResource<GenericResourceProperties> {
   }
 
   alias genericOps = Azure.ResourceManager.Legacy.RoutedOperations<
@@ -4327,14 +4325,14 @@ namespace Microsoft.Resources {
 
   @armResourceOperations
   interface GenericResourceOps {
-    get is genericOps.Read<GenericResource>;
-    createOrUpdate is genericOps.CreateOrUpdateAsync<GenericResource>;
-    update is genericOps.CustomPatchSync<GenericResource, GenericResource>;
-    delete is genericOps.DeleteWithoutOkAsync<GenericResource>;
+    get is genericOps.Read<MyGenericResource>;
+    createOrUpdate is genericOps.CreateOrUpdateAsync<MyGenericResource>;
+    update is genericOps.CustomPatchSync<MyGenericResource, MyGenericResource>;
+    delete is genericOps.DeleteWithoutOkAsync<MyGenericResource>;
     /** A sample resource action that moves employee to different location */
-    move is genericOps.ActionAsync<GenericResource, MoveRequest, MoveResponse>;
+    move is genericOps.ActionAsync<MyGenericResource, MoveRequest, MoveResponse>;
     /** A sample HEAD to check resource existence */
-    checkExistence is genericOps.CheckExistence<GenericResource>;
+    checkExistence is genericOps.CheckExistence<MyGenericResource>;
   }
 }
 `);
@@ -4342,6 +4340,10 @@ namespace Microsoft.Resources {
     expect(provider).toBeDefined();
     expect(provider.resources).toBeDefined();
     ok(provider.resources);
+    // Debug: log resource names and kinds
+    for (const r of provider.resources) {
+      console.log("Resource:", r.typespecType?.name, "kind:", r.kind, "type:", r.type);
+    }
     expect(provider.resources).toHaveLength(1);
 
     const resource = provider.resources[0];
@@ -4378,7 +4380,7 @@ namespace Microsoft.Resources {
       },
       resourceInstancePath:
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Resources/genericResources/{genericId}",
-      resourceName: "GenericResource",
+      resourceName: "MyGenericResource",
     });
   });
 });

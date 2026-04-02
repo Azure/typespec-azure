@@ -238,6 +238,6 @@ extern dec validateCommonTypesVersionForResource(
  * It is *not* meant to be used directly by a spec author, it instead
  * gets implicitly applied when the spec author defines a model type in this form:
  *
- *   `model MyResource is GenericProxyResource;`
+ *   `model MyResource is GenericResource;`
  */
 extern dec genericResourceInternal(target: Model);
