@@ -205,3 +205,13 @@ model DiscriminatedExtensionResource<
 @Http.Private.includeInapplicableMetadataInPayload(false)
 @customAzureResource(#{ isAzureResource: isResource })
 model CustomAzureResource<isResource extends valueof boolean = true> {}
+
+/**
+ * Model representing a custom resource that extends ProxyResource.
+ * Use this template with 'is' to create a custom proxy resource.
+ * @template isResource Optional. A boolean flag indicating whether the resource should be marked as an Azure resource. Default false.
+ */
+@Http.Private.includeInapplicableMetadataInPayload(false)
+@customAzureResource(#{ isAzureResource: isResource })
+model CustomAzureProxyResource<isResource extends valueof boolean = false>
+  extends Foundations.ProxyResource {}

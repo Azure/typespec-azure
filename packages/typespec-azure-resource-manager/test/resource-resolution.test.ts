@@ -3873,6 +3873,62 @@ model MoveResponse {
     );
   });
 
+  const noProviderResourceGroupSpec = `
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.Resources;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+@subscriptionResource
+model ResourceGroup is TrackedResource<ResourceGroupProperties> {
+  @key("resourceGroupName")
+  @segment("resourceGroups")
+  @path
+  name: string;
+}
+
+model ResourceGroupProperties {
+  @visibility(Lifecycle.Read)
+  provisioningState?: ResourceProvisioningState;
+}
+
+@armResourceOperations
+interface ResourceGroups {
+  list is ArmResourceListByParent<ResourceGroup, Provider = {}>;
+  get is ArmResourceRead<ResourceGroup, Provider = {}>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<ResourceGroup, Provider = {}>;
+  update is ArmCustomPatchSync<ResourceGroup, Provider = {}>;
+  delete is ArmResourceDeleteWithoutOkAsync<ResourceGroup, Provider = {}>;
+}
+`;
+
+  it("generates correct paths for subscription resource without provider using empty Provider", async () => {
+    const { program } = await Tester.compile(noProviderResourceGroupSpec);
+
+    const provider = resolveArmResources(program);
+    const resourceGroup = provider.resources?.find((r) => r.resourceName === "ResourceGroup");
+    ok(resourceGroup, "ResourceGroup resource should be found");
+
+    // Validate path - should NOT contain /providers/Microsoft.Resources/
+    expect(resourceGroup.resourceInstancePath).toEqual(
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}",
+    );
+  });
+
+  it("resolveArmResources correctly identifies subscription resource without provider", async () => {
+    const { program } = await Tester.compile(noProviderResourceGroupSpec);
+
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    const resourceGroup = provider.resources?.find((r) => r.resourceName === "ResourceGroup");
+    ok(resourceGroup, "ResourceGroup resource should exist in resolved ARM resources");
+    expect(resourceGroup.resourceType.provider).toEqual("Microsoft.Resources");
+    expect(resourceGroup.resourceType.types).toEqual(["resourceGroups"]);
+  });
+
   it("versioned spec with parent-child resources does not produce duplicate resources", async () => {
     const { program } = await Tester.compile(`
 using Azure.Core;
