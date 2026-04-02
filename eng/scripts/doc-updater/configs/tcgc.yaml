@@ -15,6 +15,8 @@ sourceCodePaths:
 allowedPaths:
   - website/src/content/docs/docs/howtos/Generate client libraries/
   - website/src/content/docs/docs/libraries/typespec-client-generator-core/guideline.md
+  - website/src/content/docs/docs/libraries/typespec-client-generator-core/
+  - packages/typespec-client-generator-core/lib/
   - packages/typespec-client-generator-core/design-docs/
   - packages/azure-http-specs/specs/
   - packages/azure-http-specs/spec-summary.md
