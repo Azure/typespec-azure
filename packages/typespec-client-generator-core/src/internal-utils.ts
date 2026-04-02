@@ -928,6 +928,16 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
   // No service, thus no versioning mutation needed
   if (servicesNs.size === 0) return globalNamespace;
 
+  // Multi services' client should not honor the specific api-version set in config
+  if (
+    servicesNs.size > 1 &&
+    context.apiVersion !== undefined &&
+    context.apiVersion !== "latest" &&
+    context.apiVersion !== "all"
+  ) {
+    context.apiVersion = undefined;
+  }
+
   // Explicit all API version setting, thus no versioning mutation needed
   if (context.apiVersion === "all") return globalNamespace;
 
