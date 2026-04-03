@@ -639,7 +639,6 @@ export function registerArmResource(
   setArmResource(context.program, resourceType, armResourceDetails);
 }
 
-
 export function listArmResources(program: Program): ArmResourceDetails[] {
   // Deduplicate by namespace-qualified name. Versioning mutations (from TCGC's
   // createSdkContext or autorest's per-version snapshots) re-apply decorators on

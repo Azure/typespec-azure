@@ -4286,7 +4286,11 @@ namespace Microsoft.Resources {
           read: [{ operationGroup: "GenericResourceOps", name: "get", kind: "read" }],
           update: [{ operationGroup: "GenericResourceOps", name: "update", kind: "update" }],
           checkExistence: [
-            { operationGroup: "GenericResourceOps", name: "checkExistence", kind: "checkExistence" },
+            {
+              operationGroup: "GenericResourceOps",
+              name: "checkExistence",
+              kind: "checkExistence",
+            },
           ],
         },
       },

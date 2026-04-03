@@ -503,8 +503,8 @@ export function resolveArmResources(program: Program): Provider {
         kind:
           resource.kind === "Generic"
             ? mapResourceKind(resource.kind, operations.length > 0)
-            : getPublicResourceKind(resource.typespecType) ??
-              (operations.length > 0 ? "Tracked" : "Other"),
+            : (getPublicResourceKind(resource.typespecType) ??
+              (operations.length > 0 ? "Tracked" : "Other")),
         providerNamespace: resource.armProviderNamespace,
       };
       resources.push(fullResource);
