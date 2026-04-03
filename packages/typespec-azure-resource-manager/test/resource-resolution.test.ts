@@ -4267,7 +4267,7 @@ namespace Microsoft.Resources {
     const resource = provider.resources[0];
     ok(resource);
     expect(resource).toMatchObject({
-      kind: "Tracked",
+      kind: "Other",
       providerNamespace: "Microsoft.Resources",
       type: expect.anything(),
     });

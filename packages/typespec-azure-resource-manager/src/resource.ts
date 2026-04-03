@@ -477,9 +477,9 @@ function mapResourceKind(
     case "Extension":
       return "Extension";
     case "Generic":
-      return hasOperations ? "Tracked" : "Other";
-    default:
       return "Other";
+    default:
+      return hasOperations ? "Tracked" : "Other";
   }
 }
 
@@ -501,10 +501,8 @@ export function resolveArmResources(program: Program): Provider {
         ...op,
         type: resource.typespecType,
         kind:
-          resource.kind === "Generic"
-            ? mapResourceKind(resource.kind, operations.length > 0)
-            : (getPublicResourceKind(resource.typespecType) ??
-              (operations.length > 0 ? "Tracked" : "Other")),
+          getPublicResourceKind(resource.typespecType) ??
+          mapResourceKind(resource.kind, operations.length > 0),
         providerNamespace: resource.armProviderNamespace,
       };
       resources.push(fullResource);
