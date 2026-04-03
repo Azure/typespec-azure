@@ -39,7 +39,6 @@ Azure TypeSpec Author helps you write and update Azure API specifications using 
 - "In specification/widget/resource-manager/Microsoft.Widget, Add an async/LRO operation to export data from the Asset resource"
 - "In specification/widget/resource-manager/Microsoft.Widget, Add a PATCH operation to the Asset resource"
 - "In specification/widget/resource-manager/Microsoft.Widget, Modify the LRO createOrUpdate PUT operation in interface employees so that it returns Azure-AsyncOperation header but NOT Retry-After header in the 201 response."
-- "In specification/widget/resource-manager/Microsoft.Widget, Add 'top' and 'skip' query parameters to the ListBySubscription operation in interface employees"
 
 ### Models & Types
 
