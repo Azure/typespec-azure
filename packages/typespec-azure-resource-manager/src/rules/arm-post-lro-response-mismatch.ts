@@ -56,7 +56,8 @@ function createLroHeadersCodeFix(op: Operation, responseTypeName: string): CodeF
 /**
  * Get the Response type from an operation's template parameter.
  * Looks at the operation's immediate sourceOperation to find a template parameter named "Response"
- * and returns the resolved type if it's a non-void Type (Model, Scalar, or UnknownType).
+ * and returns the resolved type. The Response type can be a Model, Scalar, UnknownType, or void
+ * (as per the constraint on ArmResourceActionAsync: `Response extends Model | unknown | void`).
  * Only checks the first level of template indirection to avoid picking up internal
  * template parameters (e.g., ArmResourceActionAsyncBase's Response parameter).
  */
@@ -78,11 +79,7 @@ function getResponseTemplateParam(op: Operation): Type | undefined {
   for (let i = 0; i < templateParams.length; i++) {
     if (templateParams[i].id.sv === "Response") {
       const resolvedType = mapper.args[i];
-      if (
-        typeof resolvedType === "object" &&
-        "kind" in resolvedType &&
-        !isVoidType(resolvedType as Type)
-      ) {
+      if (typeof resolvedType === "object" && "kind" in resolvedType) {
         return resolvedType as Type;
       }
       return undefined;
@@ -106,6 +103,7 @@ function getResponseBody(responses: HttpOperationResponse[]): HttpPayloadBody | 
 
 /**
  * Get a printable name for a type, if available.
+ * Handles Model, Scalar, and Intrinsic types (including void, unknown, etc.).
  */
 function getTypeName(type: Type): string | undefined {
   switch (type.kind) {

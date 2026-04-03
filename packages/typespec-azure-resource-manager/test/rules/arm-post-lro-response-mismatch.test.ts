@@ -20,14 +20,7 @@ beforeEach(async () => {
   );
 });
 
-describe("emits warning", () => {
-  it("when LroHeaders are overridden with ArmLroLocationHeader and Response is non-void but FinalResult is void", async () => {
-    await tester
-      .expect(
-        `
-      @armProviderNamespace
-      namespace Microsoft.Contoso;
-
+const employeeResource = `
       model Employee is ProxyResource<{}> {
         @pattern("^[a-zA-Z0-9-]{3,24}$")
         @key("employeeName")
@@ -35,6 +28,21 @@ describe("emits warning", () => {
         @segment("employees")
         name: string;
       }
+`;
+
+const preamble = `
+      @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+      ${employeeResource}
+`;
+
+describe("emits warning", () => {
+  it("when LroHeaders are overridden with ArmLroLocationHeader and Response is non-void but FinalResult is void", async () => {
+    await tester
+      .expect(
+        `
+      ${preamble}
 
       model GenerateResponse {
         message: string;
@@ -60,16 +68,7 @@ describe("emits warning", () => {
     await tester
       .expect(
         `
-      @armProviderNamespace
-      namespace Microsoft.Contoso;
-
-      model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
-      }
+      ${preamble}
 
       model GenerateResponse {
         message: string;
@@ -95,16 +94,7 @@ describe("emits warning", () => {
     await tester
       .expect(
         `
-      @armProviderNamespace
-      namespace Microsoft.Contoso;
-
-      model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
-      }
+      ${preamble}
 
       model GenerateResponse {
         message: string;
@@ -130,16 +120,7 @@ describe("emits warning", () => {
     await tester
       .expect(
         `
-      @armProviderNamespace
-      namespace Microsoft.Contoso;
-
-      model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
-      }
+      ${preamble}
 
       model GenerateResponse {
         message: string;
@@ -165,16 +146,7 @@ describe("emits warning", () => {
     await tester
       .expect(
         `
-      @armProviderNamespace
-      namespace Microsoft.Contoso;
-
-      model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
-      }
+      ${preamble}
 
       model GenerateResponse {
         message: string;
@@ -200,112 +172,48 @@ describe("emits warning", () => {
       });
   });
 
-  it("when Response template parameter is unknown type but FinalResult is void", async () => {
-    await tester
-      .expect(
-        `
-      @armProviderNamespace
-      namespace Microsoft.Contoso;
+  it.each([
+    ["Model", "GenerateResponse", "model GenerateResponse { message: string; }"],
+    ["scalar", "string", ""],
+    ["void", "void", ""],
+  ])(
+    "when Response is %s type but FinalResult does not match (template)",
+    async (_label, responseType, modelDef) => {
+      await tester
+        .expect(
+          `
+        ${preamble}
 
-      model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
-      }
+        ${modelDef}
 
-      @armResourceOperations
-      interface Employees {
-        generate is ArmResourceActionAsync<
-          Employee,
-          void,
-          unknown,
-          LroHeaders = ArmLroLocationHeader
-        >;
-      }
-      `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
-      });
-  });
+        model OtherResponse {
+          value: int32;
+        }
 
-  it("when Response template parameter is a scalar type but FinalResult is void", async () => {
-    await tester
-      .expect(
-        `
-      @armProviderNamespace
-      namespace Microsoft.Contoso;
-
-      model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
-      }
-
-      @armResourceOperations
-      interface Employees {
-        generate is ArmResourceActionAsync<
-          Employee,
-          void,
-          string,
-          LroHeaders = ArmLroLocationHeader
-        >;
-      }
-      `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
-      });
-  });
+        @armResourceOperations
+        interface Employees {
+          generate is ArmResourceActionAsync<
+            Employee,
+            void,
+            ${responseType},
+            LroHeaders = ArmLroLocationHeader<FinalResult = OtherResponse>
+          >;
+        }
+        `,
+        )
+        .toEmitDiagnostics({
+          code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
+        });
+    },
+  );
 });
 
 describe("does not emit warning", () => {
-  it("when using default LroHeaders (FinalResult matches Response)", async () => {
-    await tester
-      .expect(
-        `
-      @armProviderNamespace
-      namespace Microsoft.Contoso;
-
-      model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
-      }
-
-      model GenerateResponse {
-        message: string;
-      }
-
-      @armResourceOperations
-      interface Employees {
-        generate is ArmResourceActionAsync<Employee, void, GenerateResponse>;
-      }
-      `,
-      )
-      .toBeValid();
-  });
-
   it("when LroHeaders explicitly sets FinalResult to match Response", async () => {
     await tester
       .expect(
         `
-      @armProviderNamespace
-      namespace Microsoft.Contoso;
-
-      model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
-      }
+      ${preamble}
 
       model GenerateResponse {
         message: string;
@@ -332,16 +240,7 @@ describe("does not emit warning", () => {
     await tester
       .expect(
         `
-      @armProviderNamespace
-      namespace Microsoft.Contoso;
-
-      model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
-      }
+      ${preamble}
 
       @armResourceOperations
       interface Employees {
@@ -356,16 +255,7 @@ describe("does not emit warning", () => {
     await tester
       .expect(
         `
-      @armProviderNamespace
-      namespace Microsoft.Contoso;
-
-      model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
-      }
+      ${preamble}
 
       @armResourceOperations
       interface Employees {
@@ -385,16 +275,7 @@ describe("does not emit warning", () => {
     await tester
       .expect(
         `
-      @armProviderNamespace
-      namespace Microsoft.Contoso;
-
-      model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
-      }
+      ${preamble}
 
       model GenerateResponse {
         message: string;
@@ -413,16 +294,7 @@ describe("does not emit warning", () => {
     await tester
       .expect(
         `
-      @armProviderNamespace
-      namespace Microsoft.Contoso;
-
-      model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
-      }
+      ${preamble}
 
       @armResourceOperations
       interface Employees {
@@ -441,62 +313,30 @@ describe("does not emit warning", () => {
       .toBeValid();
   });
 
-  it("when Response template parameter is unknown and FinalResult matches unknown", async () => {
-    await tester
-      .expect(
-        `
-      @armProviderNamespace
-      namespace Microsoft.Contoso;
+  it.each([
+    ["Model", "GenerateResponse", "model GenerateResponse { message: string; }"],
+    ["unknown", "unknown", ""],
+    ["scalar", "string", ""],
+    ["void", "void", ""],
+  ])(
+    "when Response and FinalResult both match (%s type, template)",
+    async (_label, responseType, modelDef) => {
+      await tester
+        .expect(
+          `
+        ${preamble}
 
-      model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
-      }
+        ${modelDef}
 
-      @armResourceOperations
-      interface Employees {
-        generate is ArmResourceActionAsync<
-          Employee,
-          void,
-          unknown,
-          LroHeaders = ArmLroLocationHeader<
-            Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
-            unknown,
-            string
-          > & Azure.Core.Foundations.RetryAfterHeader
-        >;
-      }
-      `,
-      )
-      .toBeValid();
-  });
-
-  it("when Response template parameter is a scalar and FinalResult matches the scalar", async () => {
-    await tester
-      .expect(
-        `
-      @armProviderNamespace
-      namespace Microsoft.Contoso;
-
-      model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
-      }
-
-      @armResourceOperations
-      interface Employees {
-        generate is ArmResourceActionAsync<Employee, void, string>;
-      }
-      `,
-      )
-      .toBeValid();
-  });
+        @armResourceOperations
+        interface Employees {
+          generate is ArmResourceActionAsync<Employee, void, ${responseType}>;
+        }
+        `,
+        )
+        .toBeValid();
+    },
+  );
 });
 
 describe("codefix", () => {
