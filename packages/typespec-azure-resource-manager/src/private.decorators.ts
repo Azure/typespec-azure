@@ -104,6 +104,13 @@ import { ArmStateKeys } from "./state.js";
 
 export const namespace = "Azure.ResourceManager.Private";
 
+const [getArmResource, setArmResource, armResourceStateMap] = useStateMap<
+  Model,
+  ArmResourceDetails
+>(ArmStateKeys.armResources);
+
+export { getArmResource };
+
 /** @internal */
 
 const $builtInResource: BuiltInResourceDecorator = (
@@ -142,6 +149,51 @@ const $genericResourceInternal: GenericResourceInternalDecorator = (
   target: Model,
 ) => {
   setGenericResourceInternal(context.program, target, true);
+
+  // Register the resource directly with kind "Generic" — no key/segment required
+  const { program } = context;
+  const namespaceName = target.namespace ? getTypeName(target.namespace) : undefined;
+  if (
+    namespaceName === undefined ||
+    namespaceName === "Azure.ResourceManager" ||
+    namespaceName === "Azure.ResourceManager.Legacy" ||
+    namespaceName === "Azure.ResourceManager.CommonTypes"
+  ) {
+    return;
+  }
+
+  if (!target.namespace || target.namespace.name === "") {
+    reportDiagnostic(program, {
+      code: "decorator-in-namespace",
+      format: { decoratorName: "genericResourceInternal" },
+      target,
+    });
+    return;
+  }
+
+  const armProviderNamespace = getArmProviderNamespace(program, target);
+  const armLibraryNamespace = isArmLibraryNamespace(program, target.namespace);
+  if (!armProviderNamespace && !armLibraryNamespace) {
+    reportDiagnostic(program, { code: "arm-resource-missing-arm-namespace", target });
+    return;
+  }
+
+  // Skip if already registered
+  if (getArmResource(program, target)) return;
+
+  const armResourceDetails: ArmResourceDetails = {
+    name: target.name,
+    kind: "Generic",
+    typespecType: target,
+    armProviderNamespace: armProviderNamespace ?? "",
+    operations: {
+      lifecycle: {},
+      lists: {},
+      actions: {},
+    },
+  };
+
+  setArmResource(program, target, armResourceDetails);
 };
 
 export function isGenericResource(program: Program, target: Model): boolean {
@@ -507,9 +559,6 @@ export function registerArmResource(
     return;
   }
 
-  // Check if already registered
-  if (getArmResource(program, resourceType)) return;
-
   let keyName: string | undefined;
   let collectionName: string | undefined;
   let kind: ArmResourceKind | undefined;
@@ -522,59 +571,47 @@ export function registerArmResource(
     // Ensure the resource type has defined a name property that has a segment
     const primaryKeyProperty = getPrimaryKeyProperty(program, resourceType);
     if (!primaryKeyProperty) {
-      // Generic resources (via GenericResource template) and custom resources
-      // (via @customAzureResource) may not have key properties.
-      // They rely on RoutedOperations to define their paths.
-      if (isGenericResource(program, resourceType)) {
-        kind = getArmResourceKind(resourceType);
-        // GenericResource extends Resource directly; getArmResourceKind returns "BuiltIn"
-        // but the actual kind should default to "Proxy" for generic resources
-        if (kind === "BuiltIn" || kind === undefined) kind = "Proxy";
-      } else if (isCustomAzureResource(program, resourceType)) {
-        kind = getArmResourceKind(resourceType) ?? "Custom";
-      } else {
-        reportDiagnostic(program, {
-          code: "arm-resource-missing-name-property",
-          target: resourceType,
-        });
-        return;
-      }
-    } else {
-      // Set the name property to be read only
-      if (primaryKeyProperty.name === "name") {
-        const Lifecycle = getLifecycleVisibilityEnum(program);
-        clearVisibilityModifiersForClass(program, primaryKeyProperty, Lifecycle, context);
-        addVisibilityModifiers(
-          program,
-          primaryKeyProperty,
-          [Lifecycle.members.get("Read")!],
-          context,
-        );
-        sealVisibilityModifiers(program, primaryKeyProperty, Lifecycle);
-      }
-
-      keyName = getKeyName(program, primaryKeyProperty);
-      if (!keyName) {
-        reportDiagnostic(program, {
-          code: "arm-resource-missing-name-key-decorator",
-          target: resourceType,
-        });
-        return;
-      }
-
-      collectionName = getSegment(program, primaryKeyProperty);
-      if (!collectionName) {
-        reportDiagnostic(program, {
-          code: "arm-resource-missing-name-segment-decorator",
-          target: resourceType,
-        });
-        return;
-      }
-
-      kind = getArmResourceKind(resourceType);
-      if (isArmVirtualResource(program, resourceType)) kind = "Virtual";
-      if (isCustomAzureResource(program, resourceType) && kind === undefined) kind = "Custom";
+      reportDiagnostic(program, {
+        code: "arm-resource-missing-name-property",
+        target: resourceType,
+      });
+      return;
     }
+
+    // Set the name property to be read only
+    if (primaryKeyProperty.name === "name") {
+      const Lifecycle = getLifecycleVisibilityEnum(program);
+      clearVisibilityModifiersForClass(program, primaryKeyProperty, Lifecycle, context);
+      addVisibilityModifiers(
+        program,
+        primaryKeyProperty,
+        [Lifecycle.members.get("Read")!],
+        context,
+      );
+      sealVisibilityModifiers(program, primaryKeyProperty, Lifecycle);
+    }
+
+    keyName = getKeyName(program, primaryKeyProperty);
+    if (!keyName) {
+      reportDiagnostic(program, {
+        code: "arm-resource-missing-name-key-decorator",
+        target: resourceType,
+      });
+      return;
+    }
+
+    collectionName = getSegment(program, primaryKeyProperty);
+    if (!collectionName) {
+      reportDiagnostic(program, {
+        code: "arm-resource-missing-name-segment-decorator",
+        target: resourceType,
+      });
+      return;
+    }
+
+    kind = getArmResourceKind(resourceType);
+    if (isArmVirtualResource(program, resourceType)) kind = "Virtual";
+    if (isCustomAzureResource(program, resourceType)) kind = "Custom";
   }
   if (!kind) {
     reportDiagnostic(program, {
@@ -602,12 +639,6 @@ export function registerArmResource(
   setArmResource(context.program, resourceType, armResourceDetails);
 }
 
-const [getArmResource, setArmResource, armResourceStateMap] = useStateMap<
-  Model,
-  ArmResourceDetails
->(ArmStateKeys.armResources);
-
-export { getArmResource };
 
 export function listArmResources(program: Program): ArmResourceDetails[] {
   // Deduplicate by namespace-qualified name. Versioning mutations (from TCGC's

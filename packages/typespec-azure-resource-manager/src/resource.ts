@@ -70,7 +70,14 @@ import {
 import { getArmResource, listArmResources, registerArmResource } from "./private.decorators.js";
 import { ArmStateKeys } from "./state.js";
 
-export type ArmResourceKind = "Tracked" | "Proxy" | "Extension" | "Virtual" | "Custom" | "BuiltIn";
+export type ArmResourceKind =
+  | "Tracked"
+  | "Proxy"
+  | "Extension"
+  | "Virtual"
+  | "Custom"
+  | "BuiltIn"
+  | "Generic";
 
 /**
  * The base details for all kinds of resources
@@ -87,9 +94,9 @@ export interface ArmResourceDetailsBase {
   /** The RP namespace */
   armProviderNamespace: string;
   /** The name parameter for the resource */
-  keyName: string;
+  keyName?: string;
   /** The type name / collection name of the resource */
-  collectionName: string;
+  collectionName?: string;
   /** A reference to the TypeSpec type */
   typespecType: Model;
 }
@@ -388,10 +395,14 @@ function getResourceTypePath(
   // To do so, we need to:
   // 1) Cut out the resource name from the item path
   let temporaryPath;
-  const index = itemPath.indexOf(resource.collectionName);
-  if (index !== -1) {
-    const truncatedPath = itemPath.slice(0, index + resource.collectionName.length);
-    temporaryPath = truncatedPath;
+  if (resource.collectionName) {
+    const index = itemPath.indexOf(resource.collectionName);
+    if (index !== -1) {
+      const truncatedPath = itemPath.slice(0, index + resource.collectionName.length);
+      temporaryPath = truncatedPath;
+    } else {
+      temporaryPath = itemPath;
+    }
   } else {
     temporaryPath = itemPath;
   }
@@ -454,6 +465,24 @@ export function getPublicResourceKind(
   }
 }
 
+function mapResourceKind(
+  kind: ArmResourceKind,
+  hasOperations: boolean,
+): "Tracked" | "Proxy" | "Extension" | "Other" {
+  switch (kind) {
+    case "Tracked":
+      return "Tracked";
+    case "Proxy":
+      return "Proxy";
+    case "Extension":
+      return "Extension";
+    case "Generic":
+      return hasOperations ? "Tracked" : "Other";
+    default:
+      return "Other";
+  }
+}
+
 export function resolveArmResources(program: Program): Provider {
   const provider = resolveProviderNamespace(program);
   if (provider === undefined) return {};
@@ -472,8 +501,10 @@ export function resolveArmResources(program: Program): Provider {
         ...op,
         type: resource.typespecType,
         kind:
-          getPublicResourceKind(resource.typespecType) ??
-          (operations.length > 0 ? "Tracked" : "Other"),
+          resource.kind === "Generic"
+            ? mapResourceKind(resource.kind, operations.length > 0)
+            : getPublicResourceKind(resource.typespecType) ??
+              (operations.length > 0 ? "Tracked" : "Other"),
         providerNamespace: resource.armProviderNamespace,
       };
       resources.push(fullResource);
@@ -771,7 +802,20 @@ function getResourceInfoFromArmOperation(
     }
   }
 
-  if (resourceTypeIndex === -1) return undefined;
+  if (resourceTypeIndex === -1) {
+    // For generic resources, the path may consist entirely of variable segments
+    // (e.g. /{resourceId}). Use the raw path as the instance path.
+    if (segments.length > 0 && segments.every((s) => isVariableSegment(s))) {
+      return {
+        resourceType: {
+          provider: provider,
+          types: [],
+        },
+        resourceInstancePath: path,
+      };
+    }
+    return undefined;
+  }
 
   const resourceTypeName = segments[resourceTypeIndex];
   const typeSegments = [resourceTypeName];
