@@ -117,28 +117,10 @@ for (const configPath of configPaths) {
     throw new Error(`Sample at ${sampleDir} is missing main.tsp file.`);
   }
 
-  let content: string;
-  if (tspFiles.length === 1) {
-    // Single-file sample
-    content = await readFile(mainTspPath, "utf-8");
-  } else {
-    // Multi-file sample: concatenate files (main.tsp first), stripping relative imports
-    const mainContent = await readFile(mainTspPath, "utf-8");
-    const otherFiles = tspFiles.filter((f) => f !== mainTspPath);
+  // Skip multi-file samples — the playground only supports single-file editing
+  if (tspFiles.length > 1) continue;
 
-    // Strip relative import lines from main.tsp
-    const mainLines = mainContent
-      .split("\n")
-      .filter((line) => !line.match(/^import\s+"\.\/.*";?\s*$/));
-
-    const parts = [mainLines.join("\n")];
-    for (const filePath of otherFiles) {
-      const fileContent = await readFile(filePath, "utf-8");
-      const relativeName = filePath.slice(sampleDir.length + 1);
-      parts.push(`// --- ${relativeName} ---\n${fileContent}`);
-    }
-    content = parts.join("\n\n");
-  }
+  const content = await readFile(mainTspPath, "utf-8");
 
   // Compute relative path from specs dir for the sample identifier
   const sampleRelPath = sampleDir.slice(samplesSpecsDir.length + 1);
