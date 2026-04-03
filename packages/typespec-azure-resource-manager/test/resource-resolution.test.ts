@@ -4244,14 +4244,14 @@ alias ResourceIdParameter = {
   @path @key resourceId: string;
 };
 
-alias EmplOps = Azure.ResourceManager.Legacy.RoutedOperations<
+alias GenericOps = Azure.ResourceManager.Legacy.RoutedOperations<
   GenericResourceParams,
   ResourceIdParameter,
   ErrorResponse,
   ResourceRoute = #{ useStaticRoute: true }
 >;
 
-/** Employee move request */
+/** Resource move request */
 model MoveRequest {
   /** The moving from location */
   from: string;
@@ -4260,7 +4260,7 @@ model MoveRequest {
   to: string;
 }
 
-/** Employee move response */
+/** Resource move response */
 model MoveResponse {
   /** The status of the move */
   movingStatus: string;
@@ -4271,14 +4271,14 @@ interface Operations extends Azure.ResourceManager.Operations {}
 @route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/genericResources/{resourceId}")
 @armResourceOperations(#{ allowStaticRoutes: true })
 interface GenericOperations {
-  get is EmplOps.Read<GenericResource>;
-  createOrUpdate is EmplOps.CreateOrUpdateAsync<GenericResource>;
-  update is EmplOps.CustomPatchSync<GenericResource, GenericResource>;
-  delete is EmplOps.DeleteSync<GenericResource>;
+  get is GenericOps.Read<GenericResource>;
+  createOrUpdate is GenericOps.CreateOrUpdateAsync<GenericResource>;
+  update is GenericOps.CustomPatchSync<GenericResource, GenericResource>;
+  delete is GenericOps.DeleteSync<GenericResource>;
   @route("/move")
-  move is EmplOps.ActionAsync<GenericResource, MoveRequest, MoveResponse>;
+  move is GenericOps.ActionAsync<GenericResource, MoveRequest, MoveResponse>;
   /** A sample HEAD operation to check resource existence */
-  checkExistence is EmplOps.CheckExistence<GenericResource>;
+  checkExistence is GenericOps.CheckExistence<GenericResource>;
 }
 `);
 
