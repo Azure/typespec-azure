@@ -1,12 +1,18 @@
 import {
   EmitterTesterInstance,
+  expectDiagnosticEmpty,
   expectDiagnostics,
   resolveVirtualPath,
   TestEmitterCompileResult,
 } from "@typespec/compiler/testing";
 import { deepStrictEqual } from "assert";
 import { beforeEach, describe, expect, it } from "vitest";
-import { compileOpenAPI, ignoreUseStandardOps, Tester } from "./test-host.js";
+import {
+  compileOpenAPI,
+  ignoreDiagnostics,
+  ignoreUseStandardOps,
+  Tester,
+} from "./test-host.js";
 
 let tester: EmitterTesterInstance<TestEmitterCompileResult>;
 
@@ -263,6 +269,65 @@ describe("explicit example", () => {
         },
       });
       expect(tester.fs.fs.has(resolveVirtualPath("./tsp-output/examples/getPet.json"))).toBe(false);
+    });
+
+    it("references source example with relative path in versioned spec and does not copy", async () => {
+      tester.fs.add(
+        "./examples/v1/getPet.json",
+        JSON.stringify({ operationId: "Pets_get", title: "Get a pet" }),
+      );
+      tester.fs.add(
+        "./examples/v2/getPet.json",
+        JSON.stringify({ operationId: "Pets_get", title: "Get a pet" }),
+      );
+
+      const emitterOutputDir = resolveVirtualPath("./tsp-output");
+      const [{ outputs }, diagnostics] = await tester.compileAndDiagnose(
+        `
+@versioned(Versions)
+@service(#{title: "Pet Service"})
+namespace PetService;
+enum Versions {v1, v2}
+
+@operationId("Pets_get")
+op read(): void;
+`,
+        {
+          compilerOptions: {
+            options: {
+              "@azure-tools/typespec-autorest": {
+                "emitter-output-dir": emitterOutputDir,
+                "skip-example-copying": true,
+              },
+            },
+          },
+        },
+      );
+      expectDiagnosticEmpty(
+        ignoreDiagnostics(diagnostics, ["@typespec/http/no-service-found"]),
+      );
+
+      const v1Doc = JSON.parse(outputs["stable/v1/openapi.json"]);
+      const v2Doc = JSON.parse(outputs["stable/v2/openapi.json"]);
+
+      deepStrictEqual(v1Doc.paths["/"]?.get?.["x-ms-examples"], {
+        "Get a pet": {
+          $ref: "../../../examples/v1/getPet.json",
+        },
+      });
+      deepStrictEqual(v2Doc.paths["/"]?.get?.["x-ms-examples"], {
+        "Get a pet": {
+          $ref: "../../../examples/v2/getPet.json",
+        },
+      });
+
+      // Verify examples were NOT copied to the output directory
+      expect(
+        tester.fs.fs.has(resolveVirtualPath("./tsp-output/stable/v1/examples/getPet.json")),
+      ).toBe(false);
+      expect(
+        tester.fs.fs.has(resolveVirtualPath("./tsp-output/stable/v2/examples/getPet.json")),
+      ).toBe(false);
     });
   });
 });
