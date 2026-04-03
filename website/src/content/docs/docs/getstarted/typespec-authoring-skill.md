@@ -25,7 +25,6 @@ Azure TypeSpec Author helps you write and update Azure API specifications using 
 - "In specification/widget/resource-manager/Microsoft.Widget, Add a new stable API version 2026-01-01"
 - "In specification/widget/resource-manager/Microsoft.Widget, Change visibility of provisioningState to Read+Create in 2025-05-04-preview only"
 - "In specification/widget/resource-manager/Microsoft.Widget, Change property age from required to optional in 2025-05-04-preview only"
-- "In specification/widget/resource-manager/Microsoft.Widget, change visibility of provisioningState to Read+Create in 2025-05-04-preview only"
 
 ### Resource Definitions
 
