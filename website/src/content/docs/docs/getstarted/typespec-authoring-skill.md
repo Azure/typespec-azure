@@ -46,6 +46,6 @@ Azure TypeSpec Author helps you write and update Azure API specifications using 
 - "In specification/widget/resource-manager/Microsoft.Widget, Add an enum named AssetStatus with values Active, Inactive, and Deprecated"
 - "In specification/widget/resource-manager/Microsoft.Widget, Add a new property tags to the Asset resource"
 
-## =Getting Support
+## Getting Support
 
 Any questions or feedbacks about using 'TypeSpec Authoring Skill for Azure' can be sent to the [TypeSpec Discussion](https://teams.microsoft.com/l/channel/19%3A906c1efbbec54dc8949ac736633e6bdf%40thread.skype/TypeSpec%20Discussion?groupId=3e17dcb0-4257-4a30-b843-77f47f1d4121&tenantId=72f988bf-86f1-41af-91ab-2d7cd011db47) teams channel.
