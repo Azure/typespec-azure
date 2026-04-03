@@ -1,6 +1,6 @@
 import type { PlaygroundSample } from "@typespec/playground";
 import { mkdir, readFile, readdir, writeFile } from "fs/promises";
-import { dirname, join, resolve } from "path";
+import { dirname, join, resolve } from "pathe";
 import { fileURLToPath } from "url";
 import { parse as parseYaml } from "yaml";
 

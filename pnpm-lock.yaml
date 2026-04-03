@@ -3596,6 +3596,9 @@ importers:
       cross-env:
         specifier: 'catalog:'
         version: 10.1.0
+      pathe:
+        specifier: 'catalog:'
+        version: 2.0.3
       rimraf:
         specifier: 'catalog:'
         version: 6.1.3
