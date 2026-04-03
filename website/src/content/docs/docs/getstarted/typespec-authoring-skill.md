@@ -9,17 +9,19 @@ Azure TypeSpec Author helps you write and update Azure API specifications using 
 ## Set up environment
 
 ### Copilot CLI Mode
+
 1. Install the GitHub Copilot CLI by following the [official installation guide](https://docs.github.com/en/copilot/how-tos/copilot-cli).
 2. Launch copilot CLI session from the root folder of https://github.com/Azure/azure-rest-api-specs in VSCode terminal.
 3. In the Copilot CLI session, input prompts.
 
-### VSCode Agend Mode
+### VSCode Agent Mode
+
 1. Launch VSCode from the root folder of https://github.com/Azure/azure-rest-api-specs.
 2. Input prompts in the agent panel.
 
 ## Sample prompts
 
-### API Versioning 
+### API Versioning
 
 - "In specification/widget/resource-manager/Microsoft.Widget, Add a new preview API version 2026-01-01-preview"
 - "In specification/widget/resource-manager/Microsoft.Widget, Add a new stable API version 2026-01-01"
