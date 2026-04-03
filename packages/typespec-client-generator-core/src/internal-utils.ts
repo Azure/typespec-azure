@@ -795,6 +795,16 @@ export function getCorrespondingClientParam(
   type: ModelProperty,
   operation: Operation,
 ): SdkMethodParameter | undefined {
+  // When @clientLocation explicitly targets this operation, the parameter should stay at
+  // the method level and not be mapped to an existing client parameter.
+  const clientLocation = getClientLocation(context, type);
+  if (
+    clientLocation &&
+    clientLocation === (getOverriddenClientMethod(context, operation) ?? operation)
+  ) {
+    return undefined;
+  }
+
   const clientParams = [];
   let client: SdkClient | undefined = context.getClientForOperation(operation);
   while (client) {

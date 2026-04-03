@@ -123,31 +123,6 @@ model ExtensionResource<Properties extends {}, PropertiesOptional extends valueo
   @armResourcePropertiesOptionality(PropertiesOptional)
   properties?: Properties;
 }
-
-/**
- * A generic Azure Resource Manager resource type that does not require name, key,
- * or segment properties on the model itself. The resource type and path information
- * comes from the operations (e.g. RoutedOperations).
- *
- * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
- * @template Properties A model containing the provider-specific properties for this resource
- * @template PropertiesOptional A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended.
- *
- * @example
- * ```typespec
- * model MyResource is GenericResource<MyResourceProperties> {}
- * ```
- */
-@doc("A generic Azure Resource Manager resource type.")
-@armResourceInternal(Properties)
-@Private.genericResourceInternal
-@Http.Private.includeInapplicableMetadataInPayload(false)
-model GenericResource<Properties extends {}, PropertiesOptional extends valueof boolean = true>
-  extends Foundations.Resource {
-  @doc("The resource-specific properties for this resource.")
-  @armResourcePropertiesOptionality(PropertiesOptional)
-  properties?: Properties;
-}
 //#region
 
 //#region Standard extraction models
