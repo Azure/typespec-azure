@@ -48,8 +48,8 @@ describe("typespec-azure-core: no-route-parameter-name-mismatch", () => {
         `
         @service namespace TestService;
 
-        @route("/providers/Microsoft.Contoso/foos/{fooName}/bars/{barName}")
-        op getBar(@path fooName: string, @path barName: string): void;
+        @route("/providers/Microsoft.Contoso/foos/{fooName}/bars/{name}")
+        op getBar(@path fooName: string, @path name: string): void;
 
         @route("/providers/Microsoft.Contoso/foos/{name}/bars/{barName}")
         op updateBar(@path name: string, @path barName: string): void;
@@ -59,7 +59,12 @@ describe("typespec-azure-core: no-route-parameter-name-mismatch", () => {
         {
           code: "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch",
           severity: "warning",
-          message: `Operation "TestService.updateBar" path "/providers/Microsoft.Contoso/foos/{name}/bars/{barName}" has inconsistent parameter name "name" which should be "fooName" to match operation "TestService.getBar" with path "/providers/Microsoft.Contoso/foos/{fooName}/bars/{barName}"`,
+          message: `Operation "TestService.updateBar" path "/providers/Microsoft.Contoso/foos/{name}/bars/{barName}" has inconsistent parameter name "name" which should be "fooName" to match operation "TestService.getBar" with path "/providers/Microsoft.Contoso/foos/{fooName}/bars/{name}"`,
+        },
+        {
+          code: "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch",
+          severity: "warning",
+          message: `Operation "TestService.updateBar" path "/providers/Microsoft.Contoso/foos/{name}/bars/{barName}" has inconsistent parameter name "barName" which should be "name" to match operation "TestService.getBar" with path "/providers/Microsoft.Contoso/foos/{fooName}/bars/{name}"`,
         },
       ]);
   });
