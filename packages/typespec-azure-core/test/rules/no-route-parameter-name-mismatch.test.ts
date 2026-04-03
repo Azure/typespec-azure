@@ -21,18 +21,23 @@ describe("typespec-azure-core: no-route-parameter-name-mismatch", () => {
         `
         @service namespace TestService;
 
-        @route("/subscriptions/{subscriptionId}/providers/Microsoft.Foo/widgets/{widgetName}")
-        op getWidget(@path subscriptionId: string, @path widgetName: string): void;
+        @route("/providers/Microsoft.Contoso/foos/{fooName}/bars/{barName}")
+        op getBar(@path fooName: string, @path barName: string): void;
 
-        @route("/subscriptions/{subscriptionId}/providers/Microsoft.Foo/widgets/{name}")
-        op updateWidget(@path subscriptionId: string, @path name: string): void;
+        @route("/providers/Microsoft.Contoso/foos/{name}/bars/{barId}")
+        op updateBar(@path name: string, @path barId: string): void;
         `,
       )
       .toEmitDiagnostics([
         {
           code: "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch",
           severity: "warning",
-          message: `Path "/subscriptions/{subscriptionId}/providers/Microsoft.Foo/widgets/{name}" has inconsistent parameter name "name" which should be "widgetName" to match existing operation with path "/subscriptions/{subscriptionId}/providers/Microsoft.Foo/widgets/{widgetName}"`,
+          message: `Operation "TestService.updateBar" path "/providers/Microsoft.Contoso/foos/{name}/bars/{barId}" has inconsistent parameter name "name" which should be "fooName" to match operation "TestService.getBar" with path "/providers/Microsoft.Contoso/foos/{fooName}/bars/{barName}"`,
+        },
+        {
+          code: "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch",
+          severity: "warning",
+          message: `Operation "TestService.updateBar" path "/providers/Microsoft.Contoso/foos/{name}/bars/{barId}" has inconsistent parameter name "barId" which should be "barName" to match operation "TestService.getBar" with path "/providers/Microsoft.Contoso/foos/{fooName}/bars/{barName}"`,
         },
       ]);
   });
@@ -54,7 +59,7 @@ describe("typespec-azure-core: no-route-parameter-name-mismatch", () => {
         {
           code: "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch",
           severity: "warning",
-          message: `Path "/providers/Microsoft.Contoso/foos/{name}/bars/{barName}" has inconsistent parameter name "name" which should be "fooName" to match existing operation with path "/providers/Microsoft.Contoso/foos/{fooName}/bars/{barName}"`,
+          message: `Operation "TestService.updateBar" path "/providers/Microsoft.Contoso/foos/{name}/bars/{barName}" has inconsistent parameter name "name" which should be "fooName" to match operation "TestService.getBar" with path "/providers/Microsoft.Contoso/foos/{fooName}/bars/{barName}"`,
         },
       ]);
   });
@@ -109,12 +114,12 @@ describe("typespec-azure-core: no-route-parameter-name-mismatch", () => {
         {
           code: "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch",
           severity: "warning",
-          message: `Path "/{resourceUri}/providers/Microsoft.Contoso/foos/{name}" has inconsistent parameter name "resourceUri" which should be "scope" to match existing operation with path "/{scope}/providers/Microsoft.Contoso/foos/{fooName}"`,
+          message: `Operation "TestService.updateFoo" path "/{resourceUri}/providers/Microsoft.Contoso/foos/{name}" has inconsistent parameter name "resourceUri" which should be "scope" to match operation "TestService.getFoo" with path "/{scope}/providers/Microsoft.Contoso/foos/{fooName}"`,
         },
         {
           code: "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch",
           severity: "warning",
-          message: `Path "/{resourceUri}/providers/Microsoft.Contoso/foos/{name}" has inconsistent parameter name "name" which should be "fooName" to match existing operation with path "/{scope}/providers/Microsoft.Contoso/foos/{fooName}"`,
+          message: `Operation "TestService.updateFoo" path "/{resourceUri}/providers/Microsoft.Contoso/foos/{name}" has inconsistent parameter name "name" which should be "fooName" to match operation "TestService.getFoo" with path "/{scope}/providers/Microsoft.Contoso/foos/{fooName}"`,
         },
       ]);
   });
@@ -137,7 +142,7 @@ describe("typespec-azure-core: no-route-parameter-name-mismatch", () => {
         {
           code: "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch",
           severity: "warning",
-          message: `Path "/{scope}/providers/Microsoft.Contoso/foos/{fooName}" has inconsistent parameter name "scope" which should be "resourceUri" to match existing operation with path "/{resourceUri}/providers/Microsoft.Contoso/foos/{fooName}"`,
+          message: `Operation "TestService.updateFoo" path "/{scope}/providers/Microsoft.Contoso/foos/{fooName}" has inconsistent parameter name "scope" which should be "resourceUri" to match operation "TestService.getFoo" with path "/{resourceUri}/providers/Microsoft.Contoso/foos/{fooName}"`,
         },
       ]);
   });
@@ -152,8 +157,8 @@ describe("typespec-azure-core: no-route-parameter-name-mismatch", () => {
         op getFoo(@path scope: string, @path fooName: string): void;
 
         @put
-        @route("/{scope}/providers/Microsoft.Contoso/foos/{fooName}")
-        op updateFoo(@path scope: string, @path fooName: string): void;
+        @route("/{scope}/providers/Microsoft.Contoso/foos/{name}")
+        op updateFoo(@path scope: string, @path name: string): void;
         `,
       )
       .toBeValid();
@@ -228,12 +233,12 @@ describe("typespec-azure-core: no-route-parameter-name-mismatch", () => {
         {
           code: "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch",
           severity: "warning",
-          message: `Path "/subscriptions/{subscriptionId}/providers/Microsoft.Foo/widgets/{name}" has inconsistent parameter name "name" which should be "widgetName" to match existing operation with path "/subscriptions/{subscriptionId}/providers/Microsoft.Foo/widgets/{widgetName}"`,
+          message: `Operation "TestService.updateWidget" path "/subscriptions/{subscriptionId}/providers/Microsoft.Foo/widgets/{name}" has inconsistent parameter name "name" which should be "widgetName" to match operation "TestService.getWidget" with path "/subscriptions/{subscriptionId}/providers/Microsoft.Foo/widgets/{widgetName}"`,
         },
         {
           code: "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch",
           severity: "warning",
-          message: `Path "/subscriptions/{subscription}/providers/Microsoft.Foo/widgets/{widgetName}" has inconsistent parameter name "subscription" which should be "subscriptionId" to match existing operation with path "/subscriptions/{subscriptionId}/providers/Microsoft.Foo/widgets/{widgetName}"`,
+          message: `Operation "TestService.deleteWidget" path "/subscriptions/{subscription}/providers/Microsoft.Foo/widgets/{widgetName}" has inconsistent parameter name "subscription" which should be "subscriptionId" to match operation "TestService.getWidget" with path "/subscriptions/{subscriptionId}/providers/Microsoft.Foo/widgets/{widgetName}"`,
         },
       ]);
   });

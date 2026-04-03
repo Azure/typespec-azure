@@ -1,4 +1,10 @@
-import { createRule, ignoreDiagnostics, Operation, paramMessage } from "@typespec/compiler";
+import {
+  createRule,
+  getNamespaceFullName,
+  ignoreDiagnostics,
+  Operation,
+  paramMessage,
+} from "@typespec/compiler";
 import { getHttpOperation, HttpOperationPathParameter } from "@typespec/http";
 import { isExcludedCoreType, isTemplatedInterfaceOperation } from "./utils.js";
 
@@ -13,13 +19,25 @@ interface OperationPathInfo {
   params: PathParamInfo[];
 }
 
+function getFullyQualifiedOperationName(operation: Operation): string {
+  const parts: string[] = [];
+  if (operation.namespace) {
+    parts.push(getNamespaceFullName(operation.namespace));
+  }
+  if (operation.interface) {
+    parts.push(operation.interface.name);
+  }
+  parts.push(operation.name);
+  return parts.join(".");
+}
+
 export const noRouteParameterNameMismatchRule = createRule({
   name: "no-route-parameter-name-mismatch",
   description: "Ensure that operations with the same path use consistent path parameter names.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-route-parameter-name-mismatch",
   messages: {
-    default: paramMessage`Path "${"path"}" has inconsistent parameter name "${"paramName"}" which should be "${"expected"}" to match existing operation with path "${"existingPath"}"`,
+    default: paramMessage`Operation "${"operationName"}" path "${"path"}" has inconsistent parameter name "${"paramName"}" which should be "${"expected"}" to match operation "${"existingOperationName"}" with path "${"existingPath"}"`,
   },
   create(context) {
     // Map from normalized path (params replaced with {}) to first operation seen
@@ -67,17 +85,20 @@ export const noRouteParameterNameMismatchRule = createRule({
         if (existing) {
           // Compare parameter names at each position
           for (let i = 0; i < params.length && i < existing.params.length; i++) {
-            // Skip comparison when only one parameter uses allowReserved, since
+            // Stop comparison when only one parameter uses allowReserved, since
             // parameters with differing allowReserved settings should not be matched
+            // and the rest of the parameters are irrelevant
             if (params[i].allowReserved !== existing.params[i].allowReserved) {
-              continue;
+              break;
             }
             if (params[i].name !== existing.params[i].name) {
               context.reportDiagnostic({
                 format: {
+                  operationName: getFullyQualifiedOperationName(operation),
                   path,
                   paramName: params[i].name,
                   expected: existing.params[i].name,
+                  existingOperationName: getFullyQualifiedOperationName(existing.operation),
                   existingPath: existing.path,
                 },
                 target: operation,
