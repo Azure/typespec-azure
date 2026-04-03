@@ -4210,4 +4210,122 @@ interface SupportTicketsNoSubscription {
     expect(resource.operations.lists).toBeDefined();
     expect(resource.operations.lists).toHaveLength(2);
   });
+
+  it("resolves resource info and operations for RoutedOperations with useStaticRoute", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+/** Contoso Resource Provider management API. */
+@armProviderNamespace
+@service(#{ title: "ContosoProviderHubClient" })
+@versioned(Versions)
+namespace Microsoft.ContosoProviderHub;
+
+/** Contoso API versions */
+enum Versions {
+  /** 2021-10-01-preview version */
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  @previewVersion
+  \`2021-10-01-preview\`,
+}
+
+/** A ContosoProviderHub resource */
+model GenericResource is ProxyResource<{}> {
+  ...ResourceNameParameter<GenericResource>;
+}
+
+alias GenericResourceParams = {
+  ...ApiVersionParameter;
+  ...SubscriptionIdParameter;
+  ...ResourceGroupParameter;
+};
+
+alias ResourceIdParameter = {
+  @path @key resourceId: string;
+};
+
+alias EmplOps = Azure.ResourceManager.Legacy.RoutedOperations<
+  GenericResourceParams,
+  ResourceIdParameter,
+  ErrorResponse,
+  ResourceRoute = #{ useStaticRoute: true }
+>;
+
+/** Employee move request */
+model MoveRequest {
+  /** The moving from location */
+  from: string;
+
+  /** The moving to location */
+  to: string;
+}
+
+/** Employee move response */
+model MoveResponse {
+  /** The status of the move */
+  movingStatus: string;
+}
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+@route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/genericResources/{resourceId}")
+@armResourceOperations(#{ allowStaticRoutes: true })
+interface GenericOperations {
+  get is EmplOps.Read<GenericResource>;
+  createOrUpdate is EmplOps.CreateOrUpdateAsync<GenericResource>;
+  update is EmplOps.CustomPatchSync<GenericResource, GenericResource>;
+  delete is EmplOps.DeleteSync<GenericResource>;
+  @route("/move")
+  move is EmplOps.ActionAsync<GenericResource, MoveRequest, MoveResponse>;
+  /** A sample HEAD operation to check resource existence */
+  checkExistence is EmplOps.CheckExistence<GenericResource>;
+}
+`);
+
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    ok(provider.resources);
+    expect(provider.resources.length).toBeGreaterThanOrEqual(1);
+
+    const genericResource = provider.resources.find(
+      (r) => r.resourceName === "GenericResource" || r.type.name === "GenericResource",
+    );
+    ok(genericResource, "GenericResource should exist in resolved ARM resources");
+
+    expect(genericResource.providerNamespace).toEqual("Microsoft.ContosoProviderHub");
+    expect(genericResource.kind).toEqual("Proxy");
+
+    checkResolvedOperations(genericResource, {
+      operations: {
+        lifecycle: {
+          read: [{ operationGroup: "GenericOperations", name: "get", kind: "read" }],
+          createOrUpdate: [
+            {
+              operationGroup: "GenericOperations",
+              name: "createOrUpdate",
+              kind: "createOrUpdate",
+            },
+          ],
+          update: [{ operationGroup: "GenericOperations", name: "update", kind: "update" }],
+          delete: [{ operationGroup: "GenericOperations", name: "delete", kind: "delete" }],
+          checkExistence: [
+            {
+              operationGroup: "GenericOperations",
+              name: "checkExistence",
+              kind: "checkExistence",
+            },
+          ],
+        },
+        actions: [{ operationGroup: "GenericOperations", name: "move", kind: "action" }],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["genericResources"],
+      },
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/genericResources/{resourceId}",
+      resourceName: "GenericResources",
+    });
+  });
 });
