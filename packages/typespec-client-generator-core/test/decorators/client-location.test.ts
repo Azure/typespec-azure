@@ -967,4 +967,79 @@ describe("Parameter", () => {
     ok(getSubIdOpParam);
     strictEqual(getSubIdOpParam.methodParameterSegments[0][0], subIdOgParam);
   });
+
+  it("subscriptionId stays on client for foo but moves to method for bar when using ArmProviderActionSync with shared parameters", async () => {
+    const { program } = await ArmTester.compile(
+      `
+      @armProviderNamespace("My.Service")
+      @service(#{ title: "My.Service" })
+      @versioned(Versions)
+      @armCommonTypesVersion(CommonTypes.Versions.v5)
+      namespace My.Service;
+
+      /** Api versions */
+      enum Versions {
+        /** 2024-04-01-preview api version */
+        V2024_04_01_PREVIEW: "2024-04-01-preview",
+      }
+
+      @autoRoute
+      @action("foo")
+      op foo is ArmProviderActionSync<
+        Request = {},
+        Response = {},
+        Scope = SubscriptionActionScope,
+        Parameters = {},
+        OptionalRequestBody = true
+      >;
+
+      @autoRoute
+      @action("bar")
+      op bar is ArmProviderActionSync<
+        Request = {},
+        Response = {},
+        Scope = SubscriptionActionScope,
+        Parameters = {},
+        OptionalRequestBody = true
+      >;
+
+      @@clientLocation(bar::parameters.subscriptionId, bar);
+      `,
+    );
+
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
+    const client = sdkPackage.clients[0];
+    ok(client);
+
+    // The subscriptionId should exist at the client level because 'foo' operation doesn't have
+    // clientLocation specified for subscriptionId, so it should remain on the client
+    const subIdClientParam = client.clientInitialization.parameters.find(
+      (p) => p.name === "subscriptionId",
+    );
+    ok(subIdClientParam);
+
+    // The foo method should NOT have subscriptionId as a method parameter (it's on client)
+    const fooMethod = client.methods.find((m) => m.name === "foo") as
+      | SdkServiceMethod<SdkHttpOperation>
+      | undefined;
+    ok(fooMethod);
+    const fooSubIdMethodParam = fooMethod.parameters.find((p) => p.name === "subscriptionId");
+    ok(!fooSubIdMethodParam);
+
+    // The bar method SHOULD have subscriptionId as a method parameter (moved to method level)
+    const barMethod = client.methods.find((m) => m.name === "bar") as
+      | SdkServiceMethod<SdkHttpOperation>
+      | undefined;
+    ok(barMethod);
+    const barSubIdMethodParam = barMethod.parameters.find((p) => p.name === "subscriptionId");
+    ok(barSubIdMethodParam);
+
+    // The bar operation should reference the method-level subscriptionId
+    const barOperation = barMethod.operation;
+    ok(barOperation);
+    const barSubIdOpParam = barOperation.parameters.find((p) => p.name === "subscriptionId");
+    ok(barSubIdOpParam);
+    strictEqual(barSubIdOpParam.methodParameterSegments[0][0], barSubIdMethodParam);
+  });
 });
