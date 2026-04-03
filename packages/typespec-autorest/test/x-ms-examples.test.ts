@@ -7,12 +7,7 @@ import {
 } from "@typespec/compiler/testing";
 import { deepStrictEqual } from "assert";
 import { beforeEach, describe, expect, it } from "vitest";
-import {
-  compileOpenAPI,
-  ignoreDiagnostics,
-  ignoreUseStandardOps,
-  Tester,
-} from "./test-host.js";
+import { compileOpenAPI, ignoreDiagnostics, ignoreUseStandardOps, Tester } from "./test-host.js";
 
 let tester: EmitterTesterInstance<TestEmitterCompileResult>;
 
@@ -303,9 +298,7 @@ op read(): void;
           },
         },
       );
-      expectDiagnosticEmpty(
-        ignoreDiagnostics(diagnostics, ["@typespec/http/no-service-found"]),
-      );
+      expectDiagnosticEmpty(ignoreDiagnostics(diagnostics, ["@typespec/http/no-service-found"]));
 
       const v1Doc = JSON.parse(outputs["stable/v1/openapi.json"]);
       const v2Doc = JSON.parse(outputs["stable/v2/openapi.json"]);
