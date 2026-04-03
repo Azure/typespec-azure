@@ -170,6 +170,12 @@ Strategy for applying XML serialization metadata to schemas.
 
 Determines whether output should be split into multiple files. The only supported option for splitting is "legacy-feature-files", which uses the typespec-azure-resource-manager `@feature` decorators to split into output files based on feature.
 
+### `skip-example-copying`
+
+**Type:** `boolean`
+
+When enabled, the emitter will not copy example files to the output directory. Instead, it will reference the source example files using relative file paths.
+
 ## Decorators
 
 ### Autorest

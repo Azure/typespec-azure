@@ -204,4 +204,65 @@ describe("explicit example", () => {
       code: "@azure-tools/typespec-autorest/duplicate-example-file",
     });
   });
+
+  describe("with skip-example-copying", () => {
+    it("references source example with relative path and does not copy", async () => {
+      addExampleFile("./examples/getPet.json", { operationId: "Pets_get", title: "Get a pet" });
+
+      const openapi = await compileOpenAPI(`@operationId("Pets_get") op read(): void;`, {
+        tester,
+        options: { "skip-example-copying": true },
+      });
+
+      deepStrictEqual(openapi.paths["/"]?.get?.["x-ms-examples"], {
+        "Get a pet": {
+          $ref: "../examples/getPet.json",
+        },
+      });
+      expect(tester.fs.fs.has(resolveVirtualPath("./tsp-output/examples/getPet.json"))).toBe(false);
+    });
+
+    it("references nested source example with relative path and does not copy", async () => {
+      addExampleFile("./examples/pets/getPet.json", {
+        operationId: "Pets_get",
+        title: "Get a pet",
+      });
+
+      const openapi = await compileOpenAPI(`@operationId("Pets_get") op read(): void;`, {
+        tester,
+        options: { "skip-example-copying": true },
+      });
+
+      deepStrictEqual(openapi.paths["/"]?.get?.["x-ms-examples"], {
+        "Get a pet": {
+          $ref: "../examples/pets/getPet.json",
+        },
+      });
+      expect(tester.fs.fs.has(resolveVirtualPath("./tsp-output/examples/pets/getPet.json"))).toBe(
+        false,
+      );
+    });
+
+    it("references source example from custom examples-dir", async () => {
+      addExampleFile("./my-examples/getPet.json", {
+        operationId: "Pets_get",
+        title: "Get a pet",
+      });
+
+      const openapi = await compileOpenAPI(`@operationId("Pets_get") op read(): void;`, {
+        tester,
+        options: {
+          "skip-example-copying": true,
+          "examples-dir": resolveVirtualPath("./my-examples"),
+        },
+      });
+
+      deepStrictEqual(openapi.paths["/"]?.get?.["x-ms-examples"], {
+        "Get a pet": {
+          $ref: "../my-examples/getPet.json",
+        },
+      });
+      expect(tester.fs.fs.has(resolveVirtualPath("./tsp-output/examples/getPet.json"))).toBe(false);
+    });
+  });
 });

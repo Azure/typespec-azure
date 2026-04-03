@@ -253,6 +253,13 @@ export interface AutorestDocumentEmitterOptions {
    * Determines whether output should be split into multiple files.  The only supported option for splitting is "legacy-feature-files",
    */
   readonly outputSplitting?: "legacy-feature-files";
+
+  /**
+   * When enabled, example files will not be copied to the output directory.
+   * Instead, the source example files will be referenced using relative file paths.
+   * @default false
+   */
+  readonly skipExampleCopying?: boolean;
 }
 
 type HttpParameterProperties = Extract<
@@ -315,6 +322,12 @@ export async function getOpenAPIForService(
   const indirectlyProcessedTypes: Set<Type> = new Set();
 
   const operationIdsWithExample = new Set<string>();
+
+  // Compute the example directory for resolving source example paths
+  const examplesBaseDir = options.examplesDirectory ?? resolvePath(program.projectRoot, "examples");
+  const exampleDir = context.version
+    ? resolvePath(examplesBaseDir, context.version)
+    : resolvePath(examplesBaseDir);
 
   const [exampleMap, diagnostics] = await loadExamples(program, options, context.version);
   program.reportDiagnostics(diagnostics);
@@ -609,7 +622,15 @@ export async function getOpenAPIForService(
       operationIdsWithExample.add(currentEndpoint.operationId);
       currentEndpoint["x-ms-examples"] = currentEndpoint["x-ms-examples"] || {};
       for (const [title, example] of Object.entries(autoExamples)) {
-        currentEndpoint["x-ms-examples"][title] = { $ref: `./examples/${example.relativePath}` };
+        let ref: string;
+        if (options.skipExampleCopying) {
+          const sourceExamplePath = resolvePath(exampleDir, example.relativePath);
+          const outputDir = getDirectoryPath(context.outputFile);
+          ref = getRelativePathFromDirectory(outputDir, sourceExamplePath, false);
+        } else {
+          ref = `./examples/${example.relativePath}`;
+        }
+        currentEndpoint["x-ms-examples"][title] = { $ref: ref };
       }
     }
 

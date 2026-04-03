@@ -118,6 +118,13 @@ export interface AutorestEmitterOptions {
    * which uses the typespec-azure-resource-manager `@feature` decorators to split into output files based on feature.
    */
   "output-splitting"?: "legacy-feature-files";
+
+  /**
+   * When enabled, the emitter will not copy example files to the output directory.
+   * Instead, it will reference the source example files using relative file paths.
+   * @default false
+   */
+  "skip-example-copying"?: boolean;
 }
 
 const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
@@ -253,6 +260,13 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       nullable: true,
       description:
         'Determines whether output should be split into multiple files.  The only supported option for splitting is "legacy-feature-files", which uses the typespec-azure-resource-manager `@feature` decorators to split into output files based on feature.',
+    },
+    "skip-example-copying": {
+      type: "boolean",
+      nullable: true,
+      default: false,
+      description:
+        "When enabled, the emitter will not copy example files to the output directory. Instead, it will reference the source example files using relative file paths.",
     },
   },
   required: [],
