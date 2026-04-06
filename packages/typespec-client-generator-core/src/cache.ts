@@ -221,6 +221,16 @@ function getRootClients(context: TCGCContext): ClientCreationResult {
     let validClients = true;
     clients = explicitClients.filter((c: SdkClient) => {
       if (c.parent === undefined && c.services.length === 0) {
+        // Before reporting an error, check if an ancestor namespace has a @client
+        // decorator for any scope. If so, this client is only a sub-client in
+        // other scopes and should be silently excluded for the current scope.
+        let ancestor: Namespace | undefined = c.type?.namespace;
+        while (ancestor) {
+          if (context.program.stateMap(clientKey).has(ancestor)) {
+            return false;
+          }
+          ancestor = ancestor.namespace;
+        }
         reportDiagnostic(context.program, {
           code: "root-client-missing-service",
           target: c.type!,

@@ -1,6 +1,7 @@
-import { expectDiagnostics } from "@typespec/compiler/testing";
+import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
+import { listClients, listSubClients } from "../../src/decorators.js";
 import { InitializedByFlags } from "../../src/interfaces.js";
 import {
   ArmTester,
@@ -2742,6 +2743,79 @@ it("validation: root client missing service", async () => {
       code: "@azure-tools/typespec-client-generator-core/root-client-missing-service",
     },
   ]);
+});
+
+it("validation: scoped @client with unscoped @operationGroup should not report root-client-missing-service", async () => {
+  // When @client has a scope and @operationGroup has no scope, the operationGroup
+  // should not trigger root-client-missing-service for scopes where @client doesn't apply.
+  const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace TestService {
+      @route("/test")
+      op test(): void;
+    }`,
+      `
+    @client({name: "TestClient", service: TestService}, "python")
+    namespace Customizations {
+      @operationGroup
+      interface MyGroup {
+      }
+    }
+  `,
+    ),
+  );
+  expectDiagnosticEmpty(diagnostics);
+
+  // For python: @client matches, @operationGroup resolves → 1 root + 1 sub
+  {
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const tcgcDiags = program.diagnostics.filter(
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/root-client-missing-service",
+    );
+    strictEqual(tcgcDiags.length, 0);
+    const clients = listClients(context);
+    strictEqual(clients.length, 1);
+    strictEqual(listSubClients(context, clients[0]).length, 1);
+  }
+});
+
+it("validation: multiple scoped @client with scoped @operationGroup should not report root-client-missing-service", async () => {
+  // For scopes where @client doesn't match, orphaned @operationGroup sub-clients
+  // should be silently excluded when an ancestor has @client data.
+  const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace TestService {
+      @route("/test")
+      op test(): void;
+    }`,
+      `
+    @client({name: "TestClient", service: TestService}, "python")
+    @client({name: "TestClient", service: TestService}, "java")
+    namespace Customizations {
+      @operationGroup("python")
+      interface MyGroup {
+      }
+    }
+  `,
+    ),
+  );
+  expectDiagnosticEmpty(diagnostics);
+
+  // For python: should have 1 root client with 1 sub client
+  {
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const clients = listClients(context);
+    strictEqual(clients.length, 1);
+    strictEqual(listSubClients(context, clients[0]).length, 1);
+  }
 });
 
 it("validation: nested client service not subset of parent", async () => {
