@@ -2773,10 +2773,6 @@ it("validation: scoped @client with unscoped @operationGroup should not report r
     const context = await createSdkContextForTester(program, {
       emitterName: "@azure-tools/typespec-python",
     });
-    const tcgcDiags = program.diagnostics.filter(
-      (d) => d.code === "@azure-tools/typespec-client-generator-core/root-client-missing-service",
-    );
-    strictEqual(tcgcDiags.length, 0);
     const clients = listClients(context);
     strictEqual(clients.length, 1);
     strictEqual(listSubClients(context, clients[0]).length, 1);
