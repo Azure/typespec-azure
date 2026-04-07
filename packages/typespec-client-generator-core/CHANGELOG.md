@@ -1,5 +1,49 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.67.0
+
+### Breaking Changes
+
+- [#3997](https://github.com/Azure/typespec-azure/pull/3997) For multiple service case, remove the use of `@useDependency` to decare each service's API version, but use the latest version instead. Remove related tests.
+- [#3997](https://github.com/Azure/typespec-azure/pull/3997) Consolidated `SdkOperationGroup` into `SdkClient`. The `SdkOperationGroup` interface has been removed. All operation groups are now represented as `SdkClient` instances.
+  
+  **Migration Guide:**
+  
+  - Replace all references to `SdkOperationGroup` with `SdkClient`
+  - Replace `subOperationGroups` with `subClients`
+  - Replace `groupPath` with `clientPath`
+  - Replace `SdkClient.service` (removed) with `SdkClient.services` (array of namespaces)
+  - Replace `listOperationGroups()` with `listSubClients()`
+  - Replace `listOperationsInOperationGroup()` with `listOperationsInClient()`
+  - Replace `isOperationGroup()` / `getOperationGroup()` — use `getClient()` and check `parent` instead
+- [#3997](https://github.com/Azure/typespec-azure/pull/3997) Added multi-service client support with `autoMergeService` property on `@client` decorator. The `service` property now accepts an array of services (e.g., `service: [ServiceA, ServiceB]`). When `autoMergeService: true`, all services' operations and sub clients are auto-merged into the client. Supports advanced scenarios including services as direct children (nested `@client` with `autoMergeService: true` on children) and fully customized client hierarchies using explicit `is` operation mapping.
+
+### Deprecations
+
+- [#3997](https://github.com/Azure/typespec-azure/pull/3997) Deprecated `@operationGroup` decorator in favor of `@client`. The `@operationGroup` decorator now delegates to `@client` internally and will be removed in a future release. Use `@client` to define sub clients instead.
+
+### Features
+
+- [#3995](https://github.com/Azure/typespec-azure/pull/3995) Add experimental extern functions for operation transformations:
+  - `replaceParameter`: Replace a parameter in an operation
+  - `removeParameter`: Remove a parameter from an operation
+  - `addParameter`: Add a new parameter to an operation
+  - `reorderParameters`: Reorder parameters of an operation according to a specified order
+  
+  These functions enable composable transformations that work with `@@override` to customize method signatures in client SDKs.
+- [#4063](https://github.com/Azure/typespec-azure/pull/4063) Add `.crossLanguageVersion` to `SdkPackage` to track equivalent API surfaces across different language sdks
+
+### Bug Fixes
+
+- [#4164](https://github.com/Azure/typespec-azure/pull/4164) Fix `@clientLocation` not working for subscriptionId parameter when another operation had already elevated it to client level
+- [#4135](https://github.com/Azure/typespec-azure/pull/4135) Fix synthetic union created from split HTTP union responses not getting generated name and creating union-of-union when there are more than 2 response types.
+- [#4124](https://github.com/Azure/typespec-azure/pull/4124) Fixed `@clientLocation` operations being lost when targeting a sub client that gets merged in multi-service `autoMergeService` scenarios
+- [#4030](https://github.com/Azure/typespec-azure/pull/4030) Fix File type contentType/accept header handling: add a new branch in `createContentTypeOrAcceptHeader` for File type bodies to produce constant (single content type) or enum (multiple content types) for both contentType and accept params, and fix response contentType header serializedName fallback to "Content-Type" when `@header` is missing
+- [#4177](https://github.com/Azure/typespec-azure/pull/4177) Multi services' client should not honor the specific `api-version` set in config. The `api-version` config value is now cleared when dealing with multi-service clients during the versioning mutation and cache steps.
+- [#4062](https://github.com/Azure/typespec-azure/pull/4062) Add support to use `@scope` to specify generation of parameters for certain languages
+- [#4125](https://github.com/Azure/typespec-azure/pull/4125) Synthetic content type and accept parameters now honor HTTP library's result directly. Single content type produces a constant, multiple content types produce an enum, for both File and non-File body types.
+
+
 ## 0.66.4
 
 ### Bug Fixes

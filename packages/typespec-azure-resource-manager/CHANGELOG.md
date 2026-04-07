@@ -1,5 +1,23 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.67.0
+
+### Deprecations
+
+- [#4132](https://github.com/Azure/typespec-azure/pull/4132) Updated `@locationResource` documentation to mark it as deprecated and recommend using `@parentResource(ArmLocationResource<...>)` instead.
+
+### Features
+
+- [#4188](https://github.com/Azure/typespec-azure/pull/4188) Add GenericResource template in Azure.ResourceManager.Legacy with new "Generic" resource kind
+- [#4004](https://github.com/Azure/typespec-azure/pull/4004) Add new templates to support operationStatus endpoints
+
+### Bug Fixes
+
+- [#4005](https://github.com/Azure/typespec-azure/pull/4005) Fix `resolveArmResources` returning duplicate resources for versioned specs.
+- [#4072](https://github.com/Azure/typespec-azure/pull/4072) Fix `resolveArmResources` incorrectly merging cross-scope `LegacyOperations` into a single resource. Operations at different scopes (e.g., subscription vs tenant) with the same model but no explicit resource name are now resolved as separate resources.
+- [#4183](https://github.com/Azure/typespec-azure/pull/4183) Fix default resource name for extension resources using `Extension.ScopeParameter` scope. Previously the name was incorrectly prefixed with "ScopeParameter", now it uses just the extension resource name.
+
+
 ## 0.66.1
 
 ### Bug Fixes
