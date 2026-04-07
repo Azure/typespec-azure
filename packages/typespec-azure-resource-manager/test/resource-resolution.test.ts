@@ -4344,4 +4344,120 @@ namespace Microsoft.Resources {
       resourceName: "MyGenericResource",
     });
   });
+
+  it.each(["default", "current"])(
+    "provides singleton information for @singleton('%s') decorated resources",
+    async (singletonKey) => {
+      const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+@singleton("${singletonKey}")
+model SingletonResource is ProxyResource<SingletonResourceProperties> {
+  ...ResourceNameParameter<SingletonResource>;
+}
+
+model SingletonResourceProperties {
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+@lroStatus
+union ProvisioningState {
+  string,
+  ResourceProvisioningState,
+}
+
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+  age?: int32;
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+@armResourceOperations
+interface SingletonResources {
+  get is ArmResourceRead<SingletonResource>;
+  createOrUpdate is ArmResourceCreateOrReplaceSync<SingletonResource>;
+}
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+}
+`);
+      const provider = resolveArmResources(program);
+      expect(provider).toBeDefined();
+      expect(provider.resources).toBeDefined();
+
+      const singletonResource = provider.resources!.find(
+        (r) => r.type.name === "SingletonResource",
+      );
+      ok(singletonResource);
+      expect(singletonResource.singleton).toBeDefined();
+      expect(singletonResource.singleton!.keyValue).toEqual(singletonKey);
+
+      const employee = provider.resources!.find((r) => r.type.name === "Employee");
+      ok(employee);
+      expect(employee.singleton).toBeUndefined();
+    },
+  );
+
+  it("provides singleton information for resources with union name type", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+union ExampleSingletonValues {
+  salaried: "salaried",
+  hourly: "hourly",
+  string,
+}
+
+@singleton("salaried")
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Resource = Employee, Type = ExampleSingletonValues>;
+}
+
+model EmployeeProperties {
+  age?: int32;
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+@lroStatus
+union ProvisioningState {
+  string,
+  ResourceProvisioningState,
+}
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+
+    const employee = provider.resources!.find((r) => r.type.name === "Employee");
+    ok(employee);
+    expect(employee.singleton).toBeDefined();
+    expect(employee.singleton!.keyValue).toEqual(["salaried", "hourly"]);
+  });
 });
