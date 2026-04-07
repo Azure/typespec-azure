@@ -64,6 +64,7 @@ import { LinkCard } from "@astrojs/starlight/components";
 - [#4005](https://github.com/Azure/typespec-azure/pull/4005) Fix `resolveArmResources` returning duplicate resources for versioned specs.
 - [#4072](https://github.com/Azure/typespec-azure/pull/4072) Fix `resolveArmResources` incorrectly merging cross-scope `LegacyOperations` into a single resource. Operations at different scopes (e.g., subscription vs tenant) with the same model but no explicit resource name are now resolved as separate resources.
 - [#4183](https://github.com/Azure/typespec-azure/pull/4183) Fix default resource name for extension resources using `Extension.ScopeParameter` scope. Previously the name was incorrectly prefixed with "ScopeParameter", now it uses just the extension resource name.
+- [#4184](https://github.com/Azure/typespec-azure/pull/4184) Support singleton resources in `resolveArmResources`
 
 ### @azure-tools/typespec-client-generator-core
 
