@@ -1,5 +1,9 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.67.0
+
+No changes, version bump only.
+
 ## 0.66.1
 
 ### Bug Fixes
