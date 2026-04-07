@@ -1,0 +1,77 @@
+---
+title: 0.67.0
+---
+
+import { LinkCard } from "@astrojs/starlight/components";
+
+<LinkCard
+  title="TypeSpec Core 1.11"
+  description="See changes to the TypeSpec language and core libraries"
+  href="https://typespec.io/docs/release-notes/release-2026-04-07"
+/>
+
+# 0.67.0
+
+## Breaking Changes
+
+### @azure-tools/typespec-client-generator-core
+
+- [#3997](https://github.com/Azure/typespec-azure/pull/3997) Consolidated `SdkOperationGroup` into `SdkClient`. The `SdkOperationGroup` interface has been removed. All operation groups are now represented as `SdkClient` instances.
+
+  **Migration Guide:**
+
+  - Replace all references to `SdkOperationGroup` with `SdkClient`
+  - Replace `subOperationGroups` with `subClients`
+  - Replace `groupPath` with `clientPath`
+  - Replace `SdkClient.service` (removed) with `SdkClient.services` (array of namespaces)
+  - Replace `listOperationGroups()` with `listSubClients()`
+  - Replace `listOperationsInOperationGroup()` with `listOperationsInClient()`
+  - Replace `isOperationGroup()` / `getOperationGroup()` — use `getClient()` and check `parent` instead
+
+- [#3997](https://github.com/Azure/typespec-azure/pull/3997) For multiple service case, removed the use of `@useDependency` to declare each service's API version, using the latest version instead.
+
+- [#3997](https://github.com/Azure/typespec-azure/pull/3997) Added multi-service client support with `autoMergeService` property on `@client` decorator. The `service` property now accepts an array of services (e.g., `service: [ServiceA, ServiceB]`). When `autoMergeService: true`, all services' operations and sub clients are auto-merged into the client. Supports advanced scenarios including services as direct children (nested `@client` with `autoMergeService: true` on children) and fully customized client hierarchies using explicit `is` operation mapping.
+
+## Deprecations
+
+### @azure-tools/typespec-azure-resource-manager
+
+- [#4132](https://github.com/Azure/typespec-azure/pull/4132) Updated `@locationResource` documentation to mark it as deprecated and recommend using `@parentResource(ArmLocationResource<...>)` instead.
+
+### @azure-tools/typespec-client-generator-core
+
+- [#3997](https://github.com/Azure/typespec-azure/pull/3997) Deprecated `@operationGroup` decorator in favor of `@client`. The `@operationGroup` decorator now delegates to `@client` internally and will be removed in a future release. Use `@client` to define sub clients instead.
+
+## Features
+
+### @azure-tools/typespec-azure-resource-manager
+
+- [#4188](https://github.com/Azure/typespec-azure/pull/4188) Add GenericResource template in Azure.ResourceManager.Legacy with new "Generic" resource kind
+- [#4004](https://github.com/Azure/typespec-azure/pull/4004) Add new templates to support operationStatus endpoints
+
+### @azure-tools/typespec-client-generator-core
+
+- [#3995](https://github.com/Azure/typespec-azure/pull/3995) Add experimental extern functions for operation transformations: `replaceParameter`, `removeParameter`, `addParameter`, and `reorderParameters`. These functions enable composable transformations that work with `@@override` to customize method signatures in client SDKs.
+- [#4063](https://github.com/Azure/typespec-azure/pull/4063) Add `.crossLanguageVersion` to `SdkPackage` to track equivalent API surfaces across different language SDKs
+
+## Bug Fixes
+
+### @azure-tools/typespec-autorest
+
+- [#4088](https://github.com/Azure/typespec-azure/pull/4088) Fix sorting of x-ms-paths entries that start with `?` (query-only paths). Previously these paths were not sorted alphabetically.
+
+### @azure-tools/typespec-azure-resource-manager
+
+- [#4005](https://github.com/Azure/typespec-azure/pull/4005) Fix `resolveArmResources` returning duplicate resources for versioned specs.
+- [#4072](https://github.com/Azure/typespec-azure/pull/4072) Fix `resolveArmResources` incorrectly merging cross-scope `LegacyOperations` into a single resource. Operations at different scopes (e.g., subscription vs tenant) with the same model but no explicit resource name are now resolved as separate resources.
+- [#4183](https://github.com/Azure/typespec-azure/pull/4183) Fix default resource name for extension resources using `Extension.ScopeParameter` scope. Previously the name was incorrectly prefixed with "ScopeParameter", now it uses just the extension resource name.
+
+### @azure-tools/typespec-client-generator-core
+
+- [#4164](https://github.com/Azure/typespec-azure/pull/4164) Fix `@clientLocation` not working for subscriptionId parameter when another operation had already elevated it to client level
+- [#4135](https://github.com/Azure/typespec-azure/pull/4135) Fix synthetic union created from split HTTP union responses not getting generated name and creating union-of-union when there are more than 2 response types.
+- [#4124](https://github.com/Azure/typespec-azure/pull/4124) Fixed `@clientLocation` operations being lost when targeting a sub client that gets merged in multi-service `autoMergeService` scenarios
+- [#4030](https://github.com/Azure/typespec-azure/pull/4030) Fix File type contentType/accept header handling: add a new branch in `createContentTypeOrAcceptHeader` for File type bodies to produce constant (single content type) or enum (multiple content types) for both contentType and accept params, and fix response contentType header serializedName fallback to "Content-Type" when `@header` is missing
+- [#4177](https://github.com/Azure/typespec-azure/pull/4177) Multi services' client should not honor the specific `api-version` set in config. The `api-version` config value is now cleared when dealing with multi-service clients during the versioning mutation and cache steps.
+- [#4111](https://github.com/Azure/typespec-azure/pull/4111) Add support to use `@scope` to specify generation of parameters for certain languages
+- [#4125](https://github.com/Azure/typespec-azure/pull/4125) Synthetic content type and accept parameters now honor HTTP library's result directly. Single content type produces a constant, multiple content types produce an enum, for both File and non-File body types.
