@@ -10,6 +10,7 @@
 
 - [#4188](https://github.com/Azure/typespec-azure/pull/4188) Add GenericResource template in Azure.ResourceManager.Legacy with new "Generic" resource kind
 - [#4004](https://github.com/Azure/typespec-azure/pull/4004) Add new templates to support operationStatus endpoints
+- [#4184](https://github.com/Azure/typespec-azure/pull/4184) Support singleton resources in `resolveArmResources`
 
 ### Bug Fixes
 
