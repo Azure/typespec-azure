@@ -2828,7 +2828,7 @@ it("validation: @operationGroup with scope not matching ancestor @client should 
       `
     @client({name: "TestClient", service: TestService}, "python")
     namespace Customizations {
-      @operationGroup("foobar")
+      @operationGroup("java")
       interface MyGroup {
       }
     }
@@ -2836,7 +2836,7 @@ it("validation: @operationGroup with scope not matching ancestor @client should 
     ),
   );
   await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-foobar",
+    emitterName: "@azure-tools/typespec-java",
   });
   expectDiagnostics(program.diagnostics, [
     {
