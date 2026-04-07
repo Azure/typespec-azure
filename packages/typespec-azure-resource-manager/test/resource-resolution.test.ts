@@ -789,7 +789,8 @@ interface GenericOps
       {
         ...Extension.ExtensionProviderNamespace<Employee>,
         ...KeysOf<Employee>,
-      }
+      },
+      "GenericEmployee"
     > {}
 
 @armResourceOperations
@@ -1110,6 +1111,47 @@ interface GenericResources {
     checkArmOperationsHas(provider.providerOperations, [
       { operationGroup: "Operations", name: "list", kind: "other" },
     ]);
+  });
+
+  it("uses extension resource name as default for ScopeParameter scope", async () => {
+    const { program } = await Tester.compile(`
+      using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+model WidgetResource
+  is Azure.ResourceManager.ExtensionResource<WidgetResourceProperties> {
+  ...ResourceNameParameter<
+    Resource = WidgetResource,
+    KeyName = "widgetName",
+    SegmentName = "widgets",
+    NamePattern = ""
+  >;
+}
+
+model WidgetResourceProperties {
+  widgetId: string;
+}
+
+@armResourceOperations
+interface WidgetResources {
+  get is Extension.Read<Extension.ScopeParameter, WidgetResource>;
+}
+      `);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    ok(provider.resources);
+    const widget = provider.resources.find(
+      (r) =>
+        r.resourceInstancePath ===
+        "/{scope}/providers/Microsoft.ContosoProviderHub/widgets/{widgetName}",
+    );
+    ok(widget);
+    expect(widget.resourceName).toEqual("WidgetResource");
   });
 
   it("allows overriding resource name for extension resources", async () => {

@@ -837,7 +837,9 @@ const $extensionResourceOperation: ExtensionResourceOperationDecorator = (
   }
   const resolvedResourceName =
     resourceName === undefined || resourceName.length === 0
-      ? `${targetResourceType.name}${extensionResourceType.name}`
+      ? targetResourceType.name === "ScopeParameter"
+        ? extensionResourceType.name
+        : `${targetResourceType.name}${extensionResourceType.name}`
       : resourceName;
   callOperationDecorator(
     context,
