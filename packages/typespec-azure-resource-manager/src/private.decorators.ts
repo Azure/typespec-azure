@@ -60,6 +60,7 @@ import {
   DefaultResourceKeySegmentNameDecorator,
   EnforceConstraintDecorator,
   ExtensionResourceOperationDecorator,
+  GenericResourceInternalDecorator,
   LegacyExtensionResourceOperationDecorator,
   LegacyResourceOperationDecorator,
   LegacyTypeDecorator,
@@ -103,6 +104,13 @@ import { ArmStateKeys } from "./state.js";
 
 export const namespace = "Azure.ResourceManager.Private";
 
+const [getArmResource, setArmResource, armResourceStateMap] = useStateMap<
+  Model,
+  ArmResourceDetails
+>(ArmStateKeys.armResources);
+
+export { getArmResource };
+
 /** @internal */
 
 const $builtInResource: BuiltInResourceDecorator = (
@@ -131,6 +139,69 @@ const $builtInResourceGroupResource: BuiltInResourceGroupResourceDecorator = (
 
   setResourceBaseType(program, resourceType, ResourceBaseType.BuiltInResourceGroup);
 };
+
+const [getGenericResourceInternal, setGenericResourceInternal] = useStateMap<Model, boolean>(
+  ArmStateKeys.genericResource,
+);
+
+const $genericResourceInternal: GenericResourceInternalDecorator = (
+  context: DecoratorContext,
+  target: Model,
+) => {
+  setGenericResourceInternal(context.program, target, true);
+
+  // Register the resource directly with kind "Generic" — no key/segment required
+  const { program } = context;
+  const namespaceName = target.namespace ? getTypeName(target.namespace) : undefined;
+  if (
+    namespaceName === undefined ||
+    namespaceName === "Azure.ResourceManager" ||
+    namespaceName === "Azure.ResourceManager.Legacy" ||
+    namespaceName === "Azure.ResourceManager.CommonTypes"
+  ) {
+    return;
+  }
+
+  if (!target.namespace || target.namespace.name === "") {
+    reportDiagnostic(program, {
+      code: "decorator-in-namespace",
+      format: { decoratorName: "genericResourceInternal" },
+      target,
+    });
+    return;
+  }
+
+  const armProviderNamespace = getArmProviderNamespace(program, target);
+  const armLibraryNamespace = isArmLibraryNamespace(program, target.namespace);
+  if (!armProviderNamespace && !armLibraryNamespace) {
+    reportDiagnostic(program, { code: "arm-resource-missing-arm-namespace", target });
+    return;
+  }
+
+  // Skip if already registered
+  if (getArmResource(program, target)) return;
+
+  const armResourceDetails: ArmResourceDetails = {
+    name: target.name,
+    kind: "Generic",
+    typespecType: target,
+    armProviderNamespace: armProviderNamespace ?? "",
+    operations: {
+      lifecycle: {},
+      lists: {},
+      actions: {},
+    },
+  };
+
+  setArmResource(program, target, armResourceDetails);
+};
+
+export function isGenericResource(program: Program, target: Model): boolean {
+  if (getGenericResourceInternal(program, target)) return true;
+  if (target.baseModel) return isGenericResource(program, target.baseModel);
+  return false;
+}
+
 const $omitIfEmpty: OmitIfEmptyDecorator = (
   context: DecoratorContext,
   entity: Model,
@@ -186,6 +257,7 @@ const $enforceConstraint: EnforceConstraintDecorator = (
       if (
         baseType === constraintType ||
         isCustomAzureResource(context.program, baseType) ||
+        isGenericResource(context.program, baseType) ||
         isBuiltIn(getResourceBaseType(context.program, baseType)) ||
         checkAllowedVirtualResource(context.program, entity, baseType)
       )
@@ -567,13 +639,6 @@ export function registerArmResource(
   setArmResource(context.program, resourceType, armResourceDetails);
 }
 
-const [getArmResource, setArmResource, armResourceStateMap] = useStateMap<
-  Model,
-  ArmResourceDetails
->(ArmStateKeys.armResources);
-
-export { getArmResource };
-
 export function listArmResources(program: Program): ArmResourceDetails[] {
   // Deduplicate by namespace-qualified name. Versioning mutations (from TCGC's
   // createSdkContext or autorest's per-version snapshots) re-apply decorators on
@@ -772,7 +837,9 @@ const $extensionResourceOperation: ExtensionResourceOperationDecorator = (
   }
   const resolvedResourceName =
     resourceName === undefined || resourceName.length === 0
-      ? `${targetResourceType.name}${extensionResourceType.name}`
+      ? targetResourceType.name === "ScopeParameter"
+        ? extensionResourceType.name
+        : `${targetResourceType.name}${extensionResourceType.name}`
       : resourceName;
   callOperationDecorator(
     context,
@@ -1018,6 +1085,7 @@ export const $decorators = {
     legacyResourceOperation: $legacyResourceOperation,
     builtInResourceOperation: $builtInResourceOperation,
     validateCommonTypesVersionForResource: $validateCommonTypesVersionForResource,
+    genericResourceInternal: $genericResourceInternal,
   } satisfies AzureResourceManagerPrivateDecorators,
   "Azure.ResourceManager.Extension.Private": {
     builtInResource: $builtInResource,
