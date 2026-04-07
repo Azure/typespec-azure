@@ -597,7 +597,7 @@ Customizations SHOULD always be made in a file named `client.tsp` alongside `mai
 There are two ways to customize the client hierarchy: using `@clientLocation` to change the location of the operations, or use `@client` to restructure the client hierarchy.
 Be careful when you use both of them since `@clientLocation` could not move the client that is no longer exist with `@client` customization.
 
-The `@clientLocaton` decorator allows you to change the location of the operations in the client hierarchy.
+The `@clientLocation` decorator allows you to change the location of the operations in the client hierarchy.
 It can be used to move operations to an existed sub client defined by `Interface` or `Namespace`, or move the the root client of namespace with `@service` decorator.
 This decorator is useful when you want to keep the default client hierarchy but need to change the location of some operations.
 

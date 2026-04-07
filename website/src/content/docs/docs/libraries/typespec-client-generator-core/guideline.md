@@ -168,15 +168,15 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 
 **Built-in Types:**
 
-- [`SdkBuiltInType`](../reference/js-api/interfaces/sdkbuiltintype/) represents a [built-in TypeSpec type](https://typespec.io/docs/language-basics/built-in-types/) or a [`scalar`](https://typespec.io/docs/language-basics/scalars/) type that derives from a built-in TypeSpec type, excluding `utcDateTime`, `offsetDateTime` and `duration`. The `encode` property is added to these types when the `@encode` decorator exists, indicating how to encode when sending to the service.
+- [`SdkBuiltInType`](../reference/js-api/interfaces/sdkbuiltintype/) represents a [built-in TypeSpec type](https://typespec.io/docs/language-basics/built-in-types/) or a [`scalar`](https://typespec.io/docs/language-basics/scalars/) type that derives from a built-in TypeSpec type, excluding `utcDateTime`, `offsetDateTime` and `duration`. The `encode` property is added to these types when the `@encode` decorator exists, indicating how to encode when sending to the service. Supported `kind` values include: `string`, `boolean`, `int8`, `int16`, `int32`, `int64`, `uint8`, `uint16`, `uint32`, `uint64`, `integer`, `safeint`, `float`, `float32`, `float64`, `decimal`, `decimal128`, `numeric`, `bytes`, `url`, `plainDate`, `plainTime`, and `unknown`. Scalar types that derive from built-in types preserve the inheritance chain via the `baseType` property.
 
 **Date and Time Types:**
 
-- [`SdkDateTimeType`](../reference/js-api/type-aliases/sdkdatetimetype/) and [`SdkDurationType`](../reference/js-api/interfaces/sdkdurationtype/) are converted from TypeSpec `utcDateTime`, `offsetDateTime` and `duration` types. The datetime encoding info is in the `encode` property.
+- [`SdkDateTimeType`](../reference/js-api/type-aliases/sdkdatetimetype/) and [`SdkDurationType`](../reference/js-api/interfaces/sdkdurationtype/) are converted from TypeSpec `utcDateTime`, `offsetDateTime` and `duration` types. The encoding info is in the `encode` property (e.g., `"rfc3339"`, `"rfc7231"`, `"unixTimestamp"` for datetime; `"ISO8601"`, `"seconds"` for duration). The `wireType` property indicates the serialization type used on the wire (e.g., `string` for RFC formats, `int64` for unix timestamps, `int32`/`float` for duration seconds).
 
 **Collection Types:**
 
-- [`SdkArrayType`](../reference/js-api/interfaces/sdkarraytype/), [`SdkTupleType`](../reference/js-api/interfaces/sdktupletype/) and [`SdkDictionaryType`](../reference/js-api/interfaces/sdkdictionarytype/) are converted from TypeSpec [`Array`](https://typespec.io/docs/language-basics/models/#array), [`Tuple`](https://typespec.io/docs/standard-library/reference/js-api/interfaces/tuple/) and [`Record`](https://typespec.io/docs/language-basics/models/#record) types.
+- [`SdkArrayType`](../reference/js-api/interfaces/sdkarraytype/), [`SdkTupleType`](../reference/js-api/interfaces/sdktupletype/) and [`SdkDictionaryType`](../reference/js-api/interfaces/sdkdictionarytype/) are converted from TypeSpec [`Array`](https://typespec.io/docs/language-basics/models/#array), [`Tuple`](https://typespec.io/docs/standard-library/reference/js-api/interfaces/tuple/) and [`Record`](https://typespec.io/docs/language-basics/models/#record) types. `SdkArrayType` has a `valueType` property for the element type. `SdkDictionaryType` has `keyType` and `valueType` properties. `SdkTupleType` has a `valueTypes` array for each positional element type. Identical collection types are deduplicated to the same instance.
 
 **Nullable Types:**
 
@@ -184,19 +184,19 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 
 **Enumeration Types:**
 
-- [`SdkEnumType`](../reference/js-api/interfaces/sdkenumtype/) and [`SdkEnumValueType`](../reference/js-api/interfaces/sdkenumvaluetype/) represent TCGC enumeration types. They are typically converted from TypeSpec [`Enum`](https://typespec.io/docs/language-basics/enums/) types or [`Union`](https://typespec.io/docs/language-basics/unions/) types (for extensible enumeration cases).
+- [`SdkEnumType`](../reference/js-api/interfaces/sdkenumtype/) and [`SdkEnumValueType`](../reference/js-api/interfaces/sdkenumvaluetype/) represent TCGC enumeration types. They are typically converted from TypeSpec [`Enum`](https://typespec.io/docs/language-basics/enums/) types or [`Union`](https://typespec.io/docs/language-basics/unions/) types (for extensible enumeration cases). Key properties on `SdkEnumType` include: `isFixed` (whether the enum is a fixed set of values), `isUnionAsEnum` (whether it was converted from a union type), and `valueType` (the underlying built-in type, e.g., `string` or `int32`).
 
 **Literal Types:**
 
-- [`SdkConstantType`](../reference/js-api/interfaces/sdkconstanttype/) represents a literal type in TypeSpec ([`StringLiteral`](https://typespec.io/docs/language-basics/type-literals/#string-literals), [`NumericLiteral`](https://typespec.io/docs/language-basics/type-literals/#numeric-literal), or [`BooleanLiteral`](https://typespec.io/docs/language-basics/type-literals/#boolean-literal)).
+- [`SdkConstantType`](../reference/js-api/interfaces/sdkconstanttype/) represents a literal type in TypeSpec ([`StringLiteral`](https://typespec.io/docs/language-basics/type-literals/#string-literals), [`NumericLiteral`](https://typespec.io/docs/language-basics/type-literals/#numeric-literal), or [`BooleanLiteral`](https://typespec.io/docs/language-basics/type-literals/#boolean-literal)). It has a `value` property containing the literal value and a `valueType` property indicating the underlying built-in type.
 
 **Union Types:**
 
-- [`SdkUnionType`](../reference/js-api/interfaces/sdkuniontype/) represents a TCGC union type. It is typically converted from a TypeSpec [`Union`](https://typespec.io/docs/language-basics/unions/) type.
+- [`SdkUnionType`](../reference/js-api/interfaces/sdkuniontype/) represents a TCGC union type. It is typically converted from a TypeSpec [`Union`](https://typespec.io/docs/language-basics/unions/) type. It has a `variantTypes` array containing each variant's type. For discriminated unions, the `discriminatedOptions` property provides the discriminator property name and envelope information.
 
 **Model Types:**
 
-- [`SdkModelType`](../reference/js-api/interfaces/sdkmodeltype/) represents a TCGC model type. It is typically converted from a TypeSpec [`Model`](https://typespec.io/docs/language-basics/models/) type.
+- [`SdkModelType`](../reference/js-api/interfaces/sdkmodeltype/) represents a TCGC model type. It is typically converted from a TypeSpec [`Model`](https://typespec.io/docs/language-basics/models/) type. Key properties include: `baseModel` (the base model for inheritance), `discriminatorProperty` (the property used as a discriminator), `discriminatedSubtypes` (a map of discriminator values to subtypes), `discriminatorValue` (the discriminator value for this subtype), and `additionalProperties` (the type for additional properties when the model extends `Record<T>`).
 
 **Model Property Types:**
 
