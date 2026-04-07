@@ -4210,4 +4210,96 @@ interface SupportTicketsNoSubscription {
     expect(resource.operations.lists).toBeDefined();
     expect(resource.operations.lists).toHaveLength(2);
   });
+
+  it("collects operation information for GenericResource with RoutedOperations", async () => {
+    const { program } = await Tester.compile(`
+
+using Azure.Core;
+
+/** Contoso Resource Provider management API. */
+@armProviderNamespace
+@service(#{ title: "ContosoProviderHubClient" })
+@versioned(Versions)
+namespace Microsoft.Resources {
+  /** Contoso API versions */
+  enum Versions {
+    /** 2021-10-01-preview version */
+    @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+    v2021_20_01_preview: "2021-10-01-preview",
+  }
+
+  /** A generic resource */
+  model MyGenericResource
+    is Azure.ResourceManager.Legacy.GenericResource<{}> {
+  }
+
+  alias genericOps = Azure.ResourceManager.Legacy.RoutedOperations<
+    {
+      ...ApiVersionParameter;
+
+      @path(#{ allowReserved: true })
+      @key
+      @doc("The resource id")
+      resourceId: string;
+    },
+    {}
+  >;
+
+  interface Operations extends Azure.ResourceManager.Operations {}
+
+  @armResourceOperations
+  interface GenericResourceOps {
+    get is genericOps.Read<MyGenericResource>;
+    createOrUpdate is genericOps.CreateOrUpdateAsync<MyGenericResource>;
+    update is genericOps.CustomPatchSync<MyGenericResource, MyGenericResource>;
+    delete is genericOps.DeleteWithoutOkAsync<MyGenericResource>;
+    /** A sample HEAD to check resource existence */
+    checkExistence is genericOps.CheckExistence<MyGenericResource>;
+  }
+}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    ok(provider.resources);
+    expect(provider.resources).toHaveLength(1);
+
+    const resource = provider.resources[0];
+    ok(resource);
+    expect(resource).toMatchObject({
+      kind: "Other",
+      providerNamespace: "Microsoft.Resources",
+      type: expect.anything(),
+    });
+
+    checkResolvedOperations(resource, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            {
+              operationGroup: "GenericResourceOps",
+              name: "createOrUpdate",
+              kind: "createOrUpdate",
+            },
+          ],
+          delete: [{ operationGroup: "GenericResourceOps", name: "delete", kind: "delete" }],
+          read: [{ operationGroup: "GenericResourceOps", name: "get", kind: "read" }],
+          update: [{ operationGroup: "GenericResourceOps", name: "update", kind: "update" }],
+          checkExistence: [
+            {
+              operationGroup: "GenericResourceOps",
+              name: "checkExistence",
+              kind: "checkExistence",
+            },
+          ],
+        },
+      },
+      resourceType: {
+        provider: "Microsoft.Resources",
+        types: [],
+      },
+      resourceInstancePath: "/{resourceId}",
+      resourceName: "MyGenericResource",
+    });
+  });
 });
