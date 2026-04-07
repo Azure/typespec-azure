@@ -40,3 +40,54 @@ After you've created your customization file, use the command `tsp compile clien
 ```shell
 tsp compile client.tsp
 ```
+
+## Language scoping
+
+Most TCGC decorators accept an optional `scope` parameter that lets you target customizations to specific language emitters. When no scope is specified, the customization applies to all languages.
+
+**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`
+
+**Valid scope patterns:**
+
+- Single language: `"python"`
+- Multiple languages (comma-separated): `"python, java"`
+- Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
+
+```typespec
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+// Rename for all languages
+@@clientName(MyService.MyModel, "RenamedModel");
+
+// Rename only for Python
+@@clientName(MyService.MyModel, "PythonModel", "python");
+
+// Rename for all languages except C#
+@@clientName(MyService.MyModel, "NonCSharpModel", "!csharp");
+```
+
+The `@scope` decorator can also be used on operations and model properties to control which languages include them in the generated SDK:
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@service
+namespace MyService;
+
+model MyModel {
+  name: string;
+
+  // This property will only appear in the Python SDK
+  @scope("python")
+  pythonOnlyProp: string;
+}
+
+// This operation will only be generated for Java and C#
+@scope("java, csharp")
+op javaAndCsharpOnly(): void;
+```

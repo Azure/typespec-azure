@@ -176,7 +176,7 @@ public final class PetStoreNamespaceClient {
 
 Sometimes it may be useful to still generate the method, but to make it private, so it can be re-used by a manual code wrapper.
 
-The two possible value for the `Access` enum are `internal` and `public`.
+The `@access` decorator accepts values from the `Access` enum: `Access.internal` makes the method and its associated models internal/private, while `Access.public` (the default) keeps them publicly visible. When an operation is marked as `internal`, the models it uses will also be treated as internal unless they are also used by a public operation.
 
 <ClientTabs>
 
@@ -186,7 +186,7 @@ import "@azure-tools/typespec-client-generator-core";
 
 using Azure.ClientGenerator.Core;
 
-@@access(PetStoreNamespace.GetModel, "internal");
+@@access(PetStoreNamespace.GetModel, Access.internal);
 ```
 
 ```python
@@ -2231,3 +2231,58 @@ Use the `scope` parameter to apply customizations only to specific language emit
 ```
 
 Supported scope values include: `"python"`, `"csharp"`, `"java"`, `"javascript"`, `"go"`.
+
+## HEAD operations as boolean responses
+
+For HEAD operations, you can use the `@responseAsBool` decorator to model the response as a boolean value. When applied, the generated method will return `true` for 2xx responses, `false` for 404 responses, and raise an exception for all other error status codes.
+
+This decorator can only be applied to HEAD operations.
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@service
+namespace MyService;
+
+@route("/resources/{name}")
+@head
+@responseAsBool
+op exists(@path name: string): OkResponse | NotFoundResponse;
+```
+
+## Client documentation with `@clientDoc`
+
+The `@clientDoc` decorator allows you to provide client-specific documentation that may differ from the original service documentation. This is useful when the client API needs different wording than the service description.
+
+The decorator supports two modes:
+
+- `DocumentationMode.append`: Adds to the existing documentation (default)
+- `DocumentationMode.replace`: Replaces the existing documentation entirely
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@service
+namespace MyService;
+
+/** Gets the resource. */
+@route("/resources/{name}")
+op getResource(@path name: string): Resource;
+
+// Append client-specific details
+@@clientDoc(MyService.getResource,
+  "Returns null if the resource does not exist.",
+  DocumentationMode.append
+);
+
+// Replace documentation entirely for Python
+@@clientDoc(MyService.getResource,
+  "Fetch the named resource from the service.",
+  DocumentationMode.replace,
+  "python"
+);
+```

@@ -427,3 +427,89 @@ model Page {
   ]>;
 }
 ```
+
+### Specifying next link HTTP verb with `@nextLinkVerb`
+
+By default, the next link in a paging operation is fetched using a `GET` request. If your service requires a different HTTP verb (e.g., `POST`) to fetch the next page, use the `@nextLinkVerb` decorator from the legacy namespace.
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+@service
+namespace MyService;
+
+model Item {
+  name: string;
+}
+model PagedItems {
+  @pageItems items: Item[];
+  @nextLink nextLink?: string;
+}
+
+@nextLinkVerb("POST")
+@list
+@route("/items")
+op listItems(): PagedItems;
+```
+
+### Forcing an operation to be pageable with `@markAsPageable`
+
+:::caution
+This is a legacy decorator. Use standard TypeSpec paging patterns (`@list` with `@pageItems`) for new services.
+:::
+
+The `@markAsPageable` decorator forces an operation to be treated as pageable even when it doesn't follow standard paging patterns. The response model must contain an array property (marked with `@pageItems` or named `value`).
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+@service
+namespace MyService;
+
+model Item {
+  name: string;
+}
+model ItemListResult {
+  @pageItems value: Item[];
+  nextLink?: string;
+}
+
+@markAsPageable
+@route("/items")
+op listItems(): ItemListResult;
+```
+
+### Disabling paging with `@disablePageable`
+
+:::caution
+This is a legacy decorator. Consider using standard non-paging patterns for new services.
+:::
+
+The `@disablePageable` decorator prevents an operation from being treated as pageable, even when it follows standard paging patterns. The generated method will return the full result model instead of an iterator over items.
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+@service
+namespace MyService;
+
+model Item {
+  name: string;
+}
+model ItemListResult {
+  @pageItems value: Item[];
+  nextLink?: string;
+}
+
+@disablePageable
+@list
+@route("/items")
+op listItems(): ItemListResult;
+// Generated method will return ItemListResult directly, not an iterator of Item
+```

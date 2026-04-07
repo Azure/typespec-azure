@@ -227,6 +227,38 @@ Expected response body:
 }
 ```
 
+### Azure_ClientGenerator_Core_ClientDoc_AppendDoc
+
+- Endpoint: `get /azure/client-generator-core/client-doc/appendDoc`
+
+This scenario tests @clientDoc with append mode.
+The operation's original doc is "Gets a resource."
+After applying @clientDoc in append mode, the client documentation should be:
+"Gets a resource. Returns null if the resource is not found."
+
+Expected query parameter: name="sample"
+Expected response body:
+
+```json
+{ "name": "sample" }
+```
+
+### Azure_ClientGenerator_Core_ClientDoc_ReplaceDoc
+
+- Endpoint: `get /azure/client-generator-core/client-doc/replaceDoc`
+
+This scenario tests @clientDoc with replace mode.
+The operation's original doc is "Gets a resource."
+After applying @clientDoc in replace mode, the client documentation should be:
+"Fetch the named resource from the service."
+
+Expected query parameter: name="sample"
+Expected response body:
+
+```json
+{ "name": "sample" }
+```
+
 ### Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_HeaderParam
 
 - Endpoints:
@@ -839,6 +871,45 @@ Expected client structure:
 - Interface ResourceOperations should contain only operation `getResource`
 - Root client should contain operation `getHealthStatus` (moved from ResourceOperations)
 
+### Azure_ClientGenerator_Core_ConvenientApi_Both
+
+- Endpoint: `get /azure/client-generator-core/convenient-api/both`
+
+This scenario tests both @convenientAPI and @protocolAPI enabled (default behavior).
+Both protocol and convenience methods should be generated.
+Expected query parameter: name="sample"
+Expected response body:
+
+```json
+{ "name": "sample" }
+```
+
+### Azure_ClientGenerator_Core_ConvenientApi_ConvenientOnly
+
+- Endpoint: `get /azure/client-generator-core/convenient-api/protocolOnly`
+
+This scenario tests @convenientAPI(false) on an operation, meaning only a protocol method
+should be generated. The convenience method should NOT be generated.
+Expected query parameter: name="sample"
+Expected response body:
+
+```json
+{ "name": "sample" }
+```
+
+### Azure_ClientGenerator_Core_ConvenientApi_ProtocolOnly
+
+- Endpoint: `get /azure/client-generator-core/convenient-api/convenientOnly`
+
+This scenario tests @protocolAPI(false) on an operation, meaning only a convenience method
+should be generated. The protocol method should NOT be generated.
+Expected query parameter: name="sample"
+Expected response body:
+
+```json
+{ "name": "sample" }
+```
+
 ### Azure_ClientGenerator_Core_DeserializeEmptyStringAsNull_get
 
 - Endpoint: `get /azure/client-generator-core/deserialize-empty-string-as-null/responseModel`
@@ -1204,6 +1275,50 @@ param1: param1
 param2: param2
 
 Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_ResponseAsBool_Exists
+
+- Endpoint: `head /azure/client-generator-core/response-as-bool/exists/found`
+
+This scenario tests @responseAsBool on a HEAD operation that returns 200 (exists).
+The generated method should return `true` for 2xx responses.
+Expected request: HEAD /azure/client-generator-core/response-as-bool/exists/found
+Expected response: 200
+
+### Azure_ClientGenerator_Core_ResponseAsBool_NotExists
+
+- Endpoint: `head /azure/client-generator-core/response-as-bool/exists/notFound`
+
+This scenario tests @responseAsBool on a HEAD operation that returns 404 (not found).
+The generated method should return `false` for 404 responses.
+Expected request: HEAD /azure/client-generator-core/response-as-bool/exists/notFound
+Expected response: 404
+
+### Azure_ClientGenerator_Core_Scope_NegatedScopeOperation
+
+- Endpoint: `get /azure/client-generator-core/scope/negatedOp`
+
+This scenario tests that an operation scoped with negation is generated for all
+languages except those excluded. The 'negatedOp' operation should NOT be generated
+for C# but should be generated for all other languages.
+Expected response body:
+
+```json
+{ "name": "sample" }
+```
+
+### Azure_ClientGenerator_Core_Scope_ScopedOperation
+
+- Endpoint: `get /azure/client-generator-core/scope/scopedOp`
+
+This scenario tests that an operation scoped to a specific set of languages is only
+generated for those languages. The 'scopedOp' operation should only be generated for
+Python and Java. Other languages should not include this operation.
+Expected response body:
+
+```json
+{ "name": "sample" }
+```
 
 ### Azure_ClientGenerator_Core_Usage_ModelInOperation
 

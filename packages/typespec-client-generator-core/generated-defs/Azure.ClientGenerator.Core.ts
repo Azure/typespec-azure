@@ -185,9 +185,6 @@ export type ProtocolAPIDecorator = (
  * @client({service: MyService, name: "MySpecialClient"})
  * interface MyInterface {}
  * ```
- * @example
- *
- *
  */
 export type ClientDecorator = (
   context: DecoratorContext,
@@ -511,7 +508,7 @@ export type AccessDecorator = (
  *
  * @@override(MyService.myOperation, myOperationCustomization)
  *
- * // method signature is now `op myOperation(params: Params)` just for csharp // method signature is now `op myOperation(foo: string, bar: string)`
+ * // method signature is now `op myOperation(foo: string, bar: string)` with bar as required
  * ```
  */
 export type OverrideDecorator = (
@@ -839,8 +836,8 @@ export type ApiVersionDecorator = (
  * This decorator is useful for extending the API version enum exposed by the client.
  * It is particularly beneficial when generating a complete API version enum without requiring the entire specification to be annotated with versioning decorators, as the generation process does not depend on versioning details.
  *
- * @param target The target client for which you want to define additional API versions.
- * @param value If true, we will treat this parameter as an api-version parameter. If false, we will not. Default is true.
+ * @param target The target namespace for which you want to define additional API versions.
+ * @param value An enum containing the API versions that the client should support.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  *
  * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
@@ -885,15 +882,14 @@ export type ClientApiVersionsDecorator = (
  * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
  * @example
  * ```typespec
+ * scalar MyStringLike extends string;
  *
  * model MyModel {
- *   scalar stringlike extends string;
- *
  *   @deserializeEmptyStringAsNull
  *   prop: string;
  *
  *   @deserializeEmptyStringAsNull
- *   prop: stringlike;
+ *   scalarProp: MyStringLike;
  * }
  * ```
  */

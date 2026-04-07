@@ -378,14 +378,14 @@ It is particularly beneficial when generating a complete API version enum withou
 
 #### Target
 
-The target client for which you want to define additional API versions.
+The target namespace for which you want to define additional API versions.
 `Namespace`
 
 #### Parameters
 
 | Name  | Type             | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | ----- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| value | `Enum`           | If true, we will treat this parameter as an api-version parameter. If false, we will not. Default is true.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| value | `Enum`           | An enum containing the API versions that the client should support.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
@@ -832,15 +832,14 @@ The target type that you want to apply this deserialization behavior to.
 #### Examples
 
 ```typespec
+scalar MyStringLike extends string;
 
 model MyModel {
-  scalar stringlike extends string;
-
   @deserializeEmptyStringAsNull
   prop: string;
 
   @deserializeEmptyStringAsNull
-  prop: stringlike;
+  scalarProp: MyStringLike;
 }
 ```
 
@@ -930,7 +929,7 @@ op myOperationCustomization(foo: string, bar: string): void;
 
 @@override(MyService.myOperation, myOperationCustomization)
 
-// method signature is now `op myOperation(params: Params)` just for csharp // method signature is now `op myOperation(foo: string, bar: string)`
+// method signature is now `op myOperation(foo: string, bar: string)` with bar as required
 ```
 
 ### `@paramAlias` {#@Azure.ClientGenerator.Core.paramAlias}
@@ -1407,7 +1406,7 @@ model SportsCar extends Vehicle {
 Forces an operation to be treated as a Long Running Operation (LRO) by the SDK generators,
 even when the operation is not long-running on the service side.
 
-NOTE: When used, you will need to verify the operatio and add tests for the generated code
+NOTE: When used, you will need to verify the operation and add tests for the generated code
 to make sure the end-to-end works for library users, since there is a risk that forcing
 this operation to be LRO will result in errors.
 
