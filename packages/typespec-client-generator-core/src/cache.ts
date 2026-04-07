@@ -12,6 +12,7 @@ import { getVersions } from "@typespec/versioning";
 import { getClientLocation, getClientNameOverride, isInScope } from "./decorators.js";
 import { SdkClient, TCGCContext } from "./interfaces.js";
 import {
+  AllScopes,
   clientKey,
   clientLocationKey,
   findServiceForOperation,
@@ -203,6 +204,7 @@ function getRootClients(context: TCGCContext): ClientCreationResult {
     });
 
     // Build explicit client hierarchy
+    const scopeOrphanedClients = new Set<SdkClient>();
     explicitClients.forEach((client: SdkClient) => {
       let parentClientType: Namespace | undefined = client.type!.namespace;
       while (parentClientType) {
@@ -213,24 +215,33 @@ function getRootClients(context: TCGCContext): ClientCreationResult {
           parentClient.subClients.push(client);
           break;
         }
+        // If an ancestor namespace has @client data for any scope but not for the
+        // current emitter, and this client was resolved via AllScopes (unscoped
+        // decorator like @operationGroup without a scope argument), then it is an
+        // orphaned sub-client only relevant in the ancestor's scope.
+        if (
+          context.program.stateMap(clientKey).has(parentClientType) &&
+          getScopedDecoratorData(context, clientKey, client.type!, AllScopes) !== undefined
+        ) {
+          scopeOrphanedClients.add(client);
+          break;
+        }
         parentClientType = parentClientType.namespace;
       }
     });
 
+    // Remove scope-orphaned clients from caches
+    for (const orphan of scopeOrphanedClients) {
+      context.__rawClientsCache!.delete(orphan.type!);
+      context.__clientToOperationsCache!.delete(orphan);
+      context.__explicitClients!.delete(orphan);
+    }
+
     // Get root clients
     let validClients = true;
     clients = explicitClients.filter((c: SdkClient) => {
+      if (scopeOrphanedClients.has(c)) return false;
       if (c.parent === undefined && c.services.length === 0) {
-        // Before reporting an error, check if an ancestor namespace has a @client
-        // decorator for any scope. If so, this client is only a sub-client in
-        // other scopes and should be silently excluded for the current scope.
-        let ancestor: Namespace | undefined = c.type?.namespace;
-        while (ancestor) {
-          if (context.program.stateMap(clientKey).has(ancestor)) {
-            return false;
-          }
-          ancestor = ancestor.namespace;
-        }
         reportDiagnostic(context.program, {
           code: "root-client-missing-service",
           target: c.type!,

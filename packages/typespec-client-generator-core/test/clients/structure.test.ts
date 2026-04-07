@@ -2814,6 +2814,37 @@ it("validation: multiple scoped @client with scoped @operationGroup should not r
   }
 });
 
+it("validation: @operationGroup with scope not matching ancestor @client should still report root-client-missing-service", async () => {
+  // If an @operationGroup has an explicit scope that doesn't match any ancestor
+  // @client scope, it should still emit the root-client-missing-service diagnostic.
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace TestService {
+      @route("/test")
+      op test(): void;
+    }`,
+      `
+    @client({name: "TestClient", service: TestService}, "python")
+    namespace Customizations {
+      @operationGroup("foobar")
+      interface MyGroup {
+      }
+    }
+  `,
+    ),
+  );
+  await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-foobar",
+  });
+  expectDiagnostics(program.diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/root-client-missing-service",
+    },
+  ]);
+});
+
 it("validation: nested client service not subset of parent", async () => {
   const { program } = await SimpleBaseTester.compile(
     createClientCustomizationInput(
