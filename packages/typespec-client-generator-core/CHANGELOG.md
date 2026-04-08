@@ -1,5 +1,13 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.67.1
+
+### Bug Fixes
+
+- [#4215](https://github.com/Azure/typespec-azure/pull/4215) Fix error response in intersection types (e.g., `ArmAcceptedResponse & ErrorResponse`) not being classified as exceptions, causing false `unexpected-pageable-operation-return-type` diagnostic for pageable operations.
+- [#4209](https://github.com/Azure/typespec-azure/pull/4209) Revert `*/*` content type to be treated as constant instead of string
+
+
 ## 0.67.0
 
 ### Breaking Changes
