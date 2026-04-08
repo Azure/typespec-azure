@@ -403,11 +403,7 @@ function createContentTypeOrAcceptHeader(
   // For a single content type, create a constant. For multiple content types, create an enum.
   // For File type bodies, the content type is constrained by the File type itself;
   // treat it the same as a user-defined content type/accept parameter.
-  if (
-    bodyObject.contentTypes &&
-    bodyObject.contentTypes.length === 1 &&
-    bodyObject.contentTypes[0] !== "*/*"
-  ) {
+  if (bodyObject.contentTypes && bodyObject.contentTypes.length === 1) {
     type = {
       kind: "constant",
       value: bodyObject.contentTypes[0],
@@ -446,9 +442,7 @@ function createContentTypeOrAcceptHeader(
     type = enumType;
   }
   const optional = bodyObject.kind === "body" ? bodyObject.optional : false;
-  // For */* wildcard, provide a sensible client default value
-  const isWildcard = bodyObject.contentTypes?.length === 1 && bodyObject.contentTypes[0] === "*/*";
-  // No need for clientDefaultValue when it's a constant, it only has one value
+  // No need for clientDefaultValue because it's a constant, it only has one value
   return {
     type,
     name,
@@ -457,7 +451,6 @@ function createContentTypeOrAcceptHeader(
     isApiVersionParam: false,
     onClient: false,
     optional: optional,
-    ...(isWildcard && { clientDefaultValue: "application/octet-stream" }),
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
     decorators: [],
     access: "public",
