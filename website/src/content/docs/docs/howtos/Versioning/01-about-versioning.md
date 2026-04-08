@@ -5,7 +5,7 @@ llmstxt: true
 
 See [`@typespec/versioning` documentation](https://typespec.io/docs/libraries/versioning/guide) for the general versioning concept. This guide expands on how Azure Services should define and manage API versions.
 
-See [Common Versioning Scenarios](../ARM/versioning.md) for how to make specific kinds of common API changes in your specs.
+See [Evolving APIs using the Versioning Library](./06-evolving-apis.md) for how to make specific kinds of common API changes in your specs.
 
 ## How Versioning Works in TypeSpec
 

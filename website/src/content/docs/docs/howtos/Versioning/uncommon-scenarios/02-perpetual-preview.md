@@ -80,7 +80,7 @@ For some Resource Providers, whenever a new stable version is released, a new pr
     newName: int32;
   ```
 
-- Add any new type changes to stable version (A + 1) and decorate appropriately, as shown in the [versioning guide](../../ARM/versioning.md). Note that these changes should also appear in the new preview (A + 2)
+- Add any new type changes to stable version (A + 1) and decorate appropriately, as shown in the [versioning guide](../06-evolving-apis.md). Note that these changes should also appear in the new preview (A + 2)
 - Remove version `A` from the versions enumeration
 
   ```diff lang=tsp
@@ -213,7 +213,7 @@ For some Resource Providers, whenever a new stable version is released, a new pr
 
 - Do the following with the Original
   - Follow the instructions for normalizing decoration in the [converting specifications](./01-converting-specs.md#normalizing-version-decoration-optional) document. This will remove any redundant decoration between the new stable and preview versions (`A + 1` and `A + 2`).
-  - Add any type changes that are introduced in the new preview and decorate appropriately, following the [versioning guide](../../ARM/versioning.md)
+  - Add any type changes that are introduced in the new preview and decorate appropriately, following the [versioning guide](../06-evolving-apis.md)
   - Add a new example folder for the new preview version and populate with appropriate examples.
   - Compile the spec to produce artifacts (especially the new stable and preview version (`A + 1` and `A + 2`) APIs).
   - Copy the README.md from copy 1 and add the new preview version to the file.
