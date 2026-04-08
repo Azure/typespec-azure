@@ -3,7 +3,7 @@ title: Adding a Preview Version when the Last Version was Stable
 llmstxt: true
 ---
 
-When the latest api-version in your TypeSpec spec is a stable version, adding a new preview version is simply adding any new types and operations in the new preview and marking them with the appropriate versioning decoration, as described in [Common Versioning Scenarios](../ARM/versioning.md).
+When the latest api-version in your TypeSpec spec is a stable version, adding a new preview version is simply adding any new types and operations in the new preview and marking them with the appropriate versioning decoration, as described in [Evolving APIs using the Versioning Library](./06-evolving-apis.md).
 
 ## Making Changes to your TypeSpec spec
 

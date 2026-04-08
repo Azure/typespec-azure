@@ -1,10 +1,10 @@
 ---
-title: Versioning
-description: Managing versioning for ARM services
+title: Evolving APIs using the Versioning Library
+description: How to add, remove, or modify resources, operations, and properties across API versions
 llmstxt: true
 ---
 
-This document explains how to manage versioning in TypeSpec projects, including how to add, remove, or modify resources, operations, and properties across API versions.
+This document explains how to evolve your API across versions in TypeSpec projects, including how to add, remove, or modify resources, operations, and properties using versioning decorators.
 
 ## Introduction
 
