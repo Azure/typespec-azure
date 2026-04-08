@@ -707,7 +707,7 @@ function getSdkHttpResponseAndExceptions(
     if (
       response.statusCodes === "*" ||
       isErrorModel(context.program, response.type) ||
-      (bodyTypes.length > 0 && bodyTypes.some((b) => isErrorModel(context.program, b)))
+      (body && isErrorModel(context.program, body))
     ) {
       exceptions.push({
         ...sdkResponse,
