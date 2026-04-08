@@ -71,12 +71,31 @@ const EMITTER_REGISTRY: Record<string, EmitterRegistration> = {
   "@azure-tools/typespec-ts": { language: "typescript", parser: parseTypeScript },
   "@azure-tools/typespec-go": { language: "go", parser: parseGo },
   "@azure-tools/typespec-rust": { language: "rust", parser: parseRust },
-  "@azure-typespec/http-client-csharp": { language: "http-client-csharp", parser: parseCSharp },
+  "@azure-typespec/http-client-csharp": { language: "csharp", parser: parseCSharp },
   "@azure-typespec/http-client-csharp-mgmt": {
-    language: "http-client-csharp-mgmt",
+    language: "csharp",
     parser: parseCSharp,
   },
 };
+
+/**
+ * Heuristic patterns used to infer a normalized language key from an emitter
+ * package name when the emitter is not found in EMITTER_REGISTRY.
+ *
+ * Order matters: more specific patterns (e.g. "typescript") must precede
+ * shorter ones (e.g. "java") to avoid false positives ("javascript" matching
+ * "java").
+ */
+const LANGUAGE_HEURISTICS: Array<[RegExp, string]> = [
+  [/csharp/i, "csharp"],
+  [/python/i, "python"],
+  [/typescript/i, "typescript"],
+  [/javascript/i, "javascript"],
+  [/java(?!script)/i, "java"],
+  [/\brust\b/i, "rust"],
+  [/\bswift\b/i, "swift"],
+  [/\bgo\b/i, "go"],
+];
 
 interface LanguageParserResult {
   packageName?: string;
@@ -300,7 +319,7 @@ function parseRust(
 }
 
 export interface LanguageCollectionResult {
-  languages: Record<string, LanguagePackageMetadata>;
+  languages: Record<string, LanguagePackageMetadata[]>;
   sourceConfigPath?: string;
 }
 
@@ -469,8 +488,8 @@ export function buildLanguageMetadata(
   params: Record<string, unknown>,
   baseOutputDir: string,
   defaultServiceDir?: string,
-): Record<string, LanguagePackageMetadata> {
-  const languagesDict: Record<string, LanguagePackageMetadata> = {};
+): Record<string, LanguagePackageMetadata[]> {
+  const languagesDict: Record<string, LanguagePackageMetadata[]> = {};
 
   for (const [emitterName, emitterOptions] of Object.entries(optionMap)) {
     const metadata = createLanguageMetadata(
@@ -481,7 +500,10 @@ export function buildLanguageMetadata(
       defaultServiceDir,
     );
     const language = inferLanguageFromEmitterName(emitterName);
-    languagesDict[language] = metadata;
+    if (!languagesDict[language]) {
+      languagesDict[language] = [];
+    }
+    languagesDict[language].push(metadata);
   }
 
   return languagesDict;
@@ -596,7 +618,14 @@ export function inferLanguageFromEmitterName(emitterName: string): string {
     return registration.language;
   }
 
-  return emitterName;
+  // Heuristic: scan the emitter name for known language keywords
+  for (const [pattern, language] of LANGUAGE_HEURISTICS) {
+    if (pattern.test(normalized)) {
+      return language;
+    }
+  }
+
+  return "unknown";
 }
 
 function trimOrUndefined(value: string | undefined): string | undefined {
