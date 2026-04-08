@@ -207,6 +207,14 @@ export interface ResolvedResource {
   parent?: ResolvedResource;
   /** The scope of this resource */
   scope?: string | ResolvedResource;
+  /** Singleton resource information, if the resource is a singleton */
+  singleton?: SingletonResourceInfo;
+}
+
+/** Singleton resource information */
+export interface SingletonResourceInfo {
+  /** The key value(s) of the singleton resource (e.g. "default"). May be an array of strings if the singleton uses a union of names. */
+  keyValue: string | string[];
 }
 
 /** Description of the resource type */
@@ -496,6 +504,7 @@ export function resolveArmResources(program: Program): Provider {
   const resources: ResolvedResource[] = [];
   for (const resource of listArmResources(program)) {
     const operations = resolveArmResourceOperations(program, resource.typespecType);
+    const singletonKeyValues = getSingletonKeyValues(program, resource.typespecType);
     for (const op of operations) {
       const fullResource: ResolvedResource = {
         ...op,
@@ -504,6 +513,9 @@ export function resolveArmResources(program: Program): Provider {
           getPublicResourceKind(resource.typespecType) ??
           mapResourceKind(resource.kind, operations.length > 0),
         providerNamespace: resource.armProviderNamespace,
+        ...(singletonKeyValues !== undefined
+          ? { singleton: { keyValue: singletonKeyValues } }
+          : {}),
       };
       resources.push(fullResource);
     }
@@ -1220,6 +1232,39 @@ export function isSingletonResource(program: Program, resourceType: Model): bool
 
 export function getSingletonResourceKey(program: Program, resourceType: Model): string | undefined {
   return program.stateMap(ArmStateKeys.armSingletonResources).get(resourceType);
+}
+
+/**
+ * Gets the singleton key value(s) for a resource. For resources with a union name type,
+ * returns an array of the string literal values in the union. For simple singletons,
+ * returns the key string from the @singleton decorator.
+ */
+function getSingletonKeyValues(
+  program: Program,
+  resourceType: Model,
+): string | string[] | undefined {
+  const singletonKey = getSingletonResourceKey(program, resourceType);
+  if (singletonKey === undefined) return undefined;
+
+  // Check the name property for union types
+  for (const [, prop] of resourceType.properties) {
+    if (getKeyName(program, prop) !== undefined) {
+      if (prop.type.kind === "Union") {
+        const values: string[] = [];
+        for (const variant of prop.type.variants.values()) {
+          if (variant.type.kind === "String") {
+            values.push(variant.type.value);
+          }
+        }
+        if (values.length > 0) {
+          return values;
+        }
+      }
+      break;
+    }
+  }
+
+  return singletonKey;
 }
 
 export enum ResourceBaseType {

@@ -164,6 +164,7 @@ been pre-computed and is available in `/tmp/gh-aw/agent/context.json`.
 
 ## Important Rules
 
+- **Use sub-agents as much as possible.** Your main context window is limited — offload all reading, investigation, and editing work to sub-agents to prevent context loss. Only keep high-level coordination state in your own context. When in doubt, use a sub-agent.
 - **Only modify files** whose paths start with one of the `allowedPaths` entries.
 - **Complete every step in the domain-specific prompt.** Do not stop after finishing one step. After each step, explicitly state which step you just completed and which step you are starting next. Continue until all steps are done.
 - **Do not defer work.** Fix every issue you find in this run. Do not leave "remaining gaps" or "future work" in the knowledge base or PR description — the knowledge base is for lessons learned, not a to-do list.
