@@ -2,7 +2,6 @@ import {
   Diagnostic,
   ModelProperty,
   Operation,
-  Program,
   Type,
   Union,
   compilerAssert,
@@ -595,25 +594,6 @@ export function getSdkHttpParameter(
   });
 }
 
-/**
- * Check if a type is an error model, including checking source models
- * of intersection types. This is needed because `A & B` creates an anonymous
- * model that does not inherit the `@error` decorator from its components.
- */
-function isOrContainsErrorModel(program: Program, type: Type): boolean {
-  if (isErrorModel(program, type)) {
-    return true;
-  }
-  if (type.kind === "Model" && type.sourceModels) {
-    for (const source of type.sourceModels) {
-      if (source.usage === "intersection" && isErrorModel(program, source.model)) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
 function getSdkHttpResponseAndExceptions(
   context: TCGCContext,
   httpOperation: HttpOperation,
@@ -733,8 +713,8 @@ function getSdkHttpResponseAndExceptions(
 
     if (
       response.statusCodes === "*" ||
-      isOrContainsErrorModel(context.program, response.type) ||
-      (bodyTypes.length > 0 && bodyTypes.some((b) => isOrContainsErrorModel(context.program, b)))
+      isErrorModel(context.program, response.type) ||
+      (body && isErrorModel(context.program, body))
     ) {
       exceptions.push({
         ...sdkResponse,
