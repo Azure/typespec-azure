@@ -164,3 +164,56 @@ This includes the following steps:
     ```
 
   - update README.md to include a new entry for the new preview version.
+
+## Data-Plane Example
+
+This example builds on the data-plane preview version example in [Adding a Preview Version when the Last Version was Preview](./02-preview-after-preview.md#data-plane-example), where `v3` is introduced which GA's the `nickname` property introduced in `v3Preview`.
+
+```diff lang=tsp
+import "@typespec/http";
+import "@typespec/rest";
+import "@typespec/versioning";
+import "@azure-tools/typespec-azure-core";
+
+using Http;
+using Rest;
+using Versioning;
+using Azure.Core;
+
+
+@versioned(Versions)
+@service(#{ title: "Widget Service" })
+namespace DemoService;
+
+enum Versions {
+  v1,
+  v2,
+-  @previewVersion
+-  v3Preview
++  v3
+}
+
+/**
+ * Model defining the Widget resource
+ */
+model Widget {
+  /**
+   * Identifier of the Widget Resource
+   */
+  @visibility(Lifecycle.Read)
+  @key id: string;
+  /**
+   * Weight of the widget
+   */
+  weight: int32;
+  /**
+   * Color of the widget;
+   */
+  color: "red" | "blue";
+  /**
+   * Nickname of the Widget resource
+   */
+-  @added(Versions.v3Preview) nickname: string;
++  @added(Versions.v3) nickname: string;
+}
+```
