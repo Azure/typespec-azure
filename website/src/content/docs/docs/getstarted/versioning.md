@@ -2,7 +2,7 @@
 title: Versioning
 ---
 
-Versioning lets you evolve your API without breaking existing clients. This guide covers the basics of declaring versions and adding new resources, operations, and properties in a clear, easy-to-follow way. For more advanced scenarios, see the [full versioning documentation](../howtos/ARM/versioning.md).
+Versioning lets you evolve your API without breaking existing clients. This guide covers the basics of declaring versions and adding new resources, operations, and properties in a clear, easy-to-follow way. For more advanced scenarios, see the [full versioning documentation](../howtos/Versioning/01-about-versioning.md).
 
 ## Declaring Versions
 
@@ -96,4 +96,4 @@ interface Employees {
 
 ---
 
-For more details and advanced scenarios, see the [full versioning documentation](../howtos/ARM/versioning.md).
+For more details and advanced scenarios, see the [full versioning documentation](../howtos/Versioning/01-about-versioning.md).

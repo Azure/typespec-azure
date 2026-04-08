@@ -91,7 +91,7 @@ Normalizing version decoration consists of removing redundant decorators and fol
 - Based on the version referenced in the decorator, determine the immediate successor version `u + 1`
 - If version `u + 1` does not exist (the version argument is the last version) then this version will not be deleted
 - If there is one or more `@madeOptional` decorators referencing the immediate successor version, remove them.
-- Change `@madeOption(T, u)` to `@madeOptional(T, u + 1)`
+- Change `@madeOptional(T, u)` to `@madeOptional(T, u + 1)`
 
   ```diff lang=tsp
   - @madeOptional(Versions.`2025-10-01-preview`)
