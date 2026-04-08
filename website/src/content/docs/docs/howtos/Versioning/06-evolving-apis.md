@@ -10,9 +10,15 @@ This document explains how to evolve your API across versions in TypeSpec projec
 
 Versioning allows you to evolve your API without breaking existing clients. By using versioning decorators, you can specify when resources, operations, or properties are added, removed, or changed.
 
+:::note
+This document shows examples using both ARM and data-plane patterns. ARM APIs use operation templates from `@azure-tools/typespec-azure-resource-manager`, while data-plane APIs use operation templates from `@azure-tools/typespec-azure-core`. Model-level versioning (adding properties, renaming types, etc.) works the same way for both.
+:::
+
 ## Declaring Versions
 
 Define your API versions in an enum. For each version, specify dependencies and common types as needed.
+
+**ARM example:**
 
 ```tsp
 /** Contoso API versions */
@@ -34,6 +40,19 @@ After defining your enum, link it to your namespace using the `@versioned` decor
 namespace Microsoft.ContosoProviderHub;
 ```
 
+**Data-plane example:**
+
+```tsp
+enum Versions {
+  v1,
+  v2,
+}
+
+@versioned(Versions)
+@service(#{ title: "Widget Service" })
+namespace DemoService;
+```
+
 > **Note:** Add dependencies and common types for each version. After defining a new version, the emitter will produce outputs for all versions. You can then adapt your TypeSpec code for the latest version.
 
 ## Simple Scenarios
@@ -53,12 +72,24 @@ model Employee {
 
 ### Add an operation in v2
 
+**ARM:**
+
 ```tsp
 @armResourceOperations
 interface Employees {
   get is ArmResourceRead<Employee>;
   @added(Versions.v2)
   createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+}
+```
+
+**Data-plane:**
+
+```tsp
+interface Widgets {
+  getWidget is Operations.ResourceRead<Widget>;
+  @added(Versions.v2)
+  createOrReplaceWidget is Operations.ResourceCreateOrReplace<Widget>;
 }
 ```
 
@@ -75,6 +106,8 @@ model Employee {
 
 ### Add a parameter to an operation in v2
 
+**ARM:**
+
 ```tsp
 @armResourceOperations
 interface Employees {
@@ -90,7 +123,29 @@ interface Employees {
 }
 ```
 
+**Data-plane:**
+
+```tsp
+interface Widgets {
+  getWidget is Operations.ResourceRead<
+    Widget,
+    Traits = {
+      parameters: {
+        @query
+        name: string;
+
+        @added(Versions.v2)
+        @query
+        department?: string;
+      };
+    }
+  >;
+}
+```
+
 ### Add a new operation in v2
+
+**ARM:**
 
 ```tsp
 @armResourceOperations
@@ -99,6 +154,17 @@ interface Employees {
 
   @added(Versions.v2)
   move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
+}
+```
+
+**Data-plane:**
+
+```tsp
+interface Widgets {
+  getWidget is Operations.ResourceRead<Widget>;
+
+  @added(Versions.v2)
+  moveWidget is Operations.ResourceAction<Widget, MoveRequest, MoveResponse>;
 }
 ```
 
@@ -142,6 +208,8 @@ This scenario shows how to add a parameter and make another optional in an opera
 
 Suppose you start with the following operation in v1:
 
+**ARM:**
+
 ```tsp
 @armResourceOperations
 interface Employees {
@@ -155,12 +223,30 @@ interface Employees {
 }
 ```
 
+**Data-plane:**
+
+```tsp
+interface Widgets {
+  listWidgets is Operations.ResourceList<
+    Widget,
+    Traits = {
+      parameters: {
+        @header
+        location: string;
+      };
+    }
+  >;
+}
+```
+
 In version `v2`, you want to:
 
 - Make the `location` header parameter optional.
 - Add a new optional query parameter `orderBy`.
 
 You can achieve this using the `@madeOptional` and `@added` decorators:
+
+**ARM:**
 
 ```tsp
 @armResourceOperations
@@ -180,6 +266,27 @@ interface Employees {
 }
 ```
 
+**Data-plane:**
+
+```tsp
+interface Widgets {
+  listWidgets is Operations.ResourceList<
+    Widget,
+    Traits = {
+      parameters: {
+        @madeOptional(Versions.v2)
+        @header
+        location?: string;
+
+        @added(Versions.v2)
+        @query("order-by")
+        orderBy?: string;
+      };
+    }
+  >;
+}
+```
+
 **Explanation:**
 
 - `@madeOptional(Versions.v2)` makes `location` optional starting in v2.
@@ -191,6 +298,8 @@ This scenario illustrates converting a synchronous operation to an asynchronous 
 
 Suppose you start with the following synchronous operation in `v1`:
 
+**ARM:**
+
 ```tsp
 @armResourceOperations
 interface Employees {
@@ -198,7 +307,17 @@ interface Employees {
 }
 ```
 
+**Data-plane:**
+
+```tsp
+interface Widgets {
+  createOrReplaceWidget is Operations.ResourceCreateOrReplace<Widget>;
+}
+```
+
 In version `v2`, you update this operation to be asynchronous as follows:
+
+**ARM:**
 
 ```tsp
 @armResourceOperations
@@ -211,6 +330,21 @@ interface Employees {
   @added(Versions.v2)
   @sharedRoute
   createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+}
+```
+
+**Data-plane:**
+
+```tsp
+interface Widgets {
+  @removed(Versions.v2)
+  @renamedFrom(Versions.v2, "createOrReplaceWidget")
+  @sharedRoute
+  createOrReplaceWidgetV1 is Operations.ResourceCreateOrReplace<Widget>;
+
+  @added(Versions.v2)
+  @sharedRoute
+  createOrReplaceWidget is Operations.LongRunningResourceCreateOrReplace<Widget>;
 }
 ```
 
@@ -254,6 +388,8 @@ model Employee {
 
 **Example: Adding an operation in a later version**
 
+**ARM:**
+
 ```tsp
 @armResourceOperations
 interface Employees {
@@ -261,6 +397,17 @@ interface Employees {
   // v3: Add createOrUpdate operation
   @added(Versions.v3)
   createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+}
+```
+
+**Data-plane:**
+
+```tsp
+interface Widgets {
+  getWidget is Operations.ResourceRead<Widget>;
+  // v3: Add createOrReplaceWidget operation
+  @added(Versions.v3)
+  createOrReplaceWidget is Operations.ResourceCreateOrReplace<Widget>;
 }
 ```
 
@@ -299,12 +446,24 @@ model Employee {
 
 **Example: Removing an operation**
 
+**ARM:**
+
 ```tsp
 @armResourceOperations
 interface Employees {
   get is ArmResourceRead<Employee>;
   @removed(Versions.v3)
   createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+}
+```
+
+**Data-plane:**
+
+```tsp
+interface Widgets {
+  getWidget is Operations.ResourceRead<Widget>;
+  @removed(Versions.v3)
+  createOrReplaceWidget is Operations.ResourceCreateOrReplace<Widget>;
 }
 ```
 
