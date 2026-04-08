@@ -4,7 +4,7 @@ llmstxt: true
 ---
 
 :::note
-This document applies specifically to **Azure Resource Manager (ARM) APIs**. Data plane services should follow the general versioning guidance.
+This document applies specifically to **Azure Resource Manager (ARM) APIs**. Data plane services should follow the [general versioning guidance](../01-about-versioning.md).
 :::
 
 For some Resource Providers, whenever a new stable version is released, a new preview version is created, because some preview features are not ready to be stable, but may become stable in a future version. To accommodate this need and account for the limitations of breaking change checks, which require a single version change for any PR into the rest-api-specs repo, the recommended solution is to introduce a stable and subsequent preview _together_ in your TypeSpec API description and then split this change into two PRs: one representing the new stable and the second representing the subsequent preview. This involves the following steps described in the sections below:
