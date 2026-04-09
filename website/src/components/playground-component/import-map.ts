@@ -55,9 +55,7 @@ export async function loadImportMap({
   const parsed = new URLSearchParams(window.location.search);
 
   const requestedVersion = parsed.get("version");
-  const importMapUrl = `${pkgsBaseUrl}/indexes/azure/${
-    requestedVersion ?? latestVersion
-  }.json`;
+  const importMapUrl = `${pkgsBaseUrl}/indexes/azure/${requestedVersion ?? latestVersion}.json`;
 
   const [mainResponse, additionalImports] = await Promise.all([
     fetch(importMapUrl),
