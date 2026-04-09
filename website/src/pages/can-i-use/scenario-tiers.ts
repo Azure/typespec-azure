@@ -135,6 +135,10 @@ export const scenarioTiers = {
       "Encode_Duration_Query_floatMillisecondsLargerUnit",
       "Encode_Duration_Header_floatSecondsLargerUnit",
       "Encode_Duration_Header_floatMillisecondsLargerUnit",
+
+      // Payload XML with namespace — XML namespace support is not required for all languages
+      "Payload_Xml_ModelWithNamespaceValue_*",
+      "Payload_Xml_ModelWithNamespaceOnPropertiesValue_*",
     ],
   },
 };
