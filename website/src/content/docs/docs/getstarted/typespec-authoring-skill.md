@@ -11,8 +11,8 @@ The "Azure TypeSpec Author" skill helps you write and update Azure API specifica
 ### Copilot CLI Mode
 
 1. Install the GitHub Copilot CLI by following the [official installation guide](https://docs.github.com/en/copilot/how-tos/copilot-cli).
-2. Launch copilot CLI session from the root folder of https://github.com/Azure/azure-rest-api-specs in VSCode terminal.
-3. In the Copilot CLI session, input prompts.
+2. Launch a copilot CLI session from the root folder of https://github.com/Azure/azure-rest-api-specs in VSCode terminal.
+3. In the Copilot CLI session, input your prompts.
 
 ### VSCode Agent Mode
 
