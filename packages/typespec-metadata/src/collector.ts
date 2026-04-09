@@ -97,6 +97,16 @@ const LANGUAGE_HEURISTICS: Array<[RegExp, string]> = [
   [/\bgo\b/i, "go"],
 ];
 
+/** Maps a normalized language key to its parser so heuristic matches can reuse language-specific logic. */
+const LANGUAGE_PARSERS: Record<string, LanguageParser> = {
+  csharp: parseCSharp,
+  java: parseJava,
+  python: parsePython,
+  typescript: parseTypeScript,
+  go: parseGo,
+  rust: parseRust,
+};
+
 interface LanguageParserResult {
   packageName?: string;
   namespace?: string;
@@ -539,9 +549,18 @@ function createLanguageMetadata(
     packageName = result.packageName;
     namespace = result.namespace;
   } else {
-    // Fallback to generic extraction
-    packageName = extractOption(normalizedOptions, PACKAGE_NAME_KEYS);
-    namespace = extractOption(normalizedOptions, NAMESPACE_KEYS);
+    // Try heuristic language match to pick a language-specific parser
+    const heuristicLang = inferLanguageFromEmitterName(emitterName);
+    const heuristicParser = LANGUAGE_PARSERS[heuristicLang];
+    if (heuristicParser) {
+      const result = heuristicParser(normalizedOptions, params);
+      packageName = result.packageName;
+      namespace = result.namespace;
+    } else {
+      // Fallback to generic extraction
+      packageName = extractOption(normalizedOptions, PACKAGE_NAME_KEYS);
+      namespace = extractOption(normalizedOptions, NAMESPACE_KEYS);
+    }
   }
 
   // Convert outputDir to use {output-dir} placeholder
