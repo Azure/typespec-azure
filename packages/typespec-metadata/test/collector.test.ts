@@ -400,7 +400,8 @@ describe("inferLanguageFromEmitterName", () => {
     expect(inferLanguageFromEmitterName("@azure-tools/typespec-go")).toBe("go");
     expect(inferLanguageFromEmitterName("@azure-tools/typespec-rust")).toBe("rust");
     expect(inferLanguageFromEmitterName("@azure-typespec/http-client-csharp")).toBe("csharp");
-    expect(inferLanguageFromEmitterName("@azure-typespec/http-client-csharp-mgmt")).toBe(
+    expect(inferLanguageFromEmitterName("@azure-typespec/http-client-csharp-mgmt")).toBe("csharp");
+    expect(inferLanguageFromEmitterName("@azure-typespec/http-client-csharp-provisioning")).toBe(
       "csharp",
     );
   });
@@ -507,6 +508,65 @@ describe("@azure-typespec/http-client-csharp emitter", () => {
     const lang = result["csharp"][0];
 
     expect(lang.outputDir).toBe("{output-dir}/sdk/keyvault/Azure.Security.KeyVault");
+  });
+});
+
+describe("@azure-typespec/http-client-csharp-provisioning emitter", () => {
+  it("should parse namespace from provisioning emitter options", () => {
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-typespec/http-client-csharp-provisioning": {
+        namespace: "Azure.Provisioning.WeightsAndBiases",
+        "emitter-output-dir":
+          "c:/repos/tsp-output/sdk/weightsandbiases/Azure.Provisioning.WeightsAndBiases",
+      },
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "c:/repos/tsp-output");
+    const lang = result["csharp"][0];
+
+    expect(lang).toBeDefined();
+    expect(lang.namespace).toBe("Azure.Provisioning.WeightsAndBiases");
+    expect(lang.packageName).toBe("Azure.Provisioning.WeightsAndBiases");
+    expect(lang.emitterName).toBe("@azure-typespec/http-client-csharp-provisioning");
+  });
+
+  it("should resolve {namespace} placeholder in emitter-output-dir", () => {
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-typespec/http-client-csharp-provisioning": {
+        namespace: "Azure.Provisioning.WeightsAndBiases",
+        "emitter-output-dir": "c:/repos/tsp-output/sdk/weightsandbiases/{namespace}",
+      },
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "c:/repos/tsp-output");
+    const lang = result["csharp"][0];
+
+    expect(lang.outputDir).toBe(
+      "{output-dir}/sdk/weightsandbiases/Azure.Provisioning.WeightsAndBiases",
+    );
+  });
+
+  it("should resolve {namespace} with service-dir in emitter-output-dir", () => {
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-typespec/http-client-csharp-provisioning": {
+        namespace: "Azure.Provisioning.HealthDataAIServices",
+        "emitter-output-dir":
+          "c:/repos/tsp-output/sdk/healthdataaiservices/Azure.Provisioning.HealthDataAIServices",
+      },
+    };
+
+    const result = buildLanguageMetadata(
+      optionMap,
+      {},
+      "c:/repos/tsp-output",
+      "sdk/healthdataaiservices",
+    );
+    const lang = result["csharp"][0];
+
+    expect(lang.namespace).toBe("Azure.Provisioning.HealthDataAIServices");
+    expect(lang.outputDir).toBe(
+      "{output-dir}/sdk/healthdataaiservices/Azure.Provisioning.HealthDataAIServices",
+    );
   });
 });
 

@@ -59,28 +59,9 @@ function extractParameters(
   return params;
 }
 
-interface EmitterRegistration {
-  language: string;
-  parser: LanguageParser;
-}
-
-const EMITTER_REGISTRY: Record<string, EmitterRegistration> = {
-  "@azure-tools/typespec-csharp": { language: "csharp", parser: parseCSharp },
-  "@azure-tools/typespec-java": { language: "java", parser: parseJava },
-  "@azure-tools/typespec-python": { language: "python", parser: parsePython },
-  "@azure-tools/typespec-ts": { language: "typescript", parser: parseTypeScript },
-  "@azure-tools/typespec-go": { language: "go", parser: parseGo },
-  "@azure-tools/typespec-rust": { language: "rust", parser: parseRust },
-  "@azure-typespec/http-client-csharp": { language: "csharp", parser: parseCSharp },
-  "@azure-typespec/http-client-csharp-mgmt": {
-    language: "csharp",
-    parser: parseCSharp,
-  },
-};
-
 /**
  * Heuristic patterns used to infer a normalized language key from an emitter
- * package name when the emitter is not found in EMITTER_REGISTRY.
+ * package name.
  *
  * Order matters: more specific patterns (e.g. "typescript") must precede
  * shorter ones (e.g. "java") to avoid false positives ("javascript" matching
@@ -90,6 +71,7 @@ const LANGUAGE_HEURISTICS: Array<[RegExp, string]> = [
   [/csharp/i, "csharp"],
   [/python/i, "python"],
   [/typescript/i, "typescript"],
+  [/\bts\b/i, "typescript"],
   [/javascript/i, "javascript"],
   [/java(?!script)/i, "java"],
   [/\brust\b/i, "rust"],
@@ -541,26 +523,17 @@ function createLanguageMetadata(
   let packageName: string | undefined;
   let namespace: string | undefined;
 
-  const normalizedEmitterName = emitterName.toLowerCase();
-  const registration = EMITTER_REGISTRY[normalizedEmitterName];
-
-  if (registration) {
-    const result = registration.parser(normalizedOptions, params);
+  // Use heuristic language match to pick a language-specific parser
+  const heuristicLang = inferLanguageFromEmitterName(emitterName);
+  const heuristicParser = LANGUAGE_PARSERS[heuristicLang];
+  if (heuristicParser) {
+    const result = heuristicParser(normalizedOptions, params);
     packageName = result.packageName;
     namespace = result.namespace;
   } else {
-    // Try heuristic language match to pick a language-specific parser
-    const heuristicLang = inferLanguageFromEmitterName(emitterName);
-    const heuristicParser = LANGUAGE_PARSERS[heuristicLang];
-    if (heuristicParser) {
-      const result = heuristicParser(normalizedOptions, params);
-      packageName = result.packageName;
-      namespace = result.namespace;
-    } else {
-      // Fallback to generic extraction
-      packageName = extractOption(normalizedOptions, PACKAGE_NAME_KEYS);
-      namespace = extractOption(normalizedOptions, NAMESPACE_KEYS);
-    }
+    // Fallback to generic extraction
+    packageName = extractOption(normalizedOptions, PACKAGE_NAME_KEYS);
+    namespace = extractOption(normalizedOptions, NAMESPACE_KEYS);
   }
 
   // Convert outputDir to use {output-dir} placeholder
@@ -632,10 +605,6 @@ function normalizeKey(key: string): string {
 
 export function inferLanguageFromEmitterName(emitterName: string): string {
   const normalized = emitterName.toLowerCase();
-  const registration = EMITTER_REGISTRY[normalized];
-  if (registration) {
-    return registration.language;
-  }
 
   // Heuristic: scan the emitter name for known language keywords
   for (const [pattern, language] of LANGUAGE_HEURISTICS) {
