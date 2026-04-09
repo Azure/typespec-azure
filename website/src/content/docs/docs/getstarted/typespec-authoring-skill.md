@@ -34,7 +34,7 @@ The "Azure TypeSpec Author" skill helps you write and update Azure API specifica
 
 ### Resource Definitions
 
-- "In specification/widget/resource-manager/Microsoft.Widget, Add an ARM resource named Asset with CRUD operations"
+- "In specification/widget/resource-manager/Microsoft.Widget add a new Tracked resource Asset with standard CRUD and list operations."
 - "In specification/widget/resource-manager/Microsoft.Widget, Add a child resource named Component under the Asset resource"
 - "In specification/widget/resource-manager/Microsoft.Widget, Add a proxy resource named Config under the Asset resource"
 - "In specification/widget/resource-manager/Microsoft.Widget, change resource Employee as extension resource"
