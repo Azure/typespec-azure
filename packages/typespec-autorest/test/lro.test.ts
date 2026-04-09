@@ -305,14 +305,14 @@ describe("typespec-autorest: Long-running Operations", () => {
   });
 
   it("Creates a named final-state-schema definition for scalar final results", async () => {
-    const openapi = await compileOpenAPI(
+    const openapi = (await compileOpenAPI(
       armCode.apply(armCode, [
         {
           putOp: "move is ArmResourceActionAsync<Widget, void, string>;",
         },
       ]),
       { preset: "azure", options: { "emit-lro-options": "all" } },
-    );
+    )) as any;
 
     const itemPath =
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}/move";
@@ -326,7 +326,7 @@ describe("typespec-autorest: Long-running Operations", () => {
   });
 
   it("Reuses the same schema when string is the finalResult in two operations", async () => {
-    const openapi = await compileOpenAPI(
+    const openapi = (await compileOpenAPI(
       `
       @armProviderNamespace
       namespace Microsoft.Test;
@@ -367,7 +367,7 @@ describe("typespec-autorest: Long-running Operations", () => {
       }
       `,
       { preset: "azure", options: { "emit-lro-options": "all" } },
-    );
+    )) as any;
 
     const basePath =
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}";
@@ -388,7 +388,7 @@ describe("typespec-autorest: Long-running Operations", () => {
   });
 
   it("Creates separate schemas for two custom scalars with different names", async () => {
-    const openapi = await compileOpenAPI(
+    const openapi = (await compileOpenAPI(
       `
       @armProviderNamespace
       namespace Microsoft.Test;
@@ -432,28 +432,83 @@ describe("typespec-autorest: Long-running Operations", () => {
       }
       `,
       { preset: "azure", options: { "emit-lro-options": "all" } },
-    );
+    )) as any;
 
     const basePath =
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}";
     deepStrictEqual(openapi.paths[`${basePath}/move`].post["x-ms-long-running-operation-options"], {
       "final-state-via": "location",
-      "final-state-schema": "#/definitions/WidgetId",
+      "final-state-schema": "#/definitions/widgetId",
     });
     deepStrictEqual(
       openapi.paths[`${basePath}/transfer`].post["x-ms-long-running-operation-options"],
       {
         "final-state-via": "location",
-        "final-state-schema": "#/definitions/WidgetTag",
+        "final-state-schema": "#/definitions/widgetTag",
       },
     );
     // Both schemas should exist separately
-    deepStrictEqual(openapi.definitions["WidgetId"], { type: "string" });
-    deepStrictEqual(openapi.definitions["WidgetTag"], { type: "string" });
+    deepStrictEqual(openapi.definitions["widgetId"], { type: "string" });
+    deepStrictEqual(openapi.definitions["widgetTag"], { type: "string" });
+  });
+
+  it("Preserves camelCase in custom scalar names for final-state-schema", async () => {
+    const openapi = (await compileOpenAPI(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Test;
+
+      interface Operations extends Azure.ResourceManager.Operations {}
+
+      @doc("The state of the resource")
+      enum ResourceState {
+        Succeeded,
+        Canceled,
+        Failed
+      }
+
+      @doc("The widget properties")
+      model WidgetProperties {
+        @doc("I am a simple Resource Identifier")
+        simpleArmId: Azure.Core.armResourceIdentifier;
+
+        @doc("The provisioning State")
+        provisioningState: ResourceState;
+      }
+
+      @doc("Foo resource")
+      model Widget is TrackedResource<WidgetProperties> {
+        @doc("Widget name")
+        @key("widgetName")
+        @segment("widgets")
+        @path
+        name: string;
+      }
+
+      scalar myCustomResult extends string;
+
+      @armResourceOperations(Widget)
+      interface Widgets {
+        get is ArmResourceRead<Widget>;
+        createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+        move is ArmResourceActionAsync<Widget, void, myCustomResult>;
+      }
+      `,
+      { preset: "azure", options: { "emit-lro-options": "all" } },
+    )) as any;
+
+    const basePath =
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}";
+    deepStrictEqual(openapi.paths[`${basePath}/move`].post["x-ms-long-running-operation-options"], {
+      "final-state-via": "location",
+      "final-state-schema": "#/definitions/myCustomResult",
+    });
+    // Verify the schema definition preserves the camelCase name
+    deepStrictEqual(openapi.definitions["myCustomResult"], { type: "string" });
   });
 
   it("Creates separate schemas for custom scalars with the same name in different namespaces", async () => {
-    const openapi = await compileOpenAPI(
+    const openapi = (await compileOpenAPI(
       `
       @armProviderNamespace
       namespace Microsoft.Test;
@@ -501,7 +556,7 @@ describe("typespec-autorest: Long-running Operations", () => {
       }
       `,
       { preset: "azure", options: { "emit-lro-options": "all" } },
-    );
+    )) as any;
 
     const basePath =
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}";
@@ -527,10 +582,10 @@ describe("typespec-autorest: Long-running Operations", () => {
         "final-state-schema"
       ];
     // Both should have distinct, specifically-named schema references
-    deepStrictEqual(moveSchema, "#/definitions/Ns1.CustomResult");
-    deepStrictEqual(transferSchema, "#/definitions/Ns2.CustomResult");
+    deepStrictEqual(moveSchema, "#/definitions/Ns1.customResult");
+    deepStrictEqual(transferSchema, "#/definitions/Ns2.customResult");
     // Both schemas should exist with correct types
-    deepStrictEqual(openapi.definitions["Ns1.CustomResult"], { type: "string" });
-    deepStrictEqual(openapi.definitions["Ns2.CustomResult"], { type: "integer", format: "int32" });
+    deepStrictEqual(openapi.definitions["Ns1.customResult"], { type: "string" });
+    deepStrictEqual(openapi.definitions["Ns2.customResult"], { type: "integer", format: "int32" });
   });
 });

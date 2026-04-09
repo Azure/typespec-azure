@@ -1041,7 +1041,7 @@ The dynamic parameters of a resource instance - pass in the proper base type to 
 where the resource is based. The default is in a resource group
 
 ```typespec
-model Azure.ResourceManager.ResourceInstanceParameters<Resource, BaseParameters>
+model Azure.ResourceManager.ResourceInstanceParameters<Resource, BaseParameters, Provider>
 ```
 
 #### Template Parameters
@@ -1050,6 +1050,7 @@ model Azure.ResourceManager.ResourceInstanceParameters<Resource, BaseParameters>
 | -------------- | -------------------------------------------------------- |
 | Resource       | The resource to get parameters for                       |
 | BaseParameters | The parameters representing the base Uri of the resource |
+| Provider       | Optional. The provider namespace model for the resource. |
 
 #### Examples
 
@@ -1059,9 +1060,7 @@ op get(...ResourceInstanceParameters<Employee>): ArmResponse<EmployeeResponse> |
 
 #### Properties
 
-| Name     | Type                             | Description |
-| -------- | -------------------------------- | ----------- |
-| provider | `"Microsoft.ThisWillBeReplaced"` |             |
+None
 
 ### `ResourceKindProperty` {#Azure.ResourceManager.ResourceKindProperty}
 
@@ -1208,7 +1207,7 @@ The dynamic parameters of a list call for a resource instance - pass in the prop
 where the list should take place. The default is in a resource group
 
 ```typespec
-model Azure.ResourceManager.ResourceParentParameters<Resource, BaseParameters>
+model Azure.ResourceManager.ResourceParentParameters<Resource, BaseParameters, Provider>
 ```
 
 #### Template Parameters
@@ -1217,12 +1216,11 @@ model Azure.ResourceManager.ResourceParentParameters<Resource, BaseParameters>
 | -------------- | -------------------------------------------------------- |
 | Resource       | The resource to get parameters for                       |
 | BaseParameters | The parameters representing the base Uri of the resource |
+| Provider       | Optional. The provider namespace model for the resource. |
 
 #### Properties
 
-| Name     | Type                             | Description |
-| -------- | -------------------------------- | ----------- |
-| provider | `"Microsoft.ThisWillBeReplaced"` |             |
+None
 
 ### `ResourcePlanProperty` {#Azure.ResourceManager.ResourcePlanProperty}
 
@@ -3609,6 +3607,25 @@ model Azure.ResourceManager.Legacy.ArmOperationOptions
 | useStaticRoute? | `boolean` | Should a static route be used          |
 | route?          | `string`  | The status route for operations to use |
 
+### `CustomAzureProxyResource` {#Azure.ResourceManager.Legacy.CustomAzureProxyResource}
+
+Model representing a custom resource that extends ProxyResource.
+Use this template with 'is' to create a custom proxy resource.
+
+```typespec
+model Azure.ResourceManager.Legacy.CustomAzureProxyResource<isResource>
+```
+
+#### Template Parameters
+
+| Name       | Description                                                                                                    |
+| ---------- | -------------------------------------------------------------------------------------------------------------- |
+| isResource | Optional. A boolean flag indicating whether the resource should be marked as an Azure resource. Default false. |
+
+#### Properties
+
+None
+
 ### `CustomAzureResource` {#Azure.ResourceManager.Legacy.CustomAzureResource}
 
 Model representing a custom Azure Resource Manager Resource.
@@ -3782,6 +3799,37 @@ model Employee is TrackedResource<EmployeeProperties> {
 | Name              | Type                                                                                                | Description |
 | ----------------- | --------------------------------------------------------------------------------------------------- | ----------- |
 | extendedLocation? | [`ExtendedLocationOptional`](./data-types.md#Azure.ResourceManager.Legacy.ExtendedLocationOptional) |             |
+
+### `GenericResource` {#Azure.ResourceManager.Legacy.GenericResource}
+
+A generic Azure Resource Manager resource type that does not require name, key,
+or segment properties on the model itself. The resource type and path information
+comes from the operations (e.g. RoutedOperations).
+
+See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+
+```typespec
+model Azure.ResourceManager.Legacy.GenericResource<Properties, PropertiesOptional>
+```
+
+#### Template Parameters
+
+| Name               | Description                                                                                                                                    |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Properties         | A model containing the provider-specific properties for this resource                                                                          |
+| PropertiesOptional | A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended. |
+
+#### Examples
+
+```typespec
+model MyResource is GenericResource<{}>;
+```
+
+#### Properties
+
+| Name        | Type         | Description |
+| ----------- | ------------ | ----------- |
+| properties? | `Properties` |             |
 
 ### `ManagedServiceIdentityV4` {#Azure.ResourceManager.Legacy.ManagedServiceIdentityV4}
 

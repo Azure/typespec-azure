@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-azure-resource-manager",
-  "version": "0.66.0",
+  "version": "0.67.0",
   "author": "Microsoft Corporation",
   "description": "TypeSpec Azure Resource Manager library",
   "homepage": "https://azure.github.io/typespec-azure",
@@ -35,7 +35,7 @@
   },
   "type": "module",
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
   },
   "scripts": {
     "clean": "rimraf ./dist ./temp",

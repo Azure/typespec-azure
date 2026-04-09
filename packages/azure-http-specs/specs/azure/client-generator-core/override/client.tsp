@@ -26,10 +26,7 @@ model GroupParametersOptions {
 
 op groupCustomized(options: GroupParametersOptions): void;
 
-@@override(_Specs_.Azure.ClientGenerator.Core.Override.GroupParameters.group,
-  groupCustomized,
-  "!javascript"
-);
+@@override(_Specs_.Azure.ClientGenerator.Core.Override.GroupParameters.group, groupCustomized);
 
 op requireOptionalCustomized(@path param1: string, @path param2: string): void;
 

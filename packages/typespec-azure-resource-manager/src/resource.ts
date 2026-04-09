@@ -70,7 +70,14 @@ import {
 import { getArmResource, listArmResources, registerArmResource } from "./private.decorators.js";
 import { ArmStateKeys } from "./state.js";
 
-export type ArmResourceKind = "Tracked" | "Proxy" | "Extension" | "Virtual" | "Custom" | "BuiltIn";
+export type ArmResourceKind =
+  | "Tracked"
+  | "Proxy"
+  | "Extension"
+  | "Virtual"
+  | "Custom"
+  | "BuiltIn"
+  | "Generic";
 
 /**
  * The base details for all kinds of resources
@@ -87,9 +94,9 @@ export interface ArmResourceDetailsBase {
   /** The RP namespace */
   armProviderNamespace: string;
   /** The name parameter for the resource */
-  keyName: string;
+  keyName?: string;
   /** The type name / collection name of the resource */
-  collectionName: string;
+  collectionName?: string;
   /** A reference to the TypeSpec type */
   typespecType: Model;
 }
@@ -200,6 +207,14 @@ export interface ResolvedResource {
   parent?: ResolvedResource;
   /** The scope of this resource */
   scope?: string | ResolvedResource;
+  /** Singleton resource information, if the resource is a singleton */
+  singleton?: SingletonResourceInfo;
+}
+
+/** Singleton resource information */
+export interface SingletonResourceInfo {
+  /** The key value(s) of the singleton resource (e.g. "default"). May be an array of strings if the singleton uses a union of names. */
+  keyValue: string | string[];
 }
 
 /** Description of the resource type */
@@ -388,10 +403,14 @@ function getResourceTypePath(
   // To do so, we need to:
   // 1) Cut out the resource name from the item path
   let temporaryPath;
-  const index = itemPath.indexOf(resource.collectionName);
-  if (index !== -1) {
-    const truncatedPath = itemPath.slice(0, index + resource.collectionName.length);
-    temporaryPath = truncatedPath;
+  if (resource.collectionName) {
+    const index = itemPath.indexOf(resource.collectionName);
+    if (index !== -1) {
+      const truncatedPath = itemPath.slice(0, index + resource.collectionName.length);
+      temporaryPath = truncatedPath;
+    } else {
+      temporaryPath = itemPath;
+    }
   } else {
     temporaryPath = itemPath;
   }
@@ -454,6 +473,24 @@ export function getPublicResourceKind(
   }
 }
 
+function mapResourceKind(
+  kind: ArmResourceKind,
+  hasOperations: boolean,
+): "Tracked" | "Proxy" | "Extension" | "Other" {
+  switch (kind) {
+    case "Tracked":
+      return "Tracked";
+    case "Proxy":
+      return "Proxy";
+    case "Extension":
+      return "Extension";
+    case "Generic":
+      return "Other";
+    default:
+      return hasOperations ? "Tracked" : "Other";
+  }
+}
+
 export function resolveArmResources(program: Program): Provider {
   const provider = resolveProviderNamespace(program);
   if (provider === undefined) return {};
@@ -467,14 +504,18 @@ export function resolveArmResources(program: Program): Provider {
   const resources: ResolvedResource[] = [];
   for (const resource of listArmResources(program)) {
     const operations = resolveArmResourceOperations(program, resource.typespecType);
+    const singletonKeyValues = getSingletonKeyValues(program, resource.typespecType);
     for (const op of operations) {
       const fullResource: ResolvedResource = {
         ...op,
         type: resource.typespecType,
         kind:
           getPublicResourceKind(resource.typespecType) ??
-          (operations.length > 0 ? "Tracked" : "Other"),
+          mapResourceKind(resource.kind, operations.length > 0),
         providerNamespace: resource.armProviderNamespace,
+        ...(singletonKeyValues !== undefined
+          ? { singleton: { keyValue: singletonKeyValues } }
+          : {}),
       };
       resources.push(fullResource);
     }
@@ -662,11 +703,31 @@ function normalizePathForScopeComparison(path: string): string {
 function getResourceInfo(
   program: Program,
   operation: ArmResourceOperation,
+  resourceModel?: Model,
 ): ResolvedResourceInfo | undefined {
   const pathInfo = getResourcePathElements(operation.httpOperation.path, operation.kind);
-  if (pathInfo === undefined) return undefined;
+  // First, try to get resource info from the path when it contains /providers/
+  if (pathInfo !== undefined) {
+    return {
+      ...pathInfo,
+      resourceName: operation.resourceName ?? operation.operationGroup,
+    };
+  }
+
+  // If the path does not contain /providers/, we can still identify the resource
+  // because an ARM operations decorator was executed on this operation (e.g.
+  // @armResourceRead, @armResourceCreateOrUpdate, etc.). Use the ARM provider
+  // namespace and the path structure to construct resource info.
+  const fallback = getResourceInfoFromArmOperation(
+    program,
+    operation.httpOperation.path,
+    operation.kind,
+    operation.operation,
+    resourceModel,
+  );
+  if (fallback === undefined) return undefined;
   return {
-    ...pathInfo,
+    ...fallback,
     resourceName: operation.resourceName ?? operation.operationGroup,
   };
 }
@@ -713,6 +774,99 @@ export function getResourcePathElements(
     };
   }
   return undefined;
+}
+
+/**
+ * Construct resource path info for an ARM resource operation whose path does not
+ * contain a /providers/ segment. This relies on the fact that an ARM operations
+ * decorator was executed on the operation, so we know it belongs to a resource.
+ * The provider namespace is resolved from the operation's namespace.
+ */
+function getResourceInfoFromArmOperation(
+  program: Program,
+  path: string,
+  kind: ArmOperationKind,
+  operation: Operation,
+  resourceModel?: Model,
+): ResourcePathInfo | undefined {
+  const provider = operation.namespace
+    ? getArmProviderNamespace(program, operation.namespace)
+    : undefined;
+  if (provider === undefined) return undefined;
+
+  const segments = path.split("/").filter((s) => s.length > 0);
+
+  // Find the innermost resource type segment by scanning forward.
+  // The resource type segment is a non-variable segment followed by either
+  // a variable segment (instance path) or end-of-path (list operation).
+  let resourceTypeIndex = -1;
+  for (let i = 0; i < segments.length; i++) {
+    if (!isVariableSegment(segments[i])) {
+      if (i + 1 < segments.length && isVariableSegment(segments[i + 1])) {
+        // Non-variable followed by variable: this is a resource type/instance pair
+        resourceTypeIndex = i;
+      } else if (i + 1 === segments.length && kind === "list") {
+        // Terminal non-variable segment in a list operation: this is the resource type
+        resourceTypeIndex = i;
+      }
+    }
+  }
+
+  if (resourceTypeIndex === -1) {
+    // For generic resources, the path may consist entirely of variable segments
+    // (e.g. /{resourceId}). Use the raw path as the instance path.
+    if (segments.length > 0 && segments.every((s) => isVariableSegment(s))) {
+      return {
+        resourceType: {
+          provider: provider,
+          types: [],
+        },
+        resourceInstancePath: path,
+      };
+    }
+    return undefined;
+  }
+
+  const resourceTypeName = segments[resourceTypeIndex];
+  const typeSegments = [resourceTypeName];
+
+  // Build the instance path: all segments up to and including the resource type,
+  // plus the instance variable
+  const instanceSegments = segments.slice(0, resourceTypeIndex + 1);
+
+  // For list operations (no instance variable in path), derive the variable name
+  // from the resource model's @key property
+  if (
+    resourceTypeIndex + 1 < segments.length &&
+    isVariableSegment(segments[resourceTypeIndex + 1])
+  ) {
+    instanceSegments.push(segments[resourceTypeIndex + 1]);
+  } else if (kind === "list" && resourceModel) {
+    // Derive instance path variable name from the resource model's @key property
+    let keyPropName: string | undefined;
+    for (const [, prop] of resourceModel.properties) {
+      const keyName = getKeyName(program, prop);
+      if (keyName !== undefined) {
+        keyPropName = keyName;
+        break;
+      }
+    }
+    if (keyPropName) {
+      instanceSegments.push(`{${keyPropName}}`);
+    } else {
+      instanceSegments.push("{name}");
+    }
+  } else {
+    instanceSegments.push("{name}");
+  }
+
+  return {
+    resourceType: {
+      provider: provider,
+      types: typeSegments,
+    },
+    resourceInstancePath: `/${instanceSegments.join("/")}`,
+  };
 }
 
 function tryAddLifecycleOperation(
@@ -901,7 +1055,7 @@ export function resolveArmResourceOperations(
     armOperation.kind = operation.kind;
 
     armOperation.resourceModelName = operation.resource?.name ?? resourceType.name;
-    const resourceInfo = getResourceInfo(program, armOperation);
+    const resourceInfo = getResourceInfo(program, armOperation, operation.resource ?? resourceType);
     if (resourceInfo === undefined) continue;
     armOperation.name = operation.name;
     armOperation.resourceKind = operation.resourceKind;
@@ -1078,6 +1232,39 @@ export function isSingletonResource(program: Program, resourceType: Model): bool
 
 export function getSingletonResourceKey(program: Program, resourceType: Model): string | undefined {
   return program.stateMap(ArmStateKeys.armSingletonResources).get(resourceType);
+}
+
+/**
+ * Gets the singleton key value(s) for a resource. For resources with a union name type,
+ * returns an array of the string literal values in the union. For simple singletons,
+ * returns the key string from the @singleton decorator.
+ */
+function getSingletonKeyValues(
+  program: Program,
+  resourceType: Model,
+): string | string[] | undefined {
+  const singletonKey = getSingletonResourceKey(program, resourceType);
+  if (singletonKey === undefined) return undefined;
+
+  // Check the name property for union types
+  for (const [, prop] of resourceType.properties) {
+    if (getKeyName(program, prop) !== undefined) {
+      if (prop.type.kind === "Union") {
+        const values: string[] = [];
+        for (const variant of prop.type.variants.values()) {
+          if (variant.type.kind === "String") {
+            values.push(variant.type.value);
+          }
+        }
+        if (values.length > 0) {
+          return values;
+        }
+      }
+      break;
+    }
+  }
+
+  return singletonKey;
 }
 
 export enum ResourceBaseType {

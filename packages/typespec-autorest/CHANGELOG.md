@@ -1,5 +1,19 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.67.0
+
+### Bug Fixes
+
+- [#4088](https://github.com/Azure/typespec-azure/pull/4088) Fix sorting of x-ms-paths entries that start with `?` (query-only paths). Previously these paths were not sorted alphabetically.
+
+
+## 0.66.2
+
+### Bug Fixes
+
+- [#4166](https://github.com/Azure/typespec-azure/pull/4166) Preserve casing in custom scalars used as lro final-result
+
+
 ## 0.66.1
 
 ### Bug Fixes

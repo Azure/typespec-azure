@@ -482,19 +482,22 @@ export async function getOpenAPIForService(
       metadata.finalResult !== "void" &&
       metadata.finalResult.name.length > 0
     ) {
-      // Scalar types (e.g., string) need a schema definition entry with a PascalCase name
+      // Scalar types need a schema definition entry.
+      // Built-in scalars (e.g., string) get a PascalCase name; custom scalars preserve their original casing.
       if (metadata.finalResult.kind === "Scalar") {
+        const scalar = metadata.finalResult as Scalar;
+        const isBuiltIn = program.checker.isStdType(scalar);
         const pending = pendingSchemas.getOrAdd(metadata.finalResult, Visibility.Read, () => ({
-          type: metadata.finalResult as Scalar,
+          type: scalar,
           visibility: Visibility.Read,
           getSchemaNameOverride: (name: string) =>
-            name
-              .split(".")
-              .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-              .join("."),
-          ref: refs.getOrAdd(metadata.finalResult as Scalar, Visibility.Read, () =>
-            proxy.createLocalRef(metadata.finalResult as Scalar),
-          ),
+            isBuiltIn
+              ? name
+                  .split(".")
+                  .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+                  .join(".")
+              : name,
+          ref: refs.getOrAdd(scalar, Visibility.Read, () => proxy.createLocalRef(scalar)),
         }));
         return { "final-state-schema": pending.ref };
       }

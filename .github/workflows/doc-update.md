@@ -160,30 +160,24 @@ been pre-computed and is available in `/tmp/gh-aw/agent/context.json`.
 2. If `mode` is `"skip"`, report "No source changes detected" and stop.
 
 3. Read the detailed domain-specific instructions from:
-   `eng/scripts/doc-updater/prompts/${config.name}/doc-update.md`
+   `eng/scripts/doc-updater/prompts/${config.name}.md`
 
 ## Important Rules
 
-- **Only modify files** whose paths start with one of the `allowedPaths` entries
-- **In incremental mode**, analyze the provided diffs in `changes.commits` to determine which documentation is affected. Only update affected pages.
-- **When feedback is provided**, study the code diffs in `feedback.humanCommitDiffs` to understand what reviewers corrected for last documentation update. Update the knowledge base to capture these corrections so future runs don't repeat the same mistakes.
-- **Update the knowledge base** at `knowledgePath` as you work.
+- **Use sub-agents as much as possible.** Your main context window is limited — offload all reading, investigation, and editing work to sub-agents to prevent context loss. Only keep high-level coordination state in your own context. When in doubt, use a sub-agent.
+- **Only modify files** whose paths start with one of the `allowedPaths` entries.
+- **Complete every step in the domain-specific prompt.** Do not stop after finishing one step. After each step, explicitly state which step you just completed and which step you are starting next. Continue until all steps are done.
+- **Do not defer work.** Fix every issue you find in this run. Do not leave "remaining gaps" or "future work" in the knowledge base or PR description — the knowledge base is for lessons learned, not a to-do list.
+- **Update the knowledge base** at `knowledgePath` as you work (see Knowledge Base Rules below).
 
 ## Knowledge Base Rules
 
-Record only information that directly helps future documentation maintenance:
-
-- **API signatures and behaviors** — exact parameter types, default values, and verified edge cases
-- **Feature-to-doc mapping** — which documented feature areas or pages should stay in sync with which source capabilities
-- **Doc conventions** — heading hierarchy, admonition usage, formatting patterns, and example style
-- **Cross-references** — relationships between documentation sections and important source concepts
+As you work, record any information at `knowledgePath` that would be useful for the next execution — things you had to look up, patterns you discovered, mistakes you corrected, or context that was hard to find. The goal is that a future run can read the knowledge base and work more efficiently.
 
 Do **not** record:
 
-- Environment or tooling setup details
 - Transient state such as commit hashes, workflow run IDs, timestamps, or PR numbers
 - Full source code copies
-- General knowledge unrelated to the package being documented
 
 After updating the knowledge base, run `pnpm format:dir <knowledgePath>` to format it.
 
@@ -198,13 +192,5 @@ pages affected by those changes.
 
 When `feedback` is present, humans modified the previous doc-update PR before
 merging it. The `feedback.humanCommitDiffs` array contains the code diffs from
-their commits. Study these diffs to understand what they corrected — factual
-errors, formatting preferences, missing context — and update the knowledge base
-accordingly.
-
-When learning from feedback:
-
-- If humans corrected a factual error, fix the corresponding knowledge
-- If humans added clarification or context, incorporate it
-- If humans changed formatting or conventions, capture that convention
-- If humans effectively rejected a prior change, record what should not be done again
+their commits. Study these diffs to understand what they corrected, then update
+the knowledge base so future runs don't repeat the same mistakes.
