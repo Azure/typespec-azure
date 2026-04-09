@@ -4,7 +4,7 @@ title: TypeSpec Authoring Skill for Azure
 
 ## TypeSpec Authoring Skill for Azure
 
-Azure TypeSpec Author helps you write and update Azure API specifications using TypeSpec with confidence. It guides you through common authoring tasks, such as adding API versions and evolving existing specs, while ensuring your changes follow Azure standards, repository conventions, and validation rules, so your APIs are ready for review and SDK generation.
+The "Azure TypeSpec Author" skill helps you write and update Azure API specifications using TypeSpec with confidence. It guides you through common authoring tasks, such as adding API versions and evolving existing specs, while ensuring your changes follow Azure standards, repository conventions, and validation rules, so your APIs are ready for review and SDK generation.
 
 ## Set up environment
 
