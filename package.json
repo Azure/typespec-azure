@@ -5,8 +5,8 @@
   "type": "module",
   "packageManager": "pnpm@10.23.0",
   "scripts": {
-    "run-all": "turbo --filter='!@typespec/monorepo'",
-    "run-azure-only": "turbo --filter='!{./core/**}'",
+    "run-all": "turbo --filter=!@typespec/monorepo",
+    "run-azure-only": "turbo --filter=!{./core/**}",
     "build": "pnpm run-all build && pnpm check:eng",
     "check-version-mismatch": "tsx eng/scripts/sync-catalog.ts check",
     "check:eng": "tsc -p ./tsconfig.eng.json --noEmit",
