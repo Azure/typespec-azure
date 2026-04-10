@@ -106,7 +106,11 @@ const exceptions: Record<string, Set<string>> = {};
  * Validates that all workspace package dependencies use `catalog:` or `workspace:` protocols,
  * ensuring versions are centrally managed via the pnpm catalog in pnpm-workspace.yaml.
  */
-function checkCatalogUsage(coreCatalog: Record<string, string>): { errors: string[]; warnings: string[]; unusedEntries: string[] } {
+function checkCatalogUsage(coreCatalog: Record<string, string>): {
+  errors: string[];
+  warnings: string[];
+  unusedEntries: string[];
+} {
   const errors: string[] = [];
   const warnings: string[] = [];
   const unusedEntries: string[] = [];
@@ -197,7 +201,9 @@ function main() {
     console.error(
       "  check  - Verify catalog sync with core and enforce catalog: usage (exits non-zero if any issues)",
     );
-    console.error("  fix    - Sync catalog from core, align packageManager, and remove unused entries");
+    console.error(
+      "  fix    - Sync catalog from core, align packageManager, and remove unused entries",
+    );
     process.exit(1);
   }
 
@@ -337,7 +343,9 @@ function checkAndReportCatalogUsage(mode: "check" | "fix", coreCatalog: Record<s
     const content = readFileSync(repoWorkspaceYaml, "utf8");
     const updated = replaceCatalogSection(content, repoCatalog);
     writeFileSync(repoWorkspaceYaml, updated);
-    console.log(`\n${pc.green("✓")} Removed ${pc.yellow(String(unusedEntries.length))} unused catalog entries.`);
+    console.log(
+      `\n${pc.green("✓")} Removed ${pc.yellow(String(unusedEntries.length))} unused catalog entries.`,
+    );
   } else if (mode === "check" && unusedEntries.length > 0) {
     console.log(`\nRun with ${pc.cyan("fix")} to remove unused entries.`);
   }
