@@ -711,7 +711,7 @@ describe("external types", () => {
     );
   });
 
-  it("should set External usage flag for types referenced by external types", async () => {
+  it("should not include types only referenced by external types in sdkPackage", async () => {
     const { program } = await SimpleTester.compile(`
       @service
       namespace MyService {
@@ -763,46 +763,44 @@ describe("external types", () => {
 
     const context = await createSdkContextForTester(program);
     const models = getAllModels(context);
-    const itemCollection = models.find((m) => m.name === "ItemCollection");
-    const itemCollectionType = models.find((m) => m.name === "ItemCollectionType");
-    const stacItem = models.find((m) => m.name === "StacItem");
-    const link = models.find((m) => m.name === "Link");
-    const contextExtension = models.find((m) => m.name === "ContextExtension");
-    const sharedModel = models.find((m) => m.name === "SharedModel");
-    const itemCollection2 = models.find((m) => m.name === "ItemCollection2");
 
-    // ItemCollection has external info and should have External usage flag
+    // ItemCollection has external info and should still be in the models list
+    const itemCollection = models.find((m) => m.name === "ItemCollection");
     strictEqual(itemCollection?.kind, "model");
     strictEqual(itemCollection.external?.identity, "pystac.Collection");
     strictEqual((itemCollection.usage & UsageFlags.External) > 0, true);
 
-    // Types only referenced by ItemCollection should have External usage flag
-    strictEqual(itemCollectionType?.kind, "model");
-    strictEqual((itemCollectionType.usage & UsageFlags.External) > 0, true);
+    // Types only referenced by ItemCollection should NOT be in the models list
+    // since they are only needed by the external type
+    strictEqual(
+      models.find((m) => m.name === "ItemCollectionType"),
+      undefined,
+    );
+    strictEqual(
+      models.find((m) => m.name === "StacItem"),
+      undefined,
+    );
+    strictEqual(
+      models.find((m) => m.name === "Link"),
+      undefined,
+    );
+    strictEqual(
+      models.find((m) => m.name === "ContextExtension"),
+      undefined,
+    );
 
-    strictEqual(stacItem?.kind, "model");
-    strictEqual((stacItem.usage & UsageFlags.External) > 0, true);
-
-    strictEqual(link?.kind, "model");
-    strictEqual((link.usage & UsageFlags.External) > 0, true);
-
-    strictEqual(contextExtension?.kind, "model");
-    strictEqual((contextExtension.usage & UsageFlags.External) > 0, true);
-
-    // SharedModel is used by both external and non-external types
-    // It will have External flag (from ItemCollection) AND Input flag (from ItemCollection2)
-    // NOTE: for shared model, TCGC actually shall not set External flag, because it's not fully external.
-    // But for simplicity we just keep it this way since we may not meet this scenario in the future.
+    // SharedModel is used by both external and non-external types, so it should still be present
+    const sharedModel = models.find((m) => m.name === "SharedModel");
     strictEqual(sharedModel?.kind, "model");
-    strictEqual((sharedModel.usage & UsageFlags.External) > 0, true);
     strictEqual((sharedModel.usage & UsageFlags.Input) > 0, true);
 
     // ItemCollection2 is not external, should NOT have External flag
+    const itemCollection2 = models.find((m) => m.name === "ItemCollection2");
     strictEqual(itemCollection2?.kind, "model");
     strictEqual((itemCollection2.usage & UsageFlags.External) === 0, true);
   });
 
-  it("should set External usage flag for transitively referenced types", async () => {
+  it("should not include transitively referenced types of external types in sdkPackage", async () => {
     const { program } = await SimpleTester.compile(`
       @service
       namespace MyService {
@@ -830,23 +828,75 @@ describe("external types", () => {
 
     const context = await createSdkContextForTester(program);
     const models = getAllModels(context);
-    const externalModel = models.find((m) => m.name === "ExternalModel");
-    const nestedModel = models.find((m) => m.name === "NestedModel");
-    const deepNestedModel = models.find((m) => m.name === "DeepNestedModel");
 
-    // ExternalModel has external info and should have External usage flag
+    // ExternalModel has external info and should still be in the models list
+    const externalModel = models.find((m) => m.name === "ExternalModel");
     strictEqual(externalModel?.kind, "model");
     strictEqual(externalModel.external?.identity, "external.Collection");
     strictEqual((externalModel.usage & UsageFlags.External) > 0, true);
 
-    // NestedModel is only referenced by ExternalModel, should have External usage flag
-    strictEqual(nestedModel?.kind, "model");
-    strictEqual((nestedModel.usage & UsageFlags.External) > 0, true);
+    // NestedModel and DeepNestedModel are only referenced by ExternalModel,
+    // so they should NOT be in the models list
+    strictEqual(
+      models.find((m) => m.name === "NestedModel"),
+      undefined,
+    );
+    strictEqual(
+      models.find((m) => m.name === "DeepNestedModel"),
+      undefined,
+    );
+  });
 
-    // DeepNestedModel is only referenced by NestedModel (which has External flag)
-    // So it should also have External flag (recursive propagation)
-    strictEqual(deepNestedModel?.kind, "model");
-    strictEqual((deepNestedModel.usage & UsageFlags.External) > 0, true);
+  it("should not include types and unions only used in external alternate type", async () => {
+    const { program } = await SimpleTester.compile(`
+      @service
+      namespace MyService {
+        model Geometry {
+          type: string;
+          coordinates: numeric[];
+        }
+
+        model Feature {
+          type: "Feature";
+          geometry: Geometry | null;
+          properties: Record<unknown>;
+          id?: string | numeric;
+        }
+
+        @route("/test")
+        op test(@body body: Feature): void;
+
+        @@alternateType(Feature,
+          {
+            identity: "geojson::Feature",
+            package: "geojson",
+            minVersion: "0.24.2",
+          },
+          "rust"
+        );
+      };
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-rust",
+    });
+    const models = context.sdkPackage.models;
+    const unions = context.sdkPackage.unions;
+
+    // Feature should still be in the models list (it has external + Input usage)
+    const feature = models.find((m) => m.name === "Feature");
+    strictEqual(feature?.kind, "model");
+    strictEqual(feature.external?.identity, "geojson::Feature");
+
+    // Geometry should NOT be in the models list since it's only used inside Feature
+    strictEqual(
+      models.find((m) => m.name === "Geometry"),
+      undefined,
+    );
+
+    // The FeatureId union (string | numeric) should NOT be in the unions list
+    // since it's only used inside Feature
+    strictEqual(unions.length, 0);
   });
 
   it("should not treat regular TypeSpec models as external types", async () => {

@@ -1584,6 +1584,13 @@ export function updateUsageOrAccess(
     }
   }
 
+  // Stop propagation past external types (except for External usage flag itself).
+  // External types will be replaced by external packages, so their children
+  // don't need non-External usage flags (Input/Output/Json/etc.) or access propagation.
+  if (type.external && !(typeof value === "number" && value === UsageFlags.External)) {
+    return diagnostics.wrap(undefined);
+  }
+
   if (type.kind === "enum") return diagnostics.wrap(undefined);
   if (type.kind === "union") {
     for (const unionType of type.variantTypes) {
@@ -2113,6 +2120,11 @@ function filterOutTypes(
   for (const sdkType of context.__referencedTypeCache.values()) {
     // filter models with unexpected usage
     if ((sdkType.usage & filter) === 0) {
+      continue;
+    }
+    // Skip types that only have External usage and no Input/Output usage.
+    // These types are only referenced by external types and don't need to be generated.
+    if ((sdkType.usage & UsageFlags.External) > 0 && !hasInputOrOutputUsage(sdkType.usage)) {
       continue;
     }
     if (!seen.has(sdkType)) {
