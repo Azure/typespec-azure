@@ -300,6 +300,9 @@ catalogs:
     decimal.js:
       specifier: ^10.6.0
       version: 10.6.0
+    dotenv:
+      specifier: ^17.2.3
+      version: 17.4.1
     ecmarkup:
       specifier: ~23.0.2
       version: 23.0.2
@@ -3080,6 +3083,9 @@ importers:
       '@typespec/compiler':
         specifier: workspace:^
         version: link:../../core/packages/compiler
+      dotenv:
+        specifier: 'catalog:'
+        version: 17.4.1
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -9070,6 +9076,10 @@ packages:
 
   dotenv@16.6.1:
     resolution: {integrity: sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==}
+    engines: {node: '>=12'}
+
+  dotenv@17.4.1:
+    resolution: {integrity: sha512-k8DaKGP6r1G30Lx8V4+pCsLzKr8vLmV2paqEj1Y55GdAgJuIqpRp5FfajGF8KtwMxCz9qJc6wUIJnm053d/WCw==}
     engines: {node: '>=12'}
 
   dset@3.1.4:
@@ -21342,6 +21352,8 @@ snapshots:
       domhandler: 5.0.3
 
   dotenv@16.6.1: {}
+
+  dotenv@17.4.1: {}
 
   dset@3.1.4: {}
 
