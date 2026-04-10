@@ -1416,13 +1416,13 @@ function isExcludedInapplicableMetadata(
     return false;
   }
   const stateKey = httpLib.stateKeys.includeInapplicableMetadataInPayload;
-  let e: ModelProperty | Model | Namespace | undefined = property;
-  while (e !== undefined) {
-    const value = context.program.stateMap(stateKey).get(e);
+  let current: ModelProperty | Model | Namespace | undefined = property;
+  while (current !== undefined) {
+    const value = context.program.stateMap(stateKey).get(current);
     if (value !== undefined) {
       return !value;
     }
-    e = e.kind === "ModelProperty" ? e.model : e.namespace;
+    current = current.kind === "ModelProperty" ? current.model : current.namespace;
   }
   return false;
 }
