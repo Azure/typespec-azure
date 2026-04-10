@@ -3,13 +3,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "inputs": [
-        "src/**",
-        "lib/**",
-        "tsconfig*.json",
-        "package.json",
-        ".scripts/**"
-      ],
+      "inputs": ["src/**", "lib/**", "tsconfig*.json", "package.json", ".scripts/**"],
       "outputs": ["dist/**"]
     },
     "test": {
@@ -40,6 +34,18 @@
     "watch": {
       "cache": false,
       "persistent": true
+    },
+    "dogfood": {
+      "dependsOn": ["build"],
+      "cache": false
+    },
+    "update-playground-versions": {
+      "dependsOn": ["build"],
+      "cache": false
+    },
+    "test:e2e": {
+      "dependsOn": ["build"],
+      "cache": false
     }
   }
 }
