@@ -4,7 +4,6 @@
     "outDir": "dist",
     "rootDir": ".",
     "tsBuildInfoFile": "temp/.tsbuildinfo",
-    "types": ["multer"],
     "allowJs": true
   }
 }

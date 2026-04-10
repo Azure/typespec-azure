@@ -136,6 +136,7 @@ catalog:
   eslint-plugin-unicorn: ^63.0.0
   execa: ^9.6.1
   express: ^5.2.1
+  fast-xml-parser: ^5.5.9
   fs-extra: ^11.3.4
   globby: ~16.1.1
   grammarkdown: ~3.3.2
