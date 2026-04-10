@@ -196,14 +196,9 @@ catalog:
   tree-sitter-python: ^0.25.0
   tree-sitter-typescript: ^0.23.2
   tsx: ^4.21.0
-<<<<<<< HEAD
   turbo: ^2.9.5
-  typedoc: ^0.28.17
-  typedoc-plugin-markdown: ^4.10.0
-=======
   typedoc: ^0.28.18
   typedoc-plugin-markdown: ^4.11.0
->>>>>>> 7e1220479566889f3fe18de797a98070ee5a27c9
   typescript: ~6.0.2
   typescript-eslint: ^8.58.1
   unist-util-visit: ^5.0.0
