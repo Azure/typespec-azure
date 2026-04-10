@@ -806,6 +806,9 @@ importers:
       '@typespec/bundler':
         specifier: workspace:^
         version: link:../bundler
+      globby:
+        specifier: 'catalog:'
+        version: 16.1.1
       picocolors:
         specifier: 'catalog:'
         version: 1.1.1
