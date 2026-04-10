@@ -1587,7 +1587,7 @@ export function updateUsageOrAccess(
   // Stop propagation past external types (except for External usage flag itself).
   // External types will be replaced by external packages, so their children
   // don't need non-External usage flags (Input/Output/Json/etc.) or access propagation.
-  if (type.external && !(typeof value === "number" && value === UsageFlags.External)) {
+  if (type.external && value !== UsageFlags.External) {
     return diagnostics.wrap(undefined);
   }
 
