@@ -214,5 +214,5 @@ catalog:
   web-tree-sitter: ^0.26.7
   which: ^6.0.1
   xml2js: ^0.6.2
-  yaml: ~2.8.2
+  yaml: ~1.10.3
   yargs: ~18.0.0
