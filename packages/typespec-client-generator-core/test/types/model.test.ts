@@ -1906,3 +1906,70 @@ it("model sequence", async function () {
   strictEqual(models.length, 3);
   strictEqual(models.map((x) => x.name).join(","), "A,C,B");
 });
+
+it("filters out metadata properties when includeInapplicableMetadataInPayload is false", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    @Http.Private.includeInapplicableMetadataInPayload(false)
+    model Resource {
+      @path
+      name: string;
+      displayName: string;
+    }
+    @route("/resources/{name}")
+    @get op getResource(@path name: string): Resource;
+  `);
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
+  strictEqual(models.length, 1);
+  const resource = models[0];
+  strictEqual(resource.name, "Resource");
+  // The @path property "name" should be filtered out because the model has
+  // includeInapplicableMetadataInPayload(false)
+  const propNames = resource.properties.map((p) => p.name);
+  ok(!propNames.includes("name"), "metadata property 'name' should be excluded");
+  ok(propNames.includes("displayName"), "non-metadata property 'displayName' should be included");
+});
+
+it("includes metadata properties when includeInapplicableMetadataInPayload is not set", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    model Resource {
+      @path
+      name: string;
+      displayName: string;
+    }
+    @route("/resources/{name}")
+    @get op getResource(@path name: string): Resource;
+  `);
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
+  strictEqual(models.length, 1);
+  const resource = models[0];
+  strictEqual(resource.name, "Resource");
+  // Without the decorator, @path property should be included in the model
+  const propNames = resource.properties.map((p) => p.name);
+  ok(propNames.includes("name"), "metadata property 'name' should be included by default");
+  ok(propNames.includes("displayName"), "non-metadata property 'displayName' should be included");
+});
+
+it("filters out @query metadata when includeInapplicableMetadataInPayload is false", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    @Http.Private.includeInapplicableMetadataInPayload(false)
+    model Resource {
+      @query
+      filter: string;
+      @path
+      name: string;
+      displayName: string;
+    }
+    @route("/resources/{name}")
+    @get op getResource(@path name: string, @query filter: string): Resource;
+  `);
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
+  strictEqual(models.length, 1);
+  const resource = models[0];
+  const propNames = resource.properties.map((p) => p.name);
+  ok(!propNames.includes("name"), "metadata property 'name' should be excluded");
+  ok(!propNames.includes("filter"), "metadata property 'filter' should be excluded");
+  ok(propNames.includes("displayName"), "non-metadata property 'displayName' should be included");
+});

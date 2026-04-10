@@ -31,6 +31,7 @@ import {
   resolveEncodedName,
 } from "@typespec/compiler";
 import {
+  $lib as httpLib,
   Authentication,
   HttpOperationFileBody,
   HttpOperationMultipartBody,
@@ -39,6 +40,7 @@ import {
   getAuthentication,
   getServers,
   isHeader,
+  isMetadata,
   isOrExtendsHttpFile,
   isStatusCode,
 } from "@typespec/http";
@@ -1399,6 +1401,32 @@ export function getSdkModelPropertyType(
   return diagnostics.wrap(property);
 }
 
+/**
+ * Checks if a model property is inapplicable metadata that should be excluded from the payload.
+ * This replicates the `includeInapplicableMetadataInPayload` check from `@typespec/http`.
+ * When a model is decorated with `@Http.Private.includeInapplicableMetadataInPayload(false)`,
+ * metadata properties (e.g., `@path`, `@query`) that are not applicable as payload
+ * should be filtered out.
+ */
+function isExcludedInapplicableMetadata(
+  context: TCGCContext,
+  property: ModelProperty,
+): boolean {
+  if (!isMetadata(context.program, property)) {
+    return false;
+  }
+  const stateKey = httpLib.stateKeys.includeInapplicableMetadataInPayload;
+  let e: ModelProperty | Model | Namespace | undefined = property;
+  while (e !== undefined) {
+    const value = context.program.stateMap(stateKey).get(e);
+    if (value !== undefined) {
+      return !value;
+    }
+    e = e.kind === "ModelProperty" ? e.model : e.namespace;
+  }
+  return false;
+}
+
 function addPropertiesToModelType(
   context: TCGCContext,
   type: Model,
@@ -1411,7 +1439,8 @@ function addPropertiesToModelType(
       isStatusCode(context.program, property) ||
       isNeverOrVoidType(property.type) ||
       hasNoneVisibility(context, property) ||
-      !isInScope(context, property)
+      !isInScope(context, property) ||
+      isExcludedInapplicableMetadata(context, property)
     ) {
       continue;
     }
