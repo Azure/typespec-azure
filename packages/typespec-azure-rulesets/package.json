@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-azure-rulesets",
-  "version": "0.66.0",
+  "version": "0.67.0",
   "author": "Microsoft Corporation",
   "description": "TypeSpec ruleset for Azure specs",
   "homepage": "https://azure.github.io/typespec-azure",
@@ -26,7 +26,7 @@
     }
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
   },
   "scripts": {
     "clean": "rimraf ./dist ./temp",
@@ -59,7 +59,6 @@
     "@typespec/tspd": "workspace:^",
     "@vitest/coverage-v8": "catalog:",
     "@vitest/ui": "catalog:",
-    "c8": "catalog:",
     "change-case": "catalog:",
     "rimraf": "catalog:",
     "typescript": "catalog:",

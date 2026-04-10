@@ -5,4 +5,4 @@ packages:
   - "@azure-tools/azure-http-specs"
 ---
 
-Update the `azure/client-generator-core/alternate-type` spec for Rust.
+Remove "!javascript" scope from @@override for GroupParameters.group

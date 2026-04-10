@@ -789,7 +789,8 @@ interface GenericOps
       {
         ...Extension.ExtensionProviderNamespace<Employee>,
         ...KeysOf<Employee>,
-      }
+      },
+      "GenericEmployee"
     > {}
 
 @armResourceOperations
@@ -1110,6 +1111,47 @@ interface GenericResources {
     checkArmOperationsHas(provider.providerOperations, [
       { operationGroup: "Operations", name: "list", kind: "other" },
     ]);
+  });
+
+  it("uses extension resource name as default for ScopeParameter scope", async () => {
+    const { program } = await Tester.compile(`
+      using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+model WidgetResource
+  is Azure.ResourceManager.ExtensionResource<WidgetResourceProperties> {
+  ...ResourceNameParameter<
+    Resource = WidgetResource,
+    KeyName = "widgetName",
+    SegmentName = "widgets",
+    NamePattern = ""
+  >;
+}
+
+model WidgetResourceProperties {
+  widgetId: string;
+}
+
+@armResourceOperations
+interface WidgetResources {
+  get is Extension.Read<Extension.ScopeParameter, WidgetResource>;
+}
+      `);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    ok(provider.resources);
+    const widget = provider.resources.find(
+      (r) =>
+        r.resourceInstancePath ===
+        "/{scope}/providers/Microsoft.ContosoProviderHub/widgets/{widgetName}",
+    );
+    ok(widget);
+    expect(widget.resourceName).toEqual("WidgetResource");
   });
 
   it("allows overriding resource name for extension resources", async () => {
@@ -4209,5 +4251,213 @@ interface SupportTicketsNoSubscription {
     // Both list operations should be present
     expect(resource.operations.lists).toBeDefined();
     expect(resource.operations.lists).toHaveLength(2);
+  });
+
+  it("collects operation information for GenericResource with RoutedOperations", async () => {
+    const { program } = await Tester.compile(`
+
+using Azure.Core;
+
+/** Contoso Resource Provider management API. */
+@armProviderNamespace
+@service(#{ title: "ContosoProviderHubClient" })
+@versioned(Versions)
+namespace Microsoft.Resources {
+  /** Contoso API versions */
+  enum Versions {
+    /** 2021-10-01-preview version */
+    @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+    v2021_20_01_preview: "2021-10-01-preview",
+  }
+
+  /** A generic resource */
+  model MyGenericResource
+    is Azure.ResourceManager.Legacy.GenericResource<{}> {
+  }
+
+  alias genericOps = Azure.ResourceManager.Legacy.RoutedOperations<
+    {
+      ...ApiVersionParameter;
+
+      @path(#{ allowReserved: true })
+      @key
+      @doc("The resource id")
+      resourceId: string;
+    },
+    {}
+  >;
+
+  interface Operations extends Azure.ResourceManager.Operations {}
+
+  @armResourceOperations
+  interface GenericResourceOps {
+    get is genericOps.Read<MyGenericResource>;
+    createOrUpdate is genericOps.CreateOrUpdateAsync<MyGenericResource>;
+    update is genericOps.CustomPatchSync<MyGenericResource, MyGenericResource>;
+    delete is genericOps.DeleteWithoutOkAsync<MyGenericResource>;
+    /** A sample HEAD to check resource existence */
+    checkExistence is genericOps.CheckExistence<MyGenericResource>;
+  }
+}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    ok(provider.resources);
+    expect(provider.resources).toHaveLength(1);
+
+    const resource = provider.resources[0];
+    ok(resource);
+    expect(resource).toMatchObject({
+      kind: "Other",
+      providerNamespace: "Microsoft.Resources",
+      type: expect.anything(),
+    });
+
+    checkResolvedOperations(resource, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            {
+              operationGroup: "GenericResourceOps",
+              name: "createOrUpdate",
+              kind: "createOrUpdate",
+            },
+          ],
+          delete: [{ operationGroup: "GenericResourceOps", name: "delete", kind: "delete" }],
+          read: [{ operationGroup: "GenericResourceOps", name: "get", kind: "read" }],
+          update: [{ operationGroup: "GenericResourceOps", name: "update", kind: "update" }],
+          checkExistence: [
+            {
+              operationGroup: "GenericResourceOps",
+              name: "checkExistence",
+              kind: "checkExistence",
+            },
+          ],
+        },
+      },
+      resourceType: {
+        provider: "Microsoft.Resources",
+        types: [],
+      },
+      resourceInstancePath: "/{resourceId}",
+      resourceName: "MyGenericResource",
+    });
+  });
+
+  it.each(["default", "current"])(
+    "provides singleton information for @singleton('%s') decorated resources",
+    async (singletonKey) => {
+      const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+@singleton("${singletonKey}")
+model SingletonResource is ProxyResource<SingletonResourceProperties> {
+  ...ResourceNameParameter<SingletonResource>;
+}
+
+model SingletonResourceProperties {
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+@lroStatus
+union ProvisioningState {
+  string,
+  ResourceProvisioningState,
+}
+
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+  age?: int32;
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+@armResourceOperations
+interface SingletonResources {
+  get is ArmResourceRead<SingletonResource>;
+  createOrUpdate is ArmResourceCreateOrReplaceSync<SingletonResource>;
+}
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+}
+`);
+      const provider = resolveArmResources(program);
+      expect(provider).toBeDefined();
+      expect(provider.resources).toBeDefined();
+
+      const singletonResource = provider.resources!.find(
+        (r) => r.type.name === "SingletonResource",
+      );
+      ok(singletonResource);
+      expect(singletonResource.singleton).toBeDefined();
+      expect(singletonResource.singleton!.keyValue).toEqual(singletonKey);
+
+      const employee = provider.resources!.find((r) => r.type.name === "Employee");
+      ok(employee);
+      expect(employee.singleton).toBeUndefined();
+    },
+  );
+
+  it("provides singleton information for resources with union name type", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+union ExampleSingletonValues {
+  salaried: "salaried",
+  hourly: "hourly",
+  string,
+}
+
+@singleton("salaried")
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Resource = Employee, Type = ExampleSingletonValues>;
+}
+
+model EmployeeProperties {
+  age?: int32;
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+@lroStatus
+union ProvisioningState {
+  string,
+  ResourceProvisioningState,
+}
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+
+    const employee = provider.resources!.find((r) => r.type.name === "Employee");
+    ok(employee);
+    expect(employee.singleton).toBeDefined();
+    expect(employee.singleton!.keyValue).toEqual(["salaried", "hourly"]);
   });
 });

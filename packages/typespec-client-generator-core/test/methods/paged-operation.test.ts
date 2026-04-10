@@ -1,8 +1,13 @@
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
-import { SdkMethodParameter } from "../../src/interfaces.js";
+import {
+  SdkHttpOperation,
+  SdkMethodParameter,
+  SdkPagingServiceMethod,
+} from "../../src/interfaces.js";
 import { getPropertySegmentsFromModelOrParameters } from "../../src/methods.js";
 import {
+  ArmTester,
   AzureCoreTester,
   AzureCoreTesterWithService,
   createSdkContextForTester,
@@ -989,4 +994,62 @@ it("paged result with nextLinkVerb decorator POST", async () => {
   strictEqual(method.name, "test");
   strictEqual(method.kind, "paging");
   strictEqual(method.pagingMetadata.nextLinkVerb, "POST");
+});
+
+it("ARM paging with intersection error response should not include error in response union", async () => {
+  const { program } = await ArmTester.compile(`
+    @armProviderNamespace
+    @service(#{ title: "ContosoProviderHubClient" })
+    @versioned(Versions)
+    namespace Microsoft.ContosoProviderHub;
+
+    enum Versions {
+      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+      \`2021-10-01-preview\`,
+    }
+
+    model Employee is TrackedResource<EmployeeProperties> {
+      ...ResourceNameParameter<Employee>;
+    }
+
+    model EmployeeProperties {
+      age?: int32;
+      city?: string;
+    }
+
+    @armResourceOperations
+    interface Employees {
+      @autoRoute
+      @get
+      @list
+      @tag("UsageAggregates")
+      @action("UsageAggregates")
+      list is ArmProviderActionSync<
+        Response = ResourceListResult<Employee> | (ArmAcceptedResponse &
+          ErrorResponse),
+        Scope = SubscriptionActionScope,
+        Parameters = {},
+        Error = ErrorResponse
+      >;
+    }
+  `);
+
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  const client = sdkPackage.clients[0];
+  const childClient = client.children![0];
+  const method = childClient.methods[0];
+  const httpOp = method.operation as SdkHttpOperation;
+
+  // The intersection (ArmAcceptedResponse & ErrorResponse) should be classified as exception
+  strictEqual(httpOp.responses.length, 1);
+  strictEqual(httpOp.responses[0].statusCodes, 200);
+
+  // The method should be a paging method with proper metadata
+  strictEqual(method.kind, "paging");
+  const pagingMethod = method as SdkPagingServiceMethod<SdkHttpOperation>;
+  ok(pagingMethod.pagingMetadata.pageItemsSegments);
+
+  // The response type should be the paged items array, not a union containing ErrorResponse
+  strictEqual(method.response.type?.kind, "array");
 });

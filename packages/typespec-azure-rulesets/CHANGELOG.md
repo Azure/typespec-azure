@@ -1,5 +1,9 @@
 # Changelog - @azure-tools/typespec-azure-rulesets
 
+## 0.67.0
+
+No changes, version bump only.
+
 ## 0.65.1
 
 ### Bump dependencies

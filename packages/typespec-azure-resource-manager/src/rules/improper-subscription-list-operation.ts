@@ -9,6 +9,7 @@ export const improperSubscriptionListOperationRule = createRule({
   name: "improper-subscription-list-operation",
   severity: "warning",
   description: `Tenant and Extension resources should not define a list by subscription operation.`,
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/improper-subscription-list-operation",
   messages: {
     default: `Tenant and Extension resources should not define a list by subscription operation.`,
   },

@@ -4,6 +4,8 @@ on:
   pull_request:
     branches: ["main"]
     types: [opened]
+    paths:
+      - "core"
 
 permissions: {}
 
@@ -14,7 +16,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ github.head_ref }}
           submodules: recursive
