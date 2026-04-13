@@ -46,7 +46,6 @@
     "@pnpm/workspace.find-packages": "catalog:",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
-    "c8": "catalog:",
     "cspell": "catalog:",
     "eslint": "catalog:",
     "eslint-plugin-import": "catalog:",
