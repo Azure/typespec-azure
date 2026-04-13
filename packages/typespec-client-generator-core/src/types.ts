@@ -1548,6 +1548,16 @@ export function updateUsageOrAccess(
     return diagnostics.wrap(undefined);
   }
 
+  // For external types, only allow External usage flag to be set.
+  // External types are replaced by external packages, so they don't need
+  // Input/Output/Json usage or access propagation, and children should not be visited.
+  if (type.external) {
+    if (value === UsageFlags.External) {
+      type.usage |= value;
+    }
+    return diagnostics.wrap(undefined);
+  }
+
   if (options.ignoreSubTypeStack.length === 0 || !options.ignoreSubTypeStack.at(-1)) {
     options.seenTypes.add(type);
   }
@@ -1582,13 +1592,6 @@ export function updateUsageOrAccess(
     if (typeof value !== "number") {
       type.__accessSet = true;
     }
-  }
-
-  // Stop propagation past external types (except for External usage flag itself).
-  // External types will be replaced by external packages, so their children
-  // don't need non-External usage flags (Input/Output/Json/etc.) or access propagation.
-  if (type.external && value !== UsageFlags.External) {
-    return diagnostics.wrap(undefined);
   }
 
   if (type.kind === "enum") return diagnostics.wrap(undefined);
@@ -2120,11 +2123,6 @@ function filterOutTypes(
   for (const sdkType of context.__referencedTypeCache.values()) {
     // filter models with unexpected usage
     if ((sdkType.usage & filter) === 0) {
-      continue;
-    }
-    // Skip types that only have External usage and no Input/Output usage.
-    // These types are only referenced by external types and don't need to be generated.
-    if ((sdkType.usage & UsageFlags.External) > 0 && !hasInputOrOutputUsage(sdkType.usage)) {
       continue;
     }
     if (!seen.has(sdkType)) {

@@ -883,7 +883,7 @@ describe("external types", () => {
     const models = context.sdkPackage.models;
     const unions = context.sdkPackage.unions;
 
-    // Feature should still be in the models list (it has external + Input usage)
+    // Feature should still be in the models list (it has External usage)
     const feature = models.find((m) => m.name === "Feature");
     strictEqual(feature?.kind, "model");
     strictEqual(feature.external?.identity, "geojson::Feature");
