@@ -84,10 +84,10 @@ Most TCGC types share the following common properties:
 - **`decorators`**: Stores all TypeSpec decorator info for advanced use cases.
 - **`crossLanguageDefinitionId`**: A unique ID for a TCGC type that can be used for output mapping across different emitters.
 - **`name`** and **`isGeneratedName`**: The type's name and whether the name was created by TCGC.
-- **`access`**: Indicates whether the type has public or private accessibility.
+- **`access`**: Indicates whether the type has public or internal accessibility.
 - **`usage`**: Indicates the type's usage information; its value is a bitmap of [`UsageFlags`](../reference/js-api/enumerations/usageflags/) enumeration.
 - **`deprecation`**: Indicates whether the type is deprecated and provides the deprecation message.
-- **`clientDefaultValue`**: The type's default value if provided. Set via the `@clientDefaultValue` decorator or auto-set for endpoint and API version parameters.
+- **`clientDefaultValue`**: The type's default value if provided. Set via the legacy `@clientDefaultValue` decorator or auto-set for endpoint and API version parameters.
 
 ### Package
 
@@ -97,6 +97,26 @@ Clients, models, enums, and unions include namespace information. Emitters can u
 
 - A flattened structure (`SdkPackage.clients`, `SdkPackage.enums`, `SdkPackage.models`, `SdkPackage.unions`)
 - A hierarchical structure (`SdkPackage.namespaces`) requiring iteration through nested namespaces.
+
+`SdkPackage` also provides the following properties:
+
+- `crossLanguagePackageId`: A unique string ID for the package across languages.
+- `crossLanguageVersion`: A hash of API-affecting elements for cross-language SDK comparison.
+- `metadata`: An object containing versioning information:
+  - `apiVersion`: _(deprecated, use `apiVersions`)_ The version of the package.
+  - `apiVersions`: A map from service namespace to its resolved API version string.
+
+**SdkNamespace:**
+
+[`SdkNamespace`](../reference/js-api/interfaces/sdknamespace/) represents a namespace within the package hierarchy. It contains:
+
+- `name`: The namespace name.
+- `fullName`: The fully qualified namespace name.
+- `clients`: Clients under this namespace.
+- `models`: Models under this namespace.
+- `enums`: Enums under this namespace.
+- `unions`: Unions under this namespace.
+- `namespaces`: Nested child namespaces (recursive).
 
 ### License Information
 
@@ -143,11 +163,35 @@ TCGC supports four kinds of methods: [`SdkBasicServiceMethod`](../reference/js-a
 
 `SdkBasicServiceMethod.parameters` is the method's input. Its type [`SdkMethodParameter`](../reference/js-api/interfaces/sdkmethodparameter/) contains the type of the parameter along with some attributes of the parameter.
 
-`SdkBasicServiceMethod.response` is the method's normal response while `SdkBasicServiceMethod.exceptions` contains the method's error responses.
+`SdkBasicServiceMethod.response` is the method's normal response while `SdkBasicServiceMethod.exception` contains the method's optional error response.
 
-**SdkPagingServiceMethod** is a paging method that has pageable responses. It extends `SdkBasicServiceMethod` and contains extra paging information.
+All service methods also have the following generation control properties:
 
-**SdkLroServiceMethod** is an LRO method that calls a long-running server-side API. It extends `SdkBasicServiceMethod` and contains extra LRO information.
+- `generateConvenient`: Whether to generate a convenience API for this method.
+- `generateProtocol`: Whether to generate a protocol API for this method.
+- `isOverride`: Whether this method is overridden via `@override`.
+
+**SdkMethodResponse:**
+
+[`SdkMethodResponse`](../reference/js-api/interfaces/sdkmethodresponse/) represents the method-level response. Key properties:
+
+- `kind`: Always `"method"`.
+- `type`: The response type (`SdkType`), if the method returns a value.
+- `resultSegments`: An array of property segments to fetch the result from the response model (used for LRO and paging patterns).
+
+**SdkPagingServiceMethod** is a paging method that has pageable responses. It extends `SdkBasicServiceMethod` and contains `pagingMetadata` ([`SdkPagingServiceMetadata`](../reference/js-api/interfaces/sdkpagingservicemetadata/)) with paging details:
+
+- `nextLinkSegments`: Segments to get the next page link value from the response.
+- `nextLinkOperation`: Method used to get the next page.
+- `continuationTokenParameterSegments` / `continuationTokenResponseSegments`: Segments for continuation token handling.
+- `pageItemsSegments`: Segments to get page items from the response.
+
+**SdkLroServiceMethod** is an LRO method that calls a long-running server-side API. It extends `SdkBasicServiceMethod` and contains `lroMetadata` ([`SdkLroServiceMetadata`](../reference/js-api/interfaces/sdklroservicemetadata/)) with LRO details:
+
+- `finalStateVia`: The `FinalStateValue` indicating how to resolve the final result.
+- `pollingStep`: Polling step metadata (response body type).
+- `finalStep`: Final step metadata (how to get the final result after polling).
+- `finalResponse`: Synthesized final response with `envelopeResult`, `result`, and optional `resultSegments`.
 
 **SdkLroPagingServiceMethod** is an LRO method that calls a long-running server-side API and has pageable responses. It extends `SdkBasicServiceMethod`, `SdkPagingServiceMethod` and `SdkLroServiceMethod`.
 
@@ -160,7 +204,35 @@ TCGC currently supports one kind of operation: [`SdkHttpOperation`](../reference
 
 `SdkHttpOperation` contains verb, path, URI template, query/header/path/cookie/body parameters, responses, and exceptions of an HTTP operation.
 
+**HTTP Parameter Types:**
+
+Each parameter type extends `SdkModelPropertyTypeBase` and has a `serializedName` and `methodParameterSegments` property:
+
+- [`SdkQueryParameter`](../reference/js-api/interfaces/sdkqueryparameter/): HTTP query parameter. Has `collectionFormat` for array serialization and `explode` for parameter expansion.
+- [`SdkPathParameter`](../reference/js-api/interfaces/sdkpathparameter/): HTTP path parameter. Has `explode`, `style` (e.g. `"simple"`, `"label"`), and `allowReserved`.
+- [`SdkHeaderParameter`](../reference/js-api/interfaces/sdkheaderparameter/): HTTP header parameter. Has `collectionFormat` for array serialization.
+- [`SdkCookieParameter`](../reference/js-api/interfaces/sdkcookieparameter/): HTTP cookie parameter.
+- [`SdkBodyParameter`](../reference/js-api/interfaces/sdkbodyparameter/): HTTP body parameter. Has `contentTypes`, `defaultContentType`, and optional `streamMetadata`.
+
 Each parameter for an HTTP operation has a `methodParameterSegments` property to indicate the mapping of one payload parameter with the path of one or more method-level parameters or model properties. This helps emitters determine how to compose the underlying payload with the method's parameters. One body parameter can have several method-level parameter or model property mapping paths because of the implicit body parameter resolving from the TypeSpec HTTP library.
+
+**HTTP Response Types:**
+
+- [`SdkHttpResponse`](../reference/js-api/interfaces/sdkhttpresponse/): Represents a normal HTTP response. Contains `statusCodes` (number or range), `type` (response body type), `headers`, `contentTypes`, `defaultContentType`, `description`, and optional `streamMetadata`.
+- [`SdkHttpErrorResponse`](../reference/js-api/interfaces/sdkhttperrorresponse/): Represents an error HTTP response. Same as `SdkHttpResponse` but `statusCodes` can also be `"*"` (wildcard).
+
+**SdkServiceResponseHeader:**
+
+[`SdkServiceResponseHeader`](../reference/js-api/interfaces/sdkserviceresponseheader/) represents a response header. It has `kind: "responseheader"` and a `serializedName` property for the wire name of the header.
+
+**SdkStreamMetadata:**
+
+[`SdkStreamMetadata`](../reference/js-api/interfaces/sdkstreammetadata/) provides metadata about streaming operation bodies or responses (e.g. `JsonlStream`, `SSEStream`). Properties:
+
+- `bodyType`: The type of the property decorated with `@body`.
+- `originalType`: The stream model type itself.
+- `streamType`: The payload model type being streamed.
+- `contentTypes`: Content types associated with the stream (e.g. `["application/jsonl"]`).
 
 ### Type
 
@@ -172,7 +244,7 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 
 **Date and Time Types:**
 
-- [`SdkDateTimeType`](../reference/js-api/type-aliases/sdkdatetimetype/) and [`SdkDurationType`](../reference/js-api/interfaces/sdkdurationtype/) are converted from TypeSpec `utcDateTime`, `offsetDateTime` and `duration` types. The datetime encoding info is in the `encode` property.
+- [`SdkDateTimeType`](../reference/js-api/type-aliases/sdkdatetimetype/) and [`SdkDurationType`](../reference/js-api/interfaces/sdkdurationtype/) are converted from TypeSpec `utcDateTime`, `offsetDateTime` and `duration` types. The datetime encoding info is in the `encode` property. The `wireType` property (of type `SdkBuiltInType`) indicates the type used on the wire after encoding.
 
 **Collection Types:**
 
@@ -184,7 +256,10 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 
 **Enumeration Types:**
 
-- [`SdkEnumType`](../reference/js-api/interfaces/sdkenumtype/) and [`SdkEnumValueType`](../reference/js-api/interfaces/sdkenumvaluetype/) represent TCGC enumeration types. They are typically converted from TypeSpec [`Enum`](https://typespec.io/docs/language-basics/enums/) types or [`Union`](https://typespec.io/docs/language-basics/unions/) types (for extensible enumeration cases).
+- [`SdkEnumType`](../reference/js-api/interfaces/sdkenumtype/) and [`SdkEnumValueType`](../reference/js-api/interfaces/sdkenumvaluetype/) represent TCGC enumeration types. They are typically converted from TypeSpec [`Enum`](https://typespec.io/docs/language-basics/enums/) types or [`Union`](https://typespec.io/docs/language-basics/unions/) types (for extensible enumeration cases). Key properties on `SdkEnumType`:
+  - `isFixed`: Whether the enum is fixed (closed) or extensible (open)
+  - `isFlags`: Whether the enum is a flags enum (values can be combined with bitwise OR)
+  - `isUnionAsEnum`: Whether the enum was synthesized from a TypeSpec `Union` type
 
 **Literal Types:**
 
@@ -192,24 +267,39 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 
 **Union Types:**
 
-- [`SdkUnionType`](../reference/js-api/interfaces/sdkuniontype/) represents a TCGC union type. It is typically converted from a TypeSpec [`Union`](https://typespec.io/docs/language-basics/unions/) type.
+- [`SdkUnionType`](../reference/js-api/interfaces/sdkuniontype/) represents a TCGC union type. It is typically converted from a TypeSpec [`Union`](https://typespec.io/docs/language-basics/unions/) type. If the union is a discriminated union, the `discriminatedOptions` property contains:
+  - `envelope`: How the discriminated union is serialized (`"object"` or `"none"`)
+  - `discriminatorPropertyName`: Name of the discriminator property
+  - `envelopePropertyName`: Name of the envelope property (if `envelope` is `"object"`)
 
 **Model Types:**
 
-- [`SdkModelType`](../reference/js-api/interfaces/sdkmodeltype/) represents a TCGC model type. It is typically converted from a TypeSpec [`Model`](https://typespec.io/docs/language-basics/models/) type.
+- [`SdkModelType`](../reference/js-api/interfaces/sdkmodeltype/) represents a TCGC model type. It is typically converted from a TypeSpec [`Model`](https://typespec.io/docs/language-basics/models/) type. Key properties include:
+  - `properties`: The list of [`SdkModelPropertyType`](../reference/js-api/interfaces/sdkmodelpropertytype/) belonging to this model
+  - `baseModel`: Optional parent [`SdkModelType`](../reference/js-api/interfaces/sdkmodeltype/) for model inheritance
+  - `additionalProperties`: Indicates if the model can accept additional properties with a specific type
+  - `serializationOptions`: A [`SerializationOptions`](../reference/js-api/interfaces/serializationoptions/) object describing how to serialize the model (see below)
+  - For discriminated models:
+    - `discriminatorProperty`: The property used as a discriminator
+    - `discriminatedSubtypes`: Record of all subtypes of this discriminated model, keyed by discriminator value
+  - For subtypes of discriminated models:
+    - `discriminatorValue`: The instance value for the discriminator for this subtype
+
+**Serialization Options:**
+
+[`SerializationOptions`](../reference/js-api/interfaces/serializationoptions/) describes how to serialize a model or property. It appears on both `SdkModelType` and `SdkModelPropertyType`. A model/property used in multiple operations with different wire formats may have multiple options set. It contains:
+  - `json`: JSON serialization options (serialized name)
+  - `xml`: XML serialization options (name, attribute, namespace, unwrapped, etc.)
+  - `multipart`: Multipart serialization options (part name, file part, headers, etc.)
+  - `binary`: Binary serialization options (file/stream metadata)
 
 **Model Property Types:**
 
 - [`SdkModelPropertyType`](../reference/js-api/interfaces/sdkmodelpropertytype/) represents a TCGC model property type. It is typically converted from a TypeSpec [`ModelProperty`](https://typespec.io/docs/standard-library/reference/js-api/interfaces/modelproperty/) type. It represents a property of a model and has the following key properties:
   - `flatten`: Indicates if the property can be flattened
-  - `additionalProperties`: Indicates if the model can accept additional properties with a specific type
-  - For discriminated models:
-    - `discriminatorProperty`: The property used as a discriminator
-    - `discriminatedSubtypes`: List of all subtypes of this discriminated model
-  - For subtypes of discriminated models:
-    - `discriminatorValue`: The instance value for the discriminator for this subtype
-  - For array properties:
-    - `arrayEncode`: Indicates the encoding style for array properties (if specified).
+  - `discriminator`: Boolean indicating if this property is the discriminator for the model
+  - `encode`: Indicates the encoding style for array properties (type `ArrayKnownEncoding`, if specified)
+  - `serializationOptions`: A [`SerializationOptions`](../reference/js-api/interfaces/serializationoptions/) object describing how to serialize the property
 
 ### Example types
 
@@ -251,9 +341,9 @@ Normally, a client's initialization parameters include:
 
 4. **Subscription ID parameter**: If the service is an ARM service, then the subscription ID parameter on method is elevated to client.
 
-The client's initialization way is `undefined`. Emitters can choose how to initialize all the clients.
+The client's initialization way is `InitializedByFlags.Default` (0). Emitters can choose how to initialize all the clients.
 
-With `@clientInitialization` decorator, the default behavior may change. New client-level parameters are added. Client initialization way can be specified with initializing by parent client, initializing individually or both.
+With `@clientInitialization` decorator, the default behavior may change. New client-level parameters are added. Client initialization way can be specified with `Individually` (initialize by itself), `Parent` (initialize by parent client), a combination of both, or `CustomizeCode` (initialization is omitted from generated code and handled manually in custom code).
 
 ### Method Detection
 
