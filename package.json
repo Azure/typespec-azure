@@ -8,7 +8,7 @@
     "run-all": "turbo --filter=!@typespec/monorepo",
     "run-azure-only": "turbo --filter=!{./core/**}",
     "build": "pnpm run-all build && pnpm check:eng",
-    "check-version-mismatch": "tsx eng/scripts/sync-catalog.ts check",
+    "deps": "tsx eng/scripts/sync-deps.ts",
     "check:eng": "tsc -p ./tsconfig.eng.json --noEmit",
     "change": "chronus",
     "clean": "pnpm run-all clean",
