@@ -5,7 +5,7 @@
   "type": "module",
   "packageManager": "pnpm@10.30.2",
   "scripts": {
-    "run-all": "pnpm -r --filter=!./core/",
+    "run-all": "pnpm -r --filter=!./core/ --filter=!./core/packages/standalone",
     "run-azure-only": "pnpm -r --filter=\"!./core/**\"",
     "build": "pnpm run-all --workspace-concurrency=Infinity --aggregate-output --reporter=append-only build && pnpm check:eng",
     "deps": "tsx eng/scripts/sync-deps.ts",
