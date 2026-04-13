@@ -65,6 +65,7 @@ import {
   getAlternateType,
   getClientDocExplicit,
   getClientLocation,
+  getIsApiVersion,
   getLegacyHierarchyBuilding,
   getMarkAsLro,
   getOverriddenClientMethod,
@@ -820,7 +821,14 @@ export function getCorrespondingClientParam(
   const correspondingClientParam = clientParams?.find((x) =>
     twoParamsEquivalent(context, x.__raw, type),
   );
-  if (correspondingClientParam) return correspondingClientParam;
+  if (correspondingClientParam) {
+    // If the parameter is explicitly marked as not an API version parameter via @apiVersion(false),
+    // it should not be matched to a client API version parameter.
+    if (getIsApiVersion(context, type) === false && correspondingClientParam.isApiVersionParam) {
+      return undefined;
+    }
+    return correspondingClientParam;
+  }
   return undefined;
 }
 
