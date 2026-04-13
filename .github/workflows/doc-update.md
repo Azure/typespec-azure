@@ -74,7 +74,6 @@ steps:
 tools:
   edit:
   bash: true
-  glob: true
 
 network:
   allowed:
@@ -183,14 +182,8 @@ After updating the knowledge base, run `pnpm format:dir <knowledgePath>` to form
 
 ## Incremental Mode
 
-When `mode` is `"incremental"`, the `changes.commits` array contains pre-extracted
-unified diffs for each commit that changed the source code since the last update.
-Analyze these diffs to understand what changed, then update only the documentation
-pages affected by those changes.
+When `mode` is `"incremental"`, the `changes.commits` array contains pre-extracted unified diffs for each commit that changed the source code since the last update. Analyze these diffs to understand what changed, then update only the documentation pages affected by those changes.
 
 ## Feedback Processing
 
-When `feedback` is present, humans modified the previous doc-update PR before
-merging it. The `feedback.humanCommitDiffs` array contains the code diffs from
-their commits. Study these diffs to understand what they corrected, then update
-the knowledge base so future runs don't repeat the same mistakes.
+When `feedback` is present, humans modified the previous doc-update PR before merging it. The `feedback.humanCommitDiffs` array contains the code diffs from their commits. Study these diffs to understand what they corrected, then update the knowledge base so future runs don't repeat the same mistakes.
