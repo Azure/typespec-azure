@@ -196,20 +196,25 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 
 **Model Types:**
 
-- [`SdkModelType`](../reference/js-api/interfaces/sdkmodeltype/) represents a TCGC model type. It is typically converted from a TypeSpec [`Model`](https://typespec.io/docs/language-basics/models/) type.
-
-**Model Property Types:**
-
-- [`SdkModelPropertyType`](../reference/js-api/interfaces/sdkmodelpropertytype/) represents a TCGC model property type. It is typically converted from a TypeSpec [`ModelProperty`](https://typespec.io/docs/standard-library/reference/js-api/interfaces/modelproperty/) type. It represents a property of a model and has the following key properties:
-  - `flatten`: Indicates if the property can be flattened
+- [`SdkModelType`](../reference/js-api/interfaces/sdkmodeltype/) represents a TCGC model type. It is typically converted from a TypeSpec [`Model`](https://typespec.io/docs/language-basics/models/) type. It has the following key properties:
   - `additionalProperties`: Indicates if the model can accept additional properties with a specific type
   - For discriminated models:
     - `discriminatorProperty`: The property used as a discriminator
     - `discriminatedSubtypes`: List of all subtypes of this discriminated model
   - For subtypes of discriminated models:
     - `discriminatorValue`: The instance value for the discriminator for this subtype
+
+**Credential and Endpoint Types:**
+
+- [`SdkCredentialType`](../reference/js-api/interfaces/sdkcredentialtype/) represents credential information. It contains a `scheme` property describing the auth scheme, reusing TypeSpec HTTP auth types.
+- [`SdkEndpointType`](../reference/js-api/interfaces/sdkendpointtype/) represents endpoint information. It contains a `serverUrl` property for the base endpoint URL and `templateArguments` for any template parameters used in the URL.
+
+**Model Property Types:**
+
+- [`SdkModelPropertyType`](../reference/js-api/interfaces/sdkmodelpropertytype/) represents a TCGC model property type. It is typically converted from a TypeSpec [`ModelProperty`](https://typespec.io/docs/standard-library/reference/js-api/interfaces/modelproperty/) type. It represents a property of a model and has the following key properties:
+  - `flatten`: Indicates if the property can be flattened
   - For array properties:
-    - `arrayEncode`: Indicates the encoding style for array properties (if specified).
+    - `encode`: Indicates the encoding style for array properties (if specified), as an `ArrayKnownEncoding` value.
 
 ### Example types
 
