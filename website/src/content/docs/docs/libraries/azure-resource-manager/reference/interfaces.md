@@ -989,6 +989,24 @@ op Azure.ResourceManager.ArmListBySubscription(apiVersion: string, subscriptionI
 | Response   | Optional. The success response for the list operation     |
 | Error      | Optional. The error response, if non-standard.            |
 
+### `ArmListBySubscriptionScope` {#Azure.ResourceManager.ArmListBySubscriptionScope}
+
+A resource list operation, at the subscription scope, for any resource.
+This template generates a standard resource list operation at the subscription level,
+
+```typespec
+op Azure.ResourceManager.ArmListBySubscriptionScope(apiVersion: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+```
+
+#### Template Parameters
+
+| Name       | Description                                           |
+| ---------- | ----------------------------------------------------- |
+| Resource   | the resource being listed                             |
+| Parameters | Optional. Additional query or header parameters       |
+| Response   | Optional. The success response for the list operation |
+| Error      | Optional. The error response, if non-standard.        |
+
 ### `ArmProviderActionAsync` {#Azure.ResourceManager.ArmProviderActionAsync}
 
 ```typespec
