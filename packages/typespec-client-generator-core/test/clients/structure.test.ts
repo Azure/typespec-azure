@@ -1,6 +1,8 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
+import { createTCGCContext } from "../../src/context.js";
+import { getClient } from "../../src/decorators.js";
 import { InitializedByFlags } from "../../src/interfaces.js";
 import {
   ArmTester,
@@ -3194,4 +3196,51 @@ it("no duplicate clients in getClients() after nested multi-service merge", asyn
   strictEqual(combined.subClients[0].name, "Level1");
   strictEqual(combined.subClients[0].subClients.length, 1);
   strictEqual(combined.subClients[0].subClients[0].name, "Level2");
+});
+
+it("no duplicate subClients when multiple TCGCContexts process same program (lint rule + emitter)", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service(#{ title: "MultiClient" })
+    namespace Client.Structure {}
+
+    @client({
+      name: "FirstClient",
+      service: Client.Structure,
+    })
+    namespace FirstClient {
+      @client
+      interface Group3 {}
+
+      @client
+      interface Group4 {}
+    }
+  `);
+
+  // Simulate the lint rule creating a TCGCContext and calling getClient
+  // (same as require-client-suffix rule does)
+  const lintContext = createTCGCContext(program, "@azure-tools/typespec-client-generator-core", {
+    mutateNamespace: false,
+  });
+  for (const ns of program.getGlobalNamespaceType().namespaces.values()) {
+    getClient(lintContext, ns);
+    for (const iface of ns.interfaces.values()) {
+      getClient(lintContext, iface);
+    }
+  }
+
+  // Now simulate the emitter creating a second context
+  const context = await createSdkContextForTester(program);
+
+  // Root clients should not have duplicate subClients
+  const rootClients = context.getRootClients();
+  strictEqual(rootClients.length, 1);
+  const firstClient = rootClients[0];
+  strictEqual(firstClient.name, "FirstClient");
+  strictEqual(firstClient.subClients.length, 2);
+  deepStrictEqual(firstClient.subClients.map((c) => c.name).sort(), ["Group3", "Group4"]);
+
+  // clientPath should not be double-prepended
+  for (const sub of firstClient.subClients) {
+    strictEqual(sub.clientPath, `FirstClient.${sub.name}`);
+  }
 });
