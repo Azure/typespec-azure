@@ -2121,11 +2121,6 @@ function filterOutTypes(
     if ((sdkType.usage & filter) === 0) {
       continue;
     }
-    // Skip types whose only usage is External and that are not themselves external types.
-    // These are children only reachable through external types and don't need to be generated.
-    if (sdkType.usage === UsageFlags.External && !sdkType.external) {
-      continue;
-    }
     if (!seen.has(sdkType)) {
       seen.add(sdkType);
       result.push(sdkType);
