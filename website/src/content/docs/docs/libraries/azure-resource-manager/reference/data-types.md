@@ -3800,6 +3800,37 @@ model Employee is TrackedResource<EmployeeProperties> {
 | ----------------- | --------------------------------------------------------------------------------------------------- | ----------- |
 | extendedLocation? | [`ExtendedLocationOptional`](./data-types.md#Azure.ResourceManager.Legacy.ExtendedLocationOptional) |             |
 
+### `GenericResource` {#Azure.ResourceManager.Legacy.GenericResource}
+
+A generic Azure Resource Manager resource type that does not require name, key,
+or segment properties on the model itself. The resource type and path information
+comes from the operations (e.g. RoutedOperations).
+
+See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+
+```typespec
+model Azure.ResourceManager.Legacy.GenericResource<Properties, PropertiesOptional>
+```
+
+#### Template Parameters
+
+| Name               | Description                                                                                                                                    |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Properties         | A model containing the provider-specific properties for this resource                                                                          |
+| PropertiesOptional | A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended. |
+
+#### Examples
+
+```typespec
+model MyResource is GenericResource<{}>;
+```
+
+#### Properties
+
+| Name        | Type         | Description |
+| ----------- | ------------ | ----------- |
+| properties? | `Properties` |             |
+
 ### `ManagedServiceIdentityV4` {#Azure.ResourceManager.Legacy.ManagedServiceIdentityV4}
 
 Managed service identity (system assigned and/or user assigned identities)

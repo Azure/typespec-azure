@@ -63,9 +63,11 @@ You MUST complete ALL four steps below. After finishing each step, state: "Step 
 
 **Do not defer work to future runs.** Every gap you find must be fixed in this run. Do not record "remaining gaps" or "future work" in the knowledge base — instead, do the work now. The knowledge base is for lessons learned, not a to-do list.
 
-### Step 1: Read and Understand All Unit Tests
+### Step 1: Read and Understand Unit Tests and Source Code
 
-**This is the learning phase.** Before checking or changing any documentation, read the unit tests to build a complete understanding of how TCGC works.
+**This is the learning phase.** Before checking or changing any documentation, read the unit tests and source code to build a complete understanding of how TCGC works.
+
+#### Unit Tests
 
 The tests in `packages/typespec-client-generator-core/test/` cover two major areas:
 
@@ -79,7 +81,13 @@ By reading the tests, you learn:
 - Edge cases, validation rules, and error conditions
 - How behavior varies depending on TypeSpec patterns (e.g., interface hierarchy → client hierarchy, model inheritance → type inheritance)
 
-**Extract all distinct user scenarios.** Each `describe` block or test group typically represents a scenario. Build a complete list — you will use it in Steps 2 and 3 to verify documentation and Spector coverage.
+#### Source Code
+
+After reading the tests, read the implementation source code in `packages/typespec-client-generator-core/src/`. The unit tests are the quickest way to learn the concrete input→output mappings, but the source code contains the full logic — including conditional behavior, fallback paths, and interactions between features that may not all be covered by individual tests. Use the source code to deepen your understanding of _why_ things work the way the tests show, and to catch scenarios that may only be visible in the implementation.
+
+#### Build Your Scenario List
+
+**Extract all distinct user scenarios** from both unit tests and source code. Each `describe` block or test group typically represents a scenario. Build a complete list — you will use it in Steps 2 and 3 to verify documentation and Spector coverage.
 
 **Include legacy decorators.** Decorators in `lib/legacy.tsp` (the `Azure.ClientGenerator.Core.Legacy` namespace) are still functional and used in production. Read their tests with the same rigor.
 
@@ -106,6 +114,8 @@ For every `<ClientTabs>` block you create or update, invoke @doc-example-generat
 ### Step 3: Audit and Fix Spector Test Coverage
 
 Spector specs must cover all TCGC features — both decorator customizations and baseline type graph mappings. Every distinct usage pattern (e.g., applying a decorator to different target types, using different parameter combinations) needs Spector coverage. You do not need to cover every edge case or corner case — focus on the main usage patterns that users would encounter.
+
+**All decorators need Spector coverage, including non-HTTP decorators.** Decorators that affect client behavior but don't directly involve HTTP operations still need Spector test scenarios. Language emitters use Spector specs to verify their client SDK generation — they need to test that these decorators produce the correct client-side behavior. Create Spector specs for these decorators with a simple HTTP service as a carrier, focusing on demonstrating the decorator's effect on the generated client type graph.
 
 **First, build the gap list.** Inventory existing Spector specs under `packages/azure-http-specs/specs/`, then compare against the scenarios from Step 1. List every uncovered scenario explicitly.
 

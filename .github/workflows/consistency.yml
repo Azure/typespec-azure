@@ -125,7 +125,7 @@ jobs:
       - run: pnpm install
         name: Install dependencies
 
-      - run: pnpm run check-version-mismatch
+      - run: pnpm deps check
         name: Check catalog is in sync
 
   # Verify Arm OpenAPI common types are up to date

@@ -1,10 +1,12 @@
 import "@typespec/versioning";
 import "@typespec/http";
 import "@typespec/spector";
+import "@azure-tools/typespec-client-generator-core";
 
 using Versioning;
 using Http;
 using Spector;
+using Azure.ClientGenerator.Core;
 
 namespace Service.MultipleServices;
 
@@ -20,6 +22,7 @@ namespace ServiceA {
     av2,
   }
 
+  @clientName("AOperations", "java")
   interface Operations {
     @scenario
     @scenarioDoc("""
@@ -34,6 +37,7 @@ namespace ServiceA {
     opA(@query("api-version") apiVersion: VersionsA): void;
   }
 
+  @clientName("ASubNamespace", "java")
   namespace SubNamespace {
     @scenario
     @scenarioDoc("""
@@ -61,6 +65,7 @@ namespace ServiceB {
     bv2,
   }
 
+  @clientName("BOperations", "java")
   interface Operations {
     @scenario
     @scenarioDoc("""
@@ -75,6 +80,7 @@ namespace ServiceB {
     opB(@query("api-version") apiVersion: VersionsB): void;
   }
 
+  @clientName("BSubNamespace", "java")
   namespace SubNamespace {
     @scenario
     @scenarioDoc("""
