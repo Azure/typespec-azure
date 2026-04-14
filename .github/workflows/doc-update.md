@@ -87,7 +87,8 @@ network:
 safe-outputs:
   create-pull-request:
     title-prefix: "[Automated][${{ github.event.inputs.config }}] "
-    labels: [documentation, automated]
+    labels: [docs, "lib:${{ github.event.inputs.config }}"]
+    max: 1
 
 post-steps:
   - name: Validate file scope
@@ -168,6 +169,7 @@ been pre-computed and is available in `/tmp/gh-aw/agent/context.json`.
 - **Complete every step in the domain-specific prompt.** Do not stop after finishing one step. After each step, explicitly state which step you just completed and which step you are starting next. Continue until all steps are done.
 - **Do not defer work.** Fix every issue you find in this run. Do not leave "remaining gaps" or "future work" in the knowledge base or PR description — the knowledge base is for lessons learned, not a to-do list.
 - **Update the knowledge base** at `knowledgePath` as you work (see Knowledge Base Rules below).
+- **Create exactly one pull request at the very end.** Complete ALL file edits across ALL steps first, then create a single pull request that contains every change. Do NOT call `create_pull_request` after each step or file — batch everything into one PR.
 
 ## Knowledge Base Rules
 
