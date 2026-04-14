@@ -99,6 +99,19 @@ Normalizing version decoration consists of removing redundant decorators and fol
     nowOptional?: string;
   ```
 
+## `@madeRequired(T, u)` decorator
+
+- Based on the version referenced in the decorator, determine the immediate successor version `u + 1`
+- If version `u + 1` does not exist (the version argument is the last version) then this version will not be deleted
+- If there is one or more `@madeRequired` decorators referencing the immediate successor version, remove them.
+- Change `@madeRequired(T, u)` to `@madeRequired(T, u + 1)`
+
+  ```diff lang=tsp
+  - @madeRequired(Versions.`2025-10-01-preview`)
+  + @madeRequired(Versions.`2025-11-01`)
+    nowRequired: string;
+  ```
+
 ## `@added(T, u)` decorator
 
 - Based on the version referenced in the decorator, determine the immediate successor version `u + 1`

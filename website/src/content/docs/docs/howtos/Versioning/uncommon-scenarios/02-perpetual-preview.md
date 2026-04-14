@@ -1,10 +1,10 @@
 ---
-title: "ARM: Managing a Single Active Preview with Perpetual Preview Features"
+title: "ARM: Managing a Single Active Preview When Some Features Always Remain in Preview"
 llmstxt: true
 ---
 
 :::note
-This document applies specifically to **Azure Resource Manager (ARM) APIs**. Data plane services should follow the [general versioning guidance](../01-about-versioning.md).
+This document applies specifically to **Azure Resource Manager (ARM) APIs**. Data plane services should not allow versions to remain in preview across stable releases.
 :::
 
 For some Resource Providers, whenever a new stable version is released, a new preview version is created, because some preview features are not ready to be stable, but may become stable in a future version. To accommodate this need and account for the limitations of breaking change checks, which require a single version change for any PR into the rest-api-specs repo, the recommended solution is to introduce a stable and subsequent preview _together_ in your TypeSpec API description and then split this change into two PRs: one representing the new stable and the second representing the subsequent preview. This involves the following steps described in the sections below:
@@ -80,7 +80,7 @@ For some Resource Providers, whenever a new stable version is released, a new pr
     newName: int32;
   ```
 
-- Add any new type changes to stable version (A + 1) and decorate appropriately, as shown in the [versioning guide](../06-evolving-apis.md). Note that these changes should also appear in the new preview (A + 2)
+- Add any new type changes to stable version (A + 1) and decorate appropriately, as shown in the [versioning guide](../06-evolving-apis.md). Note that these changes will also appear in the new preview (A + 2)
 - Remove version `A` from the versions enumeration
 
   ```diff lang=tsp

@@ -129,16 +129,14 @@ interface Employees {
 interface Widgets {
   getWidget is Operations.ResourceRead<
     Widget,
-    Traits = {
-      parameters: {
-        @query
-        name: string;
+    QueryParametersTrait<{
+      @query
+      name: string;
 
-        @added(Versions.v2)
-        @query
-        department?: string;
-      };
-    }
+      @added(Versions.v2)
+      @query
+      department?: string;
+    }>
   >;
 }
 ```
@@ -229,12 +227,10 @@ interface Employees {
 interface Widgets {
   listWidgets is Operations.ResourceList<
     Widget,
-    Traits = {
-      parameters: {
-        @header
-        location: string;
-      };
-    }
+    RequestHeadersTrait<{
+      @header
+      location: string;
+    }>
   >;
 }
 ```
@@ -272,17 +268,16 @@ interface Employees {
 interface Widgets {
   listWidgets is Operations.ResourceList<
     Widget,
-    Traits = {
-      parameters: {
-        @madeOptional(Versions.v2)
-        @header
-        location?: string;
-
+    RequestHeadersTrait<{
+      @madeOptional(Versions.v2)
+      @header
+      location?: string;
+    }> &
+      QueryParametersTrait<{
         @added(Versions.v2)
         @query("order-by")
         orderBy?: string;
-      };
-    }
+      }>
   >;
 }
 ```
@@ -343,7 +338,11 @@ interface Widgets {
   createOrReplaceWidgetV1 is Operations.ResourceCreateOrReplace<Widget>;
 
   @added(Versions.v2)
+  getWidgetOperationStatus is Operations.GetResourceOperationStatus<Widget, never>;
+
+  @added(Versions.v2)
   @sharedRoute
+  @pollingOperation(Widgets.getWidgetOperationStatus)
   createOrReplaceWidget is Operations.LongRunningResourceCreateOrReplace<Widget>;
 }
 ```
@@ -354,6 +353,7 @@ interface Widgets {
 - `@renamedFrom(Versions.v2, "createOrUpdate")` keeps the original name for v1.
 - `@added(Versions.v2)` adds the new asynchronous operation in v2 and later.
 - `@sharedRoute` ensures both operations can use the same route.
+- `@pollingOperation` links the long-running operation to its status monitor endpoint (data-plane only).
 
 ## Versioning Decorators
 

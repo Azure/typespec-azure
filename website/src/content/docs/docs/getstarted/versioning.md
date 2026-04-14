@@ -109,16 +109,14 @@ interface Employees {
 interface Widgets {
   getWidget is Operations.ResourceRead<
     Widget,
-    Traits = {
-      parameters: {
-        @query
-        name: string;
+    QueryParametersTrait<{
+      @query
+      name: string;
 
-        @added(Versions.v2)
-        @query
-        department?: string;
-      };
-    }
+      @added(Versions.v2)
+      @query
+      department?: string;
+    }>
   >;
 }
 ```
