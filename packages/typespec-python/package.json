@@ -1,0 +1,109 @@
+{
+  "name": "@azure-tools/typespec-python",
+  "version": "0.61.2",
+  "author": "Microsoft Corporation",
+  "description": "TypeSpec emitter for Python SDKs",
+  "homepage": "https://azure.github.io/typespec-azure",
+  "readme": "https://github.com/Azure/typespec-azure/blob/main/packages/typespec-python/README.md",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Azure/typespec-azure.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Azure/typespec-azure/issues"
+  },
+  "keywords": [
+    "typespec"
+  ],
+  "type": "module",
+  "main": "dist/src/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    }
+  },
+  "tspMain": "dist/src/index.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "clean": "rimraf ./dist ./temp ./venv ./node_modules",
+    "build": "tsc -p .",
+    "watch": "tsc -p . --watch",
+    "install": "tsx ./eng/scripts/setup/run-python3.ts ./eng/scripts/setup/install.py",
+    "prepare": "tsx ./eng/scripts/setup/run-python3.ts ./eng/scripts/setup/prepare.py",
+    "lint": "tsx ./eng/scripts/ci/lint.ts",
+    "lint:fix": "eslint . --fix --ext .ts",
+    "format": "tsx ./eng/scripts/ci/format.ts",
+    "format:check": "tsx ./eng/scripts/ci/format.ts --check",
+    "regenerate": "tsx ./eng/scripts/regenerate.ts",
+    "test": "tsx ./eng/scripts/ci/run-tests.ts",
+    "regen-docs": "npm run build && tspd doc . --enable-experimental --output-dir ./website/src/content/docs/docs/emitters/clients/typespec-python/reference --skip-js"
+  },
+  "files": [
+    "dist/**",
+    "!dist/tests/**",
+    "eng/scripts/setup/**",
+    "generator/**"
+  ],
+  "peerDependencies": {
+    "@azure-tools/typespec-autorest": "workspace:^",
+    "@azure-tools/typespec-azure-core": "workspace:^",
+    "@azure-tools/typespec-azure-resource-manager": "workspace:^",
+    "@azure-tools/typespec-azure-rulesets": "workspace:^",
+    "@azure-tools/typespec-client-generator-core": "workspace:^",
+    "@typespec/compiler": "workspace:^",
+    "@typespec/events": "workspace:^",
+    "@typespec/http": "workspace:^",
+    "@typespec/openapi": "workspace:^",
+    "@typespec/rest": "workspace:^",
+    "@typespec/sse": "workspace:^",
+    "@typespec/streams": "workspace:^",
+    "@typespec/versioning": "workspace:^",
+    "@typespec/xml": "workspace:^"
+  },
+  "dependencies": {
+    "@typespec/http-client-python": "^0.28.3",
+    "fs-extra": "~11.2.0",
+    "js-yaml": "~4.1.0",
+    "semver": "catalog:",
+    "tsx": "catalog:"
+  },
+  "devDependencies": {
+    "@azure-tools/azure-http-specs": "workspace:^",
+    "@azure-tools/typespec-autorest": "workspace:^",
+    "@azure-tools/typespec-azure-core": "workspace:^",
+    "@azure-tools/typespec-azure-resource-manager": "workspace:^",
+    "@azure-tools/typespec-azure-rulesets": "workspace:^",
+    "@azure-tools/typespec-client-generator-core": "workspace:^",
+    "@eslint/js": "catalog:",
+    "@types/fs-extra": "11.0.4",
+    "@types/js-yaml": "~4.0.5",
+    "@types/node": "catalog:",
+    "@types/semver": "catalog:",
+    "@types/yargs": "catalog:",
+    "@typespec/compiler": "workspace:^",
+    "@typespec/events": "workspace:^",
+    "@typespec/http": "workspace:^",
+    "@typespec/http-specs": "workspace:^",
+    "@typespec/openapi": "workspace:^",
+    "@typespec/rest": "workspace:^",
+    "@typespec/spec-api": "workspace:^",
+    "@typespec/spector": "workspace:^",
+    "@typespec/sse": "workspace:^",
+    "@typespec/streams": "workspace:^",
+    "@typespec/tspd": "workspace:^",
+    "@typespec/versioning": "workspace:^",
+    "@typespec/xml": "workspace:^",
+    "c8": "catalog:",
+    "eslint": "catalog:",
+    "picocolors": "catalog:",
+    "prettier": "catalog:",
+    "rimraf": "catalog:",
+    "typescript": "catalog:",
+    "typescript-eslint": "catalog:",
+    "vitest": "catalog:"
+  }
+}
