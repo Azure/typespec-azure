@@ -8,6 +8,7 @@ emit:
 options:
   "@azure-tools/typespec-autorest":
     output-file: "data-plane/{service-name}/{version-status}/{version}/openapi.json"
+    skip-example-copying: true
   "@azure-tools/typespec-python":    
     emitter-output-dir: "{output-dir}/{service-dir}/azure-contoso"
     namespace: azure.contoso 
