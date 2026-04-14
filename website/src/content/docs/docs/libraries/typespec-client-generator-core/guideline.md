@@ -87,6 +87,9 @@ Most TCGC types share the following common properties:
 - **`access`**: Indicates whether the type has public or private accessibility.
 - **`usage`**: Indicates the type's usage information; its value is a bitmap of [`UsageFlags`](../reference/js-api/enumerations/usageflags/) enumeration.
 - **`deprecation`**: Indicates whether the type is deprecated and provides the deprecation message.
+
+Properties and parameters (types extending [`SdkModelPropertyTypeBase`](../reference/js-api/interfaces/sdkmodelpropertytypebase/)) additionally share:
+
 - **`clientDefaultValue`**: The type's default value if provided. Set via the `@clientDefaultValue` decorator or auto-set for endpoint and API version parameters.
 
 ### Package
@@ -143,13 +146,13 @@ TCGC supports four kinds of methods: [`SdkBasicServiceMethod`](../reference/js-a
 
 `SdkBasicServiceMethod.parameters` is the method's input. Its type [`SdkMethodParameter`](../reference/js-api/interfaces/sdkmethodparameter/) contains the type of the parameter along with some attributes of the parameter.
 
-`SdkBasicServiceMethod.response` is the method's normal response while `SdkBasicServiceMethod.exceptions` contains the method's error responses.
+`SdkBasicServiceMethod.response` is the method's normal response while `SdkBasicServiceMethod.exception` contains the method's error response.
 
-**SdkPagingServiceMethod** is a paging method that has pageable responses. It extends `SdkBasicServiceMethod` and contains extra paging information.
+**SdkPagingServiceMethod** is a paging method that has pageable responses. It shares the same base properties as `SdkBasicServiceMethod` and contains extra paging information.
 
-**SdkLroServiceMethod** is an LRO method that calls a long-running server-side API. It extends `SdkBasicServiceMethod` and contains extra LRO information.
+**SdkLroServiceMethod** is an LRO method that calls a long-running server-side API. It shares the same base properties as `SdkBasicServiceMethod` and contains extra LRO information.
 
-**SdkLroPagingServiceMethod** is an LRO method that calls a long-running server-side API and has pageable responses. It extends `SdkBasicServiceMethod`, `SdkPagingServiceMethod` and `SdkLroServiceMethod`.
+**SdkLroPagingServiceMethod** is an LRO method that calls a long-running server-side API and has pageable responses. It shares the same base properties as `SdkBasicServiceMethod` and contains both the LRO information from `SdkLroServiceMethod` and the paging information from `SdkPagingServiceMethod`.
 
 ### Operation
 
@@ -196,20 +199,23 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 
 **Model Types:**
 
-- [`SdkModelType`](../reference/js-api/interfaces/sdkmodeltype/) represents a TCGC model type. It is typically converted from a TypeSpec [`Model`](https://typespec.io/docs/language-basics/models/) type.
-
-**Model Property Types:**
-
-- [`SdkModelPropertyType`](../reference/js-api/interfaces/sdkmodelpropertytype/) represents a TCGC model property type. It is typically converted from a TypeSpec [`ModelProperty`](https://typespec.io/docs/standard-library/reference/js-api/interfaces/modelproperty/) type. It represents a property of a model and has the following key properties:
-  - `flatten`: Indicates if the property can be flattened
+- [`SdkModelType`](../reference/js-api/interfaces/sdkmodeltype/) represents a TCGC model type. It is typically converted from a TypeSpec [`Model`](https://typespec.io/docs/language-basics/models/) type. It has the following key properties:
   - `additionalProperties`: Indicates if the model can accept additional properties with a specific type
+  - `baseModel`: The base model type, if this model inherits from another model
+  - `serializationOptions`: Contains serialization configuration for different wire formats (JSON, XML, multipart, binary)
   - For discriminated models:
     - `discriminatorProperty`: The property used as a discriminator
     - `discriminatedSubtypes`: List of all subtypes of this discriminated model
   - For subtypes of discriminated models:
     - `discriminatorValue`: The instance value for the discriminator for this subtype
-  - For array properties:
-    - `arrayEncode`: Indicates the encoding style for array properties (if specified).
+
+**Model Property Types:**
+
+- [`SdkModelPropertyType`](../reference/js-api/interfaces/sdkmodelpropertytype/) represents a TCGC model property type. It is typically converted from a TypeSpec [`ModelProperty`](https://typespec.io/docs/standard-library/reference/js-api/interfaces/modelproperty/) type. It represents a property of a model and has the following key properties:
+  - `flatten`: Indicates if the property can be flattened
+  - `discriminator`: Indicates if this property is the discriminator of its model
+  - `serializationOptions`: Contains serialization configuration for different wire formats (JSON, XML, multipart, binary)
+  - `encode`: Indicates the encoding style for array properties (if specified)
 
 ### Example types
 
@@ -251,9 +257,9 @@ Normally, a client's initialization parameters include:
 
 4. **Subscription ID parameter**: If the service is an ARM service, then the subscription ID parameter on method is elevated to client.
 
-The client's initialization way is `undefined`. Emitters can choose how to initialize all the clients.
+The client's initialization way is `InitializedByFlags.Default`. Emitters can choose how to initialize all the clients.
 
-With `@clientInitialization` decorator, the default behavior may change. New client-level parameters are added. Client initialization way can be specified with initializing by parent client, initializing individually or both.
+With `@clientInitialization` decorator, the default behavior may change. New client-level parameters are added. Client initialization way can be specified with initializing by parent client, initializing individually, both, or `CustomizeCode` to indicate that the client initialization should be omitted from generated code and handled manually in custom code.
 
 ### Method Detection
 
