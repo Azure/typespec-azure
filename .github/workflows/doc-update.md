@@ -74,7 +74,6 @@ steps:
 tools:
   edit:
   bash: true
-  glob: true
 
 network:
   allowed:
@@ -88,7 +87,8 @@ network:
 safe-outputs:
   create-pull-request:
     title-prefix: "[Automated][${{ github.event.inputs.config }}] "
-    labels: [documentation, automated]
+    labels: [docs, "lib:${{ github.event.inputs.config }}"]
+    max: 1
 
 post-steps:
   - name: Validate file scope
@@ -164,10 +164,12 @@ been pre-computed and is available in `/tmp/gh-aw/agent/context.json`.
 
 ## Important Rules
 
+- **Use sub-agents as much as possible.** Your main context window is limited — offload all reading, investigation, and editing work to sub-agents to prevent context loss. Only keep high-level coordination state in your own context. When in doubt, use a sub-agent.
 - **Only modify files** whose paths start with one of the `allowedPaths` entries.
 - **Complete every step in the domain-specific prompt.** Do not stop after finishing one step. After each step, explicitly state which step you just completed and which step you are starting next. Continue until all steps are done.
 - **Do not defer work.** Fix every issue you find in this run. Do not leave "remaining gaps" or "future work" in the knowledge base or PR description — the knowledge base is for lessons learned, not a to-do list.
 - **Update the knowledge base** at `knowledgePath` as you work (see Knowledge Base Rules below).
+- **Create exactly one pull request at the very end.** Complete ALL file edits across ALL steps first, then create a single pull request that contains every change. Do NOT call `create_pull_request` after each step or file — batch everything into one PR.
 
 ## Knowledge Base Rules
 
@@ -182,14 +184,8 @@ After updating the knowledge base, run `pnpm format:dir <knowledgePath>` to form
 
 ## Incremental Mode
 
-When `mode` is `"incremental"`, the `changes.commits` array contains pre-extracted
-unified diffs for each commit that changed the source code since the last update.
-Analyze these diffs to understand what changed, then update only the documentation
-pages affected by those changes.
+When `mode` is `"incremental"`, the `changes.commits` array contains pre-extracted unified diffs for each commit that changed the source code since the last update. Analyze these diffs to understand what changed, then update only the documentation pages affected by those changes.
 
 ## Feedback Processing
 
-When `feedback` is present, humans modified the previous doc-update PR before
-merging it. The `feedback.humanCommitDiffs` array contains the code diffs from
-their commits. Study these diffs to understand what they corrected, then update
-the knowledge base so future runs don't repeat the same mistakes.
+When `feedback` is present, humans modified the previous doc-update PR before merging it. The `feedback.humanCommitDiffs` array contains the code diffs from their commits. Study these diffs to understand what they corrected, then update the knowledge base so future runs don't repeat the same mistakes.

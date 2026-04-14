@@ -218,3 +218,6 @@ packages/samples/test/output/azure/templates-contoso/setup.*
 .last-run.json
 
 .pnpm-store/
+
+# Turborepo
+.turbo
