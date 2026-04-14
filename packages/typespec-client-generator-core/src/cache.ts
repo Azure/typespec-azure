@@ -210,7 +210,9 @@ function getRootClients(context: TCGCContext): ClientCreationResult {
         if (parentClient) {
           client.parent = parentClient;
           client.clientPath = `${client.parent.name}.${client.clientPath}`;
-          parentClient.subClients.push(client);
+          if (!parentClient.subClients.includes(client)) {
+            parentClient.subClients.push(client);
+          }
           break;
         }
         parentClientType = parentClientType.namespace;

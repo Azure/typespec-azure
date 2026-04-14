@@ -3102,3 +3102,96 @@ it("validation: @clientLocation string target with multiple separate root client
     },
   ]);
 });
+
+it("no duplicate clients in getClients() after multi-service sub-client merge", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    namespace ServiceA {
+      interface SubGroup {
+        @route("/a") @post a(): void;
+      }
+    }
+
+    @service
+    namespace ServiceB {
+      interface SubGroup {
+        @route("/b") @post b(): void;
+      }
+    }
+
+    @client({
+      service: [ServiceA, ServiceB],
+      autoMergeService: true,
+    })
+    namespace Combined {}
+  `);
+  const context = await createSdkContextForTester(program);
+
+  // getClients() should not return duplicate entries
+  const allClients = context.getClients();
+  const uniqueClients = new Set(allClients);
+  strictEqual(allClients.length, uniqueClients.size);
+  strictEqual(allClients.length, 2); // Combined + SubGroup
+
+  // Root clients should also be unique
+  const rootClients = context.getRootClients();
+  const uniqueRootClients = new Set(rootClients);
+  strictEqual(rootClients.length, uniqueRootClients.size);
+  strictEqual(rootClients.length, 1); // Combined
+
+  // SubClients should have no duplicates
+  const combined = rootClients[0];
+  strictEqual(combined.name, "Combined");
+  strictEqual(combined.subClients.length, 1);
+  strictEqual(combined.subClients[0].name, "SubGroup");
+
+  // SdkClientType children should have no duplicates
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  strictEqual(sdkPackage.clients[0].children?.length, 1);
+  strictEqual(sdkPackage.clients[0].children![0].name, "SubGroup");
+});
+
+it("no duplicate clients in getClients() after nested multi-service merge", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    namespace ServiceA {
+      namespace Level1 {
+        interface Level2 {
+          @route("/a") @post a(): void;
+        }
+      }
+    }
+
+    @service
+    namespace ServiceB {
+      namespace Level1 {
+        interface Level2 {
+          @route("/b") @post b(): void;
+        }
+      }
+    }
+
+    @client({
+      service: [ServiceA, ServiceB],
+      autoMergeService: true,
+    })
+    namespace Combined {}
+  `);
+  const context = await createSdkContextForTester(program);
+
+  // getClients() should not return duplicate entries
+  const allClients = context.getClients();
+  const uniqueClients = new Set(allClients);
+  strictEqual(allClients.length, uniqueClients.size);
+  strictEqual(allClients.length, 3); // Combined + Level1 + Level2
+
+  // SubClients hierarchy should have no duplicates
+  const rootClients = context.getRootClients();
+  strictEqual(rootClients.length, 1);
+  const combined = rootClients[0];
+  strictEqual(combined.subClients.length, 1);
+  strictEqual(combined.subClients[0].name, "Level1");
+  strictEqual(combined.subClients[0].subClients.length, 1);
+  strictEqual(combined.subClients[0].subClients[0].name, "Level2");
+});
