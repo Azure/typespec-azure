@@ -56,7 +56,6 @@
     "@azure-tools/typespec-azure-resource-manager": "workspace:^",
     "@azure-tools/typespec-azure-rulesets": "workspace:^",
     "@azure-tools/typespec-client-generator-core": "workspace:^",
-    "@emotion/react": "catalog:",
     "@fluentui/react-components": "catalog:",
     "@fluentui/react-icons": "catalog:",
     "@typespec/compiler": "workspace:^",

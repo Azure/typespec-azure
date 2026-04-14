@@ -46,7 +46,6 @@
     "@azure-tools/typespec-autorest": "workspace:^",
     "@azure-tools/typespec-azure-resource-manager": "workspace:^",
     "@azure-tools/typespec-client-generator-core": "workspace:^",
-    "@types/multer": "catalog:",
     "@types/node": "catalog:",
     "@typespec/openapi": "workspace:^",
     "@typespec/openapi3": "workspace:^",

@@ -59,23 +59,34 @@ function extractParameters(
   return params;
 }
 
-interface EmitterRegistration {
-  language: string;
-  parser: LanguageParser;
-}
+/**
+ * Heuristic patterns used to infer a normalized language key from an emitter
+ * package name.
+ *
+ * Order matters: more specific patterns (e.g. "typescript") must precede
+ * shorter ones (e.g. "java") to avoid false positives ("javascript" matching
+ * "java").
+ */
+const LANGUAGE_HEURISTICS: Array<[RegExp, string]> = [
+  [/csharp/i, "csharp"],
+  [/python/i, "python"],
+  [/typescript/i, "typescript"],
+  [/\bts\b/i, "typescript"],
+  [/javascript/i, "javascript"],
+  [/java(?!script)/i, "java"],
+  [/\brust\b/i, "rust"],
+  [/\bswift\b/i, "swift"],
+  [/\bgo\b/i, "go"],
+];
 
-const EMITTER_REGISTRY: Record<string, EmitterRegistration> = {
-  "@azure-tools/typespec-csharp": { language: "csharp", parser: parseCSharp },
-  "@azure-tools/typespec-java": { language: "java", parser: parseJava },
-  "@azure-tools/typespec-python": { language: "python", parser: parsePython },
-  "@azure-tools/typespec-ts": { language: "typescript", parser: parseTypeScript },
-  "@azure-tools/typespec-go": { language: "go", parser: parseGo },
-  "@azure-tools/typespec-rust": { language: "rust", parser: parseRust },
-  "@azure-typespec/http-client-csharp": { language: "http-client-csharp", parser: parseCSharp },
-  "@azure-typespec/http-client-csharp-mgmt": {
-    language: "http-client-csharp-mgmt",
-    parser: parseCSharp,
-  },
+/** Maps a normalized language key to its parser so heuristic matches can reuse language-specific logic. */
+const LANGUAGE_PARSERS: Record<string, LanguageParser> = {
+  csharp: parseCSharp,
+  java: parseJava,
+  python: parsePython,
+  typescript: parseTypeScript,
+  go: parseGo,
+  rust: parseRust,
 };
 
 interface LanguageParserResult {
@@ -300,7 +311,7 @@ function parseRust(
 }
 
 export interface LanguageCollectionResult {
-  languages: Record<string, LanguagePackageMetadata>;
+  languages: Record<string, LanguagePackageMetadata[]>;
   sourceConfigPath?: string;
 }
 
@@ -469,8 +480,8 @@ export function buildLanguageMetadata(
   params: Record<string, unknown>,
   baseOutputDir: string,
   defaultServiceDir?: string,
-): Record<string, LanguagePackageMetadata> {
-  const languagesDict: Record<string, LanguagePackageMetadata> = {};
+): Record<string, LanguagePackageMetadata[]> {
+  const languagesDict: Record<string, LanguagePackageMetadata[]> = {};
 
   for (const [emitterName, emitterOptions] of Object.entries(optionMap)) {
     const metadata = createLanguageMetadata(
@@ -481,7 +492,10 @@ export function buildLanguageMetadata(
       defaultServiceDir,
     );
     const language = inferLanguageFromEmitterName(emitterName);
-    languagesDict[language] = metadata;
+    if (!languagesDict[language]) {
+      languagesDict[language] = [];
+    }
+    languagesDict[language].push(metadata);
   }
 
   return languagesDict;
@@ -509,11 +523,11 @@ function createLanguageMetadata(
   let packageName: string | undefined;
   let namespace: string | undefined;
 
-  const normalizedEmitterName = emitterName.toLowerCase();
-  const registration = EMITTER_REGISTRY[normalizedEmitterName];
-
-  if (registration) {
-    const result = registration.parser(normalizedOptions, params);
+  // Use heuristic language match to pick a language-specific parser
+  const heuristicLang = inferLanguageFromEmitterName(emitterName);
+  const heuristicParser = LANGUAGE_PARSERS[heuristicLang];
+  if (heuristicParser) {
+    const result = heuristicParser(normalizedOptions, params);
     packageName = result.packageName;
     namespace = result.namespace;
   } else {
@@ -591,12 +605,15 @@ function normalizeKey(key: string): string {
 
 export function inferLanguageFromEmitterName(emitterName: string): string {
   const normalized = emitterName.toLowerCase();
-  const registration = EMITTER_REGISTRY[normalized];
-  if (registration) {
-    return registration.language;
+
+  // Heuristic: scan the emitter name for known language keywords
+  for (const [pattern, language] of LANGUAGE_HEURISTICS) {
+    if (pattern.test(normalized)) {
+      return language;
+    }
   }
 
-  return emitterName;
+  return "unknown";
 }
 
 function trimOrUndefined(value: string | undefined): string | undefined {
