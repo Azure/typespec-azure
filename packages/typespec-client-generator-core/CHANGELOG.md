@@ -5,7 +5,7 @@
 ### Bug Fixes
 
 - [#4234](https://github.com/Azure/typespec-azure/pull/4234) Fix `@apiVersion(false)` decorator being ignored by `isOnClient()` logic when other operations have api-version elevated to client.
-- [#4253](https://github.com/Azure/typespec-azure/pull/4253) Fix duplicate client entries returned by `getClients()` and `getRootClients()` when multi-service sub-clients are merged via `autoMergeService`.
+- [#4253](https://github.com/Azure/typespec-azure/pull/4253) Fix duplicate client entries when calling `createSdkContext` multiple times or merging sub clients with same name in multiple service cases.
 - [#4235](https://github.com/Azure/typespec-azure/pull/4235) Fix readonly property usage propagation: properly strip Input flag from combined usage values for readonly properties, and fix ignoreSubTypeStack imbalance when skipping readonly properties.
 
 
