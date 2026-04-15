@@ -2709,14 +2709,8 @@ public final class Widget {
 </ClientTabItem>
 <ClientTabItem lang="go">
 
-The model declaration is the same. During deserialization, if the service returns `""` for `Description` or `WebsiteURL`, the SDK deserializes it as `nil`.
-
 ```go
-type Widget struct {
-    Name        *string
-    Description *string  // "" from service → nil
-    WebsiteURL  *string  // "" from service → nil
-}
+// NOT_SUPPORTED
 ```
 
 </ClientTabItem>

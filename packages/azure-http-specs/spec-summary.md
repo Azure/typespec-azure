@@ -227,6 +227,18 @@ Expected response body:
 }
 ```
 
+### Azure_ClientGenerator_Core_ClientDoc_Documentation
+
+- Endpoint: `post /azure/client-generator-core/client-doc/harvest`
+
+This scenario tests the @clientDoc decorator which overrides documentation for types in client libraries.
+The 'Plant' model has a base doc from TypeSpec and additional client-specific documentation appended via @clientDoc in append mode.
+The 'harvest' operation has its documentation completely replaced by @clientDoc in replace mode.
+
+Expected calls:
+
+- POST /azure/client-generator-core/client-doc/harvest -> 200 with Plant body
+
 ### Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_HeaderParam
 
 - Endpoints:
@@ -1204,6 +1216,20 @@ param1: param1
 param2: param2
 
 Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_ResponseAsBool_HeadAsBoolean
+
+- Endpoints:
+  - `head /azure/client-generator-core/response-as-bool/exists`
+  - `head /azure/client-generator-core/response-as-bool/exists/not`
+
+Test that a HEAD operation decorated with @responseAsBool returns a boolean.
+A successful (2xx) response should return true, and a 404 response should return false.
+
+Expected calls:
+
+- HEAD /azure/client-generator-core/response-as-bool/exists?name=exists-resource -> 200 (returns true)
+- HEAD /azure/client-generator-core/response-as-bool/exists?name=not-exists-resource -> 404 (returns false)
 
 ### Azure_ClientGenerator_Core_Usage_ModelInOperation
 

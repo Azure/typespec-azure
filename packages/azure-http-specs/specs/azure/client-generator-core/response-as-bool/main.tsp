@@ -19,11 +19,17 @@ model Resource {
   A successful (2xx) response should return true, and a 404 response should return false.
   
   Expected calls:
-  - HEAD /azure/client-generator-core/response-as-bool/exists -> 200 (returns true)
+  - HEAD /azure/client-generator-core/response-as-bool/exists?name=exists-resource -> 200 (returns true)
+  - HEAD /azure/client-generator-core/response-as-bool/exists?name=not-exists-resource -> 404 (returns false)
   """)
 @route("/exists")
 namespace HeadAsBoolean {
   @global.Azure.ClientGenerator.Core.responseAsBool
   @head
   op exists(@query name: string): void;
+
+  @global.Azure.ClientGenerator.Core.responseAsBool
+  @head
+  @route("/not")
+  op notExists(@query name: string): void;
 }
