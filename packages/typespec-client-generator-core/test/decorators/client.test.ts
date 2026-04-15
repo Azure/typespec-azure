@@ -1512,3 +1512,100 @@ it("operations under namespace or interface without @client or @operationGroup",
   const operationGroup = operationGroups[0];
   strictEqual(listOperationsInClient(context, operationGroup).length, 1);
 });
+
+it("nested interfaces in @client namespace should have operations flattened to client", async () => {
+  // When a namespace has @client decorator and contains nested interfaces (without @client or @operationGroup),
+  // the operations from those interfaces should be treated as mixin operations on the parent client,
+  // not as sub-clients or operation groups.
+  const { program } = await SimpleTester.compile(`
+    @service
+    namespace MyService;
+
+    @client({name: "SearchClient", service: MyService})
+    namespace SearchClient {
+      interface Documents {
+        @route("/documents/count")
+        op count(): int32;
+
+        @route("/documents/search")
+        op search(): string;
+      }
+
+      interface Indexing {
+        @route("/documents/index")
+        op index(): void;
+      }
+    }
+  `);
+
+  const context = await createSdkContextForTester(program);
+  const clients = listClients(context);
+  strictEqual(clients.length, 1);
+  const client = clients[0];
+  strictEqual(client.name, "SearchClient");
+
+  // The operations from nested interfaces (Documents and Indexing) should be flattened into the client
+  const operations = listOperationsInClient(context, client);
+  deepStrictEqual(
+    operations.map((x) => x.name),
+    ["count", "search", "index"],
+  );
+
+  // There should be no sub-clients created from the interfaces
+  const subClients = listSubClients(context, client);
+  strictEqual(subClients.length, 0);
+});
+
+it("nested interfaces with @operationGroup should NOT be flattened", async () => {
+  // When an interface inside a @client namespace has @operationGroup decorator,
+  // it should remain a separate sub-client, not be flattened
+  const { program } = await SimpleTester.compile(`
+    @service
+    namespace MyService;
+
+    @client({name: "SearchClient", service: MyService})
+    namespace SearchClient {
+      @route("/root")
+      op rootOp(): void;
+
+      // This interface does NOT have @operationGroup, so it should be flattened
+      interface Documents {
+        @route("/documents/count")
+        op count(): int32;
+      }
+
+      // This interface HAS @operationGroup decorator, so it should be a sub-client
+      @operationGroup
+      interface Indexer {
+        @route("/indexer/run")
+        op run(): void;
+      }
+    }
+  `);
+
+  const context = await createSdkContextForTester(program);
+  const clients = listClients(context);
+  strictEqual(clients.length, 1);
+
+  const searchClient = clients[0];
+  strictEqual(searchClient.name, "SearchClient");
+
+  // The rootOp and count should be flattened into SearchClient
+  // but run should NOT be flattened (it's in an @operationGroup)
+  const operations = listOperationsInClient(context, searchClient);
+  deepStrictEqual(
+    operations.map((x) => x.name),
+    ["rootOp", "count"],
+  );
+
+  // Indexer should be a sub-client
+  const subClients = listSubClients(context, searchClient);
+  strictEqual(subClients.length, 1);
+  strictEqual(subClients[0].name, "Indexer");
+
+  const indexerOps = listOperationsInClient(context, subClients[0]);
+  deepStrictEqual(
+    indexerOps.map((x) => x.name),
+    ["run"],
+  );
+});

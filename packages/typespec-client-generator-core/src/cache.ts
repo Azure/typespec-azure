@@ -89,6 +89,19 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
     } else if (client.type) {
       // single-service client or sub client
       operations.push(...client.type.operations.values());
+
+      // For explicit clients with namespace type, also include operations from nested interfaces
+      // that don't have their own @client decorator. This allows interfaces to be used for
+      // organizing operations without creating sub-clients.
+      if (context.__explicitClients!.has(client) && client.type.kind === "Namespace") {
+        for (const iface of client.type.interfaces.values()) {
+          // Skip interfaces that have @client decorator (they are explicit clients themselves)
+          const hasClientDecorator = context.program.stateMap(clientKey).get(iface);
+          if (!hasClientDecorator) {
+            operations.push(...iface.operations.values());
+          }
+        }
+      }
     }
 
     // add operations
