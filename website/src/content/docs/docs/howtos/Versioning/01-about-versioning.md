@@ -45,7 +45,7 @@ This section applies specifically to **Azure Resource Manager (ARM) APIs**. ARM 
 
 - RPaaS live validation support
 - ARM registration support
-:::
+  :::
 
 It is safe to remove the swagger for an old API version if any of the following is true:
 
