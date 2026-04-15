@@ -944,3 +944,36 @@ func (client *ServiceClient) Get(ctx context.Context, version Versions, options 
 ```
 
 </ClientTabs>
+
+## Extending the Client API Version Enum (`@clientApiVersions`)
+
+When generating a client, you may want the API version enum to include versions beyond those defined by the service's `@versioned` decorator. This is useful when you want to generate a complete API version enum without requiring the entire specification to be annotated with versioning decorators.
+
+Use `@clientApiVersions` to specify the full set of API versions the client should support:
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+// main.tsp
+@versioned(Versions)
+namespace Contoso;
+
+enum Versions {
+  v4,
+  v5,
+}
+
+// client.tsp
+enum ClientApiVersions {
+  v1,
+  v2,
+  v3,
+  ...Contoso.Versions,
+}
+
+@@clientApiVersions(Contoso, ClientApiVersions);
+```
+
+In this example, the generated client will expose API versions `v1` through `v5`, even though the service spec only defines `v4` and `v5`. This is particularly useful for legacy services where adding `@added`/`@removed` annotations to every type and operation is not practical.

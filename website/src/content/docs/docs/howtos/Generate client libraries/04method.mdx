@@ -2231,3 +2231,27 @@ Use the `scope` parameter to apply customizations only to specific language emit
 ```
 
 Supported scope values include: `"python"`, `"csharp"`, `"java"`, `"javascript"`, `"go"`.
+
+## HEAD Operations with Boolean Response (`@responseAsBool`)
+
+For HEAD operations, you can use `@responseAsBool` to model the response as a boolean value. A successful response (2xx) returns `true`, and a 404 response returns `false` instead of throwing an error.
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@responseAsBool
+@head
+op exists(@path name: string): void;
+```
+
+When this decorator is applied:
+
+- All successful (2xx) responses are modeled as returning `true`
+- A 404 response is modeled as returning `false` (moved from exceptions to normal responses)
+- If the operation has no explicit 404 response, one is automatically added
+
+:::note
+This decorator can only be applied to HEAD operations. Applying it to operations with other HTTP verbs will result in an error.
+:::
