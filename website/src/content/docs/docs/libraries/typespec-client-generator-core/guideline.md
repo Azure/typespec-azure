@@ -284,6 +284,8 @@ If `@override` is used for the method, the parameters are handled by the target 
 
 Parameters used in client (either API version parameter or client parameter defined in `@clientInitialization`) are filtered from method parameter list.
 
+`@scope` can also be applied to individual operation parameters (which are `ModelProperty` types). When a parameter is scoped out for a given emitter, it is excluded from both the method signature and the HTTP operation parameters. If a required parameter is scoped out, a warning diagnostic is emitted.
+
 ### Method Return Type Calculation
 
 The method's return type is determined by the underlying operation's normal responses:

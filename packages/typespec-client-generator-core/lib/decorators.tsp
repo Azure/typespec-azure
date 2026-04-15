@@ -843,6 +843,9 @@ extern dec alternateType(
  * Define the scope of an operation or model property.
  * By default, the element will be applied to all language emitters.
  * This decorator allows you to omit the element from certain languages or apply it to specific languages.
+ * When applied to an operation parameter (which is a `ModelProperty`), the parameter will be excluded
+ * from the generated method signature for the specified languages. A warning is emitted if a required
+ * parameter is scoped out.
  * @param target The target operation or model property that you want to scope.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  *
@@ -871,6 +874,14 @@ extern dec alternateType(
  *   @scope("csharp")
  *   csharpOnlyProp: string;
  * }
+ * ```
+ *
+ * @example Exclude an operation parameter from a specific language
+ * ```typespec
+ * op test(
+ *   name: string,
+ *   @header("X-Custom-Header") @scope("!python") customHeader?: string,
+ * ): void;
  * ```
  */
 extern dec scope(target: Operation | ModelProperty, scope?: valueof string);

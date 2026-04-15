@@ -2236,6 +2236,8 @@ Supported scope values include: `"python"`, `"csharp"`, `"java"`, `"javascript"`
 
 For HEAD operations, you can use `@responseAsBool` to model the response as a boolean value. A successful response (2xx) returns `true`, and a 404 response returns `false` instead of throwing an error.
 
+<ClientTabs>
+
 ```typespec
 import "@azure-tools/typespec-client-generator-core";
 
@@ -2243,8 +2245,37 @@ using Azure.ClientGenerator.Core;
 
 @responseAsBool
 @head
+@route("/widgets/{name}")
 op exists(@path name: string): void;
 ```
+
+```python
+def exists(self, name: str, **kwargs: Any) -> bool:
+    ...
+```
+
+```csharp
+public virtual Response<bool> Exists(string name, CancellationToken cancellationToken = default);
+public virtual async Task<Response<bool>> ExistsAsync(string name, CancellationToken cancellationToken = default);
+```
+
+```typescript
+export async function exists(
+  context: Client,
+  name: string,
+  options?: ExistsOptionalParams,
+): Promise<boolean>;
+```
+
+```java
+// TODO: fill in Java example manually — Java emitter does not yet generate boolean return type for @responseAsBool
+```
+
+```go
+// TODO: fill in Go example manually — Go emitter does not yet support @responseAsBool
+```
+
+</ClientTabs>
 
 When this decorator is applied:
 

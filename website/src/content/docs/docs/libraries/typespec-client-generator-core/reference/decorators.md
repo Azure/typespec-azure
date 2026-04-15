@@ -385,7 +385,7 @@ The target client for which you want to define additional API versions.
 
 | Name  | Type             | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | ----- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| value | `Enum`           | If true, we will treat this parameter as an api-version parameter. If false, we will not. Default is true.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| value | `Enum`           | An enum defining the complete set of API versions the client should support, including both service-defined and additional versions.                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
@@ -972,8 +972,8 @@ model MyServiceClientOptions {
 @@clientInitialization(MyService, MyServiceClientOptions)
 @@paramAlias(MyServiceClientOptions.blob, "blobName")
 
-// The generated client will have `blobName` in it. We will also
-// elevate the existing `blob` parameter to the client level.
+// The `blob` property from MyServiceClientOptions will be elevated to the client level.
+// Because of @@paramAlias, it will be matched to the `blobName` operation parameter.
 ```
 
 ### `@protocolAPI` {#@Azure.ClientGenerator.Core.protocolAPI}
@@ -1060,6 +1060,9 @@ op headOperation(): void;
 Define the scope of an operation or model property.
 By default, the element will be applied to all language emitters.
 This decorator allows you to omit the element from certain languages or apply it to specific languages.
+When applied to an operation parameter (which is a `ModelProperty`), the parameter will be excluded
+from the generated method signature for the specified languages. A warning is emitted if a required
+parameter is scoped out.
 
 ```typespec
 @Azure.ClientGenerator.Core.scope(scope?: valueof string)
@@ -1099,6 +1102,12 @@ model TestModel {
   @scope("csharp")
   csharpOnlyProp: string;
 }
+```
+
+##### Exclude an operation parameter from a specific language
+
+```typespec
+op test(name: string, @header("X-Custom-Header") @scope("!python") customHeader?: string): void;
 ```
 
 ### `@usage` {#@Azure.ClientGenerator.Core.usage}
