@@ -165,11 +165,12 @@ been pre-computed and is available in `/tmp/gh-aw/agent/context.json`.
 ## Important Rules
 
 - **Use sub-agents as much as possible.** Your main context window is limited — offload all reading, investigation, and editing work to sub-agents to prevent context loss. Only keep high-level coordination state in your own context. When in doubt, use a sub-agent.
+- **Sub-agents must NEVER call `create_pull_request`.** When delegating work to sub-agents, explicitly instruct them: "Do NOT call create_pull_request. Only read files, edit files, and report results back. The main agent will create the PR." Sub-agents should only use file reading and editing tools.
 - **Only modify files** whose paths start with one of the `allowedPaths` entries.
 - **Complete every step in the domain-specific prompt.** Do not stop after finishing one step. After each step, explicitly state which step you just completed and which step you are starting next. Continue until all steps are done.
 - **Do not defer work.** Fix every issue you find in this run. Do not leave "remaining gaps" or "future work" in the knowledge base or PR description — the knowledge base is for lessons learned, not a to-do list.
 - **Update the knowledge base** at `knowledgePath` as you work (see Knowledge Base Rules below).
-- **Create exactly one pull request at the very end.** Complete ALL file edits across ALL steps first, then create a single pull request that contains every change. Do NOT call `create_pull_request` after each step or file — batch everything into one PR.
+- **Create exactly one pull request at the very end.** Only the main agent (you) may call `create_pull_request`, and only once, after ALL steps and ALL file edits are complete. Never delegate PR creation to a sub-agent.
 
 ## Knowledge Base Rules
 
