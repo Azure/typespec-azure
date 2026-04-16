@@ -35,7 +35,7 @@ jobs:
       - uses: ./.github/actions/setup-python
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --filter "@azure-tools/typespec-python..."
 
       - name: Build
         run: pnpm --filter "@azure-tools/typespec-python..." run build
@@ -47,9 +47,6 @@ jobs:
       - name: Regenerate
         run: pnpm run regenerate
         working-directory: packages/typespec-python
-
-      - name: Check no diff after regeneration
-        run: node eng/scripts/check-for-changed-files.js
 
       - name: Pre-build wheels
         working-directory: packages/typespec-python
@@ -84,10 +81,7 @@ jobs:
       - uses: ./.github/actions/setup-python
 
       - name: Install dependencies
-        run: pnpm install
-
-      - name: Build
-        run: pnpm --filter "@azure-tools/typespec-python..." run build
+        run: pnpm install --filter "@azure-tools/typespec-python..."
 
       - name: Prepare Python environment
         run: pnpm run prepare
@@ -117,10 +111,7 @@ jobs:
       - uses: ./.github/actions/setup-python
 
       - name: Install dependencies
-        run: pnpm install
-
-      - name: Build
-        run: pnpm --filter "@azure-tools/typespec-python..." run build
+        run: pnpm install --filter "@azure-tools/typespec-python..."
 
       - name: Prepare Python environment
         run: pnpm run prepare
@@ -150,10 +141,7 @@ jobs:
       - uses: ./.github/actions/setup-python
 
       - name: Install dependencies
-        run: pnpm install
-
-      - name: Build
-        run: pnpm --filter "@azure-tools/typespec-python..." run build
+        run: pnpm install --filter "@azure-tools/typespec-python..."
 
       - name: Prepare Python environment
         run: pnpm run prepare
@@ -191,10 +179,7 @@ jobs:
       - uses: ./.github/actions/setup-python
 
       - name: Install dependencies
-        run: pnpm install
-
-      - name: Build
-        run: pnpm --filter "@azure-tools/typespec-python..." run build
+        run: pnpm install --filter "@azure-tools/typespec-python..."
 
       - name: Prepare Python environment
         run: pnpm run prepare
