@@ -134,11 +134,6 @@ post-steps:
       fi
 
       echo "All modified files are within allowed paths."
-
-  - name: Update metadata
-    env:
-      CONFIG_INPUT: ${{ github.event.inputs.config }}
-    run: npx tsx eng/scripts/doc-updater/src/update-meta.ts --config "$CONFIG_INPUT"
 ---
 
 # Documentation Update Agent
@@ -156,6 +151,7 @@ been pre-computed and is available in `/tmp/gh-aw/agent/context.json`.
    - `knowledge` — current knowledge base content
    - `knowledgePath` — where to write knowledge updates
    - `allowedPaths` — which file paths you may modify
+   - `checkoutCommit` — the git commit hash at checkout time (pass to update-meta)
 
 2. If `mode` is `"skip"`, report "No source changes detected" and stop.
 
@@ -165,11 +161,13 @@ been pre-computed and is available in `/tmp/gh-aw/agent/context.json`.
 ## Important Rules
 
 - **Use sub-agents as much as possible.** Your main context window is limited — offload all reading, investigation, and editing work to sub-agents to prevent context loss. Only keep high-level coordination state in your own context. When in doubt, use a sub-agent.
+- **Sub-agents must NEVER call `create_pull_request`.** When delegating work to sub-agents, explicitly instruct them: "Do NOT call create_pull_request. Only read files, edit files, and report results back. The main agent will create the PR." Sub-agents should only use file reading and editing tools.
 - **Only modify files** whose paths start with one of the `allowedPaths` entries.
 - **Complete every step in the domain-specific prompt.** Do not stop after finishing one step. After each step, explicitly state which step you just completed and which step you are starting next. Continue until all steps are done.
 - **Do not defer work.** Fix every issue you find in this run. Do not leave "remaining gaps" or "future work" in the knowledge base or PR description — the knowledge base is for lessons learned, not a to-do list.
 - **Update the knowledge base** at `knowledgePath` as you work (see Knowledge Base Rules below).
-- **Create exactly one pull request at the very end.** Complete ALL file edits across ALL steps first, then create a single pull request that contains every change. Do NOT call `create_pull_request` after each step or file — batch everything into one PR.
+- **Create exactly one pull request at the very end.** Only the main agent (you) may call `create_pull_request`, and only once, after ALL steps and ALL file edits are complete. Never delegate PR creation to a sub-agent.
+- **Update metadata as your final step before creating the PR.** Run `npx tsx eng/scripts/doc-updater/src/update-meta.ts --config <config-name> --commit <checkoutCommit>` (using the config name and `checkoutCommit` from the context) via the bash tool. This records the checkout commit hash so the next incremental run knows where to start. This must be done inside the agent so the metadata file is captured by safe-outputs.
 
 ## Knowledge Base Rules
 

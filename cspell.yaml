@@ -79,6 +79,7 @@ words:
   - pytest
   - qnas
   - regionality
+  - responseasbool
   - reinjected
   - Reranker
   - rpaasoneboxacr
