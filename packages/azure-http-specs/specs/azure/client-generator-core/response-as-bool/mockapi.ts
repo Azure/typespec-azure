@@ -8,7 +8,7 @@ Scenarios.Azure_ClientGenerator_Core_ResponseAsBool_HeadAsBoolean = passOnSucces
     method: "head",
     request: {},
     response: {
-      status: 200,
+      status: 204,
     },
     kind: "MockApiDefinition",
   },

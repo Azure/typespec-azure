@@ -1242,7 +1242,7 @@ A successful (2xx) response should return true, and a 404 response should return
 
 Expected calls:
 
-- HEAD /azure/client-generator-core/response-as-bool/exists -> 200 (returns true)
+- HEAD /azure/client-generator-core/response-as-bool/exists -> 204 (returns true)
 - HEAD /azure/client-generator-core/response-as-bool/not-exists -> 404 (returns false)
 
 ### Azure_ClientGenerator_Core_Usage_ModelInOperation
