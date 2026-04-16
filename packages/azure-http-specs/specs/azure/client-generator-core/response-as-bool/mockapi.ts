@@ -6,24 +6,16 @@ Scenarios.Azure_ClientGenerator_Core_ResponseAsBool_HeadAsBoolean = passOnSucces
   {
     uri: "/azure/client-generator-core/response-as-bool/exists",
     method: "head",
-    request: {
-      query: {
-        name: "exists-resource",
-      },
-    },
+    request: {},
     response: {
       status: 200,
     },
     kind: "MockApiDefinition",
   },
   {
-    uri: "/azure/client-generator-core/response-as-bool/exists/not",
+    uri: "/azure/client-generator-core/response-as-bool/exists/not-exists",
     method: "head",
-    request: {
-      query: {
-        name: "not-exists-resource",
-      },
-    },
+    request: {},
     response: {
       status: 404,
     },

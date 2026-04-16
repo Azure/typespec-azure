@@ -3,10 +3,12 @@ import "@typespec/spector";
 import "@azure-tools/typespec-client-generator-core";
 
 using Http;
+using Azure.ClientGenerator.Core;
 using Spector;
 
 @doc("Test for @clientDoc decorator.")
 @scenarioService("/azure/client-generator-core/client-doc")
+@global.Azure.ClientGenerator.Core.clientNamespace("azure.clientgenerator.core.clientdoc", "java")
 namespace _Specs_.Azure.ClientGenerator.Core.ClientDoc;
 
 @scenario

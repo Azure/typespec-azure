@@ -3,10 +3,15 @@ import "@typespec/spector";
 import "@azure-tools/typespec-client-generator-core";
 
 using Http;
+using Azure.ClientGenerator.Core;
 using Spector;
 
 @doc("Test for @responseAsBool decorator.")
 @scenarioService("/azure/client-generator-core/response-as-bool")
+@global.Azure.ClientGenerator.Core.clientNamespace(
+  "azure.clientgenerator.core.responseasbool",
+  "java"
+)
 namespace _Specs_.Azure.ClientGenerator.Core.ResponseAsBool;
 
 model Resource {
@@ -19,17 +24,17 @@ model Resource {
   A successful (2xx) response should return true, and a 404 response should return false.
   
   Expected calls:
-  - HEAD /azure/client-generator-core/response-as-bool/exists?name=exists-resource -> 200 (returns true)
-  - HEAD /azure/client-generator-core/response-as-bool/exists?name=not-exists-resource -> 404 (returns false)
+  - HEAD /azure/client-generator-core/response-as-bool/exists -> 200 (returns true)
+  - HEAD /azure/client-generator-core/response-as-bool/not-exists -> 404 (returns false)
   """)
 @route("/exists")
 namespace HeadAsBoolean {
   @global.Azure.ClientGenerator.Core.responseAsBool
   @head
-  op exists(@query name: string): void;
+  op exists(): void;
 
   @global.Azure.ClientGenerator.Core.responseAsBool
   @head
-  @route("/not")
-  op notExists(@query name: string): void;
+  @route("/not-exists")
+  op notExists(): void;
 }
