@@ -753,6 +753,7 @@ it("body param with basic type has json serialization options", async function (
   const bodyParam = (method as SdkServiceMethod<SdkHttpOperation>).operation.bodyParam;
   ok(bodyParam);
   ok(bodyParam.serializationOptions.json);
+  strictEqual(bodyParam.serializationOptions.json.name, "body");
   strictEqual(bodyParam.serializationOptions.xml, undefined);
 });
 
@@ -770,7 +771,24 @@ it("body param with model type has json serialization options", async function (
   const bodyParam = (method as SdkServiceMethod<SdkHttpOperation>).operation.bodyParam;
   ok(bodyParam);
   ok(bodyParam.serializationOptions.json);
+  strictEqual(bodyParam.serializationOptions.json.name, "body");
   strictEqual(bodyParam.serializationOptions.xml, undefined);
+});
+
+it("body param serialization options uses serialized name", async function () {
+  const { program } = await SimpleTesterWithService.compile(`
+    op test(
+      @header("content-type") contentType: "application/json",
+      @body @encodedName("application/json", "test") param: int32,
+    ): void;
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  const bodyParam = (method as SdkServiceMethod<SdkHttpOperation>).operation.bodyParam;
+  ok(bodyParam);
+  ok(bodyParam.serializationOptions.json);
+  strictEqual(bodyParam.serializationOptions.json.name, "test");
 });
 
 it("response with basic type has json serialization options", async function () {
@@ -817,6 +835,7 @@ it("body param with xml content type has xml serialization options", async funct
   const bodyParam = (method as SdkServiceMethod<SdkHttpOperation>).operation.bodyParam;
   ok(bodyParam);
   ok(bodyParam.serializationOptions.xml);
+  strictEqual(bodyParam.serializationOptions.xml.name, "body");
   strictEqual(bodyParam.serializationOptions.json, undefined);
 });
 

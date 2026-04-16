@@ -94,18 +94,19 @@ import {
  * Build serialization options from content types.
  * This provides a consistent way for emitters to determine the serialization format
  * for body parameters and HTTP responses, regardless of whether the type is a model or basic type.
+ * @param contentTypes - The content types to build serialization options from.
+ * @param name - The serialized name of the body parameter (for request bodies).
  */
-function buildSerializationOptionsFromContentTypes(contentTypes: string[]): SerializationOptions {
+function buildSerializationOptionsFromContentTypes(
+  contentTypes: string[],
+  name?: string,
+): SerializationOptions {
   const options: SerializationOptions = {};
   if (contentTypes.some(isMediaTypeJson)) {
-    // name is empty because body/response level serialization options indicate the wire format,
-    // not a specific model/property wire name (which is on the type's own serializationOptions)
-    options.json = { name: "" };
+    options.json = { name: name ?? "" };
   }
   if (contentTypes.some(isMediaTypeXml)) {
-    // name is empty because body/response level serialization options indicate the wire format,
-    // not a specific model/property wire name (which is on the type's own serializationOptions)
-    options.xml = { name: "" };
+    options.xml = { name: name ?? "" };
   }
   return options;
 }
@@ -338,6 +339,7 @@ function getSdkHttpParameters(
       // populate serialization options based on content types
       retval.bodyParam.serializationOptions = buildSerializationOptionsFromContentTypes(
         retval.bodyParam.contentTypes,
+        retval.bodyParam.serializedName,
       );
 
       // map stream request body type to bytes, but preserve stream metadata
@@ -566,16 +568,20 @@ export function getSdkHttpParameter(
     });
   }
   if (isBody(context.program, param) || location === "body") {
+    const serializedName = param.name === "" ? "body" : getWireName(context, param);
     return diagnostics.wrap({
       ...base,
       kind: "body",
-      serializedName: param.name === "" ? "body" : getWireName(context, param),
+      serializedName,
       contentTypes: ["application/json"],
       defaultContentType: "application/json",
       optional: param.optional,
       correspondingMethodParams: [],
       methodParameterSegments: [],
-      serializationOptions: buildSerializationOptionsFromContentTypes(["application/json"]),
+      serializationOptions: buildSerializationOptionsFromContentTypes(
+        ["application/json"],
+        serializedName,
+      ),
     });
   }
   const headerQueryBase = {
