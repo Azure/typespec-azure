@@ -45,7 +45,7 @@ Follow the structure and style of the previous newsletter. Key rules:
 - **Bottom line**: 2-3 short paragraphs, concise, aligned with detailed sections above.
 - **Documentation links**: Every section and summary bullet should include links to the relevant documentation page on `https://azure.github.io/typespec-azure/`. Use the following pattern:
   - In the **summary bullets** at the top, append ` — [docs](url)` to each item that has a doc page.
-  - Under each **`##` section heading**, add a `📖 **Docs**: [Page Title](url)` line linking to the howto or reference page(s). Separate multiple links with ` · `.
+  - Under each **`##` section heading**, add a `📖 **Docs**: [Page Title](url)` line linking to the howto or reference page(s). Separate multiple links with `·`.
   - For **bug-fix sections** that reference multiple decorators, add a single `Related docs:` line with links to each decorator's howto or reference page.
   - Look for doc pages under these URL patterns:
     - Howtos: `https://azure.github.io/typespec-azure/docs/howtos/generate-client-libraries/<slug>/`
