@@ -92,7 +92,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: python-generated
-          path: packages/typespec-python
+          path: .
 
       - name: Test
         run: pnpm run test:python:e2e
@@ -122,7 +122,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: python-generated
-          path: packages/typespec-python
+          path: .
 
       - name: Mypy & Pyright
         run: pnpm run test:python:e2e --env mypy,pyright
@@ -152,7 +152,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: python-generated
-          path: packages/typespec-python
+          path: .
 
       - name: Pylint
         run: pnpm run test:python:e2e --env lint
@@ -190,7 +190,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: python-generated
-          path: packages/typespec-python
+          path: .
 
       - name: API View & Sphinx
         run: pnpm run test:python:e2e --env apiview,sphinx
