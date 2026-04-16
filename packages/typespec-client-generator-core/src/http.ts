@@ -74,6 +74,7 @@ import {
   isSubscriptionId,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
+import { isMediaTypeJson, isMediaTypeXml } from "./media-types.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -88,7 +89,6 @@ import {
   getTypeSpecBuiltInType,
   isReadOnly,
 } from "./types.js";
-import { isMediaTypeJson, isMediaTypeXml } from "./media-types.js";
 
 /**
  * Build serialization options from content types.
@@ -98,9 +98,13 @@ import { isMediaTypeJson, isMediaTypeXml } from "./media-types.js";
 function buildSerializationOptionsFromContentTypes(contentTypes: string[]): SerializationOptions {
   const options: SerializationOptions = {};
   if (contentTypes.some(isMediaTypeJson)) {
+    // name is empty because body/response level serialization options indicate the wire format,
+    // not a specific model/property wire name (which is on the type's own serializationOptions)
     options.json = { name: "" };
   }
   if (contentTypes.some(isMediaTypeXml)) {
+    // name is empty because body/response level serialization options indicate the wire format,
+    // not a specific model/property wire name (which is on the type's own serializationOptions)
     options.xml = { name: "" };
   }
   return options;
