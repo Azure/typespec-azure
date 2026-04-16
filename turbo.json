@@ -46,6 +46,19 @@
     "test:e2e": {
       "dependsOn": ["build"],
       "cache": false
+    },
+    "test:extra": {
+      "dependsOn": ["build"],
+      "outputs": []
+    },
+    "format:extra": {
+      "cache": false
+    },
+    "format:extra:check": {
+      "outputs": []
+    },
+    "lint:extra": {
+      "outputs": []
     }
   }
 }

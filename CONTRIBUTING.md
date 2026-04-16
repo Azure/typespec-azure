@@ -177,6 +177,68 @@ Note that you only need to do all of the above when your changes span both
 repos. If you are only changing one repo or the other, then just work in
 each individual repo as you would any other.
 
+## Testing, formatting, and linting
+
+Testing, formatting, and linting run at the repo root via workspace-level tools (vitest, prettier, eslint). Packages that need additional tooling define `:extra` scripts run via turbo.
+
+### Package examples
+
+**Standard package** (vitest only — most packages):
+
+```json
+{
+  "scripts": {
+    "test": "vitest run"
+  }
+}
+```
+
+The package also needs a `vitest.config.ts` — the root vitest workspace config discovers it automatically.
+
+**Package with extra tests** (vitest + another runner):
+
+```json
+{
+  "scripts": {
+    "test": "npm run test:vitest && npm run test:extra",
+    "test:vitest": "vitest run",
+    "test:extra": "dotnet test"
+  }
+}
+```
+
+**Package with custom formatting**:
+
+```json
+{
+  "scripts": {
+    "format:extra": "my-formatter --write .",
+    "format:extra:check": "my-formatter --check ."
+  }
+}
+```
+
+**Package with extra linting**:
+
+```json
+{
+  "scripts": {
+    "lint:extra": "my-linter ."
+  }
+}
+```
+
+### How the top-level commands work
+
+| Command              | What runs                                              |
+| -------------------- | ------------------------------------------------------ |
+| `pnpm test`          | vitest (workspace) + `turbo run test:extra`             |
+| `pnpm format`        | prettier (whole repo) + `turbo run format:extra`        |
+| `pnpm format:check`  | prettier (check) + `turbo run format:extra:check`       |
+| `pnpm lint`          | eslint (whole repo) + `turbo run lint:extra`            |
+
+Vitest workspace mode runs all vitest-based packages in a single process with relative error paths. Turbo handles the `:extra` tasks in parallel for packages that define them — if no package defines them, the turbo step is a no-op.
+
 ## E2E tests
 
 ### Run tests same as the ci:
