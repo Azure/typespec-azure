@@ -339,10 +339,18 @@ const EMITTER_OPTIONS: Record<string, Record<string, string> | Record<string, st
     "package-name": "typetest-model-singlediscriminator",
     namespace: "typetest.model.singlediscriminator",
   },
-  "type/model/inheritance/recursive": {
-    "package-name": "typetest-model-recursive",
-    namespace: "typetest.model.recursive",
-  },
+  "type/model/inheritance/recursive": [
+    {
+      "package-name": "typetest-model-recursive",
+      namespace: "typetest.model.recursive",
+    },
+    {
+      "package-name": "generation-subdir",
+      namespace: "generation.subdir",
+      "generation-subdir": "_generated",
+      "clear-output-folder": "true",
+    },
+  ],
   "type/model/usage": {
     "package-name": "typetest-model-usage",
     namespace: "typetest.model.usage",
@@ -400,18 +408,6 @@ const EMITTER_OPTIONS: Record<string, Record<string, string> | Record<string, st
     namespace: "specs.documentation",
   },
   // Repo-specific overrides
-  "type/model/inheritance/recursive": [
-    {
-      "package-name": "typetest-model-recursive",
-      namespace: "typetest.model.recursive",
-    },
-    {
-      "package-name": "generation-subdir",
-      namespace: "generation.subdir",
-      "generation-subdir": "_generated",
-      "clear-output-folder": "true",
-    },
-  ],
   "client/structure/client-operation-group": {
     "package-name": "client-structure-clientoperationgroup",
     namespace: "client.structure.clientoperationgroup",
