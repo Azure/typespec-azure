@@ -3,12 +3,13 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
-from generation.subdir import CustomizedClient, Extension
+from generation.subdir._generated import RecursiveClient
+from generation.subdir._generated.models import Extension
 
 
 def test_custom_method():
-    client = CustomizedClient()
-    assert client.customized_get() == Extension(
+    client = RecursiveClient()
+    assert client.get() == Extension(
         {
             "level": 0,
             "extension": [{"level": 1, "extension": [{"level": 2}]}, {"level": 1}],
