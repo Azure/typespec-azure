@@ -100,7 +100,7 @@ jobs:
           path: packages/typespec-python
 
       - name: Test
-        run: npm test
+        run: npm run test:e2e
         working-directory: packages/typespec-python
 
   typecheck:
@@ -133,7 +133,7 @@ jobs:
           path: packages/typespec-python
 
       - name: Mypy & Pyright
-        run: npm test -- --env mypy,pyright
+        run: npm run test:e2e -- --env mypy,pyright
         working-directory: packages/typespec-python
 
   lint:
@@ -166,15 +166,15 @@ jobs:
           path: packages/typespec-python
 
       - name: Pylint
-        run: npm test -- --env lint
+        run: npm run test:e2e -- --env lint
         working-directory: packages/typespec-python
 
-      - name: ESLint
-        run: npm run lint
+      - name: Lint (extra)
+        run: npm run lint:extra
         working-directory: packages/typespec-python
 
-      - name: Format check
-        run: npm run format:check
+      - name: Format check (extra)
+        run: npm run format:extra:check
         working-directory: packages/typespec-python
 
   docs:
@@ -207,5 +207,5 @@ jobs:
           path: packages/typespec-python
 
       - name: API View & Sphinx
-        run: npm test -- --env apiview,sphinx
+        run: npm run test:e2e -- --env apiview,sphinx
         working-directory: packages/typespec-python

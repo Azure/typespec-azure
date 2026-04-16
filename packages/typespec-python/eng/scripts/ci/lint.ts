@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import { spawn } from "child_process";
+import fs from "fs";
 import { dirname, join } from "path";
 import pc from "picocolors";
 import { fileURLToPath } from "url";
@@ -11,8 +12,6 @@ const argv = parseArgs({
   args: process.argv.slice(2),
   options: {
     help: { type: "boolean", short: "h" },
-    command: { type: "string" },
-    skipWarning: { type: "string" },
   },
 });
 
@@ -21,36 +20,28 @@ if (argv.values.help) {
 ${pc.bold("Usage:")} tsx lint.ts [options]
 
 ${pc.bold("Description:")}
-  Run linting checks on the codebase.
+  Run Python linting checks (pylint) on generated code.
+  TypeScript linting (eslint) is handled by the root workspace.
 
 ${pc.bold("Options:")}
   ${pc.cyan("-h, --help")}
       Show this help message.
-  ${pc.cyan("--command <eslint|pylint>")}
-      Specify which linter to run (default: eslint).
-  ${pc.cyan("--skipWarning <true|false>")}
-      Skip warnings in output (default: false).
-
-${pc.bold("Examples:")}
-  ${pc.dim("# Lint TypeScript code")}
-  tsx lint.ts
-
-  ${pc.dim("# Run eslint only")}
-  tsx lint.ts --command eslint
 `);
   process.exit(0);
 }
 
+function getVenvPython(): string {
+  const venvPath = join(root, "venv");
+  if (fs.existsSync(join(venvPath, "bin"))) {
+    return join(venvPath, "bin", "python");
+  } else if (fs.existsSync(join(venvPath, "Scripts"))) {
+    return join(venvPath, "Scripts", "python.exe");
+  }
+  throw new Error("Virtual environment not found. Run 'npm run install' first.");
+}
+
 function runCommand(command: string, args: string[], displayName?: string): Promise<boolean> {
   const name = displayName || `${command} ${args.join(" ")}`;
-
-  // Add node_modules/.bin to PATH so eslint can be found
-  const pathSep = process.platform === "win32" ? ";" : ":";
-  const binPath = join(root, "node_modules", ".bin");
-  const env = {
-    ...process.env,
-    PATH: `${binPath}${pathSep}${process.env.PATH}`,
-  };
 
   return new Promise((resolve) => {
     console.log(`${pc.cyan("[RUN]")} ${name}`);
@@ -58,7 +49,6 @@ function runCommand(command: string, args: string[], displayName?: string): Prom
       cwd: root,
       stdio: "inherit",
       shell: true,
-      env,
     });
 
     proc.on("close", (code) => {
@@ -79,27 +69,19 @@ function runCommand(command: string, args: string[], displayName?: string): Prom
 }
 
 async function main(): Promise<void> {
-  const command = argv.values.command || "eslint";
-  const skipWarning = argv.values.skipWarning === "true";
+  console.log(`\n${pc.bold("=== Linting Python (pylint) ===")}\n`);
 
-  // Only run eslint for now (pylint is handled by tox)
-  if (command !== "eslint") {
-    console.log(`${pc.yellow("[SKIP]")} ${command} is handled by tox, skipping...`);
-    process.exit(0);
+  let pythonPath: string;
+  try {
+    pythonPath = getVenvPython();
+  } catch (error) {
+    console.error(pc.red((error as Error).message));
+    process.exit(1);
   }
 
-  console.log(`\n${pc.bold("=== Linting TypeScript ===")}\n`);
-
-  const eslintArgs = ["."];
-  if (!skipWarning) {
-    eslintArgs.push("--max-warnings=0");
-  }
-
-  const success = await runCommand(
-    "eslint",
-    eslintArgs,
-    `eslint .${skipWarning ? "" : " --max-warnings=0"}`,
-  );
+  // Run pylint via the CI helper script
+  const pylintScript = join(root, "eng", "scripts", "ci", "run_pylint.py");
+  const success = await runCommand(pythonPath, [pylintScript], "pylint");
 
   if (!success) {
     process.exit(1);

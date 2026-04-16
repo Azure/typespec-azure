@@ -128,7 +128,7 @@ async function main(): Promise<void> {
   const runPython = argv.values.python;
   const check = argv.values.check || false;
 
-  // Default: format both
+  // Default: format both; --python only runs black (for format:extra)
   const runBoth = !runTypeScript && !runPython;
 
   let success = true;
