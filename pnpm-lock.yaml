@@ -336,9 +336,6 @@ catalogs:
     fast-xml-parser:
       specifier: ^5.5.9
       version: 5.5.9
-    globby:
-      specifier: ^16.2.0
-      version: 16.2.0
     happy-dom:
       specifier: ^20.8.9
       version: 20.8.9
@@ -487,8 +484,8 @@ catalogs:
       specifier: ^2.9.5
       version: 2.9.5
     typedoc:
-      specifier: ^0.28.18
-      version: 0.28.18
+      specifier: ^0.28.19
+      version: 0.28.19
     typedoc-plugin-markdown:
       specifier: ^4.11.0
       version: 4.11.0
@@ -812,9 +809,6 @@ importers:
       '@typespec/bundler':
         specifier: workspace:^
         version: link:../bundler
-      globby:
-        specifier: 'catalog:'
-        version: 16.2.0
       picocolors:
         specifier: 'catalog:'
         version: 1.1.1
@@ -904,9 +898,6 @@ importers:
       env-paths:
         specifier: 'catalog:'
         version: 4.0.0
-      globby:
-        specifier: 'catalog:'
-        version: 16.2.0
       is-unicode-supported:
         specifier: 'catalog:'
         version: 2.1.0
@@ -1357,9 +1348,6 @@ importers:
       execa:
         specifier: 'catalog:'
         version: 9.6.1
-      globby:
-        specifier: 'catalog:'
-        version: 16.2.0
       ora:
         specifier: 'catalog:'
         version: 9.3.0
@@ -1454,9 +1442,6 @@ importers:
       '@vitest/ui':
         specifier: 'catalog:'
         version: 4.1.3(vitest@4.1.3)
-      globby:
-        specifier: 'catalog:'
-        version: 16.2.0
       ora:
         specifier: 'catalog:'
         version: 9.3.0
@@ -1530,9 +1515,6 @@ importers:
       express:
         specifier: 'catalog:'
         version: 5.2.1
-      globby:
-        specifier: 'catalog:'
-        version: 16.2.0
       morgan:
         specifier: 'catalog:'
         version: 1.10.1
@@ -2555,9 +2537,6 @@ importers:
       express:
         specifier: 'catalog:'
         version: 5.2.1
-      globby:
-        specifier: 'catalog:'
-        version: 16.2.0
       micromatch:
         specifier: 'catalog:'
         version: 4.0.8
@@ -2759,9 +2738,6 @@ importers:
       execa:
         specifier: 'catalog:'
         version: 9.6.1
-      globby:
-        specifier: 'catalog:'
-        version: 16.2.0
       log-symbols:
         specifier: 'catalog:'
         version: 7.0.1
@@ -2825,10 +2801,10 @@ importers:
         version: 3.8.1
       typedoc:
         specifier: 'catalog:'
-        version: 0.28.18(typescript@6.0.2)
+        version: 0.28.19(typescript@6.0.2)
       typedoc-plugin-markdown:
         specifier: 'catalog:'
-        version: 4.11.0(typedoc@0.28.18(typescript@6.0.2))
+        version: 4.11.0(typedoc@0.28.19(typescript@6.0.2))
       yaml:
         specifier: 'catalog:'
         version: 2.8.3
@@ -8554,6 +8530,10 @@ packages:
     resolution: {integrity: sha512-h+DEnpVvxmfVefa4jFbCf5HdH5YMDXRsmKflpf1pILZWRFlTbJpxeU55nJl4Smt5HQaGzg1o6RHFPJaOqnmBDg==}
     engines: {node: 18 || 20 || >=22}
 
+  brace-expansion@5.0.5:
+    resolution: {integrity: sha512-VZznLgtwhn+Mact9tfiwx64fA9erHH/MCXEUfB/0bX/6Fz6ny5EGTXYltMocqg4xFAQZtnO3DHWWXi8RiuN7cQ==}
+    engines: {node: 18 || 20 || >=22}
+
   braces@3.0.3:
     resolution: {integrity: sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==}
     engines: {node: '>=8'}
@@ -9985,10 +9965,6 @@ packages:
     resolution: {integrity: sha512-dW7vl+yiAJSp6aCekaVnVJxurRv7DCOLyXqEG3RYMYUg7AuJ2jCqPkZTA8ooqC2vtnkaMcV5WfFBMuEnTu1OQg==}
     engines: {node: '>=20'}
 
-  globby@16.2.0:
-    resolution: {integrity: sha512-QrJia2qDf5BB/V6HYlDTs0I0lBahyjLzpGQg3KT7FnCdTonAyPy2RtY802m2k4ALx6Dp752f82WsOczEVr3l6Q==}
-    engines: {node: '>=20'}
-
   globrex@0.1.2:
     resolution: {integrity: sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg==}
 
@@ -11297,6 +11273,10 @@ packages:
 
   minimatch@10.2.4:
     resolution: {integrity: sha512-oRjTw/97aTBN0RHbYCdtF1MQfvusSIBQM0IZEgzl6426+8jSC0nF1a/GmnVLpfB9yyr6g6FTqWqiZVbxrtaCIg==}
+    engines: {node: 18 || 20 || >=22}
+
+  minimatch@10.2.5:
+    resolution: {integrity: sha512-MULkVLfKGYDFYejP07QOurDLLQpcjk7Fw+7jXS2R2czRQzR56yHRveU5NDJEOviH+hETZKSkIk5c+T23GjFUMg==}
     engines: {node: 18 || 20 || >=22}
 
   minimatch@3.1.5:
@@ -13381,8 +13361,8 @@ packages:
     peerDependencies:
       typedoc: 0.28.x
 
-  typedoc@0.28.18:
-    resolution: {integrity: sha512-NTWTUOFRQ9+SGKKTuWKUioUkjxNwtS3JDRPVKZAXGHZy2wCA8bdv2iJiyeePn0xkmK+TCCqZFT0X7+2+FLjngA==}
+  typedoc@0.28.19:
+    resolution: {integrity: sha512-wKh+lhdmMFivMlc6vRRcMGXeGEHGU2g8a2CkPTJjJlwRf1iXbimWIPcFolCqe4E0d/FRtGszpIrsp3WLpDB8Pw==}
     engines: {node: '>= 18', pnpm: '>= 10'}
     hasBin: true
     peerDependencies:
@@ -14633,7 +14613,7 @@ snapshots:
 
   '@astrojs/yaml2ts@0.2.3':
     dependencies:
-      yaml: 2.8.2
+      yaml: 2.8.3
 
   '@azu/format-text@1.0.2': {}
 
@@ -18583,7 +18563,7 @@ snapshots:
       '@pnpm/yaml.document-sync': 1000.0.0
       ramda: '@pnpm/ramda@0.28.1'
       write-file-atomic: 5.0.1
-      yaml: 2.8.2
+      yaml: 2.8.3
 
   '@pnpm/workspace.read-manifest@1000.3.1':
     dependencies:
@@ -18604,7 +18584,7 @@ snapshots:
 
   '@pnpm/yaml.document-sync@1000.0.0':
     dependencies:
-      yaml: 2.8.2
+      yaml: 2.8.3
 
   '@polka/url@1.0.0-next.29': {}
 
@@ -20957,6 +20937,10 @@ snapshots:
     dependencies:
       balanced-match: 4.0.4
 
+  brace-expansion@5.0.5:
+    dependencies:
+      balanced-match: 4.0.4
+
   braces@3.0.3:
     dependencies:
       fill-range: 7.1.1
@@ -22647,15 +22631,6 @@ snapshots:
       unicorn-magic: 0.3.0
 
   globby@16.1.1:
-    dependencies:
-      '@sindresorhus/merge-streams': 4.0.0
-      fast-glob: 3.3.3
-      ignore: 7.0.5
-      is-path-inside: 4.0.0
-      slash: 5.1.0
-      unicorn-magic: 0.4.0
-
-  globby@16.2.0:
     dependencies:
       '@sindresorhus/merge-streams': 4.0.0
       fast-glob: 3.3.3
@@ -24424,6 +24399,10 @@ snapshots:
   minimatch@10.2.4:
     dependencies:
       brace-expansion: 5.0.4
+
+  minimatch@10.2.5:
+    dependencies:
+      brace-expansion: 5.0.5
 
   minimatch@3.1.5:
     dependencies:
@@ -26869,16 +26848,16 @@ snapshots:
 
   typedarray@0.0.6: {}
 
-  typedoc-plugin-markdown@4.11.0(typedoc@0.28.18(typescript@6.0.2)):
+  typedoc-plugin-markdown@4.11.0(typedoc@0.28.19(typescript@6.0.2)):
     dependencies:
-      typedoc: 0.28.18(typescript@6.0.2)
+      typedoc: 0.28.19(typescript@6.0.2)
 
-  typedoc@0.28.18(typescript@6.0.2):
+  typedoc@0.28.19(typescript@6.0.2):
     dependencies:
       '@gerrit0/mini-shiki': 3.23.0
       lunr: 2.3.9
       markdown-it: 14.1.1
-      minimatch: 10.2.4
+      minimatch: 10.2.5
       typescript: 6.0.2
       yaml: 2.8.3
 
