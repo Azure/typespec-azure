@@ -1221,15 +1221,15 @@ Expected response: 204 No Content
 
 - Endpoints:
   - `head /azure/client-generator-core/response-as-bool/exists`
-  - `head /azure/client-generator-core/response-as-bool/exists/not`
+  - `head /azure/client-generator-core/response-as-bool/exists/not-exists`
 
 Test that a HEAD operation decorated with @responseAsBool returns a boolean.
 A successful (2xx) response should return true, and a 404 response should return false.
 
 Expected calls:
 
-- HEAD /azure/client-generator-core/response-as-bool/exists?name=exists-resource -> 200 (returns true)
-- HEAD /azure/client-generator-core/response-as-bool/exists?name=not-exists-resource -> 404 (returns false)
+- HEAD /azure/client-generator-core/response-as-bool/exists -> 200 (returns true)
+- HEAD /azure/client-generator-core/response-as-bool/not-exists -> 404 (returns false)
 
 ### Azure_ClientGenerator_Core_Usage_ModelInOperation
 
