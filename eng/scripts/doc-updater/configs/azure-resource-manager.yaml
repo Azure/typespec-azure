@@ -1,0 +1,24 @@
+name: azure-resource-manager
+displayName: Azure Resource Manager
+description: >-
+  The Azure Resource Manager TypeSpec library provides decorators, templates,
+  and linting rules for defining ARM-compliant APIs. It includes resource type
+  base models (TrackedResource, ProxyResource, ExtensionResource, etc.), operation
+  templates for standard CRUD and LRO operations, common types for managed
+  identity/private endpoints/network security perimeter, and 40+ linting rules
+  enforcing ARM RPC compliance.
+
+sourceCodePaths:
+  - packages/typespec-azure-resource-manager/src
+  - packages/typespec-azure-resource-manager/lib
+  - packages/samples/specs/resource-manager/
+
+# File path prefixes the agent is allowed to modify.
+# Enforced by the agentic workflow's post-step validation — not just a prompt hint.
+allowedPaths:
+  - website/src/content/docs/docs/getstarted/azure-resource-manager/
+  - website/src/content/docs/docs/howtos/ARM/
+  - website/src/content/docs/docs/libraries/azure-resource-manager/
+  - packages/typespec-azure-resource-manager/lib/
+  - eng/scripts/doc-updater/knowledge/
+  - cspell.yaml
