@@ -1,12 +1,6 @@
 /* eslint-disable no-console */
-import { spawn } from "child_process";
-import fs from "fs";
-import { dirname, join } from "path";
 import pc from "picocolors";
-import { fileURLToPath } from "url";
 import { parseArgs } from "util";
-
-const root = join(dirname(fileURLToPath(import.meta.url)), "../../../");
 
 const argv = parseArgs({
   args: process.argv.slice(2),
@@ -20,8 +14,8 @@ if (argv.values.help) {
 ${pc.bold("Usage:")} tsx lint.ts [options]
 
 ${pc.bold("Description:")}
-  Run Python linting checks (pylint) on generated code.
-  TypeScript linting (eslint) is handled by the root workspace.
+  Run extra linting checks beyond what tox provides.
+  Python linting (pylint) is handled by tox via test:python:e2e --env lint.
 
 ${pc.bold("Options:")}
   ${pc.cyan("-h, --help")}
@@ -30,76 +24,12 @@ ${pc.bold("Options:")}
   process.exit(0);
 }
 
-function getVenvPython(): string {
-  const venvPath = join(root, "venv");
-  if (fs.existsSync(join(venvPath, "bin"))) {
-    return join(venvPath, "bin", "python");
-  } else if (fs.existsSync(join(venvPath, "Scripts"))) {
-    return join(venvPath, "Scripts", "python.exe");
-  }
-  throw new Error("Virtual environment not found. Run 'pnpm run install' first.");
-}
-
-function runCommand(command: string, args: string[], displayName?: string): Promise<boolean> {
-  const name = displayName || `${command} ${args.join(" ")}`;
-
-  return new Promise((resolve) => {
-    console.log(`${pc.cyan("[RUN]")} ${name}`);
-    const proc = spawn(command, args, {
-      cwd: root,
-      stdio: "inherit",
-      shell: true,
-    });
-
-    proc.on("close", (code) => {
-      if (code === 0) {
-        console.log(`${pc.green("[PASS]")} ${name} completed successfully`);
-        resolve(true);
-      } else {
-        console.log(`${pc.red("[FAIL]")} ${name} failed with code ${code}`);
-        resolve(false);
-      }
-    });
-
-    proc.on("error", (err) => {
-      console.log(`${pc.red("[ERROR]")} ${name}: ${err.message}`);
-      resolve(false);
-    });
-  });
-}
-
 async function main(): Promise<void> {
-  console.log(`\n${pc.bold("=== Linting Python (pylint) ===")}\n`);
-
-  let pythonPath: string;
-  try {
-    pythonPath = getVenvPython();
-  } catch (error) {
-    console.error(pc.red((error as Error).message));
-    process.exit(1);
-  }
-
-  // Run pylint via the CI helper script for both flavors
-  const pylintScript = join(root, "eng", "scripts", "ci", "run_pylint.py");
-  const flavors = ["azure", "unbranded"];
-  let allPassed = true;
-
-  for (const flavor of flavors) {
-    const success = await runCommand(
-      pythonPath,
-      [pylintScript, "-t", flavor, "-s", "generated"],
-      `pylint (${flavor})`,
-    );
-    if (!success) {
-      allPassed = false;
-    }
-  }
-
-  if (!allPassed) {
-    process.exit(1);
-  }
-
-  console.log(`\n${pc.green(pc.bold("All linting checks passed!"))}\n`);
+  // Python linting (pylint) is handled by tox environments (lint-azure, lint-unbranded).
+  // This script is reserved for any additional linting not covered by tox.
+  console.log(
+    `${pc.green("✓")} Python linting is handled by tox (lint-azure, lint-unbranded). No extra lint checks needed.`,
+  );
 }
 
 main().catch((error) => {
