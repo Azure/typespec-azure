@@ -17,8 +17,20 @@ namespace _Specs_.Azure.ClientGenerator.Core.ClientDoc;
   The 'Plant' model has a base doc from TypeSpec and additional client-specific documentation appended via @clientDoc in append mode.
   The 'harvest' operation has its documentation completely replaced by @clientDoc in replace mode.
   
-  Expected calls:
-  - POST /azure/client-generator-core/client-doc/harvest -> 200 with Plant body
+  Expected request body:
+  ```json
+  {
+    "name": "Rose",
+    "species": "Rosa"
+  }
+  ```
+  Expected response body:
+  ```json
+  {
+    "name": "Rose",
+    "species": "Rosa"
+  }
+  ```
   """)
 namespace Documentation {
   @doc("A plant in the garden.")

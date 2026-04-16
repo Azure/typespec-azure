@@ -235,9 +235,23 @@ This scenario tests the @clientDoc decorator which overrides documentation for t
 The 'Plant' model has a base doc from TypeSpec and additional client-specific documentation appended via @clientDoc in append mode.
 The 'harvest' operation has its documentation completely replaced by @clientDoc in replace mode.
 
-Expected calls:
+Expected request body:
 
-- POST /azure/client-generator-core/client-doc/harvest -> 200 with Plant body
+```json
+{
+  "name": "Rose",
+  "species": "Rosa"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "name": "Rose",
+  "species": "Rosa"
+}
+```
 
 ### Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_HeaderParam
 
