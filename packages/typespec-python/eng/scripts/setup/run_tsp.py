@@ -26,7 +26,9 @@ if __name__ == "__main__":
         try:
             import debugpy  # pylint: disable=import-outside-toplevel
         except (ImportError, ModuleNotFoundError):
-            raise SystemExit("Please pip install ptvsd in order to use VSCode debugging")
+            raise SystemExit(
+                "Please pip install ptvsd in order to use VSCode debugging"
+            )
 
         # 5678 is the default attach port in the VS Code debug configurations
         debugpy.listen(("localhost", 5678))
@@ -35,5 +37,9 @@ if __name__ == "__main__":
 
     # pre-process
     args, unknown_args = parse_args()
-    preprocess.PreProcessPlugin(output_folder=args.output_folder, tsp_file=args.tsp_file, **unknown_args).process()
-    codegen.CodeGenerator(output_folder=args.output_folder, tsp_file=args.tsp_file, **unknown_args).process()
+    preprocess.PreProcessPlugin(
+        output_folder=args.output_folder, tsp_file=args.tsp_file, **unknown_args
+    ).process()
+    codegen.CodeGenerator(
+        output_folder=args.output_folder, tsp_file=args.tsp_file, **unknown_args
+    ).process()

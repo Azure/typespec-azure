@@ -15,7 +15,9 @@ try:
 
     detect_package_manager()  # Just check if we have a package manager
 except (ImportError, ModuleNotFoundError, PackageManagerNotFoundError):
-    raise Exception("Your Python installation doesn't have a suitable package manager (pip or uv) available")
+    raise Exception(
+        "Your Python installation doesn't have a suitable package manager (pip or uv) available"
+    )
 
 try:
     import venv

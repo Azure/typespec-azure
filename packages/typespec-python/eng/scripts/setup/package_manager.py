@@ -48,12 +48,16 @@ def detect_package_manager() -> str:
 
     # As a last resort, try using python -m pip
     try:
-        subprocess.run([sys.executable, "-m", "pip", "--version"], capture_output=True, check=True)
+        subprocess.run(
+            [sys.executable, "-m", "pip", "--version"], capture_output=True, check=True
+        )
         return "python -m pip"
     except (subprocess.CalledProcessError, FileNotFoundError):
         pass
 
-    raise PackageManagerNotFoundError("No suitable package manager found. Please install either uv or pip.")
+    raise PackageManagerNotFoundError(
+        "No suitable package manager found. Please install either uv or pip."
+    )
 
 
 def get_install_command(package_manager: str, venv_context=None) -> list:
@@ -85,7 +89,9 @@ def get_install_command(package_manager: str, venv_context=None) -> list:
         raise ValueError(f"Unknown package manager: {package_manager}")
 
 
-def install_packages(packages: list, venv_context=None, package_manager: str = None) -> None:
+def install_packages(
+    packages: list, venv_context=None, package_manager: str = None
+) -> None:
     """Install packages using the available package manager.
 
     Args:

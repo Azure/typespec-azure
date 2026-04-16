@@ -26,10 +26,7 @@ const allFilesConfig = tsEslint.config({
 
     // This rule is bugged https://github.com/typescript-eslint/typescript-eslint/issues/6538
     "@typescript-eslint/no-misused-promises": "off",
-    "@typescript-eslint/no-unused-expressions": [
-      "warn",
-      { allowShortCircuit: true, allowTernary: true },
-    ],
+    "@typescript-eslint/no-unused-expressions": ["warn", { allowShortCircuit: true, allowTernary: true }],
 
     /**
      * Core
@@ -46,7 +43,7 @@ const allFilesConfig = tsEslint.config({
         destructuring: "all",
       },
     ],
-    eqeqeq: ["warn", "always", { null: "ignore" }],
+    "eqeqeq": ["warn", "always", { null: "ignore" }],
 
     // Do not want console.log left from debugging or using console.log for logging. Use the program logger.
     "no-console": "warn",

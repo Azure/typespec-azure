@@ -1,0 +1,11 @@
+name: Setup Python
+description: Setup Python for typespec-python package development and CI
+
+runs:
+  using: composite
+
+  steps:
+    - name: Setup mise
+      uses: jdx/mise-action@v2
+      with:
+        working_directory: packages/typespec-python
