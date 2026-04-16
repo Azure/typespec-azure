@@ -544,6 +544,12 @@ export const $lib = createTypeSpecLibrary({
         default: "Auto-merging service client must be empty.",
       },
     },
+    "operation-not-in-client": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Operation "${"operationName"}" under namespace "${"namespaceName"}" is not included in any @client definition. If you are using @client to customize the client, ensure all service operations are included.`,
+      },
+    },
   },
   emitter: {
     options: TCGCEmitterOptionsSchema,
