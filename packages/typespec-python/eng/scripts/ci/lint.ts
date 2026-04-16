@@ -95,7 +95,11 @@ async function main(): Promise<void> {
     eslintArgs.push("--max-warnings=0");
   }
 
-  const success = await runCommand("eslint", eslintArgs, `eslint .${skipWarning ? "" : " --max-warnings=0"}`);
+  const success = await runCommand(
+    "eslint",
+    eslintArgs,
+    `eslint .${skipWarning ? "" : " --max-warnings=0"}`,
+  );
 
   if (!success) {
     process.exit(1);

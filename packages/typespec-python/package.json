@@ -65,9 +65,7 @@
     "@typespec/xml": "workspace:^"
   },
   "dependencies": {
-    "@typespec/http-client-python": "^0.28.3",
-    "fs-extra": "~11.2.0",
-    "js-yaml": "~4.1.0",
+    "@typespec/http-client-python": "catalog:",
     "semver": "catalog:",
     "tsx": "catalog:"
   },
@@ -78,9 +76,6 @@
     "@azure-tools/typespec-azure-resource-manager": "workspace:^",
     "@azure-tools/typespec-azure-rulesets": "workspace:^",
     "@azure-tools/typespec-client-generator-core": "workspace:^",
-    "@eslint/js": "catalog:",
-    "@types/fs-extra": "11.0.4",
-    "@types/js-yaml": "~4.0.5",
     "@types/node": "catalog:",
     "@types/semver": "catalog:",
     "@types/yargs": "catalog:",

@@ -99,7 +99,9 @@ function runCommand(command: string, args: string[]): Promise<boolean> {
 
 async function formatTypeScript(check: boolean): Promise<boolean> {
   console.log(`\n${pc.bold("=== Formatting TypeScript ===")}\n`);
-  const args = check ? ["--check", "src/", "eng/", "*.json", "*.md"] : ["--write", "src/", "eng/", "*.json", "*.md"];
+  const args = check
+    ? ["--check", "src/", "eng/", "*.json", "*.md"]
+    : ["--write", "src/", "eng/", "*.json", "*.md"];
   return runCommand("prettier", args);
 }
 
@@ -145,7 +147,9 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  console.log(`\n${pc.green(pc.bold(`All formatting ${check ? "checks passed" : "complete"}!`))}\n`);
+  console.log(
+    `\n${pc.green(pc.bold(`All formatting ${check ? "checks passed" : "complete"}!`))}\n`,
+  );
 }
 
 main().catch((error) => {

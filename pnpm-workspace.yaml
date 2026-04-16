@@ -85,6 +85,7 @@ catalog:
   "@typescript-eslint/rule-tester": ^8.58.1
   "@typescript-eslint/types": ^8.58.1
   "@typescript-eslint/utils": ^8.58.1
+  "@typespec/http-client-python": ^0.28.3
   "@typespec/ts-http-runtime": "0.3.4"
   "@vitejs/plugin-react": ^6.0.1
   "@vitest/coverage-v8": ^4.1.3

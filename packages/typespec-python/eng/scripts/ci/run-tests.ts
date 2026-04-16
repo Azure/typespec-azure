@@ -137,7 +137,12 @@ async function runToxEnv(env: string, pythonPath: string, name?: string): Promis
   });
 }
 
-async function runParallel(envs: string[], pythonPath: string, maxJobs: number, name?: string): Promise<ToxResult[]> {
+async function runParallel(
+  envs: string[],
+  pythonPath: string,
+  maxJobs: number,
+  name?: string,
+): Promise<ToxResult[]> {
   const results: ToxResult[] = [];
   const running: Map<string, Promise<ToxResult>> = new Map();
 
@@ -198,7 +203,11 @@ async function main(): Promise<void> {
 
   // Header
   console.log(pc.cyan("\n╔══════════════════════════════════════════════════════════╗"));
-  console.log(pc.cyan("║") + pc.bold("              TypeSpec Python SDK Tests                   ") + pc.cyan("║"));
+  console.log(
+    pc.cyan("║") +
+      pc.bold("              TypeSpec Python SDK Tests                   ") +
+      pc.cyan("║"),
+  );
   console.log(pc.cyan("╚══════════════════════════════════════════════════════════╝") + "\n");
 
   // Get Python path
@@ -248,7 +257,9 @@ async function main(): Promise<void> {
   const testEnvs = envs.filter((e) => e.startsWith("test-"));
   const otherEnvs = envs.filter((e) => !e.startsWith("test-"));
 
-  const maxJobs = argv.values.jobs ? parseInt(argv.values.jobs, 10) : Math.max(2, cpus().length - 2);
+  const maxJobs = argv.values.jobs
+    ? parseInt(argv.values.jobs, 10)
+    : Math.max(2, cpus().length - 2);
 
   console.log(`  Flavors:      ${flavors.join(", ")}`);
   console.log(`  Environments: ${envs.join(", ")}`);

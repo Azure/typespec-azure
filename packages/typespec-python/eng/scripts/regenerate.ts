@@ -88,30 +88,30 @@ const EMITTER_OPTIONS: Record<string, Record<string, string> | Record<string, st
   "type/model/inheritance/recursive": [
     {
       "package-name": "typetest-model-recursive",
-      "namespace": "typetest.model.recursive",
+      namespace: "typetest.model.recursive",
     },
     {
       "package-name": "generation-subdir",
-      "namespace": "generation.subdir",
+      namespace: "generation.subdir",
       "generation-subdir": "_generated",
       "clear-output-folder": "true",
     },
   ],
   "client/structure/client-operation-group": {
     "package-name": "client-structure-clientoperationgroup",
-    "namespace": "client.structure.clientoperationgroup",
+    namespace: "client.structure.clientoperationgroup",
   },
   "client/structure/multi-client": {
     "package-name": "client-structure-multiclient",
-    "namespace": "client.structure.multiclient",
+    namespace: "client.structure.multiclient",
   },
   "client/structure/renamed-operation": {
     "package-name": "client-structure-renamedoperation",
-    "namespace": "client.structure.renamedoperation",
+    namespace: "client.structure.renamedoperation",
   },
   "client/structure/two-operation-group": {
     "package-name": "client-structure-twooperationgroup",
-    "namespace": "client.structure.twooperationgroup",
+    namespace: "client.structure.twooperationgroup",
   },
 };
 
@@ -137,8 +137,11 @@ function defaultPackageName(spec: string): string {
 function getEmitterOptions(spec: string, flavor: string): Record<string, string>[] {
   const specDir = spec.includes("azure") ? AZURE_HTTP_SPECS : HTTP_SPECS;
   const relativeSpec = toPosix(relative(specDir, spec));
-  const key = relativeSpec.includes("resiliency/srv-driven/old.tsp") ? relativeSpec : dirname(relativeSpec);
-  const emitterOpts = EMITTER_OPTIONS[key] || (flavor === "azure" ? AZURE_EMITTER_OPTIONS[key] : [{}]) || [{}];
+  const key = relativeSpec.includes("resiliency/srv-driven/old.tsp")
+    ? relativeSpec
+    : dirname(relativeSpec);
+  const emitterOpts = EMITTER_OPTIONS[key] ||
+    (flavor === "azure" ? AZURE_EMITTER_OPTIONS[key] : [{}]) || [{}];
   return Array.isArray(emitterOpts) ? emitterOpts : [emitterOpts];
 }
 
@@ -239,7 +242,9 @@ async function runParallel(groups: TaskGroup[], maxJobs: number): Promise<Map<st
         if (result.success) {
           console.log(pc.green(`[${completed}/${totalTasks}] ${packageName} succeeded`));
         } else {
-          console.log(pc.red(`[${completed}/${totalTasks}] ${packageName} failed: ${result.error}`));
+          console.log(
+            pc.red(`[${completed}/${totalTasks}] ${packageName} failed: ${result.error}`),
+          );
           groupSuccess = false;
         }
       }
@@ -263,24 +268,29 @@ async function runParallel(groups: TaskGroup[], maxJobs: number): Promise<Map<st
 async function preprocess(flavor: string): Promise<void> {
   if (flavor === "azure") {
     const generalParts = [PLUGIN_DIR, "tests", "generated", "azure"];
-    await promises.writeFile(
-      join(...generalParts, "authentication-api-key", "authentication", "apikey", "_operations", "to_be_deleted.py"),
-      "# This file is to be deleted after regeneration",
+    const authFile = join(
+      ...generalParts,
+      "authentication-api-key",
+      "authentication",
+      "apikey",
+      "_operations",
+      "to_be_deleted.py",
     );
+    await promises.mkdir(dirname(authFile), { recursive: true });
+    await promises.writeFile(authFile, "# This file is to be deleted after regeneration");
 
     const folderParts = [...generalParts, "generation-subdir"];
-    await promises.writeFile(
-      join(...folderParts, "generation", "subdir", "_generated", "to_be_deleted.py"),
-      "# This file is to be deleted after regeneration",
-    );
-    await promises.writeFile(
-      join(...folderParts, "generated_tests", "to_be_deleted.py"),
-      "# This file is to be kept after regeneration",
-    );
-    await promises.writeFile(
-      join(...folderParts, "generation", "subdir", "to_be_kept.py"),
-      "# This file is to be kept after regeneration",
-    );
+    const genFile = join(...folderParts, "generation", "subdir", "_generated", "to_be_deleted.py");
+    await promises.mkdir(dirname(genFile), { recursive: true });
+    await promises.writeFile(genFile, "# This file is to be deleted after regeneration");
+
+    const testFile = join(...folderParts, "generated_tests", "to_be_deleted.py");
+    await promises.mkdir(dirname(testFile), { recursive: true });
+    await promises.writeFile(testFile, "# This file is to be kept after regeneration");
+
+    const keptFile = join(...folderParts, "generation", "subdir", "to_be_kept.py");
+    await promises.mkdir(dirname(keptFile), { recursive: true });
+    await promises.writeFile(keptFile, "# This file is to be kept after regeneration");
   }
 }
 

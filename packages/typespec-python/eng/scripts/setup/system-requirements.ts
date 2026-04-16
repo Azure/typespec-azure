@@ -1,11 +1,15 @@
-import { SpawnOptions, ChildProcess, spawn } from "child_process";
+import { ChildProcess, spawn, SpawnOptions } from "child_process";
 import { coerce, satisfies } from "semver";
 
 /*
  * Copied from @autorest/system-requirements
  */
 
-const execute = (command: string, cmdlineargs: Array<string>, options: MoreOptions = {}): Promise<ExecResult> => {
+const execute = (
+  command: string,
+  cmdlineargs: Array<string>,
+  options: MoreOptions = {},
+): Promise<ExecResult> => {
   return new Promise((resolve, reject) => {
     const cp = spawn(command, cmdlineargs, { ...options, stdio: "pipe", shell: true });
     if (options.onCreate) {
@@ -104,7 +108,11 @@ const tryPython = async (
   };
 
   try {
-    const result = await execute(command, [...additionalArgs, "-c", `"${PRINT_PYTHON_VERSION_SCRIPT}"`]);
+    const result = await execute(command, [
+      ...additionalArgs,
+      "-c",
+      `"${PRINT_PYTHON_VERSION_SCRIPT}"`,
+    ]);
     return validateVersionRequirement(resolution, result.stdout.trim(), requirement);
   } catch (e) {
     return {

@@ -1,12 +1,16 @@
-import { SdkContext, SdkServiceOperation, BrandedSdkEmitterOptions } from "@azure-tools/typespec-client-generator-core";
+import {
+  BrandedSdkEmitterOptions,
+  SdkContext,
+  SdkServiceOperation,
+} from "@azure-tools/typespec-client-generator-core";
 import { createTypeSpecLibrary, JSONSchemaType } from "@typespec/compiler";
 import { PythonEmitterOptions, PythonEmitterOptionsSchema } from "@typespec/http-client-python";
 
 export interface PythonAzureEmitterOptions extends PythonEmitterOptions {
   "examples-dir"?: string;
-  "namespace"?: string;
+  namespace?: string;
 
-  "flavor"?: "azure";
+  flavor?: "azure";
   "models-mode"?: string;
   "generate-sample"?: boolean;
   "generate-test"?: boolean;
@@ -26,7 +30,7 @@ const PythonAzureEmitterOptionsSchema: JSONSchemaType<PythonAzureEmitterOptions>
     ...BrandedSdkEmitterOptions["examples-dir"],
     ...BrandedSdkEmitterOptions["namespace"],
 
-    "flavor": {
+    flavor: {
       type: "string",
       nullable: true,
       description: "The flavor of the SDK.",
@@ -41,12 +45,14 @@ const PythonAzureEmitterOptionsSchema: JSONSchemaType<PythonAzureEmitterOptions>
     "generate-sample": {
       type: "boolean",
       nullable: true,
-      description: "Whether to generate sample files, for basic samples of your generated sdks. Defaults to `false`.",
+      description:
+        "Whether to generate sample files, for basic samples of your generated sdks. Defaults to `false`.",
     },
     "generate-test": {
       type: "boolean",
       nullable: true,
-      description: "Whether to generate test files, for basic testing of your generated sdks. Defaults to `false`.",
+      description:
+        "Whether to generate test files, for basic testing of your generated sdks. Defaults to `false`.",
     },
     ...PythonEmitterOptionsSchema.properties,
   },
