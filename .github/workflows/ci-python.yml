@@ -62,6 +62,7 @@ jobs:
             packages/typespec-python/tests/generated
             packages/typespec-python/tests/.wheels
             packages/typespec-python/dist
+            core/packages/spector/dist
           retention-days: 1
 
   test:
