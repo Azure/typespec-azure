@@ -12,7 +12,6 @@ const testsDir = join(root, "tests");
 
 const argv = parseArgs({
   args: process.argv.slice(2),
-  allowPositionals: true,
   options: {
     flavor: { type: "string", short: "f", default: "all" },
     env: { type: "string", short: "e" },
