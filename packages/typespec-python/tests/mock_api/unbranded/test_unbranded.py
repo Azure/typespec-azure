@@ -29,8 +29,11 @@ def test_track_back(client: ScalarClient):
         client.string.put("to raise exception")
     except HttpResponseError:
         track_back = traceback.format_exc().lower()
-        assert "azure" not in track_back
-        assert "microsoft" not in track_back
+        # Filter out file path lines (contain repo path which may include "azure"/"microsoft")
+        lines = [line for line in track_back.split("\n") if not line.strip().startswith("file ")]
+        filtered = "\n".join(lines)
+        assert "azure" not in filtered
+        assert "microsoft" not in filtered
 
 
 def check_sensitive_word(folder: Path, word: str) -> str:

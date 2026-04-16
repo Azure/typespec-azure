@@ -4,14 +4,20 @@
 # license information.
 # --------------------------------------------------------------------------
 import pytest
-from generation.subdir import Extension
-from generation.subdir.aio import CustomizedClient
+import pytest_asyncio
+from generation.subdir._generated.aio import RecursiveClient
+from generation.subdir._generated.models import Extension
+
+
+@pytest_asyncio.fixture
+async def client():
+    async with RecursiveClient() as client:
+        yield client
 
 
 @pytest.mark.asyncio
-async def test_custom_method():
-    client = CustomizedClient()
-    assert (await client.customized_get()) == Extension(
+async def test_custom_method(client: RecursiveClient):
+    assert await client.get() == Extension(
         {
             "level": 0,
             "extension": [{"level": 1, "extension": [{"level": 2}]}, {"level": 1}],
