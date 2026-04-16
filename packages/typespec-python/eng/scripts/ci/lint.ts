@@ -79,11 +79,23 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  // Run pylint via the CI helper script
+  // Run pylint via the CI helper script for both flavors
   const pylintScript = join(root, "eng", "scripts", "ci", "run_pylint.py");
-  const success = await runCommand(pythonPath, [pylintScript], "pylint");
+  const flavors = ["azure", "unbranded"];
+  let allPassed = true;
 
-  if (!success) {
+  for (const flavor of flavors) {
+    const success = await runCommand(
+      pythonPath,
+      [pylintScript, "-t", flavor, "-s", "generated"],
+      `pylint (${flavor})`,
+    );
+    if (!success) {
+      allPassed = false;
+    }
+  }
+
+  if (!allPassed) {
     process.exit(1);
   }
 
