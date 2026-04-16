@@ -89,8 +89,8 @@ jobs:
       - name: Build spector and specs
         run: |
           pnpm --filter "@typespec/spector..." run build
-          pnpm --filter "@typespec/http-specs" run build
-          pnpm --filter "@azure-tools/azure-http-specs" run build
+          pnpm --filter "@typespec/http-specs" exec tsc -p ./tsconfig.build.json
+          pnpm --filter "@azure-tools/azure-http-specs" exec tsc -p ./tsconfig.build.json
 
       - name: Prepare Python environment
         run: pnpm run prepare
