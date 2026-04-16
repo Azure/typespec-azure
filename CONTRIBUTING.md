@@ -207,6 +207,8 @@ The package also needs a `vitest.config.ts` — the root vitest workspace config
 }
 ```
 
+`test:extra` should only contain fast unit tests. Slow end-to-end tests should use `test:e2e` instead.
+
 **Package with custom formatting**:
 
 ```json
