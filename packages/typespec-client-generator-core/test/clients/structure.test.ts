@@ -3173,7 +3173,7 @@ it("validation: diagnostic when operation is missing from @client definition", a
   expectDiagnostics(program.diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/operation-not-in-client",
-      message: `Operation "opB" under namespace "MyService" is not included in any @client definition. If you are using @client to customize the client, ensure all service operations are included.`,
+      message: `Operation "opB" under namespace "MyService" is not included in any @client definition.`,
     },
   ]);
 });
@@ -3205,7 +3205,7 @@ it("validation: diagnostic for operations in nested namespace not covered by @cl
   expectDiagnostics(program.diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/operation-not-in-client",
-      message: `Operation "opB" under namespace "MyService.SubGroup" is not included in any @client definition. If you are using @client to customize the client, ensure all service operations are included.`,
+      message: `Operation "opB" under namespace "MyService.SubGroup" is not included in any @client definition.`,
     },
   ]);
 });
@@ -3237,7 +3237,7 @@ it("validation: diagnostic for operations in interface not covered by @client", 
   expectDiagnostics(program.diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/operation-not-in-client",
-      message: `Operation "opB" under namespace "MyService" is not included in any @client definition. If you are using @client to customize the client, ensure all service operations are included.`,
+      message: `Operation "opB" under namespace "MyService" is not included in any @client definition.`,
     },
   ]);
 });
