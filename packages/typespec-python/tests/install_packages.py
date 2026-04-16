@@ -40,17 +40,15 @@ def build_wheels(flavor, tests_dir):
 
     print(f"Building {len(packages)} wheels for {flavor}...")
 
-    batch_size = 50
-    for i in range(0, len(packages), batch_size):
-        batch = packages[i:i + batch_size]
+    for pkg in packages:
         try:
             subprocess.run(
-                ["uv", "pip", "wheel", "--no-deps", "--wheel-dir", wheel_dir] + batch,
+                ["uv", "build", "--wheel", "--no-build-logs", "--out-dir", wheel_dir, pkg],
                 check=True,
             )
         except FileNotFoundError:
             subprocess.run(
-                [sys.executable, "-m", "pip", "wheel", "--no-deps", "--wheel-dir", wheel_dir] + batch,
+                [sys.executable, "-m", "pip", "wheel", "--no-deps", "--wheel-dir", wheel_dir, pkg],
                 check=True,
             )
 
