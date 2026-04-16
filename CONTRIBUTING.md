@@ -232,12 +232,12 @@ The package also needs a `vitest.config.ts` — the root vitest workspace config
 
 ### How the top-level commands work
 
-| Command              | What runs                                              |
-| -------------------- | ------------------------------------------------------ |
-| `pnpm test`          | vitest (workspace) + `turbo run test:extra`             |
-| `pnpm format`        | prettier (whole repo) + `turbo run format:extra`        |
-| `pnpm format:check`  | prettier (check) + `turbo run format:extra:check`       |
-| `pnpm lint`          | eslint (whole repo) + `turbo run lint:extra`            |
+| Command             | What runs                                         |
+| ------------------- | ------------------------------------------------- |
+| `pnpm test`         | vitest (workspace) + `turbo run test:extra`       |
+| `pnpm format`       | prettier (whole repo) + `turbo run format:extra`  |
+| `pnpm format:check` | prettier (check) + `turbo run format:extra:check` |
+| `pnpm lint`         | eslint (whole repo) + `turbo run lint:extra`      |
 
 Vitest workspace mode runs all vitest-based packages in a single process with relative error paths. Turbo handles the `:extra` tasks in parallel for packages that define them — if no package defines them, the turbo step is a no-op.
 
@@ -484,10 +484,11 @@ Process labels
 
 Misc labels
 
-| Name               | Color   | Description                                        |
-| ------------------ | ------- | -------------------------------------------------- |
-| `good first issue` | #7057ff | Good for newcomers                                 |
-| `int:azure-specs`  | #0e8a16 | Run integration tests against azure-rest-api-specs |
+| Name                | Color   | Description                                        |
+| ------------------- | ------- | -------------------------------------------------- |
+| `good first issue`  | #7057ff | Good for newcomers                                 |
+| `int:azure-specs`   | #0e8a16 | Run integration tests against azure-rest-api-specs |
+| `agentic-workflows` | #000000 | Issues/PR created by github agentic workflows      |
 
 #### external
 

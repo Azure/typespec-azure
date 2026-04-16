@@ -89,6 +89,10 @@ export default defineConfig({
           color: "0e8a16",
           description: "Run integration tests against azure-rest-api-specs",
         },
+        "agentic-workflows": {
+          color: "000000",
+          description: "Issues/PR created by github agentic workflows",
+        },
       },
     },
     external: {
