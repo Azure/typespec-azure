@@ -36,6 +36,12 @@ export const BASE_AZURE_EMITTER_OPTIONS: Record<
   "azure/client-generator-core/client-initialization/individuallyParent": {
     namespace: "specs.azure.clientgenerator.core.clientinitialization.individuallyparent",
   },
+  "azure/client-generator-core/client-default-value": {
+    namespace: "specs.azure.clientgenerator.core.clientdefaultvalue",
+  },
+  "azure/client-generator-core/client-doc": {
+    namespace: "specs.azure.clientgenerator.core.clientdoc",
+  },
   "azure/client-generator-core/client-location": {
     namespace: "specs.azure.clientgenerator.core.clientlocation",
   },
@@ -53,6 +59,12 @@ export const BASE_AZURE_EMITTER_OPTIONS: Record<
   },
   "azure/client-generator-core/hierarchy-building": {
     namespace: "specs.azure.clientgenerator.core.hierarchybuilding",
+  },
+  "azure/client-generator-core/next-link-verb": {
+    namespace: "specs.azure.clientgenerator.core.nextlinkverb",
+  },
+  "azure/client-generator-core/response-as-bool": {
+    namespace: "specs.azure.clientgenerator.core.responseasbool",
   },
   "azure/core/basic": {
     namespace: "specs.azure.core.basic",
