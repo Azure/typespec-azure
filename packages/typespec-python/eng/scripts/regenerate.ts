@@ -138,6 +138,10 @@ const AZURE_HTTP_SPECS = resolve(PLUGIN_DIR, "node_modules/@azure-tools/azure-ht
 const HTTP_SPECS = resolve(PLUGIN_DIR, "node_modules/@typespec/http-specs/specs");
 const EMITTER_NAME = "@azure-tools/typespec-python";
 
+function isAzureSpec(specPath: string): boolean {
+  return specPath.startsWith(AZURE_HTTP_SPECS);
+}
+
 // Emitter options
 const AZURE_EMITTER_OPTIONS: Record<string, Record<string, string> | Record<string, string>[]> = {
   "azure/client-generator-core/access": {
@@ -427,14 +431,14 @@ interface TaskGroup {
 }
 
 function defaultPackageName(spec: string): string {
-  const specDir = spec.includes("azure") ? AZURE_HTTP_SPECS : HTTP_SPECS;
+  const specDir = isAzureSpec(spec) ? AZURE_HTTP_SPECS : HTTP_SPECS;
   return toPosix(relative(specDir, dirname(spec)))
     .replace(/\//g, "-")
     .toLowerCase();
 }
 
 function getEmitterOptions(spec: string, flavor: string): Record<string, string>[] {
-  const specDir = spec.includes("azure") ? AZURE_HTTP_SPECS : HTTP_SPECS;
+  const specDir = isAzureSpec(spec) ? AZURE_HTTP_SPECS : HTTP_SPECS;
   const relativeSpec = toPosix(relative(specDir, spec));
   const key = relativeSpec.includes("resiliency/srv-driven/old.tsp")
     ? relativeSpec
@@ -526,7 +530,7 @@ async function runParallel(groups: TaskGroup[], maxJobs: number): Promise<Map<st
     // Each group runs as a unit - tasks within a group run sequentially
     // But different groups can run in parallel
     const runGroup = async () => {
-      const specDir = group.spec.includes("azure") ? AZURE_HTTP_SPECS : HTTP_SPECS;
+      const specDir = isAzureSpec(group.spec) ? AZURE_HTTP_SPECS : HTTP_SPECS;
       const shortName = toPosix(relative(specDir, dirname(group.spec)));
 
       // Run all tasks in this group sequentially to avoid state pollution

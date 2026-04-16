@@ -82,7 +82,10 @@ jobs:
       - uses: ./.github/actions/setup-python
 
       - name: Install dependencies
-        run: pnpm install --filter "@azure-tools/typespec-python..."
+        run: pnpm install
+
+      - name: Build spector
+        run: pnpm --filter "@typespec/spector..." run build
 
       - name: Prepare Python environment
         run: pnpm run prepare
