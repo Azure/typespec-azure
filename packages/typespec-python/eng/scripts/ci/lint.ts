@@ -37,7 +37,7 @@ function getVenvPython(): string {
   } else if (fs.existsSync(join(venvPath, "Scripts"))) {
     return join(venvPath, "Scripts", "python.exe");
   }
-  throw new Error("Virtual environment not found. Run 'npm run install' first.");
+  throw new Error("Virtual environment not found. Run 'pnpm run install' first.");
 }
 
 function runCommand(command: string, args: string[], displayName?: string): Promise<boolean> {

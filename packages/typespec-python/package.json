@@ -38,8 +38,8 @@
     "format:extra": "tsx ./eng/scripts/ci/format.ts --python",
     "format:extra:check": "tsx ./eng/scripts/ci/format.ts --python --check",
     "regenerate": "tsx ./eng/scripts/regenerate.ts",
-    "test:e2e": "tsx ./eng/scripts/ci/run-tests.ts",
-    "regen-docs": "npm run build && tspd doc . --enable-experimental --output-dir ./website/src/content/docs/docs/emitters/clients/typespec-python/reference --skip-js"
+    "test:python:e2e": "tsx ./eng/scripts/ci/run-tests.ts",
+    "regen-docs": "pnpm run build && tspd doc . --enable-experimental --output-dir ./website/src/content/docs/docs/emitters/clients/typespec-python/reference --skip-js"
   },
   "files": [
     "dist/**",
