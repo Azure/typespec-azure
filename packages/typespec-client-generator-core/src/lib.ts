@@ -547,7 +547,7 @@ export const $lib = createTypeSpecLibrary({
     "operation-not-in-client": {
       severity: "warning",
       messages: {
-        default: paramMessage`Operation "${"operationName"}" under namespace "${"namespaceName"}" is not included in any @client definition. If you are using @client to customize the client, ensure all service operations are included.`,
+        default: paramMessage`Operation "${"operationName"}" under namespace "${"namespaceName"}" is not included in any @client definition.`,
       },
     },
   },
