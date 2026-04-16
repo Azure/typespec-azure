@@ -45,9 +45,7 @@ async function main(): Promise<void> {
     lastPrNumber: latestMergedPr ?? undefined,
   });
 
-  console.log(
-    `[update-meta] Updated metadata for ${configName}: commit ${commit.slice(0, 8)}`,
-  );
+  console.log(`[update-meta] Updated metadata for ${configName}: commit ${commit.slice(0, 8)}`);
 }
 
 main().catch((err) => {
