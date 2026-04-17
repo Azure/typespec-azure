@@ -3124,7 +3124,7 @@ op createJob(
         code: string,
         operationName?: string,
       ): Promise<[HttpOperation, LroMetadata | undefined, TesterInstance]> {
-        let [operations, _diagnostics, runner] = await getOperations(
+        let [operations, , runner] = await getOperations(
           `
           model TestModel {
             @key

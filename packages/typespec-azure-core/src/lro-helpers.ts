@@ -409,7 +409,10 @@ function createLroMetadata(
   if (finalState === undefined || context.pollingStep === undefined) return undefined;
 
   // If original-uri is explicitly specified via @useFinalStateVia and there's no GET
-  // operation at the same path, emit a warning and treat the final result as void
+  // operation at the same path, emit a warning and treat the final result as void.
+  // We check both finalState and finalStateOverride to only emit the diagnostic when
+  // the user explicitly opted into original-uri (via @useFinalStateVia), not when
+  // original-uri is the natural computed state (e.g., for standard resource create operations).
   let resolvedModel = model;
   const finalStateOverride = getFinalStateOverride(program, operation);
   if (
