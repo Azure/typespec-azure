@@ -22,9 +22,6 @@ jobs:
   build:
     name: "Build & Regenerate"
     runs-on: ubuntu-latest
-    env:
-      TYPESPEC_VS_CI_BUILD: true
-      TYPESPEC_SKIP_WEBSITE_BUILD: true
     steps:
       - uses: actions/checkout@v6
         with:
@@ -38,7 +35,7 @@ jobs:
         run: pnpm install
 
       - name: Build
-        run: pnpm --filter "@azure-tools/typespec-python..." run build
+        run: pnpm turbo run --filter "@azure-tools/typespec-python..." build
 
       - name: Prepare Python environment
         run: pnpm run prepare
@@ -71,9 +68,6 @@ jobs:
     name: "Mock API Tests"
     needs: build
     runs-on: ubuntu-latest
-    env:
-      TYPESPEC_VS_CI_BUILD: true
-      TYPESPEC_SKIP_WEBSITE_BUILD: true
     steps:
       - uses: actions/checkout@v6
         with:
@@ -88,7 +82,7 @@ jobs:
 
       - name: Build spector and specs
         run: |
-          pnpm --filter "@typespec/spector..." run build
+          pnpm turbo run --filter "@typespec/spector..." build
           pnpm --filter "@typespec/http-specs" exec tsc -p ./tsconfig.build.json
           pnpm --filter "@azure-tools/azure-http-specs" exec tsc -p ./tsconfig.build.json
 

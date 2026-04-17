@@ -92,12 +92,9 @@
     "@typespec/versioning": "workspace:^",
     "@typespec/xml": "workspace:^",
     "c8": "catalog:",
-    "eslint": "catalog:",
     "picocolors": "catalog:",
-    "prettier": "catalog:",
     "rimraf": "catalog:",
     "typescript": "catalog:",
-    "typescript-eslint": "catalog:",
     "vitest": "catalog:"
   }
 }
