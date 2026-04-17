@@ -207,6 +207,9 @@ catalogs:
     '@typescript-eslint/utils':
       specifier: ^8.58.1
       version: 8.58.1
+    '@typespec/http-client-python':
+      specifier: ^0.28.3
+      version: 0.28.3
     '@typespec/ts-http-runtime':
       specifier: 0.3.4
       version: 0.3.4
@@ -3644,6 +3647,100 @@ importers:
       '@vitest/ui':
         specifier: 'catalog:'
         version: 4.1.3(vitest@4.1.3)
+      rimraf:
+        specifier: 'catalog:'
+        version: 6.1.3
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.2
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.3(@types/node@25.5.2)(@vitest/coverage-v8@4.1.3)(@vitest/ui@4.1.3)(happy-dom@20.8.9)(jsdom@25.0.1)(vite@8.0.7(@types/node@25.5.2)(esbuild@0.28.0)(tsx@4.21.0)(yaml@2.8.3))
+
+  packages/typespec-python:
+    dependencies:
+      '@typespec/http-client-python':
+        specifier: 'catalog:'
+        version: 0.28.3(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)
+      semver:
+        specifier: 'catalog:'
+        version: 7.7.4
+      tsx:
+        specifier: 'catalog:'
+        version: 4.21.0
+    devDependencies:
+      '@azure-tools/azure-http-specs':
+        specifier: workspace:^
+        version: link:../azure-http-specs
+      '@azure-tools/typespec-autorest':
+        specifier: workspace:^
+        version: link:../typespec-autorest
+      '@azure-tools/typespec-azure-core':
+        specifier: workspace:^
+        version: link:../typespec-azure-core
+      '@azure-tools/typespec-azure-resource-manager':
+        specifier: workspace:^
+        version: link:../typespec-azure-resource-manager
+      '@azure-tools/typespec-azure-rulesets':
+        specifier: workspace:^
+        version: link:../typespec-azure-rulesets
+      '@azure-tools/typespec-client-generator-core':
+        specifier: workspace:^
+        version: link:../typespec-client-generator-core
+      '@types/node':
+        specifier: 'catalog:'
+        version: 25.5.2
+      '@types/semver':
+        specifier: 'catalog:'
+        version: 7.7.1
+      '@types/yargs':
+        specifier: 'catalog:'
+        version: 17.0.35
+      '@typespec/compiler':
+        specifier: workspace:^
+        version: link:../../core/packages/compiler
+      '@typespec/events':
+        specifier: workspace:^
+        version: link:../../core/packages/events
+      '@typespec/http':
+        specifier: workspace:^
+        version: link:../../core/packages/http
+      '@typespec/http-specs':
+        specifier: workspace:^
+        version: link:../../core/packages/http-specs
+      '@typespec/openapi':
+        specifier: workspace:^
+        version: link:../../core/packages/openapi
+      '@typespec/rest':
+        specifier: workspace:^
+        version: link:../../core/packages/rest
+      '@typespec/spec-api':
+        specifier: workspace:^
+        version: link:../../core/packages/spec-api
+      '@typespec/spector':
+        specifier: workspace:^
+        version: link:../../core/packages/spector
+      '@typespec/sse':
+        specifier: workspace:^
+        version: link:../../core/packages/sse
+      '@typespec/streams':
+        specifier: workspace:^
+        version: link:../../core/packages/streams
+      '@typespec/tspd':
+        specifier: workspace:^
+        version: link:../../core/packages/tspd
+      '@typespec/versioning':
+        specifier: workspace:^
+        version: link:../../core/packages/versioning
+      '@typespec/xml':
+        specifier: workspace:^
+        version: link:../../core/packages/xml
+      c8:
+        specifier: 'catalog:'
+        version: 11.0.0
+      picocolors:
+        specifier: 'catalog:'
+        version: 1.1.1
       rimraf:
         specifier: 'catalog:'
         version: 6.1.3
@@ -7499,9 +7596,6 @@ packages:
   '@types/node@24.12.0':
     resolution: {integrity: sha512-GYDxsZi3ChgmckRT9HPU0WEhKLP08ev/Yfcq2AstjrDASOYCSXeyjDsHg4v5t4jOj7cyDX3vmprafKlWIG9MXQ==}
 
-  '@types/node@25.5.0':
-    resolution: {integrity: sha512-jp2P3tQMSxWugkCUKLRPVUpGaL5MVFwF8RDuSRztfwgN1wmqJeMSbKlnEtQqU8UrhTmzEmZdu2I6v2dpp7XIxw==}
-
   '@types/node@25.5.2':
     resolution: {integrity: sha512-tO4ZIRKNC+MDWV4qKVZe3Ql/woTnmHDr5JD8UI5hn2pwBrHEwOEMZK7WlNb5RKB6EoJ02gwmQS9OrjuFnZYdpg==}
 
@@ -7661,6 +7755,25 @@ packages:
   '@typescript-eslint/visitor-keys@8.58.1':
     resolution: {integrity: sha512-y+vH7QE8ycjoa0bWciFg7OpFcipUuem1ujhrdLtq1gByKwfbC7bPeKsiny9e0urg93DqwGcHey+bGRKCnF1nZQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@typespec/http-client-python@0.28.3':
+    resolution: {integrity: sha512-UkahPQB23vAYFY+7YtN1H+wG1+H642Hw8FlF5LAEtSx0bu2PNkrQe9W8COZWLoVKBuWh5oLJEzVZd8FRP9nBbg==}
+    engines: {node: '>=20.0.0'}
+    peerDependencies:
+      '@azure-tools/typespec-autorest': '>=0.67.0 <1.0.0'
+      '@azure-tools/typespec-azure-core': '>=0.67.0 <1.0.0'
+      '@azure-tools/typespec-azure-resource-manager': '>=0.67.0 <1.0.0'
+      '@azure-tools/typespec-azure-rulesets': '>=0.67.0 <1.0.0'
+      '@azure-tools/typespec-client-generator-core': '>=0.67.0 <1.0.0'
+      '@typespec/compiler': ^1.11.0
+      '@typespec/events': '>=0.81.0 <1.0.0'
+      '@typespec/http': ^1.11.0
+      '@typespec/openapi': ^1.11.0
+      '@typespec/rest': '>=0.81.0 <1.0.0'
+      '@typespec/sse': '>=0.81.0 <1.0.0'
+      '@typespec/streams': '>=0.81.0 <1.0.0'
+      '@typespec/versioning': '>=0.81.0 <1.0.0'
+      '@typespec/xml': '>=0.81.0 <1.0.0'
 
   '@typespec/ts-http-runtime@0.3.4':
     resolution: {integrity: sha512-CI0NhTrz4EBaa0U+HaaUZrJhPoso8sG7ZFya8uQoBA57fjzrjRSv87ekCjLZOFExN+gXE/z0xuN2QfH4H2HrLQ==}
@@ -9757,9 +9870,6 @@ packages:
     resolution: {integrity: sha512-f7ccFPK3SXFHpx15UIGyRJ/FJQctuKZ0zVuN3frBo4HnK3cay9VEW0R6yPYFHC0AgqhukPzKjq22t5DmAyqGyw==}
     engines: {node: '>=16'}
 
-  flatted@3.4.1:
-    resolution: {integrity: sha512-IxfVbRFVlV8V/yRaGzk0UVIcsKKHMSfYw66T/u4nTwlWteQePsxe//LjudR1AMX4tZW3WFCh3Zqa/sjlqpbURQ==}
-
   flatted@3.4.2:
     resolution: {integrity: sha512-PjDse7RzhcPkIJwy5t7KPWQSZ9cAbzQXcafsetQoD7sOJRQlGikNbx7yZp2OotDnJyrDcbyRq3Ttb18iYOqkxA==}
 
@@ -11011,6 +11121,11 @@ packages:
     engines: {node: '>= 18'}
     hasBin: true
 
+  marked@15.0.12:
+    resolution: {integrity: sha512-8dD6FusOQSrpv9Z1rdNMdlSgQOIP880DHqnohobOmYLElGEqAL/JvxvuxZO16r4HtjTlfPRDC1hbvxC9dPN2nA==}
+    engines: {node: '>= 18'}
+    hasBin: true
+
   marked@16.4.2:
     resolution: {integrity: sha512-TI3V8YYWvkVf3KJe1dRkpnjs68JUPyEa5vjKrp1XEEJUAOaQc+Qj+L1qWbPd0SJuAdQkFU0h73sXXqwDYxsiDA==}
     engines: {node: '>= 20'}
@@ -12111,6 +12226,10 @@ packages:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
 
+  pyodide@0.26.2:
+    resolution: {integrity: sha512-8VCRdFX83gBsWs6XP2rhG8HMaB+JaVyyav4q/EMzoV8fXH8HN6T5IISC92SNma6i1DRA3SVXA61S1rJcB8efgA==}
+    engines: {node: '>=18.0.0'}
+
   qs@6.15.0:
     resolution: {integrity: sha512-mAZTtNCeetKMH+pSjrb76NAM8V9a05I9aBZOHztWy/UqcJdQYNsf59vrRKWnojAT9Y+GbIvoTBC++CPHqpDBhQ==}
     engines: {node: '>=0.6'}
@@ -12571,6 +12690,11 @@ packages:
 
   semver@7.5.4:
     resolution: {integrity: sha512-1bCSESV6Pv+i21Hvpxp3Dx+pSD8lIPt8uVjRrxAUt/nbswYc+tK6Y2btiULjd4+fnq15PX+nqQDC7Oft7WkwcA==}
+    engines: {node: '>=10'}
+    hasBin: true
+
+  semver@7.6.3:
+    resolution: {integrity: sha512-oVekP1cKtI+CTDvHWYFUcMtsK/00wmAEfyqKfNdARm8u1wNVhSgaX7A8d4UuIlUI5e84iEwOhs7ZPYRmzU9U6A==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -15603,7 +15727,7 @@ snapshots:
     dependencies:
       '@eslint/object-schema': 3.0.5
       debug: 4.4.3
-      minimatch: 10.2.4
+      minimatch: 10.2.5
     transitivePeerDependencies:
       - supports-color
 
@@ -19279,7 +19403,7 @@ snapshots:
   '@tufjs/models@4.1.0':
     dependencies:
       '@tufjs/canonical-json': 2.0.0
-      minimatch: 10.2.4
+      minimatch: 10.2.5
 
   '@turbo/darwin-64@2.9.5':
     optional: true
@@ -19447,10 +19571,6 @@ snapshots:
     dependencies:
       undici-types: 7.16.0
 
-  '@types/node@25.5.0':
-    dependencies:
-      undici-types: 7.18.2
-
   '@types/node@25.5.2':
     dependencies:
       undici-types: 7.18.2
@@ -19490,7 +19610,7 @@ snapshots:
 
   '@types/sax@1.2.7':
     dependencies:
-      '@types/node': 25.5.0
+      '@types/node': 25.5.2
 
   '@types/semver@7.7.1': {}
 
@@ -19624,7 +19744,7 @@ snapshots:
       '@typescript-eslint/types': 8.58.1
       '@typescript-eslint/visitor-keys': 8.58.1
       debug: 4.4.3
-      minimatch: 10.2.4
+      minimatch: 10.2.5
       semver: 7.7.4
       tinyglobby: 0.2.15
       ts-api-utils: 2.5.0(typescript@6.0.2)
@@ -19647,6 +19767,31 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 8.58.1
       eslint-visitor-keys: 5.0.1
+
+  '@typespec/http-client-python@0.28.3(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)':
+    dependencies:
+      '@azure-tools/typespec-autorest': link:packages/typespec-autorest
+      '@azure-tools/typespec-azure-core': link:packages/typespec-azure-core
+      '@azure-tools/typespec-azure-resource-manager': link:packages/typespec-azure-resource-manager
+      '@azure-tools/typespec-azure-rulesets': link:packages/typespec-azure-rulesets
+      '@azure-tools/typespec-client-generator-core': link:packages/typespec-client-generator-core
+      '@typespec/compiler': link:core/packages/compiler
+      '@typespec/events': link:core/packages/events
+      '@typespec/http': link:core/packages/http
+      '@typespec/openapi': link:core/packages/openapi
+      '@typespec/rest': link:core/packages/rest
+      '@typespec/sse': link:core/packages/sse
+      '@typespec/streams': link:core/packages/streams
+      '@typespec/versioning': link:core/packages/versioning
+      '@typespec/xml': link:core/packages/xml
+      js-yaml: 4.1.1
+      marked: 15.0.12
+      pyodide: 0.26.2
+      semver: 7.6.3
+      tsx: 4.21.0
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
 
   '@typespec/ts-http-runtime@0.3.4':
     dependencies:
@@ -22124,7 +22269,7 @@ snapshots:
       imurmurhash: 0.1.4
       is-glob: 4.0.3
       json-stable-stringify-without-jsonify: 1.0.1
-      minimatch: 10.2.4
+      minimatch: 10.2.5
       natural-compare: 1.4.0
       optionator: 0.9.4
     transitivePeerDependencies:
@@ -22399,10 +22544,8 @@ snapshots:
 
   flat-cache@4.0.1:
     dependencies:
-      flatted: 3.4.1
+      flatted: 3.4.2
       keyv: 4.5.4
-
-  flatted@3.4.1: {}
 
   flatted@3.4.2: {}
 
@@ -22571,7 +22714,7 @@ snapshots:
     dependencies:
       foreground-child: 3.3.1
       jackspeak: 4.2.3
-      minimatch: 10.2.4
+      minimatch: 10.2.5
       minipass: 7.1.3
       package-json-from-dist: 1.0.1
       path-scurry: 2.0.2
@@ -23057,7 +23200,7 @@ snapshots:
 
   ignore-walk@8.0.0:
     dependencies:
-      minimatch: 10.2.4
+      minimatch: 10.2.5
 
   ignore@5.3.2: {}
 
@@ -23874,6 +24017,8 @@ snapshots:
 
   marked@14.0.0: {}
 
+  marked@15.0.12: {}
+
   marked@16.4.2: {}
 
   math-intrinsics@1.1.0: {}
@@ -24394,7 +24539,7 @@ snapshots:
 
   minimatch@10.2.3:
     dependencies:
-      brace-expansion: 5.0.4
+      brace-expansion: 5.0.5
 
   minimatch@10.2.4:
     dependencies:
@@ -25285,6 +25430,13 @@ snapshots:
 
   punycode@2.3.1: {}
 
+  pyodide@0.26.2:
+    dependencies:
+      ws: 8.19.0
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
   qs@6.15.0:
     dependencies:
       side-channel: 1.1.0
@@ -25926,6 +26078,8 @@ snapshots:
   semver@7.5.4:
     dependencies:
       lru-cache: 6.0.0
+
+  semver@7.6.3: {}
 
   semver@7.7.4: {}
 
@@ -26590,7 +26744,7 @@ snapshots:
     dependencies:
       '@istanbuljs/schema': 0.1.3
       glob: 13.0.6
-      minimatch: 10.2.4
+      minimatch: 10.2.5
 
   text-decoder@1.2.7:
     dependencies:
