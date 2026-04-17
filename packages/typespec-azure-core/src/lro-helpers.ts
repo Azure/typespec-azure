@@ -62,8 +62,8 @@ import {
   type StatusMonitorMetadata,
 } from "./decorators/polling-location.js";
 import { PollingOperationKey } from "./decorators/polling-operation.js";
-import type { PropertyMap } from "./lro-info.js";
 import { reportDiagnostic } from "./lib.js";
+import type { PropertyMap } from "./lro-info.js";
 import { FinalStateValue, getFinalStateOverride } from "./state/final-state.js";
 
 /**
