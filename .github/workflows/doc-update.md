@@ -85,6 +85,8 @@ network:
     - go
 
 safe-outputs:
+  noop:
+    report-as-issue: false
   create-pull-request:
     title-prefix: "[Automated][${{ github.event.inputs.config }}] "
     labels: [docs, "lib:${{ github.event.inputs.config }}"]
