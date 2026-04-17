@@ -24,6 +24,7 @@ import {
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import {
+  getAllHttpServices,
   getHeaderFieldName,
   getHttpOperation,
   getOperationVerb,
@@ -62,6 +63,7 @@ import {
 } from "./decorators/polling-location.js";
 import { PollingOperationKey } from "./decorators/polling-operation.js";
 import type { PropertyMap } from "./lro-info.js";
+import { reportDiagnostic } from "./lib.js";
 import { FinalStateValue, getFinalStateOverride } from "./state/final-state.js";
 
 /**
@@ -404,24 +406,43 @@ function createLroMetadata(
   context: LroContext,
 ): LroMetadata | undefined {
   const [finalState, model] = getFinalStateVia(program, operation, context);
-  if (finalState === undefined || model === undefined || context.pollingStep === undefined)
-    return undefined;
+  if (finalState === undefined || context.pollingStep === undefined) return undefined;
+
+  // If original-uri is explicitly specified via @useFinalStateVia and there's no GET
+  // operation at the same path, emit a warning and treat the final result as void
+  let resolvedModel = model;
+  const finalStateOverride = getFinalStateOverride(program, operation);
+  if (
+    finalState === FinalStateValue.originalUri &&
+    finalStateOverride === FinalStateValue.originalUri
+  ) {
+    if (!hasGetOperationAtSamePath(program, context.httpOperation)) {
+      reportDiagnostic(program, {
+        code: "no-operation-at-original-uri",
+        target: operation,
+      });
+      // When there's no GET at the original URI, treat the final result as void
+      resolvedModel = $(program).intrinsic.void;
+    }
+  }
+
+  if (resolvedModel === undefined) return undefined;
   const logicalPathName =
     context.finalStep?.kind === "pollingSuccessProperty"
       ? context.finalStep.target.name
       : undefined;
 
   let finalResult: Model | Scalar | UnknownType | "void" =
-    model.kind === "Model" ||
-    model.kind === "Scalar" ||
-    (model.kind === "Intrinsic" && !isVoidType(model))
-      ? model
+    resolvedModel.kind === "Model" ||
+    resolvedModel.kind === "Scalar" ||
+    (resolvedModel.kind === "Intrinsic" && !isVoidType(resolvedModel))
+      ? resolvedModel
       : "void";
   let finalEnvelopeResult: Model | Scalar | UnknownType | "void" =
-    model.kind === "Model" ||
-    model.kind === "Scalar" ||
-    (model.kind === "Intrinsic" && !isVoidType(model))
-      ? model
+    resolvedModel.kind === "Model" ||
+    resolvedModel.kind === "Scalar" ||
+    (resolvedModel.kind === "Intrinsic" && !isVoidType(resolvedModel))
+      ? resolvedModel
       : "void";
   if (context.finalStep && context.finalStep.kind === "pollingSuccessProperty") {
     finalEnvelopeResult = context.pollingStep.responseModel;
@@ -432,9 +453,9 @@ function createLroMetadata(
   return {
     operation: operation,
     logicalResult:
-      model.kind === "Intrinsic" || model.kind === "Scalar"
+      resolvedModel.kind === "Intrinsic" || resolvedModel.kind === "Scalar"
         ? context.pollingStep.responseModel
-        : model,
+        : resolvedModel,
     finalStateVia: finalState,
     statusMonitorStep: context.statusMonitorStep,
     pollingInfo: context.pollingStep,
@@ -952,6 +973,22 @@ function isMatchingGetOperation(
   const sourceHttp = getHttpMetadata(program, sourceOperation);
   const targetHttp = getHttpMetadata(program, targetOperation);
   return sourceHttp.path === targetHttp.path && targetHttp.verb === "get";
+}
+
+/**
+ * Checks if there is a GET operation at the same path as the given operation
+ * in the program's HTTP services.
+ */
+function hasGetOperationAtSamePath(program: Program, httpOperation: HttpOperation): boolean {
+  const [services] = getAllHttpServices(program);
+  for (const service of services) {
+    for (const op of service.operations) {
+      if (op.verb === "get" && op.path === httpOperation.path) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 function processFinalLink(

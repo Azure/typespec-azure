@@ -3118,6 +3118,279 @@ op createJob(
         },
       ]);
     });
+
+    describe("original-uri with no GET operation", () => {
+      async function compileLroWithDiagnostics(
+        code: string,
+        operationName?: string,
+      ): Promise<[HttpOperation, LroMetadata | undefined, TesterInstance]> {
+        let [operations, _diagnostics, runner] = await getOperations(
+          `
+          model TestModel {
+            @key
+            @segment("test")
+            name: string;
+            value: int32;
+          }
+
+          ${code}
+          `,
+        );
+
+        if (operationName !== undefined) {
+          operations = operations.filter((o) => o.operation.name === operationName);
+        }
+
+        strictEqual(operations.length, 1);
+        const lro = getLroMetadata(runner.program, operations[0].operation);
+        return [operations[0], lro, runner];
+      }
+
+      it("emits no-operation-at-original-uri for PUT with original-uri and no GET", async () => {
+        const [_, metadata, runner] = await compileLroWithDiagnostics(
+          `
+          model PollingStatus {
+            @Azure.Core.lroStatus
+            statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+          }
+
+          @route("/widgets/{id}/operations/{operationId}")
+          @get
+          op getStatus(@path id: string, @path operationId: string): PollingStatus;
+
+          @pollingOperation(getStatus, {operationId: ResponseProperty<"opId">})
+          @useFinalStateVia("original-uri")
+          @route("/widgets/{id}")
+          @put
+          op createWidget(@path id: string, @body body: TestModel): TestModel | {
+            @statusCode statusCode: 201;
+            @header opId: string;
+            @pollingLocation @header("Operation-Location") opLink: string;
+          };
+          `,
+          "createWidget",
+        );
+
+        ok(metadata);
+        expectDiagnostics(runner.program.diagnostics, [
+          {
+            code: "@azure-tools/typespec-azure-core/no-operation-at-original-uri",
+          },
+        ]);
+      });
+
+      it("emits no-operation-at-original-uri for PATCH with original-uri and no GET", async () => {
+        const [_, metadata, runner] = await compileLroWithDiagnostics(
+          `
+          model PollingStatus {
+            @Azure.Core.lroStatus
+            statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+          }
+
+          @route("/widgets/{id}/operations/{operationId}")
+          @get
+          op getStatus(@path id: string, @path operationId: string): PollingStatus;
+
+          @pollingOperation(getStatus, {operationId: ResponseProperty<"opId">})
+          @useFinalStateVia("original-uri")
+          @route("/widgets/{id}")
+          @patch
+          op updateWidget(@path id: string, @body body: TestModel): {
+            @statusCode statusCode: 200;
+            @header opId: string;
+            @pollingLocation @header("Operation-Location") opLink: string;
+            @bodyRoot body: TestModel;
+          } | {
+            @statusCode statusCode: 201;
+            @header opId: string;
+            @pollingLocation @header("Operation-Location") opLink: string;
+            @bodyRoot body: TestModel;
+          };
+          `,
+          "updateWidget",
+        );
+
+        ok(metadata);
+        expectDiagnostics(runner.program.diagnostics, [
+          {
+            code: "@azure-tools/typespec-azure-core/no-operation-at-original-uri",
+          },
+        ]);
+      });
+
+      it("emits no-operation-at-original-uri for POST with original-uri and no GET", async () => {
+        const [_, metadata, runner] = await compileLroWithDiagnostics(
+          `
+          model PollingStatus {
+            @Azure.Core.lroStatus
+            statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+          }
+
+          @route("/widgets/{id}/operations/{operationId}")
+          @get
+          op getStatus(@path id: string, @path operationId: string): PollingStatus;
+
+          @pollingOperation(getStatus, {operationId: ResponseProperty<"opId">})
+          @useFinalStateVia("original-uri")
+          @route("/widgets/{id}")
+          @post
+          op processWidget(@path id: string, @body body: TestModel): {
+            @statusCode statusCode: 202;
+            @header opId: string;
+            @pollingLocation @header("Operation-Location") opLink: string;
+          };
+          `,
+          "processWidget",
+        );
+
+        ok(metadata);
+        expectDiagnostics(runner.program.diagnostics, [
+          {
+            code: "@azure-tools/typespec-azure-core/no-operation-at-original-uri",
+          },
+        ]);
+      });
+
+      it("returns void finalResult for PUT with original-uri and no GET when diagnostic is suppressed", async () => {
+        const [_, metadata, runner] = await compileLroWithDiagnostics(
+          `
+          model PollingStatus {
+            @Azure.Core.lroStatus
+            statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+          }
+
+          @route("/widgets/{id}/operations/{operationId}")
+          @get
+          op getStatus(@path id: string, @path operationId: string): PollingStatus;
+
+          @pollingOperation(getStatus, {operationId: ResponseProperty<"opId">})
+          #suppress "@azure-tools/typespec-azure-core/no-operation-at-original-uri" "No GET at original URI"
+          @useFinalStateVia("original-uri")
+          @route("/widgets/{id}")
+          @put
+          op createWidget(@path id: string, @body body: TestModel): TestModel | {
+            @statusCode statusCode: 201;
+            @header opId: string;
+            @pollingLocation @header("Operation-Location") opLink: string;
+          };
+          `,
+          "createWidget",
+        );
+
+        ok(metadata);
+        deepStrictEqual(metadata.finalStateVia, "original-uri");
+        deepStrictEqual(metadata.finalResult, "void");
+        deepStrictEqual(metadata.finalEnvelopeResult, "void");
+      });
+
+      it("returns void finalResult for PATCH with original-uri and no GET when diagnostic is suppressed", async () => {
+        const [_, metadata, runner] = await compileLroWithDiagnostics(
+          `
+          model PollingStatus {
+            @Azure.Core.lroStatus
+            statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+          }
+
+          @route("/widgets/{id}/operations/{operationId}")
+          @get
+          op getStatus(@path id: string, @path operationId: string): PollingStatus;
+
+          @pollingOperation(getStatus, {operationId: ResponseProperty<"opId">})
+          #suppress "@azure-tools/typespec-azure-core/no-operation-at-original-uri" "No GET at original URI"
+          @useFinalStateVia("original-uri")
+          @route("/widgets/{id}")
+          @patch
+          op updateWidget(@path id: string, @body body: TestModel): {
+            @statusCode statusCode: 200;
+            @header opId: string;
+            @pollingLocation @header("Operation-Location") opLink: string;
+            @bodyRoot body: TestModel;
+          } | {
+            @statusCode statusCode: 201;
+            @header opId: string;
+            @pollingLocation @header("Operation-Location") opLink: string;
+            @bodyRoot body: TestModel;
+          };
+          `,
+          "updateWidget",
+        );
+
+        ok(metadata);
+        deepStrictEqual(metadata.finalStateVia, "original-uri");
+        deepStrictEqual(metadata.finalResult, "void");
+        deepStrictEqual(metadata.finalEnvelopeResult, "void");
+      });
+
+      it("returns void finalResult for POST with original-uri and no GET when diagnostic is suppressed", async () => {
+        const [_, metadata, runner] = await compileLroWithDiagnostics(
+          `
+          model PollingStatus {
+            @Azure.Core.lroStatus
+            statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+          }
+
+          @route("/widgets/{id}/operations/{operationId}")
+          @get
+          op getStatus(@path id: string, @path operationId: string): PollingStatus;
+
+          @pollingOperation(getStatus, {operationId: ResponseProperty<"opId">})
+          #suppress "@azure-tools/typespec-azure-core/no-operation-at-original-uri" "No GET at original URI"
+          @useFinalStateVia("original-uri")
+          @route("/widgets/{id}")
+          @post
+          op processWidget(@path id: string, @body body: TestModel): {
+            @statusCode statusCode: 202;
+            @header opId: string;
+            @pollingLocation @header("Operation-Location") opLink: string;
+          };
+          `,
+          "processWidget",
+        );
+
+        ok(metadata);
+        deepStrictEqual(metadata.finalStateVia, "original-uri");
+        deepStrictEqual(metadata.finalResult, "void");
+        deepStrictEqual(metadata.finalEnvelopeResult, "void");
+      });
+
+      it("does not emit no-operation-at-original-uri when GET exists at same path", async () => {
+        const [_, metadata, runner] = await compileLroWithDiagnostics(
+          `
+          model PollingStatus {
+            @Azure.Core.lroStatus
+            statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+          }
+
+          @route("/widgets/{id}/operations/{operationId}")
+          @get
+          op getStatus(@path id: string, @path operationId: string): PollingStatus;
+
+          @route("/widgets/{id}")
+          @get
+          op getWidget(@path id: string): TestModel;
+
+          @pollingOperation(getStatus, {operationId: ResponseProperty<"opId">})
+          @useFinalStateVia("original-uri")
+          @route("/widgets/{id}")
+          @put
+          op createWidget(@path id: string, @body body: TestModel): TestModel | {
+            @statusCode statusCode: 201;
+            @header opId: string;
+            @pollingLocation @header("Operation-Location") opLink: string;
+          };
+          `,
+          "createWidget",
+        );
+
+        ok(metadata);
+        deepStrictEqual(metadata.finalStateVia, "original-uri");
+        expectDiagnosticEmpty(
+          runner.program.diagnostics.filter(
+            (d) => d.code === "@azure-tools/typespec-azure-core/no-operation-at-original-uri",
+          ),
+        );
+      });
+    });
   });
 
   // Regression test for https://github.com/Azure/typespec-azure/issues/332
