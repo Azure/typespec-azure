@@ -5,7 +5,7 @@ description: >-
   and linting rules for defining ARM-compliant APIs. It includes resource type
   base models (TrackedResource, ProxyResource, ExtensionResource, etc.), operation
   templates for standard CRUD and LRO operations, common types for managed
-  identity/private endpoints/network security perimeter, and 40+ linting rules
+  identity/private endpoints/network security perimeter, and linting rules
   enforcing ARM RPC compliance.
 
 sourceCodePaths:
