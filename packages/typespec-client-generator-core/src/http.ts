@@ -53,6 +53,7 @@ import {
   SdkServiceResponseHeader,
   SdkStreamMetadata,
   SdkType,
+  SerializationOptions,
   TCGCContext,
   UsageFlags,
 } from "./interfaces.js";
@@ -73,6 +74,7 @@ import {
   isSubscriptionId,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
+import { isMediaTypeJson, isMediaTypeXml } from "./media-types.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -87,6 +89,27 @@ import {
   getTypeSpecBuiltInType,
   isReadOnly,
 } from "./types.js";
+
+/**
+ * Build serialization options from content types.
+ * This provides a consistent way for emitters to determine the serialization format
+ * for body parameters and HTTP responses, regardless of whether the type is a model or basic type.
+ * @param contentTypes - The content types to build serialization options from.
+ * @param name - The serialized name of the body parameter (for request bodies).
+ */
+function buildSerializationOptionsFromContentTypes(
+  contentTypes: string[],
+  name?: string,
+): SerializationOptions {
+  const options: SerializationOptions = {};
+  if (contentTypes.some(isMediaTypeJson)) {
+    options.json = { name: name ?? "" };
+  }
+  if (contentTypes.some(isMediaTypeXml)) {
+    options.xml = { name: name ?? "" };
+  }
+  return options;
+}
 
 function buildSdkStreamMetadata(
   context: TCGCContext,
@@ -151,6 +174,7 @@ export function getSdkHttpOperation(
         ),
         headers: [],
         __raw: (responses[0] || exceptions[0]).__raw,
+        serializationOptions: {},
       });
     }
   }
@@ -291,6 +315,7 @@ function getSdkHttpParameters(
         decorators: diagnostics.pipe(getTypeDecorators(context, tspBody.type)),
         access: "public",
         flatten: false,
+        serializationOptions: {},
       };
     }
     if (retval.bodyParam) {
@@ -310,6 +335,12 @@ function getSdkHttpParameters(
       );
 
       addContentTypeInfoToBodyParam(context, httpOperation, retval.bodyParam);
+
+      // populate serialization options based on content types
+      retval.bodyParam.serializationOptions = buildSerializationOptionsFromContentTypes(
+        retval.bodyParam.contentTypes,
+        retval.bodyParam.serializedName,
+      );
 
       // map stream request body type to bytes, but preserve stream metadata
       const requestStreamMeta = getStreamMetadata(context.program, httpOperation.parameters);
@@ -537,16 +568,20 @@ export function getSdkHttpParameter(
     });
   }
   if (isBody(context.program, param) || location === "body") {
+    const serializedName = param.name === "" ? "body" : getWireName(context, param);
     return diagnostics.wrap({
       ...base,
       kind: "body",
-      serializedName: param.name === "" ? "body" : getWireName(context, param),
+      serializedName,
       contentTypes: ["application/json"],
       defaultContentType: "application/json",
       optional: param.optional,
       correspondingMethodParams: [],
       methodParameterSegments: [],
-      serializationOptions: {},
+      serializationOptions: buildSerializationOptionsFromContentTypes(
+        ["application/json"],
+        serializedName,
+      ),
     });
   }
   const headerQueryBase = {
@@ -702,6 +737,7 @@ function getSdkHttpResponseAndExceptions(
       ),
       description: response.description,
       streamMetadata,
+      serializationOptions: buildSerializationOptionsFromContentTypes(contentTypes),
     };
 
     if (

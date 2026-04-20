@@ -85,7 +85,20 @@ Most TCGC types share the following common properties:
 - **`crossLanguageDefinitionId`**: A unique ID for a TCGC type that can be used for output mapping across different emitters.
 - **`name`** and **`isGeneratedName`**: The type's name and whether the name was created by TCGC.
 - **`access`**: Indicates whether the type has public or private accessibility.
-- **`usage`**: Indicates the type's usage information; its value is a bitmap of [`UsageFlags`](../reference/js-api/enumerations/usageflags/) enumeration.
+- **`usage`**: Indicates the type's usage information; its value is a bitmap of [`UsageFlags`](../reference/js-api/enumerations/usageflags/) enumeration. The flags are:
+  - `Input` (2): Type is used as input (in a request body).
+  - `Output` (4): Type is used as output (in a response body).
+  - `ApiVersionEnum` (8): Type is an API version enum.
+  - `JsonMergePatch` (16): Type is used in a JSON merge patch request.
+  - `MultipartFormData` (32): Type is used in a multipart form data request.
+  - `Spread` (64): Type is used in a spread operation.
+  - `Json` (256): Type is serialized as JSON.
+  - `Xml` (512): Type is serialized as XML.
+  - `Exception` (1024): Type is used as an error/exception model.
+  - `LroInitial` (2048): Type is used in the initial response of an LRO.
+  - `LroPolling` (4096): Type is used in a polling response of an LRO.
+  - `LroFinalEnvelope` (8192): Type is used in the final envelope of an LRO.
+  - `External` (16384): Type is only referenced through external alternate types.
 - **`deprecation`**: Indicates whether the type is deprecated and provides the deprecation message.
 - **`clientDefaultValue`**: The type's default value if provided. Set via the `@clientDefaultValue` decorator or auto-set for endpoint and API version parameters.
 
@@ -123,7 +136,11 @@ export async function $onEmit(context: EmitContext<SdkEmitterOptions>) {
 
 Emitters can get first-level clients of a client package from `SdkPackage.clients`. An [`SdkClientType`](../reference/js-api/interfaces/sdkclienttype/) represents a client in the package. Emitters can use `SdkClientType.children` to get nested sub clients, and use `SdkClientType.parent` to trace back.
 
-`SdkClientType.clientInitialization` tells emitters how to initialize the client. [`SdkClientInitializationType`](../reference/js-api/interfaces/sdkclientinitializationtype/) contains info about the client's initialization parameters and how the client can be initialized: by parent client or by itself.
+`SdkClientType.clientInitialization` tells emitters how to initialize the client. [`SdkClientInitializationType`](../reference/js-api/interfaces/sdkclientinitializationtype/) contains info about the client's initialization parameters and how the client can be initialized, controlled by the `initializedBy` flags:
+
+- `Individually` (1): The client can be instantiated directly by the user.
+- `Parent` (2): The client is created through a parent client's accessor method.
+- `CustomizeCode` (4): Initialization is omitted from generated code and handled manually in custom code (cannot be combined with other flags).
 
 The initialization parameter can be either [`SdkEndpointParameter`](../reference/js-api/interfaces/sdkendpointparameter/), [`SdkCredentialParameter`](../reference/js-api/interfaces/sdkcredentialparameter/) or [`SdkMethodParameter`](../reference/js-api/interfaces/sdkmethodparameter/).
 
@@ -266,6 +283,8 @@ A client's operations include the `Operation` under the client's `Namespace` or 
 If `@override` is used for the method, the parameters are handled by the target method.
 
 Parameters used in client (either API version parameter or client parameter defined in `@clientInitialization`) are filtered from method parameter list.
+
+`@scope` can also be applied to individual operation parameters (which are `ModelProperty` types). When a parameter is scoped out for a given emitter, it is excluded from both the method signature and the HTTP operation parameters. If a required parameter is scoped out, a warning diagnostic is emitted.
 
 ### Method Return Type Calculation
 
