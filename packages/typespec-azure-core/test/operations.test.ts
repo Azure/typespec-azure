@@ -3252,7 +3252,7 @@ op createJob(
       });
 
       it("returns void finalResult for PUT with original-uri and no GET when diagnostic is suppressed", async () => {
-        const [_, metadata, runner] = await compileLroWithDiagnostics(
+        const [_, metadata] = await compileLroWithDiagnostics(
           `
           model PollingStatus {
             @Azure.Core.lroStatus
@@ -3284,7 +3284,7 @@ op createJob(
       });
 
       it("returns void finalResult for PATCH with original-uri and no GET when diagnostic is suppressed", async () => {
-        const [_, metadata, runner] = await compileLroWithDiagnostics(
+        const [_, metadata] = await compileLroWithDiagnostics(
           `
           model PollingStatus {
             @Azure.Core.lroStatus
@@ -3322,7 +3322,7 @@ op createJob(
       });
 
       it("returns void finalResult for POST with original-uri and no GET when diagnostic is suppressed", async () => {
-        const [_, metadata, runner] = await compileLroWithDiagnostics(
+        const [_, metadata] = await compileLroWithDiagnostics(
           `
           model PollingStatus {
             @Azure.Core.lroStatus
