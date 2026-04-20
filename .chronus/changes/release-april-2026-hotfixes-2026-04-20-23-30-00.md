@@ -5,3 +5,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
+Includes hotfix changes from release branch.
