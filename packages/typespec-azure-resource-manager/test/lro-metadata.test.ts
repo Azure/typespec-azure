@@ -689,3 +689,76 @@ it("Returns correct metadata for Async CreateOrUpdate with final location, with 
   deepStrictEqual(metadata.finalResultPath, undefined);
   deepStrictEqual(metadata.finalStateVia, "location");
 });
+
+it("Returns void finalResult for ArmProviderActionAsync with original-uri and no GET", async () => {
+  const metadata = await getLroMetadataFor(
+    `
+      @armProviderNamespace
+      namespace Microsoft.Test;
+
+      model RequestModel {
+        message: string;
+      }
+
+      #suppress "@azure-tools/typespec-azure-core/no-operation-at-original-uri" "No GET at original URI"
+      @Azure.Core.useFinalStateVia("original-uri")
+      op doProviderAction is ArmProviderActionAsync<RequestModel, void, SubscriptionActionScope>;
+      `,
+    "doProviderAction",
+  );
+  ok(metadata);
+  deepStrictEqual(metadata.finalResult, "void");
+  deepStrictEqual(metadata.finalEnvelopeResult, "void");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "original-uri");
+});
+
+it("Returns void finalResult for ArmResourceActionAsync with original-uri and no GET", async () => {
+  const metadata = await getLroMetadataFor(
+    `
+      @armProviderNamespace
+      namespace Microsoft.Test;
+
+      enum ResourceState {
+       Succeeded,
+       Canceled,
+       Failed
+     }
+
+      model WidgetProperties {
+        simpleArmId: Azure.Core.armResourceIdentifier;
+
+        provisioningState: ResourceState;
+      }
+
+      model RequestModel {
+        message: string;
+      }
+
+      model Widget is TrackedResource<WidgetProperties> {
+        @key("widgetName")
+        @segment("widgets")
+        @path
+        name: string;
+      }
+
+      @armResourceOperations(Widget)
+      interface Widgets {
+        createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+        update is ArmResourcePatchSync<Widget, WidgetProperties>;
+        delete is ArmResourceDeleteSync<Widget>;
+        #suppress "@azure-tools/typespec-azure-core/no-operation-at-original-uri" "No GET at original URI"
+        @Azure.Core.useFinalStateVia("original-uri")
+        doStuff is ArmResourceActionAsync<Widget, RequestModel, void>;
+        listByResourceGroup is ArmResourceListByParent<Widget>;
+        listBySubscription is ArmListBySubscription<Widget>;
+      }
+      `,
+    "doStuff",
+  );
+  ok(metadata);
+  deepStrictEqual(metadata.finalResult, "void");
+  deepStrictEqual(metadata.finalEnvelopeResult, "void");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "original-uri");
+});
