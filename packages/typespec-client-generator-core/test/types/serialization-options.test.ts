@@ -1,10 +1,12 @@
-import { strictEqual } from "assert";
+import { ok, strictEqual } from "assert";
 import { it } from "vitest";
+import { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
 import {
   createSdkContextForTester,
   SimpleTesterWithService,
   XmlTesterWithBuiltInService,
 } from "../tester.js";
+import { getServiceMethodOfClient } from "../utils.js";
 
 it("default input json serialization option", async function () {
   const { program } = await SimpleTesterWithService.compile(`
@@ -739,4 +741,130 @@ it("orphan model with both json and xml usage gets both serialization options", 
   strictEqual(model.properties[1].kind, "property");
   strictEqual(model.properties[1].serializationOptions.json?.name, "value");
   strictEqual(model.properties[1].serializationOptions.xml?.name, "value");
+});
+
+it("body param with basic type has json serialization options", async function () {
+  const { program } = await SimpleTesterWithService.compile(`
+    op test(@header("content-type") contentType: "application/json", @body body: int32): void;
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  const bodyParam = (method as SdkServiceMethod<SdkHttpOperation>).operation.bodyParam;
+  ok(bodyParam);
+  ok(bodyParam.serializationOptions.json);
+  strictEqual(bodyParam.serializationOptions.json.name, "body");
+  strictEqual(bodyParam.serializationOptions.xml, undefined);
+});
+
+it("body param with model type has json serialization options", async function () {
+  const { program } = await SimpleTesterWithService.compile(`
+    model Blob {
+      id: string;
+    }
+
+    op test(@body body: Blob): void;
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  const bodyParam = (method as SdkServiceMethod<SdkHttpOperation>).operation.bodyParam;
+  ok(bodyParam);
+  ok(bodyParam.serializationOptions.json);
+  strictEqual(bodyParam.serializationOptions.json.name, "body");
+  strictEqual(bodyParam.serializationOptions.xml, undefined);
+});
+
+it("body param serialization options uses serialized name", async function () {
+  const { program } = await SimpleTesterWithService.compile(`
+    op test(
+      @header("content-type") contentType: "application/json",
+      @body @encodedName("application/json", "test") param: int32,
+    ): void;
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  const bodyParam = (method as SdkServiceMethod<SdkHttpOperation>).operation.bodyParam;
+  ok(bodyParam);
+  ok(bodyParam.serializationOptions.json);
+  strictEqual(bodyParam.serializationOptions.json.name, "test");
+});
+
+it("response with basic type has json serialization options", async function () {
+  const { program } = await SimpleTesterWithService.compile(`
+    op test(): {@header("content-type") contentType: "application/json"; @body body: int32};
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  const response = (method as SdkServiceMethod<SdkHttpOperation>).operation.responses[0];
+  ok(response);
+  ok(response.serializationOptions.json);
+  strictEqual(response.serializationOptions.xml, undefined);
+});
+
+it("response with model type has json serialization options", async function () {
+  const { program } = await SimpleTesterWithService.compile(`
+    model Blob {
+      id: string;
+    }
+
+    op test(): Blob;
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  const response = (method as SdkServiceMethod<SdkHttpOperation>).operation.responses[0];
+  ok(response);
+  ok(response.serializationOptions.json);
+  strictEqual(response.serializationOptions.xml, undefined);
+});
+
+it("body param with xml content type has xml serialization options", async function () {
+  const { program } = await XmlTesterWithBuiltInService.compile(`
+    model Blob {
+      id: string;
+    }
+
+    op test(@header("content-type") contentType: "application/xml", @body body: Blob): void;
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  const bodyParam = (method as SdkServiceMethod<SdkHttpOperation>).operation.bodyParam;
+  ok(bodyParam);
+  ok(bodyParam.serializationOptions.xml);
+  strictEqual(bodyParam.serializationOptions.xml.name, "body");
+  strictEqual(bodyParam.serializationOptions.json, undefined);
+});
+
+it("response with xml content type has xml serialization options", async function () {
+  const { program } = await XmlTesterWithBuiltInService.compile(`
+    model Blob {
+      id: string;
+    }
+
+    op test(): {@header("content-type") contentType: "application/xml"; @body body: Blob};
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  const response = (method as SdkServiceMethod<SdkHttpOperation>).operation.responses[0];
+  ok(response);
+  ok(response.serializationOptions.xml);
+  strictEqual(response.serializationOptions.json, undefined);
+});
+
+it("response without body has empty serialization options", async function () {
+  const { program } = await SimpleTesterWithService.compile(`
+    op test(): void;
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  const response = (method as SdkServiceMethod<SdkHttpOperation>).operation.responses[0];
+  ok(response);
+  strictEqual(response.serializationOptions.json, undefined);
+  strictEqual(response.serializationOptions.xml, undefined);
 });
