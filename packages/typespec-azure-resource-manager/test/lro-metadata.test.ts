@@ -1,8 +1,9 @@
 import { LroMetadata, getLroMetadata } from "@azure-tools/typespec-azure-core";
-import { Model, Program } from "@typespec/compiler";
+import { Diagnostic, Model, Program } from "@typespec/compiler";
+import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
 import { HttpOperation, getAllHttpServices } from "@typespec/http";
 import { deepStrictEqual, ok } from "assert";
-import { it } from "vitest";
+import { describe, it } from "vitest";
 import { Tester } from "./tester.js";
 
 async function getOperations(code: string): Promise<[HttpOperation[], Program]> {
@@ -690,75 +691,129 @@ it("Returns correct metadata for Async CreateOrUpdate with final location, with 
   deepStrictEqual(metadata.finalStateVia, "location");
 });
 
-it("Returns void finalResult for ArmProviderActionAsync with original-uri and no GET", async () => {
-  const metadata = await getLroMetadataFor(
-    `
-      @armProviderNamespace
-      namespace Microsoft.Test;
+describe("original-uri with no GET at same path", () => {
+  const providerActionSpec = `
+    @armProviderNamespace
+    namespace Microsoft.Test;
 
-      model RequestModel {
-        message: string;
-      }
+    model RequestModel {
+      message: string;
+    }
 
-      #suppress "@azure-tools/typespec-azure-core/no-operation-at-original-uri" "No GET at original URI"
+    {suppress}
+    @Azure.Core.useFinalStateVia("original-uri")
+    op doProviderAction is ArmProviderActionAsync<RequestModel, void, SubscriptionActionScope>;
+  `;
+
+  const widgetBase = `
+    @armProviderNamespace
+    namespace Microsoft.Test;
+
+    enum ResourceState {
+      Succeeded,
+      Canceled,
+      Failed
+    }
+
+    model WidgetProperties {
+      simpleArmId: Azure.Core.armResourceIdentifier;
+      provisioningState: ResourceState;
+    }
+
+    model RequestModel {
+      message: string;
+    }
+
+    model Widget is TrackedResource<WidgetProperties> {
+      @key("widgetName")
+      @segment("widgets")
+      @path
+      name: string;
+    }
+  `;
+
+  const resourceActionSpec = `
+    ${widgetBase}
+
+    @armResourceOperations(Widget)
+    interface Widgets {
+      createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+      update is ArmResourcePatchSync<Widget, WidgetProperties>;
+      delete is ArmResourceDeleteSync<Widget>;
+      {suppress}
       @Azure.Core.useFinalStateVia("original-uri")
-      op doProviderAction is ArmProviderActionAsync<RequestModel, void, SubscriptionActionScope>;
-      `,
-    "doProviderAction",
-  );
-  ok(metadata);
-  deepStrictEqual(metadata.finalResult, "void");
-  deepStrictEqual(metadata.finalEnvelopeResult, "void");
-  deepStrictEqual(metadata.finalResultPath, undefined);
-  deepStrictEqual(metadata.finalStateVia, "original-uri");
-});
+      doStuff is ActionAsync<Widget, RequestModel, void>;
+      listByResourceGroup is ArmResourceListByParent<Widget>;
+      listBySubscription is ArmListBySubscription<Widget>;
+    }
+  `;
 
-it("Returns void finalResult for ArmResourceActionAsync with original-uri and no GET", async () => {
-  const metadata = await getLroMetadataFor(
-    `
-      @armProviderNamespace
-      namespace Microsoft.Test;
+  function withSuppress(spec: string): string {
+    return spec.replace(
+      "{suppress}",
+      '#suppress "@azure-tools/typespec-azure-core/no-operation-at-original-uri" "No GET at original URI"',
+    );
+  }
 
-      enum ResourceState {
-       Succeeded,
-       Canceled,
-       Failed
-     }
+  function withoutSuppress(spec: string): string {
+    return spec.replace("{suppress}", "");
+  }
 
-      model WidgetProperties {
-        simpleArmId: Azure.Core.armResourceIdentifier;
+  /** Compile and call getLroMetadata, returning metadata and program diagnostics. */
+  async function getLroMetadataAndDiagnostics(
+    code: string,
+    operationName: string,
+  ): Promise<{ metadata: LroMetadata | undefined; diagnostics: readonly Diagnostic[] }> {
+    const [operations, program] = await getOperations(code);
+    const filteredOperations = operations.filter((o) => o.operation.name === operationName);
+    ok(filteredOperations?.length > 0);
+    const metadata = getLroMetadata(program, filteredOperations[0].operation);
+    return { metadata, diagnostics: program.diagnostics };
+  }
 
-        provisioningState: ResourceState;
-      }
+  it("emits diagnostic for ArmProviderActionAsync with original-uri and no GET", async () => {
+    const { diagnostics } = await getLroMetadataAndDiagnostics(
+      withoutSuppress(providerActionSpec),
+      "doProviderAction",
+    );
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-azure-core/no-operation-at-original-uri",
+    });
+  });
 
-      model RequestModel {
-        message: string;
-      }
+  it("returns void finalResult for ArmProviderActionAsync when diagnostic is suppressed", async () => {
+    const { metadata, diagnostics } = await getLroMetadataAndDiagnostics(
+      withSuppress(providerActionSpec),
+      "doProviderAction",
+    );
+    expectDiagnosticEmpty(diagnostics);
+    ok(metadata);
+    deepStrictEqual(metadata.finalResult, "void");
+    deepStrictEqual(metadata.finalEnvelopeResult, "void");
+    deepStrictEqual(metadata.finalResultPath, undefined);
+    deepStrictEqual(metadata.finalStateVia, "original-uri");
+  });
 
-      model Widget is TrackedResource<WidgetProperties> {
-        @key("widgetName")
-        @segment("widgets")
-        @path
-        name: string;
-      }
+  it("emits diagnostic for ActionAsync with original-uri and no GET", async () => {
+    const { diagnostics } = await getLroMetadataAndDiagnostics(
+      withoutSuppress(resourceActionSpec),
+      "doStuff",
+    );
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-azure-core/no-operation-at-original-uri",
+    });
+  });
 
-      @armResourceOperations(Widget)
-      interface Widgets {
-        createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
-        update is ArmResourcePatchSync<Widget, WidgetProperties>;
-        delete is ArmResourceDeleteSync<Widget>;
-        #suppress "@azure-tools/typespec-azure-core/no-operation-at-original-uri" "No GET at original URI"
-        @Azure.Core.useFinalStateVia("original-uri")
-        doStuff is ArmResourceActionAsync<Widget, RequestModel, void>;
-        listByResourceGroup is ArmResourceListByParent<Widget>;
-        listBySubscription is ArmListBySubscription<Widget>;
-      }
-      `,
-    "doStuff",
-  );
-  ok(metadata);
-  deepStrictEqual(metadata.finalResult, "void");
-  deepStrictEqual(metadata.finalEnvelopeResult, "void");
-  deepStrictEqual(metadata.finalResultPath, undefined);
-  deepStrictEqual(metadata.finalStateVia, "original-uri");
+  it("returns void finalResult for ActionAsync when diagnostic is suppressed", async () => {
+    const { metadata, diagnostics } = await getLroMetadataAndDiagnostics(
+      withSuppress(resourceActionSpec),
+      "doStuff",
+    );
+    expectDiagnosticEmpty(diagnostics);
+    ok(metadata);
+    deepStrictEqual(metadata.finalResult, "void");
+    deepStrictEqual(metadata.finalEnvelopeResult, "void");
+    deepStrictEqual(metadata.finalResultPath, undefined);
+    deepStrictEqual(metadata.finalStateVia, "original-uri");
+  });
 });
