@@ -860,3 +860,60 @@ it("allows sync and async provider actions with unknown body", async () => {
     schema: {},
   });
 });
+
+it("emits correct subscription-level list path for child resource using ArmListBySubscriptionScope", async () => {
+  const openApi = await compileOpenAPI(
+    `
+    @armProviderNamespace
+      namespace Microsoft.ContosoProviderhub;
+
+    model Test is TrackedResource<{}> {
+      ...ResourceNameParameter<Test>;
+    }
+
+    @parentResource(Test)
+    model Employee is ProxyResource<EmployeeProperties> {
+      ...ResourceNameParameter<Employee>;
+    }
+
+    model EmployeeProperties {
+      age?: int32;
+      city?: string;
+    }
+
+    @armResourceOperations
+    interface Tests {
+      get is ArmResourceRead<Test>;
+      createOrUpdate is ArmResourceCreateOrReplaceAsync<Test>;
+      delete is ArmResourceDeleteWithoutOkAsync<Test>;
+      listByResourceGroup is ArmResourceListByParent<Test>;
+    }
+
+    @armResourceOperations
+    interface Employees {
+      get is ArmResourceRead<Employee>;
+      createOrUpdate is ArmResourceCreateOrReplaceSync<Employee>;
+      delete is ArmResourceDeleteSync<Employee>;
+      listByParent is ArmResourceListByParent<Employee>;
+      listBySubscription is ArmListBySubscriptionScope<Employee>;
+    }
+  `,
+    { preset: "azure" },
+  );
+
+  // Verify the subscription-level list path is correct (no parent resource path segments)
+  const subscriptionListPath =
+    "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderhub/employees";
+  ok(
+    openApi.paths[subscriptionListPath]?.get,
+    `Expected subscription-level list path ${subscriptionListPath} to exist`,
+  );
+
+  // Verify the parent-level list path also exists
+  const parentListPath =
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderhub/tests/{testName}/employees";
+  ok(
+    openApi.paths[parentListPath]?.get,
+    `Expected parent-level list path ${parentListPath} to exist`,
+  );
+});

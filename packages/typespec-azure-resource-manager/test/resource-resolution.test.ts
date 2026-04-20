@@ -4460,4 +4460,105 @@ interface Employees {
     expect(employee.singleton).toBeDefined();
     expect(employee.singleton!.keyValue).toEqual(["salaried", "hourly"]);
   });
+
+  it("collects list operations for child resource using ArmListBySubscriptionScope", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+model Test is TrackedResource<{}> {
+  ...ResourceNameParameter<Test>;
+}
+
+@parentResource(Test)
+model Employee is ProxyResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+  age?: int32;
+  city?: string;
+}
+
+@armResourceOperations
+interface Tests {
+  get is ArmResourceRead<Test>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Test>;
+  delete is ArmResourceDeleteWithoutOkAsync<Test>;
+  listByResourceGroup is ArmResourceListByParent<Test>;
+  listBySubscription is ArmListBySubscription<Test>;
+}
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceSync<Employee>;
+  delete is ArmResourceDeleteSync<Employee>;
+  listByParent is ArmResourceListByParent<Employee>;
+  listBySubscription is ArmListBySubscriptionScope<Employee>;
+}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    ok(provider.resources);
+
+    // Find the Employee resource at its normal scope
+    const employee = provider.resources.find(
+      (r) =>
+        r.resourceName === "Employee" &&
+        r.resourceInstancePath ===
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/tests/{testName}/employees/{employeeName}",
+    );
+    ok(employee);
+    expect(employee).toMatchObject({
+      providerNamespace: "Microsoft.ContosoProviderHub",
+    });
+
+    // Verify the listByParent operation is correctly resolved on the main resource
+    checkResolvedOperations(employee, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            { operationGroup: "Employees", name: "createOrUpdate", kind: "createOrUpdate" },
+          ],
+          delete: [{ operationGroup: "Employees", name: "delete", kind: "delete" }],
+          read: [{ operationGroup: "Employees", name: "get", kind: "read" }],
+        },
+        lists: [
+          {
+            operationGroup: "Employees",
+            name: "listByParent",
+            kind: "list",
+          },
+        ],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["tests", "employees"],
+      },
+      resourceName: "Employee",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/tests/{testName}/employees/{employeeName}",
+    });
+
+    // Verify a subscription-scoped employee resource entry was created for the subscription list
+    const subscriptionEmployee = provider.resources.find(
+      (r) =>
+        r.resourceInstancePath ===
+        "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees/{name}",
+    );
+    ok(subscriptionEmployee);
+    expect(subscriptionEmployee.operations.lists).toHaveLength(1);
+    expect(subscriptionEmployee.operations.lists![0]).toMatchObject({
+      operationGroup: "Employees",
+      name: "listBySubscription",
+      kind: "list",
+      path: "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees",
+    });
+  });
 });
