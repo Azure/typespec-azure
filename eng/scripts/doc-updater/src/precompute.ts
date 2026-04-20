@@ -15,6 +15,7 @@ import { dirname } from "node:path";
 import { loadConfig } from "./config.js";
 import {
   getCommitDiff,
+  getCurrentCommit,
   getHumanFeedback,
   getKnowledgeRelativePath,
   getLatestMergedAutomatedPr,
@@ -76,6 +77,9 @@ export interface PrecomputedContext {
 
   /** File path prefixes the agent is allowed to modify (enforced by post-step) */
   allowedPaths: string[];
+
+  /** The git commit hash at checkout time (before the agent runs) */
+  checkoutCommit: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -151,6 +155,7 @@ async function main(): Promise<void> {
     knowledge: await readKnowledge(config.name),
     knowledgePath: getKnowledgeRelativePath(config.name),
     allowedPaths: config.allowedPaths ?? [],
+    checkoutCommit: getCurrentCommit(),
   };
 
   // --- Incremental change detection ---

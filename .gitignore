@@ -221,3 +221,6 @@ packages/samples/test/output/azure/templates-contoso/setup.*
 
 # Turborepo
 .turbo
+
+# python emitter
+packages/typespec-python/tests/generated/**
