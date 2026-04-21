@@ -32,6 +32,14 @@ Location: `website/src/content/docs/docs/libraries/azure-resource-manager/`
 Auto-generated from doc comments in `lib/decorators.tsp` via `pnpm regen-docs` from `packages/typespec-azure-resource-manager/`. Do NOT edit these files directly.
 When a doc comment is wrong, fix the `.tsp` file and regenerate.
 
+## Critical Rules
+
+1. **Preserve `@dev` comments on template interfaces.** The `@dev` tag in `.tsp` doc comments is intentional — it prevents the description from becoming the default description of template instantiations. Never convert `@dev` comments to regular `/** ... */` doc comments, and never remove them.
+2. **Use spread patterns from samples, not manual alternatives.** When writing code examples for resource definitions, always use the idiomatic spread patterns shown in `packages/samples/specs/resource-manager/` (e.g., `...ResourceNameParameter<Resource, "widgetName">` for name parameters). Do NOT use manual `@key`/`@segment`/`@path` patterns when a spread pattern exists.
+3. **Be conservative with existing content.** Do not restructure, remove rows from, or rewrite tables and sections that are already accurate. Only fix clear errors (typos, wrong names, missing items). If you are unsure whether existing content is wrong, leave it as-is.
+4. **Only document what currently exists in the source code.** Never describe features, behaviors, or return types that are not implemented in `lib/` and `src/`. If a template does not yet return a certain type, do not claim it does.
+5. **Verify every change against source before committing it.** Read the actual `.tsp` declaration or `.ts` implementation to confirm a fix is correct. Do not infer or fabricate behavior.
+
 ## Instructions
 
 Complete ALL three steps below. After finishing each step, state:
@@ -72,8 +80,9 @@ Specifically check:
 When fixing a `.tsp` doc comment:
 
 1. Fix the doc comment in the `.tsp` file
-2. Run `pnpm regen-docs` from `packages/typespec-azure-resource-manager/`
-3. Do NOT edit the generated reference docs directly
+2. **Never change a `@dev` comment to a regular doc comment** — `@dev` is intentional on template interfaces
+3. Run `pnpm regen-docs` from `packages/typespec-azure-resource-manager/`
+4. Do NOT edit the generated reference docs directly
 
 ### Step 3: Finalize
 
@@ -83,5 +92,7 @@ Run `pnpm change add` from the repository root for changelog entries on any modi
 
 1. **Match the audience.** Getting-started pages are for newcomers; how-to guides assume TypeSpec familiarity. Use ARM terminology (resource type, provider namespace, LRO, common types) since the audience already knows ARM.
 2. **Study existing files** before editing — match their formatting, heading hierarchy, and example style.
-3. **Link to related docs.** Cross-reference between getting-started and how-to guides.
-4. **Keep it practical.** Service teams want to know what to write, not implementation details. Show realistic TypeSpec patterns, not toy examples.
+3. **Copy code examples from samples.** When a sample in `packages/samples/specs/resource-manager/` demonstrates the pattern, adapt that code into the doc example. This ensures examples use the latest idiomatic patterns (spread operators, template aliases, etc.).
+4. **Link to related docs.** Cross-reference between getting-started and how-to guides.
+5. **Keep it practical.** Service teams want to know what to write, not implementation details. Show realistic TypeSpec patterns, not toy examples.
+6. **When in doubt, don't change it.** If you cannot confirm from source code that existing doc content is wrong, leave it alone. False fixes are worse than unfixed typos.
