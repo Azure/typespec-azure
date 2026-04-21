@@ -22,8 +22,7 @@ namespace ServiceA {
     av2,
   }
 
-  @clientName("AOperations", "java")
-  @clientName("AOperations", "csharp")
+  @clientName("AOperations", "java,csharp")
   interface Operations {
     @scenario
     @scenarioDoc("""
@@ -38,8 +37,7 @@ namespace ServiceA {
     opA(@query("api-version") apiVersion: VersionsA): void;
   }
 
-  @clientName("ASubNamespace", "java")
-  @clientName("ASubNamespace", "csharp")
+  @clientName("ASubNamespace", "java,csharp")
   namespace SubNamespace {
     @scenario
     @scenarioDoc("""
@@ -67,8 +65,7 @@ namespace ServiceB {
     bv2,
   }
 
-  @clientName("BOperations", "java")
-  @clientName("BOperations", "csharp")
+  @clientName("BOperations", "java,csharp")
   interface Operations {
     @scenario
     @scenarioDoc("""
@@ -83,8 +80,7 @@ namespace ServiceB {
     opB(@query("api-version") apiVersion: VersionsB): void;
   }
 
-  @clientName("BSubNamespace", "java")
-  @clientName("BSubNamespace", "csharp")
+  @clientName("BSubNamespace", "java,csharp")
   namespace SubNamespace {
     @scenario
     @scenarioDoc("""
