@@ -23,6 +23,7 @@ namespace ServiceA {
   }
 
   @clientName("AOperations", "java")
+  @clientName("AOperations", "csharp")
   interface Operations {
     @scenario
     @scenarioDoc("""
@@ -38,6 +39,7 @@ namespace ServiceA {
   }
 
   @clientName("ASubNamespace", "java")
+  @clientName("ASubNamespace", "csharp")
   namespace SubNamespace {
     @scenario
     @scenarioDoc("""
@@ -66,6 +68,7 @@ namespace ServiceB {
   }
 
   @clientName("BOperations", "java")
+  @clientName("BOperations", "csharp")
   interface Operations {
     @scenario
     @scenarioDoc("""
@@ -81,6 +84,7 @@ namespace ServiceB {
   }
 
   @clientName("BSubNamespace", "java")
+  @clientName("BSubNamespace", "csharp")
   namespace SubNamespace {
     @scenario
     @scenarioDoc("""
