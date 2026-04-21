@@ -40,6 +40,8 @@ After defining your enum, link it to your namespace using the `@versioned` decor
 namespace Microsoft.ContosoProviderHub;
 ```
 
+> **Note:** Add dependencies and common types for each version. After defining a new version, the emitter will produce outputs for all versions. You can then adapt your TypeSpec code for the latest version.
+
 **Data-plane example:**
 
 ```tsp
@@ -52,8 +54,6 @@ enum Versions {
 @service(#{ title: "Widget Service" })
 namespace DemoService;
 ```
-
-> **Note:** Add dependencies and common types for each version. After defining a new version, the emitter will produce outputs for all versions. You can then adapt your TypeSpec code for the latest version.
 
 ## Simple Scenarios
 
