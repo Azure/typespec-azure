@@ -108,7 +108,18 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - UsageFlags reference table was missing — added with all 13 flag values and descriptions.
 - InitializedByFlags documentation was incomplete — added Individually, Parent, CustomizeCode descriptions.
 - The `CustomizeCode` (4) flag means initialization is omitted from generated code and handled manually.
-- `serializationOptions` and `baseModel` properties on SdkModelType are not documented in guideline.md but exist in interfaces.ts.
+- `serializationOptions` on SdkModelType properties was already documented. Now also documented on `SdkBodyParameter` and `SdkHttpResponseBase` in the HTTP Operation Parameters and Response sections.
+- `baseModel` property on SdkModelType is not documented in guideline.md but exists in interfaces.ts.
+
+## Diagnostics
+
+- `operation-not-in-client` (warning): Emitted when explicit `@client` is used but a service operation is not included in any client. Documented in 03client.mdx under the "Fully Customized Client Hierarchy" section.
+
+## External Type Usage Propagation
+
+- Types marked as external (via `@alternateType` with `ExternalTypeInfo`) only receive the `External` usage flag. TCGC blocks propagation of non-`External` usage flags (`Input`, `Output`, `Json`, etc.) through external types. This was a bug fix — previously, types reachable through external types could incorrectly get `Input`/`Output` flags.
+- The `External` usage flag description in guideline.md was expanded to explain the propagation blocking behavior.
+- The `@alternateType` external types Notes section in 08types.mdx was updated to explain that types only reachable through external types won't get `Input`/`Output` flags.
 
 ## Common Mistakes to Avoid
 
