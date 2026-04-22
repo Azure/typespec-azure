@@ -94,15 +94,10 @@ For some Resource Providers, whenever a new stable version is released, a new pr
   ```
 
 - Create examples directories for the new stable version (A + 1) and populate them with appropriate examples
-- If version A _is not needed_ in the specs repo (see [Should I Retain the OpenAPI for an Old Preview API](../01-about-versioning.md#should-i-retain-the-openapi-for-an-old-preview-api-arm-only) if you are not sure)
-  - Remove its example folder
 
-    ```bash
-    > rm -r examples/2025-10-01-preview
-    ```
-
-  - Remove the OpenAPI spec for version A
-  - Remove all references to version A in `README.md`
+:::tip
+If you wish to remove the OpenAPI files for the old preview version, do so in a **separate follow-up PR** after this PR merges. See [Removing OpenAPI for Old Preview API Versions](../01-about-versioning.md#removing-openapi-for-old-preview-api-versions).
+:::
 
 ## Create A Copy of the Spec for the Stable Version only
 
@@ -177,36 +172,11 @@ For some Resource Providers, whenever a new stable version is released, a new pr
     ```
 
   - Compile the spec to produce artifacts (especially the new stable version (`A + 1`) OpenAPI)
-  - If you _do not_ need the older preview version (A) (see [Should I Retain the OpenAPI for an Old Preview API](../01-about-versioning.md#should-i-retain-the-openapi-for-an-old-preview-api-arm-only) if you are not sure)
-    - remove the OpenAPI and examples for preview version A
-  - If you _do_ need the older preview version (A) (see [Should I Retain the OpenAPI for an Old Preview API](../01-about-versioning.md#should-i-retain-the-openapi-for-an-old-preview-api-arm-only) if you are not sure):
-    - remove the `x-typespec-generated` extension from the `info` section of the OpenAPI file for preview version A:
-
-      ```diff lang=json
-          "info": {
-           "title": "Microsoft.Contoso management service",
-           "version": "2021-10-01-preview",
-      -    "description": "Microsoft.Contoso Resource Provider management API.",
-      -    "x-typespec-generated": [
-      -      {
-      -        "emitter": "@azure-tools/typespec-autorest"
-      -      }
-      -    ]
-      +    "description": "Microsoft.Contoso Resource Provider management API."
-         },
-      ```
-
-      Note that if you do not remove the x-typespec-generated comment, TypeSpec Validation will fail with an error like:
-
-      ```bash
-      Rule Compile failed
-
-      Output folder '..\resource-manager\Microsoft.Contoso' appears to contain TypeSpec-generated swagger files, not generated from the current TypeSpec sources. Perhaps you deleted a version from your TypeSpec, but didn't delete the associated swaggers?
-
-      ..\resource-manager\Microsoft.Contoso\preview\2021-10-01-preview\contoso.json
-      ```
-
   - Add the new stable version (`A + 1`) to the README.md file.
+
+  :::tip
+  If you wish to remove the OpenAPI files for the old preview version, do so in a **separate follow-up PR** after this PR merges. See [Removing OpenAPI for Old Preview API Versions](../01-about-versioning.md#removing-openapi-for-old-preview-api-versions).
+  :::
   - Create and merge the PR
 
 ## Create a PR with the Combined Spec
