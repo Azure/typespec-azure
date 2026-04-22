@@ -32,13 +32,7 @@ import {
 } from "@typespec/http";
 import { StreamMetadata, getStreamMetadata } from "@typespec/http/experimental";
 import { camelCase } from "change-case";
-import {
-  getClientLocation,
-  getOverriddenClientMethod,
-  getResponseAsBool,
-  isInScope,
-  shouldOmitSlashFromEmptyRoute,
-} from "./decorators.js";
+import { getResponseAsBool, isInScope, shouldOmitSlashFromEmptyRoute } from "./decorators.js";
 import {
   CollectionFormat,
   SdkBodyParameter,
@@ -749,27 +743,6 @@ export function getMethodParameterSegments(
   serviceParam: SdkHttpParameter,
 ): [(SdkMethodParameter | SdkModelPropertyType)[][], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-
-  if (serviceParam.onClient) {
-    // When using @override, @clientLocation might be on the override operation's parameter
-    // rather than on the original HTTP operation's parameter. If the override's corresponding
-    // parameter has @clientLocation targeting the override, the parameter should stay at
-    // method level, so skip all client-level checks.
-    if (serviceParam.__raw) {
-      const override = getOverriddenClientMethod(context, operation);
-      if (override) {
-        for (const [, overrideParam] of override.parameters.properties) {
-          if (
-            compareModelProperties(context.program, overrideParam, serviceParam.__raw) &&
-            getClientLocation(context, overrideParam) === override
-          ) {
-            serviceParam.onClient = false;
-            break;
-          }
-        }
-      }
-    }
-  }
 
   if (serviceParam.onClient) {
     // 1. To see if the service parameter is a client parameter.
