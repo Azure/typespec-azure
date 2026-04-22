@@ -44,7 +44,7 @@ If you want to remove old preview OpenAPI files after your version-change PR has
 - Removes references to the old version from `README.md`
 
 :::note
-For **ARM APIs**, you may need to retain old preview OpenAPI files even after the initial PR merges, for reasons including:
+For **ARM APIs**, you may need to retain old preview OpenAPI files even after your version-change PR merges, for reasons including:
 
 - RPaaS live validation support
 - ARM registration support
