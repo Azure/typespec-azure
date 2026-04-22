@@ -34,22 +34,23 @@ Additionally, there are some (ARM) services that may always have features that r
 
 - [How to manage a single active preview if your service always has some features in preview (ARM only)](./uncommon-scenarios/02-perpetual-preview.md)
 
-## Should I Retain the OpenAPI for an Old Preview API (ARM Only)
+## Removing OpenAPI for Old Preview API Versions
+
+When adding a new preview or stable version, **always retain the existing OpenAPI files for any old preview versions** in your version-change PR. This simplifies the PR and avoids potential issues with validation and downstream tooling.
+
+If you want to remove old preview OpenAPI files after your version-change PR has merged, create a **separate follow-up PR** that:
+
+- Removes the old preview OpenAPI directory and examples
+- Removes references to the old version from `README.md`
 
 :::note
-This section applies specifically to **Azure Resource Manager (ARM) APIs**. ARM teams may need to maintain OpenAPI files for preview versions until they are retired for reasons including:
+For **ARM APIs**, you may need to retain old preview OpenAPI files even after the initial PR merges, for reasons including:
 
 - RPaaS live validation support
 - ARM registration support
-  :::
-
-It is safe to remove the swagger for an old API version if any of the following is true:
-
-- The api-version is retired
-- The OpenAPI document in the azure-rest-api-specs repo is not needed for RPaaS live validation
-- The OpenAPI document in the azure-rest-api-specs repo is not needed for ARM registration
 
 It is recommended that preview api-versions are set for retirement within 90 days when a preview or stable API is introduced. See the [Azure Retirement Policy](https://aka.ms/AzureRetirementPolicy) and [Azure Retirement Process](https://aka.ms/cpexretirementsprocess) for details.
+:::
 
 ## Additional Information on TypeSpec Versioning
 
