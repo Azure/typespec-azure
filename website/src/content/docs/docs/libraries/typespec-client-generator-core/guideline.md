@@ -98,7 +98,7 @@ Most TCGC types share the following common properties:
   - `LroInitial` (2048): Type is used in the initial response of an LRO.
   - `LroPolling` (4096): Type is used in a polling response of an LRO.
   - `LroFinalEnvelope` (8192): Type is used in the final envelope of an LRO.
-  - `External` (16384): Type is only referenced through external alternate types. When a type has the `External` flag and no `Input` or `Output` flags, it means emitters do not need to generate serialization/deserialization code for it — the external package handles that. TCGC blocks propagation of non-`External` usage flags (such as `Input`, `Output`, `Json`) through types marked as external.
+  - `External` (16384): Type is only referenced through external alternate types.
 - **`deprecation`**: Indicates whether the type is deprecated and provides the deprecation message.
 - **`clientDefaultValue`**: The type's default value if provided. Set via the `@clientDefaultValue` decorator or auto-set for endpoint and API version parameters.
 
@@ -314,8 +314,6 @@ TCGC uses several ways to find an HTTP operation's parameter's corresponding met
 - Check if the parameter is a method parameter or a nested model property of a method parameter (nested HTTP metadata case when using `@bodyRoot`).
 - Check if all properties of the parameter can be mapped to a method parameter or a nested model property of a method parameter (spread).
 
-Body parameters include a `serializationOptions` property that indicates how to serialize the body. TCGC automatically populates this from the operation's content types — for example, if the content type is `application/json`, the `json` option is set with the serialized name of the body parameter. This provides a consistent way for emitters to determine the serialization format, regardless of whether the body type is a model or a basic type.
-
 ### HTTP Operation Response Calculation
 
 The response is inferred from TypeSpec HTTP lib type [`HttpOperationResponse`](https://typespec.io/docs/libraries/http/reference/js-api/interfaces/httpoperationresponse/).
@@ -323,8 +321,6 @@ The response is inferred from TypeSpec HTTP lib type [`HttpOperationResponse`](h
 For each response, TCGC will check the response's content. If contents from different responses are not equal, TCGC takes the last one as the response type. Any response with `*` status code or response content type that has `@error` decorator, TCGC puts them into the exception response list. Others are put in the response list.
 
 If `@responseAsBool` is on the operation's upper level method, the `404` status code is always recognized as a normal response.
-
-HTTP responses include a `serializationOptions` property that indicates how to deserialize the response body. TCGC automatically populates this from the response's content types — for example, if the response content type is `application/json`, the `json` option is set. Responses without a body have empty serialization options.
 
 ### Type Detection
 

@@ -2529,14 +2529,6 @@ In this approach, `autoMergeService` is **not set** (defaults to `false`) on any
 All services being merged must share the same endpoint and authentication method. If not, you will get a diagnostic error.
 :::
 
-:::note[Operation coverage validation]
-When you use explicit `@client` decorators with custom operation mapping, TCGC validates that all service operations are included in at least one client definition. If an operation is not covered, you will see a warning:
-
-> Operation "opName" under namespace "MyService" is not included in any @client definition.
-
-This validation only applies when explicit `@client` is used. It does not apply to default auto-generated clients or when `@client` is applied directly to the service namespace without remapping operations.
-:::
-
 <ClientTabs>
 
 ```typespec title="main.tsp"
