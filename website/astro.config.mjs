@@ -10,7 +10,8 @@ import { resolve } from "path";
 import remarkHeadingID from "remark-heading-id";
 import current from "./src/content/current-sidebar";
 
-const base = process.env.TYPESPEC_WEBSITE_BASE_PATH ?? "/";
+const rawBase = process.env.TYPESPEC_WEBSITE_BASE_PATH ?? "/";
+const base = rawBase.startsWith("/") ? rawBase : `/${rawBase}`;
 
 // https://astro.build/config
 export default defineConfig({

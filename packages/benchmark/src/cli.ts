@@ -1,11 +1,16 @@
 #!/usr/bin/env node
 /* eslint-disable no-console */
 
-import { readFile, writeFile } from "fs/promises";
+import { appendFile, readFile, writeFile } from "fs/promises";
 import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
 import { compareBenchmarks, hasNotableChanges } from "./compare.js";
-import { formatConsoleSummary, formatPrComment } from "./format-comment.js";
+import {
+  formatComparisonSummary,
+  formatConsoleSummary,
+  formatPrComment,
+  formatRunSummary,
+} from "./format-comment.js";
 import { runBenchmarks } from "./run.js";
 import type { BenchmarkResult } from "./types.js";
 
@@ -54,6 +59,15 @@ async function outputResult(data: string, outputFile?: string): Promise<void> {
   }
 }
 
+async function writeGitHubSummary(markdown: string): Promise<void> {
+  const summaryFile = process.env["GITHUB_STEP_SUMMARY"];
+  if (!summaryFile) {
+    return;
+  }
+  await appendFile(summaryFile, markdown + "\n", "utf-8");
+  console.log("GitHub Actions job summary written.");
+}
+
 function parseArgs(args: string[]): Record<string, string> {
   const parsed: Record<string, string> = {};
   for (let i = 0; i < args.length; i++) {
@@ -89,6 +103,7 @@ async function runCommand(args: Record<string, string>): Promise<void> {
   });
 
   await outputResult(JSON.stringify(result, null, 2), outputFile);
+  await writeGitHubSummary(formatRunSummary(result));
 }
 
 async function compareCommand(args: Record<string, string>): Promise<void> {
@@ -125,6 +140,9 @@ async function compareCommand(args: Record<string, string>): Promise<void> {
   }
 
   await outputResult(output, outputFile);
+  await writeGitHubSummary(
+    formatComparisonSummary(comparisons, baseline.commit, current.commit, threshold),
+  );
 }
 
 async function main(): Promise<void> {
