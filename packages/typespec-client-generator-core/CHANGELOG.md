@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.67.3
+
+### Bug Fixes
+
+- [#4302](https://github.com/Azure/typespec-azure/pull/4302) Fix wrong `methodParameterSegments` for op with `@clientLocation` and `@override`
+
+
 ## 0.67.2
 
 ### Bug Fixes
