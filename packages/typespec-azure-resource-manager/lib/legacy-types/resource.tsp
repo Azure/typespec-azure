@@ -233,7 +233,7 @@ model CustomAzureProxyResource<isResource extends valueof boolean = false>
 @doc("A generic Azure Resource Manager resource type.")
 @Private.genericResourceInternal
 @Http.Private.includeInapplicableMetadataInPayload(false)
-model GenericResource<Properties, PropertiesOptional extends valueof boolean = true>
+model GenericResource<Properties extends {}, PropertiesOptional extends valueof boolean = true>
   extends Foundations.Resource {
   @doc("The resource-specific properties for this resource.")
   @Azure.ResourceManager.Private.armResourcePropertiesOptionality(PropertiesOptional)
