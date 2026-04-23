@@ -3258,6 +3258,8 @@ it("validation: no diagnostic when @client is applied directly to service namesp
     (d) => d.code === "@azure-tools/typespec-client-generator-core/operation-not-in-client",
   );
   strictEqual(operationNotInClient.length, 0);
+});
+
 it("no duplicate clients in getClients() after multi-service sub-client merge", async () => {
   const { program } = await SimpleTester.compile(`
     @service
