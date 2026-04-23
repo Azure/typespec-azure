@@ -212,7 +212,10 @@ Expected input body:
 
 ```json
 {
-  "name": "test"
+  "name": "test",
+  "timeout": 30,
+  "tier": "standard",
+  "retry": true
 }
 ```
 
