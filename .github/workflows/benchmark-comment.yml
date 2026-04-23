@@ -1,0 +1,37 @@
+name: Benchmark Comment
+
+on:
+  workflow_run:
+    workflows: ["Benchmark"]
+    types:
+      - completed
+
+permissions:
+  pull-requests: write
+
+jobs:
+  comment:
+    name: Post Benchmark Comment
+    runs-on: ubuntu-latest
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
+    steps:
+      - name: Download benchmark comment artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: benchmark-comment
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get PR number
+        id: get-pr
+        run: echo "pr_number=$(cat benchmark-pr-number.txt)" >> "$GITHUB_OUTPUT"
+
+      - name: Post PR comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: benchmark-results
+          number: ${{ steps.get-pr.outputs.pr_number }}
+          path: benchmark-comment.md
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

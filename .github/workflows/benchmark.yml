@@ -11,7 +11,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 concurrency:
   group: benchmark-${{ github.ref }}
@@ -88,7 +87,7 @@ jobs:
           git commit -m "Benchmark results for ${COMMIT_SHA}"
           git push origin HEAD:benchmark-data
 
-      # On PR: compare against baseline and post comment
+      # On PR: fetch baseline, compare, and upload as artifact for the comment workflow
       - name: Fetch baseline
         if: github.event_name == 'pull_request'
         id: fetch-baseline
@@ -117,19 +116,25 @@ jobs:
             --baseline /tmp/benchmark-baseline.json \
             --current /tmp/benchmark-results.json
 
-      - name: Post PR comment
-        if: github.event_name == 'pull_request' && steps.fetch-baseline.outputs.has_baseline == 'true'
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          header: benchmark-results
-          path: /tmp/benchmark-comment.md
-
-      - name: Post PR comment (no baseline)
+      - name: Generate no-baseline comment
         if: github.event_name == 'pull_request' && steps.fetch-baseline.outputs.has_baseline != 'true'
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          header: benchmark-results
-          message: |
-            ## ⚡ Benchmark Results
+        run: |
+          cat > /tmp/benchmark-comment.md << 'EOF'
+          ## ⚡ Benchmark Results
 
-            No baseline found on the `benchmark-data` branch. Benchmark results will be stored after merging to `main`.
+          No baseline found on the `benchmark-data` branch. Benchmark results will be stored after merging to `main`.
+          EOF
+
+      - name: Save PR number
+        if: github.event_name == 'pull_request'
+        run: echo "${{ github.event.number }}" > /tmp/benchmark-pr-number.txt
+
+      - name: Upload benchmark comment
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-comment
+          path: |
+            /tmp/benchmark-comment.md
+            /tmp/benchmark-pr-number.txt
+          retention-days: 1
