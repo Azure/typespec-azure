@@ -30,6 +30,33 @@ op ArmListBySubscription<
 > is ArmReadOperation<SubscriptionScope<Resource> & Parameters, Response, Error>;
 
 /**
+ * A resource list operation, at the subscription scope, for any resource.
+ * This template generates a standard resource list operation at the subscription level,
+ * @template Resource the resource being listed
+ * @template Parameters Optional. Additional query or header parameters
+ * @template Response Optional. The success response for the list operation
+ * @template Error Optional. The error response, if non-standard.
+ */
+@autoRoute
+@doc("List {name} resources by subscription ID", Resource)
+@list
+@listsResource(Resource)
+@segmentOf(Resource)
+@armResourceList(Resource)
+@get
+@Private.enforceConstraint(Resource, Foundations.Resource)
+op ArmListBySubscriptionScope<
+  Resource extends Foundations.SimpleResource,
+  Parameters extends {} = {},
+  Response extends {} = ArmResponse<ResourceListResult<Resource>>,
+  Error extends {} = ErrorResponse
+> is ArmReadOperation<
+  SubscriptionBaseParameters & ProviderNamespace<Resource> & Parameters,
+  Response,
+  Error
+>;
+
+/**
  * A resource list operation, at the scope of the resource's parent
  * @template Resource the resource being patched
  * @template BaseParameters Optional. Allows overriding the operation parameters

@@ -1,0 +1,145 @@
+#!/usr/bin/env python
+"""Install generated packages for testing.
+
+Supports two modes:
+1. Build wheels from source dirs into a wheel directory (build command)
+2. Install from pre-built wheels via --find-links (instant, no compilation)
+
+The build step runs once before tox envs start. Each tox env then installs
+from pre-built wheels, avoiding redundant source builds across environments.
+"""
+
+import glob
+import os
+import subprocess
+import sys
+
+
+def _find_packages(generated_dir):
+    """Find all package directories that have pyproject.toml or setup.py."""
+    all_dirs = glob.glob(os.path.join(generated_dir, "*"))
+    return sorted([
+        p for p in all_dirs
+        if os.path.isdir(p) and (
+            os.path.exists(os.path.join(p, "pyproject.toml")) or
+            os.path.exists(os.path.join(p, "setup.py"))
+        )
+    ])
+
+
+def build_wheels(flavor, tests_dir):
+    """Build wheels for all packages into a shared directory."""
+    generated_dir = os.path.join(tests_dir, "generated", flavor)
+    wheel_dir = os.path.join(tests_dir, ".wheels", flavor)
+    os.makedirs(wheel_dir, exist_ok=True)
+
+    packages = _find_packages(generated_dir)
+    if not packages:
+        print(f"Warning: No packages found in {generated_dir}")
+        return
+
+    print(f"Building {len(packages)} wheels for {flavor}...")
+
+    failed = []
+    for pkg in packages:
+        try:
+            subprocess.run(
+                ["uv", "build", "--wheel", "--no-build-logs", "--out-dir", wheel_dir, pkg],
+                check=True,
+                capture_output=True,
+            )
+        except subprocess.CalledProcessError:
+            pkg_name = os.path.basename(pkg)
+            print(f"Warning: Failed to build wheel for {pkg_name}, will install from source")
+            failed.append(pkg)
+
+    wheel_count = len(glob.glob(os.path.join(wheel_dir, "*.whl")))
+    print(f"Built {wheel_count}/{len(packages)} wheels for {flavor}")
+    if failed:
+        print(f"  Skipped {len(failed)}: {', '.join(os.path.basename(p) for p in failed)}")
+
+
+def install_packages(flavor, tests_dir):
+    """Install generated packages for the given flavor."""
+    generated_dir = os.path.join(tests_dir, "generated", flavor)
+    wheel_dir = os.path.join(tests_dir, ".wheels", flavor)
+
+    if not os.path.exists(generated_dir):
+        print(f"Warning: Generated directory does not exist: {generated_dir}")
+        return
+
+    packages = _find_packages(generated_dir)
+    if not packages:
+        print(f"Warning: No packages found in {generated_dir}")
+        return
+
+    print(f"Installing {len(packages)} packages from {generated_dir}")
+
+    use_wheels = os.path.isdir(wheel_dir) and bool(glob.glob(os.path.join(wheel_dir, "*.whl")))
+    use_uv = True
+
+    if use_wheels:
+        wheel_files = glob.glob(os.path.join(wheel_dir, "*.whl"))
+        print(f"  Using {len(wheel_files)} pre-built wheels from .wheels/{flavor}/")
+        try:
+            cmd = ["uv", "pip", "install", "--no-deps", "--no-index",
+                   "--find-links", wheel_dir, "--python", sys.executable] + wheel_files
+            subprocess.run(cmd, check=True)
+            print(f"Successfully installed {len(wheel_files)} packages")
+            return
+        except FileNotFoundError:
+            use_uv = False
+            try:
+                cmd = [sys.executable, "-m", "pip", "install", "--no-deps",
+                       "--no-index", "--find-links", wheel_dir] + wheel_files
+                subprocess.run(cmd, check=True)
+                print(f"Successfully installed {len(wheel_files)} packages")
+                return
+            except subprocess.CalledProcessError:
+                print("  Wheel install failed, falling back to source install")
+        except subprocess.CalledProcessError:
+            print("  Wheel install failed, falling back to source install")
+
+    # Fall back to source install
+    if use_uv:
+        cmd = ["uv", "pip", "install", "--no-deps", "--python", sys.executable] + packages
+    else:
+        cmd = [sys.executable, "-m", "pip", "install", "--no-deps"] + packages
+
+    try:
+        subprocess.run(cmd, check=True)
+        print(f"Successfully installed {len(packages)} packages")
+    except subprocess.CalledProcessError as e:
+        print(f"Error installing packages: {e}")
+        sys.exit(1)
+    except FileNotFoundError:
+        if use_uv:
+            print("uv not found, falling back to pip")
+            cmd = [sys.executable, "-m", "pip", "install", "--no-deps"] + packages
+            subprocess.run(cmd, check=True)
+
+
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: install_packages.py <flavor> [tests_dir]")
+        print("       install_packages.py build <flavor> [tests_dir]")
+        sys.exit(1)
+
+    if sys.argv[1] == "build":
+        if len(sys.argv) < 3:
+            print("Usage: install_packages.py build <flavor> [tests_dir]")
+            sys.exit(1)
+        flavor = sys.argv[2]
+        tests_dir = sys.argv[3] if len(sys.argv) > 3 else os.path.dirname(os.path.abspath(__file__))
+        build_wheels(flavor, tests_dir)
+    elif sys.argv[1] in ("azure", "unbranded"):
+        flavor = sys.argv[1]
+        tests_dir = sys.argv[2] if len(sys.argv) > 2 else os.path.dirname(os.path.abspath(__file__))
+        install_packages(flavor, tests_dir)
+    else:
+        print(f"Error: Unknown command or flavor '{sys.argv[1]}'")
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,5 +1,9 @@
 # @azure-tools/typespec-metadata
 
+## 0.2.0
+- Group emitters by normalized language key in the `languages` output. Each language key now maps to an array of emitter configs instead of a single config, allowing multiple emitters per language (e.g. two C# emitters). Unrecognized emitters are grouped under `"unknown"`. Language is inferred by heuristic when the emitter is not in the built-in registry.
+
+
 ## 0.1.3
 - Fixes issue with azurev2 flavored package names.
 

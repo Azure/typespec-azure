@@ -7,8 +7,8 @@ name: Documentation Update Scheduler
 # (an agentic workflow compiled to doc-update.md.lock.yml).
 #
 # To add a new package:
-#   1. Create a YAML config in eng/scripts/doc-updater/configs/
-#   2. Create prompt files in eng/scripts/doc-updater/prompts/<name>/
+#   1. Create a YAML config in eng/scripts/doc-updater/configs/<name>.yaml
+#   2. Create a prompt file at eng/scripts/doc-updater/prompts/<name>.md
 #   3. The scheduler will auto-discover and dispatch it.
 
 on:

@@ -182,11 +182,15 @@ Arm Resource list operations return a list of Tracked or Proxy Resources at a pa
   - For **Child Resources**, this is at the scope of the resource parent.
 - Tracked resources _must_ include a list operation at the Subscription level.
 
-| Operation          | TypeSpec                                                    |
-| ------------------ | ----------------------------------------------------------- |
-| ListByParent       | `listByWidget is ArmResourceListByParent<ResourceType>`     |
-| ListBySubscription | `listBySubscription is ArmListBySubscription<ResourceType>` |
-| ListAtScope        | `listAtScope is ArmResourceListAtScope<ResourceType>`       |
+| Operation          | TypeSpec                                                         |
+| ------------------ | ---------------------------------------------------------------- |
+| ListByParent       | `listByWidget is ArmResourceListByParent<ResourceType>`          |
+| ListBySubscription | `listBySubscription is ArmListBySubscriptionScope<ResourceType>` |
+| ListAtScope        | `listAtScope is ArmResourceListAtScope<ResourceType>`            |
+
+The `ArmListBySubscriptionScope` template is used for listing a resource directly at the subscription
+scope, generating a flat subscription-level path regardless of the resource's parent hierarchy.
+Use this instead of `ArmListBySubscription` when you need a subscription-level list operation for a child resource.
 
 The `ArmResourceListAtScope` template is used when the scope of the list operation is determined by
 the `BaseParameters` type parameter. This is useful for resources with custom scope requirements

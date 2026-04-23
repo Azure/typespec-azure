@@ -4,6 +4,8 @@ on:
   pull_request:
     branches: ["main"]
     types: [opened]
+    paths:
+      - "core"
 
 permissions: {}
 
@@ -24,7 +26,7 @@ jobs:
       - run: pnpm install --no-frozen-lockfile
         name: Install dependencies
 
-      - run: pnpm sync-catalog
+      - run: pnpm deps fix
         name: Sync catalog versions from core
 
       - run: pnpm install --no-frozen-lockfile
