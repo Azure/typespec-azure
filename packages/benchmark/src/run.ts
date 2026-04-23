@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { compile, NodeHost, resolveCompilerOptions } from "@typespec/compiler";
 import { execSync } from "child_process";
 import { readdir } from "fs/promises";

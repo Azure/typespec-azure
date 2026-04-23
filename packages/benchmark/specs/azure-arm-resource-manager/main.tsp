@@ -86,7 +86,7 @@ model DiskProperties {
   sizeGb: int32;
   diskType: DiskType;
   iops?: int32;
-  throughputMbps?: int32;
+  throughput?: int32;
 
   @visibility(Lifecycle.Read)
   provisioningState?: ResourceProvisioningState;
