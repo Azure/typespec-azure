@@ -1,0 +1,7 @@
+{
+    "CrossLanguagePackageId": "ContentNegotiation",
+    "CrossLanguageDefinitionId": {
+        "contentnegotiation.operations.SameBodySingleOperationOperations.get_avatar": "ContentNegotiation.SameBodySingleOperation.getAvatar",
+        "contentnegotiation.aio.operations.SameBodySingleOperationOperations.get_avatar": "ContentNegotiation.SameBodySingleOperation.getAvatar"
+    }
+}

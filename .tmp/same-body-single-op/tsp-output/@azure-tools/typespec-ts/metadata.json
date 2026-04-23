@@ -1,0 +1,9 @@
+{
+  "emitterVersion": "0.52.2",
+  "crossLanguageDefinitions": {
+    "CrossLanguagePackageId": "ContentNegotiation",
+    "CrossLanguageDefinitionId": {
+      "!SameBodySingleOperationOperations#getAvatar:member": "ContentNegotiation.SameBodySingleOperation.getAvatar"
+    }
+  }
+}
