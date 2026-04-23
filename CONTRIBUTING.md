@@ -46,6 +46,10 @@ recommended to test a private of the change before merging.
 
 Example: https://github.com/Azure/azure-rest-api-specs/pull/26684
 
+# Breaking changes
+
+See [docs/breaking-changes.md](docs/breaking-changes.md) for guidelines on rolling out breaking changes across TypeSpec, the spec repo, and SDK repos.
+
 # Working with the core submodule
 
 This repository uses a git

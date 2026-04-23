@@ -43,16 +43,8 @@ export const $lib = createTypeSpecLibrary({
       severity: "warning",
       messages: {
         badValue: paramMessage`Specified final state value '${"finalStateValue"}' is not valid. It must be one of ("operation-location", "original-uri", "location", "azure-async-operation")`,
-        notPut:
-          "The final state value 'original-uri' can only be used in http PUT, PATCH, or POST operations",
+        notPut: "The final state value 'original-uri' can only be used in http PUT operations",
         noHeader: paramMessage`There was no header corresponding to the desired final-state-via value '${"finalStateValue"}'.`,
-      },
-    },
-    "no-operation-at-original-uri": {
-      severity: "warning",
-      messages: {
-        default:
-          "The 'original-uri' final state is specified, but there is no GET operation at the original URI. The final result will be treated as 'void'.",
       },
     },
     "bad-record-type": {
