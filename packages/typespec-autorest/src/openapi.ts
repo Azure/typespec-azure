@@ -2651,7 +2651,7 @@ export async function getOpenAPIForService(
       }
     }
 
-    const security = getOpenAPISecurity(oaiSchemes, authentication.defaultAuth);
+    const security = getOpenAPISecurity(oaiSchemes, authentication.defaultAuth, serviceNamespace);
 
     return { securitySchemes: oaiSchemes, security };
   }
@@ -2688,7 +2688,12 @@ export async function getOpenAPIForService(
           flow: oaiFlowName,
           authorizationUrl: (flow as any).authorizationUrl,
           tokenUrl: (flow as any).tokenUrl,
-          scopes: Object.fromEntries(flow.scopes.map((x) => [x.value, x.description ?? ""])),
+          scopes: Object.fromEntries(
+            flow.scopes.map((x) => [
+              rewriteArmScopeForOpenAPI2(x.value, serviceNamespace),
+              x.description ?? "",
+            ]),
+          ),
         };
       case "openIdConnect":
       default:
@@ -2704,6 +2709,7 @@ export async function getOpenAPIForService(
   function getOpenAPISecurity(
     oaiSchemes: Record<string, OpenAPI2SecurityScheme>,
     authReference: AuthenticationReference,
+    serviceNamespace: Namespace,
   ) {
     const security = authReference.options
       .map((authOption: AuthenticationOptionReference) => {
@@ -2711,13 +2717,35 @@ export async function getOpenAPIForService(
         for (const httpAuthRef of authOption.all) {
           const scopes = getScopesForAuthReference(httpAuthRef);
           if (httpAuthRef.auth.id in oaiSchemes && scopes) {
-            securityOption[httpAuthRef.auth.id] = scopes;
+            securityOption[httpAuthRef.auth.id] = scopes.map((scope) =>
+              rewriteArmScopeForOpenAPI2(scope, serviceNamespace),
+            );
           }
         }
         return securityOption;
       })
       .filter((x) => Object.keys(x).length > 0);
     return security;
+  }
+
+  /**
+   * For services declared with `@armProviderNamespace`, the ARM library injects
+   * the canonical absolute ARM scope (`https://management.azure.com/.default`)
+   * as the default OAuth2 scope. Historically, ARM Swagger has emitted the
+   * legacy `user_impersonation` scope name and azure-rest-api-specs still
+   * expects that wire format. To preserve parity with the existing ARM Swagger
+   * while giving SDK emitters (via TCGC) the real scope, rewrite the canonical
+   * ARM scope back to `user_impersonation` when emitting OpenAPI v2 for an ARM
+   * service.
+   */
+  function rewriteArmScopeForOpenAPI2(scope: string, serviceNamespace: Namespace): string {
+    if (
+      scope === "https://management.azure.com/.default" &&
+      isArmProviderNamespace(program, serviceNamespace)
+    ) {
+      return "user_impersonation";
+    }
+    return scope;
   }
 
   function getScopesForAuthReference(httpAuthRef: HttpAuthRef) {
