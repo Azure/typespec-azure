@@ -49,6 +49,10 @@ If your spec is in preview and has not ever had a stable api-version, then there
 
 - Update the README.md to include the new api-version
 
+:::tip
+If you wish to remove the OpenAPI files for the old preview version, do so in a **separate follow-up PR** after this PR merges. See [Should I Retain the OpenAPI for an Old Preview API](./01-about-versioning.md#should-i-retain-the-openapi-for-an-old-preview-api-arm-only).
+:::
+
 ## The General Case: One or more Stable Versions Exist
 
 If there are stable versions before the latest preview version, then you will need to adapt the latest preview version and its decoration for the new preview version.
@@ -174,3 +178,7 @@ This includes the following steps:
   ```
 
 - If you _do_ need the older preview version (see [Should I Retain the OpenAPI for an Old Preview API](./01-about-versioning.md#should-i-retain-the-openapi-for-an-old-preview-api-arm-only) if you are not sure), update README.md to include a new entry for the new preview version.
+
+:::tip
+If you wish to remove the OpenAPI files for the old preview version, do so in a **separate follow-up PR** after this PR merges. See [Should I Retain the OpenAPI for an Old Preview API](./01-about-versioning.md#should-i-retain-the-openapi-for-an-old-preview-api-arm-only).
+:::

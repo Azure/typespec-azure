@@ -164,3 +164,7 @@ This includes the following steps:
     ```
 
   - update README.md to include a new entry for the new preview version.
+
+:::tip
+If you wish to remove the OpenAPI files for the old preview version, do so in a **separate follow-up PR** after this PR merges. See [Should I Retain the OpenAPI for an Old Preview API](./01-about-versioning.md#should-i-retain-the-openapi-for-an-old-preview-api-arm-only).
+:::
