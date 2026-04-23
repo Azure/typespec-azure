@@ -95,9 +95,7 @@ For some Resource Providers, whenever a new stable version is released, a new pr
 
 - Create examples directories for the new stable version (A + 1) and populate them with appropriate examples
 
-:::tip
 If you wish to remove the OpenAPI files for the old preview version, do so in a **separate follow-up PR** after this PR merges. See [Removing OpenAPI for Old Preview API Versions](../01-about-versioning.md#removing-openapi-for-old-preview-api-versions).
-:::
 
 ## Create A Copy of the Spec for the Stable Version only
 
@@ -174,9 +172,7 @@ If you wish to remove the OpenAPI files for the old preview version, do so in a 
   - Compile the spec to produce artifacts (especially the new stable version (`A + 1`) OpenAPI)
   - Add the new stable version (`A + 1`) to the README.md file.
 
-  :::tip
   If you wish to remove the OpenAPI files for the old preview version, do so in a **separate follow-up PR** after this PR merges. See [Removing OpenAPI for Old Preview API Versions](../01-about-versioning.md#removing-openapi-for-old-preview-api-versions).
-  :::
   - Create and merge the PR
 
 ## Create a PR with the Combined Spec

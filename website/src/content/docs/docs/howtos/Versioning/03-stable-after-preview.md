@@ -132,6 +132,4 @@ This includes the following steps:
 
 - Update README.md to include a new entry for the new stable version.
 
-:::tip
 If you wish to remove the OpenAPI files for the old preview version, do so in a **separate follow-up PR** after this PR merges. See [Removing OpenAPI for Old Preview API Versions](./01-about-versioning.md#removing-openapi-for-old-preview-api-versions).
-:::
