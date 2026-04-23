@@ -179,6 +179,22 @@ interface ClientCreationResult {
 }
 
 /**
+ * Create a fresh copy of an SdkClient, resetting hierarchy fields to their
+ * initial state (empty subClients, no parent, clientPath = name).
+ */
+function cloneSdkClient(client: SdkClient): SdkClient {
+  return {
+    kind: "SdkClient",
+    name: client.name,
+    services: [...client.services],
+    type: client.type,
+    subClients: [],
+    clientPath: client.name,
+    autoMergeService: client.autoMergeService,
+  };
+}
+
+/**
  * Get the TCGC root clients with full hierarchy.
  * If user has explicitly defined `@client` then we will use those clients.
  * If user has not defined any `@client` then we will create a client for the first service namespace.
@@ -192,15 +208,23 @@ function getRootClients(context: TCGCContext): ClientCreationResult {
   const mergedSubClientTypes = new Map<SdkClient, (Namespace | Interface)[]>();
   const namespaces: Namespace[] = listAllUserDefinedNamespaces(context);
 
-  // Collect all explicit @client declarations
+  // Collect all explicit @client declarations.
+  // Clone each SdkClient so this context gets its own mutable copies.
+  // The decorator stores SdkClient objects in the program state map, which is
+  // shared across all TCGCContext instances (e.g., lint rules + emitters).
+  // Without cloning, the hierarchy builder below would mutate the shared
+  // objects (parent, subClients, clientPath), causing duplicates when a
+  // second context processes the same program.
   const explicitClients: SdkClient[] = [];
   for (const ns of namespaces) {
-    if (getScopedDecoratorData(context, clientKey, ns)) {
-      explicitClients.push(getScopedDecoratorData(context, clientKey, ns));
+    const nsClient = getScopedDecoratorData(context, clientKey, ns);
+    if (nsClient) {
+      explicitClients.push(cloneSdkClient(nsClient));
     }
     for (const i of ns.interfaces.values()) {
-      if (getScopedDecoratorData(context, clientKey, i)) {
-        explicitClients.push(getScopedDecoratorData(context, clientKey, i));
+      const iClient = getScopedDecoratorData(context, clientKey, i);
+      if (iClient) {
+        explicitClients.push(cloneSdkClient(iClient));
       }
     }
   }

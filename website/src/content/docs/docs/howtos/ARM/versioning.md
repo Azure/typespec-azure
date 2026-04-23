@@ -1,24 +1,18 @@
 ---
-title: Evolving APIs using the Versioning Library
-description: How to add, remove, or modify resources, operations, and properties across API versions
+title: Versioning
+description: Managing versioning for ARM services
 llmstxt: true
 ---
 
-This document explains how to evolve your API across versions in TypeSpec projects, including how to add, remove, or modify resources, operations, and properties using versioning decorators.
+This document explains how to manage versioning in TypeSpec projects, including how to add, remove, or modify resources, operations, and properties across API versions.
 
 ## Introduction
 
 Versioning allows you to evolve your API without breaking existing clients. By using versioning decorators, you can specify when resources, operations, or properties are added, removed, or changed.
 
-:::note
-This document shows examples using both ARM and data-plane patterns. ARM APIs use operation templates from `@azure-tools/typespec-azure-resource-manager`, while data-plane APIs use operation templates from `@azure-tools/typespec-azure-core`. Model-level versioning (adding properties, renaming types, etc.) works the same way for both.
-:::
-
 ## Declaring Versions
 
 Define your API versions in an enum. For each version, specify dependencies and common types as needed.
-
-**ARM example:**
 
 ```tsp
 /** Contoso API versions */
@@ -42,19 +36,6 @@ namespace Microsoft.ContosoProviderHub;
 
 > **Note:** Add dependencies and common types for each version. After defining a new version, the emitter will produce outputs for all versions. You can then adapt your TypeSpec code for the latest version.
 
-**Data-plane example:**
-
-```tsp
-enum Versions {
-  v1,
-  v2,
-}
-
-@versioned(Versions)
-@service(#{ title: "Widget Service" })
-namespace DemoService;
-```
-
 ## Simple Scenarios
 
 These examples show how to add models, operations, properties, and parameters in specific versions using TypeSpec versioning decorators.
@@ -72,24 +53,12 @@ model Employee {
 
 ### Add an operation in v2
 
-**ARM:**
-
 ```tsp
 @armResourceOperations
 interface Employees {
   get is ArmResourceRead<Employee>;
   @added(Versions.v2)
   createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
-}
-```
-
-**Data-plane:**
-
-```tsp
-interface Widgets {
-  getWidget is Operations.ResourceRead<Widget>;
-  @added(Versions.v2)
-  createOrReplaceWidget is Operations.ResourceCreateOrReplace<Widget>;
 }
 ```
 
@@ -106,8 +75,6 @@ model Employee {
 
 ### Add a parameter to an operation in v2
 
-**ARM:**
-
 ```tsp
 @armResourceOperations
 interface Employees {
@@ -123,27 +90,7 @@ interface Employees {
 }
 ```
 
-**Data-plane:**
-
-```tsp
-interface Widgets {
-  getWidget is Operations.ResourceRead<
-    Widget,
-    QueryParametersTrait<{
-      @query
-      name: string;
-
-      @added(Versions.v2)
-      @query
-      department?: string;
-    }>
-  >;
-}
-```
-
 ### Add a new operation in v2
-
-**ARM:**
 
 ```tsp
 @armResourceOperations
@@ -152,17 +99,6 @@ interface Employees {
 
   @added(Versions.v2)
   move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
-}
-```
-
-**Data-plane:**
-
-```tsp
-interface Widgets {
-  getWidget is Operations.ResourceRead<Widget>;
-
-  @added(Versions.v2)
-  moveWidget is Operations.ResourceAction<Widget, MoveRequest, MoveResponse>;
 }
 ```
 
@@ -206,8 +142,6 @@ This scenario shows how to add a parameter and make another optional in an opera
 
 Suppose you start with the following operation in v1:
 
-**ARM:**
-
 ```tsp
 @armResourceOperations
 interface Employees {
@@ -221,28 +155,12 @@ interface Employees {
 }
 ```
 
-**Data-plane:**
-
-```tsp
-interface Widgets {
-  listWidgets is Operations.ResourceList<
-    Widget,
-    RequestHeadersTrait<{
-      @header
-      location: string;
-    }>
-  >;
-}
-```
-
 In version `v2`, you want to:
 
 - Make the `location` header parameter optional.
 - Add a new optional query parameter `orderBy`.
 
 You can achieve this using the `@madeOptional` and `@added` decorators:
-
-**ARM:**
 
 ```tsp
 @armResourceOperations
@@ -262,26 +180,6 @@ interface Employees {
 }
 ```
 
-**Data-plane:**
-
-```tsp
-interface Widgets {
-  listWidgets is Operations.ResourceList<
-    Widget,
-    RequestHeadersTrait<{
-      @madeOptional(Versions.v2)
-      @header
-      location?: string;
-    }> &
-      QueryParametersTrait<{
-        @added(Versions.v2)
-        @query("order-by")
-        orderBy?: string;
-      }>
-  >;
-}
-```
-
 **Explanation:**
 
 - `@madeOptional(Versions.v2)` makes `location` optional starting in v2.
@@ -293,8 +191,6 @@ This scenario illustrates converting a synchronous operation to an asynchronous 
 
 Suppose you start with the following synchronous operation in `v1`:
 
-**ARM:**
-
 ```tsp
 @armResourceOperations
 interface Employees {
@@ -302,17 +198,7 @@ interface Employees {
 }
 ```
 
-**Data-plane:**
-
-```tsp
-interface Widgets {
-  createOrReplaceWidget is Operations.ResourceCreateOrReplace<Widget>;
-}
-```
-
 In version `v2`, you update this operation to be asynchronous as follows:
-
-**ARM:**
 
 ```tsp
 @armResourceOperations
@@ -328,32 +214,12 @@ interface Employees {
 }
 ```
 
-**Data-plane:**
-
-```tsp
-interface Widgets {
-  @removed(Versions.v2)
-  @renamedFrom(Versions.v2, "createOrReplaceWidget")
-  @sharedRoute
-  createOrReplaceWidgetV1 is Operations.ResourceCreateOrReplace<Widget>;
-
-  @added(Versions.v2)
-  getWidgetOperationStatus is Operations.GetResourceOperationStatus<Widget, never>;
-
-  @added(Versions.v2)
-  @sharedRoute
-  @pollingOperation(Widgets.getWidgetOperationStatus)
-  createOrReplaceWidget is Operations.LongRunningResourceCreateOrReplace<Widget>;
-}
-```
-
 **Explanation:**
 
 - `@removed(Versions.v2)` removes the original synchronous operation in v2 and later.
 - `@renamedFrom(Versions.v2, "createOrUpdate")` keeps the original name for v1.
 - `@added(Versions.v2)` adds the new asynchronous operation in v2 and later.
 - `@sharedRoute` ensures both operations can use the same route.
-- `@pollingOperation` links the long-running operation to its status monitor endpoint (data-plane only).
 
 ## Versioning Decorators
 
@@ -388,8 +254,6 @@ model Employee {
 
 **Example: Adding an operation in a later version**
 
-**ARM:**
-
 ```tsp
 @armResourceOperations
 interface Employees {
@@ -397,17 +261,6 @@ interface Employees {
   // v3: Add createOrUpdate operation
   @added(Versions.v3)
   createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
-}
-```
-
-**Data-plane:**
-
-```tsp
-interface Widgets {
-  getWidget is Operations.ResourceRead<Widget>;
-  // v3: Add createOrReplaceWidget operation
-  @added(Versions.v3)
-  createOrReplaceWidget is Operations.ResourceCreateOrReplace<Widget>;
 }
 ```
 
@@ -446,24 +299,12 @@ model Employee {
 
 **Example: Removing an operation**
 
-**ARM:**
-
 ```tsp
 @armResourceOperations
 interface Employees {
   get is ArmResourceRead<Employee>;
   @removed(Versions.v3)
   createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
-}
-```
-
-**Data-plane:**
-
-```tsp
-interface Widgets {
-  getWidget is Operations.ResourceRead<Widget>;
-  @removed(Versions.v3)
-  createOrReplaceWidget is Operations.ResourceCreateOrReplace<Widget>;
 }
 ```
 

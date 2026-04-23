@@ -7,7 +7,7 @@ When the last api-version in your TypeSpec spec is a preview, adding a new previ
 
 ## The Simplest Case: No Stable api-versions
 
-If your spec is in preview and has not ever had a stable api-version, then there is no need to have versioning decoration in your TypeSpec at all:
+If your spec is in preview and has not ever had a stable api-version, then there is no need to have versioning decoration in your typespec at all:
 
 - Change the api-version to match the new api-version
   ```diff lang=tsp
@@ -18,7 +18,7 @@ If your spec is in preview and has not ever had a stable api-version, then there
   }
   ```
 - Remove any versioning decorators
-- Make any API changes for the new preview, there is no need to use versioning decoration for this.
+- Make any api changes for the new preview, there is no need to use versioning decoration for this.
 - Update the example folder name to match the new api-version
 
   ```bash
@@ -38,9 +38,16 @@ If your spec is in preview and has not ever had a stable api-version, then there
   }
   ```
 
-- Update the README.md to include the new api-version
+- If you **do not need** to retain the OpenAPI for older previews (see [Should I delete an old preview](./01-about-versioning.md#should-i-retain-the-openapi-for-an-old-preview-api) if you are not sure).
+  - Remove the associated OpenAPI file and examples
 
-If you wish to remove the OpenAPI files for the old preview version, do so in a **separate follow-up PR** after this PR merges. See [Removing OpenAPI for Old Preview API Versions](./01-about-versioning.md#removing-openapi-for-old-preview-api-versions).
+    ```bash
+    > rm -r 2025-12-01-preview
+    ```
+
+  - Remove any references to the old version from README.md
+
+- Update the README.md to include the new api-version
 
 ## The General Case: One or more Stable Versions Exist
 
@@ -51,7 +58,7 @@ This includes the following steps:
 ### Making Changes to your TypeSpec spec
 
 - Rename the latest preview version to match the new preview version, in all instances in the spec
-  - In VS Code, highlight the version name and select `rename symbol` from the context menu to rename the version throughout your spec
+  - In vscode, highlight the version name and select `rename symbol` from the context menu to rename the version throughout your spec
   - In any editor, search and replace the latest preview version in the spec with the new preview version
 - Update the version value of this version to match the new api-version string, for example:
 
@@ -129,7 +136,7 @@ This includes the following steps:
   }
   ```
 
-- Add and modify examples to match the API changes
+- Add and modify examples to match the api changes
 
 ### Preparing a PR into the azure-rest-api-specs repo
 
@@ -160,6 +167,10 @@ This includes the following steps:
   C:\repos\azure-rest-api-specs\specification\myRpShortname\resource-manager\Microsoft.MyRP\MyService > npx tsp compile .
   ```
 
-- Update README.md to include a new entry for the new preview version.
+- If you _don't_ need the older preview version (see [Should I delete an old preview](./01-about-versioning.md#should-i-retain-the-openapi-for-an-old-preview-api) if you are not sure), remove the OpenAPI directory for that version and update the `README.md` file to use the new version instead.
 
-If you wish to remove the OpenAPI files for the old preview version, do so in a **separate follow-up PR** after this PR merges. See [Removing OpenAPI for Old Preview API Versions](./01-about-versioning.md#removing-openapi-for-old-preview-api-versions).
+  ```bash
+  C:\repos\azure-rest-api-specs\specification\myRpShortname\resource-manager\Microsoft.MyRP\  > rm -r 2025-12-01-preview
+  ```
+
+- If you _do_ need the older preview version (see [Should I delete an old preview](./01-about-versioning.md#should-i-retain-the-openapi-for-an-old-preview-api) if you are not sure), update README.md to include a new entry for the new preview version.

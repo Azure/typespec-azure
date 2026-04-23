@@ -1,13 +1,9 @@
 ---
-title: "ARM: Managing a Single Active Preview When Some Features Always Remain in Preview"
+title: How to Manage a Single Active Preview When Some Features Always Remain In Preview
 llmstxt: true
 ---
 
-:::note
-This document applies specifically to **Azure Resource Manager (ARM) APIs**. Data plane services should not allow versions to remain in preview across stable releases.
-:::
-
-For some Resource Providers, whenever a new stable version is released, a new preview version is created, because some preview features are not ready to be stable, but may become stable in a future version. To accommodate this need and account for the limitations of breaking change checks, which require a single version change for any PR into the rest-api-specs repo, the recommended solution is to introduce a stable and subsequent preview _together_ in your TypeSpec API description and then split this change into two PRs: one representing the new stable and the second representing the subsequent preview. This involves the following steps described in the sections below:
+For some Resource Providers, whenever a new stable version is released, a new preview version is created, because some preview features are not ready to be stable, but may become stable in a future version. To accommodate this need and account for the limitations of breaking change checks, which require a single version change for any PR into the rest-api-specs repo, the recommended solution is to introduce a stable and subsequent preview _together_ in your TypeSpec api description and then split this change into two PRs: one representing the new stable and the second representing the subsequent preview. This involves the following steps described in the sections below:
 
 - Create the new preview version based on the latest preview version
 - Create the stable version (which should immediately precede the new preview version)
@@ -80,7 +76,7 @@ For some Resource Providers, whenever a new stable version is released, a new pr
     newName: int32;
   ```
 
-- Add any new type changes to stable version (A + 1) and decorate appropriately, as shown in the [versioning guide](../06-evolving-apis.md). Note that these changes will also appear in the new preview (A + 2)
+- Add any new type changes to stable version (A + 1) and decorate appropriately, as shown in the [versioning guide](../../../ARM/versioning.md). Note that these changes should also appear in the new preview (A + 2)
 - Remove version `A` from the versions enumeration
 
   ```diff lang=tsp
@@ -94,8 +90,15 @@ For some Resource Providers, whenever a new stable version is released, a new pr
   ```
 
 - Create examples directories for the new stable version (A + 1) and populate them with appropriate examples
+- If version A _is not needed_ in the specs repo (see [Should I delete an old preview](../01-about-versioning.md#should-i-retain-the-openapi-for-an-old-preview-api) if you are not sure)
+  - Remove its example folder
 
-If you wish to remove the OpenAPI files for the old preview version, do so in a **separate follow-up PR** after this PR merges. See [Removing OpenAPI for Old Preview API Versions](../01-about-versioning.md#removing-openapi-for-old-preview-api-versions).
+    ```bash
+    > rm -r examples/2025-10-01-preview
+    ```
+
+  - Remove the OpenAPI spec for version A
+  - Remove all references to version A in `README.md`
 
 ## Create A Copy of the Spec for the Stable Version only
 
@@ -169,18 +172,45 @@ If you wish to remove the OpenAPI files for the old preview version, do so in a 
     }
     ```
 
-  - Compile the spec to produce artifacts (especially the new stable version (`A + 1`) OpenAPI)
-  - Add the new stable version (`A + 1`) to the README.md file.
+  - Compile the spec to produce artifacts (especially the new stable version (`A + 1`) openapi )
+  - If you _do not_ need the older preview version (A) (see [Should I delete an old preview](../01-about-versioning.md#should-i-retain-the-openapi-for-an-old-preview-api) if you are not sure)
+    - remove the OpenAPI and examples for preview version A
+  - If you _do_ need the older preview version (A) (see [Should I delete an old preview](../01-about-versioning.md#should-i-retain-the-openapi-for-an-old-preview-api) if you are not sure):
+    - remove the `x-typespec-generated` extension from the `info` section of the OpenAPI file for preview version A:
 
-  If you wish to remove the OpenAPI files for the old preview version, do so in a **separate follow-up PR** after this PR merges. See [Removing OpenAPI for Old Preview API Versions](../01-about-versioning.md#removing-openapi-for-old-preview-api-versions).
+      ```diff lang=json
+          "info": {
+           "title": "Microsoft.Contoso management service",
+           "version": "2021-10-01-preview",
+      -    "description": "Microsoft.Contoso Resource Provider management API.",
+      -    "x-typespec-generated": [
+      -      {
+      -        "emitter": "@azure-tools/typespec-autorest"
+      -      }
+      -    ]
+      +    "description": "Microsoft.Contoso Resource Provider management API."
+         },
+      ```
+
+      Note that if you do not remove the x-typespec-generated comment, TypeSpec Validation will fail with an error like:
+
+      ```bash
+      Rule Compile failed
+
+      Output folder '..\resource-manager\Microsoft.Contoso' appears to contain TypeSpec-generated swagger files, not generated from the current TypeSpec sources. Perhaps you deleted a version from your TypeSpec, but didn't delete the associated swaggers?
+
+      ..\resource-manager\Microsoft.Contoso\preview\2021-10-01-preview\contoso.json
+      ```
+
+  - Add the new stable version (`A + 1`) to the README.md file.
   - Create and merge the PR
 
 ## Create a PR with the Combined Spec
 
 - Do the following with the Original
   - Follow the instructions for normalizing decoration in the [converting specifications](./01-converting-specs.md#normalizing-version-decoration-optional) document. This will remove any redundant decoration between the new stable and preview versions (`A + 1` and `A + 2`).
-  - Add any type changes that are introduced in the new preview and decorate appropriately, following the [versioning guide](../06-evolving-apis.md)
+  - Add any type changes that are introduced in the new preview and decorate appropriately, following the [versioning guide](../../../ARM/versioning.md)
   - Add a new example folder for the new preview version and populate with appropriate examples.
-  - Compile the spec to produce artifacts (especially the new stable and preview version (`A + 1` and `A + 2`) APIs).
+  - Compile the spec to produce artifacts (especially the new stable and preview version (`A + 1` and `A + 2` ) apis).
   - Copy the README.md from copy 1 and add the new preview version to the file.
   - Create and merge the final PR - this copy will be your specification going forward.
