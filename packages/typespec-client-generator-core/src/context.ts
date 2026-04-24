@@ -217,7 +217,7 @@ export async function createSdkContext<
   for (const client of sdkContext.sdkPackage.clients) {
     diagnostics.pipe(await handleClientExamples(sdkContext, client));
   }
-  // Validate duplicate names within each type kind in each namespace (cross-kind duplicates are allowed).
+  // Validate duplicate names within each namespace (raises errors for same-namespace duplicates)
   diagnostics.pipe(validateNamesUnderNamespaces(sdkContext));
   sdkContext.diagnostics = [...sdkContext.diagnostics, ...diagnostics.diagnostics];
 
@@ -247,9 +247,12 @@ function validateNamesUnderNamespaces(context: SdkContext) {
   };
 
   const validateNamespace = (namespace: SdkContext["sdkPackage"]["namespaces"][number]) => {
-    validateItems(namespace.models);
-    validateItems(namespace.enums.filter((e) => (e.usage & UsageFlags.ApiVersionEnum) === 0));
-    validateItems(namespace.unions.filter((u): u is SdkUnionType => u.kind === "union"));
+    // Validate all types together to catch cross-kind conflicts (e.g., model and enum with same name)
+    validateItems([
+      ...namespace.models,
+      ...namespace.enums.filter((e) => (e.usage & UsageFlags.ApiVersionEnum) === 0),
+      ...namespace.unions.filter((u): u is SdkUnionType => u.kind === "union"),
+    ]);
     for (const nestedNamespace of namespace.namespaces) {
       validateNamespace(nestedNamespace);
     }
