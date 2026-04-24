@@ -152,12 +152,18 @@ export function formatRunSummary(result: BenchmarkResult): string {
 
     lines.push("| Stage | Time |");
     lines.push("|-------|------|");
-    lines.push(`| **Total** | **${formatMsColored(spec.stats.runtime.total, Thresholds.stage)}** |`);
+    lines.push(
+      `| **Total** | **${formatMsColored(spec.stats.runtime.total, Thresholds.stage)}** |`,
+    );
     lines.push(`| Loader | ${formatMsColored(spec.stats.runtime.loader, Thresholds.stage)} |`);
     lines.push(`| Resolver | ${formatMsColored(spec.stats.runtime.resolver, Thresholds.stage)} |`);
     lines.push(`| Checker | ${formatMsColored(spec.stats.runtime.checker, Thresholds.stage)} |`);
-    lines.push(`| Validation | ${formatMsColored(spec.stats.runtime.validation.total, Thresholds.stage)} |`);
-    lines.push(`| Linter | ${formatMsColored(spec.stats.runtime.linter.total, Thresholds.stage)} |`);
+    lines.push(
+      `| Validation | ${formatMsColored(spec.stats.runtime.validation.total, Thresholds.stage)} |`,
+    );
+    lines.push(
+      `| Linter | ${formatMsColored(spec.stats.runtime.linter.total, Thresholds.stage)} |`,
+    );
     lines.push(`| Emit | ${formatMsColored(spec.stats.runtime.emit.total, Thresholds.stage)} |`);
     lines.push("");
 
