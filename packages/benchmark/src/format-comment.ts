@@ -1,9 +1,4 @@
-import type {
-  BenchmarkResult,
-  ComparisonResult,
-  MetricComparison,
-  RuntimeStats,
-} from "./types.js";
+import type { BenchmarkResult, ComparisonResult, MetricComparison, RuntimeStats } from "./types.js";
 
 const DEFAULT_THRESHOLD = 5;
 
@@ -137,6 +132,7 @@ function isSubMetric(label: string): boolean {
 /** Format a metric label for display, indenting sub-metrics. */
 function displayLabel(label: string): string {
   if (label === "total") return "**total**";
+  // cspell:ignore ensp
   if (isSubMetric(label)) return `&ensp;↳ ${label}`;
   return label;
 }
@@ -232,8 +228,7 @@ function averageComparisonMetrics(comparisons: ComparisonResult[]): MetricCompar
       const baseline = e.baseline / e.count;
       const current = e.current / e.count;
       const change = e.change / e.count;
-      const percentChange =
-        baseline === 0 ? (current === 0 ? 0 : 100) : (change / baseline) * 100;
+      const percentChange = baseline === 0 ? (current === 0 ? 0 : 100) : (change / baseline) * 100;
       return { label, baseline, current, change, percentChange };
     });
 }
