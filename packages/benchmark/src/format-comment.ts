@@ -1,4 +1,9 @@
-import type { BenchmarkResult, ComparisonResult, MetricComparison } from "./types.js";
+import type {
+  BenchmarkResult,
+  ComparisonResult,
+  MetricComparison,
+  RuntimeStats,
+} from "./types.js";
 
 const DEFAULT_THRESHOLD = 5;
 
@@ -21,6 +26,13 @@ const Thresholds = {
   validator: [10, 20] as const,
 };
 
+/** Pick the right threshold based on metric label. */
+function thresholdsFor(label: string): readonly [number, number] {
+  if (label.startsWith("linter/")) return Thresholds.lintRule;
+  if (label.startsWith("validation/")) return Thresholds.validator;
+  return Thresholds.stage;
+}
+
 function formatMsColored(ms: number, thresholds: readonly [number, number]): string {
   return `${timeIndicator(ms, thresholds)} ${formatMs(ms)}`;
 }
@@ -36,19 +48,107 @@ function formatPercent(pct: number): string {
   return `${sign}${pct.toFixed(1)}%`;
 }
 
-/** Whether a metric is a "top-level" metric (not a nested sub-metric). */
-function isTopLevel(label: string): boolean {
-  const parts = label.split("/");
-  // Top-level: "total", "loader", "checker", "resolver", "validation", "linter", "emit"
-  // Also top-level emitter entries: "emit/@azure-tools/typespec-autorest"
-  return parts.length <= 1 || (parts[0] === "emit" && parts.length === 2);
+// ── Metric flattening helpers ──────────────────────────────────────────────
+
+interface FlatMetric {
+  label: string;
+  value: number;
 }
+
+/** Extract a flat list of labelled metrics from RuntimeStats. */
+function flattenRuntime(rt: RuntimeStats): FlatMetric[] {
+  const metrics: FlatMetric[] = [];
+
+  metrics.push({ label: "total", value: rt.total });
+  metrics.push({ label: "loader", value: rt.loader });
+  metrics.push({ label: "resolver", value: rt.resolver });
+  metrics.push({ label: "checker", value: rt.checker });
+
+  metrics.push({ label: "validation", value: rt.validation.total });
+  for (const [v, t] of Object.entries(rt.validation.validators).sort(([, a], [, b]) => b - a)) {
+    metrics.push({ label: `validation/${v}`, value: t });
+  }
+
+  metrics.push({ label: "linter", value: rt.linter.total });
+  for (const [r, t] of Object.entries(rt.linter.rules).sort(([, a], [, b]) => b - a)) {
+    metrics.push({ label: `linter/${r}`, value: t });
+  }
+
+  metrics.push({ label: "emit", value: rt.emit.total });
+  for (const [e, data] of Object.entries(rt.emit.emitters).sort(
+    ([, a], [, b]) => b.total - a.total,
+  )) {
+    metrics.push({ label: `emit/${e}`, value: data.total });
+  }
+
+  return metrics;
+}
+
+/** Sort key to group metrics by category: stages first, then sub-metrics under their parent. */
+function metricSortKey(label: string): string {
+  const categoryOrder: Record<string, string> = {
+    total: "0",
+    loader: "1",
+    resolver: "2",
+    checker: "3",
+    validation: "4",
+    linter: "5",
+    emit: "6",
+  };
+
+  const parts = label.split("/");
+  const category = parts[0];
+  const prefix = categoryOrder[category] ?? "9";
+  // Parent categories sort before their children, children sort alphabetically
+  if (parts.length === 1) return `${prefix}`;
+  return `${prefix}/${parts.slice(1).join("/")}`;
+}
+
+/** Average flat metrics across multiple specs. Metrics are matched by label. */
+function averageFlatMetrics(specMetrics: FlatMetric[][]): FlatMetric[] {
+  const sums = new Map<string, { total: number; count: number }>();
+
+  for (const metrics of specMetrics) {
+    for (const m of metrics) {
+      const entry = sums.get(m.label);
+      if (entry) {
+        entry.total += m.value;
+        entry.count++;
+      } else {
+        sums.set(m.label, { total: m.value, count: 1 });
+      }
+    }
+  }
+
+  return [...sums.entries()]
+    .sort(([a], [b]) => metricSortKey(a).localeCompare(metricSortKey(b)))
+    .map(([label, entry]) => ({ label, value: entry.total / entry.count }));
+}
+
+/** Whether a metric is a sub-metric (indented in the table). */
+function isSubMetric(label: string): boolean {
+  return (
+    label.startsWith("linter/") ||
+    label.startsWith("validation/") ||
+    (label.startsWith("emit/") && label !== "emit")
+  );
+}
+
+/** Format a metric label for display, indenting sub-metrics. */
+function displayLabel(label: string): string {
+  if (label === "total") return "**total**";
+  if (isSubMetric(label)) return `&ensp;↳ ${label}`;
+  return label;
+}
+
+const LEGEND =
+  "> 🟢 Fast · 🟡 Moderate (stages >200ms, rules >10ms) · 🔴 Slow (stages >400ms, rules >20ms)";
+
+// ── Public formatters ──────────────────────────────────────────────────────
 
 export interface FormatOptions {
   /** Change threshold for highlighting (default: 5%). */
   threshold?: number;
-  /** Show all metrics, not just top-level ones. */
-  detailed?: boolean;
   /** Only show metrics with notable changes. */
   changesOnly?: boolean;
 }
@@ -61,7 +161,6 @@ export function formatPrComment(
   options: FormatOptions = {},
 ): string {
   const threshold = options.threshold ?? DEFAULT_THRESHOLD;
-  const detailed = options.detailed ?? false;
   const changesOnly = options.changesOnly ?? false;
 
   const lines: string[] = [];
@@ -70,46 +169,73 @@ export function formatPrComment(
     `Comparing [\`${currentCommit.slice(0, 7)}\`] against baseline [\`${baselineCommit.slice(0, 7)}\`]\n`,
   );
 
-  for (const comp of comparisons) {
-    lines.push(`### ${comp.specName}\n`);
+  // Average metrics across all specs
+  const averaged = averageComparisonMetrics(comparisons);
 
-    // Complexity
-    lines.push(
-      `> Types: ${comp.complexity.createdTypes.current} created (was ${comp.complexity.createdTypes.baseline}), ${comp.complexity.finishedTypes.current} finished (was ${comp.complexity.finishedTypes.baseline})\n`,
-    );
+  let metrics = averaged;
+  if (changesOnly) {
+    metrics = metrics.filter((m) => Math.abs(m.percentChange) >= threshold);
+  }
 
-    let metrics: MetricComparison[] = comp.metrics;
-    if (!detailed) {
-      metrics = metrics.filter((m) => isTopLevel(m.label));
-    }
-    if (changesOnly) {
-      metrics = metrics.filter((m) => Math.abs(m.percentChange) >= threshold);
-    }
-
-    if (metrics.length === 0) {
-      lines.push("_No notable changes._\n");
-      continue;
-    }
-
+  if (metrics.length === 0) {
+    lines.push("_No notable changes._\n");
+  } else {
     lines.push("| Metric | Baseline | Current | Change |");
     lines.push("|--------|----------|---------|--------|");
-
     for (const m of metrics) {
       const indicator = changeIndicator(m.percentChange, threshold);
       const changeStr = `${formatPercent(m.percentChange)} ${indicator}`.trim();
+      const th = thresholdsFor(m.label);
       lines.push(
-        `| ${m.label} | ${formatMs(m.baseline)} | ${formatMs(m.current)} | ${changeStr} |`,
+        `| ${displayLabel(m.label)} | ${formatMsColored(m.baseline, th)} | ${formatMsColored(m.current, th)} | ${changeStr} |`,
       );
     }
-
     lines.push("");
   }
 
-  lines.push(
-    `> Threshold: changes > ±${threshold}% are highlighted. Run with \`--detailed\` for per-rule breakdown.`,
-  );
+  const specNames = comparisons.map((c) => c.specName).join(", ");
+  lines.push(`> Averaged across ${comparisons.length} specs (${specNames}).`);
+  lines.push(`> Threshold: changes > ±${threshold}% are highlighted.`);
 
   return lines.join("\n");
+}
+
+/** Average MetricComparisons across all ComparisonResults by label. */
+function averageComparisonMetrics(comparisons: ComparisonResult[]): MetricComparison[] {
+  const sums = new Map<
+    string,
+    { baseline: number; current: number; change: number; count: number }
+  >();
+
+  for (const comp of comparisons) {
+    for (const m of comp.metrics) {
+      const entry = sums.get(m.label);
+      if (entry) {
+        entry.baseline += m.baseline;
+        entry.current += m.current;
+        entry.change += m.change;
+        entry.count++;
+      } else {
+        sums.set(m.label, {
+          baseline: m.baseline,
+          current: m.current,
+          change: m.change,
+          count: 1,
+        });
+      }
+    }
+  }
+
+  return [...sums.entries()]
+    .sort(([a], [b]) => metricSortKey(a).localeCompare(metricSortKey(b)))
+    .map(([label, e]) => {
+      const baseline = e.baseline / e.count;
+      const current = e.current / e.count;
+      const change = e.change / e.count;
+      const percentChange =
+        baseline === 0 ? (current === 0 ? 0 : 100) : (change / baseline) * 100;
+      return { label, baseline, current, change, percentChange };
+    });
 }
 
 /** Format comparison as a brief console summary. */
@@ -118,17 +244,15 @@ export function formatConsoleSummary(
   threshold: number = DEFAULT_THRESHOLD,
 ): string {
   const lines: string[] = [];
+  const averaged = averageComparisonMetrics(comparisons);
 
-  for (const comp of comparisons) {
-    lines.push(`\n${comp.specName}:`);
-
-    const topLevel = comp.metrics.filter((m) => isTopLevel(m.label));
-    for (const m of topLevel) {
-      const indicator = changeIndicator(m.percentChange, threshold);
-      lines.push(
-        `  ${m.label.padEnd(30)} ${formatMs(m.baseline).padStart(10)} → ${formatMs(m.current).padStart(10)}  ${formatPercent(m.percentChange).padStart(8)} ${indicator}`,
-      );
-    }
+  lines.push("\nBenchmark comparison (averaged across specs):");
+  for (const m of averaged) {
+    const indicator = changeIndicator(m.percentChange, threshold);
+    const label = isSubMetric(m.label) ? `  ${m.label}` : m.label;
+    lines.push(
+      `  ${label.padEnd(50)} ${formatMs(m.baseline).padStart(10)} → ${formatMs(m.current).padStart(10)}  ${formatPercent(m.percentChange).padStart(8)} ${indicator}`,
+    );
   }
 
   return lines.join("\n");
@@ -144,68 +268,37 @@ export function formatRunSummary(result: BenchmarkResult): string {
     `**Runner:** ${result.runner.os}, Node ${result.runner.nodeVersion}, ${result.runner.arch}\n`,
   );
 
-  for (const [specName, spec] of Object.entries(result.specs)) {
-    lines.push(`### ${specName}\n`);
-    lines.push(
-      `> ${spec.iterations} iteration(s) · ${spec.stats.complexity.createdTypes} types created · ${spec.stats.complexity.finishedTypes} types finished\n`,
-    );
+  const specs = Object.values(result.specs);
+  const specNames = Object.keys(result.specs);
+  const allFlat = specs.map((s) => flattenRuntime(s.stats.runtime));
+  const averaged = averageFlatMetrics(allFlat);
 
-    lines.push("| Stage | Time |");
-    lines.push("|-------|------|");
-    lines.push(
-      `| **Total** | **${formatMsColored(spec.stats.runtime.total, Thresholds.stage)}** |`,
-    );
-    lines.push(`| Loader | ${formatMsColored(spec.stats.runtime.loader, Thresholds.stage)} |`);
-    lines.push(`| Resolver | ${formatMsColored(spec.stats.runtime.resolver, Thresholds.stage)} |`);
-    lines.push(`| Checker | ${formatMsColored(spec.stats.runtime.checker, Thresholds.stage)} |`);
-    lines.push(
-      `| Validation | ${formatMsColored(spec.stats.runtime.validation.total, Thresholds.stage)} |`,
-    );
-    lines.push(
-      `| Linter | ${formatMsColored(spec.stats.runtime.linter.total, Thresholds.stage)} |`,
-    );
-    lines.push(`| Emit | ${formatMsColored(spec.stats.runtime.emit.total, Thresholds.stage)} |`);
-    lines.push("");
+  const total = averaged.find((m) => m.label === "total")?.value ?? 0;
 
-    // Linter rules detail in a collapsible section
-    const ruleEntries = Object.entries(spec.stats.runtime.linter.rules).sort(
-      ([, a], [, b]) => b - a,
-    );
-    if (ruleEntries.length > 0) {
-      lines.push("<details>");
-      lines.push("<summary>Linter rules breakdown</summary>\n");
-      lines.push("| Rule | Time |");
-      lines.push("|------|------|");
-      for (const [rule, time] of ruleEntries) {
-        lines.push(`| ${rule} | ${formatMsColored(time, Thresholds.lintRule)} |`);
-      }
-      lines.push("\n</details>\n");
-    }
+  lines.push("| Metric | Avg Time | % of Total |");
+  lines.push("|--------|----------|------------|");
 
-    // Emitter detail
-    const emitterEntries = Object.entries(spec.stats.runtime.emit.emitters).sort(
-      ([, a], [, b]) => b.total - a.total,
-    );
-    if (emitterEntries.length > 0) {
-      lines.push("<details>");
-      lines.push("<summary>Emitter breakdown</summary>\n");
-      lines.push("| Emitter | Time |");
-      lines.push("|---------|------|");
-      for (const [emitter, data] of emitterEntries) {
-        lines.push(`| ${emitter} | ${formatMsColored(data.total, Thresholds.stage)} |`);
-      }
-      lines.push("\n</details>\n");
+  for (const m of averaged) {
+    const th = thresholdsFor(m.label);
+    const pctOfTotal = total > 0 && m.label !== "total" ? `${((m.value / total) * 100).toFixed(1)}%` : "—";
+    const bold = m.label === "total";
+    const label = displayLabel(m.label);
+    const time = formatMsColored(m.value, th);
+    if (bold) {
+      lines.push(`| ${label} | **${time}** | ${pctOfTotal} |`);
+    } else {
+      lines.push(`| ${label} | ${time} | ${pctOfTotal} |`);
     }
   }
 
-  lines.push(
-    "> 🟢 Fast · 🟡 Moderate (stages >200ms, rules >10ms) · 🔴 Slow (stages >400ms, rules >20ms)",
-  );
+  lines.push("");
+  lines.push(`> Averaged across ${specs.length} specs (${specNames.join(", ")}).`);
+  lines.push(LEGEND);
 
   return lines.join("\n");
 }
 
-/** Format a comparison as a GitHub Actions Job Summary (detailed with collapsible sections). */
+/** Format a comparison as a GitHub Actions Job Summary. */
 export function formatComparisonSummary(
   comparisons: ComparisonResult[],
   baselineCommit: string,
@@ -218,43 +311,24 @@ export function formatComparisonSummary(
     `Comparing [\`${currentCommit.slice(0, 7)}\`] against baseline [\`${baselineCommit.slice(0, 7)}\`]\n`,
   );
 
-  for (const comp of comparisons) {
-    lines.push(`### ${comp.specName}\n`);
+  const averaged = averageComparisonMetrics(comparisons);
+
+  lines.push("| Metric | Baseline | Current | Change |");
+  lines.push("|--------|----------|---------|--------|");
+  for (const m of averaged) {
+    const indicator = changeIndicator(m.percentChange, threshold);
+    const changeStr = `${formatPercent(m.percentChange)} ${indicator}`.trim();
+    const th = thresholdsFor(m.label);
     lines.push(
-      `> Types: ${comp.complexity.createdTypes.current} created (was ${comp.complexity.createdTypes.baseline}), ${comp.complexity.finishedTypes.current} finished (was ${comp.complexity.finishedTypes.baseline})\n`,
+      `| ${displayLabel(m.label)} | ${formatMsColored(m.baseline, th)} | ${formatMsColored(m.current, th)} | ${changeStr} |`,
     );
-
-    // Top-level table
-    const topLevel = comp.metrics.filter((m) => isTopLevel(m.label));
-    lines.push("| Metric | Baseline | Current | Change |");
-    lines.push("|--------|----------|---------|--------|");
-    for (const m of topLevel) {
-      const indicator = changeIndicator(m.percentChange, threshold);
-      const changeStr = `${formatPercent(m.percentChange)} ${indicator}`.trim();
-      lines.push(
-        `| ${m.label} | ${formatMs(m.baseline)} | ${formatMs(m.current)} | ${changeStr} |`,
-      );
-    }
-    lines.push("");
-
-    // Detailed breakdown in collapsible
-    const detailed = comp.metrics.filter((m) => !isTopLevel(m.label));
-    if (detailed.length > 0) {
-      lines.push("<details>");
-      lines.push("<summary>Detailed breakdown</summary>\n");
-      lines.push("| Metric | Baseline | Current | Change |");
-      lines.push("|--------|----------|---------|--------|");
-      for (const m of detailed) {
-        const indicator = changeIndicator(m.percentChange, threshold);
-        const changeStr = `${formatPercent(m.percentChange)} ${indicator}`.trim();
-        lines.push(
-          `| ${m.label} | ${formatMs(m.baseline)} | ${formatMs(m.current)} | ${changeStr} |`,
-        );
-      }
-      lines.push("\n</details>\n");
-    }
   }
+  lines.push("");
 
+  const specNames = comparisons.map((c) => c.specName).join(", ");
+  lines.push(`> Averaged across ${comparisons.length} specs (${specNames}).`);
   lines.push(`> Threshold: changes > ±${threshold}% are highlighted.`);
+  lines.push(LEGEND);
+
   return lines.join("\n");
 }

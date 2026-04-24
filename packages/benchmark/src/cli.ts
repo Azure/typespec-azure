@@ -116,7 +116,6 @@ async function compareCommand(args: Record<string, string>): Promise<void> {
 
   const threshold = args["threshold"] ? parseFloat(args["threshold"]) : undefined;
   const format = args["format"] ?? "console";
-  const detailed = args["detailed"] === "true";
   const changesOnly = args["changes-only"] === "true";
   const outputFile = args["output"];
 
@@ -128,7 +127,6 @@ async function compareCommand(args: Record<string, string>): Promise<void> {
   if (format === "markdown") {
     output = formatPrComment(comparisons, baseline.commit, current.commit, {
       threshold,
-      detailed,
       changesOnly,
     });
   } else {
