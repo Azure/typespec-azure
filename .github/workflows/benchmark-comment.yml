@@ -18,7 +18,7 @@ jobs:
       github.event.workflow_run.conclusion == 'success'
     steps:
       - name: Download benchmark comment artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: benchmark-comment
           run-id: ${{ github.event.workflow_run.id }}
@@ -29,7 +29,7 @@ jobs:
         run: echo "pr_number=$(cat benchmark-pr-number.txt)" >> "$GITHUB_OUTPUT"
 
       - name: Post PR comment
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@v3
         with:
           header: benchmark-results
           number: ${{ steps.get-pr.outputs.pr_number }}

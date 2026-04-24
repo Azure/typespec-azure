@@ -7,6 +7,24 @@ function formatMs(ms: number): string {
   return `${ms.toFixed(1)}ms`;
 }
 
+/** Color-code a time value based on thresholds: 🔴 slow, 🟡 moderate, 🟢 fast. */
+function timeIndicator(ms: number, thresholds: readonly [number, number]): string {
+  if (ms > thresholds[1]) return "🔴";
+  if (ms > thresholds[0]) return "🟡";
+  return "🟢";
+}
+
+/** Thresholds [yellow, red] aligned with the compiler's `--stats` output. */
+const Thresholds = {
+  stage: [200, 400] as const,
+  lintRule: [10, 20] as const,
+  validator: [10, 20] as const,
+};
+
+function formatMsColored(ms: number, thresholds: readonly [number, number]): string {
+  return `${timeIndicator(ms, thresholds)} ${formatMs(ms)}`;
+}
+
 function changeIndicator(percentChange: number, threshold: number): string {
   if (percentChange >= threshold) return "🔴";
   if (percentChange <= -threshold) return "🟢";
@@ -134,13 +152,13 @@ export function formatRunSummary(result: BenchmarkResult): string {
 
     lines.push("| Stage | Time |");
     lines.push("|-------|------|");
-    lines.push(`| **Total** | **${formatMs(spec.stats.runtime.total)}** |`);
-    lines.push(`| Loader | ${formatMs(spec.stats.runtime.loader)} |`);
-    lines.push(`| Resolver | ${formatMs(spec.stats.runtime.resolver)} |`);
-    lines.push(`| Checker | ${formatMs(spec.stats.runtime.checker)} |`);
-    lines.push(`| Validation | ${formatMs(spec.stats.runtime.validation.total)} |`);
-    lines.push(`| Linter | ${formatMs(spec.stats.runtime.linter.total)} |`);
-    lines.push(`| Emit | ${formatMs(spec.stats.runtime.emit.total)} |`);
+    lines.push(`| **Total** | **${formatMsColored(spec.stats.runtime.total, Thresholds.stage)}** |`);
+    lines.push(`| Loader | ${formatMsColored(spec.stats.runtime.loader, Thresholds.stage)} |`);
+    lines.push(`| Resolver | ${formatMsColored(spec.stats.runtime.resolver, Thresholds.stage)} |`);
+    lines.push(`| Checker | ${formatMsColored(spec.stats.runtime.checker, Thresholds.stage)} |`);
+    lines.push(`| Validation | ${formatMsColored(spec.stats.runtime.validation.total, Thresholds.stage)} |`);
+    lines.push(`| Linter | ${formatMsColored(spec.stats.runtime.linter.total, Thresholds.stage)} |`);
+    lines.push(`| Emit | ${formatMsColored(spec.stats.runtime.emit.total, Thresholds.stage)} |`);
     lines.push("");
 
     // Linter rules detail in a collapsible section
@@ -153,7 +171,7 @@ export function formatRunSummary(result: BenchmarkResult): string {
       lines.push("| Rule | Time |");
       lines.push("|------|------|");
       for (const [rule, time] of ruleEntries) {
-        lines.push(`| ${rule} | ${formatMs(time)} |`);
+        lines.push(`| ${rule} | ${formatMsColored(time, Thresholds.lintRule)} |`);
       }
       lines.push("\n</details>\n");
     }
@@ -168,11 +186,15 @@ export function formatRunSummary(result: BenchmarkResult): string {
       lines.push("| Emitter | Time |");
       lines.push("|---------|------|");
       for (const [emitter, data] of emitterEntries) {
-        lines.push(`| ${emitter} | ${formatMs(data.total)} |`);
+        lines.push(`| ${emitter} | ${formatMsColored(data.total, Thresholds.stage)} |`);
       }
       lines.push("\n</details>\n");
     }
   }
+
+  lines.push(
+    "> 🟢 Fast · 🟡 Moderate (stages >200ms, rules >10ms) · 🔴 Slow (stages >400ms, rules >20ms)",
+  );
 
   return lines.join("\n");
 }
