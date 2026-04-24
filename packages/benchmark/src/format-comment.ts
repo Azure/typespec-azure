@@ -273,21 +273,17 @@ export function formatRunSummary(result: BenchmarkResult): string {
   const allFlat = specs.map((s) => flattenRuntime(s.stats.runtime));
   const averaged = averageFlatMetrics(allFlat);
 
-  const total = averaged.find((m) => m.label === "total")?.value ?? 0;
-
-  lines.push("| Metric | Avg Time | % of Total |");
-  lines.push("|--------|----------|------------|");
+  lines.push("| Metric | Avg Time |");
+  lines.push("|--------|----------|");
 
   for (const m of averaged) {
     const th = thresholdsFor(m.label);
-    const pctOfTotal = total > 0 && m.label !== "total" ? `${((m.value / total) * 100).toFixed(1)}%` : "—";
-    const bold = m.label === "total";
     const label = displayLabel(m.label);
     const time = formatMsColored(m.value, th);
-    if (bold) {
-      lines.push(`| ${label} | **${time}** | ${pctOfTotal} |`);
+    if (m.label === "total") {
+      lines.push(`| ${label} | **${time}** |`);
     } else {
-      lines.push(`| ${label} | ${time} | ${pctOfTotal} |`);
+      lines.push(`| ${label} | ${time} |`);
     }
   }
 
