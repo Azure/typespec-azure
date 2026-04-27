@@ -7,8 +7,8 @@
 # --------------------------------------------------------------------------
 import sys
 
-if not sys.version_info >= (3, 9, 0):
-    raise Exception("Autorest for Python extension requires Python 3.9 at least")
+if not sys.version_info >= (3, 10, 0):
+    raise Exception("Autorest for Python extension requires Python 3.10 at least")
 
 from pathlib import Path
 from package_manager import create_venv_with_package_manager, install_packages
