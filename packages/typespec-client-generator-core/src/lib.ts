@@ -399,8 +399,8 @@ export const $lib = createTypeSpecLibrary({
     "legacy-hierarchy-building-conflict": {
       severity: "warning",
       messages: {
-        "property-missing": paramMessage`@hierarchyBuilding decorator conflict: Model ${"childModel"} is missing property '${"propertyName"}' that is required by parent model ${"parentModel"}.`,
-        "type-mismatch": paramMessage`@hierarchyBuilding decorator conflict: Property '${"propertyName"}' in model ${"childModel"} has a different type than parent model ${"parentModel"} expects.`,
+        "property-discarded": paramMessage`@hierarchyBuilding decorator: property '${"propertyName"}' from removed intermediate parent model ${"intermediateModel"} was discarded on model ${"childModel"} because '${"winner"}' already supplies a property with the same name.`,
+        "property-type-mismatch": paramMessage`@hierarchyBuilding decorator: lifted property '${"propertyName"}' on model ${"childModel"} (from removed intermediate parent ${"intermediateModel"}) has a different type than the same-named property on the new base ${"parentModel"}; the lift was skipped, verify the new base supplies a compatible type.`,
       },
     },
     "legacy-hierarchy-building-circular-reference": {

@@ -1357,13 +1357,29 @@ model Bar {}
 
 ### `@hierarchyBuilding` {#@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding}
 
-Adds support for client-level multiple levels of inheritance.
+Adds support for client-level multiple levels of inheritance and arbitrary
+inheritance replacement.
 
-This decorator will update the models returned from TCGC to include the multi-level inheritance information.
+This decorator updates the models returned from TCGC to override the base
+type of the target model. There are two supported scenarios:
 
-It could be used in the scenario where the discriminated models have multiple levels of inheritance, which is not supported by pure TypeSpec.
+1. **Multi-level discriminated inheritance** (original use case): when
+   discriminated subtypes need to inherit from a sibling rather than the
+   discriminator root.
+2. **Arbitrary base-class replacement** (issue 3737): when a client SDK
+   needs to keep API compatibility with a previously-generated SDK that
+   used a different base class. Properties contributed by the removed
+   intermediate parents are _lifted_ onto the target model so its
+   observable property set is preserved.
 
-This decorator is considered legacy functionality and may be deprecated in future releases.
+The decorator no longer pre-validates that the target is a property
+superset of the new parent. Instead, when properties have to be discarded
+during the lift (because the target or the new base chain already supplies
+a same-named property), TCGC reports a `legacy-hierarchy-building-conflict`
+warning.
+
+This decorator is considered legacy functionality and may be deprecated in
+future releases.
 
 ```typespec
 @Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(value: Model, scope?: valueof string)
@@ -1409,6 +1425,26 @@ model SportsCar extends Vehicle {
   topSpeed: int32;
 }
 
+```
+
+##### Replace the base class and lift properties from removed
+
+intermediate parents.
+
+```typespec
+model C {
+  c?: string;
+}
+model B extends C {
+  b?: string;
+}
+
+// Rebase A from B to C. The property `b` is lifted onto A so its
+// observable property set ({ a, b }) matches the original.
+@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(C)
+model A extends B {
+  a?: string;
+}
 ```
 
 ### `@markAsLro` {#@Azure.ClientGenerator.Core.Legacy.markAsLro}

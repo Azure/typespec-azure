@@ -2069,6 +2069,11 @@ function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Di
       }
     }
 
+    if (legacyHierarchyBuilding) {
+      // Lift properties from removed intermediate parents onto the rebased model.
+      diagnostics.pipe(liftPropertiesFromRemovedAncestors(context, sdkType, legacyHierarchyBuilding));
+    }
+
     // must be done after discriminator is added
     // Populate discriminated subtypes for legacy hierarchy building
     if (legacyHierarchyBuilding && sdkType.discriminatorValue) {
@@ -2088,6 +2093,143 @@ function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Di
           property.discriminator || !legacyHierarchyBuilding.properties.has(property.__raw!.name)
         );
       });
+    }
+  }
+  return diagnostics.wrap(undefined);
+}
+
+/**
+ * Build the chain of raw Models that the new base contributes to the rebased
+ * model (the new base + all of its ancestors, honoring nested
+ * `@hierarchyBuilding` overrides on those ancestors).
+ */
+function buildValueChain(context: TCGCContext, value: Model): Model[] {
+  const chain: Model[] = [];
+  const seen = new Set<Model>();
+  let current: Model | undefined = value;
+  while (current && !seen.has(current)) {
+    seen.add(current);
+    chain.push(current);
+    const overridden = getLegacyHierarchyBuilding(context, current);
+    current = overridden ?? current.baseModel;
+  }
+  return chain;
+}
+
+/**
+ * Walk the original raw ancestor chain of `target` until we reach a model
+ * that is in `valueChain`. The intermediate models we walk past are the
+ * ancestors that the rebase removes from the inheritance tree.
+ */
+function collectRemovedAncestors(target: Model, valueChain: Set<Model>): Model[] {
+  const removed: Model[] = [];
+  const seen = new Set<Model>();
+  seen.add(target);
+  let current: Model | undefined = target.baseModel;
+  while (current && !seen.has(current)) {
+    if (valueChain.has(current)) break;
+    seen.add(current);
+    removed.push(current);
+    current = current.baseModel;
+  }
+  return removed;
+}
+
+function liftPropertiesFromRemovedAncestors(
+  context: TCGCContext,
+  sdkType: SdkModelType,
+  newBase: Model,
+): [void, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const target = sdkType.__raw as Model;
+  const valueChainList = buildValueChain(context, newBase);
+  const valueChain = new Set<Model>(valueChainList);
+  const removed = collectRemovedAncestors(target, valueChain);
+  if (removed.length === 0) return diagnostics.wrap(undefined);
+
+  // Build a map of property name -> ModelProperty contributed by the new
+  // base chain (own properties of each model in the chain).
+  const newBaseProps = new Map<string, ModelProperty>();
+  for (const m of valueChainList) {
+    for (const [name, prop] of m.properties) {
+      if (!newBaseProps.has(name)) {
+        newBaseProps.set(name, prop);
+      }
+    }
+  }
+
+  const existingNames = new Set<string>();
+  for (const prop of sdkType.properties) {
+    if (prop.__raw?.name) existingNames.add(prop.__raw.name);
+    else existingNames.add(prop.name);
+  }
+
+  // Lift nearest-first: iterate removed[] in order (already nearest -> farthest).
+  for (const intermediate of removed) {
+    for (const [propName, rawProp] of intermediate.properties) {
+      // Apply the same filtering as addPropertiesToModelType.
+      if (
+        isStatusCode(context.program, rawProp) ||
+        isNeverOrVoidType(rawProp.type) ||
+        hasNoneVisibility(context, rawProp) ||
+        !isInScope(context, rawProp)
+      ) {
+        continue;
+      }
+      if (existingNames.has(propName)) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "legacy-hierarchy-building-conflict",
+            messageId: "property-discarded",
+            format: {
+              propertyName: propName,
+              childModel: target.name,
+              intermediateModel: intermediate.name,
+              winner: target.name,
+            },
+            target,
+          }),
+        );
+        continue;
+      }
+      const newBaseProp = newBaseProps.get(propName);
+      if (newBaseProp) {
+        if (newBaseProp.type !== rawProp.type) {
+          diagnostics.add(
+            createDiagnostic({
+              code: "legacy-hierarchy-building-conflict",
+              messageId: "property-type-mismatch",
+              format: {
+                propertyName: propName,
+                childModel: target.name,
+                intermediateModel: intermediate.name,
+                parentModel: newBase.name,
+              },
+              target,
+            }),
+          );
+        } else {
+          diagnostics.add(
+            createDiagnostic({
+              code: "legacy-hierarchy-building-conflict",
+              messageId: "property-discarded",
+              format: {
+                propertyName: propName,
+                childModel: target.name,
+                intermediateModel: intermediate.name,
+                winner: newBase.name,
+              },
+              target,
+            }),
+          );
+        }
+        continue;
+      }
+      pushNamingContext(context, propName, rawProp.type as ContextNode["type"]);
+      const lifted = diagnostics.pipe(getSdkModelPropertyType(context, rawProp));
+      popNamingContext(context);
+      sdkType.properties.push(lifted);
+      existingNames.add(propName);
     }
   }
   return diagnostics.wrap(undefined);

@@ -1428,79 +1428,12 @@ export function getClientLocation(
   return getScopedDecoratorData(context, clientLocationKey, input);
 }
 
-interface PropertyConflict {
-  propertyName: string;
-  reason: "missing" | "type-mismatch";
-}
-
-function isPropertySuperset(program: Program, target: Model, value: Model): PropertyConflict[] {
-  const conflicts: PropertyConflict[] = [];
-
-  // Check if all properties in value exist in target
-  for (const name of value.properties.keys()) {
-    if (!target.properties.has(name)) {
-      conflicts.push({
-        propertyName: name,
-        reason: "missing",
-      });
-      continue;
-    }
-    const targetProperty = target.properties.get(name)!;
-    const valueProperty = value.properties.get(name)!;
-    // Compare properties to handle envelope/spread semantics correctly
-    // Properties match if they come from the same source OR if they have the same type
-    // This ensures properties from envelopes (e.g., ...ArmTagsProperty) are recognized
-    // as equivalent to directly defined properties with the same name and type
-    if (targetProperty.sourceProperty !== valueProperty.sourceProperty) {
-      // Different sources - check if they have the same type
-      if (targetProperty.type !== valueProperty.type) {
-        conflicts.push({
-          propertyName: name,
-          reason: "type-mismatch",
-        });
-      }
-    }
-  }
-  return conflicts;
-}
-
 export const $legacyHierarchyBuilding: HierarchyBuildingDecorator = (
   context: DecoratorContext,
   target: Model,
   value: Model,
   scope?: LanguageScopes,
 ) => {
-  // Validate that target has all properties from value
-  const conflicts = isPropertySuperset(context.program, target, value);
-  if (conflicts.length > 0) {
-    for (const conflict of conflicts) {
-      if (conflict.reason === "missing") {
-        reportDiagnostic(context.program, {
-          code: "legacy-hierarchy-building-conflict",
-          messageId: "property-missing",
-          format: {
-            childModel: target.name,
-            parentModel: value.name,
-            propertyName: conflict.propertyName,
-          },
-          target: context.decoratorTarget,
-        });
-      } else if (conflict.reason === "type-mismatch") {
-        reportDiagnostic(context.program, {
-          code: "legacy-hierarchy-building-conflict",
-          messageId: "type-mismatch",
-          format: {
-            childModel: target.name,
-            parentModel: value.name,
-            propertyName: conflict.propertyName,
-          },
-          target: context.decoratorTarget,
-        });
-      }
-    }
-    return;
-  }
-
   setScopedDecoratorData(
     context,
     $legacyHierarchyBuilding,
