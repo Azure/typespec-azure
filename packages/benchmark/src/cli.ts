@@ -5,6 +5,7 @@ import { appendFile, readFile, writeFile } from "fs/promises";
 import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
 import { compareBenchmarks, hasNotableChanges } from "./compare.js";
+import { generateHistoryMain } from "./generate-history.js";
 import {
   formatComparisonSummary,
   formatConsoleSummary,
@@ -22,9 +23,10 @@ function usage(): void {
 Usage: typespec-benchmark <command> [options]
 
 Commands:
-  run       Run benchmarks and output results as JSON
-  compare   Compare two benchmark result files
-  format    Format a comparison as a PR comment
+  run               Run benchmarks and output results as JSON
+  compare           Compare two benchmark result files
+  format            Format a comparison as a PR comment
+  generate-history  Generate aggregated history.json from benchmark results
 
 Run options:
   --specs-dir <dir>     Directory containing benchmark specs (default: built-in specs)
@@ -42,6 +44,10 @@ Compare options:
   --format <type>       Output format: "console" or "markdown" (default: console)
   --detailed            Show per-rule/per-emitter-step breakdown
   --changes-only        Only show metrics with notable changes
+
+Generate-history options:
+  --dir <dir>           Read results from a directory instead of the benchmark-data git branch
+  <output-file>         Output file path (default: stdout)
 `);
 }
 
@@ -160,6 +166,10 @@ async function main(): Promise<void> {
       break;
     case "compare":
       await compareCommand(args);
+      break;
+    case "generate-history":
+      // Pass args after the command name: [node, cli.js, generate-history, ...rest]
+      generateHistoryMain(["", "", ...process.argv.slice(3)]);
       break;
     default:
       console.error(`Unknown command: ${command}`);

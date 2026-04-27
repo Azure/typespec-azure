@@ -81,6 +81,10 @@ jobs:
           cp "$RESULTS_FILE" "/tmp/bench-data/results/${COMMIT_SHA}.json"
           cp "$RESULTS_FILE" "/tmp/bench-data/results/latest.json"
 
+          # Generate aggregated history.json for the website
+          cd $GITHUB_WORKSPACE
+          node packages/benchmark/dist/src/cli.js generate-history /tmp/bench-data/results/history.json --dir /tmp/bench-data/results
+
           # Commit and push
           cd /tmp/bench-data
           git add results/
