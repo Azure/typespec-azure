@@ -46,7 +46,7 @@ async function compileSpec(specDir: string): Promise<Stats> {
     cwd: specDir,
   });
   if (diagnostics.length > 0) {
-    const msgs = diagnostics.map((d) => `  ${d.message}`).join("\n");
+    const msgs = diagnostics.map((d: any) => `  ${d.message}`).join("\n");
     console.warn(`  Warnings resolving options for ${specDir}:\n${msgs}`);
   }
 
@@ -57,8 +57,8 @@ async function compileSpec(specDir: string): Promise<Stats> {
 
   if (program.hasError()) {
     const errorDiags = program.diagnostics
-      .filter((d) => d.severity === "error")
-      .map((d) => `  ${d.message}`)
+      .filter((d: any) => d.severity === "error")
+      .map((d: any) => `  ${d.message}`)
       .join("\n");
     throw new Error(`Compilation failed for ${specDir}:\n${errorDiags}`);
   }
