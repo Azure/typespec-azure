@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-azure-portal-core",
-  "version": "0.66.0",
+  "version": "0.67.0",
   "author": "Microsoft Corporation",
   "description": "TypeSpec Azure Portal Core library",
   "license": "MIT",
@@ -55,8 +55,6 @@
     "@typespec/versioning": "workspace:^",
     "@vitest/coverage-v8": "catalog:",
     "@vitest/ui": "catalog:",
-    "c8": "catalog:",
-    "source-map-support": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

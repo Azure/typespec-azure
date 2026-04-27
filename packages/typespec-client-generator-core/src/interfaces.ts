@@ -25,6 +25,7 @@ import {
   HttpVerb,
   Visibility,
 } from "@typespec/http";
+import type { ContextNode } from "./internal-utils.js";
 
 // Types for TCGC lib
 
@@ -71,6 +72,7 @@ export interface TCGCContext {
   __clientApiVersionDefaultValueCache: Map<SdkClient, string | undefined>;
   __httpOperationExamples: Map<HttpOperation, SdkHttpOperationExample[]>;
   __pagedResultSet: Set<SdkType>;
+  __namingContextPath: ContextNode[]; // Stack tracking the current traversal position for naming anonymous types.
   __orphanTypesCache?: (Model | Enum | Union)[]; // cached result of listOrphanTypes to avoid repeated namespace traversals
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
   __mutatedRealm?: unsafe_Realm; // the realm that contains all mutated types for this instance
@@ -883,6 +885,8 @@ export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
   methodParameterSegments: (SdkMethodParameter | SdkModelPropertyType)[][];
   /** Stream metadata, present when the body is a streaming type (e.g. JsonlStream, SSEStream). */
   streamMetadata?: SdkStreamMetadata;
+  /** Options to show how to serialize the body. */
+  serializationOptions: SerializationOptions;
 }
 
 export type SdkHttpParameter =
@@ -933,6 +937,8 @@ interface SdkHttpResponseBase extends SdkServiceResponse {
   description?: string;
   /** Stream metadata, present when the response is a streaming type (e.g. JsonlStream, SSEStream). */
   streamMetadata?: SdkStreamMetadata;
+  /** Options to show how to deserialize the response body. */
+  serializationOptions: SerializationOptions;
 }
 
 export interface SdkHttpResponse extends SdkHttpResponseBase {
@@ -1088,8 +1094,8 @@ export interface SdkLroServiceMetadata {
   pollingInfo: SdkPollingOperationStep;
   envelopeResult: SdkModelType;
   logicalPath?: string;
-  finalResult?: SdkModelType | SdkArrayType | SdkBuiltInType<"unknown"> | "void";
-  finalEnvelopeResult?: SdkModelType | SdkArrayType | SdkBuiltInType<"unknown"> | "void";
+  finalResult?: SdkModelType | SdkArrayType | SdkBuiltInType | "void";
+  finalEnvelopeResult?: SdkModelType | SdkArrayType | SdkBuiltInType | "void";
   finalResultPath?: string;
 }
 
@@ -1145,7 +1151,7 @@ export interface SdkOperationLink {
 
 interface SdkLogicalOperationStep {
   /** The TypeSpec type that is returned by following a link or calling a lined operation */
-  responseModel?: SdkModelType;
+  responseModel?: SdkModelType | SdkBuiltInType;
 }
 
 export interface SdkPropertyMap {
@@ -1190,7 +1196,7 @@ interface SdkFinalOperationReference extends SdkLogicalOperationStep {
 
 interface SdkPollingSuccessProperty extends SdkLogicalOperationStep {
   kind: "pollingSuccessProperty";
-  responseModel: SdkModelType;
+  responseModel: SdkModelType | SdkBuiltInType;
   /** The property containing the results of success */
   target: SdkModelPropertyType;
   /** The property in the response that contained a url to the status monitor */
@@ -1207,9 +1213,9 @@ interface SdkNoPollingSuccessProperty extends SdkLogicalOperationStep {
  */
 export interface SdkLroServiceFinalResponse {
   /** Intact response type */
-  envelopeResult: SdkModelType | SdkArrayType | SdkBuiltInType<"unknown">;
+  envelopeResult: SdkModelType | SdkArrayType | SdkBuiltInType;
   /** Meaningful result type */
-  result: SdkModelType | SdkArrayType | SdkBuiltInType<"unknown">;
+  result: SdkModelType | SdkArrayType | SdkBuiltInType;
   /** An array of properties to fetch {result} from the {envelopeResult} model. */
   resultSegments?: SdkModelPropertyType[];
 }
@@ -1256,6 +1262,8 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   unions: (SdkUnionType | SdkNullableType)[];
   /** Unique ID for the package. */
   crossLanguagePackageId: string;
+  /** Hash of API-affecting elements for cross-language SDK comparison. */
+  crossLanguageVersion: string;
   /** Hierarchical structure for the package based on namespaces. */
   namespaces: SdkNamespace<TServiceOperation>[];
   /** License details for client code comments or license file generation. */

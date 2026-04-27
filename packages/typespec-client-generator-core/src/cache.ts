@@ -1,5 +1,6 @@
 import {
   Enum,
+  getNamespaceFullName,
   Interface,
   isService,
   isTemplateDeclaration,
@@ -122,6 +123,25 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
     }
 
     queue.push(...client.subClients);
+  }
+
+  // Check that all service operations are included in client hierarchy when explicit @client is used
+  if (context.__explicitClients!.size > 0) {
+    // Collect all service operations that are covered by client operations
+    // (including through sourceOperation chain)
+    const coveredServiceOps = new Set<Operation>();
+    for (const clientOp of context.__operationToClientCache!.keys()) {
+      let current: Operation | undefined = clientOp;
+      while (current) {
+        coveredServiceOps.add(current);
+        current = current.sourceOperation;
+      }
+    }
+
+    // For each service namespace, check all operations are covered
+    for (const service of servicesNs) {
+      checkUncoveredOperations(context, service, coveredServiceOps);
+    }
   }
 
   // omit empty clients
@@ -467,8 +487,9 @@ function handleMultipleServicesSubClientNameConflict(
         types.push(sc.type);
       }
 
-      // Remove orphaned cache entries for the merged-away sub client
-      context.__rawClientsCache!.delete(sc.type!);
+      // Redirect the merged-away sub client's type to the surviving sub client
+      // so that @clientLocation lookups still resolve correctly.
+      context.__rawClientsCache!.set(sc.type!, existingSc);
       context.__clientToOperationsCache!.delete(sc);
 
       return true;
@@ -515,9 +536,10 @@ function mergeChildrenRecursively(
         types.push(incoming.type);
       }
 
-      // Remove orphaned cache entries for the merged-away child
+      // Redirect the merged-away child's type to the surviving child
+      // so that @clientLocation lookups still resolve correctly.
       if (incoming.type) {
-        context.__rawClientsCache!.delete(incoming.type);
+        context.__rawClientsCache!.set(incoming.type, existing);
       }
       context.__clientToOperationsCache!.delete(incoming);
     } else {
@@ -600,6 +622,51 @@ function createSubClient(
   context.__clientToOperationsCache!.set(subClient, []);
 
   return subClient;
+}
+
+/**
+ * Check for service operations that are not included in any @client definition.
+ * Recursively walks the namespace and its children to find uncovered operations.
+ */
+function checkUncoveredOperations(
+  context: TCGCContext,
+  ns: Namespace,
+  coveredOps: Set<Operation>,
+): void {
+  for (const op of ns.operations.values()) {
+    if (isTemplateDeclarationOrInstance(op) || !isInScope(context, op)) continue;
+    if (context.program.stateMap(omitOperation).get(op)) continue;
+    if (!coveredOps.has(op)) {
+      reportDiagnostic(context.program, {
+        code: "operation-not-in-client",
+        format: {
+          operationName: op.name,
+          namespaceName: getNamespaceFullName(ns),
+        },
+        target: op,
+      });
+    }
+  }
+  for (const childNs of ns.namespaces.values()) {
+    checkUncoveredOperations(context, childNs, coveredOps);
+  }
+  for (const iface of ns.interfaces.values()) {
+    if (isTemplateDeclaration(iface)) continue;
+    for (const op of iface.operations.values()) {
+      if (isTemplateDeclarationOrInstance(op) || !isInScope(context, op)) continue;
+      if (context.program.stateMap(omitOperation).get(op)) continue;
+      if (!coveredOps.has(op)) {
+        reportDiagnostic(context.program, {
+          code: "operation-not-in-client",
+          format: {
+            operationName: op.name,
+            namespaceName: getNamespaceFullName(iface.namespace ?? ns),
+          },
+          target: op,
+        });
+      }
+    }
+  }
 }
 
 function isArm(service: Namespace[] | Namespace): boolean {

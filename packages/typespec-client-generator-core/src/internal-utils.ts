@@ -556,7 +556,7 @@ function getDecoratorArgValue(
   const diagnostics = createDiagnosticCollector();
   if (typeof arg === "object" && arg !== null && "kind" in arg) {
     if (arg.kind === "EnumMember") {
-      return diagnostics.wrap(diagnostics.pipe(getClientTypeWithDiagnostics(context, arg)));
+      return diagnostics.wrap(diagnostics.pipe(getClientTypeWithDiagnostics(context, arg as any)));
     }
     if (
       arg.kind === "String" ||
@@ -608,6 +608,13 @@ export function isHttpOperation(context: TCGCContext, obj: any): obj is HttpOper
 }
 
 export type TspLiteralType = StringLiteral | NumericLiteral | BooleanLiteral;
+
+/** A node in a context path that tracks the traversal position for naming anonymous types. */
+export interface ContextNode {
+  name: string;
+  // Type can be undefined to indicate "anonymous" context (e.g., when property type is a named union)
+  type: Model | Union | TspLiteralType | Operation | undefined;
+}
 
 export function getNonNullOptions(type: Union): Type[] {
   return [...type.variants.values()].map((x) => x.type).filter((t) => !isNullType(t));
@@ -788,6 +795,16 @@ export function getCorrespondingClientParam(
   type: ModelProperty,
   operation: Operation,
 ): SdkMethodParameter | undefined {
+  // When @clientLocation explicitly targets this operation, the parameter should stay at
+  // the method level and not be mapped to an existing client parameter.
+  const clientLocation = getClientLocation(context, type);
+  if (
+    clientLocation &&
+    clientLocation === (getOverriddenClientMethod(context, operation) ?? operation)
+  ) {
+    return undefined;
+  }
+
   const clientParams = [];
   let client: SdkClient | undefined = context.getClientForOperation(operation);
   while (client) {
@@ -920,6 +937,16 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
 
   // No service, thus no versioning mutation needed
   if (servicesNs.size === 0) return globalNamespace;
+
+  // Multi services' client should not honor the specific api-version set in config
+  if (
+    servicesNs.size > 1 &&
+    context.apiVersion !== undefined &&
+    context.apiVersion !== "latest" &&
+    context.apiVersion !== "all"
+  ) {
+    context.apiVersion = undefined;
+  }
 
   // Explicit all API version setting, thus no versioning mutation needed
   if (context.apiVersion === "all") return globalNamespace;

@@ -16,6 +16,7 @@ namespace Microsoft.OperationStatusSample;
 
 enum Versions {
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  @Azure.Core.previewVersion
   `2022-11-01-preview`,
 }
 

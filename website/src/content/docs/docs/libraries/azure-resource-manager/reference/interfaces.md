@@ -914,7 +914,7 @@ op Azure.ResourceManager.TrackedResourceOperations<Resource, Properties, BasePar
 ### `ActionAsync` {#Azure.ResourceManager.ActionAsync}
 
 ```typespec
-op Azure.ResourceManager.ActionAsync(provider: "Microsoft.ThisWillBeReplaced", body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Error
+op Azure.ResourceManager.ActionAsync(body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Error
 ```
 
 #### Template Parameters
@@ -929,13 +929,14 @@ op Azure.ResourceManager.ActionAsync(provider: "Microsoft.ThisWillBeReplaced", b
 | Parameters          | Optional. Additional parameters after the path parameters                            |
 | Error               | Optional. The error response, if non-standard.                                       |
 | OptionalRequestBody | Optional. Indicates whether the body parameter is optional.                          |
+| Provider            | Optional. The provider namespace model for the resource.                             |
 
 ### `ArmCustomPatchAsync` {#Azure.ResourceManager.ArmCustomPatchAsync}
 
 A long-running resource update using a custom PATCH payload (Asynchronous)
 
 ```typespec
-op Azure.ResourceManager.ArmCustomPatchAsync(provider: "Microsoft.ThisWillBeReplaced", properties: PatchModel): Response | Error
+op Azure.ResourceManager.ArmCustomPatchAsync(properties: PatchModel): Response | Error
 ```
 
 #### Template Parameters
@@ -949,13 +950,14 @@ op Azure.ResourceManager.ArmCustomPatchAsync(provider: "Microsoft.ThisWillBeRepl
 | Parameters     | Optional. Additional parameters after the path parameters                     |
 | Response       | Optional. The success response for the patch operation                        |
 | Error          | Optional. The error response, if non-standard.                                |
+| Provider       | Optional. The provider namespace model for the resource.                      |
 
 ### `ArmCustomPatchSync` {#Azure.ResourceManager.ArmCustomPatchSync}
 
 A resource update using a custom PATCH payload (synchronous)
 
 ```typespec
-op Azure.ResourceManager.ArmCustomPatchSync(provider: "Microsoft.ThisWillBeReplaced", properties: PatchModel): Response | Error
+op Azure.ResourceManager.ArmCustomPatchSync(properties: PatchModel): Response | Error
 ```
 
 #### Template Parameters
@@ -968,6 +970,7 @@ op Azure.ResourceManager.ArmCustomPatchSync(provider: "Microsoft.ThisWillBeRepla
 | Parameters     | Optional. Additional parameters after the path parameters |
 | Response       | Optional. The success response for the patch operation    |
 | Error          | Optional. The error response, if non-standard.            |
+| Provider       | Optional. The provider namespace model for the resource.  |
 
 ### `ArmListBySubscription` {#Azure.ResourceManager.ArmListBySubscription}
 
@@ -985,6 +988,24 @@ op Azure.ResourceManager.ArmListBySubscription(apiVersion: string, subscriptionI
 | Parameters | Optional. Additional parameters after the path parameters |
 | Response   | Optional. The success response for the list operation     |
 | Error      | Optional. The error response, if non-standard.            |
+
+### `ArmListBySubscriptionScope` {#Azure.ResourceManager.ArmListBySubscriptionScope}
+
+A resource list operation, at the subscription scope, for any resource.
+This template generates a standard resource list operation at the subscription level,
+
+```typespec
+op Azure.ResourceManager.ArmListBySubscriptionScope(apiVersion: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+```
+
+#### Template Parameters
+
+| Name       | Description                                           |
+| ---------- | ----------------------------------------------------- |
+| Resource   | the resource being listed                             |
+| Parameters | Optional. Additional query or header parameters       |
+| Response   | Optional. The success response for the list operation |
+| Error      | Optional. The error response, if non-standard.        |
 
 ### `ArmProviderActionAsync` {#Azure.ResourceManager.ArmProviderActionAsync}
 
@@ -1024,7 +1045,7 @@ op Azure.ResourceManager.ArmProviderActionSync(apiVersion: string, subscriptionI
 ### `ArmResourceActionAsync` {#Azure.ResourceManager.ArmResourceActionAsync}
 
 ```typespec
-op Azure.ResourceManager.ArmResourceActionAsync(provider: "Microsoft.ThisWillBeReplaced", body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Response | Error
+op Azure.ResourceManager.ArmResourceActionAsync(body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Response | Error
 ```
 
 #### Template Parameters
@@ -1039,13 +1060,14 @@ op Azure.ResourceManager.ArmResourceActionAsync(provider: "Microsoft.ThisWillBeR
 | Parameters          | Optional. Additional parameters after the path parameters                 |
 | Error               | Optional. The error response, if non-standard.                            |
 | OptionalRequestBody | Optional. Indicates whether the body parameter is optional.               |
+| Provider            | Optional. The provider namespace model for the resource.                  |
 
 ### `ArmResourceActionAsyncBase` {#Azure.ResourceManager.ArmResourceActionAsyncBase}
 
 A long-running resource action.
 
 ```typespec
-op Azure.ResourceManager.ArmResourceActionAsyncBase(provider: "Microsoft.ThisWillBeReplaced", body: Request): Response | Error
+op Azure.ResourceManager.ArmResourceActionAsyncBase(body: Request): Response | Error
 ```
 
 #### Template Parameters
@@ -1059,11 +1081,12 @@ op Azure.ResourceManager.ArmResourceActionAsyncBase(provider: "Microsoft.ThisWil
 | Parameters          | Optional. Additional parameters after the path parameters    |
 | Error               | Optional. The error response, if non-standard.               |
 | OptionalRequestBody | Optional. Indicates whether the request body is optional.    |
+| Provider            | Optional. The provider namespace model for the resource.     |
 
 ### `ArmResourceActionNoContentAsync` {#Azure.ResourceManager.ArmResourceActionNoContentAsync}
 
 ```typespec
-op Azure.ResourceManager.ArmResourceActionNoContentAsync(provider: "Microsoft.ThisWillBeReplaced", body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Azure.ResourceManager.ArmNoContentResponse<"Action completed successfully."> | Error
+op Azure.ResourceManager.ArmResourceActionNoContentAsync(body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Azure.ResourceManager.ArmNoContentResponse<"Action completed successfully."> | Error
 ```
 
 #### Template Parameters
@@ -1077,13 +1100,14 @@ op Azure.ResourceManager.ArmResourceActionNoContentAsync(provider: "Microsoft.Th
 | Parameters          | Optional. Additional parameters after the path parameters                 |
 | Error               | Optional. The error response, if non-standard.                            |
 | OptionalRequestBody | Optional. Indicates whether the body parameter is optional.               |
+| Provider            | Optional. The provider namespace model for the resource.                  |
 
 ### `ArmResourceActionNoContentSync` {#Azure.ResourceManager.ArmResourceActionNoContentSync}
 
 A synchronous resource action that returns no content.
 
 ```typespec
-op Azure.ResourceManager.ArmResourceActionNoContentSync(provider: "Microsoft.ThisWillBeReplaced", body: Request): Azure.ResourceManager.ArmNoContentResponse<"Action completed successfully."> | Error
+op Azure.ResourceManager.ArmResourceActionNoContentSync(body: Request): Azure.ResourceManager.ArmNoContentResponse<"Action completed successfully."> | Error
 ```
 
 #### Template Parameters
@@ -1096,11 +1120,12 @@ op Azure.ResourceManager.ArmResourceActionNoContentSync(provider: "Microsoft.Thi
 | Parameters          | Optional. Additional parameters after the path parameters    |
 | Error               | Optional. The error response, if non-standard.               |
 | OptionalRequestBody | Optional. Indicates whether the request body is optional.    |
+| Provider            | Optional. The provider namespace model for the resource.     |
 
 ### `ArmResourceActionNoResponseContentAsync` {#Azure.ResourceManager.ArmResourceActionNoResponseContentAsync}
 
 ```typespec
-op Azure.ResourceManager.ArmResourceActionNoResponseContentAsync(provider: "Microsoft.ThisWillBeReplaced", body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Error
+op Azure.ResourceManager.ArmResourceActionNoResponseContentAsync(body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Error
 ```
 
 #### Template Parameters
@@ -1114,13 +1139,14 @@ op Azure.ResourceManager.ArmResourceActionNoResponseContentAsync(provider: "Micr
 | Parameters          | Optional. Additional parameters after the path parameters                 |
 | Error               | Optional. The error response, if non-standard.                            |
 | OptionalRequestBody | Optional. Indicates whether the body parameter is optional.               |
+| Provider            | Optional. The provider namespace model for the resource.                  |
 
 ### `ArmResourceActionSync` {#Azure.ResourceManager.ArmResourceActionSync}
 
 A synchronous resource action.
 
 ```typespec
-op Azure.ResourceManager.ArmResourceActionSync(provider: "Microsoft.ThisWillBeReplaced", body: Request): Response | Error
+op Azure.ResourceManager.ArmResourceActionSync(body: Request): Response | Error
 ```
 
 #### Template Parameters
@@ -1134,13 +1160,14 @@ op Azure.ResourceManager.ArmResourceActionSync(provider: "Microsoft.ThisWillBeRe
 | Parameters          | Optional. Additional parameters after the path parameters    |
 | Error               | Optional. The error response, if non-standard.               |
 | OptionalRequestBody | Optional. Indicates whether the body parameter is optional.  |
+| Provider            | Optional. The provider namespace model for the resource.     |
 
 ### `ArmResourceCheckExistence` {#Azure.ResourceManager.ArmResourceCheckExistence}
 
 Check a resource's existence via HEAD operation
 
 ```typespec
-op Azure.ResourceManager.ArmResourceCheckExistence(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.ArmResourceCheckExistence(): Response | Error
 ```
 
 #### Template Parameters
@@ -1152,11 +1179,12 @@ op Azure.ResourceManager.ArmResourceCheckExistence(provider: "Microsoft.ThisWill
 | Parameters     | Optional. Additional parameters after the path parameters |
 | Response       | Optional. The success response for the read operation     |
 | Error          | Optional. The error response, if non-standard.            |
+| Provider       | Optional. The provider namespace model for the resource.  |
 
 ### `ArmResourceCreateOrReplaceAsync` {#Azure.ResourceManager.ArmResourceCreateOrReplaceAsync}
 
 ```typespec
-op Azure.ResourceManager.ArmResourceCreateOrReplaceAsync(provider: "Microsoft.ThisWillBeReplaced", resource: Resource): Response | Error
+op Azure.ResourceManager.ArmResourceCreateOrReplaceAsync(resource: Resource): Response | Error
 ```
 
 #### Template Parameters
@@ -1169,13 +1197,14 @@ op Azure.ResourceManager.ArmResourceCreateOrReplaceAsync(provider: "Microsoft.Th
 | Parameters     | Optional. Additional parameters after the path parameters               |
 | Response       | Optional. The success response for the createOrReplace operation        |
 | Error          | Optional. The error response, if non-standard.                          |
+| Provider       | Optional. The provider namespace model for the resource.                |
 
 ### `ArmResourceCreateOrReplaceSync` {#Azure.ResourceManager.ArmResourceCreateOrReplaceSync}
 
 Synchronous PUT operation for Azure Resource Manager resources
 
 ```typespec
-op Azure.ResourceManager.ArmResourceCreateOrReplaceSync(provider: "Microsoft.ThisWillBeReplaced", resource: Resource): Response | Error
+op Azure.ResourceManager.ArmResourceCreateOrReplaceSync(resource: Resource): Response | Error
 ```
 
 #### Template Parameters
@@ -1187,13 +1216,14 @@ op Azure.ResourceManager.ArmResourceCreateOrReplaceSync(provider: "Microsoft.Thi
 | Parameters     | Optional. Additional parameters after the path parameters       |
 | Response       | Optional. The success response for the createOrUpdate operation |
 | Error          | Optional. The error response, if non-standard.                  |
+| Provider       | Optional. The provider namespace model for the resource.        |
 
 ### `ArmResourceCreateOrUpdateAsync` {#Azure.ResourceManager.ArmResourceCreateOrUpdateAsync}
 
 A long-running resource CreateOrUpdate (PUT)
 
 ```typespec
-op Azure.ResourceManager.ArmResourceCreateOrUpdateAsync(provider: "Microsoft.ThisWillBeReplaced", resource: Resource): Response | Error
+op Azure.ResourceManager.ArmResourceCreateOrUpdateAsync(resource: Resource): Response | Error
 ```
 
 #### Template Parameters
@@ -1206,6 +1236,7 @@ op Azure.ResourceManager.ArmResourceCreateOrUpdateAsync(provider: "Microsoft.Thi
 | Parameters     | Optional. Additional parameters after the path parameters               |
 | Response       | Optional. The success response for the createOrUpdate operation         |
 | Error          | Optional. The error response, if non-standard.                          |
+| Provider       | Optional. The provider namespace model for the resource.                |
 
 ### `ArmResourceCreateOrUpdateSync` {#Azure.ResourceManager.ArmResourceCreateOrUpdateSync}
 
@@ -1216,7 +1247,7 @@ op Azure.ResourceManager.ArmResourceCreateOrUpdateAsync(provider: "Microsoft.Thi
 DEPRECATED: Please use ArmResourceCreateOrReplaceSync instead
 
 ```typespec
-op Azure.ResourceManager.ArmResourceCreateOrUpdateSync(provider: "Microsoft.ThisWillBeReplaced", resource: Resource): Response | Error
+op Azure.ResourceManager.ArmResourceCreateOrUpdateSync(resource: Resource): Response | Error
 ```
 
 #### Template Parameters
@@ -1228,6 +1259,7 @@ op Azure.ResourceManager.ArmResourceCreateOrUpdateSync(provider: "Microsoft.This
 | Parameters     | Optional. Additional parameters after the path parameters       |
 | Response       | Optional. The success response for the createOrUpdate operation |
 | Error          | Optional. The error response, if non-standard.                  |
+| Provider       | Optional. The provider namespace model for the resource.        |
 
 ### `ArmResourceDeleteAsync` {#Azure.ResourceManager.ArmResourceDeleteAsync}
 
@@ -1236,7 +1268,7 @@ op Azure.ResourceManager.ArmResourceCreateOrUpdateSync(provider: "Microsoft.This
 :::
 
 ```typespec
-op Azure.ResourceManager.ArmResourceDeleteAsync(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.ArmResourceDeleteAsync(): Response | Error
 ```
 
 #### Template Parameters
@@ -1249,11 +1281,12 @@ op Azure.ResourceManager.ArmResourceDeleteAsync(provider: "Microsoft.ThisWillBeR
 | Parameters     | Optional. Additional parameters after the path parameters        |
 | Response       | Optional. The success response(s) for the delete operation       |
 | Error          | Optional. The error response, if non-standard.                   |
+| Provider       | Optional. The provider namespace model for the resource.         |
 
 ### `ArmResourceDeleteAsyncBase` {#Azure.ResourceManager.ArmResourceDeleteAsyncBase}
 
 ```typespec
-op Azure.ResourceManager.ArmResourceDeleteAsyncBase(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.ArmResourceDeleteAsyncBase(): Response | Error
 ```
 
 #### Template Parameters
@@ -1265,13 +1298,14 @@ op Azure.ResourceManager.ArmResourceDeleteAsyncBase(provider: "Microsoft.ThisWil
 | BaseParameters | Optional. Allows overriding the parameters for the operation |
 | Parameters     | Optional. Additional parameters after the path parameters    |
 | Error          | Optional. The error response, if non-standard.               |
+| Provider       | Optional. The provider namespace model for the resource.     |
 
 ### `ArmResourceDeleteSync` {#Azure.ResourceManager.ArmResourceDeleteSync}
 
 Delete a resource synchronously
 
 ```typespec
-op Azure.ResourceManager.ArmResourceDeleteSync(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.ArmResourceDeleteSync(): Response | Error
 ```
 
 #### Template Parameters
@@ -1283,11 +1317,12 @@ op Azure.ResourceManager.ArmResourceDeleteSync(provider: "Microsoft.ThisWillBeRe
 | Parameters     | Optional. Additional parameters after the path parameters    |
 | Response       | Optional. The success response(s) for the delete operation   |
 | Error          | Optional. The error response, if non-standard.               |
+| Provider       | Optional. The provider namespace model for the resource.     |
 
 ### `ArmResourceDeleteWithoutOkAsync` {#Azure.ResourceManager.ArmResourceDeleteWithoutOkAsync}
 
 ```typespec
-op Azure.ResourceManager.ArmResourceDeleteWithoutOkAsync(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.ArmResourceDeleteWithoutOkAsync(): Response | Error
 ```
 
 #### Template Parameters
@@ -1300,13 +1335,14 @@ op Azure.ResourceManager.ArmResourceDeleteWithoutOkAsync(provider: "Microsoft.Th
 | Parameters     | Optional. Additional parameters after the path parameters                 |
 | Response       | Optional. The success response(s) for the delete operation                |
 | Error          | Optional. The error response, if non-standard.                            |
+| Provider       | Optional. The provider namespace model for the resource.                  |
 
 ### `ArmResourceListAtScope` {#Azure.ResourceManager.ArmResourceListAtScope}
 
 A resource list operation, with scope determined by BaseParameters
 
 ```typespec
-op Azure.ResourceManager.ArmResourceListAtScope(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.ArmResourceListAtScope(): Response | Error
 ```
 
 #### Template Parameters
@@ -1318,13 +1354,14 @@ op Azure.ResourceManager.ArmResourceListAtScope(provider: "Microsoft.ThisWillBeR
 | Parameters     | Optional. Additional parameters after the path parameters |
 | Response       | Optional. The success response for the list operation     |
 | Error          | Optional. The error response, if non-standard.            |
+| Provider       | Optional. The provider namespace model for the resource.  |
 
 ### `ArmResourceListByParent` {#Azure.ResourceManager.ArmResourceListByParent}
 
 A resource list operation, at the scope of the resource's parent
 
 ```typespec
-op Azure.ResourceManager.ArmResourceListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.ArmResourceListByParent(): Response | Error
 ```
 
 #### Template Parameters
@@ -1338,11 +1375,12 @@ op Azure.ResourceManager.ArmResourceListByParent(provider: "Microsoft.ThisWillBe
 | Parameters         | Optional. Additional parameters after the path parameters |
 | Response           | Optional. The success response for the list operation     |
 | Error              | Optional. The error response, if non-standard.            |
+| Provider           | Optional. The provider namespace model for the resource.  |
 
 ### `ArmResourcePatchAsync` {#Azure.ResourceManager.ArmResourcePatchAsync}
 
 ```typespec
-op Azure.ResourceManager.ArmResourcePatchAsync(provider: "Microsoft.ThisWillBeReplaced", properties: Resource): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Azure.ResourceManager.CommonTypes.ErrorResponse
+op Azure.ResourceManager.ArmResourcePatchAsync(properties: Resource): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### Template Parameters
@@ -1354,11 +1392,12 @@ op Azure.ResourceManager.ArmResourcePatchAsync(provider: "Microsoft.ThisWillBeRe
 | BaseParameters | Optional. Allows overriding the operation parameters                          |
 | LroHeaders     | Optional. Allows overriding the lro headers returned in the Accepted response |
 | Parameters     | Optional. Additional parameters after the path parameters                     |
+| Provider       | Optional. The provider namespace model for the resource.                      |
 
 ### `ArmResourcePatchSync` {#Azure.ResourceManager.ArmResourcePatchSync}
 
 ```typespec
-op Azure.ResourceManager.ArmResourcePatchSync(provider: "Microsoft.ThisWillBeReplaced", properties: Resource): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.CommonTypes.ErrorResponse
+op Azure.ResourceManager.ArmResourcePatchSync(properties: Resource): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### Template Parameters
@@ -1369,13 +1408,14 @@ op Azure.ResourceManager.ArmResourcePatchSync(provider: "Microsoft.ThisWillBeRep
 | Properties     | The model type of the resource properties                 |
 | BaseParameters | Optional. Allows overriding the operation parameters      |
 | Parameters     | Optional. Additional parameters after the path parameters |
+| Provider       | Optional. The provider namespace model for the resource.  |
 
 ### `ArmResourceRead` {#Azure.ResourceManager.ArmResourceRead}
 
 A resource GET operation
 
 ```typespec
-op Azure.ResourceManager.ArmResourceRead(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.ArmResourceRead(): Response | Error
 ```
 
 #### Template Parameters
@@ -1387,11 +1427,12 @@ op Azure.ResourceManager.ArmResourceRead(provider: "Microsoft.ThisWillBeReplaced
 | Parameters     | Optional. Additional parameters after the path parameters |
 | Response       | Optional. The success response for the read operation     |
 | Error          | Optional. The error response, if non-standard.            |
+| Provider       | Optional. The provider namespace model for the resource.  |
 
 ### `ArmTagsPatchAsync` {#Azure.ResourceManager.ArmTagsPatchAsync}
 
 ```typespec
-op Azure.ResourceManager.ArmTagsPatchAsync(provider: "Microsoft.ThisWillBeReplaced", properties: Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Azure.ResourceManager.CommonTypes.ErrorResponse
+op Azure.ResourceManager.ArmTagsPatchAsync(properties: Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### Template Parameters
@@ -1403,11 +1444,12 @@ op Azure.ResourceManager.ArmTagsPatchAsync(provider: "Microsoft.ThisWillBeReplac
 | BaseParameters | Optional. Allows overriding the operation parameters                             |
 | LroHeaders     | Optional. Allows overriding the lro headers that appear in the Accepted response |
 | Parameters     | Optional. Additional parameters after the path parameters                        |
+| Provider       | Optional. The provider namespace model for the resource.                         |
 
 ### `ArmTagsPatchSync` {#Azure.ResourceManager.ArmTagsPatchSync}
 
 ```typespec
-op Azure.ResourceManager.ArmTagsPatchSync(provider: "Microsoft.ThisWillBeReplaced", properties: Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.CommonTypes.ErrorResponse
+op Azure.ResourceManager.ArmTagsPatchSync(properties: Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### Template Parameters
@@ -1417,6 +1459,7 @@ op Azure.ResourceManager.ArmTagsPatchSync(provider: "Microsoft.ThisWillBeReplace
 | Resource       | the resource being patched                                |
 | BaseParameters | Optional. Allows overriding the operation parameters      |
 | Parameters     | Optional. Additional parameters after the path parameters |
+| Provider       | Optional. The provider namespace model for the resource.  |
 
 ### `checkGlobalNameAvailability` {#Azure.ResourceManager.checkGlobalNameAvailability}
 

@@ -1,5 +1,21 @@
 # @azure-tools/typespec-metadata
 
+## 0.2.0
+- Group emitters by normalized language key in the `languages` output. Each language key now maps to an array of emitter configs instead of a single config, allowing multiple emitters per language (e.g. two C# emitters). Unrecognized emitters are grouped under `"unknown"`. Language is inferred by heuristic when the emitter is not in the built-in registry.
+
+
+## 0.1.3
+- Fixes issue with azurev2 flavored package names.
+
+## 0.1.2
+
+Java package name now includes the Maven groupId prefix based on flavor and management/data plane.
+The format is `{groupId}:{artifactId}` where groupId is:
+- `com.azure` for data-plane libraries (default)
+- `com.azure.resourcemanager` for management-plane (ARM) libraries
+- `com.azure.v2` for data-plane libraries with `flavor: azurev2`
+- `com.azure.resourcemanager.v2` for management-plane libraries with `flavor: azurev2`
+
 ## 0.1.1
 
 ### Bump dependencies

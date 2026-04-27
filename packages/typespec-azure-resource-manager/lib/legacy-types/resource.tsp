@@ -205,3 +205,37 @@ model DiscriminatedExtensionResource<
 @Http.Private.includeInapplicableMetadataInPayload(false)
 @customAzureResource(#{ isAzureResource: isResource })
 model CustomAzureResource<isResource extends valueof boolean = true> {}
+
+/**
+ * Model representing a custom resource that extends ProxyResource.
+ * Use this template with 'is' to create a custom proxy resource.
+ * @template isResource Optional. A boolean flag indicating whether the resource should be marked as an Azure resource. Default false.
+ */
+@Http.Private.includeInapplicableMetadataInPayload(false)
+@customAzureResource(#{ isAzureResource: isResource })
+model CustomAzureProxyResource<isResource extends valueof boolean = false>
+  extends Foundations.ProxyResource {}
+
+/**
+ * A generic Azure Resource Manager resource type that does not require name, key,
+ * or segment properties on the model itself. The resource type and path information
+ * comes from the operations (e.g. RoutedOperations).
+ *
+ * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+ * @template Properties A model containing the provider-specific properties for this resource
+ * @template PropertiesOptional A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended.
+ *
+ * @example
+ * ```typespec
+ * model MyResource is GenericResource<{}> {}
+ * ```
+ */
+@doc("A generic Azure Resource Manager resource type.")
+@Private.genericResourceInternal
+@Http.Private.includeInapplicableMetadataInPayload(false)
+model GenericResource<Properties extends {}, PropertiesOptional extends valueof boolean = true>
+  extends Foundations.Resource {
+  @doc("The resource-specific properties for this resource.")
+  @Azure.ResourceManager.Private.armResourcePropertiesOptionality(PropertiesOptional)
+  properties?: Properties;
+}

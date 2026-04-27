@@ -9,6 +9,9 @@ Scenarios.Azure_ClientGenerator_Core_ClientDefaultValue_putModelProperty = passO
     request: {
       body: json({
         name: "test",
+        timeout: 30,
+        tier: "standard",
+        retry: true,
       }),
     },
     response: {

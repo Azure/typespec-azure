@@ -1,6 +1,67 @@
 import { deepEqual, deepStrictEqual, ok, strictEqual } from "assert";
-import { expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { compileOpenAPI } from "../test-host.js";
+
+describe("CustomAzureProxyResource", () => {
+  it("emits correct paths and schemas for subscription resource with standard CRUD operations", async () => {
+    const openApi = await compileOpenAPI(
+      `
+      @armProviderNamespace
+        namespace Microsoft.Contoso;
+
+      #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "legacy test"
+      @subscriptionResource
+      model Widget is Azure.ResourceManager.Legacy.CustomAzureProxyResource {
+         ...ResourceNameParameter<Widget>;
+         /** The widget color */
+         color?: string;
+      }
+
+      @@visibility(Widget.name, Lifecycle.Read);
+
+      interface Widgets {
+        get is ArmResourceRead<Widget>;
+        put is ArmResourceCreateOrReplaceSync<Widget>;
+        update is ArmCustomPatchSync<Widget, Azure.ResourceManager.Foundations.TagsUpdateModel<Widget>>;
+        delete is ArmResourceDeleteSync<Widget>;
+        list is ArmListBySubscription<Widget>;
+      }
+  `,
+      { preset: "azure" },
+    );
+
+    const widgetPath =
+      "/subscriptions/{subscriptionId}/providers/Microsoft.Contoso/widgets/{widgetName}";
+    const listPath = "/subscriptions/{subscriptionId}/providers/Microsoft.Contoso/widgets";
+    const opApi = openApi as any;
+
+    // Validate that all expected paths exist
+    ok(opApi.paths[widgetPath], `Expected path ${widgetPath} to exist`);
+    ok(opApi.paths[listPath], `Expected path ${listPath} to exist`);
+
+    // Validate GET 200 response references the resource schema
+    expect(opApi.paths[widgetPath].get.responses["200"].schema).toStrictEqual({
+      $ref: "#/definitions/Widget",
+    });
+
+    // Validate PUT 200 response references the resource schema
+    expect(opApi.paths[widgetPath].put.responses["200"].schema).toStrictEqual({
+      $ref: "#/definitions/Widget",
+    });
+
+    // Validate PATCH 200 response references the resource schema
+    expect(opApi.paths[widgetPath].patch.responses["200"].schema).toStrictEqual({
+      $ref: "#/definitions/Widget",
+    });
+
+    // Validate PUT request body parameter references the resource schema
+    const putBodyParam = opApi.paths[widgetPath].put.parameters.find((p: any) => p.in === "body");
+    ok(putBodyParam, "Expected PUT to have a body parameter");
+    expect(putBodyParam.schema).toStrictEqual({
+      $ref: "#/definitions/Widget",
+    });
+  });
+});
 
 it("emits correct paths for tenant resources", async () => {
   const openApi = await compileOpenAPI(
@@ -755,4 +816,104 @@ it("allows action requests with optional body parameters", async () => {
       $ref: "#/definitions/MoveRequest",
     },
   });
+});
+
+it("allows sync and async provider actions with unknown body", async () => {
+  const openApi = await compileOpenAPI(
+    `@armProviderNamespace
+    namespace Microsoft.Contoso;
+    
+    @armResourceOperations
+    interface ProviderOperations {
+      calculateSync is ArmProviderActionSync<
+        Request = unknown,
+        Response = unknown,
+      >;
+      calculateAsync is ArmProviderActionAsync<
+        Request = unknown,
+        Response = unknown,
+      >;
+    }
+  `,
+    { preset: "azure" },
+  );
+
+  const syncOp = openApi.paths["/providers/Microsoft.Contoso/calculateSync"].post;
+  const asyncOp = openApi.paths["/providers/Microsoft.Contoso/calculateAsync"].post;
+
+  ok(syncOp);
+  ok(asyncOp);
+
+  deepStrictEqual(syncOp.parameters[1], {
+    name: "body",
+    in: "body",
+    description: "The request body",
+    required: true,
+    schema: {},
+  });
+
+  deepStrictEqual(asyncOp.parameters[1], {
+    name: "body",
+    in: "body",
+    description: "The request body",
+    required: true,
+    schema: {},
+  });
+});
+
+it("emits correct subscription-level list path for child resource using ArmListBySubscriptionScope", async () => {
+  const openApi = await compileOpenAPI(
+    `
+    @armProviderNamespace
+      namespace Microsoft.ContosoProviderhub;
+
+    model Test is TrackedResource<{}> {
+      ...ResourceNameParameter<Test>;
+    }
+
+    @parentResource(Test)
+    model Employee is ProxyResource<EmployeeProperties> {
+      ...ResourceNameParameter<Employee>;
+    }
+
+    model EmployeeProperties {
+      age?: int32;
+      city?: string;
+    }
+
+    @armResourceOperations
+    interface Tests {
+      get is ArmResourceRead<Test>;
+      createOrUpdate is ArmResourceCreateOrReplaceAsync<Test>;
+      delete is ArmResourceDeleteWithoutOkAsync<Test>;
+      listByResourceGroup is ArmResourceListByParent<Test>;
+    }
+
+    @armResourceOperations
+    interface Employees {
+      get is ArmResourceRead<Employee>;
+      createOrUpdate is ArmResourceCreateOrReplaceSync<Employee>;
+      delete is ArmResourceDeleteSync<Employee>;
+      listByParent is ArmResourceListByParent<Employee>;
+      listBySubscription is ArmListBySubscriptionScope<Employee>;
+    }
+  `,
+    { preset: "azure" },
+  );
+
+  // Verify the subscription-level list path is correct (no parent resource path segments)
+  const subscriptionListPath =
+    "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderhub/employees";
+  ok(
+    openApi.paths[subscriptionListPath]?.get,
+    `Expected subscription-level list path ${subscriptionListPath} to exist`,
+  );
+
+  // Verify the parent-level list path also exists
+  const parentListPath =
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderhub/tests/{testName}/employees";
+  ok(
+    openApi.paths[parentListPath]?.get,
+    `Expected parent-level list path ${parentListPath} to exist`,
+  );
 });

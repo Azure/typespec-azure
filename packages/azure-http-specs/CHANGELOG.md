@@ -1,5 +1,23 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.39
+
+### Breaking Changes
+
+- [#3997](https://github.com/Azure/typespec-azure/pull/3997) For multiple service case, remove the use of `@useDependency` to decare each service's API version, but use the latest version instead. Remove related tests.
+
+### Features
+
+- [#4158](https://github.com/Azure/typespec-azure/pull/4158) Add test for multiple services without explicit `@client` creating separate root clients.
+
+### Bug Fixes
+
+- [#3950](https://github.com/Azure/typespec-azure/pull/3950) Update the `azure/client-generator-core/alternate-type` spec for Rust.
+- [#4058](https://github.com/Azure/typespec-azure/pull/4058) Add `@clientLocation` on operations in interface `AddOptionalParam` in resiliency srv-driven specs. To keep the client hierarchy unchanged after TCGC update.
+- [#3997](https://github.com/Azure/typespec-azure/pull/3997) Migrate `@operationGroup` to `@client`
+- [#4054](https://github.com/Azure/typespec-azure/pull/4054) Add required `service:` parameter to `@client` decorators in client-initialization spec files.
+
+
 ## 0.1.0-alpha.38
 
 ### Features

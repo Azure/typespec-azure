@@ -1845,6 +1845,58 @@ it("merged sub clients with @clientLocation targeting merged type should not los
   ok(operations.methods.find((m) => m.name === "extraOp"));
 });
 
+it("@clientLocation targeting merged-away sub client type should resolve to surviving sub client", async () => {
+  // Verifies the scenario from issue: @clientLocation targets an interface
+  // in ServiceB that gets merged away into the surviving sub-client from ServiceA.
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace ServiceA {
+      interface SubGroup {
+        @route("/a")
+        a(): void;
+      }
+    }
+    @service
+    namespace ServiceB {
+      interface SubGroup {
+        @route("/b")
+        b(): void;
+      }
+      @route("/c")
+      op c(): void;
+    }`,
+      `
+    @client(
+      {
+        service: [ServiceA, ServiceB],
+        autoMergeService: true,
+      }
+    )
+    namespace Combined;
+
+    @@clientLocation(ServiceB.c, ServiceB.SubGroup);
+  `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "Combined");
+
+  // Should have only 1 sub client (merged SubGroup)
+  strictEqual(client.children!.length, 1);
+  const subGroup = client.children!.find((c) => c.name === "SubGroup");
+  ok(subGroup);
+  // The merged SubGroup should contain all 3 operations: a, b, and c
+  strictEqual(subGroup.methods.length, 3);
+  ok(subGroup.methods.find((m) => m.name === "a"));
+  ok(subGroup.methods.find((m) => m.name === "b"));
+  ok(subGroup.methods.find((m) => m.name === "c"));
+});
+
 it("merged sub clients have correct parent pointers for moved children", async () => {
   // Verifies that when sub-clients are merged, the children of the
   // merged-away sub-client get re-parented to the surviving sub-client.
@@ -3049,4 +3101,159 @@ it("validation: @clientLocation string target with multiple separate root client
       code: "@azure-tools/typespec-client-generator-core/client-location-wrong-type",
     },
   ]);
+});
+
+it("validation: no diagnostic when no @client is used", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    namespace MyService {
+      @route("/a")
+      op opA(): void;
+
+      @route("/b")
+      interface SubOps {
+        op opB(): void;
+      }
+    }
+  `);
+  await createSdkContextForTester(program);
+  const operationNotInClient = program.diagnostics.filter(
+    (d) => d.code === "@azure-tools/typespec-client-generator-core/operation-not-in-client",
+  );
+  strictEqual(operationNotInClient.length, 0);
+});
+
+it("validation: no diagnostic when all operations are covered by @client", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+      @service
+      namespace MyService {
+        @route("/a")
+        op opA(): void;
+      }
+    `,
+      `
+      @client({service: MyService, name: "MyServiceClient"})
+      namespace MyCustomClient {
+        op customOpA is MyService.opA;
+      }
+    `,
+    ),
+  );
+  await createSdkContextForTester(program);
+  const operationNotInClient = program.diagnostics.filter(
+    (d) => d.code === "@azure-tools/typespec-client-generator-core/operation-not-in-client",
+  );
+  strictEqual(operationNotInClient.length, 0);
+});
+
+it("validation: diagnostic when operation is missing from @client definition", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+      @service
+      namespace MyService {
+        @route("/a")
+        op opA(): void;
+
+        @route("/b")
+        op opB(): void;
+      }
+    `,
+      `
+      @client({service: MyService, name: "MyServiceClient"})
+      namespace MyCustomClient {
+        op customOpA is MyService.opA;
+      }
+    `,
+    ),
+  );
+  await createSdkContextForTester(program);
+  expectDiagnostics(program.diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/operation-not-in-client",
+      message: `Operation "opB" under namespace "MyService" is not included in any @client definition.`,
+    },
+  ]);
+});
+
+it("validation: diagnostic for operations in nested namespace not covered by @client", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+      @service
+      namespace MyService {
+        @route("/a")
+        op opA(): void;
+
+        namespace SubGroup {
+          @route("/b")
+          op opB(): void;
+        }
+      }
+    `,
+      `
+      @client({service: MyService, name: "MyServiceClient"})
+      namespace MyCustomClient {
+        op customOpA is MyService.opA;
+      }
+    `,
+    ),
+  );
+  await createSdkContextForTester(program);
+  expectDiagnostics(program.diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/operation-not-in-client",
+      message: `Operation "opB" under namespace "MyService.SubGroup" is not included in any @client definition.`,
+    },
+  ]);
+});
+
+it("validation: diagnostic for operations in interface not covered by @client", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+      @service
+      namespace MyService {
+        @route("/a")
+        op opA(): void;
+
+        interface SubOps {
+          @route("/b")
+          op opB(): void;
+        }
+      }
+    `,
+      `
+      @client({service: MyService, name: "MyServiceClient"})
+      namespace MyCustomClient {
+        op customOpA is MyService.opA;
+      }
+    `,
+    ),
+  );
+  await createSdkContextForTester(program);
+  expectDiagnostics(program.diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/operation-not-in-client",
+      message: `Operation "opB" under namespace "MyService" is not included in any @client definition.`,
+    },
+  ]);
+});
+
+it("validation: no diagnostic when @client is applied directly to service namespace", async () => {
+  const { program } = await SimpleTester.compile(`
+    @client({service: MyService})
+    @service
+    namespace MyService {
+      @route("/a")
+      op opA(): void;
+    }
+  `);
+  await createSdkContextForTester(program);
+  const operationNotInClient = program.diagnostics.filter(
+    (d) => d.code === "@azure-tools/typespec-client-generator-core/operation-not-in-client",
+  );
+  strictEqual(operationNotInClient.length, 0);
 });

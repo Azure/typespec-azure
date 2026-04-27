@@ -79,44 +79,75 @@ describe("TypeSpecMetadata structure", () => {
 
 describe("LanguagePackageMetadata structure", () => {
   it("should use language name as dictionary key", () => {
-    const languages: Record<string, LanguagePackageMetadata> = {
-      python: {
-        emitterName: "@azure-tools/typespec-python",
-        packageName: "azure-keyvault-secrets",
-        namespace: "azure.keyvault.secrets",
-        outputDir: "{output-dir}/sdk/keyvault/azure-keyvault-secrets",
-        flavor: "azure",
-        serviceDir: "sdk/keyvault",
-      },
+    const languages: Record<string, LanguagePackageMetadata[]> = {
+      python: [
+        {
+          emitterName: "@azure-tools/typespec-python",
+          packageName: "azure-keyvault-secrets",
+          namespace: "azure.keyvault.secrets",
+          outputDir: "{output-dir}/sdk/keyvault/azure-keyvault-secrets",
+          flavor: "azure",
+          serviceDir: "sdk/keyvault",
+        },
+      ],
     };
 
     expect(languages).toHaveProperty("python");
-    expect(languages.python.packageName).toBe("azure-keyvault-secrets");
+    expect(languages.python[0].packageName).toBe("azure-keyvault-secrets");
   });
 
   it("should support multiple languages", () => {
-    const languages: Record<string, LanguagePackageMetadata> = {
-      python: {
-        emitterName: "@azure-tools/typespec-python",
-        packageName: "azure-keyvault-secrets",
-        namespace: "azure.keyvault.secrets",
-        outputDir: "{output-dir}/sdk/keyvault/azure-keyvault-secrets",
-        flavor: "azure",
-        serviceDir: "sdk/keyvault",
-      },
-      java: {
-        emitterName: "@azure-tools/typespec-java",
-        packageName: "azure-security-keyvault-secrets",
-        namespace: "com.azure.security.keyvault.secrets",
-        outputDir: "{output-dir}/sdk/keyvault/azure-security-keyvault-secrets",
-        flavor: "azure",
-        serviceDir: "sdk/keyvault",
-      },
+    const languages: Record<string, LanguagePackageMetadata[]> = {
+      python: [
+        {
+          emitterName: "@azure-tools/typespec-python",
+          packageName: "azure-keyvault-secrets",
+          namespace: "azure.keyvault.secrets",
+          outputDir: "{output-dir}/sdk/keyvault/azure-keyvault-secrets",
+          flavor: "azure",
+          serviceDir: "sdk/keyvault",
+        },
+      ],
+      java: [
+        {
+          emitterName: "@azure-tools/typespec-java",
+          packageName: "com.azure:azure-security-keyvault-secrets",
+          namespace: "com.azure.security.keyvault.secrets",
+          outputDir: "{output-dir}/sdk/keyvault/azure-security-keyvault-secrets",
+          flavor: "azure",
+          serviceDir: "sdk/keyvault",
+        },
+      ],
     };
 
     expect(Object.keys(languages)).toHaveLength(2);
     expect(languages).toHaveProperty("python");
     expect(languages).toHaveProperty("java");
+  });
+
+  it("should support multiple emitters under the same language", () => {
+    const languages: Record<string, LanguagePackageMetadata[]> = {
+      csharp: [
+        {
+          emitterName: "@typespec/http-client-csharp",
+          packageName: "Azure.AI.Projects",
+          outputDir: "{output-dir}/sdk/ai/Azure.AI.Projects",
+          serviceDir: "sdk/ai",
+        },
+        {
+          emitterName: "@azure-tools/typespec-csharp",
+          packageName: "Azure.AI.Agents.Contracts.V2",
+          namespace: "Azure.AI.Agents.Contracts.V2",
+          outputDir: "{output-dir}/sdk/ai/Azure.AI.Agents.Contracts.V2",
+          flavor: "azure",
+          serviceDir: "sdk/ai",
+        },
+      ],
+    };
+
+    expect(languages.csharp).toHaveLength(2);
+    expect(languages.csharp[0].emitterName).toBe("@typespec/http-client-csharp");
+    expect(languages.csharp[1].emitterName).toBe("@azure-tools/typespec-csharp");
   });
 
   it("should use {output-dir} placeholder in outputDir", () => {
@@ -145,25 +176,29 @@ describe("LanguagePackageMetadata structure", () => {
   });
 
   it("should support language-specific service-dir", () => {
-    const languages: Record<string, LanguagePackageMetadata> = {
-      go: {
-        emitterName: "@azure-tools/typespec-go",
-        packageName: "sdk/security/keyvault/azsecrets",
-        namespace: "sdk/security/keyvault/azsecrets",
-        outputDir: "{output-dir}/sdk/security/keyvault/azsecrets",
-        serviceDir: "sdk/security/keyvault", // Different from other languages
-      },
-      python: {
-        emitterName: "@azure-tools/typespec-python",
-        packageName: "azure-keyvault-secrets",
-        namespace: "azure.keyvault.secrets",
-        outputDir: "{output-dir}/sdk/keyvault/azure-keyvault-secrets",
-        serviceDir: "sdk/keyvault", // Default service-dir
-      },
+    const languages: Record<string, LanguagePackageMetadata[]> = {
+      go: [
+        {
+          emitterName: "@azure-tools/typespec-go",
+          packageName: "sdk/security/keyvault/azsecrets",
+          namespace: "sdk/security/keyvault/azsecrets",
+          outputDir: "{output-dir}/sdk/security/keyvault/azsecrets",
+          serviceDir: "sdk/security/keyvault", // Different from other languages
+        },
+      ],
+      python: [
+        {
+          emitterName: "@azure-tools/typespec-python",
+          packageName: "azure-keyvault-secrets",
+          namespace: "azure.keyvault.secrets",
+          outputDir: "{output-dir}/sdk/keyvault/azure-keyvault-secrets",
+          serviceDir: "sdk/keyvault", // Default service-dir
+        },
+      ],
     };
 
-    expect(languages.go.serviceDir).toBe("sdk/security/keyvault");
-    expect(languages.python.serviceDir).toBe("sdk/keyvault");
+    expect(languages.go[0].serviceDir).toBe("sdk/security/keyvault");
+    expect(languages.python[0].serviceDir).toBe("sdk/keyvault");
   });
 });
 
@@ -179,30 +214,36 @@ describe("Complete snapshot example", () => {
         type: "data",
       },
       languages: {
-        python: {
-          emitterName: "@azure-tools/typespec-python",
-          packageName: "azure-keyvault-secrets",
-          namespace: "azure.keyvault.secrets",
-          outputDir: "{output-dir}/sdk/keyvault/azure-keyvault-secrets",
-          flavor: "azure",
-          serviceDir: "sdk/keyvault",
-        },
-        java: {
-          emitterName: "@azure-tools/typespec-java",
-          packageName: "azure-security-keyvault-secrets",
-          namespace: "com.azure.security.keyvault.secrets",
-          outputDir: "{output-dir}/sdk/keyvault/azure-security-keyvault-secrets",
-          flavor: "azure",
-          serviceDir: "sdk/keyvault",
-        },
-        typescript: {
-          emitterName: "@azure-tools/typespec-ts",
-          packageName: "@azure/keyvault-secrets",
-          namespace: "@azure/keyvault-secrets",
-          outputDir: "{output-dir}/sdk/keyvault/keyvault-secrets",
-          flavor: "azure",
-          serviceDir: "sdk/keyvault",
-        },
+        python: [
+          {
+            emitterName: "@azure-tools/typespec-python",
+            packageName: "azure-keyvault-secrets",
+            namespace: "azure.keyvault.secrets",
+            outputDir: "{output-dir}/sdk/keyvault/azure-keyvault-secrets",
+            flavor: "azure",
+            serviceDir: "sdk/keyvault",
+          },
+        ],
+        java: [
+          {
+            emitterName: "@azure-tools/typespec-java",
+            packageName: "com.azure:azure-security-keyvault-secrets",
+            namespace: "com.azure.security.keyvault.secrets",
+            outputDir: "{output-dir}/sdk/keyvault/azure-security-keyvault-secrets",
+            flavor: "azure",
+            serviceDir: "sdk/keyvault",
+          },
+        ],
+        typescript: [
+          {
+            emitterName: "@azure-tools/typespec-ts",
+            packageName: "@azure/keyvault-secrets",
+            namespace: "@azure/keyvault-secrets",
+            outputDir: "{output-dir}/sdk/keyvault/keyvault-secrets",
+            flavor: "azure",
+            serviceDir: "sdk/keyvault",
+          },
+        ],
       },
       sourceConfigPath:
         "C:/repos/azure-rest-api-specs/specification/keyvault/Security.KeyVault.Secrets/tspconfig.yaml",
@@ -217,10 +258,12 @@ describe("Complete snapshot example", () => {
     expect(snapshot.sourceConfigPath).toBeTruthy();
 
     // Validate no absolute paths in output directories
-    Object.values(snapshot.languages).forEach((lang) => {
-      if (lang.outputDir) {
-        expect(lang.outputDir).toContain("{output-dir}");
-      }
+    Object.values(snapshot.languages).forEach((langs) => {
+      langs.forEach((lang) => {
+        if (lang.outputDir) {
+          expect(lang.outputDir).toContain("{output-dir}");
+        }
+      });
     });
   });
 });

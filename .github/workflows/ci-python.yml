@@ -1,0 +1,199 @@
+name: "python / test e2e"
+
+on:
+  pull_request:
+    branches:
+      - main
+      - release/*
+    paths:
+      - "packages/typespec-python/**"
+      - ".github/workflows/ci-python.yml"
+      - ".github/actions/setup-python/**"
+  merge_group:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: "Build & Regenerate"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - uses: ./.github/actions/setup
+
+      - uses: ./.github/actions/setup-python
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm turbo run --filter "@azure-tools/typespec-python..." build
+
+      - name: Prepare Python environment
+        run: pnpm run prepare
+        working-directory: packages/typespec-python
+
+      - name: Regenerate
+        run: pnpm run regenerate
+        working-directory: packages/typespec-python
+
+      - name: Pre-build wheels
+        working-directory: packages/typespec-python
+        run: |
+          venv/bin/python tests/install_packages.py build azure tests
+          venv/bin/python tests/install_packages.py build unbranded tests
+
+      - name: Upload generated artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: python-generated
+          path: |
+            packages/typespec-python/tests/generated
+            packages/typespec-python/tests/.wheels
+            packages/typespec-python/dist
+            core/packages/spector/dist
+            core/packages/http-specs/dist
+            packages/azure-http-specs/dist
+          retention-days: 1
+
+  test:
+    name: "Mock API Tests"
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - uses: ./.github/actions/setup
+
+      - uses: ./.github/actions/setup-python
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build spector and specs
+        run: |
+          pnpm turbo run --filter "@typespec/spector..." build
+          pnpm --filter "@typespec/http-specs" exec tsc -p ./tsconfig.build.json
+          pnpm --filter "@azure-tools/azure-http-specs" exec tsc -p ./tsconfig.build.json
+
+      - name: Prepare Python environment
+        run: pnpm run prepare
+        working-directory: packages/typespec-python
+
+      - name: Download generated artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: python-generated
+          path: .
+
+      - name: Test
+        run: pnpm run test:python:e2e
+        working-directory: packages/typespec-python
+
+  typecheck:
+    name: "Type Checking"
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - uses: ./.github/actions/setup
+
+      - uses: ./.github/actions/setup-python
+
+      - name: Install dependencies
+        run: pnpm install --filter "@azure-tools/typespec-python..."
+
+      - name: Prepare Python environment
+        run: pnpm run prepare
+        working-directory: packages/typespec-python
+
+      - name: Download generated artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: python-generated
+          path: .
+
+      - name: Mypy & Pyright
+        run: pnpm run test:python:e2e --env mypy,pyright
+        working-directory: packages/typespec-python
+
+  lint:
+    name: "Lint & Format"
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - uses: ./.github/actions/setup
+
+      - uses: ./.github/actions/setup-python
+
+      - name: Install dependencies
+        run: pnpm install --filter "@azure-tools/typespec-python..."
+
+      - name: Prepare Python environment
+        run: pnpm run prepare
+        working-directory: packages/typespec-python
+
+      - name: Download generated artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: python-generated
+          path: .
+
+      - name: Pylint
+        run: pnpm run test:python:e2e --env lint
+        working-directory: packages/typespec-python
+
+      - name: Lint (extra)
+        run: pnpm run lint:extra
+        working-directory: packages/typespec-python
+
+      - name: Format check (extra)
+        run: pnpm run format:extra:check
+        working-directory: packages/typespec-python
+
+  docs:
+    name: "Docs Validation"
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - uses: ./.github/actions/setup
+
+      - uses: ./.github/actions/setup-python
+
+      - name: Install dependencies
+        run: pnpm install --filter "@azure-tools/typespec-python..."
+
+      - name: Prepare Python environment
+        run: pnpm run prepare
+        working-directory: packages/typespec-python
+
+      - name: Download generated artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: python-generated
+          path: .
+
+      - name: API View & Sphinx
+        run: pnpm run test:python:e2e --env apiview,sphinx
+        working-directory: packages/typespec-python
