@@ -5,21 +5,34 @@ title: x-ms-examples example files
 import { FileTree } from "@astrojs/starlight/components";
 
 The `x-ms-examples` is automatically populated in the generated OpenAPI 2.0 when using the `typespec-autorest` emitter.
-The examples must be placed in the `examples-directory` (default to `{project-root}/examples`) and have the `operationdId` property.
+The examples must be placed in the `examples-dir` directory (default `{project-root}/examples`) and have the `operationId` property.
 
 :::caution
 Do not use `@extension("x-ms-examples", "<value>")`.
 :::
 
+## Recommended configuration
+
+We recommend enabling the `skip-example-copying` option in your `tspconfig.yaml`. This prevents example files from being copied into the output directory and instead generates `x-ms-examples` `$ref` values that point directly to the source example files using relative paths.
+
+```yaml
+options:
+  "@azure-tools/typespec-autorest":
+    skip-example-copying: true
+```
+
+With this setting, example files remain in the source `examples` directory and are referenced in the generated OpenAPI spec via relative paths from the output file location.
+
 ## Example structure
 
-Example below assume `example-directory` is `{project-root}/examples`.
+Examples below assume `examples-dir` is `{project-root}/examples` (the default).
 
 - Single version structure
 
 {/* prettier-ignore */}
 <FileTree>
 - main.tsp
+- tspconfig.yaml
 - examples/
   - example1.json
   - example2.json
@@ -30,6 +43,7 @@ Example below assume `example-directory` is `{project-root}/examples`.
 {/* prettier-ignore */}
 <FileTree>
 - main.tsp
+- tspconfig.yaml
 - examples/
   - 2021-01-01/
     - example1.json
@@ -54,6 +68,6 @@ Note, latest OAV tool should automatically generate the following. However, if y
 - include `title` field and make sure it is descriptive and unique for each operation.
 - include `operationId`. This is used to match with declared operations in TypeSpec and correctly output in swagger.
 
-:::caution
-The examples are now in the examples directory relative to the output openapi.json. You must now copy them to the examples directory in the project root. The typespec-autorest emitter will then copy them back to the correct location when generating the OpenAPI 2.0.
+:::note
+When using `skip-example-copying: true`, the generated examples from `oav` will be in the output directory next to `openapi.json`. You should move them to the source `examples` directory in your project root so they are referenced correctly on subsequent compilations.
 :::
