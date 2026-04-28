@@ -212,7 +212,7 @@ const highlightPlugin: Plugin<"line"> = {
 
 function BenchmarkChart({ data, category }: { data: HistoryData; category: MetricCategory }) {
   const filter = CATEGORY_FILTERS[category];
-  const metricLabels = useMemo(() => data.labels.filter(filter).sort(), [data, category]);
+  const metricLabels = useMemo(() => data.labels.filter(filter).sort(), [data, filter]);
   const colors = useMemo(() => seriesColors(metricLabels.length), [metricLabels.length]);
   const isDense = metricLabels.length >= 8;
 
@@ -280,7 +280,7 @@ function BenchmarkChart({ data, category }: { data: HistoryData; category: Metri
         },
       },
     }),
-    [data, category],
+    [data, category, isDense],
   );
 
   return (
