@@ -9,6 +9,10 @@ import {
 } from "../tester.js";
 
 it("three-level inheritance chain", async () => {
+  // Expected after rebase:
+  //   C extends B extends A
+  //   A.properties = { kind }, B.properties = { kind, foo }, C.properties = { kind, bar }.
+  //   Discriminator A.kind dispatches to { B, C }; B.kind dispatches to { C }.
   const { program } = await SimpleTesterWithService.compile(`
       @discriminator("kind")
       model A {
@@ -77,6 +81,11 @@ it("three-level inheritance chain", async () => {
 });
 
 it("four-level inheritance chain", async () => {
+  // Expected after rebase:
+  //   SportsCar extends Car extends MotorVehicle extends Vehicle
+  //   Vehicle.properties = { type }, MotorVehicle.properties = { type, engine },
+  //   Car.properties = { type, doors }, SportsCar.properties = { type, topSpeed }.
+  //   Discriminator Vehicle.type dispatches to { MotorVehicle, Car, SportsCar }.
   const { program } = await SimpleTesterWithService.compile(`
       @discriminator("type")
       model Vehicle {
@@ -167,6 +176,12 @@ it("four-level inheritance chain", async () => {
 });
 
 it("nested property inheritance", async () => {
+  // Expected after rebase:
+  //   SmartKindSalmon extends KingSalmon extends Salmon
+  //   SmartKindSalmon.properties = { kind }, KingSalmon.properties = { kind, properties },
+  //   Salmon.properties = { kind, properties }.
+  //   Nested anonymous `properties` model is a different shape per subtype
+  //   (refinement is allowed); compatibility check stays silent.
   const { program } = await SimpleTesterWithService.compile(`
     @discriminator("kind")
     model Salmon {
@@ -311,6 +326,7 @@ it("rebases to an unrelated base and lifts properties from the original parent",
   // Expected after rebase:
   //   C extends B
   //   C.properties = { propC, propA }, B.properties = { propB }.
+  //   propA is lifted from the removed intermediate A; propB is supplied by the new base B.
   const { program } = await SimpleTesterWithService.compile(`
       model A {
         propA: string;
@@ -344,6 +360,9 @@ it("rebases to an unrelated base and lifts properties from the original parent",
 });
 
 it("inheritance override with template models", async () => {
+  // Expected after rebase:
+  //   SpecialContainer extends StringContainer extends Container<string>
+  //   SpecialContainer.properties = { type, metadata } (data is supplied by Container).
   const { program } = await SimpleTesterWithService.compile(`
       @discriminator("type")
       model Container<T> {
@@ -375,6 +394,10 @@ it("inheritance override with template models", async () => {
 });
 
 it("without polymorphism", async () => {
+  // Expected after rebase:
+  //   C extends B extends A
+  //   A.properties = { kind }, B.properties = { kind, foo }, C.properties = { kind, bar }.
+  //   Same shape as the discriminated three-level test but without @discriminator.
   const { program } = await SimpleTesterWithService.compile(`
       model A {
         kind: string;
@@ -416,6 +439,9 @@ it("without polymorphism", async () => {
 });
 
 it("verify respectLegacyHierarchyBuilding: false flag", async () => {
+  // Expected when the flag disables hierarchyBuilding:
+  //   SportsCar extends Vehicle, Car extends Vehicle (original chain preserved)
+  //   SportsCar.properties = { type }, Car.properties = { type }, Vehicle.properties = { type }.
   const { program } = await SimpleTesterWithService.compile(`
       @discriminator("type")
       model Vehicle {
@@ -500,6 +526,10 @@ it("verify diagnostic gets raised for usage", async () => {
 });
 
 it("verify legacy hierarchy building usage with unordered models", async () => {
+  // Expected after rebase (decorator order in the source doesn't matter):
+  //   SportsCar extends Car extends MotorVehicle extends Vehicle
+  //   Vehicle.properties = { type }, MotorVehicle.properties = { type, engine },
+  //   Car.properties = { type, doors }, SportsCar.properties = { type, topSpeed }.
   const { program } = await SimpleTesterWithService.compile(`
       @discriminator("type")
       model Vehicle {
@@ -560,6 +590,12 @@ it("verify legacy hierarchy building usage with unordered models", async () => {
 });
 
 it("handles envelope properties correctly", async () => {
+  // Real-world ARM envelope-property pattern (issue #2768).
+  // Expected after rebase:
+  //   FooResourceWithHierarchy extends TrackedResource
+  //   TrackedResource.properties = { id, name, tags, location },
+  //   FooResourceWithHierarchy.properties = {} (everything is supplied by TrackedResource;
+  //   tags from the spread `...ArmTagsProperty` is dropped by reconciliation).
   const { program } = await SimpleTesterWithService.compile(`
       // Simulating Azure.ResourceManager.Foundations.ArmTagsProperty
       model ArmTagsProperty {
