@@ -1415,9 +1415,7 @@ The target model that will gain legacy inheritance behavior
 
 #### Examples
 
-##### Multi-level discriminated inheritance — rebase a discriminated
-
-subtype onto a sibling so the SDK exposes a deeper hierarchy.
+##### Build multiple levels inheritance for discriminated models.
 
 ```typespec
 @discriminator("type")
@@ -1425,19 +1423,61 @@ model Vehicle {
   type: string;
 }
 
+alias CarProperties = {
+ make: string;
+ model: string;
+ year: int32;
+}
+
 model Car extends Vehicle {
   type: "car";
-  doors: int32;
+  ...CarProperties;
 }
 
 @Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(Car)
 model SportsCar extends Vehicle {
   type: "sports";
-  doors: int32;
+  ...CarProperties;
   topSpeed: int32;
 }
-// SDK shape: SportsCar extends Car (instead of Vehicle directly).
-// SportsCar's own properties: { type, topSpeed }; doors is inherited from Car.
+
+```
+
+##### Replace the base class. Properties contributed by the removed
+
+intermediate parent (`b`) are kept on the rebased model.
+
+```typespec
+model C {
+  c?: string;
+}
+model B extends C {
+  b?: string;
+}
+
+@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(C)
+model A extends B {
+  a?: string;
+}
+// After: A extends C, A's own properties are { a, b }, C still supplies c.
+```
+
+##### Rebase a model whose own properties (via spread) overlap with
+
+the new base. Overlapping same-typed properties are deduplicated silently.
+
+```typespec
+model B {
+  propB: string;
+}
+
+model A {
+  ...B;
+  propA: string;
+}
+
+@@Legacy.hierarchyBuilding(A, B);
+// After: A extends B, A's own property is just { propA }.
 ```
 
 ##### Brownfield ARM resource — rebase a resource onto
