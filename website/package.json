@@ -22,10 +22,10 @@
     "@fluentui/react-components": "catalog:",
     "@typespec/playground": "workspace:^",
     "astro": "catalog:",
-    "chart.js": "^4.5.1",
+    "chart.js": "catalog:",
     "es-module-shims": "catalog:",
     "react": "catalog:",
-    "react-chartjs-2": "^5.3.1",
+    "react-chartjs-2": "catalog:",
     "react-dom": "catalog:",
     "sharp": "catalog:",
     "typescript": "catalog:"
