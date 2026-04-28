@@ -308,7 +308,9 @@ it("another circular inheritance", async () => {
 });
 
 it("rebases to an unrelated base and lifts properties from the original parent", async () => {
-  // Expected after rebase: C.properties = { propC, propA }, B.properties = { propB }.
+  // Expected after rebase:
+  //   C extends B
+  //   C.properties = { propC, propA }, B.properties = { propB }.
   const { program } = await SimpleTesterWithService.compile(`
       model A {
         propA: string;
@@ -599,7 +601,9 @@ it("handles envelope properties correctly", async () => {
 
 
 it("lifts intermediate property when target is rebased to its grandparent", async () => {
-  // Expected after rebase: A.properties = { a, b }, C.properties = { c }.
+  // Expected after rebase:
+  //   A extends C
+  //   A.properties = { a, b }, C.properties = { c }.
   const { program } = await SimpleTesterWithService.compile(`
       model C {
         c?: string;
@@ -634,7 +638,9 @@ it("lifts intermediate property when target is rebased to its grandparent", asyn
 });
 
 it("lifts properties from every removed intermediate ancestor", async () => {
-  // Expected after rebase: A.properties = { a, b, c }, D.properties = { d }.
+  // Expected after rebase:
+  //   A extends D
+  //   A.properties = { a, b, c }, D.properties = { d }.
   const { program } = await SimpleTesterWithService.compile(`
       model D {
         d?: string;
@@ -667,7 +673,9 @@ it("lifts properties from every removed intermediate ancestor", async () => {
 });
 
 it("rebases to an unrelated model and inherits the new base's properties", async () => {
-  // Expected after rebase: Patch.properties = { description, tags }, NewBase.properties = { id, name }.
+  // Expected after rebase:
+  //   Patch extends NewBase
+  //   Patch.properties = { description, tags }, NewBase.properties = { id, name }.
   const { program } = await SimpleTesterWithService.compile(`
       // simulates an external base class supplying id/name itself
       model NewBase {
@@ -699,7 +707,9 @@ it("rebases to an unrelated model and inherits the new base's properties", async
 });
 
 it("silently drops the lifted intermediate property when the target already defines the same name", async () => {
-  // Expected after rebase: A.properties = { shared }, C.properties = { c }. No diagnostic.
+  // Expected after rebase:
+  //   A extends C
+  //   A.properties = { shared }, C.properties = { c }. No diagnostic.
   const { program } = await SimpleTesterWithService.compile(`
       model C {
         c?: string;
@@ -732,7 +742,9 @@ it("silently drops the lifted intermediate property when the target already defi
 });
 
 it("silently drops the lifted intermediate property when the new base supplies the same name and type", async () => {
-  // Expected after rebase: A.properties = { a }, C.properties = { shared }. No diagnostic.
+  // Expected after rebase:
+  //   A extends C
+  //   A.properties = { a }, C.properties = { shared }. No diagnostic.
   const { program } = await SimpleTesterWithService.compile(`
       model C {
         shared?: string;
@@ -763,7 +775,9 @@ it("silently drops the lifted intermediate property when the new base supplies t
 });
 
 it("warns when a kept property has a different type than the new base's same-named property", async () => {
-  // Expected after rebase: A.properties = { a }, C.properties = { shared: int32 }, with `legacy-hierarchy-building-conflict` warning.
+  // Expected after rebase:
+  //   A extends C
+  //   A.properties = { a }, C.properties = { shared: int32 }, with `legacy-hierarchy-building-conflict` warning.
   const { program } = await SimpleTesterWithService.compile(`
       model C {
         shared?: int32;
@@ -787,8 +801,12 @@ it("warns when a kept property has a different type than the new base's same-nam
 });
 
 it("only lifts properties for the requested emitter scope", async () => {
-  // Expected for csharp scope: A extends C, A.properties = { a, b }.
-  // Expected for python scope: A extends B, A.properties = { a }.
+  // Expected for csharp scope:
+  //   A extends C
+  //   A.properties = { a, b }.
+  // Expected for python scope (rebase not applied):
+  //   A extends B
+  //   A.properties = { a }.
   const { program } = await SimpleTesterWithService.compile(`
       model C {
         c?: string;
@@ -828,7 +846,9 @@ it("only lifts properties for the requested emitter scope", async () => {
 });
 
 it("rebases a target that spreads the new base instead of extending it", async () => {
-  // Expected after rebase: A.properties = { propA }, B.properties = { propB }. No diagnostic.
+  // Expected after rebase:
+  //   A extends B
+  //   A.properties = { propA }, B.properties = { propB }. No diagnostic.
   const { program } = await SimpleTesterWithService.compile(`
       model B {
         propB: string;
@@ -864,7 +884,9 @@ it("rebases to a wider base whose chain supplies extra properties", async () => 
   // Real-world ARM scenario: A originally extends a small resource base (B);
   // we want to rebase it onto a wider resource base (BB) that also carries
   // additional properties (e.g. systemData).
-  // Expected after rebase: A.properties = { foo }, BB.properties = { id, name, type, systemData }. No diagnostic.
+  // Expected after rebase:
+  //   A extends BB
+  //   A.properties = { foo }, BB.properties = { id, name, type, systemData }. No diagnostic.
   const { program } = await SimpleTesterWithService.compile(`
       model B {
         id?: string;
