@@ -2114,12 +2114,11 @@ function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Di
  *      the new base chain (newBase + its ancestors, honoring nested
  *      `@hierarchyBuilding` overrides).
  *   3. For each name in `targetEffective` that also appears in
- *      `newBaseSupplied`: drop it. If the types match, drop silently. If
- *      they differ, drop and emit `legacy-hierarchy-building-conflict`
+ *      `newBaseSupplied`: drop it. If the target's type is assignable to
+ *      the new base's type (or vice versa) — covering literal-vs-scalar,
+ *      sub-scalar-vs-scalar, and identical types — drop silently.
+ *      Otherwise drop and emit `legacy-hierarchy-building-conflict`
  *      (`property-type-mismatch`) so the spec author can align them.
- *      TODO: revisit this — we may want a richer policy (e.g. let the user
- *      opt into keeping the target's property, or fail hard on type
- *      mismatch) once we have more real-world feedback.
  *   4. Whatever remains becomes the rebased model's own SDK properties.
  *      Properties that were already materialized on the SDK model are
  *      preserved as-is; properties contributed only by removed
@@ -2184,13 +2183,7 @@ function reconcilePropertiesAfterRebase(
     const newBaseProp = newBaseSupplied.get(name);
 
     if (newBaseProp && !isDiscriminator) {
-      if (isObviousTypeMismatch(newBaseProp.type, rawProp.type)) {
-        // TODO: this mismatch check is intentionally narrow (scalar-vs-scalar
-        // by scalar name only). We may want to broaden it to cover other
-        // structural mismatches once we have more real-world feedback —
-        // anonymous-model refinement (e.g. `properties: { farmed: false }`
-        // vs `properties: { farmed: boolean }`) is a legitimate pattern in
-        // discriminated hierarchies and should stay silent for now.
+      if (areTypesIncompatible(context, rawProp.type, newBaseProp.type)) {
         diagnostics.add(
           createDiagnostic({
             code: "legacy-hierarchy-building-conflict",
@@ -2226,16 +2219,26 @@ function reconcilePropertiesAfterRebase(
 }
 
 /**
- * Conservative same-name type-mismatch check used by
- * `reconcilePropertiesAfterRebase`. Only flags scalar-vs-scalar pairs where
- * the scalar names clearly differ. Returns false for everything else
- * (model/anon-model/union/tuple) so legitimate refinement patterns in
- * discriminated hierarchies stay silent.
+ * Check if a target property's type is incompatible with the new base
+ * property's same-named slot during `@hierarchyBuilding` reconciliation.
+ *
+ * Two types are considered compatible (no diagnostic) when either is
+ * assignable to the other under TypeSpec's type system. This covers the
+ * common refinement patterns:
+ *   - a string literal vs a `string` base (literal assignable to string),
+ *   - a sub-scalar like `azureLocation` vs `string` (sub-scalar assignable
+ *     to its parent),
+ *   - structurally identical models, etc.
+ *
+ * Unrelated types in both directions (e.g. `int32` vs `string`) are flagged
+ * so the spec author can align them.
  */
-function isObviousTypeMismatch(a: Type, b: Type): boolean {
-  if (a === b) return false;
-  if (a.kind === "Scalar" && b.kind === "Scalar") return a.name !== b.name;
-  return false;
+function areTypesIncompatible(context: TCGCContext, targetType: Type, newBaseType: Type): boolean {
+  if (targetType === newBaseType) return false;
+  const typekit = $(context.program).type;
+  if (typekit.isAssignableTo(targetType, newBaseType, targetType)) return false;
+  if (typekit.isAssignableTo(newBaseType, targetType, newBaseType)) return false;
+  return true;
 }
 
 /**

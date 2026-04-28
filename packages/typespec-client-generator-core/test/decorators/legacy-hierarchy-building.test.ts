@@ -774,6 +774,45 @@ it("silently drops the lifted intermediate property when the new base supplies t
   strictEqual(conflicts.length, 0);
 });
 
+it("treats literal and sub-scalar types as compatible with their base scalar", async () => {
+  // A.kind is a string literal, A.location is a sub-scalar of string. Both
+  // names are also supplied by the new base C with plain `string`. Because
+  // the literal/sub-scalar are assignable to `string`, reconciliation drops
+  // them silently — no diagnostic is raised.
+  // Expected after rebase:
+  //   A extends C
+  //   A.properties = { a }, C.properties = { kind, location }. No diagnostic.
+  const { program } = await SimpleTesterWithService.compile(`
+      scalar azureLocation extends string;
+      model C {
+        kind: string;
+        location: string;
+      }
+      model OldBase {
+        kind: "old";
+        location: azureLocation;
+      }
+      @Legacy.hierarchyBuilding(C)
+      model A extends OldBase {
+        a?: string;
+      }
+
+      @route("/test")
+      op test(): A;
+    `);
+  const context = await createSdkContextForTester(program);
+  const aModel = context.sdkPackage.models.find((m) => m.name === "A");
+  ok(aModel);
+  strictEqual(aModel.baseModel?.name, "C");
+  const aProps = aModel.properties.map((p) => p.name);
+  strictEqual(aProps.length, 1);
+  strictEqual(aProps[0], "a");
+  const conflicts = context.diagnostics.filter(
+    (d) => d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
+  );
+  strictEqual(conflicts.length, 0);
+});
+
 it("warns when a kept property has a different type than the new base's same-named property", async () => {
   // Expected after rebase:
   //   A extends C
