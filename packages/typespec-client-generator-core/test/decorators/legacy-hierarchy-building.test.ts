@@ -694,7 +694,7 @@ it("rebases to an unrelated model and inherits the new base's properties", async
   ok(!props.includes("name"));
 });
 
-it("warns when the target already defines a lifted property", async () => {
+it("silently drops the lifted intermediate property when the target already defines the same name", async () => {
   const { program } = await SimpleTesterWithService.compile(`
       model C {
         c?: string;
@@ -704,20 +704,29 @@ it("warns when the target already defines a lifted property", async () => {
       }
       @Legacy.hierarchyBuilding(C)
       model A extends B {
-        shared?: string;  // collides with B.shared, lift should be skipped with diagnostic
+        shared?: string;
       }
 
       @route("/test")
       op test(): A;
     `);
   const context = await createSdkContextForTester(program);
-  expectDiagnostics(context.diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
-    message: /property 'shared' .* was discarded on model A/,
-  });
+  const aModel = context.sdkPackage.models.find((m) => m.name === "A");
+  ok(aModel);
+  strictEqual(aModel.baseModel?.name, "C");
+  // A's own property wins; the same-named property on the removed intermediate
+  // is shadowed (no diagnostic, no duplicate).
+  const aProps = aModel.properties.map((p) => p.name).sort();
+  strictEqual(aProps.length, 1);
+  strictEqual(aProps[0], "shared");
+  // No legacy-hierarchy-building-conflict diagnostics should be raised.
+  const conflicts = context.diagnostics.filter(
+    (d) => d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
+  );
+  strictEqual(conflicts.length, 0);
 });
 
-it("warns when the new base already supplies a lifted property", async () => {
+it("silently drops the lifted intermediate property when the new base supplies the same name and type", async () => {
   const { program } = await SimpleTesterWithService.compile(`
       model C {
         shared?: string;
@@ -734,13 +743,20 @@ it("warns when the new base already supplies a lifted property", async () => {
       op test(): A;
     `);
   const context = await createSdkContextForTester(program);
-  expectDiagnostics(context.diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
-    message: /property 'shared' .* was discarded on model A/,
-  });
+  const aModel = context.sdkPackage.models.find((m) => m.name === "A");
+  ok(aModel);
+  strictEqual(aModel.baseModel?.name, "C");
+  // `shared` is supplied by the new base; A inherits it instead of owning it.
+  const aProps = aModel.properties.map((p) => p.name);
+  strictEqual(aProps.length, 1);
+  strictEqual(aProps[0], "a");
+  const conflicts = context.diagnostics.filter(
+    (d) => d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
+  );
+  strictEqual(conflicts.length, 0);
 });
 
-it("warns when a lifted property has a different type than the new base's same-named property", async () => {
+it("warns when a kept property has a different type than the new base's same-named property", async () => {
   const { program } = await SimpleTesterWithService.compile(`
       model C {
         shared?: int32;
@@ -759,7 +775,7 @@ it("warns when a lifted property has a different type than the new base's same-n
   const context = await createSdkContextForTester(program);
   expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
-    message: /lifted property 'shared'.*has a different type/,
+    message: /property 'shared' on model 'A' has type that does not match/,
   });
 });
 
@@ -800,4 +816,81 @@ it("only lifts properties for the requested emitter scope", async () => {
   const pythonProps = pythonA.properties.map((p) => p.name).sort();
   strictEqual(pythonProps.length, 1);
   strictEqual(pythonProps[0], "a");
+});
+
+it("rebases a target that spreads the new base instead of extending it", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+      model B {
+        propB: string;
+      }
+
+      model A {
+        ...B;
+        propA: string;
+      }
+
+      @@Legacy.hierarchyBuilding(A, B);
+
+      @route("/test")
+      op test(): A;
+    `);
+
+  const context = await createSdkContextForTester(program);
+  const aModel = context.sdkPackage.models.find((m) => m.name === "A");
+  ok(aModel);
+  strictEqual(aModel.baseModel?.name, "B");
+  // `propB` was an own property of A via spread, but the new base now
+  // supplies it; same type → silently dropped from A.
+  const propNames = aModel.properties.map((p) => p.name).sort();
+  strictEqual(propNames.length, 1);
+  strictEqual(propNames[0], "propA");
+  const conflicts = context.diagnostics.filter(
+    (d) => d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
+  );
+  strictEqual(conflicts.length, 0);
+});
+
+it("rebases to a wider base whose chain supplies extra properties", async () => {
+  // Real-world ARM scenario: A originally extends a small resource base (B);
+  // we want to rebase it onto a wider resource base (BB) that also carries
+  // additional properties (e.g. systemData).
+  const { program } = await SimpleTesterWithService.compile(`
+      model B {
+        id?: string;
+        name?: string;
+        type?: string;
+      }
+      model BB {
+        id?: string;
+        name?: string;
+        type?: string;
+        systemData?: string;
+      }
+      model A extends B {
+        foo?: string;
+      }
+
+      @@Legacy.hierarchyBuilding(A, BB);
+
+      @route("/test")
+      op test(): A;
+    `);
+
+  const context = await createSdkContextForTester(program);
+  const aModel = context.sdkPackage.models.find((m) => m.name === "A");
+  ok(aModel);
+  strictEqual(aModel.baseModel?.name, "BB");
+  // `id`/`name`/`type` are supplied by the new base chain → dropped from A.
+  // `systemData` is also supplied by BB → A inherits it, doesn't own it.
+  // `foo` is only on A → kept.
+  const propNames = aModel.properties.map((p) => p.name).sort();
+  strictEqual(propNames.length, 1);
+  strictEqual(propNames[0], "foo");
+  const bbModel = context.sdkPackage.models.find((m) => m.name === "BB");
+  ok(bbModel);
+  ok(bbModel.properties.some((p) => p.name === "systemData"));
+  const conflicts = context.diagnostics.filter(
+    (d) => d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
+  );
+  strictEqual(conflicts.length, 0);
 });

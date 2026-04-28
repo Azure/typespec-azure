@@ -399,8 +399,7 @@ export const $lib = createTypeSpecLibrary({
     "legacy-hierarchy-building-conflict": {
       severity: "warning",
       messages: {
-        "property-discarded": paramMessage`@hierarchyBuilding decorator: property '${"propertyName"}' from removed intermediate parent model ${"intermediateModel"} was discarded on model ${"childModel"} because '${"winner"}' already supplies a property with the same name.`,
-        "property-type-mismatch": paramMessage`@hierarchyBuilding decorator: lifted property '${"propertyName"}' on model ${"childModel"} (from removed intermediate parent ${"intermediateModel"}) has a different type than the same-named property on the new base ${"parentModel"}; the lift was skipped, verify the new base supplies a compatible type.`,
+        "property-type-mismatch": paramMessage`@hierarchyBuilding decorator: property '${"propertyName"}' on model '${"childModel"}' has type that does not match the same-named property supplied by the new base chain (rooted at '${"parentModel"}'). The property is dropped from '${"childModel"}' to satisfy the rebase rule (own properties are filtered against the new base chain by name). Consider aligning the types or removing the property from '${"childModel"}'.`,
       },
     },
     "legacy-hierarchy-building-circular-reference": {

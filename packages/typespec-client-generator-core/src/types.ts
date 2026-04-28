@@ -2070,8 +2070,10 @@ function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Di
     }
 
     if (legacyHierarchyBuilding) {
-      // Lift properties from removed intermediate parents onto the rebased model.
-      diagnostics.pipe(liftPropertiesFromRemovedAncestors(context, sdkType, legacyHierarchyBuilding));
+      // Reconcile properties on the rebased model: drop duplicates that the
+      // new base chain already supplies, and lift in properties contributed
+      // by removed intermediate parents.
+      diagnostics.pipe(reconcilePropertiesAfterRebase(context, sdkType, legacyHierarchyBuilding));
     }
 
     // must be done after discriminator is added
@@ -2096,6 +2098,144 @@ function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Di
     }
   }
   return diagnostics.wrap(undefined);
+}
+
+/**
+ * Reconcile properties on a rebased model after `@hierarchyBuilding(target, newBase)`.
+ *
+ * Rule:
+ *   1. Compute `targetEffective` = properties already on `target` (its own
+ *      `properties` Map) plus properties contributed by every removed
+ *      intermediate ancestor (each ancestor walked when going from `target`
+ *      up to but not including the new base chain). When the same name
+ *      appears more than once in this walk, the nearest contributor wins
+ *      (target's own > nearest intermediate > farther intermediate).
+ *   2. Compute `newBaseSupplied` = every property name supplied anywhere in
+ *      the new base chain (newBase + its ancestors, honoring nested
+ *      `@hierarchyBuilding` overrides).
+ *   3. For each name in `targetEffective` that also appears in
+ *      `newBaseSupplied`: drop it. If the types match, drop silently. If
+ *      they differ, drop and emit `legacy-hierarchy-building-conflict`
+ *      (`property-type-mismatch`) so the spec author can align them.
+ *      TODO: revisit this — we may want a richer policy (e.g. let the user
+ *      opt into keeping the target's property, or fail hard on type
+ *      mismatch) once we have more real-world feedback.
+ *   4. Whatever remains becomes the rebased model's own SDK properties.
+ *      Properties that were already materialized on the SDK model are
+ *      preserved as-is; properties contributed only by removed
+ *      intermediates are materialized via `getSdkModelPropertyType`.
+ */
+function reconcilePropertiesAfterRebase(
+  context: TCGCContext,
+  sdkType: SdkModelType,
+  newBase: Model,
+): [void, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const target = sdkType.__raw as Model;
+
+  const newBaseChain = buildValueChain(context, newBase);
+  const newBaseChainSet = new Set<Model>(newBaseChain);
+
+  // Names supplied anywhere in the new base chain → first ModelProperty seen.
+  const newBaseSupplied = new Map<string, ModelProperty>();
+  for (const m of newBaseChain) {
+    for (const [name, prop] of m.properties) {
+      if (!newBaseSupplied.has(name)) newBaseSupplied.set(name, prop);
+    }
+  }
+
+  // Effective properties on the target before reconciliation: target's own
+  // first (they win), then nearest-removed-ancestor first.
+  const removed = collectRemovedAncestors(target, newBaseChainSet);
+  const targetEffective = new Map<string, ModelProperty>();
+  for (const [name, prop] of target.properties) {
+    targetEffective.set(name, prop);
+  }
+  for (const intermediate of removed) {
+    for (const [name, prop] of intermediate.properties) {
+      if (!targetEffective.has(name)) targetEffective.set(name, prop);
+    }
+  }
+
+  // Identify the discriminator property name (if any) on the target — it
+  // must be preserved across the rebase even when the new base supplies a
+  // wider-typed property with the same name.
+  const discriminatorPropName = sdkType.properties.find((p) => p.discriminator)?.__raw?.name;
+
+  // Walk the existing materialized SDK properties and decide which to keep.
+  const keptProps: SdkModelPropertyType[] = [];
+  const sdkPropByRawName = new Map<string, SdkModelPropertyType>();
+  for (const prop of sdkType.properties) {
+    if (prop.__raw?.name) sdkPropByRawName.set(prop.__raw.name, prop);
+  }
+
+  for (const [name, rawProp] of targetEffective) {
+    if (
+      isStatusCode(context.program, rawProp) ||
+      isNeverOrVoidType(rawProp.type) ||
+      hasNoneVisibility(context, rawProp) ||
+      !isInScope(context, rawProp)
+    ) {
+      continue;
+    }
+
+    const fromTargetOwn = target.properties.has(name);
+    const isDiscriminator = name === discriminatorPropName;
+    const newBaseProp = newBaseSupplied.get(name);
+
+    if (newBaseProp && !isDiscriminator) {
+      if (isObviousTypeMismatch(newBaseProp.type, rawProp.type)) {
+        // TODO: this mismatch check is intentionally narrow (scalar-vs-scalar
+        // by scalar name only). We may want to broaden it to cover other
+        // structural mismatches once we have more real-world feedback —
+        // anonymous-model refinement (e.g. `properties: { farmed: false }`
+        // vs `properties: { farmed: boolean }`) is a legitimate pattern in
+        // discriminated hierarchies and should stay silent for now.
+        diagnostics.add(
+          createDiagnostic({
+            code: "legacy-hierarchy-building-conflict",
+            messageId: "property-type-mismatch",
+            format: {
+              propertyName: name,
+              childModel: target.name,
+              parentModel: newBase.name,
+            },
+            target,
+          }),
+        );
+      }
+      // Drop either way: the new base chain owns this name.
+      continue;
+    }
+
+    if (fromTargetOwn) {
+      const existing = sdkPropByRawName.get(name);
+      if (existing) keptProps.push(existing);
+      continue;
+    }
+
+    // Lift from a removed intermediate.
+    pushNamingContext(context, name, rawProp.type as ContextNode["type"]);
+    const lifted = diagnostics.pipe(getSdkModelPropertyType(context, rawProp));
+    popNamingContext(context);
+    keptProps.push(lifted);
+  }
+
+  sdkType.properties = keptProps;
+  return diagnostics.wrap(undefined);
+}
+
+/**
+ * Conservative same-name type-mismatch check used by
+ * `reconcilePropertiesAfterRebase`. Only flags scalar-vs-scalar pairs where
+ * the scalar names clearly differ. Returns false for everything else
+ * (model/anon-model/union/tuple) so legitimate refinement patterns in
+ * discriminated hierarchies stay silent.
+ */
+function isObviousTypeMismatch(a: Type, b: Type): boolean {
+  if (a === b) return false;
+  if (a.kind === "Scalar" && b.kind === "Scalar") return a.name !== b.name;
+  return false;
 }
 
 /**
@@ -2133,106 +2273,6 @@ function collectRemovedAncestors(target: Model, valueChain: Set<Model>): Model[]
     current = current.baseModel;
   }
   return removed;
-}
-
-function liftPropertiesFromRemovedAncestors(
-  context: TCGCContext,
-  sdkType: SdkModelType,
-  newBase: Model,
-): [void, readonly Diagnostic[]] {
-  const diagnostics = createDiagnosticCollector();
-  const target = sdkType.__raw as Model;
-  const valueChainList = buildValueChain(context, newBase);
-  const valueChain = new Set<Model>(valueChainList);
-  const removed = collectRemovedAncestors(target, valueChain);
-  if (removed.length === 0) return diagnostics.wrap(undefined);
-
-  // Build a map of property name -> ModelProperty contributed by the new
-  // base chain (own properties of each model in the chain).
-  const newBaseProps = new Map<string, ModelProperty>();
-  for (const m of valueChainList) {
-    for (const [name, prop] of m.properties) {
-      if (!newBaseProps.has(name)) {
-        newBaseProps.set(name, prop);
-      }
-    }
-  }
-
-  const existingNames = new Set<string>();
-  for (const prop of sdkType.properties) {
-    if (prop.__raw?.name) existingNames.add(prop.__raw.name);
-    else existingNames.add(prop.name);
-  }
-
-  // Lift nearest-first: iterate removed[] in order (already nearest -> farthest).
-  for (const intermediate of removed) {
-    for (const [propName, rawProp] of intermediate.properties) {
-      // Apply the same filtering as addPropertiesToModelType.
-      if (
-        isStatusCode(context.program, rawProp) ||
-        isNeverOrVoidType(rawProp.type) ||
-        hasNoneVisibility(context, rawProp) ||
-        !isInScope(context, rawProp)
-      ) {
-        continue;
-      }
-      if (existingNames.has(propName)) {
-        diagnostics.add(
-          createDiagnostic({
-            code: "legacy-hierarchy-building-conflict",
-            messageId: "property-discarded",
-            format: {
-              propertyName: propName,
-              childModel: target.name,
-              intermediateModel: intermediate.name,
-              winner: target.name,
-            },
-            target,
-          }),
-        );
-        continue;
-      }
-      const newBaseProp = newBaseProps.get(propName);
-      if (newBaseProp) {
-        if (newBaseProp.type !== rawProp.type) {
-          diagnostics.add(
-            createDiagnostic({
-              code: "legacy-hierarchy-building-conflict",
-              messageId: "property-type-mismatch",
-              format: {
-                propertyName: propName,
-                childModel: target.name,
-                intermediateModel: intermediate.name,
-                parentModel: newBase.name,
-              },
-              target,
-            }),
-          );
-        } else {
-          diagnostics.add(
-            createDiagnostic({
-              code: "legacy-hierarchy-building-conflict",
-              messageId: "property-discarded",
-              format: {
-                propertyName: propName,
-                childModel: target.name,
-                intermediateModel: intermediate.name,
-                winner: newBase.name,
-              },
-              target,
-            }),
-          );
-        }
-        continue;
-      }
-      pushNamingContext(context, propName, rawProp.type as ContextNode["type"]);
-      const lifted = diagnostics.pipe(getSdkModelPropertyType(context, rawProp));
-      popNamingContext(context);
-      sdkType.properties.push(lifted);
-      existingNames.add(propName);
-    }
-  }
-  return diagnostics.wrap(undefined);
 }
 
 interface UsageFilteringOptions {

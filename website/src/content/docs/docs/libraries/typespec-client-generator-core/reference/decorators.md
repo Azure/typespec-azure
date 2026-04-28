@@ -1368,15 +1368,25 @@ type of the target model. There are two supported scenarios:
    discriminator root.
 2. **Arbitrary base-class replacement** (issue 3737): when a client SDK
    needs to keep API compatibility with a previously-generated SDK that
-   used a different base class. Properties contributed by the removed
-   intermediate parents are _lifted_ onto the target model so its
-   observable property set is preserved.
+   used a different base class.
 
-The decorator no longer pre-validates that the target is a property
-superset of the new parent. Instead, when properties have to be discarded
-during the lift (because the target or the new base chain already supplies
-a same-named property), TCGC reports a `legacy-hierarchy-building-conflict`
-warning.
+### Reconciliation rule
+
+After the rebase is applied, TCGC reconciles the target model's
+properties so the SDK shape stays consistent:
+
+1. Gather all properties currently observed on the target — its own
+   properties **plus** properties contributed by every removed
+   intermediate ancestor (the parents that the rebase walked past).
+2. Drop any of those whose name is supplied anywhere in the new base
+   chain (the new parent **and** all of its ancestors), since the new
+   base will provide them via inheritance.
+3. Whatever remains becomes the rebased model's own properties.
+
+When step 2 drops a property whose type does not match the same-named
+property on the new base chain, TCGC reports a
+`legacy-hierarchy-building-conflict` warning so the spec author can
+align the types.
 
 This decorator is considered legacy functionality and may be deprecated in
 future releases.
@@ -1427,9 +1437,9 @@ model SportsCar extends Vehicle {
 
 ```
 
-##### Replace the base class and lift properties from removed
+##### Replace the base class. Properties contributed by the removed
 
-intermediate parents.
+intermediate parent (`b`) are kept on the rebased model.
 
 ```typespec
 model C {
@@ -1439,12 +1449,29 @@ model B extends C {
   b?: string;
 }
 
-// Rebase A from B to C. The property `b` is lifted onto A so its
-// observable property set ({ a, b }) matches the original.
 @Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(C)
 model A extends B {
   a?: string;
 }
+// After: A extends C, A's own properties are { a, b }, C still supplies c.
+```
+
+##### Rebase a model whose own properties (via spread) overlap with
+
+the new base. Overlapping same-typed properties are deduplicated silently.
+
+```typespec
+model B {
+  propB: string;
+}
+
+model A {
+  ...B;
+  propA: string;
+}
+
+@@Legacy.hierarchyBuilding(A, B);
+// After: A extends B, A's own property is just { propA }.
 ```
 
 ### `@markAsLro` {#@Azure.ClientGenerator.Core.Legacy.markAsLro}
