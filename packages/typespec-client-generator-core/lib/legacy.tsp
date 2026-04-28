@@ -3,18 +3,22 @@ using Reflection;
 namespace Azure.ClientGenerator.Core.Legacy;
 
 /**
- * Adds support for client-level multiple levels of inheritance and arbitrary
- * inheritance replacement.
+ * Change the base type of a model in the client SDK.
  *
- * This decorator updates the models returned from TCGC to override the base
- * type of the target model. There are two supported scenarios:
+ * This decorator updates the model returned from TCGC so that, in the
+ * generated SDK, the target model inherits from a different base than the
+ * one declared in the spec. The TypeSpec service definition is not
+ * affected — only the SDK shape changes.
  *
- * 1. **Multi-level discriminated inheritance** (original use case): when
- *    discriminated subtypes need to inherit from a sibling rather than the
- *    discriminator root.
- * 2. **Arbitrary base-class replacement** (issue 3737): when a client SDK
- *    needs to keep API compatibility with a previously-generated SDK that
- *    used a different base class.
+ * Common real-world applications:
+ *
+ * - **Multi-level discriminated inheritance**: when discriminated subtypes
+ *   need to inherit from a sibling rather than the discriminator root
+ *   (e.g. `SportsCar` inheriting from `Car` instead of from `Vehicle`).
+ * - **Brownfield base-class alignment**: when a client SDK needs to keep
+ *   API compatibility with a previously-generated SDK that used a
+ *   different base — typically rebasing onto a richer Azure resource base
+ *   such as `TrackedResource` instead of plain `Resource`.
  *
  * ### Reconciliation rule
  *
@@ -29,10 +33,12 @@ namespace Azure.ClientGenerator.Core.Legacy;
  *    base will provide them via inheritance.
  * 3. Whatever remains becomes the rebased model's own properties.
  *
- * When step 2 drops a property whose type does not match the same-named
- * property on the new base chain, TCGC reports a
+ * When step 2 drops a property whose type is not assignable to (and not
+ * assignable from) the same-named property on the new base chain — i.e.
+ * the two types are unrelated, like `int32` vs `string` — TCGC reports a
  * `legacy-hierarchy-building-conflict` warning so the spec author can
- * align the types.
+ * align the types. Compatible refinements (a string literal vs `string`,
+ * a sub-scalar like `azureLocation` vs `string`, etc.) stay silent.
  *
  * This decorator is considered legacy functionality and may be deprecated in
  * future releases.
@@ -41,7 +47,8 @@ namespace Azure.ClientGenerator.Core.Legacy;
  * @param value The model whose properties should be inherited from
  * @param scope Optional parameter to specify which language emitters this applies to
  *
- * @example Build multiple levels inheritance for discriminated models.
+ * @example Multi-level discriminated inheritance — rebase a discriminated
+ * subtype onto a sibling so the SDK exposes a deeper hierarchy.
  *
  * ```typespec
  * @discriminator("type")
@@ -49,59 +56,75 @@ namespace Azure.ClientGenerator.Core.Legacy;
  *   type: string;
  * }
  *
- * alias CarProperties = {
- *  make: string;
- *  model: string;
- *  year: int32;
- * }
- *
  * model Car extends Vehicle {
  *   type: "car";
- *   ...CarProperties;
+ *   doors: int32;
  * }
  *
  * @Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(Car)
  * model SportsCar extends Vehicle {
  *   type: "sports";
- *   ...CarProperties;
+ *   doors: int32;
  *   topSpeed: int32;
  * }
- *
+ * // SDK shape: SportsCar extends Car (instead of Vehicle directly).
+ * // SportsCar's own properties: { type, topSpeed }; doors is inherited from Car.
  * ```
  *
- * @example Replace the base class. Properties contributed by the removed
- * intermediate parent (`b`) are kept on the rebased model.
+ * @example Brownfield ARM resource — rebase a resource onto
+ * `TrackedResource` so the generated SDK matches the previously-shipped
+ * tracked-resource shape (`location`, `tags`, etc.).
  *
  * ```typespec
- * model C {
- *   c?: string;
- * }
- * model B extends C {
- *   b?: string;
+ * model Resource {
+ *   id?: string;
+ *   name?: string;
+ *   type?: string;
  * }
  *
- * @Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(C)
- * model A extends B {
- *   a?: string;
+ * model TrackedResource extends Resource {
+ *   location: string;
+ *   tags?: Record<string>;
  * }
- * // After: A extends C, A's own properties are { a, b }, C still supplies c.
+ *
+ * model FooProperties {
+ *   provisioningState?: string;
+ * }
+ *
+ * @Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(TrackedResource)
+ * model Foo extends Resource {
+ *   properties: FooProperties;
+ *   location?: string;
+ *   tags?: Record<string>;
+ * }
+ * // SDK shape: Foo extends TrackedResource.
+ * // Foo's own properties: { properties }; location and tags are inherited from TrackedResource.
  * ```
  *
- * @example Rebase a model whose own properties (via spread) overlap with
- * the new base. Overlapping same-typed properties are deduplicated silently.
+ * @example Brownfield ARM envelope — drop an `ArmTagsProperty` envelope
+ * spread by rebasing onto a base that supplies the same properties
+ * directly.
  *
  * ```typespec
- * model B {
- *   propB: string;
+ * model ArmTagsProperty {
+ *   tags?: Record<string>;
  * }
  *
- * model A {
- *   ...B;
- *   propA: string;
+ * model TrackedResource {
+ *   id?: string;
+ *   name?: string;
+ *   tags?: Record<string>;
+ *   location?: string;
  * }
  *
- * @@Legacy.hierarchyBuilding(A, B);
- * // After: A extends B, A's own property is just { propA }.
+ * @Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(TrackedResource)
+ * model FooResourceWithHierarchy {
+ *   id?: string;
+ *   name?: string;
+ *   ...ArmTagsProperty;
+ *   location?: string;
+ * }
+ * // SDK shape: FooResourceWithHierarchy extends TrackedResource with no own properties.
  * ```
  */
 extern dec hierarchyBuilding(target: Model, value: Model, scope?: valueof string);
