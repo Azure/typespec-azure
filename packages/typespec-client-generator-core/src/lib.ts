@@ -484,7 +484,7 @@ export const $lib = createTypeSpecLibrary({
     "inconsistent-multiple-service-dependency": {
       severity: "warning",
       messages: {
-        default: paramMessage`Services merged into client "${"clientName"}" depend on different versions of "${"dependencyName"}": ${"versions"}. Align the @useDependency versions across all services to avoid generating duplicate models.`,
+        default: paramMessage`Services merged into client "${"clientName"}" depend on different versions of "${"dependencyName"}": ${"versions"}.`,
       },
     },
     "client-option": {
