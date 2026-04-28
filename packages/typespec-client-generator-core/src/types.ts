@@ -1639,11 +1639,17 @@ export function updateUsageOrAccess(
   }
   for (const property of type.properties) {
     options.ignoreSubTypeStack.push(false);
-    if (property.kind === "property" && isReadOnly(property) && value === UsageFlags.Input) {
-      continue;
-    }
     if (typeof value === "number") {
-      diagnostics.pipe(updateUsageOrAccess(context, value, property.type, options));
+      let effectiveValue = value;
+      // Strip Input flag for readonly properties - readonly properties only appear in output
+      if (property.kind === "property" && isReadOnly(property)) {
+        effectiveValue = value & ~UsageFlags.Input;
+        if (effectiveValue === 0) {
+          options.ignoreSubTypeStack.pop();
+          continue;
+        }
+      }
+      diagnostics.pipe(updateUsageOrAccess(context, effectiveValue, property.type, options));
     } else {
       // by default, we set property access value to parent. If there's an override though, we override.
       let propertyAccess = value;

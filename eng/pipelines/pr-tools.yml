@@ -15,7 +15,7 @@ extends:
           - job: publish_playground
             displayName: Publish playground & website
             variables:
-              TYPESPEC_WEBSITE_BASE_PATH: "typespec-azure/prs/$(System.PullRequest.PullRequestNumber)/"
+              TYPESPEC_WEBSITE_BASE_PATH: "/typespec-azure/prs/$(System.PullRequest.PullRequestNumber)/"
             pool:
               name: $(LINUXPOOL)
               image: $(LINUXVMIMAGE)
