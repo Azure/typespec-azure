@@ -62,6 +62,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes": true,
     "@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes": true,
     "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes": true,
+    "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-action-no-segment": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-duplicate-property": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-envelope-property": true,
