@@ -1385,8 +1385,23 @@ export function getSdkModelPropertyType(
   let property = context.__modelPropertyCache?.get(type);
 
   if (!property) {
+    const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
+    // Body model properties (kind: "property") should never be treated as API
+    // version parameters. `updateWithApiVersionInformation` only inspects the
+    // property name (e.g. "apiVersion" / "api-version") and the service's
+    // version enum, so it can incorrectly flag a regular model body property
+    // as an API version parameter. Strip that information here so the SDK
+    // property is not surfaced as a client API version parameter with a
+    // service-derived default value. User-provided client defaults are
+    // preserved.
+    if (base.isApiVersionParam) {
+      base.isApiVersionParam = false;
+      if (getClientDefaultValue(context, type) === undefined) {
+        delete base.clientDefaultValue;
+      }
+    }
     property = {
-      ...diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation)),
+      ...base,
       kind: "property",
       optional: type.optional,
       discriminator: false,
