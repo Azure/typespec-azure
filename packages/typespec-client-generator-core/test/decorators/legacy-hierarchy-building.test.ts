@@ -308,13 +308,7 @@ it("another circular inheritance", async () => {
 });
 
 it("rebases to an unrelated base and lifts properties from the original parent", async () => {
-  // Inheritance: C extends A; @hierarchyBuilding(B) rebases C onto B.
-  // Expected after rebase:
-  //   C extends B (no extends-relation between A and B).
-  //   All effective properties on C = own (propC) + lifted from removed
-  //     intermediate A (propA). propB is supplied by the new base B and
-  //     is therefore inherited, not on C.
-  //   So C.properties === { propC, propA }; B.properties === { propB }.
+  // Expected after rebase: C.properties = { propC, propA }, B.properties = { propB }.
   const { program } = await SimpleTesterWithService.compile(`
       model A {
         propA: string;
@@ -605,14 +599,7 @@ it("handles envelope properties correctly", async () => {
 
 
 it("lifts intermediate property when target is rebased to its grandparent", async () => {
-  // Inheritance: A extends B extends C; @hierarchyBuilding(C) rebases A
-  // onto its grandparent C.
-  // Expected after rebase:
-  //   A extends C; the intermediate B is removed from A's chain.
-  //   All effective properties on A = own (a) + lifted from removed
-  //     intermediate B (b). c is supplied by the new base C and is
-  //     therefore inherited, not on A.
-  //   So A.properties === { a, b }; C.properties === { c }.
+  // Expected after rebase: A.properties = { a, b }, C.properties = { c }.
   const { program } = await SimpleTesterWithService.compile(`
       model C {
         c?: string;
@@ -647,14 +634,7 @@ it("lifts intermediate property when target is rebased to its grandparent", asyn
 });
 
 it("lifts properties from every removed intermediate ancestor", async () => {
-  // Inheritance: A extends B extends C extends D;
-  // @hierarchyBuilding(D) rebases A directly onto D.
-  // Expected after rebase:
-  //   A extends D; both B and C are removed intermediates.
-  //   All effective properties on A = own (a) + lifted from B (b) and
-  //     C (c), nearest-first. d is supplied by the new base D and is
-  //     therefore inherited, not on A.
-  //   So A.properties === { a, b, c }.
+  // Expected after rebase: A.properties = { a, b, c }, D.properties = { d }.
   const { program } = await SimpleTesterWithService.compile(`
       model D {
         d?: string;
@@ -687,15 +667,7 @@ it("lifts properties from every removed intermediate ancestor", async () => {
 });
 
 it("rebases to an unrelated model and inherits the new base's properties", async () => {
-  // Inheritance: Patch extends OldBase; @hierarchyBuilding(NewBase)
-  // rebases Patch onto NewBase (no extends-relation between OldBase and
-  // NewBase).
-  // Expected after rebase:
-  //   Patch extends NewBase.
-  //   All effective properties on Patch = own (description) + lifted
-  //     from removed OldBase (tags). id/name are supplied by the new
-  //     base NewBase and are therefore inherited, not on Patch.
-  //   So Patch.properties === { description, tags }.
+  // Expected after rebase: Patch.properties = { description, tags }, NewBase.properties = { id, name }.
   const { program } = await SimpleTesterWithService.compile(`
       // simulates an external base class supplying id/name itself
       model NewBase {
@@ -727,14 +699,7 @@ it("rebases to an unrelated model and inherits the new base's properties", async
 });
 
 it("silently drops the lifted intermediate property when the target already defines the same name", async () => {
-  // Inheritance: A extends B extends C; both A and B define `shared`.
-  // @hierarchyBuilding(C) rebases A onto C.
-  // Expected after rebase:
-  //   A extends C; B is the removed intermediate.
-  //   When we attempt to lift `shared` from B, A already owns `shared`,
-  //     so the lift is shadowed (target wins). No duplicate, no
-  //     diagnostic.
-  //   So A.properties === { shared }.
+  // Expected after rebase: A.properties = { shared }, C.properties = { c }. No diagnostic.
   const { program } = await SimpleTesterWithService.compile(`
       model C {
         c?: string;
@@ -767,14 +732,7 @@ it("silently drops the lifted intermediate property when the target already defi
 });
 
 it("silently drops the lifted intermediate property when the new base supplies the same name and type", async () => {
-  // Inheritance: A extends OldBase; OldBase has `shared: string`,
-  // NewBase C also has `shared: string`. @hierarchyBuilding(C) rebases
-  // A onto C.
-  // Expected after rebase:
-  //   A extends C; OldBase is the removed intermediate.
-  //   `shared` is supplied by the new base C with the same type,
-  //     so A inherits it instead of owning it. No diagnostic.
-  //   So A.properties === { a } only.
+  // Expected after rebase: A.properties = { a }, C.properties = { shared }. No diagnostic.
   const { program } = await SimpleTesterWithService.compile(`
       model C {
         shared?: string;
@@ -805,14 +763,7 @@ it("silently drops the lifted intermediate property when the new base supplies t
 });
 
 it("warns when a kept property has a different type than the new base's same-named property", async () => {
-  // Inheritance: A extends OldBase; OldBase has `shared: string`,
-  // NewBase C has `shared: int32`. @hierarchyBuilding(C) rebases A onto C.
-  // Expected after rebase:
-  //   A extends C; OldBase is the removed intermediate.
-  //   `shared` is supplied by the new base C but with a different
-  //     scalar type, so the property is dropped from A AND a
-  //     `legacy-hierarchy-building-conflict` warning is raised.
-  //   So A.properties === { a } only.
+  // Expected after rebase: A.properties = { a }, C.properties = { shared: int32 }, with `legacy-hierarchy-building-conflict` warning.
   const { program } = await SimpleTesterWithService.compile(`
       model C {
         shared?: int32;
@@ -836,12 +787,8 @@ it("warns when a kept property has a different type than the new base's same-nam
 });
 
 it("only lifts properties for the requested emitter scope", async () => {
-  // Inheritance: A extends B extends C; @hierarchyBuilding(C, "csharp")
-  // applies the rebase only for the csharp emitter.
-  // Expected:
-  //   For csharp: A extends C; A.properties === { a, b } (b lifted from B).
-  //   For python: rebase is not applied; A still extends B and
-  //     A.properties === { a } (b/c inherited normally).
+  // Expected for csharp scope: A extends C, A.properties = { a, b }.
+  // Expected for python scope: A extends B, A.properties = { a }.
   const { program } = await SimpleTesterWithService.compile(`
       model C {
         c?: string;
@@ -881,14 +828,7 @@ it("only lifts properties for the requested emitter scope", async () => {
 });
 
 it("rebases a target that spreads the new base instead of extending it", async () => {
-  // Inheritance: A has no extends but spreads B (...B), and also defines
-  // propA. @hierarchyBuilding(A, B) rebases A onto B.
-  // Expected after rebase:
-  //   A extends B (no removed intermediate; A had no original parent).
-  //   A's own props before rebase = { propB (from spread), propA }.
-  //     The new base B supplies propB with the same type, so it is
-  //     dropped from A; A only owns propA.
-  //   So A.properties === { propA }; B.properties === { propB }. No diagnostic.
+  // Expected after rebase: A.properties = { propA }, B.properties = { propB }. No diagnostic.
   const { program } = await SimpleTesterWithService.compile(`
       model B {
         propB: string;
@@ -924,15 +864,7 @@ it("rebases to a wider base whose chain supplies extra properties", async () => 
   // Real-world ARM scenario: A originally extends a small resource base (B);
   // we want to rebase it onto a wider resource base (BB) that also carries
   // additional properties (e.g. systemData).
-  // Inheritance: A extends B; B has { id, name, type }; BB has
-  //   { id, name, type, systemData }. @hierarchyBuilding(A, BB) rebases
-  //   A onto BB.
-  // Expected after rebase:
-  //   A extends BB; B is the removed intermediate.
-  //   id/name/type are supplied by the new base chain → dropped from A.
-  //   systemData is also supplied by BB → A inherits it, doesn't own it.
-  //   foo is only on A → kept.
-  //   So A.properties === { foo }; BB still owns systemData. No diagnostic.
+  // Expected after rebase: A.properties = { foo }, BB.properties = { id, name, type, systemData }. No diagnostic.
   const { program } = await SimpleTesterWithService.compile(`
       model B {
         id?: string;
