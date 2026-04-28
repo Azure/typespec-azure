@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.67.1
+
+### Bug Fixes
+
+- [#4277](https://github.com/Azure/typespec-azure/pull/4277) Allow `@useFinalStateVia("original-uri")` for long-running POST operations, even when there is no GET operation modeled at the POST url.
+
+
 ## 0.67.0
 
 No changes, version bump only.
