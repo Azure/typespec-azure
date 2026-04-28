@@ -43,12 +43,12 @@ echo ""
 
 # Check which commits already have results on benchmark-data
 EXISTING_RESULTS=()
-if git rev-parse --verify origin/benchmark-data >/dev/null 2>&1; then
+if git rev-parse --verify origin/benchmark-data > /dev/null 2>&1; then
   while IFS= read -r file; do
     sha="${file%.json}"
     sha="${sha#results/}"
     EXISTING_RESULTS+=("$sha")
-  done < <(git ls-tree --name-only origin/benchmark-data -- results/ 2>/dev/null | grep -v latest.json || true)
+  done < <(git ls-tree --name-only origin/benchmark-data -- results/ 2> /dev/null | grep -v latest.json || true)
 fi
 
 is_already_done() {
@@ -72,12 +72,12 @@ fi
 cleanup() {
   echo ""
   echo "Cleaning up..."
-  rm -rf "$REPO_ROOT/packages/benchmark" 2>/dev/null || true
-  git checkout -- pnpm-lock.yaml 2>/dev/null || true
-  git checkout "$CURRENT_BRANCH" --force --quiet 2>/dev/null || true
-  git submodule update --init --recursive --quiet 2>/dev/null || true
+  rm -rf "$REPO_ROOT/packages/benchmark" 2> /dev/null || true
+  git checkout -- pnpm-lock.yaml 2> /dev/null || true
+  git checkout "$CURRENT_BRANCH" --force --quiet 2> /dev/null || true
+  git submodule update --init --recursive --quiet 2> /dev/null || true
   if [ "$STASHED" = true ]; then
-    git stash pop --quiet 2>/dev/null || true
+    git stash pop --quiet 2> /dev/null || true
   fi
   echo "Results saved in: $RESULTS_DIR"
 }
@@ -86,7 +86,7 @@ trap cleanup EXIT
 # Helper: restore the benchmark package and wire up node_modules
 restore_benchmark() {
   local bench_dir="$REPO_ROOT/packages/benchmark"
-  rm -rf "$bench_dir" 2>/dev/null || true
+  rm -rf "$bench_dir" 2> /dev/null || true
   mkdir -p "$bench_dir"
   cp -r "$SAVED_BENCHMARK/dist" "$bench_dir/dist"
   cp -r "$SAVED_BENCHMARK/specs" "$bench_dir/specs"
@@ -130,26 +130,26 @@ for i in "${!COMMITS[@]}"; do
   echo -n "$PROGRESS $SHORT_SHA — "
 
   # Clean up any benchmark artifacts from previous iteration
-  rm -rf "$REPO_ROOT/packages/benchmark" 2>/dev/null || true
-  git checkout -- pnpm-lock.yaml 2>/dev/null || true
+  rm -rf "$REPO_ROOT/packages/benchmark" 2> /dev/null || true
+  git checkout -- pnpm-lock.yaml 2> /dev/null || true
 
   # Checkout the commit
-  if ! git checkout "$SHA" --force --quiet 2>/dev/null; then
+  if ! git checkout "$SHA" --force --quiet 2> /dev/null; then
     echo "checkout failed, skipping"
     ((FAILED++))
     continue
   fi
 
   # Update submodules to match this commit
-  if ! git submodule update --init --recursive --quiet 2>/dev/null; then
+  if ! git submodule update --init --recursive --quiet 2> /dev/null; then
     echo "submodule update failed, skipping"
     ((FAILED++))
     continue
   fi
 
   # Install dependencies
-  if ! pnpm install --frozen-lockfile --quiet 2>/dev/null; then
-    if ! pnpm install --quiet 2>/dev/null; then
+  if ! pnpm install --frozen-lockfile --quiet 2> /dev/null; then
+    if ! pnpm install --quiet 2> /dev/null; then
       echo "install failed, skipping"
       ((FAILED++))
       continue
@@ -158,10 +158,10 @@ for i in "${!COMMITS[@]}"; do
 
   # Build compiler + azure libs (everything the benchmark depends on)
   if ! pnpm -r --filter "@typespec/compiler" --filter "@azure-tools/typespec-azure-core" \
-       --filter "@azure-tools/typespec-azure-resource-manager" \
-       --filter "@azure-tools/typespec-autorest" --filter "@typespec/openapi3" \
-       --filter "@azure-tools/typespec-client-generator-core" \
-       --filter "@azure-tools/typespec-azure-rulesets" build 2>/dev/null; then
+    --filter "@azure-tools/typespec-azure-resource-manager" \
+    --filter "@azure-tools/typespec-autorest" --filter "@typespec/openapi3" \
+    --filter "@azure-tools/typespec-client-generator-core" \
+    --filter "@azure-tools/typespec-azure-rulesets" build 2> /dev/null; then
     echo "build failed, skipping"
     ((FAILED++))
     continue
@@ -215,12 +215,12 @@ git checkout "$CURRENT_BRANCH" --force --quiet
 git submodule update --init --recursive --quiet
 
 # Switch to benchmark-data branch
-if git rev-parse --verify origin/benchmark-data >/dev/null 2>&1; then
-  git checkout origin/benchmark-data --force --quiet 2>/dev/null || true
-  git checkout -B benchmark-data --quiet 2>/dev/null || true
+if git rev-parse --verify origin/benchmark-data > /dev/null 2>&1; then
+  git checkout origin/benchmark-data --force --quiet 2> /dev/null || true
+  git checkout -B benchmark-data --quiet 2> /dev/null || true
 else
   git checkout --orphan benchmark-data --quiet
-  git rm -rf . --quiet 2>/dev/null || true
+  git rm -rf . --quiet 2> /dev/null || true
 fi
 
 mkdir -p results
@@ -230,7 +230,7 @@ for f in "${NEW_RESULTS[@]}"; do
 done
 
 # Update latest.json to the most recent result
-LATEST_FILE=$(ls -t results/*.json 2>/dev/null | grep -v latest.json | head -1)
+LATEST_FILE=$(ls -t results/*.json 2> /dev/null | grep -v latest.json | head -1)
 if [ -n "$LATEST_FILE" ]; then
   cp "$LATEST_FILE" results/latest.json
 fi
@@ -238,7 +238,7 @@ fi
 git add results/
 git commit -m "benchmark: backfill results for $SUCCEEDED commits
 
-Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>" --quiet 2>/dev/null || echo "Nothing to commit"
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>" --quiet 2> /dev/null || echo "Nothing to commit"
 
 echo "Results committed to benchmark-data branch."
 echo "Run 'git push origin benchmark-data' to push to remote."

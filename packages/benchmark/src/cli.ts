@@ -5,13 +5,13 @@ import { appendFile, readFile, writeFile } from "fs/promises";
 import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
 import { compareBenchmarks, hasNotableChanges } from "./compare.js";
-import { generateHistoryMain } from "./generate-history.js";
 import {
   formatComparisonSummary,
   formatConsoleSummary,
   formatPrComment,
   formatRunSummary,
 } from "./format-comment.js";
+import { generateHistoryMain } from "./generate-history.js";
 import { runBenchmarks } from "./run.js";
 import type { BenchmarkResult } from "./types.js";
 
