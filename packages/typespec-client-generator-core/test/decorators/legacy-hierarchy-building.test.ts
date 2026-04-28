@@ -635,7 +635,6 @@ it("handles envelope properties correctly", async () => {
   strictEqual(fooResourceWithHierarchy.baseModel?.name, "TrackedResource");
 });
 
-
 it("lifts intermediate property when target is rebased to its grandparent", async () => {
   // Expected after rebase:
   //   A extends C
@@ -772,7 +771,8 @@ it("silently drops the lifted intermediate property when the target already defi
   strictEqual(aProps[0], "shared");
   // No legacy-hierarchy-building-conflict diagnostics should be raised.
   const conflicts = context.diagnostics.filter(
-    (d) => d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
+    (d) =>
+      d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
   );
   strictEqual(conflicts.length, 0);
 });
@@ -805,7 +805,8 @@ it("silently drops the lifted intermediate property when the new base supplies t
   strictEqual(aProps.length, 1);
   strictEqual(aProps[0], "a");
   const conflicts = context.diagnostics.filter(
-    (d) => d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
+    (d) =>
+      d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
   );
   strictEqual(conflicts.length, 0);
 });
@@ -844,7 +845,8 @@ it("treats literal and sub-scalar types as compatible with their base scalar", a
   strictEqual(aProps.length, 1);
   strictEqual(aProps[0], "a");
   const conflicts = context.diagnostics.filter(
-    (d) => d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
+    (d) =>
+      d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
   );
   strictEqual(conflicts.length, 0);
 });
@@ -950,7 +952,8 @@ it("rebases a target that spreads the new base instead of extending it", async (
   strictEqual(propNames.length, 1);
   strictEqual(propNames[0], "propA");
   const conflicts = context.diagnostics.filter(
-    (d) => d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
+    (d) =>
+      d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
   );
   strictEqual(conflicts.length, 0);
 });
@@ -998,7 +1001,8 @@ it("rebases to a wider base whose chain supplies extra properties", async () => 
   ok(bbModel);
   ok(bbModel.properties.some((p) => p.name === "systemData"));
   const conflicts = context.diagnostics.filter(
-    (d) => d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
+    (d) =>
+      d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
   );
   strictEqual(conflicts.length, 0);
 });
@@ -1052,7 +1056,8 @@ it("rebases an ARM-style resource onto a tracked resource base", async () => {
   ok(trackedProps.includes("location"));
   ok(trackedProps.includes("tags"));
   const conflicts = context.diagnostics.filter(
-    (d) => d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
+    (d) =>
+      d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
   );
   strictEqual(conflicts.length, 0);
 });
