@@ -4716,6 +4716,42 @@ Expected response body:
 }
 ```
 
+### Azure_SpecialHeaders_ConditionalRequest_postCustomIfMatch
+
+- Endpoint: `post /azure/special-headers/conditional-request/custom-if-match`
+
+Check when custom If-Match header name is used with eTag type for conditional requests.
+Expected header parameters:
+
+- x-ms-blob-if-match="valid"
+
+### Azure_SpecialHeaders_ConditionalRequest_postCustomIfNoneMatch
+
+- Endpoint: `post /azure/special-headers/conditional-request/custom-if-none-match`
+
+Check when custom If-None-Match header name is used with eTag type for conditional requests.
+Expected header parameters:
+
+- x-ms-blob-if-none-match="invalid"
+
+### Azure_SpecialHeaders_ConditionalRequest_postIfMatch
+
+- Endpoint: `post /azure/special-headers/conditional-request/if-match`
+
+Check when only If-Match in header is defined with eTag type.
+Expected header parameters:
+
+- if-match="valid"
+
+### Azure_SpecialHeaders_ConditionalRequest_postIfNoneMatch
+
+- Endpoint: `post /azure/special-headers/conditional-request/if-none-match`
+
+Check when only If-None-Match in header is defined with eTag type.
+Expected header parameters:
+
+- if-none-match="invalid"
+
 ### Azure_SpecialHeaders_XmsClientRequestId
 
 - Endpoint: `get /azure/special-headers/x-ms-client-request-id/`
