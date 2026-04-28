@@ -46,6 +46,10 @@ recommended to test a private of the change before merging.
 
 Example: https://github.com/Azure/azure-rest-api-specs/pull/26684
 
+# Breaking changes
+
+See [docs/breaking-changes.md](docs/breaking-changes.md) for guidelines on rolling out breaking changes across TypeSpec, the spec repo, and SDK repos.
+
 # Working with the core submodule
 
 This repository uses a git
@@ -433,6 +437,7 @@ Area of the codebase
 | `lib:azure-resource-manager` | #957300 | Issues for @azure-tools/typespec-azure-core library                                 |
 | `lib:azure-http-specs`       | #c7aee6 | For issues/prs related to the @azure-tools/typespec-azure-http-specs package        |
 | `emitter:autorest`           | #957300 | Issues for @azure-tools/typespec-autorest emitter                                   |
+| `emitter:python`             | #957300 | Issues for @azure-tools/typespec-python emitter                                     |
 | `emitter:client:all`         | #957300 | General client emitter issues that do not involve TCGC or typespec-azure-http-specs |
 | `eng`                        | #65bfff |                                                                                     |
 | `ide`                        | #846da1 | Issues for Azure specific ide features                                              |

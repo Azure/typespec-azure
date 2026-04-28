@@ -28,6 +28,8 @@ configuration:
                 - hasLabel:
                     label: emitter:autorest
                 - hasLabel:
+                    label: emitter:python
+                - hasLabel:
                     label: emitter:client:all
                 - hasLabel:
                     label: eng
@@ -57,6 +59,8 @@ configuration:
                   label: lib:azure-http-specs
               - labelAdded:
                   label: emitter:autorest
+              - labelAdded:
+                  label: emitter:python
               - labelAdded:
                   label: emitter:client:all
               - labelAdded:
@@ -89,6 +93,8 @@ configuration:
               - labelRemoved:
                   label: emitter:autorest
               - labelRemoved:
+                  label: emitter:python
+              - labelRemoved:
                   label: emitter:client:all
               - labelRemoved:
                   label: eng
@@ -110,6 +116,8 @@ configuration:
                     label: lib:azure-http-specs
                 - hasLabel:
                     label: emitter:autorest
+                - hasLabel:
+                    label: emitter:python
                 - hasLabel:
                     label: emitter:client:all
                 - hasLabel:

@@ -12,6 +12,10 @@ using Spector;
   "azure.clientgenerator.core.responseasbool",
   "java"
 )
+@global.Azure.ClientGenerator.Core.clientNamespace(
+  "specs.azure.clientgenerator.core.responseasbool",
+  "python"
+)
 namespace _Specs_.Azure.ClientGenerator.Core.ResponseAsBool;
 
 model Resource {

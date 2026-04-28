@@ -1462,6 +1462,14 @@ function addMultipartPropertiesToModelType(
     }
     popNamingContext(context);
 
+    // re-apply encoding with the part's default content type so that e.g. bytes
+    // in multipart/form-data gets encode "bytes" instead of the default "base64"
+    const partDefaultContentType =
+      part.body.contentTypes.length > 0 ? part.body.contentTypes[0] : undefined;
+    const typeToEncode =
+      clientProperty.type.kind === "array" ? clientProperty.type.valueType : clientProperty.type;
+    diagnostics.pipe(addEncodeInfo(context, part.property!, typeToEncode, partDefaultContentType));
+
     clientProperty.serializationOptions.multipart = {
       isFilePart: isFilePart(context, clientProperty.type),
       isMulti: part.multi,
@@ -1631,17 +1639,11 @@ export function updateUsageOrAccess(
   }
   for (const property of type.properties) {
     options.ignoreSubTypeStack.push(false);
+    if (property.kind === "property" && isReadOnly(property) && value === UsageFlags.Input) {
+      continue;
+    }
     if (typeof value === "number") {
-      let effectiveValue = value;
-      // Strip Input flag for readonly properties - readonly properties only appear in output
-      if (property.kind === "property" && isReadOnly(property)) {
-        effectiveValue = value & ~UsageFlags.Input;
-        if (effectiveValue === 0) {
-          options.ignoreSubTypeStack.pop();
-          continue;
-        }
-      }
-      diagnostics.pipe(updateUsageOrAccess(context, effectiveValue, property.type, options));
+      diagnostics.pipe(updateUsageOrAccess(context, value, property.type, options));
     } else {
       // by default, we set property access value to parent. If there's an override though, we override.
       let propertyAccess = value;
