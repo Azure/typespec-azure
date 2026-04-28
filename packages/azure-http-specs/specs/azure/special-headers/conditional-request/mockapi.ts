@@ -8,6 +8,19 @@ Scenarios.Azure_SpecialHeaders_ConditionalRequest_postIfMatch = passOnSuccess({
   request: {
     headers: {
       "If-Match": '"valid"',
+    },
+  },
+  response: {
+    status: 204,
+  },
+  kind: "MockApiDefinition",
+});
+
+Scenarios.Azure_SpecialHeaders_ConditionalRequest_postIfNoneMatch = passOnSuccess({
+  uri: "/azure/special-headers/conditional-request/if-none-match",
+  method: "post",
+  request: {
+    headers: {
       "If-None-Match": '"invalid"',
     },
   },
@@ -23,6 +36,19 @@ Scenarios.Azure_SpecialHeaders_ConditionalRequest_postCustomIfMatch = passOnSucc
   request: {
     headers: {
       "x-ms-blob-if-match": '"valid"',
+    },
+  },
+  response: {
+    status: 204,
+  },
+  kind: "MockApiDefinition",
+});
+
+Scenarios.Azure_SpecialHeaders_ConditionalRequest_postCustomIfNoneMatch = passOnSuccess({
+  uri: "/azure/special-headers/conditional-request/custom-if-none-match",
+  method: "post",
+  request: {
+    headers: {
       "x-ms-blob-if-none-match": '"invalid"',
     },
   },
