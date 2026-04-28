@@ -927,3 +927,57 @@ it("rebases to a wider base whose chain supplies extra properties", async () => 
   );
   strictEqual(conflicts.length, 0);
 });
+
+it("rebases an ARM-style resource onto a tracked resource base", async () => {
+  // Real-world ARM scenario: A originally extends Resource (id/name/type) and
+  // declares `location?` and `tags?` itself. We want to rebase A onto
+  // TrackedResource, which already supplies `location` (required) and `tags?`.
+  // Expected after rebase:
+  //   A extends TrackedResource
+  //   A.properties = { properties }, TrackedResource.properties = { location, tags }.
+  //   `location` and `tags` are supplied by the new base chain → dropped from A
+  //   (no diagnostic — same scalar name; required-vs-optional difference is
+  //   not surfaced by the current narrow type-mismatch check).
+  const { program } = await SimpleTesterWithService.compile(`
+      model AProperties {
+        provisioningState?: string;
+      }
+      model Resource {
+        id?: string;
+        name?: string;
+        type?: string;
+      }
+      model TrackedResource extends Resource {
+        location: string;
+        tags?: Record<string>;
+      }
+      model A extends Resource {
+        properties: AProperties;
+        location?: string;
+        tags?: Record<string>;
+      }
+
+      @@Legacy.hierarchyBuilding(A, TrackedResource);
+
+      @route("/test")
+      op test(): A;
+    `);
+
+  const context = await createSdkContextForTester(program);
+  const aModel = context.sdkPackage.models.find((m) => m.name === "A");
+  const trackedResourceModel = context.sdkPackage.models.find((m) => m.name === "TrackedResource");
+  ok(aModel);
+  ok(trackedResourceModel);
+  strictEqual(aModel.baseModel?.name, "TrackedResource");
+  const aProps = aModel.properties.map((p) => p.name).sort();
+  strictEqual(aProps.length, 1);
+  strictEqual(aProps[0], "properties");
+  // TrackedResource keeps its own location/tags; id/name/type stay on Resource.
+  const trackedProps = trackedResourceModel.properties.map((p) => p.name).sort();
+  ok(trackedProps.includes("location"));
+  ok(trackedProps.includes("tags"));
+  const conflicts = context.diagnostics.filter(
+    (d) => d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
+  );
+  strictEqual(conflicts.length, 0);
+});
