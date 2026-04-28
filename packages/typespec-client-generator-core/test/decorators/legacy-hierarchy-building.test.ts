@@ -307,7 +307,7 @@ it("another circular inheritance", async () => {
   });
 });
 
-it("conflicting inheritance now succeeds (validation relaxed)", async () => {
+it("rebases to an unrelated base and lifts properties from the original parent", async () => {
   const { program } = await SimpleTesterWithService.compile(`
       model A {
         propA: string;
@@ -597,7 +597,7 @@ it("handles envelope properties correctly", async () => {
 });
 
 
-it("lifts intermediate property when target is rebased to grandparent (issue 3737 repro)", async () => {
+it("lifts intermediate property when target is rebased to its grandparent", async () => {
   const { program } = await SimpleTesterWithService.compile(`
       model C {
         c?: string;
@@ -631,7 +631,7 @@ it("lifts intermediate property when target is rebased to grandparent (issue 373
   strictEqual(cModel.properties[0].name, "c");
 });
 
-it("lifts properties from multi-level removed intermediates (nearest first)", async () => {
+it("lifts properties from every removed intermediate ancestor", async () => {
   const { program } = await SimpleTesterWithService.compile(`
       model D {
         d?: string;
@@ -663,7 +663,7 @@ it("lifts properties from multi-level removed intermediates (nearest first)", as
   ok(aProps.includes("c"));
 });
 
-it("rebase to unrelated model lifts intermediate properties without erroring on new-base-only properties", async () => {
+it("rebases to an unrelated model and inherits the new base's properties", async () => {
   const { program } = await SimpleTesterWithService.compile(`
       // simulates an external base class supplying id/name itself
       model NewBase {
@@ -694,7 +694,7 @@ it("rebase to unrelated model lifts intermediate properties without erroring on 
   ok(!props.includes("name"));
 });
 
-it("emits property-discarded diagnostic when target already defines a same-named property", async () => {
+it("warns when the target already defines a lifted property", async () => {
   const { program } = await SimpleTesterWithService.compile(`
       model C {
         c?: string;
@@ -717,7 +717,7 @@ it("emits property-discarded diagnostic when target already defines a same-named
   });
 });
 
-it("emits property-discarded diagnostic when new base already supplies the property", async () => {
+it("warns when the new base already supplies a lifted property", async () => {
   const { program } = await SimpleTesterWithService.compile(`
       model C {
         shared?: string;
@@ -740,7 +740,7 @@ it("emits property-discarded diagnostic when new base already supplies the prope
   });
 });
 
-it("emits property-type-mismatch diagnostic when lifted property has different type than new base", async () => {
+it("warns when a lifted property has a different type than the new base's same-named property", async () => {
   const { program } = await SimpleTesterWithService.compile(`
       model C {
         shared?: int32;
@@ -763,7 +763,7 @@ it("emits property-type-mismatch diagnostic when lifted property has different t
   });
 });
 
-it("scope is honored for property lifting (csharp only)", async () => {
+it("only lifts properties for the requested emitter scope", async () => {
   const { program } = await SimpleTesterWithService.compile(`
       model C {
         c?: string;
