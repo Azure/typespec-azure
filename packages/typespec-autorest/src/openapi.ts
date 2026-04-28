@@ -2689,10 +2689,14 @@ export async function getOpenAPIForService(
           authorizationUrl: (flow as any).authorizationUrl,
           tokenUrl: (flow as any).tokenUrl,
           scopes: Object.fromEntries(
-            flow.scopes.map((x) => [
-              rewriteArmScopeForOpenAPI2(x.value, serviceNamespace),
-              x.description ?? "",
-            ]),
+            flow.scopes.map((x) => {
+              const rewritten = rewriteArmScopeForOpenAPI2(x.value, serviceNamespace);
+              const description =
+                rewritten === "user_impersonation" && rewritten !== x.value
+                  ? "impersonate your user account"
+                  : (x.description ?? "");
+              return [rewritten, description];
+            }),
           ),
         };
       case "openIdConnect":

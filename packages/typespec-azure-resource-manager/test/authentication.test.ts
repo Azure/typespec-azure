@@ -24,7 +24,7 @@ it("@armProviderNamespace injects the canonical absolute ARM scope as the only s
   deepStrictEqual(flow.scopes, [
     {
       value: "https://management.azure.com/.default",
-      description: "impersonate your user account",
+      description: "Default scope for management APIs",
     },
   ]);
 });

@@ -210,7 +210,7 @@ export const $armProviderNamespace: ArmProviderNamespaceDecorator = (
                     scopes: [
                       {
                         value: "https://management.azure.com/.default",
-                        description: "impersonate your user account",
+                        description: "Default scope for management APIs",
                       },
                     ],
                   },
