@@ -252,7 +252,11 @@ Singleton resources can use any resource base type, but most often use `ProxyRes
 @singleton
 @tenantResource
 model EmployeeAgreementResource is ProxyResource<EmployeeAgreementProperties> {
-  ...ResourceNameParameter<EmployeeAgreementResource, KeyName = "employeeAgreementName", SegmentName = "employeeAgreements">;
+  ...ResourceNameParameter<
+    EmployeeAgreementResource,
+    KeyName = "employeeAgreementName",
+    SegmentName = "employeeAgreements"
+  >;
 }
 ```
 
