@@ -1,6 +1,6 @@
-import { deepStrictEqual } from "assert";
+import { deepStrictEqual, ok } from "assert";
 import { it } from "vitest";
-import { compileMultipleOpenAPI } from "./test-host.js";
+import { AzureTester, compileMultipleOpenAPI } from "./test-host.js";
 
 it("supports emitting multiple services", async () => {
   const { Service, Client } = await compileMultipleOpenAPI(
@@ -49,4 +49,24 @@ it("supports emitting multiple services", async () => {
       },
     },
   });
+});
+
+it("does not crash when no @service is defined and a model references a versioned namespace", async () => {
+  // Regression test for a null reference crash in the autorest emitter when
+  // there is no @service declared but the spec references a model from a
+  // versioned namespace (e.g. CommonTypes.AzureEntityResource).
+  const tester = await AzureTester.createInstance();
+  const [{ outputs }] = await tester.compileAndDiagnose(
+    `
+      /** Move response */
+      model MoveResponse extends Azure.ResourceManager.CommonTypes.AzureEntityResource {
+        /** Status */
+        movingStatus: string;
+      }
+      `,
+  );
+  const content = outputs["openapi.json"];
+  ok(content, "Expected to have found openapi output");
+  const doc = JSON.parse(content);
+  deepStrictEqual(typeof doc, "object");
 });
