@@ -1556,6 +1556,12 @@ export function updateUsageOrAccess(
     return diagnostics.wrap(undefined);
   }
 
+  // For external types, only allow External usage flag to be set and propagated.
+  // All other usage (Input/Output/Json) and access propagation are blocked.
+  if (type.external && value !== UsageFlags.External) {
+    return diagnostics.wrap(undefined);
+  }
+
   if (options.ignoreSubTypeStack.length === 0 || !options.ignoreSubTypeStack.at(-1)) {
     options.seenTypes.add(type);
   }

@@ -53,6 +53,7 @@ import {
   SdkServiceResponseHeader,
   SdkStreamMetadata,
   SdkType,
+  SerializationOptions,
   TCGCContext,
   UsageFlags,
 } from "./interfaces.js";
@@ -73,6 +74,7 @@ import {
   isSubscriptionId,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
+import { isMediaTypeJson, isMediaTypeXml } from "./media-types.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -82,11 +84,31 @@ import {
 import {
   addEncodeInfo,
   getClientTypeWithDiagnostics,
-  getSdkConstant,
   getSdkModelPropertyTypeBase,
   getTypeSpecBuiltInType,
   isReadOnly,
 } from "./types.js";
+
+/**
+ * Build serialization options from content types.
+ * This provides a consistent way for emitters to determine the serialization format
+ * for body parameters and HTTP responses, regardless of whether the type is a model or basic type.
+ * @param contentTypes - The content types to build serialization options from.
+ * @param name - The serialized name of the body parameter (for request bodies).
+ */
+function buildSerializationOptionsFromContentTypes(
+  contentTypes: string[],
+  name?: string,
+): SerializationOptions {
+  const options: SerializationOptions = {};
+  if (contentTypes.some(isMediaTypeJson)) {
+    options.json = { name: name ?? "" };
+  }
+  if (contentTypes.some(isMediaTypeXml)) {
+    options.xml = { name: name ?? "" };
+  }
+  return options;
+}
 
 function buildSdkStreamMetadata(
   context: TCGCContext,
@@ -117,33 +139,31 @@ export function getSdkHttpOperation(
   methodParameters: SdkMethodParameter[],
   client: SdkClientType<SdkHttpOperation>,
 ): [SdkHttpOperation, readonly Diagnostic[]] {
-  const tk = $(context.program);
   const diagnostics = createDiagnosticCollector();
   const { responses, exceptions } = diagnostics.pipe(
     getSdkHttpResponseAndExceptions(context, httpOperation, client),
   );
   if (getResponseAsBool(context, httpOperation.operation)) {
-    // we make sure valid responses and 404 responses are booleans
+    // HEAD operations never have a response body, so we clear response.type here.
+    // The boolean return type is a client-side concept handled at the method response level.
     for (const response of responses) {
-      // all valid responses will return boolean
-      response.type = getSdkConstant(context, tk.literal.createBoolean(true));
+      response.type = undefined;
     }
+    // Promote 404 from exception to valid response.
     const fourOFourResponse = exceptions.find((e) => e.statusCodes === 404);
     if (fourOFourResponse) {
-      fourOFourResponse.type = getSdkConstant(context, tk.literal.createBoolean(false));
       // move from exception to valid response with status code 404
       responses.push({
         ...fourOFourResponse,
+        type: undefined,
         statusCodes: 404,
       });
       exceptions.splice(exceptions.indexOf(fourOFourResponse), 1);
-      // remove the exception from the list
     } else {
       // add 404 response to the list of valid responses
       responses.push({
         kind: "http",
         statusCodes: 404,
-        type: getSdkConstant(context, tk.literal.createBoolean(false)),
         apiVersions: getAvailableApiVersions(
           context,
           httpOperation.operation,
@@ -151,6 +171,7 @@ export function getSdkHttpOperation(
         ),
         headers: [],
         __raw: (responses[0] || exceptions[0]).__raw,
+        serializationOptions: {},
       });
     }
   }
@@ -291,6 +312,7 @@ function getSdkHttpParameters(
         decorators: diagnostics.pipe(getTypeDecorators(context, tspBody.type)),
         access: "public",
         flatten: false,
+        serializationOptions: {},
       };
     }
     if (retval.bodyParam) {
@@ -310,6 +332,12 @@ function getSdkHttpParameters(
       );
 
       addContentTypeInfoToBodyParam(context, httpOperation, retval.bodyParam);
+
+      // populate serialization options based on content types
+      retval.bodyParam.serializationOptions = buildSerializationOptionsFromContentTypes(
+        retval.bodyParam.contentTypes,
+        retval.bodyParam.serializedName,
+      );
 
       // map stream request body type to bytes, but preserve stream metadata
       const requestStreamMeta = getStreamMetadata(context.program, httpOperation.parameters);
@@ -537,16 +565,20 @@ export function getSdkHttpParameter(
     });
   }
   if (isBody(context.program, param) || location === "body") {
+    const serializedName = param.name === "" ? "body" : getWireName(context, param);
     return diagnostics.wrap({
       ...base,
       kind: "body",
-      serializedName: param.name === "" ? "body" : getWireName(context, param),
+      serializedName,
       contentTypes: ["application/json"],
       defaultContentType: "application/json",
       optional: param.optional,
       correspondingMethodParams: [],
       methodParameterSegments: [],
-      serializationOptions: {},
+      serializationOptions: buildSerializationOptionsFromContentTypes(
+        ["application/json"],
+        serializedName,
+      ),
     });
   }
   const headerQueryBase = {
@@ -702,6 +734,7 @@ function getSdkHttpResponseAndExceptions(
       ),
       description: response.description,
       streamMetadata,
+      serializationOptions: buildSerializationOptionsFromContentTypes(contentTypes),
     };
 
     if (

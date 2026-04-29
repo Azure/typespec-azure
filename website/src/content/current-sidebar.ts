@@ -44,6 +44,7 @@ const sidebar: SidebarItem[] = [
           directory: "getstarted/azure-resource-manager",
         },
       },
+      "getstarted/typespec-authoring-skill",
     ],
   },
   {

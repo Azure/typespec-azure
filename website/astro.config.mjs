@@ -19,6 +19,23 @@ export default defineConfig({
   trailingSlash: "always",
   redirects: {
     "/docs/": "/docs/intro/",
+    // Redirects for versioning docs reorganization
+    "/docs/howtos/Versioning/ARM/02-preview-after-preview/":
+      "/docs/howtos/Versioning/02-preview-after-preview/",
+    "/docs/howtos/Versioning/ARM/03-stable-after-preview/":
+      "/docs/howtos/Versioning/03-stable-after-preview/",
+    "/docs/howtos/Versioning/ARM/04-preview-after-stable/":
+      "/docs/howtos/Versioning/04-preview-after-stable/",
+    "/docs/howtos/Versioning/ARM/05-stable-after-stable/":
+      "/docs/howtos/Versioning/05-stable-after-stable/",
+    "/docs/howtos/Versioning/ARM/01-about-versioning/":
+      "/docs/howtos/Versioning/01-about-versioning/",
+    "/docs/howtos/Versioning/01-preview-version/": "/docs/howtos/Versioning/01-about-versioning/",
+    "/docs/howtos/ARM/versioning/": "/docs/howtos/Versioning/06-evolving-apis/",
+    "/docs/howtos/Versioning/ARM/uncommon-scenarios/01-converting-specs/":
+      "/docs/howtos/Versioning/uncommon-scenarios/01-converting-specs/",
+    "/docs/howtos/Versioning/ARM/uncommon-scenarios/02-perpetual-preview/":
+      "/docs/howtos/Versioning/uncommon-scenarios/02-perpetual-preview/",
   },
   integrations: [
     astroExpressiveCode(),

@@ -155,7 +155,7 @@ describe("language-specific parsers", () => {
     };
 
     const result = buildLanguageMetadata(optionMap, {}, "/repos/tsp-output");
-    const lang = result["java"];
+    const lang = result["java"][0];
 
     // Package name should include the Maven groupId prefix
     expect(lang.packageName).toBe("com.azure:azure-security-keyvault-secrets");
@@ -170,7 +170,7 @@ describe("language-specific parsers", () => {
     };
 
     const result = buildLanguageMetadata(optionMap, {}, "/repos/tsp-output");
-    const lang = result["java"];
+    const lang = result["java"][0];
 
     expect(lang.packageName).toBe("com.azure.resourcemanager:azure-resourcemanager-frontdoor");
     expect(lang.namespace).toBe("com.azure.resourcemanager.frontdoor");
@@ -185,7 +185,7 @@ describe("language-specific parsers", () => {
     };
 
     const result = buildLanguageMetadata(optionMap, {}, "/repos/tsp-output");
-    const lang = result["java"];
+    const lang = result["java"][0];
 
     expect(lang.packageName).toBe("com.azure.v2:azure-ai-agents");
     expect(lang.namespace).toBe("com.azure.ai.agents");
@@ -202,7 +202,7 @@ describe("language-specific parsers", () => {
     };
 
     const result = buildLanguageMetadata(optionMap, {}, "/repos/tsp-output");
-    const lang = result["java"];
+    const lang = result["java"][0];
 
     expect(lang.packageName).toBe("com.azure.v2:azure-security-keyvault-administration");
     expect(lang.namespace).toBe("com.azure.v2.security.keyvault.administration");
@@ -217,7 +217,7 @@ describe("language-specific parsers", () => {
     };
 
     const result = buildLanguageMetadata(optionMap, {}, "/repos/tsp-output");
-    const lang = result["java"];
+    const lang = result["java"][0];
 
     expect(lang.packageName).toBe("com.azure.resourcemanager.v2:azure-resourcemanager-cdn");
     expect(lang.namespace).toBe("com.azure.resourcemanager.cdn");
@@ -234,7 +234,7 @@ describe("language-specific parsers", () => {
     };
 
     const result = buildLanguageMetadata(optionMap, {}, "/repos/tsp-output");
-    const lang = result["java"];
+    const lang = result["java"][0];
 
     expect(lang.packageName).toBe("com.azure.resourcemanager.v2:azure-resourcemanager-cdn");
     expect(lang.namespace).toBe("com.azure.resourcemanager.v2.cdn");
@@ -249,7 +249,7 @@ describe("language-specific parsers", () => {
     };
 
     const result = buildLanguageMetadata(optionMap, {}, "/repos/tsp-output");
-    const lang = result["java"];
+    const lang = result["java"][0];
 
     // Explicit package-name should also get the groupId prefix
     expect(lang.packageName).toBe("com.azure:azure-storage-blobs");
@@ -264,7 +264,7 @@ describe("language-specific parsers", () => {
     };
 
     const result = buildLanguageMetadata(optionMap, {}, "/repos/tsp-output");
-    const lang = result["java"];
+    const lang = result["java"][0];
 
     // Already has groupId:artifactId format – should not be modified
     expect(lang.packageName).toBe("com.azure.spring:azure-spring-data-cosmos");
@@ -386,12 +386,10 @@ describe("namespace selection logic", () => {
 });
 
 describe("inferLanguageFromEmitterName", () => {
-  it("should return full emitter name for unrecognized emitters", () => {
-    // Emitters not in EMITTER_REGISTRY should use the full emitter name as the language key.
-    expect(inferLanguageFromEmitterName("@unknown/some-emitter")).toBe("@unknown/some-emitter");
-    expect(inferLanguageFromEmitterName("@azure-tools/typespec-swift")).toBe(
-      "@azure-tools/typespec-swift",
-    );
+  it("should return 'unknown' for unrecognized emitters with no language keyword", () => {
+    expect(inferLanguageFromEmitterName("@unknown/some-emitter")).toBe("unknown");
+    expect(inferLanguageFromEmitterName("@typespec/openapi3")).toBe("unknown");
+    expect(inferLanguageFromEmitterName("@typespec/json-schema")).toBe("unknown");
   });
 
   it("should return known alias for registered emitters", () => {
@@ -401,12 +399,24 @@ describe("inferLanguageFromEmitterName", () => {
     expect(inferLanguageFromEmitterName("@azure-tools/typespec-ts")).toBe("typescript");
     expect(inferLanguageFromEmitterName("@azure-tools/typespec-go")).toBe("go");
     expect(inferLanguageFromEmitterName("@azure-tools/typespec-rust")).toBe("rust");
-    expect(inferLanguageFromEmitterName("@azure-typespec/http-client-csharp")).toBe(
-      "http-client-csharp",
+    expect(inferLanguageFromEmitterName("@azure-typespec/http-client-csharp")).toBe("csharp");
+    expect(inferLanguageFromEmitterName("@azure-typespec/http-client-csharp-mgmt")).toBe("csharp");
+    expect(inferLanguageFromEmitterName("@azure-typespec/http-client-csharp-provisioning")).toBe(
+      "csharp",
     );
-    expect(inferLanguageFromEmitterName("@azure-typespec/http-client-csharp-mgmt")).toBe(
-      "http-client-csharp-mgmt",
-    );
+  });
+
+  it("should infer language by heuristic for unregistered emitters", () => {
+    expect(inferLanguageFromEmitterName("@typespec/http-client-csharp")).toBe("csharp");
+    expect(inferLanguageFromEmitterName("@azure-tools/typespec-swift")).toBe("swift");
+    expect(inferLanguageFromEmitterName("@contoso/typespec-python-experimental")).toBe("python");
+    expect(inferLanguageFromEmitterName("@contoso/some-java-emitter")).toBe("java");
+    expect(inferLanguageFromEmitterName("@contoso/some-javascript-emitter")).toBe("javascript");
+  });
+
+  it("should not match 'java' inside 'javascript'", () => {
+    expect(inferLanguageFromEmitterName("@contoso/javascript-emitter")).toBe("javascript");
+    expect(inferLanguageFromEmitterName("@contoso/javascript-emitter")).not.toBe("java");
   });
 });
 
@@ -421,7 +431,7 @@ describe("@azure-typespec/http-client-csharp-mgmt emitter", () => {
     };
 
     const result = buildLanguageMetadata(optionMap, {}, "c:/repos/tsp-output");
-    const lang = result["http-client-csharp-mgmt"];
+    const lang = result["csharp"][0];
 
     expect(lang).toBeDefined();
     expect(lang.namespace).toBe("Azure.ResourceManager.WeightsAndBiases");
@@ -438,7 +448,7 @@ describe("@azure-typespec/http-client-csharp-mgmt emitter", () => {
     };
 
     const result = buildLanguageMetadata(optionMap, {}, "c:/repos/tsp-output");
-    const lang = result["http-client-csharp-mgmt"];
+    const lang = result["csharp"][0];
 
     expect(lang.outputDir).toBe(
       "{output-dir}/sdk/weightsandbiases/Azure.ResourceManager.WeightsAndBiases",
@@ -460,7 +470,7 @@ describe("@azure-typespec/http-client-csharp-mgmt emitter", () => {
       "c:/repos/tsp-output",
       "sdk/healthdataaiservices",
     );
-    const lang = result["http-client-csharp-mgmt"];
+    const lang = result["csharp"][0];
 
     expect(lang.namespace).toBe("Azure.ResourceManager.HealthDataAIServices");
     expect(lang.outputDir).toBe(
@@ -479,7 +489,7 @@ describe("@azure-typespec/http-client-csharp emitter", () => {
     };
 
     const result = buildLanguageMetadata(optionMap, {}, "c:/repos/tsp-output");
-    const lang = result["http-client-csharp"];
+    const lang = result["csharp"][0];
 
     expect(lang).toBeDefined();
     expect(lang.namespace).toBe("Azure.Security.KeyVault");
@@ -495,8 +505,118 @@ describe("@azure-typespec/http-client-csharp emitter", () => {
     };
 
     const result = buildLanguageMetadata(optionMap, {}, "c:/repos/tsp-output");
-    const lang = result["http-client-csharp"];
+    const lang = result["csharp"][0];
 
     expect(lang.outputDir).toBe("{output-dir}/sdk/keyvault/Azure.Security.KeyVault");
+  });
+});
+
+describe("@azure-typespec/http-client-csharp-provisioning emitter", () => {
+  it("should parse namespace from provisioning emitter options", () => {
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-typespec/http-client-csharp-provisioning": {
+        namespace: "Azure.Provisioning.WeightsAndBiases",
+        "emitter-output-dir":
+          "c:/repos/tsp-output/sdk/weightsandbiases/Azure.Provisioning.WeightsAndBiases",
+      },
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "c:/repos/tsp-output");
+    const lang = result["csharp"][0];
+
+    expect(lang).toBeDefined();
+    expect(lang.namespace).toBe("Azure.Provisioning.WeightsAndBiases");
+    expect(lang.packageName).toBe("Azure.Provisioning.WeightsAndBiases");
+    expect(lang.emitterName).toBe("@azure-typespec/http-client-csharp-provisioning");
+  });
+
+  it("should resolve {namespace} placeholder in emitter-output-dir", () => {
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-typespec/http-client-csharp-provisioning": {
+        namespace: "Azure.Provisioning.WeightsAndBiases",
+        "emitter-output-dir": "c:/repos/tsp-output/sdk/weightsandbiases/{namespace}",
+      },
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "c:/repos/tsp-output");
+    const lang = result["csharp"][0];
+
+    expect(lang.outputDir).toBe(
+      "{output-dir}/sdk/weightsandbiases/Azure.Provisioning.WeightsAndBiases",
+    );
+  });
+
+  it("should resolve {namespace} with service-dir in emitter-output-dir", () => {
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-typespec/http-client-csharp-provisioning": {
+        namespace: "Azure.Provisioning.HealthDataAIServices",
+        "emitter-output-dir":
+          "c:/repos/tsp-output/sdk/healthdataaiservices/Azure.Provisioning.HealthDataAIServices",
+      },
+    };
+
+    const result = buildLanguageMetadata(
+      optionMap,
+      {},
+      "c:/repos/tsp-output",
+      "sdk/healthdataaiservices",
+    );
+    const lang = result["csharp"][0];
+
+    expect(lang.namespace).toBe("Azure.Provisioning.HealthDataAIServices");
+    expect(lang.outputDir).toBe(
+      "{output-dir}/sdk/healthdataaiservices/Azure.Provisioning.HealthDataAIServices",
+    );
+  });
+});
+
+describe("multiple emitters per language", () => {
+  it("should group two C# emitters under the same 'csharp' key", () => {
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@typespec/http-client-csharp": {
+        "package-name": "Azure.AI.Projects",
+        "emitter-output-dir": "c:/repos/tsp-output/sdk/ai/Azure.AI.Projects",
+      },
+      "@azure-tools/typespec-csharp": {
+        "package-name": "Azure.AI.Agents.Contracts.V2",
+        namespace: "Azure.AI.Agents.Contracts.V2",
+        "emitter-output-dir": "c:/repos/tsp-output/sdk/ai/Azure.AI.Agents.Contracts.V2",
+        flavor: "azure",
+      },
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "c:/repos/tsp-output");
+
+    expect(result["csharp"]).toHaveLength(2);
+    expect(result["csharp"][0].emitterName).toBe("@typespec/http-client-csharp");
+    expect(result["csharp"][0].packageName).toBe("Azure.AI.Projects");
+    expect(result["csharp"][1].emitterName).toBe("@azure-tools/typespec-csharp");
+    expect(result["csharp"][1].packageName).toBe("Azure.AI.Agents.Contracts.V2");
+  });
+
+  it("should produce array of one for single-emitter languages", () => {
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-tools/typespec-python": {
+        "package-name": "azure-keyvault-secrets",
+      },
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "/repos/tsp-output");
+
+    expect(result["python"]).toHaveLength(1);
+    expect(result["python"][0].packageName).toBe("azure-keyvault-secrets");
+  });
+
+  it("should group unrecognized emitters under 'unknown'", () => {
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@typespec/openapi3": {},
+      "@typespec/json-schema": {},
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "/repos/tsp-output");
+
+    expect(result["unknown"]).toHaveLength(2);
+    expect(result["unknown"][0].emitterName).toBe("@typespec/openapi3");
+    expect(result["unknown"][1].emitterName).toBe("@typespec/json-schema");
   });
 });

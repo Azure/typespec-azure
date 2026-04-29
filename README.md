@@ -15,8 +15,7 @@ You can try TypeSpec on the web without installing anything.
 
 ## Prerequisites
 
-- Please install Node.js 16 LTS and ensure you are able to run the npm command in a command prompt: `npm --version`.
-- It is recommended to have npm 7+. To update npm run `npm install -g npm`
+- Please install [Node.js 24 LTS](https://nodejs.org/) and ensure you are able to run the npm command in a command prompt: `npm --version`.
 
 ## Getting Started
 

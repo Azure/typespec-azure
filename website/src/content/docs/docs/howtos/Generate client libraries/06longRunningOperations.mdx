@@ -268,3 +268,28 @@ func (c *Client) BeginExportUser(ctx context.Context, name string, format string
 ```
 
 </ClientTabs>
+
+## Legacy LRO Decorators
+
+:::caution
+The decorators in this section are in the `Azure.ClientGenerator.Core.Legacy` namespace and should only be used for legacy compatibility scenarios.
+:::
+
+### Forcing an operation to be treated as long-running (`@markAsLro`)
+
+If you have an operation that should be treated as a long-running operation but isn't recognized as one by default, you can force it using `@markAsLro`. The operation's return type must be a `Model`.
+
+```tsp
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+model OperationResult {
+  id: string;
+  status: string;
+}
+
+@markAsLro
+@post
+op startProcessing(): OperationResult;
+```

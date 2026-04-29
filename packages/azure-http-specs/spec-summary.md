@@ -212,7 +212,10 @@ Expected input body:
 
 ```json
 {
-  "name": "test"
+  "name": "test",
+  "timeout": 30,
+  "tier": "standard",
+  "retry": true
 }
 ```
 
@@ -224,6 +227,32 @@ Expected response body:
   "timeout": 30,
   "tier": "standard",
   "retry": true
+}
+```
+
+### Azure_ClientGenerator_Core_ClientDoc_Documentation
+
+- Endpoint: `post /azure/client-generator-core/client-doc/harvest`
+
+This scenario tests the @clientDoc decorator which overrides documentation for types in client libraries.
+The 'Plant' model has a base doc from TypeSpec and additional client-specific documentation appended via @clientDoc in append mode.
+The 'harvest' operation has its documentation completely replaced by @clientDoc in replace mode.
+
+Expected request body:
+
+```json
+{
+  "name": "Rose",
+  "species": "Rosa"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "name": "Rose",
+  "species": "Rosa"
 }
 ```
 
@@ -1204,6 +1233,20 @@ param1: param1
 param2: param2
 
 Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_ResponseAsBool_HeadAsBoolean
+
+- Endpoints:
+  - `head /azure/client-generator-core/response-as-bool/exists`
+  - `head /azure/client-generator-core/response-as-bool/exists/not-exists`
+
+Test that a HEAD operation decorated with @responseAsBool returns a boolean.
+A successful (2xx) response should return true, and a 404 response should return false.
+
+Expected calls:
+
+- HEAD /azure/client-generator-core/response-as-bool/exists -> 204 (returns true)
+- HEAD /azure/client-generator-core/response-as-bool/not-exists -> 404 (returns false)
 
 ### Azure_ClientGenerator_Core_Usage_ModelInOperation
 
@@ -4672,6 +4715,42 @@ Expected response body:
   }
 }
 ```
+
+### Azure_SpecialHeaders_ConditionalRequest_postCustomIfMatch
+
+- Endpoint: `post /azure/special-headers/conditional-request/custom-if-match`
+
+Check when custom If-Match header name is used with eTag type for conditional requests.
+Expected header parameters:
+
+- x-ms-blob-if-match="valid"
+
+### Azure_SpecialHeaders_ConditionalRequest_postCustomIfNoneMatch
+
+- Endpoint: `post /azure/special-headers/conditional-request/custom-if-none-match`
+
+Check when custom If-None-Match header name is used with eTag type for conditional requests.
+Expected header parameters:
+
+- x-ms-blob-if-none-match="invalid"
+
+### Azure_SpecialHeaders_ConditionalRequest_postIfMatch
+
+- Endpoint: `post /azure/special-headers/conditional-request/if-match`
+
+Check when only If-Match in header is defined with eTag type.
+Expected header parameters:
+
+- if-match="valid"
+
+### Azure_SpecialHeaders_ConditionalRequest_postIfNoneMatch
+
+- Endpoint: `post /azure/special-headers/conditional-request/if-none-match`
+
+Check when only If-None-Match in header is defined with eTag type.
+Expected header parameters:
+
+- if-none-match="invalid"
 
 ### Azure_SpecialHeaders_XmsClientRequestId
 

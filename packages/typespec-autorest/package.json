@@ -32,7 +32,7 @@
     }
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
   },
   "scripts": {
     "clean": "rimraf ./dist ./temp",
@@ -86,7 +86,6 @@
     "@typespec/versioning": "workspace:^",
     "@vitest/coverage-v8": "catalog:",
     "@vitest/ui": "catalog:",
-    "c8": "catalog:",
     "rimraf": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
