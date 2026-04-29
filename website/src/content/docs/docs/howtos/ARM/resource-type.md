@@ -39,7 +39,7 @@ Tracked resources use the `TrackedResource<TProperties/>` as their base resource
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<EmployeeResource>;
+  ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
 }
 ```
 
@@ -54,7 +54,7 @@ Tenant resources use the `ProxyResource<TProperties/>` as their base resource ty
 ```typespec
 @tenantResource
 model EmployeeResource is ProxyResource<EmployeeProperties> {
-  ...ResourceNameParameter<EmployeeResource>;
+  ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
 }
 ```
 
@@ -71,7 +71,7 @@ Extension resources use the `ExtensionResource<TProperties/>` as their base reso
 
 ```typespec
 model Employee is ExtensionResource<EmployeeProperties> {
-  ...ResourceNameParameter<Employee>;
+  ...ResourceNameParameter<Employee, KeyName = "employeeName", SegmentName = "employees">;
 }
 ```
 
@@ -197,7 +197,7 @@ Child resources usually use the `ProxyResource<TProperties/>` as their base reso
 ```typespec
 @parentResource(EmployeeResource)
 model JobResource is ProxyResource<JobProperties> {
-  ...ResourceNameParameter<JobResource>;
+  ...ResourceNameParameter<JobResource, KeyName = "jobName", SegmentName = "jobs">;
 }
 ```
 
@@ -213,7 +213,7 @@ Subscription-based resources use the `ProxyResource<TProperties/>` as their base
 ```typespec
 @subscriptionResource
 model EmployeeResource is ProxyResource<EmployeeProperties> {
-  ...ResourceNameParameter<EmployeeResource>;
+  ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
 }
 ```
 
@@ -232,7 +232,7 @@ Use `@parentResource(ArmLocationResource<"Subscription">)` to define a location-
 ```typespec
 @parentResource(ArmLocationResource<"Subscription">)
 model Employee is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<Employee>;
+  ...ResourceNameParameter<Employee, KeyName = "employeeName", SegmentName = "employees">;
 }
 ```
 
@@ -252,7 +252,7 @@ Singleton resources can use any resource base type, but most often use `ProxyRes
 @singleton
 @tenantResource
 model EmployeeAgreementResource is ProxyResource<EmployeeAgreementProperties> {
-  ...ResourceNameParameter<EmployeeAgreementResource>;
+  ...ResourceNameParameter<EmployeeAgreementResource, KeyName = "employeeAgreementName", SegmentName = "employeeAgreements">;
 }
 ```
 
@@ -277,7 +277,7 @@ Here is an example of a property bag for the `EmployeeResource` resource.
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<EmployeeResource>;
+  ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
 }
 
 union EmployeeProvisioningState {
@@ -478,7 +478,7 @@ Standard configuration for ARM support of both SystemAssigned and UserAssigned M
 
   ```typespec
   model EmployeeResource is TrackedResource<EmployeeProperties> {
-    ...ResourceNameParameter<EmployeeResource>;
+    ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
     ...ManagedServiceIdentityProperty;
   }
   ```
@@ -487,7 +487,7 @@ Standard configuration for ARM support of both SystemAssigned and UserAssigned M
 
   ```typespec
   model EmployeeResource is TrackedResource<EmployeeProperties> {
-    ...ResourceNameParameter<EmployeeResource>;
+    ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
     ...ManagedSystemAssignedIdentityProperty;
   }
   ```
@@ -500,7 +500,7 @@ Standard support for setting a SKU-based service level for a resource. To enable
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<EmployeeResource>;
+  ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
   ...ResourceSkuProperty;
 }
 ```
@@ -513,7 +513,7 @@ Indicator that entity-tag operation concurrency support is enabled for this reso
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<EmployeeResource>;
+  ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
   ...EntityTagProperty;
 }
 ```
@@ -526,7 +526,7 @@ Support for marketplace billing configuration for the resource. To enable `Plan`
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<EmployeeResource>;
+  ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
   ...ResourcePlanProperty;
 }
 ```
@@ -539,7 +539,7 @@ Support for certain kinds of portal user experiences based on the kind of resour
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<EmployeeResource>;
+  ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
   ...ResourceKindProperty;
 }
 ```
@@ -552,7 +552,7 @@ Support for management of this resource by other resources. To add 'ManagedBy' s
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<EmployeeResource>;
+  ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
   ...ManagedByProperty;
 }
 ```
