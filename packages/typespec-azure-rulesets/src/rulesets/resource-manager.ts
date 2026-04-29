@@ -66,6 +66,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/arm-resource-duplicate-property": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-envelope-property": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-version-format": true,
+    "@azure-tools/typespec-azure-resource-manager/arm-version-progression": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-key-invalid-chars": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-name-pattern": true,
     "@azure-tools/typespec-azure-resource-manager/arm-custom-resource-no-key": true,
