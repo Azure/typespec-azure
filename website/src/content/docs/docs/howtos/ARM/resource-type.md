@@ -43,7 +43,7 @@ model EmployeeResource is TrackedResource<EmployeeProperties> {
 }
 ```
 
-`...ResourceNameParameter<EmployeeResource>`: spreads in the standard resource name parameter, which automatically defines the resource type name, parameter name, and path segment based on the resource model.
+`...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">`: spreads in the standard resource name parameter, which automatically defines the resource type name, parameter name, and path segment based on the resource model.
 
 You can find samples of Tracked Resources [in the Tracked Resource sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/resource-types/tracked/main.tsp).
 
@@ -59,7 +59,7 @@ model EmployeeResource is ProxyResource<EmployeeProperties> {
 ```
 
 `@tenantResource`: designates this resource as being a cross-tenant resource, with scope across all customer subscriptions in the tenant.
-`...ResourceNameParameter<EmployeeResource>`: spreads in the standard resource name parameter, which automatically defines the resource type name, parameter name, and path segment based on the resource model.
+`...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">`: spreads in the standard resource name parameter, which automatically defines the resource type name, parameter name, and path segment based on the resource model.
 
 You can find samples of Tenant Resources [in the TenantResource sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/resource-types/tenant/main.tsp).
 
@@ -71,7 +71,7 @@ Extension resources use the `ExtensionResource<TProperties/>` as their base reso
 
 ```typespec
 model Employee is ExtensionResource<EmployeeProperties> {
-  ...ResourceNameParameter<Employee, KeyName = "employeeName", SegmentName = "employees">;
+  ...ResourceNameParameter<Employee>;
 }
 ```
 
@@ -202,7 +202,7 @@ model JobResource is ProxyResource<JobProperties> {
 ```
 
 `@parentResource`: designates the model type for the parent of this child resource. The resource identifier for this resource will be prepended with the resource identity of the parent.
-`...ResourceNameParameter<JobResource>`: spreads in the standard resource name parameter, which automatically defines the resource type name, parameter name, and path segment based on the resource model.
+`...ResourceNameParameter<JobResource, KeyName = "jobName", SegmentName = "jobs">`: spreads in the standard resource name parameter, which automatically defines the resource type name, parameter name, and path segment based on the resource model.
 
 You can find samples of Child Resources [in the Proxy Resource sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/resource-types/proxy/main.tsp).
 
@@ -218,7 +218,7 @@ model EmployeeResource is ProxyResource<EmployeeProperties> {
 ```
 
 `@subscriptionResource`: designates this resource as being a cross-subscription resource, with scope across all resource groups in the subscription.
-`...ResourceNameParameter<EmployeeResource>`: spreads in the standard resource name parameter, which automatically defines the resource type name, parameter name, and path segment based on the resource model.
+`...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">`: spreads in the standard resource name parameter, which automatically defines the resource type name, parameter name, and path segment based on the resource model.
 
 You can find samples of Subscription Resources [in the OperationTemplates sample](/docs/samples/resource-manager/resource-types/tracked/).
 
@@ -232,7 +232,7 @@ Use `@parentResource(ArmLocationResource<"Subscription">)` to define a location-
 ```typespec
 @parentResource(ArmLocationResource<"Subscription">)
 model Employee is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<Employee, KeyName = "employeeName", SegmentName = "employees">;
+  ...ResourceNameParameter<Employee>;
 }
 ```
 
@@ -258,7 +258,7 @@ model EmployeeAgreementResource is ProxyResource<EmployeeAgreementProperties> {
 
 `@singleton`: indicates that there can only be one of the resources in the resource container (in this case, only one instance in the customer tenant).
 `@tenantResource`: designates this resource as being a cross-tenant resource, with scope across all customer subscriptions in the tenant.
-`...ResourceNameParameter<EmployeeAgreementResource>`: spreads in the standard resource name parameter, which automatically defines the resource type name, parameter name, and path segment based on the resource model.
+`...ResourceNameParameter<EmployeeAgreementResource, KeyName = "employeeAgreementName", SegmentName = "employeeAgreements">`: spreads in the standard resource name parameter, which automatically defines the resource type name, parameter name, and path segment based on the resource model.
 
 You can find samples of Singleton Resources [in the Singleton sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/resource-types/singleton/main.tsp).
 
