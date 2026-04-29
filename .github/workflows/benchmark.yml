@@ -1,0 +1,144 @@
+name: Benchmark
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+      - release/*
+
+permissions:
+  contents: write
+
+concurrency:
+  group: benchmark-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  benchmark:
+    name: Run Benchmarks
+    runs-on: ubuntu-latest
+    env:
+      TYPESPEC_VS_CI_BUILD: true
+      TYPESPEC_SKIP_WEBSITE_BUILD: true
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm -r --filter "@azure-tools/typespec-benchmark..." build
+
+      - name: Run benchmarks
+        run: |
+          node packages/benchmark/dist/src/cli.js run \
+            --specs-dir packages/benchmark/specs \
+            --iterations 5 \
+            --warmup 1 \
+            --commit ${{ github.sha }} \
+            --output /tmp/benchmark-results.json
+
+      # On push to main: store results to benchmark-data branch
+      - name: Store benchmark results
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          COMMIT_SHA=${{ github.sha }}
+          RESULTS_FILE="/tmp/benchmark-results.json"
+
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Check if benchmark-data branch exists
+          if git ls-remote --exit-code --heads origin benchmark-data > /dev/null 2>&1; then
+            git fetch origin benchmark-data
+            git worktree add /tmp/bench-data origin/benchmark-data
+          else
+            # Create orphan branch
+            git worktree add --detach /tmp/bench-data
+            cd /tmp/bench-data
+            git checkout --orphan benchmark-data
+            git rm -rf . 2>/dev/null || true
+            mkdir -p results
+            echo "# Benchmark Data" > README.md
+            echo "" >> README.md
+            echo "This branch stores TypeSpec benchmark results. Do not merge into main." >> README.md
+            git add README.md
+            git commit -m "Initialize benchmark-data branch"
+            cd -
+          fi
+
+          # Copy results
+          mkdir -p /tmp/bench-data/results
+          cp "$RESULTS_FILE" "/tmp/bench-data/results/${COMMIT_SHA}.json"
+          cp "$RESULTS_FILE" "/tmp/bench-data/results/latest.json"
+
+          # Generate aggregated history.json for the website
+          cd "$GITHUB_WORKSPACE"
+          node packages/benchmark/dist/src/cli.js generate-history /tmp/bench-data/results/history.json --dir /tmp/bench-data/results
+
+          # Commit and push
+          cd /tmp/bench-data
+          git add results/
+          git commit -m "Benchmark results for ${COMMIT_SHA}"
+          git push origin HEAD:benchmark-data
+
+      # On PR: fetch baseline, compare, and upload as artifact for the comment workflow
+      - name: Fetch baseline
+        if: github.event_name == 'pull_request'
+        id: fetch-baseline
+        run: |
+          if git ls-remote --exit-code --heads origin benchmark-data > /dev/null 2>&1; then
+            git fetch origin benchmark-data
+            git show origin/benchmark-data:results/latest.json > /tmp/benchmark-baseline.json 2>/dev/null && \
+              echo "has_baseline=true" >> "$GITHUB_OUTPUT" || \
+              echo "has_baseline=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_baseline=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Compare benchmarks
+        if: github.event_name == 'pull_request' && steps.fetch-baseline.outputs.has_baseline == 'true'
+        run: |
+          # Generate markdown comment
+          node packages/benchmark/dist/src/cli.js compare \
+            --baseline /tmp/benchmark-baseline.json \
+            --current /tmp/benchmark-results.json \
+            --format markdown \
+            --output /tmp/benchmark-comment.md
+
+          # Print console summary
+          node packages/benchmark/dist/src/cli.js compare \
+            --baseline /tmp/benchmark-baseline.json \
+            --current /tmp/benchmark-results.json
+
+      - name: Generate no-baseline comment
+        if: github.event_name == 'pull_request' && steps.fetch-baseline.outputs.has_baseline != 'true'
+        run: |
+          cat > /tmp/benchmark-comment.md << 'EOF'
+          ## ⚡ Benchmark Results
+
+          No baseline found on the `benchmark-data` branch. Benchmark results will be stored after merging to `main`.
+          EOF
+
+      - name: Save PR number
+        if: github.event_name == 'pull_request'
+        run: echo "${{ github.event.number }}" > /tmp/benchmark-pr-number.txt
+
+      - name: Upload benchmark comment
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v7
+        with:
+          name: benchmark-comment
+          path: |
+            /tmp/benchmark-comment.md
+            /tmp/benchmark-pr-number.txt
+          retention-days: 1

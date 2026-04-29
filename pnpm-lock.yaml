@@ -276,6 +276,9 @@ catalogs:
     change-case:
       specifier: ^5.4.4
       version: 5.4.4
+    chart.js:
+      specifier: ^4.5.1
+      version: 4.5.1
     chokidar:
       specifier: ^5.0.0
       version: 5.0.0
@@ -411,6 +414,9 @@ catalogs:
     react:
       specifier: ^19.2.5
       version: 19.2.5
+    react-chartjs-2:
+      specifier: ^5.3.1
+      version: 5.3.1
     react-dom:
       specifier: ^19.2.5
       version: 19.2.5
@@ -3060,6 +3066,52 @@ importers:
         specifier: 'catalog:'
         version: 6.0.2
 
+  packages/benchmark:
+    dependencies:
+      '@azure-tools/typespec-autorest':
+        specifier: workspace:^
+        version: link:../typespec-autorest
+      '@azure-tools/typespec-azure-core':
+        specifier: workspace:^
+        version: link:../typespec-azure-core
+      '@azure-tools/typespec-azure-resource-manager':
+        specifier: workspace:^
+        version: link:../typespec-azure-resource-manager
+      '@azure-tools/typespec-azure-rulesets':
+        specifier: workspace:^
+        version: link:../typespec-azure-rulesets
+      '@azure-tools/typespec-client-generator-core':
+        specifier: workspace:^
+        version: link:../typespec-client-generator-core
+      '@typespec/compiler':
+        specifier: workspace:^
+        version: link:../../core/packages/compiler
+      '@typespec/http':
+        specifier: workspace:^
+        version: link:../../core/packages/http
+      '@typespec/openapi':
+        specifier: workspace:^
+        version: link:../../core/packages/openapi
+      '@typespec/openapi3':
+        specifier: workspace:^
+        version: link:../../core/packages/openapi3
+      '@typespec/rest':
+        specifier: workspace:^
+        version: link:../../core/packages/rest
+      '@typespec/versioning':
+        specifier: workspace:^
+        version: link:../../core/packages/versioning
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 25.5.2
+      rimraf:
+        specifier: 'catalog:'
+        version: 6.1.3
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.2
+
   packages/e2e-tests:
     devDependencies:
       '@typespec/compiler':
@@ -3777,12 +3829,18 @@ importers:
       astro:
         specifier: 'catalog:'
         version: 6.1.8(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.5.2)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.3)
+      chart.js:
+        specifier: 'catalog:'
+        version: 4.5.1
       es-module-shims:
         specifier: 'catalog:'
         version: 2.8.0
       react:
         specifier: 'catalog:'
         version: 19.2.5
+      react-chartjs-2:
+        specifier: 'catalog:'
+        version: 5.3.1(chart.js@4.5.1)(react@19.2.5)
       react-dom:
         specifier: 'catalog:'
         version: 19.2.5(react@19.2.5)
@@ -5955,6 +6013,9 @@ packages:
     engines: {node: '>= 20'}
     peerDependencies:
       koa: ^2.0.0 || ^3.0.0
+
+  '@kurkle/color@0.3.4':
+    resolution: {integrity: sha512-M5UknZPHRu3DEDWoipU6sE8PdkZ6Z/S+v4dD+Ke8IaNlpdSQah50lz1KtcFBa2vsdOnwbbnxJwVM4wty6udA5w==}
 
   '@kwsites/file-exists@1.1.1':
     resolution: {integrity: sha512-m9/5YGR18lIwxSFDwfE3oA7bWuq9kdau6ugN4H2rJeyhFQZcG9AgSHkQtSD15a8WvTgfz9aikZMrKPHvbpqFiw==}
@@ -8812,6 +8873,10 @@ packages:
 
   chardet@2.1.1:
     resolution: {integrity: sha512-PsezH1rqdV9VvyNhxxOW32/d75r01NY7TQCmOqomRo15ZSOKbpTFVsfjghxo6JloQUCGnH4k1LGu0R4yCLlWQQ==}
+
+  chart.js@4.5.1:
+    resolution: {integrity: sha512-GIjfiT9dbmHRiYi6Nl2yFCq7kkwdkp1W/lp2J99rX0yo9tgJGn3lKQATztIjb5tVtevcBtIdICNWqlq5+E8/Pw==}
+    engines: {pnpm: '>=8'}
 
   check-error@2.1.3:
     resolution: {integrity: sha512-PAJdDJusoxnwm1VwW07VWwUN1sl7smmC3OKggvndJFadxxDRyFJBX/ggnu/KE4kQAB7a3Dp8f/YXC1FlUprWmA==}
@@ -12289,6 +12354,12 @@ packages:
   rc@1.2.8:
     resolution: {integrity: sha512-y3bGgqKj3QBdxLbLkomlohkvsA8gdAiUQlSBJnBhfn+BPxg4bc62d8TcBW15wavDfgexCgccckhcZvywyQYPOw==}
     hasBin: true
+
+  react-chartjs-2@5.3.1:
+    resolution: {integrity: sha512-h5IPXKg9EXpjoBzUfyWJvllMjG2mQ4EiuHQFhms/AjUm0XSZHhyRy2xVmLXHKrtcdrPO4mnGqRtYoD0vp95A0A==}
+    peerDependencies:
+      chart.js: ^4.1.1
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   react-devtools-core@4.28.5:
     resolution: {integrity: sha512-cq/o30z9W2Wb4rzBefjv5fBalHU0rJGZCHAkf/RHSBWSSYwh8PlQTqqOJmgIIbBtpj27T6FIPXeomIjZtCNVqA==}
@@ -17280,6 +17351,8 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@kurkle/color@0.3.4': {}
+
   '@kwsites/file-exists@1.1.1':
     dependencies:
       debug: 4.4.3
@@ -21294,6 +21367,10 @@ snapshots:
   character-reference-invalid@2.0.1: {}
 
   chardet@2.1.1: {}
+
+  chart.js@4.5.1:
+    dependencies:
+      '@kurkle/color': 0.3.4
 
   check-error@2.1.3: {}
 
@@ -25518,6 +25595,11 @@ snapshots:
       minimist: 1.2.8
       strip-json-comments: 2.0.1
     optional: true
+
+  react-chartjs-2@5.3.1(chart.js@4.5.1)(react@19.2.5):
+    dependencies:
+      chart.js: 4.5.1
+      react: 19.2.5
 
   react-devtools-core@4.28.5:
     dependencies:
