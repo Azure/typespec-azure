@@ -27,7 +27,7 @@ Creating a new version of an existing common type mostly involves editing what i
      Azure.ResourceManager.CommonTypes.Versions.v6
    );
    ```
-3. If it is a completely new version, add the version to [versions.tsp](https://github.com/AlitzelMendez/typespec-azure/blob/main/packages/typespec-azure-resource-manager/lib/common-types/versions.tsp))
+3. If it is a completely new version, add the version to [versions.tsp](https://github.com/Azure/typespec-azure/blob/main/packages/typespec-azure-resource-manager/lib/common-types/versions.tsp)
 4. Generate the Swagger updates by running:
    ```bash
    cd typespec-azure\packages\samples\common-types

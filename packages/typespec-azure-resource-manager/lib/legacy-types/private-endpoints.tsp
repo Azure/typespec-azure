@@ -172,7 +172,7 @@ op CustomPatchAsync<
  * @template OptionalRequestBody Optional. Indicates whether the request body is optional.
  */
 @autoRoute
-@doc("Update a {name PrivateEndpointConnection}", ParentResource)
+@doc("Update a {name} PrivateEndpointConnection", ParentResource)
 @armResourceUpdate(Resource)
 @Private.enforceConstraint(ParentResource, Foundations.Resource)
 @patch(#{ implicitOptionality: false })

@@ -1,9 +1,9 @@
 ---
-title: unsupported-types
+title: unsupported-type
 ---
 
 ```text title=- Full name-
-@azure-tools/typespec-azure-core/unsupported-types
+@azure-tools/typespec-azure-resource-manager/unsupported-type
 ```
 
 Check the ARM specification is not using types not supported in ARM.
