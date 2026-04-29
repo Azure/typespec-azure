@@ -20,7 +20,7 @@ beforeEach(async () => {
   );
 });
 
-it("is valid for chronologically increasing versions", async () => {
+it("is valid for chronologically increasing versions with unique dates", async () => {
   await tester
     .expect(
       `
@@ -30,7 +30,7 @@ it("is valid for chronologically increasing versions", async () => {
 
       enum Versions {
         v2024_01_01_preview: "2024-01-01-preview",
-        v2024_01_01: "2024-01-01",
+        v2024_03_01: "2024-03-01",
         v2024_06_01: "2024-06-01",
       }
       `,
@@ -65,25 +65,6 @@ it("is valid when the namespace is not versioned", async () => {
     .toBeValid();
 });
 
-it("is valid for ordered preview suffixes with version numbers on the same date", async () => {
-  await tester
-    .expect(
-      `
-      @versioned(Versions)
-      @armProviderNamespace
-      namespace Microsoft.Foo;
-
-      enum Versions {
-        v1: "2024-01-01-alpha.1",
-        v2: "2024-01-01-alpha.2",
-        v3: "2024-01-01-preview",
-        v4: "2024-01-01",
-      }
-      `,
-    )
-    .toBeValid();
-});
-
 it("emits diagnostic when versions are not in chronological order", async () => {
   await tester
     .expect(
@@ -101,7 +82,28 @@ it("emits diagnostic when versions are not in chronological order", async () => 
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/arm-version-progression",
       message:
-        "Version '2024-01-01' is declared after '2024-06-01' but is not chronologically later. ARM versions must be declared in strictly increasing chronological order.",
+        "Version '2024-01-01' is declared after '2024-06-01' but is not chronologically later. ARM versions must be declared in strictly increasing chronological order by date.",
+    });
+});
+
+it("emits diagnostic when a stable version shares a date with a preview version", async () => {
+  await tester
+    .expect(
+      `
+      @versioned(Versions)
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      enum Versions {
+        v2026_04_28_preview: "2026-04-28-preview",
+        v2026_04_28: "2026-04-28",
+      }
+      `,
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-version-progression",
+      message:
+        "Version '2026-04-28' has the same date as '2026-04-28-preview'. Every ARM api-version must use a unique date — preview and stable versions cannot share the same 'YYYY-MM-DD'.",
     });
 });
 
@@ -122,7 +124,28 @@ it("emits diagnostic when a preview version follows the stable version with the 
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/arm-version-progression",
       message:
-        "Preview version '2024-01-01-preview' must not appear after the stable version '2024-01-01' with the same date '2024-01-01'. Stable versions must come after their preview counterparts.",
+        "Version '2024-01-01-preview' has the same date as '2024-01-01'. Every ARM api-version must use a unique date — preview and stable versions cannot share the same 'YYYY-MM-DD'.",
+    });
+});
+
+it("emits diagnostic when two preview versions share a date", async () => {
+  await tester
+    .expect(
+      `
+      @versioned(Versions)
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      enum Versions {
+        v2024_01_01_alpha_1: "2024-01-01-alpha.1",
+        v2024_01_01_alpha_2: "2024-01-01-alpha.2",
+      }
+      `,
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-version-progression",
+      message:
+        "Version '2024-01-01-alpha.2' has the same date as '2024-01-01-alpha.1'. Every ARM api-version must use a unique date — preview and stable versions cannot share the same 'YYYY-MM-DD'.",
     });
 });
 
