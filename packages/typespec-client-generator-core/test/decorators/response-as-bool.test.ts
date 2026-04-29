@@ -18,15 +18,11 @@ it("head operation marked as void", async () => {
 
   const twoOFourResponse = operation.responses.find((x) => x.statusCodes === 204);
   ok(twoOFourResponse);
-  strictEqual(twoOFourResponse.type?.kind, "constant");
-  strictEqual(twoOFourResponse.type.value, true);
-  strictEqual(twoOFourResponse.type.valueType.kind, "boolean");
+  strictEqual(twoOFourResponse.type, undefined);
 
   const fourOFourResponse = operation.responses.find((x) => x.statusCodes === 404);
   ok(fourOFourResponse);
-  strictEqual(fourOFourResponse.type?.kind, "constant");
-  strictEqual(fourOFourResponse.type.value, false);
-  strictEqual(fourOFourResponse.type.valueType.kind, "boolean");
+  strictEqual(fourOFourResponse.type, undefined);
 
   strictEqual(operation.exceptions.length, 0);
 
@@ -54,15 +50,11 @@ it("head operation marked as void with error model", async () => {
 
   const twoOFourResponse = operation.responses.find((x) => x.statusCodes === 204);
   ok(twoOFourResponse);
-  strictEqual(twoOFourResponse.type?.kind, "constant");
-  strictEqual(twoOFourResponse.type.value, true);
-  strictEqual(twoOFourResponse.type.valueType.kind, "boolean");
+  strictEqual(twoOFourResponse.type, undefined);
 
   const fourOFourResponse = operation.responses.find((x) => x.statusCodes === 404);
   ok(fourOFourResponse);
-  strictEqual(fourOFourResponse.type?.kind, "constant");
-  strictEqual(fourOFourResponse.type.value, false);
-  strictEqual(fourOFourResponse.type.valueType.kind, "boolean");
+  strictEqual(fourOFourResponse.type, undefined);
 
   strictEqual(operation.exceptions.length, 1);
 
@@ -83,14 +75,10 @@ it("head operation with explicitly marked valid response", async () => {
   strictEqual(operation.responses.length, 2);
   const twoOFourResponse = operation.responses.find((x) => x.statusCodes === 200);
   ok(twoOFourResponse);
-  strictEqual(twoOFourResponse.type?.kind, "constant");
-  strictEqual(twoOFourResponse.type.value, true);
-  strictEqual(twoOFourResponse.type.valueType.kind, "boolean");
+  strictEqual(twoOFourResponse.type, undefined);
   const fourOFourResponse = operation.responses.find((x) => x.statusCodes === 404);
   ok(fourOFourResponse);
-  strictEqual(fourOFourResponse.type?.kind, "constant");
-  strictEqual(fourOFourResponse.type.value, false);
-  strictEqual(fourOFourResponse.type.valueType.kind, "boolean");
+  strictEqual(fourOFourResponse.type, undefined);
   strictEqual(method.response.type?.kind, "boolean");
 });
 
@@ -120,15 +108,11 @@ it("head operation with explicitly marked 404", async () => {
 
   const twoOFourResponse = operation.responses.find((x) => x.statusCodes === 204);
   ok(twoOFourResponse);
-  strictEqual(twoOFourResponse.type?.kind, "constant");
-  strictEqual(twoOFourResponse.type.value, true);
-  strictEqual(twoOFourResponse.type.valueType.kind, "boolean");
+  strictEqual(twoOFourResponse.type, undefined);
 
   const fourOFourResponse = operation.responses.find((x) => x.statusCodes === 404);
   ok(fourOFourResponse);
-  strictEqual(fourOFourResponse.type?.kind, "constant");
-  strictEqual(fourOFourResponse.type.value, false);
-  strictEqual(fourOFourResponse.type.valueType.kind, "boolean");
+  strictEqual(fourOFourResponse.type, undefined);
 });
 
 it("non-head operation", async () => {
