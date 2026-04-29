@@ -1,12 +1,24 @@
 import { getNamespaceFullName, Namespace } from "@typespec/compiler";
 import { resolveVersions } from "@typespec/versioning";
-import { listClients } from "../decorators.js";
 import { SdkClient, TCGCContext } from "../interfaces.js";
+import {
+  clientKey,
+  getScopedDecoratorData,
+  listAllUserDefinedNamespaces,
+} from "../internal-utils.js";
 import { reportDiagnostic } from "../lib.js";
 
 export function validateClients(context: TCGCContext) {
-  for (const client of listClients(context)) {
-    validateMultipleServiceDependencyVersions(context, client);
+  // Walk raw `@client` decorator state directly so we don't trigger
+  // listClients/getRootClients (which builds the client cache and reports
+  // unrelated structural diagnostics during $onValidate).
+  for (const ns of listAllUserDefinedNamespaces(context)) {
+    const nsClient: SdkClient | undefined = getScopedDecoratorData(context, clientKey, ns);
+    if (nsClient) validateMultipleServiceDependencyVersions(context, nsClient);
+    for (const i of ns.interfaces.values()) {
+      const iClient: SdkClient | undefined = getScopedDecoratorData(context, clientKey, i);
+      if (iClient) validateMultipleServiceDependencyVersions(context, iClient);
+    }
   }
 }
 
