@@ -1,9 +1,9 @@
 ---
-title: resource-name-pattern
+title: arm-resource-name-pattern
 ---
 
 ```text title=- Full name-
-@azure-tools/typespec-azure-resource-manager/resource-name-pattern
+@azure-tools/typespec-azure-resource-manager/arm-resource-name-pattern
 ```
 
 Resource names must specify a pattern string using `@pattern`, providing a regular expression that the name must match.

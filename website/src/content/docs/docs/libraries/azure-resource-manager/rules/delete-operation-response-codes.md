@@ -1,9 +1,9 @@
 ---
-title: delete-operation-response-codes
+title: arm-delete-operation-response-codes
 ---
 
 ```text title=- Full name-
-@azure-tools/typespec-azure-resource-manager/delete-operation-response-codes
+@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes
 ```
 
 ## Synchronous
