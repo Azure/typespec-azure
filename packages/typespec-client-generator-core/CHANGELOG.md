@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.67.4
+
+### Bug Fixes
+
+- [#4345](https://github.com/Azure/typespec-azure/pull/4345) Fix wrong encode for `bytes` in `HttpPart` for `multipart/form-data`. The encode is now correctly `bytes` instead of `base64`.
+
+
 ## 0.67.3
 
 ### Bug Fixes
