@@ -285,7 +285,7 @@ it("file upload with specific content type should have constant contentType", as
   ok(contentTypeMethodParam);
   strictEqual(contentTypeMethodParam.type.kind, "constant");
   strictEqual(contentTypeMethodParam.type.value, "image/png");
-  strictEqual(contentTypeMethodParam.type.name, "UploadFileSpecificContentTypeContentType");
+  strictEqual(contentTypeMethodParam.type.name, "FileContentType");
   // The Content-Type header should also be constant
   const httpOperation = method.operation;
   const contentTypeHeader = httpOperation.parameters.find(
@@ -294,7 +294,7 @@ it("file upload with specific content type should have constant contentType", as
   ok(contentTypeHeader);
   strictEqual(contentTypeHeader.type.kind, "constant");
   strictEqual(contentTypeHeader.type.value, "image/png");
-  strictEqual(contentTypeHeader.type.name, "UploadFileSpecificContentTypeContentType");
+  strictEqual(contentTypeHeader.type.name, "FileContentType");
   strictEqual(contentTypeHeader.serializedName, "Content-Type");
 });
 
@@ -339,7 +339,7 @@ it("file download with single content type should have constant accept header", 
   ok(acceptMethodParam);
   strictEqual(acceptMethodParam.type.kind, "constant");
   strictEqual(acceptMethodParam.type.value, "image/png");
-  strictEqual(acceptMethodParam.type.name, "DownloadFileSingleContentTypeContentType");
+  strictEqual(acceptMethodParam.type.name, "DownloadFileSingleContentTypeResponseContentType");
   // The Accept header should also be constant
   const httpOperation = method.operation;
   const acceptHeader = httpOperation.parameters.find(
@@ -348,7 +348,7 @@ it("file download with single content type should have constant accept header", 
   ok(acceptHeader);
   strictEqual(acceptHeader.type.kind, "constant");
   strictEqual(acceptHeader.type.value, "image/png");
-  strictEqual(acceptHeader.type.name, "DownloadFileSingleContentTypeContentType");
+  strictEqual(acceptHeader.type.name, "DownloadFileSingleContentTypeResponseContentType");
   strictEqual(acceptHeader.serializedName, "Accept");
 });
 
