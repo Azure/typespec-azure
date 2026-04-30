@@ -59,7 +59,6 @@ import {
 } from "./interfaces.js";
 import {
   compareModelProperties,
-  dedupGeneratedName,
   getActualClientType,
   getAvailableApiVersions,
   getClientDoc,
@@ -85,6 +84,7 @@ import {
 import {
   addEncodeInfo,
   getClientTypeWithDiagnostics,
+  getSdkConstant,
   getSdkModelPropertyTypeBase,
   getTypeSpecBuiltInType,
   isReadOnly,
@@ -445,7 +445,7 @@ function createContentTypeOrAcceptHeader(
       kind: "constant",
       value: bodyObject.contentTypes[0],
       valueType: type,
-      name: dedupGeneratedName(context, `${httpOperation.operation.name}ContentType`),
+      name: `${httpOperation.operation.name}ContentType`,
       isGeneratedName: true,
       decorators: [],
     };
@@ -456,19 +456,16 @@ function createContentTypeOrAcceptHeader(
     const structured = bodyObject.contentTypes.filter(isStructured);
     const others = bodyObject.contentTypes.filter((ct) => !isStructured(ct));
     const combined = [...structured, ...others].join(", ");
-    type = {
-      kind: "constant",
-      value: combined,
-      valueType: type,
-      name: dedupGeneratedName(context, `${httpOperation.operation.name}ContentType`),
-      isGeneratedName: true,
-      decorators: [],
-    };
+    // Create the literal via TypeSpec typekit and convert to the TCGC constant type so that
+    // the generated name is produced and stored via `getGeneratedName` (which dedups against
+    // `__generatedNames`).
+    const literal = $(context.program).literal.createString(combined);
+    type = getSdkConstant(context, literal, httpOperation.operation);
   } else if (bodyObject.contentTypes && bodyObject.contentTypes.length > 1) {
     const stringType: SdkBuiltInType = getTypeSpecBuiltInType(context, "string");
     const enumType: SdkEnumType = {
       kind: "enum",
-      name: dedupGeneratedName(context, `${httpOperation.operation.name}ContentType`),
+      name: `${httpOperation.operation.name}ContentType`,
       isGeneratedName: true,
       namespace: "",
       valueType: stringType,
