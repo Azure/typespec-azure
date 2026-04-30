@@ -59,6 +59,7 @@ import {
 } from "./interfaces.js";
 import {
   compareModelProperties,
+  dedupGeneratedName,
   getActualClientType,
   getAvailableApiVersions,
   getClientDoc,
@@ -444,7 +445,7 @@ function createContentTypeOrAcceptHeader(
       kind: "constant",
       value: bodyObject.contentTypes[0],
       valueType: type,
-      name: `${httpOperation.operation.name}ContentType`,
+      name: dedupGeneratedName(context, `${httpOperation.operation.name}ContentType`),
       isGeneratedName: true,
       decorators: [],
     };
@@ -459,7 +460,7 @@ function createContentTypeOrAcceptHeader(
       kind: "constant",
       value: combined,
       valueType: type,
-      name: `${httpOperation.operation.name}ContentType`,
+      name: dedupGeneratedName(context, `${httpOperation.operation.name}ContentType`),
       isGeneratedName: true,
       decorators: [],
     };
@@ -467,7 +468,7 @@ function createContentTypeOrAcceptHeader(
     const stringType: SdkBuiltInType = getTypeSpecBuiltInType(context, "string");
     const enumType: SdkEnumType = {
       kind: "enum",
-      name: `${httpOperation.operation.name}ContentType`,
+      name: dedupGeneratedName(context, `${httpOperation.operation.name}ContentType`),
       isGeneratedName: true,
       namespace: "",
       valueType: stringType,

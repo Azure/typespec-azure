@@ -1028,13 +1028,24 @@ export function resolveDuplicateGenearatedName(
   type: Union | Model | TspLiteralType,
   createName: string,
 ): string {
+  createName = dedupGeneratedName(context, createName);
+  context.__generatedNames.set(type, createName);
+  return createName;
+}
+
+/**
+ * Dedup a generated name against names already present in `context.__generatedNames`
+ * without registering an entry. Use this when the generated name is not associated
+ * with a single TypeSpec `Model | Union | TspLiteralType` (e.g. synthetic content
+ * type / accept parameter names).
+ */
+export function dedupGeneratedName(context: TCGCContext, createName: string): string {
   let duplicateCount = 1;
   const rawCreateName = createName;
   const generatedNames = [...context.__generatedNames.values()];
   while (generatedNames.includes(createName)) {
     createName = `${rawCreateName}${duplicateCount++}`;
   }
-  context.__generatedNames.set(type, createName);
   return createName;
 }
 
