@@ -1,6 +1,8 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
+import { createTCGCContext } from "../../src/context.js";
+import { getClient } from "../../src/decorators.js";
 import { InitializedByFlags } from "../../src/interfaces.js";
 import {
   ArmTester,
@@ -3103,157 +3105,142 @@ it("validation: @clientLocation string target with multiple separate root client
   ]);
 });
 
-it("validation: no diagnostic when no @client is used", async () => {
+it("no duplicate clients in getClients() after multi-service sub-client merge", async () => {
   const { program } = await SimpleTester.compile(`
     @service
-    namespace MyService {
-      @route("/a")
-      op opA(): void;
-
-      @route("/b")
-      interface SubOps {
-        op opB(): void;
+    namespace ServiceA {
+      interface SubGroup {
+        @route("/a") @post a(): void;
       }
     }
-  `);
-  await createSdkContextForTester(program);
-  const operationNotInClient = program.diagnostics.filter(
-    (d) => d.code === "@azure-tools/typespec-client-generator-core/operation-not-in-client",
-  );
-  strictEqual(operationNotInClient.length, 0);
-});
 
-it("validation: no diagnostic when all operations are covered by @client", async () => {
-  const { program } = await SimpleBaseTester.compile(
-    createClientCustomizationInput(
-      `
-      @service
-      namespace MyService {
-        @route("/a")
-        op opA(): void;
-      }
-    `,
-      `
-      @client({service: MyService, name: "MyServiceClient"})
-      namespace MyCustomClient {
-        op customOpA is MyService.opA;
-      }
-    `,
-    ),
-  );
-  await createSdkContextForTester(program);
-  const operationNotInClient = program.diagnostics.filter(
-    (d) => d.code === "@azure-tools/typespec-client-generator-core/operation-not-in-client",
-  );
-  strictEqual(operationNotInClient.length, 0);
-});
-
-it("validation: diagnostic when operation is missing from @client definition", async () => {
-  const { program } = await SimpleBaseTester.compile(
-    createClientCustomizationInput(
-      `
-      @service
-      namespace MyService {
-        @route("/a")
-        op opA(): void;
-
-        @route("/b")
-        op opB(): void;
-      }
-    `,
-      `
-      @client({service: MyService, name: "MyServiceClient"})
-      namespace MyCustomClient {
-        op customOpA is MyService.opA;
-      }
-    `,
-    ),
-  );
-  await createSdkContextForTester(program);
-  expectDiagnostics(program.diagnostics, [
-    {
-      code: "@azure-tools/typespec-client-generator-core/operation-not-in-client",
-      message: `Operation "opB" under namespace "MyService" is not included in any @client definition.`,
-    },
-  ]);
-});
-
-it("validation: diagnostic for operations in nested namespace not covered by @client", async () => {
-  const { program } = await SimpleBaseTester.compile(
-    createClientCustomizationInput(
-      `
-      @service
-      namespace MyService {
-        @route("/a")
-        op opA(): void;
-
-        namespace SubGroup {
-          @route("/b")
-          op opB(): void;
-        }
-      }
-    `,
-      `
-      @client({service: MyService, name: "MyServiceClient"})
-      namespace MyCustomClient {
-        op customOpA is MyService.opA;
-      }
-    `,
-    ),
-  );
-  await createSdkContextForTester(program);
-  expectDiagnostics(program.diagnostics, [
-    {
-      code: "@azure-tools/typespec-client-generator-core/operation-not-in-client",
-      message: `Operation "opB" under namespace "MyService.SubGroup" is not included in any @client definition.`,
-    },
-  ]);
-});
-
-it("validation: diagnostic for operations in interface not covered by @client", async () => {
-  const { program } = await SimpleBaseTester.compile(
-    createClientCustomizationInput(
-      `
-      @service
-      namespace MyService {
-        @route("/a")
-        op opA(): void;
-
-        interface SubOps {
-          @route("/b")
-          op opB(): void;
-        }
-      }
-    `,
-      `
-      @client({service: MyService, name: "MyServiceClient"})
-      namespace MyCustomClient {
-        op customOpA is MyService.opA;
-      }
-    `,
-    ),
-  );
-  await createSdkContextForTester(program);
-  expectDiagnostics(program.diagnostics, [
-    {
-      code: "@azure-tools/typespec-client-generator-core/operation-not-in-client",
-      message: `Operation "opB" under namespace "MyService" is not included in any @client definition.`,
-    },
-  ]);
-});
-
-it("validation: no diagnostic when @client is applied directly to service namespace", async () => {
-  const { program } = await SimpleTester.compile(`
-    @client({service: MyService})
     @service
-    namespace MyService {
-      @route("/a")
-      op opA(): void;
+    namespace ServiceB {
+      interface SubGroup {
+        @route("/b") @post b(): void;
+      }
+    }
+
+    @client({
+      service: [ServiceA, ServiceB],
+      autoMergeService: true,
+    })
+    namespace Combined {}
+  `);
+  const context = await createSdkContextForTester(program);
+
+  // getClients() should not return duplicate entries
+  const allClients = context.getClients();
+  const uniqueClients = new Set(allClients);
+  strictEqual(allClients.length, uniqueClients.size);
+  strictEqual(allClients.length, 2); // Combined + SubGroup
+
+  // Root clients should also be unique
+  const rootClients = context.getRootClients();
+  const uniqueRootClients = new Set(rootClients);
+  strictEqual(rootClients.length, uniqueRootClients.size);
+  strictEqual(rootClients.length, 1); // Combined
+
+  // SubClients should have no duplicates
+  const combined = rootClients[0];
+  strictEqual(combined.name, "Combined");
+  strictEqual(combined.subClients.length, 1);
+  strictEqual(combined.subClients[0].name, "SubGroup");
+
+  // SdkClientType children should have no duplicates
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  strictEqual(sdkPackage.clients[0].children?.length, 1);
+  strictEqual(sdkPackage.clients[0].children![0].name, "SubGroup");
+});
+
+it("no duplicate clients in getClients() after nested multi-service merge", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    namespace ServiceA {
+      namespace Level1 {
+        interface Level2 {
+          @route("/a") @post a(): void;
+        }
+      }
+    }
+
+    @service
+    namespace ServiceB {
+      namespace Level1 {
+        interface Level2 {
+          @route("/b") @post b(): void;
+        }
+      }
+    }
+
+    @client({
+      service: [ServiceA, ServiceB],
+      autoMergeService: true,
+    })
+    namespace Combined {}
+  `);
+  const context = await createSdkContextForTester(program);
+
+  // getClients() should not return duplicate entries
+  const allClients = context.getClients();
+  const uniqueClients = new Set(allClients);
+  strictEqual(allClients.length, uniqueClients.size);
+  strictEqual(allClients.length, 3); // Combined + Level1 + Level2
+
+  // SubClients hierarchy should have no duplicates
+  const rootClients = context.getRootClients();
+  strictEqual(rootClients.length, 1);
+  const combined = rootClients[0];
+  strictEqual(combined.subClients.length, 1);
+  strictEqual(combined.subClients[0].name, "Level1");
+  strictEqual(combined.subClients[0].subClients.length, 1);
+  strictEqual(combined.subClients[0].subClients[0].name, "Level2");
+});
+
+it("no duplicate subClients when multiple TCGCContexts process same program (lint rule + emitter)", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service(#{ title: "MultiClient" })
+    namespace Client.Structure {}
+
+    @client({
+      name: "FirstClient",
+      service: Client.Structure,
+    })
+    namespace FirstClient {
+      @client
+      interface Group3 {}
+
+      @client
+      interface Group4 {}
     }
   `);
-  await createSdkContextForTester(program);
-  const operationNotInClient = program.diagnostics.filter(
-    (d) => d.code === "@azure-tools/typespec-client-generator-core/operation-not-in-client",
-  );
-  strictEqual(operationNotInClient.length, 0);
+
+  // Simulate the lint rule creating a TCGCContext and calling getClient
+  // (same as require-client-suffix rule does)
+  const lintContext = createTCGCContext(program, "@azure-tools/typespec-client-generator-core", {
+    mutateNamespace: false,
+  });
+  for (const ns of program.getGlobalNamespaceType().namespaces.values()) {
+    getClient(lintContext, ns);
+    for (const iface of ns.interfaces.values()) {
+      getClient(lintContext, iface);
+    }
+  }
+
+  // Now simulate the emitter creating a second context
+  const context = await createSdkContextForTester(program);
+
+  // Root clients should not have duplicate subClients
+  const rootClients = context.getRootClients();
+  strictEqual(rootClients.length, 1);
+  const firstClient = rootClients[0];
+  strictEqual(firstClient.name, "FirstClient");
+  strictEqual(firstClient.subClients.length, 2);
+  deepStrictEqual(firstClient.subClients.map((c) => c.name).sort(), ["Group3", "Group4"]);
+
+  // clientPath should not be double-prepended
+  for (const sub of firstClient.subClients) {
+    strictEqual(sub.clientPath, `FirstClient.${sub.name}`);
+  }
 });

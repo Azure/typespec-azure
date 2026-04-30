@@ -126,13 +126,13 @@ export function createTCGCContext(
       if (!this.__rawClientsCache) {
         prepareClientAndOperationCache(this);
       }
-      return Array.from(this.__rawClientsCache!.values());
+      return [...new Set(this.__rawClientsCache!.values())];
     },
     getRootClients(): SdkClient[] {
       if (!this.__rawClientsCache) {
         prepareClientAndOperationCache(this);
       }
-      return Array.from(this.__rawClientsCache!.values()).filter((item) => !item.parent);
+      return [...new Set(this.__rawClientsCache!.values())].filter((item) => !item.parent);
     },
     getClient(type: Namespace | Interface): SdkClient | undefined {
       if (!this.__rawClientsCache) {
