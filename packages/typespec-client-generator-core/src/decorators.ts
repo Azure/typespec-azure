@@ -265,7 +265,7 @@ function validateMultipleServiceDependencyVersions(
   // For each shared dependency namespace, collect the set of versions picked
   // across all merged services.
   const depVersions = new Map<Namespace, Set<string>>();
-  const serviceSet = new Set<Namespace>(services);
+  const serviceSet: ReadonlySet<Namespace> = new Set<Namespace>(services);
 
   for (const service of services) {
     const resolutions = resolveVersions(program, service);
