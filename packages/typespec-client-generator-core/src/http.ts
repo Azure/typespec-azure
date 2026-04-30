@@ -74,7 +74,7 @@ import {
   isSubscriptionId,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
-import { isMediaTypeJson, isMediaTypeXml } from "./media-types.js";
+import { isMediaTypeJson, isMediaTypeTextPlain, isMediaTypeXml } from "./media-types.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -428,13 +428,40 @@ function createContentTypeOrAcceptHeader(
   const name = bodyObject.kind === "body" ? "contentType" : "accept";
   let type: SdkType = getTypeSpecBuiltInType(context, "string");
   // Honor the content types from the HTTP library result.
-  // For a single content type, create a constant. For multiple content types, create an enum.
+  // For a single content type, create a constant.
+  // For multiple content types on a request body (`contentType`), create an enum since the
+  // caller actually picks one value to send.
+  // For multiple content types on a response (`accept`), create a single constant whose value
+  // is a comma-joined list of all response content types, with structured content types
+  // (JSON/XML/text-plain) listed first. This matches the behavior of the .NET emitter and
+  // avoids treating the synthetic `accept` parameter as a content-negotiation parameter.
+  // Services that genuinely need content negotiation should use `@sharedRoute` to split the
+  // operation per content type.
   // For File type bodies, the content type is constrained by the File type itself;
   // treat it the same as a user-defined content type/accept parameter.
   if (bodyObject.contentTypes && bodyObject.contentTypes.length === 1) {
     type = {
       kind: "constant",
       value: bodyObject.contentTypes[0],
+      valueType: type,
+      name: `${httpOperation.operation.name}ContentType`,
+      isGeneratedName: true,
+      decorators: [],
+    };
+  } else if (
+    bodyObject.contentTypes &&
+    bodyObject.contentTypes.length > 1 &&
+    name === "accept"
+  ) {
+    // Stable partition: structured content types first, others after, preserving original order.
+    const isStructured = (ct: string) =>
+      isMediaTypeJson(ct) || isMediaTypeXml(ct) || isMediaTypeTextPlain(ct);
+    const structured = bodyObject.contentTypes.filter(isStructured);
+    const others = bodyObject.contentTypes.filter((ct) => !isStructured(ct));
+    const combined = [...structured, ...others].join(", ");
+    type = {
+      kind: "constant",
+      value: combined,
       valueType: type,
       name: `${httpOperation.operation.name}ContentType`,
       isGeneratedName: true,

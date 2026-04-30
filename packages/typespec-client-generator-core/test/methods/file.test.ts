@@ -348,7 +348,7 @@ it("file download with single content type should have constant accept header", 
   strictEqual(acceptHeader.serializedName, "Accept");
 });
 
-it("file download with multiple content types should have enum accept header", async () => {
+it("file download with multiple content types should have combined accept header string", async () => {
   const { program } = await SimpleTester.compile(
     `
       @service
@@ -361,21 +361,43 @@ it("file download with multiple content types should have enum accept header", a
   const sdkPackage = context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0];
   strictEqual(method.name, "downloadFileMultipleContentTypes");
-  // The accept method parameter should be an enum, not string
+  // The accept method parameter should be a constant whose value is a comma-joined
+  // string of all response content types (matches the .NET emitter behavior).
   const acceptMethodParam = method.parameters.find((p) => p.name === "accept");
   ok(acceptMethodParam);
-  strictEqual(acceptMethodParam.type.kind, "enum");
-  strictEqual(acceptMethodParam.type.values.length, 2);
-  ok(acceptMethodParam.type.values.find((v) => v.value === "image/png"));
-  ok(acceptMethodParam.type.values.find((v) => v.value === "image/jpeg"));
-  // The Accept header should also be an enum
+  strictEqual(acceptMethodParam.type.kind, "constant");
+  strictEqual(acceptMethodParam.type.value, "image/png, image/jpeg");
+  // The Accept header should also be a constant
   const httpOperation = method.operation;
   const acceptHeader = httpOperation.parameters.find(
     (p) => p.kind === "header" && p.name === "accept",
   );
   ok(acceptHeader);
-  strictEqual(acceptHeader.type.kind, "enum");
+  strictEqual(acceptHeader.type.kind, "constant");
   strictEqual(acceptHeader.serializedName, "Accept");
+});
+
+it("response with multiple content types should put structured types first in accept header", async () => {
+  const { program } = await SimpleTester.compile(
+    `
+      @service
+      namespace TestService {
+        op download():
+          | { @header contentType: "image/png", @body data: bytes }
+          | { @header contentType: "application/json", @body data: { value: string } };
+      }
+    `,
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  const method = sdkPackage.clients[0].methods[0];
+  // Even though "image/png" appears first in the response declaration, structured
+  // content types (application/json, application/xml, text/plain) are sorted before
+  // unstructured ones in the synthetic accept header value.
+  const acceptMethodParam = method.parameters.find((p) => p.name === "accept");
+  ok(acceptMethodParam);
+  strictEqual(acceptMethodParam.type.kind, "constant");
+  strictEqual(acceptMethodParam.type.value, "application/json, image/png");
 });
 
 it("file upload with multiple content types should have enum contentType header", async () => {
