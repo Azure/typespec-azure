@@ -448,11 +448,7 @@ function createContentTypeOrAcceptHeader(
       isGeneratedName: true,
       decorators: [],
     };
-  } else if (
-    bodyObject.contentTypes &&
-    bodyObject.contentTypes.length > 1 &&
-    name === "accept"
-  ) {
+  } else if (bodyObject.contentTypes && bodyObject.contentTypes.length > 1 && name === "accept") {
     // Stable partition: structured content types first, others after, preserving original order.
     const isStructured = (ct: string) =>
       isMediaTypeJson(ct) || isMediaTypeXml(ct) || isMediaTypeTextPlain(ct);
