@@ -225,7 +225,12 @@ export const $client: ClientDecorator = (
     // For clients merging multiple services, ensure all services agree on the
     // version of any shared library dependency (e.g. ARM common-types).
     // Diverging versions cause TCGC to emit duplicated/diverged models.
-    validateMultipleServiceDependencyVersions(context.program, name, services, context.decoratorTarget);
+    validateMultipleServiceDependencyVersions(
+      context.program,
+      name,
+      services,
+      context.decoratorTarget,
+    );
   } else {
     // No explicit service - store empty array. Cache.ts will either:
     // - inherit from parent client (if nested)
