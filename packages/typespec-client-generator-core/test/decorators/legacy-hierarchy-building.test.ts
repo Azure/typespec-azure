@@ -1061,3 +1061,52 @@ it("rebases an ARM-style resource onto a tracked resource base", async () => {
   );
   strictEqual(conflicts.length, 0);
 });
+
+it("nested @hierarchyBuilding on the new base chain follows the original parent links", async () => {
+  // C is itself rebased onto E (a sibling of D). When A is rebased onto C,
+  // the reconciliation should walk C's *original* parent chain (C → D) to
+  // determine which names the new base chain supplies, not C's overridden
+  // chain (C → E). The end result: A extends C (the literal new base), and
+  // any name supplied by C or D is treated as inherited.
+  const { program } = await SimpleTesterWithService.compile(`
+      model E {
+        e?: string;
+      }
+      model D {
+        d?: string;
+      }
+      model C extends D {
+        c?: string;
+      }
+      model B extends C {
+        b?: string;
+      }
+
+      @@Legacy.hierarchyBuilding(C, E);
+      @@Legacy.hierarchyBuilding(A, C);
+
+      model A extends B {
+        a?: string;
+        b?: string;
+        c?: string;
+        d?: string;
+      }
+
+      @route("/test")
+      op test(): A;
+    `);
+
+  const context = await createSdkContextForTester(program);
+  const aModel = context.sdkPackage.models.find((m) => m.name === "A");
+  ok(aModel);
+  strictEqual(aModel.baseModel?.name, "C");
+  // C and D supply c and d, so they are dropped from A. b is lifted from the
+  // removed intermediate B. a is A's own.
+  const aProps = aModel.properties.map((p) => p.name).sort();
+  strictEqual(aProps.join(","), "a,b");
+  const conflicts = context.diagnostics.filter(
+    (d) =>
+      d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
+  );
+  strictEqual(conflicts.length, 0);
+});

@@ -1509,25 +1509,11 @@ Common real-world applications:
   different base — typically rebasing onto a richer Azure resource base
   such as `TrackedResource` instead of plain `Resource`.
 
-### Reconciliation rule
-
-After the rebase is applied, TCGC reconciles the target model's
-properties so the SDK shape stays consistent:
-
-1. Gather all properties currently observed on the target — its own
-   properties **plus** properties contributed by every removed
-   intermediate ancestor (the parents that the rebase walked past).
-2. Drop any of those whose name is supplied anywhere in the new base
-   chain (the new parent **and** all of its ancestors), since the new
-   base will provide them via inheritance.
-3. Whatever remains becomes the rebased model's own properties.
-
-When step 2 drops a property whose type is not assignable to (and not
-assignable from) the same-named property on the new base chain — i.e.
-the two types are unrelated, like `int32` vs `string` — TCGC reports a
-`legacy-hierarchy-building-conflict` warning so the spec author can
-align the types. Compatible refinements (a string literal vs `string`,
-a sub-scalar like `azureLocation` vs `string`, etc.) stay silent.
+After the rebase, properties supplied by the new base chain are
+inherited; same-named properties on the target (or on intermediate
+ancestors that the rebase walked past) are deduplicated when their
+types are compatible, and a `legacy-hierarchy-building-conflict`
+warning is emitted when the types are unrelated.
 
 This decorator is considered legacy functionality and may be deprecated in
 future releases.
@@ -1578,9 +1564,7 @@ model SportsCar extends Vehicle {
 
 ```
 
-###### Replace the base class. Properties contributed by the removed
-
-intermediate parent (`b`) are kept on the rebased model.
+###### Replace the base class
 
 ```typespec
 model C {
@@ -1594,12 +1578,11 @@ model B extends C {
 model A extends B {
   a?: string;
 }
-// After: A extends C, A's own properties are { a, b }, C still supplies c.
+// After: A extends C. A's own properties are { a, b } (b is lifted from
+// the removed intermediate parent B). C still supplies c.
 ```
 
-###### Rebase a model whose own properties (via spread) overlap with
-
-the new base. Overlapping same-typed properties are deduplicated silently.
+###### Deduplicate spread properties that overlap with the new base
 
 ```typespec
 model B {
@@ -1612,13 +1595,11 @@ model A {
 }
 
 @@Legacy.hierarchyBuilding(A, B);
-// After: A extends B, A's own property is just { propA }.
+// After: A extends B. Overlapping same-typed properties are dropped
+// silently, so A's own property is just { propA }.
 ```
 
-###### Brownfield ARM resource — rebase a resource onto
-
-`TrackedResource` so the generated SDK matches the previously-shipped
-tracked-resource shape (`location`, `tags`, etc.).
+###### Brownfield ARM resource rebased onto TrackedResource
 
 ```typespec
 model Resource {
@@ -1642,14 +1623,11 @@ model Foo extends Resource {
   location?: string;
   tags?: Record<string>;
 }
-// SDK shape: Foo extends TrackedResource.
-// Foo's own properties: { properties }; location and tags are inherited from TrackedResource.
+// After: Foo extends TrackedResource. Foo's own properties are
+// { properties }; location and tags are inherited from TrackedResource.
 ```
 
-###### Brownfield ARM envelope — drop an `ArmTagsProperty` envelope
-
-spread by rebasing onto a base that supplies the same properties
-directly.
+###### Brownfield ARM envelope dropping an ArmTagsProperty spread
 
 ```typespec
 model ArmTagsProperty {
@@ -1670,7 +1648,8 @@ model FooResourceWithHierarchy {
   ...ArmTagsProperty;
   location?: string;
 }
-// SDK shape: FooResourceWithHierarchy extends TrackedResource with no own properties.
+// After: FooResourceWithHierarchy extends TrackedResource with no own
+// properties — every field is supplied by the new base chain.
 ```
 
 #### `@markAsLro`
