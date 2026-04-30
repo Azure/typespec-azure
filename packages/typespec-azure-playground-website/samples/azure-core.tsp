@@ -9,15 +9,7 @@ using Versioning;
 using Azure.Core;
 using Azure.Core.Traits;
 
-@useAuth(
-  ApiKeyAuth<ApiKeyLocation.header, "api-key"> | OAuth2Auth<[
-    {
-      type: OAuth2FlowType.implicit,
-      authorizationUrl: "https://login.contoso.com/common/oauth2/v2.0/authorize",
-      scopes: ["https://widget.contoso.com/.default"],
-    }
-  ]>
-)
+@useAuth(ContosoApiKey | ContosoEntraId)
 @service(#{ title: "Contoso Widget Manager" })
 @server(
   "{endpoint}/widget",
@@ -32,6 +24,21 @@ https://westus.api.widget.contoso.com).
 )
 @versioned(Contoso.WidgetManager.Versions)
 namespace Contoso.WidgetManager;
+
+// Security ////////////////////
+
+/** An API key is a token that a client provides when making API calls. */
+model ContosoApiKey is ApiKeyAuth<ApiKeyLocation.header, "api-key">;
+
+/** Contoso Entra ID OAuth2 authentication */
+model ContosoEntraId
+  is OAuth2Auth<[
+    {
+      type: OAuth2FlowType.implicit;
+      authorizationUrl: "https://login.contoso.com/common/oauth2/v2.0/authorize";
+      scopes: ["https://widget.contoso.com/.default"];
+    }
+  ]>;
 
 /** The Contoso Widget Manager service version. */
 enum Versions {
