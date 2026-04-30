@@ -78,13 +78,13 @@ import { isMediaTypeJson, isMediaTypeTextPlain, isMediaTypeXml } from "./media-t
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
+  getGeneratedName,
   getWireName,
   isApiVersion,
 } from "./public-utils.js";
 import {
   addEncodeInfo,
   getClientTypeWithDiagnostics,
-  getSdkConstant,
   getSdkModelPropertyTypeBase,
   getTypeSpecBuiltInType,
   isReadOnly,
@@ -440,55 +440,81 @@ function createContentTypeOrAcceptHeader(
   // operation per content type.
   // For File type bodies, the content type is constrained by the File type itself;
   // treat it the same as a user-defined content type/accept parameter.
-  if (bodyObject.contentTypes && bodyObject.contentTypes.length === 1) {
-    type = {
-      kind: "constant",
-      value: bodyObject.contentTypes[0],
-      valueType: type,
-      name: `${httpOperation.operation.name}ContentType`,
-      isGeneratedName: true,
-      decorators: [],
-    };
-  } else if (bodyObject.contentTypes && bodyObject.contentTypes.length > 1 && name === "accept") {
-    // Stable partition: structured content types first, others after, preserving original order.
-    const isStructured = (ct: string) =>
-      isMediaTypeJson(ct) || isMediaTypeXml(ct) || isMediaTypeTextPlain(ct);
-    const structured = bodyObject.contentTypes.filter(isStructured);
-    const others = bodyObject.contentTypes.filter((ct) => !isStructured(ct));
-    const combined = [...structured, ...others].join(", ");
-    // Create the literal via TypeSpec typekit and convert to the TCGC constant type so that
-    // the generated name is produced and stored via `getGeneratedName` (which dedups against
+  if (bodyObject.contentTypes && bodyObject.contentTypes.length > 0) {
+    // Push naming context so the generated content type / accept type name reflects the
+    // operation it belongs to and flows through `getGeneratedName` (which dedups against
     // `__generatedNames`).
-    const literal = $(context.program).literal.createString(combined);
-    type = getSdkConstant(context, literal, httpOperation.operation);
-  } else if (bodyObject.contentTypes && bodyObject.contentTypes.length > 1) {
-    const stringType: SdkBuiltInType = getTypeSpecBuiltInType(context, "string");
-    const enumType: SdkEnumType = {
-      kind: "enum",
-      name: `${httpOperation.operation.name}ContentType`,
-      isGeneratedName: true,
-      namespace: "",
-      valueType: stringType,
-      values: [],
-      isFixed: true,
-      isFlags: false,
-      usage: UsageFlags.None,
-      access: "public",
-      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
-      apiVersions: bodyObject.apiVersions,
-      isUnionAsEnum: false,
-      decorators: [],
-    };
-    enumType.values = bodyObject.contentTypes.map((ct) => ({
-      kind: "enumvalue" as const,
-      name: ct,
-      value: ct,
-      enumType,
-      valueType: stringType,
-      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}.${ct}`,
-      decorators: [],
-    }));
-    type = enumType;
+    context.__namingContextPath.push({
+      name: httpOperation.operation.name,
+      type: httpOperation.operation,
+    });
+    context.__namingContextPath.push({ name: "ContentType", type: undefined });
+    try {
+      // Create a TypeSpec union from the content type literals to use as a unique cache
+      // key for the generated name. Unions created via the typekit are not interned, so
+      // each invocation gets a fresh key — preventing collisions with literal names that
+      // may already be cached during type usage analysis.
+      const tk = $(context.program);
+      const union = tk.union.create(
+        bodyObject.contentTypes.map((ct) => tk.literal.createString(ct)),
+      );
+      const generatedName = getGeneratedName(context, union, httpOperation.operation);
+      if (bodyObject.contentTypes.length === 1) {
+        type = {
+          kind: "constant",
+          value: bodyObject.contentTypes[0],
+          valueType: type,
+          name: generatedName,
+          isGeneratedName: true,
+          decorators: [],
+        };
+      } else if (name === "accept") {
+        // Stable partition: structured content types first, others after, preserving original order.
+        const isStructured = (ct: string) =>
+          isMediaTypeJson(ct) || isMediaTypeXml(ct) || isMediaTypeTextPlain(ct);
+        const structured = bodyObject.contentTypes.filter(isStructured);
+        const others = bodyObject.contentTypes.filter((ct) => !isStructured(ct));
+        type = {
+          kind: "constant",
+          value: [...structured, ...others].join(", "),
+          valueType: type,
+          name: generatedName,
+          isGeneratedName: true,
+          decorators: [],
+        };
+      } else {
+        const stringType: SdkBuiltInType = getTypeSpecBuiltInType(context, "string");
+        const enumType: SdkEnumType = {
+          kind: "enum",
+          name: generatedName,
+          isGeneratedName: true,
+          namespace: "",
+          valueType: stringType,
+          values: [],
+          isFixed: true,
+          isFlags: false,
+          usage: UsageFlags.None,
+          access: "public",
+          crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
+          apiVersions: bodyObject.apiVersions,
+          isUnionAsEnum: false,
+          decorators: [],
+        };
+        enumType.values = bodyObject.contentTypes.map((ct) => ({
+          kind: "enumvalue" as const,
+          name: ct,
+          value: ct,
+          enumType,
+          valueType: stringType,
+          crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}.${ct}`,
+          decorators: [],
+        }));
+        type = enumType;
+      }
+    } finally {
+      context.__namingContextPath.pop();
+      context.__namingContextPath.pop();
+    }
   }
   const optional = bodyObject.kind === "body" ? bodyObject.optional : false;
   // No need for clientDefaultValue because it's a constant, it only has one value
