@@ -285,7 +285,7 @@ it("file upload with specific content type should have constant contentType", as
   ok(contentTypeMethodParam);
   strictEqual(contentTypeMethodParam.type.kind, "constant");
   strictEqual(contentTypeMethodParam.type.value, "image/png");
-  strictEqual(contentTypeMethodParam.type.name, "FileContentType");
+  strictEqual(contentTypeMethodParam.type.name, "UploadFileSpecificContentTypeContentType");
   // The Content-Type header should also be constant
   const httpOperation = method.operation;
   const contentTypeHeader = httpOperation.parameters.find(
@@ -294,7 +294,7 @@ it("file upload with specific content type should have constant contentType", as
   ok(contentTypeHeader);
   strictEqual(contentTypeHeader.type.kind, "constant");
   strictEqual(contentTypeHeader.type.value, "image/png");
-  strictEqual(contentTypeHeader.type.name, "FileContentType");
+  strictEqual(contentTypeHeader.type.name, "UploadFileSpecificContentTypeContentType");
   strictEqual(contentTypeHeader.serializedName, "Content-Type");
 });
 
@@ -339,7 +339,7 @@ it("file download with single content type should have constant accept header", 
   ok(acceptMethodParam);
   strictEqual(acceptMethodParam.type.kind, "constant");
   strictEqual(acceptMethodParam.type.value, "image/png");
-  strictEqual(acceptMethodParam.type.name, "DownloadFileSingleContentTypeResponseContentType");
+  strictEqual(acceptMethodParam.type.name, "DownloadFileSingleContentTypeAccept");
   // The Accept header should also be constant
   const httpOperation = method.operation;
   const acceptHeader = httpOperation.parameters.find(
@@ -348,7 +348,7 @@ it("file download with single content type should have constant accept header", 
   ok(acceptHeader);
   strictEqual(acceptHeader.type.kind, "constant");
   strictEqual(acceptHeader.type.value, "image/png");
-  strictEqual(acceptHeader.type.name, "DownloadFileSingleContentTypeResponseContentType");
+  strictEqual(acceptHeader.type.name, "DownloadFileSingleContentTypeAccept");
   strictEqual(acceptHeader.serializedName, "Accept");
 });
 
@@ -371,7 +371,7 @@ it("file download with multiple content types should have combined accept header
   ok(acceptMethodParam);
   strictEqual(acceptMethodParam.type.kind, "constant");
   strictEqual(acceptMethodParam.type.value, "image/png, image/jpeg");
-  strictEqual(acceptMethodParam.type.name, "DownloadFileMultipleContentTypesContentType");
+  strictEqual(acceptMethodParam.type.name, "DownloadFileMultipleContentTypesAccept");
   // The Accept header should also be a constant
   const httpOperation = method.operation;
   const acceptHeader = httpOperation.parameters.find(
@@ -379,7 +379,7 @@ it("file download with multiple content types should have combined accept header
   );
   ok(acceptHeader);
   strictEqual(acceptHeader.type.kind, "constant");
-  strictEqual(acceptHeader.type.name, "DownloadFileMultipleContentTypesContentType");
+  strictEqual(acceptHeader.type.name, "DownloadFileMultipleContentTypesAccept");
   strictEqual(acceptHeader.serializedName, "Accept");
 });
 
@@ -404,7 +404,7 @@ it("response with multiple content types should put structured types first in ac
   ok(acceptMethodParam);
   strictEqual(acceptMethodParam.type.kind, "constant");
   strictEqual(acceptMethodParam.type.value, "application/json, image/png");
-  strictEqual(acceptMethodParam.type.name, "DownloadContentType");
+  strictEqual(acceptMethodParam.type.name, "DownloadAccept");
 });
 
 it("file upload with multiple content types should have enum contentType header", async () => {
@@ -488,7 +488,7 @@ it("file download with default content type should have constant accept header",
   ok(acceptMethodParam);
   strictEqual(acceptMethodParam.type.kind, "constant");
   strictEqual(acceptMethodParam.type.value, "*/*");
-  strictEqual(acceptMethodParam.type.name, "DownloadFileDefaultContentType");
+  strictEqual(acceptMethodParam.type.name, "DownloadFileDefaultAccept");
   // The Accept header should also be constant
   const httpOperation = method.operation;
   const acceptHeader = httpOperation.parameters.find(
@@ -498,5 +498,5 @@ it("file download with default content type should have constant accept header",
   strictEqual(acceptHeader.type.kind, "constant");
   strictEqual(acceptHeader.serializedName, "Accept");
   strictEqual(acceptHeader.type.value, "*/*");
-  strictEqual(acceptHeader.type.name, "DownloadFileDefaultContentType");
+  strictEqual(acceptHeader.type.name, "DownloadFileDefaultAccept");
 });

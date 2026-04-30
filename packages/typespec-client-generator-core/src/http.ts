@@ -75,6 +75,7 @@ import { isMediaTypeJson, isMediaTypeTextPlain, isMediaTypeXml } from "./media-t
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
+  getGeneratedName,
   getWireName,
   isApiVersion,
 } from "./public-utils.js";
@@ -82,7 +83,6 @@ import {
   addEncodeInfo,
   getClientType,
   getClientTypeWithDiagnostics,
-  getSdkConstant,
   getSdkModelPropertyTypeBase,
   getTypeSpecBuiltInType,
   isReadOnly,
@@ -443,12 +443,30 @@ function createContentTypeOrAcceptHeader(
       name: httpOperation.operation.name,
       type: httpOperation.operation,
     });
-    context.__namingContextPath.push({ name: "ContentType", type: undefined });
+    context.__namingContextPath.push({
+      name: name === "accept" ? "Accept" : "ContentType",
+      type: undefined,
+    });
     try {
+      // Resolve a deterministic generated name via `getGeneratedName`. A fresh typekit
+      // `Union` over the content type literals is used as the dedup cache key — TypeSpec
+      // literals are interned and may already have names cached during type-usage analysis
+      // (e.g. the literal `"image/png"` inside `File<"image/png">`), but unions created via
+      // the typekit are not interned, so each call gets a fresh, collision-free key.
+      const cacheKey = tk.union.create(
+        bodyObject.contentTypes.map((ct) => tk.literal.createString(ct)),
+      );
+      const generatedName = getGeneratedName(context, cacheKey, httpOperation.operation);
       if (bodyObject.contentTypes.length === 1) {
         // Single content type → constant.
-        const literal = tk.literal.createString(bodyObject.contentTypes[0]);
-        type = getSdkConstant(context, literal, httpOperation.operation);
+        type = {
+          kind: "constant",
+          value: bodyObject.contentTypes[0],
+          valueType: type,
+          name: generatedName,
+          isGeneratedName: true,
+          decorators: [],
+        };
       } else if (name === "accept") {
         // Multi accept → single constant whose value is a comma-joined string. Stable
         // partition: structured content types first, others after, preserving order.
@@ -456,15 +474,17 @@ function createContentTypeOrAcceptHeader(
           isMediaTypeJson(ct) || isMediaTypeXml(ct) || isMediaTypeTextPlain(ct);
         const structured = bodyObject.contentTypes.filter(isStructured);
         const others = bodyObject.contentTypes.filter((ct) => !isStructured(ct));
-        const combined = [...structured, ...others].join(", ");
-        const literal = tk.literal.createString(combined);
-        type = getSdkConstant(context, literal, httpOperation.operation);
+        type = {
+          kind: "constant",
+          value: [...structured, ...others].join(", "),
+          valueType: type,
+          name: generatedName,
+          isGeneratedName: true,
+          decorators: [],
+        };
       } else {
         // Multi content types on request → enum.
-        const union = tk.union.create(
-          bodyObject.contentTypes.map((ct) => tk.literal.createString(ct)),
-        );
-        type = getClientType(context, union, httpOperation.operation);
+        type = getClientType(context, cacheKey, httpOperation.operation);
       }
     } finally {
       context.__namingContextPath.pop();
