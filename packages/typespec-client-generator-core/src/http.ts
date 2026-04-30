@@ -75,7 +75,6 @@ import { isMediaTypeJson, isMediaTypeTextPlain, isMediaTypeXml } from "./media-t
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
-  getGeneratedName,
   getWireName,
   isApiVersion,
 } from "./public-utils.js";
@@ -447,19 +446,9 @@ function createContentTypeOrAcceptHeader(
     context.__namingContextPath.push({ name: "ContentType", type: undefined });
     try {
       if (bodyObject.contentTypes.length === 1) {
-        // Single content type → constant. Use a fresh typekit `Union` wrapping the literal
-        // as the cache key for `getGeneratedName` because TypeSpec literals are interned
-        // and may already have a name cached from another usage context.
+        // Single content type → constant.
         const literal = tk.literal.createString(bodyObject.contentTypes[0]);
-        const union = tk.union.create([literal]);
-        type = {
-          kind: "constant",
-          value: bodyObject.contentTypes[0],
-          valueType: type,
-          name: getGeneratedName(context, union, httpOperation.operation),
-          isGeneratedName: true,
-          decorators: [],
-        };
+        type = getSdkConstant(context, literal, httpOperation.operation);
       } else if (name === "accept") {
         // Multi accept → single constant whose value is a comma-joined string. Stable
         // partition: structured content types first, others after, preserving order.
@@ -468,13 +457,10 @@ function createContentTypeOrAcceptHeader(
         const structured = bodyObject.contentTypes.filter(isStructured);
         const others = bodyObject.contentTypes.filter((ct) => !isStructured(ct));
         const combined = [...structured, ...others].join(", ");
-        // The combined string is unique to this operation (not authored by users), so we
-        // can let `getSdkConstant` cache the generated name on the literal directly.
         const literal = tk.literal.createString(combined);
         type = getSdkConstant(context, literal, httpOperation.operation);
       } else {
-        // Multi content types on request → enum. Build a synthetic typekit `Union` of
-        // string literals and let TCGC's union-as-enum conversion produce the SdkEnumType.
+        // Multi content types on request → enum.
         const union = tk.union.create(
           bodyObject.contentTypes.map((ct) => tk.literal.createString(ct)),
         );
