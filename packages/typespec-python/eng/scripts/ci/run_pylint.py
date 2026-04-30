@@ -51,7 +51,7 @@ def _single_dir_pylint(mod):
                 "--output-format=parseable",
                 "--recursive=y",
                 "--ignore=build",
-                "--py-version=3.9",
+                "--py-version=3.10",
                 str(inner_class.absolute()),
             ]
         )
