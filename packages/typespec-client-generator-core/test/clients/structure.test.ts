@@ -2099,6 +2099,105 @@ it("error: inconsistent-multiple-service-servers auth", async () => {
   ]);
 });
 
+it("warning: inconsistent-multiple-service-dependency", async () => {
+  const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
+        @versioned(LibVersions)
+        namespace SharedLib {
+          enum LibVersions {
+            v1: "v1",
+            v2: "v2",
+          }
+        }
+
+        @service
+        @versioned(VersionsA)
+        namespace ServiceA {
+          enum VersionsA {
+            @useDependency(SharedLib.LibVersions.v1)
+            av1,
+          }
+          op a(): void;
+        }
+        @service
+        @versioned(VersionsB)
+        namespace ServiceB {
+          enum VersionsB {
+            @useDependency(SharedLib.LibVersions.v2)
+            bv1,
+          }
+          op b(): void;
+        }`,
+      `
+        @client(
+          {
+            name: "CombineClient",
+            service: [ServiceA, ServiceB],
+            autoMergeService: true,
+          }
+        )
+        namespace CombineClient {}
+      `,
+    ),
+  );
+  await createSdkContextForTester(program);
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service-dependency",
+      severity: "warning",
+      message:
+        'Services merged into client "CombineClient" depend on different versions of "SharedLib": "v1", "v2".',
+    },
+  ]);
+});
+
+it("no warning when multiple services share the same dependency version", async () => {
+  const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
+        @versioned(LibVersions)
+        namespace SharedLib {
+          enum LibVersions {
+            v1: "v1",
+            v2: "v2",
+          }
+        }
+
+        @service
+        @versioned(VersionsA)
+        namespace ServiceA {
+          enum VersionsA {
+            @useDependency(SharedLib.LibVersions.v2)
+            av1,
+          }
+          op a(): void;
+        }
+        @service
+        @versioned(VersionsB)
+        namespace ServiceB {
+          enum VersionsB {
+            @useDependency(SharedLib.LibVersions.v2)
+            bv1,
+          }
+          op b(): void;
+        }`,
+      `
+        @client(
+          {
+            name: "CombineClient",
+            service: [ServiceA, ServiceB],
+            autoMergeService: true,
+          }
+        )
+        namespace CombineClient {}
+      `,
+    ),
+  );
+  await createSdkContextForTester(program);
+  expectDiagnostics(diagnostics, []);
+});
+
 it("multiple clients from single service", async () => {
   const { program } = await SimpleBaseTester.compile(
     createClientCustomizationInput(

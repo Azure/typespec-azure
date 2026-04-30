@@ -480,6 +480,12 @@ export const $lib = createTypeSpecLibrary({
         default: "All services must have the same server and auth definitions.",
       },
     },
+    "inconsistent-multiple-service-dependency": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Services merged into client "${"clientName"}" depend on different versions of "${"dependencyName"}": ${"versions"}.`,
+      },
+    },
     "client-option": {
       severity: "warning",
       messages: {
