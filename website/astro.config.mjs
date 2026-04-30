@@ -20,22 +20,22 @@ export default defineConfig({
   redirects: {
     "/docs/": "/docs/intro/",
     // Redirects for versioning docs reorganization
-    "/docs/howtos/versioning/arm/02-preview-after-preview/":
-      "/docs/howtos/versioning/02-preview-after-preview/",
-    "/docs/howtos/versioning/arm/03-stable-after-preview/":
-      "/docs/howtos/versioning/03-stable-after-preview/",
-    "/docs/howtos/versioning/arm/04-preview-after-stable/":
-      "/docs/howtos/versioning/04-preview-after-stable/",
-    "/docs/howtos/versioning/arm/05-stable-after-stable/":
-      "/docs/howtos/versioning/05-stable-after-stable/",
-    "/docs/howtos/versioning/arm/01-about-versioning/":
-      "/docs/howtos/versioning/01-about-versioning/",
-    "/docs/howtos/versioning/01-preview-version/": "/docs/howtos/versioning/01-about-versioning/",
-    "/docs/howtos/arm/versioning/": "/docs/howtos/versioning/06-evolving-apis/",
-    "/docs/howtos/versioning/arm/uncommon-scenarios/01-converting-specs/":
-      "/docs/howtos/versioning/uncommon-scenarios/01-converting-specs/",
-    "/docs/howtos/versioning/arm/uncommon-scenarios/02-perpetual-preview/":
-      "/docs/howtos/versioning/uncommon-scenarios/02-perpetual-preview/",
+    "docs/howtos/versioning/arm/02-preview-after-preview/":
+      "docs/howtos/versioning/02-preview-after-preview/",
+    "docs/howtos/versioning/arm/03-stable-after-preview/":
+      "docs/howtos/versioning/03-stable-after-preview/",
+    "docs/howtos/versioning/arm/04-preview-after-stable/":
+      "docs/howtos/versioning/04-preview-after-stable/",
+    "docs/howtos/versioning/arm/05-stable-after-stable/":
+      "docs/howtos/versioning/05-stable-after-stable/",
+    "docs/howtos/versioning/arm/01-about-versioning/":
+      "docs/howtos/versioning/01-about-versioning/",
+    "docs/howtos/versioning/01-preview-version/": "docs/howtos/versioning/01-about-versioning/",
+    "docs/howtos/arm/versioning/": "docs/howtos/versioning/06-evolving-apis/",
+    "docs/howtos/versioning/arm/uncommon-scenarios/01-converting-specs/":
+      "docs/howtos/versioning/uncommon-scenarios/01-converting-specs/",
+    "docs/howtos/versioning/arm/uncommon-scenarios/02-perpetual-preview/":
+      "docs/howtos/versioning/uncommon-scenarios/02-perpetual-preview/",
   },
   integrations: [
     astroExpressiveCode(),
