@@ -2075,6 +2075,13 @@ function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Di
       }
     }
 
+    if (legacyHierarchyBuilding) {
+      // Reconcile properties on the rebased model: drop duplicates that the
+      // new base chain already supplies, and lift in properties contributed
+      // by removed intermediate parents.
+      diagnostics.pipe(reconcilePropertiesAfterRebase(context, sdkType, legacyHierarchyBuilding));
+    }
+
     // must be done after discriminator is added
     // Populate discriminated subtypes for legacy hierarchy building
     if (legacyHierarchyBuilding && sdkType.discriminatorValue) {
@@ -2097,6 +2104,166 @@ function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Di
     }
   }
   return diagnostics.wrap(undefined);
+}
+
+/**
+ * Reconcile properties on a rebased model after `@hierarchyBuilding(oldBase, newBase)`.
+ *
+ * Rule:
+ *   1. Compute `oldBaseEffective` = properties already on `oldBase` (its own
+ *      `properties` Map) plus properties contributed by every removed
+ *      intermediate ancestor. When the same name appears more than once,
+ *      the nearest contributor wins (own > nearest intermediate > farther).
+ *   2. Compute `newBaseSupplied` = every property name supplied anywhere in
+ *      the new base chain (newBase + its ancestors).
+ *   3. For each name in `oldBaseEffective` that also appears in
+ *      `newBaseSupplied`: drop it. If the types are assignable in either
+ *      direction, drop silently; otherwise emit
+ *      `legacy-hierarchy-building-conflict` (`property-type-mismatch`).
+ *   4. Whatever remains becomes the rebased model's own SDK properties.
+ *      Properties already materialized on the SDK model are preserved
+ *      as-is; properties contributed only by removed intermediates are
+ *      materialized via `getSdkModelPropertyType`.
+ */
+function reconcilePropertiesAfterRebase(
+  context: TCGCContext,
+  sdkType: SdkModelType,
+  newBase: Model,
+): [void, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const oldBase = sdkType.__raw as Model;
+
+  const oldBaseChain = walkBaseChain(oldBase);
+  const newBaseChain = walkBaseChain(newBase);
+  const newBaseIndex = oldBaseChain.indexOf(newBase);
+  const removed = newBaseIndex >= 0 ? oldBaseChain.slice(1, newBaseIndex) : oldBaseChain.slice(1);
+
+  // Names supplied anywhere in the new base chain → first ModelProperty seen.
+  // Apply the same SDK-shape filters as `addPropertiesToModelType` so the
+  // "supplied by the new base chain" view matches what the SDK actually sees.
+  const newBaseSupplied = new Map<string, ModelProperty>();
+  for (const m of newBaseChain) {
+    for (const [name, prop] of m.properties) {
+      if (newBaseSupplied.has(name)) continue;
+      if (!isVisibleSdkProperty(context, prop)) continue;
+      newBaseSupplied.set(name, prop);
+    }
+  }
+
+  // Effective properties on the rebased model before reconciliation: oldBase's
+  // own first (they win), then nearest-removed-ancestor first.
+  const oldBaseEffective = new Map<string, ModelProperty>();
+  for (const [name, prop] of oldBase.properties) {
+    oldBaseEffective.set(name, prop);
+  }
+  for (const intermediate of removed) {
+    for (const [name, prop] of intermediate.properties) {
+      if (!oldBaseEffective.has(name)) oldBaseEffective.set(name, prop);
+    }
+  }
+
+  // Identify the discriminator property name (if any) on the rebased model —
+  // it must be preserved across the rebase even when the new base supplies a
+  // wider-typed property with the same name.
+  const discriminatorPropName = sdkType.properties.find((p) => p.discriminator)?.__raw?.name;
+
+  const keptProps: SdkModelPropertyType[] = [];
+  const sdkPropByRawName = new Map<string, SdkModelPropertyType>();
+  for (const prop of sdkType.properties) {
+    if (prop.__raw?.name) sdkPropByRawName.set(prop.__raw.name, prop);
+  }
+
+  for (const [name, rawProp] of oldBaseEffective) {
+    if (!isVisibleSdkProperty(context, rawProp)) {
+      continue;
+    }
+
+    const fromOwn = oldBase.properties.has(name);
+    const isDiscriminator = name === discriminatorPropName;
+    const newBaseProp = newBaseSupplied.get(name);
+
+    if (newBaseProp && !isDiscriminator) {
+      if (areTypesIncompatible(context, rawProp.type, newBaseProp.type)) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "legacy-hierarchy-building-conflict",
+            messageId: "property-type-mismatch",
+            format: {
+              propertyName: name,
+              childModel: oldBase.name,
+              parentModel: newBase.name,
+            },
+            target: oldBase,
+          }),
+        );
+      }
+      // Drop either way: the new base chain owns this name.
+      continue;
+    }
+
+    if (fromOwn) {
+      const existing = sdkPropByRawName.get(name);
+      if (existing) keptProps.push(existing);
+      continue;
+    }
+
+    // Lift from a removed intermediate. Mirror the contextType logic used in
+    // `addPropertiesToModelType`: for named unions, pass `undefined` so any
+    // anonymous variants get named relative to the property rather than
+    // relative to the union.
+    const propType = rawProp.type;
+    const contextType =
+      propType.kind === "Union" && propType.name ? undefined : (propType as ContextNode["type"]);
+    pushNamingContext(context, name, contextType);
+    const lifted = diagnostics.pipe(getSdkModelPropertyType(context, rawProp));
+    popNamingContext(context);
+    keptProps.push(lifted);
+  }
+
+  sdkType.properties = keptProps;
+  return diagnostics.wrap(undefined);
+}
+
+/**
+ * Apply the same predicates as `addPropertiesToModelType` so our view of the
+ * SDK-observable property set stays aligned with the actual SDK shape.
+ */
+function isVisibleSdkProperty(context: TCGCContext, property: ModelProperty): boolean {
+  return (
+    !isStatusCode(context.program, property) &&
+    !isNeverOrVoidType(property.type) &&
+    !hasNoneVisibility(context, property) &&
+    isInScope(context, property)
+  );
+}
+
+/**
+ * Check if two property types are incompatible during `@hierarchyBuilding`
+ * reconciliation. They are considered compatible (no diagnostic) when either
+ * is assignable to the other under TypeSpec's type system.
+ */
+function areTypesIncompatible(context: TCGCContext, targetType: Type, newBaseType: Type): boolean {
+  if (targetType === newBaseType) return false;
+  const typekit = $(context.program).type;
+  if (typekit.isAssignableTo(targetType, newBaseType, targetType)) return false;
+  if (typekit.isAssignableTo(newBaseType, targetType, newBaseType)) return false;
+  return true;
+}
+
+/**
+ * Walk a model's raw inheritance chain, returning [model, model.baseModel, ...]
+ * along the original (pre-rebase) parent links.
+ */
+function walkBaseChain(model: Model): Model[] {
+  const chain: Model[] = [];
+  const seen = new Set<Model>();
+  let current: Model | undefined = model;
+  while (current && !seen.has(current)) {
+    seen.add(current);
+    chain.push(current);
+    current = current.baseModel;
+  }
+  return chain;
 }
 
 interface UsageFilteringOptions {

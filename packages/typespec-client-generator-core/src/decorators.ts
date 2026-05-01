@@ -3,6 +3,7 @@ import {
   compilerAssert,
   DecoratorContext,
   DecoratorFunction,
+  DiagnosticTarget,
   Enum,
   EnumMember,
   getDiscriminator,
@@ -32,6 +33,7 @@ import {
   isBody,
   isBodyRoot,
 } from "@typespec/http";
+import { resolveVersions } from "@typespec/versioning";
 import {
   AccessDecorator,
   AlternateTypeDecorator,
@@ -220,6 +222,15 @@ export const $client: ClientDecorator = (
       });
       return;
     }
+    // For clients merging multiple services, ensure all services agree on the
+    // version of any shared library dependency (e.g. ARM common-types).
+    // Diverging versions cause TCGC to emit duplicated/diverged models.
+    validateMultipleServiceDependencyVersions(
+      context.program,
+      name,
+      services,
+      context.decoratorTarget,
+    );
   } else {
     // No explicit service - store empty array. Cache.ts will either:
     // - inherit from parent client (if nested)
@@ -239,6 +250,50 @@ export const $client: ClientDecorator = (
   };
   setScopedDecoratorData(context, $client, clientKey, target, client, scope);
 };
+
+/**
+ * Validate that all services merged into the same client agree on the version
+ * of every shared library dependency. Diverging versions silently produce
+ * duplicated/diverged models in the generated SDK.
+ */
+function validateMultipleServiceDependencyVersions(
+  program: Program,
+  clientName: string,
+  services: Namespace[],
+  target: DiagnosticTarget,
+): void {
+  // For each shared dependency namespace, collect the set of versions picked
+  // across all merged services.
+  const depVersions = new Map<Namespace, Set<string>>();
+  const serviceSet: ReadonlySet<Namespace> = new Set<Namespace>(services);
+
+  for (const service of services) {
+    const resolutions = resolveVersions(program, service);
+    if (resolutions.length === 0) continue;
+    // Use the latest resolved version of this service (matches what TCGC picks).
+    for (const [depNs, depVersion] of resolutions[resolutions.length - 1].versions) {
+      // Ignore versions of the merged services themselves.
+      if (serviceSet.has(depNs)) continue;
+      const versions = depVersions.get(depNs) ?? new Set<string>();
+      versions.add(depVersion.value ?? depVersion.name);
+      depVersions.set(depNs, versions);
+    }
+  }
+
+  // Report any dependency that resolved to more than one version.
+  for (const [depNs, versions] of depVersions) {
+    if (versions.size <= 1) continue;
+    reportDiagnostic(program, {
+      code: "inconsistent-multiple-service-dependency",
+      format: {
+        clientName,
+        dependencyName: getNamespaceFullName(depNs),
+        versions: [...versions].map((v) => `"${v}"`).join(", "),
+      },
+      target,
+    });
+  }
+}
 
 /**
  * Return the client object for the given namespace or interface, or undefined if the given namespace or interface is not a client.
@@ -1428,79 +1483,12 @@ export function getClientLocation(
   return getScopedDecoratorData(context, clientLocationKey, input);
 }
 
-interface PropertyConflict {
-  propertyName: string;
-  reason: "missing" | "type-mismatch";
-}
-
-function isPropertySuperset(program: Program, target: Model, value: Model): PropertyConflict[] {
-  const conflicts: PropertyConflict[] = [];
-
-  // Check if all properties in value exist in target
-  for (const name of value.properties.keys()) {
-    if (!target.properties.has(name)) {
-      conflicts.push({
-        propertyName: name,
-        reason: "missing",
-      });
-      continue;
-    }
-    const targetProperty = target.properties.get(name)!;
-    const valueProperty = value.properties.get(name)!;
-    // Compare properties to handle envelope/spread semantics correctly
-    // Properties match if they come from the same source OR if they have the same type
-    // This ensures properties from envelopes (e.g., ...ArmTagsProperty) are recognized
-    // as equivalent to directly defined properties with the same name and type
-    if (targetProperty.sourceProperty !== valueProperty.sourceProperty) {
-      // Different sources - check if they have the same type
-      if (targetProperty.type !== valueProperty.type) {
-        conflicts.push({
-          propertyName: name,
-          reason: "type-mismatch",
-        });
-      }
-    }
-  }
-  return conflicts;
-}
-
 export const $legacyHierarchyBuilding: HierarchyBuildingDecorator = (
   context: DecoratorContext,
   target: Model,
   value: Model,
   scope?: LanguageScopes,
 ) => {
-  // Validate that target has all properties from value
-  const conflicts = isPropertySuperset(context.program, target, value);
-  if (conflicts.length > 0) {
-    for (const conflict of conflicts) {
-      if (conflict.reason === "missing") {
-        reportDiagnostic(context.program, {
-          code: "legacy-hierarchy-building-conflict",
-          messageId: "property-missing",
-          format: {
-            childModel: target.name,
-            parentModel: value.name,
-            propertyName: conflict.propertyName,
-          },
-          target: context.decoratorTarget,
-        });
-      } else if (conflict.reason === "type-mismatch") {
-        reportDiagnostic(context.program, {
-          code: "legacy-hierarchy-building-conflict",
-          messageId: "type-mismatch",
-          format: {
-            childModel: target.name,
-            parentModel: value.name,
-            propertyName: conflict.propertyName,
-          },
-          target: context.decoratorTarget,
-        });
-      }
-    }
-    return;
-  }
-
   setScopedDecoratorData(
     context,
     $legacyHierarchyBuilding,
