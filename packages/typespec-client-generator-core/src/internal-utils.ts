@@ -1276,7 +1276,10 @@ export function isSameAuth(left: Authentication, right: Authentication): boolean
             }
             switch (leftFlow.type) {
               case "authorizationCode":
-                compilerAssert(rightFlow.type === "authorizationCode", "Unexpected auth scheme type mismatch");
+                compilerAssert(
+                  rightFlow.type === "authorizationCode",
+                  "Unexpected auth scheme type mismatch",
+                );
                 if (
                   leftFlow.authorizationUrl !== rightFlow.authorizationUrl ||
                   leftFlow.tokenUrl !== rightFlow.tokenUrl ||
@@ -1286,7 +1289,10 @@ export function isSameAuth(left: Authentication, right: Authentication): boolean
                 }
                 break;
               case "clientCredentials":
-                compilerAssert(rightFlow.type === "clientCredentials", "Unexpected auth scheme type mismatch");
+                compilerAssert(
+                  rightFlow.type === "clientCredentials",
+                  "Unexpected auth scheme type mismatch",
+                );
                 if (
                   leftFlow.tokenUrl !== rightFlow.tokenUrl ||
                   leftFlow.refreshUrl !== rightFlow.refreshUrl
@@ -1295,7 +1301,10 @@ export function isSameAuth(left: Authentication, right: Authentication): boolean
                 }
                 break;
               case "implicit":
-                compilerAssert(rightFlow.type === "implicit", "Unexpected auth scheme type mismatch");
+                compilerAssert(
+                  rightFlow.type === "implicit",
+                  "Unexpected auth scheme type mismatch",
+                );
                 if (
                   leftFlow.authorizationUrl !== rightFlow.authorizationUrl ||
                   leftFlow.refreshUrl !== rightFlow.refreshUrl
@@ -1304,7 +1313,10 @@ export function isSameAuth(left: Authentication, right: Authentication): boolean
                 }
                 break;
               case "password":
-                compilerAssert(rightFlow.type === "password", "Unexpected auth scheme type mismatch");
+                compilerAssert(
+                  rightFlow.type === "password",
+                  "Unexpected auth scheme type mismatch",
+                );
                 if (
                   leftFlow.authorizationUrl !== rightFlow.authorizationUrl ||
                   leftFlow.refreshUrl !== rightFlow.refreshUrl
@@ -1316,7 +1328,10 @@ export function isSameAuth(left: Authentication, right: Authentication): boolean
           }
           break;
         case "openIdConnect":
-          compilerAssert(rightScheme.type === "openIdConnect", "Unexpected auth scheme type mismatch");
+          compilerAssert(
+            rightScheme.type === "openIdConnect",
+            "Unexpected auth scheme type mismatch",
+          );
           if (leftScheme.openIdConnectUrl !== rightScheme.openIdConnectUrl) {
             return false;
           }
