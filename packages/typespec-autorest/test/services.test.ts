@@ -1,6 +1,6 @@
-import { deepStrictEqual, ok } from "assert";
+import { deepStrictEqual } from "assert";
 import { it } from "vitest";
-import { AzureTester, compileMultipleOpenAPI } from "./test-host.js";
+import { compileMultipleOpenAPI, compileOpenAPI } from "./test-host.js";
 
 it("supports emitting multiple services", async () => {
   const { Service, Client } = await compileMultipleOpenAPI(
@@ -55,18 +55,33 @@ it("does not crash when no @service is defined and a model references a versione
   // Regression test for a null reference crash in the autorest emitter when
   // there is no @service declared but the spec references a model from a
   // versioned namespace (e.g. CommonTypes.AzureEntityResource).
-  const tester = await AzureTester.createInstance();
-  const [{ outputs }] = await tester.compileAndDiagnose(
+  const openApi = await compileOpenAPI(
     `
+      @armProviderNamespace
+      namespace Microsoft.Contoso;
+
       /** Move response */
       model MoveResponse extends Azure.ResourceManager.CommonTypes.AzureEntityResource {
         /** Status */
         movingStatus: string;
       }
       `,
+    { preset: "azure" },
   );
-  const content = outputs["openapi.json"];
-  ok(content, "Expected to have found openapi output");
-  const doc = JSON.parse(content);
-  deepStrictEqual(typeof doc, "object");
+  deepStrictEqual(openApi.definitions?.MoveResponse, {
+    type: "object",
+    description: "Move response",
+    properties: {
+      movingStatus: {
+        type: "string",
+        description: "Status",
+      },
+    },
+    required: ["movingStatus"],
+    allOf: [
+      {
+        $ref: "../../common-types/resource-management/v3/types.json#/definitions/AzureEntityResource",
+      },
+    ],
+  });
 });
