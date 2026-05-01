@@ -63,12 +63,11 @@ namespace Client.Structure.ClientOperationGroup {
     name: "SecondClient",
     service: Client.Structure.Service,
   },
-  "javascript,go,python,rust"
+  "!csharp,!java"
 )
 namespace Client.Structure.AnotherClientOperationGroup {
   op five is Client.Structure.Service.Bar.five;
 
-  #suppress "@azure-tools/typespec-client-generator-core/client-service" "issue https://github.com/Azure/typespec-azure/issues/1326"
   @client
   interface Group5 {
     six is Client.Structure.Service.Bar.six;
