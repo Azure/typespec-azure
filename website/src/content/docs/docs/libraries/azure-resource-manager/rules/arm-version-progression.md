@@ -23,8 +23,8 @@ A preview and a stable version share the same date:
 namespace Microsoft.Contoso;
 
 enum Versions {
-  v2026_04_28_preview: "2026-04-28-preview",
   v2026_04_28: "2026-04-28",
+  v2026_04_28_preview: "2026-04-28-preview",
 }
 ```
 
@@ -49,8 +49,22 @@ enum Versions {
 namespace Microsoft.Contoso;
 
 enum Versions {
-  v2024_01_01_preview: "2024-01-01-preview",
+  v2024_01_01: "2024-01-01",
+  v2024_03_01: "2024-03-01",
+  v2024_06_01_preview: "2024-06-01-preview",
+}
+```
+
+A stable version followed by a preview that is chronologically later (one day after) is also valid — previews must come chronologically after the most recent stable version:
+
+```tsp
+@versioned(Versions)
+@armProviderNamespace
+namespace Microsoft.Contoso;
+
+enum Versions {
   v2024_03_01: "2024-03-01",
   v2024_06_01: "2024-06-01",
+  v2024_06_02_preview: "2024-06-02-preview",
 }
 ```
