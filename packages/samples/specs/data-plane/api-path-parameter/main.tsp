@@ -81,6 +81,7 @@ interface Widgets {
   // Widget Operations
   @doc("Creates or updates a Widget asynchronously")
   @pollingOperation(Widgets.getWidgetOperationStatus)
+  #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
   createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
 
   @doc("Get a Widget")
