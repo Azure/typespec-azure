@@ -5,6 +5,7 @@ import {
   Enum,
   getRelativePathFromDirectory,
   Interface,
+  isPathAbsolute,
   Model,
   ModelProperty,
   Namespace,
@@ -16,7 +17,6 @@ import {
   Union,
 } from "@typespec/compiler";
 import { HttpOperation } from "@typespec/http";
-import { isAbsolute } from "path";
 import { stringify } from "yaml";
 import { prepareClientAndOperationCache } from "./cache.js";
 import { defaultDecoratorsAllowList } from "./configs.js";
@@ -203,7 +203,7 @@ export async function createSdkContext<
 
   if (context.options["examples-dir"]) {
     const normalizeExamplesDir = normalizePath(context.options["examples-dir"]);
-    if (isAbsolute(normalizeExamplesDir)) {
+    if (isPathAbsolute(normalizeExamplesDir)) {
       sdkContext.examplesDir = getRelativePathFromDirectory(
         context.program.projectRoot,
         normalizeExamplesDir,
@@ -213,7 +213,7 @@ export async function createSdkContext<
       sdkContext.examplesDir = normalizeExamplesDir;
     }
   }
-  sdkContext.sdkPackage = diagnostics.pipe(createSdkPackage(sdkContext));
+  sdkContext.sdkPackage = diagnostics.pipe(await createSdkPackage(sdkContext));
   for (const client of sdkContext.sdkPackage.clients) {
     diagnostics.pipe(await handleClientExamples(sdkContext, client));
   }
