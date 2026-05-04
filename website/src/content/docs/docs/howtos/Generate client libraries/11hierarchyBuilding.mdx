@@ -1,10 +1,8 @@
 ---
-title: Multi-Layer Discriminator Hierarchy Building
+title: Legacy Hierarchy Building
 ---
 
-import { ClientTabs, ClientTabItem } from "@components/client-tabs";
-
-This document explains how to use the `@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding` decorator to create multi-layer inheritance hierarchies in discriminated models.
+This document explains how to use the `@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding` decorator to change the base type of a model in generated client SDKs.
 
 :::caution
 Legacy hierarchy building is NOT a recommended pattern and should only be used when specifically requested by SDK architects.
@@ -12,33 +10,111 @@ Legacy hierarchy building is NOT a recommended pattern and should only be used w
 
 ## Overview
 
-The `@hierarchyBuilding` decorator enables client-level multiple levels of inheritance for discriminated models. This decorator modifies the inheritance chain in generated client libraries to create deeper hierarchies than what TypeSpec natively supports.
+The `@hierarchyBuilding` decorator changes the base type (parent class) of a model in the generated SDK type graph. It does **not** validate property presence at decoration time. Instead, property reconciliation happens during SDK type graph building.
 
-Use `@hierarchyBuilding` when you need to represent complex inheritance hierarchies in discriminated models where:
+Use `@hierarchyBuilding` when you need to:
 
-- You have multiple levels of inheritance (grandparent → parent → child)
-- You need to share common properties across multiple inheritance levels
-- You have explicit permission from SDK architects
+- Rebase a model onto a different ancestor in the inheritance chain (e.g., skip intermediate models)
+- Rebase a model onto an unrelated base that shares common properties (e.g., brownfield ARM resources onto `TrackedResource`)
+- Create multi-level discriminated hierarchies in generated SDKs
 
-## Basic Three-Level Hierarchy
+## Property Reconciliation Rules
 
-This example demonstrates a simple three-level inheritance chain: Animal → Pet → Dog.
+When the decorator is applied, the following rules govern how properties are reconciled:
 
-<ClientTabs>
-<ClientTabItem lang="typespec">
+### 1. Property Lifting
+
+Properties from removed intermediate ancestors (between the target's original parent and the new base) are "lifted" onto the rebased model as its own properties.
+
+```typespec
+model C {
+  c?: string;
+}
+model B extends C {
+  b?: string;
+}
+@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(C)
+model A extends B {
+  a?: string;
+}
+// SDK result: A extends C. A.properties = { a, b }. C.properties = { c }.
+// 'b' was lifted from removed intermediate B.
+```
+
+### 2. Duplicate Dropping
+
+Properties whose names are supplied by the new base chain are dropped from the model (they are inherited instead).
+
+```typespec
+model B {
+  propB: string;
+}
+model A {
+  ...B;
+  propA: string;
+}
+@@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(A, B);
+// SDK result: A extends B. A.properties = { propA }. B.properties = { propB }.
+// propB was A's own property via spread, but is now supplied by new base → dropped.
+```
+
+### 3. Type Compatibility Check
+
+When dropping a property, if the type on the dropped property is incompatible with the same-named property on the new base chain, a `legacy-hierarchy-building-conflict` warning with `property-type-mismatch` message is emitted. The property is still dropped.
+
+```typespec
+model C {
+  shared?: int32;
+}
+model OldBase {
+  shared?: string; // different type than C.shared
+}
+@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(C)
+model A extends OldBase {
+  a?: string;
+}
+// SDK result: A extends C. A.properties = { a }.
+// Warning emitted: 'shared' type mismatch (string vs int32).
+```
+
+Compatible types are silently dropped without warnings:
+
+```typespec
+scalar azureLocation extends string;
+model C {
+  kind: string;
+  location: string;
+}
+model OldBase {
+  kind: "old";
+  location: azureLocation;
+}
+@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(C)
+model A extends OldBase {
+  a?: string;
+}
+// SDK result: A extends C. A.properties = { a }.
+// No warning: literal "old" is assignable to string, azureLocation is assignable to string.
+```
+
+### 4. Discriminator Preservation
+
+Discriminator properties are never dropped, even if the new base has a same-named property.
+
+## Common Use Cases
+
+### Multi-Level Discriminated Hierarchy
+
+Use the decorator to create deeper inheritance in discriminated models:
 
 ```typespec
 @discriminator("kind")
 model Animal {
-  @doc("The kind of animal")
   kind: string;
-
-  @doc("Name of the animal")
   name: string;
 }
 
 alias PetContent = {
-  @doc("Whether the pet is trained")
   trained: boolean;
 };
 
@@ -48,7 +124,6 @@ model Pet extends Animal {
 }
 
 alias DogContent = {
-  @doc("The breed of the dog")
   breed: string;
 };
 
@@ -58,172 +133,31 @@ model Dog extends Animal {
   ...PetContent;
   ...DogContent;
 }
+// SDK result: Dog extends Pet. Dog.properties = { kind, breed }.
+// 'trained' is supplied by Pet → dropped. 'kind' is a discriminator → preserved.
 ```
 
-Without `@hierarchyBuilding`, Dog would extend Animal directly. With the decorator, Dog extends Pet instead, creating the hierarchy: Animal → Pet → Dog.
+### Brownfield ARM Resource Rebasing
 
-</ClientTabItem>
-<ClientTabItem lang="python">
+A common pattern for Azure resources that need to be rebased onto `TrackedResource`:
 
-```python
-# _models.py
-from typing import Literal
-from .. import _model_base
-from .._model_base import rest_discriminator, rest_field
-
-class Animal(_model_base.Model):
-    kind: str = rest_discriminator(name="kind")
-    name: str = rest_field()
-
-class Pet(Animal, discriminator="pet"):
-    kind: Literal["pet"] = rest_discriminator(name="kind")
-    trained: bool = rest_field()
-
-class Dog(Pet, discriminator="dog"):  # Inherits from Pet, not Animal directly
-    kind: Literal["dog"] = rest_discriminator(name="kind")
-    breed: str = rest_field()
+```typespec
+model Resource {
+  id?: string;
+  name?: string;
+  type?: string;
+}
+model TrackedResource extends Resource {
+  location: string;
+  tags?: Record<string>;
+}
+model Foo extends Resource {
+  properties: FooProperties;
+  location?: string;
+  tags?: Record<string>;
+}
+@@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(Foo, TrackedResource);
+// SDK result: Foo extends TrackedResource. Foo.properties = { properties }.
+// location and tags are supplied by TrackedResource → dropped.
+// id, name, type are supplied by Resource (in TrackedResource's chain) → dropped.
 ```
-
-</ClientTabItem>
-<ClientTabItem lang="csharp">
-
-```csharp
-//TODO
-```
-
-</ClientTabItem>
-<ClientTabItem lang="typescript">
-
-```typescript
-export interface Pet extends Animal {
-  kind: "pet" | "dog";
-  /** Whether the pet is trained */
-  trained: boolean;
-}
-
-export function petSerializer(item: Pet): any {
-  return { kind: item["kind"], name: item["name"], trained: item["trained"] };
-}
-
-export function petDeserializer(item: any): Pet {
-  return {
-    kind: item["kind"],
-    name: item["name"],
-    trained: item["trained"],
-  };
-}
-
-/** Alias for PetUnion */
-export type PetUnion = Dog | Pet;
-
-export function petUnionSerializer(item: PetUnion): any {
-  switch (item.kind) {
-    default:
-      return petSerializer(item);
-  }
-}
-
-export function petUnionDeserializer(item: any): PetUnion {
-  switch (item.kind) {
-    case "dog":
-      return dogDeserializer(item as Dog);
-
-    default:
-      return petDeserializer(item);
-  }
-}
-
-/** model interface Dog */
-export interface Dog extends Pet {
-  kind: "dog";
-  /** The breed of the dog */
-  breed: string;
-}
-
-export function dogDeserializer(item: any): Dog {
-  return {
-    kind: item["kind"],
-    trained: item["trained"],
-    name: item["name"],
-    breed: item["breed"],
-  };
-}
-
-/** model interface Animal */
-export interface Animal {
-  /** The kind of animal */
-  /** The discriminator possible values: pet, dog */
-  kind: string;
-  /** Name of the animal */
-  name: string;
-}
-
-export function animalSerializer(item: Animal): any {
-  return { kind: item["kind"], name: item["name"] };
-}
-
-export function animalDeserializer(item: any): Animal {
-  return {
-    kind: item["kind"],
-    name: item["name"],
-  };
-}
-
-/** Alias for AnimalUnion */
-export type AnimalUnion = PetUnion | Animal;
-
-export function animalUnionSerializer(item: AnimalUnion): any {
-  switch (item.kind) {
-    case "pet":
-    case "dog":
-      return petUnionSerializer(item as PetUnion);
-
-    default:
-      return animalSerializer(item);
-  }
-}
-
-export function animalUnionDeserializer(item: any): AnimalUnion {
-  switch (item.kind) {
-    case "pet":
-    case "dog":
-      return petUnionDeserializer(item as PetUnion);
-
-    default:
-      return animalDeserializer(item);
-  }
-}
-```
-
-</ClientTabItem>
-<ClientTabItem lang="java">
-
-```java
-@Immutable
-public class Animal implements JsonSerializable<Animal> {
-    public String getKind();
-    public String getName();
-}
-
-@Immutable
-public class Pet extends Animal {
-    public String getKind();
-    public boolean isTrained();
-}
-
-@Immutable
-public final class Dog extends Pet {
-    public String getKind();
-    public String getBreed();
-}
-```
-
-</ClientTabItem>
-<ClientTabItem lang="go">
-
-```go
-//TODO
-```
-
-</ClientTabItem>
-</ClientTabs>
