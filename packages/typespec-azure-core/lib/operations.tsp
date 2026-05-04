@@ -156,6 +156,7 @@ interface ResourceOperations<
    * @template Traits Object describing the traits of the operation.
    */
   #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
+  #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
   @Foundations.Private.ensureVerb("ResourceCreateOrUpdate", "PATCH")
   @createsOrUpdatesResource(Resource)
   @parameterVisibility(Lifecycle.Create, Lifecycle.Update)
@@ -192,6 +193,7 @@ interface ResourceOperations<
    * @template Resource Resource type.
    * @template Traits Object describing the traits of the operation.
    */
+  #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
   #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
   @Foundations.Private.ensureVerb("LongRunningResourceCreateOrUpdate", "PATCH")
   @createsOrUpdatesResource(Resource)

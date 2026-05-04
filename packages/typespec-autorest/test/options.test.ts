@@ -286,6 +286,7 @@ op test(): void;
         get is ArmResourceRead<Widget>;
         @Azure.Core.useFinalStateVia("azure-async-operation")
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget, LroHeaders = Azure.Core.Foundations.RetryAfterHeader & ArmAsyncOperationHeader>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchSync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteSync<Widget>;
         listByResourceGroup is ArmResourceListByParent<Widget>;
@@ -381,6 +382,7 @@ op test(): void;
         get is ArmResourceRead<Widget>;
         @Azure.Core.useFinalStateVia("azure-async-operation")
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget, LroHeaders = Azure.Core.Foundations.RetryAfterHeader & ArmAsyncOperationHeader>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchSync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteSync<Widget>;
         listByResourceGroup is ArmResourceListByParent<Widget>;

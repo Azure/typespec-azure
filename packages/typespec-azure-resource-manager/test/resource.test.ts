@@ -310,6 +310,7 @@ describe("ARM resource model:", () => {
 
       @armResourceOperations
       interface Foos extends TrackedResourceOperations<FooResource, FooResourceProperties> {
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmTagsPatchAsync<FooResource, FooResourceProperties>;
       }
     `);

@@ -25,6 +25,7 @@ describe("typespec-azure-core: operation templates", () => {
         data: string;
       };
 
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       @test op resourceUpsert is StandardResourceOperations.ResourceCreateOrUpdate<TestModel>;
       `,
     );
@@ -139,6 +140,7 @@ describe("typespec-azure-core: operation templates", () => {
       }
 
       op read is Azure.Core.ResourceRead<NoKeyModel>;
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       op create is StandardResourceOperations.ResourceCreateOrUpdate<NoSegmentModel>;
     `);
 
@@ -364,7 +366,8 @@ describe("typespec-azure-core: operation templates", () => {
 
   it("ResourceCreateOrUpdate", async () => {
     const operation = await compileResourceOperation(
-      `@test op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<TestModel, Customizations>;`,
+      `#suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+      @test op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<TestModel, Customizations>;`,
     );
 
     const params = [...expectedParamsWithName];
@@ -387,7 +390,8 @@ describe("typespec-azure-core: operation templates", () => {
 
   it("ResourceUpdate", async () => {
     const operation = await compileResourceOperation(
-      `@test op update is StandardResourceOperations.ResourceUpdate<TestModel, Customizations>;`,
+      `#suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+      @test op update is StandardResourceOperations.ResourceUpdate<TestModel, Customizations>;`,
     );
 
     const params = [...expectedParamsWithName];
@@ -461,7 +465,8 @@ describe("typespec-azure-core: operation templates", () => {
 
   it("LongRunningResourceCreateOrUpdate", async () => {
     const operation = await compileResourceOperation(
-      `@test op createOrUpdate is StandardResourceOperations.LongRunningResourceCreateOrUpdate<TestModel, Customizations>;`,
+      `#suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+      @test op createOrUpdate is StandardResourceOperations.LongRunningResourceCreateOrUpdate<TestModel, Customizations>;`,
     );
 
     const params = [...expectedParamsWithName];
@@ -502,6 +507,7 @@ describe("typespec-azure-core: operation templates", () => {
   it("LongRunningResourceUpdate", async () => {
     const operation = await compileResourceOperation(
       `#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
+       #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
        @test op update is Azure.Core.Foundations.LongRunningResourceUpdate<TestModel, Customizations>;`,
     );
 
@@ -799,7 +805,8 @@ describe("typespec-azure-core: operation templates", () => {
   describe("LongRunningOperation", () => {
     it("Gets Lro for standard Async CreateOrUpdate", async () => {
       const [_, metadata] = await compileLroOperation(
-        `@test op createOrUpdate is StandardResourceOperations.LongRunningResourceCreateOrUpdate<TestModel, Customizations>;`,
+        `#suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+        @test op createOrUpdate is StandardResourceOperations.LongRunningResourceCreateOrUpdate<TestModel, Customizations>;`,
       );
       ok(metadata);
       deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
@@ -825,6 +832,7 @@ describe("typespec-azure-core: operation templates", () => {
         op poll is StandardResourceOperations.GetResourceOperationStatus<TestModel>;
   
         @Azure.Core.pollingOperation(poll)
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         @test op createOrUpdate is StandardResourceOperations.LongRunningResourceCreateOrUpdate<TestModel, Customizations>;`,
         "createOrUpdate",
       );
@@ -1111,6 +1119,7 @@ op createJob(
     it("Gets Lro for standard Async Update", async () => {
       const [_, metadata] = await compileLroOperation(
         `#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
+         #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
          @test op update is Azure.Core.Foundations.LongRunningResourceUpdate<TestModel, Customizations>;`,
       );
       ok(metadata);
@@ -1139,6 +1148,7 @@ op createJob(
         
          #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
          @Azure.Core.pollingOperation(poll)
+         #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
          @test op update is Azure.Core.Foundations.LongRunningResourceUpdate<TestModel, Customizations>;`,
         "update",
       );
@@ -1646,7 +1656,9 @@ op createJob(
           value: string;
         }
         
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         @route("/simpleWidgets/{id}")
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         @patch(#{implicitOptionality: true}) op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
           {
             @statusCode statusCode: 201;
@@ -1704,7 +1716,9 @@ op createJob(
           value: string;
         }
         
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         @route("/simpleWidgets/{id}")
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         @patch(#{implicitOptionality: true}) op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
           {
             @statusCode statusCode: 201;
@@ -1754,7 +1768,9 @@ op createJob(
           value: string;
         }
         
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         @route("/simpleWidgets/{id}")
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         @patch(#{implicitOptionality: true}) op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
           {
             @statusCode statusCode: 201;
@@ -2405,6 +2421,7 @@ op createJob(
         @finalOperation(getWidget)
         @pollingOperation(getStatus, {id: ResponseProperty<"id">})
         @route("/simpleWidgets/{id}")
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         @patch(#{implicitOptionality: true}) op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operate: string, @header("Operation-Location")opLink: string};
   
         @route("/simpleWidgets/{id}/operations/{operationId}")
