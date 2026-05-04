@@ -167,7 +167,7 @@ export function formatPrComment(
   if (regressions.length === 0) {
     lines.push("✅ No performance regressions detected.\n");
   } else {
-    lines.push(`⚠️ **${regressions.length} metric(s) regressed** above the ±${threshold}% threshold:\n`);
+    lines.push(`⚠️ **${regressions.length} metric(s) regressed** above the +${threshold}% threshold:\n`);
     lines.push("| Metric | Baseline | Current | Change |");
     lines.push("|--------|----------|---------|--------|");
     for (const m of regressions) {
@@ -184,7 +184,7 @@ export function formatPrComment(
   const specNames = comparisons.map((c) => c.specName).join(", ");
   lines.push("<details>");
   lines.push(
-    `<summary>Full details — comparing <code>${currentCommit.slice(0, 7)}</code> vs baseline <code>${baselineCommit.slice(0, 7)}</code></summary>\n`,
+    `<summary>Full details – comparing <code>${currentCommit.slice(0, 7)}</code> vs baseline <code>${baselineCommit.slice(0, 7)}</code></summary>\n`,
   );
   lines.push("| Metric | Baseline | Current | Change |");
   lines.push("|--------|----------|---------|--------|");
