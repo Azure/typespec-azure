@@ -15,6 +15,48 @@ import { getResourceOperation } from "@typespec/rest";
 import { ArmResourceOperation } from "../operations.js";
 import { ArmResourceDetails, getArmResourceKind } from "../resource.js";
 
+/** Categorization of list operations for an ARM resource. */
+export interface ListCategories {
+  /** True if the resource has a list-by-subscription operation. */
+  bySubscription: boolean;
+  /** True if the resource has a list-by-resource-group operation. */
+  byResourceGroup: boolean;
+  /** True if the resource has a list-by-parent (nested) operation. */
+  byParent: boolean;
+}
+
+/**
+ * Examine the list operations registered on the given ARM resource and
+ * categorize each by its path prefix. The categorization rules mirror RPC
+ * §2.3 conventions:
+ * - A path containing more than one `/providers/` segment is considered a
+ *   list-by-parent (nested) operation.
+ * - A path containing `/resourceGroups/{` is a list-by-resource-group.
+ * - A path containing `/subscriptions/{` (without `/resourceGroups/{`) is a
+ *   list-by-subscription.
+ */
+export function getListCategories(armResource: ArmResourceDetails): ListCategories {
+  const categories: ListCategories = {
+    bySubscription: false,
+    byResourceGroup: false,
+    byParent: false,
+  };
+  const lists = armResource.operations.lists;
+  if (!lists) return categories;
+  for (const op of Object.values(lists)) {
+    const path = op.path ?? "";
+    const providersCount = (path.match(/\/providers\//g) ?? []).length;
+    if (providersCount > 1) {
+      categories.byParent = true;
+    } else if (/\/resourceGroups\/\{/.test(path)) {
+      categories.byResourceGroup = true;
+    } else if (/\/subscriptions\/\{/.test(path)) {
+      categories.bySubscription = true;
+    }
+  }
+  return categories;
+}
+
 /**
  *
  *@param target

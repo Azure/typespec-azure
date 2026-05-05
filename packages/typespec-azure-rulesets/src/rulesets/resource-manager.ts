@@ -77,6 +77,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/beyond-nesting-levels": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-operation": true,
     "@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation": true,
+    "@azure-tools/typespec-azure-resource-manager/arm-resource-required-operations": true,
     "@azure-tools/typespec-azure-resource-manager/empty-updateable-properties": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb": true,
