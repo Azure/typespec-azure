@@ -785,6 +785,7 @@ it("filterOutCoreModels true", async () => {
     }
 
     @doc("Creates or updates a User")
+    #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
     op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<User>;
   `);
   const context = await createSdkContextForTester(program);
@@ -815,6 +816,7 @@ it("filterOutCoreModels false", async () => {
     }
 
     @doc("Creates or updates a User")
+    #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
     op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<User>;
   `);
   const context = await createSdkContextForTester(program);
@@ -846,6 +848,7 @@ it("lro core filterOutCoreModels true", async () => {
 
     @doc("Polls status.")
     @pollingOperation(My.Service.getStatus)
+    #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
     op createOrUpdateUser is StandardResourceOperations.LongRunningResourceCreateOrUpdate<User>;
   `);
   const context = await createSdkContextForTester(program);
@@ -871,6 +874,7 @@ it("lro core filterOutCoreModels false", async () => {
 
     @doc("Polls status.")
     @pollingOperation(My.Service.getStatus)
+    #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
     op createOrUpdateUser is StandardResourceOperations.LongRunningResourceCreateOrUpdate<User>;
   `);
   const context = await createSdkContextForTester(program);
@@ -1219,6 +1223,48 @@ it("propagation from subtype of type with another discriminated property", async
   strictEqual(meet?.serializationOptions.json?.name, "Meet");
   strictEqual(meet?.properties[0].kind, "property");
   strictEqual(meet?.properties[0].serializationOptions.json?.name, "kind");
+});
+
+it("readonly property in discriminated base does not leak Input to sibling subtypes", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    @discriminator("kind")
+    model Base {
+      @visibility(Lifecycle.Read)
+      readonlyProp: ReadonlyModel;
+    }
+
+    model ReadonlyModel {
+      value: string;
+    }
+
+    model SubA extends Base {
+      kind: "a";
+    }
+
+    model SubB extends Base {
+      kind: "b";
+    }
+
+    @route("/a")
+    op getSubA(): SubA;
+
+    @route("/b")
+    op createSubB(@body body: SubB): void;
+  `);
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
+
+  const base = models.find((x) => x.name === "Base");
+  strictEqual(base?.usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
+
+  const subA = models.find((x) => x.name === "SubA");
+  strictEqual(subA?.usage, UsageFlags.Output | UsageFlags.Json);
+
+  const subB = models.find((x) => x.name === "SubB");
+  strictEqual(subB?.usage, UsageFlags.Input | UsageFlags.Json);
+
+  const readonlyModel = models.find((x) => x.name === "ReadonlyModel");
+  strictEqual(readonlyModel?.usage, UsageFlags.Output | UsageFlags.Json);
 });
 
 it("unnamed model", async () => {

@@ -12,9 +12,7 @@ For example, here's how you could create a new `AddressResource` resource under 
 /** An address resource belonging to a user resource */
 @parentResource(User)
 model AddressResource is ProxyResource<AddressResourceProperties> {
-  @key("addressName")
-  @segment("addresses")
-  name: string;
+  ...ResourceNameParameter<AddressResource, KeyName = "addressName", SegmentName = "addresses">;
 }
 
 /** The properties of AddressResource */

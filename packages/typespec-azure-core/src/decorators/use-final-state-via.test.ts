@@ -47,17 +47,18 @@ it("emits error for missing header", async () => {
     message: `There was no header corresponding to the desired final-state-via value 'location'.`,
   });
 });
-it("emits error for original-uri on non-PUT request", async () => {
+it("emits error for original-uri on non-PUT/PATCH/POST request", async () => {
   const diagnostics = await Tester.diagnose(`
     @pollingOperation(bar)
     @useFinalStateVia("original-uri")
-    @post op foo(): {};
+    @delete op foo(): {};
 
     @route("/polling")
     @get op bar(): {status: "Succeeded" | "Failed" | "Cancelled"};
   `);
   expectDiagnostics(diagnostics, {
     code: "@azure-tools/typespec-azure-core/invalid-final-state",
-    message: "The final state value 'original-uri' can only be used in http PUT operations",
+    message:
+      "The final state value 'original-uri' can only be used in http PUT, PATCH, or POST operations",
   });
 });

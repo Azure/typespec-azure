@@ -4253,8 +4253,14 @@ interface SupportTicketsNoSubscription {
     expect(resource.operations.lists).toHaveLength(2);
   });
 
-  it("collects operation information for GenericResource with RoutedOperations", async () => {
-    const { program } = await Tester.compile(`
+  it.each([
+    { propertyType: "{}" },
+    { propertyType: "unknown" },
+    { propertyType: "Record<unknown>" },
+  ])(
+    "collects operation information for GenericResource with $propertyType properties",
+    async ({ propertyType }) => {
+      const { program } = await Tester.compile(`
 
 using Azure.Core;
 
@@ -4270,9 +4276,9 @@ namespace Microsoft.Resources {
     v2021_20_01_preview: "2021-10-01-preview",
   }
 
-  /** A generic resource */
+  /** A generic resource with ${propertyType} properties */
   model MyGenericResource
-    is Azure.ResourceManager.Legacy.GenericResource<{}> {
+    is Azure.ResourceManager.Legacy.GenericResource<${propertyType}> {
   }
 
   alias genericOps = Azure.ResourceManager.Legacy.RoutedOperations<
@@ -4300,50 +4306,51 @@ namespace Microsoft.Resources {
   }
 }
 `);
-    const provider = resolveArmResources(program);
-    expect(provider).toBeDefined();
-    expect(provider.resources).toBeDefined();
-    ok(provider.resources);
-    expect(provider.resources).toHaveLength(1);
+      const provider = resolveArmResources(program);
+      expect(provider).toBeDefined();
+      expect(provider.resources).toBeDefined();
+      ok(provider.resources);
+      expect(provider.resources).toHaveLength(1);
 
-    const resource = provider.resources[0];
-    ok(resource);
-    expect(resource).toMatchObject({
-      kind: "Other",
-      providerNamespace: "Microsoft.Resources",
-      type: expect.anything(),
-    });
+      const resource = provider.resources[0];
+      ok(resource);
+      expect(resource).toMatchObject({
+        kind: "Other",
+        providerNamespace: "Microsoft.Resources",
+        type: expect.anything(),
+      });
 
-    checkResolvedOperations(resource, {
-      operations: {
-        lifecycle: {
-          createOrUpdate: [
-            {
-              operationGroup: "GenericResourceOps",
-              name: "createOrUpdate",
-              kind: "createOrUpdate",
-            },
-          ],
-          delete: [{ operationGroup: "GenericResourceOps", name: "delete", kind: "delete" }],
-          read: [{ operationGroup: "GenericResourceOps", name: "get", kind: "read" }],
-          update: [{ operationGroup: "GenericResourceOps", name: "update", kind: "update" }],
-          checkExistence: [
-            {
-              operationGroup: "GenericResourceOps",
-              name: "checkExistence",
-              kind: "checkExistence",
-            },
-          ],
+      checkResolvedOperations(resource, {
+        operations: {
+          lifecycle: {
+            createOrUpdate: [
+              {
+                operationGroup: "GenericResourceOps",
+                name: "createOrUpdate",
+                kind: "createOrUpdate",
+              },
+            ],
+            delete: [{ operationGroup: "GenericResourceOps", name: "delete", kind: "delete" }],
+            read: [{ operationGroup: "GenericResourceOps", name: "get", kind: "read" }],
+            update: [{ operationGroup: "GenericResourceOps", name: "update", kind: "update" }],
+            checkExistence: [
+              {
+                operationGroup: "GenericResourceOps",
+                name: "checkExistence",
+                kind: "checkExistence",
+              },
+            ],
+          },
         },
-      },
-      resourceType: {
-        provider: "Microsoft.Resources",
-        types: [],
-      },
-      resourceInstancePath: "/{resourceId}",
-      resourceName: "MyGenericResource",
-    });
-  });
+        resourceType: {
+          provider: "Microsoft.Resources",
+          types: [],
+        },
+        resourceInstancePath: "/{resourceId}",
+        resourceName: "MyGenericResource",
+      });
+    },
+  );
 
   it.each(["default", "current"])(
     "provides singleton information for @singleton('%s') decorated resources",
