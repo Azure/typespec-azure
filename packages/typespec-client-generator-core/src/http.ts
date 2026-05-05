@@ -36,10 +36,8 @@ import { getResponseAsBool, isInScope, shouldOmitSlashFromEmptyRoute } from "./d
 import {
   CollectionFormat,
   SdkBodyParameter,
-  SdkBuiltInType,
   SdkClientType,
   SdkCookieParameter,
-  SdkEnumType,
   SdkHeaderParameter,
   SdkHttpErrorResponse,
   SdkHttpOperation,
@@ -55,7 +53,6 @@ import {
   SdkType,
   SerializationOptions,
   TCGCContext,
-  UsageFlags,
 } from "./interfaces.js";
 import {
   compareModelProperties,
@@ -74,7 +71,7 @@ import {
   isSubscriptionId,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
-import { isMediaTypeJson, isMediaTypeXml } from "./media-types.js";
+import { isMediaTypeJson, isMediaTypeTextPlain, isMediaTypeXml } from "./media-types.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -83,7 +80,9 @@ import {
 } from "./public-utils.js";
 import {
   addEncodeInfo,
+  getClientType,
   getClientTypeWithDiagnostics,
+  getSdkConstant,
   getSdkModelPropertyTypeBase,
   getTypeSpecBuiltInType,
   isReadOnly,
@@ -428,46 +427,52 @@ function createContentTypeOrAcceptHeader(
   const name = bodyObject.kind === "body" ? "contentType" : "accept";
   let type: SdkType = getTypeSpecBuiltInType(context, "string");
   // Honor the content types from the HTTP library result.
-  // For a single content type, create a constant. For multiple content types, create an enum.
+  // For a single content type, create a constant.
+  // For multiple content types on a request body (`contentType`), create an enum since the
+  // caller actually picks one value to send.
+  // For multiple content types on a response (`accept`), create a single constant whose value
+  // is a comma-joined list of all response content types, with structured content types
+  // (JSON/XML/text-plain) listed first. This avoids treating the synthetic `accept` parameter
+  // as a content-negotiation parameter. Services that genuinely need content negotiation
+  // should use `@sharedRoute` to split the operation per content type.
   // For File type bodies, the content type is constrained by the File type itself;
   // treat it the same as a user-defined content type/accept parameter.
-  if (bodyObject.contentTypes && bodyObject.contentTypes.length === 1) {
-    type = {
-      kind: "constant",
-      value: bodyObject.contentTypes[0],
-      valueType: type,
-      name: `${httpOperation.operation.name}ContentType`,
-      isGeneratedName: true,
-      decorators: [],
-    };
-  } else if (bodyObject.contentTypes && bodyObject.contentTypes.length > 1) {
-    const stringType: SdkBuiltInType = getTypeSpecBuiltInType(context, "string");
-    const enumType: SdkEnumType = {
-      kind: "enum",
-      name: `${httpOperation.operation.name}ContentType`,
-      isGeneratedName: true,
-      namespace: "",
-      valueType: stringType,
-      values: [],
-      isFixed: true,
-      isFlags: false,
-      usage: UsageFlags.None,
-      access: "public",
-      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
-      apiVersions: bodyObject.apiVersions,
-      isUnionAsEnum: false,
-      decorators: [],
-    };
-    enumType.values = bodyObject.contentTypes.map((ct) => ({
-      kind: "enumvalue" as const,
-      name: ct,
-      value: ct,
-      enumType,
-      valueType: stringType,
-      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}.${ct}`,
-      decorators: [],
-    }));
-    type = enumType;
+  if (bodyObject.contentTypes && bodyObject.contentTypes.length > 0) {
+    const tk = $(context.program);
+    context.__namingContextPath.push({
+      name: httpOperation.operation.name,
+      type: httpOperation.operation,
+    });
+    context.__namingContextPath.push({
+      name: name === "accept" ? "Accept" : "ContentType",
+      type: undefined,
+    });
+    try {
+      if (bodyObject.contentTypes.length === 1) {
+        // Single content type → constant.
+        const literal = tk.literal.createString(bodyObject.contentTypes[0]);
+        type = getSdkConstant(context, literal, httpOperation.operation);
+      } else if (name === "accept") {
+        // Multi accept → single constant whose value is a comma-joined string. Stable
+        // partition: structured content types first, others after, preserving order.
+        const isStructured = (ct: string) =>
+          isMediaTypeJson(ct) || isMediaTypeXml(ct) || isMediaTypeTextPlain(ct);
+        const structured = bodyObject.contentTypes.filter(isStructured);
+        const others = bodyObject.contentTypes.filter((ct) => !isStructured(ct));
+        const combined = [...structured, ...others].join(", ");
+        const literal = tk.literal.createString(combined);
+        type = getSdkConstant(context, literal, httpOperation.operation);
+      } else {
+        // Multi content types on request → enum.
+        const union = tk.union.create(
+          bodyObject.contentTypes.map((ct) => tk.literal.createString(ct)),
+        );
+        type = getClientType(context, union, httpOperation.operation);
+      }
+    } finally {
+      context.__namingContextPath.pop();
+      context.__namingContextPath.pop();
+    }
   }
   const optional = bodyObject.kind === "body" ? bodyObject.optional : false;
   // No need for clientDefaultValue because it's a constant, it only has one value

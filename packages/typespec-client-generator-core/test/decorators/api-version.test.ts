@@ -137,4 +137,33 @@ describe("@apiVersion", () => {
     strictEqual(checkApiVersionParam.isApiVersionParam, false);
     strictEqual(checkApiVersionParam.onClient, false);
   });
+
+  it("body model property named apiVersion is not treated as api version param", async () => {
+    const { program } = await SimpleTester.compile(`
+      @service(#{
+        title: "Contoso Widget Manager",
+      })
+      @versioned(Contoso.WidgetManager.Versions)
+      namespace Contoso.WidgetManager;
+
+      enum Versions {
+        v1,
+      }
+
+      model M {
+        apiVersion: string;
+      }
+
+      op test(): M;
+    `);
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
+    const model = sdkPackage.models.find((x) => x.name === "M");
+    ok(model);
+    const apiVersionProperty = model.properties.find((x) => x.name === "apiVersion");
+    ok(apiVersionProperty);
+    strictEqual(apiVersionProperty.kind, "property");
+    strictEqual(apiVersionProperty.isApiVersionParam, false);
+    strictEqual(apiVersionProperty.clientDefaultValue, undefined);
+  });
 });

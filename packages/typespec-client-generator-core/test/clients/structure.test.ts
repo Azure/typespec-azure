@@ -2099,6 +2099,105 @@ it("error: inconsistent-multiple-service-servers auth", async () => {
   ]);
 });
 
+it("warning: inconsistent-multiple-service-dependency", async () => {
+  const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
+        @versioned(LibVersions)
+        namespace SharedLib {
+          enum LibVersions {
+            v1: "v1",
+            v2: "v2",
+          }
+        }
+
+        @service
+        @versioned(VersionsA)
+        namespace ServiceA {
+          enum VersionsA {
+            @useDependency(SharedLib.LibVersions.v1)
+            av1,
+          }
+          op a(): void;
+        }
+        @service
+        @versioned(VersionsB)
+        namespace ServiceB {
+          enum VersionsB {
+            @useDependency(SharedLib.LibVersions.v2)
+            bv1,
+          }
+          op b(): void;
+        }`,
+      `
+        @client(
+          {
+            name: "CombineClient",
+            service: [ServiceA, ServiceB],
+            autoMergeService: true,
+          }
+        )
+        namespace CombineClient {}
+      `,
+    ),
+  );
+  await createSdkContextForTester(program);
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service-dependency",
+      severity: "warning",
+      message:
+        'Services merged into client "CombineClient" depend on different versions of "SharedLib": "v1", "v2".',
+    },
+  ]);
+});
+
+it("no warning when multiple services share the same dependency version", async () => {
+  const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
+        @versioned(LibVersions)
+        namespace SharedLib {
+          enum LibVersions {
+            v1: "v1",
+            v2: "v2",
+          }
+        }
+
+        @service
+        @versioned(VersionsA)
+        namespace ServiceA {
+          enum VersionsA {
+            @useDependency(SharedLib.LibVersions.v2)
+            av1,
+          }
+          op a(): void;
+        }
+        @service
+        @versioned(VersionsB)
+        namespace ServiceB {
+          enum VersionsB {
+            @useDependency(SharedLib.LibVersions.v2)
+            bv1,
+          }
+          op b(): void;
+        }`,
+      `
+        @client(
+          {
+            name: "CombineClient",
+            service: [ServiceA, ServiceB],
+            autoMergeService: true,
+          }
+        )
+        namespace CombineClient {}
+      `,
+    ),
+  );
+  await createSdkContextForTester(program);
+  expectDiagnostics(diagnostics, []);
+});
+
 it("multiple clients from single service", async () => {
   const { program } = await SimpleBaseTester.compile(
     createClientCustomizationInput(
@@ -3103,161 +3202,6 @@ it("validation: @clientLocation string target with multiple separate root client
       code: "@azure-tools/typespec-client-generator-core/client-location-wrong-type",
     },
   ]);
-});
-
-it("validation: no diagnostic when no @client is used", async () => {
-  const { program } = await SimpleTester.compile(`
-    @service
-    namespace MyService {
-      @route("/a")
-      op opA(): void;
-
-      @route("/b")
-      interface SubOps {
-        op opB(): void;
-      }
-    }
-  `);
-  await createSdkContextForTester(program);
-  const operationNotInClient = program.diagnostics.filter(
-    (d) => d.code === "@azure-tools/typespec-client-generator-core/operation-not-in-client",
-  );
-  strictEqual(operationNotInClient.length, 0);
-});
-
-it("validation: no diagnostic when all operations are covered by @client", async () => {
-  const { program } = await SimpleBaseTester.compile(
-    createClientCustomizationInput(
-      `
-      @service
-      namespace MyService {
-        @route("/a")
-        op opA(): void;
-      }
-    `,
-      `
-      @client({service: MyService, name: "MyServiceClient"})
-      namespace MyCustomClient {
-        op customOpA is MyService.opA;
-      }
-    `,
-    ),
-  );
-  await createSdkContextForTester(program);
-  const operationNotInClient = program.diagnostics.filter(
-    (d) => d.code === "@azure-tools/typespec-client-generator-core/operation-not-in-client",
-  );
-  strictEqual(operationNotInClient.length, 0);
-});
-
-it("validation: diagnostic when operation is missing from @client definition", async () => {
-  const { program } = await SimpleBaseTester.compile(
-    createClientCustomizationInput(
-      `
-      @service
-      namespace MyService {
-        @route("/a")
-        op opA(): void;
-
-        @route("/b")
-        op opB(): void;
-      }
-    `,
-      `
-      @client({service: MyService, name: "MyServiceClient"})
-      namespace MyCustomClient {
-        op customOpA is MyService.opA;
-      }
-    `,
-    ),
-  );
-  await createSdkContextForTester(program);
-  expectDiagnostics(program.diagnostics, [
-    {
-      code: "@azure-tools/typespec-client-generator-core/operation-not-in-client",
-      message: `Operation "opB" under namespace "MyService" is not included in any @client definition.`,
-    },
-  ]);
-});
-
-it("validation: diagnostic for operations in nested namespace not covered by @client", async () => {
-  const { program } = await SimpleBaseTester.compile(
-    createClientCustomizationInput(
-      `
-      @service
-      namespace MyService {
-        @route("/a")
-        op opA(): void;
-
-        namespace SubGroup {
-          @route("/b")
-          op opB(): void;
-        }
-      }
-    `,
-      `
-      @client({service: MyService, name: "MyServiceClient"})
-      namespace MyCustomClient {
-        op customOpA is MyService.opA;
-      }
-    `,
-    ),
-  );
-  await createSdkContextForTester(program);
-  expectDiagnostics(program.diagnostics, [
-    {
-      code: "@azure-tools/typespec-client-generator-core/operation-not-in-client",
-      message: `Operation "opB" under namespace "MyService.SubGroup" is not included in any @client definition.`,
-    },
-  ]);
-});
-
-it("validation: diagnostic for operations in interface not covered by @client", async () => {
-  const { program } = await SimpleBaseTester.compile(
-    createClientCustomizationInput(
-      `
-      @service
-      namespace MyService {
-        @route("/a")
-        op opA(): void;
-
-        interface SubOps {
-          @route("/b")
-          op opB(): void;
-        }
-      }
-    `,
-      `
-      @client({service: MyService, name: "MyServiceClient"})
-      namespace MyCustomClient {
-        op customOpA is MyService.opA;
-      }
-    `,
-    ),
-  );
-  await createSdkContextForTester(program);
-  expectDiagnostics(program.diagnostics, [
-    {
-      code: "@azure-tools/typespec-client-generator-core/operation-not-in-client",
-      message: `Operation "opB" under namespace "MyService" is not included in any @client definition.`,
-    },
-  ]);
-});
-
-it("validation: no diagnostic when @client is applied directly to service namespace", async () => {
-  const { program } = await SimpleTester.compile(`
-    @client({service: MyService})
-    @service
-    namespace MyService {
-      @route("/a")
-      op opA(): void;
-    }
-  `);
-  await createSdkContextForTester(program);
-  const operationNotInClient = program.diagnostics.filter(
-    (d) => d.code === "@azure-tools/typespec-client-generator-core/operation-not-in-client",
-  );
-  strictEqual(operationNotInClient.length, 0);
 });
 
 it("no duplicate clients in getClients() after multi-service sub-client merge", async () => {

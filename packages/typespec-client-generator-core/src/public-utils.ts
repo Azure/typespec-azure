@@ -91,9 +91,18 @@ export function isApiVersion(context: TCGCContext, type: ModelProperty): boolean
   if (versionEnumSets.length === 0) {
     return false;
   }
-  // if the parameter type is the version enum or named as "apiVersion" or "api-version", then it is api version
+  // if the parameter type is the version enum, then it is api version
+  if (versionEnumSets.some((versionEnum) => type.type === versionEnum)) {
+    return true;
+  }
+  // otherwise, only consider name-based matching for http metadata parameters
+  // (header/query/path/cookie/statusCode). A regular body model property whose
+  // name happens to be `apiVersion`/`api-version` should not be treated as an
+  // api version parameter.
+  if (!isMetadata(context.program, type)) {
+    return false;
+  }
   return (
-    versionEnumSets.some((versionEnum) => type.type === versionEnum) ||
     type.name.toLowerCase().includes("apiversion") ||
     type.name.toLowerCase().includes("api-version")
   );
