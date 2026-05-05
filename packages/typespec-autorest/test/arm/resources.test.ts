@@ -469,6 +469,7 @@ it("omits path metadata for @customAzureResource with options.usePathNameParamet
       get is ArmResourceRead<Widget>;
       list is ArmResourceListByParent<Widget>;
       put is ArmResourceCreateOrReplaceSync<Widget>;
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       update is ArmTagsPatchSync<Widget>;
       delete is ArmResourceDeleteSync<Widget>;
     }
@@ -808,6 +809,7 @@ it("allows action requests with optional body parameters", async () => {
     interface Employees {
       get is ArmResourceRead<Employee>;
       createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       update is ArmResourcePatchAsync<Employee, Employee>;
       delete is ArmResourceDeleteWithoutOkAsync<Employee>;
       list is ArmResourceListByParent<Employee>;

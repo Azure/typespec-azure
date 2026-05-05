@@ -278,6 +278,7 @@ it("poll widget", async () => {
 
     @doc("Creates or updates a Widget asynchronously")
     @pollingOperation(Widgets.getWidgetOperationStatus)
+    #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
     createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
     `,
   );
