@@ -382,6 +382,7 @@ it("generates PATCH bodies for custom patch of common resource envelope mixins",
       interface AllProperties {
         get is ArmResourceRead<AllPropertiesResource>;
         put is ArmResourceCreateOrReplaceAsync<AllPropertiesResource>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
          @patch(#{ implicitOptionality: true })
         update is ArmCustomPatchAsync<AllPropertiesResource, AllPropertiesResource>;
         delete is ArmResourceDeleteWithoutOkAsync<AllPropertiesResource>;
@@ -390,6 +391,7 @@ it("generates PATCH bodies for custom patch of common resource envelope mixins",
       interface AssignedOperations {
         get is ArmResourceRead<SystemAssignedResource>;
         put is ArmResourceCreateOrReplaceAsync<SystemAssignedResource>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         @patch(#{ implicitOptionality: true })
         update is ArmCustomPatchAsync<SystemAssignedResource, SystemAssignedResource>;
         delete is ArmResourceDeleteWithoutOkAsync<SystemAssignedResource>;
@@ -478,6 +480,7 @@ it("generates PATCH bodies for resource patch of common resource envelope mixins
       interface AllProperties {
         get is ArmResourceRead<AllPropertiesResource>;
         put is ArmResourceCreateOrReplaceAsync<AllPropertiesResource>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchAsync<AllPropertiesResource, AllPropertiesProperties>;
         delete is ArmResourceDeleteWithoutOkAsync<AllPropertiesResource>;
       }
@@ -485,6 +488,7 @@ it("generates PATCH bodies for resource patch of common resource envelope mixins
       interface AssignedOperations {
         get is ArmResourceRead<SystemAssignedResource>;
         put is ArmResourceCreateOrReplaceAsync<SystemAssignedResource>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchAsync<SystemAssignedResource, SystemAssignedProperties>;
         delete is ArmResourceDeleteWithoutOkAsync<SystemAssignedResource>;
       }

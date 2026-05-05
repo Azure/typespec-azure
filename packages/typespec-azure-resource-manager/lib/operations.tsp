@@ -342,6 +342,7 @@ op ArmResourceCreateOrReplaceAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Provider Optional. The provider namespace model for the resource.
  */
+#suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
 @patch(#{ implicitOptionality: true })
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmTagsPatchAsync<
@@ -376,6 +377,7 @@ op ArmTagsPatchAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Provider Optional. The provider namespace model for the resource.
  */
+#suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
 @patch(#{ implicitOptionality: true })
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourcePatchAsync<
@@ -448,6 +450,7 @@ op ArmCustomPatchAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Provider Optional. The provider namespace model for the resource.
  */
+#suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
 @patch(#{ implicitOptionality: true })
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmTagsPatchSync<
@@ -473,6 +476,7 @@ op ArmTagsPatchSync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Provider Optional. The provider namespace model for the resource.
  */
+#suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
 @patch(#{ implicitOptionality: true })
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourcePatchSync<

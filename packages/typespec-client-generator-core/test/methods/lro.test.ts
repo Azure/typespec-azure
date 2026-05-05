@@ -827,6 +827,7 @@ interface DocumentIntelligenceClient {
       @pollingOperation(
         OperationProgress.getOperationResult
       )
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For testing"
       op update is apiOperations.LongRunningResourceCreateOrUpdate<Instruction>;
 
       @resource("instruction")
@@ -839,19 +840,15 @@ interface DocumentIntelligenceClient {
         instructionId: string;
       }
 
-      @doc("Operation Response Model")
       @resource("operation")
       model OperationResultQuery {
-        @doc("The operation status.")
         @visibility(Lifecycle.Read)
         status: Foundations.OperationState;
 
-        @doc("The operation id.")
         @key("operationId")
         @visibility(Lifecycle.Read)
         operationId: string;
 
-        @doc("The error message.")
         @visibility(Lifecycle.Read)
         errorMessage: string[];
       }
