@@ -33,7 +33,13 @@ import {
   $usage,
   $useSystemTextJsonConverter,
 } from "./decorators.js";
-import { addParameter, exact, removeParameter, reorderParameters, replaceParameter } from "./functions.js";
+import {
+  addParameter,
+  exact,
+  removeParameter,
+  reorderParameters,
+  replaceParameter,
+} from "./functions.js";
 
 export { $lib } from "./lib.js";
 export { $onValidate } from "./validate.js";
