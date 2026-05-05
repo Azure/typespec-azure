@@ -41,7 +41,7 @@ export const patchOperationsRule = createRule({
     default: "The request body of a PATCH must be a model with a subset of resource properties",
     missingTags: "Resource PATCH must contain the 'tags' property.",
     modelSuperset: paramMessage`Resource PATCH models must be a subset of the resource type. The following properties: [${"name"}] do not exist in resource Model '${"resourceModel"}'.`,
-    notUpdateableInPatch: paramMessage`Property '${"propertyName"}' is in the PATCH request body but is marked read-only (e.g. '@visibility(Lifecycle.Read)') on the resource; it cannot be updated and must be removed from the PATCH request model.`,
+    notUpdateableInPatch: paramMessage`Property '${"propertyName"}' is in the PATCH request body but is not updateable on the resource (e.g. it has '@visibility(Lifecycle.Create)' which excludes 'Lifecycle.Update'); it cannot be updated and must be removed from the PATCH request model.`,
     requiredInPatch: paramMessage`Property '${"propertyName"}' is required in the PATCH request body. PATCH request body properties must all be optional so partial updates work.`,
     defaultInPatch: paramMessage`Property '${"propertyName"}' has a default value in the PATCH request body. PATCH request body properties that are not present in the request body leave the value unchanged; they do not result in any default value being assigned.`,
     nonMergePatchContentType: paramMessage`PATCH operation '${"operationName"}' specifies a content-type other than 'application/merge-patch+json'.`,
@@ -156,9 +156,17 @@ function isNotUpdateable(program: Program, property: ModelProperty): boolean {
   const sourceProperty = getSourceProperty(property);
   const lifecycle = getLifecycleVisibilityEnum(program);
   const updateMember = lifecycle.members.get("Update");
+  const readMember = lifecycle.members.get("Read");
   if (updateMember === undefined) return false;
   const visibility = getVisibilityForClass(program, sourceProperty, lifecycle);
-  // If the source property's lifecycle visibility excludes Update, it cannot be patched.
+  // Properties that are read-only (only Lifecycle.Read visibility) are allowed in
+  // the PATCH request body — they are filtered out by visibility transforms when
+  // the body is serialized for the request, so they don't need to be removed.
+  if (readMember !== undefined && visibility.size === 1 && visibility.has(readMember)) {
+    return false;
+  }
+  // If the source property's lifecycle visibility excludes Update, it cannot be
+  // patched and must be removed from the PATCH body model.
   return !visibility.has(updateMember);
 }
 

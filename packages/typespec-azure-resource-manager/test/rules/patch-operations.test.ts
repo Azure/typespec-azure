@@ -203,6 +203,7 @@ it("emits requiredInPatch diagnostic when a PATCH body property is required", as
       interface FooResources
         extends ResourceRead<FooResource>, ResourceCreate<FooResource>, ResourceDelete<FooResource> {
          @armResourceUpdate(FooResource)
+         #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
          @patch(#{implicitOptionality: true}) myFooUpdate(...ResourceInstanceParameters<FooResource>, @bodyRoot body: MyPatch) : ArmResponse<FooResource> | ErrorResponse;
         }
 
@@ -251,6 +252,7 @@ it("emits defaultInPatch diagnostic when a PATCH body property has a default val
       interface FooResources
         extends ResourceRead<FooResource>, ResourceCreate<FooResource>, ResourceDelete<FooResource> {
          @armResourceUpdate(FooResource)
+         #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
          @patch(#{implicitOptionality: true}) myFooUpdate(...ResourceInstanceParameters<FooResource>, @bodyRoot body: MyPatch) : ArmResponse<FooResource> | ErrorResponse;
         }
 
@@ -274,7 +276,7 @@ it("emits defaultInPatch diagnostic when a PATCH body property has a default val
     ]);
 });
 
-it("emits notUpdateableInPatch diagnostic when a PATCH body property is read-only on the resource", async () => {
+it("does not emit notUpdateableInPatch when a PATCH body property is read-only (Lifecycle.Read only) on the resource", async () => {
   await tester
     .expect(
       `
@@ -305,6 +307,46 @@ it("emits notUpdateableInPatch diagnostic when a PATCH body property is read-onl
       interface FooResources
         extends ResourceRead<FooResource>, ResourceCreate<FooResource>, ResourceDelete<FooResource> {
          @armResourceUpdate(FooResource)
+         #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+         @patch(#{implicitOptionality: true}) myFooUpdate(...ResourceInstanceParameters<FooResource>, @bodyRoot body: MyPatch) : ArmResponse<FooResource> | ErrorResponse;
+        }
+    `,
+    )
+    .toBeValid();
+});
+
+it("emits notUpdateableInPatch diagnostic when a PATCH body property is not updateable (e.g. Lifecycle.Create only) on the resource", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model FooResource is TrackedResource<FooProperties> {
+        @key("foo")
+        @segment("foo")
+        @path
+        name: string;
+      }
+
+      model FooProperties {
+        @visibility(Lifecycle.Create)
+        createOnlyProp?: string;
+
+        displayName?: string;
+      }
+
+      model MyPatch {
+        ...FooProperties;
+        tags?: Record<string>;
+      }
+
+      @armResourceOperations
+      #suppress "deprecated" "test"
+      interface FooResources
+        extends ResourceRead<FooResource>, ResourceCreate<FooResource>, ResourceDelete<FooResource> {
+         @armResourceUpdate(FooResource)
+         #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
          @patch(#{implicitOptionality: true}) myFooUpdate(...ResourceInstanceParameters<FooResource>, @bodyRoot body: MyPatch) : ArmResponse<FooResource> | ErrorResponse;
         }
     `,
@@ -313,7 +355,7 @@ it("emits notUpdateableInPatch diagnostic when a PATCH body property is read-onl
       {
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
         message:
-          "Property 'readOnlyProp' is in the PATCH request body but is marked read-only (e.g. '@visibility(Lifecycle.Read)') on the resource; it cannot be updated and must be removed from the PATCH request model.",
+          "Property 'createOnlyProp' is in the PATCH request body but is not updateable on the resource (e.g. it has '@visibility(Lifecycle.Create)' which excludes 'Lifecycle.Update'); it cannot be updated and must be removed from the PATCH request model.",
       },
     ]);
 });
@@ -346,6 +388,7 @@ it("emits nonMergePatchContentType diagnostic when content-type is not merge-pat
       interface FooResources
         extends ResourceRead<FooResource>, ResourceCreate<FooResource>, ResourceDelete<FooResource> {
          @armResourceUpdate(FooResource)
+         #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
          @patch(#{implicitOptionality: true}) myFooUpdate(
            ...ResourceInstanceParameters<FooResource>,
            @header("content-type") contentType: "application/xml",
@@ -391,6 +434,7 @@ it("does not emit nonMergePatchContentType when content-type is application/merg
       interface FooResources
         extends ResourceRead<FooResource>, ResourceCreate<FooResource>, ResourceDelete<FooResource> {
          @armResourceUpdate(FooResource)
+         #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
          @patch(#{implicitOptionality: true}) myFooUpdate(
            ...ResourceInstanceParameters<FooResource>,
            @header("content-type") contentType: "application/merge-patch+json",

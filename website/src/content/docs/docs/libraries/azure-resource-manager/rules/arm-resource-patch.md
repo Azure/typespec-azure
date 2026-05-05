@@ -10,7 +10,7 @@ Validate ARM PATCH operations. The request body of a PATCH must be a model with 
 
 - All properties in the PATCH request body are optional (PATCH supports partial updates).
 - No PATCH request body property has a default value (a property absent from a PATCH request leaves the existing value unchanged; defaults are not applied).
-- No PATCH request body property maps back to a resource property that is read-only or otherwise not updateable (for example, `@visibility(Lifecycle.Read)`).
+- No PATCH request body property maps back to a resource property that is not updateable (for example, `@visibility(Lifecycle.Create)`). Properties that are purely read-only (`@visibility(Lifecycle.Read)`) are allowed because they are filtered out by visibility transforms when the request body is serialized.
 - The `content-type` header (when explicitly specified) is `application/merge-patch+json` (or the implicit `application/json`).
 
 #### ❌ Incorrect
