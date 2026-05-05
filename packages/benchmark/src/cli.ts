@@ -93,7 +93,9 @@ function parseArgs(args: string[]): Record<string, string> {
 
 async function runCommand(args: Record<string, string>): Promise<void> {
   const specsDir = args["specs-dir"] ?? defaultSpecsDir;
-  const iterations = args["iterations"] ? parseInt(args["iterations"], 10) : undefined;
+  const iterations = args["iterations"]
+    ? parseInt(args["iterations"], 10)
+    : undefined;
   const warmup = args["warmup"] ? parseInt(args["warmup"], 10) : undefined;
   const specs = args["specs"]?.split(",");
   const commit = args["commit"];
@@ -115,11 +117,15 @@ async function compareCommand(args: Record<string, string>): Promise<void> {
   const baselineFile = args["baseline"];
   const currentFile = args["current"];
   if (!baselineFile || !currentFile) {
-    console.error("Error: --baseline and --current are required for compare command");
+    console.error(
+      "Error: --baseline and --current are required for compare command",
+    );
     process.exit(1);
   }
 
-  const threshold = args["threshold"] ? parseFloat(args["threshold"]) : undefined;
+  const threshold = args["threshold"]
+    ? parseFloat(args["threshold"])
+    : undefined;
   const format = args["format"] ?? "console";
   const outputFile = args["output"];
 
@@ -142,7 +148,12 @@ async function compareCommand(args: Record<string, string>): Promise<void> {
 
   await outputResult(output, outputFile);
   await writeGitHubSummary(
-    formatComparisonSummary(comparisons, baseline.commit, current.commit, threshold),
+    formatComparisonSummary(
+      comparisons,
+      baseline.commit,
+      current.commit,
+      threshold,
+    ),
   );
 }
 

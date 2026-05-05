@@ -1,4 +1,9 @@
-import type { BenchmarkResult, ComparisonResult, MetricComparison, RuntimeStats } from "./types.js";
+import type {
+  BenchmarkResult,
+  ComparisonResult,
+  MetricComparison,
+  RuntimeStats,
+} from "./types.js";
 
 const DEFAULT_THRESHOLD = 5;
 
@@ -8,7 +13,10 @@ function formatMs(ms: number): string {
 }
 
 /** Color-code a time value based on thresholds: 🔴 slow, 🟡 moderate, 🟢 fast. */
-function timeIndicator(ms: number, thresholds: readonly [number, number]): string {
+function timeIndicator(
+  ms: number,
+  thresholds: readonly [number, number],
+): string {
   if (ms > thresholds[1]) return "🔴";
   if (ms > thresholds[0]) return "🟡";
   return "🟢";
@@ -28,7 +36,10 @@ function thresholdsFor(label: string): readonly [number, number] {
   return Thresholds.stage;
 }
 
-function formatMsColored(ms: number, thresholds: readonly [number, number]): string {
+function formatMsColored(
+  ms: number,
+  thresholds: readonly [number, number],
+): string {
   return `${timeIndicator(ms, thresholds)} ${formatMs(ms)}`;
 }
 
@@ -60,12 +71,16 @@ function flattenRuntime(rt: RuntimeStats): FlatMetric[] {
   metrics.push({ label: "checker", value: rt.checker });
 
   metrics.push({ label: "validation", value: rt.validation.total });
-  for (const [v, t] of Object.entries(rt.validation.validators).sort(([, a], [, b]) => b - a)) {
+  for (const [v, t] of Object.entries(rt.validation.validators).sort(
+    ([, a], [, b]) => b - a,
+  )) {
     metrics.push({ label: `validation/${v}`, value: t });
   }
 
   metrics.push({ label: "linter", value: rt.linter.total });
-  for (const [r, t] of Object.entries(rt.linter.rules).sort(([, a], [, b]) => b - a)) {
+  for (const [r, t] of Object.entries(rt.linter.rules).sort(
+    ([, a], [, b]) => b - a,
+  )) {
     metrics.push({ label: `linter/${r}`, value: t });
   }
 
@@ -167,11 +182,14 @@ export function formatPrComment(
   if (regressions.length === 0) {
     lines.push("✅ No performance regressions detected.\n");
   } else {
-    lines.push(`⚠️ **${regressions.length} metric(s) regressed** above the +${threshold}% threshold:\n`);
+    lines.push(
+      `⚠️ **${regressions.length} metric(s) regressed** above the +${threshold}% threshold:\n`,
+    );
     lines.push("| Metric | Baseline | Current | Change |");
     lines.push("|--------|----------|---------|--------|");
     for (const m of regressions) {
-      const changeStr = `${formatPercent(m.percentChange)} ${changeIndicator(m.percentChange, threshold)}`.trim();
+      const changeStr =
+        `${formatPercent(m.percentChange)} ${changeIndicator(m.percentChange, threshold)}`.trim();
       const th = thresholdsFor(m.label);
       lines.push(
         `| ${displayLabel(m.label)} | ${formatMsColored(m.baseline, th)} | ${formatMsColored(m.current, th)} | ${changeStr} |`,
@@ -189,7 +207,8 @@ export function formatPrComment(
   lines.push("| Metric | Baseline | Current | Change |");
   lines.push("|--------|----------|---------|--------|");
   for (const m of averaged) {
-    const changeStr = `${formatPercent(m.percentChange)} ${changeIndicator(m.percentChange, threshold)}`.trim();
+    const changeStr =
+      `${formatPercent(m.percentChange)} ${changeIndicator(m.percentChange, threshold)}`.trim();
     const th = thresholdsFor(m.label);
     lines.push(
       `| ${displayLabel(m.label)} | ${formatMsColored(m.baseline, th)} | ${formatMsColored(m.current, th)} | ${changeStr} |`,
@@ -205,7 +224,9 @@ export function formatPrComment(
 }
 
 /** Average MetricComparisons across all ComparisonResults by label. */
-function averageComparisonMetrics(comparisons: ComparisonResult[]): MetricComparison[] {
+function averageComparisonMetrics(
+  comparisons: ComparisonResult[],
+): MetricComparison[] {
   const sums = new Map<
     string,
     { baseline: number; current: number; change: number; count: number }
@@ -236,7 +257,8 @@ function averageComparisonMetrics(comparisons: ComparisonResult[]): MetricCompar
       const baseline = e.baseline / e.count;
       const current = e.current / e.count;
       const change = e.change / e.count;
-      const percentChange = baseline === 0 ? (current === 0 ? 0 : 100) : (change / baseline) * 100;
+      const percentChange =
+        baseline === 0 ? (current === 0 ? 0 : 100) : (change / baseline) * 100;
       return { label, baseline, current, change, percentChange };
     });
 }
@@ -291,7 +313,9 @@ export function formatRunSummary(result: BenchmarkResult): string {
   }
 
   lines.push("");
-  lines.push(`> Averaged across ${specs.length} specs (${specNames.join(", ")}).`);
+  lines.push(
+    `> Averaged across ${specs.length} specs (${specNames.join(", ")}).`,
+  );
   lines.push(LEGEND);
 
   return lines.join("\n");
