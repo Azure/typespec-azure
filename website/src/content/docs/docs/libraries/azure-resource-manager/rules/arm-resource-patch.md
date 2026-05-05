@@ -6,7 +6,12 @@ title: "arm-resource-patch"
 @azure-tools/typespec-azure-resource-manager/arm-resource-patch
 ```
 
-Validate ARM PATCH operations. The request body of a PATCH must be a model with a subset of the resource properties. The PATCH body must not contain properties that do not exist on the resource.
+Validate ARM PATCH operations. The request body of a PATCH must be a model with a subset of the resource properties. The PATCH body must not contain properties that do not exist on the resource. In addition, the rule validates that:
+
+- All properties in the PATCH request body are optional (PATCH supports partial updates).
+- No PATCH request body property has a default value (a property absent from a PATCH request leaves the existing value unchanged; defaults are not applied).
+- No PATCH request body property maps back to a resource property that is read-only or otherwise not updateable (for example, `@visibility(Lifecycle.Read)`).
+- The `content-type` header (when explicitly specified) is `application/merge-patch+json` (or the implicit `application/json`).
 
 #### ❌ Incorrect
 
@@ -19,6 +24,8 @@ model MyBadPatch {
   name?: string;
   ...Foundations.ArmTagsProperty;
   blah?: string; // does not exist on FooResource
+  required: string; // not optional
+  withDefault?: string = "x"; // has a default value
 }
 ```
 

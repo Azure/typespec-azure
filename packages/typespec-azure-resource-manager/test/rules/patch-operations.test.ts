@@ -174,3 +174,227 @@ it("emit diagnostic when there is no request body", async () => {
       message: "The request body of a PATCH must be a model with a subset of resource properties",
     });
 });
+
+it("emits requiredInPatch diagnostic when a PATCH body property is required", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model FooResource is TrackedResource<FooProperties> {
+        @visibility(Lifecycle.Read)
+        @key("foo")
+        @segment("foo")
+        @path
+        name: string;
+        ...ManagedServiceIdentityProperty;
+      }
+
+      model MyPatch {
+        tags: Record<string>;
+      }
+
+      @armResourceOperations
+      #suppress "deprecated" "test"
+      interface FooResources
+        extends ResourceRead<FooResource>, ResourceCreate<FooResource>, ResourceDelete<FooResource> {
+         @armResourceUpdate(FooResource)
+         @patch(#{implicitOptionality: true}) myFooUpdate(...ResourceInstanceParameters<FooResource>, @bodyRoot body: MyPatch) : ArmResponse<FooResource> | ErrorResponse;
+        }
+
+       enum ResourceState {
+         Succeeded,
+         Canceled,
+         Failed
+       }
+
+       model FooProperties {
+         displayName?: string;
+         provisioningState: ResourceState;
+       }
+    `,
+    )
+    .toEmitDiagnostics([
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
+        message:
+          "Property 'tags' is required in the PATCH request body. PATCH request body properties must all be optional so partial updates work.",
+      },
+    ]);
+});
+
+it("emits defaultInPatch diagnostic when a PATCH body property has a default value", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model FooResource is TrackedResource<FooProperties> {
+        @visibility(Lifecycle.Read)
+        @key("foo")
+        @segment("foo")
+        @path
+        name: string;
+      }
+
+      model MyPatch {
+        tags?: Record<string> = #{};
+      }
+
+      @armResourceOperations
+      #suppress "deprecated" "test"
+      interface FooResources
+        extends ResourceRead<FooResource>, ResourceCreate<FooResource>, ResourceDelete<FooResource> {
+         @armResourceUpdate(FooResource)
+         @patch(#{implicitOptionality: true}) myFooUpdate(...ResourceInstanceParameters<FooResource>, @bodyRoot body: MyPatch) : ArmResponse<FooResource> | ErrorResponse;
+        }
+
+       enum ResourceState {
+         Succeeded,
+         Canceled,
+         Failed
+       }
+
+       model FooProperties {
+         provisioningState?: ResourceState;
+       }
+    `,
+    )
+    .toEmitDiagnostics([
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
+        message:
+          "Property 'tags' has a default value in the PATCH request body. PATCH request body properties that are not present in the request body leave the value unchanged; they do not result in any default value being assigned.",
+      },
+    ]);
+});
+
+it("emits notUpdateableInPatch diagnostic when a PATCH body property is read-only on the resource", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model FooResource is TrackedResource<FooProperties> {
+        @key("foo")
+        @segment("foo")
+        @path
+        name: string;
+      }
+
+      model FooProperties {
+        @visibility(Lifecycle.Read)
+        readOnlyProp?: string;
+
+        displayName?: string;
+      }
+
+      model MyPatch {
+        ...FooProperties;
+        tags?: Record<string>;
+      }
+
+      @armResourceOperations
+      #suppress "deprecated" "test"
+      interface FooResources
+        extends ResourceRead<FooResource>, ResourceCreate<FooResource>, ResourceDelete<FooResource> {
+         @armResourceUpdate(FooResource)
+         @patch(#{implicitOptionality: true}) myFooUpdate(...ResourceInstanceParameters<FooResource>, @bodyRoot body: MyPatch) : ArmResponse<FooResource> | ErrorResponse;
+        }
+    `,
+    )
+    .toEmitDiagnostics([
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
+        message:
+          "Property 'readOnlyProp' is in the PATCH request body but is marked read-only (e.g. '@visibility(Lifecycle.Read)') on the resource; it cannot be updated and must be removed from the PATCH request model.",
+      },
+    ]);
+});
+
+it("emits nonMergePatchContentType diagnostic when content-type is not merge-patch+json", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model FooResource is TrackedResource<FooProperties> {
+        @visibility(Lifecycle.Read)
+        @key("foo")
+        @segment("foo")
+        @path
+        name: string;
+      }
+
+      model FooProperties {
+        displayName?: string;
+      }
+
+      model MyPatch {
+        tags?: Record<string>;
+      }
+
+      @armResourceOperations
+      #suppress "deprecated" "test"
+      interface FooResources
+        extends ResourceRead<FooResource>, ResourceCreate<FooResource>, ResourceDelete<FooResource> {
+         @armResourceUpdate(FooResource)
+         @patch(#{implicitOptionality: true}) myFooUpdate(
+           ...ResourceInstanceParameters<FooResource>,
+           @header("content-type") contentType: "application/xml",
+           @bodyRoot body: MyPatch,
+         ) : ArmResponse<FooResource> | ErrorResponse;
+        }
+    `,
+    )
+    .toEmitDiagnostics([
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
+        message:
+          "PATCH operation 'myFooUpdate' specifies a content-type other than 'application/merge-patch+json'.",
+      },
+    ]);
+});
+
+it("does not emit nonMergePatchContentType when content-type is application/merge-patch+json", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model FooResource is TrackedResource<FooProperties> {
+        @visibility(Lifecycle.Read)
+        @key("foo")
+        @segment("foo")
+        @path
+        name: string;
+      }
+
+      model FooProperties {
+        displayName?: string;
+      }
+
+      model MyPatch {
+        tags?: Record<string>;
+      }
+
+      @armResourceOperations
+      #suppress "deprecated" "test"
+      interface FooResources
+        extends ResourceRead<FooResource>, ResourceCreate<FooResource>, ResourceDelete<FooResource> {
+         @armResourceUpdate(FooResource)
+         @patch(#{implicitOptionality: true}) myFooUpdate(
+           ...ResourceInstanceParameters<FooResource>,
+           @header("content-type") contentType: "application/merge-patch+json",
+           @bodyRoot body: MyPatch,
+         ) : ArmResponse<FooResource> | ErrorResponse;
+        }
+    `,
+    )
+    .toBeValid();
+});

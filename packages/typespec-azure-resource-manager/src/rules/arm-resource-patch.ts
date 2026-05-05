@@ -1,4 +1,5 @@
 import {
+  CodeFix,
   DiagnosticMessages,
   LinterRuleContext,
   Model,
@@ -6,13 +7,20 @@ import {
   Operation,
   Program,
   createRule,
+  defineCodeFix,
   getEffectiveModelType,
+  getLifecycleVisibilityEnum,
   getProperty,
+  getSourceLocation,
+  getVisibilityForClass,
   isErrorType,
   isType,
   paramMessage,
 } from "@typespec/compiler";
+import { SyntaxKind } from "@typespec/compiler/ast";
 import {
+  getContentTypes,
+  getHeaderFieldName,
   getOperationVerb,
   isBody,
   isBodyRoot,
@@ -22,7 +30,7 @@ import {
 } from "@typespec/http";
 
 import { getArmResource } from "../resource.js";
-import { getSourceModel, isInternalTypeSpec } from "./utils.js";
+import { getSourceModel, getSourceProperty, isInternalTypeSpec } from "./utils.js";
 
 export const patchOperationsRule = createRule({
   name: "arm-resource-patch",
@@ -33,6 +41,10 @@ export const patchOperationsRule = createRule({
     default: "The request body of a PATCH must be a model with a subset of resource properties",
     missingTags: "Resource PATCH must contain the 'tags' property.",
     modelSuperset: paramMessage`Resource PATCH models must be a subset of the resource type. The following properties: [${"name"}] do not exist in resource Model '${"resourceModel"}'.`,
+    notUpdateableInPatch: paramMessage`Property '${"propertyName"}' is in the PATCH request body but is marked read-only (e.g. '@visibility(Lifecycle.Read)') on the resource; it cannot be updated and must be removed from the PATCH request model.`,
+    requiredInPatch: paramMessage`Property '${"propertyName"}' is required in the PATCH request body. PATCH request body properties must all be optional so partial updates work.`,
+    defaultInPatch: paramMessage`Property '${"propertyName"}' has a default value in the PATCH request body. PATCH request body properties that are not present in the request body leave the value unchanged; they do not result in any default value being assigned.`,
+    nonMergePatchContentType: paramMessage`PATCH operation '${"operationName"}' specifies a content-type other than 'application/merge-patch+json'.`,
   },
   create(context) {
     return {
@@ -94,7 +106,144 @@ function checkPatchModel(
         },
         target: operation,
       });
+
+    // Check each property in the PATCH body for additional issues.
+    checkPatchBodyProperties(context, patchModel);
   }
+
+  // Check the request content-type header (if explicit).
+  checkPatchContentType(context, operation);
+}
+
+function checkPatchBodyProperties(
+  context: LinterRuleContext<DiagnosticMessages>,
+  patchModel: ModelProperty[],
+) {
+  for (const property of patchModel) {
+    // Required (non-optional) PATCH body properties are not allowed.
+    if (!property.optional) {
+      context.reportDiagnostic({
+        messageId: "requiredInPatch",
+        format: { propertyName: property.name },
+        target: property,
+        codefixes: [createMakeOptionalCodeFix(property)],
+      });
+    }
+
+    // Default values on PATCH body properties are not meaningful.
+    if (property.defaultValue !== undefined) {
+      context.reportDiagnostic({
+        messageId: "defaultInPatch",
+        format: { propertyName: property.name },
+        target: property,
+        codefixes: [createRemoveDefaultCodeFix(property)],
+      });
+    }
+
+    // Read-only / not-updateable properties should not appear in PATCH body.
+    if (isNotUpdateable(context.program, property)) {
+      context.reportDiagnostic({
+        messageId: "notUpdateableInPatch",
+        format: { propertyName: property.name },
+        target: property,
+        codefixes: [createRemovePropertyCodeFix(property)],
+      });
+    }
+  }
+}
+
+function isNotUpdateable(program: Program, property: ModelProperty): boolean {
+  const sourceProperty = getSourceProperty(property);
+  const lifecycle = getLifecycleVisibilityEnum(program);
+  const updateMember = lifecycle.members.get("Update");
+  if (updateMember === undefined) return false;
+  const visibility = getVisibilityForClass(program, sourceProperty, lifecycle);
+  // If the source property's lifecycle visibility excludes Update, it cannot be patched.
+  return !visibility.has(updateMember);
+}
+
+function checkPatchContentType(
+  context: LinterRuleContext<DiagnosticMessages>,
+  operation: Operation,
+) {
+  const program = context.program;
+  for (const property of operation.parameters.properties.values()) {
+    if (!isHeader(program, property)) continue;
+    const headerName = getHeaderFieldName(program, property);
+    if (headerName?.toLowerCase() !== "content-type") continue;
+    const [contentTypes] = getContentTypes(property);
+    if (contentTypes.length === 0) continue;
+    const allowed = new Set(["application/merge-patch+json", "application/json"]);
+    if (!contentTypes.every((ct) => allowed.has(ct))) {
+      context.reportDiagnostic({
+        messageId: "nonMergePatchContentType",
+        format: { operationName: operation.name },
+        target: property,
+      });
+    }
+  }
+}
+
+function createMakeOptionalCodeFix(property: ModelProperty): CodeFix {
+  return defineCodeFix({
+    id: "make-patch-property-optional",
+    label: `Make property '${property.name}' optional`,
+    fix: (context) => {
+      const node = property.node;
+      if (!node || node.kind !== SyntaxKind.ModelProperty) return undefined;
+      const idLocation = getSourceLocation(node.id);
+      return context.appendText(idLocation, "?");
+    },
+  });
+}
+
+function createRemoveDefaultCodeFix(property: ModelProperty): CodeFix {
+  return defineCodeFix({
+    id: "remove-patch-property-default",
+    label: `Remove default value from property '${property.name}'`,
+    fix: (context) => {
+      const node = property.node;
+      if (!node || node.kind !== SyntaxKind.ModelProperty || node.default === undefined)
+        return undefined;
+      const valueLocation = getSourceLocation(node.value);
+      const defaultLocation = getSourceLocation(node.default);
+      return context.replaceText(
+        { file: valueLocation.file, pos: valueLocation.end, end: defaultLocation.end },
+        "",
+      );
+    },
+  });
+}
+
+function createRemovePropertyCodeFix(property: ModelProperty): CodeFix {
+  return defineCodeFix({
+    id: "remove-patch-property",
+    label: `Remove property '${property.name}' from PATCH body`,
+    fix: (context) => {
+      const node = property.node;
+      if (!node || node.kind !== SyntaxKind.ModelProperty) return undefined;
+      const location = getSourceLocation(node);
+      const fileText = location.file.text;
+      // Extend the range to include any trailing terminator (`;` or `,`) and the rest
+      // of the line (including the newline) so we don't leave an empty line behind.
+      let end = location.end;
+      if (end < fileText.length && (fileText[end] === ";" || fileText[end] === ",")) {
+        end += 1;
+      }
+      // Consume trailing horizontal whitespace and a single newline (if present).
+      while (end < fileText.length && (fileText[end] === " " || fileText[end] === "\t")) {
+        end += 1;
+      }
+      if (fileText[end] === "\r") end += 1;
+      if (fileText[end] === "\n") end += 1;
+      // Also consume leading whitespace on the same line so the line is fully removed.
+      let pos = location.pos;
+      while (pos > 0 && (fileText[pos - 1] === " " || fileText[pos - 1] === "\t")) {
+        pos -= 1;
+      }
+      return context.replaceText({ file: location.file, pos, end }, "");
+    },
+  });
 }
 
 function getResourceModel(program: Program, operation: Operation): Model | undefined {
