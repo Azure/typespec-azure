@@ -1,6 +1,7 @@
-import { deepStrictEqual } from "assert";
+import { expectDiagnosticEmpty } from "@typespec/compiler/testing";
+import { deepStrictEqual, ok } from "assert";
 import { it } from "vitest";
-import { compileMultipleOpenAPI, compileOpenAPI } from "./test-host.js";
+import { AzureTester, compileMultipleOpenAPI } from "./test-host.js";
 
 it("supports emitting multiple services", async () => {
   const { Service, Client } = await compileMultipleOpenAPI(
@@ -55,7 +56,8 @@ it("does not crash when no @service is defined and a model references a versione
   // Regression test for a null reference crash in the autorest emitter when
   // there is no @service declared but the spec references a model from a
   // versioned namespace (e.g. CommonTypes.AzureEntityResource).
-  const openApi = await compileOpenAPI(
+  const tester = await AzureTester.createInstance();
+  const [{ outputs }, diagnostics] = await tester.compileAndDiagnose(
     `
       @armProviderNamespace
       namespace Microsoft.Contoso;
@@ -66,8 +68,11 @@ it("does not crash when no @service is defined and a model references a versione
         movingStatus: string;
       }
       `,
-    { preset: "azure" },
   );
+  expectDiagnosticEmpty(diagnostics);
+  const content = outputs["openapi.json"];
+  ok(content, "Expected to have found openapi output");
+  const openApi = JSON.parse(content);
   deepStrictEqual(openApi.definitions?.MoveResponse, {
     type: "object",
     description: "Move response",
