@@ -646,6 +646,7 @@ function getSdkMethodResponse(
         variantTypes: allResponseBodies,
         name: createGeneratedName(context, operation, "UnionResponse"),
         isGeneratedName: true,
+        isExactName: false,
         namespace: client.namespace,
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, operation)}.UnionResponse`,
         decorators: [],
