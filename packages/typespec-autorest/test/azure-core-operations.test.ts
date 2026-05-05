@@ -61,6 +61,7 @@ describe("typespec-autorest: Azure.Core.ResourceOperations", () => {
         
         @doc("Create or update a widget.")
         @test
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         op createOrUpdateWidget is Operations.ResourceCreateOrUpdate<Widget>;
       `,
       { preset: "azure" },
@@ -92,6 +93,7 @@ describe("typespec-autorest: Azure.Core.ResourceOperations", () => {
       
       @doc("Create or update a widget.")
       @test
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       op createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
     `,
       { preset: "azure" },

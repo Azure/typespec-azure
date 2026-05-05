@@ -44,6 +44,7 @@ describe("typespec-azure-core: use-standard-names rule", () => {
         @put op wholeNewFoo(@body body: Foo): FooResponse<Foo, 200>;
         
         @route("5")
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         @patch(#{implicitOptionality: true}) op changeFoo(@body body: Foo): FooResponse<Foo, 201>;
         
         @route("6")
@@ -120,7 +121,9 @@ describe("typespec-azure-core: use-standard-names rule", () => {
       @route("5")
       @put op replaceFoo(@body body: Foo): FooResponse<Foo, 200>;
       
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       @route("6")
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       @patch(#{implicitOptionality: true}) op createOrUpdateFoo(@body body: Foo): FooResponse<Foo, 201>;
       
       @route("7")

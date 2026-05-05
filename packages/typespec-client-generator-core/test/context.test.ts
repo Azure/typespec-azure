@@ -144,6 +144,7 @@ it("export complex TCGC output from emitter", async () => {
       interface Employees {
         get is ArmResourceRead<Employee>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchSync<Employee, EmployeeProperties>;
         delete is ArmResourceDeleteWithoutOkAsync<Employee>;
         listByResourceGroup is ArmResourceListByParent<Employee>;
