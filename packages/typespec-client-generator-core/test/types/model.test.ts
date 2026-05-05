@@ -785,6 +785,7 @@ it("filterOutCoreModels true", async () => {
     }
 
     @doc("Creates or updates a User")
+    #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
     op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<User>;
   `);
   const context = await createSdkContextForTester(program);
@@ -815,6 +816,7 @@ it("filterOutCoreModels false", async () => {
     }
 
     @doc("Creates or updates a User")
+    #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
     op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<User>;
   `);
   const context = await createSdkContextForTester(program);
@@ -846,6 +848,7 @@ it("lro core filterOutCoreModels true", async () => {
 
     @doc("Polls status.")
     @pollingOperation(My.Service.getStatus)
+    #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
     op createOrUpdateUser is StandardResourceOperations.LongRunningResourceCreateOrUpdate<User>;
   `);
   const context = await createSdkContextForTester(program);
@@ -871,6 +874,7 @@ it("lro core filterOutCoreModels false", async () => {
 
     @doc("Polls status.")
     @pollingOperation(My.Service.getStatus)
+    #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
     op createOrUpdateUser is StandardResourceOperations.LongRunningResourceCreateOrUpdate<User>;
   `);
   const context = await createSdkContextForTester(program);
