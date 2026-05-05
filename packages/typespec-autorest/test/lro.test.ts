@@ -54,6 +54,7 @@ describe("typespec-autorest: Long-running Operations", () => {
       op getWidgetOperationStatus is Operations.GetResourceOperationStatus<Widget>;
     
       @pollingOperation(getWidgetOperationStatus)
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       op createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
       `,
       { preset: "azure", options: { "emit-lro-options": "all" } },
@@ -106,6 +107,7 @@ describe("typespec-autorest: Long-running Operations", () => {
       op getWidgetOperationStatus is Operations.GetResourceOperationStatus<Widget>;
     
       @pollingOperation(getWidgetOperationStatus)
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       op createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
       `,
       { preset: "azure", options: { "emit-lro-options": "all" } },
@@ -153,6 +155,7 @@ describe("typespec-autorest: Long-running Operations", () => {
       interface Widgets {
         get is ArmResourceRead<Widget>;
         ${"putOp"}
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchAsync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteWithoutOkAsync<Widget>;
         restart is ArmResourceActionAsync<Widget, void, never>;

@@ -152,7 +152,7 @@ it("vanilla widget read", async () => {
 
 it("vanilla widget update", async () => {
   const { program } = await compileVanillaWidgetService(
-    "@patch(#{implicitOptionality: true}) update(...Widget): Widget | Error;",
+    '#suppress "@typespec/http/deprecated-implicit-optionality" "For test"\n@patch(#{implicitOptionality: true}) update(...Widget): Widget | Error;',
   );
 
   const context = await createSdkContextForTester(program);

@@ -354,7 +354,8 @@ describe("typespec-autorest: polymorphic model inheritance with discriminator", 
         model Pet { kind: string; }
         model Cat extends Pet { kind: "cat"; meow: int32; }
         model Dog extends Pet { kind: "dog"; bark: string; }
-  
+        
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For testing"
         @patch(#{implicitOptionality: true}) op read(...Pet): Pet;
       `);
 

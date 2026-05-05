@@ -189,10 +189,12 @@ it("patch usage", async () => {
         prop: string
       }
 
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       @patch(#{implicitOptionality: true})
       @route("/patch")
       op patchModel(@body body: PatchModel): void;
 
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       @patch(#{implicitOptionality: true})
       @route("/jsonMergePatch")
       op jsonMergePatchModel(@body body: JsonMergePatchModel, @header contentType: "application/merge-patch+json"): void;
