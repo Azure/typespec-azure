@@ -272,7 +272,7 @@ async function getVersionSnapshotDocument(
   );
 
   compilerAssert(subgraph.type.kind === "Namespace", "Should not have mutated to another type");
-  const service = getService(context.program, subgraph.type)!;
+  const service = getService(context.program, subgraph.type) ?? { type: subgraph.type };
   const newContext: AutorestEmitterContext = getEmitterContext(
     context.program,
     service,
