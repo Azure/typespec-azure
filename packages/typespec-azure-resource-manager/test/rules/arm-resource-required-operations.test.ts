@@ -116,7 +116,59 @@ it("emits a single default diagnostic listing all missing operations when multip
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/arm-resource-required-operations",
       message:
-        "Resource 'Foo' is missing required operations: [read, delete, list-by-resource-group, list-by-subscription].",
+        "Resource 'Foo' is missing required operations: [read, delete, list-by-parent, list-by-subscription].",
+    });
+});
+
+it("emits missingListByParent for a tracked resource without a list-by-resource-group operation", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model Foo is TrackedResource<{}> {
+        @key @path @segment("foos") name: string;
+      }
+
+      @armResourceOperations
+      interface FooOperations {
+        read is ArmResourceRead<Foo>;
+        createOrUpdate is ArmResourceCreateOrReplaceAsync<Foo>;
+        delete is ArmResourceDeleteWithoutOkAsync<Foo>;
+        listBySubscription is ArmListBySubscription<Foo>;
+      }
+      `,
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-required-operations",
+      message: `Resource 'Foo' must have a list-by-parent operation (list-by-resource-group satisfies this for tracked resources).`,
+    });
+});
+
+it("emits missingListBySubscription for a tracked resource without a list-by-subscription operation", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model Foo is TrackedResource<{}> {
+        @key @path @segment("foos") name: string;
+      }
+
+      @armResourceOperations
+      interface FooOperations {
+        read is ArmResourceRead<Foo>;
+        createOrUpdate is ArmResourceCreateOrReplaceAsync<Foo>;
+        delete is ArmResourceDeleteWithoutOkAsync<Foo>;
+        listByResourceGroup is ArmResourceListByParent<Foo>;
+      }
+      `,
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-required-operations",
+      message: `Tracked resource 'Foo' must have a list-by-subscription operation.`,
     });
 });
 
@@ -155,7 +207,7 @@ it("emits missingListByParent for a nested proxy resource", async () => {
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/arm-resource-required-operations",
-      message: `Nested resource 'Bar' must have a list-by-parent operation.`,
+      message: `Resource 'Bar' must have a list-by-parent operation (list-by-resource-group satisfies this for tracked resources).`,
     });
 });
 
