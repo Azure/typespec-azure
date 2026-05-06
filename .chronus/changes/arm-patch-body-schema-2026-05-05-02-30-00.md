@@ -6,9 +6,9 @@ packages:
 
 Extend the `arm-resource-patch` linter rule to validate PATCH request body schemas. New diagnostics are emitted when:
 
-- A PATCH request body property is required (must be optional for partial updates).
+- A PATCH request body property is required and the resource property it maps back to has any visibility other than `Lifecycle.Read` by itself (required properties are only allowed when the source resource property is purely read-only, in which case they are filtered out by visibility transforms).
 - A PATCH request body property has a default value (defaults are never applied to PATCH requests).
-- A PATCH request body property maps back to a resource property that is read-only or otherwise not updateable (e.g. `@visibility(Lifecycle.Read)`).
+- A PATCH request body property maps back to a resource property whose visibility excludes `Lifecycle.Update` and is not exactly `Lifecycle.Read` by itself (e.g. `@visibility(Lifecycle.Create)` or `@visibility(Lifecycle.Create, Lifecycle.Read)`). The check is applied recursively to nested model and `Record<Model>` properties.
 - A PATCH operation specifies an explicit `content-type` other than `application/merge-patch+json` (or the implicit `application/json`).
 
-Codefixes are provided to remove default values, mark properties as optional, and remove read-only properties from PATCH bodies.
+Codefixes are provided to remove default values, mark properties as optional, and remove non-updateable properties from PATCH bodies.

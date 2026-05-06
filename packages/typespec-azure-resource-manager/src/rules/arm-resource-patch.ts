@@ -41,8 +41,8 @@ export const patchOperationsRule = createRule({
     default: "The request body of a PATCH must be a model with a subset of resource properties",
     missingTags: "Resource PATCH must contain the 'tags' property.",
     modelSuperset: paramMessage`Resource PATCH models must be a subset of the resource type. The following properties: [${"name"}] do not exist in resource Model '${"resourceModel"}'.`,
-    notUpdateableInPatch: paramMessage`Property '${"propertyName"}' is in the PATCH request body but is not updateable on the resource (e.g. it has '@visibility(Lifecycle.Create)' which excludes 'Lifecycle.Update'); it cannot be updated and must be removed from the PATCH request model.`,
-    requiredInPatch: paramMessage`Property '${"propertyName"}' is required in the PATCH request body. PATCH request body properties must all be optional so partial updates work.`,
+    notUpdateableInPatch: paramMessage`Property '${"propertyName"}' is in the PATCH request body but is not updateable on the resource. Only properties whose visibility excludes 'Lifecycle.Update' AND is exactly '{Lifecycle.Read}' by itself are allowed in PATCH bodies; properties with any other visibility that excludes 'Lifecycle.Update' (for example '@visibility(Lifecycle.Create)' or '@visibility(Lifecycle.Create, Lifecycle.Read)') must be removed from the PATCH request model.`,
+    requiredInPatch: paramMessage`Property '${"propertyName"}' is required in the PATCH request body. PATCH request body properties must all be optional so partial updates work, unless the resource property they map to has visibility 'Lifecycle.Read' by itself.`,
     defaultInPatch: paramMessage`Property '${"propertyName"}' has a default value in the PATCH request body. PATCH request body properties that are not present in the request body leave the value unchanged; they do not result in any default value being assigned.`,
     nonMergePatchContentType: paramMessage`PATCH operation '${"operationName"}' specifies a content-type other than 'application/merge-patch+json'.`,
   },
@@ -119,9 +119,17 @@ function checkPatchBodyProperties(
   context: LinterRuleContext<DiagnosticMessages>,
   patchModel: ModelProperty[],
 ) {
+  // The `isReadOnlyOnly` check is a pure per-source-property predicate that
+  // doesn't depend on recursion, so its results can be safely shared across
+  // every top-level patch property.
+  const readOnlyOnlyCache = new Map<ModelProperty, boolean>();
+
   for (const property of patchModel) {
-    // Required (non-optional) PATCH body properties are not allowed.
-    if (!property.optional) {
+    // Required (non-optional) PATCH body properties are only allowed when the
+    // source resource property has visibility '{Lifecycle.Read}' by itself —
+    // those are filtered out by visibility transforms during request
+    // serialization, so requiring them in the model is not a problem.
+    if (!property.optional && !isReadOnlyOnly(context.program, property, readOnlyOnlyCache)) {
       context.reportDiagnostic({
         messageId: "requiredInPatch",
         format: { propertyName: property.name },
@@ -140,8 +148,18 @@ function checkPatchBodyProperties(
       });
     }
 
-    // Read-only / not-updateable properties should not appear in PATCH body.
-    if (isNotUpdateable(context.program, property)) {
+    // Non-updateable properties should not appear in PATCH body. The check is
+    // applied recursively to nested model and Record<Model> property types.
+    // Recursion-related state is created fresh per top-level property so that
+    // a cycle-resolution false on one traversal does not leak as a stale
+    // cached "false" into a sibling property's traversal.
+    if (
+      isNotUpdateable(context.program, property, {
+        readOnlyOnlyCache,
+        modelHasNonUpdateableCache: new Map<Model, boolean>(),
+        inProgressModels: new Set<Model>(),
+      })
+    ) {
       context.reportDiagnostic({
         messageId: "notUpdateableInPatch",
         format: { propertyName: property.name },
@@ -152,22 +170,133 @@ function checkPatchBodyProperties(
   }
 }
 
-function isNotUpdateable(program: Program, property: ModelProperty): boolean {
+interface NotUpdateableState {
+  /** Pure per-source-property cache; safe to share across the entire traversal. */
+  readOnlyOnlyCache: Map<ModelProperty, boolean>;
+  /**
+   * Per-top-level-property cache of the recursive "does this model contain a
+   * non-updateable property" answer. Recreated for every top-level patch
+   * property because cycle-breaking inside one traversal can otherwise cache
+   * a too-conservative `false` for a model whose true answer depends on a
+   * different entry path.
+   */
+  modelHasNonUpdateableCache: Map<Model, boolean>;
+  /**
+   * Models currently being visited in the active recursion stack. Used purely
+   * to break cycles — entries are added on entry to `modelHasNonUpdateable`
+   * and removed on exit, so each top-level call sees a clean stack.
+   */
+  inProgressModels: Set<Model>;
+}
+
+/**
+ * Returns true when the source resource property's lifecycle visibility is
+ * exactly `{Lifecycle.Read}` by itself. Such properties are filtered out by
+ * visibility transforms during PATCH request serialization, so they are
+ * allowed (even if required) in the PATCH body model.
+ */
+function isReadOnlyOnly(
+  program: Program,
+  property: ModelProperty,
+  cache: Map<ModelProperty, boolean>,
+): boolean {
   const sourceProperty = getSourceProperty(property);
+  const cached = cache.get(sourceProperty);
+  if (cached !== undefined) return cached;
   const lifecycle = getLifecycleVisibilityEnum(program);
-  const updateMember = lifecycle.members.get("Update");
   const readMember = lifecycle.members.get("Read");
-  if (updateMember === undefined) return false;
-  const visibility = getVisibilityForClass(program, sourceProperty, lifecycle);
-  // Properties that are read-only (only Lifecycle.Read visibility) are allowed in
-  // the PATCH request body — they are filtered out by visibility transforms when
-  // the body is serialized for the request, so they don't need to be removed.
-  if (readMember !== undefined && visibility.size === 1 && visibility.has(readMember)) {
+  if (readMember === undefined) {
+    cache.set(sourceProperty, false);
     return false;
   }
-  // If the source property's lifecycle visibility excludes Update, it cannot be
-  // patched and must be removed from the PATCH body model.
-  return !visibility.has(updateMember);
+  const visibility = getVisibilityForClass(program, sourceProperty, lifecycle);
+  const result = visibility.size === 1 && visibility.has(readMember);
+  cache.set(sourceProperty, result);
+  return result;
+}
+
+/**
+ * Returns true when the source resource property has a visibility that
+ * excludes `Lifecycle.Update` and is not `{Lifecycle.Read}` by itself, OR when
+ * any of its transitively-nested complex keyed properties (model types and
+ * `Record<Model>` value types) is itself not updateable.
+ */
+function isNotUpdateable(
+  program: Program,
+  property: ModelProperty,
+  state: NotUpdateableState,
+): boolean {
+  const sourceProperty = getSourceProperty(property);
+
+  const lifecycle = getLifecycleVisibilityEnum(program);
+  const updateMember = lifecycle.members.get("Update");
+  if (updateMember !== undefined) {
+    const visibility = getVisibilityForClass(program, sourceProperty, lifecycle);
+    if (
+      !visibility.has(updateMember) &&
+      !isReadOnlyOnly(program, sourceProperty, state.readOnlyOnlyCache)
+    ) {
+      return true;
+    }
+  }
+
+  // Recurse into complex keyed property types: bare model types (excluding
+  // arrays) and the value type of records when that value type is a model.
+  const nested = getNestedModelToCheck(property.type);
+  if (nested !== undefined && modelHasNonUpdateable(program, nested, state)) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Returns true when `model` (or any of its transitively-nested complex keyed
+ * property types) has a property that is not updateable. Cycles are broken by
+ * treating an in-progress model as not contributing any new non-updateable
+ * findings on the back-edge — the property that started the cycle is still
+ * checked by its own enclosing call, so any non-updateable property is still
+ * detected from at least one path.
+ */
+function modelHasNonUpdateable(program: Program, model: Model, state: NotUpdateableState): boolean {
+  const cached = state.modelHasNonUpdateableCache.get(model);
+  if (cached !== undefined) return cached;
+  if (state.inProgressModels.has(model)) return false;
+  state.inProgressModels.add(model);
+  try {
+    for (const nestedProperty of model.properties.values()) {
+      if (isNotUpdateable(program, nestedProperty, state)) {
+        state.modelHasNonUpdateableCache.set(model, true);
+        return true;
+      }
+    }
+    state.modelHasNonUpdateableCache.set(model, false);
+    return false;
+  } finally {
+    state.inProgressModels.delete(model);
+  }
+}
+
+/**
+ * Returns the nested `Model` to recurse into for the `notUpdateableInPatch`
+ * check, or `undefined` when the property's type is not a complex keyed type.
+ *
+ * - Plain model types are returned directly (excluding arrays which are
+ *   `Model<"Array">` in TypeSpec).
+ * - For `Record<T>` types, the value type `T` is returned when it is a model.
+ */
+function getNestedModelToCheck(type: ModelProperty["type"]): Model | undefined {
+  if (type.kind !== "Model") return undefined;
+  // `Array<T>` is represented as a Model whose name is "Array"; skip it.
+  if (type.name === "Array") return undefined;
+  if (type.name === "Record") {
+    const valueType = type.indexer?.value;
+    if (valueType && valueType.kind === "Model" && valueType.name !== "Array") {
+      return valueType;
+    }
+    return undefined;
+  }
+  return type;
 }
 
 function checkPatchContentType(
