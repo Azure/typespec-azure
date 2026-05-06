@@ -1030,7 +1030,6 @@ describe("Arm LRO templates", () => {
       }
 
       model EmployeeProperties {
-        /** Age of employee */
         age?: int32;
       }
 
@@ -1088,7 +1087,6 @@ describe("Arm LRO templates", () => {
       }
 
       model EmployeeProperties {
-        /** Age of employee */
         age?: int32;
       }
 

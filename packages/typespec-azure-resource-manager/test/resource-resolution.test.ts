@@ -2346,58 +2346,44 @@ model MoveResponse {
 
 using Azure.Core;
 
-/** Contoso Resource Provider management API. */
 @armProviderNamespace
 @service(#{ title: "ContosoProviderHubClient" })
 @versioned(Versions)
 namespace Microsoft.ContosoProviderHub;
 
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   v2021_20_01_preview: "2021-10-01-preview",
 }
 
 // For more information about the proxy vs tracked,
 // see https://armwiki.azurewebsites.net/rp_onboarding/tracked_vs_proxy_resources.html?q=proxy%20resource
-/** A ContosoProviderHub resource */
 model Employee is ProxyResource<EmployeeProperties> {
   ...ResourceNameParameter<Employee>;
 }
 
-/** Employee properties */
 model EmployeeProperties {
-  /** Age of employee */
   age?: int32;
 
-  /** City of employee */
   city?: string;
 
-  /** Profile of employee */
   @encode("base64url")
   profile?: bytes;
 
-  /** The status of the last operation. */
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
 
-/** The provisioning state of a resource. */
 @lroStatus
 union ProvisioningState {
   ResourceProvisioningState,
 
-  /** The resource is being provisioned */
   Provisioning: "Provisioning",
 
-  /** The resource is updating */
   Updating: "Updating",
 
-  /** The resource is being deleted */
   Deleting: "Deleting",
 
-  /** The resource create request has been accepted */
   Accepted: "Accepted",
 
   string,
@@ -2412,21 +2398,18 @@ alias EmployeeRoomOps = Azure.ResourceManager.Legacy.LegacyOperations<
     ...ResourceGroupParameter;
     ...Azure.ResourceManager.Legacy.Provider;
 
-    /** The name of the API Management service. */
     @path
     @segment("buildings")
     @key
     @pattern("^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$")
     buildingName: string;
 
-    /** API identifier. Must be unique in the current API Management service instance. */
     @path
     @segment("rooms")
     @key
     roomId: string;
   },
   {
-    /** Diagnostic identifier. Must be unique in the current API Management service instance. */
     @path
     @segment("employeeResources")
     @key
@@ -2442,7 +2425,6 @@ alias EmployeeBuildingOps = Azure.ResourceManager.Legacy.LegacyOperations<
     ...ResourceGroupParameter;
     ...Azure.ResourceManager.Legacy.Provider;
 
-    /** The name of the API Management service. */
     @path
     @segment("buildings")
     @key
@@ -2450,7 +2432,6 @@ alias EmployeeBuildingOps = Azure.ResourceManager.Legacy.LegacyOperations<
     buildingName: string;
   },
   {
-    /** Diagnostic identifier. Must be unique in the current API Management service instance. */
     @path
     @segment("employeeResources")
     @key
@@ -2469,7 +2450,6 @@ interface EmployeesByBuilding {
   >;
   delete is EmployeeBuildingOps.DeleteSync<Employee>;
   list is EmployeeBuildingOps.List<Employee>;
-  /** A sample resource action that move employee to different location */
   move is EmployeeBuildingOps.ActionSync<Employee, MoveRequest, MoveResponse>;
 }
 
@@ -2483,22 +2463,16 @@ interface EmployeesByRoom {
   >;
   delete is EmployeeRoomOps.DeleteSync<Employee>;
   list is EmployeeRoomOps.List<Employee>;
-  /** A sample resource action that move employee to different location */
   move is EmployeeRoomOps.ActionSync<Employee, MoveRequest, MoveResponse>;
 }
 
-/** Employee move request */
 model MoveRequest {
-  /** The moving from location */
   from: string;
 
-  /** The moving to location */
   to: string;
 }
 
-/** Employee move response */
 model MoveResponse {
-  /** The status of the move */
   movingStatus: string;
 }
 `);
@@ -2638,58 +2612,44 @@ model MoveResponse {
 
 using Azure.Core;
 
-/** Contoso Resource Provider management API. */
 @armProviderNamespace
 @service(#{ title: "ContosoProviderHubClient" })
 @versioned(Versions)
 namespace Microsoft.ContosoProviderHub;
 
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   v2021_20_01_preview: "2021-10-01-preview",
 }
 
 // For more information about the proxy vs tracked,
 // see https://armwiki.azurewebsites.net/rp_onboarding/tracked_vs_proxy_resources.html?q=proxy%20resource
-/** A ContosoProviderHub resource */
 model Employee is ProxyResource<EmployeeProperties> {
   ...ResourceNameParameter<Employee>;
 }
 
-/** Employee properties */
 model EmployeeProperties {
-  /** Age of employee */
   age?: int32;
 
-  /** City of employee */
   city?: string;
 
-  /** Profile of employee */
   @encode("base64url")
   profile?: bytes;
 
-  /** The status of the last operation. */
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
 
-/** The provisioning state of a resource. */
 @lroStatus
 union ProvisioningState {
   ResourceProvisioningState,
 
-  /** The resource is being provisioned */
   Provisioning: "Provisioning",
 
-  /** The resource is updating */
   Updating: "Updating",
 
-  /** The resource is being deleted */
   Deleting: "Deleting",
 
-  /** The resource create request has been accepted */
   Accepted: "Accepted",
 
   string,
@@ -2704,7 +2664,6 @@ alias EmployeeBuildingOps = Azure.ResourceManager.Legacy.LegacyOperations<
     ...ResourceGroupParameter;
     ...Azure.ResourceManager.Legacy.Provider;
 
-    /** The name of the API Management service. */
     @path
     @segment("buildings")
     @key
@@ -2712,7 +2671,6 @@ alias EmployeeBuildingOps = Azure.ResourceManager.Legacy.LegacyOperations<
     buildingName: string;
   },
   {
-    /** Diagnostic identifier. Must be unique in the current API Management service instance. */
     @path
     @segment("employeeResources")
     @key
@@ -2732,22 +2690,16 @@ interface EmployeesByBuilding {
   >;
   delete is EmployeeBuildingOps.DeleteSync<Employee>;
   list is EmployeeBuildingOps.List<Employee>;
-  /** A sample resource action that move employee to different location */
   move is EmployeeBuildingOps.ActionSync<Employee, MoveRequest, MoveResponse>;
 }
 
-/** Employee move request */
 model MoveRequest {
-  /** The moving from location */
   from: string;
 
-  /** The moving to location */
   to: string;
 }
 
-/** Employee move response */
 model MoveResponse {
-  /** The status of the move */
   movingStatus: string;
 }
 `);
@@ -2825,58 +2777,44 @@ model MoveResponse {
 
 using Azure.Core;
 
-/** Contoso Resource Provider management API. */
 @armProviderNamespace
 @service(#{ title: "ContosoProviderHubClient" })
 @versioned(Versions)
 namespace Microsoft.ContosoProviderHub;
 
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   v2021_20_01_preview: "2021-10-01-preview",
 }
 
 // For more information about the proxy vs tracked,
 // see https://armwiki.azurewebsites.net/rp_onboarding/tracked_vs_proxy_resources.html?q=proxy%20resource
-/** A ContosoProviderHub resource */
 model Employee is ProxyResource<EmployeeProperties> {
   ...ResourceNameParameter<Employee>;
 }
 
-/** Employee properties */
 model EmployeeProperties {
-  /** Age of employee */
   age?: int32;
 
-  /** City of employee */
   city?: string;
 
-  /** Profile of employee */
   @encode("base64url")
   profile?: bytes;
 
-  /** The status of the last operation. */
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
 
-/** The provisioning state of a resource. */
 @lroStatus
 union ProvisioningState {
   ResourceProvisioningState,
 
-  /** The resource is being provisioned */
   Provisioning: "Provisioning",
 
-  /** The resource is updating */
   Updating: "Updating",
 
-  /** The resource is being deleted */
   Deleting: "Deleting",
 
-  /** The resource create request has been accepted */
   Accepted: "Accepted",
 
   string,
@@ -2889,7 +2827,6 @@ alias BuildingParams = {
   ...SubscriptionIdParameter;
   ...ResourceGroupParameter;
 
-  /** The name of the API Management service. */
   @path
   @segment("buildings")
   @key
@@ -2898,7 +2835,6 @@ alias BuildingParams = {
 };
 
 alias EmployeeParams = {
-  /** Diagnostic identifier. Must be unique in the current API Management service instance. */
   @path
   @segment("employeeResources")
   @key
@@ -2910,7 +2846,6 @@ alias EmployeeRoomOps = Azure.ResourceManager.Legacy.RoutedOperations<
   {
     ...BuildingParams;
 
-    /** API identifier. Must be unique in the current API Management service instance. */
     @path
     @segment("rooms")
     @key
@@ -2943,7 +2878,6 @@ interface EmployeesByBuilding {
   >;
   delete is EmployeeBuildingOps.DeleteSync<Employee>;
   list is EmployeeBuildingOps.List<Employee>;
-  /** A sample resource action that move employee to different location */
   @route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/employeeResources/{employeeId}/otherResource/thirdResource/{addedId}/move")
   move is EmployeeBuildingOps.ActionSync<
     Employee,
@@ -2971,23 +2905,17 @@ interface EmployeesByRoom {
   >;
   delete is EmployeeRoomOps.DeleteSync<Employee>;
   list is EmployeeRoomOps.List<Employee>;
-  /** A sample resource action that move employee to different location */
   @route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/rooms/{roomId}/employeeResources/{employeeId}/roomMove/move")
   move is EmployeeRoomOps.ActionSync<Employee, MoveRequest, MoveResponse>;
 }
 
-/** Employee move request */
 model MoveRequest {
-  /** The moving from location */
   from: string;
 
-  /** The moving to location */
   to: string;
 }
 
-/** Employee move response */
 model MoveResponse {
-  /** The status of the move */
   movingStatus: string;
 }
 
@@ -3129,9 +3057,7 @@ using Azure.Core;
 @versioned(Versions)
 @armProviderNamespace
 namespace Microsoft.ContosoProviderHub;
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   v2025_11_19_preview: "2025-11-19-preview",
 }
@@ -3422,9 +3348,7 @@ using Azure.Core;
 @versioned(Versions)
 @armProviderNamespace
 namespace Microsoft.ContosoProviderHub;
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   v2025_11_19_preview: "2025-11-19-preview",
 }
@@ -3625,9 +3549,7 @@ using Azure.Core;
 @versioned(Versions)
 @armProviderNamespace
 namespace Microsoft.ContosoProviderHub;
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   v2025_11_19_preview: "2025-11-19-preview",
 }
@@ -3681,15 +3603,11 @@ interface Employees {
   checkExistence is ArmResourceCheckExistence<Employee>;
 }
 
-/** A reconcile request for NSP configuration */
 model ReconcileRequest {
-  /** Whether to force the reconcile */
   force: boolean;
 }
 
-/** A reconcile response for NSP configuration */
 model ReconcileResponse {
-  /** The status of the reconcile */
   status: string;
 }
 @armResourceOperations(NetworkSecurityPerimeterConfiguration)
@@ -4022,15 +3940,12 @@ interface Employees {
 
 using Azure.Core;
 
-/** Contoso Resource Provider management API. */
 @armProviderNamespace
 @service(#{ title: "ContosoProviderHubClient" })
 @versioned(Versions)
 namespace Microsoft.ContosoProviderHub;
 
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   v2021_20_01_preview: "2021-10-01-preview",
 }
@@ -4151,15 +4066,12 @@ interface SupportTicketsNoSubscription {
 
 using Azure.Core;
 
-/** Contoso Resource Provider management API. */
 @armProviderNamespace
 @service(#{ title: "ContosoProviderHubClient" })
 @versioned(Versions)
 namespace Microsoft.ContosoProviderHub;
 
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   v2021_20_01_preview: "2021-10-01-preview",
 }
@@ -4254,19 +4166,15 @@ interface SupportTicketsNoSubscription {
 
 using Azure.Core;
 
-/** Contoso Resource Provider management API. */
 @armProviderNamespace
 @service(#{ title: "ContosoProviderHubClient" })
 @versioned(Versions)
 namespace Microsoft.Resources {
-  /** Contoso API versions */
   enum Versions {
-    /** 2021-10-01-preview version */
     @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
     v2021_20_01_preview: "2021-10-01-preview",
   }
 
-  /** A generic resource with ${propertyType} properties */
   model MyGenericResource
     is Azure.ResourceManager.Legacy.GenericResource<${propertyType}> {
   }
@@ -4291,7 +4199,6 @@ namespace Microsoft.Resources {
     createOrUpdate is genericOps.CreateOrUpdateAsync<MyGenericResource>;
     update is genericOps.CustomPatchSync<MyGenericResource, MyGenericResource>;
     delete is genericOps.DeleteWithoutOkAsync<MyGenericResource>;
-    /** A sample HEAD to check resource existence */
     checkExistence is genericOps.CheckExistence<MyGenericResource>;
   }
 }

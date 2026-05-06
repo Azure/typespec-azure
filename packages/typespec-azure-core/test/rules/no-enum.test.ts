@@ -86,9 +86,7 @@ describe("codefix", () => {
       .expect(
         `        
           enum PetKind {
-            /** cat doc */
             cat,
-            /** dog doc */
             dog
           }
           `,
@@ -97,9 +95,7 @@ describe("codefix", () => {
           union PetKind {
             string,
 
-            /** cat doc */
             cat: "cat",
-            /** dog doc */
             dog: "dog",
           }
         `);
@@ -130,14 +126,12 @@ describe("codefix", () => {
           enum PetKind {
             // cat
 
-            /** cat */
             
             #suppress "cat"
             cat, 
             
             // dog
 
-            /** dog */
             
             #suppress "dog"
             dog
@@ -152,14 +146,12 @@ describe("codefix", () => {
 
             // cat
 
-            /** cat */
             
             #suppress "cat"
             cat: "cat", 
             
             // dog
 
-            /** dog */
             
             #suppress "dog"
             dog: "dog",

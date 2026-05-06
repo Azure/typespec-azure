@@ -478,9 +478,6 @@ function getServiceNoDefaultApiVersion(op: string) {
       "{endpoint}",
       "Testserver endpoint",
       {
-        /**
-         * Need to be set as 'http://localhost:3000' in client.
-         */
         endpoint: url,
       }
     )

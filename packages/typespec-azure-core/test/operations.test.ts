@@ -901,24 +901,18 @@ describe("typespec-azure-core: operation templates", () => {
     it("Gets Lro for non-resource PUT with polling reference", async () => {
       const [_, metadata] = await compileLroOperation(
         `
-        /** The created job */
 model Job {
-  /** job id */
   @path
   @key
   @visibility(Lifecycle.Read)
   id: uuid;
 
-  /** job name */
   name: string;
 }
 
-/** request to create a job */
 model StartJobRequest {
-  /** Name of the job */
   name: string;
 
-  /** Job instructions */
   instructions: string[];
 }
 
@@ -936,7 +930,6 @@ alias JobLroResponse = {
   ...Azure.Core.Foundations.OperationStatus<Job>;
 };
 
-/** Start a job */
 #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Non-resource operation"
 @pollingOperation(getJobStatus)
 @route("/startJob/")
@@ -944,7 +937,6 @@ alias JobLroResponse = {
 op startJobAsync(
   ...Azure.Core.Foundations.ApiVersionParameter,
 
-  /** body */
   @body _: StartJobRequest,
 ): (CreatedResponse & JobLroResponse) | (OkResponse &
   JobLroResponse) | Azure.Core.Foundations.ErrorResponse;
@@ -973,25 +965,19 @@ op startJobAsync(
     it("Gets Lro for custom PUT with polling reference", async () => {
       const [_, metadata] = await compileLroOperation(
         `
-        /** The created job */
         @resource("jobs")
 model Job {
-  /** job id */
   @path
   @key
   @visibility(Lifecycle.Read)
   name: string;
 
-  /** Job instructions */
   instructions: string[];
 }
 
-/** request to create a job */
 model StartJobRequest {
-  /** Name of the job */
   name: string;
 
-  /** Job instructions */
   instructions: string[];
 }
 
@@ -1011,7 +997,6 @@ alias JobLroResponse = {
   ...Azure.Core.Foundations.OperationStatus<Job>;
 };
 
-/** Start a job */
 #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "test"
 @finalOperation(read)
 @pollingOperation(getJobStatus)

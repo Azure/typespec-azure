@@ -474,15 +474,11 @@ describe("ARM resource model:", () => {
 @versioned(Versions)
 @armProviderNamespace("Microsoft.Test")
 namespace ${t.namespace("MSTest")};
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   v2025_11_19_preview: "2025-11-19-preview",
 }
 enum Features {
-  /** Feature A */
   FeatureA: "FeatureA",
-  /** Feature B */
   FeatureB: "FeatureB",
 }
       @Azure.ResourceManager.Legacy.feature(Features.FeatureA)
@@ -535,20 +531,15 @@ enum Features {
 @versioned(Versions)
 @armProviderNamespace("Microsoft.Test")
 namespace ${t.namespace("MSTest")};
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   v2025_11_19_preview: "2025-11-19-preview",
 }
 enum Features {
-  /** Feature A */
   @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "FeatureA", fileName: "feature-a", description: "The data for feature A"})
   FeatureA: "Feature A",
-  /** Feature B */
   @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "FeatureB", fileName: "feature-b", description: "The data for feature B"})
   FeatureB: "Feature B",
 
-  /** Common feature */
   @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "Common", fileName: "common", description: "The data in common for all features", title: "Common types for FeatureA and FeatureB", termsOfService: "MIT License"})
   Common: "Common",
 }
@@ -604,16 +595,12 @@ enum Features {
 @versioned(Versions)
 @armProviderNamespace("Microsoft.Test")
 namespace ${t.namespace("MSTest")};
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   v2025_11_19_preview: "2025-11-19-preview",
 }
 enum Features {
-  /** Feature A */
   @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "FeatureA", fileName: "feature-a", description: "The data for feature A"})
   FeatureA: "Feature A",
-  /** Feature B */
   @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "FeatureB", fileName: "feature-b", description: "The data for feature B"})
   FeatureB: "Feature B",
 }
@@ -714,9 +701,7 @@ enum Features {
 @versioned(Versions)
 @armProviderNamespace
 namespace Microsoft.Test;
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   v2025_11_19_preview: "2025-11-19-preview",
 }
 
@@ -732,9 +717,7 @@ enum Versions {
 @versioned(Versions)
 @armProviderNamespace
 namespace Microsoft.Test;
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v3)
   v2025_11_19_preview: "2025-11-19-preview",
 }
@@ -751,9 +734,7 @@ enum Versions {
 @versioned(Versions)
 @armProviderNamespace
 namespace Microsoft.Test;
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
   v2025_11_19_preview: "2025-11-19-preview",
 }
@@ -770,9 +751,7 @@ enum Versions {
 @versioned(Versions)
 @armProviderNamespace
 namespace Microsoft.Test;
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   v2025_11_19_preview: "2025-11-19-preview",
 }
@@ -787,9 +766,7 @@ enum Versions {
 @versioned(Versions)
 @armProviderNamespace
 namespace Microsoft.Test;
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v6)
   v2025_11_19_preview: "2025-11-19-preview",
 }
@@ -1038,7 +1015,6 @@ model Employee is ExtensionResource<EmployeeProperties> {
 model EmployeeProperties {
   age?: int32;
 
-
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
@@ -1074,14 +1050,12 @@ alias VirtualMachine = Extension.ExternalResource<
   Description = "The name of the virtual machine"
 >;
 
-
 @armResourceOperations
 interface ${t.interface("Employees")} extends EmplOps<Extension.ScopeParameter> {}
 @armResourceOperations
 interface ${t.interface("ManagementGroups")} extends EmplOps<Extension.ManagementGroup> {}
 @armResourceOperations
 interface ${t.interface("VirtualMachines")} extends EmplOps<VirtualMachine> {}
-
 
 model MoveRequest {
   from: string;
@@ -1149,7 +1123,6 @@ alias BaseParams = {
     ...SubscriptionIdParameter;
     ...Azure.ResourceManager.Legacy.Provider;
   };
-
 
 @armResourceOperations
 interface Employees {
@@ -1257,7 +1230,6 @@ alias BaseParams = {
     ...Azure.ResourceManager.Legacy.Provider;
   };
 
-
 @armResourceOperations
 interface Employees {
   @armResourceRead(Employee)
@@ -1312,7 +1284,6 @@ alias BaseParams = {
     ...SubscriptionIdParameter;
     ...Azure.ResourceManager.Legacy.Provider;
   };
-
 
 @armResourceOperations
 interface Employees {
