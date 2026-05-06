@@ -20,7 +20,14 @@ import {
   isService,
   resolveEncodedName,
 } from "@typespec/compiler";
-import { HttpOperation, Visibility, getHttpOperation, isMetadata, isVisible } from "@typespec/http";
+import {
+  HttpOperation,
+  Visibility,
+  getHttpOperation,
+  getServers,
+  isMetadata,
+  isVisible,
+} from "@typespec/http";
 import { getOperationId } from "@typespec/openapi";
 import { Version, getVersions } from "@typespec/versioning";
 import { pascalCase } from "change-case";
@@ -96,16 +103,39 @@ export function isApiVersion(context: TCGCContext, type: ModelProperty): boolean
     return true;
   }
   // otherwise, only consider name-based matching for http metadata parameters
-  // (header/query/path/cookie/statusCode). A regular body model property whose
-  // name happens to be `apiVersion`/`api-version` should not be treated as an
-  // api version parameter.
-  if (!isMetadata(context.program, type)) {
+  // (header/query/path/cookie/statusCode) or server URL template parameters.
+  // A regular body model property whose name happens to be `apiVersion`/`api-version`
+  // should not be treated as an api version parameter.
+  if (!isMetadata(context.program, type) && !isServerUrlTemplateParam(context, type)) {
     return false;
   }
   return (
     type.name.toLowerCase().includes("apiversion") ||
     type.name.toLowerCase().includes("api-version")
   );
+}
+
+/**
+ * Return whether a model property is a server URL template parameter (i.e., a
+ * path-segment variable declared in the `@server` decorator's parameter model).
+ * These parameters are not annotated with HTTP metadata decorators, but they
+ * represent URL template variables and should still be eligible for API-version
+ * name matching.
+ */
+function isServerUrlTemplateParam(context: TCGCContext, type: ModelProperty): boolean {
+  for (const ns of listAllServiceNamespaces(context)) {
+    const servers = getServers(context.program, ns);
+    if (servers) {
+      for (const server of servers) {
+        for (const param of server.parameters.values()) {
+          if (param === type) {
+            return true;
+          }
+        }
+      }
+    }
+  }
+  return false;
 }
 
 /**
