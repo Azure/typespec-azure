@@ -6,7 +6,7 @@ import {
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 
-import { armVersionProgressionRule } from "../../src/rules/arm-version-progression.js";
+import { versionProgressionRule } from "../../src/rules/version-progression.js";
 
 let runner: TesterInstance;
 let tester: LinterRuleTester;
@@ -15,7 +15,7 @@ beforeEach(async () => {
   runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    armVersionProgressionRule,
+    versionProgressionRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });
@@ -80,7 +80,7 @@ it("emits diagnostic when versions are not in chronological order", async () => 
       `,
     )
     .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-version-progression",
+      code: "@azure-tools/typespec-azure-resource-manager/version-progression",
       message:
         "Version '2024-01-01' is declared after '2024-06-01' but is not chronologically later. ARM versions must be declared in strictly increasing chronological order by date.",
     });
@@ -101,7 +101,7 @@ it("emits diagnostic when a stable version shares a date with a preview version"
       `,
     )
     .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-version-progression",
+      code: "@azure-tools/typespec-azure-resource-manager/version-progression",
       message:
         "Version '2026-04-28' has the same date as '2026-04-28-preview'. Every ARM api-version must use a unique date — preview and stable versions cannot share the same 'YYYY-MM-DD'.",
     });
@@ -122,7 +122,7 @@ it("emits diagnostic when a preview version follows the stable version with the 
       `,
     )
     .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-version-progression",
+      code: "@azure-tools/typespec-azure-resource-manager/version-progression",
       message:
         "Version '2024-01-01-preview' has the same date as '2024-01-01'. Every ARM api-version must use a unique date — preview and stable versions cannot share the same 'YYYY-MM-DD'.",
     });
@@ -143,7 +143,7 @@ it("emits diagnostic when two preview versions share a date", async () => {
       `,
     )
     .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-version-progression",
+      code: "@azure-tools/typespec-azure-resource-manager/version-progression",
       message:
         "Version '2024-01-01-alpha.2' has the same date as '2024-01-01-alpha.1'. Every ARM api-version must use a unique date — preview and stable versions cannot share the same 'YYYY-MM-DD'.",
     });

@@ -1,7 +1,6 @@
 import { EnumMember, Namespace, createRule, paramMessage } from "@typespec/compiler";
 
 import { getVersion } from "@typespec/versioning";
-import { isInternalTypeSpec } from "./utils.js";
 
 interface ParsedVersion {
   enumMember: EnumMember;
@@ -28,12 +27,12 @@ function parseVersionDate(value: string): string | undefined {
  * must be different from every other version's date in the same `Versions`
  * enum.
  */
-export const armVersionProgressionRule = createRule({
-  name: "arm-version-progression",
+export const versionProgressionRule = createRule({
+  name: "version-progression",
   severity: "warning",
   description:
     "Validate that ARM service versions all use unique dates and are declared in strictly increasing chronological order.",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-version-progression",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/version-progression",
   messages: {
     notMonotonic: paramMessage`Version '${"version"}' is declared after '${"previous"}' but is not chronologically later. ARM versions must be declared in strictly increasing chronological order by date.`,
     duplicateDate: paramMessage`Version '${"version"}' has the same date as '${"previous"}'. Every ARM api-version must use a unique date — preview and stable versions cannot share the same 'YYYY-MM-DD'.`,
@@ -41,10 +40,6 @@ export const armVersionProgressionRule = createRule({
   create(context) {
     return {
       namespace: (namespace: Namespace) => {
-        if (isInternalTypeSpec(context.program, namespace)) {
-          return;
-        }
-
         const map = getVersion(context.program, namespace);
         if (map === undefined) return;
 

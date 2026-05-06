@@ -1,9 +1,9 @@
 ---
-title: arm-version-progression
+title: version-progression
 ---
 
 ```text title="Full name"
-@azure-tools/typespec-azure-resource-manager/arm-version-progression
+@azure-tools/typespec-azure-resource-manager/version-progression
 ```
 
 ARM service api-versions must:
