@@ -99,3 +99,35 @@ it("api version in host param with versioning", async () => {
 
   ok(hostParam && isApiVersion(context, hostParam));
 });
+
+it("api version in host param named api-version with plain string type in versioned service", async () => {
+  // Regression test: server URL template param named `apiVersion` with plain string type
+  // (not the version enum) in a versioned service must still be recognized as an API
+  // version parameter.  This was broken by PR #4341 which added an isMetadata guard that
+  // excluded server URL template params because they carry no HTTP metadata annotations.
+  // See https://github.com/Azure/typespec-azure/blob/main/packages/azure-http-specs/specs/resiliency/srv-driven/old.tsp
+  const { program } = await SimpleTester.compile(`
+    @service
+    @versioned(Versions)
+    @server(
+      "{endpoint}/resiliency/service-driven/client:v1/service:{serviceDeploymentVersion}/api-version:{apiVersion}",
+      "Testserver endpoint",
+      {
+        endpoint: url,
+        serviceDeploymentVersion: string,
+        apiVersion: string,
+      }
+    )
+    namespace Resiliency.ServiceDriven;
+
+    enum Versions {
+      v1,
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const serviceNamespace = listAllServiceNamespaces(context)[0];
+  const server = getServers(context.program, serviceNamespace)?.[0];
+  const apiVersionParam = server?.parameters.get("apiVersion");
+
+  ok(apiVersionParam && isApiVersion(context, apiVersionParam));
+});
