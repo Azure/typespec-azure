@@ -34,16 +34,7 @@ describe("ARM resource model:", () => {
       @armProviderNamespace
       namespace Microsoft.Test;
 
-      enum ResourceState {
-       Succeeded,
-       Canceled,
-       Failed
-     }
-
-      model FooResourceProperties {
-        iAmFoo: string;
-        provisioningState: ResourceState;
-      }
+      model FooResourceProperties {}
 
       model FooResource is TrackedResource<FooResourceProperties> {
         @key("fooName")
@@ -81,18 +72,7 @@ describe("ARM resource model:", () => {
       
           namespace Microsoft.Test {
 
-      interface Operations extends Azure.ResourceManager.Operations {}
-
-      enum ResourceState {
-       Succeeded,
-       Canceled,
-       Failed
-     }
-
-     model FooResourceProperties {
-       displayName?: string = "default";
-       provisioningState: ResourceState;
-     }
+      model FooResourceProperties {}
 
       model FooResource is TrackedResource<FooResourceProperties> {
         @key("fooName")
@@ -119,16 +99,7 @@ describe("ARM resource model:", () => {
       @armProviderNamespace
       namespace Microsoft.Test;
 
-      enum ResourceState {
-       Succeeded,
-       Canceled,
-       Failed
-     }
-
-     model FooResourceProperties {
-       displayName?: string = "default";
-       provisioningState: ResourceState;
-     }
+      model FooResourceProperties {}
 
       model FooResource is TrackedResource<FooResourceProperties> {
         @key("fooName")
@@ -140,10 +111,7 @@ describe("ARM resource model:", () => {
       interface Foos extends TrackedResourceOperations<FooResource,FooResourceProperties> {
       }
 
-      model BarResourceProperties {
-        iAmBar: string;
-        provisioningState: ResourceState;
-      }
+      model BarResourceProperties {}
 
       @parentResource(FooResource)
       model BarResource is ProxyResource<BarResourceProperties> {
@@ -179,16 +147,7 @@ describe("ARM resource model:", () => {
       @armProviderNamespace
       namespace Microsoft.Test;
 
-      enum ResourceState {
-       Succeeded,
-       Canceled,
-       Failed
-     }
-
-     model BazResourceProperties {
-       displayName?: string = "default";
-       provisioningState: ResourceState;
-     }
+      model BazResourceProperties {}
 
       model BazResource is ExtensionResource<BazResourceProperties> {
         @key("bazName")
@@ -224,18 +183,7 @@ describe("ARM resource model:", () => {
       @armProviderNamespace
       namespace Microsoft.Test;
 
-      interface Operations extends Azure.ResourceManager.Operations {}
-
-      enum ResourceState {
-       Succeeded,
-       Canceled,
-       Failed
-     }
-
-     model FooResourceProperties {
-       displayName?: string = "default";
-       provisioningState: ResourceState;
-     }
+      model FooResourceProperties {}
 
       model FooResource is TrackedResource<FooResourceProperties> {
         @key("fooName")
@@ -248,10 +196,7 @@ describe("ARM resource model:", () => {
       #suppress "deprecated" "test"
       interface Foos extends ResourceCreate<FooResource>,ResourceRead<FooResource>,ResourceDelete<FooResource> {}
 
-      model BarResourceProperties {
-        iAmBar: string;
-       provisioningState: ResourceState;
-      }
+      model BarResourceProperties {}
 
       @singleton
       @parentResource(FooResource)
@@ -290,16 +235,7 @@ describe("ARM resource model:", () => {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      enum ResourceState {
-       Succeeded,
-       Canceled,
-       Failed
-     }
-
-      model FooResourceProperties {
-        iAmFoo: string;
-        provisioningState: ResourceState;
-      }
+      model FooResourceProperties {}
 
       model FooResource is TrackedResource<FooResourceProperties> {
         @key("fooName")
@@ -421,20 +357,13 @@ describe("ARM resource model:", () => {
   it("resources with armResourceIdentifier property types", async () => {
     const { program } = await Tester.compile(`
       @armProviderNamespace
-              namespace Microsoft.Test;
-
-      enum ResourceState {
-        Succeeded,
-        Canceled,
-        Failed
-     }
+      namespace Microsoft.Test;
 
       model FooResourceProperties {
         simpleArmId: Azure.Core.armResourceIdentifier;
         armIdWithType: Azure.Core.armResourceIdentifier<[{type:"Microsoft.RP/type"}]>;
         armIdWithTypeAndScope: Azure.Core.armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["Tenant", "ResourceGroup"]}]>;
         armIdWithMultipleTypeAndScope: Azure.Core.armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["Tenant", "ResourceGroup"]}, {type:"Microsoft.RP/type2", scopes:["Tenant", "ResourceGroup"]}]>;
-        provisioningState: ResourceState;
       }
 
       model FooResource is TrackedResource<FooResourceProperties> {

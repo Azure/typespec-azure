@@ -585,8 +585,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 }
 
 model EmployeeProperties {
-  age?: int32;
-
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
@@ -599,7 +597,6 @@ union ProvisioningState {
 
 model MoveRequest {
   from: string;
-
   to: string;
 }
 
@@ -618,9 +615,7 @@ interface Employees {
   delete is ArmResourceDeleteWithoutOkAsync<Employee>;
   listByResourceGroup is ArmResourceListByParent<Employee>;
   listBySubscription is ArmListBySubscription<Employee>;
-
   move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
-
   checkExistence is ArmResourceCheckExistence<Employee>;
 }
 `);
@@ -684,7 +679,6 @@ model Employee is ExtensionResource<EmployeeProperties> {
 }
 
 model EmployeeProperties {
-  age?: int32;
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -1167,7 +1161,6 @@ model Employee is ExtensionResource<EmployeeProperties> {
 }
 
 model EmployeeProperties {
-  age?: int32;
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -1452,7 +1445,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 }
 
 model EmployeeProperties {
-  age?: int32;
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -1758,7 +1750,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 }
 
 model EmployeeProperties {
-  age?: int32;
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -1938,7 +1929,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 }
 
 model EmployeeProperties {
-  age?: int32;
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -2188,7 +2178,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 }
 
 model EmployeeProperties {
-  age?: int32;
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -2363,12 +2352,6 @@ model Employee is ProxyResource<EmployeeProperties> {
 }
 
 model EmployeeProperties {
-  age?: int32;
-
-  city?: string;
-
-  @encode("base64url")
-  profile?: bytes;
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -2629,12 +2612,6 @@ model Employee is ProxyResource<EmployeeProperties> {
 }
 
 model EmployeeProperties {
-  age?: int32;
-
-  city?: string;
-
-  @encode("base64url")
-  profile?: bytes;
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -2794,12 +2771,6 @@ model Employee is ProxyResource<EmployeeProperties> {
 }
 
 model EmployeeProperties {
-  age?: int32;
-
-  city?: string;
-
-  @encode("base64url")
-  profile?: bytes;
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -3072,7 +3043,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 }
 
 model EmployeeProperties {
-  age?: int32;
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -3362,7 +3332,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 }
 
 model EmployeeProperties {
-  age?: int32;
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -3563,7 +3532,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 }
 
 model EmployeeProperties {
-  age?: int32;
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -3900,7 +3868,6 @@ model EmployeeParent is TrackedResource<EmployeeParentProperties> {
 }
 
 model EmployeeParentProperties {
-  age?: int32;
 }
 
 @parentResource(EmployeeParent)
@@ -3909,7 +3876,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 }
 
 model EmployeeProperties {
-  age?: int32;
 }
 
 interface Operations extends Azure.ResourceManager.Operations {}
@@ -4281,7 +4247,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 }
 
 model EmployeeProperties {
-  age?: int32;
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -4337,7 +4302,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 }
 
 model EmployeeProperties {
-  age?: int32;
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -4384,8 +4348,6 @@ model Employee is ProxyResource<EmployeeProperties> {
 }
 
 model EmployeeProperties {
-  age?: int32;
-  city?: string;
 }
 
 @armResourceOperations
