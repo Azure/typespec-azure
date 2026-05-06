@@ -4,6 +4,7 @@ import {
   defineCodeFix,
   getSourceLocation,
   Interface,
+  LinterRuleContext,
   Model,
   paramMessage,
   Program,
@@ -17,6 +18,15 @@ type RequiredOperation =
   | "delete"
   | "list-by-parent"
   | "list-by-subscription";
+
+type RequiredOperationsMessages = {
+  default: ReturnType<typeof paramMessage>;
+  missingListBySubscription: ReturnType<typeof paramMessage>;
+  missingListByParent: ReturnType<typeof paramMessage>;
+  missingGet: ReturnType<typeof paramMessage>;
+  missingCreateOrUpdate: ReturnType<typeof paramMessage>;
+  missingDelete: ReturnType<typeof paramMessage>;
+};
 
 /**
  * Verify that an ARM resource declares the complete set of required
@@ -38,62 +48,73 @@ export const armResourceRequiredOperationsRule = createRule({
     missingDelete: paramMessage`Resource '${"name"}' must have a delete operation.`,
   },
   create(context) {
-    // Resolve resources once for the program and reuse for every model visit.
-    let resourcesByModel: Map<Model, ResolvedResource[]> | undefined;
-    const getResources = (program: Program): Map<Model, ResolvedResource[]> => {
-      if (resourcesByModel !== undefined) return resourcesByModel;
-      resourcesByModel = new Map();
-      const provider = resolveArmResources(program);
-      for (const resource of provider.resources ?? []) {
-        const list = resourcesByModel.get(resource.type);
-        if (list) list.push(resource);
-        else resourcesByModel.set(resource.type, [resource]);
-      }
-      return resourcesByModel;
-    };
-
     return {
-      model: (model: Model) => {
-        if (isInternalTypeSpec(context.program, model)) return;
-        const resources = getResources(context.program).get(model);
-        if (!resources || resources.length === 0) return;
-        // A resource model can have multiple resolved entries (e.g., distinct
-        // operation paths). Treat the union of their operations as the
-        // operations declared for this model.
-        const armResource = resources[0];
-        if (armResource.kind === "Other") return;
-
-        const required = getRequiredOperationsForResource(armResource);
-        if (required.length === 0) return;
-        const present = getPresentOperations(resources);
-        const missing = required.filter((op) => !present.has(op));
-        if (missing.length === 0) return;
-
-        const resourceInterface = getResolvedResourceInterface(resources);
-        const target = resourceInterface ?? model;
-
-        if (missing.length === 1) {
-          const messageId = singleMessageId(missing[0]);
-          context.reportDiagnostic({
-            messageId,
-            target,
-            format: { name: armResource.resourceName },
-            codefixes: buildCodefixes(missing, armResource.resourceName, resourceInterface),
-          });
-          return;
+      // Iterate every resolved ARM resource once for the program. We use
+      // `resolveArmResources` (which handles both standard and legacy resource
+      // operations) and read kind / singleton / operations directly from the
+      // returned ResolvedResource entries.
+      //
+      // A single declared resource can produce multiple ResolvedResource
+      // entries (e.g., when ARM operation templates emit additional paths
+      // for createOrUpdate under a nested resource), so entries are grouped
+      // by model identity and a single diagnostic is reported per logical
+      // resource using the union of their operations.
+      root: (program: Program) => {
+        const provider = resolveArmResources(program);
+        const groups = new Map<Model, ResolvedResource[]>();
+        for (const resource of provider.resources ?? []) {
+          if (resource.kind === "Other") continue;
+          if (isInternalTypeSpec(program, resource.type)) continue;
+          const list = groups.get(resource.type);
+          if (list) list.push(resource);
+          else groups.set(resource.type, [resource]);
         }
-        context.reportDiagnostic({
-          target,
-          format: { name: armResource.resourceName, operations: missing.join(", ") },
-          codefixes: buildCodefixes(missing, armResource.resourceName, resourceInterface),
-        });
+        for (const entries of groups.values()) {
+          checkResource(context, entries);
+        }
       },
     };
   },
 });
 
+function checkResource(
+  context: LinterRuleContext<RequiredOperationsMessages>,
+  entries: ResolvedResource[],
+): void {
+  // Use the entry with the shortest `resourceType.types` as the canonical
+  // representation of the resource (it has the natural depth declared by the
+  // user). Operations are aggregated across all entries.
+  const canonical = entries.reduce((best, cur) =>
+    cur.resourceType.types.length < best.resourceType.types.length ? cur : best,
+  );
+
+  const required = getRequiredOperationsForResource(canonical);
+  if (required.length === 0) return;
+  const present = getPresentOperations(entries);
+  const missing = required.filter((op) => !present.has(op));
+  if (missing.length === 0) return;
+
+  const resourceInterface = getResolvedResourceInterface(entries);
+  const target = resourceInterface ?? canonical.type;
+  const name = canonical.resourceName;
+
+  if (missing.length === 1) {
+    context.reportDiagnostic({
+      messageId: singleMessageId(missing[0]),
+      target,
+      format: { name },
+      codefixes: buildCodefixes(missing, name, resourceInterface),
+    });
+    return;
+  }
+  context.reportDiagnostic({
+    target,
+    format: { name, operations: missing.join(", ") },
+    codefixes: buildCodefixes(missing, name, resourceInterface),
+  });
+}
+
 function getRequiredOperationsForResource(resource: ResolvedResource): RequiredOperation[] {
-  if (resource.kind === "Other") return [];
   const isSingleton = resource.singleton !== undefined;
   if (isSingleton) {
     return ["read", "createOrUpdate"];
@@ -108,9 +129,9 @@ function getRequiredOperationsForResource(resource: ResolvedResource): RequiredO
   return required;
 }
 
-function getPresentOperations(resources: ResolvedResource[]): Set<RequiredOperation> {
+function getPresentOperations(entries: ResolvedResource[]): Set<RequiredOperation> {
   const present = new Set<RequiredOperation>();
-  for (const resource of resources) {
+  for (const resource of entries) {
     const lifecycle = resource.operations.lifecycle;
     if (lifecycle.read?.length) present.add("read");
     if (lifecycle.createOrUpdate?.length) present.add("createOrUpdate");
@@ -132,8 +153,8 @@ function getPresentOperations(resources: ResolvedResource[]): Set<RequiredOperat
   return present;
 }
 
-function getResolvedResourceInterface(resources: ResolvedResource[]): Interface | undefined {
-  for (const resource of resources) {
+function getResolvedResourceInterface(entries: ResolvedResource[]): Interface | undefined {
+  for (const resource of entries) {
     for (const ops of Object.values(resource.operations.lifecycle)) {
       if (!Array.isArray(ops)) continue;
       for (const op of ops) {
