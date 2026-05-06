@@ -244,7 +244,7 @@ interface PrivateEndpoints<
   @doc("Update a {name} PrivateEndpointConnection", ParentResource)
   @builtInResourceOperation(ParentResource, Resource, "update", OverrideResourceName)
   @Private.enforceConstraint(ParentResource, Foundations.Resource)
-  @patch(#{ implicitOptionality: false })
+  @patch
   CustomPatchAsync<
     ParentResource extends Foundations.SimpleResource,
     Resource extends PrivateEndpointConnectionResource = PrivateEndpointResource,
@@ -287,7 +287,7 @@ interface PrivateEndpoints<
   @doc("Update a {name PrivateEndpointConnection}", ParentResource)
   @builtInResourceOperation(ParentResource, Resource, "update", OverrideResourceName)
   @Private.enforceConstraint(ParentResource, Foundations.Resource)
-  @patch(#{ implicitOptionality: false })
+  @patch
   CustomPatchSync<
     ParentResource extends Foundations.SimpleResource,
     Resource extends PrivateEndpointConnectionResource = PrivateEndpointResource,

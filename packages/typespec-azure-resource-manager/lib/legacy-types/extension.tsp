@@ -106,7 +106,7 @@ interface ExtensionOperations<
   @armOperationRoute(OperationOptions)
   @doc("Update a {name}", Resource)
   @legacyExtensionResourceOperation(Resource, "update", OverrideResourceName)
-  @patch(#{ implicitOptionality: false })
+  @patch
   CustomPatchAsync<
     Resource extends Foundations.SimpleResource,
     PatchModel extends {} | void = Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>,
@@ -146,7 +146,7 @@ interface ExtensionOperations<
   @armOperationRoute(OperationOptions)
   @doc("Update a {name}", Resource)
   @legacyExtensionResourceOperation(Resource, "update", OverrideResourceName)
-  @patch(#{ implicitOptionality: false })
+  @patch
   CustomPatchSync<
     Resource extends Foundations.SimpleResource,
     PatchModel extends {} | void = Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>,

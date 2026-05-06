@@ -134,7 +134,7 @@ interface RoutedOperations<
   @armOperationRoute(OverrideRouteOptions)
   @legacyResourceOperation(Resource, "update", OverrideResourceName)
   @Private.armUpdateProviderNamespace
-  @patch(#{ implicitOptionality: false })
+  @patch
   CustomPatchAsync<
     Resource extends Foundations.SimpleResource,
     PatchModel extends {} | void = Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>,
@@ -175,7 +175,7 @@ interface RoutedOperations<
   @armOperationRoute(OverrideRouteOptions)
   @legacyResourceOperation(Resource, "update", OverrideResourceName)
   @Private.armUpdateProviderNamespace
-  @patch(#{ implicitOptionality: false })
+  @patch
   CustomPatchSync<
     Resource extends Foundations.SimpleResource,
     PatchModel extends {} | void = Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>,
@@ -465,7 +465,7 @@ model ProviderParameter<Resource extends {}> {
 @doc("Update a {name}", Resource)
 @armResourceUpdate(Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
-@patch(#{ implicitOptionality: false })
+@patch
 op CustomPatchAsync<
   Resource extends Foundations.SimpleResource,
   PatchModel extends TypeSpec.Reflection.Model | void = TagsUpdateModel<Resource>,
@@ -505,7 +505,7 @@ op CustomPatchAsync<
 @doc("Update a {name}", Resource)
 @armResourceUpdate(Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
-@patch(#{ implicitOptionality: false })
+@patch
 op CustomPatchSync<
   Resource extends Foundations.SimpleResource,
   PatchModel extends TypeSpec.Reflection.Model | void = TagsUpdateModel<Resource>,
