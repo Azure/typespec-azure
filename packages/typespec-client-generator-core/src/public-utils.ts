@@ -127,8 +127,10 @@ function isServerUrlTemplateParam(context: TCGCContext, type: ModelProperty): bo
     const servers = getServers(context.program, ns);
     if (servers) {
       for (const server of servers) {
-        if ([...server.parameters.values()].includes(type)) {
-          return true;
+        for (const param of server.parameters.values()) {
+          if (param === type) {
+            return true;
+          }
         }
       }
     }
