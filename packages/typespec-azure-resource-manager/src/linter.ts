@@ -5,6 +5,7 @@ import { armCustomResourceUsageDiscourage } from "./rules/arm-custom-resource-us
 import { armDeleteResponseCodesRule } from "./rules/arm-delete-response-codes.js";
 import { armNoPathCasingConflictsRule } from "./rules/arm-no-path-casing-conflicts.js";
 import { armNoRecordRule } from "./rules/arm-no-record.js";
+import { armNoReplaceInheritedPropsRule } from "./rules/arm-no-replace-inherited-props.js";
 import { armPostResponseCodesRule } from "./rules/arm-post-response-codes.js";
 import { armPutResponseCodesRule } from "./rules/arm-put-response-codes.js";
 import { armResourceActionNoSegmentRule } from "./rules/arm-resource-action-no-segment.js";
@@ -39,6 +40,7 @@ import { versionProgressionRule } from "./rules/version-progression.js";
 const rules = [
   armNoRecordRule,
   armNoPathCasingConflictsRule,
+  armNoReplaceInheritedPropsRule,
   armCommonTypesVersionRule,
   armDeleteResponseCodesRule,
   armPutResponseCodesRule,
