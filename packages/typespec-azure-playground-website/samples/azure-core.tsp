@@ -198,6 +198,7 @@ interface Widgets {
 
   // Widget Operations
   /** Creates or updates a Widget asynchronously */
+  #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
   @pollingOperation(Widgets.getWidgetOperationStatus)
   createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
 
@@ -219,6 +220,7 @@ interface Widgets {
   getAnalytics is Operations.ResourceRead<WidgetAnalytics>;
 
   /** Creates or updates a WidgetAnalytics */
+  #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
   updateAnalytics is Operations.ResourceCreateOrUpdate<WidgetAnalytics>;
 
   // Widget Repair Operations
