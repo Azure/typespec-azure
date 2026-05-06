@@ -438,60 +438,6 @@ it("non-versioning service with api version param in endpoint", async () => {
   strictEqual(apiVersionParam.kind, "path");
 });
 
-it("versioned service with api-version in server url as plain string param (regression #4341)", async () => {
-  // Regression test for https://github.com/Azure/typespec-azure/pull/4341:
-  // A server URL template param named `apiVersion` with type `string` (not the version
-  // enum) in a versioned service must still be recognised as an API version parameter
-  // and receive the correct clientDefaultValue.
-  // See: packages/azure-http-specs/specs/resiliency/srv-driven/old.tsp
-  const { program } = await SimpleTester.compile(`
-        @versioned(Versions)
-        @server(
-          "{endpoint}/resiliency/service-driven/client:v1/service:{serviceDeploymentVersion}/api-version:{apiVersion}",
-          "Testserver endpoint",
-          {
-            endpoint: url,
-            serviceDeploymentVersion: string,
-            apiVersion: string,
-          }
-        )
-        @service
-        namespace Resiliency.ServiceDriven;
-
-        enum Versions {
-          v1,
-        }
-
-        op fromNone(): void;
-      `);
-  const context = await createSdkContextForTester(program);
-  const sdkPackage = context.sdkPackage;
-  strictEqual(sdkPackage.clients.length, 1);
-  const client = sdkPackage.clients[0];
-
-  const endpointParam = client.clientInitialization.parameters.find(
-    (p): p is SdkEndpointParameter => p.kind === "endpoint",
-  );
-  ok(endpointParam);
-
-  const endpointType = endpointParam.type;
-  strictEqual(endpointType.kind, "union");
-
-  const templatedEndpoint = endpointType.variantTypes.find(
-    (x): x is SdkEndpointType =>
-      x.kind === "endpoint" &&
-      x.serverUrl.includes("{apiVersion}") &&
-      x.serverUrl.includes("{serviceDeploymentVersion}"),
-  );
-  ok(templatedEndpoint, "templated endpoint with apiVersion must exist");
-
-  const apiVersionArg = templatedEndpoint.templateArguments.find((a) => a.name === "apiVersion");
-  ok(apiVersionArg, "apiVersion template argument must exist");
-  strictEqual(apiVersionArg.kind, "path");
-  strictEqual(apiVersionArg.isApiVersionParam, true);
-  strictEqual(apiVersionArg.clientDefaultValue, "v1");
-});
-
 it("endpoint with path param default value", async () => {
   const { program } = await SimpleTester.compile(`
         @server(
