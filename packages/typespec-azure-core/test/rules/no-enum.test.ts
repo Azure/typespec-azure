@@ -131,14 +131,14 @@ describe("codefix", () => {
             // cat
 
             /** cat */
-            @doc("cat")
+            
             #suppress "cat"
             cat, 
             
             // dog
 
             /** dog */
-            @doc("dog")
+            
             #suppress "dog"
             dog
 
@@ -153,14 +153,14 @@ describe("codefix", () => {
             // cat
 
             /** cat */
-            @doc("cat")
+            
             #suppress "cat"
             cat: "cat", 
             
             // dog
 
             /** dog */
-            @doc("dog")
+            
             #suppress "dog"
             dog: "dog",
 

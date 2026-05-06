@@ -686,7 +686,6 @@ model Employee is ExtensionResource<EmployeeProperties> {
 model EmployeeProperties {
   age?: int32;
 
-
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
@@ -1170,7 +1169,6 @@ model Employee is ExtensionResource<EmployeeProperties> {
 model EmployeeProperties {
   age?: int32;
 
-
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
@@ -1210,7 +1208,6 @@ interface Employees extends EmplOps<Extension.ScopeParameter, "EmployeesAtScope"
 interface Tenants extends EmplOps<Extension.Tenant, "EmployeesAtTenant"> {}
 @armResourceOperations
 interface Subscriptions extends EmplOps<Extension.Subscription, "EmployeesAtSubscription"> {}
-
 
 @armResourceOperations
 interface VirtualMachines extends EmplOps<VirtualMachine, "EmployeesAtVirtualMachine"> {}
@@ -1456,7 +1453,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 
 model EmployeeProperties {
   age?: int32;
-
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -1764,7 +1760,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 model EmployeeProperties {
   age?: int32;
 
-
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
@@ -1944,7 +1939,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 
 model EmployeeProperties {
   age?: int32;
-
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -2195,7 +2189,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 
 model EmployeeProperties {
   age?: int32;
-
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -2957,7 +2950,7 @@ interface EmployeesByBuilding {
     MoveRequest,
     MoveResponse,
     Parameters = {
-      @doc("an additional parameter")
+      
       @path
       @key
       addedId: string;
@@ -3154,7 +3147,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 
 model EmployeeProperties {
   age?: int32;
-
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -3448,7 +3440,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 model EmployeeProperties {
   age?: int32;
 
-
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
@@ -3651,7 +3642,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 
 model EmployeeProperties {
   age?: int32;
-
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -4287,7 +4277,7 @@ namespace Microsoft.Resources {
 
       @path(#{ allowReserved: true })
       @key
-      @doc("The resource id")
+      
       resourceId: string;
     },
     {}

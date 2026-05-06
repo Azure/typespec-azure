@@ -285,10 +285,10 @@ it("initialization multiple server parameters with apikey auth", async () => {
           "{endpoint}/server/path/multiple/{apiVersion}",
           "Test server with path parameters.",
           {
-            @doc("Pass in http://localhost:3000 for endpoint.")
+            
             endpoint: url,
 
-            @doc("Pass in v1.0 for API version.")
+            
             apiVersion: Versions,
           }
         )
@@ -298,7 +298,7 @@ it("initialization multiple server parameters with apikey auth", async () => {
         op myOp(): void;
 
         enum Versions {
-          @doc("Version 1.0")
+          
           v1_0: "v1.0",
         }
       `);
@@ -376,10 +376,10 @@ it("non-versioning service with api version param in endpoint", async () => {
           "{endpoint}/server/path/multiple/{apiVersion}",
           "Test server with path parameters.",
           {
-            @doc("Pass in http://localhost:3000 for endpoint.")
+            
             endpoint: url = "http://localhost:3000",
 
-            @doc("Pass in v1.0 for API version.")
+            
             apiVersion: string = "v1",
           }
         )
@@ -682,10 +682,10 @@ it("endpoint template argument with default value of enum member", async () => {
       "{endpoint}/client/structure/{client}",
       "",
       {
-        @doc("Need to be set as 'http://localhost:3000' in client.")
+        
         endpoint: url,
     
-        @doc("Need to be set as 'default', 'multi-client', 'renamed-operation', 'two-operation-group' in client.")
+        
         client: ClientType = ClientType.Default,
       }
     )
@@ -726,7 +726,7 @@ it("client level signatures by default", async () => {
   const { program } = await ArmTesterWithService.compile(`
     model MyProperties {
       @visibility(Lifecycle.Read)
-      @doc("Display name of the Azure Extended Zone.")
+      
       displayName: string;
     }
 

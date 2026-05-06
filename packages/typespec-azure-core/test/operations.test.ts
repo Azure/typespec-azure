@@ -688,15 +688,11 @@ describe("typespec-azure-core: operation templates", () => {
     it("allows override of TraitContext", async () => {
       const operations = await compileResourceOperations(
         `
-        @doc("get lro status")
         @route("/lrRpcOp/{operationId}")
-        @get op getStatus(@doc("The operation") @path operationId: string): PollingStatus;
+        @get op getStatus(@path operationId: string): PollingStatus;
   
         model PollingStatus {
-          @doc("PollingLocation")
           @header location?: ResourceLocation<PollingStatus>;
-  
-          @doc("The status of the operation")
           @Azure.Core.lroStatus
           statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
         }
@@ -752,15 +748,11 @@ describe("typespec-azure-core: operation templates", () => {
     it("works with default TraitContext.Undefined", async () => {
       const operations = await compileResourceOperations(
         `
-        @doc("get lro status")
         @route("/lrRpcOp/{operationId}")
-        @get op getStatus(@doc("The operation") @path operationId: string): PollingStatus;
+        @get op getStatus(@path operationId: string): PollingStatus;
   
         model PollingStatus {
-          @doc("PollingLocation")
           @header location?: ResourceLocation<PollingStatus>;
-  
-          @doc("The status of the operation")
           @Azure.Core.lroStatus
           statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
         }
@@ -1241,19 +1233,13 @@ op createJob(
     it("Gets Lro for standard Async RpcOperation with polling reference", async () => {
       const [_, metadata] = await compileLroOperation(
         `
-        @doc("get lro status")
         @route("/lrRpcOp/{operationId}")
-        @get op getStatus(@doc("The operation") @path operationId: string): PollingStatus;
+        @get op getStatus(@path operationId: string): PollingStatus;
   
         model PollingStatus {
-          @doc("PollingLocation")
           @header location?: ResourceLocation<TestModel>;
-  
-          @doc("The status of the operation")
           @Azure.Core.lroStatus
           statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-
-          @doc("The result")
           @Azure.Core.lroResult
           result?: TestModel;
         }
@@ -1283,42 +1269,27 @@ op createJob(
     it("Gets Lro for polling and final reference", async () => {
       const [_, metadata] = await compileLroOperation(
         `
-        @doc("simple polling status")
         model PollingStatus {
-          @doc("PollingLocation")
           @header location?: ResourceLocation<PollingStatus>;
-  
-          @doc("The status of the operation")
           @Azure.Core.lroStatus
           statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
         }
-  
-        @doc("A sample widget")
         model SimpleWidget {
-          @doc("The widget identity")
           @key
           @segment("simpleWidgets")
           @visibility(Lifecycle.Read)
           @path
           id: string;
-  
-          @doc("A value")
           value: string;
         }
-  
-        @doc("Get a widget")
         @route("/simpleWidgets/{id}")
-        @get op getWidget(@doc("The id") @path id: string): SimpleWidget;
-  
-        @doc("Create a widget")
-        @finalOperation(getWidget, {@doc("The id") id: ResponseProperty<"id">})
-        @pollingOperation(getStatus, {@doc("The id")id: ResponseProperty<"id">; @doc("The operation")operationId: ResponseProperty<"operationId">})
+        @get op getWidget(@path id: string): SimpleWidget;
+        @finalOperation(getWidget, {id: ResponseProperty<"id">})
+        @pollingOperation(getStatus, {id: ResponseProperty<"id">; operationId: ResponseProperty<"operationId">})
         @route("/simpleWidgets/{id}")
-        @put op createWidget(@doc("The id") @path id: string, @doc("The request body")body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operationId: string};
-  
-        @doc("get lro status")
+        @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operationId: string};
         @route("/simpleWidgets/{id}/operations/{operationId}")
-        @get op getStatus(@doc("The id") @path id: string, @doc("The operation") @path operationId: string): PollingStatus;
+        @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
         `,
         "createWidget",
       );
@@ -2337,23 +2308,14 @@ op createJob(
       const [_, metadata] = await compileLroOperation(
         `
         model PollingStatus {
-          @doc("PollingLocation")
           @header location?: ResourceLocation<PollingStatus>;
-
-          @doc("The status of the operation")
           @Azure.Core.lroStatus
           statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-
-          @doc("The result")
           @Azure.Core.lroResult
           result?: string;
         }
-
-        @doc("get lro status")
         @route("/scalarResult/operations/{operationId}")
-        @get op getScalarStatus(@doc("The operation") @path operationId: string): PollingStatus;
-
-        @doc("Start operation")
+        @get op getScalarStatus(@path operationId: string): PollingStatus;
         @pollingOperation(getScalarStatus, {operationId: ResponseProperty<"operationId">})
         @route("/scalarResult")
         @post @test op startScalarOp(@body body: {}): {
@@ -2452,42 +2414,27 @@ op createJob(
     it("ignores bad lro operation links with @pollingLocation", async () => {
       const [_, metadata] = await compileLroOperation(
         `
-        @doc("simple polling status")
         model PollingStatus {
-          @doc("PollingLocation")
           @header location?: ResourceLocation<PollingStatus>;
-  
-          @doc("The status of the operation")
           @Azure.Core.lroStatus
           statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
         }
-  
-        @doc("A sample widget")
         model SimpleWidget {
-          @doc("The widget identity")
           @key
           @segment("simpleWidgets")
           @visibility(Lifecycle.Read)
           @path
           id: string;
-  
-          @doc("A value")
           value: string;
         }
-  
-        @doc("Get a widget")
         @route("/simpleWidgets/{id}")
-        @get op getWidget(@doc("The id") @path id: string): SimpleWidget;
-  
-        @doc("Create a widget")
+        @get op getWidget(@path id: string): SimpleWidget;
         @finalOperation(getWidget)
-        @pollingOperation(getStatus, {@doc("The id")id: ResponseProperty<"id">})
+        @pollingOperation(getStatus, {id: ResponseProperty<"id">})
         @route("/simpleWidgets/{id}")
-        @put op createWidget(@doc("The id") @path id: string, @doc("The request body")body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operate: string, @Azure.Core.pollingLocation opLink: string};
-  
-        @doc("get lro status")
+        @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operate: string, @Azure.Core.pollingLocation opLink: string};
         @route("/simpleWidgets/{id}/operations/{operationId}")
-        @get op getStatus(@doc("The id") @path id: string, @doc("The operation") @path operationId: string): PollingStatus;
+        @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
         `,
         "createWidget",
       );
@@ -2514,42 +2461,27 @@ op createJob(
     it("throws with bad lro operation links and no polling header", async () => {
       const [_, diagnostics] = await getOperations(
         `
-        @doc("simple polling status")
         model PollingStatus {
-          @doc("PollingLocation")
           @header location?: ResourceLocation<PollingStatus>;
-  
-          @doc("The status of the operation")
           @Azure.Core.lroStatus
           statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
         }
-  
-        @doc("A sample widget")
         model SimpleWidget {
-          @doc("The widget identity")
           @key
           @segment("simpleWidgets")
           @visibility(Lifecycle.Read)
           @path
           id: string;
-  
-          @doc("A value")
           value: string;
         }
-  
-        @doc("Get a widget")
         @route("/simpleWidgets/{id}")
-        @get op getWidget(@doc("The id") @path id: string): SimpleWidget;
-  
-        @doc("Create a widget")
+        @get op getWidget(@path id: string): SimpleWidget;
         @finalOperation(getWidget)
-        @pollingOperation(getStatus, {@doc("The id")id: ResponseProperty<"id">})
+        @pollingOperation(getStatus, {id: ResponseProperty<"id">})
         @route("/simpleWidgets/{id}")
-        @put op createWidget(@doc("The id") @path id: string, @doc("The request body")body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operate: string};
-  
-        @doc("get lro status")
+        @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operate: string};
         @route("/simpleWidgets/{id}/operations/{operationId}")
-        @get op getStatus(@doc("The id") @path id: string, @doc("The operation") @path operationId: string): PollingStatus;
+        @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
         `,
       );
 
@@ -2565,42 +2497,27 @@ op createJob(
     it("handles custom lro with polling and final links", async () => {
       const [_, metadata] = await compileLroOperation(
         `
-        @doc("simple polling status")
         model PollingStatus {
-          @doc("PollingLocation")
           @header location?: ResourceLocation<PollingStatus>;
-  
-          @doc("The status of the operation")
           @Azure.Core.lroStatus
           statusValue: "Succeeded" | "Failed" | "Canceled" | "Running" | "NotStarted";
         }
-  
-        @doc("A sample widget")
         model SimpleWidget {
-          @doc("The widget identity")
           @key
           @segment("simpleWidgets")
           @visibility(Lifecycle.Read)
           @path
           id: string;
-  
-          @doc("A value")
           value: string;
         }
-  
-        @doc("Get a widget")
         @route("/simpleWidgets/{id}")
-        @get op getWidget(@doc("The id") @path id: string): SimpleWidget;
-  
-        @doc("Create a widget")
+        @get op getWidget(@path id: string): SimpleWidget;
         @finalOperation(getWidget)
-        @pollingOperation(getStatus, {@doc("The id")id: ResponseProperty<"id">; @doc("The operation")operationId: ResponseProperty<"operation">})
+        @pollingOperation(getStatus, {id: ResponseProperty<"id">; operationId: ResponseProperty<"operation">})
         @route("/simpleWidgets/{id}")
-        @put op createWidget(@doc("The id") @path id: string, @doc("The request body")body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operation: string};
-  
-        @doc("get lro status")
+        @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operation: string};
         @route("/simpleWidgets/{id}/operations/{operationId}")
-        @get op getStatus(@doc("The id") @path id: string, @doc("The operation") @path operationId: string): PollingStatus;
+        @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
         `,
         "createWidget",
       );
@@ -2823,41 +2740,26 @@ op createJob(
     it("throws for missing success value", async () => {
       const [_, diagnostics] = await getOperations(
         `
-        @doc("simple polling status")
         model PollingStatus {
-          @doc("PollingLocation")
           @header location?: ResourceLocation<PollingStatus>;
-  
-          @doc("The status of the operation")
           status: "Successful" | "Canceled" | "Failed";
         }
-  
-        @doc("A sample widget")
         model SimpleWidget {
-          @doc("The widget identity")
           @key
           @segment("simpleWidgets")
           @visibility(Lifecycle.Read)
           @path
           id: string;
-  
-          @doc("A value")
           value: string;
         }
-  
-        @doc("Get a widget")
         @route("/simpleWidgets/{id}")
-        @get op getWidget(@doc("The id") @path id: string): SimpleWidget;
-  
-        @doc("Create a widget")
+        @get op getWidget(@path id: string): SimpleWidget;
         @finalOperation(getWidget)
-        @pollingOperation(getStatus, {@doc("The id")id: ResponseProperty<"id">; @doc("The operation")operationId: ResponseProperty<"operation">})
+        @pollingOperation(getStatus, {id: ResponseProperty<"id">; operationId: ResponseProperty<"operation">})
         @route("/simpleWidgets/{id}")
-        @put op createWidget(@doc("The id") @path id: string, @doc("The request body")body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operation: string};
-  
-        @doc("get lro status")
+        @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operation: string};
         @route("/simpleWidgets/{id}/operations/{operationId}")
-        @get op getStatus(@doc("The id") @path id: string, @doc("The operation") @path operationId: string): PollingStatus;
+        @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
         `,
       );
 

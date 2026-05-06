@@ -461,21 +461,21 @@ it("single with core", async () => {
     @service
     namespace My.Service;
 
-    @doc("The version of the API.")
+    
     enum MyVersions {
-      @doc("The version 2022-12-01-preview.")
+      
       v2022_12_01_preview: "2022-12-01-preview",
     }
 
     @resource("users")
-    @doc("Details about a user.")
+    
     model User {
       @key
-      @doc("The user's id.")
+      
       @visibility(Lifecycle.Read)
       id: int32;
 
-      @doc("The user's name.")
+      
       name: string;
     }
 
@@ -530,23 +530,23 @@ it("multiple with core", async () => {
     @service
     namespace My.Service;
 
-    @doc("The version of the API.")
+    
     enum MyVersions {
-      @doc("The version 2022-12-01-preview.")
+      
       v2022_12_01_preview: "2022-12-01-preview",
-      @doc("The version 2022-12-01.")
+      
       v2022_12_01: "2022-12-01",
     }
 
     @resource("users")
-    @doc("Details about a user.")
+    
     model User {
       @key
-      @doc("The user's id.")
+      
       @visibility(Lifecycle.Read)
       id: int32;
 
-      @doc("The user's name.")
+      
       name: string;
     }
 

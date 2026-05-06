@@ -740,7 +740,7 @@ it("unbranded next link with mix of re-injected parameters and not", async () =>
       nextLink: Azure.Core.Legacy.parameterizedNextLink<[IncludePendingOptions.includePending]>;
     }
 
-    @doc("List with parameterized next link that re-injects parameters.")
+    
     @route("/with-parameterized-next-link")
     @list
     op test(
