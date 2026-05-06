@@ -69,6 +69,7 @@ Available ruleSets:
 | [`@azure-tools/typespec-azure-core/no-private-usage`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-private-usage)                                               | Verify that elements inside Private namespace are not referenced.                                                                                    |
 | [`@azure-tools/typespec-azure-core/no-legacy-usage`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-legacy-usage)                                                 | Linter warning against using elements from the Legacy namespace                                                                                      |
 | [`@azure-tools/typespec-azure-core/no-query-explode`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-query-explode)                                               | It is recommended to serialize query parameter without explode: true                                                                                 |
+| [`@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-route-parameter-name-mismatch)               | Ensure that operations with the same path use consistent path parameter names.                                                                       |
 
 ## Decorators
 

@@ -885,6 +885,8 @@ export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
   methodParameterSegments: (SdkMethodParameter | SdkModelPropertyType)[][];
   /** Stream metadata, present when the body is a streaming type (e.g. JsonlStream, SSEStream). */
   streamMetadata?: SdkStreamMetadata;
+  /** Options to show how to serialize the body. */
+  serializationOptions: SerializationOptions;
 }
 
 export type SdkHttpParameter =
@@ -935,6 +937,8 @@ interface SdkHttpResponseBase extends SdkServiceResponse {
   description?: string;
   /** Stream metadata, present when the response is a streaming type (e.g. JsonlStream, SSEStream). */
   streamMetadata?: SdkStreamMetadata;
+  /** Options to show how to deserialize the response body. */
+  serializationOptions: SerializationOptions;
 }
 
 export interface SdkHttpResponse extends SdkHttpResponseBase {

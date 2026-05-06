@@ -1,0 +1,250 @@
+import { Tester } from "#test/test-host.js";
+import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
+import { noRouteParameterNameMismatchRule } from "../../src/rules/no-route-parameter-name-mismatch.js";
+
+describe("typespec-azure-core: no-route-parameter-name-mismatch", () => {
+  let tester: LinterRuleTester;
+
+  beforeEach(async () => {
+    const runner = await Tester.createInstance();
+    tester = createLinterRuleTester(
+      runner,
+      noRouteParameterNameMismatchRule,
+      "@azure-tools/typespec-azure-core",
+    );
+  });
+
+  it("emit a warning if two operations have the same path but different parameter names", async () => {
+    await tester
+      .expect(
+        `
+        @service namespace TestService;
+
+        @route("/providers/Microsoft.Contoso/foos/{fooName}/bars/{barName}")
+        op getBar(@path fooName: string, @path barName: string): void;
+
+        @route("/providers/Microsoft.Contoso/foos/{name}/bars/{barId}")
+        op updateBar(@path name: string, @path barId: string): void;
+        `,
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch",
+          severity: "warning",
+          message: `Operation "TestService.updateBar" path "/providers/Microsoft.Contoso/foos/{name}/bars/{barId}" has inconsistent parameter name "name" which should be "fooName" to match operation "TestService.getBar" with path "/providers/Microsoft.Contoso/foos/{fooName}/bars/{barName}"`,
+        },
+        {
+          code: "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch",
+          severity: "warning",
+          message: `Operation "TestService.updateBar" path "/providers/Microsoft.Contoso/foos/{name}/bars/{barId}" has inconsistent parameter name "barId" which should be "barName" to match operation "TestService.getBar" with path "/providers/Microsoft.Contoso/foos/{fooName}/bars/{barName}"`,
+        },
+      ]);
+  });
+
+  it("emit warnings for multiple mismatched parameters", async () => {
+    await tester
+      .expect(
+        `
+        @service namespace TestService;
+
+        @route("/providers/Microsoft.Contoso/foos/{fooName}/bars/{name}")
+        op getBar(@path fooName: string, @path name: string): void;
+
+        @route("/providers/Microsoft.Contoso/foos/{name}/bars/{barName}")
+        op updateBar(@path name: string, @path barName: string): void;
+        `,
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch",
+          severity: "warning",
+          message: `Operation "TestService.updateBar" path "/providers/Microsoft.Contoso/foos/{name}/bars/{barName}" has inconsistent parameter name "name" which should be "fooName" to match operation "TestService.getBar" with path "/providers/Microsoft.Contoso/foos/{fooName}/bars/{name}"`,
+        },
+        {
+          code: "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch",
+          severity: "warning",
+          message: `Operation "TestService.updateBar" path "/providers/Microsoft.Contoso/foos/{name}/bars/{barName}" has inconsistent parameter name "barName" which should be "name" to match operation "TestService.getBar" with path "/providers/Microsoft.Contoso/foos/{fooName}/bars/{name}"`,
+        },
+      ]);
+  });
+
+  it("does not emit a warning when parameter names are consistent", async () => {
+    await tester
+      .expect(
+        `
+        @service namespace TestService;
+
+        @route("/providers/Microsoft.Contoso/foos/{fooName}/bars/{barName}")
+        op getBar(@path fooName: string, @path barName: string): void;
+
+        @put
+        @route("/providers/Microsoft.Contoso/foos/{fooName}/bars/{barName}")
+        op updateBar(@path fooName: string, @path barName: string): void;
+        `,
+      )
+      .toBeValid();
+  });
+
+  it("does not emit a warning for different paths", async () => {
+    await tester
+      .expect(
+        `
+        @service namespace TestService;
+
+        @route("/providers/Microsoft.Contoso/foos/{fooName}")
+        op getFoo(@path fooName: string): void;
+
+        @route("/providers/Microsoft.Contoso/bars/{barName}")
+        op getBar(@path barName: string): void;
+        `,
+      )
+      .toBeValid();
+  });
+
+  it("emit warnings when both allowReserved and non-allowReserved params are mismatched", async () => {
+    await tester
+      .expect(
+        `
+        @service namespace TestService;
+
+        @route("/{+scope}/providers/Microsoft.Contoso/foos/{fooName}")
+        op getFoo(@path scope: string, @path fooName: string): void;
+
+        @route("/{+resourceUri}/providers/Microsoft.Contoso/foos/{name}")
+        op updateFoo(@path resourceUri: string, @path name: string): void;
+        `,
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch",
+          severity: "warning",
+          message: `Operation "TestService.updateFoo" path "/{resourceUri}/providers/Microsoft.Contoso/foos/{name}" has inconsistent parameter name "resourceUri" which should be "scope" to match operation "TestService.getFoo" with path "/{scope}/providers/Microsoft.Contoso/foos/{fooName}"`,
+        },
+        {
+          code: "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch",
+          severity: "warning",
+          message: `Operation "TestService.updateFoo" path "/{resourceUri}/providers/Microsoft.Contoso/foos/{name}" has inconsistent parameter name "name" which should be "fooName" to match operation "TestService.getFoo" with path "/{scope}/providers/Microsoft.Contoso/foos/{fooName}"`,
+        },
+      ]);
+  });
+
+  it("emit a warning when both allowReserved path parameters have different names", async () => {
+    await tester
+      .expect(
+        `
+        @service namespace TestService;
+
+        @route("/{+resourceUri}/providers/Microsoft.Contoso/foos/{fooName}")
+        op getFoo(@path resourceUri: string, @path fooName: string): void;
+
+        @put
+        @route("/{+scope}/providers/Microsoft.Contoso/foos/{fooName}")
+        op updateFoo(@path scope: string, @path fooName: string): void;
+        `,
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch",
+          severity: "warning",
+          message: `Operation "TestService.updateFoo" path "/{scope}/providers/Microsoft.Contoso/foos/{fooName}" has inconsistent parameter name "scope" which should be "resourceUri" to match operation "TestService.getFoo" with path "/{resourceUri}/providers/Microsoft.Contoso/foos/{fooName}"`,
+        },
+      ]);
+  });
+
+  it("does not emit a warning when allowReserved differs between matching path parameters", async () => {
+    await tester
+      .expect(
+        `
+        @service namespace TestService;
+
+        @route("/{+scope}/providers/Microsoft.Contoso/foos/{fooName}")
+        op getFoo(@path scope: string, @path fooName: string): void;
+
+        @put
+        @route("/{scope}/providers/Microsoft.Contoso/foos/{name}")
+        op updateFoo(@path scope: string, @path name: string): void;
+        `,
+      )
+      .toBeValid();
+  });
+
+  it("does not emit a warning when allowReserved operations have consistent names", async () => {
+    await tester
+      .expect(
+        `
+        @service namespace TestService;
+
+        @route("/{+scope}/providers/Microsoft.Contoso/foos/{fooName}")
+        op getFoo(@path scope: string, @path fooName: string): void;
+
+        @put
+        @route("/{+scope}/providers/Microsoft.Contoso/foos/{fooName}")
+        op updateFoo(@path scope: string, @path fooName: string): void;
+        `,
+      )
+      .toBeValid();
+  });
+
+  it("does not emit a warning for paths with no static segments", async () => {
+    await tester
+      .expect(
+        `
+        @service namespace TestService;
+
+        @route("/{scope}")
+        op getByScope(@path scope: string): void;
+
+        @route("/{resourceUri}")
+        op getByResourceUri(@path resourceUri: string): void;
+        `,
+      )
+      .toBeValid();
+  });
+
+  it("does not emit a warning for paths with consecutive path variables", async () => {
+    await tester
+      .expect(
+        `
+        @service namespace TestService;
+
+        @route("/providers/Microsoft.Contoso/{foo}/{bar}")
+        op getBar(@path foo: string, @path bar: string): void;
+
+        @route("/providers/Microsoft.Contoso/{name}/{id}")
+        op updateBar(@path name: string, @path id: string): void;
+        `,
+      )
+      .toBeValid();
+  });
+
+  it("emit warnings when third operation also mismatches", async () => {
+    await tester
+      .expect(
+        `
+        @service namespace TestService;
+
+        @route("/subscriptions/{subscriptionId}/providers/Microsoft.Foo/widgets/{widgetName}")
+        op getWidget(@path subscriptionId: string, @path widgetName: string): void;
+
+        @route("/subscriptions/{subscriptionId}/providers/Microsoft.Foo/widgets/{name}")
+        op updateWidget(@path subscriptionId: string, @path name: string): void;
+
+        @route("/subscriptions/{subscription}/providers/Microsoft.Foo/widgets/{widgetName}")
+        op deleteWidget(@path subscription: string, @path widgetName: string): void;
+        `,
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch",
+          severity: "warning",
+          message: `Operation "TestService.updateWidget" path "/subscriptions/{subscriptionId}/providers/Microsoft.Foo/widgets/{name}" has inconsistent parameter name "name" which should be "widgetName" to match operation "TestService.getWidget" with path "/subscriptions/{subscriptionId}/providers/Microsoft.Foo/widgets/{widgetName}"`,
+        },
+        {
+          code: "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch",
+          severity: "warning",
+          message: `Operation "TestService.deleteWidget" path "/subscriptions/{subscription}/providers/Microsoft.Foo/widgets/{widgetName}" has inconsistent parameter name "subscription" which should be "subscriptionId" to match operation "TestService.getWidget" with path "/subscriptions/{subscriptionId}/providers/Microsoft.Foo/widgets/{widgetName}"`,
+        },
+      ]);
+  });
+});

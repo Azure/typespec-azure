@@ -427,3 +427,61 @@ model Page {
   ]>;
 }
 ```
+
+## Legacy Paging Decorators
+
+:::caution
+The decorators in this section are in the `Azure.ClientGenerator.Core.Legacy` namespace and should only be used for legacy compatibility scenarios.
+:::
+
+### Forcing an operation to be treated as pageable (`@markAsPageable`)
+
+If you have an operation that returns a paged result but isn't recognized as a paging operation by default (e.g., it doesn't use `@list`), you can force it to be treated as a pageable operation using `@markAsPageable`.
+
+The decorator will look for a property decorated with `@pageItems` in the response model. If no such property exists, it will look for a property named `value`. If neither is found, a warning is emitted.
+
+```tsp
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+@markAsPageable
+op listItems(): {
+  @pageItems items: Widget[];
+  nextLink?: string;
+};
+```
+
+### Disabling paging for an operation (`@disablePageable`)
+
+If an operation is automatically detected as a paging operation (e.g., because it uses `@list`) but you don't want it treated as pageable in the generated client, use `@disablePageable`.
+
+```tsp
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+@disablePageable
+@list
+op listItems(): {
+  @pageItems items: Widget[];
+  nextLink?: string;
+};
+```
+
+### Specifying the HTTP verb for next link requests (`@nextLinkVerb`)
+
+By default, the next link request uses a `GET` verb. If your service requires a `POST` verb for fetching subsequent pages, use `@nextLinkVerb`.
+
+```tsp
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core.Legacy;
+
+@nextLinkVerb("POST")
+@list
+op listItems(): {
+  @pageItems items: Widget[];
+  @nextLink nextLink?: string;
+};
+```

@@ -1,5 +1,28 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.67.4
+
+### Bug Fixes
+
+- [#4345](https://github.com/Azure/typespec-azure/pull/4345) Fix wrong encode for `bytes` in `HttpPart` for `multipart/form-data`. The encode is now correctly `bytes` instead of `base64`.
+
+
+## 0.67.3
+
+### Bug Fixes
+
+- [#4302](https://github.com/Azure/typespec-azure/pull/4302) Fix wrong `methodParameterSegments` for op with `@clientLocation` and `@override`
+
+
+## 0.67.2
+
+### Bug Fixes
+
+- [#4234](https://github.com/Azure/typespec-azure/pull/4234) Fix `@apiVersion(false)` decorator being ignored by `isOnClient()` logic when other operations have api-version elevated to client.
+- [#4253](https://github.com/Azure/typespec-azure/pull/4253) Fix duplicate client entries when calling `createSdkContext` multiple times or merging sub clients with same name in multiple service cases.
+- [#4235](https://github.com/Azure/typespec-azure/pull/4235) Fix readonly property usage propagation: properly strip Input flag from combined usage values for readonly properties, and fix ignoreSubTypeStack imbalance when skipping readonly properties.
+
+
 ## 0.67.1
 
 ### Bug Fixes

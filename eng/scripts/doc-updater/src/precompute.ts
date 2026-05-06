@@ -15,6 +15,8 @@ import { dirname } from "node:path";
 import { loadConfig } from "./config.js";
 import {
   getCommitDiff,
+  getCommitDiffFromApi,
+  getCurrentCommit,
   getHumanFeedback,
   getKnowledgeRelativePath,
   getLatestMergedAutomatedPr,
@@ -76,6 +78,9 @@ export interface PrecomputedContext {
 
   /** File path prefixes the agent is allowed to modify (enforced by post-step) */
   allowedPaths: string[];
+
+  /** The git commit hash at checkout time (before the agent runs) */
+  checkoutCommit: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -151,6 +156,7 @@ async function main(): Promise<void> {
     knowledge: await readKnowledge(config.name),
     knowledgePath: getKnowledgeRelativePath(config.name),
     allowedPaths: config.allowedPaths ?? [],
+    checkoutCommit: getCurrentCommit(),
   };
 
   // --- Incremental change detection ---
@@ -184,17 +190,21 @@ async function main(): Promise<void> {
         log(`Found ${feedback.commits.length} human commit(s). Extracting diffs...`);
         context.feedback = {
           prNumber: feedback.prNumber,
-          // Extract only code diffs — no commit messages, no review comments
+          // Extract only code diffs — no commit messages, no review comments.
+          // Use the GitHub API: PR commits may not exist in the local clone
+          // (e.g. squash-merged PRs whose head branch was deleted).
           humanCommitDiffs: feedback.commits
             .map((c) => ({
               sha: c.sha,
-              diff: getCommitDiff(c.sha),
+              diff: getCommitDiffFromApi(c.sha),
             }))
             .filter((c) => c.diff.length > 0),
         };
         if (context.feedback.humanCommitDiffs.length === 0) {
           context.feedback = undefined;
           log("Human commits had no extractable diffs.");
+        } else {
+          log(`Extracted diffs for ${context.feedback.humanCommitDiffs.length} human commit(s).`);
         }
       } else {
         log(`No human feedback detected on merged PR #${latestMergedPr}.`);

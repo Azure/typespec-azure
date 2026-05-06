@@ -4253,8 +4253,14 @@ interface SupportTicketsNoSubscription {
     expect(resource.operations.lists).toHaveLength(2);
   });
 
-  it("collects operation information for GenericResource with RoutedOperations", async () => {
-    const { program } = await Tester.compile(`
+  it.each([
+    { propertyType: "{}" },
+    { propertyType: "unknown" },
+    { propertyType: "Record<unknown>" },
+  ])(
+    "collects operation information for GenericResource with $propertyType properties",
+    async ({ propertyType }) => {
+      const { program } = await Tester.compile(`
 
 using Azure.Core;
 
@@ -4270,9 +4276,9 @@ namespace Microsoft.Resources {
     v2021_20_01_preview: "2021-10-01-preview",
   }
 
-  /** A generic resource */
+  /** A generic resource with ${propertyType} properties */
   model MyGenericResource
-    is Azure.ResourceManager.Legacy.GenericResource<{}> {
+    is Azure.ResourceManager.Legacy.GenericResource<${propertyType}> {
   }
 
   alias genericOps = Azure.ResourceManager.Legacy.RoutedOperations<
@@ -4300,50 +4306,51 @@ namespace Microsoft.Resources {
   }
 }
 `);
-    const provider = resolveArmResources(program);
-    expect(provider).toBeDefined();
-    expect(provider.resources).toBeDefined();
-    ok(provider.resources);
-    expect(provider.resources).toHaveLength(1);
+      const provider = resolveArmResources(program);
+      expect(provider).toBeDefined();
+      expect(provider.resources).toBeDefined();
+      ok(provider.resources);
+      expect(provider.resources).toHaveLength(1);
 
-    const resource = provider.resources[0];
-    ok(resource);
-    expect(resource).toMatchObject({
-      kind: "Other",
-      providerNamespace: "Microsoft.Resources",
-      type: expect.anything(),
-    });
+      const resource = provider.resources[0];
+      ok(resource);
+      expect(resource).toMatchObject({
+        kind: "Other",
+        providerNamespace: "Microsoft.Resources",
+        type: expect.anything(),
+      });
 
-    checkResolvedOperations(resource, {
-      operations: {
-        lifecycle: {
-          createOrUpdate: [
-            {
-              operationGroup: "GenericResourceOps",
-              name: "createOrUpdate",
-              kind: "createOrUpdate",
-            },
-          ],
-          delete: [{ operationGroup: "GenericResourceOps", name: "delete", kind: "delete" }],
-          read: [{ operationGroup: "GenericResourceOps", name: "get", kind: "read" }],
-          update: [{ operationGroup: "GenericResourceOps", name: "update", kind: "update" }],
-          checkExistence: [
-            {
-              operationGroup: "GenericResourceOps",
-              name: "checkExistence",
-              kind: "checkExistence",
-            },
-          ],
+      checkResolvedOperations(resource, {
+        operations: {
+          lifecycle: {
+            createOrUpdate: [
+              {
+                operationGroup: "GenericResourceOps",
+                name: "createOrUpdate",
+                kind: "createOrUpdate",
+              },
+            ],
+            delete: [{ operationGroup: "GenericResourceOps", name: "delete", kind: "delete" }],
+            read: [{ operationGroup: "GenericResourceOps", name: "get", kind: "read" }],
+            update: [{ operationGroup: "GenericResourceOps", name: "update", kind: "update" }],
+            checkExistence: [
+              {
+                operationGroup: "GenericResourceOps",
+                name: "checkExistence",
+                kind: "checkExistence",
+              },
+            ],
+          },
         },
-      },
-      resourceType: {
-        provider: "Microsoft.Resources",
-        types: [],
-      },
-      resourceInstancePath: "/{resourceId}",
-      resourceName: "MyGenericResource",
-    });
-  });
+        resourceType: {
+          provider: "Microsoft.Resources",
+          types: [],
+        },
+        resourceInstancePath: "/{resourceId}",
+        resourceName: "MyGenericResource",
+      });
+    },
+  );
 
   it.each(["default", "current"])(
     "provides singleton information for @singleton('%s') decorated resources",
@@ -4459,5 +4466,106 @@ interface Employees {
     ok(employee);
     expect(employee.singleton).toBeDefined();
     expect(employee.singleton!.keyValue).toEqual(["salaried", "hourly"]);
+  });
+
+  it("collects list operations for child resource using ArmListBySubscriptionScope", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+model Test is TrackedResource<{}> {
+  ...ResourceNameParameter<Test>;
+}
+
+@parentResource(Test)
+model Employee is ProxyResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+  age?: int32;
+  city?: string;
+}
+
+@armResourceOperations
+interface Tests {
+  get is ArmResourceRead<Test>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Test>;
+  delete is ArmResourceDeleteWithoutOkAsync<Test>;
+  listByResourceGroup is ArmResourceListByParent<Test>;
+  listBySubscription is ArmListBySubscription<Test>;
+}
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceSync<Employee>;
+  delete is ArmResourceDeleteSync<Employee>;
+  listByParent is ArmResourceListByParent<Employee>;
+  listBySubscription is ArmListBySubscriptionScope<Employee>;
+}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    ok(provider.resources);
+
+    // Find the Employee resource at its normal scope
+    const employee = provider.resources.find(
+      (r) =>
+        r.resourceName === "Employee" &&
+        r.resourceInstancePath ===
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/tests/{testName}/employees/{employeeName}",
+    );
+    ok(employee);
+    expect(employee).toMatchObject({
+      providerNamespace: "Microsoft.ContosoProviderHub",
+    });
+
+    // Verify the listByParent operation is correctly resolved on the main resource
+    checkResolvedOperations(employee, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            { operationGroup: "Employees", name: "createOrUpdate", kind: "createOrUpdate" },
+          ],
+          delete: [{ operationGroup: "Employees", name: "delete", kind: "delete" }],
+          read: [{ operationGroup: "Employees", name: "get", kind: "read" }],
+        },
+        lists: [
+          {
+            operationGroup: "Employees",
+            name: "listByParent",
+            kind: "list",
+          },
+        ],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["tests", "employees"],
+      },
+      resourceName: "Employee",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/tests/{testName}/employees/{employeeName}",
+    });
+
+    // Verify a subscription-scoped employee resource entry was created for the subscription list
+    const subscriptionEmployee = provider.resources.find(
+      (r) =>
+        r.resourceInstancePath ===
+        "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees/{name}",
+    );
+    ok(subscriptionEmployee);
+    expect(subscriptionEmployee.operations.lists).toHaveLength(1);
+    expect(subscriptionEmployee.operations.lists![0]).toMatchObject({
+      operationGroup: "Employees",
+      name: "listBySubscription",
+      kind: "list",
+      path: "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees",
+    });
   });
 });

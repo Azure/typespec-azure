@@ -81,6 +81,9 @@ jobs:
       - run: pnpm run format:check
         name: Check formatting
 
+      - run: pnpm run format:extra:check
+        name: Check formatting (Extra)
+
   # Lint
   lint:
     name: Lint
@@ -100,6 +103,9 @@ jobs:
 
       - run: pnpm run lint
         name: Lint
+
+      - run: pnpm run lint:extra
+        name: Lint (Extra)
 
       # cspell:ignore rhysd
       # Content copied from https://raw.githubusercontent.com/rhysd/actionlint/2ab3a12c7848f6c15faca9a92612ef4261d0e370/.github/actionlint-matcher.json

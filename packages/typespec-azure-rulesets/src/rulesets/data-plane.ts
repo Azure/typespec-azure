@@ -43,6 +43,7 @@ export default {
     "@azure-tools/typespec-azure-core/friendly-name": true,
     "@azure-tools/typespec-azure-core/no-query-explode": true,
     "@azure-tools/typespec-azure-core/no-header-explode": true,
+    "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch": true,
 
     // TCGC rules
     "@azure-tools/typespec-client-generator-core/require-client-suffix": true,

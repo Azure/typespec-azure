@@ -272,7 +272,6 @@ op ArmCreateOperation<
  * @template BodyParameter The body parameter
  * @template Response The response or union of responses for success.
  * @template ErrorResponse The error response.
- * @template RequestBody Optional. ENables changing the name, documentation, or optionality of the request body parameter
  */
 op ArmUpdateOperation<
   HttpParameters extends {},

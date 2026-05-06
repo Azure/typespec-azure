@@ -597,8 +597,8 @@ Customizations SHOULD always be made in a file named `client.tsp` alongside `mai
 There are two ways to customize the client hierarchy: using `@clientLocation` to change the location of the operations, or use `@client` to restructure the client hierarchy.
 Be careful when you use both of them since `@clientLocation` could not move the client that is no longer exist with `@client` customization.
 
-The `@clientLocaton` decorator allows you to change the location of the operations in the client hierarchy.
-It can be used to move operations to an existed sub client defined by `Interface` or `Namespace`, or move the the root client of namespace with `@service` decorator.
+The `@clientLocation` decorator allows you to change the location of the operations in the client hierarchy.
+It can be used to move operations to an existing sub client defined by `Interface` or `Namespace`, or move to the root client of the namespace with the `@service` decorator.
 This decorator is useful when you want to keep the default client hierarchy but need to change the location of some operations.
 
 The `@client` decorator allows you to totally restructure the client hierarchy.
@@ -2527,6 +2527,14 @@ In this approach, `autoMergeService` is **not set** (defaults to `false`) on any
 
 :::caution
 All services being merged must share the same endpoint and authentication method. If not, you will get a diagnostic error.
+:::
+
+:::note[Operation coverage validation]
+When you use explicit `@client` decorators with custom operation mapping, TCGC validates that all service operations are included in at least one client definition. If an operation is not covered, you will see a warning:
+
+> Operation "opName" under namespace "MyService" is not included in any @client definition.
+
+This validation only applies when explicit `@client` is used. It does not apply to default auto-generated clients or when `@client` is applied directly to the service namespace without remapping operations.
 :::
 
 <ClientTabs>

@@ -22,6 +22,7 @@ import { noOpenAPIRule } from "./rules/no-openapi.js";
 import { noPrivateUsage } from "./rules/no-private-usage.js";
 import { noQueryExplodeRule } from "./rules/no-query-explode.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
+import { noRouteParameterNameMismatchRule } from "./rules/no-route-parameter-name-mismatch.js";
 import { noRpcPathParamsRule } from "./rules/no-rpc-path-params.js";
 import { noStringDiscriminatorRule } from "./rules/no-string-discriminator.js";
 import { noUnnamedUnionRule } from "./rules/no-unnamed-union.js";
@@ -81,6 +82,7 @@ const rules = [
   noPrivateUsage,
   noLegacyUsage,
   noQueryExplodeRule,
+  noRouteParameterNameMismatchRule,
 ];
 
 export const $linter = defineLinter({
