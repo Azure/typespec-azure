@@ -30,14 +30,16 @@ export const armNoPathCasingConflictsRule = createRule({
       root: (program: Program) => {
         const [services] = getAllHttpServices(program);
 
-        // Collect all eligible operations, bucketed by normalized lowercase path.
+        // Collect all eligible operations, bucketed by lowercased path with
+        // parameter names normalized to `{}` so that bucketing only considers
+        // static segments.
         const buckets = new Map<string, HttpOperation[]>();
         for (const service of services) {
           for (const op of service.operations) {
             if (op.operation.namespace && isInternalTypeSpec(program, op.operation.namespace)) {
               continue;
             }
-            const key = normalizePath(op.path).toLowerCase();
+            const key = normalizeParameters(op.path).toLowerCase();
             let bucket = buckets.get(key);
             if (bucket === undefined) {
               bucket = [];
@@ -50,19 +52,22 @@ export const armNoPathCasingConflictsRule = createRule({
         for (const bucket of buckets.values()) {
           if (bucket.length < 2) continue;
 
-          // Determine if the bucket has more than one distinct exact-case spelling.
-          const distinctPaths = new Set(bucket.map((o) => o.path));
-          if (distinctPaths.size < 2) continue;
+          // Compare static-segment casing only — parameter-name casing
+          // differences are out of scope for this rule.
+          const distinctStaticSpellings = new Set(bucket.map((o) => normalizeParameters(o.path)));
+          if (distinctStaticSpellings.size < 2) continue;
 
           // Sort deterministically by source location for stable diagnostics.
           const sorted = [...bucket].sort((a, b) => compareBySource(a.operation, b.operation));
 
           const firstPath = sorted[0].path;
+          const firstStatic = normalizeParameters(firstPath);
           for (let i = 1; i < sorted.length; i++) {
             const op = sorted[i];
-            // Skip ones that share casing with the first one — that's a different,
-            // already-handled `@route` duplicate scenario.
-            if (op.path === firstPath) continue;
+            // Skip ones whose static segments match the first one — either an
+            // exact duplicate (handled by `@route`) or a parameter-name-only
+            // difference (out of scope).
+            if (normalizeParameters(op.path) === firstStatic) continue;
 
             const codefix = tryCreateSegmentCasingCodeFix(op, firstPath);
 
@@ -79,10 +84,10 @@ export const armNoPathCasingConflictsRule = createRule({
 });
 
 /**
- * Replace `{paramName}` placeholders with `{}` so that paths only differing
- * by parameter name still get bucketed together.
+ * Replace `{paramName}` placeholders with `{}` so that path-parameter naming
+ * differences are ignored when comparing paths.
  */
-function normalizePath(path: string): string {
+function normalizeParameters(path: string): string {
   return path.replace(/\{[^/{}]+\}/g, "{}");
 }
 
@@ -102,9 +107,6 @@ function compareBySource(a: Operation, b: Operation): number {
  * non-parameter literal segment tokens (i.e. they differ only by case), build
  * a CodeFix that lowercases the matching `@segment("...")` decorator string
  * literals reachable from this operation.
- *
- * If any differing token is a path parameter (e.g. `{ResourceName}` vs
- * `{resourceName}`), no codefix is produced — renaming a parameter is breaking.
  */
 function tryCreateSegmentCasingCodeFix(
   offending: HttpOperation,
@@ -121,7 +123,6 @@ function tryCreateSegmentCasingCodeFix(
     const isParamA = aTokens[i].startsWith("{") && aTokens[i].endsWith("}");
     const isParamB = bTokens[i].startsWith("{") && bTokens[i].endsWith("}");
     if (isParamA || isParamB) {
-      // Casing difference is in a parameter name — not auto-fixable.
       return undefined;
     }
     offendingSegments.push(aTokens[i]);

@@ -75,7 +75,7 @@ it("does not emit when paths do not overlap case-insensitively", async () => {
     .toBeValid();
 });
 
-it("emits a diagnostic when two paths differ only by path parameter name casing", async () => {
+it("does not emit when paths differ only by path parameter name casing", async () => {
   await tester
     .expect(
       `
@@ -89,9 +89,7 @@ it("emits a diagnostic when two paths differ only by path parameter name casing"
       @post op getTwo(@path resourceName: string): void;
       `,
     )
-    .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-no-path-casing-conflicts",
-    });
+    .toBeValid();
 });
 
 it("applies a codefix that lowercases the offending @segment value", async () => {
