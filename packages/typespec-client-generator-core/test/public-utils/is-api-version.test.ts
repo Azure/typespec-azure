@@ -102,7 +102,7 @@ it("api version in host param with versioning", async () => {
 
 it("api version in host param named api-version with plain string type in versioned service", async () => {
   // Regression test: server URL template param named `apiVersion` with plain string type
-  // (not the version enum) in a versioned service must still be recognised as an API
+  // (not the version enum) in a versioned service must still be recognized as an API
   // version parameter.  This was broken by PR #4341 which added an isMetadata guard that
   // excluded server URL template params because they carry no HTTP metadata annotations.
   // See https://github.com/Azure/typespec-azure/blob/main/packages/azure-http-specs/specs/resiliency/srv-driven/old.tsp
