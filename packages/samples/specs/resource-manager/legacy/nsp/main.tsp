@@ -70,7 +70,6 @@ interface Operations extends Azure.ResourceManager.Operations {}
 model NetworkSecurityPerimeterConfiguration is Azure.ResourceManager.NspConfiguration;
 alias NspConfigurationOperations = Azure.ResourceManager.NspConfigurations<NetworkSecurityPerimeterConfiguration>;
 
-#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-required-operations" "Network security perimeter configuration resources are read-only by design."
 @armResourceOperations
 interface Employees {
   get is ArmResourceRead<Employee>;

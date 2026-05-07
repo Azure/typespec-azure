@@ -2,6 +2,7 @@ import {
   CodeFix,
   createRule,
   defineCodeFix,
+  getNamespaceFullName,
   getSourceLocation,
   Interface,
   LinterRuleContext,
@@ -65,6 +66,10 @@ export const armResourceRequiredOperationsRule = createRule({
         for (const resource of provider.resources ?? []) {
           if (resource.kind === "Other") continue;
           if (isInternalTypeSpec(program, resource.type)) continue;
+          // Network Security Perimeter configurations, Private Links, and
+          // Private Endpoint Connections have their own well-defined operation
+          // shapes and are exempt from this rule.
+          if (isExemptCommonTypeResource(resource.type)) continue;
           const list = groups.get(resource.type);
           if (list) list.push(resource);
           else groups.set(resource.type, [resource]);
@@ -257,4 +262,39 @@ function makeAddOperationFix(
       );
     },
   });
+}
+
+/**
+ * Common-types resource models that have their own well-defined operation
+ * shapes and are therefore exempt from the required-operations rule. These
+ * are the canonical models in `Azure.ResourceManager.CommonTypes`.
+ */
+const EXEMPT_COMMON_TYPE_RESOURCES = new Set<string>([
+  "PrivateLinkResource",
+  "PrivateEndpointConnection",
+  "NetworkSecurityPerimeterConfiguration",
+]);
+const EXEMPT_COMMON_TYPE_NAMESPACE = "Azure.ResourceManager.CommonTypes";
+
+/**
+ * Returns true if the given model derives from one of the exempt common-type
+ * ARM resource models (NSP configurations, Private Links, Private Endpoint
+ * Connections). Walks both `sourceModel` (`is`) and `baseModel` (`extends`)
+ * chains.
+ */
+function isExemptCommonTypeResource(model: Model): boolean {
+  const visited = new Set<Model>();
+  let current: Model | undefined = model;
+  while (current && !visited.has(current)) {
+    visited.add(current);
+    if (
+      EXEMPT_COMMON_TYPE_RESOURCES.has(current.name) &&
+      current.namespace !== undefined &&
+      getNamespaceFullName(current.namespace) === EXEMPT_COMMON_TYPE_NAMESPACE
+    ) {
+      return true;
+    }
+    current = current.sourceModel ?? current.baseModel;
+  }
+  return false;
 }

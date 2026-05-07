@@ -321,3 +321,108 @@ it("skips @armVirtualResource models", async () => {
     )
     .toBeValid();
 });
+
+it("exempts NetworkSecurityPerimeterConfiguration resources", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      @versioned(Versions)
+      namespace Microsoft.Foo;
+
+      enum Versions {
+        @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+        v1,
+      }
+
+      interface Operations extends Azure.ResourceManager.Operations {}
+
+      model Employee is TrackedResource<{}> {
+        @key @path @segment("employees") name: string;
+      }
+
+      model EmployeeNspConfig is Azure.ResourceManager.NspConfiguration;
+      alias EmployeeNspOps = Azure.ResourceManager.NspConfigurations<EmployeeNspConfig>;
+
+      @armResourceOperations
+      interface Employees {
+        get is ArmResourceRead<Employee>;
+        createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+        delete is ArmResourceDeleteWithoutOkAsync<Employee>;
+        listByResourceGroup is ArmResourceListByParent<Employee>;
+        listBySubscription is ArmListBySubscription<Employee>;
+        /** Get NSP config */
+        getNsp is EmployeeNspOps.Read<Employee>;
+        /** List NSP configs */
+        listNsp is EmployeeNspOps.ListByParent<Employee>;
+      }
+      `,
+    )
+    .toBeValid();
+});
+
+it("exempts PrivateLink resources", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      interface Operations extends Azure.ResourceManager.Operations {}
+
+      model Employee is TrackedResource<{}> {
+        @key @path @segment("employees") name: string;
+      }
+
+      model EmployeePrivateLink is Azure.ResourceManager.PrivateLink;
+      alias EmployeePLOps = Azure.ResourceManager.PrivateLinks<EmployeePrivateLink>;
+
+      @armResourceOperations
+      interface Employees {
+        get is ArmResourceRead<Employee>;
+        createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+        delete is ArmResourceDeleteWithoutOkAsync<Employee>;
+        listByResourceGroup is ArmResourceListByParent<Employee>;
+        listBySubscription is ArmListBySubscription<Employee>;
+        /** Get private link */
+        getPrivateLink is EmployeePLOps.Read<Employee>;
+        /** List private links */
+        listPrivateLinks is EmployeePLOps.ListByParent<Employee>;
+      }
+      `,
+    )
+    .toBeValid();
+});
+
+it("exempts PrivateEndpointConnection resources", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      interface Operations extends Azure.ResourceManager.Operations {}
+
+      model Employee is TrackedResource<{}> {
+        @key @path @segment("employees") name: string;
+      }
+
+      model EmployeePrivateEndpoint is Azure.ResourceManager.PrivateEndpointConnectionResource;
+      alias EmployeePEOps = Azure.ResourceManager.PrivateEndpoints<EmployeePrivateEndpoint>;
+
+      @armResourceOperations
+      interface Employees {
+        get is ArmResourceRead<Employee>;
+        createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+        delete is ArmResourceDeleteWithoutOkAsync<Employee>;
+        listByResourceGroup is ArmResourceListByParent<Employee>;
+        listBySubscription is ArmListBySubscription<Employee>;
+        /** Get private endpoint connection */
+        getPE is EmployeePEOps.Read<Employee>;
+        /** List private endpoint connections */
+        listPE is EmployeePEOps.ListByParent<Employee>;
+      }
+      `,
+    )
+    .toBeValid();
+});
