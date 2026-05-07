@@ -63,9 +63,8 @@ const INCLUDES: readonly string[] = [
   "eng/scripts/ci/util.py",
 
   // Regeneration scripts (the local regenerate.ts is intentionally synced from
-  // upstream; regenerate-common.ts is its shared helper module).
+  // upstream).
   "eng/scripts/ci/regenerate.ts",
-  "eng/scripts/ci/regenerate-common.ts",
 
   // Shared setup scripts (invoked by package.json install/prepare hooks
   // and by ci/regenerate.ts which spawns run_batch.py).
