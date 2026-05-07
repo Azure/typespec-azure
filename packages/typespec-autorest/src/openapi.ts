@@ -109,7 +109,7 @@ import {
 } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
-import { TwoLevelMap } from "@typespec/compiler/utils";
+import { DuplicateTracker, TwoLevelMap } from "@typespec/compiler/utils";
 import {
   AuthenticationOptionReference,
   AuthenticationReference,
@@ -2943,6 +2943,7 @@ export function createDefaultDocumentProxy(
   const tags = new Set<string>();
   const definitions = new Map<string, OpenAPI2Schema>();
   const parameters: Map<string, [ModelProperty, OpenAPI2Parameter]> = new Map();
+  const operationIds = new DuplicateTracker<string, Operation>();
   let examples: Map<string, Record<string, LoadedExample>> = new Map();
   let operationIdsWithExamples: Set<string> = new Set();
   return {
@@ -2980,6 +2981,7 @@ export function createDefaultDocumentProxy(
       }
       const resolvedOp = pathItem[op.verb]!;
       resolvedOp.operationId = resolveOperationId(context, op.operation);
+      operationIds.track(resolvedOp.operationId, op.operation);
       return resolvedOp;
     },
     addTag(tag: string, op: Operation) {
@@ -3015,6 +3017,7 @@ export function createDefaultDocumentProxy(
       operationIdsWithExamples = exampleIds;
     },
     resolveDocuments(context: AutorestEmitterContext) {
+      reportDuplicateOperationIds(program, operationIds);
       root.definitions = {};
       for (const [name, schema] of definitions) {
         root.definitions[name] = schema;
@@ -3079,14 +3082,17 @@ function createFeatureDocumentProxy(
     return createDefaultDocumentProxy(program, service, options, version);
   const root: Map<string, OpenAPI2DocumentItem> = new Map();
   const operationFeatures: Map<string, Set<string>> = new Map();
+  const operationIds = new Map<string, DuplicateTracker<string, Operation>>();
   let examples: Map<string, Record<string, LoadedExample>> = new Map();
   let operationIdsWithExamples: Set<string> = new Set();
   for (const featureName of features.keys()) {
     const featureOptions = features.get(featureName)!;
+    const featureKey = featureName.toLowerCase();
     root.set(
-      featureName.toLowerCase(),
+      featureKey,
       initializeOpenAPIDocumentItem(program, service, featureOptions, version),
     );
+    operationIds.set(featureKey, new DuplicateTracker<string, Operation>());
   }
   const defaultFeature = [...root.entries()].filter(
     ([key, _]) => key.toLowerCase() === "common",
@@ -3133,6 +3139,7 @@ function createFeatureDocumentProxy(
       }
       const resolvedOp = pathItem[op.verb]!;
       const opId = resolveOperationId(context, op.operation);
+      operationIds.get(options.featureName.toLowerCase())?.track(opId, op.operation);
       addFeatureOperation(opId, options.featureName);
       resolvedOp.operationId = opId;
       return resolvedOp;
@@ -3182,6 +3189,9 @@ function createFeatureDocumentProxy(
     },
     resolveDocuments(context: AutorestEmitterContext) {
       const docs: AutorestEmitterResult[] = [];
+      for (const tracker of operationIds.values()) {
+        reportDuplicateOperationIds(program, tracker);
+      }
       for (const [featureName, featureItem] of root.entries()) {
         const exampleIds = operationFeatures.get(featureName) || new Set<string>();
         const featureExamples = [...exampleIds]
@@ -3258,6 +3268,21 @@ function createFeatureDocumentProxy(
     }
     const ops = operationFeatures.get(featureName)!;
     ops.add(operationId);
+  }
+}
+
+function reportDuplicateOperationIds(
+  program: Program,
+  duplicateTracker: DuplicateTracker<string, Operation>,
+) {
+  for (const [operationId, duplicates] of duplicateTracker.entries()) {
+    for (const duplicate of duplicates) {
+      reportDiagnostic(program, {
+        code: "duplicate-operation-id",
+        format: { operationId },
+        target: duplicate,
+      });
+    }
   }
 }
 

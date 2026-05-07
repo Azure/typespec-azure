@@ -1,7 +1,7 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, notStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
-import { compileOpenAPI, diagnoseOpenApiFor, oapiForModel } from "./test-host.js";
+import { compileOpenAPI, diagnoseOpenApiFor, ignoreUseStandardOps, oapiForModel } from "./test-host.js";
 
 describe("typespec-autorest: definitions", () => {
   it("defines models", async () => {
@@ -586,6 +586,45 @@ describe("typespec-autorest: operations", () => {
     strictEqual(res.paths["/test-service"].get.operationId, "ServiceOperation");
     // Original operation in the custom namespace should still use namespace prefix
     strictEqual(res.paths["/custom-op"].get.operationId, "CustomNamespace_CustomOperation");
+  });
+
+  it("emits warning on each operation when operationId is duplicated", async () => {
+    const diagnostics = ignoreUseStandardOps(
+      await diagnoseOpenApiFor(`
+      using Azure.ClientGenerator.Core;
+      @service namespace MyService;
+
+      namespace A {
+        @route("/foo")
+        @clientLocation("Shared")
+        op list(): string;
+      }
+
+      namespace B {
+        @route("/bar")
+        @clientLocation("Shared")
+        op list(): string;
+      }
+      `),
+    );
+
+    const duplicateDiagnostics = diagnostics.filter(
+      (x) => x.code === "@azure-tools/typespec-autorest/duplicate-operation-id",
+    );
+
+    strictEqual(duplicateDiagnostics.length, 2);
+    expectDiagnostics(duplicateDiagnostics, [
+      {
+        code: "@azure-tools/typespec-autorest/duplicate-operation-id",
+        message:
+          "Operation ID 'Shared_List' is duplicated across operations. OpenAPI requires operationId values to be globally unique.",
+      },
+      {
+        code: "@azure-tools/typespec-autorest/duplicate-operation-id",
+        message:
+          "Operation ID 'Shared_List' is duplicated across operations. OpenAPI requires operationId values to be globally unique.",
+      },
+    ]);
   });
 });
 
