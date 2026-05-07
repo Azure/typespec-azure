@@ -108,10 +108,27 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - UsageFlags reference table was missing — added with all 13 flag values and descriptions.
 - InitializedByFlags documentation was incomplete — added Individually, Parent, CustomizeCode descriptions.
 - The `CustomizeCode` (4) flag means initialization is omitted from generated code and handled manually.
-- `serializationOptions` and `baseModel` properties on SdkModelType are not documented in guideline.md but exist in interfaces.ts.
+- `serializationOptions` on SdkModelType properties was already documented. Now also documented on `SdkBodyParameter` and `SdkHttpResponseBase` in the HTTP Operation Parameters and Response sections.
+- `baseModel` property on SdkModelType is not documented in guideline.md but exists in interfaces.ts.
+
+## Diagnostics
+
+- `operation-not-in-client` (warning): Emitted when explicit `@client` is used but a service operation is not included in any client. Documented in 03client.mdx under the "Fully Customized Client Hierarchy" section.
+
+## External Type Usage Propagation
+
+- Types marked as external (via `@alternateType` with `ExternalTypeInfo`) only receive the `External` usage flag. TCGC blocks propagation of non-`External` usage flags (`Input`, `Output`, `Json`, etc.) through external types. This was a bug fix — previously, types reachable through external types could incorrectly get `Input`/`Output` flags.
+- The `External` usage flag description in guideline.md was expanded to explain the propagation blocking behavior.
+- The `@alternateType` external types Notes section in 08types.mdx was updated to explain that types only reachable through external types won't get `Input`/`Output` flags.
+
+## Encoding Context Awareness
+
+- The `encode` property on `SdkBuiltInType` is not only set by the `@encode` decorator. TCGC also sets it contextually — for example, `bytes` in a `multipart/form-data` part get `encode: "bytes"` (raw binary) instead of the default `"base64"`. This is handled in `addMultipartPropertiesToModelType` in `src/types.ts`, which calls `addEncodeInfo` with the part's default content type.
+- The guideline.md description of `SdkBuiltInType.encode` was updated to reflect this contextual encoding behavior.
 
 ## Common Mistakes to Avoid
 
 - Don't copy @param descriptions between decorators — @clientApiVersions had @apiVersion's description.
 - The 03client.mdx file had a typo "@clientLocaton" (missing 'i') — fixed to "@clientLocation".
 - In mockapi.ts files, query parameters use `query:` not `params:` in the request object.
+- The guideline.md previously said `encode` is set only when `@encode` exists — this was inaccurate since encode can also be set contextually (e.g., multipart).

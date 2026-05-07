@@ -1,7 +1,7 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
-import { SdkModelPropertyType, UsageFlags } from "../../src/interfaces.js";
+import { SdkBuiltInType, SdkModelPropertyType, UsageFlags } from "../../src/interfaces.js";
 import {
   createClientCustomizationInput,
   createSdkContextForTester,
@@ -36,10 +36,32 @@ it("multipart form basic", async function () {
   const profileImage = model.properties.find((x) => x.name === "profileImage");
   ok(profileImage);
   strictEqual(profileImage.kind, "property");
+  strictEqual(profileImage.type.kind, "bytes");
+  strictEqual((profileImage.type as SdkBuiltInType).encode, "bytes");
   ok(profileImage.serializationOptions.multipart);
   strictEqual(profileImage.serializationOptions.multipart.isFilePart, true);
   strictEqual(profileImage.isMultipartFileInput, true);
   strictEqual(profileImage.multipartOptions, profileImage.serializationOptions.multipart);
+});
+
+it("multipart bytes in HttpPart should have bytes encode", async function () {
+  const { program } = await SimpleTesterWithService.compile(`
+    op anonymousModel(
+      @header contentType: "multipart/form-data",
+      @multipartBody body: {
+        profileImage: HttpPart<bytes>;
+      },
+    ): NoContentResponse;
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const models = context.sdkPackage.models;
+  strictEqual(models.length, 1);
+  const model = models[0];
+  const profileImage = model.properties.find((x) => x.name === "profileImage");
+  ok(profileImage);
+  strictEqual(profileImage.type.kind, "bytes");
+  strictEqual((profileImage.type as SdkBuiltInType).encode, "bytes");
 });
 
 it("multipart conflicting model usage", async function () {

@@ -89,3 +89,6 @@ tspCodeModel.json
 
 # Auto generated version list
 website/playground-versions.json
+
+# http-server-csharp snapshot test output
+core/packages/http-server-csharp/test/snapshots/sample-service/

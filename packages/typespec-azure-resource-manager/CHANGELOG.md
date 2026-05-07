@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.67.1
+
+### Bug Fixes
+
+- [#4252](https://github.com/Azure/typespec-azure/pull/4252) Remove the type constraint on the `Properties` parameter in `Azure.ResourceManager.Legacy.GenericResource`, allowing `unknown` and `Record<unknown>` as property types.
+
+
 ## 0.67.0
 
 ### Deprecations

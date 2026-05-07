@@ -763,41 +763,38 @@ describe("external types", () => {
 
     const context = await createSdkContextForTester(program);
     const models = getAllModels(context);
-    const itemCollection = models.find((m) => m.name === "ItemCollection");
-    const itemCollectionType = models.find((m) => m.name === "ItemCollectionType");
-    const stacItem = models.find((m) => m.name === "StacItem");
-    const link = models.find((m) => m.name === "Link");
-    const contextExtension = models.find((m) => m.name === "ContextExtension");
-    const sharedModel = models.find((m) => m.name === "SharedModel");
-    const itemCollection2 = models.find((m) => m.name === "ItemCollection2");
 
-    // ItemCollection has external info and should have External usage flag
+    // ItemCollection has external info and should still be in the models list
+    const itemCollection = models.find((m) => m.name === "ItemCollection");
     strictEqual(itemCollection?.kind, "model");
     strictEqual(itemCollection.external?.identity, "pystac.Collection");
     strictEqual((itemCollection.usage & UsageFlags.External) > 0, true);
 
     // Types only referenced by ItemCollection should have External usage flag
+    const itemCollectionType = models.find((m) => m.name === "ItemCollectionType");
     strictEqual(itemCollectionType?.kind, "model");
     strictEqual((itemCollectionType.usage & UsageFlags.External) > 0, true);
 
+    const stacItem = models.find((m) => m.name === "StacItem");
     strictEqual(stacItem?.kind, "model");
     strictEqual((stacItem.usage & UsageFlags.External) > 0, true);
 
+    const link = models.find((m) => m.name === "Link");
     strictEqual(link?.kind, "model");
     strictEqual((link.usage & UsageFlags.External) > 0, true);
 
+    const contextExtension = models.find((m) => m.name === "ContextExtension");
     strictEqual(contextExtension?.kind, "model");
     strictEqual((contextExtension.usage & UsageFlags.External) > 0, true);
 
     // SharedModel is used by both external and non-external types
-    // It will have External flag (from ItemCollection) AND Input flag (from ItemCollection2)
-    // NOTE: for shared model, TCGC actually shall not set External flag, because it's not fully external.
-    // But for simplicity we just keep it this way since we may not meet this scenario in the future.
+    const sharedModel = models.find((m) => m.name === "SharedModel");
     strictEqual(sharedModel?.kind, "model");
     strictEqual((sharedModel.usage & UsageFlags.External) > 0, true);
     strictEqual((sharedModel.usage & UsageFlags.Input) > 0, true);
 
     // ItemCollection2 is not external, should NOT have External flag
+    const itemCollection2 = models.find((m) => m.name === "ItemCollection2");
     strictEqual(itemCollection2?.kind, "model");
     strictEqual((itemCollection2.usage & UsageFlags.External) === 0, true);
   });
@@ -830,23 +827,82 @@ describe("external types", () => {
 
     const context = await createSdkContextForTester(program);
     const models = getAllModels(context);
-    const externalModel = models.find((m) => m.name === "ExternalModel");
-    const nestedModel = models.find((m) => m.name === "NestedModel");
-    const deepNestedModel = models.find((m) => m.name === "DeepNestedModel");
 
-    // ExternalModel has external info and should have External usage flag
+    // ExternalModel has external info and should still be in the models list
+    const externalModel = models.find((m) => m.name === "ExternalModel");
     strictEqual(externalModel?.kind, "model");
     strictEqual(externalModel.external?.identity, "external.Collection");
     strictEqual((externalModel.usage & UsageFlags.External) > 0, true);
 
     // NestedModel is only referenced by ExternalModel, should have External usage flag
+    const nestedModel = models.find((m) => m.name === "NestedModel");
     strictEqual(nestedModel?.kind, "model");
     strictEqual((nestedModel.usage & UsageFlags.External) > 0, true);
 
     // DeepNestedModel is only referenced by NestedModel (which has External flag)
     // So it should also have External flag (recursive propagation)
+    const deepNestedModel = models.find((m) => m.name === "DeepNestedModel");
     strictEqual(deepNestedModel?.kind, "model");
     strictEqual((deepNestedModel.usage & UsageFlags.External) > 0, true);
+  });
+
+  it("should set External usage for types and unions only used in external alternate type", async () => {
+    const { program } = await SimpleTester.compile(`
+      @service
+      namespace MyService {
+        model Geometry {
+          type: string;
+          coordinates: numeric[];
+        }
+
+        model Feature {
+          type: "Feature";
+          geometry: Geometry | null;
+          properties: Record<unknown>;
+          id?: string | numeric;
+        }
+
+        @route("/test")
+        op test(@body body: Feature): void;
+
+        @@alternateType(Feature,
+          {
+            identity: "geojson::Feature",
+            package: "geojson",
+            minVersion: "0.24.2",
+          },
+          "rust"
+        );
+      };
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-rust",
+    });
+    const models = context.sdkPackage.models;
+    const unions = context.sdkPackage.unions;
+
+    // Feature should still be in the models list (it has External usage)
+    const feature = models.find((m) => m.name === "Feature");
+    strictEqual(feature?.kind, "model");
+    strictEqual(feature.external?.identity, "geojson::Feature");
+
+    // Geometry should be in the models list with only External usage
+    const geometry = models.find((m) => m.name === "Geometry");
+    strictEqual(geometry?.kind, "model");
+    strictEqual((geometry.usage & UsageFlags.External) > 0, true);
+    // It should not have Input/Output usage since it's only reachable through an external type
+    strictEqual((geometry.usage & UsageFlags.Input) === 0, true);
+    strictEqual((geometry.usage & UsageFlags.Output) === 0, true);
+
+    // The FeatureId union (string | numeric) and geometry union (Geometry | null)
+    // should be in the unions list with only External usage
+    strictEqual(unions.length, 2);
+    for (const union of unions) {
+      strictEqual((union.usage & UsageFlags.External) > 0, true);
+      strictEqual((union.usage & UsageFlags.Input) === 0, true);
+      strictEqual((union.usage & UsageFlags.Output) === 0, true);
+    }
   });
 
   it("should not treat regular TypeSpec models as external types", async () => {
