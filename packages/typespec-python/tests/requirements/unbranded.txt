@@ -1,3 +1,0 @@
-# Unbranded SDK dependencies
--r base.txt
-corehttp[requests]
