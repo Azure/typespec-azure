@@ -24,19 +24,11 @@ it("Detects non-post/non-get actions", async () => {
   await tester
     .expect(
       `
-      @service
       @armProviderNamespace
       namespace Microsoft.Foo;
 
-
-
-      model FooResource is TrackedResource<FooProperties> {
-        @visibility(Lifecycle.Read)
-        @key("foo")
-        @segment("foo")
-        @path
-        name: string;
-        ...ManagedServiceIdentityProperty;
+      model FooResource is TrackedResource<{}> {
+        ...ResourceNameParameter<FooResource>;
       }
 
       @armResourceOperations
@@ -45,17 +37,6 @@ it("Detects non-post/non-get actions", async () => {
         extends ResourceCreate<FooResource>,ResourceDelete<FooResource> {
         @armResourceRead(FooResource)
         @action @delete deleteFooAction(...ResourceInstanceParameters<FooResource>) : ArmResponse<FooResource> | ErrorResponse;
-      }
-
-      enum ResourceState {
-        Succeeded,
-        Canceled,
-        Failed
-      }
-
-      model FooProperties {
-        displayName?: string = "default";
-        provisioningState: ResourceState;
       }
     `,
     )
