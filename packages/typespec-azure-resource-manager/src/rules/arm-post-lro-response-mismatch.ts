@@ -126,6 +126,20 @@ function getTypeName(type: Type): string | undefined {
 }
 
 /**
+ * Templates where the Response parameter represents the logical response type.
+ * Only these templates have a Response param that indicates the author's intended
+ * final result. Other templates (e.g., ArmResourceActionAsyncBase) have a Response
+ * parameter that is the full combined response, not a logical response.
+ */
+const TEMPLATES_WITH_LOGICAL_RESPONSE = new Set([
+  "ArmResourceActionAsync",
+  "ActionAsync",
+  "ArmProviderActionAsync",
+  "ArmResourceActionNoContentAsync",
+  "ArmResourceActionNoResponseContentAsync",
+]);
+
+/**
  * Verify that the final result of an ARM LRO POST operation matches the Response parameter.
  */
 export const armPostLroResponseMismatchRule = createRule({
@@ -168,18 +182,20 @@ export const armPostLroResponseMismatchRule = createRule({
         return;
       }
 
-      // Skip ArmResourceActionAsyncBase — its Response parameter is the full combined
-      // response (e.g., ArmAcceptedLroResponse | LogicalResponse), not the logical response.
+      // For template-based operations, only check templates where the Response
+      // parameter represents the logical response type.
       const sourceOp = op.operation.sourceOperation;
-      if (sourceOp?.name === "ArmResourceActionAsyncBase") {
+      const isFromTemplate = sourceOp !== undefined && sourceOp.templateMapper !== undefined;
+
+      if (isFromTemplate && !TEMPLATES_WITH_LOGICAL_RESPONSE.has(sourceOp.name)) {
+        // Template not in allowlist — cannot determine intent, skip
         return;
       }
 
-      // Get the Response type from the template parameter
+      // Try template-based detection first: check the Response template parameter
       const responseType = getResponseTemplateParam(op.operation);
 
       if (responseType !== undefined) {
-        // Template-based detection: Response template param is non-void but finalResult doesn't match
         if (!doesFinalResultMatch(finalResult, responseType)) {
           const responseTypeName = getTypeName(responseType);
           const codefixes: CodeFix[] = [];
@@ -194,19 +210,32 @@ export const armPostLroResponseMismatchRule = createRule({
             codefixes,
           });
         }
-      } else {
-        // Fallback for non-template operations: check the 200 response body
-        // A void finalResult with a 204 response (no content) is valid
-        if (finalResult === "void" && has204Response(op.httpOperation.responses)) {
-          return;
-        }
-        const body200 = getResponseBody(op.httpOperation.responses);
-        if (body200 !== undefined && !doesFinalResultMatch(finalResult, body200.type)) {
+        return;
+      }
+
+      // Fallback for operations without a Response template parameter:
+      // Check 200 response body — if present, it should match the finalResult
+      const body200 = getResponseBody(op.httpOperation.responses);
+      if (body200 !== undefined) {
+        if (!doesFinalResultMatch(finalResult, body200.type)) {
           context.reportDiagnostic({
             target: op.operation,
           });
         }
+        return;
       }
+
+      // Check 204 response — if present, the finalResult should be void
+      if (has204Response(op.httpOperation.responses)) {
+        if (finalResult !== "void") {
+          context.reportDiagnostic({
+            target: op.operation,
+          });
+        }
+        return;
+      }
+
+      // No 200 or 204 alongside 202 — cannot determine the author's intent, skip
     }
 
     return {

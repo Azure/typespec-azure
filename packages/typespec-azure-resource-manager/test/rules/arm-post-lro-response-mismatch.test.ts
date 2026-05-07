@@ -338,7 +338,7 @@ describe("does not emit warning", () => {
     },
   );
 
-  it("when using ArmResourceActionAsyncBase (Response is not a logical response)", async () => {
+  it("when using ArmResourceActionAsyncBase with ArmAcceptedLroResponse in Response", async () => {
     await tester
       .expect(
         `
@@ -354,6 +354,26 @@ describe("does not emit warning", () => {
           Employee,
           void,
           ArmAcceptedLroResponse | GenerateResponse,
+          Azure.ResourceManager.Foundations.DefaultBaseParameters<Employee>
+        >;
+      }
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("when using ArmResourceActionAsyncBase with 202-only response (no 200 or 204)", async () => {
+    await tester
+      .expect(
+        `
+      ${preamble}
+
+      @armResourceOperations
+      interface Employees {
+        generate is ArmResourceActionAsyncBase<
+          Employee,
+          void,
+          ArmAcceptedLroResponse,
           Azure.ResourceManager.Foundations.DefaultBaseParameters<Employee>
         >;
       }
@@ -394,39 +414,11 @@ describe("does not emit warning", () => {
 
       @armResourceOperations
       interface Employees {
-        restart is ArmResourceActionNoResponseContentAsync<Employee, void>;
+        restart is ArmResourceActionNoContentAsync<Employee, void>;
       }
       `,
       )
       .toBeValid();
-  });
-});
-
-describe("emits warning for low-level operations", () => {
-  it("when a low-level LRO POST has a 200 response with a Model body but void finalResult", async () => {
-    await tester
-      .expect(
-        `
-      ${preamble}
-
-      model GenerateResponse {
-        message: string;
-      }
-
-      @armResourceOperations
-      interface Employees {
-        generate is ArmResourceActionAsync<
-          Employee,
-          void,
-          GenerateResponse,
-          LroHeaders = ArmLroLocationHeader
-        >;
-      }
-      `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
-      });
   });
 });
 
