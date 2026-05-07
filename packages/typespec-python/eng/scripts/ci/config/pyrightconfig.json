@@ -2,7 +2,5 @@
   "reportUnnecessaryCast": "warning",
   "reportTypeCommentUsage": true,
   "reportMissingImports": false,
-  "reportAttributeAccessIssue": false,
-  "pythonVersion": "3.9",
-  "exclude": ["**/build/**"]
+  "pythonVersion": "3.10"
 }

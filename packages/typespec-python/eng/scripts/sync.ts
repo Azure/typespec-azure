@@ -66,10 +66,12 @@ const INCLUDES: readonly string[] = [
   "ci/regenerate.ts",
   "ci/regenerate-common.ts",
 
-  // Shared setup scripts (invoked by package.json install/prepare hooks)
+  // Shared setup scripts (invoked by package.json install/prepare hooks
+  // and by ci/regenerate.ts which spawns run_batch.py).
   "setup/install.py",
   "setup/package_manager.py",
   "setup/prepare.py",
+  "setup/run_batch.py",
   "setup/run_tsp.py",
   "setup/run-python3.ts",
   "setup/system-requirements.ts",

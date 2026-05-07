@@ -8,8 +8,8 @@ import venv
 import sys
 from pathlib import Path
 
-
-_ROOT_DIR = Path(__file__).parent.parent
+# eng/scripts/setup/venvtools.py -> need to go up 4 levels to get to package root
+_ROOT_DIR = Path(__file__).parent.parent.parent.parent
 
 
 class ExtendedEnvBuilder(venv.EnvBuilder):
@@ -19,6 +19,9 @@ class ExtendedEnvBuilder(venv.EnvBuilder):
 
     def __init__(self, *args, **kwargs):
         self.context = None
+        if sys.version_info < (3, 9, 0):
+            # Not supported on Python 3.8, and we don't need it
+            kwargs.pop("upgrade_deps", None)
         super().__init__(*args, **kwargs)
 
     def ensure_directories(self, env_dir):
