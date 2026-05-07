@@ -1,6 +1,5 @@
 import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
-import "./common-types.tsp";
 import "./types-ref.tsp";
 import "./managed-identity-ref.tsp";
 import "./managed-identity-with-delegation-ref.tsp";
