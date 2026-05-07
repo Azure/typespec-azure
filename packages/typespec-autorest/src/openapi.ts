@@ -66,6 +66,7 @@ import {
   getDiscriminator,
   getDoc,
   getEncode,
+  getExamples as getTypeSpecExamples,
   getFormat,
   getLifecycleVisibilityEnum,
   getMaxItems,
@@ -152,7 +153,7 @@ import {
 } from "@typespec/openapi";
 import { getVersionsForEnum } from "@typespec/versioning";
 import { AutorestOpenAPISchema } from "./autorest-openapi-schema.js";
-import { getExamples, getRef } from "./decorators.js";
+import { getExamples as getAutorestExamples, getRef } from "./decorators.js";
 import { sortWithJsonSchema } from "./json-schema-sorter/sorter.js";
 import { createDiagnostic, reportDiagnostic } from "./lib.js";
 import {
@@ -596,7 +597,7 @@ export async function getOpenAPIForService(
       currentEndpoint.deprecated = true;
     }
 
-    const examples = getExamples(program, op);
+    const examples = getAutorestExamples(program, op);
     if (examples) {
       currentEndpoint["x-ms-examples"] = examples.reduce(
         (acc, example) => ({ ...acc, [example.title]: { $ref: example.pathOrUri } }),
@@ -2278,6 +2279,11 @@ export async function getOpenAPIForService(
       hasUniqueItems(program, typespecType);
     if (uniqueItems && !target.uniqueItems) {
       newTarget.uniqueItems = true;
+    }
+
+    const examples = getTypeSpecExamples(program, typespecType);
+    if (typespecType.kind === "ModelProperty" && examples.length > 0) {
+      newTarget.example = serializeValueAsJson(program, examples[0].value, typespecType);
     }
 
     if (isSecret(program, typespecType)) {
