@@ -611,18 +611,18 @@ describe("typespec-autorest: operations", () => {
     const duplicateDiagnostics = diagnostics.filter(
       (x) => x.code === "@azure-tools/typespec-autorest/duplicate-operation-id",
     );
+    const duplicateMessage =
+      "Operation ID 'Shared_List' is duplicated across operations. OpenAPI requires operationId values to be globally unique.";
 
     strictEqual(duplicateDiagnostics.length, 2);
     expectDiagnostics(duplicateDiagnostics, [
       {
         code: "@azure-tools/typespec-autorest/duplicate-operation-id",
-        message:
-          "Operation ID 'Shared_List' is duplicated across operations. OpenAPI requires operationId values to be globally unique.",
+        message: duplicateMessage,
       },
       {
         code: "@azure-tools/typespec-autorest/duplicate-operation-id",
-        message:
-          "Operation ID 'Shared_List' is duplicated across operations. OpenAPI requires operationId values to be globally unique.",
+        message: duplicateMessage,
       },
     ]);
   });
