@@ -102,6 +102,13 @@ function getResponseBody(responses: HttpOperationResponse[]): HttpPayloadBody | 
 }
 
 /**
+ * Check if there is a 204 (No Content) response among the HTTP responses.
+ */
+function has204Response(responses: HttpOperationResponse[]): boolean {
+  return responses.some((r) => r.statusCodes === 204);
+}
+
+/**
  * Get a printable name for a type, if available.
  * Handles Model, Scalar, and Intrinsic types (including void, unknown, etc.).
  */
@@ -140,7 +147,11 @@ export const armPostLroResponseMismatchRule = createRule({
       if (finalResult === "void") {
         return isVoidType(expectedResponseType);
       }
-      return $(context.program).type.isAssignableTo(finalResult, expectedResponseType, finalResult);
+      const tk = $(context.program).type;
+      return (
+        tk.isAssignableTo(finalResult, expectedResponseType, finalResult) ||
+        tk.isAssignableTo(expectedResponseType, finalResult, expectedResponseType)
+      );
     }
 
     function validateOperation(op: ArmResourceOperation) {
@@ -154,6 +165,13 @@ export const armPostLroResponseMismatchRule = createRule({
 
       const { finalResult } = lroMetadata;
       if (finalResult === undefined) {
+        return;
+      }
+
+      // Skip ArmResourceActionAsyncBase — its Response parameter is the full combined
+      // response (e.g., ArmAcceptedLroResponse | LogicalResponse), not the logical response.
+      const sourceOp = op.operation.sourceOperation;
+      if (sourceOp?.name === "ArmResourceActionAsyncBase") {
         return;
       }
 
@@ -178,6 +196,10 @@ export const armPostLroResponseMismatchRule = createRule({
         }
       } else {
         // Fallback for non-template operations: check the 200 response body
+        // A void finalResult with a 204 response (no content) is valid
+        if (finalResult === "void" && has204Response(op.httpOperation.responses)) {
+          return;
+        }
         const body200 = getResponseBody(op.httpOperation.responses);
         if (body200 !== undefined && !doesFinalResultMatch(finalResult, body200.type)) {
           context.reportDiagnostic({

@@ -337,6 +337,97 @@ describe("does not emit warning", () => {
         .toBeValid();
     },
   );
+
+  it("when using ArmResourceActionAsyncBase (Response is not a logical response)", async () => {
+    await tester
+      .expect(
+        `
+      ${preamble}
+
+      model GenerateResponse {
+        message: string;
+      }
+
+      @armResourceOperations
+      interface Employees {
+        generate is ArmResourceActionAsyncBase<
+          Employee,
+          void,
+          ArmAcceptedLroResponse | GenerateResponse,
+          Azure.ResourceManager.Foundations.DefaultBaseParameters<Employee>
+        >;
+      }
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("when a low-level LRO POST has a 200 response with a body matching finalResult", async () => {
+    await tester
+      .expect(
+        `
+      ${preamble}
+
+      model GenerateResponse {
+        message: string;
+      }
+
+      @armResourceOperations
+      interface Employees {
+        generate is ArmResourceActionAsync<
+          Employee,
+          void,
+          GenerateResponse,
+          LroHeaders = ArmLroLocationHeader<FinalResult = GenerateResponse>
+        >;
+      }
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("when a low-level LRO POST has a 204 response and void finalResult", async () => {
+    await tester
+      .expect(
+        `
+      ${preamble}
+
+      @armResourceOperations
+      interface Employees {
+        restart is ArmResourceActionNoResponseContentAsync<Employee, void>;
+      }
+      `,
+      )
+      .toBeValid();
+  });
+});
+
+describe("emits warning for low-level operations", () => {
+  it("when a low-level LRO POST has a 200 response with a Model body but void finalResult", async () => {
+    await tester
+      .expect(
+        `
+      ${preamble}
+
+      model GenerateResponse {
+        message: string;
+      }
+
+      @armResourceOperations
+      interface Employees {
+        generate is ArmResourceActionAsync<
+          Employee,
+          void,
+          GenerateResponse,
+          LroHeaders = ArmLroLocationHeader
+        >;
+      }
+      `,
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
+      });
+  });
 });
 
 describe("codefix", () => {
