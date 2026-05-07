@@ -39,6 +39,7 @@ it("is valid if there is an interface called Operations extending Azure.Resource
         @armResourceOperations
         interface FooResources {
           @armResourceUpdate(FooResource)
+          #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
           @patch(#{implicitOptionality: true})
           update(): UpdateFooResponse;
         }

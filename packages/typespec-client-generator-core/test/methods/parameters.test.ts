@@ -91,7 +91,7 @@ it("path defined in model", async () => {
     op pathInModel(...NameParameter): void;
 
     model NameParameter {
-      @doc("Name parameter")
+      
       @pattern("^[a-zA-Z0-9-]{3,24}$")
       @format("UUID")
       name: string;
@@ -738,6 +738,7 @@ it("parameter grouping", async () => {
 describe("content type", () => {
   it("content type will be added if not defined and there is body", async () => {
     const { program } = await SimpleTesterWithService.compile(`
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       @patch(#{implicitOptionality: true}) op patchNull(@body body: string): void;
     `);
     const context = await createSdkContextForTester(program);
@@ -820,6 +821,7 @@ describe("content type", () => {
 
   it("content type should be optional if body is optional", async () => {
     const { program } = await SimpleTesterWithService.compile(`
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       @patch(#{implicitOptionality: true}) op patchNull(@body body?: string): void;
     `);
     const context = await createSdkContextForTester(program);

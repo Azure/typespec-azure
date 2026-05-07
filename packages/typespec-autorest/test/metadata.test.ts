@@ -11,6 +11,7 @@ describe("typespec-autorest: metadata", () => {
         @visibility(Lifecycle.Read, Lifecycle.Update, Lifecycle.Create) ruc?: string;
       }
       @parameterVisibility(Lifecycle.Create, Lifecycle.Update)
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       @route("/") @patch(#{implicitOptionality: true}) op createOrUpdate(...M): M; 
     `);
 
@@ -88,6 +89,7 @@ describe("typespec-autorest: metadata", () => {
         person: Person;
         relationship: string;
       }
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       @route("/") @patch(#{implicitOptionality: true}) op update(...Person): Person; 
     `);
 
@@ -227,6 +229,7 @@ describe("typespec-autorest: metadata", () => {
       @get get(...M): M;
       @post create(...M): M;
       @put createOrUpdate(...M): M;
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       @patch(#{implicitOptionality: true}) update(...M): M;
       @delete delete(...M): void; 
     }
@@ -236,6 +239,7 @@ describe("typespec-autorest: metadata", () => {
       @get get(...D): D;
       @post create(...D): D;
       @put createOrUpdate(...D): D;
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       @patch(#{implicitOptionality: true}) update(...D): D;
       @delete delete(...D): void; 
     }
@@ -245,6 +249,7 @@ describe("typespec-autorest: metadata", () => {
       @get op get(id: string): R;
       @post op create(...R): R;
       @put op createOrUpdate(...R): R;
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       @patch(#{implicitOptionality: true}) op update(...R): R;
       @delete op delete(...D): void; 
     }
