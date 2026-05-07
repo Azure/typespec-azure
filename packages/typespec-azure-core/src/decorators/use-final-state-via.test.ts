@@ -25,10 +25,7 @@ it("correctly overrides original-uri regardless of decorator order on PUT", asyn
     @route("/polling")
     @get op bar(): {status: "Succeeded" | "Failed" | "Cancelled"};
   `);
-  assert.strictEqual(
-    diagnostics.some((x) => x.code === "@azure-tools/typespec-azure-core/invalid-final-state"),
-    false,
-  );
+  expectDiagnostics(diagnostics, []);
 
   const { foo, program } = await Tester.compile(t.code`
     @pollingOperation(bar)
