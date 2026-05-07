@@ -1,7 +1,7 @@
 import { ignoreDiagnostics } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
 import type { UseFinalStateViaDecorator } from "../../generated-defs/Azure.Core.js";
-import { reportDiagnostic } from "../lib.js";
+import { createDiagnostic, reportDiagnostic } from "../lib.js";
 import {
   FinalStateValue,
   setFinalStateOverride,
@@ -55,12 +55,14 @@ export const $useFinalStateVia: UseFinalStateViaDecorator = (context, entity, fi
           FinalStateValue.azureAsyncOperation,
         ].includes(finalStateVia)
       ) {
-        reportDiagnostic(program, {
-          code: "invalid-final-state",
-          target: entity,
-          messageId: "noHeader",
-          format: { finalStateValue: finalStateVia },
-        });
+        return [
+          createDiagnostic({
+            code: "invalid-final-state",
+            target: entity,
+            messageId: "noHeader",
+            format: { finalStateValue: finalStateVia },
+          }),
+        ];
       }
       return [];
     },
