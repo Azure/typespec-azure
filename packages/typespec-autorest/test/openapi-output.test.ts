@@ -590,19 +590,17 @@ describe("typespec-autorest: operations", () => {
 
   it("emits warning on each operation when operationId is duplicated", async () => {
     const diagnostics = await diagnoseOpenApiFor(`
-      using Azure.ClientGenerator.Core;
-      #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Test operation ids."
       @service namespace MyService;
 
       namespace A {
         @route("/foo")
-        @clientLocation("Shared")
+        @operationId("Shared_List")
         op list(): string;
       }
 
       namespace B {
         @route("/bar")
-        @clientLocation("Shared")
+        @operationId("Shared_List")
         op list(): string;
       }
       `);
