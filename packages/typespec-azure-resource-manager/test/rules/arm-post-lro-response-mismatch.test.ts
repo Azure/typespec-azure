@@ -172,6 +172,31 @@ describe("emits warning", () => {
       });
   });
 
+  it("when ArmResourceActionNoContentAsync has LroHeaders with non-void FinalResult but 204 response", async () => {
+    await tester
+      .expect(
+        `
+      ${preamble}
+
+      model GenerateResponse {
+        message: string;
+      }
+
+      @armResourceOperations
+      interface Employees {
+        restart is ArmResourceActionNoContentAsync<
+          Employee,
+          void,
+          LroHeaders = ArmLroLocationHeader<FinalResult = GenerateResponse>
+        >;
+      }
+      `,
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
+      });
+  });
+
   it.each([
     ["Model", "GenerateResponse", "model GenerateResponse { message: string; }"],
     ["scalar", "string", ""],
