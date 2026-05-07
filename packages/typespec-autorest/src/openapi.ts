@@ -3088,10 +3088,7 @@ function createFeatureDocumentProxy(
   for (const featureName of features.keys()) {
     const featureOptions = features.get(featureName)!;
     const featureKey = featureName.toLowerCase();
-    root.set(
-      featureKey,
-      initializeOpenAPIDocumentItem(program, service, featureOptions, version),
-    );
+    root.set(featureKey, initializeOpenAPIDocumentItem(program, service, featureOptions, version));
     operationIds.set(featureKey, new DuplicateTracker<string, Operation>());
   }
   const defaultFeature = [...root.entries()].filter(
