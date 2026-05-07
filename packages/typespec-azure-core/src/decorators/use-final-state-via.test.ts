@@ -2,7 +2,10 @@ import { Tester } from "#test/test-host.js";
 import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import assert from "assert";
 import { it } from "vitest";
-import { FinalStateValue, getFinalStateOverride } from "../state/final-state.js";
+import {
+  FinalStateValue,
+  getFinalStateOverride,
+} from "../state/final-state.js";
 
 it("correctly overrides PUT lro final-state-via", async () => {
   const { foo, program } = await Tester.compile(t.code`
