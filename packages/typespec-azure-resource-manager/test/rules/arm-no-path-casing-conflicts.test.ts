@@ -75,7 +75,7 @@ it("does not emit when paths do not overlap case-insensitively", async () => {
     .toBeValid();
 });
 
-it("does not emit when paths differ only by path parameter name casing", async () => {
+it("emits a diagnostic when paths differ only by path parameter name casing", async () => {
   await tester
     .expect(
       `
@@ -89,7 +89,52 @@ it("does not emit when paths differ only by path parameter name casing", async (
       @post op getTwo(@path resourceName: string): void;
       `,
     )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-no-path-casing-conflicts",
+      message:
+        "Operation path '/providers/Microsoft.Contoso/foos/{resourceName}' differs from operation path '/providers/Microsoft.Contoso/foos/{ResourceName}' only by character casing. Each ARM operation path must be unique case-insensitively.",
+    });
+});
+
+it("buckets paths with different parameter names separately (no diagnostic)", async () => {
+  // /{resourceUri}/... and /{scope}/... have different parameter names, so
+  // they belong to different buckets and must not collide.
+  await tester
+    .expect(
+      `
+      @service(#{ title: "Test" })
+      namespace Microsoft.Contoso;
+
+      @route("/{resourceUri}/providers/Microsoft.Foo/widgets")
+      @get op listByResourceUri(@path resourceUri: string): void;
+
+      @route("/{scope}/providers/microsoft.foo/widgets")
+      @get op listByScope(@path scope: string): void;
+      `,
+    )
     .toBeValid();
+});
+
+it("buckets paths whose parameter names match case-insensitively together (diagnostic)", async () => {
+  // /{scope}/... and /{Scope}/... share a bucket and differ only by casing.
+  await tester
+    .expect(
+      `
+      @service(#{ title: "Test" })
+      namespace Microsoft.Contoso;
+
+      @route("/{scope}/providers/microsoft.foo/widgets")
+      @get op listLower(@path scope: string): void;
+
+      @route("/{Scope}/providers/Microsoft.Foo/widgets")
+      @post op listUpper(@path Scope: string): void;
+      `,
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-no-path-casing-conflicts",
+      message:
+        "Operation path '/{Scope}/providers/Microsoft.Foo/widgets' differs from operation path '/{scope}/providers/microsoft.foo/widgets' only by character casing. Each ARM operation path must be unique case-insensitively.",
+    });
 });
 
 it("applies a codefix that lowercases the offending @segment value", async () => {

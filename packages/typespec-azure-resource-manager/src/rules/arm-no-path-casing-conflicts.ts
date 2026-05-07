@@ -30,16 +30,17 @@ export const armNoPathCasingConflictsRule = createRule({
       root: (program: Program) => {
         const [services] = getAllHttpServices(program);
 
-        // Collect all eligible operations, bucketed by lowercased path with
-        // parameter names normalized to `{}` so that bucketing only considers
-        // static segments.
+        // Bucket eligible operations by lowercased path. Path parameter names
+        // are part of the comparison: `/{scope}/...` and `/{resourceUri}/...`
+        // are in different buckets, while `/{scope}/...` and `/{Scope}/...`
+        // share a bucket.
         const buckets = new Map<string, HttpOperation[]>();
         for (const service of services) {
           for (const op of service.operations) {
             if (op.operation.namespace && isInternalTypeSpec(program, op.operation.namespace)) {
               continue;
             }
-            const key = normalizeParameters(op.path).toLowerCase();
+            const key = op.path.toLowerCase();
             let bucket = buckets.get(key);
             if (bucket === undefined) {
               bucket = [];
@@ -52,22 +53,18 @@ export const armNoPathCasingConflictsRule = createRule({
         for (const bucket of buckets.values()) {
           if (bucket.length < 2) continue;
 
-          // Compare static-segment casing only — parameter-name casing
-          // differences are out of scope for this rule.
-          const distinctStaticSpellings = new Set(bucket.map((o) => normalizeParameters(o.path)));
-          if (distinctStaticSpellings.size < 2) continue;
+          // Skip buckets where every path string is identical — exact
+          // duplicates are handled by `@route`.
+          const distinctSpellings = new Set(bucket.map((o) => o.path));
+          if (distinctSpellings.size < 2) continue;
 
           // Sort deterministically by source location for stable diagnostics.
           const sorted = [...bucket].sort((a, b) => compareBySource(a.operation, b.operation));
 
           const firstPath = sorted[0].path;
-          const firstStatic = normalizeParameters(firstPath);
           for (let i = 1; i < sorted.length; i++) {
             const op = sorted[i];
-            // Skip ones whose static segments match the first one — either an
-            // exact duplicate (handled by `@route`) or a parameter-name-only
-            // difference (out of scope).
-            if (normalizeParameters(op.path) === firstStatic) continue;
+            if (op.path === firstPath) continue;
 
             const codefix = tryCreateSegmentCasingCodeFix(op, firstPath);
 
@@ -82,14 +79,6 @@ export const armNoPathCasingConflictsRule = createRule({
     };
   },
 });
-
-/**
- * Replace `{paramName}` placeholders with `{}` so that path-parameter naming
- * differences are ignored when comparing paths.
- */
-function normalizeParameters(path: string): string {
-  return path.replace(/\{[^/{}]+\}/g, "{}");
-}
 
 function compareBySource(a: Operation, b: Operation): number {
   const sa = getSourceLocation(a);

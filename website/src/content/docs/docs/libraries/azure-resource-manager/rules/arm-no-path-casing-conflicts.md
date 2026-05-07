@@ -7,8 +7,10 @@ title: arm-no-path-casing-conflicts
 ```
 
 ARM operation paths must be unique case-insensitively. Two operations whose
-paths differ only by character casing of static path segments (for example
-`/foos` and `/Foos`) violate this rule.
+paths differ only by character casing (for example `/foos` and `/Foos`, or
+`/{scope}/...` and `/{Scope}/...`) violate this rule. Path parameter names
+are part of the comparison: paths whose parameter names differ (for example
+`/{resourceUri}/...` versus `/{scope}/...`) are treated as distinct.
 
 When the casing difference is in a `@segment("...")` decorator value, an
 auto-fix is offered that lowercases the offending segment.
