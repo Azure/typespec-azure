@@ -1,7 +1,7 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, notStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
-import { compileOpenAPI, diagnoseOpenApiFor, ignoreUseStandardOps, oapiForModel } from "./test-host.js";
+import { compileOpenAPI, diagnoseOpenApiFor, oapiForModel } from "./test-host.js";
 
 describe("typespec-autorest: definitions", () => {
   it("defines models", async () => {
@@ -589,9 +589,9 @@ describe("typespec-autorest: operations", () => {
   });
 
   it("emits warning on each operation when operationId is duplicated", async () => {
-    const diagnostics = ignoreUseStandardOps(
-      await diagnoseOpenApiFor(`
+    const diagnostics = await diagnoseOpenApiFor(`
       using Azure.ClientGenerator.Core;
+      #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Test operation ids."
       @service namespace MyService;
 
       namespace A {
@@ -605,17 +605,11 @@ describe("typespec-autorest: operations", () => {
         @clientLocation("Shared")
         op list(): string;
       }
-      `),
-    );
-
-    const duplicateDiagnostics = diagnostics.filter(
-      (x) => x.code === "@azure-tools/typespec-autorest/duplicate-operation-id",
-    );
+      `);
     const duplicateMessage =
       "Operation ID 'Shared_List' is duplicated across operations. OpenAPI requires operationId values to be globally unique.";
 
-    strictEqual(duplicateDiagnostics.length, 2);
-    expectDiagnostics(duplicateDiagnostics, [
+    expectDiagnostics(diagnostics, [
       {
         code: "@azure-tools/typespec-autorest/duplicate-operation-id",
         message: duplicateMessage,
