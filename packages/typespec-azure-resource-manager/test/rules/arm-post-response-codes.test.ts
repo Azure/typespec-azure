@@ -28,11 +28,7 @@ it("Emits a warning for a synchronous post operation that does not contain the a
       namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
+        ...ResourceNameParameter<Employee>;
       }
       
       @armResourceOperations
@@ -61,11 +57,7 @@ it("Emits a warning for a synchronous post operation that does not contain the a
       namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
+        ...ResourceNameParameter<Employee>;
       }
       
       @armResourceOperations
@@ -95,11 +87,7 @@ it("Does not emit a warning for a synchronous post operation that contains the 2
       namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
+        ...ResourceNameParameter<Employee>;
       }
       
       @armResourceOperations
@@ -124,11 +112,7 @@ it("Does not emit a warning for a synchronous post operation that contains 204 a
       namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
+        ...ResourceNameParameter<Employee>;
       }
       
       @armResourceOperations
@@ -160,10 +144,7 @@ it("Does not emit a warning for a long-running post operation that satisfies the
       }
             
       model Widget is TrackedResource<{}> {
-        @key("widgetName")
-        @segment("widgets")
-        @path
-        name: string;
+        ...ResourceNameParameter<Widget>;
       }
       
       @armResourceOperations
@@ -203,10 +184,7 @@ it("Emits a warning for a long-running post operation that has a 202 response wi
       }
             
       model Widget is TrackedResource<{}> {
-        @key("widgetName")
-        @segment("widgets")
-        @path
-        name: string;
+        ...ResourceNameParameter<Widget>;
       }
       
       @armResourceOperations
@@ -247,10 +225,7 @@ it("Emits a warning for a long-running post operation that has a 200 response wi
       }
             
       model Widget is TrackedResource<{}> {
-        @key("widgetName")
-        @segment("widgets")
-        @path
-        name: string;
+        ...ResourceNameParameter<Widget>;
       }
       
       @armResourceOperations
@@ -293,10 +268,7 @@ it("Emits a warning for a long-running post operation that has invalid response 
       }
             
       model Widget is TrackedResource<{}> {
-        @key("widgetName")
-        @segment("widgets")
-        @path
-        name: string;
+        ...ResourceNameParameter<Widget>;
       }
       
       @armResourceOperations

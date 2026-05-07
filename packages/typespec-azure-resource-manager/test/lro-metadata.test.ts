@@ -35,8 +35,6 @@ it("Returns correct metadata for Async CreateOrUpdate", async () => {
      }
 
       model WidgetProperties {
-        simpleArmId: Azure.Core.armResourceIdentifier;
-
         provisioningState: ResourceState;
       }
 
@@ -80,8 +78,6 @@ it("Returns correct metadata for Async CreateOrUpdate with final location", asyn
      }
 
       model WidgetProperties {
-        simpleArmId: Azure.Core.armResourceIdentifier;
-
         provisioningState: ResourceState;
       }
 
@@ -133,8 +129,6 @@ it("Returns correct metadata for Async Update", async () => {
      }
 
       model WidgetProperties {
-        simpleArmId: Azure.Core.armResourceIdentifier;
-
         provisioningState: ResourceState;
       }
 
@@ -177,7 +171,6 @@ it("Returns correct metadata for Async Delete", async () => {
      }
 
       model WidgetProperties {
-        simpleArmId: Azure.Core.armResourceIdentifier;
         provisioningState: ResourceState;
       }
 
@@ -221,7 +214,6 @@ it("Returns correct metadata for Async action", async () => {
      }
 
       model WidgetProperties {
-        simpleArmId: Azure.Core.armResourceIdentifier;
 
         provisioningState: ResourceState;
       }
@@ -274,7 +266,6 @@ it("Returns correct metadata for Async action with void return type", async () =
      }
 
       model WidgetProperties {
-        simpleArmId: Azure.Core.armResourceIdentifier;
 
         provisioningState: ResourceState;
       }
@@ -329,7 +320,6 @@ it("Returns correct metadata for Async CreateOrUpdate with union type Provisioni
      }
 
       model WidgetProperties {
-        simpleArmId: Azure.Core.armResourceIdentifier;
 
         provisioningState: ResourceState;
       }
@@ -374,8 +364,6 @@ it("Returns correct metadata for Async CreateOrUpdate with final location, with 
       }
 
       model WidgetProperties {
-        simpleArmId: Azure.Core.armResourceIdentifier;
-
         provisioningState: ResourceState;
       }
 
@@ -427,8 +415,6 @@ it("Returns correct metadata for Async CreateOrUpdate with final operation, with
       }
 
       model WidgetProperties {
-        simpleArmId: Azure.Core.armResourceIdentifier;
-
         provisioningState: ResourceState;
       }
 
@@ -473,8 +459,6 @@ it("Returns correct metadata for Async Update with final operation, with union t
       }
 
       model WidgetProperties {
-        simpleArmId: Azure.Core.armResourceIdentifier;
-
         provisioningState: ResourceState;
       }
 
@@ -519,7 +503,6 @@ it("Returns correct metadata for Async Update with union type ProvisioningState"
       }
 
       model WidgetProperties {
-        simpleArmId: Azure.Core.armResourceIdentifier;
 
         provisioningState: ResourceState;
       }
@@ -564,7 +547,6 @@ it("Returns correct metadata for Async Delete with union type ProvisioningState"
       }
 
       model WidgetProperties {
-        simpleArmId: Azure.Core.armResourceIdentifier;
 
         provisioningState: ResourceState;
       }
@@ -609,8 +591,6 @@ it("Returns correct metadata for Async action with union type ProvisioningState"
       }
 
       model WidgetProperties {
-        simpleArmId: Azure.Core.armResourceIdentifier;
-
         provisioningState: ResourceState;
       }
 
@@ -729,7 +709,6 @@ describe("original-uri with no GET at same path", () => {
     }
 
     model WidgetProperties {
-      simpleArmId: Azure.Core.armResourceIdentifier;
       provisioningState: ResourceState;
     }
 

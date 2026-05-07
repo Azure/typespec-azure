@@ -54,7 +54,7 @@ it("api version in host param", async () => {
       {
         endpoint: string,
 
-        @doc("Api Version")
+        
         @path
         ApiVersion: APIVersions,
       }

@@ -65,7 +65,7 @@ describe("typespec-autorest: Additional properties", () => {
     const res = await oapiForModel(
       "Pet",
       `
-      @doc("value")
+      
       scalar Value;
       model Pet is Record<Value> {};
       `,
