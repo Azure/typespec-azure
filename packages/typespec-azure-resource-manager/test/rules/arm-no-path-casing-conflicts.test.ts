@@ -170,7 +170,7 @@ it("applies a codefix that lowercases the offending @segment value", async () =>
 
       @armResourceOperations
       interface Bars {
-        get is ArmResourceRead<Bar>;
+        delete is ArmResourceDeleteSync<Bar>;
       }
       `,
     )
@@ -204,9 +204,30 @@ it("applies a codefix that lowercases the offending @segment value", async () =>
 
       @armResourceOperations
       interface Bars {
-        get is ArmResourceRead<Bar>;
+        delete is ArmResourceDeleteSync<Bar>;
       }
       `);
+});
+
+it("emits a diagnostic for two @route operations (delete and get) that differ only by static-segment casing", async () => {
+  await tester
+    .expect(
+      `
+      @service(#{ title: "Test" })
+      namespace Microsoft.Contoso;
+
+      @route("/providers/Microsoft.Contoso/foos/{name}")
+      @delete op deleteFoo(@path name: string): void;
+
+      @route("/providers/Microsoft.Contoso/Foos/{name}")
+      @get op getFoo(@path name: string): void;
+      `,
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-no-path-casing-conflicts",
+      message:
+        "Operation path '/providers/Microsoft.Contoso/Foos/{name}' differs from operation path '/providers/Microsoft.Contoso/foos/{name}' only by character casing. Each ARM operation path must be unique case-insensitively.",
+    });
 });
 
 it("does not check operations from internal TypeSpec namespaces", async () => {
