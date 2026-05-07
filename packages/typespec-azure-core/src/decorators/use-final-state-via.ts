@@ -40,24 +40,29 @@ export const $useFinalStateVia: UseFinalStateViaDecorator = (context, entity, fi
       return;
   }
 
-  const operation = ignoreDiagnostics(getHttpOperation(program, entity));
-  const storedValue = validateFinalState(program, operation, finalStateVia);
-  if (storedValue !== undefined || operation.verb === "put") {
-    setFinalStateOverride(program, entity, finalStateVia);
-  }
-  if (
-    storedValue === undefined &&
-    [
-      FinalStateValue.operationLocation,
-      FinalStateValue.location,
-      FinalStateValue.azureAsyncOperation,
-    ].includes(finalStateVia)
-  ) {
-    reportDiagnostic(program, {
-      code: "invalid-final-state",
-      target: entity,
-      messageId: "noHeader",
-      format: { finalStateValue: finalStateVia },
-    });
-  }
+  return {
+    onTargetFinish: () => {
+      const operation = ignoreDiagnostics(getHttpOperation(program, entity));
+      const storedValue = validateFinalState(program, operation, finalStateVia);
+      if (storedValue !== undefined) {
+        setFinalStateOverride(program, entity, finalStateVia);
+      }
+      if (
+        storedValue === undefined &&
+        [
+          FinalStateValue.operationLocation,
+          FinalStateValue.location,
+          FinalStateValue.azureAsyncOperation,
+        ].includes(finalStateVia)
+      ) {
+        reportDiagnostic(program, {
+          code: "invalid-final-state",
+          target: entity,
+          messageId: "noHeader",
+          format: { finalStateValue: finalStateVia },
+        });
+      }
+      return [];
+    },
+  };
 };
