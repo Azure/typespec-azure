@@ -73,7 +73,7 @@ describe("typespec-autorest: model definitions", () => {
       `,
     );
 
-    strictEqual(res.defs.Test.properties.abcd.example, "core.windows.net");
+    expect(res.defs.Test.properties.abcd.example).toEqual("core.windows.net");
   });
 
   it("uses json name specified via @encodedName", async () => {
