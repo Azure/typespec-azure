@@ -136,13 +136,13 @@ it("client accessor", async () => {
       @clientInitialization({parameters: clientInitModel})
       interface bumpParameter {
           @route("/op1")
-          @doc("bump parameter")
+          
           @post
           @convenientAPI(true)
           op op1(@path p1: string, @query q1: string): void;
 
           @route("/op2")
-          @doc("bump parameter")
+          
           @post
           @convenientAPI(true)
           op op2(@path p1: string): void;
@@ -515,7 +515,6 @@ it("redefine client structure", async () => {
       namespace ContainerClient {
         op upload is MyService.uploadContainer;
 
-
         model BlobClientInitialization {
           containerName: string;
           blobName: string;
@@ -693,13 +692,13 @@ it("sub client initialized individually", async () => {
     @clientInitialization({parameters: clientInitModel, initializedBy: InitializedBy.individually | InitializedBy.parent})
     interface bumpParameter {
         @route("/op1")
-        @doc("bump parameter")
+        
         @post
         @convenientAPI(true)
         op op1(@path p1: string, @query q1: string): void;
 
         @route("/op2")
-        @doc("bump parameter")
+        
         @post
         @convenientAPI(true)
         op op2(@path p1: string): void;
