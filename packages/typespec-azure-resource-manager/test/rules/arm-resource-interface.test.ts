@@ -27,27 +27,11 @@ it("Detects interfaces without @armResourceOperations", async () => {
       @armProviderNamespace
       namespace Microsoft.Foo;
 
-      model FooResource is TrackedResource<FooProperties> {
-        @visibility(Lifecycle.Read)
-        @key("foo")
-        @segment("foo")
-        @path
-        name: string;
-        ...ManagedServiceIdentityProperty;
+      model FooResource is TrackedResource<{}> {
+        ...ResourceNameParameter<FooResource>;
       }
 
-      interface FooResources extends TrackedResourceOperations<FooResource, FooProperties> {}
-
-      enum ResourceState {
-        Succeeded,
-        Canceled,
-        Failed
-      }
-
-      model FooProperties {
-        displayName?: string = "default";
-        provisioningState: ResourceState;
-      }
+      interface FooResources extends TrackedResourceOperations<FooResource, {}> {}
     `,
     )
     .toEmitDiagnostics({

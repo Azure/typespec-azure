@@ -61,15 +61,15 @@ describe("cannot contain path parameters", () => {
     await tester
       .expect(
         `
-          @doc("get lro status")
+          
           @route("/lrRpcOp/{operationId}")
-          @get op getStatus(@doc("The operation") @path operationId: string): PollingStatus;
+          @get op getStatus(@path operationId: string): PollingStatus;
 
           model PollingStatus {
-            @doc("PollingLocation")
+            
             @header location?: ResourceLocation<PollingStatus>;
 
-            @doc("The status of the operation")
+            
             @Azure.Core.lroStatus
             statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
           }
