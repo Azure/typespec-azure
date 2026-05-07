@@ -233,6 +233,79 @@ it("does not emit missingDelete or missingList for a singleton tracked resource"
     .toBeValid();
 });
 
+it("emits missingCreateOrUpdate when only createOrUpdate is missing", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model Foo is TrackedResource<{}> {
+        @key @path @segment("foos") name: string;
+      }
+
+      @armResourceOperations
+      interface FooOperations {
+        read is ArmResourceRead<Foo>;
+        delete is ArmResourceDeleteWithoutOkAsync<Foo>;
+        listByResourceGroup is ArmResourceListByParent<Foo>;
+        listBySubscription is ArmListBySubscription<Foo>;
+      }
+      `,
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-required-operations",
+      message: `Resource 'Foo' must have a PUT (createOrUpdate) operation.`,
+    });
+});
+
+it("emits missingGet for a singleton tracked resource missing read", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      @singleton
+      model Foo is TrackedResource<{}> {
+        @key @path @segment("foos") name: string;
+      }
+
+      @armResourceOperations
+      interface FooOperations {
+        createOrUpdate is ArmResourceCreateOrReplaceAsync<Foo>;
+      }
+      `,
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-required-operations",
+      message: `Resource 'Foo' must have a GET (read) operation.`,
+    });
+});
+
+it("is valid when an extension resource has read, createOrUpdate, delete, and a list operation", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model Foo is ExtensionResource<{}> {
+        @key @path @segment("foos") name: string;
+      }
+
+      @armResourceOperations
+      interface FooOperations {
+        read is ArmResourceRead<Foo>;
+        createOrUpdate is ArmResourceCreateOrReplaceAsync<Foo>;
+        delete is ArmResourceDeleteWithoutOkAsync<Foo>;
+        listByParent is ArmResourceListByParent<Foo>;
+      }
+      `,
+    )
+    .toBeValid();
+});
+
 it("skips @armVirtualResource models", async () => {
   await tester
     .expect(

@@ -49,6 +49,7 @@ model Office extends Room {
   properties: OfficeProperties;
 }
 
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-required-operations" "This sample demonstrates a read-only polymorphic proxy resource; createOrUpdate and delete are intentionally omitted."
 @armResourceOperations
 interface Rooms {
   get is ArmResourceRead<Room>;

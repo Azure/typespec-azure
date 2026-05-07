@@ -123,14 +123,28 @@ function getRequiredOperationsForResource(resource: ResolvedResource): RequiredO
   // list-by-parent operation. For tracked resources at resource-group scope,
   // list-by-resource-group satisfies the list-by-parent requirement.
   const required: RequiredOperation[] = ["read", "createOrUpdate", "delete", "list-by-parent"];
-  if (resource.kind === "Tracked") {
+  // list-by-subscription is required only for top-level resource-group-scoped
+  // tracked resources (the standard Azure RP pattern). Nested resources
+  // (parented under another resource) and tracked resources at non-RG scope
+  // (tenant, subscription, location) do not require a list-by-subscription.
+  if (resource.kind === "Tracked" && isTopLevelResourceGroupScoped(resource)) {
     required.push("list-by-subscription");
   }
   return required;
 }
 
+function isTopLevelResourceGroupScoped(resource: ResolvedResource): boolean {
+  if (resource.parent !== undefined) return false;
+  const path = resource.resourceInstancePath ?? "";
+  return /\/resourceGroups\/\{/.test(path);
+}
+
 function getPresentOperations(entries: ResolvedResource[]): Set<RequiredOperation> {
   const present = new Set<RequiredOperation>();
+  // Determine the resource kind from the canonical-equivalent: if any entry is
+  // tracked, the resource is tracked. (All entries for the same logical model
+  // share the same kind in practice.)
+  const isTracked = entries.some((e) => e.kind === "Tracked");
   for (const resource of entries) {
     const lifecycle = resource.operations.lifecycle;
     if (lifecycle.read?.length) present.add("read");
@@ -138,15 +152,23 @@ function getPresentOperations(entries: ResolvedResource[]): Set<RequiredOperatio
     if (lifecycle.delete?.length) present.add("delete");
     for (const op of resource.operations.lists ?? []) {
       const path = op.path ?? "";
+      if (!isTracked) {
+        // For non-tracked resources (Proxy / Extension), any list operation
+        // satisfies the list-by-parent requirement regardless of scope.
+        present.add("list-by-parent");
+        continue;
+      }
+      // Tracked resources: list-by-subscription is a list rooted at
+      // subscription scope (has /subscriptions/{...} but not
+      // /resourceGroups/{...} and no nested /providers/). Everything else
+      // (resource-group, location, parent, etc.) counts as list-by-parent.
       const providersCount = (path.match(/\/providers\//g) ?? []).length;
-      if (providersCount > 1) {
-        // Nested list-by-parent.
-        present.add("list-by-parent");
-      } else if (/\/resourceGroups\/\{/.test(path)) {
-        // List-by-resource-group satisfies list-by-parent for tracked resources.
-        present.add("list-by-parent");
-      } else if (/\/subscriptions\/\{/.test(path)) {
+      const hasSubscription = /\/subscriptions\/\{/.test(path);
+      const hasResourceGroup = /\/resourceGroups\/\{/.test(path);
+      if (hasSubscription && !hasResourceGroup && providersCount <= 1) {
         present.add("list-by-subscription");
+      } else {
+        present.add("list-by-parent");
       }
     }
   }
