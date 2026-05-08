@@ -15,6 +15,8 @@ Additionally, in Azure, preview APIs have a limited lifespan and limited support
 - Only one version may be marked with the `@previewVersion` decorator.
 - Mark all changes from the latest stable with appropriate versioning decorators, using `Versions.<PreviewVersion>` as the version argument (where `<PreviewVersion>` is the name of the last enum value)
 
+The [`@azure-tools/typespec-azure-resource-manager/version-progression`](../../libraries/azure-resource-manager/rules/version-progression.md) linter rule helps enforce that every api-version uses a unique `YYYY-MM-DD` date and that versions are declared in strictly increasing chronological order from top to bottom of the `Versions` enum.
+
 ## Common Version Transition Scenarios
 
 These documents add specific guidance about how to follow these guidelines for specific version changes
