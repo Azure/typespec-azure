@@ -91,7 +91,7 @@ it("path defined in model", async () => {
     op pathInModel(...NameParameter): void;
 
     model NameParameter {
-      @doc("Name parameter")
+      
       @pattern("^[a-zA-Z0-9-]{3,24}$")
       @format("UUID")
       name: string;
