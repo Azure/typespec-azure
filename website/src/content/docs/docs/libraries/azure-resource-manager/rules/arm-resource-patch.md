@@ -8,9 +8,9 @@ title: "arm-resource-patch"
 
 Validate ARM PATCH operations. The request body of a PATCH must be a model with a subset of the resource properties. The PATCH body must not contain properties that do not exist on the resource. In addition, the rule validates that:
 
-- All properties in the PATCH request body are optional (PATCH supports partial updates).
+- All properties in the PATCH request body are optional (PATCH supports partial updates), unless their source resource property has visibility `{Lifecycle.Read}` by itself (in which case they are filtered out of the request body by visibility transforms).
 - No PATCH request body property has a default value (a property absent from a PATCH request leaves the existing value unchanged; defaults are not applied).
-- No PATCH request body property maps back to a resource property that is not updateable (for example, `@visibility(Lifecycle.Create)`). Properties that are purely read-only (`@visibility(Lifecycle.Read)`) are allowed because they are filtered out by visibility transforms when the request body is serialized.
+- Every PATCH request body property maps back to a resource property whose visibility either includes both `Lifecycle.Create` and `Lifecycle.Update` (for example default visibility, `@visibility(Lifecycle.Create, Lifecycle.Update)`, or `@visibility(Lifecycle.Create, Lifecycle.Update, Lifecycle.Read)`) or is exactly `{Lifecycle.Read}` by itself. Visibilities like `@visibility(Lifecycle.Create)` or `@visibility(Lifecycle.Create, Lifecycle.Read)` are not allowed. The check is applied recursively to nested model and `Record<Model>` property types.
 - The `content-type` header (when explicitly specified) is `application/merge-patch+json` (or the implicit `application/json`).
 
 #### ❌ Incorrect
