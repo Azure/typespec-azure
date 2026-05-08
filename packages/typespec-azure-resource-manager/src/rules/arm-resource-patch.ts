@@ -13,6 +13,7 @@ import {
   getProperty,
   getSourceLocation,
   getVisibilityForClass,
+  hasVisibility,
   isErrorType,
   isType,
   paramMessage,
@@ -41,7 +42,7 @@ export const patchOperationsRule = createRule({
     default: "The request body of a PATCH must be a model with a subset of resource properties",
     missingTags: "Resource PATCH must contain the 'tags' property.",
     modelSuperset: paramMessage`Resource PATCH models must be a subset of the resource type. The following properties: [${"name"}] do not exist in resource Model '${"resourceModel"}'.`,
-    notUpdateableInPatch: paramMessage`Property '${"propertyName"}' is in the PATCH request body but is not updateable on the resource. PATCH bodies may only contain properties whose visibility includes both 'Lifecycle.Create' and 'Lifecycle.Update' (for example default visibility, '@visibility(Lifecycle.Create, Lifecycle.Update)', or '@visibility(Lifecycle.Create, Lifecycle.Update, Lifecycle.Read)'), or whose visibility is exactly '{Lifecycle.Read}' by itself; other visibilities (for example '@visibility(Lifecycle.Create)' or '@visibility(Lifecycle.Create, Lifecycle.Read)') must be removed from the PATCH request model.`,
+    notUpdateableInPatch: paramMessage`Property '${"propertyName"}' is in the PATCH request body but is not updateable on the resource. PATCH bodies may only contain properties whose visibility includes 'Lifecycle.Update' (this includes default visibility, '@visibility(Lifecycle.Update)' alone, or any combination of 'Lifecycle.Update' with other lifecycle modifiers), or whose visibility includes 'Lifecycle.Read' but not 'Lifecycle.Create'; other visibilities (for example '@visibility(Lifecycle.Create)' or '@visibility(Lifecycle.Create, Lifecycle.Read)') must be removed from the PATCH request model.`,
     requiredInPatch: paramMessage`Property '${"propertyName"}' is required in the PATCH request body. PATCH request body properties must all be optional so partial updates work, unless the resource property they map to has visibility 'Lifecycle.Read' by itself.`,
     defaultInPatch: paramMessage`Property '${"propertyName"}' has a default value in the PATCH request body. PATCH request body properties that are not present in the request body leave the value unchanged; they do not result in any default value being assigned.`,
     nonMergePatchContentType: paramMessage`PATCH operation '${"operationName"}' specifies a content-type other than 'application/merge-patch+json'.`,
@@ -220,31 +221,34 @@ function isReadOnlyOnly(
  * it eligible to appear in a PATCH request body. A property is allowed if its
  * visibility either:
  *
- * - includes BOTH `Lifecycle.Create` AND `Lifecycle.Update` (which covers
- *   default visibility `{Read, Create, Update, Delete, Query}`,
- *   `@visibility(Lifecycle.Create, Lifecycle.Update)`, and
- *   `@visibility(Lifecycle.Create, Lifecycle.Update, Lifecycle.Read)`), OR
- * - is exactly `{Lifecycle.Read}` by itself (such properties are filtered out
- *   of the request body by visibility transforms during serialization).
+ * - includes `Lifecycle.Update` (this covers default visibility — which has
+ *   all lifecycle modifiers — as well as `@visibility(Lifecycle.Update)`
+ *   alone or combined with any other modifier), OR
+ * - includes `Lifecycle.Read` but not `Lifecycle.Create` (such properties are
+ *   filtered out of the request body by visibility transforms during
+ *   serialization, so their presence in the PATCH body is harmless).
  *
- * Other visibilities (for example `@visibility(Lifecycle.Create)` or
- * `@visibility(Lifecycle.Create, Lifecycle.Read)` or
- * `@visibility(Lifecycle.Update)` alone) are not allowed in PATCH bodies.
+ * Other visibilities (for example `@visibility(Lifecycle.Create)` only or
+ * `@visibility(Lifecycle.Create, Lifecycle.Read)`) are not allowed.
  */
-function isAllowedInPatchByVisibility(
-  program: Program,
-  property: ModelProperty,
-  readOnlyOnlyCache: Map<ModelProperty, boolean>,
-): boolean {
+function isAllowedInPatchByVisibility(program: Program, property: ModelProperty): boolean {
   const sourceProperty = getSourceProperty(property);
   const lifecycle = getLifecycleVisibilityEnum(program);
-  const createMember = lifecycle.members.get("Create");
   const updateMember = lifecycle.members.get("Update");
-  if (createMember !== undefined && updateMember !== undefined) {
-    const visibility = getVisibilityForClass(program, sourceProperty, lifecycle);
-    if (visibility.has(createMember) && visibility.has(updateMember)) return true;
+  if (updateMember !== undefined && hasVisibility(program, sourceProperty, updateMember)) {
+    return true;
   }
-  return isReadOnlyOnly(program, sourceProperty, readOnlyOnlyCache);
+  const readMember = lifecycle.members.get("Read");
+  const createMember = lifecycle.members.get("Create");
+  if (
+    readMember !== undefined &&
+    createMember !== undefined &&
+    hasVisibility(program, sourceProperty, readMember) &&
+    !hasVisibility(program, sourceProperty, createMember)
+  ) {
+    return true;
+  }
+  return false;
 }
 
 /**
@@ -258,7 +262,7 @@ function isNotUpdateable(
   property: ModelProperty,
   state: NotUpdateableState,
 ): boolean {
-  if (!isAllowedInPatchByVisibility(program, property, state.readOnlyOnlyCache)) {
+  if (!isAllowedInPatchByVisibility(program, property)) {
     return true;
   }
 

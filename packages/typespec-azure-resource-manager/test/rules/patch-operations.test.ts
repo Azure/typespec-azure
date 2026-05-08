@@ -355,7 +355,7 @@ it("emits notUpdateableInPatch diagnostic when a PATCH body property is not upda
       {
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
         message:
-          "Property 'createOnlyProp' is in the PATCH request body but is not updateable on the resource. PATCH bodies may only contain properties whose visibility includes both 'Lifecycle.Create' and 'Lifecycle.Update' (for example default visibility, '@visibility(Lifecycle.Create, Lifecycle.Update)', or '@visibility(Lifecycle.Create, Lifecycle.Update, Lifecycle.Read)'), or whose visibility is exactly '{Lifecycle.Read}' by itself; other visibilities (for example '@visibility(Lifecycle.Create)' or '@visibility(Lifecycle.Create, Lifecycle.Read)') must be removed from the PATCH request model.",
+          "Property 'createOnlyProp' is in the PATCH request body but is not updateable on the resource. PATCH bodies may only contain properties whose visibility includes 'Lifecycle.Update' (this includes default visibility, '@visibility(Lifecycle.Update)' alone, or any combination of 'Lifecycle.Update' with other lifecycle modifiers), or whose visibility includes 'Lifecycle.Read' but not 'Lifecycle.Create'; other visibilities (for example '@visibility(Lifecycle.Create)' or '@visibility(Lifecycle.Create, Lifecycle.Read)') must be removed from the PATCH request model.",
       },
     ]);
 });
@@ -486,7 +486,7 @@ it("emits notUpdateableInPatch when a PATCH body property has visibility (Lifecy
       {
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
         message:
-          "Property 'createReadProp' is in the PATCH request body but is not updateable on the resource. PATCH bodies may only contain properties whose visibility includes both 'Lifecycle.Create' and 'Lifecycle.Update' (for example default visibility, '@visibility(Lifecycle.Create, Lifecycle.Update)', or '@visibility(Lifecycle.Create, Lifecycle.Update, Lifecycle.Read)'), or whose visibility is exactly '{Lifecycle.Read}' by itself; other visibilities (for example '@visibility(Lifecycle.Create)' or '@visibility(Lifecycle.Create, Lifecycle.Read)') must be removed from the PATCH request model.",
+          "Property 'createReadProp' is in the PATCH request body but is not updateable on the resource. PATCH bodies may only contain properties whose visibility includes 'Lifecycle.Update' (this includes default visibility, '@visibility(Lifecycle.Update)' alone, or any combination of 'Lifecycle.Update' with other lifecycle modifiers), or whose visibility includes 'Lifecycle.Read' but not 'Lifecycle.Create'; other visibilities (for example '@visibility(Lifecycle.Create)' or '@visibility(Lifecycle.Create, Lifecycle.Read)') must be removed from the PATCH request model.",
       },
     ]);
 });
@@ -576,7 +576,7 @@ it("emits notUpdateableInPatch recursively into nested model properties", async 
       {
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
         message:
-          "Property 'nested' is in the PATCH request body but is not updateable on the resource. PATCH bodies may only contain properties whose visibility includes both 'Lifecycle.Create' and 'Lifecycle.Update' (for example default visibility, '@visibility(Lifecycle.Create, Lifecycle.Update)', or '@visibility(Lifecycle.Create, Lifecycle.Update, Lifecycle.Read)'), or whose visibility is exactly '{Lifecycle.Read}' by itself; other visibilities (for example '@visibility(Lifecycle.Create)' or '@visibility(Lifecycle.Create, Lifecycle.Read)') must be removed from the PATCH request model.",
+          "Property 'nested' is in the PATCH request body but is not updateable on the resource. PATCH bodies may only contain properties whose visibility includes 'Lifecycle.Update' (this includes default visibility, '@visibility(Lifecycle.Update)' alone, or any combination of 'Lifecycle.Update' with other lifecycle modifiers), or whose visibility includes 'Lifecycle.Read' but not 'Lifecycle.Create'; other visibilities (for example '@visibility(Lifecycle.Create)' or '@visibility(Lifecycle.Create, Lifecycle.Read)') must be removed from the PATCH request model.",
       },
     ]);
 });
@@ -627,7 +627,7 @@ it("emits notUpdateableInPatch recursively into Record<Model> property value typ
       {
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
         message:
-          "Property 'items' is in the PATCH request body but is not updateable on the resource. PATCH bodies may only contain properties whose visibility includes both 'Lifecycle.Create' and 'Lifecycle.Update' (for example default visibility, '@visibility(Lifecycle.Create, Lifecycle.Update)', or '@visibility(Lifecycle.Create, Lifecycle.Update, Lifecycle.Read)'), or whose visibility is exactly '{Lifecycle.Read}' by itself; other visibilities (for example '@visibility(Lifecycle.Create)' or '@visibility(Lifecycle.Create, Lifecycle.Read)') must be removed from the PATCH request model.",
+          "Property 'items' is in the PATCH request body but is not updateable on the resource. PATCH bodies may only contain properties whose visibility includes 'Lifecycle.Update' (this includes default visibility, '@visibility(Lifecycle.Update)' alone, or any combination of 'Lifecycle.Update' with other lifecycle modifiers), or whose visibility includes 'Lifecycle.Read' but not 'Lifecycle.Create'; other visibilities (for example '@visibility(Lifecycle.Create)' or '@visibility(Lifecycle.Create, Lifecycle.Read)') must be removed from the PATCH request model.",
       },
     ]);
 });
@@ -956,4 +956,88 @@ it("applies the remove-patch-property codefix to a non-updateable PATCH body pro
          @patch(#{implicitOptionality: true}) myFooUpdate(...ResourceInstanceParameters<FooResource>, @bodyRoot body: MyPatch) : ArmResponse<FooResource> | ErrorResponse;
         }
     `);
+});
+
+it("does not emit notUpdateableInPatch for @visibility(Lifecycle.Update)-only properties", async () => {
+  // Per the visibility rubric, a property is allowed in the PATCH body if its
+  // visibility includes Lifecycle.Update — even when Lifecycle.Update is the
+  // only modifier applied.
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model FooResource is TrackedResource<FooProperties> {
+        @key("foo")
+        @segment("foo")
+        @path
+        name: string;
+      }
+
+      model FooProperties {
+        @visibility(Lifecycle.Update)
+        updateOnlyProp?: string;
+
+        displayName?: string;
+      }
+
+      model MyPatch {
+        ...FooProperties;
+        tags?: Record<string>;
+      }
+
+      @armResourceOperations
+      #suppress "deprecated" "test"
+      interface FooResources
+        extends ResourceRead<FooResource>, ResourceCreate<FooResource>, ResourceDelete<FooResource> {
+         @armResourceUpdate(FooResource)
+         #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+         @patch(#{implicitOptionality: true}) myFooUpdate(...ResourceInstanceParameters<FooResource>, @bodyRoot body: MyPatch) : ArmResponse<FooResource> | ErrorResponse;
+        }
+    `,
+    )
+    .toBeValid();
+});
+
+it("does not emit notUpdateableInPatch for @visibility(Lifecycle.Read, Lifecycle.Update) properties (Read+Update without Create)", async () => {
+  // Per the visibility rubric, a property whose visibility includes
+  // Lifecycle.Read but not Lifecycle.Create is allowed in PATCH bodies. Here
+  // Lifecycle.Update is also present, so the property is updateable.
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model FooResource is TrackedResource<FooProperties> {
+        @key("foo")
+        @segment("foo")
+        @path
+        name: string;
+      }
+
+      model FooProperties {
+        @visibility(Lifecycle.Read, Lifecycle.Update)
+        readUpdateProp?: string;
+
+        displayName?: string;
+      }
+
+      model MyPatch {
+        ...FooProperties;
+        tags?: Record<string>;
+      }
+
+      @armResourceOperations
+      #suppress "deprecated" "test"
+      interface FooResources
+        extends ResourceRead<FooResource>, ResourceCreate<FooResource>, ResourceDelete<FooResource> {
+         @armResourceUpdate(FooResource)
+         #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+         @patch(#{implicitOptionality: true}) myFooUpdate(...ResourceInstanceParameters<FooResource>, @bodyRoot body: MyPatch) : ArmResponse<FooResource> | ErrorResponse;
+        }
+    `,
+    )
+    .toBeValid();
 });
