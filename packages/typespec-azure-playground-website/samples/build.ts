@@ -20,6 +20,8 @@ interface SampleConfig {
   title?: string;
   description?: string;
   directory?: boolean;
+  /** Whether to include this sample in the playground. Defaults to true. */
+  playground?: boolean;
 }
 
 interface TspConfig {
@@ -41,6 +43,28 @@ async function findSampleConfigs(dir: string): Promise<string[]> {
     }
   }
   return results;
+}
+
+/** Check if any ancestor directory config has playground: false. */
+async function isPlaygroundExcludedByParent(
+  sampleDir: string,
+  specsDir: string,
+): Promise<boolean> {
+  let dir = dirname(sampleDir);
+  while (dir.startsWith(specsDir)) {
+    const configPath = join(dir, "sample-config.yaml");
+    try {
+      const content = await readFile(configPath, "utf-8");
+      const config = parseYaml(content) as SampleConfig;
+      if (config.playground === false) return true;
+    } catch {
+      // No config at this level
+    }
+    const parent = dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return false;
 }
 
 /** Find the nearest tspconfig.yaml by walking up the directory tree, stopping at specsDir. */
@@ -90,6 +114,10 @@ for (const configPath of configPaths) {
 
   // Skip directory-only configs
   if (config.directory === true) continue;
+
+  // Skip samples excluded from playground (directly or via parent directory)
+  if (config.playground === false) continue;
+  if (await isPlaygroundExcludedByParent(sampleDir, samplesSpecsDir)) continue;
 
   if (!config.title) {
     throw new Error(`Sample config at ${configPath} is missing title field.`);
