@@ -740,7 +740,7 @@ it("unbranded next link with mix of re-injected parameters and not", async () =>
       nextLink: Azure.Core.Legacy.parameterizedNextLink<[IncludePendingOptions.includePending]>;
     }
 
-    @doc("List with parameterized next link that re-injects parameters.")
+    
     @route("/with-parameterized-next-link")
     @list
     op test(
@@ -770,9 +770,7 @@ it("unbranded next link with reinjected parameters with versioning", async () =>
     @versioned(Versions)
     namespace My.Service;
 
-    /** Api versions */
     enum Versions {
-      /** 2024-04-01-preview api version */
           V2024_04_01_PREVIEW: "2024-04-01-preview",
     }
 

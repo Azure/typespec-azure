@@ -184,7 +184,6 @@ describe("models", () => {
         @service
         namespace Test;
 
-        /** Contoso API versions */
         enum Versions {
           "2021-10-01-preview",
         }
