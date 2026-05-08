@@ -22,11 +22,7 @@ beforeEach(async () => {
 
 const employeeResource = `
       model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
+        ...ResourceNameParameter<Employee>;
       }
 `;
 
@@ -407,7 +403,7 @@ describe("does not emit warning", () => {
       .toBeValid();
   });
 
-  it("when a low-level LRO POST has a 200 response with a body matching finalResult", async () => {
+  it("when a non-template LRO POST has a 200 response with a body matching finalResult", async () => {
     await tester
       .expect(
         `
@@ -431,7 +427,7 @@ describe("does not emit warning", () => {
       .toBeValid();
   });
 
-  it("when a low-level LRO POST has a 204 response and void finalResult", async () => {
+  it("when a non-template LRO POST has a 204 response and void finalResult", async () => {
     await tester
       .expect(
         `
@@ -440,6 +436,32 @@ describe("does not emit warning", () => {
       @armResourceOperations
       interface Employees {
         restart is ArmResourceActionNoContentAsync<Employee, void>;
+      }
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("when a low-level operation returns only 202 with LRO headers (no 200 or 204)", async () => {
+    await tester
+      .expect(
+        `
+      ${preamble}
+
+      model GenerateResponse {
+        message: string;
+      }
+
+      @armResourceOperations
+      interface Employees {
+        @post
+        @armResourceAction(Employee)
+        generate(...ApiVersionParameter): {
+          @statusCode _: 202;
+          @header("Azure-AsyncOperation") azureAsyncOperation?: string;
+          @header("Location") location?: string;
+          @body body: GenerateResponse;
+        } | ErrorResponse;
       }
       `,
       )
@@ -456,11 +478,7 @@ describe("codefix", () => {
       namespace Microsoft.Contoso;
 
       model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
+        ...ResourceNameParameter<Employee>;
       }
 
       model GenerateResponse {
@@ -485,11 +503,7 @@ describe("codefix", () => {
       namespace Microsoft.Contoso;
 
       model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
+        ...ResourceNameParameter<Employee>;
       }
 
       model GenerateResponse {

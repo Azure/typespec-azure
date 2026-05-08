@@ -1,11 +1,12 @@
 import {
   CodeFix,
+  createRule,
+  getNamespaceFullName,
+  getSourceLocation,
+  isVoidType,
   Operation,
   Program,
   Type,
-  createRule,
-  getSourceLocation,
-  isVoidType,
 } from "@typespec/compiler";
 import {
   type OperationSignatureReferenceNode,
@@ -153,14 +154,35 @@ export const armPostLroResponseMismatchRule = createRule({
   },
   create(context) {
     /**
-     * Checks if the finalResult type matches the expected response type.
-     * Returns true if they match or if the comparison is not applicable.
-     * Returns false if there is a mismatch.
+     * Gets the namespace-qualified name for a type, if available.
      */
+    function getQualifiedTypeName(type: Type): string | undefined {
+      if (
+        (type.kind === "Model" || type.kind === "Scalar") &&
+        type.name !== undefined &&
+        type.name !== ""
+      ) {
+        const nsPrefix =
+          type.namespace !== undefined ? getNamespaceFullName(type.namespace) + "." : "";
+        return nsPrefix + type.name;
+      }
+      return undefined;
+    }
+
     function doesFinalResultMatch(finalResult: Type | "void", expectedResponseType: Type): boolean {
       if (finalResult === "void") {
         return isVoidType(expectedResponseType);
       }
+
+      // For named types, check that the namespace-qualified names match
+      const finalResultName = getQualifiedTypeName(finalResult);
+      const expectedName = getQualifiedTypeName(expectedResponseType);
+      if (finalResultName !== undefined && expectedName !== undefined) {
+        if (finalResultName !== expectedName) {
+          return false;
+        }
+      }
+
       const tk = $(context.program).type;
       return (
         tk.isAssignableTo(finalResult, expectedResponseType, finalResult) ||
