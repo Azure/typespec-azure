@@ -105,13 +105,6 @@ const INCLUDES: readonly string[] = [
  * build artifacts (egg-info, __pycache__, build/, dist/) from polluting the
  * sync.
  */
-/**
- * Directory/file names to skip when walking INCLUDES directory entries. Any
- * path that has a segment matching one of these names is ignored on both
- * sides: not copied from source, and not pruned in dest. This is how we keep
- * build artifacts (egg-info, __pycache__, build/, dist/) from polluting the
- * sync.
- */
 const EXCLUDED_SEGMENTS: ReadonlySet<string> = new Set([
   "__pycache__",
   "build",
@@ -212,7 +205,10 @@ function listFilesRecursive(dir: string): string[] {
 
 function removeEmptyDirsUpTo(startDir: string, stopDir: string): void {
   let cur = startDir;
-  while (cur.startsWith(stopDir) && cur !== stopDir) {
+  while (cur !== stopDir) {
+    const rel = relative(stopDir, cur);
+    // Bail if we've walked outside stopDir (rel starts with "..") or reached it (rel === "").
+    if (rel === "" || rel.startsWith("..")) return;
     try {
       if (fs.readdirSync(cur).length === 0) {
         fs.rmdirSync(cur);
