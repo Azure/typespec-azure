@@ -40,7 +40,6 @@
     "regenerate": "tsx ./eng/scripts/ci/regenerate.ts",
     "sync": "tsx ./eng/scripts/sync.ts",
     "sync:check": "tsx ./eng/scripts/sync.ts --check",
-    "prepack": "tsx ./eng/scripts/sync.ts",
     "test:python:e2e": "tsx ./eng/scripts/ci/run-tests.ts",
     "regen-docs": "pnpm run build && tspd doc . --enable-experimental --output-dir ./website/src/content/docs/docs/emitters/clients/typespec-python/reference --skip-js"
   },
