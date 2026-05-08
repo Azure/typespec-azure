@@ -1,7 +1,7 @@
 # Test asset directories that are populated at runtime by `pnpm sync` from the
 # upstream http-client-python checkout (see eng/scripts/sync.ts INCLUDES).
 # These are intentionally not committed; CI runs `pnpm sync` before running
-# the Python test suites, and `prepack` runs sync before npm publish.
+# the Python test suites.
 tests/data/
 tests/mock_api/
 tests/requirements/
