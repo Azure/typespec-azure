@@ -1,4 +1,5 @@
 import { ChildProcess, spawn, SpawnOptions } from "child_process";
+import { coerce, satisfies } from "semver";
 
 /*
  * Copied from @autorest/system-requirements
@@ -37,7 +38,7 @@ const execute = (
     cp.on("error", (err) => {
       reject(err);
     });
-    cp.on("close", (code, _signal) =>
+    cp.on("close", (code, signal) =>
       resolve({
         stdout: out,
         stderr: err,
@@ -49,21 +50,12 @@ const execute = (
   });
 };
 
-// Simple version comparison without semver dependency
 const versionIsSatisfied = (version: string, requirement: string): boolean => {
-  // For now, support only >= requirements since that's what we use
-  if (requirement.startsWith(">=")) {
-    const requiredVersion = requirement.substring(2);
-    return parseVersionNumber(version) >= parseVersionNumber(requiredVersion);
+  const cleanedVersion = coerce(version);
+  if (!cleanedVersion) {
+    throw new Error(`Invalid version ${version}.`);
   }
-  // Fallback to true for other version requirements
-  return true;
-};
-
-const parseVersionNumber = (version: string): number => {
-  // Parse version like "3.9.0" to a comparable number
-  const parts = version.split(".").map((p) => parseInt(p.replace(/[^0-9]/g, ""), 10) || 0);
-  return parts[0] * 10000 + (parts[1] || 0) * 100 + (parts[2] || 0);
+  return satisfies(cleanedVersion, requirement, true);
 };
 
 /**
@@ -122,7 +114,7 @@ const tryPython = async (
       `"${PRINT_PYTHON_VERSION_SCRIPT}"`,
     ]);
     return validateVersionRequirement(resolution, result.stdout.trim(), requirement);
-  } catch {
+  } catch (e) {
     return {
       error: true,
       ...resolution,

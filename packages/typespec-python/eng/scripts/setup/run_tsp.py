@@ -9,8 +9,7 @@ from pathlib import Path
 from pygen import preprocess, codegen
 from pygen.utils import parse_args
 
-# eng/scripts/setup/run_tsp.py -> need to go up 4 levels to get to package root
-_ROOT_DIR = Path(__file__).parent.parent.parent.parent
+_ROOT_DIR = Path(__file__).parent.parent
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -27,7 +26,9 @@ if __name__ == "__main__":
         try:
             import debugpy  # pylint: disable=import-outside-toplevel
         except (ImportError, ModuleNotFoundError):
-            raise SystemExit("Please pip install ptvsd in order to use VSCode debugging")
+            raise SystemExit(
+                "Please pip install ptvsd in order to use VSCode debugging"
+            )
 
         # 5678 is the default attach port in the VS Code debug configurations
         debugpy.listen(("localhost", 5678))
@@ -36,5 +37,9 @@ if __name__ == "__main__":
 
     # pre-process
     args, unknown_args = parse_args()
-    preprocess.PreProcessPlugin(output_folder=args.output_folder, tsp_file=args.tsp_file, **unknown_args).process()
-    codegen.CodeGenerator(output_folder=args.output_folder, tsp_file=args.tsp_file, **unknown_args).process()
+    preprocess.PreProcessPlugin(
+        output_folder=args.output_folder, tsp_file=args.tsp_file, **unknown_args
+    ).process()
+    codegen.CodeGenerator(
+        output_folder=args.output_folder, tsp_file=args.tsp_file, **unknown_args
+    ).process()

@@ -25,7 +25,7 @@ def _check_command_available(command: str) -> bool:
     try:
         subprocess.run([command, "--version"], capture_output=True, check=True)
         return True
-    except (subprocess.CalledProcessError, FileNotFoundError, PermissionError):
+    except (subprocess.CalledProcessError, FileNotFoundError):
         return False
 
 
@@ -48,12 +48,16 @@ def detect_package_manager() -> str:
 
     # As a last resort, try using python -m pip
     try:
-        subprocess.run([sys.executable, "-m", "pip", "--version"], capture_output=True, check=True)
+        subprocess.run(
+            [sys.executable, "-m", "pip", "--version"], capture_output=True, check=True
+        )
         return "python -m pip"
-    except (subprocess.CalledProcessError, FileNotFoundError, PermissionError):
+    except (subprocess.CalledProcessError, FileNotFoundError):
         pass
 
-    raise PackageManagerNotFoundError("No suitable package manager found. Please install either uv or pip.")
+    raise PackageManagerNotFoundError(
+        "No suitable package manager found. Please install either uv or pip."
+    )
 
 
 def get_install_command(package_manager: str, venv_context=None) -> list:
@@ -85,7 +89,9 @@ def get_install_command(package_manager: str, venv_context=None) -> list:
         raise ValueError(f"Unknown package manager: {package_manager}")
 
 
-def install_packages(packages: list, venv_context=None, package_manager: str = None, cwd: Path = None) -> None:
+def install_packages(
+    packages: list, venv_context=None, package_manager: str = None
+) -> None:
     """Install packages using the available package manager.
 
     Args:
@@ -99,10 +105,7 @@ def install_packages(packages: list, venv_context=None, package_manager: str = N
     install_cmd = get_install_command(package_manager, venv_context)
 
     try:
-        if cwd:
-            subprocess.check_call(install_cmd + packages, cwd=cwd)
-        else:
-            subprocess.check_call(install_cmd + packages)
+        subprocess.check_call(install_cmd + packages)
     except subprocess.CalledProcessError as e:
         raise RuntimeError(f"Failed to install packages with {package_manager}: {e}")
 

@@ -67,16 +67,10 @@ const INCLUDES: readonly string[] = [
   // each repo's own `regenerate.ts` and is intentionally *not* synced.
   "eng/scripts/ci/regenerate-common.ts",
 
-  // Shared setup scripts (invoked by package.json install/prepare hooks
-  // and by ci/regenerate.ts which spawns run_batch.py).
-  "eng/scripts/setup/install.py",
-  "eng/scripts/setup/package_manager.py",
-  "eng/scripts/setup/prepare.py",
-  "eng/scripts/setup/run_batch.py",
-  "eng/scripts/setup/run_tsp.py",
-  "eng/scripts/setup/run-python3.ts",
-  "eng/scripts/setup/system-requirements.ts",
-  "eng/scripts/setup/venvtools.py",
+  // NOTE: eng/scripts/setup/* is intentionally NOT synced. Those scripts
+  // (install.py, prepare.py, venvtools.py, etc.) diverged from upstream's
+  // http-client-python build/test pipeline; the typespec-python wrapper
+  // owns its own copies.
 
   // Shared test assets. Directory entries (trailing `/`) are recursive and
   // **mirror** the upstream layout: files matching upstream are overwritten,
