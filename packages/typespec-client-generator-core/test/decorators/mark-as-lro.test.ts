@@ -192,7 +192,6 @@ it("should work with ArmResourceRead", async () => {
 
 it("Extension.Read", async () => {
   const { program } = await ArmTesterWithService.compile(`
-    /** A ContosoProviderHub resource */
     model Employee is TrackedResource<{}> {
       ...ResourceNameParameter<Employee>;
     }

@@ -28,13 +28,11 @@ it("emits diagnostics if response type is different from resource type.", async 
         namespace Microsoft.Foo;
 
         model FooResource is TrackedResource<{}> {
-          @key("foo") @segment("foo") @path
-          name: string;
+          ...ResourceNameParameter<FooResource>;
         }
 
         model BarResource is TrackedResource<{}> {
-          @key("bar") @segment("bar") @path
-          name: string;
+          ...ResourceNameParameter<BarResource>;
         }
 
         @armResourceOperations
@@ -59,13 +57,11 @@ it("emits diagnostics if response type of create operation is different from res
         namespace Microsoft.Foo;
 
         model FooResource is TrackedResource<{}> {
-          @key("foo") @segment("foo") @path
-          name: string;
+          ...ResourceNameParameter<FooResource>;
         }
 
         model BarResource is TrackedResource<{}> {
-          @key("bar") @segment("bar") @path
-          name: string;
+          ...ResourceNameParameter<BarResource>;
         }
 
         @armResourceOperations
@@ -88,13 +84,11 @@ it("emits diagnostics if response type of list operation is different from resou
         namespace Microsoft.Foo;
         
         model FooResource is TrackedResource<{}> {
-          @key("foo") @segment("foo") @path
-          name: string;
+          ...ResourceNameParameter<FooResource>;
         }
 
         model BarResource is TrackedResource<{}> {
-          @key("bar") @segment("bar") @path
-          name: string;
+          ...ResourceNameParameter<BarResource>;
         }
 
         @armResourceOperations
