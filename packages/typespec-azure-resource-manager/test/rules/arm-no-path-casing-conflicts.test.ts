@@ -230,6 +230,32 @@ it("emits a diagnostic for two @route operations (delete and get) that differ on
     });
 });
 
+it("applies a codefix that lowercases the offending @route value", async () => {
+  await tester
+    .expect(
+      `
+      @service(#{ title: "Test" })
+      namespace Microsoft.Contoso;
+
+      @route("/providers/Microsoft.Contoso/foos/{name}")
+      @delete op deleteFoo(@path name: string): void;
+
+      @route("/providers/Microsoft.Contoso/Foos/{name}")
+      @get op getFoo(@path name: string): void;
+      `,
+    )
+    .applyCodeFix("arm-segment-to-lowercase").toEqual(`
+      @service(#{ title: "Test" })
+      namespace Microsoft.Contoso;
+
+      @route("/providers/Microsoft.Contoso/foos/{name}")
+      @delete op deleteFoo(@path name: string): void;
+
+      @route("/providers/Microsoft.Contoso/foos/{name}")
+      @get op getFoo(@path name: string): void;
+      `);
+});
+
 it("does not check operations from internal TypeSpec namespaces", async () => {
   // Operations in Azure.ResourceManager / TypeSpec / Azure.Core should be
   // ignored.  Define only one user-facing operation that would otherwise

@@ -119,19 +119,88 @@ function tryCreateSegmentCasingCodeFix(
 
   if (offendingSegments.length === 0) return undefined;
 
-  // Find @segment decorator nodes whose argument matches an offending segment.
-  const literalNodes = collectSegmentLiteralNodes(offending, new Set(offendingSegments));
-  if (literalNodes.length === 0) return undefined;
+  const offendingSet = new Set(offendingSegments);
+
+  // Build a list of (node, replacementText) edits from any @segment and/or
+  // @route decorators reachable from this operation that contain offending
+  // segments.  Both decorator forms can contribute path segments, so the
+  // codefix handles them together.
+  const edits: { node: StringLiteralNode; newText: string }[] = [];
+
+  for (const node of collectSegmentLiteralNodes(offending, offendingSet)) {
+    edits.push({ node, newText: `"${node.value.toLowerCase()}"` });
+  }
+
+  for (const node of collectRouteLiteralNodes(offending)) {
+    const newValue = lowercaseOffendingSegmentsInRoute(node.value, offendingSet);
+    if (newValue !== node.value) {
+      edits.push({ node, newText: `"${newValue}"` });
+    }
+  }
+
+  if (edits.length === 0) return undefined;
 
   return {
     id: "arm-segment-to-lowercase",
-    label: "Lowercase the conflicting @segment(...) value(s)",
+    label: "Lowercase the conflicting @segment(...) or @route(...) value(s)",
     fix(fixContext) {
-      return literalNodes.map((node) =>
-        fixContext.replaceText(getSourceLocation(node), `"${node.value.toLowerCase()}"`),
+      return edits.map((edit) =>
+        fixContext.replaceText(getSourceLocation(edit.node), edit.newText),
       );
     },
   };
+}
+
+/**
+ * Replace any occurrences of an offending segment (delimited by `/` or string
+ * start/end) inside a `@route` literal with its lowercase form.  Path
+ * parameter tokens like `{Name}` are left alone.
+ */
+function lowercaseOffendingSegmentsInRoute(value: string, offending: Set<string>): string {
+  const parts = value.split("/");
+  for (let i = 0; i < parts.length; i++) {
+    if (parts[i].length === 0) continue;
+    if (parts[i].startsWith("{") && parts[i].endsWith("}")) continue;
+    if (offending.has(parts[i])) {
+      parts[i] = parts[i].toLowerCase();
+    }
+  }
+  return parts.join("/");
+}
+
+/**
+ * Collect `@route(...)` string literal nodes reachable from the operation —
+ * the operation itself, its containing interface, and ancestor namespaces.
+ */
+function collectRouteLiteralNodes(op: HttpOperation): StringLiteralNode[] {
+  const result: StringLiteralNode[] = [];
+  const seen = new Set<unknown>();
+
+  const visitDecorators = (decorators: readonly DecoratorApplication[] | undefined) => {
+    if (!decorators) return;
+    for (const dec of decorators) {
+      if (dec.decorator.name !== "$route") continue;
+      const node = dec.node;
+      if (!node || node.arguments.length === 0) continue;
+      const arg = node.arguments[0];
+      if (arg.kind !== SyntaxKind.StringLiteral) continue;
+      const stringNode = arg as StringLiteralNode;
+      if (seen.has(stringNode)) continue;
+      seen.add(stringNode);
+      result.push(stringNode);
+    }
+  };
+
+  visitDecorators(op.operation.decorators);
+  if (op.operation.interface) {
+    visitDecorators(op.operation.interface.decorators);
+  }
+  let ns = op.operation.namespace;
+  while (ns) {
+    visitDecorators(ns.decorators);
+    ns = ns.namespace;
+  }
+  return result;
 }
 
 function collectSegmentLiteralNodes(op: HttpOperation, values: Set<string>): StringLiteralNode[] {
