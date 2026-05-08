@@ -93,8 +93,7 @@ const INCLUDES: readonly string[] = [
 
   // The pygen Python package. Mirrored from upstream because the tox envs
   // (`-e {tox_root}/../generator`) and PYTHONPATH expect this directory to
-  // exist. Gitignored locally; `pnpm sync` populates it before tests/builds
-  // and `prepack` runs sync so npm publish still includes it.
+  // exist. Gitignored locally; `pnpm sync` populates it before tests/builds.
   "generator/",
 ];
 
