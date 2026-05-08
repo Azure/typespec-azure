@@ -21,4 +21,3 @@ export function aggregateDurations(values: number[]): number {
 
   return (sorted[middle - 1] + sorted[middle]) / 2;
 }
-

@@ -11,4 +11,3 @@ test("aggregateDurations uses median for fewer than 5 samples", () => {
   const actual = aggregateDurations([100, 101, 1000]);
   assert.equal(actual, 101);
 });
-
