@@ -165,6 +165,65 @@ interface SyncStats {
   removed: string[]; // local-only files inside a synced directory (mirror)
 }
 
+/**
+ * Merge upstream dependencies into this package's top-level
+ *   dev_requirements.txt
+ *
+ * This is NOT a full copy. The wrapper file is split on the marker line
+ *   `# additional dependency needed for development`
+ * Everything BEFORE the marker is replaced verbatim with the contents of
+ *   <upstream>/eng/scripts/ci/dev_requirements.txt
+ * Everything from the marker onwards (wrapper-specific deps such as
+ * `setuptools`) is preserved untouched. If the wrapper file lacks the
+ * marker, the upstream content simply replaces the whole file.
+ */
+function syncDevRequirements(srcAbs: string, destAbs: string, stats: SyncStats): void {
+  const relPath = "dev_requirements.txt";
+
+  if (!fs.existsSync(srcAbs)) {
+    stats.missing.push("eng/scripts/ci/dev_requirements.txt");
+    return;
+  }
+  if (!fs.existsSync(destAbs)) {
+    stats.missing.push(relPath);
+    return;
+  }
+
+  const srcText = fs.readFileSync(srcAbs, "utf8");
+  const destText = fs.readFileSync(destAbs, "utf8");
+
+  // Preserve any leading comment block ("title") of the wrapper file -- the
+  // run of `#`-prefixed lines at the very top, before the first non-comment
+  // line.
+  const destLines = destText.split(/\r?\n/);
+  const titleLines: string[] = [];
+  for (const line of destLines) {
+    if (line.trim().startsWith("#")) titleLines.push(line);
+    else break;
+  }
+  const title = titleLines.length ? titleLines.join("\n") + "\n" : "";
+
+  const MARKER_RE = /^#\s*additional dependency/im;
+  const match = MARKER_RE.exec(destText);
+  // If marker is missing, the upstream content (with title) becomes the whole
+  // file. Otherwise, keep the marker line and everything after it as-is, with
+  // a single blank line between the upstream block and the wrapper-only tail.
+  const tail = match ? destText.slice(match.index) : "";
+  const upstream = srcText.endsWith("\n") ? srcText : srcText + "\n";
+  const newText = tail ? title + upstream + "\n" + tail : title + upstream;
+
+  if (newText === destText) {
+    stats.unchanged.push(relPath);
+    return;
+  }
+  if (check) {
+    stats.drifted.push(relPath);
+    return;
+  }
+  fs.writeFileSync(destAbs, newText, "utf8");
+  stats.copied.push(relPath);
+}
+
 function syncFile(srcAbs: string, destAbs: string, relPath: string, stats: SyncStats): void {
   const srcBuf = fs.readFileSync(srcAbs);
   const destBuf = readBytes(destAbs);
@@ -287,6 +346,15 @@ function main(): void {
       syncFile(srcAbs, destAbs, toPosix(rel), stats);
     }
   }
+
+  // Special-case merge (NOT a full copy): pull dependency lines from upstream's
+  // eng/scripts/ci/dev_requirements.txt into this package's top-level
+  // dev_requirements.txt while preserving wrapper-only deps and comments.
+  syncDevRequirements(
+    join(sourceRoot, "eng", "scripts", "ci", "dev_requirements.txt"),
+    join(packageRoot, "dev_requirements.txt"),
+    stats,
+  );
 
   if (stats.copied.length) {
     console.log(pc.green(pc.bold(`Copied (${stats.copied.length}):`)));
