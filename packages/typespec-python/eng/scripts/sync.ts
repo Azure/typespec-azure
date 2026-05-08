@@ -62,10 +62,6 @@ const INCLUDES: readonly string[] = [
   "eng/scripts/ci/run_sphinx_build.py",
   "eng/scripts/ci/util.py",
 
-  // Regeneration scripts (the local regenerate.ts is intentionally synced from
-  // upstream).
-  "eng/scripts/ci/regenerate.ts",
-
   // Shared setup scripts (invoked by package.json install/prepare hooks
   // and by ci/regenerate.ts which spawns run_batch.py).
   "eng/scripts/setup/install.py",

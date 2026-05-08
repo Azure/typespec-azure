@@ -7,14 +7,80 @@
  */
 
 import { compile, NodeHost } from "@typespec/compiler";
-import { execSync } from "child_process";
-import { existsSync, rmSync } from "fs";
-import { access, mkdir, readdir, writeFile } from "fs/promises";
+import { promises, rmSync } from "fs";
 import { platform } from "os";
 import { dirname, join, relative, resolve } from "path";
 import pc from "picocolors";
 import { fileURLToPath } from "url";
 import { parseArgs } from "util";
+
+// ---- Shared constants ----
+
+const SKIP_SPECS: string[] = ["type/file"];
+
+const SpecialFlags: Record<string, Record<string, any>> = {
+  azure: {
+    "generate-test": true,
+    "generate-sample": true,
+  },
+};
+
+function toPosix(dir: string): string {
+  return dir.replace(/\\/g, "/");
+}
+
+interface RegenerateFlags {
+  flavor: string;
+  debug: boolean;
+  name?: string;
+}
+
+async function getSubdirectories(baseDir: string, flags: RegenerateFlags): Promise<string[]> {
+  const subdirectories: string[] = [];
+
+  async function searchDir(currentDir: string) {
+    const items = await promises.readdir(currentDir, { withFileTypes: true });
+
+    const promisesArray = items.map(async (item) => {
+      const subDirPath = join(currentDir, item.name);
+      if (item.isDirectory()) {
+        const mainTspPath = join(subDirPath, "main.tsp");
+        const clientTspPath = join(subDirPath, "client.tsp");
+
+        const mainTspRelativePath = toPosix(relative(baseDir, mainTspPath));
+
+        if (SKIP_SPECS.some((skipSpec) => mainTspRelativePath.includes(skipSpec))) return;
+
+        const hasMainTsp = await promises
+          .access(mainTspPath)
+          .then(() => true)
+          .catch(() => false);
+        const hasClientTsp = await promises
+          .access(clientTspPath)
+          .then(() => true)
+          .catch(() => false);
+
+        if (mainTspRelativePath.toLowerCase().includes(flags.name || "")) {
+          if (mainTspRelativePath.includes("resiliency/srv-driven")) {
+            subdirectories.push(resolve(subDirPath, "old.tsp"));
+          }
+          if (hasClientTsp) {
+            subdirectories.push(resolve(subDirPath, "client.tsp"));
+          } else if (hasMainTsp) {
+            subdirectories.push(resolve(subDirPath, "main.tsp"));
+          }
+        }
+
+        await searchDir(subDirPath);
+      }
+    });
+
+    await Promise.all(promisesArray);
+  }
+
+  await searchDir(baseDir);
+  return subdirectories;
+}
 
 // Parse arguments
 const argv = parseArgs({
@@ -23,9 +89,6 @@ const argv = parseArgs({
     flavor: { type: "string", short: "f" },
     name: { type: "string", short: "n" },
     debug: { type: "boolean", short: "d" },
-    pluginDir: { type: "string" },
-    emitterName: { type: "string" },
-    generatedFolder: { type: "string" },
     jobs: { type: "string", short: "j" },
     help: { type: "boolean", short: "h" },
   },
@@ -45,10 +108,6 @@ ${pc.bold("Options:")}
 
   ${pc.cyan("-n, --name <pattern>")}
       Filter packages by name pattern (case-insensitive substring match).
-      Examples:
-        --name xml              Regenerate packages containing "xml"
-        --name authentication   Regenerate authentication packages
-        --name type/array       Regenerate the type/array package
 
   ${pc.cyan("-d, --debug")}
       Enable debug output during regeneration.
@@ -68,37 +127,22 @@ ${pc.bold("Examples:")}
 
   ${pc.dim("# Regenerate a specific package by name")}
   tsx regenerate.ts --flavor azure --name authentication-api-key
-
-  ${pc.dim("# Regenerate with more parallelism")}
-  tsx regenerate.ts --jobs 50
 `);
   process.exit(0);
 }
 
-// ---- Shared constants ----
+// Get paths
+const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
+const PLUGIN_DIR = resolve(SCRIPT_DIR, "../../../");
+const AZURE_HTTP_SPECS = resolve(PLUGIN_DIR, "node_modules/@azure-tools/azure-http-specs/specs");
+const HTTP_SPECS = resolve(PLUGIN_DIR, "node_modules/@typespec/http-specs/specs");
+const EMITTER_NAME = "@azure-tools/typespec-python";
 
-const SKIP_SPECS: string[] = ["type/file", "service/multiple-services"];
-
-const SpecialFlags: Record<string, Record<string, any>> = {
-  azure: {
-    "generate-test": true,
-    "generate-sample": true,
-  },
-};
-
-function toPosix(dir: string): string {
-  return dir.replace(/\\/g, "/");
+function isAzureSpec(specPath: string): boolean {
+  return specPath.startsWith(AZURE_HTTP_SPECS);
 }
 
-interface RegenerateFlags {
-  flavor: string;
-  debug: boolean;
-  name?: string;
-  pyodide?: boolean;
-}
-
-// ---- Base emitter options ----
-
+// Emitter options
 const AZURE_EMITTER_OPTIONS: Record<string, Record<string, string> | Record<string, string>[]> = {
   "azure/client-generator-core/access": {
     namespace: "specs.azure.clientgenerator.core.access",
@@ -118,6 +162,12 @@ const AZURE_EMITTER_OPTIONS: Record<string, Record<string, string> | Record<stri
   "azure/client-generator-core/client-initialization/individuallyParent": {
     namespace: "specs.azure.clientgenerator.core.clientinitialization.individuallyparent",
   },
+  "azure/client-generator-core/client-default-value": {
+    namespace: "specs.azure.clientgenerator.core.clientdefaultvalue",
+  },
+  "azure/client-generator-core/client-doc": {
+    namespace: "specs.azure.clientgenerator.core.clientdoc",
+  },
   "azure/client-generator-core/client-location": {
     namespace: "specs.azure.clientgenerator.core.clientlocation",
   },
@@ -130,14 +180,17 @@ const AZURE_EMITTER_OPTIONS: Record<string, Record<string, string> | Record<stri
   "azure/client-generator-core/usage": {
     namespace: "specs.azure.clientgenerator.core.usage",
   },
-  "azure/client-generator-core/client-doc": {
-    namespace: "specs.azure.clientgenerator.core.clientdoc",
-  },
   "azure/client-generator-core/override": {
     namespace: "specs.azure.clientgenerator.core.override",
   },
   "azure/client-generator-core/hierarchy-building": {
     namespace: "specs.azure.clientgenerator.core.hierarchybuilding",
+  },
+  "azure/client-generator-core/next-link-verb": {
+    namespace: "specs.azure.clientgenerator.core.nextlinkverb",
+  },
+  "azure/client-generator-core/response-as-bool": {
+    namespace: "specs.azure.clientgenerator.core.responseasbool",
   },
   "azure/core/basic": {
     namespace: "specs.azure.core.basic",
@@ -220,10 +273,6 @@ const AZURE_EMITTER_OPTIONS: Record<string, Record<string, string> | Record<stri
   "service/multi-service": {
     namespace: "service.multiservice",
   },
-  "client/structure/client-operation-group": {
-    "package-name": "client-structure-clientoperationgroup",
-    namespace: "client.structure.clientoperationgroup",
-  },
 };
 
 const EMITTER_OPTIONS: Record<string, Record<string, string> | Record<string, string>[]> = {
@@ -303,7 +352,6 @@ const EMITTER_OPTIONS: Record<string, Record<string, string> | Record<string, st
       "package-name": "generation-subdir",
       namespace: "generation.subdir",
       "generation-subdir": "_generated",
-      "generate-test": "false",
       "clear-output-folder": "true",
     },
   ],
@@ -363,117 +411,12 @@ const EMITTER_OPTIONS: Record<string, Record<string, string> | Record<string, st
     "package-name": "specs-documentation",
     namespace: "specs.documentation",
   },
-  "versioning/added": [
-    {
-      "package-name": "versioning-added",
-      namespace: "versioning.added",
-    },
-    {
-      "package-name": "generation-subdir2",
-      namespace: "generation.subdir2",
-      "generate-test": "false",
-      "generation-subdir": "_generated",
-    },
-  ],
+  // Repo-specific overrides
+  "client/structure/client-operation-group": {
+    "package-name": "client-structure-clientoperationgroup",
+    namespace: "client.structure.clientoperationgroup",
+  },
 };
-
-// ---- Shared utility functions ----
-
-async function getSubdirectories(baseDir: string, flags: RegenerateFlags): Promise<string[]> {
-  const subdirectories: string[] = [];
-
-  async function searchDir(currentDir: string) {
-    const items = await readdir(currentDir, { withFileTypes: true });
-
-    const promisesArray = items.map(async (item) => {
-      const subDirPath = join(currentDir, item.name);
-      if (item.isDirectory()) {
-        const mainTspPath = join(subDirPath, "main.tsp");
-        const clientTspPath = join(subDirPath, "client.tsp");
-
-        const mainTspRelativePath = toPosix(relative(baseDir, mainTspPath));
-
-        if (SKIP_SPECS.some((skipSpec) => mainTspRelativePath.includes(skipSpec))) return;
-
-        const hasMainTsp = await access(mainTspPath)
-          .then(() => true)
-          .catch(() => false);
-        const hasClientTsp = await access(clientTspPath)
-          .then(() => true)
-          .catch(() => false);
-
-        if (mainTspRelativePath.toLowerCase().includes(flags.name || "")) {
-          if (mainTspRelativePath.includes("resiliency/srv-driven")) {
-            subdirectories.push(resolve(subDirPath, "old.tsp"));
-          }
-          if (hasClientTsp) {
-            subdirectories.push(resolve(subDirPath, "client.tsp"));
-          } else if (hasMainTsp) {
-            subdirectories.push(resolve(subDirPath, "main.tsp"));
-          }
-        }
-
-        await searchDir(subDirPath);
-      }
-    });
-
-    await Promise.all(promisesArray);
-  }
-
-  await searchDir(baseDir);
-  return subdirectories;
-}
-
-async function preprocess(flavor: string, generatedFolder: string): Promise<void> {
-  if (flavor === "azure") {
-    const testsGeneratedDir = resolve(generatedFolder, "../tests/generated/azure");
-
-    const DELETE_CONTENT = "# This file is to be deleted after regeneration";
-    const DELETE_FILE = "to_be_deleted.py";
-    const entries: { folder: string[]; file: string; content: string }[] = [
-      {
-        folder: ["authentication-api-key", "authentication", "apikey", "_operations"],
-        file: DELETE_FILE,
-        content: DELETE_CONTENT,
-      },
-      {
-        folder: ["generation-subdir", "generation", "subdir", "_generated"],
-        file: DELETE_FILE,
-        content: DELETE_CONTENT,
-      },
-      {
-        folder: ["generation-subdir", "generated_tests"],
-        file: DELETE_FILE,
-        content: DELETE_CONTENT,
-      },
-      {
-        folder: ["generation-subdir", "generation", "subdir"],
-        file: "to_be_kept.py",
-        content: "# This file is to be kept after regeneration",
-      },
-    ];
-
-    await Promise.all(
-      entries.map(async ({ folder, file, content }) => {
-        const targetFolder = join(testsGeneratedDir, ...folder);
-        await mkdir(targetFolder, { recursive: true });
-        await writeFile(join(targetFolder, file), content);
-      }),
-    );
-  }
-}
-
-// Get paths
-const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
-const PLUGIN_DIR = argv.values.pluginDir
-  ? resolve(argv.values.pluginDir)
-  : resolve(SCRIPT_DIR, "../../../");
-const AZURE_HTTP_SPECS = resolve(PLUGIN_DIR, "node_modules/@azure-tools/azure-http-specs/specs");
-const HTTP_SPECS = resolve(PLUGIN_DIR, "node_modules/@typespec/http-specs/specs");
-const GENERATED_FOLDER = argv.values.generatedFolder
-  ? resolve(argv.values.generatedFolder)
-  : resolve(PLUGIN_DIR, "generator");
-const EMITTER_NAME = argv.values.emitterName || "@typespec/http-client-python";
 
 interface CompileTask {
   spec: string;
@@ -485,13 +428,6 @@ interface CompileTask {
 interface TaskGroup {
   spec: string;
   tasks: CompileTask[];
-}
-
-// Check whether a spec path belongs to azure-http-specs (vs standard http-specs).
-// Using "azure-http-specs" instead of "azure" to avoid false positives when the
-// working directory path contains "azure" (e.g. azure-sdk-for-python).
-function isAzureSpec(spec: string): boolean {
-  return spec.includes("azure-http-specs");
 }
 
 function defaultPackageName(spec: string): string {
@@ -519,21 +455,19 @@ function buildTaskGroups(specs: string[], flags: RegenerateFlags): TaskGroup[] {
     const tasks: CompileTask[] = [];
 
     for (const emitterConfig of getEmitterOptions(spec, flags.flavor)) {
-      // Apply flavor defaults first, then per-spec options so they can override (e.g., "generate-test": "false")
-      const options: Record<string, unknown> = {};
+      const options: Record<string, unknown> = { ...emitterConfig };
+
+      // Add flavor-specific options
+      options["flavor"] = flags.flavor;
       for (const [k, v] of Object.entries(SpecialFlags[flags.flavor] ?? {})) {
         options[k] = v;
       }
-      Object.assign(options, emitterConfig);
-
-      // Add flavor
-      options["flavor"] = flags.flavor;
 
       // Set output directory - use tests/generated/<flavor>/<package> structure
       const packageName = (options["package-name"] as string) || defaultPackageName(spec);
       const outputDir =
         (options["emitter-output-dir"] as string) ||
-        toPosix(`${GENERATED_FOLDER}/../tests/generated/${flags.flavor}/${packageName}`);
+        toPosix(`${PLUGIN_DIR}/tests/generated/${flags.flavor}/${packageName}`);
       options["emitter-output-dir"] = outputDir;
 
       // Debug mode
@@ -543,9 +477,6 @@ function buildTaskGroups(specs: string[], flags: RegenerateFlags): TaskGroup[] {
 
       // Examples directory
       options["examples-dir"] = toPosix(join(dirname(spec), "examples"));
-
-      // Emit YAML only - Python processing is batched after all specs compile
-      options["emit-yaml-only"] = true;
 
       tasks.push({ spec, outputDir, options });
     }
@@ -587,25 +518,6 @@ async function compileSpec(task: CompileTask): Promise<{ success: boolean; error
   }
 }
 
-function renderProgressBar(
-  completed: number,
-  failed: number,
-  total: number,
-  width: number = 40,
-): string {
-  const successCount = completed - failed;
-  const successWidth = Math.round((successCount / total) * width);
-  const failWidth = Math.round((failed / total) * width);
-  const emptyWidth = width - successWidth - failWidth;
-
-  const successBar = pc.bgGreen(" ".repeat(successWidth));
-  const failBar = failed > 0 ? pc.bgRed(" ".repeat(failWidth)) : "";
-  const emptyBar = pc.dim("░".repeat(Math.max(0, emptyWidth)));
-
-  const percent = Math.round((completed / total) * 100);
-  return `${successBar}${failBar}${emptyBar} ${pc.cyan(`${percent}%`)} (${completed}/${total})`;
-}
-
 async function runParallel(groups: TaskGroup[], maxJobs: number): Promise<Map<string, boolean>> {
   const results = new Map<string, boolean>();
   const executing: Set<Promise<void>> = new Set();
@@ -613,20 +525,6 @@ async function runParallel(groups: TaskGroup[], maxJobs: number): Promise<Map<st
   // Count total tasks for progress
   const totalTasks = groups.reduce((sum, g) => sum + g.tasks.length, 0);
   let completed = 0;
-  let failed = 0;
-  const failedSpecs: string[] = [];
-
-  // Check if we're in a TTY for progress bar updates
-  const isTTY = process.stdout.isTTY;
-
-  const updateProgress = () => {
-    if (isTTY) {
-      process.stdout.write(`\r${renderProgressBar(completed, failed, totalTasks)}`);
-    }
-  };
-
-  // Initial progress bar
-  updateProgress();
 
   for (const group of groups) {
     // Each group runs as a unit - tasks within a group run sequentially
@@ -639,17 +537,19 @@ async function runParallel(groups: TaskGroup[], maxJobs: number): Promise<Map<st
       let groupSuccess = true;
       for (const task of group.tasks) {
         const packageName = (task.options["package-name"] as string) || shortName;
+        console.log(pc.blue(`[${completed + 1}/${totalTasks}] Compiling ${packageName}...`));
 
         const result = await compileSpec(task);
         completed++;
 
-        if (!result.success) {
-          failed++;
-          failedSpecs.push(`${packageName}: ${result.error}`);
+        if (result.success) {
+          console.log(pc.green(`[${completed}/${totalTasks}] ${packageName} succeeded`));
+        } else {
+          console.log(
+            pc.red(`[${completed}/${totalTasks}] ${packageName} failed: ${result.error}`),
+          );
           groupSuccess = false;
         }
-
-        updateProgress();
       }
 
       results.set(group.spec, groupSuccess);
@@ -664,75 +564,36 @@ async function runParallel(groups: TaskGroup[], maxJobs: number): Promise<Map<st
   }
 
   await Promise.all(executing);
-
-  // Clear progress bar line and print final status
-  if (isTTY) {
-    process.stdout.write("\r" + " ".repeat(60) + "\r");
-  }
-
-  // Print failures at the end
-  if (failedSpecs.length > 0) {
-    console.log(pc.red(`\nFailed specs:`));
-    for (const spec of failedSpecs) {
-      console.log(pc.red(`  • ${spec}`));
-    }
-  }
-
   return results;
 }
 
-async function collectConfigFiles(generatedDir: string, flavor: string): Promise<string[]> {
-  const flavorDir = join(generatedDir, "..", "tests", "generated", flavor);
-  try {
-    await access(flavorDir);
-  } catch {
-    return [];
-  }
-
-  const configFiles: string[] = [];
-  for (const pkg of await readdir(flavorDir, { withFileTypes: true })) {
-    if (pkg.isDirectory()) {
-      const pkgDir = join(flavorDir, pkg.name);
-      for (const file of await readdir(pkgDir)) {
-        if (file.startsWith(".tsp-codegen-") && file.endsWith(".json")) {
-          configFiles.push(join(pkgDir, file));
-        }
-      }
-    }
-  }
-  return configFiles;
-}
-
-function runBatchPythonProcessing(flavor: string, configCount: number, jobs: number): boolean {
-  if (configCount === 0) return true;
-
-  console.log(pc.cyan(`\nRunning batch Python processing on ${configCount} specs...`));
-
-  // Find Python venv
-  let venvPath = join(PLUGIN_DIR, "venv");
-  if (existsSync(join(venvPath, "bin"))) {
-    venvPath = join(venvPath, "bin", "python");
-  } else if (existsSync(join(venvPath, "Scripts"))) {
-    venvPath = join(venvPath, "Scripts", "python.exe");
-  } else {
-    console.error(pc.red("Python venv not found"));
-    return false;
-  }
-
-  const batchScript = join(PLUGIN_DIR, "eng", "scripts", "setup", "run_batch.py");
-
-  try {
-    // Pass directory and flavor instead of individual config files to avoid command line length limits on Windows
-    execSync(
-      `"${venvPath}" "${batchScript}" --generated-dir "${PLUGIN_DIR}" --flavor ${flavor} --jobs ${jobs}`,
-      {
-        stdio: "inherit",
-        cwd: PLUGIN_DIR,
-      },
+// Preprocess: create files that should be deleted after regeneration (for testing)
+async function preprocess(flavor: string): Promise<void> {
+  if (flavor === "azure") {
+    const generalParts = [PLUGIN_DIR, "tests", "generated", "azure"];
+    const authFile = join(
+      ...generalParts,
+      "authentication-api-key",
+      "authentication",
+      "apikey",
+      "_operations",
+      "to_be_deleted.py",
     );
-    return true;
-  } catch {
-    return false;
+    await promises.mkdir(dirname(authFile), { recursive: true });
+    await promises.writeFile(authFile, "# This file is to be deleted after regeneration");
+
+    const folderParts = [...generalParts, "generation-subdir"];
+    const genFile = join(...folderParts, "generation", "subdir", "_generated", "to_be_deleted.py");
+    await promises.mkdir(dirname(genFile), { recursive: true });
+    await promises.writeFile(genFile, "# This file is to be deleted after regeneration");
+
+    const testFile = join(...folderParts, "generated_tests", "to_be_deleted.py");
+    await promises.mkdir(dirname(testFile), { recursive: true });
+    await promises.writeFile(testFile, "# This file is to be kept after regeneration");
+
+    const keptFile = join(...folderParts, "generation", "subdir", "to_be_kept.py");
+    await promises.mkdir(dirname(keptFile), { recursive: true });
+    await promises.writeFile(keptFile, "# This file is to be kept after regeneration");
   }
 }
 
@@ -749,7 +610,7 @@ async function regenerateFlavor(
   const flags: RegenerateFlags = { flavor, debug, name };
 
   // Preprocess
-  await preprocess(flavor, GENERATED_FOLDER);
+  await preprocess(flavor);
 
   // Collect specs
   const azureSpecs = flavor === "azure" ? await getSubdirectories(AZURE_HTTP_SPECS, flags) : [];
@@ -763,46 +624,21 @@ async function regenerateFlavor(
   console.log(pc.cyan(`Found ${allSpecs.length} specs (${totalTasks} total tasks) to compile`));
   console.log(pc.cyan(`Using ${jobs} parallel jobs\n`));
 
-  // Run compilation (emits YAML only)
+  // Run compilation
   const startTime = performance.now();
   const results = await runParallel(groups, jobs);
-  const compileTime = (performance.now() - startTime) / 1000;
+  const duration = (performance.now() - startTime) / 1000;
 
-  // Summary for TypeSpec compilation
+  // Summary
   const succeeded = Array.from(results.values()).filter((v) => v).length;
-  const compileFailed = results.size - succeeded;
-
-  console.log(
-    pc.cyan(
-      `\nTypeSpec compilation: ${succeeded} succeeded, ${compileFailed} failed (${compileTime.toFixed(1)}s)`,
-    ),
-  );
-
-  if (compileFailed > 0) {
-    console.log(pc.red(`Skipping Python processing due to compilation failures`));
-    return false;
-  }
-
-  // Batch process all specs with Python
-  const pyStartTime = performance.now();
-  const configCount = (await collectConfigFiles(GENERATED_FOLDER, flavor)).length;
-  // Use fewer Python jobs since Python processing is heavier
-  const pyJobs = Math.max(4, jobs);
-  const pySuccess = runBatchPythonProcessing(flavor, configCount, pyJobs);
-  const pyTime = (performance.now() - pyStartTime) / 1000;
-
-  const totalTime = (performance.now() - startTime) / 1000;
+  const failed = results.size - succeeded;
 
   console.log(pc.cyan(`\n${"=".repeat(60)}`));
-  console.log(pc.cyan(`Results: ${succeeded} specs processed`));
-  console.log(
-    pc.cyan(
-      `  TypeSpec: ${compileTime.toFixed(1)}s | Python: ${pyTime.toFixed(1)}s | Total: ${totalTime.toFixed(1)}s`,
-    ),
-  );
+  console.log(pc.cyan(`Results: ${succeeded} succeeded, ${failed} failed`));
+  console.log(pc.cyan(`Time: ${duration.toFixed(1)}s`));
   console.log(pc.cyan(`${"=".repeat(60)}\n`));
 
-  return pySuccess;
+  return failed === 0;
 }
 
 async function main() {
