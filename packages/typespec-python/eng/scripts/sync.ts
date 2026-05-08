@@ -238,9 +238,9 @@ function main(): void {
     process.exit(0);
   }
 
-  console.log(pc.bold("Source:")      + " " + sourceRoot);
+  console.log(pc.bold("Source:") + " " + sourceRoot);
   console.log(pc.bold("Destination:") + " " + packageRoot);
-  console.log(pc.bold("Mode:")        + " " + (check ? "check (read-only)" : "write"));
+  console.log(pc.bold("Mode:") + " " + (check ? "check (read-only)" : "write"));
   console.log("");
 
   const stats: SyncStats = { copied: [], unchanged: [], drifted: [], missing: [], removed: [] };
@@ -262,9 +262,7 @@ function main(): void {
       // touch tracked files.
       const destDirAbs = join(packageRoot, ...rel.split("/"));
       const sourceFiles = listFilesRecursive(srcAbs);
-      const sourceRelSet = new Set(
-        sourceFiles.map((f) => toPosix(relative(srcAbs, f))),
-      );
+      const sourceRelSet = new Set(sourceFiles.map((f) => toPosix(relative(srcAbs, f))));
 
       // Step 1: copy source -> dest
       for (const srcFile of sourceFiles) {
