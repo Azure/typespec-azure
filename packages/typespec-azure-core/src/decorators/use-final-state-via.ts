@@ -44,7 +44,7 @@ export const $useFinalStateVia: UseFinalStateViaDecorator = (context, entity, fi
     onTargetFinish: () => {
       const operation = ignoreDiagnostics(getHttpOperation(program, entity));
       const storedValue = validateFinalState(program, operation, finalStateVia);
-      if (storedValue !== undefined) {
+      if (storedValue !== undefined || operation.verb === "put") {
         setFinalStateOverride(program, entity, finalStateVia);
       }
       if (
