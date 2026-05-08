@@ -442,7 +442,7 @@ describe("does not emit warning", () => {
       .toBeValid();
   });
 
-  it("when a low-level operation returns only 202 with LRO headers (no 200 or 204)", async () => {
+  it("when a low-level operation has a 200 response with a Model body and ArmAcceptedLroResponse (not discovered)", async () => {
     await tester
       .expect(
         `
@@ -454,14 +454,30 @@ describe("does not emit warning", () => {
 
       @armResourceOperations
       interface Employees {
+        get is ArmResourceRead<Employee>;
         @post
         @armResourceAction(Employee)
-        generate(...ApiVersionParameter): {
-          @statusCode _: 202;
-          @header("Azure-AsyncOperation") azureAsyncOperation?: string;
-          @header("Location") location?: string;
-          @body body: GenerateResponse;
-        } | ErrorResponse;
+        generate(...ApiVersionParameter): GenerateResponse | ArmAcceptedLroResponse | ErrorResponse;
+      }
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("when a low-level operation has a 204 response and ArmAcceptedLroResponse (not discovered)", async () => {
+    await tester
+      .expect(
+        `
+      ${preamble}
+
+      @armResourceOperations
+      interface Employees {
+        get is ArmResourceRead<Employee>;
+        @post
+        @armResourceAction(Employee)
+        restart(...ApiVersionParameter): {
+          @statusCode _: 204;
+        } | ArmAcceptedLroResponse | ErrorResponse;
       }
       `,
       )
