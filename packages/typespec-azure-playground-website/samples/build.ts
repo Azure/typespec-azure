@@ -22,6 +22,8 @@ interface SampleConfig {
   directory?: boolean;
   /** Whether to include this sample in the playground. Defaults to true. */
   playground?: boolean;
+  /** Sort order within a category. Lower values appear first. Defaults to Infinity. */
+  order?: number;
 }
 
 interface TspConfig {
@@ -105,7 +107,13 @@ async function findTspFiles(dir: string): Promise<string[]> {
 // Discover all sample-config.yaml files
 const configPaths = (await findSampleConfigs(samplesSpecsDir)).sort();
 
-const samples: Record<string, PlaygroundSample> = {};
+interface CollectedSample {
+  title: string;
+  order: number;
+  sample: PlaygroundSample;
+}
+
+const collected: CollectedSample[] = [];
 
 for (const configPath of configPaths) {
   const sampleDir = dirname(configPath);
@@ -157,14 +165,26 @@ for (const configPath of configPaths) {
   const pathParts = sampleRelPath.split("/");
   const category = formatCategory(pathParts[0]);
 
-  samples[config.title] = {
-    filename: `../samples/specs/${sampleRelPath}/main.tsp`,
-    content,
-    preferredEmitter,
-    category,
-    description: config.description ?? "",
-    ...(compilerOptions ? { compilerOptions } : {}),
-  };
+  collected.push({
+    title: config.title,
+    order: config.order ?? Infinity,
+    sample: {
+      filename: `../samples/specs/${sampleRelPath}/main.tsp`,
+      content,
+      preferredEmitter,
+      category,
+      description: config.description ?? "",
+      ...(compilerOptions ? { compilerOptions } : {}),
+    },
+  });
+}
+
+// Sort by order within each category so lower-ordered samples appear first
+collected.sort((a, b) => a.order - b.order);
+
+const samples: Record<string, PlaygroundSample> = {};
+for (const { title, sample } of collected) {
+  samples[title] = sample;
 }
 
 // Write output
