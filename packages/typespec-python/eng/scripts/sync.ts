@@ -62,12 +62,10 @@ const INCLUDES: readonly string[] = [
   "eng/scripts/ci/run_sphinx_build.py",
   "eng/scripts/ci/util.py",
 
-  // The two-phase upstream regenerate.ts is patched at sync time (see
-  // POST_PROCESS) to add a `--single-phase` flag that bypasses the YAML +
-  // batched-Python pipeline. The wrapper's `regenerate` npm script passes
-  // that flag so we keep the in-process emit path that is faster for the
-  // azure-only / Windows / smaller-spec-set wrapper case.
-  "eng/scripts/ci/regenerate.ts",
+  // Shared regenerate helpers/data tables.  Per-repo orchestration (paths,
+  // emitter name, single-phase vs two-phase pipeline, argv/help) lives in
+  // each repo's own `regenerate.ts` and is intentionally *not* synced.
+  "eng/scripts/ci/regenerate-common.ts",
 
   // Shared setup scripts (invoked by package.json install/prepare hooks
   // and by ci/regenerate.ts which spawns run_batch.py).
@@ -114,60 +112,12 @@ const INCLUDES: readonly string[] = [
  * sync.
  */
 /**
- * Post-process hooks applied to specific synced files after copying. The
- * transform runs against the source bytes; the resulting buffer is what gets
- * compared with (and written to) the local file. Use sparingly — every patch
- * is local divergence we have to maintain.
- *
- * Why we patch eng/scripts/ci/regenerate.ts:
- *   Upstream's regenerate.ts uses a two-phase pipeline (TypeSpec compile emits
- *   YAML only; then a single batched Python subprocess reads the YAMLs and
- *   writes the final .py files). That amortizes Python-startup cost across
- *   many specs and pays off when both `azure` and `unbranded` flavors are
- *   regenerated together. typespec-python only ever regenerates the `azure`
- *   flavor, with a smaller spec set, on Windows — the fixed subprocess +
- *   YAML round-trip cost ends up slower than just letting the emitter write
- *   .py files in-process. This patch adds a `--single-phase` flag that
- *   bypasses both `emit-yaml-only` and `runBatchPythonProcessing`. The
- *   wrapper's `regenerate` npm script passes `--single-phase`.
+ * Directory/file names to skip when walking INCLUDES directory entries. Any
+ * path that has a segment matching one of these names is ignored on both
+ * sides: not copied from source, and not pruned in dest. This is how we keep
+ * build artifacts (egg-info, __pycache__, build/, dist/) from polluting the
+ * sync.
  */
-const POST_PROCESS: Record<string, (content: Buffer) => Buffer> = {
-  "eng/scripts/ci/regenerate.ts": (buf) => Buffer.from(patchRegenerateTs(buf.toString("utf8")), "utf8"),
-};
-
-function patchRegenerateTs(src: string): string {
-  let out = src;
-
-  const argvBefore = `    jobs: { type: "string", short: "j" },\n    help: { type: "boolean", short: "h" },`;
-  const argvAfter = `    jobs: { type: "string", short: "j" },\n    singlePhase: { type: "boolean" },\n    help: { type: "boolean", short: "h" },`;
-  if (!out.includes(argvAfter)) {
-    if (!out.includes(argvBefore)) {
-      throw new Error("regenerate.ts patch: argv anchor not found (upstream changed shape)");
-    }
-    out = out.replace(argvBefore, argvAfter);
-  }
-
-  const yamlBefore = `      // Emit YAML only - Python processing is batched after all specs compile\n      options["emit-yaml-only"] = true;`;
-  const yamlAfter = `      // Emit YAML only - Python processing is batched after all specs compile\n      if (!argv.values.singlePhase) {\n        options["emit-yaml-only"] = true;\n      }`;
-  if (!out.includes(yamlAfter)) {
-    if (!out.includes(yamlBefore)) {
-      throw new Error("regenerate.ts patch: emit-yaml-only anchor not found");
-    }
-    out = out.replace(yamlBefore, yamlAfter);
-  }
-
-  const batchBefore = `  const pySuccess = runBatchPythonProcessing(flavor, configCount, pyJobs);`;
-  const batchAfter = `  const pySuccess = argv.values.singlePhase\n    ? true\n    : runBatchPythonProcessing(flavor, configCount, pyJobs);`;
-  if (!out.includes(batchAfter)) {
-    if (!out.includes(batchBefore)) {
-      throw new Error("regenerate.ts patch: runBatchPythonProcessing anchor not found");
-    }
-    out = out.replace(batchBefore, batchAfter);
-  }
-
-  return out;
-}
-
 const EXCLUDED_SEGMENTS: ReadonlySet<string> = new Set([
   "__pycache__",
   "build",
@@ -229,11 +179,7 @@ interface SyncStats {
 }
 
 function syncFile(srcAbs: string, destAbs: string, relPath: string, stats: SyncStats): void {
-  let srcBuf = fs.readFileSync(srcAbs);
-  const transform = POST_PROCESS[toPosix(relPath)];
-  if (transform) {
-    srcBuf = transform(srcBuf);
-  }
+  const srcBuf = fs.readFileSync(srcAbs);
   const destBuf = readBytes(destAbs);
 
   if (destBuf && destBuf.equals(srcBuf)) {
