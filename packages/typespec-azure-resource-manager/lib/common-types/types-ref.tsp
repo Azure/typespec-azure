@@ -18,19 +18,19 @@ namespace Azure.ResourceManager.CommonTypes;
 
 /** The resource model definition for an Azure Resource Manager resource with an etag. */
 @@armCommonDefinition(AzureEntityResource,
-  "TrackedResource",
+  "AzureEntityResource",
   Azure.ResourceManager.CommonTypes.Versions.v3
 );
 @@armCommonDefinition(AzureEntityResource,
-  "TrackedResource",
+  "AzureEntityResource",
   Azure.ResourceManager.CommonTypes.Versions.v4
 );
 @@armCommonDefinition(AzureEntityResource,
-  "TrackedResource",
+  "AzureEntityResource",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
 @@armCommonDefinition(AzureEntityResource,
-  "TrackedResource",
+  "AzureEntityResource",
   Azure.ResourceManager.CommonTypes.Versions.v6
 );
 
