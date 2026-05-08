@@ -154,7 +154,8 @@ export const armPostLroResponseMismatchRule = createRule({
   },
   create(context) {
     /**
-     * Gets the namespace-qualified name for a type, if available.
+     * Gets the namespace-qualified name for a named type (Model or Scalar).
+     * Returns undefined for anonymous types or non-Model/Scalar kinds.
      */
     function getQualifiedTypeName(type: Type): string | undefined {
       if (
@@ -169,6 +170,11 @@ export const armPostLroResponseMismatchRule = createRule({
       return undefined;
     }
 
+    /**
+     * Checks if the finalResult type matches the expected response type.
+     * For named types, verifies that namespace-qualified names match before
+     * checking structural compatibility via isAssignableTo.
+     */
     function doesFinalResultMatch(finalResult: Type | "void", expectedResponseType: Type): boolean {
       if (finalResult === "void") {
         return isVoidType(expectedResponseType);
