@@ -71,26 +71,38 @@ const INCLUDES: readonly string[] = [
   // (install.py, prepare.py, venvtools.py, etc.) diverged from upstream's
   // http-client-python build/test pipeline; the typespec-python wrapper
   // owns its own copies.
+  //
+  // Likewise NOT synced (committed and owned by this wrapper):
+  //   - generator/                  : pygen lives upstream as the source of
+  //                                   truth, but the wrapper checks in a
+  //                                   pinned snapshot rather than re-fetching
+  //                                   on every CI run.
+  //   - tests/tox.ini               : tox envs differ from upstream (paths,
+  //                                   emitter name, extra envs).
+  //   - tests/install_packages.py   : upstream's version calls `uv pip wheel`,
+  //                                   which is not a real uv subcommand, so
+  //                                   it fails in CI. The wrapper keeps the
+  //                                   working `uv build --wheel` flow. Once
+  //                                   the upstream script is fixed (see
+  //                                   microsoft/typespec#10636) it can be
+  //                                   re-added to this list.
 
   // Shared test assets. Directory entries (trailing `/`) are recursive and
   // **mirror** the upstream layout: files matching upstream are overwritten,
-  // and local-only files are deleted. The matching directories are
-  // .gitignored in this package so a fresh CI checkout starts empty and is
-  // fully populated by `pnpm sync`. Upstream tests are treated as the source
-  // of truth; any wrapper-specific test must live OUTSIDE these directories
-  // (e.g. tests/wrapper/) so it isn't pruned by the sync.
+  // and local-only files are deleted. `tests/data/` and `tests/mock_api/`
+  // are gitignored so a fresh CI checkout starts empty and is populated by
+  // `pnpm sync`; `tests/requirements/` is small and stable enough to commit
+  // as a snapshot that `pnpm sync` refreshes in place. Upstream tests are
+  // treated as the source of truth; any wrapper-specific test must live
+  // OUTSIDE these directories (e.g. tests/wrapper/) so it isn't pruned by
+  // the sync.
   "tests/data/",
   "tests/mock_api/",
   "tests/requirements/",
 
-  // Test driver/helper files at the tests/ root. Each is treated as the
-  // upstream source of truth — DATA_FOLDER, server-launch logic, lint/test
-  // tox envs etc. stay aligned with http-client-python.
-  //
-  // tests/install_packages.py is intentionally NOT synced: upstream's version
-  // calls `uv pip wheel`, which is not a real uv subcommand, so it fails in
-  // CI. Azure's version uses the working `uv build --wheel` flow. Re-include
-  // once the upstream script is fixed.
+  // Shared test driver/helper file. Treated as the upstream source of truth
+  // (DATA_FOLDER, server-launch logic, etc.) and kept aligned with
+  // http-client-python.
   "tests/conftest.py",
 ];
 
