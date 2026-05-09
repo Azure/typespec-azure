@@ -47,7 +47,6 @@
     "dist/**",
     "!dist/tests/**",
     "eng/scripts/setup/**",
-    "generator/**"
   ],
   "peerDependencies": {
     "@azure-tools/typespec-autorest": "workspace:^",
