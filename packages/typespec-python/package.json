@@ -46,7 +46,7 @@
   "files": [
     "dist/**",
     "!dist/tests/**",
-    "eng/scripts/setup/**",
+    "eng/scripts/setup/**"
   ],
   "peerDependencies": {
     "@azure-tools/typespec-autorest": "workspace:^",
