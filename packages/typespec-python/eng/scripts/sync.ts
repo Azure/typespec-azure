@@ -85,10 +85,13 @@ const INCLUDES: readonly string[] = [
 
   // Test driver/helper files at the tests/ root. Each is treated as the
   // upstream source of truth — DATA_FOLDER, server-launch logic, lint/test
-  // tox envs, wheel install algorithms etc. all stay aligned with
-  // http-client-python.
+  // tox envs etc. stay aligned with http-client-python.
+  //
+  // tests/install_packages.py is intentionally NOT synced: upstream's version
+  // calls `uv pip wheel`, which is not a real uv subcommand, so it fails in
+  // CI. Azure's version uses the working `uv build --wheel` flow. Re-include
+  // once the upstream script is fixed.
   "tests/conftest.py",
-  "tests/install_packages.py",
   "tests/tox.ini",
 
   // The pygen Python package. Mirrored from upstream because the tox envs

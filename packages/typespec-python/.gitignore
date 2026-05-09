@@ -6,6 +6,5 @@ tests/data/
 tests/mock_api/
 tests/requirements/
 tests/conftest.py
-tests/install_packages.py
 tests/tox.ini
 generator/
