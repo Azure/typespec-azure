@@ -92,12 +92,6 @@ const INCLUDES: readonly string[] = [
   // CI. Azure's version uses the working `uv build --wheel` flow. Re-include
   // once the upstream script is fixed.
   "tests/conftest.py",
-  "tests/tox.ini",
-
-  // The pygen Python package. Mirrored from upstream because the tox envs
-  // (`-e {tox_root}/../generator`) and PYTHONPATH expect this directory to
-  // exist. Gitignored locally; `pnpm sync` populates it before tests/builds.
-  "generator/",
 ];
 
 /**

@@ -4,4 +4,3 @@
 # the Python test suites.
 tests/data/
 tests/mock_api/
-generator/
