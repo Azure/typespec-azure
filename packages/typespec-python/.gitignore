@@ -6,3 +6,6 @@
 # place.
 tests/data/
 tests/mock_api/
+
+# folder for debug
+alpha
