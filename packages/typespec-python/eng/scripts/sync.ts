@@ -124,6 +124,21 @@ const EXCLUDED_SEGMENTS: ReadonlySet<string> = new Set([
   ".wheels",
 ]);
 
+/**
+ * Specific file paths (POSIX, relative to the package root) that must NOT be
+ * present in the destination after a sync, even if upstream has them. They are
+ * skipped during the copy phase and actively deleted from the destination if
+ * they exist. In --check mode their presence is reported as drift.
+ *
+ * Use this for individual upstream files that don't apply to the wrapper but
+ * live inside an otherwise-mirrored directory. Whole directories should be
+ * handled via EXCLUDED_SEGMENTS instead.
+ */
+const EXCLUDED_FILES: ReadonlySet<string> = new Set([
+  // Unbranded-only mock test that doesn't apply to the Azure wrapper.
+  "tests/mock_api/unbranded/test_unbranded.py",
+]);
+
 const argv = parseArgs({
   args: process.argv.slice(2),
   options: {
@@ -327,22 +342,25 @@ function main(): void {
       const sourceFiles = listFilesRecursive(srcAbs);
       const sourceRelSet = new Set(sourceFiles.map((f) => toPosix(relative(srcAbs, f))));
 
-      // Step 1: copy source -> dest
+      // Step 1: copy source -> dest (skipping excluded files)
       for (const srcFile of sourceFiles) {
         const relFromDir = toPosix(relative(srcAbs, srcFile));
         const destAbs = join(destDirAbs, ...relFromDir.split("/"));
         const relFromPkg = toPosix(relative(packageRoot, destAbs));
+        if (EXCLUDED_FILES.has(relFromPkg)) continue;
         syncFile(srcFile, destAbs, relFromPkg, stats);
       }
 
-      // Step 2: prune local-only files
+      // Step 2: prune local-only files (and any explicitly excluded files
+      // that may still be sitting in the destination from a previous sync).
       const destFiles = listFilesRecursive(destDirAbs);
       for (const destFile of destFiles) {
         const relFromDir = toPosix(relative(destDirAbs, destFile));
-        if (sourceRelSet.has(relFromDir)) continue;
         const relFromPkg = toPosix(relative(packageRoot, destFile));
+        const isExcluded = EXCLUDED_FILES.has(relFromPkg);
+        if (sourceRelSet.has(relFromDir) && !isExcluded) continue;
         if (check) {
-          stats.drifted.push(relFromPkg + " (local-only)");
+          stats.drifted.push(relFromPkg + (isExcluded ? " (excluded)" : " (local-only)"));
         } else {
           fs.unlinkSync(destFile);
           removeEmptyDirsUpTo(dirname(destFile), destDirAbs);
