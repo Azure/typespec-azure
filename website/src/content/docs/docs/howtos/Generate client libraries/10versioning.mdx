@@ -829,7 +829,9 @@ func (client *ServiceClient) GetUserInfo(ctx context.Context, userInfo UserInfo,
 
 ## Overriding the Client Api Version Parameter
 
-By default, we find api version parameters in specs based off of names. There is special logic we do with api version parameters:
+By default, we find api version parameters in specs based off of names. Name-based detection applies to HTTP metadata parameters (header, query, path, or cookie) and server URL template parameters (declared in `@server`). A parameter named `apiVersion` or `api-version` in these positions will automatically be treated as an API version parameter.
+
+There is special logic we do with api version parameters:
 
 1. These api version parameters get elevated up to the client level (if the service is versioned)
 2. We auto-add api version information to next links when paging
@@ -1014,7 +1016,10 @@ export class ServiceClient {
   constructor(endpoint: string, options?: ServiceClientOptionalParams);
 
   listResources(options?: ListResourcesOptionalParams): Promise<void>;
-  getSnapshot(apiVersion: string, options?: GetSnapshotOptionalParams): Promise<void>;
+  getSnapshot(
+    apiVersion: string,
+    options?: GetSnapshotOptionalParams,
+  ): Promise<void>;
 }
 ```
 
