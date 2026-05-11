@@ -45,23 +45,34 @@ model A extends B {
 
 ```python
 class C:
-    c: str | None
+    c: Optional[str]
 
-class A(C):
-    a: str | None
-    b: str | None
+
+class B(C):
+    c: Optional[str]
+    b: Optional[str]
+
+
+class A(B):
+    c: Optional[str]
+    b: Optional[str]
+    a: Optional[str]
 ```
 
 ```csharp
 public partial class C
 {
-    public string? CValue { get; set; }
+    public string CProperty { get; }
 }
 
-public partial class A : C
+public partial class B : C
 {
-    public string? AValue { get; set; }
-    public string? B { get; set; }
+    public string BProperty { get; }
+}
+
+public partial class A : B
+{
+    public string AProperty { get; }
 }
 ```
 
@@ -70,32 +81,37 @@ export interface C {
   c?: string;
 }
 
-export interface A extends C {
-  a?: string;
+export interface B extends C {
   b?: string;
+}
+
+export interface A extends B {
+  a?: string;
 }
 ```
 
 ```java
-public final class C {
+public class C {
     private String c;
 }
 
-public final class A extends C {
+public class B extends C {
+    private String b;
+    private String c;
+}
+
+public final class A extends B {
     private String a;
     private String b;
+    private String c;
 }
 ```
 
 ```go
-type C struct {
-	C *string
-}
-
 type A struct {
-	C
-	A *string
-	B *string
+    A *string
+    B *string
+    C *string
 }
 ```
 
@@ -124,18 +140,21 @@ model A {
 class B:
     prop_b: str
 
+
 class A(B):
+    prop_b: str
     prop_a: str
 ```
 
 ```csharp
 public partial class B
 {
-    public string PropB { get; }
+    public virtual string PropB { get; }
 }
 
 public partial class A : B
 {
+    public override string PropB { get; }
     public string PropA { get; }
 }
 ```
@@ -146,28 +165,34 @@ export interface B {
 }
 
 export interface A extends B {
+  propB: string;
   propA: string;
 }
 ```
 
 ```java
-public final class B {
-    private String propB;
+public class B {
+    private final String propB;
 }
 
 public final class A extends B {
-    private String propA;
+    private final String propB;
+    private final String propA;
 }
 ```
 
 ```go
-type B struct {
-	PropB string
+type A struct {
+    // REQUIRED
+    PropA *string
+
+    // REQUIRED
+    PropB *string
 }
 
-type A struct {
-	B
-	PropA string
+type B struct {
+    // REQUIRED
+    PropB *string
 }
 ```
 
@@ -195,58 +220,57 @@ model A extends OldBase {
 ```
 
 ```python
-# legacy-hierarchy-building-conflict warning is emitted during generation.
-class C:
-    shared: int | None
+# A `legacy-hierarchy-building-conflict` warning is emitted at compile time.
+class OldBase:
+    shared: Optional[str]
 
-class A(C):
-    a: str | None
+
+class A(OldBase):
+    shared: Optional[str]
+    a: Optional[str]
 ```
 
 ```csharp
-// Warning: property-type-mismatch for 'shared' on hierarchy rebasing.
-public partial class C
+// Warning: legacy-hierarchy-building-conflict (property-type-mismatch for 'shared').
+public partial class OldBase
 {
-    public int? Shared { get; set; }
+    public string Shared { get; }
 }
 
-public partial class A : C
+public partial class A : OldBase
 {
-    public string? AValue { get; set; }
+    public string AProperty { get; }
 }
 ```
 
 ```typescript
-// Warning: property-type-mismatch for "shared".
-export interface C {
-  shared?: number;
+// Warning: legacy-hierarchy-building-conflict (property-type-mismatch for "shared").
+export interface OldBase {
+  shared?: string;
 }
 
-export interface A extends C {
+export interface A extends OldBase {
   a?: string;
 }
 ```
 
 ```java
-// Warning: property-type-mismatch for "shared".
-public final class C {
-    private Integer shared;
+// Warning: legacy-hierarchy-building-conflict (property-type-mismatch for "shared").
+public class OldBase {
+    private String shared;
 }
 
-public final class A extends C {
+public final class A extends OldBase {
     private String a;
+    private String shared;
 }
 ```
 
 ```go
-// Warning: property-type-mismatch for "shared".
-type C struct {
-	Shared *int32
-}
-
+// Warning: legacy-hierarchy-building-conflict (property-type-mismatch for "shared").
 type A struct {
-	C
-	AValue *string
+    A      *string
+    Shared *string
 }
 ```
 
@@ -275,58 +299,60 @@ model A extends OldBase {
 ```
 
 ```python
-class C:
-    kind: str
+class OldBase:
+    kind: Literal["old"] = "old"
     location: str
 
-class A(C):
-    a: str | None
+
+class A(OldBase):
+    kind: Literal["old"] = "old"
+    location: str
+    a: Optional[str]
 ```
 
 ```csharp
-public partial class C
+public partial class OldBase
 {
-    public string Kind { get; }
+    public string Kind { get; } = "old";
     public string Location { get; }
 }
 
-public partial class A : C
+public partial class A : OldBase
 {
-    public string? AValue { get; set; }
+    public string AProperty { get; }
 }
 ```
 
 ```typescript
-export interface C {
-  kind: string;
+export interface OldBase {
+  kind: "old";
   location: string;
 }
 
-export interface A extends C {
+export interface A extends OldBase {
   a?: string;
 }
 ```
 
 ```java
-public final class C {
-    private String kind;
-    private String location;
+public class OldBase {
+    private final String kind = "old";
+    private final String location;
 }
 
-public final class A extends C {
+public final class A extends OldBase {
     private String a;
 }
 ```
 
 ```go
-type C struct {
-	Kind string
-	Location string
-}
-
 type A struct {
-	C
-	AValue *string
+    // REQUIRED
+    Kind *string
+
+    // REQUIRED
+    Location *string
+    A        *string
 }
 ```
 
@@ -375,23 +401,24 @@ model Dog extends Animal {
 ```
 
 ```python
-class Animal:
+class Animal(_Model):
     kind: str
     name: str
 
-class Pet(Animal):
+
+class Pet(Animal, discriminator="pet"):
     kind: Literal["pet"]
     trained: bool
 
-class Dog(Pet):
+
+class Dog(Pet, discriminator="dog"):
     kind: Literal["dog"]
     breed: str
 ```
 
 ```csharp
-public partial class Animal
+public abstract partial class Animal
 {
-    public string Kind { get; }
     public string Name { get; }
 }
 
@@ -402,7 +429,6 @@ public partial class Pet : Animal
 
 public partial class Dog : Pet
 {
-    public string Kind { get; }
     public string Breed { get; }
 }
 ```
@@ -422,39 +448,60 @@ export interface Dog extends Pet {
   kind: "dog";
   breed: string;
 }
+
+export type AnimalUnion = PetUnion | Animal;
+export type PetUnion = Dog | Pet;
 ```
 
 ```java
 public class Animal {
-    private String kind;
-    private String name;
+    private String kind = "Animal";
+    private final String name;
 }
 
 public class Pet extends Animal {
-    private Boolean trained;
+    private String kind = "pet";
+    private final boolean trained;
 }
 
-public class Dog extends Pet {
-    private String kind;
-    private String breed;
+public final class Dog extends Pet {
+    private String kind = "dog";
+    private final String breed;
 }
 ```
 
 ```go
 type Animal struct {
-	Kind string
-	Name string
+    // REQUIRED
+    Kind *string
+
+    // REQUIRED
+    Name *string
 }
 
 type Pet struct {
-	Animal
-	Trained bool
+    // REQUIRED
+    Kind *string
+
+    // REQUIRED
+    Name *string
+
+    // REQUIRED
+    Trained *bool
 }
 
 type Dog struct {
-	Pet
-	Kind string
-	Breed string
+    // REQUIRED
+    Breed *string
+
+    // REQUIRED
+    Kind *string
+
+    // REQUIRED
+    Name *string
+
+    // REQUIRED
+    Trained *bool
 }
 ```
 
@@ -488,28 +535,51 @@ model Foo extends Resource {
 ```
 
 ```python
+class Resource(_Model):
+    id: Optional[str]
+    name: Optional[str]
+    type: Optional[str]
+
+
 class TrackedResource(Resource):
     location: str
-    tags: dict[str, str] | None
+    tags: Optional[dict[str, str]]
+
 
 class Foo(TrackedResource):
-    properties: FooProperties
+    properties: "FooProperties"
+    location: Optional[str]
 ```
 
 ```csharp
+public partial class Resource
+{
+    public string Id { get; }
+    public string Name { get; }
+    public string Type { get; }
+}
+
 public partial class TrackedResource : Resource
 {
     public string Location { get; }
-    public IDictionary<string, string>? Tags { get; }
+    public virtual IDictionary<string, string> Tags { get; }
 }
 
 public partial class Foo : TrackedResource
 {
     public FooProperties Properties { get; }
+    public new string Location { get; }
+    public override IDictionary<string, string> Tags { get; }
 }
 ```
 
 ```typescript
+export interface Resource {
+  id?: string;
+  name?: string;
+  type?: string;
+}
+
 export interface TrackedResource extends Resource {
   location: string;
   tags?: Record<string, string>;
@@ -517,30 +587,39 @@ export interface TrackedResource extends Resource {
 
 export interface Foo extends TrackedResource {
   properties: FooProperties;
+  location?: string;
+  tags?: Record<string, string>;
 }
 ```
 
 ```java
+public class Resource {
+    private String id;
+    private String name;
+    private String type;
+}
+
 public class TrackedResource extends Resource {
-    private String location;
+    private final String location;
     private Map<String, String> tags;
 }
 
-public class Foo extends TrackedResource {
-    private FooProperties properties;
+public final class Foo extends TrackedResource {
+    private final FooProperties properties;
+    private String location;
+    private Map<String, String> tags;
 }
 ```
 
 ```go
-type TrackedResource struct {
-	Resource
-	Location string
-	Tags map[string]string
-}
-
 type Foo struct {
-	TrackedResource
-	Properties FooProperties
+    // REQUIRED
+    Properties *FooProperties
+    ID         *string
+    Location   *string
+    Name       *string
+    Tags       map[string]*string
+    Type       *string
 }
 ```
 

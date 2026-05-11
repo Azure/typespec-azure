@@ -976,10 +976,12 @@ enum Versions {
 }
 
 // This operation has its api-version elevated to the client as normal
+@route("/resources")
 op listResources(@query("api-version") apiVersion: string): void;
 
 // This operation has an api-version query param that should NOT be treated
 // as the API version. It stays as a method parameter.
+@route("/snapshot")
 op getSnapshot(
   @apiVersion(false)
   @query("api-version")
@@ -988,39 +990,49 @@ op getSnapshot(
 ```
 
 ```python
-from my.service import MyServiceClient
+class ServiceClient:
+    def __init__(self, endpoint: str, **kwargs: Any) -> None: ...
 
-client = MyServiceClient(endpoint=..., credential=...)
-client.list_resources()  # Uses client-level api-version (default "2024-04-01")
-client.get_snapshot(api_version="2023-11-01")  # Operation-level parameter
+    def list_resources(self, **kwargs: Any) -> None: ...
+
+    def get_snapshot(self, *, api_version: str, **kwargs: Any) -> None: ...
 ```
 
 ```csharp
-public virtual Response ListResources(CancellationToken cancellationToken = default);
-public virtual Response GetSnapshot(string apiVersion, CancellationToken cancellationToken = default);
+public partial class ServiceClient
+{
+    public ServiceClient(Uri endpoint);
+    public ServiceClient(Uri endpoint, ServiceClientOptions options);
+
+    public virtual Response GetResources(CancellationToken cancellationToken = default);
+    public virtual Response GetSnapshot(string apiVersion, CancellationToken cancellationToken = default);
+}
 ```
 
 ```typescript
-export function listResources(
-  context: Client,
-  options?: ListResourcesOptionalParams,
-): Promise<void>;
+export class ServiceClient {
+  constructor(endpoint: string, options?: ServiceClientOptionalParams);
 
-export function getSnapshot(
-  context: Client,
-  apiVersion: string,
-  options?: GetSnapshotOptionalParams,
-): Promise<void>;
+  listResources(options?: ListResourcesOptionalParams): Promise<void>;
+  getSnapshot(apiVersion: string, options?: GetSnapshotOptionalParams): Promise<void>;
+}
 ```
 
 ```java
-public void listResources();
-public void getSnapshot(String apiVersion);
+@ServiceClient(builder = ServiceClientClientBuilder.class)
+public final class ServiceClientClient {
+    public void listResources();
+
+    public void getSnapshot(String apiVersion);
+}
 ```
 
 ```go
-func (client *ServiceClient) ListResources(ctx context.Context, options *ListResourcesOptions) (ListResourcesResponse, error)
-func (client *ServiceClient) GetSnapshot(ctx context.Context, apiVersion string, options *GetSnapshotOptions) (GetSnapshotResponse, error)
+func NewServiceClientWithNoCredential(endpoint string, options *ServiceClientOptions) (*ServiceClient, error)
+
+func (client *ServiceClient) ListResources(ctx context.Context, options *ServiceClientListResourcesOptions) (ServiceClientListResourcesResponse, error)
+
+func (client *ServiceClient) GetSnapshot(ctx context.Context, apiVersion string, options *ServiceClientGetSnapshotOptions) (ServiceClientGetSnapshotResponse, error)
 ```
 
 </ClientTabs>
