@@ -137,78 +137,6 @@ it("buckets paths whose parameter names match case-insensitively together (diagn
     });
 });
 
-it("applies a codefix that lowercases the offending @segment value", async () => {
-  await tester
-    .expect(
-      `
-      @armProviderNamespace
-      @service(#{ title: "Test" })
-      namespace Microsoft.Contoso;
-
-      model Foo is ProxyResource<FooProperties> {
-        @key("name")
-        @path
-        @segment("foos")
-        @visibility(Lifecycle.Read)
-        name: string;
-      }
-
-      model Bar is ProxyResource<FooProperties> {
-        @key("name")
-        @path
-        @segment("Foos")
-        @visibility(Lifecycle.Read)
-        name: string;
-      }
-
-      model FooProperties { color?: string; }
-
-      @armResourceOperations
-      interface Foos {
-        get is ArmResourceRead<Foo>;
-      }
-
-      @armResourceOperations
-      interface Bars {
-        delete is ArmResourceDeleteSync<Bar>;
-      }
-      `,
-    )
-    .applyCodeFix("arm-segment-to-lowercase").toEqual(`
-      @armProviderNamespace
-      @service(#{ title: "Test" })
-      namespace Microsoft.Contoso;
-
-      model Foo is ProxyResource<FooProperties> {
-        @key("name")
-        @path
-        @segment("foos")
-        @visibility(Lifecycle.Read)
-        name: string;
-      }
-
-      model Bar is ProxyResource<FooProperties> {
-        @key("name")
-        @path
-        @segment("foos")
-        @visibility(Lifecycle.Read)
-        name: string;
-      }
-
-      model FooProperties { color?: string; }
-
-      @armResourceOperations
-      interface Foos {
-        get is ArmResourceRead<Foo>;
-      }
-
-      @armResourceOperations
-      interface Bars {
-        delete is ArmResourceDeleteSync<Bar>;
-      }
-      `);
-});
-
 it("emits a diagnostic for two @route operations (delete and get) that differ only by static-segment casing", async () => {
   await tester
     .expect(
@@ -228,32 +156,6 @@ it("emits a diagnostic for two @route operations (delete and get) that differ on
       message:
         "Operation path '/providers/Microsoft.Contoso/Foos/{name}' differs from operation path '/providers/Microsoft.Contoso/foos/{name}' only by character casing. Each ARM operation path must be unique case-insensitively.",
     });
-});
-
-it("applies a codefix that lowercases the offending @route value", async () => {
-  await tester
-    .expect(
-      `
-      @service(#{ title: "Test" })
-      namespace Microsoft.Contoso;
-
-      @route("/providers/Microsoft.Contoso/foos/{name}")
-      @delete op deleteFoo(@path name: string): void;
-
-      @route("/providers/Microsoft.Contoso/Foos/{name}")
-      @get op getFoo(@path name: string): void;
-      `,
-    )
-    .applyCodeFix("arm-segment-to-lowercase").toEqual(`
-      @service(#{ title: "Test" })
-      namespace Microsoft.Contoso;
-
-      @route("/providers/Microsoft.Contoso/foos/{name}")
-      @delete op deleteFoo(@path name: string): void;
-
-      @route("/providers/Microsoft.Contoso/foos/{name}")
-      @get op getFoo(@path name: string): void;
-      `);
 });
 
 it("does not check operations from internal TypeSpec namespaces", async () => {

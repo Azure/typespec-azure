@@ -1,17 +1,12 @@
 import {
-  CodeFix,
   createRule,
-  DecoratorApplication,
   getSourceLocation,
-  Model,
-  ModelProperty,
   Operation,
   paramMessage,
   Program,
   SemanticNodeListener,
 } from "@typespec/compiler";
-import { StringLiteralNode, SyntaxKind } from "@typespec/compiler/ast";
-import { getAllHttpServices, HttpOperation } from "@typespec/http";
+import { getAllHttpServices } from "@typespec/http";
 import { isInternalTypeSpec } from "./utils.js";
 
 /**
@@ -34,7 +29,7 @@ export const armNoPathCasingConflictsRule = createRule({
         // are part of the comparison: `/{scope}/...` and `/{resourceUri}/...`
         // are in different buckets, while `/{scope}/...` and `/{Scope}/...`
         // share a bucket.
-        const buckets = new Map<string, HttpOperation[]>();
+        const buckets = new Map<string, { path: string; operation: Operation }[]>();
         for (const service of services) {
           for (const op of service.operations) {
             if (op.operation.namespace && isInternalTypeSpec(program, op.operation.namespace)) {
@@ -46,7 +41,7 @@ export const armNoPathCasingConflictsRule = createRule({
               bucket = [];
               buckets.set(key, bucket);
             }
-            bucket.push(op);
+            bucket.push({ path: op.path, operation: op.operation });
           }
         }
 
@@ -66,12 +61,9 @@ export const armNoPathCasingConflictsRule = createRule({
             const op = sorted[i];
             if (op.path === firstPath) continue;
 
-            const codefix = tryCreateSegmentCasingCodeFix(op, firstPath);
-
             context.reportDiagnostic({
               format: { pathA: op.path, pathB: firstPath },
               target: op.operation,
-              codefixes: codefix ? [codefix] : undefined,
             });
           }
         }
@@ -89,168 +81,4 @@ function compareBySource(a: Operation, b: Operation): number {
   const pa = sa?.pos ?? 0;
   const pb = sb?.pos ?? 0;
   return pa - pb;
-}
-
-/**
- * If the only differences between `offending.path` and `firstPath` are in
- * non-parameter literal segment tokens (i.e. they differ only by case), build
- * a CodeFix that lowercases the matching `@segment("...")` decorator string
- * literals reachable from this operation.
- */
-function tryCreateSegmentCasingCodeFix(
-  offending: HttpOperation,
-  firstPath: string,
-): CodeFix | undefined {
-  const aTokens = offending.path.split("/");
-  const bTokens = firstPath.split("/");
-  if (aTokens.length !== bTokens.length) return undefined;
-
-  const offendingSegments: string[] = [];
-  for (let i = 0; i < aTokens.length; i++) {
-    if (aTokens[i] === bTokens[i]) continue;
-    if (aTokens[i].toLowerCase() !== bTokens[i].toLowerCase()) return undefined;
-    const isParamA = aTokens[i].startsWith("{") && aTokens[i].endsWith("}");
-    const isParamB = bTokens[i].startsWith("{") && bTokens[i].endsWith("}");
-    if (isParamA || isParamB) {
-      return undefined;
-    }
-    offendingSegments.push(aTokens[i]);
-  }
-
-  if (offendingSegments.length === 0) return undefined;
-
-  const offendingSet = new Set(offendingSegments);
-
-  // Build a list of (node, replacementText) edits from any @segment and/or
-  // @route decorators reachable from this operation that contain offending
-  // segments.  Both decorator forms can contribute path segments, so the
-  // codefix handles them together.
-  const edits: { node: StringLiteralNode; newText: string }[] = [];
-
-  for (const node of collectSegmentLiteralNodes(offending, offendingSet)) {
-    edits.push({ node, newText: `"${node.value.toLowerCase()}"` });
-  }
-
-  for (const node of collectRouteLiteralNodes(offending)) {
-    const newValue = lowercaseOffendingSegmentsInRoute(node.value, offendingSet);
-    if (newValue !== node.value) {
-      edits.push({ node, newText: `"${newValue}"` });
-    }
-  }
-
-  if (edits.length === 0) return undefined;
-
-  return {
-    id: "arm-segment-to-lowercase",
-    label: "Lowercase the conflicting @segment(...) or @route(...) value(s)",
-    fix(fixContext) {
-      return edits.map((edit) =>
-        fixContext.replaceText(getSourceLocation(edit.node), edit.newText),
-      );
-    },
-  };
-}
-
-/**
- * Replace any occurrences of an offending segment (delimited by `/` or string
- * start/end) inside a `@route` literal with its lowercase form.  Path
- * parameter tokens like `{Name}` are left alone.
- */
-function lowercaseOffendingSegmentsInRoute(value: string, offending: Set<string>): string {
-  const parts = value.split("/");
-  for (let i = 0; i < parts.length; i++) {
-    if (parts[i].length === 0) continue;
-    if (parts[i].startsWith("{") && parts[i].endsWith("}")) continue;
-    if (offending.has(parts[i])) {
-      parts[i] = parts[i].toLowerCase();
-    }
-  }
-  return parts.join("/");
-}
-
-/**
- * Collect `@route(...)` string literal nodes reachable from the operation —
- * the operation itself, its containing interface, and ancestor namespaces.
- */
-function collectRouteLiteralNodes(op: HttpOperation): StringLiteralNode[] {
-  const result: StringLiteralNode[] = [];
-  const seen = new Set<unknown>();
-
-  const visitDecorators = (decorators: readonly DecoratorApplication[] | undefined) => {
-    if (!decorators) return;
-    for (const dec of decorators) {
-      if (dec.decorator.name !== "$route") continue;
-      const node = dec.node;
-      if (!node || node.arguments.length === 0) continue;
-      const arg = node.arguments[0];
-      if (arg.kind !== SyntaxKind.StringLiteral) continue;
-      const stringNode = arg as StringLiteralNode;
-      if (seen.has(stringNode)) continue;
-      seen.add(stringNode);
-      result.push(stringNode);
-    }
-  };
-
-  visitDecorators(op.operation.decorators);
-  if (op.operation.interface) {
-    visitDecorators(op.operation.interface.decorators);
-  }
-  let ns = op.operation.namespace;
-  while (ns) {
-    visitDecorators(ns.decorators);
-    ns = ns.namespace;
-  }
-  return result;
-}
-
-function collectSegmentLiteralNodes(op: HttpOperation, values: Set<string>): StringLiteralNode[] {
-  const seen = new Set<unknown>();
-  const result: StringLiteralNode[] = [];
-
-  const visitDecorators = (decorators: readonly DecoratorApplication[]) => {
-    for (const dec of decorators) {
-      if (dec.decorator.name !== "$segment") continue;
-      const node = dec.node;
-      if (!node || node.arguments.length === 0) continue;
-      const arg = node.arguments[0];
-      if (arg.kind !== SyntaxKind.StringLiteral) continue;
-      const stringNode = arg as StringLiteralNode;
-      if (!values.has(stringNode.value)) continue;
-      if (seen.has(stringNode)) continue;
-      seen.add(stringNode);
-      result.push(stringNode);
-    }
-  };
-
-  const visitedModels = new Set<Model>();
-  const visitModel = (model: Model) => {
-    if (visitedModels.has(model)) return;
-    visitedModels.add(model);
-    for (const prop of model.properties.values()) {
-      visitProperty(prop);
-    }
-    if (model.baseModel) visitModel(model.baseModel);
-  };
-
-  const visitedProps = new Set<ModelProperty>();
-  const visitProperty = (prop: ModelProperty) => {
-    if (visitedProps.has(prop)) return;
-    visitedProps.add(prop);
-    visitDecorators(prop.decorators);
-    if (prop.type.kind === "Model") {
-      visitModel(prop.type);
-    }
-  };
-
-  // Scan operation's own decorators.
-  visitDecorators(op.operation.decorators);
-
-  // Scan the operation's parameter model and its referenced models for
-  // @segment decorators (this typically reaches the resource's `name`
-  // property where ARM segment decorators live).
-  if (op.operation.parameters) {
-    visitModel(op.operation.parameters);
-  }
-
-  return result;
 }

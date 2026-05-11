@@ -12,9 +12,6 @@ paths differ only by character casing (for example `/foos` and `/Foos`, or
 are part of the comparison: paths whose parameter names differ (for example
 `/{resourceUri}/...` versus `/{scope}/...`) are treated as distinct.
 
-When the casing difference is in a `@segment("...")` decorator value, an
-auto-fix is offered that lowercases the offending segment.
-
 #### ❌ Incorrect
 
 ```tsp
