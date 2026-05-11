@@ -2,7 +2,7 @@
 title: resource-name-pattern
 ---
 
-```text title=- Full name-
+```text title="Full name"
 @azure-tools/typespec-azure-resource-manager/arm-resource-name-pattern
 ```
 

@@ -2,7 +2,7 @@
 title: unsupported-type
 ---
 
-```text title=- Full name-
+```text title="Full name"
 @azure-tools/typespec-azure-resource-manager/unsupported-type
 ```
 
