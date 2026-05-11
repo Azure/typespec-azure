@@ -62,6 +62,20 @@ describe("typespec-autorest: model definitions", () => {
     strictEqual(res.defs.Foo.properties.y.title, "YProp");
   });
 
+  it("emits property-level @example", async () => {
+    const res = await oapiForModel(
+      "Test",
+      `
+      model Test {
+        @TypeSpec.example("core.windows.net")
+        abcd: string;
+      };
+      `,
+    );
+
+    expect(res.defs.Test.properties.abcd.example).toEqual("core.windows.net");
+  });
+
   it("uses json name specified via @encodedName", async () => {
     const res = await oapiForModel(
       "Foo",

@@ -394,6 +394,27 @@ it("emits x-ms-azure-resource for resource with @azureResourceBase", async () =>
   ok(openApi.definitions?.Widget["x-ms-azure-resource"]);
 });
 
+it("emits allOf reference to AzureEntityResource for a model extending AzureEntityResource", async () => {
+  const openApi = await compileOpenAPI(
+    `
+    @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+    /** Move response */
+    model MoveResponse extends Azure.ResourceManager.CommonTypes.AzureEntityResource {
+      /** The status of the move */
+      movingStatus: string;
+    }
+`,
+    { preset: "azure" },
+  );
+  expect((openApi.definitions?.MoveResponse as any).allOf).toStrictEqual([
+    {
+      $ref: "../../common-types/resource-management/v3/types.json#/definitions/AzureEntityResource",
+    },
+  ]);
+});
+
 it("emits x-ms-external for resource with @armExternalType", async () => {
   const openApi = await compileOpenAPI(
     `

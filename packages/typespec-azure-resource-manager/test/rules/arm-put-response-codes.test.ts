@@ -28,11 +28,7 @@ it("Emits a warning for put operation that does not contain the appropriate resp
       namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
+        ...ResourceNameParameter<Employee>;
       }
       
       @armResourceOperations
@@ -59,11 +55,7 @@ it("Emits a warning for put action that does not contain the appropriate respons
       namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
+        ...ResourceNameParameter<Employee>;
       }
       
       @armResourceOperations
@@ -90,11 +82,7 @@ it("Does not emit a warning for put operation that contains the appropriate resp
       namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
+        ...ResourceNameParameter<Employee>;
       }
       
       @armResourceOperations
@@ -122,11 +110,7 @@ it("Does not emit a warning for operation that uses the 'ArmResourceCreateOrUpda
       namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
+        ...ResourceNameParameter<Employee>;
       }
       
       @armResourceOperations
@@ -146,11 +130,7 @@ it("Does not emit a warning for operation that uses the 'ArmResourceCreateOrRepl
       namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
+        ...ResourceNameParameter<Employee>;
       }
       
       @armResourceOperations
@@ -170,11 +150,7 @@ it("Does not emit a warning for operation that uses the 'ArmResourceCreateOrRepl
       namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
+        ...ResourceNameParameter<Employee>;
       }
       
       @armResourceOperations
@@ -194,11 +170,7 @@ it("Does not emit a warning for put action that contains the appropriate respons
       namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
+        ...ResourceNameParameter<Employee>;
       }
       
       @armResourceOperations
