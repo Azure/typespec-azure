@@ -1,5 +1,5 @@
 ---
-title: arm-delete-operation-response-codes
+title: delete-operation-response-codes
 ---
 
 ```text title=- Full name-

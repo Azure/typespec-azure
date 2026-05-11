@@ -1,5 +1,5 @@
 ---
-title: arm-resource-name-pattern
+title: resource-name-pattern
 ---
 
 ```text title=- Full name-

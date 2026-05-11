@@ -38,12 +38,12 @@ Resources are modeled in TypeSpec by choosing a _base resource type_, defining _
 Tracked resources use the `TrackedResource<TProperties/>` as their base resource type, where `TProperties` is the properties model for the rp-specific properties of the resource. Here is an example:
 
 ```typespec
-model EmployeeResource is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
 }
 ```
 
-`...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">`: spreads in the standard resource name parameter, which automatically defines the resource type name, parameter name, and path segment based on the resource model.
+`...ResourceNameParameter<Employee>`: spreads in the standard resource name parameter, which automatically defines the resource type name, parameter name, and path segment based on the resource model.
 
 You can find samples of Tracked Resources [in the Tracked Resource sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/resource-types/tracked/main.tsp).
 
@@ -53,13 +53,13 @@ Tenant resources use the `ProxyResource<TProperties/>` as their base resource ty
 
 ```typespec
 @tenantResource
-model EmployeeResource is ProxyResource<EmployeeProperties> {
-  ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
+model Employee is ProxyResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
 }
 ```
 
 `@tenantResource`: designates this resource as being a cross-tenant resource, with scope across all customer subscriptions in the tenant.
-`...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">`: spreads in the standard resource name parameter, which automatically defines the resource type name, parameter name, and path segment based on the resource model.
+`...ResourceNameParameter<Employee>`: spreads in the standard resource name parameter, which automatically defines the resource type name, parameter name, and path segment based on the resource model.
 
 You can find samples of Tenant Resources [in the TenantResource sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/resource-types/tenant/main.tsp).
 
@@ -195,14 +195,14 @@ You can find the complete sample of Extension Resources [in the specific-extensi
 Child resources usually use the `ProxyResource<TProperties/>` as their base resource type, where `TProperties` is the properties model for the rp-specific properties of the resource. Here is an example:
 
 ```typespec
-@parentResource(EmployeeResource)
-model JobResource is ProxyResource<JobProperties> {
-  ...ResourceNameParameter<JobResource, KeyName = "jobName", SegmentName = "jobs">;
+@parentResource(Employee)
+model Job is ProxyResource<JobProperties> {
+  ...ResourceNameParameter<Job>;
 }
 ```
 
 `@parentResource`: designates the model type for the parent of this child resource. The resource identifier for this resource will be prepended with the resource identity of the parent.
-`...ResourceNameParameter<JobResource, KeyName = "jobName", SegmentName = "jobs">`: spreads in the standard resource name parameter, which automatically defines the resource type name, parameter name, and path segment based on the resource model.
+`...ResourceNameParameter<Job>`: spreads in the standard resource name parameter, which automatically defines the resource type name, parameter name, and path segment based on the resource model.
 
 You can find samples of Child Resources [in the Proxy Resource sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/resource-types/proxy/main.tsp).
 
@@ -212,13 +212,13 @@ Subscription-based resources use the `ProxyResource<TProperties/>` as their base
 
 ```typespec
 @subscriptionResource
-model EmployeeResource is ProxyResource<EmployeeProperties> {
-  ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
+model Employee is ProxyResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
 }
 ```
 
 `@subscriptionResource`: designates this resource as being a cross-subscription resource, with scope across all resource groups in the subscription.
-`...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">`: spreads in the standard resource name parameter, which automatically defines the resource type name, parameter name, and path segment based on the resource model.
+`...ResourceNameParameter<Employee>`: spreads in the standard resource name parameter, which automatically defines the resource type name, parameter name, and path segment based on the resource model.
 
 You can find samples of Subscription Resources [in the OperationTemplates sample](/docs/samples/resource-manager/resource-types/tracked/).
 
@@ -251,18 +251,14 @@ Singleton resources can use any resource base type, but most often use `ProxyRes
 ```typespec
 @singleton
 @tenantResource
-model EmployeeAgreementResource is ProxyResource<EmployeeAgreementProperties> {
-  ...ResourceNameParameter<
-    EmployeeAgreementResource,
-    KeyName = "employeeAgreementName",
-    SegmentName = "employeeAgreements"
-  >;
+model EmployeeAgreement is ProxyResource<EmployeeAgreementProperties> {
+  ...ResourceNameParameter<EmployeeAgreement>;
 }
 ```
 
 `@singleton`: indicates that there can only be one of the resources in the resource container (in this case, only one instance in the customer tenant).
 `@tenantResource`: designates this resource as being a cross-tenant resource, with scope across all customer subscriptions in the tenant.
-`...ResourceNameParameter<EmployeeAgreementResource, KeyName = "employeeAgreementName", SegmentName = "employeeAgreements">`: spreads in the standard resource name parameter, which automatically defines the resource type name, parameter name, and path segment based on the resource model.
+`...ResourceNameParameter<EmployeeAgreement>`: spreads in the standard resource name parameter, which automatically defines the resource type name, parameter name, and path segment based on the resource model.
 
 You can find samples of Singleton Resources [in the Singleton sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/resource-types/singleton/main.tsp).
 
@@ -277,11 +273,11 @@ Modifying the ARM envelope is discussed in later sections on [mixing in standard
 
 The inner _rp-specific property bag_ consists of all of the properties that the RP needs to manage about the resource. Properties should be completely specified, should not duplicate properties from the _ARM envelope_, and may consist of simple types, arrays, or other complex properties.
 
-Here is an example of a property bag for the `EmployeeResource` resource.
+Here is an example of a property bag for the `Employee` resource.
 
 ```typespec
-model EmployeeResource is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
 }
 
 union EmployeeProvisioningState {
@@ -481,8 +477,8 @@ Standard configuration for ARM support of both SystemAssigned and UserAssigned M
 - If a resource allows both generated (SystemAssigned) and user-assigned (UserAssigned) Managed Identity, use the spread (...) operator to include the standard `ManagedServiceIdentityProperty` envelope property. This will allow users to manage any ManagedServiceIdentity associated with this resource.
 
   ```typespec
-  model EmployeeResource is TrackedResource<EmployeeProperties> {
-    ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
+  model Employee is TrackedResource<EmployeeProperties> {
+    ...ResourceNameParameter<Employee>;
     ...ManagedServiceIdentityProperty;
   }
   ```
@@ -490,8 +486,8 @@ Standard configuration for ARM support of both SystemAssigned and UserAssigned M
 - If a resource allows only generated (SystemAssigned) Managed Identity, use the spread operator (...) to include the `ManagedSystemAssignedIdentityProperty` standard envelope property in the resource definition. This will allow users to manage the SystemAssigned identity associated with this resource.
 
   ```typespec
-  model EmployeeResource is TrackedResource<EmployeeProperties> {
-    ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
+  model Employee is TrackedResource<EmployeeProperties> {
+    ...ResourceNameParameter<Employee>;
     ...ManagedSystemAssignedIdentityProperty;
   }
   ```
@@ -503,8 +499,8 @@ For more information, see [Managed Service Identity Support](https://eng.ms/docs
 Standard support for setting a SKU-based service level for a resource. To enable SKU support, add the `ResourceSkuProperty` envelope property to the resource definition:
 
 ```typespec
-model EmployeeResource is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
   ...ResourceSkuProperty;
 }
 ```
@@ -516,8 +512,8 @@ For more information, see [SKU Support](https://eng.ms/docs/products/arm/rpaas/s
 Indicator that entity-tag operation concurrency support is enabled for this resource. To enable ETags, add the `EntityTagProperty` envelope property to the resource definition.
 
 ```typespec
-model EmployeeResource is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
   ...EntityTagProperty;
 }
 ```
@@ -529,8 +525,8 @@ For more information, and limitations on RPaaS concurrency support, see [RPaaS E
 Support for marketplace billing configuration for the resource. To enable `Plan` support, add the `ResourcePlanProperty` standard envelope property to the resource definition.
 
 ```typespec
-model EmployeeResource is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
   ...ResourcePlanProperty;
 }
 ```
@@ -542,8 +538,8 @@ See [MarketPlace Third Party Billing Support](https://eng.ms/docs/products/arm/r
 Support for certain kinds of portal user experiences based on the kind of resource. To include 'Kind' in the resource definition, add the `ResourceKindProperty` standard envelope property.
 
 ```typespec
-model EmployeeResource is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
   ...ResourceKindProperty;
 }
 ```
@@ -555,8 +551,8 @@ For more information on user experiences in the Azure Portal, see [Portal Suppor
 Support for management of this resource by other resources. To add 'ManagedBy' support to the resource, add the `ManagedByProperty` envelope property to the resource definition:
 
 ```typespec
-model EmployeeResource is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<EmployeeResource, KeyName = "employeeName", SegmentName = "employees">;
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
   ...ManagedByProperty;
 }
 ```

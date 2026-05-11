@@ -1,5 +1,5 @@
 ---
-title: arm-put-operation-response-codes
+title: put-operation-response-codes
 ---
 
 ```text title=- Full name-
