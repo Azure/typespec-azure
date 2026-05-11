@@ -52,6 +52,7 @@ function getEndpointTypeFromSingleServer<
       {
         name: "endpoint",
         isGeneratedName: true,
+        isExactName: false,
         doc: "Service host",
         kind: "path",
         onClient: true,
@@ -153,6 +154,7 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
       variantTypes: types,
       name: createGeneratedName(context, service, "Endpoint"),
       isGeneratedName: true,
+      isExactName: false,
       apiVersions: client.apiVersions,
       crossLanguageDefinitionId: `${client.crossLanguageDefinitionId}.Endpoint`,
       namespace: getClientNamespace(context, service),
@@ -166,6 +168,7 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
     type,
     name: "endpoint",
     isGeneratedName: true,
+    isExactName: false,
     doc: "Service host",
     onClient: true,
     urlEncode: false,
@@ -314,6 +317,7 @@ function createSdkClientInitializationType<
     initializedBy: isRootClient ? InitializedByFlags.Individually : InitializedByFlags.Default,
     name,
     isGeneratedName: true,
+    isExactName: false,
     decorators: [],
   };
   let initializationOptions: ClientInitializationOptions | undefined = undefined;
