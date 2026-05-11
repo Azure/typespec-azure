@@ -955,6 +955,8 @@ When `@apiVersion(false)` is applied to a parameter:
 - It stays as a method-level parameter and is **not** elevated to the client
 - Other operations in the same client can still have their API version parameters elevated to the client normally
 
+<ClientTabs>
+
 ```typespec
 import "@typespec/versioning";
 import "@typespec/http";
@@ -985,28 +987,45 @@ op getSnapshot(
 ): void;
 ```
 
-In the generated client, `listResources` will use the client-level API version parameter (defaulting to `"2024-04-01"`), while `getSnapshot` will require `apiVersion` to be passed explicitly as a method parameter.
+```python
+from my.service import MyServiceClient
 
-### Body Model Properties Named `apiVersion`
-
-API version detection by name only applies to HTTP metadata parameters (header, query, path, or cookie parameters). A body model property named `apiVersion` or `api-version` will **not** be treated as an API version parameter.
-
-```typespec
-import "@typespec/http";
-
-using Http;
-
-model MyRequestBody {
-  // This is a regular body property, NOT treated as an API version parameter
-  apiVersion: string;
-
-  data: string;
-}
-
-op createResource(@body body: MyRequestBody): void;
+client = MyServiceClient(endpoint=..., credential=...)
+client.list_resources()  # Uses client-level api-version (default "2024-04-01")
+client.get_snapshot(api_version="2023-11-01")  # Operation-level parameter
 ```
 
-In this example, `apiVersion` inside the body model is a normal property and will not be elevated to the client or given any special API version behavior.
+```csharp
+public virtual Response ListResources(CancellationToken cancellationToken = default);
+public virtual Response GetSnapshot(string apiVersion, CancellationToken cancellationToken = default);
+```
+
+```typescript
+export function listResources(
+  context: Client,
+  options?: ListResourcesOptionalParams,
+): Promise<void>;
+
+export function getSnapshot(
+  context: Client,
+  apiVersion: string,
+  options?: GetSnapshotOptionalParams,
+): Promise<void>;
+```
+
+```java
+public void listResources();
+public void getSnapshot(String apiVersion);
+```
+
+```go
+func (client *ServiceClient) ListResources(ctx context.Context, options *ListResourcesOptions) (ListResourcesResponse, error)
+func (client *ServiceClient) GetSnapshot(ctx context.Context, apiVersion string, options *GetSnapshotOptions) (GetSnapshotResponse, error)
+```
+
+</ClientTabs>
+
+In the generated client, `listResources` will use the client-level API version parameter (defaulting to `"2024-04-01"`), while `getSnapshot` will require `apiVersion` to be passed explicitly as a method parameter.
 
 ## Extending the Client API Version Enum (`@clientApiVersions`)
 
