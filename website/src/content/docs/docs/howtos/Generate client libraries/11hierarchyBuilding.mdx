@@ -55,12 +55,12 @@ class A(C):
 ```csharp
 public partial class C
 {
-    public string? C { get; set; }
+    public string? CValue { get; set; }
 }
 
 public partial class A : C
 {
-    public string? A { get; set; }
+    public string? AValue { get; set; }
     public string? B { get; set; }
 }
 ```
@@ -212,7 +212,7 @@ public partial class C
 
 public partial class A : C
 {
-    public string? A { get; set; }
+    public string? AValue { get; set; }
 }
 ```
 
@@ -246,7 +246,7 @@ type C struct {
 
 type A struct {
 	C
-	A *string
+	AValue *string
 }
 ```
 
@@ -292,7 +292,7 @@ public partial class C
 
 public partial class A : C
 {
-    public string? A { get; set; }
+    public string? AValue { get; set; }
 }
 ```
 
@@ -326,7 +326,7 @@ type C struct {
 
 type A struct {
 	C
-	A *string
+	AValue *string
 }
 ```
 
