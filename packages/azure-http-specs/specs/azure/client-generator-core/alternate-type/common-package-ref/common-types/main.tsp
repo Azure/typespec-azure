@@ -11,9 +11,7 @@ using Spector;
  * that use `@alternateType` with `ExternalType` can reference the generated
  * package instead of re-generating these types inline.
  */
-@scenarioService(
-  "/azure/client-generator-core/alternate-type/common-package-ref/common-types"
-)
+@scenarioService("/azure/client-generator-core/alternate-type/common-package-ref/common-types")
 @service
 namespace _Specs_.Azure.ClientGenerator.Core.AlternateType.CommonPackageRef.CommonTypes;
 

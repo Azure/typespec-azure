@@ -53,7 +53,10 @@ const modelWithAddressProperty = {
   name: "test",
 };
 
-const modelPropertyScenarioTypes = createMockApiDefinitions("property", json(modelWithAddressProperty));
+const modelPropertyScenarioTypes = createMockApiDefinitions(
+  "property",
+  json(modelWithAddressProperty),
+);
 
 Scenarios.Azure_ClientGenerator_Core_AlternateType_CommonPackageRef_getProperty = passOnSuccess(
   modelPropertyScenarioTypes[0],
