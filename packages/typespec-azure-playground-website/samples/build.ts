@@ -48,10 +48,7 @@ async function findSampleConfigs(dir: string): Promise<string[]> {
 }
 
 /** Check if any ancestor directory config has playground: false. */
-async function isPlaygroundExcludedByParent(
-  sampleDir: string,
-  specsDir: string,
-): Promise<boolean> {
+async function isPlaygroundExcludedByParent(sampleDir: string, specsDir: string): Promise<boolean> {
   let dir = dirname(sampleDir);
   while (dir.startsWith(specsDir)) {
     const configPath = join(dir, "sample-config.yaml");
