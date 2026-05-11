@@ -145,55 +145,15 @@ jobs:
         run: |
           echo "=== Build info for ${{ matrix.name }} E2E ==="
           echo ""
-          echo "All packages are built from source (workspace). Version numbers"
-          echo "reflect the last release tag, not a published npm install."
-          echo ""
           echo "--- Source commits ---"
           echo "  typespec-azure: $(git rev-parse --short HEAD) ($(git log -1 --format=%ci))"
           echo "  typespec core:  $(git -C core rev-parse --short HEAD) ($(git -C core log -1 --format=%ci))"
           echo ""
-          echo "--- Key package versions (from source) ---"
-          node -e "
-            const fs = require('fs');
-            const path = require('path');
-
-            const keyPackages = [
-              'core/packages/compiler',
-              'core/packages/http',
-              'core/packages/rest',
-              'core/packages/openapi',
-              'core/packages/openapi3',
-              'core/packages/versioning',
-              'core/packages/xml',
-              'core/packages/events',
-              'core/packages/sse',
-              'core/packages/streams',
-              'packages/typespec-azure-core',
-              'packages/typespec-client-generator-core',
-              'packages/typespec-azure-resource-manager',
-              'packages/typespec-autorest',
-              'packages/typespec-python',
-            ];
-
-            for (const dir of keyPackages) {
-              try {
-                const p = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf8'));
-                console.log('  ' + p.name + ': ' + p.version + ' (workspace)');
-              } catch {}
-            }
-
-            // Overridden packages (built from core submodule, injected via tgz)
-            const rootPkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-            const overrides = rootPkg.pnpm?.overrides || {};
-            if (Object.keys(overrides).length > 0) {
-              console.log('');
-              console.log('--- Overridden excluded packages (built from core submodule) ---');
-              Object.entries(overrides).forEach(([k, v]) => {
-                const tgzName = path.basename(v);
-                console.log('  ' + k + ': ' + tgzName);
-              });
-            }
-          "
+          echo "--- Core TypeSpec pending versions (dev) ---"
+          cd core && pnpm chronus status 2>/dev/null && cd ..
+          echo ""
+          echo "--- Azure TypeSpec pending versions (dev) ---"
+          pnpm chronus status 2>/dev/null
           "
 
       # --- Language-specific preparation ---
