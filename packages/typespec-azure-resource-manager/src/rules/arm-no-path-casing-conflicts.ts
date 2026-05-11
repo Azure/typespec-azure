@@ -15,10 +15,10 @@ import { isInternalTypeSpec } from "./utils.js";
 export const armNoPathCasingConflictsRule = createRule({
   name: "arm-no-path-casing-conflicts",
   severity: "warning",
-  description: "Operation paths must be unique case-insensitively.",
+  description: "Operation paths must be unique when compared case-insensitively.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-no-path-casing-conflicts",
   messages: {
-    default: paramMessage`Operation path '${"pathA"}' differs from operation path '${"pathB"}' only by character casing. Each ARM operation path must be unique case-insensitively.`,
+    default: paramMessage`Operation path '${"pathA"}' differs from operation path '${"pathB"}' only by character casing. Each ARM operation path must be unique when compared case-insensitively.`,
   },
   create(context): SemanticNodeListener {
     return {

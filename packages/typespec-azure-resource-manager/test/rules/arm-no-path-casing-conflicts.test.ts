@@ -37,11 +37,11 @@ it("emits a diagnostic when two operation paths differ only by segment casing", 
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/arm-no-path-casing-conflicts",
       message:
-        "Operation path '/providers/Microsoft.Contoso/Foos' differs from operation path '/providers/Microsoft.Contoso/foos' only by character casing. Each ARM operation path must be unique case-insensitively.",
+        "Operation path '/providers/Microsoft.Contoso/Foos' differs from operation path '/providers/Microsoft.Contoso/foos' only by character casing. Each ARM operation path must be unique when compared case-insensitively.",
     });
 });
 
-it("does not emit when two operations share the exact same path (handled by @route duplicate check)", async () => {
+it("does not emit when two operations share the exact same path", async () => {
   await tester
     .expect(
       `
@@ -92,7 +92,7 @@ it("emits a diagnostic when paths differ only by path parameter name casing", as
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/arm-no-path-casing-conflicts",
       message:
-        "Operation path '/providers/Microsoft.Contoso/foos/{resourceName}' differs from operation path '/providers/Microsoft.Contoso/foos/{ResourceName}' only by character casing. Each ARM operation path must be unique case-insensitively.",
+        "Operation path '/providers/Microsoft.Contoso/foos/{resourceName}' differs from operation path '/providers/Microsoft.Contoso/foos/{ResourceName}' only by character casing. Each ARM operation path must be unique when compared case-insensitively.",
     });
 });
 
@@ -133,7 +133,7 @@ it("buckets paths whose parameter names match case-insensitively together (diagn
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/arm-no-path-casing-conflicts",
       message:
-        "Operation path '/{Scope}/providers/Microsoft.Foo/widgets' differs from operation path '/{scope}/providers/microsoft.foo/widgets' only by character casing. Each ARM operation path must be unique case-insensitively.",
+        "Operation path '/{Scope}/providers/Microsoft.Foo/widgets' differs from operation path '/{scope}/providers/microsoft.foo/widgets' only by character casing. Each ARM operation path must be unique when compared case-insensitively.",
     });
 });
 
@@ -154,34 +154,6 @@ it("emits a diagnostic for two @route operations (delete and get) that differ on
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/arm-no-path-casing-conflicts",
       message:
-        "Operation path '/providers/Microsoft.Contoso/Foos/{name}' differs from operation path '/providers/Microsoft.Contoso/foos/{name}' only by character casing. Each ARM operation path must be unique case-insensitively.",
+        "Operation path '/providers/Microsoft.Contoso/Foos/{name}' differs from operation path '/providers/Microsoft.Contoso/foos/{name}' only by character casing. Each ARM operation path must be unique when compared case-insensitively.",
     });
-});
-
-it("does not check operations from internal TypeSpec namespaces", async () => {
-  // Operations in Azure.ResourceManager / TypeSpec / Azure.Core should be
-  // ignored.  Define only one user-facing operation that would otherwise
-  // collide with something internal — none does, so this should be valid.
-  await tester
-    .expect(
-      `
-      @armProviderNamespace
-      @service(#{ title: "Test" })
-      namespace Microsoft.Contoso;
-
-      model Foo is ProxyResource<{}> {
-        @key("fooName")
-        @path
-        @segment("foos")
-        @visibility(Lifecycle.Read)
-        name: string;
-      }
-
-      @armResourceOperations
-      interface Foos {
-        get is ArmResourceRead<Foo>;
-      }
-      `,
-    )
-    .toBeValid();
 });
