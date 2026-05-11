@@ -15,7 +15,7 @@
   "scripts": {
     "clean": "rimraf ./dist",
     "build": "tsc -p tsconfig.build.json",
-    "test": "tsx --test ./test/**/*.test.ts",
+    "test": "vitest run",
     "watch": "tsc -p tsconfig.build.json --watch",
     "bench": "node ./dist/src/cli.js run",
     "bench:compare": "node ./dist/src/cli.js compare"
@@ -36,6 +36,7 @@
   "devDependencies": {
     "@types/node": "catalog:",
     "rimraf": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }
