@@ -1260,9 +1260,32 @@ export type ReorderParametersFunctionImplementation = (
   order: readonly string[],
 ) => Operation;
 
+/**
+ * Mark a client name as exact, preventing language emitters from applying
+ * their usual casing transformations (e.g., snake_case for Python, camelCase for JavaScript).
+ *
+ * Use this with `@clientName` when you want the name to be used exactly as specified,
+ * without any automatic casing conversion.
+ *
+ * @param name The exact name to use in generated client code.
+ * @returns The name with an internal marker that signals emitters to preserve it as-is.
+ * @example Preserve exact casing for a specific language
+ * ```typespec
+ * @clientName(exact("hello_world"), "python")
+ * model MyModel {}
+ * ```
+ * @example Preserve exact casing for all languages
+ * ```typespec
+ * @clientName(exact("myExactName"))
+ * op myOperation(): void;
+ * ```
+ */
+export type ExactFunctionImplementation = (context: FunctionContext, name: string) => string;
+
 export type AzureClientGeneratorCoreFunctions = {
   replaceParameter: ReplaceParameterFunctionImplementation;
   removeParameter: RemoveParameterFunctionImplementation;
   addParameter: AddParameterFunctionImplementation;
   reorderParameters: ReorderParametersFunctionImplementation;
+  exact: ExactFunctionImplementation;
 };
