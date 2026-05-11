@@ -1,6 +1,10 @@
 name: Nightly E2E Tests
 
 on:
+  # TODO: Remove push trigger before merging — added for testing only
+  push:
+    branches:
+      - python/addNightly
   schedule:
     - cron: "0 8 * * *" # Daily at 8 AM UTC
   workflow_dispatch:
