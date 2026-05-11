@@ -37,12 +37,12 @@ interface Users {
 
 The following operation templates for different kinds of actions are provided in the `Azure.ResourceManager` namespace:
 
-| Template                                                 | Description                                                                                        |
-| -------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| `ArmResourceActionNoContentSync<TResource, TRequest>`    | Synchronous action with no data in the response, providing the resource type and request payload.  |
-| `ArmResourceActionNoContentAsync<TResource, TRequest>`   | Asynchronous action with no data in the response, providing the resource type and request payload. |
-| `ArmResourceActionSync<TResource, TRequest, TResponse>`  | Synchronous action, providing the resource type and request and response payload.                  |
-| `ArmResourceActionAsync<TResource, TRequest, TResponse>` | Asynchronous action, providing the resource type and request and response payload.                 |
+| Template                                                       | Description                                                                                        |
+| -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `ArmResourceActionNoContentSync<TResource, TRequest>`          | Synchronous action with no data in the response, providing the resource type and request payload.  |
+| `ArmResourceActionNoResponseContentAsync<TResource, TRequest>` | Asynchronous action with no data in the response, providing the resource type and request payload. |
+| `ArmResourceActionSync<TResource, TRequest, TResponse>`        | Synchronous action, providing the resource type and request and response payload.                  |
+| `ArmResourceActionAsync<TResource, TRequest, TResponse>`       | Asynchronous action, providing the resource type and request and response payload.                 |
 
 ## Custom Operations
 

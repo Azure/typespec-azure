@@ -32,7 +32,7 @@ extern dec armProviderNamespace(target: Namespace, providerNamespace?: valueof s
 extern dec useLibraryNamespace(target: Namespace, ...namespaces: Namespace[]);
 
 /**
- * `@armLibraryNamespace` designates a namespace as containign Azure Resource Manager Provider information.
+ * `@armLibraryNamespace` designates a namespace as containing Azure Resource Manager Provider information.
  *
  * @example
  *
@@ -110,7 +110,7 @@ extern dec resourceGroupResource(target: Model);
 extern dec extensionResource(target: Model);
 
 /**
- * `@armResourceType` sets the value fo the decorated string
+ * `@armResourceType` sets the value of the decorated string
  * property to the type of the Azure Resource Manager resource.
  * @param resource The resource to get the type of
  */

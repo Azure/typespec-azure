@@ -658,7 +658,7 @@ op CreateOrReplaceSync<
 
 /**
  * A resource list operation, at the subscription scope, that lists only a single page
- * @template Resource the resource being patched
+ * @template Resource the resource being listed
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the list operation
  * @template Error Optional. The error response, if non-standard.
@@ -679,7 +679,7 @@ op ArmListSinglePageBySubscription<
 
 /**
  * A resource list operation, at the scope of the resource's parent that lists only a single page.
- * @template Resource the resource being patched
+ * @template Resource the resource being listed
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template ParentName Optional. The name of the parent resource
  * @template ParentFriendlyName Optional. The friendly name of the parent resource

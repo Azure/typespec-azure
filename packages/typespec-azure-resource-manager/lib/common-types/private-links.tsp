@@ -144,7 +144,7 @@ model PrivateEndpointConnectionParameter {
  * @template KeyName The name of the private endpoint connection name parameter (default is "privateEndpointConnectionName")
  * @template ResourceNamePattern The regex pattern for the private endpoint connection name (default is "^[a-z][a-zA-Z0-9]*$")
  * @template MinLength The minimum length for the private endpoint connection name (default is 3)
- * @template MaxLength The maximum length for the private endpoint connection name (default is 63
+ * @template MaxLength The maximum length for the private endpoint connection name (default is 63)
  */
 model PrivateEndpointConnectionNameParameter<
   KeyName extends valueof string = string("privateEndpointConnectionName"),
@@ -179,7 +179,7 @@ model PrivateLinkResourceParameter<Segment extends valueof string = "privateLink
  * @template Segment The resource type name for private links (default is privateLinkResources)
  * @template ResourceNamePattern The regex pattern for the private link resource name (default is "^[a-z][a-zA-Z0-9]*$")
  * @template MinLength The minimum length for the private link resource name (default is 3)
- * @template MaxLength The maximum length for the private link resource name (default is 63
+ * @template MaxLength The maximum length for the private link resource name (default is 63)
  */
 model PrivateLinkResourceNameParameter<
   Segment extends valueof string = "privateLinkResources",

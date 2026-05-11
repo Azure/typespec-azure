@@ -284,7 +284,7 @@ interface PrivateEndpoints<
    * @template OverrideResourceName Optional. The name of the private endpoint connection resource being operated on.
    */
   @autoRoute
-  @doc("Update a {name PrivateEndpointConnection}", ParentResource)
+  @doc("Update a {name} PrivateEndpointConnection", ParentResource)
   @builtInResourceOperation(ParentResource, Resource, "update", OverrideResourceName)
   @Private.enforceConstraint(ParentResource, Foundations.Resource)
   @patch(#{ implicitOptionality: false })
