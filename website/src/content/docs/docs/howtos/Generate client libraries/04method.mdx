@@ -2279,8 +2279,10 @@ export async function exists(
 
 When this decorator is applied:
 
-- All successful (2xx) responses are modeled as returning `true`
-- A 404 response is modeled as returning `false` (moved from exceptions to normal responses)
+- The method returns a `boolean` value — this is a purely client-side concept computed from the HTTP status code
+- A successful response (2xx) means the method returns `true`
+- A 404 response means the method returns `false` (instead of throwing an error)
+- The HTTP-level response has no body type; the boolean is derived entirely from the status code
 - If the operation has no explicit 404 response, one is automatically added
 
 :::note
