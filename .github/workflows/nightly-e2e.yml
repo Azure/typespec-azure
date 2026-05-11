@@ -143,56 +143,57 @@ jobs:
 
       - name: Log package versions
         run: |
-          echo "=== Package versions for ${{ matrix.name }} E2E ==="
+          echo "=== Build info for ${{ matrix.name }} E2E ==="
+          echo ""
+          echo "All packages are built from source (workspace). Version numbers"
+          echo "reflect the last release tag, not a published npm install."
+          echo ""
+          echo "--- Source commits ---"
+          echo "  typespec-azure: $(git rev-parse --short HEAD) ($(git log -1 --format=%ci))"
+          echo "  typespec core:  $(git -C core rev-parse --short HEAD) ($(git -C core log -1 --format=%ci))"
+          echo ""
+          echo "--- Key package versions (from source) ---"
           node -e "
             const fs = require('fs');
             const path = require('path');
 
-            function getVersion(pkgDir) {
+            const keyPackages = [
+              'core/packages/compiler',
+              'core/packages/http',
+              'core/packages/rest',
+              'core/packages/openapi',
+              'core/packages/openapi3',
+              'core/packages/versioning',
+              'core/packages/xml',
+              'core/packages/events',
+              'core/packages/sse',
+              'core/packages/streams',
+              'packages/typespec-azure-core',
+              'packages/typespec-client-generator-core',
+              'packages/typespec-azure-resource-manager',
+              'packages/typespec-autorest',
+              'packages/typespec-python',
+            ];
+
+            for (const dir of keyPackages) {
               try {
-                const pkg = JSON.parse(fs.readFileSync(path.join(pkgDir, 'package.json'), 'utf8'));
-                return pkg.version;
-              } catch { return 'not found'; }
+                const p = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf8'));
+                console.log('  ' + p.name + ': ' + p.version + ' (workspace)');
+              } catch {}
             }
 
-            // Core packages
-            const corePackages = fs.readdirSync('core/packages', { withFileTypes: true })
-              .filter(d => d.isDirectory())
-              .map(d => {
-                const pkg = path.join('core/packages', d.name, 'package.json');
-                try {
-                  const p = JSON.parse(fs.readFileSync(pkg, 'utf8'));
-                  return { name: p.name, version: p.version };
-                } catch { return null; }
-              })
-              .filter(Boolean);
-
-            // Azure packages
-            const azurePackages = fs.readdirSync('packages', { withFileTypes: true })
-              .filter(d => d.isDirectory())
-              .map(d => {
-                const pkg = path.join('packages', d.name, 'package.json');
-                try {
-                  const p = JSON.parse(fs.readFileSync(pkg, 'utf8'));
-                  return { name: p.name, version: p.version };
-                } catch { return null; }
-              })
-              .filter(Boolean);
-
-            // Overridden packages (from tgz)
+            // Overridden packages (built from core submodule, injected via tgz)
             const rootPkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
             const overrides = rootPkg.pnpm?.overrides || {};
-
-            console.log('\n--- Core TypeSpec packages ---');
-            corePackages.forEach(p => console.log('  ' + p.name + ': ' + p.version));
-
-            console.log('\n--- Azure TypeSpec packages ---');
-            azurePackages.forEach(p => console.log('  ' + p.name + ': ' + p.version));
-
             if (Object.keys(overrides).length > 0) {
-              console.log('\n--- Overridden packages (built from source) ---');
-              Object.entries(overrides).forEach(([k, v]) => console.log('  ' + k + ': ' + v));
+              console.log('');
+              console.log('--- Overridden excluded packages (built from core submodule) ---');
+              Object.entries(overrides).forEach(([k, v]) => {
+                const tgzName = path.basename(v);
+                console.log('  ' + k + ': ' + tgzName);
+              });
             }
+          "
           "
 
       # --- Language-specific preparation ---
