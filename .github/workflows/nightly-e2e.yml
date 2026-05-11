@@ -135,6 +135,60 @@ jobs:
       - name: Build
         run: pnpm turbo run --filter "${{ matrix.package-filter }}..." build
 
+      - name: Log package versions
+        run: |
+          echo "=== Package versions for ${{ matrix.name }} E2E ==="
+          node -e "
+            const fs = require('fs');
+            const path = require('path');
+
+            function getVersion(pkgDir) {
+              try {
+                const pkg = JSON.parse(fs.readFileSync(path.join(pkgDir, 'package.json'), 'utf8'));
+                return pkg.version;
+              } catch { return 'not found'; }
+            }
+
+            // Core packages
+            const corePackages = fs.readdirSync('core/packages', { withFileTypes: true })
+              .filter(d => d.isDirectory())
+              .map(d => {
+                const pkg = path.join('core/packages', d.name, 'package.json');
+                try {
+                  const p = JSON.parse(fs.readFileSync(pkg, 'utf8'));
+                  return { name: p.name, version: p.version };
+                } catch { return null; }
+              })
+              .filter(Boolean);
+
+            // Azure packages
+            const azurePackages = fs.readdirSync('packages', { withFileTypes: true })
+              .filter(d => d.isDirectory())
+              .map(d => {
+                const pkg = path.join('packages', d.name, 'package.json');
+                try {
+                  const p = JSON.parse(fs.readFileSync(pkg, 'utf8'));
+                  return { name: p.name, version: p.version };
+                } catch { return null; }
+              })
+              .filter(Boolean);
+
+            // Overridden packages (from tgz)
+            const rootPkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+            const overrides = rootPkg.pnpm?.overrides || {};
+
+            console.log('\n--- Core TypeSpec packages ---');
+            corePackages.forEach(p => console.log('  ' + p.name + ': ' + p.version));
+
+            console.log('\n--- Azure TypeSpec packages ---');
+            azurePackages.forEach(p => console.log('  ' + p.name + ': ' + p.version));
+
+            if (Object.keys(overrides).length > 0) {
+              console.log('\n--- Overridden packages (built from source) ---');
+              Object.entries(overrides).forEach(([k, v]) => console.log('  ' + k + ': ' + v));
+            }
+          "
+
       # --- Language-specific preparation ---
 
       - name: Prepare environment
