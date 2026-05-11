@@ -149,11 +149,37 @@ jobs:
           echo "  typespec-azure: $(git rev-parse --short HEAD) ($(git log -1 --format=%ci))"
           echo "  typespec core:  $(git -C core rev-parse --short HEAD) ($(git -C core log -1 --format=%ci))"
           echo ""
-          echo "--- Core TypeSpec pending versions (dev) ---"
-          cd core && pnpm chronus status 2>/dev/null && cd ..
-          echo ""
-          echo "--- Azure TypeSpec pending versions (dev) ---"
-          pnpm chronus status 2>/dev/null
+          echo "--- Dev versions (next tag on npm) ---"
+          node -e "
+            const { execSync } = require('child_process');
+            const packages = [
+              '@typespec/compiler',
+              '@typespec/http',
+              '@typespec/rest',
+              '@typespec/openapi',
+              '@typespec/openapi3',
+              '@typespec/versioning',
+              '@typespec/xml',
+              '@typespec/events',
+              '@typespec/sse',
+              '@typespec/streams',
+              '@typespec/http-client-python',
+              '@azure-tools/typespec-azure-core',
+              '@azure-tools/typespec-client-generator-core',
+              '@azure-tools/typespec-azure-resource-manager',
+              '@azure-tools/typespec-autorest',
+              '@azure-tools/typespec-python',
+            ];
+            for (const pkg of packages) {
+              try {
+                const tags = JSON.parse(execSync('npm view ' + pkg + ' dist-tags --json', { encoding: 'utf8' }));
+                const version = tags.next || tags.latest || 'unknown';
+                console.log('  ' + pkg + ': ' + version);
+              } catch {
+                console.log('  ' + pkg + ': not found on npm');
+              }
+            }
+          "
           "
 
       # --- Language-specific preparation ---
