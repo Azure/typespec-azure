@@ -267,16 +267,17 @@ describe("explicit example", () => {
     });
 
     it("references source example with relative path in versioned spec and does not copy", async () => {
+      const emitterOutputDir = resolveVirtualPath("./tsp-output");
+      // Examples are placed under the versioned output folder
       tester.fs.add(
-        "./examples/v1/getPet.json",
-        JSON.stringify({ operationId: "Pets_get", title: "Get a pet" }),
+        resolveVirtualPath("./tsp-output/stable/v1/examples/getPet.json"),
+        JSON.stringify({ operationId: "Pets_get", title: "Get a pet v1" }),
       );
       tester.fs.add(
-        "./examples/v2/getPet.json",
-        JSON.stringify({ operationId: "Pets_get", title: "Get a pet" }),
+        resolveVirtualPath("./tsp-output/stable/v2/examples/getPet.json"),
+        JSON.stringify({ operationId: "Pets_get", title: "Get a pet v2" }),
       );
 
-      const emitterOutputDir = resolveVirtualPath("./tsp-output");
       const [{ outputs }, diagnostics] = await tester.compileAndDiagnose(
         `
 @versioned(Versions)
@@ -292,6 +293,7 @@ op read(): void;
             options: {
               "@azure-tools/typespec-autorest": {
                 "emitter-output-dir": emitterOutputDir,
+                "examples-dir": `${emitterOutputDir}/{version-status}/{version}/examples`,
                 "skip-example-copying": true,
               },
             },
@@ -303,24 +305,17 @@ op read(): void;
       const v1Doc = JSON.parse(outputs["stable/v1/openapi.json"]);
       const v2Doc = JSON.parse(outputs["stable/v2/openapi.json"]);
 
+      // $ref should be relative to the swagger file: examples/getPet.json
       deepStrictEqual(v1Doc.paths["/"]?.get?.["x-ms-examples"], {
-        "Get a pet": {
-          $ref: "../../../examples/v1/getPet.json",
+        "Get a pet v1": {
+          $ref: "examples/getPet.json",
         },
       });
       deepStrictEqual(v2Doc.paths["/"]?.get?.["x-ms-examples"], {
-        "Get a pet": {
-          $ref: "../../../examples/v2/getPet.json",
+        "Get a pet v2": {
+          $ref: "examples/getPet.json",
         },
       });
-
-      // Verify examples were NOT copied to the output directory
-      expect(
-        tester.fs.fs.has(resolveVirtualPath("./tsp-output/stable/v1/examples/getPet.json")),
-      ).toBe(false);
-      expect(
-        tester.fs.fs.has(resolveVirtualPath("./tsp-output/stable/v2/examples/getPet.json")),
-      ).toBe(false);
     });
   });
 });

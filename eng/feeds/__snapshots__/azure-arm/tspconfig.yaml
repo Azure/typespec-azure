@@ -6,7 +6,7 @@ options:
     emitter-output-dir: "{project-root}"
     output-file: "{emitter-output-dir}/{version-status}/{version}/widget.json"
     arm-types-dir: "{project-root}/../../../../common-types/resource-management"
-    examples-dir: "{project-root}/examples"
+    examples-dir: "{emitter-output-dir}/{version-status}/{version}/examples"
     skip-example-copying: true
   "@azure-tools/typespec-csharp":
     emitter-output-dir: "{output-dir}/{service-dir}/Azure.ResourceManager.Contoso"

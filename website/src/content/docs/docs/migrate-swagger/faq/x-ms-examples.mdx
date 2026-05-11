@@ -13,29 +13,32 @@ Do not use `@extension("x-ms-examples", "<value>")`.
 
 ## Recommended configuration
 
-We recommend enabling the `skip-example-copying` option in your `tspconfig.yaml`. This prevents example files from being copied into the output directory and instead generates `x-ms-examples` `$ref` values that point directly to the source example files using relative paths.
+We recommend using `skip-example-copying` together with an `examples-dir` that places examples under the versioned output folder. This keeps example files co-located with the generated swagger and avoids copying files during compilation.
 
 ```yaml
 options:
   "@azure-tools/typespec-autorest":
+    emitter-output-dir: "{project-root}"
+    examples-dir: "{emitter-output-dir}/{version-status}/{version}/examples"
     skip-example-copying: true
 ```
 
-With this setting, example files remain in the source `examples` directory and are referenced in the generated OpenAPI spec via relative paths from the output file location.
+With this configuration, example files live alongside the generated swagger at `{version-status}/{version}/examples/` and are referenced via relative paths (e.g., `examples/getPet.json`).
 
 ## Example structure
 
-Examples below assume `examples-dir` is `{project-root}/examples` (the default).
-
-- Single version structure
+- Single version structure (versioned API with examples co-located in output)
 
 {/* prettier-ignore */}
 <FileTree>
 - main.tsp
 - tspconfig.yaml
-- examples/
-  - example1.json
-  - example2.json
+- stable/
+  - 2021-01-01/
+    - openapi.json
+    - examples/
+      - example1.json
+      - example2.json
 </FileTree>
 
 - Multi version structure
@@ -44,13 +47,17 @@ Examples below assume `examples-dir` is `{project-root}/examples` (the default).
 <FileTree>
 - main.tsp
 - tspconfig.yaml
-- examples/
+- stable/
   - 2021-01-01/
-    - example1.json
-    - example2.json
+    - openapi.json
+    - examples/
+      - example1.json
+      - example2.json
   - 2021-01-02/
-    - example1.json
-    - example2.json
+    - openapi.json
+    - examples/
+      - example1.json
+      - example2.json
 </FileTree>
 
 ## Generate the examples
@@ -69,5 +76,5 @@ Note, latest OAV tool should automatically generate the following. However, if y
 - include `operationId`. This is used to match with declared operations in TypeSpec and correctly output in swagger.
 
 :::note
-When using `skip-example-copying: true`, the generated examples from `oav` will be in the output directory next to `openapi.json`. You should move them to the source `examples` directory in your project root so they are referenced correctly on subsequent compilations.
+When using `skip-example-copying: true` with `examples-dir` set to the versioned output folder, `oav generate-examples` will generate examples in the correct location alongside the swagger output. No additional file moves are needed.
 :::
