@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+// eslint-disable-next-line vitest/no-import-node-test
 import test from "node:test";
 import { aggregateDurations } from "../src/aggregate.js";
 
