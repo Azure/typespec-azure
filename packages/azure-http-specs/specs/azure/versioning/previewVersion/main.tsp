@@ -79,6 +79,7 @@ model UpdateWidgetColorRequest {
   color: string;
 }
 
+#suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
 @scenario
 @scenarioDoc("""
   Test @previewVersion decorator with preview-only operations.

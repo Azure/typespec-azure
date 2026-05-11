@@ -496,6 +496,7 @@ In this example, instead of generating `MyModel` in the Python sdk, the emitter 
 ### Notes
 
 - The referenced type should be compatible with the intended usage in the generated client library.
+- When a type is marked as an external alternate type, TCGC assigns it the `External` usage flag. Types that are only reachable through external types will also only have the `External` usage flag — they will not receive `Input` or `Output` flags. This signals to emitters that serialization and deserialization code does not need to be generated for these types, since the external package handles them.
 
 ## Client Default Values (Legacy)
 

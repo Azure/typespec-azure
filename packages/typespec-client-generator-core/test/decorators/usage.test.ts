@@ -189,10 +189,12 @@ it("patch usage", async () => {
         prop: string
       }
 
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       @patch(#{implicitOptionality: true})
       @route("/patch")
       op patchModel(@body body: PatchModel): void;
 
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       @patch(#{implicitOptionality: true})
       @route("/jsonMergePatch")
       op jsonMergePatchModel(@body body: JsonMergePatchModel, @header contentType: "application/merge-patch+json"): void;
@@ -333,6 +335,57 @@ it("usage additive from multiple sources", async () => {
   strictEqual(models[1].usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
   // C should have Output from @usage
   strictEqual(models[2].usage, UsageFlags.Output);
+});
+
+it("readonly property strips Input from combined usage flags", async () => {
+  const { program } = await SimpleTesterWithService.compile(t.code`
+    @usage(Usage.input | Usage.output)
+    model A {
+      @visibility(Lifecycle.Read)
+      prop: B;
+    }
+
+    model B {
+      value: string;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
+  strictEqual(models.length, 2);
+  // A has Input | Output from @usage
+  strictEqual(models.find((m) => m.name === "A")?.usage, UsageFlags.Input | UsageFlags.Output);
+  // B should have Output only (Input stripped because property is readonly)
+  strictEqual(models.find((m) => m.name === "B")?.usage, UsageFlags.Output);
+});
+
+it("readonly property does not affect non-Input flags propagation", async () => {
+  const { program } = await SimpleTesterWithService.compile(t.code`
+    model RoundTripModel {
+      @visibility(Lifecycle.Read)
+      result: ResultModel;
+    }
+
+    model ResultModel {
+      name: string;
+    }
+
+    @route("/op")
+    @put
+    op myOp(@body body: RoundTripModel): { @body body: RoundTripModel; };
+  `);
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
+  strictEqual(models.length, 2);
+  // RoundTripModel has Input + Output + Json from operation
+  strictEqual(
+    models.find((x) => x.name === "RoundTripModel")?.usage,
+    UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
+  );
+  // ResultModel gets Output + Json (no Input because readonly property)
+  strictEqual(
+    models.find((x) => x.name === "ResultModel")?.usage,
+    UsageFlags.Output | UsageFlags.Json,
+  );
 });
 
 it("usage additive from spread", async () => {

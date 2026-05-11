@@ -81,6 +81,7 @@ import {
   getRelativePathFromDirectory,
   getRootLength,
   getSummary,
+  getExamples as getTypeSpecExamples,
   getVisibilityForClass,
   ignoreDiagnostics,
   interpolatePath,
@@ -109,7 +110,7 @@ import {
 } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
-import { TwoLevelMap } from "@typespec/compiler/utils";
+import { DuplicateTracker, TwoLevelMap } from "@typespec/compiler/utils";
 import {
   AuthenticationOptionReference,
   AuthenticationReference,
@@ -152,7 +153,7 @@ import {
 } from "@typespec/openapi";
 import { getVersionsForEnum } from "@typespec/versioning";
 import { AutorestOpenAPISchema } from "./autorest-openapi-schema.js";
-import { getExamples, getRef } from "./decorators.js";
+import { getExamples as getAutorestExamples, getRef } from "./decorators.js";
 import { sortWithJsonSchema } from "./json-schema-sorter/sorter.js";
 import { createDiagnostic, reportDiagnostic } from "./lib.js";
 import {
@@ -609,7 +610,7 @@ export async function getOpenAPIForService(
       currentEndpoint.deprecated = true;
     }
 
-    const examples = getExamples(program, op);
+    const examples = getAutorestExamples(program, op);
     if (examples) {
       currentEndpoint["x-ms-examples"] = examples.reduce(
         (acc, example) => ({ ...acc, [example.title]: { $ref: example.pathOrUri } }),
@@ -2301,6 +2302,11 @@ export async function getOpenAPIForService(
       newTarget.uniqueItems = true;
     }
 
+    const examples = getTypeSpecExamples(program, typespecType);
+    if (typespecType.kind === "ModelProperty" && examples.length > 0) {
+      newTarget.example = serializeValueAsJson(program, examples[0].value, typespecType);
+    }
+
     if (isSecret(program, typespecType)) {
       newTarget.format = "password";
       newTarget["x-ms-secret"] = true;
@@ -2672,7 +2678,7 @@ export async function getOpenAPIForService(
       }
     }
 
-    const security = getOpenAPISecurity(oaiSchemes, authentication.defaultAuth);
+    const security = getOpenAPISecurity(oaiSchemes, authentication.defaultAuth, serviceNamespace);
 
     return { securitySchemes: oaiSchemes, security };
   }
@@ -2709,7 +2715,16 @@ export async function getOpenAPIForService(
           flow: oaiFlowName,
           authorizationUrl: (flow as any).authorizationUrl,
           tokenUrl: (flow as any).tokenUrl,
-          scopes: Object.fromEntries(flow.scopes.map((x) => [x.value, x.description ?? ""])),
+          scopes: Object.fromEntries(
+            flow.scopes.map((x) => {
+              const rewritten = rewriteArmScopeForOpenAPI2(x.value, serviceNamespace);
+              const description =
+                rewritten === "user_impersonation" && rewritten !== x.value
+                  ? "impersonate your user account"
+                  : (x.description ?? "");
+              return [rewritten, description];
+            }),
+          ),
         };
       case "openIdConnect":
       default:
@@ -2725,6 +2740,7 @@ export async function getOpenAPIForService(
   function getOpenAPISecurity(
     oaiSchemes: Record<string, OpenAPI2SecurityScheme>,
     authReference: AuthenticationReference,
+    serviceNamespace: Namespace,
   ) {
     const security = authReference.options
       .map((authOption: AuthenticationOptionReference) => {
@@ -2732,13 +2748,35 @@ export async function getOpenAPIForService(
         for (const httpAuthRef of authOption.all) {
           const scopes = getScopesForAuthReference(httpAuthRef);
           if (httpAuthRef.auth.id in oaiSchemes && scopes) {
-            securityOption[httpAuthRef.auth.id] = scopes;
+            securityOption[httpAuthRef.auth.id] = scopes.map((scope) =>
+              rewriteArmScopeForOpenAPI2(scope, serviceNamespace),
+            );
           }
         }
         return securityOption;
       })
       .filter((x) => Object.keys(x).length > 0);
     return security;
+  }
+
+  /**
+   * For services declared with `@armProviderNamespace`, the ARM library injects
+   * the canonical absolute ARM scope (`https://management.azure.com/.default`)
+   * as the default OAuth2 scope. Historically, ARM Swagger has emitted the
+   * legacy `user_impersonation` scope name and azure-rest-api-specs still
+   * expects that wire format. To preserve parity with the existing ARM Swagger
+   * while giving SDK emitters (via TCGC) the real scope, rewrite the canonical
+   * ARM scope back to `user_impersonation` when emitting OpenAPI v2 for an ARM
+   * service.
+   */
+  function rewriteArmScopeForOpenAPI2(scope: string, serviceNamespace: Namespace): string {
+    if (
+      scope === "https://management.azure.com/.default" &&
+      isArmProviderNamespace(program, serviceNamespace)
+    ) {
+      return "user_impersonation";
+    }
+    return scope;
   }
 
   function getScopesForAuthReference(httpAuthRef: HttpAuthRef) {
@@ -2932,6 +2970,7 @@ export function createDefaultDocumentProxy(
   const tags = new Set<string>();
   const definitions = new Map<string, OpenAPI2Schema>();
   const parameters: Map<string, [ModelProperty, OpenAPI2Parameter]> = new Map();
+  const operationIds = new DuplicateTracker<string, Operation>();
   let examples: Map<string, Record<string, LoadedExample>> = new Map();
   let operationIdsWithExamples: Set<string> = new Set();
   return {
@@ -2969,6 +3008,7 @@ export function createDefaultDocumentProxy(
       }
       const resolvedOp = pathItem[op.verb]!;
       resolvedOp.operationId = resolveOperationId(context, op.operation);
+      operationIds.track(resolvedOp.operationId, op.operation);
       return resolvedOp;
     },
     addTag(tag: string, op: Operation) {
@@ -3004,6 +3044,7 @@ export function createDefaultDocumentProxy(
       operationIdsWithExamples = exampleIds;
     },
     resolveDocuments(context: AutorestEmitterContext) {
+      reportDuplicateOperationIds(program, operationIds);
       root.definitions = {};
       for (const [name, schema] of definitions) {
         root.definitions[name] = schema;
@@ -3068,14 +3109,14 @@ function createFeatureDocumentProxy(
     return createDefaultDocumentProxy(program, service, options, version);
   const root: Map<string, OpenAPI2DocumentItem> = new Map();
   const operationFeatures: Map<string, Set<string>> = new Map();
+  const operationIds = new Map<string, DuplicateTracker<string, Operation>>();
   let examples: Map<string, Record<string, LoadedExample>> = new Map();
   let operationIdsWithExamples: Set<string> = new Set();
   for (const featureName of features.keys()) {
     const featureOptions = features.get(featureName)!;
-    root.set(
-      featureName.toLowerCase(),
-      initializeOpenAPIDocumentItem(program, service, featureOptions, version),
-    );
+    const featureKey = featureName.toLowerCase();
+    root.set(featureKey, initializeOpenAPIDocumentItem(program, service, featureOptions, version));
+    operationIds.set(featureKey, new DuplicateTracker<string, Operation>());
   }
   const defaultFeature = [...root.entries()].filter(
     ([key, _]) => key.toLowerCase() === "common",
@@ -3122,6 +3163,7 @@ function createFeatureDocumentProxy(
       }
       const resolvedOp = pathItem[op.verb]!;
       const opId = resolveOperationId(context, op.operation);
+      operationIds.get(options.featureName.toLowerCase())?.track(opId, op.operation);
       addFeatureOperation(opId, options.featureName);
       resolvedOp.operationId = opId;
       return resolvedOp;
@@ -3171,6 +3213,9 @@ function createFeatureDocumentProxy(
     },
     resolveDocuments(context: AutorestEmitterContext) {
       const docs: AutorestEmitterResult[] = [];
+      for (const tracker of operationIds.values()) {
+        reportDuplicateOperationIds(program, tracker);
+      }
       for (const [featureName, featureItem] of root.entries()) {
         const exampleIds = operationFeatures.get(featureName) || new Set<string>();
         const featureExamples = [...exampleIds]
@@ -3247,6 +3292,21 @@ function createFeatureDocumentProxy(
     }
     const ops = operationFeatures.get(featureName)!;
     ops.add(operationId);
+  }
+}
+
+function reportDuplicateOperationIds(
+  program: Program,
+  duplicateTracker: DuplicateTracker<string, Operation>,
+) {
+  for (const [operationId, duplicates] of duplicateTracker.entries()) {
+    for (const duplicate of duplicates) {
+      reportDiagnostic(program, {
+        code: "duplicate-operation-id",
+        format: { operationId },
+        target: duplicate,
+      });
+    }
   }
 }
 

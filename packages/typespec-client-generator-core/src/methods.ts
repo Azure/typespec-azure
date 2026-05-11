@@ -646,6 +646,7 @@ function getSdkMethodResponse(
         variantTypes: allResponseBodies,
         name: createGeneratedName(context, operation, "UnionResponse"),
         isGeneratedName: true,
+        isExactName: false,
         namespace: client.namespace,
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, operation)}.UnionResponse`,
         decorators: [],
@@ -657,8 +658,9 @@ function getSdkMethodResponse(
 
   // Set optional property based on whether responses have bodies
   // If type is undefined (no response), optional remains undefined
+  // For @responseAsBool, the boolean return is never optional — it's always true or false
   let optional: boolean | undefined = undefined;
-  if (type !== undefined) {
+  if (type !== undefined && !getResponseAsBool(context, operation)) {
     // If we have a response type, set optional based on whether some responses lack bodies
     optional = containsResponseWithoutBody;
   }

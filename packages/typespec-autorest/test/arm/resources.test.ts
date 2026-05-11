@@ -394,6 +394,27 @@ it("emits x-ms-azure-resource for resource with @azureResourceBase", async () =>
   ok(openApi.definitions?.Widget["x-ms-azure-resource"]);
 });
 
+it("emits allOf reference to AzureEntityResource for a model extending AzureEntityResource", async () => {
+  const openApi = await compileOpenAPI(
+    `
+    @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+    /** Move response */
+    model MoveResponse extends Azure.ResourceManager.CommonTypes.AzureEntityResource {
+      /** The status of the move */
+      movingStatus: string;
+    }
+`,
+    { preset: "azure" },
+  );
+  expect((openApi.definitions?.MoveResponse as any).allOf).toStrictEqual([
+    {
+      $ref: "../../common-types/resource-management/v3/types.json#/definitions/AzureEntityResource",
+    },
+  ]);
+});
+
 it("emits x-ms-external for resource with @armExternalType", async () => {
   const openApi = await compileOpenAPI(
     `
@@ -448,6 +469,7 @@ it("omits path metadata for @customAzureResource with options.usePathNameParamet
       get is ArmResourceRead<Widget>;
       list is ArmResourceListByParent<Widget>;
       put is ArmResourceCreateOrReplaceSync<Widget>;
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       update is ArmTagsPatchSync<Widget>;
       delete is ArmResourceDeleteSync<Widget>;
     }
@@ -787,6 +809,7 @@ it("allows action requests with optional body parameters", async () => {
     interface Employees {
       get is ArmResourceRead<Employee>;
       createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       update is ArmResourcePatchAsync<Employee, Employee>;
       delete is ArmResourceDeleteWithoutOkAsync<Employee>;
       list is ArmResourceListByParent<Employee>;
@@ -859,4 +882,61 @@ it("allows sync and async provider actions with unknown body", async () => {
     required: true,
     schema: {},
   });
+});
+
+it("emits correct subscription-level list path for child resource using ArmListBySubscriptionScope", async () => {
+  const openApi = await compileOpenAPI(
+    `
+    @armProviderNamespace
+      namespace Microsoft.ContosoProviderhub;
+
+    model Test is TrackedResource<{}> {
+      ...ResourceNameParameter<Test>;
+    }
+
+    @parentResource(Test)
+    model Employee is ProxyResource<EmployeeProperties> {
+      ...ResourceNameParameter<Employee>;
+    }
+
+    model EmployeeProperties {
+      age?: int32;
+      city?: string;
+    }
+
+    @armResourceOperations
+    interface Tests {
+      get is ArmResourceRead<Test>;
+      createOrUpdate is ArmResourceCreateOrReplaceAsync<Test>;
+      delete is ArmResourceDeleteWithoutOkAsync<Test>;
+      listByResourceGroup is ArmResourceListByParent<Test>;
+    }
+
+    @armResourceOperations
+    interface Employees {
+      get is ArmResourceRead<Employee>;
+      createOrUpdate is ArmResourceCreateOrReplaceSync<Employee>;
+      delete is ArmResourceDeleteSync<Employee>;
+      listByParent is ArmResourceListByParent<Employee>;
+      listBySubscription is ArmListBySubscriptionScope<Employee>;
+    }
+  `,
+    { preset: "azure" },
+  );
+
+  // Verify the subscription-level list path is correct (no parent resource path segments)
+  const subscriptionListPath =
+    "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderhub/employees";
+  ok(
+    openApi.paths[subscriptionListPath]?.get,
+    `Expected subscription-level list path ${subscriptionListPath} to exist`,
+  );
+
+  // Verify the parent-level list path also exists
+  const parentListPath =
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderhub/tests/{testName}/employees";
+  ok(
+    openApi.paths[parentListPath]?.get,
+    `Expected parent-level list path ${parentListPath} to exist`,
+  );
 });

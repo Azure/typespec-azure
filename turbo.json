@@ -1,5 +1,10 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalPassThroughEnv": [
+    "TYPESPEC_WEBSITE_BASE_PATH",
+    "TYPESPEC_SKIP_WEBSITE_BUILD",
+    "TYPESPEC_VS_CI_BUILD"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -46,6 +51,19 @@
     "test:e2e": {
       "dependsOn": ["build"],
       "cache": false
+    },
+    "test:extra": {
+      "dependsOn": ["build"],
+      "outputs": []
+    },
+    "format:extra": {
+      "cache": false
+    },
+    "format:extra:check": {
+      "outputs": []
+    },
+    "lint:extra": {
+      "outputs": []
     }
   }
 }

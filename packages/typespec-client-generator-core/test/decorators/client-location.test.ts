@@ -537,9 +537,7 @@ describe("Parameter", () => {
     @armCommonTypesVersion(CommonTypes.Versions.v5)
     namespace My.Service;
 
-    /** Api versions */
     enum Versions {
-      /** 2024-04-01-preview api version */
           V2024_04_01_PREVIEW: "2024-04-01-preview",
     }
 
@@ -593,9 +591,7 @@ describe("Parameter", () => {
     @armCommonTypesVersion(CommonTypes.Versions.v5)
     namespace My.Service;
 
-    /** Api versions */
     enum Versions {
-      /** 2024-04-01-preview api version */
           V2024_04_01_PREVIEW: "2024-04-01-preview",
     }
 
@@ -801,19 +797,15 @@ describe("Parameter", () => {
         @versioned(Versions)
         namespace Microsoft.ContosoProviderHub;
 
-        /** Contoso API versions */
         enum Versions {
-          /** 2021-10-01-preview version */
           @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
           "2021-10-01-preview",
         }
 
-        /** A ContosoProviderHub resource */
         model Employee is TrackedResource<EmployeeProperties> {
           ...ResourceNameParameter<Employee>;
         }
 
-        /** Employee properties */
         model EmployeeProperties {
           prop: string;
         }
@@ -869,6 +861,81 @@ describe("Parameter", () => {
     strictEqual(subIdParam.methodParameterSegments[0][0], subIdMethodParam);
   });
 
+  it("with @override for listByResourceGroup when subscriptionId also exists on client", async () => {
+    const { program } = await ArmTester.compile(
+      `
+        @armProviderNamespace
+        @service(#{ title: "ContosoProviderHubClient" })
+        @versioned(Versions)
+        namespace Microsoft.ContosoProviderHub;
+
+        enum Versions {
+          @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+          "2021-10-01-preview",
+        }
+
+        model Employee is TrackedResource<EmployeeProperties> {
+          ...ResourceNameParameter<Employee>;
+        }
+
+        model EmployeeProperties {
+          prop: string;
+        }
+
+        @armResourceOperations
+        interface Employees {
+          get is ArmResourceRead<Employee>;
+          createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+          delete is ArmResourceDeleteWithoutOkAsync<Employee>;
+          listByResourceGroup is ArmResourceListByParent<Employee>;
+        }
+
+        op listByResourceGroupOverride(
+          ...ApiVersionParameter,
+
+          #suppress "@azure-tools/typespec-azure-core/documentation-required" "customization"
+          @clientLocation(listByResourceGroupOverride)
+          subscriptionId: Azure.Core.uuid,
+
+          ...ResourceGroupParameter,
+          ...Azure.ResourceManager.ProviderNamespace<Employee>,
+        ): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.ResourceListResult<Employee>>;
+
+        @@override(Employees.listByResourceGroup, listByResourceGroupOverride);
+      `,
+    );
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
+    const client = sdkPackage.clients[0];
+    ok(client);
+
+    // subscriptionId should still be on the client (for get, createOrUpdate, delete)
+    ok(client.clientInitialization.parameters.find((p) => p.name === "subscriptionId"));
+
+    const employeesClient = client.children?.[0];
+    ok(employeesClient);
+
+    const listMethod = employeesClient.methods?.find(
+      (m) => m.name === "listByResourceGroup",
+    ) as SdkServiceMethod<SdkHttpOperation>;
+    ok(listMethod);
+
+    // subscriptionId should be a method parameter for listByResourceGroup
+    const subIdMethodParam = listMethod.parameters.find((p) => p.name === "subscriptionId");
+    ok(subIdMethodParam);
+    strictEqual(subIdMethodParam.onClient, false);
+
+    const operation = listMethod.operation;
+    ok(operation);
+
+    const subIdParam = operation.parameters.find((p) => p.name === "subscriptionId");
+    ok(subIdParam);
+
+    // methodParameterSegments should point to the method-level subscriptionId, not the client-level one
+    strictEqual(subIdParam.methodParameterSegments.length, 1);
+    strictEqual(subIdParam.methodParameterSegments[0][0], subIdMethodParam);
+  });
+
   it("subscriptionId on client when clientLocation moves it to method level for some operations in nested sub clients", async () => {
     const { program } = await ArmTester.compile(
       `
@@ -879,21 +946,16 @@ describe("Parameter", () => {
       @versioned(Microsoft.Contoso.Versions)
       namespace Microsoft.Contoso;
 
-      /** The available API versions. */
       enum Versions {
-        /** 2021-10-01-preview version */
         @armCommonTypesVersion(CommonTypes.Versions.v5)
         v2021_10_01_preview: "2021-10-01-preview",
       }
 
-      /** Employee resource */
       model Employee is TrackedResource<EmployeeProperties> {
         ...ResourceNameParameter<Employee>;
       }
 
-      /** Employee properties */
       model EmployeeProperties {
-        /** Age of employee */
         age?: int32;
       }
 
@@ -977,9 +1039,7 @@ describe("Parameter", () => {
       @armCommonTypesVersion(CommonTypes.Versions.v5)
       namespace My.Service;
 
-      /** Api versions */
       enum Versions {
-        /** 2024-04-01-preview api version */
         V2024_04_01_PREVIEW: "2024-04-01-preview",
       }
 

@@ -20,11 +20,19 @@ import {
   isService,
   resolveEncodedName,
 } from "@typespec/compiler";
-import { HttpOperation, Visibility, getHttpOperation, isMetadata, isVisible } from "@typespec/http";
+import {
+  HttpOperation,
+  Visibility,
+  getHttpOperation,
+  getServers,
+  isMetadata,
+  isVisible,
+} from "@typespec/http";
 import { getOperationId } from "@typespec/openapi";
 import { Version, getVersions } from "@typespec/versioning";
 import { pascalCase } from "change-case";
 import { getClientLocation, getClientNameOverride, getIsApiVersion } from "./decorators.js";
+import { normalizeExactName } from "./functions.js";
 import {
   DecoratedType,
   SdkBodyParameter,
@@ -91,12 +99,44 @@ export function isApiVersion(context: TCGCContext, type: ModelProperty): boolean
   if (versionEnumSets.length === 0) {
     return false;
   }
-  // if the parameter type is the version enum or named as "apiVersion" or "api-version", then it is api version
+  // if the parameter type is the version enum, then it is api version
+  if (versionEnumSets.some((versionEnum) => type.type === versionEnum)) {
+    return true;
+  }
+  // otherwise, only consider name-based matching for http metadata parameters
+  // (header/query/path/cookie/statusCode) or server URL template parameters.
+  // A regular body model property whose name happens to be `apiVersion`/`api-version`
+  // should not be treated as an api version parameter.
+  if (!isMetadata(context.program, type) && !isServerUrlTemplateParam(context, type)) {
+    return false;
+  }
   return (
-    versionEnumSets.some((versionEnum) => type.type === versionEnum) ||
     type.name.toLowerCase().includes("apiversion") ||
     type.name.toLowerCase().includes("api-version")
   );
+}
+
+/**
+ * Return whether a model property is a server URL template parameter (i.e., a
+ * path-segment variable declared in the `@server` decorator's parameter model).
+ * These parameters are not annotated with HTTP metadata decorators, but they
+ * represent URL template variables and should still be eligible for API-version
+ * name matching.
+ */
+function isServerUrlTemplateParam(context: TCGCContext, type: ModelProperty): boolean {
+  for (const ns of listAllServiceNamespaces(context)) {
+    const servers = getServers(context.program, ns);
+    if (servers) {
+      for (const server of servers) {
+        for (const param of server.parameters.values()) {
+          if (param === type) {
+            return true;
+          }
+        }
+      }
+    }
+  }
+  return false;
 }
 
 /**
@@ -170,7 +210,10 @@ export function getLibraryName(
 ): string {
   // 1. check if there's a client name
   const emitterSpecificName = getClientNameOverride(context, type, scope);
-  if (emitterSpecificName && emitterSpecificName !== type.name) return emitterSpecificName;
+  if (emitterSpecificName && emitterSpecificName !== type.name) {
+    // Strip the exact-name prefix if present so consumers always see clean names
+    return normalizeExactName(emitterSpecificName).name;
+  }
 
   // 2. check if there's a friendly name, if so return friendly name
   const friendlyName = getFriendlyName(context.program, type);
@@ -203,6 +246,25 @@ export function getLibraryName(
   }
 
   return typeof type.name === "string" ? type.name : "";
+}
+
+/**
+ * Check whether a type has an exact client name override (set via `exact()` function).
+ * When true, language emitters should use the name as-is without applying casing transformations.
+ *
+ * @param context The SDK context
+ * @param type The type to check
+ * @returns true if the client name was marked with `exact()`
+ */
+export function isExactClientName(
+  context: TCGCContext,
+  type: Type & { name?: string | symbol },
+): boolean {
+  const emitterSpecificName = getClientNameOverride(context, type);
+  if (emitterSpecificName) {
+    return normalizeExactName(emitterSpecificName).isExactName;
+  }
+  return false;
 }
 
 /**

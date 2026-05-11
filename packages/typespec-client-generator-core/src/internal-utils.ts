@@ -60,11 +60,11 @@ import {
   getVersioningMutators,
   getVersions,
 } from "@typespec/versioning";
-import assert from "assert";
 import {
   getAlternateType,
   getClientDocExplicit,
   getClientLocation,
+  getIsApiVersion,
   getLegacyHierarchyBuilding,
   getMarkAsLro,
   getOverriddenClientMethod,
@@ -783,6 +783,22 @@ export function isOnClient(
     // if the type has explicitly been moved to the operation, it is not on the client
     return false;
   }
+  // When using @override, @clientLocation might be on the override operation's parameter
+  // rather than on the original operation's parameter. Check the override's corresponding
+  // parameter for @clientLocation targeting the override operation.
+  if (operation) {
+    const override = getOverriddenClientMethod(context, operation);
+    if (override) {
+      for (const [, overrideParam] of override.parameters.properties) {
+        if (
+          compareModelProperties(context.program, overrideParam, type) &&
+          getClientLocation(context, overrideParam) === override
+        ) {
+          return false;
+        }
+      }
+    }
+  }
   return (
     isSubscriptionId(context, type) ||
     (isApiVersion(context, type) && versioning) ||
@@ -820,7 +836,14 @@ export function getCorrespondingClientParam(
   const correspondingClientParam = clientParams?.find((x) =>
     twoParamsEquivalent(context, x.__raw, type),
   );
-  if (correspondingClientParam) return correspondingClientParam;
+  if (correspondingClientParam) {
+    // If the parameter is explicitly marked as not an API version parameter via @apiVersion(false),
+    // it should not be matched to a client API version parameter.
+    if (getIsApiVersion(context, type) === false && correspondingClientParam.isApiVersionParam) {
+      return undefined;
+    }
+    return correspondingClientParam;
+  }
   return undefined;
 }
 
@@ -1221,19 +1244,19 @@ export function isSameAuth(left: Authentication, right: Authentication): boolean
       }
       switch (leftScheme.type) {
         case "http":
-          assert(rightScheme.type === "http");
+          compilerAssert(rightScheme.type === "http", "Unexpected auth scheme type mismatch");
           if (leftScheme.scheme !== rightScheme.scheme) {
             return false;
           }
           break;
         case "apiKey":
-          assert(rightScheme.type === "apiKey");
+          compilerAssert(rightScheme.type === "apiKey", "Unexpected auth scheme type mismatch");
           if (leftScheme.name !== rightScheme.name || leftScheme.in !== rightScheme.in) {
             return false;
           }
           break;
         case "oauth2":
-          assert(rightScheme.type === "oauth2");
+          compilerAssert(rightScheme.type === "oauth2", "Unexpected auth scheme type mismatch");
           if (leftScheme.flows.length !== rightScheme.flows.length) {
             return false;
           }
@@ -1253,7 +1276,10 @@ export function isSameAuth(left: Authentication, right: Authentication): boolean
             }
             switch (leftFlow.type) {
               case "authorizationCode":
-                assert(rightFlow.type === "authorizationCode");
+                compilerAssert(
+                  rightFlow.type === "authorizationCode",
+                  "Unexpected auth scheme type mismatch",
+                );
                 if (
                   leftFlow.authorizationUrl !== rightFlow.authorizationUrl ||
                   leftFlow.tokenUrl !== rightFlow.tokenUrl ||
@@ -1263,7 +1289,10 @@ export function isSameAuth(left: Authentication, right: Authentication): boolean
                 }
                 break;
               case "clientCredentials":
-                assert(rightFlow.type === "clientCredentials");
+                compilerAssert(
+                  rightFlow.type === "clientCredentials",
+                  "Unexpected auth scheme type mismatch",
+                );
                 if (
                   leftFlow.tokenUrl !== rightFlow.tokenUrl ||
                   leftFlow.refreshUrl !== rightFlow.refreshUrl
@@ -1272,7 +1301,10 @@ export function isSameAuth(left: Authentication, right: Authentication): boolean
                 }
                 break;
               case "implicit":
-                assert(rightFlow.type === "implicit");
+                compilerAssert(
+                  rightFlow.type === "implicit",
+                  "Unexpected auth scheme type mismatch",
+                );
                 if (
                   leftFlow.authorizationUrl !== rightFlow.authorizationUrl ||
                   leftFlow.refreshUrl !== rightFlow.refreshUrl
@@ -1281,7 +1313,10 @@ export function isSameAuth(left: Authentication, right: Authentication): boolean
                 }
                 break;
               case "password":
-                assert(rightFlow.type === "password");
+                compilerAssert(
+                  rightFlow.type === "password",
+                  "Unexpected auth scheme type mismatch",
+                );
                 if (
                   leftFlow.authorizationUrl !== rightFlow.authorizationUrl ||
                   leftFlow.refreshUrl !== rightFlow.refreshUrl
@@ -1293,7 +1328,10 @@ export function isSameAuth(left: Authentication, right: Authentication): boolean
           }
           break;
         case "openIdConnect":
-          assert(rightScheme.type === "openIdConnect");
+          compilerAssert(
+            rightScheme.type === "openIdConnect",
+            "Unexpected auth scheme type mismatch",
+          );
           if (leftScheme.openIdConnectUrl !== rightScheme.openIdConnectUrl) {
             return false;
           }

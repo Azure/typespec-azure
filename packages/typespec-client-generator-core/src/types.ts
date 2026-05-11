@@ -118,6 +118,7 @@ import {
   getHttpOperationWithCache,
   getLibraryName,
   getPropertyNames,
+  isExactClientName,
 } from "./public-utils.js";
 
 import { $ } from "@typespec/compiler/typekit";
@@ -562,6 +563,7 @@ export function getSdkUnionWithDiagnostics(
           ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
           name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
           isGeneratedName: !type.name,
+          isExactName: false,
           crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
           type: diagnostics.pipe(getUnknownType(context, type)),
           access: "public",
@@ -592,6 +594,7 @@ export function getSdkUnionWithDiagnostics(
               ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
               name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
               isGeneratedName: !type.name,
+              isExactName: false,
               crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
               type: retval,
               access: "public",
@@ -609,6 +612,7 @@ export function getSdkUnionWithDiagnostics(
           ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "union")),
           name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
           isGeneratedName: nullOption !== undefined ? true : !type.name, // if nullable, always set inner union type as generated name
+          isExactName: false,
           namespace,
           variantTypes: [],
           crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
@@ -632,6 +636,7 @@ export function getSdkUnionWithDiagnostics(
             ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
             name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
             isGeneratedName: !type.name,
+            isExactName: false,
             crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
             type: retval,
             access: "public",
@@ -667,6 +672,7 @@ function getEmptyUnionType(
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "union")),
     name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
     isGeneratedName: !type.name,
+    isExactName: false,
     namespace,
     clientNamespace: namespace,
     variantTypes: [],
@@ -710,6 +716,7 @@ function getSdkConstantWithDiagnostics(
         valueType,
         name: getGeneratedName(context, type, operation),
         isGeneratedName: true,
+        isExactName: false,
       });
   }
 }
@@ -819,6 +826,7 @@ function addDiscriminatorToModelType(
       type: discriminatorType!,
       name,
       isGeneratedName: false,
+      isExactName: false,
       onClient: false,
       apiVersions: discriminatorProperty
         ? getAvailableApiVersions(context, discriminatorProperty.__raw!, type)
@@ -858,6 +866,7 @@ export function getSdkModelWithDiagnostics(
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "model")),
       name: name,
       isGeneratedName: !type.name,
+      isExactName: isExactClientName(context, type),
       namespace: getClientNamespace(context, type),
       properties: [],
       additionalProperties: undefined, // going to set additional properties in the next few lines when we look at base model
@@ -1032,6 +1041,7 @@ function getSdkEnumWithDiagnostics(
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "enum")),
       name: getLibraryName(context, type),
       isGeneratedName: false,
+      isExactName: isExactClientName(context, type),
       namespace: getClientNamespace(context, type),
       valueType: diagnostics.pipe(
         getSdkEnumValueType(
@@ -1096,6 +1106,7 @@ export function getSdkUnionEnumWithDiagnostics(
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type.union, "enum")),
     name,
     isGeneratedName: !type.union.name,
+    isExactName: isExactClientName(context, type.union),
     namespace: getClientNamespace(context, type.union),
     valueType:
       diagnostics.pipe(getUnionAsEnumValueType(context, type.union)) ??
@@ -1269,6 +1280,7 @@ function getSdkCredentialType(
       variantTypes: credentialTypes,
       name: createGeneratedName(context, service, "CredentialUnion"),
       isGeneratedName: true,
+      isExactName: false,
       namespace: client.namespace,
       clientNamespace: client.namespace,
       crossLanguageDefinitionId: `${client.crossLanguageDefinitionId}.CredentialUnion`,
@@ -1293,6 +1305,7 @@ export function getSdkCredentialParameter(
     kind: "credential",
     name: "credential",
     isGeneratedName: true,
+    isExactName: false,
     doc: "Credential used to authenticate requests to the service.",
     apiVersions: client.apiVersions,
     onClient: true,
@@ -1318,6 +1331,7 @@ export function getSdkModelPropertyTypeBase(
     diagnostics.pipe(getClientTypeWithDiagnostics(context, type.type, operation));
   diagnostics.pipe(addEncodeInfo(context, type, propertyType));
   const name = getPropertyNames(context, type)[0];
+  const isExactName = isExactClientName(context, type);
   const onClient = isOnClient(context, type, operation, apiVersions.length > 0);
   let encode: ArrayKnownEncoding | undefined = undefined;
 
@@ -1341,6 +1355,7 @@ export function getSdkModelPropertyTypeBase(
     type: propertyType,
     name,
     isGeneratedName: false,
+    isExactName,
     optional: type.optional,
     ...updateWithApiVersionInformation(
       context,
@@ -1461,6 +1476,14 @@ function addMultipartPropertiesToModelType(
       );
     }
     popNamingContext(context);
+
+    // re-apply encoding with the part's default content type so that e.g. bytes
+    // in multipart/form-data gets encode "bytes" instead of the default "base64"
+    const partDefaultContentType =
+      part.body.contentTypes.length > 0 ? part.body.contentTypes[0] : undefined;
+    const typeToEncode =
+      clientProperty.type.kind === "array" ? clientProperty.type.valueType : clientProperty.type;
+    diagnostics.pipe(addEncodeInfo(context, part.property!, typeToEncode, partDefaultContentType));
 
     clientProperty.serializationOptions.multipart = {
       isFilePart: isFilePart(context, clientProperty.type),
@@ -1631,11 +1654,17 @@ export function updateUsageOrAccess(
   }
   for (const property of type.properties) {
     options.ignoreSubTypeStack.push(false);
-    if (property.kind === "property" && isReadOnly(property) && value === UsageFlags.Input) {
-      continue;
-    }
     if (typeof value === "number") {
-      diagnostics.pipe(updateUsageOrAccess(context, value, property.type, options));
+      let effectiveValue = value;
+      // Strip Input flag for readonly properties - readonly properties only appear in output
+      if (property.kind === "property" && isReadOnly(property)) {
+        effectiveValue = value & ~UsageFlags.Input;
+        if (effectiveValue === 0) {
+          options.ignoreSubTypeStack.pop();
+          continue;
+        }
+      }
+      diagnostics.pipe(updateUsageOrAccess(context, effectiveValue, property.type, options));
     } else {
       // by default, we set property access value to parent. If there's an override though, we override.
       let propertyAccess = value;
@@ -2061,6 +2090,13 @@ function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Di
       }
     }
 
+    if (legacyHierarchyBuilding) {
+      // Reconcile properties on the rebased model: drop duplicates that the
+      // new base chain already supplies, and lift in properties contributed
+      // by removed intermediate parents.
+      diagnostics.pipe(reconcilePropertiesAfterRebase(context, sdkType, legacyHierarchyBuilding));
+    }
+
     // must be done after discriminator is added
     // Populate discriminated subtypes for legacy hierarchy building
     if (legacyHierarchyBuilding && sdkType.discriminatorValue) {
@@ -2083,6 +2119,166 @@ function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Di
     }
   }
   return diagnostics.wrap(undefined);
+}
+
+/**
+ * Reconcile properties on a rebased model after `@hierarchyBuilding(oldBase, newBase)`.
+ *
+ * Rule:
+ *   1. Compute `oldBaseEffective` = properties already on `oldBase` (its own
+ *      `properties` Map) plus properties contributed by every removed
+ *      intermediate ancestor. When the same name appears more than once,
+ *      the nearest contributor wins (own > nearest intermediate > farther).
+ *   2. Compute `newBaseSupplied` = every property name supplied anywhere in
+ *      the new base chain (newBase + its ancestors).
+ *   3. For each name in `oldBaseEffective` that also appears in
+ *      `newBaseSupplied`: drop it. If the types are assignable in either
+ *      direction, drop silently; otherwise emit
+ *      `legacy-hierarchy-building-conflict` (`property-type-mismatch`).
+ *   4. Whatever remains becomes the rebased model's own SDK properties.
+ *      Properties already materialized on the SDK model are preserved
+ *      as-is; properties contributed only by removed intermediates are
+ *      materialized via `getSdkModelPropertyType`.
+ */
+function reconcilePropertiesAfterRebase(
+  context: TCGCContext,
+  sdkType: SdkModelType,
+  newBase: Model,
+): [void, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const oldBase = sdkType.__raw as Model;
+
+  const oldBaseChain = walkBaseChain(oldBase);
+  const newBaseChain = walkBaseChain(newBase);
+  const newBaseIndex = oldBaseChain.indexOf(newBase);
+  const removed = newBaseIndex >= 0 ? oldBaseChain.slice(1, newBaseIndex) : oldBaseChain.slice(1);
+
+  // Names supplied anywhere in the new base chain → first ModelProperty seen.
+  // Apply the same SDK-shape filters as `addPropertiesToModelType` so the
+  // "supplied by the new base chain" view matches what the SDK actually sees.
+  const newBaseSupplied = new Map<string, ModelProperty>();
+  for (const m of newBaseChain) {
+    for (const [name, prop] of m.properties) {
+      if (newBaseSupplied.has(name)) continue;
+      if (!isVisibleSdkProperty(context, prop)) continue;
+      newBaseSupplied.set(name, prop);
+    }
+  }
+
+  // Effective properties on the rebased model before reconciliation: oldBase's
+  // own first (they win), then nearest-removed-ancestor first.
+  const oldBaseEffective = new Map<string, ModelProperty>();
+  for (const [name, prop] of oldBase.properties) {
+    oldBaseEffective.set(name, prop);
+  }
+  for (const intermediate of removed) {
+    for (const [name, prop] of intermediate.properties) {
+      if (!oldBaseEffective.has(name)) oldBaseEffective.set(name, prop);
+    }
+  }
+
+  // Identify the discriminator property name (if any) on the rebased model —
+  // it must be preserved across the rebase even when the new base supplies a
+  // wider-typed property with the same name.
+  const discriminatorPropName = sdkType.properties.find((p) => p.discriminator)?.__raw?.name;
+
+  const keptProps: SdkModelPropertyType[] = [];
+  const sdkPropByRawName = new Map<string, SdkModelPropertyType>();
+  for (const prop of sdkType.properties) {
+    if (prop.__raw?.name) sdkPropByRawName.set(prop.__raw.name, prop);
+  }
+
+  for (const [name, rawProp] of oldBaseEffective) {
+    if (!isVisibleSdkProperty(context, rawProp)) {
+      continue;
+    }
+
+    const fromOwn = oldBase.properties.has(name);
+    const isDiscriminator = name === discriminatorPropName;
+    const newBaseProp = newBaseSupplied.get(name);
+
+    if (newBaseProp && !isDiscriminator) {
+      if (areTypesIncompatible(context, rawProp.type, newBaseProp.type)) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "legacy-hierarchy-building-conflict",
+            messageId: "property-type-mismatch",
+            format: {
+              propertyName: name,
+              childModel: oldBase.name,
+              parentModel: newBase.name,
+            },
+            target: oldBase,
+          }),
+        );
+      }
+      // Drop either way: the new base chain owns this name.
+      continue;
+    }
+
+    if (fromOwn) {
+      const existing = sdkPropByRawName.get(name);
+      if (existing) keptProps.push(existing);
+      continue;
+    }
+
+    // Lift from a removed intermediate. Mirror the contextType logic used in
+    // `addPropertiesToModelType`: for named unions, pass `undefined` so any
+    // anonymous variants get named relative to the property rather than
+    // relative to the union.
+    const propType = rawProp.type;
+    const contextType =
+      propType.kind === "Union" && propType.name ? undefined : (propType as ContextNode["type"]);
+    pushNamingContext(context, name, contextType);
+    const lifted = diagnostics.pipe(getSdkModelPropertyType(context, rawProp));
+    popNamingContext(context);
+    keptProps.push(lifted);
+  }
+
+  sdkType.properties = keptProps;
+  return diagnostics.wrap(undefined);
+}
+
+/**
+ * Apply the same predicates as `addPropertiesToModelType` so our view of the
+ * SDK-observable property set stays aligned with the actual SDK shape.
+ */
+function isVisibleSdkProperty(context: TCGCContext, property: ModelProperty): boolean {
+  return (
+    !isStatusCode(context.program, property) &&
+    !isNeverOrVoidType(property.type) &&
+    !hasNoneVisibility(context, property) &&
+    isInScope(context, property)
+  );
+}
+
+/**
+ * Check if two property types are incompatible during `@hierarchyBuilding`
+ * reconciliation. They are considered compatible (no diagnostic) when either
+ * is assignable to the other under TypeSpec's type system.
+ */
+function areTypesIncompatible(context: TCGCContext, targetType: Type, newBaseType: Type): boolean {
+  if (targetType === newBaseType) return false;
+  const typekit = $(context.program).type;
+  if (typekit.isAssignableTo(targetType, newBaseType, targetType)) return false;
+  if (typekit.isAssignableTo(newBaseType, targetType, newBaseType)) return false;
+  return true;
+}
+
+/**
+ * Walk a model's raw inheritance chain, returning [model, model.baseModel, ...]
+ * along the original (pre-rebase) parent links.
+ */
+function walkBaseChain(model: Model): Model[] {
+  const chain: Model[] = [];
+  const seen = new Set<Model>();
+  let current: Model | undefined = model;
+  while (current && !seen.has(current)) {
+    seen.add(current);
+    chain.push(current);
+    current = current.baseModel;
+  }
+  return chain;
 }
 
 interface UsageFilteringOptions {

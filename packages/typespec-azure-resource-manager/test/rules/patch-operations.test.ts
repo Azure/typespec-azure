@@ -46,6 +46,7 @@ it("Requires PATCH to be a proper subset of resource for model references", asyn
       interface FooResources
         extends ResourceRead<FooResource>, ResourceCreate<FooResource>, ResourceDelete<FooResource> {
          @armResourceUpdate(FooResource)
+         #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
          @patch(#{implicitOptionality: true}) myFooUpdate(...ResourceInstanceParameters<FooResource>, @bodyRoot body: MyBadPatch) : ArmResponse<FooResource> | ErrorResponse;
         }
 
@@ -97,6 +98,7 @@ it("Requires PATCH to be a proper subset of resource for model spread", async ()
       interface FooResources
         extends ResourceRead<FooResource>, ResourceCreate<FooResource>, ResourceDelete<FooResource> {
          @armResourceUpdate(FooResource)
+         #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
          @patch(#{implicitOptionality: true}) myFooUpdate(...ResourceInstanceParameters<FooResource>, ...MyBadPatch) : ArmResponse<FooResource> | ErrorResponse;
         }
 
@@ -147,6 +149,7 @@ it("emit diagnostic when there is no request body", async () => {
         extends ResourceRead<FooResource>,ResourceCreate<FooResource> ,ResourceDelete<FooResource>{
           @autoRoute
           @armResourceUpdate(FooResource)
+          #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
           @patch(#{implicitOptionality: true}) 
           op update(...ResourceInstanceParameters<FooResource>
           ):TrackedResource<FooResource> | ErrorResponse;

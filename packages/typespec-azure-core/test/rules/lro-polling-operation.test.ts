@@ -51,7 +51,8 @@ it("does not emit `long-running-polling-operation-required` when a long-running 
   await tester
     .expect(
       `
-              namespace Test;
+        namespace Test;
+        @error model Error {error: string}
 
         op getOperationStatus is Foundations.GetOperationStatus;
 
@@ -59,13 +60,13 @@ it("does not emit `long-running-polling-operation-required` when a long-running 
         op read(): Foundations.LongRunningStatusLocation;
 
         @pollingOperation(getOperationStatus)
-        op readWithError(): Foundations.LongRunningStatusLocation | { error: string };
+        op readWithError(): Foundations.LongRunningStatusLocation | Error;
 
         @pollingOperation(getOperationStatus)
         op readWithCustomHeader(): {
           @TypeSpec.Http.header("operation-LOCATION")
           location: string;
-        } | { error: string };
+        } | Error;
       `,
     )
     .toBeValid();

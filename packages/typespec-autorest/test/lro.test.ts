@@ -25,10 +25,6 @@ describe("typespec-autorest: Long-running Operations", () => {
         "{endpoint}/widget",
         "Contoso Widget APIs",
         {
-          @doc("""
-      Supported Widget Services endpoints (protocol and hostname, for example:
-      https://westus.api.widget.contoso.com).
-      """)
           endpoint: string,
         }
       )
@@ -39,13 +35,13 @@ describe("typespec-autorest: Long-running Operations", () => {
       alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
 
       @resource("widgets")
-      @doc(".")
+      
       model Widget {
         @key("widgetName")
-        @doc(".")
+        
         @visibility(Lifecycle.Read)
         name: string;
-        @doc(".")
+        
         manufacturerId: string;
       
       ...EtagProperty;
@@ -54,6 +50,7 @@ describe("typespec-autorest: Long-running Operations", () => {
       op getWidgetOperationStatus is Operations.GetResourceOperationStatus<Widget>;
     
       @pollingOperation(getWidgetOperationStatus)
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       op createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
       `,
       { preset: "azure", options: { "emit-lro-options": "all" } },
@@ -106,6 +103,7 @@ describe("typespec-autorest: Long-running Operations", () => {
       op getWidgetOperationStatus is Operations.GetResourceOperationStatus<Widget>;
     
       @pollingOperation(getWidgetOperationStatus)
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       op createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
       `,
       { preset: "azure", options: { "emit-lro-options": "all" } },
@@ -125,25 +123,25 @@ describe("typespec-autorest: Long-running Operations", () => {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("The state of the resource")
+      
       enum ResourceState {
        Succeeded,
        Canceled,
        Failed
      }
 
-      @doc("The widget properties")
+      
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
+        
         simpleArmId: Azure.Core.armResourceIdentifier;
 
-        @doc("The provisioning State")
+        
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
+      
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
+        
         @key("widgetName")
         @segment("widgets")
         @path
@@ -153,6 +151,7 @@ describe("typespec-autorest: Long-running Operations", () => {
       interface Widgets {
         get is ArmResourceRead<Widget>;
         ${"putOp"}
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchAsync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteWithoutOkAsync<Widget>;
         restart is ArmResourceActionAsync<Widget, void, never>;
@@ -333,25 +332,25 @@ describe("typespec-autorest: Long-running Operations", () => {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("The state of the resource")
+      
       enum ResourceState {
         Succeeded,
         Canceled,
         Failed
       }
 
-      @doc("The widget properties")
+      
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
+        
         simpleArmId: Azure.Core.armResourceIdentifier;
 
-        @doc("The provisioning State")
+        
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
+      
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
+        
         @key("widgetName")
         @segment("widgets")
         @path
@@ -395,25 +394,25 @@ describe("typespec-autorest: Long-running Operations", () => {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("The state of the resource")
+      
       enum ResourceState {
         Succeeded,
         Canceled,
         Failed
       }
 
-      @doc("The widget properties")
+      
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
+        
         simpleArmId: Azure.Core.armResourceIdentifier;
 
-        @doc("The provisioning State")
+        
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
+      
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
+        
         @key("widgetName")
         @segment("widgets")
         @path
@@ -460,25 +459,25 @@ describe("typespec-autorest: Long-running Operations", () => {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("The state of the resource")
+      
       enum ResourceState {
         Succeeded,
         Canceled,
         Failed
       }
 
-      @doc("The widget properties")
+      
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
+        
         simpleArmId: Azure.Core.armResourceIdentifier;
 
-        @doc("The provisioning State")
+        
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
+      
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
+        
         @key("widgetName")
         @segment("widgets")
         @path
@@ -515,25 +514,25 @@ describe("typespec-autorest: Long-running Operations", () => {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("The state of the resource")
+      
       enum ResourceState {
         Succeeded,
         Canceled,
         Failed
       }
 
-      @doc("The widget properties")
+      
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
+        
         simpleArmId: Azure.Core.armResourceIdentifier;
 
-        @doc("The provisioning State")
+        
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
+      
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
+        
         @key("widgetName")
         @segment("widgets")
         @path

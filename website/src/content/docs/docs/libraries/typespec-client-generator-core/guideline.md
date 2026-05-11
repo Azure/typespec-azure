@@ -98,7 +98,7 @@ Most TCGC types share the following common properties:
   - `LroInitial` (2048): Type is used in the initial response of an LRO.
   - `LroPolling` (4096): Type is used in a polling response of an LRO.
   - `LroFinalEnvelope` (8192): Type is used in the final envelope of an LRO.
-  - `External` (16384): Type is only referenced through external alternate types.
+  - `External` (16384): Type is only referenced through external alternate types. When a type has the `External` flag and no `Input` or `Output` flags, it means emitters do not need to generate serialization/deserialization code for it — the external package handles that. TCGC blocks propagation of non-`External` usage flags (such as `Input`, `Output`, `Json`) through types marked as external.
 - **`deprecation`**: Indicates whether the type is deprecated and provides the deprecation message.
 - **`clientDefaultValue`**: The type's default value if provided. Set via the `@clientDefaultValue` decorator or auto-set for endpoint and API version parameters.
 
@@ -185,7 +185,7 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 
 **Built-in Types:**
 
-- [`SdkBuiltInType`](../reference/js-api/interfaces/sdkbuiltintype/) represents a [built-in TypeSpec type](https://typespec.io/docs/language-basics/built-in-types/) or a [`scalar`](https://typespec.io/docs/language-basics/scalars/) type that derives from a built-in TypeSpec type, excluding `utcDateTime`, `offsetDateTime` and `duration`. The `encode` property is added to these types when the `@encode` decorator exists, indicating how to encode when sending to the service.
+- [`SdkBuiltInType`](../reference/js-api/interfaces/sdkbuiltintype/) represents a [built-in TypeSpec type](https://typespec.io/docs/language-basics/built-in-types/) or a [`scalar`](https://typespec.io/docs/language-basics/scalars/) type that derives from a built-in TypeSpec type, excluding `utcDateTime`, `offsetDateTime` and `duration`. The `encode` property indicates how to encode when sending to the service. It is set when the `@encode` decorator exists, or when the context determines a specific encoding — for example, `bytes` in a `multipart/form-data` part get `encode: "bytes"` (raw binary) rather than the default `"base64"`.
 
 **Date and Time Types:**
 
@@ -250,6 +250,8 @@ If there is no explicitly defined `@client`, then each namespace with `@service`
 
 If there is any `@client` definition, then each top-level `@client` is a root client and each nested `@client` is a sub client with hierarchy.
 
+When multiple services are merged into the same client (via `@client({service: [ServiceA, ServiceB]})`), TCGC checks whether the services depend on different versions of a shared library dependency. If they do, the `inconsistent-multiple-service-dependency` diagnostic is emitted as a warning. For example, if `ServiceA` uses `SharedLib.v1` and `ServiceB` uses `SharedLib.v2`, and they are both merged into `CombineClient`, the warning message is: `Services merged into client "CombineClient" depend on different versions of "SharedLib": "v1", "v2".`
+
 If a detected client or sub client does not contain any sub client or operation, then this client is ignored.
 
 ### Client Initialization Creation
@@ -290,7 +292,7 @@ Parameters used in client (either API version parameter or client parameter defi
 
 The method's return type is determined by the underlying operation's normal responses:
 
-- If `@responseAsBool` is on the method, then the response is a boolean.
+- If `@responseAsBool` is on the method, then the response is a `boolean` (never optional). In this case, the underlying HTTP response objects have `type: undefined` — the boolean return type is a client-side concept handled at the method response level, not at the HTTP response level.
 - If the responses contain multiple return types, the return type is a union of all the types.
 - If the responses contain empty return type, the return type is wrapped with a nullable type.
 
@@ -306,6 +308,8 @@ TCGC infers the body parameter type from TypeSpec HTTP lib type [`HttpOperationB
 
 TCGC creates the `Content-Type` header parameter for any operation with body parameter if it doesn't exist, and creates the `Accept` header parameter for any operation with response that contains body. TCGC also creates corresponding method parameters for the operation's upper layer method for each case.
 
+For request bodies with multiple content types, the `Content-Type` parameter is modeled as an enum with one value per content type. For responses with multiple content types, the `Accept` header parameter is modeled as a single constant whose value is a comma-joined string of all response content types. Structured content types (JSON, XML, `text/plain`) are sorted before unstructured ones. For example, if a response can return `image/png` or `application/json`, the `Accept` constant value is `"application/json, image/png"`.
+
 TCGC uses several ways to find an HTTP operation's parameter's corresponding method parameter or model property:
 
 - Check if the parameter is a client-level method parameter.
@@ -314,6 +318,8 @@ TCGC uses several ways to find an HTTP operation's parameter's corresponding met
 - Check if the parameter is a method parameter or a nested model property of a method parameter (nested HTTP metadata case when using `@bodyRoot`).
 - Check if all properties of the parameter can be mapped to a method parameter or a nested model property of a method parameter (spread).
 
+Body parameters include a `serializationOptions` property that indicates how to serialize the body. TCGC automatically populates this from the operation's content types — for example, if the content type is `application/json`, the `json` option is set with the serialized name of the body parameter. This provides a consistent way for emitters to determine the serialization format, regardless of whether the body type is a model or a basic type.
+
 ### HTTP Operation Response Calculation
 
 The response is inferred from TypeSpec HTTP lib type [`HttpOperationResponse`](https://typespec.io/docs/libraries/http/reference/js-api/interfaces/httpoperationresponse/).
@@ -321,6 +327,8 @@ The response is inferred from TypeSpec HTTP lib type [`HttpOperationResponse`](h
 For each response, TCGC will check the response's content. If contents from different responses are not equal, TCGC takes the last one as the response type. Any response with `*` status code or response content type that has `@error` decorator, TCGC puts them into the exception response list. Others are put in the response list.
 
 If `@responseAsBool` is on the operation's upper level method, the `404` status code is always recognized as a normal response.
+
+HTTP responses include a `serializationOptions` property that indicates how to deserialize the response body. TCGC automatically populates this from the response's content types — for example, if the response content type is `application/json`, the `json` option is set. Responses without a body have empty serialization options.
 
 ### Type Detection
 
@@ -348,6 +356,15 @@ If `@access` is decorated on either `Namespace`, `Operation`, types, or model pr
 ### Usage Calculation
 
 If there is no `@usage` used in the spec, all types' usage in TCGC is calculated by the place where the type is used. The `@usage` decorator can extend the usage for one type or all types under one namespace. The calculation logic is [here](../reference/decorators/#@Azure.ClientGenerator.Core.usage).
+
+#### Usage Flag Propagation for Readonly Properties
+
+When TCGC propagates usage flags through model properties, readonly properties receive special handling. The `Input` flag is stripped from the propagation value for readonly properties, but other flags (such as `Output`, `Json`, `Xml`) still propagate through. For example:
+
+- If propagating `Input | Output | Json` through a readonly property, only `Output | Json` propagates to the property's type.
+- If propagating only `Input`, the readonly property is skipped entirely (since stripping `Input` leaves no flags to propagate).
+
+This ensures that types reachable only through readonly properties are not incorrectly marked as input types.
 
 ### Naming Logic for Anonymous Types
 

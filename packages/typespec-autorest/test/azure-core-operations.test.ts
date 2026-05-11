@@ -21,10 +21,6 @@ using Azure.Core.Traits;
   "{endpoint}/widget",
   "Contoso Widget APIs",
   {
-    @doc("""
-Supported Widget Services endpoints (protocol and hostname, for example:
-https://westus.api.widget.contoso.com).
-""")
     endpoint: string,
   }
 )
@@ -43,24 +39,25 @@ describe("typespec-autorest: Azure.Core.ResourceOperations", () => {
       `
         ${wrapperCode}
     
-        @doc("A widget.")
+        
         @resource("widgets")
         model Widget {
           @key("widgetName")
-          @doc("The widget name.")
+          
           @visibility(Lifecycle.Read)
           name: string;
         
-          @doc("modality")
+          
           @visibility(Lifecycle.Create, Lifecycle.Read)
           modality: string;
         
-          @doc("The widget color.")
+          
           color: string;
         }
         
-        @doc("Create or update a widget.")
+        
         @test
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         op createOrUpdateWidget is Operations.ResourceCreateOrUpdate<Widget>;
       `,
       { preset: "azure" },
@@ -74,24 +71,25 @@ describe("typespec-autorest: Azure.Core.ResourceOperations", () => {
       `
       ${wrapperCode}
 
-      @doc("A widget.")
+      
       @resource("widgets")
       model Widget {
         @key("widgetName")
-        @doc("The widget name.")
+        
         @visibility(Lifecycle.Read)
         name: string;
       
-        @doc("modality")
+        
         @visibility(Lifecycle.Create, Lifecycle.Read)
         modality: string;
       
-        @doc("The widget color.")
+        
         color: string;
       }
       
-      @doc("Create or update a widget.")
+      
       @test
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       op createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
     `,
       { preset: "azure" },
@@ -117,22 +115,22 @@ describe("typespec-autorest: Azure.Core.ResourceOperations", () => {
       `
       ${wrapperCode}
 
-      @doc("A widget.")
+      
       @resource("widgets")
       model Widget {
         @key("widgetName")
-        @doc("The widget name.")
+        
         name: string;
       }
 
-      @doc(".")
+      
       @test
       op listWidgets is Operations.ResourceList<
         Widget,
         ListQueryParametersTrait<StandardListQueryParameters & SelectQueryParameter>
       >;
 
-      @doc(".")
+      
       @test
       op actionWidget is Operations.ResourceAction<Widget, {}, {}>;
     `,

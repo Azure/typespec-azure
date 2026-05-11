@@ -59,6 +59,7 @@ model WidgetResourceProperties {
 interface Widgets {
   get is ArmResourceRead<WidgetResource>;
   create is ArmResourceCreateOrReplaceAsync<WidgetResource>;
+  #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
   update is ArmTagsPatchSync<WidgetResource>;
   delete is ArmResourceDeleteWithoutOkAsync<WidgetResource>;
   listByResourceGroup is ArmResourceListByParent<WidgetResource>;

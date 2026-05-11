@@ -302,6 +302,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Example file ${"filename"} uses duplicate title '${"title"}' for operationId '${"operationId"}'`,
       },
     },
+    "duplicate-operation-id": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Operation ID '${"operationId"}' is duplicated across operations. OpenAPI requires operationId values to be globally unique.`,
+      },
+    },
     "invalid-schema": {
       severity: "error",
       messages: {
