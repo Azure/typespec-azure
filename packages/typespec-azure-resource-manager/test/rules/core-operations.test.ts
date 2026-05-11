@@ -28,14 +28,14 @@ it("emits diagnostics if missing armResourceOperation decorators.", async () => 
         namespace Microsoft.Foo;
         
         model FooResource is TrackedResource<{}> {
-          @key("foo") @segment("foo") @path
-          name: string;
+          ...ResourceNameParameter<FooResource>;
         }
 
         @armResourceOperations
         interface FooResources extends ResourceCollectionOperations<FooResource> {
           @put createOrUpdate( ...ResourceInstanceParameters<FooResource>, @bodyRoot resource: FooResource): ArmResponse<FooResource> | ArmCreatedResponse<FooResource> | ErrorResponse;
           @get get(...ResourceInstanceParameters<FooResource>): ArmResponse<FooResource> | ErrorResponse;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
           @patch(#{implicitOptionality: true}) update(...ResourceInstanceParameters<FooResource>, @bodyRoot properties: Foundations.ResourceUpdateModel<FooResource, {}>): ArmResponse<FooResource> | ErrorResponse;
           @delete delete(...ResourceInstanceParameters<FooResource>): | ArmDeletedResponse | ArmDeleteAcceptedResponse | ArmDeletedNoContentResponse | ErrorResponse;
           @post action(...ResourceInstanceParameters<FooResource>) : ArmResponse<FooResource> | ErrorResponse;
@@ -118,30 +118,14 @@ it("Detects operations outside interfaces", async () => {
           @armResourceRead(FooResource)
           @get op getFoos(...ApiVersionParameter) : FooResource;
     
-          model FooResource is TrackedResource<FooProperties> {
-            @visibility(Lifecycle.Read)
-            @key("foo")
-            @segment("foo")
-            @path
-            name: string;
-            ...ManagedServiceIdentityProperty;
+          model FooResource is TrackedResource<{}> {
+            ...ResourceNameParameter<FooResource>;
           }
     
           @armResourceOperations
           interface FooResources
-            extends TrackedResourceOperations<FooResource, FooProperties> {
+            extends TrackedResourceOperations<FooResource, {}> {
             }
-    
-            enum ResourceState {
-             Succeeded,
-             Canceled,
-             Failed
-           }
-    
-           model FooProperties {
-             displayName?: string = "default";
-             provisioningState: ResourceState;
-           }
         `,
     )
     .toEmitDiagnostics({
@@ -157,14 +141,10 @@ it("Detects missing api-version parameters", async () => {
         @armProviderNamespace
         namespace Microsoft.Foo;
   
-        model FooResource is TrackedResource<FooProperties> {
-          @visibility(Lifecycle.Read)
-          @key("foo")
-          @segment("foo")
-          @path
-          name: string;
-          ...ManagedServiceIdentityProperty;
+        model FooResource is TrackedResource<{}> {
+          ...ResourceNameParameter<FooResource>;
         }
+
         model MyResourceCommonParameters<TResource extends {}> {
           ...SubscriptionIdParameter;
           ...ResourceGroupParameter;
@@ -183,17 +163,6 @@ it("Detects missing api-version parameters", async () => {
             @armResourceAction(FooResource)
             @action @post myFooAction(...MyResourceInstanceParameters<FooResource>) : ArmResponse<FooResource> | ErrorResponse;
           }
-  
-        enum ResourceState {
-          Succeeded,
-          Canceled,
-          Failed
-        }
-
-        model FooProperties {
-          displayName?: string = "default";
-          provisioningState: ResourceState;
-        }
       `,
     )
     .toEmitDiagnostics({
@@ -209,20 +178,8 @@ describe("Provider operations", () => {
       @armProviderNamespace
       namespace Microsoft.Foo;
   
-      model Employee is TrackedResource<EmployeeProperties> {
+      model Employee is TrackedResource<{}> {
         ...ResourceNameParameter<Employee>;
-      }
-  
-      model EmployeeProperties {
-        @visibility(Lifecycle.Read)
-        provisioningState?: ProvisioningState;
-      }
-  
-      union ProvisioningState {
-        string,
-        Succeeded: "Succeeded",
-        Failed: "Failed",
-        Canceled: "Canceled",
       }
 
       op ComputeProviderActionAsync<

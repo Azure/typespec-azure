@@ -12,7 +12,6 @@ async function compileVanillaWidgetService(code: string) {
     @versioned(Versions)
     namespace DemoService;
 
-    /** The Contoso Widget Manager service version. */
     enum Versions {
       "2022-08-30",
     }
@@ -152,7 +151,7 @@ it("vanilla widget read", async () => {
 
 it("vanilla widget update", async () => {
   const { program } = await compileVanillaWidgetService(
-    "@patch(#{implicitOptionality: true}) update(...Widget): Widget | Error;",
+    '#suppress "@typespec/http/deprecated-implicit-optionality" "For test"\n@patch(#{implicitOptionality: true}) update(...Widget): Widget | Error;',
   );
 
   const context = await createSdkContextForTester(program);

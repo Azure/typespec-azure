@@ -35,8 +35,6 @@ it("Returns correct metadata for Async CreateOrUpdate", async () => {
      }
 
       model WidgetProperties {
-        simpleArmId: Azure.Core.armResourceIdentifier;
-
         provisioningState: ResourceState;
       }
 
@@ -50,6 +48,7 @@ it("Returns correct metadata for Async CreateOrUpdate", async () => {
       interface Widgets {
         get is ArmResourceRead<Widget>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchSync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteSync<Widget>;
         listByResourceGroup is ArmResourceListByParent<Widget>;
@@ -79,8 +78,6 @@ it("Returns correct metadata for Async CreateOrUpdate with final location", asyn
      }
 
       model WidgetProperties {
-        simpleArmId: Azure.Core.armResourceIdentifier;
-
         provisioningState: ResourceState;
       }
 
@@ -102,6 +99,7 @@ it("Returns correct metadata for Async CreateOrUpdate with final location", asyn
             string
           >
       >;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchSync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteSync<Widget>;
         listByResourceGroup is ArmResourceListByParent<Widget>;
@@ -131,8 +129,6 @@ it("Returns correct metadata for Async Update", async () => {
      }
 
       model WidgetProperties {
-        simpleArmId: Azure.Core.armResourceIdentifier;
-
         provisioningState: ResourceState;
       }
 
@@ -146,6 +142,7 @@ it("Returns correct metadata for Async Update", async () => {
       interface Widgets {
         get is ArmResourceRead<Widget>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchAsync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteSync<Widget>;
         listByResourceGroup is ArmResourceListByParent<Widget>;
@@ -174,7 +171,6 @@ it("Returns correct metadata for Async Delete", async () => {
      }
 
       model WidgetProperties {
-        simpleArmId: Azure.Core.armResourceIdentifier;
         provisioningState: ResourceState;
       }
 
@@ -188,6 +184,7 @@ it("Returns correct metadata for Async Delete", async () => {
       interface Widgets {
         get is ArmResourceRead<Widget>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchSync<Widget, WidgetProperties>;
         #suppress "deprecated" "test"
         delete is ArmResourceDeleteAsync<Widget>;
@@ -217,7 +214,6 @@ it("Returns correct metadata for Async action", async () => {
      }
 
       model WidgetProperties {
-        simpleArmId: Azure.Core.armResourceIdentifier;
 
         provisioningState: ResourceState;
       }
@@ -241,6 +237,7 @@ it("Returns correct metadata for Async action", async () => {
       interface Widgets {
         get is ArmResourceRead<Widget>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchSync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteSync<Widget>;
         doStuff is ArmResourceActionAsync<Widget, RequestModel, ResultModel>;
@@ -269,7 +266,6 @@ it("Returns correct metadata for Async action with void return type", async () =
      }
 
       model WidgetProperties {
-        simpleArmId: Azure.Core.armResourceIdentifier;
 
         provisioningState: ResourceState;
       }
@@ -293,6 +289,7 @@ it("Returns correct metadata for Async action with void return type", async () =
       interface Widgets {
         get is ArmResourceRead<Widget>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchSync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteSync<Widget>;
         doStuff is ArmResourceActionAsync<Widget, RequestModel, void, LroHeaders=ArmAsyncOperationHeader<FinalResult = void>>;
@@ -323,7 +320,6 @@ it("Returns correct metadata for Async CreateOrUpdate with union type Provisioni
      }
 
       model WidgetProperties {
-        simpleArmId: Azure.Core.armResourceIdentifier;
 
         provisioningState: ResourceState;
       }
@@ -338,6 +334,7 @@ it("Returns correct metadata for Async CreateOrUpdate with union type Provisioni
       interface Widgets {
         get is ArmResourceRead<Widget>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchSync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteSync<Widget>;
         listByResourceGroup is ArmResourceListByParent<Widget>;
@@ -367,8 +364,6 @@ it("Returns correct metadata for Async CreateOrUpdate with final location, with 
       }
 
       model WidgetProperties {
-        simpleArmId: Azure.Core.armResourceIdentifier;
-
         provisioningState: ResourceState;
       }
 
@@ -390,6 +385,7 @@ it("Returns correct metadata for Async CreateOrUpdate with final location, with 
             string
           >
       >;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchSync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteSync<Widget>;
         listByResourceGroup is ArmResourceListByParent<Widget>;
@@ -419,8 +415,6 @@ it("Returns correct metadata for Async CreateOrUpdate with final operation, with
       }
 
       model WidgetProperties {
-        simpleArmId: Azure.Core.armResourceIdentifier;
-
         provisioningState: ResourceState;
       }
 
@@ -435,6 +429,7 @@ it("Returns correct metadata for Async CreateOrUpdate with final operation, with
         get is ArmResourceRead<Widget>;
         @Azure.Core.finalOperation(Widgets.get)
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchSync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteSync<Widget>;
         listByResourceGroup is ArmResourceListByParent<Widget>;
@@ -464,8 +459,6 @@ it("Returns correct metadata for Async Update with final operation, with union t
       }
 
       model WidgetProperties {
-        simpleArmId: Azure.Core.armResourceIdentifier;
-
         provisioningState: ResourceState;
       }
 
@@ -480,6 +473,7 @@ it("Returns correct metadata for Async Update with final operation, with union t
         get is ArmResourceRead<Widget>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
         @Azure.Core.finalOperation(Widgets.get)
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchAsync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteSync<Widget>;
         listByResourceGroup is ArmResourceListByParent<Widget>;
@@ -509,7 +503,6 @@ it("Returns correct metadata for Async Update with union type ProvisioningState"
       }
 
       model WidgetProperties {
-        simpleArmId: Azure.Core.armResourceIdentifier;
 
         provisioningState: ResourceState;
       }
@@ -525,6 +518,7 @@ it("Returns correct metadata for Async Update with union type ProvisioningState"
         get is ArmResourceRead<Widget>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
         @Azure.Core.useFinalStateVia("original-uri")
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchAsync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteSync<Widget>;
         listByResourceGroup is ArmResourceListByParent<Widget>;
@@ -553,7 +547,6 @@ it("Returns correct metadata for Async Delete with union type ProvisioningState"
       }
 
       model WidgetProperties {
-        simpleArmId: Azure.Core.armResourceIdentifier;
 
         provisioningState: ResourceState;
       }
@@ -568,6 +561,7 @@ it("Returns correct metadata for Async Delete with union type ProvisioningState"
       interface Widgets {
         get is ArmResourceRead<Widget>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchSync<Widget, WidgetProperties>;
         #suppress "deprecated" "test"
         delete is ArmResourceDeleteAsync<Widget>;
@@ -597,8 +591,6 @@ it("Returns correct metadata for Async action with union type ProvisioningState"
       }
 
       model WidgetProperties {
-        simpleArmId: Azure.Core.armResourceIdentifier;
-
         provisioningState: ResourceState;
       }
 
@@ -621,6 +613,7 @@ it("Returns correct metadata for Async action with union type ProvisioningState"
       interface Widgets {
         get is ArmResourceRead<Widget>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchSync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteSync<Widget>;
         doStuff is ArmResourceActionAsync<Widget, RequestModel, ResultModel>;
@@ -716,7 +709,6 @@ describe("original-uri with no GET at same path", () => {
     }
 
     model WidgetProperties {
-      simpleArmId: Azure.Core.armResourceIdentifier;
       provisioningState: ResourceState;
     }
 
@@ -738,6 +730,7 @@ describe("original-uri with no GET at same path", () => {
     @armResourceOperations(Widget)
     interface Widgets {
       createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       update is ArmResourcePatchSync<Widget, WidgetProperties>;
       delete is ArmResourceDeleteSync<Widget>;
       {suppress}

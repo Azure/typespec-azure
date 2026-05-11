@@ -257,25 +257,25 @@ op test(): void;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("The state of the resource")
+      
       enum ResourceState {
        Succeeded,
        Canceled,
        Failed
      }
 
-      @doc("The widget properties")
+      
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
+        
         simpleArmId: Azure.Core.armResourceIdentifier;
 
-        @doc("The provisioning State")
+        
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
+      
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
+        
         @key("widgetName")
         @segment("widgets")
         @path
@@ -286,6 +286,7 @@ op test(): void;
         get is ArmResourceRead<Widget>;
         @Azure.Core.useFinalStateVia("azure-async-operation")
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget, LroHeaders = Azure.Core.Foundations.RetryAfterHeader & ArmAsyncOperationHeader>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchSync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteSync<Widget>;
         listByResourceGroup is ArmResourceListByParent<Widget>;
@@ -352,25 +353,25 @@ op test(): void;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("The state of the resource")
+      
       enum ResourceState {
        Succeeded,
        Canceled,
        Failed
      }
 
-      @doc("The widget properties")
+      
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
+        
         simpleArmId: Azure.Core.armResourceIdentifier;
 
-        @doc("The provisioning State")
+        
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
+      
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
+        
         @key("widgetName")
         @segment("widgets")
         @path
@@ -381,6 +382,7 @@ op test(): void;
         get is ArmResourceRead<Widget>;
         @Azure.Core.useFinalStateVia("azure-async-operation")
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget, LroHeaders = Azure.Core.Foundations.RetryAfterHeader & ArmAsyncOperationHeader>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchSync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteSync<Widget>;
         listByResourceGroup is ArmResourceListByParent<Widget>;
