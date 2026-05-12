@@ -59,7 +59,9 @@ op CreateOrReplaceSync<
   Resource extends PrivateEndpointConnectionResource,
   BaseParameters = DefaultBaseParameters<ParentResource>,
   Parameters extends {} = {},
-  Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedSyncResponse<Resource>,
+  Response extends {} =
+    | ArmResourceUpdatedResponse<Resource>
+    | ArmResourceCreatedSyncResponse<Resource>,
   Error extends {} = ErrorResponse,
   OptionalRequestBody extends valueof boolean = false,
   Request extends {} | void = Resource
@@ -98,10 +100,9 @@ op CreateOrReplaceAsync<
   LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = Resource> &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
-    Resource,
-    LroHeaders
-  >,
+  Response extends {} =
+    | ArmResourceUpdatedResponse<Resource>
+    | ArmResourceCreatedResponse<Resource, LroHeaders>,
   Error extends {} = ErrorResponse,
   OptionalRequestBody extends valueof boolean = false,
   Request extends {} | void = Resource
@@ -144,10 +145,9 @@ op CustomPatchAsync<
   > &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} = ArmResponse<Resource> | ArmAcceptedLroResponse<
-    "Resource update request accepted.",
-    LroHeaders
-  >,
+  Response extends {} =
+    | ArmResponse<Resource>
+    | ArmAcceptedLroResponse<"Resource update request accepted.", LroHeaders>,
   Error extends {} = ErrorResponse,
   OptionalRequestBody extends valueof boolean = false
 > is Azure.ResourceManager.Legacy.UpdateOperation<

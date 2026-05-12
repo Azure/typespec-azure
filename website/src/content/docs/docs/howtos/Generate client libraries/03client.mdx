@@ -1678,7 +1678,8 @@ model StorageClientOptions {
   blobName: string;
 }
 
-@@clientInitialization(Storage,
+@@clientInitialization(
+  Storage,
   {
     parameters: StorageClientOptions,
   }
@@ -1817,7 +1818,8 @@ model StorageClientOptions {
   blob: string;
 }
 
-@@clientInitialization(Storage,
+@@clientInitialization(
+  Storage,
   {
     parameters: StorageClientOptions,
   }
@@ -1961,7 +1963,8 @@ model StorageClientOptions {
   blobName: string;
 }
 
-@@clientInitialization(Storage,
+@@clientInitialization(
+  Storage,
   {
     initializedBy: InitializedBy.individually | InitializedBy.parent,
   }
