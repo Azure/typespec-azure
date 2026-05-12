@@ -142,45 +142,46 @@ jobs:
         run: pnpm turbo run --filter "${{ matrix.package-filter }}..." build
 
       - name: Log package versions
+        shell: bash
         run: |
           echo "=== Build info for ${{ matrix.name }} E2E ==="
           echo ""
           echo "--- Source commits ---"
           echo "  typespec-azure: $(git rev-parse --short HEAD) ($(git log -1 --format=%ci))"
           echo "  typespec core:  $(git -C core rev-parse --short HEAD) ($(git -C core log -1 --format=%ci))"
-          echo ""
-          echo "--- Dev versions (next tag on npm) ---"
-          node -e '
-            const { execSync } = require("child_process");
-            const packages = [
-              "@typespec/compiler",
-              "@typespec/http",
-              "@typespec/rest",
-              "@typespec/openapi",
-              "@typespec/openapi3",
-              "@typespec/versioning",
-              "@typespec/xml",
-              "@typespec/events",
-              "@typespec/sse",
-              "@typespec/streams",
-              "@typespec/http-client-python",
-              "@azure-tools/typespec-azure-core",
-              "@azure-tools/typespec-client-generator-core",
-              "@azure-tools/typespec-azure-resource-manager",
-              "@azure-tools/typespec-autorest",
-              "@azure-tools/typespec-python",
-            ];
-            for (const pkg of packages) {
-              try {
-                const tags = JSON.parse(execSync("npm view " + pkg + " dist-tags --json", { encoding: "utf8" }));
-                const version = tags.next || tags.latest || "unknown";
-                console.log("  " + pkg + ": " + version);
-              } catch {
-                console.log("  " + pkg + ": not found on npm");
-              }
+
+      - name: Log dev versions from npm
+        shell: node {0}
+        run: |
+          const { execSync } = require("child_process");
+          const packages = [
+            "@typespec/compiler",
+            "@typespec/http",
+            "@typespec/rest",
+            "@typespec/openapi",
+            "@typespec/openapi3",
+            "@typespec/versioning",
+            "@typespec/xml",
+            "@typespec/events",
+            "@typespec/sse",
+            "@typespec/streams",
+            "@typespec/http-client-python",
+            "@azure-tools/typespec-azure-core",
+            "@azure-tools/typespec-client-generator-core",
+            "@azure-tools/typespec-azure-resource-manager",
+            "@azure-tools/typespec-autorest",
+            "@azure-tools/typespec-python",
+          ];
+          console.log("--- Dev versions (next tag on npm) ---");
+          for (const pkg of packages) {
+            try {
+              const tags = JSON.parse(execSync("npm view " + pkg + " dist-tags --json", { encoding: "utf8" }));
+              const version = tags.next || tags.latest || "unknown";
+              console.log("  " + pkg + ": " + version);
+            } catch {
+              console.log("  " + pkg + ": not found on npm");
             }
-          '
-          "
+          }
 
       # --- Language-specific preparation ---
 
