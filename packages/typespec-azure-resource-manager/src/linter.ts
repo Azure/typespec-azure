@@ -3,6 +3,7 @@ import { armCommonTypesVersionRule } from "./rules/arm-common-types-version.js";
 import { armCustomResourceNoKey } from "./rules/arm-custom-resource-no-key.js";
 import { armCustomResourceUsageDiscourage } from "./rules/arm-custom-resource-usage-discourage.js";
 import { armDeleteResponseCodesRule } from "./rules/arm-delete-response-codes.js";
+import { armNoPathCasingConflictsRule } from "./rules/arm-no-path-casing-conflicts.js";
 import { armNoRecordRule } from "./rules/arm-no-record.js";
 import { armNoReplaceInheritedPropsRule } from "./rules/arm-no-replace-inherited-props.js";
 import { armPostResponseCodesRule } from "./rules/arm-post-response-codes.js";
@@ -38,7 +39,11 @@ import { versionProgressionRule } from "./rules/version-progression.js";
 
 const rules = [
   armNoRecordRule,
+<<<<<<< HEAD
   armNoReplaceInheritedPropsRule,
+=======
+  armNoPathCasingConflictsRule,
+>>>>>>> origin/main
   armCommonTypesVersionRule,
   armDeleteResponseCodesRule,
   armPutResponseCodesRule,

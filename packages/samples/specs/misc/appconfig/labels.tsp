@@ -14,15 +14,17 @@ namespace LabelsResource {
     ...AcceptDatetimeHeader,
     @query name?: string,
     @query after?: string,
-  ): {
-    ...Response<200>;
-    ...SyncTokenHeader;
+  ):
+    | {
+        ...Response<200>;
+        ...SyncTokenHeader;
 
-    @header
-    contentType: "application/vnd.microsoft.appconfig.labelset+json" | "application/json";
+        @header
+        contentType: "application/vnd.microsoft.appconfig.labelset+json" | "application/json";
 
-    @body body: Page<Label>;
-  } | Error;
+        @body body: Page<Label>;
+      }
+    | Error;
 
   @doc("Requests the headers and status of the given resource.")
   @operationId("CheckLabels")
@@ -36,8 +38,10 @@ namespace LabelsResource {
 
     @query(#{ explode: true })
     $Select?: LabelField[],
-  ): {
-    ...Response<200>;
-    ...SyncTokenHeader;
-  } | Error;
+  ):
+    | {
+        ...Response<200>;
+        ...SyncTokenHeader;
+      }
+    | Error;
 }

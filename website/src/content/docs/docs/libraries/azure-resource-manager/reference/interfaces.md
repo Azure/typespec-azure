@@ -1970,7 +1970,7 @@ op Azure.ResourceManager.Extension.Read(apiVersion: string, subscriptionId: Azur
 | Name                 | Description                                                                                              |
 | -------------------- | -------------------------------------------------------------------------------------------------------- |
 | TargetResource       | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
-| ExtensionResource    | the resource being rea                                                                                   |
+| ExtensionResource    | the resource being read                                                                                  |
 | Parameters           | Optional. Additional parameters after the path parameters                                                |
 | Response             | Optional. The success response for the read operation                                                    |
 | Error                | Optional. The error response, if non-standard.                                                           |

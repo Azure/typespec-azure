@@ -14,12 +14,14 @@ namespace KeysResource {
     ...AcceptDatetimeHeader,
     @query name: string,
     @header after: string,
-  ): {
-    ...Response<200>;
-    ...SyncTokenHeader;
-    @header contentType: "application/vnd.microsoft.appconfig.keyset+json" | "application/json";
-    @body body: Page<Key>;
-  } | Error;
+  ):
+    | {
+        ...Response<200>;
+        ...SyncTokenHeader;
+        @header contentType: "application/vnd.microsoft.appconfig.keyset+json" | "application/json";
+        @body body: Page<Key>;
+      }
+    | Error;
 
   @doc("Requests the headers and status of the given resource.")
   @operationId("CheckKeys")
@@ -30,8 +32,10 @@ namespace KeysResource {
     ...AcceptDatetimeHeader,
     @query name: string,
     @header after: string,
-  ): {
-    ...Response<200>;
-    ...SyncTokenHeader;
-  } | Error;
+  ):
+    | {
+        ...Response<200>;
+        ...SyncTokenHeader;
+      }
+    | Error;
 }

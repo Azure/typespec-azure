@@ -438,6 +438,8 @@ export interface SdkNullableType extends SdkTypeBase {
   name: string;
   /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
+  /** Whether name should be used exactly as-is, without casing transformations. */
+  isExactName: boolean;
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
   type: SdkType;
@@ -454,6 +456,8 @@ export interface SdkEnumType extends SdkTypeBase {
   name: string;
   /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
+  /** Whether name should be used exactly as-is, without casing transformations. */
+  isExactName: boolean;
   /** Full qualified namespace. */
   namespace: string;
   valueType: SdkBuiltInType;
@@ -490,12 +494,16 @@ export interface SdkConstantType extends SdkTypeBase {
   name: string;
   /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
+  /** Whether name should be used exactly as-is, without casing transformations. */
+  isExactName: boolean;
 }
 
 export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends SdkTypeBase {
   name: string;
   /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
+  /** Whether name should be used exactly as-is, without casing transformations. */
+  isExactName: boolean;
   /** Full qualified namespace. */
   namespace: string;
   kind: "union";
@@ -525,6 +533,8 @@ export interface SdkModelType extends SdkTypeBase {
   name: string;
   /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
+  /** Whether name should be used exactly as-is, without casing transformations. */
+  isExactName: boolean;
   /** Full qualified namespace. */
   namespace: string;
   /** Whether the type has public or private accessibility */
@@ -551,6 +561,8 @@ export interface SdkClientInitializationType extends SdkTypeBase {
   name: string;
   /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
+  /** Whether name should be used exactly as-is, without casing transformations. */
+  isExactName: boolean;
   /** Initialization parameters. */
   parameters: (SdkEndpointParameter | SdkCredentialParameter | SdkMethodParameter)[];
   /** How to initialize a client. */
@@ -590,6 +602,8 @@ export interface SdkModelPropertyTypeBase<
   name: string;
   /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
+  /** Whether name should be used exactly as-is, without casing transformations. */
+  isExactName: boolean;
   /** Document for the type. */
   doc?: string;
   /** Summary for the type. */
