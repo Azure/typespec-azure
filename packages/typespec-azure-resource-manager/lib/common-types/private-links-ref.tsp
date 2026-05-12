@@ -70,7 +70,7 @@ namespace Azure.ResourceManager.CommonTypes;
   "privatelinks.json"
 );
 
-/** Properties of he private endpoint connection resource */
+/** Properties of the private endpoint connection resource */
 @@armCommonDefinition(PrivateEndpointConnectionProperties,
   "PrivateEndpointConnectionProperties",
   #{ version: Azure.ResourceManager.CommonTypes.Versions.v3, isDefault: true },
