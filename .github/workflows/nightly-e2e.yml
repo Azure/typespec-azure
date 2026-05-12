@@ -88,46 +88,27 @@ jobs:
       # For the nightly, we build them from the core submodule and inject them
       # via pnpm overrides so we test against the latest dev versions.
 
-      - name: Build excluded core packages from source
+      - name: Build and override excluded core packages
         if: matrix.excluded-core-packages
         run: |
-          mkdir -p temp/overrides
           for pkg in ${{ matrix.excluded-core-packages }}; do
             echo "Building @typespec/${pkg} from core/packages/${pkg}..."
-            cd core/packages/${pkg}
+            pushd "core/packages/${pkg}"
             npm ci
             npm run build
-            npm pack --pack-destination "${GITHUB_WORKSPACE}/temp/overrides"
-            cd "${GITHUB_WORKSPACE}"
+            npm pack --pack-destination "${GITHUB_WORKSPACE}"
+            popd
+            tgz_path="$(ls typespec-${pkg}-*.tgz)"
+            node -e "
+              const fs = require('fs');
+              const root = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+              root.pnpm ??= {};
+              root.pnpm.overrides ??= {};
+              root.pnpm.overrides['@typespec/${pkg}'] = 'file:${tgz_path}';
+              fs.writeFileSync('package.json', JSON.stringify(root, null, 2) + '\n');
+              console.log('Override: @typespec/${pkg} -> ${tgz_path}');
+            "
           done
-
-      - name: Override excluded packages with local builds
-        if: matrix.excluded-core-packages
-        run: |
-          node -e "
-            const fs = require('fs');
-            const path = require('path');
-            const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-            const overridesDir = path.resolve('temp/overrides');
-            const tgzFiles = fs.readdirSync(overridesDir).filter(f => f.endsWith('.tgz'));
-
-            pkg.pnpm = pkg.pnpm || {};
-            pkg.pnpm.overrides = pkg.pnpm.overrides || {};
-
-            for (const tgz of tgzFiles) {
-              // tgz name format: typespec-http-client-python-0.28.3.tgz
-              // package name: @typespec/http-client-python
-              const match = tgz.match(/^typespec-(.+)-\d+\.\d+\.\d+.*\.tgz$/);
-              if (match) {
-                const pkgName = '@typespec/' + match[1];
-                const tgzPath = path.join(overridesDir, tgz);
-                pkg.pnpm.overrides[pkgName] = 'file:' + tgzPath;
-                console.log('Override: ' + pkgName + ' -> ' + tgzPath);
-              }
-            }
-
-            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
-          "
 
       # --- Install & Build ---
 
