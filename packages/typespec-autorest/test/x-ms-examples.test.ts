@@ -317,5 +317,136 @@ op read(): void;
         },
       });
     });
+
+    it("picks up version-specific examples with interpolated examples-dir for multiple versions", async () => {
+      const emitterOutputDir = resolveVirtualPath("./tsp-output");
+      // v1 has getPet and listPets; v2 has getPet and deletePet
+      tester.fs.add(
+        resolveVirtualPath("./tsp-output/stable/v1/examples/getPet.json"),
+        JSON.stringify({ operationId: "Pets_get", title: "Get a pet" }),
+      );
+      tester.fs.add(
+        resolveVirtualPath("./tsp-output/stable/v1/examples/listPets.json"),
+        JSON.stringify({ operationId: "Pets_list", title: "List pets" }),
+      );
+      tester.fs.add(
+        resolveVirtualPath("./tsp-output/stable/v2/examples/getPet.json"),
+        JSON.stringify({ operationId: "Pets_get", title: "Get a pet v2" }),
+      );
+      tester.fs.add(
+        resolveVirtualPath("./tsp-output/stable/v2/examples/deletePet.json"),
+        JSON.stringify({ operationId: "Pets_delete", title: "Delete a pet" }),
+      );
+
+      const [{ outputs }, diagnostics] = await tester.compileAndDiagnose(
+        `
+@versioned(Versions)
+@service(#{title: "Pet Service"})
+namespace PetService;
+enum Versions {v1, v2}
+
+@route("/pets")
+@get
+@operationId("Pets_get")
+op read(): void;
+
+@route("/pets")
+@post
+@operationId("Pets_list")
+op list(): void;
+
+@route("/pets")
+@delete
+@operationId("Pets_delete")
+@added(Versions.v2)
+op remove(): void;
+`,
+        {
+          compilerOptions: {
+            options: {
+              "@azure-tools/typespec-autorest": {
+                "emitter-output-dir": emitterOutputDir,
+                "examples-dir": `${emitterOutputDir}/{version-status}/{version}/examples`,
+                "skip-example-copying": true,
+              },
+            },
+          },
+        },
+      );
+      expectDiagnosticEmpty(ignoreDiagnostics(diagnostics, ["@typespec/http/no-service-found"]));
+
+      const v1Doc = JSON.parse(outputs["stable/v1/openapi.json"]);
+      const v2Doc = JSON.parse(outputs["stable/v2/openapi.json"]);
+
+      // v1 should have getPet and listPets examples with correct relative paths
+      deepStrictEqual(v1Doc.paths["/pets"]?.get?.["x-ms-examples"], {
+        "Get a pet": { $ref: "examples/getPet.json" },
+      });
+      deepStrictEqual(v1Doc.paths["/pets"]?.post?.["x-ms-examples"], {
+        "List pets": { $ref: "examples/listPets.json" },
+      });
+
+      // v2 should have getPet and deletePet examples
+      deepStrictEqual(v2Doc.paths["/pets"]?.get?.["x-ms-examples"], {
+        "Get a pet v2": { $ref: "examples/getPet.json" },
+      });
+      deepStrictEqual(v2Doc.paths["/pets"]?.delete?.["x-ms-examples"], {
+        "Delete a pet": { $ref: "examples/deletePet.json" },
+      });
+    });
+
+    it("picks up examples in sub-directories of the versioned example directory", async () => {
+      const emitterOutputDir = resolveVirtualPath("./tsp-output");
+      // Examples in sub-directories under the versioned examples folder
+      tester.fs.add(
+        resolveVirtualPath("./tsp-output/stable/v1/examples/pets/getPet.json"),
+        JSON.stringify({ operationId: "Pets_get", title: "Get a pet" }),
+      );
+      tester.fs.add(
+        resolveVirtualPath("./tsp-output/stable/v1/examples/pets/listPets.json"),
+        JSON.stringify({ operationId: "Pets_list", title: "List all pets" }),
+      );
+
+      const [{ outputs }, diagnostics] = await tester.compileAndDiagnose(
+        `
+@versioned(Versions)
+@service(#{title: "Pet Service"})
+namespace PetService;
+enum Versions {v1}
+
+@route("/pets")
+@get
+@operationId("Pets_get")
+op read(): void;
+
+@route("/pets")
+@post
+@operationId("Pets_list")
+op list(): void;
+`,
+        {
+          compilerOptions: {
+            options: {
+              "@azure-tools/typespec-autorest": {
+                "emitter-output-dir": emitterOutputDir,
+                "examples-dir": `${emitterOutputDir}/{version-status}/{version}/examples`,
+                "skip-example-copying": true,
+              },
+            },
+          },
+        },
+      );
+      expectDiagnosticEmpty(ignoreDiagnostics(diagnostics, ["@typespec/http/no-service-found"]));
+
+      const v1Doc = JSON.parse(outputs["stable/v1/openapi.json"]);
+
+      // Sub-directory examples should be picked up with correct relative paths
+      deepStrictEqual(v1Doc.paths["/pets"]?.get?.["x-ms-examples"], {
+        "Get a pet": { $ref: "examples/pets/getPet.json" },
+      });
+      deepStrictEqual(v1Doc.paths["/pets"]?.post?.["x-ms-examples"], {
+        "List all pets": { $ref: "examples/pets/listPets.json" },
+      });
+    });
   });
 });
