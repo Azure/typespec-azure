@@ -367,9 +367,10 @@ building blocks.
 op ArmResourceListActionAsync<
   TResource extends Foundations.SimpleResource,
   TResponse extends object
->(
-  ...ResourceInstanceParameters<TResource>,
-): ArmResponse<TResponse> | ArmAcceptedResponse | ErrorResponse;
+>(...ResourceInstanceParameters<TResource>):
+  | ArmResponse<TResponse>
+  | ArmAcceptedResponse
+  | ErrorResponse;
 
 // Usage
 

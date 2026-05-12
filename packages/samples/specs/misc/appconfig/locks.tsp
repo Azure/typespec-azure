@@ -13,11 +13,13 @@ namespace LocksResource {
     @path key: string,
     @query label: string,
     ...ETagHeaders,
-  ): {
-    ...Response<200>;
-    ...SyncTokenHeader;
-    @body body: KeyValue;
-  } | Error;
+  ):
+    | {
+        ...Response<200>;
+        ...SyncTokenHeader;
+        @body body: KeyValue;
+      }
+    | Error;
 
   @operationId("DeleteLock")
   @delete
@@ -27,9 +29,11 @@ namespace LocksResource {
     @path key: string,
     @query label: string,
     ...ETagHeaders,
-  ): {
-    ...Response<200>;
-    ...SyncTokenHeader;
-    @body body: KeyValue;
-  } | Error;
+  ):
+    | {
+        ...Response<200>;
+        ...SyncTokenHeader;
+        @body body: KeyValue;
+      }
+    | Error;
 }

@@ -28,20 +28,17 @@ it("is valid if there is only 3 level of nested resource", async () => {
               namespace MyService;
 
         model A is TrackedResource<{}> {
-          @key("a") @segment("as") @path
-          name: string;
+          ...ResourceNameParameter<A>;
         }
 
         @parentResource(A)
         model B is TrackedResource<{}> {
-          @key("b") @segment("bs") @path
-          name: string;
+          ...ResourceNameParameter<B>;
         }
 
         @parentResource(B)
         model C is TrackedResource<{}> {
-          @key("c") @segment("cs") @path
-          name: string;
+          ...ResourceNameParameter<C>;
         }
       `,
     )
@@ -56,27 +53,23 @@ it("emit warnings if there is more than 3 nested resources", async () => {
               namespace MyService;
 
         model A is TrackedResource<{}> {
-          @key("a") @segment("as") @path
-          name: string;
+          ...ResourceNameParameter<A>;
         }
 
         @parentResource(A)
         model B is TrackedResource<{}> {
-          @key("b") @segment("bs") @path
-          name: string;
+          ...ResourceNameParameter<B>;
         }
 
         @parentResource(B)
         model C is TrackedResource<{}> {
-          @key("c") @segment("cs") @path
-          name: string;
+          ...ResourceNameParameter<C>;
         }
 
         // 4th nesting A > B > C > D
         @parentResource(C)
         model D is TrackedResource<{}> {
-          @key("d") @segment("ds") @path
-          name: string;
+          ...ResourceNameParameter<D>;
         }
       `,
     )

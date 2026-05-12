@@ -197,9 +197,9 @@ it("multi layer template with discriminated model spread", async () => {
 
     alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
 
-    @doc("The version of the API.")
+    
     enum MyVersions {
-      @doc("The version 2022-12-01-preview.")
+      
       v2022_12_01_preview: "2022-12-01-preview",
     }
 
@@ -807,7 +807,7 @@ it("spread idempotent", async () => {
     namespace My.Service;
     alias FooAlias = {
         @path id: string;
-        @doc("name of the Foo")
+        
         name: string;
     };
     op test(...FooAlias): void;

@@ -234,3 +234,45 @@ export function reorderParameters(
 
   return cloneOperation(tk, operation, { parameters: newProperties });
 }
+
+/**
+ * Internal prefix used to mark a client name as exact.
+ * @internal
+ */
+export const EXACT_NAME_PREFIX = "_exact_:";
+
+/**
+ * Mark a client name as exact, preventing language emitters from applying
+ * their usual casing transformations.
+ *
+ * @param context The function context provided by TypeSpec
+ * @param name The exact name to preserve
+ * @returns The name prefixed with an internal marker
+ */
+export function exact(context: FunctionContext, name: string): string {
+  return `${EXACT_NAME_PREFIX}${name}`;
+}
+
+/**
+ * Check whether a name string carries the exact-name marker.
+ *
+ * @param name The name to check
+ * @returns true if the name was produced by the `exact()` function
+ */
+export function hasExactNameMarker(name: string): boolean {
+  return name.startsWith(EXACT_NAME_PREFIX);
+}
+
+/**
+ * Strip the exact-name marker from a name string and return both
+ * the clean name and whether the marker was present.
+ *
+ * @param name The name to normalize
+ * @returns An object with the clean name and whether it was marked as exact
+ */
+export function normalizeExactName(name: string): { name: string; isExactName: boolean } {
+  if (name.startsWith(EXACT_NAME_PREFIX)) {
+    return { name: name.slice(EXACT_NAME_PREFIX.length), isExactName: true };
+  }
+  return { name, isExactName: false };
+}

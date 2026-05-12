@@ -6,7 +6,6 @@ import {
   LinearScale,
   LineElement,
   PointElement,
-  TimeScale,
   Title,
   Tooltip,
   type ChartOptions,
@@ -15,102 +14,9 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { Line } from "react-chartjs-2";
 
-// Minimal Chart.js date adapter using Temporal
-import { _adapters } from "chart.js";
-
-const MILLISECONDS_PER_UNIT: Record<string, number> = {
-  millisecond: 1,
-  second: 1000,
-  minute: 60_000,
-  hour: 3_600_000,
-  day: 86_400_000,
-  week: 604_800_000,
-  month: 2_592_000_000,
-  quarter: 7_776_000_000,
-  year: 31_536_000_000,
-};
-
-_adapters._date.override({
-  formats() {
-    return {
-      datetime: "yyyy-MM-dd HH:mm",
-      millisecond: "HH:mm:ss.SSS",
-      second: "HH:mm:ss",
-      minute: "HH:mm",
-      hour: "HH:mm",
-      day: "MMM d",
-      week: "MMM d",
-      month: "MMM yyyy",
-      quarter: "QQ yyyy",
-      year: "yyyy",
-    };
-  },
-  parse(value: unknown) {
-    if (value === null || value === undefined) return null;
-    if (typeof value === "number") return value;
-    if (typeof value === "string") return new Date(value).getTime();
-    if (value instanceof Date) return value.getTime();
-    return null;
-  },
-  format(timestamp: number, fmt: string) {
-    const d = new Date(timestamp);
-    // Simple format substitution
-    return fmt
-      .replace("yyyy", String(d.getFullYear()))
-      .replace("MMM", d.toLocaleString("en", { month: "short" }))
-      .replace("MM", String(d.getMonth() + 1).padStart(2, "0"))
-      .replace("dd", String(d.getDate()).padStart(2, "0"))
-      .replace(/\bd\b/, String(d.getDate()))
-      .replace("HH", String(d.getHours()).padStart(2, "0"))
-      .replace("mm", String(d.getMinutes()).padStart(2, "0"))
-      .replace("ss", String(d.getSeconds()).padStart(2, "0"))
-      .replace("SSS", String(d.getMilliseconds()).padStart(3, "0"))
-      .replace("QQ", `Q${Math.floor(d.getMonth() / 3) + 1}`);
-  },
-  add(timestamp: number, amount: number, unit: string) {
-    return timestamp + amount * (MILLISECONDS_PER_UNIT[unit] ?? 0);
-  },
-  diff(a: number, b: number, unit: string) {
-    return (a - b) / (MILLISECONDS_PER_UNIT[unit] ?? 1);
-  },
-  startOf(timestamp: number, unit: string) {
-    const d = new Date(timestamp);
-    if (unit === "year") return new Date(d.getFullYear(), 0, 1).getTime();
-    if (unit === "quarter")
-      return new Date(d.getFullYear(), Math.floor(d.getMonth() / 3) * 3, 1).getTime();
-    if (unit === "month") return new Date(d.getFullYear(), d.getMonth(), 1).getTime();
-    if (unit === "week") {
-      const day = d.getDay();
-      return new Date(d.getFullYear(), d.getMonth(), d.getDate() - day).getTime();
-    }
-    if (unit === "day") return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
-    if (unit === "hour")
-      return new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours()).getTime();
-    if (unit === "minute")
-      return new Date(
-        d.getFullYear(),
-        d.getMonth(),
-        d.getDate(),
-        d.getHours(),
-        d.getMinutes(),
-      ).getTime();
-    if (unit === "second")
-      return new Date(
-        d.getFullYear(),
-        d.getMonth(),
-        d.getDate(),
-        d.getHours(),
-        d.getMinutes(),
-        d.getSeconds(),
-      ).getTime();
-    return timestamp;
-  },
-});
-
 ChartJS.register(
   CategoryScale,
   LinearScale,
-  TimeScale,
   PointElement,
   LineElement,
   Title,
@@ -216,13 +122,12 @@ function BenchmarkChart({ data, category }: { data: HistoryData; category: Metri
   const colors = useMemo(() => seriesColors(metricLabels.length), [metricLabels.length]);
   const isDense = metricLabels.length >= 8;
 
+  const commitLabels = useMemo(() => data.entries.map((e) => e.commit.slice(0, 7)), [data]);
+
   const chartData = useMemo(() => {
     const datasets = metricLabels.map((label, i) => ({
       label: shortLabel(label),
-      data: data.entries.map((e) => ({
-        x: new Date(e.timestamp).getTime(),
-        y: e.metrics[label] ?? null,
-      })),
+      data: data.entries.map((e) => e.metrics[label] ?? null),
       borderColor: colors[i],
       backgroundColor: colors[i],
       borderWidth: 1.5,
@@ -230,8 +135,8 @@ function BenchmarkChart({ data, category }: { data: HistoryData; category: Metri
       pointHoverRadius: 5,
       tension: 0.2,
     }));
-    return { datasets };
-  }, [data, metricLabels, colors]);
+    return { labels: commitLabels, datasets };
+  }, [data, metricLabels, colors, commitLabels]);
 
   const options: ChartOptions<"line"> = useMemo(
     () => ({
@@ -267,12 +172,12 @@ function BenchmarkChart({ data, category }: { data: HistoryData; category: Metri
       },
       scales: {
         x: {
-          type: "time",
-          time: {
-            unit: "day",
-            tooltipFormat: "MMM d, yyyy",
+          type: "category",
+          title: { display: true, text: "Commit" },
+          ticks: {
+            maxRotation: 45,
+            minRotation: 45,
           },
-          title: { display: true, text: "Date" },
         },
         y: {
           beginAtZero: true,

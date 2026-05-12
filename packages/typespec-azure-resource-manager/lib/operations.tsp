@@ -230,10 +230,9 @@ op ArmResourceCreateOrUpdateAsync<
   LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = Resource> &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
-    Resource,
-    LroHeaders
-  >,
+  Response extends {} =
+    | ArmResourceUpdatedResponse<Resource>
+    | ArmResourceCreatedResponse<Resource, LroHeaders>,
   Error extends {} = ErrorResponse,
   Provider extends {} = ProviderNamespace<Resource>
 > is ArmCreateOperation<
@@ -290,7 +289,9 @@ op ArmResourceCreateOrReplaceSync<
   Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
-  Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedSyncResponse<Resource>,
+  Response extends {} =
+    | ArmResourceUpdatedResponse<Resource>
+    | ArmResourceCreatedSyncResponse<Resource>,
   Error extends {} = ErrorResponse,
   Provider extends {} = ProviderNamespace<Resource>
 > is ArmCreateOperation<
@@ -317,10 +318,9 @@ op ArmResourceCreateOrReplaceAsync<
   LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = Resource> &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
-    Resource,
-    LroHeaders
-  >,
+  Response extends {} =
+    | ArmResourceUpdatedResponse<Resource>
+    | ArmResourceCreatedResponse<Resource, LroHeaders>,
   Error extends {} = ErrorResponse,
   Provider extends {} = ProviderNamespace<Resource>
 > is ArmResourceCreateOrUpdateAsync<
@@ -428,10 +428,9 @@ op ArmCustomPatchAsync<
   > &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} = ArmResponse<Resource> | ArmAcceptedLroResponse<
-    "Resource update request accepted.",
-    LroHeaders
-  >,
+  Response extends {} =
+    | ArmResponse<Resource>
+    | ArmAcceptedLroResponse<"Resource update request accepted.", LroHeaders>,
   Error extends {} = ErrorResponse,
   Provider extends {} = ProviderNamespace<Resource>
 > is ArmUpdateOperation<
@@ -542,10 +541,9 @@ op ArmResourceDeleteAsyncBase<
   Parameters extends {} = {},
   Error extends {} = ErrorResponse,
   Provider extends {} = ProviderNamespace<Resource>
->(
-  ...ResourceInstanceParameters<Resource, BaseParameters, Provider>,
-  ...Parameters,
-): Response | Error;
+>(...ResourceInstanceParameters<Resource, BaseParameters, Provider>, ...Parameters):
+  | Response
+  | Error;
 
 /**
  * @dev Delete a resource asynchronously.  DEPRECATED: Use ArmResourceDeleteWithoutOkAsync instead
@@ -565,7 +563,10 @@ op ArmResourceDeleteAsync<
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} = ArmDeletedResponse | ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
+  Response extends {} =
+    | ArmDeletedResponse
+    | ArmDeleteAcceptedLroResponse<LroHeaders>
+    | ArmDeletedNoContentResponse,
   Error extends {} = ErrorResponse,
   Provider extends {} = ProviderNamespace<Resource>
 > is ArmResourceDeleteAsyncBase<Resource, Response, BaseParameters, Parameters, Error, Provider>;
@@ -613,10 +614,9 @@ op ArmResourceDeleteSync<
   Response extends {} = ArmDeletedResponse | ArmDeletedNoContentResponse,
   Error = ErrorResponse,
   Provider extends {} = ProviderNamespace<Resource>
->(
-  ...ResourceInstanceParameters<Resource, BaseParameters, Provider>,
-  ...Parameters,
-): Response | Error;
+>(...ResourceInstanceParameters<Resource, BaseParameters, Provider>, ...Parameters):
+  | Response
+  | Error;
 
 /**
  * A long-running resource action.
@@ -790,10 +790,9 @@ op ArmResourceActionNoContentAsync<
 > is ArmResourceActionAsyncBase<
   Resource,
   Request,
-  ArmAcceptedLroResponse<
-    "Resource operation accepted.",
-    LroHeaders
-  > | ArmNoContentResponse<"Action completed successfully.">,
+
+    | ArmAcceptedLroResponse<"Resource operation accepted.", LroHeaders>
+    | ArmNoContentResponse<"Action completed successfully.">,
   BaseParameters,
   Parameters,
   Error,

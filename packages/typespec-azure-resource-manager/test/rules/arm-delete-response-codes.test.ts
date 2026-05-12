@@ -28,11 +28,7 @@ it("Emits a warning for synchronous delete operation that does not contain the a
       namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<EmployeeProperties> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
+        ...ResourceNameParameter<Employee>;
       }
       
       model EmployeeProperties {}
@@ -62,11 +58,7 @@ it("Does not emit a warning for synchronous delete operation that contains the a
     namespace Microsoft.Contoso;
     
     model Employee is ProxyResource<EmployeeProperties> {
-      @pattern("^[a-zA-Z0-9-]{3,24}$")
-      @key("employeeName")
-      @path
-      @segment("employees")
-      name: string;
+        ...ResourceNameParameter<Employee>;
     }
     
     model EmployeeProperties {}
@@ -94,11 +86,7 @@ it("Does not emit a warning for synchronous delete operation that uses the `ArmR
     namespace Microsoft.Contoso;
     
     model Employee is ProxyResource<EmployeeProperties> {
-      @pattern("^[a-zA-Z0-9-]{3,24}$")
-      @key("employeeName")
-      @path
-      @segment("employees")
-      name: string;
+        ...ResourceNameParameter<Employee>;
     }
     
     model EmployeeProperties {}
@@ -119,11 +107,7 @@ it("Emits a warning for long-running delete operation that does not contain the 
       namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<EmployeeProperties> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
+        ...ResourceNameParameter<Employee>;
       }
       
       model EmployeeProperties {}
@@ -150,11 +134,7 @@ it("Does not emit a warning for long-running delete operation that uses the `Arm
       namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<EmployeeProperties> {
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @key("employeeName")
-        @path
-        @segment("employees")
-        name: string;
+        ...ResourceNameParameter<Employee>;
       }
 
       model EmployeeProperties {}
