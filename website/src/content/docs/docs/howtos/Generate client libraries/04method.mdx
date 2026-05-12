@@ -1884,7 +1884,8 @@ model RequiredMaxResults {
 }
 
 #suppress "experimental-feature" "using replaceParameter"
-@@override(KeyVault.getSecrets,
+@@override(
+  KeyVault.getSecrets,
   replaceParameter(KeyVault.getSecrets, "maxResults", RequiredMaxResults.maxResults)
 );
 ```
@@ -2224,7 +2225,8 @@ Use the `scope` parameter to apply customizations only to specific language emit
 ```typespec
 // Only apply to Python - maxResults will be required in Python but remain optional in other languages
 #suppress "experimental-feature" "using replaceParameter"
-@@override(getSecrets,
+@@override(
+  getSecrets,
   replaceParameter(getSecrets, "maxResults", RequiredMaxResults.maxResults),
   "python"
 );

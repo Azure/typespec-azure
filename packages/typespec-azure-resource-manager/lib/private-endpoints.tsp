@@ -143,10 +143,9 @@ interface PrivateEndpoints<
     LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = Resource> &
       Azure.Core.Foundations.RetryAfterHeader,
     Parameters extends {} = {},
-    Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
-      Resource,
-      LroHeaders
-    >,
+    Response extends {} =
+      | ArmResourceUpdatedResponse<Resource>
+      | ArmResourceCreatedResponse<Resource, LroHeaders>,
     Error extends {} = ErrorResponse,
     OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmCreateOperation<
@@ -178,7 +177,9 @@ interface PrivateEndpoints<
     Resource extends PrivateEndpointConnectionResource = PrivateEndpointResource,
     BaseParameters = DefaultBaseParameters<ParentResource>,
     Parameters extends {} = {},
-    Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedSyncResponse<Resource>,
+    Response extends {} =
+      | ArmResourceUpdatedResponse<Resource>
+      | ArmResourceCreatedSyncResponse<Resource>,
     Error extends {} = ErrorResponse,
     OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmCreateOperation<
@@ -213,10 +214,9 @@ interface PrivateEndpoints<
     LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = Resource> &
       Azure.Core.Foundations.RetryAfterHeader,
     Parameters extends {} = {},
-    Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
-      Resource,
-      LroHeaders
-    >,
+    Response extends {} =
+      | ArmResourceUpdatedResponse<Resource>
+      | ArmResourceCreatedResponse<Resource, LroHeaders>,
     Error extends {} = ErrorResponse,
     OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmCreateOperation<
@@ -257,10 +257,9 @@ interface PrivateEndpoints<
     > &
       Azure.Core.Foundations.RetryAfterHeader,
     Parameters extends {} = {},
-    Response extends {} = ArmResponse<Resource> | ArmAcceptedLroResponse<
-      "Resource update request accepted.",
-      LroHeaders
-    >,
+    Response extends {} =
+      | ArmResponse<Resource>
+      | ArmAcceptedLroResponse<"Resource update request accepted.", LroHeaders>,
     Error extends {} = ErrorResponse,
     OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmUpdateOperation<

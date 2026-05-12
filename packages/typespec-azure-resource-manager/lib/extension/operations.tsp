@@ -127,10 +127,9 @@ op CreateOrUpdateAsync<
   LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = ExtensionResource> &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} = ArmResourceUpdatedResponse<ExtensionResource> | ArmResourceCreatedResponse<
-    ExtensionResource,
-    LroHeaders
-  >,
+  Response extends {} =
+    | ArmResourceUpdatedResponse<ExtensionResource>
+    | ArmResourceCreatedResponse<ExtensionResource, LroHeaders>,
   Error extends {} = ErrorResponse,
   OverrideResourceName extends valueof string = ""
 > is ArmCreateOperation<
@@ -164,7 +163,9 @@ op CreateOrReplaceSync<
   TargetResource extends Foundations.SimpleResource,
   ExtensionResource extends Foundations.SimpleResource,
   Parameters extends {} = {},
-  Response extends {} = ArmResourceUpdatedResponse<ExtensionResource> | ArmResourceCreatedSyncResponse<ExtensionResource>,
+  Response extends {} =
+    | ArmResourceUpdatedResponse<ExtensionResource>
+    | ArmResourceCreatedSyncResponse<ExtensionResource>,
   Error extends {} = ErrorResponse,
   OverrideResourceName extends valueof string = ""
 > is ArmCreateOperation<
@@ -200,10 +201,9 @@ op CreateOrReplaceAsync<
   LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = ExtensionResource> &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} = ArmResourceUpdatedResponse<ExtensionResource> | ArmResourceCreatedResponse<
-    ExtensionResource,
-    LroHeaders
-  >,
+  Response extends {} =
+    | ArmResourceUpdatedResponse<ExtensionResource>
+    | ArmResourceCreatedResponse<ExtensionResource, LroHeaders>,
   Error extends {} = ErrorResponse,
   OverrideResourceName extends valueof string = ""
 > is CreateOrUpdateAsync<
@@ -244,10 +244,9 @@ op CustomPatchAsync<
   > &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} = ArmResponse<ExtensionResource> | ArmAcceptedLroResponse<
-    "Resource update request accepted.",
-    LroHeaders
-  >,
+  Response extends {} =
+    | ArmResponse<ExtensionResource>
+    | ArmAcceptedLroResponse<"Resource update request accepted.", LroHeaders>,
   Error extends {} = ErrorResponse,
   OverrideResourceName extends valueof string = ""
 > is ArmUpdateOperation<
@@ -310,10 +309,9 @@ op DeleteAsyncBase<
   Parameters extends {} = {},
   Error extends {} = ErrorResponse,
   OverrideResourceName extends valueof string = ""
->(
-  ...ExtensionInstanceParameters<TargetResource, ExtensionResource>,
-  ...Parameters,
-): Response | Error;
+>(...ExtensionInstanceParameters<TargetResource, ExtensionResource>, ...Parameters):
+  | Response
+  | Error;
 
 /**
  * @dev Delete a resource asynchronously.
@@ -337,7 +335,10 @@ op DeleteAsync<
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} = ArmDeletedResponse | ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
+  Response extends {} =
+    | ArmDeletedResponse
+    | ArmDeleteAcceptedLroResponse<LroHeaders>
+    | ArmDeletedNoContentResponse,
   Error extends {} = ErrorResponse,
   OverrideResourceName extends valueof string = ""
 > is DeleteAsyncBase<
@@ -404,10 +405,9 @@ op DeleteSync<
   Response extends {} = ArmDeletedResponse | ArmDeletedNoContentResponse,
   Error = ErrorResponse,
   OverrideResourceName extends valueof string = ""
->(
-  ...ExtensionInstanceParameters<TargetResource, ExtensionResource>,
-  ...Parameters,
-): Response | Error;
+>(...ExtensionInstanceParameters<TargetResource, ExtensionResource>, ...Parameters):
+  | Response
+  | Error;
 
 /**
  * A long-running resource action.

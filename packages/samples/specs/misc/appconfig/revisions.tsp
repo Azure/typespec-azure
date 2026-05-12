@@ -24,15 +24,17 @@ namespace RevisionsResource {
     @doc("A filter used to match keys.")
     @query
     key: string,
-  ): {
-    ...Response<200>;
-    ...SyncTokenHeader;
+  ):
+    | {
+        ...Response<200>;
+        ...SyncTokenHeader;
 
-    @header
-    contentType: "application/vnd.microsoft.appconfig.kvset+json" | "application/json";
+        @header
+        contentType: "application/vnd.microsoft.appconfig.kvset+json" | "application/json";
 
-    @body body: Page<KeyValue>;
-  } | Error;
+        @body body: Page<KeyValue>;
+      }
+    | Error;
 
   @doc("Requests the headers and status of the given resource.")
   @operationId("CheckRevisions")
@@ -43,8 +45,10 @@ namespace RevisionsResource {
     ...AcceptDatetimeHeader,
     @query name: string,
     @query after: string,
-  ): {
-    ...Response<200>;
-    ...SyncTokenHeader;
-  } | Error;
+  ):
+    | {
+        ...Response<200>;
+        ...SyncTokenHeader;
+      }
+    | Error;
 }
