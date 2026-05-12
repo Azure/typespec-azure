@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.67.2
+
+### Bug Fixes
+
+- Remove self import from common-types.tsp
+
+
 ## 0.67.1
 
 ### Bug Fixes
