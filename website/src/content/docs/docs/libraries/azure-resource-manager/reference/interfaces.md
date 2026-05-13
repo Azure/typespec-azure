@@ -984,7 +984,7 @@ op Azure.ResourceManager.ArmListBySubscription(apiVersion: string, subscriptionI
 
 | Name       | Description                                               |
 | ---------- | --------------------------------------------------------- |
-| Resource   | the resource being patched                                |
+| Resource   | the resource being listed                                 |
 | Parameters | Optional. Additional parameters after the path parameters |
 | Response   | Optional. The success response for the list operation     |
 | Error      | Optional. The error response, if non-standard.            |
@@ -1349,7 +1349,7 @@ op Azure.ResourceManager.ArmResourceListAtScope(): Response | Error
 
 | Name           | Description                                               |
 | -------------- | --------------------------------------------------------- |
-| Resource       | the resource being patched                                |
+| Resource       | the resource being listed                                 |
 | BaseParameters | Optional. Allows overriding the operation parameters      |
 | Parameters     | Optional. Additional parameters after the path parameters |
 | Response       | Optional. The success response for the list operation     |
@@ -1368,7 +1368,7 @@ op Azure.ResourceManager.ArmResourceListByParent(): Response | Error
 
 | Name               | Description                                               |
 | ------------------ | --------------------------------------------------------- |
-| Resource           | the resource being patched                                |
+| Resource           | the resource being listed                                 |
 | BaseParameters     | Optional. Allows overriding the operation parameters      |
 | ParentName         | Optional. The name of the parent resource                 |
 | ParentFriendlyName | Optional. The friendly name of the parent resource        |
@@ -2714,7 +2714,7 @@ op Azure.ResourceManager.Legacy.ArmListSinglePageByParent(provider: "Microsoft.T
 
 | Name               | Description                                               |
 | ------------------ | --------------------------------------------------------- |
-| Resource           | the resource being patched                                |
+| Resource           | the resource being listed                                 |
 | BaseParameters     | Optional. Allows overriding the operation parameters      |
 | ParentName         | Optional. The name of the parent resource                 |
 | ParentFriendlyName | Optional. The friendly name of the parent resource        |
@@ -2734,7 +2734,7 @@ op Azure.ResourceManager.Legacy.ArmListSinglePageBySubscription(apiVersion: stri
 
 | Name       | Description                                               |
 | ---------- | --------------------------------------------------------- |
-| Resource   | the resource being patched                                |
+| Resource   | the resource being listed                                 |
 | Parameters | Optional. Additional parameters after the path parameters |
 | Response   | Optional. The success response for the list operation     |
 | Error      | Optional. The error response, if non-standard.            |

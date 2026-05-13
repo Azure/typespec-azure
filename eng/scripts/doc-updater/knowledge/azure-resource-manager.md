@@ -79,4 +79,20 @@ Old paths like `dynatrace/`, `tenantResource/`, `arm-scenarios/singleton/`, `ope
 
 `ArmResourcePatchAsync` and `ArmResourcePatchSync` exist and are not deprecated, though they are noted as "not recommended" in resource-operations.md. `ArmCustomPatchSync` and `ArmCustomPatchAsync` are the preferred alternatives.
 
-`TrackedResourceOperations` interface is current. `ResourceOperations` is deprecated (use `TrackedResourceOperations` instead).
+`ArmResourcePatchAsync` and `ArmResourcePatchSync` are not deprecated but are "not recommended". `ArmCustomPatchSync` and `ArmCustomPatchAsync` are preferred.
+
+## Getting-Started Examples
+
+- **Do not use `TrackedResourceOperations`** in getting-started guides. Instead, list individual operations explicitly (e.g., `get is ArmResourceRead<User>; create is ArmResourceCreateOrReplaceAsync<User>;`). This makes the tutorial clearer and avoids hiding what operations are generated. `TrackedResourceOperations` is technically current but is not appropriate for beginner tutorials.
+- **Do not include `version` in `@service()`**. Use `@service(#{ title: "..." })` without a `version` parameter. Versioning is handled by the `@versioned` decorator, not `@service`.
+- All resource models must use `...ResourceNameParameter<Model>` instead of manual `@key/@segment/@path name: string` patterns.
+
+## Rule Documentation Integrity
+
+- Only create rule documentation files for rules that actually exist in `src/rules/` and are registered in `src/linter.ts`. Never fabricate rule docs for non-existent rules (e.g., `arm-legacy-operations-discourage` was incorrectly documented in a past run and had to be removed).
+- When new rules are added to `src/linter.ts`, check whether their rule doc files under `rules/` already exist before creating them. The auto-generated `reference/linter.md` will list them after `pnpm regen-docs`.
+
+## Common Doc Comment Copy-Paste Errors
+
+- List operation templates (e.g., `ArmListBySubscription`, `ArmResourceListByParent`, `ArmResourceListAtScope`, `ArmListSinglePageBySubscription`, `ArmListSinglePageByParent`) sometimes have `@template Resource the resource being patched` — this should be `the resource being listed`. These are copy-paste errors from patch operation templates.
+- Always verify the `@template Resource` description matches the actual operation type (read, list, create, patch, delete, action).
