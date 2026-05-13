@@ -1,5 +1,5 @@
-import type { BenchmarkResult, ComparisonResult, MetricComparison, RuntimeStats } from "./types.js";
 import { isNotableMetricChange } from "./compare.js";
+import type { BenchmarkResult, ComparisonResult, MetricComparison, RuntimeStats } from "./types.js";
 
 const DEFAULT_THRESHOLD = 5;
 const DEFAULT_MIN_CHANGE_MS = 1;
@@ -165,7 +165,8 @@ export function formatPrComment(
   // Average metrics across all specs
   const averaged = averageComparisonMetrics(comparisons);
   const regressions = averaged.filter(
-    (m) => m.percentChange >= threshold && isNotableMetricChange(m, threshold, DEFAULT_MIN_CHANGE_MS),
+    (m) =>
+      m.percentChange >= threshold && isNotableMetricChange(m, threshold, DEFAULT_MIN_CHANGE_MS),
   );
 
   // Top-level summary: show regressions prominently, otherwise a simple ok message
@@ -178,8 +179,7 @@ export function formatPrComment(
     lines.push("| Metric | Baseline | Current | Change |");
     lines.push("|--------|----------|---------|--------|");
     for (const m of regressions) {
-      const changeStr =
-        `${formatPercent(m.percentChange)} ${changeIndicator(m, threshold)}`.trim();
+      const changeStr = `${formatPercent(m.percentChange)} ${changeIndicator(m, threshold)}`.trim();
       const th = thresholdsFor(m.label);
       lines.push(
         `| ${displayLabel(m.label)} | ${formatMsColored(m.baseline, th)} | ${formatMsColored(m.current, th)} | ${changeStr} |`,
@@ -197,8 +197,7 @@ export function formatPrComment(
   lines.push("| Metric | Baseline | Current | Change |");
   lines.push("|--------|----------|---------|--------|");
   for (const m of averaged) {
-    const changeStr =
-      `${formatPercent(m.percentChange)} ${changeIndicator(m, threshold)}`.trim();
+    const changeStr = `${formatPercent(m.percentChange)} ${changeIndicator(m, threshold)}`.trim();
     const th = thresholdsFor(m.label);
     lines.push(
       `| ${displayLabel(m.label)} | ${formatMsColored(m.baseline, th)} | ${formatMsColored(m.current, th)} | ${changeStr} |`,

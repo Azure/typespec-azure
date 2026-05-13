@@ -39,7 +39,10 @@ it("detects notable changes when percent and absolute deltas are both large enou
 
 it("excludes metrics below minimum absolute threshold from regression summary", () => {
   const comparisons = [
-    createComparison([createMetric("linter/noisy-rule", 0.05, 0.06), createMetric("checker", 100, 106)]),
+    createComparison([
+      createMetric("linter/noisy-rule", 0.05, 0.06),
+      createMetric("checker", 100, 106),
+    ]),
   ];
 
   const comment = formatPrComment(comparisons, "baseline123", "current123", { threshold: 5 });
@@ -47,5 +50,5 @@ it("excludes metrics below minimum absolute threshold from regression summary", 
 
   expect(topSummary).toContain("⚠️ **1 metric(s) regressed** above the +5% threshold:");
   expect(topSummary).toContain("| checker |");
-  expect(topSummary).not.toContain("| &ensp;↳ linter/noisy-rule |");
+  expect(topSummary).not.toContain("linter/noisy-rule");
 });
