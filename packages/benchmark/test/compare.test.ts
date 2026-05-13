@@ -25,13 +25,19 @@ it("ignores tiny absolute changes even when percent change is high", () => {
   expect(isNotableMetricChange(tinyMetric, 5)).toBe(false);
 });
 
+it("respects a custom minimum absolute threshold", () => {
+  const metric = createMetric("checker", 100, 100.6);
+  expect(isNotableMetricChange(metric, 0.5, 0.5)).toBe(true);
+  expect(isNotableMetricChange(metric, 0.5, 1)).toBe(false);
+});
+
 it("detects notable changes when percent and absolute deltas are both large enough", () => {
   const notableMetric = createMetric("checker", 100, 106);
   const comparisons = [createComparison([notableMetric])];
   expect(hasNotableChanges(comparisons, 5)).toBe(true);
 });
 
-it("summary regression count excludes tiny noisy metrics", () => {
+it("excludes metrics below minimum absolute threshold from regression summary", () => {
   const comparisons = [
     createComparison([createMetric("linter/noisy-rule", 0.05, 0.06), createMetric("checker", 100, 106)]),
   ];
