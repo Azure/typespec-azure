@@ -1,6 +1,8 @@
 import type { BenchmarkResult, ComparisonResult, MetricComparison, RuntimeStats } from "./types.js";
+import { isNotableMetricChange } from "./compare.js";
 
 const DEFAULT_THRESHOLD = 5;
+const DEFAULT_MIN_CHANGE_MS = 1;
 
 function formatMs(ms: number): string {
   if (ms >= 1000) return `${(ms / 1000).toFixed(2)}s`;
@@ -32,9 +34,10 @@ function formatMsColored(ms: number, thresholds: readonly [number, number]): str
   return `${timeIndicator(ms, thresholds)} ${formatMs(ms)}`;
 }
 
-function changeIndicator(percentChange: number, threshold: number): string {
-  if (percentChange >= threshold) return "🔴";
-  if (percentChange <= -threshold) return "🟢";
+function changeIndicator(metric: MetricComparison, threshold: number): string {
+  if (!isNotableMetricChange(metric, threshold, DEFAULT_MIN_CHANGE_MS)) return "";
+  if (metric.percentChange >= threshold) return "🔴";
+  if (metric.percentChange <= -threshold) return "🟢";
   return "";
 }
 
@@ -161,7 +164,9 @@ export function formatPrComment(
 
   // Average metrics across all specs
   const averaged = averageComparisonMetrics(comparisons);
-  const regressions = averaged.filter((m) => m.percentChange >= threshold);
+  const regressions = averaged.filter(
+    (m) => m.percentChange >= threshold && isNotableMetricChange(m, threshold, DEFAULT_MIN_CHANGE_MS),
+  );
 
   // Top-level summary: show regressions prominently, otherwise a simple ok message
   if (regressions.length === 0) {
@@ -174,7 +179,7 @@ export function formatPrComment(
     lines.push("|--------|----------|---------|--------|");
     for (const m of regressions) {
       const changeStr =
-        `${formatPercent(m.percentChange)} ${changeIndicator(m.percentChange, threshold)}`.trim();
+        `${formatPercent(m.percentChange)} ${changeIndicator(m, threshold)}`.trim();
       const th = thresholdsFor(m.label);
       lines.push(
         `| ${displayLabel(m.label)} | ${formatMsColored(m.baseline, th)} | ${formatMsColored(m.current, th)} | ${changeStr} |`,
@@ -193,7 +198,7 @@ export function formatPrComment(
   lines.push("|--------|----------|---------|--------|");
   for (const m of averaged) {
     const changeStr =
-      `${formatPercent(m.percentChange)} ${changeIndicator(m.percentChange, threshold)}`.trim();
+      `${formatPercent(m.percentChange)} ${changeIndicator(m, threshold)}`.trim();
     const th = thresholdsFor(m.label);
     lines.push(
       `| ${displayLabel(m.label)} | ${formatMsColored(m.baseline, th)} | ${formatMsColored(m.current, th)} | ${changeStr} |`,
@@ -255,7 +260,7 @@ export function formatConsoleSummary(
 
   lines.push("\nBenchmark comparison (averaged across specs):");
   for (const m of averaged) {
-    const indicator = changeIndicator(m.percentChange, threshold);
+    const indicator = changeIndicator(m, threshold);
     const label = isSubMetric(m.label) ? `  ${m.label}` : m.label;
     lines.push(
       `  ${label.padEnd(50)} ${formatMs(m.baseline).padStart(10)} → ${formatMs(m.current).padStart(10)}  ${formatPercent(m.percentChange).padStart(8)} ${indicator}`,
@@ -319,7 +324,7 @@ export function formatComparisonSummary(
   lines.push("| Metric | Baseline | Current | Change |");
   lines.push("|--------|----------|---------|--------|");
   for (const m of averaged) {
-    const indicator = changeIndicator(m.percentChange, threshold);
+    const indicator = changeIndicator(m, threshold);
     const changeStr = `${formatPercent(m.percentChange)} ${indicator}`.trim();
     const th = thresholdsFor(m.label);
     lines.push(
