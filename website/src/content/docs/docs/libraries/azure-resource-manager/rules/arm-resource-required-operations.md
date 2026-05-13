@@ -6,21 +6,21 @@ title: arm-resource-required-operations
 @azure-tools/typespec-azure-resource-manager/arm-resource-required-operations
 ```
 
-ARM resources must declare the complete set of required lifecycle and list
-operations defined by the [ARM RPC contract][rpc] (sections 2.2 and 2.3).
+ARM resources must declare their required lifecycle and list operations as
+defined by the [ARM RPC contract][rpc] (sections 2.2 and 2.3).
 
 The required set depends on the resource kind:
 
-| Resource kind        | Required operations                                                                                                  |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| Tracked              | `read`, `createOrUpdate`, `delete`, `list-by-parent` (satisfied by `list-by-resource-group`), `list-by-subscription` |
-| Proxy / Extension    | `read`, `createOrUpdate`, `delete`, `list-by-parent`                                                                 |
-| Singleton (any kind) | `read`, `createOrUpdate` only — no `delete`, no `list`                                                               |
+| Resource kind     | Required operations                                                                                                  |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Tracked           | `read`, `createOrUpdate`, `delete`, `list-by-parent` (satisfied by `list-by-resource-group`), `list-by-subscription` |
+| Tracked singleton | `read`, `createOrUpdate` only                                                                                        |
+| Proxy / Extension | `read` (and `delete` if `createOrUpdate` is also defined)                                                            |
 
 For tracked resources, a `list-by-resource-group` operation satisfies the
 `list-by-parent` requirement (the resource group is the parent in that scope).
-For nested proxy or extension resources, `list-by-parent` refers to a list
-operation under the parent resource's path.
+`list-by-subscription` is required only for top-level resource-group-scoped
+tracked resources.
 
 When more than one operation is missing, a single diagnostic is emitted that
 lists every missing operation. When only one is missing, a more specific

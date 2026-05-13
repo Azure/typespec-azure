@@ -172,7 +172,41 @@ it("emits missingListBySubscription for a tracked resource without a list-by-sub
     });
 });
 
-it("emits missingListByParent for a nested proxy resource", async () => {
+it("is valid when a nested proxy resource has only a read operation", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model Foo is TrackedResource<{}> {
+        @key @path @segment("foos") fooName: string;
+      }
+
+      @parentResource(Foo)
+      model Bar is ProxyResource<{}> {
+        @key @path @segment("bars") barName: string;
+      }
+
+      @armResourceOperations
+      interface FooOperations {
+        read is ArmResourceRead<Foo>;
+        createOrUpdate is ArmResourceCreateOrReplaceAsync<Foo>;
+        delete is ArmResourceDeleteWithoutOkAsync<Foo>;
+        listByResourceGroup is ArmResourceListByParent<Foo>;
+        listBySubscription is ArmListBySubscription<Foo>;
+      }
+
+      @armResourceOperations
+      interface BarOperations {
+        read is ArmResourceRead<Bar>;
+      }
+      `,
+    )
+    .toBeValid();
+});
+
+it("emits missingDelete for a proxy resource that defines createOrUpdate but no delete", async () => {
   await tester
     .expect(
       `
@@ -201,13 +235,49 @@ it("emits missingListByParent for a nested proxy resource", async () => {
       interface BarOperations {
         read is ArmResourceRead<Bar>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Bar>;
-        delete is ArmResourceDeleteWithoutOkAsync<Bar>;
       }
       `,
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/arm-resource-required-operations",
-      message: `Resource 'Bar' must have a list-by-parent operation (list-by-resource-group satisfies this for tracked resources).`,
+      message: `Resource 'Bar' must have a delete operation.`,
+    });
+});
+
+it("emits missingGet for a proxy resource missing read", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model Foo is TrackedResource<{}> {
+        @key @path @segment("foos") fooName: string;
+      }
+
+      @parentResource(Foo)
+      model Bar is ProxyResource<{}> {
+        @key @path @segment("bars") barName: string;
+      }
+
+      @armResourceOperations
+      interface FooOperations {
+        read is ArmResourceRead<Foo>;
+        createOrUpdate is ArmResourceCreateOrReplaceAsync<Foo>;
+        delete is ArmResourceDeleteWithoutOkAsync<Foo>;
+        listByResourceGroup is ArmResourceListByParent<Foo>;
+        listBySubscription is ArmListBySubscription<Foo>;
+      }
+
+      @armResourceOperations
+      interface BarOperations {
+        listByParent is ArmResourceListByParent<Bar>;
+      }
+      `,
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-required-operations",
+      message: `Resource 'Bar' must have a GET (read) operation.`,
     });
 });
 
@@ -283,7 +353,27 @@ it("emits missingGet for a singleton tracked resource missing read", async () =>
     });
 });
 
-it("is valid when an extension resource has read, createOrUpdate, delete, and a list operation", async () => {
+it("is valid when an extension resource has only a read operation", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model Foo is ExtensionResource<{}> {
+        @key @path @segment("foos") name: string;
+      }
+
+      @armResourceOperations
+      interface FooOperations {
+        read is ArmResourceRead<Foo>;
+      }
+      `,
+    )
+    .toBeValid();
+});
+
+it("is valid when an extension resource has read, createOrUpdate, and delete", async () => {
   await tester
     .expect(
       `
@@ -299,7 +389,6 @@ it("is valid when an extension resource has read, createOrUpdate, delete, and a 
         read is ArmResourceRead<Foo>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Foo>;
         delete is ArmResourceDeleteWithoutOkAsync<Foo>;
-        listByParent is ArmResourceListByParent<Foo>;
       }
       `,
     )

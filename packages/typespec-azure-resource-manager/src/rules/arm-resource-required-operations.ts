@@ -39,7 +39,7 @@ export const armResourceRequiredOperationsRule = createRule({
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-required-operations",
   description:
-    "Tracked, proxy, and extension ARM resources must define the complete set of required operations.",
+    "ARM resources must define their required operations: tracked resources need the full lifecycle and list set, other resources need a read, and any resource defining createOrUpdate must also define delete.",
   messages: {
     default: paramMessage`Resource '${"name"}' is missing required operations: [${"operations"}].`,
     missingListBySubscription: paramMessage`Tracked resource '${"name"}' must have a list-by-subscription operation.`,
@@ -93,9 +93,9 @@ function checkResource(
     cur.resourceType.types.length < best.resourceType.types.length ? cur : best,
   );
 
-  const required = getRequiredOperationsForResource(canonical);
-  if (required.length === 0) return;
   const present = getPresentOperations(entries);
+  const required = getRequiredOperationsForResource(canonical, present);
+  if (required.length === 0) return;
   const missing = required.filter((op) => !present.has(op));
   if (missing.length === 0) return;
 
@@ -119,21 +119,34 @@ function checkResource(
   });
 }
 
-function getRequiredOperationsForResource(resource: ResolvedResource): RequiredOperation[] {
+function getRequiredOperationsForResource(
+  resource: ResolvedResource,
+  present: Set<RequiredOperation>,
+): RequiredOperation[] {
   const isSingleton = resource.singleton !== undefined;
-  if (isSingleton) {
-    return ["read", "createOrUpdate"];
+  if (resource.kind === "Tracked") {
+    if (isSingleton) {
+      return ["read", "createOrUpdate"];
+    }
+    // Tracked non-singleton resources require the full set of lifecycle and
+    // list operations. For resources at resource-group scope,
+    // list-by-resource-group satisfies the list-by-parent requirement.
+    const required: RequiredOperation[] = ["read", "createOrUpdate", "delete", "list-by-parent"];
+    // list-by-subscription is required only for top-level resource-group-scoped
+    // tracked resources (the standard Azure RP pattern). Nested tracked
+    // resources and tracked resources at non-RG scope (tenant, subscription,
+    // location) do not require a list-by-subscription.
+    if (isTopLevelResourceGroupScoped(resource)) {
+      required.push("list-by-subscription");
+    }
+    return required;
   }
-  // Every non-singleton resource requires read, createOrUpdate, delete, and a
-  // list-by-parent operation. For tracked resources at resource-group scope,
-  // list-by-resource-group satisfies the list-by-parent requirement.
-  const required: RequiredOperation[] = ["read", "createOrUpdate", "delete", "list-by-parent"];
-  // list-by-subscription is required only for top-level resource-group-scoped
-  // tracked resources (the standard Azure RP pattern). Nested resources
-  // (parented under another resource) and tracked resources at non-RG scope
-  // (tenant, subscription, location) do not require a list-by-subscription.
-  if (resource.kind === "Tracked" && isTopLevelResourceGroupScoped(resource)) {
-    required.push("list-by-subscription");
+  // Non-tracked resources (Proxy / Extension) only require a read operation.
+  // Additionally, any resource that defines a createOrUpdate (PUT) operation
+  // must also define a delete operation.
+  const required: RequiredOperation[] = ["read"];
+  if (present.has("createOrUpdate")) {
+    required.push("delete");
   }
   return required;
 }
