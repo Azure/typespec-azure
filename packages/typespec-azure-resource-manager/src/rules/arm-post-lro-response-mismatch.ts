@@ -269,7 +269,9 @@ export const armPostLroResponseMismatchRule = createRule({
         if (
           sourceOp !== undefined &&
           sourceOp.templateMapper !== undefined &&
-          sourceOp.name === "ActionAsync"
+          sourceOp.name === "ActionAsync" &&
+          sourceOp.namespace !== undefined &&
+          getNamespaceFullName(sourceOp.namespace) === "Azure.ResourceManager"
         ) {
           const responseType = getResponseTemplateParam(op.operation);
           if (responseType !== undefined && !doesFinalResultMatch(finalResult, responseType)) {
