@@ -135,12 +135,12 @@ function checkPatchBodyProperties(
   patchModel: ModelProperty[],
   lifecycleMembers: LifecycleMembers,
 ) {
-  const readOnlyOnlyCache = new Map<ModelProperty, boolean>();
+  const readOnlyCache = new Map<ModelProperty, boolean>();
 
   for (const property of patchModel) {
     if (
       !property.optional &&
-      !isReadOnlyOnly(context.program, property, lifecycleMembers, readOnlyOnlyCache)
+      !isReadOnly(context.program, property, lifecycleMembers, readOnlyCache)
     ) {
       context.reportDiagnostic({
         messageId: "requiredInPatch",
@@ -168,7 +168,7 @@ function checkPatchBodyProperties(
     if (
       isNotUpdateable(context.program, property, {
         lifecycleMembers,
-        readOnlyOnlyCache,
+        readOnlyCache,
         modelHasNonUpdateableCache: new Map<Model, boolean>(),
         inProgressModels: new Set<Model>(),
       })
@@ -187,7 +187,7 @@ interface NotUpdateableState {
   /** Resolved Lifecycle visibility members; computed once at rule activation. */
   lifecycleMembers: LifecycleMembers;
   /** Pure per-source-property cache; safe to share across the entire traversal. */
-  readOnlyOnlyCache: Map<ModelProperty, boolean>;
+  readOnlyCache: Map<ModelProperty, boolean>;
   /**
    * Per-top-level-property cache of the recursive "does this model contain a
    * non-updateable property" answer. Recreated for every top-level patch
@@ -210,7 +210,7 @@ interface NotUpdateableState {
  * visibility transforms during PATCH request serialization, so they are
  * allowed (even if required) in the PATCH body model.
  */
-function isReadOnlyOnly(
+function isReadOnly(
   program: Program,
   property: ModelProperty,
   lifecycleMembers: LifecycleMembers,
@@ -249,7 +249,7 @@ function isAllowedInPatchByVisibility(
   program: Program,
   property: ModelProperty,
   lifecycleMembers: LifecycleMembers,
-  readOnlyOnlyCache: Map<ModelProperty, boolean>,
+  readOnlyCache: Map<ModelProperty, boolean>,
 ): boolean {
   const updateMember = lifecycleMembers.update;
   if (updateMember !== undefined) {
@@ -258,7 +258,7 @@ function isAllowedInPatchByVisibility(
       return true;
     }
   }
-  return isReadOnlyOnly(program, property, lifecycleMembers, readOnlyOnlyCache);
+  return isReadOnly(program, property, lifecycleMembers, readOnlyCache);
 }
 
 /**
@@ -273,12 +273,7 @@ function isNotUpdateable(
   state: NotUpdateableState,
 ): boolean {
   if (
-    !isAllowedInPatchByVisibility(
-      program,
-      property,
-      state.lifecycleMembers,
-      state.readOnlyOnlyCache,
-    )
+    !isAllowedInPatchByVisibility(program, property, state.lifecycleMembers, state.readOnlyCache)
   ) {
     return true;
   }
