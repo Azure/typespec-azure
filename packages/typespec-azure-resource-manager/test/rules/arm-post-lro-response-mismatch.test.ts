@@ -33,8 +33,8 @@ const preamble = `
       ${employeeResource}
 `;
 
-describe("emits warning", () => {
-  it("when LroHeaders are overridden with ArmLroLocationHeader and Response is non-void but FinalResult is void", async () => {
+describe("emits warning when 200 response body does not match finalResult", () => {
+  it("when LroHeaders override sets void FinalResult but Response is non-void Model", async () => {
     await tester
       .expect(
         `
@@ -51,6 +51,36 @@ describe("emits warning", () => {
           void,
           GenerateResponse,
           LroHeaders = ArmLroLocationHeader
+        >;
+      }
+      `,
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
+      });
+  });
+
+  it("when LroHeaders set FinalResult to a type that does not match the 200 body", async () => {
+    await tester
+      .expect(
+        `
+      ${preamble}
+
+      model GenerateResponse {
+        message: string;
+      }
+
+      model OtherResponse {
+        value: int32;
+      }
+
+      @armResourceOperations
+      interface Employees {
+        generate is ArmResourceActionAsync<
+          Employee,
+          void,
+          GenerateResponse,
+          LroHeaders = ArmLroLocationHeader<FinalResult = OtherResponse>
         >;
       }
       `,
@@ -85,7 +115,64 @@ describe("emits warning", () => {
         code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
       });
   });
+});
 
+describe("emits warning when 204 response has non-void finalResult", () => {
+  it("when ArmResourceActionNoContentAsync has LroHeaders with non-void FinalResult", async () => {
+    await tester
+      .expect(
+        `
+      ${preamble}
+
+      model GenerateResponse {
+        message: string;
+      }
+
+      @armResourceOperations
+      interface Employees {
+        restart is ArmResourceActionNoContentAsync<
+          Employee,
+          void,
+          LroHeaders = ArmLroLocationHeader<FinalResult = GenerateResponse>
+        >;
+      }
+      `,
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
+      });
+  });
+});
+
+describe("emits warning for ArmResourceActionAsyncBase with 200 response body mismatch", () => {
+  it("when ArmResourceActionAsyncBase produces 200 with Model body but void finalResult", async () => {
+    await tester
+      .expect(
+        `
+      ${preamble}
+
+      model GenerateResponse {
+        message: string;
+      }
+
+      @armResourceOperations
+      interface Employees {
+        generate is ArmResourceActionAsyncBase<
+          Employee,
+          void,
+          ArmAcceptedLroResponse | GenerateResponse,
+          Azure.ResourceManager.Foundations.DefaultBaseParameters<Employee>
+        >;
+      }
+      `,
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
+      });
+  });
+});
+
+describe("emits warning for 202-only ActionAsync template when finalResult mismatches", () => {
   it("when ActionAsync has LroHeaders overridden and finalResult does not match Response parameter", async () => {
     await tester
       .expect(
@@ -111,126 +198,10 @@ describe("emits warning", () => {
         code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
       });
   });
-
-  it("when ArmProviderActionAsync has LroHeaders overridden and finalResult does not match Response parameter", async () => {
-    await tester
-      .expect(
-        `
-      ${preamble}
-
-      model GenerateResponse {
-        message: string;
-      }
-
-      @armResourceOperations
-      interface Employees {
-        generate is ArmProviderActionAsync<
-          void,
-          GenerateResponse,
-          SubscriptionActionScope,
-          LroHeaders = ArmLroLocationHeader
-        >;
-      }
-      `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
-      });
-  });
-
-  it("when LroHeaders set FinalResult to a type that does not match the Response parameter", async () => {
-    await tester
-      .expect(
-        `
-      ${preamble}
-
-      model GenerateResponse {
-        message: string;
-      }
-
-      model OtherResponse {
-        value: int32;
-      }
-
-      @armResourceOperations
-      interface Employees {
-        generate is ArmResourceActionAsync<
-          Employee,
-          void,
-          GenerateResponse,
-          LroHeaders = ArmLroLocationHeader<FinalResult = OtherResponse>
-        >;
-      }
-      `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
-      });
-  });
-
-  it("when ArmResourceActionNoContentAsync has LroHeaders with non-void FinalResult but 204 response", async () => {
-    await tester
-      .expect(
-        `
-      ${preamble}
-
-      model GenerateResponse {
-        message: string;
-      }
-
-      @armResourceOperations
-      interface Employees {
-        restart is ArmResourceActionNoContentAsync<
-          Employee,
-          void,
-          LroHeaders = ArmLroLocationHeader<FinalResult = GenerateResponse>
-        >;
-      }
-      `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
-      });
-  });
-
-  it.each([
-    ["Model", "GenerateResponse", "model GenerateResponse { message: string; }"],
-    ["scalar", "string", ""],
-    ["void", "void", ""],
-  ])(
-    "when Response is %s type but FinalResult does not match (template)",
-    async (_label, responseType, modelDef) => {
-      await tester
-        .expect(
-          `
-        ${preamble}
-
-        ${modelDef}
-
-        model OtherResponse {
-          value: int32;
-        }
-
-        @armResourceOperations
-        interface Employees {
-          generate is ArmResourceActionAsync<
-            Employee,
-            void,
-            ${responseType},
-            LroHeaders = ArmLroLocationHeader<FinalResult = OtherResponse>
-          >;
-        }
-        `,
-        )
-        .toEmitDiagnostics({
-          code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
-        });
-    },
-  );
 });
 
 describe("does not emit warning", () => {
-  it("when LroHeaders explicitly sets FinalResult to match Response", async () => {
+  it("when LroHeaders explicitly sets FinalResult to match 200 body", async () => {
     await tester
       .expect(
         `
@@ -257,7 +228,7 @@ describe("does not emit warning", () => {
       .toBeValid();
   });
 
-  it("when using ArmResourceActionNoResponseContentAsync (void response)", async () => {
+  it("when using ArmResourceActionNoResponseContentAsync (void response, 204)", async () => {
     await tester
       .expect(
         `
@@ -334,32 +305,7 @@ describe("does not emit warning", () => {
       .toBeValid();
   });
 
-  it.each([
-    ["Model", "GenerateResponse", "model GenerateResponse { message: string; }"],
-    ["unknown", "unknown", ""],
-    ["scalar", "string", ""],
-    ["void", "void", ""],
-  ])(
-    "when Response and FinalResult both match (%s type, template)",
-    async (_label, responseType, modelDef) => {
-      await tester
-        .expect(
-          `
-        ${preamble}
-
-        ${modelDef}
-
-        @armResourceOperations
-        interface Employees {
-          generate is ArmResourceActionAsync<Employee, void, ${responseType}>;
-        }
-        `,
-        )
-        .toBeValid();
-    },
-  );
-
-  it("when using ArmResourceActionAsyncBase with ArmAcceptedLroResponse in Response", async () => {
+  it("when ArmResourceActionAsync has default LroHeaders (200 body matches default FinalResult)", async () => {
     await tester
       .expect(
         `
@@ -371,19 +317,29 @@ describe("does not emit warning", () => {
 
       @armResourceOperations
       interface Employees {
-        generate is ArmResourceActionAsyncBase<
-          Employee,
-          void,
-          ArmAcceptedLroResponse | GenerateResponse,
-          Azure.ResourceManager.Foundations.DefaultBaseParameters<Employee>
-        >;
+        generate is ArmResourceActionAsync<Employee, void, GenerateResponse>;
       }
       `,
       )
       .toBeValid();
   });
 
-  it("when using ArmResourceActionAsyncBase with 202-only response (no 200 or 204)", async () => {
+  it("when ArmResourceActionNoContentAsync has 204 response and void finalResult", async () => {
+    await tester
+      .expect(
+        `
+      ${preamble}
+
+      @armResourceOperations
+      interface Employees {
+        restart is ArmResourceActionNoContentAsync<Employee, void>;
+      }
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("when using ArmResourceActionAsyncBase with 202-only response", async () => {
     await tester
       .expect(
         `
@@ -403,46 +359,7 @@ describe("does not emit warning", () => {
       .toBeValid();
   });
 
-  it("when a non-template LRO POST has a 200 response with a body matching finalResult", async () => {
-    await tester
-      .expect(
-        `
-      ${preamble}
-
-      model GenerateResponse {
-        message: string;
-      }
-
-      @armResourceOperations
-      interface Employees {
-        generate is ArmResourceActionAsync<
-          Employee,
-          void,
-          GenerateResponse,
-          LroHeaders = ArmLroLocationHeader<FinalResult = GenerateResponse>
-        >;
-      }
-      `,
-      )
-      .toBeValid();
-  });
-
-  it("when a non-template LRO POST has a 204 response and void finalResult", async () => {
-    await tester
-      .expect(
-        `
-      ${preamble}
-
-      @armResourceOperations
-      interface Employees {
-        restart is ArmResourceActionNoContentAsync<Employee, void>;
-      }
-      `,
-      )
-      .toBeValid();
-  });
-
-  it("when a low-level operation has a 200 response with a Model body and ArmAcceptedLroResponse (not discovered)", async () => {
+  it("when a low-level LRO POST has a 200 response with a body matching finalResult (using ArmAcceptedLroResponse)", async () => {
     await tester
       .expect(
         `
@@ -464,7 +381,7 @@ describe("does not emit warning", () => {
       .toBeValid();
   });
 
-  it("when a low-level operation has a 204 response and ArmAcceptedLroResponse (not discovered)", async () => {
+  it("when a low-level LRO POST has a 204 response and ArmAcceptedLroResponse (void finalResult)", async () => {
     await tester
       .expect(
         `
@@ -478,6 +395,29 @@ describe("does not emit warning", () => {
         restart(...ApiVersionParameter): {
           @statusCode _: 204;
         } | ArmAcceptedLroResponse | ErrorResponse;
+      }
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("when ArmProviderActionAsync with default LroHeaders (200 body matches)", async () => {
+    await tester
+      .expect(
+        `
+      ${preamble}
+
+      model GenerateResponse {
+        message: string;
+      }
+
+      @armResourceOperations
+      interface Employees {
+        generate is ArmProviderActionAsync<
+          void,
+          GenerateResponse,
+          SubscriptionActionScope
+        >;
       }
       `,
       )
