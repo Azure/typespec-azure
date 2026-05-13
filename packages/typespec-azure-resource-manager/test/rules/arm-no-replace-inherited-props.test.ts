@@ -38,19 +38,22 @@ it("succeeds when child model does not redefine inherited properties", async () 
     .toBeValid();
 });
 
-it("emits warning when child model redefines an inherited property", async () => {
+it("warns when child model redefines an inherited model-typed property with the same model", async () => {
   await tester
     .expect(
       `
       @armProviderNamespace namespace MyService;
 
+      model Inner {
+        a: string;
+      }
+
       model Base {
-        id: string;
-        commonProp: string;
+        nested: Inner;
       }
 
       model Child extends Base {
-        commonProp: string;
+        nested: Inner;
       }
       `,
     )
@@ -58,19 +61,21 @@ it("emits warning when child model redefines an inherited property", async () =>
       {
         code: "@azure-tools/typespec-azure-resource-manager/arm-no-replace-inherited-props",
         message:
-          "The property 'commonProp' is also defined in the base model.  Redefining inherited properties can cause problems with OpenAPI tooling and some language representations of the models.",
+          "The property 'nested' is also defined in the base model.  Redefining inherited properties can cause problems with OpenAPI tooling and some language representations of the models.",
       },
     ]);
 });
 
-it("emits warning when redefining a property from an indirect ancestor", async () => {
+it("warns when redefining a model-typed property from an indirect ancestor", async () => {
   await tester
     .expect(
       `
       @armProviderNamespace namespace MyService;
 
+      model Inner { a: string; }
+
       model GrandParent {
-        sharedProp: string;
+        sharedProp: Inner;
       }
 
       model Parent extends GrandParent {
@@ -78,7 +83,7 @@ it("emits warning when redefining a property from an indirect ancestor", async (
       }
 
       model Child extends Parent {
-        sharedProp: string;
+        sharedProp: Inner;
       }
       `,
     )
@@ -91,7 +96,105 @@ it("emits warning when redefining a property from an indirect ancestor", async (
     ]);
 });
 
-it("does not warn when redefining the 'name' property of an ARM resource", async () => {
+it("allows overriding an inherited string property with another string", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace namespace MyService;
+
+      model Base {
+        commonProp: string;
+      }
+
+      model Child extends Base {
+        commonProp: string;
+      }
+      `,
+    )
+    .toBeValid();
+});
+
+it("allows overriding an inherited string property with a derived scalar", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace namespace MyService;
+
+      scalar myString extends string;
+
+      model Base {
+        commonProp: string;
+      }
+
+      model Child extends Base {
+        commonProp: myString;
+      }
+      `,
+    )
+    .toBeValid();
+});
+
+it("allows overriding an inherited string property with a closed string union", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace namespace MyService;
+
+      model Base {
+        commonProp: string;
+      }
+
+      model Child extends Base {
+        commonProp: "a" | "b";
+      }
+      `,
+    )
+    .toBeValid();
+});
+
+it("allows overriding an inherited string property with an open string union", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace namespace MyService;
+
+      union OpenStrings {
+        string,
+        "a",
+        "b",
+      }
+
+      model Base {
+        commonProp: string;
+      }
+
+      model Child extends Base {
+        commonProp: OpenStrings;
+      }
+      `,
+    )
+    .toBeValid();
+});
+
+it("allows overriding an inherited numeric property with the same numeric type", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace namespace MyService;
+
+      model Base {
+        weight: int32;
+      }
+
+      model Child extends Base {
+        weight: int32;
+      }
+      `,
+    )
+    .toBeValid();
+});
+
+it("allows overriding the 'name' property of an ARM resource (string is compatible)", async () => {
   await tester
     .expect(
       `
@@ -105,7 +208,7 @@ it("does not warn when redefining the 'name' property of an ARM resource", async
     .toBeValid();
 });
 
-it("does not warn when redefining a discriminator property in a derived model", async () => {
+it("allows overriding a discriminator property with a string literal", async () => {
   await tester
     .expect(
       `
@@ -124,31 +227,4 @@ it("does not warn when redefining a discriminator property in a derived model", 
       `,
     )
     .toBeValid();
-});
-
-it("warns on non-discriminator inherited properties even when base has @discriminator", async () => {
-  await tester
-    .expect(
-      `
-      @armProviderNamespace namespace MyService;
-
-      @discriminator("kind")
-      model Pet {
-        kind: string;
-        weight: int32;
-      }
-
-      model Cat extends Pet {
-        kind: "cat";
-        weight: int32;
-      }
-      `,
-    )
-    .toEmitDiagnostics([
-      {
-        code: "@azure-tools/typespec-azure-resource-manager/arm-no-replace-inherited-props",
-        message:
-          "The property 'weight' is also defined in the base model.  Redefining inherited properties can cause problems with OpenAPI tooling and some language representations of the models.",
-      },
-    ]);
 });

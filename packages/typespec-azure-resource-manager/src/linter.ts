@@ -39,11 +39,8 @@ import { versionProgressionRule } from "./rules/version-progression.js";
 
 const rules = [
   armNoRecordRule,
-<<<<<<< HEAD
-  armNoReplaceInheritedPropsRule,
-=======
   armNoPathCasingConflictsRule,
->>>>>>> origin/main
+  armNoReplaceInheritedPropsRule,
   armCommonTypesVersionRule,
   armDeleteResponseCodesRule,
   armPutResponseCodesRule,
