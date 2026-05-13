@@ -8,7 +8,7 @@ title: arm-no-replace-inherited-props
 
 Warns when a model redefines a property that is already defined in one of its base models. Repeating inherited properties in a child model is an anti-pattern for Azure APIs and can cause problems with OpenAPI tooling and some language representations of the models.
 
-The `name` property of an ARM resource and properties redefined as part of a model marked with `@discriminator` are not flagged by this rule.
+Overriding an inherited property is allowed when both the inherited property and the overriding property are "compatible scalars" — that is, both reduce to the same scalar family (`string`, `numeric`, or `boolean`). For example, an inherited property of type `string` may be overridden by a `string`, by a scalar that extends `string`, by a string literal, by a string-valued enum, or by an open or closed string union.
 
 #### ❌ Incorrect
 
@@ -16,13 +16,16 @@ The `name` property of an ARM resource and properties redefined as part of a mod
 @armProviderNamespace
 namespace MyService;
 
+model Inner {
+  a: string;
+}
+
 model Base {
-  id: string;
-  commonProp: string;
+  nested: Inner;
 }
 
 model Child extends Base {
-  commonProp: string; // duplicate of inherited "commonProp"
+  nested: Inner; // duplicate of inherited "nested"
 }
 ```
 
@@ -42,7 +45,7 @@ model Child extends Base {
 }
 ```
 
-#### ✅ Correct (discriminator property)
+#### ✅ Correct (compatible scalar override)
 
 ```tsp
 @armProviderNamespace
@@ -55,7 +58,7 @@ model Pet {
 }
 
 model Cat extends Pet {
-  kind: "cat"; // allowed: 'kind' is a discriminator property
+  kind: "cat"; // allowed: string and string literal are compatible scalars
   meow: boolean;
 }
 ```
