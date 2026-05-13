@@ -1,6 +1,7 @@
 import {
   CodeFix,
   DiagnosticMessages,
+  EnumMember,
   LinterRuleContext,
   Model,
   ModelProperty,
@@ -42,12 +43,19 @@ export const patchOperationsRule = createRule({
     default: "The request body of a PATCH must be a model with a subset of resource properties",
     missingTags: "Resource PATCH must contain the 'tags' property.",
     modelSuperset: paramMessage`Resource PATCH models must be a subset of the resource type. The following properties: [${"name"}] do not exist in resource Model '${"resourceModel"}'.`,
-    notUpdateableInPatch: paramMessage`Property '${"propertyName"}' is in the PATCH request body but is not updateable on the resource. PATCH bodies may only contain properties whose visibility includes 'Lifecycle.Update' (this includes default visibility, '@visibility(Lifecycle.Update)' alone, or any combination of 'Lifecycle.Update' with other lifecycle modifiers), or whose visibility is exactly '{Lifecycle.Read}' by itself; other visibilities (for example '@visibility(Lifecycle.Create)' or '@visibility(Lifecycle.Create, Lifecycle.Read)') must be removed from the PATCH request model.`,
-    requiredInPatch: paramMessage`Property '${"propertyName"}' is required in the PATCH request body. PATCH request body properties must all be optional so partial updates work, unless the resource property they map to has visibility 'Lifecycle.Read' by itself.`,
+    notUpdateableInPatch: paramMessage`Property '${"propertyName"}' is in the PATCH request body but is not updateable on the resource. Make this property updateable on the resource or remove it from the PATCH request.`,
+    requiredInPatch: paramMessage`Property '${"propertyName"}' is required in the PATCH request body. PATCH request body properties must all be optional or readOnly.`,
     defaultInPatch: paramMessage`Property '${"propertyName"}' has a default value in the PATCH request body. PATCH request body properties that are not present in the request body leave the value unchanged; they do not result in any default value being assigned.`,
-    nonMergePatchContentType: paramMessage`PATCH operation '${"operationName"}' specifies a content-type other than 'application/merge-patch+json'.`,
+    nonMergePatchContentType: paramMessage`PATCH operation '${"operationName"}' specifies a content-type '${"contentType"}' other than 'application/merge-patch+json'.`,
   },
   create(context) {
+    // Resolve the lifecycle visibility class members once per rule activation
+    // so we don't re-resolve them on every property check.
+    const lifecycle = getLifecycleVisibilityEnum(context.program);
+    const lifecycleMembers: LifecycleMembers = {
+      read: lifecycle.members.get("Read"),
+      update: lifecycle.members.get("Update"),
+    };
     return {
       operation: (operation: Operation) => {
         if (!isInternalTypeSpec(context.program, operation)) {
@@ -55,7 +63,7 @@ export const patchOperationsRule = createRule({
           if (verb === "patch") {
             const resourceType = getResourceModel(context.program, operation);
             if (resourceType) {
-              checkPatchModel(context, operation, resourceType);
+              checkPatchModel(context, operation, resourceType, lifecycleMembers);
             }
           }
         }
@@ -64,10 +72,16 @@ export const patchOperationsRule = createRule({
   },
 });
 
+interface LifecycleMembers {
+  read: EnumMember | undefined;
+  update: EnumMember | undefined;
+}
+
 function checkPatchModel(
   context: LinterRuleContext<DiagnosticMessages>,
   operation: Operation,
   resourceType: Model,
+  lifecycleMembers: LifecycleMembers,
 ) {
   const patchModel = getPatchModel(context.program, operation);
   if (patchModel === undefined) {
@@ -109,7 +123,7 @@ function checkPatchModel(
       });
 
     // Check each property in the PATCH body for additional issues.
-    checkPatchBodyProperties(context, patchModel);
+    checkPatchBodyProperties(context, patchModel, lifecycleMembers);
   }
 
   // Check the request content-type header (if explicit).
@@ -119,18 +133,15 @@ function checkPatchModel(
 function checkPatchBodyProperties(
   context: LinterRuleContext<DiagnosticMessages>,
   patchModel: ModelProperty[],
+  lifecycleMembers: LifecycleMembers,
 ) {
-  // The `isReadOnlyOnly` check is a pure per-source-property predicate that
-  // doesn't depend on recursion, so its results can be safely shared across
-  // every top-level patch property.
   const readOnlyOnlyCache = new Map<ModelProperty, boolean>();
 
   for (const property of patchModel) {
-    // Required (non-optional) PATCH body properties are only allowed when the
-    // source resource property has visibility '{Lifecycle.Read}' by itself —
-    // those are filtered out by visibility transforms during request
-    // serialization, so requiring them in the model is not a problem.
-    if (!property.optional && !isReadOnlyOnly(context.program, property, readOnlyOnlyCache)) {
+    if (
+      !property.optional &&
+      !isReadOnlyOnly(context.program, property, lifecycleMembers, readOnlyOnlyCache)
+    ) {
       context.reportDiagnostic({
         messageId: "requiredInPatch",
         format: { propertyName: property.name },
@@ -156,6 +167,7 @@ function checkPatchBodyProperties(
     // cached "false" into a sibling property's traversal.
     if (
       isNotUpdateable(context.program, property, {
+        lifecycleMembers,
         readOnlyOnlyCache,
         modelHasNonUpdateableCache: new Map<Model, boolean>(),
         inProgressModels: new Set<Model>(),
@@ -172,6 +184,8 @@ function checkPatchBodyProperties(
 }
 
 interface NotUpdateableState {
+  /** Resolved Lifecycle visibility members; computed once at rule activation. */
+  lifecycleMembers: LifecycleMembers;
   /** Pure per-source-property cache; safe to share across the entire traversal. */
   readOnlyOnlyCache: Map<ModelProperty, boolean>;
   /**
@@ -199,17 +213,18 @@ interface NotUpdateableState {
 function isReadOnlyOnly(
   program: Program,
   property: ModelProperty,
+  lifecycleMembers: LifecycleMembers,
   cache: Map<ModelProperty, boolean>,
 ): boolean {
   const sourceProperty = getSourceProperty(property);
   const cached = cache.get(sourceProperty);
   if (cached !== undefined) return cached;
-  const lifecycle = getLifecycleVisibilityEnum(program);
-  const readMember = lifecycle.members.get("Read");
+  const readMember = lifecycleMembers.read;
   if (readMember === undefined) {
     cache.set(sourceProperty, false);
     return false;
   }
+  const lifecycle = readMember.enum;
   const visibility = getVisibilityForClass(program, sourceProperty, lifecycle);
   const result = visibility.size === 1 && visibility.has(readMember);
   cache.set(sourceProperty, result);
@@ -233,17 +248,17 @@ function isReadOnlyOnly(
 function isAllowedInPatchByVisibility(
   program: Program,
   property: ModelProperty,
+  lifecycleMembers: LifecycleMembers,
   readOnlyOnlyCache: Map<ModelProperty, boolean>,
 ): boolean {
-  const lifecycle = getLifecycleVisibilityEnum(program);
-  const updateMember = lifecycle.members.get("Update");
+  const updateMember = lifecycleMembers.update;
   if (updateMember !== undefined) {
     const sourceProperty = getSourceProperty(property);
     if (hasVisibility(program, sourceProperty, updateMember)) {
       return true;
     }
   }
-  return isReadOnlyOnly(program, property, readOnlyOnlyCache);
+  return isReadOnlyOnly(program, property, lifecycleMembers, readOnlyOnlyCache);
 }
 
 /**
@@ -257,7 +272,14 @@ function isNotUpdateable(
   property: ModelProperty,
   state: NotUpdateableState,
 ): boolean {
-  if (!isAllowedInPatchByVisibility(program, property, state.readOnlyOnlyCache)) {
+  if (
+    !isAllowedInPatchByVisibility(
+      program,
+      property,
+      state.lifecycleMembers,
+      state.readOnlyOnlyCache,
+    )
+  ) {
     return true;
   }
 
@@ -332,10 +354,11 @@ function checkPatchContentType(
     const [contentTypes] = getContentTypes(property);
     if (contentTypes.length === 0) continue;
     const allowed = new Set(["application/merge-patch+json", "application/json"]);
-    if (!contentTypes.every((ct) => allowed.has(ct))) {
+    const offending = contentTypes.find((ct) => !allowed.has(ct));
+    if (offending !== undefined) {
       context.reportDiagnostic({
         messageId: "nonMergePatchContentType",
-        format: { operationName: operation.name },
+        format: { operationName: operation.name, contentType: offending },
         target: property,
       });
     }

@@ -223,7 +223,7 @@ it("emits requiredInPatch diagnostic when a PATCH body property is required", as
       {
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
         message:
-          "Property 'tags' is required in the PATCH request body. PATCH request body properties must all be optional so partial updates work, unless the resource property they map to has visibility 'Lifecycle.Read' by itself.",
+          "Property 'tags' is required in the PATCH request body. PATCH request body properties must all be optional or readOnly.",
       },
     ]);
 });
@@ -355,7 +355,7 @@ it("emits notUpdateableInPatch diagnostic when a PATCH body property is not upda
       {
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
         message:
-          "Property 'createOnlyProp' is in the PATCH request body but is not updateable on the resource. PATCH bodies may only contain properties whose visibility includes 'Lifecycle.Update' (this includes default visibility, '@visibility(Lifecycle.Update)' alone, or any combination of 'Lifecycle.Update' with other lifecycle modifiers), or whose visibility is exactly '{Lifecycle.Read}' by itself; other visibilities (for example '@visibility(Lifecycle.Create)' or '@visibility(Lifecycle.Create, Lifecycle.Read)') must be removed from the PATCH request model.",
+          "Property 'createOnlyProp' is in the PATCH request body but is not updateable on the resource. Make this property updateable on the resource or remove it from the PATCH request.",
       },
     ]);
 });
@@ -401,7 +401,53 @@ it("emits nonMergePatchContentType diagnostic when content-type is not merge-pat
       {
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
         message:
-          "PATCH operation 'myFooUpdate' specifies a content-type other than 'application/merge-patch+json'.",
+          "PATCH operation 'myFooUpdate' specifies a content-type 'application/xml' other than 'application/merge-patch+json'.",
+      },
+    ]);
+});
+
+it("emits nonMergePatchContentType diagnostic with the offending content-type for text/plain", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model FooResource is TrackedResource<FooProperties> {
+        @visibility(Lifecycle.Read)
+        @key("foo")
+        @segment("foo")
+        @path
+        name: string;
+      }
+
+      model FooProperties {
+        displayName?: string;
+      }
+
+      model MyPatch {
+        tags?: Record<string>;
+      }
+
+      @armResourceOperations
+      #suppress "deprecated" "test"
+      interface FooResources
+        extends ResourceRead<FooResource>, ResourceCreate<FooResource>, ResourceDelete<FooResource> {
+         @armResourceUpdate(FooResource)
+         #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+         @patch(#{implicitOptionality: true}) myFooUpdate(
+           ...ResourceInstanceParameters<FooResource>,
+           @header("content-type") contentType: "text/plain",
+           @bodyRoot body: MyPatch,
+         ) : ArmResponse<FooResource> | ErrorResponse;
+        }
+    `,
+    )
+    .toEmitDiagnostics([
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
+        message:
+          "PATCH operation 'myFooUpdate' specifies a content-type 'text/plain' other than 'application/merge-patch+json'.",
       },
     ]);
 });
@@ -486,7 +532,7 @@ it("emits notUpdateableInPatch when a PATCH body property has visibility (Lifecy
       {
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
         message:
-          "Property 'createReadProp' is in the PATCH request body but is not updateable on the resource. PATCH bodies may only contain properties whose visibility includes 'Lifecycle.Update' (this includes default visibility, '@visibility(Lifecycle.Update)' alone, or any combination of 'Lifecycle.Update' with other lifecycle modifiers), or whose visibility is exactly '{Lifecycle.Read}' by itself; other visibilities (for example '@visibility(Lifecycle.Create)' or '@visibility(Lifecycle.Create, Lifecycle.Read)') must be removed from the PATCH request model.",
+          "Property 'createReadProp' is in the PATCH request body but is not updateable on the resource. Make this property updateable on the resource or remove it from the PATCH request.",
       },
     ]);
 });
@@ -576,7 +622,7 @@ it("emits notUpdateableInPatch recursively into nested model properties", async 
       {
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
         message:
-          "Property 'nested' is in the PATCH request body but is not updateable on the resource. PATCH bodies may only contain properties whose visibility includes 'Lifecycle.Update' (this includes default visibility, '@visibility(Lifecycle.Update)' alone, or any combination of 'Lifecycle.Update' with other lifecycle modifiers), or whose visibility is exactly '{Lifecycle.Read}' by itself; other visibilities (for example '@visibility(Lifecycle.Create)' or '@visibility(Lifecycle.Create, Lifecycle.Read)') must be removed from the PATCH request model.",
+          "Property 'nested' is in the PATCH request body but is not updateable on the resource. Make this property updateable on the resource or remove it from the PATCH request.",
       },
     ]);
 });
@@ -627,7 +673,7 @@ it("emits notUpdateableInPatch recursively into Record<Model> property value typ
       {
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
         message:
-          "Property 'items' is in the PATCH request body but is not updateable on the resource. PATCH bodies may only contain properties whose visibility includes 'Lifecycle.Update' (this includes default visibility, '@visibility(Lifecycle.Update)' alone, or any combination of 'Lifecycle.Update' with other lifecycle modifiers), or whose visibility is exactly '{Lifecycle.Read}' by itself; other visibilities (for example '@visibility(Lifecycle.Create)' or '@visibility(Lifecycle.Create, Lifecycle.Read)') must be removed from the PATCH request model.",
+          "Property 'items' is in the PATCH request body but is not updateable on the resource. Make this property updateable on the resource or remove it from the PATCH request.",
       },
     ]);
 });
