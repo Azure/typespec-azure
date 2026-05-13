@@ -492,6 +492,51 @@ it("does not emit nonMergePatchContentType when content-type is application/merg
     .toBeValid();
 });
 
+it("does not emit diagnostics when the 'properties' property of a tracked resource is included as an optional property in the PATCH body", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model FooResource is TrackedResource<FooProperties> {
+        @key("foo")
+        @segment("foo")
+        @path
+        name: string;
+      }
+
+      enum ResourceState {
+        Succeeded,
+        Canceled,
+        Failed,
+      }
+
+      model FooProperties {
+        displayName?: string;
+
+        @visibility(Lifecycle.Read)
+        provisioningState?: ResourceState;
+      }
+
+      model MyPatch {
+        properties?: FooProperties;
+        tags?: Record<string>;
+      }
+
+      @armResourceOperations
+      #suppress "deprecated" "test"
+      interface FooResources
+        extends ResourceRead<FooResource>, ResourceCreate<FooResource>, ResourceDelete<FooResource> {
+         @armResourceUpdate(FooResource)
+         #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+         @patch(#{implicitOptionality: true}) myFooUpdate(...ResourceInstanceParameters<FooResource>, @bodyRoot body: MyPatch) : ArmResponse<FooResource> | ErrorResponse;
+        }
+    `,
+    )
+    .toBeValid();
+});
+
 it("emits notUpdateableInPatch when a PATCH body property has visibility (Lifecycle.Create, Lifecycle.Read) on the resource", async () => {
   await tester
     .expect(
