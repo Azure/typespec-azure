@@ -15,7 +15,7 @@ The required set depends on the resource kind:
 | ----------------- | -------------------------------------------------------------------------------------------------------------------- |
 | Tracked           | `read`, `createOrUpdate`, `delete`, `list-by-parent` (satisfied by `list-by-resource-group`), `list-by-subscription` |
 | Tracked singleton | `read`, `createOrUpdate` only                                                                                        |
-| Proxy / Extension | `read` (and `delete` if `createOrUpdate` is also defined)                                                            |
+| Proxy / Extension | `read`                                                                                                               |
 
 For tracked resources, a `list-by-resource-group` operation satisfies the
 `list-by-parent` requirement (the resource group is the parent in that scope).
@@ -26,9 +26,9 @@ When more than one operation is missing, a single diagnostic is emitted that
 lists every missing operation. When only one is missing, a more specific
 message ID is used so editors and tooling can present a clearer hint.
 
-This rule is singleton-aware and supersedes
-[`no-resource-delete-operation`](./no-resource-delete-operation.md). Both rules
-are currently registered for backwards compatibility.
+The requirement that a resource defining `createOrUpdate` must also define
+`delete` is enforced by the separate
+[`no-resource-delete-operation`](./no-resource-delete-operation.md) rule.
 
 #### ❌ Incorrect — tracked resource missing the delete and list operations
 

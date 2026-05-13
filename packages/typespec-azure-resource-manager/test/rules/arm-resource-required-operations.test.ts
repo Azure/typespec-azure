@@ -206,7 +206,7 @@ it("is valid when a nested proxy resource has only a read operation", async () =
     .toBeValid();
 });
 
-it("emits missingDelete for a proxy resource that defines createOrUpdate but no delete", async () => {
+it("is valid for a proxy resource that defines createOrUpdate but no delete (covered by no-resource-delete-operation)", async () => {
   await tester
     .expect(
       `
@@ -238,10 +238,7 @@ it("emits missingDelete for a proxy resource that defines createOrUpdate but no 
       }
       `,
     )
-    .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-required-operations",
-      message: `Resource 'Bar' must have a delete operation.`,
-    });
+    .toBeValid();
 });
 
 it("emits missingGet for a proxy resource missing read", async () => {

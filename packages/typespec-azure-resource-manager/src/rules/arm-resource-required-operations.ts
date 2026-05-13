@@ -94,7 +94,7 @@ function checkResource(
   );
 
   const present = getPresentOperations(entries);
-  const required = getRequiredOperationsForResource(canonical, present);
+  const required = getRequiredOperationsForResource(canonical);
   if (required.length === 0) return;
   const missing = required.filter((op) => !present.has(op));
   if (missing.length === 0) return;
@@ -119,10 +119,7 @@ function checkResource(
   });
 }
 
-function getRequiredOperationsForResource(
-  resource: ResolvedResource,
-  present: Set<RequiredOperation>,
-): RequiredOperation[] {
+function getRequiredOperationsForResource(resource: ResolvedResource): RequiredOperation[] {
   const isSingleton = resource.singleton !== undefined;
   if (resource.kind === "Tracked") {
     if (isSingleton) {
@@ -142,13 +139,9 @@ function getRequiredOperationsForResource(
     return required;
   }
   // Non-tracked resources (Proxy / Extension) only require a read operation.
-  // Additionally, any resource that defines a createOrUpdate (PUT) operation
-  // must also define a delete operation.
-  const required: RequiredOperation[] = ["read"];
-  if (present.has("createOrUpdate")) {
-    required.push("delete");
-  }
-  return required;
+  // The "createOrUpdate without delete" condition is enforced separately by
+  // the `no-resource-delete-operation` rule.
+  return ["read"];
 }
 
 function isTopLevelResourceGroupScoped(resource: ResolvedResource): boolean {
