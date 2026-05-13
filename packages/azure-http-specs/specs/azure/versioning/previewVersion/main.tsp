@@ -68,10 +68,9 @@ model Widget {
 @doc("Get widget by id (available in all versions)")
 @get
 @route("/widgets/{id}")
-op getWidget(
-  @path id: string,
-  ...global.Azure.Core.Foundations.ApiVersionParameter,
-): Widget | NotFoundResponse;
+op getWidget(@path id: string, ...global.Azure.Core.Foundations.ApiVersionParameter):
+  | Widget
+  | NotFoundResponse;
 
 @doc("Update widget color request.")
 model UpdateWidgetColorRequest {

@@ -36,7 +36,7 @@
 
 ### Legacy Decorators (lib/legacy.tsp) — 7 decorators
 
-22. `@hierarchyBuilding(target, value, scope?)` — multi-level discriminator inheritance
+22. `@hierarchyBuilding(target, value, scope?)` — change base type of a model in SDK; lifts properties from removed intermediates, reconciles duplicates with new base chain
 23. `@flattenProperty(target, scope?)` — flatten model properties
 24. `@markAsLro(target, scope?)` — force operation as LRO
 25. `@markAsPageable(target, scope?)` — force operation as pageable
@@ -87,7 +87,7 @@
 
 ### Covered in azure/client-generator-core/
 
-access, alternate-type, api-version, client-default-value, client-doc, client-initialization, client-location, convenient-api, deserialize-empty-string-as-null, flatten-property, hierarchy-building, next-link-verb, override, response-as-bool, usage
+access, alternate-type, api-version, client-default-value, client-doc, client-initialization, client-location, deserialize-empty-string-as-null, flatten-property, hierarchy-building, next-link-verb, override, response-as-bool, usage
 
 ### Covered in client/
 
@@ -103,6 +103,10 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - `@useSystemTextJsonConverter` — C# specific
 - Functions (replaceParameter, removeParameter, addParameter, reorderParameters)
 
+### Specs Removed (feedback from PR #4268)
+
+- `convenient-api` — removed because @convenientAPI/@protocolAPI are code-generation controls that aren't testable at the wire level via Spector
+
 ## Guideline.md (Emitter Developer Docs) Notes
 
 - UsageFlags reference table was missing — added with all 13 flag values and descriptions.
@@ -113,7 +117,9 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 
 ## Diagnostics
 
-- `operation-not-in-client` (warning): Emitted when explicit `@client` is used but a service operation is not included in any client. Documented in 03client.mdx under the "Fully Customized Client Hierarchy" section.
+- `operation-not-in-client`: REMOVED in May 2026. This diagnostic no longer exists.
+- `inconsistent-multiple-service-dependency` (warning): Emitted when services merged into the same client depend on different versions of a shared library dependency. Documented in 03client.mdx under the "One Client from Multiple Services" section and in guideline.md under "Client Detection".
+- `legacy-hierarchy-building-conflict` (warning): Now only has `property-type-mismatch` message ID (the old `property-missing` and `type-mismatch` message IDs were removed). Emitted during property reconciliation when a dropped property's type is incompatible with the same-named property on the new base chain.
 
 ## External Type Usage Propagation
 
@@ -132,3 +138,37 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - The 03client.mdx file had a typo "@clientLocaton" (missing 'i') — fixed to "@clientLocation".
 - In mockapi.ts files, query parameters use `query:` not `params:` in the request object.
 - The guideline.md previously said `encode` is set only when `@encode` exists — this was inaccurate since encode can also be set contextually (e.g., multipart).
+- Use `// NOT_SUPPORTED` for language examples where an emitter doesn't support a feature. Do NOT use `// TODO: fill in X example manually`.
+- Separate changesets: TCGC documentation updates use "internal" changeKind. Spector spec additions use "feature" changeKind with a separate changeset file.
+- Don't add Spector specs for code-generation controls like @convenientAPI/@protocolAPI — they aren't testable at the HTTP wire level.
+- The `@deserializeEmptyStringAsNull` section was removed from 08types.mdx in feedback PR #4268. Don't re-add it unless specifically requested.
+- Spector response-as-bool spec needs BOTH a success (200) case AND a 404 case to be complete.
+
+## @responseAsBool Internal Design
+
+- HTTP response objects have `type: undefined` when @responseAsBool is applied. The boolean is computed at the method response level only.
+- The method response `optional` is never set for @responseAsBool operations (boolean is always true or false, never optional).
+- The 404 response is promoted from exception to valid response with status code 404.
+
+## @hierarchyBuilding Reconciliation (May 2026 Overhaul)
+
+- No validation at decoration time. Property reconciliation happens during SDK type graph building.
+- Properties from removed intermediate ancestors are "lifted" onto the rebased model.
+- Properties whose names are supplied by the new base chain are dropped (inherited instead).
+- Discriminator properties are never dropped, even if new base has same-named property.
+- Type compatibility uses TypeSpec's `isAssignableTo` in both directions — literal/sub-scalar types assignable to a wider base type are silently dropped.
+- The diagnostic message ID changed from "property-missing"/"type-mismatch" to just "property-type-mismatch".
+
+## Content-Type/Accept Header Design (May 2026)
+
+- Single content type: constant value.
+- Multiple request content types: enum with one value per content type.
+- Multiple response content types: single constant with comma-joined string (structured types first).
+- Constants and enums get proper generated names via the naming context path (e.g., `DownloadFileMultipleContentTypesAccept`).
+
+## Usage Flag Propagation
+
+- Readonly properties have Input flag stripped but other flags (Output, Json, Xml) still propagate through.
+- External types (via @alternateType with ExternalTypeInfo) block propagation of all non-External flags.
+- `@apiVersion(false)` prevents a parameter from matching to a client API version parameter, keeping it on the method.
+- Body model properties named "apiVersion" are NOT treated as API version params — only HTTP metadata params (header/query/path/cookie) are matched by name.

@@ -41,7 +41,7 @@ jobs:
         run: |
           node packages/benchmark/dist/src/cli.js run \
             --specs-dir packages/benchmark/specs \
-            --iterations 5 \
+            --iterations 15 \
             --warmup 1 \
             --commit ${{ github.sha }} \
             --output /tmp/benchmark-results.json
