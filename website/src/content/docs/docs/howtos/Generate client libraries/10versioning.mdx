@@ -1016,10 +1016,7 @@ export class ServiceClient {
   constructor(endpoint: string, options?: ServiceClientOptionalParams);
 
   listResources(options?: ListResourcesOptionalParams): Promise<void>;
-  getSnapshot(
-    apiVersion: string,
-    options?: GetSnapshotOptionalParams,
-  ): Promise<void>;
+  getSnapshot(apiVersion: string, options?: GetSnapshotOptionalParams): Promise<void>;
 }
 ```
 
