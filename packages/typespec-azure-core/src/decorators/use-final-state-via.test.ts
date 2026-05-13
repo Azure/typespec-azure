@@ -17,6 +17,27 @@ it("correctly overrides PUT lro final-state-via", async () => {
   const finalState = getFinalStateOverride(program, foo);
   assert.deepStrictEqual(finalState, FinalStateValue.operationLocation);
 });
+it("correctly overrides original-uri regardless of decorator order on PUT", async () => {
+  const diagnostics = await Tester.diagnose(`
+    @pollingOperation(bar)
+    @test @put @useFinalStateVia("original-uri") op foo(): {};
+
+    @route("/polling")
+    @get op bar(): {status: "Succeeded" | "Failed" | "Cancelled"};
+  `);
+  expectDiagnostics(diagnostics, []);
+
+  const { foo, program } = await Tester.compile(t.code`
+    @pollingOperation(bar)
+    @test @put @useFinalStateVia("original-uri") op ${t.op("foo")}(): {};
+
+    @route("/polling")
+    @get op bar(): {status: "Succeeded" | "Failed" | "Cancelled"};
+  `);
+
+  const finalState = getFinalStateOverride(program, foo);
+  assert.deepStrictEqual(finalState, FinalStateValue.originalUri);
+});
 it("emits diagnostic for invalid PUT override", async () => {
   const diagnostics = await Tester.diagnose(`
     @pollingOperation(bar)
