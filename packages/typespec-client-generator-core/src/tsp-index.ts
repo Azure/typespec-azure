@@ -33,7 +33,13 @@ import {
   $usage,
   $useSystemTextJsonConverter,
 } from "./decorators.js";
-import { addParameter, removeParameter, reorderParameters, replaceParameter } from "./functions.js";
+import {
+  addParameter,
+  exact,
+  removeParameter,
+  reorderParameters,
+  replaceParameter,
+} from "./functions.js";
 
 export { $lib } from "./lib.js";
 export { $onValidate } from "./validate.js";
@@ -85,5 +91,6 @@ export const $functions: Record<string, AzureClientGeneratorCoreFunctions> = {
     removeParameter: removeParameter as AzureClientGeneratorCoreFunctions["removeParameter"],
     addParameter: addParameter as AzureClientGeneratorCoreFunctions["addParameter"],
     reorderParameters: reorderParameters as AzureClientGeneratorCoreFunctions["reorderParameters"],
+    exact: exact as AzureClientGeneratorCoreFunctions["exact"],
   },
 };

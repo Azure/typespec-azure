@@ -1,5 +1,20 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.68.0
+
+### Features
+
+- [#4185](https://github.com/Azure/typespec-azure/pull/4185) Add `ArmListBySubscriptionScope` operation template for listing resources at the subscription scope with a flat path, useful for child resources that need a subscription-level list operation without parent path segments.
+- [#4347](https://github.com/Azure/typespec-azure/pull/4347) Add new `version-progression` linter rule that validates ARM service versions all use unique dates and are declared in strictly increasing chronological order. Two api-versions sharing the same `YYYY-MM-DD` date (for example, `2026-04-28` and `2026-04-28-preview`) are not allowed.
+- [#4379](https://github.com/Azure/typespec-azure/pull/4379) Add new linter rule `arm-no-path-casing-conflicts` that flags ARM operation paths which differ only by character casing. The rule is enabled in the `@azure-tools/typespec-azure-rulesets` resource-manager ruleset.
+
+### Bug Fixes
+
+- [#4322](https://github.com/Azure/typespec-azure/pull/4322) Fix `@armProviderNamespace` to inject the canonical absolute ARM scope `https://management.azure.com/.default` as the default OAuth2 scope instead of the bare relative `user_impersonation` value. For backwards compatibility with existing ARM Swagger, the `@azure-tools/typespec-autorest` emitter now rewrites this scope back to `user_impersonation` when emitting OpenAPI v2 for namespaces decorated with `@armProviderNamespace`.
+- [#4369](https://github.com/Azure/typespec-azure/pull/4369) Fix doc comment typos and errors in ARM foundations library.
+- [#4357](https://github.com/Azure/typespec-azure/pull/4357) Fix `AzureEntityResource` emitting `TrackedResource` reference in OpenAPI. It now correctly references the `AzureEntityResource` definition in the ARM common-types schema.
+
+
 ## 0.67.1
 
 ### Bug Fixes

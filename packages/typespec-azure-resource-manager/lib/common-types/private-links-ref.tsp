@@ -5,110 +5,130 @@ using Azure.ResourceManager.CommonTypes.Private;
 namespace Azure.ResourceManager.CommonTypes;
 
 /** The private endpoint */
-@@armCommonDefinition(PrivateEndpoint,
+@@armCommonDefinition(
+  PrivateEndpoint,
   "PrivateEndpoint",
   #{ version: Azure.ResourceManager.CommonTypes.Versions.v3, isDefault: true },
   "privatelinks.json"
 );
-@@armCommonDefinition(PrivateEndpoint,
+@@armCommonDefinition(
+  PrivateEndpoint,
   "PrivateEndpoint",
   Azure.ResourceManager.CommonTypes.Versions.v4,
   "privatelinks.json"
 );
-@@armCommonDefinition(PrivateEndpoint,
+@@armCommonDefinition(
+  PrivateEndpoint,
   "PrivateEndpoint",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "privatelinks.json"
 );
-@@armCommonDefinition(PrivateEndpoint,
+@@armCommonDefinition(
+  PrivateEndpoint,
   "PrivateEndpoint",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "privatelinks.json"
 );
 
 /** The private endpoint resource */
-@@armCommonDefinition(PrivateLinkResource,
+@@armCommonDefinition(
+  PrivateLinkResource,
   "PrivateLinkResource",
   #{ version: Azure.ResourceManager.CommonTypes.Versions.v3, isDefault: true },
   "privatelinks.json"
 );
-@@armCommonDefinition(PrivateLinkResource,
+@@armCommonDefinition(
+  PrivateLinkResource,
   "PrivateLinkResource",
   Azure.ResourceManager.CommonTypes.Versions.v4,
   "privatelinks.json"
 );
-@@armCommonDefinition(PrivateLinkResource,
+@@armCommonDefinition(
+  PrivateLinkResource,
   "PrivateLinkResource",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "privatelinks.json"
 );
-@@armCommonDefinition(PrivateLinkResource,
+@@armCommonDefinition(
+  PrivateLinkResource,
   "PrivateLinkResource",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "privatelinks.json"
 );
 
 /** PrivateEndpointConnection */
-@@armCommonDefinition(PrivateEndpointConnection,
+@@armCommonDefinition(
+  PrivateEndpointConnection,
   "PrivateEndpointConnection",
   #{ version: Azure.ResourceManager.CommonTypes.Versions.v3, isDefault: true },
   "privatelinks.json"
 );
-@@armCommonDefinition(PrivateEndpointConnection,
+@@armCommonDefinition(
+  PrivateEndpointConnection,
   "PrivateEndpointConnection",
   Azure.ResourceManager.CommonTypes.Versions.v4,
   "privatelinks.json"
 );
-@@armCommonDefinition(PrivateEndpointConnection,
+@@armCommonDefinition(
+  PrivateEndpointConnection,
   "PrivateEndpointConnection",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "privatelinks.json"
 );
-@@armCommonDefinition(PrivateEndpointConnection,
+@@armCommonDefinition(
+  PrivateEndpointConnection,
   "PrivateEndpointConnection",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "privatelinks.json"
 );
 
-/** Properties of he private endpoint connection resource */
-@@armCommonDefinition(PrivateEndpointConnectionProperties,
+/** Properties of the private endpoint connection resource */
+@@armCommonDefinition(
+  PrivateEndpointConnectionProperties,
   "PrivateEndpointConnectionProperties",
   #{ version: Azure.ResourceManager.CommonTypes.Versions.v3, isDefault: true },
   "privatelinks.json"
 );
-@@armCommonDefinition(PrivateEndpointConnectionProperties,
+@@armCommonDefinition(
+  PrivateEndpointConnectionProperties,
   "PrivateEndpointConnectionProperties",
   Azure.ResourceManager.CommonTypes.Versions.v4,
   "privatelinks.json"
 );
-@@armCommonDefinition(PrivateEndpointConnectionProperties,
+@@armCommonDefinition(
+  PrivateEndpointConnectionProperties,
   "PrivateEndpointConnectionProperties",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "privatelinks.json"
 );
-@@armCommonDefinition(PrivateEndpointConnectionProperties,
+@@armCommonDefinition(
+  PrivateEndpointConnectionProperties,
   "PrivateEndpointConnectionProperties",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "privatelinks.json"
 );
 
 /** A collection of information about the state of the connection between service consumer and provider. */
-@@armCommonDefinition(PrivateLinkServiceConnectionState,
+@@armCommonDefinition(
+  PrivateLinkServiceConnectionState,
   "PrivateLinkServiceConnectionState",
   #{ version: Azure.ResourceManager.CommonTypes.Versions.v3, isDefault: true },
   "privatelinks.json"
 );
-@@armCommonDefinition(PrivateLinkServiceConnectionState,
+@@armCommonDefinition(
+  PrivateLinkServiceConnectionState,
   "PrivateLinkServiceConnectionState",
   Azure.ResourceManager.CommonTypes.Versions.v4,
   "privatelinks.json"
 );
-@@armCommonDefinition(PrivateLinkServiceConnectionState,
+@@armCommonDefinition(
+  PrivateLinkServiceConnectionState,
   "PrivateLinkServiceConnectionState",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "privatelinks.json"
 );
-@@armCommonDefinition(PrivateLinkServiceConnectionState,
+@@armCommonDefinition(
+  PrivateLinkServiceConnectionState,
   "PrivateLinkServiceConnectionState",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "privatelinks.json"
@@ -116,126 +136,150 @@ namespace Azure.ResourceManager.CommonTypes;
 
 /** Properties of a private link resource. */
 #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state" "Matches current common code"
-@@armCommonDefinition(PrivateLinkResourceProperties,
+@@armCommonDefinition(
+  PrivateLinkResourceProperties,
   "PrivateLinkResourceProperties",
   #{ version: Azure.ResourceManager.CommonTypes.Versions.v3, isDefault: true },
   "privatelinks.json"
 );
-@@armCommonDefinition(PrivateLinkResourceProperties,
+@@armCommonDefinition(
+  PrivateLinkResourceProperties,
   "PrivateLinkResourceProperties",
   Azure.ResourceManager.CommonTypes.Versions.v4,
   "privatelinks.json"
 );
-@@armCommonDefinition(PrivateLinkResourceProperties,
+@@armCommonDefinition(
+  PrivateLinkResourceProperties,
   "PrivateLinkResourceProperties",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "privatelinks.json"
 );
-@@armCommonDefinition(PrivateLinkResourceProperties,
+@@armCommonDefinition(
+  PrivateLinkResourceProperties,
   "PrivateLinkResourceProperties",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "privatelinks.json"
 );
 
 /** PrivateEndpointConnectionListResult */
-@@armCommonDefinition(PrivateEndpointConnectionListResultV5,
+@@armCommonDefinition(
+  PrivateEndpointConnectionListResultV5,
   "PrivateEndpointConnectionListResult",
   #{ version: Azure.ResourceManager.CommonTypes.Versions.v3, isDefault: true },
   "privatelinks.json"
 );
-@@armCommonDefinition(PrivateEndpointConnectionListResultV5,
+@@armCommonDefinition(
+  PrivateEndpointConnectionListResultV5,
   "PrivateEndpointConnectionListResult",
   Azure.ResourceManager.CommonTypes.Versions.v4,
   "privatelinks.json"
 );
-@@armCommonDefinition(PrivateEndpointConnectionListResultV5,
+@@armCommonDefinition(
+  PrivateEndpointConnectionListResultV5,
   "PrivateEndpointConnectionListResult",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "privatelinks.json"
 );
-@@armCommonDefinition(PrivateEndpointConnectionListResult,
+@@armCommonDefinition(
+  PrivateEndpointConnectionListResult,
   "PrivateEndpointConnectionListResult",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "privatelinks.json"
 );
 
 /** PrivateLinkResourceListResult */
-@@armCommonDefinition(PrivateLinkResourceListResultV5,
+@@armCommonDefinition(
+  PrivateLinkResourceListResultV5,
   "PrivateLinkResourceListResult",
   Azure.ResourceManager.CommonTypes.Versions.v3,
   "privatelinks.json"
 );
-@@armCommonDefinition(PrivateLinkResourceListResultV5,
+@@armCommonDefinition(
+  PrivateLinkResourceListResultV5,
   "PrivateLinkResourceListResult",
   Azure.ResourceManager.CommonTypes.Versions.v4,
   "privatelinks.json"
 );
-@@armCommonDefinition(PrivateLinkResourceListResultV5,
+@@armCommonDefinition(
+  PrivateLinkResourceListResultV5,
   "PrivateLinkResourceListResult",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "privatelinks.json"
 );
-@@armCommonDefinition(PrivateLinkResourceListResult,
+@@armCommonDefinition(
+  PrivateLinkResourceListResult,
   "PrivateLinkResourceListResult",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "privatelinks.json"
 );
 
 // PrivateEndpointServiceConnectionStatus
-@@armCommonDefinition(PrivateEndpointServiceConnectionStatus,
+@@armCommonDefinition(
+  PrivateEndpointServiceConnectionStatus,
   "PrivateEndpointServiceConnectionStatus",
   Azure.ResourceManager.CommonTypes.Versions.v3,
   "privatelinks.json"
 );
-@@armCommonDefinition(PrivateEndpointServiceConnectionStatus,
+@@armCommonDefinition(
+  PrivateEndpointServiceConnectionStatus,
   "PrivateEndpointServiceConnectionStatus",
   Azure.ResourceManager.CommonTypes.Versions.v4
 );
-@@armCommonDefinition(PrivateEndpointServiceConnectionStatus,
+@@armCommonDefinition(
+  PrivateEndpointServiceConnectionStatus,
   "PrivateEndpointServiceConnectionStatus",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
-@@armCommonDefinition(PrivateEndpointServiceConnectionStatus,
+@@armCommonDefinition(
+  PrivateEndpointServiceConnectionStatus,
   "PrivateEndpointServiceConnectionStatus",
   Azure.ResourceManager.CommonTypes.Versions.v6
 );
 
 // PrivateEndpointServiceConnectionStatus
-@@armCommonDefinition(PrivateEndpointConnectionProvisioningState,
+@@armCommonDefinition(
+  PrivateEndpointConnectionProvisioningState,
   "PrivateEndpointConnectionProvisioningState",
   Azure.ResourceManager.CommonTypes.Versions.v3,
   "privatelinks.json"
 );
-@@armCommonDefinition(PrivateEndpointConnectionProvisioningState,
+@@armCommonDefinition(
+  PrivateEndpointConnectionProvisioningState,
   "PrivateEndpointConnectionProvisioningState",
   Azure.ResourceManager.CommonTypes.Versions.v4
 );
-@@armCommonDefinition(PrivateEndpointConnectionProvisioningState,
+@@armCommonDefinition(
+  PrivateEndpointConnectionProvisioningState,
   "PrivateEndpointConnectionProvisioningState",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
-@@armCommonDefinition(PrivateEndpointConnectionProvisioningState,
+@@armCommonDefinition(
+  PrivateEndpointConnectionProvisioningState,
   "PrivateEndpointConnectionProvisioningState",
   Azure.ResourceManager.CommonTypes.Versions.v6
 );
 
 /** PrivateEndpointConnectionParameter */
-@@CommonTypes.Private.armCommonParameter(PrivateEndpointConnectionParameter.name,
+@@CommonTypes.Private.armCommonParameter(
+  PrivateEndpointConnectionParameter.name,
   "PrivateEndpointConnectionName",
   #{ version: Azure.ResourceManager.CommonTypes.Versions.v3, isDefault: true },
   "privatelinks.json"
 );
-@@CommonTypes.Private.armCommonParameter(PrivateEndpointConnectionParameter.name,
+@@CommonTypes.Private.armCommonParameter(
+  PrivateEndpointConnectionParameter.name,
   "PrivateEndpointConnectionName",
   Azure.ResourceManager.CommonTypes.Versions.v4,
   "privatelinks.json"
 );
-@@CommonTypes.Private.armCommonParameter(PrivateEndpointConnectionParameter.name,
+@@CommonTypes.Private.armCommonParameter(
+  PrivateEndpointConnectionParameter.name,
   "PrivateEndpointConnectionName",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "privatelinks.json"
 );
-@@CommonTypes.Private.armCommonParameter(PrivateEndpointConnectionParameter.name,
+@@CommonTypes.Private.armCommonParameter(
+  PrivateEndpointConnectionParameter.name,
   "PrivateEndpointConnectionName",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "privatelinks.json"
