@@ -1,11 +1,19 @@
-import { createRule, Model, paramMessage, Scalar, Type } from "@typespec/compiler";
+import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
+import {
+  createRule,
+  ignoreDiagnostics,
+  Model,
+  paramMessage,
+  Scalar,
+  Type,
+} from "@typespec/compiler";
 
 type ScalarFamily = "string" | "numeric" | "boolean";
 
 /**
  * Determine if `type` is "logically" a value of one of the well-known scalar
  * families (string, numeric, boolean). Walks unions, enums, scalar-extends
- * chains, and literals.
+ * chains, union variants, and literals.
  *
  * Returns the standard scalar family name if `type` reduces to a single
  * family, or `undefined` otherwise (e.g. model types, mixed unions, custom
@@ -51,14 +59,14 @@ function getScalarFamily(type: Type): ScalarFamily | undefined {
     }
     case "EnumMember":
       return typeof type.value === "number" ? "numeric" : "string";
+    case "UnionVariant":
+      return getScalarFamily(type.type);
     case "Union": {
-      const families = new Set<ScalarFamily>();
-      for (const variant of type.variants.values()) {
-        const family = getScalarFamily(variant.type);
-        if (family === undefined) return undefined;
-        families.add(family);
-      }
-      return families.size === 1 ? [...families][0] : undefined;
+      // Use the azure-core helper to classify the union as a string- or
+      // number-typed open/closed enum.
+      const unionEnum = ignoreDiagnostics(getUnionAsEnum(type));
+      if (unionEnum === undefined) return undefined;
+      return unionEnum.kind === "string" ? "string" : "numeric";
     }
     default:
       return undefined;
