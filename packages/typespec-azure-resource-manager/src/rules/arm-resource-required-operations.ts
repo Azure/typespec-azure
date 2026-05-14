@@ -32,14 +32,14 @@ type RequiredOperationsMessages = {
 /**
  * Verify that an ARM resource declares the complete set of required
  * lifecycle and list operations for its kind. This rule is singleton-aware
- * and is intended to supersede `no-resource-delete-operation`.
+ * and complements `no-resource-delete-operation`.
  */
 export const armResourceRequiredOperationsRule = createRule({
   name: "arm-resource-required-operations",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-required-operations",
   description:
-    "ARM resources must define their required operations: tracked resources need the full lifecycle and list set, other resources need a read, and any resource defining createOrUpdate must also define delete.",
+    "ARM resources must define their required operations: tracked resources need the full lifecycle and list set, other resources need a read operation.",
   messages: {
     default: paramMessage`Resource '${"name"}' is missing required operations: [${"operations"}].`,
     missingListBySubscription: paramMessage`Tracked resource '${"name"}' must have a list-by-subscription operation.`,
@@ -53,29 +53,33 @@ export const armResourceRequiredOperationsRule = createRule({
       // Iterate every resolved ARM resource once for the program. We use
       // `resolveArmResources` (which handles both standard and legacy resource
       // operations) and read kind / singleton / operations directly from the
-      // returned ResolvedResource entries.
-      //
-      // A single declared resource can produce multiple ResolvedResource
-      // entries (e.g., when ARM operation templates emit additional paths
-      // for createOrUpdate under a nested resource), so entries are grouped
-      // by model identity and a single diagnostic is reported per logical
-      // resource using the union of their operations.
+      // returned ResolvedResource entries. A single resource model may
+      // represent multiple actual resources, so each ResolvedResource is
+      // validated individually and its diagnostic is targeted at the
+      // interface containing the resource's operations.
       root: (program: Program) => {
         const provider = resolveArmResources(program);
-        const groups = new Map<Model, ResolvedResource[]>();
+        // Collect operation sets contributed by resolver path-doubling
+        // artifacts (entries where a model appears as its own ancestor), so
+        // they can be merged into the canonical entry's present-operation set
+        // without producing duplicate diagnostics for the same logical
+        // resource.
+        const extraPresentByModel = new Map<Model, Set<RequiredOperation>>();
+        for (const resource of provider.resources ?? []) {
+          if (!isSelfAncestor(resource)) continue;
+          const set = extraPresentByModel.get(resource.type) ?? new Set();
+          for (const op of getPresentOperations(resource)) set.add(op);
+          extraPresentByModel.set(resource.type, set);
+        }
         for (const resource of provider.resources ?? []) {
           if (resource.kind === "Other") continue;
           if (isInternalTypeSpec(program, resource.type)) continue;
+          if (isSelfAncestor(resource)) continue;
           // Network Security Perimeter configurations, Private Links, and
           // Private Endpoint Connections have their own well-defined operation
           // shapes and are exempt from this rule.
           if (isExemptCommonTypeResource(resource.type)) continue;
-          const list = groups.get(resource.type);
-          if (list) list.push(resource);
-          else groups.set(resource.type, [resource]);
-        }
-        for (const entries of groups.values()) {
-          checkResource(context, entries);
+          checkResource(context, resource, extraPresentByModel.get(resource.type));
         }
       },
     };
@@ -84,24 +88,19 @@ export const armResourceRequiredOperationsRule = createRule({
 
 function checkResource(
   context: LinterRuleContext<RequiredOperationsMessages>,
-  entries: ResolvedResource[],
+  resource: ResolvedResource,
+  extraPresent: Set<RequiredOperation> | undefined,
 ): void {
-  // Use the entry with the shortest `resourceType.types` as the canonical
-  // representation of the resource (it has the natural depth declared by the
-  // user). Operations are aggregated across all entries.
-  const canonical = entries.reduce((best, cur) =>
-    cur.resourceType.types.length < best.resourceType.types.length ? cur : best,
-  );
-
-  const present = getPresentOperations(entries);
-  const required = getRequiredOperationsForResource(canonical);
+  const required = getRequiredOperationsForResource(resource);
   if (required.length === 0) return;
+  const present = getPresentOperations(resource);
+  if (extraPresent) for (const op of extraPresent) present.add(op);
   const missing = required.filter((op) => !present.has(op));
   if (missing.length === 0) return;
 
-  const resourceInterface = getResolvedResourceInterface(entries);
-  const target = resourceInterface ?? canonical.type;
-  const name = canonical.resourceName;
+  const resourceInterface = getResolvedResourceInterface(resource);
+  const target = resourceInterface ?? resource.type;
+  const name = resource.resourceName;
 
   if (missing.length === 1) {
     context.reportDiagnostic({
@@ -150,50 +149,60 @@ function isTopLevelResourceGroupScoped(resource: ResolvedResource): boolean {
   return /\/resourceGroups\/\{/.test(path);
 }
 
-function getPresentOperations(entries: ResolvedResource[]): Set<RequiredOperation> {
+function isSelfAncestor(resource: ResolvedResource): boolean {
+  const visited = new Set<ResolvedResource>();
+  let current = resource.parent;
+  while (current && !visited.has(current)) {
+    if (current.type === resource.type) return true;
+    visited.add(current);
+    current = current.parent;
+  }
+  return false;
+}
+
+function getPresentOperations(resource: ResolvedResource): Set<RequiredOperation> {
   const present = new Set<RequiredOperation>();
-  // Determine the resource kind from the canonical-equivalent: if any entry is
-  // tracked, the resource is tracked. (All entries for the same logical model
-  // share the same kind in practice.)
-  const isTracked = entries.some((e) => e.kind === "Tracked");
-  for (const resource of entries) {
-    const lifecycle = resource.operations.lifecycle;
-    if (lifecycle.read?.length) present.add("read");
-    if (lifecycle.createOrUpdate?.length) present.add("createOrUpdate");
-    if (lifecycle.delete?.length) present.add("delete");
-    for (const op of resource.operations.lists ?? []) {
-      const path = op.path ?? "";
-      if (!isTracked) {
-        // For non-tracked resources (Proxy / Extension), any list operation
-        // satisfies the list-by-parent requirement regardless of scope.
-        present.add("list-by-parent");
-        continue;
-      }
-      // Tracked resources: list-by-subscription is a list rooted at
-      // subscription scope (has /subscriptions/{...} but not
-      // /resourceGroups/{...} and no nested /providers/). Everything else
-      // (resource-group, location, parent, etc.) counts as list-by-parent.
-      const providersCount = (path.match(/\/providers\//g) ?? []).length;
-      const hasSubscription = /\/subscriptions\/\{/.test(path);
-      const hasResourceGroup = /\/resourceGroups\/\{/.test(path);
-      if (hasSubscription && !hasResourceGroup && providersCount <= 1) {
-        present.add("list-by-subscription");
-      } else {
-        present.add("list-by-parent");
-      }
+  const isTracked = resource.kind === "Tracked";
+  const lifecycle = resource.operations.lifecycle;
+  if (lifecycle.read?.length) present.add("read");
+  if (lifecycle.createOrUpdate?.length) present.add("createOrUpdate");
+  if (lifecycle.delete?.length) present.add("delete");
+  for (const op of resource.operations.lists ?? []) {
+    const path = op.path ?? "";
+    if (!isTracked) {
+      // For non-tracked resources (Proxy / Extension), any list operation
+      // satisfies the list-by-parent requirement regardless of scope.
+      present.add("list-by-parent");
+      continue;
+    }
+    // Tracked resources: list-by-subscription is a list rooted at
+    // subscription scope (has /subscriptions/{...} but not
+    // /resourceGroups/{...} and no nested /providers/). Everything else
+    // (resource-group, location, parent, etc.) counts as list-by-parent.
+    const providersCount = (path.match(/\/providers\//g) ?? []).length;
+    const hasSubscription = /\/subscriptions\/\{/.test(path);
+    const hasResourceGroup = /\/resourceGroups\/\{/.test(path);
+    if (hasSubscription && !hasResourceGroup && providersCount <= 1) {
+      present.add("list-by-subscription");
+    } else {
+      present.add("list-by-parent");
     }
   }
   return present;
 }
 
-function getResolvedResourceInterface(entries: ResolvedResource[]): Interface | undefined {
-  for (const resource of entries) {
-    for (const ops of Object.values(resource.operations.lifecycle)) {
-      if (!Array.isArray(ops)) continue;
-      for (const op of ops) {
-        if (op.operation.interface) return op.operation.interface;
-      }
+function getResolvedResourceInterface(resource: ResolvedResource): Interface | undefined {
+  for (const ops of Object.values(resource.operations.lifecycle)) {
+    if (!Array.isArray(ops)) continue;
+    for (const op of ops) {
+      if (op.operation.interface) return op.operation.interface;
     }
+  }
+  for (const op of resource.operations.lists ?? []) {
+    if (op.operation.interface) return op.operation.interface;
+  }
+  for (const op of resource.operations.actions ?? []) {
+    if (op.operation.interface) return op.operation.interface;
   }
   return undefined;
 }
