@@ -228,3 +228,81 @@ it("allows overriding a discriminator property with a string literal", async () 
     )
     .toBeValid();
 });
+
+it("allows overriding an inherited string property with a specific string literal value", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace namespace MyService;
+
+      model Parent {
+        prop: string;
+      }
+
+      model Child extends Parent {
+        prop: "foo";
+      }
+      `,
+    )
+    .toBeValid();
+});
+
+it("allows overriding an inherited numeric (int32) property with a specific numeric literal value", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace namespace MyService;
+
+      model Parent {
+        prop: int32;
+      }
+
+      model Child extends Parent {
+        prop: 12;
+      }
+      `,
+    )
+    .toBeValid();
+});
+
+it("allows overriding an inherited anonymous closed string union with one of its variants", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace namespace MyService;
+
+      model Parent {
+        prop: "foo" | "bar";
+      }
+
+      model Child extends Parent {
+        prop: "foo";
+      }
+      `,
+    )
+    .toBeValid();
+});
+
+it("allows overriding an inherited named open string union with one of its named variants", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace namespace MyService;
+
+      union PropType {
+        Foo: "foo",
+        Bar: "bar",
+        string,
+      }
+
+      model Parent {
+        prop: PropType;
+      }
+
+      model Child extends Parent {
+        prop: PropType.Foo;
+      }
+      `,
+    )
+    .toBeValid();
+});
