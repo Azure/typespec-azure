@@ -104,7 +104,7 @@ describe("@about", () => {
         }
       ],
       })
-      @doc("this is doc for about decorator")`;
+      `;
     const { Foo } = await runner.compile(createTestSpec(aboutTest));
     const displayNames = getAboutDisplayNames(runner.program, Foo);
     const keywords = getAboutKeywords(runner.program, Foo);

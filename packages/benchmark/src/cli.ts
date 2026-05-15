@@ -43,7 +43,6 @@ Compare options:
   --output <file>       Output file (default: stdout)
   --format <type>       Output format: "console" or "markdown" (default: console)
   --detailed            Show per-rule/per-emitter-step breakdown
-  --changes-only        Only show metrics with notable changes
 
 Generate-history options:
   --dir <dir>           Read results from a directory instead of the benchmark-data git branch
@@ -122,7 +121,6 @@ async function compareCommand(args: Record<string, string>): Promise<void> {
 
   const threshold = args["threshold"] ? parseFloat(args["threshold"]) : undefined;
   const format = args["format"] ?? "console";
-  const changesOnly = args["changes-only"] === "true";
   const outputFile = args["output"];
 
   const baseline = await loadJson<BenchmarkResult>(baselineFile);
@@ -133,7 +131,6 @@ async function compareCommand(args: Record<string, string>): Promise<void> {
   if (format === "markdown") {
     output = formatPrComment(comparisons, baseline.commit, current.commit, {
       threshold,
-      changesOnly,
     });
   } else {
     output = formatConsoleSummary(comparisons, threshold);
