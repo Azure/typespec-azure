@@ -169,6 +169,17 @@ export function buildHistory(resultFiles: ResultFile[]): HistoryData {
   };
 }
 
+export interface GenerateHistoryOptions {
+  /** Read results from a directory instead of the benchmark-data git branch. */
+  dir?: string;
+}
+
+/** Generate history data from result files. */
+export function generateHistory(options: GenerateHistoryOptions = {}): HistoryData {
+  const resultFiles = options.dir ? readFromDirectory(options.dir) : readFromGitBranch();
+  return buildHistory(resultFiles);
+}
+
 /** CLI entry point for generate-history. */
 export function generateHistoryMain(argv: string[]): void {
   let outputFile: string | null = null;
@@ -183,8 +194,7 @@ export function generateHistoryMain(argv: string[]): void {
     }
   }
 
-  const resultFiles = resultsDir ? readFromDirectory(resultsDir) : readFromGitBranch();
-  const history = buildHistory(resultFiles);
+  const history = generateHistory({ dir: resultsDir ?? undefined });
   const output = JSON.stringify(history, null, 2);
 
   if (outputFile) {
