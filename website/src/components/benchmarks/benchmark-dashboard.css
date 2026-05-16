@@ -1,0 +1,216 @@
+.benchmarkDashboard {
+  padding: 1rem 2rem 2rem;
+  color: var(--colorNeutralForeground1, #1b1b1f);
+}
+
+.meta {
+  color: var(--colorNeutralForeground3, gray);
+  font-size: 0.85em;
+  margin-bottom: 1rem;
+}
+
+/* Controls bar */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.controlGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.controlLabel {
+  font-size: 0.8rem;
+  color: var(--colorNeutralForeground3, #57606a);
+  font-weight: 500;
+}
+
+.select {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--colorNeutralStroke1, #d0d7de);
+  background: var(--colorNeutralBackground1, #fff);
+  color: var(--colorNeutralForeground1, #1b1b1f);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.select:focus {
+  outline: 2px solid var(--colorBrandForeground1, #0969da);
+  outline-offset: 1px;
+}
+
+/* Summary cards */
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.summaryCard {
+  padding: 0.75rem;
+  border-radius: 8px;
+  background: var(--colorNeutralBackground3, #f8f9fa);
+  border: 1px solid var(--colorNeutralStroke2, #e9ecef);
+  text-align: center;
+}
+
+.summaryCardLabel {
+  font-size: 0.75rem;
+  color: var(--colorNeutralForeground3, #6c757d);
+  text-transform: capitalize;
+  margin-bottom: 2px;
+}
+
+.summaryCardValue {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.summaryCardChange {
+  font-size: 0.7rem;
+}
+
+.summaryCardChange--neutral {
+  color: var(--colorNeutralForeground3, #6c757d);
+}
+
+.summaryCardChange--positive {
+  color: var(--colorPaletteRedForeground1, #dc3545);
+}
+
+.summaryCardChange--negative {
+  color: var(--colorPaletteGreenForeground1, #28a745);
+}
+
+/* Tabs */
+.tabBar {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--colorNeutralStroke2, #e9ecef);
+  margin-bottom: 1.5rem;
+}
+
+.tab {
+  padding: 0.5rem 1.25rem;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--colorNeutralForeground3, #57606a);
+  margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.tab:hover {
+  color: var(--colorNeutralForeground1, #1b1b1f);
+}
+
+.tab--active {
+  font-weight: 600;
+  color: var(--colorBrandForeground1, #0969da);
+  border-bottom-color: var(--colorBrandForeground1, #0969da);
+}
+
+/* Chart container */
+.chartContainer {
+  height: 500px;
+  position: relative;
+}
+
+/* Emitter sections */
+.emitterSection {
+  margin-bottom: 2rem;
+  border: 1px solid var(--colorNeutralStroke2, #e0e0e0);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.emitterHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.emitterHeader--expanded {
+  margin-bottom: 1rem;
+}
+
+.emitterTitle {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.emitterToggle {
+  background: none;
+  border: 1px solid var(--colorNeutralStroke1, #ccc);
+  border-radius: 4px;
+  padding: 4px 12px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--colorNeutralForeground1, #1b1b1f);
+}
+
+.emitterToggle:hover {
+  background: var(--colorNeutralBackground3, #f0f0f0);
+}
+
+.emitterSteps {
+  margin-top: 1.5rem;
+}
+
+/* Loading & Error states */
+.stateContainer {
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.spinner {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--colorNeutralStroke2, #e9ecef);
+  border-top-color: var(--colorBrandForeground1, #0969da);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.errorText {
+  color: var(--colorPaletteRedForeground1, #dc3545);
+  margin-bottom: 0.5rem;
+}
+
+.errorHint {
+  font-size: 0.9em;
+  color: var(--colorNeutralForeground3, gray);
+  margin-bottom: 1rem;
+}
+
+.retryButton {
+  padding: 6px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--colorNeutralStroke1, #ccc);
+  background: var(--colorNeutralBackground1, #fff);
+  color: var(--colorNeutralForeground1, #1b1b1f);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.retryButton:hover {
+  background: var(--colorNeutralBackground3, #f0f0f0);
+}
