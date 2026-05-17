@@ -52,19 +52,20 @@ interface FilteredData {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const GITHUB_REPO = "Azure/typespec-azure";
+const DEFAULT_GITHUB_REPO = "Azure/typespec-azure";
 const DEFAULT_DATA_BRANCH = "benchmark-data";
 
 function getHistoryUrl(): string {
   if (typeof window === "undefined") {
-    return `https://raw.githubusercontent.com/${GITHUB_REPO}/${DEFAULT_DATA_BRANCH}/results/history.json`;
+    return `https://raw.githubusercontent.com/${DEFAULT_GITHUB_REPO}/${DEFAULT_DATA_BRANCH}/results/history.json`;
   }
   const params = new URLSearchParams(window.location.search);
+  const repo = params.get("repo") || DEFAULT_GITHUB_REPO;
   const branch = params.get("branch") || DEFAULT_DATA_BRANCH;
-  return `https://raw.githubusercontent.com/${GITHUB_REPO}/${branch}/results/history.json`;
+  return `https://raw.githubusercontent.com/${repo}/${branch}/results/history.json`;
 }
 
-const GITHUB_COMMIT_URL = `https://github.com/${GITHUB_REPO}/commit/`;
+const GITHUB_COMMIT_URL = `https://github.com/${DEFAULT_GITHUB_REPO}/commit/`;
 
 type Tab = "stages" | "linter" | "validation" | "emitters";
 type TimeRange = "30d" | "90d" | "all";
