@@ -110,17 +110,13 @@ function resolveCommitRange(from: string, to: string | undefined, sourceBranch: 
   if (isNumber) {
     // `from` is a count — get the last N commits up to `to` (or branch HEAD)
     const endpoint = to ?? sourceBranch;
-    const commitLog = git(
-      `--no-pager log ${endpoint} --oneline -${from} --format="%H"`,
-    );
+    const commitLog = git(`--no-pager log ${endpoint} --oneline -${from} --format="%H"`);
     return commitLog.split("\n").filter(Boolean).reverse();
   }
 
   // `from` is a commit SHA — get the range from..to
   const endpoint = to ?? sourceBranch;
-  const commitLog = git(
-    `--no-pager log ${from}..${endpoint} --format="%H"`,
-  );
+  const commitLog = git(`--no-pager log ${from}..${endpoint} --format="%H"`);
   // Also include the `from` commit itself
   const commits = commitLog.split("\n").filter(Boolean).reverse();
   commits.unshift(from);
