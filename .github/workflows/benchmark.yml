@@ -14,6 +14,11 @@ on:
         description: "Backfill from: commit SHA or number of recent commits. Leave empty to run a normal benchmark."
         required: false
         type: string
+      branch:
+        description: "Data branch to store results (default: benchmark-data)"
+        required: false
+        type: string
+        default: "benchmark-data"
 
 permissions:
   contents: write
@@ -51,6 +56,7 @@ jobs:
             --specs-dir packages/benchmark/specs \
             --iterations 15 \
             --warmup 1 \
+            --branch ${{ inputs.branch }} \
             --push
 
       - name: Run benchmarks

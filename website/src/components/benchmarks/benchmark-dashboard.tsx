@@ -52,10 +52,19 @@ interface FilteredData {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const HISTORY_URL =
-  "https://raw.githubusercontent.com/Azure/typespec-azure/benchmark-data/results/history.json";
+const GITHUB_REPO = "Azure/typespec-azure";
+const DEFAULT_DATA_BRANCH = "benchmark-data";
 
-const GITHUB_COMMIT_URL = "https://github.com/Azure/typespec-azure/commit/";
+function getHistoryUrl(): string {
+  if (typeof window === "undefined") {
+    return `https://raw.githubusercontent.com/${GITHUB_REPO}/${DEFAULT_DATA_BRANCH}/results/history.json`;
+  }
+  const params = new URLSearchParams(window.location.search);
+  const branch = params.get("branch") || DEFAULT_DATA_BRANCH;
+  return `https://raw.githubusercontent.com/${GITHUB_REPO}/${branch}/results/history.json`;
+}
+
+const GITHUB_COMMIT_URL = `https://github.com/${GITHUB_REPO}/commit/`;
 
 type Tab = "stages" | "linter" | "validation" | "emitters";
 type TimeRange = "30d" | "90d" | "all";
@@ -376,10 +385,12 @@ export function BenchmarkDashboard() {
   const [selectedSpec, setSelectedSpec] = useState<string>(initialParams.spec);
   const [timeRange, setTimeRange] = useState<TimeRange>(initialParams.range);
 
+  const historyUrl = useMemo(getHistoryUrl, []);
+
   const fetchData = useCallback(() => {
     setLoading(true);
     setError(null);
-    fetch(HISTORY_URL)
+    fetch(historyUrl)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
