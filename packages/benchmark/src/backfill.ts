@@ -8,9 +8,11 @@ import {
   readdirSync,
   rmSync,
   symlinkSync,
+  writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { generateHistory } from "./generate-history.js";
 import { DEFAULT_BRANCH, exec, execOk, git, gitSilent, listExistingResults } from "./utils.js";
 
 export interface BackfillOptions {
@@ -309,6 +311,12 @@ export function backfill(options: BackfillOptions = {}): void {
   if (sorted.length > 0) {
     copyFileSync(join(resultsDir, sorted[sorted.length - 1]), "results/latest.json");
   }
+
+  // Generate aggregated history.json
+  const resultsPath = join(process.cwd(), "results");
+  const history = generateHistory({ dir: resultsPath });
+  writeFileSync(join(resultsPath, "history.json"), JSON.stringify(history, null, 2));
+  console.log("Generated history.json");
 
   git("add results/");
   const commitMsg = `benchmark: backfill results for ${succeeded} commits`;
