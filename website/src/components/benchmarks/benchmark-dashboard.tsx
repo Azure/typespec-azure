@@ -55,17 +55,26 @@ interface FilteredData {
 const DEFAULT_GITHUB_REPO = "Azure/typespec-azure";
 const DEFAULT_DATA_BRANCH = "benchmark-data";
 
-function getHistoryUrl(): string {
+function getUrlParams(): { repo: string; branch: string } {
   if (typeof window === "undefined") {
-    return `https://raw.githubusercontent.com/${DEFAULT_GITHUB_REPO}/${DEFAULT_DATA_BRANCH}/results/history.json`;
+    return { repo: DEFAULT_GITHUB_REPO, branch: DEFAULT_DATA_BRANCH };
   }
   const params = new URLSearchParams(window.location.search);
-  const repo = params.get("repo") || DEFAULT_GITHUB_REPO;
-  const branch = params.get("branch") || DEFAULT_DATA_BRANCH;
+  return {
+    repo: params.get("repo") || DEFAULT_GITHUB_REPO,
+    branch: params.get("branch") || DEFAULT_DATA_BRANCH,
+  };
+}
+
+function getHistoryUrl(): string {
+  const { repo, branch } = getUrlParams();
   return `https://raw.githubusercontent.com/${repo}/${branch}/results/history.json`;
 }
 
-const GITHUB_COMMIT_URL = `https://github.com/${DEFAULT_GITHUB_REPO}/commit/`;
+function getCommitUrl(): string {
+  const { repo } = getUrlParams();
+  return `https://github.com/${repo}/commit/`;
+}
 
 type Tab = "stages" | "linter" | "validation" | "emitters";
 type TimeRange = "30d" | "90d" | "all";
@@ -243,7 +252,7 @@ function BenchmarkChart({ data, section }: { data: FilteredData; section: ChartS
             afterTitle: (items) => {
               if (items.length === 0) return "";
               const entry = data.entries[items[0].dataIndex];
-              return `${GITHUB_COMMIT_URL}${entry.commit}`;
+              return `${getCommitUrl()}${entry.commit}`;
             },
           },
         },

@@ -9,8 +9,7 @@ import {
   formatPrComment,
 } from "./format-comment.js";
 import type { BenchmarkResult } from "./types.js";
-
-const DEFAULT_BRANCH = "benchmark-data";
+import { DEFAULT_BRANCH } from "./utils.js";
 
 export interface UploadPrCommentOptions {
   /** Path to the current benchmark results JSON file. */

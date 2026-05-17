@@ -203,6 +203,13 @@ export function backfill(options: BackfillOptions = {}): void {
     console.log(`Results saved in: ${resultsDir}`);
   };
 
+  const onSignal = () => {
+    cleanup();
+    process.exit(1);
+  };
+  process.on("SIGINT", onSignal);
+  process.on("SIGTERM", onSignal);
+
   // Step 3: Process each commit
   let succeeded = 0;
   let failed = 0;
@@ -276,6 +283,8 @@ export function backfill(options: BackfillOptions = {}): void {
     }
   } finally {
     cleanup();
+    process.removeListener("SIGINT", onSignal);
+    process.removeListener("SIGTERM", onSignal);
   }
 
   console.log("\n=== Backfill Complete ===");
@@ -306,10 +315,11 @@ export function backfill(options: BackfillOptions = {}): void {
     copyFileSync(join(resultsDir, file), join("results", file));
   }
 
-  // Update latest.json to the most recent result
-  const sorted = newResults.sort();
-  if (sorted.length > 0) {
-    copyFileSync(join(resultsDir, sorted[sorted.length - 1]), "results/latest.json");
+  // Update latest.json to the most recent result (by commit order, not lexicographic SHA)
+  const resultShas = new Set(newResults.map((f) => f.replace(".json", "")));
+  const latestSha = [...commits].reverse().find((sha) => resultShas.has(sha));
+  if (latestSha) {
+    copyFileSync(join(resultsDir, `${latestSha}.json`), "results/latest.json");
   }
 
   // Generate aggregated history.json

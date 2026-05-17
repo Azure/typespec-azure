@@ -27,39 +27,43 @@ export function storeResults(options: StoreResultsOptions): void {
   git('config user.name "github-actions[bot]"');
   git('config user.email "github-actions[bot]@users.noreply.github.com"');
 
-  // Set up worktree for the benchmark-data branch
-  const branchExists = gitSilent(`ls-remote --exit-code --heads origin ${branch}`);
-  if (branchExists) {
-    git(`fetch origin ${branch}`);
-    git(`worktree add ${worktreeDir} origin/${branch}`);
-  } else {
-    git(`worktree add --detach ${worktreeDir}`);
-    git(`checkout --orphan ${branch}`, worktreeDir);
-    gitSilent("rm -rf .", worktreeDir);
-    mkdirSync(join(worktreeDir, "results"), { recursive: true });
+  try {
+    // Set up worktree for the benchmark-data branch
+    const branchExists = gitSilent(`ls-remote --exit-code --heads origin ${branch}`);
+    if (branchExists) {
+      git(`fetch origin ${branch}`);
+      git(`worktree add ${worktreeDir} origin/${branch}`);
+    } else {
+      git(`worktree add --detach ${worktreeDir}`);
+      git(`checkout --orphan ${branch}`, worktreeDir);
+      gitSilent("rm -rf .", worktreeDir);
+      mkdirSync(join(worktreeDir, "results"), { recursive: true });
 
-    const readmeContent =
-      "# Benchmark Data\n\nThis branch stores TypeSpec benchmark results. Do not merge into main.\n";
-    writeFileSync(join(worktreeDir, "README.md"), readmeContent);
+      const readmeContent =
+        "# Benchmark Data\n\nThis branch stores TypeSpec benchmark results. Do not merge into main.\n";
+      writeFileSync(join(worktreeDir, "README.md"), readmeContent);
 
-    git("add README.md", worktreeDir);
-    git('commit -m "Initialize benchmark-data branch"', worktreeDir);
+      git("add README.md", worktreeDir);
+      git('commit -m "Initialize benchmark-data branch"', worktreeDir);
+    }
+
+    // Copy results
+    const resultsDir = join(worktreeDir, "results");
+    mkdirSync(resultsDir, { recursive: true });
+    copyFileSync(resultsFile, join(resultsDir, `${commit}.json`));
+    copyFileSync(resultsFile, join(resultsDir, "latest.json"));
+
+    // Generate aggregated history
+    const history = generateHistory({ dir: resultsDir });
+    writeFileSync(join(resultsDir, "history.json"), JSON.stringify(history, null, 2));
+
+    // Commit and push
+    git("add results/", worktreeDir);
+    git(`commit -m "Benchmark results for ${commit}"`, worktreeDir);
+    git(`push origin HEAD:${branch}`, worktreeDir);
+
+    console.log(`Benchmark results stored on ${branch} branch for commit ${commit}`);
+  } finally {
+    gitSilent(`worktree remove ${worktreeDir} --force`);
   }
-
-  // Copy results
-  const resultsDir = join(worktreeDir, "results");
-  mkdirSync(resultsDir, { recursive: true });
-  copyFileSync(resultsFile, join(resultsDir, `${commit}.json`));
-  copyFileSync(resultsFile, join(resultsDir, "latest.json"));
-
-  // Generate aggregated history
-  const history = generateHistory({ dir: resultsDir });
-  writeFileSync(join(resultsDir, "history.json"), JSON.stringify(history, null, 2));
-
-  // Commit and push
-  git("add results/", worktreeDir);
-  git(`commit -m "Benchmark results for ${commit}"`, worktreeDir);
-  git(`push origin HEAD:${branch}`, worktreeDir);
-
-  console.log(`Benchmark results stored on ${branch} branch for commit ${commit}`);
 }
