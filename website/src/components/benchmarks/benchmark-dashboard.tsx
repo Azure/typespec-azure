@@ -413,7 +413,7 @@ export function BenchmarkDashboard() {
         setError(e.message);
         setLoading(false);
       });
-  }, []);
+  }, [historyUrl]);
 
   useEffect(() => {
     fetchData();
