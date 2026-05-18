@@ -9,6 +9,7 @@ using Spector;
 @doc("Test for the exact() function used with @clientName to preserve exact naming.")
 @scenarioService("/azure/client-generator-core/exact-name")
 @global.Azure.ClientGenerator.Core.clientNamespace("azure.clientgenerator.core.exactname", "java")
+@global.Azure.ClientGenerator.Core.clientNamespace("specs.azure.clientgenerator.core.exactname", "python")
 namespace _Specs_.Azure.ClientGenerator.Core.ExactName;
 
 @scenario
