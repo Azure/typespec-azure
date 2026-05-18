@@ -440,15 +440,23 @@ The `exact()` function marks a client name so that the TCGC type graph sets `isE
 
 ```typespec title=main.tsp
 @service
-namespace PetStoreNamespace;
+namespace ExactNameService;
 
-model InputModel {
+model ExactModel {
   name: string;
 }
 
-@route("/analyze")
+model ScopedModel {
+  name: string;
+}
+
+@route("/model")
 @post
-op analyze(@body body: InputModel): void;
+op sendModel(@body body: ExactModel): ExactModel;
+
+@route("/property")
+@post
+op sendProperty(@body body: ScopedModel): ScopedModel;
 ```
 
 ```typespec title=client.tsp
@@ -457,73 +465,43 @@ import "@azure-tools/typespec-client-generator-core";
 
 using Azure.ClientGenerator.Core;
 
+// Global rename: preserves "my_model" verbatim for all languages
 #suppress "experimental-feature" "exact"
-@@clientName(PetStoreNamespace.InputModel, exact("InputModel"), "python");
-@@clientName(PetStoreNamespace.InputModel.name, exact("name"), "python");
+@@clientName(ExactNameService.ExactModel, exact("my_model"));
+
+// Scoped renames: per-language exact names with underscore prefix to verify
+// that language naming logic does not strip or recase the name
+#suppress "experimental-feature" "exact"
+@@clientName(ExactNameService.ScopedModel.name, exact("_my_name"), "python");
+@@clientName(ExactNameService.ScopedModel.name, exact("_myName"), "java");
+@@clientName(ExactNameService.ScopedModel.name, exact("_MyName"), "csharp");
+@@clientName(ExactNameService.ScopedModel.name, exact("_myName"), "javascript");
+@@clientName(ExactNameService.ScopedModel.name, exact("_MyName"), "go");
 ```
 
 ```python
-class InputModel(_Model):
-  name: str = rest_field()
-
-def analyze(self, body: InputModel, **kwargs: Any) -> None:
-  ...
+# not supported
 ```
 
 ```csharp
-namespace PetStoreNamespace
-{
-  public partial class InputModel
-  {
-    public string Name { get; }
-  }
-
-  public partial class PetStoreNamespaceClient
-  {
-    public virtual Response Analyze(InputModel body, CancellationToken cancellationToken = default);
-    public virtual async Task<Response> AnalyzeAsync(InputModel body, CancellationToken cancellationToken = default);
-  }
-}
+// not supported
 ```
 
 ```typescript
-export interface InputModel {
-  name: string;
-}
-
-export async function analyze(
-  context: Client,
-  body: InputModel,
-  options: AnalyzeOptionalParams,
-): Promise<void>;
+// not supported
 ```
 
 ```java
-package petstorenamespace.models;
-public final class InputModel {
-    public String getName()
-}
-
-package petstorenamespace;
-public final class PetStoreNamespaceClient {
-    public Response<Void> analyzeWithResponse(BinaryData body, RequestOptions requestOptions)
-    public void analyze(InputModel body)
-}
+// not supported
 ```
 
 ```go
-type InputModel struct {
-	Name *string
-}
-
-type PetStoreNamespaceClient struct {}
-
-func (client *PetStoreNamespaceClient) Analyze(ctx context.Context, body InputModel, options *PetStoreNamespaceClientAnalyzeOptions) (PetStoreNamespaceClientAnalyzeResponse, error)
+// not supported
 ```
 
 </ClientTabs>
 
-In this example, `exact("InputModel")` and `exact("name")` are scoped to Python, ensuring that the Python emitter preserves these names verbatim instead of converting them to `input_model` and `name` (which would be the default snake_case convention). Other languages are unaffected and apply their own idiomatic casing as usual.
+In this example, `exact("my_model")` globally renames `ExactModel` to `my_model` for all languages, preventing any automatic casing conversion. The scoped renames on `ScopedModel.name` use an underscore-prefixed name per language to verify that each emitter preserves the name as-is. Language emitter support for `isExactName` is not yet available.
 
 ## Implementation
 
