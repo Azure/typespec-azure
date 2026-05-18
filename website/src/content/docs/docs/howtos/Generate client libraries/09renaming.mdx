@@ -428,6 +428,103 @@ resp, err := client.Get(context.TODO(), "name", &PetStoreNamespaceClientGetOptio
 
 </ClientTabs>
 
+### Preserving exact casing
+
+By default, language emitters adapt names to idiomatic casing conventions (e.g., `snake_case` for Python, `PascalCase` for C#). When you use `@clientName`, emitters are expected to use that name without applying casing transformations. However, if you want to make this intent explicit and machine-readable, you can wrap the name with the `exact()` function.
+
+The `exact()` function marks a client name so that the TCGC type graph sets `isExactName: true` on the corresponding type or property. Language emitters that check this flag will preserve the name exactly as specified, without any automatic casing conversion.
+
+`exact()` supports language scoping, so you can preserve exact casing for a specific language while letting others apply their own conventions.
+
+<ClientTabs>
+
+```typespec title=main.tsp
+@service
+namespace PetStoreNamespace;
+
+model InputModel {
+  name: string;
+}
+
+@route("/analyze")
+@post
+op analyze(@body body: InputModel): void;
+```
+
+```typespec title=client.tsp
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+#suppress "experimental-feature" "exact"
+@@clientName(PetStoreNamespace.InputModel, exact("InputModel"), "python");
+@@clientName(PetStoreNamespace.InputModel.name, exact("name"), "python");
+```
+
+```python
+class InputModel(_Model):
+  name: str = rest_field()
+
+def analyze(self, body: InputModel, **kwargs: Any) -> None:
+  ...
+```
+
+```csharp
+namespace PetStoreNamespace
+{
+  public partial class InputModel
+  {
+    public string Name { get; }
+  }
+
+  public partial class PetStoreNamespaceClient
+  {
+    public virtual Response Analyze(InputModel body, CancellationToken cancellationToken = default);
+    public virtual async Task<Response> AnalyzeAsync(InputModel body, CancellationToken cancellationToken = default);
+  }
+}
+```
+
+```typescript
+export interface InputModel {
+  name: string;
+}
+
+export async function analyze(
+  context: Client,
+  body: InputModel,
+  options: AnalyzeOptionalParams,
+): Promise<void>;
+```
+
+```java
+package petstorenamespace.models;
+public final class InputModel {
+    public String getName()
+}
+
+package petstorenamespace;
+public final class PetStoreNamespaceClient {
+    public Response<Void> analyzeWithResponse(BinaryData body, RequestOptions requestOptions)
+    public void analyze(InputModel body)
+}
+```
+
+```go
+type InputModel struct {
+	Name *string
+}
+
+type PetStoreNamespaceClient struct {}
+
+func (client *PetStoreNamespaceClient) Analyze(ctx context.Context, body InputModel, options *PetStoreNamespaceClientAnalyzeOptions) (PetStoreNamespaceClientAnalyzeResponse, error)
+```
+
+</ClientTabs>
+
+In this example, `exact("InputModel")` and `exact("name")` are scoped to Python, ensuring that the Python emitter preserves these names verbatim instead of converting them to `input_model` and `name` (which would be the default snake_case convention). Other languages are unaffected and apply their own idiomatic casing as usual.
+
 ## Implementation
 
 ### Order of Operations
