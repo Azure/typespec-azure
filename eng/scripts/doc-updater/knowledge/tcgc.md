@@ -143,6 +143,10 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - Don't add Spector specs for code-generation controls like @convenientAPI/@protocolAPI — they aren't testable at the HTTP wire level.
 - The `@deserializeEmptyStringAsNull` section was removed from 08types.mdx in feedback PR #4268. Don't re-add it unless specifically requested.
 - Spector response-as-bool spec needs BOTH a success (200) case AND a 404 case to be complete.
+- TypeSpec examples in docs with operations MUST include `@route` decorators to be valid TypeSpec (feedback PR #4398).
+- In @hierarchyBuilding language examples: each language handles inheritance differently. Python doesn't use real hierarchy (copies all props to each class). Go uses flat structs. C# and TypeScript use real inheritance. Java uses class inheritance.
+- C# property names that conflict with their enclosing class name should use a suffix (e.g., `CProperty` not `C` for a property in class `C`).
+- The "Body Model Properties Named apiVersion" section was removed from 10versioning.mdx during review (PR #4398) — don't re-add as a separate section. The behavior is covered implicitly by the main description.
 
 ## @responseAsBool Internal Design
 
@@ -171,4 +175,5 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - Readonly properties have Input flag stripped but other flags (Output, Json, Xml) still propagate through.
 - External types (via @alternateType with ExternalTypeInfo) block propagation of all non-External flags.
 - `@apiVersion(false)` prevents a parameter from matching to a client API version parameter, keeping it on the method.
-- Body model properties named "apiVersion" are NOT treated as API version params — only HTTP metadata params (header/query/path/cookie) are matched by name.
+- Body model properties named "apiVersion" are NOT treated as API version params — only HTTP metadata params (header/query/path/cookie) and server URL template parameters (from `@server`) are matched by name.
+- Server URL template parameters (declared in `@server` decorator's parameter model) named `apiVersion`/`api-version` are recognized as API version params, even with plain `string` type in versioned services.
