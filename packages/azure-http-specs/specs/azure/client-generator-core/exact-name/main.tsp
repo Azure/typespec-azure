@@ -48,12 +48,12 @@ namespace Model {
 @scenarioDoc("""
   This scenario tests the exact() function applied to a model property with language scoping.
   The property 'name' on ScopedModel is renamed using exact() scoped to each language,
-  with names that follow each language's naming convention:
-  - Python uses snake_case: 'my_name'
-  - Java uses camelCase: 'myName'
-  - C# uses PascalCase: 'MyName'
-  - JavaScript uses camelCase: 'myName'
-  - Go uses PascalCase: 'MyName'
+  with names that include an underscore prefix to verify that language naming logic does not apply:
+  - Python: '_my_name' (should not be converted to 'my_name' or other casing)
+  - Java: '_myName' (should not be converted to remove the underscore prefix)
+  - C#: '_MyName' (should not be converted to remove the underscore prefix)
+  - JavaScript: '_myName' (should not be converted to remove the underscore prefix)
+  - Go: '_MyName' (should not be converted to remove the underscore prefix)
   Each language should preserve the specified exact name as-is without any further casing conversion.
   
   Expected request body:
@@ -73,23 +73,23 @@ namespace Property {
   model ScopedModel {
     #suppress "experimental-feature" "exact"
     @global.Azure.ClientGenerator.Core.clientName(
-      global.Azure.ClientGenerator.Core.exact("my_name"),
+      global.Azure.ClientGenerator.Core.exact("_my_name"),
       "python"
     )
     @global.Azure.ClientGenerator.Core.clientName(
-      global.Azure.ClientGenerator.Core.exact("myName"),
+      global.Azure.ClientGenerator.Core.exact("_myName"),
       "java"
     )
     @global.Azure.ClientGenerator.Core.clientName(
-      global.Azure.ClientGenerator.Core.exact("MyName"),
+      global.Azure.ClientGenerator.Core.exact("_MyName"),
       "csharp"
     )
     @global.Azure.ClientGenerator.Core.clientName(
-      global.Azure.ClientGenerator.Core.exact("myName"),
+      global.Azure.ClientGenerator.Core.exact("_myName"),
       "javascript"
     )
     @global.Azure.ClientGenerator.Core.clientName(
-      global.Azure.ClientGenerator.Core.exact("MyName"),
+      global.Azure.ClientGenerator.Core.exact("_MyName"),
       "go"
     )
     name: string;
