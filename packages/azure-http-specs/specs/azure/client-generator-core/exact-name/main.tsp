@@ -8,10 +8,7 @@ using Spector;
 
 @doc("Test for the exact() function used with @clientName to preserve exact naming.")
 @scenarioService("/azure/client-generator-core/exact-name")
-@global.Azure.ClientGenerator.Core.clientNamespace(
-  "azure.clientgenerator.core.exactname",
-  "java"
-)
+@global.Azure.ClientGenerator.Core.clientNamespace("azure.clientgenerator.core.exactname", "java")
 namespace _Specs_.Azure.ClientGenerator.Core.ExactName;
 
 @scenario
@@ -50,8 +47,8 @@ namespace Model {
 @scenario
 @scenarioDoc("""
   This scenario tests the exact() function applied to a model property with language scoping.
-  The property 'name' on ScopedModel is renamed to 'my_name' using exact() scoped to Python only.
-  Python should preserve the exact name 'my_name' as-is. Other languages use the default name 'name'.
+  The property 'name' on ScopedModel is renamed to 'my_name' using exact() scoped to each language.
+  Each language should preserve the exact name 'my_name' as-is without any casing conversion.
   
   Expected request body:
   ```json
@@ -69,9 +66,29 @@ namespace Model {
 namespace Property {
   model ScopedModel {
     #suppress "experimental-feature" "exact"
+    #suppress "experimental-feature" "exact"
+    #suppress "experimental-feature" "exact"
+    #suppress "experimental-feature" "exact"
+    #suppress "experimental-feature" "exact"
     @global.Azure.ClientGenerator.Core.clientName(
       global.Azure.ClientGenerator.Core.exact("my_name"),
       "python"
+    )
+    @global.Azure.ClientGenerator.Core.clientName(
+      global.Azure.ClientGenerator.Core.exact("my_name"),
+      "java"
+    )
+    @global.Azure.ClientGenerator.Core.clientName(
+      global.Azure.ClientGenerator.Core.exact("my_name"),
+      "csharp"
+    )
+    @global.Azure.ClientGenerator.Core.clientName(
+      global.Azure.ClientGenerator.Core.exact("my_name"),
+      "javascript"
+    )
+    @global.Azure.ClientGenerator.Core.clientName(
+      global.Azure.ClientGenerator.Core.exact("my_name"),
+      "go"
     )
     name: string;
   }
