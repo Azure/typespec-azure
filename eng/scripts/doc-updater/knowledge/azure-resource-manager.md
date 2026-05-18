@@ -68,15 +68,35 @@ Old paths like `dynatrace/`, `tenantResource/`, `arm-scenarios/singleton/`, `ope
 - The `@defaultResourceKeySegmentName` decorator on `ResourceNameParameter` auto-generates key and segment names.
 - Ghost `@template` or `@param` tags in doc comments (referencing non-existent parameters) should be removed.
 - The `nsp-operations.tsp` file has Action/ActionAsync templates that are POST operations, not GET — doc comments must reflect this.
+- List operations (`ArmListBySubscription`, `ArmResourceListByParent`, `ArmResourceListAtScope`) must say "the resource being listed" — NOT "being patched" (copy-paste error from patch templates).
+- `CreateOrReplace*` operations should say "createOrReplace" in their @template Response description. The deprecated `CreateOrUpdate*` ops say "createOrUpdate" (correct for them). In `legacy-types/`, operations named `CreateOrReplace*` still use "createOrUpdate" because the `@armResourceCreateOrUpdate` decorator confirms the ARM-level semantics.
+- In `lib/extension/operations.tsp`, template doc comments use `Extension.Subscription`, `Extension.ManagementGroup`, `Extension.ResourceGroup` (dot-separated, not `>`).
 
 ## Build Requirements
 
-- Node.js >= 22 is required for `pnpm install`.
+- Node.js >= 22 is required for `pnpm install` and `pnpm build`.
 - Build the ARM package with: `pnpm -r --filter "@azure-tools/typespec-azure-resource-manager..." build`
 - Format with: `pnpm format`
+- If the default Node.js is too old, download Node 22 manually and prepend to PATH.
 
 ## Operation Templates (Not Deprecated)
 
 `ArmResourcePatchAsync` and `ArmResourcePatchSync` exist and are not deprecated, though they are noted as "not recommended" in resource-operations.md. `ArmCustomPatchSync` and `ArmCustomPatchAsync` are the preferred alternatives.
 
 `TrackedResourceOperations` interface is current. `ResourceOperations` is deprecated (use `TrackedResourceOperations` instead).
+
+## ArmTagsPatch Suppress Requirement
+
+`ArmTagsPatchSync`, `ArmTagsPatchAsync`, `ArmResourcePatchSync`, and `ArmResourcePatchAsync` use `@patch(#{ implicitOptionality: true })` which triggers a deprecation warning. Users must add `#suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"` at the usage site. This is documented in `resource-operations.md`.
+
+## Getting-Started Guide Style
+
+The getting-started guide uses a simplified pattern without `@versioned` for beginner friendliness. The `@service` decorator should NOT include a `version` parameter (version comes from `@versioned` when used). The guide uses `ArmCustomPatchSync` (not ArmTagsPatch) to avoid the suppress complexity.
+
+## Feedback Corrections Applied
+
+- `step03.md`: Use `...ResourceNameParameter<AddressResource, KeyName = "addressName", SegmentName = "addresses">` instead of manual `@key/@segment name` fields for child resources.
+- `step04.md`: Use individual operation declarations (not `TrackedResourceOperations<User, UserProperties>`) in the interface example, with `ArmCustomPatchSync` for the update operation.
+- `step05.md`: Remove `version` from `@service` decorator; use `...ResourceNameParameter<User>` instead of manual key/segment/path.
+- `deprecation.tsp`: The ExtensionResourceBase deprecation message must say "Foundations.ExtensionResource" (not "ProxyResource").
+- `arm-legacy-operations-discourage` rule was removed from linter registration; its rule doc file and linter.md entry should not exist.
