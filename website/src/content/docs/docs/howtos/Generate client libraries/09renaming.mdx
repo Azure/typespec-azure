@@ -430,7 +430,7 @@ resp, err := client.Get(context.TODO(), "name", &PetStoreNamespaceClientGetOptio
 
 ### Preserving exact casing
 
-By default, language emitters adapt names to idiomatic casing conventions (e.g., `snake_case` for Python, `PascalCase` for C#). When you use `@clientName`, emitters are expected to use that name without applying casing transformations. However, if you want to make this intent explicit and machine-readable, you can wrap the name with the `exact()` function.
+By default, language emitters adapt names to idiomatic casing conventions (e.g., `snake_case` for Python, `PascalCase` for C#). `@clientName` also allows emitters to apply language-specific casing transformations to the provided name. To prevent this and preserve the name exactly as specified, wrap it with the `exact()` function.
 
 The `exact()` function marks a client name so that the TCGC type graph sets `isExactName: true` on the corresponding type or property. Language emitters that check this flag will preserve the name exactly as specified, without any automatic casing conversion.
 
