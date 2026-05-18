@@ -442,17 +442,9 @@ The `exact()` function marks a client name so that the TCGC type graph sets `isE
 @service
 namespace ExactNameService;
 
-model ExactModel {
-  name: string;
-}
-
 model ScopedModel {
   name: string;
 }
-
-@route("/model")
-@post
-op sendModel(@body body: ExactModel): ExactModel;
 
 @route("/property")
 @post
@@ -464,10 +456,6 @@ import "./main.tsp";
 import "@azure-tools/typespec-client-generator-core";
 
 using Azure.ClientGenerator.Core;
-
-// Global rename: preserves "my_model" verbatim for all languages
-#suppress "experimental-feature" "exact"
-@@clientName(ExactNameService.ExactModel, exact("my_model"));
 
 // Scoped renames: per-language exact names with underscore prefix to verify
 // that language naming logic does not strip or recase the name
@@ -501,7 +489,7 @@ using Azure.ClientGenerator.Core;
 
 </ClientTabs>
 
-In this example, `exact("my_model")` globally renames `ExactModel` to `my_model` for all languages, preventing any automatic casing conversion. The scoped renames on `ScopedModel.name` use an underscore-prefixed name per language to verify that each emitter preserves the name as-is. Language emitter support for `isExactName` is not yet available.
+In this example, the scoped renames on `ScopedModel.name` use an underscore-prefixed name per language to verify that each emitter preserves the name as-is, without stripping or recasing it. Language emitter support for `isExactName` is not yet available.
 
 ## Implementation
 
