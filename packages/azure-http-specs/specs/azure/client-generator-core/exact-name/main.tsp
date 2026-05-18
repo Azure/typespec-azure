@@ -47,8 +47,14 @@ namespace Model {
 @scenario
 @scenarioDoc("""
   This scenario tests the exact() function applied to a model property with language scoping.
-  The property 'name' on ScopedModel is renamed to 'my_name' using exact() scoped to each language.
-  Each language should preserve the exact name 'my_name' as-is without any casing conversion.
+  The property 'name' on ScopedModel is renamed using exact() scoped to each language,
+  with names that follow each language's naming convention:
+  - Python uses snake_case: 'my_name'
+  - Java uses camelCase: 'myName'
+  - C# uses PascalCase: 'MyName'
+  - JavaScript uses camelCase: 'myName'
+  - Go uses PascalCase: 'MyName'
+  Each language should preserve the specified exact name as-is without any further casing conversion.
   
   Expected request body:
   ```json
@@ -71,19 +77,19 @@ namespace Property {
       "python"
     )
     @global.Azure.ClientGenerator.Core.clientName(
-      global.Azure.ClientGenerator.Core.exact("my_name"),
+      global.Azure.ClientGenerator.Core.exact("myName"),
       "java"
     )
     @global.Azure.ClientGenerator.Core.clientName(
-      global.Azure.ClientGenerator.Core.exact("my_name"),
+      global.Azure.ClientGenerator.Core.exact("MyName"),
       "csharp"
     )
     @global.Azure.ClientGenerator.Core.clientName(
-      global.Azure.ClientGenerator.Core.exact("my_name"),
+      global.Azure.ClientGenerator.Core.exact("myName"),
       "javascript"
     )
     @global.Azure.ClientGenerator.Core.clientName(
-      global.Azure.ClientGenerator.Core.exact("my_name"),
+      global.Azure.ClientGenerator.Core.exact("MyName"),
       "go"
     )
     name: string;
