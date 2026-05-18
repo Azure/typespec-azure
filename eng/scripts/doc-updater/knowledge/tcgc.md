@@ -44,12 +44,13 @@
 27. `@nextLinkVerb(target, verb, scope?)` — set HTTP verb for next link (GET or POST)
 28. `@clientDefaultValue(target, value, scope?)` — set client-level defaults
 
-### Functions (lib/functions.tsp) — 4 functions
+### Functions (lib/functions.tsp) — 5 functions
 
 29. `replaceParameter(operation, selector, replacement)` — replace operation parameter
 30. `removeParameter(operation, selector)` — remove optional parameter
 31. `addParameter(operation, parameter)` — add new parameter
 32. `reorderParameters(operation, order)` — reorder parameters by name list
+33. `exact(name)` — mark a client name as exact, preventing casing transformations; used with @clientName; sets `isExactName: true` on the type graph
 
 ## TSP Doc Comment Issues Found
 
@@ -69,7 +70,7 @@
 | 06longRunningOperations.mdx | LRO patterns, @pollingOperation, @markAsLro                                                                                                     |
 | 07multipart.mdx             | @multipartBody, HttpPart, file upload                                                                                                           |
 | 08types.mdx                 | @clientNamespace, @clientDefaultValue, @clientName, @discriminator, @alternateType, @clientDoc, @flattenProperty, @deserializeEmptyStringAsNull |
-| 09renaming.mdx              | @clientName, @encodedName                                                                                                                       |
+| 09renaming.mdx              | @clientName, @encodedName, exact()                                                                                                              |
 | 10versioning.mdx            | @versioned, @added, @removed, @apiVersion, @clientApiVersions                                                                                   |
 | 11hierarchyBuilding.mdx     | @hierarchyBuilding (Legacy)                                                                                                                     |
 | 12clientOptions.mdx         | @clientOption                                                                                                                                   |
@@ -87,7 +88,7 @@
 
 ### Covered in azure/client-generator-core/
 
-access, alternate-type, api-version, client-default-value, client-doc, client-initialization, client-location, deserialize-empty-string-as-null, flatten-property, hierarchy-building, next-link-verb, override, response-as-bool, usage
+access, alternate-type, api-version, client-default-value, client-doc, client-initialization, client-location, deserialize-empty-string-as-null, exact-name, flatten-property, hierarchy-building, next-link-verb, override, response-as-bool, usage
 
 ### Covered in client/
 
@@ -177,3 +178,16 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - `@apiVersion(false)` prevents a parameter from matching to a client API version parameter, keeping it on the method.
 - Body model properties named "apiVersion" are NOT treated as API version params — only HTTP metadata params (header/query/path/cookie) and server URL template parameters (from `@server`) are matched by name.
 - Server URL template parameters (declared in `@server` decorator's parameter model) named `apiVersion`/`api-version` are recognized as API version params, even with plain `string` type in versioned services.
+
+## isExactName Property (May 2026)
+
+- The `isExactName: boolean` property was added to many SDK type interfaces: SdkModelType, SdkEnumType, SdkUnionType, SdkConstantType, SdkNullableType, SdkClientInitializationType, and SdkModelPropertyTypeBase (base for all property types).
+- Set to `true` when a name is wrapped with the `exact()` function in `@clientName`.
+- The `exact()` function internally prepends `_exact_:` prefix which is stripped by `normalizeExactName()` before the name reaches the type graph.
+- Exported helpers: `EXACT_NAME_PREFIX`, `hasExactNameMarker()`, `normalizeExactName()` from the TCGC package index.
+- Public utility: `isExactClientName(context, type)` checks whether a type has exact name override.
+- Documented in guideline.md under Common Properties and in 09renaming.mdx under "Preserving exact casing".
+
+## Feedback Lessons (PR #4416)
+
+- In TypeScript code examples, keep method signatures on a single line when they fit within ~120 characters. Don't use multi-line formatting for short method signatures.
