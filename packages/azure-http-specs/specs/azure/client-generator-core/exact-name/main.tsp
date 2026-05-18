@@ -66,10 +66,6 @@ namespace Model {
 namespace Property {
   model ScopedModel {
     #suppress "experimental-feature" "exact"
-    #suppress "experimental-feature" "exact"
-    #suppress "experimental-feature" "exact"
-    #suppress "experimental-feature" "exact"
-    #suppress "experimental-feature" "exact"
     @global.Azure.ClientGenerator.Core.clientName(
       global.Azure.ClientGenerator.Core.exact("my_name"),
       "python"
