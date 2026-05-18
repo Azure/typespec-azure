@@ -6,8 +6,9 @@ Performance benchmarking tool for TypeSpec Azure compilation. Tracks compilation
 
 1. **Benchmark runner** compiles dedicated TypeSpec specs using the compiler's programmatic API
 2. The compiler provides built-in `Stats` data including per-stage timing and per-linter-rule breakdown
-3. Results are stored as JSON — on CI, they're saved to the `benchmark-data` branch
-4. PR comments show a comparison table highlighting performance changes
+3. Runtime metrics are aggregated with an outlier-resistant estimator (trimmed mean for 5+ samples, median for smaller sample sizes)
+4. Results are stored as JSON — on CI, they're saved to the `benchmark-data` branch
+5. PR comments show a comparison table highlighting performance changes
 
 ## Local usage
 

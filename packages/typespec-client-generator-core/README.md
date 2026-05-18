@@ -375,7 +375,8 @@ model MyModel {
   field: FieldType;
 }
 // This will emit a warning - external types cannot be applied to properties
-@@alternateType(MyModel.field,
+@@alternateType(
+  MyModel.field,
   {
     identity: "ExternalType",
   },

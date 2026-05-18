@@ -18,7 +18,7 @@ jobs:
       github.event.workflow_run.conclusion == 'success'
     steps:
       - name: Download benchmark comment artifact
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: benchmark-comment
           run-id: ${{ github.event.workflow_run.id }}

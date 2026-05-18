@@ -74,7 +74,9 @@ alias ResourceCreatedResponse<Resource extends TypeSpec.Reflection.Model> = Type
 
 alias ResourceOkResponse<Resource> = TypeSpec.Http.Response<200> & Resource;
 
-alias ResourceCreatedOrOkResponse<Resource extends TypeSpec.Reflection.Model> = ResourceCreatedResponse<Resource> | ResourceOkResponse<Resource>;
+alias ResourceCreatedOrOkResponse<Resource extends TypeSpec.Reflection.Model> =
+  | ResourceCreatedResponse<Resource>
+  | ResourceOkResponse<Resource>;
 
 /**
  * Response describing the location of a created resource.

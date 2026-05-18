@@ -2282,7 +2282,7 @@ export async function getOpenAPIForService(
     }
 
     const examples = getTypeSpecExamples(program, typespecType);
-    if (typespecType.kind === "ModelProperty" && examples.length > 0) {
+    if (typespecType.kind === "ModelProperty" && usage !== "parameter" && examples.length > 0) {
       newTarget.example = serializeValueAsJson(program, examples[0].value, typespecType);
     }
 
