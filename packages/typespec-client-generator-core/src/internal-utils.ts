@@ -1360,21 +1360,33 @@ export function listOrphanTypes(context: TCGCContext): (Model | Enum | Union)[] 
     result.push(type);
   }
 
+  function addNamespace(namespace: Namespace) {
+    const namespaces = [namespace];
+    let currentIndex = 0;
+    while (currentIndex < namespaces.length) {
+      const ns = namespaces[currentIndex];
+      for (const model of ns.models.values()) {
+        addType(model);
+      }
+      for (const enumType of ns.enums.values()) {
+        addType(enumType);
+      }
+      for (const unionType of ns.unions.values()) {
+        addType(unionType);
+      }
+      namespaces.push(...ns.namespaces.values());
+      currentIndex++;
+    }
+  }
+
   // Iterate all types/namespaces with an explicit @usage decorator. This covers
   // models, enums, and unions defined anywhere (including imported libraries),
   // not only those declared inside user-defined namespaces.
   for (const [type] of listScopedDecoratorData(context, usageKey)) {
     if (type.kind === "Namespace") {
-      // @@usage applied to a namespace propagates to its direct member types.
-      for (const model of type.models.values()) {
-        addType(model);
-      }
-      for (const enumType of type.enums.values()) {
-        addType(enumType);
-      }
-      for (const unionType of type.unions.values()) {
-        addType(unionType);
-      }
+      // @@usage applied to a namespace propagates to its member types,
+      // recursively descending into sub-namespaces.
+      addNamespace(type);
     } else if (type.kind === "Model" || type.kind === "Enum" || type.kind === "Union") {
       addType(type);
     }

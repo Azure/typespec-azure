@@ -467,6 +467,37 @@ it("@@usage and @@access on model from imported library are honored", async () =
   strictEqual(errorModel?.access, "public");
 });
 
+it("@usage on namespace propagates recursively to nested namespaces", async () => {
+  const { program } = await SimpleTesterWithService.compile(t.code`
+    @access(Access.public)
+    @usage(Usage.output)
+    namespace Models {
+      model TopLevel {
+        prop: string;
+      }
+
+      namespace Nested {
+        model NestedModel {
+          name: string;
+        }
+
+        namespace DeeplyNested {
+          model DeepModel {
+            value: int32;
+          }
+        }
+      }
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
+  strictEqual(models.length, 3);
+  for (const model of models) {
+    strictEqual(model.usage, UsageFlags.Output);
+    strictEqual(model.access, "public");
+  }
+});
+
 it("disableUsageAccessPropagationToBase true with override", async () => {
   const { program } = await SimpleTesterWithService.compile(t.code`
     model BaseClassThatsPruned {
