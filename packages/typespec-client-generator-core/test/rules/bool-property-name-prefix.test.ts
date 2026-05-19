@@ -3,7 +3,7 @@ import {
   LinterRuleTester,
   TesterInstance,
 } from "@typespec/compiler/testing";
-import { beforeEach, it } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 import { boolPropertyNamePrefixRule } from "../../src/rules/bool-property-name-prefix.rule.js";
 import { SimpleTester } from "../tester.js";
 
@@ -144,4 +144,51 @@ it("does not match prefix substrings without uppercase boundary", async () => {
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-client-generator-core/bool-property-name-prefix",
     });
+});
+
+describe("codefix", () => {
+  it("offers Is prefix codefix", async () => {
+    await tester
+      .expect(
+        `
+        model Foo {
+          tracked: boolean;
+        }`,
+      )
+      .applyCodeFix("add-clientName-Is").toEqual(`
+        model Foo {
+          @clientName("IsTracked", "csharp")
+          tracked: boolean;
+        }`);
+  });
+
+  it("offers Can prefix codefix", async () => {
+    await tester
+      .expect(
+        `
+        model Foo {
+          tracked: boolean;
+        }`,
+      )
+      .applyCodeFix("add-clientName-Can").toEqual(`
+        model Foo {
+          @clientName("CanTracked", "csharp")
+          tracked: boolean;
+        }`);
+  });
+
+  it("offers Has prefix codefix", async () => {
+    await tester
+      .expect(
+        `
+        model Foo {
+          tracked: boolean;
+        }`,
+      )
+      .applyCodeFix("add-clientName-Has").toEqual(`
+        model Foo {
+          @clientName("HasTracked", "csharp")
+          tracked: boolean;
+        }`);
+  });
 });

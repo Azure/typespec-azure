@@ -1,8 +1,17 @@
-import { createRule, ModelProperty, paramMessage, Type } from "@typespec/compiler";
+import {
+  CodeFix,
+  createRule,
+  defineCodeFix,
+  getSourceLocation,
+  ModelProperty,
+  paramMessage,
+  Type,
+} from "@typespec/compiler";
 import { createTCGCContext } from "../context.js";
 import { getLibraryName } from "../public-utils.js";
 
 const ALLOWED_PREFIXES = ["Is", "Has", "Can", "Should", "Are", "Was", "Will", "Does", "Do"];
+const SUGGESTED_PREFIXES = ["Is", "Can", "Has"] as const;
 
 function isBooleanType(type: Type): boolean {
   if (type.kind !== "Scalar") return false;
@@ -29,6 +38,36 @@ function startsWithAllowedPrefix(name: string): boolean {
 function toPascalCase(name: string): string {
   if (name.length === 0) return name;
   return name.charAt(0).toUpperCase() + name.slice(1);
+}
+
+function createClientNameCodeFix(
+  target: ModelProperty,
+  prefix: string,
+  csharpName: string,
+): CodeFix {
+  const newName = `${prefix}${csharpName}`;
+  return defineCodeFix({
+    id: `add-clientName-${prefix}`,
+    label: `Add @clientName("${newName}", "csharp")`,
+    fix: (fixContext) => {
+      const location = getSourceLocation(target);
+      const text = location.file.text;
+      let lineStart = location.pos;
+      while (lineStart > 0 && text[lineStart - 1] !== "\n") {
+        lineStart--;
+      }
+      let indentEnd = lineStart;
+      while (indentEnd < text.length && (text[indentEnd] === " " || text[indentEnd] === "\t")) {
+        indentEnd++;
+      }
+      const indent = text.slice(lineStart, indentEnd);
+      const updatedLocation = { ...location, pos: lineStart };
+      return fixContext.prependText(
+        updatedLocation,
+        `${indent}@clientName("${newName}", "csharp")\n`,
+      );
+    },
+  });
 }
 
 export const boolPropertyNamePrefixRule = createRule({
@@ -63,6 +102,9 @@ export const boolPropertyNamePrefixRule = createRule({
             suggestion,
           },
           target: property,
+          codefixes: SUGGESTED_PREFIXES.map((prefix) =>
+            createClientNameCodeFix(property, prefix, csharpName),
+          ),
         });
       },
     };
