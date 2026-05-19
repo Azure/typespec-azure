@@ -79,6 +79,10 @@ export const modelNameResourceSuffixRule = createRule({
     );
     return {
       model: (model: Model) => {
+        // TODO: Currently uses string suffix matching on the model name. If more precise
+        // ARM resource detection is needed, walk the model's inheritance chain to check
+        // if it extends TrackedResource<T>, ProxyResource<T>, etc. This would require
+        // either depending on the ARM package or replicating the base type check here.
         const csharpName = getLibraryName(tcgcContext, model, "csharp");
         if (!csharpName.endsWith("Resource")) return;
         // Don't flag if the name is exactly "Resource" (too generic to lint)
