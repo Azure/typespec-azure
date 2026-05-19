@@ -127,6 +127,10 @@ it("is case-sensitive - does not flag lowercase resource", async () => {
     .toBeValid();
 });
 
+// Note: @suppress / #suppress works at the compiler level to silence warnings for edge cases.
+// Example: #suppress "@azure-tools/typespec-client-generator-core/model-name-resource-suffix" "reason"
+// This cannot be tested via the linter rule tester as it doesn't process suppress directives.
+
 it("does not flag non-model types", async () => {
   await tester.expect(`scalar ResourceId extends string;`).toBeValid();
 });
