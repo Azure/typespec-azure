@@ -91,7 +91,7 @@ Old paths like `dynatrace/`, `tenantResource/`, `arm-scenarios/singleton/`, `ope
 
 ## Getting-Started Guide Style
 
-The getting-started guide uses a simplified pattern without `@versioned` for beginner friendliness. The `@service` decorator should NOT include a `version` parameter (version comes from `@versioned` when used). The guide uses `ArmCustomPatchSync` (not ArmTagsPatch) to avoid the suppress complexity.
+The `@service` decorator should NOT include a `version` parameter (version comes from `@versioned` when used). The guide uses `ArmCustomPatchSync` (not ArmTagsPatch) because that is the recommendation, based on the requirements of the ARM RPC (Resource Provider Contract).
 
 ## Feedback Corrections Applied
 
