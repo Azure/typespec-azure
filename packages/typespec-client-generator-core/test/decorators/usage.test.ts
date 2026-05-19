@@ -3,7 +3,12 @@ import { strictEqual } from "assert";
 import { it } from "vitest";
 import { getUsage } from "../../src/decorators.js";
 import { UsageFlags } from "../../src/interfaces.js";
-import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
+import {
+  AzureCoreTester,
+  createSdkContextForTester,
+  SimpleTester,
+  SimpleTesterWithService,
+} from "../tester.js";
 
 it("defaults calculated usage", async () => {
   const { program, Model1, Model2, Model3, Model4 } = await SimpleTester.compile(t.code`
@@ -441,6 +446,25 @@ it("orphan model in group", async () => {
   strictEqual(models[0].access, "public");
   strictEqual(models[1].usage, UsageFlags.Output);
   strictEqual(models[1].access, "public");
+});
+
+it("@@usage and @@access on model from imported library are honored", async () => {
+  // Regression test: previously, augment decorators applied to models in
+  // imported library namespaces (e.g. Azure.Core) were silently dropped when
+  // the target model was not also reachable from an operation.
+  const { program } = await AzureCoreTester.compile(t.code`
+    @service
+    namespace MyService;
+
+    op noop(): void;
+
+    @@usage(Azure.Core.Foundations.Error, Usage.input);
+    @@access(Azure.Core.Foundations.Error, Access.public);
+  `);
+  const context = await createSdkContextForTester(program);
+  const errorModel = context.sdkPackage.models.find((m) => m.name === "Error");
+  strictEqual(errorModel?.usage, UsageFlags.Input);
+  strictEqual(errorModel?.access, "public");
 });
 
 it("disableUsageAccessPropagationToBase true with override", async () => {
