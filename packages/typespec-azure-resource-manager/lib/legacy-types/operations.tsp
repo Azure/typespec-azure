@@ -121,7 +121,7 @@ interface RoutedOperations<
 
   /**
    * A long-running resource Update (PATCH)
-   * @template Resource the resource being created or updated
+   * @template Resource the resource being updated
    * @template PatchModel the PATCH request model
    * @template LroHeaders Optional.  Allows overriding the lro headers returned on resource create
    * @template Parameters Optional. Additional parameters after the path parameters
