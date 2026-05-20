@@ -228,11 +228,17 @@ export class TestServiceClient {
 ```
 
 ```java
-NOT_SUPPORTED
+public PagedIterable<User> listWithPage();
+public PagedIterable<User> listWithPage(String continuationToken);
+public PagedIterable<BinaryData> listWithPage(RequestOptions requestOptions);
 ```
 
 ```go
-// NOT_SUPPORTED
+func (client *MyServiceClient) NewListWithPagePager(options *MyServiceClientListWithPageOptions) *runtime.Pager[MyServiceClientListWithPageResponse]
+
+type MyServiceClientListWithPageOptions struct {
+    ContinuationToken *string
+}
 ```
 
 </ClientTabs>
@@ -302,11 +308,17 @@ export class TestServiceClient {
 ```
 
 ```java
-NOT_SUPPORTED
+public PagedIterable<User> listWithPage();
+public PagedIterable<User> listWithPage(String continuationToken);
+public PagedIterable<BinaryData> listWithPage(RequestOptions requestOptions);
 ```
 
 ```go
-// NOT_SUPPORTED
+func (client *MyServiceClient) NewListWithPagePager(options *MyServiceClientListWithPageOptions) *runtime.Pager[MyServiceClientListWithPageResponse]
+
+type MyServiceClientListWithPageOptions struct {
+    ContinuationToken *string
+}
 ```
 
 </ClientTabs>
@@ -375,11 +387,17 @@ export class TestServiceClient {
 ```
 
 ```java
-NOT_SUPPORTED
+public PagedIterable<User> listWithPage();
+public PagedIterable<User> listWithPage(String continuationToken);
+public PagedIterable<BinaryData> listWithPage(RequestOptions requestOptions);
 ```
 
 ```go
-// NOT_SUPPORTED
+func (client *MyServiceClient) NewListWithPagePager(options *MyServiceClientListWithPageOptions) *runtime.Pager[MyServiceClientListWithPageResponse]
+
+type MyServiceClientListWithPageOptions struct {
+    ContinuationToken *string
+}
 ```
 
 </ClientTabs>
@@ -448,11 +466,17 @@ export class TestServiceClient {
 ```
 
 ```java
-NOT_SUPPORTED
+public PagedIterable<User> listWithPage();
+public PagedIterable<User> listWithPage(String continuationToken);
+public PagedIterable<BinaryData> listWithPage(RequestOptions requestOptions);
 ```
 
 ```go
-// NOT_SUPPORTED
+func (client *MyServiceClient) NewListWithPagePager(options *MyServiceClientListWithPageOptions) *runtime.Pager[MyServiceClientListWithPageResponse]
+
+type MyServiceClientListWithPageOptions struct {
+    ContinuationToken *string
+}
 ```
 
 </ClientTabs>

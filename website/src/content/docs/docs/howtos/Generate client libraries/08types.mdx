@@ -1173,7 +1173,13 @@ public final class Animal implements JsonSerializable<Animal> {
 <ClientTabItem lang="go" >
 
 ```go
-// NOT_SUPPORTED
+type Animal struct {
+    // REQUIRED
+    Kind *string
+    // REQUIRED
+    Name                 *string
+    AdditionalProperties map[string]*string
+}
 ```
 
 </ClientTabItem>
@@ -2761,7 +2767,17 @@ jsonWriter.writeStringField("prop", Objects.toString(this.value, null));
 </ClientTabItem>
 <ClientTabItem lang="go" >
 ```go
-// NOT_SUPPORTED
+type Test struct {
+    // REQUIRED
+    Prop *int64
+}
+
+// Custom MarshalJSON converts int64 to a JSON string.
+func (t Test) MarshalJSON() ([]byte, error) {
+    objectMap := make(map[string]any)
+    populate(objectMap, "prop", to.Ptr(strconv.FormatInt(*t.Prop, 10)))
+    return json.Marshal(objectMap)
+}
 ```
 </ClientTabItem>
 </ClientTabs>
