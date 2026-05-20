@@ -84,6 +84,7 @@ Most TCGC types share the following common properties:
 - **`decorators`**: Stores all TypeSpec decorator info for advanced use cases.
 - **`crossLanguageDefinitionId`**: A unique ID for a TCGC type that can be used for output mapping across different emitters.
 - **`name`** and **`isGeneratedName`**: The type's name and whether the name was created by TCGC.
+- **`isExactName`**: Indicates that the name was set via `@clientName` with the `exact()` function and must be used as-is by language emitters, without applying any casing transformations (e.g., no snake_case for Python, no camelCase for JavaScript).
 - **`access`**: Indicates whether the type has public or private accessibility.
 - **`usage`**: Indicates the type's usage information; its value is a bitmap of [`UsageFlags`](../reference/js-api/enumerations/usageflags/) enumeration. The flags are:
   - `Input` (2): Type is used as input (in a request body).
