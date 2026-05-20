@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { execSync } from "node:child_process";
 
 export const DEFAULT_BRANCH = "benchmark-data";
