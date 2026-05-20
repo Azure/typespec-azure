@@ -13,6 +13,7 @@ import {
   getLifecycleVisibilityEnum,
   getProperty,
   getSourceLocation,
+  getTypeName,
   getVisibilityForClass,
   hasVisibility,
   isErrorType,
@@ -135,7 +136,7 @@ function checkPatchBodyProperties(
   patchModel: ModelProperty[],
   lifecycleMembers: LifecycleMembers,
 ) {
-  const readOnlyCache = new Map<ModelProperty, boolean>();
+  const readOnlyCache = new Map<string, boolean>();
 
   for (const property of patchModel) {
     if (
@@ -169,8 +170,8 @@ function checkPatchBodyProperties(
       isNotUpdateable(context.program, property, {
         lifecycleMembers,
         readOnlyCache,
-        modelHasNonUpdateableCache: new Map<Model, boolean>(),
-        inProgressModels: new Set<Model>(),
+        modelHasNonUpdateableCache: new Map<string, boolean>(),
+        inProgressModels: new Set<string>(),
       })
     ) {
       context.reportDiagnostic({
@@ -186,22 +187,28 @@ function checkPatchBodyProperties(
 interface NotUpdateableState {
   /** Resolved Lifecycle visibility members; computed once at rule activation. */
   lifecycleMembers: LifecycleMembers;
-  /** Pure per-source-property cache; safe to share across the entire traversal. */
-  readOnlyCache: Map<ModelProperty, boolean>;
+  /**
+   * Pure per-source-property cache; safe to share across the entire traversal.
+   * Keyed by the source property's fully-qualified name (namespace + model +
+   * property) which is guaranteed to be unique in TypeSpec, since identity
+   * comparisons on `ModelProperty` objects are not reliable across recursion.
+   */
+  readOnlyCache: Map<string, boolean>;
   /**
    * Per-top-level-property cache of the recursive "does this model contain a
-   * non-updateable property" answer. Recreated for every top-level patch
-   * property because cycle-breaking inside one traversal can otherwise cache
-   * a too-conservative `false` for a model whose true answer depends on a
-   * different entry path.
+   * non-updateable property" answer. Keyed by the model's fully-qualified
+   * name. Recreated for every top-level patch property because cycle-breaking
+   * inside one traversal can otherwise cache a too-conservative `false` for a
+   * model whose true answer depends on a different entry path.
    */
-  modelHasNonUpdateableCache: Map<Model, boolean>;
+  modelHasNonUpdateableCache: Map<string, boolean>;
   /**
-   * Models currently being visited in the active recursion stack. Used purely
-   * to break cycles — entries are added on entry to `modelHasNonUpdateable`
-   * and removed on exit, so each top-level call sees a clean stack.
+   * Models currently being visited in the active recursion stack, keyed by
+   * fully-qualified name. Used purely to break cycles — entries are added on
+   * entry to `modelHasNonUpdateable` and removed on exit, so each top-level
+   * call sees a clean stack.
    */
-  inProgressModels: Set<Model>;
+  inProgressModels: Set<string>;
 }
 
 /**
@@ -214,20 +221,21 @@ function isReadOnly(
   program: Program,
   property: ModelProperty,
   lifecycleMembers: LifecycleMembers,
-  cache: Map<ModelProperty, boolean>,
+  cache: Map<string, boolean>,
 ): boolean {
   const sourceProperty = getSourceProperty(property);
-  const cached = cache.get(sourceProperty);
+  const cacheKey = getTypeName(sourceProperty);
+  const cached = cache.get(cacheKey);
   if (cached !== undefined) return cached;
   const readMember = lifecycleMembers.read;
   if (readMember === undefined) {
-    cache.set(sourceProperty, false);
+    cache.set(cacheKey, false);
     return false;
   }
   const lifecycle = readMember.enum;
   const visibility = getVisibilityForClass(program, sourceProperty, lifecycle);
   const result = visibility.size === 1 && visibility.has(readMember);
-  cache.set(sourceProperty, result);
+  cache.set(cacheKey, result);
   return result;
 }
 
@@ -249,7 +257,7 @@ function isAllowedInPatchByVisibility(
   program: Program,
   property: ModelProperty,
   lifecycleMembers: LifecycleMembers,
-  readOnlyCache: Map<ModelProperty, boolean>,
+  readOnlyCache: Map<string, boolean>,
 ): boolean {
   const updateMember = lifecycleMembers.update;
   if (updateMember !== undefined) {
@@ -297,21 +305,22 @@ function isNotUpdateable(
  * detected from at least one path.
  */
 function modelHasNonUpdateable(program: Program, model: Model, state: NotUpdateableState): boolean {
-  const cached = state.modelHasNonUpdateableCache.get(model);
+  const cacheKey = getTypeName(model);
+  const cached = state.modelHasNonUpdateableCache.get(cacheKey);
   if (cached !== undefined) return cached;
-  if (state.inProgressModels.has(model)) return false;
-  state.inProgressModels.add(model);
+  if (state.inProgressModels.has(cacheKey)) return false;
+  state.inProgressModels.add(cacheKey);
   try {
     for (const nestedProperty of model.properties.values()) {
       if (isNotUpdateable(program, nestedProperty, state)) {
-        state.modelHasNonUpdateableCache.set(model, true);
+        state.modelHasNonUpdateableCache.set(cacheKey, true);
         return true;
       }
     }
-    state.modelHasNonUpdateableCache.set(model, false);
+    state.modelHasNonUpdateableCache.set(cacheKey, false);
     return false;
   } finally {
-    state.inProgressModels.delete(model);
+    state.inProgressModels.delete(cacheKey);
   }
 }
 
