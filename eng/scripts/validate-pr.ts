@@ -1,7 +1,7 @@
+import { spawnSync, type SpawnSyncReturns } from "child_process";
 import { readFileSync } from "fs";
 import path from "path";
 import process from "process";
-import { spawnSync, type SpawnSyncReturns } from "child_process";
 
 type StepStatus = "passed" | "failed" | "warning" | "skipped";
 
@@ -169,14 +169,19 @@ function printSummary(results: StepResult[]): void {
     if (skipped > 0) {
       extra.push(`${skipped} skipped`);
     }
-    console.log(`Result: ${passed}/${results.length} passed ${GREEN}✅${RESET} (${extra.join(", ")})`);
+    console.log(
+      `Result: ${passed}/${results.length} passed ${GREEN}✅${RESET} (${extra.join(", ")})`,
+    );
     return;
   }
 
   console.log(`Result: ${passed}/${results.length} passed ${GREEN}✅${RESET}`);
 }
 
-function runStep(label: string, action: () => Omit<StepResult, "label" | "durationMs">): StepResult {
+function runStep(
+  label: string,
+  action: () => Omit<StepResult, "label" | "durationMs">,
+): StepResult {
   const start = Date.now();
 
   try {
@@ -313,7 +318,10 @@ function checkFormat(): Omit<StepResult, "label" | "durationMs"> {
     );
   }
 
-  return { status: "passed", details: options.fix ? ["Applied formatting fixes before re-checking."] : [] };
+  return {
+    status: "passed",
+    details: options.fix ? ["Applied formatting fixes before re-checking."] : [],
+  };
 }
 
 function checkSpelling(): Omit<StepResult, "label" | "durationMs"> {
@@ -410,7 +418,9 @@ function checkDiff(): Omit<StepResult, "label" | "durationMs"> {
 
   const details = changedFiles.length > 0 ? [...changedFiles] : ["No files changed."];
   const warnings: string[] = [];
-  const hasPackageJsonChange = changedFiles.some((file) => normalizePath(file).endsWith("package.json"));
+  const hasPackageJsonChange = changedFiles.some((file) =>
+    normalizePath(file).endsWith("package.json"),
+  );
 
   if (changedFiles.some((file) => /(^|\/)dist\//.test(normalizePath(file)))) {
     warnings.push("PR diff includes files under dist/.");
@@ -432,7 +442,10 @@ function checkDiff(): Omit<StepResult, "label" | "durationMs"> {
   }
 
   if (warnings.length > 0) {
-    return { status: "warning", details: [...details, ...warnings.map((warning) => `Warning: ${warning}`)] };
+    return {
+      status: "warning",
+      details: [...details, ...warnings.map((warning) => `Warning: ${warning}`)],
+    };
   }
 
   return { status: "passed", details };
@@ -550,7 +563,10 @@ function isSuccess(result: SpawnSyncReturns<string>): boolean {
   return !result.error && result.status === 0;
 }
 
-function failFromCommand(command: CommandResult, message: string): Omit<StepResult, "label" | "durationMs"> {
+function failFromCommand(
+  command: CommandResult,
+  message: string,
+): Omit<StepResult, "label" | "durationMs"> {
   return {
     status: "failed",
     details: [message, ...commandOutput(command)],
@@ -577,9 +593,7 @@ function commandOutput(command: CommandResult): string[] {
 }
 
 function formatCommand(command: string, args: string[]): string {
-  return [command, ...args]
-    .map((part) => (/\s/.test(part) ? `"${part}"` : part))
-    .join(" ");
+  return [command, ...args].map((part) => (/\s/.test(part) ? `"${part}"` : part)).join(" ");
 }
 
 function splitLines(text: string): string[] {

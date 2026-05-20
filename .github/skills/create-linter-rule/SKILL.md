@@ -26,10 +26,11 @@ Determine the rule metadata before writing any code:
 Generate all required files using the repo's scaffolding tool:
 
 ```bash
-pnpm create:linter-rule <rule-name> --package <azure-core|azure-resource-manager> --severity <warning|error> --description "<description>"
+pnpm create:linter-rule < rule-name > --package < azure-core | azure-resource-manager > --severity < warning | error > --description "<description>"
 ```
 
 This creates:
+
 - `packages/<pkg>/src/rules/<rule-name>.ts` — rule skeleton
 - `packages/<pkg>/test/rules/<rule-name>.test.ts` — test skeleton
 - `website/src/content/docs/docs/libraries/<pkg>/rules/<rule-name>.md` — docs skeleton
@@ -50,22 +51,29 @@ Edit `packages/<pkg>/test/rules/<rule-name>.test.ts`:
    - Types that look similar but shouldn't trigger the rule
 
 Test API reference:
+
 ```typescript
 // No diagnostics expected
 await tester.expect(`model Foo {}`).toBeValid();
 
 // Specific diagnostic expected
-await tester.expect(`model foo {}`).toEmitDiagnostics([{
-  code: "@azure-tools/typespec-<pkg>/<rule-name>",
-  severity: "<severity>",
-  message: "Expected message text",
-}]);
+await tester.expect(`model foo {}`).toEmitDiagnostics([
+  {
+    code: "@azure-tools/typespec-<pkg>/<rule-name>",
+    severity: "<severity>",
+    message: "Expected message text",
+  },
+]);
 
 // Test code fix (if rule provides one)
-await tester.expect(`enum Color { red }`).applyCodeFix("fix-id").toEqual(`union Color { string, red: "red" }`);
+await tester
+  .expect(`enum Color { red }`)
+  .applyCodeFix("fix-id")
+  .toEqual(`union Color { string, red: "red" }`);
 ```
 
 Verify tests fail before implementing:
+
 ```bash
 pnpm --filter "@azure-tools/typespec-<pkg>..." build
 pnpm --filter "@azure-tools/typespec-<pkg>..." test
@@ -109,6 +117,7 @@ Add an entry: `"@azure-tools/typespec-<pkg>/<rule-name>": true,`
 Every rule MUST be explicitly listed (enabled or disabled). The `validate-rules-defined.test.ts` test will fail otherwise.
 
 Verify:
+
 ```bash
 pnpm --filter "@azure-tools/typespec-azure-rulesets..." build
 pnpm --filter "@azure-tools/typespec-azure-rulesets..." test
@@ -124,6 +133,7 @@ Edit `website/src/content/docs/docs/libraries/<pkg>/rules/<rule-name>.md`:
 - Ensure the `Full name` code block shows the correct fully-qualified rule name
 
 Then regenerate the library's reference docs (updates the rule listing):
+
 ```bash
 pnpm --filter "@azure-tools/typespec-<pkg>..." build
 pnpm --filter "@azure-tools/typespec-<pkg>" regen-docs
@@ -136,6 +146,7 @@ pnpm change add
 ```
 
 When prompted:
+
 - Select change kind: `feature` (new rule) or `fix` (bugfix to existing rule)
 - Select affected package: `@azure-tools/typespec-<pkg>`
 - Write a concise description: "Add `<rule-name>` linter rule that <what it does>"

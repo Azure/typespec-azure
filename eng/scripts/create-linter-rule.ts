@@ -156,7 +156,11 @@ function updateLinterFile(linterPath: string, importLine: string, ruleIdentifier
   const withUpdatedImports = `${updatedImports}${afterImports}`;
 
   const rulesArrayMatch = withUpdatedImports.match(/const rules = \[(?<body>[\s\S]*?)\n\];/);
-  if (!rulesArrayMatch || rulesArrayMatch.index === undefined || rulesArrayMatch.groups === undefined) {
+  if (
+    !rulesArrayMatch ||
+    rulesArrayMatch.index === undefined ||
+    rulesArrayMatch.groups === undefined
+  ) {
     fail(`Could not find rules array in ${linterPath}.`);
   }
 
@@ -197,7 +201,9 @@ function main(): void {
   const fileTargets = [rulePath, testPath, docsPath];
   const existingFiles = fileTargets.filter((path) => existsSync(path));
   if (existingFiles.length > 0) {
-    fail(`The following file(s) already exist:\n${existingFiles.map((path) => `- ${path}`).join("\n")}`);
+    fail(
+      `The following file(s) already exist:\n${existingFiles.map((path) => `- ${path}`).join("\n")}`,
+    );
   }
 
   if (!existsSync(linterPath)) {
@@ -244,20 +250,20 @@ function main(): void {
     `describe(${toDoubleQuotedString(options.ruleName)}, () => {`,
     '  it("is valid when TODO: describe valid case", async () => {',
     "    await tester",
-    '      .expect(',
-    '        `',
-    '        model Example {}',
-    '        `,',
+    "      .expect(",
+    "        `",
+    "        model Example {}",
+    "        `,",
     "      )",
     "      .toBeValid();",
     "  });",
     "",
     '  it("emits diagnostic when TODO: describe invalid case", async () => {',
     "    await tester",
-    '      .expect(',
-    '        `',
-    '        model Example {}',
-    '        `,',
+    "      .expect(",
+    "        `",
+    "        model Example {}",
+    "        `,",
     "      )",
     "      .toEmitDiagnostics([",
     "        {",
@@ -276,7 +282,7 @@ function main(): void {
     `title: ${toDoubleQuotedString(options.ruleName)}`,
     "---",
     "",
-    "```text title=\"Full name\"",
+    '```text title="Full name"',
     `@azure-tools/typespec-${config.packageShort}/${options.ruleName}`,
     "```",
     "",
