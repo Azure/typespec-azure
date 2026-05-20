@@ -1342,7 +1342,25 @@ client2.pet()
 ```
 
 ```csharp
-// TODO
+namespace NewPetStore.Food
+{
+  public partial class FoodClient
+  {
+    public FoodClient(Uri endpoint);
+    public virtual Response Feed(CancellationToken cancellationToken = default);
+    public virtual Task<Response> FeedAsync(CancellationToken cancellationToken = default);
+  }
+}
+
+namespace NewPetStore.PetAction
+{
+  public partial class PetActionClient
+  {
+    public PetActionClient(Uri endpoint);
+    public virtual Response Pet(CancellationToken cancellationToken = default);
+    public virtual Task<Response> PetAsync(CancellationToken cancellationToken = default);
+  }
+}
 ```
 
 ```typescript
@@ -1976,7 +1994,7 @@ NOT_SUPPORTED
 ```
 
 ```csharp
-// TODO
+// NOT_SUPPORTED
 ```
 
 ```typescript
@@ -1992,7 +2010,7 @@ client.download("blobName");
 ```
 
 ```java
-// TODO
+// NOT_SUPPORTED
 ```
 
 ```go

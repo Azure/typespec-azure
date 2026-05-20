@@ -534,7 +534,43 @@ def create_user_profile(
 ```
 
 ```csharp
-// TODO
+// The C# emitter generates both operations and a ServiceVersion enum, but does not
+// emit version guards on the newly added operation.
+namespace My.Service
+{
+  public partial class UserInfo
+  {
+    public UserInfo(string username);
+    public string Username { get; }
+  }
+
+  public partial class UserProfile
+  {
+    public UserProfile(string profileName);
+    public string ProfileName { get; }
+  }
+
+  public partial class ServiceClient
+  {
+    public ServiceClient(Uri endpoint);
+    public ServiceClient(Uri endpoint, ServiceClientOptions options);
+    public virtual Response GetUserInfo(UserInfo userInfo, CancellationToken cancellationToken = default);
+    public virtual Task<Response> GetUserInfoAsync(UserInfo userInfo, CancellationToken cancellationToken = default);
+    public virtual Response CreateUserProfile(UserProfile userProfile, CancellationToken cancellationToken = default);
+    public virtual Task<Response> CreateUserProfileAsync(UserProfile userProfile, CancellationToken cancellationToken = default);
+  }
+
+  public partial class ServiceClientOptions : ClientOptions
+  {
+    public ServiceClientOptions(ServiceVersion version = ServiceVersion.V2024_02_01);
+
+    public enum ServiceVersion
+    {
+      V2024_01_01 = 1,
+      V2024_02_01 = 2
+    }
+  }
+}
 ```
 
 ```typescript
@@ -697,7 +733,37 @@ def create_user_profile(
 ```
 
 ```csharp
-// TODO
+// The C# emitter generates the new model and property as plain members; it does not
+// emit version guards or per-version conditional shapes.
+namespace My.Service
+{
+  public partial class UserInfo
+  {
+    public UserInfo(string username);
+    public string Username { get; }
+  }
+
+  public partial class UserProfile
+  {
+    public UserProfile(string profileName, ProfileDetails profileDetails);
+    public string ProfileName { get; }
+    public ProfileDetails ProfileDetails { get; }
+  }
+
+  public partial class ProfileDetails
+  {
+    public ProfileDetails(string detailDescription);
+    public string DetailDescription { get; }
+  }
+
+  public partial class ServiceClient
+  {
+    public ServiceClient(Uri endpoint);
+    public ServiceClient(Uri endpoint, ServiceClientOptions options);
+    public virtual Response GetUserInfo(UserInfo userInfo, CancellationToken cancellationToken = default);
+    public virtual Response CreateUserProfile(UserProfile userProfile, CancellationToken cancellationToken = default);
+  }
+}
 ```
 
 ```typescript

@@ -38,7 +38,13 @@ foo = Foo(prop="hello")
 <ClientTabItem lang="csharp" >
 
 ```csharp
-// TODO
+namespace Service
+{
+  public partial class Foo
+  {
+    public string Prop { get; }
+  }
+}
 ```
 
 </ClientTabItem>
@@ -107,7 +113,13 @@ foo = Foo(prop="hello")
 <ClientTabItem lang="csharp" >
 
 ```csharp
-// TODO
+namespace Service.Container
+{
+  public partial class Foo
+  {
+    public string Prop { get; }
+  }
+}
 ```
 
 </ClientTabItem>
@@ -177,7 +189,13 @@ foo = Foo(prop="hello")
 <ClientTabItem lang="csharp" >
 
 ```csharp
-// TODO
+namespace Service.Container
+{
+  public partial class Foo
+  {
+    public string Prop { get; }
+  }
+}
 ```
 
 </ClientTabItem>
@@ -539,7 +557,17 @@ model RequestOptions {
 <ClientTabItem lang="csharp" >
 
 ```csharp
-TODO
+// The C# emitter generates the model but does not apply the client default value.
+namespace TestService
+{
+  public partial class RequestOptions
+  {
+    public RequestOptions();
+    public int? Timeout { get; set; }
+    public string Tier { get; set; }
+    public bool? EnableRetry { get; set; }
+  }
+}
 ```
 
 </ClientTabItem>
@@ -547,7 +575,20 @@ TODO
 <ClientTabItem lang="typescript" >
 
 ```typescript
-TODO;
+// The TypeScript emitter applies the client default values in the request serializer.
+export interface RequestOptions {
+  timeout?: number;
+  tier?: string;
+  enableRetry?: boolean;
+}
+
+export function requestOptionsSerializer(item: RequestOptions): any {
+  return {
+    timeout: item["timeout"] ?? 30,
+    tier: item["tier"] ?? "standard",
+    enableRetry: item["enableRetry"] ?? false,
+  };
+}
 ```
 
 </ClientTabItem>
@@ -555,7 +596,16 @@ TODO;
 <ClientTabItem lang="java" >
 
 ```java
-TODO
+// The Java emitter generates the model but does not apply the client default value.
+public final class RequestOptions implements JsonSerializable<RequestOptions> {
+    public RequestOptions();
+    public Integer getTimeout();
+    public RequestOptions setTimeout(Integer timeout);
+    public String getTier();
+    public RequestOptions setTier(String tier);
+    public Boolean isEnableRetry();
+    public RequestOptions setEnableRetry(Boolean enableRetry);
+}
 ```
 
 </ClientTabItem>
@@ -563,13 +613,21 @@ TODO
 <ClientTabItem lang="go" >
 
 ```go
-TODO
+// The Go emitter generates the model with the default value mentioned in a comment,
+// but does not apply it automatically.
+type RequestOptions struct {
+    EnableRetry *bool
+
+    // The default value is "standard".
+    Tier *string
+
+    // The default value is 30.
+    Timeout *int32
+}
 ```
 
 </ClientTabItem>
 </ClientTabs>
-
-### Operation Parameter Default Values
 
 Use `@clientDefaultValue` on operation parameters when you need to specify a default value for query parameters, headers, or other operation inputs.
 
@@ -603,7 +661,16 @@ op getItems(
 <ClientTabItem lang="csharp" >
 
 ```csharp
-TODO
+// The C# emitter generates the method but does not apply the client default value.
+namespace TestService
+{
+  public partial class TestServiceClient
+  {
+    public TestServiceClient(Uri endpoint);
+    public virtual Response<IReadOnlyList<Item>> GetItems(int? pageSize = default, string sortOrder = default, CancellationToken cancellationToken = default);
+    public virtual Task<Response<IReadOnlyList<Item>>> GetItemsAsync(int? pageSize = default, string sortOrder = default, CancellationToken cancellationToken = default);
+  }
+}
 ```
 
 </ClientTabItem>
@@ -611,7 +678,17 @@ TODO
 <ClientTabItem lang="typescript" >
 
 ```typescript
-TODO;
+// The TypeScript emitter applies the client default values when building the request URL.
+export interface GetItemsOptionalParams extends OperationOptions {
+  pageSize?: number;
+  sortOrder?: string;
+}
+
+export async function getItems(
+  context: Client,
+  options: GetItemsOptionalParams = { requestOptions: {} },
+): Promise<Item[]>;
+// Internally: expandUrlTemplate uses `options?.pageSize ?? 10` and `options?.sortOrder ?? "desc"`.
 ```
 
 </ClientTabItem>
@@ -619,7 +696,10 @@ TODO;
 <ClientTabItem lang="java" >
 
 ```java
-TODO
+// The Java emitter generates the method but does not apply the client default value.
+public Response<BinaryData> getItemsWithResponse(RequestOptions requestOptions);
+public List<Item> getItems(Integer pageSize, String sortOrder);
+public List<Item> getItems();
 ```
 
 </ClientTabItem>
@@ -627,13 +707,21 @@ TODO
 <ClientTabItem lang="go" >
 
 ```go
-TODO
+// The Go emitter generates the optional-parameters struct with the default value mentioned
+// in a comment, but does not apply it automatically.
+type TestServiceClientGetItemsOptions struct {
+    // The default value is 10.
+    PageSize *int32
+
+    // The default value is "desc".
+    SortOrder *string
+}
+
+func (client *TestServiceClient) GetItems(ctx context.Context, options *TestServiceClientGetItemsOptions) (TestServiceClientGetItemsResponse, error)
 ```
 
 </ClientTabItem>
 </ClientTabs>
-
-### Language-Specific Scoping
 
 You can also scope the default value to specific languages using the `scope` parameter:
 
@@ -1333,7 +1421,28 @@ class Foo(_model_base.Model):
 </ClientTabItem>
 <ClientTabItem lang="csharp" >
 
-TODO
+```csharp
+namespace TestService
+{
+  public partial class Foo
+  {
+    public string BasicNullableProperty { get; }
+    public Bar ModelNullableProperty { get; }
+    public LR? EnumNullableProperty { get; }
+  }
+
+  public partial class Bar
+  {
+    public string Prop { get; }
+  }
+
+  public enum LR
+  {
+    Left,
+    Right
+  }
+}
+```
 
 </ClientTabItem>
 <ClientTabItem lang="typescript" >
@@ -1353,7 +1462,24 @@ export type LR = "left" | "right";
 </ClientTabItem>
 <ClientTabItem lang="java" >
 
-TODO
+```java
+// Java represents nullable reference types directly; the model and enum classes are
+// generated under the `models` package.
+public final class Foo implements JsonSerializable<Foo> {
+    public String getBasicNullableProperty();
+    public Bar getModelNullableProperty();
+    public LR getEnumNullableProperty();
+}
+
+public final class Bar implements JsonSerializable<Bar> {
+    public String getProp();
+}
+
+public enum LR {
+    LEFT("left"),
+    RIGHT("right");
+}
+```
 
 </ClientTabItem>
 <ClientTabItem lang="go" >
@@ -2591,10 +2717,21 @@ serialized_prop = json.dumps(prop, cls=SdkJSONEncoder, format="string")
 <ClientTabItem lang="csharp" >
 
 ```csharp
-TODO
+// The property is exposed as `long`; serialization writes it as a JSON string.
+namespace TestService
+{
+  public partial class Test
+  {
+    public long Prop { get; }
+  }
+}
+
+// Internal implementation
+writer.WriteStringValue(Prop.ToString());
 ```
 
 </ClientTabItem>
+
 <ClientTabItem lang="typescript" >
 
 ```typescript

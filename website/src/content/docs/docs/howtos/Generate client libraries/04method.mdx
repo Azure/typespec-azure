@@ -1606,7 +1606,24 @@ def get(self, *, etag: Optional[str] = None, match_condition: Optional[MatchCond
 ```
 
 ```csharp
-# TODO
+namespace TestService
+{
+  public partial class Response
+  {
+    public string Name { get; }
+  }
+
+  public partial class TestServiceClient
+  {
+    public TestServiceClient(Uri endpoint);
+    // protocol method
+    public virtual Azure.Response Get(MatchConditions matchConditions, RequestContext context);
+    public virtual Task<Azure.Response> GetAsync(MatchConditions matchConditions, RequestContext context);
+    // convenience method
+    public virtual Response<Response> Get(MatchConditions matchConditions = default, CancellationToken cancellationToken = default);
+    public virtual Task<Response<Response>> GetAsync(MatchConditions matchConditions = default, CancellationToken cancellationToken = default);
+  }
+}
 ```
 
 ```typescript

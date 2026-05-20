@@ -195,7 +195,21 @@ def list_with_page(self, **kwargs: Any) -> ItemPaged["_models.User"]:
 ```
 
 ```csharp
-// TODO
+namespace TestService
+{
+  public partial class User
+  {
+    public string Id { get; }
+    public string Name { get; }
+  }
+
+  public partial class TestServiceClient
+  {
+    public TestServiceClient(Uri endpoint);
+    public virtual Pageable<User> GetWithPage(string continuationToken = default, CancellationToken cancellationToken = default);
+    public virtual AsyncPageable<User> GetWithPageAsync(string continuationToken = default, CancellationToken cancellationToken = default);
+  }
+}
 ```
 
 ```typescript
@@ -255,7 +269,21 @@ def list_with_page(self, **kwargs: Any) -> ItemPaged["_models.User"]:
 ```
 
 ```csharp
-// TODO
+namespace TestService
+{
+  public partial class User
+  {
+    public string Id { get; }
+    public string Name { get; }
+  }
+
+  public partial class TestServiceClient
+  {
+    public TestServiceClient(Uri endpoint);
+    public virtual Pageable<User> GetWithPage(string continuationToken = default, CancellationToken cancellationToken = default);
+    public virtual AsyncPageable<User> GetWithPageAsync(string continuationToken = default, CancellationToken cancellationToken = default);
+  }
+}
 ```
 
 ```typescript
@@ -314,7 +342,21 @@ def list_with_page(self, **kwargs: Any) -> ItemPaged["_models.User"]:
 ```
 
 ```csharp
-// TODO
+namespace TestService
+{
+  public partial class User
+  {
+    public string Id { get; }
+    public string Name { get; }
+  }
+
+  public partial class TestServiceClient
+  {
+    public TestServiceClient(Uri endpoint);
+    public virtual Pageable<User> GetWithPage(string continuationToken = default, CancellationToken cancellationToken = default);
+    public virtual AsyncPageable<User> GetWithPageAsync(string continuationToken = default, CancellationToken cancellationToken = default);
+  }
+}
 ```
 
 ```typescript
@@ -373,7 +415,21 @@ def list_with_page(self, **kwargs: Any) -> ItemPaged["_models.User"]:
 ```
 
 ```csharp
-// TODO
+namespace TestService
+{
+  public partial class User
+  {
+    public string Id { get; }
+    public string Name { get; }
+  }
+
+  public partial class TestServiceClient
+  {
+    public TestServiceClient(Uri endpoint);
+    public virtual Pageable<User> GetWithPage(string continuationToken = default, CancellationToken cancellationToken = default);
+    public virtual AsyncPageable<User> GetWithPageAsync(string continuationToken = default, CancellationToken cancellationToken = default);
+  }
+}
 ```
 
 ```typescript
