@@ -712,6 +712,9 @@ importers:
       tsx:
         specifier: 'catalog:'
         version: 4.21.0
+      turbo:
+        specifier: 'catalog:'
+        version: 2.9.5
       typescript:
         specifier: 'catalog:'
         version: 6.0.2
