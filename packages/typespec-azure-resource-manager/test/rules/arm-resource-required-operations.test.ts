@@ -392,6 +392,59 @@ it("is valid when an extension resource has read, createOrUpdate, and delete", a
     .toBeValid();
 });
 
+it("is valid when an extension resource declared at multiple scopes has read at every scope", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model Employee is ExtensionResource<{}> {
+        @key @path @segment("employees") name: string;
+      }
+
+      @armResourceOperations
+      interface AtSubscription {
+        read is Extension.Read<Extension.Subscription, Employee>;
+      }
+
+      @armResourceOperations
+      interface AtTenant {
+        read is Extension.Read<Extension.Tenant, Employee>;
+      }
+      `,
+    )
+    .toBeValid();
+});
+
+it("emits missingGet for the scope that lacks read when an extension resource is declared at multiple scopes", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model Employee is ExtensionResource<{}> {
+        @key @path @segment("employees") name: string;
+      }
+
+      @armResourceOperations
+      interface AtSubscription {
+        read is Extension.Read<Extension.Subscription, Employee>;
+      }
+
+      @armResourceOperations
+      interface AtTenant {
+        list is Extension.ListByTarget<Extension.Tenant, Employee>;
+      }
+      `,
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-required-operations",
+      message: `Resource 'TenantEmployee' must have a GET (read) operation.`,
+    });
+});
+
 it("skips @armVirtualResource models", async () => {
   await tester
     .expect(
