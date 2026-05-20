@@ -9,6 +9,7 @@ import {
   Type,
 } from "@typespec/compiler";
 import {
+  type IntersectionExpressionNode,
   type OperationSignatureReferenceNode,
   type OperationStatementNode,
   SyntaxKind,
@@ -20,6 +21,18 @@ import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import { HttpOperationResponse, HttpPayloadBody } from "@typespec/http";
 import { ArmResourceOperation } from "../operations.js";
 import { resolveArmResources } from "../resource.js";
+
+/**
+ * Check if a node is a TypeReference to ArmLroLocationHeader (with or without template arguments).
+ */
+function isArmLroLocationHeaderRef(node: TemplateArgumentNode["argument"]): boolean {
+  if (node.kind !== SyntaxKind.TypeReference) return false;
+  const target = node.target;
+  if (target.kind === SyntaxKind.Identifier) {
+    return target.sv === "ArmLroLocationHeader";
+  }
+  return false;
+}
 
 function createLroHeadersCodeFix(op: Operation, responseTypeName: string): CodeFix | undefined {
   const node = op.node;
@@ -37,19 +50,63 @@ function createLroHeadersCodeFix(op: Operation, responseTypeName: string): CodeF
   const templateArgs: readonly TemplateArgumentNode[] = sigRef.baseOperation.arguments;
   const lroHeadersArg = templateArgs.find((arg) => arg.name?.sv === "LroHeaders");
 
+  const newValue = `ArmLroLocationHeader<FinalResult = ${responseTypeName}>`;
+
   if (lroHeadersArg === undefined) {
-    return undefined;
+    // No LroHeaders argument — add it after the last template argument
+    if (templateArgs.length === 0) {
+      return undefined;
+    }
+    const lastArg = templateArgs[templateArgs.length - 1];
+    const lastArgLocation = getSourceLocation(lastArg);
+    return {
+      id: "arm-post-lro-set-final-result",
+      label: `Set FinalResult to ${responseTypeName} in LroHeaders`,
+      fix(context) {
+        return context.appendText(lastArgLocation, `,\n  LroHeaders = ${newValue}`);
+      },
+    };
   }
 
+  const argExpr = lroHeadersArg.argument;
+
+  // If the value is an intersection (e.g., ArmAsyncOperationHeader & ArmLroLocationHeader),
+  // find and replace just the ArmLroLocationHeader part
+  if (argExpr.kind === SyntaxKind.IntersectionExpression) {
+    const intersectionNode = argExpr as IntersectionExpressionNode;
+    const options = intersectionNode.options;
+    const lroHeaderOption = options.find((opt) => isArmLroLocationHeaderRef(opt));
+    if (lroHeaderOption !== undefined) {
+      return {
+        id: "arm-post-lro-set-final-result",
+        label: `Set FinalResult to ${responseTypeName} in LroHeaders`,
+        fix(context) {
+          const optionLocation = getSourceLocation(lroHeaderOption);
+          return context.replaceText(optionLocation, newValue);
+        },
+      };
+    }
+  }
+
+  // If the value is a direct reference to ArmLroLocationHeader, replace it
+  if (isArmLroLocationHeaderRef(argExpr)) {
+    return {
+      id: "arm-post-lro-set-final-result",
+      label: `Set FinalResult to ${responseTypeName} in LroHeaders`,
+      fix(context) {
+        const argValueLocation = getSourceLocation(argExpr);
+        return context.replaceText(argValueLocation, newValue);
+      },
+    };
+  }
+
+  // Fallback: replace the entire LroHeaders argument value
   return {
     id: "arm-post-lro-set-final-result",
     label: `Set FinalResult to ${responseTypeName} in LroHeaders`,
     fix(context) {
-      const argValueLocation = getSourceLocation(lroHeadersArg.argument);
-      return context.replaceText(
-        argValueLocation,
-        `ArmLroLocationHeader<FinalResult = ${responseTypeName}>`,
-      );
+      const argValueLocation = getSourceLocation(argExpr);
+      return context.replaceText(argValueLocation, newValue);
     },
   };
 }

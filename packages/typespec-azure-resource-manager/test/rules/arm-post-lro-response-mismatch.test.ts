@@ -57,6 +57,7 @@ describe("emits warning when 200 response body does not match finalResult", () =
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
+        message: `The final result type of a long-running POST operation does not match the response. Specify the FinalResult in the LroHeaders parameter to match the response type. For example: 'LroHeaders = ArmLroLocationHeader<FinalResult = ResponseType>'.`,
       });
   });
 
@@ -87,6 +88,7 @@ describe("emits warning when 200 response body does not match finalResult", () =
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
+        message: `The final result type of a long-running POST operation does not match the response. Specify the FinalResult in the LroHeaders parameter to match the response type. For example: 'LroHeaders = ArmLroLocationHeader<FinalResult = ResponseType>'.`,
       });
   });
 
@@ -113,6 +115,7 @@ describe("emits warning when 200 response body does not match finalResult", () =
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
+        message: `The final result type of a long-running POST operation does not match the response. Specify the FinalResult in the LroHeaders parameter to match the response type. For example: 'LroHeaders = ArmLroLocationHeader<FinalResult = ResponseType>'.`,
       });
   });
 });
@@ -140,6 +143,7 @@ describe("emits warning when 204 response has non-void finalResult", () => {
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
+        message: `The final result type of a long-running POST operation does not match the response. Specify the FinalResult in the LroHeaders parameter to match the response type. For example: 'LroHeaders = ArmLroLocationHeader<FinalResult = ResponseType>'.`,
       });
   });
 });
@@ -160,7 +164,7 @@ describe("emits warning for ArmResourceActionAsyncBase with 200 response body mi
         generate is ArmResourceActionAsyncBase<
           Employee,
           void,
-          ArmAcceptedLroResponse | GenerateResponse,
+          ArmAcceptedLroResponse | ArmResponse<GenerateResponse>,
           Azure.ResourceManager.Foundations.DefaultBaseParameters<Employee>
         >;
       }
@@ -168,6 +172,7 @@ describe("emits warning for ArmResourceActionAsyncBase with 200 response body mi
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
+        message: `The final result type of a long-running POST operation does not match the response. Specify the FinalResult in the LroHeaders parameter to match the response type. For example: 'LroHeaders = ArmLroLocationHeader<FinalResult = ResponseType>'.`,
       });
   });
 });
@@ -196,6 +201,7 @@ describe("emits warning for 202-only ActionAsync template when finalResult misma
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
+        message: `The final result type of a long-running POST operation does not match the response. Specify the FinalResult in the LroHeaders parameter to match the response type. For example: 'LroHeaders = ArmLroLocationHeader<FinalResult = ResponseType>'.`,
       });
   });
 });
@@ -359,7 +365,9 @@ describe("does not emit warning", () => {
       .toBeValid();
   });
 
-  it("when a low-level LRO POST has a 200 response with a body matching finalResult (using ArmAcceptedLroResponse)", async () => {
+  it("when a low-level LRO POST has a 200 response with a body and ArmAcceptedLroResponse (not discovered by resolveArmResources)", async () => {
+    // Note: Raw @armResourceAction operations are not discovered in resource.operations.actions
+    // by resolveArmResources(), so this pattern is not checked by the rule.
     await tester
       .expect(
         `
@@ -473,6 +481,59 @@ describe("codefix", () => {
           void,
           GenerateResponse,
           LroHeaders = ArmLroLocationHeader<FinalResult = GenerateResponse>
+        >;
+      }
+      `,
+      );
+  });
+
+  it("replaces ArmLroLocationHeader within an intersection in LroHeaders", async () => {
+    await tester
+      .expect(
+        `
+      @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+      model Employee is ProxyResource<{}> {
+        ...ResourceNameParameter<Employee>;
+      }
+
+      model GenerateResponse {
+        message: string;
+      }
+
+      @armResourceOperations
+      interface Employees {
+        generate is ArmResourceActionAsync<
+          Employee,
+          void,
+          GenerateResponse,
+          LroHeaders = ArmAsyncOperationHeader & ArmLroLocationHeader
+        >;
+      }
+      `,
+      )
+      .applyCodeFix("arm-post-lro-set-final-result")
+      .toEqual(
+        `
+      @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+      model Employee is ProxyResource<{}> {
+        ...ResourceNameParameter<Employee>;
+      }
+
+      model GenerateResponse {
+        message: string;
+      }
+
+      @armResourceOperations
+      interface Employees {
+        generate is ArmResourceActionAsync<
+          Employee,
+          void,
+          GenerateResponse,
+          LroHeaders = ArmAsyncOperationHeader & ArmLroLocationHeader<FinalResult = GenerateResponse>
         >;
       }
       `,
