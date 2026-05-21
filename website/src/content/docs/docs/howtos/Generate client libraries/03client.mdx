@@ -2000,7 +2000,21 @@ NOT_SUPPORTED
 ```
 
 ```java
-// TODO
+// Java requires `enable-subclient: true` option in "tspconfig.yaml"
+
+public final class StorageClientBuilder {
+    public StorageClient buildClient();
+}
+
+// via ClientBuilder
+public final class BlobBuilder {
+    public BlobClient buildClient();
+}
+
+// via parent Client
+public final class StorageClient {
+    public BlobClient getBlobClient()
+}
 ```
 
 ```go
