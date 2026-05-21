@@ -1966,7 +1966,9 @@ With `@clientInitialization`, you can change the initialization way, by passing 
 @service
 namespace Storage;
 
-op download(@path blobName: string): void;
+namespace Blob {
+  op download(@path blobName: string): void;
+}
 ```
 
 ```typespec title="client.tsp"
@@ -1977,12 +1979,8 @@ using Azure.ClientGenerator.Core;
 
 namespace Customizations;
 
-model StorageClientOptions {
-  blobName: string;
-}
-
 @@clientInitialization(
-  Storage,
+  Storage.Blob,
   {
     initializedBy: InitializedBy.individually | InitializedBy.parent,
   }
@@ -1994,35 +1992,15 @@ NOT_SUPPORTED
 ```
 
 ```csharp
-// NOT_SUPPORTED
+// TODO
 ```
 
 ```typescript
-export class StorageClient {
-  download(
-    blobName: string,
-    options: DownloadOptionalParams = { requestOptions: {} },
-  ): Promise<void>;
-}
-
-const client = new StorageClient();
-client.download("blobName");
+// TODO
 ```
 
 ```java
-public final class StorageClientBuilder {
-    public StorageClient buildClient();
-    public StorageAsyncClient buildAsyncClient();
-}
-
-public final class StorageClient {
-    public void download(String blobName);
-    public Response<Void> downloadWithResponse(String blobName, RequestOptions requestOptions);
-}
-
-// Usage Sample
-StorageClient client = new StorageClientBuilder().buildClient();
-client.download("blobName");
+// TODO
 ```
 
 ```go
