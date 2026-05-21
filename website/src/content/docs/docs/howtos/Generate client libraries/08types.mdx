@@ -2695,6 +2695,7 @@ jsonWriter.writeStringField("prop", Objects.toString(this.value, null));
 
 </ClientTabItem>
 <ClientTabItem lang="go" >
+
 ```go
 type Test struct {
     // REQUIRED
@@ -2708,5 +2709,6 @@ func (t Test) MarshalJSON() ([]byte, error) {
     return json.Marshal(objectMap)
 }
 ```
+
 </ClientTabItem>
 </ClientTabs>

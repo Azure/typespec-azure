@@ -89,6 +89,7 @@ words:
   - SERVICERP
   - seti
   - stac
+  - strconv
   - tcgc
   - tsmv
   - userrp
