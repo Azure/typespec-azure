@@ -701,6 +701,23 @@ export const $override = (
   override: Operation,
   scope?: LanguageScopes,
 ) => {
+  if (!original || original.kind !== "Operation") {
+    reportDiagnostic(context.program, {
+      code: "invalid-operation-argument",
+      format: { functionName: "@override" },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+  if (!override || override.kind !== "Operation") {
+    reportDiagnostic(context.program, {
+      code: "invalid-operation-argument",
+      format: { functionName: "@override" },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+
   // omit all override operation
   context.program.stateMap(omitOperation).set(override, true);
 

@@ -20,6 +20,8 @@ function cloneOperation(
   // Copy decorators from the original operation
   if (operation.decorators) {
     newOp.decorators = [...operation.decorators];
+    // Re-finish the type so the copied decorators are applied
+    tk.type.finishType(newOp);
   }
 
   // Set the source operation for tracing
@@ -30,7 +32,36 @@ function cloneOperation(
 
 // Helper function to clone a model property
 function cloneModelProperty(tk: ReturnType<typeof $>, prop: ModelProperty): ModelProperty {
-  return tk.type.clone(prop);
+  const clonedProp = tk.modelProperty.create({
+    name: prop.name,
+    type: prop.type,
+    optional: prop.optional,
+    defaultValue: prop.defaultValue,
+  });
+  // Copy decorators from the original property
+  if (prop.decorators) {
+    clonedProp.decorators = [...prop.decorators];
+  }
+  // Finish the type so decorators are applied
+  tk.type.finishType(clonedProp);
+  return clonedProp;
+}
+
+// Helper function to validate that the operation parameter is a valid Operation
+function validateOperation(
+  context: FunctionContext,
+  operation: Operation,
+  functionName: string,
+): boolean {
+  if (!operation || operation.kind !== "Operation") {
+    reportDiagnostic(context.program, {
+      code: "invalid-operation-argument",
+      format: { functionName },
+      target: context.functionCallTarget,
+    });
+    return false;
+  }
+  return true;
 }
 
 /**
@@ -48,6 +79,9 @@ export function replaceParameter(
   selector: string | ModelProperty,
   replacement: ModelProperty,
 ): Operation {
+  if (!validateOperation(context, operation, "replaceParameter")) {
+    return operation;
+  }
   const program = context.program;
   const tk = $(program);
 
@@ -92,6 +126,9 @@ export function removeParameter(
   operation: Operation,
   selector: string | ModelProperty,
 ): Operation {
+  if (!validateOperation(context, operation, "removeParameter")) {
+    return operation;
+  }
   const program = context.program;
   const tk = $(program);
 
@@ -133,6 +170,9 @@ export function addParameter(
   operation: Operation,
   parameter: ModelProperty,
 ): Operation {
+  if (!validateOperation(context, operation, "addParameter")) {
+    return operation;
+  }
   const program = context.program;
   const tk = $(program);
 
@@ -169,6 +209,9 @@ export function reorderParameters(
   operation: Operation,
   order: readonly string[],
 ): Operation {
+  if (!validateOperation(context, operation, "reorderParameters")) {
+    return operation;
+  }
   const program = context.program;
   const tk = $(program);
 

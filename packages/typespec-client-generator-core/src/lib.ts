@@ -536,6 +536,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Parameter "${"paramName"}" not found in operation "${"operationName"}".`,
       },
     },
+    "invalid-operation-argument": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Argument passed to "${"functionName"}" is not a valid operation. Make sure the operation reference exists.`,
+      },
+    },
     "nested-client-service-not-subset": {
       severity: "error",
       messages: {
