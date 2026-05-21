@@ -197,13 +197,12 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
       name = normalizeExactName(override).name;
     }
   }
-  const isExactName = client.type ? isExactClientName(context, client.type) : false;
   const clientType = getActualClientType(client);
   const sdkClientType: SdkClientType<TServiceOperation> = {
     __raw: client,
     kind: "client",
     name,
-    isExactName,
+    isExactName: client.type ? isExactClientName(context, client.type) : false,
     doc: client.type ? getClientDoc(context, client.type) : undefined,
     summary: client.type ? getSummary(context.program, client.type) : undefined,
     methods: [],
