@@ -701,15 +701,8 @@ export const $override = (
   override: Operation,
   scope?: LanguageScopes,
 ) => {
-  if (!original || original.kind !== "Operation") {
-    reportDiagnostic(context.program, {
-      code: "invalid-operation-argument",
-      format: { functionName: "@override" },
-      target: context.decoratorTarget,
-    });
-    return;
-  }
-  if (!override || override.kind !== "Operation") {
+  const isValidOperation = (op: Operation) => op && op.kind === "Operation";
+  if (!isValidOperation(original) || !isValidOperation(override)) {
     reportDiagnostic(context.program, {
       code: "invalid-operation-argument",
       format: { functionName: "@override" },
