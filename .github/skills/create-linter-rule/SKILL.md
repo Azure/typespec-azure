@@ -163,6 +163,27 @@ This checks: branch is up to date, build passes, tests pass, lint passes, format
 
 If any check fails, fix the issue and re-run. Use `pnpm validate:pr --fix` to auto-fix formatting and lint issues.
 
+## Step 10: EXTERNAL INTEGRATION CHECK
+
+New linter rules MUST NOT break existing Azure service specs. After pushing your PR:
+
+1. Apply the `int:azure-specs` label to the PR to trigger the External Integration check
+2. This workflow packages your changes and runs TypeSpec validation against all specs in `Azure/azure-rest-api-specs`
+3. Wait for the check to pass before requesting review
+
+If the check fails, it means your new rule produces diagnostics on existing specs. You have two options:
+
+- **Adjust the rule**: Make it more targeted so it doesn't flag existing patterns
+- **Disable in rulesets**: Set the rule to `false` in the ruleset initially and plan a separate rollout with spec fixes
+
+The External Integration workflow:
+
+- Builds and packs all typespec-azure packages from your PR
+- Checks out `Azure/azure-rest-api-specs` (main branch)
+- Patches in your packaged changes
+- Runs `tsp-integration azure-specs --stage validate`
+- Checks for unexpected git changes
+
 ## Important Notes
 
 - **Import extensions**: Always use `.js` extensions in imports (e.g., `from "./rules/my-rule.js"`)
