@@ -191,15 +191,13 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
 ): [SdkClientType<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   let name = client.name;
-  let isExactName = false;
   if (client.type) {
     const override = getClientNameOverride(context, client.type);
     if (override) {
-      const normalized = normalizeExactName(override);
-      name = normalized.name;
-      isExactName = normalized.isExactName;
+      name = normalizeExactName(override).name;
     }
   }
+  const isExactName = client.type ? isExactClientName(context, client.type) : false;
   const clientType = getActualClientType(client);
   const sdkClientType: SdkClientType<TServiceOperation> = {
     __raw: client,
