@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { dirname, resolve } from "path";
 import process from "process";
 
-type PackageOption = "azure-core" | "azure-resource-manager";
+type PackageOption = "azure-core" | "azure-resource-manager" | "client-generator-core";
 type Severity = "warning" | "error";
 
 interface Options {
@@ -15,29 +15,40 @@ interface Options {
 
 interface PackageConfig {
   packageDir: string;
-  packageShort: PackageOption;
+  docsLibraryDir: string;
   packageNpmName: string;
+  testHostComment?: string;
   testHostImport: string;
   testHostFactory: string;
 }
 
 const usage =
-  "Usage: pnpm create:linter-rule <rule-name> [--package <azure-core|azure-resource-manager>] [--severity <warning|error>] [--description <text>] [--dry-run]";
+  "Usage: pnpm create:linter-rule <rule-name> [--package <azure-core|azure-resource-manager|client-generator-core>] [--severity <warning|error>] [--description <text>] [--dry-run]";
 
 const packageConfigs: Record<PackageOption, PackageConfig> = {
   "azure-core": {
     packageDir: "typespec-azure-core",
-    packageShort: "azure-core",
+    docsLibraryDir: "azure-core",
     packageNpmName: "@azure-tools/typespec-azure-core",
     testHostImport: 'import { TesterWithService } from "#test/test-host.js";',
     testHostFactory: "TesterWithService.createInstance()",
   },
   "azure-resource-manager": {
     packageDir: "typespec-azure-resource-manager",
-    packageShort: "azure-resource-manager",
+    docsLibraryDir: "azure-resource-manager",
     packageNpmName: "@azure-tools/typespec-azure-resource-manager",
     testHostImport: 'import { Tester } from "#test/tester.js";',
     testHostFactory: "Tester.createInstance()",
+  },
+  "client-generator-core": {
+    packageDir: "typespec-client-generator-core",
+    docsLibraryDir: "typespec-client-generator-core",
+    packageNpmName: "@azure-tools/typespec-client-generator-core",
+    testHostComment:
+      "// TODO: Verify this helper matches the current client-generator-core linter test host pattern.",
+    testHostImport:
+      'import { createSdkTestRunner } from "@azure-tools/typespec-client-generator-core/testing";',
+    testHostFactory: "createSdkTestRunner()",
   },
 };
 
@@ -93,8 +104,14 @@ function parseArgs(argv: string[]): Options {
     switch (arg) {
       case "--package": {
         const value = argv[++index];
-        if (value !== "azure-core" && value !== "azure-resource-manager") {
-          fail("--package must be either azure-core or azure-resource-manager.");
+        if (
+          value !== "azure-core" &&
+          value !== "azure-resource-manager" &&
+          value !== "client-generator-core"
+        ) {
+          fail(
+            "--package must be one of azure-core, azure-resource-manager, or client-generator-core.",
+          );
         }
         packageName = value;
         break;
@@ -155,7 +172,7 @@ function updateLinterFile(linterPath: string, importLine: string, ruleIdentifier
   const afterImports = current.slice(importBlock.length);
   const withUpdatedImports = `${updatedImports}${afterImports}`;
 
-  const rulesArrayMatch = withUpdatedImports.match(/const rules = \[(?<body>[\s\S]*?)\n\];/);
+  const rulesArrayMatch = withUpdatedImports.match(/const rules = \[(?<body>[\s\S]*?)\];/);
   if (
     !rulesArrayMatch ||
     rulesArrayMatch.index === undefined ||
@@ -167,10 +184,12 @@ function updateLinterFile(linterPath: string, importLine: string, ruleIdentifier
   const start = rulesArrayMatch.index;
   const end = start + rulesArrayMatch[0].length;
   const body = rulesArrayMatch.groups.body;
-  const updatedBody = body.endsWith("\n")
-    ? `${body}  ${ruleIdentifier},`
-    : `${body}\n  ${ruleIdentifier},`;
-  const updatedRules = `const rules = [${updatedBody}\n];`;
+  const ruleEntries = body
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter((entry) => entry.length > 0);
+  ruleEntries.push(ruleIdentifier);
+  const updatedRules = `const rules = [\n${ruleEntries.map((entry) => `  ${entry},`).join("\n")}\n];`;
 
   return `${withUpdatedImports.slice(0, start)}${updatedRules}${withUpdatedImports.slice(end)}`;
 }
@@ -192,7 +211,7 @@ function main(): void {
     "docs",
     "docs",
     "libraries",
-    config.packageShort,
+    config.docsLibraryDir,
     "rules",
     `${options.ruleName}.md`,
   );
@@ -217,7 +236,7 @@ function main(): void {
     `  name: ${toDoubleQuotedString(options.ruleName)},`,
     `  description: ${toDoubleQuotedString(options.description)},`,
     `  severity: ${toDoubleQuotedString(options.severity)},`,
-    `  url: ${toDoubleQuotedString(`https://azure.github.io/typespec-azure/docs/libraries/${config.packageShort}/rules/${options.ruleName}`)},`,
+    `  url: ${toDoubleQuotedString(`https://azure.github.io/typespec-azure/docs/libraries/${config.docsLibraryDir}/rules/${options.ruleName}`)},`,
     "  messages: {",
     '    default: "TODO: Add default diagnostic message.",',
     "  },",
@@ -231,6 +250,7 @@ function main(): void {
   ].join("\n");
 
   const testFile = [
+    ...(config.testHostComment ? [config.testHostComment] : []),
     config.testHostImport,
     'import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";',
     'import { beforeEach, describe, it } from "vitest";',
@@ -283,7 +303,7 @@ function main(): void {
     "---",
     "",
     '```text title="Full name"',
-    `@azure-tools/typespec-${config.packageShort}/${options.ruleName}`,
+    `${config.packageNpmName}/${options.ruleName}`,
     "```",
     "",
     "TODO: Add a description of what this rule checks and why it matters.",

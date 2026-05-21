@@ -11,10 +11,23 @@ coding agents that need a repeatable, end-to-end workflow.
 Linter rules enforce Azure API design guidelines on TypeSpec specifications.
 Rules live in one of these packages:
 
-| Package path                               | Scope            | npm name                                       |
-| ------------------------------------------ | ---------------- | ---------------------------------------------- |
-| `packages/typespec-azure-core`             | Data-plane rules | `@azure-tools/typespec-azure-core`             |
-| `packages/typespec-azure-resource-manager` | ARM rules        | `@azure-tools/typespec-azure-resource-manager` |
+| Package path                               | Scope                             | npm name                                       |
+| ------------------------------------------ | --------------------------------- | ---------------------------------------------- |
+| `packages/typespec-client-generator-core`  | Client SDK generation rules       | `@azure-tools/typespec-client-generator-core`  |
+| `packages/typespec-azure-core`             | Data-plane and shared Azure rules | `@azure-tools/typespec-azure-core`             |
+| `packages/typespec-azure-resource-manager` | ARM-specific rules                | `@azure-tools/typespec-azure-resource-manager` |
+
+### Where to put your rule
+
+- **`typespec-client-generator-core`** — Rules that pertain to decorators in `typespec-client-generator-core`, or are only about client SDK generation
+- **`typespec-azure-resource-manager`** — Rules specific to ARM APIs
+- **`typespec-azure-core`** — Rules that apply to both data-plane and ARM APIs, or only to data-plane APIs
+
+### Ruleset registration
+
+- Rules that apply to ARM APIs → add to `resource-manager` ruleset
+- Rules that apply to data-plane APIs → add to `data-plane` ruleset
+- Rules can be in both rulesets if they apply to both
 
 A complete rule usually touches **7+ files across 3+ packages**:
 
@@ -54,13 +67,13 @@ pnpm install
 
 Decide the rule metadata before touching code:
 
-| Decision            | What to choose                                             |
-| ------------------- | ---------------------------------------------------------- |
-| Package             | `typespec-azure-core` or `typespec-azure-resource-manager` |
-| Rule name           | Kebab-case, for example `no-nullable-key`                  |
-| Severity            | `warning` or `error`                                       |
-| Target ruleset(s)   | Data-plane, resource-manager, or both                      |
-| Enabled by default? | `true` or `false`                                          |
+| Decision            | What to choose                                                                                |
+| ------------------- | --------------------------------------------------------------------------------------------- |
+| Package             | `typespec-client-generator-core`, `typespec-azure-core`, or `typespec-azure-resource-manager` |
+| Rule name           | Kebab-case, for example `no-nullable-key`                                                     |
+| Severity            | `warning` or `error`                                                                          |
+| Target ruleset(s)   | Data-plane, resource-manager, or both                                                         |
+| Enabled by default? | `true` or `false`                                                                             |
 
 Also review existing rules in `packages/<pkg>/src/rules/` to match local
 patterns for naming, visitors, diagnostics, and fixes.
@@ -77,7 +90,7 @@ Use the repo scaffold command:
 
 <!-- prettier-ignore -->
 ```bash
-pnpm create:linter-rule <rule-name> --package <azure-core|azure-resource-manager> --severity <warning|error> --description "What the rule enforces"
+pnpm create:linter-rule <rule-name> --package <azure-core|azure-resource-manager|client-generator-core> --severity <warning|error> --description "What the rule enforces"
 ```
 
 It creates or updates the main rule artifacts:
@@ -130,6 +143,26 @@ beforeEach(async () => {
     runner,
     myArmRule,
     "@azure-tools/typespec-azure-resource-manager",
+  );
+});
+```
+
+For client generator rules, start from one of the package-local testers:
+
+```typescript
+import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
+import { beforeEach } from "vitest";
+import { myClientRule } from "../../src/rules/my-client-rule.js";
+import { SimpleTester } from "../tester.js";
+
+let tester: LinterRuleTester;
+
+beforeEach(async () => {
+  const runner = await SimpleTester.createInstance();
+  tester = createLinterRuleTester(
+    runner,
+    myClientRule,
+    "@azure-tools/typespec-client-generator-core",
   );
 });
 ```
@@ -437,10 +470,22 @@ The workflow:
 4. Runs `tsp-integration azure-specs --stage validate`
 5. Checks for unexpected changes
 
-If the check fails:
+If the External Integration check fails, your rule produces diagnostics on
+existing specs in `Azure/azure-rest-api-specs`. To resolve this:
 
-- Narrow the rule logic
-- Or set the rule to `false` in the ruleset and plan a phased rollout
+1. **Apply an API-neutral fix to the spec** (preferred) — If the fix doesn't
+   change API behavior (for example, adding a decorator or renaming a type to
+   follow conventions), submit a PR to `Azure/azure-rest-api-specs` on the
+   **main** branch.
+2. **Suppress the rule** — If the spec cannot be fixed without changing API
+   behavior, add a `// suppress` comment. Suppressions can always go to the
+   **main** branch.
+3. **Fix on typespec-next branch** — If the fix requires unreleased TypeSpec
+   APIs, types, or behavior that aren't yet available in the published
+   packages, submit the fix to the **typespec-next** branch, which uses nightly
+   TypeSpec builds.
+4. **Link your spec fix PR** — Always link the PR that fixes the spec failures
+   in your linter rule PR description. Reviewers need to see both together.
 
 For local experimentation, see
 [Testing a change in azure-rest-api-specs](https://github.com/Azure/typespec-azure?tab=contributing-ov-file#testing-a-change-in-repo-azure-rest-api-specs).
@@ -461,6 +506,15 @@ For local experimentation, see
 
 ```text
 packages/
+├── typespec-client-generator-core/
+│   ├── src/
+│   │   ├── linter.ts
+│   │   └── rules/
+│   │       └── <rule-name>.ts
+│   └── test/
+│       ├── tester.ts
+│       └── rules/
+│           └── <rule-name>.test.ts
 ├── typespec-azure-core/
 │   ├── src/
 │   │   ├── linter.ts
@@ -485,15 +539,17 @@ packages/
 website/
 └── src/content/docs/docs/libraries/
     ├── azure-core/rules/<rule-name>.md
-    └── azure-resource-manager/rules/<rule-name>.md
+    ├── azure-resource-manager/rules/<rule-name>.md
+    └── typespec-client-generator-core/rules/<rule-name>.md
 ```
 
 ### Test Hosts
 
-| Package                           | Import                                                   | Notes                         |
-| --------------------------------- | -------------------------------------------------------- | ----------------------------- |
-| `typespec-azure-core`             | `import { TesterWithService } from "#test/test-host.js"` | Wraps in `@service namespace` |
-| `typespec-azure-resource-manager` | `import { Tester } from "#test/tester.js"`               | ARM context                   |
+| Package                           | Import                                                   | Notes                                                                 |
+| --------------------------------- | -------------------------------------------------------- | --------------------------------------------------------------------- |
+| `typespec-client-generator-core`  | `import { SimpleTester } from "../tester.js"`            | Client SDK generation context; other local testers are also available |
+| `typespec-azure-core`             | `import { TesterWithService } from "#test/test-host.js"` | Wraps in `@service namespace`                                         |
+| `typespec-azure-resource-manager` | `import { Tester } from "#test/tester.js"`               | ARM context                                                           |
 
 ### Common Compiler APIs
 
@@ -522,7 +578,7 @@ website/
 | `validate-rules-defined` fails | Rule not in ruleset       | Add to `data-plane.ts` or `resource-manager.ts`                   |
 | Tests can't find rule          | Import path wrong         | Check the `.js` extension and `linter.ts`                         |
 | `pnpm format` fails            | Prettier plugin not built | Run `pnpm --filter "@typespec/prettier-plugin-typespec..." build` |
-| External Integration fails     | Rule flags existing specs | Narrow the rule or disable it by default                          |
+| External Integration fails     | Rule flags existing specs | Fix the spec, suppress the rule, or use `typespec-next` as needed |
 | `regen-docs` shows changes     | Forgot `regen-docs`       | Run it and commit the output                                      |
 | Changeset missing              | `pnpm change add` not run | Run it and select the package                                     |
 

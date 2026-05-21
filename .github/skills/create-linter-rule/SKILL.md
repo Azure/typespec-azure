@@ -15,18 +15,24 @@ Follow these steps in order to create a complete, high-quality linter rule.
 
 Determine the rule metadata before writing any code:
 
-- **Package**: `typespec-azure-core` (data-plane rules) or `typespec-azure-resource-manager` (ARM rules)
+- **Package**: `typespec-azure-core` (data-plane rules), `typespec-azure-resource-manager` (ARM rules), or `typespec-client-generator-core` (client SDK generation rules)
 - **Rule name**: kebab-case (e.g., `no-nullable-key`, `require-pagination`)
 - **Severity**: `warning` (style/best practice) or `error` (correctness/breaking)
 - **Target ruleset(s)**: `data-plane`, `resource-manager`, or both
 - **Description**: One-line explanation of what the rule enforces
+
+Choose the package by scope:
+
+- Decorators from `typespec-client-generator-core`, or rules only about client SDK generation → `typespec-client-generator-core`
+- Rules specific to ARM APIs → `typespec-azure-resource-manager`
+- Rules that apply to both data-plane and ARM, or only data-plane → `typespec-azure-core`
 
 ## Step 2: SCAFFOLD
 
 Generate all required files using the repo's scaffolding tool:
 
 ```bash
-pnpm create:linter-rule < rule-name > --package < azure-core | azure-resource-manager > --severity < warning | error > --description "<description>"
+pnpm create:linter-rule < rule-name > --package < azure-core | azure-resource-manager | client-generator-core > --severity < warning | error > --description "<description>"
 ```
 
 This creates:
@@ -112,6 +118,8 @@ Add the rule to the appropriate ruleset(s):
 - **Data-plane rules**: Edit `packages/typespec-azure-rulesets/src/rulesets/data-plane.ts`
 - **ARM rules**: Edit `packages/typespec-azure-rulesets/src/rulesets/resource-manager.ts`
 
+Rules applying to ARM go in `resource-manager.ts`, rules applying to data-plane go in `data-plane.ts`, and shared rules can be listed in both.
+
 Add an entry: `"@azure-tools/typespec-<pkg>/<rule-name>": true,`
 
 Every rule MUST be explicitly listed (enabled or disabled). The `validate-rules-defined.test.ts` test will fail otherwise.
@@ -171,10 +179,12 @@ New linter rules MUST NOT break existing Azure service specs. After pushing your
 2. This workflow packages your changes and runs TypeSpec validation against all specs in `Azure/azure-rest-api-specs`
 3. Wait for the check to pass before requesting review
 
-If the check fails, it means your new rule produces diagnostics on existing specs. You have two options:
+If the check fails, your rule produces diagnostics on existing specs. To resolve:
 
-- **Adjust the rule**: Make it more targeted so it doesn't flag existing patterns
-- **Disable in rulesets**: Set the rule to `false` in the ruleset initially and plan a separate rollout with spec fixes
+1. **Apply an API-neutral fix to the spec** (preferred): If the fix doesn't change API behavior, submit a PR to `Azure/azure-rest-api-specs` on the **main** branch.
+2. **Suppress the rule**: If the spec cannot be fixed without changing API behavior, add a suppress comment. Suppressions always go to the **main** branch.
+3. **Fix on typespec-next**: If the fix requires unreleased TypeSpec APIs or behavior, submit to the **typespec-next** branch (uses nightly builds).
+4. **Link your spec fix PR**: Always link the spec fix PR in your linter rule PR description.
 
 The External Integration workflow:
 
