@@ -119,7 +119,7 @@ describe("reorderParameters", () => {
   });
 
   describe("with versioning decorators", () => {
-    it("does not crash when parameter has @typeChangedFrom decorator", async () => {
+    it("does not report error when parameter has @typeChangedFrom decorator", async () => {
       const { program } = await SimpleBaseTester.compile(
         createClientCustomizationInput(
           `
@@ -144,7 +144,9 @@ describe("reorderParameters", () => {
         ),
       );
 
-      const context = await createSdkContextForTester(program);
+      const context = await createSdkContextForTester(program, {
+        "api-version": "v1",
+      });
       const method = context.sdkPackage.clients[0].methods[0];
 
       const userParams = method.parameters.filter((p) => p.name !== "contentType");
@@ -220,8 +222,8 @@ describe("reorderParameters", () => {
           code: "unassignable",
         },
         {
-          code: "@azure-tools/typespec-client-generator-core/invalid-operation-argument",
-          message: /is not a valid operation/,
+          code: "@azure-tools/typespec-client-generator-core/invalid-function-argument",
+          message: /Invalid argument passed to function/,
         },
       ]);
     });

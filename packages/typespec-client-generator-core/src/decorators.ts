@@ -704,7 +704,7 @@ export const $override = (
   const isValidOperation = (op: Operation) => op && op.kind === "Operation";
   if (!isValidOperation(original) || !isValidOperation(override)) {
     reportDiagnostic(context.program, {
-      code: "invalid-operation-argument",
+      code: "invalid-function-argument",
       format: { functionName: "@override" },
       target: context.decoratorTarget,
     });

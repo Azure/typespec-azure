@@ -55,7 +55,7 @@ function validateOperation(
 ): boolean {
   if (!operation || operation.kind !== "Operation") {
     reportDiagnostic(context.program, {
-      code: "invalid-operation-argument",
+      code: "invalid-function-argument",
       format: { functionName },
       target: context.functionCallTarget,
     });
