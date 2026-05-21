@@ -2010,7 +2010,19 @@ client.download("blobName");
 ```
 
 ```java
-// TODO
+public final class StorageClientBuilder {
+    public StorageClient buildClient();
+    public StorageAsyncClient buildAsyncClient();
+}
+
+public final class StorageClient {
+    public void download(String blobName);
+    public Response<Void> downloadWithResponse(String blobName, RequestOptions requestOptions);
+}
+
+// Usage Sample
+StorageClient client = new StorageClientBuilder().buildClient();
+client.download("blobName");
 ```
 
 ```go
