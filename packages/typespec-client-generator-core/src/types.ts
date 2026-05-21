@@ -1018,6 +1018,7 @@ function getSdkEnumValueWithDiagnostics(
   return diagnostics.wrap({
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "enumvalue")),
     name: getLibraryName(context, type),
+    isExactName: isExactClientName(context, type),
     value: type.value ?? type.name,
     enumType,
     valueType: enumType.valueType,
@@ -1081,6 +1082,7 @@ function getSdkUnionEnumValues(
     values.push({
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, member.type, "enumvalue")),
       name: name ? name : `${member.value}`,
+      isExactName: isExactClientName(context, member.type),
       value: member.value,
       valueType: enumType.valueType,
       enumType,

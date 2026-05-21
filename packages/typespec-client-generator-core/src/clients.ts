@@ -6,6 +6,7 @@ import {
   getClientNameOverride,
   getClientNamespace,
 } from "./decorators.js";
+import { normalizeExactName } from "./functions.js";
 import { getSdkHttpParameter } from "./http.js";
 import {
   ClientInitializationOptions,
@@ -33,7 +34,7 @@ import {
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import { createSdkMethods, getSdkMethodParameter } from "./methods.js";
-import { getCrossLanguageDefinitionId } from "./public-utils.js";
+import { getCrossLanguageDefinitionId, isExactClientName } from "./public-utils.js";
 import { getSdkBuiltInType, getSdkCredentialParameter, getTypeSpecBuiltInType } from "./types.js";
 
 function getEndpointTypeFromSingleServer<
@@ -190,10 +191,13 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
 ): [SdkClientType<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   let name = client.name;
+  let isExactName = false;
   if (client.type) {
     const override = getClientNameOverride(context, client.type);
     if (override) {
-      name = override;
+      const normalized = normalizeExactName(override);
+      name = normalized.name;
+      isExactName = normalized.isExactName;
     }
   }
   const clientType = getActualClientType(client);
@@ -201,6 +205,7 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     __raw: client,
     kind: "client",
     name,
+    isExactName,
     doc: client.type ? getClientDoc(context, client.type) : undefined,
     summary: client.type ? getSummary(context.program, client.type) : undefined,
     methods: [],
