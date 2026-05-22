@@ -208,6 +208,8 @@ export interface SdkClientType<
   kind: "client";
   /** Name of the client. */
   name: string;
+  /** Whether name should be used exactly as-is, without casing transformations. */
+  isExactName: boolean;
   /** Full qualified namespace. */
   namespace: string;
   /** Document for the type. */
@@ -480,6 +482,8 @@ export interface SdkEnumValueType<
 > extends SdkTypeBase {
   kind: "enumvalue";
   name: string;
+  /** Whether name should be used exactly as-is, without casing transformations. */
+  isExactName: boolean;
   value: string | number;
   enumType: SdkEnumType;
   valueType: TValueType;
@@ -1000,6 +1004,8 @@ interface SdkServiceMethodBase<
 > extends DecoratedType {
   __raw?: Operation;
   name: string;
+  /** Whether name should be used exactly as-is, without casing transformations. */
+  isExactName: boolean;
   /** Whether the type has public or private accessibility */
   access: AccessFlags;
   /** API versions supported for current type. */
