@@ -19,13 +19,10 @@ jobs:
       - template: /eng/pipelines/templates/upload-coverage.yml
 
       # Python e2e tests and spector coverage upload
-      - script: |
-          curl -sSf https://mise.run | sh
-          export PATH="$HOME/.local/bin:$PATH"
-          mise install python uv
-          echo "##vso[task.prependpath]$(mise where python)/bin"
-          echo "##vso[task.prependpath]$(mise where uv)/bin"
-        displayName: "Install Python and uv via mise"
+      - task: UsePythonVersion@0
+        displayName: "Use Python 3.12"
+        inputs:
+          versionSpec: "3.12"
 
       - script: pnpm run prepare
         displayName: "Prepare Python environment"
