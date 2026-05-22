@@ -1,0 +1,63 @@
+# Template for uploading spector coverage reports to Azure Storage.
+# Designed to be reusable by any emitter package in typespec-azure.
+#
+# Prerequisites:
+#   - Tests must have been run against tsp-spector mock APIs, producing
+#     spec-coverage.json in the http-specs / azure-http-specs directories.
+#
+# Usage:
+#   - template: /eng/pipelines/templates/upload-spector-coverage.yml
+#     parameters:
+#       PackagePath: packages/typespec-python
+#       GeneratorName: "@azure-tools/typespec-python"
+#       UnbrandedGeneratorName: "@typespec/http-client-python"  # optional
+
+parameters:
+  # Path to the emitter package relative to repo root
+  - name: PackagePath
+    type: string
+
+  # Generator name for azure (branded) coverage upload
+  - name: GeneratorName
+    type: string
+
+  # Generator name for unbranded (standard) coverage upload. If empty, skipped.
+  - name: UnbrandedGeneratorName
+    type: string
+    default: ""
+
+steps:
+  - ${{ if ne(parameters.UnbrandedGeneratorName, '') }}:
+      - task: AzureCLI@2
+        displayName: "Upload spector coverage (standard)"
+        continueOnError: true
+        inputs:
+          azureSubscription: "TypeSpec Storage"
+          scriptType: "bash"
+          scriptLocation: "inlineScript"
+          inlineScript: >-
+            npx tsp-spector upload-coverage
+            --coverageFile ./spec-coverage.json
+            --generatorName "${{ parameters.UnbrandedGeneratorName }}"
+            --storageAccountName typespec
+            --containerName coverages
+            --generatorVersion $(node -p -e "require('$(Build.SourcesDirectory)/${{ parameters.PackagePath }}/node_modules/@typespec/http-client-python/package.json').version")
+            --generatorMode standard
+          workingDirectory: $(Build.SourcesDirectory)/${{ parameters.PackagePath }}/node_modules/@typespec/http-specs
+
+  - task: AzureCLI@2
+    displayName: "Upload spector coverage (azure)"
+    continueOnError: true
+    inputs:
+      azureSubscription: "TypeSpec Storage"
+      scriptType: "bash"
+      scriptLocation: "inlineScript"
+      inlineScript: >-
+        npx tsp-spector upload-coverage
+        --coverageFile ./spec-coverage.json
+        --generatorName "${{ parameters.GeneratorName }}"
+        --storageAccountName typespec
+        --containerName coverages
+        --generatorVersion $(node -p -e "require('$(Build.SourcesDirectory)/${{ parameters.PackagePath }}/package.json').version")
+        --generatorMode azure
+      workingDirectory: $(Build.SourcesDirectory)/${{ parameters.PackagePath }}/node_modules/@azure-tools/azure-http-specs
