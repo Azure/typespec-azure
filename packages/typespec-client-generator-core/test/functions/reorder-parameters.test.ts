@@ -198,36 +198,6 @@ describe("reorderParameters", () => {
   });
 
   describe("error handling", () => {
-    it("reports error when operation argument is not a valid operation", async () => {
-      const diagnostics = await SimpleBaseTester.diagnose(
-        createClientCustomizationInput(
-          `
-          @service
-          namespace MyService;
-
-          op myOp(@query a: string, @query b: int32): void;
-          `,
-          `
-          #suppress "experimental-feature" "testing reorderParameters"
-          @@override(MyService.myOp, reorderParameters(MyService.NotExists, #["a", "b"]));
-          `,
-        ),
-      );
-
-      expectDiagnostics(diagnostics, [
-        {
-          code: "invalid-ref",
-        },
-        {
-          code: "unassignable",
-        },
-        {
-          code: "@azure-tools/typespec-client-generator-core/invalid-function-argument",
-          message: /Invalid argument passed to function/,
-        },
-      ]);
-    });
-
     it("reports error when order list contains non-existent parameter", async () => {
       const diagnostics = await SimpleBaseTester.diagnose(
         createClientCustomizationInput(

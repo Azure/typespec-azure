@@ -47,23 +47,6 @@ function cloneModelProperty(tk: ReturnType<typeof $>, prop: ModelProperty): Mode
   return clonedProp;
 }
 
-// Helper function to validate that the operation parameter is a valid Operation
-function validateOperation(
-  context: FunctionContext,
-  operation: Operation,
-  functionName: string,
-): boolean {
-  if (!operation || operation.kind !== "Operation") {
-    reportDiagnostic(context.program, {
-      code: "invalid-function-argument",
-      format: { functionName },
-      target: context.functionCallTarget,
-    });
-    return false;
-  }
-  return true;
-}
-
 /**
  * Replace a parameter in an operation with a new parameter definition.
  *
@@ -79,9 +62,6 @@ export function replaceParameter(
   selector: string | ModelProperty,
   replacement: ModelProperty,
 ): Operation {
-  if (!validateOperation(context, operation, "replaceParameter")) {
-    return operation;
-  }
   const program = context.program;
   const tk = $(program);
 
@@ -126,9 +106,6 @@ export function removeParameter(
   operation: Operation,
   selector: string | ModelProperty,
 ): Operation {
-  if (!validateOperation(context, operation, "removeParameter")) {
-    return operation;
-  }
   const program = context.program;
   const tk = $(program);
 
@@ -170,9 +147,6 @@ export function addParameter(
   operation: Operation,
   parameter: ModelProperty,
 ): Operation {
-  if (!validateOperation(context, operation, "addParameter")) {
-    return operation;
-  }
   const program = context.program;
   const tk = $(program);
 
@@ -209,9 +183,6 @@ export function reorderParameters(
   operation: Operation,
   order: readonly string[],
 ): Operation {
-  if (!validateOperation(context, operation, "reorderParameters")) {
-    return operation;
-  }
   const program = context.program;
   const tk = $(program);
 

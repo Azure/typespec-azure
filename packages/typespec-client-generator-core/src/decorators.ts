@@ -701,16 +701,6 @@ export const $override = (
   override: Operation,
   scope?: LanguageScopes,
 ) => {
-  const isValidOperation = (op: Operation) => op && op.kind === "Operation";
-  if (!isValidOperation(original) || !isValidOperation(override)) {
-    reportDiagnostic(context.program, {
-      code: "invalid-function-argument",
-      format: { functionName: "@override" },
-      target: context.decoratorTarget,
-    });
-    return;
-  }
-
   // omit all override operation
   context.program.stateMap(omitOperation).set(override, true);
 
