@@ -695,6 +695,31 @@ function getSdkModelExample(
         addExampleValueNoMappingDignostic(diagnostics, example, relativePath);
         return diagnostics.wrap(undefined);
       }
+    } else {
+      // If current model doesn't have discriminatorProperty set, walk up the base model chain
+      // to find a model that does. This handles the case where the discriminator property was
+      // cleaned up on the current model but the value from a child model is still valid.
+      let baseModel = type.baseModel;
+      while (baseModel) {
+        if (baseModel.discriminatorProperty) {
+          const discriminatorName = baseModel.discriminatorProperty.name;
+          if (discriminatorName in example) {
+            if (
+              baseModel.discriminatedSubtypes &&
+              example[discriminatorName] in baseModel.discriminatedSubtypes
+            ) {
+              const resolvedSubtype = baseModel.discriminatedSubtypes[example[discriminatorName]];
+              // Only recurse if the resolved subtype is different from the current type
+              // to avoid infinite recursion
+              if (resolvedSubtype !== type) {
+                return getSdkModelExample(resolvedSubtype, example, relativePath);
+              }
+            }
+          }
+          break;
+        }
+        baseModel = baseModel.baseModel;
+      }
     }
 
     let additionalPropertiesType: SdkType | undefined;
@@ -729,11 +754,28 @@ function getSdkModelExample(
     for (const name of Object.keys(example)) {
       const property = properties.get(name);
       if (property) {
-        const result = diagnostics.pipe(
-          getSdkTypeExample(property.type, example[name], relativePath),
-        );
-        if (result) {
-          propertiesExample[name] = result;
+        // For discriminator properties with constant types that don't match the example
+        // value (e.g., when the example uses a value from a child model), preserve the
+        // example value directly rather than passing it through getSdkTypeExample which
+        // would reject it.
+        if (
+          property.discriminator &&
+          property.type.kind === "constant" &&
+          example[name] !== property.type.value &&
+          typeof example[name] === typeof property.type.value
+        ) {
+          propertiesExample[name] = {
+            kind: typeof property.type.value as "string" | "number" | "boolean",
+            type: property.type,
+            value: example[name],
+          } as SdkExampleValue;
+        } else {
+          const result = diagnostics.pipe(
+            getSdkTypeExample(property.type, example[name], relativePath),
+          );
+          if (result) {
+            propertiesExample[name] = result;
+          }
         }
       } else {
         additionalProperties[name] = example[name];
