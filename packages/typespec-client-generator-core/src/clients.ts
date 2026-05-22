@@ -6,7 +6,6 @@ import {
   getClientNameOverride,
   getClientNamespace,
 } from "./decorators.js";
-import { normalizeExactName } from "./functions.js";
 import { getSdkHttpParameter } from "./http.js";
 import {
   ClientInitializationOptions,
@@ -34,7 +33,7 @@ import {
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import { createSdkMethods, getSdkMethodParameter } from "./methods.js";
-import { getCrossLanguageDefinitionId, isExactClientName } from "./public-utils.js";
+import { getCrossLanguageDefinitionId, getLibraryName, isExactClientName } from "./public-utils.js";
 import { getSdkBuiltInType, getSdkCredentialParameter, getTypeSpecBuiltInType } from "./types.js";
 
 function getEndpointTypeFromSingleServer<
@@ -194,7 +193,7 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
   if (client.type) {
     const override = getClientNameOverride(context, client.type);
     if (override) {
-      name = normalizeExactName(override).name;
+      name = getLibraryName(context, client.type);
     }
   }
   const clientType = getActualClientType(client);
