@@ -1333,6 +1333,67 @@ it("SdkModelExample from discriminated types with union kind fallback", async ()
   expectDiagnostics(context.diagnostics, []);
 });
 
+it("SdkModelExample from discriminated types with child value via intermediate model", async () => {
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./examples/updatePet.json",
+    `${__dirname}/example-types/getModelDiscriminatorFromChild.json`,
+  );
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      @discriminator("kind")
+      model Animal {
+        kind: string;
+        @doc("Whether the pet is trained")
+        isTrained: boolean;
+      }
+
+      model Pet extends Animal {
+        kind: "pet";
+      }
+
+      model Dog extends Animal {
+        kind: "dog";
+        breed: string;
+      }
+
+      model Cat extends Animal {
+        kind: "cat";
+      }
+
+      @@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(Dog, Pet);
+      @@usage(Animal, Usage.input | Usage.output);
+
+      op updatePet(@body pet: Pet): void;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  const example = operation.examples[0];
+  const bodyParam = example.parameters.find((x) => x.parameter.name === "pet");
+  ok(bodyParam);
+  strictEqual(bodyParam.value.kind, "model");
+  strictEqual(bodyParam.value.type.name, "Dog");
+  // The discriminator value "dog" from the child model should be preserved
+  strictEqual(bodyParam.value.value["kind"].value, "dog");
+  strictEqual(bodyParam.value.value["kind"].kind, "string");
+  strictEqual(bodyParam.value.value["kind"].type.kind, "constant");
+  strictEqual(bodyParam.value.value["isTrained"].value, true);
+  strictEqual(bodyParam.value.value["breed"].value, "labrador");
+  strictEqual(bodyParam.value.value["breed"].kind, "string");
+
+  // Only diagnostic expected is for the response body
+  // (operation returns void but example has a response body)
+  expectDiagnostics(context.diagnostics, [
+    { code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping" },
+  ]);
+});
+
 it("SdkModelExample with additional properties", async () => {
   const instance = await SimpleTester.createInstance();
   await instance.fs.addRealTypeSpecFile(
