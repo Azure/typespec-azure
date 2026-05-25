@@ -375,7 +375,7 @@ export function isSdkFloatKind(kind: string): kind is keyof typeof SdkFloatingPo
   return kind in SdkFloatingPointKindsEnum;
 }
 
-function isSdkFixedPointKind(kind: string): kind is keyof typeof SdkFixedPointKindsEnum {
+export function isSdkFixedPointKind(kind: string): kind is keyof typeof SdkFixedPointKindsEnum {
   return kind in SdkFixedPointKindsEnum;
 }
 
