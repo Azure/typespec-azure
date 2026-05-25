@@ -345,6 +345,62 @@ it("SdkNumberExample", async () => {
   expectDiagnostics(context.diagnostics, []);
 });
 
+it("SdkNumberExample for decimal", async () => {
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./examples/getDecimal.json",
+    `${__dirname}/example-types/getDecimal.json`,
+  );
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      #suppress "@azure-tools/typespec-azure-core/no-generic-numeric" "for test"
+      op getDecimal(): decimal;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
+  ok(response);
+  strictEqual(response.bodyValue?.kind, "number");
+  strictEqual(response.bodyValue?.value, 123.45);
+  strictEqual(response.bodyValue?.type.kind, "decimal");
+
+  expectDiagnostics(context.diagnostics, []);
+});
+
+it("SdkNumberExample for decimal128", async () => {
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./examples/getDecimal128.json",
+    `${__dirname}/example-types/getDecimal128.json`,
+  );
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      #suppress "@azure-tools/typespec-azure-core/no-generic-numeric" "for test"
+      op getDecimal128(): decimal128;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
+  ok(response);
+  strictEqual(response.bodyValue?.kind, "number");
+  strictEqual(response.bodyValue?.value, 80);
+  strictEqual(response.bodyValue?.type.kind, "decimal128");
+
+  expectDiagnostics(context.diagnostics, []);
+});
+
 it("SdkNumberExample diagnostic", async () => {
   const instance = await SimpleTester.createInstance();
   await instance.fs.addRealTypeSpecFile(
