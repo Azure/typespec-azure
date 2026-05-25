@@ -51,3 +51,19 @@ Scenarios.Azure_ClientGenerator_Core_Usage_ModelInOperation = passOnSuccess([
     kind: "MockApiDefinition",
   },
 ]);
+
+Scenarios.Azure_ClientGenerator_Core_Usage_NamespaceUsage = passOnSuccess([
+  {
+    uri: "/azure/client-generator-core/usage/namespaceModelSerializable",
+    method: "put",
+    request: {
+      body: json({
+        name: "test",
+      }),
+    },
+    response: {
+      status: 204,
+    },
+    kind: "MockApiDefinition",
+  },
+]);
