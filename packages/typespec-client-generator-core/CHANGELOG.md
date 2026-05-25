@@ -1,6 +1,6 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
-## 0.69.0
+## 0.68.2
 
 ### Features
 
