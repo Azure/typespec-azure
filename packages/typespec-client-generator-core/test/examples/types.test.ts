@@ -1307,8 +1307,7 @@ it("SdkModelExample from discriminated types with child value via intermediate m
       }
 
       @@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(Dog, Pet);
-      @@usage(Dog, Usage.input | Usage.output);
-      @@usage(Cat, Usage.input | Usage.output);
+      @@usage(Animal, Usage.input | Usage.output);
 
       op updatePet(@body pet: Pet): void;
     }
@@ -1331,7 +1330,7 @@ it("SdkModelExample from discriminated types with child value via intermediate m
   strictEqual(bodyParam.value.value["isTrained"].value, true);
 
   // Diagnostics are expected for "breed" (Dog's property lacks JSON serialization
-  // since Dog only gets usage from @@usage without Json flag) and for the response body
+  // since usage propagates without Json flag) and for the response body
   // (operation returns void but example has a response body)
   expectDiagnostics(context.diagnostics, [
     { code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping" },
