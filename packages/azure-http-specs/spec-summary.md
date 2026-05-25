@@ -881,6 +881,56 @@ Expected response body:
 }
 ```
 
+### Azure_ClientGenerator_Core_ExactName_Model
+
+- Endpoint: `post /azure/client-generator-core/exact-name/model`
+
+This scenario tests the exact() function which prevents language emitters from applying
+casing transformations to client names. The model 'ExactModel' is renamed to 'my_model'
+using exact(), meaning all languages should preserve the name 'my_model' without any
+casing conversion (e.g., Python should NOT convert to 'MyModel' class name,
+and C# should NOT convert to 'MyModel').
+
+Expected request body:
+
+```json
+{
+  "name": "test"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "name": "test"
+}
+```
+
+### Azure_ClientGenerator_Core_ExactName_Property
+
+- Endpoint: `post /azure/client-generator-core/exact-name/property`
+
+This scenario tests the exact() function applied to a model property with language scoping.
+The property 'name' on ScopedModel is renamed to 'my_name' using exact() scoped to Python only.
+Python should preserve the exact name 'my_name' as-is. Other languages use the default name 'name'.
+
+Expected request body:
+
+```json
+{
+  "name": "test"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "name": "test"
+}
+```
+
 ### Azure_ClientGenerator_Core_FlattenProperty_putFlattenModel
 
 - Endpoint: `put /azure/client-generator-core/flatten-property/flattenModel`

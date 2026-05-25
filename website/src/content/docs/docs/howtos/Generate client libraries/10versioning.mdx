@@ -829,7 +829,9 @@ func (client *ServiceClient) GetUserInfo(ctx context.Context, userInfo UserInfo,
 
 ## Overriding the Client Api Version Parameter
 
-By default, we find api version parameters in specs based off of names. There is special logic we do with api version parameters:
+By default, we find api version parameters in specs based off of names. Name-based detection applies to HTTP metadata parameters (header, query, path, or cookie) and server URL template parameters (declared in `@server`). A parameter named `apiVersion` or `api-version` in these positions will automatically be treated as an API version parameter.
+
+There is special logic we do with api version parameters:
 
 1. These api version parameters get elevated up to the client level (if the service is versioned)
 2. We auto-add api version information to next links when paging
@@ -944,6 +946,100 @@ func (client *ServiceClient) Get(ctx context.Context, version Versions, options 
 ```
 
 </ClientTabs>
+
+### Keeping an Api Version Parameter on the Operation with `@apiVersion(false)`
+
+In some cases, a service may have an `api-version` query parameter on an operation that should **not** be treated as the client-level API version parameter. For example, when the parameter controls a downstream service version or has a different semantic meaning for a specific operation. You can use `@apiVersion(false)` to explicitly opt a parameter out of API version treatment.
+
+When `@apiVersion(false)` is applied to a parameter:
+
+- That parameter will **not** be treated as an API version parameter
+- It stays as a method-level parameter and is **not** elevated to the client
+- Other operations in the same client can still have their API version parameters elevated to the client normally
+
+<ClientTabs>
+
+```typespec
+import "@typespec/versioning";
+import "@typespec/http";
+import "@azure-tools/typespec-client-generator-core";
+
+using Versioning;
+using Http;
+using Azure.ClientGenerator.Core;
+
+@versioned(My.Service.Versions)
+@service
+namespace My.Service;
+
+enum Versions {
+  v2023_11_01: "2023-11-01",
+  v2024_04_01: "2024-04-01",
+}
+
+// This operation has its api-version elevated to the client as normal
+@route("/resources")
+op listResources(@query("api-version") apiVersion: string): void;
+
+// This operation has an api-version query param that should NOT be treated
+// as the API version. It stays as a method parameter.
+@route("/snapshot")
+op getSnapshot(
+  @apiVersion(false)
+  @query("api-version")
+  apiVersion: string,
+): void;
+```
+
+```python
+class ServiceClient:
+    def __init__(self, endpoint: str, **kwargs: Any) -> None: ...
+
+    def list_resources(self, **kwargs: Any) -> None: ...
+
+    def get_snapshot(self, *, api_version: str, **kwargs: Any) -> None: ...
+```
+
+```csharp
+public partial class ServiceClient
+{
+    public ServiceClient(Uri endpoint);
+    public ServiceClient(Uri endpoint, ServiceClientOptions options);
+
+    public virtual Response GetResources(CancellationToken cancellationToken = default);
+    public virtual Response GetSnapshot(string apiVersion, CancellationToken cancellationToken = default);
+}
+```
+
+```typescript
+export class ServiceClient {
+  constructor(endpoint: string, options?: ServiceClientOptionalParams);
+
+  listResources(options?: ListResourcesOptionalParams): Promise<void>;
+  getSnapshot(apiVersion: string, options?: GetSnapshotOptionalParams): Promise<void>;
+}
+```
+
+```java
+@ServiceClient(builder = ServiceClientClientBuilder.class)
+public final class ServiceClientClient {
+    public void listResources();
+
+    public void getSnapshot(String apiVersion);
+}
+```
+
+```go
+func NewServiceClientWithNoCredential(endpoint string, options *ServiceClientOptions) (*ServiceClient, error)
+
+func (client *ServiceClient) ListResources(ctx context.Context, options *ServiceClientListResourcesOptions) (ServiceClientListResourcesResponse, error)
+
+func (client *ServiceClient) GetSnapshot(ctx context.Context, apiVersion string, options *ServiceClientGetSnapshotOptions) (ServiceClientGetSnapshotResponse, error)
+```
+
+</ClientTabs>
+
+In the generated client, `listResources` will use the client-level API version parameter (defaulting to `"2024-04-01"`), while `getSnapshot` will require `apiVersion` to be passed explicitly as a method parameter.
 
 ## Extending the Client API Version Enum (`@clientApiVersions`)
 
