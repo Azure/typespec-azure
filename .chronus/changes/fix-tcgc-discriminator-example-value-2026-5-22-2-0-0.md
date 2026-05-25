@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Fix discriminator property value being dropped from examples when the value comes from a child model
+Fix example values being dropped on subtypes added via `@hierarchyBuilding` by propagating serialization options from the nearest ancestor to the newly added subtype
