@@ -1328,12 +1328,12 @@ it("SdkModelExample from discriminated types with child value via intermediate m
   strictEqual(bodyParam.value.value["kind"].kind, "string");
   strictEqual(bodyParam.value.value["kind"].type.kind, "constant");
   strictEqual(bodyParam.value.value["isTrained"].value, true);
+  strictEqual(bodyParam.value.value["breed"].value, "labrador");
+  strictEqual(bodyParam.value.value["breed"].kind, "string");
 
-  // Diagnostics are expected for "breed" (Dog's property lacks JSON serialization
-  // since usage propagates without Json flag) and for the response body
+  // Only diagnostic expected is for the response body
   // (operation returns void but example has a response body)
   expectDiagnostics(context.diagnostics, [
-    { code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping" },
     { code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping" },
   ]);
 });
