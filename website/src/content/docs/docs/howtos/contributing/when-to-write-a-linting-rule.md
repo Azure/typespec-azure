@@ -26,7 +26,7 @@ All linter rules emit diagnostics with **warning** severity. This is important t
 - **Warnings** are suppressible — authors can add a suppression comment with justification
 - **Unsuppressed warnings block CI** — the compiler treats unsuppressed diagnostics as errors
   during validation
-- **Errors** (non-linter) indicate inconsistent or uncompilable code and are _never_ suppressible
+- **Errors** (non-linter) indicate inconsistent code or code that will not compile and are _never_ suppressible
 
 Linter rules are never classed as errors because they enforce design guidelines, not language
 correctness. The suppression mechanism exists precisely because even high-confidence rules
@@ -40,13 +40,14 @@ questions:
 1. **Can violations be detected deterministically with high fidelity?** (detection axis)
 2. **Can violations be resolved without contextual judgment?** (resolution axis)
 
-These combine into three categories:
+These combine into four categories:
 
 | Detection                          | Resolution                 | Approach                                                |
 | ---------------------------------- | -------------------------- | ------------------------------------------------------- |
 | Deterministic, low false positives | Unambiguous or few options | **Standalone linting rule** — detects and may offer fix |
 | Deterministic, low false positives | Requires judgment/context  | **Hybrid** — rule detects, AI assists resolution        |
 | Requires semantic judgment         | Requires judgment/context  | **Defer to AI tooling**                                 |
+| Requires semantic judgment         | Unambiguous or few options | **Defer to AI tooling** — detection is the bottleneck   |
 
 The key insight: **detection determinism decides whether a rule should exist.** Resolution
 complexity decides whether it needs AI assistance, not whether it's worth building.

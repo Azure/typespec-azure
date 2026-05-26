@@ -71,16 +71,18 @@ Decide the rule metadata before touching code:
 | ------------------- | --------------------------------------------------------------------------------------------- |
 | Package             | `typespec-client-generator-core`, `typespec-azure-core`, or `typespec-azure-resource-manager` |
 | Rule name           | Kebab-case, for example `no-nullable-key`                                                     |
-| Severity            | `warning` or `error`                                                                          |
 | Target ruleset(s)   | Data-plane, resource-manager, or both                                                         |
 | Enabled by default? | `true` or `false`                                                                             |
+
+All linter rules use `warning` severity. This is not configurable.
 
 Also review existing rules in `packages/<pkg>/src/rules/` to match local
 patterns for naming, visitors, diagnostics, and fixes.
 
 :::note
-AI agents should explicitly record the intended package, rule name, severity,
-ruleset entry, and whether the rule is enabled by default before scaffolding.
+AI agents should explicitly record the intended package, rule name, ruleset
+entry, and whether the rule is enabled by default before scaffolding.
+Severity does not need planning because all linter rules use `warning`.
 That prevents follow-up churn across `linter.ts`, tests, and rulesets.
 :::
 
@@ -90,8 +92,11 @@ Use the repo scaffold command:
 
 <!-- prettier-ignore -->
 ```bash
-pnpm create:linter-rule <rule-name> --package <azure-core|azure-resource-manager|client-generator-core> --severity <warning|error> --description "What the rule enforces"
+pnpm create:linter-rule <rule-name> --package <azure-core|azure-resource-manager|client-generator-core> --description "What the rule enforces"
 ```
+
+All linter rules use `warning` severity, so the scaffold command does not
+accept a severity flag.
 
 It creates or updates the main rule artifacts:
 
@@ -192,11 +197,13 @@ What to test:
 
 - Valid code that must stay silent
 - Invalid code that must emit the diagnostic
-- Empty types and minimal declarations
-- Nested generics or templates
-- Decorated types
-- Cross-namespace references
-- Multiple violations in one file
+- Equivalence classes: group inputs by how the rule handles them
+- For `ModelProperty` rules, include concrete examples such as simply defined
+  properties, properties introduced through spread or `is`, and inherited
+  properties
+- Boundary conditions that are specific to the rule logic
+- At least one test verifying that library types in `Azure.Core` and
+  `Azure.ResourceManager` are not subject to the rule
 - Near-misses that should **not** trigger
 
 Verify the tests fail before implementation:
@@ -337,10 +344,19 @@ green.
 
 ### Step 6: Register in Rulesets
 
-Add the rule to the right ruleset file:
+Add the rule to the appropriate ruleset file or files:
 
 - Data-plane: `packages/typespec-azure-rulesets/src/rulesets/data-plane.ts`
 - ARM: `packages/typespec-azure-rulesets/src/rulesets/resource-manager.ts`
+
+Ruleset guidance:
+
+- `typespec-client-generator-core` rules generally go in **both** rulesets
+- `typespec-azure-core` rules intended for both ARM and data-plane also go in
+  **both** rulesets
+- Only rules that are truly ARM-specific go exclusively in the resource-manager
+  ruleset
+- Data-plane-only rules go only in the data-plane ruleset
 
 Entry format:
 
@@ -458,9 +474,10 @@ Azure service specs in `Azure/azure-rest-api-specs`.
 
 After opening the PR:
 
-1. Apply the `int:azure-specs` label
-2. Wait for the External Integration workflow to run
-3. Review any failures before requesting review
+1. Apply the `int:azure-specs` label. An agent can do this with `gh pr edit --add-label "int:azure-specs"`.
+2. If the agent cannot apply the label, instruct the user to apply it manually.
+3. Monitor the workflow with `gh run list --workflow=external-integration.yml` and wait for the External Integration run.
+4. Review any failures before requesting review.
 
 The workflow:
 

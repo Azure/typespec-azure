@@ -3,12 +3,10 @@ import { dirname, resolve } from "path";
 import process from "process";
 
 type PackageOption = "azure-core" | "azure-resource-manager" | "client-generator-core";
-type Severity = "warning" | "error";
 
 interface Options {
   ruleName: string;
   packageName: PackageOption;
-  severity: Severity;
   description: string;
   dryRun: boolean;
 }
@@ -23,7 +21,7 @@ interface PackageConfig {
 }
 
 const usage =
-  "Usage: pnpm create:linter-rule <rule-name> [--package <azure-core|azure-resource-manager|client-generator-core>] [--severity <warning|error>] [--description <text>] [--dry-run]";
+  "Usage: pnpm create:linter-rule <rule-name> [--package <azure-core|azure-resource-manager|client-generator-core>] [--description <text>] [--dry-run]";
 
 const packageConfigs: Record<PackageOption, PackageConfig> = {
   "azure-core": {
@@ -89,7 +87,6 @@ function writeText(path: string, content: string): void {
 function parseArgs(argv: string[]): Options {
   const positionals: string[] = [];
   let packageName: PackageOption = "azure-core";
-  let severity: Severity = "warning";
   let description = "TODO: Add rule description.";
   let dryRun = false;
 
@@ -114,14 +111,6 @@ function parseArgs(argv: string[]): Options {
           );
         }
         packageName = value;
-        break;
-      }
-      case "--severity": {
-        const value = argv[++index];
-        if (value !== "warning" && value !== "error") {
-          fail("--severity must be either warning or error.");
-        }
-        severity = value;
         break;
       }
       case "--description": {
@@ -149,7 +138,7 @@ function parseArgs(argv: string[]): Options {
     fail("rule-name must be kebab-case using lowercase letters, numbers, and hyphens only.");
   }
 
-  return { ruleName, packageName, severity, description, dryRun };
+  return { ruleName, packageName, description, dryRun };
 }
 
 function updateLinterFile(linterPath: string, importLine: string, ruleIdentifier: string): string {
@@ -235,7 +224,7 @@ function main(): void {
     `export const ${ruleIdentifier} = createRule({`,
     `  name: ${toDoubleQuotedString(options.ruleName)},`,
     `  description: ${toDoubleQuotedString(options.description)},`,
-    `  severity: ${toDoubleQuotedString(options.severity)},`,
+    '  severity: "warning",',
     `  url: ${toDoubleQuotedString(`https://azure.github.io/typespec-azure/docs/libraries/${config.docsLibraryDir}/rules/${options.ruleName}`)},`,
     "  messages: {",
     '    default: "TODO: Add default diagnostic message.",',
@@ -288,7 +277,7 @@ function main(): void {
     "      .toEmitDiagnostics([",
     "        {",
     `          code: ${toDoubleQuotedString(`${config.packageNpmName}/${options.ruleName}`)},`,
-    `          severity: ${toDoubleQuotedString(options.severity)},`,
+    '          severity: "warning",',
     '          message: "TODO: Expected diagnostic message",',
     "        },",
     "      ]);",

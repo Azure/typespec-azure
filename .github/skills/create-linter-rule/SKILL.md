@@ -1,9 +1,11 @@
 ---
 name: create-linter-rule
 description: >
-  Create a new TypeSpec linter rule with TDD approach, including implementation,
-  tests, documentation, ruleset registration, and changeset. Use this skill when
-  asked to create, add, or implement a new linter rule for TypeSpec Azure libraries.
+  Create a new TypeSpec linter rule, lint diagnostic, or design guideline checker with a
+  TDD approach, including implementation, tests, documentation, ruleset registration,
+  and changeset. Use this skill when asked to create, add, implement, or write a new
+  linter rule, lint warning, validation rule, or design guideline enforcement for
+  TypeSpec Azure libraries.
 allowed-tools: shell
 ---
 
@@ -17,7 +19,7 @@ Determine the rule metadata before writing any code:
 
 - **Package**: `typespec-azure-core` (data-plane rules), `typespec-azure-resource-manager` (ARM rules), or `typespec-client-generator-core` (client SDK generation rules)
 - **Rule name**: kebab-case (e.g., `no-nullable-key`, `require-pagination`)
-- **Severity**: `warning` (style/best practice) or `error` (correctness/breaking)
+- **Severity**: All linter rules are warnings; no severity choice is needed
 - **Target ruleset(s)**: `data-plane`, `resource-manager`, or both
 - **Description**: One-line explanation of what the rule enforces
 
@@ -32,7 +34,7 @@ Choose the package by scope:
 Generate all required files using the repo's scaffolding tool:
 
 ```bash
-pnpm create:linter-rule < rule-name > --package < azure-core | azure-resource-manager | client-generator-core > --severity < warning | error > --description "<description>"
+pnpm create:linter-rule < rule-name > --package < azure-core | azure-resource-manager | client-generator-core > --description "<description>"
 ```
 
 This creates:
@@ -48,13 +50,16 @@ Edit `packages/<pkg>/test/rules/<rule-name>.test.ts`:
 
 1. Write tests for **valid code** that should produce no diagnostics (`.toBeValid()`)
 2. Write tests for **invalid code** that should produce specific diagnostics (`.toEmitDiagnostics()`)
-3. Write tests for **edge cases**:
-   - Empty/minimal inputs
-   - Nested types and generics
-   - Decorated types
-   - Cross-namespace references
-   - Multiple violations in one file
-   - Types that look similar but shouldn't trigger the rule
+3. Create **equivalence classes** for the input and write tests covering at least one instance of each class:
+   - Group inputs by how the rule handles them (e.g., for a rule targeting `ModelProperty`):
+     - Simply defined properties
+     - Properties defined using `spread` or `is`
+     - Properties inherited from a base class
+   - Add boundary conditions specific to the rule logic (e.g., for a name-prefix rule):
+     - Properties with the forbidden prefix
+     - Properties with the prefix text in the middle or end of the name
+     - Properties with names shorter than the prefix
+4. Always include at least one test verifying that **library types in `Azure.Core` and `Azure.ResourceManager` are not subject to the rule**
 
 Test API reference:
 
@@ -66,7 +71,7 @@ await tester.expect(`model Foo {}`).toBeValid();
 await tester.expect(`model foo {}`).toEmitDiagnostics([
   {
     code: "@azure-tools/typespec-<pkg>/<rule-name>",
-    severity: "<severity>",
+    severity: "warning",
     message: "Expected message text",
   },
 ]);
@@ -118,7 +123,7 @@ Add the rule to the appropriate ruleset(s):
 - **Data-plane rules**: Edit `packages/typespec-azure-rulesets/src/rulesets/data-plane.ts`
 - **ARM rules**: Edit `packages/typespec-azure-rulesets/src/rulesets/resource-manager.ts`
 
-Rules applying to ARM go in `resource-manager.ts`, rules applying to data-plane go in `data-plane.ts`, and shared rules can be listed in both.
+TCGC rules generally go in **both** rulesets. Rules in `typespec-azure-core` that apply to both ARM and data-plane specs also go in **both** rulesets. Only rules that are truly ARM-specific go exclusively in `resource-manager.ts`; otherwise, add the rule to both `resource-manager.ts` and `data-plane.ts` as appropriate.
 
 Add an entry: `"@azure-tools/typespec-<pkg>/<rule-name>": true,`
 
@@ -175,9 +180,11 @@ If any check fails, fix the issue and re-run. Use `pnpm validate:pr --fix` to au
 
 New linter rules MUST NOT break existing Azure service specs. After pushing your PR:
 
-1. Apply the `int:azure-specs` label to the PR to trigger the External Integration check
-2. This workflow packages your changes and runs TypeSpec validation against all specs in `Azure/azure-rest-api-specs`
-3. Wait for the check to pass before requesting review
+1. Apply the `int:azure-specs` label to the PR to trigger the External Integration check: `gh pr edit --add-label "int:azure-specs"`
+2. If the agent cannot apply the label automatically, tell the user to apply the `int:azure-specs` label manually in the GitHub UI
+3. After applying the label, the External Integration workflow will start. Monitor it via `gh run list --workflow=external-integration.yml`
+4. This workflow packages your changes and runs TypeSpec validation against all specs in `Azure/azure-rest-api-specs`
+5. Wait for the check to pass before requesting review
 
 If the check fails, your rule produces diagnostics on existing specs. To resolve:
 
