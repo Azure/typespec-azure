@@ -147,6 +147,14 @@ resource type and your custom PATCH request type as parameters, giving you full 
 PATCH schema. The `ArmTagsPatch*` templates take the resource type as a parameter and only allow
 updating ARM tags.
 
+> **Note:** The `ArmTagsPatch*` and `ArmResourcePatch*` templates use implicit optionality, which
+> requires a suppression at the usage site:
+>
+> ```tsp
+> #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
+> update is ArmTagsPatchSync<ResourceType>;
+> ```
+
 > **Note:** The `ArmResourcePatch*` templates are **not recommended**. They rely on Lifecycle.Update
 > visibility analysis to automatically determine which properties are included in the PATCH schema,
 > but this analysis is only performed by the typespec-autorest emitter and will not be replicated in

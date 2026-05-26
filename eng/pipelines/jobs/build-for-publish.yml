@@ -17,6 +17,30 @@ jobs:
         displayName: Test
 
       - template: /eng/pipelines/templates/upload-coverage.yml
+
+      # Python e2e tests and spector coverage upload
+      - task: UsePythonVersion@0
+        displayName: "Use Python 3.12"
+        inputs:
+          versionSpec: "3.12"
+
+      - script: pnpm run prepare
+        displayName: "Prepare Python environment"
+        workingDirectory: packages/typespec-python
+
+      - script: pnpm run regenerate
+        displayName: "Regenerate Python test code"
+        workingDirectory: packages/typespec-python
+
+      - script: pnpm run test:python:e2e
+        displayName: "Run Python e2e tests"
+        workingDirectory: packages/typespec-python
+
+      - template: /eng/pipelines/templates/upload-spector-coverage.yml
+        parameters:
+          PackagePath: packages/typespec-python
+          GeneratorName: "@azure-tools/typespec-python"
+
       - template: /eng/pipelines/templates/pack.yml
         parameters:
           artifactName: npm-packages-stable
