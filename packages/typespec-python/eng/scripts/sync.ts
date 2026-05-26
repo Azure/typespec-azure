@@ -137,6 +137,7 @@ const EXCLUDED_SEGMENTS: ReadonlySet<string> = new Set([
 const EXCLUDED_FILES: ReadonlySet<string> = new Set([
   // Unbranded-only mock test that doesn't apply to the Azure wrapper.
   "tests/mock_api/unbranded/test_unbranded.py",
+  "tests/mock_api/unbranded/asynctests/test_unbranded_async.py",
 ]);
 
 const argv = parseArgs({
