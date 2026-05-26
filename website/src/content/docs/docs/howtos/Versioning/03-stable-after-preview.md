@@ -80,7 +80,7 @@ This includes the following steps:
         property?: string;
       ```
 
-    - For any property that uses the `@removed`/`@added`/`@renamedFrom` pattern to change a decorator or default value in the preview, reverse the pattern by removing both the old and new properties and restoring the original property. For example, if a property added a default value in preview:
+    - For any property that uses the `@removed`/`@added`/`@renamedFrom` pattern to change decoration or a default value in the preview (see [Adding Decoration to an Existing Type](./06-evolving-apis.md#adding-decoration-to-an-existing-type)), reverse the pattern by removing both the old and new properties and restoring the original property. For example, if a property added a default value in preview:
 
       ```diff lang=tsp
         model Employee {

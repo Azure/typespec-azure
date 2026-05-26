@@ -124,7 +124,7 @@ This includes the following steps:
     + requiredProp?: string;
     ```
 
-  - If a property uses the `@removed`/`@added`/`@renamedFrom` pattern to change a decorator or default value in the latest preview, reverse the pattern by removing both the old and new properties and restoring the original property. For example, if a property added a default value in preview:
+  - If a property uses the `@removed`/`@added`/`@renamedFrom` pattern to change decoration or a default value in the latest preview (see [Adding Decoration to an Existing Type](./06-evolving-apis.md#adding-decoration-to-an-existing-type)), reverse the pattern by removing both the old and new properties and restoring the original property. For example, if a property added a default value in preview:
 
     ```diff lang=tsp
       model Employee {
