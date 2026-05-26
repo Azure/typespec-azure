@@ -20,6 +20,8 @@ function cloneOperation(
   // Copy decorators from the original operation
   if (operation.decorators) {
     newOp.decorators = [...operation.decorators];
+    // Re-finish the type so the copied decorators are applied
+    tk.type.finishType(newOp);
   }
 
   // Set the source operation for tracing
@@ -40,6 +42,8 @@ function cloneModelProperty(tk: ReturnType<typeof $>, prop: ModelProperty): Mode
   if (prop.decorators) {
     clonedProp.decorators = [...prop.decorators];
   }
+  // Finish the type so decorators are applied
+  tk.type.finishType(clonedProp);
   return clonedProp;
 }
 

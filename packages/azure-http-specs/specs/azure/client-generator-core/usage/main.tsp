@@ -120,3 +120,45 @@ model OrphanModel {
   @encodedName("application/json", "desc")
   description: string;
 }
+
+@scenario
+@scenarioDoc("""
+  This scenario tests @usage applied to a namespace.
+  All models within the namespace (including nested sub-namespaces) inherit the usage.
+  'NamespaceModel' and 'NestedNamespaceModel' are orphan models that should be generated
+  because their parent namespace has @usage(Usage.input | Usage.json) applied.
+  The 'namespaceModelSerializable' operation verifies that models from the namespace can be serialized.
+  """)
+@global.Azure.ClientGenerator.Core.clientNamespace("azure.clientgenerator.core.usage", "java")
+namespace NamespaceUsage {
+  @route("/namespaceModelSerializable")
+  @put
+  @global.Azure.ClientGenerator.Core.convenientAPI(false)
+  @doc("""
+    Serialize the 'NamespaceModel' as request body.
+    
+    Expected body parameter:
+    ```json
+    {
+      "name": "test"
+    }
+    ```
+    """)
+  op namespaceModelSerializable(@body body: unknown): NoContentResponse;
+}
+
+@global.Azure.ClientGenerator.Core.usage(
+  global.Azure.ClientGenerator.Core.Usage.input | global.Azure.ClientGenerator.Core.Usage.json
+)
+@global.Azure.ClientGenerator.Core.access(global.Azure.ClientGenerator.Core.Access.public)
+namespace Models {
+  model NamespaceModel {
+    name: string;
+  }
+
+  namespace Nested {
+    model NestedNamespaceModel {
+      value: string;
+    }
+  }
+}

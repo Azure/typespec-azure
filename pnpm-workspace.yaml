@@ -23,6 +23,7 @@ catalog:
   "@alloy-js/core": ^0.23.0
   "@alloy-js/csharp": ^0.23.0
   "@alloy-js/markdown": ^0.23.0
+  "@alloy-js/msbuild": ^0.23.0
   "@alloy-js/python": ^0.4.0
   "@alloy-js/rollup-plugin": ^0.1.1
   "@alloy-js/typescript": ^0.23.0
@@ -86,7 +87,7 @@ catalog:
   "@typescript-eslint/rule-tester": ^8.58.1
   "@typescript-eslint/types": ^8.58.1
   "@typescript-eslint/utils": ^8.58.1
-  "@typespec/http-client-python": ^0.29.1
+  "@typespec/http-client-python": ^0.29.2
   "@typespec/ts-http-runtime": "0.3.4"
   "@vitejs/plugin-react": ^6.0.1
   "@vitest/coverage-v8": ^4.1.3

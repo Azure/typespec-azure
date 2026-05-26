@@ -345,6 +345,62 @@ it("SdkNumberExample", async () => {
   expectDiagnostics(context.diagnostics, []);
 });
 
+it("SdkNumberExample for decimal", async () => {
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./examples/getDecimal.json",
+    `${__dirname}/example-types/getDecimal.json`,
+  );
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      #suppress "@azure-tools/typespec-azure-core/no-generic-numeric" "for test"
+      op getDecimal(): decimal;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
+  ok(response);
+  strictEqual(response.bodyValue?.kind, "number");
+  strictEqual(response.bodyValue?.value, 123.45);
+  strictEqual(response.bodyValue?.type.kind, "decimal");
+
+  expectDiagnostics(context.diagnostics, []);
+});
+
+it("SdkNumberExample for decimal128", async () => {
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./examples/getDecimal128.json",
+    `${__dirname}/example-types/getDecimal128.json`,
+  );
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      #suppress "@azure-tools/typespec-azure-core/no-generic-numeric" "for test"
+      op getDecimal128(): decimal128;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
+  ok(response);
+  strictEqual(response.bodyValue?.kind, "number");
+  strictEqual(response.bodyValue?.value, 80);
+  strictEqual(response.bodyValue?.type.kind, "decimal128");
+
+  expectDiagnostics(context.diagnostics, []);
+});
+
 it("SdkNumberExample diagnostic", async () => {
   const instance = await SimpleTester.createInstance();
   await instance.fs.addRealTypeSpecFile(
@@ -1275,6 +1331,67 @@ it("SdkModelExample from discriminated types with union kind fallback", async ()
   strictEqual(bodyValue.value["kind"].type.isFixed, false);
 
   expectDiagnostics(context.diagnostics, []);
+});
+
+it("SdkModelExample from discriminated types with child value via intermediate model", async () => {
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./examples/updatePet.json",
+    `${__dirname}/example-types/getModelDiscriminatorFromChild.json`,
+  );
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      @discriminator("kind")
+      model Animal {
+        kind: string;
+        @doc("Whether the pet is trained")
+        isTrained: boolean;
+      }
+
+      model Pet extends Animal {
+        kind: "pet";
+      }
+
+      model Dog extends Animal {
+        kind: "dog";
+        breed: string;
+      }
+
+      model Cat extends Animal {
+        kind: "cat";
+      }
+
+      @@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(Dog, Pet);
+      @@usage(Animal, Usage.input | Usage.output);
+
+      op updatePet(@body pet: Pet): void;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  const example = operation.examples[0];
+  const bodyParam = example.parameters.find((x) => x.parameter.name === "pet");
+  ok(bodyParam);
+  strictEqual(bodyParam.value.kind, "model");
+  strictEqual(bodyParam.value.type.name, "Dog");
+  // The discriminator value "dog" from the child model should be preserved
+  strictEqual(bodyParam.value.value["kind"].value, "dog");
+  strictEqual(bodyParam.value.value["kind"].kind, "string");
+  strictEqual(bodyParam.value.value["kind"].type.kind, "constant");
+  strictEqual(bodyParam.value.value["isTrained"].value, true);
+  strictEqual(bodyParam.value.value["breed"].value, "labrador");
+  strictEqual(bodyParam.value.value["breed"].kind, "string");
+
+  // Only diagnostic expected is for the response body
+  // (operation returns void but example has a response body)
+  expectDiagnostics(context.diagnostics, [
+    { code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping" },
+  ]);
 });
 
 it("SdkModelExample with additional properties", async () => {
