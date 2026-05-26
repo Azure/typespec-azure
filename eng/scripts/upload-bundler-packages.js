@@ -4,6 +4,7 @@ import {
   getPackageVersion,
 } from "../../core/packages/bundle-uploader/dist/src/index.js";
 import { repoRoot } from "./helpers.js";
+import { uploadPythonEmitterAssets } from "./upload-python-emitter-assets.js";
 
 await bundleAndUploadPackages({
   repoRoot: repoRoot,
@@ -27,5 +28,8 @@ await bundleAndUploadPackages({
     "@azure-tools/typespec-client-generator-core",
     "@azure-tools/typespec-azure-resource-manager",
     "@azure-tools/typespec-azure-rulesets",
+    "@azure-tools/typespec-python",
   ],
 });
+
+await uploadPythonEmitterAssets(repoRoot);
