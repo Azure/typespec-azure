@@ -1097,7 +1097,7 @@ model Foo is TrackedResource<FooProperties> {
 
 ### `ResourceListCustomResult` {#Azure.ResourceManager.ResourceListCustomResult}
 
-Paged response containing results
+Paged response containing custom result types.
 
 ```typespec
 model Azure.ResourceManager.ResourceListCustomResult<Result>

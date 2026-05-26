@@ -19,7 +19,6 @@ namespace Azure.ResourceManager;
  * ```
  *
  * @param providerNamespace Provider namespace
- * @param libraryNamespaces a library namespace containing types for this namespace
  *
  */
 extern dec armProviderNamespace(target: Namespace, providerNamespace?: valueof string);
@@ -32,7 +31,9 @@ extern dec armProviderNamespace(target: Namespace, providerNamespace?: valueof s
 extern dec useLibraryNamespace(target: Namespace, ...namespaces: Namespace[]);
 
 /**
- * `@armLibraryNamespace` designates a namespace as containign Azure Resource Manager Provider information.
+ * `@armLibraryNamespace` designates a namespace as containing Azure Resource Manager Provider information.
+ * This is used for library namespaces that define reusable ARM resource types that can be shared
+ * across multiple provider specifications.
  *
  * @example
  *
@@ -110,18 +111,23 @@ extern dec resourceGroupResource(target: Model);
 extern dec extensionResource(target: Model);
 
 /**
- * `@armResourceType` sets the value fo the decorated string
- * property to the type of the Azure Resource Manager resource.
- * @param resource The resource to get the type of
+ * `@armProviderNameValue` sets the provider namespace value on operations.
+ * It is used internally to inject the correct provider namespace path segment
+ * for resource operations in auto-generated routes.
  */
 extern dec armProviderNameValue(target: Operation);
 
 /**
- * Marks the operation as being a collection action
+ * Marks the operation as being a collection action that is not associated with a specific resource instance.
+ * Collection actions are operations that act on a resource collection rather than a single resource,
+ * such as `checkNameAvailability` or provider-level actions.
  */
 extern dec armResourceCollectionAction(target: Operation);
 
 /**
+ * Marks the operation as a custom action on a specific Azure Resource Manager resource type.
+ * This decorator associates a POST action operation with its resource for routing and documentation generation.
+ *
  * @param resourceModel Resource model
  * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
@@ -132,6 +138,9 @@ extern dec armResourceAction(
 );
 
 /**
+ * Marks the operation as a create or update (PUT) operation for a specific Azure Resource Manager resource type.
+ * This decorator associates the operation with its resource for routing and documentation generation.
+ *
  * @param resourceModel Resource model
  * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
@@ -142,12 +151,18 @@ extern dec armResourceCreateOrUpdate(
 );
 
 /**
+ * Marks the operation as a read (GET) operation for a specific Azure Resource Manager resource type.
+ * This decorator associates the operation with its resource for routing and documentation generation.
+ *
  * @param resourceModel Resource model
  * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
 extern dec armResourceRead(target: Operation, resourceModel: Model, resourceName?: valueof string);
 
 /**
+ * Marks the operation as an update (PATCH) operation for a specific Azure Resource Manager resource type.
+ * This decorator associates the operation with its resource for routing and documentation generation.
+ *
  * @param resourceModel Resource model
  * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
@@ -158,6 +173,9 @@ extern dec armResourceUpdate(
 );
 
 /**
+ * Marks the operation as a delete (DELETE) operation for a specific Azure Resource Manager resource type.
+ * This decorator associates the operation with its resource for routing and documentation generation.
+ *
  * @param resourceModel Resource model
  * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
@@ -168,6 +186,9 @@ extern dec armResourceDelete(
 );
 
 /**
+ * Marks the operation as a list (GET collection) operation for a specific Azure Resource Manager resource type.
+ * This decorator associates the operation with its resource for routing and documentation generation.
+ *
  * @param resourceModel Resource model
  * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
@@ -242,21 +263,22 @@ extern dec armCommonTypesVersion(
 
 /**
  * This decorator is used on Azure Resource Manager resources that are not based on
- * Azure.ResourceManager common types.
+ * Azure.ResourceManager common types. It marks a model as an ARM virtual resource,
+ * which is useful for scope resources like `ArmLocationResource` or action scope models.
  *
- * @param propertiesType: The type of the resource properties.
  * @param provider Optional. The resource provider namespace for the virtual resource.
  */
 extern dec armVirtualResource(target: Model, provider?: valueof string);
 
 /**
- * This decorator sets the base type of the given resource.
+ * This decorator sets the base type of the given resource, indicating where in the
+ * Azure Resource Manager hierarchy the resource is located.
  *
- * @param baseTypeIt The built-in parent of the resource, this can be "Tenant", "Subscription", "ResourceGroup", "Location", or "Extension"
+ * @param baseType The built-in parent of the resource, this can be "Tenant", "Subscription", "ResourceGroup", "Location", or "Extension"
  */
 extern dec resourceBaseType(
   target: Model,
-  baseTypeIt: "Tenant" | "Subscription" | "ResourceGroup" | "Location" | "Extension"
+  baseType: "Tenant" | "Subscription" | "ResourceGroup" | "Location" | "Extension"
 );
 
 /**

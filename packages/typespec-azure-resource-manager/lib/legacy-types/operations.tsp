@@ -38,7 +38,6 @@ interface LegacyOperations<
  * @template ResourceRoute Optional. The resource route to use for operations in the interface.
  * @template RoutedResourceName Optional. The name of the resource type described in this template
  */
-@doc("")
 interface RoutedOperations<
   ParentParameters extends {},
   ResourceTypeParameter extends {},

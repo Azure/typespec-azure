@@ -14,7 +14,6 @@ using Rest;
  * @template ExtensionInstanceParameters The instance parameters of the extension resource
  * @template ResourceName Optional. The name of the resource type at this scope in clients.
  */
-@doc("")
 interface ExtensionOperations<
   TargetParameters extends {},
   ExtensionParentParameters extends {},
