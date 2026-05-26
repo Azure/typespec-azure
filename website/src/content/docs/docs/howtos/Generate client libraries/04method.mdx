@@ -252,8 +252,18 @@ Models can be used for input, output, or both at the same time. In some language
 changes the way the API is exposed for those models.
 
 By default, the code generator will infer the usage based on the TypeSpec. If this inference doesn't
-correspond to expectation, this can be customized with the `usage` decorator. Possible values are
-`input` and `output`, and can be combined with `Usage.input | Usage.output`.
+correspond to expectation, this can be customized with the `usage` decorator.
+
+Possible values are:
+
+- `Usage.input`: type is used in request payloads.
+- `Usage.output`: type is used in response payloads.
+- `Usage.json`: type is used in JSON payloads.
+- `Usage.xml`: type is used in XML payloads.
+
+Values can be combined with bitwise OR (`|`) to express all applicable contexts. For example,
+`Usage.input | Usage.output | Usage.json` means the type is round-trip (both request and response)
+and JSON-based.
 
 The `@usage` decorator can be applied to individual models, enums, or unions. It can also be applied to a **namespace**, in which case the usage propagates recursively to all models, enums, and unions defined within that namespace and its nested sub-namespaces. This includes types in imported libraries when using augment decorators (`@@usage`).
 
