@@ -1,11 +1,2 @@
-# Test asset directories that are populated at runtime by `pnpm sync` from the
-# upstream http-client-python checkout (see eng/scripts/sync.ts INCLUDES).
-# These are too large or churn too much to commit; CI runs `pnpm sync` before
-# running the Python test suites. Other synced files (tests/conftest.py,
-# tests/requirements/*) are committed snapshots that `pnpm sync` refreshes in
-# place.
-tests/data/
-tests/mock_api/
-
 # folder for debug
 alpha
