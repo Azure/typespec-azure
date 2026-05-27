@@ -107,12 +107,6 @@ This includes the following steps:
     ```
 
     ```diff lang=tsp
-    - @returnTypeChangedFrom(Versions.`2026-01-01-preview`, void)
-    - move is ArmResourceActionSync<Widget, MoveOptions, MoveResult>;
-    + move is ArmResourceActionSync<Widget, MoveOptions, void>;
-    ```
-
-    ```diff lang=tsp
     - @madeOptional(Versions.`2026-01-01-preview`)
     - requiredProp?: string;
     + requiredProp: string;
@@ -133,7 +127,6 @@ This includes the following steps:
     -   oldLevel: int32;
     -
     -   @added(Versions.`2026-01-01-preview`)
-    -   @encodedName("application/json", "level")
     -   level: int32 = 1;
     +   level: int32;
       }

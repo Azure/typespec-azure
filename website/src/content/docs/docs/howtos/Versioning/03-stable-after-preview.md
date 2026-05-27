@@ -89,7 +89,6 @@ This includes the following steps:
       -   oldLevel: int32;
       -
       -   @added(Versions.`2025-12-01-preview`)
-      -   @encodedName("application/json", "level")
       -   level: int32 = 1;
       +   level: int32;
         }
