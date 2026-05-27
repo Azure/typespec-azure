@@ -2197,11 +2197,6 @@ it("no warning when multiple services share the same dependency version", async 
 });
 
 it("no crash when a merged service does not specify a version for the depended library", async () => {
-  // Regression test: when one of the merged services has a service version that
-  // does not map to any version of the depended library (i.e. no `@useDependency`
-  // for that service version), the validation should not crash with "Cannot read
-  // properties of undefined" and should fall back to the latest version of the
-  // depended library.
   const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
     createClientCustomizationInput(
       `
