@@ -20,6 +20,7 @@ export default defineConfig(
       "**/.scripts/**/*",
       "eng/scripts/**/*",
       "packages/*/scripts/**/*",
+      "packages/typespec-ts/**/*", // typespec-ts has its own linting config and is very large, so ignore it here to avoid OOM
     ],
   },
   ...TypeSpecCommonEslintConfigs,

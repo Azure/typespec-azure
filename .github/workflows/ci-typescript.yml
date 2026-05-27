@@ -1,0 +1,94 @@
+name: "typespec-ts / CI"
+
+on:
+  pull_request:
+    branches:
+      - main
+      - release/*
+    paths:
+      - "packages/typespec-ts/**"
+      - ".github/workflows/ci-typescript.yml"
+  merge_group:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: ./.github/actions/setup
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build typespec-ts package
+        run: pnpm turbo run --filter "@azure-tools/typespec-ts..." build
+  unit-test:
+    name: Run unit tests
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: ./.github/actions/setup
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build typespec-ts package
+        run: pnpm turbo run --filter "@azure-tools/typespec-ts..." build
+      - name: Run unit tests
+        working-directory: packages/typespec-ts
+        run: pnpm unit-test && pnpm test-next
+  e2e-test:
+    name: Run end-to-end Spector tests
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: ./.github/actions/setup
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build typespec-ts package
+        run: pnpm turbo run --filter "@azure-tools/typespec-ts..." build
+      - name: Copy TypeSpec files
+        working-directory: packages/typespec-ts
+        run: pnpm copy:typespec
+      - name: Run Modular Spector tests
+        working-directory: packages/typespec-ts
+        run: pnpm integration-test-ci:azure-modular
+      - name: Run RLC Spector tests
+        working-directory: packages/typespec-ts
+        run: pnpm integration-test-ci:azure-rlc
+      - name: Check git tree is clean
+        working-directory: packages/typespec-ts
+        run: pnpm check:tree
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: ./.github/actions/setup
+      - name: Install dependencies
+        run: pnpm install
+      - name: Run linters
+        working-directory: packages/typespec-ts
+        run: pnpm lint
+  format:
+    name: Check formatting
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: ./.github/actions/setup
+      - name: Install dependencies
+        run: pnpm install
+      - name: Check formatting
+        working-directory: packages/typespec-ts
+        run: pnpm check-format

@@ -1,0 +1,12 @@
+emit:
+  - "@azure-tools/typespec-ts"
+options:
+  "@azure-tools/typespec-ts":
+    generate-metadata: true
+    generate-test: false
+    flavor: azure
+    azure-sdk-for-js: false
+    hierarchy-client: false
+    emitter-output-dir: "{project-root}"
+    package-details:
+      name: "@msinternal/modular-property-flatten"
