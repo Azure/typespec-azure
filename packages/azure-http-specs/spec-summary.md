@@ -912,8 +912,15 @@ Expected response body:
 - Endpoint: `post /azure/client-generator-core/exact-name/property`
 
 This scenario tests the exact() function applied to a model property with language scoping.
-The property 'name' on ScopedModel is renamed to 'my_name' using exact() scoped to Python only.
-Python should preserve the exact name 'my_name' as-is. Other languages use the default name 'name'.
+The property 'name' on ScopedModel is renamed using exact() scoped to each language,
+with names that include an underscore prefix to verify that language naming logic does not apply:
+
+- Python: '\_my_name' (should not be converted to 'my_name' or other casing)
+- Java: '\_myName' (should not be converted to remove the underscore prefix)
+- C#: '\_MyName' (should not be converted to remove the underscore prefix)
+- JavaScript: '\_myName' (should not be converted to remove the underscore prefix)
+- Go: '\_MyName' (should not be converted to remove the underscore prefix)
+  Each language should preserve the specified exact name as-is without any further casing conversion.
 
 Expected request body:
 
@@ -1309,6 +1316,16 @@ Expected calls:
 This scenario contains 4 public operations. All should be generated and exported.
 'OrphanModel' is not used but specified as 'public' and 'input', so it should be generated in SDK. The 'orphanModelSerializable' operation verifies that the model can be serialized to JSON.
 The other models' usage is additive to roundtrip, so they should be generated and exported as well.
+
+### Azure_ClientGenerator_Core_Usage_NamespaceUsage
+
+- Endpoint: `put /azure/client-generator-core/usage/namespaceModelSerializable`
+
+This scenario tests @usage applied to a namespace.
+All models within the namespace (including nested sub-namespaces) inherit the usage.
+'NamespaceModel' and 'NestedNamespaceModel' are orphan models that should be generated
+because their parent namespace has @usage(Usage.input | Usage.json) applied.
+The 'namespaceModelSerializable' operation verifies that models from the namespace can be serialized.
 
 ### Azure_Core_Basic_createOrReplace
 
