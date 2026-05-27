@@ -13,7 +13,9 @@ We have created a OpenAPI to TypeSpec conversion tool to help take on the bulk o
 
 ### Prerequisite
 
-- Clone [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs).
+- Clone the appropriate repository based on your service type:
+  - **RPSaaS service**: Clone the repository where the latest version of your service spec resides — either [azure-rest-api-specs-pr](https://github.com/Azure/azure-rest-api-specs-pr) or [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs).
+  - **non-RPSaaS service**: Clone [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs).
 - Install dependencies:
   ```shell
   npm install # Run at root of the repository
@@ -21,8 +23,10 @@ We have created a OpenAPI to TypeSpec conversion tool to help take on the bulk o
 
 ### Generate TypeSpec with converter
 
-- Go to the `specification/{service-name}` folder in `azure-rest-api-specs`.
-- Create a directory holding TypeSpec files. See details [here](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/typespec-structure-guidelines.md).
+- Ensure your service folder structure follows the [Specification Folder Structure Guide](https://github.com/Azure/azure-rest-api-specs/wiki/Specification-Folder-Structure-Guide).
+- Go to the service folder 
+  - **control-plane**: `specification/{organization}/resource-manager/{resource-provider-namespace}/{service-name}`.
+  - **data-plan**: `specification/{organization}/data-plane/{service-name}`.
 - Run the tool from the directory.
   - Convert a **data-plane** specification:
 
@@ -31,14 +35,6 @@ We have created a OpenAPI to TypeSpec conversion tool to help take on the bulk o
     ```
 
   - Convert a **control-plane** specification:
-
-    ```shell
-    tsp-client convert --swagger-readme [path to readme.md] --arm
-    ```
-
-  - Convert a **control-plane** specification to fully compatible output:
-
-    By default, the converted TypeSpec project will leverage TypeSpec built-in libraries with standard patterns and templates (highly recommended), which will cause discrepancies between the generated TypeSpec and original OpenAPI file. If you really don't want this intended discrepancy, add `--fully-compatible` flag to generate a TypeSpec project that is fully compatible with the OpenAPI file.
 
     ```shell
     tsp-client convert --swagger-readme [path to readme.md] --arm --fully-compatible
@@ -56,9 +52,17 @@ You will need to compare the OpenAPI file generated from TypeSpec with the origi
 
 - From the root folder, download the latest specification as baseline. Your original specification will be located at `.\sparse-spec\specification\{service-name}`:
 
-  ```shell
-  .\eng\tools\typespec-migration-validation\scripts\download-main.ps1 {path\to\your\generated\openapi\file}
-  ```
+  - For **non-RPSaaS service** (cloned from `azure-rest-api-specs`):
+
+    ```shell
+    .\eng\tools\typespec-migration-validation\scripts\download-main.ps1 {path\to\your\generated\openapi\file}
+    ```
+
+  - For **RPSaaS service** (cloned from `azure-rest-api-specs-pr`):
+
+    ```shell
+    .\eng\tools\typespec-migration-validation\scripts\download-main.ps1 {path\to\your\generated\openapi\file} -isRPSaaSMaster $true
+    ```
 
 - At the end of the console output, you'll see the next command to sort, merge, and normalize the original OpenAPI file(s) and generated OpenAPI file, making it easier to review changes. Provide an `outputFolder` to store the analysis results:
 
@@ -72,20 +76,27 @@ You will need to compare the OpenAPI file generated from TypeSpec with the origi
 
   In VS Code, select both files (select `oldNormalizedSwagger.json` first, then `newNormalizedSwagger.json`), right-click and choose "Compare Selected". Review these differences to understand their patterns.
 
-- Check out the output from `npx tsmv` execution. It prints suggested fixes and prompts if any. Please review them before any run.
+- Check out the output from `npx tsmv` execution. It prints errors, warnings, suggested fixes, and prompts. Carefully review each item and take the appropriate action:
 
-  **Suggested fixes:** These provide exact TypeSpec code that you can apply directly by following the instructions.
-
-  **Suggested prompts:** To use these, drag all the TypeSpec files into GitHub Copilot context. Select "Agent" or "Edit" mode with the "Claude" model. Use the provided prompt to ask GitHub Copilot to generate fixes. Carefully review all changes before accepting or undoing them.
+  - **Errors:** These indicate issues that must be resolved before the migration can proceed. Address them before continuing.
+  - **Warnings:** These highlight potential problems that may affect correctness. Review each one and decide whether action is needed.
 
 - For remaining differences, follow this iterative process:
   1. Recompile TypeSpec files with `tsp compile .` in the TypeSpec folder.
   2. Run the `npx tsmv` command again with the same parameters.
   3. Review the updated differences in VS Code.
-  4. Make further adjustments as needed. Refer to [Understanding the OpenAPI Changes](./faq/mustread.md) to understand expected changes and mitigation steps. For more effective visualization, fix differences in this recommended order:
-     - Path (route) differences first
-     - Definition (model) name differences next
-     - Detail differences within paths and definitions last
+  4. Make further adjustments as needed. Refer to [Understanding the OpenAPI Changes](./faq/mustread.md) to understand expected changes and mitigation steps.
+
+  :::tip[Recommended order for fixing differences]
+  For more effective visualization, fix differences in this order:
+  1. **Path (route) differences** first
+  2. **Definition (model) name differences** next
+  3. **Detail differences** within paths and definitions last
+  :::
+
+Once the TypeSpec-generated OpenAPI achieves functional equivalence with the original OpenAPI at the API level, add SDK emitter configurations to your `tspconfig.yaml` to validate that SDKs can be generated correctly from the TypeSpec.
+
+Refer to the example at [`specification/widget/resource-manager/Microsoft.Widget/Widget/tspconfig.yaml`](https://github.com/Azure/azure-rest-api-specs/blob/main/specification/widget/resource-manager/Microsoft.Widget/Widget/tspconfig.yaml) in `azure-rest-api-specs` for the language-specific emitter options to add.
 
 ### Create Spec PR with new TypeSpec project
 
@@ -93,6 +104,10 @@ You will need to compare the OpenAPI file generated from TypeSpec with the origi
 - If the generated OpenAPI file(s) for the latest version changed name, delete the old OpenAPI file(s) no longer referenced in README.md.
 - Create a PR with the TypeSpec files, changed OpenAPI files (examples included) and readme file.
 - Check CI failures. Refer to [Resolving Pipeline failures](./faq/pipeline.md)
+
+### Canary Validation (RPSaaS service only)
+
+If your service is an RPSaaS service, you must perform canary validation to verify the TypeSpec-generated spec works correctly before creating a PR. Follow the steps described in the [Testing TypeSpec conversion in Canary](https://armwiki.azurewebsites.net/rpaas/typespeccanarytesting.html) documentation.
 
 ## How to Get Help
 
