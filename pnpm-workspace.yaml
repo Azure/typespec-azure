@@ -1,5 +1,6 @@
 packages:
   - packages/*
+  - packages/typespec-java/src/*
   - core/ # Install core workspace dependencies too. Needed for prettier plugins
   - website/
   - eng/feeds/
@@ -81,6 +82,7 @@ catalog:
   "@types/swagger-ui-express": ^4.1.8
   "@types/which": ^3.0.4
   "@types/yargs": ^17.0.35
+  "@typescript-eslint/eslint-plugin": "~8.58.1"
   "@typescript-eslint/parser": ^8.58.1
   "@typescript-eslint/rule-tester": ^8.58.1
   "@typescript-eslint/types": ^8.58.1

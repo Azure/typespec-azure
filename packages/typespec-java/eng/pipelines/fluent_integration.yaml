@@ -1,0 +1,22 @@
+trigger:
+  branches:
+    include:
+      - main
+      - hotfix/*
+      - release/*
+
+pr:
+  branches:
+    include:
+      - main
+      - feature/*
+      - hotfix/*
+      - release/*
+  paths:
+    include:
+      - '*'
+    exclude:
+      - 'typespec*'
+
+jobs:
+- template: /eng/pipelines/jobs/build-autorest-mgmt.yml

@@ -1,0 +1,401 @@
+import {
+  ArraySchema,
+  BinarySchema,
+  ObjectSchema,
+  Property,
+  Schema,
+  Schemas,
+  StringSchema,
+} from "@autorest/codemodel";
+import { KnownMediaType } from "@azure-tools/codegen";
+import {
+  SdkModelPropertyType,
+  SdkModelType,
+  SdkType,
+} from "@azure-tools/typespec-client-generator-core";
+import { getNamespace, pascalCase } from "./utils.js";
+
+/*
+ * These schema need to reflect
+ * 1. wire schema via "serializedName"
+ * 2. client schema in Java via "name"
+ */
+export function createResponseErrorSchema(
+  schemas: Schemas,
+  stringSchema: StringSchema,
+): ObjectSchema {
+  const responseErrorSchema = new ObjectSchema("Error", "The error object.", {
+    language: {
+      default: {
+        namespace: "Azure.Core.Foundations",
+      },
+      java: {
+        namespace: "com.azure.core.models",
+      },
+    },
+  });
+  responseErrorSchema.language.default.crossLanguageDefinitionId = "Azure.Core.Foundations.Error";
+
+  schemas.add(responseErrorSchema);
+  responseErrorSchema.addProperty(
+    new Property("code", "One of a server-defined set of error codes.", stringSchema, {
+      serializedName: "code",
+      required: true,
+      nullable: false,
+      readOnly: true,
+    }),
+  );
+  responseErrorSchema.addProperty(
+    new Property("message", "A human-readable representation of the error.", stringSchema, {
+      serializedName: "message",
+      required: true,
+      nullable: false,
+      readOnly: true,
+    }),
+  );
+  responseErrorSchema.addProperty(
+    new Property("target", "The target of this error.", stringSchema, {
+      serializedName: "target",
+      required: false,
+      nullable: true,
+      readOnly: true,
+    }),
+  );
+  const errorDetailsSchema = new ArraySchema(
+    "errorDetails",
+    "the array of errors.",
+    responseErrorSchema,
+  );
+  responseErrorSchema.addProperty(
+    new Property(
+      "errorDetails",
+      "An array of details about specific errors that led to this reported error.",
+      errorDetailsSchema,
+      {
+        serializedName: "details",
+        required: false,
+        nullable: true,
+        readOnly: true,
+      },
+    ),
+  );
+  const innerErrorSchema = createResponseInnerErrorSchema(schemas, stringSchema);
+  responseErrorSchema.addProperty(
+    new Property(
+      "innerError",
+      "An object containing more specific information than the current object about the error.",
+      innerErrorSchema,
+      {
+        serializedName: "innererror",
+        required: false,
+        nullable: true,
+        readOnly: true,
+      },
+    ),
+  );
+  return responseErrorSchema;
+}
+
+export function createResponseInnerErrorSchema(
+  schemas: Schemas,
+  stringSchema: StringSchema,
+): ObjectSchema {
+  const responseInnerErrorSchema = new ObjectSchema(
+    "InnerError",
+    "An object containing more specific information about the error.",
+    {
+      language: {
+        default: {
+          namespace: "Azure.Core.Foundations",
+        },
+        java: {
+          namespace: "com.azure.core.models",
+        },
+      },
+    },
+  );
+  responseInnerErrorSchema.language.default.crossLanguageDefinitionId =
+    "Azure.Core.Foundations.InnerError";
+
+  schemas.add(responseInnerErrorSchema);
+  responseInnerErrorSchema.addProperty(
+    new Property("code", "One of a server-defined set of error codes.", stringSchema, {
+      serializedName: "code",
+      required: false,
+      nullable: true,
+      readOnly: true,
+    }),
+  );
+  responseInnerErrorSchema.addProperty(
+    new Property("innerError", "Inner error.", responseInnerErrorSchema, {
+      serializedName: "innererror",
+      required: false,
+      nullable: true,
+      readOnly: true,
+    }),
+  );
+  return responseInnerErrorSchema;
+}
+
+export function createPollOperationDetailsSchema(
+  schemas: Schemas,
+  stringSchema: StringSchema,
+): ObjectSchema {
+  const pollOperationDetailsSchema = new ObjectSchema(
+    "PollOperationDetails",
+    "Status details for long running operations.",
+    {
+      language: {
+        default: {
+          namespace: "Azure.Core.Foundations",
+        },
+        java: {
+          namespace: "com.azure.core.util.polling",
+        },
+      },
+    },
+  );
+  schemas.add(pollOperationDetailsSchema);
+  pollOperationDetailsSchema.addProperty(
+    new Property("operationId", "The unique ID of the operation.", stringSchema, {
+      serializedName: "id",
+      required: true,
+      nullable: false,
+      readOnly: true,
+    }),
+  );
+  pollOperationDetailsSchema.addProperty(
+    new Property("status", "The status of the operation.", stringSchema, {
+      serializedName: "status",
+      required: true,
+      nullable: false,
+      readOnly: true,
+    }),
+  );
+  const responseErrorSchema = createResponseErrorSchema(schemas, stringSchema);
+  pollOperationDetailsSchema.addProperty(
+    new Property(
+      "error",
+      'Error object that describes the error when status is "Failed".',
+      responseErrorSchema,
+      {
+        serializedName: "error",
+        required: false,
+        nullable: true,
+        readOnly: true,
+      },
+    ),
+  );
+  return pollOperationDetailsSchema;
+}
+
+const fileDetailsMap: Map<string, ObjectSchema> = new Map();
+
+function getFileSchemaName(baseName: string, sdkModelType?: SdkModelType): string {
+  // If the TypeSpec Model exists and is not TypeSpec.Http.File, directly use its name
+  if (sdkModelType && sdkModelType.crossLanguageDefinitionId !== "TypeSpec.Http.File") {
+    return sdkModelType.name;
+  }
+
+  // make sure suffix "FileDetails"
+  if (baseName.toLocaleLowerCase().endsWith("filedetails")) {
+    return pascalCase(baseName);
+  } else if (baseName.toLocaleLowerCase().endsWith("file")) {
+    return pascalCase(baseName) + "Details";
+  } else {
+    return pascalCase(baseName) + "FileDetails";
+  }
+}
+
+function createFileDetailsSchema(
+  schemaName: string,
+  propertyName: string,
+  namespace: string,
+  javaNamespace: string | undefined,
+  schemas: Schemas,
+) {
+  const fileDetailsSchema = new ObjectSchema(
+    schemaName,
+    'The file details for the "' + propertyName + '" field.',
+    {
+      language: {
+        default: {
+          namespace: namespace,
+        },
+        java: {
+          namespace: javaNamespace,
+        },
+      },
+      serializationFormats: [KnownMediaType.Multipart],
+    },
+  );
+  schemas.add(fileDetailsSchema);
+  fileDetailsMap.set(schemaName, fileDetailsSchema);
+  return fileDetailsSchema;
+}
+
+function addContentProperty(fileDetailsSchema: ObjectSchema, binarySchema: BinarySchema) {
+  fileDetailsSchema.addProperty(
+    new Property("content", "The content of the file.", binarySchema, {
+      required: true,
+      nullable: false,
+      readOnly: false,
+    }),
+  );
+}
+
+function addFilenameProperty(
+  fileDetailsSchema: ObjectSchema,
+  stringSchema: StringSchema,
+  filenameProperty?: SdkModelPropertyType,
+  processSchemaFunc?: (type: SdkType) => Schema,
+) {
+  const isRequired = filenameProperty ? !filenameProperty.optional : false;
+  const isConstant = filenameProperty?.type.kind === "constant" && isRequired;
+  // If the type is constant but not required, treat the type as non-constant String but its value as the default.
+  const clientDefaultValue =
+    filenameProperty?.type.kind === "constant" ? String(filenameProperty.type.value) : undefined;
+  fileDetailsSchema.addProperty(
+    new Property(
+      "filename",
+      "The filename of the file.",
+      isConstant && processSchemaFunc ? processSchemaFunc(filenameProperty.type) : stringSchema,
+      {
+        required: isRequired,
+        nullable: false,
+        readOnly: false,
+        clientDefaultValue: clientDefaultValue,
+      },
+    ),
+  );
+}
+
+function addContentTypeProperty(
+  fileDetailsSchema: ObjectSchema,
+  stringSchema: StringSchema,
+  contentTypeProperty?: SdkModelPropertyType,
+  processSchemaFunc?: (type: SdkType) => Schema,
+) {
+  const isRequired = contentTypeProperty ? !contentTypeProperty.optional : false;
+  const isConstant = contentTypeProperty?.type.kind === "constant" && isRequired;
+  // If the type is constant but not required, treat the type as non-constant String but its value as the default.
+  /*
+   * TypeSpec 'TypeSpec.Http.File<"image/png">' is such case.
+   * Feels that it is not user-friendly to create a single value enum for FileContentType that user probably had to set for the request.
+   */
+  const clientDefaultValue =
+    contentTypeProperty?.type.kind === "constant"
+      ? String(contentTypeProperty.type.value)
+      : "application/octet-stream";
+  fileDetailsSchema.addProperty(
+    new Property(
+      "contentType",
+      "The content-type of the file.",
+      isConstant && processSchemaFunc ? processSchemaFunc(contentTypeProperty.type) : stringSchema,
+      {
+        required: isRequired,
+        nullable: false,
+        readOnly: false,
+        clientDefaultValue: clientDefaultValue,
+      },
+    ),
+  );
+}
+
+export function getFileDetailsSchema(
+  property: SdkModelPropertyType,
+  namespace: string,
+  javaNamespace: string | undefined,
+  schemas: Schemas,
+  binarySchema: BinarySchema,
+  stringSchema: StringSchema,
+  processSchemaFunc: (type: SdkType) => Schema,
+): ObjectSchema {
+  let fileSdkType: SdkModelType | undefined;
+  if (property.type.kind === "model") {
+    fileSdkType = property.type;
+  } else if (property.type.kind === "array" && property.type.valueType.kind === "model") {
+    fileSdkType = property.type.valueType;
+  }
+  if (fileSdkType) {
+    // property.type is File, use name and properties from property.type for the File schema
+    /*
+    Current logic:
+    - Class name suffix "FileDetails"
+    - No class hierarchy for File
+    - File has 3 properties: "content", "filename", "contentType" (Note that it is "contents" in TypeSpec)
+    - No adjustment on "content" property, it is always BinaryData and required
+    - Allow constant type for "filename" and "contentType" (to be discussed for other types e.g. enum)
+    - Allow required for "filename" and "contentType"
+     */
+    const filePropertyName = property.name;
+    const schemaName = getFileSchemaName(filePropertyName, fileSdkType);
+    let fileDetailsSchema = fileDetailsMap.get(schemaName);
+    if (!fileDetailsSchema) {
+      const typeNamespace = getNamespace(property.type.__raw) ?? namespace;
+      fileDetailsSchema = createFileDetailsSchema(
+        schemaName,
+        filePropertyName,
+        typeNamespace,
+        javaNamespace,
+        schemas,
+      );
+
+      // description if available
+      if (fileSdkType.summary) {
+        fileDetailsSchema.summary = fileSdkType.summary;
+      }
+      if (fileSdkType.doc) {
+        fileDetailsSchema.language.default.description = fileSdkType.doc;
+      }
+      // crossLanguageDefinitionId
+      fileDetailsSchema.language.default.crossLanguageDefinitionId =
+        fileSdkType.crossLanguageDefinitionId;
+
+      let contentTypeProperty;
+      let filenameProperty;
+
+      // find "filename" and "contentType" property in current model and its base models
+      while (fileSdkType !== undefined) {
+        for (const property of fileSdkType.properties) {
+          if (!filenameProperty && property.name === "filename") {
+            filenameProperty = property;
+          }
+          if (!contentTypeProperty && property.name === "contentType") {
+            contentTypeProperty = property;
+          }
+        }
+        fileSdkType = fileSdkType.baseModel;
+      }
+
+      addContentProperty(fileDetailsSchema, binarySchema);
+      addFilenameProperty(fileDetailsSchema, stringSchema, filenameProperty, processSchemaFunc);
+      addContentTypeProperty(
+        fileDetailsSchema,
+        stringSchema,
+        contentTypeProperty,
+        processSchemaFunc,
+      );
+    }
+    return fileDetailsSchema;
+  } else {
+    // property.type is bytes, create a File schema
+    const filePropertyName = property.name;
+    const schemaName = getFileSchemaName(filePropertyName);
+    let fileDetailsSchema = fileDetailsMap.get(schemaName);
+    if (!fileDetailsSchema) {
+      fileDetailsSchema = createFileDetailsSchema(
+        schemaName,
+        filePropertyName,
+        namespace,
+        javaNamespace,
+        schemas,
+      );
+
+      addContentProperty(fileDetailsSchema, binarySchema);
+      addFilenameProperty(fileDetailsSchema, stringSchema);
+      addContentTypeProperty(fileDetailsSchema, stringSchema);
+    }
+    return fileDetailsSchema;
+  }
+}

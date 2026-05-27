@@ -10,7 +10,8 @@
     { "path": "packages/azure-http-specs/tsconfig.build.json" },
     { "path": "packages/typespec-metadata/tsconfig.build.json" },
     { "path": "packages/samples/tsconfig.build.json" },
-    { "path": "packages/typespec-python/tsconfig.json" }
+    { "path": "packages/typespec-python/tsconfig.json" },
+    { "path": "packages/typespec-java/typespec-extension/tsconfig.json" }
   ],
   "files": []
 }

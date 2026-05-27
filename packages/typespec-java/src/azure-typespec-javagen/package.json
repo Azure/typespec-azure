@@ -1,0 +1,24 @@
+{
+  "name": "@azure-tools/azure-typespec-javagen",
+  "version": "4.0.0",
+  "description": "The Java extension for classic generators in TypeSpec.",
+  "scripts": {
+    "start": "java --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED -jar target/azure-autorest-javagen-jar-with-dependencies.jar",
+    "debug": "java --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,quiet=y,address=5005 -jar target/azure-autorest-javagen-jar-with-dependencies.jar",
+    "build": "mvn package -Dlocal"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Azure/typespec-azure"
+  },
+  "readme": "./readme.md",
+  "keywords": [
+    "java"
+  ],
+  "author": "Microsoft Corporation",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Azure/typespec-azure/issues"
+  },
+  "homepage": "https://github.com/Azure/typespec-azure/blob/main/packages/typespec-java/src/azure-typespec-javagen/readme.md"
+}

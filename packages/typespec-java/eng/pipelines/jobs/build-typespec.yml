@@ -1,0 +1,26 @@
+parameters:
+- name: SubmodulePullRequestId
+  type: string
+  default: ''
+- name: UploadSpectorReport
+  type: string
+  default: false
+
+jobs:
+- job: Build_TypeSpec
+
+  timeoutInMinutes: 60
+
+  variables:
+  - template: /eng/pipelines/variables/globals.yml
+  - template: /eng/pipelines/variables/image.yml
+
+  pool:
+    name: $(LINUXPOOL)
+    image: $(LINUXVMIMAGE)
+    os: linux
+
+  steps:
+  - template: /eng/pipelines/steps/build-typespec.yml
+    parameters:
+      SubmodulePullRequestId: ${{ parameters.SubmodulePullRequestId }}
