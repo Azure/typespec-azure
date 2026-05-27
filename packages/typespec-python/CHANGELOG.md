@@ -1,5 +1,15 @@
 # Release
 
+## 0.63.0
+
+- [#4503](https://github.com/Azure/typespec-azure/pull/4503) Bump @typespec/http-client-python to 0.30.0
+
+## 0.62.1
+
+### Bump dependencies
+
+- [#4418](https://github.com/Azure/typespec-azure/pull/4418) Bump @typespec/http-client-python to 0.29.1
+
 ## 0.62.0
 
 ### Features
