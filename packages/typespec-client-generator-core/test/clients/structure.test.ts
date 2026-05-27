@@ -2196,6 +2196,68 @@ it("no warning when multiple services share the same dependency version", async 
   expectDiagnostics(diagnostics, []);
 });
 
+it("no crash when a merged service does not specify a version for the depended library", async () => {
+  // Regression test: when one of the merged services has a service version that
+  // does not map to any version of the depended library (i.e. no `@useDependency`
+  // for that service version), the validation should not crash with "Cannot read
+  // properties of undefined" and should fall back to the latest version of the
+  // depended library.
+  const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
+        @versioned(LibVersions)
+        namespace SharedLib {
+          enum LibVersions {
+            v1: "v1",
+            v2: "v2",
+          }
+        }
+
+        @service
+        @versioned(VersionsA)
+        namespace ServiceA {
+          enum VersionsA {
+            @useDependency(SharedLib.LibVersions.v2)
+            av1,
+          }
+          op a(): void;
+        }
+        @service
+        @versioned(VersionsB)
+        namespace ServiceB {
+          enum VersionsB {
+            @useDependency(SharedLib.LibVersions.v2)
+            bv1,
+            bv2,
+          }
+          op b(): void;
+        }`,
+      `
+        @client(
+          {
+            name: "CombineClient",
+            service: [ServiceA, ServiceB],
+            autoMergeService: true,
+          }
+        )
+        namespace CombineClient {}
+      `,
+    ),
+  );
+  await createSdkContextForTester(program);
+  // ServiceA explicitly uses SharedLib.v2; ServiceB does not specify a version
+  // so the validation falls back to SharedLib's latest version (v2). Both
+  // resolve to the same version, so no inconsistency warning is reported.
+  expectDiagnostics(
+    diagnostics.filter(
+      (d) =>
+        d.code ===
+        "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service-dependency",
+    ),
+    [],
+  );
+});
+
 it("multiple clients from single service", async () => {
   const { program } = await SimpleBaseTester.compile(
     createClientCustomizationInput(

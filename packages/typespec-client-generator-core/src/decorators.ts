@@ -33,7 +33,7 @@ import {
   isBody,
   isBodyRoot,
 } from "@typespec/http";
-import { resolveVersions } from "@typespec/versioning";
+import { getVersion, resolveVersions, type Version } from "@typespec/versioning";
 import {
   AccessDecorator,
   AlternateTypeDecorator,
@@ -274,8 +274,21 @@ function validateMultipleServiceDependencyVersions(
     for (const [depNs, depVersion] of resolutions[resolutions.length - 1].versions) {
       // Ignore versions of the merged services themselves.
       if (serviceSet.has(depNs)) continue;
+      // When the service does not specify a version for the depended library
+      // (e.g. the latest service version has no `@useDependency` mapping for it),
+      // fall back to the latest version of the depended library, matching the
+      // behavior expected by downstream emitters.
+      let resolvedDepVersion: Version | undefined = depVersion;
+      if (resolvedDepVersion === undefined) {
+        const depVersionMap = getVersion(program, depNs);
+        const allDepVersions = depVersionMap?.getVersions();
+        if (allDepVersions && allDepVersions.length > 0) {
+          resolvedDepVersion = allDepVersions[allDepVersions.length - 1];
+        }
+      }
+      if (resolvedDepVersion === undefined) continue;
       const versions = depVersions.get(depNs) ?? new Set<string>();
-      versions.add(depVersion.value ?? depVersion.name);
+      versions.add(resolvedDepVersion.value ?? resolvedDepVersion.name);
       depVersions.set(depNs, versions);
     }
   }
