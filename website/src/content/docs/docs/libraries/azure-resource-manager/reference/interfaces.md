@@ -22,6 +22,8 @@ interface Azure.ResourceManager.ExtensionResourceCollectionOperations<Resource>
 
 #### `ExtensionResourceCollectionOperations.listByParent` {#Azure.ResourceManager.ExtensionResourceCollectionOperations<Resource>.listByParent}
 
+List resources by parent.
+
 ```typespec
 op Azure.ResourceManager.ExtensionResourceCollectionOperations<Resource>.listByParent(apiVersion: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.ResourceListResult<Resource>> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
@@ -43,11 +45,15 @@ interface Azure.ResourceManager.ExtensionResourceInstanceOperations<Resource, Pr
 
 #### `ExtensionResourceInstanceOperations.get` {#Azure.ResourceManager.ExtensionResourceInstanceOperations<Resource, Properties>.get}
 
+Retrieve a resource.
+
 ```typespec
 op Azure.ResourceManager.ExtensionResourceInstanceOperations<Resource, Properties>.get(apiVersion: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### `ExtensionResourceInstanceOperations.createOrUpdate` {#Azure.ResourceManager.ExtensionResourceInstanceOperations<Resource, Properties>.createOrUpdate}
+
+Create or update a resource using the asynchronous call pattern.
 
 ```typespec
 op Azure.ResourceManager.ExtensionResourceInstanceOperations<Resource, Properties>.createOrUpdate(apiVersion: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced", resource: Resource): Azure.ResourceManager.ArmResourceUpdatedResponse<Resource> | Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders> | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -55,11 +61,15 @@ op Azure.ResourceManager.ExtensionResourceInstanceOperations<Resource, Propertie
 
 #### `ExtensionResourceInstanceOperations.update` {#Azure.ResourceManager.ExtensionResourceInstanceOperations<Resource, Properties>.update}
 
+Update a resource using the synchronous call pattern.
+
 ```typespec
 op Azure.ResourceManager.ExtensionResourceInstanceOperations<Resource, Properties>.update(apiVersion: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced", properties: Azure.ResourceManager.Foundations.ResourceUpdateModel<Resource, Properties>): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### `ExtensionResourceInstanceOperations.delete` {#Azure.ResourceManager.ExtensionResourceInstanceOperations<Resource, Properties>.delete}
+
+Delete a resource using the asynchronous call pattern.
 
 ```typespec
 op Azure.ResourceManager.ExtensionResourceInstanceOperations<Resource, Properties>.delete(apiVersion: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.{ location: string, retryAfter: int32 }> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -82,11 +92,15 @@ interface Azure.ResourceManager.ExtensionResourceOperations<Resource, Properties
 
 #### `ExtensionResourceOperations.get` {#Azure.ResourceManager.ExtensionResourceOperations<Resource, Properties>.get}
 
+Retrieve a resource.
+
 ```typespec
 op Azure.ResourceManager.ExtensionResourceOperations<Resource, Properties>.get(apiVersion: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### `ExtensionResourceOperations.createOrUpdate` {#Azure.ResourceManager.ExtensionResourceOperations<Resource, Properties>.createOrUpdate}
+
+Create or update a resource using the asynchronous call pattern.
 
 ```typespec
 op Azure.ResourceManager.ExtensionResourceOperations<Resource, Properties>.createOrUpdate(apiVersion: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced", resource: Resource): Azure.ResourceManager.ArmResourceUpdatedResponse<Resource> | Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders> | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -94,17 +108,23 @@ op Azure.ResourceManager.ExtensionResourceOperations<Resource, Properties>.creat
 
 #### `ExtensionResourceOperations.update` {#Azure.ResourceManager.ExtensionResourceOperations<Resource, Properties>.update}
 
+Update a resource using the synchronous call pattern.
+
 ```typespec
 op Azure.ResourceManager.ExtensionResourceOperations<Resource, Properties>.update(apiVersion: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced", properties: Azure.ResourceManager.Foundations.ResourceUpdateModel<Resource, Properties>): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### `ExtensionResourceOperations.delete` {#Azure.ResourceManager.ExtensionResourceOperations<Resource, Properties>.delete}
 
+Delete a resource using the asynchronous call pattern.
+
 ```typespec
 op Azure.ResourceManager.ExtensionResourceOperations<Resource, Properties>.delete(apiVersion: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.{ location: string, retryAfter: int32 }> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### `ExtensionResourceOperations.listByParent` {#Azure.ResourceManager.ExtensionResourceOperations<Resource, Properties>.listByParent}
+
+List resources by parent.
 
 ```typespec
 op Azure.ResourceManager.ExtensionResourceOperations<Resource, Properties>.listByParent(apiVersion: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.ResourceListResult<Resource>> | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -122,6 +142,8 @@ interface Azure.ResourceManager.Operations<>
 ```
 
 #### `Operations.list` {#Azure.ResourceManager.Operations.list}
+
+List the operations for the provider.
 
 ```typespec
 op Azure.ResourceManager.Operations.list(apiVersion: string, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.CommonTypes.OperationListResult> | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -145,6 +167,8 @@ interface Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, Resour
 
 #### `PrivateEndpoints.ListByParent` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.ListByParent}
 
+List the private endpoint connections over a resource
+
 ```typespec
 op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.ListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
@@ -163,6 +187,8 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName,
 
 #### `PrivateEndpoints.Read` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.Read}
 
+GET the a private endpoint connection for a particular resource
+
 ```typespec
 op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.Read(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
@@ -180,6 +206,8 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName,
 | OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
 #### `PrivateEndpoints.CreateOrUpdateAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.CreateOrUpdateAsync}
+
+A long-running resource CreateOrUpdate (PUT) for a PrivateEndpointConnection to a resource
 
 ```typespec
 op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.CreateOrUpdateAsync(provider: "Microsoft.ThisWillBeReplaced", resource: Resource): Response | Error
@@ -200,6 +228,8 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName,
 
 #### `PrivateEndpoints.CreateOrReplaceSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.CreateOrReplaceSync}
 
+Synchronous PUT operation for a Private endpoint connection to a resource
+
 ```typespec
 op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.CreateOrReplaceSync(provider: "Microsoft.ThisWillBeReplaced", resource: Resource): Response | Error
 ```
@@ -217,6 +247,8 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName,
 | OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
 #### `PrivateEndpoints.CreateOrReplaceAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.CreateOrReplaceAsync}
+
+A long-running resource CreateOrUpdate (PUT) for a PrivateEndpointConnection to a resource
 
 ```typespec
 op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.CreateOrReplaceAsync(provider: "Microsoft.ThisWillBeReplaced", resource: Resource): Response | Error
@@ -259,6 +291,8 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName,
 
 #### `PrivateEndpoints.CustomPatchSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.CustomPatchSync}
 
+A resource update using a custom PATCH payload (synchronous) to update a PrivateEndpointConnection to a resource
+
 ```typespec
 op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.CustomPatchSync(provider: "Microsoft.ThisWillBeReplaced", properties: PatchModel): Response | Error
 ```
@@ -277,6 +311,8 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName,
 | OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
 #### `PrivateEndpoints.DeleteAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.DeleteAsync}
+
+Delete a PrivateEndpointConnection to a resource asynchronously
 
 ```typespec
 op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.DeleteAsync(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
@@ -297,6 +333,8 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName,
 
 #### `PrivateEndpoints.DeleteSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.DeleteSync}
 
+Delete a PrivateEndpointConnection to a resource synchronously
+
 ```typespec
 op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.DeleteSync(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
@@ -314,6 +352,8 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName,
 | OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
 #### `PrivateEndpoints.DeleteAsyncBase` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.DeleteAsyncBase}
+
+Delete a PrivateEndpointConnection to a resource asynchronously
 
 ```typespec
 op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.DeleteAsyncBase(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
@@ -362,6 +402,8 @@ interface Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceN
 
 #### `PrivateLinks.ListByParent` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName, ResourceParameter>.ListByParent}
 
+List the private links to a resource
+
 ```typespec
 op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName, ResourceParameter>.ListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
@@ -380,6 +422,8 @@ op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName, Re
 
 #### `PrivateLinks.ListSinglePageByParent` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName, ResourceParameter>.ListSinglePageByParent}
 
+List the private links to a resource - this should only be used for legacy operations
+
 ```typespec
 op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName, ResourceParameter>.ListSinglePageByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
@@ -397,6 +441,8 @@ op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName, Re
 | OverrideResourceName | Optional. The name of the private link resource being operated on. |
 
 #### `PrivateLinks.Read` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName, ResourceParameter>.Read}
+
+GET the a private link to a particular resource
 
 ```typespec
 op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName, ResourceParameter>.Read(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
@@ -450,11 +496,15 @@ interface Azure.ResourceManager.ProxyResourceOperations<Resource, BaseParameters
 
 #### `ProxyResourceOperations.get` {#Azure.ResourceManager.ProxyResourceOperations<Resource, BaseParameters>.get}
 
+Retrieve a resource.
+
 ```typespec
 op Azure.ResourceManager.ProxyResourceOperations<Resource, BaseParameters>.get(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### `ProxyResourceOperations.createOrUpdate` {#Azure.ResourceManager.ProxyResourceOperations<Resource, BaseParameters>.createOrUpdate}
+
+Create or update a resource using the asynchronous call pattern.
 
 ```typespec
 op Azure.ResourceManager.ProxyResourceOperations<Resource, BaseParameters>.createOrUpdate(provider: "Microsoft.ThisWillBeReplaced", resource: Resource): Azure.ResourceManager.ArmResourceUpdatedResponse<Resource> | Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders> | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -462,11 +512,15 @@ op Azure.ResourceManager.ProxyResourceOperations<Resource, BaseParameters>.creat
 
 #### `ProxyResourceOperations.delete` {#Azure.ResourceManager.ProxyResourceOperations<Resource, BaseParameters>.delete}
 
+Delete a resource using the asynchronous call pattern.
+
 ```typespec
 op Azure.ResourceManager.ProxyResourceOperations<Resource, BaseParameters>.delete(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.{ location: string, retryAfter: int32 }> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### `ProxyResourceOperations.listByParent` {#Azure.ResourceManager.ProxyResourceOperations<Resource, BaseParameters>.listByParent}
+
+List resources by parent.
 
 ```typespec
 op Azure.ResourceManager.ProxyResourceOperations<Resource, BaseParameters>.listByParent(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.ResourceListResult<Resource>> | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -489,11 +543,15 @@ interface Azure.ResourceManager.ResourceCollectionOperations<Resource, BaseParam
 
 #### `ResourceCollectionOperations.listByParent` {#Azure.ResourceManager.ResourceCollectionOperations<Resource, BaseParameters>.listByParent}
 
+List resources by parent.
+
 ```typespec
 op Azure.ResourceManager.ResourceCollectionOperations<Resource, BaseParameters>.listByParent(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.ResourceListResult<Resource>> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### `ResourceCollectionOperations.listBySubscription` {#Azure.ResourceManager.ResourceCollectionOperations<Resource, BaseParameters>.listBySubscription}
+
+List resources by subscription.
 
 ```typespec
 op Azure.ResourceManager.ResourceCollectionOperations<Resource, BaseParameters>.listBySubscription(apiVersion: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.ResourceListResult<Resource>> | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -516,6 +574,8 @@ interface Azure.ResourceManager.ResourceCreateAsync<Resource, BaseParameters>
 
 #### `ResourceCreateAsync.createOrUpdate` {#Azure.ResourceManager.ResourceCreateAsync<Resource, BaseParameters>.createOrUpdate}
 
+Create or update a resource using the asynchronous call pattern.
+
 ```typespec
 op Azure.ResourceManager.ResourceCreateAsync<Resource, BaseParameters>.createOrUpdate(provider: "Microsoft.ThisWillBeReplaced", resource: Resource): Azure.ResourceManager.ArmResourceUpdatedResponse<Resource> | Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
@@ -537,6 +597,8 @@ interface Azure.ResourceManager.ResourceCreateSync<Resource, BaseParameters>
 
 #### `ResourceCreateSync.createOrUpdate` {#Azure.ResourceManager.ResourceCreateSync<Resource, BaseParameters>.createOrUpdate}
 
+Create or update a resource using the synchronous call pattern.
+
 ```typespec
 op Azure.ResourceManager.ResourceCreateSync<Resource, BaseParameters>.createOrUpdate(provider: "Microsoft.ThisWillBeReplaced", resource: Resource): Azure.ResourceManager.ArmResourceUpdatedResponse<Resource> | Azure.ResourceManager.ArmResourceCreatedSyncResponse<Resource> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
@@ -546,6 +608,9 @@ op Azure.ResourceManager.ResourceCreateSync<Resource, BaseParameters>.createOrUp
 :::caution
 **Deprecated**: This should be deprecated in a future release
 :::
+
+A composite interface for resources that include a long-running delete operation.
+DEPRECATED: Use ResourceDeleteWithoutOkAsync instead
 
 ```typespec
 interface Azure.ResourceManager.ResourceDeleteAsync<Resource, BaseParameters>
@@ -559,6 +624,8 @@ interface Azure.ResourceManager.ResourceDeleteAsync<Resource, BaseParameters>
 | BaseParameters | The http parameters that are part of the request |
 
 #### `ResourceDeleteAsync.delete` {#Azure.ResourceManager.ResourceDeleteAsync<Resource, BaseParameters>.delete}
+
+Delete a resource using the asynchronous call pattern.
 
 ```typespec
 op Azure.ResourceManager.ResourceDeleteAsync<Resource, BaseParameters>.delete(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.{ location: string, retryAfter: int32 }> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -581,11 +648,16 @@ interface Azure.ResourceManager.ResourceDeleteSync<Resource, BaseParameters>
 
 #### `ResourceDeleteSync.delete` {#Azure.ResourceManager.ResourceDeleteSync<Resource, BaseParameters>.delete}
 
+Delete a resource using the synchronous call pattern.
+
 ```typespec
 op Azure.ResourceManager.ResourceDeleteSync<Resource, BaseParameters>.delete(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 ### `ResourceDeleteWithoutOkAsync` {#Azure.ResourceManager.ResourceDeleteWithoutOkAsync}
+
+A composite interface for resources that include a long-running delete operation
+without returning a final OK response.
 
 ```typespec
 interface Azure.ResourceManager.ResourceDeleteWithoutOkAsync<Resource, BaseParameters>
@@ -599,6 +671,8 @@ interface Azure.ResourceManager.ResourceDeleteWithoutOkAsync<Resource, BaseParam
 | BaseParameters | The http parameters that are part of the request |
 
 #### `ResourceDeleteWithoutOkAsync.delete` {#Azure.ResourceManager.ResourceDeleteWithoutOkAsync<Resource, BaseParameters>.delete}
+
+Delete a resource using the asynchronous call pattern.
 
 ```typespec
 op Azure.ResourceManager.ResourceDeleteWithoutOkAsync<Resource, BaseParameters>.delete(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.{ location: string, retryAfter: int32 }> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -623,11 +697,15 @@ interface Azure.ResourceManager.ResourceInstanceOperations<Resource, Properties,
 
 #### `ResourceInstanceOperations.get` {#Azure.ResourceManager.ResourceInstanceOperations<Resource, Properties, BaseParameters, PatchModel>.get}
 
+Retrieve a resource.
+
 ```typespec
 op Azure.ResourceManager.ResourceInstanceOperations<Resource, Properties, BaseParameters, PatchModel>.get(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### `ResourceInstanceOperations.createOrUpdate` {#Azure.ResourceManager.ResourceInstanceOperations<Resource, Properties, BaseParameters, PatchModel>.createOrUpdate}
+
+Create or update a resource using the asynchronous call pattern.
 
 ```typespec
 op Azure.ResourceManager.ResourceInstanceOperations<Resource, Properties, BaseParameters, PatchModel>.createOrUpdate(provider: "Microsoft.ThisWillBeReplaced", resource: Resource): Azure.ResourceManager.ArmResourceUpdatedResponse<Resource> | Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders> | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -635,11 +713,15 @@ op Azure.ResourceManager.ResourceInstanceOperations<Resource, Properties, BasePa
 
 #### `ResourceInstanceOperations.update` {#Azure.ResourceManager.ResourceInstanceOperations<Resource, Properties, BaseParameters, PatchModel>.update}
 
+Update a resource using the synchronous call pattern.
+
 ```typespec
 op Azure.ResourceManager.ResourceInstanceOperations<Resource, Properties, BaseParameters, PatchModel>.update(provider: "Microsoft.ThisWillBeReplaced", properties: Azure.ResourceManager.Foundations.ResourceUpdateModel<Resource, Properties>): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### `ResourceInstanceOperations.delete` {#Azure.ResourceManager.ResourceInstanceOperations<Resource, Properties, BaseParameters, PatchModel>.delete}
+
+Delete a resource using the asynchronous call pattern.
 
 ```typespec
 op Azure.ResourceManager.ResourceInstanceOperations<Resource, Properties, BaseParameters, PatchModel>.delete(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.{ location: string, retryAfter: int32 }> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -664,6 +746,8 @@ interface Azure.ResourceManager.ResourceListByParent<Resource, BaseParameters, P
 
 #### `ResourceListByParent.listByParent` {#Azure.ResourceManager.ResourceListByParent<Resource, BaseParameters, ParentName, ParentFriendlyName>.listByParent}
 
+List resources by parent.
+
 ```typespec
 op Azure.ResourceManager.ResourceListByParent<Resource, BaseParameters, ParentName, ParentFriendlyName>.listByParent(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.ResourceListResult<Resource>> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
@@ -683,6 +767,8 @@ interface Azure.ResourceManager.ResourceListBySubscription<Resource>
 | Resource | The ArmResource that provides these operations |
 
 #### `ResourceListBySubscription.listBySubscription` {#Azure.ResourceManager.ResourceListBySubscription<Resource>.listBySubscription}
+
+List resources by subscription.
 
 ```typespec
 op Azure.ResourceManager.ResourceListBySubscription<Resource>.listBySubscription(apiVersion: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.ResourceListResult<Resource>> | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -708,11 +794,15 @@ interface Azure.ResourceManager.ResourceOperations<Resource, Properties, BasePar
 
 #### `ResourceOperations.get` {#Azure.ResourceManager.ResourceOperations<Resource, Properties, BaseParameters>.get}
 
+Retrieve a resource.
+
 ```typespec
 op Azure.ResourceManager.ResourceOperations<Resource, Properties, BaseParameters>.get(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### `ResourceOperations.createOrUpdate` {#Azure.ResourceManager.ResourceOperations<Resource, Properties, BaseParameters>.createOrUpdate}
+
+Create or update a resource using the asynchronous call pattern.
 
 ```typespec
 op Azure.ResourceManager.ResourceOperations<Resource, Properties, BaseParameters>.createOrUpdate(provider: "Microsoft.ThisWillBeReplaced", resource: Resource): Azure.ResourceManager.ArmResourceUpdatedResponse<Resource> | Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders> | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -720,11 +810,15 @@ op Azure.ResourceManager.ResourceOperations<Resource, Properties, BaseParameters
 
 #### `ResourceOperations.update` {#Azure.ResourceManager.ResourceOperations<Resource, Properties, BaseParameters>.update}
 
+Update a resource using the synchronous call pattern.
+
 ```typespec
 op Azure.ResourceManager.ResourceOperations<Resource, Properties, BaseParameters>.update(provider: "Microsoft.ThisWillBeReplaced", properties: Azure.ResourceManager.Foundations.ResourceUpdateModel<Resource, Properties>): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### `ResourceOperations.delete` {#Azure.ResourceManager.ResourceOperations<Resource, Properties, BaseParameters>.delete}
+
+Delete a resource using the asynchronous call pattern.
 
 ```typespec
 op Azure.ResourceManager.ResourceOperations<Resource, Properties, BaseParameters>.delete(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.{ location: string, retryAfter: int32 }> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -732,11 +826,15 @@ op Azure.ResourceManager.ResourceOperations<Resource, Properties, BaseParameters
 
 #### `ResourceOperations.listByParent` {#Azure.ResourceManager.ResourceOperations<Resource, Properties, BaseParameters>.listByParent}
 
+List resources by parent.
+
 ```typespec
 op Azure.ResourceManager.ResourceOperations<Resource, Properties, BaseParameters>.listByParent(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.ResourceListResult<Resource>> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### `ResourceOperations.listBySubscription` {#Azure.ResourceManager.ResourceOperations<Resource, Properties, BaseParameters>.listBySubscription}
+
+List resources by subscription.
 
 ```typespec
 op Azure.ResourceManager.ResourceOperations<Resource, Properties, BaseParameters>.listBySubscription(apiVersion: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.ResourceListResult<Resource>> | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -759,11 +857,15 @@ interface Azure.ResourceManager.ResourceRead<Resource, BaseParameters>
 
 #### `ResourceRead.get` {#Azure.ResourceManager.ResourceRead<Resource, BaseParameters>.get}
 
+Retrieve a resource.
+
 ```typespec
 op Azure.ResourceManager.ResourceRead<Resource, BaseParameters>.get(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 ### `ResourceUpdateAsync` {#Azure.ResourceManager.ResourceUpdateAsync}
+
+A composite interface for resources that include a long-running update operation.
 
 ```typespec
 interface Azure.ResourceManager.ResourceUpdateAsync<Resource, Properties, BaseParameters>
@@ -778,6 +880,8 @@ interface Azure.ResourceManager.ResourceUpdateAsync<Resource, Properties, BasePa
 | BaseParameters | The http parameters that are part of the request |
 
 #### `ResourceUpdateAsync.update` {#Azure.ResourceManager.ResourceUpdateAsync<Resource, Properties, BaseParameters>.update}
+
+Update a resource using the asynchronous call pattern.
 
 ```typespec
 op Azure.ResourceManager.ResourceUpdateAsync<Resource, Properties, BaseParameters>.update(provider: "Microsoft.ThisWillBeReplaced", properties: Azure.ResourceManager.Foundations.ResourceUpdateModel<Resource, Properties>): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.ArmAcceptedLroResponse<"Resource update request accepted.", Azure.ResourceManager.{ location: string, retryAfter: int32 }> | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -800,6 +904,8 @@ interface Azure.ResourceManager.ResourceUpdateSync<Resource, Properties, BasePar
 | BaseParameters | The http parameters that are part of the request |
 
 #### `ResourceUpdateSync.update` {#Azure.ResourceManager.ResourceUpdateSync<Resource, Properties, BaseParameters>.update}
+
+Update a resource using the synchronous call pattern.
 
 ```typespec
 op Azure.ResourceManager.ResourceUpdateSync<Resource, Properties, BaseParameters>.update(provider: "Microsoft.ThisWillBeReplaced", properties: Azure.ResourceManager.Foundations.ResourceUpdateModel<Resource, Properties>): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -828,11 +934,15 @@ interface Azure.ResourceManager.TenantResourceOperations<Resource, Properties>
 
 #### `TenantResourceOperations.get` {#Azure.ResourceManager.TenantResourceOperations<Resource, Properties>.get}
 
+Retrieve a resource.
+
 ```typespec
 op Azure.ResourceManager.TenantResourceOperations<Resource, Properties>.get(apiVersion: string, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### `TenantResourceOperations.createOrUpdate` {#Azure.ResourceManager.TenantResourceOperations<Resource, Properties>.createOrUpdate}
+
+Create or update a resource using the asynchronous call pattern.
 
 ```typespec
 op Azure.ResourceManager.TenantResourceOperations<Resource, Properties>.createOrUpdate(apiVersion: string, provider: "Microsoft.ThisWillBeReplaced", resource: Resource): Azure.ResourceManager.ArmResourceUpdatedResponse<Resource> | Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders> | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -840,17 +950,23 @@ op Azure.ResourceManager.TenantResourceOperations<Resource, Properties>.createOr
 
 #### `TenantResourceOperations.update` {#Azure.ResourceManager.TenantResourceOperations<Resource, Properties>.update}
 
+Update a resource using the synchronous call pattern.
+
 ```typespec
 op Azure.ResourceManager.TenantResourceOperations<Resource, Properties>.update(apiVersion: string, provider: "Microsoft.ThisWillBeReplaced", properties: Azure.ResourceManager.Foundations.ResourceUpdateModel<Resource, Properties>): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### `TenantResourceOperations.delete` {#Azure.ResourceManager.TenantResourceOperations<Resource, Properties>.delete}
 
+Delete a resource using the asynchronous call pattern.
+
 ```typespec
 op Azure.ResourceManager.TenantResourceOperations<Resource, Properties>.delete(apiVersion: string, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.{ location: string, retryAfter: int32 }> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### `TenantResourceOperations.listByParent` {#Azure.ResourceManager.TenantResourceOperations<Resource, Properties>.listByParent}
+
+List resources by parent.
 
 ```typespec
 op Azure.ResourceManager.TenantResourceOperations<Resource, Properties>.listByParent(apiVersion: string, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.ResourceListResult<Resource>> | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -877,11 +993,15 @@ interface Azure.ResourceManager.TrackedResourceOperations<Resource, Properties, 
 
 #### `TrackedResourceOperations.get` {#Azure.ResourceManager.TrackedResourceOperations<Resource, Properties, BaseParameters>.get}
 
+Retrieve a resource.
+
 ```typespec
 op Azure.ResourceManager.TrackedResourceOperations<Resource, Properties, BaseParameters>.get(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### `TrackedResourceOperations.createOrUpdate` {#Azure.ResourceManager.TrackedResourceOperations<Resource, Properties, BaseParameters>.createOrUpdate}
+
+Create or update a resource using the asynchronous call pattern.
 
 ```typespec
 op Azure.ResourceManager.TrackedResourceOperations<Resource, Properties, BaseParameters>.createOrUpdate(provider: "Microsoft.ThisWillBeReplaced", resource: Resource): Azure.ResourceManager.ArmResourceUpdatedResponse<Resource> | Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders> | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -889,11 +1009,15 @@ op Azure.ResourceManager.TrackedResourceOperations<Resource, Properties, BasePar
 
 #### `TrackedResourceOperations.update` {#Azure.ResourceManager.TrackedResourceOperations<Resource, Properties, BaseParameters>.update}
 
+Update a resource using the synchronous call pattern.
+
 ```typespec
 op Azure.ResourceManager.TrackedResourceOperations<Resource, Properties, BaseParameters>.update(provider: "Microsoft.ThisWillBeReplaced", properties: Azure.ResourceManager.Foundations.ResourceUpdateModel<Resource, Properties>): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### `TrackedResourceOperations.delete` {#Azure.ResourceManager.TrackedResourceOperations<Resource, Properties, BaseParameters>.delete}
+
+Delete a resource using the asynchronous call pattern.
 
 ```typespec
 op Azure.ResourceManager.TrackedResourceOperations<Resource, Properties, BaseParameters>.delete(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmDeletedResponse | Azure.ResourceManager.ArmDeleteAcceptedLroResponse<Azure.ResourceManager.{ location: string, retryAfter: int32 }> | Azure.ResourceManager.ArmDeletedNoContentResponse | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -901,17 +1025,23 @@ op Azure.ResourceManager.TrackedResourceOperations<Resource, Properties, BasePar
 
 #### `TrackedResourceOperations.listByParent` {#Azure.ResourceManager.TrackedResourceOperations<Resource, Properties, BaseParameters>.listByParent}
 
+List resources by parent.
+
 ```typespec
 op Azure.ResourceManager.TrackedResourceOperations<Resource, Properties, BaseParameters>.listByParent(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.ResourceListResult<Resource>> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### `TrackedResourceOperations.listBySubscription` {#Azure.ResourceManager.TrackedResourceOperations<Resource, Properties, BaseParameters>.listBySubscription}
 
+List resources by subscription.
+
 ```typespec
 op Azure.ResourceManager.TrackedResourceOperations<Resource, Properties, BaseParameters>.listBySubscription(apiVersion: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.ResourceListResult<Resource>> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 ### `ActionAsync` {#Azure.ResourceManager.ActionAsync}
+
+The _standard_ long-running resource action.
 
 ```typespec
 op Azure.ResourceManager.ActionAsync(body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Error
@@ -1009,6 +1139,8 @@ op Azure.ResourceManager.ArmListBySubscriptionScope(apiVersion: string, subscrip
 
 ### `ArmProviderActionAsync` {#Azure.ResourceManager.ArmProviderActionAsync}
 
+A long-running provider action.
+
 ```typespec
 op Azure.ResourceManager.ArmProviderActionAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, location: string, resourceGroupName: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced", body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Response | Error
 ```
@@ -1027,6 +1159,8 @@ op Azure.ResourceManager.ArmProviderActionAsync(apiVersion: string, subscription
 
 ### `ArmProviderActionSync` {#Azure.ResourceManager.ArmProviderActionSync}
 
+A provider action performed over a tenant
+
 ```typespec
 op Azure.ResourceManager.ArmProviderActionSync(apiVersion: string, subscriptionId: Azure.Core.uuid, location: string, resourceGroupName: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced", body: Request): Response | Error
 ```
@@ -1043,6 +1177,8 @@ op Azure.ResourceManager.ArmProviderActionSync(apiVersion: string, subscriptionI
 | OptionalRequestBody | Optional. Indicates whether the request body is optional.                                             |
 
 ### `ArmResourceActionAsync` {#Azure.ResourceManager.ArmResourceActionAsync}
+
+A long-running resource action.
 
 ```typespec
 op Azure.ResourceManager.ArmResourceActionAsync(body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Response | Error
@@ -1085,6 +1221,8 @@ op Azure.ResourceManager.ArmResourceActionAsyncBase(body: Request): Response | E
 
 ### `ArmResourceActionNoContentAsync` {#Azure.ResourceManager.ArmResourceActionNoContentAsync}
 
+A long-running resource action that returns no content. DEPRECATED: Use 'ArmResourceActionNoResponseContentAsync' instead
+
 ```typespec
 op Azure.ResourceManager.ArmResourceActionNoContentAsync(body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Azure.ResourceManager.ArmNoContentResponse<"Action completed successfully."> | Error
 ```
@@ -1123,6 +1261,8 @@ op Azure.ResourceManager.ArmResourceActionNoContentSync(body: Request): Azure.Re
 | Provider            | Optional. The provider namespace model for the resource.     |
 
 ### `ArmResourceActionNoResponseContentAsync` {#Azure.ResourceManager.ArmResourceActionNoResponseContentAsync}
+
+A long-running resource action that returns no content.
 
 ```typespec
 op Azure.ResourceManager.ArmResourceActionNoResponseContentAsync(body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Error
@@ -1182,6 +1322,8 @@ op Azure.ResourceManager.ArmResourceCheckExistence(): Response | Error
 | Provider       | Optional. The provider namespace model for the resource.  |
 
 ### `ArmResourceCreateOrReplaceAsync` {#Azure.ResourceManager.ArmResourceCreateOrReplaceAsync}
+
+A long-running resource CreateOrUpdate (PUT)
 
 ```typespec
 op Azure.ResourceManager.ArmResourceCreateOrReplaceAsync(resource: Resource): Response | Error
@@ -1267,6 +1409,8 @@ op Azure.ResourceManager.ArmResourceCreateOrUpdateSync(resource: Resource): Resp
 **Deprecated**: Use 'ArmResourceDeleteWithoutOkAsync' instead
 :::
 
+Delete a resource asynchronously. DEPRECATED: Use ArmResourceDeleteWithoutOkAsync instead
+
 ```typespec
 op Azure.ResourceManager.ArmResourceDeleteAsync(): Response | Error
 ```
@@ -1284,6 +1428,8 @@ op Azure.ResourceManager.ArmResourceDeleteAsync(): Response | Error
 | Provider       | Optional. The provider namespace model for the resource.         |
 
 ### `ArmResourceDeleteAsyncBase` {#Azure.ResourceManager.ArmResourceDeleteAsyncBase}
+
+Delete a resource asynchronously
 
 ```typespec
 op Azure.ResourceManager.ArmResourceDeleteAsyncBase(): Response | Error
@@ -1320,6 +1466,8 @@ op Azure.ResourceManager.ArmResourceDeleteSync(): Response | Error
 | Provider       | Optional. The provider namespace model for the resource.     |
 
 ### `ArmResourceDeleteWithoutOkAsync` {#Azure.ResourceManager.ArmResourceDeleteWithoutOkAsync}
+
+Delete a resource asynchronously
 
 ```typespec
 op Azure.ResourceManager.ArmResourceDeleteWithoutOkAsync(): Response | Error
@@ -1379,6 +1527,8 @@ op Azure.ResourceManager.ArmResourceListByParent(): Response | Error
 
 ### `ArmResourcePatchAsync` {#Azure.ResourceManager.ArmResourcePatchAsync}
 
+A long-running resource update using the items from the resource marked with Lifecycle.Update visibility
+
 ```typespec
 op Azure.ResourceManager.ArmResourcePatchAsync(properties: Resource): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
@@ -1395,6 +1545,8 @@ op Azure.ResourceManager.ArmResourcePatchAsync(properties: Resource): Azure.Reso
 | Provider       | Optional. The provider namespace model for the resource.                      |
 
 ### `ArmResourcePatchSync` {#Azure.ResourceManager.ArmResourcePatchSync}
+
+A resource update using the items from the resource marked with Lifecycle.Update visibility
 
 ```typespec
 op Azure.ResourceManager.ArmResourcePatchSync(properties: Resource): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -1431,6 +1583,8 @@ op Azure.ResourceManager.ArmResourceRead(): Response | Error
 
 ### `ArmTagsPatchAsync` {#Azure.ResourceManager.ArmTagsPatchAsync}
 
+A long-running resource update that only allows updating resource tags (the minimum)
+
 ```typespec
 op Azure.ResourceManager.ArmTagsPatchAsync(properties: Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
@@ -1448,6 +1602,8 @@ op Azure.ResourceManager.ArmTagsPatchAsync(properties: Azure.ResourceManager.Fou
 
 ### `ArmTagsPatchSync` {#Azure.ResourceManager.ArmTagsPatchSync}
 
+A resource update that only allows updating resource tags (the minimum)
+
 ```typespec
 op Azure.ResourceManager.ArmTagsPatchSync(properties: Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
@@ -1463,6 +1619,10 @@ op Azure.ResourceManager.ArmTagsPatchSync(properties: Azure.ResourceManager.Foun
 
 ### `checkGlobalNameAvailability` {#Azure.ResourceManager.checkGlobalNameAvailability}
 
+Adds check global name availability operation, normally used if
+a resource name must be globally unique (for example, if the resource
+exposes and endpoint that uses the resource name in the url)
+
 ```typespec
 op Azure.ResourceManager.checkGlobalNameAvailability(apiVersion: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced", body: Request): Response | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
@@ -1476,6 +1636,10 @@ op Azure.ResourceManager.checkGlobalNameAvailability(apiVersion: string, subscri
 | AdditionalParams | A model specifying additional non-path parameters to the availability request                 |
 
 ### `checkLocalNameAvailability` {#Azure.ResourceManager.checkLocalNameAvailability}
+
+Adds check location-specific name availability operation, normally used if
+a resource name must be globally unique (for example, if the resource
+exposes and endpoint that uses the resource name in the url)
 
 ```typespec
 op Azure.ResourceManager.checkLocalNameAvailability(apiVersion: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced", location: Azure.Core.azureLocation, body: Request): Response | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -1533,6 +1697,8 @@ interface Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfig
 
 #### `NspConfigurationOperations.ListByParent` {#Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName, ResourceParameter>.ListByParent}
 
+List the network security perimeter configurations to a resource
+
 ```typespec
 op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName, ResourceParameter>.ListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
@@ -1550,6 +1716,8 @@ op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfiguration
 | OverrideResourceName | Optional. The name of the network security perimeter configuration resource being operated on. |
 
 #### `NspConfigurationOperations.ListSinglePageByParent` {#Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName, ResourceParameter>.ListSinglePageByParent}
+
+List the network security parameter configuration for a resource without pagination - this should only be used for legacy operations
 
 ```typespec
 op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName, ResourceParameter>.ListSinglePageByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
@@ -1569,6 +1737,8 @@ op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfiguration
 
 #### `NspConfigurationOperations.Read` {#Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName, ResourceParameter>.Read}
 
+GET a network security perimeter configuration for a particular resource
+
 ```typespec
 op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName, ResourceParameter>.Read(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
@@ -1587,6 +1757,8 @@ op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfiguration
 | OverrideResourceName | Optional. The name of the network security perimeter configuration resource being operated on.                           |
 
 #### `NspConfigurationOperations.Action` {#Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName, ResourceParameter>.Action}
+
+Perform an action on a network security perimeter configuration for a particular resource
 
 ```typespec
 op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName, ResourceParameter>.Action(provider: "Microsoft.ThisWillBeReplaced", body: Request): Response | Error
@@ -1608,6 +1780,8 @@ op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfiguration
 | OptionalRequestBody  | Optional. Indicates if the request body is optional.                                                                     |
 
 #### `NspConfigurationOperations.ActionAsync` {#Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName, ResourceParameter>.ActionAsync}
+
+Perform an action on a network security perimeter configuration for a particular resource
 
 ```typespec
 op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName, ResourceParameter>.ActionAsync(provider: "Microsoft.ThisWillBeReplaced", body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Response | Error
@@ -1645,6 +1819,8 @@ interface Employees {
 ## Azure.ResourceManager.Extension
 
 ### `ActionAsync` {#Azure.ResourceManager.Extension.ActionAsync}
+
+A long-running resource action.
 
 ```typespec
 op Azure.ResourceManager.Extension.ActionAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.TargetProviderNamespace", extensionProvider: "Microsoft.ExtensionProviderNamespace", body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Response | Error
@@ -1707,6 +1883,8 @@ op Azure.ResourceManager.Extension.ActionNoContentSync(apiVersion: string, subsc
 
 ### `ActionNoResponseContentAsync` {#Azure.ResourceManager.Extension.ActionNoResponseContentAsync}
 
+A long-running resource action that returns no content.
+
 ```typespec
 op Azure.ResourceManager.Extension.ActionNoResponseContentAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.TargetProviderNamespace", extensionProvider: "Microsoft.ExtensionProviderNamespace", body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Error
 ```
@@ -1765,6 +1943,8 @@ op Azure.ResourceManager.Extension.CheckExistence(apiVersion: string, subscripti
 | OverrideResourceName | Optional. Allows overriding the resource name for this scope in generated clients.                       |
 
 ### `CreateOrReplaceAsync` {#Azure.ResourceManager.Extension.CreateOrReplaceAsync}
+
+A long-running resource CreateOrUpdate (PUT)
 
 ```typespec
 op Azure.ResourceManager.Extension.CreateOrReplaceAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.TargetProviderNamespace", extensionProvider: "Microsoft.ExtensionProviderNamespace", resource: ExtensionResource): Response | Error
@@ -1868,6 +2048,8 @@ op Azure.ResourceManager.Extension.CustomPatchSync(apiVersion: string, subscript
 **Deprecated**: Use 'DeleteWithoutOkAsync' instead
 :::
 
+Delete a resource asynchronously.
+
 ```typespec
 op Azure.ResourceManager.Extension.DeleteAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.TargetProviderNamespace", extensionProvider: "Microsoft.ExtensionProviderNamespace"): Response | Error
 ```
@@ -1885,6 +2067,8 @@ op Azure.ResourceManager.Extension.DeleteAsync(apiVersion: string, subscriptionI
 | OverrideResourceName | Optional. Allows overriding the resource name for this scope in generated clients.                       |
 
 ### `DeleteAsyncBase` {#Azure.ResourceManager.Extension.DeleteAsyncBase}
+
+Delete a resource asynchronously
 
 ```typespec
 op Azure.ResourceManager.Extension.DeleteAsyncBase(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.TargetProviderNamespace", extensionProvider: "Microsoft.ExtensionProviderNamespace"): Response | Error
@@ -1921,6 +2105,8 @@ op Azure.ResourceManager.Extension.DeleteSync(apiVersion: string, subscriptionId
 | OverrideResourceName | Optional. Allows overriding the resource name for this scope in generated clients.                       |
 
 ### `DeleteWithoutOkAsync` {#Azure.ResourceManager.Extension.DeleteWithoutOkAsync}
+
+Delete a resource asynchronously
 
 ```typespec
 op Azure.ResourceManager.Extension.DeleteWithoutOkAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.TargetProviderNamespace", extensionProvider: "Microsoft.ExtensionProviderNamespace"): Response | Error
@@ -1980,6 +2166,8 @@ op Azure.ResourceManager.Extension.Read(apiVersion: string, subscriptionId: Azur
 
 ### `ArmCreateOperation` {#Azure.ResourceManager.Foundations.ArmCreateOperation}
 
+The base template for Azure Resource Manager PUT Operations.
+
 ```typespec
 op Azure.ResourceManager.Foundations.ArmCreateOperation(resource: BodyParameter): Response | ErrorResponse
 ```
@@ -1995,6 +2183,8 @@ op Azure.ResourceManager.Foundations.ArmCreateOperation(resource: BodyParameter)
 
 ### `ArmReadOperation` {#Azure.ResourceManager.Foundations.ArmReadOperation}
 
+The base template for Azure Resource Manager GET and HEAD Operations.
+
 ```typespec
 op Azure.ResourceManager.Foundations.ArmReadOperation(): Response | ErrorResponse
 ```
@@ -2008,6 +2198,8 @@ op Azure.ResourceManager.Foundations.ArmReadOperation(): Response | ErrorRespons
 | ErrorResponse | The error response.                             |
 
 ### `ArmUpdateOperation` {#Azure.ResourceManager.Foundations.ArmUpdateOperation}
+
+The base template for Azure Resource Manager PATCH Operations.
 
 ```typespec
 op Azure.ResourceManager.Foundations.ArmUpdateOperation(properties: BodyParameter): Response | ErrorResponse
@@ -2186,6 +2378,8 @@ op Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionP
 | OverrideResourceName | Optional. The name of the resource type at this scope in clients. |
 
 #### `ExtensionOperations.Read` {#Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters, ResourceName>.Read}
+
+Get a resource
 
 ```typespec
 op Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters, ResourceName>.Read(): Response | ErrorType
@@ -2370,6 +2564,8 @@ op Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeP
 ```
 
 #### `LegacyOperations.Read` {#Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.Read}
+
+Get a resource
 
 ```typespec
 op Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.Read(): Response | OverrideErrorType
@@ -2586,6 +2782,8 @@ op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeP
 
 #### `RoutedOperations.Read` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.Read}
 
+Get a resource
+
 ```typespec
 op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.Read(): Response | OverrideErrorType
 ```
@@ -2741,6 +2939,8 @@ op Azure.ResourceManager.Legacy.ArmListSinglePageBySubscription(apiVersion: stri
 
 ### `CreateOperation` {#Azure.ResourceManager.Legacy.CreateOperation}
 
+The base template for Azure Resource Manager PUT Operations.
+
 ```typespec
 op Azure.ResourceManager.Legacy.CreateOperation(resource: BodyParameter): Response | ErrorResponse
 ```
@@ -2838,6 +3038,8 @@ op Azure.ResourceManager.Legacy.CustomPatchSync(provider: "Microsoft.ThisWillBeR
 | OptionalRequestBody | Optional. Indicates whether the request body is optional  |
 
 ### `UpdateOperation` {#Azure.ResourceManager.Legacy.UpdateOperation}
+
+The base template for Legacy Azure Resource Manager PATCH Operations.
 
 ```typespec
 op Azure.ResourceManager.Legacy.UpdateOperation(properties: BodyParameter): Response | ErrorResponse
@@ -2945,6 +3147,8 @@ op Azure.ResourceManager.Legacy.Extension.CustomPatchSync(apiVersion: string, su
 
 ### `CreateOrReplaceAsync` {#Azure.ResourceManager.Legacy.PrivateEndpoints.CreateOrReplaceAsync}
 
+A long-running resource CreateOrUpdate (PUT) for a PrivateEndpointConnection to a resource
+
 ```typespec
 op Azure.ResourceManager.Legacy.PrivateEndpoints.CreateOrReplaceAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Request): Response | Error
 ```
@@ -2964,6 +3168,8 @@ op Azure.ResourceManager.Legacy.PrivateEndpoints.CreateOrReplaceAsync(provider: 
 | Request             | Optional. The request body for the operation.                           |
 
 ### `CreateOrReplaceSync` {#Azure.ResourceManager.Legacy.PrivateEndpoints.CreateOrReplaceSync}
+
+Synchronous PUT operation for a Private endpoint connection to a resource
 
 ```typespec
 op Azure.ResourceManager.Legacy.PrivateEndpoints.CreateOrReplaceSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Request): Response | Error
@@ -3006,6 +3212,8 @@ op Azure.ResourceManager.Legacy.PrivateEndpoints.CustomPatchAsync(provider: "Mic
 
 ### `CustomPatchSync` {#Azure.ResourceManager.Legacy.PrivateEndpoints.CustomPatchSync}
 
+A resource update using a custom PATCH payload (synchronous) to update a PrivateEndpointConnection to a resource
+
 ```typespec
 op Azure.ResourceManager.Legacy.PrivateEndpoints.CustomPatchSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, properties: PatchModel): Response | Error
 ```
@@ -3024,6 +3232,8 @@ op Azure.ResourceManager.Legacy.PrivateEndpoints.CustomPatchSync(provider: "Micr
 | OptionalRequestBody | Optional. Indicates whether the request body is optional.      |
 
 ### `ListSinglePageByParent` {#Azure.ResourceManager.Legacy.PrivateEndpoints.ListSinglePageByParent}
+
+List the private endpoint connections over a resource
 
 ```typespec
 op Azure.ResourceManager.Legacy.PrivateEndpoints.ListSinglePageByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error

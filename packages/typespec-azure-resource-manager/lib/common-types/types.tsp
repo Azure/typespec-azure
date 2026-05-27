@@ -344,7 +344,7 @@ union createdByType {
   string,
 }
 
-/** @dev Resource Identity Type */
+/** Resource Identity Type */
 @doc("")
 union ResourceIdentityType {
   SystemAssigned: "SystemAssigned",
@@ -369,7 +369,7 @@ model Identity {
   type?: ResourceIdentityType;
 }
 
-/** @dev Properties of a KeyVault */
+/** Properties of a KeyVault */
 model KeyVaultProperties {
   /** Key vault uri to access the encryption key. */
   keyIdentifier?: string;

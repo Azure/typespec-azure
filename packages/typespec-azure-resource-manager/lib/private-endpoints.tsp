@@ -56,7 +56,7 @@ interface PrivateEndpoints<
   ResourceParameter extends {} = CommonTypes.PrivateEndpointConnectionParameter
 > {
   /**
-   * @dev List the private endpoint connections over a resource
+   * List the private endpoint connections over a resource
    * @template ParentResource the parent resource of the PrivateEndpointConnection
    * @template Resource Optional. The PrivateEndpointConnection resource being listed
    * @template BaseParameters Optional. Allows overriding the operation parameters
@@ -90,7 +90,7 @@ interface PrivateEndpoints<
   >;
 
   /**
-   * @dev GET the a private endpoint connection for a particular resource
+   * GET the a private endpoint connection for a particular resource
    * @template ParentResource the parent resource of the PrivateEndpointConnection
    * @template Resource the PrivateEndpointConnection resource being read
    * @template BaseParameters Optional. Allows overriding the operation parameters
@@ -120,7 +120,7 @@ interface PrivateEndpoints<
   >;
 
   /**
-   * @dev A long-running resource CreateOrUpdate (PUT) for a PrivateEndpointConnection to a resource
+   * A long-running resource CreateOrUpdate (PUT) for a PrivateEndpointConnection to a resource
    * @template ParentResource the parent resource of the PrivateEndpointConnection
    * @template Resource the PrivateEndpointConnection resource being created or updated
    * @template BaseParameters Optional. Allows overriding the operation parameters
@@ -143,9 +143,10 @@ interface PrivateEndpoints<
     LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = Resource> &
       Azure.Core.Foundations.RetryAfterHeader,
     Parameters extends {} = {},
-    Response extends {} =
-      | ArmResourceUpdatedResponse<Resource>
-      | ArmResourceCreatedResponse<Resource, LroHeaders>,
+    Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
+      Resource,
+      LroHeaders
+    >,
     Error extends {} = ErrorResponse,
     OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmCreateOperation<
@@ -158,7 +159,7 @@ interface PrivateEndpoints<
   >;
 
   /**
-   * @dev Synchronous PUT operation for a Private endpoint connection to a resource
+   * Synchronous PUT operation for a Private endpoint connection to a resource
    * @template ParentResource the parent resource of the PrivateEndpointConnection
    * @template Resource the PrivateEndpointConnection resource being created or updated
    * @template BaseParameters Optional. Allows overriding the operation parameters
@@ -177,9 +178,7 @@ interface PrivateEndpoints<
     Resource extends PrivateEndpointConnectionResource = PrivateEndpointResource,
     BaseParameters = DefaultBaseParameters<ParentResource>,
     Parameters extends {} = {},
-    Response extends {} =
-      | ArmResourceUpdatedResponse<Resource>
-      | ArmResourceCreatedSyncResponse<Resource>,
+    Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedSyncResponse<Resource>,
     Error extends {} = ErrorResponse,
     OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmCreateOperation<
@@ -192,7 +191,7 @@ interface PrivateEndpoints<
   >;
 
   /**
-   * @dev A long-running resource CreateOrUpdate (PUT) for a PrivateEndpointConnection to a resource
+   * A long-running resource CreateOrUpdate (PUT) for a PrivateEndpointConnection to a resource
    * @template ParentResource the parent resource of the PrivateEndpointConnection
    * @template Resource the PrivateEndpointConnection resource being created or updated
    * @template BaseParameters Optional. Allows overriding the operation parameters
@@ -214,9 +213,10 @@ interface PrivateEndpoints<
     LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = Resource> &
       Azure.Core.Foundations.RetryAfterHeader,
     Parameters extends {} = {},
-    Response extends {} =
-      | ArmResourceUpdatedResponse<Resource>
-      | ArmResourceCreatedResponse<Resource, LroHeaders>,
+    Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
+      Resource,
+      LroHeaders
+    >,
     Error extends {} = ErrorResponse,
     OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmCreateOperation<
@@ -257,9 +257,10 @@ interface PrivateEndpoints<
     > &
       Azure.Core.Foundations.RetryAfterHeader,
     Parameters extends {} = {},
-    Response extends {} =
-      | ArmResponse<Resource>
-      | ArmAcceptedLroResponse<"Resource update request accepted.", LroHeaders>,
+    Response extends {} = ArmResponse<Resource> | ArmAcceptedLroResponse<
+      "Resource update request accepted.",
+      LroHeaders
+    >,
     Error extends {} = ErrorResponse,
     OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmUpdateOperation<
@@ -272,7 +273,7 @@ interface PrivateEndpoints<
   >;
 
   /**
-   * @dev A resource update using a custom PATCH payload (synchronous) to update a PrivateEndpointConnection to a resource
+   * A resource update using a custom PATCH payload (synchronous) to update a PrivateEndpointConnection to a resource
    * @template ParentResource The parent resource of the PrivateEndpointConnection
    * @template Resource Optional. The PrivateEndpointConnection resource being patched
    * @template PatchModel The input model for the PATCH request
@@ -306,7 +307,7 @@ interface PrivateEndpoints<
   >;
 
   /**
-   * @dev Delete a PrivateEndpointConnection to a resource asynchronously
+   * Delete a PrivateEndpointConnection to a resource asynchronously
    * @template ParentResource The parent resource of the PrivateEndpointConnection
    * @template Resource Optional. The PrivateEndpointConnection resource being deleted
    * @template BaseParameters Optional. Allows overriding the parameters for the operation
@@ -338,7 +339,7 @@ interface PrivateEndpoints<
   ): Response | Error;
 
   /**
-   * @dev Delete a PrivateEndpointConnection to a resource synchronously
+   * Delete a PrivateEndpointConnection to a resource synchronously
    * @template ParentResource The parent resource of the PrivateEndpointConnection
    * @template Resource The PrivateEndpointConnection resource being deleted
    * @template BaseParameters Optional. Allows overriding the parameters for the operation
@@ -367,7 +368,7 @@ interface PrivateEndpoints<
   ): Response | Error;
 
   /**
-   * @dev Delete a PrivateEndpointConnection to a resource asynchronously
+   * Delete a PrivateEndpointConnection to a resource asynchronously
    * @template ParentResource The parent resource of the PrivateEndpointConnection
    * @template Response The response type for the operation
    * @template Resource Optional. The PrivateEndpointConnection resource being deleted

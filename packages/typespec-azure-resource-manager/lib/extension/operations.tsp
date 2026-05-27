@@ -127,9 +127,10 @@ op CreateOrUpdateAsync<
   LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = ExtensionResource> &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} =
-    | ArmResourceUpdatedResponse<ExtensionResource>
-    | ArmResourceCreatedResponse<ExtensionResource, LroHeaders>,
+  Response extends {} = ArmResourceUpdatedResponse<ExtensionResource> | ArmResourceCreatedResponse<
+    ExtensionResource,
+    LroHeaders
+  >,
   Error extends {} = ErrorResponse,
   OverrideResourceName extends valueof string = ""
 > is ArmCreateOperation<
@@ -163,9 +164,7 @@ op CreateOrReplaceSync<
   TargetResource extends Foundations.SimpleResource,
   ExtensionResource extends Foundations.SimpleResource,
   Parameters extends {} = {},
-  Response extends {} =
-    | ArmResourceUpdatedResponse<ExtensionResource>
-    | ArmResourceCreatedSyncResponse<ExtensionResource>,
+  Response extends {} = ArmResourceUpdatedResponse<ExtensionResource> | ArmResourceCreatedSyncResponse<ExtensionResource>,
   Error extends {} = ErrorResponse,
   OverrideResourceName extends valueof string = ""
 > is ArmCreateOperation<
@@ -176,7 +175,7 @@ op CreateOrReplaceSync<
 >;
 
 /**
- * @dev A long-running resource CreateOrUpdate (PUT)
+ * A long-running resource CreateOrUpdate (PUT)
  * @template TargetResource the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup
  * @template ExtensionResource the resource being created or replaced
  * @template LroHeaders Optional.  Allows overriding the lro headers returned on resource create
@@ -201,9 +200,10 @@ op CreateOrReplaceAsync<
   LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = ExtensionResource> &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} =
-    | ArmResourceUpdatedResponse<ExtensionResource>
-    | ArmResourceCreatedResponse<ExtensionResource, LroHeaders>,
+  Response extends {} = ArmResourceUpdatedResponse<ExtensionResource> | ArmResourceCreatedResponse<
+    ExtensionResource,
+    LroHeaders
+  >,
   Error extends {} = ErrorResponse,
   OverrideResourceName extends valueof string = ""
 > is CreateOrUpdateAsync<
@@ -244,9 +244,10 @@ op CustomPatchAsync<
   > &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} =
-    | ArmResponse<ExtensionResource>
-    | ArmAcceptedLroResponse<"Resource update request accepted.", LroHeaders>,
+  Response extends {} = ArmResponse<ExtensionResource> | ArmAcceptedLroResponse<
+    "Resource update request accepted.",
+    LroHeaders
+  >,
   Error extends {} = ErrorResponse,
   OverrideResourceName extends valueof string = ""
 > is ArmUpdateOperation<
@@ -288,7 +289,7 @@ op CustomPatchSync<
 >;
 
 /**
- * @dev Delete a resource asynchronously
+ * Delete a resource asynchronously
  * @template TargetResource The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup
  * @template ExtensionResource The resource being deleted
  * @template Response The response type for the operation
@@ -309,12 +310,13 @@ op DeleteAsyncBase<
   Parameters extends {} = {},
   Error extends {} = ErrorResponse,
   OverrideResourceName extends valueof string = ""
->(...ExtensionInstanceParameters<TargetResource, ExtensionResource>, ...Parameters):
-  | Response
-  | Error;
+>(
+  ...ExtensionInstanceParameters<TargetResource, ExtensionResource>,
+  ...Parameters,
+): Response | Error;
 
 /**
- * @dev Delete a resource asynchronously.
+ * Delete a resource asynchronously.
  * @template TargetResource The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup
  * @template ExtensionResource The resource being deleted
  * @template LroHeaders Optional. Allows overriding the headers in the Accepted response
@@ -335,10 +337,7 @@ op DeleteAsync<
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} =
-    | ArmDeletedResponse
-    | ArmDeleteAcceptedLroResponse<LroHeaders>
-    | ArmDeletedNoContentResponse,
+  Response extends {} = ArmDeletedResponse | ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
   Error extends {} = ErrorResponse,
   OverrideResourceName extends valueof string = ""
 > is DeleteAsyncBase<
@@ -351,7 +350,7 @@ op DeleteAsync<
 >;
 
 /**
- * @dev Delete a resource asynchronously
+ * Delete a resource asynchronously
  * @template TargetResource The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup
  * @template ExtensionResource The resource being deleted
  * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted response
@@ -405,9 +404,10 @@ op DeleteSync<
   Response extends {} = ArmDeletedResponse | ArmDeletedNoContentResponse,
   Error = ErrorResponse,
   OverrideResourceName extends valueof string = ""
->(...ExtensionInstanceParameters<TargetResource, ExtensionResource>, ...Parameters):
-  | Response
-  | Error;
+>(
+  ...ExtensionInstanceParameters<TargetResource, ExtensionResource>,
+  ...Parameters,
+): Response | Error;
 
 /**
  * A long-running resource action.
@@ -444,7 +444,7 @@ op ActionAsyncBase<
 ): Response | Error;
 
 /**
- * @dev A long-running resource action.
+ * A long-running resource action.
  * @template TargetResource The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup
  * @template ExtensionResource The resource being acted upon
  * @template Request The request model for the action
@@ -459,6 +459,7 @@ op ActionAsyncBase<
 @extensionResourceOperation(TargetResource, ExtensionResource, "action", OverrideResourceName)
 @returnsDoc("Azure operation completed successfully.")
 @enforceConstraint(ExtensionResource, Foundations.Resource)
+@doc("")
 op ActionAsync<
   TargetResource extends Foundations.SimpleResource,
   ExtensionResource extends Foundations.SimpleResource,
@@ -520,7 +521,7 @@ op ActionSync<
 ): Response | Error;
 
 /**
- * @dev A long-running resource action that returns no content.
+ * A long-running resource action that returns no content.
  * @template TargetResource The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup
  * @template ExtensionResource The resource being acted upon
  * @template Request The request model for the action
@@ -535,6 +536,7 @@ op ActionSync<
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
 @post
+@doc("")
 op ActionNoResponseContentAsync<
   TargetResource extends Foundations.SimpleResource,
   ExtensionResource extends Foundations.SimpleResource,

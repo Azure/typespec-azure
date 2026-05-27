@@ -69,9 +69,10 @@ interface RoutedOperations<
     LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = Resource> &
       Azure.Core.Foundations.RetryAfterHeader,
     Parameters extends {} = {},
-    Response extends {} =
-      | ArmResourceUpdatedResponse<Resource>
-      | ArmResourceCreatedResponse<Resource, LroHeaders>,
+    Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
+      Resource,
+      LroHeaders
+    >,
     OptionalRequestBody extends valueof boolean = false,
     OverrideErrorType extends {} = ErrorType,
     OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute,
@@ -104,9 +105,7 @@ interface RoutedOperations<
   CreateOrUpdateSync<
     Resource extends Foundations.SimpleResource,
     Parameters extends {} = {},
-    Response extends {} =
-      | ArmResourceUpdatedResponse<Resource>
-      | ArmResourceCreatedSyncResponse<Resource>,
+    Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedSyncResponse<Resource>,
     OptionalRequestBody extends valueof boolean = false,
     OverrideErrorType extends {} = ErrorType,
     OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute,
@@ -146,9 +145,10 @@ interface RoutedOperations<
     > &
       Azure.Core.Foundations.RetryAfterHeader,
     Parameters extends {} = {},
-    Response extends {} =
-      | ArmResponse<Resource>
-      | ArmAcceptedLroResponse<"Resource update request accepted.", LroHeaders>,
+    Response extends {} = ArmResponse<Resource> | ArmAcceptedLroResponse<
+      "Resource update request accepted.",
+      LroHeaders
+    >,
     OptionalRequestBody extends valueof boolean = false,
     OverrideErrorType extends {} = ErrorType,
     OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute,
@@ -246,7 +246,7 @@ interface RoutedOperations<
   >(...ParentParameters, ...ResourceTypeParameter, ...Parameters): Response | OverrideErrorType;
 
   /**
-   * @dev Get a resource
+   * Get a resource
    * @template Resource The resource being read
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response for a get operation.
@@ -416,9 +416,10 @@ interface RoutedOperations<
     > &
       Azure.Core.Foundations.RetryAfterHeader,
     Parameters extends {} = {},
-    Response extends {} | void =
-      | ArmAcceptedLroResponse<"Resource operation accepted.", LroHeaders>
-      | Result,
+    Response extends {} | void = ArmAcceptedLroResponse<
+      "Resource operation accepted.",
+      LroHeaders
+    > | Result,
     OptionalRequestBody extends valueof boolean = false,
     OverrideErrorType extends {} = ErrorType,
     OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute,
@@ -434,17 +435,19 @@ interface RoutedOperations<
   ): Response | OverrideErrorType;
 }
 /**
- * @dev DEPRECATED: Use ProviderParameter instead. Get the provider namespace key-value pair
+ * DEPRECATED: Use ProviderParameter instead. Get the provider namespace key-value pair
  * @template Resource Optional.  The resource to get the provider namespace for.
  */
+@doc("")
 model Provider<Resource extends {} = TenantActionScope> {
   ...ProviderNamespace<Resource>;
 }
 
 /**
- * @dev Get the provider namespace key-value pair
+ * Get the provider namespace key-value pair
  * @template Resource The resource to get the provider namespace for.
  */
+@doc("")
 model ProviderParameter<Resource extends {}> {
   ...ProviderNamespace<Resource>;
 }
@@ -476,9 +479,10 @@ op CustomPatchAsync<
   > &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} =
-    | ArmResponse<Resource>
-    | ArmAcceptedLroResponse<"Resource update request accepted.", LroHeaders>,
+  Response extends {} = ArmResponse<Resource> | ArmAcceptedLroResponse<
+    "Resource update request accepted.",
+    LroHeaders
+  >,
   Error extends {} = ErrorResponse,
   OptionalRequestBody extends valueof boolean = false
 > is UpdateOperation<
@@ -539,9 +543,10 @@ alias CreateOrUpdateAsync<
   LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = Resource> &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} =
-    | ArmResourceUpdatedResponse<Resource>
-    | ArmResourceCreatedResponse<Resource, LroHeaders>,
+  Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
+    Resource,
+    LroHeaders
+  >,
   Error extends {} = ErrorResponse,
   OptionalRequestBody extends valueof boolean = false
 > = CreateOrReplaceAsync<
@@ -579,9 +584,10 @@ op CreateOrReplaceAsync<
   LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = Resource> &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} =
-    | ArmResourceUpdatedResponse<Resource>
-    | ArmResourceCreatedResponse<Resource, LroHeaders>,
+  Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
+    Resource,
+    LroHeaders
+  >,
   Error extends {} = ErrorResponse,
   OptionalRequestBody extends valueof boolean = false
 > is CreateOperation<
@@ -608,9 +614,7 @@ alias CreateOrUpdateSync<
   Request extends {} | void = Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
-  Response extends {} =
-    | ArmResourceUpdatedResponse<Resource>
-    | ArmResourceCreatedSyncResponse<Resource>,
+  Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedSyncResponse<Resource>,
   Error extends {} = ErrorResponse,
   OptionalRequestBody extends valueof boolean = false
 > = CreateOrReplaceSync<
@@ -643,9 +647,7 @@ op CreateOrReplaceSync<
   Request extends {} | void = Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
-  Response extends {} =
-    | ArmResourceUpdatedResponse<Resource>
-    | ArmResourceCreatedSyncResponse<Resource>,
+  Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedSyncResponse<Resource>,
   Error extends {} = ErrorResponse,
   OptionalRequestBody extends valueof boolean = false
 > is CreateOperation<
@@ -709,13 +711,14 @@ op ArmListSinglePageByParent<
 >;
 
 /**
- * @dev The base template for Azure Resource Manager PUT Operations.
+ * The base template for Azure Resource Manager PUT Operations.
  * @template HttpParameters The parameter object for the operation.
  * @template BodyParameter The body parameter
  * @template Response The response or union of responses for success.
  * @template ErrorResponse The error response.
  * @template OptionalRequestBody Optional. Indicates whether the request body is optional
  */
+@doc("")
 op CreateOperation<
   HttpParameters extends {},
   BodyParameter extends {} | void,
@@ -731,13 +734,14 @@ op CreateOperation<
 ): Response | ErrorResponse;
 
 /**
- * @dev The base template for Legacy Azure Resource Manager PATCH Operations.
+ * The base template for Legacy Azure Resource Manager PATCH Operations.
  * @template HttpParameters The parameter object for the operation.
  * @template BodyParameter The body parameter
  * @template Response The response or union of responses for success.
  * @template ErrorResponse The error response.
  * @template OptionalRequestBody Optional. Indicates whether the request body is optional
  */
+@doc("")
 op UpdateOperation<
   HttpParameters extends {},
   BodyParameter extends {} | void,
