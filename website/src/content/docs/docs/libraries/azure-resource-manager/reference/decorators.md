@@ -104,7 +104,9 @@ None
 ### `@armResourceAction` {#@Azure.ResourceManager.armResourceAction}
 
 Marks the operation as a custom action on a specific Azure Resource Manager resource type.
-This decorator associates a POST action operation with its resource for routing and documentation generation.
+This decorator associates a POST action operation with its resource,
+identifying the semantics of the operation as a resource action over a specific resource for documentation,
+resource validation, and use by downstream emitters.
 
 ```typespec
 @Azure.ResourceManager.armResourceAction(resourceModel: Model, resourceName?: valueof string)
@@ -161,7 +163,8 @@ None
 ### `@armResourceCreateOrUpdate` {#@Azure.ResourceManager.armResourceCreateOrUpdate}
 
 Marks the operation as a create or update (PUT) operation for a specific Azure Resource Manager resource type.
-This decorator associates the operation with its resource for routing and documentation generation.
+This decorator identifies the semantics of the operation as a CreateOrReplace lifecycle operation over a particular resource,
+for use in documentation, resource validation, and downstream emitters.
 
 ```typespec
 @Azure.ResourceManager.armResourceCreateOrUpdate(resourceModel: Model, resourceName?: valueof string)
@@ -181,7 +184,8 @@ This decorator associates the operation with its resource for routing and docume
 ### `@armResourceDelete` {#@Azure.ResourceManager.armResourceDelete}
 
 Marks the operation as a delete (DELETE) operation for a specific Azure Resource Manager resource type.
-This decorator associates the operation with its resource for routing and documentation generation.
+This decorator identifies the operation as a Delete lifecycle operation over the resource for us in documentation,
+resource validation, and downstream emitters.
 
 ```typespec
 @Azure.ResourceManager.armResourceDelete(resourceModel: Model, resourceName?: valueof string)
@@ -201,7 +205,8 @@ This decorator associates the operation with its resource for routing and docume
 ### `@armResourceList` {#@Azure.ResourceManager.armResourceList}
 
 Marks the operation as a list (GET collection) operation for a specific Azure Resource Manager resource type.
-This decorator associates the operation with its resource for routing and documentation generation.
+This decorator identifies the semantics of the operation as a collection list operation over a resource type and a particular scope for documentation,
+resource validation, and downstream emitters.
 
 ```typespec
 @Azure.ResourceManager.armResourceList(resourceModel: Model, resourceName?: valueof string)
@@ -255,7 +260,8 @@ individually tagged
 ### `@armResourceRead` {#@Azure.ResourceManager.armResourceRead}
 
 Marks the operation as a read (GET) operation for a specific Azure Resource Manager resource type.
-This decorator associates the operation with its resource for routing and documentation generation.
+This decorator identifies the semantics of the operation as a Read lifecycle operation over a particular resource,
+for use in documentation, resource validation, and downstream emitters.
 
 ```typespec
 @Azure.ResourceManager.armResourceRead(resourceModel: Model, resourceName?: valueof string)
@@ -275,7 +281,8 @@ This decorator associates the operation with its resource for routing and docume
 ### `@armResourceUpdate` {#@Azure.ResourceManager.armResourceUpdate}
 
 Marks the operation as an update (PATCH) operation for a specific Azure Resource Manager resource type.
-This decorator associates the operation with its resource for routing and documentation generation.
+This decorator identifies the operation as an Update lifecycle operation over the resource for use in documentation,
+resource validation, and downstream emitters.
 
 ```typespec
 @Azure.ResourceManager.armResourceUpdate(resourceModel: Model, resourceName?: valueof string)

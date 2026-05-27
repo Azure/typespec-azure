@@ -126,7 +126,9 @@ extern dec armResourceCollectionAction(target: Operation);
 
 /**
  * Marks the operation as a custom action on a specific Azure Resource Manager resource type.
- * This decorator associates a POST action operation with its resource for routing and documentation generation.
+ * This decorator associates a POST action operation with its resource,
+ * identifying the semantics of the operation as a resource action over a specific resource for documentation,
+ * resource validation, and use by downstream emitters.
  *
  * @param resourceModel Resource model
  * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
@@ -139,7 +141,8 @@ extern dec armResourceAction(
 
 /**
  * Marks the operation as a create or update (PUT) operation for a specific Azure Resource Manager resource type.
- * This decorator associates the operation with its resource for routing and documentation generation.
+ * This decorator identifies the semantics of the operation as a CreateOrReplace lifecycle operation over a particular resource,
+ * for use in documentation, resource validation, and downstream emitters.
  *
  * @param resourceModel Resource model
  * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
@@ -152,7 +155,8 @@ extern dec armResourceCreateOrUpdate(
 
 /**
  * Marks the operation as a read (GET) operation for a specific Azure Resource Manager resource type.
- * This decorator associates the operation with its resource for routing and documentation generation.
+ * This decorator identifies the semantics of the operation as a Read lifecycle operation over a particular resource,
+ * for use in documentation, resource validation, and downstream emitters.
  *
  * @param resourceModel Resource model
  * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
@@ -161,7 +165,8 @@ extern dec armResourceRead(target: Operation, resourceModel: Model, resourceName
 
 /**
  * Marks the operation as an update (PATCH) operation for a specific Azure Resource Manager resource type.
- * This decorator associates the operation with its resource for routing and documentation generation.
+ * This decorator identifies the operation as an Update lifecycle operation over the resource for use in documentation,
+ * resource validation, and downstream emitters.
  *
  * @param resourceModel Resource model
  * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
@@ -174,7 +179,8 @@ extern dec armResourceUpdate(
 
 /**
  * Marks the operation as a delete (DELETE) operation for a specific Azure Resource Manager resource type.
- * This decorator associates the operation with its resource for routing and documentation generation.
+ * This decorator identifies the operation as a Delete lifecycle operation over the resource for us in documentation,
+ * resource validation, and downstream emitters.
  *
  * @param resourceModel Resource model
  * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
@@ -187,7 +193,8 @@ extern dec armResourceDelete(
 
 /**
  * Marks the operation as a list (GET collection) operation for a specific Azure Resource Manager resource type.
- * This decorator associates the operation with its resource for routing and documentation generation.
+ * This decorator identifies the semantics of the operation as a collection list operation over a resource type and a particular scope for documentation,
+ * resource validation, and downstream emitters.
  *
  * @param resourceModel Resource model
  * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
