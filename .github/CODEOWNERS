@@ -1,6 +1,8 @@
-* @bterlson @markcowl @allenjzhang @timotheeguerin
+* @bterlson @markcowl @timotheeguerin
 
 /packages/typespec-client-generator-core @lmazuel @m-nash @iscai-msft @srnagar @joheredi
 /packages/azure-http-specs/specs/ @iscai-msft @lmazuel @m-nash @joheredi @srnagar @weidongxu-microsoft @tadelesh @jhendrixMSFT 
 
 /docs/howtos/DataPlane*/ @lmazuel @m-nash @iscai-msft @srnagar @joheredi
+
+/packages/typespec-python @iscai-msft @msyyc @tadelesh

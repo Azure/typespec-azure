@@ -219,6 +219,21 @@
       "request": "launch",
       "args": ["--extensionDevelopmentPath=${workspaceFolder}/packages/typespec-azure-vscode"],
       "sourceMaps": true
+    },
+    {
+      "name": "typespec-python",
+      "request": "launch",
+      "args": [
+        "compile",
+        "${workspaceFolder}/packages/typespec-python/alpha/client.tsp",
+        "--emit=${workspaceFolder}/packages/typespec-python",
+        "--option=@azure-tools/typespec-python.flavor=azure"
+      ],
+      "program": "${workspaceRoot}/core/packages/compiler/entrypoints/cli.js",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node",
+      "smartStep": true,
+      "sourceMaps": true
     }
   ],
   "compounds": [

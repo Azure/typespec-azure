@@ -12,7 +12,7 @@ from subprocess import check_call, CalledProcessError
 import os
 import logging
 import sys
-from util import run_check
+from util import run_check, get_package_namespace_dir
 
 logging.getLogger().setLevel(logging.INFO)
 
@@ -26,41 +26,33 @@ def get_rfc_file_location():
     return os.path.join(os.path.dirname(__file__), "config/pylintrc")
 
 
-def _has_python_files(directory):
-    """Check if a directory contains any .py files recursively."""
-    return any(directory.rglob("*.py"))
-
-
 def _single_dir_pylint(mod):
+    inner_class = get_package_namespace_dir(mod)
+    if not inner_class:
+        logging.info(f"No package directory found in {mod}, skipping")
+        return True
+    # Only load the Azure pylint guidelines checker plugin for azure packages.
+    # The plugin (azure-pylint-guidelines-checker) is only installed in the
+    # lint-azure tox environment and is not available for unbranded packages.
+    is_azure = "azure" in mod.parts
+    pylint_args = [
+        sys.executable,
+        "-m",
+        "pylint",
+        "--rcfile={}".format(get_rfc_file_location()),
+        "--evaluation=(max(0, 0 if fatal else 10.0 - ((float(5 * error + warning + refactor + convention + info)/ statement) * 10)))",
+        "--output-format=parseable",
+        "--recursive=y",
+        "--py-version=3.10",
+    ]
+    if is_azure:
+        pylint_args.append("--load-plugins=pylint_guidelines_checker")
+    pylint_args.append(str(inner_class.absolute()))
     try:
-        inner_class = next(
-            (d for d in mod.iterdir() if d.is_dir() and d.name not in ("build", "generated_tests", "specs", "generated_samples") and not str(d).endswith("egg-info") and _has_python_files(d)),
-            None
-        )
-        if inner_class is None:
-            logging.warning("No valid source directory found in %s, skipping", mod)
-            return True
-        check_call(
-            [
-                sys.executable,
-                "-m",
-                "pylint",
-                "--rcfile={}".format(get_rfc_file_location()),
-                "--evaluation=(max(0, 0 if fatal else 10.0 - ((float(5 * error + warning + refactor + convention + info)/ statement) * 10)))",
-                "--load-plugins=pylint_guidelines_checker",
-                "--output-format=parseable",
-                "--recursive=y",
-                "--ignore=build",
-                "--py-version=3.9",
-                str(inner_class.absolute()),
-            ]
-        )
+        check_call(pylint_args)
         return True
     except CalledProcessError as e:
-        logging.error("{} exited with linting error {}".format(mod.stem, e.returncode))
-        return False
-    except Exception as e:
-        logging.error("Unexpected error processing %s: %s", mod, e)
+        logging.error("{} exited with linting error {}".format(str(inner_class.absolute()), e.returncode))
         return False
 
 
