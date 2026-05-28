@@ -109,6 +109,7 @@ jobs:
         run: dotnet restore core/packages/typespec-vs
 
       - name: Install playwright browsers
+        if: false # Temporarily disable bc of playwright break, re-enable once core version is bumped in release branch
         run: |
           sudo dpkg --configure -a
           npx playwright install --with-deps
