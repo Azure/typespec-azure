@@ -18,7 +18,12 @@ Follow these steps in order to create a complete, high-quality linter rule.
 Determine the rule metadata before writing any code:
 
 - **Package**: `typespec-azure-core` (data-plane rules), `typespec-azure-resource-manager` (ARM rules), or `typespec-client-generator-core` (client SDK generation rules)
-- **Rule name**: kebab-case (e.g., `no-nullable-key`, `require-pagination`)
+- **Rule name**: Must follow these naming conventions:
+  - Use kebab-case (lowercase letters, numbers, hyphens)
+  - DO NOT include the package name in the rule ID (the package is already part of the fully-qualified diagnostic code)
+  - Use `no-<thing>` when the rule bans a construct or usage (e.g., `no-nullable`, `no-enum`, `no-format`)
+  - Use `use-<preferred-thing>` when the rule points users to a standard/preferred TypeSpec pattern (e.g., `use-standard-operations`, `use-extensible-enum`)
+  - Keep names short and concise — prefer `no-enum` over `no-enum-type-usage`
 - **Severity**: All linter rules are warnings; no severity choice is needed
 - **Target ruleset(s)**: `data-plane`, `resource-manager`, or both
 - **Description**: One-line explanation of what the rule enforces

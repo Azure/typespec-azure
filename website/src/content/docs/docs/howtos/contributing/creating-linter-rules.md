@@ -70,11 +70,25 @@ Decide the rule metadata before touching code:
 | Decision            | What to choose                                                                                |
 | ------------------- | --------------------------------------------------------------------------------------------- |
 | Package             | `typespec-client-generator-core`, `typespec-azure-core`, or `typespec-azure-resource-manager` |
-| Rule name           | Kebab-case, for example `no-nullable-key`                                                     |
+| Rule name           | Follow the rule naming guidelines below                                                       |
 | Target ruleset(s)   | Data-plane, resource-manager, or both                                                         |
 | Enabled by default? | `true` or `false`                                                                             |
 
 All linter rules use `warning` severity. This is not configurable.
+
+#### Rule Naming Guidelines
+
+- Use kebab-case (lowercase letters, numbers, hyphens only)
+- DO NOT include the package name in the rule ID — the package is already part of
+  the fully-qualified diagnostic code (e.g.,
+  `@azure-tools/typespec-azure-core/no-nullable`, not
+  `@azure-tools/typespec-azure-core/azure-core-no-nullable`)
+- Use `no-<thing>` when the rule bans a construct or usage (e.g.,
+  `no-nullable`, `no-enum`, `no-format`)
+- Use `use-<preferred-thing>` when the rule points users toward a standard or
+  preferred pattern (e.g., `use-standard-operations`, `use-extensible-enum`)
+- Keep names short and concise — prefer `no-enum` over
+  `no-enum-type-usage`
 
 Also review existing rules in `packages/<pkg>/src/rules/` to match local
 patterns for naming, visitors, diagnostics, and fixes.
@@ -513,11 +527,25 @@ For local experimentation, see
 
 | Item             | Convention                                                                      | Example                                                                                  |
 | ---------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| Rule name        | kebab-case                                                                      | `no-nullable-key`                                                                        |
+| Rule name        | kebab-case; omit package names; prefer `no-*` and `use-*` prefixes              | `no-nullable-key`                                                                        |
 | Export variable  | camelCase + `Rule`                                                              | `noNullableKeyRule`                                                                      |
 | Import extension | Always `.js`                                                                    | `from "./rules/no-nullable-key.js"`                                                      |
 | Diagnostic code  | `@azure-tools/typespec-<pkg>/<rule-name>`                                       | `@azure-tools/typespec-azure-core/no-nullable-key`                                       |
 | Rule URL         | `https://azure.github.io/typespec-azure/docs/libraries/<pkg>/rules/<rule-name>` | `https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-nullable-key` |
+
+**Rule Naming Guidelines:**
+
+- Use kebab-case (lowercase letters, numbers, hyphens only)
+- DO NOT include the package name in the rule ID — the package is already part of
+  the fully-qualified diagnostic code (e.g.,
+  `@azure-tools/typespec-azure-core/no-nullable`, not
+  `@azure-tools/typespec-azure-core/azure-core-no-nullable`)
+- Use `no-<thing>` when the rule bans a construct or usage (e.g.,
+  `no-nullable`, `no-enum`, `no-format`)
+- Use `use-<preferred-thing>` when the rule points users toward a standard or
+  preferred pattern (e.g., `use-standard-operations`, `use-extensible-enum`)
+- Keep names short and concise — prefer `no-enum` over
+  `no-enum-type-usage`
 
 ### File Locations
 
