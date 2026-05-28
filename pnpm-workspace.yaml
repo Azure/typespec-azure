@@ -51,7 +51,7 @@ catalog:
   "@octokit/core": ^7.0.6
   "@octokit/plugin-paginate-graphql": ^6.0.0
   "@octokit/plugin-rest-endpoint-methods": ^17.0.0
-  "@playwright/test": ^1.59.1
+  "@playwright/test": ^1.60.0
   "@pnpm/workspace.find-packages": ^1000.0.65
   "@scalar/json-magic": ^0.12.5
   "@scalar/openapi-parser": ^0.25.8
@@ -108,8 +108,8 @@ catalog:
   astro-rehype-relative-markdown-links: ^0.19.0
   autorest: ^3.7.1
   c8: ^11.0.0
-  change-case: ^5.4.4
   chart.js: ^4.5.1
+  change-case: ^5.4.4
   chokidar: ^5.0.0
   clsx: ^2.1.1
   concurrently: ^9.2.1
@@ -146,7 +146,7 @@ catalog:
   p-limit: ^7.3.0
   pathe: ^2.0.3
   picocolors: ^1.1.1
-  playwright: ^1.59.1
+  playwright: ^1.60.0
   plist: ^3.1.0
   pluralize: ^8.0.0
   postject: "1.0.0-alpha.6"
