@@ -1,5 +1,13 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.68.3
+
+### Bug Fixes
+
+- [#4508](https://github.com/Azure/typespec-azure/pull/4508) Fix orphan type ordering so that models are always processed before unions, ensuring anonymous model variants inside unions get their generated name from the model property context rather than the union context. This restores the naming behavior from 0.68.0 that was inadvertently changed in 0.68.1.
+- [#4501](https://github.com/Azure/typespec-azure/pull/4501) Fix "Cannot read properties of undefined" crash in the `inconsistent-multiple-service-dependency` validation when a service merged into a multi-service client does not specify a version for a depended library (e.g. its latest service version has no matching `@useDependency` entry). The validation now falls back to the latest version of the depended library, matching the behavior of downstream emitters.
+
+
 ## 0.68.2
 
 ### Features
