@@ -737,6 +737,46 @@ describe("orphan model with anonymous model", () => {
     const eouEnum = context.sdkPackage.enums.find((e) => e.name === "EouDetectionModel");
     ok(eouEnum, "Enum should be named 'EouDetectionModel' without numeric suffix");
   });
+
+  it("orphan union anonymous variant should be named from model property context", async () => {
+    // Regression test: when @@usage on the union appears before @@usage on the
+    // model that references it, the anonymous model variant of the union should
+    // still get its generated name from the model property context (e.g.
+    // "OuterWithNullableValue"), not from the union context (e.g.
+    // "RecursiveNullableType1").
+    const { program } = await SimpleTesterWithService.compile(`
+      union RecursiveNullableType {
+        null,
+        {
+          inner?: RecursiveNullableType,
+        },
+      }
+
+      model OuterWithNullable {
+        value?: RecursiveNullableType;
+      }
+
+      @@access(TestService.RecursiveNullableType, Access.public);
+      @@usage(TestService.RecursiveNullableType, Usage.output);
+      @@access(TestService.OuterWithNullable, Access.public);
+      @@usage(TestService.OuterWithNullable, Usage.output);
+    `);
+    const context = await createSdkContextForTester(program);
+    const models = context.sdkPackage.models;
+
+    const outerModel = models.find((m) => m.name === "OuterWithNullable");
+    ok(outerModel, "Should find OuterWithNullable model");
+
+    // The anonymous model variant should be named from the model property
+    // context, not the union context.
+    const anonModel = models.find((m) => m.isGeneratedName);
+    ok(anonModel, "Should find the anonymous model variant");
+    strictEqual(
+      anonModel.name,
+      "OuterWithNullableValue",
+      "Anonymous model should be named from model property context, not union context",
+    );
+  });
 });
 
 describe("corner case", () => {
