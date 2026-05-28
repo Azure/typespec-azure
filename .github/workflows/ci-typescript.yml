@@ -1,0 +1,39 @@
+name: "ts / test e2e"
+
+on:
+  pull_request:
+    branches:
+      - main
+      - release/*
+    paths:
+      - "packages/typespec-ts/**"
+      - ".github/workflows/ci-typescript.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build typespec-ts package
+        run: pnpm turbo run build --filter "@azure-tools/typespec-ts..."
+      - name: Check lint
+        working-directory: packages/typespec-ts
+        run: pnpm lint
+      - name: Check format
+        working-directory: packages/typespec-ts
+        run: pnpm check-format
+      - name: Run unit tests
+        working-directory: packages/typespec-ts
+        run: pnpm test-next && pnpm unit-test
+      - name: Run standard integration tests
+        working-directory: packages/typespec-ts
+        run: pnpm test:standard
+      - name: Run Azure integration tests
+        working-directory: packages/typespec-ts
+        run: pnpm test:azure
+      - name: Check git tree is clean
+        working-directory: packages/typespec-ts
+        run: pnpm check-tree
