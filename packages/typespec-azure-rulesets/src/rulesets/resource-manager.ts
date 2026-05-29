@@ -58,6 +58,7 @@ export default {
     // Azure resource manager
     "@azure-tools/typespec-azure-resource-manager/arm-no-record": true,
     "@azure-tools/typespec-azure-resource-manager/arm-no-path-casing-conflicts": true,
+    "@azure-tools/typespec-azure-resource-manager/arm-no-replace-inherited-props": true,
     "@azure-tools/typespec-azure-resource-manager/no-empty-model": true,
     "@azure-tools/typespec-azure-resource-manager/arm-common-types-version": true,
     "@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes": true,
