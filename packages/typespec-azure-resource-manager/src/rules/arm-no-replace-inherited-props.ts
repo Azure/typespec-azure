@@ -102,6 +102,14 @@ export const armNoReplaceInheritedPropsRule = createRule({
 
           if (inherited === undefined) continue;
 
+          // Allow overriding with the exact same type (identity). Aliases in
+          // TypeSpec resolve to the same Type instance, and template
+          // instantiations are cached, so this naturally handles cases such
+          // as redefining `systemData: SystemData` (alias) where the parent
+          // uses `systemData: Foundations.SystemData`, or `tags: Record<string>`
+          // cloned via `model X is TrackedResource<...>`.
+          if (property.type === inherited.type) continue;
+
           // Allow overriding when both the inherited property and the override
           // resolve to the same scalar family (e.g. both are "string"
           // -- including string scalars, string-derived scalars, string
