@@ -397,14 +397,23 @@ op remove(): void;
 
     it("picks up examples in sub-directories of the versioned example directory", async () => {
       const emitterOutputDir = resolveVirtualPath("./tsp-output");
-      // Examples in sub-directories under the versioned examples folder
+      // Examples in multiple sub-directories under the versioned examples folder,
+      // simulating the real-world pattern: stable/2020-01-01/examples/FooResources/*.json
       tester.fs.add(
-        resolveVirtualPath("./tsp-output/stable/v1/examples/pets/getPet.json"),
+        resolveVirtualPath("./tsp-output/stable/v1/examples/PetResources/getPet.json"),
         JSON.stringify({ operationId: "Pets_get", title: "Get a pet" }),
       );
       tester.fs.add(
-        resolveVirtualPath("./tsp-output/stable/v1/examples/pets/listPets.json"),
+        resolveVirtualPath("./tsp-output/stable/v1/examples/PetResources/listPets.json"),
         JSON.stringify({ operationId: "Pets_list", title: "List all pets" }),
+      );
+      tester.fs.add(
+        resolveVirtualPath("./tsp-output/stable/v1/examples/StoreResources/getStore.json"),
+        JSON.stringify({ operationId: "Stores_get", title: "Get a store" }),
+      );
+      tester.fs.add(
+        resolveVirtualPath("./tsp-output/stable/v1/examples/StoreResources/deleteStore.json"),
+        JSON.stringify({ operationId: "Stores_delete", title: "Delete a store" }),
       );
 
       const [{ outputs }, diagnostics] = await tester.compileAndDiagnose(
@@ -423,6 +432,16 @@ op read(): void;
 @post
 @operationId("Pets_list")
 op list(): void;
+
+@route("/stores")
+@get
+@operationId("Stores_get")
+op getStore(): void;
+
+@route("/stores")
+@delete
+@operationId("Stores_delete")
+op deleteStore(): void;
 `,
         {
           compilerOptions: {
@@ -440,13 +459,27 @@ op list(): void;
 
       const v1Doc = JSON.parse(outputs["stable/v1/openapi.json"]);
 
-      // Sub-directory examples should be picked up with correct relative paths
+      // Sub-directory examples should be picked up with correct relative paths preserving sub-dir
       deepStrictEqual(v1Doc.paths["/pets"]?.get?.["x-ms-examples"], {
-        "Get a pet": { $ref: "examples/pets/getPet.json" },
+        "Get a pet": { $ref: "examples/PetResources/getPet.json" },
       });
       deepStrictEqual(v1Doc.paths["/pets"]?.post?.["x-ms-examples"], {
-        "List all pets": { $ref: "examples/pets/listPets.json" },
+        "List all pets": { $ref: "examples/PetResources/listPets.json" },
       });
+      deepStrictEqual(v1Doc.paths["/stores"]?.get?.["x-ms-examples"], {
+        "Get a store": { $ref: "examples/StoreResources/getStore.json" },
+      });
+      deepStrictEqual(v1Doc.paths["/stores"]?.delete?.["x-ms-examples"], {
+        "Delete a store": { $ref: "examples/StoreResources/deleteStore.json" },
+      });
+
+      // Verify no files were copied to a separate examples output
+      expect(
+        tester.fs.fs.has(resolveVirtualPath("./tsp-output/examples/PetResources/getPet.json")),
+      ).toBe(false);
+      expect(
+        tester.fs.fs.has(resolveVirtualPath("./tsp-output/examples/StoreResources/getStore.json")),
+      ).toBe(false);
     });
   });
 });
