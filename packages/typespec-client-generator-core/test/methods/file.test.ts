@@ -424,7 +424,7 @@ it("file upload with multiple content types should have enum contentType header"
   const contentTypeMethodParam = method.parameters.find((p) => p.name === "contentType");
   ok(contentTypeMethodParam);
   strictEqual(contentTypeMethodParam.type.kind, "enum");
-  strictEqual(contentTypeMethodParam.type.name, "FileContentType");
+  strictEqual(contentTypeMethodParam.type.name, "UploadFileMultipleContentTypesContentType");
   strictEqual(contentTypeMethodParam.type.values.length, 2);
   ok(contentTypeMethodParam.type.values.find((v) => v.value === "image/png"));
   ok(contentTypeMethodParam.type.values.find((v) => v.value === "image/jpeg"));
@@ -435,7 +435,7 @@ it("file upload with multiple content types should have enum contentType header"
   );
   ok(contentTypeHeader);
   strictEqual(contentTypeHeader.type.kind, "enum");
-  strictEqual(contentTypeHeader.type.name, "FileContentType");
+  strictEqual(contentTypeHeader.type.name, "UploadFileMultipleContentTypesContentType");
   strictEqual(contentTypeHeader.serializedName, "Content-Type");
   // The synthesized contentType parameter and the File model's contentType property
   // must reference the same enum instance, and that enum must be present in

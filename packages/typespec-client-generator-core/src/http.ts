@@ -467,8 +467,9 @@ function createContentTypeOrAcceptHeader(
         // Multi content types on request → enum.
         // For File bodies, reuse the File model's `contentType` property type so that the
         // synthetic `contentType` header parameter and the File model reference the same
-        // enum instance (otherwise two equivalent but separately named enums get generated,
-        // and only one ends up in `sdkPackage.enums`).
+        // SdkEnumType instance (the cache for that union is pre-warmed under the operation
+        // naming context in `updateTypesFromOperation`, so the enum gets a name derived
+        // from the operation, e.g. `UploadFileMultipleContentTypesContentType`).
         const fileBody =
           bodyObject.kind === "body" && httpOperation.parameters.body?.bodyKind === "file"
             ? httpOperation.parameters.body

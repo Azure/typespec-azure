@@ -1722,6 +1722,23 @@ function updateTypesFromOperation(
       // Otherwise use the body type directly
       const bodyTypeOrProperty = httpBody.property ?? getHttpBodyType(httpBody);
       const bodyType = getHttpBodyType(httpBody);
+      // For file bodies with multiple content types, pre-warm the cache for the
+      // `contentType` property's union under the operation naming context so that
+      // the resulting SdkEnumType is named after the operation (e.g.
+      // `UploadFileMultipleContentTypesContentType`) and is the same instance later
+      // reused by both the File model's `contentType` property and the synthetic
+      // `contentType` header parameter created in `createContentTypeOrAcceptHeader`.
+      if (
+        httpBody.bodyKind === "file" &&
+        httpBody.contentTypes.length > 1 &&
+        httpBody.contentTypeProperty.type.kind === "Union"
+      ) {
+        pushNamingContext(context, "ContentType", undefined);
+        diagnostics.pipe(
+          getClientTypeWithDiagnostics(context, httpBody.contentTypeProperty.type, operation),
+        );
+        popNamingContext(context);
+      }
       // For named unions, pass undefined so anonymous types inside get named relative
       // to the operation (e.g., "PostRequest") rather than the union (e.g., "A1")
       const bodyContextType =
