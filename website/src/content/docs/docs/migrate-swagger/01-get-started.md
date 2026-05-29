@@ -24,7 +24,7 @@ We have created a OpenAPI to TypeSpec conversion tool to help take on the bulk o
 ### Generate TypeSpec with converter
 
 - Ensure your service folder structure follows the [Specification Folder Structure Guide](https://github.com/Azure/azure-rest-api-specs/wiki/Specification-Folder-Structure-Guide).
-- Go to the service folder 
+- Go to the service folder
   - **control-plane**: `specification/{organization}/resource-manager/{resource-provider-namespace}/{service-name}`.
   - **data-plan**: `specification/{organization}/data-plane/{service-name}`.
 - Run the tool from the directory.
@@ -51,7 +51,6 @@ You will need to compare the OpenAPI file generated from TypeSpec with the origi
   ```
 
 - From the root folder, download the latest specification as baseline. Your original specification will be located at `.\sparse-spec\specification\{service-name}`:
-
   - For **non-RPSaaS service** (cloned from `azure-rest-api-specs`):
 
     ```shell
@@ -77,7 +76,6 @@ You will need to compare the OpenAPI file generated from TypeSpec with the origi
   In VS Code, select both files (select `oldNormalizedSwagger.json` first, then `newNormalizedSwagger.json`), right-click and choose "Compare Selected". Review these differences to understand their patterns.
 
 - Check out the output from `npx tsmv` execution. It prints errors, warnings, suggested fixes, and prompts. Carefully review each item and take the appropriate action:
-
   - **Errors:** These indicate issues that must be resolved before the migration can proceed. Address them before continuing.
   - **Warnings:** These highlight potential problems that may affect correctness. Review each one and decide whether action is needed.
 
@@ -92,7 +90,7 @@ You will need to compare the OpenAPI file generated from TypeSpec with the origi
   1. **Path (route) differences** first
   2. **Definition (model) name differences** next
   3. **Detail differences** within paths and definitions last
-  :::
+     :::
 
 Once the TypeSpec-generated OpenAPI achieves functional equivalence with the original OpenAPI at the API level, add SDK emitter configurations to your `tspconfig.yaml` to validate that SDKs can be generated correctly from the TypeSpec.
 
