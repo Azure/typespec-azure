@@ -13,7 +13,7 @@ using Azure.Core;
 @armProviderNamespace("Contoso.CommonEnvelopePropertiesExample")
 @service(#{ title: "Contoso.CommonEnvelopePropertiesExample" })
 @versioned(Versions)
-@doc("An example of using some of common envelope and property bag properties in a resource type. Their names are all end with 'Property'.")
+@doc("An example of using all recommended common envelope properties in a resource type. Their names all end with 'Property'.")
 namespace Microsoft.UpdateTests;
 
 /** UpdateTests API versions */
@@ -27,20 +27,19 @@ enum Versions {
 interface Operations extends Azure.ResourceManager.Operations {}
 
 @doc("Widget Resource")
-model WidgetResource is TrackedResource<WidgetResourceProperties> {
-  @pattern("^[a-zA-Z0-9-]{3,24}$")
-  @doc("The name of the widget.")
-  @key("widgetName")
-  @segment("widgets")
-  @path
-  name: string;
-
+model Widget is TrackedResource<WidgetProperties> {
+  ...ResourceNameParameter<Widget, NamePattern = "^[a-zA-Z0-9-]{3,24}$">;
+  ...EntityTagProperty;
   ...ExtendedLocationProperty;
   ...ManagedByProperty;
+  ...ManagedServiceIdentityProperty;
+  ...ResourceKindProperty;
+  ...ResourcePlanProperty;
+  ...ResourceSkuProperty;
 }
 
 @doc("Widget Resource Properties.")
-model WidgetResourceProperties {
+model WidgetProperties {
   @doc("The widget color.")
   @visibility(Lifecycle.Create, Lifecycle.Read)
   color: string;
@@ -48,20 +47,15 @@ model WidgetResourceProperties {
   /** Provisioning state */
   @visibility(Lifecycle.Read)
   provisioningState?: ResourceProvisioningState;
-
-  ...EntityTagProperty;
-  ...ResourceKindProperty;
-  ...ResourcePlanProperty;
-  ...ResourceSkuProperty;
 }
 
 @armResourceOperations
 interface Widgets {
-  get is ArmResourceRead<WidgetResource>;
-  create is ArmResourceCreateOrReplaceAsync<WidgetResource>;
+  get is ArmResourceRead<Widget>;
+  create is ArmResourceCreateOrReplaceAsync<Widget>;
   #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
-  update is ArmTagsPatchSync<WidgetResource>;
-  delete is ArmResourceDeleteWithoutOkAsync<WidgetResource>;
-  listByResourceGroup is ArmResourceListByParent<WidgetResource>;
-  listBySubscription is ArmListBySubscription<WidgetResource>;
+  update is ArmTagsPatchSync<Widget>;
+  delete is ArmResourceDeleteWithoutOkAsync<Widget>;
+  listByResourceGroup is ArmResourceListByParent<Widget>;
+  listBySubscription is ArmListBySubscription<Widget>;
 }
