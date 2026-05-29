@@ -1626,8 +1626,8 @@ namespace TestService
   {
     public TestServiceClient(Uri endpoint);
     // protocol method
-    public virtual Azure.Response Get(MatchConditions matchConditions, RequestContext context);
-    public virtual Task<Azure.Response> GetAsync(MatchConditions matchConditions, RequestContext context);
+    public virtual Response Get(MatchConditions matchConditions, RequestContext context);
+    public virtual Task<Response> GetAsync(MatchConditions matchConditions, RequestContext context);
     // convenience method
     public virtual Response<Response> Get(MatchConditions matchConditions = default, CancellationToken cancellationToken = default);
     public virtual Task<Response<Response>> GetAsync(MatchConditions matchConditions = default, CancellationToken cancellationToken = default);
