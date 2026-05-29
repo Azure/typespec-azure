@@ -118,6 +118,43 @@ describe("reorderParameters", () => {
     });
   });
 
+  describe("with versioning decorators", () => {
+    it("does not report error when parameter has @typeChangedFrom decorator", async () => {
+      const { program } = await SimpleBaseTester.compile(
+        createClientCustomizationInput(
+          `
+          @service
+          @versioned(Versions)
+          namespace MyService;
+
+          enum Versions {
+            v1,
+            v2,
+          }
+
+          op myOp(
+            @typeChangedFrom(Versions.v2, int32) @query a: string,
+            @query b: string,
+          ): void;
+          `,
+          `
+          #suppress "experimental-feature" "testing reorderParameters"
+          @@override(MyService.myOp, reorderParameters(MyService.myOp, #["b", "a"]));
+          `,
+        ),
+      );
+
+      const context = await createSdkContextForTester(program, {
+        "api-version": "v1",
+      });
+      const method = context.sdkPackage.clients[0].methods[0];
+
+      const userParams = method.parameters.filter((p) => p.name !== "contentType");
+      strictEqual(userParams[0].name, "b");
+      strictEqual(userParams[1].name, "a");
+    });
+  });
+
   describe("scoped usage", () => {
     it("applies reorder only for specified language scope", async () => {
       const mainCode = `

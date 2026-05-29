@@ -55,10 +55,9 @@ In a custom operation, you define the operation parameters, responses, http verb
 /** Send a notification to the user */
 @post
 @segment("notify")
-op NotifyUser(
-  ...ResourceInstanceParameters<User>,
-  @body notification: NotificationDetails,
-): ArmResponse<string> | ErrorResponse;
+op NotifyUser(...ResourceInstanceParameters<User>, @body notification: NotificationDetails):
+  | ArmResponse<string>
+  | ErrorResponse;
 ```
 
 ### ARM Response Types
