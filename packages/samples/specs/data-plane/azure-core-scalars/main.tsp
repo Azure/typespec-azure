@@ -9,7 +9,7 @@ using Versioning;
 using Azure.Core;
 using Azure.Core.Traits;
 
-@service
+@service(#{ title: "Azure Core Scalars" })
 @versioned(Contoso.WidgetManager.Versions)
 @useAuth(ApiKeyAuth<ApiKeyLocation.header, "X-Key">)
 namespace Contoso.WidgetManager;
