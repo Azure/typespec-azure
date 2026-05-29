@@ -9,7 +9,16 @@ This includes the following steps:
 
 ## Making Changes to your TypeSpec spec
 
-- Add a new entry to the versions enum for the new stable version
+- Remove the `@previewVersion` decorator from the preview version and add the new stable version as the last entry in the enum
+
+  ```diff lang=tsp
+  enum Versions {
+  - @Azure.Core.previewVersion
+    `2025-10-01-preview`,
+  + `2026-01-01`,
+  }
+  ```
+
 - Update any mention in documentation of the old api-version to use the new api-version
 
   ```bash
@@ -136,15 +145,13 @@ This includes the following steps:
       ```
 
 - Model any additional changes in the new stable version and mark with the appropriate versioning decorator, referencing the new stable version
-- Remove the preview version from the version enum
+- Remove the replaced preview version from the version enum
 
   ```diff lang=tsp
   enum Versions {
-  - @Azure.Core.previewVersion
   - `2025-10-01-preview`,
-  + `2026-01-01`,
+    `2026-01-01`,
   }
-
   ```
 
 - Change the name of the `examples` version folder for the latest preview to match the new stable version
