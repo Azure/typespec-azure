@@ -3,7 +3,7 @@
   "info": {
     "title": "Contoso.CommonEnvelopePropertiesExample",
     "version": "2023-03-01-preview",
-    "description": "An example of using some of common envelope and property bag properties in a resource type. Their names are all end with 'Property'.",
+    "description": "An example of using all recommended common envelope properties in a resource type. Their names all end with 'Property'.",
     "x-typespec-generated": [
       {
         "emitter": "@azure-tools/typespec-autorest"
@@ -78,7 +78,7 @@
         }
       }
     },
-    "/subscriptions/{subscriptionId}/providers/Contoso.CommonEnvelopePropertiesExample/widgets": {
+    "/subscriptions/{subscriptionId}/providers/Contoso.CommonEnvelopePropertiesExample/widgetResources": {
       "get": {
         "operationId": "Widgets_ListBySubscription",
         "tags": [
@@ -112,7 +112,7 @@
         }
       }
     },
-    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.CommonEnvelopePropertiesExample/widgets": {
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.CommonEnvelopePropertiesExample/widgetResources": {
       "get": {
         "operationId": "Widgets_ListByResourceGroup",
         "tags": [
@@ -149,7 +149,7 @@
         }
       }
     },
-    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.CommonEnvelopePropertiesExample/widgets/{widgetName}": {
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.CommonEnvelopePropertiesExample/widgetResources/{widgetResourceName}": {
       "get": {
         "operationId": "Widgets_Get",
         "tags": [
@@ -167,9 +167,9 @@
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
-            "name": "widgetName",
+            "name": "widgetResourceName",
             "in": "path",
-            "description": "The name of the widget.",
+            "description": "The name of the WidgetResource",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -207,9 +207,9 @@
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
-            "name": "widgetName",
+            "name": "widgetResourceName",
             "in": "path",
-            "description": "The name of the widget.",
+            "description": "The name of the WidgetResource",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -277,9 +277,9 @@
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
-            "name": "widgetName",
+            "name": "widgetResourceName",
             "in": "path",
-            "description": "The name of the widget.",
+            "description": "The name of the WidgetResource",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -326,9 +326,9 @@
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
-            "name": "widgetName",
+            "name": "widgetResourceName",
             "in": "path",
-            "description": "The name of the widget.",
+            "description": "The name of the WidgetResource",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -448,6 +448,11 @@
           "$ref": "#/definitions/WidgetResourceProperties",
           "description": "The resource-specific properties for this resource."
         },
+        "eTag": {
+          "type": "string",
+          "description": "If eTag is provided in the response body, it may also be provided as a header per the normal etag convention.  Entity tags are used for comparing two or more entities from the same requested resource. HTTP/1.1 uses entity tags in the etag (section 14.19), If-Match (section 14.24), If-None-Match (section 14.26), and If-Range (section 14.27) header fields.",
+          "readOnly": true
+        },
         "extendedLocation": {
           "$ref": "#/definitions/Azure.ResourceManager.CommonTypes.ExtendedLocation",
           "x-ms-mutability": [
@@ -458,6 +463,27 @@
         "managedBy": {
           "type": "string",
           "description": "The fully qualified resource ID of the resource that manages this resource. Indicates if this resource is managed by another Azure resource. If this is present, complete mode deployment will not delete the resource if it is removed from the template since it is managed by another resource."
+        },
+        "identity": {
+          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/managedidentity.json#/definitions/ManagedServiceIdentity",
+          "description": "The managed service identities assigned to this resource."
+        },
+        "kind": {
+          "type": "string",
+          "description": "Metadata used by portal/tooling/etc to render different UX experiences for resources of the same type; e.g. ApiApps are a kind of Microsoft.Web/sites type.  If supported, the resource provider must validate and persist this value.",
+          "pattern": "^[-\\w\\._,\\(\\\\\\)]+$",
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        },
+        "plan": {
+          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/Plan",
+          "description": "Details of the resource plan."
+        },
+        "sku": {
+          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/Sku",
+          "description": "The SKU (Stock Keeping Unit) assigned to this resource."
         }
       },
       "allOf": [
@@ -503,28 +529,6 @@
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
           "description": "Provisioning state",
           "readOnly": true
-        },
-        "eTag": {
-          "type": "string",
-          "description": "If eTag is provided in the response body, it may also be provided as a header per the normal etag convention.  Entity tags are used for comparing two or more entities from the same requested resource. HTTP/1.1 uses entity tags in the etag (section 14.19), If-Match (section 14.24), If-None-Match (section 14.26), and If-Range (section 14.27) header fields.",
-          "readOnly": true
-        },
-        "kind": {
-          "type": "string",
-          "description": "Metadata used by portal/tooling/etc to render different UX experiences for resources of the same type; e.g. ApiApps are a kind of Microsoft.Web/sites type.  If supported, the resource provider must validate and persist this value.",
-          "pattern": "^[-\\w\\._,\\(\\\\\\)]+$",
-          "x-ms-mutability": [
-            "read",
-            "create"
-          ]
-        },
-        "plan": {
-          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/Plan",
-          "description": "Details of the resource plan."
-        },
-        "sku": {
-          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/Sku",
-          "description": "The SKU (Stock Keeping Unit) assigned to this resource."
         }
       },
       "required": [

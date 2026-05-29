@@ -13,7 +13,7 @@ using Azure.Core;
 @armProviderNamespace("Contoso.CommonEnvelopePropertiesExample")
 @service(#{ title: "Contoso.CommonEnvelopePropertiesExample" })
 @versioned(Versions)
-@doc("An example of using some of common envelope and property bag properties in a resource type. Their names are all end with 'Property'.")
+@doc("An example of using all recommended common envelope properties in a resource type. Their names all end with 'Property'.")
 namespace Microsoft.UpdateTests;
 
 /** UpdateTests API versions */
@@ -28,15 +28,14 @@ interface Operations extends Azure.ResourceManager.Operations {}
 
 @doc("Widget Resource")
 model WidgetResource is TrackedResource<WidgetResourceProperties> {
-  @pattern("^[a-zA-Z0-9-]{3,24}$")
-  @doc("The name of the widget.")
-  @key("widgetName")
-  @segment("widgets")
-  @path
-  name: string;
-
+  ...ResourceNameParameter<WidgetResource, NamePattern = "^[a-zA-Z0-9-]{3,24}$">;
+  ...EntityTagProperty;
   ...ExtendedLocationProperty;
   ...ManagedByProperty;
+  ...ManagedServiceIdentityProperty;
+  ...ResourceKindProperty;
+  ...ResourcePlanProperty;
+  ...ResourceSkuProperty;
 }
 
 @doc("Widget Resource Properties.")
@@ -48,11 +47,6 @@ model WidgetResourceProperties {
   /** Provisioning state */
   @visibility(Lifecycle.Read)
   provisioningState?: ResourceProvisioningState;
-
-  ...EntityTagProperty;
-  ...ResourceKindProperty;
-  ...ResourcePlanProperty;
-  ...ResourceSkuProperty;
 }
 
 @armResourceOperations
