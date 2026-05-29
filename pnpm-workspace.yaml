@@ -23,6 +23,7 @@ catalog:
   "@alloy-js/core": ^0.23.0
   "@alloy-js/csharp": ^0.23.0
   "@alloy-js/markdown": ^0.23.0
+  "@alloy-js/msbuild": ^0.23.0
   "@alloy-js/python": ^0.4.0
   "@alloy-js/rollup-plugin": ^0.1.1
   "@alloy-js/typescript": ^0.23.0
@@ -51,7 +52,7 @@ catalog:
   "@octokit/core": ^7.0.6
   "@octokit/plugin-paginate-graphql": ^6.0.0
   "@octokit/plugin-rest-endpoint-methods": ^17.0.0
-  "@playwright/test": ^1.59.1
+  "@playwright/test": ^1.60.0
   "@pnpm/workspace.find-packages": ^1000.0.65
   "@scalar/json-magic": ^0.12.5
   "@scalar/openapi-parser": ^0.25.8
@@ -86,7 +87,7 @@ catalog:
   "@typescript-eslint/rule-tester": ^8.58.1
   "@typescript-eslint/types": ^8.58.1
   "@typescript-eslint/utils": ^8.58.1
-  "@typespec/http-client-python": ^0.29.1
+  "@typespec/http-client-python": ^0.29.2
   "@typespec/ts-http-runtime": "0.3.4"
   "@vitejs/plugin-react": ^6.0.1
   "@vitest/coverage-v8": ^4.1.3
@@ -146,7 +147,7 @@ catalog:
   p-limit: ^7.3.0
   pathe: ^2.0.3
   picocolors: ^1.1.1
-  playwright: ^1.59.1
+  playwright: ^1.60.0
   plist: ^3.1.0
   pluralize: ^8.0.0
   postject: "1.0.0-alpha.6"

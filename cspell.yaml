@@ -51,6 +51,7 @@ words:
   - healthdataaiservices
   - horiz
   - Howtos
+  - incentivizes
   - infile
   - kvset
   - kwargs
@@ -75,8 +76,10 @@ words:
   - Onco
   - oncophenotype
   - PAYG
+  - popd
   - prismjs
   - psscriptanalyzer
+  - pushd
   - pystac
   - pytest
   - qnas
