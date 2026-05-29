@@ -38,22 +38,26 @@ it("succeeds when child model does not redefine inherited properties", async () 
     .toBeValid();
 });
 
-it("warns when child model redefines an inherited model-typed property with the same model", async () => {
+it("warns when child model redefines an inherited model-typed property with a derived model", async () => {
   await tester
     .expect(
       `
       @armProviderNamespace namespace MyService;
 
-      model Inner {
+      model InnerBase {
         a: string;
       }
 
+      model InnerDerived extends InnerBase {
+        b: string;
+      }
+
       model Base {
-        nested: Inner;
+        nested: InnerBase;
       }
 
       model Child extends Base {
-        nested: Inner;
+        nested: InnerDerived;
       }
       `,
     )
@@ -66,16 +70,17 @@ it("warns when child model redefines an inherited model-typed property with the 
     ]);
 });
 
-it("warns when redefining a model-typed property from an indirect ancestor", async () => {
+it("warns when redefining a model-typed property from an indirect ancestor with a derived model", async () => {
   await tester
     .expect(
       `
       @armProviderNamespace namespace MyService;
 
-      model Inner { a: string; }
+      model InnerBase { a: string; }
+      model InnerDerived extends InnerBase { b: string; }
 
       model GrandParent {
-        sharedProp: Inner;
+        sharedProp: InnerBase;
       }
 
       model Parent extends GrandParent {
@@ -83,7 +88,7 @@ it("warns when redefining a model-typed property from an indirect ancestor", asy
       }
 
       model Child extends Parent {
-        sharedProp: Inner;
+        sharedProp: InnerDerived;
       }
       `,
     )
@@ -94,6 +99,82 @@ it("warns when redefining a model-typed property from an indirect ancestor", asy
           "The property 'sharedProp' is also defined in the base model.  Redefining inherited properties can cause problems with OpenAPI tooling and some language representations of the models.",
       },
     ]);
+});
+
+it("allows overriding an inherited model-typed property with the exact same model type", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace namespace MyService;
+
+      model Inner { a: string; }
+
+      model Base {
+        nested: Inner;
+      }
+
+      model Child extends Base {
+        nested: Inner;
+      }
+      `,
+    )
+    .toBeValid();
+});
+
+it("allows overriding an inherited model-typed property through an alias that resolves to the same model", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace namespace MyService;
+
+      model Inner { a: string; }
+      alias InnerAlias = Inner;
+
+      model Base {
+        nested: Inner;
+      }
+
+      model Child extends Base {
+        nested: InnerAlias;
+      }
+      `,
+    )
+    .toBeValid();
+});
+
+it("allows the implicit 'tags' clone in 'model X is TrackedResource<Properties>' (no explicit override)", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model FooProperties { p: string; }
+
+      model FooResource is TrackedResource<FooProperties> {
+        ...ResourceNameParameter<FooResource>;
+      }
+      `,
+    )
+    .toBeValid();
+});
+
+it("allows explicitly redefining 'tags' on 'model X is TrackedResource<Properties>' with the same Record<string> type", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model FooProperties { p: string; }
+
+      model FooResource is TrackedResource<FooProperties> {
+        ...ResourceNameParameter<FooResource>;
+        tags?: Record<string>;
+      }
+      `,
+    )
+    .toBeValid();
 });
 
 it("allows overriding an inherited string property with another string", async () => {
