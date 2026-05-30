@@ -5,7 +5,7 @@ title: x-ms-examples example files
 import { FileTree } from "@astrojs/starlight/components";
 
 The `x-ms-examples` is automatically populated in the generated OpenAPI 2.0 when using the `typespec-autorest` emitter.
-The examples must be placed in the `examples-dir` directory (default `{project-root}/examples`) and have the `operationId` property.
+If you use the `skip-example-copying` in typespec-autorest configuration as suggested below, examples will automatically be picked up from the examples directory adjacent to the spec. If you do not use this option, the examples must be placed in the `examples-dir` directory (default `{project-root}/examples`). Examples must all have the `operationId` property, allowing each example to be matched with the appropriate operation.
 
 :::caution
 Do not use `@extension("x-ms-examples", "<value>")`.
@@ -19,6 +19,7 @@ We recommend using `skip-example-copying` together with an `examples-dir` that p
 options:
   "@azure-tools/typespec-autorest":
     emitter-output-dir: "{project-root}"
+    output-file: "{emitter-output-dir}/{version-status}/{version}/openapi.json"
     examples-dir: "{emitter-output-dir}/{version-status}/{version}/examples"
     skip-example-copying: true
 ```
