@@ -254,6 +254,13 @@ export interface AutorestDocumentEmitterOptions {
    * Determines whether output should be split into multiple files.  The only supported option for splitting is "legacy-feature-files",
    */
   readonly outputSplitting?: "legacy-feature-files";
+
+  /**
+   * When enabled, example files will not be copied to the output directory.
+   * Instead, the source example files will be referenced using relative file paths.
+   * @default false
+   */
+  readonly skipExampleCopying?: boolean;
 }
 
 type HttpParameterProperties = Extract<
@@ -316,6 +323,13 @@ export async function getOpenAPIForService(
   const indirectlyProcessedTypes: Set<Type> = new Set();
 
   const operationIdsWithExample = new Set<string>();
+
+  // Compute the example directory for resolving source example paths
+  const exampleDir = resolveExampleDir(
+    options.examplesDirectory,
+    program.projectRoot,
+    context.version,
+  );
 
   const [exampleMap, diagnostics] = await loadExamples(program, options, context.version);
   program.reportDiagnostics(diagnostics);
@@ -610,7 +624,15 @@ export async function getOpenAPIForService(
       operationIdsWithExample.add(currentEndpoint.operationId);
       currentEndpoint["x-ms-examples"] = currentEndpoint["x-ms-examples"] || {};
       for (const [title, example] of Object.entries(autoExamples)) {
-        currentEndpoint["x-ms-examples"][title] = { $ref: `./examples/${example.relativePath}` };
+        let ref: string;
+        if (options.skipExampleCopying) {
+          const sourceExamplePath = resolvePath(exampleDir, example.relativePath);
+          const outputDir = getDirectoryPath(context.outputFile);
+          ref = getRelativePathFromDirectory(outputDir, sourceExamplePath, false);
+        } else {
+          ref = `./examples/${example.relativePath}`;
+        }
+        currentEndpoint["x-ms-examples"][title] = { $ref: ref };
       }
     }
 
@@ -2799,6 +2821,34 @@ export function sortOpenAPIDocument(doc: OpenAPI2Document): OpenAPI2Document {
   return sorted;
 }
 
+/**
+ * Resolves the example directory path, supporting `{version}` and `{version-status}` interpolation
+ * variables in the `examples-dir` option.
+ *
+ * When the examples-dir contains `{version}` or `{version-status}`, these are interpolated
+ * with the actual version values and the resulting path is used directly.
+ * Otherwise, the version is appended as a subdirectory (legacy behavior).
+ */
+function resolveExampleDir(
+  examplesDirectory: string | undefined,
+  projectRoot: string,
+  version: string | undefined,
+): string {
+  const rawDir = examplesDirectory ?? resolvePath(projectRoot, "examples");
+  const hasVersionInterpolation =
+    rawDir.includes("{version}") || rawDir.includes("{version-status}");
+
+  if (hasVersionInterpolation) {
+    const versionStatus = version && (version.includes("preview") ? "preview" : "stable");
+    return interpolatePath(rawDir, {
+      "version-status": versionStatus,
+      version: version,
+    });
+  }
+
+  return version ? resolvePath(rawDir, version) : rawDir;
+}
+
 async function checkExamplesDirExists(host: CompilerHost, dir: string) {
   try {
     return (await host.stat(dir)).isDirectory();
@@ -2841,8 +2891,7 @@ async function loadExamples(
 ): Promise<[Map<string, Record<string, LoadedExample>>, readonly Diagnostic[]]> {
   const host = program.host;
   const diagnostics = createDiagnosticCollector();
-  const examplesBaseDir = options.examplesDirectory ?? resolvePath(program.projectRoot, "examples");
-  const exampleDir = version ? resolvePath(examplesBaseDir, version) : resolvePath(examplesBaseDir);
+  const exampleDir = resolveExampleDir(options.examplesDirectory, program.projectRoot, version);
 
   if (!(await checkExamplesDirExists(host, exampleDir))) {
     if (options.examplesDirectory) {
