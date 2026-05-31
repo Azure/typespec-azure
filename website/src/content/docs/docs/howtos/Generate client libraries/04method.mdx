@@ -241,7 +241,14 @@ public final class PetStoreNamespaceClient {
 ```
 
 ```go
-// NOT_SUPPORTED
+// Go generates the model and method as `outputModel` / `getModel` (unexported),
+// so they are not part of the package's public API.
+type outputModel struct {
+    // READ-ONLY
+    Name *string
+}
+
+func (client *PetStoreNamespaceClient) getModel(ctx context.Context, apiVersion string, name string, options *petStoreNamespaceClientgetModelOptions) (petStoreNamespaceClientgetModelResponse, error)
 ```
 
 </ClientTabs>
@@ -352,7 +359,9 @@ public final class ImageGenerations {
 ```
 
 ```go
-// NOT_SUPPORTED
+// Go does not generate different code based on usage.
+// However, the model may not be generated if it's never used.
+// In that case, set a usage for the model.
 ```
 
 </ClientTabs>
@@ -1618,7 +1627,24 @@ def get(self, *, etag: Optional[str] = None, match_condition: Optional[MatchCond
 ```
 
 ```csharp
-# TODO
+namespace TestService
+{
+  public partial class Response
+  {
+    public string Name { get; }
+  }
+
+  public partial class TestServiceClient
+  {
+    public TestServiceClient(Uri endpoint);
+    // protocol method
+    public virtual Response Get(MatchConditions matchConditions, RequestContext context);
+    public virtual Task<Response> GetAsync(MatchConditions matchConditions, RequestContext context);
+    // convenience method
+    public virtual Response<Response> Get(MatchConditions matchConditions = default, CancellationToken cancellationToken = default);
+    public virtual Task<Response<Response>> GetAsync(MatchConditions matchConditions = default, CancellationToken cancellationToken = default);
+  }
+}
 ```
 
 ```typescript
@@ -1759,7 +1785,12 @@ public final class ContosoProviderHubClient {
 ```
 
 ```go
-// NOT_SUPPORTED
+// subscriptionID is moved from the client to the operation level.
+type ContosoProviderHubClient struct { ... }
+
+func (c *ClientFactory) NewContosoProviderHubClient() *ContosoProviderHubClient
+
+func (client *ContosoProviderHubClient) Get(ctx context.Context, subscriptionID string, extendedZoneName string, options *ContosoProviderHubClientGetOptions) (ContosoProviderHubClientGetResponse, error)
 ```
 
 </ClientTabs>
@@ -1847,7 +1878,8 @@ public void getSecrets(int maxResults);
 <ClientTabItem lang="go">
 
 ```go
-// NOT_SUPPORTED
+// maxResults is now required, exposed as a positional parameter.
+func (client *MyServiceClient) GetSecrets(ctx context.Context, maxResults int32, options *MyServiceClientGetSecretsOptions) (MyServiceClientGetSecretsResponse, error)
 ```
 
 </ClientTabItem>
@@ -1939,7 +1971,8 @@ public void getSecrets(int maxResults);
 <ClientTabItem lang="go">
 
 ```go
-// NOT_SUPPORTED
+// maxResults is now required, exposed as a positional parameter.
+func (client *MyServiceClient) GetSecrets(ctx context.Context, maxResults int32, options *MyServiceClientGetSecretsOptions) (MyServiceClientGetSecretsResponse, error)
 ```
 
 </ClientTabItem>
@@ -2015,7 +2048,8 @@ public void getSecrets();
 <ClientTabItem lang="go">
 
 ```go
-// NOT_SUPPORTED
+// maxResults parameter is removed.
+func (client *MyServiceClient) GetSecrets(ctx context.Context, options *MyServiceClientGetSecretsOptions) (MyServiceClientGetSecretsResponse, error)
 ```
 
 </ClientTabItem>
@@ -2154,7 +2188,8 @@ public void myOp(boolean c, String a, int b);
 <ClientTabItem lang="go">
 
 ```go
-// NOT_SUPPORTED
+// Parameters are now in the order: c, a, b.
+func (client *MyServiceClient) MyOp(ctx context.Context, c bool, a string, b int32, options *MyServiceClientMyOpOptions) (MyServiceClientMyOpResponse, error)
 ```
 
 </ClientTabItem>
@@ -2282,7 +2317,8 @@ export async function exists(
 ```
 
 ```java
-// NOT_SUPPORTED
+public boolean exists(String name);
+public Response<Boolean> existsWithResponse(String name, RequestOptions requestOptions);
 ```
 
 ```go

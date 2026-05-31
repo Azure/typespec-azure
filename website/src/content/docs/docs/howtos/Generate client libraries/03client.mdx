@@ -1342,7 +1342,25 @@ client2.pet()
 ```
 
 ```csharp
-// TODO
+namespace NewPetStore.Food
+{
+  public partial class FoodClient
+  {
+    public FoodClient(Uri endpoint);
+    public virtual Response Feed(CancellationToken cancellationToken = default);
+    public virtual Task<Response> FeedAsync(CancellationToken cancellationToken = default);
+  }
+}
+
+namespace NewPetStore.PetAction
+{
+  public partial class PetActionClient
+  {
+    public PetActionClient(Uri endpoint);
+    public virtual Response Pet(CancellationToken cancellationToken = default);
+    public virtual Task<Response> PetAsync(CancellationToken cancellationToken = default);
+  }
+}
 ```
 
 ```typescript
@@ -1948,7 +1966,9 @@ With `@clientInitialization`, you can change the initialization way, by passing 
 @service
 namespace Storage;
 
-op download(@path blobName: string): void;
+namespace Blob {
+  op download(@path blobName: string): void;
+}
 ```
 
 ```typespec title="client.tsp"
@@ -1959,12 +1979,8 @@ using Azure.ClientGenerator.Core;
 
 namespace Customizations;
 
-model StorageClientOptions {
-  blobName: string;
-}
-
 @@clientInitialization(
-  Storage,
+  Storage.Blob,
   {
     initializedBy: InitializedBy.individually | InitializedBy.parent,
   }
@@ -1980,19 +1996,25 @@ NOT_SUPPORTED
 ```
 
 ```typescript
-export class StorageClient {
-  download(
-    blobName: string,
-    options: DownloadOptionalParams = { requestOptions: {} },
-  ): Promise<void>;
-}
-
-const client = new StorageClient();
-client.download("blobName");
+// TODO
 ```
 
 ```java
-// TODO
+// Java requires `enable-subclient: true` option in "tspconfig.yaml"
+
+public final class StorageClientBuilder {
+    public StorageClient buildClient();
+}
+
+// via ClientBuilder
+public final class BlobBuilder {
+    public BlobClient buildClient();
+}
+
+// via parent Client
+public final class StorageClient {
+    public BlobClient getBlobClient()
+}
 ```
 
 ```go
