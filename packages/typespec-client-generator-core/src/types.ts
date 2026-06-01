@@ -1927,13 +1927,15 @@ function updateTypesFromOperation(
             }
 
             // add serialization options to model type
-            updateSerializationOptions(
-              context,
-              sdkType,
-              innerResponse.body.contentTypes,
-              undefined,
-              innerResponse.body,
-              operation,
+            diagnostics.pipe(
+              updateSerializationOptions(
+                context,
+                sdkType,
+                innerResponse.body.contentTypes,
+                undefined,
+                innerResponse.body,
+                operation,
+              ),
             );
           }
           const access = getAccessOverride(context, operation) ?? "public";
