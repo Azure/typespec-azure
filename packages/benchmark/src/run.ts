@@ -70,16 +70,14 @@ async function compileSpec(specDir: string): Promise<Stats> {
   // program.stats is @internal but available at runtime
   const stats = (program as any).stats as Stats;
 
-  // The compiler doesn't always set runtime.total — compute it from parts
-  if (!stats.runtime.total) {
-    stats.runtime.total =
-      (stats.runtime.loader ?? 0) +
-      (stats.runtime.resolver ?? 0) +
-      (stats.runtime.checker ?? 0) +
-      (stats.runtime.validation?.total ?? 0) +
-      (stats.runtime.linter?.total ?? 0) +
-      (stats.runtime.emit?.total ?? 0);
-  }
+  // Recompute total without the emit stage so that adding more emitters
+  // does not inflate the "compilation" total metric.
+  stats.runtime.total =
+    (stats.runtime.loader ?? 0) +
+    (stats.runtime.resolver ?? 0) +
+    (stats.runtime.checker ?? 0) +
+    (stats.runtime.validation?.total ?? 0) +
+    (stats.runtime.linter?.total ?? 0);
 
   return stats;
 }
