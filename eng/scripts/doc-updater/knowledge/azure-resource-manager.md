@@ -93,6 +93,14 @@ Old paths like `dynatrace/`, `tenantResource/`, `arm-scenarios/singleton/`, `ope
 
 The `@service` decorator should NOT include a `version` parameter (version comes from `@versioned` when used). The guide uses `ArmCustomPatchSync` (not ArmTagsPatch) because that is the recommendation, based on the requirements of the ARM RPC (Resource Provider Contract).
 
+## Envelope Properties Placement
+
+All standard envelope properties (`EntityTagProperty`, `ExtendedLocationProperty`, `ManagedByProperty`, `ManagedServiceIdentityProperty`, `ResourceKindProperty`, `ResourcePlanProperty`, `ResourceSkuProperty`) must be spread on the **resource model** itself — NOT inside the properties bag model. The canonical sample `resource-common-properties/common-properties/main.tsp` demonstrates this pattern with all seven properties on the resource model.
+
+## ResourceNameParameter NamePattern
+
+`ResourceNameParameter` has a `NamePattern` template parameter with default value `"^[a-zA-Z0-9-]{3,24}$"`. In documentation examples, omit `NamePattern` when the value equals the default. Only show it when demonstrating a custom pattern.
+
 ## Feedback Corrections Applied
 
 - `step03.md`: Use `...ResourceNameParameter<AddressResource, KeyName = "addressName", SegmentName = "addresses">` instead of manual `@key/@segment name` fields for child resources.
@@ -100,3 +108,4 @@ The `@service` decorator should NOT include a `version` parameter (version comes
 - `step05.md`: Remove `version` from `@service` decorator; use `...ResourceNameParameter<User>` instead of manual key/segment/path.
 - `deprecation.tsp`: The ExtensionResourceBase deprecation message must say "Foundations.ExtensionResource" (not "ProxyResource").
 - `arm-legacy-operations-discourage` rule was removed from linter registration; its rule doc file and linter.md entry should not exist.
+- Knowledge base: The reason for using `ArmCustomPatchSync` in docs is "because that is the recommendation, based on the requirements of the ARM RPC" — NOT "to avoid the suppress complexity".
