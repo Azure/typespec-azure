@@ -2087,6 +2087,71 @@ maxpagesize=3
 }
 ```
 
+### Azure_ResourceManager_CommonProperties_ArmResourceIdentifiers_createOrReplace
+
+- Endpoint: `put https://management.azure.com`
+
+Resource PUT operation.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.CommonProperties/armResourceIdentifierResources/armId
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "location": "eastus",
+  "properties": {
+    "simpleArmId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithType": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithTypeAndScope": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.CommonProperties/armResourceIdentifierResources/armId",
+  "location": "eastus",
+  "name": "armId",
+  "type": "Azure.ResourceManager.CommonProperties/armResourceIdentifierResources",
+  "properties": {
+    "provisioningState": "Succeeded",
+    "simpleArmId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithType": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithTypeAndScope": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm"
+  }
+}
+```
+
+### Azure_ResourceManager_CommonProperties_ArmResourceIdentifiers_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.CommonProperties/armResourceIdentifierResources/armId
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.CommonProperties/armResourceIdentifierResources/armId",
+  "location": "eastus",
+  "name": "armId",
+  "type": "Azure.ResourceManager.CommonProperties/armResourceIdentifierResources",
+  "properties": {
+    "provisioningState": "Succeeded",
+    "simpleArmId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithType": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithTypeAndScope": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm"
+  }
+}
+```
+
 ### Azure_ResourceManager_CommonProperties_Error_createForUserDefinedError
 
 - Endpoint: `put https://management.azure.com`
@@ -2253,6 +2318,80 @@ Expected response body:
   "properties": {
     "provisioningState": "Succeeded"
   }
+}
+```
+
+### Azure_ResourceManager_LargeHeader_LargeHeaders_two6k
+
+- Endpoint: `post https://management.azure.com`
+
+Resource POST operation with long LRO headers(> 6KB + 6KB = 12KB).
+To pass the test, client should accept both:
+
+1. Single header size that's more than 6KB. 7KB is sure to pass the test.
+2. Total headers size that's more than 12KB. 13KB is sure to pass the test.
+
+Service returns both Location and Azure-AsyncOperation header on initial request.
+final-state-via: location
+
+Expected verb: POST
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.LargeHeader/largeHeaders/header1/two6k
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 202
+Expected response headers:
+
+- Azure-AsyncOperation={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/locations/eastus/operations/post?userContext=<6KB-string>
+- Location={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/operations/post?userContext=<6KB-string>
+  Expected no response body
+
+Whether you do polling through AAO, Location or combined, first one will respond with provisioning state "InProgress", second one with "Succeeded".
+
+AAO first poll.
+Expected verb: GET
+Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/locations/eastus/operations/post_aao?userContext=<6KB-string>
+Expected status code: 200
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/locations/eastus/operations/post_aao?userContext=<6KB-string>",
+  "name": "post_aao",
+  "status": "InProgress",
+  "startTime": "2024-11-08T01:41:53.5508583+00:00"
+}
+```
+
+AAO second poll.
+Expected verb: GET
+Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/locations/eastus/operations/post_aao?userContext=<6KB-string>
+Expected status code: 200
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/locations/eastus/operations/post_aao?userContext=<6KB-string>",
+  "name": "post_aao",
+  "status": "Succeeded",
+  "startTime": "2024-11-08T01:41:53.5508583+00:00",
+  "endTime": "2024-11-08T01:42:41.5354192+00:00"
+}
+```
+
+Location first poll.
+Expected verb: GET
+Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/locations/eastus/operations/post_location?userContext=<6KB-string>
+Expected status code: 202
+Expected no response body
+
+Location second poll.
+Expected verb: GET
+Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/locations/eastus/operations/post_location?userContext=<6KB-string>
+Expected status code: 200
+Expected response body:
+
+```json
+{
+  "succeeded": true
 }
 ```
 
