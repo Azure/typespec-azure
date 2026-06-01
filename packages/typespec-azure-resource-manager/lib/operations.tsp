@@ -342,8 +342,7 @@ op ArmResourceCreateOrReplaceAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Provider Optional. The provider namespace model for the resource.
  */
-#suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
-@patch(#{ implicitOptionality: true })
+@patch
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmTagsPatchAsync<
   Resource extends Foundations.SimpleResource,
@@ -377,8 +376,7 @@ op ArmTagsPatchAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Provider Optional. The provider namespace model for the resource.
  */
-#suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
-@patch(#{ implicitOptionality: true })
+@patch
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourcePatchAsync<
   Resource extends Foundations.SimpleResource,
@@ -417,7 +415,7 @@ op ArmResourcePatchAsync<
 @autoRoute
 @doc("Update a {name}", Resource)
 @armResourceUpdate(Resource)
-@patch(#{ implicitOptionality: false })
+@patch
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmCustomPatchAsync<
   Resource extends Foundations.SimpleResource,
@@ -449,8 +447,7 @@ op ArmCustomPatchAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Provider Optional. The provider namespace model for the resource.
  */
-#suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
-@patch(#{ implicitOptionality: true })
+@patch
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmTagsPatchSync<
   Resource extends Foundations.SimpleResource,
@@ -475,8 +472,7 @@ op ArmTagsPatchSync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Provider Optional. The provider namespace model for the resource.
  */
-#suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
-@patch(#{ implicitOptionality: true })
+@patch
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourcePatchSync<
   Resource extends Foundations.SimpleResource,
@@ -507,7 +503,7 @@ op ArmResourcePatchSync<
 @autoRoute
 @doc("Update a {name}", Resource)
 @armResourceUpdate(Resource)
-@patch(#{ implicitOptionality: false })
+@patch
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmCustomPatchSync<
   Resource extends Foundations.SimpleResource,

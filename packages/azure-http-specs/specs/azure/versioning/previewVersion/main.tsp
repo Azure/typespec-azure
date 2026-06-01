@@ -104,7 +104,7 @@ model UpdateWidgetColorRequest {
   ```
   """)
 @doc("Update widget color (preview only)")
-@patch(#{ implicitOptionality: true })
+@patch
 @route("/widgets/{id}/color")
 @added(ApiVersions.v2024_12_01_preview)
 op updateWidgetColor(
