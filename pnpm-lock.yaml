@@ -3116,12 +3116,18 @@ importers:
       '@azure-tools/typespec-client-generator-core':
         specifier: workspace:^
         version: link:../typespec-client-generator-core
+      '@azure-tools/typespec-python':
+        specifier: workspace:^
+        version: link:../typespec-python
       '@typespec/compiler':
         specifier: workspace:^
         version: link:../../core/packages/compiler
       '@typespec/http':
         specifier: workspace:^
         version: link:../../core/packages/http
+      '@typespec/http-client-js':
+        specifier: workspace:^
+        version: link:../../core/packages/http-client-js
       '@typespec/openapi':
         specifier: workspace:^
         version: link:../../core/packages/openapi
@@ -7890,6 +7896,7 @@ packages:
 
   '@ungap/structured-clone@1.3.0':
     resolution: {integrity: sha512-WmoN8qaIAo7WTYWbAZuG8PYEhn5fkz7dZrqTBZ7dtt//lL2Gwms1IcnQ5yHqjDfX8Ft5j4YzDM23f87zBfDe9g==}
+    deprecated: Potential CWE-502 - Update to 1.3.1 or higher
 
   '@vitejs/plugin-react@5.2.0':
     resolution: {integrity: sha512-YmKkfhOAi3wsB1PhJq5Scj3GXMn3WvtQ/JC0xoopuHoXSdmtdStOpFrYaT1kie2YgFBcIe64ROzMYRjCrYOdYw==}
@@ -13881,10 +13888,12 @@ packages:
 
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   uuid@9.0.1:
     resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   v8-to-istanbul@9.3.0:
@@ -20541,7 +20550,7 @@ snapshots:
       algoliasearch: 4.27.0
       clipanion: 4.0.0-rc.4(typanion@3.14.0)
       diff: 5.2.2
-      ink: 3.2.0(@types/react@19.2.14)(react@17.0.2)
+      ink: 3.2.0(@types/react@19.2.14)(react@19.2.5)
       ink-text-input: 4.0.3(ink@3.2.0(@types/react@19.2.14)(react@17.0.2))(react@17.0.2)
       react: 17.0.2
       semver: 7.7.4
@@ -20706,7 +20715,7 @@ snapshots:
       '@yarnpkg/plugin-git': 3.1.4(@yarnpkg/core@4.6.0(typanion@3.14.0))(typanion@3.14.0)
       clipanion: 4.0.0-rc.4(typanion@3.14.0)
       es-toolkit: 1.45.1
-      ink: 3.2.0(@types/react@19.2.14)(react@19.2.5)
+      ink: 3.2.0(@types/react@19.2.14)(react@17.0.2)
       react: 17.0.2
       semver: 7.7.4
       tslib: 2.8.1
