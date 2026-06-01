@@ -65,7 +65,7 @@ export function isSupportedSerializeType(type: SdkType): boolean {
  * 6. nested model i.e. model with property that is a model with one of the above three conditions.
  * If we consider array type, with all the above 6 types as the element types.
  */
-const specialVariantMap = new Map<SdkType, boolean>();
+const specialVariantMap = new WeakMap<SdkType, boolean>();
 export function isSpecialUnionVariant(
   t: SdkType & { isNonExhaustive?: boolean },
   variantStack: SdkType[] = []
@@ -155,7 +155,7 @@ export function isSpecialHandledUnion(
   return isDiscriminatedUnion(t!) || isPolymorphicUnion(t);
 }
 
-const polymorphicUnionMap = new Map<SdkType, boolean>();
+const polymorphicUnionMap = new WeakMap<SdkType, boolean>();
 export function isPolymorphicUnion(t: SdkType): boolean {
   if (polymorphicUnionMap.has(t)) {
     return polymorphicUnionMap.get(t) ?? false;

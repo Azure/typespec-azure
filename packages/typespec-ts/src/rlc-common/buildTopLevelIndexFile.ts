@@ -8,7 +8,17 @@ import * as path from "path";
 import { getRelativePartFromSrcPath } from "./helpers/pathUtils.js";
 import { getImportModuleName } from "./helpers/nameConstructors.js";
 
-const batchOutputFolder: [string, string, string][] = [];
+let batchOutputFolder: [string, string, string][] = [];
+
+/**
+ * Resets the accumulated batch output folder state. This module-level state is
+ * accumulated across calls to `buildTopLevelIndex` within a single emit; it must
+ * be cleared between emits (and between tests) to avoid retaining stale entries
+ * and leaking memory across runs.
+ */
+export function resetBatchOutputFolder(): void {
+  batchOutputFolder = [];
+}
 
 export function buildTopLevelIndex(model: RLCModel) {
   if (!model.options) {
@@ -59,6 +69,7 @@ export function buildTopLevelIndex(model: RLCModel) {
       model.options.isModularLibrary ? "rest" : "",
       `index.ts`
     );
+    resetBatchOutputFolder();
     return { path: filePath, content };
   }
   return undefined;

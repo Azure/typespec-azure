@@ -16,7 +16,7 @@ import { assert } from "vitest";
 import { format } from "prettier";
 import { prettierTypeScriptOptions } from "../../src/lib.js";
 import { createContextWithDefaultOptions } from "../../src/index.js";
-import { provideContext } from "../../src/contextManager.js";
+import { provideContext, clearContexts } from "../../src/contextManager.js";
 import { Project } from "ts-morph";
 import { provideSdkTypes } from "../../src/framework/hooks/sdkTypes.js";
 import { provideBinder } from "../../src/framework/hooks/binder.js";
@@ -202,6 +202,7 @@ export async function createDpgContextTestHelper(
   configs: Record<string, unknown> = {}
 ): Promise<SdkContext> {
   const outputProject = new Project({ useInMemoryFileSystem: true });
+  clearContexts();
   provideContext("rlcMetaTree", new Map());
   provideContext("symbolMap", new Map());
   provideContext("outputProject", outputProject);

@@ -72,6 +72,16 @@ class ContextManager {
   public getContext<K extends ContextKey>(key: K): Contexts[K] | undefined {
     return this.contexts.get(key) as Contexts[K] | undefined;
   }
+
+  /**
+   * Clears all stored contexts. This releases references to heavy object graphs
+   * (e.g. the compiler/TCGC program, the ts-morph project and binder) so they can
+   * be garbage collected. Primarily used between emits and between tests to avoid
+   * leaking memory across runs.
+   */
+  public clear(): void {
+    this.contexts.clear();
+  }
 }
 
 // Expose the singleton instance of the context manager.
@@ -101,4 +111,13 @@ export function provideContext<K extends ContextKey>(
   value: Contexts[K]
 ): void {
   contextManager.setContext(key, value);
+}
+
+/**
+ * Clears all provided contexts, releasing references to the heavy object graphs
+ * they hold so they can be garbage collected. Call this between emits and between
+ * tests to avoid leaking memory across runs.
+ */
+export function clearContexts(): void {
+  contextManager.clear();
 }
