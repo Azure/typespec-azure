@@ -2,6 +2,7 @@ emit:
   - "@azure-tools/typespec-autorest"
   - "@typespec/openapi3"
   - "@azure-tools/typespec-python"
+  - "@typespec/http-client-js"
 options:
   "@azure-tools/typespec-autorest":
     output-file: "{emitter-output-dir}/{service-name}/{version}/openapi.json"
