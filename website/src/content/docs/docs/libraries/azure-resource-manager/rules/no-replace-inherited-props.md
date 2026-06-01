@@ -1,9 +1,9 @@
 ---
-title: arm-no-replace-inherited-props
+title: no-replace-inherited-props
 ---
 
 ```text title="Full name"
-@azure-tools/typespec-azure-resource-manager/arm-no-replace-inherited-props
+@azure-tools/typespec-azure-resource-manager/no-replace-inherited-props
 ```
 
 Warns when a model redefines a property that is already defined in one of its base models. Repeating inherited properties in a child model is an anti-pattern for Azure APIs and can cause problems with OpenAPI tooling and some language representations of the models.

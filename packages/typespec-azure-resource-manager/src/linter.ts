@@ -5,7 +5,6 @@ import { armCustomResourceUsageDiscourage } from "./rules/arm-custom-resource-us
 import { armDeleteResponseCodesRule } from "./rules/arm-delete-response-codes.js";
 import { armNoPathCasingConflictsRule } from "./rules/arm-no-path-casing-conflicts.js";
 import { armNoRecordRule } from "./rules/arm-no-record.js";
-import { armNoReplaceInheritedPropsRule } from "./rules/arm-no-replace-inherited-props.js";
 import { armPostResponseCodesRule } from "./rules/arm-post-response-codes.js";
 import { armPutResponseCodesRule } from "./rules/arm-put-response-codes.js";
 import { armResourceActionNoSegmentRule } from "./rules/arm-resource-action-no-segment.js";
@@ -27,6 +26,7 @@ import { improperSubscriptionListOperationRule } from "./rules/improper-subscrip
 import { lroLocationHeaderRule } from "./rules/lro-location-header.js";
 import { missingXmsIdentifiersRule } from "./rules/missing-x-ms-identifiers.js";
 import { noEmptyModel } from "./rules/no-empty-model.js";
+import { armNoReplaceInheritedPropsRule } from "./rules/no-replace-inherited-props.js";
 import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";

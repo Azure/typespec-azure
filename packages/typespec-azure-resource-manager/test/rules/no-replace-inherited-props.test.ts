@@ -6,7 +6,7 @@ import {
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 
-import { armNoReplaceInheritedPropsRule } from "../../src/rules/arm-no-replace-inherited-props.js";
+import { armNoReplaceInheritedPropsRule } from "../../src/rules/no-replace-inherited-props.js";
 
 let runner: TesterInstance;
 let tester: LinterRuleTester;
@@ -63,7 +63,7 @@ it("warns when child model redefines an inherited model-typed property with a de
     )
     .toEmitDiagnostics([
       {
-        code: "@azure-tools/typespec-azure-resource-manager/arm-no-replace-inherited-props",
+        code: "@azure-tools/typespec-azure-resource-manager/no-replace-inherited-props",
         message:
           "The property 'nested' is also defined in the base model.  Redefining inherited properties can cause problems with OpenAPI tooling and some language representations of the models.",
       },
@@ -94,7 +94,7 @@ it("warns when redefining a model-typed property from an indirect ancestor with 
     )
     .toEmitDiagnostics([
       {
-        code: "@azure-tools/typespec-azure-resource-manager/arm-no-replace-inherited-props",
+        code: "@azure-tools/typespec-azure-resource-manager/no-replace-inherited-props",
         message:
           "The property 'sharedProp' is also defined in the base model.  Redefining inherited properties can cause problems with OpenAPI tooling and some language representations of the models.",
       },
