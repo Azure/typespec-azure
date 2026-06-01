@@ -29,15 +29,3 @@ namespace Azure.ResourceManager.CommonTypes;
   #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
   "customermanagedkeys.json"
 );
-@@armCommonDefinition(
-  CustomerManagedKeyEncryption,
-  "customerManagedKeyEncryption",
-  Azure.ResourceManager.CommonTypes.Versions.v5,
-  "customermanagedkeys.json"
-);
-@@armCommonDefinition(
-  CustomerManagedKeyEncryption,
-  "customerManagedKeyEncryption",
-  Azure.ResourceManager.CommonTypes.Versions.v6,
-  "customermanagedkeys.json"
-);

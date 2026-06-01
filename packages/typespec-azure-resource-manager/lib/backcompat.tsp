@@ -6,6 +6,7 @@ namespace Azure.ResourceManager;
 alias InfrastructureEncryption = CommonTypes.InfrastructureEncryption;
 alias KeyEncryptionIdentity = CommonTypes.KeyEncryptionKeyIdentity;
 alias KeyEncryptionKeyIdentity = CommonTypes.KeyEncryptionKeyIdentity;
+#suppress "deprecated" "Need for back compatibility in common-types"
 alias CustomerManagedKeyEncryption = CommonTypes.CustomerManagedKeyEncryption;
 alias EncryptionConfiguration = CommonTypes.Encryption;
 
