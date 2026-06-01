@@ -240,38 +240,42 @@ op checkNameAvailability<
 ): Response | ErrorResponse;
 
 /**
- * @dev The base template for Azure Resource Manager GET and HEAD Operations.
+ * The base template for Azure Resource Manager GET and HEAD Operations.
  * @template Parameters The parameter object for the operation.
  * @template Response The response or union of responses for success.
  * @template ErrorResponse The error response.
  */
+@doc("")
 op ArmReadOperation<Parameters extends {}, Response extends {}, ErrorResponse extends {}>(
   ...Parameters,
 ): Response | ErrorResponse;
 
 /**
- * @dev The base template for Azure Resource Manager PUT Operations.
+ * The base template for Azure Resource Manager PUT Operations.
  * @template HttpParameters The parameter object for the operation.
  * @template BodyParameter The body parameter
  * @template Response The response or union of responses for success.
  * @template ErrorResponse The error response.
  */
+@doc("")
 op ArmCreateOperation<
   HttpParameters extends {},
   BodyParameter extends {},
   Response extends {},
   ErrorResponse extends {}
->(...HttpParameters, @doc("Resource create parameters.") @bodyRoot resource: BodyParameter):
-  | Response
-  | ErrorResponse;
+>(
+  ...HttpParameters,
+  @doc("Resource create parameters.") @bodyRoot resource: BodyParameter,
+): Response | ErrorResponse;
 
 /**
- * @dev The base template for Azure Resource Manager PATCH Operations.
+ * The base template for Azure Resource Manager PATCH Operations.
  * @template HttpParameters The parameter object for the operation.
  * @template BodyParameter The body parameter
  * @template Response The response or union of responses for success.
  * @template ErrorResponse The error response.
  */
+@doc("")
 op ArmUpdateOperation<
   HttpParameters extends {},
   BodyParameter extends {},

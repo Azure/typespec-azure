@@ -8,6 +8,8 @@ llmstxt: true
 
 ### `ArmAcceptedLroResponse` {#Azure.ResourceManager.ArmAcceptedLroResponse}
 
+The standard Azure Resource Manager response for asynchronous PATCH, POST, and DELETE operations
+
 ```typespec
 model Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders>
 ```
@@ -36,6 +38,8 @@ op post(...ResourceInstanceParameters<Employee>):
 | statusCode | `202` | The status code. |
 
 ### `ArmAcceptedResponse` {#Azure.ResourceManager.ArmAcceptedResponse}
+
+The standard ACCEPTED response
 
 ```typespec
 model Azure.ResourceManager.ArmAcceptedResponse<Message, ExtraHeaders>
@@ -166,6 +170,8 @@ op post(...ResourceInstanceParameters<Employee>): ArmCreatedResponse<
 
 ### `ArmDeleteAcceptedLroResponse` {#Azure.ResourceManager.ArmDeleteAcceptedLroResponse}
 
+The response for asynchronous Azure Resource Manager delete ACCEPTED
+
 ```typespec
 model Azure.ResourceManager.ArmDeleteAcceptedLroResponse<LroHeaders>
 ```
@@ -193,6 +199,8 @@ op delete is ArmResourceDeleteWithoutOkAsync<
 
 ### `ArmDeleteAcceptedResponse` {#Azure.ResourceManager.ArmDeleteAcceptedResponse}
 
+The response for synchronous Azure Resource Manager delete ACCEPTED
+
 ```typespec
 model Azure.ResourceManager.ArmDeleteAcceptedResponse
 ```
@@ -205,6 +213,8 @@ model Azure.ResourceManager.ArmDeleteAcceptedResponse
 | retryAfter? | `int32` | The Retry-After header can indicate how long the client should wait before polling the operation status. |
 
 ### `ArmDeletedNoContentResponse` {#Azure.ResourceManager.ArmDeletedNoContentResponse}
+
+Azure Resource Manager response for a properly formed delete request, with no resource found
 
 ```typespec
 model Azure.ResourceManager.ArmDeletedNoContentResponse
@@ -388,6 +398,8 @@ model Azure.ResourceManager.ArmOperationStatus<Properties, StatusValues>
 
 ### `ArmResourceCreatedResponse` {#Azure.ResourceManager.ArmResourceCreatedResponse}
 
+Resource create operation succeeded
+
 ```typespec
 model Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders>
 ```
@@ -423,6 +435,8 @@ op createOrUpdate is ArmResourceCreateOrReplaceAsync<
 
 ### `ArmResourceCreatedSyncResponse` {#Azure.ResourceManager.ArmResourceCreatedSyncResponse}
 
+Resource synchronous create operation succeeded
+
 ```typespec
 model Azure.ResourceManager.ArmResourceCreatedSyncResponse<Resource>
 ```
@@ -451,6 +465,8 @@ op createOrUpdate is ArmResourceCreateOrReplaceSync<
 
 ### `ArmResourceExistsResponse` {#Azure.ResourceManager.ArmResourceExistsResponse}
 
+Resource exists response
+
 ```typespec
 model Azure.ResourceManager.ArmResourceExistsResponse
 ```
@@ -470,6 +486,15 @@ op head(...ResourceInstanceParameters<Employee>): ArmResourceExistsResponse;
 
 ### `ArmResourceNotFoundResponse` {#Azure.ResourceManager.ArmResourceNotFoundResponse}
 
+Resource is not found response
+
+```typespec
+@head
+op head(...ResourceInstanceParameters<Employee>):
+  | ArmResponse<Employee>
+  | ArmResourceNotFoundResponse;
+```
+
 ```typespec
 model Azure.ResourceManager.ArmResourceNotFoundResponse
 ```
@@ -481,6 +506,8 @@ model Azure.ResourceManager.ArmResourceNotFoundResponse
 | statusCode | `404` | The status code. |
 
 ### `ArmResourceUpdatedResponse` {#Azure.ResourceManager.ArmResourceUpdatedResponse}
+
+Resource update operation succeeded
 
 ```typespec
 model Azure.ResourceManager.ArmResourceUpdatedResponse<Resource>
@@ -1097,7 +1124,7 @@ model Foo is TrackedResource<FooProperties> {
 
 ### `ResourceListCustomResult` {#Azure.ResourceManager.ResourceListCustomResult}
 
-Paged response containing results
+Paged response containing custom result types.
 
 ```typespec
 model Azure.ResourceManager.ResourceListCustomResult<Result>
@@ -1809,6 +1836,8 @@ model Azure.ResourceManager.CommonTypes.KeyEncryptionKeyIdentity
 | delegatedIdentityClientId?      | `Core.uuid`                                                                                                      | delegated identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity and userAssignedIdentity - internal use only. |
 
 ### `KeyVaultProperties` {#Azure.ResourceManager.CommonTypes.KeyVaultProperties}
+
+Properties of a KeyVault
 
 ```typespec
 model Azure.ResourceManager.CommonTypes.KeyVaultProperties
@@ -2907,6 +2936,8 @@ union Azure.ResourceManager.CommonTypes.ResourceAssociationAccessMode
 
 ### `ResourceIdentityType` {#Azure.ResourceManager.CommonTypes.ResourceIdentityType}
 
+Resource Identity Type
+
 ```typespec
 union Azure.ResourceManager.CommonTypes.ResourceIdentityType
 ```
@@ -3911,6 +3942,8 @@ model Foo is TrackedResource<FooProperties> {
 
 ### `Provider` {#Azure.ResourceManager.Legacy.Provider}
 
+DEPRECATED: Use ProviderParameter instead. Get the provider namespace key-value pair
+
 ```typespec
 model Azure.ResourceManager.Legacy.Provider<Resource>
 ```
@@ -3928,6 +3961,8 @@ model Azure.ResourceManager.Legacy.Provider<Resource>
 | provider | `"Microsoft.ThisWillBeReplaced"` |             |
 
 ### `ProviderParameter` {#Azure.ResourceManager.Legacy.ProviderParameter}
+
+Get the provider namespace key-value pair
 
 ```typespec
 model Azure.ResourceManager.Legacy.ProviderParameter<Resource>

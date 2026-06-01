@@ -43,9 +43,10 @@ interface ExtensionOperations<
     LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = Resource> &
       Azure.Core.Foundations.RetryAfterHeader,
     Parameters extends {} = {},
-    Response extends {} =
-      | ArmResourceUpdatedResponse<Resource>
-      | ArmResourceCreatedResponse<Resource, LroHeaders>,
+    Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
+      Resource,
+      LroHeaders
+    >,
     OptionalRequestBody extends valueof boolean = false,
     ErrorType extends {} = ErrorResponse,
     OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
@@ -77,9 +78,7 @@ interface ExtensionOperations<
   CreateOrUpdateSync<
     Resource extends Foundations.SimpleResource,
     Parameters extends {} = {},
-    Response extends {} =
-      | ArmResourceUpdatedResponse<Resource>
-      | ArmResourceCreatedSyncResponse<Resource>,
+    Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedSyncResponse<Resource>,
     OptionalRequestBody extends valueof boolean = false,
     ErrorType extends {} = ErrorResponse,
     OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
@@ -118,9 +117,10 @@ interface ExtensionOperations<
     > &
       Azure.Core.Foundations.RetryAfterHeader,
     Parameters extends {} = {},
-    Response extends {} =
-      | ArmResponse<Resource>
-      | ArmAcceptedLroResponse<"Resource update request accepted.", LroHeaders>,
+    Response extends {} = ArmResponse<Resource> | ArmAcceptedLroResponse<
+      "Resource update request accepted.",
+      LroHeaders
+    >,
     OptionalRequestBody extends valueof boolean = false,
     ErrorType extends {} = ErrorResponse,
     OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
@@ -215,7 +215,7 @@ interface ExtensionOperations<
   >(...TargetParameters, ...ExtensionInstanceParameters, ...Parameters): Response | ErrorType;
 
   /**
-   * @dev Get a resource
+   * Get a resource
    * @template Resource The resource being read
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response for a get operation.
@@ -376,9 +376,10 @@ interface ExtensionOperations<
     > &
       Azure.Core.Foundations.RetryAfterHeader,
     Parameters extends {} = {},
-    Response extends {} | void =
-      | ArmAcceptedLroResponse<"Resource operation accepted.", LroHeaders>
-      | Result,
+    Response extends {} | void = ArmAcceptedLroResponse<
+      "Resource operation accepted.",
+      LroHeaders
+    > | Result,
     OptionalRequestBody extends valueof boolean = false,
     ErrorType extends {} = ErrorResponse,
     OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },

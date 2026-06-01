@@ -114,7 +114,9 @@ the version of the Azure Resource Manager common-types to use for refs in emitte
 
 #### `@armLibraryNamespace`
 
-`@armLibraryNamespace` designates a namespace as containign Azure Resource Manager Provider information.
+`@armLibraryNamespace` designates a namespace as containing Azure Resource Manager Provider information.
+This is used for library namespaces that define reusable ARM resource types that can be shared
+across multiple provider specifications.
 
 ```typespec
 @Azure.ResourceManager.armLibraryNamespace
@@ -168,8 +170,9 @@ namespace Microsoft.ContosoService;
 
 #### `@armProviderNameValue`
 
-`@armResourceType` sets the value fo the decorated string
-property to the type of the Azure Resource Manager resource.
+`@armProviderNameValue` sets the provider namespace value on operations.
+It is used internally to inject the correct provider namespace path segment
+for resource operations in auto-generated routes.
 
 ```typespec
 @Azure.ResourceManager.armProviderNameValue
@@ -184,6 +187,11 @@ property to the type of the Azure Resource Manager resource.
 None
 
 #### `@armResourceAction`
+
+Marks the operation as a custom action on a specific Azure Resource Manager resource type.
+This decorator associates a POST action operation with its resource,
+identifying the semantics of the operation as a resource action over a specific resource for documentation,
+resource validation, and use by downstream emitters.
 
 ```typespec
 @Azure.ResourceManager.armResourceAction(resourceModel: Model, resourceName?: valueof string)
@@ -221,7 +229,9 @@ Marks the operation as being a check existence (HEAD) operation
 
 #### `@armResourceCollectionAction`
 
-Marks the operation as being a collection action
+Marks the operation as being a collection action that is not associated with a specific resource instance.
+Collection actions are operations that act on a resource collection rather than a single resource,
+such as `checkNameAvailability` or provider-level actions.
 
 ```typespec
 @Azure.ResourceManager.armResourceCollectionAction
@@ -236,6 +246,10 @@ Marks the operation as being a collection action
 None
 
 #### `@armResourceCreateOrUpdate`
+
+Marks the operation as a create or update (PUT) operation for a specific Azure Resource Manager resource type.
+This decorator identifies the semantics of the operation as a CreateOrReplace lifecycle operation over a particular resource,
+for use in documentation, resource validation, and downstream emitters.
 
 ```typespec
 @Azure.ResourceManager.armResourceCreateOrUpdate(resourceModel: Model, resourceName?: valueof string)
@@ -254,6 +268,10 @@ None
 
 #### `@armResourceDelete`
 
+Marks the operation as a delete (DELETE) operation for a specific Azure Resource Manager resource type.
+This decorator identifies the operation as a Delete lifecycle operation over the resource for us in documentation,
+resource validation, and downstream emitters.
+
 ```typespec
 @Azure.ResourceManager.armResourceDelete(resourceModel: Model, resourceName?: valueof string)
 ```
@@ -270,6 +288,10 @@ None
 | resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 #### `@armResourceList`
+
+Marks the operation as a list (GET collection) operation for a specific Azure Resource Manager resource type.
+This decorator identifies the semantics of the operation as a collection list operation over a resource type and a particular scope for documentation,
+resource validation, and downstream emitters.
 
 ```typespec
 @Azure.ResourceManager.armResourceList(resourceModel: Model, resourceName?: valueof string)
@@ -322,6 +344,10 @@ individually tagged
 
 #### `@armResourceRead`
 
+Marks the operation as a read (GET) operation for a specific Azure Resource Manager resource type.
+This decorator identifies the semantics of the operation as a Read lifecycle operation over a particular resource,
+for use in documentation, resource validation, and downstream emitters.
+
 ```typespec
 @Azure.ResourceManager.armResourceRead(resourceModel: Model, resourceName?: valueof string)
 ```
@@ -338,6 +364,10 @@ individually tagged
 | resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 #### `@armResourceUpdate`
+
+Marks the operation as an update (PATCH) operation for a specific Azure Resource Manager resource type.
+This decorator identifies the operation as an Update lifecycle operation over the resource for use in documentation,
+resource validation, and downstream emitters.
 
 ```typespec
 @Azure.ResourceManager.armResourceUpdate(resourceModel: Model, resourceName?: valueof string)
@@ -357,7 +387,8 @@ individually tagged
 #### `@armVirtualResource`
 
 This decorator is used on Azure Resource Manager resources that are not based on
-Azure.ResourceManager common types.
+Azure.ResourceManager common types. It marks a model as an ARM virtual resource,
+which is useful for scope resources like `ArmLocationResource` or action scope models.
 
 ```typespec
 @Azure.ResourceManager.armVirtualResource(provider?: valueof string)
@@ -447,10 +478,11 @@ None
 
 #### `@resourceBaseType`
 
-This decorator sets the base type of the given resource.
+This decorator sets the base type of the given resource, indicating where in the
+Azure Resource Manager hierarchy the resource is located.
 
 ```typespec
-@Azure.ResourceManager.resourceBaseType(baseTypeIt: "Tenant" | "Subscription" | "ResourceGroup" | "Location" | "Extension")
+@Azure.ResourceManager.resourceBaseType(baseType: "Tenant" | "Subscription" | "ResourceGroup" | "Location" | "Extension")
 ```
 
 ##### Target
@@ -459,9 +491,9 @@ This decorator sets the base type of the given resource.
 
 ##### Parameters
 
-| Name       | Type                                                                         | Description                                                                                                            |
-| ---------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| baseTypeIt | `"Tenant" \| "Subscription" \| "ResourceGroup" \| "Location" \| "Extension"` | The built-in parent of the resource, this can be "Tenant", "Subscription", "ResourceGroup", "Location", or "Extension" |
+| Name     | Type                                                                         | Description                                                                                                            |
+| -------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| baseType | `"Tenant" \| "Subscription" \| "ResourceGroup" \| "Location" \| "Extension"` | The built-in parent of the resource, this can be "Tenant", "Subscription", "ResourceGroup", "Location", or "Extension" |
 
 #### `@resourceGroupResource`
 
