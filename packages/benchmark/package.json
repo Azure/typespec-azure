@@ -33,6 +33,7 @@
     "@azure-tools/typespec-autorest": "workspace:^",
     "@azure-tools/typespec-client-generator-core": "workspace:^",
     "@azure-tools/typespec-python": "workspace:^",
+    "@azure-tools/typespec-ts": "workspace:^",
     "@typespec/http-client-js": "workspace:^"
   },
   "devDependencies": {

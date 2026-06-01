@@ -1,6 +1,7 @@
 emit:
   - "@azure-tools/typespec-autorest"
   - "@azure-tools/typespec-python"
+  - "@azure-tools/typespec-ts"
   - "@typespec/http-client-js"
 options:
   "@azure-tools/typespec-autorest":
@@ -8,6 +9,11 @@ options:
     output-file: "{emitter-output-dir}/{service-name}/{version}/openapi.json"
   "@azure-tools/typespec-python":
     namespace: "azure.mgmt.contosobenchmark"
+  "@azure-tools/typespec-ts":
+    flavor: azure
+    azure-arm: true
+    package-details:
+      name: "@azure/arm-contosobenchmark"
 linter:
   extends:
     - "@azure-tools/typespec-azure-rulesets/resource-manager"

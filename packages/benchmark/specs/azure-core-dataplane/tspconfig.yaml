@@ -2,6 +2,7 @@ emit:
   - "@azure-tools/typespec-autorest"
   - "@typespec/openapi3"
   - "@azure-tools/typespec-python"
+  - "@azure-tools/typespec-ts"
   - "@typespec/http-client-js"
 options:
   "@azure-tools/typespec-autorest":
@@ -9,6 +10,10 @@ options:
   "@azure-tools/typespec-python":
     namespace: "contoso.benchmarkwidgets"
     package-mode: dataplane
+  "@azure-tools/typespec-ts":
+    flavor: azure
+    package-details:
+      name: "@azure-rest/contoso-benchmarkwidgets"
 linter:
   extends:
     - "@azure-tools/typespec-azure-rulesets/data-plane"

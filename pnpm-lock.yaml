@@ -3194,6 +3194,9 @@ importers:
       '@azure-tools/typespec-python':
         specifier: workspace:^
         version: link:../typespec-python
+      '@azure-tools/typespec-ts':
+        specifier: workspace:^
+        version: link:../typespec-ts
       '@typespec/compiler':
         specifier: workspace:^
         version: link:../../core/packages/compiler
