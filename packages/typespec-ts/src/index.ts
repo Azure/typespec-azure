@@ -253,9 +253,7 @@ export async function $onEmit(context: EmitContext) {
     const customizationFolder = join(projectRoot, "generated");
     const srcGeneratedFolder = join(projectRoot, "src", "generated");
     // if customization folder exists, use it as sources root
-    const finalCustomizationFolder = (await pathExists(
-      srcGeneratedFolder
-    ))
+    const finalCustomizationFolder = (await pathExists(srcGeneratedFolder))
       ? srcGeneratedFolder
       : customizationFolder;
     const sourcesRoot = (await pathExists(finalCustomizationFolder))
