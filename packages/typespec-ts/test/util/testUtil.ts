@@ -12,7 +12,7 @@ import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { AutorestTestLibrary } from "@azure-tools/typespec-autorest/testing";
 import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
 import { SdkContext } from "../../src/utils/interfaces.js";
-import { assert } from "chai";
+import { assert } from "vitest";
 import { format } from "prettier";
 import { prettierTypeScriptOptions } from "../../src/lib.js";
 import { createContextWithDefaultOptions } from "../../src/index.js";
