@@ -1722,6 +1722,23 @@ function updateTypesFromOperation(
       // Otherwise use the body type directly
       const bodyTypeOrProperty = httpBody.property ?? getHttpBodyType(httpBody);
       const bodyType = getHttpBodyType(httpBody);
+      // For file bodies with multiple content types, pre-warm the cache for the
+      // `contentType` property's union under the operation naming context so that
+      // the resulting SdkEnumType is named after the operation (e.g.
+      // `UploadFileMultipleContentTypesContentType`) and is the same instance later
+      // reused by both the File model's `contentType` property and the synthetic
+      // `contentType` header parameter created in `createContentTypeOrAcceptHeader`.
+      if (
+        httpBody.bodyKind === "file" &&
+        httpBody.contentTypes.length > 1 &&
+        httpBody.contentTypeProperty.type.kind === "Union"
+      ) {
+        pushNamingContext(context, "ContentType", undefined);
+        diagnostics.pipe(
+          getClientTypeWithDiagnostics(context, httpBody.contentTypeProperty.type, operation),
+        );
+        popNamingContext(context);
+      }
       // For named unions, pass undefined so anonymous types inside get named relative
       // to the operation (e.g., "PostRequest") rather than the union (e.g., "A1")
       const bodyContextType =
@@ -1759,7 +1776,16 @@ function updateTypesFromOperation(
         }
 
         // add serialization options to model type
-        updateSerializationOptions(context, sdkType, httpBody.contentTypes, undefined, httpBody);
+        diagnostics.pipe(
+          updateSerializationOptions(
+            context,
+            sdkType,
+            httpBody.contentTypes,
+            undefined,
+            httpBody,
+            operation,
+          ),
+        );
 
         // after completion of usage calculation for httpBody, check whether it has
         // conflicting usage between multipart and regular body
@@ -1901,12 +1927,15 @@ function updateTypesFromOperation(
             }
 
             // add serialization options to model type
-            updateSerializationOptions(
-              context,
-              sdkType,
-              innerResponse.body.contentTypes,
-              undefined,
-              innerResponse.body,
+            diagnostics.pipe(
+              updateSerializationOptions(
+                context,
+                sdkType,
+                innerResponse.body.contentTypes,
+                undefined,
+                innerResponse.body,
+                operation,
+              ),
             );
           }
           const access = getAccessOverride(context, operation) ?? "public";
@@ -2468,22 +2497,25 @@ function updateSerializationOptions(
   contentTypes: string[],
   options?: PropagationOptions,
   httpBody?: HttpPayloadBody,
-) {
+  operation?: Operation,
+): [void, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   options = options ?? {};
   options.seenTypes = options.seenTypes ?? new Set<SdkType>();
   options.propagation = options?.propagation ?? true;
   options.ignoreSubTypeStack = options.ignoreSubTypeStack ?? [];
 
   if (options.seenTypes.has(type)) {
-    return; // avoid circular references
+    return diagnostics.wrap(undefined); // avoid circular references
   }
 
   if (type.kind === "array" || type.kind === "dict") {
     updateSerializationOptions(context, type.valueType, contentTypes, options);
-    return;
+    return diagnostics.wrap(undefined);
   }
 
-  if (type.kind !== "model" && type.kind !== "union" && type.kind !== "nullable") return;
+  if (type.kind !== "model" && type.kind !== "union" && type.kind !== "nullable")
+    return diagnostics.wrap(undefined);
 
   if (options.ignoreSubTypeStack.length === 0 || !options.ignoreSubTypeStack.at(-1)) {
     options.seenTypes.add(type);
@@ -2493,11 +2525,11 @@ function updateSerializationOptions(
     for (const unionType of type.variantTypes) {
       updateSerializationOptions(context, unionType, contentTypes, options);
     }
-    return;
+    return diagnostics.wrap(undefined);
   }
   if (type.kind === "nullable") {
     updateSerializationOptions(context, type.type, contentTypes, options);
-    return;
+    return diagnostics.wrap(undefined);
   }
 
   // Handle file body serialization - if it's a file, set binary options and skip json/xml
@@ -2507,9 +2539,12 @@ function updateSerializationOptions(
       isFile: true,
       isText: fileBody.isText,
       contentTypes: fileBody.contentTypes,
-      filename: fileBody.filename,
+      filename:
+        fileBody.filename && operation
+          ? diagnostics.pipe(getSdkModelPropertyType(context, fileBody.filename, operation))
+          : undefined,
     };
-    return; // No need to add json/xml serialization for file types
+    return diagnostics.wrap(undefined); // No need to add json/xml serialization for file types
   }
 
   setSerializationOptions(context, type, contentTypes);
@@ -2556,7 +2591,7 @@ function updateSerializationOptions(
     updateSerializationOptions(context, property.type, contentTypes, options);
     options.ignoreSubTypeStack.pop();
   }
-  return;
+  return diagnostics.wrap(undefined);
 }
 
 function setSerializationOptions(

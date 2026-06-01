@@ -465,10 +465,24 @@ function createContentTypeOrAcceptHeader(
         type = getSdkConstant(context, literal, httpOperation.operation);
       } else {
         // Multi content types on request → enum.
-        const union = tk.union.create(
-          bodyObject.contentTypes.map((ct) => tk.literal.createString(ct)),
-        );
-        type = getClientType(context, union, httpOperation.operation);
+        // For File bodies, reuse the File model's `contentType` property type so that the
+        // synthetic `contentType` header parameter and the File model reference the same
+        // SdkEnumType instance (the cache for that union is pre-warmed under the operation
+        // naming context in `updateTypesFromOperation`, so the enum gets a name derived
+        // from the operation, e.g. `UploadFileMultipleContentTypesContentType`).
+        const fileBody =
+          bodyObject.kind === "body" && httpOperation.parameters.body?.bodyKind === "file"
+            ? httpOperation.parameters.body
+            : undefined;
+        const contentTypePropertyType = fileBody?.contentTypeProperty.type;
+        if (contentTypePropertyType && contentTypePropertyType.kind === "Union") {
+          type = getClientType(context, contentTypePropertyType, httpOperation.operation);
+        } else {
+          const union = tk.union.create(
+            bodyObject.contentTypes.map((ct) => tk.literal.createString(ct)),
+          );
+          type = getClientType(context, union, httpOperation.operation);
+        }
       }
     } finally {
       context.__namingContextPath.pop();
