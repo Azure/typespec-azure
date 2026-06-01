@@ -6,7 +6,7 @@ import {
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 
-import { armNoReplaceInheritedPropsRule } from "../../src/rules/no-replace-inherited-props.js";
+import { noReplaceInheritedPropsRule } from "../../src/rules/no-replace-inherited-props.js";
 
 let runner: TesterInstance;
 let tester: LinterRuleTester;
@@ -15,7 +15,7 @@ beforeEach(async () => {
   runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    armNoReplaceInheritedPropsRule,
+    noReplaceInheritedPropsRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });

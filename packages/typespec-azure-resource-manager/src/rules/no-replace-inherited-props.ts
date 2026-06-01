@@ -73,7 +73,7 @@ function getScalarFamily(type: Type): ScalarFamily | undefined {
   }
 }
 
-export const armNoReplaceInheritedPropsRule = createRule({
+export const noReplaceInheritedPropsRule = createRule({
   name: "no-replace-inherited-props",
   severity: "warning",
   description: "Disallow redefining properties already defined in a base type.",

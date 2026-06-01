@@ -26,7 +26,7 @@ import { improperSubscriptionListOperationRule } from "./rules/improper-subscrip
 import { lroLocationHeaderRule } from "./rules/lro-location-header.js";
 import { missingXmsIdentifiersRule } from "./rules/missing-x-ms-identifiers.js";
 import { noEmptyModel } from "./rules/no-empty-model.js";
-import { armNoReplaceInheritedPropsRule } from "./rules/no-replace-inherited-props.js";
+import { noReplaceInheritedPropsRule } from "./rules/no-replace-inherited-props.js";
 import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
@@ -40,7 +40,7 @@ import { versionProgressionRule } from "./rules/version-progression.js";
 const rules = [
   armNoRecordRule,
   armNoPathCasingConflictsRule,
-  armNoReplaceInheritedPropsRule,
+  noReplaceInheritedPropsRule,
   armCommonTypesVersionRule,
   armDeleteResponseCodesRule,
   armPutResponseCodesRule,
