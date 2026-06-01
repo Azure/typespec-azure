@@ -6,9 +6,9 @@ export default mergeConfig(
   defineConfig({
     test: {
       projects: [
-        "packages/!(typespec-ts)/vitest.config.ts",
+        "packages/*/vitest.config.ts",
         "core/packages/*/vitest.config.ts",
-        "packages/!(typespec-ts)/vitest.config.mts",
+        "packages/*/vitest.config.mts",
         "core/packages/*/vitest.config.mts",
       ],
     },
