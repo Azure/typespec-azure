@@ -6,10 +6,7 @@ export default mergeConfig(
   defineConfig({
     test: {
       // Exclude core packages so we can only run test for this repo
-      projects: [
-        "packages/*/vitest.config.ts",
-        "packages/*/vitest.config.mts",
-      ],
+      projects: ["packages/*/vitest.config.ts", "packages/*/vitest.config.mts"],
     },
   }),
 );
