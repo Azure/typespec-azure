@@ -198,9 +198,7 @@ export function serializeExampleValue(value: SdkExampleValue): string {
             .replace(/\n/g, "\\n")
             .replace(/\r/g, "\\r")
             .replace(/\t/g, "\\t")
-            .replace(/\f/g, "\\f")
-            .replace(/>/g, ">")
-            .replace(/</g, "<")}"`;
+            .replace(/\f/g, "\\f")}"`;
           break;
       }
       break;
@@ -743,9 +741,7 @@ export function generateAssertionsForValue(
             .replace(/\n/g, "\\n")
             .replace(/\r/g, "\\r")
             .replace(/\t/g, "\\t")
-            .replace(/\f/g, "\\f")
-            .replace(/>/g, ">")
-            .replace(/</g, "<")}"`;
+            .replace(/\f/g, "\\f")}"`;
           assertions.push(`assert.strictEqual(${path}, ${retValue});`);
           break;
         }

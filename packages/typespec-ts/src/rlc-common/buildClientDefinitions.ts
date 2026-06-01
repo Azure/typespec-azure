@@ -187,6 +187,7 @@ function getPathFirstRoutesInterfaceDefinition(
     signatures.push({
       docs: [
         `Resource for '${key
+          .replace(/\\/g, "\\\\")
           .replace(/}/g, "\\}")
           .replace(
             /{/g,

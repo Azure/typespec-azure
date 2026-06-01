@@ -600,9 +600,7 @@ function getParameterValue(
             .replace(/\n/g, "\\n")
             .replace(/\r/g, "\\r")
             .replace(/\t/g, "\\t")
-            .replace(/\f/g, "\\f")
-            .replace(/>/g, ">")
-            .replace(/</g, "<")}"`;
+            .replace(/\f/g, "\\f")}"`;
           break;
       }
       break;
