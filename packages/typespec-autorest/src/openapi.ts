@@ -2835,8 +2835,7 @@ function resolveExampleDir(
   version: string | undefined,
 ): string {
   const rawDir = examplesDirectory ?? resolvePath(projectRoot, "examples");
-  const hasVersionInterpolation =
-    rawDir.includes("{version}") || rawDir.includes("{version-status}");
+  const hasVersionInterpolation = rawDir.includes("{version}");
 
   if (hasVersionInterpolation) {
     const versionStatus = version && (version.includes("preview") ? "preview" : "stable");
