@@ -3125,6 +3125,9 @@ importers:
       '@typespec/http':
         specifier: workspace:^
         version: link:../../core/packages/http
+      '@typespec/http-client-js':
+        specifier: workspace:^
+        version: link:../../core/packages/http-client-js
       '@typespec/openapi':
         specifier: workspace:^
         version: link:../../core/packages/openapi
