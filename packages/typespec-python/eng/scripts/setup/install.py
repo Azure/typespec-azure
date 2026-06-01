@@ -7,8 +7,8 @@
 # --------------------------------------------------------------------------
 import sys
 
-if not sys.version_info >= (3, 9, 0):
-    raise Exception("Autorest for Python extension requires Python 3.9 at least")
+if not sys.version_info >= (3, 10, 0):
+    raise Exception("Autorest for Python extension requires Python 3.10 at least")
 
 try:
     from package_manager import detect_package_manager, PackageManagerNotFoundError
@@ -25,4 +25,4 @@ except ImportError:
     raise Exception("Your Python installation doesn't have venv available")
 
 
-# Now we have a package manager (uv or pip) and Py >= 3.9 and check is over
+# Now we have a package manager (uv or pip) and Py >= 3.10 and check is over
