@@ -1,4 +1,4 @@
-import { assert } from "chai";
+import { assert } from "vitest";
 import exp from "constants";
 import {
   FunctionDeclaration,

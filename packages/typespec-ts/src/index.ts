@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import * as fsextra from "fs-extra";
 import {
   AzureCoreDependencies,
   AzureIdentityDependencies,
@@ -9,7 +8,11 @@ import {
   DefaultCoreDependencies,
   AzureTestDependencies
 } from "./modular/external-dependencies.js";
-import { clearDirectory } from "./utils/fileSystemUtils.js";
+import {
+  clearDirectory,
+  emptyDir,
+  pathExists
+} from "./utils/fileSystemUtils.js";
 import { EmitContext, Program } from "@typespec/compiler";
 import { GenerationDirDetail, SdkContext } from "./utils/interfaces.js";
 import {
@@ -234,7 +237,7 @@ export async function $onEmit(context: EmitContext) {
         program
       );
     }
-    const hasTestFolder = await fsextra.pathExists(
+    const hasTestFolder = await pathExists(
       join(dpgContext.generationPathDetail?.metadataDir ?? "", "test")
     );
     options.generateTest =
@@ -250,12 +253,12 @@ export async function $onEmit(context: EmitContext) {
     const customizationFolder = join(projectRoot, "generated");
     const srcGeneratedFolder = join(projectRoot, "src", "generated");
     // if customization folder exists, use it as sources root
-    const finalCustomizationFolder = (await fsextra.pathExists(
+    const finalCustomizationFolder = (await pathExists(
       srcGeneratedFolder
     ))
       ? srcGeneratedFolder
       : customizationFolder;
-    const sourcesRoot = (await fsextra.pathExists(finalCustomizationFolder))
+    const sourcesRoot = (await pathExists(finalCustomizationFolder))
       ? finalCustomizationFolder
       : join(projectRoot, "src");
     return {
@@ -267,7 +270,7 @@ export async function $onEmit(context: EmitContext) {
   }
 
   async function clearSrcFolder() {
-    await fsextra.emptyDir(
+    await emptyDir(
       dpgContext.generationPathDetail?.modularSourcesDir ??
         dpgContext.generationPathDetail?.rlcSourcesDir ??
         ""
@@ -280,8 +283,8 @@ export async function $onEmit(context: EmitContext) {
         dpgContext.generationPathDetail?.rootDir ?? "",
         "samples-dev"
       );
-      if (await fsextra.pathExists(samplesDevPath)) {
-        await fsextra.emptyDir(samplesDevPath);
+      if (await pathExists(samplesDevPath)) {
+        await emptyDir(samplesDevPath);
       }
     }
   }

@@ -1,21 +1,45 @@
-import * as fsextra from "fs-extra";
-import { readdir, rm } from "fs/promises";
+import { mkdir, readdir, rm, stat } from "fs/promises";
 import { resolve } from "path";
 import { NoTarget, Program } from "@typespec/compiler";
 import { reportDiagnostic } from "../lib.js";
+
+export async function pathExists(targetPath: string): Promise<boolean> {
+  try {
+    await stat(targetPath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function emptyDir(dirPath: string): Promise<void> {
+  let entries: string[];
+  try {
+    entries = await readdir(dirPath);
+  } catch {
+    await mkdir(dirPath, { recursive: true });
+    return;
+  }
+
+  await Promise.all(
+    entries.map((entry) =>
+      rm(resolve(dirPath, entry), { recursive: true, force: true })
+    )
+  );
+}
 
 export async function clearDirectory(
   dirPath: string,
   excludeNames: string[] = [],
   program?: Program
 ): Promise<void> {
-  if (!(await fsextra.pathExists(dirPath))) {
+  if (!(await pathExists(dirPath))) {
     return;
   }
 
   // If no exclude names, just use regular emptyDir for efficiency
   if (excludeNames.length === 0) {
-    await fsextra.emptyDir(dirPath);
+    await emptyDir(dirPath);
     return;
   }
 
@@ -42,6 +66,6 @@ export async function clearDirectory(
         target: NoTarget
       });
     }
-    await fsextra.emptyDir(dirPath);
+    await emptyDir(dirPath);
   }
 }
