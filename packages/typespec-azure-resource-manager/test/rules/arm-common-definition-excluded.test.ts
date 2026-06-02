@@ -84,4 +84,3 @@ it("does not emit diagnostic when using Foundations.CustomerManagedKeyEncryption
     )
     .toBeValid();
 });
-
