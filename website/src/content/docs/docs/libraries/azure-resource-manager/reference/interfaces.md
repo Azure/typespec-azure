@@ -2423,7 +2423,7 @@ Azure Resource Manager service. It implements
 GET "/providers/{provider-namespace}/operations"
 
 ```typespec
-interface Azure.ResourceManager.Legacy.Operations<Response, Error, Parameters>
+interface Azure.ResourceManager.Legacy.Operations<Response, Error, Parameters, Tag>
 ```
 
 #### Template Parameters
@@ -2433,11 +2433,12 @@ interface Azure.ResourceManager.Legacy.Operations<Response, Error, Parameters>
 | Response   | The response returned by the operation list.          |
 | Error      | the error response returned by the operation list.    |
 | Parameters | Additional request parameters for the list operation. |
+| Tag        | Optional. The openapi tag for the operation.          |
 
-#### `Operations.list` {#Azure.ResourceManager.Legacy.Operations<Response, Error, Parameters>.list}
+#### `Operations.list` {#Azure.ResourceManager.Legacy.Operations<Response, Error, Parameters, Tag>.list}
 
 ```typespec
-op Azure.ResourceManager.Legacy.Operations<Response, Error, Parameters>.list(apiVersion: string, provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.Legacy.Operations<Response, Error, Parameters, Tag>.list(apiVersion: string, provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 ### `RoutedOperations` {#Azure.ResourceManager.Legacy.RoutedOperations}
