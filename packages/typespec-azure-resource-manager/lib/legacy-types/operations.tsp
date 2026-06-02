@@ -69,10 +69,9 @@ interface RoutedOperations<
     LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = Resource> &
       Azure.Core.Foundations.RetryAfterHeader,
     Parameters extends {} = {},
-    Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
-      Resource,
-      LroHeaders
-    >,
+    Response extends {} =
+      | ArmResourceUpdatedResponse<Resource>
+      | ArmResourceCreatedResponse<Resource, LroHeaders>,
     OptionalRequestBody extends valueof boolean = false,
     OverrideErrorType extends {} = ErrorType,
     OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute,
@@ -105,7 +104,9 @@ interface RoutedOperations<
   CreateOrUpdateSync<
     Resource extends Foundations.SimpleResource,
     Parameters extends {} = {},
-    Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedSyncResponse<Resource>,
+    Response extends {} =
+      | ArmResourceUpdatedResponse<Resource>
+      | ArmResourceCreatedSyncResponse<Resource>,
     OptionalRequestBody extends valueof boolean = false,
     OverrideErrorType extends {} = ErrorType,
     OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute,
@@ -145,10 +146,9 @@ interface RoutedOperations<
     > &
       Azure.Core.Foundations.RetryAfterHeader,
     Parameters extends {} = {},
-    Response extends {} = ArmResponse<Resource> | ArmAcceptedLroResponse<
-      "Resource update request accepted.",
-      LroHeaders
-    >,
+    Response extends {} =
+      | ArmResponse<Resource>
+      | ArmAcceptedLroResponse<"Resource update request accepted.", LroHeaders>,
     OptionalRequestBody extends valueof boolean = false,
     OverrideErrorType extends {} = ErrorType,
     OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute,
@@ -416,10 +416,9 @@ interface RoutedOperations<
     > &
       Azure.Core.Foundations.RetryAfterHeader,
     Parameters extends {} = {},
-    Response extends {} | void = ArmAcceptedLroResponse<
-      "Resource operation accepted.",
-      LroHeaders
-    > | Result,
+    Response extends {} | void =
+      | ArmAcceptedLroResponse<"Resource operation accepted.", LroHeaders>
+      | Result,
     OptionalRequestBody extends valueof boolean = false,
     OverrideErrorType extends {} = ErrorType,
     OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute,
@@ -479,10 +478,9 @@ op CustomPatchAsync<
   > &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} = ArmResponse<Resource> | ArmAcceptedLroResponse<
-    "Resource update request accepted.",
-    LroHeaders
-  >,
+  Response extends {} =
+    | ArmResponse<Resource>
+    | ArmAcceptedLroResponse<"Resource update request accepted.", LroHeaders>,
   Error extends {} = ErrorResponse,
   OptionalRequestBody extends valueof boolean = false
 > is UpdateOperation<
@@ -543,10 +541,9 @@ alias CreateOrUpdateAsync<
   LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = Resource> &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
-    Resource,
-    LroHeaders
-  >,
+  Response extends {} =
+    | ArmResourceUpdatedResponse<Resource>
+    | ArmResourceCreatedResponse<Resource, LroHeaders>,
   Error extends {} = ErrorResponse,
   OptionalRequestBody extends valueof boolean = false
 > = CreateOrReplaceAsync<
@@ -584,10 +581,9 @@ op CreateOrReplaceAsync<
   LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = Resource> &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
-    Resource,
-    LroHeaders
-  >,
+  Response extends {} =
+    | ArmResourceUpdatedResponse<Resource>
+    | ArmResourceCreatedResponse<Resource, LroHeaders>,
   Error extends {} = ErrorResponse,
   OptionalRequestBody extends valueof boolean = false
 > is CreateOperation<
@@ -614,7 +610,9 @@ alias CreateOrUpdateSync<
   Request extends {} | void = Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
-  Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedSyncResponse<Resource>,
+  Response extends {} =
+    | ArmResourceUpdatedResponse<Resource>
+    | ArmResourceCreatedSyncResponse<Resource>,
   Error extends {} = ErrorResponse,
   OptionalRequestBody extends valueof boolean = false
 > = CreateOrReplaceSync<
@@ -647,7 +645,9 @@ op CreateOrReplaceSync<
   Request extends {} | void = Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
-  Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedSyncResponse<Resource>,
+  Response extends {} =
+    | ArmResourceUpdatedResponse<Resource>
+    | ArmResourceCreatedSyncResponse<Resource>,
   Error extends {} = ErrorResponse,
   OptionalRequestBody extends valueof boolean = false
 > is CreateOperation<
