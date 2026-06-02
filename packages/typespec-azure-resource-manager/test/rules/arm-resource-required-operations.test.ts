@@ -172,29 +172,15 @@ it("emits missingListBySubscription for a tracked resource without a list-by-sub
     });
 });
 
-it("is valid when a nested proxy resource has only a read operation", async () => {
+it("is valid when an extension resource has only a read operation", async () => {
   await tester
     .expect(
       `
       @armProviderNamespace
       namespace Microsoft.Foo;
 
-      model Foo is TrackedResource<{}> {
-        @key @path @segment("foos") fooName: string;
-      }
-
-      @parentResource(Foo)
-      model Bar is ProxyResource<{}> {
+      model Bar is ExtensionResource<{}> {
         @key @path @segment("bars") barName: string;
-      }
-
-      @armResourceOperations
-      interface FooOperations {
-        read is ArmResourceRead<Foo>;
-        createOrUpdate is ArmResourceCreateOrReplaceAsync<Foo>;
-        delete is ArmResourceDeleteWithoutOkAsync<Foo>;
-        listByResourceGroup is ArmResourceListByParent<Foo>;
-        listBySubscription is ArmListBySubscription<Foo>;
       }
 
       @armResourceOperations
@@ -206,64 +192,15 @@ it("is valid when a nested proxy resource has only a read operation", async () =
     .toBeValid();
 });
 
-it("is valid for a proxy resource that defines createOrUpdate but no delete (covered by no-resource-delete-operation)", async () => {
+it("emits missingGet for an extension resource missing read", async () => {
   await tester
     .expect(
       `
       @armProviderNamespace
       namespace Microsoft.Foo;
 
-      model Foo is TrackedResource<{}> {
-        @key @path @segment("foos") fooName: string;
-      }
-
-      @parentResource(Foo)
-      model Bar is ProxyResource<{}> {
+      model Bar is ExtensionResource<{}> {
         @key @path @segment("bars") barName: string;
-      }
-
-      @armResourceOperations
-      interface FooOperations {
-        read is ArmResourceRead<Foo>;
-        createOrUpdate is ArmResourceCreateOrReplaceAsync<Foo>;
-        delete is ArmResourceDeleteWithoutOkAsync<Foo>;
-        listByResourceGroup is ArmResourceListByParent<Foo>;
-        listBySubscription is ArmListBySubscription<Foo>;
-      }
-
-      @armResourceOperations
-      interface BarOperations {
-        read is ArmResourceRead<Bar>;
-        createOrUpdate is ArmResourceCreateOrReplaceAsync<Bar>;
-      }
-      `,
-    )
-    .toBeValid();
-});
-
-it("emits missingGet for a proxy resource missing read", async () => {
-  await tester
-    .expect(
-      `
-      @armProviderNamespace
-      namespace Microsoft.Foo;
-
-      model Foo is TrackedResource<{}> {
-        @key @path @segment("foos") fooName: string;
-      }
-
-      @parentResource(Foo)
-      model Bar is ProxyResource<{}> {
-        @key @path @segment("bars") barName: string;
-      }
-
-      @armResourceOperations
-      interface FooOperations {
-        read is ArmResourceRead<Foo>;
-        createOrUpdate is ArmResourceCreateOrReplaceAsync<Foo>;
-        delete is ArmResourceDeleteWithoutOkAsync<Foo>;
-        listByResourceGroup is ArmResourceListByParent<Foo>;
-        listBySubscription is ArmListBySubscription<Foo>;
       }
 
       @armResourceOperations

@@ -53,39 +53,21 @@ export const armResourceRequiredOperationsRule = createRule({
       // Iterate every resolved ARM resource once for the program. We use
       // `resolveArmResources` (which handles both standard and legacy resource
       // operations) and read kind / singleton / operations directly from the
-      // returned ResolvedResource entries. A single resource model may
-      // represent multiple actual resources (for example, an extension
-      // resource declared at multiple scopes), so each ResolvedResource is
-      // validated independently with its own required-operations check, and
-      // its diagnostic is targeted at the interface containing the
-      // resource's operations.
+      // returned ResolvedResource entries. Each ResolvedResource represents
+      // a distinct resource (a single model may produce multiple resolved
+      // resources, e.g. an extension resource declared at multiple scopes),
+      // so each is validated independently and its diagnostic is targeted
+      // at the interface containing the resource's operations.
       root: (program: Program) => {
         const provider = resolveArmResources(program);
-        // Path-doubling artifacts: the resolver sometimes emits an extra
-        // ResolvedResource for a model whose parent chain loops back to a
-        // canonical entry of the same model (typically attributing the
-        // `createOrUpdate` operation to that artifact when the resource has
-        // a nested child). These are not distinct resources, so collect
-        // their operations and merge into the specific canonical ancestor
-        // entry they belong to (not by Model, which would incorrectly bleed
-        // operations across genuine multi-scope resources).
-        const extraPresent = new Map<ResolvedResource, Set<RequiredOperation>>();
-        for (const resource of provider.resources ?? []) {
-          const canonical = findSelfAncestor(resource);
-          if (!canonical) continue;
-          const set = extraPresent.get(canonical) ?? new Set();
-          for (const op of getPresentOperations(resource)) set.add(op);
-          extraPresent.set(canonical, set);
-        }
         for (const resource of provider.resources ?? []) {
           if (resource.kind === "Other") continue;
           if (isInternalTypeSpec(program, resource.type)) continue;
-          if (findSelfAncestor(resource)) continue;
           // Network Security Perimeter configurations, Private Links, and
           // Private Endpoint Connections have their own well-defined operation
           // shapes and are exempt from this rule.
           if (isExemptCommonTypeResource(resource.type)) continue;
-          checkResource(context, resource, extraPresent.get(resource));
+          checkResource(context, resource);
         }
       },
     };
@@ -95,12 +77,10 @@ export const armResourceRequiredOperationsRule = createRule({
 function checkResource(
   context: LinterRuleContext<RequiredOperationsMessages>,
   resource: ResolvedResource,
-  extraPresent: Set<RequiredOperation> | undefined,
 ): void {
   const required = getRequiredOperationsForResource(resource);
   if (required.length === 0) return;
   const present = getPresentOperations(resource);
-  if (extraPresent) for (const op of extraPresent) present.add(op);
   const missing = required.filter((op) => !present.has(op));
   if (missing.length === 0) return;
 
@@ -153,24 +133,6 @@ function isTopLevelResourceGroupScoped(resource: ResolvedResource): boolean {
   if (resource.parent !== undefined) return false;
   const path = resource.resourceInstancePath ?? "";
   return /\/resourceGroups\/\{/.test(path);
-}
-
-/**
- * Returns the closest ancestor ResolvedResource sharing the same model type
- * as the given resource, or undefined if none exists. Used to detect the
- * resolver's path-doubling artifacts (where the model appears as its own
- * ancestor) and to merge their operations into the specific canonical
- * ancestor entry they belong to.
- */
-function findSelfAncestor(resource: ResolvedResource): ResolvedResource | undefined {
-  const visited = new Set<ResolvedResource>();
-  let current = resource.parent;
-  while (current && !visited.has(current)) {
-    if (current.type === resource.type) return current;
-    visited.add(current);
-    current = current.parent;
-  }
-  return undefined;
 }
 
 function getPresentOperations(resource: ResolvedResource): Set<RequiredOperation> {
