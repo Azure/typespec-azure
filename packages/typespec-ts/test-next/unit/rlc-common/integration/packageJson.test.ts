@@ -4,18 +4,11 @@
 
 import { describe, it, expect } from "vitest";
 
-import path from "path";
-import { fileURLToPath } from "url";
 import { TestModelConfig, createMockModel } from "./mockHelper.js";
 import {
   buildPackageFile,
   updatePackageFile
 } from "../../../../src/rlc-common/metadata/buildPackageFile.js";
-
-const STATIC_DIR = path.join(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "static"
-);
 
 describe("Package file generation", () => {
   describe("Flavor agnostic config", () => {
@@ -748,7 +741,7 @@ describe("Package file generation", () => {
       });
       const packageFileContent = updatePackageFile(
         model,
-        path.join(STATIC_DIR, "package.json")
+        "./test-next/unit/rlc-common/integration/static/package.json"
       );
       const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
       expect(packageFile.dependencies).to.have.property(
@@ -771,7 +764,7 @@ describe("Package file generation", () => {
       });
       let packageFileContent = updatePackageFile(
         model,
-        path.join(STATIC_DIR, "package.json")
+        "./test-next/unit/rlc-common/integration/static/package.json"
       );
       expect(packageFileContent).to.be.undefined;
       model = createMockModel({
@@ -783,7 +776,7 @@ describe("Package file generation", () => {
       });
       packageFileContent = updatePackageFile(
         model,
-        path.join(STATIC_DIR, "package_non_existing.json")
+        "./test-next/unit/rlc-common/integration/static/package_non_existing.json"
       );
       expect(packageFileContent).to.be.undefined;
     });

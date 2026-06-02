@@ -2,7 +2,6 @@ import { describe, it, assert } from "vitest";
 
 import { readdirSync, readFileSync, statSync, writeFileSync } from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
 import {
   emitModularClientContextFromTypeSpec,
   emitModularClientFromTypeSpec,
@@ -17,10 +16,7 @@ import { format } from "prettier";
 import { prettierTypeScriptOptions } from "../../src/lib.js";
 import { load as loadYaml } from "js-yaml";
 
-const SCENARIOS_LOCATION = path.join(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "scenarios"
-);
+const SCENARIOS_LOCATION = "./test/modularUnit/scenarios";
 
 const SCENARIOS_UPDATE = process.env["SCENARIOS_UPDATE"] === "true";
 
