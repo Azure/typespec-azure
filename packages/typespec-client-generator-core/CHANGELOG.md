@@ -1,5 +1,25 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.68.2
+
+### Features
+
+- [#4480](https://github.com/Azure/typespec-azure/pull/4480) Extend `isExactName` to additional SDK types whose names can be changed by `@clientName`: `SdkClientType`, `SdkServiceMethodBase` (and its derived method kinds), and `SdkEnumValueType`. Also fixed `SdkClientType.name` to strip the internal `exact()` marker.
+
+### Bug Fixes
+
+- [#4477](https://github.com/Azure/typespec-azure/pull/4477) Fix `reorderParameters`, `addParameter`, `removeParameter`, and `replaceParameter` so that decorators copied to cloned model properties and cloned operations are applied (by calling `finishType` after cloning). This fixes scenarios such as parameters with `@typeChangedFrom` under a `@versioned` service.
+- [#4487](https://github.com/Azure/typespec-azure/pull/4487) Fix example value matching for `decimal` and `decimal128` typed properties. JSON `number` values in example files are now correctly recognized as matching `decimal` / `decimal128` typed properties.
+- [#4484](https://github.com/Azure/typespec-azure/pull/4484) Fix example values being dropped on subtypes added via `@hierarchyBuilding` by propagating serialization options from the nearest ancestor to the newly added subtype
+
+
+## 0.68.1
+
+### Bug Fixes
+
+- [#4440](https://github.com/Azure/typespec-azure/pull/4440) Fix `@@usage` and `@@access` augment decorators being silently dropped when targeting models from imported libraries (npm packages) whose namespaces are not user-defined. Explicitly-tagged models are now honored regardless of which namespace they live in.
+
+
 ## 0.68.0
 
 ### Breaking Changes

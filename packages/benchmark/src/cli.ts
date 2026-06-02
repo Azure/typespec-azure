@@ -4,6 +4,7 @@
 import { appendFile, readFile, writeFile } from "fs/promises";
 import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
+import { backfill } from "./backfill.js";
 import { compareBenchmarks, hasNotableChanges } from "./compare.js";
 import {
   formatComparisonSummary,
@@ -13,7 +14,9 @@ import {
 } from "./format-comment.js";
 import { generateHistoryMain } from "./generate-history.js";
 import { runBenchmarks } from "./run.js";
+import { storeResults } from "./store-results.js";
 import type { BenchmarkResult } from "./types.js";
+import { uploadPrComment } from "./upload-pr-comment.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const defaultSpecsDir = resolve(__dirname, "..", "..", "specs");
@@ -27,6 +30,9 @@ Commands:
   compare           Compare two benchmark result files
   format            Format a comparison as a PR comment
   generate-history  Generate aggregated history.json from benchmark results
+  store-results     Store benchmark results to the benchmark-data git branch
+  upload-pr-comment Fetch baseline, compare, and generate PR comment artifacts
+  backfill          Backfill benchmark data for historical commits
 
 Run options:
   --specs-dir <dir>     Directory containing benchmark specs (default: built-in specs)
@@ -47,6 +53,29 @@ Compare options:
 Generate-history options:
   --dir <dir>           Read results from a directory instead of the benchmark-data git branch
   <output-file>         Output file path (default: stdout)
+
+Store-results options:
+  --results <file>      Path to the benchmark results JSON file
+  --commit <sha>        Git commit SHA
+  --branch <name>       Branch name for storing results (default: benchmark-data)
+
+Upload-pr-comment options:
+  --results <file>      Path to the current benchmark results JSON file
+  --pr-number <n>       Pull request number
+  --output-dir <dir>    Output directory for artifacts
+  --branch <name>       Branch name for fetching baseline (default: benchmark-data)
+  --threshold <n>       Percent threshold for notable changes (default: 5)
+
+Backfill options:
+  --from <sha|n>        Start point: a commit SHA or number of recent commits (default: 100)
+  --to <sha>            End commit SHA, inclusive (default: HEAD of source branch)
+  --source-branch <b>   Branch to read commits from (default: main)
+  --branch <name>       Branch for storing results (default: benchmark-data)
+  --push                Push results to remote after backfill
+  --specs-dir <dir>     Directory containing benchmark specs (default: built-in specs)
+  --iterations <n>      Number of measured iterations per spec (default: 5)
+  --warmup <n>          Number of warmup iterations (default: 1)
+  --specs <name,...>    Comma-separated list of specific specs to run
 `);
 }
 
@@ -146,6 +175,53 @@ async function compareCommand(args: Record<string, string>): Promise<void> {
   );
 }
 
+function storeResultsCommand(args: Record<string, string>): void {
+  const resultsFile = args["results"];
+  const commit = args["commit"];
+  if (!resultsFile || !commit) {
+    console.error("Error: --results and --commit are required for store-results command");
+    process.exit(1);
+  }
+  storeResults({
+    resultsFile,
+    commit,
+    branch: args["branch"],
+  });
+}
+
+function uploadPrCommentCommand(args: Record<string, string>): void {
+  const resultsFile = args["results"];
+  const prNumber = args["pr-number"];
+  const outputDir = args["output-dir"];
+  if (!resultsFile || !prNumber || !outputDir) {
+    console.error(
+      "Error: --results, --pr-number, and --output-dir are required for upload-pr-comment command",
+    );
+    process.exit(1);
+  }
+  uploadPrComment({
+    resultsFile,
+    prNumber,
+    outputDir,
+    branch: args["branch"],
+    threshold: args["threshold"] ? parseFloat(args["threshold"]) : undefined,
+  });
+}
+
+function backfillCommand(args: Record<string, string>): void {
+  backfill({
+    from: args["from"],
+    to: args["to"],
+    sourceBranch: args["source-branch"],
+    dataBranch: args["branch"],
+    push: args["push"] === "true",
+    iterations: args["iterations"] ? parseInt(args["iterations"], 10) : undefined,
+    warmup: args["warmup"] ? parseInt(args["warmup"], 10) : undefined,
+    specs: args["specs"],
+    specsDir: args["specs-dir"],
+  });
+}
+
 async function main(): Promise<void> {
   const rawArgs = process.argv.slice(2);
   const command = rawArgs[0];
@@ -167,6 +243,15 @@ async function main(): Promise<void> {
     case "generate-history":
       // Pass args after the command name: [node, cli.js, generate-history, ...rest]
       generateHistoryMain(["", "", ...process.argv.slice(3)]);
+      break;
+    case "store-results":
+      storeResultsCommand(args);
+      break;
+    case "upload-pr-comment":
+      uploadPrCommentCommand(args);
+      break;
+    case "backfill":
+      backfillCommand(args);
       break;
     default:
       console.error(`Unknown command: ${command}`);

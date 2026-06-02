@@ -516,11 +516,11 @@ export const $usage: UsageDecorator = (
 
 export function getUsageOverride(
   context: TCGCContext,
-  entity: Model | Enum | Union,
+  entity: Model | Enum | Union | Namespace,
 ): number | undefined {
   const usageFlags = getScopedDecoratorData(context, usageKey, entity);
   if (usageFlags || entity.namespace === undefined) return usageFlags;
-  return getScopedDecoratorData(context, usageKey, entity.namespace);
+  return getUsageOverride(context, entity.namespace);
 }
 
 export function getUsage(context: TCGCContext, entity: Model | Enum | Union): UsageFlags {

@@ -65,11 +65,9 @@ import {
   getClientDocExplicit,
   getClientLocation,
   getIsApiVersion,
-  getLegacyHierarchyBuilding,
   getMarkAsLro,
   getOverriddenClientMethod,
   getParamAlias,
-  getUsageOverride,
 } from "./decorators.js";
 import {
   DecoratorInfo,
@@ -1352,34 +1350,58 @@ export function isTypeNeedsHandling(context: TCGCContext, type: Type): boolean {
 export function listOrphanTypes(context: TCGCContext): (Model | Enum | Union)[] {
   if (context.__orphanTypesCache) return context.__orphanTypesCache;
   const result: (Model | Enum | Union)[] = [];
-  const userDefinedNamespaces = listAllUserDefinedNamespaces(context);
-  for (const currNamespace of userDefinedNamespaces) {
-    const namespaces = [currNamespace];
+  const seen = new Set<Model | Enum | Union>();
+
+  function addType(type: Model | Enum | Union) {
+    if (seen.has(type)) return;
+    if ((type.kind === "Model" || type.kind === "Union") && isTemplateDeclaration(type)) return;
+    if (!isTypeNeedsHandling(context, type)) return;
+    seen.add(type);
+    result.push(type);
+  }
+
+  function addNamespace(namespace: Namespace) {
+    const namespaces = [namespace];
     let currentIndex = 0;
     while (currentIndex < namespaces.length) {
-      const namespace = namespaces[currentIndex];
-      // orphan models
-      for (const model of namespace.models.values()) {
-        if (isTemplateDeclaration(model)) continue;
-        if (!getUsageOverride(context, model) && !getLegacyHierarchyBuilding(context, model))
-          continue;
-        result.push(model);
+      const ns = namespaces[currentIndex];
+      for (const model of ns.models.values()) {
+        addType(model);
       }
-      // orphan enums
-      for (const enumType of namespace.enums.values()) {
-        if (!getUsageOverride(context, enumType)) continue;
-        result.push(enumType);
+      for (const enumType of ns.enums.values()) {
+        addType(enumType);
       }
-      // orphan unions
-      for (const unionType of namespace.unions.values()) {
-        if (isTemplateDeclaration(unionType)) continue;
-        if (!getUsageOverride(context, unionType)) continue;
-        result.push(unionType);
+      for (const unionType of ns.unions.values()) {
+        addType(unionType);
       }
-      namespaces.push(...namespace.namespaces.values());
+      namespaces.push(...ns.namespaces.values());
       currentIndex++;
     }
   }
+
+  // Iterate all types/namespaces with an explicit @usage decorator. This covers
+  // models, enums, and unions defined anywhere (including imported libraries),
+  // not only those declared inside user-defined namespaces.
+  for (const [type] of listScopedDecoratorData(context, usageKey)) {
+    if (type.kind === "Namespace") {
+      // @@usage applied to a namespace propagates to its member types,
+      // recursively descending into sub-namespaces.
+      addNamespace(type);
+    } else if (type.kind === "Model" || type.kind === "Enum" || type.kind === "Union") {
+      addType(type);
+    }
+  }
+
+  // Iterate all models with an explicit @hierarchyBuilding decorator (only
+  // honored when legacy hierarchy building is enabled).
+  if (context.enableLegacyHierarchyBuilding) {
+    for (const [type] of listScopedDecoratorData(context, legacyHierarchyBuildingKey)) {
+      if (type.kind === "Model") {
+        addType(type);
+      }
+    }
+  }
+
   context.__orphanTypesCache = result;
   return result;
 }

@@ -76,8 +76,8 @@ Located in `specs/`:
 
 The `.github/workflows/benchmark.yml` workflow:
 
-- **On push to `main`**: Runs benchmarks and stores results to the `benchmark-data` branch
-- **On pull requests**: Runs benchmarks, compares with the latest `main` baseline, and posts a sticky PR comment with the comparison table
+- **On push to `main`**: Runs benchmarks and stores results to the `benchmark-data` branch via the `store-results` CLI command
+- **On pull requests**: Runs benchmarks, fetches the baseline, compares, and generates a PR comment via the `upload-pr-comment` CLI command
 
 ### Data storage
 
@@ -85,6 +85,32 @@ Results are stored on the `benchmark-data` orphan branch:
 
 - `results/<commit-sha>.json` — per-commit results
 - `results/latest.json` — latest main baseline
+- `results/history.json` — aggregated history for the website
+
+### Backfill historical data
+
+To backfill benchmark results for past commits:
+
+```bash
+# Backfill last 100 commits (default)
+node packages/benchmark/dist/src/cli.js backfill
+
+# Backfill last 50 commits, then push
+node packages/benchmark/dist/src/cli.js backfill --from 50 --push
+
+# Backfill from a specific commit to HEAD of main
+node packages/benchmark/dist/src/cli.js backfill --from abc1234
+
+# Backfill a specific commit range
+node packages/benchmark/dist/src/cli.js backfill --from abc1234 --to def5678
+```
+
+The backfill command:
+
+1. Builds and saves the current benchmark CLI
+2. Checks out each historical commit, builds its dependencies, and runs benchmarks using the saved CLI
+3. Skips commits that already have results on the `benchmark-data` branch
+4. Commits all new results to the `benchmark-data` branch
 
 ## What gets measured
 

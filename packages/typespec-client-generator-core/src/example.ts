@@ -31,6 +31,7 @@ import {
   SdkServiceOperation,
   SdkType,
   TCGCContext,
+  isSdkFixedPointKind,
   isSdkFloatKind,
   isSdkIntKind,
 } from "./interfaces.js";
@@ -446,7 +447,7 @@ function getSdkTypeExample(
     return diagnostics.wrap(undefined);
   }
 
-  if (isSdkIntKind(type.kind) || isSdkFloatKind(type.kind)) {
+  if (isSdkIntKind(type.kind) || isSdkFloatKind(type.kind) || isSdkFixedPointKind(type.kind)) {
     return getSdkBaseTypeExample("number", type as SdkType, example, relativePath);
   } else {
     switch (type.kind) {
