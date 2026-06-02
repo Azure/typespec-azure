@@ -1,4 +1,4 @@
-import { describe, it, beforeEach } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 
 import { SpecialWordsClient } from "./generated/special-words/src/index.js";
 
@@ -8,13 +8,13 @@ describe("Special Words Client", () => {
   beforeEach(() => {
     client = new SpecialWordsClient({
       allowInsecureConnection: true,
-      endpoint: "http://localhost:3002"
+      endpoint: "http://localhost:3002",
     });
   });
 
   it("should post modelProperties sameAsModel", async () => {
     await client.modelProperties.sameAsModel({
-      sameAsModel: "ok"
+      sameAsModel: "ok",
     });
   });
   it("should post modelProperties dictMethods", async () => {
@@ -28,12 +28,12 @@ describe("Special Words Client", () => {
       setdefault: "ok",
       pop: "ok",
       get: "ok",
-      copy: "ok"
+      copy: "ok",
     });
   });
   it("should post modelProperties withList", async () => {
     await client.modelProperties.withList({
-      list: "ok"
+      list: "ok",
     });
   });
   it("should get operations And", async () => {
@@ -239,167 +239,167 @@ describe("Special Words Client", () => {
   });
   it("should post models withAnd", async () => {
     await client.models.withAnd({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withAs", async () => {
     await client.models.withAs({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withAssert", async () => {
     await client.models.withAssert({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withAsync", async () => {
     await client.models.withAsync({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withAwait", async () => {
     await client.models.withAwait({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withBreak", async () => {
     await client.models.withBreak({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withClass", async () => {
     await client.models.withClass({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withConstructor", async () => {
     await client.models.withConstructor({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withContinue", async () => {
     await client.models.withContinue({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withDef", async () => {
     await client.models.withDef({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withDel", async () => {
     await client.models.withDel({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withElif", async () => {
     await client.models.withElif({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withElse", async () => {
     await client.models.withElse({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withExcept", async () => {
     await client.models.withExcept({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withExec", async () => {
     await client.models.withExec({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withFinally", async () => {
     await client.models.withFinally({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withFor", async () => {
     await client.models.withFor({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withFrom", async () => {
     await client.models.withFrom({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withGlobal", async () => {
     await client.models.withGlobal({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withIf", async () => {
     await client.models.withIf({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withImport", async () => {
     await client.models.withImport({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withIn", async () => {
     await client.models.withIn({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withIs", async () => {
     await client.models.withIs({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withLambda", async () => {
     await client.models.withLambda({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withNot", async () => {
     await client.models.withNot({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withOr", async () => {
     await client.models.withOr({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withPass", async () => {
     await client.models.withPass({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withRaise", async () => {
     await client.models.withRaise({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withReturn", async () => {
     await client.models.withReturn({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withTry", async () => {
     await client.models.withTry({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withWhile", async () => {
     await client.models.withWhile({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withWith", async () => {
     await client.models.withWith({
-      name: "ok"
+      name: "ok",
     });
   });
   it("should post models withYield", async () => {
     await client.models.withYield({
-      name: "ok"
+      name: "ok",
     });
   });
 });

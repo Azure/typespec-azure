@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { ApiKeyClient } from "./generated/authentication/api-key/src/index.js";
 
@@ -9,21 +9,21 @@ describe("ApiKeyClient Classical Client", () => {
   beforeEach(() => {
     validKeyClient = new ApiKeyClient(
       {
-        key: "valid-key"
+        key: "valid-key",
       },
       {
         allowInsecureConnection: true,
-        endpoint: "http://localhost:3002"
-      }
+        endpoint: "http://localhost:3002",
+      },
     );
     invalidKeyClient = new ApiKeyClient(
       {
-        key: "invalid-key"
+        key: "invalid-key",
       },
       {
         allowInsecureConnection: true,
-        endpoint: "http://localhost:3002"
-      }
+        endpoint: "http://localhost:3002",
+      },
     );
   });
 

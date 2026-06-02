@@ -26,12 +26,10 @@ export function _$continueSend(
   context: Client,
   options: ContinueOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-    });
+  return context.path("/").get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _$continueDeserialize(result: PathUncheckedResponse): Promise<Test> {
@@ -85,12 +83,10 @@ export function _$returnSend(
   context: Client,
   options: ReturnOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-    });
+  return context.path("/").get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _$returnDeserialize(result: PathUncheckedResponse): Promise<Test> {
@@ -144,12 +140,10 @@ export function _globalSend(
   context: Client,
   options: GlobalOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-    });
+  return context.path("/").get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _globalDeserialize(result: PathUncheckedResponse): Promise<Test> {

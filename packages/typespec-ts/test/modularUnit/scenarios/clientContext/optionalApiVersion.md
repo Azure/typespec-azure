@@ -14,9 +14,7 @@ using TypeSpec.Versioning;
 using Azure.Core;
 using Azure.Core.Traits;
 
-@service(#{
-  title: "DataMapClient",
-})
+@service(#{ title: "DataMapClient" })
 @versioned(DataMapService.Versions)
 @server(
   "{endpoint}",

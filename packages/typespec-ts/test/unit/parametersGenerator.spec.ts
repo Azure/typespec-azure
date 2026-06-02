@@ -1,9 +1,9 @@
-import { describe, it, assert } from "vitest";
+import { assert, describe, it } from "vitest";
 
 import {
   emitClientFactoryFromTypeSpec,
   emitModelsFromTypeSpec,
-  emitParameterFromTypeSpec
+  emitParameterFromTypeSpec,
 } from "../util/emitUtil.js";
 import { assertEqualContent } from "../util/testUtil.js";
 
@@ -14,13 +14,13 @@ describe("Parameters.ts", () => {
         await emitParameterFromTypeSpec(
           `
           op test(@cookie token: string): string;
-          `
+          `,
         );
         assert.fail("should throw error");
       } catch (e: any) {
         assert.strictEqual(
           "Parameter 'token' with type 'cookie' is not supported and we would ignore this parameter.",
-          e[0].message
+          e[0].message,
         );
       }
     });
@@ -31,8 +31,8 @@ describe("Parameters.ts", () => {
         op test(@cookie token: string): string;
         `,
         {
-          mustEmptyDiagnostic: false
-        }
+          mustEmptyDiagnostic: false,
+        },
       );
       assert.notDeepInclude(parameters?.content, "token");
     });
@@ -49,7 +49,7 @@ describe("Parameters.ts", () => {
         op test(...ApiVersionParameter): string;
         `;
         const parameters = await emitParameterFromTypeSpec(tspContent, {
-          needTCGC: true
+          needTCGC: true,
         });
         assert.ok(parameters);
         await assertEqualContent(
@@ -58,11 +58,11 @@ describe("Parameters.ts", () => {
             import type { RequestParameters } from "@azure-rest/core-client";
             
             export type TestParameters = RequestParameters;
-            `
+            `,
         );
         const models = await emitClientFactoryFromTypeSpec(tspContent, {
           needNamespaces: true,
-          needTCGC: true
+          needTCGC: true,
         });
         assert.ok(models);
         await assertEqualContent(
@@ -124,7 +124,7 @@ describe("Parameters.ts", () => {
 
           return client;
       }
-      `
+      `,
         );
       });
 
@@ -139,8 +139,8 @@ describe("Parameters.ts", () => {
           `,
           {
             needTCGC: true,
-            withVersionedApiVersion: true
-          }
+            withVersionedApiVersion: true,
+          },
         );
         assert.ok(parameters);
         await assertEqualContent(
@@ -149,7 +149,7 @@ describe("Parameters.ts", () => {
             import type { RequestParameters } from "@azure-rest/core-client";
             
             export type TestParameters = RequestParameters;
-            `
+            `,
         );
       });
       it("should generate apiVersion in query parameter if there's no client level apiVersion", async () => {
@@ -165,8 +165,8 @@ describe("Parameters.ts", () => {
           op test1(): string;
           `,
           {
-            needTCGC: true
-          }
+            needTCGC: true,
+          },
         );
         assert.ok(parameters);
         await assertEqualContent(
@@ -184,7 +184,7 @@ describe("Parameters.ts", () => {
             
             export type TestParameters = TestQueryParam & RequestParameters;
             export type Test1Parameters = RequestParameters;
-            `
+            `,
         );
       });
     });
@@ -197,7 +197,7 @@ describe("Parameters.ts", () => {
               "user-custom-query": string;
             }
             op test(...CustomParameter): string;
-            `
+            `,
         );
         assert.ok(parameters);
         await assertEqualContent(
@@ -214,7 +214,7 @@ describe("Parameters.ts", () => {
           }
           
           export type TestParameters = TestQueryParam & RequestParameters;
-          `
+          `,
         );
       });
 
@@ -226,7 +226,7 @@ describe("Parameters.ts", () => {
             executionTo?: offsetDateTime;
           }
           op test(...QueryParameter): string;
-          `
+          `,
         );
         assert.ok(parameters);
         await assertEqualContent(
@@ -243,7 +243,7 @@ describe("Parameters.ts", () => {
             }
             
             export type TestParameters = TestQueryParam & RequestParameters;
-            `
+            `,
         );
       });
     });
@@ -272,7 +272,7 @@ describe("Parameters.ts", () => {
               queryParameters: TestQueryParamProperties;
           }
           
-          export type TestParameters = TestQueryParam & RequestParameters;`
+          export type TestParameters = TestQueryParam & RequestParameters;`,
         );
       });
 
@@ -304,12 +304,12 @@ describe("Parameters.ts", () => {
               queryParameters: TestQueryParamProperties;
           }
           
-          export type TestParameters = TestQueryParam & RequestParameters;`
+          export type TestParameters = TestQueryParam & RequestParameters;`,
         );
         const models = await emitModelsFromTypeSpec(tspContent);
         await assertEqualContent(
           models?.inputModelFile?.content!,
-          `/** Alias for Foo */\nexport type Foo = "bar" | "baz";`
+          `/** Alias for Foo */\nexport type Foo = "bar" | "baz";`,
         );
       });
 
@@ -341,12 +341,12 @@ describe("Parameters.ts", () => {
               queryParameters: TestQueryParamProperties;
           }
           
-          export type TestParameters = TestQueryParam & RequestParameters;`
+          export type TestParameters = TestQueryParam & RequestParameters;`,
         );
         const models = await emitModelsFromTypeSpec(tspContent);
         await assertEqualContent(
           models?.inputModelFile?.content!,
-          `/** Alias for Foo */\nexport type Foo = "bar" | "baz";`
+          `/** Alias for Foo */\nexport type Foo = "bar" | "baz";`,
         );
       });
     });
@@ -361,7 +361,7 @@ describe("Parameters.ts", () => {
           executionTo?: offsetDateTime;
         }
         op test(...QueryParameter): string;
-        `
+        `,
       );
       assert.ok(parameters);
       await assertEqualContent(
@@ -378,7 +378,7 @@ describe("Parameters.ts", () => {
           }
           
           export type TestParameters = TestHeaderParam & RequestParameters;
-          `
+          `,
       );
     });
     it("should handle int/decimal/decimal128/int8 with encode `string` in parameter headers", async () => {
@@ -406,8 +406,8 @@ describe("Parameters.ts", () => {
           op getModel(...SimpleModel): SimpleModel;
           `,
         {
-          needTCGC: false
-        }
+          needTCGC: false,
+        },
       );
       assert.ok(parameters);
       await assertEqualContent(
@@ -429,7 +429,7 @@ describe("Parameters.ts", () => {
         }
 
         export type GetModelParameters = GetModelHeaderParam & RequestParameters;
-        `
+        `,
       );
     });
   });
@@ -450,7 +450,7 @@ describe("Parameters.ts", () => {
         }  
 
         export type ReadParameters = ReadBodyParam & RequestParameters;
-      `
+      `,
       );
     });
     it("string array request generation", async () => {
@@ -468,7 +468,7 @@ describe("Parameters.ts", () => {
         }  
 
         export type ReadParameters = ReadBodyParam & RequestParameters;
-      `
+      `,
       );
     });
 
@@ -487,7 +487,7 @@ describe("Parameters.ts", () => {
         }  
 
         export type ReadParameters = ReadBodyParam & RequestParameters;
-      `
+      `,
       );
     });
 
@@ -506,7 +506,7 @@ describe("Parameters.ts", () => {
         }  
 
         export type ReadParameters = ReadBodyParam & RequestParameters;
-      `
+      `,
       );
     });
 
@@ -525,7 +525,7 @@ describe("Parameters.ts", () => {
         }  
 
         export type ReadParameters = ReadBodyParam & RequestParameters;
-      `
+      `,
       );
     });
 
@@ -544,7 +544,7 @@ describe("Parameters.ts", () => {
         }  
 
         export type ReadParameters = ReadBodyParam & RequestParameters;
-      `
+      `,
       );
     });
 
@@ -563,7 +563,7 @@ describe("Parameters.ts", () => {
         }  
 
         export type ReadParameters = ReadBodyParam & RequestParameters;
-      `
+      `,
       );
     });
 
@@ -582,7 +582,7 @@ describe("Parameters.ts", () => {
         }  
 
         export type ReadParameters = ReadBodyParam & RequestParameters;
-      `
+      `,
       );
     });
 
@@ -601,7 +601,7 @@ describe("Parameters.ts", () => {
         }  
 
         export type ReadParameters = ReadBodyParam & RequestParameters;
-      `
+      `,
       );
     });
 
@@ -620,7 +620,7 @@ describe("Parameters.ts", () => {
         }  
 
         export type ReadParameters = ReadBodyParam & RequestParameters;
-      `
+      `,
       );
     });
 
@@ -644,7 +644,7 @@ describe("Parameters.ts", () => {
         }  
 
         export type ReadParameters = ReadBodyParam & RequestParameters;
-      `
+      `,
       );
     });
 
@@ -668,7 +668,7 @@ describe("Parameters.ts", () => {
         }  
 
         export type ReadParameters = ReadBodyParam & RequestParameters;
-      `
+      `,
       );
     });
   });
@@ -694,7 +694,7 @@ describe("Parameters.ts", () => {
         }  
 
         export type ReadParameters = ReadBodyParam & RequestParameters;
-      `
+      `,
       );
     });
   });
@@ -710,7 +710,7 @@ describe("Parameters.ts", () => {
         import type { RequestParameters } from "@azure-rest/core-client";
         
         export type ReadParameters = RequestParameters;
-      `
+      `,
       );
     });
   });

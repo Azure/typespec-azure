@@ -34,7 +34,9 @@ model CompositeRequest {
 }
 
 @doc("show example demo")
-op read(...CompositeRequest): { @body body: {}};
+op read(...CompositeRequest): {
+  @body body: {};
+};
 ```
 
 ## Example and generated tests

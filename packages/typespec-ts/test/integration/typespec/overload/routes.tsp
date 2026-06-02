@@ -24,17 +24,17 @@ interface OveralodOperations {
   upload(
     @body
     data: string | bytes,
-    @header contentType: "text/plain" | "application/octet-stream"
+
+    @header contentType: "text/plain" | "application/octet-stream",
   ): void;
 
   /**
    * Overloads with different actions
    */
-
   @route("/changed-actions")
   @put
   process(
     data: string | bytes,
-    @header contentType: "text/plain" | "application/octet-stream"
+    @header contentType: "text/plain" | "application/octet-stream",
   ): void;
 }

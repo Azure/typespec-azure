@@ -1,4 +1,4 @@
-import { describe, it, beforeEach } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 
 import { PathClient } from "./generated/parameters/path/src/index.js";
 describe("PathClient Client", () => {
@@ -7,7 +7,7 @@ describe("PathClient Client", () => {
   beforeEach(() => {
     client = new PathClient({
       allowInsecureConnection: true,
-      endpoint: "http://localhost:3002"
+      endpoint: "http://localhost:3002",
     });
   });
 

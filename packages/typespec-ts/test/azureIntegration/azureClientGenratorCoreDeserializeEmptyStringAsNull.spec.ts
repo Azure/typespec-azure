@@ -1,7 +1,7 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import DeserializeEmptyStringAsNullClientFactory, {
-  DeserializeEmptyStringAsNullClient
+  DeserializeEmptyStringAsNullClient,
 } from "./generated/azure/client-generator-core/deserialize-empty-string-as-null/src/index.js";
 
 describe("Usage Client", () => {
@@ -9,15 +9,13 @@ describe("Usage Client", () => {
 
   beforeEach(() => {
     client = DeserializeEmptyStringAsNullClientFactory({
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
   it("should get deserialize empty string as null", async () => {
     const result = await client
-      .path(
-        "/azure/client-generator-core/deserialize-empty-string-as-null/responseModel"
-      )
+      .path("/azure/client-generator-core/deserialize-empty-string-as-null/responseModel")
       .get();
     assert.strictEqual(result.status, "200");
     assert.strictEqual(result.body.sampleUrl, "");

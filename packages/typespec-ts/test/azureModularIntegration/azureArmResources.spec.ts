@@ -1,11 +1,11 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import {
   ExtensionsResource,
   LocationResource,
   NestedProxyResource,
   ResourcesClient,
-  TopLevelTrackedResource
+  TopLevelTrackedResource,
 } from "./generated/azure/resource-manager/resources/src/index.js";
 describe("Azure Arm Resources Rest Client", () => {
   let client: ResourcesClient;
@@ -13,7 +13,7 @@ describe("Azure Arm Resources Rest Client", () => {
   beforeEach(() => {
     client = new ResourcesClient("00000000-0000-0000-0000-000000000000", {
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
   const SUBSCRIPTION_ID_EXPECTED = "00000000-0000-0000-0000-000000000000";
@@ -26,7 +26,7 @@ describe("Azure Arm Resources Rest Client", () => {
     location: "eastus",
     properties: {
       provisioningState: "Succeeded",
-      description: "valid"
+      description: "valid",
     },
     systemData: {
       createdBy: "AzureSDK",
@@ -34,8 +34,8 @@ describe("Azure Arm Resources Rest Client", () => {
       createdAt: new Date("2024-10-04T00:56:07.442Z"),
       lastModifiedBy: "AzureSDK",
       lastModifiedAt: new Date("2024-10-04T00:56:07.442Z"),
-      lastModifiedByType: "User"
-    }
+      lastModifiedByType: "User",
+    },
   };
 
   const validNestedResource = {
@@ -44,7 +44,7 @@ describe("Azure Arm Resources Rest Client", () => {
     type: "Azure.ResourceManager.Resources/topLevelTrackedResources/top/nestedProxyResources",
     properties: {
       provisioningState: "Succeeded",
-      description: "valid"
+      description: "valid",
     },
     systemData: {
       createdBy: "AzureSDK",
@@ -52,8 +52,8 @@ describe("Azure Arm Resources Rest Client", () => {
       createdAt: new Date("2024-10-04T00:56:07.442Z"),
       lastModifiedBy: "AzureSDK",
       lastModifiedAt: new Date("2024-10-04T00:56:07.442Z"),
-      lastModifiedByType: "User"
-    }
+      lastModifiedByType: "User",
+    },
   };
 
   const validSingletonResource = {
@@ -63,7 +63,7 @@ describe("Azure Arm Resources Rest Client", () => {
     location: "eastus",
     properties: {
       provisioningState: "Succeeded",
-      description: "valid"
+      description: "valid",
     },
     systemData: {
       createdBy: "AzureSDK",
@@ -71,8 +71,8 @@ describe("Azure Arm Resources Rest Client", () => {
       createdAt: new Date("2024-10-04T00:56:07.442Z"),
       lastModifiedBy: "AzureSDK",
       lastModifiedAt: new Date("2024-10-04T00:56:07.442Z"),
-      lastModifiedByType: "User"
-    }
+      lastModifiedByType: "User",
+    },
   };
 
   const validLocationResource = {
@@ -81,7 +81,7 @@ describe("Azure Arm Resources Rest Client", () => {
     type: "Azure.ResourceManager.Resources/locationResources",
     properties: {
       description: "valid",
-      provisioningState: "Succeeded"
+      provisioningState: "Succeeded",
     },
     systemData: {
       createdBy: "AzureSDK",
@@ -89,8 +89,8 @@ describe("Azure Arm Resources Rest Client", () => {
       createdAt: new Date("2024-10-04T00:56:07.442Z"),
       lastModifiedBy: "AzureSDK",
       lastModifiedAt: new Date("2024-10-04T00:56:07.442Z"),
-      lastModifiedByType: "User"
-    }
+      lastModifiedByType: "User",
+    },
   };
   const validResourceGroupExtensionsResource: ExtensionsResource = {
     id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.Resources/extensionsResources/extension`,
@@ -98,7 +98,7 @@ describe("Azure Arm Resources Rest Client", () => {
     type: "Azure.ResourceManager.Resources/extensionsResources",
     properties: {
       description: "valid",
-      provisioningState: "Succeeded"
+      provisioningState: "Succeeded",
     },
     systemData: {
       createdBy: "AzureSDK",
@@ -106,8 +106,8 @@ describe("Azure Arm Resources Rest Client", () => {
       createdAt: new Date("2024-10-04T00:56:07.442Z"),
       lastModifiedBy: "AzureSDK",
       lastModifiedAt: new Date("2024-10-04T00:56:07.442Z"),
-      lastModifiedByType: "User"
-    }
+      lastModifiedByType: "User",
+    },
   };
 
   const validSubscriptionExtensionsResource: ExtensionsResource = {
@@ -116,7 +116,7 @@ describe("Azure Arm Resources Rest Client", () => {
     type: "Azure.ResourceManager.Resources/extensionsResources",
     properties: {
       description: "valid",
-      provisioningState: "Succeeded"
+      provisioningState: "Succeeded",
     },
     systemData: {
       createdBy: "AzureSDK",
@@ -124,8 +124,8 @@ describe("Azure Arm Resources Rest Client", () => {
       createdAt: new Date("2024-10-04T00:56:07.442Z"),
       lastModifiedBy: "AzureSDK",
       lastModifiedAt: new Date("2024-10-04T00:56:07.442Z"),
-      lastModifiedByType: "User"
-    }
+      lastModifiedByType: "User",
+    },
   };
 
   const validTenantExtensionsResource: ExtensionsResource = {
@@ -134,7 +134,7 @@ describe("Azure Arm Resources Rest Client", () => {
     type: "Azure.ResourceManager.Resources/extensionsResources",
     properties: {
       description: "valid",
-      provisioningState: "Succeeded"
+      provisioningState: "Succeeded",
     },
     systemData: {
       createdBy: "AzureSDK",
@@ -142,8 +142,8 @@ describe("Azure Arm Resources Rest Client", () => {
       createdAt: new Date("2024-10-04T00:56:07.442Z"),
       lastModifiedBy: "AzureSDK",
       lastModifiedAt: new Date("2024-10-04T00:56:07.442Z"),
-      lastModifiedByType: "User"
-    }
+      lastModifiedByType: "User",
+    },
   };
 
   const validResourceExtensionsResource: ExtensionsResource = {
@@ -152,7 +152,7 @@ describe("Azure Arm Resources Rest Client", () => {
     type: "Azure.ResourceManager.Resources/extensionsResources",
     properties: {
       description: "valid",
-      provisioningState: "Succeeded"
+      provisioningState: "Succeeded",
     },
     systemData: {
       createdBy: "AzureSDK",
@@ -160,8 +160,8 @@ describe("Azure Arm Resources Rest Client", () => {
       createdAt: new Date("2024-10-04T00:56:07.442Z"),
       lastModifiedBy: "AzureSDK",
       lastModifiedAt: new Date("2024-10-04T00:56:07.442Z"),
-      lastModifiedByType: "User"
-    }
+      lastModifiedByType: "User",
+    },
   };
 
   // singleton tracked resource
@@ -176,8 +176,8 @@ describe("Azure Arm Resources Rest Client", () => {
     const result = await client.singleton.update("test-rg", {
       location: "eastus",
       properties: {
-        description: "valid2"
-      }
+        description: "valid2",
+      },
     });
 
     assert.strictEqual(result.id, validSingletonResource.id);
@@ -191,8 +191,8 @@ describe("Azure Arm Resources Rest Client", () => {
     const result = await client.singleton.createOrUpdate("test-rg", {
       location: "eastus",
       properties: {
-        description: "valid"
-      }
+        description: "valid",
+      },
     });
     assert.strictEqual(result.id, validSingletonResource.id);
     assert.strictEqual(result.name, validSingletonResource.name);
@@ -214,7 +214,7 @@ describe("Azure Arm Resources Rest Client", () => {
   it("should actionSync top level tracked resources", async () => {
     const result = await client.topLevel.actionSync("test-rg", "top", {
       message: "Resource action at top level.",
-      urgent: true
+      urgent: true,
     });
     assert.isUndefined(result);
   });
@@ -230,8 +230,8 @@ describe("Azure Arm Resources Rest Client", () => {
     const result = await client.topLevel.createOrReplace("test-rg", "top", {
       location: "eastus",
       properties: {
-        description: "valid"
-      }
+        description: "valid",
+      },
     });
     assert.strictEqual(result.id, validTopLevelResource.id);
     assert.strictEqual(result.name, validTopLevelResource.name);
@@ -239,7 +239,7 @@ describe("Azure Arm Resources Rest Client", () => {
     assert.strictEqual(result.location, validTopLevelResource.location);
     assert.strictEqual(
       result.properties?.description,
-      validTopLevelResource.properties?.description
+      validTopLevelResource.properties?.description,
     );
   });
 
@@ -247,8 +247,8 @@ describe("Azure Arm Resources Rest Client", () => {
     const result = await client.topLevel.update("test-rg", "top", {
       location: "eastus",
       properties: {
-        description: "valid2"
-      }
+        description: "valid2",
+      },
     });
     assert.strictEqual(result.id, validTopLevelResource.id);
     assert.strictEqual(result.name, validTopLevelResource.name);
@@ -294,31 +294,26 @@ describe("Azure Arm Resources Rest Client", () => {
   });
 
   it("should create or replace nested proxy resource", async () => {
-    const result = await client.nested.createOrReplace(
-      "test-rg",
-      "top",
-      "nested",
-      {
-        properties: {
-          description: "valid"
-        }
-      }
-    );
+    const result = await client.nested.createOrReplace("test-rg", "top", "nested", {
+      properties: {
+        description: "valid",
+      },
+    });
     assert.deepStrictEqual<NestedProxyResource>(result, validNestedResource);
   });
 
   it("should update nested proxy resource", async () => {
     const result = await client.nested.update("test-rg", "top", "nested", {
       properties: {
-        description: "valid2"
-      }
+        description: "valid2",
+      },
     });
     assert.deepStrictEqual<NestedProxyResource>(result, {
       ...validNestedResource,
       properties: {
         provisioningState: "Succeeded",
-        description: "valid2"
-      }
+        description: "valid2",
+      },
     });
   });
 
@@ -328,10 +323,7 @@ describe("Azure Arm Resources Rest Client", () => {
   });
 
   it("should list nested proxy resource by TopLevelTrackedResource ", async () => {
-    const result = await client.nested.listByTopLevelTrackedResource(
-      "test-rg",
-      "top"
-    );
+    const result = await client.nested.listByTopLevelTrackedResource("test-rg", "top");
 
     const items: Array<NestedProxyResource> = [];
     for await (const item of result) {
@@ -343,57 +335,42 @@ describe("Azure Arm Resources Rest Client", () => {
 
   // location resource
   it("should get LocationResources ", async () => {
-    const result = await client.locationResources.get(
-      LOCATION_EXPECTED,
-      "resource"
-    );
+    const result = await client.locationResources.get(LOCATION_EXPECTED, "resource");
     assert.deepStrictEqual<LocationResource>(result, validLocationResource);
   });
 
   it("should createOrUpdate LocationResources ", async () => {
-    const result = await client.locationResources.createOrUpdate(
-      LOCATION_EXPECTED,
-      "resource",
-      {
-        properties: {
-          description: "valid"
-        }
-      }
-    );
+    const result = await client.locationResources.createOrUpdate(LOCATION_EXPECTED, "resource", {
+      properties: {
+        description: "valid",
+      },
+    });
     assert.deepStrictEqual<LocationResource>(result, validLocationResource);
   });
 
   it("should update LocationResources ", async () => {
-    const result = await client.locationResources.update(
-      LOCATION_EXPECTED,
-      "resource",
-      {
-        properties: {
-          description: "valid2"
-        }
-      }
-    );
+    const result = await client.locationResources.update(LOCATION_EXPECTED, "resource", {
+      properties: {
+        description: "valid2",
+      },
+    });
 
     assert.deepStrictEqual<LocationResource>(result, {
       ...validLocationResource,
       properties: {
         provisioningState: "Succeeded",
-        description: "valid2"
-      }
+        description: "valid2",
+      },
     });
   });
 
   it("should delete LocationResources ", async () => {
-    const result = await client.locationResources.delete(
-      LOCATION_EXPECTED,
-      "resource"
-    );
+    const result = await client.locationResources.delete(LOCATION_EXPECTED, "resource");
     assert.isUndefined(result);
   });
 
   it("should list LocationResources by subscription ", async () => {
-    const result =
-      await client.locationResources.listByLocation(LOCATION_EXPECTED);
+    const result = await client.locationResources.listByLocation(LOCATION_EXPECTED);
 
     const items: Array<LocationResource> = [];
     for await (const item of result) {
@@ -410,36 +387,30 @@ describe("Azure Arm Resources Rest Client", () => {
   it.skip("should get ExtensionsResources ", async () => {
     const resourceGroupResult = await client.extensionsResources.get(
       `subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}`,
-      "extension"
+      "extension",
     );
     assert.deepStrictEqual<ExtensionsResource>(
       resourceGroupResult,
-      validResourceGroupExtensionsResource
+      validResourceGroupExtensionsResource,
     );
 
     const subscriptionResult = await client.extensionsResources.get(
       `subscriptions/${SUBSCRIPTION_ID_EXPECTED}`,
-      "extension"
+      "extension",
     );
     assert.deepStrictEqual<ExtensionsResource>(
       subscriptionResult,
-      validSubscriptionExtensionsResource
+      validSubscriptionExtensionsResource,
     );
 
     const tenantResult = await client.extensionsResources.get("", "extension");
-    assert.deepStrictEqual<ExtensionsResource>(
-      tenantResult,
-      validTenantExtensionsResource
-    );
+    assert.deepStrictEqual<ExtensionsResource>(tenantResult, validTenantExtensionsResource);
 
     const resourceResult = await client.extensionsResources.get(
       `subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top`,
-      "extension"
+      "extension",
     );
-    assert.deepStrictEqual<ExtensionsResource>(
-      resourceResult,
-      validResourceExtensionsResource
-    );
+    assert.deepStrictEqual<ExtensionsResource>(resourceResult, validResourceExtensionsResource);
   });
 
   // TODO: fix - tenant scope (empty resourceUri) now produces a double-slash URL ("//providers/...")
@@ -451,13 +422,13 @@ describe("Azure Arm Resources Rest Client", () => {
       "extension",
       {
         properties: {
-          description: "valid"
-        }
-      }
+          description: "valid",
+        },
+      },
     );
     assert.deepStrictEqual<ExtensionsResource>(
       resourceGroupResult,
-      validResourceGroupExtensionsResource
+      validResourceGroupExtensionsResource,
     );
 
     const subscriptionResult = await client.extensionsResources.createOrUpdate(
@@ -465,42 +436,32 @@ describe("Azure Arm Resources Rest Client", () => {
       "extension",
       {
         properties: {
-          description: "valid"
-        }
-      }
+          description: "valid",
+        },
+      },
     );
     assert.deepStrictEqual<ExtensionsResource>(
       subscriptionResult,
-      validSubscriptionExtensionsResource
+      validSubscriptionExtensionsResource,
     );
 
-    const tenantResult = await client.extensionsResources.createOrUpdate(
-      "",
-      "extension",
-      {
-        properties: {
-          description: "valid"
-        }
-      }
-    );
-    assert.deepStrictEqual<ExtensionsResource>(
-      tenantResult,
-      validTenantExtensionsResource
-    );
+    const tenantResult = await client.extensionsResources.createOrUpdate("", "extension", {
+      properties: {
+        description: "valid",
+      },
+    });
+    assert.deepStrictEqual<ExtensionsResource>(tenantResult, validTenantExtensionsResource);
 
     const resourceResult = await client.extensionsResources.createOrUpdate(
       `subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top`,
       "extension",
       {
         properties: {
-          description: "valid"
-        }
-      }
+          description: "valid",
+        },
+      },
     );
-    assert.deepStrictEqual<ExtensionsResource>(
-      resourceResult,
-      validResourceExtensionsResource
-    );
+    assert.deepStrictEqual<ExtensionsResource>(resourceResult, validResourceExtensionsResource);
   });
 
   // TODO: fix - tenant scope (empty resourceUri) now produces a double-slash URL ("//providers/...")
@@ -512,16 +473,16 @@ describe("Azure Arm Resources Rest Client", () => {
       "extension",
       {
         properties: {
-          description: "valid2"
-        }
-      }
+          description: "valid2",
+        },
+      },
     );
     assert.deepStrictEqual<ExtensionsResource>(resourceGroupResult, {
       ...validResourceGroupExtensionsResource,
       properties: {
         provisioningState: "Succeeded",
-        description: "valid2"
-      }
+        description: "valid2",
+      },
     });
 
     const subscriptionResult = await client.extensionsResources.update(
@@ -529,33 +490,29 @@ describe("Azure Arm Resources Rest Client", () => {
       "extension",
       {
         properties: {
-          description: "valid2"
-        }
-      }
+          description: "valid2",
+        },
+      },
     );
     assert.deepStrictEqual<ExtensionsResource>(subscriptionResult, {
       ...validSubscriptionExtensionsResource,
       properties: {
         provisioningState: "Succeeded",
-        description: "valid2"
-      }
+        description: "valid2",
+      },
     });
 
-    const tenantResult = await client.extensionsResources.update(
-      "",
-      "extension",
-      {
-        properties: {
-          description: "valid2"
-        }
-      }
-    );
+    const tenantResult = await client.extensionsResources.update("", "extension", {
+      properties: {
+        description: "valid2",
+      },
+    });
     assert.deepStrictEqual<ExtensionsResource>(tenantResult, {
       ...validTenantExtensionsResource,
       properties: {
         provisioningState: "Succeeded",
-        description: "valid2"
-      }
+        description: "valid2",
+      },
     });
 
     const resourceResult = await client.extensionsResources.update(
@@ -563,16 +520,16 @@ describe("Azure Arm Resources Rest Client", () => {
       "extension",
       {
         properties: {
-          description: "valid2"
-        }
-      }
+          description: "valid2",
+        },
+      },
     );
     assert.deepStrictEqual<ExtensionsResource>(resourceResult, {
       ...validResourceExtensionsResource,
       properties: {
         provisioningState: "Succeeded",
-        description: "valid2"
-      }
+        description: "valid2",
+      },
     });
   });
 
@@ -582,25 +539,22 @@ describe("Azure Arm Resources Rest Client", () => {
   it.skip("should delete ExtensionsResources ", async () => {
     const resourceGroupResult = await client.extensionsResources.delete(
       `subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}`,
-      "extension"
+      "extension",
     );
     assert.isUndefined(resourceGroupResult);
 
     const subscriptionResult = await client.extensionsResources.delete(
       `subscriptions/${SUBSCRIPTION_ID_EXPECTED}`,
-      "extension"
+      "extension",
     );
     assert.isUndefined(subscriptionResult);
 
-    const tenantResult = await client.extensionsResources.delete(
-      "",
-      "extension"
-    );
+    const tenantResult = await client.extensionsResources.delete("", "extension");
     assert.isUndefined(tenantResult);
 
     const resourceResult = await client.extensionsResources.delete(
       `subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top`,
-      "extension"
+      "extension",
     );
     assert.isUndefined(resourceResult);
   });
@@ -610,7 +564,7 @@ describe("Azure Arm Resources Rest Client", () => {
   // removed slash normalization from ts-http-runtime's buildRequestUrl.
   it.skip("should list ExtensionsResources ", async () => {
     const resourceGroupResult = await client.extensionsResources.listByScope(
-      `subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}`
+      `subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}`,
     );
     const resourceGroupItems: Array<ExtensionsResource> = [];
     for await (const item of resourceGroupResult) {
@@ -618,11 +572,11 @@ describe("Azure Arm Resources Rest Client", () => {
     }
     assert.strictEqual(resourceGroupItems.length, 1);
     assert.deepStrictEqual<ExtensionsResource[]>(resourceGroupItems, [
-      validResourceGroupExtensionsResource
+      validResourceGroupExtensionsResource,
     ]);
 
     const subscriptionResult = await client.extensionsResources.listByScope(
-      `subscriptions/${SUBSCRIPTION_ID_EXPECTED}`
+      `subscriptions/${SUBSCRIPTION_ID_EXPECTED}`,
     );
     const subscriptionItems: Array<ExtensionsResource> = [];
     for await (const item of subscriptionResult) {
@@ -630,7 +584,7 @@ describe("Azure Arm Resources Rest Client", () => {
     }
     assert.strictEqual(subscriptionItems.length, 1);
     assert.deepStrictEqual<ExtensionsResource[]>(subscriptionItems, [
-      validSubscriptionExtensionsResource
+      validSubscriptionExtensionsResource,
     ]);
 
     const tenantResult = await client.extensionsResources.listByScope("");
@@ -639,20 +593,16 @@ describe("Azure Arm Resources Rest Client", () => {
       tenantItems.push(item);
     }
     assert.strictEqual(tenantItems.length, 1);
-    assert.deepStrictEqual<ExtensionsResource[]>(tenantItems, [
-      validTenantExtensionsResource
-    ]);
+    assert.deepStrictEqual<ExtensionsResource[]>(tenantItems, [validTenantExtensionsResource]);
 
     const resourceResult = await client.extensionsResources.listByScope(
-      `subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top`
+      `subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top`,
     );
     const resourceItems: Array<ExtensionsResource> = [];
     for await (const item of resourceResult) {
       resourceItems.push(item);
     }
     assert.strictEqual(resourceItems.length, 1);
-    assert.deepStrictEqual<ExtensionsResource[]>(resourceItems, [
-      validResourceExtensionsResource
-    ]);
+    assert.deepStrictEqual<ExtensionsResource[]>(resourceItems, [validResourceExtensionsResource]);
   });
 });

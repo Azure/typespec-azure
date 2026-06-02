@@ -1,10 +1,10 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import {
   GoblinShark,
   NestedDiscriminatorClient,
   Salmon,
-  Shark
+  Shark,
 } from "./generated/type/model/inheritance/nested-discriminator/src/index.js";
 
 describe("NestedDiscriminatorClient Rest Client", () => {
@@ -13,14 +13,14 @@ describe("NestedDiscriminatorClient Rest Client", () => {
   beforeEach(() => {
     client = new NestedDiscriminatorClient({
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
   const validBody: GoblinShark = {
     age: 1,
     kind: "shark",
-    sharktype: "goblin"
+    sharktype: "goblin",
   };
   it("should get valid", async () => {
     const result = await client.getModel();
@@ -40,7 +40,7 @@ describe("NestedDiscriminatorClient Rest Client", () => {
     partner: {
       age: 2,
       kind: "shark",
-      sharktype: "saw"
+      sharktype: "saw",
     },
     friends: [
       {
@@ -48,31 +48,31 @@ describe("NestedDiscriminatorClient Rest Client", () => {
         kind: "salmon",
         partner: {
           age: 3,
-          kind: "salmon"
+          kind: "salmon",
         },
         hate: {
           key1: {
             age: 4,
-            kind: "salmon"
+            kind: "salmon",
           },
           key2: {
             age: 2,
             kind: "shark",
-            sharktype: "goblin"
-          }
-        }
+            sharktype: "goblin",
+          },
+        },
       },
       {
         age: 3,
         kind: "shark",
-        sharktype: "goblin"
-      }
+        sharktype: "goblin",
+      },
     ],
     hate: {
       key3: {
         age: 3,
         kind: "shark",
-        sharktype: "saw"
+        sharktype: "saw",
       },
       key4: {
         age: 2,
@@ -80,28 +80,25 @@ describe("NestedDiscriminatorClient Rest Client", () => {
         friends: [
           {
             age: 1,
-            kind: "salmon"
+            kind: "salmon",
           },
           {
             age: 4,
             kind: "shark",
-            sharktype: "goblin"
-          }
-        ]
-      }
-    }
+            sharktype: "goblin",
+          },
+        ],
+      },
+    },
   };
   it("should get recursive body", async () => {
     const result = await client.getRecursiveModel();
     assert.strictEqual(
       JSON.stringify(result, Object.keys(result).sort()),
-      JSON.stringify(validRecursiveBody, Object.keys(validRecursiveBody).sort())
+      JSON.stringify(validRecursiveBody, Object.keys(validRecursiveBody).sort()),
     );
     if (result.kind === "salmon") {
-      assert.strictEqual(
-        (result as Salmon).partner?.kind,
-        validRecursiveBody.partner?.kind
-      );
+      assert.strictEqual((result as Salmon).partner?.kind, validRecursiveBody.partner?.kind);
     }
   });
 

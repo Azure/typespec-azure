@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { PageClient, User } from "./generated/azure/core/page/src/index.js";
 
@@ -8,13 +8,13 @@ describe("Page Client", () => {
   beforeEach(() => {
     client = new PageClient({
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
   const validUser = {
     id: 1,
     name: "Madge",
-    etag: "11bdc430-65e8-45ad-81d9-8ffa60d55b59"
+    etag: "11bdc430-65e8-45ad-81d9-8ffa60d55b59",
   };
 
   it("should list core page withPage", async () => {
@@ -32,7 +32,7 @@ describe("Page Client", () => {
   it("should list core page withParameters", async () => {
     const validBody = { inputName: "Madge" };
     const result = client.listWithParameters(validBody, {
-      another: "Second"
+      another: "Second",
     });
     const items: User[] = [];
     for await (const parameter of result) {
@@ -75,9 +75,7 @@ describe("Page Client", () => {
 
   it("should list core page withParameterizedNextLink", async () => {
     // TODO: We can only get the first page data because the parameter re-injection is not implemented yet.
-    const result = await client
-      .withParameterizedNextLink("name", { includePending: true })
-      .next();
+    const result = await client.withParameterizedNextLink("name", { includePending: true }).next();
     assert.strictEqual(result.value.name, "User1");
   });
 

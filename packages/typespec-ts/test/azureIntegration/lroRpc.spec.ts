@@ -1,25 +1,23 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import SpecsAzureCoreLroStandardClientFactory, {
   RpcClient,
   getLongRunningPoller,
-  isUnexpected
+  isUnexpected,
 } from "./generated/azure/core/lro/rpc/src/index.js";
 describe("RpcClient Rest Client", () => {
   let client: RpcClient;
 
   beforeEach(() => {
     client = SpecsAzureCoreLroStandardClientFactory({
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
   it("should post LRO response", async () => {
-    const initialResponse = await client
-      .path("/azure/core/lro/rpc/generations:submit")
-      .post({
-        body: { prompt: "text" }
-      });
+    const initialResponse = await client.path("/azure/core/lro/rpc/generations:submit").post({
+      body: { prompt: "text" },
+    });
     const poller = await getLongRunningPoller(client, initialResponse);
     const result = await poller.pollUntilDone();
     assert.equal(result.status, "200");

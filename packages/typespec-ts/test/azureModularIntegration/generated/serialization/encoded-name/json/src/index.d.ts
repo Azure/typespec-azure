@@ -1,32 +1,26 @@
-import { ClientOptions } from '@azure-rest/core-client';
-import { isRestError } from '@azure/core-rest-pipeline';
-import { OperationOptions } from '@azure-rest/core-client';
-import { Pipeline } from '@azure/core-rest-pipeline';
-import { RestError } from '@azure/core-rest-pipeline';
+import { ClientOptions, OperationOptions } from "@azure-rest/core-client";
+import { isRestError, Pipeline, RestError } from "@azure/core-rest-pipeline";
 
-export declare interface GetOptionalParams extends OperationOptions {
-}
+export declare interface GetOptionalParams extends OperationOptions {}
 
-export { isRestError }
+export { isRestError };
 
 export declare class JsonClient {
-    private _client;
-    readonly pipeline: Pipeline;
-    constructor(options?: JsonClientOptionalParams);
-    get(options?: GetOptionalParams): Promise<JsonEncodedNameModel>;
-    send(body: JsonEncodedNameModel, options?: SendOptionalParams): Promise<void>;
+  private _client;
+  readonly pipeline: Pipeline;
+  constructor(options?: JsonClientOptionalParams);
+  get(options?: GetOptionalParams): Promise<JsonEncodedNameModel>;
+  send(body: JsonEncodedNameModel, options?: SendOptionalParams): Promise<void>;
 }
 
-export declare interface JsonClientOptionalParams extends ClientOptions {
-}
+export declare interface JsonClientOptionalParams extends ClientOptions {}
 
 export declare interface JsonEncodedNameModel {
-    defaultName: boolean;
+  defaultName: boolean;
 }
 
-export { RestError }
+export { RestError };
 
-export declare interface SendOptionalParams extends OperationOptions {
-}
+export declare interface SendOptionalParams extends OperationOptions {}
 
-export { }
+export {};

@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { DictionaryClient } from "./generated/type/dictionary/src/index.js";
 
@@ -10,8 +10,8 @@ describe("DictionaryClient Modular Client", () => {
       endpoint: "http://localhost:3002",
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
-      }
+        maxRetries: 0,
+      },
     });
   });
 
@@ -32,7 +32,7 @@ describe("DictionaryClient Modular Client", () => {
 
   it("should send a dictionary of datetime", async () => {
     const result = await client.datetimeValue.put({
-      k1: new Date("2022-08-26T18:38:00Z")
+      k1: new Date("2022-08-26T18:38:00Z"),
     });
     assert.isUndefined(result);
   });
@@ -40,13 +40,13 @@ describe("DictionaryClient Modular Client", () => {
   it("should get a dictionary of durations", async () => {
     const result = await client.durationValue.get();
     assert.deepEqual(result, {
-      k1: "P123DT22H14M12.011S"
+      k1: "P123DT22H14M12.011S",
     });
   });
 
   it("should send a dictionary of durations", async () => {
     const result = await client.durationValue.put({
-      k1: "P123DT22H14M12.011S"
+      k1: "P123DT22H14M12.011S",
     });
     assert.isUndefined(result);
   });
@@ -83,7 +83,7 @@ describe("DictionaryClient Modular Client", () => {
     const minSafeInteger = -Math.pow(2, 53) + 1;
     const result = await client.int64Value.put({
       k1: maxSafeInteger,
-      k2: minSafeInteger
+      k2: minSafeInteger,
     });
     assert.isUndefined(result);
   });
@@ -93,23 +93,23 @@ describe("DictionaryClient Modular Client", () => {
     assert.deepEqual(result, {
       k1: {
         property: "hello",
-        children: undefined
+        children: undefined,
       },
       k2: {
         property: "world",
-        children: undefined
-      }
+        children: undefined,
+      },
     });
   });
 
   it("should send a dictionary of model", async () => {
     const result = await client.modelValue.put({
       k1: {
-        property: "hello"
+        property: "hello",
       },
       k2: {
-        property: "world"
-      }
+        property: "world",
+      },
     });
     assert.isUndefined(result);
   });
@@ -123,7 +123,7 @@ describe("DictionaryClient Modular Client", () => {
     const result = await client.nullableFloatValue.put({
       k1: 1.25,
       k2: 0.5,
-      k3: null
+      k3: null,
     });
     assert.isUndefined(result);
   });
@@ -134,8 +134,8 @@ describe("DictionaryClient Modular Client", () => {
       k1: { property: "hello", children: {} },
       k2: {
         property: "world",
-        children: { "k2.1": { children: undefined, property: "inner world" } }
-      }
+        children: { "k2.1": { children: undefined, property: "inner world" } },
+      },
     });
   });
 

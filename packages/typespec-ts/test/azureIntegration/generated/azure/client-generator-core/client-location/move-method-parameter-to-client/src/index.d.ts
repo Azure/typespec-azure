@@ -1,55 +1,59 @@
-import type { Client } from '@azure-rest/core-client';
-import type { ClientOptions } from '@azure-rest/core-client';
-import type { HttpResponse } from '@azure-rest/core-client';
-import { isRestError } from '@azure/core-rest-pipeline';
-import type { RequestParameters } from '@azure-rest/core-client';
-import { RestError } from '@azure/core-rest-pipeline';
-import type { StreamableMethod } from '@azure-rest/core-client';
+import type {
+  Client,
+  ClientOptions,
+  HttpResponse,
+  RequestParameters,
+  StreamableMethod,
+} from "@azure-rest/core-client";
+import { isRestError, RestError } from "@azure/core-rest-pipeline";
 
 export declare interface BlobOutput {
-    id: string;
-    name: string;
-    size: number;
-    path: string;
+  id: string;
+  name: string;
+  size: number;
+  path: string;
 }
 
-declare function createClient(options?: MoveMethodParameterToClientClientOptions): MoveMethodParameterToClientClient;
+declare function createClient(
+  options?: MoveMethodParameterToClientClientOptions,
+): MoveMethodParameterToClientClient;
 export default createClient;
 
 export declare interface GetBlob {
-    get(options: GetBlobParameters): StreamableMethod<GetBlob200Response>;
+  get(options: GetBlobParameters): StreamableMethod<GetBlob200Response>;
 }
 
 export declare interface GetBlob200Response extends HttpResponse {
-    status: "200";
-    body: BlobOutput;
+  status: "200";
+  body: BlobOutput;
 }
 
 export declare type GetBlobParameters = GetBlobQueryParam & RequestParameters;
 
 export declare interface GetBlobQueryParam {
-    queryParameters: GetBlobQueryParamProperties;
+  queryParameters: GetBlobQueryParamProperties;
 }
 
 export declare interface GetBlobQueryParamProperties {
-    storageAccount: string;
-    container: string;
-    blob: string;
+  storageAccount: string;
+  container: string;
+  blob: string;
 }
 
-export { isRestError }
+export { isRestError };
 
 export declare type MoveMethodParameterToClientClient = Client & {
-    path: Routes;
+  path: Routes;
 };
 
-export declare interface MoveMethodParameterToClientClientOptions extends ClientOptions {
-}
+export declare interface MoveMethodParameterToClientClientOptions extends ClientOptions {}
 
-export { RestError }
+export { RestError };
 
 export declare interface Routes {
-    (path: "/azure/client-generator-core/client-location/move-method-parameter-to-client/blob"): GetBlob;
+  (
+    path: "/azure/client-generator-core/client-location/move-method-parameter-to-client/blob",
+  ): GetBlob;
 }
 
-export { }
+export {};

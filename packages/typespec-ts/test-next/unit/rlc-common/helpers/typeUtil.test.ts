@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import {
   TypeScriptType,
@@ -16,7 +16,7 @@ import {
   leaveBracket,
   leaveStringQuotes,
   toTypeScriptTypeFromName,
-  toTypeScriptTypeFromSchema
+  toTypeScriptTypeFromSchema,
 } from "../../../../src/rlc-common/helpers/typeUtil.js";
 
 describe("#isStringLiteral", () => {
@@ -30,8 +30,8 @@ describe("#isStringLiteral", () => {
     expect(isStringLiteral(`'   string  ssss '`)).to.be.true;
     expect(
       isStringLiteral(
-        `"啊齄丂狛狜隣郎隣兀﨩ˊ〞〡￤℡㈱‐ー﹡﹢﹫、〓ⅰⅹ⒈€㈠㈩ⅠⅫ！￣ぁんァヶΑ︴АЯаяāɡㄅㄩ─╋︵﹄︻︱︳︴ⅰⅹɑɡ〇〾⿻⺁䜣€"`
-      )
+        `"啊齄丂狛狜隣郎隣兀﨩ˊ〞〡￤℡㈱‐ー﹡﹢﹫、〓ⅰⅹ⒈€㈠㈩ⅠⅫ！￣ぁんァヶΑ︴АЯаяāɡㄅㄩ─╋︵﹄︻︱︳︴ⅰⅹɑɡ〇〾⿻⺁䜣€"`,
+      ),
     ).to.be.true;
   });
 
@@ -41,8 +41,7 @@ describe("#isStringLiteral", () => {
     expect(isStringLiteral(`123`)).to.be.false;
     expect(isStringLiteral(`null`)).to.be.false;
     expect(isStringLiteral(`undefined`)).to.be.false;
-    expect(isStringLiteral(`"application/json" | "application/octet-stream"`))
-      .to.be.false;
+    expect(isStringLiteral(`"application/json" | "application/octet-stream"`)).to.be.false;
   });
 });
 
@@ -101,19 +100,11 @@ describe("#isRecord", () => {
 describe("#getRecordType", () => {
   it("should return the type of the record", () => {
     expect(getRecordType(`Record<string, string>`)).to.equal("string");
-    expect(getRecordType(`Record<string, string | "1">`)).to.equal(
-      'string | "1"'
-    );
-    expect(getRecordType(`Record<string, Record<string, any>>`)).to.equal(
-      "Record<string, any>"
-    );
+    expect(getRecordType(`Record<string, string | "1">`)).to.equal('string | "1"');
+    expect(getRecordType(`Record<string, Record<string, any>>`)).to.equal("Record<string, any>");
     expect(getRecordType(`Record<string, string[]>`)).to.equal("string[]");
-    expect(getRecordType(`Record<string, Array<SimpleModel>>`)).to.equal(
-      "Array<SimpleModel>"
-    );
-    expect(getRecordType(`Record<string, SimpleModel>`)).to.equal(
-      "SimpleModel"
-    );
+    expect(getRecordType(`Record<string, Array<SimpleModel>>`)).to.equal("Array<SimpleModel>");
+    expect(getRecordType(`Record<string, SimpleModel>`)).to.equal("SimpleModel");
     expect(getRecordType(`Record<string, "a" | "b">`)).to.equal(`"a" | "b"`);
   });
 });
@@ -141,9 +132,7 @@ describe("#getArrayObjectType", () => {
   it("should return the type of the array", () => {
     expect(getArrayObjectType(`Array<Model>`)).to.equal("Model");
     expect(getArrayObjectType(`Array<A>`)).to.equal("A");
-    expect(getArrayObjectType(`Array<string | number>`)).to.equal(
-      "string | number"
-    );
+    expect(getArrayObjectType(`Array<string | number>`)).to.equal("string | number");
   });
 });
 
@@ -163,16 +152,14 @@ describe("#isUnion", () => {
     expect(isUnion(`1 | "a"`)).to.be.true;
     expect(isUnion(`Record<string, string> | string`)).to.be.true;
     expect(isUnion(`string[] | string`)).to.be.true;
-    expect(isUnion(`"application/json" | "application/octet-stream"`)).to.be
-      .true;
+    expect(isUnion(`"application/json" | "application/octet-stream"`)).to.be.true;
     expect(isUnion(`true | 123 | "application/xml"`)).to.be.true;
   });
 
   it("should return false if the string is not union", () => {
     expect(isUnion(`Record<string, string | "sss">`)).to.be.false;
     expect(isUnion(`"sss | tt"`)).to.be.false;
-    expect(isUnion(`"application/json | application/octet-stream"`)).to.be
-      .false;
+    expect(isUnion(`"application/json | application/octet-stream"`)).to.be.false;
   });
 });
 
@@ -211,23 +198,13 @@ describe("#toTypeScriptTypeFromName", () => {
   it("should return the typeScriptType from the type name", () => {
     expect(toTypeScriptTypeFromName("string")).to.equal(TypeScriptType.string);
     expect(toTypeScriptTypeFromName("number")).to.equal(TypeScriptType.number);
-    expect(toTypeScriptTypeFromName("boolean")).to.equal(
-      TypeScriptType.boolean
-    );
+    expect(toTypeScriptTypeFromName("boolean")).to.equal(TypeScriptType.boolean);
     expect(toTypeScriptTypeFromName("Date")).to.equal(TypeScriptType.date);
     expect(toTypeScriptTypeFromName("string[]")).to.equal(TypeScriptType.array);
-    expect(toTypeScriptTypeFromName("Record<string, string>")).to.equal(
-      TypeScriptType.record
-    );
-    expect(toTypeScriptTypeFromName("Date | string")).to.equal(
-      TypeScriptType.union
-    );
-    expect(toTypeScriptTypeFromName(`"constant"`)).to.equal(
-      TypeScriptType.constant
-    );
-    expect(toTypeScriptTypeFromName("unknown")).to.equal(
-      TypeScriptType.unknown
-    );
+    expect(toTypeScriptTypeFromName("Record<string, string>")).to.equal(TypeScriptType.record);
+    expect(toTypeScriptTypeFromName("Date | string")).to.equal(TypeScriptType.union);
+    expect(toTypeScriptTypeFromName(`"constant"`)).to.equal(TypeScriptType.constant);
+    expect(toTypeScriptTypeFromName("unknown")).to.equal(TypeScriptType.unknown);
   });
 
   it("should return undefined if the type name is not supported", () => {
@@ -237,59 +214,58 @@ describe("#toTypeScriptTypeFromName", () => {
 
 describe("#toTypeScriptTypeFromSchema", () => {
   it("should return the typeScriptType from the schema", () => {
-    expect(
-      toTypeScriptTypeFromSchema({ type: "string", name: "foo" })
-    ).to.equal(TypeScriptType.string);
-    expect(
-      toTypeScriptTypeFromSchema({ type: "number", name: "foo" })
-    ).to.equal(TypeScriptType.number);
-    expect(
-      toTypeScriptTypeFromSchema({ type: "boolean", name: "foo" })
-    ).to.equal(TypeScriptType.boolean);
+    expect(toTypeScriptTypeFromSchema({ type: "string", name: "foo" })).to.equal(
+      TypeScriptType.string,
+    );
+    expect(toTypeScriptTypeFromSchema({ type: "number", name: "foo" })).to.equal(
+      TypeScriptType.number,
+    );
+    expect(toTypeScriptTypeFromSchema({ type: "boolean", name: "foo" })).to.equal(
+      TypeScriptType.boolean,
+    );
     expect(
       toTypeScriptTypeFromSchema({
         type: "string",
         name: "string",
         typeName: "Date | string",
-        outputTypeName: "string"
-      })
+        outputTypeName: "string",
+      }),
     ).to.equal(TypeScriptType.date);
-    expect(
-      toTypeScriptTypeFromSchema({ type: "object", name: "foo" })
-    ).to.equal(TypeScriptType.object);
-    expect(toTypeScriptTypeFromSchema({ type: "array", name: "foo" })).to.equal(
-      TypeScriptType.array
+    expect(toTypeScriptTypeFromSchema({ type: "object", name: "foo" })).to.equal(
+      TypeScriptType.object,
     );
-    expect(
-      toTypeScriptTypeFromSchema({ type: "dictionary", name: "foo" })
-    ).to.equal(TypeScriptType.record);
+    expect(toTypeScriptTypeFromSchema({ type: "array", name: "foo" })).to.equal(
+      TypeScriptType.array,
+    );
+    expect(toTypeScriptTypeFromSchema({ type: "dictionary", name: "foo" })).to.equal(
+      TypeScriptType.record,
+    );
     expect(
       toTypeScriptTypeFromSchema({
         type: "union",
         name: "foo",
-        enum: [{ type: "number", format: "int32" }]
-      })
+        enum: [{ type: "number", format: "int32" }],
+      }),
     ).to.equal(TypeScriptType.union);
     expect(
       toTypeScriptTypeFromSchema({
         type: "string",
         enum: ["val1", "val2"],
-        name: "foo"
-      })
+        name: "foo",
+      }),
     ).to.equal(TypeScriptType.enum);
     expect(
       toTypeScriptTypeFromSchema({
         isConstant: true,
         name: "foo",
-        type: `"test"`
-      })
+        type: `"test"`,
+      }),
     ).to.equal(TypeScriptType.constant);
-    expect(
-      toTypeScriptTypeFromSchema({ type: "unknown", name: "foo" })
-    ).to.equal(TypeScriptType.unknown);
+    expect(toTypeScriptTypeFromSchema({ type: "unknown", name: "foo" })).to.equal(
+      TypeScriptType.unknown,
+    );
   });
   it("should return undefined if the schema is not supported", () => {
-    expect(toTypeScriptTypeFromSchema({ type: "unknownType", name: "foo" })).to
-      .be.undefined;
+    expect(toTypeScriptTypeFromSchema({ type: "unknownType", name: "foo" })).to.be.undefined;
   });
 });

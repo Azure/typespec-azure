@@ -13,9 +13,7 @@ import "@typespec/versioning";
 using TypeSpec.Http;
 using TypeSpec.Rest;
 using TypeSpec.Versioning;
-@service(#{
-  title: "Demo Service",
-})
+@service(#{ title: "Demo Service" })
 @versioned(Versions)
 namespace DemoService;
 
@@ -25,7 +23,9 @@ enum Versions {
 }
 
 @doc("show example demo")
-op read(name: string):  { @body body: {}};
+op read(name: string): {
+  @body body: {};
+};
 ```
 
 The config would be like:

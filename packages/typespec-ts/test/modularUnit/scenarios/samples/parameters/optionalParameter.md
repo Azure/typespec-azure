@@ -12,15 +12,14 @@ using TypeSpec.Http;
 using TypeSpec.Rest;
 using Azure.Core;
 
-@service(#{
-  title: "Sample Service",
-})
+@service(#{ title: "Sample Service" })
 @server(
   "{endpoint}/{storage}",
   "Sample endpoint",
   {
     @doc("The endpoint URL")
     endpoint: string = "https://example.com",
+
     storage: string,
   }
 )
@@ -34,10 +33,7 @@ model Person {
 @route("/persons")
 interface Persons {
   @get
-  list(
-    @query start?: string,
-    @query top?: int32,
-  ): Person[];
+  list(@query start?: string, @query top?: int32): Person[];
 }
 ```
 

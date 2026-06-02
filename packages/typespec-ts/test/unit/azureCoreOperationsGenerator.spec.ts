@@ -1,14 +1,11 @@
-import { describe, it, assert } from "vitest";
+import { assert, describe, it } from "vitest";
 
-import {
-  emitParameterFromTypeSpec,
-  emitResponsesFromTypeSpec
-} from "../util/emitUtil.js";
+import { emitParameterFromTypeSpec, emitResponsesFromTypeSpec } from "../util/emitUtil.js";
 
 describe("typespec-azure-core: operation templates", () => {
   it("ResourceCreateWithServiceProvidedName", async () => {
     const { parameters, responses } = await compileResourceOperation(
-      `@test op create is Azure.Core.StandardResourceOperations.ResourceCreateWithServiceProvidedName<TestModel, Customizations>;`
+      `@test op create is Azure.Core.StandardResourceOperations.ResourceCreateWithServiceProvidedName<TestModel, Customizations>;`,
     );
     assert.ok(parameters);
     assert.ok(responses);
@@ -66,10 +63,10 @@ async function compileResourceOperation(code: string) {
     ${code}
     `;
   const parameters = await emitParameterFromTypeSpec(content, {
-    needAzureCore: true
+    needAzureCore: true,
   });
   const responses = await emitResponsesFromTypeSpec(content, {
-    needAzureCore: true
+    needAzureCore: true,
   });
 
   return { parameters, responses };

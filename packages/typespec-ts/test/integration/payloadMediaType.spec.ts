@@ -1,7 +1,7 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import MediaTypeClientFactory, {
-  MediaTypeClient
+  MediaTypeClient,
 } from "./generated/payload/media-type/src/index.js";
 
 describe("MediaType Client", () => {
@@ -9,7 +9,7 @@ describe("MediaType Client", () => {
 
   beforeEach(() => {
     client = MediaTypeClientFactory({
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 

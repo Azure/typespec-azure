@@ -4,9 +4,7 @@ import "./routes.tsp";
 
 using TypeSpec.Rest;
 using TypeSpec.Http;
-@service(#{
-  title: "MediaTypes",
-})
+@service(#{ title: "MediaTypes" })
 @server(
   "{$host}",
   "Play with produces/consumes and media-types in general.",

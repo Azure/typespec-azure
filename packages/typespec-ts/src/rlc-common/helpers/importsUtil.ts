@@ -12,42 +12,42 @@ export function buildRuntimeImports(flavor?: PackageFlavor): Imports {
       restClient: {
         type: "restClient",
         specifier: "@azure-rest/core-client",
-        version: "^2.0.0"
+        version: "^2.0.0",
       },
       coreAuth: {
         type: "coreAuth",
         specifier: "@azure/core-auth",
-        version: "^1.6.0"
+        version: "^1.6.0",
       },
       restPipeline: {
         type: "restPipeline",
         specifier: "@azure/core-rest-pipeline",
-        version: "^1.14.0"
+        version: "^1.14.0",
       },
       coreUtil: {
         type: "coreUtil",
         specifier: "@azure/core-util",
-        version: "^1.4.0"
+        version: "^1.4.0",
       },
       coreLogger: {
         type: "coreLogger",
         specifier: "@azure/logger",
-        version: "^1.0.4"
+        version: "^1.0.4",
       },
       azureEslintPlugin: {
         type: "azureEslintPlugin",
         specifier: "@azure/eslint-plugin-azure-sdk",
-        version: "^3.0.0"
+        version: "^3.0.0",
       },
       azureTestRecorder: {
         type: "azureTestRecorder",
         specifier: "@azure-tools/test-recorder",
-        version: "^3.0.0"
+        version: "^3.0.0",
       },
       azureCoreLro: {
         type: "azureCoreLro",
-        specifier: "@azure/core-lro"
-      }
+        specifier: "@azure/core-lro",
+      },
     } as Imports;
   } else {
     // In non-azure branded scope we only have one dependency that is ts-http-runtime
@@ -55,8 +55,8 @@ export function buildRuntimeImports(flavor?: PackageFlavor): Imports {
       commonFallback: {
         type: "commonFallback",
         specifier: "@typespec/ts-http-runtime",
-        version: "0.1.0"
-      }
+        version: "0.1.0",
+      },
     } as Imports;
   }
 }
@@ -69,39 +69,39 @@ export function initInternalImports(): Imports {
   return {
     parameter: {
       type: "parameter",
-      importsSet: new Set<string>()
+      importsSet: new Set<string>(),
     },
     response: {
       type: "response",
-      importsSet: new Set<string>()
+      importsSet: new Set<string>(),
     },
     rlcIndex: {
       type: "rlcIndex",
-      importsSet: new Set<string>()
+      importsSet: new Set<string>(),
     },
     modularModel: {
       type: "modularModel",
-      importsSet: new Set<string>()
+      importsSet: new Set<string>(),
     },
     rlcClientFactory: {
       type: "rlcClientFactory",
-      importsSet: new Set<string>()
+      importsSet: new Set<string>(),
     },
     rlcClientDefinition: {
       type: "rlcClientDefinition",
-      importsSet: new Set<string>()
+      importsSet: new Set<string>(),
     },
     serializerHelpers: {
       type: "serializerHelpers",
-      importsSet: new Set<string>()
-    }
+      importsSet: new Set<string>(),
+    },
   } as Imports;
 }
 
 export function getImportSpecifier(
   importType: ImportType,
   imports?: Imports,
-  includeFallback = true
+  includeFallback = true,
 ): string {
   imports = imports ?? ({} as Imports);
   const defaultPackageMap: Record<ImportType, string> = {
@@ -110,7 +110,7 @@ export function getImportSpecifier(
     restPipeline: "@azure/core-rest-pipeline",
     coreUtil: "@azure/core-util",
     coreLogger: "@azure/logger",
-    azureCoreLro: "@azure/core-lro"
+    azureCoreLro: "@azure/core-lro",
   } as any;
   if (!includeFallback) {
     return imports[importType]?.specifier ?? "";
@@ -125,7 +125,7 @@ export function getImportSpecifier(
 export function addImportToSpecifier(
   importType: ImportType,
   runtimeImports: Imports,
-  importedName: string
+  importedName: string,
 ): void {
   const specifier = getImportSpecifier(importType, runtimeImports);
   const importSet = runtimeImports[importType]?.importsSet;
@@ -133,7 +133,7 @@ export function addImportToSpecifier(
     runtimeImports[importType] = {
       type: importType,
       specifier,
-      importsSet: new Set<string>().add(importedName)
+      importsSet: new Set<string>().add(importedName),
     };
   } else {
     importSet.add(importedName);
@@ -149,15 +149,14 @@ export function clearImportSets(runtimeImports: Imports): void {
 export function addImportsToFiles(
   runtimeImports: Imports,
   file: SourceFile,
-  internalSpecifierMap?: Record<string, string>
+  internalSpecifierMap?: Record<string, string>,
 ): void {
   Object.values(runtimeImports)
     .filter((importType) => {
       return importType.importsSet?.size;
     })
     .forEach((importType) => {
-      const specifier =
-        internalSpecifierMap?.[importType.type] ?? importType.specifier!;
+      const specifier = internalSpecifierMap?.[importType.type] ?? importType.specifier!;
       let hasModifier = false;
       if (!specifier) {
         return;
@@ -169,16 +168,14 @@ export function addImportsToFiles(
         })
         .forEach((importDeclaration) => {
           hasModifier = true;
-          importDeclaration.addNamedImports([
-            ...importType.importsSet!.values()
-          ]);
+          importDeclaration.addNamedImports([...importType.importsSet!.values()]);
         });
 
       if (!hasModifier) {
         file.addImportDeclaration({
           isTypeOnly: true,
           moduleSpecifier: specifier,
-          namedImports: [...importType.importsSet!.values()]
+          namedImports: [...importType.importsSet!.values()],
         });
         return;
       }

@@ -1,9 +1,9 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import NextLinkVerbClientFactory, {
   NextLinkVerbClient,
   TestOutput,
-  paginate
+  paginate,
 } from "./generated/azure/client-generator-core/next-link-verb/src/index.js";
 
 describe("NextLinkVerb Rest Client", () => {
@@ -11,19 +11,17 @@ describe("NextLinkVerb Rest Client", () => {
 
   beforeEach(() => {
     client = NextLinkVerbClientFactory({
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
   it("should list items with POST method", async () => {
-    const result = await client
-      .path("/azure/client-generator-core/next-link-verb/items")
-      .post();
+    const result = await client.path("/azure/client-generator-core/next-link-verb/items").post();
     assert.strictEqual(result.status, "200");
     assert.strictEqual(result.body.items[0]?.id, "test1");
     assert.strictEqual(
       result.body.nextLink,
-      "http://localhost:3000/azure/client-generator-core/next-link-verb/items/page/2"
+      "http://localhost:3000/azure/client-generator-core/next-link-verb/items/page/2",
     );
   });
 
@@ -34,15 +32,13 @@ describe("NextLinkVerb Rest Client", () => {
 
     const iter = paginate(client, initialResponse, {
       customGetPage: async (pageLink: string) => {
-        const result = pageLink
-          ? await client.pathUnchecked(pageLink).post()
-          : initialResponse;
+        const result = pageLink ? await client.pathUnchecked(pageLink).post() : initialResponse;
 
         return {
           page: result.body.items ?? [],
-          nextPageLink: result.body.nextLink
+          nextPageLink: result.body.nextLink,
         };
-      }
+      },
     });
 
     const result: TestOutput[] = [];

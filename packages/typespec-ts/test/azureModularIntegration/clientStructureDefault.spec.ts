@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { ServiceClient } from "./generated/client/structure/default/src/index.js";
 describe("Client Structure Default Rest Client", () => {
@@ -6,7 +6,7 @@ describe("Client Structure Default Rest Client", () => {
 
   beforeEach(() => {
     client = new ServiceClient("http://localhost:3002", "default", {
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 

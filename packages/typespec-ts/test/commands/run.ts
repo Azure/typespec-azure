@@ -1,15 +1,15 @@
-import { fileURLToPath } from "url";
-import { dirname, join as joinPath } from "path";
 import {
   Extractor,
   ExtractorConfig,
   ExtractorLogLevel,
-  IExtractorConfigPrepareOptions
+  IExtractorConfigPrepareOptions,
 } from "@microsoft/api-extractor";
-import { npxCommand } from "./runCommand.js";
 import * as fs from "fs/promises";
+import { dirname, join as joinPath } from "path";
+import { CompilerOptions, createProgram } from "typescript";
+import { fileURLToPath } from "url";
 import { createTaskLogger } from "./logger.js";
-import { createProgram, CompilerOptions } from "typescript";
+import { npxCommand } from "./runCommand.js";
 
 function deepMerge(target: any, source: any): any {
   const result = { ...target };
@@ -55,7 +55,7 @@ function genEnv(config: any, mode: any): GenEnv {
     sourceTypespec: () => sourceTypespec,
     targetFolder: () => targetFolder,
     scriptDir: () => testRoot,
-    declarationSubpath: () => declarationDir
+    declarationSubpath: () => declarationDir,
   } as const;
 }
 
@@ -93,11 +93,7 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
     const logger = env.logger();
 
     const workingDir = outputPath();
-    const commandArguments = [
-      "compile",
-      `${await entryPath()}`,
-      "--config tspconfig.yaml "
-    ];
+    const commandArguments = ["compile", `${await entryPath()}`, "--config tspconfig.yaml "];
 
     await npxCommand("tsp", commandArguments, workingDir, logger);
   }
@@ -112,7 +108,7 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
 !/src/index.d.ts
 !/.gitignore
 !/tspconfig.yaml
-`
+`,
     );
   }
 
@@ -120,7 +116,7 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
     const logger = env.logger();
     const program = createProgram({
       options: tsconfig().compilerOptions,
-      rootNames: [joinPath(outputPath(), "src/index.ts")]
+      rootNames: [joinPath(outputPath(), "src/index.ts")],
     });
 
     // side effect: loads source files into memory
@@ -147,7 +143,7 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
             logger.log(message.formatMessageWithLocation(outputPath()));
         }
         message.handled = true;
-      }
+      },
     });
   }
 
@@ -156,45 +152,45 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
     const mainEntryPointFilePath = joinPath(
       "<projectFolder>",
       env.declarationSubpath(),
-      "src/index.d.ts"
+      "src/index.d.ts",
     );
     const untrimmedFilePath = joinPath("<projectFolder>", "src/index.d.ts");
     const packageJsonFullPath = joinPath(projectFolder, "package.json");
 
     const baseConfigObject = {
       apiReport: {
-        enabled: false
+        enabled: false,
       },
       docModel: {
-        enabled: true
+        enabled: true,
       },
       dtsRollup: {
         enabled: true,
-        untrimmedFilePath
+        untrimmedFilePath,
       },
       compiler: {
-        overrideTsconfig: tsconfig()
+        overrideTsconfig: tsconfig(),
       },
       mainEntryPointFilePath,
       messages: {
         compilerMessageReporting: {
           default: {
-            logLevel: ExtractorLogLevel.None
-          }
+            logLevel: ExtractorLogLevel.None,
+          },
         },
         extractorMessageReporting: {
           default: {
-            logLevel: ExtractorLogLevel.None
-          }
+            logLevel: ExtractorLogLevel.None,
+          },
         },
         tsdocMessageReporting: {
           default: {
-            logLevel: ExtractorLogLevel.None
-          }
-        }
+            logLevel: ExtractorLogLevel.None,
+          },
+        },
       },
       newlineKind: "lf",
-      projectFolder
+      projectFolder,
     };
 
     // Defaults are merged in api-extractor when the config file is read from disk with
@@ -202,17 +198,14 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
     // https://github.com/microsoft/rushstack/blob/1a92f17fa537b55529adbec80203bd99afd8cd24/apps/api-extractor/src/api/ExtractorConfig.ts#L624-L627
     const configObject = deepMerge(
       structuredClone((ExtractorConfig as any)._defaultConfig),
-      baseConfigObject
+      baseConfigObject,
     );
-    ExtractorConfig.jsonSchema.validateObject(
-      configObject,
-      "api extractor config object"
-    );
+    ExtractorConfig.jsonSchema.validateObject(configObject, "api extractor config object");
 
     const config: IExtractorConfigPrepareOptions = {
       configObject,
       packageJsonFullPath,
-      configObjectFullPath: null as unknown as undefined
+      configObjectFullPath: null as unknown as undefined,
     };
 
     return ExtractorConfig.prepare(config);
@@ -226,19 +219,15 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
         declarationMap: true,
         removeComments: true,
         declarationDir: joinPath(outputPath(), env.declarationSubpath()),
-        rootDir: outputPath()
-      }
+        rootDir: outputPath(),
+      },
     };
   }
 
   async function entryPath(): Promise<string> {
-    const specPath = joinPath(
-      emitterRoot(),
-      "./temp/specs",
-      env.sourceTypespec()
-    );
+    const specPath = joinPath(emitterRoot(), "./temp/specs", env.sourceTypespec());
     const possibleEntryPaths = ["client.tsp", "main.tsp"].map((filename) =>
-      joinPath(specPath, filename)
+      joinPath(specPath, filename),
     );
     const entryPath =
       (await findAsync(possibleEntryPaths, entryFileExists)) ??
@@ -267,17 +256,12 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
     const subPath = {
       standard: {
         modular: "modularIntegration",
-        rlc: "integration"
+        rlc: "integration",
       },
-      azure: { modular: "azureModularIntegration", rlc: "azureIntegration" }
+      azure: { modular: "azureModularIntegration", rlc: "azureIntegration" },
     }[flavor()][clientType()];
 
-    const outputPath = joinPath(
-      testRoot(),
-      subPath,
-      "generated",
-      env.targetFolder()
-    );
+    const outputPath = joinPath(testRoot(), subPath, "generated", env.targetFolder());
 
     return outputPath;
   }
@@ -302,7 +286,7 @@ async function exists(filePath: any) {
 
 async function findAsync<T>(
   array: T[],
-  predicate: (x: T) => Promise<boolean>
+  predicate: (x: T) => Promise<boolean>,
 ): Promise<T | undefined> {
   for (const x of array) {
     if (await predicate(x)) {

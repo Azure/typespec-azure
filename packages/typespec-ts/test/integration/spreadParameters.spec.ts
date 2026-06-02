@@ -1,7 +1,7 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import ParametersSpreadClientFactory, {
-  SpreadClient
+  SpreadClient,
 } from "./generated/parameters/spread/src/index.js";
 describe("HelloClient Rest Client", () => {
   let client: SpreadClient;
@@ -11,13 +11,11 @@ describe("HelloClient Rest Client", () => {
   });
 
   it("should spread named model", async () => {
-    const result = await client
-      .path("/parameters/spread/model/request-body")
-      .put({
-        body: {
-          name: "foo"
-        }
-      });
+    const result = await client.path("/parameters/spread/model/request-body").put({
+      body: {
+        name: "foo",
+      },
+    });
     assert.strictEqual(result.status, "204");
   });
 
@@ -26,18 +24,15 @@ describe("HelloClient Rest Client", () => {
       .path("/parameters/spread/model/composite-request-only-with-body")
       .put({
         body: {
-          name: "foo"
-        }
+          name: "foo",
+        },
       });
     assert.strictEqual(result.status, "204");
   });
 
   it("should spread model composite request without body param", async () => {
     const result = await client
-      .path(
-        "/parameters/spread/model/composite-request-without-body/{name}",
-        "foo"
-      )
+      .path("/parameters/spread/model/composite-request-without-body/{name}", "foo")
       .put({ headers: { "test-header": "bar" } });
     assert.strictEqual(result.status, "204");
   });
@@ -48,8 +43,8 @@ describe("HelloClient Rest Client", () => {
       .put({
         headers: { "test-header": "bar" },
         body: {
-          name: "foo"
-        }
+          name: "foo",
+        },
       });
     assert.strictEqual(result.status, "204");
   });
@@ -60,51 +55,45 @@ describe("HelloClient Rest Client", () => {
       .put({
         headers: { "test-header": "bar" },
         body: {
-          prop: "foo"
-        }
+          prop: "foo",
+        },
       });
     assert.strictEqual(result.status, "204");
   });
 
   it("should spread alias with only body param", async () => {
-    const result = await client
-      .path("/parameters/spread/alias/request-body")
-      .put({
-        body: {
-          name: "foo"
-        }
-      });
+    const result = await client.path("/parameters/spread/alias/request-body").put({
+      body: {
+        name: "foo",
+      },
+    });
     assert.strictEqual(result.status, "204");
   });
 
   it("should spread alias with mixed params", async () => {
-    const result = await client
-      .path("/parameters/spread/alias/request-parameter/{id}", "1")
-      .put({
-        body: {
-          name: "foo"
-        },
-        headers: {
-          "x-ms-test-header": "bar"
-        }
-      });
+    const result = await client.path("/parameters/spread/alias/request-parameter/{id}", "1").put({
+      body: {
+        name: "foo",
+      },
+      headers: {
+        "x-ms-test-header": "bar",
+      },
+    });
     assert.strictEqual(result.status, "204");
   });
 
   it("should spread alias with more than 5 params", async () => {
-    const result = await client
-      .path("/parameters/spread/alias/multiple-parameters/{id}", "1")
-      .put({
-        body: {
-          requiredString: "foo",
-          optionalInt: 1,
-          requiredIntList: [1, 2],
-          optionalStringList: ["foo", "bar"]
-        },
-        headers: {
-          "x-ms-test-header": "bar"
-        }
-      });
+    const result = await client.path("/parameters/spread/alias/multiple-parameters/{id}", "1").put({
+      body: {
+        requiredString: "foo",
+        optionalInt: 1,
+        requiredIntList: [1, 2],
+        optionalStringList: ["foo", "bar"],
+      },
+      headers: {
+        "x-ms-test-header": "bar",
+      },
+    });
     assert.strictEqual(result.status, "204");
   });
 
@@ -114,8 +103,8 @@ describe("HelloClient Rest Client", () => {
       .post({
         body: { name: "foo" },
         headers: {
-          "x-ms-test-header": "bar"
-        }
+          "x-ms-test-header": "bar",
+        },
       });
     assert.strictEqual(result.status, "204");
   });
@@ -126,8 +115,8 @@ describe("HelloClient Rest Client", () => {
       .post({
         body: { name: "foo", age: 1 },
         headers: {
-          "x-ms-test-header": "bar"
-        }
+          "x-ms-test-header": "bar",
+        },
       });
     assert.strictEqual(result.status, "204");
   });

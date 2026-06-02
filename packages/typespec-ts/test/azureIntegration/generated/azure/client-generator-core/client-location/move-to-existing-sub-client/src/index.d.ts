@@ -1,55 +1,59 @@
-import type { Client } from '@azure-rest/core-client';
-import type { ClientOptions } from '@azure-rest/core-client';
-import type { HttpResponse } from '@azure-rest/core-client';
-import { isRestError } from '@azure/core-rest-pipeline';
-import type { RequestParameters } from '@azure-rest/core-client';
-import { RestError } from '@azure/core-rest-pipeline';
-import type { StreamableMethod } from '@azure-rest/core-client';
+import type {
+  Client,
+  ClientOptions,
+  HttpResponse,
+  RequestParameters,
+  StreamableMethod,
+} from "@azure-rest/core-client";
+import { isRestError, RestError } from "@azure/core-rest-pipeline";
 
-declare function createClient(options?: MoveToExistingSubClientClientOptions): MoveToExistingSubClientClient;
+declare function createClient(
+  options?: MoveToExistingSubClientClientOptions,
+): MoveToExistingSubClientClient;
 export default createClient;
 
 export declare interface DeleteUser204Response extends HttpResponse {
-    status: "204";
+  status: "204";
 }
 
 export declare type DeleteUserParameters = RequestParameters;
 
 export declare interface GetAdminInfo {
-    get(options?: GetAdminInfoParameters): StreamableMethod<GetAdminInfo204Response>;
+  get(options?: GetAdminInfoParameters): StreamableMethod<GetAdminInfo204Response>;
 }
 
 export declare interface GetAdminInfo204Response extends HttpResponse {
-    status: "204";
+  status: "204";
 }
 
 export declare type GetAdminInfoParameters = RequestParameters;
 
 export declare interface GetUser {
-    get(options?: GetUserParameters): StreamableMethod<GetUser204Response>;
-    delete(options?: DeleteUserParameters): StreamableMethod<DeleteUser204Response>;
+  get(options?: GetUserParameters): StreamableMethod<GetUser204Response>;
+  delete(options?: DeleteUserParameters): StreamableMethod<DeleteUser204Response>;
 }
 
 export declare interface GetUser204Response extends HttpResponse {
-    status: "204";
+  status: "204";
 }
 
 export declare type GetUserParameters = RequestParameters;
 
-export { isRestError }
+export { isRestError };
 
 export declare type MoveToExistingSubClientClient = Client & {
-    path: Routes;
+  path: Routes;
 };
 
-export declare interface MoveToExistingSubClientClientOptions extends ClientOptions {
-}
+export declare interface MoveToExistingSubClientClientOptions extends ClientOptions {}
 
-export { RestError }
+export { RestError };
 
 export declare interface Routes {
-    (path: "/azure/client-generator-core/client-location/move-to-existing-sub-client/admin"): GetAdminInfo;
-    (path: "/azure/client-generator-core/client-location/move-to-existing-sub-client/user"): GetUser;
+  (
+    path: "/azure/client-generator-core/client-location/move-to-existing-sub-client/admin",
+  ): GetAdminInfo;
+  (path: "/azure/client-generator-core/client-location/move-to-existing-sub-client/user"): GetUser;
 }
 
-export { }
+export {};

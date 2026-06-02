@@ -19,9 +19,7 @@ using Azure.ClientGenerator.Core;
 
 /** Microsoft.Contoso Resource Provider management API. */
 @armProviderNamespace
-@service(#{
-  title: "Microsoft.Contoso management service",
-})
+@service(#{ title: "Microsoft.Contoso management service" })
 namespace Microsoft.Contoso;
 
 model ResourceNameAvailabilityRequest {
@@ -42,12 +40,11 @@ op checkNameAvailabilityCustomized(
   ...Azure.ResourceManager.CommonTypes.ApiVersionParameter,
   ...Azure.ResourceManager.CommonTypes.SubscriptionIdParameter,
   ...Azure.ResourceManager.Legacy.Provider,
-
   name: string,
   type: string,
 ): void;
 
-@@override(checkNameAvailability,checkNameAvailabilityCustomized);
+@@override(checkNameAvailability, checkNameAvailabilityCustomized);
 ```
 
 This is the tspconfig.yaml.
@@ -87,13 +84,11 @@ export function _checkNameAvailabilitySend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context
-    .path(path)
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      body: { name: name, type: typeParam },
-    });
+  return context.path(path).post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    body: { name: name, type: typeParam },
+  });
 }
 
 export async function _checkNameAvailabilityDeserialize(

@@ -21,9 +21,7 @@ using Azure.ResourceManager;
 
 /** Microsoft.Contoso Resource Provider management API. */
 @armProviderNamespace
-@service(#{
-  title: "Microsoft.Contoso management service",
-})
+@service(#{ title: "Microsoft.Contoso management service" })
 @versioned(Microsoft.Contoso.Versions)
 namespace Microsoft.Contoso;
 
@@ -45,10 +43,12 @@ model Employee is TrackedResource<EmployeeProperties> {
 model EmployeeProperties {
   /** Age of employee */
   age?: int32;
-  /** City of employee */  
+
+  /** City of employee */
   city?: string;
+
   /** Profile of employee */
-  profile?: string,
+  profile?: string;
 }
 
 @armResourceOperations
@@ -87,7 +87,7 @@ Raw json files.
           },
           {
             "id": "/subscriptions/11809CA1-E126-4017-945E-AA795CD5C5A9/resourceGroups/rgopenapi/providers/Microsoft.Contoso/employees/emp2",
-            "name": "emp2", 
+            "name": "emp2",
             "type": "Microsoft.Contoso/employees",
             "location": "westus",
             "properties": {

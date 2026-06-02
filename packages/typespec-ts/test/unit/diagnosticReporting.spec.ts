@@ -1,16 +1,16 @@
-import { describe, it, beforeEach, afterAll, assert } from "vitest";
+import { afterAll, assert, beforeEach, describe, it } from "vitest";
 
+import { UsageFlags } from "@azure-tools/typespec-client-generator-core";
 import { NoTarget } from "@typespec/compiler";
-import { buildModelDeserializer } from "../../src/modular/serialization/buildDeserializerFunction.js";
-import { buildModelSerializer } from "../../src/modular/serialization/buildSerializerFunction.js";
-import { getParameterMap } from "../../src/modular/helpers/operationHelpers.js";
+import { Project } from "ts-morph";
+import { provideContext } from "../../src/contextManager.js";
 import { buildSubClientIndexFile } from "../../src/modular/buildRootIndex.js";
 import { visitPackageTypes } from "../../src/modular/emitModels.js";
-import { provideContext } from "../../src/contextManager.js";
-import { SdkContext } from "../../src/utils/interfaces.js";
-import { UsageFlags } from "@azure-tools/typespec-client-generator-core";
-import { Project } from "ts-morph";
+import { getParameterMap } from "../../src/modular/helpers/operationHelpers.js";
+import { buildModelDeserializer } from "../../src/modular/serialization/buildDeserializerFunction.js";
+import { buildModelSerializer } from "../../src/modular/serialization/buildSerializerFunction.js";
 import { emitContentByBuilder } from "../../src/utils/emitUtil.js";
+import { SdkContext } from "../../src/utils/interfaces.js";
 
 /**
  * Diagnostic Reporting Tests
@@ -29,21 +29,21 @@ describe("Diagnostic Reporting Tests", () => {
         capturedDiagnostics.push(diagnostic);
       },
       getMutatedGlobalNamespace: () => ({
-        namespaces: new Map()
+        namespaces: new Map(),
       }),
       checker: {
-        getMutatedType: () => undefined
-      }
+        getMutatedType: () => undefined,
+      },
     };
 
     mockContext = {
       program: mockProgram,
       rlcOptions: {
-        ignoreEnumMemberNameNormalize: false
+        ignoreEnumMemberNameNormalize: false,
       },
       generationPathDetail: {
-        namespaceKey: "test"
-      }
+        namespaceKey: "test",
+      },
     } as unknown as SdkContext;
   });
 
@@ -55,7 +55,7 @@ describe("Diagnostic Reporting Tests", () => {
         kind: "model",
         name: undefined,
         usage: UsageFlags.Output,
-        __raw: NoTarget
+        __raw: NoTarget,
         // No discriminatorProperty to trigger buildModelTypeDeserializer path
       } as any;
 
@@ -74,7 +74,7 @@ describe("Diagnostic Reporting Tests", () => {
         name: undefined,
         usage: UsageFlags.Output,
         __raw: NoTarget,
-        values: []
+        values: [],
       } as any;
 
       const result = buildModelDeserializer(mockContext, mockUnionType);
@@ -98,15 +98,12 @@ describe("Diagnostic Reporting Tests", () => {
             kind: "model",
             name: "TestType",
             usage: UsageFlags.Output,
-            discriminatorValue: "test"
-          }
-        }
+            discriminatorValue: "test",
+          },
+        },
       } as any;
 
-      const result = buildModelDeserializer(
-        mockContext,
-        mockDiscriminatedUnionType
-      );
+      const result = buildModelDeserializer(mockContext, mockDiscriminatedUnionType);
 
       assert.equal(result, undefined);
       // Check that it returns undefined due to anonymous type
@@ -121,7 +118,7 @@ describe("Diagnostic Reporting Tests", () => {
         name: undefined,
         usage: UsageFlags.Output,
         __raw: NoTarget,
-        discriminatorProperty: { name: "kind" }
+        discriminatorProperty: { name: "kind" },
         // No discriminatedSubtypes to make it polymorphic instead of discriminated union
       } as any;
 
@@ -147,9 +144,9 @@ describe("Diagnostic Reporting Tests", () => {
             name: undefined, // Anonymous subtype
             usage: UsageFlags.Output,
             discriminatorValue: "subtype1",
-            __raw: NoTarget
-          }
-        }
+            __raw: NoTarget,
+          },
+        },
       } as any;
 
       try {
@@ -160,10 +157,7 @@ describe("Diagnostic Reporting Tests", () => {
         console.log("Captured diagnostics:", capturedDiagnostics);
       } catch (error) {
         // Expected to fail due to mock context limitations
-        console.log(
-          "Expected error in mock environment:",
-          (error as Error).message
-        );
+        console.log("Expected error in mock environment:", (error as Error).message);
       }
     });
   });
@@ -176,7 +170,7 @@ describe("Diagnostic Reporting Tests", () => {
         kind: "model",
         name: undefined,
         usage: UsageFlags.Input,
-        __raw: NoTarget
+        __raw: NoTarget,
       } as any;
 
       const result = buildModelSerializer(mockContext, mockModelType);
@@ -194,7 +188,7 @@ describe("Diagnostic Reporting Tests", () => {
         name: undefined,
         usage: UsageFlags.Input,
         __raw: NoTarget,
-        values: []
+        values: [],
       } as any;
 
       const result = buildModelSerializer(mockContext, mockUnionType);
@@ -218,15 +212,12 @@ describe("Diagnostic Reporting Tests", () => {
             kind: "model",
             name: "TestType",
             usage: UsageFlags.Input,
-            discriminatorValue: "test"
-          }
-        }
+            discriminatorValue: "test",
+          },
+        },
       } as any;
 
-      const result = buildModelSerializer(
-        mockContext,
-        mockDiscriminatedUnionType
-      );
+      const result = buildModelSerializer(mockContext, mockDiscriminatedUnionType);
 
       assert.equal(result, undefined);
       // Check that it returns undefined due to anonymous type
@@ -241,7 +232,7 @@ describe("Diagnostic Reporting Tests", () => {
         name: undefined,
         usage: UsageFlags.Input,
         __raw: NoTarget,
-        discriminatorProperty: { name: "kind" }
+        discriminatorProperty: { name: "kind" },
         // No discriminatedSubtypes to make it polymorphic instead of discriminated union
       } as any;
 
@@ -267,9 +258,9 @@ describe("Diagnostic Reporting Tests", () => {
             name: undefined, // Anonymous subtype
             usage: UsageFlags.Input,
             discriminatorValue: "subtype1",
-            __raw: NoTarget
-          }
-        }
+            __raw: NoTarget,
+          },
+        },
       } as any;
 
       try {
@@ -280,10 +271,7 @@ describe("Diagnostic Reporting Tests", () => {
         console.log("Captured diagnostics:", capturedDiagnostics);
       } catch (error) {
         // Expected to fail due to mock context limitations
-        console.log(
-          "Expected error in mock environment:",
-          (error as Error).message
-        );
+        console.log("Expected error in mock environment:", (error as Error).message);
       }
     });
   });
@@ -295,11 +283,11 @@ describe("Diagnostic Reporting Tests", () => {
         diagnostics: [],
         reportDiagnostic: (diagnostic: any) => {
           capturedDiagnostic = diagnostic;
-        }
+        },
       };
 
       const localMockContext = {
-        program: mockProgram
+        program: mockProgram,
       } as unknown as SdkContext;
 
       const unsupportedParam = {
@@ -310,7 +298,7 @@ describe("Diagnostic Reporting Tests", () => {
         correspondingMethodParams: [],
         isGeneratedName: false,
         onClient: false,
-        collectionFormat: undefined
+        collectionFormat: undefined,
       } as any;
 
       let optionalCallCount = 0;
@@ -319,14 +307,10 @@ describe("Diagnostic Reporting Tests", () => {
           optionalCallCount++;
           return optionalCallCount === 1 ? false : true;
         },
-        configurable: true
+        configurable: true,
       });
 
-      const result = getParameterMap(
-        localMockContext,
-        unsupportedParam,
-        unsupportedParam.name
-      );
+      const result = getParameterMap(localMockContext, unsupportedParam, unsupportedParam.name);
 
       console.log(capturedDiagnostic.code);
       console.log(capturedDiagnostic.message);
@@ -345,11 +329,11 @@ describe("Diagnostic Reporting Tests", () => {
       const mockClient = {
         kind: "client",
         name: "TestClient",
-        operations: []
+        operations: [],
       } as any;
       const mockClientMap: [string[], any] = [["TestClient"], mockClient];
       const mockEmitterOptions = {
-        modularOptions: { sourceRoot: "src" }
+        modularOptions: { sourceRoot: "src" },
       } as any;
 
       buildSubClientIndexFile(mockContext, mockClientMap, mockEmitterOptions);
@@ -374,25 +358,25 @@ describe("Diagnostic Reporting Tests", () => {
           verb: "get",
           parameters: [],
           responses: [],
-          exceptions: []
-        }
+          exceptions: [],
+        },
       } as any;
 
       const mockClient = {
         kind: "client",
         name: "TestClient",
         methods: [mockMethod],
-        operations: [mockMethod]
+        operations: [mockMethod],
       } as any;
       const mockSdkPackage = {
         models: [],
         unions: [],
         enums: [],
-        clients: [mockClient]
+        clients: [mockClient],
       };
       const localMockContext = {
         ...mockContext,
-        sdkPackage: mockSdkPackage
+        sdkPackage: mockSdkPackage,
       } as any;
 
       visitPackageTypes(localMockContext);
@@ -412,19 +396,16 @@ describe("Diagnostic Reporting Tests", () => {
         compilerOptions: { noEmit: false },
         hasError: () => false,
         host: { mkdirp: async () => {}, writeFile: async () => {} },
-        reportDiagnostic: (diagnostic: any) =>
-          capturedDiagnostics.push(diagnostic)
+        reportDiagnostic: (diagnostic: any) => capturedDiagnostics.push(diagnostic),
       } as any;
 
       const mockFile = {
         path: "test.ts",
-        content: "export const test = { invalid: syntax error }"
+        content: "export const test = { invalid: syntax error }",
       };
       await emitContentByBuilder(mockProgram, () => mockFile, {} as any);
 
-      const diagnostic = capturedDiagnostics.find((d) =>
-        d.code.endsWith("file-formatting-error")
-      );
+      const diagnostic = capturedDiagnostics.find((d) => d.code.endsWith("file-formatting-error"));
       console.log(diagnostic?.code);
       console.log(diagnostic?.message);
 
@@ -452,20 +433,17 @@ describe("Diagnostic Reporting Tests", () => {
             type: {
               kind: "model",
               name: undefined, // Anonymous type in property
-              __raw: NoTarget
-            }
-          }
-        ]
+              __raw: NoTarget,
+            },
+          },
+        ],
       } as any;
 
       try {
         const result = buildModelDeserializer(mockContext, mockModelType);
         console.log("Advanced test - Result:", typeof result);
       } catch (error) {
-        console.log(
-          "Advanced test - Expected context error:",
-          (error as Error).message
-        );
+        console.log("Advanced test - Expected context error:", (error as Error).message);
       }
     });
 
@@ -493,20 +471,17 @@ describe("Diagnostic Reporting Tests", () => {
             type: {
               kind: "model",
               name: undefined, // Anonymous type in property
-              __raw: NoTarget
-            }
-          }
-        ]
+              __raw: NoTarget,
+            },
+          },
+        ],
       } as any;
 
       try {
         const result = buildModelSerializer(mockContext, mockModelType);
         console.log("Advanced serializer test - Result:", typeof result);
       } catch (error) {
-        console.log(
-          "Advanced serializer test - Expected context error:",
-          (error as Error).message
-        );
+        console.log("Advanced serializer test - Expected context error:", (error as Error).message);
       }
     });
 

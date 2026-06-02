@@ -1,16 +1,14 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import UnionsClientFactory, {
   CatOutput,
   DogOutput,
-  UnionsClient
+  UnionsClient,
 } from "./generated/type/union/src/index.js";
 describe("UnionsClient Rest Client", () => {
   let client: UnionsClient;
 
-  function isCatOutput(
-    pet: CatOutput | DogOutput | "a" | number | boolean
-  ): pet is CatOutput {
+  function isCatOutput(pet: CatOutput | DogOutput | "a" | number | boolean): pet is CatOutput {
     return (pet as CatOutput)?.name !== undefined;
   }
 
@@ -27,8 +25,8 @@ describe("UnionsClient Rest Client", () => {
   it("should post strings only union", async () => {
     const result = await client.path("/type/union/strings-only").post({
       body: {
-        prop: "b"
-      }
+        prop: "b",
+      },
     });
     assert.strictEqual(result.status, "204");
   });
@@ -42,28 +40,24 @@ describe("UnionsClient Rest Client", () => {
   it("should post strings extensible union", async () => {
     const result = await client.path("/type/union/string-extensible").post({
       body: {
-        prop: "custom"
-      }
+        prop: "custom",
+      },
     });
     assert.strictEqual(result.status, "204");
   });
 
   it("should get strings extensible named union", async () => {
-    const result = await client
-      .path("/type/union/string-extensible-named")
-      .get();
+    const result = await client.path("/type/union/string-extensible-named").get();
     assert.strictEqual(result.status, "200");
     assert.strictEqual(result.body.prop, "custom");
   });
 
   it("should post strings extensible named union", async () => {
-    const result = await client
-      .path("/type/union/string-extensible-named")
-      .post({
-        body: {
-          prop: "custom"
-        }
-      });
+    const result = await client.path("/type/union/string-extensible-named").post({
+      body: {
+        prop: "custom",
+      },
+    });
     assert.strictEqual(result.status, "204");
   });
 
@@ -76,8 +70,8 @@ describe("UnionsClient Rest Client", () => {
   it("should post ints only union", async () => {
     const result = await client.path("/type/union/ints-only").post({
       body: {
-        prop: 2
-      }
+        prop: 2,
+      },
     });
     assert.strictEqual(result.status, "204");
   });
@@ -91,8 +85,8 @@ describe("UnionsClient Rest Client", () => {
   it("should post floats only union", async () => {
     const result = await client.path("/type/union/floats-only").post({
       body: {
-        prop: 2.2
-      }
+        prop: 2.2,
+      },
     });
     assert.strictEqual(result.status, "204");
   });
@@ -108,8 +102,8 @@ describe("UnionsClient Rest Client", () => {
   it("should post models only union", async () => {
     const result = await client.path("/type/union/models-only").post({
       body: {
-        prop: { name: "test" }
-      }
+        prop: { name: "test" },
+      },
     });
     assert.strictEqual(result.status, "204");
   });
@@ -126,9 +120,9 @@ describe("UnionsClient Rest Client", () => {
       body: {
         prop: {
           lr: "right",
-          ud: "up"
-        }
-      }
+          ud: "up",
+        },
+      },
     });
     assert.strictEqual(result.status, "204");
   });
@@ -146,9 +140,9 @@ describe("UnionsClient Rest Client", () => {
       body: {
         prop: {
           string: "test",
-          array: ["test1", "test2"]
-        }
-      }
+          array: ["test1", "test2"],
+        },
+      },
     });
     assert.strictEqual(result.status, "204");
   });
@@ -169,9 +163,9 @@ describe("UnionsClient Rest Client", () => {
           stringLiteral: "a",
           intLiteral: 2,
           floatLiteral: 3.3,
-          booleanLiteral: true
-        }
-      }
+          booleanLiteral: true,
+        },
+      },
     });
     assert.strictEqual(result.status, "204");
   });
@@ -192,21 +186,21 @@ describe("UnionsClient Rest Client", () => {
       body: {
         prop: {
           model: {
-            name: "test"
+            name: "test",
           },
           literal: "a",
           int: 2,
           boolean: true,
           array: [
             {
-              name: "test"
+              name: "test",
             },
             "a",
             2,
-            true
-          ]
-        }
-      }
+            true,
+          ],
+        },
+      },
     });
     assert.strictEqual(result.status, "204");
   });

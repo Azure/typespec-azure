@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { getParameterMap } from "../../src/modular/helpers/operationHelpers.js";
 import { SdkContext } from "../../src/utils/interfaces.js";
@@ -11,11 +11,11 @@ describe("operationHelpers", () => {
       // Create a mock context with minimal program structure for testing
       const mockProgram = {
         diagnostics: [],
-        reportDiagnostic: () => {} // Mock reportDiagnostic function
+        reportDiagnostic: () => {}, // Mock reportDiagnostic function
       };
 
       mockContext = {
-        program: mockProgram
+        program: mockProgram,
       } as unknown as SdkContext;
     });
 
@@ -26,11 +26,11 @@ describe("operationHelpers", () => {
         diagnostics: [],
         reportDiagnostic: (diagnostic: any) => {
           capturedDiagnostic = diagnostic;
-        }
+        },
       };
 
       mockContext = {
-        program: mockProgram
+        program: mockProgram,
       } as unknown as SdkContext;
 
       // Create an unsupported parameter
@@ -38,13 +38,13 @@ describe("operationHelpers", () => {
         name: "testParam",
         kind: "header", // Use a different kind to test
         type: {
-          kind: "model" // Non-constant type
+          kind: "model", // Non-constant type
         },
         serializedName: "test-param",
         correspondingMethodParams: [],
         isGeneratedName: false,
         onClient: false,
-        collectionFormat: undefined
+        collectionFormat: undefined,
       } as any;
 
       // Make both isOptional and isRequired return false using the same technique
@@ -54,43 +54,36 @@ describe("operationHelpers", () => {
           optionalCallCount++;
           return optionalCallCount === 1 ? false : true;
         },
-        configurable: true
+        configurable: true,
       });
 
       // Call the function
-      const result = getParameterMap(
-        mockContext,
-        unsupportedParam,
-        unsupportedParam.name
-      );
+      const result = getParameterMap(mockContext, unsupportedParam, unsupportedParam.name);
 
       console.log(capturedDiagnostic.code);
       console.log(capturedDiagnostic.message);
       // Verify the diagnostic was captured and has the correct format
-      assert.isNotNull(
-        capturedDiagnostic,
-        "Expected diagnostic to be reported"
-      );
+      assert.isNotNull(capturedDiagnostic, "Expected diagnostic to be reported");
       assert.isTrue(
         capturedDiagnostic.code.endsWith("unsupported-parameter-type"),
-        "Expected diagnostic code to end with 'unsupported-parameter-type'"
+        "Expected diagnostic code to end with 'unsupported-parameter-type'",
       );
 
       // Verify the message contains the parameter name and kind (format has been applied to message)
       assert.include(
         capturedDiagnostic.message,
         "testParam",
-        "Expected message to contain parameter name"
+        "Expected message to contain parameter name",
       );
       assert.include(
         capturedDiagnostic.message,
         "header",
-        "Expected message to contain parameter kind"
+        "Expected message to contain parameter kind",
       );
       assert.include(
         capturedDiagnostic.message,
         "is not supported",
-        "Expected message to contain error description"
+        "Expected message to contain error description",
       );
 
       // Verify the fallback value

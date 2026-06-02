@@ -1,9 +1,9 @@
-import { describe, it, assert } from "vitest";
+import { assert, describe, it } from "vitest";
 
 import {
   emitClientDefinitionFromTypeSpec,
   emitModelsFromTypeSpec,
-  emitParameterFromTypeSpec
+  emitParameterFromTypeSpec,
 } from "../util/emitUtil.js";
 import { assertEqualContent } from "../util/testUtil.js";
 
@@ -27,7 +27,7 @@ describe("Doc generation testing", () => {
         /** A test property. */
         prop: string;
       }
-      `
+      `,
       );
     });
   });
@@ -42,7 +42,7 @@ describe("Doc generation testing", () => {
           username: string;
         }
         op createOrUpdateUser(...UserDetailsParameter): OkResponse;
-        `
+        `,
       );
       assert.ok(parameters);
       await assertEqualContent(
@@ -56,7 +56,7 @@ describe("Doc generation testing", () => {
         }
 
         export type CreateOrUpdateUserParameters = CreateOrUpdateUserBodyParam & RequestParameters;
-      `
+      `,
       );
     });
     it("shouldn't generate type description as body property description", async () => {
@@ -67,7 +67,7 @@ describe("Doc generation testing", () => {
           username: string;
         }
         op createOrUpdateUser(@body username: UserDetailsParameter): OkResponse;
-        `
+        `,
       );
       assert.ok(parameters);
       await assertEqualContent(
@@ -81,7 +81,7 @@ describe("Doc generation testing", () => {
         }
 
         export type CreateOrUpdateUserParameters = CreateOrUpdateUserBodyParam & RequestParameters;
-      `
+      `,
       );
     });
     it("should generate query description", async () => {
@@ -94,7 +94,7 @@ describe("Doc generation testing", () => {
           filter: string;
         }
         op list(...FilterParameter): OkResponse;
-        `
+        `,
       );
       assert.ok(parameters);
       await assertEqualContent(
@@ -112,14 +112,14 @@ describe("Doc generation testing", () => {
         }
         
         export type ListParameters = ListQueryParam & RequestParameters;
-      `
+      `,
       );
     });
     it("should generate header description with custom name", async () => {
       const parameters = await emitParameterFromTypeSpec(
         `
         op test(@doc("test header") @header("x-my-header") MyHeader: string): string;
-        `
+        `,
       );
       assert.ok(parameters);
       await assertEqualContent(
@@ -138,7 +138,7 @@ describe("Doc generation testing", () => {
         }
         
        export type TestParameters = TestHeaderParam & RequestParameters;
-      `
+      `,
       );
     });
     it("should generate contentType description", async () => {
@@ -146,7 +146,7 @@ describe("Doc generation testing", () => {
         `
         #suppress "@typespec/http/content-type-ignored" "for test"
         op test(@doc("content type") @header contentType: "application/octet-stream"): string;
-        `
+        `,
       );
       assert.ok(parameters);
       await assertEqualContent(
@@ -160,7 +160,7 @@ describe("Doc generation testing", () => {
       }
       
       export type TestParameters = TestMediaTypesParam & RequestParameters;
-      `
+      `,
       );
     });
   });
@@ -172,7 +172,7 @@ describe("Doc generation testing", () => {
         @summary("This is a summary")
         @doc("This is the longer description")
         op read(): {};
-        `
+        `,
       );
       assert.ok(clientDef);
       await assertEqualContent(
@@ -195,7 +195,7 @@ describe("Doc generation testing", () => {
         export type testClient = Client & {
                 path: Routes;
         };
-      `
+      `,
       );
     });
   });

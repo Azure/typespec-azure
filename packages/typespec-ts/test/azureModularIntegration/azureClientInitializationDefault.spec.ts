@@ -1,18 +1,18 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import {
   HeaderParamClient,
-  MultipleParamsClient,
   MixedParamsClient,
-  PathParamClient,
+  MultipleParamsClient,
   ParamAliasClient,
-  QueryParamClient
+  PathParamClient,
+  QueryParamClient,
 } from "./generated/azure/client-generator-core/client-initialization/default/src/index.js";
 
 describe("Azure ClientGeneratorCore Client Initialization", () => {
   const endpointOptions = {
     endpoint: "http://localhost:3002",
-    allowInsecureConnection: true
+    allowInsecureConnection: true,
   };
 
   describe("HeaderParam Client", () => {
@@ -35,11 +35,7 @@ describe("Azure ClientGeneratorCore Client Initialization", () => {
     let client: MultipleParamsClient;
 
     beforeEach(() => {
-      client = new MultipleParamsClient(
-        "test-name-value",
-        "us-west",
-        endpointOptions
-      );
+      client = new MultipleParamsClient("test-name-value", "us-west", endpointOptions);
     });
 
     it("should send multiple parameters in withQuery operation", async () => {
@@ -83,10 +79,7 @@ describe("Azure ClientGeneratorCore Client Initialization", () => {
       assert.strictEqual(result.name, "sample-blob");
       assert.strictEqual(result.size, 42);
       assert.strictEqual(result.contentType, "text/plain");
-      assert.strictEqual(
-        result.createdOn.toISOString(),
-        "2025-04-01T12:00:00.000Z"
-      );
+      assert.strictEqual(result.createdOn.toISOString(), "2025-04-01T12:00:00.000Z");
     });
 
     it("should delete standalone with path parameter", async () => {
@@ -126,10 +119,7 @@ describe("Azure ClientGeneratorCore Client Initialization", () => {
       assert.strictEqual(result.name, "test-blob");
       assert.strictEqual(result.size, 42);
       assert.strictEqual(result.contentType, "text/plain");
-      assert.strictEqual(
-        result.createdOn.toISOString(),
-        "2025-04-01T12:00:00.000Z"
-      );
+      assert.strictEqual(result.createdOn.toISOString(), "2025-04-01T12:00:00.000Z");
     });
 
     it("should delete resource with query parameter", async () => {

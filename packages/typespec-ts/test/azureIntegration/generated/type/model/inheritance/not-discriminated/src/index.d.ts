@@ -1,85 +1,85 @@
-import type { Client } from '@azure-rest/core-client';
-import type { ClientOptions } from '@azure-rest/core-client';
-import type { HttpResponse } from '@azure-rest/core-client';
-import { isRestError } from '@azure/core-rest-pipeline';
-import type { RequestParameters } from '@azure-rest/core-client';
-import { RestError } from '@azure/core-rest-pipeline';
-import type { StreamableMethod } from '@azure-rest/core-client';
+import type {
+  Client,
+  ClientOptions,
+  HttpResponse,
+  RequestParameters,
+  StreamableMethod,
+} from "@azure-rest/core-client";
+import { isRestError, RestError } from "@azure/core-rest-pipeline";
 
 export declare interface Cat extends Pet {
-    age: number;
+  age: number;
 }
 
 export declare interface CatOutput extends PetOutput {
-    age: number;
+  age: number;
 }
 
 declare function createClient(options?: NotDiscriminatedClientOptions): NotDiscriminatedClient;
 export default createClient;
 
 export declare interface GetValid200Response extends HttpResponse {
-    status: "200";
-    body: SiameseOutput;
+  status: "200";
+  body: SiameseOutput;
 }
 
 export declare type GetValidParameters = RequestParameters;
 
-export { isRestError }
+export { isRestError };
 
 export declare type NotDiscriminatedClient = Client & {
-    path: Routes;
+  path: Routes;
 };
 
-export declare interface NotDiscriminatedClientOptions extends ClientOptions {
-}
+export declare interface NotDiscriminatedClientOptions extends ClientOptions {}
 
 export declare interface Pet {
-    name: string;
+  name: string;
 }
 
 export declare interface PetOutput {
-    name: string;
+  name: string;
 }
 
 export declare interface PostValid {
-    post(options: PostValidParameters): StreamableMethod<PostValid204Response>;
-    get(options?: GetValidParameters): StreamableMethod<GetValid200Response>;
-    put(options: PutValidParameters): StreamableMethod<PutValid200Response>;
+  post(options: PostValidParameters): StreamableMethod<PostValid204Response>;
+  get(options?: GetValidParameters): StreamableMethod<GetValid200Response>;
+  put(options: PutValidParameters): StreamableMethod<PutValid200Response>;
 }
 
 export declare interface PostValid204Response extends HttpResponse {
-    status: "204";
+  status: "204";
 }
 
 export declare interface PostValidBodyParam {
-    body: Siamese;
+  body: Siamese;
 }
 
 export declare type PostValidParameters = PostValidBodyParam & RequestParameters;
 
 export declare interface PutValid200Response extends HttpResponse {
-    status: "200";
-    body: SiameseOutput;
+  status: "200";
+  body: SiameseOutput;
 }
 
 export declare interface PutValidBodyParam {
-    body: Siamese;
+  body: Siamese;
 }
 
 export declare type PutValidParameters = PutValidBodyParam & RequestParameters;
 
-export { RestError }
+export { RestError };
 
 export declare interface Routes {
-    (path: "/type/model/inheritance/not-discriminated/valid"): PostValid;
+  (path: "/type/model/inheritance/not-discriminated/valid"): PostValid;
 }
 
 export declare interface Siamese extends Cat {
-    smart: boolean;
+  smart: boolean;
 }
 
 export declare interface SiameseOutput extends CatOutput {
-    smart: boolean;
+  smart: boolean;
 }
 
-export { }
+export {};

@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { EmptyClient } from "./generated/type/model/empty/src/index.js";
 
@@ -9,7 +9,7 @@ describe("Empty Client", () => {
   beforeEach(() => {
     client = new EmptyClient({
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 

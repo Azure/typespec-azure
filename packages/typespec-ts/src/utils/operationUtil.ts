@@ -1,18 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import {
-  getLroLogicalResponseName,
-  getResponseTypeName,
-  NameType,
-  normalizeName,
-  OperationLroDetail,
-  OPERATION_LRO_HIGH_PRIORITY,
-  OPERATION_LRO_LOW_PRIORITY,
-  Paths,
-  ResponseMetadata,
-  ResponseTypes
-} from "../rlc-common/index.js";
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import {
   getDisablePageable,
@@ -27,36 +15,41 @@ import {
   SdkMethod,
   SdkMethodParameter,
   SdkServiceMethod,
-  SdkServiceOperation
+  SdkServiceOperation,
 } from "@azure-tools/typespec-client-generator-core";
-import {
-  isList,
-  ModelProperty,
-  NoTarget,
-  Operation,
-  Program,
-  Type
-} from "@typespec/compiler";
+import { isList, ModelProperty, NoTarget, Operation, Program, Type } from "@typespec/compiler";
+import { $ } from "@typespec/compiler/typekit";
 import {
   HttpOperation,
   HttpOperationParameter,
   HttpOperationResponse,
-  HttpStatusCodesEntry
+  HttpStatusCodesEntry,
 } from "@typespec/http";
+import { resolveReference } from "../framework/reference.js";
+import { reportDiagnostic } from "../lib.js";
+import { SerializationHelpers } from "../modular/static-helpers-metadata.js";
+import {
+  getLroLogicalResponseName,
+  getResponseTypeName,
+  NameType,
+  normalizeName,
+  OPERATION_LRO_HIGH_PRIORITY,
+  OPERATION_LRO_LOW_PRIORITY,
+  OperationLroDetail,
+  Paths,
+  ResponseMetadata,
+  ResponseTypes,
+} from "../rlc-common/index.js";
+import { listOperationsUnderRLCClient } from "./clientUtils.js";
 import { SdkContext } from "./interfaces.js";
 import {
+  isMediaTypeMultipart,
+  isMediaTypeXml,
   KnownMediaType,
   knownMediaType,
-  isMediaTypeXml,
-  isMediaTypeMultipart
 } from "./mediaTypes.js";
 import { isByteOrByteUnion } from "./modelUtils.js";
 import { getOperationNamespaceInterfaceName } from "./namespaceUtils.js";
-import { resolveReference } from "../framework/reference.js";
-import { SerializationHelpers } from "../modular/static-helpers-metadata.js";
-import { listOperationsUnderRLCClient } from "./clientUtils.js";
-import { $ } from "@typespec/compiler/typekit";
-import { reportDiagnostic } from "../lib.js";
 
 // Sorts the responses by status code
 export function sortedOperationResponses(responses: HttpOperationResponse[]) {
@@ -67,10 +60,8 @@ export function sortedOperationResponses(responses: HttpOperationResponse[]) {
     if (b.statusCodes === "*") {
       return -1;
     }
-    const aStatus =
-      typeof a.statusCodes === "number" ? a.statusCodes : a.statusCodes.start;
-    const bStatus =
-      typeof b.statusCodes === "number" ? b.statusCodes : b.statusCodes.start;
+    const aStatus = typeof a.statusCodes === "number" ? a.statusCodes : a.statusCodes.start;
+    const bStatus = typeof b.statusCodes === "number" ? b.statusCodes : b.statusCodes.start;
     return aStatus - bStatus;
   });
 }
@@ -81,11 +72,11 @@ export function sortedOperationResponses(responses: HttpOperationResponse[]) {
  */
 export function getOperationResponseTypes(
   dpgContext: SdkContext,
-  operation: HttpOperation
+  operation: HttpOperation,
 ): ResponseTypes {
   const returnTypes: ResponseTypes = {
     error: [],
-    success: []
+    success: [],
   };
   function getResponseType(responses: HttpOperationResponse[]) {
     return responses.map((r) => {
@@ -93,17 +84,17 @@ export function getOperationResponseTypes(
       const responseName = getResponseTypeName(
         getOperationGroupName(dpgContext, operation),
         getOperationName(dpgContext, operation.operation),
-        statusCode
+        statusCode,
       );
       return responseName;
     });
   }
   if (operation.responses && operation.responses.length) {
     returnTypes.error = getResponseType(
-      operation.responses.filter((r) => isDefaultStatusCode(r.statusCodes))
+      operation.responses.filter((r) => isDefaultStatusCode(r.statusCodes)),
     );
     returnTypes.success = getResponseType(
-      operation.responses.filter((r) => isDefinedStatusCode(r.statusCodes))
+      operation.responses.filter((r) => isDefinedStatusCode(r.statusCodes)),
     );
   }
   return returnTypes;
@@ -125,9 +116,7 @@ export function getOperationSuccessStatus(operation: HttpOperation): string[] {
   return status;
 }
 
-export function getOperationStatuscode(
-  response: HttpOperationResponse
-): string {
+export function getOperationStatuscode(response: HttpOperationResponse): string {
   const statusCodes = response.statusCodes;
   if (statusCodes === "*") {
     return "default";
@@ -140,17 +129,11 @@ export function getOperationStatuscode(
   }
 }
 
+export function getOperationGroupName(dpgContext: SdkContext, route?: HttpOperation): string;
+export function getOperationGroupName(dpgContext: SdkContext, operation?: Operation): string;
 export function getOperationGroupName(
   dpgContext: SdkContext,
-  route?: HttpOperation
-): string;
-export function getOperationGroupName(
-  dpgContext: SdkContext,
-  operation?: Operation
-): string;
-export function getOperationGroupName(
-  dpgContext: SdkContext,
-  operationOrRoute?: Operation | HttpOperation
+  operationOrRoute?: Operation | HttpOperation,
 ) {
   if (!dpgContext.rlcOptions?.enableOperationGroup || !operationOrRoute) {
     return "";
@@ -160,10 +143,7 @@ export function getOperationGroupName(
     operationOrRoute = (operationOrRoute as HttpOperation).operation;
   }
   const operation = operationOrRoute as Operation;
-  const namespaceNames = getOperationNamespaceInterfaceName(
-    dpgContext,
-    operation
-  );
+  const namespaceNames = getOperationNamespaceInterfaceName(dpgContext, operation);
 
   return namespaceNames
     .map((name) => {
@@ -175,11 +155,7 @@ export function getOperationGroupName(
 export function getOperationName(dpgContext: SdkContext, operation: Operation) {
   const projectedOperationName = getWireName(dpgContext, operation);
 
-  return normalizeName(
-    projectedOperationName ?? operation.name,
-    NameType.Interface,
-    true
-  );
+  return normalizeName(projectedOperationName ?? operation.name, NameType.Interface, true);
 }
 
 export function isDefaultStatusCode(statusCodes: HttpStatusCodesEntry) {
@@ -194,7 +170,7 @@ export function isBinaryPayload(
   dpgContext: SdkContext,
   body: Type,
   contentType: string | string[],
-  encode?: string
+  encode?: string,
 ) {
   const knownMediaTypes: KnownMediaType[] = (
     Array.isArray(contentType) ? contentType : [contentType]
@@ -232,19 +208,12 @@ export function isMultipartPayload(contentType: string | string[]): boolean {
  * Checks if the operation supports multiple content types (e.g., both JSON and XML)
  */
 export function hasDualFormatSupport(contentTypes: string[]): boolean {
-  const hasJson = contentTypes.some(
-    (ct) => knownMediaType(ct) === KnownMediaType.Json
-  );
-  const hasXml = contentTypes.some(
-    (ct) => knownMediaType(ct) === KnownMediaType.Xml
-  );
+  const hasJson = contentTypes.some((ct) => knownMediaType(ct) === KnownMediaType.Json);
+  const hasXml = contentTypes.some((ct) => knownMediaType(ct) === KnownMediaType.Xml);
   return hasJson && hasXml;
 }
 
-export function isLongRunningOperation(
-  program: Program,
-  operation: HttpOperation
-) {
+export function isLongRunningOperation(program: Program, operation: HttpOperation) {
   return Boolean(getLroMetadata(program, operation.operation));
 }
 
@@ -286,15 +255,13 @@ export function getOperationLroOverload(
   program: Program,
   operation: HttpOperation,
   existingResponseTypes?: ResponseTypes,
-  existingResponses?: ResponseMetadata[]
+  existingResponses?: ResponseMetadata[],
 ) {
   const metadata = getLroMetadata(program, operation.operation);
   if (!metadata) {
     return false;
   }
-  const hasSuccessReturn = existingResponses?.filter((r) =>
-    r.statusCode.startsWith("20")
-  );
+  const hasSuccessReturn = existingResponses?.filter((r) => r.statusCode.startsWith("20"));
   if (existingResponseTypes?.success || hasSuccessReturn) {
     return true;
   }
@@ -313,7 +280,7 @@ export function extractOperationLroDetail(
   dpgContext: SdkContext,
   operation: HttpOperation,
   responsesTypes: ResponseTypes,
-  operationGroupName: string
+  operationGroupName: string,
 ): OperationLroDetail {
   let logicalResponseTypes: ResponseTypes | undefined;
 
@@ -321,7 +288,7 @@ export function extractOperationLroDetail(
   const operationLroOverload = getOperationLroOverload(
     dpgContext.program,
     operation,
-    responsesTypes
+    responsesTypes,
   );
   if (operationLroOverload) {
     logicalResponseTypes = {
@@ -329,9 +296,9 @@ export function extractOperationLroDetail(
       success: [
         getLroLogicalResponseName(
           operationGroupName,
-          getOperationName(dpgContext, operation.operation)
-        )
-      ]
+          getOperationName(dpgContext, operation.operation),
+        ),
+      ],
     };
     const metadata = getLroMetadata(dpgContext.program, operation.operation);
     precedence =
@@ -344,19 +311,14 @@ export function extractOperationLroDetail(
   }
 
   return {
-    isLongRunning: Boolean(
-      getLroMetadata(dpgContext.program, operation.operation)
-    ),
+    isLongRunning: Boolean(getLroMetadata(dpgContext.program, operation.operation)),
     logicalResponseTypes,
     operationLroOverload,
-    precedence
+    precedence,
   };
 }
 
-export function hasPollingOperations(
-  client: SdkClient,
-  dpgContext: SdkContext
-) {
+export function hasPollingOperations(client: SdkClient, dpgContext: SdkContext) {
   const program = dpgContext.program;
   for (const op of listOperationsUnderRLCClient(client)) {
     const route = getHttpOperationWithCache(dpgContext, op);
@@ -378,64 +340,54 @@ export interface PageDetails {
 
 export function extractPageDetails(
   program: Program,
-  operation: HttpOperation
+  operation: HttpOperation,
 ): PageDetails | undefined {
   if (isList(program, operation.operation)) {
     // If the operation is a list, we don't need to extract paging details.
-    const metadata = $(program).operation.getPagingMetadata(
-      operation.operation
-    );
+    const metadata = $(program).operation.getPagingMetadata(operation.operation);
     if (metadata === undefined) {
       // would fallback to default paging metadata
       reportDiagnostic(program, {
         code: "no-paging-items-defined",
         format: {
-          operationName: operation.operation.name
+          operationName: operation.operation.name,
         },
-        target: NoTarget
+        target: NoTarget,
       });
     }
 
     const nextLinkPath = mapFirstSegmentForResultSegments(
       metadata?.output.nextLink?.path,
-      operation.responses
+      operation.responses,
     );
     const itemNamePath = mapFirstSegmentForResultSegments(
       metadata?.output.pageItems?.path,
-      operation.responses
+      operation.responses,
     );
-    if (
-      (nextLinkPath && nextLinkPath?.length > 1) ||
-      (itemNamePath && itemNamePath?.length > 1)
-    ) {
+    if ((nextLinkPath && nextLinkPath?.length > 1) || (itemNamePath && itemNamePath?.length > 1)) {
       // Any cases with nested nextLink or itemName are not supported
       reportDiagnostic(program, {
         code: "un-supported-paging-cases",
         format: {
-          operationName: operation.operation.name
+          operationName: operation.operation.name,
         },
-        target: NoTarget
+        target: NoTarget,
       });
       // these paging information will be ignored
       // and the operation will be treated as a non-paging operation.
       return undefined;
     }
-    const nextLinkNames =
-      nextLinkPath?.map((prop) => prop.name).join(".") ?? "nextLink";
-    const itemNames =
-      itemNamePath?.map((prop) => prop.name).join(".") ?? "value";
+    const nextLinkNames = nextLinkPath?.map((prop) => prop.name).join(".") ?? "nextLink";
+    const itemNames = itemNamePath?.map((prop) => prop.name).join(".") ?? "value";
     return {
       nextLinkNames: [nextLinkNames],
-      itemNames: [itemNames]
+      itemNames: [itemNames],
     };
   }
   return undefined;
 }
 
-export function isPagingOperation(
-  dpgContext: SdkContext,
-  operation: HttpOperation
-) {
+export function isPagingOperation(dpgContext: SdkContext, operation: HttpOperation) {
   const { program } = dpgContext;
   if (getDisablePageable(dpgContext, operation.operation)) {
     return false;
@@ -446,10 +398,9 @@ export function isPagingOperation(
 
 function mapFirstSegmentForResultSegments(
   resultSegments: ModelProperty[] | undefined,
-  responses: HttpOperationResponse[]
+  responses: HttpOperationResponse[],
 ): ModelProperty[] | undefined {
-  const pagingBodyType = responses.find((r) => r.statusCodes === 200)
-    ?.responses[0]?.body;
+  const pagingBodyType = responses.find((r) => r.statusCodes === 200)?.responses[0]?.body;
   if (!pagingBodyType || pagingBodyType.bodyKind !== "single") return undefined;
   const bodyType = pagingBodyType.type;
 
@@ -468,8 +419,7 @@ function mapFirstSegmentForResultSegments(
         if (
           property &&
           segment &&
-          findRootSourceProperty(property[1]) ===
-            findRootSourceProperty(segment)
+          findRootSourceProperty(property[1]) === findRootSourceProperty(segment)
         ) {
           return [property[1], ...resultSegments.slice(i + 1)];
         }
@@ -500,10 +450,7 @@ export function hasPagingOperations(client: SdkClient, dpgContext: SdkContext) {
   return false;
 }
 
-export function hasCollectionFormatInfo(
-  paramType: string,
-  paramFormat: string
-) {
+export function hasCollectionFormatInfo(paramType: string, paramFormat: string) {
   return (
     getHasMultiCollection(paramType, paramFormat, false) ||
     getHasSsvCollection(paramType, paramFormat) ||
@@ -517,13 +464,13 @@ export function hasCollectionFormatInfo(
 export function getSpecialSerializeInfo(
   dpgContext: SdkContext,
   paramType: string,
-  paramFormat: string
+  paramFormat: string,
 ) {
   const hasMultiCollection = getHasMultiCollection(
     paramType,
     paramFormat,
     // Include query multi support in compatibility mode
-    dpgContext.rlcOptions?.compatibilityQueryMultiFormat ?? false
+    dpgContext.rlcOptions?.compatibilityQueryMultiFormat ?? false,
   );
   const hasCsvCollection = getHasCsvCollection(paramType, paramFormat);
   const descriptions = [];
@@ -541,15 +488,11 @@ export function getSpecialSerializeInfo(
     hasMultiCollection,
     hasCsvCollection,
     descriptions,
-    collectionInfo
+    collectionInfo,
   };
 }
 
-function getHasMultiCollection(
-  paramType: string,
-  paramFormat: string,
-  includeQuery = true
-) {
+function getHasMultiCollection(paramType: string, paramFormat: string, includeQuery = true) {
   return (
     ((includeQuery && paramType === "query") || paramType === "header") &&
     paramFormat === KnownCollectionFormat.Multi
@@ -557,8 +500,7 @@ function getHasMultiCollection(
 }
 function getHasSsvCollection(paramType: string, paramFormat: string) {
   return (
-    (paramType === "query" || paramType === "property") &&
-    paramFormat === KnownCollectionFormat.Ssv
+    (paramType === "query" || paramType === "property") && paramFormat === KnownCollectionFormat.Ssv
   );
 }
 
@@ -581,9 +523,7 @@ function getHasPipeCollection(paramType: string, paramFormat: string) {
 }
 
 function getHasNewlineCollection(paramType: string, paramFormat: string) {
-  return (
-    paramType === "property" && paramFormat === KnownCollectionFormat.Newline
-  );
+  return paramType === "property" && paramFormat === KnownCollectionFormat.Newline;
 }
 
 export function getCollectionFormatHelper(format: string) {
@@ -641,15 +581,11 @@ export enum KnownCollectionFormat {
   Tsv = "tsv",
   Pipes = "pipes",
   Newline = "newline",
-  Multi = "multi"
+  Multi = "multi",
 }
 
-export function getCustomRequestHeaderNameForOperation(
-  route: HttpOperation
-): string | undefined {
-  const params = route.parameters.parameters.filter(
-    isCustomClientRequestIdParam
-  );
+export function getCustomRequestHeaderNameForOperation(route: HttpOperation): string | undefined {
+  const params = route.parameters.parameters.filter(isCustomClientRequestIdParam);
   if (params.length > 0) {
     return "client-request-id";
   }
@@ -658,18 +594,14 @@ export function getCustomRequestHeaderNameForOperation(
 }
 
 export function isCustomClientRequestIdParam(param: HttpOperationParameter) {
-  return (
-    param.type === "header" && param.name.toLowerCase() === "client-request-id"
-  );
+  return param.type === "header" && param.name.toLowerCase() === "client-request-id";
 }
 
 export function isIgnoredHeaderParam(param: HttpOperationParameter) {
   return (
     isCustomClientRequestIdParam(param) ||
     (param.type === "header" &&
-      ["return-client-request-id", "ocp-date"].includes(
-        param.name.toLowerCase()
-      ))
+      ["return-client-request-id", "ocp-date"].includes(param.name.toLowerCase()))
   );
 }
 
@@ -677,29 +609,22 @@ export type ServiceOperation = SdkServiceMethod<SdkHttpOperation> & {
   oriName?: string;
 };
 
-export type ServiceParameter = (
-  | SdkMethodParameter
-  | SdkHttpParameter
-  | SdkBodyParameter
-) & {
+export type ServiceParameter = (SdkMethodParameter | SdkHttpParameter | SdkBodyParameter) & {
   oriName?: string;
 };
 
 export function getMethodHierarchiesMap(
   context: SdkContext,
-  client: SdkClientType<SdkServiceOperation>
+  client: SdkClientType<SdkServiceOperation>,
 ): Map<string, ServiceOperation[]> {
   const methodQueue: [
     string[],
-    SdkMethod<SdkHttpOperation> | SdkClientType<SdkServiceOperation>
+    SdkMethod<SdkHttpOperation> | SdkClientType<SdkServiceOperation>,
   ][] =
     client.children
       ?.filter((p) => {
         return (
-          !(
-            p.clientInitialization.initializedBy &
-            InitializedByFlags.Individually
-          ) &&
+          !(p.clientInitialization.initializedBy & InitializedByFlags.Individually) &&
           !(p.clientInitialization.initializedBy & InitializedByFlags.Parent)
         );
       })
@@ -728,36 +653,25 @@ export function getMethodHierarchiesMap(
 
     if (operationOrGroup.kind === "client") {
       operationOrGroup.methods.forEach((m) =>
-        methodQueue.push([[...prefixes, operationOrGroup.name], m])
+        methodQueue.push([[...prefixes, operationOrGroup.name], m]),
       );
-      const nonIndependentChildren = operationOrGroup.children?.filter(
-        (child) => {
-          return (
-            !(
-              child.clientInitialization.initializedBy &
-              InitializedByFlags.Individually
-            ) &&
-            !(
-              child.clientInitialization.initializedBy &
-              InitializedByFlags.Parent
-            )
-          );
-        }
-      );
+      const nonIndependentChildren = operationOrGroup.children?.filter((child) => {
+        return (
+          !(child.clientInitialization.initializedBy & InitializedByFlags.Individually) &&
+          !(child.clientInitialization.initializedBy & InitializedByFlags.Parent)
+        );
+      });
       if (nonIndependentChildren && nonIndependentChildren.length > 0) {
         nonIndependentChildren.forEach((child) =>
-          methodQueue.push([[...prefixes, operationOrGroup.name], child])
+          methodQueue.push([[...prefixes, operationOrGroup.name], child]),
         );
       }
     } else {
       const prefixKey =
-        context.rlcOptions?.hierarchyClient ||
-        context.rlcOptions?.enableOperationGroup
+        context.rlcOptions?.hierarchyClient || context.rlcOptions?.enableOperationGroup
           ? prefixes.join("/")
           : "";
-      const groupName = prefixes
-        .map((p) => normalizeName(p, NameType.OperationGroup))
-        .join("");
+      const groupName = prefixes.map((p) => normalizeName(p, NameType.OperationGroup)).join("");
       if (
         context.rlcOptions?.hierarchyClient === false &&
         context.rlcOptions?.enableOperationGroup &&
@@ -774,19 +688,14 @@ export function getMethodHierarchiesMap(
       operationOrGroup.operation.parameters.map((p) => {
         return resolveParameterNameConflict(operationOrGroup, p);
       });
-      if (
-        operationOrGroup.operation.bodyParam?.name === operationOrGroup.name
-      ) {
+      if (operationOrGroup.operation.bodyParam?.name === operationOrGroup.name) {
         operationOrGroup.operation.bodyParam = resolveParameterNameConflict(
           operationOrGroup,
-          operationOrGroup.operation.bodyParam
+          operationOrGroup.operation.bodyParam,
         ) as SdkBodyParameter;
       }
       const operations = operationHierarchiesMap.get(prefixKey);
-      operationHierarchiesMap.set(prefixKey, [
-        ...(operations ?? []),
-        operationOrGroup
-      ]);
+      operationHierarchiesMap.set(prefixKey, [...(operations ?? []), operationOrGroup]);
     }
   }
   return operationHierarchiesMap;
@@ -794,12 +703,11 @@ export function getMethodHierarchiesMap(
 
 export function isTenantLevelOperation(
   operation: ServiceOperation,
-  client: SdkClientType<SdkServiceOperation>
+  client: SdkClientType<SdkServiceOperation>,
 ): boolean {
   // Check if this operation has a subscriptionId path parameter
   const subscriptionIdParam = operation.operation.parameters?.find(
-    (param) =>
-      param.name.toLowerCase() === "subscriptionid" && param.kind === "path"
+    (param) => param.name.toLowerCase() === "subscriptionid" && param.kind === "path",
   );
 
   if (subscriptionIdParam) {
@@ -829,7 +737,7 @@ export function isTenantLevelOperation(
 
 function resolveParameterNameConflict(
   operationOrGroup: SdkServiceMethod<SdkHttpOperation>,
-  p: ServiceParameter
+  p: ServiceParameter,
 ): ServiceParameter {
   // When the name starts with $DO_NOT_NORMALIZE$, record the original name so that
   // subsequent calls (e.g. emitNonModelResponseTypes then buildApiOptions both call
@@ -841,7 +749,7 @@ function resolveParameterNameConflict(
     true,
     undefined,
     undefined,
-    p.oriName
+    p.oriName,
   );
   if (!p.oriName) {
     p.oriName = p.name;

@@ -4,10 +4,7 @@
  * @param properties The list of property names to check on the item.
  * @returns True if all specified properties are undefined, otherwise false.
  */
-export function areAllPropsUndefined(
-  item: Record<string, any>,
-  properties: string[]
-): boolean {
+export function areAllPropsUndefined(item: Record<string, any>, properties: string[]): boolean {
   for (const property of properties) {
     if (item[property] !== undefined) {
       return false;

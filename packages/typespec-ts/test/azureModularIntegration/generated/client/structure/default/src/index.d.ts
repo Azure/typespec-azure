@@ -1,82 +1,78 @@
-import { ClientOptions } from '@azure-rest/core-client';
-import { isRestError } from '@azure/core-rest-pipeline';
-import { OperationOptions } from '@azure-rest/core-client';
-import { Pipeline } from '@azure/core-rest-pipeline';
-import { RestError } from '@azure/core-rest-pipeline';
+import { ClientOptions, OperationOptions } from "@azure-rest/core-client";
+import { isRestError, Pipeline, RestError } from "@azure/core-rest-pipeline";
 
-export declare interface BarFiveOptionalParams extends OperationOptions {
-}
+export declare interface BarFiveOptionalParams extends OperationOptions {}
 
 export declare interface BarOperations {
-    six: (options?: BarSixOptionalParams) => Promise<void>;
-    five: (options?: BarFiveOptionalParams) => Promise<void>;
+  six: (options?: BarSixOptionalParams) => Promise<void>;
+  five: (options?: BarFiveOptionalParams) => Promise<void>;
 }
 
-export declare interface BarSixOptionalParams extends OperationOptions {
-}
+export declare interface BarSixOptionalParams extends OperationOptions {}
 
 export declare interface BazFooOperations {
-    seven: (options?: BazFooSevenOptionalParams) => Promise<void>;
+  seven: (options?: BazFooSevenOptionalParams) => Promise<void>;
 }
 
-export declare interface BazFooSevenOptionalParams extends OperationOptions {
-}
+export declare interface BazFooSevenOptionalParams extends OperationOptions {}
 
 export declare interface BazOperations {
-    foo: BazFooOperations;
+  foo: BazFooOperations;
 }
 
-export declare type ClientType = "default" | "multi-client" | "renamed-operation" | "two-operation-group" | "client-operation-group";
+export declare type ClientType =
+  | "default"
+  | "multi-client"
+  | "renamed-operation"
+  | "two-operation-group"
+  | "client-operation-group";
 
-export declare interface FooFourOptionalParams extends OperationOptions {
-}
+export declare interface FooFourOptionalParams extends OperationOptions {}
 
 export declare interface FooOperations {
-    four: (options?: FooFourOptionalParams) => Promise<void>;
-    three: (options?: FooThreeOptionalParams) => Promise<void>;
+  four: (options?: FooFourOptionalParams) => Promise<void>;
+  three: (options?: FooThreeOptionalParams) => Promise<void>;
 }
 
-export declare interface FooThreeOptionalParams extends OperationOptions {
-}
+export declare interface FooThreeOptionalParams extends OperationOptions {}
 
-export { isRestError }
+export { isRestError };
 
-export declare interface OneOptionalParams extends OperationOptions {
-}
+export declare interface OneOptionalParams extends OperationOptions {}
 
-export declare interface QuxBarNineOptionalParams extends OperationOptions {
-}
+export declare interface QuxBarNineOptionalParams extends OperationOptions {}
 
 export declare interface QuxBarOperations {
-    nine: (options?: QuxBarNineOptionalParams) => Promise<void>;
+  nine: (options?: QuxBarNineOptionalParams) => Promise<void>;
 }
 
-export declare interface QuxEightOptionalParams extends OperationOptions {
-}
+export declare interface QuxEightOptionalParams extends OperationOptions {}
 
 export declare interface QuxOperations {
-    eight: (options?: QuxEightOptionalParams) => Promise<void>;
-    bar: QuxBarOperations;
+  eight: (options?: QuxEightOptionalParams) => Promise<void>;
+  bar: QuxBarOperations;
 }
 
-export { RestError }
+export { RestError };
 
 export declare class ServiceClient {
-    private _client;
-    readonly pipeline: Pipeline;
-    constructor(endpointParam: string, clientParam: ClientType, options?: ServiceClientOptionalParams);
-    two(options?: TwoOptionalParams): Promise<void>;
-    one(options?: OneOptionalParams): Promise<void>;
-    readonly bar: BarOperations;
-    readonly foo: FooOperations;
-    readonly qux: QuxOperations;
-    readonly baz: BazOperations;
+  private _client;
+  readonly pipeline: Pipeline;
+  constructor(
+    endpointParam: string,
+    clientParam: ClientType,
+    options?: ServiceClientOptionalParams,
+  );
+  two(options?: TwoOptionalParams): Promise<void>;
+  one(options?: OneOptionalParams): Promise<void>;
+  readonly bar: BarOperations;
+  readonly foo: FooOperations;
+  readonly qux: QuxOperations;
+  readonly baz: BazOperations;
 }
 
-export declare interface ServiceClientOptionalParams extends ClientOptions {
-}
+export declare interface ServiceClientOptionalParams extends ClientOptions {}
 
-export declare interface TwoOptionalParams extends OperationOptions {
-}
+export declare interface TwoOptionalParams extends OperationOptions {}
 
-export { }
+export {};

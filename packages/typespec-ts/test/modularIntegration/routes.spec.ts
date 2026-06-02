@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { RoutesClient } from "./generated/routes/src/index.js";
 describe("Routes Client", () => {
@@ -7,7 +7,7 @@ describe("Routes Client", () => {
   beforeEach(() => {
     client = new RoutesClient({
       allowInsecureConnection: true,
-      endpoint: "http://localhost:3002"
+      endpoint: "http://localhost:3002",
     });
   });
 
@@ -36,8 +36,8 @@ describe("Routes Client", () => {
     // Should not encode the path parameter
     await client.pathParameters.reservedExpansion.template("foo/bar baz", {
       requestOptions: {
-        skipUrlEncoding: true
-      }
+        skipUrlEncoding: true,
+      },
     });
   });
 
@@ -46,8 +46,8 @@ describe("Routes Client", () => {
       // Should encode the path parameter because skipUrlEncoding is explicitly set to false
       await client.pathParameters.reservedExpansion.template("foo/bar baz", {
         requestOptions: {
-          skipUrlEncoding: false
-        }
+          skipUrlEncoding: false,
+        },
       });
       assert.fail("Should fail this case if path parameter is not encoded");
     } catch (error: any) {
@@ -170,7 +170,7 @@ describe("Routes Client", () => {
   it("Routes_QueryParameters_QueryContinuation_Standard_record", async () => {
     await client.queryParameters.queryContinuation.standard.record({
       a: 1,
-      b: 2
+      b: 2,
     });
   });
   it("Routes_QueryParameters_QueryContinuation_Explode_primitive", async () => {
@@ -182,7 +182,7 @@ describe("Routes Client", () => {
   it("Routes_QueryParameters_QueryContinuation_Explode_record", async () => {
     await client.queryParameters.queryContinuation.explode.record({
       a: 1,
-      b: 2
+      b: 2,
     });
   });
 });

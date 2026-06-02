@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { ConditionalRequestClient } from "./generated/special-headers/conditional-request/src/index.js";
 
@@ -10,35 +10,35 @@ describe("Conditional Request Client", () => {
       endpoint: "http://localhost:3002",
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
-      }
+        maxRetries: 0,
+      },
     });
   });
 
   it("should send the If-Modified-Since header", async () => {
     await client.headIfModifiedSince({
-      ifModifiedSince: new Date("Fri, 26 Aug 2022 14:38:00 GMT")
+      ifModifiedSince: new Date("Fri, 26 Aug 2022 14:38:00 GMT"),
     });
     assert.ok(true);
   });
 
   it("should send the If-Unmodified-Since header", async () => {
     await client.postIfUnmodifiedSince({
-      ifUnmodifiedSince: new Date("Fri, 26 Aug 2022 14:38:00 GMT")
+      ifUnmodifiedSince: new Date("Fri, 26 Aug 2022 14:38:00 GMT"),
     });
     assert.ok(true);
   });
 
   it("should send the If-Match header", async () => {
     await client.postIfMatch({
-      ifMatch: `"valid"`
+      ifMatch: `"valid"`,
     });
     assert.ok(true);
   });
 
   it("should send the If-None-Match header", async () => {
     await client.postIfNoneMatch({
-      ifNoneMatch: `"invalid"`
+      ifNoneMatch: `"invalid"`,
     });
     assert.ok(true);
   });

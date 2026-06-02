@@ -1,8 +1,8 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import AzureArmMethodSubscriptionIdClientFactory, {
   AzureArmMethodSubscriptionIdClient,
-  isUnexpected
+  isUnexpected,
 } from "./generated/azure/resource-manager/method-subscription-id/src/index.js";
 
 describe("Azure Arm Method Subscription Id Rest Client", () => {
@@ -11,7 +11,7 @@ describe("Azure Arm Method Subscription Id Rest Client", () => {
   beforeEach(() => {
     client = AzureArmMethodSubscriptionIdClientFactory({
       endpoint: "http://localhost:3000",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
@@ -25,7 +25,7 @@ describe("Azure Arm Method Subscription Id Rest Client", () => {
     type: "Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s",
     properties: {
       provisioningState: "Succeeded",
-      description: "Valid subscription resource 1"
+      description: "Valid subscription resource 1",
     },
     systemData: {
       createdBy: "AzureSDK",
@@ -33,8 +33,8 @@ describe("Azure Arm Method Subscription Id Rest Client", () => {
       createdAt: "2023-01-01T00:00:00.000Z",
       lastModifiedBy: "AzureSDK",
       lastModifiedAt: "2023-01-01T00:00:00.000Z",
-      lastModifiedByType: "User"
-    }
+      lastModifiedByType: "User",
+    },
   };
 
   const validSubscriptionResource2 = {
@@ -43,7 +43,7 @@ describe("Azure Arm Method Subscription Id Rest Client", () => {
     type: "Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s",
     properties: {
       provisioningState: "Succeeded",
-      configValue: "test-config"
+      configValue: "test-config",
     },
     systemData: {
       createdBy: "AzureSDK",
@@ -51,8 +51,8 @@ describe("Azure Arm Method Subscription Id Rest Client", () => {
       createdAt: "2023-01-01T00:00:00.000Z",
       lastModifiedBy: "AzureSDK",
       lastModifiedAt: "2023-01-01T00:00:00.000Z",
-      lastModifiedByType: "User"
-    }
+      lastModifiedByType: "User",
+    },
   };
 
   const validMixedSubscriptionResource = {
@@ -61,7 +61,7 @@ describe("Azure Arm Method Subscription Id Rest Client", () => {
     type: "Azure.ResourceManager.MethodSubscriptionId/subscriptionResources",
     properties: {
       provisioningState: "Succeeded",
-      subscriptionSetting: "test-sub-setting"
+      subscriptionSetting: "test-sub-setting",
     },
     systemData: {
       createdBy: "AzureSDK",
@@ -69,8 +69,8 @@ describe("Azure Arm Method Subscription Id Rest Client", () => {
       createdAt: "2023-01-01T00:00:00.000Z",
       lastModifiedBy: "AzureSDK",
       lastModifiedAt: "2023-01-01T00:00:00.000Z",
-      lastModifiedByType: "User"
-    }
+      lastModifiedByType: "User",
+    },
   };
 
   const validResourceGroupResource = {
@@ -80,7 +80,7 @@ describe("Azure Arm Method Subscription Id Rest Client", () => {
     location: LOCATION_EXPECTED,
     properties: {
       provisioningState: "Succeeded",
-      resourceGroupSetting: "test-setting"
+      resourceGroupSetting: "test-setting",
     },
     systemData: {
       createdBy: "AzureSDK",
@@ -88,8 +88,8 @@ describe("Azure Arm Method Subscription Id Rest Client", () => {
       createdAt: "2023-01-01T00:00:00.000Z",
       lastModifiedBy: "AzureSDK",
       lastModifiedAt: "2023-01-01T00:00:00.000Z",
-      lastModifiedByType: "User"
-    }
+      lastModifiedByType: "User",
+    },
   };
 
   // Test operations list
@@ -112,7 +112,7 @@ describe("Azure Arm Method Subscription Id Rest Client", () => {
       .path(
         "/subscriptions/{subscriptionId}/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s/{subscriptionResource1Name}",
         SUBSCRIPTION_ID_EXPECTED,
-        "sub-resource-1"
+        "sub-resource-1",
       )
       .get();
 
@@ -129,14 +129,14 @@ describe("Azure Arm Method Subscription Id Rest Client", () => {
       .path(
         "/subscriptions/{subscriptionId}/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s/{subscriptionResource1Name}",
         SUBSCRIPTION_ID_EXPECTED,
-        "sub-resource-1"
+        "sub-resource-1",
       )
       .put({
         body: {
           properties: {
-            description: "Valid subscription resource 1"
-          }
-        }
+            description: "Valid subscription resource 1",
+          },
+        },
       });
 
     if (isUnexpected(result)) {
@@ -151,7 +151,7 @@ describe("Azure Arm Method Subscription Id Rest Client", () => {
       .path(
         "/subscriptions/{subscriptionId}/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s/{subscriptionResource1Name}",
         SUBSCRIPTION_ID_EXPECTED,
-        "sub-resource-1"
+        "sub-resource-1",
       )
       .delete();
 
@@ -164,7 +164,7 @@ describe("Azure Arm Method Subscription Id Rest Client", () => {
       .path(
         "/subscriptions/{subscriptionId}/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s/{subscriptionResource2Name}",
         SUBSCRIPTION_ID_EXPECTED,
-        "sub-resource-2"
+        "sub-resource-2",
       )
       .get();
 
@@ -181,14 +181,14 @@ describe("Azure Arm Method Subscription Id Rest Client", () => {
       .path(
         "/subscriptions/{subscriptionId}/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s/{subscriptionResource2Name}",
         SUBSCRIPTION_ID_EXPECTED,
-        "sub-resource-2"
+        "sub-resource-2",
       )
       .put({
         body: {
           properties: {
-            configValue: "test-config"
-          }
-        }
+            configValue: "test-config",
+          },
+        },
       });
 
     if (isUnexpected(result)) {
@@ -203,7 +203,7 @@ describe("Azure Arm Method Subscription Id Rest Client", () => {
       .path(
         "/subscriptions/{subscriptionId}/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s/{subscriptionResource2Name}",
         SUBSCRIPTION_ID_EXPECTED,
-        "sub-resource-2"
+        "sub-resource-2",
       )
       .delete();
 
@@ -216,7 +216,7 @@ describe("Azure Arm Method Subscription Id Rest Client", () => {
       .path(
         "/subscriptions/{subscriptionId}/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResources/{subscriptionResourceName}",
         SUBSCRIPTION_ID_EXPECTED,
-        "sub-resource"
+        "sub-resource",
       )
       .get();
 
@@ -233,14 +233,14 @@ describe("Azure Arm Method Subscription Id Rest Client", () => {
       .path(
         "/subscriptions/{subscriptionId}/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResources/{subscriptionResourceName}",
         SUBSCRIPTION_ID_EXPECTED,
-        "sub-resource"
+        "sub-resource",
       )
       .put({
         body: {
           properties: {
-            subscriptionSetting: "test-sub-setting"
-          }
-        }
+            subscriptionSetting: "test-sub-setting",
+          },
+        },
       });
 
     if (isUnexpected(result)) {
@@ -255,7 +255,7 @@ describe("Azure Arm Method Subscription Id Rest Client", () => {
       .path(
         "/subscriptions/{subscriptionId}/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResources/{subscriptionResourceName}",
         SUBSCRIPTION_ID_EXPECTED,
-        "sub-resource"
+        "sub-resource",
       )
       .delete();
 
@@ -269,7 +269,7 @@ describe("Azure Arm Method Subscription Id Rest Client", () => {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources/{resourceGroupResourceName}",
         SUBSCRIPTION_ID_EXPECTED,
         RESOURCE_GROUP_EXPECTED,
-        "rg-resource"
+        "rg-resource",
       )
       .get();
 
@@ -287,15 +287,15 @@ describe("Azure Arm Method Subscription Id Rest Client", () => {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources/{resourceGroupResourceName}",
         SUBSCRIPTION_ID_EXPECTED,
         RESOURCE_GROUP_EXPECTED,
-        "rg-resource"
+        "rg-resource",
       )
       .put({
         body: {
           location: LOCATION_EXPECTED,
           properties: {
-            resourceGroupSetting: "test-setting"
-          }
-        }
+            resourceGroupSetting: "test-setting",
+          },
+        },
       });
 
     if (isUnexpected(result)) {
@@ -311,7 +311,7 @@ describe("Azure Arm Method Subscription Id Rest Client", () => {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources/{resourceGroupResourceName}",
         SUBSCRIPTION_ID_EXPECTED,
         RESOURCE_GROUP_EXPECTED,
-        "rg-resource"
+        "rg-resource",
       )
       .delete();
 

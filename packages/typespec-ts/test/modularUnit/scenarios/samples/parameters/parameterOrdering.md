@@ -60,7 +60,6 @@ The config would be like:
 ```yaml
 needAzureCore: true
 withVersionedApiVersion: true
-
 ```
 
 ## Operations
@@ -97,21 +96,19 @@ export function _verifySend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context
-    .path(path)
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: {
-        ...(options?.clientRequestId !== undefined
-          ? { "x-ms-client-request-id": options?.clientRequestId }
-          : {}),
-        "apc-gateway-id": apcGatewayId,
-        accept: "application/json",
-        ...options.requestOptions?.headers,
-      },
-      body: testVerificationContentSerializer(body),
-    });
+  return context.path(path).post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: {
+      ...(options?.clientRequestId !== undefined
+        ? { "x-ms-client-request-id": options?.clientRequestId }
+        : {}),
+      "apc-gateway-id": apcGatewayId,
+      accept: "application/json",
+      ...options.requestOptions?.headers,
+    },
+    body: testVerificationContentSerializer(body),
+  });
 }
 
 export async function _verifyDeserialize(

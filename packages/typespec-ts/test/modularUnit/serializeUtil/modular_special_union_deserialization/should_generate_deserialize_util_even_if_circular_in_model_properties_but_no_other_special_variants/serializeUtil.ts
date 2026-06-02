@@ -1,5 +1,5 @@
-import { PetUnion, Gold, DogUnion } from "../models/models.js";
-import { PetOutput, GoldOutput, DogOutput } from "../rest/index.js";
+import { DogUnion, Gold, PetUnion } from "../models/models.js";
+import { DogOutput, GoldOutput, PetOutput } from "../rest/index.js";
 
 /** deserialize function for PetOutput */
 export function deserializePetUnion(obj: PetOutput): PetUnion {
@@ -20,7 +20,7 @@ function deserializeGold(obj: GoldOutput): Gold {
     name: obj["name"],
     weight: obj["weight"],
     friends: obj["friends"].map((p: any) => deserializePetUnion(p)),
-    birthDay: new Date(obj["birthDay"])
+    birthDay: new Date(obj["birthDay"]),
   };
 }
 

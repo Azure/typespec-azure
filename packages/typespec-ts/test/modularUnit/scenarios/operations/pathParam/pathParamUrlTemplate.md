@@ -6,7 +6,7 @@
 alias KeyVaultOperation<
   TParams extends Reflection.Model,
   TResponse,
-  Traits extends Reflection.Model = {},
+  Traits extends Reflection.Model = {}
 > = Foundations.Operation<TParams, TResponse, Traits>;
 model KeyBundle {
   key?: string;
@@ -15,7 +15,7 @@ model KeyBundle {
 #suppress "@typespec/http/deprecated-implicit-optionality" "testing legacy behavior"
 @summary("The update key operation changes specified attributes of a stored key and can be applied to any key type and key version stored in Azure Key Vault.")
 @route("/keys/{key-name}/{key-version}")
-@patch(#{implicitOptionality: true})
+@patch(#{ implicitOptionality: true })
 op updateKey is KeyVaultOperation<
   {
     /**
@@ -38,7 +38,6 @@ op updateKey is KeyVaultOperation<
   },
   KeyBundle
 >;
-
 ```
 
 The config would be like:
@@ -80,14 +79,12 @@ export function _updateKeySend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context
-    .path(path)
-    .patch({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "text/plain",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: parameters,
-    });
+  return context.path(path).patch({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "text/plain",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: parameters,
+  });
 }
 
 export async function _updateKeyDeserialize(result: PathUncheckedResponse): Promise<KeyBundle> {

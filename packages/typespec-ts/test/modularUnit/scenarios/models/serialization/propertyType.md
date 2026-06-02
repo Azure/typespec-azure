@@ -1,4 +1,5 @@
 # Should generate serializer for property types
+
 Will prompt all operations into top-level.
 
 ## TypeSpec
@@ -44,8 +45,10 @@ model SimpleModel {
   propRecordOfUnionArrayOptional?: Record<(string | boolean | int32)[]>;
   propArrayOfRecordOfUnion: Record<string | boolean | int32>[];
   propArrayOfRecordOfUnionOptional?: Record<string | boolean | int32>[];
+
   @encodedName("application/json", "prop_encoded")
   propEncoded: string;
+
   propNotNormalizeModel: FOO;
   propNormalizeModel: FOOBAR;
   propRecordOfUnionArrayNotNormalize: Record<NFVIs[]>;
@@ -69,17 +72,17 @@ model AzureArcK8sClusterNFVIDetails extends NFVIs {
   nfviType: "AzureArcKubernetes";
 }
 
-model FOOBAR{
+model FOOBAR {
   name?: Record<NFVIs[]>;
 }
 
 model FOO {
-   param?: FOOBAR;
+  param?: FOOBAR;
 }
 
 @route("/serialize")
 interface D {
-  op bar(@body body: SimpleModel): void;
+  bar(@body body: SimpleModel): void;
 }
 ```
 

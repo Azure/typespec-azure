@@ -1,52 +1,38 @@
 import {
-  StructureKind,
-  FunctionDeclarationStructure,
-  SourceFile
-} from "ts-morph";
-import { resolveReference } from "../framework/reference.js";
-import { SdkContext } from "../utils/interfaces.js";
-import {
+  isReadOnly,
+  SdkClientInitializationType,
   SdkClientType,
+  SdkExampleValue,
   SdkHttpOperationExample,
   SdkHttpParameterExampleValue,
-  SdkServiceOperation,
-  SdkExampleValue,
-  SdkClientInitializationType,
   SdkModelPropertyType,
-  isReadOnly
+  SdkServiceOperation,
 } from "@azure-tools/typespec-client-generator-core";
-import {
-  isAzurePackage,
-  NameType,
-  normalizeName
-} from "../rlc-common/index.js";
-import { useContext } from "../contextManager.js";
-import { join } from "path";
-import { AzureIdentityDependencies } from "../modular/external-dependencies.js";
-import { reportDiagnostic } from "../index.js";
 import { NoTarget } from "@typespec/compiler";
-import {
-  buildPropertyNameMapper,
-  isSpreadBodyParameter
-} from "./helpers/typeHelpers.js";
-import { getClassicalClientName } from "./helpers/namingHelpers.js";
-import {
-  hasKeyCredential,
-  hasTokenCredential
-} from "../utils/credentialUtils.js";
+import { join } from "path";
+import { FunctionDeclarationStructure, SourceFile, StructureKind } from "ts-morph";
+import { useContext } from "../contextManager.js";
+import { resolveReference } from "../framework/reference.js";
+import { reportDiagnostic } from "../index.js";
+import { AzureIdentityDependencies } from "../modular/external-dependencies.js";
+import { isAzurePackage, NameType, normalizeName } from "../rlc-common/index.js";
+import { getSubscriptionId } from "../transform/transfromRLCOptions.js";
+import { hasKeyCredential, hasTokenCredential } from "../utils/credentialUtils.js";
+import { SdkContext } from "../utils/interfaces.js";
 import {
   getMethodHierarchiesMap,
   isTenantLevelOperation,
-  ServiceOperation
+  ServiceOperation,
 } from "../utils/operationUtil.js";
-import { getSubscriptionId } from "../transform/transfromRLCOptions.js";
 import {
-  getClientParametersDeclaration,
+  getClientParameterName,
   getClientParameters,
+  getClientParametersDeclaration,
   hasDefaultValue,
-  getClientParameterName
 } from "./helpers/clientHelpers.js";
+import { getClassicalClientName } from "./helpers/namingHelpers.js";
 import { getOperationFunction } from "./helpers/operationHelpers.js";
+import { buildPropertyNameMapper, isSpreadBodyParameter } from "./helpers/typeHelpers.js";
 import { ModelOverrideOptions } from "./serialization/serializeUtils.js";
 
 /**
@@ -79,7 +65,7 @@ export function emitSamples(dpgContext: SdkContext): SourceFile[] {
       subFolder:
         clients.length > 1
           ? normalizeName(getClassicalClientName(client), NameType.File)
-          : undefined
+          : undefined,
     });
   }
   return generatedFiles;
@@ -88,7 +74,7 @@ export function emitSamples(dpgContext: SdkContext): SourceFile[] {
 function emitClientSamples(
   dpgContext: SdkContext,
   client: SdkClientType<SdkServiceOperation>,
-  options: EmitSampleOptions
+  options: EmitSampleOptions,
 ) {
   const methodMap = getMethodHierarchiesMap(dpgContext, client);
   for (const [prefixKey, operations] of methodMap) {
@@ -102,7 +88,7 @@ function emitClientSamples(
       emitMethodSamples(dpgContext, op, {
         ...options,
         classicalMethodPrefix: prefix,
-        hierarchies: hierarchies
+        hierarchies: hierarchies,
       });
     }
   }
@@ -111,48 +97,39 @@ function emitClientSamples(
 function emitMethodSamples(
   dpgContext: SdkContext,
   method: ServiceOperation,
-  options: EmitSampleOptions
+  options: EmitSampleOptions,
 ): SourceFile | undefined {
   const examples = method.operation.examples ?? [];
   if (examples.length === 0) {
     return;
   }
   const project = useContext("outputProject");
-  const operationPrefix = `${options.classicalMethodPrefix ?? ""} ${
-    method.oriName ?? method.name
-  }`;
+  const operationPrefix = `${options.classicalMethodPrefix ?? ""} ${method.oriName ?? method.name}`;
   const sampleFolder = join(
     dpgContext.generationPathDetail?.rootDir ?? "",
     "samples-dev",
-    options.subFolder ?? ""
+    options.subFolder ?? "",
   );
   const fileName = normalizeName(`${operationPrefix} Sample`, NameType.File);
-  const sourceFile = project.createSourceFile(
-    join(sampleFolder, `${fileName}.ts`),
-    "",
-    {
-      overwrite: true
-    }
-  );
+  const sourceFile = project.createSourceFile(join(sampleFolder, `${fileName}.ts`), "", {
+    overwrite: true,
+  });
   const exampleFunctions = [];
   // TODO: remove hard-coded for package
   if (dpgContext.rlcOptions?.packageDetails?.name) {
     sourceFile.addImportDeclaration({
       moduleSpecifier: dpgContext.rlcOptions?.packageDetails?.name,
-      namedImports: [getClassicalClientName(options.topLevelClient)]
+      namedImports: [getClassicalClientName(options.topLevelClient)],
     });
   }
 
   for (const example of examples) {
     const exampleFunctionBody: string[] = [];
-    const exampleName = normalizeName(
-      escapeSpecialCharToSpace(example.name),
-      NameType.Method
-    );
+    const exampleName = normalizeName(escapeSpecialCharToSpace(example.name), NameType.Method);
     const exampleFunctionType = {
       name: exampleName,
       returnType: "Promise<void>",
-      body: exampleFunctionBody
+      body: exampleFunctionBody,
     };
     const parameterMap: Record<string, SdkHttpParameterExampleValue> =
       buildParameterValueMap(example);
@@ -160,7 +137,7 @@ function emitMethodSamples(
       dpgContext,
       method,
       parameterMap,
-      options.topLevelClient
+      options.topLevelClient,
     );
     // prepare client-level parameters
     const clientParamValues = parameters.filter((p) => p.onClient);
@@ -174,15 +151,13 @@ function emitMethodSamples(
       .filter((p) => p.isOptional)
       .map((param) => `${param.name}: ${param.value}`);
     if (optionalClientParams.length > 0) {
-      exampleFunctionBody.push(
-        `const clientOptions = {${optionalClientParams.join(", ")}};`
-      );
+      exampleFunctionBody.push(`const clientOptions = {${optionalClientParams.join(", ")}};`);
       clientParams.push("clientOptions");
     }
     exampleFunctionBody.push(
       `const client = new ${getClassicalClientName(
-        options.topLevelClient
-      )}(${clientParams.join(", ")});`
+        options.topLevelClient,
+      )}(${clientParams.join(", ")});`,
     );
 
     // prepare operation-level parameters
@@ -190,17 +165,13 @@ function emitMethodSamples(
     const operationFunction = getOperationFunction(
       dpgContext,
       [options.hierarchies ?? [], method],
-      "Client"
+      "Client",
     );
 
     // Extract parameter names from the function signature (excluding context and options)
     const signatureParamNames =
       operationFunction.parameters
-        ?.filter(
-          (p) =>
-            p.name !== "context" &&
-            !p.type?.toString().includes("OptionalParams")
-        )
+        ?.filter((p) => p.name !== "context" && !p.type?.toString().includes("OptionalParams"))
         .map((p) => p.name) ?? [];
 
     const methodParamValues = parameters.filter((p) => !p.onClient);
@@ -221,18 +192,14 @@ function emitMethodSamples(
     if (optionalParams.length > 0) {
       methodParams.push(`{${optionalParams.join(", ")}}`);
     }
-    const prefix = options.classicalMethodPrefix
-      ? `${options.classicalMethodPrefix}.`
-      : "";
+    const prefix = options.classicalMethodPrefix ? `${options.classicalMethodPrefix}.` : "";
     const isPaging = method.kind === "paging";
     const methodCall = `client.${prefix}${normalizeName(method.oriName ?? method.name, NameType.Property)}(${methodParams.join(
-      ", "
+      ", ",
     )})`;
     if (isPaging) {
       exampleFunctionBody.push(`const resArray = new Array();`);
-      exampleFunctionBody.push(
-        `for await (const item of ${methodCall}) { resArray.push(item); }`
-      );
+      exampleFunctionBody.push(`for await (const item of ${methodCall}) { resArray.push(item); }`);
       exampleFunctionBody.push(`console.log(resArray);`);
     } else if (method.response.type === undefined) {
       // skip response handling for void methods
@@ -243,10 +210,8 @@ function emitMethodSamples(
     }
 
     // Create a function declaration structure
-    const description =
-      method.doc ?? `execute ${method.oriName ?? method.name}`;
-    const normalizedDescription =
-      description.charAt(0).toLowerCase() + description.slice(1);
+    const description = method.doc ?? `execute ${method.oriName ?? method.name}`;
+    const normalizedDescription = description.charAt(0).toLowerCase() + description.slice(1);
     const functionDeclaration: FunctionDeclarationStructure = {
       returnType: exampleFunctionType.returnType,
       kind: StructureKind.Function,
@@ -254,8 +219,8 @@ function emitMethodSamples(
       name: exampleFunctionType.name,
       statements: exampleFunctionType.body,
       docs: [
-        `This sample demonstrates how to ${normalizedDescription}\n\n@summary ${normalizedDescription}\nx-ms-original-file: ${example.filePath}`
-      ]
+        `This sample demonstrates how to ${normalizedDescription}\n\n@summary ${normalizedDescription}\nx-ms-original-file: ${example.filePath}`,
+      ],
     };
     sourceFile.addFunction(functionDeclaration);
     exampleFunctions.push(exampleFunctionType.name);
@@ -274,9 +239,7 @@ function emitMethodSamples(
 
 function buildParameterValueMap(example: SdkHttpOperationExample) {
   const parameterMap: Record<string, SdkHttpParameterExampleValue> = {};
-  example.parameters.forEach(
-    (param) => (parameterMap[param.parameter.serializedName] = param)
-  );
+  example.parameters.forEach((param) => (parameterMap[param.parameter.serializedName] = param));
   return parameterMap;
 }
 
@@ -285,14 +248,13 @@ function prepareExampleValue(
   name: string,
   value: SdkExampleValue | string,
   isOptional?: boolean,
-  onClient?: boolean
+  onClient?: boolean,
 ): ExampleValue {
   return {
     name: normalizeName(name, NameType.Parameter, true),
-    value:
-      typeof value === "string" ? value : getParameterValue(context, value),
+    value: typeof value === "string" ? value : getParameterValue(context, value),
     isOptional: Boolean(isOptional),
-    onClient: Boolean(onClient)
+    onClient: Boolean(onClient),
   };
 }
 
@@ -300,7 +262,7 @@ function prepareExampleParameters(
   dpgContext: SdkContext,
   method: ServiceOperation,
   parameterMap: Record<string, SdkHttpParameterExampleValue>,
-  topLevelClient: SdkClientType<SdkServiceOperation>
+  topLevelClient: SdkClientType<SdkServiceOperation>,
 ): ExampleValue[] {
   // TODO: blocked by TCGC issue: https://github.com/Azure/typespec-azure/issues/1419
   // refine this to support generic client-level parameters once resolved
@@ -308,16 +270,12 @@ function prepareExampleParameters(
 
   // Get the raw SDK parameters to check for default values
   const rawClientParams = getClientParameters(topLevelClient, dpgContext, {
-    onClientOnly: true
+    onClientOnly: true,
   });
 
-  const clientParams = getClientParametersDeclaration(
-    topLevelClient,
-    dpgContext,
-    {
-      onClientOnly: true
-    }
-  );
+  const clientParams = getClientParametersDeclaration(topLevelClient, dpgContext, {
+    onClientOnly: true,
+  });
 
   // Helper to check if a parameter has a default value
   const hasParamDefaultValue = (paramName: string) => {
@@ -342,19 +300,16 @@ function prepareExampleParameters(
 
     const exampleValue: ExampleValue = {
       name: param.name === "endpointParam" ? "endpoint" : param.name,
-      value: getEnvironmentVariableName(
-        param.name,
-        getClassicalClientName(topLevelClient)
-      ),
+      value: getEnvironmentVariableName(param.name, getClassicalClientName(topLevelClient)),
       isOptional: Boolean(param.hasQuestionToken),
-      onClient: true
+      onClient: true,
     };
 
     result.push(exampleValue);
   }
   const credentialExampleValue = getCredentialExampleValue(
     dpgContext,
-    topLevelClient.clientInitialization
+    topLevelClient.clientInitialization,
   );
   if (credentialExampleValue) {
     result.push(credentialExampleValue);
@@ -364,11 +319,7 @@ function prepareExampleParameters(
   let isSubscriptionIdAdded = false;
   // required parameters
   for (const param of method.operation.parameters) {
-    if (
-      param.optional === true ||
-      param.type.kind === "constant" ||
-      param.clientDefaultValue
-    ) {
+    if (param.optional === true || param.type.kind === "constant" || param.clientDefaultValue) {
       continue;
     }
 
@@ -387,8 +338,8 @@ function prepareExampleParameters(
           param.name,
           subscriptionIdValue,
           param.optional,
-          param.onClient
-        )
+          param.onClient,
+        ),
       );
       continue;
     }
@@ -399,9 +350,9 @@ function prepareExampleParameters(
         code: "required-sample-parameter",
         format: {
           exampleName: method.oriName ?? method.name,
-          paramName: param.name
+          paramName: param.name,
         },
-        target: NoTarget
+        target: NoTarget,
       });
       continue;
     }
@@ -412,8 +363,8 @@ function prepareExampleParameters(
         exampleValue.parameter.name,
         exampleValue.value,
         param.optional,
-        param.onClient
-      )
+        param.onClient,
+      ),
     );
   }
 
@@ -426,13 +377,7 @@ function prepareExampleParameters(
     !isTenantLevelOperation(method, topLevelClient)
   ) {
     result.push(
-      prepareExampleValue(
-        dpgContext,
-        "subscriptionId",
-        subscriptionIdValue,
-        false,
-        true
-      )
+      prepareExampleValue(dpgContext, "subscriptionId", subscriptionIdValue, false, true),
     );
   }
 
@@ -456,22 +401,14 @@ function prepareExampleParameters(
           continue;
         }
         result.push(
-          prepareExampleValue(
-            dpgContext,
-            prop.name,
-            propExample,
-            prop.optional,
-            prop.onClient
-          )
+          prepareExampleValue(dpgContext, prop.name, propExample, prop.optional, prop.onClient),
         );
       }
     } else {
       // Check if the body parameter is nested inside a wrapper (e.g., @bodyRoot)
       const segments = bodyParam.methodParameterSegments;
       const isNestedBody =
-        segments.length === 1 &&
-        segments[0] !== undefined &&
-        segments[0].length > 1;
+        segments.length === 1 && segments[0] !== undefined && segments[0].length > 1;
       if (isNestedBody) {
         const path = segments[0]!;
         // The first segment is the method-level wrapper param (e.g., "body")
@@ -480,11 +417,7 @@ function prepareExampleParameters(
         // Wrap the example value with the intermediate property names
         let wrappedValue = getParameterValue(dpgContext, bodyExample.value);
         for (let i = path.length - 1; i >= 1; i--) {
-          const propName = normalizeName(
-            path[i]!.name,
-            NameType.Property,
-            true
-          );
+          const propName = normalizeName(path[i]!.name, NameType.Property, true);
           wrappedValue = `{ ${propName}: ${wrappedValue} }`;
         }
         result.push(
@@ -493,8 +426,8 @@ function prepareExampleParameters(
             methodParamName,
             wrappedValue,
             methodParamOptional,
-            bodyParam.onClient
-          )
+            bodyParam.onClient,
+          ),
         );
       } else {
         result.push(
@@ -503,8 +436,8 @@ function prepareExampleParameters(
             bodyParam.name,
             bodyExample.value,
             bodyParam.optional,
-            bodyParam.onClient
-          )
+            bodyParam.onClient,
+          ),
         );
       }
     }
@@ -513,9 +446,7 @@ function prepareExampleParameters(
   method.operation.parameters
     .filter(
       (param) =>
-        param.optional === true &&
-        parameterMap[param.serializedName] &&
-        !param.clientDefaultValue
+        param.optional === true && parameterMap[param.serializedName] && !param.clientDefaultValue,
     )
     .map((param) => parameterMap[param.serializedName]!)
     .forEach((param) => {
@@ -525,8 +456,8 @@ function prepareExampleParameters(
           param.parameter.name,
           param.value,
           true,
-          param.parameter.onClient
-        )
+          param.parameter.onClient,
+        ),
       );
     });
 
@@ -535,36 +466,34 @@ function prepareExampleParameters(
 
 function getCredentialExampleValue(
   dpgContext: SdkContext,
-  initialization: SdkClientInitializationType
+  initialization: SdkClientInitializationType,
 ): ExampleValue | undefined {
   const keyCredential = hasKeyCredential(initialization),
     tokenCredential = hasTokenCredential(initialization);
   const defaultSetting = {
     isOptional: false,
     onClient: true,
-    name: "credential"
+    name: "credential",
   };
   if (keyCredential || tokenCredential) {
     if (isAzurePackage({ options: dpgContext.rlcOptions })) {
       // Support DefaultAzureCredential for Azure packages
       return {
         ...defaultSetting,
-        value: `new ${resolveReference(
-          AzureIdentityDependencies.DefaultAzureCredential
-        )}()`
+        value: `new ${resolveReference(AzureIdentityDependencies.DefaultAzureCredential)}()`,
       };
     } else if (keyCredential) {
       // Support ApiKeyCredential for non-Azure packages
       return {
         ...defaultSetting,
-        value: `{ key: "INPUT_YOUR_KEY_HERE" }`
+        value: `{ key: "INPUT_YOUR_KEY_HERE" }`,
       };
     } else if (tokenCredential) {
       // Support TokenCredential for non-Azure packages
       return {
         ...defaultSetting,
         value: `{ getToken: async () => {
-          return { token: "INPUT_YOUR_TOKEN_HERE", expiresOnTimestamp: now() }; } }`
+          return { token: "INPUT_YOUR_TOKEN_HERE", expiresOnTimestamp: now() }; } }`,
       };
     }
   }
@@ -576,7 +505,7 @@ function getParameterValue(
   value: SdkExampleValue,
   options?: {
     overrides?: ModelOverrideOptions;
-  }
+  },
 ): string {
   let retValue = `{} as any`;
   switch (value.kind) {
@@ -612,8 +541,7 @@ function getParameterValue(
       retValue = `${JSON.stringify(value.value)}`;
       break;
     case "null": {
-      const ignoreNullableOnOptional =
-        context.rlcOptions?.ignoreNullableOnOptional ?? false;
+      const ignoreNullableOnOptional = context.rlcOptions?.ignoreNullableOnOptional ?? false;
       if (ignoreNullableOnOptional) {
         // When ignore-nullable-on-optional is true, the TypeScript type won't include
         // | null for optional properties, so we convert null to a type-appropriate default
@@ -633,16 +561,12 @@ function getParameterValue(
     }
     case "dict":
     case "model": {
-      const mapper = buildPropertyNameMapper(
-        context,
-        value.type,
-        options?.overrides
-      );
+      const mapper = buildPropertyNameMapper(context, value.type, options?.overrides);
       const values = [];
       const additionalPropertiesValue =
         value.kind === "model" ? (value.additionalPropertiesValue ?? {}) : {};
       for (const propName in {
-        ...value.value
+        ...value.value,
       }) {
         let property;
         if (value.type.kind === "model") {
@@ -667,21 +591,17 @@ function getParameterValue(
           // but disable further flattening to match the TypeScript interface structure
           const paramValue = getParameterValue(context, propValue, {
             overrides: {
-              propertyRenames:
-                useContext("sdkTypes").flattenProperties.get(property)
-                  ?.conflictMap,
-              enableFlatten: false
-            }
+              propertyRenames: useContext("sdkTypes").flattenProperties.get(property)?.conflictMap,
+              enableFlatten: false,
+            },
           });
-          propRetValue =
-            paramValue.length > 2 ? paramValue.slice(1, -1) : undefined;
+          propRetValue = paramValue.length > 2 ? paramValue.slice(1, -1) : undefined;
         } else {
           // Don't propagate enableFlatten:false to deeper levels — it's only
           // meant to block consecutive (transition) flatten at the direct child
           // level.  Non-flatten properties should recurse with default behavior
           // so that independent inner flattens at deeper levels still work.
-          const childOptions =
-            options?.overrides?.enableFlatten === false ? undefined : options;
+          const childOptions = options?.overrides?.enableFlatten === false ? undefined : options;
           propRetValue =
             `"${mapper.get(propName) ?? propName}": ` +
             getParameterValue(context, propValue, childOptions);
@@ -690,15 +610,14 @@ function getParameterValue(
       }
       const additionalBags = [];
       for (const propName in {
-        ...additionalPropertiesValue
+        ...additionalPropertiesValue,
       }) {
         const propValue = additionalPropertiesValue[propName];
         if (propValue === undefined || propValue === null) {
           continue;
         }
         const propRetValue =
-          `"${mapper.get(propName) ?? propName}": ` +
-          getParameterValue(context, propValue);
+          `"${mapper.get(propName) ?? propName}": ` + getParameterValue(context, propValue);
         additionalBags.push(propRetValue);
       }
       if (additionalBags.length > 0) {
@@ -714,9 +633,7 @@ function getParameterValue(
       break;
     }
     case "array": {
-      const valuesArr = value.value.map((item) =>
-        getParameterValue(context, item)
-      );
+      const valuesArr = value.value.map((item) => getParameterValue(context, item));
       retValue = `[${valuesArr.join(", ")}]`;
       break;
     }
@@ -733,10 +650,7 @@ function escapeSpecialCharToSpace(str: string) {
   return str.replace(/_|,|\.|\(|\)|'s |\[|\]/g, " ").replace(/\//g, " Or ");
 }
 
-function getEnvironmentVariableName(
-  paramName: string,
-  clientName?: string
-): string {
+function getEnvironmentVariableName(paramName: string, clientName?: string): string {
   // Remove "Param" suffix if present
   const cleanName = paramName.replace(/Param$/, "");
 

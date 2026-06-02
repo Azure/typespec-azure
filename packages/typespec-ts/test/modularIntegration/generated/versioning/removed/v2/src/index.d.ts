@@ -1,48 +1,43 @@
-import { ClientOptions } from '@azure-rest/core-client';
-import { isRestError } from '@azure/core-rest-pipeline';
-import { OperationOptions } from '@azure-rest/core-client';
-import { Pipeline } from '@azure/core-rest-pipeline';
-import { RestError } from '@azure/core-rest-pipeline';
+import { ClientOptions, OperationOptions } from "@azure-rest/core-client";
+import { isRestError, Pipeline, RestError } from "@azure/core-rest-pipeline";
 
 export declare type EnumV2 = "enumMemberV2";
 
 export declare type EnumV3 = "enumMemberV1" | "enumMemberV2Preview";
 
-export { isRestError }
+export { isRestError };
 
 export declare interface ModelV2 {
-    prop: string;
-    enumProp: EnumV2;
-    unionProp: UnionV2;
+  prop: string;
+  enumProp: EnumV2;
+  unionProp: UnionV2;
 }
 
 export declare interface ModelV3 {
-    id: string;
-    enumProp: EnumV3;
+  id: string;
+  enumProp: EnumV3;
 }
 
-export declare interface ModelV3OptionalParams extends OperationOptions {
-}
+export declare interface ModelV3OptionalParams extends OperationOptions {}
 
 export declare class RemovedClient {
-    private _client;
-    readonly pipeline: Pipeline;
-    constructor(endpointParam: string, options?: RemovedClientOptionalParams);
-    modelV3(body: ModelV3, options?: ModelV3OptionalParams): Promise<ModelV3>;
-    v2(body: ModelV2, options?: V2OptionalParams): Promise<ModelV2>;
+  private _client;
+  readonly pipeline: Pipeline;
+  constructor(endpointParam: string, options?: RemovedClientOptionalParams);
+  modelV3(body: ModelV3, options?: ModelV3OptionalParams): Promise<ModelV3>;
+  v2(body: ModelV2, options?: V2OptionalParams): Promise<ModelV2>;
 }
 
 export declare interface RemovedClientOptionalParams extends ClientOptions {
-    version?: Versions;
+  version?: Versions;
 }
 
-export { RestError }
+export { RestError };
 
 export declare type UnionV2 = string | number;
 
-export declare interface V2OptionalParams extends OperationOptions {
-}
+export declare interface V2OptionalParams extends OperationOptions {}
 
 export declare type Versions = "v1" | "v2preview" | "v2";
 
-export { }
+export {};

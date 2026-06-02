@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { buildWarpConfig } from "../../../../src/rlc-common/metadata/buildWarpConfig.js";
 import { createMockModel } from "./mockHelper.js";
@@ -12,7 +12,7 @@ describe("warp.config.yml generation", () => {
       const model = createMockModel({
         moduleKind: "esm",
         isMonorepo: true,
-        flavor: "azure"
+        flavor: "azure",
       });
 
       const result = buildWarpConfig(model);
@@ -38,7 +38,7 @@ describe("warp.config.yml generation", () => {
         moduleKind: "esm",
         isMonorepo: true,
         flavor: "azure",
-        generateReactNativeTarget: true
+        generateReactNativeTarget: true,
       });
 
       const result = buildWarpConfig(model);
@@ -53,14 +53,14 @@ describe("warp.config.yml generation", () => {
       const model = createMockModel({
         moduleKind: "esm",
         isMonorepo: true,
-        flavor: "azure"
+        flavor: "azure",
       });
 
       const result = buildWarpConfig(model, {
         exports: {
           ".": "./src/index.ts",
-          "./models": "./src/models/index.ts"
-        }
+          "./models": "./src/models/index.ts",
+        },
       });
       expect(result).toBeDefined();
       expect(result!.content).not.toContain("extends:");
@@ -74,7 +74,7 @@ describe("warp.config.yml generation", () => {
       const model = createMockModel({
         moduleKind: "cjs",
         isMonorepo: true,
-        flavor: "azure"
+        flavor: "azure",
       });
 
       const result = buildWarpConfig(model);
@@ -86,7 +86,7 @@ describe("warp.config.yml generation", () => {
     it("should generate a self-contained config without polyfillSuffix and without react-native by default", () => {
       const model = createMockModel({
         moduleKind: "esm",
-        isMonorepo: false
+        isMonorepo: false,
       });
 
       const result = buildWarpConfig(model);
@@ -101,7 +101,7 @@ describe("warp.config.yml generation", () => {
     it("should include three targets by default (browser, esm, commonjs)", () => {
       const model = createMockModel({
         moduleKind: "esm",
-        isMonorepo: false
+        isMonorepo: false,
       });
 
       const result = buildWarpConfig(model);
@@ -116,7 +116,7 @@ describe("warp.config.yml generation", () => {
       const model = createMockModel({
         moduleKind: "esm",
         isMonorepo: false,
-        generateReactNativeTarget: true
+        generateReactNativeTarget: true,
       });
 
       const result = buildWarpConfig(model);

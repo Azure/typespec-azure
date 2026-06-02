@@ -5,7 +5,6 @@
 ```tsp
 model Widget {
   colors: string[];
-
   optionalColors?: string[];
 
   @encode(ArrayEncoding.commaDelimited)
@@ -226,14 +225,14 @@ export function nestedWidgetDeserializer(item: any): NestedWidget {
 enum Color {
   Red: "red",
   Blue: "blue",
-  Green: "green"
+  Green: "green",
 }
 
 union ColorsUnion {
   string,
-  red: "red";
-  blue: "blue";
-  green: "green";
+  red: "red",
+  blue: "blue",
+  green: "green",
 }
 
 alias Type = "x" | "y" | "z";

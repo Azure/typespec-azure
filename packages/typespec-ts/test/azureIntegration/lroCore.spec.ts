@@ -1,16 +1,16 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import SpecsAzureCoreLroStandardClientFactory, {
   StandardClient,
   getLongRunningPoller,
-  isUnexpected
+  isUnexpected,
 } from "./generated/azure/core/lro/standard/src/index.js";
 describe("AzureLroCoreClient Rest Client", () => {
   let client: StandardClient;
 
   beforeEach(() => {
     client = SpecsAzureCoreLroStandardClientFactory({
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
@@ -19,8 +19,8 @@ describe("AzureLroCoreClient Rest Client", () => {
       .path("/azure/core/lro/standard/users/{name}", "madge")
       .put({
         body: {
-          role: "contributor"
-        }
+          role: "contributor",
+        },
       });
     const poller = await getLongRunningPoller(client, initialResponse);
     const result = await poller.pollUntilDone();
@@ -40,8 +40,8 @@ describe("AzureLroCoreClient Rest Client", () => {
       .path("/azure/core/lro/standard/users/{name}", "madge")
       .delete({
         body: {
-          role: "contributor"
-        }
+          role: "contributor",
+        },
       });
     const poller = await getLongRunningPoller(client, initialResponse);
     const result = await poller.pollUntilDone();
@@ -60,8 +60,8 @@ describe("AzureLroCoreClient Rest Client", () => {
       .path("/azure/core/lro/standard/users/{name}:export", "madge")
       .post({
         queryParameters: {
-          format: "json"
-        }
+          format: "json",
+        },
       });
     const poller = await getLongRunningPoller(client, initialResponse);
     const result = await poller.pollUntilDone();

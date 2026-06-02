@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { JsonClient } from "./generated/serialization/encoded-name/json/src/index.js";
 describe("NameAndEncodedName Client", () => {
@@ -9,8 +9,8 @@ describe("NameAndEncodedName Client", () => {
       endpoint: "http://localhost:3002",
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
-      }
+        maxRetries: 0,
+      },
     });
   });
 

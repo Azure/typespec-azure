@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { MediaTypeClient } from "./generated/payload/media-type/src/index.js";
 
@@ -8,13 +8,13 @@ describe("MediaType Client", () => {
   beforeEach(() => {
     client = new MediaTypeClient({
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
   it("should getAsText", async () => {
     const result = await client.stringBody.getAsText({
-      requestOptions: { headers: { accept: "text/plain" } }
+      requestOptions: { headers: { accept: "text/plain" } },
     });
     assert.strictEqual(result, "{cat}");
   });

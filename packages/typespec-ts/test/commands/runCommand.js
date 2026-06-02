@@ -7,7 +7,7 @@ export async function runCommand(command, args = [], workingDirectory, logger) {
       cwd: workingDirectory ?? process.cwd(),
       shell: true,
       env,
-      stdio: ["pipe"] // Use 'inherit' to 'pipe' for stdout and stderr
+      stdio: ["pipe"], // Use 'inherit' to 'pipe' for stdout and stderr
     });
 
     child.stdout.on("data", (data) => {

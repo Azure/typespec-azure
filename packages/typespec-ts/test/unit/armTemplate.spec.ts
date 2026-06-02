@@ -1,4 +1,4 @@
-import { describe, it, assert } from "vitest";
+import { assert, describe, it } from "vitest";
 
 import { emitResponsesFromTypeSpec } from "../util/emitUtil.js";
 import { assertEqualContent } from "../util/testUtil.js";
@@ -71,7 +71,7 @@ describe("ARM template", () => {
       needAzureCore: false,
       withRawContent: true,
       needTCGC: true,
-      withVersionedApiVersion: true
+      withVersionedApiVersion: true,
     });
     assert.ok(response);
     await assertEqualContent(
@@ -109,7 +109,7 @@ describe("ARM template", () => {
       export interface UploadLogicalResponse extends HttpResponse {
           status: "200";
           body: OnboardResponseOutput;
-      }`
+      }`,
     );
   });
 });

@@ -1,4 +1,4 @@
-import { assert, describe, it, beforeEach } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { ClientDefaultValueClient } from "./generated/azure/client-generator-core/client-default-value/src/index.js";
 
@@ -10,8 +10,8 @@ describe("Azure ClientGeneratorCore ClientDefaultValue Client", () => {
       endpoint: "http://localhost:3002",
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
-      }
+        maxRetries: 0,
+      },
     });
   });
 

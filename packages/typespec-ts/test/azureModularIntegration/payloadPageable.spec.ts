@@ -1,10 +1,6 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
-import {
-  PageableClient,
-  Pet,
-  XmlPet
-} from "./generated/payload/pageable/src/index.js";
+import { PageableClient, Pet, XmlPet } from "./generated/payload/pageable/src/index.js";
 
 describe("PageableClient Classical Client", () => {
   let client: PageableClient;
@@ -12,14 +8,14 @@ describe("PageableClient Classical Client", () => {
   beforeEach(() => {
     client = new PageableClient({
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
   const pets = [
     { id: "1", name: "dog" },
     { id: "2", name: "cat" },
     { id: "3", name: "bird" },
-    { id: "4", name: "fish" }
+    { id: "4", name: "fish" },
   ];
   it("Payload Pageable ServerDriven Pagination link", async () => {
     const iter = client.serverDrivenPagination.link();
@@ -34,7 +30,7 @@ describe("PageableClient Classical Client", () => {
   describe("AlternateInitialVerb", () => {
     it("should list pets using post initial verb", async () => {
       const iter = client.serverDrivenPagination.alternateInitialVerb.post({
-        filter: "foo eq bar"
+        filter: "foo eq bar",
       });
       const items: Array<Pet> = [];
       for await (const pet of iter) {

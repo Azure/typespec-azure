@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { UnionClient } from "./generated/type/union/src/index.js";
 describe("Type Union Client", () => {
@@ -9,8 +9,8 @@ describe("Type Union Client", () => {
       endpoint: "http://localhost:3002",
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
-      }
+        maxRetries: 0,
+      },
     });
   });
 
@@ -61,10 +61,7 @@ describe("Type Union Client", () => {
 
   it("should get models only union", async () => {
     const result = await client.modelsOnly.get();
-    assert.strictEqual(
-      JSON.stringify(result.prop),
-      JSON.stringify({ name: "test" })
-    );
+    assert.strictEqual(JSON.stringify(result.prop), JSON.stringify({ name: "test" }));
   });
   it("should send models only union", async () => {
     const result = await client.modelsOnly.send({ name: "test" });
@@ -90,7 +87,7 @@ describe("Type Union Client", () => {
   it("should send string and array union", async () => {
     const result = await client.stringAndArray.send({
       string: "test",
-      array: ["test1", "test2"]
+      array: ["test1", "test2"],
     });
     assert.isUndefined(result);
   });
@@ -107,17 +104,14 @@ describe("Type Union Client", () => {
       stringLiteral: "a",
       intLiteral: 2,
       floatLiteral: 3.3,
-      booleanLiteral: true
+      booleanLiteral: true,
     });
     assert.isUndefined(result);
   });
 
   it("should get mixed types union", async () => {
     const result = await client.mixedTypes.get();
-    assert.strictEqual(
-      JSON.stringify(result.prop.model),
-      JSON.stringify({ name: "test" })
-    );
+    assert.strictEqual(JSON.stringify(result.prop.model), JSON.stringify({ name: "test" }));
     assert.strictEqual(result.prop.literal, "a");
     assert.strictEqual(result.prop.int, 2);
     assert.strictEqual(result.prop.boolean, true);
@@ -130,12 +124,12 @@ describe("Type Union Client", () => {
       boolean: true,
       array: [
         {
-          name: "test"
+          name: "test",
         },
         "a",
         2,
-        true
-      ]
+        true,
+      ],
     });
     assert.isUndefined(result);
   });

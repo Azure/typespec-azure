@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { CollectionFormatClient } from "./generated/parameters/collection-format/src/index.js";
 
@@ -8,7 +8,7 @@ describe("CollectionFormatClient Classical Client", () => {
   beforeEach(() => {
     client = new CollectionFormatClient({
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 

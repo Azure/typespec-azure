@@ -1,89 +1,94 @@
-import type { Client } from '@azure-rest/core-client';
-import type { ClientOptions } from '@azure-rest/core-client';
-import type { HttpResponse } from '@azure-rest/core-client';
-import { isRestError } from '@azure/core-rest-pipeline';
-import type { RequestParameters } from '@azure-rest/core-client';
-import { RestError } from '@azure/core-rest-pipeline';
-import type { StreamableMethod } from '@azure-rest/core-client';
+import type {
+  Client,
+  ClientOptions,
+  HttpResponse,
+  RequestParameters,
+  StreamableMethod,
+} from "@azure-rest/core-client";
+import { isRestError, RestError } from "@azure/core-rest-pipeline";
 
-declare function createClient(endpointParam: string, options?: VersioningRenamedFromClientOptions): VersioningRenamedFromClient;
+declare function createClient(
+  endpointParam: string,
+  options?: VersioningRenamedFromClientOptions,
+): VersioningRenamedFromClient;
 export default createClient;
 
-export { isRestError }
+export { isRestError };
 
 export declare type NewEnum = "newEnumMember";
 
 export declare type NewEnumOutput = "newEnumMember";
 
 export declare interface NewModel {
-    newProp: string;
-    enumProp: NewEnum;
-    unionProp: NewUnion;
+  newProp: string;
+  enumProp: NewEnum;
+  unionProp: NewUnion;
 }
 
 export declare interface NewModelOutput {
-    newProp: string;
-    enumProp: NewEnumOutput;
-    unionProp: NewUnionOutput;
+  newProp: string;
+  enumProp: NewEnumOutput;
+  unionProp: NewUnionOutput;
 }
 
 export declare interface NewOp {
-    post(options: NewOpParameters): StreamableMethod<NewOp200Response>;
+  post(options: NewOpParameters): StreamableMethod<NewOp200Response>;
 }
 
 export declare interface NewOp200Response extends HttpResponse {
-    status: "200";
-    body: NewModelOutput;
+  status: "200";
+  body: NewModelOutput;
 }
 
 export declare interface NewOpBodyParam {
-    body: NewModel;
+  body: NewModel;
 }
 
 export declare interface NewOpInNewInterface {
-    post(options: NewOpInNewInterfaceParameters): StreamableMethod<NewOpInNewInterface200Response>;
+  post(options: NewOpInNewInterfaceParameters): StreamableMethod<NewOpInNewInterface200Response>;
 }
 
 export declare interface NewOpInNewInterface200Response extends HttpResponse {
-    status: "200";
-    body: NewModelOutput;
+  status: "200";
+  body: NewModelOutput;
 }
 
 export declare interface NewOpInNewInterfaceBodyParam {
-    body: NewModel;
+  body: NewModel;
 }
 
-export declare type NewOpInNewInterfaceParameters = NewOpInNewInterfaceBodyParam & RequestParameters;
+export declare type NewOpInNewInterfaceParameters = NewOpInNewInterfaceBodyParam &
+  RequestParameters;
 
 export declare type NewOpParameters = NewOpQueryParam & NewOpBodyParam & RequestParameters;
 
 export declare interface NewOpQueryParam {
-    queryParameters: NewOpQueryParamProperties;
+  queryParameters: NewOpQueryParamProperties;
 }
 
 export declare interface NewOpQueryParamProperties {
-    newQuery: string;
+  newQuery: string;
 }
 
 export declare type NewUnion = string | number;
 
 export declare type NewUnionOutput = string | number;
 
-export { RestError }
+export { RestError };
 
 export declare interface Routes {
-    (path: "/test"): NewOp;
-    (path: "/interface/test"): NewOpInNewInterface;
+  (path: "/test"): NewOp;
+  (path: "/interface/test"): NewOpInNewInterface;
 }
 
 export declare type VersioningRenamedFromClient = Client & {
-    path: Routes;
+  path: Routes;
 };
 
 export declare interface VersioningRenamedFromClientOptions extends ClientOptions {
-    version?: Versions;
+  version?: Versions;
 }
 
 export declare type Versions = "v1" | "v2";
 
-export { }
+export {};

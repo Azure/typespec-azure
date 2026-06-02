@@ -13,20 +13,20 @@ export type FileContents =
 export function createFilePartDescriptor(
   partName: string,
   fileInput: any,
-  defaultContentType?: string
+  defaultContentType?: string,
 ): any {
   if (fileInput.contents) {
     return {
       name: partName,
       body: fileInput.contents,
       contentType: fileInput.contentType ?? defaultContentType,
-      filename: fileInput.filename
+      filename: fileInput.filename,
     };
   } else {
     return {
       name: partName,
       body: fileInput,
-      contentType: defaultContentType
+      contentType: defaultContentType,
     };
   }
 }

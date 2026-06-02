@@ -19,19 +19,27 @@ namespace B {
       prop3: string;
     }
     interface C {
-      op opBEC(@body body: A):  { @body body: {}};
+      opBEC(@body body: A): {
+        @body body: {};
+      };
     }
   }
-  op opB(@body body: A):  { @body body: {}};
+  op opB(@body body: A): {
+    @body body: {};
+  };
 }
 
 @route("/d")
 interface D {
   @doc("show example opD")
-  op opD(@body body: A): { @body body: {}};
+  opD(@body body: A): {
+    @body body: {};
+  };
 }
 @doc("show example opTopLevel")
-op opTopLevel(@body body: A):  { @body body: {}};
+op opTopLevel(@body body: A): {
+  @body body: {};
+};
 ```
 
 This is the tspconfig.yaml.

@@ -1,24 +1,19 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import {
-  CasingConvention,
-  NameType,
-  normalizeName,
-  ReservedName
-} from "./helpers/nameUtils.js";
-import { Paths, PathParameter, PathMetadata } from "./interfaces.js";
+import { CasingConvention, NameType, normalizeName, ReservedName } from "./helpers/nameUtils.js";
+import { PathMetadata, PathParameter, Paths } from "./interfaces.js";
 
 export const REST_CLIENT_RESERVED: ReservedName[] = [
   { name: "path", reservedFor: [NameType.Property, NameType.OperationGroup] },
   {
     name: "pathUnchecked",
-    reservedFor: [NameType.Property, NameType.OperationGroup]
+    reservedFor: [NameType.Property, NameType.OperationGroup],
   },
   {
     name: "pipeline",
-    reservedFor: [NameType.Property, NameType.OperationGroup]
-  }
+    reservedFor: [NameType.Property, NameType.OperationGroup],
+  },
 ];
 
 export function buildMethodShortcutImplementation(paths: Paths) {
@@ -33,7 +28,7 @@ export function buildMethodShortcutImplementation(paths: Paths) {
       NameType.OperationGroup,
       true,
       REST_CLIENT_RESERVED,
-      CasingConvention.Camel
+      CasingConvention.Camel,
     );
 
     if (keys[groupName]) {
@@ -55,12 +50,7 @@ function buildOperationDeclarations(path: string, pathMetadata: PathMetadata) {
     for (const op of methodOps) {
       const pathParams = pathMetadata?.pathParameters;
       const name = normalizeName(op.operationName, NameType.Property);
-      const methodDefinitions = generateOperationDeclaration(
-        path,
-        name,
-        method,
-        pathParams
-      );
+      const methodDefinitions = generateOperationDeclaration(path, name, method, pathParams);
       ops = [...ops, methodDefinitions];
     }
   }
@@ -72,11 +62,9 @@ function generateOperationDeclaration(
   path: string,
   operationName: string,
   method: string,
-  pathParams: PathParameter[] = []
+  pathParams: PathParameter[] = [],
 ): string {
-  const pathParamNames = `${
-    pathParams.length > 0 ? `${pathParams.map((p) => p.name)},` : ""
-  }`;
+  const pathParamNames = `${pathParams.length > 0 ? `${pathParams.map((p) => p.name)},` : ""}`;
   return `"${operationName}": (${pathParamNames} options) => {
       return client.path("${path}", ${pathParamNames}).${method}(options);
     }`;

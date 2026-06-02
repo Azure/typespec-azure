@@ -1,7 +1,7 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import HeaderClientFactory, {
-  HeaderClient
+  HeaderClient,
 } from "./generated/azure/client-generator-core/api-version/header/src/index.js";
 
 describe("Azure Client Generator Core - API Version Header", () => {
@@ -9,18 +9,16 @@ describe("Azure Client Generator Core - API Version Header", () => {
 
   beforeEach(() => {
     client = HeaderClientFactory({
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
   it("should handle API version through header parameter", async () => {
-    const result = await client
-      .path("/azure/client-generator-core/api-version/header")
-      .post({
-        headers: {
-          "x-ms-version": "2025-01-01"
-        }
-      });
+    const result = await client.path("/azure/client-generator-core/api-version/header").post({
+      headers: {
+        "x-ms-version": "2025-01-01",
+      },
+    });
 
     assert.strictEqual(result.status, "200");
   });

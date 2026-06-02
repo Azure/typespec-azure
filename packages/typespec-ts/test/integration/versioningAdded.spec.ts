@@ -1,7 +1,7 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import VersioningAddedClientFactory, {
-  VersioningAddedClient
+  VersioningAddedClient,
 } from "./generated/versioning/added/src/index.js";
 describe("VersioningAdded Rest Client", () => {
   let client: VersioningAddedClient;
@@ -9,7 +9,7 @@ describe("VersioningAdded Rest Client", () => {
   beforeEach(() => {
     client = VersioningAddedClientFactory("http://localhost:3000", {
       version: "v2",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
@@ -18,11 +18,11 @@ describe("VersioningAdded Rest Client", () => {
       body: {
         prop: "foo",
         enumProp: "enumMemberV2",
-        unionProp: 10
+        unionProp: 10,
       },
       headers: {
-        "header-v2": "bar"
-      }
+        "header-v2": "bar",
+      },
     });
     assert.strictEqual(result.status, "200");
     assert.strictEqual(result.body.prop, "foo");
@@ -35,8 +35,8 @@ describe("VersioningAdded Rest Client", () => {
       body: {
         prop: "foo",
         enumProp: "enumMember",
-        unionProp: "bar"
-      }
+        unionProp: "bar",
+      },
     });
     assert.strictEqual(result.status, "200");
     assert.strictEqual(result.body.prop, "foo");
@@ -49,8 +49,8 @@ describe("VersioningAdded Rest Client", () => {
       body: {
         prop: "foo",
         enumProp: "enumMember",
-        unionProp: "bar"
-      }
+        unionProp: "bar",
+      },
     });
     assert.strictEqual(result.status, "200");
     assert.strictEqual(result.body.prop, "foo");

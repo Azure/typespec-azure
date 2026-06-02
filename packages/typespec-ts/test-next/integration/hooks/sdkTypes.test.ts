@@ -1,17 +1,26 @@
-import { describe, it, beforeAll, assert } from "vitest";
-import { createSdkContextFromTypespec } from "../test-hots.js";
-import { SdkContext, SdkHttpOperation, SdkPackage, SdkUnionType, namespace as tcgcNamespace } from "@azure-tools/typespec-client-generator-core";
-import { provideSdkTypes, useSdkTypes } from "../../../src/framework/hooks/sdkTypes.js"
-import { getNamespaceFullName, isGlobalNamespace, isStdNamespace, Namespace, navigateProgram } from "@typespec/compiler"
-import { namespace as httpNamespace } from "@typespec/http"
+import {
+  SdkContext,
+  SdkHttpOperation,
+  SdkPackage,
+  namespace as tcgcNamespace,
+} from "@azure-tools/typespec-client-generator-core";
+import {
+  getNamespaceFullName,
+  isStdNamespace,
+  Namespace,
+  navigateProgram,
+} from "@typespec/compiler";
+import { namespace as httpNamespace } from "@typespec/http";
+import { assert, beforeAll, describe, it } from "vitest";
 import { provideContext } from "../../../src/contextManager.js";
+import { provideSdkTypes, useSdkTypes } from "../../../src/framework/hooks/sdkTypes.js";
+import { createSdkContextFromTypespec } from "../test-hots.js";
 
 describe("SdkTypes hook", () => {
-
-    let sdkPackage: SdkPackage<SdkHttpOperation>;
-    let sdkContext: SdkContext;
-    beforeAll(async () => {
-        const spec = `
+  let sdkPackage: SdkPackage<SdkHttpOperation>;
+  let sdkContext: SdkContext;
+  beforeAll(async () => {
+    const spec = `
             union NoNamespaceUnion {
                 D: "d"
             };
@@ -83,80 +92,82 @@ describe("SdkTypes hook", () => {
                  }
             }
     }
-        `
-        sdkContext = await createSdkContextFromTypespec(spec, {});
-        provideSdkTypes(sdkContext);
-        provideContext("emitContext", { tcgcContext: sdkContext, compilerContext: sdkContext.emitContext as any })
+        `;
+    sdkContext = await createSdkContextFromTypespec(spec, {});
+    provideSdkTypes(sdkContext);
+    provideContext("emitContext", {
+      tcgcContext: sdkContext,
+      compilerContext: sdkContext.emitContext as any,
     });
+  });
 
-    it("should setup the SdkTypeContext", async () => {
-        const getSdkType = useSdkTypes();
-        assert.isDefined(getSdkType);
+  it("should setup the SdkTypeContext", async () => {
+    const getSdkType = useSdkTypes();
+    assert.isDefined(getSdkType);
+  });
+
+  it("should provide all operations regardless of namespace", () => {
+    const getSdkType = useSdkTypes();
+
+    navigateProgram(sdkContext.program, {
+      operation(o) {
+        const sdkMethod = getSdkType(o);
+        assert.isDefined(sdkMethod, `Couldn't find sdkOperation for ${o.name}`);
+      },
     });
+  });
 
-    it("should provide all operations regardless of namespace", () => {
-        const getSdkType = useSdkTypes();
+  it("should provide all models regardless of namespace", () => {
+    const getSdkType = useSdkTypes();
 
-        navigateProgram(sdkContext.program, {
-            operation(o) {
-                const sdkMethod = getSdkType(o);
-                assert.isDefined(sdkMethod, `Couldn't find sdkOperation for ${o.name}`);
-            }
-        })
-    })
+    navigateProgram(sdkContext.program, {
+      model(m) {
+        // Filtering out namespaces declared in other libraries such as @typespec/http
+        if (isIgnoredNamespace(m.namespace)) {
+          return;
+        }
 
-    it("should provide all models regardless of namespace", () => {
-        const getSdkType = useSdkTypes();
+        const sdkMethod = getSdkType(m);
+        assert.isDefined(sdkMethod, `Couldn't find sdk model for ${m.name}`);
+      },
+    });
+  });
 
-        navigateProgram(sdkContext.program, {
-            model(m) {
-                // Filtering out namespaces declared in other libraries such as @typespec/http
-                if (isIgnoredNamespace(m.namespace)) {
-                    return;
-                }
+  it("should provide all enums regardless of namespace", () => {
+    const getSdkType = useSdkTypes();
 
-                const sdkMethod = getSdkType(m);
-                assert.isDefined(sdkMethod, `Couldn't find sdk model for ${m.name}`);
-            }
-        })
-    })
+    navigateProgram(sdkContext.program, {
+      enum(e) {
+        // Filtering out namespaces declared in other libraries such as @typespec/http
+        if (isIgnoredNamespace(e.namespace)) {
+          return;
+        }
 
-    it("should provide all enums regardless of namespace", () => {
-        const getSdkType = useSdkTypes();
+        const sdkMethod = getSdkType(e);
+        assert.isDefined(sdkMethod, `Couldn't find sdk model for ${e.name}`);
+      },
+      union(u) {
+        if (isIgnoredNamespace(u.namespace)) {
+          return;
+        }
 
-        navigateProgram(sdkContext.program, {
-            enum(e) {
-                // Filtering out namespaces declared in other libraries such as @typespec/http
-                if (isIgnoredNamespace(e.namespace)) {
-                    return;
-                }
-
-                const sdkMethod = getSdkType(e);
-                assert.isDefined(sdkMethod, `Couldn't find sdk model for ${e.name}`);
-            },
-            union(u) {
-                if (isIgnoredNamespace(u.namespace)) {
-                    return;
-                }
-
-                const sdkMethod = getSdkType(u);
-                assert.isDefined(sdkMethod, `Couldn't find sdk union for ${u.name}`);
-            }
-        })
-    })
-})
+        const sdkMethod = getSdkType(u);
+        assert.isDefined(sdkMethod, `Couldn't find sdk union for ${u.name}`);
+      },
+    });
+  });
+});
 
 function isIgnoredNamespace(namespace: Namespace | undefined) {
-    const externalNamespaces = [httpNamespace, tcgcNamespace]
-    if (!namespace) {
-        return true;
-    }
+  const externalNamespaces = [httpNamespace, tcgcNamespace];
+  if (!namespace) {
+    return true;
+  }
 
-    if (namespace) {
-        const nsName = getNamespaceFullName(namespace);
-        if (isStdNamespace(namespace) || externalNamespaces.includes(nsName)) {
-            return true;
-        }
+  if (namespace) {
+    const nsName = getNamespaceFullName(namespace);
+    if (isStdNamespace(namespace) || externalNamespaces.includes(nsName)) {
+      return true;
     }
-
+  }
 }

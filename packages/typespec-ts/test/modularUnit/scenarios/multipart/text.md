@@ -5,7 +5,7 @@
 ```tsp
 model RequestBody {
   firstName: HttpPart<string>;
-  lastName: HttpPart<string>; 
+  lastName: HttpPart<string>;
 }
 
 op doThing(@header contentType: "multipart/form-data", @multipartBody bodyParam: RequestBody): void;
@@ -52,13 +52,11 @@ export function _doThingSend(
   bodyParam: RequestBody,
   options: DoThingOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "multipart/form-data",
-      body: requestBodySerializer(bodyParam),
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "multipart/form-data",
+    body: requestBodySerializer(bodyParam),
+  });
 }
 
 export async function _doThingDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -84,7 +82,7 @@ export async function doThing(
 
 ```tsp
 model RequestBody {
-  lastName?: HttpPart<string>; 
+  lastName?: HttpPart<string>;
 }
 
 op doThing(@header contentType: "multipart/form-data", @multipartBody bodyParam: RequestBody): void;

@@ -1,16 +1,12 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
-  ArraySchema,
-  DictionarySchema,
-  NameType,
-  ObjectSchema,
-  Schema,
-  SchemaContext,
-  isArraySchema,
-  normalizeName
-} from "../rlc-common/index.js";
+  getDefaultApiVersion,
+  getWireName,
+  isApiVersion,
+} from "@azure-tools/typespec-client-generator-core";
 import {
   Discriminator,
   EncodeData,
@@ -51,9 +47,8 @@ import {
   isStringType,
   isTemplateDeclaration,
   isUnknownType,
-  listServices
+  listServices,
 } from "@typespec/compiler";
-import { GetSchemaOptions, SdkContext } from "./interfaces.js";
 import {
   HttpOperation,
   HttpOperationHeaderParameter,
@@ -67,22 +62,23 @@ import {
   getPathParamName,
   getQueryParamName,
   isBody,
-  isStatusCode
+  isStatusCode,
 } from "@typespec/http";
 import {
-  KnownMediaType,
-  hasMediaType,
-  isMediaTypeMultipartFormData
-} from "./mediaTypes.js";
-import {
-  getDefaultApiVersion,
-  getWireName,
-  isApiVersion
-} from "@azure-tools/typespec-client-generator-core";
-import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
+  ArraySchema,
+  DictionarySchema,
+  NameType,
+  ObjectSchema,
+  Schema,
+  SchemaContext,
+  isArraySchema,
+  normalizeName,
+} from "../rlc-common/index.js";
+import { GetSchemaOptions, SdkContext } from "./interfaces.js";
+import { KnownMediaType, hasMediaType, isMediaTypeMultipartFormData } from "./mediaTypes.js";
 
-import { getModelNamespaceName } from "./namespaceUtils.js";
 import { reportDiagnostic } from "../lib.js";
+import { getModelNamespaceName } from "./namespaceUtils.js";
 
 export const BINARY_TYPE_UNION =
   "string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream";
@@ -90,9 +86,7 @@ export const BINARY_TYPE_UNION =
 export const BINARY_AND_FILE_TYPE_UNION = `${BINARY_TYPE_UNION} | File`;
 
 export function getBinaryType(usage: SchemaContext[]) {
-  return usage.includes(SchemaContext.Output)
-    ? "Uint8Array"
-    : BINARY_TYPE_UNION;
+  return usage.includes(SchemaContext.Output) ? "Uint8Array" : BINARY_TYPE_UNION;
 }
 
 export function isByteOrByteUnion(dpgContext: SdkContext, type: Type) {
@@ -101,10 +95,7 @@ export function isByteOrByteUnion(dpgContext: SdkContext, type: Type) {
 }
 
 function isBytesType(schema: any) {
-  return (
-    schema.type === "string" &&
-    (schema.format === "bytes" || schema.format === "binary")
-  );
+  return schema.type === "string" && (schema.format === "bytes" || schema.format === "binary");
 }
 
 function isBytesUnion(schema: any) {
@@ -120,10 +111,7 @@ function isBytesUnion(schema: any) {
 }
 
 function refineByteType(schema: any) {
-  schema.typeName = getBinaryType([
-    SchemaContext.Input,
-    SchemaContext.Exception
-  ]);
+  schema.typeName = getBinaryType([SchemaContext.Input, SchemaContext.Exception]);
   schema.outputTypeName = getBinaryType([SchemaContext.Output]);
   return schema;
 }
@@ -151,7 +139,7 @@ export function enrichBinaryTypeInBody(schema: any) {
 export function getSchemaForType(
   dpgContext: SdkContext,
   typeInput: Type,
-  options?: GetSchemaOptions
+  options?: GetSchemaOptions,
 ): any {
   const program = dpgContext.program;
   const { usage } = options ?? {};
@@ -176,31 +164,25 @@ export function getSchemaForType(
     if (httpPart) {
       const fileModel = getHttpFileModel(program, httpPart.type);
       if (fileModel) {
-        const schema: any = getSchemaForType(
-          dpgContext,
-          fileModel.contents,
-          options
-        );
+        const schema: any = getSchemaForType(dpgContext, fileModel.contents, options);
         return {
           ...schema,
           multipartOptions: {
             filenameSchema: {
               required: !fileModel.filename.optional,
-              ...getSchemaForType(dpgContext, fileModel.filename, options)
+              ...getSchemaForType(dpgContext, fileModel.filename, options),
             },
             contentTypeSchema: {
               required: !fileModel.contentType.optional,
-              ...getSchemaForType(dpgContext, fileModel.contentType, options)
-            }
-          }
+              ...getSchemaForType(dpgContext, fileModel.contentType, options),
+            },
+          },
         };
       } else {
         // extract body if required
         const body =
           (httpPart.type.kind === "Model" &&
-            [...httpPart.type.properties.values()].find((x) =>
-              isBody(program, x)
-            )) ||
+            [...httpPart.type.properties.values()].find((x) => isBody(program, x))) ||
           httpPart.type;
         return getSchemaForType(dpgContext, body, options);
       }
@@ -210,25 +192,22 @@ export function getSchemaForType(
     if (isAnonymousObjectSchema(schema)) {
       if (Object.keys(schema.properties ?? {}).length === 0) {
         // Handle empty anonymous model as Record
-        schema.typeName =
-          schema.type === "object" ? "Record<string, unknown>" : "unknown";
+        schema.typeName = schema.type === "object" ? "Record<string, unknown>" : "unknown";
         if (usage && usage.includes(SchemaContext.Output)) {
-          schema.outputTypeName =
-            schema.type === "object" ? "Record<string, any>" : "any";
+          schema.outputTypeName = schema.type === "object" ? "Record<string, any>" : "any";
         }
         schema.type = "unknown";
       } else {
         // Handle non-empty anonymous model as inline model
         if (usage && usage.includes(SchemaContext.Output)) {
           schema.outputTypeName = getModelInlineSigniture(schema, {
-            usage: [SchemaContext.Output]
+            usage: [SchemaContext.Output],
           });
         }
         schema.typeName = getModelInlineSigniture(schema, {
           usage: [SchemaContext.Input],
           multipart:
-            options?.isRequestBody &&
-            isMediaTypeMultipartFormData(options?.mediaTypes ?? [])
+            options?.isRequestBody && isMediaTypeMultipartFormData(options?.mediaTypes ?? []),
         });
         schema.type = "object";
       }
@@ -272,23 +251,20 @@ export function getSchemaForType(
     code: "invalid-schema",
     format: {
       type: type.kind,
-      property: options?.relevantProperty?.name ?? ""
+      property: options?.relevantProperty?.name ?? "",
     },
-    target: type
+    target: type,
   });
   return undefined;
 }
-export function getEffectiveModelFromType(
-  context: SdkContext,
-  type: Type
-): Type {
+export function getEffectiveModelFromType(context: SdkContext, type: Type): Type {
   /**
    * If type is an anonymous model, tries to find a named model that has the same
    * set of properties when non-schema properties are excluded.
    */
   if (type.kind === "Model" && type.name === "") {
     const effective = getEffectiveModelType(context.program, type, (property) =>
-      isSchemaProperty(context.program, property)
+      isSchemaProperty(context.program, property),
     );
     if (effective.name) {
       return effective;
@@ -296,10 +272,7 @@ export function getEffectiveModelFromType(
   }
   return type;
 }
-export function includeDerivedModel(
-  model: Model,
-  needRef: boolean = false
-): boolean {
+export function includeDerivedModel(model: Model, needRef: boolean = false): boolean {
   return (
     !needRef &&
     !isTemplateDeclaration(model) &&
@@ -313,7 +286,7 @@ export function includeDerivedModel(
 function applyEncoding(
   dpgContext: SdkContext,
   typespecType: Scalar | ModelProperty,
-  target: any = {}
+  target: any = {},
 ) {
   const encodeData = getEncode(dpgContext.program, typespecType);
   if (encodeData) {
@@ -326,7 +299,7 @@ function applyEncoding(
     newTarget["format"] = mergeFormatAndEncoding(
       newTarget.format,
       encodeData.encoding,
-      newType["format"]
+      newType["format"],
     );
     return newTarget;
   }
@@ -336,7 +309,7 @@ function applyEncoding(
 function mergeFormatAndEncoding(
   format: string | undefined,
   encoding: string | undefined,
-  encodeAsFormat: string | undefined
+  encodeAsFormat: string | undefined,
 ): string | undefined {
   switch (format) {
     case undefined:
@@ -349,22 +322,18 @@ function mergeFormatAndEncoding(
   }
 }
 
-function getSchemaForScalar(
-  dpgContext: SdkContext,
-  scalar: Scalar,
-  options?: GetSchemaOptions
-) {
+function getSchemaForScalar(dpgContext: SdkContext, scalar: Scalar, options?: GetSchemaOptions) {
   let result = {} as any;
   const isStd = dpgContext.program.checker.isStdType(scalar);
   const {
     relevantProperty,
     isRequestBody,
     isParentRequestBody,
-    mediaTypes: contentTypes
+    mediaTypes: contentTypes,
   } = options ?? {};
   if (isStd) {
     result = getSchemaForStdScalar(dpgContext.program, scalar, {
-      relevantProperty
+      relevantProperty,
     });
   } else if (scalar.baseScalar) {
     result = getSchemaForScalar(dpgContext, scalar.baseScalar);
@@ -385,14 +354,9 @@ function getSchemaForScalar(
     const withDecorators = applyEncoding(
       dpgContext,
       scalar,
-      result
-        ? applyIntrinsicDecorators(dpgContext.program, scalar, result)
-        : undefined
+      result ? applyIntrinsicDecorators(dpgContext.program, scalar, result) : undefined,
     );
-    if (
-      withDecorators.type === "string" &&
-      withDecorators.format === "binary"
-    ) {
+    if (withDecorators.type === "string" && withDecorators.format === "binary") {
       withDecorators.typeName = BINARY_TYPE_UNION;
       withDecorators.outputTypeName = "Uint8Array";
     }
@@ -401,9 +365,7 @@ function getSchemaForScalar(
 
   function isBinaryAsRequestBody() {
     return (
-      hasMediaType(KnownMediaType.Binary, contentTypes) &&
-      isRequestBody &&
-      isBytesType(result)
+      hasMediaType(KnownMediaType.Binary, contentTypes) && isRequestBody && isBytesType(result)
     );
   }
 
@@ -416,11 +378,7 @@ function getSchemaForScalar(
   }
 }
 
-function getSchemaForUnion(
-  dpgContext: SdkContext,
-  union: Union,
-  options?: GetSchemaOptions
-) {
+function getSchemaForUnion(dpgContext: SdkContext, union: Union, options?: GetSchemaOptions) {
   const [asEnum, _] = getUnionAsEnum(union);
   const variants = Array.from(union.variants.values());
 
@@ -432,7 +390,7 @@ function getSchemaForUnion(
       for (const [_, member] of asEnum.members.entries()) {
         const memberType = getSchemaForType(dpgContext, member.type, {
           ...options,
-          needRef: options?.needRef ?? false
+          needRef: options?.needRef ?? false,
         });
         values.push(memberType);
         if (memberType.name) {
@@ -444,7 +402,7 @@ function getSchemaForUnion(
         // We already know it's not a model type
         const variantType = getSchemaForType(dpgContext, variant.type, {
           ...options,
-          needRef: isAnonymousModelType(variant.type) ? false : true
+          needRef: isAnonymousModelType(variant.type) ? false : true,
         });
         values.push(variantType);
         if (variantType.typeName) {
@@ -460,26 +418,16 @@ function getSchemaForUnion(
     const unionAlias =
       asEnum?.open && asEnum?.kind && !namedUnionMember
         ? asEnum.kind + (asEnum.nullable ? " | null" : "")
-        : values
-            .map(
-              (item) => `${getTypeName(item, [SchemaContext.Input]) ?? item}`
-            )
-            .join(" | ");
+        : values.map((item) => `${getTypeName(item, [SchemaContext.Input]) ?? item}`).join(" | ");
     const outputUnionAlias =
       asEnum?.open && asEnum?.kind && !namedUnionMember
         ? asEnum.kind + (asEnum.nullable ? " | null" : "")
-        : values
-            .map(
-              (item) => `${getTypeName(item, [SchemaContext.Output]) ?? item}`
-            )
-            .join(" | ");
+        : values.map((item) => `${getTypeName(item, [SchemaContext.Output]) ?? item}`).join(" | ");
     schema.alias = unionAlias;
     schema.outputAlias = outputUnionAlias;
   }
   if (!union.expression) {
-    const unionName = union.name
-      ? normalizeName(union.name, NameType.Interface)
-      : undefined;
+    const unionName = union.name ? normalizeName(union.name, NameType.Interface) : undefined;
     schema.name = unionName;
     schema.type = "object";
     schema.typeName = unionName;
@@ -493,9 +441,7 @@ function getSchemaForUnion(
   } else {
     schema.type = "union";
     schema.typeName = union.name ?? schema.alias;
-    schema.outputTypeName = union.name
-      ? union.name + "Output"
-      : schema.outputAlias;
+    schema.outputTypeName = union.name ? union.name + "Output" : schema.outputAlias;
     delete schema.alias;
     delete schema.outputAlias;
   }
@@ -506,7 +452,7 @@ function getSchemaForUnion(
 function getSchemaForUnionVariant(
   dpgContext: SdkContext,
   variant: UnionVariant,
-  options?: GetSchemaOptions
+  options?: GetSchemaOptions,
 ): Schema {
   return getSchemaForType(dpgContext, variant.type, options);
 }
@@ -546,8 +492,7 @@ function isStringLiteral(type: Type): boolean {
   }
   return (
     type.kind === "String" ||
-    (type.kind === "EnumMember" &&
-      typeof (type.value ?? type.name) === "string") ||
+    (type.kind === "EnumMember" && typeof (type.value ?? type.name) === "string") ||
     (type.kind === "UnionVariant" && type.type.kind === "String")
   );
 }
@@ -572,7 +517,7 @@ function getStringValues(type: Type): string[] {
 function validateDiscriminator(
   program: Program,
   discriminator: Discriminator,
-  derivedModels: readonly Model[]
+  derivedModels: readonly Model[],
 ): boolean {
   const { propertyName } = discriminator;
   const retVals = derivedModels.map((t) => {
@@ -581,20 +526,16 @@ function validateDiscriminator(
       reportDiagnostic(program, {
         code: "discriminator",
         messageId: "missing",
-        target: t
+        target: t,
       });
       return false;
     }
     let retval = true;
-    if (
-      !isOasString(prop.type) &&
-      prop.type.kind !== "EnumMember" &&
-      prop.type.kind !== "Enum"
-    ) {
+    if (!isOasString(prop.type) && prop.type.kind !== "EnumMember" && prop.type.kind !== "Enum") {
       reportDiagnostic(program, {
         code: "discriminator",
         messageId: "type",
-        target: prop
+        target: prop,
       });
       retval = false;
     }
@@ -602,7 +543,7 @@ function validateDiscriminator(
       reportDiagnostic(program, {
         code: "discriminator",
         messageId: "required",
-        target: prop
+        target: prop,
       });
       retval = false;
     }
@@ -618,7 +559,7 @@ function validateDiscriminator(
       reportDiagnostic(program, {
         code: "discriminator-value",
         messageId: "literal",
-        target: prop || t
+        target: prop || t,
       });
     }
     if (prop) {
@@ -631,9 +572,9 @@ function validateDiscriminator(
             format: {
               val: val,
               model1: discriminatorValues.get(val)!,
-              model2: t.name
+              model2: t.name,
             },
-            target: prop
+            target: prop,
           });
           retVals.push(false);
         } else {
@@ -645,17 +586,8 @@ function validateDiscriminator(
   return retVals.every((v) => v);
 }
 
-function getSchemaForModel(
-  dpgContext: SdkContext,
-  model: Model,
-  options?: GetSchemaOptions
-) {
-  const {
-    usage,
-    needRef,
-    isRequestBody,
-    mediaTypes: contentTypes
-  } = options ?? {};
+function getSchemaForModel(dpgContext: SdkContext, model: Model, options?: GetSchemaOptions) {
+  const { usage, needRef, isRequestBody, mediaTypes: contentTypes } = options ?? {};
   if (isArrayModelType(model)) {
     return getSchemaForArrayModel(dpgContext, model, options);
   }
@@ -668,14 +600,10 @@ function getSchemaForModel(
     type: "object",
     isMultipartBody,
     description: getDoc(program, model) ?? "",
-    fromCore: isCoreModel
+    fromCore: isCoreModel,
   };
   // normalized the output name
-  modelSchema.name = normalizeName(
-    modelSchema.name,
-    NameType.Interface,
-    true /** shouldGuard */
-  );
+  modelSchema.name = normalizeName(modelSchema.name, NameType.Interface, true /** shouldGuard */);
 
   if (model.name === "Record" && isRecordModelType(model)) {
     return getSchemaForRecordModel(dpgContext, model, { usage });
@@ -696,20 +624,20 @@ function getSchemaForModel(
   if (derivedModels.length > 0) {
     modelSchema.children = {
       all: [],
-      immediate: []
+      immediate: [],
     };
   }
   for (const child of derivedModels) {
     const childSchema = getSchemaForType(dpgContext, child, {
       usage,
-      needRef: true
+      needRef: true,
     });
     for (const [name, prop] of child.properties) {
       if (name === discriminator?.propertyName) {
         const propSchema = getSchemaForType(dpgContext, prop.type, {
           usage,
           needRef: !isAnonymousModelType(prop.type),
-          relevantProperty: prop
+          relevantProperty: prop,
         });
         childSchema.discriminatorValue = propSchema.type.replace(/"/g, "");
         break;
@@ -735,7 +663,7 @@ function getSchemaForModel(
     modelSchema.discriminator = {
       name: propertyName,
       type: "string",
-      description: `Discriminator property for ${model.name}.`
+      description: `Discriminator property for ${model.name}.`,
     };
     modelSchema.discriminatorValue = propertyName;
     modelSchema.isPolyParent = true;
@@ -748,7 +676,7 @@ function getSchemaForModel(
   if (isRecordModelType(model)) {
     modelSchema.parents = {
       all: [getSchemaForRecordModel(dpgContext, model, { usage })],
-      immediate: [getSchemaForRecordModel(dpgContext, model, { usage })]
+      immediate: [getSchemaForRecordModel(dpgContext, model, { usage })],
     };
   }
   for (const [propName, prop] of model.properties) {
@@ -764,7 +692,7 @@ function getSchemaForModel(
       relevantProperty: prop,
       isParentRequestBody: isRequestBody,
       isRequestBody: false,
-      mediaTypes: contentTypes
+      mediaTypes: contentTypes,
     });
 
     if (propSchema === undefined) {
@@ -773,29 +701,21 @@ function getSchemaForModel(
     if (!prop.optional) {
       propSchema.required = true;
     }
-    const propertyDescription = getFormattedPropertyDoc(
-      program,
-      prop,
-      propSchema
-    );
+    const propertyDescription = getFormattedPropertyDoc(program, prop, propSchema);
     propSchema.usage = usage;
     // Use the description from ModelProperty not derived from Model Type
     propSchema.description = propertyDescription;
     modelSchema.properties[name] = propSchema;
     // if this property is a discriminator property, remove it to keep autorest validation happy
     const { propertyName } = getDiscriminator(program, model) || {};
-    if (
-      propertyName &&
-      name === `"${propertyName}"` &&
-      modelSchema.discriminator
-    ) {
+    if (propertyName && name === `"${propertyName}"` && modelSchema.discriminator) {
       modelSchema.discriminator = {
         ...modelSchema.discriminator,
         ...{
           type: propSchema.typeName ?? propSchema.type,
           typeName: propSchema.typeName,
-          outputTypeName: propSchema.outputTypeName
-        }
+          outputTypeName: propSchema.outputTypeName,
+        },
       };
       continue;
     }
@@ -834,61 +754,43 @@ function getSchemaForModel(
     if (modelSchema.parents === undefined) {
       modelSchema.parents = {
         all: [],
-        immediate: []
+        immediate: [],
       };
     }
     modelSchema.parents.all?.push(
       getSchemaForType(dpgContext, model.baseModel, {
         usage,
-        needRef: true
-      })
+        needRef: true,
+      }),
     );
     modelSchema.parents.immediate?.push(
       getSchemaForType(dpgContext, model.baseModel, {
         usage,
-        needRef: true
-      })
+        needRef: true,
+      }),
     );
   }
   return modelSchema;
 }
 
-function getSdkVisibility(
-  program: Program,
-  type: ModelProperty
-): Visibility[] | undefined {
+function getSdkVisibility(program: Program, type: ModelProperty): Visibility[] | undefined {
   const lifecycle = getLifecycleVisibilityEnum(program);
   const visibility = getVisibilityForClass(program, type, lifecycle);
   if (visibility) {
     const result: Visibility[] = [];
-    if (
-      lifecycle.members.get("Read") &&
-      visibility.has(lifecycle.members.get("Read")!)
-    ) {
+    if (lifecycle.members.get("Read") && visibility.has(lifecycle.members.get("Read")!)) {
       result.push(Visibility.Read);
     }
-    if (
-      lifecycle.members.get("Create") &&
-      visibility.has(lifecycle.members.get("Create")!)
-    ) {
+    if (lifecycle.members.get("Create") && visibility.has(lifecycle.members.get("Create")!)) {
       result.push(Visibility.Create);
     }
-    if (
-      lifecycle.members.get("Update") &&
-      visibility.has(lifecycle.members.get("Update")!)
-    ) {
+    if (lifecycle.members.get("Update") && visibility.has(lifecycle.members.get("Update")!)) {
       result.push(Visibility.Update);
     }
-    if (
-      lifecycle.members.get("Delete") &&
-      visibility.has(lifecycle.members.get("Delete")!)
-    ) {
+    if (lifecycle.members.get("Delete") && visibility.has(lifecycle.members.get("Delete")!)) {
       result.push(Visibility.Delete);
     }
-    if (
-      lifecycle.members.get("Query") &&
-      visibility.has(lifecycle.members.get("Query")!)
-    ) {
+    if (lifecycle.members.get("Query") && visibility.has(lifecycle.members.get("Query")!)) {
       result.push(Visibility.Query);
     }
     return result;
@@ -957,9 +859,7 @@ function getModelName(dpgContext: SdkContext, model: Model) {
     fullNamespacePrefix = "";
   }
   // 5. check if this model should be namespaced
-  return dpgContext.rlcOptions?.enableModelNamespace
-    ? `${fullNamespacePrefix}${name}`
-    : name;
+  return dpgContext.rlcOptions?.enableModelNamespace ? `${fullNamespacePrefix}${name}` : name;
 }
 
 // Map an typespec type to an OA schema. Returns undefined when the resulting
@@ -985,7 +885,7 @@ function getSchemaForLiteral(type: Type): any {
 function applyIntrinsicDecorators(
   program: Program,
   type: Scalar | ModelProperty,
-  target: any
+  target: any,
 ): any {
   const newTarget = { ...target };
   const docStr = getDoc(program, type);
@@ -1056,7 +956,7 @@ function getSchemaForEnum(dpgContext: SdkContext, e: Enum) {
     if (type !== enumMemberType(option)) {
       reportDiagnostic(dpgContext.program, {
         code: "union-unsupported",
-        target: e
+        target: e,
       });
       continue;
     }
@@ -1070,7 +970,7 @@ function getSchemaForEnum(dpgContext: SdkContext, e: Enum) {
     typeName: normalizeName(e.name, NameType.Interface),
     outputTypeName: normalizeName(e.name, NameType.Interface) + "Output",
     description: getDoc(dpgContext.program, e),
-    memberType: type
+    memberType: type,
   };
 
   if (values.length > 0) {
@@ -1094,18 +994,10 @@ function enumMemberType(member: EnumMember) {
 /**
  * Map TypeSpec intrinsic models to open api definitions
  */
-function getSchemaForArrayModel(
-  dpgContext: SdkContext,
-  type: Model,
-  options?: GetSchemaOptions
-) {
+function getSchemaForArrayModel(dpgContext: SdkContext, type: Model, options?: GetSchemaOptions) {
   const { program } = dpgContext;
   const { indexer } = type;
-  const {
-    usage,
-    isParentRequestBody,
-    mediaTypes: contentTypes
-  } = options ?? {};
+  const { usage, isParentRequestBody, mediaTypes: contentTypes } = options ?? {};
   let schema: any = {};
   if (!indexer) {
     return schema;
@@ -1118,15 +1010,12 @@ function getSchemaForArrayModel(
         isRequestBody: false,
         mediaTypes: contentTypes,
         // special handling for array in formdata
-        isParentRequestBody: hasMediaType(
-          KnownMediaType.MultipartFormData,
-          contentTypes
-        )
+        isParentRequestBody: hasMediaType(KnownMediaType.MultipartFormData, contentTypes)
           ? isParentRequestBody
           : false,
-        needRef: !isAnonymousModelType(indexer.value!)
+        needRef: !isAnonymousModelType(indexer.value!),
       }),
-      description: getDoc(program, type)
+      description: getDoc(program, type),
     };
     if (
       !program.checker.isStdType(indexer.value) &&
@@ -1171,11 +1060,7 @@ function getSchemaForArrayModel(
               return `${typeName}[]`;
             })
             .join(" | ");
-          if (
-            schema.items.outputTypeName &&
-            usage &&
-            usage.includes(SchemaContext.Output)
-          ) {
+          if (schema.items.outputTypeName && usage && usage.includes(SchemaContext.Output)) {
             schema.outputTypeName = schema.items.outputTypeName
               .split("|")
               .map((typeName: string) => {
@@ -1195,11 +1080,7 @@ function getSchemaForArrayModel(
   }
 }
 
-function getSchemaForRecordModel(
-  dpgContext: SdkContext,
-  type: Model,
-  options?: GetSchemaOptions
-) {
+function getSchemaForRecordModel(dpgContext: SdkContext, type: Model, options?: GetSchemaOptions) {
   const { program } = dpgContext;
   const { indexer } = type;
   const { usage } = options ?? {};
@@ -1210,12 +1091,12 @@ function getSchemaForRecordModel(
   if (isRecordModelType(type)) {
     const valueType = getSchemaForType(dpgContext, indexer?.value, {
       usage,
-      needRef: !isAnonymousModelType(indexer.value)
+      needRef: !isAnonymousModelType(indexer.value),
     });
     schema = {
       type: "dictionary",
       additionalProperties: valueType,
-      description: getDoc(program, type)
+      description: getDoc(program, type),
     };
     if (
       !program.checker.isStdType(indexer.value) &&
@@ -1229,21 +1110,13 @@ function getSchemaForRecordModel(
         schema.outputValueTypeName = `${valueType.outputTypeName}`;
       }
     } else if (isUnknownType(indexer.value!)) {
-      schema.typeName = `Record<string, ${
-        valueType.typeName ?? valueType.type
-      }>`;
+      schema.typeName = `Record<string, ${valueType.typeName ?? valueType.type}>`;
       if (usage && usage.includes(SchemaContext.Output)) {
-        schema.outputTypeName = `Record<string, ${
-          valueType.outputTypeName ?? valueType.type
-        }>`;
+        schema.outputTypeName = `Record<string, ${valueType.outputTypeName ?? valueType.type}>`;
       }
     } else {
-      schema.typeName = `Record<string, ${getTypeName(valueType, [
-        SchemaContext.Input
-      ])}>`;
-      schema.outputTypeName = `Record<string, ${getTypeName(valueType, [
-        SchemaContext.Output
-      ])}>`;
+      schema.typeName = `Record<string, ${getTypeName(valueType, [SchemaContext.Input])}>`;
+      schema.outputTypeName = `Record<string, ${getTypeName(valueType, [SchemaContext.Output])}>`;
     }
     schema.usage = usage;
     return schema;
@@ -1256,8 +1129,7 @@ function isUnionType(type: Type) {
 
 export function isObjectOrDictType(schema: Schema) {
   return (
-    (schema.type === "object" &&
-      (schema as ObjectSchema).properties !== undefined) ||
+    (schema.type === "object" && (schema as ObjectSchema).properties !== undefined) ||
     schema.type === "dictionary"
   );
 }
@@ -1266,11 +1138,7 @@ export function isArrayType(schema: Schema) {
   return schema.type === "array";
 }
 
-function getSchemaForStdScalar(
-  program: Program,
-  type: Scalar,
-  options?: GetSchemaOptions
-) {
+function getSchemaForStdScalar(program: Program, type: Scalar, options?: GetSchemaOptions) {
   const { relevantProperty } = options ?? {};
   if (!program.checker.isStdType(type)) {
     return undefined;
@@ -1296,97 +1164,97 @@ function getSchemaForStdScalar(
       return { type: "string", format: "bytes", description };
     case "integer":
       return applyIntrinsicDecorators(program, type, {
-        type: "number"
+        type: "number",
       });
     case "int8":
       return applyIntrinsicDecorators(program, type, {
         type: "number",
-        format: "int8"
+        format: "int8",
       });
     case "int16":
       return applyIntrinsicDecorators(program, type, {
         type: "number",
-        format: "int16"
+        format: "int16",
       });
     case "int32":
       return applyIntrinsicDecorators(program, type, {
         type: "number",
-        format: "int32"
+        format: "int32",
       });
     case "int64":
       return applyIntrinsicDecorators(program, type, {
         type: "number",
-        format: "int64"
+        format: "int64",
       });
     case "safeint":
       return applyIntrinsicDecorators(program, type, {
         type: "number",
-        format: "safeint"
+        format: "safeint",
       });
     case "numeric":
       return applyIntrinsicDecorators(program, type, {
-        type: "number"
+        type: "number",
       });
     case "uint8":
       return applyIntrinsicDecorators(program, type, {
         type: "number",
-        format: "uint8"
+        format: "uint8",
       });
     case "uint16":
       return applyIntrinsicDecorators(program, type, {
         type: "number",
-        format: "uint16"
+        format: "uint16",
       });
     case "uint32":
       return applyIntrinsicDecorators(program, type, {
         type: "number",
-        format: "uint32"
+        format: "uint32",
       });
     case "uint64":
       return applyIntrinsicDecorators(program, type, {
         type: "number",
-        format: "uint64"
+        format: "uint64",
       });
     case "float64":
       return applyIntrinsicDecorators(program, type, {
         type: "number",
-        format: "float64"
+        format: "float64",
       });
     case "float32":
       return applyIntrinsicDecorators(program, type, {
         type: "number",
-        format: "float32"
+        format: "float32",
       });
     case "float":
       return applyIntrinsicDecorators(program, type, {
         type: "number",
-        format: "float"
+        format: "float",
       });
     case "decimal":
       reportDiagnostic(program, {
         code: "decimal-to-number",
         format: {
-          propertyName: relevantProperty?.name ?? ""
+          propertyName: relevantProperty?.name ?? "",
         },
-        target: relevantProperty ?? NoTarget
+        target: relevantProperty ?? NoTarget,
       });
       return applyIntrinsicDecorators(program, type, {
         type: "number",
         format: "decimal",
-        description: "decimal"
+        description: "decimal",
       });
     case "decimal128":
       reportDiagnostic(program, {
         code: "decimal-to-number",
         format: {
-          propertyName: relevantProperty?.name ?? ""
+          propertyName: relevantProperty?.name ?? "",
         },
-        target: relevantProperty ?? NoTarget
+        target: relevantProperty ?? NoTarget,
       });
       return applyIntrinsicDecorators(program, type, {
         type: "number",
         format: "decimal128",
-        description: "decimal128"
+        description: "decimal128",
       });
     case "string":
       if (format === "binary") {
@@ -1395,11 +1263,11 @@ function getSchemaForStdScalar(
           format: "binary",
           description,
           typeName: BINARY_TYPE_UNION,
-          outputTypeName: "Uint8Array"
+          outputTypeName: "Uint8Array",
         };
       }
       return applyIntrinsicDecorators(program, type, {
-        type: "string"
+        type: "string",
       });
     case "boolean":
       return { type: "boolean", description };
@@ -1409,7 +1277,7 @@ function getSchemaForStdScalar(
         format,
         description,
         typeName: "string",
-        outputTypeName: "string"
+        outputTypeName: "string",
       };
     case "utcDateTime":
       return {
@@ -1417,7 +1285,7 @@ function getSchemaForStdScalar(
         format,
         description,
         typeName: "Date | string",
-        outputTypeName: "string"
+        outputTypeName: "string",
       };
     case "offsetDateTime":
       return {
@@ -1425,7 +1293,7 @@ function getSchemaForStdScalar(
         format: "date-time",
         description,
         typeName: "string",
-        outputTypeName: "string"
+        outputTypeName: "string",
       };
     case "plainTime":
       return {
@@ -1433,7 +1301,7 @@ function getSchemaForStdScalar(
         format: "time",
         description,
         typeName: "string",
-        outputTypeName: "string"
+        outputTypeName: "string",
       };
     case "duration":
       return { type: "string", format, description };
@@ -1442,23 +1310,12 @@ function getSchemaForStdScalar(
   }
 }
 
-function isEncodeTypeEffective(
-  type: Scalar,
-  encodeData: EncodeData | undefined
-) {
+function isEncodeTypeEffective(type: Scalar, encodeData: EncodeData | undefined) {
   if (!encodeData) {
     return false;
   }
-  const datetimeTypes = [
-    "plaindate",
-    "utcdatetime",
-    "offsetdatetime",
-    "plaintime"
-  ];
-  if (
-    datetimeTypes.includes(type.name.toLowerCase()) &&
-    encodeData.type.name === "string"
-  ) {
+  const datetimeTypes = ["plaindate", "utcdatetime", "offsetdatetime", "plaintime"];
+  if (datetimeTypes.includes(type.name.toLowerCase()) && encodeData.type.name === "string") {
     return false;
   }
   return true;
@@ -1469,18 +1326,13 @@ export function getTypeName(schema: Schema, usage?: SchemaContext[]): string {
   return getPriorityName(schema, usage) ?? schema.type ?? "any";
 }
 
-export function getImportedModelName(
-  schema: Schema,
-  usage?: SchemaContext[]
-): string[] {
+export function getImportedModelName(schema: Schema, usage?: SchemaContext[]): string[] {
   switch (schema.type) {
     case "array": {
       const ret = new Set<string>();
       [(schema as ArraySchema).items]
         .filter((i?: Schema) => !!i)
-        .forEach((i?: Schema) =>
-          getImportedModelName(i!, usage).forEach((it) => ret.add(it))
-        );
+        .forEach((i?: Schema) => getImportedModelName(i!, usage).forEach((it) => ret.add(it)));
       return [...ret];
     }
     case "object": {
@@ -1491,23 +1343,17 @@ export function getImportedModelName(
           if (!properties[name]) {
             continue;
           }
-          getImportedModelName(properties[name]!, usage).forEach((it) =>
-            ret.add(it)
-          );
+          getImportedModelName(properties[name]!, usage).forEach((it) => ret.add(it));
         }
         return [...ret];
       }
-      return getPriorityName(schema, usage)
-        ? [getPriorityName(schema, usage)]
-        : [];
+      return getPriorityName(schema, usage) ? [getPriorityName(schema, usage)] : [];
     }
     case "dictionary": {
       const ret = new Set<string>();
       [(schema as DictionarySchema).additionalProperties]
         .filter((i?: Schema) => !!i)
-        .forEach((i?: Schema) =>
-          getImportedModelName(i!, usage).forEach((it) => ret.add(it))
-        );
+        .forEach((i?: Schema) => getImportedModelName(i!, usage).forEach((it) => ret.add(it)));
 
       return [...ret];
     }
@@ -1515,9 +1361,7 @@ export function getImportedModelName(
       const ret = new Set<string>();
       ((schema as Schema).enum ?? [])
         .filter((i?: Schema) => !!i)
-        .forEach((i?: Schema) =>
-          getImportedModelName(i!, usage).forEach((it) => ret.add(it))
-        );
+        .forEach((i?: Schema) => getImportedModelName(i!, usage).forEach((it) => ret.add(it)));
 
       return [...ret];
     }
@@ -1527,9 +1371,7 @@ export function getImportedModelName(
 }
 
 function getPriorityName(schema: Schema, usage?: SchemaContext[]): string {
-  return usage &&
-    usage.includes(SchemaContext.Input) &&
-    !usage.includes(SchemaContext.Output)
+  return usage && usage.includes(SchemaContext.Input) && !usage.includes(SchemaContext.Output)
     ? (schema.typeName ?? schema.name)
     : (schema.outputTypeName ?? schema.typeName ?? schema.name);
 }
@@ -1562,10 +1404,7 @@ function getBinaryDescription(type: any) {
 }
 
 function getDecimalDescription(type: any) {
-  if (
-    (type.format === "decimal" || type.format === "decimal128") &&
-    type.type === "number"
-  ) {
+  if ((type.format === "decimal" || type.format === "decimal128") && type.type === "number") {
     return `NOTE: This property is represented as a 'number' in JavaScript, but it corresponds to a 'decimal' type in other languages.
 Due to the inherent limitations of floating-point arithmetic in JavaScript, precision issues may arise when performing arithmetic operations.
 If your application requires high precision for arithmetic operations or when round-tripping data back to other languages, consider using a library like decimal.js, which provides an arbitrary-precision Decimal type.
@@ -1580,7 +1419,7 @@ export function getFormattedPropertyDoc(
   program: Program,
   type: ModelProperty | Type,
   schemaType: any,
-  sperator: string = "\n\n"
+  sperator: string = "\n\n",
 ) {
   const propertyDoc = getDoc(program, type);
   const enhancedDocFromType =
@@ -1599,7 +1438,7 @@ export function getBodyType(route: HttpOperation): Type | undefined {
 }
 
 export function getValueTypeValue(
-  value: Value
+  value: Value,
 ): string | boolean | null | number | Array<unknown> | object | undefined {
   switch (value.valueKind) {
     case "ArrayValue":
@@ -1616,8 +1455,8 @@ export function getValueTypeValue(
       return Object.fromEntries(
         [...value.properties.keys()].map((x) => [
           x,
-          getValueTypeValue(value.properties.get(x)!.value)
-        ])
+          getValueTypeValue(value.properties.get(x)!.value),
+        ]),
       );
     default:
       // TODO: handle scalar value
@@ -1634,25 +1473,20 @@ export function getValueTypeValue(
  * @param param The param to predict
  * @returns
  */
-export function predictDefaultValue(
-  dpgContext: SdkContext,
-  param?: ModelProperty
-) {
+export function predictDefaultValue(dpgContext: SdkContext, param?: ModelProperty) {
   if (!param) {
     return;
   }
   const program = dpgContext.program;
-  const specificDefault = param.defaultValue
-    ? getValueTypeValue(param.defaultValue)
-    : undefined;
+  const specificDefault = param.defaultValue ? getValueTypeValue(param.defaultValue) : undefined;
   if (specificDefault) {
     if (typeof specificDefault === "object") {
       reportDiagnostic(program, {
         code: "default-value-object",
         format: {
-          propertyName: param.name
+          propertyName: param.name,
         },
-        target: param
+        target: param,
       });
       return specificDefault.toString();
     }
@@ -1660,7 +1494,7 @@ export function predictDefaultValue(
   }
   const serviceNamespace = getDefaultService(
     program,
-    dpgContext.rlcOptions?.isModularLibrary
+    dpgContext.rlcOptions?.isModularLibrary,
   )?.type;
   if (!serviceNamespace) {
     return;
@@ -1674,19 +1508,19 @@ export function predictDefaultValue(
 
 export function getDefaultService(
   program: Program,
-  isModularLibrary: boolean = true
+  isModularLibrary: boolean = true,
 ): Service | undefined {
   const services = listServices(program);
   if (!services || services.length === 0) {
     reportDiagnostic(program, {
       code: "no-service-defined",
-      target: NoTarget
+      target: NoTarget,
     });
   }
   if (services.length > 1 && !isModularLibrary) {
     reportDiagnostic(program, {
       code: "more-than-one-service",
-      target: NoTarget
+      target: NoTarget,
     });
   }
   return services[0];
@@ -1694,16 +1528,11 @@ export function getDefaultService(
 /**
  * Return the default api version from the program; undefined if no default
  */
-export function getDefaultApiVersionString(
-  dpgContext: SdkContext
-): string | undefined {
+export function getDefaultApiVersionString(dpgContext: SdkContext): string | undefined {
   const program = dpgContext.program;
   const isModularLibrary = dpgContext.rlcOptions?.isModularLibrary;
   return getDefaultService(program, isModularLibrary)
-    ? getDefaultApiVersion(
-        dpgContext,
-        getDefaultService(program, isModularLibrary)!.type
-      )?.value
+    ? getDefaultApiVersion(dpgContext, getDefaultService(program, isModularLibrary)!.type)?.value
     : undefined;
 }
 
@@ -1727,29 +1556,17 @@ export function isAzureCoreErrorType(program: Program, t?: Type): boolean {
     return false;
   }
   const effective = getEffectiveSchemaType(program, t);
-  if (
-    !["error", "errorresponse", "innererror"].includes(
-      effective.name.toLowerCase()
-    )
-  ) {
+  if (!["error", "errorresponse", "innererror"].includes(effective.name.toLowerCase())) {
     return false;
   }
   return isAzureCoreFoundationsNamespace(effective);
 }
 
-function isAzureCoreFoundationsNamespace(
-  t?: Type,
-  skipFoundation: boolean = false
-): boolean {
-  const namespaces = (
-    skipFoundation ? ".Azure.Core" : ".Azure.Core.Foundations"
-  ).split(".");
+function isAzureCoreFoundationsNamespace(t?: Type, skipFoundation: boolean = false): boolean {
+  const namespaces = (skipFoundation ? ".Azure.Core" : ".Azure.Core.Foundations").split(".");
   while (
     namespaces.length > 0 &&
-    (t?.kind === "Model" ||
-      t?.kind === "Enum" ||
-      t?.kind === "Union" ||
-      t?.kind === "Namespace") &&
+    (t?.kind === "Model" || t?.kind === "Enum" || t?.kind === "Union" || t?.kind === "Namespace") &&
     t.namespace?.name === namespaces.pop()
   ) {
     t = t.namespace;
@@ -1782,14 +1599,10 @@ export function getModelInlineSigniture(
     importedModels?: Set<string>;
     usage?: SchemaContext[];
     multipart?: boolean;
-  } = {}
+  } = {},
 ) {
   if (options.multipart) {
-    return getMultipartInlineSignature(
-      schema,
-      options.importedModels,
-      options.usage
-    );
+    return getMultipartInlineSignature(schema, options.importedModels, options.usage);
   }
 
   let schemaSignature = `{`;
@@ -1802,10 +1615,7 @@ export function getModelInlineSigniture(
     if (options.importedModels) {
       const importNames = getImportedModelName(propType);
       if (importNames) {
-        importNames!.forEach(
-          options.importedModels.add,
-          options.importedModels
-        );
+        importNames!.forEach(options.importedModels.add, options.importedModels);
       }
     }
     const isOptional = propType.required ? "" : "?";
@@ -1819,7 +1629,7 @@ export function getModelInlineSigniture(
 function getMultipartInlineSignature(
   schema: ObjectSchema,
   importedModels?: Set<string>,
-  usage?: SchemaContext[]
+  usage?: SchemaContext[],
 ): string {
   const types = Object.entries(schema.properties ?? {})
     .map(([propertyName, property]) => {
@@ -1864,30 +1674,16 @@ function getMultipartInlineSignature(
  * Headers, parameters, status codes are not schema properties even they are
  * represented as properties in typespec.
  */
-export function isSchemaProperty(
-  program: Program,
-  property: ModelProperty
-): boolean {
+export function isSchemaProperty(program: Program, property: ModelProperty): boolean {
   const headerInfo = getHeaderFieldName(program, property);
   const queryInfo = getQueryParamName(program, property);
   const pathInfo = getPathParamName(program, property);
   const statusCodeInfo = isStatusCode(program, property);
-  const isNonVisibility = getSdkVisibility(program, property)?.includes(
-    Visibility.None
-  );
-  return !(
-    headerInfo ||
-    queryInfo ||
-    pathInfo ||
-    statusCodeInfo ||
-    isNonVisibility
-  );
+  const isNonVisibility = getSdkVisibility(program, property)?.includes(Visibility.None);
+  return !(headerInfo || queryInfo || pathInfo || statusCodeInfo || isNonVisibility);
 }
 
-export function getEffectiveSchemaType(
-  program: Program,
-  type: Model | Union
-): Model {
+export function getEffectiveSchemaType(program: Program, type: Model | Union): Model {
   // If type is an anonymous model, tries to find a named model that has the same properties
   let effective: Model | undefined = undefined;
   if (type.kind === "Union") {
@@ -1904,7 +1700,7 @@ export function getEffectiveSchemaType(
     return type as any;
   } else if (type.name === "") {
     effective = getEffectiveModelType(program, type, (property) =>
-      isSchemaProperty(program, property)
+      isSchemaProperty(program, property),
     );
   }
 
@@ -1915,17 +1711,12 @@ export function getEffectiveSchemaType(
 }
 
 export function isBodyRequired(parameter: HttpOperationParameters) {
-  return parameter.body?.type && parameter.body?.property?.optional !== true
-    ? true
-    : false;
+  return parameter.body?.type && parameter.body?.property?.optional !== true ? true : false;
 }
 
 export function getCollectionFormat(
   context: SdkContext,
-  param:
-    | HttpOperationPathParameter
-    | HttpOperationQueryParameter
-    | HttpOperationHeaderParameter
+  param: HttpOperationPathParameter | HttpOperationQueryParameter | HttpOperationHeaderParameter,
 ): string | undefined {
   const type = param.param;
   const encode = getEncode(context.program, param.param);

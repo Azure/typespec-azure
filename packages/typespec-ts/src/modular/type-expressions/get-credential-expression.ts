@@ -1,6 +1,6 @@
 import { SdkCredentialType } from "@azure-tools/typespec-client-generator-core";
-import { resolveReference } from "../../framework/reference.js";
 import { useDependencies } from "../../framework/hooks/useDependencies.js";
+import { resolveReference } from "../../framework/reference.js";
 
 export function getCredentialExpression(type: SdkCredentialType): string {
   const dependencies = useDependencies();

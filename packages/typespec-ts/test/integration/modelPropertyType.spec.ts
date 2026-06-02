@@ -1,9 +1,9 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
-import TypePropertyValueTypesClientFactory, {
-  ValueTypesClient
-} from "./generated/type/property/value-types/src/index.js";
 import { matrix } from "../util/matrix.js";
+import TypePropertyValueTypesClientFactory, {
+  ValueTypesClient,
+} from "./generated/type/property/value-types/src/index.js";
 
 interface TypeDetail {
   type: string;
@@ -14,136 +14,134 @@ interface TypeDetail {
 const testedTypes: TypeDetail[] = [
   {
     type: "boolean",
-    defaultValue: true
+    defaultValue: true,
   },
   {
     type: "string",
-    defaultValue: "hello"
+    defaultValue: "hello",
   },
   {
     type: "bytes",
-    defaultValue: "aGVsbG8sIHdvcmxkIQ=="
+    defaultValue: "aGVsbG8sIHdvcmxkIQ==",
   },
   {
     type: "int",
-    defaultValue: 42
+    defaultValue: 42,
   },
   {
     type: "float",
-    defaultValue: 43.125
+    defaultValue: 43.125,
   },
   {
     type: "decimal",
-    defaultValue: 0.33333
+    defaultValue: 0.33333,
   },
   {
     type: "decimal128",
-    defaultValue: 0.33333
+    defaultValue: 0.33333,
   },
   {
     type: "datetime",
     defaultValue: "2022-08-26T18:38:00Z",
-    convertedToFn: (value: string) => new Date(value).toISOString()
+    convertedToFn: (value: string) => new Date(value).toISOString(),
   },
   {
     type: "duration",
-    defaultValue: "P123DT22H14M12.011S"
+    defaultValue: "P123DT22H14M12.011S",
   },
   {
     type: "enum",
-    defaultValue: "ValueOne"
+    defaultValue: "ValueOne",
   },
   {
     type: "extensible-enum",
-    defaultValue: "UnknownValue"
+    defaultValue: "UnknownValue",
   },
   {
     type: "model",
-    defaultValue: { property: "hello" }
+    defaultValue: { property: "hello" },
   },
   {
     type: "collections/string",
-    defaultValue: ["hello", "world"]
+    defaultValue: ["hello", "world"],
   },
   {
     type: "collections/int",
-    defaultValue: [1, 2]
+    defaultValue: [1, 2],
   },
   {
     type: "collections/model",
-    defaultValue: [{ property: "hello" }, { property: "world" }]
+    defaultValue: [{ property: "hello" }, { property: "world" }],
   },
   {
     type: "dictionary/string",
-    defaultValue: { k1: "hello", k2: "world" }
+    defaultValue: { k1: "hello", k2: "world" },
   },
   {
     type: "never",
-    defaultValue: undefined
+    defaultValue: undefined,
   },
   {
     type: "unknown/string",
-    defaultValue: "hello"
+    defaultValue: "hello",
   },
   {
     type: "unknown/int",
-    defaultValue: 42
+    defaultValue: 42,
   },
   {
     type: "unknown/dict",
-    defaultValue: { k1: "hello", k2: 42 }
+    defaultValue: { k1: "hello", k2: 42 },
   },
   {
     type: "unknown/array",
-    defaultValue: ["hello", "world"]
+    defaultValue: ["hello", "world"],
   },
   {
     type: "string/literal",
-    defaultValue: "hello"
+    defaultValue: "hello",
   },
   {
     type: "int/literal",
-    defaultValue: 42
+    defaultValue: 42,
   },
   {
     type: "float/literal",
-    defaultValue: 43.125
+    defaultValue: 43.125,
   },
   {
     type: "boolean/literal",
-    defaultValue: true
+    defaultValue: true,
   },
   {
     type: "union/string/literal",
-    defaultValue: "world"
+    defaultValue: "world",
   },
   {
     type: "union/int/literal",
-    defaultValue: 42
+    defaultValue: 42,
   },
   {
     type: "union/float/literal",
-    defaultValue: 46.875
+    defaultValue: 46.875,
   },
   {
     type: "union-enum-value",
-    defaultValue: "value2"
-  }
+    defaultValue: "value2",
+  },
 ];
 describe("ModelsPropertyTypesClient Rest Client", () => {
   let client: ValueTypesClient;
 
   beforeEach(() => {
     client = TypePropertyValueTypesClientFactory({
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
   matrix([testedTypes], async (params: TypeDetail) => {
     it(`should get a ${params.type} value`, async () => {
-      const result = await client
-        .path(`/type/property/value-types/${params.type}` as any)
-        .get();
+      const result = await client.path(`/type/property/value-types/${params.type}` as any).get();
       assert.strictEqual(result.status, "200");
       assert.deepEqual(result.body.property, params.defaultValue);
     });
@@ -155,13 +153,11 @@ describe("ModelsPropertyTypesClient Rest Client", () => {
       } else {
         property = params.defaultValue;
       }
-      const result = await client
-        .path(`/type/property/value-types/${params.type}` as any)
-        .put({
-          body: {
-            property
-          }
-        });
+      const result = await client.path(`/type/property/value-types/${params.type}` as any).put({
+        body: {
+          property,
+        },
+      });
       assert.strictEqual(result.status, "204");
     });
   });

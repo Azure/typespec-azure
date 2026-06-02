@@ -1,12 +1,12 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import TypeModelUsageClientFactory, {
-  UsageClient
+  UsageClient,
 } from "./generated/type/model/usage/src/index.js";
 describe("ModelsUsageClient Rest Client", () => {
   let client: UsageClient;
   const body = {
-    requiredProp: "example-value"
+    requiredProp: "example-value",
   };
 
   beforeEach(() => {
@@ -15,7 +15,7 @@ describe("ModelsUsageClient Rest Client", () => {
 
   it("should post input model correctly", async () => {
     const result = await client.path("/type/model/usage/input").post({
-      body
+      body,
     });
     assert.strictEqual(result.status, "204");
   });
@@ -27,9 +27,7 @@ describe("ModelsUsageClient Rest Client", () => {
   });
 
   it("should get output model correctly", async () => {
-    const result = await client
-      .path("/type/model/usage/input-output")
-      .post({ body });
+    const result = await client.path("/type/model/usage/input-output").post({ body });
     assert.strictEqual(result.status, "200");
     assert.deepEqual(result.body, body);
   });

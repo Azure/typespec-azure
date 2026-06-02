@@ -10,6 +10,7 @@ This is tsp definition.
 @doc("This is a simple model.")
 model BodyParameter {
   name: string;
+
   @doc("This is a readonly optional property.")
   @visibility(Lifecycle.Read)
   sku?: Sku;
@@ -34,7 +35,9 @@ model CompositeRequest {
 }
 
 @doc("show example demo")
-op read(...CompositeRequest): { @body body: {}};
+op read(...CompositeRequest): {
+  @body body: {};
+};
 ```
 
 ## Example
@@ -112,14 +115,12 @@ export function _readSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context
-    .path(path)
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: bodyParameterSerializer(widget),
-    });
+  return context.path(path).post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: bodyParameterSerializer(widget),
+  });
 }
 
 export async function _readDeserialize(

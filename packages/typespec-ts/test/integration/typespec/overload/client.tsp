@@ -31,7 +31,6 @@ interface OverloadClient {
   /**
    * Overload with different routes
    */
-
   upload is OveralodOperations.upload;
 
   @overload(OverloadClient.upload)
@@ -42,13 +41,13 @@ interface OverloadClient {
   uploadBytes(
     @body
     data: bytes,
-    @header contentType: "application/octet-stream"
+
+    @header contentType: "application/octet-stream",
   ): void;
 
   /**
    * Overloads with different actions
    */
-
   process is OveralodOperations.process;
 
   @overload(OverloadClient.process)
@@ -56,8 +55,5 @@ interface OverloadClient {
   processString(data: string, @header contentType: "text/plain"): void;
 
   @overload(OverloadClient.process)
-  processBytes(
-    data: bytes,
-    @header contentType: "application/octet-stream"
-  ): void;
+  processBytes(data: bytes, @header contentType: "application/octet-stream"): void;
 }

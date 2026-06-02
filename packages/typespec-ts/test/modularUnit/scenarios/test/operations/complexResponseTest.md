@@ -21,9 +21,7 @@ using Azure.ResourceManager;
 
 /** Microsoft.Contoso Resource Provider management API. */
 @armProviderNamespace
-@service(#{
-  title: "Microsoft.Contoso management service",
-})
+@service(#{ title: "Microsoft.Contoso management service" })
 @versioned(Microsoft.Contoso.Versions)
 namespace Microsoft.Contoso;
 
@@ -45,10 +43,13 @@ model Employee is TrackedResource<EmployeeProperties> {
 model EmployeeProperties {
   /** Department information */
   department?: DepartmentInfo;
+
   /** Skills array */
   skills?: string[];
+
   /** Projects map */
   projects?: Record<ProjectDetails>;
+
   /** Active status */
   isActive?: boolean;
 }
@@ -57,8 +58,10 @@ model EmployeeProperties {
 model DepartmentInfo {
   /** Department name */
   name?: string;
+
   /** Manager info */
   manager?: ManagerInfo;
+
   /** Budget */
   budget?: int32;
 }
@@ -67,6 +70,7 @@ model DepartmentInfo {
 model ManagerInfo {
   /** Manager name */
   name?: string;
+
   /** Manager email */
   email?: string;
 }
@@ -75,6 +79,7 @@ model ManagerInfo {
 model ProjectDetails {
   /** Project name */
   title?: string;
+
   /** Project status */
   status?: string;
 }
@@ -122,7 +127,7 @@ Raw json files.
               "status": "active"
             },
             "project2": {
-              "title": "API Modernization", 
+              "title": "API Modernization",
               "status": "completed"
             }
           },

@@ -32,33 +32,28 @@ export function getPackageCommonInfo(config: PackageCommonInfoConfig) {
     version,
     description,
     engines: {
-      node: ">=20.0.0"
+      node: ">=20.0.0",
     },
     sideEffects: false,
     autoPublish: false,
-    ...getEntryPointInformation(config)
+    ...getEntryPointInformation(config),
   };
 }
 
 export const commonPackageDependencies = {
-  tslib: "^2.6.2"
+  tslib: "^2.6.2",
 };
 
-export function getCommonPackageDevDependencies(
-  config: PackageCommonInfoConfig
-) {
+export function getCommonPackageDevDependencies(config: PackageCommonInfoConfig) {
   return {
     "@types/node": "^20.0.0",
     eslint: "^9.9.0",
     typescript: "~5.8.2",
-    ...getEsmDevDependencies(config)
+    ...getEsmDevDependencies(config),
   };
 }
 
-function getEsmDevDependencies({
-  moduleKind,
-  azureSdkForJs
-}: PackageCommonInfoConfig) {
+function getEsmDevDependencies({ moduleKind, azureSdkForJs }: PackageCommonInfoConfig) {
   if (moduleKind !== "esm") {
     return {};
   }
@@ -67,14 +62,14 @@ function getEsmDevDependencies({
     return {};
   }
   return {
-    tshy: "^2.0.0"
+    tshy: "^2.0.0",
   };
 }
 
 function getEntryPointInformation(config: PackageCommonInfoConfig) {
   return {
     ...getCjsEntrypointInformation(config),
-    ...getEsmEntrypointInformation(config)
+    ...getEsmEntrypointInformation(config),
   };
 }
 
@@ -83,7 +78,7 @@ function getCjsEntrypointInformation({
   nameWithoutScope,
   moduleKind,
   withTests,
-  withSamples
+  withSamples,
 }: PackageCommonInfoConfig) {
   if (moduleKind !== "cjs") {
     return;
@@ -96,11 +91,8 @@ function getCjsEntrypointInformation({
   const main = withTests || withSamples ? "dist/src/index.js" : "dist/index.js";
   return {
     main,
-    module:
-      withTests || withSamples
-        ? "./dist-esm/src/index.js"
-        : "./dist-esm/index.js",
-    types
+    module: withTests || withSamples ? "./dist-esm/src/index.js" : "./dist-esm/index.js",
+    types,
   };
 }
 
@@ -120,29 +112,22 @@ function getEsmEntrypointInformation(config: PackageCommonInfoConfig) {
       imports: {
         "#platform/*": {
           browser: "./src/*-browser.mts",
-          default: "./src/*.ts"
-        } as Record<string, string>
+          default: "./src/*.ts",
+        } as Record<string, string>,
       },
-      exports: resolveWarpExports(
-        config.exports,
-        config.generateReactNativeTarget
-      )
+      exports: resolveWarpExports(config.exports, config.generateReactNativeTarget),
     };
 
     if (config.generateReactNativeTarget) {
       result["react-native"] = "./dist/react-native/index.js";
-      (result["imports"]["#platform/*"] as Record<string, string>)[
-        "react-native"
-      ] = "./src/*-react-native.mts";
+      (result["imports"]["#platform/*"] as Record<string, string>)["react-native"] =
+        "./src/*-react-native.mts";
       // Reorder so react-native comes before default
-      const importsEntry = result["imports"]["#platform/*"] as Record<
-        string,
-        string
-      >;
+      const importsEntry = result["imports"]["#platform/*"] as Record<string, string>;
       result["imports"]["#platform/*"] = {
         browser: importsEntry["browser"],
         "react-native": importsEntry["react-native"],
-        default: importsEntry["default"]
+        default: importsEntry["default"],
       };
     }
 
@@ -154,7 +139,7 @@ function getEsmEntrypointInformation(config: PackageCommonInfoConfig) {
   const result: Record<string, any> = {
     tshy: getTshyConfig(config),
     type: "module",
-    browser: "./dist/browser/index.js"
+    browser: "./dist/browser/index.js",
   };
 
   if (config.generateReactNativeTarget) {
@@ -171,13 +156,13 @@ function getEsmEntrypointInformation(config: PackageCommonInfoConfig) {
  */
 export function resolveWarpExports(
   sourceExports?: Record<string, any>,
-  includeReactNative?: boolean
+  includeReactNative?: boolean,
 ): Record<string, any> {
   const exports: Record<string, any> = {};
   const allExports: Record<string, string> = {
     "./package.json": "./package.json",
     ".": "./src/index.ts",
-    ...sourceExports
+    ...sourceExports,
   };
 
   for (const [subpath, sourcePath] of Object.entries(allExports)) {
@@ -193,25 +178,25 @@ export function resolveWarpExports(
     const exportEntry: Record<string, any> = {
       browser: {
         types: `./dist/browser/${relPath}.d.ts`,
-        default: `./dist/browser/${relPath}.js`
-      }
+        default: `./dist/browser/${relPath}.js`,
+      },
     };
 
     if (includeReactNative) {
       exportEntry["react-native"] = {
         types: `./dist/react-native/${relPath}.d.ts`,
-        default: `./dist/react-native/${relPath}.js`
+        default: `./dist/react-native/${relPath}.js`,
       };
     }
 
     exportEntry["import"] = {
       types: `./dist/esm/${relPath}.d.ts`,
-      default: `./dist/esm/${relPath}.js`
+      default: `./dist/esm/${relPath}.js`,
     };
 
     exportEntry["require"] = {
       types: `./dist/commonjs/${relPath}.d.ts`,
-      default: `./dist/commonjs/${relPath}.js`
+      default: `./dist/commonjs/${relPath}.js`,
     };
 
     exports[subpath] = exportEntry;
@@ -222,18 +207,16 @@ export function resolveWarpExports(
 
 export function getTshyConfig(config: PackageCommonInfoConfig) {
   const { exports = {} } = config;
-  const esmDialects = config.generateReactNativeTarget
-    ? ["browser", "react-native"]
-    : ["browser"];
+  const esmDialects = config.generateReactNativeTarget ? ["browser", "react-native"] : ["browser"];
   const tshyConfig: Record<string, any> = {
     exports: {
       "./package.json": "./package.json",
       ".": "./src/index.ts",
-      ...exports
+      ...exports,
     },
     dialects: ["esm", "commonjs"],
     esmDialects,
-    selfLink: false
+    selfLink: false,
   };
   if (config.azureSdkForJs) {
     tshyConfig["project"] = "../../../tsconfig.src.build.json";
@@ -243,13 +226,10 @@ export function getTshyConfig(config: PackageCommonInfoConfig) {
 
 export function getCommonPackageScripts() {
   return {
-    clean:
-      "rimraf --glob dist dist-browser dist-esm test-dist temp types *.tgz *.log",
-    "extract-api":
-      "rimraf review && mkdirp ./review && api-extractor run --local",
+    clean: "rimraf --glob dist dist-browser dist-esm test-dist temp types *.tgz *.log",
+    "extract-api": "rimraf review && mkdirp ./review && api-extractor run --local",
     pack: "npm pack 2>&1",
     lint: "eslint package.json api-extractor.json src",
-    "lint:fix":
-      "eslint package.json api-extractor.json src --fix --fix-type [problem,suggestion]"
+    "lint:fix": "eslint package.json api-extractor.json src --fix --fix-type [problem,suggestion]",
   };
 }

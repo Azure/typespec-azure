@@ -22,7 +22,7 @@ export enum NameType {
   Operation,
   OperationGroup,
   Method,
-  EnumMemberName
+  EnumMemberName,
 }
 
 const Newable = [NameType.Class, NameType.Interface, NameType.OperationGroup];
@@ -47,7 +47,7 @@ export const ReservedModelNames: ReservedName[] = [
   { name: "default", reservedFor: [NameType.Parameter, NameType.Method] },
   {
     name: "delete",
-    reservedFor: [NameType.Parameter, NameType.Operation, NameType.Method]
+    reservedFor: [NameType.Parameter, NameType.Operation, NameType.Method],
   },
   { name: "do", reservedFor: [NameType.Parameter, NameType.Method] },
   { name: "else", reservedFor: [NameType.Parameter, NameType.Method] },
@@ -55,7 +55,7 @@ export const ReservedModelNames: ReservedName[] = [
   { name: "error", reservedFor: [NameType.Parameter, ...Newable] },
   {
     name: "export",
-    reservedFor: [NameType.Parameter, NameType.Operation, NameType.Method]
+    reservedFor: [NameType.Parameter, NameType.Operation, NameType.Method],
   },
   { name: "extends", reservedFor: [NameType.Parameter, NameType.Method] },
   { name: "false", reservedFor: [NameType.Parameter, NameType.Method] },
@@ -64,7 +64,7 @@ export const ReservedModelNames: ReservedName[] = [
   { name: "from", reservedFor: [NameType.Parameter] },
   {
     name: "function",
-    reservedFor: [NameType.Parameter, ...Newable, NameType.Method]
+    reservedFor: [NameType.Parameter, ...Newable, NameType.Method],
   },
   { name: "get", reservedFor: [NameType.Parameter] },
   { name: "if", reservedFor: [NameType.Parameter, NameType.Method] },
@@ -84,7 +84,7 @@ export const ReservedModelNames: ReservedName[] = [
   { name: "protected", reservedFor: [NameType.Parameter] },
   {
     name: "public",
-    reservedFor: [NameType.Parameter, NameType.Operation, NameType.Method]
+    reservedFor: [NameType.Parameter, NameType.Operation, NameType.Method],
   },
   { name: "requestoptions", reservedFor: [NameType.Parameter] },
   { name: "require", reservedFor: [NameType.Parameter, NameType.Method] },
@@ -111,18 +111,18 @@ export const ReservedModelNames: ReservedName[] = [
   // reserve client for codegen
   { name: "client", reservedFor: [NameType.Parameter] },
   { name: "endpoint", reservedFor: [NameType.Parameter] },
-  { name: "apiVersion", reservedFor: [NameType.Parameter] }
+  { name: "apiVersion", reservedFor: [NameType.Parameter] },
 ];
 
 export enum CasingConvention {
   Pascal,
-  Camel
+  Camel,
 }
 
 export function guardReservedNames(
   name: string,
   nameType: NameType,
-  customReservedNames: ReservedName[] = []
+  customReservedNames: ReservedName[] = [],
 ): string {
   const [prefix, suffix] = getAffix(nameType);
   return [...ReservedModelNames, ...customReservedNames]
@@ -158,12 +158,12 @@ export function normalizeName(
   shouldGuard?: boolean,
   customReservedNames?: ReservedName[],
   casingOverride?: CasingConvention,
-  oriName?: string
+  oriName?: string,
 ): string;
 export function normalizeName(
   name: string,
   nameType: NameType,
-  options?: NormalizeNameOption
+  options?: NormalizeNameOption,
 ): string;
 export function normalizeName(
   name: string,
@@ -171,7 +171,7 @@ export function normalizeName(
   optionsOrShouldGuard?: NormalizeNameOption | boolean,
   optionalCustomReservedNames?: ReservedName[],
   optionalCasingOverride?: CasingConvention,
-  oriName?: string
+  oriName?: string,
 ): string {
   let shouldGuard: boolean | undefined,
     customReservedNames: ReservedName[],
@@ -208,11 +208,7 @@ export function normalizeName(
   return fixLeadingNumber(result, nameType, numberPrefixOverride);
 }
 
-export function fixLeadingNumber(
-  name: string,
-  nameType: NameType,
-  prefix: string = "_"
-): string {
+export function fixLeadingNumber(name: string, nameType: NameType, prefix: string = "_"): string {
   const casingConvention = getCasingConvention(nameType);
   if (!name || !name.match(/^[-.]?\d/)) {
     return name;
@@ -220,16 +216,10 @@ export function fixLeadingNumber(
   return `${toCasing(prefix, casingConvention)}${name}`;
 }
 
-function isFullyUpperCase(
-  identifier: string,
-  maxUppercasePreserve: number = 3
-) {
+function isFullyUpperCase(identifier: string, maxUppercasePreserve: number = 3) {
   const len = identifier.length;
   if (len > 1) {
-    if (
-      len <= maxUppercasePreserve &&
-      identifier === identifier.toUpperCase()
-    ) {
+    if (len <= maxUppercasePreserve && identifier === identifier.toUpperCase()) {
       return true;
     }
 
@@ -283,19 +273,11 @@ function getCasingConvention(nameType: NameType) {
   }
 }
 
-function toCasing(
-  str: string,
-  casing: CasingConvention,
-  keepConsistent = false
-): string {
+function toCasing(str: string, casing: CasingConvention, keepConsistent = false): string {
   const firstChar =
-    casing === CasingConvention.Pascal
-      ? str.charAt(0).toUpperCase()
-      : str.charAt(0).toLowerCase();
+    casing === CasingConvention.Pascal ? str.charAt(0).toUpperCase() : str.charAt(0).toLowerCase();
   const allLowerCases =
-    casing !== CasingConvention.Pascal &&
-    keepConsistent &&
-    str.toUpperCase() === str;
+    casing !== CasingConvention.Pascal && keepConsistent && str.toUpperCase() === str;
   return allLowerCases ? str.toLowerCase() : `${firstChar}${str.substring(1)}`;
 }
 
@@ -303,14 +285,9 @@ export function pascalCase(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export function camelCase(
-  str: string,
-  options: { uppercaseThreshold?: number } = {}
-) {
+export function camelCase(str: string, options: { uppercaseThreshold?: number } = {}) {
   const { uppercaseThreshold = 4 } = options;
-  const thresholdRegex = new RegExp(
-    `^(?<![A-Z])[A-Z]{1,${uppercaseThreshold}}(?![A-Z])`
-  );
+  const thresholdRegex = new RegExp(`^(?<![A-Z])[A-Z]{1,${uppercaseThreshold}}(?![A-Z])`);
   if (!thresholdRegex.test(str)) {
     return str;
   }

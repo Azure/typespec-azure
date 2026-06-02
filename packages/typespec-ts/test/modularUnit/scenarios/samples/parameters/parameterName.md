@@ -5,7 +5,6 @@ Sample generation should handle different parameter names in body.
 ## TypeSpec
 
 ```tsp
-
 import "@azure-tools/typespec-client-generator-core";
 
 import "@typespec/http";
@@ -23,9 +22,7 @@ using Azure.ClientGenerator.Core;
 
 /** Microsoft.Contoso Resource Provider management API. */
 @armProviderNamespace
-@service(#{
-  title: "Microsoft.Contoso management service",
-})
+@service(#{ title: "Microsoft.Contoso management service" })
 @versioned(Microsoft.Contoso.Versions)
 namespace Microsoft.Contoso;
 
@@ -234,7 +231,6 @@ interface Documents {
   @post
   publish(@body endpoint: DocumentBase): void;
 }
-
 ```
 
 Should ignore the warning `@azure-tools/typespec-ts/property-name-normalized`:
@@ -276,13 +272,11 @@ export function _publishSend(
   endpointParam: DocumentBase,
   options: PublishOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/documents")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      body: documentBaseSerializer(endpointParam),
-    });
+  return context.path("/documents").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    body: documentBaseSerializer(endpointParam),
+  });
 }
 
 export async function _publishDeserialize(result: PathUncheckedResponse): Promise<void> {

@@ -8,8 +8,8 @@ model StreamingChatCompletionOptions {
   messages: "aaaaa";
   index: 123;
 }
-op read(@path id: string; @body body: StreamingChatCompletionOptions): {
-  @bodyRoot result: StreamingChatCompletionOptions
+op read(@path id: string, @body body: StreamingChatCompletionOptions): {
+  @bodyRoot result: StreamingChatCompletionOptions;
 };
 ```
 
@@ -79,14 +79,12 @@ export function _readSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context
-    .path(path)
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: streamingChatCompletionOptionsSerializer(body),
-    });
+  return context.path(path).post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: streamingChatCompletionOptionsSerializer(body),
+  });
 }
 
 export async function _readDeserialize(
@@ -148,14 +146,12 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: { accept: "text/plain", ...options.requestOptions?.headers },
-      body: { stream: true, messages: "aaaaa", index: 123 },
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: { accept: "text/plain", ...options.requestOptions?.headers },
+    body: { stream: true, messages: "aaaaa", index: 123 },
+  });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<true> {
@@ -177,6 +173,7 @@ export async function read(
 ```
 
 // We need to skip this case due to tcgc issue: https://github.com/Azure/typespec-azure/issues/3088
+
 # skip: Should get the effective model name
 
 ## TypeSpec
@@ -220,10 +217,12 @@ model TodoItem {
   @visibility(Lifecycle.Create) dummy?: string;
 }
 
-op try(@header contentType: "multipart/form-data",
-    @multipartBody body: {
-  item: HttpPart<TodoItem>;
-}): void;
+op try(
+  @header contentType: "multipart/form-data",
+  @multipartBody body: {
+    item: HttpPart<TodoItem>;
+  },
+): void;
 ```
 
 ## Models

@@ -1,122 +1,162 @@
-import type { Client } from '@azure-rest/core-client';
-import type { ClientOptions } from '@azure-rest/core-client';
-import type { HttpResponse } from '@azure-rest/core-client';
-import { isRestError } from '@azure/core-rest-pipeline';
-import type { RequestParameters } from '@azure-rest/core-client';
-import { RestError } from '@azure/core-rest-pipeline';
-import type { StreamableMethod } from '@azure-rest/core-client';
+import type {
+  Client,
+  ClientOptions,
+  HttpResponse,
+  RequestParameters,
+  StreamableMethod,
+} from "@azure-rest/core-client";
+import { isRestError, RestError } from "@azure/core-rest-pipeline";
 
 declare function createClient(host: string, options?: MediaTypesClientOptions): MediaTypesClient;
 export default createClient;
 
 export declare interface GetByOverloadParent {
-    post(options: GetByOverloadParentParameters): StreamableMethod<GetByOverloadParent200Response>;
+  post(options: GetByOverloadParentParameters): StreamableMethod<GetByOverloadParent200Response>;
 }
 
 export declare interface GetByOverloadParent200Response extends HttpResponse {
-    status: "200";
-    body: string;
+  status: "200";
+  body: string;
 }
 
 export declare interface GetByOverloadParentBodyParam {
-    body: SourcePath | string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream | string;
+  body:
+    | SourcePath
+    | string
+    | Uint8Array
+    | ReadableStream<Uint8Array>
+    | NodeJS.ReadableStream
+    | string;
 }
 
 export declare interface GetByOverloadParentMediaTypesParam {
-    contentType: "application/pdf" | "application/json" | "image/jpeg" | "image/png" | "image/tiff" | "text/plain";
+  contentType:
+    | "application/pdf"
+    | "application/json"
+    | "image/jpeg"
+    | "image/png"
+    | "image/tiff"
+    | "text/plain";
 }
 
-export declare type GetByOverloadParentParameters = GetByOverloadParentMediaTypesParam & GetByOverloadParentBodyParam & RequestParameters;
+export declare type GetByOverloadParentParameters = GetByOverloadParentMediaTypesParam &
+  GetByOverloadParentBodyParam &
+  RequestParameters;
 
 export declare interface GetBySharedRouteForBytes200Response extends HttpResponse {
-    status: "200";
-    body: string;
+  status: "200";
+  body: string;
 }
 
 export declare interface GetBySharedRouteForBytesBodyParam {
-    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream;
+  body: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream;
 }
 
 export declare interface GetBySharedRouteForBytesMediaTypesParam {
-    contentType: "application/pdf" | "image/jpeg" | "image/png" | "image/tiff";
+  contentType: "application/pdf" | "image/jpeg" | "image/png" | "image/tiff";
 }
 
-export declare type GetBySharedRouteForBytesParameters = GetBySharedRouteForBytesMediaTypesParam & GetBySharedRouteForBytesBodyParam & RequestParameters;
+export declare type GetBySharedRouteForBytesParameters = GetBySharedRouteForBytesMediaTypesParam &
+  GetBySharedRouteForBytesBodyParam &
+  RequestParameters;
 
 export declare interface GetBySharedRouteForModel200Response extends HttpResponse {
-    status: "200";
-    body: string;
+  status: "200";
+  body: string;
 }
 
 export declare interface GetBySharedRouteForModelBodyParam {
-    body: SourcePath;
+  body: SourcePath;
 }
 
 export declare interface GetBySharedRouteForModelMediaTypesParam {
-    contentType: "application/json";
+  contentType: "application/json";
 }
 
-export declare type GetBySharedRouteForModelParameters = GetBySharedRouteForModelMediaTypesParam & GetBySharedRouteForModelBodyParam & RequestParameters;
+export declare type GetBySharedRouteForModelParameters = GetBySharedRouteForModelMediaTypesParam &
+  GetBySharedRouteForModelBodyParam &
+  RequestParameters;
 
 export declare interface GetBySharedRouteForString {
-    post(options: GetBySharedRouteForStringParameters): StreamableMethod<GetBySharedRouteForString200Response>;
-    post(options: GetBySharedRouteForModelParameters): StreamableMethod<GetBySharedRouteForModel200Response>;
-    post(options: GetBySharedRouteForBytesParameters): StreamableMethod<GetBySharedRouteForBytes200Response>;
+  post(
+    options: GetBySharedRouteForStringParameters,
+  ): StreamableMethod<GetBySharedRouteForString200Response>;
+  post(
+    options: GetBySharedRouteForModelParameters,
+  ): StreamableMethod<GetBySharedRouteForModel200Response>;
+  post(
+    options: GetBySharedRouteForBytesParameters,
+  ): StreamableMethod<GetBySharedRouteForBytes200Response>;
 }
 
 export declare interface GetBySharedRouteForString200Response extends HttpResponse {
-    status: "200";
-    body: string;
+  status: "200";
+  body: string;
 }
 
 export declare interface GetBySharedRouteForStringBodyParam {
-    body: string;
+  body: string;
 }
 
 export declare interface GetBySharedRouteForStringMediaTypesParam {
-    contentType: "text/plain";
+  contentType: "text/plain";
 }
 
-export declare type GetBySharedRouteForStringParameters = GetBySharedRouteForStringMediaTypesParam & GetBySharedRouteForStringBodyParam & RequestParameters;
+export declare type GetBySharedRouteForStringParameters = GetBySharedRouteForStringMediaTypesParam &
+  GetBySharedRouteForStringBodyParam &
+  RequestParameters;
 
 export declare interface GetByUnionOnly {
-    post(options: GetByUnionOnlyParameters): StreamableMethod<GetByUnionOnly200Response>;
+  post(options: GetByUnionOnlyParameters): StreamableMethod<GetByUnionOnly200Response>;
 }
 
 export declare interface GetByUnionOnly200Response extends HttpResponse {
-    status: "200";
-    body: string;
+  status: "200";
+  body: string;
 }
 
 export declare interface GetByUnionOnlyBodyParam {
-    body: SourcePath | string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream | string;
+  body:
+    | SourcePath
+    | string
+    | Uint8Array
+    | ReadableStream<Uint8Array>
+    | NodeJS.ReadableStream
+    | string;
 }
 
 export declare interface GetByUnionOnlyMediaTypesParam {
-    contentType: "application/pdf" | "application/json" | "image/jpeg" | "image/png" | "image/tiff" | "text/plain";
+  contentType:
+    | "application/pdf"
+    | "application/json"
+    | "image/jpeg"
+    | "image/png"
+    | "image/tiff"
+    | "text/plain";
 }
 
-export declare type GetByUnionOnlyParameters = GetByUnionOnlyMediaTypesParam & GetByUnionOnlyBodyParam & RequestParameters;
+export declare type GetByUnionOnlyParameters = GetByUnionOnlyMediaTypesParam &
+  GetByUnionOnlyBodyParam &
+  RequestParameters;
 
-export { isRestError }
+export { isRestError };
 
 export declare type MediaTypesClient = Client & {
-    path: Routes;
+  path: Routes;
 };
 
-export declare interface MediaTypesClientOptions extends ClientOptions {
-}
+export declare interface MediaTypesClientOptions extends ClientOptions {}
 
-export { RestError }
+export { RestError };
 
 export declare interface Routes {
-    (path: "/mediatypes/union"): GetByUnionOnly;
-    (path: "/mediatypes/shared-route"): GetBySharedRouteForString;
-    (path: "/mediatypes/overload"): GetByOverloadParent;
+  (path: "/mediatypes/union"): GetByUnionOnly;
+  (path: "/mediatypes/shared-route"): GetBySharedRouteForString;
+  (path: "/mediatypes/overload"): GetByOverloadParent;
 }
 
 export declare interface SourcePath {
-    source: string;
+  source: string;
 }
 
-export { }
+export {};

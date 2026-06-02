@@ -10,9 +10,7 @@ This is tsp definition.
 import "@typespec/http";
 
 using TypeSpec.Http;
-@service(#{
-  title: "Widget Service",
-})
+@service(#{ title: "Widget Service" })
 namespace DemoService;
 
 union Foo {

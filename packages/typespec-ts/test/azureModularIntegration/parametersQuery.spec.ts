@@ -1,4 +1,4 @@
-import { assert, describe, it, beforeEach } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 
 import { QueryClient } from "./generated/parameters/query/src/index.js";
 
@@ -9,7 +9,7 @@ describe("Parameters Query Client", () => {
     client = new QueryClient({
       endpoint: "http://localhost:3002",
       allowInsecureConnection: true,
-      retryOptions: { maxRetries: 0 }
+      retryOptions: { maxRetries: 0 },
     });
   });
 

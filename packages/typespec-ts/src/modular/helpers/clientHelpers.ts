@@ -1,29 +1,21 @@
-import { ModularEmitterOptions } from "../interfaces.js";
-import {
-  OptionalKind,
-  ParameterDeclarationStructure,
-  StatementedNode
-} from "ts-morph";
 import {
   SdkClientType,
   SdkCredentialParameter,
   SdkEndpointParameter,
   SdkHttpParameter,
   SdkMethodParameter,
-  SdkServiceOperation
+  SdkServiceOperation,
 } from "@azure-tools/typespec-client-generator-core";
+import { OptionalKind, ParameterDeclarationStructure, StatementedNode } from "ts-morph";
+import { ModularEmitterOptions } from "../interfaces.js";
 
-import {
-  NameType,
-  normalizeName,
-  PackageFlavor
-} from "../../rlc-common/index.js";
-import { SdkContext } from "../../utils/interfaces.js";
-import { getClassicalClientName } from "./namingHelpers.js";
-import { getTypeExpression } from "../type-expressions/get-type-expression.js";
-import { isCredentialType } from "./typeHelpers.js";
-import { CloudSettingHelpers } from "../static-helpers-metadata.js";
 import { resolveReference } from "../../framework/reference.js";
+import { NameType, normalizeName, PackageFlavor } from "../../rlc-common/index.js";
+import { SdkContext } from "../../utils/interfaces.js";
+import { CloudSettingHelpers } from "../static-helpers-metadata.js";
+import { getTypeExpression } from "../type-expressions/get-type-expression.js";
+import { getClassicalClientName } from "./namingHelpers.js";
+import { isCredentialType } from "./typeHelpers.js";
 
 interface ClientParameterOptions {
   onClientOnly?: boolean;
@@ -41,11 +33,7 @@ type SdkParameter =
   | SdkHttpParameter;
 
 export function hasDefaultValue(p: SdkParameter) {
-  if (
-    p.clientDefaultValue ||
-    p.__raw?.defaultValue ||
-    p.type.kind === "constant"
-  ) {
+  if (p.clientDefaultValue || p.__raw?.defaultValue || p.type.kind === "constant") {
     return true;
   }
 
@@ -71,15 +59,12 @@ export function getClientParameters(
     optionalOnly: false,
     skipArmSpecific: false,
     skipEndpointTemplate: false,
-    apiVersionAsRequired: true
-  }
+    apiVersionAsRequired: true,
+  },
 ) {
   const clientParams: SdkParameter[] = [];
   for (const property of client.clientInitialization.parameters) {
-    if (
-      property.type.kind === "union" &&
-      property.type.variantTypes[0]?.kind === "endpoint"
-    ) {
+    if (property.type.kind === "union" && property.type.variantTypes[0]?.kind === "endpoint") {
       if (options.skipEndpointTemplate) {
         clientParams.push(property);
       } else {
@@ -94,33 +79,24 @@ export function getClientParameters(
 
   const isRequired = (p: SdkParameter) =>
     // Special case: when apiVersionAsRequired is true, apiVersion should always be considered required
-    (options.apiVersionAsRequired && p.isApiVersionParam) ||
-    (!p.optional && !hasDefaultValue(p));
+    (options.apiVersionAsRequired && p.isApiVersionParam) || (!p.optional && !hasDefaultValue(p));
   const isOptional = (p: SdkParameter) =>
-    p.optional ||
-    p.clientDefaultValue ||
-    p.__raw?.defaultValue ||
-    p.type.kind === "constant";
+    p.optional || p.clientDefaultValue || p.__raw?.defaultValue || p.type.kind === "constant";
   const skipCredentials = (p: SdkParameter) => p.kind !== "credential";
   const skipMethodParam = (p: SdkParameter) => p.kind !== "method";
-  const armSpecific = (p: SdkParameter) =>
-    !(p.kind === "endpoint" && dpgContext.arm);
+  const armSpecific = (p: SdkParameter) => !(p.kind === "endpoint" && dpgContext.arm);
   // Skip apiVersion parameter when it's multi-service (each service has its own default apiVersion)
   const skipApiVersionOnMultiService = (p: SdkParameter) =>
     !(dpgContext.rlcOptions?.isMultiService && p.isApiVersionParam);
   const filters = [
     options.requiredOnly ? isRequired : undefined,
-    dpgContext.rlcOptions?.addCredentials === false
-      ? skipCredentials
-      : undefined,
+    dpgContext.rlcOptions?.addCredentials === false ? skipCredentials : undefined,
     options.optionalOnly ? isOptional : undefined,
     options.onClientOnly ? skipMethodParam : undefined,
     options.skipArmSpecific ? undefined : armSpecific,
-    skipApiVersionOnMultiService
+    skipApiVersionOnMultiService,
   ];
-  const params = clientParams.filter((p) =>
-    filters.every((filter) => !filter || filter(p))
-  );
+  const params = clientParams.filter((p) => filters.every((filter) => !filter || filter(p)));
   return params;
 }
 
@@ -132,14 +108,14 @@ export function getClientParametersDeclaration(
     requiredOnly: false,
     onClientOnly: false,
     skipArmSpecific: false,
-    apiVersionAsRequired: false
-  }
+    apiVersionAsRequired: false,
+  },
 ): OptionalKind<ParameterDeclarationStructure>[] {
   const name = getClassicalClientName(client);
   const optionsParam = {
     name: "options",
     type: `${name}OptionalParams`,
-    initializer: "{}"
+    initializer: "{}",
   };
 
   const params: OptionalKind<ParameterDeclarationStructure>[] = [
@@ -150,27 +126,22 @@ export function getClientParametersDeclaration(
       const name = getClientParameterName(p);
       return {
         name,
-        type: typeExpression
+        type: typeExpression,
       };
-    })
+    }),
   ];
   params.push(optionsParam);
 
   return params;
 }
 
-function getClientParameterTypeExpression(
-  context: SdkContext,
-  parameter: SdkParameter
-) {
+function getClientParameterTypeExpression(context: SdkContext, parameter: SdkParameter) {
   // Special handle to work around the fact that TCGC creates a union type for endpoint. The reason they do this
   // is to provide a way for users to either pass the value to fill in the template of the whole endpoint. Basically they are
   // inserting a variant with {endpoint}.
   // Our emitter allows this through the options.endpoint.
   if (parameter.type.kind === "union") {
-    const endpointVariant = parameter.type.variantTypes.find(
-      (p) => p.kind === "endpoint"
-    );
+    const endpointVariant = parameter.type.variantTypes.find((p) => p.kind === "endpoint");
     if (endpointVariant) {
       return getTypeExpression(context, endpointVariant);
     }
@@ -195,7 +166,7 @@ export function getClientParameterName(parameter: SdkParameter) {
 export function buildGetClientEndpointParam(
   context: StatementedNode,
   dpgContext: SdkContext,
-  client: SdkClientType<SdkServiceOperation>
+  client: SdkClientType<SdkServiceOperation>,
 ): { endpointParamName: string; assignedOptionalParams?: Set<string> } {
   const assignedOptionalParams = new Set<string>();
   let coreEndpointParam = "";
@@ -212,7 +183,7 @@ export function buildGetClientEndpointParam(
   const endpointParam = getClientParameters(client, dpgContext, {
     onClientOnly: true,
     skipEndpointTemplate: true,
-    skipArmSpecific: true
+    skipArmSpecific: true,
   }).find((x) => x.kind === "endpoint" || x.kind === "path");
   if (endpointParam) {
     if (
@@ -220,8 +191,7 @@ export function buildGetClientEndpointParam(
       endpointParam.type.variantTypes[0]?.kind === "endpoint"
     ) {
       const params = endpointParam.type.variantTypes[0].templateArguments;
-      let parameterizedEndpointUrl =
-        endpointParam.type.variantTypes[0].serverUrl;
+      let parameterizedEndpointUrl = endpointParam.type.variantTypes[0].serverUrl;
       for (const templateParam of params) {
         const paramName = getClientParameterName(templateParam);
         if (templateParam.clientDefaultValue) {
@@ -229,9 +199,7 @@ export function buildGetClientEndpointParam(
             typeof templateParam.clientDefaultValue === "string"
               ? `"${templateParam.clientDefaultValue}"`
               : templateParam.clientDefaultValue;
-          context.addStatements(
-            `const ${paramName} = options.${paramName} ?? ${defaultValue};`
-          );
+          context.addStatements(`const ${paramName} = options.${paramName} ?? ${defaultValue};`);
           assignedOptionalParams.add(paramName);
         } else if (templateParam.optional) {
           context.addStatements(`const ${paramName} = options.${paramName};`);
@@ -239,15 +207,14 @@ export function buildGetClientEndpointParam(
         }
         parameterizedEndpointUrl = parameterizedEndpointUrl.replace(
           `{${templateParam.name}}`,
-          `\${${getClientParameterName(templateParam)}}`
+          `\${${getClientParameterName(templateParam)}}`,
         );
       }
       const endpointUrl = `const endpointUrl = ${coreEndpointParam} ?? \`${parameterizedEndpointUrl}\`;`;
       context.addStatements(endpointUrl);
       return { endpointParamName: "endpointUrl", assignedOptionalParams };
     } else if (endpointParam.type.kind === "endpoint") {
-      const clientDefaultValue =
-        endpointParam.type.templateArguments[0]?.clientDefaultValue;
+      const clientDefaultValue = endpointParam.type.templateArguments[0]?.clientDefaultValue;
       const defaultValueStr =
         clientDefaultValue && typeof clientDefaultValue === "string"
           ? `"${clientDefaultValue}"`
@@ -278,13 +245,9 @@ export function buildGetClientOptionsParam(
   context: StatementedNode,
   emitterOptions: ModularEmitterOptions,
   endpointParam: string,
-  apiVersionParamName?: string
+  apiVersionParamName?: string,
 ): string {
-  const userAgentOptions = buildUserAgentOptions(
-    context,
-    emitterOptions,
-    "azsdk-js-api"
-  );
+  const userAgentOptions = buildUserAgentOptions(context, emitterOptions, "azsdk-js-api");
   const loggingOptions = buildLoggingOptions(emitterOptions.options.flavor);
   const credentials = buildCredentials(emitterOptions, endpointParam);
 
@@ -312,16 +275,14 @@ export function buildGetClientOptionsParam(
 
 export function buildGetClientCredentialParam(
   client: SdkClientType<SdkServiceOperation>,
-  emitterOptions: ModularEmitterOptions
+  emitterOptions: ModularEmitterOptions,
 ): string {
   if (
     emitterOptions.options.addCredentials &&
-    (emitterOptions.options.credentialScopes ||
-      emitterOptions.options.credentialKeyHeaderName)
+    (emitterOptions.options.credentialScopes || emitterOptions.options.credentialKeyHeaderName)
   ) {
     return (
-      client.clientInitialization.parameters.find((x) => isCredentialType(x))
-        ?.name ?? "undefined"
+      client.clientInitialization.parameters.find((x) => isCredentialType(x))?.name ?? "undefined"
     );
   } else {
     return "undefined";
@@ -330,7 +291,7 @@ export function buildGetClientCredentialParam(
 
 function buildCredentials(
   emitterOptions: ModularEmitterOptions,
-  endpointParam: string
+  endpointParam: string,
 ): string | undefined {
   if (!emitterOptions.options.addCredentials) {
     return undefined;
@@ -339,12 +300,9 @@ function buildCredentials(
   const { credentialScopes, credentialKeyHeaderName } = emitterOptions.options;
 
   const scopesString = credentialScopes
-    ? credentialScopes.map((cs) => `"${cs}"`).join(", ") ||
-      `\`\${${endpointParam}}/.default\``
+    ? credentialScopes.map((cs) => `"${cs}"`).join(", ") || `\`\${${endpointParam}}/.default\``
     : "";
-  const scopes = scopesString
-    ? `scopes: options.credentials?.scopes ?? [${scopesString}],`
-    : "";
+  const scopes = scopesString ? `scopes: options.credentials?.scopes ?? [${scopesString}],` : "";
 
   const apiKeyHeaderName = credentialKeyHeaderName
     ? `apiKeyHeaderName: options.credentials?.apiKeyHeaderName ?? "${credentialKeyHeaderName}",`
@@ -368,11 +326,10 @@ function buildLoggingOptions(flavor?: PackageFlavor): string | undefined {
 export function buildUserAgentOptions(
   context: StatementedNode,
   emitterOptions: ModularEmitterOptions,
-  sdkUserAgentPrefix: string
+  sdkUserAgentPrefix: string,
 ): string {
   const userAgentStatements = [];
-  const prefixFromOptions =
-    "const prefixFromOptions = options?.userAgentOptions?.userAgentPrefix;";
+  const prefixFromOptions = "const prefixFromOptions = options?.userAgentOptions?.userAgentPrefix;";
   userAgentStatements.push(prefixFromOptions);
 
   const clientPackageName =
@@ -383,11 +340,7 @@ export function buildUserAgentOptions(
 
   const userAgentInfoStatement =
     packageVersion && clientPackageName && sdkUserAgentPrefix.includes("api")
-      ? "const userAgentInfo = `azsdk-js-" +
-        clientPackageName +
-        "/" +
-        packageVersion +
-        "`;"
+      ? "const userAgentInfo = `azsdk-js-" + clientPackageName + "/" + packageVersion + "`;"
       : "";
 
   if (userAgentInfoStatement) {

@@ -1,7 +1,7 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
-import { ValueTypesClient } from "./generated/type//property/value-types/src/index.js";
 import { stringToUint8Array } from "@azure/core-util";
+import { ValueTypesClient } from "./generated/type//property/value-types/src/index.js";
 
 interface TypeDetail {
   type: string;
@@ -12,120 +12,120 @@ interface TypeDetail {
 const testedTypes: TypeDetail[] = [
   {
     type: "boolean",
-    defaultValue: true
+    defaultValue: true,
   },
   {
     type: "string",
-    defaultValue: "hello"
+    defaultValue: "hello",
   },
   {
     type: "bytes",
-    defaultValue: stringToUint8Array("aGVsbG8sIHdvcmxkIQ==", "base64")
+    defaultValue: stringToUint8Array("aGVsbG8sIHdvcmxkIQ==", "base64"),
   },
   {
     type: "int",
-    defaultValue: 42
+    defaultValue: 42,
   },
   {
     type: "float",
-    defaultValue: 43.125
+    defaultValue: 43.125,
   },
   {
     type: "decimal",
-    defaultValue: 0.33333
+    defaultValue: 0.33333,
   },
   {
     type: "decimal128",
-    defaultValue: 0.33333
+    defaultValue: 0.33333,
   },
   {
     type: "datetime",
-    defaultValue: new Date("2022-08-26T18:38:00Z")
+    defaultValue: new Date("2022-08-26T18:38:00Z"),
   },
   {
     type: "duration",
-    defaultValue: "P123DT22H14M12.011S"
+    defaultValue: "P123DT22H14M12.011S",
   },
   {
     type: "enum",
-    defaultValue: "ValueOne"
+    defaultValue: "ValueOne",
   },
   {
     type: "extensible-enum",
-    defaultValue: "UnknownValue"
+    defaultValue: "UnknownValue",
   },
   {
     type: "model",
-    defaultValue: { property: "hello" }
+    defaultValue: { property: "hello" },
   },
   {
     type: "collections/string",
-    defaultValue: ["hello", "world"]
+    defaultValue: ["hello", "world"],
   },
   {
     type: "collections/int",
-    defaultValue: [1, 2]
+    defaultValue: [1, 2],
   },
   {
     type: "collections/model",
-    defaultValue: [{ property: "hello" }, { property: "world" }]
+    defaultValue: [{ property: "hello" }, { property: "world" }],
   },
   {
     type: "dictionary/string",
-    defaultValue: { k1: "hello", k2: "world" }
+    defaultValue: { k1: "hello", k2: "world" },
   },
   {
     type: "never",
-    defaultValue: undefined
+    defaultValue: undefined,
   },
   {
     type: "unknown/string",
-    defaultValue: "hello"
+    defaultValue: "hello",
   },
   {
     type: "unknown/int",
-    defaultValue: 42
+    defaultValue: 42,
   },
   {
     type: "unknown/dict",
-    defaultValue: { k1: "hello", k2: 42 }
+    defaultValue: { k1: "hello", k2: 42 },
   },
   {
     type: "unknown/array",
-    defaultValue: ["hello", "world"]
+    defaultValue: ["hello", "world"],
   },
   {
     type: "string/literal",
-    defaultValue: "hello"
+    defaultValue: "hello",
   },
   {
     type: "int/literal",
-    defaultValue: 42
+    defaultValue: 42,
   },
   {
     type: "float/literal",
-    defaultValue: 43.125
+    defaultValue: 43.125,
   },
   {
     type: "boolean/literal",
-    defaultValue: true
+    defaultValue: true,
   },
   {
     type: "union/string/literal",
-    defaultValue: "world"
+    defaultValue: "world",
   },
   {
     type: "union/int/literal",
-    defaultValue: 42
+    defaultValue: 42,
   },
   {
     type: "union/float/literal",
-    defaultValue: 46.875
+    defaultValue: 46.875,
   },
   {
     type: "union-enum-value",
-    defaultValue: "value2"
-  }
+    defaultValue: "value2",
+  },
 ];
 
 describe("ModelsPropertyTypesClient Rest Client", () => {
@@ -136,8 +136,8 @@ describe("ModelsPropertyTypesClient Rest Client", () => {
       endpoint: "http://localhost:3002",
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
-      }
+        maxRetries: 0,
+      },
     });
   });
   for (let item of testedTypes) {
@@ -259,7 +259,7 @@ describe("ModelsPropertyTypesClient Rest Client", () => {
           break;
         case "bytes":
           result = await client.bytes.put({
-            property: item.defaultValue
+            property: item.defaultValue,
           });
           break;
         case "int":
@@ -273,17 +273,17 @@ describe("ModelsPropertyTypesClient Rest Client", () => {
           break;
         case "decimal128":
           result = await client.decimal128.put({
-            property: item.defaultValue
+            property: item.defaultValue,
           });
           break;
         case "datetime":
           result = await client.datetime.put({
-            property: item.defaultValue
+            property: item.defaultValue,
           });
           break;
         case "duration":
           result = await client.duration.put({
-            property: item.defaultValue
+            property: item.defaultValue,
           });
           break;
         case "enum":
@@ -291,97 +291,97 @@ describe("ModelsPropertyTypesClient Rest Client", () => {
           break;
         case "extensible-enum":
           result = await client.extensibleEnum.put({
-            property: item.defaultValue
+            property: item.defaultValue,
           });
           break;
         case "model":
           result = await client.model.put({
-            property: item.defaultValue
+            property: item.defaultValue,
           });
           break;
         case "collections/string":
           result = await client.collectionsString.put({
-            property: item.defaultValue
+            property: item.defaultValue,
           });
           break;
         case "collections/int":
           result = await client.collectionsInt.put({
-            property: item.defaultValue
+            property: item.defaultValue,
           });
           break;
         case "collections/model":
           result = await client.collectionsModel.put({
-            property: item.defaultValue
+            property: item.defaultValue,
           });
           break;
         case "dictionary/string":
           result = await client.dictionaryString.put({
-            property: item.defaultValue
+            property: item.defaultValue,
           });
           break;
         case "never":
           result = await client.never.put({
-            property: item.defaultValue as never
+            property: item.defaultValue as never,
           });
           break;
         case "unknown/string":
           result = await client.unknownString.put({
-            property: item.defaultValue
+            property: item.defaultValue,
           });
           break;
         case "unknown/int":
           result = await client.unknownInt.put({
-            property: item.defaultValue
+            property: item.defaultValue,
           });
           break;
         case "unknown/dict":
           result = await client.unknownDict.put({
-            property: item.defaultValue
+            property: item.defaultValue,
           });
           break;
         case "unknown/array":
           result = await client.unknownArray.put({
-            property: item.defaultValue
+            property: item.defaultValue,
           });
           break;
         case "string/literal":
           result = await client.stringLiteral.put({
-            property: item.defaultValue
+            property: item.defaultValue,
           });
           break;
         case "int/literal":
           result = await client.intLiteral.put({
-            property: item.defaultValue
+            property: item.defaultValue,
           });
           break;
         case "float/literal":
           result = await client.floatLiteral.put({
-            property: item.defaultValue
+            property: item.defaultValue,
           });
           break;
         case "boolean/literal":
           result = await client.booleanLiteral.put({
-            property: item.defaultValue
+            property: item.defaultValue,
           });
           break;
         case "union/string/literal":
           result = await client.unionStringLiteral.put({
-            property: item.defaultValue
+            property: item.defaultValue,
           });
           break;
         case "union/int/literal":
           result = await client.unionIntLiteral.put({
-            property: item.defaultValue
+            property: item.defaultValue,
           });
           break;
         case "union/float/literal":
           result = await client.unionFloatLiteral.put({
-            property: item.defaultValue
+            property: item.defaultValue,
           });
           break;
         case "union-enum-value":
           result = await client.unionEnumValue.put({
-            property: item.defaultValue
+            property: item.defaultValue,
           });
           break;
         default:

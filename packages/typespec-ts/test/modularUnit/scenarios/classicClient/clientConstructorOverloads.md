@@ -17,9 +17,7 @@ using Azure.ResourceManager;
 
 /** Client.GlobalService Resource Provider management API. */
 @armProviderNamespace
-@service(#{
-  title: "Client.GlobalService management service",
-})
+@service(#{ title: "Client.GlobalService management service" })
 @versioned(Client.GlobalService.Versions)
 namespace Client.GlobalService;
 
@@ -97,9 +95,7 @@ using Azure.ResourceManager;
 
 /** Client.StandardService Resource Provider management API. */
 @armProviderNamespace
-@service(#{
-  title: "Client.StandardService management service",
-})
+@service(#{ title: "Client.StandardService management service" })
 @versioned(Client.StandardService.Versions)
 namespace Client.StandardService;
 
@@ -119,6 +115,7 @@ model StandardResource is TrackedResource<StandardProperties> {
 
 model StandardProperties {
   displayName?: string;
+
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
@@ -149,8 +146,10 @@ model CheckNameAvailabilityInput {
 model CheckNameAvailabilityOutput {
   @visibility(Lifecycle.Read)
   nameAvailable?: boolean;
+
   @visibility(Lifecycle.Read)
   reason?: string;
+
   @visibility(Lifecycle.Read)
   message?: string;
 }
@@ -249,9 +248,7 @@ using Azure.ResourceManager;
 
 /** Client.MixedService Resource Provider management API. */
 @armProviderNamespace
-@service(#{
-  title: "Client.MixedService management service",
-})
+@service(#{ title: "Client.MixedService management service" })
 @versioned(Client.MixedService.Versions)
 namespace Client.MixedService;
 
@@ -271,6 +268,7 @@ model MixedResource is TrackedResource<MixedProperties> {
 
 model MixedProperties {
   displayName?: string;
+
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }

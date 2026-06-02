@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { FixedClient } from "./generated/type/enum/fixed/src/index.js";
 describe("FixedEnums Rest Client", () => {
@@ -7,7 +7,7 @@ describe("FixedEnums Rest Client", () => {
   beforeEach(() => {
     client = new FixedClient({
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
@@ -18,7 +18,7 @@ describe("FixedEnums Rest Client", () => {
 
   it("should put known value", async () => {
     const result = await client.string.putKnownValue("Monday", {
-      requestOptions: { headers: { "content-type": "text/plain" } }
+      requestOptions: { headers: { "content-type": "text/plain" } },
     });
     assert.isUndefined(result);
   });
@@ -26,7 +26,7 @@ describe("FixedEnums Rest Client", () => {
   it("should put unknown value and receives 500", async () => {
     try {
       await client.string.putUnknownValue("Weekend" as any, {
-        requestOptions: { headers: { "content-type": "application/json" } }
+        requestOptions: { headers: { "content-type": "application/json" } },
       });
       assert.fail("Expected an exception to be thrown.");
     } catch (err) {

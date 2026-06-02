@@ -15,38 +15,32 @@ model Error {
   message: string;
 }
 
-model NoContentResponse { 
-  @statusCode statusCode: 202; 
-  @body body: Resource; 
+model NoContentResponse {
+  @statusCode statusCode: 202;
+  @body body: Resource;
 }
 
-model OkResponse { 
+model OkResponse {
   @statusCode statusCode: 200;
-  @body body: Resource[]; 
+  @body body: Resource[];
 }
-
 
 @route("/sharedroute")
 interface SharedRouteOperations {
-
   /**
    * different query & header parameters
    */
-
   @sharedRoute
   @route("/query")
   listBySubscription(...Resource, @header filter: "subscription"): NoContentResponse | Error;
-
 
   @sharedRoute
   @route("/query")
   listByResourceGroup(...Resource, @query filter: "resourceGroup"): OkResponse | Error;
 
-  
   /**
    * different request bodies
    */
-
   @sharedRoute
   @route("/request-body")
   updateInt(@body a: int32, @query options: string): void;
@@ -58,7 +52,6 @@ interface SharedRouteOperations {
   /**
    * different responses
    */
-
   @sharedRoute
   @route("/response-body")
   returnsInt(...Resource, @query options: string): int32;

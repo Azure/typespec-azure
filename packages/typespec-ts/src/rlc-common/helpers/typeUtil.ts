@@ -71,12 +71,10 @@ export enum TypeScriptType {
   object,
   union,
   unknown,
-  enum
+  enum,
 }
 
-export function toTypeScriptTypeFromSchema(
-  schema: Schema
-): TypeScriptType | undefined {
+export function toTypeScriptTypeFromSchema(schema: Schema): TypeScriptType | undefined {
   schema.type = schema.type.trim();
   if (
     schema.type === "string" &&
@@ -92,10 +90,7 @@ export function toTypeScriptTypeFromSchema(
       // Include both extensible and fixed enum
       return TypeScriptType.enum;
     }
-  } else if (
-    schema.isConstant === true ||
-    isConstant(schema.typeName ?? schema.type)
-  ) {
+  } else if (schema.isConstant === true || isConstant(schema.typeName ?? schema.type)) {
     return TypeScriptType.constant;
   } else if (schema.type === "number") {
     return TypeScriptType.number;
@@ -115,9 +110,7 @@ export function toTypeScriptTypeFromSchema(
   return undefined;
 }
 
-export function toTypeScriptTypeFromName(
-  typeName: string
-): TypeScriptType | undefined {
+export function toTypeScriptTypeFromName(typeName: string): TypeScriptType | undefined {
   typeName = typeName.trim();
   if (typeName === "Date") {
     return TypeScriptType.date;

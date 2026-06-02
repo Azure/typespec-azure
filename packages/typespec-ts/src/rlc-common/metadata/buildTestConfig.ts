@@ -32,13 +32,13 @@ export function buildTestBrowserTsConfig(model: RLCModel) {
           paths: {
             [name]: ["../src/index.ts"],
             [`${name}/*`]: ["../src/*"],
-            "$internal/*": ["../src/*"]
-          }
-        }
+            "$internal/*": ["../src/*"],
+          },
+        },
       },
       null,
-      2
-    )
+      2,
+    ),
   };
 }
 
@@ -61,12 +61,12 @@ export function buildTestNodeTsConfig(model: RLCModel) {
           paths: {
             [name]: ["../src/index.ts"],
             [`${name}/*`]: ["../src/*"],
-            "$internal/*": ["../src/*"]
-          }
-        }
+            "$internal/*": ["../src/*"],
+          },
+        },
       },
       null,
-      2
-    )
+      2,
+    ),
   };
 }

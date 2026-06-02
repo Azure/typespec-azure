@@ -1,124 +1,135 @@
-import type { Client } from '@azure-rest/core-client';
-import type { ClientOptions } from '@azure-rest/core-client';
-import type { HttpResponse } from '@azure-rest/core-client';
-import { isRestError } from '@azure/core-rest-pipeline';
-import type { RawHttpHeaders } from '@azure/core-rest-pipeline';
-import type { RawHttpHeadersInput } from '@azure/core-rest-pipeline';
-import type { RequestParameters } from '@azure-rest/core-client';
-import { RestError } from '@azure/core-rest-pipeline';
-import type { StreamableMethod } from '@azure-rest/core-client';
+import type {
+  Client,
+  ClientOptions,
+  HttpResponse,
+  RequestParameters,
+  StreamableMethod,
+} from "@azure-rest/core-client";
+import type { RawHttpHeaders, RawHttpHeadersInput } from "@azure/core-rest-pipeline";
+import { isRestError, RestError } from "@azure/core-rest-pipeline";
 
 export declare type ContentNegotiationClient = Client & {
-    path: Routes;
+  path: Routes;
 };
 
-export declare interface ContentNegotiationClientOptions extends ClientOptions {
-}
+export declare interface ContentNegotiationClientOptions extends ClientOptions {}
 
 declare function createClient(options?: ContentNegotiationClientOptions): ContentNegotiationClient;
 export default createClient;
 
 export declare interface DifferentBodyGetAvatarAsJson200Headers {
-    "content-type": "application/json";
+  "content-type": "application/json";
 }
 
 export declare interface DifferentBodyGetAvatarAsJson200Response extends HttpResponse {
-    status: "200";
-    body: PngImageAsJsonOutput;
-    headers: RawHttpHeaders & DifferentBodyGetAvatarAsJson200Headers;
+  status: "200";
+  body: PngImageAsJsonOutput;
+  headers: RawHttpHeaders & DifferentBodyGetAvatarAsJson200Headers;
 }
 
 export declare interface DifferentBodyGetAvatarAsJsonHeaderParam {
-    headers: RawHttpHeadersInput & DifferentBodyGetAvatarAsJsonHeaders;
+  headers: RawHttpHeadersInput & DifferentBodyGetAvatarAsJsonHeaders;
 }
 
 export declare interface DifferentBodyGetAvatarAsJsonHeaders {
-    accept: "application/json";
+  accept: "application/json";
 }
 
-export declare type DifferentBodyGetAvatarAsJsonParameters = DifferentBodyGetAvatarAsJsonHeaderParam & RequestParameters;
+export declare type DifferentBodyGetAvatarAsJsonParameters =
+  DifferentBodyGetAvatarAsJsonHeaderParam & RequestParameters;
 
 export declare interface DifferentBodyGetAvatarAsPng {
-    get(options: DifferentBodyGetAvatarAsPngParameters): StreamableMethod<DifferentBodyGetAvatarAsPng200Response>;
-    get(options: DifferentBodyGetAvatarAsJsonParameters): StreamableMethod<DifferentBodyGetAvatarAsJson200Response>;
+  get(
+    options: DifferentBodyGetAvatarAsPngParameters,
+  ): StreamableMethod<DifferentBodyGetAvatarAsPng200Response>;
+  get(
+    options: DifferentBodyGetAvatarAsJsonParameters,
+  ): StreamableMethod<DifferentBodyGetAvatarAsJson200Response>;
 }
 
 export declare interface DifferentBodyGetAvatarAsPng200Headers {
-    "content-type": "image/png";
+  "content-type": "image/png";
 }
 
 export declare interface DifferentBodyGetAvatarAsPng200Response extends HttpResponse {
-    status: "200";
-    body: Uint8Array;
-    headers: RawHttpHeaders & DifferentBodyGetAvatarAsPng200Headers;
+  status: "200";
+  body: Uint8Array;
+  headers: RawHttpHeaders & DifferentBodyGetAvatarAsPng200Headers;
 }
 
 export declare interface DifferentBodyGetAvatarAsPngHeaderParam {
-    headers: RawHttpHeadersInput & DifferentBodyGetAvatarAsPngHeaders;
+  headers: RawHttpHeadersInput & DifferentBodyGetAvatarAsPngHeaders;
 }
 
 export declare interface DifferentBodyGetAvatarAsPngHeaders {
-    accept: "image/png";
+  accept: "image/png";
 }
 
-export declare type DifferentBodyGetAvatarAsPngParameters = DifferentBodyGetAvatarAsPngHeaderParam & RequestParameters;
+export declare type DifferentBodyGetAvatarAsPngParameters = DifferentBodyGetAvatarAsPngHeaderParam &
+  RequestParameters;
 
-export { isRestError }
+export { isRestError };
 
 export declare interface PngImageAsJsonOutput {
-    content: string;
+  content: string;
 }
 
-export { RestError }
+export { RestError };
 
 export declare interface Routes {
-    (path: "/content-negotiation/same-body"): SameBodyGetAvatarAsPng;
-    (path: "/content-negotiation/different-body"): DifferentBodyGetAvatarAsPng;
+  (path: "/content-negotiation/same-body"): SameBodyGetAvatarAsPng;
+  (path: "/content-negotiation/different-body"): DifferentBodyGetAvatarAsPng;
 }
 
 export declare interface SameBodyGetAvatarAsJpeg200Headers {
-    "content-type": "image/jpeg";
+  "content-type": "image/jpeg";
 }
 
 export declare interface SameBodyGetAvatarAsJpeg200Response extends HttpResponse {
-    status: "200";
-    body: Uint8Array;
-    headers: RawHttpHeaders & SameBodyGetAvatarAsJpeg200Headers;
+  status: "200";
+  body: Uint8Array;
+  headers: RawHttpHeaders & SameBodyGetAvatarAsJpeg200Headers;
 }
 
 export declare interface SameBodyGetAvatarAsJpegHeaderParam {
-    headers: RawHttpHeadersInput & SameBodyGetAvatarAsJpegHeaders;
+  headers: RawHttpHeadersInput & SameBodyGetAvatarAsJpegHeaders;
 }
 
 export declare interface SameBodyGetAvatarAsJpegHeaders {
-    accept: "image/jpeg";
+  accept: "image/jpeg";
 }
 
-export declare type SameBodyGetAvatarAsJpegParameters = SameBodyGetAvatarAsJpegHeaderParam & RequestParameters;
+export declare type SameBodyGetAvatarAsJpegParameters = SameBodyGetAvatarAsJpegHeaderParam &
+  RequestParameters;
 
 export declare interface SameBodyGetAvatarAsPng {
-    get(options: SameBodyGetAvatarAsPngParameters): StreamableMethod<SameBodyGetAvatarAsPng200Response>;
-    get(options: SameBodyGetAvatarAsJpegParameters): StreamableMethod<SameBodyGetAvatarAsJpeg200Response>;
+  get(
+    options: SameBodyGetAvatarAsPngParameters,
+  ): StreamableMethod<SameBodyGetAvatarAsPng200Response>;
+  get(
+    options: SameBodyGetAvatarAsJpegParameters,
+  ): StreamableMethod<SameBodyGetAvatarAsJpeg200Response>;
 }
 
 export declare interface SameBodyGetAvatarAsPng200Headers {
-    "content-type": "image/png";
+  "content-type": "image/png";
 }
 
 export declare interface SameBodyGetAvatarAsPng200Response extends HttpResponse {
-    status: "200";
-    body: Uint8Array;
-    headers: RawHttpHeaders & SameBodyGetAvatarAsPng200Headers;
+  status: "200";
+  body: Uint8Array;
+  headers: RawHttpHeaders & SameBodyGetAvatarAsPng200Headers;
 }
 
 export declare interface SameBodyGetAvatarAsPngHeaderParam {
-    headers: RawHttpHeadersInput & SameBodyGetAvatarAsPngHeaders;
+  headers: RawHttpHeadersInput & SameBodyGetAvatarAsPngHeaders;
 }
 
 export declare interface SameBodyGetAvatarAsPngHeaders {
-    accept: "image/png";
+  accept: "image/png";
 }
 
-export declare type SameBodyGetAvatarAsPngParameters = SameBodyGetAvatarAsPngHeaderParam & RequestParameters;
+export declare type SameBodyGetAvatarAsPngParameters = SameBodyGetAvatarAsPngHeaderParam &
+  RequestParameters;
 
-export { }
+export {};

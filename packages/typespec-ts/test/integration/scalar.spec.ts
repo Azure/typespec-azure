@@ -1,8 +1,6 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
-import ScalarClientFactory, {
-  ScalarClient
-} from "./generated/type/scalar/src/index.js";
+import ScalarClientFactory, { ScalarClient } from "./generated/type/scalar/src/index.js";
 
 describe("Scalar Client", () => {
   let client: ScalarClient;
@@ -11,8 +9,8 @@ describe("Scalar Client", () => {
     client = ScalarClientFactory({
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
-      }
+        maxRetries: 0,
+      },
     });
   });
 
@@ -56,9 +54,7 @@ describe("Scalar Client", () => {
   });
 
   it("should get decimal response body", async () => {
-    const result = await client
-      .path("/type/scalar/decimal/response_body")
-      .get();
+    const result = await client.path("/type/scalar/decimal/response_body").get();
     assert.strictEqual(result.status, "200");
     assert.strictEqual(result.body, 0.33333);
   });
@@ -78,9 +74,7 @@ describe("Scalar Client", () => {
   });
 
   it("should get decimal128 response body", async () => {
-    const result = await client
-      .path("/type/scalar/decimal128/response_body")
-      .get();
+    const result = await client.path("/type/scalar/decimal128/response_body").get();
     assert.strictEqual(result.status, "200");
     assert.strictEqual(result.body, 0.33333);
   });
@@ -101,9 +95,7 @@ describe("Scalar Client", () => {
 
   it("should fail to post decimal verify", async () => {
     // prepare the verification
-    const getResult = await client
-      .path("/type/scalar/decimal/prepare_verify")
-      .get();
+    const getResult = await client.path("/type/scalar/decimal/prepare_verify").get();
     // do any calculation based on numbers
     let total = 0;
     getResult.body.forEach((decimal: number) => {
@@ -116,9 +108,7 @@ describe("Scalar Client", () => {
   });
 
   it("should fail to post decimal128 verify", async () => {
-    const getResult = await client
-      .path("/type/scalar/decimal128/prepare_verify")
-      .get();
+    const getResult = await client.path("/type/scalar/decimal128/prepare_verify").get();
     // do any calculation based on numbers
     let total = 0;
     getResult.body.forEach((decimal: number) => {

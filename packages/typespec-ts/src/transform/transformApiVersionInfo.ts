@@ -1,37 +1,30 @@
 import {
+  getHttpOperationWithCache,
+  isApiVersion,
+  SdkClient,
+} from "@azure-tools/typespec-client-generator-core";
+import {
   ApiVersionInfo,
   ApiVersionPosition,
   extractDefinedPosition,
   extractPathApiVersion,
   SchemaContext,
-  UrlInfo
+  UrlInfo,
 } from "../rlc-common/index.js";
-import {
-  getHttpOperationWithCache,
-  isApiVersion,
-  SdkClient
-} from "@azure-tools/typespec-client-generator-core";
-import { SdkContext } from "../utils/interfaces.js";
-import {
-  getDefaultApiVersionString,
-  getSchemaForType,
-  trimUsage
-} from "../utils/modelUtils.js";
 import { listOperationsUnderRLCClient } from "../utils/clientUtils.js";
+import { SdkContext } from "../utils/interfaces.js";
+import { getDefaultApiVersionString, getSchemaForType, trimUsage } from "../utils/modelUtils.js";
 
 export function transformApiVersionInfo(
   client: SdkClient,
   dpgContext: SdkContext,
-  urlInfo?: UrlInfo
+  urlInfo?: UrlInfo,
 ): ApiVersionInfo | undefined {
   const queryVersionDetail = getOperationApiVersion(client, dpgContext);
   const pathVersionDetail = extractPathApiVersion(urlInfo);
   const isCrossedVersion =
     queryVersionDetail || pathVersionDetail
-      ? Boolean(
-          pathVersionDetail?.isCrossedVersion ||
-          queryVersionDetail?.isCrossedVersion
-        )
+      ? Boolean(pathVersionDetail?.isCrossedVersion || queryVersionDetail?.isCrossedVersion)
       : undefined;
   const defaultValue =
     (pathVersionDetail || queryVersionDetail) && !isCrossedVersion
@@ -47,19 +40,16 @@ export function transformApiVersionInfo(
     dpgContext.hasApiVersionInClient = true;
   }
   return {
-    definedPosition: extractDefinedPosition(
-      queryVersionDetail,
-      pathVersionDetail
-    ),
+    definedPosition: extractDefinedPosition(queryVersionDetail, pathVersionDetail),
     isCrossedVersion,
     defaultValue,
-    required: pathVersionDetail?.required ?? queryVersionDetail?.required
+    required: pathVersionDetail?.required ?? queryVersionDetail?.required,
   };
 }
 
 export function getOperationApiVersion(
   client: SdkClient,
-  dpgContext: SdkContext
+  dpgContext: SdkContext,
 ): ApiVersionInfo | undefined {
   const apiVersionTypes = new Set<string>();
   const locations = new Set<ApiVersionPosition>();
@@ -74,15 +64,13 @@ export function getOperationApiVersion(
       continue;
     }
     const params = route.parameters.parameters.filter(
-      (p) =>
-        (p.type === "query" || p.type === "path") &&
-        isApiVersion(dpgContext, p.param)
+      (p) => (p.type === "query" || p.type === "path") && isApiVersion(dpgContext, p.param),
     );
     params.map((p) => {
       const type = getSchemaForType(dpgContext, p.param.type, {
         usage: [SchemaContext.Exception, SchemaContext.Input],
         needRef: false,
-        relevantProperty: p.param
+        relevantProperty: p.param,
       });
       required.add(!p.param.optional);
       if (p.type === "query" || p.type === "path") {
@@ -106,11 +94,10 @@ export function getOperationApiVersion(
     return;
   }
   const detail: ApiVersionInfo = {
-    definedPosition:
-      locations.size > 1 ? "duplicate" : locations.values().next().value,
+    definedPosition: locations.size > 1 ? "duplicate" : locations.values().next().value,
     isCrossedVersion: apiVersionTypes.size > 1,
     defaultValue: undefined, // We won't prompt the query versions into client one
-    required: required.values().next().value
+    required: required.values().next().value,
   };
   return detail;
 }

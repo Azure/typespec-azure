@@ -1,30 +1,30 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
   addStorageCompatResponse,
   createStorageCompatOnResponse,
-  StorageCompatResponseInfo
+  StorageCompatResponseInfo,
 } from "../../../static/static-helpers/storageCompatResponse.js";
 
 // Minimal mock for FullOperationResponse (extends PipelineResponse)
 function createMockFullOperationResponse(
   status: number = 200,
   body: any = {},
-  headers: Record<string, string> = {}
+  headers: Record<string, string> = {},
 ) {
   return {
     status,
     headers: {
       get: (name: string) => headers[name],
-      toJSON: () => ({ ...headers })
+      toJSON: () => ({ ...headers }),
     },
     request: {
       url: "https://example.com/test",
       method: "GET",
-      headers: { toJSON: () => ({}) }
+      headers: { toJSON: () => ({}) },
     },
     bodyAsText: JSON.stringify(body),
     rawHeaders: headers,
-    parsedBody: body
+    parsedBody: body,
   } as any;
 }
 
@@ -34,11 +34,7 @@ describe("addStorageCompatResponse", () => {
     const parsedBody = { name: "widget-1" };
     const parsedHeaders = { requestId: "abc-123" };
 
-    const result = addStorageCompatResponse(
-      rawResponse,
-      parsedBody,
-      parsedHeaders
-    );
+    const result = addStorageCompatResponse(rawResponse, parsedBody, parsedHeaders);
 
     // The original body properties should be accessible directly
     expect(result.name).toBe("widget-1");
@@ -57,11 +53,7 @@ describe("addStorageCompatResponse", () => {
     const rawResponse = createMockFullOperationResponse(204);
     const parsedHeaders = { requestId: "req-1", version: "2024-01-01" };
 
-    const result = addStorageCompatResponse(
-      rawResponse,
-      undefined,
-      parsedHeaders
-    );
+    const result = addStorageCompatResponse(rawResponse, undefined, parsedHeaders);
 
     // Header properties should be accessible at the top level
     expect(result.requestId).toBe("req-1");
@@ -97,16 +89,12 @@ describe("addStorageCompatResponse", () => {
   it("should handle complex nested model body", () => {
     const rawResponse = createMockFullOperationResponse(200, {
       id: "1",
-      nested: { value: 42 }
+      nested: { value: 42 },
     });
     const parsedBody = { id: "1", nested: { value: 42 } };
     const parsedHeaders = { etag: '"abc"', requestId: "req-1" };
 
-    const result = addStorageCompatResponse(
-      rawResponse,
-      parsedBody,
-      parsedHeaders
-    );
+    const result = addStorageCompatResponse(rawResponse, parsedBody, parsedHeaders);
 
     expect(result.id).toBe("1");
     expect(result.nested.value).toBe(42);
@@ -119,11 +107,7 @@ describe("addStorageCompatResponse", () => {
     const parsedBody = { name: "test" };
     const parsedHeaders: Record<string, unknown> = {};
 
-    const result = addStorageCompatResponse(
-      rawResponse,
-      parsedBody,
-      parsedHeaders
-    );
+    const result = addStorageCompatResponse(rawResponse, parsedBody, parsedHeaders);
 
     expect(result._response.parsedHeaders).toEqual({});
   });
@@ -145,9 +129,9 @@ describe("addStorageCompatResponse", () => {
     const parsedHeaders = { requestId: "abc" };
 
     const result: { requestId: string } & { name: string } & StorageCompatResponseInfo<
-      { name: string },
-      { requestId: string }
-    > = addStorageCompatResponse(rawResponse, parsedBody, parsedHeaders);
+        { name: string },
+        { requestId: string }
+      > = addStorageCompatResponse(rawResponse, parsedBody, parsedHeaders);
 
     // Body and header properties accessible at top level
     expect(result.name).toBe("test");

@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { NameType, normalizeName } from "../../../../src/rlc-common/helpers/nameUtils.js";
 
@@ -7,36 +7,28 @@ describe("#normalizeName", () => {
     describe("Step 1 - split words", () => {
       it("should use uppercase words", () => {
         expect(normalizeName("someSQLConnection", NameType.EnumMemberName)).to.equal(
-          "SomeSQLConnection"
+          "SomeSQLConnection",
         );
       });
       it("should use special chars to help split", () => {
-        expect(normalizeName("pascal_case", NameType.EnumMemberName)).to.equal(
-          "PascalCase"
-        );
-        expect(normalizeName("pascal case", NameType.EnumMemberName)).to.equal(
-          "PascalCase"
-        );
-        expect(normalizeName("pascal/case", NameType.EnumMemberName)).to.equal(
-          "PascalCase"
-        );
+        expect(normalizeName("pascal_case", NameType.EnumMemberName)).to.equal("PascalCase");
+        expect(normalizeName("pascal case", NameType.EnumMemberName)).to.equal("PascalCase");
+        expect(normalizeName("pascal/case", NameType.EnumMemberName)).to.equal("PascalCase");
       });
       it("should split a plural upper cased word correctly", () => {
         expect(normalizeName("diskMBpsReadWrite", NameType.EnumMemberName)).to.equal(
-          "DiskMBpsReadWrite"
+          "DiskMBpsReadWrite",
         );
-        expect(
-          normalizeName("LRORetrysPost", NameType.OperationGroup,)
-        ).to.equal("LRORetrysPost");
-        expect(
-          normalizeName("_LRORetrysPost", NameType.OperationGroup,)
-        ).to.equal("LRORetrysPost");
+        expect(normalizeName("LRORetrysPost", NameType.OperationGroup)).to.equal("LRORetrysPost");
+        expect(normalizeName("_LRORetrysPost", NameType.OperationGroup)).to.equal("LRORetrysPost");
       });
 
       it("should limit the charset to alphanumeric characters", () => {
         expect(normalizeName("base64urlArray", NameType.Property)).to.equal("base64UrlArray");
         expect(normalizeName("R-10Min", NameType.EnumMemberName)).to.equal("R10Min");
-        expect(normalizeName("___pascal____case6666", NameType.EnumMemberName)).to.equal("PascalCase6666");
+        expect(normalizeName("___pascal____case6666", NameType.EnumMemberName)).to.equal(
+          "PascalCase6666",
+        );
         expect(normalizeName("system,user", NameType.EnumMemberName)).to.equal("SystemUser");
         expect(normalizeName("x86_64_mac", NameType.EnumMemberName)).to.equal("X8664Mac");
         expect(normalizeName("size256x256", NameType.EnumMemberName)).to.equal("Size256X256");
@@ -58,18 +50,23 @@ describe("#normalizeName", () => {
 
     describe("Step 3 - to target casing", () => {
       it("should keep whole upper case for enum member", () => {
-        expect(normalizeName("SAS_AUTHENTICATION_IP", NameType.EnumMemberName)).to.equal("SASAuthenticationIP");
+        expect(normalizeName("SAS_AUTHENTICATION_IP", NameType.EnumMemberName)).to.equal(
+          "SASAuthenticationIP",
+        );
       });
       it("should keep whole lower case for property", () => {
-        expect(normalizeName("SAS_AUTHENTICATION_IP", NameType.Property)).to.equal("sasAuthenticationIP");
+        expect(normalizeName("SAS_AUTHENTICATION_IP", NameType.Property)).to.equal(
+          "sasAuthenticationIP",
+        );
       });
     });
 
     describe("$DO_NOT_NORMALIZE", () => {
       it("should keep the whole name if it starts with $DO_NOT_NORMALIZE$", () => {
-        expect(normalizeName("$DO_NOT_NORMALIZE$VALIDATION_NOT_REQUIRED", NameType.EnumMemberName)).to.equal("VALIDATION_NOT_REQUIRED");
+        expect(
+          normalizeName("$DO_NOT_NORMALIZE$VALIDATION_NOT_REQUIRED", NameType.EnumMemberName),
+        ).to.equal("VALIDATION_NOT_REQUIRED");
       });
-
     });
   });
   describe("for enum member name", () => {
@@ -78,71 +75,45 @@ describe("#normalizeName", () => {
     });
     it("should handle api-version enums as normal enum", () => {
       expect(normalizeName("V1.1", NameType.EnumMemberName)).to.equal("V11");
-      expect(normalizeName("2024-07-01-preview ", NameType.EnumMemberName)).to.equal("_20240701Preview");
+      expect(normalizeName("2024-07-01-preview ", NameType.EnumMemberName)).to.equal(
+        "_20240701Preview",
+      );
     });
   });
   describe("for property", () => {
     it("should remove $ char", () => {
-      expect(normalizeName("$select", NameType.Property)).to.equal(
-        "select"
-      );
-      expect(normalizeName("hate/threatening", NameType.Property)).to.equal(
-        "hateThreatening"
-      );
+      expect(normalizeName("$select", NameType.Property)).to.equal("select");
+      expect(normalizeName("hate/threatening", NameType.Property)).to.equal("hateThreatening");
     });
   });
   describe("for parameter", () => {
     it("should return the name with the suffix 'Param' if the name is a reserved name", () => {
-      expect(normalizeName("static", NameType.Parameter, true)).to.equal(
-        "staticParam"
-      );
-      expect(normalizeName("any", NameType.Parameter, true)).to.equal(
-        "anyParam"
-      );
+      expect(normalizeName("static", NameType.Parameter, true)).to.equal("staticParam");
+      expect(normalizeName("any", NameType.Parameter, true)).to.equal("anyParam");
       expect(normalizeName("SAS", NameType.Parameter)).to.equal("sas");
     });
   });
 
   describe("for method", () => {
     it("should return the name with prefix $ for the method name is a reserved name", () => {
-      expect(normalizeName("continue", NameType.Method, true)).to.equal(
-        "$continue"
-      );
-      expect(normalizeName("break", NameType.Method, true)).to.equal(
-        "$break"
-      );
-      expect(normalizeName("case", NameType.Method, true)).to.equal(
-        "$case"
-      );
-      expect(normalizeName("break", NameType.Method, true)).to.equal(
-        "$break"
-      );
-      expect(normalizeName("class", NameType.Method, true)).to.equal(
-        "$class"
-      );
-      expect(normalizeName("default", NameType.Method, true)).to.equal(
-        "$default"
-      );
-      expect(normalizeName("do", NameType.Method, true)).to.equal(
-        "$do"
-      );
-      expect(normalizeName("function", NameType.Method, true)).to.equal(
-        "$function"
-      );
+      expect(normalizeName("continue", NameType.Method, true)).to.equal("$continue");
+      expect(normalizeName("break", NameType.Method, true)).to.equal("$break");
+      expect(normalizeName("case", NameType.Method, true)).to.equal("$case");
+      expect(normalizeName("break", NameType.Method, true)).to.equal("$break");
+      expect(normalizeName("class", NameType.Method, true)).to.equal("$class");
+      expect(normalizeName("default", NameType.Method, true)).to.equal("$default");
+      expect(normalizeName("do", NameType.Method, true)).to.equal("$do");
+      expect(normalizeName("function", NameType.Method, true)).to.equal("$function");
     });
   });
 
   describe("for operation", () => {
     it("should return the name with the suffix 'Operation' if the name is a reserved name", () => {
-      expect(normalizeName("export", NameType.Operation,)).to.equal(
-        "export"
-      );
+      expect(normalizeName("export", NameType.Operation)).to.equal("export");
     });
 
     it("should normalize the name", () => {
-      expect(
-        normalizeName("create_ widget", NameType.Parameter,)
-      ).to.equal("createWidget");
+      expect(normalizeName("create_ widget", NameType.Parameter)).to.equal("createWidget");
     });
   });
 });

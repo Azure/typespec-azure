@@ -1,16 +1,13 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
-import {
-  bearerTokenAuthenticationPolicyName,
-  PipelinePolicy
-} from "@azure/core-rest-pipeline";
+import { bearerTokenAuthenticationPolicyName, PipelinePolicy } from "@azure/core-rest-pipeline";
+import { customBearerTokenAuthenticationPolicy } from "../util/customBearerTokenTestingPolicy.js";
 import {
   createOAuth2,
   invalid,
   OAuth2Context,
-  valid
+  valid,
 } from "./generated/authentication/oauth2/src/api/index.js";
-import { customBearerTokenAuthenticationPolicy } from "../util/customBearerTokenTestingPolicy.js";
 
 describe("OAuth2Context in API Layer", () => {
   let context: OAuth2Context;
@@ -20,12 +17,12 @@ describe("OAuth2Context in API Layer", () => {
   beforeEach(() => {
     context = createOAuth2(
       {
-        getToken: async () => Promise.resolve(null)
+        getToken: async () => Promise.resolve(null),
       },
       {
         allowInsecureConnection: true,
-        endpoint: "http://localhost:3002"
-      }
+        endpoint: "http://localhost:3002",
+      },
     );
 
     policy = customBearerTokenAuthenticationPolicy({
@@ -34,13 +31,13 @@ describe("OAuth2Context in API Layer", () => {
         getToken: async () => {
           return {
             token: defaultScope,
-            expiresOnTimestamp: Date.now()
+            expiresOnTimestamp: Date.now(),
           };
-        }
-      }
+        },
+      },
     });
     context.pipeline.removePolicy({
-      name: bearerTokenAuthenticationPolicyName
+      name: bearerTokenAuthenticationPolicyName,
     });
     context.pipeline.addPolicy(policy);
   });

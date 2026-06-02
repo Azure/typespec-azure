@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { RepeatabilityClient } from "./generated/special-headers/repeatability/src/index.js";
 
@@ -8,7 +8,7 @@ describe("Repeatability Client", () => {
   beforeEach(() => {
     client = new RepeatabilityClient({
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
@@ -16,7 +16,7 @@ describe("Repeatability Client", () => {
     const requestID = "86aede1f-96fa-4e7f-b1e1-bf8a947cb804";
     const result = await client.immediateSuccess(
       requestID,
-      new Date("Mon, 13 Nov 2023 14:38:00 GMT")
+      new Date("Mon, 13 Nov 2023 14:38:00 GMT"),
     );
     assert.isUndefined(result);
   });

@@ -1,40 +1,27 @@
 import {
-  SdkHttpOperationExample,
-  SdkHttpParameterExampleValue,
-  SdkExampleValue,
+  isReadOnly,
   SdkClientInitializationType,
   SdkClientType,
-  SdkServiceOperation,
+  SdkExampleValue,
+  SdkHttpOperationExample,
+  SdkHttpParameterExampleValue,
   SdkModelPropertyType,
-  isReadOnly
+  SdkServiceOperation,
 } from "@azure-tools/typespec-client-generator-core";
-import {
-  isAzurePackage,
-  NameType,
-  normalizeName
-} from "../../rlc-common/index.js";
-import { resolveReference } from "../../framework/reference.js";
-import { SdkContext } from "../../utils/interfaces.js";
-import {
-  AzureIdentityDependencies,
-  AzureTestDependencies
-} from "../external-dependencies.js";
-import {
-  hasKeyCredential,
-  hasTokenCredential
-} from "../../utils/credentialUtils.js";
-import { isSpreadBodyParameter } from "./typeHelpers.js";
-import { getClassicalClientName } from "./namingHelpers.js";
-import {
-  getMethodHierarchiesMap,
-  ServiceOperation
-} from "../../utils/operationUtil.js";
-import { getSubscriptionId } from "../../transform/transfromRLCOptions.js";
+import { join } from "path";
 import { SourceFile } from "ts-morph";
 import { useContext } from "../../contextManager.js";
-import { join } from "path";
-import { getOperationFunction } from "./operationHelpers.js";
+import { resolveReference } from "../../framework/reference.js";
+import { isAzurePackage, NameType, normalizeName } from "../../rlc-common/index.js";
+import { getSubscriptionId } from "../../transform/transfromRLCOptions.js";
+import { hasKeyCredential, hasTokenCredential } from "../../utils/credentialUtils.js";
+import { SdkContext } from "../../utils/interfaces.js";
+import { getMethodHierarchiesMap, ServiceOperation } from "../../utils/operationUtil.js";
+import { AzureIdentityDependencies, AzureTestDependencies } from "../external-dependencies.js";
 import { getClientParametersDeclaration } from "./clientHelpers.js";
+import { getClassicalClientName } from "./namingHelpers.js";
+import { getOperationFunction } from "./operationHelpers.js";
+import { isSpreadBodyParameter } from "./typeHelpers.js";
 
 /**
  * Common interfaces for both samples and tests
@@ -58,12 +45,10 @@ export interface ClientEmitOptions {
  * Build parameter value map from example
  */
 export function buildParameterValueMap(
-  example: SdkHttpOperationExample
+  example: SdkHttpOperationExample,
 ): Record<string, SdkHttpParameterExampleValue> {
   const parameterMap: Record<string, SdkHttpParameterExampleValue> = {};
-  example.parameters.forEach(
-    (param) => (parameterMap[param.parameter.serializedName] = param)
-  );
+  example.parameters.forEach((param) => (parameterMap[param.parameter.serializedName] = param));
   return parameterMap;
 }
 
@@ -74,13 +59,13 @@ export function prepareCommonValue(
   name: string,
   value: SdkExampleValue | string,
   isOptional?: boolean,
-  onClient?: boolean
+  onClient?: boolean,
 ): CommonValue {
   return {
     name: normalizeName(name, NameType.Parameter),
     value: typeof value === "string" ? value : serializeExampleValue(value),
     isOptional: Boolean(isOptional),
-    onClient: Boolean(onClient)
+    onClient: Boolean(onClient),
   };
 }
 
@@ -89,36 +74,34 @@ export function prepareCommonValue(
  */
 export function getCredentialSampleValue(
   dpgContext: SdkContext,
-  initialization: SdkClientInitializationType
+  initialization: SdkClientInitializationType,
 ): CommonValue | undefined {
   const keyCredential = hasKeyCredential(initialization),
     tokenCredential = hasTokenCredential(initialization);
   const defaultSetting = {
     isOptional: false,
     onClient: true,
-    name: "credential"
+    name: "credential",
   };
   if (keyCredential || tokenCredential) {
     if (isAzurePackage({ options: dpgContext.rlcOptions })) {
       // Support DefaultAzureCredential for Azure packages
       return {
         ...defaultSetting,
-        value: `new ${resolveReference(
-          AzureIdentityDependencies.DefaultAzureCredential
-        )}()`
+        value: `new ${resolveReference(AzureIdentityDependencies.DefaultAzureCredential)}()`,
       };
     } else if (keyCredential) {
       // Support ApiKeyCredential for non-Azure packages
       return {
         ...defaultSetting,
-        value: `{ key: "INPUT_YOUR_KEY_HERE" }`
+        value: `{ key: "INPUT_YOUR_KEY_HERE" }`,
       };
     } else if (tokenCredential) {
       // Support TokenCredential for non-Azure packages
       return {
         ...defaultSetting,
         value: `{ getToken: async () => {
-          return { token: "INPUT_YOUR_TOKEN_HERE", expiresOnTimestamp: Date.now() }; } }`
+          return { token: "INPUT_YOUR_TOKEN_HERE", expiresOnTimestamp: Date.now() }; } }`,
       };
     }
   }
@@ -130,17 +113,15 @@ export function getCredentialSampleValue(
  */
 export function getCredentialTestValue(
   dpgContext: SdkContext,
-  initialization: SdkClientInitializationType
+  initialization: SdkClientInitializationType,
 ): CommonValue | undefined {
-  const createTestCredentialType = resolveReference(
-    AzureTestDependencies.createTestCredential
-  );
+  const createTestCredentialType = resolveReference(AzureTestDependencies.createTestCredential);
   const keyCredential = hasKeyCredential(initialization),
     tokenCredential = hasTokenCredential(initialization);
   const defaultSetting = {
     isOptional: false,
     onClient: true,
-    name: "credential"
+    name: "credential",
   };
 
   if (keyCredential || tokenCredential) {
@@ -148,13 +129,13 @@ export function getCredentialTestValue(
       // Support createTestCredential for ARM/Azure packages
       return {
         ...defaultSetting,
-        value: `${createTestCredentialType}()`
+        value: `${createTestCredentialType}()`,
       };
     } else if (keyCredential) {
       // Support ApiKeyCredential for non-Azure packages
       return {
         ...defaultSetting,
-        value: `{ key: "INPUT_YOUR_KEY_HERE" } `
+        value: `{ key: "INPUT_YOUR_KEY_HERE" } `,
       };
     } else if (tokenCredential) {
       // Support TokenCredential for non-Azure packages
@@ -164,7 +145,7 @@ export function getCredentialTestValue(
         getToken: async () => {
             return { token: "INPUT_YOUR_TOKEN_HERE", expiresOnTimestamp: Date.now() };
         }
-    } `
+    } `,
       };
     }
   }
@@ -217,7 +198,7 @@ export function serializeExampleValue(value: SdkExampleValue): string {
       const additionalPropertiesValue =
         value.kind === "model" ? (value.additionalPropertiesValue ?? {}) : {};
       for (const propName in {
-        ...value.value
+        ...value.value,
       }) {
         let property;
         if (value.type.kind === "model") {
@@ -232,49 +213,38 @@ export function serializeExampleValue(value: SdkExampleValue): string {
           continue;
         }
         // Handle flattened properties: inline inner model properties at current level
-        if (
-          property?.flatten &&
-          property.type.kind === "model" &&
-          propValue.kind === "model"
-        ) {
+        if (property?.flatten && property.type.kind === "model" && propValue.kind === "model") {
           const innerMapper = buildTestPropertyNameMapper(property.type);
           for (const innerPropName in propValue.value ?? {}) {
             const innerPropValue = propValue.value[innerPropName];
             if (innerPropValue === undefined || innerPropValue === null) {
               continue;
             }
-            const innerProperty = property.type.properties.find(
-              (p) => p.name === innerPropName
-            );
-            if (
-              innerProperty &&
-              isReadOnly(innerProperty as SdkModelPropertyType)
-            ) {
+            const innerProperty = property.type.properties.find((p) => p.name === innerPropName);
+            if (innerProperty && isReadOnly(innerProperty as SdkModelPropertyType)) {
               continue;
             }
             values.push(
               `"${innerMapper.get(innerPropName) ?? innerPropName}": ` +
-                serializeExampleValue(innerPropValue)
+                serializeExampleValue(innerPropValue),
             );
           }
           continue;
         }
         const propRetValue =
-          `"${mapper.get(propName) ?? propName}": ` +
-          serializeExampleValue(propValue);
+          `"${mapper.get(propName) ?? propName}": ` + serializeExampleValue(propValue);
         values.push(propRetValue);
       }
       const additionalBags = [];
       for (const propName in {
-        ...additionalPropertiesValue
+        ...additionalPropertiesValue,
       }) {
         const propValue = additionalPropertiesValue[propName];
         if (propValue === undefined || propValue === null) {
           continue;
         }
         const propRetValue =
-          `"${mapper.get(propName) ?? propName}": ` +
-          serializeExampleValue(propValue);
+          `"${mapper.get(propName) ?? propName}": ` + serializeExampleValue(propValue);
         additionalBags.push(propRetValue);
       }
       if (additionalBags.length > 0) {
@@ -315,7 +285,7 @@ function buildTestPropertyNameMapper(type: SdkExampleValue["type"]) {
     }
     mapper.set(
       prop.serializationOptions.json?.name || prop.name,
-      normalizeName(prop.name, NameType.Property)
+      normalizeName(prop.name, NameType.Property),
     );
   }
   return mapper;
@@ -337,11 +307,10 @@ export function escapeSpecialCharToSpace(str: string): string {
 export function getDescriptiveName(
   method: { doc?: string; oriName?: string; name: string },
   exampleName: string,
-  type: "sample" | "test"
+  type: "sample" | "test",
 ): string {
   const description = method.doc ?? `execute ${method.oriName ?? method.name}`;
-  let descriptiveName =
-    description.charAt(0).toLowerCase() + description.slice(1);
+  let descriptiveName = description.charAt(0).toLowerCase() + description.slice(1);
 
   // Only remove trailing dots for test names to avoid redundancy
   if (type === "test") {
@@ -362,18 +331,14 @@ export function prepareCommonParameters(
   dpgContext: SdkContext,
   method: ServiceOperation,
   parameterMap: Record<string, SdkHttpParameterExampleValue>,
-  topLevelClient: SdkClientType<SdkServiceOperation>
+  topLevelClient: SdkClientType<SdkServiceOperation>,
 ): CommonValue[] {
   const envType = resolveReference(AzureTestDependencies.env);
   const result: CommonValue[] = [];
 
-  const clientParams = getClientParametersDeclaration(
-    topLevelClient,
-    dpgContext,
-    {
-      onClientOnly: true
-    }
-  );
+  const clientParams = getClientParametersDeclaration(topLevelClient, dpgContext, {
+    onClientOnly: true,
+  });
 
   for (const param of clientParams) {
     if (param.name === "options" || param.name === "credential") {
@@ -382,22 +347,16 @@ export function prepareCommonParameters(
 
     const exampleValue: CommonValue = {
       name: param.name === "endpointParam" ? "endpoint" : param.name,
-      value: getEnvironmentVariableName(
-        param.name,
-        getClassicalClientName(topLevelClient)
-      ),
+      value: getEnvironmentVariableName(param.name, getClassicalClientName(topLevelClient)),
       isOptional: Boolean(param.hasQuestionToken),
-      onClient: true
+      onClient: true,
     };
 
     result.push(exampleValue);
   }
 
   // Handle credentials for tests
-  const credentialValue = getCredentialTestValue(
-    dpgContext,
-    topLevelClient.clientInitialization
-  );
+  const credentialValue = getCredentialTestValue(dpgContext, topLevelClient.clientInitialization);
   if (credentialValue) {
     result.push(credentialValue);
   }
@@ -407,11 +366,7 @@ export function prepareCommonParameters(
 
   // Process required parameters
   for (const param of method.operation.parameters) {
-    if (
-      param.optional === true ||
-      param.type.kind === "constant" ||
-      param.clientDefaultValue
-    ) {
+    if (param.optional === true || param.type.kind === "constant" || param.clientDefaultValue) {
       continue;
     }
 
@@ -421,9 +376,7 @@ export function prepareCommonParameters(
     if (param.name.toLowerCase() === "subscriptionid" && dpgContext.arm) {
       isSubscriptionIdAdded = true;
       // For tests, always use env variable
-      result.push(
-        prepareCommonValue("subscriptionId", subscriptionIdValue, false, true)
-      );
+      result.push(prepareCommonValue("subscriptionId", subscriptionIdValue, false, true));
       continue;
     }
 
@@ -431,12 +384,7 @@ export function prepareCommonParameters(
       if (!param.optional) {
         // Generate default values for required parameters without examples in tests
         result.push(
-          prepareCommonValue(
-            param.name,
-            `"{Your ${param.name}}"`,
-            false,
-            param.onClient
-          )
+          prepareCommonValue(param.name, `"{Your ${param.name}}"`, false, param.onClient),
         );
       }
       continue;
@@ -447,20 +395,14 @@ export function prepareCommonParameters(
         exampleValue.parameter.name,
         exampleValue.value,
         param.optional,
-        param.onClient
-      )
+        param.onClient,
+      ),
     );
   }
 
   // Add subscriptionId for ARM clients if needed
-  if (
-    dpgContext.arm &&
-    getSubscriptionId(dpgContext) &&
-    !isSubscriptionIdAdded
-  ) {
-    result.push(
-      prepareCommonValue("subscriptionId", subscriptionIdValue, false, true)
-    );
+  if (dpgContext.arm && getSubscriptionId(dpgContext) && !isSubscriptionIdAdded) {
+    result.push(prepareCommonValue("subscriptionId", subscriptionIdValue, false, true));
   }
 
   // Handle body parameters
@@ -482,22 +424,13 @@ export function prepareCommonParameters(
         if (isReadOnly(prop as SdkModelPropertyType)) {
           continue;
         }
-        result.push(
-          prepareCommonValue(
-            prop.name,
-            propExample,
-            prop.optional,
-            prop.onClient
-          )
-        );
+        result.push(prepareCommonValue(prop.name, propExample, prop.optional, prop.onClient));
       }
     } else {
       // Check if the body parameter is nested inside a wrapper (e.g., @bodyRoot)
       const segments = bodyParam.methodParameterSegments;
       const isNestedBody =
-        segments.length === 1 &&
-        segments[0] !== undefined &&
-        segments[0].length > 1;
+        segments.length === 1 && segments[0] !== undefined && segments[0].length > 1;
       if (isNestedBody) {
         const path = segments[0]!;
         // The first segment is the method-level wrapper param (e.g., "body")
@@ -514,8 +447,8 @@ export function prepareCommonParameters(
             methodParamName,
             wrappedValue,
             methodParamOptional,
-            bodyParam.onClient
-          )
+            bodyParam.onClient,
+          ),
         );
       } else {
         result.push(
@@ -523,8 +456,8 @@ export function prepareCommonParameters(
             bodyParam.name,
             bodyExample.value,
             bodyParam.optional,
-            bodyParam.onClient
-          )
+            bodyParam.onClient,
+          ),
         );
       }
     }
@@ -534,21 +467,12 @@ export function prepareCommonParameters(
   method.operation.parameters
     .filter(
       (param) =>
-        param.optional === true &&
-        parameterMap[param.serializedName] &&
-        !param.clientDefaultValue
+        param.optional === true && parameterMap[param.serializedName] && !param.clientDefaultValue,
     )
     .forEach((param) => {
       const exampleValue = parameterMap[param.serializedName];
       if (exampleValue && exampleValue.value) {
-        result.push(
-          prepareCommonValue(
-            param.name,
-            exampleValue.value,
-            true,
-            param.onClient
-          )
-        );
+        result.push(prepareCommonValue(param.name, exampleValue.value, true, param.onClient));
       }
     });
 
@@ -563,8 +487,8 @@ export function iterateClientsAndMethods(
   callback: (
     dpgContext: SdkContext,
     method: ServiceOperation,
-    options: ClientEmitOptions
-  ) => SourceFile | undefined
+    options: ClientEmitOptions,
+  ) => SourceFile | undefined,
 ): SourceFile[] {
   const generatedFiles: SourceFile[] = [];
   const clients = dpgContext.sdkPackage.clients;
@@ -587,7 +511,7 @@ export function iterateClientsAndMethods(
             clients.length > 1
               ? normalizeName(getClassicalClientName(client), NameType.File)
               : undefined,
-          hierarchies: hierarchies
+          hierarchies: hierarchies,
         });
       }
     }
@@ -602,7 +526,7 @@ export function generateMethodCall(
   method: ServiceOperation,
   parameters: CommonValue[],
   options: ClientEmitOptions,
-  dpgContext?: SdkContext
+  dpgContext?: SdkContext,
 ): { methodCall: string; clientParams: string[]; clientParamDefs: string[] } {
   // Prepare client-level parameters
   const clientParamValues = parameters.filter((p) => p.onClient);
@@ -624,17 +548,13 @@ export function generateMethodCall(
     const operationFunction = getOperationFunction(
       dpgContext,
       [options.hierarchies ?? [], method],
-      "Client"
+      "Client",
     );
 
     // Extract parameter names from the function signature (excluding context and options)
     const signatureParamNames =
       operationFunction.parameters
-        ?.filter(
-          (p) =>
-            p.name !== "context" &&
-            !p.type?.toString().includes("OptionalParams")
-        )
+        ?.filter((p) => p.name !== "context" && !p.type?.toString().includes("OptionalParams"))
         .map((p) => p.name) ?? [];
 
     // Create a map for quick lookup of parameter values by name
@@ -648,9 +568,7 @@ export function generateMethodCall(
     methodParams = orderedRequiredParams.map((p) => `${p.value}`);
   } else {
     // Original logic when dpgContext is not provided
-    methodParams = methodParamValues
-      .filter((p) => !p.isOptional)
-      .map((p) => `${p.value}`);
+    methodParams = methodParamValues.filter((p) => !p.isOptional).map((p) => `${p.value}`);
   }
 
   const optionalParams = methodParamValues
@@ -660,9 +578,7 @@ export function generateMethodCall(
     methodParams.push(`{${optionalParams.join(", ")}}`);
   }
 
-  const prefix = options.classicalMethodPrefix
-    ? `${options.classicalMethodPrefix}.`
-    : "";
+  const prefix = options.classicalMethodPrefix ? `${options.classicalMethodPrefix}.` : "";
   const methodCall = `client.${prefix}${normalizeName(method.oriName ?? method.name, NameType.Property)}(${methodParams.join(", ")})`;
 
   return { methodCall, clientParams, clientParamDefs };
@@ -676,30 +592,22 @@ export function createSourceFile(
   method: ServiceOperation,
   options: ClientEmitOptions,
   type: "sample" | "test",
-  fileName: string
+  fileName: string,
 ): SourceFile {
   const project = useContext("outputProject");
-  const operationPrefix = `${options.classicalMethodPrefix ?? ""} ${
-    method.oriName ?? method.name
-  }`;
-  const baseFolder =
-    type === "sample" ? "samples-dev" : join("test", "generated");
+  const operationPrefix = `${options.classicalMethodPrefix ?? ""} ${method.oriName ?? method.name}`;
+  const baseFolder = type === "sample" ? "samples-dev" : join("test", "generated");
   const folder = join(
     dpgContext.generationPathDetail?.rootDir ?? "",
     baseFolder,
-    options.subFolder ?? ""
+    options.subFolder ?? "",
   );
   const fileExtension = type === "sample" ? ".ts" : ".spec.ts";
-  const normalizedFileName = normalizeName(
-    fileName || `${operationPrefix} ${type}`,
-    NameType.File
-  );
+  const normalizedFileName = normalizeName(fileName || `${operationPrefix} ${type}`, NameType.File);
 
-  return project.createSourceFile(
-    join(folder, `${normalizedFileName}${fileExtension}`),
-    "",
-    { overwrite: true }
-  );
+  return project.createSourceFile(join(folder, `${normalizedFileName}${fileExtension}`), "", {
+    overwrite: true,
+  });
 }
 
 /**
@@ -709,7 +617,7 @@ export function generateAssertionsForValue(
   value: SdkExampleValue,
   path: string,
   maxDepth: number = 3,
-  currentDepth: number = 0
+  currentDepth: number = 0,
 ): string[] {
   const assertions: string[] = [];
 
@@ -723,13 +631,13 @@ export function generateAssertionsForValue(
       switch (value.type.kind) {
         case "utcDateTime":
           assertions.push(
-            `assert.strictEqual(${path}.getTime(), new Date("${value.value}").getTime());`
+            `assert.strictEqual(${path}.getTime(), new Date("${value.value}").getTime());`,
           );
           break;
         case "bytes": {
           const encode = value.type.encode ?? "base64";
           assertions.push(
-            `assert.deepEqual(${path}, Buffer.from("${value.value}",  "${encode}"));`
+            `assert.deepEqual(${path}, Buffer.from("${value.value}",  "${encode}"));`,
           );
           break;
         }
@@ -750,9 +658,7 @@ export function generateAssertionsForValue(
     }
     case "boolean":
     case "number":
-      assertions.push(
-        `assert.strictEqual(${path}, ${JSON.stringify(value.value)});`
-      );
+      assertions.push(`assert.strictEqual(${path}, ${JSON.stringify(value.value)});`);
       break;
     case "unknown":
       // for unknown type we fall back to assert.isDefined to avoid false positives in tests, so we can't assert on the exact value. But we can still check that the payload is defined.
@@ -761,9 +667,7 @@ export function generateAssertionsForValue(
     case "array":
       if (value.value && value.value.length > 0) {
         assertions.push(`assert.ok(Array.isArray(${path}));`);
-        assertions.push(
-          `assert.strictEqual(${path}.length, ${value.value.length});`
-        );
+        assertions.push(`assert.strictEqual(${path}.length, ${value.value.length});`);
 
         // Assert on first few items to avoid overly verbose tests
         const itemsToCheck = Math.min(value.value.length, 2);
@@ -774,7 +678,7 @@ export function generateAssertionsForValue(
               item,
               `${path}[${i}]`,
               maxDepth,
-              currentDepth + 1
+              currentDepth + 1,
             );
             assertions.push(...itemAssertions);
           }
@@ -792,21 +696,16 @@ export function generateAssertionsForValue(
             // Check if this property is flattened in the model type
             let property;
             if (value.kind === "model" && value.type.kind === "model") {
-              property = value.type.properties.find(
-                (p) => p.kind === "property" && p.name === key
-              );
+              property = value.type.properties.find((p) => p.kind === "property" && p.name === key);
             }
-            if (
-              property?.flatten &&
-              (val as SdkExampleValue).kind === "model"
-            ) {
+            if (property?.flatten && (val as SdkExampleValue).kind === "model") {
               // For flattened properties, recurse using the parent path so
               // assertions reference result.xxx instead of result.properties.xxx
               const innerAssertions = generateAssertionsForValue(
                 val as SdkExampleValue,
                 path,
                 maxDepth,
-                currentDepth + 1
+                currentDepth + 1,
               );
               assertions.push(...innerAssertions);
             } else {
@@ -815,14 +714,12 @@ export function generateAssertionsForValue(
               // For nested model/dict values, append "?" to the path so child
               // property accesses use optional chaining (e.g. result.systemData?.createdBy)
               const recursePath =
-                nestedVal.kind === "model" || nestedVal.kind === "dict"
-                  ? `${propPath}?`
-                  : propPath;
+                nestedVal.kind === "model" || nestedVal.kind === "dict" ? `${propPath}?` : propPath;
               const propAssertions = generateAssertionsForValue(
                 nestedVal,
                 recursePath,
                 maxDepth,
-                currentDepth + 1
+                currentDepth + 1,
               );
               assertions.push(...propAssertions);
             }
@@ -842,7 +739,7 @@ export function generateAssertionsForValue(
           value.value as SdkExampleValue,
           path,
           maxDepth,
-          currentDepth
+          currentDepth,
         );
         assertions.push(...unionAssertions);
       }
@@ -858,7 +755,7 @@ export function generateAssertionsForValue(
 export function generateResponseAssertions(
   example: SdkHttpOperationExample,
   resultVariableName: string,
-  isPaging: boolean = false
+  isPaging: boolean = false,
 ): string[] {
   const assertions: string[] = [];
 
@@ -889,16 +786,13 @@ export function generateResponseAssertions(
   if (isPaging) {
     // For paging operations, the response body should have a 'value' array
     if (responseBody.kind === "model" || responseBody.kind === "dict") {
-      const responseValue = responseBody.value as Record<
-        string,
-        SdkExampleValue
-      >;
+      const responseValue = responseBody.value as Record<string, SdkExampleValue>;
       const valueArray = responseValue?.["value"];
 
       if (valueArray && valueArray.kind === "array" && valueArray.value) {
         // Assert on the length of the collected results
         assertions.push(
-          `assert.strictEqual(${resultVariableName}.length, ${valueArray.value.length});`
+          `assert.strictEqual(${resultVariableName}.length, ${valueArray.value.length});`,
         );
 
         // Assert on the first item if available
@@ -909,7 +803,7 @@ export function generateResponseAssertions(
               firstItem,
               `${resultVariableName}[0]`,
               2, // Limit depth for paging items
-              0
+              0,
             );
             assertions.push(...itemAssertions);
           }
@@ -918,10 +812,7 @@ export function generateResponseAssertions(
     }
   } else {
     // Generate assertions based on response body structure
-    const responseAssertions = generateAssertionsForValue(
-      responseBody,
-      resultVariableName
-    );
+    const responseAssertions = generateAssertionsForValue(responseBody, resultVariableName);
     assertions.push(...responseAssertions);
   }
 
@@ -935,10 +826,7 @@ export function generateResponseAssertions(
  * @param clientName - Optional client name to use as prefix
  * @returns The environment variable expression string
  */
-function getEnvironmentVariableName(
-  paramName: string,
-  clientName?: string
-): string {
+function getEnvironmentVariableName(paramName: string, clientName?: string): string {
   // Remove "Param" suffix if present
   const cleanName = paramName.replace(/Param$/, "");
 

@@ -9,7 +9,7 @@ This is tsp definition.
 ```tsp
 @discriminator("kind")
 model AWidgetData {
-    kind: string;
+  kind: string;
 }
 
 model AOAIModelConfig extends AWidgetData {
@@ -25,7 +25,7 @@ model MAASModelConfig extends AWidgetData {
 
 @route("/serialize")
 interface D {
-  @get op bar(): AWidgetData;
+  @get bar(): AWidgetData;
 }
 ```
 
@@ -160,10 +160,8 @@ model DiscountTypeCustomPriceMultiCurrency extends DiscountTypeCustomPrice {
 
 @route("/serialize")
 interface D {
-  @get op bar(): DiscountTypeProperties;
+  @get bar(): DiscountTypeProperties;
 }
-
-
 ```
 
 ## Provide generated models and its serializer
@@ -311,7 +309,7 @@ model Exception extends DocumentIngress {
 
 @route("/documents")
 interface DocumentService {
-  op processDocument(@body body: DocumentIngress): DocumentIngress;
+  processDocument(@body body: DocumentIngress): DocumentIngress;
 }
 ```
 
@@ -513,16 +511,14 @@ using TypeSpec.Http;
 using TypeSpec.Versioning;
 using Azure.ClientGenerator.Core;
 
-@service(#{
-  title: "Microsoft.Contoso management service",
-})
+@service(#{ title: "Microsoft.Contoso management service" })
 @versioned(Microsoft.Contoso.Versions)
 namespace Microsoft.Contoso;
 
 enum Versions {
   PreviewVersion: "2024-07-01-preview",
   `2024-07-01`,
-  `2024-08-01-preview`
+  `2024-08-01-preview`,
 }
 
 alias PetContent = {

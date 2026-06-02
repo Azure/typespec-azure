@@ -3,13 +3,18 @@
 ## TypeSpec
 
 ```tsp
-model ListCredentialsRequest{
+model ListCredentialsRequest {
   serviceName: string;
   PROPERTY_NAME: string;
 }
 
 @doc("show example demo")
-op post(@query QUERY_PARAM?: string, @header HEADER_PARAM?: string,@path PATH_PARAM?: string, @body ListCredentialsRequest?: ListCredentialsRequest): void;
+op post(
+  @query QUERY_PARAM?: string,
+  @header HEADER_PARAM?: string,
+  @path PATH_PARAM?: string,
+  @body ListCredentialsRequest?: ListCredentialsRequest,
+): void;
 ```
 
 Should ingore the warning `@azure-tools/typespec-ts/property-name-normalized`:
@@ -71,19 +76,17 @@ export function _postSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context
-    .path(path)
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: {
-        ...(options?.headerParam !== undefined ? { header_param: options?.headerParam } : {}),
-        ...options.requestOptions?.headers,
-      },
-      body: !options?.listCredentialsRequest
-        ? options?.listCredentialsRequest
-        : listCredentialsRequestSerializer(options?.listCredentialsRequest),
-    });
+  return context.path(path).post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: {
+      ...(options?.headerParam !== undefined ? { header_param: options?.headerParam } : {}),
+      ...options.requestOptions?.headers,
+    },
+    body: !options?.listCredentialsRequest
+      ? options?.listCredentialsRequest
+      : listCredentialsRequestSerializer(options?.listCredentialsRequest),
+  });
 }
 
 export async function _postDeserialize(result: PathUncheckedResponse): Promise<void> {

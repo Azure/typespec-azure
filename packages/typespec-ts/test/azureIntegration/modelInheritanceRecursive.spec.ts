@@ -1,8 +1,8 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import RecursiveClientFactory, {
   Extension,
-  RecursiveClient
+  RecursiveClient,
 } from "./generated/type/model/inheritance/recursive/src/index.js";
 
 const body: Extension = {
@@ -12,28 +12,26 @@ const body: Extension = {
       level: 1,
       extension: [
         {
-          level: 2
-        }
-      ]
+          level: 2,
+        },
+      ],
     },
     {
-      level: 1
-    }
-  ]
+      level: 1,
+    },
+  ],
 };
 describe("Recursive Client", () => {
   let client: RecursiveClient;
 
   beforeEach(() => {
     client = RecursiveClientFactory({
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
   it("Inheritance Recursive put test", async () => {
-    const result = await client
-      .path("/type/model/inheritance/recursive")
-      .put({ body });
+    const result = await client.path("/type/model/inheritance/recursive").put({ body });
     assert.equal(result.status, "204");
   });
 

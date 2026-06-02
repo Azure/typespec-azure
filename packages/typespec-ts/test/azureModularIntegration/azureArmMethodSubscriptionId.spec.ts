@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { MethodSubscriptionIdClient } from "./generated/azure/resource-manager/method-subscription-id/src/index.js";
 
@@ -10,7 +10,7 @@ describe("Azure Arm Method Subscription Id Modular Client", () => {
   beforeEach(() => {
     client = new MethodSubscriptionIdClient(SUBSCRIPTION_ID_EXPECTED, {
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
   const RESOURCE_GROUP_EXPECTED = "test-rg";
@@ -22,7 +22,7 @@ describe("Azure Arm Method Subscription Id Modular Client", () => {
     type: "Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s",
     properties: {
       provisioningState: "Succeeded",
-      description: "Valid subscription resource 1"
+      description: "Valid subscription resource 1",
     },
     systemData: {
       createdBy: "AzureSDK",
@@ -30,8 +30,8 @@ describe("Azure Arm Method Subscription Id Modular Client", () => {
       createdAt: new Date("2023-01-01T00:00:00.000Z"),
       lastModifiedBy: "AzureSDK",
       lastModifiedAt: new Date("2023-01-01T00:00:00.000Z"),
-      lastModifiedByType: "User"
-    }
+      lastModifiedByType: "User",
+    },
   };
 
   const validSubscriptionResource2 = {
@@ -40,7 +40,7 @@ describe("Azure Arm Method Subscription Id Modular Client", () => {
     type: "Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s",
     properties: {
       provisioningState: "Succeeded",
-      configValue: "test-config"
+      configValue: "test-config",
     },
     systemData: {
       createdBy: "AzureSDK",
@@ -48,8 +48,8 @@ describe("Azure Arm Method Subscription Id Modular Client", () => {
       createdAt: new Date("2023-01-01T00:00:00.000Z"),
       lastModifiedBy: "AzureSDK",
       lastModifiedAt: new Date("2023-01-01T00:00:00.000Z"),
-      lastModifiedByType: "User"
-    }
+      lastModifiedByType: "User",
+    },
   };
 
   const validMixedSubscriptionResource = {
@@ -58,7 +58,7 @@ describe("Azure Arm Method Subscription Id Modular Client", () => {
     type: "Azure.ResourceManager.MethodSubscriptionId/subscriptionResources",
     properties: {
       provisioningState: "Succeeded",
-      subscriptionSetting: "test-sub-setting"
+      subscriptionSetting: "test-sub-setting",
     },
     systemData: {
       createdBy: "AzureSDK",
@@ -66,8 +66,8 @@ describe("Azure Arm Method Subscription Id Modular Client", () => {
       createdAt: new Date("2023-01-01T00:00:00.000Z"),
       lastModifiedBy: "AzureSDK",
       lastModifiedAt: new Date("2023-01-01T00:00:00.000Z"),
-      lastModifiedByType: "User"
-    }
+      lastModifiedByType: "User",
+    },
   };
 
   const validResourceGroupResource = {
@@ -77,7 +77,7 @@ describe("Azure Arm Method Subscription Id Modular Client", () => {
     location: LOCATION_EXPECTED,
     properties: {
       provisioningState: "Succeeded",
-      resourceGroupSetting: "test-setting"
+      resourceGroupSetting: "test-setting",
     },
     systemData: {
       createdBy: "AzureSDK",
@@ -85,8 +85,8 @@ describe("Azure Arm Method Subscription Id Modular Client", () => {
       createdAt: new Date("2023-01-01T00:00:00.000Z"),
       lastModifiedBy: "AzureSDK",
       lastModifiedAt: new Date("2023-01-01T00:00:00.000Z"),
-      lastModifiedByType: "User"
-    }
+      lastModifiedByType: "User",
+    },
   };
 
   // Test operations list
@@ -104,7 +104,7 @@ describe("Azure Arm Method Subscription Id Modular Client", () => {
   it("should get subscription resource 1", async () => {
     const result = await client.subscriptionResource1Operations.get(
       SUBSCRIPTION_ID_EXPECTED,
-      "sub-resource-1"
+      "sub-resource-1",
     );
     assert.strictEqual(result.name, validSubscriptionResource1.name);
     assert.strictEqual(result.type, validSubscriptionResource1.type);
@@ -116,9 +116,9 @@ describe("Azure Arm Method Subscription Id Modular Client", () => {
       "sub-resource-1",
       {
         properties: {
-          description: "Valid subscription resource 1"
-        }
-      }
+          description: "Valid subscription resource 1",
+        },
+      },
     );
     assert.strictEqual(result.name, validSubscriptionResource1.name);
     assert.strictEqual(result.type, validSubscriptionResource1.type);
@@ -127,7 +127,7 @@ describe("Azure Arm Method Subscription Id Modular Client", () => {
   it("should delete subscription resource 1", async () => {
     const result = await client.subscriptionResource1Operations.delete(
       SUBSCRIPTION_ID_EXPECTED,
-      "sub-resource-1"
+      "sub-resource-1",
     );
     assert.isUndefined(result);
   });
@@ -136,7 +136,7 @@ describe("Azure Arm Method Subscription Id Modular Client", () => {
   it("should get subscription resource 2", async () => {
     const result = await client.subscriptionResource2Operations.get(
       SUBSCRIPTION_ID_EXPECTED,
-      "sub-resource-2"
+      "sub-resource-2",
     );
     assert.strictEqual(result.name, validSubscriptionResource2.name);
     assert.strictEqual(result.type, validSubscriptionResource2.type);
@@ -148,9 +148,9 @@ describe("Azure Arm Method Subscription Id Modular Client", () => {
       "sub-resource-2",
       {
         properties: {
-          configValue: "test-config"
-        }
-      }
+          configValue: "test-config",
+        },
+      },
     );
     assert.strictEqual(result.name, validSubscriptionResource2.name);
     assert.strictEqual(result.type, validSubscriptionResource2.type);
@@ -159,7 +159,7 @@ describe("Azure Arm Method Subscription Id Modular Client", () => {
   it("should delete subscription resource 2", async () => {
     const result = await client.subscriptionResource2Operations.delete(
       SUBSCRIPTION_ID_EXPECTED,
-      "sub-resource-2"
+      "sub-resource-2",
     );
     assert.isUndefined(result);
   });
@@ -168,7 +168,7 @@ describe("Azure Arm Method Subscription Id Modular Client", () => {
   it("should get mixed subscription resource", async () => {
     const result = await client.subscriptionResourceOperations.get(
       SUBSCRIPTION_ID_EXPECTED,
-      "sub-resource"
+      "sub-resource",
     );
     assert.strictEqual(result.name, validMixedSubscriptionResource.name);
     assert.strictEqual(result.type, validMixedSubscriptionResource.type);
@@ -178,11 +178,11 @@ describe("Azure Arm Method Subscription Id Modular Client", () => {
     const SUBSCRIPTION_ID_UNEXPECTED = "11111111-1111-1111-1111-111111111111";
     client = new MethodSubscriptionIdClient(SUBSCRIPTION_ID_UNEXPECTED, {
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
     const result = await client.subscriptionResourceOperations.get(
       SUBSCRIPTION_ID_EXPECTED,
-      "sub-resource"
+      "sub-resource",
     );
     assert.strictEqual(result.name, validMixedSubscriptionResource.name);
     assert.strictEqual(result.type, validMixedSubscriptionResource.type);
@@ -194,9 +194,9 @@ describe("Azure Arm Method Subscription Id Modular Client", () => {
       "sub-resource",
       {
         properties: {
-          subscriptionSetting: "test-sub-setting"
-        }
-      }
+          subscriptionSetting: "test-sub-setting",
+        },
+      },
     );
     assert.strictEqual(result.name, validMixedSubscriptionResource.name);
     assert.strictEqual(result.type, validMixedSubscriptionResource.type);
@@ -205,7 +205,7 @@ describe("Azure Arm Method Subscription Id Modular Client", () => {
   it("should delete mixed subscription resource", async () => {
     const result = await client.subscriptionResourceOperations.delete(
       SUBSCRIPTION_ID_EXPECTED,
-      "sub-resource"
+      "sub-resource",
     );
     assert.isUndefined(result);
   });
@@ -214,7 +214,7 @@ describe("Azure Arm Method Subscription Id Modular Client", () => {
   it("should get resource group resource", async () => {
     const result = await client.resourceGroupResourceOperations.get(
       RESOURCE_GROUP_EXPECTED,
-      "rg-resource"
+      "rg-resource",
     );
     assert.strictEqual(result.name, validResourceGroupResource.name);
     assert.strictEqual(result.type, validResourceGroupResource.type);
@@ -227,9 +227,9 @@ describe("Azure Arm Method Subscription Id Modular Client", () => {
       {
         location: LOCATION_EXPECTED,
         properties: {
-          resourceGroupSetting: "test-setting"
-        }
-      }
+          resourceGroupSetting: "test-setting",
+        },
+      },
     );
     assert.strictEqual(result.name, validResourceGroupResource.name);
     assert.strictEqual(result.type, validResourceGroupResource.type);
@@ -238,7 +238,7 @@ describe("Azure Arm Method Subscription Id Modular Client", () => {
   it("should delete resource group resource", async () => {
     const result = await client.resourceGroupResourceOperations.delete(
       RESOURCE_GROUP_EXPECTED,
-      "rg-resource"
+      "rg-resource",
     );
     assert.isUndefined(result);
   });

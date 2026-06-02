@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { BasicClient, User } from "./generated/azure/core/basic/src/index.js";
 
@@ -8,7 +8,7 @@ describe("BasicClient Classical Client", () => {
   beforeEach(() => {
     client = new BasicClient({
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
@@ -21,7 +21,7 @@ describe("BasicClient Classical Client", () => {
           orderby: ["id"],
           filter: "id lt 10",
           select: ["id", "orders", "etag"],
-          expand: ["orders"]
+          expand: ["orders"],
         });
         const items = [];
         for await (const user of iter) {
@@ -29,10 +29,7 @@ describe("BasicClient Classical Client", () => {
         }
         assert.strictEqual(items.length, 2);
         assert.strictEqual(items[0]?.name, "Madge");
-        assert.strictEqual(
-          items[1]?.etag,
-          "11bdc430-65e8-45ad-81d9-8ffa60d55b5a"
-        );
+        assert.strictEqual(items[1]?.etag, "11bdc430-65e8-45ad-81d9-8ffa60d55b5a");
       });
 
       it("could pass the validation if enable skipUrlEncoding because of no special chars", async () => {
@@ -43,7 +40,7 @@ describe("BasicClient Classical Client", () => {
           filter: "id lt 10",
           select: ["id", "orders", "etag"],
           expand: ["orders"],
-          requestOptions: { skipUrlEncoding: true }
+          requestOptions: { skipUrlEncoding: true },
         });
         const items = [];
         for await (const user of iter) {
@@ -51,10 +48,7 @@ describe("BasicClient Classical Client", () => {
         }
         assert.strictEqual(items.length, 2);
         assert.strictEqual(items[0]?.name, "Madge");
-        assert.strictEqual(
-          items[1]?.etag,
-          "11bdc430-65e8-45ad-81d9-8ffa60d55b5a"
-        );
+        assert.strictEqual(items[1]?.etag, "11bdc430-65e8-45ad-81d9-8ffa60d55b5a");
       });
     });
 
@@ -66,7 +60,7 @@ describe("BasicClient Classical Client", () => {
           orderby: ["id"],
           filter: "id lt 10",
           select: ["id", "orders", "etag"],
-          expand: ["orders"]
+          expand: ["orders"],
         });
         const pagedItems = iter.byPage();
         const items: User[] = [];
@@ -75,10 +69,7 @@ describe("BasicClient Classical Client", () => {
         }
         assert.strictEqual(items.length, 2);
         assert.strictEqual(items[0]?.name, "Madge");
-        assert.strictEqual(
-          items[1]?.etag,
-          "11bdc430-65e8-45ad-81d9-8ffa60d55b5a"
-        );
+        assert.strictEqual(items[1]?.etag, "11bdc430-65e8-45ad-81d9-8ffa60d55b5a");
       });
 
       it("maxPageSize param should be ignored", async () => {
@@ -88,7 +79,7 @@ describe("BasicClient Classical Client", () => {
           orderby: ["id"],
           filter: "id lt 10",
           select: ["id", "orders", "etag"],
-          expand: ["orders"]
+          expand: ["orders"],
         });
 
         const pagedIter = iter.byPage({ maxPageSize: 10 } as any);
@@ -100,7 +91,7 @@ describe("BasicClient Classical Client", () => {
         const iter = client.list();
         const pagedItems = iter.byPage({
           continuationToken:
-            "/azure/core/basic/users?top=5&skip=10&orderby=id&filter=id%20lt%2010&select=id&select=orders&select=etag&expand=orders&api-version=2022-12-01-preview"
+            "/azure/core/basic/users?top=5&skip=10&orderby=id&filter=id%20lt%2010&select=id&select=orders&select=etag&expand=orders&api-version=2022-12-01-preview",
         });
         const items: User[] = [];
         for await (const user of pagedItems) {
@@ -108,10 +99,7 @@ describe("BasicClient Classical Client", () => {
         }
         assert.strictEqual(items.length, 2);
         assert.strictEqual(items[0]?.name, "Madge");
-        assert.strictEqual(
-          items[1]?.etag,
-          "11bdc430-65e8-45ad-81d9-8ffa60d55b5a"
-        );
+        assert.strictEqual(items[1]?.etag, "11bdc430-65e8-45ad-81d9-8ffa60d55b5a");
       });
     });
   });
@@ -137,16 +125,10 @@ describe("BasicClient Classical Client", () => {
       const result = await client.exportAllUsers("json");
       assert.strictEqual(result.users[0]?.id, 1);
       assert.strictEqual(result.users[0]?.name, "Madge");
-      assert.strictEqual(
-        result.users[0]?.etag,
-        "11bdc430-65e8-45ad-81d9-8ffa60d55b59"
-      );
+      assert.strictEqual(result.users[0]?.etag, "11bdc430-65e8-45ad-81d9-8ffa60d55b59");
       assert.strictEqual(result.users[1]?.id, 2);
       assert.strictEqual(result.users[1]?.name, "John");
-      assert.strictEqual(
-        result.users[1]?.etag,
-        "22bdc430-65e8-45ad-81d9-8ffa60d55b59"
-      );
+      assert.strictEqual(result.users[1]?.etag, "22bdc430-65e8-45ad-81d9-8ffa60d55b59");
     } catch (err) {
       assert.fail(err as string);
     }
@@ -158,11 +140,11 @@ describe("BasicClient Classical Client", () => {
         {
           name: "Madge",
           id: 1,
-          etag: "11bdc430-65e8-45ad-81d9-8ffa60d55b59"
+          etag: "11bdc430-65e8-45ad-81d9-8ffa60d55b59",
         },
         {
-          requestOptions: { headers: { "content-type": "application/json" } }
-        }
+          requestOptions: { headers: { "content-type": "application/json" } },
+        },
       );
       assert.strictEqual(user?.id, 1);
       assert.strictEqual(user?.name, "Madge");
@@ -177,7 +159,7 @@ describe("BasicClient Classical Client", () => {
       const user = await client.createOrUpdate(1, {
         name: "Madge",
         id: 1,
-        etag: "11bdc430-65e8-45ad-81d9-8ffa60d55b59"
+        etag: "11bdc430-65e8-45ad-81d9-8ffa60d55b59",
       });
       assert.strictEqual(user?.id, 1);
       assert.strictEqual(user?.name, "Madge");

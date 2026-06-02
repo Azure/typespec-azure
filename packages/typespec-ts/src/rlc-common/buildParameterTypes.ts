@@ -1,30 +1,30 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+import * as path from "path";
 import {
   InterfaceDeclarationStructure,
   Project,
   PropertySignatureStructure,
   SourceFile,
-  StructureKind
+  StructureKind,
 } from "ts-morph";
-import * as path from "path";
+import { getObjectInterfaceDeclaration } from "./buildObjectTypes.js";
+import { getImportSpecifier } from "./helpers/importsUtil.js";
+import {
+  getImportModuleName,
+  getParameterBaseName,
+  getParameterTypeName,
+} from "./helpers/nameConstructors.js";
+import { getGeneratedWrapperTypes } from "./helpers/operationHelpers.js";
 import {
   ObjectSchema,
   ParameterMetadata,
   ParameterMetadatas,
   RLCModel,
   Schema,
-  SchemaContext
+  SchemaContext,
 } from "./interfaces.js";
-import {
-  getImportModuleName,
-  getParameterBaseName,
-  getParameterTypeName
-} from "./helpers/nameConstructors.js";
-import { getImportSpecifier } from "./helpers/importsUtil.js";
-import { getObjectInterfaceDeclaration } from "./buildObjectTypes.js";
-import { getGeneratedWrapperTypes } from "./helpers/operationHelpers.js";
 
 export function buildParameterTypes(model: RLCModel) {
   const project = new Project();
@@ -32,7 +32,7 @@ export function buildParameterTypes(model: RLCModel) {
   const filePath = path.join(srcPath, `parameters.ts`);
   const partialBodyTypeNames = new Set<string>();
   const parametersFile = project.createSourceFile(filePath, undefined, {
-    overwrite: true
+    overwrite: true,
   });
   let hasHeaders = false;
 
@@ -42,7 +42,7 @@ export function buildParameterTypes(model: RLCModel) {
   for (const requestParameter of model.parameters) {
     const baseParameterName = getParameterBaseName(
       requestParameter.operationGroup,
-      requestParameter.operationName
+      requestParameter.operationName,
     );
     const requestCount = requestParameter?.parameters?.length ?? 0;
     const topParamName = getParameterTypeName(baseParameterName);
@@ -60,15 +60,13 @@ export function buildParameterTypes(model: RLCModel) {
       // In case we have more than one request to model we need to add a suffix to differentiate
       const nameSuffix = i > 0 ? `${i}` : "";
       const parameterInterfaceName =
-        requestCount > 1
-          ? `${baseParameterName}RequestParameters${nameSuffix}`
-          : topParamName;
+        requestCount > 1 ? `${baseParameterName}RequestParameters${nameSuffix}` : topParamName;
       const queryParameterDefinitions = buildQueryParameterDefinition(
         model,
         parameter,
         baseParameterName,
         internalReferences,
-        i
+        i,
       );
       const pathParameterDefinitions = buildPathParameterDefinitions(
         model,
@@ -76,7 +74,7 @@ export function buildParameterTypes(model: RLCModel) {
         baseParameterName,
         parametersFile,
         internalReferences,
-        i
+        i,
       );
 
       const headerParameterDefinitions = buildHeaderParameterDefinitions(
@@ -84,22 +82,21 @@ export function buildParameterTypes(model: RLCModel) {
         baseParameterName,
         parametersFile,
         internalReferences,
-        i
+        i,
       );
 
-      const contentTypeParameterDefinition =
-        buildContentTypeParametersDefinition(
-          parameter,
-          baseParameterName,
-          internalReferences,
-          i
-        );
+      const contentTypeParameterDefinition = buildContentTypeParametersDefinition(
+        parameter,
+        baseParameterName,
+        internalReferences,
+        i,
+      );
 
       const bodyParameterDefinition = buildBodyParametersDefinition(
         parameter,
         baseParameterName,
         internalReferences,
-        i
+        i,
       );
 
       const bodyTypeAlias = buildBodyTypeAlias(parameter, partialBodyTypeNames);
@@ -113,9 +110,7 @@ export function buildParameterTypes(model: RLCModel) {
         ...(queryParameterDefinitions ?? []),
         ...(pathParameterDefinitions ?? []),
         ...(headerParameterDefinitions ? [headerParameterDefinitions] : []),
-        ...(contentTypeParameterDefinition
-          ? [contentTypeParameterDefinition]
-          : [])
+        ...(contentTypeParameterDefinition ? [contentTypeParameterDefinition] : []),
       ]);
 
       // Add Operation parameters type alias which is composed of the types we generated above
@@ -123,7 +118,7 @@ export function buildParameterTypes(model: RLCModel) {
       parametersFile.addTypeAlias({
         name: parameterInterfaceName,
         isExported: true,
-        type: [...internalReferences, "RequestParameters"].join(" & ")
+        type: [...internalReferences, "RequestParameters"].join(" & "),
       });
 
       subParamNames.push(parameterInterfaceName);
@@ -138,7 +133,7 @@ export function buildParameterTypes(model: RLCModel) {
       parametersFile.addTypeAlias({
         name: topParamName,
         isExported: true,
-        type: [...subParamNames].join(" | ")
+        type: [...subParamNames].join(" | "),
       });
     }
   }
@@ -148,40 +143,30 @@ export function buildParameterTypes(model: RLCModel) {
       {
         isTypeOnly: true,
         namedImports: ["RawHttpHeadersInput"],
-        moduleSpecifier: getImportSpecifier(
-          "restPipeline",
-          model.importInfo.runtimeImports
-        )
-      }
+        moduleSpecifier: getImportSpecifier("restPipeline", model.importInfo.runtimeImports),
+      },
     ]);
   }
   parametersFile.addImportDeclarations([
     {
       isTypeOnly: true,
       namedImports: ["RequestParameters"],
-      moduleSpecifier: getImportSpecifier(
-        "restClient",
-        model.importInfo.runtimeImports
-      )
-    }
+      moduleSpecifier: getImportSpecifier("restClient", model.importInfo.runtimeImports),
+    },
   ]);
-  if (
-    (model.importInfo.internalImports?.parameter?.importsSet?.size ?? 0) > 0
-  ) {
+  if ((model.importInfo.internalImports?.parameter?.importsSet?.size ?? 0) > 0) {
     parametersFile.addImportDeclarations([
       {
         isTypeOnly: true,
-        namedImports: Array.from(
-          model.importInfo.internalImports.parameter.importsSet!
-        ),
+        namedImports: Array.from(model.importInfo.internalImports.parameter.importsSet!),
         moduleSpecifier: getImportModuleName(
           {
             cjsName: `./models`,
-            esModulesName: `./models.js`
+            esModulesName: `./models.js`,
           },
-          model
-        )
-      }
+          model,
+        ),
+      },
     ]);
   }
   return { path: filePath, content: parametersFile.getFullText() };
@@ -192,11 +177,9 @@ function buildQueryParameterDefinition(
   parameters: ParameterMetadatas,
   baseName: string,
   internalReferences: Set<string>,
-  requestIndex: number
+  requestIndex: number,
 ): InterfaceDeclarationStructure[] | undefined {
-  const queryParameters = (parameters?.parameters || []).filter(
-    (p) => p.type === "query"
-  );
+  const queryParameters = (parameters?.parameters || []).filter((p) => p.type === "query");
 
   if (!queryParameters.length) {
     return undefined;
@@ -207,31 +190,25 @@ function buildQueryParameterDefinition(
   const queryParameterPropertiesName = `${baseName}QueryParamProperties`;
 
   // Get the property signature for each query parameter
-  const propertiesDefinition = queryParameters.map((qp) =>
-    getPropertyFromSchema(qp.param)
-  );
+  const propertiesDefinition = queryParameters.map((qp) => getPropertyFromSchema(qp.param));
   // Get wrapper types for query parameters
-  const wrapperTypesDefinition = getGeneratedWrapperTypes(queryParameters).map(
-    (wrapObj) => {
-      return getObjectInterfaceDeclaration(
-        model,
-        wrapObj.name,
-        wrapObj,
-        [SchemaContext.Input],
-        new Set<string>()
-      );
-    }
-  );
+  const wrapperTypesDefinition = getGeneratedWrapperTypes(queryParameters).map((wrapObj) => {
+    return getObjectInterfaceDeclaration(
+      model,
+      wrapObj.name,
+      wrapObj,
+      [SchemaContext.Input],
+      new Set<string>(),
+    );
+  });
 
-  const hasRequiredParameters = propertiesDefinition.some(
-    (p) => !p.hasQuestionToken
-  );
+  const hasRequiredParameters = propertiesDefinition.some((p) => !p.hasQuestionToken);
 
   const propertiesInterface: InterfaceDeclarationStructure = {
     kind: StructureKind.Interface,
     isExported: true,
     name: queryParameterPropertiesName,
-    properties: propertiesDefinition
+    properties: propertiesDefinition,
   };
 
   const parameterInterface: InterfaceDeclarationStructure = {
@@ -243,9 +220,9 @@ function buildQueryParameterDefinition(
         name: "queryParameters",
         type: queryParameterPropertiesName,
         // Mark as optional if there are no required parameters
-        hasQuestionToken: !hasRequiredParameters
-      }
-    ]
+        hasQuestionToken: !hasRequiredParameters,
+      },
+    ],
   };
 
   // Mark the queryParameter interface for importing
@@ -261,7 +238,7 @@ function getPropertyFromSchema(schema: Schema): PropertySignatureStructure {
     ...(description && { docs: [{ description }] }),
     type: schema.type,
     hasQuestionToken: !schema.required,
-    kind: StructureKind.PropertySignature
+    kind: StructureKind.PropertySignature,
   };
 }
 
@@ -271,11 +248,9 @@ function buildPathParameterDefinitions(
   baseName: string,
   parametersFile: SourceFile,
   internalReferences: Set<string>,
-  requestIndex: number
+  requestIndex: number,
 ): InterfaceDeclarationStructure[] | undefined {
-  const pathParameters = (parameters.parameters || []).filter(
-    (p) => p.type === "path"
-  );
+  const pathParameters = (parameters.parameters || []).filter((p) => p.type === "path");
   if (!pathParameters.length) {
     return undefined;
   }
@@ -293,10 +268,7 @@ function buildPathParameterDefinitions(
     const nameSuffix = requestIndex > 0 ? `${requestIndex}` : "";
     const pathParameterInterfaceName = `${baseName}PathParam${nameSuffix}`;
 
-    const pathInterface = getPathInterfaceDefinition(
-      clientPathParams,
-      baseName
-    );
+    const pathInterface = getPathInterfaceDefinition(clientPathParams, baseName);
 
     if (pathInterface) {
       parametersFile.addInterface(pathInterface);
@@ -312,9 +284,9 @@ function buildPathParameterDefinitions(
         {
           name: "pathParameters",
           type: `${baseName}PathParameters`,
-          kind: StructureKind.PropertySignature
-        }
-      ]
+          kind: StructureKind.PropertySignature,
+        },
+      ],
     });
   }
 
@@ -326,15 +298,13 @@ function buildPathParameterDefinitions(
     const methodPathParams = pathParameters.length > 0 ? pathParameters : [];
 
     // we only need to build the wrapper types if the path parameters are objects
-    const wrapperTypesDefinition = getGeneratedWrapperTypes(
-      methodPathParams
-    ).map((wrap) => {
+    const wrapperTypesDefinition = getGeneratedWrapperTypes(methodPathParams).map((wrap) => {
       return getObjectInterfaceDeclaration(
         model,
         wrap.name,
         wrap,
         [SchemaContext.Input],
-        new Set<string>()
+        new Set<string>(),
       );
     });
     allDefinitions.push(...wrapperTypesDefinition);
@@ -343,16 +313,14 @@ function buildPathParameterDefinitions(
 
 function getPathInterfaceDefinition(
   pathParameters: ParameterMetadata[],
-  baseName: string
+  baseName: string,
 ): undefined | InterfaceDeclarationStructure {
   const pathInterfaceName = `${baseName}PathParameters`;
   return {
     kind: StructureKind.Interface,
     isExported: true,
     name: pathInterfaceName,
-    properties: pathParameters.map((p: ParameterMetadata) =>
-      getPropertyFromSchema(p.param)
-    )
+    properties: pathParameters.map((p: ParameterMetadata) => getPropertyFromSchema(p.param)),
   };
 }
 
@@ -361,10 +329,10 @@ function buildHeaderParameterDefinitions(
   baseName: string,
   parametersFile: SourceFile,
   internalReferences: Set<string>,
-  requestIndex: number
+  requestIndex: number,
 ): InterfaceDeclarationStructure | undefined {
   const headerParameters = (parameters.parameters || []).filter(
-    (p) => p.type === "header" && p.name !== "contentType"
+    (p) => p.type === "header" && p.name !== "contentType",
   );
   if (!headerParameters.length) {
     return undefined;
@@ -373,16 +341,13 @@ function buildHeaderParameterDefinitions(
   const nameSuffix = requestIndex > 0 ? `${requestIndex}` : "";
   const headerParameterInterfaceName = `${baseName}HeaderParam${nameSuffix}`;
 
-  const headersInterface = getRequestHeaderInterfaceDefinition(
-    headerParameters,
-    baseName
-  );
+  const headersInterface = getRequestHeaderInterfaceDefinition(headerParameters, baseName);
 
   let isOptional = true;
   if (headersInterface) {
     parametersFile.addInterface(headersInterface);
     isOptional = !(headersInterface.properties || []).some(
-      (prop) => prop.hasQuestionToken === false
+      (prop) => prop.hasQuestionToken === false,
     );
   }
 
@@ -397,24 +362,22 @@ function buildHeaderParameterDefinitions(
         name: "headers",
         type: `RawHttpHeadersInput & ${baseName}Headers`,
         kind: StructureKind.PropertySignature,
-        hasQuestionToken: isOptional
-      }
-    ]
+        hasQuestionToken: isOptional,
+      },
+    ],
   };
 }
 
 function getRequestHeaderInterfaceDefinition(
   headerParameters: ParameterMetadata[],
-  baseName: string
+  baseName: string,
 ): undefined | InterfaceDeclarationStructure {
   const headersInterfaceName = `${baseName}Headers`;
   return {
     kind: StructureKind.Interface,
     isExported: true,
     name: headersInterfaceName,
-    properties: headerParameters.map((h: ParameterMetadata) =>
-      getPropertyFromSchema(h.param)
-    )
+    properties: headerParameters.map((h: ParameterMetadata) => getPropertyFromSchema(h.param)),
   };
 }
 
@@ -422,10 +385,10 @@ function buildContentTypeParametersDefinition(
   parameters: ParameterMetadatas,
   baseName: string,
   internalReferences: Set<string>,
-  requestIndex: number
+  requestIndex: number,
 ): InterfaceDeclarationStructure | undefined {
   const mediaTypeParameters = (parameters.parameters || []).filter(
-    (p) => p.type === "header" && p.name === "contentType"
+    (p) => p.type === "header" && p.name === "contentType",
   );
   if (!mediaTypeParameters.length) {
     return undefined;
@@ -446,7 +409,7 @@ function buildContentTypeParametersDefinition(
     isExported: true,
     kind: StructureKind.Interface,
     name: mediaTypesParameterInterfaceName,
-    properties: [getPropertyFromSchema(mediaParam)]
+    properties: [getPropertyFromSchema(mediaParam)],
   };
 }
 
@@ -454,14 +417,10 @@ function buildBodyParametersDefinition(
   parameters: ParameterMetadatas,
   baseName: string,
   internalReferences: Set<string>,
-  requestIndex: number
+  requestIndex: number,
 ): InterfaceDeclarationStructure[] {
   const bodyParameters = parameters.body;
-  if (
-    !bodyParameters ||
-    !bodyParameters?.body ||
-    !bodyParameters?.body.length
-  ) {
+  if (!bodyParameters || !bodyParameters?.body || !bodyParameters?.body.length) {
     return [];
   }
 
@@ -486,7 +445,7 @@ function buildBodyParametersDefinition(
       isExported: true,
       kind: StructureKind.Interface,
       name: formBodyName,
-      properties: propertiesDefinitions
+      properties: propertiesDefinitions,
     };
 
     return [
@@ -498,11 +457,11 @@ function buildBodyParametersDefinition(
           {
             name: "body",
             type: formBodyName,
-            hasQuestionToken: allOptionalParts
-          }
-        ]
+            hasQuestionToken: allOptionalParts,
+          },
+        ],
       },
-      formBodyInterface
+      formBodyInterface,
     ];
   } else {
     const firstBody = bodyParameters.body[0];
@@ -521,29 +480,25 @@ function buildBodyParametersDefinition(
             docs: bodySignature.docs,
             name: "body",
             type: bodySignature.type,
-            hasQuestionToken: bodySignature.hasQuestionToken
-          }
-        ]
-      }
+            hasQuestionToken: bodySignature.hasQuestionToken,
+          },
+        ],
+      },
     ];
   }
 }
 
 export function buildBodyTypeAlias(
   parameters: ParameterMetadatas,
-  partialBodyTypeNames: Set<string>
+  partialBodyTypeNames: Set<string>,
 ) {
   const bodyParameters = parameters.body;
-  if (
-    !bodyParameters ||
-    !bodyParameters?.body ||
-    !bodyParameters?.body.length
-  ) {
+  if (!bodyParameters || !bodyParameters?.body || !bodyParameters?.body.length) {
     return undefined;
   }
   const schema = bodyParameters.body[0] as ObjectSchema;
   const headerParameters = (parameters.parameters || []).filter(
-    (p) => p.type === "header" && p.name === "contentType"
+    (p) => p.type === "header" && p.name === "contentType",
   );
   if (!headerParameters.length || headerParameters.length > 1) {
     return undefined;
@@ -568,7 +523,7 @@ export function buildBodyTypeAlias(
       ...(description && { docs: [{ description }] }),
       name: `${typeName}`,
       type,
-      isExported: true
+      isExported: true,
     };
   }
   return undefined;

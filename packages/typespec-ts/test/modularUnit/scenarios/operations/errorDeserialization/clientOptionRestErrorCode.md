@@ -16,9 +16,7 @@ import "@azure-tools/typespec-client-generator-core";
 using TypeSpec.Http;
 using Azure.ClientGenerator.Core;
 
-@service(#{
-  title: "Test Service"
-})
+@service(#{ title: "Test Service" })
 namespace TestService;
 
 #suppress "@azure-tools/typespec-client-generator-core/client-option"
@@ -77,14 +75,12 @@ import "@azure-tools/typespec-client-generator-core";
 using TypeSpec.Http;
 using Azure.ClientGenerator.Core;
 
-@service(#{
-  title: "Test Service"
-})
+@service(#{ title: "Test Service" })
 namespace TestService;
 
 #suppress "@azure-tools/typespec-client-generator-core/client-option"
-@clientOption("restErrorCodeHeader", "x-ms-error-code", "javascript")
 #suppress "@azure-tools/typespec-client-generator-core/client-option"
+@clientOption("restErrorCodeHeader", "x-ms-error-code", "javascript")
 @clientOption("header", "x-ms-request-id:requestId", "javascript")
 @error
 model ServiceError {
@@ -151,9 +147,7 @@ import "@azure-tools/typespec-client-generator-core";
 using TypeSpec.Http;
 using Azure.ClientGenerator.Core;
 
-@service(#{
-  title: "Test Service"
-})
+@service(#{ title: "Test Service" })
 namespace TestService;
 
 @error
