@@ -17,13 +17,15 @@ using Rest;
  * @template Response The response returned by the operation list.
  * @template Error the error response returned by the operation list.
  * @template Parameters Additional request parameters for the list operation.
+ * @template Tag Optional. The openapi tag for the operation.
  */
 interface Operations<
   Response extends {} = ArmResponse<OperationListResult>,
   Error extends {} = ErrorResponse,
-  Parameters extends {} = {}
+  Parameters extends {} = {},
+  Tag extends valueof string = "Operations"
 > {
-  @tag("Operations")
+  @tag(Tag)
   @autoRoute
   @armUpdateProviderNamespace
   @doc("List the operations for the provider")

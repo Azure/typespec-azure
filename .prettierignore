@@ -92,3 +92,6 @@ website/playground-versions.json
 
 # http-server-csharp snapshot test output
 core/packages/http-server-csharp/test/snapshots/sample-service/
+
+# https://github.com/Azure/typespec-azure/issues/4531
+packages/typespec-ts/

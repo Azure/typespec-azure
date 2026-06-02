@@ -437,6 +437,11 @@ it("file upload with multiple content types should have enum contentType header"
   strictEqual(contentTypeHeader.type.kind, "enum");
   strictEqual(contentTypeHeader.type.name, "UploadFileMultipleContentTypesContentType");
   strictEqual(contentTypeHeader.serializedName, "Content-Type");
+  // The synthesized contentType parameter and the File model's contentType property
+  // must reference the same enum instance, and that enum must be present in
+  // `sdkPackage.enums`.
+  strictEqual(sdkPackage.enums.includes(contentTypeMethodParam.type), true);
+  strictEqual(contentTypeMethodParam.type, contentTypeHeader.type);
 });
 
 it("file upload with default content type should have constant contentType header", async () => {

@@ -49,6 +49,13 @@ jobs:
             # Core packages excluded from the pnpm workspace that must be
             # built from source and injected via overrides.
             excluded-core-packages: "http-client-python"
+          - name: TypeScript
+            lang: ts
+            package-filter: "@azure-tools/typespec-ts"
+            working-directory: packages/typespec-ts
+            run-prepare: false
+            run-regenerate: false
+
     env:
       TYPESPEC_VS_CI_BUILD: true
       TYPESPEC_SKIP_WEBSITE_BUILD: true
@@ -148,6 +155,7 @@ jobs:
             "@azure-tools/typespec-azure-resource-manager",
             "@azure-tools/typespec-autorest",
             "@azure-tools/typespec-python",
+            "@azure-tools/typespec-ts"
           ];
           console.log("--- Dev versions (next tag on npm) ---");
           for (const pkg of packages) {
