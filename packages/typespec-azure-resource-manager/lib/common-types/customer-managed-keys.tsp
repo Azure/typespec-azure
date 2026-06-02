@@ -50,6 +50,7 @@ model KeyEncryptionKeyIdentity {
 /** Customer-managed key encryption properties for the resource. */
 #deprecated "Use Azure.ResourceManager.CommonTypes.Encryption instead"
 @added(Versions.v4)
+@Azure.ResourceManager.Private.armCommonDefinitionExcluded
 model CustomerManagedKeyEncryption {
   /** All identity configuration for Customer-managed key settings defining which identity should be used to auth to Key Vault. */
   keyEncryptionKeyIdentity?: KeyEncryptionKeyIdentity;

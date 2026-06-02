@@ -334,6 +334,16 @@ export type GenericResourceInternalDecorator = (
   target: Model,
 ) => DecoratorValidatorCallbacks | void;
 
+/**
+ * Marks an Azure Resource Manager common type as excluded from direct use in
+ * service specifications. Types decorated with this decorator should not be
+ * referenced directly in service specs; use the equivalent Foundations type instead.
+ */
+export type ArmCommonDefinitionExcludedDecorator = (
+  context: DecoratorContext,
+  target: Model,
+) => DecoratorValidatorCallbacks | void;
+
 export type AzureResourceManagerPrivateDecorators = {
   resourceParameterBaseFor: ResourceParameterBaseForDecorator;
   resourceBaseParametersOf: ResourceBaseParametersOfDecorator;
@@ -357,4 +367,5 @@ export type AzureResourceManagerPrivateDecorators = {
   legacyExtensionResourceOperation: LegacyExtensionResourceOperationDecorator;
   validateCommonTypesVersionForResource: ValidateCommonTypesVersionForResourceDecorator;
   genericResourceInternal: GenericResourceInternalDecorator;
+  armCommonDefinitionExcluded: ArmCommonDefinitionExcludedDecorator;
 };

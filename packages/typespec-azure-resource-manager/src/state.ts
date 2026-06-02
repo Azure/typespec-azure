@@ -34,6 +34,7 @@ export const ArmStateKeys = {
   // private.decorator.ts
   azureResourceBase: azureResourceManagerCreateStateSymbol("azureResourceBase"),
   renamePathParameters: azureResourceManagerCreateStateSymbol("renamePathParameters"),
+  armCommonDefinitionExcluded: azureResourceManagerCreateStateSymbol("armCommonDefinitionExcluded"),
 
   // commontypes.private.decorators.ts
   armCommonDefinitions: azureResourceManagerCreateStateSymbol("armCommonDefinitions"),
