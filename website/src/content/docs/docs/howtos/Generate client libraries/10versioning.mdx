@@ -534,7 +534,43 @@ def create_user_profile(
 ```
 
 ```csharp
-// TODO
+// The C# emitter generates both operations and a ServiceVersion enum, but does not
+// emit version guards on the newly added operation.
+namespace My.Service
+{
+  public partial class UserInfo
+  {
+    public UserInfo(string username);
+    public string Username { get; }
+  }
+
+  public partial class UserProfile
+  {
+    public UserProfile(string profileName);
+    public string ProfileName { get; }
+  }
+
+  public partial class ServiceClient
+  {
+    public ServiceClient(Uri endpoint);
+    public ServiceClient(Uri endpoint, ServiceClientOptions options);
+    public virtual Response GetUserInfo(UserInfo userInfo, CancellationToken cancellationToken = default);
+    public virtual Task<Response> GetUserInfoAsync(UserInfo userInfo, CancellationToken cancellationToken = default);
+    public virtual Response CreateUserProfile(UserProfile userProfile, CancellationToken cancellationToken = default);
+    public virtual Task<Response> CreateUserProfileAsync(UserProfile userProfile, CancellationToken cancellationToken = default);
+  }
+
+  public partial class ServiceClientOptions : ClientOptions
+  {
+    public ServiceClientOptions(ServiceVersion version = ServiceVersion.V2024_02_01);
+
+    public enum ServiceVersion
+    {
+      V2024_01_01 = 1,
+      V2024_02_01 = 2
+    }
+  }
+}
 ```
 
 ```typescript
@@ -697,7 +733,37 @@ def create_user_profile(
 ```
 
 ```csharp
-// TODO
+// The C# emitter generates the new model and property as plain members; it does not
+// emit version guards or per-version conditional shapes.
+namespace My.Service
+{
+  public partial class UserInfo
+  {
+    public UserInfo(string username);
+    public string Username { get; }
+  }
+
+  public partial class UserProfile
+  {
+    public UserProfile(string profileName, ProfileDetails profileDetails);
+    public string ProfileName { get; }
+    public ProfileDetails ProfileDetails { get; }
+  }
+
+  public partial class ProfileDetails
+  {
+    public ProfileDetails(string detailDescription);
+    public string DetailDescription { get; }
+  }
+
+  public partial class ServiceClient
+  {
+    public ServiceClient(Uri endpoint);
+    public ServiceClient(Uri endpoint, ServiceClientOptions options);
+    public virtual Response GetUserInfo(UserInfo userInfo, CancellationToken cancellationToken = default);
+    public virtual Response CreateUserProfile(UserProfile userProfile, CancellationToken cancellationToken = default);
+  }
+}
 ```
 
 ```typescript
@@ -829,7 +895,9 @@ func (client *ServiceClient) GetUserInfo(ctx context.Context, userInfo UserInfo,
 
 ## Overriding the Client Api Version Parameter
 
-By default, we find api version parameters in specs based off of names. There is special logic we do with api version parameters:
+By default, we find api version parameters in specs based off of names. Name-based detection applies to HTTP metadata parameters (header, query, path, or cookie) and server URL template parameters (declared in `@server`). A parameter named `apiVersion` or `api-version` in these positions will automatically be treated as an API version parameter.
+
+There is special logic we do with api version parameters:
 
 1. These api version parameters get elevated up to the client level (if the service is versioned)
 2. We auto-add api version information to next links when paging

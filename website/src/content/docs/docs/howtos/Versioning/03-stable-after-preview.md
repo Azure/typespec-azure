@@ -9,7 +9,16 @@ This includes the following steps:
 
 ## Making Changes to your TypeSpec spec
 
-- Add a new entry to the versions enum for the new stable version
+- Remove the `@previewVersion` decorator from the preview version and add the new stable version as the last entry in the enum
+
+  ```diff lang=tsp
+  enum Versions {
+  - @Azure.Core.previewVersion
+    `2025-10-01-preview`,
+  + `2026-01-01`,
+  }
+  ```
+
 - Update any mention in documentation of the old api-version to use the new api-version
 
   ```bash
@@ -65,23 +74,84 @@ This includes the following steps:
       + property: int32;
       ```
 
+    - For any property or parameter with a `@madeRequired(p)` decorator, remove the decorator, and make the property optional, for example:
+
+      ```diff lang=tsp
+      - @madeRequired(Versions.`2025-12-01-preview`)
+      - property: int32;
+      + property?: int32;
+      ```
+
     - For any type with an `@removed(p)` decorator, remove the decorator
 
-    ```diff lang=tsp
-    - @removed( Versions.`2025-12-01-preview`)
-      property?: string;
-    ```
+      ```diff lang=tsp
+      - @removed(Versions.`2025-12-01-preview`)
+        property?: string;
+      ```
+
+    - For any property that uses the `@removed`/`@added`/`@renamedFrom` pattern to change decoration or a default value in the preview (see [Adding Decoration to an Existing Type](./06-evolving-apis.md#adding-decoration-to-an-existing-type)), reverse the pattern by removing both the old and new properties and restoring the original property. For example, if a property added a default value in preview:
+
+      ```diff lang=tsp
+        model Employee {
+      -   @removed(Versions.`2025-12-01-preview`)
+      -   @renamedFrom(Versions.`2025-12-01-preview`, "level")
+      -   oldLevel: int32;
+      -
+      -   @added(Versions.`2025-12-01-preview`)
+      -   level: int32 = 1;
+      +   level: int32;
+        }
+      ```
+
+      Here, `level` had a default value of `1` added in the preview. To reverse this, remove both properties (the renamed "old" version and the "new" version with the default) and restore the original property without the default.
+
+    - For any operation that uses the `@removed`/`@added`/`@renamedFrom` pattern to convert from synchronous to asynchronous in preview, reverse the pattern by removing both operations and restoring the original synchronous operation. For example (ARM):
+
+      ```diff lang=tsp
+        @armResourceOperations
+        interface Employees {
+      -   @removed(Versions.`2025-12-01-preview`)
+      -   @renamedFrom(Versions.`2025-12-01-preview`, "createOrUpdate")
+      -   @sharedRoute
+      -   createOrUpdateV1 is ArmResourceCreateOrReplaceSync<Employee>;
+      -
+      -   @added(Versions.`2025-12-01-preview`)
+      -   @sharedRoute
+      -   createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+      +   createOrUpdate is ArmResourceCreateOrReplaceSync<Employee>;
+        }
+      ```
+
+      Here the operation was converted from `ArmResourceCreateOrReplaceSync` to `ArmResourceCreateOrReplaceAsync` in preview. To reverse this, remove both the old renamed operation and the new async operation, and restore the original synchronous operation.
+
+      Similarly for data-plane:
+
+      ```diff lang=tsp
+        interface Widgets {
+      -   @removed(Versions.`2025-12-01-preview`)
+      -   @renamedFrom(Versions.`2025-12-01-preview`, "createOrReplaceWidget")
+      -   @sharedRoute
+      -   createOrReplaceWidgetV1 is Operations.ResourceCreateOrReplace<Widget>;
+      -
+      -   @added(Versions.`2025-12-01-preview`)
+      -   getWidgetOperationStatus is Operations.GetResourceOperationStatus<Widget, never>;
+      -
+      -   @added(Versions.`2025-12-01-preview`)
+      -   @sharedRoute
+      -   @pollingOperation(Widgets.getWidgetOperationStatus)
+      -   createOrReplaceWidget is Operations.LongRunningResourceCreateOrReplace<Widget>;
+      +   createOrReplaceWidget is Operations.ResourceCreateOrReplace<Widget>;
+        }
+      ```
 
 - Model any additional changes in the new stable version and mark with the appropriate versioning decorator, referencing the new stable version
-- Remove the preview version from the version enum
+- Remove the replaced preview version from the version enum
 
   ```diff lang=tsp
   enum Versions {
-  - @Azure.Core.previewVersion
   - `2025-10-01-preview`,
-  + `2026-01-01`,
+    `2026-01-01`,
   }
-
   ```
 
 - Change the name of the `examples` version folder for the latest preview to match the new stable version
