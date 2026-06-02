@@ -73,11 +73,11 @@ function getScalarFamily(type: Type): ScalarFamily | undefined {
   }
 }
 
-export const noReplaceInheritedPropsRule = createRule({
-  name: "no-replace-inherited-props",
+export const noOverridePropsRule = createRule({
+  name: "no-override-props",
   severity: "warning",
   description: "Disallow redefining properties already defined in a base type.",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-replace-inherited-props",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-override-props",
   messages: {
     default: paramMessage`The property '${"propertyName"}' is also defined in the base model.  Redefining inherited properties can cause problems with OpenAPI tooling and some language representations of the models.`,
   },

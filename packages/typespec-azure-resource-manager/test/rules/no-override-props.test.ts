@@ -6,7 +6,7 @@ import {
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 
-import { noReplaceInheritedPropsRule } from "../../src/rules/no-replace-inherited-props.js";
+import { noOverridePropsRule } from "../../src/rules/no-override-props.js";
 
 let runner: TesterInstance;
 let tester: LinterRuleTester;
@@ -15,7 +15,7 @@ beforeEach(async () => {
   runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    noReplaceInheritedPropsRule,
+    noOverridePropsRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });
@@ -61,13 +61,11 @@ it("warns when child model redefines an inherited model-typed property with a de
       }
       `,
     )
-    .toEmitDiagnostics([
-      {
-        code: "@azure-tools/typespec-azure-resource-manager/no-replace-inherited-props",
-        message:
-          "The property 'nested' is also defined in the base model.  Redefining inherited properties can cause problems with OpenAPI tooling and some language representations of the models.",
-      },
-    ]);
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/no-override-props",
+      message:
+        "The property 'nested' is also defined in the base model.  Redefining inherited properties can cause problems with OpenAPI tooling and some language representations of the models.",
+    });
 });
 
 it("warns when redefining a model-typed property from an indirect ancestor with a derived model", async () => {
@@ -92,13 +90,11 @@ it("warns when redefining a model-typed property from an indirect ancestor with 
       }
       `,
     )
-    .toEmitDiagnostics([
-      {
-        code: "@azure-tools/typespec-azure-resource-manager/no-replace-inherited-props",
-        message:
-          "The property 'sharedProp' is also defined in the base model.  Redefining inherited properties can cause problems with OpenAPI tooling and some language representations of the models.",
-      },
-    ]);
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/no-override-props",
+      message:
+        "The property 'sharedProp' is also defined in the base model.  Redefining inherited properties can cause problems with OpenAPI tooling and some language representations of the models.",
+    });
 });
 
 it("allows overriding an inherited model-typed property with the exact same model type", async () => {
