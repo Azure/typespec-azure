@@ -29,7 +29,7 @@ model ArmResourceIdentifierResource is TrackedResource<ArmResourceIdentifierReso
 model ArmResourceIdentifierResourceProperties {
   @visibility(Lifecycle.Read)
   @doc("The status of the last operation.")
-  provisioningState: string;
+  provisioningState: ResourceProvisioningState;
 
   @doc("A basic ARM resource identifier without type or scopes.")
   simpleArmId: armResourceIdentifier;
