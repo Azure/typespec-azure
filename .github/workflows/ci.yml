@@ -75,9 +75,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      # Temporarily disabled bc of playwright break, re-enable once core version is bumped in release branch
-      # - name: Install browsers
-      #   run: pnpm exec playwright install
+      - name: Install browsers
+        run: pnpm exec playwright install
 
       - name: Build website
         run: pnpm --filter "@azure-tools/typespec-azure-website..." run build
@@ -109,12 +108,11 @@ jobs:
       - name: Restore .NET dependencies
         run: dotnet restore core/packages/typespec-vs
 
-      # Temporarily disabled bc of playwright break, re-enable once core version is bumped in release branch
-      # - name: Install playwright browsers
-      #   run: |
-      #     sudo dpkg --configure -a
-      #     npx playwright install --with-deps
-      #   working-directory: packages/typespec-azure-playground-website
+      - name: Install playwright browsers
+        run: |
+          sudo dpkg --configure -a
+          npx playwright install --with-deps
+        working-directory: packages/typespec-azure-playground-website
 
       - name: Build
         run: pnpm run build
@@ -122,11 +120,10 @@ jobs:
       - name: Azure Http Specs e2e tests
         run: node packages/e2e-tests/e2e-tests.mjs
 
-      # Temporarily disabled bc of playwright break, re-enable once core version is bumped in release branch
-      # - name: E2E Tests
-      #   # Skip on merge queue from publish branches and on publish/* PR source branches
-      #   if: ${{ !startsWith(github.ref, 'refs/heads/gh-readonly-queue/') && !startsWith(github.head_ref, 'publish/') }}
-      #   run: pnpm test:e2e
+      - name: E2E Tests
+        # Skip on merge queue from publish branches and on publish/* PR source branches
+        if: ${{ !startsWith(github.ref, 'refs/heads/gh-readonly-queue/') && !startsWith(github.head_ref, 'publish/') }}
+        run: pnpm test:e2e
 
   autorest-checks:
     name: Autorest Checks
