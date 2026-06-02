@@ -1,5 +1,13 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.68.4
+
+### Bug Fixes
+
+- [#4515](https://github.com/Azure/typespec-azure/pull/4515) Fix example matching when `@clientLocation` (or `@clientName`) is applied with per-language scope. Example files coming from the swagger/autorest output carry a single canonical `operationId`, but per-language `@clientLocation` overrides previously caused TCGC to resolve a different operation id per emitter, silently breaking example linkage for all languages whose group name didn't match the example file. Example matching now resolves operation ids under the `autorest` scope so a single example file links successfully across all language emitters.
+- [#4514](https://github.com/Azure/typespec-azure/pull/4514) Fix mismatched enum type names for `Http.File` bodies with multiple content types. The synthetic `contentType` header/method parameter now reuses the `File` model's `contentType` property type, so the enum referenced by the parameter and the enum present in `sdkPackage.enums` are the same instance (and share the same name).
+
+
 ## 0.68.3
 
 ### Bug Fixes
