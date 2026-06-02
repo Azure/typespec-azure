@@ -1,0 +1,179 @@
+name: Nightly E2E Tests
+
+on:
+  schedule:
+    - cron: "0 8 * * *" # Daily at 8 AM UTC
+  workflow_dispatch:
+    inputs:
+      use-latest-core:
+        description: "Update core submodule to latest main before testing"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# ============================================================================
+# Nightly E2E tests for language emitters.
+#
+# Runs on a schedule to catch regressions caused by changes in typespec core
+# or typespec-azure packages that may affect language emitters.
+#
+# To add a new language emitter:
+# 1. Add a `test:<lang>:e2e` script to your emitter's package.json
+# 2. Add an entry to the matrix below with:
+#    - name, lang, package-filter, working-directory
+#    - mise-install-args: tools to install via mise (e.g., "java maven")
+#    - run-prepare / run-regenerate: set to true if the package has those scripts
+# ============================================================================
+
+jobs:
+  e2e:
+    name: "${{ matrix.name }} E2E"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Python
+            lang: python
+            package-filter: "@azure-tools/typespec-python"
+            working-directory: packages/typespec-python
+            mise-install-args: "python uv"
+            run-prepare: true
+            run-regenerate: true
+            # Core packages excluded from the pnpm workspace that must be
+            # built from source and injected via overrides.
+            excluded-core-packages: "http-client-python"
+    env:
+      TYPESPEC_VS_CI_BUILD: true
+      TYPESPEC_SKIP_WEBSITE_BUILD: true
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Update core submodule to latest main
+        if: github.event_name == 'schedule' || inputs.use-latest-core
+        run: |
+          cd core
+          git fetch origin main
+          git checkout origin/main
+          cd ..
+
+      - name: Log core submodule commit
+        run: |
+          echo "Core submodule SHA: $(git -C core rev-parse HEAD)"
+          echo "Core submodule date: $(git -C core log -1 --format=%ci)"
+
+      - uses: ./.github/actions/setup
+        with:
+          node-version: "22.x"
+
+      # --- Language-specific setup via mise ---
+
+      - name: Setup language runtime
+        if: matrix.mise-install-args
+        uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
+        with:
+          install_args: ${{ matrix.mise-install-args }}
+
+      # --- Build excluded core packages from source ---
+      # Some language client packages (http-client-python, http-client-java, etc.)
+      # are excluded from the pnpm workspace and normally resolve from npm.
+      # For the nightly, we build them from the core submodule and inject them
+      # via pnpm overrides so we test against the latest dev versions.
+
+      - name: Build and override excluded core packages
+        if: matrix.excluded-core-packages
+        run: |
+          for pkg in ${{ matrix.excluded-core-packages }}; do
+            echo "Building @typespec/${pkg} from core/packages/${pkg}..."
+            pushd "core/packages/${pkg}"
+            npm ci
+            npm run build
+            npm pack --pack-destination "${GITHUB_WORKSPACE}"
+            popd
+            tgz_path="$(ls typespec-${pkg}-*.tgz)"
+            node -e "
+              const fs = require('fs');
+              const root = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+              root.pnpm ??= {};
+              root.pnpm.overrides ??= {};
+              root.pnpm.overrides['@typespec/${pkg}'] = 'file:${tgz_path}';
+              fs.writeFileSync('package.json', JSON.stringify(root, null, 2) + '\n');
+              console.log('Override: @typespec/${pkg} -> ${tgz_path}');
+            "
+          done
+
+      # --- Install & Build ---
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Build
+        run: pnpm turbo run --filter "${{ matrix.package-filter }}..." build
+
+      - name: Log package versions
+        shell: bash
+        run: |
+          echo "=== Build info for ${{ matrix.name }} E2E ==="
+          echo ""
+          echo "--- Source commits ---"
+          echo "  typespec-azure: $(git rev-parse --short HEAD) ($(git log -1 --format=%ci))"
+          echo "  typespec core:  $(git -C core rev-parse --short HEAD) ($(git -C core log -1 --format=%ci))"
+
+      - name: Log dev versions from npm
+        shell: node {0}
+        run: |
+          const { execSync } = require("child_process");
+          const packages = [
+            "@typespec/compiler",
+            "@typespec/http",
+            "@typespec/rest",
+            "@typespec/openapi",
+            "@typespec/openapi3",
+            "@typespec/versioning",
+            "@typespec/xml",
+            "@typespec/events",
+            "@typespec/sse",
+            "@typespec/streams",
+            "@typespec/http-client-python",
+            "@azure-tools/typespec-azure-core",
+            "@azure-tools/typespec-client-generator-core",
+            "@azure-tools/typespec-azure-resource-manager",
+            "@azure-tools/typespec-autorest",
+            "@azure-tools/typespec-python",
+          ];
+          console.log("--- Dev versions (next tag on npm) ---");
+          for (const pkg of packages) {
+            try {
+              const tags = JSON.parse(execSync("npm view " + pkg + " dist-tags --json", { encoding: "utf8" }));
+              const version = tags.next || tags.latest || "unknown";
+              console.log("  " + pkg + ": " + version);
+            } catch {
+              console.log("  " + pkg + ": not found on npm");
+            }
+          }
+
+      # --- Language-specific preparation ---
+
+      - name: Prepare environment
+        if: matrix.run-prepare
+        run: pnpm run prepare
+        working-directory: ${{ matrix.working-directory }}
+
+      - name: Regenerate
+        if: matrix.run-regenerate
+        run: pnpm run regenerate
+        working-directory: ${{ matrix.working-directory }}
+
+      # --- Run E2E tests (standardized script: test:<lang>:e2e) ---
+
+      - name: Run E2E Tests
+        run: pnpm run test:${{ matrix.lang }}:e2e
+        working-directory: ${{ matrix.working-directory }}

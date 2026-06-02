@@ -17,7 +17,7 @@
 3. `@protocolAPI(target, flag?, scope?)` — control protocol method generation
 4. `@client(target, options?, scope?)` — define explicit client; ClientOptions has service, name, autoMergeService
 5. `@operationGroup(target, scope?)` — DEPRECATED, use @client
-6. `@usage(target, value, scope?)` — mark model/enum/union usage (input/output/json/xml)
+6. `@usage(target, value, scope?)` — mark model/enum/union/namespace usage (input/output/json/xml); on namespace, propagates recursively to all contained types
 7. `@access(target, value, scope?)` — public/internal visibility
 8. `@override(target, override, scope?)` — customize method signatures
 9. `@useSystemTextJsonConverter(target, scope?)` — C# backward compat only
@@ -181,7 +181,7 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 
 ## isExactName Property (May 2026)
 
-- The `isExactName: boolean` property was added to many SDK type interfaces: SdkModelType, SdkEnumType, SdkUnionType, SdkConstantType, SdkNullableType, SdkClientInitializationType, and SdkModelPropertyTypeBase (base for all property types).
+- The `isExactName: boolean` property was added to many SDK type interfaces: SdkModelType, SdkEnumType, SdkUnionType, SdkConstantType, SdkNullableType, SdkClientInitializationType, SdkModelPropertyTypeBase (base for all property types), SdkClientType, SdkEnumValueType, and SdkServiceMethodBase.
 - Set to `true` when a name is wrapped with the `exact()` function in `@clientName`.
 - The `exact()` function internally prepends `_exact_:` prefix which is stripped by `normalizeExactName()` before the name reaches the type graph.
 - Exported helpers: `EXACT_NAME_PREFIX`, `hasExactNameMarker()`, `normalizeExactName()` from the TCGC package index.
@@ -191,3 +191,17 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 ## Feedback Lessons (PR #4416)
 
 - In TypeScript code examples, keep method signatures on a single line when they fit within ~120 characters. Don't use multi-line formatting for short method signatures.
+
+## Feedback Lessons (PR #4481)
+
+- For exact-name Spector specs: use per-language underscore-prefixed names (e.g., `_my_name`, `_myName`, `_MyName`) to truly verify that language naming logic does not strip or recase the name. Simple camelCase/snake_case names don't prove exactness because they'd survive normal casing rules.
+- `@clientName` description in docs: say it "allows emitters to apply language-specific casing transformations to the provided name." The `exact()` function "prevents this and preserves the name exactly as specified."
+- guideline.md formatting: do NOT add extra blank lines between numbered list items and their sub-items (keep `  -` sub-items immediately after the numbered item).
+- Keep exact() doc examples simple: prefer showing only scoped renames (per-language). Don't combine global rename + scoped rename in the same example.
+- Language tabs for exact() should show `# not supported` / `// not supported` since no emitter supports `isExactName` yet.
+
+## Orphan Type Detection (May 2026 Refactoring)
+
+- `listOrphanTypes` no longer iterates only user-defined namespaces. It now uses `listScopedDecoratorData` to find all types and namespaces with an explicit `@usage` decorator, including types in imported libraries (e.g., `@@usage(Azure.Core.Foundations.Error, Usage.input)`).
+- When `@usage` is applied to a namespace, the function recursively descends into sub-namespaces to collect all models, enums, and unions.
+- Types with `@hierarchyBuilding` are also collected separately (only when legacy hierarchy building is enabled).
