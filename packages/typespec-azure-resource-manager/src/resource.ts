@@ -58,6 +58,7 @@ import {
   resolveProviderNamespace,
 } from "./namespace.js";
 import {
+  ArmOperationIdentifier,
   ArmOperationKind,
   ArmResolvedOperationsForResource,
   ArmResourceOperation,
@@ -1044,6 +1045,11 @@ export function resolveArmResourceOperations(
   resourceType: Model,
 ): ResolvedResourceOperations[] {
   const resolvedOperations: Set<ResolvedResourceOperations> = new Set<ResolvedResourceOperations>();
+  const deferredOperations: {
+    armOperation: ArmResourceOperation;
+    operation: ArmOperationIdentifier;
+    targetModel: Model;
+  }[] = [];
   const operations = getArmResourceOperationList(program, resourceType);
   for (const operation of operations) {
     const armOperation: ArmResourceOperation | undefined = getResourceOperation(
@@ -1056,7 +1062,40 @@ export function resolveArmResourceOperations(
 
     armOperation.resourceModelName = operation.resource?.name ?? resourceType.name;
     const resourceInfo = getResourceInfo(program, armOperation, operation.resource ?? resourceType);
-    if (resourceInfo === undefined) continue;
+    if (resourceInfo === undefined) {
+      // For raw operations (e.g. @armResourceAction with a simple path like "/generate"),
+      // getResourceInfo cannot determine resource info from the path alone. Try to match
+      // against already-resolved resources using the operation's resource model.
+      const targetModel = operation.resource ?? resourceType;
+      armOperation.name = operation.name;
+      armOperation.resourceKind = operation.resourceKind;
+      let added = false;
+      for (const resolvedOp of resolvedOperations) {
+        if (resolvedOp.resourceType.provider && targetModel.name) {
+          // Check if any resolved resource's instance path contains this resource's type
+          const typeName = targetModel.name.toLowerCase();
+          const pathSegments = resolvedOp.resourceInstancePath
+            .split("/")
+            .filter((s) => s.length > 0);
+          const hasMatchingType = pathSegments.some(
+            (s) => s.toLowerCase() === typeName || s.toLowerCase() === typeName + "s",
+          );
+          if (hasMatchingType) {
+            armOperation.resourceName = resolvedOp.resourceName;
+            if (!tryAddLifecycleOperation(resolvedOp.resourceType, armOperation, resolvedOp)) {
+              addAssociatedOperation(armOperation, resolvedOp);
+            }
+            added = true;
+            break;
+          }
+        }
+      }
+      if (!added) {
+        // Defer: store for a second pass after all path-resolvable operations are processed
+        deferredOperations.push({ armOperation, operation, targetModel });
+      }
+      continue;
+    }
     armOperation.name = operation.name;
     armOperation.resourceKind = operation.resourceKind;
     const resourceNameIsExplicit = operation.resourceName !== undefined;
@@ -1105,6 +1144,27 @@ export function resolveArmResourceOperations(
     }
     resolvedOperations.add(newResource);
   }
+
+  // Second pass: process deferred operations (raw operations whose paths couldn't be resolved)
+  for (const { armOperation, targetModel } of deferredOperations) {
+    for (const resolvedOp of resolvedOperations) {
+      if (resolvedOp.resourceType.provider && targetModel.name) {
+        const typeName = targetModel.name.toLowerCase();
+        const pathSegments = resolvedOp.resourceInstancePath.split("/").filter((s) => s.length > 0);
+        const hasMatchingType = pathSegments.some(
+          (s) => s.toLowerCase() === typeName || s.toLowerCase() === typeName + "s",
+        );
+        if (hasMatchingType) {
+          armOperation.resourceName = resolvedOp.resourceName;
+          if (!tryAddLifecycleOperation(resolvedOp.resourceType, armOperation, resolvedOp)) {
+            addAssociatedOperation(armOperation, resolvedOp);
+          }
+          break;
+        }
+      }
+    }
+  }
+
   return [...resolvedOperations.values()].toSorted((a, b) => {
     // Sort by provider, type, then instance path
     if (a.resourceType.types.length < b.resourceType.types.length) return -1;

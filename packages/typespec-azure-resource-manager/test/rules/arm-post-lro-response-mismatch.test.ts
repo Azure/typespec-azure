@@ -365,9 +365,7 @@ describe("does not emit warning", () => {
       .toBeValid();
   });
 
-  it("when a low-level LRO POST has a 200 response with a body and ArmAcceptedLroResponse (not discovered by resolveArmResources)", async () => {
-    // Note: Raw @armResourceAction operations are not discovered in resource.operations.actions
-    // by resolveArmResources(), so this pattern is not checked by the rule.
+  it("when a low-level LRO POST has a 200 response with a body and ArmAcceptedLroResponse", async () => {
     await tester
       .expect(
         `
@@ -386,7 +384,11 @@ describe("does not emit warning", () => {
       }
       `,
       )
-      .toBeValid();
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
+        message:
+          "The final result type of a long-running POST operation does not match the response. Specify the FinalResult in the LroHeaders parameter to match the response type. For example: 'LroHeaders = ArmLroLocationHeader<FinalResult = ResponseType>'.",
+      });
   });
 
   it("when a low-level LRO POST has a 204 response and ArmAcceptedLroResponse (void finalResult)", async () => {
