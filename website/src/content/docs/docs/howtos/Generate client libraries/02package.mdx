@@ -85,7 +85,27 @@ client.feed(Food(name="pork", "quantity="1"))
 ```
 
 ```csharp
-// TODO
+namespace PetStore
+{
+  public partial class Food
+  {
+    public Food(string name, int quantity);
+    public string Name { get; }
+    public int Quantity { get; }
+  }
+
+  public partial class PetStoreClient
+  {
+    public PetStoreClient(Uri endpoint);
+    public PetStoreClient(Uri endpoint, PetStoreClientOptions options);
+    // protocol method
+    public virtual Response Feed(RequestContent content, RequestContext context = null);
+    public virtual Task<Response> FeedAsync(RequestContent content, RequestContext context = null);
+    // convenience method
+    public virtual Response Feed(Food food, CancellationToken cancellationToken = default);
+    public virtual Task<Response> FeedAsync(Food food, CancellationToken cancellationToken = default);
+  }
+}
 ```
 
 ```typescript
@@ -189,7 +209,26 @@ namespace Customization;
 ```
 
 ```csharp
-// TODO
+// Food is generated in the PetStore.Models namespace.
+namespace PetStore.Models
+{
+  public partial class Food
+  {
+    public Food(string name, int quantity);
+    public string Name { get; }
+    public int Quantity { get; }
+  }
+}
+
+namespace PetStore
+{
+  public partial class PetStoreClient
+  {
+    public PetStoreClient(Uri endpoint);
+    public virtual Response Feed(Food food, CancellationToken cancellationToken = default);
+    public virtual Task<Response> FeedAsync(Food food, CancellationToken cancellationToken = default);
+  }
+}
 ```
 
 ```typescript

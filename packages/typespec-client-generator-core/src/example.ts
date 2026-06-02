@@ -204,6 +204,14 @@ export async function handleClientExamples(
   const diagnostics = createDiagnosticCollector();
 
   const examples = diagnostics.pipe(await loadExamples(context));
+  // Example files are sourced from the swagger/autorest output, where each operation has a
+  // single canonical `operationId`. Per-language `@clientLocation`/`@clientName` overrides
+  // (e.g. `@@clientLocation(op, "Foo", "javascript")`) would otherwise produce a different
+  // resolved operation id for each language, causing example linkage to silently fail for
+  // every language whose group name doesn't match the example file. To avoid this, resolve
+  // example operation ids under the `autorest` scope so the same matching is used regardless
+  // of which language emitter is consuming TCGC.
+  const exampleMatchingContext: TCGCContext = { ...context, emitterName: "autorest" };
   const clientQueue = [client];
   while (clientQueue.length > 0) {
     const client = clientQueue.pop()!;
@@ -215,13 +223,13 @@ export async function handleClientExamples(
       let operation = method.__raw;
       while (operation) {
         // try operation id with renaming
-        let operationId = resolveOperationId(context, operation, true).toLowerCase();
+        let operationId = resolveOperationId(exampleMatchingContext, operation, true).toLowerCase();
         if (examples.has(operationId)) {
           diagnostics.pipe(handleMethodExamples(context, method, examples.get(operationId)!));
           break;
         }
         // try operation id without renaming
-        operationId = resolveOperationId(context, operation, false).toLowerCase();
+        operationId = resolveOperationId(exampleMatchingContext, operation, false).toLowerCase();
         if (examples.has(operationId)) {
           diagnostics.pipe(handleMethodExamples(context, method, examples.get(operationId)!));
           break;
