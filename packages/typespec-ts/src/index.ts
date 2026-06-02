@@ -71,15 +71,14 @@ import {
   updatePackageFile,
   buildSampleEnvFile,
   buildSnippets,
-  buildTsSampleConfig,
-  resetBatchOutputFolder
+  buildTsSampleConfig
 } from "./rlc-common/index.js";
 import {
   buildRootIndex,
   buildSubClientIndexFile
 } from "./modular/buildRootIndex.js";
 import { emitContentByBuilder, emitModels } from "./utils/emitUtil.js";
-import { provideContext, useContext, clearContexts } from "./contextManager.js";
+import { provideContext, useContext } from "./contextManager.js";
 
 import { EmitterOptions } from "./lib.js";
 import { ModularEmitterOptions } from "./modular/interfaces.js";
@@ -128,11 +127,6 @@ export async function $onEmit(context: EmitContext) {
   if (context.program.compilerOptions.noEmit || context.program.hasError()) {
     return;
   }
-  // Reset module-level state that accumulates across emits to avoid leaking
-  // references to prior programs/projects when the emitter runs multiple times
-  // in the same process (e.g. during tests).
-  clearContexts();
-  resetBatchOutputFolder();
   /** Shared status */
   const outputProject = new Project();
   const program: Program = context.program;
