@@ -26,6 +26,8 @@ export declare type GetThingParameters = GetThingBodyParam & RequestParameters;
 
 export { isRestError }
 
+declare type NodeReadableStream = NodeJS.ReadableStream;
+
 export declare type OveralodClient = Client & {
     path: Routes;
 };
@@ -70,7 +72,7 @@ export declare interface Upload204Response extends HttpResponse {
 }
 
 export declare interface UploadBodyParam {
-    body: string | string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream;
+    body: string | string | Uint8Array | ReadableStream<Uint8Array> | NodeReadableStream;
 }
 
 export declare interface UploadMediaTypesParam {
