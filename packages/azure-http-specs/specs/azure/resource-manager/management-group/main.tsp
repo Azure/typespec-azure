@@ -77,7 +77,7 @@ interface MgmtGroupResources {
     }
     ```
     """)
-  get is Extension.Read<Extension.ManagementGroup, MgmtGroupResource>;
+  get is Extension.Read<Extension.ManagementGroup<"managementGroupId">, MgmtGroupResource>;
 
   @scenario
   @scenarioDoc("""
@@ -115,7 +115,7 @@ interface MgmtGroupResources {
     }
     ```
     """)
-  createOrUpdate is Extension.CreateOrReplaceAsync<Extension.ManagementGroup, MgmtGroupResource>;
+  createOrUpdate is Extension.CreateOrReplaceAsync<Extension.ManagementGroup<"managementGroupId">, MgmtGroupResource>;
 
   @scenario
   @scenarioDoc("""
@@ -154,7 +154,7 @@ interface MgmtGroupResources {
     ```
     """)
   update is Extension.CustomPatchSync<
-    Extension.ManagementGroup,
+    Extension.ManagementGroup<"managementGroupId">,
     MgmtGroupResource,
     MgmtGroupResource
   >;
@@ -166,7 +166,7 @@ interface MgmtGroupResources {
     Expected query parameter: api-version=2023-12-01-preview
     Expected response status code: 204
     """)
-  delete is Extension.DeleteSync<Extension.ManagementGroup, MgmtGroupResource>;
+  delete is Extension.DeleteSync<Extension.ManagementGroup<"managementGroupId">, MgmtGroupResource>;
 
   @scenario
   @scenarioDoc("""
@@ -197,5 +197,5 @@ interface MgmtGroupResources {
     }
     ```
     """)
-  listByManagementGroup is Extension.ListByTarget<Extension.ManagementGroup, MgmtGroupResource>;
+  listByManagementGroup is Extension.ListByTarget<Extension.ManagementGroup<"managementGroupId">, MgmtGroupResource>;
 }

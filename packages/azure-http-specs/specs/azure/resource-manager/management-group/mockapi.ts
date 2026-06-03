@@ -25,11 +25,11 @@ const validMgmtGroupResource = {
 };
 
 Scenarios.Azure_ResourceManager_ManagementGroup_MgmtGroupResources_get = passOnSuccess({
-  uri: `/providers/Microsoft.Management/managementGroups/:managementGroupName/providers/Azure.ResourceManager.ManagementGroup/mgmtGroupResources/:mgmtGroupResourceName`,
+  uri: `/providers/Microsoft.Management/managementGroups/:managementGroupId/providers/Azure.ResourceManager.ManagementGroup/mgmtGroupResources/:mgmtGroupResourceName`,
   method: "get",
   request: {
     pathParams: {
-      managementGroupName: MANAGEMENT_GROUP_ID,
+      managementGroupId: MANAGEMENT_GROUP_ID,
       mgmtGroupResourceName: RESOURCE_NAME,
     },
     query: {
@@ -44,11 +44,11 @@ Scenarios.Azure_ResourceManager_ManagementGroup_MgmtGroupResources_get = passOnS
 });
 
 Scenarios.Azure_ResourceManager_ManagementGroup_MgmtGroupResources_createOrUpdate = passOnSuccess({
-  uri: `/providers/Microsoft.Management/managementGroups/:managementGroupName/providers/Azure.ResourceManager.ManagementGroup/mgmtGroupResources/:mgmtGroupResourceName`,
+  uri: `/providers/Microsoft.Management/managementGroups/:managementGroupId/providers/Azure.ResourceManager.ManagementGroup/mgmtGroupResources/:mgmtGroupResourceName`,
   method: "put",
   request: {
     pathParams: {
-      managementGroupName: MANAGEMENT_GROUP_ID,
+      managementGroupId: MANAGEMENT_GROUP_ID,
       mgmtGroupResourceName: RESOURCE_NAME,
     },
     query: {
@@ -68,11 +68,11 @@ Scenarios.Azure_ResourceManager_ManagementGroup_MgmtGroupResources_createOrUpdat
 });
 
 Scenarios.Azure_ResourceManager_ManagementGroup_MgmtGroupResources_update = passOnSuccess({
-  uri: `/providers/Microsoft.Management/managementGroups/:managementGroupName/providers/Azure.ResourceManager.ManagementGroup/mgmtGroupResources/:mgmtGroupResourceName`,
+  uri: `/providers/Microsoft.Management/managementGroups/:managementGroupId/providers/Azure.ResourceManager.ManagementGroup/mgmtGroupResources/:mgmtGroupResourceName`,
   method: "patch",
   request: {
     pathParams: {
-      managementGroupName: MANAGEMENT_GROUP_ID,
+      managementGroupId: MANAGEMENT_GROUP_ID,
       mgmtGroupResourceName: RESOURCE_NAME,
     },
     query: {
@@ -98,11 +98,11 @@ Scenarios.Azure_ResourceManager_ManagementGroup_MgmtGroupResources_update = pass
 });
 
 Scenarios.Azure_ResourceManager_ManagementGroup_MgmtGroupResources_delete = passOnSuccess({
-  uri: `/providers/Microsoft.Management/managementGroups/:managementGroupName/providers/Azure.ResourceManager.ManagementGroup/mgmtGroupResources/:mgmtGroupResourceName`,
+  uri: `/providers/Microsoft.Management/managementGroups/:managementGroupId/providers/Azure.ResourceManager.ManagementGroup/mgmtGroupResources/:mgmtGroupResourceName`,
   method: "delete",
   request: {
     pathParams: {
-      managementGroupName: MANAGEMENT_GROUP_ID,
+      managementGroupId: MANAGEMENT_GROUP_ID,
       mgmtGroupResourceName: RESOURCE_NAME,
     },
     query: {
@@ -117,11 +117,11 @@ Scenarios.Azure_ResourceManager_ManagementGroup_MgmtGroupResources_delete = pass
 
 Scenarios.Azure_ResourceManager_ManagementGroup_MgmtGroupResources_listByManagementGroup =
   passOnSuccess({
-    uri: `/providers/Microsoft.Management/managementGroups/:managementGroupName/providers/Azure.ResourceManager.ManagementGroup/mgmtGroupResources`,
+    uri: `/providers/Microsoft.Management/managementGroups/:managementGroupId/providers/Azure.ResourceManager.ManagementGroup/mgmtGroupResources`,
     method: "get",
     request: {
       pathParams: {
-        managementGroupName: MANAGEMENT_GROUP_ID,
+        managementGroupId: MANAGEMENT_GROUP_ID,
       },
       query: {
         "api-version": "2023-12-01-preview",
