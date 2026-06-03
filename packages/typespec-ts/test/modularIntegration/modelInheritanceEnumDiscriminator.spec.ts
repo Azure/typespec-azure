@@ -1,9 +1,9 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import {
   EnumDiscriminatorClient,
+  Golden,
   Snake,
-  Golden
 } from "./generated/type/model/inheritance/enum-discriminator/src/index.js";
 
 describe("EnumDiscriminatorClient Rest Client", () => {
@@ -12,17 +12,17 @@ describe("EnumDiscriminatorClient Rest Client", () => {
   beforeEach(() => {
     client = new EnumDiscriminatorClient({
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
   const validBody: Golden = {
     weight: 10,
-    kind: "golden"
+    kind: "golden",
   };
   const validFixedEnumBody: Snake = {
     length: 10,
-    kind: "cobra"
+    kind: "cobra",
   };
   it("should get extensible enum", async () => {
     const result = await client.getExtensibleModel();

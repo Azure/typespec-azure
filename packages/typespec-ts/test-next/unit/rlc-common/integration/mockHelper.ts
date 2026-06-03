@@ -1,6 +1,6 @@
 import {
   buildRuntimeImports,
-  initInternalImports
+  initInternalImports,
 } from "../../../../src/rlc-common/helpers/importsUtil.js";
 import { PackageFlavor, RLCModel } from "../../../../src/rlc-common/interfaces.js";
 
@@ -31,7 +31,7 @@ export function createMockModel(config: TestModelConfig = {}): RLCModel {
   return {
     importInfo: {
       runtimeImports: buildRuntimeImports(config.flavor),
-      internalImports: initInternalImports()
+      internalImports: initInternalImports(),
     },
     libraryName: config.libraryName ?? "@msinternal/test",
     // Package json file generation doesn't need paths information
@@ -46,7 +46,7 @@ export function createMockModel(config: TestModelConfig = {}): RLCModel {
         version: config.version ?? "1.0.0",
         description: config.description ?? "A test package",
         nameWithoutScope: "test",
-        scopeName: config.scopeName ?? "msinternal"
+        scopeName: config.scopeName ?? "msinternal",
       },
       azureSdkForJs: config.isMonorepo ?? false,
       flavor: config.flavor,
@@ -58,11 +58,11 @@ export function createMockModel(config: TestModelConfig = {}): RLCModel {
       azureArm: config.azureArm ?? false,
       hasSubscriptionId: config.hasSubscriptionId ?? false,
       addCredentials: config.addCredentials ?? false,
-      generateReactNativeTarget: config.generateReactNativeTarget ?? false
+      generateReactNativeTarget: config.generateReactNativeTarget ?? false,
     },
     helperDetails: {
       hasPaging: config.hasPaging ?? false,
-      hasLongRunning: config.hasLro ?? false
-    }
+      hasLongRunning: config.hasLro ?? false,
+    },
   };
 }

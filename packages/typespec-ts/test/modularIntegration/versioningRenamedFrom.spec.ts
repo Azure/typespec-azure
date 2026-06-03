@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { RenamedFromClient } from "./generated/versioning/renamedFrom/src/index.js";
 
@@ -7,7 +7,7 @@ describe("VersioningRenamedFrom Rest Client", () => {
 
   beforeEach(() => {
     client = new RenamedFromClient("http://localhost:3002", {
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
@@ -16,9 +16,9 @@ describe("VersioningRenamedFrom Rest Client", () => {
       {
         newProp: "foo",
         enumProp: "newEnumMember",
-        unionProp: 10
+        unionProp: 10,
       },
-      "bar"
+      "bar",
     );
     assert.strictEqual(result.newProp, "foo");
     assert.strictEqual(result.enumProp, "newEnumMember");
@@ -29,7 +29,7 @@ describe("VersioningRenamedFrom Rest Client", () => {
     const result = await client.newOpInNewInterface({
       newProp: "foo",
       enumProp: "newEnumMember",
-      unionProp: 10
+      unionProp: 10,
     });
     assert.strictEqual(result.newProp, "foo");
     assert.strictEqual(result.enumProp, "newEnumMember");

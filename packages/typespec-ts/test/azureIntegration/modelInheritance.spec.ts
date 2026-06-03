@@ -1,11 +1,11 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import NestedDiscriminatorClientFactory, {
   GoblinShark,
   NestedDiscriminatorClient,
   Salmon,
   SalmonOutput,
-  SharkOutput
+  SharkOutput,
 } from "./generated/type/model/inheritance/nested-discriminator/src/index.js";
 
 describe("NestedDiscriminatorClient Rest Client", () => {
@@ -13,19 +13,17 @@ describe("NestedDiscriminatorClient Rest Client", () => {
 
   beforeEach(() => {
     client = NestedDiscriminatorClientFactory({
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
   const validBody: GoblinShark = {
     age: 1,
     kind: "shark",
-    sharktype: "goblin"
+    sharktype: "goblin",
   };
   it("should get valid", async () => {
-    const result = await client
-      .path("/type/model/inheritance/nested-discriminator/model")
-      .get();
+    const result = await client.path("/type/model/inheritance/nested-discriminator/model").get();
     assert.strictEqual(result.status, "200");
     assert.strictEqual(result.body.age, 1);
     if (result.body.kind === "shark") {
@@ -34,11 +32,9 @@ describe("NestedDiscriminatorClient Rest Client", () => {
   });
 
   it("should put valid", async () => {
-    const result = await client
-      .path("/type/model/inheritance/nested-discriminator/model")
-      .put({
-        body: validBody
-      });
+    const result = await client.path("/type/model/inheritance/nested-discriminator/model").put({
+      body: validBody,
+    });
     assert.strictEqual(result.status, "204");
   });
 
@@ -48,7 +44,7 @@ describe("NestedDiscriminatorClient Rest Client", () => {
     partner: {
       age: 2,
       kind: "shark",
-      sharktype: "saw"
+      sharktype: "saw",
     },
     friends: [
       {
@@ -56,31 +52,31 @@ describe("NestedDiscriminatorClient Rest Client", () => {
         kind: "salmon",
         partner: {
           age: 3,
-          kind: "salmon"
+          kind: "salmon",
         },
         hate: {
           key1: {
             age: 4,
-            kind: "salmon"
+            kind: "salmon",
           },
           key2: {
             age: 2,
             kind: "shark",
-            sharktype: "goblin"
-          }
-        }
+            sharktype: "goblin",
+          },
+        },
       },
       {
         age: 3,
         kind: "shark",
-        sharktype: "goblin"
-      }
+        sharktype: "goblin",
+      },
     ],
     hate: {
       key3: {
         age: 3,
         kind: "shark",
-        sharktype: "saw"
+        sharktype: "saw",
       },
       key4: {
         age: 2,
@@ -88,30 +84,27 @@ describe("NestedDiscriminatorClient Rest Client", () => {
         friends: [
           {
             age: 1,
-            kind: "salmon"
+            kind: "salmon",
           },
           {
             age: 4,
             kind: "shark",
-            sharktype: "goblin"
-          }
-        ]
-      }
-    }
+            sharktype: "goblin",
+          },
+        ],
+      },
+    },
   };
   it("should get recursive body", async () => {
     const result = await client
       .path("/type/model/inheritance/nested-discriminator/recursivemodel")
       .get();
     assert.strictEqual(result.status, "200");
-    assert.strictEqual(
-      JSON.stringify(result.body),
-      JSON.stringify(validRecursiveBody)
-    );
+    assert.strictEqual(JSON.stringify(result.body), JSON.stringify(validRecursiveBody));
     if (result.body.kind === "salmon") {
       assert.strictEqual(
         (result.body as SalmonOutput).partner?.kind,
-        validRecursiveBody.partner?.kind
+        validRecursiveBody.partner?.kind,
       );
     }
   });
@@ -120,7 +113,7 @@ describe("NestedDiscriminatorClient Rest Client", () => {
     const result = await client
       .path("/type/model/inheritance/nested-discriminator/recursivemodel")
       .put({
-        body: validRecursiveBody
+        body: validRecursiveBody,
       });
     assert.strictEqual(result.status, "204");
   });

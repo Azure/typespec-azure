@@ -1,12 +1,9 @@
-import { describe, it, assert } from "vitest";
+import { assert, describe, it } from "vitest";
 
-import {
-  bearerTokenAuthenticationPolicyName,
-  PipelinePolicy
-} from "@azure/core-rest-pipeline";
+import { bearerTokenAuthenticationPolicyName, PipelinePolicy } from "@azure/core-rest-pipeline";
 import { customBearerTokenAuthenticationPolicy } from "../util/customBearerTokenTestingPolicy.js";
 import AuthUnionClientFactory, {
-  AuthUnionClient
+  AuthUnionClient,
 } from "./generated/authentication/union/src/index.js";
 
 describe("AuthUnionClient Rest Client", () => {
@@ -17,9 +14,9 @@ describe("AuthUnionClient Rest Client", () => {
   function prepareToken() {
     client = AuthUnionClientFactory(
       {
-        getToken: async () => Promise.resolve(null)
+        getToken: async () => Promise.resolve(null),
       },
-      { allowInsecureConnection: true }
+      { allowInsecureConnection: true },
     );
     policy = customBearerTokenAuthenticationPolicy({
       scopes: defaultScope,
@@ -27,13 +24,13 @@ describe("AuthUnionClient Rest Client", () => {
         getToken: async () => {
           return {
             token: defaultScope,
-            expiresOnTimestamp: Date.now()
+            expiresOnTimestamp: Date.now(),
           };
-        }
-      }
+        },
+      },
     });
     client.pipeline.removePolicy({
-      name: bearerTokenAuthenticationPolicyName
+      name: bearerTokenAuthenticationPolicyName,
     });
     client.pipeline.addPolicy(policy);
   }
@@ -41,9 +38,9 @@ describe("AuthUnionClient Rest Client", () => {
   function prepareKey() {
     client = AuthUnionClientFactory(
       {
-        key: "valid-key"
+        key: "valid-key",
       },
-      { allowInsecureConnection: true }
+      { allowInsecureConnection: true },
     );
   }
 

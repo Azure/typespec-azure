@@ -1,7 +1,7 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import SharedRouteTestClientFactory, {
-  SharedRouteClient
+  SharedRouteClient,
 } from "./generated/shared-route/src/index.js";
 describe("SharedRouteTest Rest Client", () => {
   let client: SharedRouteClient;
@@ -10,8 +10,8 @@ describe("SharedRouteTest Rest Client", () => {
     client = SharedRouteTestClientFactory("http://fake-url.com", {
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
-      }
+        maxRetries: 0,
+      },
     });
   });
 

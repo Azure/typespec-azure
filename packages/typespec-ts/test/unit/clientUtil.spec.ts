@@ -1,4 +1,4 @@
-import { describe, it, assert } from "vitest";
+import { assert, describe, it } from "vitest";
 
 import { getRLCClientsFromTypeSpec } from "../util/emitUtil.js";
 

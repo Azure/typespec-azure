@@ -8,14 +8,13 @@ const sampleEnvText = `
 
 export function buildSampleEnvFile(model: RLCModel) {
   if (
-    (model.options?.generateMetadata === true ||
-      model.options?.generateSample === true) &&
+    (model.options?.generateMetadata === true || model.options?.generateSample === true) &&
     model.options?.flavor === "azure"
   ) {
     const filePath = "sample.env";
     return {
       path: filePath,
-      content: sampleEnvText.trim()
+      content: sampleEnvText.trim(),
     };
   }
   return undefined;

@@ -4,11 +4,11 @@
 import { RLCModel } from "../interfaces.js";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: to fix the handlebars issue
+import { readFileSync } from "fs";
 import hbs from "handlebars";
+import { getClientName } from "../helpers/nameConstructors.js";
 import { NameType, normalizeName } from "../helpers/nameUtils.js";
 import { isAzurePackage } from "../helpers/packageUtil.js";
-import { getClientName } from "../helpers/nameConstructors.js";
-import { readFileSync } from "fs";
 
 const azureReadmeRLCTemplate = `# {{ clientDescriptiveName }} library for JavaScript
 
@@ -355,22 +355,19 @@ export function buildReadmeFile(model: RLCModel) {
         ? azureReadmeModularTemplate
         : azureReadmeRLCTemplate
       : nonBrandedReadmeTemplate,
-    { noEscape: true }
+    { noEscape: true },
   );
   return {
     path: "README.md",
-    content: readmeFileContents(metadata)
+    content: readmeFileContents(metadata),
   };
 }
 
-export function hasClientNameChanged(
-  model: RLCModel,
-  existingReadmeFilePath: string
-): boolean {
+export function hasClientNameChanged(model: RLCModel, existingReadmeFilePath: string): boolean {
   try {
     const existingContent = readFileSync(existingReadmeFilePath, "utf8");
     const importMatch = existingContent.match(
-      /import\s*\{\s*([A-Za-z0-9_]+)\s*\}\s*from\s*["'][^"']*["']/
+      /import\s*\{\s*([A-Za-z0-9_]+)\s*\}\s*from\s*["'][^"']*["']/,
     );
     const existingClientName = importMatch?.[1];
     const newClientName = getClientName(model);
@@ -382,15 +379,13 @@ export function hasClientNameChanged(
 
 export function updateReadmeFile(
   model: RLCModel,
-  existingReadmeFilePath: string
+  existingReadmeFilePath: string,
 ): { path: string; content: string } | undefined {
   try {
     const existingContent = readFileSync(existingReadmeFilePath, "utf8");
     const metadata = createMetadata(model) ?? {};
 
-    const newApiRefLink = hbs
-      .compile(apiReferenceTemplate, { noEscape: true })(metadata)
-      .trim();
+    const newApiRefLink = hbs.compile(apiReferenceTemplate, { noEscape: true })(metadata).trim();
 
     if (!newApiRefLink) {
       return { path: "README.md", content: existingContent };
@@ -399,7 +394,7 @@ export function updateReadmeFile(
     const apiRefRegex =
       /^- \[API reference documentation\]\(https:\/\/learn\.microsoft\.com\/javascript\/api\/[^)]+\)$/m;
     const updatedContent = existingContent.replace(apiRefRegex, (match) =>
-      match ? newApiRefLink : match
+      match ? newApiRefLink : match,
     );
 
     return { path: "README.md", content: updatedContent };
@@ -426,27 +421,21 @@ function createMetadata(model: RLCModel): Metadata | undefined {
     multiClient,
     batch,
     serviceInfo,
-    isTypeSpecTest
+    isTypeSpecTest,
   } = model.options;
 
   const azureHuh =
-    packageDetails?.scopeName === "azure" ||
-    packageDetails?.scopeName === "azure-rest";
+    packageDetails?.scopeName === "azure" || packageDetails?.scopeName === "azure-rest";
   const repoURL = "https://github.com/Azure/azure-sdk-for-js";
   const relativePackageSourcePath = azureOutputDirectory;
   const packageSourceURL =
-    relativePackageSourcePath &&
-    repoURL &&
-    `${repoURL}/tree/main/${relativePackageSourcePath}`;
+    relativePackageSourcePath && repoURL && `${repoURL}/tree/main/${relativePackageSourcePath}`;
 
   const clientPackageName = packageDetails?.name;
   const clientClassName = getClientName(model);
   const serviceName = getServiceName(model);
   let apiRefUrlQueryParameter: string = "";
-  if (
-    !packageDetails?.isVersionUserProvided &&
-    model.apiVersionInfo?.defaultValue
-  ) {
+  if (!packageDetails?.isVersionUserProvided && model.apiVersionInfo?.defaultValue) {
     if (model.apiVersionInfo?.defaultValue?.toLowerCase().includes("preview")) {
       apiRefUrlQueryParameter = "?view=azure-node-preview";
     }
@@ -469,9 +458,7 @@ function createMetadata(model: RLCModel): Metadata | undefined {
     packageSourceURL: packageSourceURL,
     packageNPMURL: `https://www.npmjs.com/package/${clientPackageName}`,
     samplesURL:
-      model.options.generateSample && packageSourceURL
-        ? `${packageSourceURL}/samples`
-        : undefined,
+      model.options.generateSample && packageSourceURL ? `${packageSourceURL}/samples` : undefined,
     apiRefURL: azureHuh
       ? `https://learn.microsoft.com/javascript/api/${clientPackageName}${apiRefUrlQueryParameter}`
       : undefined,
@@ -488,7 +475,7 @@ function createMetadata(model: RLCModel): Metadata | undefined {
     contributingGuideURL: repoURL && `${repoURL}/blob/main/CONTRIBUTING.md`,
     azureSdkForJs: model.options.azureSdkForJs,
     generateTest: model.options.generateTest,
-    hasSubscriptionId: model.options.hasSubscriptionId
+    hasSubscriptionId: model.options.hasSubscriptionId,
   };
 }
 
@@ -506,7 +493,7 @@ function getServiceName(model: RLCModel) {
     batch && batch.length > 1
       ? normalizeName(
           packageDetails!.nameWithoutScope ?? packageDetails?.name ?? "",
-          NameType.Class
+          NameType.Class,
         )
       : normalizeName(serviceTitle, NameType.Class);
   simpleServiceName =

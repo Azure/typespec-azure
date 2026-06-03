@@ -1,10 +1,10 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
+import { stringToUint8Array } from "@azure/core-util";
 import {
   CollectionsModelProperty,
-  NullableClient
+  NullableClient,
 } from "./generated/type/property/nullable/src/index.js";
-import { stringToUint8Array } from "@azure/core-util";
 
 describe("NullableProperties Modular Client", () => {
   let client: NullableClient;
@@ -14,15 +14,15 @@ describe("NullableProperties Modular Client", () => {
       endpoint: "http://localhost:3002",
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
-      }
+        maxRetries: 0,
+      },
     });
   });
 
   it("should handle nullable bytes", async () => {
     const nonNull = {
       requiredProperty: "foo",
-      nullableProperty: stringToUint8Array("aGVsbG8sIHdvcmxkIQ==", "base64")
+      nullableProperty: stringToUint8Array("aGVsbG8sIHdvcmxkIQ==", "base64"),
     };
     const nullProperty = { requiredProperty: "foo", nullableProperty: null };
     const result = await client.bytes.getNull();
@@ -40,8 +40,8 @@ describe("NullableProperties Modular Client", () => {
       requiredProperty: "foo",
       nullableProperty: [
         stringToUint8Array("aGVsbG8sIHdvcmxkIQ==", "base64"),
-        stringToUint8Array("aGVsbG8sIHdvcmxkIQ==", "base64")
-      ]
+        stringToUint8Array("aGVsbG8sIHdvcmxkIQ==", "base64"),
+      ],
     };
     const nullProperty = { requiredProperty: "foo", nullableProperty: null };
     const result = await client.collectionsByte.getNull();
@@ -57,7 +57,7 @@ describe("NullableProperties Modular Client", () => {
   it("should handle collection model", async () => {
     const nonNull: CollectionsModelProperty = {
       requiredProperty: "foo",
-      nullableProperty: [{ property: "hello" }, { property: "world" }]
+      nullableProperty: [{ property: "hello" }, { property: "world" }],
     };
     const nullProperty = { requiredProperty: "foo", nullableProperty: null };
     const result = await client.collectionsModel.getNull();
@@ -72,7 +72,7 @@ describe("NullableProperties Modular Client", () => {
   it("should handle collection string", async () => {
     const nonNull = {
       requiredProperty: "foo",
-      nullableProperty: ["hello", "world"]
+      nullableProperty: ["hello", "world"],
     };
     const nullProperty = { requiredProperty: "foo", nullableProperty: null };
     const result = await client.collectionsString.getNull();
@@ -87,7 +87,7 @@ describe("NullableProperties Modular Client", () => {
   it("should handle nullable datetime", async () => {
     const nonNull = {
       requiredProperty: "foo",
-      nullableProperty: new Date("2022-08-26T18:38:00.000Z")
+      nullableProperty: new Date("2022-08-26T18:38:00.000Z"),
     };
     const nullProperty = { requiredProperty: "foo", nullableProperty: null };
     const result = await client.datetime.getNull();
@@ -103,7 +103,7 @@ describe("NullableProperties Modular Client", () => {
   it("should handle nullable duration", async () => {
     const nonNull = {
       requiredProperty: "foo",
-      nullableProperty: "P123DT22H14M12.011S"
+      nullableProperty: "P123DT22H14M12.011S",
     };
     const nullProperty = { requiredProperty: "foo", nullableProperty: null };
     const result = await client.duration.getNull();

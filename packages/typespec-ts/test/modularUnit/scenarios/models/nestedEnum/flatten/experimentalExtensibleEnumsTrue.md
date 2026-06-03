@@ -15,15 +15,13 @@ using Azure.ResourceManager;
 
 /** Microsoft.Contoso Resource Provider management API. */
 @armProviderNamespace
-@service(#{
-  title: "Microsoft.Contoso management service",
-})
+@service(#{ title: "Microsoft.Contoso management service" })
 @versioned(Microsoft.Contoso.Versions)
 namespace Microsoft.Contoso;
 
 /** The available API versions. */
 enum Versions {
-  /** 2021-10-01-preview version */ 
+  /** 2021-10-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   v2021_10_01_preview: "2021-10-01-preview",
 }

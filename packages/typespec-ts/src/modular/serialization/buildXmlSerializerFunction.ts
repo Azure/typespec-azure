@@ -1,39 +1,30 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { FunctionDeclarationStructure, StructureKind } from "ts-morph";
 import {
+  isReadOnly,
   SdkModelPropertyType,
   SdkModelType,
   SdkPackage,
   SdkType,
-  UsageFlags
+  UsageFlags,
 } from "@azure-tools/typespec-client-generator-core";
-import { SdkContext } from "../../utils/interfaces.js";
-import {
-  getAllAncestors,
-  getAllProperties
-} from "../helpers/operationHelpers.js";
-import {
-  normalizeModelName,
-  getAdditionalPropertiesName
-} from "../emitModels.js";
-import { NameType } from "../../rlc-common/index.js";
-import { isAzureCoreErrorType } from "../../utils/modelUtils.js";
-import {
-  isSupportedSerializeType,
-  ModelSerializeOptions
-} from "./serializeUtils.js";
-import { XmlHelpers } from "../static-helpers-metadata.js";
+import { NoTarget } from "@typespec/compiler";
+import { isMetadata } from "@typespec/http";
+import { FunctionDeclarationStructure, StructureKind } from "ts-morph";
+import { useDependencies } from "../../framework/hooks/useDependencies.js";
 import { resolveReference } from "../../framework/reference.js";
 import { refkey } from "../../framework/refkey.js";
 import { reportDiagnostic } from "../../lib.js";
-import { NoTarget } from "@typespec/compiler";
-import { isMetadata } from "@typespec/http";
-import { normalizeModelPropertyName } from "../type-expressions/get-type-expression.js";
-import { isReadOnly } from "@azure-tools/typespec-client-generator-core";
-import { useDependencies } from "../../framework/hooks/useDependencies.js";
+import { NameType } from "../../rlc-common/index.js";
+import { SdkContext } from "../../utils/interfaces.js";
+import { isAzureCoreErrorType } from "../../utils/modelUtils.js";
+import { getAdditionalPropertiesName, normalizeModelName } from "../emitModels.js";
+import { getAllAncestors, getAllProperties } from "../helpers/operationHelpers.js";
 import { getAdditionalPropertiesType } from "../helpers/typeHelpers.js";
+import { XmlHelpers } from "../static-helpers-metadata.js";
+import { normalizeModelPropertyName } from "../type-expressions/get-type-expression.js";
+import { isSupportedSerializeType, ModelSerializeOptions } from "./serializeUtils.js";
 
 /**
  * Checks if a model type has XML serialization options defined
@@ -53,9 +44,7 @@ export function hasXmlSerialization(type: SdkType): boolean {
 /**
  * Checks if any model in the SDK package uses XML serialization
  */
-export function packageUsesXmlSerialization(
-  sdkPackage: SdkPackage<any>
-): boolean {
+export function packageUsesXmlSerialization(sdkPackage: SdkPackage<any>): boolean {
   for (const model of sdkPackage.models) {
     if (hasXmlSerialization(model)) {
       return true;
@@ -75,7 +64,7 @@ export function getXmlRootName(type: SdkModelType): string {
  * Gets the XML namespace for a model type
  */
 export function getXmlRootNs(
-  type: SdkModelType
+  type: SdkModelType,
 ): { namespace: string; prefix: string } | undefined {
   return type.serializationOptions?.xml?.ns;
 }
@@ -88,8 +77,8 @@ export function buildXmlModelSerializer(
   type: SdkModelType,
   options: ModelSerializeOptions = {
     nameOnly: false,
-    skipDiscriminatedUnionSuffix: false
-  }
+    skipDiscriminatedUnionSuffix: false,
+  },
 ): FunctionDeclarationStructure | string | undefined {
   if (!isSupportedSerializeType(type)) {
     return undefined;
@@ -98,15 +87,14 @@ export function buildXmlModelSerializer(
   if (!type.name) {
     reportDiagnostic(context.program, {
       code: "anonymous-type-serialization",
-      target: type.__raw || NoTarget
+      target: type.__raw || NoTarget,
     });
     return undefined;
   }
 
   if (
     !type.usage ||
-    (type.usage !== undefined &&
-      (type.usage & UsageFlags.Input) !== UsageFlags.Input)
+    (type.usage !== undefined && (type.usage & UsageFlags.Input) !== UsageFlags.Input)
   ) {
     return undefined;
   }
@@ -121,7 +109,7 @@ export function buildXmlModelSerializer(
       context,
       type,
       NameType.Operation,
-      options.skipDiscriminatedUnionSuffix
+      options.skipDiscriminatedUnionSuffix,
     )}XmlSerializer`;
 
   if (options.nameOnly) {
@@ -129,9 +117,7 @@ export function buildXmlModelSerializer(
   }
 
   const serializeToXmlRef = resolveReference(XmlHelpers.serializeToXml);
-  const xmlPropertyMetadataRef = resolveReference(
-    XmlHelpers.XmlPropertyMetadata
-  );
+  const xmlPropertyMetadataRef = resolveReference(XmlHelpers.XmlPropertyMetadata);
 
   const properties = getAllProperties(context, type, getAllAncestors(type));
   const xmlRootName = getXmlRootName(type);
@@ -143,37 +129,29 @@ export function buildXmlModelSerializer(
   const statements: string[] = [];
 
   // Generate the properties metadata constant
-  statements.push(
-    `const properties: ${xmlPropertyMetadataRef}[] = [${propertyMetadata}];`
-  );
+  statements.push(`const properties: ${xmlPropertyMetadataRef}[] = [${propertyMetadata}];`);
 
   // Generate additionalProperties config if applicable
-  const additionalPropsConfigExpr = buildAdditionalPropertiesConfigExpr(
-    context,
-    type,
-    properties
-  );
+  const additionalPropsConfigExpr = buildAdditionalPropertiesConfigExpr(context, type, properties);
 
   // Generate the serialization call
   if (xmlRootNs) {
     if (additionalPropsConfigExpr) {
       statements.push(
-        `return ${serializeToXmlRef}(item, properties, "${xmlRootName}", { namespace: "${xmlRootNs.namespace}", prefix: "${xmlRootNs.prefix}" }, undefined, ${additionalPropsConfigExpr});`
+        `return ${serializeToXmlRef}(item, properties, "${xmlRootName}", { namespace: "${xmlRootNs.namespace}", prefix: "${xmlRootNs.prefix}" }, undefined, ${additionalPropsConfigExpr});`,
       );
     } else {
       statements.push(
-        `return ${serializeToXmlRef}(item, properties, "${xmlRootName}", { namespace: "${xmlRootNs.namespace}", prefix: "${xmlRootNs.prefix}" });`
+        `return ${serializeToXmlRef}(item, properties, "${xmlRootName}", { namespace: "${xmlRootNs.namespace}", prefix: "${xmlRootNs.prefix}" });`,
       );
     }
   } else {
     if (additionalPropsConfigExpr) {
       statements.push(
-        `return ${serializeToXmlRef}(item, properties, "${xmlRootName}", undefined, undefined, ${additionalPropsConfigExpr});`
+        `return ${serializeToXmlRef}(item, properties, "${xmlRootName}", undefined, undefined, ${additionalPropsConfigExpr});`,
       );
     } else {
-      statements.push(
-        `return ${serializeToXmlRef}(item, properties, "${xmlRootName}");`
-      );
+      statements.push(`return ${serializeToXmlRef}(item, properties, "${xmlRootName}");`);
     }
   }
 
@@ -184,11 +162,11 @@ export function buildXmlModelSerializer(
     parameters: [
       {
         name: "item",
-        type: resolveReference(refkey(type))
-      }
+        type: resolveReference(refkey(type)),
+      },
     ],
     returnType: "string",
-    statements
+    statements,
   };
 
   return serializerFunction;
@@ -204,8 +182,8 @@ export function buildXmlObjectModelSerializer(
   type: SdkModelType,
   options: ModelSerializeOptions = {
     nameOnly: false,
-    skipDiscriminatedUnionSuffix: false
-  }
+    skipDiscriminatedUnionSuffix: false,
+  },
 ): FunctionDeclarationStructure | string | undefined {
   if (!isSupportedSerializeType(type)) {
     return undefined;
@@ -214,15 +192,14 @@ export function buildXmlObjectModelSerializer(
   if (!type.name) {
     reportDiagnostic(context.program, {
       code: "anonymous-type-serialization",
-      target: type.__raw || NoTarget
+      target: type.__raw || NoTarget,
     });
     return undefined;
   }
 
   if (
     !type.usage ||
-    (type.usage !== undefined &&
-      (type.usage & UsageFlags.Input) !== UsageFlags.Input)
+    (type.usage !== undefined && (type.usage & UsageFlags.Input) !== UsageFlags.Input)
   ) {
     return undefined;
   }
@@ -237,7 +214,7 @@ export function buildXmlObjectModelSerializer(
       context,
       type,
       NameType.Operation,
-      options.skipDiscriminatedUnionSuffix
+      options.skipDiscriminatedUnionSuffix,
     )}XmlObjectSerializer`;
 
   if (options.nameOnly) {
@@ -247,10 +224,7 @@ export function buildXmlObjectModelSerializer(
   const properties = getAllProperties(context, type, getAllAncestors(type));
 
   // Build the object literal with XML property names
-  const propertyAssignments = buildXmlObjectPropertyAssignments(
-    context,
-    properties
-  );
+  const propertyAssignments = buildXmlObjectPropertyAssignments(context, properties);
 
   const statements: string[] = [];
 
@@ -262,7 +236,7 @@ export function buildXmlObjectModelSerializer(
     if (propertyAssignments.length === 0) {
       // Pure dictionary type - spread additionalProperties entries as XML elements
       statements.push(
-        `return { ...item["${apName}"] } as ${resolveReference(XmlHelpers.XmlSerializedObject)};`
+        `return { ...item["${apName}"] } as ${resolveReference(XmlHelpers.XmlSerializedObject)};`,
       );
     } else {
       // Model with both defined properties and additional properties
@@ -272,15 +246,10 @@ export function buildXmlObjectModelSerializer(
     statements.push(`return {${propertyAssignments}};`);
   }
 
-  const xmlSerializedObjectRef = resolveReference(
-    XmlHelpers.XmlSerializedObject
-  );
+  const xmlSerializedObjectRef = resolveReference(XmlHelpers.XmlSerializedObject);
 
   // Use _item when there are no properties and not a dict type to avoid unused parameter lint error
-  const paramName =
-    propertyAssignments.length === 0 && !additionalPropertyType
-      ? "_item"
-      : "item";
+  const paramName = propertyAssignments.length === 0 && !additionalPropertyType ? "_item" : "item";
 
   const serializerFunction: FunctionDeclarationStructure = {
     kind: StructureKind.Function,
@@ -289,11 +258,11 @@ export function buildXmlObjectModelSerializer(
     parameters: [
       {
         name: paramName,
-        type: resolveReference(refkey(type))
-      }
+        type: resolveReference(refkey(type)),
+      },
     ],
     returnType: xmlSerializedObjectRef,
-    statements
+    statements,
   };
 
   return serializerFunction;
@@ -305,7 +274,7 @@ export function buildXmlObjectModelSerializer(
  */
 function buildXmlObjectPropertyAssignments(
   context: SdkContext,
-  properties: SdkModelPropertyType[]
+  properties: SdkModelPropertyType[],
 ): string {
   const assignments: string[] = [];
 
@@ -357,7 +326,7 @@ function buildXmlObjectPropertyAssignments(
       const primitiveExpr = buildXmlValueSerializationExpr(
         context,
         property.type,
-        `item["${cleanPropertyName}"]`
+        `item["${cleanPropertyName}"]`,
       );
       if (xmlOptions?.unwrapped) {
         const itemKey = xmlOptions?.itemsName ?? xmlName;
@@ -373,7 +342,7 @@ function buildXmlObjectPropertyAssignments(
       valueExpr = buildXmlValueSerializationExpr(
         context,
         property.type,
-        `item["${cleanPropertyName}"]`
+        `item["${cleanPropertyName}"]`,
       );
     }
 
@@ -390,11 +359,9 @@ function buildXmlObjectPropertyAssignments(
 function buildXmlValueSerializationExpr(
   context: SdkContext,
   type: SdkType,
-  valueExpr: string
+  valueExpr: string,
 ): string {
-  const uint8ArrayToStringRef = resolveReference(
-    useDependencies().uint8ArrayToString
-  );
+  const uint8ArrayToStringRef = resolveReference(useDependencies().uint8ArrayToString);
 
   switch (type.kind) {
     case "bytes":
@@ -415,11 +382,7 @@ function buildXmlValueSerializationExpr(
 
     case "array": {
       // Handle arrays - need to serialize each element
-      const itemExpr = buildXmlValueSerializationExpr(
-        context,
-        type.valueType,
-        "i"
-      );
+      const itemExpr = buildXmlValueSerializationExpr(context, type.valueType, "i");
       if (itemExpr !== "i") {
         // If items need transformation, map them
         return `${valueExpr}?.map((i: any) => ${itemExpr})`;
@@ -439,7 +402,7 @@ function buildXmlValueSerializationExpr(
  */
 function buildPropertyMetadataArray(
   context: SdkContext,
-  properties: SdkModelPropertyType[]
+  properties: SdkModelPropertyType[],
 ): string {
   const metadataEntries: string[] = [];
 
@@ -460,12 +423,11 @@ function buildPropertyMetadataArray(
     const cleanPropertyName = propertyName.replace(/^"|"$/g, "");
 
     // Use XML name if available, fall back to JSON name, then property name
-    const serializedName =
-      xmlOptions?.name ?? jsonOptions?.name ?? property.name;
+    const serializedName = xmlOptions?.name ?? jsonOptions?.name ?? property.name;
 
     const metadataObj: string[] = [
       `propertyName: "${cleanPropertyName}"`,
-      `xmlOptions: { name: "${serializedName}"${buildXmlOptionsString(xmlOptions)} }`
+      `xmlOptions: { name: "${serializedName}"${buildXmlOptionsString(xmlOptions)} }`,
     ];
 
     // Add type information for special handling
@@ -517,7 +479,7 @@ function buildXmlOptionsString(xmlOptions?: {
   }
   if (xmlOptions.ns) {
     parts.push(
-      `ns: { namespace: "${xmlOptions.ns.namespace}", prefix: "${xmlOptions.ns.prefix}" }`
+      `ns: { namespace: "${xmlOptions.ns.namespace}", prefix: "${xmlOptions.ns.prefix}" }`,
     );
   }
   if (xmlOptions.unwrapped) {
@@ -528,7 +490,7 @@ function buildXmlOptionsString(xmlOptions?: {
   }
   if (xmlOptions.itemsNs) {
     parts.push(
-      `itemsNs: { namespace: "${xmlOptions.itemsNs.namespace}", prefix: "${xmlOptions.itemsNs.prefix}" }`
+      `itemsNs: { namespace: "${xmlOptions.itemsNs.namespace}", prefix: "${xmlOptions.itemsNs.prefix}" }`,
     );
   }
 
@@ -551,11 +513,7 @@ function getPropertyTypeInfo(type: SdkType): {
       const itemInfo = getPropertyTypeInfo(type.valueType);
       const result: ReturnType<typeof getPropertyTypeInfo> = { type: "array" };
       // Only include item type info for types that need special serialization
-      if (
-        itemInfo.type === "bytes" ||
-        itemInfo.type === "date" ||
-        itemInfo.type === "primitive"
-      ) {
+      if (itemInfo.type === "bytes" || itemInfo.type === "date" || itemInfo.type === "primitive") {
         result.itemType = itemInfo.type as "primitive" | "date" | "bytes";
       }
       if (itemInfo.dateEncoding) {
@@ -576,14 +534,12 @@ function getPropertyTypeInfo(type: SdkType): {
     case "utcDateTime":
       return {
         type: "date",
-        dateEncoding:
-          (type.encode as "rfc3339" | "rfc7231" | "unixTimestamp") ?? "rfc3339"
+        dateEncoding: (type.encode as "rfc3339" | "rfc7231" | "unixTimestamp") ?? "rfc3339",
       };
     case "bytes": {
       const encode = (type as any).encode as string | undefined;
       // Default to base64 if no encoding specified
-      const bytesEncoding =
-        encode === "base64url" ? "base64url" : ("base64" as const);
+      const bytesEncoding = encode === "base64url" ? "base64url" : ("base64" as const);
       return { type: "bytes", bytesEncoding };
     }
     case "boolean":
@@ -602,8 +558,7 @@ function getPropertyTypeInfo(type: SdkType): {
       if (type.variantTypes.length > 0) {
         const first = getPropertyTypeInfo(type.variantTypes[0]!);
         const allSame = type.variantTypes.every(
-          (v) =>
-            getPropertyTypeInfo(v).primitiveSubtype === first.primitiveSubtype
+          (v) => getPropertyTypeInfo(v).primitiveSubtype === first.primitiveSubtype,
         );
         if (allSame) {
           return first;
@@ -625,16 +580,13 @@ function getPropertyTypeInfo(type: SdkType): {
  * Gets the nested XML serializer function reference for complex types.
  * Uses the XML object serializer to properly handle XML property names.
  */
-function getNestedXmlSerializer(
-  context: SdkContext,
-  type: SdkType
-): string | undefined {
+function getNestedXmlSerializer(context: SdkContext, type: SdkType): string | undefined {
   if (type.kind === "model") {
     // For nested objects, use the XML object serializer which returns objects
     // with XML property names for proper serialization
     const serializerName = buildXmlObjectModelSerializer(context, type, {
       nameOnly: true,
-      skipDiscriminatedUnionSuffix: false
+      skipDiscriminatedUnionSuffix: false,
     });
     if (typeof serializerName === "string") {
       return serializerName;
@@ -643,14 +595,10 @@ function getNestedXmlSerializer(
   if (type.kind === "array" && type.valueType.kind === "model") {
     // For arrays, use the XML object serializer for items
     // The XML helper calls this for each item and handles the array mapping
-    const itemSerializer = buildXmlObjectModelSerializer(
-      context,
-      type.valueType,
-      {
-        nameOnly: true,
-        skipDiscriminatedUnionSuffix: false
-      }
-    );
+    const itemSerializer = buildXmlObjectModelSerializer(context, type.valueType, {
+      nameOnly: true,
+      skipDiscriminatedUnionSuffix: false,
+    });
     if (typeof itemSerializer === "string") {
       return itemSerializer;
     }
@@ -666,8 +614,8 @@ export function buildXmlModelDeserializer(
   type: SdkModelType,
   options: ModelSerializeOptions = {
     nameOnly: false,
-    skipDiscriminatedUnionSuffix: false
-  }
+    skipDiscriminatedUnionSuffix: false,
+  },
 ): FunctionDeclarationStructure | string | undefined {
   if (!isSupportedSerializeType(type)) {
     return undefined;
@@ -676,7 +624,7 @@ export function buildXmlModelDeserializer(
   if (!type.name) {
     reportDiagnostic(context.program, {
       code: "anonymous-type-deserialization",
-      target: type.__raw || NoTarget
+      target: type.__raw || NoTarget,
     });
     return undefined;
   }
@@ -700,7 +648,7 @@ export function buildXmlModelDeserializer(
       context,
       type,
       NameType.Operation,
-      options.skipDiscriminatedUnionSuffix
+      options.skipDiscriminatedUnionSuffix,
     )}XmlDeserializer`;
 
   if (options.nameOnly) {
@@ -709,7 +657,7 @@ export function buildXmlModelDeserializer(
 
   const deserializeFromXmlRef = resolveReference(XmlHelpers.deserializeFromXml);
   const xmlPropertyDeserializeMetadataRef = resolveReference(
-    XmlHelpers.XmlPropertyDeserializeMetadata
+    XmlHelpers.XmlPropertyDeserializeMetadata,
   );
 
   const properties = getAllProperties(context, type, getAllAncestors(type));
@@ -717,45 +665,38 @@ export function buildXmlModelDeserializer(
   const xmlRootNs = getXmlRootNs(type);
 
   // Build property metadata array for deserialization
-  const propertyMetadata = buildDeserializePropertyMetadataArray(
-    context,
-    properties
-  );
+  const propertyMetadata = buildDeserializePropertyMetadataArray(context, properties);
 
   const statements: string[] = [];
 
   // Generate the properties metadata constant
   statements.push(
-    `const properties: ${xmlPropertyDeserializeMetadataRef}[] = [${propertyMetadata}];`
+    `const properties: ${xmlPropertyDeserializeMetadataRef}[] = [${propertyMetadata}];`,
   );
 
   // Generate additionalProperties config if applicable
-  const additionalPropsConfigExpr = buildAdditionalPropertiesConfigExpr(
-    context,
-    type,
-    properties
-  );
+  const additionalPropsConfigExpr = buildAdditionalPropertiesConfigExpr(context, type, properties);
 
   // Generate the deserialization call
   const typeRef = resolveReference(refkey(type));
   if (xmlRootNs) {
     if (additionalPropsConfigExpr) {
       statements.push(
-        `return ${deserializeFromXmlRef}<${typeRef}>(xmlString, properties, "${xmlRootName}", { namespace: "${xmlRootNs.namespace}", prefix: "${xmlRootNs.prefix}" }, undefined, ${additionalPropsConfigExpr});`
+        `return ${deserializeFromXmlRef}<${typeRef}>(xmlString, properties, "${xmlRootName}", { namespace: "${xmlRootNs.namespace}", prefix: "${xmlRootNs.prefix}" }, undefined, ${additionalPropsConfigExpr});`,
       );
     } else {
       statements.push(
-        `return ${deserializeFromXmlRef}<${typeRef}>(xmlString, properties, "${xmlRootName}", { namespace: "${xmlRootNs.namespace}", prefix: "${xmlRootNs.prefix}" });`
+        `return ${deserializeFromXmlRef}<${typeRef}>(xmlString, properties, "${xmlRootName}", { namespace: "${xmlRootNs.namespace}", prefix: "${xmlRootNs.prefix}" });`,
       );
     }
   } else {
     if (additionalPropsConfigExpr) {
       statements.push(
-        `return ${deserializeFromXmlRef}<${typeRef}>(xmlString, properties, "${xmlRootName}", undefined, undefined, ${additionalPropsConfigExpr});`
+        `return ${deserializeFromXmlRef}<${typeRef}>(xmlString, properties, "${xmlRootName}", undefined, undefined, ${additionalPropsConfigExpr});`,
       );
     } else {
       statements.push(
-        `return ${deserializeFromXmlRef}<${typeRef}>(xmlString, properties, "${xmlRootName}");`
+        `return ${deserializeFromXmlRef}<${typeRef}>(xmlString, properties, "${xmlRootName}");`,
       );
     }
   }
@@ -767,11 +708,11 @@ export function buildXmlModelDeserializer(
     parameters: [
       {
         name: "xmlString",
-        type: "string"
-      }
+        type: "string",
+      },
     ],
     returnType: resolveReference(refkey(type)),
-    statements
+    statements,
   };
 
   return deserializerFunction;
@@ -782,7 +723,7 @@ export function buildXmlModelDeserializer(
  */
 function buildDeserializePropertyMetadataArray(
   context: SdkContext,
-  properties: SdkModelPropertyType[]
+  properties: SdkModelPropertyType[],
 ): string {
   const metadataEntries: string[] = [];
 
@@ -800,12 +741,11 @@ function buildDeserializePropertyMetadataArray(
     const cleanPropertyName = propertyName.replace(/^"|"$/g, "");
 
     // Use XML name if available, fall back to JSON name, then property name
-    const serializedName =
-      xmlOptions?.name ?? jsonOptions?.name ?? property.name;
+    const serializedName = xmlOptions?.name ?? jsonOptions?.name ?? property.name;
 
     const metadataObj: string[] = [
       `propertyName: "${cleanPropertyName}"`,
-      `xmlOptions: { name: "${serializedName}"${buildXmlOptionsString(xmlOptions)} }`
+      `xmlOptions: { name: "${serializedName}"${buildXmlOptionsString(xmlOptions)} }`,
     ];
 
     // Add type information for special handling
@@ -842,16 +782,13 @@ function buildDeserializePropertyMetadataArray(
  * Gets the nested XML deserializer function reference for complex types.
  * Uses the XML object deserializer to properly handle XML property names.
  */
-function getNestedXmlDeserializer(
-  context: SdkContext,
-  type: SdkType
-): string | undefined {
+function getNestedXmlDeserializer(context: SdkContext, type: SdkType): string | undefined {
   if (type.kind === "model") {
     // For nested objects, use the XML object deserializer which takes parsed XML objects
     // and uses XML property names for mapping
     const deserializerName = buildXmlObjectModelDeserializer(context, type, {
       nameOnly: true,
-      skipDiscriminatedUnionSuffix: false
+      skipDiscriminatedUnionSuffix: false,
     });
     if (typeof deserializerName === "string") {
       return deserializerName;
@@ -860,14 +797,10 @@ function getNestedXmlDeserializer(
   if (type.kind === "array" && type.valueType.kind === "model") {
     // For arrays, use the XML object deserializer for items
     // The XML helper calls this for each item and handles the array mapping
-    const itemDeserializer = buildXmlObjectModelDeserializer(
-      context,
-      type.valueType,
-      {
-        nameOnly: true,
-        skipDiscriminatedUnionSuffix: false
-      }
-    );
+    const itemDeserializer = buildXmlObjectModelDeserializer(context, type.valueType, {
+      nameOnly: true,
+      skipDiscriminatedUnionSuffix: false,
+    });
     if (typeof itemDeserializer === "string") {
       return itemDeserializer;
     }
@@ -885,8 +818,8 @@ export function buildXmlObjectModelDeserializer(
   type: SdkModelType,
   options: ModelSerializeOptions = {
     nameOnly: false,
-    skipDiscriminatedUnionSuffix: false
-  }
+    skipDiscriminatedUnionSuffix: false,
+  },
 ): FunctionDeclarationStructure | string | undefined {
   if (!isSupportedSerializeType(type)) {
     return undefined;
@@ -895,7 +828,7 @@ export function buildXmlObjectModelDeserializer(
   if (!type.name) {
     reportDiagnostic(context.program, {
       code: "anonymous-type-deserialization",
-      target: type.__raw || NoTarget
+      target: type.__raw || NoTarget,
     });
     return undefined;
   }
@@ -919,52 +852,41 @@ export function buildXmlObjectModelDeserializer(
       context,
       type,
       NameType.Operation,
-      options.skipDiscriminatedUnionSuffix
+      options.skipDiscriminatedUnionSuffix,
     )}XmlObjectDeserializer`;
 
   if (options.nameOnly) {
     return resolveReference(refkey(type, "xmlObjectDeserializer"));
   }
 
-  const deserializeXmlObjectRef = resolveReference(
-    XmlHelpers.deserializeXmlObject
-  );
+  const deserializeXmlObjectRef = resolveReference(XmlHelpers.deserializeXmlObject);
   const xmlPropertyDeserializeMetadataRef = resolveReference(
-    XmlHelpers.XmlPropertyDeserializeMetadata
+    XmlHelpers.XmlPropertyDeserializeMetadata,
   );
 
   const properties = getAllProperties(context, type, getAllAncestors(type));
 
   // Build property metadata array for deserialization
-  const propertyMetadata = buildDeserializePropertyMetadataArray(
-    context,
-    properties
-  );
+  const propertyMetadata = buildDeserializePropertyMetadataArray(context, properties);
 
   const statements: string[] = [];
 
   // Generate the properties metadata constant
   statements.push(
-    `const properties: ${xmlPropertyDeserializeMetadataRef}[] = [${propertyMetadata}];`
+    `const properties: ${xmlPropertyDeserializeMetadataRef}[] = [${propertyMetadata}];`,
   );
 
   // Generate additionalProperties config if applicable
-  const additionalPropsConfigExpr = buildAdditionalPropertiesConfigExpr(
-    context,
-    type,
-    properties
-  );
+  const additionalPropsConfigExpr = buildAdditionalPropertiesConfigExpr(context, type, properties);
 
   // Generate the deserialization call - no rootName needed for object deserializer
   const typeRef = resolveReference(refkey(type));
   if (additionalPropsConfigExpr) {
     statements.push(
-      `return ${deserializeXmlObjectRef}<${typeRef}>(xmlObject, properties, ${additionalPropsConfigExpr});`
+      `return ${deserializeXmlObjectRef}<${typeRef}>(xmlObject, properties, ${additionalPropsConfigExpr});`,
     );
   } else {
-    statements.push(
-      `return ${deserializeXmlObjectRef}<${typeRef}>(xmlObject, properties);`
-    );
+    statements.push(`return ${deserializeXmlObjectRef}<${typeRef}>(xmlObject, properties);`);
   }
 
   const deserializerFunction: FunctionDeclarationStructure = {
@@ -974,11 +896,11 @@ export function buildXmlObjectModelDeserializer(
     parameters: [
       {
         name: "xmlObject",
-        type: "Record<string, unknown>"
-      }
+        type: "Record<string, unknown>",
+      },
     ],
     returnType: resolveReference(refkey(type)),
-    statements
+    statements,
   };
 
   return deserializerFunction;
@@ -993,12 +915,11 @@ export function buildXmlObjectModelDeserializer(
 function buildAdditionalPropertiesConfigExpr(
   context: SdkContext,
   type: SdkModelType,
-  properties: SdkModelPropertyType[]
+  properties: SdkModelPropertyType[],
 ): string | undefined {
   const additionalPropertyType = getAdditionalPropertiesType(type);
   const isErrorModel =
-    type.usage !== undefined &&
-    (type.usage & UsageFlags.Exception) === UsageFlags.Exception;
+    type.usage !== undefined && (type.usage & UsageFlags.Exception) === UsageFlags.Exception;
 
   if (!additionalPropertyType && !isErrorModel) {
     return undefined;

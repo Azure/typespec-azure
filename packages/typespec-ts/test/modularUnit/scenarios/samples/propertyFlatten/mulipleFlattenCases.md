@@ -28,7 +28,6 @@ model BodyParameter {
 
 @doc("show example demo")
 op read(@body widget?: BodyParameter): void;
-
 ```
 
 Enable the raw content with TCGC dependency.
@@ -53,7 +52,7 @@ Raw json files.
       "name": "body name",
       "properties": {
         "bar": {
-            "x": "xx"
+          "x": "xx"
         }
       }
     }
@@ -189,7 +188,6 @@ model BodyParameter {
 
 @doc("show example demo")
 op read(@body body?: BodyParameter): void;
-
 ```
 
 Enable the raw content with TCGC dependency.

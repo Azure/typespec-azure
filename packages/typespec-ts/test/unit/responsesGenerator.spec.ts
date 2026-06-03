@@ -1,9 +1,6 @@
-import { describe, it, assert } from "vitest";
+import { assert, describe, it } from "vitest";
 
-import {
-  emitModelsFromTypeSpec,
-  emitResponsesFromTypeSpec
-} from "../util/emitUtil.js";
+import { emitModelsFromTypeSpec, emitResponsesFromTypeSpec } from "../util/emitUtil.js";
 import { assertEqualContent } from "../util/testUtil.js";
 
 describe("Responses.ts", () => {
@@ -36,7 +33,7 @@ describe("Responses.ts", () => {
     export interface Read204Response extends HttpResponse {
       status: "204";
       headers: RawHttpHeaders & Read204Headers;
-    }`
+    }`,
       );
     });
 
@@ -68,7 +65,7 @@ describe("Responses.ts", () => {
     export interface Read204Response extends HttpResponse {
       status: "204";
       headers: RawHttpHeaders & Read204Headers;
-    }`
+    }`,
       );
     });
   });
@@ -104,7 +101,7 @@ describe("Responses.ts", () => {
         status: string;
         body: ErrorModelOutput;
       }
-      `
+      `,
       );
     });
   });
@@ -124,7 +121,7 @@ describe("Responses.ts", () => {
         export interface Read204Response extends HttpResponse {
           status: "204";
         }
-      `
+      `,
       );
     });
 
@@ -143,7 +140,7 @@ describe("Responses.ts", () => {
           status: "200";
           body: any[];
         }
-      `
+      `,
       );
     });
 
@@ -167,7 +164,7 @@ describe("Responses.ts", () => {
           status: "200";
           body: Record<string, SimpleModelOutput>;
         }
-      `
+      `,
       );
     });
 
@@ -186,7 +183,7 @@ describe("Responses.ts", () => {
       status: "200";
       body: Record<string, any>;
     }
-    `
+    `,
       );
     });
     it("@header contentType not json or text should set format to binary(finally unit8array)", async () => {
@@ -211,7 +208,7 @@ describe("Responses.ts", () => {
         body: Uint8Array;
         headers: RawHttpHeaders & Read200Headers;
       }
-      `
+      `,
       );
     });
     it("@header contentType text/plain should keep format to byte(finally string)", async () => {
@@ -235,7 +232,7 @@ describe("Responses.ts", () => {
          body: string;
          headers: RawHttpHeaders & Read200Headers;
        }
-      `
+      `,
       );
     });
 
@@ -264,8 +261,8 @@ describe("Responses.ts", () => {
       op getModel(...SimpleModel): SimpleModel;
       `,
         {
-          needTCGC: false
-        }
+          needTCGC: false,
+        },
       );
       assert.ok(responses);
       await assertEqualContent(
@@ -287,7 +284,7 @@ describe("Responses.ts", () => {
             status: "200";
             headers: RawHttpHeaders & GetModel200Headers;
         }
-        `
+        `,
       );
     });
   });
@@ -301,8 +298,8 @@ describe("Responses.ts", () => {
       @get op read(): Azure.Core.Foundations.ErrorResponse;
       `,
       {
-        needAzureCore: true
-      }
+        needAzureCore: true,
+      },
     );
     assert.ok(parameters);
     await assertEqualContent(
@@ -321,7 +318,7 @@ describe("Responses.ts", () => {
           body: ErrorResponse;
           headers: RawHttpHeaders & ReadDefaultHeaders;
         }
-      `
+      `,
     );
   });
 
@@ -359,7 +356,7 @@ describe("Responses.ts", () => {
         message: string;
         param: string | null;
         code: string | null;
-      } `
+      } `,
     );
     await assertEqualContent(
       parameters?.content!,
@@ -371,7 +368,7 @@ describe("Responses.ts", () => {
           status: string;
           body: ErrorResponseOutput;
         }
-      `
+      `,
     );
   });
 });
@@ -407,7 +404,7 @@ describe("headers generation", () => {
         body: KeyOutput | Uint8Array;
         headers: RawHttpHeaders & Read200Headers;
       }
-      `
+      `,
     );
   });
 });
@@ -428,7 +425,7 @@ describe("Array generation", () => {
         status: "200";
         body: string[];
       }
-      `
+      `,
     );
   });
 
@@ -447,7 +444,7 @@ describe("Array generation", () => {
         status: "200";
         body: number[];
       }
-      `
+      `,
     );
   });
 
@@ -466,7 +463,7 @@ describe("Array generation", () => {
         status: "200";
         body: number[];
       }
-      `
+      `,
     );
   });
 
@@ -485,7 +482,7 @@ describe("Array generation", () => {
         status: "200";
         body: number[];
       }
-      `
+      `,
     );
   });
 
@@ -504,7 +501,7 @@ describe("Array generation", () => {
         status: "200";
         body: boolean[];
       }
-      `
+      `,
     );
   });
 
@@ -523,7 +520,7 @@ describe("Array generation", () => {
         status: "200";
         body: string[];
       }
-      `
+      `,
     );
   });
 
@@ -542,7 +539,7 @@ describe("Array generation", () => {
         status: "200";
         body: string[];
       }
-      `
+      `,
     );
   });
 
@@ -561,7 +558,7 @@ describe("Array generation", () => {
         status: "200";
         body: string[];
       }
-      `
+      `,
     );
   });
 
@@ -580,7 +577,7 @@ describe("Array generation", () => {
         status: "200";
         body: string[];
       }
-      `
+      `,
     );
   });
 
@@ -604,7 +601,7 @@ describe("Array generation", () => {
         status: "200";
         body: Array<SimpleModelOutput>;
       }
-      `
+      `,
     );
   });
 
@@ -628,7 +625,7 @@ describe("Array generation", () => {
         status: "200";
         body: Array<InnerModelOutput>;
       }
-      `
+      `,
     );
   });
 });

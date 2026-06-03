@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { DeserializeEmptyStringAsNullClient } from "./generated/azure/client-generator-core/deserialize-empty-string-as-null/src/index.js";
 describe("Azure ClientGeneratorCore Usage Client", () => {
@@ -7,7 +7,7 @@ describe("Azure ClientGeneratorCore Usage Client", () => {
   beforeEach(() => {
     client = new DeserializeEmptyStringAsNullClient({
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 

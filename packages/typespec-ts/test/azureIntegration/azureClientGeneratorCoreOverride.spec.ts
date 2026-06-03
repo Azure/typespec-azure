@@ -1,7 +1,7 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import OverrideClientFactory, {
-  OverrideClient
+  OverrideClient,
 } from "./generated/azure/client-generator-core/override/src/index.js";
 
 describe("Azure Client Generator Core Override", () => {
@@ -9,7 +9,7 @@ describe("Azure Client Generator Core Override", () => {
 
   beforeEach(() => {
     client = OverrideClientFactory({
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
@@ -21,7 +21,7 @@ describe("Azure Client Generator Core Override", () => {
       .path(
         "/azure/client-generator-core/override/reorder/{param2}/{param1}",
         "param2", // param2 value
-        "param1" // param1 value
+        "param1", // param1 value
       )
       .get();
     assert.strictEqual(result.status, "204");
@@ -32,14 +32,12 @@ describe("Azure Client Generator Core Override", () => {
     // Test parameter grouping with @override decorator
     // Verifies that parameters are grouped correctly into GroupParametersOptions
     // Expected query parameters: param1="param1", param2="param2"
-    const result = await client
-      .path("/azure/client-generator-core/override/group")
-      .get({
-        queryParameters: {
-          param1: "param1",
-          param2: "param2"
-        }
-      });
+    const result = await client.path("/azure/client-generator-core/override/group").get({
+      queryParameters: {
+        param1: "param1",
+        param2: "param2",
+      },
+    });
     assert.strictEqual(result.status, "204");
   });
 
@@ -50,7 +48,7 @@ describe("Azure Client Generator Core Override", () => {
       .path(
         "/azure/client-generator-core/override/require-optional/{param1}/{param2}",
         "param1", // param1 value
-        "param2" // param2 value
+        "param2", // param2 value
       )
       .get();
     assert.strictEqual(result.status, "204");
@@ -62,12 +60,12 @@ describe("Azure Client Generator Core Override", () => {
     const result = await client
       .path(
         "/azure/client-generator-core/override/remove-optional/{param1}",
-        "param1" // param1 value
+        "param1", // param1 value
       )
       .get({
         queryParameters: {
-          param2: "param2"
-        }
+          param2: "param2",
+        },
       });
     assert.strictEqual(result.status, "204");
   });

@@ -1,8 +1,8 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import {
   NextLinkVerbClient,
-  Test
+  Test,
 } from "./generated/azure/client-generator-core/next-link-verb/src/index.js";
 
 describe("NextLinkVerbClient", () => {
@@ -11,7 +11,7 @@ describe("NextLinkVerbClient", () => {
   beforeEach(() => {
     client = new NextLinkVerbClient({
       allowInsecureConnection: true,
-      endpoint: "http://localhost:3002"
+      endpoint: "http://localhost:3002",
     });
   });
 

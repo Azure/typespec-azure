@@ -1,21 +1,17 @@
-import { TestingContext as Client } from "./index.js";
 import {
-  StreamableMethod,
-  operationOptionsToRequestParameters,
   PathUncheckedResponse,
-  createRestError
+  StreamableMethod,
+  createRestError,
+  operationOptionsToRequestParameters,
 } from "@azure-rest/core-client";
+import { TestingContext as Client } from "./index.js";
 export function _customGet1Send(
   context: Client,
-  options: CustomGet1OptionalParams = { requestOptions: {} }
+  options: CustomGet1OptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/customGet1")
-    .get({ ...operationOptionsToRequestParameters(options) });
+  return context.path("/customGet1").get({ ...operationOptionsToRequestParameters(options) });
 }
-export async function _customGet1Deserialize(
-  result: PathUncheckedResponse
-): Promise<Widget1> {
+export async function _customGet1Deserialize(result: PathUncheckedResponse): Promise<Widget1> {
   const expectedStatuses = ["200"];
   if (!expectedStatuses.includes(result.status)) {
     throw createRestError(result);
@@ -24,12 +20,12 @@ export async function _customGet1Deserialize(
     id: result.body["id"],
     weight: result.body["weight"],
     color: result.body["color"],
-    data: result.body["data"]
+    data: result.body["data"],
   };
 }
 export async function customGet1(
   context: Client,
-  options: CustomGet1OptionalParams = { requestOptions: {} }
+  options: CustomGet1OptionalParams = { requestOptions: {} },
 ): Promise<Widget1> {
   const result = await _customGet1Send(context, options);
   return _customGet1Deserialize(result);

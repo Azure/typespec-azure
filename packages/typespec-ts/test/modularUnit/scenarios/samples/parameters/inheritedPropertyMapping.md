@@ -13,15 +13,14 @@ model ExceptionDocument extends DocumentBase {
   ExceptionMessage: string;
 }
 
-model RequestModel{
-    Documents:ExceptionDocument[];
+model RequestModel {
+  Documents: ExceptionDocument[];
 }
 @route("/documents")
 interface Documents {
   @post
   publish(@body body: RequestModel): void;
 }
-
 ```
 
 Should ignore the warning `@azure-tools/typespec-ts/property-name-normalized`:

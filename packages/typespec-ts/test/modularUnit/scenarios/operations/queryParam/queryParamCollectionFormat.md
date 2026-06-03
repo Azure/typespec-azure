@@ -10,25 +10,25 @@ interface QueryOperations {
   @get
   read(
     @query
-    simpleArray: string[];
+    simpleArray: string[],
 
     @query
-    simpleOptionalArray?: string[];
+    simpleOptionalArray?: string[],
   ): void;
 
   @post
   create(
     @query
     @encode(ArrayEncoding.spaceDelimited)
-    ssvArray: int32[];
+    ssvArray: int32[],
 
     @query
     @encode(ArrayEncoding.spaceDelimited)
-    ssvOptionalArray?: int32[];
+    ssvOptionalArray?: int32[],
 
     @query
     @encode(ArrayEncoding.pipeDelimited)
-    pipeArray: string[];
+    pipeArray: string[],
   ): void;
 }
 ```
@@ -153,13 +153,13 @@ export async function read(
 interface QueryOperations {
   @get
   read(
-    @query(#{explode: true})
+    @query(#{ explode: true })
     @encode(ArrayEncoding.spaceDelimited)
-    ssvArray: int32[];
+    ssvArray: int32[],
 
-    @query(#{explode: true})
+    @query(#{ explode: true })
     @encode(ArrayEncoding.spaceDelimited)
-    ssvOptionalArray?: int32[];
+    ssvOptionalArray?: int32[],
   ): void;
 }
 ```

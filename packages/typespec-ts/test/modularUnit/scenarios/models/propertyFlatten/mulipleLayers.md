@@ -152,7 +152,6 @@ model NestedFlattenModel {
 }
 model ChildFlattenModel {
   summary: string;
-
   foo: Foo;
 }
 

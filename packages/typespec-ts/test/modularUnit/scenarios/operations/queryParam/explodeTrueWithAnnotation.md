@@ -8,10 +8,12 @@ This is tsp definition.
 model SelectQueryParameter {
   @query(#{ explode: true })
   select?: string[];
+
   @query("bar")
   foo: string;
+
   @query
-  "api-version": string;
+  `api-version`: string;
 }
 @route("annotation/optional")
 op optional(...SelectQueryParameter): void;

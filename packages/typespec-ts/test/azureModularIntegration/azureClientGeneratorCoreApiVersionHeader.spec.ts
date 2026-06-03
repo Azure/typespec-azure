@@ -1,4 +1,4 @@
-import { describe, it, beforeEach } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 
 import { HeaderClient } from "./generated/azure/client-generator-core/api-version/header/src/index.js";
 
@@ -8,7 +8,7 @@ describe("Azure Client Generator Core - API Version Header (Modular)", () => {
   beforeEach(() => {
     client = new HeaderClient({
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 

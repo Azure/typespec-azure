@@ -1,4 +1,4 @@
-import { describe, it, beforeEach } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 
 import { DocumentationClient } from "./generated/documentation/src/index.js";
 
@@ -10,8 +10,8 @@ describe("Documentation Client", () => {
       endpoint: "http://localhost:3002",
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
-      }
+        maxRetries: 0,
+      },
     });
   });
 

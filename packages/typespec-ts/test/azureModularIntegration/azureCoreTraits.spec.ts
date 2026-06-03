@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { TraitsClient } from "./generated/azure/core/traits/src/index.js";
 
@@ -8,7 +8,7 @@ describe("Traits Client", () => {
   beforeEach(() => {
     client = new TraitsClient({
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
@@ -17,15 +17,15 @@ describe("Traits Client", () => {
       ifNoneMatch: '"invalid"',
       ifMatch: '"valid"',
       ifUnmodifiedSince: new Date("Fri, 26 Aug 2022 14:38:00 GMT"),
-      ifModifiedSince: new Date("Thu, 26 Aug 2021 14:38:00 GMT")
+      ifModifiedSince: new Date("Thu, 26 Aug 2021 14:38:00 GMT"),
     });
     assert.isNotNull(result);
     assert.strictEqual(
       JSON.stringify(result),
       JSON.stringify({
         id: 1,
-        name: "Madge"
-      })
+        name: "Madge",
+      }),
     );
   });
 
@@ -35,13 +35,10 @@ describe("Traits Client", () => {
       { userActionValue: "test" },
       {
         repeatabilityRequestId: "86aede1f-96fa-4e7f-b1e1-bf8a947cb804",
-        repeatabilityFirstSent: new Date("Wed, 15 Nov 2023 15:38:00 GMT")
-      }
+        repeatabilityFirstSent: new Date("Wed, 15 Nov 2023 15:38:00 GMT"),
+      },
     );
     assert.isNotNull(result);
-    assert.strictEqual(
-      JSON.stringify(result),
-      JSON.stringify({ userActionResult: "test" })
-    );
+    assert.strictEqual(JSON.stringify(result), JSON.stringify({ userActionResult: "test" }));
   });
 });

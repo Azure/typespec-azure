@@ -12,8 +12,7 @@ import { RLCModel } from "../interfaces.js";
  */
 export function buildTsConfig(model: RLCModel) {
   const { packageDetails, azureSdkForJs } = model.options || {};
-  const { generateTest, generateSample, generateReactNativeTarget } =
-    model.options || {};
+  const { generateTest, generateSample, generateReactNativeTarget } = model.options || {};
   const clientPackageName = packageDetails?.name ?? "";
   const project = new Project();
 
@@ -22,7 +21,7 @@ export function buildTsConfig(model: RLCModel) {
   if (azureSdkForJs) {
     const references: { path: string }[] = [
       { path: "./config/tsconfig.src.esm.json" },
-      { path: "./config/tsconfig.src.browser.json" }
+      { path: "./config/tsconfig.src.browser.json" },
     ];
 
     if (generateReactNativeTarget) {
@@ -34,7 +33,7 @@ export function buildTsConfig(model: RLCModel) {
     if (generateTest) {
       references.push(
         { path: "./config/tsconfig.test.node.json" },
-        { path: "./config/tsconfig.test.browser.json" }
+        { path: "./config/tsconfig.test.browser.json" },
       );
     }
 
@@ -70,9 +69,9 @@ export function buildTsConfig(model: RLCModel) {
         allowSyntheticDefaultImports: true,
         esModuleInterop: true,
         outDir: options?.moduleKind === "cjs" ? "./dist-esm" : undefined,
-        declarationDir: options?.moduleKind === "cjs" ? "./types" : undefined
+        declarationDir: options?.moduleKind === "cjs" ? "./types" : undefined,
       },
-      include: ["src/**/*.ts"]
+      include: ["src/**/*.ts"],
     };
 
     if (generateTest) {
@@ -86,14 +85,12 @@ export function buildTsConfig(model: RLCModel) {
   }
 
   const filePath = "tsconfig.json";
-  const configFile = project.createSourceFile(
-    filePath,
-    JSON.stringify(tsConfig, null, 2),
-    { overwrite: true }
-  );
+  const configFile = project.createSourceFile(filePath, JSON.stringify(tsConfig, null, 2), {
+    overwrite: true,
+  });
   return {
     path: filePath,
-    content: configFile.getFullText()
+    content: configFile.getFullText(),
   };
 }
 
@@ -106,11 +103,11 @@ export function buildTsSrcEsmConfig() {
     content: JSON.stringify(
       {
         extends: "../../../../eng/tsconfigs/src.esm.json",
-        include: ["../src/index.ts"]
+        include: ["../src/index.ts"],
       },
       null,
-      2
-    )
+      2,
+    ),
   };
 }
 
@@ -123,11 +120,11 @@ export function buildTsSrcBrowserConfig() {
     content: JSON.stringify(
       {
         extends: "../../../../eng/tsconfigs/src.browser.json",
-        include: ["../src/index.ts"]
+        include: ["../src/index.ts"],
       },
       null,
-      2
-    )
+      2,
+    ),
   };
 }
 
@@ -140,11 +137,11 @@ export function buildTsSrcReactNativeConfig() {
     content: JSON.stringify(
       {
         extends: "../../../../eng/tsconfigs/src.react-native.json",
-        include: ["../src/index.ts"]
+        include: ["../src/index.ts"],
       },
       null,
-      2
-    )
+      2,
+    ),
   };
 }
 
@@ -157,11 +154,11 @@ export function buildTsSrcCjsConfig() {
     content: JSON.stringify(
       {
         extends: "../../../../eng/tsconfigs/src.cjs.json",
-        include: ["../src/index.ts"]
+        include: ["../src/index.ts"],
       },
       null,
-      2
-    )
+      2,
+    ),
   };
 }
 
@@ -178,13 +175,13 @@ export function buildTsSampleConfig(model: RLCModel) {
         extends: "../../../../eng/tsconfigs/samples.json",
         compilerOptions: {
           paths: {
-            [clientPackageName]: ["../dist/esm"]
-          }
-        }
+            [clientPackageName]: ["../dist/esm"],
+          },
+        },
       },
       null,
-      2
-    )
+      2,
+    ),
   };
 }
 
@@ -197,11 +194,11 @@ export function buildTsLintConfig() {
     content: JSON.stringify(
       {
         extends: "../../../../tsconfig.json",
-        include: ["../src", "../test"]
+        include: ["../src", "../test"],
       },
       null,
-      2
-    )
+      2,
+    ),
   };
 }
 
@@ -213,10 +210,10 @@ export function buildTsSnippetsConfig() {
     path: "config/tsconfig.snippets.json",
     content: JSON.stringify(
       {
-        extends: "../../../../eng/tsconfigs/snippets.json"
+        extends: "../../../../eng/tsconfigs/snippets.json",
       },
       null,
-      2
-    )
+      2,
+    ),
   };
 }

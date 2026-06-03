@@ -14,14 +14,19 @@ model User {
   email: string;
 }
 
-op getUser(): {...User,   @header("content-type")
+op getUser(): {
+  ...User;
+
+  @header("content-type")
   contentType: "application/xml";
+
   @header("x-user-id")
   userId?: string;
 
   @header
   @encode("rfc7231")
-  createdAt?: utcDateTime;};
+  createdAt?: utcDateTime;
+};
 ```
 
 ## Models
@@ -98,8 +103,10 @@ include-headers-in-response: true
 ```
 
 ```tsp
-
-@delete op deleteUser(): { @header("x-request-id") requestId: string, @header("x-optional-header") optionalHeader?: string};
+@delete op deleteUser(): {
+  @header("x-request-id") requestId: string;
+  @header("x-optional-header") optionalHeader?: string;
+};
 ```
 
 ## Models

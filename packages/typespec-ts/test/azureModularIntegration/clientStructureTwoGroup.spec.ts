@@ -1,4 +1,3 @@
-import { assert } from "vitest";
 // import { TwoOperationGroupClient } from "./generated/client/structure/two-operation-group/src/index.js";
 // // describe("Client Structure Two-Operation-Group Rest Client", () => {
 //   let client: TwoOperationGroupClient;

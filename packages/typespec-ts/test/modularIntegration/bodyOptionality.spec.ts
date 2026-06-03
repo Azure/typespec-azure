@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { BodyOptionalityClient } from "./generated/parameters/body-optionality/src/index.js";
 describe("Body Optionality Client", () => {
@@ -9,8 +9,8 @@ describe("Body Optionality Client", () => {
       endpoint: "http://localhost:3002",
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
-      }
+        maxRetries: 0,
+      },
     });
   });
 

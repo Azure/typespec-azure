@@ -1,14 +1,12 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
-import RoutesClientFactory, {
-  RoutesClient
-} from "./generated/routes/src/index.js";
+import RoutesClientFactory, { RoutesClient } from "./generated/routes/src/index.js";
 describe("RoutesClient Rest Client", () => {
   let client: RoutesClient;
 
   beforeEach(() => {
     client = RoutesClientFactory({
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
@@ -23,23 +21,17 @@ describe("RoutesClient Rest Client", () => {
   });
 
   it("should have PathParameters templateOnly", async () => {
-    const result = await client
-      .path("/routes/path/template-only/{param}", "a")
-      .get();
+    const result = await client.path("/routes/path/template-only/{param}", "a").get();
     assert.strictEqual(result.status, "204");
   });
 
   it("should have PathParameters explicit", async () => {
-    const result = await client
-      .path("/routes/path/explicit/{param}", "a")
-      .get();
+    const result = await client.path("/routes/path/explicit/{param}", "a").get();
     assert.strictEqual(result.status, "204");
   });
 
   it("should have PathParameters annotationOnly", async () => {
-    const result = await client
-      .path("/routes/path/annotation-only/{param}", "a")
-      .get();
+    const result = await client.path("/routes/path/annotation-only/{param}", "a").get();
     assert.strictEqual(result.status, "204");
   });
 
@@ -47,7 +39,7 @@ describe("RoutesClient Rest Client", () => {
     const result = await client
       .path("/routes/path/reserved-expansion/template/{param}", {
         value: "foo/bar baz",
-        allowReserved: true
+        allowReserved: true,
       })
       .get();
     assert.strictEqual(result.status, "204");
@@ -57,87 +49,75 @@ describe("RoutesClient Rest Client", () => {
     const result = await client
       .path("/routes/path/reserved-expansion/template/{param}", {
         value: "foo/bar baz",
-        allowReserved: true
+        allowReserved: true,
       })
       .get();
     assert.strictEqual(result.status, "204");
   });
 
   it("should have explode: true array", async () => {
-    const result = await client
-      .path("/routes/query/query-expansion/explode/array")
-      .get({
-        queryParameters: {
-          param: {
-            value: ["a", "b"],
-            explode: true,
-            style: "form"
-          }
-        }
-      });
+    const result = await client.path("/routes/query/query-expansion/explode/array").get({
+      queryParameters: {
+        param: {
+          value: ["a", "b"],
+          explode: true,
+          style: "form",
+        },
+      },
+    });
     assert.strictEqual(result.status, "204");
   });
 
   it("should have explode: true record", async () => {
-    const result = await client
-      .path("/routes/query/query-expansion/explode/record")
-      .get({
-        queryParameters: {
-          param: {
-            value: { a: 1, b: 2 },
-            explode: true,
-            style: "form"
-          }
-        }
-      });
+    const result = await client.path("/routes/query/query-expansion/explode/record").get({
+      queryParameters: {
+        param: {
+          value: { a: 1, b: 2 },
+          explode: true,
+          style: "form",
+        },
+      },
+    });
     assert.strictEqual(result.status, "204");
   });
 
   it("should have explode: true primitive", async () => {
-    const result = await client
-      .path("/routes/query/query-expansion/explode/primitive")
-      .get({
-        queryParameters: {
-          param: "a"
-        }
-      });
+    const result = await client.path("/routes/query/query-expansion/explode/primitive").get({
+      queryParameters: {
+        param: "a",
+      },
+    });
     assert.strictEqual(result.status, "204");
   });
 
   it("should have explode: false array", async () => {
-    const result = await client
-      .path("/routes/query/query-expansion/standard/array")
-      .get({
-        queryParameters: {
-          param: ["a", "b"]
-        }
-      });
+    const result = await client.path("/routes/query/query-expansion/standard/array").get({
+      queryParameters: {
+        param: ["a", "b"],
+      },
+    });
     assert.strictEqual(result.status, "204");
   });
 
   it("should have explode: false record", async () => {
-    const result = await client
-      .path("/routes/query/query-expansion/standard/record")
-      .get({
-        queryParameters: {
-          param: {
-            value: { a: 1, b: 2 },
-            explode: false,
-            style: "form"
-          }
-        }
-      });
+    const result = await client.path("/routes/query/query-expansion/standard/record").get({
+      queryParameters: {
+        param: {
+          value: { a: 1, b: 2 },
+          explode: false,
+          style: "form",
+        },
+      },
+    });
     assert.strictEqual(result.status, "204");
   });
 
   it("should have explode: false primitive", async () => {
-    const result = await client
-      .path("/routes/query/query-expansion/standard/primitive")
-      .get({
-        queryParameters: {
-          param: "a"
-        }
-      });
+    const result = await client.path("/routes/query/query-expansion/standard/primitive").get({
+      queryParameters: {
+        param: "a",
+      },
+    });
     assert.strictEqual(result.status, "204");
   });
 
@@ -168,8 +148,8 @@ describe("RoutesClient Rest Client", () => {
         .path("/routes/query/query-continuation/standard/array?fixed=true")
         .get({
           queryParameters: {
-            param: ["a", "b"]
-          }
+            param: ["a", "b"],
+          },
         });
       assert.strictEqual(result.status, "204");
     });
@@ -179,8 +159,8 @@ describe("RoutesClient Rest Client", () => {
         .path("/routes/query/query-continuation/standard/primitive?fixed=true")
         .get({
           queryParameters: {
-            param: "a"
-          }
+            param: "a",
+          },
         });
       assert.strictEqual(result.status, "204");
     });
@@ -193,9 +173,9 @@ describe("RoutesClient Rest Client", () => {
             param: {
               value: { a: 1, b: 2 },
               explode: false,
-              style: "form"
-            }
-          }
+              style: "form",
+            },
+          },
         });
       assert.strictEqual(result.status, "204");
     });
@@ -208,9 +188,9 @@ describe("RoutesClient Rest Client", () => {
             param: {
               value: { a: 1, b: 2 },
               explode: true,
-              style: "form"
-            }
-          }
+              style: "form",
+            },
+          },
         });
       assert.strictEqual(result.status, "204");
     });
@@ -220,8 +200,8 @@ describe("RoutesClient Rest Client", () => {
         .path("/routes/query/query-continuation/explode/primitive?fixed=true")
         .get({
           queryParameters: {
-            param: "a"
-          }
+            param: "a",
+          },
         });
       assert.strictEqual(result.status, "204");
     });
@@ -234,9 +214,9 @@ describe("RoutesClient Rest Client", () => {
             param: {
               value: ["a", "b"],
               explode: true,
-              style: "form"
-            }
-          }
+              style: "form",
+            },
+          },
         });
       assert.strictEqual(result.status, "204");
     });

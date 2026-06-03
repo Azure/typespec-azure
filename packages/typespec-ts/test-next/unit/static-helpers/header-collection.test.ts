@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import { buildCsvCollection } from "../../../static/static-helpers/serialization/build-csv-collection.js";
 import { buildPipeCollection } from "../../../static/static-helpers/serialization/build-pipe-collection.js";
 import { buildSsvCollection } from "../../../static/static-helpers/serialization/build-ssv-collection.js";

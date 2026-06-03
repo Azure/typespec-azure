@@ -1,46 +1,39 @@
-import { ModularEmitterOptions } from "./interfaces.js";
+import { InterfaceDeclarationStructure, SourceFile, StructureKind } from "ts-morph";
 import { NameType, normalizeName } from "../rlc-common/index.js";
 import {
-  SourceFile,
-  InterfaceDeclarationStructure,
-  StructureKind
-} from "ts-morph";
-import {
-  getDeserializePrivateFunction,
-  getDeserializeHeadersPrivateFunction,
   getDeserializeExceptionHeadersPrivateFunction,
+  getDeserializeHeadersPrivateFunction,
+  getDeserializePrivateFunction,
   getExpectedStatuses,
   getOperationFunction,
   getOperationOptionsName,
   getSendPrivateFunction,
+  isLroAndPagingOperation,
   isLroOnlyOperation,
-  isLroAndPagingOperation
 } from "./helpers/operationHelpers.js";
+import { ModularEmitterOptions } from "./interfaces.js";
 
-import { OperationPathAndDeserDetails } from "./interfaces.js";
-import { SdkContext } from "../utils/interfaces.js";
-import { getDocsFromDescription } from "./helpers/docsHelpers.js";
-import { getOperationName } from "./helpers/namingHelpers.js";
-import {
-  getModularClientOptions,
-  isRLCMultiEndpoint
-} from "../utils/clientUtils.js";
-import { getTypeExpression } from "./type-expressions/get-type-expression.js";
 import {
   SdkClientType,
   SdkMethodParameter,
-  SdkServiceOperation
+  SdkServiceOperation,
 } from "@azure-tools/typespec-client-generator-core";
+import { useContext } from "../contextManager.js";
+import { addDeclaration } from "../framework/declaration.js";
+import { useDependencies } from "../framework/hooks/useDependencies.js";
+import { resolveReference } from "../framework/reference.js";
+import { refkey } from "../framework/refkey.js";
+import { getModularClientOptions, isRLCMultiEndpoint } from "../utils/clientUtils.js";
+import { SdkContext } from "../utils/interfaces.js";
 import {
   getMethodHierarchiesMap,
+  hasDualFormatSupport,
   ServiceOperation,
-  hasDualFormatSupport
 } from "../utils/operationUtil.js";
-import { resolveReference } from "../framework/reference.js";
-import { useDependencies } from "../framework/hooks/useDependencies.js";
-import { addDeclaration } from "../framework/declaration.js";
-import { refkey } from "../framework/refkey.js";
-import { useContext } from "../contextManager.js";
+import { getDocsFromDescription } from "./helpers/docsHelpers.js";
+import { getOperationName } from "./helpers/namingHelpers.js";
+import { OperationPathAndDeserDetails } from "./interfaces.js";
+import { getTypeExpression } from "./type-expressions/get-type-expression.js";
 
 /**
  * This function creates a file under /api for each operation group.
@@ -50,7 +43,7 @@ import { useContext } from "../contextManager.js";
 export function buildOperationFiles(
   dpgContext: SdkContext,
   clientMap: [string[], SdkClientType<SdkServiceOperation>],
-  emitterOptions: ModularEmitterOptions
+  emitterOptions: ModularEmitterOptions,
 ) {
   const project = useContext("outputProject");
   const [_, client] = clientMap;
@@ -79,29 +72,23 @@ export function buildOperationFiles(
 
     const operationGroupFile = project.createSourceFile(filepath);
     operations.forEach((op) => {
-      const operationDeclaration = getOperationFunction(
-        dpgContext,
-        [prefixes, op],
-        clientType
-      );
+      const operationDeclaration = getOperationFunction(dpgContext, [prefixes, op], clientType);
       const sendOperationDeclaration = getSendPrivateFunction(
         dpgContext,
         [prefixes, op],
         clientType,
-        client
+        client,
       );
-      const deserializeOperationDeclaration = getDeserializePrivateFunction(
+      const deserializeOperationDeclaration = getDeserializePrivateFunction(dpgContext, [
+        prefixes,
+        op,
+      ]);
+      const deserializeHeadersDeclaration = getDeserializeHeadersPrivateFunction(dpgContext, op);
+      const deserializeExceptionHeadersDeclaration = getDeserializeExceptionHeadersPrivateFunction(
         dpgContext,
-        [prefixes, op]
+        op,
       );
-      const deserializeHeadersDeclaration =
-        getDeserializeHeadersPrivateFunction(dpgContext, op);
-      const deserializeExceptionHeadersDeclaration =
-        getDeserializeExceptionHeadersPrivateFunction(dpgContext, op);
-      const functionsToAdd = [
-        sendOperationDeclaration,
-        deserializeOperationDeclaration
-      ];
+      const functionsToAdd = [sendOperationDeclaration, deserializeOperationDeclaration];
       if (deserializeHeadersDeclaration) {
         functionsToAdd.push(deserializeHeadersDeclaration);
       }
@@ -110,18 +97,13 @@ export function buildOperationFiles(
       }
 
       operationGroupFile.addFunctions(functionsToAdd);
-      addDeclaration(
-        operationGroupFile,
-        operationDeclaration,
-        refkey(op, "api")
-      );
+      addDeclaration(operationGroupFile, operationDeclaration, refkey(op, "api"));
     });
 
-    const indexPathPrefix =
-      "../".repeat(prefixKey === "" ? 0 : prefixes.length) || "./";
+    const indexPathPrefix = "../".repeat(prefixKey === "" ? 0 : prefixes.length) || "./";
     operationGroupFile.addImportDeclaration({
       namedImports: [`${rlcClientName} as Client`],
-      moduleSpecifier: `${indexPathPrefix}index.js`
+      moduleSpecifier: `${indexPathPrefix}index.js`,
     });
     operationGroupFile.fixUnusedIdentifiers();
 
@@ -136,7 +118,7 @@ export function buildOperationFiles(
 export function buildOperationOptions(
   context: SdkContext,
   method: [string[], ServiceOperation],
-  sourceFile: SourceFile
+  sourceFile: SourceFile,
 ) {
   const dependencies = useDependencies();
   const operation = method[1];
@@ -144,10 +126,7 @@ export function buildOperationOptions(
     .filter(
       (p) =>
         p.onClient === false &&
-        !(
-          p.isGeneratedName &&
-          (p.name === "contentType" || p.name !== "accept")
-        )
+        !(p.isGeneratedName && (p.name === "contentType" || p.name !== "accept")),
     )
     .filter((p) => p.optional || p.clientDefaultValue);
   const options: SdkMethodParameter[] = [...optionalParameters];
@@ -157,7 +136,7 @@ export function buildOperationOptions(
     name: "updateIntervalInMs",
     type: "number",
     hasQuestionToken: true,
-    docs: ["Delay to wait until next poll, in milliseconds."]
+    docs: ["Delay to wait until next poll, in milliseconds."],
   };
 
   // Check if this operation supports both JSON and XML content types
@@ -170,17 +149,15 @@ export function buildOperationOptions(
     type: "string",
     hasQuestionToken: true,
     docs: [
-      'The content type for the request body. Defaults to "application/json". Use "application/xml" for XML serialization.'
-    ]
+      'The content type for the request body. Defaults to "application/json". Use "application/xml" for XML serialization.',
+    ],
   };
 
   // handle optional body parameter
   // if (operation.operation.bodyParam?.optional === true) {
   //   options.push(operation.operation.bodyParam);
   // }
-  const operationOptionsReference = resolveReference(
-    dependencies.OperationOptions
-  );
+  const operationOptionsReference = resolveReference(dependencies.OperationOptions);
 
   // Build the additional options array
   const additionalOptions: {
@@ -207,17 +184,13 @@ export function buildOperationOptions(
           docs: getDocsFromDescription(p.doc),
           hasQuestionToken: true,
           type: getTypeExpression(context, p.type, { isOptional: true }),
-          name: normalizeName(p.name, NameType.Parameter)
+          name: normalizeName(p.name, NameType.Parameter),
         };
-      })
+      }),
     ),
-    docs: [`Optional parameters.`]
+    docs: [`Optional parameters.`],
   };
-  addDeclaration(
-    sourceFile,
-    operationOptionsInterface,
-    refkey(method[1], "operationOptions")
-  );
+  addDeclaration(sourceFile, operationOptionsInterface, refkey(method[1], "operationOptions"));
 }
 
 /**
@@ -225,7 +198,7 @@ export function buildOperationOptions(
  */
 export function buildLroDeserDetailMap(
   context: SdkContext,
-  client: SdkClientType<SdkServiceOperation>
+  client: SdkClientType<SdkServiceOperation>,
 ) {
   const map = new Map<string, OperationPathAndDeserDetails[]>();
   const existingNames = new Set<string>();
@@ -257,7 +230,7 @@ export function buildLroDeserDetailMap(
         if (existingNames.has(deserName)) {
           const newName = `${name}Deserialize${normalizeName(
             operationFileName.split("/").slice(0, -1).join("_"),
-            NameType.Interface
+            NameType.Interface,
           )}`;
           renamedDeserName = `_${newName}`;
         }
@@ -266,9 +239,9 @@ export function buildLroDeserDetailMap(
           path: `${o.operation.verb.toUpperCase()} ${o.operation.path}`,
           expectedStatusesExpression: getExpectedStatuses(o),
           deserName,
-          renamedDeserName
+          renamedDeserName,
         };
-      })
+      }),
     );
   }
   return map;

@@ -1,21 +1,21 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { Client } from "@azure-rest/core-client";
+import ServiceOperationGroupClientFactory, {
+  ServiceClient as ServiceOperationGroupClient,
+} from "./generated/client/structure/client-operation-group/src/index.js";
 import ServiceDefaultClientFactory, {
-  ServiceClient as ServiceDefaultClient
+  ServiceClient as ServiceDefaultClient,
 } from "./generated/client/structure/default/src/index.js";
 import ServiceMultiClientFactory, {
-  ServiceClient as ServiceMultiClient
+  ServiceClient as ServiceMultiClient,
 } from "./generated/client/structure/multi-client/src/index.js";
 import ServiceRenamedClientFactory, {
-  ServiceClient as ServiceRenamedClient
+  ServiceClient as ServiceRenamedClient,
 } from "./generated/client/structure/renamed-operation/src/index.js";
 import ServiceTwoOpGroupClientFactory, {
-  ServiceClient as ServiceTwoOpGroupClient
+  ServiceClient as ServiceTwoOpGroupClient,
 } from "./generated/client/structure/two-operation-group/src/index.js";
-import ServiceOperationGroupClientFactory, {
-  ServiceClient as ServiceOperationGroupClient
-} from "./generated/client/structure/client-operation-group/src/index.js";
 describe("ClientStructureClient Rest Client", () => {
   let client0: ServiceDefaultClient;
   let client1: ServiceMultiClient;
@@ -26,35 +26,23 @@ describe("ClientStructureClient Rest Client", () => {
 
   beforeEach(() => {
     client0 = ServiceDefaultClientFactory("http://localhost:3000", "default", {
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
-    client1 = ServiceMultiClientFactory(
-      "http://localhost:3000",
-      "multi-client",
-      {
-        allowInsecureConnection: true
-      }
-    );
-    client2 = ServiceRenamedClientFactory(
-      "http://localhost:3000",
-      "renamed-operation",
-      {
-        allowInsecureConnection: true
-      }
-    );
-    client3 = ServiceTwoOpGroupClientFactory(
-      "http://localhost:3000",
-      "two-operation-group",
-      {
-        allowInsecureConnection: true
-      }
-    );
+    client1 = ServiceMultiClientFactory("http://localhost:3000", "multi-client", {
+      allowInsecureConnection: true,
+    });
+    client2 = ServiceRenamedClientFactory("http://localhost:3000", "renamed-operation", {
+      allowInsecureConnection: true,
+    });
+    client3 = ServiceTwoOpGroupClientFactory("http://localhost:3000", "two-operation-group", {
+      allowInsecureConnection: true,
+    });
     client4 = ServiceOperationGroupClientFactory(
       "http://localhost:3000",
       "client-operation-group",
       {
-        allowInsecureConnection: true
-      }
+        allowInsecureConnection: true,
+      },
     );
     clientArray = [client0, client1, client2, client3, client4];
   });

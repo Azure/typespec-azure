@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { FlattenPropertyClient } from "./generated/azure/client-generator-core/flatten-property/src/index.js";
 describe("Property Flatten Client", () => {
@@ -7,7 +7,7 @@ describe("Property Flatten Client", () => {
   beforeEach(() => {
     client = new FlattenPropertyClient({
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
@@ -15,7 +15,7 @@ describe("Property Flatten Client", () => {
     const result = await client.putFlattenModel({
       name: "foo",
       description: "bar",
-      age: 10
+      age: 10,
     });
     assert.strictEqual(result.name, "test");
     assert.strictEqual(result.description, "test");
@@ -28,8 +28,8 @@ describe("Property Flatten Client", () => {
       summary: "bar",
       properties: {
         description: "test",
-        age: 10
-      }
+        age: 10,
+      },
     });
     assert.strictEqual(result.name, "test");
     assert.strictEqual(result.summary, "test");
@@ -39,7 +39,7 @@ describe("Property Flatten Client", () => {
 
   it("Update and receive model with unknown properties flattening", async () => {
     const result = await client.putFlattenUnknownModel({
-      name: "foo"
+      name: "foo",
     });
     assert.strictEqual(result.name, "test");
     assert.strictEqual(result.properties?.key1, "value1");
@@ -48,7 +48,7 @@ describe("Property Flatten Client", () => {
 
   it("Update and receive model with read-only properties flattening", async () => {
     const result = await client.putFlattenReadOnlyModel({
-      name: "foo"
+      name: "foo",
     });
     assert.strictEqual(result.name, "foo");
     assert.strictEqual(result.solutionId, "solution1");

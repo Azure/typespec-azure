@@ -38,7 +38,8 @@ interface MediaTypesClient {
     @body
     @doc("Input parameter.")
     input: string,
-    @header contentType: "text/plain"
+
+    @header contentType: "text/plain",
   ): string;
 
   @overload(MediaTypesClient.getByOverload)
@@ -46,7 +47,8 @@ interface MediaTypesClient {
     @body
     @doc("Input parameter.")
     input: SourcePath,
-    @header contentType: "application/json"
+
+    @header contentType: "application/json",
   ): string;
 
   @overload(MediaTypesClient.getByOverload)
@@ -54,10 +56,7 @@ interface MediaTypesClient {
     @body
     @doc("Input parameter.")
     input: bytes,
-    @header contentType:
-      | "application/pdf"
-      | "image/jpeg"
-      | "image/png"
-      | "image/tiff"
+
+    @header contentType: "application/pdf" | "image/jpeg" | "image/png" | "image/tiff",
   ): string;
 }

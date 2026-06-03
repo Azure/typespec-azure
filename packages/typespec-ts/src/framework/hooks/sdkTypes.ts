@@ -1,4 +1,3 @@
-import { Operation, Type, getNamespaceFullName } from "@typespec/compiler";
 import {
   SdkClientType,
   SdkHttpOperation,
@@ -6,23 +5,23 @@ import {
   SdkModelType,
   SdkServiceMethod,
   SdkType,
-  getClientType
+  getClientType,
 } from "@azure-tools/typespec-client-generator-core";
+import { Operation, Type, getNamespaceFullName } from "@typespec/compiler";
 import { provideContext, useContext } from "../../contextManager.js";
 
-import { visitPackageTypes } from "../../modular/emitModels.js";
-import { SdkContext } from "../../utils/interfaces.js";
-import {
-  getAllAncestors,
-  getAllProperties
-} from "../../modular/helpers/operationHelpers.js";
-import { normalizeModelPropertyName } from "../../modular/type-expressions/get-type-expression.js";
 import { reportDiagnostic } from "../../lib.js";
+import { visitPackageTypes } from "../../modular/emitModels.js";
+import { getAllAncestors, getAllProperties } from "../../modular/helpers/operationHelpers.js";
+import { normalizeModelPropertyName } from "../../modular/type-expressions/get-type-expression.js";
 import { NameType, normalizeName } from "../../rlc-common/index.js";
+import { SdkContext } from "../../utils/interfaces.js";
 
 export const emitQueue: Set<SdkType> = new Set<SdkType>();
-export const flattenPropertyModelMap: Map<SdkModelPropertyType, SdkModelType> =
-  new Map<SdkModelPropertyType, SdkModelType>();
+export const flattenPropertyModelMap: Map<SdkModelPropertyType, SdkModelType> = new Map<
+  SdkModelPropertyType,
+  SdkModelType
+>();
 /**
  * Set of paged result models that are also used in non-paging operations.
  * Precomputed during visitPackageTypes for O(1) lookups in normalizeModelName.
@@ -46,16 +45,13 @@ export function useSdkTypes() {
 
   function getSdkType(type: Operation): SdkServiceMethod<SdkHttpOperation>;
   function getSdkType(type: Type): SdkType;
-  function getSdkType(
-    type: Type | Operation
-  ): SdkType | SdkServiceMethod<SdkHttpOperation> {
+  function getSdkType(type: Type | Operation): SdkType | SdkServiceMethod<SdkHttpOperation> {
     let sdkType: SdkType | SdkServiceMethod<SdkHttpOperation> | undefined;
 
     if (type.kind === "Operation") {
       sdkType = sdkTypesContext.operations.get(type);
     } else {
-      sdkType =
-        sdkTypesContext.types.get(type) ?? getClientType(tcgcContext, type);
+      sdkType = sdkTypesContext.types.get(type) ?? getClientType(tcgcContext, type);
     }
 
     if (!sdkType) {
@@ -63,10 +59,8 @@ export function useSdkTypes() {
         `SdkType not found for type: ${type.kind} ${
           "name" in type && typeof type.name == "string" ? type.name : ""
         } ${
-          "namespace" in type && type.namespace
-            ? ` in ${getNamespaceFullName(type.namespace)}`
-            : ""
-        }`
+          "namespace" in type && type.namespace ? ` in ${getNamespaceFullName(type.namespace)}` : ""
+        }`,
       );
     }
 
@@ -81,17 +75,10 @@ export function provideSdkTypes(context: SdkContext) {
   const sdkTypesContext: SdkTypeContext = {
     operations: new Map<Type, SdkServiceMethod<SdkHttpOperation>>(),
     types: new Map<Type, SdkType>(),
-    flattenProperties: new Map<
-      SdkModelPropertyType,
-      SdkFlattenPropertyContext
-    >()
+    flattenProperties: new Map<SdkModelPropertyType, SdkFlattenPropertyContext>(),
   };
   visitPackageTypes(context);
-  enrichFlattenProperties(
-    context,
-    sdkTypesContext.flattenProperties,
-    flattenPropertyModelMap
-  );
+  enrichFlattenProperties(context, sdkTypesContext.flattenProperties, flattenPropertyModelMap);
   for (const sdkModel of emitQueue) {
     switch (sdkModel.kind) {
       case "model":
@@ -117,16 +104,10 @@ export function provideSdkTypes(context: SdkContext) {
         });
         break;
       case "array":
-        sdkTypesContext.types.set(
-          sdkModel.valueType.__raw!,
-          sdkModel.valueType
-        );
+        sdkTypesContext.types.set(sdkModel.valueType.__raw!, sdkModel.valueType);
         break;
       case "dict":
-        sdkTypesContext.types.set(
-          sdkModel.valueType.__raw!,
-          sdkModel.valueType
-        );
+        sdkTypesContext.types.set(sdkModel.valueType.__raw!, sdkModel.valueType);
         break;
       case "nullable":
         sdkTypesContext.types.set(sdkModel.__raw!, sdkModel);
@@ -161,7 +142,7 @@ export function provideSdkTypes(context: SdkContext) {
 function enrichFlattenProperties(
   context: SdkContext,
   propertyContextMap: Map<SdkModelPropertyType, SdkFlattenPropertyContext>,
-  propertyModelMap: Map<SdkModelPropertyType, SdkModelType>
+  propertyModelMap: Map<SdkModelPropertyType, SdkModelType>,
 ) {
   // Build a map of base model to its existing properties excluding flatten properties
   // To check for conflicts later
@@ -171,19 +152,16 @@ function enrichFlattenProperties(
       const propertiesExcludedFlatten = getAllProperties(
         context,
         baseModel,
-        getAllAncestors(baseModel)
+        getAllAncestors(baseModel),
       )
         .filter((p) => !(p.flatten && p.type.kind === "model"))
         .map((p) => normalizeModelPropertyName(context, p));
-      baseModelProperties.set(
-        baseModel,
-        new Set<string>(propertiesExcludedFlatten)
-      );
+      baseModelProperties.set(baseModel, new Set<string>(propertiesExcludedFlatten));
     }
   });
   for (const [flattenProperty, baseModel] of propertyModelMap) {
     const flattenContext: SdkFlattenPropertyContext = {
-      baseModel: baseModel
+      baseModel: baseModel,
     };
     propertyContextMap.set(flattenProperty, flattenContext);
     const existingProperties = baseModelProperties.get(baseModel)!;
@@ -197,25 +175,22 @@ function enrichFlattenProperties(
         code: "unsupported-flatten-transition",
         format: {
           propertyName: flattenProperty.name,
-          modelName: baseModel.name
+          modelName: baseModel.name,
         },
-        target: flattenProperty.__raw!
+        target: flattenProperty.__raw!,
       });
     }
     const allFlattenProperties = getAllProperties(
       context,
       flattenModel,
-      getAllAncestors(flattenModel)
+      getAllAncestors(flattenModel),
     );
     for (const flattenChildProperty of allFlattenProperties) {
-      let childPropertyName = normalizeModelPropertyName(
-        context,
-        flattenChildProperty
-      );
+      let childPropertyName = normalizeModelPropertyName(context, flattenChildProperty);
       if (existingProperties.has(childPropertyName)) {
         childPropertyName = normalizeName(
           `${childPropertyName}_${flattenProperty.name}_${childPropertyName}`,
-          NameType.Property
+          NameType.Property,
         );
         conflictMap.set(flattenChildProperty, childPropertyName);
       }
@@ -228,9 +203,7 @@ function enrichFlattenProperties(
   }
 }
 
-export function getAllOperationsFromClient(
-  client: SdkClientType<SdkHttpOperation>
-) {
+export function getAllOperationsFromClient(client: SdkClientType<SdkHttpOperation>) {
   const clientQueue = [client];
   const operations: SdkServiceMethod<SdkHttpOperation>[] = [];
   while (clientQueue.length > 0) {

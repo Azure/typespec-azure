@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { NonResourceClient } from "./generated/azure/resource-manager/non-resource/src/index.js";
 describe("Azure Arm Non Resource Client", () => {
@@ -9,21 +9,18 @@ describe("Azure Arm Non Resource Client", () => {
   const nonResource = {
     id: "id",
     name: "hello",
-    type: "nonResource"
+    type: "nonResource",
   };
 
   beforeEach(() => {
     client = new NonResourceClient(SUBSCRIPTION_ID_EXPECTED, {
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
   it("should get Non Resource", async () => {
-    const result = await client.nonResourceOperations.get(
-      LOCATION_EXPECTED,
-      "hello"
-    );
+    const result = await client.nonResourceOperations.get(LOCATION_EXPECTED, "hello");
     assert.strictEqual(result.id, nonResource.id);
     assert.strictEqual(result.name, nonResource.name);
     assert.strictEqual(result.type, nonResource.type);
@@ -32,7 +29,7 @@ describe("Azure Arm Non Resource Client", () => {
     const result = await client.nonResourceOperations.create(
       LOCATION_EXPECTED,
       "hello",
-      nonResource
+      nonResource,
     );
     assert.strictEqual(result.id, nonResource.id);
     assert.strictEqual(result.name, nonResource.name);

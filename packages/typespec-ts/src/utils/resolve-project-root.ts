@@ -1,6 +1,6 @@
-import { fileURLToPath } from "url";
-import { dirname, resolve } from "path";
 import { existsSync } from "fs";
+import { dirname, resolve } from "path";
+import { fileURLToPath } from "url";
 
 /**
  * Recursively finds the nearest package.json file starting from the specified directory.
@@ -8,7 +8,7 @@ import { existsSync } from "fs";
  * @returns {string} path to the directory containing the package.json file.
  */
 export function resolveProjectRoot(
-  currentDir: string = dirname(fileURLToPath(import.meta.url))
+  currentDir: string = dirname(fileURLToPath(import.meta.url)),
 ): string {
   const packageJsonPath = resolve(currentDir, "package.json");
 

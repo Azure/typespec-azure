@@ -1,8 +1,8 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import AzureArmNonResourceClientFactory, {
   AzureArmNonResourceClient,
-  isUnexpected
+  isUnexpected,
 } from "./generated/azure/resource-manager/non-resource/src/index.js";
 describe("Azure Arm Non Resource Rest Client", () => {
   let client: AzureArmNonResourceClient;
@@ -10,7 +10,7 @@ describe("Azure Arm Non Resource Rest Client", () => {
   beforeEach(() => {
     client = AzureArmNonResourceClientFactory({
       endpoint: "http://localhost:3000",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
@@ -20,7 +20,7 @@ describe("Azure Arm Non Resource Rest Client", () => {
   const nonResource = {
     id: "id",
     name: "hello",
-    type: "nonResource"
+    type: "nonResource",
   };
   it("should get non resources", async () => {
     const result = await client
@@ -28,7 +28,7 @@ describe("Azure Arm Non Resource Rest Client", () => {
         "/subscriptions/{subscriptionId}/providers/Microsoft.NonResource/locations/{location}/otherParameters/{parameter}",
         SUBSCRIPTION_ID_EXPECTED,
         LOCATION_EXPECTED,
-        "hello"
+        "hello",
       )
       .get();
     assert.equal(result.status, "200");
@@ -45,10 +45,10 @@ describe("Azure Arm Non Resource Rest Client", () => {
         "/subscriptions/{subscriptionId}/providers/Microsoft.NonResource/locations/{location}/otherParameters/{parameter}",
         SUBSCRIPTION_ID_EXPECTED,
         LOCATION_EXPECTED,
-        "hello"
+        "hello",
       )
       .put({
-        body: nonResource
+        body: nonResource,
       });
     assert.equal(result.status, "200");
     if (isUnexpected(result)) {

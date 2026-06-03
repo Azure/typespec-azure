@@ -24,13 +24,14 @@ interface MediaTypesOperations {
     @body
     @doc("Input parameter.")
     input: SourcePath | bytes | string,
+
     @header contentType:
       | "application/pdf"
       | "application/json"
       | "image/jpeg"
       | "image/png"
       | "image/tiff"
-      | "text/plain"
+      | "text/plain",
   ): string;
 
   /**
@@ -44,7 +45,8 @@ interface MediaTypesOperations {
     @body
     @doc("Input parameter.")
     input: string,
-    @header contentType: "text/plain"
+
+    @header contentType: "text/plain",
   ): string;
 
   @doc("Using shared route to express the mapping info - model.")
@@ -55,7 +57,8 @@ interface MediaTypesOperations {
     @body
     @doc("Input parameter.")
     input: SourcePath,
-    @header contentType: "application/json"
+
+    @header contentType: "application/json",
   ): string;
 
   @doc("Using shared route to express the mapping info - bytes.")
@@ -66,11 +69,8 @@ interface MediaTypesOperations {
     @body
     @doc("Input parameter.")
     input: bytes,
-    @header contentType:
-      | "application/pdf"
-      | "image/jpeg"
-      | "image/png"
-      | "image/tiff"
+
+    @header contentType: "application/pdf" | "image/jpeg" | "image/png" | "image/tiff",
   ): string;
 
   /**
@@ -83,12 +83,13 @@ interface MediaTypesOperations {
     @body
     @doc("Input parameter.")
     input: SourcePath | bytes | string,
+
     @header contentType:
       | "application/pdf"
       | "application/json"
       | "image/jpeg"
       | "image/png"
       | "image/tiff"
-      | "text/plain"
+      | "text/plain",
   ): string;
 }

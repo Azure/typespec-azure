@@ -14,7 +14,7 @@ namespace Test;
 
 interface Test {
   @route("/test")
-  op patch(@query("type") type?: string): void;
+  patch(@query("type") type?: string): void;
 }
 
 @@clientName(Test.patch::parameters.type, "$DO_NOT_NORMALIZE$type");
@@ -52,7 +52,7 @@ namespace Test;
 
 interface Test {
   @route("/test")
-  op patch(@header("type") type?: string): void;
+  patch(@header("type") type?: string): void;
 }
 
 @@clientName(Test.patch::parameters.type, "$DO_NOT_NORMALIZE$type");
@@ -90,7 +90,7 @@ namespace Test;
 
 interface Test {
   @route("/test")
-  op patch(@body type?: string): void;
+  patch(@body type?: string): void;
 }
 
 @@clientName(Test.patch::parameters.type, "$DO_NOT_NORMALIZE$type");

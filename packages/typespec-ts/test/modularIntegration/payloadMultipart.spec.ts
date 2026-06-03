@@ -1,10 +1,10 @@
-import { describe, it, beforeEach } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 
 import { resolvePath } from "@typespec/compiler";
-import { MultiPartClient } from "./generated/payload/multipart/src/index.js";
-import { fileURLToPath } from "node:url";
-import path from "node:path";
 import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { MultiPartClient } from "./generated/payload/multipart/src/index.js";
 
 describe("Multipart Client", () => {
   let client: MultiPartClient;
@@ -16,7 +16,7 @@ describe("Multipart Client", () => {
   beforeEach(() => {
     client = new MultiPartClient({
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
@@ -26,8 +26,8 @@ describe("Multipart Client", () => {
       profileImage: {
         contents: fs.createReadStream(imgPath),
         // must specify a filename due to spector limitations
-        filename: "test.jpg"
-      }
+        filename: "test.jpg",
+      },
     });
   });
 
@@ -36,14 +36,14 @@ describe("Multipart Client", () => {
       identifier: "123",
       image: {
         contents: fs.createReadStream(imgPath),
-        filename: "test.jpg"
-      }
+        filename: "test.jpg",
+      },
     });
   });
 
   it("optional parts - id only", async () => {
     await client.formData.optionalParts({
-      id: "123"
+      id: "123",
     });
   });
 
@@ -51,8 +51,8 @@ describe("Multipart Client", () => {
     await client.formData.optionalParts({
       profileImage: {
         contents: fs.createReadStream(imgPath),
-        filename: "test.jpg"
-      }
+        filename: "test.jpg",
+      },
     });
   });
 
@@ -61,8 +61,8 @@ describe("Multipart Client", () => {
       id: "123",
       profileImage: {
         contents: fs.createReadStream(imgPath),
-        filename: "test.jpg"
-      }
+        filename: "test.jpg",
+      },
     });
   });
 
@@ -77,8 +77,8 @@ describe("Multipart Client", () => {
       id: "123",
       pictures: [
         { filename: "test1.png", contents: fs.createReadStream(pngPath) },
-        { filename: "test2.png", contents: fs.createReadStream(pngPath) }
-      ]
+        { filename: "test2.png", contents: fs.createReadStream(pngPath) },
+      ],
     });
   });
 
@@ -89,8 +89,8 @@ describe("Multipart Client", () => {
       profileImage: {
         filename: "hello.jpg",
         contentType: "image/jpg",
-        contents: fs.createReadStream(imgPath)
-      }
+        contents: fs.createReadStream(imgPath),
+      },
     });
   });
 
@@ -98,28 +98,28 @@ describe("Multipart Client", () => {
     await client.formData.fileArrayAndBasic({
       id: "123",
       address: {
-        city: "X"
+        city: "X",
       },
       profileImage: {
         filename: "hello.jpg",
-        contents: fs.createReadStream(imgPath)
+        contents: fs.createReadStream(imgPath),
       },
       pictures: [
         { filename: "test1.png", contents: fs.createReadStream(pngPath) },
-        { filename: "test2.png", contents: fs.createReadStream(pngPath) }
-      ]
+        { filename: "test2.png", contents: fs.createReadStream(pngPath) },
+      ],
     });
   });
 
   it("json part", async () => {
     await client.formData.jsonPart({
       address: {
-        city: "X"
+        city: "X",
       },
       profileImage: {
         filename: "hello.jpg",
-        contents: fs.createReadStream(imgPath)
-      }
+        contents: fs.createReadStream(imgPath),
+      },
     });
   });
 
@@ -127,19 +127,19 @@ describe("Multipart Client", () => {
     await client.formData.multiBinaryParts({
       profileImage: {
         filename: "hello.jpg",
-        contents: fs.createReadStream(imgPath)
-      }
+        contents: fs.createReadStream(imgPath),
+      },
     });
 
     await client.formData.multiBinaryParts({
       profileImage: {
         filename: "hello.jpg",
-        contents: fs.createReadStream(imgPath)
+        contents: fs.createReadStream(imgPath),
       },
       picture: {
         filename: "test1.png",
-        contents: fs.createReadStream(pngPath)
-      }
+        contents: fs.createReadStream(pngPath),
+      },
     });
   });
 
@@ -148,17 +148,17 @@ describe("Multipart Client", () => {
       await client.formData.httpParts.jsonArrayAndFileArray({
         id: "123",
         address: {
-          city: "X"
+          city: "X",
         },
         profileImage: {
           filename: "test.jpg",
-          contents: fs.createReadStream(imgPath)
+          contents: fs.createReadStream(imgPath),
         },
         previousAddresses: [{ city: "Y" }, { city: "Z" }],
         pictures: [
           { filename: "test1.png", contents: fs.createReadStream(pngPath) },
-          { filename: "test2.png", contents: fs.createReadStream(pngPath) }
-        ]
+          { filename: "test2.png", contents: fs.createReadStream(pngPath) },
+        ],
       });
     });
 
@@ -171,8 +171,8 @@ describe("Multipart Client", () => {
         await client.formData.httpParts.contentType.imageJpegContentType({
           profileImage: {
             contents: fs.createReadStream(imgPath),
-            filename: "hello.jpg"
-          }
+            filename: "hello.jpg",
+          },
         });
       });
 
@@ -180,15 +180,15 @@ describe("Multipart Client", () => {
         await client.formData.httpParts.contentType.optionalContentType({
           profileImage: {
             contents: fs.createReadStream(imgPath),
-            filename: "hello.jpg"
-          }
+            filename: "hello.jpg",
+          },
         });
         await client.formData.httpParts.contentType.optionalContentType({
           profileImage: {
             contents: fs.createReadStream(imgPath),
             filename: "hello.jpg",
-            contentType: "application/octet-stream"
-          }
+            contentType: "application/octet-stream",
+          },
         });
       });
 
@@ -197,8 +197,8 @@ describe("Multipart Client", () => {
           profileImage: {
             contents: fs.createReadStream(imgPath),
             filename: "hello.jpg",
-            contentType: "application/octet-stream"
-          }
+            contentType: "application/octet-stream",
+          },
         });
       });
     });
@@ -209,8 +209,8 @@ describe("Multipart Client", () => {
       await client.formData.file.uploadFileSpecificContentType({
         file: {
           contents: fs.createReadStream(pngPath),
-          filename: "image.png"
-        }
+          filename: "image.png",
+        },
       });
     });
 
@@ -218,8 +218,8 @@ describe("Multipart Client", () => {
       await client.formData.file.uploadFileRequiredFilename({
         file: {
           contents: fs.createReadStream(pngPath),
-          filename: "image.png"
-        }
+          filename: "image.png",
+        },
       });
     });
 
@@ -228,13 +228,13 @@ describe("Multipart Client", () => {
         files: [
           {
             contents: fs.createReadStream(pngPath),
-            filename: "image1.png"
+            filename: "image1.png",
           },
           {
             contents: fs.createReadStream(pngPath),
-            filename: "image2.png"
-          }
-        ]
+            filename: "image2.png",
+          },
+        ],
       });
     });
   });

@@ -5,8 +5,7 @@ export interface ReferenceableSymbol {
   visibility?: "internal" | "public";
 }
 
-export type ExternalDependencies = CoreDependencies &
-  Record<string, ReferenceableSymbol>;
+export type ExternalDependencies = CoreDependencies & Record<string, ReferenceableSymbol>;
 
 /**
  * This interface defines the well known Core dependencies that plugins can use to override and provide their own implementations if needed

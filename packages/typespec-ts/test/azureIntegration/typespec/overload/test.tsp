@@ -2,9 +2,7 @@ import "@typespec/rest";
 
 using TypeSpec.Http;
 
-@service(#{
-  title: "FooTest",
-})
+@service(#{ title: "FooTest" })
 @server(
   "{$host}",
   "Foo cases.",
@@ -16,7 +14,7 @@ using TypeSpec.Http;
 namespace TypeScript.Test.Test;
 
 /**
- * This file only contains in main.tsp but not in client.tsp 
+ * This file only contains in main.tsp but not in client.tsp
  * So it is not included in client generation.
  */
 interface FooOperations {

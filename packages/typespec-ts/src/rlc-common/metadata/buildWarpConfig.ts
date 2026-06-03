@@ -11,7 +11,7 @@ export interface WarpConfigOptions {
 /** Default exports included in every warp config. */
 const BASE_EXPORTS: Record<string, string> = {
   "./package.json": "./package.json",
-  ".": "./src/index.ts"
+  ".": "./src/index.ts",
 };
 
 /** Full inline warp config template with react-native target. */
@@ -67,17 +67,14 @@ targets:
  * By default, react-native target is NOT included. Set `generateReactNativeTarget: true`
  * in options to include it.
  */
-export function buildWarpConfig(
-  model: RLCModel,
-  { exports }: WarpConfigOptions = {}
-) {
+export function buildWarpConfig(model: RLCModel, { exports }: WarpConfigOptions = {}) {
   if (model.options?.moduleKind !== "esm") {
     return;
   }
 
   const allExports: Record<string, string> = {
     ...BASE_EXPORTS,
-    ...exports
+    ...exports,
   };
 
   const exportsContent = Object.entries(allExports)

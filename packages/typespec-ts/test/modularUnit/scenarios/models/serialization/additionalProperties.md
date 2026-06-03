@@ -6,23 +6,23 @@ This is tsp definition.
 
 ```tsp
 model SimpleModel {
-    ...Record<int32>;
-    ...Record<string>;
-    propA: string;
-    propB: string;
+  ...Record<int32>;
+  ...Record<string>;
+  propA: string;
+  propB: string;
 }
 
 model ComplexModel {
-    ...Record<SimpleModel>;
-    propA: SimpleModel;
+  ...Record<SimpleModel>;
+  propA: SimpleModel;
 }
 
 @route("/serialize")
 interface D {
   @route("/simple")
-  op bar(@body body: SimpleModel): void;
+  bar(@body body: SimpleModel): void;
   @route("/complex")
-  op baz(@body body: ComplexModel): void;
+  baz(@body body: ComplexModel): void;
 }
 ```
 
@@ -80,14 +80,14 @@ This is tsp definition.
 
 ```tsp
 model SimpleModel {
-    additionalProperties: string;
-    propA: string;
-    propB: string;
+  additionalProperties: string;
+  propA: string;
+  propB: string;
 }
 
 @route("/serialize")
 interface D {
-  op bar(@body body: SimpleModel): void;
+  bar(@body body: SimpleModel): void;
 }
 ```
 
@@ -132,22 +132,22 @@ This is tsp definition.
 
 ```tsp
 model SimpleModel {
-    ...Record<string>;
-    propA: string;
-    propB: string;
+  ...Record<string>;
+  propA: string;
+  propB: string;
 }
 
 model ComplexModel {
-    ...Record<SimpleModel>;
-    propA: SimpleModel;
+  ...Record<SimpleModel>;
+  propA: SimpleModel;
 }
 
 @route("/serialize")
 interface D {
   @route("/simple")
-  op bar(@body body: SimpleModel): void;
+  bar(@body body: SimpleModel): void;
   @route("/complex")
-  op baz(@body body: ComplexModel): void;
+  baz(@body body: ComplexModel): void;
 }
 ```
 
@@ -211,19 +211,19 @@ This is tsp definition.
 
 ```tsp
 model SimpleModel {
-    ...Record<string>;
+  ...Record<string>;
 }
 
 model ComplexModel extends SimpleModel {
-    ...Record<SimpleModel>;
+  ...Record<SimpleModel>;
 }
 
 @route("/serialize")
 interface D {
   @route("/simple")
-  op bar(@body body: SimpleModel): void;
+  bar(@body body: SimpleModel): void;
   @route("/complex")
-  op baz(@body body: ComplexModel): void;
+  baz(@body body: ComplexModel): void;
 }
 ```
 
@@ -258,11 +258,7 @@ export interface ComplexModel extends SimpleModel {
 
 export function complexModelSerializer(item: ComplexModel): any {
   return {
-    ...serializeRecord(
-      item.additionalProperties ?? {},
-      undefined,
-      simpleModelSerializer
-    )
+    ...serializeRecord(item.additionalProperties ?? {}, undefined, simpleModelSerializer),
   };
 }
 ```
@@ -275,16 +271,16 @@ This is tsp definition.
 
 ```tsp
 model SimpleModel {
-    ...Record<string>;
-    ...Record<int32>;
-    ...Record<boolean>;
-    propA: string;
-    propB: string;
+  ...Record<string>;
+  ...Record<int32>;
+  ...Record<boolean>;
+  propA: string;
+  propB: string;
 }
 
 @route("/serialize")
 interface D {
-  op bar(@body body: SimpleModel): void;
+  bar(@body body: SimpleModel): void;
 }
 ```
 
@@ -345,28 +341,28 @@ This is tsp definition.
 
 ```tsp
 model SimpleModel {
-    ...Record<string>;
-    additionalProperties: Record<int32>;
-    propA: string;
-    propB: string;
+  ...Record<string>;
+  additionalProperties: Record<int32>;
+  propA: string;
+  propB: string;
 }
 
 model BarModel {
   additionalProperties: Record<int32>;
 }
 
-model FooModel extends BarModel{
-    ...Record<string>;
-    propA: string;
-    propB: string;
+model FooModel extends BarModel {
+  ...Record<string>;
+  propA: string;
+  propB: string;
 }
 
 @route("/serialize")
 interface D {
   @route("bar")
-  op bar(@body body: SimpleModel): void;
+  bar(@body body: SimpleModel): void;
   @route("foo")
-  op foo(@body body: FooModel): void;
+  foo(@body body: FooModel): void;
 }
 ```
 

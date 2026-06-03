@@ -1,5 +1,5 @@
-import { OPERATION_LRO_HIGH_PRIORITY, RLCModel } from "./interfaces.js";
 import * as path from "path";
+import { OPERATION_LRO_HIGH_PRIORITY, RLCModel } from "./interfaces.js";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: to fix the handlebars issue
 import hbs from "handlebars";
@@ -29,7 +29,7 @@ export function buildPollingHelper(model: RLCModel) {
   const { srcPath } = model;
   return {
     path: path.join(srcPath, "pollingHelper.ts"),
-    content: readmeFileContents(lroDetail)
+    content: readmeFileContents(lroDetail),
   };
 }
 
@@ -37,7 +37,7 @@ function buildLroHelperDetail(model: RLCModel): LroDetail {
   if (!model.helperDetails?.clientLroOverload) {
     return {
       clientOverload: false,
-      isEsm: model.options?.moduleKind === "esm"
+      isEsm: model.options?.moduleKind === "esm",
     };
   }
   const mapDetail = [];
@@ -52,11 +52,11 @@ function buildLroHelperDetail(model: RLCModel): LroDetail {
       const lroDetail = firstMethod.operationHelperDetail?.lroDetails;
       if (lroDetail?.isLongRunning) {
         const initialResponses = firstMethod.responseTypes.success.concat(
-          firstMethod.responseTypes.error
+          firstMethod.responseTypes.error,
         );
 
         const finalResponse = lroDetail.logicalResponseTypes?.success.concat(
-          firstMethod.responseTypes.error
+          firstMethod.responseTypes.error,
         );
 
         if (initialResponses && finalResponse) {
@@ -65,7 +65,7 @@ function buildLroHelperDetail(model: RLCModel): LroDetail {
           mapDetail!.push({
             initialResponses: initialResponses.join("|"),
             finalResponses: finalResponse.join("|"),
-            precedence: lroDetail.precedence ?? OPERATION_LRO_HIGH_PRIORITY
+            precedence: lroDetail.precedence ?? OPERATION_LRO_HIGH_PRIORITY,
           });
         }
       }
@@ -78,6 +78,6 @@ function buildLroHelperDetail(model: RLCModel): LroDetail {
     clientOverload: responses.size > 0 && mapDetail.length > 0,
     importedResponses: Array.from(responses),
     overloadMap: mapDetail,
-    isEsm: model.options?.moduleKind === "esm"
+    isEsm: model.options?.moduleKind === "esm",
   };
 }

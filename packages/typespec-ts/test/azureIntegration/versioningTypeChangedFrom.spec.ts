@@ -1,7 +1,7 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import VersioningTypeChangedFromClientFactory, {
-  VersioningTypeChangedFromClient
+  VersioningTypeChangedFromClient,
 } from "./generated/versioning/typeChangedFrom/src/index.js";
 describe("VersioningTypeChangedFrom Rest Client", () => {
   let client: VersioningTypeChangedFromClient;
@@ -9,14 +9,14 @@ describe("VersioningTypeChangedFrom Rest Client", () => {
   beforeEach(() => {
     client = VersioningTypeChangedFromClientFactory("http://localhost:3000", {
       version: "v2",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
   it("versioning typeChangedFrom test", async () => {
     const result = await client.path("/test").post({
       body: { prop: "foo", changedProp: "bar" },
-      queryParameters: { param: "baz" }
+      queryParameters: { param: "baz" },
     });
     assert.strictEqual(result.status, "200");
     assert.strictEqual(result.body.prop, "foo");

@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { UsageClient } from "./generated/azure/client-generator-core/usage/src/index.js";
 describe("Azure ClientGeneratorCore Usage Client", () => {
@@ -9,8 +9,8 @@ describe("Azure ClientGeneratorCore Usage Client", () => {
       endpoint: "http://localhost:3002",
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
-      }
+        maxRetries: 0,
+      },
     });
   });
 
@@ -26,7 +26,7 @@ describe("Azure ClientGeneratorCore Usage Client", () => {
 
   it("should put usage model in operation", async () => {
     const result = await client.modelInReadOnlyProperty({
-      result: { name: "Madge" }
+      result: { name: "Madge" },
     });
     assert.strictEqual(result.result.name, "Madge");
   });
@@ -34,14 +34,14 @@ describe("Azure ClientGeneratorCore Usage Client", () => {
   it("should put orphan model in operation", async () => {
     const result = await client.orphanModelSerializable({
       name: "name",
-      desc: "desc"
+      desc: "desc",
     });
     assert.isUndefined(result);
   });
 
   it("should put namespace model in operation", async () => {
     const result = await client.namespaceModelSerializable({
-      name: "test"
+      name: "test",
     });
     assert.isUndefined(result);
   });

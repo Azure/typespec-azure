@@ -1,7 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+import * as path from "path";
 import { Project, SourceFile } from "ts-morph";
+import { getImportModuleName } from "./helpers/nameConstructors.js";
 import { NameType, normalizeName } from "./helpers/nameUtils.js";
 import {
   hasCsvCollection,
@@ -13,12 +15,10 @@ import {
   hasPollingOperations,
   hasSsvCollection,
   hasTsvCollection,
-  hasUnexpectedHelper
+  hasUnexpectedHelper,
 } from "./helpers/operationHelpers.js";
 import { isAzurePackage } from "./helpers/packageUtil.js";
 import { RLCModel } from "./interfaces.js";
-import * as path from "path";
-import { getImportModuleName } from "./helpers/nameConstructors.js";
 
 export function buildIndexFile(model: RLCModel) {
   const multiClient = Boolean(model.options?.multiClient),
@@ -27,7 +27,7 @@ export function buildIndexFile(model: RLCModel) {
   const { srcPath } = model;
   const filePath = path.join(srcPath, `index.ts`);
   const indexFile = project.createSourceFile(filePath, undefined, {
-    overwrite: true
+    overwrite: true,
   });
 
   if (!multiClient || !batch || batch?.length === 1) {
@@ -38,7 +38,7 @@ export function buildIndexFile(model: RLCModel) {
   }
   return {
     path: filePath,
-    content: indexFile.getFullText()
+    content: indexFile.getFullText(),
   };
 }
 
@@ -52,16 +52,16 @@ function generateRLCIndexForMultiClient(file: SourceFile, model: RLCModel) {
     namespaceImport: "Parameters",
     moduleSpecifier: getImportModuleName(
       { cjsName: "./parameters", esModulesName: "./parameters.js" },
-      model
-    )
+      model,
+    ),
   });
 
   file.addImportDeclaration({
     namespaceImport: "Responses",
     moduleSpecifier: getImportModuleName(
       { cjsName: "./responses", esModulesName: "./responses.js" },
-      model
-    )
+      model,
+    ),
   });
 
   file.addImportDeclaration({
@@ -69,10 +69,10 @@ function generateRLCIndexForMultiClient(file: SourceFile, model: RLCModel) {
     moduleSpecifier: getImportModuleName(
       {
         cjsName: "./clientDefinitions",
-        esModulesName: "./clientDefinitions.js"
+        esModulesName: "./clientDefinitions.js",
       },
-      model
-    )
+      model,
+    ),
   });
 
   const exports = ["Parameters", "Responses", "Client"];
@@ -82,10 +82,10 @@ function generateRLCIndexForMultiClient(file: SourceFile, model: RLCModel) {
       moduleSpecifier: getImportModuleName(
         {
           cjsName: "./models",
-          esModulesName: "./models.js"
+          esModulesName: "./models.js",
         },
-        model
-      )
+        model,
+      ),
     });
     exports.push("Models");
   }
@@ -96,10 +96,10 @@ function generateRLCIndexForMultiClient(file: SourceFile, model: RLCModel) {
       moduleSpecifier: getImportModuleName(
         {
           cjsName: "./outputModels",
-          esModulesName: "./outputModels.js"
+          esModulesName: "./outputModels.js",
         },
-        model
-      )
+        model,
+      ),
     });
     exports.push("OutputModels");
   }
@@ -110,10 +110,10 @@ function generateRLCIndexForMultiClient(file: SourceFile, model: RLCModel) {
       moduleSpecifier: getImportModuleName(
         {
           cjsName: "./paginateHelper",
-          esModulesName: "./paginateHelper.js"
+          esModulesName: "./paginateHelper.js",
         },
-        model
-      )
+        model,
+      ),
     });
     exports.push("PaginateHelper");
   }
@@ -124,10 +124,10 @@ function generateRLCIndexForMultiClient(file: SourceFile, model: RLCModel) {
       moduleSpecifier: getImportModuleName(
         {
           cjsName: "./isUnexpected",
-          esModulesName: "./isUnexpected.js"
+          esModulesName: "./isUnexpected.js",
         },
-        model
-      )
+        model,
+      ),
     });
     exports.push("UnexpectedHelper");
   }
@@ -138,10 +138,10 @@ function generateRLCIndexForMultiClient(file: SourceFile, model: RLCModel) {
       moduleSpecifier: getImportModuleName(
         {
           cjsName: "./pollingHelper",
-          esModulesName: "./pollingHelper.js"
+          esModulesName: "./pollingHelper.js",
         },
-        model
-      )
+        model,
+      ),
     });
     exports.push("PollingHelper");
   }
@@ -158,10 +158,10 @@ function generateRLCIndexForMultiClient(file: SourceFile, model: RLCModel) {
       moduleSpecifier: getImportModuleName(
         {
           cjsName: "./serializeHelper",
-          esModulesName: "./serializeHelper.js"
+          esModulesName: "./serializeHelper.js",
         },
-        model
-      )
+        model,
+      ),
     });
     exports.push("SerializeHelper");
   }
@@ -171,15 +171,15 @@ function generateRLCIndexForMultiClient(file: SourceFile, model: RLCModel) {
       moduleSpecifier: getImportModuleName(
         {
           cjsName: `./${moduleName}`,
-          esModulesName: `./${moduleName}.js`
+          esModulesName: `./${moduleName}.js`,
         },
-        model
+        model,
       ),
-      namedExports: [`${createClientFuncName}`, `${clientName}ClientOptions`]
+      namedExports: [`${createClientFuncName}`, `${clientName}ClientOptions`],
     },
     {
-      namedExports: [...exports]
-    }
+      namedExports: [...exports],
+    },
   ]);
 }
 
@@ -192,11 +192,11 @@ function generateRLCIndex(file: SourceFile, model: RLCModel) {
     moduleSpecifier: getImportModuleName(
       {
         cjsName: `./${moduleName}`,
-        esModulesName: `./${moduleName}.js`
+        esModulesName: `./${moduleName}.js`,
       },
-      model
+      model,
     ),
-    defaultImport: createClientFuncName
+    defaultImport: createClientFuncName,
   });
 
   file.addExportDeclarations([
@@ -204,38 +204,38 @@ function generateRLCIndex(file: SourceFile, model: RLCModel) {
       moduleSpecifier: getImportModuleName(
         {
           cjsName: `./${moduleName}`,
-          esModulesName: `./${moduleName}.js`
+          esModulesName: `./${moduleName}.js`,
         },
-        model
-      )
+        model,
+      ),
     },
     {
       moduleSpecifier: getImportModuleName(
         {
           cjsName: `./parameters`,
-          esModulesName: `./parameters.js`
+          esModulesName: `./parameters.js`,
         },
-        model
-      )
+        model,
+      ),
     },
     {
       moduleSpecifier: getImportModuleName(
         {
           cjsName: `./responses`,
-          esModulesName: `./responses.js`
+          esModulesName: `./responses.js`,
         },
-        model
-      )
+        model,
+      ),
     },
     {
       moduleSpecifier: getImportModuleName(
         {
           cjsName: `./clientDefinitions`,
-          esModulesName: `./clientDefinitions.js`
+          esModulesName: `./clientDefinitions.js`,
         },
-        model
-      )
-    }
+        model,
+      ),
+    },
   ]);
 
   if (hasUnexpectedHelper(model)) {
@@ -244,11 +244,11 @@ function generateRLCIndex(file: SourceFile, model: RLCModel) {
         moduleSpecifier: getImportModuleName(
           {
             cjsName: `./isUnexpected`,
-            esModulesName: `./isUnexpected.js`
+            esModulesName: `./isUnexpected.js`,
           },
-          model
-        )
-      }
+          model,
+        ),
+      },
     ]);
   }
 
@@ -258,11 +258,11 @@ function generateRLCIndex(file: SourceFile, model: RLCModel) {
         moduleSpecifier: getImportModuleName(
           {
             cjsName: `./models`,
-            esModulesName: `./models.js`
+            esModulesName: `./models.js`,
           },
-          model
-        )
-      }
+          model,
+        ),
+      },
     ]);
   }
 
@@ -272,11 +272,11 @@ function generateRLCIndex(file: SourceFile, model: RLCModel) {
         moduleSpecifier: getImportModuleName(
           {
             cjsName: `./outputModels`,
-            esModulesName: `./outputModels.js`
+            esModulesName: `./outputModels.js`,
           },
-          model
-        )
-      }
+          model,
+        ),
+      },
     ]);
   }
 
@@ -286,11 +286,11 @@ function generateRLCIndex(file: SourceFile, model: RLCModel) {
         moduleSpecifier: getImportModuleName(
           {
             cjsName: `./paginateHelper`,
-            esModulesName: `./paginateHelper.js`
+            esModulesName: `./paginateHelper.js`,
           },
-          model
-        )
-      }
+          model,
+        ),
+      },
     ]);
   }
 
@@ -300,11 +300,11 @@ function generateRLCIndex(file: SourceFile, model: RLCModel) {
         moduleSpecifier: getImportModuleName(
           {
             cjsName: `./pollingHelper`,
-            esModulesName: `./pollingHelper.js`
+            esModulesName: `./pollingHelper.js`,
           },
-          model
-        )
-      }
+          model,
+        ),
+      },
     ]);
   }
 
@@ -320,11 +320,11 @@ function generateRLCIndex(file: SourceFile, model: RLCModel) {
         moduleSpecifier: getImportModuleName(
           {
             cjsName: `./serializeHelper`,
-            esModulesName: `./serializeHelper.js`
+            esModulesName: `./serializeHelper.js`,
           },
-          model
-        )
-      }
+          model,
+        ),
+      },
     ]);
   }
 
@@ -332,13 +332,13 @@ function generateRLCIndex(file: SourceFile, model: RLCModel) {
     file.addExportDeclarations([
       {
         moduleSpecifier: "@azure/core-rest-pipeline",
-        namedExports: ["RestError", "isRestError"]
-      }
+        namedExports: ["RestError", "isRestError"],
+      },
     ]);
   }
 
   file.addExportAssignment({
     expression: createClientFuncName,
-    isExportEquals: false
+    isExportEquals: false,
   });
 }

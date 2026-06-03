@@ -365,14 +365,14 @@ Should support property flatten with optional `properties` and its model has a p
 This is tsp definition.
 
 ```tsp
-
 model Baz {
   @visibility(Lifecycle.Read)
   readOnlyProp: string;
+
   baz: string;
 }
 
-model FooProperties extends Baz{
+model FooProperties extends Baz {
   bar?: string;
   baz: "baz";
 }
@@ -495,14 +495,14 @@ Should support property flatten with optional `identifiers` and its model has a 
 This is tsp definition.
 
 ```tsp
-
 model Baz {
   @visibility(Lifecycle.Read)
   readOnlyProp: string;
+
   baz: string;
 }
 
-model FooProperties extends Baz{
+model FooProperties extends Baz {
   bar?: string;
   baz: "baz";
 }

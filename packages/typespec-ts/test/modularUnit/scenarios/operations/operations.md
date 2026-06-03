@@ -50,7 +50,9 @@ export async function read(
 ## TypeSpec
 
 ```tsp
-op read(): { @body _: void;};
+op read(): {
+  @body _: void;
+};
 ```
 
 ## Operations
@@ -96,25 +98,28 @@ export async function read(
 
 ```tsp
 model Bar {
-    prop1: string;
-    prop2: int64;
+  prop1: string;
+  prop2: int64;
 }
 @encode(BytesKnownEncoding.base64url)
 scalar base64urlBytes extends bytes;
 op read(
-    @header requiredHeader: string,
-    @header optionalHeader?: string,
-    @header nullableOptionalHeader?: string | null,
-    @header bytesHeader: bytes,
-    @header @encode(BytesKnownEncoding.base64) value: bytes,
-    #suppress "deprecated" "Legacy test"
-    @header
-    csvArrayHeader: base64urlBytes[],
-    @header optionalCsvArrayHeader?: string[],
-    @header utcDateHeader: utcDateTime,
-    @header optionalDateHeader?: utcDateTime,
-    @header nullableDateHeader?: utcDateTime | null,
-    ...Bar): OkResponse;
+  @header requiredHeader: string,
+  @header optionalHeader?: string,
+  @header nullableOptionalHeader?: string | null,
+  @header bytesHeader: bytes,
+  @header @encode(BytesKnownEncoding.base64) value: bytes,
+
+  #suppress "deprecated" "Legacy test"
+  @header
+  csvArrayHeader: base64urlBytes[],
+
+  @header optionalCsvArrayHeader?: string[],
+  @header utcDateHeader: utcDateTime,
+  @header optionalDateHeader?: utcDateTime,
+  @header nullableDateHeader?: utcDateTime | null,
+  ...Bar,
+): OkResponse;
 ```
 
 Should ingore the warning `@azure-tools/typespec-ts/unable-serialized-type`:
@@ -238,7 +243,7 @@ export async function read(
 ## TypeSpec
 
 ```tsp
-op read( @header nullableRequiredHeader: string | null): OkResponse;
+op read(@header nullableRequiredHeader: string | null): OkResponse;
 ```
 
 Should ingore the warning `@azure-tools/typespec-ts/nullable-required-header`:
@@ -264,15 +269,13 @@ export function _readSend(
   nullableRequiredHeader: string | null,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: {
-        "nullable-required-header": nullableRequiredHeader,
-        ...options.requestOptions?.headers,
-      },
-    });
+  return context.path("/").get({
+    ...operationOptionsToRequestParameters(options),
+    headers: {
+      "nullable-required-header": nullableRequiredHeader,
+      ...options.requestOptions?.headers,
+    },
+  });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -300,8 +303,8 @@ export async function read(
 
 ```tsp
 model Bar {
-    prop1: string;
-    prop2: int64;
+  prop1: string;
+  prop2: int64;
 }
 op read(@body bars?: Bar[]): OkResponse;
 ```
@@ -323,13 +326,11 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      body: !options?.bars ? options?.bars : barArraySerializer(options?.bars),
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    body: !options?.bars ? options?.bars : barArraySerializer(options?.bars),
+  });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -356,8 +357,8 @@ export async function read(
 
 ```tsp
 model Bar {
-    prop1: string;
-    prop2: int64;
+  prop1: string;
+  prop2: int64;
 }
 op read(@body bars: Bar[]): OkResponse;
 ```
@@ -380,13 +381,11 @@ export function _readSend(
   bars: Bar[],
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      body: barArraySerializer(bars),
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    body: barArraySerializer(bars),
+  });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -414,10 +413,14 @@ export async function read(
 
 ```tsp
 model Bar {
-    prop1: string;
-    prop2: int64;
+  prop1: string;
+  prop2: int64;
 }
-op read(): { a: Bar}[] | null;
+op read():
+  | {
+      a: Bar;
+    }[]
+  | null;
 ```
 
 ## Operations
@@ -437,12 +440,10 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-    });
+  return context.path("/").get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<
@@ -477,8 +478,8 @@ export async function read(
 
 ```tsp
 model Bar {
-    prop1: string;
-    prop2: int64;
+  prop1: string;
+  prop2: int64;
 }
 op read(@body bars?: Bar[]): Bar[] | null;
 ```
@@ -500,14 +501,12 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: !options?.bars ? options?.bars : barArraySerializer(options?.bars),
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: !options?.bars ? options?.bars : barArraySerializer(options?.bars),
+  });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<Bar[]> {
@@ -534,14 +533,14 @@ export async function read(
 
 ```tsp
 model Bar {
-    prop1: string;
-    prop2: int64;
+  prop1: string;
+  prop2: int64;
 }
 model Foo {
-    optionalBars?: Bar[];
-    requiredBars: Bar[];
-    nullableBars?: Bar[] | null;
-    nullableRequiredBars: Bar[] | null;
+  optionalBars?: Bar[];
+  requiredBars: Bar[];
+  nullableBars?: Bar[] | null;
+  nullableRequiredBars: Bar[] | null;
 }
 op read(@body body: Foo): OkResponse;
 ```
@@ -564,13 +563,11 @@ export function _readSend(
   body: Foo,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      body: fooSerializer(body),
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    body: fooSerializer(body),
+  });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -598,14 +595,14 @@ export async function read(
 
 ```tsp
 model Bar {
-    prop1: string;
-    prop2: int64;
+  prop1: string;
+  prop2: int64;
 }
 model Foo {
-    optionalBars?: Bar[];
-    requiredBars: Bar[];
-    nullableBars?: Bar[] | null;
-    nullableRequiredBars: Bar[] | null;
+  optionalBars?: Bar[];
+  requiredBars: Bar[];
+  nullableBars?: Bar[] | null;
+  nullableRequiredBars: Bar[] | null;
 }
 op read(): Foo;
 ```
@@ -627,12 +624,10 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-    });
+  return context.path("/").get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<Foo> {
@@ -660,13 +655,13 @@ export async function read(
 ```tsp
 @error
 model Error {
-    code: int32;
-    message: string;
+  code: int32;
+  message: string;
 }
 
 model Bar {
-    @pageItems
-    lists: string[];
+  @pageItems
+  lists: string[];
 }
 @post
 @list
@@ -700,12 +695,10 @@ export function _testSend(
   context: Client,
   options: TestOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _testDeserialize(result: PathUncheckedResponse): Promise<_Bar> {
@@ -743,19 +736,20 @@ export function test(
 ```tsp
 @error
 model Error {
-    code: int32;
-    message: string;
+  code: int32;
+  message: string;
 }
 
 model Bar {
-    @pageItems
-    lists: string[];
-    @TypeSpec.nextLink
-    nextLink: string;
+  @pageItems
+  lists: string[];
+
+  @TypeSpec.nextLink
+  nextLink: string;
 }
 
 model Child extends Bar {
-    message: string
+  message: string;
 }
 
 @post
@@ -790,12 +784,10 @@ export function _testSend(
   context: Client,
   options: TestOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _testDeserialize(result: PathUncheckedResponse): Promise<_Child> {
@@ -895,12 +887,10 @@ export function _getSend(
   context: Client,
   options: GetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-    });
+  return context.path("/").get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _getDeserialize(result: PathUncheckedResponse): Promise<TestArrayModel> {
@@ -933,7 +923,6 @@ model TestDictionary {
   prop: Record<Test>;
 }
 op get(): TestDictionary;
-
 ```
 
 ## models
@@ -993,12 +982,10 @@ export function _getSend(
   context: Client,
   options: GetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-    });
+  return context.path("/").get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _getDeserialize(result: PathUncheckedResponse): Promise<TestDictionary> {
@@ -1024,16 +1011,13 @@ export async function get(
 ## TypeSpec
 
 ```tsp
- model Endpoint {
+model Endpoint {
   name: string;
   description?: string;
 }
 
 @route("/endpoints/{endpointName}")
-op createOrUpdateEndpoint(
-  @path endpointName: string,
-  @body endpoint: Endpoint
-): Endpoint;
+op createOrUpdateEndpoint(@path endpointName: string, @body endpoint: Endpoint): Endpoint;
 ```
 
 ## models
@@ -1092,14 +1076,12 @@ export function _createOrUpdateEndpointSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context
-    .path(path)
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: endpointSerializer(endpointParam),
-    });
+  return context.path(path).post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: endpointSerializer(endpointParam),
+  });
 }
 
 export async function _createOrUpdateEndpointDeserialize(
@@ -1134,14 +1116,13 @@ import "@azure-tools/typespec-client-generator-core";
 using TypeSpec.Http;
 using Azure.ClientGenerator.Core;
 
-@service(#{
-  title: "Test Service"
-})
+@service(#{ title: "Test Service" })
 namespace testService;
 
 model ListTestResult {
   @pageItems
   tests: Test[];
+
   @nextLink
   next: string;
 }
@@ -1230,12 +1211,10 @@ export function _fooSend(
   context: Client,
   options: FooOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/list-post")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-    });
+  return context.path("/list-post").post({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _fooDeserialize(result: PathUncheckedResponse): Promise<_ListTestResult> {
@@ -1264,12 +1243,10 @@ export function _barSend(
   context: Client,
   options: BarOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/list-get")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-    });
+  return context.path("/list-get").post({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _barDeserialize(result: PathUncheckedResponse): Promise<_ListTestResult> {

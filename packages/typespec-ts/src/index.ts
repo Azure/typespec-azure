@@ -1,20 +1,16 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+import { EmitContext, Program } from "@typespec/compiler";
+import { provideContext, useContext } from "./contextManager.js";
+import { buildRootIndex, buildSubClientIndexFile } from "./modular/buildRootIndex.js";
 import {
   AzureCoreDependencies,
   AzureIdentityDependencies,
   AzurePollingDependencies,
+  AzureTestDependencies,
   DefaultCoreDependencies,
-  AzureTestDependencies
 } from "./modular/external-dependencies.js";
-import {
-  clearDirectory,
-  emptyDir,
-  pathExists
-} from "./utils/fileSystemUtils.js";
-import { EmitContext, Program } from "@typespec/compiler";
-import { GenerationDirDetail, SdkContext } from "./utils/interfaces.js";
 import {
   CloudSettingHelpers,
   CreateRecorderHelpers,
@@ -26,100 +22,94 @@ import {
   SimplePollerHelpers,
   StorageCompatHelpers,
   UrlTemplateHelpers,
-  XmlHelpers
+  XmlHelpers,
 } from "./modular/static-helpers-metadata.js";
 import {
   RLCModel,
   RLCOptions,
   buildApiExtractorConfig,
+  buildChangelogFile,
   buildClient,
   buildClientDefinitions,
   buildEsLintConfig,
   buildIndexFile,
   buildIsUnexpectedHelper,
   buildLicenseFile,
-  buildChangelogFile,
   buildLogger,
   buildPackageFile,
   buildParameterTypes,
   buildPollingHelper,
   buildPaginateHelper as buildRLCPaginateHelper,
   buildReadmeFile,
-  hasClientNameChanged,
-  updateReadmeFile,
   buildRecordedClientFile,
   buildResponseTypes,
   buildRollupConfig,
+  buildSampleEnvFile,
   buildSampleTest,
   buildSamples,
   buildSerializeHelper,
-  buildTopLevelIndex,
-  buildTsConfig,
-  buildTsSnippetsConfig,
-  buildTsSrcEsmConfig,
-  buildTsSrcBrowserConfig,
-  buildTsSrcReactNativeConfig,
-  buildTsSrcCjsConfig,
-  buildTsLintConfig,
+  buildSnippets,
   buildTestBrowserTsConfig,
   buildTestNodeTsConfig,
+  buildTopLevelIndex,
+  buildTsConfig,
+  buildTsLintConfig,
+  buildTsSampleConfig,
+  buildTsSnippetsConfig,
+  buildTsSrcBrowserConfig,
+  buildTsSrcCjsConfig,
+  buildTsSrcEsmConfig,
+  buildTsSrcReactNativeConfig,
   buildVitestConfig,
   buildWarpConfig,
   getClientName,
+  hasClientNameChanged,
   hasUnexpectedHelper,
   isAzurePackage,
   updatePackageFile,
-  buildSampleEnvFile,
-  buildSnippets,
-  buildTsSampleConfig
+  updateReadmeFile,
 } from "./rlc-common/index.js";
-import {
-  buildRootIndex,
-  buildSubClientIndexFile
-} from "./modular/buildRootIndex.js";
 import { emitContentByBuilder, emitModels } from "./utils/emitUtil.js";
-import { provideContext, useContext } from "./contextManager.js";
+import { clearDirectory, emptyDir, pathExists } from "./utils/fileSystemUtils.js";
+import { GenerationDirDetail, SdkContext } from "./utils/interfaces.js";
 
-import { EmitterOptions } from "./lib.js";
-import { ModularEmitterOptions } from "./modular/interfaces.js";
-import { Project } from "ts-morph";
-import { buildClassicOperationFiles } from "./modular/buildClassicalOperationGroups.js";
-import { buildClassicalClient } from "./modular/buildClassicalClient.js";
 import {
-  getClientContextPath,
-  buildClientContext
-} from "./modular/buildClientContext.js";
-import { buildApiOptions } from "./modular/emitModelsOptions.js";
-import { buildOperationFiles } from "./modular/buildOperations.js";
-import { buildRestorePoller } from "./modular/buildRestorePoller.js";
-import { buildSubpathIndexFile } from "./modular/buildSubpathIndex.js";
-import {
+  SdkClientType,
+  SdkServiceOperation,
   createSdkContext,
   listAllServiceNamespaces,
-  SdkClientType,
-  SdkServiceOperation
 } from "@azure-tools/typespec-client-generator-core";
-import { transformModularEmitterOptions } from "./modular/buildModularOptions.js";
-import { emitLoggerFile } from "./modular/emitLoggerFile.js";
-import { emitTypes, emitNonModelResponseTypes } from "./modular/emitModels.js";
 import { existsSync } from "fs";
-import { getModuleExports } from "./modular/buildProjectFiles.js";
-import {
-  getClientHierarchyMap,
-  getRLCClients,
-  getModularClientOptions
-} from "./utils/clientUtils.js";
 import { basename, join } from "path";
-import { loadStaticHelpers } from "./framework/load-static-helpers.js";
-import { packageUsesXmlSerialization } from "./modular/serialization/buildXmlSerializerFunction.js";
+import { Project } from "ts-morph";
 import { provideBinder } from "./framework/hooks/binder.js";
 import { provideSdkTypes } from "./framework/hooks/sdkTypes.js";
-import { transformRLCModel } from "./transform/transform.js";
-import { transformRLCOptions } from "./transform/transfromRLCOptions.js";
+import { loadStaticHelpers } from "./framework/load-static-helpers.js";
+import { EmitterOptions } from "./lib.js";
+import { buildClassicalClient } from "./modular/buildClassicalClient.js";
+import { buildClassicOperationFiles } from "./modular/buildClassicalOperationGroups.js";
+import { buildClientContext, getClientContextPath } from "./modular/buildClientContext.js";
+import { transformModularEmitterOptions } from "./modular/buildModularOptions.js";
+import { buildOperationFiles } from "./modular/buildOperations.js";
+import { getModuleExports } from "./modular/buildProjectFiles.js";
+import { buildRestorePoller } from "./modular/buildRestorePoller.js";
+import { buildSubpathIndexFile } from "./modular/buildSubpathIndex.js";
+import { emitLoggerFile } from "./modular/emitLoggerFile.js";
+import { emitNonModelResponseTypes, emitTypes } from "./modular/emitModels.js";
+import { buildApiOptions } from "./modular/emitModelsOptions.js";
 import { emitSamples } from "./modular/emitSamples.js";
 import { emitTests } from "./modular/emitTests.js";
-import { generateCrossLanguageDefinitionFile } from "./utils/crossLanguageDef.js";
 import { getClassicalClientName } from "./modular/helpers/namingHelpers.js";
+import { ModularEmitterOptions } from "./modular/interfaces.js";
+import { packageUsesXmlSerialization } from "./modular/serialization/buildXmlSerializerFunction.js";
+import { transformRLCModel } from "./transform/transform.js";
+import { transformRLCOptions } from "./transform/transfromRLCOptions.js";
+import {
+  getClientHierarchyMap,
+  getModularClientOptions,
+  getRLCClients,
+} from "./utils/clientUtils.js";
+import { generateCrossLanguageDefinitionFile } from "./utils/crossLanguageDef.js";
 
 export * from "./lib.js";
 
@@ -143,16 +133,13 @@ export async function $onEmit(context: EmitContext) {
   const rlcOptions = dpgContext.rlcOptions ?? {};
 
   const needUnexpectedHelper: Map<string, boolean> = new Map<string, boolean>();
-  const serviceNameToRlcModelsMap: Map<string, RLCModel> = new Map<
-    string,
-    RLCModel
-  >();
+  const serviceNameToRlcModelsMap: Map<string, RLCModel> = new Map<string, RLCModel>();
   provideContext("rlcMetaTree", new Map());
   provideContext("symbolMap", new Map());
   provideContext("outputProject", outputProject);
   provideContext("emitContext", {
     compilerContext: context,
-    tcgcContext: dpgContext
+    tcgcContext: dpgContext,
   });
   const staticHelpers = await loadStaticHelpers(
     outputProject,
@@ -167,29 +154,29 @@ export async function $onEmit(context: EmitContext) {
       ...CloudSettingHelpers,
       ...XmlHelpers,
       ...(rlcOptions.generateTest ? CreateRecorderHelpers : {}),
-      ...(rlcOptions.enableStorageCompat ? StorageCompatHelpers : {})
+      ...(rlcOptions.enableStorageCompat ? StorageCompatHelpers : {}),
     },
     {
       sourcesDir: dpgContext.generationPathDetail?.modularSourcesDir,
       rootDir: dpgContext.generationPathDetail?.rootDir,
       options: rlcOptions,
-      program
-    }
+      program,
+    },
   );
   const extraDependencies = isAzurePackage({ options: rlcOptions })
     ? {
         ...AzurePollingDependencies,
         ...AzureCoreDependencies,
         ...AzureIdentityDependencies,
-        ...AzureTestDependencies
+        ...AzureTestDependencies,
       }
     : { ...DefaultCoreDependencies };
   const binder = provideBinder(outputProject, {
     staticHelpers,
     dependencies: {
-      ...extraDependencies
+      ...extraDependencies,
     },
-    useSubpathImports: rlcOptions.azureSdkForJs === true
+    useSubpathImports: rlcOptions.azureSdkForJs === true,
   });
   provideSdkTypes(dpgContext);
 
@@ -213,7 +200,7 @@ export async function $onEmit(context: EmitContext) {
   // 5. Generate metadata and test files
   function getTypespecTsVersion(context: EmitContext): string | undefined {
     const emitterMetadata = context.program.emitters.find(
-      (emitter) => emitter.metadata.name === "@azure-tools/typespec-ts"
+      (emitter) => emitter.metadata.name === "@azure-tools/typespec-ts",
     );
     return emitterMetadata?.metadata.version;
   }
@@ -221,8 +208,7 @@ export async function $onEmit(context: EmitContext) {
   await generateMetadataAndTest(dpgContext);
 
   async function enrichDpgContext() {
-    const generationPathDetail: GenerationDirDetail =
-      await calculateGenerationDir();
+    const generationPathDetail: GenerationDirDetail = await calculateGenerationDir();
     dpgContext.generationPathDetail = generationPathDetail;
     dpgContext.allServiceNamespaces = listAllServiceNamespaces(dpgContext);
     const options: RLCOptions = transformRLCOptions(emitterOptions, dpgContext);
@@ -231,14 +217,10 @@ export async function $onEmit(context: EmitContext) {
     // clear output folder if needed
     if (options.clearOutputFolder) {
       // Clear output directory while preserving TempTypeSpecFiles
-      await clearDirectory(
-        context.emitterOutputDir,
-        ["TempTypeSpecFiles"],
-        program
-      );
+      await clearDirectory(context.emitterOutputDir, ["TempTypeSpecFiles"], program);
     }
     const hasTestFolder = await pathExists(
-      join(dpgContext.generationPathDetail?.metadataDir ?? "", "test")
+      join(dpgContext.generationPathDetail?.metadataDir ?? "", "test"),
     );
     options.generateTest =
       options.generateTest === true ||
@@ -263,7 +245,7 @@ export async function $onEmit(context: EmitContext) {
       rootDir: projectRoot,
       metadataDir: projectRoot,
       rlcSourcesDir: sourcesRoot,
-      modularSourcesDir: sourcesRoot
+      modularSourcesDir: sourcesRoot,
     };
   }
 
@@ -271,16 +253,13 @@ export async function $onEmit(context: EmitContext) {
     await emptyDir(
       dpgContext.generationPathDetail?.modularSourcesDir ??
         dpgContext.generationPathDetail?.rlcSourcesDir ??
-        ""
+        "",
     );
   }
 
   async function clearSamplesDevFolder() {
     if (emitterOptions["generate-sample"] === true) {
-      const samplesDevPath = join(
-        dpgContext.generationPathDetail?.rootDir ?? "",
-        "samples-dev"
-      );
+      const samplesDevPath = join(dpgContext.generationPathDetail?.rootDir ?? "", "samples-dev");
       if (await pathExists(samplesDevPath)) {
         await emptyDir(samplesDevPath);
       }
@@ -294,10 +273,7 @@ export async function $onEmit(context: EmitContext) {
       rlcCodeModels.push(rlcModels);
       const serviceName = client.services[0]?.name ?? "Unknown";
       serviceNameToRlcModelsMap.set(serviceName, rlcModels);
-      needUnexpectedHelper.set(
-        getClientName(rlcModels),
-        hasUnexpectedHelper(rlcModels)
-      );
+      needUnexpectedHelper.set(getClientName(rlcModels), hasUnexpectedHelper(rlcModels));
     }
   }
 
@@ -319,37 +295,28 @@ export async function $onEmit(context: EmitContext) {
         program,
         buildSamples,
         rlcModels,
-        dpgContext.generationPathDetail?.metadataDir
+        dpgContext.generationPathDetail?.metadataDir,
       );
     }
   }
 
   async function generateModularSources() {
-    const modularSourcesRoot =
-      dpgContext.generationPathDetail?.modularSourcesDir ?? "src";
+    const modularSourcesRoot = dpgContext.generationPathDetail?.modularSourcesDir ?? "src";
     const project = useContext("outputProject");
-    modularEmitterOptions = transformModularEmitterOptions(
-      dpgContext,
-      modularSourcesRoot,
-      {
-        casing: "camel"
-      }
-    );
+    modularEmitterOptions = transformModularEmitterOptions(dpgContext, modularSourcesRoot, {
+      casing: "camel",
+    });
 
     emitLoggerFile(modularEmitterOptions, modularSourcesRoot);
 
-    const rootIndexFile = project.createSourceFile(
-      `${modularSourcesRoot}/index.ts`,
-      "",
-      {
-        overwrite: true
-      }
-    );
+    const rootIndexFile = project.createSourceFile(`${modularSourcesRoot}/index.ts`, "", {
+      overwrite: true,
+    });
 
     emitTypes(dpgContext, { sourceRoot: modularSourcesRoot });
     emitNonModelResponseTypes(dpgContext, { sourceRoot: modularSourcesRoot });
     buildSubpathIndexFile(modularEmitterOptions, "models", undefined, {
-      recursive: true
+      recursive: true,
     });
     const clientMap = getClientHierarchyMap(dpgContext);
     if (clientMap.length === 0) {
@@ -365,12 +332,12 @@ export async function $onEmit(context: EmitContext) {
       if (dpgContext.rlcOptions?.hierarchyClient) {
         buildSubpathIndexFile(modularEmitterOptions, "api", subClient, {
           exportIndex: false,
-          recursive: true
+          recursive: true,
         });
       } else {
         buildSubpathIndexFile(modularEmitterOptions, "api", subClient, {
           recursive: true,
-          exportIndex: true
+          exportIndex: true,
         });
       }
 
@@ -378,19 +345,14 @@ export async function $onEmit(context: EmitContext) {
       buildClassicOperationFiles(dpgContext, subClient, modularEmitterOptions);
       buildSubpathIndexFile(modularEmitterOptions, "classic", subClient, {
         exportIndex: true,
-        interfaceOnly: true
+        interfaceOnly: true,
       });
       const { subfolder } = getModularClientOptions(subClient);
       // Generate index file for clients with subfolders (multi-client scenarios and nested clients)
       if (subfolder) {
         buildSubClientIndexFile(dpgContext, subClient, modularEmitterOptions);
       }
-      buildRootIndex(
-        dpgContext,
-        modularEmitterOptions,
-        rootIndexFile,
-        subClient
-      );
+      buildRootIndex(dpgContext, modularEmitterOptions, rootIndexFile, subClient);
     }
     // Enable modular sample generation when explicitly set to true or MPG
     if (emitterOptions["generate-sample"] === true) {
@@ -402,10 +364,7 @@ export async function $onEmit(context: EmitContext) {
       }
     }
 
-    binder.resolveAllReferences(
-      modularSourcesRoot,
-      dpgContext.generationPathDetail?.rootDir
-    );
+    binder.resolveAllReferences(modularSourcesRoot, dpgContext.generationPathDetail?.rootDir);
     if (program.compilerOptions.noEmit || program.hasError()) {
       return;
     }
@@ -414,7 +373,7 @@ export async function $onEmit(context: EmitContext) {
       await emitContentByBuilder(
         program,
         () => ({ content: file.getFullText(), path: file.getFilePath() }),
-        modularEmitterOptions as any
+        modularEmitterOptions as any,
       );
     }
   }
@@ -442,12 +401,11 @@ export async function $onEmit(context: EmitContext) {
       content.emitterVersion = emitterVersion;
     }
     if (dpgContext.rlcOptions?.isModularLibrary) {
-      content.crossLanguageDefinitions =
-        generateCrossLanguageDefinitionFile(dpgContext);
+      content.crossLanguageDefinitions = generateCrossLanguageDefinitionFile(dpgContext);
     }
     return {
       path: "metadata.json",
-      content: JSON.stringify(content, null, 2)
+      content: JSON.stringify(content, null, 2),
     };
   }
 
@@ -469,25 +427,21 @@ export async function $onEmit(context: EmitContext) {
     // Generate metadata
     const existingPackageFilePath = join(
       dpgContext.generationPathDetail?.metadataDir ?? "",
-      "package.json"
+      "package.json",
     );
     const hasPackageFile = await existsSync(existingPackageFilePath);
     const existingReadmeFilePath = join(
       dpgContext.generationPathDetail?.metadataDir ?? "",
-      "README.md"
+      "README.md",
     );
     const hasReadmeFile = await existsSync(existingReadmeFilePath);
     const existingChangelogFilePath = join(
       dpgContext.generationPathDetail?.metadataDir ?? "",
-      "CHANGELOG.md"
+      "CHANGELOG.md",
     );
     const hasChangelogFile = await existsSync(existingChangelogFilePath);
-    const shouldGenerateMetadata =
-      option.generateMetadata === true || !hasPackageFile;
-    const existingTestFolderPath = join(
-      dpgContext.generationPathDetail?.metadataDir ?? "",
-      "test"
-    );
+    const shouldGenerateMetadata = option.generateMetadata === true || !hasPackageFile;
+    const existingTestFolderPath = join(dpgContext.generationPathDetail?.metadataDir ?? "", "test");
     const hasTestFolder = await existsSync(existingTestFolderPath);
     if (option.generateTest === undefined) {
       if (hasTestFolder) {
@@ -510,7 +464,7 @@ export async function $onEmit(context: EmitContext) {
         buildApiExtractorConfig,
         buildReadmeFile,
         buildLicenseFile,
-        buildSampleEnvFile
+        buildSampleEnvFile,
       ];
       if (option.generateTest) {
         commonBuilders.push((model) => buildVitestConfig(model, "node"));
@@ -534,7 +488,7 @@ export async function $onEmit(context: EmitContext) {
       let modularPackageInfo = {};
       if (option.isModularLibrary) {
         modularPackageInfo = {
-          exports: getModuleExports(context, modularEmitterOptions)
+          exports: getModuleExports(context, modularEmitterOptions),
         };
         // Build dependencies
         const dependencies: Record<string, string> = {};
@@ -549,26 +503,19 @@ export async function $onEmit(context: EmitContext) {
           modularPackageInfo = {
             ...modularPackageInfo,
             dependencies,
-            clientContextPaths: getRelativeContextPaths(
-              context,
-              modularEmitterOptions
-            )
+            clientContextPaths: getRelativeContextPaths(context, modularEmitterOptions),
           };
         } else if (Object.keys(dependencies).length > 0) {
           modularPackageInfo = {
             ...modularPackageInfo,
-            dependencies
+            dependencies,
           };
         }
       }
-      commonBuilders.push((model) =>
-        buildPackageFile(model, modularPackageInfo)
-      );
+      commonBuilders.push((model) => buildPackageFile(model, modularPackageInfo));
       // Generate warp.config.yml for Azure monorepo ESM packages
       if (option.azureSdkForJs) {
-        commonBuilders.push((model) =>
-          buildWarpConfig(model, modularPackageInfo)
-        );
+        commonBuilders.push((model) => buildWarpConfig(model, modularPackageInfo));
       }
       commonBuilders.push(buildTsConfig);
       if (option.azureSdkForJs) {
@@ -590,7 +537,7 @@ export async function $onEmit(context: EmitContext) {
       if (option.generateTest) {
         for (const subClient of dpgContext.sdkPackage.clients) {
           commonBuilders.push((model) =>
-            buildSnippets(model, subClient.name, option.azureSdkForJs)
+            buildSnippets(model, subClient.name, option.azureSdkForJs),
           );
         }
         commonBuilders.push(buildTsSnippetsConfig);
@@ -601,7 +548,7 @@ export async function $onEmit(context: EmitContext) {
         program,
         commonBuilders,
         rlcClient,
-        dpgContext.generationPathDetail?.metadataDir
+        dpgContext.generationPathDetail?.metadataDir,
       );
 
       if (option.isModularLibrary) {
@@ -609,7 +556,7 @@ export async function $onEmit(context: EmitContext) {
           await emitContentByBuilder(
             program,
             () => ({ content: file.getFullText(), path: file.getFilePath() }),
-            modularEmitterOptions as any
+            modularEmitterOptions as any,
           );
         }
       }
@@ -627,13 +574,10 @@ export async function $onEmit(context: EmitContext) {
         }
         modularPackageInfo = {
           exports: getModuleExports(context, modularEmitterOptions),
-          clientContextPaths: getRelativeContextPaths(
-            context,
-            modularEmitterOptions
-          ),
+          clientContextPaths: getRelativeContextPaths(context, modularEmitterOptions),
           ...(Object.keys(additionalDependencies).length > 0 && {
-            dependencies: additionalDependencies
-          })
+            dependencies: additionalDependencies,
+          }),
         };
       }
 
@@ -641,40 +585,30 @@ export async function $onEmit(context: EmitContext) {
       // and for modular packages (adds exports, clientContextPaths, LRO deps)
       if (option.isModularLibrary || option.azureSdkForJs) {
         updateBuilders.push((model: RLCModel) =>
-          updatePackageFile(model, existingPackageFilePath, modularPackageInfo)
+          updatePackageFile(model, existingPackageFilePath, modularPackageInfo),
         );
       }
 
       // Update warp.config.yml for Azure monorepo packages
       if (option.azureSdkForJs) {
-        updateBuilders.push((model: RLCModel) =>
-          buildWarpConfig(model, modularPackageInfo)
-        );
+        updateBuilders.push((model: RLCModel) => buildWarpConfig(model, modularPackageInfo));
       }
 
       // If the client name changed, regenerate the README and snippets completely;
       // otherwise update only the API reference link in-place.
       if (hasReadmeFile) {
-        const clientNameChanged = hasClientNameChanged(
-          rlcClient,
-          existingReadmeFilePath
-        );
+        const clientNameChanged = hasClientNameChanged(rlcClient, existingReadmeFilePath);
         updateBuilders.push(
           clientNameChanged
             ? buildReadmeFile
-            : (model: RLCModel) =>
-                updateReadmeFile(model, existingReadmeFilePath)
+            : (model: RLCModel) => updateReadmeFile(model, existingReadmeFilePath),
         );
 
         // Regenerate snippets.spec.ts only when the client name changed
         if (clientNameChanged && option.azureSdkForJs) {
           for (const subClient of dpgContext.sdkPackage.clients) {
             updateBuilders.push((model: RLCModel) =>
-              buildSnippets(
-                model,
-                getClassicalClientName(subClient),
-                option.azureSdkForJs
-              )
+              buildSnippets(model, getClassicalClientName(subClient), option.azureSdkForJs),
             );
           }
         }
@@ -685,7 +619,7 @@ export async function $onEmit(context: EmitContext) {
         program,
         updateBuilders,
         rlcClient,
-        dpgContext.generationPathDetail?.metadataDir
+        dpgContext.generationPathDetail?.metadataDir,
       );
     }
     if (isAzureFlavor) {
@@ -693,7 +627,7 @@ export async function $onEmit(context: EmitContext) {
         program,
         buildMetadataJson,
         rlcClient,
-        dpgContext.generationPathDetail?.metadataDir
+        dpgContext.generationPathDetail?.metadataDir,
       );
     }
 
@@ -703,15 +637,12 @@ export async function $onEmit(context: EmitContext) {
         program,
         [buildRecordedClientFile, buildSampleTest],
         rlcClient,
-        dpgContext.generationPathDetail?.metadataDir
+        dpgContext.generationPathDetail?.metadataDir,
       );
     }
   }
 
-  function getRelativeContextPaths(
-    context: SdkContext,
-    options: ModularEmitterOptions
-  ) {
+  function getRelativeContextPaths(context: SdkContext, options: ModularEmitterOptions) {
     const clientMap = getClientHierarchyMap(context);
     return Array.from(clientMap)
       .map((subClient) => getClientContextPath(subClient, options))
@@ -720,7 +651,7 @@ export async function $onEmit(context: EmitContext) {
 }
 
 export async function createContextWithDefaultOptions(
-  context: EmitContext<Record<string, any>>
+  context: EmitContext<Record<string, any>>,
 ): Promise<SdkContext> {
   const flattenUnionAsEnum =
     context.options["experimental-extensible-enums"] === undefined
@@ -732,21 +663,21 @@ export async function createContextWithDefaultOptions(
     emitters: [
       {
         main: "@azure-tools/typespec-ts",
-        metadata: { name: "@azure-tools/typespec-ts" }
-      }
-    ]
+        metadata: { name: "@azure-tools/typespec-ts" },
+      },
+    ],
   };
   context.options = {
     ...context.options,
-    ...tcgcSettings
+    ...tcgcSettings,
   };
 
   return (await createSdkContext(
     context,
     context.program.emitters[0]?.metadata.name ?? "@azure-tools/typespec-ts",
     {
-      flattenUnionAsEnum
-    }
+      flattenUnionAsEnum,
+    },
   )) as SdkContext;
 }
 
@@ -758,7 +689,7 @@ function isArm(context: EmitContext<Record<string, any>>) {
 
 export async function renameClientName(
   client: SdkClientType<SdkServiceOperation>,
-  emitterOptions: ModularEmitterOptions
+  emitterOptions: ModularEmitterOptions,
 ) {
   if (
     emitterOptions.options.typespecTitleMap &&

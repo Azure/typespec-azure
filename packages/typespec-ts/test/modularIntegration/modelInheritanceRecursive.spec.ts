@@ -1,8 +1,8 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import {
   Extension,
-  RecursiveClient
+  RecursiveClient,
 } from "./generated/type/model/inheritance/recursive/src/index.js";
 
 const body: Extension = {
@@ -12,14 +12,14 @@ const body: Extension = {
       level: 1,
       extension: [
         {
-          level: 2
-        }
-      ]
+          level: 2,
+        },
+      ],
     },
     {
-      level: 1
-    }
-  ]
+      level: 1,
+    },
+  ],
 };
 describe("Recursive Client", () => {
   let client: RecursiveClient;
@@ -27,7 +27,7 @@ describe("Recursive Client", () => {
   beforeEach(() => {
     client = new RecursiveClient({
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 

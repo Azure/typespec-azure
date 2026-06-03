@@ -1,11 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import {
-  MethodSignatureStructure,
-  OptionalKind,
-  ParameterDeclarationStructure
-} from "ts-morph";
+import { MethodSignatureStructure, OptionalKind, ParameterDeclarationStructure } from "ts-morph";
 import {
   Methods,
   ObjectSchema,
@@ -13,14 +9,14 @@ import {
   PathParameter,
   RLCModel,
   Schema,
-  SchemaContext
+  SchemaContext,
 } from "../interfaces.js";
 import { NameType, normalizeName, pascalCase } from "./nameUtils.js";
 import { isObjectSchema } from "./schemaHelpers.js";
 
 export function buildMethodDefinitions(
   methods: Methods,
-  pathParams: PathParameter[] = []
+  pathParams: PathParameter[] = [],
 ): OptionalKind<MethodSignatureStructure>[] {
   const methodDefinitions: OptionalKind<MethodSignatureStructure>[] = [];
   for (const key of Object.keys(methods)) {
@@ -40,10 +36,10 @@ export function buildMethodDefinitions(
           {
             name: "options",
             hasQuestionToken: areAllOptional,
-            type: pascalCase(method.optionsName)
-          }
+            type: pascalCase(method.optionsName),
+          },
         ],
-        returnType: `StreamableMethod<${method.returnType}>`
+        returnType: `StreamableMethod<${method.returnType}>`,
       });
     }
   }
@@ -52,13 +48,13 @@ export function buildMethodDefinitions(
 }
 
 export function getPathParamDefinitions(
-  pathParams: PathParameter[]
+  pathParams: PathParameter[],
 ): OptionalKind<ParameterDeclarationStructure>[] {
   return pathParams.map(({ name, type, description }) => {
     return {
       name: normalizeName(name, NameType.Parameter),
       type,
-      description
+      description,
     };
   });
 }
@@ -114,33 +110,22 @@ export function hasInputModels(model: RLCModel) {
   return hasSchemaContextObject(model, [SchemaContext.Input]);
 }
 export function hasOutputModels(model: RLCModel) {
-  return hasSchemaContextObject(model, [
-    SchemaContext.Output,
-    SchemaContext.Exception
-  ]);
+  return hasSchemaContextObject(model, [SchemaContext.Output, SchemaContext.Exception]);
 }
 
 function hasSchemaContextObject(model: RLCModel, schemaUsage: SchemaContext[]) {
   const objectSchemas: ObjectSchema[] = (model.schemas ?? []).filter(
-    (o) =>
-      isObjectSchema(o) &&
-      (o as ObjectSchema).usage?.some((u) => schemaUsage.includes(u))
+    (o) => isObjectSchema(o) && (o as ObjectSchema).usage?.some((u) => schemaUsage.includes(u)),
   );
 
   return objectSchemas.length > 0;
 }
 
-export function getGeneratedWrapperTypes(
-  params: ParameterMetadata[] | PathParameter[]
-): Schema[] {
+export function getGeneratedWrapperTypes(params: ParameterMetadata[] | PathParameter[]): Schema[] {
   const wrapperTypes = params
-    .map((qp) =>
-      isParameterMetadata(qp) ? qp.param.wrapperType : qp.wrapperType
-    )
+    .map((qp) => (isParameterMetadata(qp) ? qp.param.wrapperType : qp.wrapperType))
     .filter((v) => v !== undefined);
-  const wrapperFromObjects = wrapperTypes.filter(
-    (wrap) => wrap.type === "object"
-  );
+  const wrapperFromObjects = wrapperTypes.filter((wrap) => wrap.type === "object");
   const wrapperFromUnions = wrapperTypes
     .filter((wrap) => wrap.type === "union")
     .flatMap((wrapperType) => wrapperType?.enum ?? [])
@@ -148,8 +133,6 @@ export function getGeneratedWrapperTypes(
   return [...wrapperFromUnions, ...wrapperFromObjects];
 }
 
-function isParameterMetadata(
-  param: ParameterMetadata | PathParameter
-): param is ParameterMetadata {
+function isParameterMetadata(param: ParameterMetadata | PathParameter): param is ParameterMetadata {
   return (param as any).param !== undefined;
 }

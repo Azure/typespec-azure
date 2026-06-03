@@ -1,12 +1,12 @@
-import { describe, it, assert } from "vitest";
+import { assert, describe, it } from "vitest";
 
+import { Diagnostic } from "@typespec/compiler";
 import {
   emitModelsFromTypeSpec,
   emitParameterFromTypeSpec,
-  emitResponsesFromTypeSpec
+  emitResponsesFromTypeSpec,
 } from "../util/emitUtil.js";
 import { VerifyPropertyConfig, assertEqualContent } from "../util/testUtil.js";
-import { Diagnostic } from "@typespec/compiler";
 
 describe("Input/output model type", () => {
   it("shouldn't generate models if there is no operations", async () => {
@@ -28,22 +28,22 @@ describe("Input/output model type", () => {
     options?: VerifyPropertyConfig,
     needAzureCore: boolean = false,
     needTCGC: boolean = false,
-    additionalImports: string = ""
+    additionalImports: string = "",
   ) {
     const defaultOption: VerifyPropertyConfig = {
       additionalTypeSpecDefinition: "",
       outputType: inputType,
       additionalInputContent: "",
-      additionalOutputContent: ""
+      additionalOutputContent: "",
     };
     const {
       additionalTypeSpecDefinition,
       outputType,
       additionalInputContent,
-      additionalOutputContent
+      additionalOutputContent,
     } = {
       ...defaultOption,
-      ...options
+      ...options,
     };
     const schemaOutput = await emitModelsFromTypeSpec(
       `
@@ -60,8 +60,8 @@ describe("Input/output model type", () => {
     op getModel(@bodyRoot input: InputOutputModel): InputOutputModel;`,
       {
         needAzureCore,
-        needTCGC
-      }
+        needTCGC,
+      },
     );
     assert.ok(schemaOutput);
     const { inputModelFile, outputModelFile } = schemaOutput!;
@@ -74,7 +74,7 @@ describe("Input/output model type", () => {
     export interface InputOutputModel {
         prop: ${inputType};
     }
-    ${additionalInputContent}`
+    ${additionalInputContent}`,
     );
 
     assert.strictEqual(outputModelFile?.path, "outputModels.ts");
@@ -86,7 +86,7 @@ describe("Input/output model type", () => {
     export interface InputOutputModelOutput {
       prop: ${outputType};
     }
-    ${additionalOutputContent}`
+    ${additionalOutputContent}`,
     );
   }
 
@@ -131,14 +131,14 @@ describe("Input/output model type", () => {
         `
         /** Alias for A */
         export type A = null | { code?: string; message?: string; propA?: A };
-      `
+      `,
       );
       await assertEqualContent(
         outputModelFile?.content!,
         `
         /** Alias for AOutput */
         export type AOutput = null | { code?: string; message?: string; propA?: AOutput };
-        `
+        `,
       );
       const parametersOutput = await emitParameterFromTypeSpec(tspDefinition);
       assert.ok(parametersOutput);
@@ -153,7 +153,7 @@ describe("Input/output model type", () => {
         }
         
         export type PostParameters = PostBodyParam & RequestParameters;
-        `
+        `,
       );
     });
 
@@ -163,7 +163,7 @@ describe("Input/output model type", () => {
       const tspType = "nullableArray[]";
       const typeScriptType = "(number | null)[]";
       await verifyPropertyType(tspType, typeScriptType, {
-        additionalTypeSpecDefinition: tspDefinition
+        additionalTypeSpecDefinition: tspDefinition,
       });
     });
 
@@ -194,7 +194,7 @@ describe("Input/output model type", () => {
         export interface SimpleModelOutput {
           color: Record<string, number | null>[];
         }
-          `
+          `,
       });
     });
 
@@ -218,7 +218,7 @@ describe("Input/output model type", () => {
         export interface SimpleModelOutput {
           color: "red" | "blue";
         }
-          `
+          `,
       });
     });
 
@@ -278,7 +278,7 @@ describe("Input/output model type", () => {
           
           /** Extensible enum model description */
           export type TranslationLanguageValues = "English" | "Chinese";
-          `
+          `,
           );
           await assertEqualContent(
             outputModelFile?.content!,
@@ -289,7 +289,7 @@ describe("Input/output model type", () => {
             }
             
             /** Extensible enum model description */
-            export type TranslationLanguageValuesOutput = "English" | "Chinese";`
+            export type TranslationLanguageValuesOutput = "English" | "Chinese";`,
           );
         });
         it("should handle enum with non-standard name as property -> type alias with union", async () => {
@@ -321,7 +321,7 @@ describe("Input/output model type", () => {
           
           /** Extensible enum model description */
           export type TranslationLanguageValues = "English" | "Chinese";
-          `
+          `,
           );
           await assertEqualContent(
             outputModelFile?.content!,
@@ -332,7 +332,7 @@ describe("Input/output model type", () => {
             }
             
             /** Extensible enum model description */
-            export type TranslationLanguageValuesOutput = "English" | "Chinese";`
+            export type TranslationLanguageValuesOutput = "English" | "Chinese";`,
           );
         });
         it("should handle enum as body -> type alias with union", async () => {
@@ -360,7 +360,7 @@ describe("Input/output model type", () => {
             body: TranslationLanguage;
           }
           
-          export type GetModelParameters = GetModelBodyParam & RequestParameters;`
+          export type GetModelParameters = GetModelBodyParam & RequestParameters;`,
           );
         });
       });
@@ -390,9 +390,9 @@ describe("Input/output model type", () => {
               additionalOutputContent: `
               /** Translation Language Values */
               export type TranslationLanguageValuesOutput = "English" | "Chinese";
-              `
+              `,
             },
-            true
+            true,
           );
         });
 
@@ -421,9 +421,9 @@ describe("Input/output model type", () => {
               additionalOutputContent: `
               /** Translation Language Values */
               export type TranslationLanguageValuesOutput = "English.Class" | "Chinese.Class";
-              `
+              `,
             },
-            true
+            true,
           );
         });
 
@@ -443,9 +443,9 @@ describe("Input/output model type", () => {
             tspType,
             typeScriptType,
             {
-              additionalTypeSpecDefinition: tspTypeDefinition
+              additionalTypeSpecDefinition: tspTypeDefinition,
             },
-            true
+            true,
           );
         });
       });
@@ -483,7 +483,7 @@ describe("Input/output model type", () => {
         additionalInputContent: `
         export interface ${inputModelName} {}`,
         additionalOutputContent: `
-        export interface ${inputModelName}Output {}`
+        export interface ${inputModelName}Output {}`,
       });
     });
   });
@@ -501,8 +501,8 @@ describe("Input/output model type", () => {
       `,
         {
           needTCGC: true,
-          mustEmptyDiagnostic: false
-        }
+          mustEmptyDiagnostic: false,
+        },
       );
       assert.ok(schemaOutput);
       const { inputModelFile, outputModelFile } = schemaOutput!;
@@ -520,7 +520,7 @@ describe("Input/output model type", () => {
         */
         prop: number;
       }
-      `
+      `,
       );
       await assertEqualContent(
         outputModelFile?.content!,
@@ -536,7 +536,7 @@ describe("Input/output model type", () => {
         */
         prop: number;
       }
-      `
+      `,
       );
     });
 
@@ -553,18 +553,15 @@ describe("Input/output model type", () => {
       `,
           {
             needTCGC: true,
-            mustEmptyDiagnostic: false
-          } // throw exception for diagnostics
+            mustEmptyDiagnostic: false,
+          }, // throw exception for diagnostics
         );
       } catch (err: any) {
         assert.strictEqual(err.length, 2);
-        assert.strictEqual(
-          err[0].code,
-          "@azure-tools/typespec-ts/decimal-to-number"
-        );
+        assert.strictEqual(err[0].code, "@azure-tools/typespec-ts/decimal-to-number");
         assert.strictEqual(
           err[0].message,
-          "Please note the decimal type will be converted to number. If you strongly care about precision you can use @encode to encode it as a string for the property - prop."
+          "Please note the decimal type will be converted to number. If you strongly care about precision you can use @encode to encode it as a string for the property - prop.",
         );
       }
     });
@@ -581,8 +578,8 @@ describe("Input/output model type", () => {
       `,
         {
           needTCGC: true,
-          mustEmptyDiagnostic: false
-        }
+          mustEmptyDiagnostic: false,
+        },
       );
       assert.ok(schemaOutput);
       const { inputModelFile, outputModelFile } = schemaOutput!;
@@ -600,7 +597,7 @@ describe("Input/output model type", () => {
         */
         prop: number;
       }
-      `
+      `,
       );
       await assertEqualContent(
         outputModelFile?.content!,
@@ -616,7 +613,7 @@ describe("Input/output model type", () => {
         */
         prop: number;
       }
-      `
+      `,
       );
     });
     it("should handle int/decimal/decimal128/int8 with encode `string`", async () => {
@@ -635,8 +632,8 @@ describe("Input/output model type", () => {
       op getModel(...SimpleModel): SimpleModel;
       `,
         {
-          needTCGC: true
-        }
+          needTCGC: true,
+        },
       );
       assert.ok(schemaOutput);
       const { inputModelFile, outputModelFile } = schemaOutput!;
@@ -648,7 +645,7 @@ describe("Input/output model type", () => {
         prop2: string;
         x: string;
       }
-      `
+      `,
       );
       await assertEqualContent(
         outputModelFile?.content!,
@@ -658,7 +655,7 @@ describe("Input/output model type", () => {
         prop2: string;
         x: string;
       }
-      `
+      `,
       );
     });
   });
@@ -755,7 +752,7 @@ describe("Input/output model type", () => {
         export interface SimpleModelOutput {
           prop1:string;
           prop2:number;
-        }`
+        }`,
       });
     });
 
@@ -784,9 +781,9 @@ describe("Input/output model type", () => {
           additionalOutputContent: `
           /** Alias for DiskEncryptionTargetOutput */
           export type DiskEncryptionTargetOutput = "osdisk" | "temporarydisk";
-          `
+          `,
         },
-        true
+        true,
       );
     });
 
@@ -814,9 +811,9 @@ describe("Input/output model type", () => {
           additionalOutputContent: `
           /** Alias for DiskEncryptionTargetOutput */
           export type DiskEncryptionTargetOutput = "osdisk" | "temporarydisk";
-          `
+          `,
         },
-        true
+        true,
       );
     });
   });
@@ -841,7 +838,7 @@ describe("Input/output model type", () => {
         export interface ${inputModelName}Output {
           prop1:string;
           prop2:number;
-        }`
+        }`,
       });
     });
 
@@ -869,7 +866,7 @@ describe("Input/output model type", () => {
         export interface ${inputModelName}Output {
           prop1:string;
           prop2:number;
-        }`
+        }`,
       });
     });
 
@@ -894,7 +891,7 @@ describe("Input/output model type", () => {
         export interface ${inputModelName}Output {
           prop1:string;
           prop2:number;
-        }`
+        }`,
       });
     });
 
@@ -939,7 +936,7 @@ describe("Input/output model type", () => {
             bark: string;
           }
   
-          export type PetOutput = PetOutputParent | CatOutput | DogOutput;`
+          export type PetOutput = PetOutputParent | CatOutput | DogOutput;`,
         );
       });
 
@@ -1018,7 +1015,7 @@ describe("Input/output model type", () => {
         export type FishOutput = FishOutputParent | SharkOutput | SalmonOutput;
         /** The second level model in polymorphic multiple levels inheritance and it defines a new discriminator. */
         export type SharkOutput = SharkOutputParent | SawSharkOutput | GoblinSharkOutput;
-        `
+        `,
         );
       });
 
@@ -1042,7 +1039,7 @@ describe("Input/output model type", () => {
           export interface ${inputModelName}Output {
             "model.kind": "derived";
             "derived.name": string;
-          }`
+          }`,
         });
       });
 
@@ -1095,7 +1092,7 @@ describe("Input/output model type", () => {
   
           /** This is a base model has discriminator name containing dot. */
           export type BaseModelOutput = BaseModelOutputParent | ${inputModelName}Output;
-          `
+          `,
         });
       });
 
@@ -1134,7 +1131,7 @@ describe("Input/output model type", () => {
 
             export type BOutput = BOutputParent | COutput;
             /** Alias for AOutput */
-            export type AOutput = "AA" | "BB";`
+            export type AOutput = "AA" | "BB";`,
             );
           });
 
@@ -1156,7 +1153,7 @@ describe("Input/output model type", () => {
             }
             
             /** Alias for AOutput */
-            export type AOutput = "AA" | "BB";`
+            export type AOutput = "AA" | "BB";`,
             );
           });
         });
@@ -1196,7 +1193,7 @@ describe("Input/output model type", () => {
             
             /** Alias for AOutput */
             export type AOutput = 1.1 | 2.2;
-            `
+            `,
             );
           });
         });
@@ -1230,7 +1227,7 @@ describe("Input/output model type", () => {
         export interface VegetableCarrot extends Record<string, unknown> {}
         
         export interface VegetableBeans extends Record<string, unknown> {}
-        `
+        `,
       );
 
       assert.ok(outputModelFile);
@@ -1246,7 +1243,7 @@ describe("Input/output model type", () => {
         export interface VegetableCarrotOutput extends Record<string, any> {}
         
         export interface VegetableBeansOutput extends Record<string, any> {}
-        `
+        `,
       );
     });
 
@@ -1276,7 +1273,7 @@ describe("Input/output model type", () => {
         export interface VegetableCarrot extends Record<string, boolean> {}
         
         export interface VegetableBeans extends Record<string, boolean> {}
-        `
+        `,
       );
 
       assert.ok(outputModelFile);
@@ -1292,7 +1289,7 @@ describe("Input/output model type", () => {
         export interface VegetableCarrotOutput extends Record<string, boolean> {}
         
         export interface VegetableBeansOutput extends Record<string, boolean> {}
-        `
+        `,
       );
     });
 
@@ -1322,7 +1319,7 @@ describe("Input/output model type", () => {
         export interface VegetableCarrot extends Record<string, number> {}
         
         export interface VegetableBeans extends Record<string, number> {}
-        `
+        `,
       );
 
       assert.ok(outputModelFile);
@@ -1338,7 +1335,7 @@ describe("Input/output model type", () => {
         export interface VegetableCarrotOutput extends Record<string, number> {}
         
         export interface VegetableBeansOutput extends Record<string, number> {}
-        `
+        `,
       );
     });
 
@@ -1368,7 +1365,7 @@ describe("Input/output model type", () => {
         export interface VegetableCarrot extends Record<string, number> {}
         
         export interface VegetableBeans extends Record<string, number> {}
-        `
+        `,
       );
 
       assert.ok(outputModelFile);
@@ -1384,7 +1381,7 @@ describe("Input/output model type", () => {
         export interface VegetableCarrotOutput extends Record<string, number> {}
         
         export interface VegetableBeansOutput extends Record<string, number> {}
-        `
+        `,
       );
     });
 
@@ -1414,7 +1411,7 @@ describe("Input/output model type", () => {
         export interface VegetableCarrot extends Record<string, string> {}
         
         export interface VegetableBeans extends Record<string, string> {}
-        `
+        `,
       );
 
       assert.ok(outputModelFile);
@@ -1430,7 +1427,7 @@ describe("Input/output model type", () => {
         export interface VegetableCarrotOutput extends Record<string, string> {}
         
         export interface VegetableBeansOutput extends Record<string, string> {}
-        `
+        `,
       );
     });
 
@@ -1481,7 +1478,7 @@ describe("Input/output model type", () => {
         export interface Beans {
           expiry: string;
           id: string;
-        }`
+        }`,
       );
 
       assert.ok(outputModelFile);
@@ -1508,7 +1505,7 @@ describe("Input/output model type", () => {
         export interface BeansOutput {
           expiry: string;
           id: string;
-        }`
+        }`,
       );
     });
 
@@ -1559,7 +1556,7 @@ describe("Input/output model type", () => {
         export interface Beans {
           expiry: string;
           id: string;
-        }`
+        }`,
       );
 
       assert.ok(outputModelFile);
@@ -1586,7 +1583,7 @@ describe("Input/output model type", () => {
         export interface BeansOutput {
           expiry: string;
           id: string;
-        }`
+        }`,
       );
     });
 
@@ -1633,7 +1630,7 @@ describe("Input/output model type", () => {
         export interface Beans {
           expiry: string;
           id: string;
-        }`
+        }`,
       );
 
       assert.ok(outputModelFile);
@@ -1658,7 +1655,7 @@ describe("Input/output model type", () => {
         export interface BeansOutput {
           expiry: string;
           id: string;
-        }`
+        }`,
       );
     });
 
@@ -1683,7 +1680,7 @@ describe("Input/output model type", () => {
           carrots: number;
           beans: number;
         }
-        `
+        `,
       );
 
       assert.ok(outputModelFile);
@@ -1695,7 +1692,7 @@ describe("Input/output model type", () => {
           carrots: number;
           beans: number;
         }
-        `
+        `,
       );
     });
 
@@ -1725,7 +1722,7 @@ describe("Input/output model type", () => {
         export interface Base {
           foo: number;
         }
-        `
+        `,
       );
     });
   });
@@ -1768,8 +1765,8 @@ describe("Input/output model type", () => {
         op getModel(...SimpleModel): SimpleModel;
         `,
           {
-            needTCGC: true
-          }
+            needTCGC: true,
+          },
         );
         assert.ok(schemaOutput);
         const { inputModelFile, outputModelFile } = schemaOutput!;
@@ -1779,7 +1776,7 @@ describe("Input/output model type", () => {
         export interface SimpleModel { 
           "prop": number;
         }
-        `
+        `,
         );
         await assertEqualContent(
           outputModelFile?.content!,
@@ -1787,7 +1784,7 @@ describe("Input/output model type", () => {
         export interface SimpleModelOutput { 
           "prop": number;
         }
-        `
+        `,
         );
       });
 
@@ -1803,8 +1800,8 @@ describe("Input/output model type", () => {
         op getModel(...SimpleModel): SimpleModel;
         `,
           {
-            needTCGC: true
-          }
+            needTCGC: true,
+          },
         );
         assert.ok(schemaOutput);
         const { inputModelFile, outputModelFile } = schemaOutput!;
@@ -1814,7 +1811,7 @@ describe("Input/output model type", () => {
         export interface SimpleModel { 
           "prop": string;
         }
-        `
+        `,
         );
         await assertEqualContent(
           outputModelFile?.content!,
@@ -1822,7 +1819,7 @@ describe("Input/output model type", () => {
         export interface SimpleModelOutput { 
           "prop": string;
         }
-        `
+        `,
         );
       });
 
@@ -1839,8 +1836,8 @@ describe("Input/output model type", () => {
         op getModel(...SimpleModel): SimpleModel;
         `,
           {
-            needTCGC: true
-          }
+            needTCGC: true,
+          },
         );
         assert.ok(schemaOutput);
         const { inputModelFile, outputModelFile } = schemaOutput!;
@@ -1850,7 +1847,7 @@ describe("Input/output model type", () => {
         export interface SimpleModel { 
           "prop": number[];
         }
-        `
+        `,
         );
         await assertEqualContent(
           outputModelFile?.content!,
@@ -1858,7 +1855,7 @@ describe("Input/output model type", () => {
         export interface SimpleModelOutput { 
           "prop": number[];
         }
-        `
+        `,
         );
       });
     });
@@ -1871,10 +1868,7 @@ describe("Input/output model type", () => {
         op getModel(@query input: duration): NoContentResponse;
         `);
         assert.ok(schemaOutput);
-        await assertEqualContent(
-          schemaOutput?.content!,
-          buildParameterDef("string")
-        );
+        await assertEqualContent(schemaOutput?.content!, buildParameterDef("string"));
       });
 
       it("should handle duration with encode `seconds`", async () => {
@@ -1886,13 +1880,10 @@ describe("Input/output model type", () => {
           @query
           @encode("seconds", float64)
           input: duration): NoContentResponse;
-        `
+        `,
         );
         assert.ok(schemaOutput);
-        await assertEqualContent(
-          schemaOutput?.content!,
-          buildParameterDef("number")
-        );
+        await assertEqualContent(schemaOutput?.content!, buildParameterDef("number"));
       });
 
       it("should handle duration with encode `iso8601`", async () => {
@@ -1904,13 +1895,10 @@ describe("Input/output model type", () => {
           @query
           @encode("iso8601")
           input: duration): NoContentResponse;
-        `
+        `,
         );
         assert.ok(schemaOutput);
-        await assertEqualContent(
-          schemaOutput?.content!,
-          buildParameterDef("string")
-        );
+        await assertEqualContent(schemaOutput?.content!, buildParameterDef("string"));
       });
     });
   });
@@ -1919,21 +1907,21 @@ describe("Input/output model type", () => {
       const inputType = "string";
       const outputType = "string";
       await verifyPropertyType("plainDate", inputType, {
-        outputType
+        outputType,
       });
     });
     it("should handle plainTime -> string in output model &  `Date | string` in input model", async () => {
       const inputType = "string";
       const outputType = "string";
       await verifyPropertyType("plainTime", inputType, {
-        outputType
+        outputType,
       });
     });
     it("should handle utcDateTime -> string in output model &  `Date | string` in input model", async () => {
       const inputType = "Date | string";
       const outputType = "string";
       await verifyPropertyType("utcDateTime", inputType, {
-        outputType
+        outputType,
       });
     });
 
@@ -1941,7 +1929,7 @@ describe("Input/output model type", () => {
       const inputType = "string";
       const outputType = "string";
       await verifyPropertyType("offsetDateTime ", inputType, {
-        outputType
+        outputType,
       });
     });
 
@@ -1957,8 +1945,8 @@ describe("Input/output model type", () => {
       op getModel(...SimpleModel): SimpleModel;
       `,
         {
-          needTCGC: true
-        }
+          needTCGC: true,
+        },
       );
       assert.ok(schemaOutput);
       const { inputModelFile, outputModelFile } = schemaOutput!;
@@ -1968,7 +1956,7 @@ describe("Input/output model type", () => {
       export interface SimpleModel { 
         "createdAt": number;
       }
-      `
+      `,
       );
       await assertEqualContent(
         outputModelFile?.content!,
@@ -1976,7 +1964,7 @@ describe("Input/output model type", () => {
       export interface SimpleModelOutput { 
         "createdAt": number;
       }
-      `
+      `,
       );
     });
 
@@ -1992,8 +1980,8 @@ describe("Input/output model type", () => {
         op getModel(...SimpleModel): SimpleModel;
       `,
         {
-          needTCGC: true
-        }
+          needTCGC: true,
+        },
       );
       assert.ok(schemaOutput);
       const { inputModelFile, outputModelFile } = schemaOutput!;
@@ -2003,7 +1991,7 @@ describe("Input/output model type", () => {
       export interface SimpleModel { 
         "createdAt": string;
       }
-      `
+      `,
       );
       await assertEqualContent(
         outputModelFile?.content!,
@@ -2011,7 +1999,7 @@ describe("Input/output model type", () => {
       export interface SimpleModelOutput { 
         "createdAt": string;
       }
-      `
+      `,
       );
     });
 
@@ -2028,8 +2016,8 @@ describe("Input/output model type", () => {
       op getModel(...SimpleModel): SimpleModel;
       `,
         {
-          needTCGC: true
-        }
+          needTCGC: true,
+        },
       );
       assert.ok(schemaOutput);
       const { inputModelFile, outputModelFile } = schemaOutput!;
@@ -2039,7 +2027,7 @@ describe("Input/output model type", () => {
       export interface SimpleModel { 
         "createdAt": number[];
       }
-      `
+      `,
       );
       await assertEqualContent(
         outputModelFile?.content!,
@@ -2047,7 +2035,7 @@ describe("Input/output model type", () => {
       export interface SimpleModelOutput { 
         "createdAt": number[];
       }
-      `
+      `,
       );
     });
   });
@@ -2077,8 +2065,7 @@ describe("Input/output model type", () => {
 
     it("should handle record of record of empty object Record<Record<{}>> -> Record<string, Record<string, Record<string, unknown>>>", async () => {
       const tspType = "Record<Record<{}>>";
-      const inputType =
-        "Record<string, Record<string, Record<string, unknown>>>";
+      const inputType = "Record<string, Record<string, Record<string, unknown>>>";
       const outputType = "Record<string, Record<string, Record<string, any>>>";
       await verifyPropertyType(tspType, inputType, { outputType });
     });
@@ -2113,7 +2100,7 @@ describe("Input/output model type", () => {
         export interface SimpleModelOutput {
           prop1:string;
           prop2:number;
-        }`
+        }`,
       });
     });
   });
@@ -2140,7 +2127,7 @@ describe("Input/output model type", () => {
         export interface ${inputModelName}Output {
           readonly prop:number;
           prop1:number;
-        }`
+        }`,
       });
     });
 
@@ -2162,7 +2149,7 @@ describe("Input/output model type", () => {
         additionalOutputContent: `
         export interface ${inputModelName}Output {
           prop?:number;
-        }`
+        }`,
       });
     });
 
@@ -2190,7 +2177,7 @@ describe("Input/output model type", () => {
           foo?: string | null;
           bar: string | null;
           baz: string;
-        }`
+        }`,
       });
     });
 
@@ -2212,7 +2199,7 @@ describe("Input/output model type", () => {
         additionalOutputContent: `
         export interface ${inputModelName}Output {
           prop?:number;
-        }`
+        }`,
       });
     });
   });
@@ -2315,7 +2302,7 @@ describe("Input/output model type", () => {
         /** The second one of the unioned model type. */
         export interface Model2Output extends BaseModelOutput {
           prop2: number;
-        }`
+        }`,
       });
     });
   });
@@ -2383,7 +2370,7 @@ describe("Input/output model type", () => {
         }
        
         /** Alias for MyNamedUnionOutput */
-        export type MyNamedUnionOutput = Model1Output | Model2Output;`
+        export type MyNamedUnionOutput = Model1Output | Model2Output;`,
       });
     });
 
@@ -2425,7 +2412,7 @@ describe("Input/output model type", () => {
         }
 
         /** Alias for MyNamedUnionOutput */
-        export type MyNamedUnionOutput = Model1Output | "foo" | null | 1 | "X" | "Y" | Array<Model1Output>;`
+        export type MyNamedUnionOutput = Model1Output | "foo" | null | 1 | "X" | "Y" | Array<Model1Output>;`,
       });
     });
 
@@ -2446,7 +2433,7 @@ describe("Input/output model type", () => {
         export type MyNamedUnion = string | number;`,
         additionalOutputContent: `
         /** Alias for MyNamedUnionOutput */
-        export type MyNamedUnionOutput = string | number;`
+        export type MyNamedUnionOutput = string | number;`,
       });
     });
 
@@ -2467,7 +2454,7 @@ describe("Input/output model type", () => {
         export type MyNamedUnion = string | number;`,
         additionalOutputContent: `
         /** Alias for MyNamedUnionOutput */
-        export type MyNamedUnionOutput = string | number;`
+        export type MyNamedUnionOutput = string | number;`,
       });
     });
 
@@ -2489,7 +2476,7 @@ describe("Input/output model type", () => {
         export type StringExtensibleNamedUnion = "b" | "c" | 1;`,
         additionalOutputContent: `
         /** Alias for StringExtensibleNamedUnionOutput */
-        export type StringExtensibleNamedUnionOutput = "b" | "c" | 1;`
+        export type StringExtensibleNamedUnionOutput = "b" | "c" | 1;`,
       });
     });
   });
@@ -2542,7 +2529,7 @@ describe("Input/output model type", () => {
        
        /** Alias for ExtensibleStringEnum */
        export type ExtensibleStringEnum = string;
-      `
+      `,
       );
       await assertEqualContent(
         outputModelFile?.content!,
@@ -2563,7 +2550,7 @@ describe("Input/output model type", () => {
        
        /** Alias for ExtensibleStringEnumOutput */
        export type ExtensibleStringEnumOutput = string;
-      `
+      `,
       );
     });
   });
@@ -2591,7 +2578,7 @@ describe("Input/output model type", () => {
         export interface ${inputModelName}Output {
           "prop": string;
           "prop1": string;
-        }`
+        }`,
       });
     });
 
@@ -2618,7 +2605,7 @@ describe("Input/output model type", () => {
         "prop": string;
         "prop1": string;
     }
-      `
+      `,
       );
       await assertEqualContent(
         outputModelFile?.content!,
@@ -2626,7 +2613,7 @@ describe("Input/output model type", () => {
       export interface BOutput {
         "prop": string;
     }
-      `
+      `,
       );
     });
 
@@ -2637,7 +2624,7 @@ describe("Input/output model type", () => {
       const inputModelName = "string";
       await verifyPropertyType(tspType, inputModelName, {
         additionalTypeSpecDefinition: tspDefinition,
-        outputType: `${inputModelName}`
+        outputType: `${inputModelName}`,
       });
     });
     it("should generate correct name and properties if A `is` B with template arguments", async () => {
@@ -2665,7 +2652,7 @@ describe("Input/output model type", () => {
         export interface ${inputModelName}Output {
           prop1:string;
           prop2:string;
-        }`
+        }`,
       });
     });
   });
@@ -2701,10 +2688,10 @@ describe("Input/output model type", () => {
         export interface FooModelOutput {
           xJson: number;
           y: string;
-        }`
+        }`,
         },
         false,
-        true
+        true,
       );
     });
 
@@ -2736,10 +2723,10 @@ describe("Input/output model type", () => {
         /** This is a Foo model. */
         export interface FooModelOutput {
           xJson: number;
-        }`
+        }`,
         },
         false,
-        true
+        true,
       );
     });
 
@@ -2770,10 +2757,10 @@ describe("Input/output model type", () => {
         /** This is a Foo model. */
         export interface CustomFriendlyModelOutput {
           x: number;
-        }`
+        }`,
         },
         false,
-        true
+        true,
       );
     });
 
@@ -2802,10 +2789,10 @@ describe("Input/output model type", () => {
         /** This is a Foo model. */
         export interface FooModelOutput {
           x: number;
-        }`
+        }`,
         },
         false,
-        true
+        true,
       );
     });
 
@@ -2814,7 +2801,7 @@ describe("Input/output model type", () => {
         `
         @encodedName("application/json", "testRunOperation")
         op test(): string;
-        `
+        `,
       );
       assert.ok(parameters);
       await assertEqualContent(
@@ -2823,7 +2810,7 @@ describe("Input/output model type", () => {
           import type { RequestParameters } from "@azure-rest/core-client";
           
           export type TestRunOperationParameters =  RequestParameters;
-          `
+          `,
       );
     });
 
@@ -2832,7 +2819,7 @@ describe("Input/output model type", () => {
         `
         @encodedName("application/json", "testRunOperation")
         op test(): string;
-        `
+        `,
       );
       assert.ok(parameters);
       await assertEqualContent(
@@ -2845,7 +2832,7 @@ describe("Input/output model type", () => {
           status: "200";
          body: string;
         }
-          `
+          `,
       );
     });
 
@@ -2856,8 +2843,8 @@ describe("Input/output model type", () => {
         op test(): string;
         `,
         {
-          needTCGC: true
-        }
+          needTCGC: true,
+        },
       );
       assert.ok(parameters);
       await assertEqualContent(
@@ -2870,7 +2857,7 @@ describe("Input/output model type", () => {
           status: "200";
          body: string;
         }
-        `
+        `,
       );
     });
   });
@@ -2891,7 +2878,7 @@ describe("Input/output model type", () => {
         `,
         additionalOutputContent: `
         export interface MyNameIsAOutput {}
-        `
+        `,
       });
     });
 
@@ -2925,7 +2912,7 @@ describe("Input/output model type", () => {
         }
 
         export interface BaseModelOutput {}
-        `
+        `,
       });
     });
 
@@ -3013,7 +3000,7 @@ describe("Input/output model type", () => {
         export interface Templated1Output {
           prop: 1;
         }
-        `
+        `,
       });
     });
   });
@@ -3048,11 +3035,11 @@ describe("Input/output model type", () => {
             /** testing */
             errors?: ErrorResponse;
           }
-          `
+          `,
         },
         true,
         false,
-        `import type { ErrorResponse } from "@azure-rest/core-client"`
+        `import type { ErrorResponse } from "@azure-rest/core-client"`,
       );
     });
 
@@ -3089,8 +3076,8 @@ describe("Input/output model type", () => {
           needTCGC: true,
           withRawContent: true,
           mustEmptyDiagnostic: true,
-          enableModelNamespace: true
-        }
+          enableModelNamespace: true,
+        },
       );
       assert.ok(schemaOutput);
       const { inputModelFile } = schemaOutput!;
@@ -3104,7 +3091,7 @@ describe("Input/output model type", () => {
           /** testing */
           "errors"?: Array<ErrorResponse>;
         }
-     `
+     `,
       );
     });
 
@@ -3137,11 +3124,11 @@ describe("Input/output model type", () => {
             /** testing */
             errors?: InnerError;
           }
-          `
+          `,
         },
         true,
         false,
-        `import type { InnerError } from "@azure-rest/core-client"`
+        `import type { InnerError } from "@azure-rest/core-client"`,
       );
     });
 
@@ -3174,11 +3161,11 @@ describe("Input/output model type", () => {
             /** testing */
             errors?: ErrorModel;
           }
-          `
+          `,
         },
         true,
         false,
-        `import type { ErrorModel } from "@azure-rest/core-client"`
+        `import type { ErrorModel } from "@azure-rest/core-client"`,
       );
     });
 
@@ -3211,11 +3198,11 @@ describe("Input/output model type", () => {
             /** testing */
             errors?: Array<ErrorModel>;
           }
-          `
+          `,
         },
         true,
         false,
-        `import type { ErrorModel } from "@azure-rest/core-client"`
+        `import type { ErrorModel } from "@azure-rest/core-client"`,
       );
     });
 
@@ -3248,11 +3235,11 @@ describe("Input/output model type", () => {
             /** testing */
             errors?: Record<string, ErrorModel>
           }
-          `
+          `,
         },
         true,
         false,
-        `import type { ErrorModel } from "@azure-rest/core-client"`
+        `import type { ErrorModel } from "@azure-rest/core-client"`,
       );
     });
   });
@@ -3391,7 +3378,7 @@ describe("Input/output model type", () => {
       const schemaOutput = await emitModelsFromTypeSpec(tspDefinition, {
         needAzureCore: true,
         needTCGC: true,
-        withRawContent: true
+        withRawContent: true,
       });
       assert.ok(schemaOutput);
       const { inputModelFile, outputModelFile } = schemaOutput!;
@@ -3427,7 +3414,7 @@ describe("Input/output model type", () => {
           | LogAnalyticsDataConnectionData
           | AzureDataExplorerDataConnectionData;
         `,
-        true
+        true,
       );
 
       assert.strictEqual(outputModelFile?.path, "outputModels.ts");
@@ -3440,7 +3427,7 @@ describe("Input/output model type", () => {
           error?: ErrorModel;
         }
         `,
-        true
+        true,
       );
     });
 
@@ -3579,7 +3566,7 @@ describe("Input/output model type", () => {
       const schemaOutput = await emitModelsFromTypeSpec(tspDefinition, {
         needAzureCore: true,
         needTCGC: true,
-        withRawContent: true
+        withRawContent: true,
       });
       assert.ok(schemaOutput);
       const { inputModelFile, outputModelFile } = schemaOutput!;
@@ -3615,7 +3602,7 @@ describe("Input/output model type", () => {
           | LogAnalyticsDataConnectionData
           | AzureDataExplorerDataConnectionData;
         `,
-        true
+        true,
       );
 
       assert.strictEqual(outputModelFile?.path, "outputModels.ts");
@@ -3664,7 +3651,7 @@ describe("Input/output model type", () => {
           | LogAnalyticsDataConnectionOutput
           | AzureDataExplorerDataConnectionOutput;
         `,
-        true
+        true,
       );
     });
   });
@@ -3696,7 +3683,7 @@ describe("Input/output model type", () => {
       ): NoContentResponse;
       `;
       const schemaOutput = await emitModelsFromTypeSpec(tspDefinition, {
-        withRawContent: true
+        withRawContent: true,
       });
       assert.ok(schemaOutput);
       const { inputModelFile, outputModelFile } = schemaOutput!;
@@ -3712,7 +3699,7 @@ describe("Input/output model type", () => {
           | "application/json; serialization=json"
           | "text/plain; charset=utf-8"
           | "text/vnd.ms.protobuf";
-        `
+        `,
       );
     });
 
@@ -3742,7 +3729,7 @@ describe("Input/output model type", () => {
       ): { @header("test-header") testHeader: SchemaContentTypeValues; @statusCode _: 204; };
       `;
       const schemaOutput = await emitModelsFromTypeSpec(tspDefinition, {
-        withRawContent: true
+        withRawContent: true,
       });
       assert.ok(schemaOutput);
       const { inputModelFile, outputModelFile } = schemaOutput!;
@@ -3759,7 +3746,7 @@ describe("Input/output model type", () => {
           | "application/json; serialization=json"
           | "text/plain; charset=utf-8"
           | "text/vnd.ms.protobuf";
-        `
+        `,
       );
       await assertEqualContent(
         outputModelFile?.content!,
@@ -3770,11 +3757,11 @@ describe("Input/output model type", () => {
           | "application/json; serialization=json"
           | "text/plain; charset=utf-8"
           | "text/vnd.ms.protobuf";
-        `
+        `,
       );
 
       const paramOutput = await emitParameterFromTypeSpec(tspDefinition, {
-        withRawContent: true
+        withRawContent: true,
       });
       assert.ok(paramOutput);
       assert.strictEqual(paramOutput?.path, "parameters.ts");
@@ -3798,10 +3785,10 @@ describe("Input/output model type", () => {
         }
         
         export type GetParameters = GetHeaderParam & GetBodyParam & RequestParameters;
-        `
+        `,
       );
       const responseOutput = await emitResponsesFromTypeSpec(tspDefinition, {
-        withRawContent: true
+        withRawContent: true,
       });
       assert.ok(responseOutput);
       assert.strictEqual(responseOutput?.path, "responses.ts");
@@ -3821,7 +3808,7 @@ describe("Input/output model type", () => {
           status: "204";
           headers: RawHttpHeaders & Get204Headers;
         }
-        `
+        `,
       );
     });
 
@@ -3868,7 +3855,7 @@ describe("Input/output model type", () => {
       ): { @body body: EnumBody; @statusCode _: 204; };
       `;
       const schemaOutput = await emitModelsFromTypeSpec(tspDefinition, {
-        withRawContent: true
+        withRawContent: true,
       });
       assert.ok(schemaOutput);
       const { inputModelFile, outputModelFile } = schemaOutput!;
@@ -3893,7 +3880,7 @@ describe("Input/output model type", () => {
          export type EnumNumber = number;
          /** Alias for EnumBoolean */
          export type EnumBoolean = true | false | boolean;
-        `
+        `,
       );
       await assertEqualContent(
         outputModelFile?.content!,
@@ -3912,11 +3899,11 @@ describe("Input/output model type", () => {
          export type EnumNumberOutput = number;
          /** Alias for EnumBooleanOutput */
          export type EnumBooleanOutput = true | false | boolean;
-        `
+        `,
       );
 
       const paramOutput = await emitParameterFromTypeSpec(tspDefinition, {
-        withRawContent: true
+        withRawContent: true,
       });
       assert.ok(paramOutput);
       assert.strictEqual(paramOutput?.path, "parameters.ts");
@@ -3931,10 +3918,10 @@ describe("Input/output model type", () => {
         }
         
         export type GetParameters = GetBodyParam & RequestParameters;
-        `
+        `,
       );
       const responseOutput = await emitResponsesFromTypeSpec(tspDefinition, {
-        withRawContent: true
+        withRawContent: true,
       });
       assert.ok(responseOutput);
       assert.strictEqual(responseOutput?.path, "responses.ts");
@@ -3949,7 +3936,7 @@ describe("Input/output model type", () => {
           status: "204";
           body: EnumBodyOutput;
         }
-        `
+        `,
       );
     });
 
@@ -3972,14 +3959,14 @@ describe("Input/output model type", () => {
       ): { @header("test-header") testHeader: "A" | "B"; @statusCode _: 204; };
       `;
       const schemaOutput = await emitModelsFromTypeSpec(tspDefinition, {
-        withRawContent: true
+        withRawContent: true,
       });
       assert.ok(schemaOutput);
       const { inputModelFile, outputModelFile } = schemaOutput!;
       assert.isUndefined(inputModelFile);
       assert.isUndefined(outputModelFile);
       const paramOutput = await emitParameterFromTypeSpec(tspDefinition, {
-        withRawContent: true
+        withRawContent: true,
       });
       assert.ok(paramOutput);
       assert.strictEqual(paramOutput?.path, "parameters.ts");
@@ -4002,10 +3989,10 @@ describe("Input/output model type", () => {
         }
         
         export type GetParameters = GetHeaderParam & GetBodyParam & RequestParameters;
-        `
+        `,
       );
       const responseOutput = await emitResponsesFromTypeSpec(tspDefinition, {
-        withRawContent: true
+        withRawContent: true,
       });
       assert.ok(responseOutput);
       assert.strictEqual(responseOutput?.path, "responses.ts");
@@ -4024,7 +4011,7 @@ describe("Input/output model type", () => {
           status: "204";
           headers: RawHttpHeaders & Get204Headers;
         }
-        `
+        `,
       );
     });
 
@@ -4054,7 +4041,7 @@ describe("Input/output model type", () => {
       ): NoContentResponse;
       `;
       const schemaOutput = await emitModelsFromTypeSpec(tspDefinition, {
-        withRawContent: true
+        withRawContent: true,
       });
       assert.ok(schemaOutput);
       const { inputModelFile, outputModelFile } = schemaOutput!;
@@ -4063,7 +4050,7 @@ describe("Input/output model type", () => {
         `
       /** Alias for SchemaContentTypeValues */
       export type SchemaContentTypeValues = "application/json; serialization=Avro" | "application/json; serialization=json" | "text/plain; charset=utf-8" | "text/vnd.ms.protobuf";
-      `
+      `,
       );
       assert.isUndefined(outputModelFile);
     });
@@ -4097,7 +4084,7 @@ describe("Input/output model type", () => {
       `;
       const schemaOutput = await emitModelsFromTypeSpec(tspDefinition, {
         needAzureCore: true,
-        withRawContent: true
+        withRawContent: true,
       });
       assert.ok(schemaOutput);
       const { inputModelFile, outputModelFile } = schemaOutput!;
@@ -4106,11 +4093,11 @@ describe("Input/output model type", () => {
         `
       /** Alias for SchemaContentTypeValues */
       export type SchemaContentTypeValues = "application/json; serialization=Avro" | "application/json; serialization=json" | "text/plain; charset=utf-8" | "text/vnd.ms.protobuf";
-      `
+      `,
       );
       assert.isUndefined(outputModelFile);
       const paramOutput = await emitParameterFromTypeSpec(tspDefinition, {
-        withRawContent: true
+        withRawContent: true,
       });
       assert.ok(paramOutput);
       assert.strictEqual(paramOutput?.path, "parameters.ts");
@@ -4134,7 +4121,7 @@ describe("Input/output model type", () => {
         }
         
         export type GetParameters = GetHeaderParam & GetBodyParam & RequestParameters;
-        `
+        `,
       );
     });
 
@@ -4167,7 +4154,7 @@ describe("Input/output model type", () => {
       `;
       const schemaOutput = await emitModelsFromTypeSpec(tspDefinition, {
         needAzureCore: true,
-        withRawContent: true
+        withRawContent: true,
       });
       assert.ok(schemaOutput);
       const { inputModelFile, outputModelFile } = schemaOutput!;
@@ -4176,11 +4163,11 @@ describe("Input/output model type", () => {
         `
         /** Alias for EnumTest */
         export type EnumTest = 1 | 2 | 3 | 4;
-        `
+        `,
       );
       assert.isUndefined(outputModelFile);
       const paramOutput = await emitParameterFromTypeSpec(tspDefinition, {
-        withRawContent: true
+        withRawContent: true,
       });
       assert.ok(paramOutput);
       assert.strictEqual(paramOutput?.path, "parameters.ts");
@@ -4204,7 +4191,7 @@ describe("Input/output model type", () => {
         }
         
         export type GetParameters = GetHeaderParam & GetBodyParam & RequestParameters;
-        `
+        `,
       );
     });
 
@@ -4236,24 +4223,21 @@ describe("Input/output model type", () => {
         `;
 
         const schemaOutput = await emitModelsFromTypeSpec(tspContent, {
-          withRawContent: true
+          withRawContent: true,
         });
         assert.ok(schemaOutput);
         const { inputModelFile, outputModelFile } = schemaOutput!;
         assert.ok(inputModelFile);
         assert.isUndefined(outputModelFile);
         const paramOutput = await emitParameterFromTypeSpec(tspContent, {
-          withRawContent: true
+          withRawContent: true,
         });
         assert.ok(paramOutput);
         assert.fail("Should throw diagnostic warnings");
       } catch (e) {
         const diagnostics = e as Diagnostic[];
         assert.equal(diagnostics.length, 1);
-        assert.equal(
-          diagnostics[0]?.code,
-          "@azure-tools/typespec-ts/unable-serialized-type"
-        );
+        assert.equal(diagnostics[0]?.code, "@azure-tools/typespec-ts/unable-serialized-type");
         assert.equal(diagnostics[0]?.severity, "warning");
       }
     });

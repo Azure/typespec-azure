@@ -25,15 +25,12 @@ using Azure.Core.Traits;
     client: ClientType = ClientType.Default,
   }
 )
-@service(#{
-  title: "MultiClient"
-})
+@service(#{ title: "MultiClient" })
 @versioned(Client.Structure.Service.Versions)
 namespace Client.Structure.Service;
 
 enum Versions {
   /** Version 2022-08-31 */
-  
   `2022-08-30`,
 }
 
@@ -125,15 +122,12 @@ using Azure.Core.Traits;
     client: ClientType = ClientType.Default,
   }
 )
-@service(#{
-  title: "MultiClient"
-})
+@service(#{ title: "MultiClient" })
 @versioned(Client.Structure.Service.Versions)
 namespace Client.Structure.Service;
 
 enum Versions {
   /** Version 2022-08-31 */
-  
   `2022-08-30`,
 }
 
@@ -225,15 +219,12 @@ using Azure.Core.Traits;
     client: ClientType = ClientType.Default,
   }
 )
-@service(#{
-  title: "MultiClient"
-})
+@service(#{ title: "MultiClient" })
 @versioned(Client.Structure.Service.Versions)
 namespace Client.Structure.Service;
 
 enum Versions {
   /** Version 2022-08-31 */
-  
   `2022-08-30`,
 }
 

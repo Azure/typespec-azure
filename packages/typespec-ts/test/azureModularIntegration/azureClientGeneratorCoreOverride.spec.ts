@@ -1,4 +1,4 @@
-import { describe, it, beforeEach } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 
 import { OverrideClient } from "./generated/azure/client-generator-core/override/src/index.js";
 
@@ -8,7 +8,7 @@ describe("Azure ClientGeneratorCore Override Client", () => {
   beforeEach(() => {
     client = new OverrideClient({
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
@@ -34,7 +34,7 @@ describe("Azure ClientGeneratorCore Override Client", () => {
     // Test parameter removal with @override decorator
     // Verifies that optional parameters can be removed via @override
     await client.removeOptionalParameter.removeOptional("param1", {
-      param2: "param2"
+      param2: "param2",
     });
   });
 });

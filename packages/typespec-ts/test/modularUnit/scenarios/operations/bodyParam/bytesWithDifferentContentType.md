@@ -1,4 +1,4 @@
-# bytes response with */* content type should be treated as binary
+# bytes response with _/_ content type should be treated as binary
 
 When a response has `*/*` content type and a `bytes` body, `isBinaryPayload` should return
 `true` so the response is deserialized as `Uint8Array` (binary) rather than `string` (base64).
@@ -7,13 +7,12 @@ The request body type is unrelated to this scenario and is intentionally kept si
 ## TypeSpec
 
 ```tsp
-@post op uploadFile(
-  @body body: string
-): {
-  @header contentType: "*/*",
-  @body body: bytes
+@post op uploadFile(@body body: string): {
+  @header contentType: "*/*";
+  @body body: bytes;
 };
 ```
+
 ```yaml
 wrap-non-model-return: true
 ```
@@ -37,14 +36,12 @@ export function _uploadFileSend(
   body: string,
   options: UploadFileOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "text/plain",
-      headers: { accept: "*/*", ...options.requestOptions?.headers },
-      body: body,
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "text/plain",
+    headers: { accept: "*/*", ...options.requestOptions?.headers },
+    body: body,
+  });
 }
 
 export async function _uploadFileDeserialize(
@@ -100,15 +97,15 @@ return `true` so the response is deserialized as `Uint8Array` (binary) rather th
 ## TypeSpec
 
 ```tsp
-@post op uploadFile(
-  @body body: bytes
-): {
-  @header contentType: "application/xml",
-  @body 
+@post op uploadFile(@body body: bytes): {
+  @header contentType: "application/xml";
+
+  @body
   @encode("bytes")
-  body: bytes
+  body: bytes;
 };
 ```
+
 ```yaml
 wrap-non-model-return: true
 ```
@@ -132,14 +129,12 @@ export function _uploadFileSend(
   body: Uint8Array,
   options: UploadFileOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/octet-stream",
-      headers: { accept: "application/xml", ...options.requestOptions?.headers },
-      body: body,
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/octet-stream",
+    headers: { accept: "application/xml", ...options.requestOptions?.headers },
+    body: body,
+  });
 }
 
 export async function _uploadFileDeserialize(
@@ -196,15 +191,15 @@ content type is not `text/plain`, the payload is treated as binary.
 ## TypeSpec
 
 ```tsp
-@post op uploadFile(
-  @body body: bytes
-): {
-  @header contentType: "application/json",
+@post op uploadFile(@body body: bytes): {
+  @header contentType: "application/json";
+
   @body
   @encode("bytes")
-  body: bytes
+  body: bytes;
 };
 ```
+
 ```yaml
 wrap-non-model-return: true
 ```
@@ -228,14 +223,12 @@ export function _uploadFileSend(
   body: Uint8Array,
   options: UploadFileOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/octet-stream",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: body,
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/octet-stream",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: body,
+  });
 }
 
 export async function _uploadFileDeserialize(
@@ -292,15 +285,15 @@ is returned as a plain body property rather than a binary stream.
 ## TypeSpec
 
 ```tsp
-@post op uploadFile(
-  @body body: bytes
-): {
-  @header contentType: "text/plain",
+@post op uploadFile(@body body: bytes): {
+  @header contentType: "text/plain";
+
   @body
   @encode("bytes")
-  body: bytes
+  body: bytes;
 };
 ```
+
 ```yaml
 wrap-non-model-return: true
 ```
@@ -324,14 +317,12 @@ export function _uploadFileSend(
   body: Uint8Array,
   options: UploadFileOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/octet-stream",
-      headers: { accept: "text/plain", ...options.requestOptions?.headers },
-      body: body,
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/octet-stream",
+    headers: { accept: "text/plain", ...options.requestOptions?.headers },
+    body: body,
+  });
 }
 
 export async function _uploadFileDeserialize(
@@ -387,13 +378,12 @@ When a response has `application/json` content type and a plain `bytes` body (no
 ## TypeSpec
 
 ```tsp
-@post op uploadFile(
-  @body body: bytes
-): {
-  @header contentType: "application/json",
-  @body body: bytes
+@post op uploadFile(@body body: bytes): {
+  @header contentType: "application/json";
+  @body body: bytes;
 };
 ```
+
 ```yaml
 wrap-non-model-return: true
 ```
@@ -417,14 +407,12 @@ export function _uploadFileSend(
   body: Uint8Array,
   options: UploadFileOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/octet-stream",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: body,
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/octet-stream",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: body,
+  });
 }
 
 export async function _uploadFileDeserialize(
@@ -466,9 +454,10 @@ When a request body has `application/json` content type and `@encode("bytes")` o
 ```tsp
 @post op uploadFile(
   @header contentType: "application/json",
+
   @body
   @encode("bytes")
-  body: bytes
+  body: bytes,
 ): void;
 ```
 
@@ -489,13 +478,11 @@ export function _uploadFileSend(
   body: Uint8Array,
   options: UploadFileOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      body: body,
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    body: body,
+  });
 }
 
 export async function _uploadFileDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -528,9 +515,10 @@ When a request body has `text/plain` content type and `@encode("bytes")` on byte
 ```tsp
 @post op uploadFile(
   @header contentType: "text/plain",
+
   @body
   @encode("bytes")
-  body: bytes
+  body: bytes,
 ): void;
 ```
 
@@ -551,13 +539,11 @@ export function _uploadFileSend(
   body: Uint8Array,
   options: UploadFileOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "text/plain",
-      body: body,
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "text/plain",
+    body: body,
+  });
 }
 
 export async function _uploadFileDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -587,10 +573,7 @@ When a request body has `application/json` content type and plain `bytes` (no `@
 ## TypeSpec
 
 ```tsp
-@post op uploadFile(
-  @header contentType: "application/json",
-  @body body: bytes
-): void;
+@post op uploadFile(@header contentType: "application/json", @body body: bytes): void;
 ```
 
 ## Operations
@@ -611,13 +594,11 @@ export function _uploadFileSend(
   body: Uint8Array,
   options: UploadFileOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      body: uint8ArrayToString(body, "base64"),
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    body: uint8ArrayToString(body, "base64"),
+  });
 }
 
 export async function _uploadFileDeserialize(result: PathUncheckedResponse): Promise<void> {

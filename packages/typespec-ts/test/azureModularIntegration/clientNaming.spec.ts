@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { NamingClient } from "./generated/client/naming/src/index.js";
 describe("NameAndEncodedName Client", () => {
@@ -7,7 +7,7 @@ describe("NameAndEncodedName Client", () => {
   beforeEach(() => {
     client = new NamingClient({
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
@@ -21,7 +21,7 @@ describe("NameAndEncodedName Client", () => {
 
   it("should work with property compatibleWithEncodedName", async () => {
     await client.property.compatibleWithEncodedName({
-      clientName: true
+      clientName: true,
     });
   });
 
@@ -41,7 +41,7 @@ describe("NameAndEncodedName Client", () => {
     await client.header.response({
       onResponse: function (res) {
         assert.strictEqual(res.headers.get("default-name"), "true");
-      }
+      },
     });
   });
 
@@ -55,13 +55,13 @@ describe("NameAndEncodedName Client", () => {
 
   it("should work union enum name", async () => {
     await client.unionEnum.unionEnumName("value1", {
-      requestOptions: { headers: { "content-type": "text/plain" } }
+      requestOptions: { headers: { "content-type": "text/plain" } },
     });
   });
 
   it("should work with union enum member name", async () => {
     await client.unionEnum.unionEnumMemberName("value1", {
-      requestOptions: { headers: { "content-type": "text/plain" } }
+      requestOptions: { headers: { "content-type": "text/plain" } },
     });
   });
 });

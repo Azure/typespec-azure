@@ -1,9 +1,6 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
-import {
-  PageableClient,
-  User
-} from "./generated/azure/payload/pageable/src/index.js";
+import { PageableClient, User } from "./generated/azure/payload/pageable/src/index.js";
 
 describe("Azure PageableClient Classical Client", () => {
   let client: PageableClient;
@@ -11,7 +8,7 @@ describe("Azure PageableClient Classical Client", () => {
   beforeEach(() => {
     client = new PageableClient({
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
@@ -25,16 +22,13 @@ describe("Azure PageableClient Classical Client", () => {
       assert.fail("Should throw exception");
     } catch (err: any) {
       assert.isNotNull(err);
-      assert.strictEqual(
-        err.message,
-        "Pagination failed with unexpected statusCode 400"
-      );
+      assert.strictEqual(err.message, "Pagination failed with unexpected statusCode 400");
     }
   });
 
   it("should list all users if maxpagesize=3", async () => {
     const iter = client.list({
-      maxpagesize: 3
+      maxpagesize: 3,
     });
     const items = [];
     for await (const user of iter) {
@@ -45,7 +39,7 @@ describe("Azure PageableClient Classical Client", () => {
 
   it("should list all users byPage", async () => {
     const iter = client.list({
-      maxpagesize: 3
+      maxpagesize: 3,
     });
     const items: User[] = [];
     for await (const user of iter.byPage()) {
@@ -56,7 +50,7 @@ describe("Azure PageableClient Classical Client", () => {
 
   it("should list left users byPage if continuationToken is set", async () => {
     const iter = client.list({
-      maxpagesize: 3
+      maxpagesize: 3,
     });
     /**
      * two pages:
@@ -70,7 +64,7 @@ describe("Azure PageableClient Classical Client", () => {
     const continuationToken = firstPage.value.continuationToken;
     assert.strictEqual(
       continuationToken,
-      "http://localhost:3002/azure/payload/pageable?skipToken=name-user7&maxpagesize=3"
+      "http://localhost:3002/azure/payload/pageable?skipToken=name-user7&maxpagesize=3",
     );
     const items: User[] = [];
     for await (const pagedUsers of iter.byPage({ continuationToken })) {
@@ -80,9 +74,7 @@ describe("Azure PageableClient Classical Client", () => {
   });
 
   it("maxPageSize param should be ignored", async () => {
-    const pagedIter = client
-      .list({ maxpagesize: 3 })
-      .byPage({ maxPageSize: 10 } as any);
+    const pagedIter = client.list({ maxpagesize: 3 }).byPage({ maxPageSize: 10 } as any);
     const items: User[] = (await pagedIter.next()).value;
     assert.strictEqual(items.length, 3);
   });

@@ -13,9 +13,7 @@ using TypeSpec.Http;
 using TypeSpec.Versioning;
 using Azure.ClientGenerator.Core;
 
-@service(#{
-  title: "Microsoft.Contoso management service",
-})
+@service(#{ title: "Microsoft.Contoso management service" })
 @versioned(Microsoft.Contoso.Versions)
 namespace Microsoft.Contoso;
 
@@ -30,8 +28,10 @@ union ExtensibleString {
   _pascal_case7: "_pascal_case7",
   `pascal, case8`: "pascal, case8",
   MAX_of_MLD: "MAX_of_MLD",
+
   // we will keep the upper case
   YES_OR_NO1: "YES OR NO",
+
   YES_OR_NO2: "YES OR NO",
   VALIDATION_SUCCESS: "VALIDATION_SUCCESS",
   ___pascal____case6666: "___pascal____case6666",
@@ -52,11 +52,10 @@ union ExtensibleNumber {
   int8,
 }
 
-
 enum Versions {
   PreviewVersion: "2024-07-01-preview",
   `2024-07-01`,
-  `2024-08-01-preview`
+  `2024-08-01-preview`,
 }
 
 model Foo {
@@ -66,7 +65,7 @@ model Foo {
 op post(@body body: Foo): void;
 @@clientName(ExtensibleString.`-2.0`, "$DO_NOT_NORMALIZE$Item-1.0");
 @@clientName(ExtensibleString.`20`, "$DO_NOT_NORMALIZE$_20");
-@@clientName(ExtensibleString.`YES_OR_NO2`, "Yes_Or_No2");
+@@clientName(ExtensibleString.YES_OR_NO2, "Yes_Or_No2");
 @@clientName(Versions.`2024-07-01`, "StableVersion");
 ```
 

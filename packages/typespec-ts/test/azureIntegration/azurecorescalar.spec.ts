@@ -1,14 +1,14 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import AzureCoreScalarClientFactory, {
-  AzureCoreScalarClient
+  AzureCoreScalarClient,
 } from "./generated/azure/core/scalar/src/index.js";
 describe("Azure Core Saclar Rest Client", () => {
   let client: AzureCoreScalarClient;
 
   beforeEach(() => {
     client = AzureCoreScalarClientFactory({
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
@@ -21,7 +21,7 @@ describe("Azure Core Saclar Rest Client", () => {
   it("should put an Azure Location value", async () => {
     const result = await client.path("/azure/core/scalar/azureLocation").put({
       contentType: "application/json",
-      body: "eastus"
+      body: "eastus",
     });
     assert.strictEqual(result.status, "204");
   });
@@ -29,7 +29,7 @@ describe("Azure Core Saclar Rest Client", () => {
   it("should post an Azure Location value", async () => {
     const result = await client.path("/azure/core/scalar/azureLocation").post({
       contentType: "application/json",
-      body: { location: "eastus" }
+      body: { location: "eastus" },
     });
     assert.strictEqual(result.status, "200");
     assert.deepEqual(result.body, { location: "eastus" });

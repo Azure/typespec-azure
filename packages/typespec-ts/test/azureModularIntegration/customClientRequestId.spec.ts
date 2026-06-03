@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { PipelinePolicy } from "@azure/core-rest-pipeline";
 import { XmsClientRequestIdClient } from "./generated/azure/special-headers/client-request-id/src/index.js";
@@ -8,7 +8,7 @@ describe("XmsRequestIdClient Classical Client", () => {
   beforeEach(() => {
     client = new XmsClientRequestIdClient({
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
@@ -22,9 +22,9 @@ describe("XmsRequestIdClient Classical Client", () => {
     const result = await client.get({
       requestOptions: {
         headers: {
-          "x-ms-client-request-id": overrideId
-        }
-      }
+          "x-ms-client-request-id": overrideId,
+        },
+      },
     });
     assert.isUndefined(result);
     const checkClientRequestIdPolicy: PipelinePolicy = {
@@ -32,7 +32,7 @@ describe("XmsRequestIdClient Classical Client", () => {
         assert.equal(overrideId, req.headers.get("x-ms-client-request-id"));
         return next(req);
       },
-      name: "preventCachingPolicy"
+      name: "preventCachingPolicy",
     };
     client = new XmsClientRequestIdClient({
       allowInsecureConnection: true,
@@ -40,9 +40,9 @@ describe("XmsRequestIdClient Classical Client", () => {
       additionalPolicies: [
         {
           policy: checkClientRequestIdPolicy,
-          position: "perCall"
-        }
-      ]
+          position: "perCall",
+        },
+      ],
     });
   });
 
@@ -51,8 +51,8 @@ describe("XmsRequestIdClient Classical Client", () => {
       client = new XmsClientRequestIdClient({
         allowInsecureConnection: true,
         telemetryOptions: {
-          clientRequestIdHeaderName: "x-test-request-id"
-        }
+          clientRequestIdHeaderName: "x-test-request-id",
+        },
       });
       await client.get();
       assert.fail("should throw exceptions");

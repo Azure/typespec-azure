@@ -1,7 +1,7 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import AzureCoreModelClientFactory, {
-  AzureCoreModelClient
+  AzureCoreModelClient,
 } from "./generated/azure/core/model/src/index.js";
 describe("Azure Core Traits Rest Client", () => {
   let client: AzureCoreModelClient;
@@ -10,8 +10,8 @@ describe("Azure Core Traits Rest Client", () => {
     client = AzureCoreModelClientFactory({
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
-      }
+        maxRetries: 0,
+      },
     });
   });
 

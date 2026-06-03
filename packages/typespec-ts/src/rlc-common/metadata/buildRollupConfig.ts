@@ -2,23 +2,20 @@
 // Licensed under the MIT License.
 
 import { Project } from "ts-morph";
-import { RLCModel } from "../interfaces.js";
 import { isAzurePackage } from "../helpers/packageUtil.js";
+import { RLCModel } from "../interfaces.js";
 
 export function buildRollupConfig(model: RLCModel) {
   const azureSdkForJs = Boolean(model.options?.azureSdkForJs);
   // Only generate the file when it is not in sdk repo
-  if (
-    isAzurePackage(model) &&
-    (azureSdkForJs === true || azureSdkForJs === undefined)
-  ) {
+  if (isAzurePackage(model) && (azureSdkForJs === true || azureSdkForJs === undefined)) {
     return;
   }
 
   const project = new Project();
   const filePath = "rollup.config.js";
   const rollupFile = project.createSourceFile(filePath, undefined, {
-    overwrite: true
+    overwrite: true,
   });
 
   rollupFile.addStatements(
@@ -140,11 +137,11 @@ export function buildRollupConfig(model: RLCModel) {
       return config;
     }
     
-    export default makeConfig(require("./package.json"));`
+    export default makeConfig(require("./package.json"));`,
   );
 
   return {
     path: filePath,
-    content: rollupFile.getFullText()
+    content: rollupFile.getFullText(),
   };
 }

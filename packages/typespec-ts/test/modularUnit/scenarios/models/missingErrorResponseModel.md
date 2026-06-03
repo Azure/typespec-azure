@@ -21,8 +21,10 @@ using Azure.Core.Foundations;
     {
       @doc("implicit flow")
       type: OAuth2FlowType.implicit,
+
       @doc("the authorization URL")
       authorizationUrl: "https://login.microsoftonline.com/common/oauth2/authorize",
+
       @doc("list of scopes for the credential")
       scopes: ["https://example.com/.default"],
     }
@@ -49,7 +51,6 @@ enum Versions {
 @doc("Response for the asset chain summary.")
 @Versioning.added(Versions.v2023_03_01_preview)
 model AssetChainSummaryResult {
-
   errors?: ErrorResponse[];
 }
 
@@ -114,12 +115,10 @@ export function _getAssetChainSummarySend(
   context: Client,
   options: GetAssetChainSummaryOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/assetChainSummary")
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-    });
+  return context.path("/assetChainSummary").get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _getAssetChainSummaryDeserialize(

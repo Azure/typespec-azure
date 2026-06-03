@@ -5,9 +5,7 @@ import "./test.tsp";
 
 using TypeSpec.Rest;
 using TypeSpec.Http;
-@service(#{
-  title: "OverloadTest",
-})
+@service(#{ title: "OverloadTest" })
 @server(
   "{$host}",
   "Play with overload cases.",

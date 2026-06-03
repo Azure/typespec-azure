@@ -12,34 +12,25 @@ export function getResponseTypeName(baseResponseName: string): string;
 export function getResponseTypeName(
   operationGroup: string,
   operationName: string,
-  statusCode: string
+  statusCode: string,
 ): string;
 export function getResponseTypeName(
   baseNameOrOperationGroup: string,
   operationName?: string,
-  statusCode?: string
+  statusCode?: string,
 ): string {
   if (operationName) {
     baseNameOrOperationGroup = getResponseBaseName(
       baseNameOrOperationGroup,
       operationName!,
-      statusCode || ""
+      statusCode || "",
     );
   }
-  return normalizeName(
-    `${baseNameOrOperationGroup}Response`,
-    NameType.Interface
-  );
+  return normalizeName(`${baseNameOrOperationGroup}Response`, NameType.Interface);
 }
 
-export function getLroLogicalResponseName(
-  operationGroup: string,
-  operationName: string
-) {
-  return normalizeName(
-    `${operationGroup}_${operationName}_Logical_Response`,
-    NameType.Interface
-  );
+export function getLroLogicalResponseName(operationGroup: string, operationName: string) {
+  return normalizeName(`${operationGroup}_${operationName}_Logical_Response`, NameType.Interface);
 }
 
 /**
@@ -52,15 +43,11 @@ export function getLroLogicalResponseName(
 export function getResponseBaseName(
   operationGroup: string,
   operationName: string,
-  statusCode: string
+  statusCode: string,
 ) {
   return normalizeName(
-    `${operationGroup}_${normalizeName(
-      operationName,
-      NameType.Interface,
-      true
-    )}_${statusCode}`,
-    NameType.Interface
+    `${operationGroup}_${normalizeName(operationName, NameType.Interface, true)}_${statusCode}`,
+    NameType.Interface,
   );
 }
 
@@ -69,14 +56,8 @@ export function getResponseBaseName(
  * @param operationName is composed with operationGroup and operationID e.g string_PutEmpty
  * @returns
  */
-export function getParameterBaseName(
-  operationGroup: string,
-  operationName: string
-) {
-  return normalizeName(
-    `${operationGroup}_${operationName}`,
-    NameType.Interface
-  );
+export function getParameterBaseName(operationGroup: string, operationName: string) {
+  return normalizeName(`${operationGroup}_${operationName}`, NameType.Interface);
 }
 
 /**
@@ -86,25 +67,13 @@ export function getParameterBaseName(
  * @returns top-layer parameter name e.g StringPutEmptParameters
  */
 export function getParameterTypeName(baseName: string): string;
-export function getParameterTypeName(
-  operationGroup: string,
-  operationName: string
-): string;
-export function getParameterTypeName(
-  baseNameOrOperationGroup: string,
-  operationName?: string
-) {
+export function getParameterTypeName(operationGroup: string, operationName: string): string;
+export function getParameterTypeName(baseNameOrOperationGroup: string, operationName?: string) {
   if (operationName) {
-    baseNameOrOperationGroup = getParameterBaseName(
-      baseNameOrOperationGroup,
-      operationName!
-    );
+    baseNameOrOperationGroup = getParameterBaseName(baseNameOrOperationGroup, operationName!);
   }
 
-  return normalizeName(
-    `${baseNameOrOperationGroup}_Parameters`,
-    NameType.Interface
-  );
+  return normalizeName(`${baseNameOrOperationGroup}_Parameters`, NameType.Interface);
 }
 
 export interface ModuleName {
@@ -137,8 +106,5 @@ export function getMultipartPartTypeName(schemaName: string, partName: string) {
   const name = normalizeName(partName, NameType.Interface);
   const bodyParamName = normalizeName(schemaName, NameType.Interface);
 
-  return normalizeName(
-    `${bodyParamName}_${name}_PartDescriptor`,
-    NameType.Interface
-  );
+  return normalizeName(`${bodyParamName}_${name}_PartDescriptor`, NameType.Interface);
 }

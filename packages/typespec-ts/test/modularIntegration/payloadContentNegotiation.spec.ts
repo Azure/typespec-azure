@@ -1,10 +1,10 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { uint8ArrayToString } from "@azure/core-util";
 import { ContentNegotiationClient } from "./generated/payload/content-negotiation/src/index.js";
 
-import { readFileSync } from "fs";
 import { resolvePath } from "@typespec/compiler";
+import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 
 const root = resolvePath(fileURLToPath(import.meta.url), "../../../temp");
@@ -17,7 +17,7 @@ describe("Payload Content Negotiation Client", () => {
   beforeEach(() => {
     client = new ContentNegotiationClient({
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
@@ -28,10 +28,7 @@ describe("Payload Content Negotiation Client", () => {
 
   it("should get image/jpeg for same body in content negotiation", async () => {
     const result = await client.sameBody.getAvatarAsJpeg();
-    assert.strictEqual(
-      uint8ArrayToString(result, "utf-8"),
-      jpegImage.toString()
-    );
+    assert.strictEqual(uint8ArrayToString(result, "utf-8"), jpegImage.toString());
   });
 
   it("should get image/png for different body in content negotiation", async () => {
@@ -41,9 +38,6 @@ describe("Payload Content Negotiation Client", () => {
 
   it("should get application/json for different body in content negotiation", async () => {
     const result = await client.differentBody.getAvatarAsJson();
-    assert.strictEqual(
-      uint8ArrayToString(result.content, "utf-8"),
-      pngFile.toString()
-    );
+    assert.strictEqual(uint8ArrayToString(result.content, "utf-8"), pngFile.toString());
   });
 });

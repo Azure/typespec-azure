@@ -1,10 +1,10 @@
-import { Project, SourceFile } from "ts-morph";
-import { RlcMetaTree } from "./metaTree.js";
-import { EmitContext } from "@typespec/compiler";
 import { SdkContext } from "@azure-tools/typespec-client-generator-core";
-import { SdkTypeContext } from "./framework/hooks/sdkTypes.js";
-import { Binder } from "./framework/hooks/binder.js";
+import { EmitContext } from "@typespec/compiler";
+import { Project, SourceFile } from "ts-morph";
 import { ExternalDependencies } from "./framework/dependency.js";
+import { Binder } from "./framework/hooks/binder.js";
+import { SdkTypeContext } from "./framework/hooks/sdkTypes.js";
+import { RlcMetaTree } from "./metaTree.js";
 
 /**
  * Contexts Object Guidelines
@@ -96,9 +96,6 @@ export function useContext<K extends ContextKey>(key: K): Contexts[K] {
  * @param {ContextKey} key - The key of the context to provide.
  * @param {Contexts[K]} value - The value to set for the specified context.
  */
-export function provideContext<K extends ContextKey>(
-  key: K,
-  value: Contexts[K]
-): void {
+export function provideContext<K extends ContextKey>(key: K, value: Contexts[K]): void {
   contextManager.setContext(key, value);
 }

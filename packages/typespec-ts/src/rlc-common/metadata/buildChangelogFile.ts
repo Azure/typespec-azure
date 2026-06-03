@@ -24,6 +24,6 @@ export function buildChangelogFile(model: RLCModel) {
 
   return {
     path: "CHANGELOG.md",
-    content
+    content,
   };
 }

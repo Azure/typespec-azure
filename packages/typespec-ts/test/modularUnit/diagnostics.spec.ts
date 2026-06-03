@@ -1,15 +1,12 @@
-import { describe, it, assert } from "vitest";
+import { assert, describe, it } from "vitest";
 
-import { ok } from "assert";
 import { Diagnostic } from "@typespec/compiler";
-import {
-  createDpgContextTestHelper,
-  createRLCEmitterTestHost
-} from "../util/testUtil.js";
+import { ok } from "assert";
 import {
   emitModularModelsFromTypeSpec,
-  emitModularOperationsFromTypeSpec
+  emitModularOperationsFromTypeSpec,
 } from "../util/emitUtil.js";
+import { createDpgContextTestHelper, createRLCEmitterTestHost } from "../util/testUtil.js";
 
 describe("Diagnostic reporting tests", () => {
   it("should not crash when emitter encounters error conditions", async () => {
@@ -18,8 +15,7 @@ describe("Diagnostic reporting tests", () => {
     // that don't expect crashes when processing various TypeSpec inputs
 
     // Import the fixed modules to ensure they compile
-    const operationHelpers =
-      await import("../../src/modular/helpers/operationHelpers.js");
+    const operationHelpers = await import("../../src/modular/helpers/operationHelpers.js");
     const emitModels = await import("../../src/modular/emitModels.js");
     const buildRootIndex = await import("../../src/modular/buildRootIndex.js");
     const serializerFunction =
@@ -67,20 +63,18 @@ describe("Diagnostic reporting tests", () => {
 
       @route("/test")
       op test(@body body: Foo): Bar;
-      `
+      `,
     );
     await host.diagnose("./", { warningAsError: false });
     const dpgContext = await createDpgContextTestHelper(host.program);
 
     // Verify TCGC captures duplicate-client-name diagnostics
     const duplicateNameDiagnostics = dpgContext.diagnostics.filter(
-      (d) =>
-        d.code ===
-        "@azure-tools/typespec-client-generator-core/duplicate-client-name"
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
     );
     assert.isTrue(
       duplicateNameDiagnostics.length > 0,
-      "Expected TCGC diagnostics for duplicate client names to be present in dpgContext.diagnostics"
+      "Expected TCGC diagnostics for duplicate client names to be present in dpgContext.diagnostics",
     );
 
     // Simulate what $onEmit does: report TCGC diagnostics to the program
@@ -91,7 +85,7 @@ describe("Diagnostic reporting tests", () => {
 
     assert.isTrue(
       host.program.diagnostics.length > initialDiagCount,
-      "Expected TCGC diagnostics to be reported to the program"
+      "Expected TCGC diagnostics to be reported to the program",
     );
   });
 
@@ -106,17 +100,14 @@ describe("Diagnostic reporting tests", () => {
             op read(@body body: Test): void;
           `,
         {
-          mustEmptyDiagnostic: true
-        }
+          mustEmptyDiagnostic: true,
+        },
       );
     } catch (e: any) {
-      assert.equal(
-        e[0]?.code,
-        "@azure-tools/typespec-ts/un-supported-array-encoding"
-      );
+      assert.equal(e[0]?.code, "@azure-tools/typespec-ts/un-supported-array-encoding");
       assert.strictEqual(
         e[0]?.message,
-        'The array property "nums" of int32 type is not supported for encoding and will be ignored.'
+        'The array property "nums" of int32 type is not supported for encoding and will be ignored.',
       );
     }
   });
@@ -136,13 +127,13 @@ describe("Diagnostic reporting tests", () => {
             `,
         {
           mustEmptyDiagnostic: true,
-          "experimental-extensible-enums": true
-        }
+          "experimental-extensible-enums": true,
+        },
       );
     } catch (e: any) {
       assert.strictEqual(
         e[0].message,
-        "Enum member name 2 is not a valid TypeScript identifier. It has been renamed to ExtensibleNum2 using the enum type name ExtensibleNum as prefix."
+        "Enum member name 2 is not a valid TypeScript identifier. It has been renamed to ExtensibleNum2 using the enum type name ExtensibleNum as prefix.",
       );
     }
   });
@@ -160,10 +151,7 @@ describe("Diagnostic reporting tests", () => {
       assert.fail("Should throw diagnostic errors");
     } catch (e: any) {
       assert.equal(e[0]?.code, "@azure-tools/typespec-ts/invalid-schema");
-      assert.equal(
-        e[0]?.message,
-        "Couldn't get schema for type Intrinsic with property param"
-      );
+      assert.equal(e[0]?.message, "Couldn't get schema for type Intrinsic with property param");
       assert.equal(e[0]?.target?.name, "void");
     }
   });
@@ -175,16 +163,13 @@ describe("Diagnostic reporting tests", () => {
         `;
 
       await emitModularOperationsFromTypeSpec(tspContent, {
-        mustEmptyDiagnostic: true
+        mustEmptyDiagnostic: true,
       });
       assert.fail("Should throw diagnostic warnings");
     } catch (e) {
       const diagnostics = e as Diagnostic[];
       assert.equal(diagnostics.length, 1);
-      assert.equal(
-        diagnostics[0]?.code,
-        "@azure-tools/typespec-ts/nullable-required-header"
-      );
+      assert.equal(diagnostics[0]?.code, "@azure-tools/typespec-ts/nullable-required-header");
       assert.equal(diagnostics[0]?.severity, "warning");
     }
   });
@@ -217,13 +202,13 @@ describe("Diagnostic reporting tests", () => {
           needArmTemplate: true,
           withVersionedApiVersion: true,
           needTCGC: true,
-          mustEmptyDiagnostic: true
-        }
+          mustEmptyDiagnostic: true,
+        },
       );
     } catch (e: any) {
       assert.strictEqual(
         e[0].message,
-        'The property "properties" in "NestedFlattenModel" has multiple consecutive flatten operations. Flatten transitions are not supported so consecutive transitions will be ignored.'
+        'The property "properties" in "NestedFlattenModel" has multiple consecutive flatten operations. Flatten transitions are not supported so consecutive transitions will be ignored.',
       );
     }
   });

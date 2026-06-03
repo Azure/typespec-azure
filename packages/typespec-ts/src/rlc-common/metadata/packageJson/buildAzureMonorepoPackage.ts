@@ -1,14 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import {
-  AzurePackageInfoConfig,
-  getAzureCommonPackageInfo
-} from "./azurePackageCommon.js";
-import {
-  getCommonPackageScripts,
-  getPackageCommonInfo
-} from "./packageCommon.js";
+import { AzurePackageInfoConfig, getAzureCommonPackageInfo } from "./azurePackageCommon.js";
+import { getCommonPackageScripts, getPackageCommonInfo } from "./packageCommon.js";
 
 export interface AzureMonorepoInfoConfig extends AzurePackageInfoConfig {
   monorepoPackageDirectory?: string;
@@ -24,7 +18,7 @@ export function buildAzureMonorepoPackage(config: AzureMonorepoInfoConfig) {
     ...getAzureMonorepoPackageInfo(config),
     ...getAzureMonorepoDependencies(config),
     scripts: getAzureMonorepoScripts(config),
-    ...getSampleMetadata(config)
+    ...getSampleMetadata(config),
   };
 
   return packageInfo;
@@ -41,16 +35,16 @@ export function getAzureMonorepoDependencies(config: AzureMonorepoInfoConfig) {
     ...dependencies,
     "@azure-rest/core-client": "^2.3.1",
     ...(hasLro && {
-      "@azure/abort-controller": "^2.1.2"
+      "@azure/abort-controller": "^2.1.2",
     }),
     "@azure/core-auth": "^1.9.0",
     ...(hasLro && {
-      "@azure/core-lro": "^3.1.0"
+      "@azure/core-lro": "^3.1.0",
     }),
     "@azure/core-rest-pipeline": "^1.20.0",
     "@azure/core-util": "^1.12.0",
     "@azure/logger": "^1.2.0",
-    tslib: "^2.8.1"
+    tslib: "^2.8.1",
   };
 
   const testDeps = withTests
@@ -60,10 +54,10 @@ export function getAzureMonorepoDependencies(config: AzureMonorepoInfoConfig) {
         dotenv: "catalog:testing",
         playwright: "catalog:testing",
         typescript: "catalog:",
-        vitest: "catalog:testing"
+        vitest: "catalog:testing",
       }
     : {
-        typescript: "catalog:"
+        typescript: "catalog:",
       };
 
   return {
@@ -81,19 +75,17 @@ export function getAzureMonorepoDependencies(config: AzureMonorepoInfoConfig) {
       prettier: "catalog:",
       rimraf: "catalog:",
       ...(config.specSource === "Swagger" && {
-        autorest: "catalog:"
+        autorest: "catalog:",
       }),
-      ...testDeps
-    }
+      ...testDeps,
+    },
   };
 }
 
 /**
  * Build the common package.json config for an Azure package that will be hosted in the azure-sdk-for-js mono repo.
  */
-export function getAzureMonorepoPackageInfo(
-  config: AzureMonorepoInfoConfig
-): Record<string, any> {
+export function getAzureMonorepoPackageInfo(config: AzureMonorepoInfoConfig): Record<string, any> {
   const commonPackageInfo = getPackageCommonInfo(config);
   const repositoryDirectory = config.monorepoPackageDirectory ?? "sdk/";
 
@@ -104,24 +96,20 @@ export function getAzureMonorepoPackageInfo(
     repository: {
       type: "git",
       url: "git+https://github.com/Azure/azure-sdk-for-js",
-      directory: repositoryDirectory
+      directory: repositoryDirectory,
     },
     bugs: {
-      url: "https://github.com/Azure/azure-sdk-for-js/issues"
+      url: "https://github.com/Azure/azure-sdk-for-js/issues",
     },
     ...(config.monorepoPackageDirectory && {
-      homepage: `https://github.com/Azure/azure-sdk-for-js/tree/main/${config.monorepoPackageDirectory}/README.md`
+      homepage: `https://github.com/Azure/azure-sdk-for-js/tree/main/${config.monorepoPackageDirectory}/README.md`,
     }),
     prettier: "@azure/eslint-plugin-azure-sdk/prettier.json",
-    "//metadata": getMetadataInfo(config)
+    "//metadata": getMetadataInfo(config),
   };
 }
 
-function getSampleMetadata({
-  name,
-  version,
-  withSamples
-}: AzureMonorepoInfoConfig) {
+function getSampleMetadata({ name, version, withSamples }: AzureMonorepoInfoConfig) {
   if (!withSamples) {
     return {};
   }
@@ -136,22 +124,19 @@ function getSampleMetadata({
       productName: name,
       productSlugs: ["azure"],
       disableDocsMs: true,
-      apiRefLink: `https://learn.microsoft.com/javascript/api/${name}${apiRefUrlQueryParameter}`
-    }
+      apiRefLink: `https://learn.microsoft.com/javascript/api/${name}${apiRefUrlQueryParameter}`,
+    },
   };
 }
 
-function addSwaggerMetadata(
-  metadata: Record<string, any>,
-  specSource: "Swagger" | "TypeSpec"
-) {
+function addSwaggerMetadata(metadata: Record<string, any>, specSource: "Swagger" | "TypeSpec") {
   if (specSource !== "Swagger") {
     return;
   }
 
   metadata["constantPaths"].push({
     path: "swagger/README.md",
-    prefix: "package-version"
+    prefix: "package-version",
   });
 }
 
@@ -167,11 +152,8 @@ function getAzureMonorepoScripts(config: AzureMonorepoInfoConfig) {
     "check-format": `prettier --list-different --config ../../../.prettierrc.json --ignore-path ../../../.prettierignore "src/**/*.{ts,cts,mts}" "test/**/*.{ts,cts,mts}" "*.{js,cjs,mjs,json}" ${
       config.withSamples ? '"samples-dev/*.ts"' : ""
     }`,
-    clean:
-      "rimraf --glob dist dist-browser dist-esm test-dist temp types *.tgz *.log",
-    "execute:samples": config.withSamples
-      ? "dev-tool samples run samples-dev"
-      : "echo skipped",
+    clean: "rimraf --glob dist dist-browser dist-esm test-dist temp types *.tgz *.log",
+    "execute:samples": config.withSamples ? "dev-tool samples run samples-dev" : "echo skipped",
     "extract-api": "rimraf review && dev-tool run extract-api",
     format: `prettier --write --config ../../../.prettierrc.json --ignore-path ../../../.prettierignore "src/**/*.{ts,cts,mts}" "test/**/*.{ts,cts,mts}" "*.{js,cjs,mjs,json}" ${
       config.withSamples ? '"samples-dev/*.ts"' : ""
@@ -184,7 +166,7 @@ function getAzureMonorepoScripts(config: AzureMonorepoInfoConfig) {
     lint: skipLinting ? "echo skipped" : "eslint package.json src test",
     pack: `pnpm pack 2>&1`,
     ...esmScripts,
-    "update-snippets": "dev-tool run update-snippets"
+    "update-snippets": "dev-tool run update-snippets",
   };
 }
 
@@ -194,25 +176,22 @@ function getEsmScripts({ moduleKind }: AzureMonorepoInfoConfig) {
   }
 
   return {
-    build:
-      "npm run clean && dev-tool run build-package && dev-tool run extract-api",
+    build: "npm run clean && dev-tool run build-package && dev-tool run extract-api",
     "test:node": "dev-tool run test:vitest",
-    test: "tsc -b --noEmit && npm run test:node && npm run test:browser"
+    test: "tsc -b --noEmit && npm run test:node && npm run test:browser",
   };
 }
 
 function getMetadataInfo(config: AzureMonorepoInfoConfig) {
   const metadata: Record<string, any> = {
-    constantPaths: []
+    constantPaths: [],
   };
-  const paths = config.isModularLibrary
-    ? config.clientContextPaths
-    : config.clientFilePaths;
+  const paths = config.isModularLibrary ? config.clientContextPaths : config.clientFilePaths;
   addSwaggerMetadata(metadata, config.specSource);
   for (const path of paths ?? []) {
     metadata["constantPaths"].push({
       path: path,
-      prefix: "userAgentInfo"
+      prefix: "userAgentInfo",
     });
   }
 

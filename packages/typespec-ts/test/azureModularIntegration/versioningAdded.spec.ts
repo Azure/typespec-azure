@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { AddedClient } from "./generated/versioning/added/src/index.js";
 
@@ -7,7 +7,7 @@ describe("VersioningAdded Rest Client", () => {
 
   beforeEach(() => {
     client = new AddedClient("http://localhost:3002", {
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
@@ -16,9 +16,9 @@ describe("VersioningAdded Rest Client", () => {
       {
         prop: "foo",
         enumProp: "enumMemberV2",
-        unionProp: 10
+        unionProp: 10,
       },
-      "bar"
+      "bar",
     );
     assert.strictEqual(result.prop, "foo");
     assert.strictEqual(result.enumProp, "enumMemberV2");
@@ -29,7 +29,7 @@ describe("VersioningAdded Rest Client", () => {
     const result = await client.v2({
       prop: "foo",
       enumProp: "enumMember",
-      unionProp: "bar"
+      unionProp: "bar",
     });
     assert.strictEqual(result.prop, "foo");
     assert.strictEqual(result.enumProp, "enumMember");
@@ -40,7 +40,7 @@ describe("VersioningAdded Rest Client", () => {
     const result = await client.v2InInterface({
       prop: "foo",
       enumProp: "enumMember",
-      unionProp: "bar"
+      unionProp: "bar",
     });
     assert.strictEqual(result.prop, "foo");
     assert.strictEqual(result.enumProp, "enumMember");

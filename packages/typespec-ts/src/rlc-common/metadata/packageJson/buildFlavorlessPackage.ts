@@ -3,10 +3,10 @@
 
 import {
   PackageCommonInfoConfig,
-  getPackageCommonInfo,
-  getCommonPackageScripts,
+  commonPackageDependencies,
   getCommonPackageDevDependencies,
-  commonPackageDependencies
+  getCommonPackageScripts,
+  getPackageCommonInfo,
 } from "./packageCommon.js";
 
 /**
@@ -20,24 +20,22 @@ export function buildFlavorlessPackage(config: PackageCommonInfoConfig) {
       ...getCommonPackageDevDependencies(config),
       "@microsoft/api-extractor": "^7.40.3",
       rimraf: "^5.0.5",
-      mkdirp: "^3.0.1"
+      mkdirp: "^3.0.1",
     },
     dependencies: {
       ...commonPackageDependencies,
-      "@typespec/ts-http-runtime": "0.1.0"
-    }
+      "@typespec/ts-http-runtime": "0.1.0",
+    },
   };
 
   return packageInfo;
 }
 
-function getFlavorlessPackageInfo(
-  config: PackageCommonInfoConfig
-): Record<string, any> {
+function getFlavorlessPackageInfo(config: PackageCommonInfoConfig): Record<string, any> {
   const commonPackageInfo = getPackageCommonInfo(config);
 
   return {
-    ...commonPackageInfo
+    ...commonPackageInfo,
   };
 }
 
@@ -45,7 +43,7 @@ function getFlavorlessScripts(config: PackageCommonInfoConfig) {
   return {
     ...getCommonPackageScripts(),
     ...getCjsScripts(config),
-    ...getEsmScripts(config)
+    ...getEsmScripts(config),
   };
 }
 
@@ -55,7 +53,7 @@ function getCjsScripts({ moduleKind }: PackageCommonInfoConfig) {
   }
 
   return {
-    build: "npm run clean && tsc && npm run extract-api"
+    build: "npm run clean && tsc && npm run extract-api",
   };
 }
 
@@ -65,6 +63,6 @@ function getEsmScripts({ moduleKind }: PackageCommonInfoConfig) {
   }
 
   return {
-    build: "npm run clean && tshy && npm run extract-api"
+    build: "npm run clean && tshy && npm run extract-api",
   };
 }

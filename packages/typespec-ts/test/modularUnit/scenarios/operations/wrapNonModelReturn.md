@@ -39,12 +39,10 @@ export function _getSend(
   context: Client,
   options: GetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/dns")
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "text/plain", ...options.requestOptions?.headers },
-    });
+  return context.path("/dns").get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "text/plain", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _getDeserialize(result: PathUncheckedResponse): Promise<GetResponse> {
@@ -102,12 +100,10 @@ export function _listDomainsSend(
   context: Client,
   options: ListDomainsOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/domains")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-    });
+  return context.path("/domains").post({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _listDomainsDeserialize(
@@ -190,12 +186,10 @@ export function _getLogsSend(
   context: Client,
   options: GetLogsOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/logs")
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "application/octet-stream", ...options.requestOptions?.headers },
-    });
+  return context.path("/logs").get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "application/octet-stream", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _getLogsDeserialize(
@@ -253,12 +247,10 @@ export function _getSend(
   context: Client,
   options: GetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/dns")
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "text/plain", ...options.requestOptions?.headers },
-    });
+  return context.path("/dns").get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "text/plain", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _getDeserialize(result: PathUncheckedResponse): Promise<string> {
@@ -318,12 +310,10 @@ export function _listSend(
   context: Client,
   options: ListOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/resources")
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-    });
+  return context.path("/resources").get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _listDeserialize(result: PathUncheckedResponse): Promise<Resource[]> {
@@ -381,12 +371,10 @@ export function _getModelSend(
   context: Client,
   options: GetModelOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/models")
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-    });
+  return context.path("/models").get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _getModelDeserialize(result: PathUncheckedResponse): Promise<MyModel> {
@@ -427,10 +415,12 @@ model ApiError {
 
 @route("/logs")
 @get
-op getLogs(): {
-  @header contentType: "application/octet-stream";
-  @body body: bytes;
-} | ApiError;
+op getLogs():
+  | {
+      @header contentType: "application/octet-stream";
+      @body body: bytes;
+    }
+  | ApiError;
 ```
 
 ## Operations
@@ -476,10 +466,12 @@ model StorageError {
 
 @route("/blobs")
 @get
-op getBlob(): {
-  @header contentType: "application/octet-stream";
-  @body body: bytes;
-} | StorageError;
+op getBlob():
+  | {
+      @header contentType: "application/octet-stream";
+      @body body: bytes;
+    }
+  | StorageError;
 ```
 
 ## Operations
@@ -513,47 +505,47 @@ export async function _getBlobDeserialize(
 # skip: wrap-non-model-return wraps (string, boolean, string[], enum, any, model array,any object) response with body property
 
 Skip as need upgrade tcgc to next version https://github.com/Azure/typespec-azure/pull/4108/changes
+
 ## TypeSpec
 
 ```tsp
 model Test {
   name: string;
 }
-union EnumTest  {
+union EnumTest {
   one: "one",
   two: "two",
-  others: string
+  others: string,
 }
 
 interface testResponse {
   @route("/string")
   @get
-  getString():string;
+  getString(): string;
 
   @route("/boolean")
   @get
-  getBoolean():boolean;
-  
+  getBoolean(): boolean;
+
   @route("/stringArray")
   @get
-  getStringArray():string[];
+  getStringArray(): string[];
 
   @route("/any")
   @get
-  getAny():unknown;
+  getAny(): unknown;
 
   @route("/enum")
   @get
-  getEnum(@body body:EnumTest):EnumTest;
+  getEnum(@body body: EnumTest): EnumTest;
 
   @route("/modelArray")
   @get
-  getModelArray():Test[];
-  
+  getModelArray(): Test[];
+
   @route("/anyObject")
   @get
-  getAnyObject():unknown;
-
+  getAnyObject(): unknown;
 }
 ```
 
@@ -640,12 +632,10 @@ export function _getAnyObjectSend(
   context: Client,
   options: GetAnyObjectOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/anyObject")
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-    });
+  return context.path("/anyObject").get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _getAnyObjectDeserialize(
@@ -671,12 +661,10 @@ export function _getModelArraySend(
   context: Client,
   options: GetModelArrayOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/modelArray")
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-    });
+  return context.path("/modelArray").get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _getModelArrayDeserialize(result: PathUncheckedResponse): Promise<Test[]> {
@@ -701,13 +689,11 @@ export function _getEnumSend(
   body: EnumTest,
   options: GetEnumOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/enum")
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "text/plain",
-      body: body,
-    });
+  return context.path("/enum").get({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "text/plain",
+    body: body,
+  });
 }
 
 export async function _getEnumDeserialize(result: PathUncheckedResponse): Promise<GetEnumResponse> {
@@ -732,12 +718,10 @@ export function _getAnySend(
   context: Client,
   options: GetAnyOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/any")
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-    });
+  return context.path("/any").get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _getAnyDeserialize(result: PathUncheckedResponse): Promise<GetAnyResponse> {
@@ -761,12 +745,10 @@ export function _getStringArraySend(
   context: Client,
   options: GetStringArrayOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/stringArray")
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-    });
+  return context.path("/stringArray").get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _getStringArrayDeserialize(
@@ -796,12 +778,10 @@ export function _getBooleanSend(
   context: Client,
   options: GetBooleanOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/boolean")
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "text/plain", ...options.requestOptions?.headers },
-    });
+  return context.path("/boolean").get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "text/plain", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _getBooleanDeserialize(
@@ -827,12 +807,10 @@ export function _getStringSend(
   context: Client,
   options: GetStringOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/string")
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "text/plain", ...options.requestOptions?.headers },
-    });
+  return context.path("/string").get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "text/plain", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _getStringDeserialize(
@@ -881,27 +859,29 @@ using Azure.ResourceManager;
 namespace Microsoft.Test;
 
 enum Versions {
-    v2024_01_01: "2024-01-01",
+  v2024_01_01: "2024-01-01",
 }
 
 scalar IkeSasDocument extends string;
 
 model VpnSiteLinkConnection is TrackedResource<{}> {
-    @key("vpnSiteLinkConnectionName")
-    @path
-    @segment("vpnSiteLinkConnections")
-    name: string;
+  @key("vpnSiteLinkConnectionName")
+  @path
+  @segment("vpnSiteLinkConnections")
+  name: string;
 }
 
 @armResourceOperations
 interface VpnSiteLinkConnections {
-    getIkeSas is ArmResourceActionAsync<
-        VpnSiteLinkConnection,
-        void,
-        { @body body: IkeSasDocument; },
-        LroHeaders = ArmLroLocationHeader<FinalResult = IkeSasDocument> &
-            Azure.Core.Foundations.RetryAfterHeader
-    >;
+  getIkeSas is ArmResourceActionAsync<
+    VpnSiteLinkConnection,
+    void,
+    {
+      @body body: IkeSasDocument;
+    },
+    LroHeaders = ArmLroLocationHeader<FinalResult = IkeSasDocument> &
+      Azure.Core.Foundations.RetryAfterHeader
+  >;
 }
 ```
 

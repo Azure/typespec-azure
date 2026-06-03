@@ -1,7 +1,7 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
-import { SingleClient } from "./generated/server/path/single/src/index.js";
 import { MultipleClient } from "./generated/server/path/multiple/src/index.js";
+import { SingleClient } from "./generated/server/path/single/src/index.js";
 import { NotVersionedClient } from "./generated/server/versions/not-versioned/src/index.js";
 import { VersionedClient } from "./generated/server/versions/versioned/src/index.js";
 describe("Single Server Path Client", () => {
@@ -11,8 +11,8 @@ describe("Single Server Path Client", () => {
     client = new SingleClient("http://localhost:3002", {
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
-      }
+        maxRetries: 0,
+      },
     });
   });
 
@@ -29,8 +29,8 @@ describe("Multiple Server Path Client", () => {
     client = new MultipleClient("http://localhost:3002", {
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
-      }
+        maxRetries: 0,
+      },
     });
   });
 
@@ -52,8 +52,8 @@ describe("NotVersioned Server Version Client", () => {
     client = new NotVersionedClient("http://localhost:3002", {
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
-      }
+        maxRetries: 0,
+      },
     });
   });
 
@@ -80,8 +80,8 @@ describe("Versioned Server Version Client", () => {
     client = new VersionedClient("http://localhost:3002", {
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
-      }
+        maxRetries: 0,
+      },
     });
   });
 
@@ -99,9 +99,9 @@ describe("Versioned Server Version Client", () => {
     const client = new VersionedClient("http://localhost:3002", {
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
+        maxRetries: 0,
       },
-      apiVersion: "2022-12-01-preview"
+      apiVersion: "2022-12-01-preview",
     });
     const result = await client.withQueryApiVersion();
     assert.isUndefined(result);
@@ -111,9 +111,9 @@ describe("Versioned Server Version Client", () => {
     const client = new VersionedClient("http://localhost:3002", {
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
+        maxRetries: 0,
       },
-      apiVersion: "2022-12-01-preview"
+      apiVersion: "2022-12-01-preview",
     });
     const result = await client.withPathApiVersion();
     assert.isUndefined(result);
@@ -123,9 +123,9 @@ describe("Versioned Server Version Client", () => {
     const client = new VersionedClient("http://localhost:3002", {
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
+        maxRetries: 0,
       },
-      apiVersion: "2021-01-01-preview"
+      apiVersion: "2021-01-01-preview",
     });
     const result = await client.withQueryOldApiVersion();
     assert.isUndefined(result);

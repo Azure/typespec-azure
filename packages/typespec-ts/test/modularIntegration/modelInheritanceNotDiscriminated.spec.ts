@@ -1,8 +1,8 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import {
   NotDiscriminatedClient,
-  Siamese
+  Siamese,
 } from "./generated/type/model/inheritance/not-discriminated/src/index.js";
 
 describe("NotDiscriminatedClient Rest Client", () => {
@@ -11,7 +11,7 @@ describe("NotDiscriminatedClient Rest Client", () => {
   beforeEach(() => {
     client = new NotDiscriminatedClient({
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 

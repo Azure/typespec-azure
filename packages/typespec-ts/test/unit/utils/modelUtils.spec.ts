@@ -1,4 +1,4 @@
-import { describe, it, assert } from "vitest";
+import { assert, describe, it } from "vitest";
 
 import { ObjectSchema } from "../../../src/rlc-common/index.js";
 import { getModelInlineSigniture } from "../../../src/utils/modelUtils.js";

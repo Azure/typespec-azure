@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { DurationClient } from "./generated/encode/duration/src/index.js";
 describe("EncodeDurationClient Client", () => {
@@ -9,8 +9,8 @@ describe("EncodeDurationClient Client", () => {
       endpoint: "http://localhost:3002",
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
-      }
+        maxRetries: 0,
+      },
     });
   });
 
@@ -100,7 +100,7 @@ describe("EncodeDurationClient Client", () => {
 
     it(`should get float seconds array`, async () => {
       const result = await client.property.floatSecondsArray({
-        value: [35.625, 46.75]
+        value: [35.625, 46.75],
       });
       assert.deepEqual(result.value, [35.625, 46.75]);
     });
@@ -117,42 +117,42 @@ describe("EncodeDurationClient Client", () => {
 
     it(`should get float64 milliseconds`, async () => {
       const result = await client.property.float64Milliseconds({
-        value: 35625
+        value: 35625,
       });
       assert.deepEqual(result.value, 35625);
     });
 
     it(`should get float milliseconds array`, async () => {
       const result = await client.property.floatMillisecondsArray({
-        value: [35625, 46750]
+        value: [35625, 46750],
       });
       assert.deepEqual(result.value, [35625, 46750]);
     });
 
     it(`should get float Seconds Larger Unit`, async () => {
       const result = await client.property.floatSecondsLargerUnit({
-        value: 150.0
+        value: 150.0,
       });
       assert.deepEqual(result.value, 150.0);
     });
 
     it(`should get int32 Seconds Larger Unit`, async () => {
       const result = await client.property.int32SecondsLargerUnit({
-        value: 120
+        value: 120,
       });
       assert.deepEqual(result.value, 120);
     });
 
     it(`should get float Milliseconds Larger Unit`, async () => {
       const result = await client.property.floatMillisecondsLargerUnit({
-        value: 210000.0
+        value: 210000.0,
       });
       assert.deepEqual(result.value, 210000.0);
     });
 
     it(`should get int32 Milliseconds Larger Unit`, async () => {
       const result = await client.property.int32MillisecondsLargerUnit({
-        value: 180000
+        value: 180000,
       });
       assert.deepEqual(result.value, 180000);
     });

@@ -1,4 +1,3 @@
-
 model WidgetData0 {
   fooProp: string;
 }

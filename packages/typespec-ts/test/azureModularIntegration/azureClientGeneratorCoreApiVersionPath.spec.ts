@@ -1,4 +1,4 @@
-import { describe, it, beforeEach } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 
 import { PathClient } from "./generated/azure/client-generator-core/api-version/path/src/index.js";
 
@@ -8,7 +8,7 @@ describe("Azure Client Generator Core - API Version Path (Modular)", () => {
   beforeEach(() => {
     client = new PathClient({
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
