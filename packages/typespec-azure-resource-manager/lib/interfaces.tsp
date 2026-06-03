@@ -173,7 +173,6 @@ interface ResourceListByParent<
    * @template ParentName The name of the parent resource
    * @template ParentFriendlyName The friendly name of the parent resource
    */
-  @doc("")
   @Private.armRenameListByOperation(Resource, ParentName, ParentFriendlyName, true) // This must come before @armResourceList!
   listByParent is ArmResourceListByParent<Resource, BaseParameters, ParentName, ParentFriendlyName>;
 }
