@@ -14,10 +14,10 @@ using Azure.Core.Traits;
 @useAuth(WidgetManagerApiKeyAuth | WidgetManagerOauth2Auth)
 namespace Contoso.WidgetManager;
 
-@doc("Authenticate requests with an API key in the X-Key header.")
+/** Authenticate requests with an API key in the X-Key header. */
 model WidgetManagerApiKeyAuth is ApiKeyAuth<ApiKeyLocation.header, "X-Key">;
 
-@doc("Authenticate requests with OAuth2 using the widget service scope.")
+/** Authenticate requests with OAuth2 using the widget service scope. */
 model WidgetManagerOauth2Auth is OAuth2Auth<[
   {
     type: OAuth2FlowType.implicit,
