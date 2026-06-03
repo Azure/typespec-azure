@@ -33,7 +33,7 @@ Once a new version of the unbranded emitter has been released, follow these step
 3. **Regenerate `emitter-package-lock.yaml`**: Run the following command to update the lock file, making sure it points to your local `typespec-azure` repo where you updated the catalog version in step 1:
 
    ```bash
-   tsp-client generate-config-files --package-json=<path-to-your-local-typespec-azure-repo>/packages/typespec-python/package.json --use-npm-pinning
+   tsp-client generate-config-files --package-json= --use-npm-pinning < path-to-your-local-typespec-azure-repo > /packages/typespec-python/package.json
    ```
 
 4. **Check in the changes**: The updated `emitter-package.json` and regenerated `emitter-package-lock.yaml` should both be committed and submitted as part of the release PR.
