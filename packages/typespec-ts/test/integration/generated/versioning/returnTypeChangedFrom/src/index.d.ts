@@ -1,54 +1,49 @@
-import type {
-  Client,
-  ClientOptions,
-  HttpResponse,
-  RawHttpHeaders,
-  RequestParameters,
-  StreamableMethod,
-} from "@typespec/ts-http-runtime";
+import type { Client } from '@typespec/ts-http-runtime';
+import type { ClientOptions } from '@typespec/ts-http-runtime';
+import type { HttpResponse } from '@typespec/ts-http-runtime';
+import type { RawHttpHeaders } from '@typespec/ts-http-runtime';
+import type { RequestParameters } from '@typespec/ts-http-runtime';
+import type { StreamableMethod } from '@typespec/ts-http-runtime';
 
-declare function createClient(
-  endpointParam: string,
-  options?: VersioningReturnTypeChangedFromClientOptions,
-): VersioningReturnTypeChangedFromClient;
+declare function createClient(endpointParam: string, options?: VersioningReturnTypeChangedFromClientOptions): VersioningReturnTypeChangedFromClient;
 export default createClient;
 
 export declare interface Routes {
-  (path: "/test"): Test;
+    (path: "/test"): Test;
 }
 
 export declare interface Test {
-  post(options: TestParameters): StreamableMethod<Test200Response>;
+    post(options: TestParameters): StreamableMethod<Test200Response>;
 }
 
 export declare interface Test200Headers {
-  "content-type": "application/json";
+    "content-type": "application/json";
 }
 
 export declare interface Test200Response extends HttpResponse {
-  status: "200";
-  body: string;
-  headers: RawHttpHeaders & Test200Headers;
+    status: "200";
+    body: string;
+    headers: RawHttpHeaders & Test200Headers;
 }
 
 export declare interface TestBodyParam {
-  body: string;
+    body: string;
 }
 
 export declare interface TestMediaTypesParam {
-  contentType: "application/json";
+    contentType: "application/json";
 }
 
 export declare type TestParameters = TestMediaTypesParam & TestBodyParam & RequestParameters;
 
 export declare type VersioningReturnTypeChangedFromClient = Client & {
-  path: Routes;
+    path: Routes;
 };
 
 export declare interface VersioningReturnTypeChangedFromClientOptions extends ClientOptions {
-  version?: Versions;
+    version?: Versions;
 }
 
 export declare type Versions = "v1" | "v2";
 
-export {};
+export { }

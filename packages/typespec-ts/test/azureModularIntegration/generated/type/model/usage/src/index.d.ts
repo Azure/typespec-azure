@@ -1,40 +1,44 @@
-import { ClientOptions, OperationOptions } from "@azure-rest/core-client";
-import { isRestError, Pipeline, RestError } from "@azure/core-rest-pipeline";
+import { ClientOptions } from '@azure-rest/core-client';
+import { isRestError } from '@azure/core-rest-pipeline';
+import { OperationOptions } from '@azure-rest/core-client';
+import { Pipeline } from '@azure/core-rest-pipeline';
+import { RestError } from '@azure/core-rest-pipeline';
 
-export declare interface InputAndOutputOptionalParams extends OperationOptions {}
+export declare interface InputAndOutputOptionalParams extends OperationOptions {
+}
 
-export declare interface InputOptionalParams extends OperationOptions {}
+export declare interface InputOptionalParams extends OperationOptions {
+}
 
 export declare interface InputOutputRecord {
-  requiredProp: string;
+    requiredProp: string;
 }
 
 export declare interface InputRecord {
-  requiredProp: string;
+    requiredProp: string;
 }
 
-export { isRestError };
+export { isRestError }
 
-export declare interface OutputOptionalParams extends OperationOptions {}
+export declare interface OutputOptionalParams extends OperationOptions {
+}
 
 export declare interface OutputRecord {
-  requiredProp: string;
+    requiredProp: string;
 }
 
-export { RestError };
+export { RestError }
 
 export declare class UsageClient {
-  private _client;
-  readonly pipeline: Pipeline;
-  constructor(options?: UsageClientOptionalParams);
-  inputAndOutput(
-    body: InputOutputRecord,
-    options?: InputAndOutputOptionalParams,
-  ): Promise<InputOutputRecord>;
-  output(options?: OutputOptionalParams): Promise<OutputRecord>;
-  input(inputParameter: InputRecord, options?: InputOptionalParams): Promise<void>;
+    private _client;
+    readonly pipeline: Pipeline;
+    constructor(options?: UsageClientOptionalParams);
+    inputAndOutput(body: InputOutputRecord, options?: InputAndOutputOptionalParams): Promise<InputOutputRecord>;
+    output(options?: OutputOptionalParams): Promise<OutputRecord>;
+    input(inputParameter: InputRecord, options?: InputOptionalParams): Promise<void>;
 }
 
-export declare interface UsageClientOptionalParams extends ClientOptions {}
+export declare interface UsageClientOptionalParams extends ClientOptions {
+}
 
-export {};
+export { }

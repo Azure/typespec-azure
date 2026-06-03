@@ -1,50 +1,48 @@
-import type {
-  Client,
-  ClientOptions,
-  HttpResponse,
-  RequestParameters,
-  StreamableMethod,
-} from "@azure-rest/core-client";
-import { isRestError, RestError } from "@azure/core-rest-pipeline";
+import type { Client } from '@azure-rest/core-client';
+import type { ClientOptions } from '@azure-rest/core-client';
+import type { HttpResponse } from '@azure-rest/core-client';
+import { isRestError } from '@azure/core-rest-pipeline';
+import type { RequestParameters } from '@azure-rest/core-client';
+import { RestError } from '@azure/core-rest-pipeline';
+import type { StreamableMethod } from '@azure-rest/core-client';
 
 declare function createClient(options?: MoveToRootClientClientOptions): MoveToRootClientClient;
 export default createClient;
 
 export declare interface GetHealthStatus {
-  get(options?: GetHealthStatusParameters): StreamableMethod<GetHealthStatus204Response>;
+    get(options?: GetHealthStatusParameters): StreamableMethod<GetHealthStatus204Response>;
 }
 
 export declare interface GetHealthStatus204Response extends HttpResponse {
-  status: "204";
+    status: "204";
 }
 
 export declare type GetHealthStatusParameters = RequestParameters;
 
 export declare interface GetResource {
-  get(options?: GetResourceParameters): StreamableMethod<GetResource204Response>;
+    get(options?: GetResourceParameters): StreamableMethod<GetResource204Response>;
 }
 
 export declare interface GetResource204Response extends HttpResponse {
-  status: "204";
+    status: "204";
 }
 
 export declare type GetResourceParameters = RequestParameters;
 
-export { isRestError };
+export { isRestError }
 
 export declare type MoveToRootClientClient = Client & {
-  path: Routes;
+    path: Routes;
 };
 
-export declare interface MoveToRootClientClientOptions extends ClientOptions {}
-
-export { RestError };
-
-export declare interface Routes {
-  (path: "/azure/client-generator-core/client-location/move-to-root-client/resource"): GetResource;
-  (
-    path: "/azure/client-generator-core/client-location/move-to-root-client/health",
-  ): GetHealthStatus;
+export declare interface MoveToRootClientClientOptions extends ClientOptions {
 }
 
-export {};
+export { RestError }
+
+export declare interface Routes {
+    (path: "/azure/client-generator-core/client-location/move-to-root-client/resource"): GetResource;
+    (path: "/azure/client-generator-core/client-location/move-to-root-client/health"): GetHealthStatus;
+}
+
+export { }

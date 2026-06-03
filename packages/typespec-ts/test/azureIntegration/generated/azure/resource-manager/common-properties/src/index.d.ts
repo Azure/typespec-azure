@@ -1,65 +1,62 @@
-import type {
-  Client,
-  ClientOptions,
-  HttpResponse,
-  RequestParameters,
-  StreamableMethod,
-} from "@azure-rest/core-client";
-import { isRestError, RestError } from "@azure/core-rest-pipeline";
+import type { Client } from '@azure-rest/core-client';
+import type { ClientOptions } from '@azure-rest/core-client';
+import type { HttpResponse } from '@azure-rest/core-client';
+import { isRestError } from '@azure/core-rest-pipeline';
+import type { RequestParameters } from '@azure-rest/core-client';
+import { RestError } from '@azure/core-rest-pipeline';
+import type { StreamableMethod } from '@azure-rest/core-client';
 
 export declare interface ApiErrorBaseOutput {
-  code?: string;
-  target?: string;
-  message?: string;
+    code?: string;
+    target?: string;
+    message?: string;
 }
 
 export declare interface ApiErrorOutput {
-  details?: Array<ApiErrorBaseOutput>;
-  innererror?: InnerErrorOutput;
-  code?: string;
-  target?: string;
-  message?: string;
+    details?: Array<ApiErrorBaseOutput>;
+    innererror?: InnerErrorOutput;
+    code?: string;
+    target?: string;
+    message?: string;
 }
 
 export declare type AzureArmModelsCommonTypesManagedIdentityClient = Client & {
-  path: Routes;
+    path: Routes;
 };
 
 export declare interface AzureArmModelsCommonTypesManagedIdentityClientOptions extends ClientOptions {
-  apiVersion?: string;
+    apiVersion?: string;
 }
 
-export declare interface AzureEntityResource extends Resource {}
+export declare interface AzureEntityResource extends Resource {
+}
 
 export declare interface AzureEntityResourceOutput extends ResourceOutput {
-  readonly etag?: string;
+    readonly etag?: string;
 }
 
 export declare interface CloudErrorOutput {
-  error?: ApiErrorOutput;
+    error?: ApiErrorOutput;
 }
 
 export declare interface ConfidentialResource extends TrackedResource {
-  properties?: ConfidentialResourceProperties;
+    properties?: ConfidentialResourceProperties;
 }
 
 export declare interface ConfidentialResourceOutput extends TrackedResourceOutput {
-  properties?: ConfidentialResourcePropertiesOutput;
+    properties?: ConfidentialResourcePropertiesOutput;
 }
 
 export declare interface ConfidentialResourceProperties {
-  username: string;
+    username: string;
 }
 
 export declare interface ConfidentialResourcePropertiesOutput {
-  readonly provisioningState: string;
-  username: string;
+    readonly provisioningState: string;
+    username: string;
 }
 
-declare function createClient({
-  apiVersion,
-  ...options
-}?: AzureArmModelsCommonTypesManagedIdentityClientOptions): AzureArmModelsCommonTypesManagedIdentityClient;
+declare function createClient({ apiVersion, ...options }?: AzureArmModelsCommonTypesManagedIdentityClientOptions): AzureArmModelsCommonTypesManagedIdentityClient;
 export default createClient;
 
 export declare type CreatedByType = string;
@@ -67,118 +64,99 @@ export declare type CreatedByType = string;
 export declare type CreatedByTypeOutput = string;
 
 export declare interface CreateForUserDefinedError200Response extends HttpResponse {
-  status: "200";
-  body: ConfidentialResourceOutput;
+    status: "200";
+    body: ConfidentialResourceOutput;
 }
 
 export declare interface CreateForUserDefinedError201Response extends HttpResponse {
-  status: "201";
-  body: ConfidentialResourceOutput;
+    status: "201";
+    body: ConfidentialResourceOutput;
 }
 
 export declare interface CreateForUserDefinedErrorBodyParam {
-  body: ConfidentialResource;
+    body: ConfidentialResource;
 }
 
 export declare interface CreateForUserDefinedErrorDefaultResponse extends HttpResponse {
-  status: string;
-  body: CloudErrorOutput;
+    status: string;
+    body: CloudErrorOutput;
 }
 
-export declare type CreateForUserDefinedErrorParameters = CreateForUserDefinedErrorBodyParam &
-  RequestParameters;
+export declare type CreateForUserDefinedErrorParameters = CreateForUserDefinedErrorBodyParam & RequestParameters;
 
 export declare interface CreateWithSystemAssigned200Response extends HttpResponse {
-  status: "200";
-  body: ManagedIdentityTrackedResourceOutput;
+    status: "200";
+    body: ManagedIdentityTrackedResourceOutput;
 }
 
 export declare interface CreateWithSystemAssigned201Response extends HttpResponse {
-  status: "201";
-  body: ManagedIdentityTrackedResourceOutput;
+    status: "201";
+    body: ManagedIdentityTrackedResourceOutput;
 }
 
 export declare interface CreateWithSystemAssignedBodyParam {
-  body: ManagedIdentityTrackedResource;
+    body: ManagedIdentityTrackedResource;
 }
 
 export declare interface CreateWithSystemAssignedDefaultResponse extends HttpResponse {
-  status: string;
-  body: ErrorResponseOutput;
+    status: string;
+    body: ErrorResponseOutput;
 }
 
-export declare type CreateWithSystemAssignedParameters = CreateWithSystemAssignedBodyParam &
-  RequestParameters;
+export declare type CreateWithSystemAssignedParameters = CreateWithSystemAssignedBodyParam & RequestParameters;
 
 export declare interface ErrorAdditionalInfoOutput {
-  readonly type?: string;
-  readonly info?: any;
+    readonly type?: string;
+    readonly info?: any;
 }
 
 export declare interface ErrorDetailOutput {
-  readonly code?: string;
-  readonly message?: string;
-  readonly target?: string;
-  readonly details?: Array<ErrorDetailOutput>;
-  readonly additionalInfo?: Array<ErrorAdditionalInfoOutput>;
+    readonly code?: string;
+    readonly message?: string;
+    readonly target?: string;
+    readonly details?: Array<ErrorDetailOutput>;
+    readonly additionalInfo?: Array<ErrorAdditionalInfoOutput>;
 }
 
 export declare interface ErrorResponseOutput {
-  error?: ErrorDetailOutput;
+    error?: ErrorDetailOutput;
 }
 
-export declare interface ExtensionResource extends Resource {}
+export declare interface ExtensionResource extends Resource {
+}
 
-export declare interface ExtensionResourceOutput extends ResourceOutput {}
+export declare interface ExtensionResourceOutput extends ResourceOutput {
+}
 
 export declare interface Get {
-  get(options?: GetParameters): StreamableMethod<Get200Response | GetDefaultResponse>;
-  put(
-    options: CreateWithSystemAssignedParameters,
-  ): StreamableMethod<
-    | CreateWithSystemAssigned200Response
-    | CreateWithSystemAssigned201Response
-    | CreateWithSystemAssignedDefaultResponse
-  >;
-  patch(
-    options: UpdateWithUserAssignedAndSystemAssignedParameters,
-  ): StreamableMethod<
-    | UpdateWithUserAssignedAndSystemAssigned200Response
-    | UpdateWithUserAssignedAndSystemAssignedDefaultResponse
-  >;
+    get(options?: GetParameters): StreamableMethod<Get200Response | GetDefaultResponse>;
+    put(options: CreateWithSystemAssignedParameters): StreamableMethod<CreateWithSystemAssigned200Response | CreateWithSystemAssigned201Response | CreateWithSystemAssignedDefaultResponse>;
+    patch(options: UpdateWithUserAssignedAndSystemAssignedParameters): StreamableMethod<UpdateWithUserAssignedAndSystemAssigned200Response | UpdateWithUserAssignedAndSystemAssignedDefaultResponse>;
 }
 
 export declare interface Get200Response extends HttpResponse {
-  status: "200";
-  body: ManagedIdentityTrackedResourceOutput;
+    status: "200";
+    body: ManagedIdentityTrackedResourceOutput;
 }
 
 export declare interface GetDefaultResponse extends HttpResponse {
-  status: string;
-  body: ErrorResponseOutput;
+    status: string;
+    body: ErrorResponseOutput;
 }
 
 export declare interface GetForPredefinedError {
-  get(
-    options?: GetForPredefinedErrorParameters,
-  ): StreamableMethod<GetForPredefinedError200Response | GetForPredefinedErrorDefaultResponse>;
-  put(
-    options: CreateForUserDefinedErrorParameters,
-  ): StreamableMethod<
-    | CreateForUserDefinedError200Response
-    | CreateForUserDefinedError201Response
-    | CreateForUserDefinedErrorDefaultResponse
-  >;
+    get(options?: GetForPredefinedErrorParameters): StreamableMethod<GetForPredefinedError200Response | GetForPredefinedErrorDefaultResponse>;
+    put(options: CreateForUserDefinedErrorParameters): StreamableMethod<CreateForUserDefinedError200Response | CreateForUserDefinedError201Response | CreateForUserDefinedErrorDefaultResponse>;
 }
 
 export declare interface GetForPredefinedError200Response extends HttpResponse {
-  status: "200";
-  body: ConfidentialResourceOutput;
+    status: "200";
+    body: ConfidentialResourceOutput;
 }
 
 export declare interface GetForPredefinedErrorDefaultResponse extends HttpResponse {
-  status: string;
-  body: ErrorResponseOutput;
+    status: string;
+    body: ErrorResponseOutput;
 }
 
 export declare type GetForPredefinedErrorParameters = RequestParameters;
@@ -186,76 +164,59 @@ export declare type GetForPredefinedErrorParameters = RequestParameters;
 export declare type GetParameters = RequestParameters;
 
 export declare interface Identity {
-  type?: ResourceIdentityType;
+    type?: ResourceIdentityType;
 }
 
 export declare interface IdentityOutput {
-  readonly principalId?: string;
-  readonly tenantId?: string;
-  type?: ResourceIdentityTypeOutput;
+    readonly principalId?: string;
+    readonly tenantId?: string;
+    type?: ResourceIdentityTypeOutput;
 }
 
 export declare interface InnerErrorOutput {
-  exceptiontype?: string;
-  errordetail?: string;
+    exceptiontype?: string;
+    errordetail?: string;
 }
 
-export { isRestError };
+export { isRestError }
 
-export declare function isUnexpected(
-  response: Get200Response | GetDefaultResponse,
-): response is GetDefaultResponse;
+export declare function isUnexpected(response: Get200Response | GetDefaultResponse): response is GetDefaultResponse;
 
-export declare function isUnexpected(
-  response:
-    | CreateWithSystemAssigned200Response
-    | CreateWithSystemAssigned201Response
-    | CreateWithSystemAssignedDefaultResponse,
-): response is CreateWithSystemAssignedDefaultResponse;
+export declare function isUnexpected(response: CreateWithSystemAssigned200Response | CreateWithSystemAssigned201Response | CreateWithSystemAssignedDefaultResponse): response is CreateWithSystemAssignedDefaultResponse;
 
-export declare function isUnexpected(
-  response:
-    | UpdateWithUserAssignedAndSystemAssigned200Response
-    | UpdateWithUserAssignedAndSystemAssignedDefaultResponse,
-): response is UpdateWithUserAssignedAndSystemAssignedDefaultResponse;
+export declare function isUnexpected(response: UpdateWithUserAssignedAndSystemAssigned200Response | UpdateWithUserAssignedAndSystemAssignedDefaultResponse): response is UpdateWithUserAssignedAndSystemAssignedDefaultResponse;
 
-export declare function isUnexpected(
-  response: GetForPredefinedError200Response | GetForPredefinedErrorDefaultResponse,
-): response is GetForPredefinedErrorDefaultResponse;
+export declare function isUnexpected(response: GetForPredefinedError200Response | GetForPredefinedErrorDefaultResponse): response is GetForPredefinedErrorDefaultResponse;
 
-export declare function isUnexpected(
-  response:
-    | CreateForUserDefinedError200Response
-    | CreateForUserDefinedError201Response
-    | CreateForUserDefinedErrorDefaultResponse,
-): response is CreateForUserDefinedErrorDefaultResponse;
+export declare function isUnexpected(response: CreateForUserDefinedError200Response | CreateForUserDefinedError201Response | CreateForUserDefinedErrorDefaultResponse): response is CreateForUserDefinedErrorDefaultResponse;
 
 export declare interface ManagedIdentityTrackedResource extends TrackedResource {
-  properties?: ManagedIdentityTrackedResourceProperties;
-  identity?: ManagedServiceIdentity;
+    properties?: ManagedIdentityTrackedResourceProperties;
+    identity?: ManagedServiceIdentity;
 }
 
 export declare interface ManagedIdentityTrackedResourceOutput extends TrackedResourceOutput {
-  properties?: ManagedIdentityTrackedResourcePropertiesOutput;
-  identity?: ManagedServiceIdentityOutput;
+    properties?: ManagedIdentityTrackedResourcePropertiesOutput;
+    identity?: ManagedServiceIdentityOutput;
 }
 
-export declare interface ManagedIdentityTrackedResourceProperties {}
+export declare interface ManagedIdentityTrackedResourceProperties {
+}
 
 export declare interface ManagedIdentityTrackedResourcePropertiesOutput {
-  readonly provisioningState: string;
+    readonly provisioningState: string;
 }
 
 export declare interface ManagedServiceIdentity {
-  type: ManagedServiceIdentityType;
-  userAssignedIdentities?: Record<string, UserAssignedIdentity>;
+    type: ManagedServiceIdentityType;
+    userAssignedIdentities?: Record<string, UserAssignedIdentity>;
 }
 
 export declare interface ManagedServiceIdentityOutput {
-  readonly principalId?: string;
-  readonly tenantId?: string;
-  type: ManagedServiceIdentityTypeOutput;
-  userAssignedIdentities?: Record<string, UserAssignedIdentityOutput>;
+    readonly principalId?: string;
+    readonly tenantId?: string;
+    type: ManagedServiceIdentityTypeOutput;
+    userAssignedIdentities?: Record<string, UserAssignedIdentityOutput>;
 }
 
 export declare type ManagedServiceIdentityType = string;
@@ -263,40 +224,41 @@ export declare type ManagedServiceIdentityType = string;
 export declare type ManagedServiceIdentityTypeOutput = string;
 
 export declare interface Plan {
-  name: string;
-  publisher: string;
-  product: string;
-  promotionCode?: string;
-  version?: string;
+    name: string;
+    publisher: string;
+    product: string;
+    promotionCode?: string;
+    version?: string;
 }
 
 export declare interface PlanOutput {
-  name: string;
-  publisher: string;
-  product: string;
-  promotionCode?: string;
-  version?: string;
+    name: string;
+    publisher: string;
+    product: string;
+    promotionCode?: string;
+    version?: string;
 }
 
-export declare interface PrivateEndpoint {}
+export declare interface PrivateEndpoint {
+}
 
 export declare interface PrivateEndpointConnection extends Resource {
-  properties?: PrivateEndpointConnectionProperties;
+    properties?: PrivateEndpointConnectionProperties;
 }
 
 export declare interface PrivateEndpointConnectionOutput extends ResourceOutput {
-  properties?: PrivateEndpointConnectionPropertiesOutput;
+    properties?: PrivateEndpointConnectionPropertiesOutput;
 }
 
 export declare interface PrivateEndpointConnectionProperties {
-  privateEndpoint?: PrivateEndpoint;
-  privateLinkServiceConnectionState: PrivateLinkServiceConnectionState;
+    privateEndpoint?: PrivateEndpoint;
+    privateLinkServiceConnectionState: PrivateLinkServiceConnectionState;
 }
 
 export declare interface PrivateEndpointConnectionPropertiesOutput {
-  privateEndpoint?: PrivateEndpointOutput;
-  privateLinkServiceConnectionState: PrivateLinkServiceConnectionStateOutput;
-  readonly provisioningState?: PrivateEndpointConnectionProvisioningStateOutput;
+    privateEndpoint?: PrivateEndpointOutput;
+    privateLinkServiceConnectionState: PrivateLinkServiceConnectionStateOutput;
+    readonly provisioningState?: PrivateEndpointConnectionProvisioningStateOutput;
 }
 
 export declare type PrivateEndpointConnectionProvisioningState = string;
@@ -304,7 +266,7 @@ export declare type PrivateEndpointConnectionProvisioningState = string;
 export declare type PrivateEndpointConnectionProvisioningStateOutput = string;
 
 export declare interface PrivateEndpointOutput {
-  readonly id?: string;
+    readonly id?: string;
 }
 
 export declare type PrivateEndpointServiceConnectionStatus = string;
@@ -312,100 +274,93 @@ export declare type PrivateEndpointServiceConnectionStatus = string;
 export declare type PrivateEndpointServiceConnectionStatusOutput = string;
 
 export declare interface PrivateLinkResource extends Resource {
-  properties?: PrivateLinkResourceProperties;
+    properties?: PrivateLinkResourceProperties;
 }
 
 export declare interface PrivateLinkResourceOutput extends ResourceOutput {
-  properties?: PrivateLinkResourcePropertiesOutput;
+    properties?: PrivateLinkResourcePropertiesOutput;
 }
 
 export declare interface PrivateLinkResourceProperties {
-  requiredZoneNames?: string[];
+    requiredZoneNames?: string[];
 }
 
 export declare interface PrivateLinkResourcePropertiesOutput {
-  readonly groupId?: string;
-  readonly requiredMembers?: string[];
-  requiredZoneNames?: string[];
+    readonly groupId?: string;
+    readonly requiredMembers?: string[];
+    requiredZoneNames?: string[];
 }
 
 export declare interface PrivateLinkServiceConnectionState {
-  status?: PrivateEndpointServiceConnectionStatus;
-  description?: string;
-  actionsRequired?: string;
+    status?: PrivateEndpointServiceConnectionStatus;
+    description?: string;
+    actionsRequired?: string;
 }
 
 export declare interface PrivateLinkServiceConnectionStateOutput {
-  status?: PrivateEndpointServiceConnectionStatusOutput;
-  description?: string;
-  actionsRequired?: string;
+    status?: PrivateEndpointServiceConnectionStatusOutput;
+    description?: string;
+    actionsRequired?: string;
 }
 
-export declare interface ProxyResource extends Resource {}
+export declare interface ProxyResource extends Resource {
+}
 
-export declare interface ProxyResourceOutput extends ResourceOutput {}
+export declare interface ProxyResourceOutput extends ResourceOutput {
+}
 
-export declare interface Resource {}
+export declare interface Resource {
+}
 
 export declare type ResourceIdentityType = "SystemAssigned";
 
 export declare type ResourceIdentityTypeOutput = "SystemAssigned";
 
 export declare interface ResourceModelWithAllowedPropertySet extends TrackedResource {
-  managedBy?: string;
-  kind?: string;
-  identity?: Identity;
-  sku?: Sku;
-  plan?: Plan;
+    managedBy?: string;
+    kind?: string;
+    identity?: Identity;
+    sku?: Sku;
+    plan?: Plan;
 }
 
 export declare interface ResourceModelWithAllowedPropertySetOutput extends TrackedResourceOutput {
-  managedBy?: string;
-  kind?: string;
-  readonly etag?: string;
-  identity?: IdentityOutput;
-  sku?: SkuOutput;
-  plan?: PlanOutput;
+    managedBy?: string;
+    kind?: string;
+    readonly etag?: string;
+    identity?: IdentityOutput;
+    sku?: SkuOutput;
+    plan?: PlanOutput;
 }
 
 export declare interface ResourceOutput {
-  readonly id?: string;
-  readonly name?: string;
-  readonly type?: string;
-  readonly systemData?: SystemDataOutput;
+    readonly id?: string;
+    readonly name?: string;
+    readonly type?: string;
+    readonly systemData?: SystemDataOutput;
 }
 
-export { RestError };
+export { RestError }
 
 export declare interface Routes {
-  (
-    path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Azure.ResourceManager.CommonProperties/managedIdentityTrackedResources/{managedIdentityTrackedResourceName}",
-    subscriptionId: string,
-    resourceGroupName: string,
-    managedIdentityTrackedResourceName: string,
-  ): Get;
-  (
-    path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Azure.ResourceManager.CommonProperties/confidentialResources/{confidentialResourceName}",
-    subscriptionId: string,
-    resourceGroupName: string,
-    confidentialResourceName: string,
-  ): GetForPredefinedError;
+    (path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Azure.ResourceManager.CommonProperties/managedIdentityTrackedResources/{managedIdentityTrackedResourceName}", subscriptionId: string, resourceGroupName: string, managedIdentityTrackedResourceName: string): Get;
+    (path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Azure.ResourceManager.CommonProperties/confidentialResources/{confidentialResourceName}", subscriptionId: string, resourceGroupName: string, confidentialResourceName: string): GetForPredefinedError;
 }
 
 export declare interface Sku {
-  name: string;
-  tier?: SkuTier;
-  size?: string;
-  family?: string;
-  capacity?: number;
+    name: string;
+    tier?: SkuTier;
+    size?: string;
+    family?: string;
+    capacity?: number;
 }
 
 export declare interface SkuOutput {
-  name: string;
-  tier?: SkuTierOutput;
-  size?: string;
-  family?: string;
-  capacity?: number;
+    name: string;
+    tier?: SkuTierOutput;
+    size?: string;
+    family?: string;
+    capacity?: number;
 }
 
 export declare type SkuTier = "Free" | "Basic" | "Standard" | "Premium";
@@ -413,55 +368,55 @@ export declare type SkuTier = "Free" | "Basic" | "Standard" | "Premium";
 export declare type SkuTierOutput = "Free" | "Basic" | "Standard" | "Premium";
 
 export declare interface SystemData {
-  createdBy?: string;
-  createdByType?: CreatedByType;
-  createdAt?: Date | string;
-  lastModifiedBy?: string;
-  lastModifiedByType?: CreatedByType;
-  lastModifiedAt?: Date | string;
+    createdBy?: string;
+    createdByType?: CreatedByType;
+    createdAt?: Date | string;
+    lastModifiedBy?: string;
+    lastModifiedByType?: CreatedByType;
+    lastModifiedAt?: Date | string;
 }
 
 export declare interface SystemDataOutput {
-  createdBy?: string;
-  createdByType?: CreatedByTypeOutput;
-  createdAt?: string;
-  lastModifiedBy?: string;
-  lastModifiedByType?: CreatedByTypeOutput;
-  lastModifiedAt?: string;
+    createdBy?: string;
+    createdByType?: CreatedByTypeOutput;
+    createdAt?: string;
+    lastModifiedBy?: string;
+    lastModifiedByType?: CreatedByTypeOutput;
+    lastModifiedAt?: string;
 }
 
 export declare interface TrackedResource extends Resource {
-  tags?: Record<string, string>;
-  location: string;
+    tags?: Record<string, string>;
+    location: string;
 }
 
 export declare interface TrackedResourceOutput extends ResourceOutput {
-  tags?: Record<string, string>;
-  location: string;
+    tags?: Record<string, string>;
+    location: string;
 }
 
 export declare interface UpdateWithUserAssignedAndSystemAssigned200Response extends HttpResponse {
-  status: "200";
-  body: ManagedIdentityTrackedResourceOutput;
+    status: "200";
+    body: ManagedIdentityTrackedResourceOutput;
 }
 
 export declare interface UpdateWithUserAssignedAndSystemAssignedBodyParam {
-  body: ManagedIdentityTrackedResource;
+    body: ManagedIdentityTrackedResource;
 }
 
 export declare interface UpdateWithUserAssignedAndSystemAssignedDefaultResponse extends HttpResponse {
-  status: string;
-  body: ErrorResponseOutput;
+    status: string;
+    body: ErrorResponseOutput;
 }
 
-export declare type UpdateWithUserAssignedAndSystemAssignedParameters =
-  UpdateWithUserAssignedAndSystemAssignedBodyParam & RequestParameters;
+export declare type UpdateWithUserAssignedAndSystemAssignedParameters = UpdateWithUserAssignedAndSystemAssignedBodyParam & RequestParameters;
 
-export declare interface UserAssignedIdentity {}
+export declare interface UserAssignedIdentity {
+}
 
 export declare interface UserAssignedIdentityOutput {
-  readonly principalId?: string;
-  readonly clientId?: string;
+    readonly principalId?: string;
+    readonly clientId?: string;
 }
 
-export {};
+export { }

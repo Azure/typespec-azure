@@ -1,17 +1,15 @@
-import type {
-  Client,
-  ClientOptions,
-  HttpResponse,
-  RequestParameters,
-  StreamableMethod,
-} from "@typespec/ts-http-runtime";
+import type { Client } from '@typespec/ts-http-runtime';
+import type { ClientOptions } from '@typespec/ts-http-runtime';
+import type { HttpResponse } from '@typespec/ts-http-runtime';
+import type { RequestParameters } from '@typespec/ts-http-runtime';
+import type { StreamableMethod } from '@typespec/ts-http-runtime';
 
 export declare interface Cobra extends SnakeParent {
-  kind: "cobra";
+    kind: "cobra";
 }
 
 export declare interface CobraOutput extends SnakeOutputParent {
-  kind: "cobra";
+    kind: "cobra";
 }
 
 declare function createClient(options?: EnumDiscriminatorClientOptions): EnumDiscriminatorClient;
@@ -26,40 +24,39 @@ export declare type DogKindOutput = string;
 export declare type DogOutput = DogOutputParent | GoldenOutput;
 
 export declare interface DogOutputParent {
-  weight: number;
-  kind: DogKindOutput;
+    weight: number;
+    kind: DogKindOutput;
 }
 
 export declare interface DogParent {
-  weight: number;
-  kind: DogKind;
+    weight: number;
+    kind: DogKind;
 }
 
 export declare type EnumDiscriminatorClient = Client & {
-  path: Routes;
+    path: Routes;
 };
 
-export declare interface EnumDiscriminatorClientOptions extends ClientOptions {}
+export declare interface EnumDiscriminatorClientOptions extends ClientOptions {
+}
 
 export declare interface GetExtensibleModel {
-  get(options?: GetExtensibleModelParameters): StreamableMethod<GetExtensibleModel200Response>;
-  put(options: PutExtensibleModelParameters): StreamableMethod<PutExtensibleModel204Response>;
+    get(options?: GetExtensibleModelParameters): StreamableMethod<GetExtensibleModel200Response>;
+    put(options: PutExtensibleModelParameters): StreamableMethod<PutExtensibleModel204Response>;
 }
 
 export declare interface GetExtensibleModel200Response extends HttpResponse {
-  status: "200";
-  body: DogOutput;
+    status: "200";
+    body: DogOutput;
 }
 
 export declare interface GetExtensibleModelMissingDiscriminator {
-  get(
-    options?: GetExtensibleModelMissingDiscriminatorParameters,
-  ): StreamableMethod<GetExtensibleModelMissingDiscriminator200Response>;
+    get(options?: GetExtensibleModelMissingDiscriminatorParameters): StreamableMethod<GetExtensibleModelMissingDiscriminator200Response>;
 }
 
 export declare interface GetExtensibleModelMissingDiscriminator200Response extends HttpResponse {
-  status: "200";
-  body: DogOutput;
+    status: "200";
+    body: DogOutput;
 }
 
 export declare type GetExtensibleModelMissingDiscriminatorParameters = RequestParameters;
@@ -67,37 +64,33 @@ export declare type GetExtensibleModelMissingDiscriminatorParameters = RequestPa
 export declare type GetExtensibleModelParameters = RequestParameters;
 
 export declare interface GetExtensibleModelWrongDiscriminator {
-  get(
-    options?: GetExtensibleModelWrongDiscriminatorParameters,
-  ): StreamableMethod<GetExtensibleModelWrongDiscriminator200Response>;
+    get(options?: GetExtensibleModelWrongDiscriminatorParameters): StreamableMethod<GetExtensibleModelWrongDiscriminator200Response>;
 }
 
 export declare interface GetExtensibleModelWrongDiscriminator200Response extends HttpResponse {
-  status: "200";
-  body: DogOutput;
+    status: "200";
+    body: DogOutput;
 }
 
 export declare type GetExtensibleModelWrongDiscriminatorParameters = RequestParameters;
 
 export declare interface GetFixedModel {
-  get(options?: GetFixedModelParameters): StreamableMethod<GetFixedModel200Response>;
-  put(options: PutFixedModelParameters): StreamableMethod<PutFixedModel204Response>;
+    get(options?: GetFixedModelParameters): StreamableMethod<GetFixedModel200Response>;
+    put(options: PutFixedModelParameters): StreamableMethod<PutFixedModel204Response>;
 }
 
 export declare interface GetFixedModel200Response extends HttpResponse {
-  status: "200";
-  body: SnakeOutput;
+    status: "200";
+    body: SnakeOutput;
 }
 
 export declare interface GetFixedModelMissingDiscriminator {
-  get(
-    options?: GetFixedModelMissingDiscriminatorParameters,
-  ): StreamableMethod<GetFixedModelMissingDiscriminator200Response>;
+    get(options?: GetFixedModelMissingDiscriminatorParameters): StreamableMethod<GetFixedModelMissingDiscriminator200Response>;
 }
 
 export declare interface GetFixedModelMissingDiscriminator200Response extends HttpResponse {
-  status: "200";
-  body: SnakeOutput;
+    status: "200";
+    body: SnakeOutput;
 }
 
 export declare type GetFixedModelMissingDiscriminatorParameters = RequestParameters;
@@ -105,61 +98,51 @@ export declare type GetFixedModelMissingDiscriminatorParameters = RequestParamet
 export declare type GetFixedModelParameters = RequestParameters;
 
 export declare interface GetFixedModelWrongDiscriminator {
-  get(
-    options?: GetFixedModelWrongDiscriminatorParameters,
-  ): StreamableMethod<GetFixedModelWrongDiscriminator200Response>;
+    get(options?: GetFixedModelWrongDiscriminatorParameters): StreamableMethod<GetFixedModelWrongDiscriminator200Response>;
 }
 
 export declare interface GetFixedModelWrongDiscriminator200Response extends HttpResponse {
-  status: "200";
-  body: SnakeOutput;
+    status: "200";
+    body: SnakeOutput;
 }
 
 export declare type GetFixedModelWrongDiscriminatorParameters = RequestParameters;
 
 export declare interface Golden extends DogParent {
-  kind: "golden";
+    kind: "golden";
 }
 
 export declare interface GoldenOutput extends DogOutputParent {
-  kind: "golden";
+    kind: "golden";
 }
 
 export declare interface PutExtensibleModel204Response extends HttpResponse {
-  status: "204";
+    status: "204";
 }
 
 export declare interface PutExtensibleModelBodyParam {
-  body: Dog;
+    body: Dog;
 }
 
 export declare type PutExtensibleModelParameters = PutExtensibleModelBodyParam & RequestParameters;
 
 export declare interface PutFixedModel204Response extends HttpResponse {
-  status: "204";
+    status: "204";
 }
 
 export declare interface PutFixedModelBodyParam {
-  body: Snake;
+    body: Snake;
 }
 
 export declare type PutFixedModelParameters = PutFixedModelBodyParam & RequestParameters;
 
 export declare interface Routes {
-  (path: "/type/model/inheritance/enum-discriminator/extensible-enum"): GetExtensibleModel;
-  (
-    path: "/type/model/inheritance/enum-discriminator/extensible-enum/missingdiscriminator",
-  ): GetExtensibleModelMissingDiscriminator;
-  (
-    path: "/type/model/inheritance/enum-discriminator/extensible-enum/wrongdiscriminator",
-  ): GetExtensibleModelWrongDiscriminator;
-  (path: "/type/model/inheritance/enum-discriminator/fixed-enum"): GetFixedModel;
-  (
-    path: "/type/model/inheritance/enum-discriminator/fixed-enum/missingdiscriminator",
-  ): GetFixedModelMissingDiscriminator;
-  (
-    path: "/type/model/inheritance/enum-discriminator/fixed-enum/wrongdiscriminator",
-  ): GetFixedModelWrongDiscriminator;
+    (path: "/type/model/inheritance/enum-discriminator/extensible-enum"): GetExtensibleModel;
+    (path: "/type/model/inheritance/enum-discriminator/extensible-enum/missingdiscriminator"): GetExtensibleModelMissingDiscriminator;
+    (path: "/type/model/inheritance/enum-discriminator/extensible-enum/wrongdiscriminator"): GetExtensibleModelWrongDiscriminator;
+    (path: "/type/model/inheritance/enum-discriminator/fixed-enum"): GetFixedModel;
+    (path: "/type/model/inheritance/enum-discriminator/fixed-enum/missingdiscriminator"): GetFixedModelMissingDiscriminator;
+    (path: "/type/model/inheritance/enum-discriminator/fixed-enum/wrongdiscriminator"): GetFixedModelWrongDiscriminator;
 }
 
 export declare type Snake = SnakeParent | Cobra;
@@ -171,13 +154,13 @@ export declare type SnakeKindOutput = "cobra";
 export declare type SnakeOutput = SnakeOutputParent | CobraOutput;
 
 export declare interface SnakeOutputParent {
-  length: number;
-  kind: SnakeKindOutput;
+    length: number;
+    kind: SnakeKindOutput;
 }
 
 export declare interface SnakeParent {
-  length: number;
-  kind: SnakeKind;
+    length: number;
+    kind: SnakeKind;
 }
 
-export {};
+export { }

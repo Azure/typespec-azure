@@ -1,40 +1,47 @@
-import { ClientOptions, OperationOptions } from "@azure-rest/core-client";
-import { isRestError, Pipeline, RestError } from "@azure/core-rest-pipeline";
+import { ClientOptions } from '@azure-rest/core-client';
+import { isRestError } from '@azure/core-rest-pipeline';
+import { OperationOptions } from '@azure-rest/core-client';
+import { Pipeline } from '@azure/core-rest-pipeline';
+import { RestError } from '@azure/core-rest-pipeline';
 
 export declare class ClientNamespaceFirstClient {
-  private _client;
-  readonly pipeline: Pipeline;
-  constructor(options?: ClientNamespaceFirstClientOptionalParams);
-  getFirst(options?: GetFirstOptionalParams): Promise<FirstClientResult>;
+    private _client;
+    readonly pipeline: Pipeline;
+    constructor(options?: ClientNamespaceFirstClientOptionalParams);
+    getFirst(options?: GetFirstOptionalParams): Promise<FirstClientResult>;
 }
 
-export declare interface ClientNamespaceFirstClientOptionalParams extends ClientOptions {}
+export declare interface ClientNamespaceFirstClientOptionalParams extends ClientOptions {
+}
 
 export declare class ClientNamespaceSecondClient {
-  private _client;
-  readonly pipeline: Pipeline;
-  constructor(options?: ClientNamespaceSecondClientOptionalParams);
-  getSecond(options?: GetSecondOptionalParams): Promise<SecondClientResult>;
+    private _client;
+    readonly pipeline: Pipeline;
+    constructor(options?: ClientNamespaceSecondClientOptionalParams);
+    getSecond(options?: GetSecondOptionalParams): Promise<SecondClientResult>;
 }
 
-export declare interface ClientNamespaceSecondClientOptionalParams extends ClientOptions {}
+export declare interface ClientNamespaceSecondClientOptionalParams extends ClientOptions {
+}
 
 export declare interface FirstClientResult {
-  name: string;
+    name: string;
 }
 
-export declare interface GetFirstOptionalParams extends OperationOptions {}
+export declare interface GetFirstOptionalParams extends OperationOptions {
+}
 
-export declare interface GetSecondOptionalParams extends OperationOptions {}
+export declare interface GetSecondOptionalParams extends OperationOptions {
+}
 
-export { isRestError };
+export { isRestError }
 
-export { RestError };
+export { RestError }
 
 export declare type SecondClientEnumType = "second";
 
 export declare interface SecondClientResult {
-  type: SecondClientEnumType;
+    type: SecondClientEnumType;
 }
 
-export {};
+export { }

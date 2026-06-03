@@ -1,80 +1,79 @@
-import type {
-  Client,
-  ClientOptions,
-  HttpResponse,
-  RequestParameters,
-  StreamableMethod,
-} from "@typespec/ts-http-runtime";
+import type { Client } from '@typespec/ts-http-runtime';
+import type { ClientOptions } from '@typespec/ts-http-runtime';
+import type { HttpResponse } from '@typespec/ts-http-runtime';
+import type { RequestParameters } from '@typespec/ts-http-runtime';
+import type { StreamableMethod } from '@typespec/ts-http-runtime';
 
 declare function createClient(options?: UsageClientOptions): UsageClient;
 export default createClient;
 
 export declare interface Input {
-  post(options: InputParameters): StreamableMethod<Input204Response>;
+    post(options: InputParameters): StreamableMethod<Input204Response>;
 }
 
 export declare interface Input204Response extends HttpResponse {
-  status: "204";
+    status: "204";
 }
 
 export declare interface InputAndOutput {
-  post(options: InputAndOutputParameters): StreamableMethod<InputAndOutput200Response>;
+    post(options: InputAndOutputParameters): StreamableMethod<InputAndOutput200Response>;
 }
 
 export declare interface InputAndOutput200Response extends HttpResponse {
-  status: "200";
-  body: InputOutputRecordOutput;
+    status: "200";
+    body: InputOutputRecordOutput;
 }
 
 export declare interface InputAndOutputBodyParam {
-  body: InputOutputRecord;
+    body: InputOutputRecord;
 }
 
 export declare type InputAndOutputParameters = InputAndOutputBodyParam & RequestParameters;
 
 export declare interface InputBodyParam {
-  body: InputRecord;
+    body: InputRecord;
 }
 
 export declare interface InputOutputRecord {
-  requiredProp: string;
+    requiredProp: string;
 }
 
 export declare interface InputOutputRecordOutput {
-  requiredProp: string;
+    requiredProp: string;
 }
 
 export declare type InputParameters = InputBodyParam & RequestParameters;
 
 export declare interface InputRecord {
-  requiredProp: string;
+    requiredProp: string;
 }
 
 export declare interface Output {
-  get(options?: OutputParameters): StreamableMethod<Output200Response>;
+    get(options?: OutputParameters): StreamableMethod<Output200Response>;
 }
 
 export declare interface Output200Response extends HttpResponse {
-  status: "200";
-  body: OutputRecordOutput;
+    status: "200";
+    body: OutputRecordOutput;
 }
 
 export declare type OutputParameters = RequestParameters;
 
 export declare interface OutputRecordOutput {
-  requiredProp: string;
+    requiredProp: string;
 }
 
 export declare interface Routes {
-  (path: "/type/model/usage/input"): Input;
-  (path: "/type/model/usage/output"): Output;
-  (path: "/type/model/usage/input-output"): InputAndOutput;
+    (path: "/type/model/usage/input"): Input;
+    (path: "/type/model/usage/output"): Output;
+    (path: "/type/model/usage/input-output"): InputAndOutput;
 }
 
 export declare type UsageClient = Client & {
-  path: Routes;
+    path: Routes;
 };
 
-export declare interface UsageClientOptions extends ClientOptions {}
+export declare interface UsageClientOptions extends ClientOptions {
+}
 
-export {};
+export { }

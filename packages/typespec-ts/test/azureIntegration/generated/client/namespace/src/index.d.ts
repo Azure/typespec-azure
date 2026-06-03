@@ -1,60 +1,60 @@
-import type {
-  Client,
-  ClientOptions,
-  HttpResponse,
-  RequestParameters,
-  StreamableMethod,
-} from "@azure-rest/core-client";
-import { isRestError, RestError } from "@azure/core-rest-pipeline";
+import type { Client } from '@azure-rest/core-client';
+import type { ClientOptions } from '@azure-rest/core-client';
+import type { HttpResponse } from '@azure-rest/core-client';
+import { isRestError } from '@azure/core-rest-pipeline';
+import type { RequestParameters } from '@azure-rest/core-client';
+import { RestError } from '@azure/core-rest-pipeline';
+import type { StreamableMethod } from '@azure-rest/core-client';
 
 export declare type ClientNamespaceClient = Client & {
-  path: Routes;
+    path: Routes;
 };
 
-export declare interface ClientNamespaceClientOptions extends ClientOptions {}
+export declare interface ClientNamespaceClientOptions extends ClientOptions {
+}
 
 declare function createClient(options?: ClientNamespaceClientOptions): ClientNamespaceClient;
 export default createClient;
 
 export declare interface FirstClientResultOutput {
-  name: string;
+    name: string;
 }
 
 export declare interface GetFirst {
-  get(options?: GetFirstParameters): StreamableMethod<GetFirst200Response>;
+    get(options?: GetFirstParameters): StreamableMethod<GetFirst200Response>;
 }
 
 export declare interface GetFirst200Response extends HttpResponse {
-  status: "200";
-  body: FirstClientResultOutput;
+    status: "200";
+    body: FirstClientResultOutput;
 }
 
 export declare type GetFirstParameters = RequestParameters;
 
 export declare interface GetSecond {
-  get(options?: GetSecondParameters): StreamableMethod<GetSecond200Response>;
+    get(options?: GetSecondParameters): StreamableMethod<GetSecond200Response>;
 }
 
 export declare interface GetSecond200Response extends HttpResponse {
-  status: "200";
-  body: SecondClientResultOutput;
+    status: "200";
+    body: SecondClientResultOutput;
 }
 
 export declare type GetSecondParameters = RequestParameters;
 
-export { isRestError };
+export { isRestError }
 
-export { RestError };
+export { RestError }
 
 export declare interface Routes {
-  (path: "/client/client-namespace/second"): GetSecond;
-  (path: "/client/client-namespace/first"): GetFirst;
+    (path: "/client/client-namespace/second"): GetSecond;
+    (path: "/client/client-namespace/first"): GetFirst;
 }
 
 export declare type SecondClientEnumTypeOutput = string;
 
 export declare interface SecondClientResultOutput {
-  type: SecondClientEnumTypeOutput;
+    type: SecondClientEnumTypeOutput;
 }
 
-export {};
+export { }

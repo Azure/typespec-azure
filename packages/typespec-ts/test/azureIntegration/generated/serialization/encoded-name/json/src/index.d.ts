@@ -1,59 +1,57 @@
-import type {
-  Client,
-  ClientOptions,
-  HttpResponse,
-  RequestParameters,
-  StreamableMethod,
-} from "@azure-rest/core-client";
-import { isRestError, RestError } from "@azure/core-rest-pipeline";
+import type { Client } from '@azure-rest/core-client';
+import type { ClientOptions } from '@azure-rest/core-client';
+import type { HttpResponse } from '@azure-rest/core-client';
+import { isRestError } from '@azure/core-rest-pipeline';
+import type { RequestParameters } from '@azure-rest/core-client';
+import { RestError } from '@azure/core-rest-pipeline';
+import type { StreamableMethod } from '@azure-rest/core-client';
 
-declare function createClient(
-  options?: SerializationEncodedNameJsonClientOptions,
-): SerializationEncodedNameJsonClient;
+declare function createClient(options?: SerializationEncodedNameJsonClientOptions): SerializationEncodedNameJsonClient;
 export default createClient;
 
-export { isRestError };
+export { isRestError }
 
 export declare interface JsonEncodedNameModel {
-  wireName: boolean;
+    wireName: boolean;
 }
 
 export declare interface JsonEncodedNameModelOutput {
-  wireName: boolean;
+    wireName: boolean;
 }
 
 export declare interface PropertyGet200Response extends HttpResponse {
-  status: "200";
-  body: JsonEncodedNameModelOutput;
+    status: "200";
+    body: JsonEncodedNameModelOutput;
 }
 
 export declare type PropertyGetParameters = RequestParameters;
 
 export declare interface PropertySend204Response extends HttpResponse {
-  status: "204";
+    status: "204";
 }
 
 export declare interface PropertySendBodyParam {
-  body: JsonEncodedNameModel;
+    body: JsonEncodedNameModel;
 }
 
 export declare type PropertySendParameters = PropertySendBodyParam & RequestParameters;
 
-export { RestError };
+export { RestError }
 
 export declare interface Routes {
-  (path: "/serialization/encoded-name/json/property"): Send;
+    (path: "/serialization/encoded-name/json/property"): Send;
 }
 
 export declare interface Send {
-  post(options: PropertySendParameters): StreamableMethod<PropertySend204Response>;
-  get(options?: PropertyGetParameters): StreamableMethod<PropertyGet200Response>;
+    post(options: PropertySendParameters): StreamableMethod<PropertySend204Response>;
+    get(options?: PropertyGetParameters): StreamableMethod<PropertyGet200Response>;
 }
 
 export declare type SerializationEncodedNameJsonClient = Client & {
-  path: Routes;
+    path: Routes;
 };
 
-export declare interface SerializationEncodedNameJsonClientOptions extends ClientOptions {}
+export declare interface SerializationEncodedNameJsonClientOptions extends ClientOptions {
+}
 
-export {};
+export { }

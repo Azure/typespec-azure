@@ -1,102 +1,96 @@
-import { ClientOptions, OperationOptions } from "@azure-rest/core-client";
-import { isRestError, Pipeline, RestError } from "@azure/core-rest-pipeline";
+import { ClientOptions } from '@azure-rest/core-client';
+import { isRestError } from '@azure/core-rest-pipeline';
+import { OperationOptions } from '@azure-rest/core-client';
+import { Pipeline } from '@azure/core-rest-pipeline';
+import { RestError } from '@azure/core-rest-pipeline';
 
 export declare type ContinuablePage<TElement, TPage = TElement[]> = TPage & {
-  continuationToken?: string;
+    continuationToken?: string;
 };
 
 export declare interface FirstItem {
-  readonly id: number;
+    readonly id: number;
 }
 
-export { isRestError };
+export { isRestError }
 
 export declare enum KnownVersions {
-  V20221201Preview = "2022-12-01-preview",
+    V20221201Preview = "2022-12-01-preview"
 }
 
-export declare interface ListFirstItemOptionalParams extends OperationOptions {}
+export declare interface ListFirstItemOptionalParams extends OperationOptions {
+}
 
 export declare interface ListItemInputBody {
-  inputName: string;
+    inputName: string;
 }
 
 export declare type ListItemInputExtensibleEnum = "First" | "Second";
 
-export declare interface ListSecondItemOptionalParams extends OperationOptions {}
+export declare interface ListSecondItemOptionalParams extends OperationOptions {
+}
 
-export declare interface ListWithCustomPageModelOptionalParams extends OperationOptions {}
+export declare interface ListWithCustomPageModelOptionalParams extends OperationOptions {
+}
 
-export declare interface ListWithPageOptionalParams extends OperationOptions {}
+export declare interface ListWithPageOptionalParams extends OperationOptions {
+}
 
 export declare interface ListWithParametersOptionalParams extends OperationOptions {
-  another?: ListItemInputExtensibleEnum;
+    another?: ListItemInputExtensibleEnum;
 }
 
 export declare class PageClient {
-  private _client;
-  readonly pipeline: Pipeline;
-  constructor(options?: PageClientOptionalParams);
-  withRelativeNextLink(
-    options?: WithRelativeNextLinkOptionalParams,
-  ): PagedAsyncIterableIterator<User>;
-  withParameterizedNextLink(
-    select: string,
-    options?: WithParameterizedNextLinkOptionalParams,
-  ): PagedAsyncIterableIterator<User>;
-  listWithCustomPageModel(
-    options?: ListWithCustomPageModelOptionalParams,
-  ): PagedAsyncIterableIterator<User>;
-  listWithParameters(
-    bodyInput: ListItemInputBody,
-    options?: ListWithParametersOptionalParams,
-  ): PagedAsyncIterableIterator<User>;
-  listWithPage(options?: ListWithPageOptionalParams): PagedAsyncIterableIterator<User>;
-  listSecondItem(options?: ListSecondItemOptionalParams): PagedAsyncIterableIterator<SecondItem>;
-  listFirstItem(options?: ListFirstItemOptionalParams): PagedAsyncIterableIterator<FirstItem>;
+    private _client;
+    readonly pipeline: Pipeline;
+    constructor(options?: PageClientOptionalParams);
+    withRelativeNextLink(options?: WithRelativeNextLinkOptionalParams): PagedAsyncIterableIterator<User>;
+    withParameterizedNextLink(select: string, options?: WithParameterizedNextLinkOptionalParams): PagedAsyncIterableIterator<User>;
+    listWithCustomPageModel(options?: ListWithCustomPageModelOptionalParams): PagedAsyncIterableIterator<User>;
+    listWithParameters(bodyInput: ListItemInputBody, options?: ListWithParametersOptionalParams): PagedAsyncIterableIterator<User>;
+    listWithPage(options?: ListWithPageOptionalParams): PagedAsyncIterableIterator<User>;
+    listSecondItem(options?: ListSecondItemOptionalParams): PagedAsyncIterableIterator<SecondItem>;
+    listFirstItem(options?: ListFirstItemOptionalParams): PagedAsyncIterableIterator<FirstItem>;
 }
 
 export declare interface PageClientOptionalParams extends ClientOptions {
-  apiVersion?: string;
+    apiVersion?: string;
 }
 
-export declare interface PagedAsyncIterableIterator<
-  TElement,
-  TPage = TElement[],
-  TPageSettings extends PageSettings = PageSettings,
-> {
-  next(): Promise<IteratorResult<TElement>>;
-  [Symbol.asyncIterator](): PagedAsyncIterableIterator<TElement, TPage, TPageSettings>;
-  byPage: (settings?: TPageSettings) => AsyncIterableIterator<ContinuablePage<TElement, TPage>>;
+export declare interface PagedAsyncIterableIterator<TElement, TPage = TElement[], TPageSettings extends PageSettings = PageSettings> {
+    next(): Promise<IteratorResult<TElement>>;
+    [Symbol.asyncIterator](): PagedAsyncIterableIterator<TElement, TPage, TPageSettings>;
+    byPage: (settings?: TPageSettings) => AsyncIterableIterator<ContinuablePage<TElement, TPage>>;
 }
 
 export declare interface PageSettings {
-  continuationToken?: string;
+    continuationToken?: string;
 }
 
-export { RestError };
+export { RestError }
 
 export declare interface SecondItem {
-  readonly name: string;
+    readonly name: string;
 }
 
 export declare interface User {
-  readonly id: number;
-  name: string;
-  orders?: UserOrder[];
-  readonly etag: string;
+    readonly id: number;
+    name: string;
+    orders?: UserOrder[];
+    readonly etag: string;
 }
 
 export declare interface UserOrder {
-  readonly id: number;
-  userId: number;
-  detail: string;
+    readonly id: number;
+    userId: number;
+    detail: string;
 }
 
 export declare interface WithParameterizedNextLinkOptionalParams extends OperationOptions {
-  includePending?: boolean;
+    includePending?: boolean;
 }
 
-export declare interface WithRelativeNextLinkOptionalParams extends OperationOptions {}
+export declare interface WithRelativeNextLinkOptionalParams extends OperationOptions {
+}
 
-export {};
+export { }

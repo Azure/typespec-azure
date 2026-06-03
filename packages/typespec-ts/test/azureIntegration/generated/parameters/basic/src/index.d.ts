@@ -1,62 +1,62 @@
-import type {
-  Client,
-  ClientOptions,
-  HttpResponse,
-  RequestParameters,
-  StreamableMethod,
-} from "@azure-rest/core-client";
-import { isRestError, RestError } from "@azure/core-rest-pipeline";
+import type { Client } from '@azure-rest/core-client';
+import type { ClientOptions } from '@azure-rest/core-client';
+import type { HttpResponse } from '@azure-rest/core-client';
+import { isRestError } from '@azure/core-rest-pipeline';
+import type { RequestParameters } from '@azure-rest/core-client';
+import { RestError } from '@azure/core-rest-pipeline';
+import type { StreamableMethod } from '@azure-rest/core-client';
 
 export declare type BasicClient = Client & {
-  path: Routes;
+    path: Routes;
 };
 
-export declare interface BasicClientOptions extends ClientOptions {}
+export declare interface BasicClientOptions extends ClientOptions {
+}
 
 declare function createClient(options?: BasicClientOptions): BasicClient;
 export default createClient;
 
 export declare interface ExplicitBodySimple {
-  put(options: ExplicitBodySimpleParameters): StreamableMethod<ExplicitBodySimple204Response>;
+    put(options: ExplicitBodySimpleParameters): StreamableMethod<ExplicitBodySimple204Response>;
 }
 
 export declare interface ExplicitBodySimple204Response extends HttpResponse {
-  status: "204";
+    status: "204";
 }
 
 export declare interface ExplicitBodySimpleBodyParam {
-  body: User;
+    body: User;
 }
 
 export declare type ExplicitBodySimpleParameters = ExplicitBodySimpleBodyParam & RequestParameters;
 
 export declare interface ImplicitBodySimple {
-  put(options: ImplicitBodySimpleParameters): StreamableMethod<ImplicitBodySimple204Response>;
+    put(options: ImplicitBodySimpleParameters): StreamableMethod<ImplicitBodySimple204Response>;
 }
 
 export declare interface ImplicitBodySimple204Response extends HttpResponse {
-  status: "204";
+    status: "204";
 }
 
 export declare interface ImplicitBodySimpleBodyParam {
-  body: {
-    name: string;
-  };
+    body: {
+        name: string;
+    };
 }
 
 export declare type ImplicitBodySimpleParameters = ImplicitBodySimpleBodyParam & RequestParameters;
 
-export { isRestError };
+export { isRestError }
 
-export { RestError };
+export { RestError }
 
 export declare interface Routes {
-  (path: "/parameters/basic/explicit-body/simple"): ExplicitBodySimple;
-  (path: "/parameters/basic/implicit-body/simple"): ImplicitBodySimple;
+    (path: "/parameters/basic/explicit-body/simple"): ExplicitBodySimple;
+    (path: "/parameters/basic/implicit-body/simple"): ImplicitBodySimple;
 }
 
 export declare interface User {
-  name: string;
+    name: string;
 }
 
-export {};
+export { }
