@@ -77,7 +77,7 @@ model ArmDeletedResponse {
  *>;
  * ```
  */
-@doc("")
+@doc("Resource deletion accepted.")
 model ArmDeleteAcceptedLroResponse<LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
   Azure.Core.Foundations.RetryAfterHeader>
   is ArmAcceptedLroResponse<"Resource deletion accepted.", LroHeaders>;
@@ -85,7 +85,7 @@ model ArmDeleteAcceptedLroResponse<LroHeaders extends TypeSpec.Reflection.Model 
 /**
  * The response for synchronous Azure Resource Manager delete ACCEPTED
  */
-@doc("")
+@doc("Resource deletion accepted.")
 model ArmDeleteAcceptedResponse is ArmAcceptedResponse<"Resource deletion accepted.">;
 
 /**
@@ -282,7 +282,7 @@ model ArmCombinedLroHeaders<
  * >;
  * ```
  */
-@doc("")
+@doc("Resource does not exist.")
 model ArmDeletedNoContentResponse is ArmNoContentResponse<"Resource does not exist.">;
 
 /**

@@ -311,7 +311,7 @@ op ArmResourceCreateOrReplaceSync<
  * @template Error Optional. The error response, if non-standard.
  * @template Provider Optional. The provider namespace model for the resource.
  */
-@doc("")
+@doc("Create a {name}", Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourceCreateOrReplaceAsync<
   Resource extends Foundations.SimpleResource,
@@ -455,7 +455,7 @@ op ArmCustomPatchAsync<
 #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
 @patch(#{ implicitOptionality: true })
 @Private.enforceConstraint(Resource, Foundations.Resource)
-@doc("")
+@doc("Update a {name}", Resource)
 op ArmTagsPatchSync<
   Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>,
@@ -482,7 +482,7 @@ op ArmTagsPatchSync<
 #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
 @patch(#{ implicitOptionality: true })
 @Private.enforceConstraint(Resource, Foundations.Resource)
-@doc("")
+@doc("Update a {name}", Resource)
 op ArmResourcePatchSync<
   Resource extends Foundations.SimpleResource,
   Properties extends TypeSpec.Reflection.Model,
@@ -566,7 +566,7 @@ op ArmResourceDeleteAsyncBase<
  */
 #deprecated "Use 'ArmResourceDeleteWithoutOkAsync' instead"
 @Private.enforceConstraint(Resource, Foundations.Resource)
-@doc("")
+@doc("Delete a {name}", Resource)
 op ArmResourceDeleteAsync<
   Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>,
@@ -592,7 +592,7 @@ op ArmResourceDeleteAsync<
  * @template Provider Optional. The provider namespace model for the resource.
  */
 @Private.enforceConstraint(Resource, Foundations.Resource)
-@doc("")
+@doc("Delete a {name}", Resource)
 op ArmResourceDeleteWithoutOkAsync<
   Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>,
