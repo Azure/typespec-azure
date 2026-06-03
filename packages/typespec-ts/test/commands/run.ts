@@ -10,7 +10,25 @@ import { npxCommand } from "./runCommand.js";
 import * as fs from "fs/promises";
 import { createTaskLogger } from "./logger.js";
 import { createProgram, CompilerOptions } from "typescript";
-import lodash from "lodash";
+
+function deepMerge(target: any, source: any): any {
+  const result = { ...target };
+  for (const key of Object.keys(source)) {
+    if (
+      source[key] &&
+      typeof source[key] === "object" &&
+      !Array.isArray(source[key]) &&
+      target[key] &&
+      typeof target[key] === "object" &&
+      !Array.isArray(target[key])
+    ) {
+      result[key] = deepMerge(target[key], source[key]);
+    } else {
+      result[key] = source[key];
+    }
+  }
+  return result;
+}
 
 interface GenEnv {
   readonly logger: () => any;
@@ -182,8 +200,8 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
     // Defaults are merged in api-extractor when the config file is read from disk with
     // `ExtractorConfig.loadFile`. This is derived from that method.
     // https://github.com/microsoft/rushstack/blob/1a92f17fa537b55529adbec80203bd99afd8cd24/apps/api-extractor/src/api/ExtractorConfig.ts#L624-L627
-    const configObject = lodash.merge(
-      lodash.cloneDeep((ExtractorConfig as any)._defaultConfig),
+    const configObject = deepMerge(
+      structuredClone((ExtractorConfig as any)._defaultConfig),
       baseConfigObject
     );
     ExtractorConfig.jsonSchema.validateObject(
