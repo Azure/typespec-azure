@@ -49,7 +49,7 @@ model KeyEncryptionKeyIdentity {
 
 /** Customer-managed key encryption properties for the resource. */
 @added(Versions.v4)
-@Azure.ResourceManager.Private.armCommonDefinitionExcluded("Azure.ResourceManager.Foundations.Encryption")
+@Azure.ResourceManager.Private.armCommonDefinitionExcluded("Azure.ResourceManager.CommonTypes.Encryption")
 model CustomerManagedKeyEncryption {
   /** All identity configuration for Customer-managed key settings defining which identity should be used to auth to Key Vault. */
   keyEncryptionKeyIdentity?: KeyEncryptionKeyIdentity;
