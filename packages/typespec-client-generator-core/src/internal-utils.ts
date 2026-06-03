@@ -1349,15 +1349,25 @@ export function isTypeNeedsHandling(context: TCGCContext, type: Type): boolean {
 
 export function listOrphanTypes(context: TCGCContext): (Model | Enum | Union)[] {
   if (context.__orphanTypesCache) return context.__orphanTypesCache;
-  const result: (Model | Enum | Union)[] = [];
   const seen = new Set<Model | Enum | Union>();
+
+  // Collect types into separate buckets to maintain a stable ordering:
+  // models first, then enums, then unions. This ordering matters because
+  // anonymous types (e.g. anonymous model variants inside unions) get their
+  // generated name from the first context that processes them. Models must
+  // come first so their property-context names win over union-context names.
+  const models: Model[] = [];
+  const enums: Enum[] = [];
+  const unions: Union[] = [];
 
   function addType(type: Model | Enum | Union) {
     if (seen.has(type)) return;
     if ((type.kind === "Model" || type.kind === "Union") && isTemplateDeclaration(type)) return;
     if (!isTypeNeedsHandling(context, type)) return;
     seen.add(type);
-    result.push(type);
+    if (type.kind === "Model") models.push(type);
+    else if (type.kind === "Enum") enums.push(type);
+    else unions.push(type);
   }
 
   function addNamespace(namespace: Namespace) {
@@ -1402,6 +1412,7 @@ export function listOrphanTypes(context: TCGCContext): (Model | Enum | Union)[] 
     }
   }
 
+  const result: (Model | Enum | Union)[] = [...models, ...enums, ...unions];
   context.__orphanTypesCache = result;
   return result;
 }
