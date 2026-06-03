@@ -14,7 +14,7 @@ import {
 import { assertEqualContent, ExampleJson } from "../util/testUtil.js";
 import { format } from "prettier";
 import { prettierTypeScriptOptions } from "../../src/lib.js";
-import { load as loadYaml } from "js-yaml";
+import { parse as loadYaml } from "yaml";
 
 const SCENARIOS_LOCATION = "./test/modularUnit/scenarios";
 
