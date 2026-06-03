@@ -6,7 +6,7 @@ import {
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 
-import { armCommonDefinitionExcludedRule } from "../../src/rules/arm-common-definition-excluded.js";
+import { noDeprecatedCommonTypesRule } from "../../src/rules/no-deprecated-common-types.js";
 
 let runner: TesterInstance;
 let tester: LinterRuleTester;
@@ -15,7 +15,7 @@ beforeEach(async () => {
   runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    armCommonDefinitionExcludedRule,
+    noDeprecatedCommonTypesRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });
@@ -36,13 +36,12 @@ it("emits diagnostic when using CustomerManagedKeyEncryption directly in a user 
 
       @added(Microsoft.Contoso.Versions.v4)
       model EncryptionConfig {
-        #suppress "deprecated" "Testing arm-common-definition-excluded rule"
         customerManagedKey: Azure.ResourceManager.CommonTypes.CustomerManagedKeyEncryption;
       }
     `,
     )
     .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-common-definition-excluded",
+      code: "@azure-tools/typespec-azure-resource-manager/no-deprecated-common-types",
     });
 });
 

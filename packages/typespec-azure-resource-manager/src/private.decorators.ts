@@ -203,20 +203,21 @@ export function isGenericResource(program: Program, target: Model): boolean {
   return false;
 }
 
-const [getArmCommonDefinitionExcluded, setArmCommonDefinitionExcluded] = useStateMap<
+const [getArmCommonDefinitionExcludedState, setArmCommonDefinitionExcludedState] = useStateMap<
   Model,
-  boolean
+  string
 >(ArmStateKeys.armCommonDefinitionExcluded);
 
 const $armCommonDefinitionExcluded: ArmCommonDefinitionExcludedDecorator = (
   context: DecoratorContext,
   target: Model,
+  replacementTypeName: string,
 ) => {
-  setArmCommonDefinitionExcluded(context.program, target, true);
+  setArmCommonDefinitionExcludedState(context.program, target, replacementTypeName);
 };
 
-export function isArmCommonDefinitionExcluded(program: Program, target: Model): boolean {
-  return getArmCommonDefinitionExcluded(program, target) === true;
+export function getArmCommonDefinitionExcluded(program: Program, target: Model): string | undefined {
+  return getArmCommonDefinitionExcludedState(program, target);
 }
 
 const $omitIfEmpty: OmitIfEmptyDecorator = (

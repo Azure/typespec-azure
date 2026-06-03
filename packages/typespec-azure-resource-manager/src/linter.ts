@@ -1,5 +1,5 @@
 import { defineLinter } from "@typespec/compiler";
-import { armCommonDefinitionExcludedRule } from "./rules/arm-common-definition-excluded.js";
+import { noDeprecatedCommonTypesRule } from "./rules/no-deprecated-common-types.js";
 import { armCommonTypesVersionRule } from "./rules/arm-common-types-version.js";
 import { armCustomResourceNoKey } from "./rules/arm-custom-resource-no-key.js";
 import { armCustomResourceUsageDiscourage } from "./rules/arm-custom-resource-usage-discourage.js";
@@ -41,7 +41,7 @@ const rules = [
   armNoRecordRule,
   armNoPathCasingConflictsRule,
   armCommonTypesVersionRule,
-  armCommonDefinitionExcludedRule,
+  noDeprecatedCommonTypesRule,
   armDeleteResponseCodesRule,
   armPutResponseCodesRule,
   armPostResponseCodesRule,

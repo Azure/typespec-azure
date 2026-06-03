@@ -246,5 +246,6 @@ extern dec genericResourceInternal(target: Model);
  * Marks an Azure Resource Manager common type as excluded from direct use in
  * service specifications. Types decorated with this decorator should not be
  * referenced directly in service specs; use the equivalent Foundations type instead.
+ * @param replacementTypeName The name of the replacement type to use instead
  */
-extern dec armCommonDefinitionExcluded(target: Model);
+extern dec armCommonDefinitionExcluded(target: Model, replacementTypeName: valueof string);
