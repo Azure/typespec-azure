@@ -1,9 +1,9 @@
 ---
-title: "no-url-suffix"
+title: "dotnet-no-url-suffix"
 ---
 
 ```text title="Full name"
-@azure-tools/typespec-client-generator-core/no-url-suffix
+@azure-tools/typespec-client-generator-core/dotnet-no-url-suffix
 ```
 
 Properties ending with `Url` should use `Uri` suffix instead to follow [.NET naming conventions](https://github.com/Azure/azure-sdk-for-net/blob/main/eng/packages/http-client-csharp-mgmt/generator/Azure.Generator.Management/src/Visitors/NameVisitor.cs). The .NET SDK generator already auto-renames `Url` → `Uri`, but this rule moves that feedback upstream to spec authoring time.
@@ -28,11 +28,9 @@ model Foo {
 }
 ```
 
-Or using `@clientName` to override just the C# name:
+Or using `@@clientName` in `client.tsp` to override just the C# name:
 
 ```tsp
-model Foo {
-  @clientName("imageUri", "csharp")
-  imageUrl: string;
-}
+// client.tsp
+@@clientName(Foo.imageUrl, "imageUri", "csharp");
 ```

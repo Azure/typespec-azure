@@ -4,7 +4,6 @@ import { noUrlSuffixRule } from "./rules/no-url-suffix.js";
 import { propertyNameConflictRule } from "./rules/property-name-conflict.rule.js";
 import { requireClientSuffixRule } from "./rules/require-client-suffix.rule.js";
 
-
 const rules = [
   requireClientSuffixRule,
   propertyNameConflictRule,

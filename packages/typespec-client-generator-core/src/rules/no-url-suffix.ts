@@ -1,14 +1,18 @@
+import type {
+  CodeFix,
+  CodeFixContext,
+  CompilerHost,
+  InsertTextCodeFixEdit,
+} from "@typespec/compiler";
 import {
   ModelProperty,
   createRule,
   createSourceFile,
-  getDirectoryPath,
   getNamespaceFullName,
   getSourceLocation,
   paramMessage,
   resolvePath,
 } from "@typespec/compiler";
-import type { CodeFix, CodeFixContext, CompilerHost, InsertTextCodeFixEdit } from "@typespec/compiler";
 import { createTCGCContext } from "../context.js";
 import { getLibraryName } from "../public-utils.js";
 
@@ -16,16 +20,17 @@ function createRenameUrlToUriCodeFix(
   property: ModelProperty,
   csharpName: string,
   host: CompilerHost,
+  projectRoot: string,
 ) {
   const newName = csharpName.slice(0, -1) + "i"; // Url → Uri
   const codeFix: CodeFix = {
-    id: "rename-url-to-uri",
+    id: "dotnet-rename-url-to-uri",
     label: `Add @@clientName to client.tsp → "${newName}"`,
     fix: (async (_fixContext: CodeFixContext): Promise<any> => {
       if (property.node === undefined) return [];
-      const propertySourcePath = getSourceLocation(property.node).file.path;
-      const dir = getDirectoryPath(propertySourcePath);
-      const clientTspPath = resolvePath(dir, "client.tsp");
+      // Always create client.tsp at the project root (next to tspconfig.yaml/main.tsp),
+      // not in the property's source file directory which could be a subdirectory.
+      const clientTspPath = resolvePath(projectRoot, "client.tsp");
 
       let existingText = "";
       try {
@@ -35,57 +40,75 @@ function createRenameUrlToUriCodeFix(
         // File doesn't exist yet — will be created by the language server
       }
 
-      const modelFileName = propertySourcePath.split("/").pop() ?? "main.tsp";
-      const importPath = `./${modelFileName}`;
-      const tcgcImport = `import "@azure-tools/typespec-client-generator-core";\n`;
-      const modelImport = `import "${importPath}";\n`;
-      const usingLine = `using Azure.ClientGenerator.Core;\n`;
-
-      let textToAppend = "";
-      if (!existingText.includes(tcgcImport.trim())) {
-        textToAppend += tcgcImport;
-      }
-      if (!existingText.includes(modelImport.trim())) {
-        textToAppend += modelImport;
-      }
-      if (!existingText.includes(usingLine.trim())) {
-        textToAppend += `\n${usingLine}`;
-      }
-      if (textToAppend.length > 0 && existingText.length === 0) {
-        textToAppend += "\n";
+      // Compute relative import path from client.tsp (at project root) to the source file
+      const propertySourcePath = getSourceLocation(property.node).file.path;
+      let relativePath: string;
+      if (propertySourcePath.startsWith(projectRoot)) {
+        const subPath = propertySourcePath.slice(projectRoot.length).replace(/^\//, "");
+        relativePath = `./${subPath}`;
+      } else {
+        relativePath = `./${propertySourcePath.split("/").pop() ?? "main.tsp"}`;
       }
 
-      // Build fully qualified property reference: Namespace.Model.property
+      const clientFile = createSourceFile(existingText, clientTspPath);
+      const edits: InsertTextCodeFixEdit[] = [];
+
+      // Build imports/using to insert at the TOP of the file
+      const tcgcImport = `import "@azure-tools/typespec-client-generator-core";`;
+      const modelImport = `import "${relativePath}";`;
+      const usingLine = `using Azure.ClientGenerator.Core;`;
+
+      let headerToInsert = "";
+      if (!existingText.includes(tcgcImport)) {
+        headerToInsert += tcgcImport + "\n";
+      }
+      if (!existingText.includes(modelImport)) {
+        headerToInsert += modelImport + "\n";
+      }
+      if (!existingText.includes(usingLine)) {
+        headerToInsert += "\n" + usingLine + "\n";
+      }
+      if (headerToInsert.length > 0) {
+        edits.push({
+          kind: "insert-text",
+          pos: 0,
+          text: headerToInsert + (existingText.length === 0 ? "\n" : ""),
+          file: clientFile,
+        });
+      }
+
+      // Build @@clientName to append at the END of the file
       const model = property.model;
       let fqn: string;
       if (model && model.namespace) {
-        fqn = `${getNamespaceFullName(model.namespace)}.${model.name}.${property.name}`;
+        const nsName = getNamespaceFullName(model.namespace);
+        fqn = nsName
+          ? `${nsName}.${model.name}.${property.name}`
+          : `${model.name}.${property.name}`;
       } else if (model) {
         fqn = `${model.name}.${property.name}`;
       } else {
         fqn = property.name;
       }
-      textToAppend += `@@clientName(${fqn}, "${newName}", "csharp");\n`;
-
-      const clientFile = createSourceFile(existingText, clientTspPath);
-      const edit: InsertTextCodeFixEdit = {
+      edits.push({
         kind: "insert-text",
         pos: existingText.length,
-        text: textToAppend,
+        text: `@@clientName(${fqn}, "${newName}", "csharp");\n`,
         file: clientFile,
-      };
-      return edit;
+      });
+
+      return edits;
     }) as CodeFix["fix"],
   };
   return codeFix;
 }
 
 export const noUrlSuffixRule = createRule({
-  name: "no-url-suffix",
+  name: "dotnet-no-url-suffix",
   description:
     "Properties ending with 'Url' should use 'Uri' suffix instead to follow .NET naming conventions.",
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/no-url-suffix",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/dotnet-no-url-suffix",
   messages: {
     default: paramMessage`Property '${"propertyName"}' ends with 'Url'. Use 'Uri' suffix instead (e.g. '${"suggestion"}'). Use @clientName("${"suggestion"}", "csharp") to rename it for C#.`,
   },
@@ -106,7 +129,14 @@ export const noUrlSuffixRule = createRule({
         context.reportDiagnostic({
           format: { propertyName: csharpName, suggestion },
           target: property,
-          codefixes: [createRenameUrlToUriCodeFix(property, csharpName, context.program.host)],
+          codefixes: [
+            createRenameUrlToUriCodeFix(
+              property,
+              csharpName,
+              context.program.host,
+              context.program.projectRoot,
+            ),
+          ],
         });
       },
     };
