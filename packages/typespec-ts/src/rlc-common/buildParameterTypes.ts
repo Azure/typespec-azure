@@ -184,6 +184,28 @@ export function buildParameterTypes(model: RLCModel) {
       }
     ]);
   }
+  // Add NodeReadableStream import if binary types are used in parameters.
+  // The platform-types static helper resolves NodeReadableStream to
+  // NodeJS.ReadableStream on Node and `never` on browser/react-native, so the
+  // union arm drops out naturally in non-Node builds.
+  if (parametersFile.getFullText().includes("NodeReadableStream")) {
+    const platformTypesModuleSpecifier = model.options?.azureSdkForJs
+      ? "#platform/static-helpers/platform-types"
+      : getImportModuleName(
+          {
+            cjsName: `./static-helpers/platform-types`,
+            esModulesName: `./static-helpers/platform-types.js`
+          },
+          model
+        );
+    parametersFile.addImportDeclarations([
+      {
+        isTypeOnly: true,
+        namedImports: ["NodeReadableStream"],
+        moduleSpecifier: platformTypesModuleSpecifier
+      }
+    ]);
+  }
   return { path: filePath, content: parametersFile.getFullText() };
 }
 

@@ -10,6 +10,7 @@ import {
 } from "./buildObjectTypes.js";
 import { RLCModel, SchemaContext } from "./interfaces.js";
 import { getImportSpecifier } from "./helpers/importsUtil.js";
+import { getImportModuleName } from "./helpers/nameConstructors.js";
 
 /**
  * Generates types to represent schema definitions in the swagger
@@ -72,6 +73,28 @@ export function generateModelFiles(
             "restClient",
             model.importInfo.runtimeImports
           )
+        }
+      ]);
+    }
+    // Add NodeReadableStream import if binary types are used in models.
+    // The platform-types static helper resolves NodeReadableStream to
+    // NodeJS.ReadableStream on Node and `never` on browser/react-native, so the
+    // union arm drops out naturally in non-Node builds.
+    if (modelsFile.getFullText().includes("NodeReadableStream")) {
+      const platformTypesModuleSpecifier = model.options?.azureSdkForJs
+        ? "#platform/static-helpers/platform-types"
+        : getImportModuleName(
+            {
+              cjsName: `./static-helpers/platform-types`,
+              esModulesName: `./static-helpers/platform-types.js`
+            },
+            model
+          );
+      modelsFile.addImportDeclarations([
+        {
+          isTypeOnly: true,
+          namedImports: ["NodeReadableStream"],
+          moduleSpecifier: platformTypesModuleSpecifier
         }
       ]);
     }
