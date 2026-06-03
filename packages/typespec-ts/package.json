@@ -101,8 +101,7 @@
     "@vitest/coverage-v8": "catalog:",
     "@microsoft/api-extractor": "catalog:",
     "tsx": "catalog:",
-    "@types/js-yaml": "catalog:",
-    "js-yaml": "catalog:"
+    "yaml": "catalog:"
   },
   "peerDependencies": {
     "@azure-tools/typespec-azure-core": "workspace:^",
