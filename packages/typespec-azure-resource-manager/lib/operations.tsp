@@ -346,7 +346,7 @@ op ArmResourceCreateOrReplaceAsync<
 #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
 @patch(#{ implicitOptionality: true })
 @Private.enforceConstraint(Resource, Foundations.Resource)
-@doc("")
+@doc("Update a {name}", Resource)
 op ArmTagsPatchAsync<
   Resource extends Foundations.SimpleResource,
   Properties extends {} = TagsUpdateModel<Resource>,
@@ -382,7 +382,7 @@ op ArmTagsPatchAsync<
 #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
 @patch(#{ implicitOptionality: true })
 @Private.enforceConstraint(Resource, Foundations.Resource)
-@doc("")
+@doc("Update a {name}", Resource)
 op ArmResourcePatchAsync<
   Resource extends Foundations.SimpleResource,
   Properties extends TypeSpec.Reflection.Model,
