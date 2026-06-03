@@ -55,7 +55,7 @@ interface ManagementGroupChildResources {
     Resource GET operation at management group scope.
     Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources/resource
     Expected query parameter: api-version=2023-12-01-preview
-    
+
     Expected response body:
     ```json
     {
@@ -84,7 +84,7 @@ interface ManagementGroupChildResources {
     Resource PUT operation at management group scope.
     Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources/resource
     Expected query parameter: api-version=2023-12-01-preview
-    
+
     Expected request body:
     ```json
     {
@@ -93,7 +93,7 @@ interface ManagementGroupChildResources {
       }
     }
     ```
-    
+
     Expected response body:
     ```json
     {
@@ -122,7 +122,7 @@ interface ManagementGroupChildResources {
     Resource PATCH operation at management group scope.
     Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources/resource
     Expected query parameter: api-version=2023-12-01-preview
-    
+
     Expected request body:
     ```json
     {
@@ -131,7 +131,7 @@ interface ManagementGroupChildResources {
       }
     }
     ```
-    
+
     Expected response body:
     ```json
     {
@@ -173,7 +173,7 @@ interface ManagementGroupChildResources {
     Resource LIST operation at management group scope.
     Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources
     Expected query parameter: api-version=2023-12-01-preview
-    
+
     Expected response body:
     ```json
     {
