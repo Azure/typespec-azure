@@ -55,7 +55,7 @@ interface ManagementGroupChildResources {
     Resource GET operation at management group scope.
     Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources/resource
     Expected query parameter: api-version=2023-12-01-preview
-
+    
     Expected response body:
     ```json
     {
@@ -77,14 +77,17 @@ interface ManagementGroupChildResources {
     }
     ```
     """)
-  get is Extension.Read<Extension.ManagementGroup<"managementGroupId">, ManagementGroupChildResource>;
+  get is Extension.Read<
+    Extension.ManagementGroup<"managementGroupId">,
+    ManagementGroupChildResource
+  >;
 
   @scenario
   @scenarioDoc("""
     Resource PUT operation at management group scope.
     Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources/resource
     Expected query parameter: api-version=2023-12-01-preview
-
+    
     Expected request body:
     ```json
     {
@@ -93,7 +96,7 @@ interface ManagementGroupChildResources {
       }
     }
     ```
-
+    
     Expected response body:
     ```json
     {
@@ -115,14 +118,17 @@ interface ManagementGroupChildResources {
     }
     ```
     """)
-  createOrUpdate is Extension.CreateOrReplaceAsync<Extension.ManagementGroup<"managementGroupId">, ManagementGroupChildResource>;
+  createOrUpdate is Extension.CreateOrReplaceAsync<
+    Extension.ManagementGroup<"managementGroupId">,
+    ManagementGroupChildResource
+  >;
 
   @scenario
   @scenarioDoc("""
     Resource PATCH operation at management group scope.
     Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources/resource
     Expected query parameter: api-version=2023-12-01-preview
-
+    
     Expected request body:
     ```json
     {
@@ -131,7 +137,7 @@ interface ManagementGroupChildResources {
       }
     }
     ```
-
+    
     Expected response body:
     ```json
     {
@@ -166,14 +172,17 @@ interface ManagementGroupChildResources {
     Expected query parameter: api-version=2023-12-01-preview
     Expected response status code: 204
     """)
-  delete is Extension.DeleteSync<Extension.ManagementGroup<"managementGroupId">, ManagementGroupChildResource>;
+  delete is Extension.DeleteSync<
+    Extension.ManagementGroup<"managementGroupId">,
+    ManagementGroupChildResource
+  >;
 
   @scenario
   @scenarioDoc("""
     Resource LIST operation at management group scope.
     Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources
     Expected query parameter: api-version=2023-12-01-preview
-
+    
     Expected response body:
     ```json
     {
@@ -197,5 +206,8 @@ interface ManagementGroupChildResources {
     }
     ```
     """)
-  listByManagementGroup is Extension.ListByTarget<Extension.ManagementGroup<"managementGroupId">, ManagementGroupChildResource>;
+  listByManagementGroup is Extension.ListByTarget<
+    Extension.ManagementGroup<"managementGroupId">,
+    ManagementGroupChildResource
+  >;
 }
