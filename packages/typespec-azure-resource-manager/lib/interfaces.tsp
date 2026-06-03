@@ -149,7 +149,7 @@ interface ResourceListBySubscription<Resource extends Foundations.SimpleResource
    * List resources by subscription.
    * @template Resource The ArmResource to list.
    */
-  @doc("")
+  @doc("List {name} resources by subscription ID", Resource)
   listBySubscription is ArmListBySubscription<Resource>;
 }
 
@@ -192,7 +192,7 @@ interface ResourceRead<
    * @template Resource The ArmResource to retrieve.
    * @template BaseParameters The http parameters that are part of the request
    */
-  @doc("")
+  @doc("Get a {name}", Resource)
   get is ArmResourceRead<Resource, BaseParameters>;
 }
 
@@ -210,7 +210,7 @@ interface ResourceCreateSync<
    * @template Resource The ArmResource to create or update.
    * @template BaseParameters The http parameters that are part of the request
    */
-  @doc("")
+  @doc("Create a {name}", Resource)
   createOrUpdate is ArmResourceCreateOrReplaceSync<Resource, BaseParameters>;
 }
 
@@ -228,7 +228,7 @@ interface ResourceCreateAsync<
    * @template Resource The ArmResource to create or update.
    * @template BaseParameters The http parameters that are part of the request
    */
-  @doc("")
+  @doc("Create a {name}", Resource)
   createOrUpdate is ArmResourceCreateOrUpdateAsync<Resource, BaseParameters>;
 }
 
@@ -249,7 +249,7 @@ interface ResourceDeleteAsync<
    * @template Resource The ArmResource to delete.
    * @template BaseParameters The http parameters that are part of the request
    */
-  @doc("")
+  @doc("Delete a {name}", Resource)
   delete is ArmResourceDeleteAsync<Resource, BaseParameters>;
 }
 
@@ -269,7 +269,7 @@ interface ResourceDeleteWithoutOkAsync<
    * @template Resource The ArmResource to delete.
    * @template BaseParameters The http parameters that are part of the request
    */
-  @doc("")
+  @doc("Delete a {name}", Resource)
   delete is ArmResourceDeleteWithoutOkAsync<Resource, BaseParameters>;
 }
 
@@ -288,7 +288,7 @@ interface ResourceDeleteSync<
    * @template Resource The ArmResource to delete.
    * @template BaseParameters The http parameters that are part of the request
    */
-  @doc("")
+  @doc("Delete a {name}", Resource)
   delete is ArmResourceDeleteSync<Resource, BaseParameters>;
 }
 
@@ -310,7 +310,7 @@ interface ResourceUpdateAsync<
    * @template Properties RP-specific property bag for the resource
    * @template BaseParameters The http parameters that are part of the request
    */
-  @doc("")
+  @doc("Update a {name}", Resource)
   update is ArmCustomPatchAsync<
     Resource,
     ResourceUpdateModel<Resource, Properties>,
@@ -338,7 +338,7 @@ interface ResourceUpdateSync<
    */
   #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
   @patch(#{ implicitOptionality: true })
-  @doc("")
+  @doc("Update a {name}", Resource)
   update is ArmCustomPatchSync<Resource, ResourceUpdateModel<Resource, Properties>, BaseParameters>;
 }
 
