@@ -11,8 +11,20 @@ using Azure.Core.Traits;
 
 @service(#{ title: "Contoso Widget Manager" })
 @versioned(Contoso.WidgetManager.Versions)
-@useAuth(ApiKeyAuth<ApiKeyLocation.header, "X-Key">)
+@useAuth(WidgetManagerApiKeyAuth | WidgetManagerOauth2Auth)
 namespace Contoso.WidgetManager;
+
+@doc("Authenticate requests with an API key in the X-Key header.")
+model WidgetManagerApiKeyAuth is ApiKeyAuth<ApiKeyLocation.header, "X-Key">;
+
+@doc("Authenticate requests with OAuth2 using the widget service scope.")
+model WidgetManagerOauth2Auth is OAuth2Auth<[
+  {
+    type: OAuth2FlowType.implicit,
+    authorizationUrl: "https://login.contoso.com/common/oauth2/v2.0/authorize",
+    scopes: ["https://widget.contoso.com/.default"],
+  }
+]>;
 
 @doc("The Contoso Widget Manager service version.")
 enum Versions {
