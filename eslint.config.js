@@ -20,7 +20,8 @@ export default defineConfig(
       "**/.scripts/**/*",
       "eng/scripts/**/*",
       "packages/*/scripts/**/*",
-      "packages/typespec-ts/**/*", // typespec-ts has its own linting config and is very large, so ignore it here to avoid OOM
+      "packages/typespec-ts/test/*/generated/**/*",
+      "packages/typespec-ts/src/modular/static/**/*",
     ],
   },
   ...TypeSpecCommonEslintConfigs,
@@ -38,6 +39,12 @@ export default defineConfig(
       // Only put rules here that need typescript project information
       "@typescript-eslint/no-floating-promises": "error",
       "@typescript-eslint/no-deprecated": "warn",
+    },
+  },
+  {
+    files: ["packages/typespec-ts/**/*.ts"],
+    rules: {
+      "unicorn/filename-case": "off",
     },
   },
 );

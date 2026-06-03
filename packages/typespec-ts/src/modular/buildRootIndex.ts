@@ -153,7 +153,7 @@ function hasPaging(context: SdkContext): boolean {
 
 function exportFileContentsType(context: SdkContext, rootIndexFile: SourceFile) {
   const hasMultipartFileParts = context.sdkPackage.models.some((x) =>
-    x.properties.some((y) => y.kind === "property" && y.multipartOptions?.isFilePart),
+    x.properties.some((y) => y.kind === "property" && y.serializationOptions.multipart?.isFilePart),
   );
 
   if (hasMultipartFileParts) {
@@ -292,7 +292,7 @@ function exportModules(
   },
 ) {
   const subfolder = options.subfolder ?? "";
-  let folders = [];
+  let folders: string[];
   if (options.recursive) {
     folders = project
       .getDirectories()

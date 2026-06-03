@@ -361,7 +361,7 @@ export function prepareCommonParameters(
     result.push(credentialValue);
   }
 
-  let subscriptionIdValue = `${envType}.SUBSCRIPTION_ID || "<SUBSCRIPTION_ID>"`;
+  const subscriptionIdValue = `${envType}.SUBSCRIPTION_ID || "<SUBSCRIPTION_ID>"`;
   let isSubscriptionIdAdded = false;
 
   // Process required parameters
@@ -540,7 +540,7 @@ export function generateMethodCall(
   // Prepare operation-level parameters
   const methodParamValues = parameters.filter((p) => !p.onClient);
 
-  let methodParams: string[] = [];
+  let methodParams: string[];
 
   // If dpgContext is provided, reorder parameters according to function signature
   if (dpgContext) {

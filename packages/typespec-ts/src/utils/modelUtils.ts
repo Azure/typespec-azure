@@ -1571,7 +1571,7 @@ function isAzureCoreFoundationsNamespace(t?: Type, skipFoundation: boolean = fal
   ) {
     t = t.namespace;
   }
-  return namespaces.length == 0;
+  return namespaces.length === 0;
 }
 
 // Check if the schema is an anonymous object
@@ -1687,16 +1687,6 @@ export function getEffectiveSchemaType(program: Program, type: Model | Union): M
   // If type is an anonymous model, tries to find a named model that has the same properties
   let effective: Model | undefined = undefined;
   if (type.kind === "Union") {
-    const nonNullOptions = [...type.variants.values()]
-      .map((x) => x.type)
-      .filter((t) => !isNullType(t));
-    if (
-      nonNullOptions.length === 1 &&
-      nonNullOptions[0]?.kind === "Model" &&
-      nonNullOptions[0]?.name === ""
-    ) {
-      effective = getEffectiveModelType(program, nonNullOptions[0]);
-    }
     return type as any;
   } else if (type.name === "") {
     effective = getEffectiveModelType(program, type, (property) =>

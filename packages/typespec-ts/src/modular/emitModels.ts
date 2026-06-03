@@ -748,7 +748,7 @@ function addExtendedDictInfo(
   if (context.rlcOptions?.compatibilityMode) {
     const ancestors = getAllAncestors(model);
     const properties = getAllProperties(context, model, ancestors);
-    let anyType = true;
+    let anyType: boolean;
     if (!additionalPropertiesType) {
       // case 1: if additionalProperties is not defined, we should use any type
       anyType = true;

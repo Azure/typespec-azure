@@ -55,7 +55,7 @@ export function getOperationApiVersion(
   const locations = new Set<ApiVersionPosition>();
   const required = new Set<boolean>();
   dpgContext.hasApiVersionInClient = true;
-  let hasApiVersionInOperation = true;
+  let hasApiVersionInOperation: boolean;
   for (const op of listOperationsUnderRLCClient(client)) {
     hasApiVersionInOperation = false;
     const route = getHttpOperationWithCache(dpgContext, op);

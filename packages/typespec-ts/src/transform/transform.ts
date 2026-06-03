@@ -170,7 +170,7 @@ export function transformUrlInfo(
     }
   }
   // Set the default value if missing endpoint parameter
-  if (endpoint == undefined && urlParameters.length === 0) {
+  if (endpoint === undefined && urlParameters.length === 0) {
     endpoint = "{endpointParam}";
     urlParameters.push({
       name: "endpointParam",

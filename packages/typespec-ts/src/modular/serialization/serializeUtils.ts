@@ -92,7 +92,7 @@ export function isSpecialUnionVariant(
         })
         ?.some(
           (p) =>
-            (p.kind === "property" && p.name !== p.serializedName) ||
+            (p.kind === "property" && p.name !== p.serializationOptions.json?.name) ||
             isSpecialUnionVariant(p.type, [...variantStack, p.type]),
         )) ||
     isPolymorphicUnion(t) ||

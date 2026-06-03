@@ -57,7 +57,7 @@ export function useSdkTypes() {
     if (!sdkType) {
       throw new Error(
         `SdkType not found for type: ${type.kind} ${
-          "name" in type && typeof type.name == "string" ? type.name : ""
+          "name" in type && typeof type.name === "string" ? type.name : ""
         } ${
           "namespace" in type && type.namespace ? ` in ${getNamespaceFullName(type.namespace)}` : ""
         }`,

@@ -169,7 +169,7 @@ export function buildGetClientEndpointParam(
   client: SdkClientType<SdkServiceOperation>,
 ): { endpointParamName: string; assignedOptionalParams?: Set<string> } {
   const assignedOptionalParams = new Set<string>();
-  let coreEndpointParam = "";
+  let coreEndpointParam: string;
   if (dpgContext.rlcOptions?.flavor === "azure") {
     const cloudSettingSuffix = dpgContext.arm
       ? ` ?? ${resolveReference(CloudSettingHelpers.getArmEndpoint)}(options.cloudSetting)`

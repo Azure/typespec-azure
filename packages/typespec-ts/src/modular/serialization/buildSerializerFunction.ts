@@ -410,8 +410,6 @@ function buildModelTypeSerializer(
         const createFilePartDescriptorDefinition = resolveReference(
           MultipartHelpers.createFilePartDescriptor,
         );
-        const itemPath = multipart.isMulti ? "x" : getPropertyFullName(context, property, "item");
-        partDefinition = `${createFilePartDescriptorDefinition}("${multipart.name}", ${itemPath}, )`;
 
         // If the TypeSpec doesn't specify a default content type, TCGC will infer a default of "*/*".
         // In this case, we actually want the content type to be left unset so that Core will take care of

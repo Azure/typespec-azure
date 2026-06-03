@@ -23,7 +23,7 @@ export function buildSubpathIndexFile(
   const srcPath = emitterOptions.modularOptions.sourceRoot;
   // Skip to export these files because they are used internally.
   const skipFiles = ["pagingHelpers.ts", "pollingHelpers.ts"];
-  let folders = [];
+  let folders: string[];
   if (options.recursive) {
     folders = project
       .getDirectories()

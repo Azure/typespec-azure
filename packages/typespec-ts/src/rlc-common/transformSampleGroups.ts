@@ -359,7 +359,7 @@ function convertMethodLevelParameters(
         generateParameterTypeValue(firstContentType.param.type, firstContentType.name, schemaMap),
     );
   }
-  let value: string = `{}`;
+  let value: string;
   if (allSideAssignments.length > 0) {
     value = `{ ` + allSideAssignments.join(", ") + `}`;
   } else {

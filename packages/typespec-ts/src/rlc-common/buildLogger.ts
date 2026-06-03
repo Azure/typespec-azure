@@ -17,7 +17,7 @@ export function buildLogger(model: RLCModel) {
   const { srcPath, rlcSourceDir } = model;
   const { packageDetails } = model.options;
   const filePath = path.join(
-    model.options.sourceFrom == "Swagger"
+    model.options.sourceFrom === "Swagger"
       ? srcPath.substring(
           0,
           srcPath.includes("generated") && !srcPath.includes("src")
