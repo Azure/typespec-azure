@@ -1522,7 +1522,16 @@ export async function getOpenAPIForService(
     }
 
     function processUnreferencedSchemas() {
+      const authentication = resolveAuthentication(httpService);
+      const authSchemeModels = new Set<Type>(
+        authentication ? authentication.schemes.map((s) => s.model) : [],
+      );
       const addSchema = (type: Type) => {
+        if (authSchemeModels.has(type)) {
+          // Auth scheme models are emitted under securityDefinitions
+          // and should not also appear as payload schemas in definitions.
+          return;
+        }
         if (
           !processedSchemas.has(type) &&
           !indirectlyProcessedTypes.has(type) &&
