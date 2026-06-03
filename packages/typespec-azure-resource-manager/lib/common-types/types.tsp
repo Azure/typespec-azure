@@ -370,6 +370,7 @@ model Identity {
 }
 
 /** Properties of a KeyVault */
+@doc("")
 model KeyVaultProperties {
   /** Key vault uri to access the encryption key. */
   keyIdentifier?: string;
