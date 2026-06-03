@@ -20,7 +20,6 @@ import { getDefaultService } from "../utils/modelUtils.js";
 import { detectModelConflicts } from "../utils/namespaceUtils.js";
 import { getOperationName } from "../utils/operationUtil.js";
 import { getSupportedHttpAuth } from "../utils/credentialUtils.js";
-import _ from "lodash";
 import { getClientParameters } from "../modular/helpers/clientHelpers.js";
 
 export function transformRLCOptions(

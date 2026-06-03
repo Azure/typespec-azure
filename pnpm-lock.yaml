@@ -174,9 +174,6 @@ catalogs:
     '@types/hast':
       specifier: ^3.0.4
       version: 3.0.4
-    '@types/lodash':
-      specifier: ^4.17.4
-      version: 4.17.24
     '@types/micromatch':
       specifier: ^4.0.10
       version: 4.0.10
@@ -387,9 +384,6 @@ catalogs:
     is-unicode-supported:
       specifier: ^2.1.0
       version: 2.1.0
-    lodash:
-      specifier: ^4.17.21
-      version: 4.18.1
     log-symbols:
       specifier: ^7.0.1
       version: 7.0.1
@@ -3904,9 +3898,6 @@ importers:
       handlebars:
         specifier: 'catalog:'
         version: 4.7.9
-      lodash:
-        specifier: 'catalog:'
-        version: 4.18.1
       prettier:
         specifier: 'catalog:'
         version: 3.8.3
@@ -3959,9 +3950,6 @@ importers:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
         version: 7.58.7(@types/node@25.9.1)
-      '@types/lodash':
-        specifier: 'catalog:'
-        version: 4.17.24
       '@typescript-eslint/eslint-plugin':
         specifier: 'catalog:'
         version: 8.60.0(@typescript-eslint/parser@8.60.0(eslint@10.4.1)(typescript@6.0.3))(eslint@10.4.1)(typescript@6.0.3)
@@ -8083,9 +8071,6 @@ packages:
 
   '@types/keyv@3.1.4':
     resolution: {integrity: sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==}
-
-  '@types/lodash@4.17.24':
-    resolution: {integrity: sha512-gIW7lQLZbue7lRSWEFql49QJJWThrTFFeIMJdp3eH4tKoxm1OvEPg02rm4wCCSHS0cL3/Fizimb35b7k8atwsQ==}
 
   '@types/mdast@4.0.4':
     resolution: {integrity: sha512-kGaNbPh1k7AFzgpud/gMdvIm5xuECykRR+JnWKQno9TAXVa6WIVCGTPvYGekIDL4uwCZQSYbUxNBSb1aUo79oA==}
@@ -20282,8 +20267,6 @@ snapshots:
   '@types/keyv@3.1.4':
     dependencies:
       '@types/node': 25.9.1
-
-  '@types/lodash@4.17.24': {}
 
   '@types/mdast@4.0.4':
     dependencies:
