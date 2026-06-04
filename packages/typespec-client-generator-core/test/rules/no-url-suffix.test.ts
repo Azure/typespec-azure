@@ -135,6 +135,23 @@ it("does not flag non-model-property types", async () => {
   await tester.expect(`scalar ImageUrl extends string;`).toBeValid();
 });
 
+it("does not flag properties from library types even if they end with Url", async () => {
+  // The SimpleTester loads @typespec/http, @typespec/rest, @azure-tools/typespec-client-generator-core
+  // which define various types. navigateProgram visits ALL types including library ones,
+  // but createLinterRuleContext.reportDiagnostic silently drops diagnostics targeting
+  // library code (context.type !== "project"). This test verifies that behavior:
+  // compile user code with NO Url properties — if library Url properties were reported,
+  // this test would fail with unexpected diagnostics.
+  await tester
+    .expect(
+      `model Clean {
+        name: string;
+        count: int32;
+      }`,
+    )
+    .toBeValid();
+});
+
 // --- Codefix ---
 
 /**
@@ -241,5 +258,31 @@ describe("codefix", () => {
     expect(clientNameLine).toBeDefined();
     expect(clientNameLine).toMatch(/@@clientName\(\w/); // must start with a word char, not a dot
     expect(clientNameLine).toContain("Foo.imageUrl");
+  });
+
+  it("after applying the codefix, the diagnostic disappears on recompilation", async () => {
+    // Step 1: Compile and verify diagnostic exists for imageUrl
+    const diagnostics = await compileAndGetRuleDiagnostics(
+      runner,
+      `model Foo { imageUrl: string; }`,
+    );
+    const imageUrlDiags = diagnostics.filter((d) => d.codefixes?.some((f) => f.label.includes("imageUri")));
+    expect(imageUrlDiags.length).toBe(1);
+
+    // Step 2: Apply the codefix and capture the generated @@clientName line
+    const codefix = imageUrlDiags[0].codefixes![0];
+    const edits = await resolveCodeFix(codefix);
+    const clientNameEdit = edits[edits.length - 1];
+    const clientNameLine = clientNameEdit.text.trim();
+
+    // Step 3: Recompile with the fix applied (inline, same as client.tsp would do)
+    const codeWithFix = `model Foo { imageUrl: string; }\n${clientNameLine}`;
+    const fixedDiagnostics = await compileAndGetRuleDiagnostics(runner, codeWithFix);
+    const fixedImageUrlDiags = fixedDiagnostics.filter(
+      (d) => d.codefixes?.some((f) => f.label.includes("imageUri")),
+    );
+
+    // Step 4: Verify no diagnostic for imageUrl
+    expect(fixedImageUrlDiags).toHaveLength(0);
   });
 });
