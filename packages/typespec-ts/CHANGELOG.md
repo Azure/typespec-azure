@@ -1,13 +1,28 @@
-## 0.54.0 (2026-06-01)
+# Change Log - @azure-tools/typespec-ts
 
-- [Feature] Bump TypeSpec dependencies to latest stable and next pre-release versions. Please refer to [#4012](https://github.com/Azure/autorest.typescript/pull/4012)
-- [Bugfix] Fix config/script gaps between JS emitter and SDK libraries. Please refer to [#4006](https://github.com/Azure/autorest.typescript/pull/4006)
-- [Feature] Bump turbo from 2.6.3 to 2.9.14. Please refer to [#3989](https://github.com/Azure/autorest.typescript/pull/3989)
-- [Feature] Remove `head-as-boolean` emitter flag (superseded by TCGC `@responseAsBool`). Please refer to [#3986](https://github.com/Azure/autorest.typescript/pull/3986)
-- [Feature] Improve resolveReferences performance. Please refer to [#4004](https://github.com/Azure/autorest.typescript/pull/4004)
-- [Bugfix] Fix deserializer throwing on empty response body (success and error paths). Please refer to [#3948](https://github.com/Azure/autorest.typescript/pull/3948)
-- [Feature] Decouple typespec-ts from rlc-common. Please refer to [#3926](https://github.com/Azure/autorest.typescript/pull/3926)
-- [Feature] Update naming terminology: cadl-ranch → spector, HLC → AutoRest. Please refer to [#3957](https://github.com/Azure/autorest.typescript/pull/3957)
+## 0.54.1
+
+### Bug Fixes
+
+- [#4542](https://github.com/Azure/typespec-azure/pull/4542) Replace `NodeJS.ReadableStream` with the platform-conditional `NodeReadableStream` helper in RLC binary request body unions so generated browser builds no longer fail with TS2503 when `@types/node` is excluded.
+
+
+## 0.54.0
+
+### Features
+
+- [#4012](https://github.com/Azure/autorest.typescript/pull/4012) Bump TypeSpec dependencies to latest stable and next pre-release versions.
+- [#3989](https://github.com/Azure/autorest.typescript/pull/3989) Bump turbo from 2.6.3 to 2.9.14.
+- [#3986](https://github.com/Azure/autorest.typescript/pull/3986) Remove `head-as-boolean` emitter flag (superseded by TCGC `@responseAsBool`).
+- [#4004](https://github.com/Azure/autorest.typescript/pull/4004) Improve resolveReferences performance.
+- [#3926](https://github.com/Azure/autorest.typescript/pull/3926) Decouple typespec-ts from rlc-common.
+- [#3957](https://github.com/Azure/autorest.typescript/pull/3957) Update naming terminology: cadl-ranch → spector, HLC → AutoRest.
+
+### Bug Fixes
+
+- [#4006](https://github.com/Azure/autorest.typescript/pull/4006) Fix config/script gaps between JS emitter and SDK libraries.
+- [#3948](https://github.com/Azure/autorest.typescript/pull/3948) Fix deserializer throwing on empty response body (success and error paths).
+
 
 ## 0.53.3 (2026-05-25)
 
