@@ -12,14 +12,14 @@ export default defineConfig({
       {
         test: {
           name: "unit-rlc",
-          include: ["test/unit/**/*.spec.ts"],
+          include: ["test/unit/**/*.test.ts"],
           testTimeout: 36000,
         },
       },
       {
         test: {
           name: "unit-modular",
-          include: ["test/modularUnit/**/*.spec.ts"],
+          include: ["test/modularUnit/**/*.test.ts"],
           testTimeout: 0,
           pool: "forks",
           poolOptions: {
@@ -32,18 +32,18 @@ export default defineConfig({
       {
         test: {
           name: "integration-rlc",
-          include: ["test/integration/*.spec.ts"],
-          exclude: ["test/integration/versioningRemoved.spec.ts"],
+          include: ["test/integration/*.test.ts"],
+          exclude: ["test/integration/versioningRemoved.test.ts"],
           testTimeout: 36000,
         },
       },
       {
         test: {
           name: "integration-azure-rlc",
-          include: ["test/azureIntegration/*.spec.ts"],
+          include: ["test/azureIntegration/*.test.ts"],
           exclude: [
-            "test/azureIntegration/versioningRemoved.spec.ts",
-            "test/azureIntegration/azureClientGeneratorCoreClientInitialization.spec.ts",
+            "test/azureIntegration/versioningRemoved.test.ts",
+            "test/azureIntegration/azureClientGeneratorCoreClientInitialization.test.ts",
           ],
           testTimeout: 36000,
         },
@@ -51,19 +51,19 @@ export default defineConfig({
       {
         test: {
           name: "integration-modular",
-          include: ["test/modularIntegration/*.spec.ts"],
+          include: ["test/modularIntegration/*.test.ts"],
           testTimeout: 36000,
         },
       },
       {
         test: {
           name: "integration-azure-modular",
-          include: ["test/azureModularIntegration/*.spec.ts"],
+          include: ["test/azureModularIntegration/*.test.ts"],
           exclude: [
-            "test/azureModularIntegration/clientStructureOperationGroup.spec.ts",
-            "test/azureModularIntegration/clientStructureRenamed.spec.ts",
-            "test/azureModularIntegration/clientStructureTwoGroup.spec.ts",
-            "test/azureModularIntegration/payloadMultipart.spec.ts",
+            "test/azureModularIntegration/clientStructureOperationGroup.test.ts",
+            "test/azureModularIntegration/clientStructureRenamed.test.ts",
+            "test/azureModularIntegration/clientStructureTwoGroup.test.ts",
+            "test/azureModularIntegration/payloadMultipart.test.ts",
           ],
           testTimeout: 36000,
         },
@@ -77,7 +77,7 @@ export default defineConfig({
         "src/framework/**/*.ts",
         "static/static-helpers/**/*.ts",
       ],
-      exclude: ["**/*.spec.ts", "**/*.spec.tsx", ".next/*"],
+      exclude: ["**/*.test.ts", "**/*.test.tsx", ".next/*"],
     },
   },
 });
