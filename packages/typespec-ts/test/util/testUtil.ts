@@ -1,29 +1,33 @@
+import { AutorestTestLibrary } from "@azure-tools/typespec-autorest/testing";
+import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
+import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
+import { listAllServiceNamespaces } from "@azure-tools/typespec-client-generator-core";
+import { SdkTestLibrary } from "@azure-tools/typespec-client-generator-core/testing";
 import { EmitContext, Program } from "@typespec/compiler";
-import { createTestHost } from "@typespec/compiler/testing";
-import { TestHost } from "@typespec/compiler/testing";
-import { RestTestLibrary } from "@typespec/rest/testing";
+import { createTestHost, TestHost } from "@typespec/compiler/testing";
 import { HttpTestLibrary } from "@typespec/http/testing";
+import { OpenAPITestLibrary } from "@typespec/openapi/testing";
+import { RestTestLibrary } from "@typespec/rest/testing";
 import { VersioningTestLibrary } from "@typespec/versioning/testing";
 import { XmlTestLibrary } from "@typespec/xml/testing";
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { SdkTestLibrary } from "@azure-tools/typespec-client-generator-core/testing";
-import { listAllServiceNamespaces } from "@azure-tools/typespec-client-generator-core";
-import { OpenAPITestLibrary } from "@typespec/openapi/testing";
-import { AutorestTestLibrary } from "@azure-tools/typespec-autorest/testing";
-import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
-import { SdkContext } from "../../src/utils/interfaces.js";
-import { assert } from "vitest";
-import { format } from "prettier";
-import { prettierTypeScriptOptions } from "../../src/lib.js";
-import { createContextWithDefaultOptions } from "../../src/index.js";
-import { provideContext } from "../../src/contextManager.js";
-import { Project } from "ts-morph";
-import { provideSdkTypes } from "../../src/framework/hooks/sdkTypes.js";
-import { provideBinder } from "../../src/framework/hooks/binder.js";
-import { loadStaticHelpers } from "../../src/framework/load-static-helpers.js";
 import path from "path";
-import { getDirname } from "../../src/utils/dirname.js";
+import { format } from "prettier";
+import { Project } from "ts-morph";
+import { assert } from "vitest";
+import { provideContext } from "../../src/contextManager.js";
+import { provideBinder } from "../../src/framework/hooks/binder.js";
+import { provideSdkTypes } from "../../src/framework/hooks/sdkTypes.js";
+import { loadStaticHelpers } from "../../src/framework/load-static-helpers.js";
+import { createContextWithDefaultOptions } from "../../src/index.js";
+import { prettierTypeScriptOptions } from "../../src/lib.js";
 import {
+  AzureCoreDependencies,
+  AzureIdentityDependencies,
+  AzurePollingDependencies,
+  AzureTestDependencies,
+} from "../../src/modular/external-dependencies.js";
+import {
+  CreateRecorderHelpers,
   MultipartHelpers,
   PagingHelpers,
   PlatformTypeHelpers,
@@ -32,14 +36,9 @@ import {
   StorageCompatHelpers,
   UrlTemplateHelpers,
   XmlHelpers,
-  CreateRecorderHelpers
 } from "../../src/modular/static-helpers-metadata.js";
-import {
-  AzureCoreDependencies,
-  AzureIdentityDependencies,
-  AzurePollingDependencies,
-  AzureTestDependencies
-} from "../../src/modular/external-dependencies.js";
+import { getDirname } from "../../src/utils/dirname.js";
+import { SdkContext } from "../../src/utils/interfaces.js";
 
 export interface ExampleJson {
   filename: string;
@@ -59,8 +58,8 @@ export async function createRLCEmitterTestHost() {
       XmlTestLibrary,
       AzureResourceManagerTestLibrary,
       OpenAPITestLibrary,
-      AutorestTestLibrary
-    ]
+      AutorestTestLibrary,
+    ],
   });
 }
 
@@ -83,8 +82,8 @@ export async function rlcEmitterFor(
     withRawContent = false,
     withVersionedApiVersion = false,
     needArmTemplate = false,
-    exampleJson = {}
-  }: RLCEmitterOptions = {}
+    exampleJson = {},
+  }: RLCEmitterOptions = {},
 ): Promise<TestHost> {
   const host: TestHost = await createRLCEmitterTestHost();
   const namespace = `
@@ -105,11 +104,7 @@ import "@typespec/versioning";
 import "@typespec/xml";
 ${needTCGC ? 'import "@azure-tools/typespec-client-generator-core";' : ""} 
 ${needAzureCore ? 'import "@azure-tools/typespec-azure-core";' : ""} 
-${
-  needArmTemplate
-    ? 'import "@azure-tools/typespec-azure-resource-manager";'
-    : ""
-}
+${needArmTemplate ? 'import "@azure-tools/typespec-azure-resource-manager";' : ""}
 
 using Rest; 
 using Http;
@@ -131,15 +126,12 @@ ${code}
     host.addTypeSpecFile(`./examples/${example}.json`, exampleJson[example]);
   }
   await host.compile("./", {
-    warningAsError: false
+    warningAsError: false,
   });
   return host;
 }
 
-export async function compileTypeSpecFor(
-  code: string,
-  examples: ExampleJson[] = []
-) {
+export async function compileTypeSpecFor(code: string, examples: ExampleJson[] = []) {
   let prefix = "";
   if (!code.includes("import")) {
     prefix = prefix + importStatement();
@@ -152,11 +144,11 @@ export async function compileTypeSpecFor(
   for (const example of examples) {
     host.addTypeSpecFile(
       `./examples/2021-10-01-preview/${example.filename}.json`,
-      example.rawContent
+      example.rawContent,
     );
   }
   await host.compile("./", {
-    warningAsError: false
+    warningAsError: false,
   });
   return host;
 }
@@ -199,7 +191,7 @@ function serviceStatement() {
 export async function createDpgContextTestHelper(
   program: Program,
   enableModelNamespace = false,
-  configs: Record<string, unknown> = {}
+  configs: Record<string, unknown> = {},
 ): Promise<SdkContext> {
   const outputProject = new Project({ useInMemoryFileSystem: true });
   provideContext("rlcMetaTree", new Map());
@@ -208,7 +200,7 @@ export async function createDpgContextTestHelper(
 
   const context = await createContextWithDefaultOptions({
     program,
-    options: configs as any
+    options: configs as any,
   } as EmitContext);
 
   const sdkContext = {
@@ -217,16 +209,16 @@ export async function createDpgContextTestHelper(
     rlcOptions: {
       flavor: "azure",
       enableModelNamespace,
-      ...configs
+      ...configs,
     },
     emitterName: "@azure-tools/typespec-ts",
     originalProgram: program,
-    allServiceNamespaces: listAllServiceNamespaces(context)
+    allServiceNamespaces: listAllServiceNamespaces(context),
   } as SdkContext;
 
   provideContext("emitContext", {
     compilerContext: context as any,
-    tcgcContext: sdkContext
+    tcgcContext: sdkContext,
   });
 
   await provideBinderWithAzureDependencies(outputProject);
@@ -238,21 +230,17 @@ export async function createDpgContextTestHelper(
 export async function assertEqualContent(
   actual: string,
   expected: string,
-  ignoreWeirdLine: boolean = false
+  ignoreWeirdLine: boolean = false,
 ) {
   assert.strictEqual(
     await format(
-      ignoreWeirdLine
-        ? actual.replace(/$\n^/g, "").replace(/\s+/g, " ")
-        : actual,
-      prettierTypeScriptOptions
+      ignoreWeirdLine ? actual.replace(/$\n^/g, "").replace(/\s+/g, " ") : actual,
+      prettierTypeScriptOptions,
     ),
     await format(
-      ignoreWeirdLine
-        ? expected.replace(/$\n^/g, "").replace(/\s+/g, " ")
-        : expected,
-      prettierTypeScriptOptions
-    )
+      ignoreWeirdLine ? expected.replace(/$\n^/g, "").replace(/\s+/g, " ") : expected,
+      prettierTypeScriptOptions,
+    ),
   );
 }
 
@@ -264,16 +252,13 @@ export type VerifyPropertyConfig = {
 };
 
 export async function provideBinderWithAzureDependencies(project: Project) {
-  const helpersDirectory = path.resolve(
-    __dirname,
-    "../../static/static-helpers"
-  );
+  const helpersDirectory = path.resolve(__dirname, "../../static/static-helpers");
 
   const extraDependencies = {
     ...AzurePollingDependencies,
     ...AzureCoreDependencies,
     ...AzureIdentityDependencies,
-    ...AzureTestDependencies
+    ...AzureTestDependencies,
   };
 
   const staticHelpers = {
@@ -285,17 +270,17 @@ export async function provideBinderWithAzureDependencies(project: Project) {
     ...MultipartHelpers,
     ...PlatformTypeHelpers,
     ...CreateRecorderHelpers,
-    ...StorageCompatHelpers
+    ...StorageCompatHelpers,
   };
 
   const staticHelperMap = await loadStaticHelpers(project, staticHelpers, {
     helpersAssetDirectory: helpersDirectory,
-    loadTestHelpers: true
+    loadTestHelpers: true,
   });
 
   const binder = provideBinder(project, {
     staticHelpers: staticHelperMap,
-    dependencies: extraDependencies
+    dependencies: extraDependencies,
   });
 
   return binder;

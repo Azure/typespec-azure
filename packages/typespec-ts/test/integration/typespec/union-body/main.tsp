@@ -8,11 +8,11 @@ enum PAYMENT_METHODS {
 }
 
 model CommonRegistrationRequest {
-  payMethod: PAYMENT_METHODS,
+  payMethod: PAYMENT_METHODS;
 }
 
 model RequestRegisterCC extends CommonRegistrationRequest {
-  payMethod: PAYMENT_METHODS.CREDIT_CARD,
+  payMethod: PAYMENT_METHODS.CREDIT_CARD;
 }
 
 model RequestRegisterVA {
@@ -20,7 +20,7 @@ model RequestRegisterVA {
 }
 
 model ReturnResponse {
-  @body body: RequestRegisterCC | RequestRegisterVA
+  @body body: RequestRegisterCC | RequestRegisterVA;
 }
 
 @service(#{})
@@ -28,7 +28,9 @@ model ReturnResponse {
 namespace NicepayPlatform {
   @post
   @route("/request-union-body")
-  op requestUnionBody(@body request: RequestRegisterCC | RequestRegisterVA): {@body _ : {};};
+  op requestUnionBody(@body request: RequestRegisterCC | RequestRegisterVA): {
+    @body _: {};
+  };
 
   @get
   @route("/response-union-body")

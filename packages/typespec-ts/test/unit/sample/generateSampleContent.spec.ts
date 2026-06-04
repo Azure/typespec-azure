@@ -1,9 +1,9 @@
-import { describe, it, assert } from "vitest";
+import { assert, describe, it } from "vitest";
 
 import {
   RLCModel,
   buildSchemaObjectMap,
-  generateParameterTypeValue
+  generateParameterTypeValue,
 } from "../../../src/rlc-common/index.js";
 import { emitSchemasFromTypeSpec } from "../../util/emitUtil.js";
 
@@ -16,7 +16,7 @@ describe("Integration test for mocking sample", () => {
       const mockStr = generateParameterTypeValue(
         "string",
         "input",
-        buildSchemaObjectMap({ schemas: schemaMap } as RLCModel)
+        buildSchemaObjectMap({ schemas: schemaMap } as RLCModel),
       );
       const res = "{Your input}";
       assert.deepEqual(JSON.parse(mockStr!), res);
@@ -30,7 +30,7 @@ describe("Integration test for mocking sample", () => {
         "boolean",
         "prop",
         buildSchemaObjectMap({ schemas: schemaMap } as RLCModel),
-        new Set()
+        new Set(),
       );
       assert.strictEqual(mockStr, `true`);
     });
@@ -43,7 +43,7 @@ describe("Integration test for mocking sample", () => {
         "string[]",
         "prop",
         buildSchemaObjectMap({ schemas: schemaMap } as RLCModel),
-        new Set()
+        new Set(),
       );
       const res = ["{Your prop}"];
       assert.deepEqual(JSON.parse(mockStr!), res);
@@ -62,7 +62,7 @@ describe("Integration test for mocking sample", () => {
         "Test",
         "input",
         buildSchemaObjectMap({ schemas: schemaMap } as RLCModel),
-        new Set()
+        new Set(),
       );
       const res = { prop: "{Your prop}" };
       assert.deepEqual(JSON.parse(mockStr!), res);
@@ -91,7 +91,7 @@ describe("Integration test for mocking sample", () => {
         "Test",
         "input",
         buildSchemaObjectMap({ schemas: schemaMap } as RLCModel),
-        new Set()
+        new Set(),
       );
       // console.log(mockStr);
       const res = {
@@ -101,8 +101,8 @@ describe("Integration test for mocking sample", () => {
           foo: 123,
           bar: [{ prop: "{Your prop}", baz: [true] }],
           baz: { key: { t: "{Your t}" } },
-          unionTest: { a: "{Your a}" }
-        }
+          unionTest: { a: "{Your a}" },
+        },
       };
       assert.deepEqual(JSON.parse(mockStr!), res);
     });
@@ -124,19 +124,19 @@ describe("Integration test for mocking sample", () => {
           op getModel(@body input: Test): void;
           `,
             {
-              needAzureCore: true
-            }
+              needAzureCore: true,
+            },
           );
           const mockStr = generateParameterTypeValue(
             "Test",
             "input",
-            buildSchemaObjectMap({ schemas: schemaMap } as RLCModel)
+            buildSchemaObjectMap({ schemas: schemaMap } as RLCModel),
           );
           assert.isNotNull(mockStr);
           // console.log(mockStr);
           assert.deepEqual(
             mockStr,
-            `{"selfReferenced": {"bar": {"foo": [{} as any /**FIXME */]}}}`
+            `{"selfReferenced": {"bar": {"foo": [{} as any /**FIXME */]}}}`,
           );
         });
 
@@ -157,17 +157,17 @@ describe("Integration test for mocking sample", () => {
           op getModel(@body input: Test): void;
           `,
             {
-              needAzureCore: true
-            }
+              needAzureCore: true,
+            },
           );
           const mockStr = generateParameterTypeValue(
             "Test",
             "input",
-            buildSchemaObjectMap({ schemas: schemaMap } as RLCModel)
+            buildSchemaObjectMap({ schemas: schemaMap } as RLCModel),
           );
           assert.isNotNull(mockStr);
           const res = {
-            inheritance: { bar: "{Your bar}", kind: "B", foo: "{Your foo}" }
+            inheritance: { bar: "{Your bar}", kind: "B", foo: "{Your foo}" },
           };
           // console.log(mockStr);
           assert.deepEqual(JSON.parse(mockStr!), res);
@@ -188,12 +188,12 @@ describe("Integration test for mocking sample", () => {
           unknownValue: unknown;
         }
         op getModel(@body input: Test): void;
-        `
+        `,
         );
         const mockStr = generateParameterTypeValue(
           "Test",
           "input",
-          buildSchemaObjectMap({ schemas: schemaMap } as RLCModel)
+          buildSchemaObjectMap({ schemas: schemaMap } as RLCModel),
         );
         // console.log(mockStr);
         const res = {
@@ -203,7 +203,7 @@ describe("Integration test for mocking sample", () => {
           offsetDate: "{Your offsetDate}",
           nullable: null,
           nullableString: "{Your nullableString}",
-          unknownValue: "Unknown Type"
+          unknownValue: "Unknown Type",
         };
         assert.isNotNull(mockStr);
         assert.deepEqual(JSON.parse(mockStr!), res);
@@ -216,12 +216,12 @@ describe("Integration test for mocking sample", () => {
           date: utcDateTime;
         }
         op getModel(@body input: Test): void;
-        `
+        `,
         );
         const mockStr = generateParameterTypeValue(
           "Test",
           "input",
-          buildSchemaObjectMap({ schemas: schemaMap } as RLCModel)
+          buildSchemaObjectMap({ schemas: schemaMap } as RLCModel),
         );
         assert.isNotNull(mockStr);
         assert.deepEqual(mockStr, `{"date": new Date()}`);
@@ -252,13 +252,13 @@ describe("Integration test for mocking sample", () => {
         op getModel(@body input: Test): void;
         `,
           {
-            needAzureCore: true
-          }
+            needAzureCore: true,
+          },
         );
         const mockStr = generateParameterTypeValue(
           "Test",
           "input",
-          buildSchemaObjectMap({ schemas: schemaMap } as RLCModel)
+          buildSchemaObjectMap({ schemas: schemaMap } as RLCModel),
         );
         assert.isNotNull(mockStr);
         // console.log(mockStr);
@@ -269,7 +269,7 @@ describe("Integration test for mocking sample", () => {
           otherLiteralUnion: "string1",
           otherString: "{Your otherString}",
           testExtensibleEnum: "English",
-          testFixedEnum: "English"
+          testFixedEnum: "English",
         };
         assert.deepEqual(JSON.parse(mockStr!), res);
       });
@@ -293,13 +293,13 @@ describe("Integration test for mocking sample", () => {
         op getModel(@body input: Test): void;
         `,
           {
-            needAzureCore: true
-          }
+            needAzureCore: true,
+          },
         );
         const mockStr = generateParameterTypeValue(
           "Test",
           "input",
-          buildSchemaObjectMap({ schemas: schemaMap } as RLCModel)
+          buildSchemaObjectMap({ schemas: schemaMap } as RLCModel),
         );
         assert.isNotNull(mockStr);
         const res = {
@@ -307,7 +307,7 @@ describe("Integration test for mocking sample", () => {
           objectArray: [{ foo: "{Your foo}" }],
           complexArray: [{ foo: "{Your foo}" }],
           recordArray: [{ key: "{Your recordArray}" }],
-          literalArray: ["string1"]
+          literalArray: ["string1"],
         };
         // console.log(mockStr);
         assert.deepEqual(JSON.parse(mockStr!), res);
@@ -333,13 +333,13 @@ describe("Integration test for mocking sample", () => {
           op getModel(@body input: Test): void;
           `,
             {
-              needAzureCore: true
-            }
+              needAzureCore: true,
+            },
           );
           const mockStr = generateParameterTypeValue(
             "Test",
             "input",
-            buildSchemaObjectMap({ schemas: schemaMap } as RLCModel)
+            buildSchemaObjectMap({ schemas: schemaMap } as RLCModel),
           );
           assert.isNotNull(mockStr);
           const res = {
@@ -347,7 +347,7 @@ describe("Integration test for mocking sample", () => {
             stringUnion: "string1",
             complexUnion: "string1",
             unionOfUnion: { foo: "{Your foo}" },
-            nullableLiteral: "string1"
+            nullableLiteral: "string1",
           };
           // console.log(mockStr);
           assert.deepEqual(JSON.parse(mockStr!), res);
@@ -381,13 +381,13 @@ describe("Integration test for mocking sample", () => {
           op getModel(@body input: Test): void;
           `,
             {
-              needAzureCore: true
-            }
+              needAzureCore: true,
+            },
           );
           const mockStr = generateParameterTypeValue(
             "Test",
             "input",
-            buildSchemaObjectMap({ schemas: schemaMap } as RLCModel)
+            buildSchemaObjectMap({ schemas: schemaMap } as RLCModel),
           );
           assert.isNotNull(mockStr);
           const res = { namedUnion: { prop1: 123, name: "{Your name}" } };
@@ -417,13 +417,13 @@ describe("Integration test for mocking sample", () => {
         op getModel(@body input: Test): void;
         `,
           {
-            needAzureCore: true
-          }
+            needAzureCore: true,
+          },
         );
         const mockStr = generateParameterTypeValue(
           "Test",
           "input",
-          buildSchemaObjectMap({ schemas: schemaMap } as RLCModel)
+          buildSchemaObjectMap({ schemas: schemaMap } as RLCModel),
         );
         assert.isNotNull(mockStr);
         const res = {
@@ -433,7 +433,7 @@ describe("Integration test for mocking sample", () => {
           complexRecord: { key: { bar: "{Your bar}" } },
           recordOfRecord: { key: { key: "{Your recordOfRecord}" } },
           recordOfLiteral: { key: "string1" },
-          recordOfArray: { key: ["{Your recordOfArray}"] }
+          recordOfArray: { key: ["{Your recordOfArray}"] },
         };
         // console.log(mockStr);
         assert.deepEqual(JSON.parse(mockStr!), res);

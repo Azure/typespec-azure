@@ -26,8 +26,10 @@ model Widget {
   arrValue: string[];
   unionValue: Foo | string;
   nullValue: null;
+
   @clientName("jsClientName", "javascript")
   renamedProp: string;
+
   ...Record<string>;
   stringLiteral: "foo";
   booleanLiteral: true;
@@ -38,11 +40,13 @@ model Widget {
   offsetDateTimeProp: offsetDateTime;
   durationProp: duration;
   withEscapeChars: string;
-  unknownRecord: Record<unknown>
+  unknownRecord: Record<unknown>;
 }
 
 @doc("show example demo")
-op read(@bodyRoot body: Widget): { @body body: {}};
+op read(@bodyRoot body: Widget): {
+  @body body: {};
+};
 ```
 
 ## Example

@@ -1,4 +1,4 @@
-import { describe, it, assert } from "vitest";
+import { assert, describe, it } from "vitest";
 
 import { emitPageHelperFromTypeSpec } from "../util/emitUtil.js";
 
@@ -8,7 +8,7 @@ describe("Page helper", () => {
       `
       #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "for test"
       @list
-      op listWidgets is Azure.Core.Foundations.Operation<{}, CustomPageModel<Widget>>;`
+      op listWidgets is Azure.Core.Foundations.Operation<{}, CustomPageModel<Widget>>;`,
     );
     assert.ok(pageInfo);
     assert.isTrue((pageInfo?.content as string).includes(`customizedItems`));
@@ -21,7 +21,7 @@ describe("Page helper", () => {
       op listWidgets() : { @pageItems items: string[]; };
       `;
     const pageInfo = await emitPageHelperFromTypeSpec(content, {
-      needAzureCore: true
+      needAzureCore: true,
     });
     assert.ok(pageInfo);
     assert.isTrue((pageInfo?.content as string).includes(`items`));
@@ -35,13 +35,13 @@ describe("Page helper", () => {
       op listWidgets() : { items: string[]; };
       `;
       await emitPageHelperFromTypeSpec(content, {
-        needAzureCore: true
+        needAzureCore: true,
       });
     } catch (e) {
       assert.isTrue(
         (e as Error).message.includes(
-          "Paged operation 'listWidgets' return type must have a property annotated with @pageItems."
-        )
+          "Paged operation 'listWidgets' return type must have a property annotated with @pageItems.",
+        ),
       );
     }
   });
@@ -53,13 +53,11 @@ describe("Page helper", () => {
       op listWidgets() : { pagination: { @pageItems items: string[]; }; };
       `;
       await emitPageHelperFromTypeSpec(content, {
-        needAzureCore: true
+        needAzureCore: true,
       });
     } catch (e) {
       assert.isTrue(
-        (e as Error).message.includes(
-          "@azure-tools/typespec-ts/un-supported-paging-cases"
-        )
+        (e as Error).message.includes("@azure-tools/typespec-ts/un-supported-paging-cases"),
       );
     }
   });
@@ -70,7 +68,7 @@ describe("Page helper", () => {
       op listWidgets() : { @pageItems widgets: string[]; @nextLink next: string; };
       `;
     const pageInfo = await emitPageHelperFromTypeSpec(content, {
-      needAzureCore: true
+      needAzureCore: true,
     });
     assert.ok(pageInfo);
     assert.isTrue((pageInfo?.content as string).includes(`widgets`));
@@ -83,7 +81,7 @@ describe("Page helper", () => {
       op listWidgets() : { @body body: { @pageItems widgets: string[]; @nextLink next: string; } };
       `;
     const pageInfo = await emitPageHelperFromTypeSpec(content, {
-      needAzureCore: true
+      needAzureCore: true,
     });
     assert.ok(pageInfo);
     assert.isTrue((pageInfo?.content as string).includes(`widgets`));
@@ -96,7 +94,7 @@ describe("Page helper", () => {
       op listWidgets() : { @pageItems pageItems: string[]; @nextLink nextLink: string; };
       `;
     const pageInfo = await emitPageHelperFromTypeSpec(content, {
-      needAzureCore: true
+      needAzureCore: true,
     });
     assert.ok(pageInfo);
     assert.isTrue((pageInfo?.content as string).includes(`pageItems`));
@@ -110,7 +108,7 @@ describe("Page helper", () => {
       op listWidgets() : { @pageItems widgets: string[]; @nextLink next: null; };
       `;
     const pageInfo = await emitPageHelperFromTypeSpec(content, {
-      needAzureCore: true
+      needAzureCore: true,
     });
     assert.ok(pageInfo);
     assert.isTrue((pageInfo?.content as string).includes(`widgets`));
@@ -143,6 +141,6 @@ async function generatePagingHelper(code: string) {
     `;
 
   return await emitPageHelperFromTypeSpec(content, {
-    needAzureCore: true
+    needAzureCore: true,
   });
 }

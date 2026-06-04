@@ -1,9 +1,9 @@
-import { describe, it, assert } from "vitest";
+import { assert, describe, it } from "vitest";
 
 import {
   emitModelsFromTypeSpec,
   emitParameterFromTypeSpec,
-  emitResponsesFromTypeSpec
+  emitResponsesFromTypeSpec,
 } from "../util/emitUtil.js";
 import { assertEqualContent } from "../util/testUtil.js";
 
@@ -81,7 +81,7 @@ describe("anonymous model", () => {
       }
 
       export interface EmptyObj {}
-      `
+      `,
       );
     });
 
@@ -160,7 +160,7 @@ describe("anonymous model", () => {
       }
 
       export interface EmptyObjOutput {}
-      `
+      `,
       );
     });
 
@@ -235,7 +235,7 @@ describe("anonymous model", () => {
 
       export interface EmptyObjOutput {}
 
-      `
+      `,
       );
 
       await assertEqualContent(
@@ -270,7 +270,7 @@ describe("anonymous model", () => {
       }
 
       export interface EmptyObj {}
-      `
+      `,
       );
     });
   });
@@ -354,7 +354,7 @@ describe("anonymous model", () => {
         }
         
         export type GetModelParameters = GetModelBodyParam & RequestParameters;
-        `
+        `,
       );
     });
 
@@ -417,7 +417,7 @@ describe("anonymous model", () => {
         description: string;
         url: string;
       }
-      `
+      `,
       );
       // console.log(schemaOutput);
       await assertEqualContent(
@@ -456,7 +456,7 @@ describe("anonymous model", () => {
             attachments: (AttachmentOutput | string)[];
           };
         }
-        `
+        `,
       );
     });
   });

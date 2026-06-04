@@ -5,12 +5,9 @@ import {
   AzurePackageInfoConfig,
   getAzureCommonPackageInfo,
   getAzurePackageDependencies,
-  getAzurePackageDevDependencies
+  getAzurePackageDevDependencies,
 } from "./azurePackageCommon.js";
-import {
-  getCommonPackageScripts,
-  getPackageCommonInfo
-} from "./packageCommon.js";
+import { getCommonPackageScripts, getPackageCommonInfo } from "./packageCommon.js";
 
 /**
  * Builds the package.json for an Azure package that won't be hosted in the azure-sdk-for-js repo.
@@ -19,36 +16,32 @@ export function buildAzureStandalonePackage(config: AzurePackageInfoConfig) {
   const packageInfo = {
     ...getAzureStandalonePackageInfo(config),
     ...getAzureStandaloneDependencies(config),
-    scripts: getAzureStandaloneScripts(config)
+    scripts: getAzureStandaloneScripts(config),
   };
 
   return packageInfo;
 }
 
-function getAzureStandalonePackageInfo(
-  config: AzurePackageInfoConfig
-): Record<string, any> {
+function getAzureStandalonePackageInfo(config: AzurePackageInfoConfig): Record<string, any> {
   const commonPackageInfo = getPackageCommonInfo(config);
 
   return {
     ...commonPackageInfo,
-    ...getAzureCommonPackageInfo(config)
+    ...getAzureCommonPackageInfo(config),
   };
 }
 
-function getAzureStandaloneDependencies(
-  config: AzurePackageInfoConfig
-): Record<string, any> {
+function getAzureStandaloneDependencies(config: AzurePackageInfoConfig): Record<string, any> {
   return {
     dependencies: {
-      ...getAzurePackageDependencies(config)
+      ...getAzurePackageDependencies(config),
     },
     devDependencies: {
       ...getStandaloneDevDependencies(config),
       "@microsoft/api-extractor": "^7.40.3",
       rimraf: "^5.0.5",
-      mkdirp: "^3.0.1"
-    }
+      mkdirp: "^3.0.1",
+    },
   };
 }
 
@@ -56,7 +49,7 @@ function getStandaloneDevDependencies(config: AzurePackageInfoConfig) {
   return {
     ...getAzurePackageDevDependencies(config),
     "@microsoft/api-extractor": "^7.40.3",
-    ...getStandaloneCjsDevDependencies(config)
+    ...getStandaloneCjsDevDependencies(config),
   };
 }
 
@@ -70,29 +63,25 @@ function getStandaloneCjsDevDependencies(config: AzurePackageInfoConfig) {
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-multi-entry": "^6.0.0",
     "@rollup/plugin-node-resolve": "^13.1.3",
-    ...(config.moduleKind === "cjs" &&
-      config.withTests && { "cross-env": "^7.0.2" }),
+    ...(config.moduleKind === "cjs" && config.withTests && { "cross-env": "^7.0.2" }),
     rollup: "^2.66.1",
     "rollup-plugin-sourcemaps": "^0.6.3",
-    "uglify-js": "^3.4.9"
+    "uglify-js": "^3.4.9",
   };
 }
 
-function getAzureStandaloneScripts(
-  config: AzurePackageInfoConfig
-): Record<string, any> {
+function getAzureStandaloneScripts(config: AzurePackageInfoConfig): Record<string, any> {
   const testScripts = {
     "test:browser": "karma start --single-run",
     "test:node": `nyc mocha -r esm --require source-map-support/register --timeout 5000000 --full-trace "dist-esm/test/{,!(browser)/**/}*.spec.js"`,
-    test: "npm run test:node && npm run test:browser"
+    test: "npm run test:node && npm run test:browser",
   };
   return {
     ...getCommonPackageScripts(),
-    clean:
-      "rimraf --glob dist dist-browser dist-esm test-dist temp types *.tgz *.log",
+    clean: "rimraf --glob dist dist-browser dist-esm test-dist temp types *.tgz *.log",
     ...(config.withTests && testScripts),
     ...getCjsScripts(config),
-    ...getEsmScripts(config)
+    ...getEsmScripts(config),
   };
 }
 
@@ -104,7 +93,7 @@ function getCjsScripts(config: AzurePackageInfoConfig): Record<string, any> {
   const testScripts = {
     "build:test": "tsc -p . && rollup -c 2>&1",
     "build:browser": "tsc -p . && cross-env ONLY_BROWSER=true rollup -c 2>&1",
-    "build:node": "tsc -p . && cross-env ONLY_NODE=true rollup -c 2>&1"
+    "build:node": "tsc -p . && cross-env ONLY_NODE=true rollup -c 2>&1",
   };
 
   return {
@@ -112,7 +101,7 @@ function getCjsScripts(config: AzurePackageInfoConfig): Record<string, any> {
       "npm run clean && tsc && rollup -c 2>&1 && npm run minify && mkdirp ./review && npm run extract-api",
     ...(config.withTests && testScripts),
     minify:
-      "uglifyjs -c -m --comments --source-map \"content='./dist/index.js.map'\" -o ./dist/index.min.js ./dist/index.js"
+      "uglifyjs -c -m --comments --source-map \"content='./dist/index.js.map'\" -o ./dist/index.min.js ./dist/index.js",
   };
 }
 
@@ -124,11 +113,11 @@ function getEsmScripts(config: AzurePackageInfoConfig): Record<string, any> {
   const testScripts = {
     test: "npm run clean && tshy && npm run unit-test:node && npm run unit-test:browser && npm run integration-test",
     "test:node": "vitest -c vitest.config.ts",
-    "test:browser": "vitest -c vitest.browser.config.ts"
+    "test:browser": "vitest -c vitest.browser.config.ts",
   };
 
   return {
     build: "npm run clean && tshy && npm run extract-api",
-    ...(config.withTests && testScripts)
+    ...(config.withTests && testScripts),
   };
 }

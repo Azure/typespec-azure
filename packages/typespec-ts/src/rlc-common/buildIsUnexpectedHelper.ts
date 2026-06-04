@@ -1,16 +1,16 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { RLCModel } from "./interfaces.js";
 import * as path from "path";
 import {
   FunctionDeclarationOverloadStructure,
   OptionalKind,
   Project,
-  VariableDeclarationKind
+  VariableDeclarationKind,
 } from "ts-morph";
-import { hasUnexpectedHelper } from "./helpers/operationHelpers.js";
 import { getImportModuleName } from "./helpers/nameConstructors.js";
+import { hasUnexpectedHelper } from "./helpers/operationHelpers.js";
+import { RLCModel } from "./interfaces.js";
 export function buildIsUnexpectedHelper(model: RLCModel) {
   if (!hasUnexpectedHelper(model)) {
     return;
@@ -19,7 +19,7 @@ export function buildIsUnexpectedHelper(model: RLCModel) {
   const srcPath = model.srcPath;
   const filePath = path.join(srcPath, `isUnexpected.ts`);
   const isErrorHelper = project.createSourceFile(filePath, undefined, {
-    overwrite: true
+    overwrite: true,
   });
 
   let map: Record<string, string[]> = {};
@@ -37,13 +37,10 @@ export function buildIsUnexpectedHelper(model: RLCModel) {
         detail.successStatus.forEach(successCodeSet.add, successCodeSet);
         // LROs may call the same path but with GET
         // to get the operation status.
-        if (
-          detail.operationHelperDetail?.lroDetails?.isLongRunning &&
-          originalMethod !== "GET"
-        ) {
+        if (detail.operationHelperDetail?.lroDetails?.isLongRunning && originalMethod !== "GET") {
           const operation = `GET ${path}`;
-          const logicalSuccessCodes = detail.operationHelperDetail?.lroDetails
-            ?.logicalResponseTypes?.success
+          const logicalSuccessCodes = detail.operationHelperDetail?.lroDetails?.logicalResponseTypes
+            ?.success
             ? ["200"]
             : [];
           const initialSuccessCodes =
@@ -53,10 +50,8 @@ export function buildIsUnexpectedHelper(model: RLCModel) {
           map = {
             ...map,
             ...{
-              [operation]: Array.from(
-                new Set(logicalSuccessCodes.concat(initialSuccessCodes))
-              )
-            }
+              [operation]: Array.from(new Set(logicalSuccessCodes.concat(initialSuccessCodes))),
+            },
           };
         }
 
@@ -65,12 +60,10 @@ export function buildIsUnexpectedHelper(model: RLCModel) {
 
         if (
           model.helperDetails?.clientLroOverload &&
-          detail.operationHelperDetail?.lroDetails?.logicalResponseTypes
-            ?.success
+          detail.operationHelperDetail?.lroDetails?.logicalResponseTypes?.success
         ) {
           successTypes.push(
-            ...(detail.operationHelperDetail.lroDetails.logicalResponseTypes
-              .success ?? [])
+            ...(detail.operationHelperDetail.lroDetails.logicalResponseTypes.success ?? []),
           );
         }
 
@@ -89,10 +82,10 @@ export function buildIsUnexpectedHelper(model: RLCModel) {
           parameters: [
             {
               name: "response",
-              type: [...successTypes, ...errorTypes].join(" | ")
-            }
+              type: [...successTypes, ...errorTypes].join(" | "),
+            },
           ],
-          returnType: `response is ${errorTypes[0]}`
+          returnType: `response is ${errorTypes[0]}`,
         });
       }
       map = { ...map, ...{ [operation]: Array.from(successCodeSet) } };
@@ -104,10 +97,10 @@ export function buildIsUnexpectedHelper(model: RLCModel) {
     moduleSpecifier: getImportModuleName(
       {
         cjsName: `./responses`,
-        esModulesName: `./responses.js`
+        esModulesName: `./responses.js`,
       },
-      model
-    )
+      model,
+    ),
   });
 
   isErrorHelper.addVariableStatement({
@@ -115,10 +108,10 @@ export function buildIsUnexpectedHelper(model: RLCModel) {
       {
         name: "responseMap",
         initializer: JSON.stringify(map),
-        type: "Record<string, string[]>"
-      }
+        type: "Record<string, string[]>",
+      },
     ],
-    declarationKind: VariableDeclarationKind.Const
+    declarationKind: VariableDeclarationKind.Const,
   });
 
   if (allErrorTypes.size) {
@@ -129,8 +122,8 @@ export function buildIsUnexpectedHelper(model: RLCModel) {
       parameters: [
         {
           name: "response",
-          type: [...allResponseTypes].join(" | ")
-        }
+          type: [...allResponseTypes].join(" | "),
+        },
       ],
       returnType: `response is ${[...allErrorTypes].join(" | ")}`,
       statements: [
@@ -143,8 +136,8 @@ export function buildIsUnexpectedHelper(model: RLCModel) {
             pathDetails = getParametrizedPathSuccess(method, url.pathname);
           }
           return !pathDetails.includes(response.status);
-        `
-      ]
+        `,
+      ],
     });
     isErrorHelper.addFunction({
       isExported: false,
@@ -152,12 +145,12 @@ export function buildIsUnexpectedHelper(model: RLCModel) {
       parameters: [
         {
           name: "method",
-          type: "string"
+          type: "string",
         },
         {
           name: "path",
-          type: "string"
-        }
+          type: "string",
+        },
       ],
       returnType: `string[]`,
       statements: [
@@ -227,8 +220,8 @@ export function buildIsUnexpectedHelper(model: RLCModel) {
           }
         
           return matchedValue;
-        `
-      ]
+        `,
+      ],
     });
 
     isErrorHelper.addFunction({
@@ -237,19 +230,19 @@ export function buildIsUnexpectedHelper(model: RLCModel) {
       parameters: [
         {
           name: "mapKey",
-          type: "string"
-        }
+          type: "string",
+        },
       ],
       returnType: `string`,
       statements: [
         `const pathStart = mapKey.indexOf("/");
-         return mapKey.slice(pathStart);`
-      ]
+         return mapKey.slice(pathStart);`,
+      ],
     });
   }
 
   return {
     path: filePath,
-    content: isErrorHelper.getFullText()
+    content: isErrorHelper.getFullText(),
   };
 }

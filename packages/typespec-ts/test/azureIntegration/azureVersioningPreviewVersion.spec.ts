@@ -1,8 +1,8 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import PreviewVersionClientFactory, {
   PreviewVersionClient,
-  WidgetOutput
+  WidgetOutput,
 } from "./generated/azure/versioning/previewVersion/src/index.js";
 
 describe("Azure Versioning Preview Version", () => {
@@ -10,7 +10,7 @@ describe("Azure Versioning Preview Version", () => {
 
   beforeEach(() => {
     client = PreviewVersionClientFactory({
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
@@ -35,8 +35,8 @@ describe("Azure Versioning Preview Version", () => {
       .patch({
         contentType: "application/merge-patch+json",
         body: {
-          color: "red"
-        }
+          color: "red",
+        },
       });
 
     assert.strictEqual(result.status, "200");
@@ -51,16 +51,14 @@ describe("Azure Versioning Preview Version", () => {
     // api-version "2024-06-01" is stable, so color is not expected in the response
     const clientStable = PreviewVersionClientFactory({
       apiVersion: "2024-06-01",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
 
-    const result = await clientStable
-      .path("/azure/versioning/previewVersion/widgets")
-      .get({
-        queryParameters: {
-          name: "test"
-        }
-      });
+    const result = await clientStable.path("/azure/versioning/previewVersion/widgets").get({
+      queryParameters: {
+        name: "test",
+      },
+    });
 
     assert.strictEqual(result.status, "200");
     assert.isArray(result.body.widgets);

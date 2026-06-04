@@ -1,8 +1,8 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import {
   ClientAClient,
-  ClientBClient
+  ClientBClient,
 } from "./generated/client/structure/multi-client/src/index.js";
 describe("Client Structure Multi-Client Rest Client", () => {
   let clientA: ClientAClient;
@@ -10,10 +10,10 @@ describe("Client Structure Multi-Client Rest Client", () => {
 
   beforeEach(() => {
     clientA = new ClientAClient("http://localhost:3002", "multi-client", {
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
     clientB = new ClientBClient("http://localhost:3002", "multi-client", {
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 

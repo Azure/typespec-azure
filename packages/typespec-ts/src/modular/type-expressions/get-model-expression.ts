@@ -1,20 +1,20 @@
 import {
   EmitTypeOptions,
   getTypeExpression,
-  normalizeModelPropertyName
+  normalizeModelPropertyName,
 } from "./get-type-expression.js";
 
 import {
   SdkModelPropertyType,
   SdkModelType,
-  SdkServiceResponseHeader
+  SdkServiceResponseHeader,
 } from "@azure-tools/typespec-client-generator-core";
-import { refkey } from "../../framework/refkey.js";
-import { resolveReference } from "../../framework/reference.js";
-import { shouldEmitInline } from "./utils.js";
 import { useContext } from "../../contextManager.js";
+import { resolveReference } from "../../framework/reference.js";
+import { refkey } from "../../framework/refkey.js";
 import { SdkContext } from "../../utils/interfaces.js";
 import { MultipartHelpers } from "../static-helpers-metadata.js";
+import { shouldEmitInline } from "./utils.js";
 
 export interface ModelExpressionOptions extends EmitTypeOptions {
   skipPolymorphicUnion?: boolean;
@@ -23,7 +23,7 @@ export interface ModelExpressionOptions extends EmitTypeOptions {
 export function getModelExpression(
   context: SdkContext,
   type: SdkModelType,
-  options: ModelExpressionOptions = {}
+  options: ModelExpressionOptions = {},
 ): string {
   const externalModel = getExternalModel(type);
   if (externalModel) {
@@ -43,12 +43,12 @@ export function getModelExpression(
 
 const externalModels: Record<string, string> = {
   "Azure.Core.Foundations.Error": "ErrorModel",
-  "Azure.Core.Foundations.ErrorResponse": "AzureCoreErrorResponse"
+  "Azure.Core.Foundations.ErrorResponse": "AzureCoreErrorResponse",
 };
 
 export function emitInlineModel(
   context: SdkContext,
-  properties: (SdkModelPropertyType | SdkServiceResponseHeader)[]
+  properties: (SdkModelPropertyType | SdkServiceResponseHeader)[],
 ): string {
   // generate Record<string, any> for empty anonymous object
   if (properties.length === 0) {
@@ -58,7 +58,7 @@ export function emitInlineModel(
       ${properties
         .map(
           (p) =>
-            `${normalizeModelPropertyName(context, p)}${p.optional ? "?" : ""}: ${getPropertyTypeExpression(context, p)}`
+            `${normalizeModelPropertyName(context, p)}${p.optional ? "?" : ""}: ${getPropertyTypeExpression(context, p)}`,
         )
         .join(",\n")}
     }`;
@@ -66,12 +66,9 @@ export function emitInlineModel(
 
 function getPropertyTypeExpression(
   context: SdkContext,
-  property: SdkModelPropertyType | SdkServiceResponseHeader
+  property: SdkModelPropertyType | SdkServiceResponseHeader,
 ): string {
-  if (
-    property.kind === "property" &&
-    property.serializationOptions.multipart?.isFilePart
-  ) {
+  if (property.kind === "property" && property.serializationOptions.multipart?.isFilePart) {
     return getMultipartFileTypeExpression(context, property);
   }
   return getTypeExpression(context, property.type);
@@ -79,7 +76,7 @@ function getPropertyTypeExpression(
 
 export function getMultipartFileTypeExpression(
   context: SdkContext,
-  property: SdkModelPropertyType
+  property: SdkModelPropertyType,
 ): string {
   const multipartOptions = property.serializationOptions.multipart;
 
@@ -88,8 +85,7 @@ export function getMultipartFileTypeExpression(
     multipartOptions.contentType.optional ||
     multipartOptions.defaultContentTypes.length > 0;
   const isFilenameOptional =
-    multipartOptions?.filename === undefined ||
-    multipartOptions.filename.optional;
+    multipartOptions?.filename === undefined || multipartOptions.filename.optional;
 
   const contentTypeType = multipartOptions?.contentType
     ? getTypeExpression(context, multipartOptions.contentType.type)

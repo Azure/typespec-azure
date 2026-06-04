@@ -1,9 +1,9 @@
-import { getAllAncestors } from "../helpers/operationHelpers.js";
 import {
   SdkModelPropertyType,
   SdkModelType,
-  SdkType
+  SdkType,
 } from "@azure-tools/typespec-client-generator-core";
+import { getAllAncestors } from "../helpers/operationHelpers.js";
 import { getDirectSubtypes } from "../helpers/typeHelpers.js";
 
 /**
@@ -14,7 +14,7 @@ import { getDirectSubtypes } from "../helpers/typeHelpers.js";
  */
 export function getAllDiscriminatedValues(
   type: SdkModelType,
-  discriminatorProperty?: SdkModelPropertyType
+  discriminatorProperty?: SdkModelPropertyType,
 ) {
   if (!type.discriminatorValue) {
     return [];
@@ -30,8 +30,7 @@ export function getAllDiscriminatedValues(
     // Check if this model is a subtype of the given discriminator property
     if (
       !!discriminatorProperty &&
-      model.baseModel?.discriminatorProperty?.name ===
-        discriminatorProperty?.name
+      model.baseModel?.discriminatorProperty?.name === discriminatorProperty?.name
     ) {
       values.push(model.discriminatorValue);
       if (model.discriminatorProperty?.name === discriminatorProperty.name) {
@@ -46,10 +45,7 @@ export function getAllDiscriminatedValues(
 
 export function isSupportedSerializeType(type: SdkType): boolean {
   return (
-    type.kind === "model" ||
-    type.kind === "dict" ||
-    type.kind === "array" ||
-    type.kind === "union"
+    type.kind === "model" || type.kind === "dict" || type.kind === "array" || type.kind === "union"
   );
 }
 
@@ -68,7 +64,7 @@ export function isSupportedSerializeType(type: SdkType): boolean {
 const specialVariantMap = new Map<SdkType, boolean>();
 export function isSpecialUnionVariant(
   t: SdkType & { isNonExhaustive?: boolean },
-  variantStack: SdkType[] = []
+  variantStack: SdkType[] = [],
 ): boolean {
   if (variantStack.length <= 0) {
     variantStack.push(t);
@@ -91,14 +87,13 @@ export function isSpecialUnionVariant(
             ancestors.includes(p.type) ||
             (p.type.kind === "array" &&
               p.type.valueType &&
-              (variantStack.includes(p.type.valueType) ||
-                ancestors.includes(p.type.valueType)))
+              (variantStack.includes(p.type.valueType) || ancestors.includes(p.type.valueType)))
           );
         })
         ?.some(
           (p) =>
             (p.kind === "property" && p.name !== p.serializedName) ||
-            isSpecialUnionVariant(p.type, [...variantStack, p.type])
+            isSpecialUnionVariant(p.type, [...variantStack, p.type]),
         )) ||
     isPolymorphicUnion(t) ||
     (t.kind === "array" &&
@@ -137,21 +132,17 @@ export function isNormalUnion(t: SdkType): boolean {
 }
 
 export function isDiscriminatedUnion(
-  type: SdkType
+  type: SdkType,
 ): type is SdkModelType & { discriminatorProperty: SdkType } {
   if (!type) {
     return false;
   }
   return Boolean(
-    type?.kind === "model" &&
-    type.discriminatorProperty &&
-    type.discriminatedSubtypes
+    type?.kind === "model" && type.discriminatorProperty && type.discriminatedSubtypes,
   );
 }
 
-export function isSpecialHandledUnion(
-  t: SdkType & { isNonExhaustive?: boolean }
-): boolean {
+export function isSpecialHandledUnion(t: SdkType & { isNonExhaustive?: boolean }): boolean {
   return isDiscriminatedUnion(t!) || isPolymorphicUnion(t);
 }
 
@@ -209,7 +200,7 @@ export interface ModelOverrideOptions {
 
 export function getPropertyWithOverrides(
   property: SdkModelPropertyType,
-  overrides?: ModelOverrideOptions
+  overrides?: ModelOverrideOptions,
 ): SdkModelPropertyType {
   if (!overrides) {
     return property;

@@ -1,14 +1,11 @@
-import { describe, it, assert } from "vitest";
+import { assert, describe, it } from "vitest";
 
 import {
   expandUrlTemplate,
-  UrlTemplateOptions
+  UrlTemplateOptions,
 } from "../../../static/static-helpers/urlTemplate.js";
 
-function createAssertion(
-  context: Record<string, any>,
-  option?: UrlTemplateOptions
-) {
+function createAssertion(context: Record<string, any>, option?: UrlTemplateOptions) {
   return (template: string, expected: string) => {
     assert.equal(expandUrlTemplate(template, context, option), expected);
   };
@@ -31,7 +28,7 @@ describe("url-template", () => {
         null: null,
         chars: "šöäŸœñê€£¥‡ÑÒÓÔÕÖ×ØÙÚàáâãäåæçÿü",
         chinese: "中文",
-        surrogatepairs: "\uD834\uDF06"
+        surrogatepairs: "\uD834\uDF06",
       });
       it("should be empty string", () => {
         assert("", "");
@@ -60,7 +57,7 @@ describe("url-template", () => {
       it("should expand non-ASCII strings", () => {
         assert(
           "{chars}",
-          "%C5%A1%C3%B6%C3%A4%C5%B8%C5%93%C3%B1%C3%AA%E2%82%AC%C2%A3%C2%A5%E2%80%A1%C3%91%C3%92%C3%93%C3%94%C3%95%C3%96%C3%97%C3%98%C3%99%C3%9A%C3%A0%C3%A1%C3%A2%C3%A3%C3%A4%C3%A5%C3%A6%C3%A7%C3%BF%C3%BC"
+          "%C5%A1%C3%B6%C3%A4%C5%B8%C5%93%C3%B1%C3%AA%E2%82%AC%C2%A3%C2%A5%E2%80%A1%C3%91%C3%92%C3%93%C3%94%C3%95%C3%96%C3%97%C3%98%C3%99%C3%9A%C3%A0%C3%A1%C3%A2%C3%A3%C3%A4%C3%A5%C3%A6%C3%A7%C3%BF%C3%BC",
         );
         assert("{chinese}", "%E4%B8%AD%E6%96%87");
       });
@@ -106,7 +103,7 @@ describe("url-template", () => {
       const assert = createAssertion({
         var: "value",
         hello: "Hello World!",
-        path: "/foo/bar"
+        path: "/foo/bar",
       });
 
       it("reserved expansion of basic strings", () => {
@@ -127,7 +124,7 @@ describe("url-template", () => {
         empty: "",
         path: "/foo/bar",
         x: "1024",
-        y: "768"
+        y: "768",
       });
 
       it("variables without an operator", () => {
@@ -183,10 +180,10 @@ describe("url-template", () => {
         keys: {
           semi: ";",
           dot: ".",
-          comma: ","
+          comma: ",",
         },
         chars: {
-          ü: "ü"
+          ü: "ü",
         },
         number: 2133,
         emptystring: "",
@@ -197,8 +194,8 @@ describe("url-template", () => {
           key: null,
           hello: "world",
           empty: "",
-          "": "nothing"
-        }
+          "": "nothing",
+        },
       });
 
       it("variable empty list", () => {
@@ -218,10 +215,7 @@ describe("url-template", () => {
       it("variable undefined list item", () => {
         assert("{undefinedlistitem}", "1,2");
         assert("{undefinedlistitem*}", "1,2");
-        assert(
-          "{?undefinedlistitem*}",
-          "?undefinedlistitem=1&undefinedlistitem=2"
-        );
+        assert("{?undefinedlistitem*}", "?undefinedlistitem=1&undefinedlistitem=2");
       });
 
       it("variable undefined object item", () => {
@@ -310,12 +304,9 @@ describe("url-template", () => {
     it("should expand apiVersion", () => {
       const assert = createAssertion({
         "api-version": "2023-05-01.17.0",
-        timeOut: undefined
+        timeOut: undefined,
       });
-      assert(
-        "/pools{?api-version,timeOut}",
-        "/pools?api-version=2023-05-01.17.0"
-      );
+      assert("/pools{?api-version,timeOut}", "/pools?api-version=2023-05-01.17.0");
     });
   });
 
@@ -323,34 +314,25 @@ describe("url-template", () => {
     it("should decode percent-encoded hyphen", () => {
       const assert = createAssertion({
         "api%2Dversion": "2023-05-01.17.0",
-        timeOut: undefined
+        timeOut: undefined,
       });
-      assert(
-        "/pools{?api%2Dversion,timeOut}",
-        "/pools?api-version=2023-05-01.17.0"
-      );
+      assert("/pools{?api%2Dversion,timeOut}", "/pools?api-version=2023-05-01.17.0");
     });
 
     it("should decode percent-encoded dot", () => {
       const assert = createAssertion({
         "api%2Eversion": "2023-05-01.17.0",
-        timeOut: undefined
+        timeOut: undefined,
       });
-      assert(
-        "/pools{?api%2Eversion,timeOut}",
-        "/pools?api.version=2023-05-01.17.0"
-      );
+      assert("/pools{?api%2Eversion,timeOut}", "/pools?api.version=2023-05-01.17.0");
     });
 
     it("should decode percent-encoded tilde", () => {
       const assert = createAssertion({
         "api%7Eversion": "2023-05-01.17.0",
-        timeOut: undefined
+        timeOut: undefined,
       });
-      assert(
-        "/pools{?api%7Eversion,timeOut}",
-        "/pools?api~version=2023-05-01.17.0"
-      );
+      assert("/pools{?api%7Eversion,timeOut}", "/pools?api~version=2023-05-01.17.0");
     });
   });
 
@@ -360,9 +342,9 @@ describe("url-template", () => {
         const assert = createAssertion(
           {
             path: "/foo/bar",
-            query: "bar,baz"
+            query: "bar,baz",
           },
-          { allowReserved: true }
+          { allowReserved: true },
         );
         assert("{path}/here{?query}", "/foo/bar/here?query=bar,baz");
       });
@@ -371,9 +353,9 @@ describe("url-template", () => {
         const assert = createAssertion(
           {
             path: "/foo/bar",
-            query: "bar,baz"
+            query: "bar,baz",
           },
-          { allowReserved: false }
+          { allowReserved: false },
         );
         assert("{path}/here{?query}", "%2Ffoo%2Fbar/here?query=bar%2Cbaz");
       });
@@ -382,9 +364,9 @@ describe("url-template", () => {
         const assert = createAssertion(
           {
             path: "/foo/bar",
-            query: "bar,baz"
+            query: "bar,baz",
           },
-          { allowReserved: undefined }
+          { allowReserved: undefined },
         );
         assert("{path}/here{?query}", "%2Ffoo%2Fbar/here?query=bar%2Cbaz");
       });
@@ -394,9 +376,9 @@ describe("url-template", () => {
         const assert = createAssertion(
           {
             path: "/foo/bar",
-            query: "bar,baz"
+            query: "bar,baz",
           },
-          { allowReserved: true }
+          { allowReserved: true },
         );
         assert("{+path}/here{?query}", "/foo/bar/here?query=bar,baz");
       });
@@ -405,9 +387,9 @@ describe("url-template", () => {
         const assert = createAssertion(
           {
             path: "/foo/bar",
-            query: "bar,baz"
+            query: "bar,baz",
           },
-          { allowReserved: false }
+          { allowReserved: false },
         );
         assert("{+path}/here{?query}", "%2Ffoo%2Fbar/here?query=bar%2Cbaz");
       });
@@ -416,9 +398,9 @@ describe("url-template", () => {
         const assert = createAssertion(
           {
             path: "/foo/bar",
-            query: "bar,baz"
+            query: "bar,baz",
           },
-          { allowReserved: undefined }
+          { allowReserved: undefined },
         );
         assert("{+path}/here{?query}", "/foo/bar/here?query=bar%2Cbaz");
       });
@@ -429,20 +411,20 @@ describe("url-template", () => {
     describe("simple expansion", () => {
       it("should resolve primitive parameter", () => {
         const assert = createAssertion({
-          param: "a"
+          param: "a",
         });
         assert("/primitive{param}", "/primitivea");
       });
       it("should resolve array parameter", () => {
         const assert = createAssertion({
-          param: ["a", "b"]
+          param: ["a", "b"],
         });
         assert("/array{param}", "/arraya,b");
       });
 
       it("should resolve object parameter", () => {
         const assert = createAssertion({
-          param: { a: 1, b: 2 }
+          param: { a: 1, b: 2 },
         });
         assert("/record{param}", "/recorda,1,b,2");
       });
@@ -451,20 +433,20 @@ describe("url-template", () => {
     describe("simple expansion with explode modifier*", () => {
       it("should resolve primitive parameter", () => {
         const assert = createAssertion({
-          param: "a"
+          param: "a",
         });
         assert("/primitive{param*}", "/primitivea");
       });
       it("should resolve array parameter", () => {
         const assert = createAssertion({
-          param: ["a", "b"]
+          param: ["a", "b"],
         });
         assert("/array{param*}", "/arraya,b");
       });
 
       it("should resolve object parameter", () => {
         const assert = createAssertion({
-          param: { a: 1, b: 2 }
+          param: { a: 1, b: 2 },
         });
         assert("/record{param*}", "/recorda=1,b=2");
       });
@@ -473,20 +455,20 @@ describe("url-template", () => {
     describe("path expansion", () => {
       it("should resolve primitive parameter", () => {
         const assert = createAssertion({
-          param: "a"
+          param: "a",
         });
         assert("/primitive{/param}", "/primitive/a");
       });
       it("should resolve array parameter", () => {
         const assert = createAssertion({
-          param: ["a", "b"]
+          param: ["a", "b"],
         });
         assert("/array{/param}", "/array/a,b");
       });
 
       it("should resolve object parameter", () => {
         const assert = createAssertion({
-          param: { a: 1, b: 2 }
+          param: { a: 1, b: 2 },
         });
         assert("/record{/param}", "/record/a,1,b,2");
       });
@@ -495,20 +477,20 @@ describe("url-template", () => {
     describe("path expansion with explode modifier*", () => {
       it("should resolve primitive parameter", () => {
         const assert = createAssertion({
-          param: "a"
+          param: "a",
         });
         assert("/primitive{/param*}", "/primitive/a");
       });
       it("should resolve array parameter", () => {
         const assert = createAssertion({
-          param: ["a", "b"]
+          param: ["a", "b"],
         });
         assert("/array{/param*}", "/array/a/b");
       });
 
       it("should resolve object parameter", () => {
         const assert = createAssertion({
-          param: { a: 1, b: 2 }
+          param: { a: 1, b: 2 },
         });
         assert("/record{/param*}", "/record/a=1/b=2");
       });
@@ -518,13 +500,13 @@ describe("url-template", () => {
   describe("Advanced cases", () => {
     it("should not double encode values", () => {
       const assert = createAssertion({
-        bar: "bar/hello%20world"
+        bar: "bar/hello%20world",
       });
       assert("/foo/{+bar}", "/foo/bar/hello%20world");
     });
     it("should encode spaces", () => {
       const assert = createAssertion({
-        bar: "bar/hello world"
+        bar: "bar/hello world",
       });
       assert("/foo/{+bar}", "/foo/bar/hello%20world");
     });

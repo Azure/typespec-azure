@@ -19,9 +19,7 @@ using Azure.ResourceManager;
 
 /** Microsoft.Contoso Resource Provider management API. */
 @armProviderNamespace
-@service(#{
-  title: "Microsoft.Contoso management service",
-})
+@service(#{ title: "Microsoft.Contoso management service" })
 @versioned(Microsoft.Contoso.Versions)
 namespace Microsoft.Contoso;
 
@@ -43,6 +41,7 @@ model Employee is TrackedResource<EmployeeProperties> {
 model EmployeeProperties {
   /** Age of employee */
   age?: int32;
+
   /** The status of the last operation. */
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -72,7 +71,6 @@ union ProvisioningState {
 interface Employees {
   createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
 }
-
 ```
 
 ## Examples and generated samples
@@ -210,9 +208,7 @@ using Azure.ClientGenerator.Core;
 
 /** Microsoft.Contoso Resource Provider management API. */
 @armProviderNamespace
-@service(#{
-  title: "Microsoft.Contoso management service",
-})
+@service(#{ title: "Microsoft.Contoso management service" })
 @versioned(Microsoft.Contoso.Versions)
 namespace Microsoft.Contoso;
 
@@ -234,13 +230,13 @@ model Employee is TrackedResource<EmployeeProperties> {
 model EmployeeProperties {
   /** Age of employee */
   age?: int32;
+
   /** The status of the last operation. */
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
 
-model EmployeeBaseParameter
-    is Azure.ResourceManager.Foundations.DefaultBaseParameters<Employee>;
+model EmployeeBaseParameter is Azure.ResourceManager.Foundations.DefaultBaseParameters<Employee>;
 
 /** The resource provisioning state. */
 @lroStatus
@@ -270,7 +266,6 @@ interface Employees {
   >;
 }
 @@clientLocation(EmployeeBaseParameter.subscriptionId, Employees.createOrUpdate);
-
 ```
 
 ## Examples and generated samples
@@ -410,9 +405,7 @@ using Azure.ClientGenerator.Core;
 
 /** Microsoft.Contoso Resource Provider management API. */
 @armProviderNamespace
-@service(#{
-  title: "Microsoft.Contoso management service",
-})
+@service(#{ title: "Microsoft.Contoso management service" })
 @versioned(Microsoft.Contoso.Versions)
 namespace Microsoft.Contoso;
 
@@ -434,13 +427,13 @@ model Employee is TrackedResource<EmployeeProperties> {
 model EmployeeProperties {
   /** Age of employee */
   age?: int32;
+
   /** The status of the last operation. */
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
 
-model EmployeeBaseParameter
-    is Azure.ResourceManager.Foundations.DefaultBaseParameters<Employee>;
+model EmployeeBaseParameter is Azure.ResourceManager.Foundations.DefaultBaseParameters<Employee>;
 
 /** The resource provisioning state. */
 @lroStatus

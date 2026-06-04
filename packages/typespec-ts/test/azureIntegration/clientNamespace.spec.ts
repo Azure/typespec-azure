@@ -1,14 +1,14 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import ClientNamespaceClientFactory, {
-  ClientNamespaceClient
+  ClientNamespaceClient,
 } from "./generated/client/namespace/src/index.js";
 describe("ClientNameSpaceClient Rest Client", () => {
   let client: ClientNamespaceClient;
 
   beforeEach(() => {
     client = ClientNamespaceClientFactory({
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 

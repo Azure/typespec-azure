@@ -1,6 +1,6 @@
 import { dirname, relative, resolve } from "path";
-import { useContext } from "../contextManager.js";
 import { SourceFile } from "ts-morph";
+import { useContext } from "../contextManager.js";
 
 /**
  * Adds a named import to a TypeScript source file if it does not already exist.
@@ -21,22 +21,17 @@ export function addImportBySymbol(symbol: string, currentFile: SourceFile) {
 
   // Resolve absolute path and compute a relative path from the current file to the module.
   const moduleAbsolutePath = resolve(modulePath);
-  const relativeImportPath = getRelativeImportPath(
-    currentFile.getFilePath(),
-    moduleAbsolutePath
-  )
+  const relativeImportPath = getRelativeImportPath(currentFile.getFilePath(), moduleAbsolutePath)
     .replace(/\\/g, "/")
     .replace(/\.ts$/, ".js");
 
   // Check if the import declaration already exists and if it includes the symbol.
   const existing = currentFile.getImportDeclaration(
-    (i) => i.getModuleSpecifierValue() === relativeImportPath
+    (i) => i.getModuleSpecifierValue() === relativeImportPath,
   );
 
   if (existing) {
-    const sameImport = existing
-      .getNamedImports()
-      .some((i) => i.getName() === symbol);
+    const sameImport = existing.getNamedImports().some((i) => i.getName() === symbol);
 
     if (!sameImport) {
       existing.addNamedImport(symbol);
@@ -44,7 +39,7 @@ export function addImportBySymbol(symbol: string, currentFile: SourceFile) {
   } else {
     currentFile.addImportDeclaration({
       moduleSpecifier: relativeImportPath,
-      namedImports: [symbol]
+      namedImports: [symbol],
     });
   }
 }

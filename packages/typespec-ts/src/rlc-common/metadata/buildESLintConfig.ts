@@ -70,17 +70,15 @@ export function buildEsLintConfig(model: RLCModel) {
 
   let template: string;
   if (model.options?.moduleKind === "esm") {
-    template = model.options?.azureSdkForJs
-      ? esLintConfigEsmAzureSdk
-      : esLintConfigEsm;
+    template = model.options?.azureSdkForJs ? esLintConfigEsmAzureSdk : esLintConfigEsm;
   } else {
     template = eslintConfig;
   }
   const configFile = project.createSourceFile("eslint.config.mjs", template, {
-    overwrite: true
+    overwrite: true,
   });
   return {
     path: filePath,
-    content: configFile.getFullText()
+    content: configFile.getFullText(),
   };
 }

@@ -3,22 +3,22 @@
 ## TypeSpec
 
 ```tsp
-model Base { }
+model Base {}
 
 model Templated<T> {
-    prop: T;
+  prop: T;
 }
 
 model Foo {
-    x: Templated<Base>;
-    y: Templated<string>;
-    z: Templated<"cat">;
-    h: Templated<true>;
-    j: Templated<1>;
+  x: Templated<Base>;
+  y: Templated<string>;
+  z: Templated<"cat">;
+  h: Templated<true>;
+  j: Templated<1>;
 }
 #suppress "@azure-tools/typespec-azure-core/documentation-required" "for test"
 model InputOutputModel {
-    prop: Foo;
+  prop: Foo;
 }
 
 #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "for test"

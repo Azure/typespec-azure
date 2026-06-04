@@ -7,7 +7,7 @@ import {
   DictionarySchema,
   ObjectSchema,
   Schema,
-  SchemaContext
+  SchemaContext,
 } from "../interfaces.js";
 import {
   TypeScriptType,
@@ -20,7 +20,7 @@ import {
   leaveBracket,
   leaveStringQuotes,
   toTypeScriptTypeFromName,
-  toTypeScriptTypeFromSchema
+  toTypeScriptTypeFromSchema,
 } from "./typeUtil.js";
 
 /**
@@ -37,7 +37,7 @@ export function generateParameterTypeValue(
   parameterName: string,
   schemaMap: Map<string, Schema>,
   path: Set<string> = new Set(),
-  _allowMockValue = true
+  _allowMockValue = true,
 ): string | undefined {
   type = leaveBracket(type?.trim());
   let tsType: TypeScriptType | undefined;
@@ -85,25 +85,20 @@ function mockEnumValues(
   type: string,
   parameterName: string,
   schemaMap: Map<string, Schema>,
-  path: Set<string> = new Set()
+  path: Set<string> = new Set(),
 ) {
   const schema = schemaMap.get(type);
   if (schema && schema.enum && schema.enum.length > 0) {
     return schema.enum[0].type;
   }
-  return generateParameterTypeValue(
-    getUnionType(type),
-    parameterName,
-    schemaMap,
-    path
-  );
+  return generateParameterTypeValue(getUnionType(type), parameterName, schemaMap, path);
 }
 
 function mockUnionValues(
   type: string,
   parameterName: string,
   schemaMap: Map<string, Schema>,
-  path: Set<string> = new Set()
+  path: Set<string> = new Set(),
 ) {
   const schema = schemaMap.get(type);
   if (schema && schema.enum && schema.enum.length > 0) {
@@ -112,22 +107,17 @@ function mockUnionValues(
       getAccurateTypeName(schema.enum[0]) ?? schema.enum[0],
       parameterName,
       schemaMap,
-      path
+      path,
     );
   }
-  return generateParameterTypeValue(
-    getUnionType(type),
-    parameterName,
-    schemaMap,
-    path
-  );
+  return generateParameterTypeValue(getUnionType(type), parameterName, schemaMap, path);
 }
 
 function generateRecordValues(
   type: string,
   parameterName: string,
   schemaMap: Map<string, Schema>,
-  path: Set<string> = new Set()
+  path: Set<string> = new Set(),
 ) {
   let recordType = getRecordType(type);
   const schema = schemaMap.get(type) as DictionarySchema;
@@ -137,12 +127,7 @@ function generateRecordValues(
   }
 
   return recordType
-    ? `{"key": ${generateParameterTypeValue(
-        recordType,
-        parameterName,
-        schemaMap,
-        path
-      )}}`
+    ? `{"key": ${generateParameterTypeValue(recordType, parameterName, schemaMap, path)}}`
     : `{}`;
 }
 
@@ -150,7 +135,7 @@ function generateArrayValues(
   type: string,
   parameterName: string,
   schemaMap: Map<string, Schema>,
-  path: Set<string> = new Set()
+  path: Set<string> = new Set(),
 ) {
   let arrayType;
   const schema = schemaMap.get(type) as ArraySchema;
@@ -172,7 +157,7 @@ function generateObjectValues(
   type: string,
   _parameterName: string,
   schemaMap: Map<string, Schema>,
-  path: Set<string> = new Set()
+  path: Set<string> = new Set(),
 ) {
   if (path.has(type)) {
     // skip generating if self referenced
@@ -189,7 +174,7 @@ function generateObjectValues(
 
 function getAllProperties(
   schema?: ObjectSchema,
-  schemaMap: Map<string, Schema> = new Map()
+  schemaMap: Map<string, Schema> = new Map(),
 ): Map<string, Schema> {
   const propertiesMap: Map<string, Schema> = new Map();
   if (!schema) {
@@ -213,7 +198,7 @@ function getAllProperties(
 function extractObjectProperties(
   properties: Map<string, Schema>,
   schemaMap: Map<string, Schema> = new Map(),
-  path: Set<string> = new Set()
+  path: Set<string> = new Set(),
 ) {
   const values: string[] = [];
   for (const name of properties.keys()) {
@@ -224,12 +209,7 @@ function extractObjectProperties(
     addToSchemaMap(schemaMap, property);
     values.push(
       `${name}: ` +
-        generateParameterTypeValue(
-          getAccurateTypeName(property),
-          name,
-          schemaMap,
-          path
-        )
+        generateParameterTypeValue(getAccurateTypeName(property), name, schemaMap, path),
     );
   }
   return values;
@@ -248,10 +228,7 @@ function addToSchemaMap(schemaMap: Map<string, Schema>, schema: Schema) {
   if (!type) {
     return;
   }
-  if (
-    !schemaMap.has(type) &&
-    !["string", "number", "boolean"].includes(schema.type)
-  ) {
+  if (!schemaMap.has(type) && !["string", "number", "boolean"].includes(schema.type)) {
     schemaMap.set(type, schema);
   }
 }

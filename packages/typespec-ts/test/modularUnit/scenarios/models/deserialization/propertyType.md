@@ -48,14 +48,18 @@ model SimpleModel {
   propRecordOfUnionArrayOptional?: Record<(string | boolean | int32)[]>;
   propArrayOfRecordOfUnion: Record<string | boolean | int32>[];
   propArrayOfRecordOfUnionOptional?: Record<string | boolean | int32>[];
+
   @encodedName("application/json", "prop_encoded")
   propEncoded: string;
+
   propNestedDict?: Record<Record<unknown>>;
 }
 
 @route("/serialize")
 interface D {
-  op bar(): { @body body: SimpleModel };
+  bar(): {
+    @body body: SimpleModel;
+  };
 }
 ```
 

@@ -1,4 +1,4 @@
-import { describe, it, beforeEach } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 
 import { QueryClient } from "./generated/azure/client-generator-core/api-version/query/src/index.js";
 
@@ -8,7 +8,7 @@ describe("Azure Client Generator Core - API Version Query (Modular)", () => {
   beforeEach(() => {
     client = new QueryClient({
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 

@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { CommonPropertiesClient } from "./generated/azure/resource-manager/common-properties/src/index.js";
 describe("Azure Arm Resources Rest Client", () => {
@@ -7,7 +7,7 @@ describe("Azure Arm Resources Rest Client", () => {
   beforeEach(() => {
     client = new CommonPropertiesClient(SUBSCRIPTION_ID_EXPECTED, {
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
   const SUBSCRIPTION_ID_EXPECTED = "00000000-0000-0000-0000-000000000000";
@@ -17,29 +17,28 @@ describe("Azure Arm Resources Rest Client", () => {
   const LOCATION_REGION_EXPECTED = "eastus";
   const RESOURCE_GROUP_EXPECTED = "test-rg";
   const IDENTITY_TYPE_SYSTEM_ASSIGNED_EXPECTED = "SystemAssigned";
-  const IDENTITY_TYPE_SYSTEM_USER_ASSIGNED_EXPECTED =
-    "SystemAssigned,UserAssigned";
+  const IDENTITY_TYPE_SYSTEM_USER_ASSIGNED_EXPECTED = "SystemAssigned,UserAssigned";
   const validSystemAssignedManagedIdentityResource = {
     id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.CommonProperties/managedIdentityTrackedResources/identity`,
     location: `${LOCATION_REGION_EXPECTED}`,
     tags: {
-      tagKey1: "tagValue1"
+      tagKey1: "tagValue1",
     },
     identity: {
       type: `${IDENTITY_TYPE_SYSTEM_ASSIGNED_EXPECTED}`,
       principalId: `${PRINCIPAL_ID_EXPECTED}`,
-      tenantId: `${TENANT_ID_EXPECTED}`
+      tenantId: `${TENANT_ID_EXPECTED}`,
     },
     properties: {
-      provisioningState: "Succeeded"
-    }
+      provisioningState: "Succeeded",
+    },
   };
 
   const validUserAssignedAndSystemAssignedManagedIdentityResource = {
     id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.CommonProperties/managedIdentityTrackedResources/identity`,
     location: `${LOCATION_REGION_EXPECTED}`,
     tags: {
-      tagKey1: "tagValue1"
+      tagKey1: "tagValue1",
     },
     identity: {
       type: `${IDENTITY_TYPE_SYSTEM_USER_ASSIGNED_EXPECTED}`,
@@ -47,99 +46,71 @@ describe("Azure Arm Resources Rest Client", () => {
         "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id1":
           {
             principalId: `${PRINCIPAL_ID_EXPECTED}`,
-            clientId: `${CLIENT_ID_EXPECTED}`
-          }
+            clientId: `${CLIENT_ID_EXPECTED}`,
+          },
       },
       principalId: `${PRINCIPAL_ID_EXPECTED}`,
-      tenantId: `${TENANT_ID_EXPECTED}`
+      tenantId: `${TENANT_ID_EXPECTED}`,
     },
     properties: {
-      provisioningState: "Succeeded"
-    }
+      provisioningState: "Succeeded",
+    },
   };
 
   const createExpectedIdentity = {
-    type: `${IDENTITY_TYPE_SYSTEM_ASSIGNED_EXPECTED}`
+    type: `${IDENTITY_TYPE_SYSTEM_ASSIGNED_EXPECTED}`,
   };
 
   const updateExpectedIdentity = {
     type: `${IDENTITY_TYPE_SYSTEM_USER_ASSIGNED_EXPECTED}`,
     userAssignedIdentities: {
       "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id1":
-        {}
-    }
+        {},
+    },
   };
 
   // managed identity tracked resource
   it("should get models commonTypes managedIdentityTrackedResources", async () => {
     const result = await client.get(RESOURCE_GROUP_EXPECTED, "identity");
-    assert.strictEqual(
-      result.id,
-      validSystemAssignedManagedIdentityResource.id
-    );
-    assert.strictEqual(
-      result.location,
-      validSystemAssignedManagedIdentityResource.location
-    );
+    assert.strictEqual(result.id, validSystemAssignedManagedIdentityResource.id);
+    assert.strictEqual(result.location, validSystemAssignedManagedIdentityResource.location);
     assert.strictEqual(
       result.identity?.type,
-      validSystemAssignedManagedIdentityResource.identity?.type
+      validSystemAssignedManagedIdentityResource.identity?.type,
     );
     assert.strictEqual(
       result.identity?.principalId,
-      validSystemAssignedManagedIdentityResource.identity.principalId
+      validSystemAssignedManagedIdentityResource.identity.principalId,
     );
     assert.strictEqual(
       result.identity?.tenantId,
-      validSystemAssignedManagedIdentityResource.identity.tenantId
+      validSystemAssignedManagedIdentityResource.identity.tenantId,
     );
-    assert.deepEqual(
-      result.tags,
-      validSystemAssignedManagedIdentityResource.tags
-    );
-    assert.deepEqual(
-      result.properties,
-      validSystemAssignedManagedIdentityResource.properties
-    );
+    assert.deepEqual(result.tags, validSystemAssignedManagedIdentityResource.tags);
+    assert.deepEqual(result.properties, validSystemAssignedManagedIdentityResource.properties);
   });
 
   it("should put models commonTypes managedIdentityTrackedResources", async () => {
-    const result = await client.createWithSystemAssigned(
-      RESOURCE_GROUP_EXPECTED,
-      "identity",
-      {
-        location: LOCATION_REGION_EXPECTED,
-        identity: createExpectedIdentity
-      }
-    );
-    assert.strictEqual(
-      result.id,
-      validSystemAssignedManagedIdentityResource.id
-    );
-    assert.strictEqual(
-      result.location,
-      validSystemAssignedManagedIdentityResource.location
-    );
+    const result = await client.createWithSystemAssigned(RESOURCE_GROUP_EXPECTED, "identity", {
+      location: LOCATION_REGION_EXPECTED,
+      identity: createExpectedIdentity,
+    });
+    assert.strictEqual(result.id, validSystemAssignedManagedIdentityResource.id);
+    assert.strictEqual(result.location, validSystemAssignedManagedIdentityResource.location);
     assert.strictEqual(
       result.identity?.type,
-      validSystemAssignedManagedIdentityResource.identity?.type
+      validSystemAssignedManagedIdentityResource.identity?.type,
     );
     assert.strictEqual(
       result.identity?.principalId,
-      validSystemAssignedManagedIdentityResource.identity.principalId
+      validSystemAssignedManagedIdentityResource.identity.principalId,
     );
     assert.strictEqual(
       result.identity?.tenantId,
-      validSystemAssignedManagedIdentityResource.identity.tenantId
+      validSystemAssignedManagedIdentityResource.identity.tenantId,
     );
-    assert.deepEqual(
-      result.tags,
-      validSystemAssignedManagedIdentityResource.tags
-    );
-    assert.deepEqual(
-      result.properties,
-      validSystemAssignedManagedIdentityResource.properties
-    );
+    assert.deepEqual(result.tags, validSystemAssignedManagedIdentityResource.tags);
+    assert.deepEqual(result.properties, validSystemAssignedManagedIdentityResource.properties);
   });
 
   it("should patch models commonTypes managedIdentityTrackedResources", async () => {
@@ -148,28 +119,22 @@ describe("Azure Arm Resources Rest Client", () => {
       "identity",
       {
         location: LOCATION_REGION_EXPECTED,
-        identity: updateExpectedIdentity
-      }
+        identity: updateExpectedIdentity,
+      },
     );
-    assert.strictEqual(
-      result.id,
-      validUserAssignedAndSystemAssignedManagedIdentityResource.id
-    );
+    assert.strictEqual(result.id, validUserAssignedAndSystemAssignedManagedIdentityResource.id);
     assert.strictEqual(
       result.location,
-      validUserAssignedAndSystemAssignedManagedIdentityResource.location
+      validUserAssignedAndSystemAssignedManagedIdentityResource.location,
     );
     assert.deepEqual(
       result.identity,
-      validUserAssignedAndSystemAssignedManagedIdentityResource.identity
+      validUserAssignedAndSystemAssignedManagedIdentityResource.identity,
     );
-    assert.deepEqual(
-      result.tags,
-      validUserAssignedAndSystemAssignedManagedIdentityResource.tags
-    );
+    assert.deepEqual(result.tags, validUserAssignedAndSystemAssignedManagedIdentityResource.tags);
     assert.deepEqual(
       result.properties,
-      validUserAssignedAndSystemAssignedManagedIdentityResource.properties
+      validUserAssignedAndSystemAssignedManagedIdentityResource.properties,
     );
   });
 
@@ -177,10 +142,7 @@ describe("Azure Arm Resources Rest Client", () => {
   describe("Error Handling", () => {
     it("should handle predefined error for resource not found (404)", async () => {
       try {
-        await client.getForPredefinedError(
-          RESOURCE_GROUP_EXPECTED,
-          "confidential"
-        );
+        await client.getForPredefinedError(RESOURCE_GROUP_EXPECTED, "confidential");
         assert.fail("Should have thrown an error for resource not found");
       } catch (error: any) {
         // Azure Modular clients use createRestError which creates errors with statusCode property
@@ -189,33 +151,26 @@ describe("Azure Arm Resources Rest Client", () => {
         assert.strictEqual(error.details.error.code, "ResourceNotFound");
         assert.strictEqual(
           error.details.error.message,
-          "The Resource 'Azure.ResourceManager.CommonProperties/confidentialResources/confidential' under resource group 'test-rg' was not found."
+          "The Resource 'Azure.ResourceManager.CommonProperties/confidentialResources/confidential' under resource group 'test-rg' was not found.",
         );
       }
     });
     // skipping this test as https://github.com/Azure/autorest.typescript/issues/2965
     it.skip("should handle user-defined error for bad request (400)", async () => {
       try {
-        await client.createForUserDefinedError(
-          RESOURCE_GROUP_EXPECTED,
-          "confidential",
-          {
-            location: "eastus",
-            properties: {
-              username: "00",
-              provisioningState: ""
-            }
-          }
-        );
+        await client.createForUserDefinedError(RESOURCE_GROUP_EXPECTED, "confidential", {
+          location: "eastus",
+          properties: {
+            username: "00",
+            provisioningState: "",
+          },
+        });
         assert.fail("Should have thrown an error for bad request");
       } catch (error: any) {
         // Azure Modular clients use createRestError which creates errors with statusCode property
         assert.strictEqual(error.statusCode, 400);
         assert.strictEqual(error.code, "BadRequest");
-        assert.strictEqual(
-          error.message,
-          "Username should not contain only numbers."
-        );
+        assert.strictEqual(error.message, "Username should not contain only numbers.");
       }
     });
   });

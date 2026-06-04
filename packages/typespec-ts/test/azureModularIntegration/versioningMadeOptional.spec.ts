@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { MadeOptionalClient } from "./generated/versioning/madeOptional/src/index.js";
 
@@ -7,7 +7,7 @@ describe("VersioningMadeOptionalClient Rest Client", () => {
 
   beforeEach(() => {
     client = new MadeOptionalClient("http://localhost:3002", {
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 

@@ -28,6 +28,6 @@ SOFTWARE.
 export function buildLicenseFile() {
   return {
     path: "LICENSE",
-    content: mitLicenseText.trim()
+    content: mitLicenseText.trim(),
   };
 }

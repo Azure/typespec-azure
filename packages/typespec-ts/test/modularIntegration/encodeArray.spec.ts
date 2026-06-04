@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { ArrayClient } from "./generated/encode/array/src/index.js";
 
@@ -12,36 +12,36 @@ describe("EncodeArrayClient Modular Client", () => {
       endpoint: "http://localhost:3002",
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
-      }
+        maxRetries: 0,
+      },
     });
   });
 
   describe("property", () => {
     it("should handle comma delimited array property", async () => {
       const result = await client.property.commaDelimited({
-        value: colors
+        value: colors,
       });
       assert.deepEqual(result.value, colors);
     });
 
     it("should handle space delimited array property", async () => {
       const result = await client.property.spaceDelimited({
-        value: colors
+        value: colors,
       });
       assert.deepEqual(result.value, colors);
     });
 
     it("should handle pipe delimited array property", async () => {
       const result = await client.property.pipeDelimited({
-        value: colors
+        value: colors,
       });
       assert.deepEqual(result.value, colors);
     });
 
     it("should handle newline delimited array property", async () => {
       const result = await client.property.newlineDelimited({
-        value: colors
+        value: colors,
       });
       assert.deepEqual(result.value, colors);
     });

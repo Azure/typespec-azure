@@ -1,7 +1,7 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
-import { OptionalClient } from "./generated/type/property/optionality/src/index.js";
 import { stringToUint8Array } from "@azure/core-util";
+import { OptionalClient } from "./generated/type/property/optionality/src/index.js";
 
 describe("OptionalProperties Modular Client", () => {
   let client: OptionalClient;
@@ -11,8 +11,8 @@ describe("OptionalProperties Modular Client", () => {
       endpoint: "http://localhost:3002",
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
-      }
+        maxRetries: 0,
+      },
     });
   });
 
@@ -27,15 +27,12 @@ describe("OptionalProperties Modular Client", () => {
 
   it("should handle optional bytes", async () => {
     const result = await client.bytes.getAll();
-    assert.deepEqual(
-      result.property,
-      stringToUint8Array("aGVsbG8sIHdvcmxkIQ==", "base64")
-    );
+    assert.deepEqual(result.property, stringToUint8Array("aGVsbG8sIHdvcmxkIQ==", "base64"));
     const result2 = await client.bytes.getDefault();
     assert.equal(result2.property, undefined);
 
     await client.bytes.putAll({
-      property: stringToUint8Array("aGVsbG8sIHdvcmxkIQ==", "base64")
+      property: stringToUint8Array("aGVsbG8sIHdvcmxkIQ==", "base64"),
     });
 
     await client.bytes.putDefault({});
@@ -44,7 +41,7 @@ describe("OptionalProperties Modular Client", () => {
   it("should handle optional collections bytes", async () => {
     const testValue = [
       stringToUint8Array("aGVsbG8sIHdvcmxkIQ==", "base64"),
-      stringToUint8Array("aGVsbG8sIHdvcmxkIQ==", "base64")
+      stringToUint8Array("aGVsbG8sIHdvcmxkIQ==", "base64"),
     ];
     const result = await client.collectionsByte.getAll();
     assert.deepEqual(result.property, testValue);
@@ -102,7 +99,7 @@ describe("OptionalProperties Modular Client", () => {
     const result2 = await client.plainTime.getDefault();
     assert.equal(result2.property, undefined);
     const result3 = await client.plainTime.putAll({
-      property: testValue
+      property: testValue,
     });
     assert.isUndefined(result3);
     await client.plainTime.putDefault({});
@@ -131,11 +128,11 @@ describe("OptionalProperties Modular Client", () => {
   it("should handle required and optional", async () => {
     const allBody = {
       optionalProperty: "hello",
-      requiredProperty: 42
+      requiredProperty: 42,
     };
     const requiredOnlyBody = {
       requiredProperty: 42,
-      optionalProperty: undefined
+      optionalProperty: undefined,
     };
 
     const result = await client.requiredAndOptional.getAll();

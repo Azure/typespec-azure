@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { ResponseAsBoolClient } from "./generated/azure/client-generator-core/response-as-bool/src/index.js";
 
@@ -10,8 +10,8 @@ describe("Azure ClientGeneratorCore ResponseAsBool Client", () => {
       endpoint: "http://localhost:3002",
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
-      }
+        maxRetries: 0,
+      },
     });
   });
 

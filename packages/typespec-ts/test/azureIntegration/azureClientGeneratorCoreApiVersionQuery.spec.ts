@@ -1,7 +1,7 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import QueryClientFactory, {
-  QueryClient
+  QueryClient,
 } from "./generated/azure/client-generator-core/api-version/query/src/index.js";
 
 describe("Azure Client Generator Core - API Version Query", () => {
@@ -9,18 +9,16 @@ describe("Azure Client Generator Core - API Version Query", () => {
 
   beforeEach(() => {
     client = QueryClientFactory({
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
   it("should handle API version through query parameter", async () => {
-    const result = await client
-      .path("/azure/client-generator-core/api-version/query")
-      .post({
-        queryParameters: {
-          version: "2025-01-01"
-        }
-      });
+    const result = await client.path("/azure/client-generator-core/api-version/query").post({
+      queryParameters: {
+        version: "2025-01-01",
+      },
+    });
 
     assert.strictEqual(result.status, "200");
   });

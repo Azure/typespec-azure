@@ -1,11 +1,11 @@
 import {
+  FunctionDeclarationStructure,
+  InterfaceDeclarationStructure,
   Project,
   StructureKind,
-  InterfaceDeclarationStructure,
-  FunctionDeclarationStructure
 } from "ts-morph";
-import { useBinder } from "./hooks/binder.js";
 import { addDeclaration } from "./declaration.js";
+import { useBinder } from "./hooks/binder.js";
 import { resolveReference } from "./reference.js";
 
 // Create a new ts-morph project
@@ -21,14 +21,14 @@ const binder = useBinder();
 // At this framework level, we're just using a simple object, there is no coupling with the actual type system, but this is flexible so any object can be used.
 const modelType = {
   name: "MyInterface",
-  properties: [{ name: "id", type: "number" }]
+  properties: [{ name: "id", type: "number" }],
 };
 
 // Define a function model
 const functionType = {
   name: "MyFunction",
   returnType: "void",
-  body: `console.log("Hello World");`
+  body: `console.log("Hello World");`,
 };
 
 // Create an interface declaration structure. This illustrates a similar pattern to the one used in the emitter. Transorming a model into a structure for ts-morph.
@@ -37,8 +37,8 @@ const interfaceDeclaration: InterfaceDeclarationStructure = {
   name: modelType.name,
   properties: modelType.properties.map((p) => ({
     name: p.name,
-    type: p.type
-  }))
+    type: p.type,
+  })),
 };
 
 // Create a function declaration structure
@@ -46,7 +46,7 @@ const functionDeclaration: FunctionDeclarationStructure = {
   kind: StructureKind.Function,
   name: functionType.name,
   returnType: functionType.returnType,
-  statements: functionType.body
+  statements: functionType.body,
 };
 
 // Helper functions to add the declarations to the source file. These are needed to be able to leverage the binder to track the declarations.
@@ -56,7 +56,7 @@ addDeclaration(sourceFile, functionDeclaration, functionType);
 
 // Create another source file
 const sourceFile2 = project.createSourceFile("test2.ts", "", {
-  overwrite: true
+  overwrite: true,
 });
 
 // Add statements referencing the tracked declarations

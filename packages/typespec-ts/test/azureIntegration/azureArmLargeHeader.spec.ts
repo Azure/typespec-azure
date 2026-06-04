@@ -1,9 +1,9 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import AzureArmLargeHeaderClientFactory, {
   AzureArmLargeHeaderClient,
   getLongRunningPoller,
-  isUnexpected
+  isUnexpected,
 } from "./generated/azure/resource-manager/large-header/src/index.js";
 
 describe("Azure ARM Large Header Rest Client", () => {
@@ -12,7 +12,7 @@ describe("Azure ARM Large Header Rest Client", () => {
   beforeEach(() => {
     client = AzureArmLargeHeaderClientFactory({
       endpoint: "http://localhost:3000",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
@@ -27,7 +27,7 @@ describe("Azure ARM Large Header Rest Client", () => {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Azure.ResourceManager.LargeHeader/largeHeaders/{largeHeaderName}/two6k",
         SUBSCRIPTION_ID_EXPECTED,
         RESOURCE_GROUP_EXPECTED,
-        LARGE_HEADER_NAME
+        LARGE_HEADER_NAME,
       )
       .post();
 
@@ -36,9 +36,7 @@ describe("Azure ARM Large Header Rest Client", () => {
 
     // Verify headers contain large userContext parameter (6KB string)
     const locationHeader = initialResponse.headers.location as string;
-    const azureAsyncOperationHeader = initialResponse.headers[
-      "azure-asyncoperation"
-    ] as string;
+    const azureAsyncOperationHeader = initialResponse.headers["azure-asyncoperation"] as string;
 
     assert.include(locationHeader, "userContext=");
     assert.include(locationHeader, "operations/post_location");
@@ -50,8 +48,7 @@ describe("Azure ARM Large Header Rest Client", () => {
     assert.isAbove(azureAsyncOperationHeader.length, 6000);
 
     // Total header size should be > 12KB
-    const totalHeaderSize =
-      locationHeader.length + azureAsyncOperationHeader.length;
+    const totalHeaderSize = locationHeader.length + azureAsyncOperationHeader.length;
     assert.isAbove(totalHeaderSize, 12000);
 
     if (isUnexpected(initialResponse)) {

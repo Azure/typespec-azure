@@ -1,12 +1,12 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { uint8ArrayToString } from "@azure/core-util";
 import ContentNegotiationClientFactory, {
-  ContentNegotiationClient
+  ContentNegotiationClient,
 } from "./generated/payload/content-negotiation/src/index.js";
 
-import { readFileSync } from "fs";
 import { resolvePath } from "@typespec/compiler";
+import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 
 const root = resolvePath(fileURLToPath(import.meta.url), "../../../temp");
@@ -17,19 +17,16 @@ describe("Content Negotiation Client", () => {
 
   beforeEach(() => {
     client = ContentNegotiationClientFactory({
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
   it("should get image/png for same body in content negotiation", async () => {
     const result = await client.path("/content-negotiation/same-body").get({
-      headers: { accept: "image/png" }
+      headers: { accept: "image/png" },
     });
     assert.strictEqual(result.status, "200");
-    assert.strictEqual(
-      uint8ArrayToString(result.body, "utf-8"),
-      pngFile.toString()
-    );
+    assert.strictEqual(uint8ArrayToString(result.body, "utf-8"), pngFile.toString());
   });
 
   it("should get image/jpeg for same body in content negotiation", async () => {
@@ -37,24 +34,15 @@ describe("Content Negotiation Client", () => {
       .path("/content-negotiation/same-body")
       .get({ headers: { accept: "image/jpeg" } });
     assert.strictEqual(result.status, "200");
-    assert.strictEqual(
-      uint8ArrayToString(result.body, "utf-8"),
-      jpegImage.toString()
-    );
+    assert.strictEqual(uint8ArrayToString(result.body, "utf-8"), jpegImage.toString());
   });
 
   it("should return error if put wrong accept for same body in content negotiation", async () => {
     const result = await client
       .path("/content-negotiation/same-body")
       .get({ headers: { accept: "wrongAccept" } as any });
-    assert.strictEqual(
-      (result.body as any).message,
-      "Unsupported Accept header"
-    );
-    assert.strictEqual(
-      (result.body as any).expected,
-      `"image/png" | "image/jpeg"`
-    );
+    assert.strictEqual((result.body as any).message, "Unsupported Accept header");
+    assert.strictEqual((result.body as any).expected, `"image/png" | "image/jpeg"`);
     assert.strictEqual((result.body as any).actual, "wrongAccept");
   });
 
@@ -63,10 +51,7 @@ describe("Content Negotiation Client", () => {
       .path("/content-negotiation/different-body")
       .get({ headers: { accept: "image/png" } });
     assert.strictEqual(result.status, "200");
-    assert.strictEqual(
-      uint8ArrayToString(result.body, "utf-8"),
-      pngFile.toString()
-    );
+    assert.strictEqual(uint8ArrayToString(result.body, "utf-8"), pngFile.toString());
   });
 
   it("should get application/json for different body in content negotiation", async () => {
@@ -81,14 +66,8 @@ describe("Content Negotiation Client", () => {
     const result = await client
       .path("/content-negotiation/different-body")
       .get({ headers: { accept: "wrongAccept" } as any });
-    assert.strictEqual(
-      (result.body as any).message,
-      "Unsupported Accept header"
-    );
-    assert.strictEqual(
-      (result.body as any).expected,
-      `"image/png" | "application/json"`
-    );
+    assert.strictEqual((result.body as any).message, "Unsupported Accept header");
+    assert.strictEqual((result.body as any).expected, `"image/png" | "application/json"`);
     assert.strictEqual((result.body as any).actual, "wrongAccept");
   });
 });

@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { ExtensibleClient } from "./generated/type/enum/extensible/src/index.js";
 describe("ExtensibleEnums Rest Client", () => {
@@ -7,7 +7,7 @@ describe("ExtensibleEnums Rest Client", () => {
   beforeEach(() => {
     client = new ExtensibleClient({
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
@@ -23,14 +23,14 @@ describe("ExtensibleEnums Rest Client", () => {
 
   it("should put known value", async () => {
     const result = await client.string.putKnownValue("Monday", {
-      requestOptions: { headers: { "content-type": "text/plain" } }
+      requestOptions: { headers: { "content-type": "text/plain" } },
     });
     assert.isUndefined(result);
   });
 
   it("should put unknown value and receives 500", async () => {
     const result = await client.string.putUnknownValue("Weekend" as any, {
-      requestOptions: { headers: { "content-type": "text/plain" } }
+      requestOptions: { headers: { "content-type": "text/plain" } },
     });
     assert.isUndefined(result);
   });

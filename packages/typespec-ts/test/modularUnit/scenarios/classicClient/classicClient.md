@@ -14,9 +14,7 @@ using TypeSpec.Versioning;
 using Azure.Core;
 using Azure.Core.Traits;
 
-@service(#{
-  title: "MultiClient"
-})
+@service(#{ title: "MultiClient" })
 @versioned(Client.Structure.Service.Versions)
 namespace Client.Structure.Service;
 

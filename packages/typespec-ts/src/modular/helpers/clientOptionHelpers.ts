@@ -1,7 +1,4 @@
-import {
-  DecoratedType,
-  SdkModelType
-} from "@azure-tools/typespec-client-generator-core";
+import { DecoratedType, SdkModelType } from "@azure-tools/typespec-client-generator-core";
 
 /**
  * Represents a header-to-property mapping from @clientOption("header", ...).
@@ -22,9 +19,7 @@ const CLIENT_OPTION_DECORATOR_NAME = "Azure.ClientGenerator.Core.@clientOption";
  * @param type - A decorated SDK type (typically an SdkModelType for error models)
  * @returns Array of header-to-property mappings
  */
-export function getHeaderClientOptions(
-  type: DecoratedType
-): HeaderClientOption[] {
+export function getHeaderClientOptions(type: DecoratedType): HeaderClientOption[] {
   const results: HeaderClientOption[] = [];
   for (const decorator of type.decorators) {
     if (decorator.name !== CLIENT_OPTION_DECORATOR_NAME) {
@@ -76,7 +71,7 @@ function parseHeaderMapping(value: string): HeaderClientOption | undefined {
  * Deduplicates by property name.
  */
 export function getExceptionHeaderClientOptions(
-  exceptions: { type?: SdkModelType | any }[]
+  exceptions: { type?: SdkModelType | any }[],
 ): { model: SdkModelType; options: HeaderClientOption[] }[] {
   const results: { model: SdkModelType; options: HeaderClientOption[] }[] = [];
   const seenProperties = new Set<string>();
@@ -110,9 +105,7 @@ export function getExceptionHeaderClientOptions(
  * @param type - A decorated SDK type (typically an SdkModelType for error models)
  * @returns The header name string, or undefined if the option is not set
  */
-export function getRestErrorCodeHeader(
-  type: DecoratedType
-): string | undefined {
+export function getRestErrorCodeHeader(type: DecoratedType): string | undefined {
   for (const decorator of type.decorators) {
     if (decorator.name !== CLIENT_OPTION_DECORATOR_NAME) {
       continue;

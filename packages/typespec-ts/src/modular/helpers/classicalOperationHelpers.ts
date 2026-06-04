@@ -1,29 +1,23 @@
-import { NameType, normalizeName } from "../../rlc-common/index.js";
+import { SdkClientType, SdkServiceOperation } from "@azure-tools/typespec-client-generator-core";
 import {
   FunctionDeclarationStructure,
   InterfaceDeclarationStructure,
   OptionalKind,
   PropertySignatureStructure,
   SourceFile,
-  StructureKind
+  StructureKind,
 } from "ts-morph";
+import { addDeclaration } from "../../framework/declaration.js";
+import { resolveReference } from "../../framework/reference.js";
+import { refkey } from "../../framework/refkey.js";
+import { NameType, normalizeName } from "../../rlc-common/index.js";
+import { getModularClientOptions } from "../../utils/clientUtils.js";
+import { SdkContext } from "../../utils/interfaces.js";
+import { ServiceOperation } from "../../utils/operationUtil.js";
+import { AzurePollingDependencies } from "../external-dependencies.js";
+import { PagingHelpers, SimplePollerHelpers } from "../static-helpers-metadata.js";
 import { getClassicalLayerPrefix } from "./namingHelpers.js";
 import { getOperationFunction } from "./operationHelpers.js";
-import { SdkContext } from "../../utils/interfaces.js";
-import {
-  SdkClientType,
-  SdkServiceOperation
-} from "@azure-tools/typespec-client-generator-core";
-import { getModularClientOptions } from "../../utils/clientUtils.js";
-import { ServiceOperation } from "../../utils/operationUtil.js";
-import { refkey } from "../../framework/refkey.js";
-import { resolveReference } from "../../framework/reference.js";
-import { addDeclaration } from "../../framework/declaration.js";
-import {
-  SimplePollerHelpers,
-  PagingHelpers
-} from "../static-helpers-metadata.js";
-import { AzurePollingDependencies } from "../external-dependencies.js";
 
 interface OperationDeclarationInfo {
   // the operation function
@@ -57,29 +51,24 @@ export function getClassicalOperation(
   clientMap: [string[], SdkClientType<SdkServiceOperation>],
   classicFile: SourceFile,
   operationGroup: [string[], ServiceOperation[]],
-  layer: number = operationGroup[0].length - 1
+  layer: number = operationGroup[0].length - 1,
 ) {
   const prefixes = operationGroup[0];
   const operations = operationGroup[1];
   const { rlcClientName } = getModularClientOptions(clientMap);
-  const hasClientContextImport = classicFile
-    .getImportDeclarations()
-    .filter((i) => {
-      return (
-        i.getModuleSpecifierValue() ===
-        `${"../".repeat(layer + 2)}api/${normalizeName(
-          rlcClientName,
-          NameType.File
-        )}.js`
-      );
-    });
+  const hasClientContextImport = classicFile.getImportDeclarations().filter((i) => {
+    return (
+      i.getModuleSpecifierValue() ===
+      `${"../".repeat(layer + 2)}api/${normalizeName(rlcClientName, NameType.File)}.js`
+    );
+  });
   if (!hasClientContextImport || hasClientContextImport.length === 0) {
     classicFile.addImportDeclaration({
       namedImports: [rlcClientName],
       moduleSpecifier: `${"../".repeat(layer + 2)}api/${normalizeName(
         rlcClientName,
-        NameType.File
-      )}.js`
+        NameType.File,
+      )}.js`,
     });
   }
 
@@ -87,13 +76,9 @@ export function getClassicalOperation(
     OptionalKind<FunctionDeclarationStructure>,
     OperationDeclarationInfo | undefined
   >();
-  const operationDeclarations: OptionalKind<FunctionDeclarationStructure>[] =
-    operations.map((operation) => {
-      const declaration = getOperationFunction(
-        dpgContext,
-        [prefixes, operation],
-        rlcClientName
-      );
+  const operationDeclarations: OptionalKind<FunctionDeclarationStructure>[] = operations.map(
+    (operation) => {
+      const declaration = getOperationFunction(dpgContext, [prefixes, operation], rlcClientName);
       operationDeclarationMap.set(declaration, {
         declaration,
         oriName: operation.oriName,
@@ -101,23 +86,19 @@ export function getClassicalOperation(
         isLro: declaration.isLro,
         lroFinalReturnType: declaration.lroFinalReturnType,
         isLroPaging: declaration.isLroPaging,
-        lropagingFinalReturnType: declaration.lropagingFinalReturnType
+        lropagingFinalReturnType: declaration.lropagingFinalReturnType,
       });
       return declaration;
-    });
-
-  const interfaceNamePrefix = getClassicalLayerPrefix(
-    prefixes,
-    NameType.Interface,
-    "",
-    layer
+    },
   );
+
+  const interfaceNamePrefix = getClassicalLayerPrefix(prefixes, NameType.Interface, "", layer);
   const interfaceName = `${interfaceNamePrefix}Operations`;
   const nextLayerInterfaceName = `${getClassicalLayerPrefix(
     prefixes,
     NameType.Interface,
     "",
-    layer + 1
+    layer + 1,
   )}Operations`;
   const existInterface = classicFile
     .getInterfaces()
@@ -125,9 +106,8 @@ export function getClassicalOperation(
   const properties: OptionalKind<PropertySignatureStructure>[] = [];
   if (layer !== prefixes.length - 1) {
     const name = normalizeName(
-      (layer === prefixes.length - 1 ? prefixes[layer] : prefixes[layer + 1]) ??
-        "",
-      NameType.Property
+      (layer === prefixes.length - 1 ? prefixes[layer] : prefixes[layer + 1]) ?? "",
+      NameType.Property,
     );
     if (
       !properties.some((x) => x.name === name) &&
@@ -136,9 +116,7 @@ export function getClassicalOperation(
       properties.push({
         kind: StructureKind.PropertySignature,
         name,
-        type: resolveReference(
-          refkey(nextLayerInterfaceName, layer + 1, "classicOperations")
-        )
+        type: resolveReference(refkey(nextLayerInterfaceName, layer + 1, "classicOperations")),
       });
     }
   } else {
@@ -149,12 +127,9 @@ export function getClassicalOperation(
         .map(
           (p) =>
             p.name +
-            (p.type?.toString().endsWith("operationOptions__") ||
-            p.hasQuestionToken
-              ? "?"
-              : "") +
+            (p.type?.toString().endsWith("operationOptions__") || p.hasQuestionToken ? "?" : "") +
             ": " +
-            p.type
+            p.type,
         )
         .join(",");
       // add the operation method signature
@@ -162,19 +137,15 @@ export function getClassicalOperation(
         kind: StructureKind.PropertySignature,
         name: getClassicalMethodName(d),
         type: `(${paramStr}) => ${d.returnType}`,
-        docs: d.docs
+        docs: d.docs,
       });
       // add LRO helper methods if applicable
       if (
         dpgContext.rlcOptions?.compatibilityLro &&
         (operationInfo?.isLro || operationInfo?.isLroPaging)
       ) {
-        const operationStateReference = resolveReference(
-          AzurePollingDependencies.OperationState
-        );
-        const simplePollerLikeReference = resolveReference(
-          SimplePollerHelpers.SimplePollerLike
-        );
+        const operationStateReference = resolveReference(AzurePollingDependencies.OperationState);
+        const simplePollerLikeReference = resolveReference(SimplePollerHelpers.SimplePollerLike);
         const beginName = `begin_${getClassicalMethodName(d)}`;
         const beginAndWaitName = `${beginName}_andWait`;
 
@@ -182,16 +153,14 @@ export function getClassicalOperation(
           // LRO+Paging operation
           const returnType = operationInfo?.lropagingFinalReturnType ?? "void";
           const pagedAsyncIterableIteratorReference = resolveReference(
-            PagingHelpers.PagedAsyncIterableIterator
+            PagingHelpers.PagedAsyncIterableIterator,
           );
-          const beginListAndWaitName = getPagingLROMethodName(
-            getClassicalMethodName(d)
-          );
+          const beginListAndWaitName = getPagingLROMethodName(getClassicalMethodName(d));
           properties.push({
             kind: StructureKind.PropertySignature,
             name: `${normalizeName(beginListAndWaitName, NameType.Method)}`,
             type: `(${paramStr}) => ${pagedAsyncIterableIteratorReference}<${returnType}>`,
-            docs: [`@deprecated use ${getClassicalMethodName(d)} instead`]
+            docs: [`@deprecated use ${getClassicalMethodName(d)} instead`],
           });
         } else {
           // Regular LRO operation
@@ -200,13 +169,13 @@ export function getClassicalOperation(
             kind: StructureKind.PropertySignature,
             name: `${normalizeName(beginName, NameType.Method)}`,
             type: `(${paramStr}) => Promise<${simplePollerLikeReference}<${operationStateReference}<${returnType}>, ${returnType}>>`,
-            docs: [`@deprecated use ${getClassicalMethodName(d)} instead`]
+            docs: [`@deprecated use ${getClassicalMethodName(d)} instead`],
           });
           properties.push({
             kind: StructureKind.PropertySignature,
             name: `${normalizeName(beginAndWaitName, NameType.Method)}`,
             type: `(${paramStr}) => Promise<${returnType}>`,
-            docs: [`@deprecated use ${getClassicalMethodName(d)} instead`]
+            docs: [`@deprecated use ${getClassicalMethodName(d)} instead`],
           });
         }
       }
@@ -220,21 +189,16 @@ export function getClassicalOperation(
       name: interfaceName,
       isExported: true,
       properties,
-      docs: [`Interface representing a ${interfaceNamePrefix} operations.`]
+      docs: [`Interface representing a ${interfaceNamePrefix} operations.`],
     };
     addDeclaration(
       classicFile,
       interfaceDeclaration,
-      refkey(interfaceName, layer, "classicOperations")
+      refkey(interfaceName, layer, "classicOperations"),
     );
   }
 
-  const functionName = `_get${getClassicalLayerPrefix(
-    prefixes,
-    NameType.Interface,
-    "",
-    layer
-  )}`;
+  const functionName = `_get${getClassicalLayerPrefix(prefixes, NameType.Interface, "", layer)}`;
   if (layer === prefixes.length - 1) {
     const functionDeclaration: FunctionDeclarationStructure = {
       kind: StructureKind.Function,
@@ -243,8 +207,8 @@ export function getClassicalOperation(
       parameters: [
         {
           name: "context",
-          type: rlcClientName
-        }
+          type: rlcClientName,
+        },
       ],
       statements: `return {
         ${operationDeclarations
@@ -255,24 +219,21 @@ export function getClassicalOperation(
               .map(
                 (p) =>
                   p.name +
-                  (p.type?.toString().endsWith("operationOptions__") ||
-                  p.hasQuestionToken
+                  (p.type?.toString().endsWith("operationOptions__") || p.hasQuestionToken
                     ? "?"
                     : "") +
                   ": " +
-                  p.type
+                  p.type,
               )
               .join(",");
             const apiParamStr = [
               "context",
-              ...[
-                d.parameters?.map((p) => p.name).filter((p) => p !== "context")
-              ]
+              ...[d.parameters?.map((p) => p.name).filter((p) => p !== "context")],
             ].join(",");
             const ret = [
               `${getClassicalMethodName(d)}: (${classicalParamStr}) => ${operationInfo?.declarationRefKey}(${
                 apiParamStr
-              })`
+              })`,
             ];
             // add LRO helper methods if applicable
             if (
@@ -280,58 +241,49 @@ export function getClassicalOperation(
               (operationInfo?.isLro || operationInfo?.isLroPaging)
             ) {
               const getSimplePollerReference = resolveReference(
-                SimplePollerHelpers.getSimplePoller
+                SimplePollerHelpers.getSimplePoller,
               );
               const beginName = `begin_${getClassicalMethodName(d)}`;
               const beginAndWaitName = `${beginName}_andWait`;
-              const beginListAndWaitName = getPagingLROMethodName(
-                getClassicalMethodName(d)
-              );
+              const beginListAndWaitName = getPagingLROMethodName(getClassicalMethodName(d));
 
               if (operationInfo?.isLroPaging) {
                 ret.push(
                   `${normalizeName(
                     beginListAndWaitName,
-                    NameType.Method
+                    NameType.Method,
                   )}: (${classicalParamStr}) => {
                     return ${operationInfo?.declarationRefKey}(${apiParamStr});
-                  }`
+                  }`,
                 );
               } else {
                 // Regular LRO operation
                 ret.push(
-                  `${normalizeName(
-                    beginName,
-                    NameType.Method
-                  )}: async (${classicalParamStr}) => {
-                    const poller = ${operationInfo?.declarationRefKey}(${
-                      apiParamStr
-                    });
+                  `${normalizeName(beginName, NameType.Method)}: async (${classicalParamStr}) => {
+                    const poller = ${operationInfo?.declarationRefKey}(${apiParamStr});
                     await poller.submitted();
                     return ${getSimplePollerReference}(poller);
-                  }`
+                  }`,
                 );
                 ret.push(
                   `${normalizeName(
                     beginAndWaitName,
-                    NameType.Method
+                    NameType.Method,
                   )}: async (${classicalParamStr}) => {
-                    return await ${operationInfo?.declarationRefKey}(${
-                      apiParamStr
-                    });
-                  }`
+                    return await ${operationInfo?.declarationRefKey}(${apiParamStr});
+                  }`,
                 );
               }
             }
             return ret.join(",");
           })
           .join(",")}
-      }`
+      }`,
     };
     addDeclaration(
       classicFile,
       functionDeclaration,
-      refkey(functionName, layer, "getClassicOperation")
+      refkey(functionName, layer, "getClassicOperation"),
     );
   }
 
@@ -339,13 +291,13 @@ export function getClassicalOperation(
     prefixes,
     NameType.Interface,
     "",
-    layer
+    layer,
   )}Operations`;
   const nextLayerOperationFunctionName = `_get${getClassicalLayerPrefix(
     prefixes,
     NameType.Interface,
     "",
-    layer + 1
+    layer + 1,
   )}Operations`;
   const existFunction = classicFile
     .getFunctions()
@@ -355,10 +307,7 @@ export function getClassicalOperation(
     if (returnStatement) {
       let statement: string | undefined = undefined;
       if (layer !== prefixes.length - 1) {
-        const name = normalizeName(
-          prefixes[layer + 1] ?? "FIXME",
-          NameType.Property
-        );
+        const name = normalizeName(prefixes[layer + 1] ?? "FIXME", NameType.Property);
 
         // HACK: check if the statement includes a group of this name already to prevent an operation group appearing multiple times
         // TODO: would be good to refactor so that we have an intermediate data structure before generating the return statement
@@ -366,7 +315,7 @@ export function getClassicalOperation(
           statement = `,
           ${normalizeName(
             prefixes[layer + 1] ?? "FIXME",
-            NameType.Property
+            NameType.Property,
           )}: ${resolveReference(refkey(nextLayerOperationFunctionName, layer + 1, "getClassicOperations"))}(context)}`;
         }
       } else {
@@ -387,42 +336,40 @@ export function getClassicalOperation(
       parameters: [
         {
           name: "context",
-          type: rlcClientName
-        }
+          type: rlcClientName,
+        },
       ],
-      returnType: resolveReference(
-        refkey(interfaceName, layer, "classicOperations")
-      ),
+      returnType: resolveReference(refkey(interfaceName, layer, "classicOperations")),
       statements:
         layer !== prefixes.length - 1
           ? `return {
             ${normalizeName(
               prefixes[layer + 1] ?? "FIXME",
-              NameType.Property
+              NameType.Property,
             )}: ${resolveReference(refkey(nextLayerOperationFunctionName, layer + 1, "getClassicOperations"))}(context)   
       }`
           : `return {
         ...${resolveReference(refkey(functionName, layer, "getClassicOperation"))}(context)
-      }`
+      }`,
     };
     addDeclaration(
       classicFile,
       functions,
-      refkey(operationFunctionName, layer, "getClassicOperations")
+      refkey(operationFunctionName, layer, "getClassicOperations"),
     );
   }
 
   function getClassicalMethodName(
     declaration: OptionalKind<FunctionDeclarationStructure> & {
       propertyName?: string;
-    }
+    },
   ) {
     return normalizeName(
       operationDeclarationMap.get(declaration)?.oriName ??
         declaration.propertyName ??
         declaration.name ??
         "FIXME",
-      NameType.Method
+      NameType.Method,
     );
   }
 }

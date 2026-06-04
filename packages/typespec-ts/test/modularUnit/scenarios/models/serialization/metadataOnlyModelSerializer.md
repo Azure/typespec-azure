@@ -14,16 +14,16 @@ using TypeSpec.Http;
 using TypeSpec.Versioning;
 using Azure.ClientGenerator.Core;
 
-@service(#{
-  title: "Test Service"
-})
+@service(#{ title: "Test Service" })
 namespace TestService;
 
 model ReadonlyAndMetadataModel {
   @visibility(Lifecycle.Read)
   id?: string;
+
   @header("x-request-id")
   requestId: string;
+
   @query
   filter: string;
 }

@@ -1,7 +1,7 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import AlternateTypeClientFactory, {
-  AlternateTypeClient
+  AlternateTypeClient,
 } from "./generated/azure/client-generator-core/alternate-type/src/index.js";
 
 describe("AlternateType Client", () => {
@@ -9,7 +9,7 @@ describe("AlternateType Client", () => {
 
   beforeEach(() => {
     client = AlternateTypeClientFactory({
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
@@ -17,19 +17,19 @@ describe("AlternateType Client", () => {
     type: "Feature" as const,
     geometry: {
       type: "Point",
-      coordinates: [-122.25, 37.87]
+      coordinates: [-122.25, 37.87],
     },
     properties: {
       name: "A single point of interest",
       category: "landmark",
-      elevation: 100
+      elevation: 100,
     },
-    id: "feature-1"
+    id: "feature-1",
   };
 
   const modelWithFeatureProperty = {
     feature,
-    additionalProperty: "extra"
+    additionalProperty: "extra",
   };
 
   it("should get model in external type operation", async () => {

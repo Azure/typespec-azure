@@ -1,4 +1,4 @@
-import { describe, it, assert } from "vitest";
+import { assert, describe, it } from "vitest";
 
 import { emitParameterFromTypeSpec } from "../util/emitUtil.js";
 import { assertEqualContent } from "../util/testUtil.js";
@@ -38,7 +38,7 @@ describe("Spread(...) and alias", () => {
             }  
     
             export type ReadParameters = ReadQueryParam & ReadBodyParam & RequestParameters;
-          `
+          `,
       );
     });
 
@@ -62,7 +62,7 @@ describe("Spread(...) and alias", () => {
             }  
     
             export type ReadParameters = ReadBodyParam & RequestParameters;
-          `
+          `,
       );
     });
 
@@ -100,7 +100,7 @@ describe("Spread(...) and alias", () => {
             }  
 
             export type ReadParameters = ReadQueryParam & ReadBodyParam & RequestParameters;
-          `
+          `,
       );
     });
 
@@ -123,7 +123,7 @@ describe("Spread(...) and alias", () => {
               }  
       
               export type ReadParameters = ReadBodyParam & RequestParameters;
-            `
+            `,
       );
     });
 
@@ -160,7 +160,7 @@ describe("Spread(...) and alias", () => {
                 }
         
                 export type ReadParameters = ReadQueryParam & ReadBodyParam & RequestParameters;
-              `
+              `,
       );
     });
 
@@ -194,7 +194,7 @@ describe("Spread(...) and alias", () => {
                 }
         
                 export type ReadParameters = ReadQueryParam & ReadBodyParam & RequestParameters;
-              `
+              `,
       );
     });
   });

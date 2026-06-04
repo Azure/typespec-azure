@@ -1,15 +1,15 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import AzureCoreClientFactory, {
   AzureCoreClient,
-  isUnexpected
+  isUnexpected,
 } from "./generated/azure/core/basic/src/index.js";
 
 function buildExplodedFormStyle(values: string[]) {
   return {
     value: values,
     explode: true,
-    style: "form"
+    style: "form",
   } as const;
 }
 
@@ -20,27 +20,27 @@ describe("Azure Core Rest Client", () => {
     client = AzureCoreClientFactory({
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
-      }
+        maxRetries: 0,
+      },
     });
   });
   const validUser = {
     id: 1,
     name: "Madge",
-    etag: "11bdc430-65e8-45ad-81d9-8ffa60d55b59"
+    etag: "11bdc430-65e8-45ad-81d9-8ffa60d55b59",
   };
   const validUser2 = {
     id: 2,
     name: "John",
-    etag: "22bdc430-65e8-45ad-81d9-8ffa60d55b59"
+    etag: "22bdc430-65e8-45ad-81d9-8ffa60d55b59",
   };
   const expectBody = { users: [validUser, validUser2] };
   it("should put user", async () => {
     const result = await client.path("/azure/core/basic/users/{id}", 1).put({
       body: {
-        name: "Madge"
+        name: "Madge",
       },
-      contentType: "application/json"
+      contentType: "application/json",
     });
     if (isUnexpected(result)) {
       throw Error("Unexpected status code");
@@ -53,8 +53,8 @@ describe("Azure Core Rest Client", () => {
     const result = await client.path("/azure/core/basic/users/{id}", 1).patch({
       contentType: "application/merge-patch+json",
       body: {
-        name: "Madge"
-      }
+        name: "Madge",
+      },
     });
     if (isUnexpected(result)) {
       throw Error("Unexpected status code");
@@ -73,9 +73,7 @@ describe("Azure Core Rest Client", () => {
   });
 
   it("should delete user", async () => {
-    const result = await client
-      .path("/azure/core/basic/users/{id}", 1)
-      .delete();
+    const result = await client.path("/azure/core/basic/users/{id}", 1).delete();
     if (isUnexpected(result)) {
       throw Error("Unexpected status code");
     }
@@ -90,12 +88,12 @@ describe("Azure Core Rest Client", () => {
         orderby: {
           value: ["id"],
           explode: true,
-          style: "form"
+          style: "form",
         },
         filter: "id lt 10",
         select: buildExplodedFormStyle(["id", "orders", "etag"]),
-        expand: buildExplodedFormStyle(["orders"])
-      }
+        expand: buildExplodedFormStyle(["orders"]),
+      },
     });
     if (isUnexpected(result)) {
       throw Error("Unexpected status code");
@@ -106,28 +104,26 @@ describe("Azure Core Rest Client", () => {
           id: 1,
           name: "Madge",
           etag: "11bdc430-65e8-45ad-81d9-8ffa60d55b59",
-          orders: [{ id: 1, userId: 1, detail: "a recorder" }]
+          orders: [{ id: 1, userId: 1, detail: "a recorder" }],
         },
         {
           id: 2,
           name: "John",
           etag: "11bdc430-65e8-45ad-81d9-8ffa60d55b5a",
-          orders: [{ id: 2, userId: 2, detail: "a TV" }]
-        }
-      ]
+          orders: [{ id: 2, userId: 2, detail: "a TV" }],
+        },
+      ],
     };
     assert.strictEqual(result.status, "200");
     assert.deepEqual(result.body, responseBody);
   });
 
   it("should export a user", async () => {
-    const result = await client
-      .path("/azure/core/basic/users/{id}:export", 1)
-      .post({
-        queryParameters: {
-          format: "json"
-        }
-      });
+    const result = await client.path("/azure/core/basic/users/{id}:export", 1).post({
+      queryParameters: {
+        format: "json",
+      },
+    });
     if (isUnexpected(result)) {
       throw Error("Unexpected status code");
     }
@@ -136,13 +132,11 @@ describe("Azure Core Rest Client", () => {
   });
 
   it("should export all users", async () => {
-    const result = await client
-      .path("/azure/core/basic/users:exportallusers")
-      .post({
-        queryParameters: {
-          format: "json"
-        }
-      });
+    const result = await client.path("/azure/core/basic/users:exportallusers").post({
+      queryParameters: {
+        format: "json",
+      },
+    });
     if (isUnexpected(result)) {
       throw Error("Unexpected status code");
     }

@@ -1,4 +1,4 @@
-import { spawn, ChildProcess } from "child_process";
+import { ChildProcess, spawn } from "child_process";
 
 const onExit = (childProcess: ChildProcess): Promise<string[]> => {
   let messages: string[] = [];
@@ -22,16 +22,14 @@ const onExit = (childProcess: ChildProcess): Promise<string[]> => {
 async function check_tree() {
   await onExit(
     spawn("git", ["add", "-A"], {
-      stdio: [process.stdin, process.stdout, process.stderr]
-    })
+      stdio: [process.stdin, process.stdout, process.stderr],
+    }),
   );
 
   // If there is any output from this command it means that
   // there are non committed changes so we need to handle
   // stout
-  const messages = await onExit(
-    spawn("git", ["diff", "--staged", "--compact-summary"])
-  );
+  const messages = await onExit(spawn("git", ["diff", "--staged", "--compact-summary"]));
 
   if (messages.length !== 0) {
     // Once we have verified that there are non committed changes
@@ -39,12 +37,12 @@ async function check_tree() {
     // a readable hint to the user
     await onExit(
       spawn("git", ["diff", "--staged", "--compact-summary"], {
-        stdio: [process.stdin, process.stdout, process.stderr]
-      })
+        stdio: [process.stdin, process.stdout, process.stderr],
+      }),
     );
 
     throw new Error(
-      "Git tree is dirty, regenerate all typespec files and make sure that there are no un-intended changes"
+      "Git tree is dirty, regenerate all typespec files and make sure that there are no un-intended changes",
     );
   }
 }

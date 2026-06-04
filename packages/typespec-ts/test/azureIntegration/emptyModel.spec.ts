@@ -1,7 +1,7 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import TypeModelEmptyClientFactory, {
-  EmptyClient
+  EmptyClient,
 } from "./generated/type/model/empty/src/index.js";
 describe("TypeModelEmptyClient Rest Client", () => {
   let client: EmptyClient;
@@ -10,14 +10,14 @@ describe("TypeModelEmptyClient Rest Client", () => {
     client = TypeModelEmptyClientFactory({
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
-      }
+        maxRetries: 0,
+      },
     });
   });
 
   it(`should put empty model`, async () => {
     const result = await client.path("/type/model/empty/alone").put({
-      body: {}
+      body: {},
     });
     assert.strictEqual(result.status, "204");
   });
@@ -30,7 +30,7 @@ describe("TypeModelEmptyClient Rest Client", () => {
 
   it(`should post round-trip empty model`, async () => {
     const result = await client.path("/type/model/empty/round-trip").post({
-      body: {}
+      body: {},
     });
     assert.strictEqual(result.status, "200");
     assert.isEmpty(result.body);

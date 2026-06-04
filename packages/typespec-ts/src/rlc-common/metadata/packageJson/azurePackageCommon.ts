@@ -1,10 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import {
-  PackageCommonInfoConfig,
-  getCommonPackageDevDependencies
-} from "./packageCommon.js";
+import { PackageCommonInfoConfig, getCommonPackageDevDependencies } from "./packageCommon.js";
 
 export interface AzurePackageInfoConfig extends PackageCommonInfoConfig {
   hasLro: boolean;
@@ -20,7 +17,7 @@ export function getAzureCommonPackageInfo(config: AzurePackageInfoConfig) {
     author: "Microsoft Corporation",
     license: "MIT",
     ...getAzureCjsCommonInfo(config),
-    ...getAzureEsmCommonInfo(config)
+    ...getAzureEsmCommonInfo(config),
   };
 }
 
@@ -30,7 +27,7 @@ export function getAzureCommonPackageInfo(config: AzurePackageInfoConfig) {
 export function getAzurePackageDependencies({
   hasLro,
   specSource,
-  dependencies
+  dependencies,
 }: AzurePackageInfoConfig) {
   let azureDependencies: Record<string, string> = {
     ...dependencies,
@@ -38,14 +35,14 @@ export function getAzurePackageDependencies({
     "@azure/core-auth": "^1.6.0",
     "@azure/core-rest-pipeline": "^1.5.0",
     "@azure/logger": "^1.0.0",
-    tslib: "^2.6.2"
+    tslib: "^2.6.2",
   };
 
   if (hasLro) {
     azureDependencies = {
       ...azureDependencies,
       "@azure/core-lro": "^3.1.0",
-      "@azure/abort-controller": "^2.1.2"
+      "@azure/abort-controller": "^2.1.2",
     };
   }
 
@@ -57,7 +54,7 @@ function getAzureCjsCommonInfo({
   withSamples,
   name,
   nameWithoutScope,
-  moduleKind
+  moduleKind,
 }: AzurePackageInfoConfig) {
   if (moduleKind !== "cjs") {
     return {};
@@ -70,8 +67,8 @@ function getAzureCjsCommonInfo({
       withTests || withSamples ? "dist-esm/src/" : "dist-esm/",
       `types/${nameWithoutScope ?? name}.d.ts`,
       "README.md",
-      "LICENSE"
-    ]
+      "LICENSE",
+    ],
   };
 }
 
@@ -80,14 +77,11 @@ function getAzureEsmCommonInfo({ moduleKind }: AzurePackageInfoConfig) {
     return {};
   }
   return {
-    files: ["dist/", "!dist/**/*.d.*ts.map", "README.md", "LICENSE"]
+    files: ["dist/", "!dist/**/*.d.*ts.map", "README.md", "LICENSE"],
   };
 }
 
-function getAzurePackageCjsDevDependencies({
-  moduleKind,
-  withTests
-}: AzurePackageInfoConfig) {
+function getAzurePackageCjsDevDependencies({ moduleKind, withTests }: AzurePackageInfoConfig) {
   if (moduleKind !== "cjs") {
     return {};
   }
@@ -108,19 +102,16 @@ function getAzurePackageCjsDevDependencies({
     "karma-mocha": "^2.0.1",
     "karma-source-map-support": "~1.4.0",
     "karma-sourcemap-loader": "^0.4.0",
-    karma: "^6.2.0"
+    karma: "^6.2.0",
   };
 
   return {
     ...(withTests && testDevDependencies),
-    "source-map-support": "^0.5.9"
+    "source-map-support": "^0.5.9",
   };
 }
 
-function getAzurePackageEsmDevDependencies({
-  moduleKind,
-  withTests
-}: AzurePackageInfoConfig) {
+function getAzurePackageEsmDevDependencies({ moduleKind, withTests }: AzurePackageInfoConfig) {
   if (moduleKind !== "esm") {
     return {};
   }
@@ -135,7 +126,7 @@ function getAzurePackageEsmDevDependencies({
       playwright: "^1.41.2",
       vitest: "^4.0.6",
       "@azure-tools/test-credential": "^2.0.0",
-      "@azure-tools/test-recorder": "^4.0.0"
+      "@azure-tools/test-recorder": "^4.0.0",
     };
   }
 
@@ -147,7 +138,7 @@ export function getAzurePackageDevDependencies(config: AzurePackageInfoConfig) {
   const cjsDevDependencies = getAzurePackageCjsDevDependencies(config);
 
   const testDevDependencies = {
-    "@azure/identity": "^4.2.1"
+    "@azure/identity": "^4.2.1",
   };
 
   return {
@@ -156,6 +147,6 @@ export function getAzurePackageDevDependencies(config: AzurePackageInfoConfig) {
     ...(config.withTests && testDevDependencies),
     ...(config.specSource === "Swagger" && { autorest: "latest" }),
     ...esmDevDependencies,
-    ...cjsDevDependencies
+    ...cjsDevDependencies,
   };
 }

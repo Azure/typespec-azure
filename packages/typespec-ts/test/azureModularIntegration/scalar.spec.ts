@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { ScalarClient } from "./generated/type/scalar/src/index.js";
 describe("Scalar Client", () => {
@@ -9,8 +9,8 @@ describe("Scalar Client", () => {
       endpoint: "http://localhost:3002",
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
-      }
+        maxRetries: 0,
+      },
     });
   });
 
@@ -18,9 +18,9 @@ describe("Scalar Client", () => {
     const result = await client.string.get({
       requestOptions: {
         headers: {
-          accept: "text/plain"
-        }
-      }
+          accept: "text/plain",
+        },
+      },
     });
     assert.strictEqual(result.body, "test");
   });
@@ -29,9 +29,9 @@ describe("Scalar Client", () => {
     const result = await client.string.put("test", {
       requestOptions: {
         headers: {
-          "content-type": "text/plain"
-        }
-      }
+          "content-type": "text/plain",
+        },
+      },
     });
     assert.isUndefined(result);
   });
@@ -50,9 +50,9 @@ describe("Scalar Client", () => {
     const result = await client.unknown.get({
       requestOptions: {
         headers: {
-          accept: "text/plain"
-        }
-      }
+          accept: "text/plain",
+        },
+      },
     });
     assert.strictEqual(result.body, "test");
   });
@@ -61,9 +61,9 @@ describe("Scalar Client", () => {
     const result = await client.unknown.put("test", {
       requestOptions: {
         headers: {
-          "content-type": "text/plain"
-        }
-      }
+          "content-type": "text/plain",
+        },
+      },
     });
     assert.isUndefined(result);
   });
@@ -108,7 +108,7 @@ describe("Scalar Client", () => {
     // Convert decimals to integer representation (e.g., cents)
     const scaledSum = getResult.body.reduce(
       (acc: number, val: number) => acc + Math.round(val * 100),
-      0
+      0,
     );
     const total = scaledSum / 100;
 
@@ -126,7 +126,7 @@ describe("Scalar Client", () => {
     // Convert decimals to integer representation (e.g., cents)
     const scaledSum = getResult.body.reduce(
       (acc: number, val: number) => acc + Math.round(val * 100),
-      0
+      0,
     );
     const total = scaledSum / 100;
 

@@ -7,13 +7,18 @@ Test generation should create tests for operations with parameters that require 
 This is tsp definition.
 
 ```tsp
-model ListCredentialsRequest{
+model ListCredentialsRequest {
   serviceName: string;
   PROPERTY_NAME: string;
 }
 
 @doc("show example demo")
-op post(@query QUERY_PARAM?: string, @header HEADER_PARAM?: string,@path PATH_PARAM?: string, @body ListCredentialsRequest?: ListCredentialsRequest): void;
+op post(
+  @query QUERY_PARAM?: string,
+  @header HEADER_PARAM?: string,
+  @path PATH_PARAM?: string,
+  @body ListCredentialsRequest?: ListCredentialsRequest,
+): void;
 ```
 
 ## Example and generated tests

@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { ArrayClient } from "./generated/type/array/src/index.js";
 
@@ -11,67 +11,67 @@ interface TypeDetail {
 const testedTypes: TypeDetail[] = [
   {
     type: "int32",
-    defaultValue: [1, 2]
+    defaultValue: [1, 2],
   },
   {
     type: "int64",
-    defaultValue: [Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER]
+    defaultValue: [Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER],
   },
   {
     type: "boolean",
-    defaultValue: [true, false]
+    defaultValue: [true, false],
   },
   {
     type: "string",
-    defaultValue: ["hello", ""]
+    defaultValue: ["hello", ""],
   },
   {
     type: "float32",
-    defaultValue: [43.125]
+    defaultValue: [43.125],
   },
   {
     type: "datetime",
-    defaultValue: [new Date("2022-08-26T18:38:00Z")]
+    defaultValue: [new Date("2022-08-26T18:38:00Z")],
   },
   {
     type: "duration",
-    defaultValue: ["P123DT22H14M12.011S"]
+    defaultValue: ["P123DT22H14M12.011S"],
   },
   {
     type: "unknown",
-    defaultValue: [1, "hello", null]
+    defaultValue: [1, "hello", null],
   },
   {
     type: "model",
     defaultValue: [
       { property: "hello", children: undefined },
-      { property: "world", children: undefined }
-    ]
+      { property: "world", children: undefined },
+    ],
   },
   {
     type: "nullable-float",
-    defaultValue: [1.25, null, 3.0]
+    defaultValue: [1.25, null, 3.0],
   },
   {
     type: "nullable-int32",
-    defaultValue: [1, null, 3]
+    defaultValue: [1, null, 3],
   },
   {
     type: "nullable-string",
-    defaultValue: ["hello", null, "world"]
+    defaultValue: ["hello", null, "world"],
   },
   {
     type: "nullable-boolean",
-    defaultValue: [true, null, false]
+    defaultValue: [true, null, false],
   },
   {
     type: "nullable-model",
     defaultValue: [
       { property: "hello", children: undefined },
       null,
-      { property: "world", children: undefined }
-    ]
-  }
+      { property: "world", children: undefined },
+    ],
+  },
 ];
 describe("Array Item-Types Client", () => {
   let client: ArrayClient;
@@ -81,8 +81,8 @@ describe("Array Item-Types Client", () => {
       endpoint: "http://localhost:3002",
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
-      }
+        maxRetries: 0,
+      },
     });
   });
   for (let item of testedTypes) {

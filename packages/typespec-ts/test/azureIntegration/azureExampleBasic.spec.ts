@@ -1,8 +1,6 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
-import BasicClientFactory, {
-  BasicClient
-} from "./generated/azure/example/basic/src/index.js";
+import BasicClientFactory, { BasicClient } from "./generated/azure/example/basic/src/index.js";
 describe("Azure Example Basic Rest Client", () => {
   let client: BasicClient;
 
@@ -18,16 +16,16 @@ describe("Azure Example Basic Rest Client", () => {
         modelProperty: {
           int32Property: 1,
           float32Property: 1.5,
-          enumProperty: "EnumValue1"
+          enumProperty: "EnumValue1",
         },
         arrayProperty: ["item"],
         recordProperty: {
-          record: "value"
-        }
+          record: "value",
+        },
       },
       headers: {
-        "header-param": "header"
-      }
+        "header-param": "header",
+      },
     });
     assert.strictEqual(result.status, "200");
     assert.strictEqual(result.body.stringProperty, "text");

@@ -7,6 +7,6 @@ import { karmaConfig } from "./template.js";
 export function buildKarmaConfigFile(_model: RLCModel) {
   return {
     path: "karma.conf.js",
-    content: hbs.compile(karmaConfig, { noEscape: true })({})
+    content: hbs.compile(karmaConfig, { noEscape: true })({}),
   };
 }

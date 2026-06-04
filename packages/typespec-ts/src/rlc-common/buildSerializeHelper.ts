@@ -1,5 +1,5 @@
-import { RLCModel } from "./interfaces.js";
 import * as path from "path";
+import { RLCModel } from "./interfaces.js";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: to fix the handlebars issue
 import hbs from "handlebars";
@@ -8,14 +8,14 @@ import {
   hasMultiCollection,
   hasPipeCollection,
   hasSsvCollection,
-  hasTsvCollection
+  hasTsvCollection,
 } from "./helpers/operationHelpers.js";
 import {
   buildCsvCollectionContent,
   buildMultiCollectionContent,
   buildPipeCollectionContent,
   buildSsvCollectionContent,
-  buildTsvCollectionContent
+  buildTsvCollectionContent,
 } from "./static/serializeHelper.js";
 
 export function buildSerializeHelper(model: RLCModel) {
@@ -37,12 +37,12 @@ export function buildSerializeHelper(model: RLCModel) {
   }
   if (serializeHelperContent !== "") {
     const readmeFileContents = hbs.compile(serializeHelperContent, {
-      noEscape: true
+      noEscape: true,
     });
     const { srcPath } = model;
     return {
       path: path.join(srcPath, "serializeHelper.ts"),
-      content: readmeFileContents({})
+      content: readmeFileContents({}),
     };
   }
   return undefined;

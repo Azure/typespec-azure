@@ -1,18 +1,12 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: to fix the handlebars issue
 import hbs from "handlebars";
-import { snippetsContent } from "./template.js";
-import { RLCModel } from "../interfaces.js";
 import { getClientName } from "../helpers/nameConstructors.js";
+import { RLCModel } from "../interfaces.js";
+import { snippetsContent } from "./template.js";
 
-export function buildSnippets(
-  model: RLCModel,
-  clientName?: string,
-  azureSdkForJs?: boolean
-) {
-  const azureSdkForJsInfo = azureSdkForJs
-    ? azureSdkForJs
-    : model.options?.azureSdkForJs;
+export function buildSnippets(model: RLCModel, clientName?: string, azureSdkForJs?: boolean) {
+  const azureSdkForJsInfo = azureSdkForJs ? azureSdkForJs : model.options?.azureSdkForJs;
   // to keep the same config for azure scope in buildReadmeFile.ts
   if (
     (model?.options?.packageDetails?.scopeName === "azure" ||
@@ -27,8 +21,8 @@ export function buildSnippets(
         azureArm: model.options?.azureArm,
         azureSdkForJs: azureSdkForJsInfo,
         isModularLibrary: model.options.isModularLibrary,
-        hasSubscriptionId: model.options.hasSubscriptionId
-      })
+        hasSubscriptionId: model.options.hasSubscriptionId,
+      }),
     };
   }
   return undefined;

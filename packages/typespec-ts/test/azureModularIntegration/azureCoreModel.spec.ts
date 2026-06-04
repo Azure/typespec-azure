@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { ModelClient } from "./generated/azure/core/model/src/index.js";
 
@@ -8,7 +8,7 @@ describe("Traits Client", () => {
   beforeEach(() => {
     client = new ModelClient({
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 

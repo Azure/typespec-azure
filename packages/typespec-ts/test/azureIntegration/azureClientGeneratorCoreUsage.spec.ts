@@ -1,7 +1,7 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import UsageClientFactory, {
-  UsageClient
+  UsageClient,
 } from "./generated/azure/client-generator-core/usage/src/index.js";
 
 describe("Usage Client", () => {
@@ -11,8 +11,8 @@ describe("Usage Client", () => {
     client = UsageClientFactory({
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
-      }
+        maxRetries: 0,
+      },
     });
   });
 

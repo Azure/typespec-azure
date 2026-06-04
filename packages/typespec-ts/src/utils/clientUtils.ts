@@ -1,10 +1,10 @@
 import {
   InitializedByFlags,
+  listAllServiceNamespaces,
+  listClients,
   SdkClient,
   SdkClientType,
   SdkServiceOperation,
-  listAllServiceNamespaces,
-  listClients
 } from "@azure-tools/typespec-client-generator-core";
 import {
   getNamespaceFullName,
@@ -12,18 +12,14 @@ import {
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
   Namespace,
-  Operation
+  Operation,
 } from "@typespec/compiler";
-import { SdkContext } from "./interfaces.js";
 import { ModularClientOptions } from "../modular/interfaces.js";
 import { NameType, normalizeName } from "../rlc-common/index.js";
+import { SdkContext } from "./interfaces.js";
 
-export function getRLCClients(
-  dpgContext: SdkContext,
-  isModularLibrary?: boolean
-): SdkClient[] {
-  const modular =
-    isModularLibrary ?? dpgContext.rlcOptions?.isModularLibrary ?? false;
+export function getRLCClients(dpgContext: SdkContext, isModularLibrary?: boolean): SdkClient[] {
+  const modular = isModularLibrary ?? dpgContext.rlcOptions?.isModularLibrary ?? false;
   const clients = listClients(dpgContext);
   const rawServiceNamespaces =
     dpgContext.allServiceNamespaces ?? listAllServiceNamespaces(dpgContext);
@@ -35,9 +31,7 @@ export function getRLCClients(
       return {
         ...client,
         services: services,
-        crossLanguageDefinitionId: `${getNamespaceFullName(
-          services[0]!
-        )}.${client.name}`
+        crossLanguageDefinitionId: `${getNamespaceFullName(services[0]!)}.${client.name}`,
       };
     });
   } else {
@@ -61,10 +55,8 @@ export function getRLCClients(
           subClients: [],
           clientPath: clientName,
           arm: Boolean(dpgContext.arm),
-          crossLanguageDefinitionId: `${getNamespaceFullName(
-            service
-          )}.${clientName}`,
-          subOperationGroups: []
+          crossLanguageDefinitionId: `${getNamespaceFullName(service)}.${clientName}`,
+          subOperationGroups: [],
         };
       });
     }
@@ -82,10 +74,8 @@ export function getRLCClients(
       subClients: [],
       clientPath: clientName,
       arm: Boolean(dpgContext.arm),
-      crossLanguageDefinitionId: `${getNamespaceFullName(
-        service
-      )}.${clientName}`,
-      subOperationGroups: []
+      crossLanguageDefinitionId: `${getNamespaceFullName(service)}.${clientName}`,
+      subOperationGroups: [],
     };
   });
 }
@@ -100,8 +90,7 @@ export function listOperationsUnderRLCClient(client: SdkClient): Operation[] {
       current.decorators.some(
         (d) =>
           d.definition?.name === "@client" &&
-          getNamespaceFullName(d.definition?.namespace) ===
-            "Azure.ClientGenerator.Core"
+          getNamespaceFullName(d.definition?.namespace) === "Azure.ClientGenerator.Core",
       ) &&
       !serviceArray.includes(current as Namespace)
     ) {
@@ -109,15 +98,13 @@ export function listOperationsUnderRLCClient(client: SdkClient): Operation[] {
     }
     operations.push(
       ...[...current.operations.values()].filter(
-        (op) => isTemplateDeclarationOrInstance(op) === false
-      )
+        (op) => isTemplateDeclarationOrInstance(op) === false,
+      ),
     );
     if (current.kind === "Namespace") {
       queue.push(...current.namespaces.values());
       queue.push(
-        ...[...current.interfaces.values()].filter(
-          (i) => isTemplateDeclaration(i) === false
-        )
+        ...[...current.interfaces.values()].filter((i) => isTemplateDeclaration(i) === false),
       );
     }
   }
@@ -128,33 +115,28 @@ export function isRLCMultiEndpoint(dpgContext: SdkContext): boolean {
   return getRLCClients(dpgContext).length > 1;
 }
 
-export function getModularClientOptions(
-  clientMap: [string[], SdkClientType<SdkServiceOperation>]
-) {
+export function getModularClientOptions(clientMap: [string[], SdkClientType<SdkServiceOperation>]) {
   const [hierarchy, client] = clientMap;
   const clientOptions: ModularClientOptions = {
-    rlcClientName: `${client.name.replace(/Client$/, "")}Context`
+    rlcClientName: `${client.name.replace(/Client$/, "")}Context`,
   };
   clientOptions.subfolder = hierarchy.join("/");
   return clientOptions;
 }
 
 export function getClientHierarchyMap(
-  context: SdkContext
+  context: SdkContext,
 ): [string[], SdkClientType<SdkServiceOperation>][] {
   const clientMap: [string[], SdkClientType<SdkServiceOperation>][] = [];
   const individualClients = context.sdkPackage.clients.filter((client) => {
-    return (
-      client.clientInitialization.initializedBy &
-      InitializedByFlags.Individually
-    );
+    return client.clientInitialization.initializedBy & InitializedByFlags.Individually;
   });
   const clients = individualClients.map((client) => {
     return [
       context.sdkPackage.clients.length > 1
         ? [normalizeName(client.name.replace("Client", ""), NameType.File)]
         : [],
-      client
+      client,
     ];
   }) as [string[], SdkClientType<SdkServiceOperation>][];
   for (let i = 0; i < clients.length; i++) {
@@ -162,8 +144,7 @@ export function getClientHierarchyMap(
     clientMap.push([hierarchy, client]);
     const childClientsToGenerate = client.children?.filter((child) => {
       return (
-        child.clientInitialization.initializedBy &
-          InitializedByFlags.Individually ||
+        child.clientInitialization.initializedBy & InitializedByFlags.Individually ||
         child.clientInitialization.initializedBy & InitializedByFlags.Parent
       );
     });
@@ -171,7 +152,7 @@ export function getClientHierarchyMap(
       childClientsToGenerate.forEach((child) => {
         const childHierarchy = [
           ...hierarchy,
-          normalizeName(child.name.replace("Client", ""), NameType.File)
+          normalizeName(child.name.replace("Client", ""), NameType.File),
         ];
         clients.push([childHierarchy, child]);
       });

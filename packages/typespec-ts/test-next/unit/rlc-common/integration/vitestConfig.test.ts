@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { buildVitestConfig } from "../../../../src/rlc-common/metadata/buildVitestConfig.js";
 
@@ -9,12 +9,12 @@ describe("vitest.config", () => {
     it("vitest.browser.config.ts", () => {
       const model = createMockModel({
         withTests: true,
-        isMonorepo: true
+        isMonorepo: true,
       });
 
       const result = buildVitestConfig(model, "browser");
       expect(result?.content).includes(
-        `export { default } from "../../../eng/vitestconfigs/browser.config.ts";`
+        `export { default } from "../../../eng/vitestconfigs/browser.config.ts";`,
       );
     });
   });

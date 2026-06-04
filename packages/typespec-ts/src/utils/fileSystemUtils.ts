@@ -1,6 +1,6 @@
+import { NoTarget, Program } from "@typespec/compiler";
 import { mkdir, readdir, rm, stat } from "fs/promises";
 import { resolve } from "path";
-import { NoTarget, Program } from "@typespec/compiler";
 import { reportDiagnostic } from "../lib.js";
 
 export async function pathExists(targetPath: string): Promise<boolean> {
@@ -22,16 +22,14 @@ export async function emptyDir(dirPath: string): Promise<void> {
   }
 
   await Promise.all(
-    entries.map((entry) =>
-      rm(resolve(dirPath, entry), { recursive: true, force: true })
-    )
+    entries.map((entry) => rm(resolve(dirPath, entry), { recursive: true, force: true })),
   );
 }
 
 export async function clearDirectory(
   dirPath: string,
   excludeNames: string[] = [],
-  program?: Program
+  program?: Program,
 ): Promise<void> {
   if (!(await pathExists(dirPath))) {
     return;
@@ -63,7 +61,7 @@ export async function clearDirectory(
       reportDiagnostic(program, {
         code: "directory-traversal-error",
         format: { directory: dirPath, error: String(error) },
-        target: NoTarget
+        target: NoTarget,
       });
     }
     await emptyDir(dirPath);

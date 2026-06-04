@@ -1,24 +1,19 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import NotDefinedParamInServerEndpointClientFactory, {
-  NotDefinedParamInServerEndpointClient
+  NotDefinedParamInServerEndpointClient,
 } from "./generated/server/endpoint/not-defined/src/index.js";
 describe("NotDefinedParamInServerEndpoint Rest Client", () => {
   let client: NotDefinedParamInServerEndpointClient;
 
   beforeEach(() => {
-    client = NotDefinedParamInServerEndpointClientFactory(
-      "http://localhost:3000",
-      {
-        allowInsecureConnection: true
-      }
-    );
+    client = NotDefinedParamInServerEndpointClientFactory("http://localhost:3000", {
+      allowInsecureConnection: true,
+    });
   });
 
   it("should work with not defined endpoint", async () => {
-    const result = await client
-      .path("/server/endpoint/not-defined/valid")
-      .head();
+    const result = await client.path("/server/endpoint/not-defined/valid").head();
     assert.strictEqual(result.status, "200");
   });
 });

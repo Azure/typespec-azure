@@ -1,24 +1,13 @@
-import {
-  NameType,
-  normalizeName,
-  ReservedModelNames
-} from "../../rlc-common/index.js";
-import {
-  SdkClientType,
-  SdkServiceOperation
-} from "@azure-tools/typespec-client-generator-core";
+import { SdkClientType, SdkServiceOperation } from "@azure-tools/typespec-client-generator-core";
+import { NameType, normalizeName, ReservedModelNames } from "../../rlc-common/index.js";
 import { SdkContext } from "../../utils/interfaces.js";
 import { ServiceOperation } from "../../utils/operationUtil.js";
 
-export function getClientName(
-  client: SdkClientType<SdkServiceOperation>
-): string {
+export function getClientName(client: SdkClientType<SdkServiceOperation>): string {
   return client.name.replace(/Client$/, "");
 }
 
-export function getClassicalClientName(
-  client: SdkClientType<SdkServiceOperation>
-): string {
+export function getClassicalClientName(client: SdkClientType<SdkServiceOperation>): string {
   return client.name;
 }
 
@@ -29,31 +18,29 @@ export interface GuardedName {
 
 export function getOperationName(
   operation: ServiceOperation,
-  dpgContext?: SdkContext
+  dpgContext?: SdkContext,
 ): GuardedName {
   const norm = normalizeName(operation.name, NameType.Method, true);
-  const isDataplane =
-    dpgContext !== undefined && !dpgContext.rlcOptions?.azureArm;
+  const isDataplane = dpgContext !== undefined && !dpgContext.rlcOptions?.azureArm;
   if (isReservedName(operation.name, NameType.Method) && isDataplane) {
     return {
       name: norm,
       fixme: [
         `${operation.name} is a reserved word that cannot be used as an operation name. 
         Please add @clientName("clientName") or @clientName("<JS-Specific-Name>", "javascript") 
-        to the operation to override the generated name.`
-      ]
+        to the operation to override the generated name.`,
+      ],
     };
   }
   return {
-    name: norm
+    name: norm,
   };
 }
 
 export function isReservedName(name: string, nameType: NameType): boolean {
   return ReservedModelNames.some(
     (reservedName) =>
-      reservedName.name === name.toLowerCase() &&
-      reservedName.reservedFor.includes(nameType)
+      reservedName.name === name.toLowerCase() && reservedName.reservedFor.includes(nameType),
   );
 }
 
@@ -61,7 +48,7 @@ export function getClassicalLayerPrefix(
   prefixes: string[],
   nameType: NameType,
   separator: string = "",
-  layer: number = prefixes.length - 1
+  layer: number = prefixes.length - 1,
 ): string {
   const prefix: string[] = [];
   if (layer < 0) {
@@ -86,10 +73,7 @@ export function isDefined<T>(thing: T | undefined | null): thing is T {
  * @param existingNames - A set of names already in use.
  * @returns A unique name not present in the existing names set.
  */
-export function generateLocallyUniqueName(
-  name: string,
-  existingNames: Set<string>
-): string {
+export function generateLocallyUniqueName(name: string, existingNames: Set<string>): string {
   let uniqueName = name;
   let counter = 1;
   while (existingNames.has(uniqueName)) {

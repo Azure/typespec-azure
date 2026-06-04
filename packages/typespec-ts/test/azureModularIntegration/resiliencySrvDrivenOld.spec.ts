@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { ResiliencyServiceDrivenClient } from "./generated/resiliency/srv-driven-old/src/index.js";
 describe("Service Driven old Client v1", () => {
@@ -7,7 +7,7 @@ describe("Service Driven old Client v1", () => {
   beforeEach(() => {
     client = new ResiliencyServiceDrivenClient("http://localhost:3002", "v1", {
       allowInsecureConnection: true,
-      apiVersion: "v1"
+      apiVersion: "v1",
     });
   });
 
@@ -18,7 +18,7 @@ describe("Service Driven old Client v1", () => {
 
   it("should work with one optional parameter", async () => {
     const result = await client.fromOneOptional({
-      parameter: "optional"
+      parameter: "optional",
     });
     assert.isUndefined(result);
   });
@@ -34,7 +34,7 @@ describe("Service Driven old Client v2", () => {
   beforeEach(() => {
     client = new ResiliencyServiceDrivenClient("http://localhost:3002", "v2", {
       allowInsecureConnection: true,
-      apiVersion: "v1"
+      apiVersion: "v1",
     });
   });
 
@@ -45,7 +45,7 @@ describe("Service Driven old Client v2", () => {
 
   it("should work with one optional parameter", async () => {
     const result = await client.fromOneOptional({
-      parameter: "optional"
+      parameter: "optional",
     });
     assert.isUndefined(result);
   });

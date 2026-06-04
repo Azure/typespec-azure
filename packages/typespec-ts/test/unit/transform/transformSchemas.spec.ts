@@ -1,4 +1,4 @@
-import { describe, it, assert } from "vitest";
+import { assert, describe, it } from "vitest";
 
 import { ObjectSchema } from "../../../src/rlc-common/index.js";
 import { emitSchemasFromTypeSpec } from "../../util/emitUtil.js";
@@ -28,7 +28,7 @@ describe("#transformSchemas", () => {
         type: "string",
         description: undefined,
         required: true,
-        usage: ["output", "input"]
+        usage: ["output", "input"],
       } as any);
     });
 
@@ -40,7 +40,7 @@ describe("#transformSchemas", () => {
         format: "int32",
         description: undefined,
         required: true,
-        usage: ["output", "input"]
+        usage: ["output", "input"],
       } as any);
     });
 
@@ -66,12 +66,12 @@ describe("#transformSchemas", () => {
         type: "array",
         items: {
           type: "string",
-          description: "A sequence of textual characters."
+          description: "A sequence of textual characters.",
         },
         description: undefined,
         typeName: "string[]",
         usage: ["output", "input"],
-        required: true
+        required: true,
       } as any);
     });
 
@@ -83,12 +83,12 @@ describe("#transformSchemas", () => {
         type: "array",
         items: {
           type: `"sss"`,
-          isConstant: true
+          isConstant: true,
         },
         description: undefined,
         typeName: `"sss"[]`,
         usage: ["output", "input"],
-        required: true
+        required: true,
       } as any);
     });
 
@@ -103,12 +103,12 @@ describe("#transformSchemas", () => {
         valueTypeName: undefined,
         additionalProperties: {
           type: `"sss"`,
-          isConstant: true
+          isConstant: true,
         },
         description: undefined,
         typeName: "Record<string, undefined>",
         usage: ["output", "input"],
-        required: true
+        required: true,
       } as any);
     });
 
@@ -160,8 +160,8 @@ describe("#transformSchemas", () => {
             op getModel(@body input: Test): Test;
           `,
             {
-              needAzureCore: true
-            }
+              needAzureCore: true,
+            },
           );
           assert.isNotNull(schemaOutput);
           const first = schemaOutput?.[0] as ObjectSchema;
@@ -181,13 +181,13 @@ describe("#transformSchemas", () => {
             enum: [
               {
                 isConstant: true,
-                type: '"English"'
+                type: '"English"',
               },
               {
                 isConstant: true,
-                type: '"Chinese"'
-              }
-            ]
+                type: '"Chinese"',
+              },
+            ],
           } as any);
         });
 
@@ -216,8 +216,8 @@ describe("#transformSchemas", () => {
             op getModel(@body input: Test): Test;
           `,
             {
-              needAzureCore: true
-            }
+              needAzureCore: true,
+            },
           );
           assert.isNotNull(schemaOutput);
           const first = schemaOutput?.[0] as ObjectSchema;
@@ -237,27 +237,27 @@ describe("#transformSchemas", () => {
             enum: [
               {
                 isConstant: true,
-                type: '"English"'
+                type: '"English"',
               },
               {
                 isConstant: true,
-                type: '"Chinese"'
+                type: '"Chinese"',
               },
               {
                 enum: [
                   {
                     isConstant: true,
-                    type: '"Japanese"'
-                  }
+                    type: '"Japanese"',
+                  },
                 ],
                 name: "OtherValues",
                 type: "object",
                 typeName: "OtherValues",
                 outputTypeName: "OtherValuesOutput",
                 alias: '"Japanese"',
-                outputAlias: '"Japanese"'
-              }
-            ]
+                outputAlias: '"Japanese"',
+              },
+            ],
           } as any);
         });
       });
@@ -280,28 +280,26 @@ describe("#transformSchemas", () => {
           assert.deepEqual(property, {
             enum: [
               { type: '"a"', isConstant: true },
-              { type: '"test"', isConstant: true }
+              { type: '"test"', isConstant: true },
             ],
             type: "union",
             typeName: '"a" | "test"',
             outputTypeName: '"a" | "test"',
             required: true,
             usage: ["output", "input"],
-            description: undefined
+            description: undefined,
           } as any);
         });
 
         it("generate primitive union", async () => {
-          const property = await verifyFirstProperty(
-            `string | int32 | boolean | utcDateTime`
-          );
+          const property = await verifyFirstProperty(`string | int32 | boolean | utcDateTime`);
           assert.isNotNull(property);
           // console.log(property);
           assert.deepEqual(property, {
             enum: [
               {
                 type: "string",
-                description: "A sequence of textual characters."
+                description: "A sequence of textual characters.",
               },
               { type: "number", format: "int32" },
               { type: "boolean", description: undefined },
@@ -310,15 +308,15 @@ describe("#transformSchemas", () => {
                 format: undefined,
                 description: undefined,
                 typeName: "Date | string",
-                outputTypeName: "string"
-              }
+                outputTypeName: "string",
+              },
             ],
             type: "union",
             typeName: "string | number | boolean | Date | string",
             outputTypeName: "string | number | boolean | string",
             required: true,
             usage: ["output", "input"],
-            description: undefined
+            description: undefined,
           } as any);
         });
       });
@@ -344,8 +342,8 @@ describe("#transformSchemas", () => {
           op getModel(@body input: Test): Test;
         `,
           {
-            needAzureCore: true
-          }
+            needAzureCore: true,
+          },
         );
         assert.isNotNull(schemaOutput);
         const first = schemaOutput?.[0] as ObjectSchema;
@@ -363,18 +361,18 @@ describe("#transformSchemas", () => {
             {
               description: "English descriptions",
               isConstant: true,
-              type: '"English"'
+              type: '"English"',
             },
             {
               description: "Chinese descriptions",
               isConstant: true,
-              type: '"Chinese"'
-            }
+              type: '"Chinese"',
+            },
           ],
           alias: '"English" | "Chinese"',
           outputAlias: '"English" | "Chinese"',
           required: true,
-          usage: ["output", "input"]
+          usage: ["output", "input"],
         } as any);
       });
 
@@ -396,8 +394,8 @@ describe("#transformSchemas", () => {
           op getModel(@body input: Test): Test;
         `,
           {
-            needAzureCore: true
-          }
+            needAzureCore: true,
+          },
         );
         assert.isNotNull(schemaOutput);
         const first = schemaOutput?.[0] as ObjectSchema;
@@ -408,7 +406,7 @@ describe("#transformSchemas", () => {
           description: undefined,
           isConstant: true,
           required: true,
-          usage: ["output", "input"]
+          usage: ["output", "input"],
         } as any);
       });
     });
@@ -430,8 +428,8 @@ describe("#transformSchemas", () => {
         op getModel(@body input: Test): Test;
       `,
         {
-          needAzureCore: true
-        }
+          needAzureCore: true,
+        },
       );
       assert.isNotNull(schemaOutput);
       const first = schemaOutput?.[0] as ObjectSchema;
@@ -453,7 +451,7 @@ describe("#transformSchemas", () => {
             typeName: "A",
             properties: {},
             outputTypeName: "AOutput",
-            usage: ["input", "output"]
+            usage: ["input", "output"],
           },
           {
             name: "B",
@@ -464,11 +462,11 @@ describe("#transformSchemas", () => {
             typeName: "B",
             properties: {},
             outputTypeName: "BOutput",
-            usage: ["input", "output"]
-          }
+            usage: ["input", "output"],
+          },
         ],
         required: true,
-        usage: ["output", "input"]
+        usage: ["output", "input"],
       } as any);
     });
 
@@ -486,8 +484,8 @@ describe("#transformSchemas", () => {
         op getModel(@body input: Test): Test;
       `,
         {
-          needAzureCore: true
-        }
+          needAzureCore: true,
+        },
       );
       assert.isNotNull(schemaOutput);
       const first = schemaOutput?.[0] as ObjectSchema;
@@ -508,10 +506,10 @@ describe("#transformSchemas", () => {
           typeName: "A",
           properties: {},
           outputTypeName: "AOutput",
-          usage: ["input", "output"]
+          usage: ["input", "output"],
         },
         required: true,
-        usage: ["output", "input"]
+        usage: ["output", "input"],
       } as any);
     });
 
@@ -528,7 +526,7 @@ describe("#transformSchemas", () => {
         @get
         op getModel(@body input: Test): Test;
       `,
-        { needAzureCore: true }
+        { needAzureCore: true },
       );
       assert.isNotNull(schemaOutput);
       const first = schemaOutput?.[0] as ObjectSchema;
@@ -551,10 +549,10 @@ describe("#transformSchemas", () => {
           typeName: "A",
           properties: {},
           outputTypeName: "AOutput",
-          usage: ["input", "output"]
+          usage: ["input", "output"],
         },
         required: true,
-        usage: ["output", "input"]
+        usage: ["output", "input"],
       } as any);
     });
 
@@ -575,8 +573,8 @@ describe("#transformSchemas", () => {
         op getModel(@body input: Test): Test;
       `,
         {
-          needAzureCore: true
-        }
+          needAzureCore: true,
+        },
       );
       assert.isNotNull(schemaOutput);
       const first = schemaOutput?.[0] as ObjectSchema;
@@ -599,7 +597,7 @@ describe("#transformSchemas", () => {
               typeName: "A",
               properties: {},
               outputTypeName: "AOutput",
-              usage: ["input", "output"]
+              usage: ["input", "output"],
             },
             {
               name: "B",
@@ -610,15 +608,15 @@ describe("#transformSchemas", () => {
               typeName: "B",
               properties: {},
               outputTypeName: "BOutput",
-              usage: ["input", "output"]
-            }
+              usage: ["input", "output"],
+            },
           ],
           type: "union",
           typeName: "A | B",
-          outputTypeName: "AOutput | BOutput"
+          outputTypeName: "AOutput | BOutput",
         },
         required: true,
-        usage: ["output", "input"]
+        usage: ["output", "input"],
       } as any);
     });
   });
@@ -637,7 +635,7 @@ describe("#transformSchemas", () => {
         outputTypeName: "Record<string, any>",
         properties: {},
         usage: ["output", "input"],
-        required: true
+        required: true,
       } as any);
     });
 
@@ -664,17 +662,17 @@ describe("#transformSchemas", () => {
             type: "string",
             description: "Description for name",
             required: true,
-            usage: ["output", "input"]
+            usage: ["output", "input"],
           },
           '"arguments"': {
             type: "string",
             description: "Description for arguments",
             required: true,
-            usage: ["output", "input"]
-          }
+            usage: ["output", "input"],
+          },
         },
         usage: ["output", "input"],
-        required: true
+        required: true,
       } as any);
     });
 
@@ -719,15 +717,15 @@ describe("#transformSchemas", () => {
                     type: "string",
                     description: undefined,
                     required: true,
-                    usage: ["output", "input"]
-                  }
-                }
-              }
-            }
-          }
+                    usage: ["output", "input"],
+                  },
+                },
+              },
+            },
+          },
         },
         usage: ["output", "input"],
-        required: true
+        required: true,
       } as any);
     });
 
@@ -756,11 +754,11 @@ describe("#transformSchemas", () => {
             outputTypeName: "TestOutput",
             properties: {},
             usage: ["output", "input"],
-            required: true
-          }
+            required: true,
+          },
         },
         usage: ["output", "input"],
-        required: true
+        required: true,
       } as any);
     });
 
@@ -791,11 +789,11 @@ describe("#transformSchemas", () => {
               type: "string",
               description: "Description for name",
               required: true,
-              usage: ["output", "input"]
-            }
+              usage: ["output", "input"],
+            },
           },
-          usage: ["input", "output"]
-        }
+          usage: ["input", "output"],
+        },
       } as any);
     });
 
@@ -828,11 +826,11 @@ describe("#transformSchemas", () => {
               type: "string",
               description: "Description for name",
               required: true,
-              usage: ["output", "input"]
-            }
+              usage: ["output", "input"],
+            },
           },
-          usage: ["input", "output"]
-        }
+          usage: ["input", "output"],
+        },
       } as any);
     });
 
@@ -864,13 +862,13 @@ describe("#transformSchemas", () => {
                 type: "string",
                 description: "Description for name",
                 required: true,
-                usage: ["output", "input"]
-              }
+                usage: ["output", "input"],
+              },
             },
-            usage: ["input", "output"]
+            usage: ["input", "output"],
           },
-          { name: "null", type: "null" }
-        ]
+          { name: "null", type: "null" },
+        ],
       } as any);
     });
   });

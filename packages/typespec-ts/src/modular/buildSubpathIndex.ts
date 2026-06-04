@@ -1,13 +1,10 @@
-import {
-  SdkClientType,
-  SdkServiceOperation
-} from "@azure-tools/typespec-client-generator-core";
+import { SdkClientType, SdkServiceOperation } from "@azure-tools/typespec-client-generator-core";
 import { ModularEmitterOptions } from "./interfaces.js";
 
 import { join } from "path";
-import { getModularClientOptions } from "../utils/clientUtils.js";
-import { useContext } from "../contextManager.js";
 import { Node, SourceFile } from "ts-morph";
+import { useContext } from "../contextManager.js";
+import { getModularClientOptions } from "../utils/clientUtils.js";
 
 export interface buildSubpathIndexFileOptions {
   exportIndex?: boolean;
@@ -19,12 +16,10 @@ export function buildSubpathIndexFile(
   emitterOptions: ModularEmitterOptions,
   subpath: string,
   clientMap?: [string[], SdkClientType<SdkServiceOperation>],
-  options: buildSubpathIndexFileOptions = {}
+  options: buildSubpathIndexFileOptions = {},
 ) {
   const project = useContext("outputProject");
-  const subfolder = clientMap
-    ? (getModularClientOptions(clientMap).subfolder ?? "")
-    : "";
+  const subfolder = clientMap ? (getModularClientOptions(clientMap).subfolder ?? "") : "";
   const srcPath = emitterOptions.modularOptions.sourceRoot;
   // Skip to export these files because they are used internally.
   const skipFiles = ["pagingHelpers.ts", "pollingHelpers.ts"];
@@ -34,13 +29,9 @@ export function buildSubpathIndexFile(
       .getDirectories()
       .filter((dir) => {
         const formattedDir = dir.getPath().replace(/\\/g, "/");
-        const targetPath = join(srcPath, subfolder, subpath).replace(
-          /\\/g,
-          "/"
-        );
+        const targetPath = join(srcPath, subfolder, subpath).replace(/\\/g, "/");
         return (
-          formattedDir.startsWith(targetPath) &&
-          !project.getSourceFile(`${formattedDir}/index.ts`)
+          formattedDir.startsWith(targetPath) && !project.getSourceFile(`${formattedDir}/index.ts`)
         );
       })
       .map((dir) => {
@@ -50,21 +41,16 @@ export function buildSubpathIndexFile(
     folders = [join(srcPath, subfolder, subpath).replace(/\\/g, "/")];
   }
   for (const folder of folders) {
-    const apiFilePattern =
-      subpath === "models" ? join(folder, "models.ts") : folder;
+    const apiFilePattern = subpath === "models" ? join(folder, "models.ts") : folder;
     const apiFiles = project.getSourceFiles().filter((file) => {
       if (subpath === "api" && options.recursive) {
-        return (
-          file.getDirectoryPath().replace(/\\/g, "/") ===
-          apiFilePattern.replace(/\\/g, "/")
-        );
+        return file.getDirectoryPath().replace(/\\/g, "/") === apiFilePattern.replace(/\\/g, "/");
       }
       return file
         .getFilePath()
         .replace(/\\/g, "/")
         .startsWith(
-          apiFilePattern.replace(/\\/g, "/") +
-            (apiFilePattern.endsWith("models.ts") ? "" : "/")
+          apiFilePattern.replace(/\\/g, "/") + (apiFilePattern.endsWith("models.ts") ? "" : "/"),
         );
     });
     if (apiFiles.length === 0) {
@@ -73,8 +59,7 @@ export function buildSubpathIndexFile(
     const indexFile = project.createSourceFile(`${folder}/index.ts`);
     for (const file of apiFiles) {
       const filePath = file.getFilePath();
-      const serializerOrDeserializerRegex =
-        /.*(Serializer|Deserializer)(_\d+)?$/;
+      const serializerOrDeserializerRegex = /.*(Serializer|Deserializer)(_\d+)?$/;
       if (!options.exportIndex && filePath.endsWith("index.ts")) {
         continue;
       }
@@ -86,37 +71,33 @@ export function buildSubpathIndexFile(
         continue;
       }
 
-      let filteredDeclarations = [
-        ...file.getExportedDeclarations().entries()
-      ].filter((exDeclaration) => {
-        if (exDeclaration[0].startsWith("_")) {
-          return false;
-        }
-        return exDeclaration[1].some((ex) => {
-          if (
-            options.interfaceOnly &&
-            ex.getKindName() !== "InterfaceDeclaration"
-          ) {
+      let filteredDeclarations = [...file.getExportedDeclarations().entries()].filter(
+        (exDeclaration) => {
+          if (exDeclaration[0].startsWith("_")) {
             return false;
           }
+          return exDeclaration[1].some((ex) => {
+            if (options.interfaceOnly && ex.getKindName() !== "InterfaceDeclaration") {
+              return false;
+            }
 
-          // skip exporting serializers for models
-          if (
-            subpath === "models" &&
-            ex.getKindName() === "FunctionDeclaration" &&
-            serializerOrDeserializerRegex.test(exDeclaration[0])
-          ) {
-            return false;
-          }
+            // skip exporting serializers for models
+            if (
+              subpath === "models" &&
+              ex.getKindName() === "FunctionDeclaration" &&
+              serializerOrDeserializerRegex.test(exDeclaration[0])
+            ) {
+              return false;
+            }
 
-          return true;
-        });
-      });
+            return true;
+          });
+        },
+      );
       // Skip to export PagedResult and BuildPagedAsyncIteratorOptions
       if (filePath.endsWith("pagingTypes.ts")) {
         filteredDeclarations = filteredDeclarations.filter(
-          ([name]) =>
-            !["PagedResult", "BuildPagedAsyncIteratorOptions"].includes(name)
+          ([name]) => !["PagedResult", "BuildPagedAsyncIteratorOptions"].includes(name),
         );
       }
       if (filteredDeclarations.length > 0) {
@@ -124,11 +105,7 @@ export function buildSubpathIndexFile(
           .replace(indexFile.getDirectoryPath(), "")
           .replace(/\\/g, "/")
           .replace(".ts", "")}.js`;
-        partitionAndEmitExports(
-          indexFile,
-          moduleSpecifier,
-          filteredDeclarations
-        );
+        partitionAndEmitExports(indexFile, moduleSpecifier, filteredDeclarations);
       }
     }
   }
@@ -147,7 +124,7 @@ export function partitionAndEmitExports(
   indexFile: SourceFile,
   moduleSpecifier: string,
   entries: [string, Node[]][],
-  mapName: (name: string) => string = (n) => n
+  mapName: (name: string) => string = (n) => n,
 ): void {
   const typeOnlyExports: string[] = [];
   const valueExports: string[] = [];
@@ -163,13 +140,13 @@ export function partitionAndEmitExports(
     indexFile.addExportDeclaration({
       isTypeOnly: true,
       moduleSpecifier,
-      namedExports: typeOnlyExports
+      namedExports: typeOnlyExports,
     });
   }
   if (valueExports.length > 0) {
     indexFile.addExportDeclaration({
       moduleSpecifier,
-      namedExports: valueExports
+      namedExports: valueExports,
     });
   }
 }

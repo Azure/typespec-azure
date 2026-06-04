@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { EnumConflictClient } from "./generated/client/naming-enum-conflict/src/index.js";
 
@@ -10,15 +10,15 @@ describe("ClientNamingEnumConflict Modular Client", () => {
       endpoint: "http://localhost:3002",
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
-      }
+        maxRetries: 0,
+      },
     });
   });
 
   it("should work with first operation", async () => {
     const result = await client.firstOperations.first({
       status: "active",
-      name: "test"
+      name: "test",
     });
     assert.strictEqual(result.status, "active");
     assert.strictEqual(result.name, "test");
@@ -27,7 +27,7 @@ describe("ClientNamingEnumConflict Modular Client", () => {
   it("should work with second operation", async () => {
     const result = await client.secondOperations.second({
       status: "running",
-      description: "test description"
+      description: "test description",
     });
     assert.strictEqual(result.status, "running");
     assert.strictEqual(result.description, "test description");

@@ -6,8 +6,8 @@ This is tsp definition.
 
 ```tsp
 model Foo {
-    @encode("string")
-    prop1: int32;
+  @encode("string")
+  prop1: int32;
 }
 op post(@body body: Foo): void;
 ```

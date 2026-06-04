@@ -18,21 +18,21 @@ export enum KnownMediaType {
   Binary = "binary",
   MultipartFormData = "multipart/form-data",
   Text = "text",
-  Unknown = "unknown"
+  Unknown = "unknown",
 }
 
 export function parseMediaType(mediaType: string) {
   if (mediaType) {
     const parsed =
       /(application|audio|font|example|image|message|model|multipart|text|video|x-(?:[0-9A-Za-z!#$%&'*+.^_`|~-]+))\/([0-9A-Za-z!#$%&'*.^_`|~-]+)\s*(?:\+([0-9A-Za-z!#$%&'*.^_`|~-]+))?\s*(?:;.\s*(\S*))?/g.exec(
-        mediaType
+        mediaType,
       );
     if (parsed) {
       return {
         type: parsed[1],
         subtype: parsed[2],
         suffix: parsed[3],
-        parameter: parsed[4]
+        parameter: parsed[4],
       };
     }
   }
@@ -85,9 +85,7 @@ export function normalizeMediaType(contentType: string) {
   if (contentType) {
     const mt = parseMediaType(contentType);
     if (mt) {
-      return mt.suffix
-        ? `${mt.type}/${mt.subtype}+${mt.suffix}`
-        : `${mt.type}/${mt.subtype}`;
+      return mt.suffix ? `${mt.type}/${mt.subtype}+${mt.suffix}` : `${mt.type}/${mt.subtype}`;
     }
   }
   return undefined;
@@ -96,45 +94,31 @@ export function normalizeMediaType(contentType: string) {
 export function isMediaTypeJson(mediaType: string): boolean {
   const mt = parseMediaType(mediaType);
   return mt
-    ? (mt.subtype === json || mt.suffix === json) &&
-        (mt.type === application || mt.type === text)
+    ? (mt.subtype === json || mt.suffix === json) && (mt.type === application || mt.type === text)
     : false;
 }
 
-export function isMediaTypeJsonMergePatch(
-  mediaType: string | string[]
-): boolean {
+export function isMediaTypeJsonMergePatch(mediaType: string | string[]): boolean {
   if (Array.isArray(mediaType)) {
     return Boolean(
-      mediaType.length === 1 &&
-      mediaType[0] &&
-      isMediaTypeJsonMergePatch(mediaType[0])
+      mediaType.length === 1 && mediaType[0] && isMediaTypeJsonMergePatch(mediaType[0]),
     );
   }
   const mt = parseMediaType(mediaType);
-  return mt
-    ? mt.type === application &&
-        mt.subtype === "merge-patch" &&
-        mt.suffix === json
-    : false;
+  return mt ? mt.type === application && mt.subtype === "merge-patch" && mt.suffix === json : false;
 }
 
 export function isMediaTypeXml(mediaType: string): boolean {
   const mt = parseMediaType(mediaType);
   return mt
-    ? (mt.subtype === xml || mt.suffix === xml) &&
-        (mt.type === application || mt.type === text)
+    ? (mt.subtype === xml || mt.suffix === xml) && (mt.type === application || mt.type === text)
     : false;
 }
 
-export function isMediaTypeMultipartFormData(
-  mediaType: string | string[]
-): boolean {
+export function isMediaTypeMultipartFormData(mediaType: string | string[]): boolean {
   if (Array.isArray(mediaType)) {
     return Boolean(
-      mediaType.length === 1 &&
-      mediaType[0] &&
-      isMediaTypeMultipartFormData(mediaType[0])
+      mediaType.length === 1 && mediaType[0] && isMediaTypeMultipartFormData(mediaType[0]),
     );
   }
 
@@ -154,16 +138,11 @@ export function isMediaTypeMultipart(mediaType: string | string[]): boolean {
   return mt ? mt.type === multipart : false;
 }
 
-export function hasMediaType(
-  target: KnownMediaType,
-  sourceTypes: KnownMediaType[] = []
-) {
+export function hasMediaType(target: KnownMediaType, sourceTypes: KnownMediaType[] = []) {
   return sourceTypes.some((type) => type === target);
 }
 
-export function extractMediaTypes(
-  mediaTypes: string[] | string
-): KnownMediaType[] {
+export function extractMediaTypes(mediaTypes: string[] | string): KnownMediaType[] {
   if (typeof mediaTypes === "string") {
     mediaTypes = [mediaTypes];
   }

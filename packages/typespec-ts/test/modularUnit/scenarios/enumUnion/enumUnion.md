@@ -6,23 +6,21 @@
 import "@typespec/http";
 import "@typespec/rest";
 
-@service(#{
-    title: "Widget Service",
-})
+@service(#{ title: "Widget Service" })
 namespace DemoService;
 
 using TypeSpec.Http;
 using TypeSpec.Rest;
 union SchemaContentTypeValues {
-    avro: "application/json; serialization=Avro",
-    json: "application/json; serialization=json",
-    custom: "text/plain; charset=utf-8",
-    protobuf: "text/vnd.ms.protobuf",
+  avro: "application/json; serialization=Avro",
+  json: "application/json; serialization=json",
+  custom: "text/plain; charset=utf-8",
+  protobuf: "text/vnd.ms.protobuf",
 }
 
 op get(
-    @header("Content-Type") contentType: SchemaContentTypeValues,
-    @body body: string,
+  @header("Content-Type") contentType: SchemaContentTypeValues,
+  @body body: string,
 ): NoContentResponse;
 ```
 
@@ -71,13 +69,11 @@ export function _getSend(
   body: string,
   options: GetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: contentType,
-      body: body,
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: contentType,
+    body: body,
+  });
 }
 
 export async function _getDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -108,24 +104,22 @@ export async function get(
 import "@typespec/http";
 import "@typespec/rest";
 
-@service(#{
-    title: "Widget Service",
-})
+@service(#{ title: "Widget Service" })
 namespace DemoService;
 
 using TypeSpec.Http;
 using TypeSpec.Rest;
 union SchemaContentTypeValues {
-    avro: "application/json; serialization=Avro",
-    json: "application/json; serialization=json",
-    custom: "text/plain; charset=utf-8",
-    protobuf: "text/vnd.ms.protobuf",
+  avro: "application/json; serialization=Avro",
+  json: "application/json; serialization=json",
+  custom: "text/plain; charset=utf-8",
+  protobuf: "text/vnd.ms.protobuf",
 }
 
-op get(
-    @header("test-header") testHeader: SchemaContentTypeValues,
-    @body body: string,
-): { @header("test-header") testHeader: SchemaContentTypeValues; @statusCode _: 204; };
+op get(@header("test-header") testHeader: SchemaContentTypeValues, @body body: string): {
+  @header("test-header") testHeader: SchemaContentTypeValues;
+  @statusCode _: 204;
+};
 ```
 
 The config would be like:
@@ -160,9 +154,7 @@ export type SchemaContentTypeValues =
 import "@typespec/http";
 import "@typespec/rest";
 
-@service(#{
-    title: "Widget Service",
-})
+@service(#{ title: "Widget Service" })
 namespace DemoService;
 
 using TypeSpec.Http;
@@ -204,12 +196,10 @@ export type SchemaContentTypeValues = "text/plain; charset=utf-8" | "text/vnd.ms
 ## TypeSpec
 
 ```tsp
- import "@typespec/http";
+import "@typespec/http";
 import "@typespec/rest";
 
-@service(#{
-    title: "Widget Service",
-})
+@service(#{ title: "Widget Service" })
 namespace DemoService;
 
 using TypeSpec.Http;
@@ -273,28 +263,26 @@ export type JsonContentType =
 import "@typespec/http";
 import "@typespec/rest";
 
-@service(#{
-    title: "Widget Service",
-})
+@service(#{ title: "Widget Service" })
 namespace DemoService;
 
 using TypeSpec.Http;
 using TypeSpec.Rest;
 enum JsonContentType {
-    avro: "application/json; serialization=Avro",
-    json: "application/json; serialization=json",
+  avro: "application/json; serialization=Avro",
+  json: "application/json; serialization=json",
 }
 
 union SchemaContentTypeValues {
-    JsonContentType,
-    custom: "text/plain; charset=utf-8",
-    protobuf: "text/vnd.ms.protobuf",
-    others: string,
+  JsonContentType,
+  custom: "text/plain; charset=utf-8",
+  protobuf: "text/vnd.ms.protobuf",
+  others: string,
 }
 
 op get(
-    @header("test-header") testHeader: SchemaContentTypeValues,
-    @body body: string,
+  @header("test-header") testHeader: SchemaContentTypeValues,
+  @body body: string,
 ): NoContentResponse;
 ```
 
@@ -339,22 +327,20 @@ export type JsonContentType =
 import "@typespec/http";
 import "@typespec/rest";
 
-@service(#{
-    title: "Widget Service",
-})
+@service(#{ title: "Widget Service" })
 namespace DemoService;
 
 using TypeSpec.Http;
 using TypeSpec.Rest;
 union SchemaContentTypeValues {
-    custom: "text/plain; charset=utf-8",
-    protobuf: "text/vnd.ms.protobuf",
-    others: string,
+  custom: "text/plain; charset=utf-8",
+  protobuf: "text/vnd.ms.protobuf",
+  others: string,
 }
 
 op get(
-    @header("test-header") testHeader: SchemaContentTypeValues,
-    @body body: string,
+  @header("test-header") testHeader: SchemaContentTypeValues,
+  @body body: string,
 ): NoContentResponse;
 ```
 
@@ -386,28 +372,26 @@ export type SchemaContentTypeValues = "text/plain; charset=utf-8" | "text/vnd.ms
 import "@typespec/http";
 import "@typespec/rest";
 
-@service(#{
-    title: "Widget Service",
-})
+@service(#{ title: "Widget Service" })
 namespace DemoService;
 
 using TypeSpec.Http;
 using TypeSpec.Rest;
 union JsonContentType {
-    avro: "application/json; serialization=Avro",
-    json: "application/json; serialization=json",
+  avro: "application/json; serialization=Avro",
+  json: "application/json; serialization=json",
 }
 
 union SchemaContentTypeValues {
-    JsonContentType,
-    custom: "text/plain; charset=utf-8",
-    protobuf: "text/vnd.ms.protobuf",
-    others: string,
+  JsonContentType,
+  custom: "text/plain; charset=utf-8",
+  protobuf: "text/vnd.ms.protobuf",
+  others: string,
 }
 
 op get(
-    @header("test-header") testHeader: SchemaContentTypeValues,
-    @body body: string,
+  @header("test-header") testHeader: SchemaContentTypeValues,
+  @body body: string,
 ): NoContentResponse;
 ```
 
@@ -452,28 +436,26 @@ export type JsonContentType =
 import "@typespec/http";
 import "@typespec/rest";
 
-@service(#{
-    title: "Widget Service",
-})
+@service(#{ title: "Widget Service" })
 namespace DemoService;
 
 using TypeSpec.Http;
 using TypeSpec.Rest;
 enum JsonContentType {
-    avro: "application/json; serialization=Avro",
-    json: "application/json; serialization=json",
+  avro: "application/json; serialization=Avro",
+  json: "application/json; serialization=json",
 }
 
 union SchemaContentTypeValues {
-    JsonContentType,
-    custom: "text/plain; charset=utf-8",
-    protobuf: "text/vnd.ms.protobuf",
-    others: string,
+  JsonContentType,
+  custom: "text/plain; charset=utf-8",
+  protobuf: "text/vnd.ms.protobuf",
+  others: string,
 }
 
 op get(
-    @header("test-header") testHeader: SchemaContentTypeValues,
-    @body body: string,
+  @header("test-header") testHeader: SchemaContentTypeValues,
+  @body body: string,
 ): NoContentResponse;
 ```
 
@@ -518,17 +500,15 @@ export type JsonContentType =
 import "@typespec/http";
 import "@typespec/rest";
 
-@service(#{
-    title: "Widget Service",
-})
+@service(#{ title: "Widget Service" })
 namespace DemoService;
 
 using TypeSpec.Http;
 using TypeSpec.Rest;
-op get(
-    @header("test-header") testHeader: "A" | "B",
-    @body body: string,
-): { @header("test-header") testHeader: "A" | "B"; @statusCode _: 204; };
+op get(@header("test-header") testHeader: "A" | "B", @body body: string): {
+  @header("test-header") testHeader: "A" | "B";
+  @statusCode _: 204;
+};
 ```
 
 The config would be like:
@@ -565,14 +545,12 @@ export function _getSend(
   body: string,
   options: GetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "text/plain",
-      headers: { "test-header": testHeader, ...options.requestOptions?.headers },
-      body: body,
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "text/plain",
+    headers: { "test-header": testHeader, ...options.requestOptions?.headers },
+    body: body,
+  });
 }
 
 export async function _getDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -603,17 +581,15 @@ export async function get(
 import "@typespec/http";
 import "@typespec/rest";
 
-@service(#{
-    title: "Widget Service",
-})
+@service(#{ title: "Widget Service" })
 namespace DemoService;
 
 using TypeSpec.Http;
 using TypeSpec.Rest;
-op get(
-    @header("test-header") testHeader: "A" | "B" | string,
-    @body body: string,
-): { @header("test-header") testHeader: "A" | "B" | string; @statusCode _: 204; };
+op get(@header("test-header") testHeader: "A" | "B" | string, @body body: string): {
+  @header("test-header") testHeader: "A" | "B" | string;
+  @statusCode _: 204;
+};
 ```
 
 The config would be like:
@@ -651,14 +627,12 @@ export function _getSend(
   body: string,
   options: GetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "text/plain",
-      headers: { "test-header": testHeader, ...options.requestOptions?.headers },
-      body: body,
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "text/plain",
+    headers: { "test-header": testHeader, ...options.requestOptions?.headers },
+    body: body,
+  });
 }
 
 export async function _getDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -690,9 +664,7 @@ import "@typespec/http";
 import "@typespec/rest";
 import "@azure-tools/typespec-azure-core";
 
-@service(#{
-    title: "Widget Service",
-})
+@service(#{ title: "Widget Service" })
 namespace DemoService;
 
 using TypeSpec.Http;
@@ -700,15 +672,15 @@ using TypeSpec.Rest;
 using Azure.Core;
 
 enum SchemaContentTypeValues {
-    avro: "application/json; serialization=Avro",
-    json: "application/json; serialization=json",
-    custom: "text/plain; charset=utf-8",
-    protobuf: "text/vnd.ms.protobuf",
+  avro: "application/json; serialization=Avro",
+  json: "application/json; serialization=json",
+  custom: "text/plain; charset=utf-8",
+  protobuf: "text/vnd.ms.protobuf",
 }
 
 op get(
-    @header("test-header") testHeader: SchemaContentTypeValues,
-    @body body: string,
+  @header("test-header") testHeader: SchemaContentTypeValues,
+  @body body: string,
 ): NoContentResponse;
 ```
 
@@ -745,9 +717,7 @@ import "@typespec/http";
 import "@typespec/rest";
 import "@azure-tools/typespec-azure-core";
 
-@service(#{
-    title: "Widget Service",
-})
+@service(#{ title: "Widget Service" })
 namespace DemoService;
 
 using TypeSpec.Http;
@@ -755,15 +725,15 @@ using TypeSpec.Rest;
 using Azure.Core;
 
 enum SchemaContentTypeValues {
-    avro: "application/json; serialization=Avro",
-    json: "application/json; serialization=json",
-    custom: "text/plain; charset=utf-8",
-    protobuf: "text/vnd.ms.protobuf",
+  avro: "application/json; serialization=Avro",
+  json: "application/json; serialization=json",
+  custom: "text/plain; charset=utf-8",
+  protobuf: "text/vnd.ms.protobuf",
 }
 
 op get(
-    @header("test-header") testHeader: SchemaContentTypeValues,
-    @body body: string,
+  @header("test-header") testHeader: SchemaContentTypeValues,
+  @body body: string,
 ): NoContentResponse;
 ```
 
@@ -800,27 +770,22 @@ import "@typespec/http";
 import "@typespec/rest";
 import "@azure-tools/typespec-azure-core";
 
-@service(#{
-  title: "Widget Service",
-})
+@service(#{ title: "Widget Service" })
 namespace DemoService;
 
 using TypeSpec.Http;
 using TypeSpec.Rest;
 using Azure.Core;
 
-union EnumTest  {
+union EnumTest {
   one: 1,
   two: 2,
   three: 3,
   four: 4,
-  others: int32
+  others: int32,
 }
 
-op get(
-  @header("test-header") testHeader: EnumTest,
-  @body body: string,
-): NoContentResponse;
+op get(@header("test-header") testHeader: EnumTest, @body body: string): NoContentResponse;
 ```
 
 The config would be like:
@@ -852,16 +817,14 @@ import "@typespec/http";
 import "@typespec/rest";
 import "@azure-tools/typespec-azure-core";
 
-@service(#{
-  title: "Widget Service",
-})
+@service(#{ title: "Widget Service" })
 namespace DemoService;
 
 using TypeSpec.Http;
 using TypeSpec.Rest;
 using Azure.Core;
 
-enum EnumTest  {
+enum EnumTest {
   one: 1,
   two: 2,
   three: 3,
@@ -873,13 +836,10 @@ model Foo {}
 union MixedTypes {
   EnumTest,
   string,
-  Foo
+  Foo,
 }
 
-op get(
-  @header("test-header") testHeader: MixedTypes,
-  @body body: string,
-): NoContentResponse;
+op get(@header("test-header") testHeader: MixedTypes, @body body: string): NoContentResponse;
 ```
 
 The config would be like:
@@ -925,7 +885,7 @@ export type EnumTest = 1 | 2 | 3 | 4;
 
 ```tsp
 model Test {
-    color: "red" | "blue";
+  color: "red" | "blue";
 }
 op read(@body body: Test): void;
 ```
@@ -959,11 +919,11 @@ export function testSerializer(item: Test): any {
 
 ```tsp
 enum Color {
-    Red: "red",
-    Blue: "blue"
+  Red: "red",
+  Blue: "blue",
 }
 model Test {
-    color: Color.Red;
+  color: Color.Red;
 }
 op read(@body body: Test): void;
 ```
@@ -996,7 +956,7 @@ export type Color = "red" | "blue";
 
 ```tsp
 model Test {
-    content: "red" | null;
+  content: "red" | null;
 }
 op read(@body body: Test): void;
 ```
@@ -1030,7 +990,7 @@ export function testSerializer(item: Test): any {
 
 ```tsp
 model Test {
-    content: string | null;
+  content: string | null;
 }
 op read(@body body: Test): void;
 ```
@@ -1064,7 +1024,7 @@ export function testSerializer(item: Test): any {
 
 ```tsp
 model Test {
-    color: 1 | 2;
+  color: 1 | 2;
 }
 op read(@body body: Test): void;
 ```
@@ -1098,11 +1058,11 @@ export function testSerializer(item: Test): any {
 
 ```tsp
 enum Color {
-    Color1: 1,
-    Color2: 2
+  Color1: 1,
+  Color2: 2,
 }
 model Test {
-    color: Color.Color1;
+  color: Color.Color1;
 }
 op read(@body body: Test): void;
 ```
@@ -1135,11 +1095,11 @@ export type Color = 1 | 2;
 
 ```tsp
 enum Color {
-    Color1: 1,
-    Color2: 2
+  Color1: 1,
+  Color2: 2,
 }
 model Test {
-    color: Color | null;
+  color: Color | null;
 }
 op read(@body body: Test): void;
 ```
@@ -1165,11 +1125,11 @@ export interface Test {
 
 ```tsp
 enum Color {
-    Color1: 1,
-    Color2: 2
+  Color1: 1,
+  Color2: 2,
 }
 model Test {
-    color: Color | null;
+  color: Color | null;
 }
 op read(@body body: Test): void;
 ```
@@ -1411,7 +1371,7 @@ export type UpAndDown = "up" | "down";
 
 ```tsp
 model Test {
-    content: 1 | null;
+  content: 1 | null;
 }
 op read(@body body: Test): void;
 ```
@@ -1445,7 +1405,7 @@ export function testSerializer(item: Test): any {
 
 ```tsp
 model Test {
-    content: int32 | null;
+  content: int32 | null;
 }
 op read(@body body: Test): void;
 ```

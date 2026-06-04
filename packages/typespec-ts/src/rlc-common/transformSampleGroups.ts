@@ -1,20 +1,20 @@
-import { generateParameterTypeValue } from "./helpers/valueGenerationUtil.js";
 import { getClientName } from "./helpers/nameConstructors.js";
-import { normalizeName, NameType, camelCase } from "./helpers/nameUtils.js";
-import { buildSchemaObjectMap } from "./helpers/schemaHelpers.js";
-import {
-  RLCModel,
-  RLCSampleGroup,
-  Paths,
-  OperationMethod,
-  RLCSampleDetail,
-  SampleParameters,
-  SampleParameter,
-  Schema,
-  PathMetadata,
-  OperationParameter
-} from "./interfaces.js";
+import { NameType, camelCase, normalizeName } from "./helpers/nameUtils.js";
 import { isAzurePackage } from "./helpers/packageUtil.js";
+import { buildSchemaObjectMap } from "./helpers/schemaHelpers.js";
+import { generateParameterTypeValue } from "./helpers/valueGenerationUtil.js";
+import {
+  OperationMethod,
+  OperationParameter,
+  PathMetadata,
+  Paths,
+  RLCModel,
+  RLCSampleDetail,
+  RLCSampleGroup,
+  SampleParameter,
+  SampleParameters,
+  Schema,
+} from "./interfaces.js";
 
 /**
  * Transform the sample data based RLC detail e.g path, operations & schemas
@@ -28,10 +28,7 @@ export function transformSampleGroups(model: RLCModel, allowMockValue = true) {
     // Not support to generate if modular libraries
     return;
   }
-  if (
-    (model.sampleGroups && model.sampleGroups.length > 0) ||
-    !allowMockValue
-  ) {
+  if ((model.sampleGroups && model.sampleGroups.length > 0) || !allowMockValue) {
     // Skip to transform if already has sample data
     // Skip to transform if not allow to mock value
     return;
@@ -45,7 +42,7 @@ export function transformSampleGroups(model: RLCModel, allowMockValue = true) {
     : `${clientName}Client`;
   const defaultFactoryName = normalizeName(
     camelCase(`create ${clientInterfaceName}`),
-    NameType.Method
+    NameType.Method,
   );
   const packageName = model.options?.packageDetails?.name ?? "";
   const methodParameterMap = buildMethodParamMap(model);
@@ -69,17 +66,17 @@ export function transformSampleGroups(model: RLCModel, allowMockValue = true) {
       const operatonConcante = getOperationConcate(
         detail.operationName,
         pathDetails.operationGroupName,
-        model.options?.sourceFrom
+        model.options?.sourceFrom,
       );
       const operationPrefix = normalizeName(
         camelCase(transformSpecialLetterToSpace(operatonConcante)),
-        NameType.Operation
+        NameType.Operation,
       );
       const sampleGroup: RLCSampleGroup = {
         filename: `${operationPrefix}Sample`,
         defaultFactoryName,
         clientPackageName: packageName,
-        samples: []
+        samples: [],
       };
 
       // initialize the sample
@@ -97,21 +94,17 @@ export function transformSampleGroups(model: RLCModel, allowMockValue = true) {
         method,
         isLRO: detail.operationHelperDetail?.lroDetails?.isLongRunning ?? false,
         isPaging: detail.operationHelperDetail?.isPaging ?? false,
-        useLegacyLro: false
+        useLegacyLro: false,
       };
       // client-level, path-level and method-level parameter preparation
       const parameters: SampleParameters = {
-        client: convertClientLevelParameters(
-          model,
-          importedDict,
-          schemaObjectMap
-        ),
+        client: convertClientLevelParameters(model, importedDict, schemaObjectMap),
         path: convertPathLevelParameters(pathDetails, path, schemaObjectMap),
         method: convertMethodLevelParameters(
           methodArray,
           schemaObjectMap,
-          methodParameterMap.get(operatonConcante)
-        )
+          methodParameterMap.get(operatonConcante),
+        ),
       };
       // enrich parameter details
       enrichParameterInSample(sample, parameters);
@@ -119,12 +112,7 @@ export function transformSampleGroups(model: RLCModel, allowMockValue = true) {
       enrichLROAndPagingInSample(detail, importedDict, packageName);
       sampleGroup.samples.push(sample);
       rlcSampleGroups.push(sampleGroup);
-      enrichImportedString(
-        sampleGroup,
-        importedDict,
-        defaultFactoryName,
-        packageName
-      );
+      enrichImportedString(sampleGroup, importedDict, defaultFactoryName, packageName);
     }
   }
   return rlcSampleGroups;
@@ -133,10 +121,9 @@ export function transformSampleGroups(model: RLCModel, allowMockValue = true) {
 function enrichLROAndPagingInSample(
   operation: OperationMethod,
   importedDict: Record<string, Set<string>>,
-  packageName: string
+  packageName: string,
 ) {
-  const isLRO =
-      operation.operationHelperDetail?.lroDetails?.isLongRunning ?? false,
+  const isLRO = operation.operationHelperDetail?.lroDetails?.isLongRunning ?? false,
     isPaging = operation.operationHelperDetail?.isPaging ?? false;
   if (isPaging) {
     if (isLRO) {
@@ -163,7 +150,7 @@ function enrichImportedString(
   sampleGroup: RLCSampleGroup,
   importedDict: Record<string, Set<string>>,
   defaultFactoryName: string,
-  packageName: string
+  packageName: string,
 ) {
   const importedTypes: string[] = [];
   if (!importedDict[packageName] || importedDict[packageName].size === 0) {
@@ -175,26 +162,19 @@ function enrichImportedString(
       continue;
     }
     const values = Array.from(importedSet).join(", ");
-    const hasDefaultFactory =
-      key === packageName ? `${defaultFactoryName},` : "";
-    importedTypes.push(
-      `import ${hasDefaultFactory} { ${values} } from "${key}";`
-    );
+    const hasDefaultFactory = key === packageName ? `${defaultFactoryName},` : "";
+    importedTypes.push(`import ${hasDefaultFactory} { ${values} } from "${key}";`);
   }
   sampleGroup.importedTypes = importedTypes;
 }
 
-function enrichParameterInSample(
-  sample: RLCSampleDetail,
-  parameters: SampleParameters
-) {
+function enrichParameterInSample(sample: RLCSampleDetail, parameters: SampleParameters) {
   sample.clientParamAssignments = getAssignmentStrArray(parameters.client);
   sample.clientParamNames = getContactParameterNames(parameters.client);
   sample.pathParamAssignments = getAssignmentStrArray(parameters.path);
   sample.pathParamNames = getContactParameterNames(parameters.path);
   // Directly apply the inline option value as method parameter
-  sample.methodParamNames =
-    parameters.method.length > 0 ? (parameters.method[0]?.value ?? "") : "";
+  sample.methodParamNames = parameters.method.length > 0 ? (parameters.method[0]?.value ?? "") : "";
 }
 
 function getAssignmentStrArray(parameters: SampleParameter[]) {
@@ -211,7 +191,7 @@ function getContactParameterNames(parameters: SampleParameter[]) {
 function convertClientLevelParameters(
   model: RLCModel,
   importedDict: Record<string, Set<string>>,
-  schemaMap: Map<string, Schema>
+  schemaMap: Map<string, Schema>,
 ): SampleParameter[] {
   if (!model.options) {
     return [];
@@ -219,35 +199,27 @@ function convertClientLevelParameters(
   const clientParams: SampleParameter[] = [];
   const urlParameters = model?.urlInfo?.urlParameters?.filter(
     // Do not include parameters with constant values in the signature, these should go in the options bag
-    (p) => p.value === undefined
+    (p) => p.value === undefined,
   );
   const {
     addCredentials,
     credentialScopes,
     credentialKeyHeaderName,
     customHttpAuthHeaderName,
-    flavor
+    flavor,
   } = model.options;
   const hasUrlParameter = !!urlParameters,
     hasCredentials =
-      addCredentials &&
-      (credentialScopes || credentialKeyHeaderName || customHttpAuthHeaderName);
+      addCredentials && (credentialScopes || credentialKeyHeaderName || customHttpAuthHeaderName);
 
   if (hasUrlParameter) {
     // convert the host parameters in url
     const clientParamAssignments = urlParameters.map((urlParameter) => {
-      const urlValue = generateParameterTypeValue(
-        urlParameter.type,
-        urlParameter.name,
-        schemaMap
-      );
-      const normalizedName = normalizeName(
-        urlParameter.name,
-        NameType.Parameter
-      );
+      const urlValue = generateParameterTypeValue(urlParameter.type, urlParameter.name, schemaMap);
+      const normalizedName = normalizeName(urlParameter.name, NameType.Parameter);
       return {
         name: normalizedName,
-        assignment: `const ${normalizedName} = ` + urlValue + `;`
+        assignment: `const ${normalizedName} = ` + urlValue + `;`,
       };
     });
 
@@ -264,35 +236,24 @@ function convertClientLevelParameters(
     if (credentialKeyHeaderName && isAzurePackage(model)) {
       clientParams.push({
         name: "credential",
-        assignment: `const credential = new AzureKeyCredential("{Your API key}");`
+        assignment: `const credential = new AzureKeyCredential("{Your API key}");`,
       });
-      addValueInImportedDict(
-        apiKeyCredentialPackage,
-        "AzureKeyCredential",
-        importedDict
-      );
-    } else if (
-      (credentialKeyHeaderName && flavor !== "azure") ||
-      customHttpAuthHeaderName
-    ) {
+      addValueInImportedDict(apiKeyCredentialPackage, "AzureKeyCredential", importedDict);
+    } else if ((credentialKeyHeaderName && flavor !== "azure") || customHttpAuthHeaderName) {
       clientParams.push({
         name: "credential",
-        assignment: `const credential = { key: "{Your API key}"};`
+        assignment: `const credential = { key: "{Your API key}"};`,
       });
     } else if (isAzurePackage(model)) {
       clientParams.push({
         name: "credential",
-        assignment: "const credential = new DefaultAzureCredential();"
+        assignment: "const credential = new DefaultAzureCredential();",
       });
-      addValueInImportedDict(
-        tokenCredentialPackage,
-        "DefaultAzureCredential",
-        importedDict
-      );
+      addValueInImportedDict(tokenCredentialPackage, "DefaultAzureCredential", importedDict);
     } else {
       clientParams.push({
         name: "credential",
-        assignment: `const credential = {getToken: () => Promise.resolve({ token: "{Your token}", expiresOnTimestamp: 0 })};`
+        assignment: `const credential = {getToken: () => Promise.resolve({ token: "{Your token}", expiresOnTimestamp: 0 })};`,
       });
     }
   }
@@ -302,14 +263,14 @@ function convertClientLevelParameters(
 function convertPathLevelParameters(
   pathDetail: PathMetadata,
   path: string,
-  schemaMap: Map<string, Schema>
+  schemaMap: Map<string, Schema>,
 ): SampleParameter[] {
   const pathItself = {
-    name: `"${path}"`
+    name: `"${path}"`,
   };
   const pathParams = (pathDetail || []).pathParameters.map((p) => {
     const pathParam: SampleParameter = {
-      name: normalizeName(p.name, NameType.Parameter)
+      name: normalizeName(p.name, NameType.Parameter),
     };
     const value = generateParameterTypeValue(p.type, p.name, schemaMap);
     pathParam.assignment = `const ${pathParam.name} =` + value + `;`;
@@ -321,7 +282,7 @@ function convertPathLevelParameters(
 function convertMethodLevelParameters(
   methods: OperationMethod[],
   schemaMap: Map<string, Schema>,
-  operationParameter?: OperationParameter
+  operationParameter?: OperationParameter,
 ): SampleParameter[] {
   if (
     !methods ||
@@ -359,7 +320,7 @@ function convertMethodLevelParameters(
         schemaMap.set(bodyTypeName, body.oriSchema);
       }
       allSideAssignments.push(
-        ` body: ` + generateParameterTypeValue(bodyTypeName, "body", schemaMap)
+        ` body: ` + generateParameterTypeValue(bodyTypeName, "body", schemaMap),
       );
     }
   }
@@ -369,14 +330,12 @@ function convertMethodLevelParameters(
     .forEach((p) => {
       const name = `${p.name}`;
       querySideAssignments.push(
-        `${name}: ` + generateParameterTypeValue(p.param.type, name, schemaMap)
+        `${name}: ` + generateParameterTypeValue(p.param.type, name, schemaMap),
       );
     });
 
   if (querySideAssignments.length > 0) {
-    allSideAssignments.push(
-      ` queryParameters: { ` + querySideAssignments.join(", ") + `}`
-    );
+    allSideAssignments.push(` queryParameters: { ` + querySideAssignments.join(", ") + `}`);
   }
   requestParameter.parameters
     ?.filter((p) => p.type === "header")
@@ -384,13 +343,11 @@ function convertMethodLevelParameters(
     .forEach((p) => {
       const name = `${p.name}`;
       headerSideAssignments.push(
-        `${name}: ` + generateParameterTypeValue(p.param.type, name, schemaMap)
+        `${name}: ` + generateParameterTypeValue(p.param.type, name, schemaMap),
       );
     });
   if (headerSideAssignments.length > 0) {
-    allSideAssignments.push(
-      ` headers: { ` + headerSideAssignments.join(", ") + `}`
-    );
+    allSideAssignments.push(` headers: { ` + headerSideAssignments.join(", ") + `}`);
   }
   const contentType = requestParameter.parameters
     ?.filter((p) => p.type === "header")
@@ -399,11 +356,7 @@ function convertMethodLevelParameters(
   if (firstContentType) {
     allSideAssignments.push(
       ` ${firstContentType.name}: ` +
-        generateParameterTypeValue(
-          firstContentType.param.type,
-          firstContentType.name,
-          schemaMap
-        )
+        generateParameterTypeValue(firstContentType.param.type, firstContentType.name, schemaMap),
     );
   }
   let value: string = `{}`;
@@ -416,7 +369,7 @@ function convertMethodLevelParameters(
   const optionParam: SampleParameter = {
     name: "options",
     assignment: `const options =` + value + `;`,
-    value
+    value,
   };
   return [optionParam];
 }
@@ -424,7 +377,7 @@ function convertMethodLevelParameters(
 function addValueInImportedDict(
   key: string,
   val: string,
-  importedDict: Record<string, Set<string>>
+  importedDict: Record<string, Set<string>>,
 ) {
   if (!importedDict[key]) {
     importedDict[key] = new Set<string>();
@@ -438,18 +391,14 @@ function buildMethodParamMap(model: RLCModel): Map<string, OperationParameter> {
     const operatonConcante = getOperationConcate(
       p.operationName,
       p.operationGroup,
-      model.options?.sourceFrom
+      model.options?.sourceFrom,
     );
     map.set(operatonConcante, p);
   });
   return map;
 }
 
-function getOperationConcate(
-  opName: string,
-  opGroup: string,
-  sourceFrom?: string
-) {
+function getOperationConcate(opName: string, opGroup: string, sourceFrom?: string) {
   return sourceFrom === "Swagger"
     ? opGroup === "" || opGroup === "Client"
       ? opName

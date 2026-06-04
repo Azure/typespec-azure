@@ -1,9 +1,9 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import PageableClientFactory, {
   PageableClient,
   UserOutput,
-  paginate
+  paginate,
 } from "./generated/azure/payload/pageable/src/index.js";
 
 describe("Azure Pageable Client", () => {
@@ -13,8 +13,8 @@ describe("Azure Pageable Client", () => {
     client = PageableClientFactory({
       allowInsecureConnection: true,
       retryOptions: {
-        maxRetries: 0
-      }
+        maxRetries: 0,
+      },
     });
   });
 
@@ -28,7 +28,7 @@ describe("Azure Pageable Client", () => {
     assert.strictEqual(result.body.value[2]?.name, "user7");
     assert.strictEqual(
       result.body.nextLink,
-      "http://localhost:3000/azure/payload/pageable?skipToken=name-user7&maxpagesize=3"
+      "http://localhost:3000/azure/payload/pageable?skipToken=name-user7&maxpagesize=3",
     );
   });
 
@@ -45,13 +45,10 @@ describe("Azure Pageable Client", () => {
       .path("/azure/payload/pageable")
       .get({ queryParameters: { maxpagesize: 3, skipToken: "wrong value" } });
     assert.strictEqual(result.status, "400");
-    assert.strictEqual(
-      (result.body as any).message,
-      "Unsupported skipToken query parameter"
-    );
+    assert.strictEqual((result.body as any).message, "Unsupported skipToken query parameter");
     assert.strictEqual(
       (result.body as any).expected,
-      `Not provided for first page, "name-user7" for second page`
+      `Not provided for first page, "name-user7" for second page`,
     );
     assert.strictEqual((result.body as any).actual, "wrong value");
   });
@@ -72,7 +69,7 @@ describe("Azure Pageable Client", () => {
       { name: "user5" },
       { name: "user6" },
       { name: "user7" },
-      { name: "user8" }
+      { name: "user8" },
     ]);
   });
 });

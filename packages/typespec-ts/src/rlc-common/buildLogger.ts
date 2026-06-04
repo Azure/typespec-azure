@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { RLCModel } from "./interfaces.js";
-import { Project } from "ts-morph";
 import * as path from "path";
+import { Project } from "ts-morph";
+import { RLCModel } from "./interfaces.js";
 
 export function buildLogger(model: RLCModel) {
   if (!model.options) {
@@ -22,22 +22,22 @@ export function buildLogger(model: RLCModel) {
           0,
           srcPath.includes("generated") && !srcPath.includes("src")
             ? srcPath.lastIndexOf("generated") + 10
-            : srcPath.lastIndexOf("src") + 4
+            : srcPath.lastIndexOf("src") + 4,
         )
       : rlcSourceDir!,
-    `logger.ts`
+    `logger.ts`,
   );
   const loggerFile = project.createSourceFile("logger.ts", undefined, {
-    overwrite: true
+    overwrite: true,
   });
   loggerFile.addImportDeclaration({
     namedImports: ["createClientLogger"],
-    moduleSpecifier: `@azure/logger`
+    moduleSpecifier: `@azure/logger`,
   });
   loggerFile.addStatements(
     `export const logger = createClientLogger("${
       packageDetails!.nameWithoutScope ?? packageDetails?.name ?? ""
-    }")`
+    }")`,
   );
   return { path: filePath, content: loggerFile.getFullText() };
 }

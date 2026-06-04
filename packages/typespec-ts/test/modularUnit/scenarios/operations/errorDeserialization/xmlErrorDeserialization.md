@@ -51,12 +51,10 @@ export function _getWidgetSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context
-    .path(path)
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-    });
+  return context.path(path).get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _getWidgetDeserialize(result: PathUncheckedResponse): Promise<Widget> {
@@ -104,14 +102,16 @@ model Document {
 
 @route("/documents/{id}")
 @get
-op getDocument(@path id: string): {
-  @header contentType: "application/json" | "application/xml";
-  @body body: Document;
-} | {
-  @header contentType: "application/json" | "application/xml";
-  @body body: ApiError;
-  @statusCode statusCode: 400 | 404 | 500;
-};
+op getDocument(@path id: string):
+  | {
+      @header contentType: "application/json" | "application/xml";
+      @body body: Document;
+    }
+  | {
+      @header contentType: "application/json" | "application/xml";
+      @body body: ApiError;
+      @statusCode statusCode: 400 | 404 | 500;
+    };
 ```
 
 ## Operations
@@ -149,12 +149,10 @@ export function _getDocumentSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context
-    .path(path)
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "application/json, application/xml", ...options.requestOptions?.headers },
-    });
+  return context.path(path).get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "application/json, application/xml", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _getDocumentDeserialize(result: PathUncheckedResponse): Promise<Document> {
@@ -255,12 +253,10 @@ export function _getItemSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context
-    .path(path)
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-    });
+  return context.path(path).get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _getItemDeserialize(result: PathUncheckedResponse): Promise<Item> {

@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { NotDefinedClient } from "./generated/server/endpoint/not-defined/src/index.js";
 describe("NotDefined Server Endpoint Client", () => {
@@ -7,7 +7,7 @@ describe("NotDefined Server Endpoint Client", () => {
   beforeEach(() => {
     client = new NotDefinedClient("http://localhost:3000", {
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 

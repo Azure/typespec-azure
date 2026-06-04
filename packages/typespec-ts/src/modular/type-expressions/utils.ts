@@ -2,7 +2,7 @@ import { EmitTypeOptions } from "./get-type-expression.js";
 
 export function shouldEmitInline(
   type: { isGeneratedName?: boolean },
-  options: EmitTypeOptions = {}
+  options: EmitTypeOptions = {},
 ): boolean {
   const emitInline = options.emitInline;
 

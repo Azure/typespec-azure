@@ -1,14 +1,14 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import FlattenPropertyClientFactory, {
-  FlattenPropertyClient
+  FlattenPropertyClient,
 } from "./generated/azure/client-generator-core/flatten-property/src/index.js";
 describe("Flatten Property Rest Client", () => {
   let client: FlattenPropertyClient;
 
   beforeEach(() => {
     client = FlattenPropertyClientFactory({
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
@@ -20,9 +20,9 @@ describe("Flatten Property Rest Client", () => {
           name: "foo",
           properties: {
             description: "bar",
-            age: 10
-          }
-        }
+            age: 10,
+          },
+        },
       });
     assert.strictEqual(result.status, "200");
     assert.strictEqual(result.body.name, "test");
@@ -40,10 +40,10 @@ describe("Flatten Property Rest Client", () => {
             summary: "bar",
             properties: {
               description: "test",
-              age: 10
-            }
-          }
-        }
+              age: 10,
+            },
+          },
+        },
       });
     assert.strictEqual(result.status, "200");
     assert.strictEqual(result.body.name, "test");
@@ -57,26 +57,24 @@ describe("Flatten Property Rest Client", () => {
       .path("/azure/client-generator-core/flatten-property/flattenUnknownModel")
       .put({
         body: {
-          name: "foo"
-        }
+          name: "foo",
+        },
       });
     assert.strictEqual(result.status, "200");
     assert.strictEqual(result.body.name, "test");
     assert.deepEqual(result.body.properties, {
       key1: "value1",
-      key2: "value2"
+      key2: "value2",
     });
   });
 
   it("should update and receive model with all readonly flatten properties", async () => {
     const result = await client
-      .path(
-        "/azure/client-generator-core/flatten-property/flattenReadOnlyModel"
-      )
+      .path("/azure/client-generator-core/flatten-property/flattenReadOnlyModel")
       .put({
         body: {
-          name: "foo"
-        }
+          name: "foo",
+        },
       });
     assert.strictEqual(result.status, "200");
     assert.strictEqual(result.body.name, "foo");

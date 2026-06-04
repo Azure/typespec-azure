@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { PreviewVersionClient } from "./generated/azure/versioning/previewVersion/src/index.js";
 
@@ -8,7 +8,7 @@ describe("PreviewVersionClient Client", () => {
   beforeEach(() => {
     client = new PreviewVersionClient({
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
@@ -26,7 +26,7 @@ describe("PreviewVersionClient Client", () => {
     // Test @previewVersion with preview-only operations - only available in preview version
     // This operation can be called because the client uses preview api version
     const result = await client.updateWidgetColor("widget-123", {
-      color: "red"
+      color: "red",
     });
 
     assert.strictEqual(result?.id, "widget-123");
@@ -42,7 +42,7 @@ describe("StableVersionClient Client", () => {
     client = new PreviewVersionClient({
       endpoint: "http://localhost:3002",
       allowInsecureConnection: true,
-      apiVersion: "2024-06-01"
+      apiVersion: "2024-06-01",
     });
   });
 
@@ -50,7 +50,7 @@ describe("StableVersionClient Client", () => {
     // Test @previewVersion with preview-specific parameters
     // color parameter is only available in preview version
     const result = await client.listWidgets({
-      name: "test"
+      name: "test",
     });
 
     assert.strictEqual(result.widgets.length, 1);

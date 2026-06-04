@@ -1,14 +1,9 @@
-import {
-  NameType,
-  normalizeName,
-  Schema,
-  SchemaContext
-} from "../rlc-common/index.js";
-import { HttpOperationParameter } from "@typespec/http";
-import { getTypeName, isArrayType, isObjectOrDictType } from "./modelUtils.js";
-import { SdkContext } from "./interfaces.js";
-import { reportDiagnostic } from "../lib.js";
 import { getEncode, NoTarget, Program } from "@typespec/compiler";
+import { HttpOperationParameter } from "@typespec/http";
+import { reportDiagnostic } from "../lib.js";
+import { NameType, normalizeName, Schema, SchemaContext } from "../rlc-common/index.js";
+import { SdkContext } from "./interfaces.js";
+import { getTypeName, isArrayType, isObjectOrDictType } from "./modelUtils.js";
 
 export interface ParameterSerializationInfo {
   typeName: string;
@@ -20,11 +15,11 @@ export function getParameterSerializationInfo(
   parameter: HttpOperationParameter,
   valueSchema: Schema,
   operationGroup: string = "",
-  operationName: string = ""
+  operationName: string = "",
 ): ParameterSerializationInfo {
   const schemaContext = [SchemaContext.Input];
   const retVal: ParameterSerializationInfo = buildSerializationInfo(
-    getTypeName(valueSchema, schemaContext)
+    getTypeName(valueSchema, schemaContext),
   );
   const prefix = `${operationGroup}_${operationName}_${parameter.name}`;
   switch (parameter.type) {
@@ -33,7 +28,7 @@ export function getParameterSerializationInfo(
         const wrapperType = buildAllowReserved(
           normalizeName(`${prefix}_PathParam`, NameType.Interface),
           valueSchema,
-          parameter.name
+          parameter.name,
         );
         return buildSerializationInfo(wrapperType);
       }
@@ -56,7 +51,7 @@ export function getParameterSerializationInfo(
         parameter.explode,
         format ?? "form",
         valueSchema,
-        parameter.name
+        parameter.name,
       );
       if (parameter.explode === true) {
         if (format !== undefined) {
@@ -65,17 +60,14 @@ export function getParameterSerializationInfo(
             format: {
               paramName: parameter.name,
               explode: String(parameter.explode),
-              format: format
+              format: format,
             },
-            target: NoTarget
+            target: NoTarget,
           });
         }
 
         if (dpgContext.rlcOptions?.compatibilityQueryMultiFormat) {
-          wrapperType = buildUnionType([
-            wrapperType,
-            { type: "string", name: "string" }
-          ]);
+          wrapperType = buildUnionType([wrapperType, { type: "string", name: "string" }]);
         }
         return buildSerializationInfo(wrapperType);
       }
@@ -90,11 +82,7 @@ export function getParameterSerializationInfo(
     }
     case "header": {
       return buildSerializationInfo(
-        getHeaderSerializeTypeName(
-          dpgContext.program,
-          valueSchema,
-          schemaContext
-        )
+        getHeaderSerializeTypeName(dpgContext.program, valueSchema, schemaContext),
       );
     }
     default:
@@ -102,30 +90,25 @@ export function getParameterSerializationInfo(
   }
 }
 
-function buildSerializationInfo(
-  typeOrSchema: string | Schema
-): ParameterSerializationInfo {
+function buildSerializationInfo(typeOrSchema: string | Schema): ParameterSerializationInfo {
   if (typeof typeOrSchema === "string") {
     return {
-      typeName: typeOrSchema
+      typeName: typeOrSchema,
     };
   }
   return {
     typeName: getTypeName(typeOrSchema),
-    wrapperType: typeOrSchema
+    wrapperType: typeOrSchema,
   };
 }
 
 function getHeaderSerializeTypeName(
   program: Program,
   schema: Schema,
-  usage?: SchemaContext[]
+  usage?: SchemaContext[],
 ): string {
   const typeName = getTypeName(schema, usage);
-  const formattedName = (schema.alias ?? typeName).replace(
-    "Date | string",
-    "string"
-  );
+  const formattedName = (schema.alias ?? typeName).replace("Date | string", "string");
   const canSerialize = isSerializable(schema);
   if (canSerialize) {
     return schema.alias ? typeName : formattedName;
@@ -133,7 +116,7 @@ function getHeaderSerializeTypeName(
   reportDiagnostic(program, {
     code: "unable-serialized-type",
     format: { type: typeName },
-    target: NoTarget
+    target: NoTarget,
   });
   return "string";
   function isSerializable(type: any) {
@@ -142,17 +125,11 @@ function getHeaderSerializeTypeName(
         return isSerializable(i) || i.type === "null";
       });
     }
-    return (
-      ["string", "number", "boolean"].includes(type.type) || type.isConstant
-    );
+    return ["string", "number", "boolean"].includes(type.type) || type.isConstant;
   }
 }
 
-function buildAllowReserved(
-  typeName: string,
-  valueSchema: Schema,
-  parameterName: string
-) {
+function buildAllowReserved(typeName: string, valueSchema: Schema, parameterName: string) {
   return {
     type: "object",
     name: typeName,
@@ -161,14 +138,14 @@ function buildAllowReserved(
       value: {
         ...valueSchema,
         description: valueSchema.description ?? "Value of the parameter",
-        required: true
+        required: true,
       },
       allowReserved: {
         type: `true`,
         description: "Whether to allow reserved characters",
-        required: true
-      }
-    }
+        required: true,
+      },
+    },
   };
 }
 
@@ -177,7 +154,7 @@ function buildExplodeAndStyle(
   explode: boolean,
   style: string,
   valueSchema: Schema,
-  parameterName: string
+  parameterName: string,
 ) {
   return {
     type: "object",
@@ -187,19 +164,19 @@ function buildExplodeAndStyle(
       value: {
         ...valueSchema,
         description: valueSchema.description ?? "Value of the parameter",
-        required: true
+        required: true,
       },
       explode: {
         type: `${explode}`,
         description: "Should we explode the value?",
-        required: true
+        required: true,
       },
       style: {
         type: `"${style}"`,
         description: "Style of the value",
-        required: true
-      }
-    }
+        required: true,
+      },
+    },
   };
 }
 
@@ -210,6 +187,6 @@ function buildUnionType(values: Schema[]) {
     type: "union",
     typeName: `${values.map((v) => getTypeName(v)).join(" | ")}`,
     required: true,
-    description: undefined
+    description: undefined,
   };
 }

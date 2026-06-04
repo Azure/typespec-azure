@@ -1,37 +1,30 @@
-import {
-  NameType,
-  normalizeName,
-  isAzurePackage
-} from "../rlc-common/index.js";
+import { SdkClientType, SdkServiceOperation } from "@azure-tools/typespec-client-generator-core";
+import { NoTarget } from "@typespec/compiler";
+import { join } from "path/posix";
 import { Project, SourceFile } from "ts-morph";
-import { getClassicalClientName } from "./helpers/namingHelpers.js";
-import { ModularEmitterOptions } from "./interfaces.js";
+import { useContext } from "../contextManager.js";
 import { resolveReference } from "../framework/reference.js";
+import { reportDiagnostic } from "../lib.js";
+import { isAzurePackage, NameType, normalizeName } from "../rlc-common/index.js";
+import { getModularClientOptions } from "../utils/clientUtils.js";
+import { SdkContext } from "../utils/interfaces.js";
+import { getMethodHierarchiesMap } from "../utils/operationUtil.js";
+import { partitionAndEmitExports } from "./buildSubpathIndex.js";
+import { getClassicalClientName } from "./helpers/namingHelpers.js";
+import { isLroOnlyOperation } from "./helpers/operationHelpers.js";
+import { ModularEmitterOptions } from "./interfaces.js";
 import {
   CloudSettingHelpers,
   MultipartHelpers,
   PagingHelpers,
-  PlatformTypeHelpers
+  PlatformTypeHelpers,
 } from "./static-helpers-metadata.js";
-import {
-  SdkClientType,
-  SdkServiceOperation
-} from "@azure-tools/typespec-client-generator-core";
-import { getModularClientOptions } from "../utils/clientUtils.js";
-import { getMethodHierarchiesMap } from "../utils/operationUtil.js";
-import { join } from "path/posix";
-import { useContext } from "../contextManager.js";
-import { reportDiagnostic } from "../lib.js";
-import { NoTarget } from "@typespec/compiler";
-import { isLroOnlyOperation } from "./helpers/operationHelpers.js";
-import { SdkContext } from "../utils/interfaces.js";
-import { partitionAndEmitExports } from "./buildSubpathIndex.js";
 
 export function buildRootIndex(
   context: SdkContext,
   emitterOptions: ModularEmitterOptions,
   rootIndexFile: SourceFile,
-  clientMap?: [string[], SdkClientType<SdkServiceOperation>]
+  clientMap?: [string[], SdkClientType<SdkServiceOperation>],
 ) {
   if (!clientMap) {
     // we still need to export the models if no client is provided
@@ -47,47 +40,33 @@ export function buildRootIndex(
   const clientFile = project.getSourceFile(
     `${srcPath}/${subfolder && subfolder !== "" ? subfolder + "/" : ""}${normalizeName(
       clientName,
-      NameType.File
-    )}.ts`
+      NameType.File,
+    )}.ts`,
   );
 
   if (!clientFile) {
     reportDiagnostic(context.program, {
       code: "client-file-not-found",
       format: {
-        filePath: `${srcPath}/${normalizeName(clientName, NameType.File)}.ts`
+        filePath: `${srcPath}/${normalizeName(clientName, NameType.File)}.ts`,
       },
-      target: NoTarget
+      target: NoTarget,
     });
     return; // Skip exporting this client but continue with others
   }
 
   exportClassicalClient(client, rootIndexFile, subfolder ?? "");
-  exportSimplePollerLike(
-    context,
-    clientMap,
-    rootIndexFile,
-    project,
-    srcPath,
-    subfolder
-  );
-  exportRestoreHelpers(
-    rootIndexFile,
-    project,
-    srcPath,
-    clientName,
-    subfolder,
-    true
-  );
+  exportSimplePollerLike(context, clientMap, rootIndexFile, project, srcPath, subfolder);
+  exportRestoreHelpers(rootIndexFile, project, srcPath, clientName, subfolder, true);
   exportModels(emitterOptions, rootIndexFile, clientName);
   exportModules(rootIndexFile, project, srcPath, clientName, "api", {
     subfolder,
     interfaceOnly: true,
-    isTopLevel: true
+    isTopLevel: true,
   });
   exportModules(rootIndexFile, project, srcPath, clientName, "classic", {
     subfolder,
-    isTopLevel: true
+    isTopLevel: true,
   });
 
   exportPagingTypes(context, rootIndexFile);
@@ -99,20 +78,18 @@ export function buildRootIndex(
 function exportModels(
   emitterOptions: ModularEmitterOptions,
   rootIndexFile: SourceFile,
-  clientName: string = ""
+  clientName: string = "",
 ) {
   // export models index file if not exists
   const project = useContext("outputProject");
   const srcPath = emitterOptions.modularOptions.sourceRoot;
-  const modelsExportsIndex = rootIndexFile
-    .getExportDeclarations()
-    ?.find((i) => {
-      return i.getModuleSpecifierValue()?.startsWith(`./models/`);
-    });
+  const modelsExportsIndex = rootIndexFile.getExportDeclarations()?.find((i) => {
+    return i.getModuleSpecifierValue()?.startsWith(`./models/`);
+  });
   if (!modelsExportsIndex) {
     exportModules(rootIndexFile, project, srcPath, clientName, "models", {
       isTopLevel: true,
-      recursive: true
+      recursive: true,
     });
   }
 }
@@ -120,13 +97,11 @@ function exportModels(
 function exportAzureCloudTypes(context: SdkContext, rootIndexFile: SourceFile) {
   if (context.arm) {
     // AzureClouds is an enum (runtime value), AzureSupportedClouds is a type alias
-    addExportsToRootIndexFile(rootIndexFile, [
-      resolveReference(CloudSettingHelpers.AzureClouds)
-    ]);
+    addExportsToRootIndexFile(rootIndexFile, [resolveReference(CloudSettingHelpers.AzureClouds)]);
     addExportsToRootIndexFile(
       rootIndexFile,
       [resolveReference(CloudSettingHelpers.AzureSupportedClouds)],
-      true
+      true,
     );
   }
 }
@@ -136,13 +111,11 @@ function exportRestErrorTypes(context: SdkContext, rootIndexFile: SourceFile) {
     return;
   }
   const existingExports = getExistingExports(rootIndexFile);
-  const namedExports = ["RestError", "isRestError"].filter(
-    (name) => !existingExports.has(name)
-  );
+  const namedExports = ["RestError", "isRestError"].filter((name) => !existingExports.has(name));
   if (namedExports.length > 0) {
     rootIndexFile.addExportDeclaration({
       moduleSpecifier: "@azure/core-rest-pipeline",
-      namedExports
+      namedExports,
     });
   }
 }
@@ -160,9 +133,9 @@ function exportPagingTypes(context: SdkContext, rootIndexFile: SourceFile) {
     [
       resolveReference(PagingHelpers.PageSettings),
       resolveReference(PagingHelpers.ContinuablePage),
-      resolveReference(PagingHelpers.PagedAsyncIterableIterator)
+      resolveReference(PagingHelpers.PagedAsyncIterableIterator),
     ],
-    true
+    true,
   );
 }
 
@@ -170,9 +143,7 @@ function hasPaging(context: SdkContext): boolean {
   return context.sdkPackage.clients.some((client) => {
     const methodMap = getMethodHierarchiesMap(context, client);
     for (const [_, operations] of methodMap) {
-      if (
-        operations.some((op) => op.kind === "paging" || op.kind === "lropaging")
-      ) {
+      if (operations.some((op) => op.kind === "paging" || op.kind === "lropaging")) {
         return true;
       }
     }
@@ -180,14 +151,9 @@ function hasPaging(context: SdkContext): boolean {
   });
 }
 
-function exportFileContentsType(
-  context: SdkContext,
-  rootIndexFile: SourceFile
-) {
+function exportFileContentsType(context: SdkContext, rootIndexFile: SourceFile) {
   const hasMultipartFileParts = context.sdkPackage.models.some((x) =>
-    x.properties.some(
-      (y) => y.kind === "property" && y.multipartOptions?.isFilePart
-    )
+    x.properties.some((y) => y.kind === "property" && y.multipartOptions?.isFilePart),
   );
 
   if (hasMultipartFileParts) {
@@ -195,9 +161,9 @@ function exportFileContentsType(
       rootIndexFile,
       [
         resolveReference(MultipartHelpers.FileContents),
-        resolveReference(PlatformTypeHelpers.NodeReadableStream)
+        resolveReference(PlatformTypeHelpers.NodeReadableStream),
       ],
-      true
+      true,
     );
   }
 }
@@ -207,31 +173,26 @@ function getExistingExports(rootIndexFile: SourceFile): Set<string> {
     rootIndexFile
       .getExportDeclarations()
       .flatMap((exportDecl) =>
-        exportDecl.getNamedExports().map((namedExport) => namedExport.getName())
-      )
+        exportDecl.getNamedExports().map((namedExport) => namedExport.getName()),
+      ),
   );
 }
 
-function getNewNamedExports(
-  namedExports: string[],
-  existingExports: Set<string>
-): string[] {
-  return namedExports.filter(
-    (namedExport) => !existingExports.has(namedExport)
-  );
+function getNewNamedExports(namedExports: string[], existingExports: Set<string>): string[] {
+  return namedExports.filter((namedExport) => !existingExports.has(namedExport));
 }
 
 function addExportsToRootIndexFile(
   rootIndexFile: SourceFile,
   namedExports: string[],
-  isTypeOnly: boolean = false
+  isTypeOnly: boolean = false,
 ) {
   const existingExports = getExistingExports(rootIndexFile);
   const newNamedExports = getNewNamedExports(namedExports, existingExports);
   if (newNamedExports.length > 0) {
     rootIndexFile.addExportDeclaration({
       isTypeOnly,
-      namedExports: newNamedExports
+      namedExports: newNamedExports,
     });
   }
 }
@@ -243,7 +204,7 @@ function exportSimplePollerLike(
   project: Project,
   srcPath: string,
   subfolder: string = "",
-  isTopLevel: boolean = false
+  isTopLevel: boolean = false,
 ) {
   const [_, client] = clientMap;
 
@@ -257,7 +218,7 @@ function exportSimplePollerLike(
   const helperFile = project.getSourceFile(
     `${srcPath}/${
       subfolder && subfolder !== "" ? subfolder + "/" : ""
-    }static-helpers/simplePollerHelpers.ts`
+    }static-helpers/simplePollerHelpers.ts`,
   );
   if (!helperFile) {
     return;
@@ -268,7 +229,7 @@ function exportSimplePollerLike(
   indexFile.addExportDeclaration({
     isTypeOnly: true,
     moduleSpecifier,
-    namedExports: ["SimplePollerLike"]
+    namedExports: ["SimplePollerLike"],
   });
 }
 
@@ -278,12 +239,10 @@ function exportRestoreHelpers(
   srcPath: string,
   clientName: string,
   subfolder: string = "",
-  isTopLevel: boolean = false
+  isTopLevel: boolean = false,
 ) {
   const helperFile = project.getSourceFile(
-    `${srcPath}/${
-      subfolder && subfolder !== "" ? subfolder + "/" : ""
-    }restorePollerHelpers.ts`
+    `${srcPath}/${subfolder && subfolder !== "" ? subfolder + "/" : ""}restorePollerHelpers.ts`,
   );
   if (!helperFile) {
     return;
@@ -293,8 +252,7 @@ function exportRestoreHelpers(
   const moduleSpecifier = `./${
     isTopLevel && subfolder && subfolder !== "" ? subfolder + "/" : ""
   }restorePollerHelpers.js`;
-  const renamer = (name: string) =>
-    exported.has(name) ? `${name} as ${clientName}${name}` : name;
+  const renamer = (name: string) => (exported.has(name) ? `${name} as ${clientName}${name}` : name);
   partitionAndEmitExports(indexFile, moduleSpecifier, allEntries, renamer);
 }
 
@@ -302,14 +260,14 @@ function exportClassicalClient(
   client: SdkClientType<SdkServiceOperation>,
   indexFile: SourceFile,
   subfolder: string,
-  isSubClient: boolean = false
+  isSubClient: boolean = false,
 ) {
   const clientName = client.name;
   indexFile.addExportDeclaration({
     namedExports: [clientName],
     moduleSpecifier: `./${
       subfolder && subfolder !== "" && !isSubClient ? subfolder + "/" : ""
-    }${normalizeName(clientName, NameType.File)}.js`
+    }${normalizeName(clientName, NameType.File)}.js`,
   });
 }
 
@@ -330,8 +288,8 @@ function exportModules(
     interfaceOnly: false,
     isTopLevel: false,
     subfolder: "",
-    recursive: false
-  }
+    recursive: false,
+  },
 ) {
   const subfolder = options.subfolder ?? "";
   let folders = [];
@@ -340,10 +298,7 @@ function exportModules(
       .getDirectories()
       .filter((dir) => {
         const formattedDir = dir.getPath().replace(/\\/g, "/");
-        const targetPath = join(srcPath, subfolder, moduleName).replace(
-          /\\/g,
-          "/"
-        );
+        const targetPath = join(srcPath, subfolder, moduleName).replace(/\\/g, "/");
         return formattedDir.startsWith(targetPath);
       })
       .map((dir) => {
@@ -354,10 +309,7 @@ function exportModules(
       .getDirectories()
       .filter((dir) => {
         const formattedDir = dir.getPath().replace(/\\/g, "/");
-        const targetPath = join(srcPath, subfolder, moduleName).replace(
-          /\\/g,
-          "/"
-        );
+        const targetPath = join(srcPath, subfolder, moduleName).replace(/\\/g, "/");
         return formattedDir.startsWith(targetPath);
       })
       .map((dir) => {
@@ -375,37 +327,30 @@ function exportModules(
 
     const exported = new Set(indexFile.getExportedDeclarations().keys());
     const serializerOrDeserializerRegex = /.*(Serializer|Deserializer)(_\d+)?$/;
-    const filteredEntries = [
-      ...modelsFile.getExportedDeclarations().entries()
-    ].filter((exDeclaration) => {
-      if (exDeclaration[0].startsWith("_")) {
-        return false;
-      }
-      return exDeclaration[1].some((ex) => {
-        if (
-          options.interfaceOnly &&
-          ex.getKindName() !== "InterfaceDeclaration"
-        ) {
+    const filteredEntries = [...modelsFile.getExportedDeclarations().entries()].filter(
+      (exDeclaration) => {
+        if (exDeclaration[0].startsWith("_")) {
           return false;
         }
-        if (
-          moduleName === "models" &&
-          ex.getKindName() === "FunctionDeclaration" &&
-          serializerOrDeserializerRegex.test(exDeclaration[0])
-        ) {
-          return false;
-        }
-        if (
-          options.interfaceOnly &&
-          options.isTopLevel &&
-          exDeclaration[0].endsWith("Context")
-        ) {
-          return false;
-        }
+        return exDeclaration[1].some((ex) => {
+          if (options.interfaceOnly && ex.getKindName() !== "InterfaceDeclaration") {
+            return false;
+          }
+          if (
+            moduleName === "models" &&
+            ex.getKindName() === "FunctionDeclaration" &&
+            serializerOrDeserializerRegex.test(exDeclaration[0])
+          ) {
+            return false;
+          }
+          if (options.interfaceOnly && options.isTopLevel && exDeclaration[0].endsWith("Context")) {
+            return false;
+          }
 
-        return true;
-      });
-    });
+          return true;
+        });
+      },
+    );
     const moduleSpecifier = `.${modelsFile
       .getFilePath()
       .replace(indexFile.getDirectoryPath(), "")
@@ -413,19 +358,14 @@ function exportModules(
       .replace(".ts", "")}.js`;
     const renamer = (name: string) =>
       exported.has(name) ? `${name} as ${clientName}${name}` : name;
-    partitionAndEmitExports(
-      indexFile,
-      moduleSpecifier,
-      filteredEntries,
-      renamer
-    );
+    partitionAndEmitExports(indexFile, moduleSpecifier, filteredEntries, renamer);
   }
 }
 
 export function buildSubClientIndexFile(
   context: SdkContext,
   clientMap: [string[], SdkClientType<SdkServiceOperation>],
-  emitterOptions: ModularEmitterOptions
+  emitterOptions: ModularEmitterOptions,
 ) {
   const project = useContext("outputProject");
   const [_, client] = clientMap;
@@ -434,7 +374,7 @@ export function buildSubClientIndexFile(
   const subClientIndexFile = project.createSourceFile(
     `${srcPath}/${subfolder && subfolder !== "" ? subfolder + "/" : ""}index.ts`,
     undefined,
-    { overwrite: true }
+    { overwrite: true },
   );
   const clientName = `${getClassicalClientName(client)}`;
   const clientFilePath = `${srcPath}/${
@@ -446,35 +386,22 @@ export function buildSubClientIndexFile(
     reportDiagnostic(context.program, {
       code: "client-file-not-found",
       format: {
-        filePath: clientFilePath
+        filePath: clientFilePath,
       },
-      target: NoTarget
+      target: NoTarget,
     });
     return; // Skip exporting this client but continue with others
   }
 
   exportClassicalClient(client, subClientIndexFile, subfolder ?? "", true);
-  exportSimplePollerLike(
-    context,
-    clientMap,
-    subClientIndexFile,
-    project,
-    srcPath,
-    subfolder
-  );
-  exportRestoreHelpers(
-    subClientIndexFile,
-    project,
-    srcPath,
-    clientName,
-    subfolder
-  );
+  exportSimplePollerLike(context, clientMap, subClientIndexFile, project, srcPath, subfolder);
+  exportRestoreHelpers(subClientIndexFile, project, srcPath, clientName, subfolder);
   exportModules(subClientIndexFile, project, srcPath, clientName, "api", {
     subfolder,
     interfaceOnly: true,
-    recursive: true
+    recursive: true,
   });
   exportModules(subClientIndexFile, project, srcPath, clientName, "classic", {
-    subfolder
+    subfolder,
   });
 }

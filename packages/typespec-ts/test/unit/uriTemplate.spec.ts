@@ -1,9 +1,6 @@
-import { describe, it, assert } from "vitest";
+import { assert, describe, it } from "vitest";
 
-import {
-  emitClientDefinitionFromTypeSpec,
-  emitParameterFromTypeSpec
-} from "../util/emitUtil.js";
+import { emitClientDefinitionFromTypeSpec, emitParameterFromTypeSpec } from "../util/emitUtil.js";
 import { assertEqualContent } from "../util/testUtil.js";
 
 describe("Client definition generation", () => {
@@ -28,7 +25,7 @@ describe("Client definition generation", () => {
     }
 
     export type TemplateParameters = RequestParameters;
-      `
+      `,
     );
 
     const clientDef = await emitClientDefinitionFromTypeSpec(tsp);
@@ -52,7 +49,7 @@ describe("Client definition generation", () => {
         export type testClient = Client & {
             path: Routes;
         };
-    `
+    `,
     );
   });
 
@@ -95,7 +92,7 @@ describe("Client definition generation", () => {
     }
         
     export type TemplateParameters = TemplateQueryParam & RequestParameters;
-      `
+      `,
     );
 
     const clientDef = await emitClientDefinitionFromTypeSpec(tsp);
@@ -119,7 +116,7 @@ describe("Client definition generation", () => {
         export type testClient = Client & {
             path: Routes;
         };
-    `
+    `,
     );
   });
 });

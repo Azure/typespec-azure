@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import { BasicClient } from "./generated/parameters/basic/src/index.js";
 describe("BasicClient Client", () => {
@@ -7,7 +7,7 @@ describe("BasicClient Client", () => {
   beforeEach(() => {
     client = new BasicClient({
       allowInsecureConnection: true,
-      endpoint: "http://localhost:3002"
+      endpoint: "http://localhost:3002",
     });
   });
 

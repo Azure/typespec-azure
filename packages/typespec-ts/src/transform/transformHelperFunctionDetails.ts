@@ -1,22 +1,19 @@
+import { getHttpOperationWithCache, SdkClient } from "@azure-tools/typespec-client-generator-core";
 import { HelperFunctionDetails, PackageFlavor } from "../rlc-common/index.js";
-import {
-  getHttpOperationWithCache,
-  SdkClient
-} from "@azure-tools/typespec-client-generator-core";
+import { listOperationsUnderRLCClient } from "../utils/clientUtils.js";
 import { SdkContext } from "../utils/interfaces.js";
+import { getCollectionFormat } from "../utils/modelUtils.js";
 import {
   extractPageDetails,
   getSpecialSerializeInfo,
   hasPagingOperations,
-  hasPollingOperations
+  hasPollingOperations,
 } from "../utils/operationUtil.js";
-import { getCollectionFormat } from "../utils/modelUtils.js";
-import { listOperationsUnderRLCClient } from "../utils/clientUtils.js";
 
 export function transformHelperFunctionDetails(
   client: SdkClient,
   dpgContext: SdkContext,
-  flavor?: PackageFlavor
+  flavor?: PackageFlavor,
 ): HelperFunctionDetails {
   const serializeInfo = extractSpecialSerializeInfo(client, dpgContext);
   // Disable paging and long running for non-Azure clients.
@@ -24,18 +21,18 @@ export function transformHelperFunctionDetails(
     return {
       hasLongRunning: false,
       hasPaging: false,
-      ...serializeInfo
+      ...serializeInfo,
     };
   }
 
   const annotationDetails = {
-    hasLongRunning: hasPollingOperations(client, dpgContext)
+    hasLongRunning: hasPollingOperations(client, dpgContext),
   };
   const details = extractClientPageDetails(client, dpgContext);
   return {
     ...(details ?? {}),
     ...annotationDetails,
-    ...serializeInfo
+    ...serializeInfo,
   };
 }
 
@@ -65,36 +62,27 @@ function extractClientPageDetails(client: SdkClient, dpgContext: SdkContext) {
     pageDetails: {
       itemNames: [...itemNames],
       nextLinkNames: [...nextLinks],
-      isComplexPaging: nextLinks.size > 1 || itemNames.size > 1
-    }
+      isComplexPaging: nextLinks.size > 1 || itemNames.size > 1,
+    },
   };
 }
 
-function extractSpecialSerializeInfo(
-  client: SdkClient,
-  dpgContext: SdkContext
-) {
+function extractSpecialSerializeInfo(client: SdkClient, dpgContext: SdkContext) {
   let hasMultiCollection = false;
   let hasCsvCollection = false;
   for (const op of listOperationsUnderRLCClient(client)) {
     const route = getHttpOperationWithCache(dpgContext, op);
     route.parameters.parameters.forEach((parameter) => {
       const format = getCollectionFormat(dpgContext, parameter as any);
-      const serializeInfo = getSpecialSerializeInfo(
-        dpgContext,
-        parameter.type,
-        format!
-      );
+      const serializeInfo = getSpecialSerializeInfo(dpgContext, parameter.type, format!);
       hasMultiCollection = hasMultiCollection
         ? hasMultiCollection
         : serializeInfo.hasMultiCollection;
-      hasCsvCollection = hasCsvCollection
-        ? hasCsvCollection
-        : serializeInfo.hasCsvCollection;
+      hasCsvCollection = hasCsvCollection ? hasCsvCollection : serializeInfo.hasCsvCollection;
     });
   }
   return {
     hasMultiCollection,
-    hasCsvCollection
+    hasCsvCollection,
   };
 }

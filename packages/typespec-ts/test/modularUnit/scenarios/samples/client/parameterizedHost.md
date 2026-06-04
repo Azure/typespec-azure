@@ -21,7 +21,7 @@ using TypeSpec.Versioning;
 using Azure.Core;
 using OpenAPI;
 
-@service(#{title: "ParametrizedHost"})
+@service(#{ title: "ParametrizedHost" })
 @useAuth(OAuth2Auth<[MyFlow]>)
 @versioned(Versions)
 @server(
@@ -30,8 +30,10 @@ using OpenAPI;
   {
     @path
     host?: string = "one",
+
     @path
     subdomain?: string = "two",
+
     @path
     sufix?: string = "three",
   }
@@ -41,7 +43,6 @@ namespace Azure.Test.ParametrizedHost;
 /** The Contoso Widget Manager service version. */
 enum Versions {
   /** Version 2021-10-01-preview */
-  
   `2021-10-01-preview`,
 }
 

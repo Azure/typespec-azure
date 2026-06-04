@@ -1,9 +1,9 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import {
   Eagle,
   SingleDiscriminatorClient,
-  Sparrow
+  Sparrow,
 } from "./generated/type/model/inheritance/single-discriminator/src/index.js";
 
 describe("SingleDiscriminatorClient Rest Client", () => {
@@ -12,33 +12,33 @@ describe("SingleDiscriminatorClient Rest Client", () => {
   beforeEach(() => {
     client = new SingleDiscriminatorClient({
       endpoint: "http://localhost:3002",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
   const validBody: Sparrow = {
     wingspan: 1,
-    kind: "sparrow"
+    kind: "sparrow",
   };
   const validRecursiveBody: Eagle = {
     wingspan: 5,
     kind: "eagle",
     partner: {
       wingspan: 2,
-      kind: "goose"
+      kind: "goose",
     },
     friends: [
       {
         wingspan: 2,
-        kind: "seagull"
-      }
+        kind: "seagull",
+      },
     ],
     hate: {
       key3: {
         wingspan: 1,
-        kind: "sparrow"
-      }
-    }
+        kind: "sparrow",
+      },
+    },
   };
   it("should get model with single discriminator", async () => {
     const result = await client.getModel();

@@ -1,7 +1,7 @@
-import { describe, it, beforeEach, assert } from "vitest";
+import { assert, beforeEach, describe, it } from "vitest";
 
 import VersioningRenamedFromClientFactory, {
-  VersioningRenamedFromClient
+  VersioningRenamedFromClient,
 } from "./generated/versioning/renamedFrom/src/index.js";
 describe("VersioningRenamedFrom Rest Client", () => {
   let client: VersioningRenamedFromClient;
@@ -9,7 +9,7 @@ describe("VersioningRenamedFrom Rest Client", () => {
   beforeEach(() => {
     client = VersioningRenamedFromClientFactory("http://localhost:3000", {
       version: "v2",
-      allowInsecureConnection: true
+      allowInsecureConnection: true,
     });
   });
 
@@ -18,11 +18,11 @@ describe("VersioningRenamedFrom Rest Client", () => {
       body: {
         newProp: "foo",
         enumProp: "newEnumMember",
-        unionProp: 10
+        unionProp: 10,
       },
       queryParameters: {
-        newQuery: "bar"
-      }
+        newQuery: "bar",
+      },
     });
     assert.strictEqual(result.status, "200");
     assert.strictEqual(result.body.newProp, "foo");
@@ -35,8 +35,8 @@ describe("VersioningRenamedFrom Rest Client", () => {
       body: {
         newProp: "foo",
         enumProp: "newEnumMember",
-        unionProp: 10
-      }
+        unionProp: 10,
+      },
     });
     assert.strictEqual(result.status, "200");
     assert.strictEqual(result.body.newProp, "foo");
