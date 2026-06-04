@@ -266,7 +266,9 @@ describe("codefix", () => {
       runner,
       `model Foo { imageUrl: string; }`,
     );
-    const imageUrlDiags = diagnostics.filter((d) => d.codefixes?.some((f) => f.label.includes("imageUri")));
+    const imageUrlDiags = diagnostics.filter((d) =>
+      d.codefixes?.some((f) => f.label.includes("imageUri")),
+    );
     expect(imageUrlDiags.length).toBe(1);
 
     // Step 2: Apply the codefix and capture the generated @@clientName line
@@ -278,8 +280,8 @@ describe("codefix", () => {
     // Step 3: Recompile with the fix applied (inline, same as client.tsp would do)
     const codeWithFix = `model Foo { imageUrl: string; }\n${clientNameLine}`;
     const fixedDiagnostics = await compileAndGetRuleDiagnostics(runner, codeWithFix);
-    const fixedImageUrlDiags = fixedDiagnostics.filter(
-      (d) => d.codefixes?.some((f) => f.label.includes("imageUri")),
+    const fixedImageUrlDiags = fixedDiagnostics.filter((d) =>
+      d.codefixes?.some((f) => f.label.includes("imageUri")),
     );
 
     // Step 4: Verify no diagnostic for imageUrl
