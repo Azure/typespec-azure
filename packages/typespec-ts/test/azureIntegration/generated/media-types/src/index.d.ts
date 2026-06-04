@@ -19,7 +19,7 @@ export declare interface GetByOverloadParent200Response extends HttpResponse {
 }
 
 export declare interface GetByOverloadParentBodyParam {
-    body: SourcePath | string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream | string;
+    body: SourcePath | string | Uint8Array | ReadableStream<Uint8Array> | NodeReadableStream | string;
 }
 
 export declare interface GetByOverloadParentMediaTypesParam {
@@ -34,7 +34,7 @@ export declare interface GetBySharedRouteForBytes200Response extends HttpRespons
 }
 
 export declare interface GetBySharedRouteForBytesBodyParam {
-    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream;
+    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeReadableStream;
 }
 
 export declare interface GetBySharedRouteForBytesMediaTypesParam {
@@ -89,7 +89,7 @@ export declare interface GetByUnionOnly200Response extends HttpResponse {
 }
 
 export declare interface GetByUnionOnlyBodyParam {
-    body: SourcePath | string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream | string;
+    body: SourcePath | string | Uint8Array | ReadableStream<Uint8Array> | NodeReadableStream | string;
 }
 
 export declare interface GetByUnionOnlyMediaTypesParam {
@@ -106,6 +106,8 @@ export declare type MediaTypesClient = Client & {
 
 export declare interface MediaTypesClientOptions extends ClientOptions {
 }
+
+declare type NodeReadableStream = NodeJS.ReadableStream;
 
 export { RestError }
 

@@ -81,7 +81,7 @@ import { reportDiagnostic } from "../lib.js";
 import { getModelNamespaceName } from "./namespaceUtils.js";
 
 export const BINARY_TYPE_UNION =
-  "string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream";
+  "string | Uint8Array | ReadableStream<Uint8Array> | NodeReadableStream";
 
 export const BINARY_AND_FILE_TYPE_UNION = `${BINARY_TYPE_UNION} | File`;
 
