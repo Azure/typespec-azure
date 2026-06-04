@@ -298,6 +298,34 @@ export async function $onEmit(context: EmitContext) {
         dpgContext.generationPathDetail?.metadataDir,
       );
     }
+    // The binder is only resolved in the modular path, so static helper files
+    // loaded into the outputProject are never written to disk in the RLC path.
+    // The RLC builders reference the platform-types helper (NodeReadableStream),
+    // so emit those files here.
+    await emitRLCStaticHelpers();
+  }
+
+  async function emitRLCStaticHelpers() {
+    if (program.compilerOptions.noEmit || program.hasError() || !rlcCodeModels[0]) {
+      return;
+    }
+    const project = useContext("outputProject");
+    for (const helperFile of project.getSourceFiles()) {
+      const filePath = helperFile.getFilePath();
+      // RLC builders (buildParameterTypes / buildSchemaType) only reference
+      // platform-types (and its browser/react-native variants); emit those
+      // files directly under src/ (strip the static-helpers/ segment) to match
+      // the RLC design where all generated output lives in src/.
+      if (!basename(filePath).startsWith("platform-types")) {
+        continue;
+      }
+      const outputPath = filePath.replace(/\/static-helpers\//g, "/");
+      await emitContentByBuilder(
+        program,
+        () => ({ content: helperFile.getFullText(), path: outputPath }),
+        rlcCodeModels[0],
+      );
+    }
   }
 
   async function generateModularSources() {

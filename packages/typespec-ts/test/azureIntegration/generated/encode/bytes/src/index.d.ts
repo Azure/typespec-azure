@@ -126,6 +126,8 @@ export declare type HeaderDefaultParameters = HeaderDefaultHeaderParam & Request
 
 export { isRestError }
 
+declare type NodeReadableStream = NodeJS.ReadableStream;
+
 export declare interface PropertyBase64 {
     post(options: PropertyBase64Parameters): StreamableMethod<PropertyBase64200Response>;
 }
@@ -309,7 +311,7 @@ export declare interface RequestBodyCustomContentType204Response extends HttpRes
 }
 
 export declare interface RequestBodyCustomContentTypeBodyParam {
-    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream;
+    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeReadableStream;
 }
 
 export declare interface RequestBodyCustomContentTypeMediaTypesParam {
@@ -327,7 +329,7 @@ export declare interface RequestBodyDefault204Response extends HttpResponse {
 }
 
 export declare interface RequestBodyDefaultBodyParam {
-    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream;
+    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeReadableStream;
 }
 
 export declare type RequestBodyDefaultParameters = RequestBodyDefaultBodyParam & RequestParameters;
@@ -341,7 +343,7 @@ export declare interface RequestBodyOctetStream204Response extends HttpResponse 
 }
 
 export declare interface RequestBodyOctetStreamBodyParam {
-    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream;
+    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeReadableStream;
 }
 
 export declare interface RequestBodyOctetStreamMediaTypesParam {
