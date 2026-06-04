@@ -9,8 +9,8 @@ on:
       - "main"
     paths:
       - "package.json"
-      - "eng/common/config/"
-      - "eng/common/labels/"
+      - "core/eng/common/config/"
+      - "core/eng/common/scripts/labels/"
       - ".github/workflows/sync-labels.yml"
       - "CONTRIBUTING.md"
 
