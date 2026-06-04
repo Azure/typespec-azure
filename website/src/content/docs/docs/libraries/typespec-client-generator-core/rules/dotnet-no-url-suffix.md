@@ -6,7 +6,7 @@ title: "dotnet-no-url-suffix"
 @azure-tools/typespec-client-generator-core/dotnet-no-url-suffix
 ```
 
-Properties ending with `Url` should use `Uri` suffix instead to follow [.NET naming conventions](https://github.com/Azure/azure-sdk-for-net/blob/main/eng/packages/http-client-csharp-mgmt/generator/Azure.Generator.Management/src/Visitors/NameVisitor.cs). The .NET SDK generator already auto-renames `Url` → `Uri`, but this rule moves that feedback upstream to spec authoring time.
+Properties ending with `Url` should use `Uri` suffix instead to follow .NET SDK naming conventions.
 
 The rule checks the C#-resolved name (respecting `@clientName` overrides).
 
