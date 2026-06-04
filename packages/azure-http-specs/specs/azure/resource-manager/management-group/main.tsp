@@ -12,7 +12,7 @@ using Azure.Core;
 using Azure.ResourceManager;
 using Spector;
 
-@armProviderNamespace
+@armProviderNamespace("Microsoft.ManagementGroupChild")
 @service
 @versioned(Versions)
 @doc("Arm Resource Provider management API.")
@@ -53,15 +53,15 @@ interface ManagementGroupChildResources {
   @scenario
   @scenarioDoc("""
     Resource GET operation at management group scope.
-    Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources/resource
+    Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource
     Expected query parameter: api-version=2023-12-01-preview
     
     Expected response body:
     ```json
     {
-      "id": "/providers/Microsoft.Management/managementGroups/test-mg/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources/resource",
+      "id": "/providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource",
       "name": "resource",
-      "type": "Azure.ResourceManager.ManagementGroup/managementGroupChildResources",
+      "type": "Microsoft.ManagementGroupChild/managementGroupChildResources",
       "properties":{
         "description": "valid",
         "provisioningState": "Succeeded"
@@ -85,7 +85,7 @@ interface ManagementGroupChildResources {
   @scenario
   @scenarioDoc("""
     Resource PUT operation at management group scope.
-    Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources/resource
+    Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource
     Expected query parameter: api-version=2023-12-01-preview
     
     Expected request body:
@@ -100,9 +100,9 @@ interface ManagementGroupChildResources {
     Expected response body:
     ```json
     {
-      "id": "/providers/Microsoft.Management/managementGroups/test-mg/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources/resource",
+      "id": "/providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource",
       "name": "resource",
-      "type": "Azure.ResourceManager.ManagementGroup/managementGroupChildResources",
+      "type": "Microsoft.ManagementGroupChild/managementGroupChildResources",
       "properties":{
         "description": "valid",
         "provisioningState": "Succeeded"
@@ -126,7 +126,7 @@ interface ManagementGroupChildResources {
   @scenario
   @scenarioDoc("""
     Resource PATCH operation at management group scope.
-    Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources/resource
+    Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource
     Expected query parameter: api-version=2023-12-01-preview
     
     Expected request body:
@@ -141,9 +141,9 @@ interface ManagementGroupChildResources {
     Expected response body:
     ```json
     {
-      "id": "/providers/Microsoft.Management/managementGroups/test-mg/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources/resource",
+      "id": "/providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource",
       "name": "resource",
-      "type": "Azure.ResourceManager.ManagementGroup/managementGroupChildResources",
+      "type": "Microsoft.ManagementGroupChild/managementGroupChildResources",
       "properties":{
         "description": "valid2",
         "provisioningState": "Succeeded"
@@ -168,7 +168,7 @@ interface ManagementGroupChildResources {
   @scenario
   @scenarioDoc("""
     Resource DELETE operation at management group scope.
-    Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources/resource
+    Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource
     Expected query parameter: api-version=2023-12-01-preview
     Expected response status code: 204
     """)
@@ -180,16 +180,16 @@ interface ManagementGroupChildResources {
   @scenario
   @scenarioDoc("""
     Resource LIST operation at management group scope.
-    Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources
+    Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources
     Expected query parameter: api-version=2023-12-01-preview
     
     Expected response body:
     ```json
     {
       "value": [{
-        "id": "/providers/Microsoft.Management/managementGroups/test-mg/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources/resource",
+        "id": "/providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource",
         "name": "resource",
-        "type": "Azure.ResourceManager.ManagementGroup/managementGroupChildResources",
+        "type": "Microsoft.ManagementGroupChild/managementGroupChildResources",
         "properties":{
           "description": "valid",
           "provisioningState": "Succeeded"

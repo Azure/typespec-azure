@@ -2335,7 +2335,7 @@ Expected response body:
 - Endpoint: `put https://management.azure.com`
 
 Resource PUT operation at management group scope.
-Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources/resource
+Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource
 Expected query parameter: api-version=2023-12-01-preview
 
 Expected request body:
@@ -2352,9 +2352,9 @@ Expected response body:
 
 ```json
 {
-  "id": "/providers/Microsoft.Management/managementGroups/test-mg/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources/resource",
+  "id": "/providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource",
   "name": "resource",
-  "type": "Azure.ResourceManager.ManagementGroup/managementGroupChildResources",
+  "type": "Microsoft.ManagementGroupChild/managementGroupChildResources",
   "properties":{
     "description": "valid",
     "provisioningState": "Succeeded"
@@ -2375,7 +2375,7 @@ Expected response body:
 - Endpoint: `delete https://management.azure.com`
 
 Resource DELETE operation at management group scope.
-Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources/resource
+Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource
 Expected query parameter: api-version=2023-12-01-preview
 Expected response status code: 204
 
@@ -2384,16 +2384,16 @@ Expected response status code: 204
 - Endpoint: `get https://management.azure.com`
 
 Resource GET operation at management group scope.
-Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources/resource
+Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource
 Expected query parameter: api-version=2023-12-01-preview
 
 Expected response body:
 
 ```json
 {
-  "id": "/providers/Microsoft.Management/managementGroups/test-mg/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources/resource",
+  "id": "/providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource",
   "name": "resource",
-  "type": "Azure.ResourceManager.ManagementGroup/managementGroupChildResources",
+  "type": "Microsoft.ManagementGroupChild/managementGroupChildResources",
   "properties":{
     "description": "valid",
     "provisioningState": "Succeeded"
@@ -2414,7 +2414,7 @@ Expected response body:
 - Endpoint: `get https://management.azure.com`
 
 Resource LIST operation at management group scope.
-Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources
+Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources
 Expected query parameter: api-version=2023-12-01-preview
 
 Expected response body:
@@ -2422,9 +2422,9 @@ Expected response body:
 ```json
 {
   "value": [{
-    "id": "/providers/Microsoft.Management/managementGroups/test-mg/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources/resource",
+    "id": "/providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource",
     "name": "resource",
-    "type": "Azure.ResourceManager.ManagementGroup/managementGroupChildResources",
+    "type": "Microsoft.ManagementGroupChild/managementGroupChildResources",
     "properties":{
       "description": "valid",
       "provisioningState": "Succeeded"
@@ -2446,7 +2446,7 @@ Expected response body:
 - Endpoint: `patch https://management.azure.com`
 
 Resource PATCH operation at management group scope.
-Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources/resource
+Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource
 Expected query parameter: api-version=2023-12-01-preview
 
 Expected request body:
@@ -2463,9 +2463,9 @@ Expected response body:
 
 ```json
 {
-  "id": "/providers/Microsoft.Management/managementGroups/test-mg/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources/resource",
+  "id": "/providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource",
   "name": "resource",
-  "type": "Azure.ResourceManager.ManagementGroup/managementGroupChildResources",
+  "type": "Microsoft.ManagementGroupChild/managementGroupChildResources",
   "properties":{
     "description": "valid2",
     "provisioningState": "Succeeded"

@@ -4,12 +4,12 @@ export const Scenarios: Record<string, ScenarioMockApi> = {};
 
 const MANAGEMENT_GROUP_ID = "test-mg";
 const RESOURCE_NAME = "resource";
-const BASE_URI = `/providers/Microsoft.Management/managementGroups/${MANAGEMENT_GROUP_ID}/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources`;
+const BASE_URI = `/providers/Microsoft.Management/managementGroups/${MANAGEMENT_GROUP_ID}/providers/Microsoft.ManagementGroupChild/managementGroupChildResources`;
 
 const validManagementGroupChildResource = {
   id: `${BASE_URI}/${RESOURCE_NAME}`,
   name: RESOURCE_NAME,
-  type: "Azure.ResourceManager.ManagementGroup/managementGroupChildResources",
+  type: "Microsoft.ManagementGroupChild/managementGroupChildResources",
   properties: {
     description: "valid",
     provisioningState: "Succeeded",
@@ -25,7 +25,7 @@ const validManagementGroupChildResource = {
 };
 
 Scenarios.Azure_ResourceManager_ManagementGroup_ManagementGroupChildResources_get = passOnSuccess({
-  uri: `/providers/Microsoft.Management/managementGroups/:managementGroupId/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources/:managementGroupChildResourceName`,
+  uri: `/providers/Microsoft.Management/managementGroups/:managementGroupId/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/:managementGroupChildResourceName`,
   method: "get",
   request: {
     pathParams: {
@@ -45,7 +45,7 @@ Scenarios.Azure_ResourceManager_ManagementGroup_ManagementGroupChildResources_ge
 
 Scenarios.Azure_ResourceManager_ManagementGroup_ManagementGroupChildResources_createOrUpdate =
   passOnSuccess({
-    uri: `/providers/Microsoft.Management/managementGroups/:managementGroupId/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources/:managementGroupChildResourceName`,
+    uri: `/providers/Microsoft.Management/managementGroups/:managementGroupId/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/:managementGroupChildResourceName`,
     method: "put",
     request: {
       pathParams: {
@@ -70,7 +70,7 @@ Scenarios.Azure_ResourceManager_ManagementGroup_ManagementGroupChildResources_cr
 
 Scenarios.Azure_ResourceManager_ManagementGroup_ManagementGroupChildResources_update =
   passOnSuccess({
-    uri: `/providers/Microsoft.Management/managementGroups/:managementGroupId/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources/:managementGroupChildResourceName`,
+    uri: `/providers/Microsoft.Management/managementGroups/:managementGroupId/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/:managementGroupChildResourceName`,
     method: "patch",
     request: {
       pathParams: {
@@ -101,7 +101,7 @@ Scenarios.Azure_ResourceManager_ManagementGroup_ManagementGroupChildResources_up
 
 Scenarios.Azure_ResourceManager_ManagementGroup_ManagementGroupChildResources_delete =
   passOnSuccess({
-    uri: `/providers/Microsoft.Management/managementGroups/:managementGroupId/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources/:managementGroupChildResourceName`,
+    uri: `/providers/Microsoft.Management/managementGroups/:managementGroupId/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/:managementGroupChildResourceName`,
     method: "delete",
     request: {
       pathParams: {
@@ -120,7 +120,7 @@ Scenarios.Azure_ResourceManager_ManagementGroup_ManagementGroupChildResources_de
 
 Scenarios.Azure_ResourceManager_ManagementGroup_ManagementGroupChildResources_listByManagementGroup =
   passOnSuccess({
-    uri: `/providers/Microsoft.Management/managementGroups/:managementGroupId/providers/Azure.ResourceManager.ManagementGroup/managementGroupChildResources`,
+    uri: `/providers/Microsoft.Management/managementGroups/:managementGroupId/providers/Microsoft.ManagementGroupChild/managementGroupChildResources`,
     method: "get",
     request: {
       pathParams: {
