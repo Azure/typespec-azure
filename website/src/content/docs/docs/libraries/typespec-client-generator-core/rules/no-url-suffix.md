@@ -1,9 +1,9 @@
 ---
-title: "dotnet-no-url-suffix"
+title: "no-url-suffix"
 ---
 
 ```text title="Full name"
-@azure-tools/typespec-client-generator-core/dotnet-no-url-suffix
+@azure-tools/typespec-client-generator-core/no-url-suffix
 ```
 
 Properties ending with `Url` should use `Uri` suffix instead to follow .NET SDK naming conventions.

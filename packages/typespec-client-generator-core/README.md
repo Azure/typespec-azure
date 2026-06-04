@@ -118,7 +118,7 @@ Available ruleSets:
 | [`@azure-tools/typespec-client-generator-core/require-client-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/require-client-suffix)   | Client names should end with 'Client'.                                                          |
 | [`@azure-tools/typespec-client-generator-core/property-name-conflict`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/property-name-conflict) | Avoid naming conflicts between a property and a model of the same name.                         |
 | [`@azure-tools/typespec-client-generator-core/no-unnamed-types`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/no-unnamed-types)             | Requires types to be named rather than defined anonymously or inline.                           |
-| [`@azure-tools/typespec-client-generator-core/dotnet-no-url-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/dotnet-no-url-suffix)     | Properties ending with 'Url' should use 'Uri' suffix instead to follow .NET naming conventions. |
+| [`@azure-tools/typespec-client-generator-core/no-url-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/no-url-suffix)                   | Properties ending with 'Url' should use 'Uri' suffix instead to follow .NET naming conventions. |
 
 ## Decorators
 

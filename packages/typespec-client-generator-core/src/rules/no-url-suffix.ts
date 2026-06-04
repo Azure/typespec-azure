@@ -24,7 +24,7 @@ function createRenameUrlToUriCodeFix(
 ) {
   const newName = csharpName.slice(0, -1) + "i"; // Url → Uri
   const codeFix: CodeFix = {
-    id: "dotnet-rename-url-to-uri",
+    id: "rename-url-to-uri",
     label: `Add @@clientName to client.tsp → "${newName}"`,
     fix: (async (_fixContext: CodeFixContext): Promise<any> => {
       if (property.node === undefined) return [];
@@ -104,11 +104,11 @@ function createRenameUrlToUriCodeFix(
 }
 
 export const noUrlSuffixRule = createRule({
-  name: "dotnet-no-url-suffix",
+  name: "no-url-suffix",
   description:
     "Properties ending with 'Url' should use 'Uri' suffix instead to follow .NET naming conventions.",
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/dotnet-no-url-suffix",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/no-url-suffix",
   messages: {
     default: paramMessage`Property '${"propertyName"}' ends with 'Url'. Use 'Uri' suffix instead (e.g. '${"suggestion"}'). Use @clientName("${"suggestion"}", "csharp") to rename it for C#.`,
   },
