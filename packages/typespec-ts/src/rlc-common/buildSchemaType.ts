@@ -77,16 +77,18 @@ export function generateModelFiles(
       ]);
     }
     // Add NodeReadableStream import if binary types are used in models.
+    // platform-types.ts is generated directly under src/ (no static-helpers/
+    // subdirectory) to match the RLC design where all output lives in src/.
     // The platform-types static helper resolves NodeReadableStream to
     // NodeJS.ReadableStream on Node and `never` on browser/react-native, so the
     // union arm drops out naturally in non-Node builds.
     if (modelsFile.getFullText().includes("NodeReadableStream")) {
       const platformTypesModuleSpecifier = model.options?.azureSdkForJs
-        ? "#platform/static-helpers/platform-types"
+        ? "#platform/platform-types"
         : getImportModuleName(
             {
-              cjsName: `./static-helpers/platform-types`,
-              esModulesName: `./static-helpers/platform-types.js`
+              cjsName: `./platform-types`,
+              esModulesName: `./platform-types.js`
             },
             model
           );
