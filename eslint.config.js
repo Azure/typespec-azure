@@ -26,7 +26,7 @@ export default defineConfig(
   },
   ...TypeSpecCommonEslintConfigs,
   {
-    files: ["packages/*/src/**/*.ts", "packages/*/src/**/*.tsx"],
+    files: ["packages/!(typespec-ts)/src/**/*.ts", "packages/!(typespec-ts)/src/**/*.tsx"],
     languageOptions: {
       parserOptions: {
         projectService: {
