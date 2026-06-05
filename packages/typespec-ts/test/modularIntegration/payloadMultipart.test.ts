@@ -68,7 +68,7 @@ describe("Multipart Client", () => {
 
   // TODO not supported
   it.skip("anonymous model", async () => {
-    // @ts-ignore - not supported yet
+    // @ts-expect-error - not supported yet
     await client.formData.anonymousModel(fs.createReadStream(imgPath));
   });
 

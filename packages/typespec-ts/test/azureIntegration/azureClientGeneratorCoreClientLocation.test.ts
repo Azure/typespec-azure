@@ -47,7 +47,6 @@ describe("Azure Client Generator Core Client Location", () => {
             blob: "testblob.txt",
           },
         });
-      console.log(response);
       assert.strictEqual(response.status, "200");
       assert.strictEqual(response.body.id, "blob-001");
       assert.strictEqual(response.body.name, "testblob.txt");

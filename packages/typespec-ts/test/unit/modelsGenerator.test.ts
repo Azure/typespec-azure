@@ -198,7 +198,7 @@ describe("Input/output model type", () => {
       });
     });
 
-    it("should generate nullable model", async () => {
+    it("should generate nullable model reference", async () => {
       const tspDefinition = `
       model SimpleModel {
         color: "red" | "blue";

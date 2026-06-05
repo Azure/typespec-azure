@@ -71,7 +71,7 @@ const OUTPUT_CODE_BLOCK_TYPES: Record<string, EmitterFunction> = {
   },
 
   // Snapshot of the entire models file
-  "(ts|typescript) models": async (tsp, {}, namedUnknownArgs) => {
+  "(ts|typescript) models": async (tsp, _, namedUnknownArgs) => {
     const configs = namedUnknownArgs ? (namedUnknownArgs["configs"] as Record<string, string>) : {};
     const result = await emitModularModelsFromTypeSpec(tsp, configs);
 
@@ -83,7 +83,7 @@ const OUTPUT_CODE_BLOCK_TYPES: Record<string, EmitterFunction> = {
   },
 
   // Snapshot of the top-level index file
-  "(ts|typescript) root index": async (tsp, {}, namedUnknownArgs) => {
+  "(ts|typescript) root index": async (tsp, _, namedUnknownArgs) => {
     const configs = namedUnknownArgs ? (namedUnknownArgs["configs"] as Record<string, string>) : {};
     const result = await emitRootIndexFromTypeSpec(tsp, configs);
 
@@ -114,7 +114,7 @@ const OUTPUT_CODE_BLOCK_TYPES: Record<string, EmitterFunction> = {
   },
 
   // Snapshot of the entire models file
-  "(ts|typescript) models:withOptions": async (tsp, {}, namedUnknownArgs) => {
+  "(ts|typescript) models:withOptions": async (tsp, _, namedUnknownArgs) => {
     const configs = namedUnknownArgs ? (namedUnknownArgs["configs"] as Record<string, string>) : {};
     const result = await emitModularModelsFromTypeSpec(tsp, {
       needOptions: true,
@@ -130,7 +130,7 @@ const OUTPUT_CODE_BLOCK_TYPES: Record<string, EmitterFunction> = {
 
   // Snapshot of the entire operations file for when there is only one operation group
   // If there is more than one operations group, currently we throw
-  "(ts|typescript) operations": async (tsp, {}, namedUnknownArgs) => {
+  "(ts|typescript) operations": async (tsp, _, namedUnknownArgs) => {
     const configs = namedUnknownArgs ? (namedUnknownArgs["configs"] as Record<string, string>) : {};
     const result = await emitModularOperationsFromTypeSpec(tsp, configs);
     assert.equal(result?.length, 1, "Expected exactly 1 source file");
@@ -146,7 +146,7 @@ const OUTPUT_CODE_BLOCK_TYPES: Record<string, EmitterFunction> = {
     return result![0]!.getFunctionOrThrow(name!).getText();
   },
 
-  "(ts|typescript) samples": async (tsp, {}, namedUnknownArgs) => {
+  "(ts|typescript) samples": async (tsp, _, namedUnknownArgs) => {
     if (!namedUnknownArgs || !namedUnknownArgs["examples"]) {
       throw new Error(`Expected 'examples' to be passed in as an argument`);
     }
@@ -160,14 +160,14 @@ const OUTPUT_CODE_BLOCK_TYPES: Record<string, EmitterFunction> = {
   },
 
   //Snapshot of the clientContext file for a given typespec
-  "(ts|typescript) clientContext": async (tsp, {}, namedUnknownArgs) => {
+  "(ts|typescript) clientContext": async (tsp, _, namedUnknownArgs) => {
     const configs = namedUnknownArgs ? (namedUnknownArgs["configs"] as Record<string, string>) : {};
     const result = await emitModularClientContextFromTypeSpec(tsp, configs);
     return result!.getFullText()!;
   },
 
   //Snapshot of the classicClient file for a given typespec
-  "(ts|typescript) classicClient": async (tsp, {}, namedUnknownArgs) => {
+  "(ts|typescript) classicClient": async (tsp, _, namedUnknownArgs) => {
     const configs = namedUnknownArgs ? (namedUnknownArgs["configs"] as Record<string, string>) : {};
     const result = await emitModularClientFromTypeSpec(tsp, configs);
     return result ? result!.getFullText()! : "";
@@ -197,7 +197,7 @@ const OUTPUT_CODE_BLOCK_TYPES: Record<string, EmitterFunction> = {
   },
 
   // Pattern for single test file - returns the first generated test file
-  "(ts|typescript) tests": async (tsp, {}, namedUnknownArgs) => {
+  "(ts|typescript) tests": async (tsp, _, namedUnknownArgs) => {
     if (!namedUnknownArgs || !namedUnknownArgs["examples"]) {
       throw new Error(`Expected 'examples' to be passed in as an argument`);
     }

@@ -257,7 +257,7 @@ describe("Azure Arm Resources Rest Client", () => {
       assert.fail(error);
     }
     const iter = paginate(client, initialResponse);
-    let result: Array<SingletonTrackedResourceOutput> = [];
+    const result: Array<SingletonTrackedResourceOutput> = [];
     for await (const item of iter) {
       result.push(item);
     }
@@ -386,7 +386,7 @@ describe("Azure Arm Resources Rest Client", () => {
       assert.fail(error);
     }
     const iter = paginate(client, initialResponse);
-    let result: Array<TopLevelTrackedResourceOutput> = [];
+    const result: Array<TopLevelTrackedResourceOutput> = [];
     for await (const item of iter) {
       result.push(item);
     }
@@ -405,7 +405,7 @@ describe("Azure Arm Resources Rest Client", () => {
       assert.fail(error);
     }
     const iter = paginate(client, initialResponse);
-    let result: Array<TopLevelTrackedResourceOutput> = [];
+    const result: Array<TopLevelTrackedResourceOutput> = [];
     for await (const item of iter) {
       result.push(item);
     }
@@ -519,7 +519,7 @@ describe("Azure Arm Resources Rest Client", () => {
       assert.fail(error);
     }
     const iter = paginate(client, initialResponse);
-    let result: Array<NestedProxyResourceOutput> = [];
+    const result: Array<NestedProxyResourceOutput> = [];
     for await (const item of iter) {
       result.push(item);
     }
@@ -623,7 +623,7 @@ describe("Azure Arm Resources Rest Client", () => {
       assert.fail(error);
     }
     const iter = paginate(client, initialResponse);
-    let result: Array<LocationResourceOutput> = [];
+    const result: Array<LocationResourceOutput> = [];
     for await (const item of iter) {
       result.push(item);
     }
@@ -1019,7 +1019,7 @@ describe("Azure Arm Resources Rest Client", () => {
       assert.fail(error);
     }
     const resourceGroupIter = paginate(client, resourceGroupResponse);
-    let resourceGroupResult: Array<ExtensionsResourceOutput> = [];
+    const resourceGroupResult: Array<ExtensionsResourceOutput> = [];
     for await (const item of resourceGroupIter) {
       resourceGroupResult.push(item);
     }
@@ -1039,7 +1039,7 @@ describe("Azure Arm Resources Rest Client", () => {
       assert.fail(error);
     }
     const subscriptionIter = paginate(client, subscriptionResponse);
-    let subscriptionIterResult: Array<ExtensionsResourceOutput> = [];
+    const subscriptionIterResult: Array<ExtensionsResourceOutput> = [];
     for await (const item of subscriptionIter) {
       subscriptionIterResult.push(item);
     }
@@ -1059,7 +1059,7 @@ describe("Azure Arm Resources Rest Client", () => {
       assert.fail(error);
     }
     const tenantIter = paginate(client, tenantResponse);
-    let tenantResult: Array<ExtensionsResourceOutput> = [];
+    const tenantResult: Array<ExtensionsResourceOutput> = [];
     for await (const item of tenantIter) {
       tenantResult.push(item);
     }
@@ -1079,7 +1079,7 @@ describe("Azure Arm Resources Rest Client", () => {
       assert.fail(error);
     }
     const resourceIter = paginate(client, resourceResponse);
-    let resourceResult: Array<ExtensionsResourceOutput> = [];
+    const resourceResult: Array<ExtensionsResourceOutput> = [];
     for await (const item of resourceIter) {
       resourceResult.push(item);
     }

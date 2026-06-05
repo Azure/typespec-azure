@@ -110,7 +110,6 @@ describe("EncodeBytesClient Modular Client", () => {
         const result = await client.requestBody.default(pngFile);
         assert.isUndefined(result);
       } catch (err) {
-        console.log(JSON.stringify(err));
         assert.fail(err as string);
       }
     });
@@ -134,7 +133,7 @@ describe("EncodeBytesClient Modular Client", () => {
       assert.isUndefined(result);
     });
 
-    it(`should post bytes with custom content type`, async () => {
+    it(`should post bytes with octet-stream content type`, async () => {
       const result = await client.requestBody.octetStream(pngFile);
       assert.isUndefined(result);
     });
@@ -143,11 +142,7 @@ describe("EncodeBytesClient Modular Client", () => {
   describe("response body", () => {
     const pngFile = readFileSync(resolve("../../packages/typespec-ts/temp/assets/image.png"));
     it(`should get bytes with oct-stream by default`, async () => {
-      const result = await client.responseBody.default({
-        onResponse: (res) => {
-          res.headers.get("content-type") === "application/octet-stream";
-        },
-      });
+      const result = await client.responseBody.default({});
       const chunks: Uint8Array[] = [];
       for await (const chunk of result.readableStreamBody!) {
         chunks.push(chunk as Uint8Array);
@@ -170,11 +165,7 @@ describe("EncodeBytesClient Modular Client", () => {
     });
 
     it(`should get bytes with custom content type`, async () => {
-      const result = await client.responseBody.customContentType({
-        onResponse: (res) => {
-          res.headers.get("content-type") === "image/png";
-        },
-      });
+      const result = await client.responseBody.customContentType({});
       const chunks: Uint8Array[] = [];
       for await (const chunk of result.readableStreamBody!) {
         chunks.push(chunk as Uint8Array);
@@ -187,11 +178,7 @@ describe("EncodeBytesClient Modular Client", () => {
     });
 
     it(`should get bytes with octet-stream content type`, async () => {
-      const result = await client.responseBody.octetStream({
-        onResponse: (res) => {
-          res.headers.get("content-type") === "application/octet-stream";
-        },
-      });
+      const result = await client.responseBody.octetStream({});
       const chunks: Uint8Array[] = [];
       for await (const chunk of result.readableStreamBody!) {
         chunks.push(chunk as Uint8Array);

@@ -189,7 +189,7 @@ describe("url-template", () => {
         emptystring: "",
         emptylist: [],
         emptyobject: {},
-        undefinedlistitem: [1, , 2],
+        undefinedlistitem: [1, undefined, 2],
         undefinedobjectitem: {
           key: null,
           hello: "world",

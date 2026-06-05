@@ -140,13 +140,11 @@ describe("ModelsPropertyTypesClient Rest Client", () => {
       },
     });
   });
-  for (let item of testedTypes) {
+  for (const item of testedTypes) {
     it(`should get a ${item.type} value`, async () => {
       let result: any;
       if (item.convertedToFn) {
         item.defaultValue = item.convertedToFn(item.defaultValue);
-      } else {
-        item.defaultValue = item.defaultValue;
       }
       switch (item.type) {
         case "boolean":
@@ -242,13 +240,11 @@ describe("ModelsPropertyTypesClient Rest Client", () => {
       assert.deepEqual(result.property, item.defaultValue);
     });
   }
-  for (let item of testedTypes) {
+  for (const item of testedTypes) {
     it(`should put a ${item.type} value`, async () => {
       let result: any;
       if (item.convertedToFn) {
         item.defaultValue = item.convertedToFn(item.defaultValue);
-      } else {
-        item.defaultValue = item.defaultValue;
       }
       switch (item.type) {
         case "boolean":

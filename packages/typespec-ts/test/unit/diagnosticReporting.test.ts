@@ -150,14 +150,10 @@ describe("Diagnostic Reporting Tests", () => {
       } as any;
 
       try {
-        const result = buildModelDeserializer(mockContext, mockPolymorphicType);
-
+        buildModelDeserializer(mockContext, mockPolymorphicType);
         // Should still attempt to build but might fail due to context issues
-        console.log("Test result:", result);
-        console.log("Captured diagnostics:", capturedDiagnostics);
-      } catch (error) {
+      } catch {
         // Expected to fail due to mock context limitations
-        console.log("Expected error in mock environment:", (error as Error).message);
       }
     });
   });
@@ -264,14 +260,10 @@ describe("Diagnostic Reporting Tests", () => {
       } as any;
 
       try {
-        const result = buildModelSerializer(mockContext, mockPolymorphicType);
-
+        buildModelSerializer(mockContext, mockPolymorphicType);
         // Should still attempt to build but might fail due to context issues
-        console.log("Test result:", result);
-        console.log("Captured diagnostics:", capturedDiagnostics);
-      } catch (error) {
+      } catch {
         // Expected to fail due to mock context limitations
-        console.log("Expected error in mock environment:", (error as Error).message);
       }
     });
   });
@@ -312,9 +304,6 @@ describe("Diagnostic Reporting Tests", () => {
 
       const result = getParameterMap(localMockContext, unsupportedParam, unsupportedParam.name);
 
-      console.log(capturedDiagnostic.code);
-      console.log(capturedDiagnostic.message);
-
       assert.include(capturedDiagnostic.code, "unsupported-parameter-type");
       assert.include(capturedDiagnostic.message, "testParam");
       assert.equal(result, `"testParam": undefined`);
@@ -337,9 +326,6 @@ describe("Diagnostic Reporting Tests", () => {
       } as any;
 
       buildSubClientIndexFile(mockContext, mockClientMap, mockEmitterOptions);
-
-      console.log(capturedDiagnostics[0]?.code);
-      console.log(capturedDiagnostics[0]?.message);
 
       assert.isTrue(capturedDiagnostics.length > 0);
       assert.include(capturedDiagnostics[0].code, "client-file-not-found");
@@ -381,9 +367,6 @@ describe("Diagnostic Reporting Tests", () => {
 
       visitPackageTypes(localMockContext);
 
-      console.log(capturedDiagnostics[0]?.code);
-      console.log(capturedDiagnostics[0]?.message);
-
       assert.isTrue(capturedDiagnostics.length > 0);
       assert.include(capturedDiagnostics[0].code, "unknown-sdk-method-kind");
       assert.include(capturedDiagnostics[0].message, "unsupported-method-kind");
@@ -406,8 +389,6 @@ describe("Diagnostic Reporting Tests", () => {
       await emitContentByBuilder(mockProgram, () => mockFile, {} as any);
 
       const diagnostic = capturedDiagnostics.find((d) => d.code.endsWith("file-formatting-error"));
-      console.log(diagnostic?.code);
-      console.log(diagnostic?.message);
 
       assert.isTrue(!!diagnostic);
       assert.include(diagnostic!.code, "file-formatting-error");
@@ -440,16 +421,14 @@ describe("Diagnostic Reporting Tests", () => {
       } as any;
 
       try {
-        const result = buildModelDeserializer(mockContext, mockModelType);
-        console.log("Advanced test - Result:", typeof result);
-      } catch (error) {
-        console.log("Advanced test - Expected context error:", (error as Error).message);
+        buildModelDeserializer(mockContext, mockModelType);
+      } catch {
+        // Expected context error in mock environment
       }
     });
 
     afterAll(() => {
       // Test that validates our understanding of function routing
-      console.log("Advanced deserializer tests completed");
     });
   });
 
@@ -478,16 +457,14 @@ describe("Diagnostic Reporting Tests", () => {
       } as any;
 
       try {
-        const result = buildModelSerializer(mockContext, mockModelType);
-        console.log("Advanced serializer test - Result:", typeof result);
-      } catch (error) {
-        console.log("Advanced serializer test - Expected context error:", (error as Error).message);
+        buildModelSerializer(mockContext, mockModelType);
+      } catch {
+        // Expected context error in mock environment
       }
     });
 
     afterAll(() => {
       // Test that validates our understanding of function routing
-      console.log("Advanced serializer tests completed");
     });
   });
 });

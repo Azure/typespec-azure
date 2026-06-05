@@ -399,7 +399,7 @@ export async function emitModularModelsFromTypeSpec(
   });
   const dpgContext = await createDpgContextTestHelper(context.program, false, options);
   const binder = useBinder();
-  let modelFile = undefined;
+  let modelFile: any;
   const includeResponseHeaders = options["include-headers-in-response"] === true;
   dpgContext.rlcOptions!.includeHeadersInResponse = includeResponseHeaders;
   dpgContext.rlcOptions!.isModularLibrary = true;

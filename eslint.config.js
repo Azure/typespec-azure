@@ -26,6 +26,7 @@ export default defineConfig(
   },
   ...TypeSpecCommonEslintConfigs,
   {
+    // Disable these dynamic rules for typespec-ts to prevent OOM
     files: ["packages/!(typespec-ts)/src/**/*.ts", "packages/!(typespec-ts)/src/**/*.tsx"],
     languageOptions: {
       parserOptions: {

@@ -26,7 +26,6 @@ describe("MediaType Client", () => {
 
   it("should getAsJson", async () => {
     const result = await client.stringBody.getAsJson();
-    console.log(result);
     assert.strictEqual(result, "foo");
   });
 

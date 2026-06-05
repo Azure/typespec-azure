@@ -85,7 +85,7 @@ describe("Array Item-Types Client", () => {
       },
     });
   });
-  for (let item of testedTypes) {
+  for (const item of testedTypes) {
     it(`should get ${item.type} value`, async () => {
       let result: any;
       switch (item.type) {
@@ -137,7 +137,7 @@ describe("Array Item-Types Client", () => {
       assert.deepEqual(result, item.defaultValue);
     });
   }
-  for (let item of testedTypes) {
+  for (const item of testedTypes) {
     it(`should put ${item.type} vaule`, async () => {
       let result: any;
       switch (item.type) {

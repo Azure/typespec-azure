@@ -36,7 +36,7 @@ describe("Type Union Client", () => {
     const result = await client.stringExtensibleNamed.get();
     assert.strictEqual(result.prop, "custom");
   });
-  it("should send strings extensible union", async () => {
+  it("should send strings extensible named union", async () => {
     const result = await client.stringExtensibleNamed.send("custom");
     assert.isUndefined(result);
   });

@@ -20,7 +20,7 @@ describe("Pageable Client", () => {
       .path("/payload/pageable/server-driven-pagination/link")
       .get();
     const iter = paginate(client, initialResponse);
-    let result: PetOutput[] = [];
+    const result: PetOutput[] = [];
     for await (const item of iter) {
       result.push(item);
     }

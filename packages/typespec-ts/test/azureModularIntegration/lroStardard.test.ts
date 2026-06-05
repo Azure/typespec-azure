@@ -200,7 +200,7 @@ describe("LROStandardClient Classical Client", () => {
       assert.deepEqual(result, { name: "madge", role: "contributor" });
     });
 
-    it("should await beginCreateOrReplaceAndWait result directly", async () => {
+    it("should poll beginCreateOrReplace until done", async () => {
       const poller = await client.beginCreateOrReplace("madge", {
         role: "contributor",
       } as any);

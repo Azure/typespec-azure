@@ -60,8 +60,6 @@ describe("operationHelpers", () => {
       // Call the function
       const result = getParameterMap(mockContext, unsupportedParam, unsupportedParam.name);
 
-      console.log(capturedDiagnostic.code);
-      console.log(capturedDiagnostic.message);
       // Verify the diagnostic was captured and has the correct format
       assert.isNotNull(capturedDiagnostic, "Expected diagnostic to be reported");
       assert.isTrue(

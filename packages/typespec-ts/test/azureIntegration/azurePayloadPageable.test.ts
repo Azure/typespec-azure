@@ -60,7 +60,7 @@ describe("Azure Pageable Client", () => {
 
     const iter = paginate(client, initialResponse);
 
-    let result: UserOutput[] = [];
+    const result: UserOutput[] = [];
     for await (const item of iter) {
       result.push(item);
     }

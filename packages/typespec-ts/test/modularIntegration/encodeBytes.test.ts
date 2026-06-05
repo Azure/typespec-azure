@@ -110,7 +110,6 @@ describe("EncodeBytesClient Modular Client", () => {
         const result = await client.requestBody.default(pngFile);
         assert.isUndefined(result);
       } catch (err) {
-        console.log(JSON.stringify(err));
         assert.fail(err as string);
       }
     });
@@ -134,7 +133,7 @@ describe("EncodeBytesClient Modular Client", () => {
       assert.isUndefined(result);
     });
 
-    it(`should post bytes with custom content type`, async () => {
+    it(`should post bytes with octet-stream content type`, async () => {
       const result = await client.requestBody.octetStream(pngFile);
       assert.isUndefined(result);
     });
@@ -143,11 +142,7 @@ describe("EncodeBytesClient Modular Client", () => {
   describe("response body", () => {
     const pngFile = readFileSync(resolve("../../packages/typespec-ts/temp/assets/image.png"));
     it(`should get bytes with base64 encoding by default`, async () => {
-      const result = await client.responseBody.default({
-        onResponse: (res) => {
-          res.headers.get("content-type") === "application/octet-stream";
-        },
-      });
+      const result = await client.responseBody.default({});
       assert.sameMembers([...result], [...pngFile]);
     });
 
@@ -162,20 +157,12 @@ describe("EncodeBytesClient Modular Client", () => {
     });
 
     it(`should get bytes with custom content type`, async () => {
-      const result = await client.responseBody.customContentType({
-        onResponse: (res) => {
-          res.headers.get("content-type") === "image/png";
-        },
-      });
+      const result = await client.responseBody.customContentType({});
       assert.sameMembers([...result], [...pngFile]);
     });
 
     it(`should get bytes with octet-stream content type`, async () => {
-      const result = await client.responseBody.octetStream({
-        onResponse: (res) => {
-          res.headers.get("content-type") === "application/octet-stream";
-        },
-      });
+      const result = await client.responseBody.octetStream({});
       assert.sameMembers([...result], [...pngFile]);
     });
   });

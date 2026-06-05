@@ -25,7 +25,7 @@ describe("Azure Core Page Rest Client", () => {
     }
 
     const iter = paginate(client, initialResponse);
-    let result: UserOutput[] = [];
+    const result: UserOutput[] = [];
     for await (const item of iter) {
       result.push(item);
     }
@@ -50,7 +50,7 @@ describe("Azure Core Page Rest Client", () => {
     }
 
     const iter = paginate(client, initialResponse);
-    let result: UserOutput[] = [];
+    const result: UserOutput[] = [];
     for await (const item of iter) {
       result.push(item);
     }
@@ -69,7 +69,7 @@ describe("Azure Core Page Rest Client", () => {
     }
 
     const iter1 = paginate(client, initialResponse1);
-    let result1: FirstItemOutput[] = [];
+    const result1: FirstItemOutput[] = [];
     for await (const item of iter1) {
       result1.push(item);
     }
@@ -83,7 +83,7 @@ describe("Azure Core Page Rest Client", () => {
     }
 
     const iter2 = paginate(client, initialResponse2);
-    let result2: SecondItemOutput[] = [];
+    const result2: SecondItemOutput[] = [];
     for await (const item of iter2) {
       result2.push(item);
     }
@@ -98,7 +98,7 @@ describe("Azure Core Page Rest Client", () => {
     }
 
     const iter = paginate(client, initialResponse);
-    let result: UserOutput[] = [];
+    const result: UserOutput[] = [];
     for await (const item of iter) {
       result.push(item);
     }

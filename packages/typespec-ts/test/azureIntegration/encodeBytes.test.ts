@@ -164,7 +164,7 @@ describe("EncodeDatetimeClient Rest Client", () => {
       assert.strictEqual(result.status, "204");
     });
 
-    it(`should post bytes with custom content type`, async () => {
+    it(`should post bytes with octet-stream content type`, async () => {
       const result = await client.path(`/encode/bytes/body/request/octet-stream`).post({
         contentType: "application/octet-stream",
         body: pngFile,

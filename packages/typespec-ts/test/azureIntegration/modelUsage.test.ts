@@ -26,7 +26,7 @@ describe("ModelsUsageClient Rest Client", () => {
     assert.deepEqual(result.body, body);
   });
 
-  it("should get output model correctly", async () => {
+  it("should get input-output model correctly", async () => {
     const result = await client.path("/type/model/usage/input-output").post({ body });
     assert.strictEqual(result.status, "200");
     assert.deepEqual(result.body, body);
