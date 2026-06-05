@@ -1,7 +1,7 @@
 import {
-createLinterRuleTester,
-extractCursor,
-LinterRuleTester,
+  createLinterRuleTester,
+  extractCursor,
+  LinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 import { spreadDiscriminatedModelRule } from "../../src/rules/spread-discriminated-model.js";

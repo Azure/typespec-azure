@@ -68,8 +68,7 @@ it("emits a diagnostic for operations that don't follow naming standards", async
       {
         code: "@azure-tools/typespec-azure-core/use-standard-names",
         severity: "warning",
-        message:
-          "PUT operations that return 200 should start with 'replace' or 'createOrReplace'",
+        message: "PUT operations that return 200 should start with 'replace' or 'createOrReplace'",
       },
       {
         code: "@azure-tools/typespec-azure-core/use-standard-names",

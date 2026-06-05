@@ -7,11 +7,7 @@ let tester: LinterRuleTester;
 
 beforeEach(async () => {
   const runner = await Tester.createInstance();
-  tester = createLinterRuleTester(
-    runner,
-    noOffsetDateTimeRule,
-    "@azure-tools/typespec-azure-core",
-  );
+  tester = createLinterRuleTester(runner, noOffsetDateTimeRule, "@azure-tools/typespec-azure-core");
 });
 
 it("emit warning if offsetDateTime used as property type", async () => {
