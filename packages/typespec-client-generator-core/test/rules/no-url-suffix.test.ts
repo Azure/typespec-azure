@@ -191,7 +191,7 @@ describe("codefix", () => {
     expect(diag.codefixes!.length).toBeGreaterThanOrEqual(1);
 
     const codefix = diag.codefixes![0];
-    expect(codefix.id).toBe("rename-url-to-uri");
+    expect(codefix.id).toBe("add-clientName-in-client-tsp");
     expect(codefix.label).toContain("imageUri");
 
     const edits = await resolveCodeFix(codefix);
