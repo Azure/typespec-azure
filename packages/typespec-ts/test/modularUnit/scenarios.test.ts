@@ -13,8 +13,8 @@ import {
   emitRootIndexFromTypeSpec,
   emitSamplesFromTypeSpec,
   emitTestsFromTypeSpec,
-} from "../util/emitUtil.js";
-import { assertEqualContent, ExampleJson } from "../util/testUtil.js";
+} from "../util/emit-util.js";
+import { assertEqualContent, ExampleJson } from "../util/test-util.js";
 
 const SCENARIOS_LOCATION = "./test/modularUnit/scenarios";
 

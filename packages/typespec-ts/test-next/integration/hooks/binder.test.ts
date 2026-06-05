@@ -11,7 +11,7 @@ import { Binder, provideBinder, useBinder } from "../../../src/framework/hooks/b
 import path from "path";
 import { addDeclaration } from "../../../src/framework/declaration.js";
 import { ExternalDependencies } from "../../../src/framework/dependency.js";
-import { useDependencies } from "../../../src/framework/hooks/useDependencies.js";
+import { useDependencies } from "../../../src/framework/hooks/use-dependencies.js";
 import { loadStaticHelpers, StaticHelpers } from "../../../src/framework/load-static-helpers.js";
 import { resolveReference } from "../../../src/framework/reference.js";
 import { AzurePollingDependencies } from "../../../src/modular/external-dependencies.js";

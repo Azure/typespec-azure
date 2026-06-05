@@ -26,7 +26,6 @@
     "lint:fix": "eslint . --fix --ext .ts",
     "check:tree": "tsx ./test/commands/check-clean-tree.ts",
     "test:ts:e2e": "npm run copy:typespec && npm run integration-test-ci:azure-rlc && npm run integration-test-ci:azure-modular",
-    "prettier": "prettier --config ./.prettierrc \"{src,test,static}/**/*.ts\" \"!test/**/generated/**/*.ts\"",
     "integration-test-ci": "npm-run-all copy:typespec integration-test-ci:rlc integration-test-ci:azure-rlc integration-test-ci:modular integration-test-ci:azure-modular",
     "integration-test-ci:sequential": "npm-run-all --serial copy:typespec integration-test-ci:modular && npm run integration-test-ci:modular",
     "integration-test-ci:rlc": "npm-run-all --silent -p start-test-server:rlc --race generate-and-run:rlc",

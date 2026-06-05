@@ -9,7 +9,7 @@ import {
   SdkModelType,
   SdkServiceResponseHeader,
 } from "@azure-tools/typespec-client-generator-core";
-import { useContext } from "../../contextManager.js";
+import { useContext } from "../../context-manager.js";
 import { resolveReference } from "../../framework/reference.js";
 import { refkey } from "../../framework/refkey.js";
 import { SdkContext } from "../../utils/interfaces.js";

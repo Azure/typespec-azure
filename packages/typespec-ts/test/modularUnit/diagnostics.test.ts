@@ -5,8 +5,8 @@ import { ok } from "assert";
 import {
   emitModularModelsFromTypeSpec,
   emitModularOperationsFromTypeSpec,
-} from "../util/emitUtil.js";
-import { createDpgContextTestHelper, createRLCEmitterTestHost } from "../util/testUtil.js";
+} from "../util/emit-util.js";
+import { createDpgContextTestHelper, createRLCEmitterTestHost } from "../util/test-util.js";
 
 describe("Diagnostic reporting tests", () => {
   it("should not crash when emitter encounters error conditions", async () => {
@@ -15,14 +15,14 @@ describe("Diagnostic reporting tests", () => {
     // that don't expect crashes when processing various TypeSpec inputs
 
     // Import the fixed modules to ensure they compile
-    const operationHelpers = await import("../../src/modular/helpers/operationHelpers.js");
-    const emitModels = await import("../../src/modular/emitModels.js");
-    const buildRootIndex = await import("../../src/modular/buildRootIndex.js");
+    const operationHelpers = await import("../../src/modular/helpers/operation-helpers.js");
+    const emitModels = await import("../../src/modular/emit-models.js");
+    const buildRootIndex = await import("../../src/modular/build-root-index.js");
     const serializerFunction =
-      await import("../../src/modular/serialization/buildSerializerFunction.js");
+      await import("../../src/modular/serialization/build-serializer-function.js");
     const deserializerFunction =
-      await import("../../src/modular/serialization/buildDeserializerFunction.js");
-    const emitUtil = await import("../../src/utils/emitUtil.js");
+      await import("../../src/modular/serialization/build-deserializer-function.js");
+    const emitUtil = await import("../../src/utils/emit-util.js");
 
     // Basic checks that modules loaded successfully
     ok(operationHelpers);
