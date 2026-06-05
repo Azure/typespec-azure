@@ -1,5 +1,3 @@
-import type { CompilerHost, Diagnostic } from "@typespec/compiler";
-import { applyCodeFix, navigateProgram, resolveCodeFix } from "@typespec/compiler";
 import {
   createLinterRuleTester,
   LinterRuleTester,
@@ -8,17 +6,16 @@ import {
 import { beforeEach, describe, expect, it } from "vitest";
 import { noUrlSuffixRule } from "../../src/rules/no-url-suffix.js";
 import { SimpleTester } from "../tester.js";
+import { applyClientTspCodeFix } from "./test-codefix-helpers.js";
+
+const libraryName = "@azure-tools/typespec-client-generator-core";
 
 let runner: TesterInstance;
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
   runner = await SimpleTester.createInstance();
-  tester = createLinterRuleTester(
-    runner,
-    noUrlSuffixRule,
-    "@azure-tools/typespec-client-generator-core",
-  );
+  tester = createLinterRuleTester(runner, noUrlSuffixRule, libraryName);
 });
 
 // --- Invalid cases ---
@@ -152,137 +149,33 @@ it("does not flag properties from library types even if they end with Url", asyn
 
 // --- Codefix ---
 
-/**
- * Helper: compile code, run the rule manually (same as the rule tester does internally),
- * and return the diagnostics with codefixes.
- */
-async function compileAndGetRuleDiagnostics(
-  testRunner: TesterInstance,
-  code: string,
-): Promise<Diagnostic[]> {
-  await testRunner.compileAndDiagnose(code);
-  // Run the rule manually against the compiled program (matching rule-tester internals)
-  const rule = {
-    ...noUrlSuffixRule,
-    id: `@azure-tools/typespec-client-generator-core/${noUrlSuffixRule.name}`,
-  };
-  const diagnostics: Diagnostic[] = [];
-  const context = {
-    program: testRunner.program,
-    reportDiagnostic(diag: any) {
-      diagnostics.push({ ...diag, code: rule.id, severity: "warning" as const, message: "" });
-    },
-  };
-  const listener = noUrlSuffixRule.create(context as any);
-  navigateProgram(testRunner.program, listener);
-  return diagnostics;
-}
-
 describe("codefix", () => {
-  it("generates @@clientName in client.tsp with correct path and content", async () => {
-    const diagnostics = await compileAndGetRuleDiagnostics(
+  it("writes @@clientName to client.tsp with imports and correct target ref", async () => {
+    const content = await applyClientTspCodeFix(
       runner,
+      noUrlSuffixRule,
+      libraryName,
       `model Foo { imageUrl: string; }`,
+      "add-clientName-in-client-tsp",
     );
-    expect(diagnostics.length).toBeGreaterThanOrEqual(1);
-
-    const diag = diagnostics[0];
-    expect(diag.codefixes).toBeDefined();
-    expect(diag.codefixes!.length).toBeGreaterThanOrEqual(1);
-
-    const codefix = diag.codefixes![0];
-    expect(codefix.id).toBe("add-clientName-in-client-tsp");
-    expect(codefix.label).toContain("imageUri");
-
-    const edits = await resolveCodeFix(codefix);
-    expect(edits.length).toBeGreaterThanOrEqual(1);
-
-    // The last edit should be the @@clientName append
-    const clientNameEdit = edits[edits.length - 1];
-    expect(clientNameEdit.kind).toBe("insert-text");
-    expect(clientNameEdit.file.path).toContain("client.tsp");
-    expect(clientNameEdit.text).toContain("@@clientName(");
-    expect(clientNameEdit.text).toContain("imageUrl");
-    expect(clientNameEdit.text).toContain('"imageUri"');
-    expect(clientNameEdit.text).toContain('"csharp"');
-
-    // If there are header edits (imports/using), verify they target client.tsp too
-    if (edits.length > 1) {
-      const headerEdit = edits[0];
-      expect(headerEdit.file.path).toContain("client.tsp");
-      expect(headerEdit.text).toContain('import "@azure-tools/typespec-client-generator-core"');
-      expect(headerEdit.text).toContain("using Azure.ClientGenerator.Core");
-    }
+    expect(content).toContain('import "@azure-tools/typespec-client-generator-core"');
+    expect(content).toContain("using Azure.ClientGenerator.Core");
+    expect(content).toContain('@@clientName(Foo.imageUrl, "imageUri", "csharp")');
+    expect(content).toMatch(/@@clientName\(\w/);
   });
 
-  it("generates correct client.tsp content via applyCodeFix", async () => {
-    const diagnostics = await compileAndGetRuleDiagnostics(
+  it("after applying the codefix, the diagnostic disappears", async () => {
+    const content = await applyClientTspCodeFix(
       runner,
+      noUrlSuffixRule,
+      libraryName,
       `model Foo { imageUrl: string; }`,
+      "add-clientName-in-client-tsp",
     );
-    const codefix = diagnostics[0].codefixes![0];
-
-    // Capture all file writes
-    const writtenFiles = new Map<string, string>();
-    const host: CompilerHost = {
-      ...runner.program.host,
-      writeFile: (path, content) => {
-        writtenFiles.set(path, content);
-        return Promise.resolve();
-      },
-    };
-
-    await applyCodeFix(host, codefix);
-
-    // Find the client.tsp write
-    const clientTspEntry = [...writtenFiles.entries()].find(([path]) =>
-      path.endsWith("client.tsp"),
-    );
-    expect(clientTspEntry).toBeDefined();
-
-    const [clientPath, clientContent] = clientTspEntry!;
-    expect(clientPath).toMatch(/client\.tsp$/);
-    expect(clientContent).toContain('import "@azure-tools/typespec-client-generator-core"');
-    expect(clientContent).toContain("using Azure.ClientGenerator.Core");
-    expect(clientContent).toContain("@@clientName(");
-    expect(clientContent).toContain("imageUrl");
-    expect(clientContent).toContain('"imageUri"');
-    expect(clientContent).toContain('"csharp"');
-
-    // Verify the augment target is a valid FQN (no leading dot)
-    const clientNameLine = clientContent
+    const clientNameLine = content
       .split("\n")
-      .find((l: string) => l.includes("@@clientName("));
-    expect(clientNameLine).toBeDefined();
-    expect(clientNameLine).toMatch(/@@clientName\(\w/); // must start with a word char, not a dot
-    expect(clientNameLine).toContain("Foo.imageUrl");
-  });
-
-  it("after applying the codefix, the diagnostic disappears on recompilation", async () => {
-    // Step 1: Compile and verify diagnostic exists for imageUrl
-    const diagnostics = await compileAndGetRuleDiagnostics(
-      runner,
-      `model Foo { imageUrl: string; }`,
-    );
-    const imageUrlDiags = diagnostics.filter((d) =>
-      d.codefixes?.some((f) => f.label.includes("imageUri")),
-    );
-    expect(imageUrlDiags.length).toBe(1);
-
-    // Step 2: Apply the codefix and capture the generated @@clientName line
-    const codefix = imageUrlDiags[0].codefixes![0];
-    const edits = await resolveCodeFix(codefix);
-    const clientNameEdit = edits[edits.length - 1];
-    const clientNameLine = clientNameEdit.text.trim();
-
-    // Step 3: Recompile with the fix applied (inline, same as client.tsp would do)
-    const codeWithFix = `model Foo { imageUrl: string; }\n${clientNameLine}`;
-    const fixedDiagnostics = await compileAndGetRuleDiagnostics(runner, codeWithFix);
-    const fixedImageUrlDiags = fixedDiagnostics.filter((d) =>
-      d.codefixes?.some((f) => f.label.includes("imageUri")),
-    );
-
-    // Step 4: Verify no diagnostic for imageUrl
-    expect(fixedImageUrlDiags).toHaveLength(0);
+      .find((l) => l.includes("@@clientName("))!
+      .trim();
+    await tester.expect(`model Foo { imageUrl: string; }\n${clientNameLine}`).toBeValid();
   });
 });
