@@ -223,7 +223,7 @@ it("multipart with reused error model", async function () {
 
 it("expands model into formData parameters", async function () {
   const { program } = await SimpleTesterWithService.compile(`
-    @doc("A widget.")
+    
     model Widget {
       @key("widgetName")
       name: HttpPart<string>;

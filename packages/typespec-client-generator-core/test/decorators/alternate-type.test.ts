@@ -411,36 +411,18 @@ describe("external types", () => {
           minVersion: "1.13.0",
         }, "python")
         model ItemCollection {
-          /**
-           * GeoJSON FeatureCollection type.
-           */
           type: ItemCollectionType;
 
-          /**
-           * Array of STAC Items in the collection.
-           */
           features: StacItem[];
 
-          /**
-           * Bounding box of all items in format [west, south, east, north].
-           */
           boundingBox?: float64[];
 
-          /**
-           * Stac Version
-           */
           @minLength(1)
           @encodedName("application/json", "stac_version")
           stacVersion?: string = "1.0.0";
 
-          /**
-           * Links to related resources and endpoints.
-           */
           links?: Link[];
 
-          /**
-           * Context information for the search response.
-           */
           context?: ContextExtension;
         }
 
@@ -1058,9 +1040,7 @@ it("applied to union", async () => {
     }
 
     @usage(Usage.input)
-    /** Employee move response */
     model MoveResponse {
-      /** The status of the move */
       movingStatus: Dfe<string>;
     }
     `);
@@ -1083,9 +1063,7 @@ it("applied to enum", async () => {
     }
 
     @usage(Usage.input)
-    /** Employee status model */
     model EmployeeStatus {
-      /** The status of the employee */
       status: StatusEnum;
     }
     `);
@@ -1107,9 +1085,7 @@ it("applied to model", async () => {
     }
 
     @usage(Usage.input)
-    /** Employee info model */
     model EmployeeInfo {
-      /** The address of the employee */
       address: Address;
     }
     `);

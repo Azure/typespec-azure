@@ -32,6 +32,7 @@ import { getOperationId } from "@typespec/openapi";
 import { Version, getVersions } from "@typespec/versioning";
 import { pascalCase } from "change-case";
 import { getClientLocation, getClientNameOverride, getIsApiVersion } from "./decorators.js";
+import { normalizeExactName } from "./functions.js";
 import {
   DecoratedType,
   SdkBodyParameter,
@@ -209,7 +210,10 @@ export function getLibraryName(
 ): string {
   // 1. check if there's a client name
   const emitterSpecificName = getClientNameOverride(context, type, scope);
-  if (emitterSpecificName && emitterSpecificName !== type.name) return emitterSpecificName;
+  if (emitterSpecificName && emitterSpecificName !== type.name) {
+    // Strip the exact-name prefix if present so consumers always see clean names
+    return normalizeExactName(emitterSpecificName).name;
+  }
 
   // 2. check if there's a friendly name, if so return friendly name
   const friendlyName = getFriendlyName(context.program, type);
@@ -242,6 +246,25 @@ export function getLibraryName(
   }
 
   return typeof type.name === "string" ? type.name : "";
+}
+
+/**
+ * Check whether a type has an exact client name override (set via `exact()` function).
+ * When true, language emitters should use the name as-is without applying casing transformations.
+ *
+ * @param context The SDK context
+ * @param type The type to check
+ * @returns true if the client name was marked with `exact()`
+ */
+export function isExactClientName(
+  context: TCGCContext,
+  type: Type & { name?: string | symbol },
+): boolean {
+  const emitterSpecificName = getClientNameOverride(context, type);
+  if (emitterSpecificName) {
+    return normalizeExactName(emitterSpecificName).isExactName;
+  }
+  return false;
 }
 
 /**

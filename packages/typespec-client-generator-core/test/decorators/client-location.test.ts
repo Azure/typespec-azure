@@ -537,9 +537,7 @@ describe("Parameter", () => {
     @armCommonTypesVersion(CommonTypes.Versions.v5)
     namespace My.Service;
 
-    /** Api versions */
     enum Versions {
-      /** 2024-04-01-preview api version */
           V2024_04_01_PREVIEW: "2024-04-01-preview",
     }
 
@@ -593,9 +591,7 @@ describe("Parameter", () => {
     @armCommonTypesVersion(CommonTypes.Versions.v5)
     namespace My.Service;
 
-    /** Api versions */
     enum Versions {
-      /** 2024-04-01-preview api version */
           V2024_04_01_PREVIEW: "2024-04-01-preview",
     }
 
@@ -801,19 +797,15 @@ describe("Parameter", () => {
         @versioned(Versions)
         namespace Microsoft.ContosoProviderHub;
 
-        /** Contoso API versions */
         enum Versions {
-          /** 2021-10-01-preview version */
           @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
           "2021-10-01-preview",
         }
 
-        /** A ContosoProviderHub resource */
         model Employee is TrackedResource<EmployeeProperties> {
           ...ResourceNameParameter<Employee>;
         }
 
-        /** Employee properties */
         model EmployeeProperties {
           prop: string;
         }
@@ -877,19 +869,15 @@ describe("Parameter", () => {
         @versioned(Versions)
         namespace Microsoft.ContosoProviderHub;
 
-        /** Contoso API versions */
         enum Versions {
-          /** 2021-10-01-preview version */
           @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
           "2021-10-01-preview",
         }
 
-        /** A ContosoProviderHub resource */
         model Employee is TrackedResource<EmployeeProperties> {
           ...ResourceNameParameter<Employee>;
         }
 
-        /** Employee properties */
         model EmployeeProperties {
           prop: string;
         }
@@ -958,21 +946,16 @@ describe("Parameter", () => {
       @versioned(Microsoft.Contoso.Versions)
       namespace Microsoft.Contoso;
 
-      /** The available API versions. */
       enum Versions {
-        /** 2021-10-01-preview version */
         @armCommonTypesVersion(CommonTypes.Versions.v5)
         v2021_10_01_preview: "2021-10-01-preview",
       }
 
-      /** Employee resource */
       model Employee is TrackedResource<EmployeeProperties> {
         ...ResourceNameParameter<Employee>;
       }
 
-      /** Employee properties */
       model EmployeeProperties {
-        /** Age of employee */
         age?: int32;
       }
 
@@ -1056,9 +1039,7 @@ describe("Parameter", () => {
       @armCommonTypesVersion(CommonTypes.Versions.v5)
       namespace My.Service;
 
-      /** Api versions */
       enum Versions {
-        /** 2024-04-01-preview api version */
         V2024_04_01_PREVIEW: "2024-04-01-preview",
       }
 

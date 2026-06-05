@@ -1,5 +1,14 @@
 # Changelog - @azure-tools/typespec-azure-rulesets
 
+## 0.68.0
+
+### Features
+
+- [#4347](https://github.com/Azure/typespec-azure/pull/4347) Add new `version-progression` linter rule that validates ARM service versions all use unique dates and are declared in strictly increasing chronological order. Two api-versions sharing the same `YYYY-MM-DD` date (for example, `2026-04-28` and `2026-04-28-preview`) are not allowed.
+- [#4379](https://github.com/Azure/typespec-azure/pull/4379) Add new linter rule `arm-no-path-casing-conflicts` that flags ARM operation paths which differ only by character casing. The rule is enabled in the `@azure-tools/typespec-azure-rulesets` resource-manager ruleset.
+- [#4144](https://github.com/Azure/typespec-azure/pull/4144) Add `no-route-parameter-name-mismatch` linting rule that detects when two operation routes differ only by path parameter name.
+
+
 ## 0.67.0
 
 No changes, version bump only.

@@ -587,6 +587,70 @@ describe("typespec-autorest: operations", () => {
     // Original operation in the custom namespace should still use namespace prefix
     strictEqual(res.paths["/custom-op"].get.operationId, "CustomNamespace_CustomOperation");
   });
+
+  it("emits warning on each operation when operationId is duplicated", async () => {
+    const diagnostics = await diagnoseOpenApiFor(`
+      @service namespace MyService;
+
+      namespace A {
+        @route("/foo")
+        @operationId("Shared_List")
+        op list(): string;
+      }
+
+      namespace B {
+        @route("/bar")
+        @operationId("Shared_List")
+        op list(): string;
+      }
+      `);
+    const duplicateMessage =
+      "Operation ID 'Shared_List' is duplicated across operations. OpenAPI requires operationId values to be globally unique.";
+
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-autorest/duplicate-operation-id",
+        message: duplicateMessage,
+      },
+      {
+        code: "@azure-tools/typespec-autorest/duplicate-operation-id",
+        message: duplicateMessage,
+      },
+    ]);
+  });
+
+  it("emits warning when interfaces and operations with same names in different namespaces collide", async () => {
+    const diagnostics = await diagnoseOpenApiFor(`
+      @service namespace MyService;
+
+      namespace A {
+        interface Shared {
+          @route("/a/list")
+          op list(): string;
+        }
+      }
+
+      namespace B {
+        interface Shared {
+          @route("/b/list")
+          op list(): string;
+        }
+      }
+      `);
+    const duplicateMessage =
+      "Operation ID 'Shared_List' is duplicated across operations. OpenAPI requires operationId values to be globally unique.";
+
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-autorest/duplicate-operation-id",
+        message: duplicateMessage,
+      },
+      {
+        code: "@azure-tools/typespec-autorest/duplicate-operation-id",
+        message: duplicateMessage,
+      },
+    ]);
+  });
 });
 
 describe("typespec-autorest: request", () => {

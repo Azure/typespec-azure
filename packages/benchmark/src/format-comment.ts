@@ -1,6 +1,8 @@
+import { isNotableMetricChange } from "./compare.js";
 import type { BenchmarkResult, ComparisonResult, MetricComparison, RuntimeStats } from "./types.js";
 
 const DEFAULT_THRESHOLD = 5;
+const DEFAULT_MIN_CHANGE_MS = 1;
 
 function formatMs(ms: number): string {
   if (ms >= 1000) return `${(ms / 1000).toFixed(2)}s`;
@@ -32,9 +34,10 @@ function formatMsColored(ms: number, thresholds: readonly [number, number]): str
   return `${timeIndicator(ms, thresholds)} ${formatMs(ms)}`;
 }
 
-function changeIndicator(percentChange: number, threshold: number): string {
-  if (percentChange >= threshold) return "🔴";
-  if (percentChange <= -threshold) return "🟢";
+function changeIndicator(metric: MetricComparison, threshold: number): string {
+  if (!isNotableMetricChange(metric, threshold, DEFAULT_MIN_CHANGE_MS)) return "";
+  if (metric.percentChange >= threshold) return "🔴";
+  if (metric.percentChange <= -threshold) return "🟢";
   return "";
 }
 
@@ -145,8 +148,6 @@ const LEGEND =
 export interface FormatOptions {
   /** Change threshold for highlighting (default: 5%). */
   threshold?: number;
-  /** Only show metrics with notable changes. */
-  changesOnly?: boolean;
 }
 
 /** Format comparison results as a GitHub PR comment markdown. */
@@ -157,30 +158,28 @@ export function formatPrComment(
   options: FormatOptions = {},
 ): string {
   const threshold = options.threshold ?? DEFAULT_THRESHOLD;
-  const changesOnly = options.changesOnly ?? false;
 
   const lines: string[] = [];
   lines.push("## ⚡ Benchmark Results\n");
-  lines.push(
-    `Comparing [\`${currentCommit.slice(0, 7)}\`] against baseline [\`${baselineCommit.slice(0, 7)}\`]\n`,
-  );
 
   // Average metrics across all specs
   const averaged = averageComparisonMetrics(comparisons);
+  const regressions = averaged.filter(
+    (m) =>
+      m.percentChange >= threshold && isNotableMetricChange(m, threshold, DEFAULT_MIN_CHANGE_MS),
+  );
 
-  let metrics = averaged;
-  if (changesOnly) {
-    metrics = metrics.filter((m) => Math.abs(m.percentChange) >= threshold);
-  }
-
-  if (metrics.length === 0) {
-    lines.push("_No notable changes._\n");
+  // Top-level summary: show regressions prominently, otherwise a simple ok message
+  if (regressions.length === 0) {
+    lines.push("✅ No performance regressions detected.\n");
   } else {
+    lines.push(
+      `⚠️ **${regressions.length} metric(s) regressed** above the +${threshold}% threshold:\n`,
+    );
     lines.push("| Metric | Baseline | Current | Change |");
     lines.push("|--------|----------|---------|--------|");
-    for (const m of metrics) {
-      const indicator = changeIndicator(m.percentChange, threshold);
-      const changeStr = `${formatPercent(m.percentChange)} ${indicator}`.trim();
+    for (const m of regressions) {
+      const changeStr = `${formatPercent(m.percentChange)} ${changeIndicator(m, threshold)}`.trim();
       const th = thresholdsFor(m.label);
       lines.push(
         `| ${displayLabel(m.label)} | ${formatMsColored(m.baseline, th)} | ${formatMsColored(m.current, th)} | ${changeStr} |`,
@@ -189,9 +188,26 @@ export function formatPrComment(
     lines.push("");
   }
 
+  // Full details collapsed
   const specNames = comparisons.map((c) => c.specName).join(", ");
+  lines.push("<details>");
+  lines.push(
+    `<summary>Full details – comparing <code>${currentCommit.slice(0, 7)}</code> vs baseline <code>${baselineCommit.slice(0, 7)}</code></summary>\n`,
+  );
+  lines.push("| Metric | Baseline | Current | Change |");
+  lines.push("|--------|----------|---------|--------|");
+  for (const m of averaged) {
+    const changeStr = `${formatPercent(m.percentChange)} ${changeIndicator(m, threshold)}`.trim();
+    const th = thresholdsFor(m.label);
+    lines.push(
+      `| ${displayLabel(m.label)} | ${formatMsColored(m.baseline, th)} | ${formatMsColored(m.current, th)} | ${changeStr} |`,
+    );
+  }
+  lines.push("");
   lines.push(`> Averaged across ${comparisons.length} specs (${specNames}).`);
   lines.push(`> Threshold: changes > ±${threshold}% are highlighted.`);
+  lines.push(LEGEND);
+  lines.push("</details>");
 
   return lines.join("\n");
 }
@@ -243,7 +259,7 @@ export function formatConsoleSummary(
 
   lines.push("\nBenchmark comparison (averaged across specs):");
   for (const m of averaged) {
-    const indicator = changeIndicator(m.percentChange, threshold);
+    const indicator = changeIndicator(m, threshold);
     const label = isSubMetric(m.label) ? `  ${m.label}` : m.label;
     lines.push(
       `  ${label.padEnd(50)} ${formatMs(m.baseline).padStart(10)} → ${formatMs(m.current).padStart(10)}  ${formatPercent(m.percentChange).padStart(8)} ${indicator}`,
@@ -307,7 +323,7 @@ export function formatComparisonSummary(
   lines.push("| Metric | Baseline | Current | Change |");
   lines.push("|--------|----------|---------|--------|");
   for (const m of averaged) {
-    const indicator = changeIndicator(m.percentChange, threshold);
+    const indicator = changeIndicator(m, threshold);
     const changeStr = `${formatPercent(m.percentChange)} ${indicator}`.trim();
     const th = thresholdsFor(m.label);
     lines.push(

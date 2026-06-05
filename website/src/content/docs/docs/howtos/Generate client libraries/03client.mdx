@@ -1342,7 +1342,25 @@ client2.pet()
 ```
 
 ```csharp
-// TODO
+namespace NewPetStore.Food
+{
+  public partial class FoodClient
+  {
+    public FoodClient(Uri endpoint);
+    public virtual Response Feed(CancellationToken cancellationToken = default);
+    public virtual Task<Response> FeedAsync(CancellationToken cancellationToken = default);
+  }
+}
+
+namespace NewPetStore.PetAction
+{
+  public partial class PetActionClient
+  {
+    public PetActionClient(Uri endpoint);
+    public virtual Response Pet(CancellationToken cancellationToken = default);
+    public virtual Task<Response> PetAsync(CancellationToken cancellationToken = default);
+  }
+}
 ```
 
 ```typescript
@@ -1678,7 +1696,8 @@ model StorageClientOptions {
   blobName: string;
 }
 
-@@clientInitialization(Storage,
+@@clientInitialization(
+  Storage,
   {
     parameters: StorageClientOptions,
   }
@@ -1817,7 +1836,8 @@ model StorageClientOptions {
   blob: string;
 }
 
-@@clientInitialization(Storage,
+@@clientInitialization(
+  Storage,
   {
     parameters: StorageClientOptions,
   }
@@ -1946,7 +1966,9 @@ With `@clientInitialization`, you can change the initialization way, by passing 
 @service
 namespace Storage;
 
-op download(@path blobName: string): void;
+namespace Blob {
+  op download(@path blobName: string): void;
+}
 ```
 
 ```typespec title="client.tsp"
@@ -1957,11 +1979,8 @@ using Azure.ClientGenerator.Core;
 
 namespace Customizations;
 
-model StorageClientOptions {
-  blobName: string;
-}
-
-@@clientInitialization(Storage,
+@@clientInitialization(
+  Storage.Blob,
   {
     initializedBy: InitializedBy.individually | InitializedBy.parent,
   }
@@ -1977,19 +1996,25 @@ NOT_SUPPORTED
 ```
 
 ```typescript
-export class StorageClient {
-  download(
-    blobName: string,
-    options: DownloadOptionalParams = { requestOptions: {} },
-  ): Promise<void>;
-}
-
-const client = new StorageClient();
-client.download("blobName");
+// TODO
 ```
 
 ```java
-// TODO
+// Java requires `enable-subclient: true` option in "tspconfig.yaml"
+
+public final class StorageClientBuilder {
+    public StorageClient buildClient();
+}
+
+// via ClientBuilder
+public final class BlobBuilder {
+    public BlobClient buildClient();
+}
+
+// via parent Client
+public final class StorageClient {
+    public BlobClient getBlobClient()
+}
 ```
 
 ```go
@@ -2017,6 +2042,14 @@ You could define a single client that combines operations from multiple services
 :::caution
 All services being merged must share the same endpoint and authentication method. If not, you will get diagnostics error.
 TCGC automatically merges sub clients with the same name, but you still need to ensure that there are no naming conflicts between models, enums, and other types in the services being merged. If there are conflicts, you may need to rename the types in the original services to avoid collisions.
+:::
+
+:::warning[Diagnostic: `inconsistent-multiple-service-dependency`]
+When services merged into one client depend on different versions of a shared library (via `@useDependency`), TCGC emits a warning:
+
+> Services merged into client "\{clientName\}" depend on different versions of "\{dependencyName\}": \{versions\}.
+
+For example, if `ServiceA` depends on `SharedLib.v1` and `ServiceB` depends on `SharedLib.v2`, and both are merged into a single client, this diagnostic fires. Diverging dependency versions can cause TCGC to produce duplicated or diverged models in the generated SDK. To resolve this, align the services to use the same version of the shared dependency.
 :::
 
 <ClientTabs>

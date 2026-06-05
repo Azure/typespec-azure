@@ -6,111 +6,19 @@ import {
   LinearScale,
   LineElement,
   PointElement,
-  TimeScale,
   Title,
   Tooltip,
   type ChartOptions,
   type Plugin,
 } from "chart.js";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Line } from "react-chartjs-2";
 
-// Minimal Chart.js date adapter using Temporal
-import { _adapters } from "chart.js";
-
-const MILLISECONDS_PER_UNIT: Record<string, number> = {
-  millisecond: 1,
-  second: 1000,
-  minute: 60_000,
-  hour: 3_600_000,
-  day: 86_400_000,
-  week: 604_800_000,
-  month: 2_592_000_000,
-  quarter: 7_776_000_000,
-  year: 31_536_000_000,
-};
-
-_adapters._date.override({
-  formats() {
-    return {
-      datetime: "yyyy-MM-dd HH:mm",
-      millisecond: "HH:mm:ss.SSS",
-      second: "HH:mm:ss",
-      minute: "HH:mm",
-      hour: "HH:mm",
-      day: "MMM d",
-      week: "MMM d",
-      month: "MMM yyyy",
-      quarter: "QQ yyyy",
-      year: "yyyy",
-    };
-  },
-  parse(value: unknown) {
-    if (value === null || value === undefined) return null;
-    if (typeof value === "number") return value;
-    if (typeof value === "string") return new Date(value).getTime();
-    if (value instanceof Date) return value.getTime();
-    return null;
-  },
-  format(timestamp: number, fmt: string) {
-    const d = new Date(timestamp);
-    // Simple format substitution
-    return fmt
-      .replace("yyyy", String(d.getFullYear()))
-      .replace("MMM", d.toLocaleString("en", { month: "short" }))
-      .replace("MM", String(d.getMonth() + 1).padStart(2, "0"))
-      .replace("dd", String(d.getDate()).padStart(2, "0"))
-      .replace(/\bd\b/, String(d.getDate()))
-      .replace("HH", String(d.getHours()).padStart(2, "0"))
-      .replace("mm", String(d.getMinutes()).padStart(2, "0"))
-      .replace("ss", String(d.getSeconds()).padStart(2, "0"))
-      .replace("SSS", String(d.getMilliseconds()).padStart(3, "0"))
-      .replace("QQ", `Q${Math.floor(d.getMonth() / 3) + 1}`);
-  },
-  add(timestamp: number, amount: number, unit: string) {
-    return timestamp + amount * (MILLISECONDS_PER_UNIT[unit] ?? 0);
-  },
-  diff(a: number, b: number, unit: string) {
-    return (a - b) / (MILLISECONDS_PER_UNIT[unit] ?? 1);
-  },
-  startOf(timestamp: number, unit: string) {
-    const d = new Date(timestamp);
-    if (unit === "year") return new Date(d.getFullYear(), 0, 1).getTime();
-    if (unit === "quarter")
-      return new Date(d.getFullYear(), Math.floor(d.getMonth() / 3) * 3, 1).getTime();
-    if (unit === "month") return new Date(d.getFullYear(), d.getMonth(), 1).getTime();
-    if (unit === "week") {
-      const day = d.getDay();
-      return new Date(d.getFullYear(), d.getMonth(), d.getDate() - day).getTime();
-    }
-    if (unit === "day") return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
-    if (unit === "hour")
-      return new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours()).getTime();
-    if (unit === "minute")
-      return new Date(
-        d.getFullYear(),
-        d.getMonth(),
-        d.getDate(),
-        d.getHours(),
-        d.getMinutes(),
-      ).getTime();
-    if (unit === "second")
-      return new Date(
-        d.getFullYear(),
-        d.getMonth(),
-        d.getDate(),
-        d.getHours(),
-        d.getMinutes(),
-        d.getSeconds(),
-      ).getTime();
-    return timestamp;
-  },
-});
+import "./benchmark-dashboard.css";
 
 ChartJS.register(
   CategoryScale,
   LinearScale,
-  TimeScale,
   PointElement,
   LineElement,
   Title,
@@ -119,39 +27,72 @@ ChartJS.register(
   Colors,
 );
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
 interface HistoryEntry {
   commit: string;
   timestamp: string;
   metrics: Record<string, number>;
+  specMetrics?: Record<string, Record<string, number>>;
 }
 
 interface HistoryData {
   generated: string;
   labels: string[];
+  specNames?: string[];
   entries: HistoryEntry[];
 }
 
-type MetricCategory = "linter" | "stages" | "validation" | "emit";
+/** View of history data after applying filters (spec, time range). */
+interface FilteredData {
+  labels: string[];
+  entries: { commit: string; timestamp: string; metrics: Record<string, number> }[];
+  generated: string;
+}
 
-const HISTORY_URL =
-  "https://raw.githubusercontent.com/Azure/typespec-azure/benchmark-data/results/history.json";
+// ─── Constants ────────────────────────────────────────────────────────────────
 
-const CATEGORY_FILTERS: Record<MetricCategory, (label: string) => boolean> = {
-  linter: (l) => l.startsWith("linter/") && l !== "linter",
-  stages: (l) =>
-    ["total", "loader", "resolver", "checker", "linter", "validation", "emit"].includes(l),
-  validation: (l) => l.startsWith("validation/") && l !== "validation",
-  emit: (l) => l.startsWith("emit/") && l !== "emit",
-};
+const DEFAULT_GITHUB_REPO = "Azure/typespec-azure";
+const DEFAULT_DATA_BRANCH = "benchmark-data";
 
-const CATEGORY_LABELS: Record<MetricCategory, string> = {
-  linter: "Linting Rules",
-  stages: "Compilation Stages",
-  validation: "Validators",
-  emit: "Emitters",
-};
+function getUrlParams(): { repo: string; branch: string } {
+  if (typeof window === "undefined") {
+    return { repo: DEFAULT_GITHUB_REPO, branch: DEFAULT_DATA_BRANCH };
+  }
+  const params = new URLSearchParams(window.location.search);
+  return {
+    repo: params.get("repo") || DEFAULT_GITHUB_REPO,
+    branch: params.get("branch") || DEFAULT_DATA_BRANCH,
+  };
+}
 
-const ALL_CATEGORIES: MetricCategory[] = ["stages", "linter", "validation", "emit"];
+function getHistoryUrl(): string {
+  const { repo, branch } = getUrlParams();
+  return `https://raw.githubusercontent.com/${repo}/${branch}/results/history.json`;
+}
+
+function getCommitUrl(): string {
+  const { repo } = getUrlParams();
+  return `https://github.com/${repo}/commit/`;
+}
+
+type Tab = "stages" | "linter" | "validation" | "emitters";
+type TimeRange = "30d" | "90d" | "all";
+
+const TABS: { key: Tab; label: string }[] = [
+  { key: "stages", label: "Compilation Stages" },
+  { key: "linter", label: "Linting Rules" },
+  { key: "validation", label: "Validators" },
+  { key: "emitters", label: "Emitters" },
+];
+
+const TIME_RANGES: { key: TimeRange; label: string }[] = [
+  { key: "30d", label: "Last 30 days" },
+  { key: "90d", label: "Last 90 days" },
+  { key: "all", label: "All time" },
+];
+
+// ─── Utilities ────────────────────────────────────────────────────────────────
 
 /** Strip common prefixes for shorter legend labels */
 function shortLabel(label: string): string {
@@ -176,11 +117,40 @@ function seriesColors(count: number): string[] {
   return colors;
 }
 
-/** Chart.js plugin: on hover, dim all datasets except the nearest one (for dense charts) */
+/** Parse URL search params to get initial state */
+function getInitialParams(): { tab: Tab; spec: string; range: TimeRange } {
+  if (typeof window === "undefined") return { tab: "stages", spec: "all", range: "all" };
+  const params = new URLSearchParams(window.location.search);
+  const tab = (params.get("tab") as Tab) || "stages";
+  const spec = params.get("spec") || "all";
+  const range = (params.get("range") as TimeRange) || "all";
+  return {
+    tab: TABS.some((t) => t.key === tab) ? tab : "stages",
+    spec,
+    range: TIME_RANGES.some((r) => r.key === range) ? range : "all",
+  };
+}
+
+/** Update URL search params without page reload */
+function updateUrlParams(params: Record<string, string>) {
+  if (typeof window === "undefined") return;
+  const url = new URL(window.location.href);
+  for (const [key, value] of Object.entries(params)) {
+    if (value && value !== "all" && value !== "stages") {
+      url.searchParams.set(key, value);
+    } else {
+      url.searchParams.delete(key);
+    }
+  }
+  window.history.replaceState(null, "", url.toString());
+}
+
+// ─── Chart.js Plugin ──────────────────────────────────────────────────────────
+
+/** On hover, dim all datasets except the nearest one (for dense charts) */
 const highlightPlugin: Plugin<"line"> = {
   id: "highlightNearest",
   beforeDraw(chart) {
-    // Only activate for charts with many datasets
     if (chart.data.datasets.length < 8) return;
 
     const active = chart.getActiveElements();
@@ -210,19 +180,34 @@ const highlightPlugin: Plugin<"line"> = {
   },
 };
 
-function BenchmarkChart({ data, category }: { data: HistoryData; category: MetricCategory }) {
-  const filter = CATEGORY_FILTERS[category];
-  const metricLabels = useMemo(() => data.labels.filter(filter).sort(), [data, filter]);
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
+interface ChartSection {
+  title: string;
+  filter: (label: string) => boolean;
+}
+
+function BenchmarkChart({ data, section }: { data: FilteredData; section: ChartSection }) {
+  const metricLabels = useMemo(
+    () => data.labels.filter(section.filter).sort(),
+    [data, section.filter],
+  );
   const colors = useMemo(() => seriesColors(metricLabels.length), [metricLabels.length]);
   const isDense = metricLabels.length >= 8;
+
+  const xLabels = useMemo(
+    () =>
+      data.entries.map((e) => {
+        const date = new Date(e.timestamp);
+        return `${(date.getMonth() + 1).toString().padStart(2, "0")}/${date.getDate().toString().padStart(2, "0")}`;
+      }),
+    [data],
+  );
 
   const chartData = useMemo(() => {
     const datasets = metricLabels.map((label, i) => ({
       label: shortLabel(label),
-      data: data.entries.map((e) => ({
-        x: new Date(e.timestamp).getTime(),
-        y: e.metrics[label] ?? null,
-      })),
+      data: data.entries.map((e) => e.metrics[label] ?? null),
       borderColor: colors[i],
       backgroundColor: colors[i],
       borderWidth: 1.5,
@@ -230,8 +215,8 @@ function BenchmarkChart({ data, category }: { data: HistoryData; category: Metri
       pointHoverRadius: 5,
       tension: 0.2,
     }));
-    return { datasets };
-  }, [data, metricLabels, colors]);
+    return { labels: xLabels, datasets };
+  }, [data, metricLabels, colors, xLabels]);
 
   const options: ChartOptions<"line"> = useMemo(
     () => ({
@@ -243,8 +228,9 @@ function BenchmarkChart({ data, category }: { data: HistoryData; category: Metri
       plugins: {
         title: {
           display: true,
-          text: `${CATEGORY_LABELS[category]} (ms, averaged across specs)`,
+          text: section.title,
           font: { size: 16 },
+          color: "currentcolor",
         },
         legend: {
           position: "bottom",
@@ -259,20 +245,28 @@ function BenchmarkChart({ data, category }: { data: HistoryData; category: Metri
             title: (items) => {
               if (items.length === 0) return "";
               const entry = data.entries[items[0].dataIndex];
-              return `${entry.commit.slice(0, 7)} — ${new Date(entry.timestamp).toLocaleDateString()}`;
+              const date = new Date(entry.timestamp).toLocaleDateString();
+              return `${entry.commit.slice(0, 7)} — ${date}`;
             },
             label: (item) => `${item.dataset.label}: ${item.parsed.y?.toFixed(2)}ms`,
+            afterTitle: (items) => {
+              if (items.length === 0) return "";
+              const entry = data.entries[items[0].dataIndex];
+              return `${getCommitUrl()}${entry.commit}`;
+            },
           },
         },
       },
       scales: {
         x: {
-          type: "time",
-          time: {
-            unit: "day",
-            tooltipFormat: "MMM d, yyyy",
-          },
+          type: "category",
           title: { display: true, text: "Date" },
+          ticks: {
+            maxRotation: 45,
+            minRotation: 45,
+            autoSkip: true,
+            maxTicksLimit: 30,
+          },
         },
         y: {
           beginAtZero: true,
@@ -280,23 +274,133 @@ function BenchmarkChart({ data, category }: { data: HistoryData; category: Metri
         },
       },
     }),
-    [data, category, isDense],
+    [data, section, isDense],
   );
 
+  if (metricLabels.length === 0) return null;
+
   return (
-    <div style={{ height: "500px", position: "relative" }}>
+    <div className="chartContainer">
       <Line data={chartData} options={options} plugins={[highlightPlugin]} />
     </div>
   );
 }
 
+function MetricSummary({ data }: { data: FilteredData }) {
+  const latest = data.entries[data.entries.length - 1];
+  const previous = data.entries.length > 1 ? data.entries[data.entries.length - 2] : null;
+
+  if (!latest) return null;
+
+  const stageMetrics = ["total", "loader", "resolver", "checker", "linter", "validation"];
+
+  return (
+    <div className="summaryGrid">
+      {stageMetrics.map((metric) => {
+        const value = latest.metrics[metric];
+        if (value === undefined) return null;
+        const prev = previous?.metrics[metric];
+        const change = prev !== undefined ? ((value - prev) / prev) * 100 : null;
+
+        let changeClass = "summaryCardChange summaryCardChange--neutral";
+        if (change !== null && Math.abs(change) >= 2) {
+          changeClass = `summaryCardChange ${change > 0 ? "summaryCardChange--positive" : "summaryCardChange--negative"}`;
+        }
+
+        return (
+          <div key={metric} className="summaryCard">
+            <div className="summaryCardLabel">{metric}</div>
+            <div className="summaryCardValue">{value.toFixed(1)}ms</div>
+            {change !== null && (
+              <div className={changeClass}>
+                {change > 0 ? "+" : ""}
+                {change.toFixed(1)}%
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Discover emitter names from labels (format: emit/<emitter-name>) */
+function getEmitterNames(labels: string[]): string[] {
+  const names = new Set<string>();
+  for (const label of labels) {
+    if (!label.startsWith("emit/")) continue;
+    const parts = label.slice("emit/".length).split("/");
+    if (parts[0].startsWith("@") && parts.length >= 2) {
+      names.add(`${parts[0]}/${parts[1]}`);
+    } else if (parts.length >= 1) {
+      names.add(parts[0]);
+    }
+  }
+  return [...names].sort();
+}
+
+function emitterHasSteps(labels: string[], emitterName: string): boolean {
+  const prefix = `emit/${emitterName}/`;
+  return labels.some((l) => l.startsWith(prefix));
+}
+
+function EmitterSection({ data, emitterName }: { data: FilteredData; emitterName: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const hasSteps = useMemo(() => emitterHasSteps(data.labels, emitterName), [data, emitterName]);
+
+  const displayName = shortLabel(`emit/${emitterName}`);
+
+  return (
+    <div className="emitterSection">
+      <div className={`emitterHeader ${expanded ? "emitterHeader--expanded" : ""}`}>
+        <h4 className="emitterTitle">{displayName}</h4>
+        {hasSteps && (
+          <button className="emitterToggle" onClick={() => setExpanded(!expanded)}>
+            {expanded ? "Hide Steps" : "Show Steps"}
+          </button>
+        )}
+      </div>
+
+      <BenchmarkChart
+        data={data}
+        section={{
+          title: `${displayName} — Total (ms)`,
+          filter: (l) => l === `emit/${emitterName}`,
+        }}
+      />
+
+      {expanded && hasSteps && (
+        <div className="emitterSteps">
+          <BenchmarkChart
+            data={data}
+            section={{
+              title: `${displayName} — Steps Breakdown (ms)`,
+              filter: (l) => l.startsWith(`emit/${emitterName}/`),
+            }}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Main Dashboard ───────────────────────────────────────────────────────────
+
 export function BenchmarkDashboard() {
+  const initialParams = useMemo(getInitialParams, []);
   const [data, setData] = useState<HistoryData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<Tab>(initialParams.tab);
+  const [selectedSpec, setSelectedSpec] = useState<string>(initialParams.spec);
+  const [timeRange, setTimeRange] = useState<TimeRange>(initialParams.range);
 
-  useEffect(() => {
-    fetch(HISTORY_URL)
+  const historyUrl = useMemo(getHistoryUrl, []);
+
+  const fetchData = useCallback(() => {
+    setLoading(true);
+    setError(null);
+    fetch(historyUrl)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
@@ -309,48 +413,192 @@ export function BenchmarkDashboard() {
         setError(e.message);
         setLoading(false);
       });
-  }, []);
+  }, [historyUrl]);
 
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Sync state to URL
+  useEffect(() => {
+    updateUrlParams({ tab: activeTab, spec: selectedSpec, range: timeRange });
+  }, [activeTab, selectedSpec, timeRange]);
+
+  // Derive filtered data
+  const filteredData: FilteredData | null = useMemo(() => {
+    if (!data) return null;
+
+    let entries = data.entries;
+
+    // Apply time range filter
+    if (timeRange !== "all") {
+      const days = timeRange === "30d" ? 30 : 90;
+      const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+      entries = entries.filter((e) => new Date(e.timestamp).getTime() >= cutoff);
+    }
+
+    // Apply spec filter
+    if (selectedSpec !== "all") {
+      entries = entries.map((e) => ({
+        commit: e.commit,
+        timestamp: e.timestamp,
+        metrics: e.specMetrics?.[selectedSpec] ?? e.metrics,
+      }));
+    }
+
+    // Derive labels from filtered entries
+    const allLabels = new Set<string>();
+    for (const entry of entries) {
+      for (const label of Object.keys(entry.metrics)) {
+        allLabels.add(label);
+      }
+    }
+
+    return {
+      generated: data.generated,
+      labels: [...allLabels].sort(),
+      entries,
+    };
+  }, [data, selectedSpec, timeRange]);
+
+  const specNames = useMemo(() => data?.specNames ?? [], [data]);
+  const emitterNames = useMemo(
+    () => (filteredData ? getEmitterNames(filteredData.labels) : []),
+    [filteredData],
+  );
+
+  // Loading state
   if (loading) {
     return (
-      <div style={{ padding: "2rem", textAlign: "center" }}>
+      <div className="stateContainer">
+        <div className="spinner" />
         <p>Loading benchmark data...</p>
       </div>
     );
   }
 
+  // Error state
   if (error) {
     return (
-      <div style={{ padding: "2rem", textAlign: "center", color: "red" }}>
-        <p>Failed to load benchmark data: {error}</p>
-        <p style={{ fontSize: "0.9em", color: "gray" }}>
+      <div className="stateContainer">
+        <p className="errorText">Failed to load benchmark data: {error}</p>
+        <p className="errorHint">
           Make sure the benchmark-data branch exists and has been pushed to the remote repository.
         </p>
+        <button className="retryButton" onClick={fetchData}>
+          Retry
+        </button>
       </div>
     );
   }
 
-  if (!data || data.entries.length === 0) {
+  if (!filteredData || filteredData.entries.length === 0) {
     return (
-      <div style={{ padding: "2rem", textAlign: "center" }}>
-        <p>No benchmark data available yet.</p>
+      <div className="stateContainer">
+        <p>No benchmark data available for the selected filters.</p>
       </div>
     );
   }
 
   return (
-    <div style={{ padding: "1rem 2rem 2rem" }}>
-      <p style={{ color: "gray", fontSize: "0.85em", marginBottom: "1.5rem" }}>
-        {data.entries.length} data points · Last updated{" "}
-        {new Date(data.generated).toLocaleDateString()} · Values are averages across all benchmark
-        specs
-      </p>
-
-      {ALL_CATEGORIES.map((cat) => (
-        <div key={cat} style={{ marginBottom: "3rem" }}>
-          <BenchmarkChart data={data} category={cat} />
+    <div className="benchmarkDashboard">
+      {/* Controls: spec selector + time range */}
+      <div className="controls">
+        {specNames.length > 0 && (
+          <div className="controlGroup">
+            <span className="controlLabel">Spec:</span>
+            <select
+              className="select"
+              value={selectedSpec}
+              onChange={(e) => setSelectedSpec(e.target.value)}
+            >
+              <option value="all">All (average)</option>
+              {specNames.map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+        <div className="controlGroup">
+          <span className="controlLabel">Range:</span>
+          <select
+            className="select"
+            value={timeRange}
+            onChange={(e) => setTimeRange(e.target.value as TimeRange)}
+          >
+            {TIME_RANGES.map((r) => (
+              <option key={r.key} value={r.key}>
+                {r.label}
+              </option>
+            ))}
+          </select>
         </div>
-      ))}
+        <span className="meta" style={{ marginLeft: "auto" }}>
+          {filteredData.entries.length} data points · Updated{" "}
+          {new Date(filteredData.generated).toLocaleDateString()}
+        </span>
+      </div>
+
+      <MetricSummary data={filteredData} />
+
+      {/* Tab navigation */}
+      <div className="tabBar">
+        {TABS.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`tab ${activeTab === tab.key ? "tab--active" : ""}`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab content */}
+      {activeTab === "stages" && (
+        <BenchmarkChart
+          data={filteredData}
+          section={{
+            title: "Compilation Stages (ms)",
+            filter: (l) =>
+              ["total", "loader", "resolver", "checker", "linter", "validation"].includes(l),
+          }}
+        />
+      )}
+
+      {activeTab === "linter" && (
+        <BenchmarkChart
+          data={filteredData}
+          section={{
+            title: "Linting Rules (ms)",
+            filter: (l) => l.startsWith("linter/") && l !== "linter",
+          }}
+        />
+      )}
+
+      {activeTab === "validation" && (
+        <BenchmarkChart
+          data={filteredData}
+          section={{
+            title: "Validators (ms)",
+            filter: (l) => l.startsWith("validation/") && l !== "validation",
+          }}
+        />
+      )}
+
+      {activeTab === "emitters" && (
+        <div>
+          {emitterNames.length === 0 ? (
+            <p className="meta">No emitter data available.</p>
+          ) : (
+            emitterNames.map((name) => (
+              <EmitterSection key={name} data={filteredData} emitterName={name} />
+            ))
+          )}
+        </div>
+      )}
     </div>
   );
 }

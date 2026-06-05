@@ -33,8 +33,9 @@
   },
   "scripts": {
     "clean": "rimraf ./dist ./dist-dev ./temp ./samples/dist",
-    "build-samples": "node ./samples/build.js",
+    "build-samples": "tsx ./samples/build.ts",
     "build": "npm run build-samples && tsc -p tsconfig.build.json && vite build 2>&1",
+    "preview": "pnpm build && vite preview",
     "start": "npm run -s watch",
     "test": "vitest run",
     "test:ci": "vitest run",
@@ -74,7 +75,8 @@
     "es-module-shims": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "yaml": "catalog:"
   },
   "devDependencies": {
     "@playwright/test": "catalog:",
@@ -86,6 +88,7 @@
     "@vitest/coverage-v8": "catalog:",
     "@vitest/ui": "catalog:",
     "cross-env": "catalog:",
+    "pathe": "catalog:",
     "rimraf": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

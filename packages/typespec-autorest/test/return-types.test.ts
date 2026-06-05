@@ -158,7 +158,7 @@ describe("typespec-autorest: return types", () => {
   it("defines separate responses for each variant of a union return type", async () => {
     const res = await openApiFor(
       `
-      @doc("Error")
+      
       @error
       model Error {
         code: int32;
@@ -185,7 +185,7 @@ describe("typespec-autorest: return types", () => {
   it("defines the response media type from the content-type header if present", async () => {
     const res = await openApiFor(
       `
-      @doc("Error")
+      
       @error
       model Error {
         code: int32;

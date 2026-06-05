@@ -72,16 +72,7 @@ it("emit diagnostic if identity property is missing", async () => {
           properties: MyPatchModel):TrackedResource<FooResource> | ErrorResponse;
       }
 
-      enum ResourceState {
-         Succeeded,
-         Canceled,
-         Failed
-       }
-
-       model FooProperties {
-         displayName?: string = "default";
-         provisioningState: ResourceState;
-       }
+       model FooProperties {}
 
       model FooUpdateProperties {
         extra?: string ;
@@ -126,16 +117,7 @@ it("emit diagnostic when there is no request body", async () => {
           ):TrackedResource<FooResource> | ErrorResponse;
       }
 
-        enum ResourceState {
-         Succeeded,
-         Canceled,
-         Failed
-       }
-
-       model FooProperties {
-         displayName?: string = "default";
-         provisioningState: ResourceState;
-       }
+         model FooProperties {}
 
       model FooUpdateProperties {
         extra?: string ;

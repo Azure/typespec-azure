@@ -4,6 +4,7 @@ import { execSync } from "child_process";
 import { readdir } from "fs/promises";
 import os from "os";
 import { join, resolve } from "path";
+import { aggregateDurations } from "./aggregate.js";
 import type {
   BenchmarkResult,
   RunnerInfo,
@@ -31,7 +32,10 @@ export interface RunOptions {
 /** Discover benchmark spec directories under the given path. */
 async function discoverSpecs(specsDir: string, filter?: string[]): Promise<string[]> {
   const entries = await readdir(specsDir, { withFileTypes: true });
-  const dirs = entries.filter((e) => e.isDirectory()).map((e) => e.name);
+  const dirs = entries
+    .filter((e) => e.isDirectory())
+    .map((e) => e.name)
+    .sort((a, b) => a.localeCompare(b));
   if (filter && filter.length > 0) {
     return dirs.filter((d) => filter.includes(d));
   }
@@ -66,16 +70,14 @@ async function compileSpec(specDir: string): Promise<Stats> {
   // program.stats is @internal but available at runtime
   const stats = (program as any).stats as Stats;
 
-  // The compiler doesn't always set runtime.total — compute it from parts
-  if (!stats.runtime.total) {
-    stats.runtime.total =
-      (stats.runtime.loader ?? 0) +
-      (stats.runtime.resolver ?? 0) +
-      (stats.runtime.checker ?? 0) +
-      (stats.runtime.validation?.total ?? 0) +
-      (stats.runtime.linter?.total ?? 0) +
-      (stats.runtime.emit?.total ?? 0);
-  }
+  // Recompute total without the emit stage so that adding more emitters
+  // does not inflate the "compilation" total metric.
+  stats.runtime.total =
+    (stats.runtime.loader ?? 0) +
+    (stats.runtime.resolver ?? 0) +
+    (stats.runtime.checker ?? 0) +
+    (stats.runtime.validation?.total ?? 0) +
+    (stats.runtime.linter?.total ?? 0);
 
   return stats;
 }
@@ -98,9 +100,8 @@ function averageStats(statsList: Stats[]): Stats {
 }
 
 function averageRuntimeStats(runtimes: RuntimeStats[]): RuntimeStats {
-  const n = runtimes.length;
-  const avg = (accessor: (r: RuntimeStats) => number) =>
-    runtimes.reduce((s, r) => s + accessor(r), 0) / n;
+  const aggregate = (accessor: (r: RuntimeStats) => number) =>
+    aggregateDurations(runtimes.map((r) => accessor(r)));
 
   // Average validation
   const validatorKeys = new Set<string>();
@@ -111,7 +112,7 @@ function averageRuntimeStats(runtimes: RuntimeStats[]): RuntimeStats {
   }
   const validators: Record<string, number> = {};
   for (const k of validatorKeys) {
-    validators[k] = runtimes.reduce((s, r) => s + (r.validation.validators[k] ?? 0), 0) / n;
+    validators[k] = aggregateDurations(runtimes.map((r) => r.validation.validators[k] ?? 0));
   }
 
   // Average linter rules
@@ -123,7 +124,7 @@ function averageRuntimeStats(runtimes: RuntimeStats[]): RuntimeStats {
   }
   const rules: Record<string, number> = {};
   for (const k of ruleKeys) {
-    rules[k] = runtimes.reduce((s, r) => s + (r.linter.rules[k] ?? 0), 0) / n;
+    rules[k] = aggregateDurations(runtimes.map((r) => r.linter.rules[k] ?? 0));
   }
 
   // Average emitters
@@ -146,29 +147,29 @@ function averageRuntimeStats(runtimes: RuntimeStats[]): RuntimeStats {
     }
     const steps: Record<string, number> = {};
     for (const k of stepKeys) {
-      steps[k] = runtimes.reduce((s, r) => s + (r.emit.emitters[name]?.steps[k] ?? 0), 0) / n;
+      steps[k] = aggregateDurations(runtimes.map((r) => r.emit.emitters[name]?.steps[k] ?? 0));
     }
     emitters[name] = {
-      total: runtimes.reduce((s, r) => s + (r.emit.emitters[name]?.total ?? 0), 0) / n,
+      total: aggregateDurations(runtimes.map((r) => r.emit.emitters[name]?.total ?? 0)),
       steps,
     };
   }
 
   return {
-    total: avg((r) => r.total),
-    loader: avg((r) => r.loader),
-    resolver: avg((r) => r.resolver),
-    checker: avg((r) => r.checker),
+    total: aggregate((r) => r.total),
+    loader: aggregate((r) => r.loader),
+    resolver: aggregate((r) => r.resolver),
+    checker: aggregate((r) => r.checker),
     validation: {
-      total: avg((r) => r.validation.total),
+      total: aggregate((r) => r.validation.total),
       validators,
     },
     linter: {
-      total: avg((r) => r.linter.total),
+      total: aggregate((r) => r.linter.total),
       rules,
     },
     emit: {
-      total: avg((r) => r.emit.total),
+      total: aggregate((r) => r.emit.total),
       emitters,
     },
   };

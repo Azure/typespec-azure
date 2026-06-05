@@ -49,6 +49,13 @@ configuration:
           - if:
               - includesModifiedFiles:
                   files:
+                    - packages/typespec-ts/**/*
+            then:
+              - addLabel:
+                  label: emitter:typescript
+          - if:
+              - includesModifiedFiles:
+                  files:
                     - packages/typespec-client-generator-core/**/*
             then:
               - addLabel:

@@ -53,9 +53,7 @@ it("arm client with sub clients", async () => {
     @armCommonTypesVersion(CommonTypes.Versions.v5)
     namespace My.Service;
 
-    /** Api versions */
     enum Versions {
-      /** 2024-04-01-preview api version */
           V2024_04_01_PREVIEW: "2024-04-01-preview",
     }
 
@@ -461,21 +459,21 @@ it("single with core", async () => {
     @service
     namespace My.Service;
 
-    @doc("The version of the API.")
+    
     enum MyVersions {
-      @doc("The version 2022-12-01-preview.")
+      
       v2022_12_01_preview: "2022-12-01-preview",
     }
 
     @resource("users")
-    @doc("Details about a user.")
+    
     model User {
       @key
-      @doc("The user's id.")
+      
       @visibility(Lifecycle.Read)
       id: int32;
 
-      @doc("The user's name.")
+      
       name: string;
     }
 
@@ -530,23 +528,23 @@ it("multiple with core", async () => {
     @service
     namespace My.Service;
 
-    @doc("The version of the API.")
+    
     enum MyVersions {
-      @doc("The version 2022-12-01-preview.")
+      
       v2022_12_01_preview: "2022-12-01-preview",
-      @doc("The version 2022-12-01.")
+      
       v2022_12_01: "2022-12-01",
     }
 
     @resource("users")
-    @doc("Details about a user.")
+    
     model User {
       @key
-      @doc("The user's id.")
+      
       @visibility(Lifecycle.Read)
       id: int32;
 
-      @doc("The user's name.")
+      
       name: string;
     }
 
@@ -2196,6 +2194,63 @@ it("no warning when multiple services share the same dependency version", async 
   );
   await createSdkContextForTester(program);
   expectDiagnostics(diagnostics, []);
+});
+
+it("no crash when a merged service does not specify a version for the depended library", async () => {
+  const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
+        @versioned(LibVersions)
+        namespace SharedLib {
+          enum LibVersions {
+            v1: "v1",
+            v2: "v2",
+          }
+        }
+
+        @service
+        @versioned(VersionsA)
+        namespace ServiceA {
+          enum VersionsA {
+            @useDependency(SharedLib.LibVersions.v2)
+            av1,
+          }
+          op a(): void;
+        }
+        @service
+        @versioned(VersionsB)
+        namespace ServiceB {
+          enum VersionsB {
+            @useDependency(SharedLib.LibVersions.v2)
+            bv1,
+            bv2,
+          }
+          op b(): void;
+        }`,
+      `
+        @client(
+          {
+            name: "CombineClient",
+            service: [ServiceA, ServiceB],
+            autoMergeService: true,
+          }
+        )
+        namespace CombineClient {}
+      `,
+    ),
+  );
+  await createSdkContextForTester(program);
+  // ServiceA explicitly uses SharedLib.v2; ServiceB does not specify a version
+  // so the validation falls back to SharedLib's latest version (v2). Both
+  // resolve to the same version, so no inconsistency warning is reported.
+  expectDiagnostics(
+    diagnostics.filter(
+      (d) =>
+        d.code ===
+        "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service-dependency",
+    ),
+    [],
+  );
 });
 
 it("multiple clients from single service", async () => {
