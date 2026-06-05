@@ -3,7 +3,7 @@ import { assert, describe, it } from "vitest";
 import {
   expandUrlTemplate,
   UrlTemplateOptions,
-} from "../../../static/static-helpers/url-template.js";
+} from "../../../static/static-helpers/urlTemplate.js";
 
 function createAssertion(context: Record<string, any>, option?: UrlTemplateOptions) {
   return (template: string, expected: string) => {

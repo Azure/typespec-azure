@@ -44,6 +44,16 @@ export declare interface EagleOutput extends BirdOutputParent {
     partner?: BirdOutput;
 }
 
+export declare interface Fish {
+    kind: string;
+    size: number;
+}
+
+export declare interface FishOutput {
+    kind: string;
+    size: number;
+}
+
 export declare interface GetLegacyModel {
     get(options?: GetLegacyModelParameters): StreamableMethod<GetLegacyModel200Response>;
 }
@@ -77,6 +87,18 @@ export declare interface GetModel200Response extends HttpResponse {
 }
 
 export declare type GetModelParameters = RequestParameters;
+
+export declare interface GetNoSubtypesModel {
+    get(options?: GetNoSubtypesModelParameters): StreamableMethod<GetNoSubtypesModel200Response>;
+    put(options: PutNoSubtypesModelParameters): StreamableMethod<PutNoSubtypesModel204Response>;
+}
+
+export declare interface GetNoSubtypesModel200Response extends HttpResponse {
+    status: "200";
+    body: FishOutput;
+}
+
+export declare type GetNoSubtypesModelParameters = RequestParameters;
 
 export declare interface GetRecursiveModel {
     get(options?: GetRecursiveModelParameters): StreamableMethod<GetRecursiveModel200Response>;
@@ -121,6 +143,16 @@ export declare interface PutModelBodyParam {
 
 export declare type PutModelParameters = PutModelBodyParam & RequestParameters;
 
+export declare interface PutNoSubtypesModel204Response extends HttpResponse {
+    status: "204";
+}
+
+export declare interface PutNoSubtypesModelBodyParam {
+    body: Fish;
+}
+
+export declare type PutNoSubtypesModelParameters = PutNoSubtypesModelBodyParam & RequestParameters;
+
 export declare interface PutRecursiveModel204Response extends HttpResponse {
     status: "204";
 }
@@ -139,6 +171,7 @@ export declare interface Routes {
     (path: "/type/model/inheritance/single-discriminator/missingdiscriminator"): GetMissingDiscriminator;
     (path: "/type/model/inheritance/single-discriminator/wrongdiscriminator"): GetWrongDiscriminator;
     (path: "/type/model/inheritance/single-discriminator/legacy-model"): GetLegacyModel;
+    (path: "/type/model/inheritance/single-discriminator/no-subtypes/model"): GetNoSubtypesModel;
 }
 
 export declare interface SeaGull extends BirdParent {

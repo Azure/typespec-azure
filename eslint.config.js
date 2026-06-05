@@ -26,6 +26,14 @@ export default defineConfig(
   },
   ...TypeSpecCommonEslintConfigs,
   {
+    // typesepc-ts has static helper files which are copied verbatim into generated output and
+    // intentionally keep camelCase names to match the upstream Azure SDK sources.
+    files: ["packages/typespec-ts/static/**/*.ts", "packages/typespec-ts/static/**/*.mts"],
+    rules: {
+      "unicorn/filename-case": "off",
+    },
+  },
+  {
     // Disable these project-aware rules for typespec-ts to prevent OOM
     files: ["packages/!(typespec-ts)/src/**/*.ts", "packages/!(typespec-ts)/src/**/*.tsx"],
     languageOptions: {

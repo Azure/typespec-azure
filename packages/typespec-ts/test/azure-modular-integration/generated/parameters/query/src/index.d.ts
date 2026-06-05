@@ -17,6 +17,7 @@ export declare class QueryClient {
     private _client;
     readonly pipeline: Pipeline;
     constructor(options?: QueryClientOptionalParams);
+    readonly specialChar: SpecialCharOperations;
     readonly constant: ConstantOperations;
 }
 
@@ -24,5 +25,12 @@ export declare interface QueryClientOptionalParams extends ClientOptions {
 }
 
 export { RestError }
+
+export declare interface SpecialCharDollarSignOptionalParams extends OperationOptions {
+}
+
+export declare interface SpecialCharOperations {
+    dollarSign: (filter: string, options?: SpecialCharDollarSignOptionalParams) => Promise<void>;
+}
 
 export { }

@@ -3,7 +3,7 @@ import {
   addStorageCompatResponse,
   createStorageCompatOnResponse,
   StorageCompatResponseInfo,
-} from "../../../static/static-helpers/storage-compat-response.js";
+} from "../../../static/static-helpers/storageCompatResponse.js";
 
 // Minimal mock for FullOperationResponse (extends PipelineResponse)
 function createMockFullOperationResponse(

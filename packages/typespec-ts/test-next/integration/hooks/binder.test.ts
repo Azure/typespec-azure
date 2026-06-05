@@ -604,7 +604,6 @@ describe("Binder", () => {
       assertGetInterfaceDeclaration(sourceFile, "TestModel");
       assertGetInterfaceDeclaration(sourceFile, "TestModel_1");
 
-
       // test1.ts
       // interface TestModel {
       //   foo: string;

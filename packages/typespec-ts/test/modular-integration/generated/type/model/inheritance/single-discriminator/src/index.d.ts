@@ -23,6 +23,11 @@ export declare interface Eagle extends Bird {
     partner?: BirdUnion;
 }
 
+export declare interface Fish {
+    kind: string;
+    size: number;
+}
+
 export declare interface GetLegacyModelOptionalParams extends OperationOptions {
 }
 
@@ -30,6 +35,9 @@ export declare interface GetMissingDiscriminatorOptionalParams extends Operation
 }
 
 export declare interface GetModelOptionalParams extends OperationOptions {
+}
+
+export declare interface GetNoSubtypesModelOptionalParams extends OperationOptions {
 }
 
 export declare interface GetRecursiveModelOptionalParams extends OperationOptions {
@@ -45,6 +53,9 @@ export declare interface Goose extends Bird {
 export declare interface PutModelOptionalParams extends OperationOptions {
 }
 
+export declare interface PutNoSubtypesModelOptionalParams extends OperationOptions {
+}
+
 export declare interface PutRecursiveModelOptionalParams extends OperationOptions {
 }
 
@@ -56,6 +67,8 @@ export declare class SingleDiscriminatorClient {
     private _client;
     readonly pipeline: Pipeline;
     constructor(options?: SingleDiscriminatorClientOptionalParams);
+    putNoSubtypesModel(input: Fish, options?: PutNoSubtypesModelOptionalParams): Promise<void>;
+    getNoSubtypesModel(options?: GetNoSubtypesModelOptionalParams): Promise<Fish>;
     getLegacyModel(options?: GetLegacyModelOptionalParams): Promise<DinosaurUnion>;
     getWrongDiscriminator(options?: GetWrongDiscriminatorOptionalParams): Promise<BirdUnion>;
     getMissingDiscriminator(options?: GetMissingDiscriminatorOptionalParams): Promise<BirdUnion>;
