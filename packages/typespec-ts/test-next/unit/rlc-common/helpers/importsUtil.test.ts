@@ -8,8 +8,8 @@ import {
 describe("#buildRuntimeImports", () => {
   it("should return the correct import set for branded scope", () => {
     const imports = buildRuntimeImports("azure");
-    expect(imports.commonFallback).to.be.undefined;
-    expect(imports.restClient).to.deep.equal({
+    expect(imports.commonFallback).toBeUndefined();
+    expect(imports.restClient).toEqual({
       type: "restClient",
       specifier: "@azure-rest/core-client",
       version: "^2.0.0",
@@ -18,12 +18,12 @@ describe("#buildRuntimeImports", () => {
 
   it("should return the correct import set for non-branded scope", () => {
     const imports = buildRuntimeImports(undefined);
-    expect(imports.commonFallback).to.deep.equal({
+    expect(imports.commonFallback).toEqual({
       type: "commonFallback",
       specifier: "@typespec/ts-http-runtime",
       version: "0.1.0",
     });
-    expect(imports.restClient).to.be.undefined;
+    expect(imports.restClient).toBeUndefined();
   });
 });
 

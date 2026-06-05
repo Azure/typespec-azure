@@ -1,7 +1,5 @@
 import {
   SdkContext,
-  SdkHttpOperation,
-  SdkPackage,
   namespace as tcgcNamespace,
 } from "@azure-tools/typespec-client-generator-core";
 import {
@@ -17,7 +15,6 @@ import { provideSdkTypes, useSdkTypes } from "../../../src/framework/hooks/sdkTy
 import { createSdkContextFromTypespec } from "../test-hots.js";
 
 describe("SdkTypes hook", () => {
-  let sdkPackage: SdkPackage<SdkHttpOperation>;
   let sdkContext: SdkContext;
   beforeAll(async () => {
     const spec = `

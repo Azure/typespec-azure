@@ -21,79 +21,79 @@ import {
 
 describe("#isStringLiteral", () => {
   it("should return true if the string is quoted", () => {
-    expect(isStringLiteral(`''`)).to.be.true;
-    expect(isStringLiteral(`""`)).to.be.true;
-    expect(isStringLiteral(`"'xxx'"`)).to.be.true;
-    expect(isStringLiteral(`"string"`)).to.be.true;
-    expect(isStringLiteral(`"string|test|aaa "`)).to.be.true;
-    expect(isStringLiteral(`'string'`)).to.be.true;
-    expect(isStringLiteral(`'   string  ssss '`)).to.be.true;
+    expect(isStringLiteral(`''`)).toBe(true);
+    expect(isStringLiteral(`""`)).toBe(true);
+    expect(isStringLiteral(`"'xxx'"`)).toBe(true);
+    expect(isStringLiteral(`"string"`)).toBe(true);
+    expect(isStringLiteral(`"string|test|aaa "`)).toBe(true);
+    expect(isStringLiteral(`'string'`)).toBe(true);
+    expect(isStringLiteral(`'   string  ssss '`)).toBe(true);
     expect(
       isStringLiteral(
         `"啊齄丂狛狜隣郎隣兀﨩ˊ〞〡￤℡㈱‐ー﹡﹢﹫、〓ⅰⅹ⒈€㈠㈩ⅠⅫ！￣ぁんァヶΑ︴АЯаяāɡㄅㄩ─╋︵﹄︻︱︳︴ⅰⅹɑɡ〇〾⿻⺁䜣€"`,
       ),
-    ).to.be.true;
+    ).toBe(true);
   });
 
   it("should return false if the string is not quoted", () => {
-    expect(isStringLiteral(`string`)).to.be.false;
-    expect(isStringLiteral(`true`)).to.be.false;
-    expect(isStringLiteral(`123`)).to.be.false;
-    expect(isStringLiteral(`null`)).to.be.false;
-    expect(isStringLiteral(`undefined`)).to.be.false;
-    expect(isStringLiteral(`"application/json" | "application/octet-stream"`)).to.be.false;
+    expect(isStringLiteral(`string`)).toBe(false);
+    expect(isStringLiteral(`true`)).toBe(false);
+    expect(isStringLiteral(`123`)).toBe(false);
+    expect(isStringLiteral(`null`)).toBe(false);
+    expect(isStringLiteral(`undefined`)).toBe(false);
+    expect(isStringLiteral(`"application/json" | "application/octet-stream"`)).toBe(false);
   });
 });
 
 describe("#isNumericLiteral", () => {
   it("should return true if the string is numeric", () => {
-    expect(isNumericLiteral(`123`)).to.be.true;
-    expect(isNumericLiteral(`0.123`)).to.be.true;
+    expect(isNumericLiteral(`123`)).toBe(true);
+    expect(isNumericLiteral(`0.123`)).toBe(true);
   });
 
   it("should return false if the string is not numeric", () => {
-    expect(isNumericLiteral(`string`)).to.be.false;
-    expect(isNumericLiteral(`"123"`)).to.be.false;
+    expect(isNumericLiteral(`string`)).toBe(false);
+    expect(isNumericLiteral(`"123"`)).toBe(false);
   });
 });
 
 describe("#isBoolLiteral", () => {
   it("should return true if the string is boolean", () => {
-    expect(isBoolLiteral(`true`)).to.be.true;
-    expect(isBoolLiteral(`false`)).to.be.true;
+    expect(isBoolLiteral(`true`)).toBe(true);
+    expect(isBoolLiteral(`false`)).toBe(true);
   });
 
   it("should return false if the string is not boolean", () => {
-    expect(isBoolLiteral(`unknown`)).to.be.false;
-    expect(isBoolLiteral(`"true"`)).to.be.false;
-    expect(isBoolLiteral(`"false"`)).to.be.false;
-    expect(isBoolLiteral('"boolean"')).to.be.false;
+    expect(isBoolLiteral(`unknown`)).toBe(false);
+    expect(isBoolLiteral(`"true"`)).toBe(false);
+    expect(isBoolLiteral(`"false"`)).toBe(false);
+    expect(isBoolLiteral('"boolean"')).toBe(false);
   });
 });
 
 describe("#isConstant", () => {
   it("should return true if the string is constant", () => {
-    expect(isConstant(`null`)).to.be.true;
+    expect(isConstant(`null`)).toBe(true);
   });
 
   it("should return false if the string is not constant", () => {
-    expect(isConstant(`undefined`)).to.be.false;
+    expect(isConstant(`undefined`)).toBe(false);
   });
 });
 
 describe("#isRecord", () => {
   it("should return true if the string is record", () => {
-    expect(isRecord(`Record<string, string>`)).to.be.true;
-    expect(isRecord(`Record<string, string | "1">`)).to.be.true;
-    expect(isRecord(`Record<string, Record<string, any>>`)).to.be.true;
-    expect(isRecord(`Record<string, string[]>`)).to.be.true;
-    expect(isRecord(`Record<string, Array<SimpleModel>>`)).to.be.true;
-    expect(isRecord(`Record<string, SimpleModel>`)).to.be.true;
-    expect(isRecord(`Record<string, "a" | "b">`)).to.be.true;
+    expect(isRecord(`Record<string, string>`)).toBe(true);
+    expect(isRecord(`Record<string, string | "1">`)).toBe(true);
+    expect(isRecord(`Record<string, Record<string, any>>`)).toBe(true);
+    expect(isRecord(`Record<string, string[]>`)).toBe(true);
+    expect(isRecord(`Record<string, Array<SimpleModel>>`)).toBe(true);
+    expect(isRecord(`Record<string, SimpleModel>`)).toBe(true);
+    expect(isRecord(`Record<string, "a" | "b">`)).toBe(true);
   });
 
   it("should return false if the string is not record", () => {
-    expect(isRecord(`Record<string, string> | string`)).to.be.false;
+    expect(isRecord(`Record<string, string> | string`)).toBe(false);
   });
 });
 
@@ -111,20 +111,20 @@ describe("#getRecordType", () => {
 
 describe("#isArray", () => {
   it("should return true if the string is array", () => {
-    expect(isArray(`string[]`)).to.be.true;
-    expect(isArray(`Array<Model>`)).to.be.true;
-    expect(isArray(`Array<string | number>`)).to.be.true;
-    expect(isArray(`Array<A>`)).to.be.true;
-    expect(isArray(`true[]`)).to.be.true;
-    expect(isArray(`false[]`)).to.be.true;
-    expect(isArray(`null[]`)).to.be.true;
-    expect(isArray(`undefined[]`)).to.be.true;
-    expect(isArray(`"string"[]`)).to.be.true;
-    expect(isArray(`123[]`)).to.be.true;
+    expect(isArray(`string[]`)).toBe(true);
+    expect(isArray(`Array<Model>`)).toBe(true);
+    expect(isArray(`Array<string | number>`)).toBe(true);
+    expect(isArray(`Array<A>`)).toBe(true);
+    expect(isArray(`true[]`)).toBe(true);
+    expect(isArray(`false[]`)).toBe(true);
+    expect(isArray(`null[]`)).toBe(true);
+    expect(isArray(`undefined[]`)).toBe(true);
+    expect(isArray(`"string"[]`)).toBe(true);
+    expect(isArray(`123[]`)).toBe(true);
   });
 
   it("should return false if the string is not array", () => {
-    expect(isArray(`Record<string, string[]>`)).to.be.false;
+    expect(isArray(`Record<string, string[]>`)).toBe(false);
   });
 });
 
@@ -147,19 +147,19 @@ describe("#getNativeArrayType", () => {
 
 describe("#isUnion", () => {
   it("should return true if the string is union", () => {
-    expect(isUnion(`string | number`)).to.be.true;
-    expect(isUnion(`string | "a"`)).to.be.true;
-    expect(isUnion(`1 | "a"`)).to.be.true;
-    expect(isUnion(`Record<string, string> | string`)).to.be.true;
-    expect(isUnion(`string[] | string`)).to.be.true;
-    expect(isUnion(`"application/json" | "application/octet-stream"`)).to.be.true;
-    expect(isUnion(`true | 123 | "application/xml"`)).to.be.true;
+    expect(isUnion(`string | number`)).toBe(true);
+    expect(isUnion(`string | "a"`)).toBe(true);
+    expect(isUnion(`1 | "a"`)).toBe(true);
+    expect(isUnion(`Record<string, string> | string`)).toBe(true);
+    expect(isUnion(`string[] | string`)).toBe(true);
+    expect(isUnion(`"application/json" | "application/octet-stream"`)).toBe(true);
+    expect(isUnion(`true | 123 | "application/xml"`)).toBe(true);
   });
 
   it("should return false if the string is not union", () => {
-    expect(isUnion(`Record<string, string | "sss">`)).to.be.false;
-    expect(isUnion(`"sss | tt"`)).to.be.false;
-    expect(isUnion(`"application/json | application/octet-stream"`)).to.be.false;
+    expect(isUnion(`Record<string, string | "sss">`)).toBe(false);
+    expect(isUnion(`"sss | tt"`)).toBe(false);
+    expect(isUnion(`"application/json | application/octet-stream"`)).toBe(false);
   });
 });
 
@@ -174,7 +174,7 @@ describe("#leaveBracket", () => {
     expect(leaveBracket(`(string)`)).to.equal("string");
   });
 
-  it("should return the string without bracket", () => {
+  it("should keep brackets that are inside a quoted string", () => {
     expect(leaveBracket(`" include (not in)"`)).to.equal(`" include (not in)"`);
   });
 });
@@ -185,7 +185,7 @@ describe("#leaveStringQuotes", () => {
     expect(leaveStringQuotes(`'string'`)).to.equal("string");
   });
 
-  it("should return the string without quotes", () => {
+  it("should keep quotes when the string is not fully quoted", () => {
     expect(leaveStringQuotes(`"s" | "b"`)).to.equal(`"s" | "b"`);
     expect(leaveStringQuotes(`'s' | 'b'`)).to.equal(`'s' | 'b'`);
     expect(leaveStringQuotes(`"s" | 'b'`)).to.equal(`"s" | 'b'`);
@@ -208,7 +208,7 @@ describe("#toTypeScriptTypeFromName", () => {
   });
 
   it("should return undefined if the type name is not supported", () => {
-    expect(toTypeScriptTypeFromName("unknownType")).to.be.undefined;
+    expect(toTypeScriptTypeFromName("unknownType")).toBeUndefined();
   });
 });
 
@@ -266,6 +266,6 @@ describe("#toTypeScriptTypeFromSchema", () => {
     );
   });
   it("should return undefined if the schema is not supported", () => {
-    expect(toTypeScriptTypeFromSchema({ type: "unknownType", name: "foo" })).to.be.undefined;
+    expect(toTypeScriptTypeFromSchema({ type: "unknownType", name: "foo" })).toBeUndefined();
   });
 });

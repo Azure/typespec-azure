@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { ChildProcess, spawn } from "child_process";
 
 const onExit = (childProcess: ChildProcess): Promise<string[]> => {

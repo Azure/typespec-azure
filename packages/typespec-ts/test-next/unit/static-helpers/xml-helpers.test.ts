@@ -1240,11 +1240,6 @@ describe("XML Helpers", () => {
 
     it("should deserialize nested objects using XML property names", () => {
       // Simulates nested object scenario where inner deserializer must use XML names
-      const innerXmlObject = {
-        Enabled: true,
-        Days: 30,
-      };
-
       const innerProperties: XmlPropertyDeserializeMetadata[] = [
         {
           propertyName: "enabled",
@@ -1553,9 +1548,6 @@ describe("XML Helpers", () => {
           <Days>7</Days>
         </RetentionPolicy>
       </Logging>`;
-
-      // First parse the XML
-      const parsed = parseXmlString(xml);
 
       // The nested RetentionPolicy needs XML-aware deserialization
       const retentionPolicyXmlObjectDeserializer = (obj: any) =>
