@@ -184,7 +184,7 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - The `isExactName: boolean` property was added to many SDK type interfaces: SdkModelType, SdkEnumType, SdkUnionType, SdkConstantType, SdkNullableType, SdkClientInitializationType, SdkModelPropertyTypeBase (base for all property types), SdkClientType, SdkEnumValueType, and SdkServiceMethodBase.
 - Set to `true` when a name is wrapped with the `exact()` function in `@clientName`.
 - The `exact()` function internally prepends `_exact_:` prefix which is stripped by `normalizeExactName()` before the name reaches the type graph.
-- Exported helpers: `EXACT_NAME_PREFIX`, `hasExactNameMarker()`, `normalizeExactName()` from the TCGC package index.
+- Exported helpers: `hasExactNameMarker()`, `normalizeExactName()` from the TCGC package index. `EXACT_NAME_PREFIX` is internal (defined in `internal-utils.ts`).
 - Public utility: `isExactClientName(context, type)` checks whether a type has exact name override.
 - Documented in guideline.md under Common Properties and in 09renaming.mdx under "Preserving exact casing".
 
