@@ -19,7 +19,7 @@ export default defineConfig({
       {
         test: {
           name: "unit-modular",
-          include: ["test/modularUnit/**/*.test.ts"],
+          include: ["test/modular-unit/**/*.test.ts"],
           testTimeout: 0,
           pool: "forks",
           poolOptions: {
@@ -40,10 +40,10 @@ export default defineConfig({
       {
         test: {
           name: "integration-azure-rlc",
-          include: ["test/azureIntegration/*.test.ts"],
+          include: ["test/azure-integration/*.test.ts"],
           exclude: [
-            "test/azureIntegration/versioningRemoved.test.ts",
-            "test/azureIntegration/azureClientGeneratorCoreClientInitialization.test.ts",
+            "test/azure-integration/versioningRemoved.test.ts",
+            "test/azure-integration/azureClientGeneratorCoreClientInitialization.test.ts",
           ],
           testTimeout: 36000,
         },
@@ -51,19 +51,19 @@ export default defineConfig({
       {
         test: {
           name: "integration-modular",
-          include: ["test/modularIntegration/*.test.ts"],
+          include: ["test/modular-integration/*.test.ts"],
           testTimeout: 36000,
         },
       },
       {
         test: {
           name: "integration-azure-modular",
-          include: ["test/azureModularIntegration/*.test.ts"],
+          include: ["test/azure-modular-integration/*.test.ts"],
           exclude: [
-            "test/azureModularIntegration/clientStructureOperationGroup.test.ts",
-            "test/azureModularIntegration/clientStructureRenamed.test.ts",
-            "test/azureModularIntegration/clientStructureTwoGroup.test.ts",
-            "test/azureModularIntegration/payloadMultipart.test.ts",
+            "test/azure-modular-integration/clientStructureOperationGroup.test.ts",
+            "test/azure-modular-integration/clientStructureRenamed.test.ts",
+            "test/azure-modular-integration/clientStructureTwoGroup.test.ts",
+            "test/azure-modular-integration/payloadMultipart.test.ts",
           ],
           testTimeout: 36000,
         },

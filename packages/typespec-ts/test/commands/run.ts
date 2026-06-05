@@ -255,10 +255,10 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
   function outputPath() {
     const subPath = {
       standard: {
-        modular: "modularIntegration",
+        modular: "modular-integration",
         rlc: "integration",
       },
-      azure: { modular: "azureModularIntegration", rlc: "azureIntegration" },
+      azure: { modular: "azure-modular-integration", rlc: "azure-integration" },
     }[flavor()][clientType()];
 
     const outputPath = joinPath(testRoot(), subPath, "generated", env.targetFolder());

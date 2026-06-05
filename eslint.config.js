@@ -42,10 +42,4 @@ export default defineConfig(
       "@typescript-eslint/no-deprecated": "warn",
     },
   },
-  {
-    files: ["packages/typespec-ts/**/*.ts"],
-    rules: {
-      "unicorn/filename-case": "off",
-    },
-  },
 );

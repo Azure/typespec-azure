@@ -16,7 +16,7 @@ import {
 } from "../util/emit-util.js";
 import { assertEqualContent, ExampleJson } from "../util/test-util.js";
 
-const SCENARIOS_LOCATION = "./test/modularUnit/scenarios";
+const SCENARIOS_LOCATION = "./test/modular-unit/scenarios";
 
 const SCENARIOS_UPDATE = process.env["SCENARIOS_UPDATE"] === "true";
 

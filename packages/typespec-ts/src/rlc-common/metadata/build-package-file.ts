@@ -11,14 +11,14 @@ import {
 } from "../helpers/package-util.js";
 import { getRelativePartFromSrcPath } from "../helpers/path-utils.js";
 import { RLCModel } from "../interfaces.js";
-import { buildAzureMonorepoPackage } from "./packageJson/build-azure-monorepo-package.js";
-import { buildAzureStandalonePackage } from "./packageJson/build-azure-standalone-package.js";
-import { buildFlavorlessPackage } from "./packageJson/build-flavorless-package.js";
+import { buildAzureMonorepoPackage } from "./package-json/build-azure-monorepo-package.js";
+import { buildAzureStandalonePackage } from "./package-json/build-azure-standalone-package.js";
+import { buildFlavorlessPackage } from "./package-json/build-flavorless-package.js";
 import {
   PackageCommonInfoConfig,
   getTshyConfig,
   resolveWarpExports,
-} from "./packageJson/package-common.js";
+} from "./package-json/package-common.js";
 import { getPackageName } from "./utils.js";
 
 interface PackageFileOptions {
