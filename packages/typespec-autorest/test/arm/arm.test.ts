@@ -228,7 +228,6 @@ it("can use ResourceNameParameter for custom name parameter definition", async (
         ...ResourceNameParameter<PrivateEndpointConnectionResource, "privateEndpointConnectionName", "privateEndpointConnections", "/[a-zA-Z]*">;
       }
       
-      /** Private connection operations */
       @armResourceOperations(PrivateEndpointConnectionResource)
       interface PrivateEndpointConnections {
         listConnections is ArmResourceListByParent<PrivateEndpointConnectionResource>;
@@ -343,7 +342,6 @@ it("generates PATCH bodies for custom patch of common resource envelope mixins",
       
       interface Operations extends Azure.ResourceManager.Operations {}
       
-      /** The all properties resource */
       model AllPropertiesResource is TrackedResource<AllPropertiesProperties> {
         ...ResourceNameParameter<AllPropertiesResource>;
         ...EncryptionProperty;
@@ -355,24 +353,17 @@ it("generates PATCH bodies for custom patch of common resource envelope mixins",
         ...ResourceSkuProperty;
         ...ManagedServiceIdentityProperty;
       }
-      /** rp-specific property bag */
       model AllPropertiesProperties {
         ...DefaultProvisioningStateProperty;
-        /** An optional Property */
         optProp?: string;
-        /** A required property */
         reqProperty: string;
       }
-      /** rp-specific property bag */
       model SystemAssignedProperties {
         ...DefaultProvisioningStateProperty;
-        /** An optional Property */
         optProp?: string;
-        /** A required property */
         reqProperty: string;
       }
       
-      /** The SystemAssignedResource */
       model SystemAssignedResource is TrackedResource<SystemAssignedProperties> {
         ...ResourceNameParameter<SystemAssignedResource>;
         ...ManagedSystemAssignedIdentityProperty;
@@ -441,7 +432,6 @@ it("generates PATCH bodies for resource patch of common resource envelope mixins
       
       interface Operations extends Azure.ResourceManager.Operations {}
       
-      /** The all properties resource */
       model AllPropertiesResource is TrackedResource<AllPropertiesProperties> {
         ...ResourceNameParameter<AllPropertiesResource>;
         ...EncryptionProperty;
@@ -453,24 +443,17 @@ it("generates PATCH bodies for resource patch of common resource envelope mixins
         ...ResourceSkuProperty;
         ...ManagedServiceIdentityProperty;
       }
-      /** rp-specific property bag */
       model AllPropertiesProperties {
         ...DefaultProvisioningStateProperty;
-        /** An optional Property */
         optProp?: string;
-        /** A required property */
         reqProperty: string;
       }
-      /** rp-specific property bag */
       model SystemAssignedProperties {
         ...DefaultProvisioningStateProperty;
-        /** An optional Property */
         optProp?: string;
-        /** A required property */
         reqProperty: string;
       }
       
-      /** The SystemAssignedResource */
       model SystemAssignedResource is TrackedResource<SystemAssignedProperties> {
         ...ResourceNameParameter<SystemAssignedResource>;
         ...ManagedSystemAssignedIdentityProperty;
@@ -597,13 +580,10 @@ it("can represent type references within and between features", async () => {
 @armProviderNamespace("Microsoft.Test")
 namespace Microsoft.Test;
 enum Features {
-  /** Common */
   @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "Common", fileName: "shared", description: "The data for common features"})
   Common: "Common",
-  /** Feature A */
   @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "FeatureA", fileName: "featureA", description: "The data for feature A"})
   FeatureA: "Feature A",
-  /** Feature B */
   @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "FeatureB", fileName: "featureB", description: "The data for feature B"})
   FeatureB: "Feature B",
 }

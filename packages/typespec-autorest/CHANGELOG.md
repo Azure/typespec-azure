@@ -1,5 +1,15 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.68.0
+
+### Bug Fixes
+
+- [#4397](https://github.com/Azure/typespec-azure/pull/4397) Add an autorest emitter warning when multiple operations resolve to the same OpenAPI `operationId`, and report the warning on each conflicting operation.
+- [#4322](https://github.com/Azure/typespec-azure/pull/4322) Fix `@armProviderNamespace` to inject the canonical absolute ARM scope `https://management.azure.com/.default` as the default OAuth2 scope instead of the bare relative `user_impersonation` value. For backwards compatibility with existing ARM Swagger, the `@azure-tools/typespec-autorest` emitter now rewrites this scope back to `user_impersonation` when emitting OpenAPI v2 for namespaces decorated with `@armProviderNamespace`.
+- [#4357](https://github.com/Azure/typespec-azure/pull/4357) Fix crash in autorest emitter when no `@service` is declared but a spec references a model from a versioned namespace (e.g. `CommonTypes.AzureEntityResource`).
+- [#4393](https://github.com/Azure/typespec-azure/pull/4393) Emit intrinsic `@TypeSpec.example(...)` on model properties in the autorest OpenAPI2 emitter so property `example` values are preserved in generated definitions.
+
+
 ## 0.67.0
 
 ### Bug Fixes

@@ -118,6 +118,7 @@ import {
   getHttpOperationWithCache,
   getLibraryName,
   getPropertyNames,
+  isExactClientName,
 } from "./public-utils.js";
 
 import { $ } from "@typespec/compiler/typekit";
@@ -562,6 +563,7 @@ export function getSdkUnionWithDiagnostics(
           ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
           name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
           isGeneratedName: !type.name,
+          isExactName: false,
           crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
           type: diagnostics.pipe(getUnknownType(context, type)),
           access: "public",
@@ -592,6 +594,7 @@ export function getSdkUnionWithDiagnostics(
               ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
               name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
               isGeneratedName: !type.name,
+              isExactName: false,
               crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
               type: retval,
               access: "public",
@@ -609,6 +612,7 @@ export function getSdkUnionWithDiagnostics(
           ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "union")),
           name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
           isGeneratedName: nullOption !== undefined ? true : !type.name, // if nullable, always set inner union type as generated name
+          isExactName: false,
           namespace,
           variantTypes: [],
           crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
@@ -632,6 +636,7 @@ export function getSdkUnionWithDiagnostics(
             ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
             name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
             isGeneratedName: !type.name,
+            isExactName: false,
             crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
             type: retval,
             access: "public",
@@ -667,6 +672,7 @@ function getEmptyUnionType(
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "union")),
     name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
     isGeneratedName: !type.name,
+    isExactName: false,
     namespace,
     clientNamespace: namespace,
     variantTypes: [],
@@ -710,6 +716,7 @@ function getSdkConstantWithDiagnostics(
         valueType,
         name: getGeneratedName(context, type, operation),
         isGeneratedName: true,
+        isExactName: false,
       });
   }
 }
@@ -819,6 +826,7 @@ function addDiscriminatorToModelType(
       type: discriminatorType!,
       name,
       isGeneratedName: false,
+      isExactName: false,
       onClient: false,
       apiVersions: discriminatorProperty
         ? getAvailableApiVersions(context, discriminatorProperty.__raw!, type)
@@ -858,6 +866,7 @@ export function getSdkModelWithDiagnostics(
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "model")),
       name: name,
       isGeneratedName: !type.name,
+      isExactName: isExactClientName(context, type),
       namespace: getClientNamespace(context, type),
       properties: [],
       additionalProperties: undefined, // going to set additional properties in the next few lines when we look at base model
@@ -1009,6 +1018,7 @@ function getSdkEnumValueWithDiagnostics(
   return diagnostics.wrap({
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "enumvalue")),
     name: getLibraryName(context, type),
+    isExactName: isExactClientName(context, type),
     value: type.value ?? type.name,
     enumType,
     valueType: enumType.valueType,
@@ -1032,6 +1042,7 @@ function getSdkEnumWithDiagnostics(
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "enum")),
       name: getLibraryName(context, type),
       isGeneratedName: false,
+      isExactName: isExactClientName(context, type),
       namespace: getClientNamespace(context, type),
       valueType: diagnostics.pipe(
         getSdkEnumValueType(
@@ -1071,6 +1082,7 @@ function getSdkUnionEnumValues(
     values.push({
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, member.type, "enumvalue")),
       name: name ? name : `${member.value}`,
+      isExactName: isExactClientName(context, member.type),
       value: member.value,
       valueType: enumType.valueType,
       enumType,
@@ -1096,6 +1108,7 @@ export function getSdkUnionEnumWithDiagnostics(
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type.union, "enum")),
     name,
     isGeneratedName: !type.union.name,
+    isExactName: isExactClientName(context, type.union),
     namespace: getClientNamespace(context, type.union),
     valueType:
       diagnostics.pipe(getUnionAsEnumValueType(context, type.union)) ??
@@ -1269,6 +1282,7 @@ function getSdkCredentialType(
       variantTypes: credentialTypes,
       name: createGeneratedName(context, service, "CredentialUnion"),
       isGeneratedName: true,
+      isExactName: false,
       namespace: client.namespace,
       clientNamespace: client.namespace,
       crossLanguageDefinitionId: `${client.crossLanguageDefinitionId}.CredentialUnion`,
@@ -1293,6 +1307,7 @@ export function getSdkCredentialParameter(
     kind: "credential",
     name: "credential",
     isGeneratedName: true,
+    isExactName: false,
     doc: "Credential used to authenticate requests to the service.",
     apiVersions: client.apiVersions,
     onClient: true,
@@ -1318,6 +1333,7 @@ export function getSdkModelPropertyTypeBase(
     diagnostics.pipe(getClientTypeWithDiagnostics(context, type.type, operation));
   diagnostics.pipe(addEncodeInfo(context, type, propertyType));
   const name = getPropertyNames(context, type)[0];
+  const isExactName = isExactClientName(context, type);
   const onClient = isOnClient(context, type, operation, apiVersions.length > 0);
   let encode: ArrayKnownEncoding | undefined = undefined;
 
@@ -1341,6 +1357,7 @@ export function getSdkModelPropertyTypeBase(
     type: propertyType,
     name,
     isGeneratedName: false,
+    isExactName,
     optional: type.optional,
     ...updateWithApiVersionInformation(
       context,
@@ -1705,6 +1722,23 @@ function updateTypesFromOperation(
       // Otherwise use the body type directly
       const bodyTypeOrProperty = httpBody.property ?? getHttpBodyType(httpBody);
       const bodyType = getHttpBodyType(httpBody);
+      // For file bodies with multiple content types, pre-warm the cache for the
+      // `contentType` property's union under the operation naming context so that
+      // the resulting SdkEnumType is named after the operation (e.g.
+      // `UploadFileMultipleContentTypesContentType`) and is the same instance later
+      // reused by both the File model's `contentType` property and the synthetic
+      // `contentType` header parameter created in `createContentTypeOrAcceptHeader`.
+      if (
+        httpBody.bodyKind === "file" &&
+        httpBody.contentTypes.length > 1 &&
+        httpBody.contentTypeProperty.type.kind === "Union"
+      ) {
+        pushNamingContext(context, "ContentType", undefined);
+        diagnostics.pipe(
+          getClientTypeWithDiagnostics(context, httpBody.contentTypeProperty.type, operation),
+        );
+        popNamingContext(context);
+      }
       // For named unions, pass undefined so anonymous types inside get named relative
       // to the operation (e.g., "PostRequest") rather than the union (e.g., "A1")
       const bodyContextType =
@@ -1742,7 +1776,16 @@ function updateTypesFromOperation(
         }
 
         // add serialization options to model type
-        updateSerializationOptions(context, sdkType, httpBody.contentTypes, undefined, httpBody);
+        diagnostics.pipe(
+          updateSerializationOptions(
+            context,
+            sdkType,
+            httpBody.contentTypes,
+            undefined,
+            httpBody,
+            operation,
+          ),
+        );
 
         // after completion of usage calculation for httpBody, check whether it has
         // conflicting usage between multipart and regular body
@@ -1884,12 +1927,15 @@ function updateTypesFromOperation(
             }
 
             // add serialization options to model type
-            updateSerializationOptions(
-              context,
-              sdkType,
-              innerResponse.body.contentTypes,
-              undefined,
-              innerResponse.body,
+            diagnostics.pipe(
+              updateSerializationOptions(
+                context,
+                sdkType,
+                innerResponse.body.contentTypes,
+                undefined,
+                innerResponse.body,
+                operation,
+              ),
             );
           }
           const access = getAccessOverride(context, operation) ?? "public";
@@ -2095,6 +2141,11 @@ function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Di
         currBaseModel = currBaseModel.baseModel;
       }
 
+      // Propagate serialization options to the newly added subtype.
+      // This is needed because updateSerializationOptions may have already run
+      // on the parent model before this subtype was added to discriminatedSubtypes.
+      propagateSerializationToSubtype(context, sdkType);
+
       // Filter out legacy hierarchy building properties
       sdkType.properties = sdkType.properties.filter((property) => {
         return (
@@ -2104,6 +2155,31 @@ function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Di
     }
   }
   return diagnostics.wrap(undefined);
+}
+
+/**
+ * Propagate serialization options from a parent model to a newly added subtype.
+ * This handles the case where updateSerializationOptions already ran on the parent
+ * before the subtype was added via @hierarchyBuilding.
+ */
+function propagateSerializationToSubtype(context: TCGCContext, sdkType: SdkModelType): void {
+  // Find the nearest ancestor with serialization options to determine content types
+  let ancestor: SdkModelType | undefined = sdkType.baseModel;
+  const contentTypes: string[] = [];
+  while (ancestor) {
+    if (ancestor.serializationOptions.json) {
+      contentTypes.push("application/json");
+    }
+    if (ancestor.serializationOptions.xml) {
+      contentTypes.push("application/xml");
+    }
+    if (contentTypes.length > 0) break;
+    ancestor = ancestor.baseModel;
+  }
+
+  if (contentTypes.length > 0) {
+    updateSerializationOptions(context, sdkType, contentTypes);
+  }
 }
 
 /**
@@ -2421,22 +2497,25 @@ function updateSerializationOptions(
   contentTypes: string[],
   options?: PropagationOptions,
   httpBody?: HttpPayloadBody,
-) {
+  operation?: Operation,
+): [void, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   options = options ?? {};
   options.seenTypes = options.seenTypes ?? new Set<SdkType>();
   options.propagation = options?.propagation ?? true;
   options.ignoreSubTypeStack = options.ignoreSubTypeStack ?? [];
 
   if (options.seenTypes.has(type)) {
-    return; // avoid circular references
+    return diagnostics.wrap(undefined); // avoid circular references
   }
 
   if (type.kind === "array" || type.kind === "dict") {
     updateSerializationOptions(context, type.valueType, contentTypes, options);
-    return;
+    return diagnostics.wrap(undefined);
   }
 
-  if (type.kind !== "model" && type.kind !== "union" && type.kind !== "nullable") return;
+  if (type.kind !== "model" && type.kind !== "union" && type.kind !== "nullable")
+    return diagnostics.wrap(undefined);
 
   if (options.ignoreSubTypeStack.length === 0 || !options.ignoreSubTypeStack.at(-1)) {
     options.seenTypes.add(type);
@@ -2446,11 +2525,11 @@ function updateSerializationOptions(
     for (const unionType of type.variantTypes) {
       updateSerializationOptions(context, unionType, contentTypes, options);
     }
-    return;
+    return diagnostics.wrap(undefined);
   }
   if (type.kind === "nullable") {
     updateSerializationOptions(context, type.type, contentTypes, options);
-    return;
+    return diagnostics.wrap(undefined);
   }
 
   // Handle file body serialization - if it's a file, set binary options and skip json/xml
@@ -2460,9 +2539,12 @@ function updateSerializationOptions(
       isFile: true,
       isText: fileBody.isText,
       contentTypes: fileBody.contentTypes,
-      filename: fileBody.filename,
+      filename:
+        fileBody.filename && operation
+          ? diagnostics.pipe(getSdkModelPropertyType(context, fileBody.filename, operation))
+          : undefined,
     };
-    return; // No need to add json/xml serialization for file types
+    return diagnostics.wrap(undefined); // No need to add json/xml serialization for file types
   }
 
   setSerializationOptions(context, type, contentTypes);
@@ -2509,7 +2591,7 @@ function updateSerializationOptions(
     updateSerializationOptions(context, property.type, contentTypes, options);
     options.ignoreSubTypeStack.pop();
   }
-  return;
+  return diagnostics.wrap(undefined);
 }
 
 function setSerializationOptions(

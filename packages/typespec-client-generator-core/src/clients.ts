@@ -33,7 +33,7 @@ import {
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import { createSdkMethods, getSdkMethodParameter } from "./methods.js";
-import { getCrossLanguageDefinitionId } from "./public-utils.js";
+import { getCrossLanguageDefinitionId, getLibraryName, isExactClientName } from "./public-utils.js";
 import { getSdkBuiltInType, getSdkCredentialParameter, getTypeSpecBuiltInType } from "./types.js";
 
 function getEndpointTypeFromSingleServer<
@@ -52,6 +52,7 @@ function getEndpointTypeFromSingleServer<
       {
         name: "endpoint",
         isGeneratedName: true,
+        isExactName: false,
         doc: "Service host",
         kind: "path",
         onClient: true,
@@ -153,6 +154,7 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
       variantTypes: types,
       name: createGeneratedName(context, service, "Endpoint"),
       isGeneratedName: true,
+      isExactName: false,
       apiVersions: client.apiVersions,
       crossLanguageDefinitionId: `${client.crossLanguageDefinitionId}.Endpoint`,
       namespace: getClientNamespace(context, service),
@@ -166,6 +168,7 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
     type,
     name: "endpoint",
     isGeneratedName: true,
+    isExactName: false,
     doc: "Service host",
     onClient: true,
     urlEncode: false,
@@ -187,17 +190,15 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
 ): [SdkClientType<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   let name = client.name;
-  if (client.type) {
-    const override = getClientNameOverride(context, client.type);
-    if (override) {
-      name = override;
-    }
+  if (client.type && getClientNameOverride(context, client.type)) {
+    name = getLibraryName(context, client.type);
   }
   const clientType = getActualClientType(client);
   const sdkClientType: SdkClientType<TServiceOperation> = {
     __raw: client,
     kind: "client",
     name,
+    isExactName: client.type ? isExactClientName(context, client.type) : false,
     doc: client.type ? getClientDoc(context, client.type) : undefined,
     summary: client.type ? getSummary(context.program, client.type) : undefined,
     methods: [],
@@ -314,6 +315,7 @@ function createSdkClientInitializationType<
     initializedBy: isRootClient ? InitializedByFlags.Individually : InitializedByFlags.Default,
     name,
     isGeneratedName: true,
+    isExactName: false,
     decorators: [],
   };
   let initializationOptions: ClientInitializationOptions | undefined = undefined;

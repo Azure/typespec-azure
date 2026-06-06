@@ -1,0 +1,20 @@
+{
+  "operationId": "updatePet",
+  "title": "updatePet",
+  "parameters": {
+    "pet": {
+      "kind": "dog",
+      "isTrained": true,
+      "breed": "labrador"
+    }
+  },
+  "responses": {
+    "200": {
+      "body": {
+        "kind": "dog",
+        "isTrained": true,
+        "breed": "labrador"
+      }
+    }
+  }
+}

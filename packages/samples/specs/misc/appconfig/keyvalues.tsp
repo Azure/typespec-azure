@@ -44,15 +44,17 @@ namespace KeyValuesResource {
     @doc("Used to select what fields are present in the returned resource(s).")
     @query(#{ explode: true })
     $Select?: KeyField[],
-  ): {
-    ...Response<200>;
-    ...SyncTokenHeader;
+  ):
+    | {
+        ...Response<200>;
+        ...SyncTokenHeader;
 
-    @header
-    contentType: "application/vnd.microsoft.appconfig.keyset+json" | "application/json";
+        @header
+        contentType: "application/vnd.microsoft.appconfig.keyset+json" | "application/json";
 
-    @body body: Page<KeyValue>;
-  } | Error;
+        @body body: Page<KeyValue>;
+      }
+    | Error;
 
   @doc("Gets a list of key-values.")
   @operationId("CheckKeyValues")
@@ -68,10 +70,12 @@ namespace KeyValuesResource {
     @doc("Used to select what fields are present in the returned resource(s).")
     @query(#{ explode: true })
     $Select?: KeyField[],
-  ): {
-    ...Response<200>;
-    ...SyncTokenHeader;
-  } | Error;
+  ):
+    | {
+        ...Response<200>;
+        ...SyncTokenHeader;
+      }
+    | Error;
 
   @doc("Gets a single key-value.")
   @operationId("GetKeyValue")
@@ -84,24 +88,28 @@ namespace KeyValuesResource {
     @doc("Used to select what fields are present in the returned resource(s).")
     @query(#{ explode: true })
     $Select?: KeyField[],
-  ): {
-    ...Response<200>;
-    ...KeyValueHeaders;
+  ):
+    | {
+        ...Response<200>;
+        ...KeyValueHeaders;
 
-    @header
-    contentType: "application/vnd.microsoft.appconfig.kv+json" | "application/json";
+        @header
+        contentType: "application/vnd.microsoft.appconfig.kv+json" | "application/json";
 
-    @body body: KeyValue;
-  } | Error;
+        @body body: KeyValue;
+      }
+    | Error;
 
   @doc("Requests the headers and status of the given resource.")
   @operationId("CheckKeyValue")
   @head
-  op readHead(...ETagHeaders, ...AcceptDatetimeHeader, ...KeyWithFilters): {
-    ...Response<200>;
-    ...SyncTokenHeader;
-    ...LastModifiedHeader;
-  } | Error;
+  op readHead(...ETagHeaders, ...AcceptDatetimeHeader, ...KeyWithFilters):
+    | {
+        ...Response<200>;
+        ...SyncTokenHeader;
+        ...LastModifiedHeader;
+      }
+    | Error;
 
   @doc("Creates a key-value.")
   @operationId("PutKeyValue")
@@ -117,15 +125,17 @@ namespace KeyValuesResource {
       | "application/*+json"
       | "application/json-patch+json",
     @body entity: KeyValue,
-  ): {
-    ...Response<200>;
-    ...KeyValueHeaders;
+  ):
+    | {
+        ...Response<200>;
+        ...KeyValueHeaders;
 
-    @header
-    contentType: "application/vnd.microsoft.appconfig.kv+json" | "application/json";
+        @header
+        contentType: "application/vnd.microsoft.appconfig.kv+json" | "application/json";
 
-    @body body: KeyValue;
-  } | Error;
+        @body body: KeyValue;
+      }
+    | Error;
 
   @doc("Updates a key-value pair")
   @operationId("UpdateKeyValue")
@@ -137,30 +147,35 @@ namespace KeyValuesResource {
     ...KeyWithFilters,
     @header contentType: "application/json-patch+json",
     @body jsonPatch: string[],
-  ): {
-    ...Response<200>;
-    ...KeyValueHeaders;
+  ):
+    | {
+        ...Response<200>;
+        ...KeyValueHeaders;
 
-    @header
-    contentType: "application/vnd.microsoft.appconfig.kv+json" | "application/json";
+        @header
+        contentType: "application/vnd.microsoft.appconfig.kv+json" | "application/json";
 
-    @body body: KeyValue;
-  } | Error;
+        @body body: KeyValue;
+      }
+    | Error;
 
   @doc("Deletes a key-value.")
   @operationId("DeleteKeyValue")
   @delete
-  op delete(...ApiVersion, ...SyncTokenHeader, ...KeyWithFilters, @header ifMatch: string): {
-    ...Response<200>;
-    ...SyncTokenHeader;
-    ...ETagHeader;
+  op delete(...ApiVersion, ...SyncTokenHeader, ...KeyWithFilters, @header ifMatch: string):
+    | {
+        ...Response<200>;
+        ...SyncTokenHeader;
+        ...ETagHeader;
 
-    @header
-    contentType: "application/vnd.microsoft.appconfig.kv+json" | "application/json";
+        @header
+        contentType: "application/vnd.microsoft.appconfig.kv+json" | "application/json";
 
-    @body body: KeyValue;
-  } | {
-    ...Response<204>;
-    ...SyncTokenHeader;
-  } | Error;
+        @body body: KeyValue;
+      }
+    | {
+        ...Response<204>;
+        ...SyncTokenHeader;
+      }
+    | Error;
 }

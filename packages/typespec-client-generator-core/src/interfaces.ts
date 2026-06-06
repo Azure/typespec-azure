@@ -208,6 +208,8 @@ export interface SdkClientType<
   kind: "client";
   /** Name of the client. */
   name: string;
+  /** Whether name should be used exactly as-is, without casing transformations. */
+  isExactName: boolean;
   /** Full qualified namespace. */
   namespace: string;
   /** Document for the type. */
@@ -373,7 +375,7 @@ export function isSdkFloatKind(kind: string): kind is keyof typeof SdkFloatingPo
   return kind in SdkFloatingPointKindsEnum;
 }
 
-function isSdkFixedPointKind(kind: string): kind is keyof typeof SdkFixedPointKindsEnum {
+export function isSdkFixedPointKind(kind: string): kind is keyof typeof SdkFixedPointKindsEnum {
   return kind in SdkFixedPointKindsEnum;
 }
 
@@ -438,6 +440,8 @@ export interface SdkNullableType extends SdkTypeBase {
   name: string;
   /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
+  /** Whether name should be used exactly as-is, without casing transformations. */
+  isExactName: boolean;
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
   type: SdkType;
@@ -454,6 +458,8 @@ export interface SdkEnumType extends SdkTypeBase {
   name: string;
   /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
+  /** Whether name should be used exactly as-is, without casing transformations. */
+  isExactName: boolean;
   /** Full qualified namespace. */
   namespace: string;
   valueType: SdkBuiltInType;
@@ -476,6 +482,8 @@ export interface SdkEnumValueType<
 > extends SdkTypeBase {
   kind: "enumvalue";
   name: string;
+  /** Whether name should be used exactly as-is, without casing transformations. */
+  isExactName: boolean;
   value: string | number;
   enumType: SdkEnumType;
   valueType: TValueType;
@@ -490,12 +498,16 @@ export interface SdkConstantType extends SdkTypeBase {
   name: string;
   /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
+  /** Whether name should be used exactly as-is, without casing transformations. */
+  isExactName: boolean;
 }
 
 export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends SdkTypeBase {
   name: string;
   /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
+  /** Whether name should be used exactly as-is, without casing transformations. */
+  isExactName: boolean;
   /** Full qualified namespace. */
   namespace: string;
   kind: "union";
@@ -525,6 +537,8 @@ export interface SdkModelType extends SdkTypeBase {
   name: string;
   /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
+  /** Whether name should be used exactly as-is, without casing transformations. */
+  isExactName: boolean;
   /** Full qualified namespace. */
   namespace: string;
   /** Whether the type has public or private accessibility */
@@ -551,6 +565,8 @@ export interface SdkClientInitializationType extends SdkTypeBase {
   name: string;
   /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
+  /** Whether name should be used exactly as-is, without casing transformations. */
+  isExactName: boolean;
   /** Initialization parameters. */
   parameters: (SdkEndpointParameter | SdkCredentialParameter | SdkMethodParameter)[];
   /** How to initialize a client. */
@@ -590,6 +606,8 @@ export interface SdkModelPropertyTypeBase<
   name: string;
   /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
+  /** Whether name should be used exactly as-is, without casing transformations. */
+  isExactName: boolean;
   /** Document for the type. */
   doc?: string;
   /** Summary for the type. */
@@ -692,12 +710,12 @@ export interface BinarySerializationOptions {
    */
   contentTypes?: string[];
   /**
-   * The ModelProperty that represents the filename in the file model.
+   * The SdkModelPropertyType that represents the filename in the file model.
    *
    * This property is only present when `isFile` is `true`. When undefined, it indicates the
    * body is not a file type.
    */
-  filename?: ModelProperty;
+  filename?: SdkModelPropertyType;
 }
 
 /**
@@ -986,6 +1004,8 @@ interface SdkServiceMethodBase<
 > extends DecoratedType {
   __raw?: Operation;
   name: string;
+  /** Whether name should be used exactly as-is, without casing transformations. */
+  isExactName: boolean;
   /** Whether the type has public or private accessibility */
   access: AccessFlags;
   /** API versions supported for current type. */

@@ -81,6 +81,7 @@ import {
   getRelativePathFromDirectory,
   getRootLength,
   getSummary,
+  getExamples as getTypeSpecExamples,
   getVisibilityForClass,
   ignoreDiagnostics,
   interpolatePath,
@@ -109,7 +110,7 @@ import {
 } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
-import { TwoLevelMap } from "@typespec/compiler/utils";
+import { DuplicateTracker, TwoLevelMap } from "@typespec/compiler/utils";
 import {
   AuthenticationOptionReference,
   AuthenticationReference,
@@ -152,7 +153,7 @@ import {
 } from "@typespec/openapi";
 import { getVersionsForEnum } from "@typespec/versioning";
 import { AutorestOpenAPISchema } from "./autorest-openapi-schema.js";
-import { getExamples, getRef } from "./decorators.js";
+import { getExamples as getAutorestExamples, getRef } from "./decorators.js";
 import { sortWithJsonSchema } from "./json-schema-sorter/sorter.js";
 import { createDiagnostic, reportDiagnostic } from "./lib.js";
 import {
@@ -253,6 +254,13 @@ export interface AutorestDocumentEmitterOptions {
    * Determines whether output should be split into multiple files.  The only supported option for splitting is "legacy-feature-files",
    */
   readonly outputSplitting?: "legacy-feature-files";
+
+  /**
+   * When enabled, example files will not be copied to the output directory.
+   * Instead, the source example files will be referenced using relative file paths.
+   * @default false
+   */
+  readonly skipExampleCopying?: boolean;
 }
 
 type HttpParameterProperties = Extract<
@@ -315,6 +323,13 @@ export async function getOpenAPIForService(
   const indirectlyProcessedTypes: Set<Type> = new Set();
 
   const operationIdsWithExample = new Set<string>();
+
+  // Compute the example directory for resolving source example paths
+  const exampleDir = resolveExampleDir(
+    options.examplesDirectory,
+    program.projectRoot,
+    context.version,
+  );
 
   const [exampleMap, diagnostics] = await loadExamples(program, options, context.version);
   program.reportDiagnostics(diagnostics);
@@ -596,7 +611,7 @@ export async function getOpenAPIForService(
       currentEndpoint.deprecated = true;
     }
 
-    const examples = getExamples(program, op);
+    const examples = getAutorestExamples(program, op);
     if (examples) {
       currentEndpoint["x-ms-examples"] = examples.reduce(
         (acc, example) => ({ ...acc, [example.title]: { $ref: example.pathOrUri } }),
@@ -609,7 +624,15 @@ export async function getOpenAPIForService(
       operationIdsWithExample.add(currentEndpoint.operationId);
       currentEndpoint["x-ms-examples"] = currentEndpoint["x-ms-examples"] || {};
       for (const [title, example] of Object.entries(autoExamples)) {
-        currentEndpoint["x-ms-examples"][title] = { $ref: `./examples/${example.relativePath}` };
+        let ref: string;
+        if (options.skipExampleCopying) {
+          const sourceExamplePath = resolvePath(exampleDir, example.relativePath);
+          const outputDir = getDirectoryPath(context.outputFile);
+          ref = getRelativePathFromDirectory(outputDir, sourceExamplePath, false);
+        } else {
+          ref = `./examples/${example.relativePath}`;
+        }
+        currentEndpoint["x-ms-examples"][title] = { $ref: ref };
       }
     }
 
@@ -1522,7 +1545,16 @@ export async function getOpenAPIForService(
     }
 
     function processUnreferencedSchemas() {
+      const authentication = resolveAuthentication(httpService);
+      const authSchemeModels = new Set<Type>(
+        authentication ? authentication.schemes.map((s) => s.model) : [],
+      );
       const addSchema = (type: Type) => {
+        if (authSchemeModels.has(type)) {
+          // Auth scheme models are emitted under securityDefinitions
+          // and should not also appear as payload schemas in definitions.
+          return;
+        }
         if (
           !processedSchemas.has(type) &&
           !indirectlyProcessedTypes.has(type) &&
@@ -2280,6 +2312,11 @@ export async function getOpenAPIForService(
       newTarget.uniqueItems = true;
     }
 
+    const examples = getTypeSpecExamples(program, typespecType);
+    if (typespecType.kind === "ModelProperty" && usage !== "parameter" && examples.length > 0) {
+      newTarget.example = serializeValueAsJson(program, examples[0].value, typespecType);
+    }
+
     if (isSecret(program, typespecType)) {
       newTarget.format = "password";
       newTarget["x-ms-secret"] = true;
@@ -2793,6 +2830,33 @@ export function sortOpenAPIDocument(doc: OpenAPI2Document): OpenAPI2Document {
   return sorted;
 }
 
+/**
+ * Resolves the example directory path, supporting `{version}` and `{version-status}` interpolation
+ * variables in the `examples-dir` option.
+ *
+ * When the examples-dir contains `{version}` or `{version-status}`, these are interpolated
+ * with the actual version values and the resulting path is used directly.
+ * Otherwise, the version is appended as a subdirectory (legacy behavior).
+ */
+function resolveExampleDir(
+  examplesDirectory: string | undefined,
+  projectRoot: string,
+  version: string | undefined,
+): string {
+  const rawDir = examplesDirectory ?? resolvePath(projectRoot, "examples");
+  const hasVersionInterpolation = rawDir.includes("{version}");
+
+  if (hasVersionInterpolation) {
+    const versionStatus = version && (version.includes("preview") ? "preview" : "stable");
+    return interpolatePath(rawDir, {
+      "version-status": versionStatus,
+      version: version,
+    });
+  }
+
+  return version ? resolvePath(rawDir, version) : rawDir;
+}
+
 async function checkExamplesDirExists(host: CompilerHost, dir: string) {
   try {
     return (await host.stat(dir)).isDirectory();
@@ -2835,8 +2899,7 @@ async function loadExamples(
 ): Promise<[Map<string, Record<string, LoadedExample>>, readonly Diagnostic[]]> {
   const host = program.host;
   const diagnostics = createDiagnosticCollector();
-  const examplesBaseDir = options.examplesDirectory ?? resolvePath(program.projectRoot, "examples");
-  const exampleDir = version ? resolvePath(examplesBaseDir, version) : resolvePath(examplesBaseDir);
+  const exampleDir = resolveExampleDir(options.examplesDirectory, program.projectRoot, version);
 
   if (!(await checkExamplesDirExists(host, exampleDir))) {
     if (options.examplesDirectory) {
@@ -2943,6 +3006,7 @@ export function createDefaultDocumentProxy(
   const tags = new Set<string>();
   const definitions = new Map<string, OpenAPI2Schema>();
   const parameters: Map<string, [ModelProperty, OpenAPI2Parameter]> = new Map();
+  const operationIds = new DuplicateTracker<string, Operation>();
   let examples: Map<string, Record<string, LoadedExample>> = new Map();
   let operationIdsWithExamples: Set<string> = new Set();
   return {
@@ -2980,6 +3044,7 @@ export function createDefaultDocumentProxy(
       }
       const resolvedOp = pathItem[op.verb]!;
       resolvedOp.operationId = resolveOperationId(context, op.operation);
+      operationIds.track(resolvedOp.operationId, op.operation);
       return resolvedOp;
     },
     addTag(tag: string, op: Operation) {
@@ -3015,6 +3080,7 @@ export function createDefaultDocumentProxy(
       operationIdsWithExamples = exampleIds;
     },
     resolveDocuments(context: AutorestEmitterContext) {
+      reportDuplicateOperationIds(program, operationIds);
       root.definitions = {};
       for (const [name, schema] of definitions) {
         root.definitions[name] = schema;
@@ -3079,14 +3145,14 @@ function createFeatureDocumentProxy(
     return createDefaultDocumentProxy(program, service, options, version);
   const root: Map<string, OpenAPI2DocumentItem> = new Map();
   const operationFeatures: Map<string, Set<string>> = new Map();
+  const operationIds = new Map<string, DuplicateTracker<string, Operation>>();
   let examples: Map<string, Record<string, LoadedExample>> = new Map();
   let operationIdsWithExamples: Set<string> = new Set();
   for (const featureName of features.keys()) {
     const featureOptions = features.get(featureName)!;
-    root.set(
-      featureName.toLowerCase(),
-      initializeOpenAPIDocumentItem(program, service, featureOptions, version),
-    );
+    const featureKey = featureName.toLowerCase();
+    root.set(featureKey, initializeOpenAPIDocumentItem(program, service, featureOptions, version));
+    operationIds.set(featureKey, new DuplicateTracker<string, Operation>());
   }
   const defaultFeature = [...root.entries()].filter(
     ([key, _]) => key.toLowerCase() === "common",
@@ -3133,6 +3199,7 @@ function createFeatureDocumentProxy(
       }
       const resolvedOp = pathItem[op.verb]!;
       const opId = resolveOperationId(context, op.operation);
+      operationIds.get(options.featureName.toLowerCase())?.track(opId, op.operation);
       addFeatureOperation(opId, options.featureName);
       resolvedOp.operationId = opId;
       return resolvedOp;
@@ -3182,6 +3249,9 @@ function createFeatureDocumentProxy(
     },
     resolveDocuments(context: AutorestEmitterContext) {
       const docs: AutorestEmitterResult[] = [];
+      for (const tracker of operationIds.values()) {
+        reportDuplicateOperationIds(program, tracker);
+      }
       for (const [featureName, featureItem] of root.entries()) {
         const exampleIds = operationFeatures.get(featureName) || new Set<string>();
         const featureExamples = [...exampleIds]
@@ -3258,6 +3328,21 @@ function createFeatureDocumentProxy(
     }
     const ops = operationFeatures.get(featureName)!;
     ops.add(operationId);
+  }
+}
+
+function reportDuplicateOperationIds(
+  program: Program,
+  duplicateTracker: DuplicateTracker<string, Operation>,
+) {
+  for (const [operationId, duplicates] of duplicateTracker.entries()) {
+    for (const duplicate of duplicates) {
+      reportDiagnostic(program, {
+        code: "duplicate-operation-id",
+        format: { operationId },
+        target: duplicate,
+      });
+    }
   }
 }
 

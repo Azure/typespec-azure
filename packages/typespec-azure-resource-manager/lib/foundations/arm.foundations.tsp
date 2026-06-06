@@ -261,10 +261,9 @@ op ArmCreateOperation<
   BodyParameter extends {},
   Response extends {},
   ErrorResponse extends {}
->(
-  ...HttpParameters,
-  @doc("Resource create parameters.") @bodyRoot resource: BodyParameter,
-): Response | ErrorResponse;
+>(...HttpParameters, @doc("Resource create parameters.") @bodyRoot resource: BodyParameter):
+  | Response
+  | ErrorResponse;
 
 /**
  * @dev The base template for Azure Resource Manager PATCH Operations.

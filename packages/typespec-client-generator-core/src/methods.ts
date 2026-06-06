@@ -80,6 +80,7 @@ import {
   getCrossLanguageDefinitionId,
   getHttpOperationWithCache,
   getLibraryName,
+  isExactClientName,
 } from "./public-utils.js";
 import {
   getClientTypeWithDiagnostics,
@@ -646,6 +647,7 @@ function getSdkMethodResponse(
         variantTypes: allResponseBodies,
         name: createGeneratedName(context, operation, "UnionResponse"),
         isGeneratedName: true,
+        isExactName: false,
         namespace: client.namespace,
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, operation)}.UnionResponse`,
         decorators: [],
@@ -735,6 +737,7 @@ export function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOpe
     __raw: operation,
     kind: "basic",
     name,
+    isExactName: isExactClientName(context, operation),
     access: getAccess(context, operation) ?? "public",
     parameters: methodParameters,
     doc: getClientDoc(context, operation),

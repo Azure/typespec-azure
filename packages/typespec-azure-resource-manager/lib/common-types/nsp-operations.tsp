@@ -196,7 +196,7 @@ interface NspConfigurationOperations<
   >;
 
   /**
-   * @dev GET a network security perimeter configuration for a particular resource
+   * @dev Perform an action on a network security perimeter configuration for a particular resource
    * @template ParentResource the parent resource of the NspConfiguration
    * @template Request The request body type
    * @template Response The success response for the read operation
@@ -238,7 +238,7 @@ interface NspConfigurationOperations<
   ): Response | Error;
 
   /**
-   * @dev GET a network security perimeter configuration for a particular resource
+   * @dev Perform an action on a network security perimeter configuration for a particular resource
    * @template ParentResource the parent resource of the NspConfiguration
    * @template Request The request body type
    * @template Response The success response for the read operation

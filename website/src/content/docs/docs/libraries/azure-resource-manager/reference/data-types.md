@@ -23,10 +23,10 @@ model Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders>
 
 ```typespec
 @post
-op post(
-  ...ResourceInstanceParameters<Employee>,
-): ArmAcceptedLroResponse<LroHeaders = ArmLroLocationHeader<FinalResult = Employee> &
-  Azure.Core.Foundations.RetryAfterHeader> | ErrorResponse;
+op post(...ResourceInstanceParameters<Employee>):
+  | ArmAcceptedLroResponse<LroHeaders = ArmLroLocationHeader<FinalResult = Employee> &
+      Azure.Core.Foundations.RetryAfterHeader>
+  | ErrorResponse;
 ```
 
 #### Properties
@@ -238,9 +238,10 @@ model Azure.ResourceManager.ArmDeletedResponse
 ```typespec
 @delete
 @armResourceDelete(Employee)
-op delete(
-  ...ResourceInstanceParameters<Employee>,
-): ArmDeletedResponse | ArmDeletedNoContentResponse | ErrorResponse;
+op delete(...ResourceInstanceParameters<Employee>):
+  | ArmDeletedResponse
+  | ArmDeletedNoContentResponse
+  | ErrorResponse;
 ```
 
 #### Properties
@@ -403,11 +404,13 @@ model Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders>
 ```typespec
 op createOrUpdate is ArmResourceCreateOrReplaceAsync<
   Employee,
-  Response = ArmResponse<Employee> | ArmResourceCreatedResponse<
-    Employee,
-    LroHeaders = ArmLroLocationHeader<FinalResult = Employee> &
-      Azure.Core.Foundations.RetryAfterHeader
-  >
+  Response =
+    | ArmResponse<Employee>
+    | ArmResourceCreatedResponse<
+        Employee,
+        LroHeaders = ArmLroLocationHeader<FinalResult = Employee> &
+          Azure.Core.Foundations.RetryAfterHeader
+      >
 >;
 ```
 

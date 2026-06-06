@@ -87,6 +87,13 @@ describe("path parameters", () => {
     });
   });
 
+  it("does not emit @example on path parameters", async () => {
+    const param = await getPathParam(`
+      @get op test(@path @TypeSpec.example("testVal") myParam: string): void;
+    `);
+    strictEqual((param as any).example, undefined);
+  });
+
   it("report unsupported-optional-path-param diagnostic on the parameter when using optional path parameters", async () => {
     const offset = 258; // hard coding, need better solution in new tester
     const { pos, end, source } = extractSquiggles(`op test(~~~@path myParam?: string~~~): void;`);

@@ -17,19 +17,23 @@ namespace Azure.ResourceManager.CommonTypes;
 @@armCommonDefinition(Resource, "Resource", Azure.ResourceManager.CommonTypes.Versions.v6);
 
 /** The resource model definition for an Azure Resource Manager resource with an etag. */
-@@armCommonDefinition(AzureEntityResource,
+@@armCommonDefinition(
+  AzureEntityResource,
   "AzureEntityResource",
   Azure.ResourceManager.CommonTypes.Versions.v3
 );
-@@armCommonDefinition(AzureEntityResource,
+@@armCommonDefinition(
+  AzureEntityResource,
   "AzureEntityResource",
   Azure.ResourceManager.CommonTypes.Versions.v4
 );
-@@armCommonDefinition(AzureEntityResource,
+@@armCommonDefinition(
+  AzureEntityResource,
   "AzureEntityResource",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
-@@armCommonDefinition(AzureEntityResource,
+@@armCommonDefinition(
+  AzureEntityResource,
   "AzureEntityResource",
   Azure.ResourceManager.CommonTypes.Versions.v6
 );
@@ -37,19 +41,23 @@ namespace Azure.ResourceManager.CommonTypes;
 /**
  * The base tracked resource.
  */
-@@armCommonDefinition(TrackedResource,
+@@armCommonDefinition(
+  TrackedResource,
   "TrackedResource",
   Azure.ResourceManager.CommonTypes.Versions.v3
 );
-@@armCommonDefinition(TrackedResource,
+@@armCommonDefinition(
+  TrackedResource,
   "TrackedResource",
   Azure.ResourceManager.CommonTypes.Versions.v4
 );
-@@armCommonDefinition(TrackedResource,
+@@armCommonDefinition(
+  TrackedResource,
   "TrackedResource",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
-@@armCommonDefinition(TrackedResource,
+@@armCommonDefinition(
+  TrackedResource,
   "TrackedResource",
   Azure.ResourceManager.CommonTypes.Versions.v6
 );
@@ -57,19 +65,23 @@ namespace Azure.ResourceManager.CommonTypes;
 /**
  * The base proxy resource.
  */
-@@armCommonDefinition(ProxyResource,
+@@armCommonDefinition(
+  ProxyResource,
   "ProxyResource",
   Azure.ResourceManager.CommonTypes.Versions.v3
 );
-@@armCommonDefinition(ProxyResource,
+@@armCommonDefinition(
+  ProxyResource,
   "ProxyResource",
   Azure.ResourceManager.CommonTypes.Versions.v4
 );
-@@armCommonDefinition(ProxyResource,
+@@armCommonDefinition(
+  ProxyResource,
   "ProxyResource",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
-@@armCommonDefinition(ProxyResource,
+@@armCommonDefinition(
+  ProxyResource,
   "ProxyResource",
   Azure.ResourceManager.CommonTypes.Versions.v6
 );
@@ -77,19 +89,23 @@ namespace Azure.ResourceManager.CommonTypes;
 /**
  * The base extension resource.
  */
-@@armCommonDefinition(ExtensionResource,
+@@armCommonDefinition(
+  ExtensionResource,
   "ProxyResource",
   Azure.ResourceManager.CommonTypes.Versions.v3
 );
-@@armCommonDefinition(ExtensionResource,
+@@armCommonDefinition(
+  ExtensionResource,
   "ProxyResource",
   Azure.ResourceManager.CommonTypes.Versions.v4
 );
-@@armCommonDefinition(ExtensionResource,
+@@armCommonDefinition(
+  ExtensionResource,
   "ProxyResource",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
-@@armCommonDefinition(ExtensionResource,
+@@armCommonDefinition(
+  ExtensionResource,
   "ProxyResource",
   Azure.ResourceManager.CommonTypes.Versions.v6
 );
@@ -105,19 +121,23 @@ namespace Azure.ResourceManager.CommonTypes;
 /**
  * A list of REST API operations supported by an Azure Resource Provider. It contains an URL link to get the next set of results.
  */
-@@armCommonDefinition(OperationListResult,
+@@armCommonDefinition(
+  OperationListResult,
   "OperationListResult",
   Azure.ResourceManager.CommonTypes.Versions.v3
 );
-@@armCommonDefinition(OperationListResult,
+@@armCommonDefinition(
+  OperationListResult,
   "OperationListResult",
   Azure.ResourceManager.CommonTypes.Versions.v4
 );
-@@armCommonDefinition(OperationListResult,
+@@armCommonDefinition(
+  OperationListResult,
   "OperationListResult",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
-@@armCommonDefinition(OperationListResult,
+@@armCommonDefinition(
+  OperationListResult,
   "OperationListResult",
   Azure.ResourceManager.CommonTypes.Versions.v6
 );
@@ -133,19 +153,23 @@ namespace Azure.ResourceManager.CommonTypes;
 /**
  * Localized display information for an operation.
  */
-@@armCommonDefinition(OperationDisplay,
+@@armCommonDefinition(
+  OperationDisplay,
   "OperationDisplay",
   Azure.ResourceManager.CommonTypes.Versions.v3
 );
-@@armCommonDefinition(OperationDisplay,
+@@armCommonDefinition(
+  OperationDisplay,
   "OperationDisplay",
   Azure.ResourceManager.CommonTypes.Versions.v4
 );
-@@armCommonDefinition(OperationDisplay,
+@@armCommonDefinition(
+  OperationDisplay,
   "OperationDisplay",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
-@@armCommonDefinition(OperationDisplay,
+@@armCommonDefinition(
+  OperationDisplay,
   "OperationDisplay",
   Azure.ResourceManager.CommonTypes.Versions.v6
 );
@@ -153,19 +177,23 @@ namespace Azure.ResourceManager.CommonTypes;
 /**
  * The current status of an async operation.
  */
-@@armCommonDefinition(OperationStatusResult,
+@@armCommonDefinition(
+  OperationStatusResult,
   "OperationStatusResult",
   Azure.ResourceManager.CommonTypes.Versions.v3
 );
-@@armCommonDefinition(OperationStatusResult,
+@@armCommonDefinition(
+  OperationStatusResult,
   "OperationStatusResult",
   Azure.ResourceManager.CommonTypes.Versions.v4
 );
-@@armCommonDefinition(OperationStatusResult,
+@@armCommonDefinition(
+  OperationStatusResult,
   "OperationStatusResult",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
-@@armCommonDefinition(OperationStatusResult,
+@@armCommonDefinition(
+  OperationStatusResult,
   "OperationStatusResult",
   Azure.ResourceManager.CommonTypes.Versions.v6
 );
@@ -189,19 +217,23 @@ namespace Azure.ResourceManager.CommonTypes;
 /**
  * The resource management error additional info.
  */
-@@armCommonDefinition(ErrorAdditionalInfo,
+@@armCommonDefinition(
+  ErrorAdditionalInfo,
   "ErrorAdditionalInfo",
   Azure.ResourceManager.CommonTypes.Versions.v3
 );
-@@armCommonDefinition(ErrorAdditionalInfo,
+@@armCommonDefinition(
+  ErrorAdditionalInfo,
   "ErrorAdditionalInfo",
   Azure.ResourceManager.CommonTypes.Versions.v4
 );
-@@armCommonDefinition(ErrorAdditionalInfo,
+@@armCommonDefinition(
+  ErrorAdditionalInfo,
   "ErrorAdditionalInfo",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
-@@armCommonDefinition(ErrorAdditionalInfo,
+@@armCommonDefinition(
+  ErrorAdditionalInfo,
   "ErrorAdditionalInfo",
   Azure.ResourceManager.CommonTypes.Versions.v6
 );
@@ -232,19 +264,23 @@ namespace Azure.ResourceManager.CommonTypes;
 /**
  * encryptionProperties
  */
-@@armCommonDefinition(EncryptionProperties,
+@@armCommonDefinition(
+  EncryptionProperties,
   "encryptionProperties",
   Azure.ResourceManager.CommonTypes.Versions.v3
 );
-@@armCommonDefinition(EncryptionProperties,
+@@armCommonDefinition(
+  EncryptionProperties,
   "encryptionProperties",
   Azure.ResourceManager.CommonTypes.Versions.v4
 );
-@@armCommonDefinition(EncryptionProperties,
+@@armCommonDefinition(
+  EncryptionProperties,
   "encryptionProperties",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
-@@armCommonDefinition(EncryptionProperties,
+@@armCommonDefinition(
+  EncryptionProperties,
   "encryptionProperties",
   Azure.ResourceManager.CommonTypes.Versions.v6
 );
@@ -252,19 +288,23 @@ namespace Azure.ResourceManager.CommonTypes;
 /**
  * KeyVaultProperties
  */
-@@armCommonDefinition(KeyVaultProperties,
+@@armCommonDefinition(
+  KeyVaultProperties,
   "KeyVaultProperties",
   Azure.ResourceManager.CommonTypes.Versions.v3
 );
-@@armCommonDefinition(KeyVaultProperties,
+@@armCommonDefinition(
+  KeyVaultProperties,
   "KeyVaultProperties",
   Azure.ResourceManager.CommonTypes.Versions.v4
 );
-@@armCommonDefinition(KeyVaultProperties,
+@@armCommonDefinition(
+  KeyVaultProperties,
   "KeyVaultProperties",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
-@@armCommonDefinition(KeyVaultProperties,
+@@armCommonDefinition(
+  KeyVaultProperties,
   "KeyVaultProperties",
   Azure.ResourceManager.CommonTypes.Versions.v6
 );
@@ -272,19 +312,23 @@ namespace Azure.ResourceManager.CommonTypes;
 /**
  * ResourceModelWithAllowedPropertySet
  */
-@@armCommonDefinition(ResourceModelWithAllowedPropertySet,
+@@armCommonDefinition(
+  ResourceModelWithAllowedPropertySet,
   "ResourceModelWithAllowedPropertySet",
   Azure.ResourceManager.CommonTypes.Versions.v3
 );
-@@armCommonDefinition(ResourceModelWithAllowedPropertySet,
+@@armCommonDefinition(
+  ResourceModelWithAllowedPropertySet,
   "ResourceModelWithAllowedPropertySet",
   Azure.ResourceManager.CommonTypes.Versions.v4
 );
-@@armCommonDefinition(ResourceModelWithAllowedPropertySet,
+@@armCommonDefinition(
+  ResourceModelWithAllowedPropertySet,
   "ResourceModelWithAllowedPropertySet",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
-@@armCommonDefinition(ResourceModelWithAllowedPropertySet,
+@@armCommonDefinition(
+  ResourceModelWithAllowedPropertySet,
   "ResourceModelWithAllowedPropertySet",
   Azure.ResourceManager.CommonTypes.Versions.v6
 );
@@ -292,19 +336,23 @@ namespace Azure.ResourceManager.CommonTypes;
 /**
  * The check availability request body.
  */
-@@armCommonDefinition(CheckNameAvailabilityRequest,
+@@armCommonDefinition(
+  CheckNameAvailabilityRequest,
   "CheckNameAvailabilityRequest",
   Azure.ResourceManager.CommonTypes.Versions.v3
 );
-@@armCommonDefinition(CheckNameAvailabilityRequest,
+@@armCommonDefinition(
+  CheckNameAvailabilityRequest,
   "CheckNameAvailabilityRequest",
   Azure.ResourceManager.CommonTypes.Versions.v4
 );
-@@armCommonDefinition(CheckNameAvailabilityRequest,
+@@armCommonDefinition(
+  CheckNameAvailabilityRequest,
   "CheckNameAvailabilityRequest",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
-@@armCommonDefinition(CheckNameAvailabilityRequest,
+@@armCommonDefinition(
+  CheckNameAvailabilityRequest,
   "CheckNameAvailabilityRequest",
   Azure.ResourceManager.CommonTypes.Versions.v6
 );
@@ -312,36 +360,44 @@ namespace Azure.ResourceManager.CommonTypes;
 /**
  * The check availability result.
  */
-@@armCommonDefinition(CheckNameAvailabilityResponse,
+@@armCommonDefinition(
+  CheckNameAvailabilityResponse,
   "CheckNameAvailabilityResponse",
   Azure.ResourceManager.CommonTypes.Versions.v3
 );
-@@armCommonDefinition(CheckNameAvailabilityResponse,
+@@armCommonDefinition(
+  CheckNameAvailabilityResponse,
   "CheckNameAvailabilityResponse",
   Azure.ResourceManager.CommonTypes.Versions.v4
 );
-@@armCommonDefinition(CheckNameAvailabilityResponse,
+@@armCommonDefinition(
+  CheckNameAvailabilityResponse,
   "CheckNameAvailabilityResponse",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
-@@armCommonDefinition(CheckNameAvailabilityResponse,
+@@armCommonDefinition(
+  CheckNameAvailabilityResponse,
   "CheckNameAvailabilityResponse",
   Azure.ResourceManager.CommonTypes.Versions.v6
 );
 
-@@armCommonDefinition(ErrorResponse,
+@@armCommonDefinition(
+  ErrorResponse,
   "ErrorResponse",
   Azure.ResourceManager.CommonTypes.Versions.v3
 );
-@@armCommonDefinition(ErrorResponse,
+@@armCommonDefinition(
+  ErrorResponse,
   "ErrorResponse",
   Azure.ResourceManager.CommonTypes.Versions.v4
 );
-@@armCommonDefinition(ErrorResponse,
+@@armCommonDefinition(
+  ErrorResponse,
   "ErrorResponse",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
-@@armCommonDefinition(ErrorResponse,
+@@armCommonDefinition(
+  ErrorResponse,
   "ErrorResponse",
   Azure.ResourceManager.CommonTypes.Versions.v6
 );
@@ -353,24 +409,29 @@ namespace Azure.ResourceManager.CommonTypes;
 
 // -- Parameters
 /** ApiVersionParameter */
-@@armCommonParameter(ApiVersionParameter.apiVersion,
+@@armCommonParameter(
+  ApiVersionParameter.apiVersion,
   "ApiVersionParameter",
   Azure.ResourceManager.CommonTypes.Versions.v3
 );
-@@armCommonParameter(ApiVersionParameter.apiVersion,
+@@armCommonParameter(
+  ApiVersionParameter.apiVersion,
   "ApiVersionParameter",
   Azure.ResourceManager.CommonTypes.Versions.v4
 );
-@@armCommonParameter(ApiVersionParameter.apiVersion,
+@@armCommonParameter(
+  ApiVersionParameter.apiVersion,
   "ApiVersionParameter",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
-@@armCommonParameter(ApiVersionParameter.apiVersion,
+@@armCommonParameter(
+  ApiVersionParameter.apiVersion,
   "ApiVersionParameter",
   Azure.ResourceManager.CommonTypes.Versions.v6
 );
 
-@@resourceParameterBaseFor(ApiVersionParameter.apiVersion,
+@@resourceParameterBaseFor(
+  ApiVersionParameter.apiVersion,
   [
     ResourceHome.ResourceGroup,
     ResourceHome.Subscription,
@@ -384,23 +445,28 @@ namespace Azure.ResourceManager.CommonTypes;
 );
 
 /** SubscriptionIdParameter */
-@@armCommonParameter(SubscriptionIdParameter.subscriptionId,
+@@armCommonParameter(
+  SubscriptionIdParameter.subscriptionId,
   "SubscriptionIdParameter",
   Azure.ResourceManager.CommonTypes.Versions.v3
 );
-@@armCommonParameter(SubscriptionIdParameter.subscriptionId,
+@@armCommonParameter(
+  SubscriptionIdParameter.subscriptionId,
   "SubscriptionIdParameter",
   Azure.ResourceManager.CommonTypes.Versions.v4
 );
-@@armCommonParameter(SubscriptionIdParameter.subscriptionId,
+@@armCommonParameter(
+  SubscriptionIdParameter.subscriptionId,
   "SubscriptionIdParameter",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
-@@armCommonParameter(SubscriptionIdParameter.subscriptionId,
+@@armCommonParameter(
+  SubscriptionIdParameter.subscriptionId,
   "SubscriptionIdParameter",
   Azure.ResourceManager.CommonTypes.Versions.v6
 );
-@@resourceParameterBaseFor(SubscriptionIdParameter.subscriptionId,
+@@resourceParameterBaseFor(
+  SubscriptionIdParameter.subscriptionId,
   [
     ResourceHome.ResourceGroup,
     ResourceHome.Subscription,
@@ -411,76 +477,93 @@ namespace Azure.ResourceManager.CommonTypes;
 );
 
 /** ResourceGroupNameParameter */
-@@armCommonParameter(ResourceGroupNameParameter.resourceGroupName,
+@@armCommonParameter(
+  ResourceGroupNameParameter.resourceGroupName,
   "ResourceGroupNameParameter",
   Azure.ResourceManager.CommonTypes.Versions.v3
 );
-@@armCommonParameter(ResourceGroupNameParameter.resourceGroupName,
+@@armCommonParameter(
+  ResourceGroupNameParameter.resourceGroupName,
   "ResourceGroupNameParameter",
   Azure.ResourceManager.CommonTypes.Versions.v4
 );
-@@armCommonParameter(ResourceGroupNameParameter.resourceGroupName,
+@@armCommonParameter(
+  ResourceGroupNameParameter.resourceGroupName,
   "ResourceGroupNameParameter",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
-@@armCommonParameter(ResourceGroupNameParameter.resourceGroupName,
+@@armCommonParameter(
+  ResourceGroupNameParameter.resourceGroupName,
   "ResourceGroupNameParameter",
   Azure.ResourceManager.CommonTypes.Versions.v6
 );
-@@resourceParameterBaseFor(ResourceGroupNameParameter.resourceGroupName,
+@@resourceParameterBaseFor(
+  ResourceGroupNameParameter.resourceGroupName,
   [ResourceHome.ResourceGroup, ResourceHome.BuiltInResourceGroup]
 );
 
 /** ManagementGroupNameParameter */
-@@armCommonParameter(ManagementGroupNameParameter.managementGroupName,
+@@armCommonParameter(
+  ManagementGroupNameParameter.managementGroupName,
   "ManagementGroupNameParameter",
   Azure.ResourceManager.CommonTypes.Versions.v3
 );
-@@armCommonParameter(ManagementGroupNameParameter.managementGroupName,
+@@armCommonParameter(
+  ManagementGroupNameParameter.managementGroupName,
   "ManagementGroupNameParameter",
   Azure.ResourceManager.CommonTypes.Versions.v4
 );
-@@armCommonParameter(ManagementGroupNameParameter.managementGroupName,
+@@armCommonParameter(
+  ManagementGroupNameParameter.managementGroupName,
   "ManagementGroupNameParameter",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
-@@armCommonParameter(ManagementGroupNameParameter.managementGroupName,
+@@armCommonParameter(
+  ManagementGroupNameParameter.managementGroupName,
   "ManagementGroupNameParameter",
   Azure.ResourceManager.CommonTypes.Versions.v6
 );
 
 /** ScopeParameter */
-@@armCommonParameter(ScopeParameter.scope,
+@@armCommonParameter(
+  ScopeParameter.scope,
   "ScopeParameter",
   Azure.ResourceManager.CommonTypes.Versions.v3
 );
-@@armCommonParameter(ScopeParameter.scope,
+@@armCommonParameter(
+  ScopeParameter.scope,
   "ScopeParameter",
   Azure.ResourceManager.CommonTypes.Versions.v4
 );
-@@armCommonParameter(ScopeParameter.scope,
+@@armCommonParameter(
+  ScopeParameter.scope,
   "ScopeParameter",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
-@@armCommonParameter(ScopeParameter.scope,
+@@armCommonParameter(
+  ScopeParameter.scope,
   "ScopeParameter",
   Azure.ResourceManager.CommonTypes.Versions.v6
 );
 
 /** LocationResourceParameter */
-@@armCommonParameter(LocationResourceParameter.location,
+@@armCommonParameter(
+  LocationResourceParameter.location,
   "LocationParameter",
   Azure.ResourceManager.CommonTypes.Versions.v3
 );
-@@armCommonParameter(LocationResourceParameter.location,
+@@armCommonParameter(
+  LocationResourceParameter.location,
   "LocationParameter",
   Azure.ResourceManager.CommonTypes.Versions.v4
 );
-@@armCommonParameter(LocationResourceParameter.location,
+@@armCommonParameter(
+  LocationResourceParameter.location,
   "LocationParameter",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
-@@armCommonParameter(LocationResourceParameter.location,
+@@armCommonParameter(
+  LocationResourceParameter.location,
   "LocationParameter",
   Azure.ResourceManager.CommonTypes.Versions.v6
 );
@@ -488,19 +571,23 @@ namespace Azure.ResourceManager.CommonTypes;
 /**
  * The default operationId parameter type.
  */
-@@armCommonParameter(OperationIdParameter.operationId,
+@@armCommonParameter(
+  OperationIdParameter.operationId,
   "OperationIdParameter",
   Azure.ResourceManager.CommonTypes.Versions.v3
 );
-@@armCommonParameter(OperationIdParameter.operationId,
+@@armCommonParameter(
+  OperationIdParameter.operationId,
   "OperationIdParameter",
   Azure.ResourceManager.CommonTypes.Versions.v4
 );
-@@armCommonParameter(OperationIdParameter.operationId,
+@@armCommonParameter(
+  OperationIdParameter.operationId,
   "OperationIdParameter",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
-@@armCommonParameter(OperationIdParameter.operationId,
+@@armCommonParameter(
+  OperationIdParameter.operationId,
   "OperationIdParameter",
   Azure.ResourceManager.CommonTypes.Versions.v6
 );
@@ -508,19 +595,23 @@ namespace Azure.ResourceManager.CommonTypes;
 /**
  * TenantIdParameter
  */
-@@armCommonParameter(TenantIdParameter.tenantId,
+@@armCommonParameter(
+  TenantIdParameter.tenantId,
   "TenantIdParameter",
   Azure.ResourceManager.CommonTypes.Versions.v3
 );
-@@armCommonParameter(TenantIdParameter.tenantId,
+@@armCommonParameter(
+  TenantIdParameter.tenantId,
   "TenantIdParameter",
   Azure.ResourceManager.CommonTypes.Versions.v4
 );
-@@armCommonParameter(TenantIdParameter.tenantId,
+@@armCommonParameter(
+  TenantIdParameter.tenantId,
   "TenantIdParameter",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
-@@armCommonParameter(TenantIdParameter.tenantId,
+@@armCommonParameter(
+  TenantIdParameter.tenantId,
   "TenantIdParameter",
   Azure.ResourceManager.CommonTypes.Versions.v6
 );

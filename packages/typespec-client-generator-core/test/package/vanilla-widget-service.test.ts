@@ -12,7 +12,6 @@ async function compileVanillaWidgetService(code: string) {
     @versioned(Versions)
     namespace DemoService;
 
-    /** The Contoso Widget Manager service version. */
     enum Versions {
       "2022-08-30",
     }
