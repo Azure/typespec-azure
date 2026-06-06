@@ -9,6 +9,7 @@ import "./operations.tsp";
 import "./obsolete.tsp";
 import "./decorators.tsp";
 import "./legacy.tsp";
+import "./merge-patch.tsp";
 import "../dist/src/tsp-index.js";
 
 namespace Azure.Core;
