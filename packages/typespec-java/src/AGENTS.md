@@ -30,6 +30,7 @@ The code there, in runtime, consumes the "code-model.yaml" file produced by the 
 ## Update Node.js Package for Latest Dependencies
 
 Instructions:
+
 - Always use absolute path when change directory.
 
 Steps:

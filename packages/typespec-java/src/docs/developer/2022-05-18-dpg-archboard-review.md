@@ -4,8 +4,8 @@
 
 1. Version resiliency
 2. Clean grow-up story
-    * DPG methods and handwritten methods co-exist in the same artifact
-    * Support adding handwritten methods to a subset of REST operations
+   - DPG methods and handwritten methods co-exist in the same artifact
+   - Support adding handwritten methods to a subset of REST operations
 
 ## Key changes in DPG client
 
@@ -29,6 +29,7 @@ PhoneNumberClient client = new PhoneNumberClientBuilder()
                   .credential(tokenCredential)
                   .buildClient();
 ```
+
 ### GET request
 
 **Legacy generator**
@@ -54,6 +55,7 @@ OffsetDateTime purchaseDate = purchasedPhoneNumber.getPurchaseDate();
 @ServiceMethod(returns = ReturnType.SINGLE)
 public Response<BinaryData> getByNumberWithResponse(String phoneNumber, RequestOptions requestOptions)
 ```
+
 User Experience
 
 ```java
@@ -67,6 +69,7 @@ OffsetDateTime purchaseDate = OffsetDateTime.parse(responseBodyJson.get("purchas
 ### POST request
 
 **Legacy generator**
+
 ```java
 @Generated
 @ServiceMethod(returns = ReturnType.SINGLE)
@@ -90,6 +93,7 @@ public Response<BinaryData> createOrUpdateGroupWithResponse(String groupId, Bina
 ```
 
 User experience
+
 ```java
 ObjectNode groupNode = JsonNodeFactory.instance.objectNode();
 // set the properties of group
@@ -97,7 +101,7 @@ groupNode.put("groupType","IoTHubTag");
 // set other properties...
 BinaryData body = BinaryData.fromObject(groupNode);
 
-BinaryData responseBody = client.createOrUpdateGroupWithResponse("a-group", body, null).getValue(); 
+BinaryData responseBody = client.createOrUpdateGroupWithResponse("a-group", body, null).getValue();
 JsonNode responseBodyJson = objectMapper.readTree(responseBody.toBytes());
 Integer deviceCount = responseBodyJson.get("deviceCount").asInt();
 ```
@@ -111,6 +115,7 @@ Integer deviceCount = responseBodyJson.get("deviceCount").asInt();
 @ServiceMethod(returns = ReturnType.COLLECTION)
 public PagedIterable<PurchasedPhoneNumber> listPhoneNumbers(Integer skip, Integer top, Context context)
 ```
+
 User experience
 
 ```java
@@ -144,6 +149,7 @@ purchasedPhoneNumbers.forEach(purchasedPhoneNumber -> {
 ### LRO operations
 
 **Legacy generator**
+
 ```java
 @Generated
 @ServiceMethod(returns = ReturnType.LONG_RUNNING_OPERATION)
@@ -171,11 +177,13 @@ public Response<String> binaryBodyWithTwoContentTypesWithResponse(ContentType co
 ```
 
 User Experience
+
 ```java
 String response = client.binaryBodyWithTwoContentTypesWithResponse(ContentType.OCTET_STREAM, BinaryData.fromBytes(bytes));
 ```
 
 **DPG generator**
+
 ```java
 @Generated
 @ServiceMethod(returns = ReturnType.SINGLE)
@@ -183,6 +191,7 @@ public Response<BinaryData> binaryBodyWithTwoContentTypesWithResponse(BinaryData
 ```
 
 User Experience
+
 ```java
 RequestOptions requestOptions = new RequestOptions()
         .addHeader("Content-Type", "application/octet-stream");
@@ -194,6 +203,7 @@ String response = responseBody.toString();
 ### Glass breaker method
 
 **DPG generator**
+
 ```java
 @Generated
 @ServiceMethod(returns = ReturnType.SINGLE)
@@ -201,6 +211,7 @@ public Response<BinaryData> sendRequest(HttpRequest httpRequest, Context context
 ```
 
 User experience
+
 ```java
 BinaryData requestBody = BinaryData.fromObject(user);
 HttpHeaders httpHeaders = new HttpHeaders().add("header-key", "header-value");
@@ -208,7 +219,6 @@ HttpRequest httpRequest = new HttpRequest(HttpMethod.POST, new URL("https://exam
         requestBody);
 BinaryData responseBody = this.sendRequest(httpRequest, Context.NONE).getValue();
 ```
-
 
 ## Grow-up Story Experiment on Metrics Advisor
 
@@ -237,16 +247,14 @@ generate-tests: true
 
 Highlight a few codegen properties:
 
-* **data-plane**: this enables data-plane codegen
-* **partial-update**: with this flag, user manually added/updated code will not be deleted in next codegen.
-* **generate-samples**: this enables sample generation
-* **generate-tests**: this enables test generation
-
+- **data-plane**: this enables data-plane codegen
+- **partial-update**: with this flag, user manually added/updated code will not be deleted in next codegen.
+- **generate-samples**: this enables sample generation
+- **generate-tests**: this enables test generation
 
 ### Data-plane generated code
 
-DPG generated code: [API View](https://apiview.dev/Assemblies/Review/250323618f12485eaadcc4822c880f46?revisionId=6919fc2319694d039069cd9e777e9d8b&doc=False
-), [Java code](https://github.com/haolingdong-msft/metrics-advisor-poc/commit/6b602c187bba2dec122da35837cbc4aedf051858)
+DPG generated code: [API View](https://apiview.dev/Assemblies/Review/250323618f12485eaadcc4822c880f46?revisionId=6919fc2319694d039069cd9e777e9d8b&doc=False), [Java code](https://github.com/haolingdong-msft/metrics-advisor-poc/commit/6b602c187bba2dec122da35837cbc4aedf051858)
 
 We also generate JavaDoc for each method to let user know what does the payload look like.
 
@@ -262,6 +270,7 @@ Since MetricsAdvisor needs to have two keys in the header to do authentication, 
 Customized authentication code: [API View](https://apiview.dev/Assemblies/Review/250323618f12485eaadcc4822c880f46?diffRevisionId=603cb6f7e7ad41499b6768cb2044c791&doc=False&diffOnly=False&revisionId=dff270dd1f75419b86e43eff6f2dcac1#com.azure.ai.metricsadvisor.MetricsAdvisorAdministrationClientBuilder), [Java code](https://github.com/haolingdong-msft/metrics-advisor-poc/commit/79dbb93fb8ec395a6f79ea5971d6b4b2d090c765)
 
 Usage:
+
 ```java
 MetricsAdvisorAdministrationClientBuilder builder = new MetricsAdvisorAdministrationClientBuilder()
             .endpoint(getEndpoint());
@@ -273,20 +282,18 @@ builder.credential(new MetricsAdvisorKeyCredential("subscription_key", "api_key"
 We add a set of APIs to DPG code. Those methods are convenient to users, e.g. it can accept customized model as input value or return value.
 This is an overview of selected APIs to add.
 
-
 #### Convenient APIs overview
 
-| API  | Method |  Return Type        | API View | Code Reference |
-|------|--------|----------|----------------|--------------|
-|getDataFeed|GET| Single Value  |[API](https://apiview.dev/Assemblies/Review/250323618f12485eaadcc4822c880f46?diffRevisionId=dff270dd1f75419b86e43eff6f2dcac1&doc=False&diffOnly=False&revisionId=11c5d413369e4f099e6e8db7157bebd5)|[code](https://github.com/haolingdong-msft/metrics-advisor-poc/commit/b86c9353a90c3cbf5709cb3c982b2ff175dc59d9)|
-|createDataFeed|POST| Single Value  |[API](https://apiview.dev/Assemblies/Review/250323618f12485eaadcc4822c880f46?diffRevisionId=11c5d413369e4f099e6e8db7157bebd5&doc=False&diffOnly=False&revisionId=6a47cc424fd842539135795a8f6c9863)|[code](https://github.com/haolingdong-msft/metrics-advisor-poc/commit/acb4235e8c2f62bf497130cce7fc147818551565)|
-|listDataFeed|GET| Pageble Object    |[API](https://apiview.dev/Assemblies/Review/250323618f12485eaadcc4822c880f46?diffRevisionId=6a47cc424fd842539135795a8f6c9863&doc=False&diffOnly=False&revisionId=7384d93fddd84ffd86645da221a54392)|[code](https://github.com/haolingdong-msft/metrics-advisor-poc/commit/effbe61a64dde133d47779b4787f17d91809e495)|
-|deleteDataFeed|DELETE| Void    |[API](https://apiview.dev/Assemblies/Review/250323618f12485eaadcc4822c880f46?diffRevisionId=7384d93fddd84ffd86645da221a54392&doc=False&diffOnly=False&revisionId=3c03646e40b0412f90de084648710e2c)|[code](https://github.com/haolingdong-msft/metrics-advisor-poc/commit/effbe61a64dde133d47779b4787f17d91809e495)|
-
+| API            | Method | Return Type    | API View                                                                                                                                                                                           | Code Reference                                                                                                  |
+| -------------- | ------ | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| getDataFeed    | GET    | Single Value   | [API](https://apiview.dev/Assemblies/Review/250323618f12485eaadcc4822c880f46?diffRevisionId=dff270dd1f75419b86e43eff6f2dcac1&doc=False&diffOnly=False&revisionId=11c5d413369e4f099e6e8db7157bebd5) | [code](https://github.com/haolingdong-msft/metrics-advisor-poc/commit/b86c9353a90c3cbf5709cb3c982b2ff175dc59d9) |
+| createDataFeed | POST   | Single Value   | [API](https://apiview.dev/Assemblies/Review/250323618f12485eaadcc4822c880f46?diffRevisionId=11c5d413369e4f099e6e8db7157bebd5&doc=False&diffOnly=False&revisionId=6a47cc424fd842539135795a8f6c9863) | [code](https://github.com/haolingdong-msft/metrics-advisor-poc/commit/acb4235e8c2f62bf497130cce7fc147818551565) |
+| listDataFeed   | GET    | Pageble Object | [API](https://apiview.dev/Assemblies/Review/250323618f12485eaadcc4822c880f46?diffRevisionId=6a47cc424fd842539135795a8f6c9863&doc=False&diffOnly=False&revisionId=7384d93fddd84ffd86645da221a54392) | [code](https://github.com/haolingdong-msft/metrics-advisor-poc/commit/effbe61a64dde133d47779b4787f17d91809e495) |
+| deleteDataFeed | DELETE | Void           | [API](https://apiview.dev/Assemblies/Review/250323618f12485eaadcc4822c880f46?diffRevisionId=7384d93fddd84ffd86645da221a54392&doc=False&diffOnly=False&revisionId=3c03646e40b0412f90de084648710e2c) | [code](https://github.com/haolingdong-msft/metrics-advisor-poc/commit/effbe61a64dde133d47779b4787f17d91809e495) |
 
 #### Comparison between calling DPG method and convenient method
 
-* getDataFeed
+- getDataFeed
 
   [API](https://apiview.dev/Assemblies/Review/250323618f12485eaadcc4822c880f46?diffRevisionId=dff270dd1f75419b86e43eff6f2dcac1&doc=False&diffOnly=False&revisionId=11c5d413369e4f099e6e8db7157bebd5)
 
@@ -297,18 +304,17 @@ This is an overview of selected APIs to add.
 <tr>
 <td>
 
+```java
+RequestOptions requestOptions = new RequestOptions();
+Response<BinaryData> response =
+        metricsAdvisorAdministrationClient.getDataFeedByIdWithResponse(
+                "01234567-8901-2345-6789-012345678901", requestOptions);
+BinaryData data = response.getValue();
 
-  ```java
-  RequestOptions requestOptions = new RequestOptions();
-  Response<BinaryData> response =
-          metricsAdvisorAdministrationClient.getDataFeedByIdWithResponse(
-                  "01234567-8901-2345-6789-012345678901", requestOptions);
-  BinaryData data = response.getValue();
-
-  // get datafeed name
-  JsonNode dataFeed = MAPPER.readTree(data.toBytes());
-  String name = dataFeed.get("dataFeedName").asText();
-  ```
+// get datafeed name
+JsonNode dataFeed = MAPPER.readTree(data.toBytes());
+String name = dataFeed.get("dataFeedName").asText();
+```
 
 </td>
 </tr>
@@ -317,24 +323,23 @@ This is an overview of selected APIs to add.
 </tr>
 <td>
 
-  ```java
-  Response<DataFeed> response =
-          metricsAdvisorAdministrationClient.getDataFeedWithResponse(
-                  "01234567-8901-2345-6789-012345678901");
-  DataFeed dataFeed = response.getValue();
+```java
+Response<DataFeed> response =
+        metricsAdvisorAdministrationClient.getDataFeedWithResponse(
+                "01234567-8901-2345-6789-012345678901");
+DataFeed dataFeed = response.getValue();
 
-  // get datafeed name
-  String name = dataFeed.getName();
-  ```
+// get datafeed name
+String name = dataFeed.getName();
+```
+
 </td>
 </tr>
 </table>
 
-
-* createDataFeed
+- createDataFeed
 
   [API](https://apiview.dev/Assemblies/Review/250323618f12485eaadcc4822c880f46?diffRevisionId=11c5d413369e4f099e6e8db7157bebd5&doc=False&diffOnly=False&revisionId=6a47cc424fd842539135795a8f6c9863)
-
 
 <table>
 <tr>
@@ -343,19 +348,20 @@ This is an overview of selected APIs to add.
 <tr>
 <td>
 
-  ```java
-  ObjectNode dataFeedObjectNode = JsonNodeFactory.instance.objectNode();
-  // set the properties of data feed
-  dataFeedObjectNode.put("dataFeedName","sampleDataFeed.");
-  // set other properties...
-  BinaryData body = BinaryData.fromObject(dataFeedObjectNode);
+```java
+ObjectNode dataFeedObjectNode = JsonNodeFactory.instance.objectNode();
+// set the properties of data feed
+dataFeedObjectNode.put("dataFeedName","sampleDataFeed.");
+// set other properties...
+BinaryData body = BinaryData.fromObject(dataFeedObjectNode);
 
-  RequestOptions requestOptions = new RequestOptions();
-  Response<Void> response = metricsAdvisorAdministrationClient.createDataFeedWithResponse(body, requestOptions); 
+RequestOptions requestOptions = new RequestOptions();
+Response<Void> response = metricsAdvisorAdministrationClient.createDataFeedWithResponse(body, requestOptions);
 
-  // get data feed ID from "Location" header, then calls getDataFeedByIdWithResponse() to get the DataFeed BinaryData object
-  // get name from DataFeed BinaryData object
-  ```
+// get data feed ID from "Location" header, then calls getDataFeedByIdWithResponse() to get the DataFeed BinaryData object
+// get name from DataFeed BinaryData object
+```
+
 </td>
 </tr>
 <tr>
@@ -363,23 +369,24 @@ This is an overview of selected APIs to add.
 </tr>
 <td>
 
-  ```java
-  DataFeed dataFeed = new DataFeed();
-  // set the properties of the dataFeed
-  dataFeed.setName("testDataFeed");
-  // set other properties...
-  
-  Response<DataFeed> response = metricsAdvisorAdministrationClient.createDataFeedWithResponse(dataFeed);
+```java
+DataFeed dataFeed = new DataFeed();
+// set the properties of the dataFeed
+dataFeed.setName("testDataFeed");
+// set other properties...
 
-  // get data feed name
-  DataFeed dataFeed = response.getValue();
-  String name = dataFeed.getName();
-  ```
+Response<DataFeed> response = metricsAdvisorAdministrationClient.createDataFeedWithResponse(dataFeed);
+
+// get data feed name
+DataFeed dataFeed = response.getValue();
+String name = dataFeed.getName();
+```
+
 </td>
 </tr>
 </table>
 
-* listDataFeeds
+- listDataFeeds
 
   [API](https://apiview.dev/Assemblies/Review/250323618f12485eaadcc4822c880f46?diffRevisionId=6a47cc424fd842539135795a8f6c9863&doc=False&diffOnly=False&revisionId=7384d93fddd84ffd86645da221a54392)
 
@@ -401,7 +408,8 @@ This is an overview of selected APIs to add.
   BinaryData data = response.iterator().next();
   JsonNode dataFeed = MAPPER.readTree(data.toBytes());
   String name = dataFeed.get("dataFeedName").asText();
-  ```
+```
+
 </td>
 </tr>
 <tr>
@@ -409,24 +417,25 @@ This is an overview of selected APIs to add.
 </tr>
 <td>
 
-   ```java
-  ListDataFeedOptions listDataFeedOptions = new ListDataFeedOptions();
-  ListDataFeedFilter listDataFeedFilter = new ListDataFeedFilter();
-  listDataFeedFilter.setName("name_prefix");
-  listDataFeedFilter.setCreator("demo@microsoft.com");
-  listDataFeedOptions.setListDataFeedFilter(listDataFeedFilter);
+```java
+ListDataFeedOptions listDataFeedOptions = new ListDataFeedOptions();
+ListDataFeedFilter listDataFeedFilter = new ListDataFeedFilter();
+listDataFeedFilter.setName("name_prefix");
+listDataFeedFilter.setCreator("demo@microsoft.com");
+listDataFeedOptions.setListDataFeedFilter(listDataFeedFilter);
 
-  PagedIterable<DataFeed> response = metricsAdvisorAdministrationClient.listDataFeeds(listDataFeedOptions);
+PagedIterable<DataFeed> response = metricsAdvisorAdministrationClient.listDataFeeds(listDataFeedOptions);
 
-  // get datafeed name
-  DataFeed dataFeed = response.iterator().next();
-  String name = dataFeed.getName();
-   ```
+// get datafeed name
+DataFeed dataFeed = response.iterator().next();
+String name = dataFeed.getName();
+```
+
 </td>
 </tr>
 </table>
 
-* deleteDataFeed
+- deleteDataFeed
 
   [API](https://apiview.dev/Assemblies/Review/250323618f12485eaadcc4822c880f46?diffRevisionId=7384d93fddd84ffd86645da221a54392&doc=False&diffOnly=False&revisionId=3c03646e40b0412f90de084648710e2c)
 
@@ -437,11 +446,11 @@ This is an overview of selected APIs to add.
 <tr>
 <td>
 
-  ```java
-  RequestOptions requestOptions = new RequestOptions();
-  Response<Void> response = metricsAdvisorAdministrationClient.deleteDataFeedWithResponse(
-                          "01234567-8901-2345-6789-012345678901", requestOptions);
-  ```
+```java
+RequestOptions requestOptions = new RequestOptions();
+Response<Void> response = metricsAdvisorAdministrationClient.deleteDataFeedWithResponse(
+                        "01234567-8901-2345-6789-012345678901", requestOptions);
+```
 
 </td>
 </tr>
@@ -450,14 +459,13 @@ This is an overview of selected APIs to add.
 </tr>
 <td>
 
-  ```java
-  metricsAdvisorAdministrationClient.deleteDataFeed("01234567-8901-2345-6789-012345678901");
-  ```
+```java
+metricsAdvisorAdministrationClient.deleteDataFeed("01234567-8901-2345-6789-012345678901");
+```
 
 </td>
 </tr>
 </table>
-
 
 ## Grow-up Story on Long-Running Operation
 
@@ -479,15 +487,15 @@ namespace: com.azure.communication.phonenumbersdemo
 
 service-name: PhoneNumbers
 service-versions:
-  - '2021-03-07'
+  - "2021-03-07"
 
 generate-samples: true
 generate-tests: true
 partial-update: true
 ```
 
-* [ApiView](https://apiview.dev/Assemblies/Review/10f4f4e429594af0ba7b78f19c2e4133?revisionId=cf4ecd32a53b4a3e8a48109625ca10de&doc=False)
-* [Java code](https://github.com/Azure/azure-sdk-for-java/pull/28715/commits/3eabd2671260ed6aafd8b9fd4fc4f2f29aca7de8)
+- [ApiView](https://apiview.dev/Assemblies/Review/10f4f4e429594af0ba7b78f19c2e4133?revisionId=cf4ecd32a53b4a3e8a48109625ca10de&doc=False)
+- [Java code](https://github.com/Azure/azure-sdk-for-java/pull/28715/commits/3eabd2671260ed6aafd8b9fd4fc4f2f29aca7de8)
 
 ### Write a test
 
@@ -533,14 +541,15 @@ The activation operation returns `operation-id` and `search-id` in headers, and 
 Therefore, developer is required to adapt to this, and provides a customized [PhoneNumbersSearchPollingStrategy](https://github.com/Azure/azure-sdk-for-java/blob/6338c084ae480f48a0029b85fd9b24dd722d4c4f/sdk/communication/azure-communication-phonenumbersdemo/src/main/java/com/azure/communication/phonenumbersdemo/implementation/PhoneNumbersSearchPollingStrategy.java), which implements above polling logic.
 
 And then update the configuration to let `SearchAvailablePhoneNumbers` method use the new `PhoneNumbersSearchPollingStrategy`.
+
 ```yaml
 polling:
   PhoneNumbers_SearchAvailablePhoneNumbers:
     strategy: new com.azure.communication.phonenumbersdemo.implementation.PhoneNumbersSearchPollingStrategy<>(this, {httpPipeline}, null, {context})
 ```
 
-* No API change
-* [Java code change](https://github.com/Azure/azure-sdk-for-java/pull/28715/commits/6338c084ae480f48a0029b85fd9b24dd722d4c4f) (only `PhoneNumbersSearchPollingStrategy.java` is hand-written)
+- No API change
+- [Java code change](https://github.com/Azure/azure-sdk-for-java/pull/28715/commits/6338c084ae480f48a0029b85fd9b24dd722d4c4f) (only `PhoneNumbersSearchPollingStrategy.java` is hand-written)
 
 Test would pass now.
 
@@ -554,15 +563,18 @@ Developer chooses to provide models for input and output of the method.
 After reviewing the models in swagger, we decide to re-use some of the models that directly generated from swagger.
 
 Designed `SearchAvailablePhoneNumbers` method would be
+
 ```java
 SyncPoller<PhoneNumberOperation, PhoneNumberSearchResult> beginSearchAvailablePhoneNumbers(
-    String countryCode, PhoneNumberType phoneNumberType, PhoneNumberAssignmentType assignmentType, 
+    String countryCode, PhoneNumberType phoneNumberType, PhoneNumberAssignmentType assignmentType,
     PhoneNumberCapabilities capabilities, Context context)
 ```
 
 Update configuration to
+
 1. Generate models from swagger (in implementation package), and expose some to user.
 2. Use the `PhoneNumberOperation` and `PhoneNumberSearchResult` as polling response and final result of the method. AutoRest.Java would generate methods in implementation to help customization.
+
 ```yaml
 polling:
   PhoneNumbers_SearchAvailablePhoneNumbers:
@@ -575,10 +587,11 @@ custom-types: BillingFrequency,PhoneNumberAssignmentType,PhoneNumberCapabilities
 custom-types-subpackage: models
 ```
 
-* [ApiView](https://apiview.dev/Assemblies/Review/10f4f4e429594af0ba7b78f19c2e4133?diffRevisionId=cf4ecd32a53b4a3e8a48109625ca10de&doc=False&diffOnly=False&revisionId=4048da5001f14312acf985a140bb8b35)
-* [Java code change](https://github.com/Azure/azure-sdk-for-java/pull/28715/commits/ea3ca197941e8bae5c717a701d9afd31e5b04e32) (`PhoneNumberOperation.java` and 3 methods in clients is hand-written)
+- [ApiView](https://apiview.dev/Assemblies/Review/10f4f4e429594af0ba7b78f19c2e4133?diffRevisionId=cf4ecd32a53b4a3e8a48109625ca10de&doc=False&diffOnly=False&revisionId=4048da5001f14312acf985a140bb8b35)
+- [Java code change](https://github.com/Azure/azure-sdk-for-java/pull/28715/commits/ea3ca197941e8bae5c717a701d9afd31e5b04e32) (`PhoneNumberOperation.java` and 3 methods in clients is hand-written)
 
 Test can now use models as input and output.
+
 ```java
 // request
 SyncPoller<PhoneNumberOperation, PhoneNumberSearchResult> poller =

@@ -1,4 +1,4 @@
-# <img align="center" src="../images/logo.png">  Accessing Models and Enums
+# <img align="center" src="../images/logo.png"> Accessing Models and Enums
 
 ## General
 

@@ -1,4 +1,4 @@
-# <img align="center" src="../images/logo.png">  Generating a Data Plane Client
+# <img align="center" src="../images/logo.png"> Generating a Data Plane Client
 
 The Java generator offers the ability to generate [data-plane][data-plane] client libraries.
 

@@ -65,10 +65,10 @@ For example:
 ```yaml
 outParameter: request
 parameterMappings:
-- inputParameter: user
-  outputParameterPropertyName: user
-- inputParameter: input
-  outputParameterPropertyName: input
+  - inputParameter: user
+    outputParameterPropertyName: user
+  - inputParameter: input
+    outputParameterPropertyName: input
 ```
 
 ```java
@@ -166,8 +166,8 @@ For example:
 ```yaml
 outParameter: ifMatch
 parameterMappings:
-- inputParameter: requestConditions
-  inputParameterProperty: ifMatch
+  - inputParameter: requestConditions
+    inputParameterProperty: ifMatch
 ```
 
 ```java

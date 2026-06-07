@@ -3,6 +3,7 @@
 Use the flag `--credential-types` to specify you want your credential to be of type [`AzureKeyCredential`][azure_key_credential].
 
 ### Generation
+
 ```ps
 cd <this folder>
 autorest readme.md --java
@@ -10,7 +11,7 @@ autorest readme.md --java
 
 ### Settings
 
-``` yaml
+```yaml
 input-file: https://github.com/Azure/autorest.testserver/blob/main/swagger/head.json
 namespace: com.azure.key.credential.sample
 license-header: MICROSOFT_MIT_NO_VERSION
@@ -19,4 +20,5 @@ sync-methods: all
 ```
 
 <!-- LINKS -->
+
 [azure_key_credential]: https://docs.microsoft.com/java/api/com.azure.core.credential.azurekeycredential?view=azure-java-stable

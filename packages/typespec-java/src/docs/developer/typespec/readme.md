@@ -21,7 +21,7 @@ It first build the JAR using Maven, copy it into `typespec-extension` folder, th
 
 End-to-end test resides in `typespec-tests` folder.
 
-At present, the tests is copied from 
+At present, the tests is copied from
 
 The [`Generate.ps1` script](../../../typespec-tests/Generate.ps1) generates the test code from [http-specs](https://github.com/microsoft/typespec/tree/main/packages/http-specs) and [azure-http-specs](https://github.com/Azure/typespec-azure/tree/main/packages/azure-http-specs).
 
@@ -42,9 +42,11 @@ Then standard Maven Surefire would run the tests.
 ### Debugging TypeScript Code
 
 In project that runs TypeSpec compiler (e.g. `typespec-tests` folder), run
+
 ```shell
 node --inspect-brk "node_modules/@typespec/compiler/dist/src/core/cli/cli.js" compile <tsp-file>
 ```
+
 to run `tsp compile` in debug mode (as Node.js process).
 
 Then, have the debugging client attach to port 9229 of the Node.js process.
@@ -59,5 +61,6 @@ See [Debugging Java Code](../../../typespec-extension/readme.md#debugging-java-c
 Alternatively, since the communication from TypeScript to Java is via the `code-model.yaml` file (plus the `EmitterOptions`), one can modify the `DEFAULT_OUTPUT_DIR` in `Main.java` under `core/packages/http-client-java/generator/http-client-generator` and debug `Main.main()`.
 
 Notice:
+
 - Add `--add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED` to VM options.
 - There may be some difference of other option between `tspconfig.yaml` and `EmitterOptions.java`. Remember to temporarily modify `EmitterOptions.java` to reflect the option in `tspconfig.yaml` when running `Main.java` this way. For example, set `flavor` to `azure`.

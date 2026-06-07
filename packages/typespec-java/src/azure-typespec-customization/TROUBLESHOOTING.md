@@ -6,12 +6,12 @@ server to ensure valid Java code.
 
 ## Table of Contents
 
-* [EclipseLanguageServer failed to start on CLIENT_PORT](#eclipselanguageserver-failed-to-start-on-client_port)
-* [Failed to build with status code WITH_ERROR]()
+- [EclipseLanguageServer failed to start on CLIENT_PORT](#eclipselanguageserver-failed-to-start-on-client_port)
+- [Failed to build with status code WITH_ERROR]()
 
 ## EclipseLanguageServer failed to start on CLIENT_PORT
 
-One possible issue is that `azure-autorest-customization` requires Java 11+ to run, when an earlier version of Java is 
+One possible issue is that `azure-autorest-customization` requires Java 11+ to run, when an earlier version of Java is
 being used it'll result in `EclipseLanguageServer` failing to start. To resolve this set either the process JAVA_HOME
 or system JAVA_HOME, and restart the process, to a Java 11+ version.
 

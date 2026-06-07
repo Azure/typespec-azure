@@ -1,18 +1,18 @@
 schedules:
-- cron: '0 0 * * *'
-  displayName: Nightly dev build
-  branches:
-    include:
-    - main
+  - cron: "0 0 * * *"
+    displayName: Nightly dev build
+    branches:
+      include:
+        - main
 
 trigger: none
 pr: none
 
 parameters:
-- name: UseTypeSpecNext
-  displayName: Use TypeSpec "next" version
-  type: boolean
-  default: true
+  - name: UseTypeSpecNext
+    displayName: Use TypeSpec "next" version
+    type: boolean
+    default: true
 
 resources:
   repositories:
@@ -36,10 +36,10 @@ extends:
     EmitterPackageJsonPath: typespec-extension/package.json
     PublishInternal: true
     Packages:
-    - name: emitter
-      file: azure-tools-typespec-java-*.tgz
-      type: npm
+      - name: emitter
+        file: azure-tools-typespec-java-*.tgz
+        type: npm
     AutorestInitializationSteps:
-    - checkout: self
-      submodules: true
-      path: s/autorest
+      - checkout: self
+        submodules: true
+        path: s/autorest

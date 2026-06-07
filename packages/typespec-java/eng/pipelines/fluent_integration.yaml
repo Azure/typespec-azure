@@ -14,9 +14,9 @@ pr:
       - release/*
   paths:
     include:
-      - '*'
+      - "*"
     exclude:
-      - 'typespec*'
+      - "typespec*"
 
 jobs:
-- template: /eng/pipelines/jobs/build-autorest-mgmt.yml
+  - template: /eng/pipelines/jobs/build-autorest-mgmt.yml

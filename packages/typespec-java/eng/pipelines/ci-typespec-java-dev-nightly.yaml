@@ -1,11 +1,11 @@
 schedules:
-- cron: '0 0 * * *'
-  displayName: Nightly dev build
-  branches:
-    include:
-#    - main
-    - dev
-  always: true
+  - cron: "0 0 * * *"
+    displayName: Nightly dev build
+    branches:
+      include:
+        #    - main
+        - dev
+    always: true
 
 trigger: none
 pr: none
@@ -29,13 +29,13 @@ jobs:
         submodules: true
 
       - task: NodeTool@0
-        displayName: 'Install Node.js $(NodeVersion)'
+        displayName: "Install Node.js $(NodeVersion)"
         inputs:
-          versionSpec: '$(NodeVersion)'
+          versionSpec: "$(NodeVersion)"
 
       - template: /eng/pipelines/steps/cache-maven-repository.yml
         parameters:
-          JobType: 'TypeSpec Nightly'
+          JobType: "TypeSpec Nightly"
 
       - template: /eng/pipelines/templates/steps/maven-authenticate.yml
 
@@ -48,16 +48,16 @@ jobs:
           cat typespec-extension/package.json
           echo "typespec-tests/package.json"
           cat typespec-tests/package.json
-        displayName: 'Bump TypeSpec Dependencies to dev'
+        displayName: "Bump TypeSpec Dependencies to dev"
 
       - script: |
           npm install
-        displayName: 'Install dev TypeSpec Dependencies'
+        displayName: "Install dev TypeSpec Dependencies"
         workingDirectory: ./typespec-extension
 
       - task: PowerShell@2
         retryCountOnTaskFailure: 1
-        displayName: 'Generate Code'
+        displayName: "Generate Code"
         inputs:
           pwsh: true
           filePath: Generate-TypeSpec.ps1
@@ -69,42 +69,42 @@ jobs:
           echo "Dependencies of typespec-java-tests"
           cd ../typespec-tests
           npm ls --all
-        displayName: 'Print Package Dependencies'
+        displayName: "Print Package Dependencies"
         condition: succeededOrFailed()
 
       - script: |
           git checkout package.json typespec-extension/package.json typespec-tests/package.json
-        displayName: 'Revert package.json'
+        displayName: "Revert package.json"
 
       - script: |
           git status
           git diff
-        displayName: 'Git Diff'
+        displayName: "Git Diff"
 
-#      - script: |
-#          [ -z "`git status --porcelain`" ]
-#        displayName: 'Check no Diff'
+      #      - script: |
+      #          [ -z "`git status --porcelain`" ]
+      #        displayName: 'Check no Diff'
 
       - script: |
           npx --no-install tsp-spector server start ./node_modules/@typespec/http-specs/specs ./node_modules/@azure-tools/azure-http-specs/specs --coverageFile ./tsp-spector-coverage-java.json
-        displayName: 'Start Spector Test Server'
+        displayName: "Start Spector Test Server"
         workingDirectory: ./typespec-tests
 
       - task: Maven@4
-        displayName: 'Run TypeSpec Tests'
+        displayName: "Run TypeSpec Tests"
         inputs:
           mavenPomFile: pom.xml
-          goals: 'clean test'
-          options: '$(DefaultOptions) -PtestTsp -pl typespec-tests -DtrimStackTrace=false'
-          mavenOptions: '$(MemoryOptions) $(LoggingOptions)'
-          javaHomeOption: 'JDKVersion'
+          goals: "clean test"
+          options: "$(DefaultOptions) -PtestTsp -pl typespec-tests -DtrimStackTrace=false"
+          mavenOptions: "$(MemoryOptions) $(LoggingOptions)"
+          javaHomeOption: "JDKVersion"
           jdkVersionOption: $(JavaVersion)
-          jdkArchitectureOption: 'x64'
+          jdkArchitectureOption: "x64"
           publishJUnitResults: false
 
       - script: |
           npx --no-install tsp-spector server stop
-        displayName: 'Stop Spector Test Server'
+        displayName: "Stop Spector Test Server"
         workingDirectory: ./typespec-tests
 
       - template: /eng/pipelines/steps/cleanup-maven-local-cache.yml

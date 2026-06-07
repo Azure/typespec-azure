@@ -458,7 +458,7 @@ Compatible with compiler 0.62.
 Compatible with compiler 0.62.
 
 - Supported `enable-subclient` emitter option.
-- Supported `@clientNamespace` from "@azure-tools/typespec-client-generator-core". 
+- Supported `@clientNamespace` from "@azure-tools/typespec-client-generator-core".
 
 ## 0.25.0 (2024-11-14)
 
@@ -512,7 +512,7 @@ Compatible with compiler 0.59.
 
 - Adopt TCGC `sdkPackage`.
 - Always allow override `endpoint` parameter in `Builder`.
-- Client method parameters' order changes when define the method parameters using spread in TypeSpec. 
+- Client method parameters' order changes when define the method parameters using spread in TypeSpec.
 
 ## 0.19.3 (2024-08-21)
 
@@ -584,7 +584,7 @@ Compatible with compiler 0.56.
 Compatible with compiler 0.56.
 
 - Generate `OperationLocationPollingStrategy` class in implementation package for long-running operation.
-The generated lib would no longer need to depend on the `azure-core-experimental` lib.
+  The generated lib would no longer need to depend on the `azure-core-experimental` lib.
 
 ## 0.16.1 (2024-05-29)
 
@@ -756,7 +756,7 @@ Compatible with compiler 0.52.
 
 Compatible with compiler 0.52.
 
-- Behavior changed on "multipart/form-data" request. The file field would take a `##FileDetails` model, instead of `BinaryData`. 
+- Behavior changed on "multipart/form-data" request. The file field would take a `##FileDetails` model, instead of `BinaryData`.
 
 ## 0.13.0 (2024-01-25)
 
@@ -792,7 +792,7 @@ Compatible with compiler 0.51.
 Compatible with compiler 0.50.
 
 - Supported `crossLanguageDefinitionId`.
-- Supported `decmial` scalar.
+- Supported `decimal` scalar.
 
 ## 0.11.2 (2023-11-16)
 

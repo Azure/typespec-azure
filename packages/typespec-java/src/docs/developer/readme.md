@@ -15,6 +15,7 @@ As AutoRest plugin, it is defined by the [YAML section in `readme.md`](https://g
 Build is configured via Maven.
 
 There is several build profiles:
+
 - **`local` profile**: It is required to be enabled. It uses `maven-shade-plugin` to combine project output to a single jar.
 - **`testVanilla` profile**: It enables the integrated vanilla tests, which is the common ground for all modules.
 - **testAzure profile**: It enables the integrated Azure tests, which tests handling of some advanced [AutoRest Extensions for OpenAPI 2.0](https://github.com/Azure/autorest/blob/main/docs/extensions/readme.md).
@@ -34,6 +35,7 @@ The generated code is checked-in to the repository. [`generate` or `generate.bat
 CI will start the NodeJS test server and run the tests, which communicate with the test server.
 
 Test server can be installed and ran locally.
+
 ```
 npm install
 npm run testserver-run
@@ -60,6 +62,7 @@ The `name` of `@autorest/java` in `package.json` makes sure that it is loaded wh
 ## Publish customization libraries to Maven
 
 Modules in following folders are published to Maven
+
 - **`extension-base` module**: [azure-autorest-extension](https://central.sonatype.com/artifact/com.azure.tools/azure-autorest-extension)
 - **`customization-base` module**: [azure-autorest-customization](https://central.sonatype.com/artifact/com.azure.tools/azure-autorest-customization)
 
@@ -74,11 +77,12 @@ For formal logging, use `PluginLogger` in pattern `Logger logger = new PluginLog
 ## AutoRest
 
 - [AutoRest in the narrow sense](https://www.npmjs.com/package/autorest) is the command line tool (CLI) for the pipeline.
-- [AutoRest Core](https://www.npmjs.com/package/@autorest/core) is the core functionality of the AutoRest pipeline. Its code is at [core](https://github.com/Azure/autorest/tree/main/packages/extensions/core). 
+- [AutoRest Core](https://www.npmjs.com/package/@autorest/core) is the core functionality of the AutoRest pipeline. Its code is at [core](https://github.com/Azure/autorest/tree/main/packages/extensions/core).
 - [AutoRest Modeler Four](https://www.npmjs.com/package/@autorest/modelerfour) is the modeler extension. Its code is at [modelerfour](https://github.com/Azure/autorest/tree/main/packages/extensions/modelerfour). AutoRest Java connects to the output of the modeler.
 
 It is easy to get confused about AutoRest and AutoRest Core.
 If one run `autorest --info`, one might see below:
+
 ```
 AutoRest code generation utility [cli version: 3.3.2; node: v12.16.1]
 (C) 2018 Microsoft Corporation.
@@ -104,13 +108,13 @@ See [Design](./design.md).
 ## Debug AutoRest Java
 
 To enable debugging, first configure a remote JVM debugger. In IntelliJ, you can do this by going to
-Run -> Edit Configuration. On the configuration window, click on Add New Configuration -> Remote JVM Debug and 
-configure the remote debugger. Set the debugger mode to "Attach to remote JVM", Transport to "Socket", Host to 
+Run -> Edit Configuration. On the configuration window, click on Add New Configuration -> Remote JVM Debug and
+configure the remote debugger. Set the debugger mode to "Attach to remote JVM", Transport to "Socket", Host to
 "localhost" and Port to "5005". Set the command line arguments to "-agentlib:jdwp=transport=dt_socket,server=y,
-suspend=n,address=*:5005".
+suspend=n,address=\*:5005".
 
 ![img.png](https://raw.githubusercontent.com/Azure/autorest.java/main/docs/images/remote-debugger-config.png)
 
-After the remote debugger is configured, run autorest with this additional argument `--java.debugger`. The AutoRest 
-process will block until the JVM debugger is attached, so, after the AutoRest process pauses, start the debugger 
+After the remote debugger is configured, run autorest with this additional argument `--java.debugger`. The AutoRest
+process will block until the JVM debugger is attached, so, after the AutoRest process pauses, start the debugger
 which will connect to the remote debugger and this will hit the breakpoints set in the "Javagen" plugin.

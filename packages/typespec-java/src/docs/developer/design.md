@@ -15,6 +15,7 @@ Modeler Four is configured on `readme.md` at repository root, as well as that of
 
 The most important configure is the version of Modeler Four.
 The important options are:
+
 - `flatten-models`, whether to process for `x-ms-client-flatten` extension.
 - `flatten-payloads`, whether to process for `payload-flattening-threshold` options.
 - `group-parameters`, whether to process for `x-ms-parameter-grouping` extension.
@@ -56,6 +57,7 @@ Classes under `model.clientmodel` namespace is the client model, which is the re
 `Client` is the container of the client model objects.
 
 `IType` is the interface for all models. Its subclass contains:
+
 - `PrimitiveType` for primitive data type.
 - `ClassType` for Java classes.
 - `GenericType` for generic types (List, Map, Iterator, etc.).
@@ -75,13 +77,14 @@ It is usually one-to-many mapping from `ProxyMethod` to `ClientMethod`, as clien
 
 `ServiceClient` and `ServiceClientProperty` represents the service client and its fields, the entry class (and its builder) of the generated SDK.
 
-Other auxiliary classes, e.g. `PackageInfo`, `ModuleInfo`, `Pom`, etc. 
+Other auxiliary classes, e.g. `PackageInfo`, `ModuleInfo`, `Pom`, etc.
 
 #### Mapper
 
 Classes under `mapper` namespace is the mappers, which transforms code model to client model of Java code.
 
 For example,
+
 - `SchemaMapper` transform `Schema` to `IType`.
 - `ModelMapper` transform `ObjectSchema` to `ClientModel`.
 - `ProxyMethodMapper` transform `Operation` to (potentially multiple) `ProxyMethod`.
@@ -129,10 +132,11 @@ It also handles naming conflict between operation groups and models (e.g. `FooCl
 
 `FluentResourceCollection` and `FluentCollectionMethod` represents the resource collection and its methods.
 
-`FluentResourceModel` and `FluentModelProperty` represents the resource model and its fields. 
+`FluentResourceModel` and `FluentModelProperty` represents the resource model and its fields.
 
 Resource model is the most complicated construct in Fluent.
 It can be categorized by `ModelCategory`.
+
 - `IMMUTABLE` if it is a response of service, but actually not look like an Azure resource.
 - `RESOURCE_GROUP_AS_PARENT`, `SUBSCRIPTION_AS_PARENT`, `NESTED_CHILD` for different path pattern of the Azure resource.
 - `SCOPE_AS_PARENT`, `SCOPE_NESTED_CHILD` for different path pattern of the extension resource.
@@ -141,6 +145,7 @@ It is possible to have an Azure resource matching multiple path pattern.
 Currently, this case is not well-handled.
 
 Except for `IMMUTABLE` category, `FluentResourceModel` contains `ResourceCreate`, optionally `ResourceUpdate`, `ResourceRefresh`, `ResourceActions`, for respective mutable API to the resource.
+
 - `ResourceCreate` contains a sequence of `DefinitionStage` for definition and creation of the Azure resource, and the related `FluentMethod`.
 - `ResourceUpdate` contains a collection of `UpdateStage` for updating of the resource, and the related `FluentMethod`.
 - `ResourceRefresh` for `refresh` of the resource, and convenient `getById` API of the resource in resource collection.
@@ -165,6 +170,7 @@ On the other side, this blurs the separation of client model and template.
 
 One important option is `--sdk-integration`.
 When this option is set, fluentgen will try to generate package that conform to the requirement of [azure-sdk-for-java](https://github.com/Azure/azure-sdk-for-java).
+
 - It reads the dependency package version from `eng/versioning/version_client.txt`.
 - It generates `pom.xml` that refers to parent pom.
 - It tries a few hack to "update" the `pom.xml` and `changelog.md`.

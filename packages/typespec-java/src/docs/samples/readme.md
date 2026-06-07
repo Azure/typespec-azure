@@ -2,14 +2,14 @@
 
 Here are our samples for common generation scenarios
 
-
-| Scenario | README | Generated Code
-|------------------|-------------|-------------
-|Generating most basic | [readme.md][basic_readme] | [generated][basic_generated]
-|Generating [fluent][fluent] [management SDKs][mgmt] | [readme.md][mgmt_readme] | [generated][mgmt_generated]
-|Generating with [`AzureKeyCredential`][azure_key_credential] | [readme.md][azure_key_credential_readme] | [generated][azure_key_credential_generated]
+| Scenario                                                     | README                                   | Generated Code                              |
+| ------------------------------------------------------------ | ---------------------------------------- | ------------------------------------------- |
+| Generating most basic                                        | [readme.md][basic_readme]                | [generated][basic_generated]                |
+| Generating [fluent][fluent] [management SDKs][mgmt]          | [readme.md][mgmt_readme]                 | [generated][mgmt_generated]                 |
+| Generating with [`AzureKeyCredential`][azure_key_credential] | [readme.md][azure_key_credential_readme] | [generated][azure_key_credential_generated] |
 
 <!-- LINKS -->
+
 [basic_readme]: ./specification/basic/readme.md
 [basic_generated]: ./specification/basic/generated
 [fluent]: ../generate/fluent.md

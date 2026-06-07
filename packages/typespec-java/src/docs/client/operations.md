@@ -1,4 +1,4 @@
-# <img align="center" src="../images/logo.png">  Calling Operations with Your Java Client
+# <img align="center" src="../images/logo.png"> Calling Operations with Your Java Client
 
 AutoRest provides both synchronous and asynchronous method overloads for each service operation.
 Depending on your swagger definition, operations can be accessed through operation groups (TODO: link to swagger docs) on the client,
@@ -120,14 +120,14 @@ public static void main(String args[])
 }
 ```
 
-
 <!-- LINKS -->
+
 [operation_group_example]: https://github.com/Azure/azure-rest-api-specs/blob/main/specification/batch/data-plane/Microsoft.Batch/stable/2020-09-01.12.0/BatchService.json#L64
 [mixin_example]: https://github.com/Azure/autorest/blob/main/docs/openapi/examples/pets.json#L20
 [pets_swaggger]: https://github.com/Azure/autorest/blob/main/docs/openapi/examples/pets.json
 [initializing]: ./initializing.md
 [observable]: https://docs.oracle.com/javase/7/docs/api/java/util/Observable.html
-[sync_poller]:  https://docs.microsoft.com/java/api/com.azure.core.util.polling.syncpoller?view=azure-java-stable
+[sync_poller]: https://docs.microsoft.com/java/api/com.azure.core.util.polling.syncpoller?view=azure-java-stable
 [example_swagger]: ../samples/specification/directives/pollingPaging.json
 [poller_guidelines]: https://azure.github.io/azure-sdk/java_introduction.html#methods-invoking-long-running-operations
 [poller_flux]: https://docs.microsoft.com/java/api/com.azure.core.util.polling.pollerflux?view=azure-java-stable

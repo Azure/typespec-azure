@@ -16,9 +16,9 @@ In this section, we'll be reviewing the protocol methods generated using the CAD
 
 ### Package structure
 
-* Artifact name: `azure-language-authoring`
-* Module name: `com.azure.language.authoring`
-* Root package name: `com.azure.language.authoring`
+- Artifact name: `azure-language-authoring`
+- Module name: `com.azure.language.authoring`
+- Root package name: `com.azure.language.authoring`
 
 **NOTE**: For client libraries generated from swagger, the above names are defined in the README.md configuration. For cadl based generation, the above names are derived from the namespace definition.
 
@@ -51,7 +51,7 @@ interface Global {
 
 #### Generated client classes
 
-* [GlobalClientBuilder](https://apiview.dev/Assemblies/Review/953fc91e3ec54be1938cfc6c43ed0ed6?revisionId=50ff38081be943e298aa17ae98fb5256&doc=False#com.azure.language.authoring.GlobalClientBuilder)
+- [GlobalClientBuilder](https://apiview.dev/Assemblies/Review/953fc91e3ec54be1938cfc6c43ed0ed6?revisionId=50ff38081be943e298aa17ae98fb5256&doc=False#com.azure.language.authoring.GlobalClientBuilder)
 
 ```java
 @ServiceClientBuilder(serviceClients = { GlobalClient, GlobalAsyncClient })
@@ -60,7 +60,7 @@ public final class GlobalClientBuilder implements HttpTrait<GlobalClientBuilder>
 }
 ```
 
-* [GlobaAsyncClient](https://apiview.dev/Assemblies/Review/953fc91e3ec54be1938cfc6c43ed0ed6?revisionId=50ff38081be943e298aa17ae98fb5256&doc=False#com.azure.language.authoring.GlobalAsyncClient)
+- [GlobaAsyncClient](https://apiview.dev/Assemblies/Review/953fc91e3ec54be1938cfc6c43ed0ed6?revisionId=50ff38081be943e298aa17ae98fb5256&doc=False#com.azure.language.authoring.GlobalAsyncClient)
 
 ```java
 @ServiceClient(builder = GlobalClientBuilder, isAsync = true)
@@ -69,7 +69,7 @@ public final class GlobalAsyncClient {
 }
 ```
 
-* [GlobalClient](https://apiview.dev/Assemblies/Review/953fc91e3ec54be1938cfc6c43ed0ed6?revisionId=50ff38081be943e298aa17ae98fb5256&doc=False#com.azure.language.authoring.GlobalClient)
+- [GlobalClient](https://apiview.dev/Assemblies/Review/953fc91e3ec54be1938cfc6c43ed0ed6?revisionId=50ff38081be943e298aa17ae98fb5256&doc=False#com.azure.language.authoring.GlobalClient)
 
 ```java
 @ServiceClient(builder = GlobalClientBuilder)
@@ -95,20 +95,23 @@ GlobalClient client = new GlobalClientBuilder()
 ### GET method
 
 #### REST API definition
+
 ```ts
 @doc("Gets the details of a deployment.")
 getDeployment is ResourceRead<Deployment>;
 ```
+
 #### Generated client method
 
 ```java
 // async
-@Generated public Mono<Response<BinaryData>> getDeploymentWithResponse(String projectName, String deploymentName, RequestOptions requestOptions) 
+@Generated public Mono<Response<BinaryData>> getDeploymentWithResponse(String projectName, String deploymentName, RequestOptions requestOptions)
 
 // sync
-@Generated public Response<BinaryData> getDeploymentWithResponse(String projectName, String deploymentName, RequestOptions requestOptions) 
+@Generated public Response<BinaryData> getDeploymentWithResponse(String projectName, String deploymentName, RequestOptions requestOptions)
 
 ```
+
 #### Usage
 
 ```java
@@ -127,19 +130,24 @@ String description = jsonNode.get("description").asText();
 ### Pageable API
 
 #### REST API definition
+
 ```ts
 @doc("Lists the existing deployments.")
 list is ResourceList<Deployment>;
 ```
+
 #### Generated client method
+
 ```java
 // async
-@Generated public PagedFlux<BinaryData> list(String projectName, RequestOptions requestOptions) 
+@Generated public PagedFlux<BinaryData> list(String projectName, RequestOptions requestOptions)
 
 // sync
-@Generated public PagedIterable<BinaryData> list(String projectName, RequestOptions requestOptions) 
+@Generated public PagedIterable<BinaryData> list(String projectName, RequestOptions requestOptions)
 ```
+
 #### Usage
+
 ```java
 DeploymentsClient deploymentsClient = new DeploymentsClientBuilder()
         .endpoint("<endpoint>" )
@@ -157,19 +165,22 @@ list.forEach(deployment -> {
 ### Long Running Operation
 
 #### REST API definition
+
 ```ts
 @doc("Creates a new deployment or replaces an existing one.")
 deployProject is LongRunningResourceCreateOrReplace<Deployment>;
 ```
+
 #### Generated client method
 
 ```java
 // async
-@Generated public PollerFlux<BinaryData, BinaryData> beginDeployProject(String projectName, String deploymentName, RequestOptions requestOptions) 
+@Generated public PollerFlux<BinaryData, BinaryData> beginDeployProject(String projectName, String deploymentName, RequestOptions requestOptions)
 
 // sync
-@Generated public SyncPoller<BinaryData, BinaryData> beginDeployProject(String projectName, String deploymentName, RequestOptions requestOptions) 
+@Generated public SyncPoller<BinaryData, BinaryData> beginDeployProject(String projectName, String deploymentName, RequestOptions requestOptions)
 ```
+
 #### Usage
 
 ```java
@@ -189,10 +200,12 @@ String description = jsonNode.get("description").asText();
 ### Documentation
 
 #### REST API definition
+
 ```ts
 @doc("Creates a new project or updates an existing one.")
 createOrUpdate is LongRunningResourceCreateOrUpdate<Project>;
 ```
+
 #### Generated client JavaDoc
 
 ```java
@@ -248,6 +261,7 @@ createOrUpdate is LongRunningResourceCreateOrUpdate<Project>;
 public SyncPoller<BinaryData, BinaryData> beginCreateOrUpdate(
         String projectName, BinaryData optionalProperties, RequestOptions requestOptions)
 ```
+
 ## Key notes
 
 - Artifact name, module name and package name definition are supported using cadl `namespace` definition, we currently support overrite `namespace` definition in cadl using [java.json](https://github.com/weidongxu-microsoft/cadl-textanalytics/blob/main/authoring/java.json).
@@ -260,12 +274,10 @@ public SyncPoller<BinaryData, BinaryData> beginCreateOrUpdate(
 - Pageble operation is supported as DPG 1.0.
 - Documentation including @doc and @summary are supported.
 
-
 ## Missing features
 
-- LRO is not fully supported yet. We only support what is in current cadl-azure-core, the [OperationResource](https://github.com/Azure/cadl-azure/blob/main/packages/cadl-azure-core/lib/foundations.cadl#L57-L63) pattern. ([GitHub issue]( https://github.com/Azure/autorest.java/issues/1684))
+- LRO is not fully supported yet. We only support what is in current cadl-azure-core, the [OperationResource](https://github.com/Azure/cadl-azure/blob/main/packages/cadl-azure-core/lib/foundations.cadl#L57-L63) pattern. ([GitHub issue](https://github.com/Azure/autorest.java/issues/1684))
 - Samples/Tests generation is not supported yet. ([GitHub issue](https://github.com/Azure/autorest.java/issues/1682))
-
 
 ## Models Generation
 
@@ -325,21 +337,23 @@ model Project {
 @Fluent
 public final class ProjectRequest {
     public ProjectRequest()
-    public String getDescription() 
-    public ProjectRequest setDescription(String description) 
-    public String getLanguage() 
-    public ProjectRequest setLanguage(String language) 
-    public Boolean isMultilingual() 
-    public ProjectRequest setMultilingual(Boolean multilingual) 
-    public ProjectKind getProjectKind() 
-    public ProjectRequest setProjectKind(ProjectKind projectKind) 
-    public Map<String, String> getSettings() 
-    public ProjectRequest setSettings(Map<String, String> settings) 
-    public String getStorageInputContainerName() 
-    public ProjectRequest setStorageInputContainerName(String storageInputContainerName) 
+    public String getDescription()
+    public ProjectRequest setDescription(String description)
+    public String getLanguage()
+    public ProjectRequest setLanguage(String language)
+    public Boolean isMultilingual()
+    public ProjectRequest setMultilingual(Boolean multilingual)
+    public ProjectKind getProjectKind()
+    public ProjectRequest setProjectKind(ProjectKind projectKind)
+    public Map<String, String> getSettings()
+    public ProjectRequest setSettings(Map<String, String> settings)
+    public String getStorageInputContainerName()
+    public ProjectRequest setStorageInputContainerName(String storageInputContainerName)
 }
 ```
+
 ### Immutable models
+
 ```ts
 @doc("Represents a supported language.")
 model SupportedLanguage {
@@ -354,15 +368,15 @@ model SupportedLanguage {
 ```java
 @Immutable
 public final class SupportedLanguage {
-    public SupportedLanguage(String languageName, String languageCode) 
-    public String getLanguageCode() 
-    public String getLanguageName() 
+    public SupportedLanguage(String languageName, String languageCode)
+    public String getLanguageCode()
+    public String getLanguageName()
 }
 ```
+
 ### Property types
 
 Built-in models and a few `@format` decorator is supported ([cases](https://github.com/Azure/autorest.java/blob/main/typespec-tests/tsp/builtin.cadl)).
-
 
 ### Enums
 
@@ -394,8 +408,8 @@ public final class JobStatus extends ExpandableStringEnum<JobStatus> {
     public static final JobStatus CANCELLING = fromString("cancelling");
     public static final JobStatus PARTIALLY_COMPLETED = fromString("partiallyCompleted");
     public JobStatus()
-    public static JobStatus fromString(String name) 
-    public static Collection<JobStatus> values() 
+    public static JobStatus fromString(String name)
+    public static Collection<JobStatus> values()
 }
 ```
 
@@ -429,6 +443,7 @@ public final class AnalyzeTextEntityLinkingInput extends AnalyzeTextTask {
 ```
 
 ### ResponseError
+
 Referencing errors from `Azure.Core.Foundations.Error`.
 
 ```ts
@@ -474,19 +489,20 @@ model DeploymentJob {
 ```java
 @Immutable
 public final class DeploymentJob {
-    public DeploymentJob(String jobId, OffsetDateTime createdDateTime, OffsetDateTime lastUpdatedDateTime, OffsetDateTime expirationDateTime, JobStatus status, List<JobWarning> warnings, ResponseError errors, String id) 
-    public OffsetDateTime getCreatedDateTime() 
-    public ResponseError getErrors() 
-    public OffsetDateTime getExpirationDateTime() 
-    public String getId() 
-    public String getJobId() 
-    public OffsetDateTime getLastUpdatedDateTime() 
-    public JobStatus getStatus() 
-    public List<JobWarning> getWarnings() 
+    public DeploymentJob(String jobId, OffsetDateTime createdDateTime, OffsetDateTime lastUpdatedDateTime, OffsetDateTime expirationDateTime, JobStatus status, List<JobWarning> warnings, ResponseError errors, String id)
+    public OffsetDateTime getCreatedDateTime()
+    public ResponseError getErrors()
+    public OffsetDateTime getExpirationDateTime()
+    public String getId()
+    public String getJobId()
+    public OffsetDateTime getLastUpdatedDateTime()
+    public JobStatus getStatus()
+    public List<JobWarning> getWarnings()
 }
 ```
 
 ### Key notes
+
 - There is discussion on polymorphic on Cadl. SDK will follow up and adapt.
 - Some model that does not need to be visible to user (e.g. `Page<>`) is moved to `implementation.models`.
 - `float32` and `float64` both results in `Double`.
@@ -535,30 +551,31 @@ model DeploymentJob {
 public final class JobsClient {
     // This class does not have any public constructors, and is not able to be instantiated using 'new'.
     // Service Methods:
-    @Generated public DeploymentJob getDeploymentStatus(String projectName, String deploymentName, String jobId) 
-    @Generated public Response<BinaryData> getDeploymentStatusWithResponse(String projectName, String deploymentName, String jobId, RequestOptions requestOptions) 
-    @Generated public SwapDeploymentsJob getSwapDeploymentsStatus(String projectName, String deploymentName, String jobId) 
-    @Generated public Response<BinaryData> getSwapDeploymentsStatusWithResponse(String projectName, String deploymentName, String jobId, RequestOptions requestOptions) 
+    @Generated public DeploymentJob getDeploymentStatus(String projectName, String deploymentName, String jobId)
+    @Generated public Response<BinaryData> getDeploymentStatusWithResponse(String projectName, String deploymentName, String jobId, RequestOptions requestOptions)
+    @Generated public SwapDeploymentsJob getSwapDeploymentsStatus(String projectName, String deploymentName, String jobId)
+    @Generated public Response<BinaryData> getSwapDeploymentsStatusWithResponse(String projectName, String deploymentName, String jobId, RequestOptions requestOptions)
 }
 
 // Model for DeploymentJob
 @Immutable
 public final class DeploymentJob {
-    public DeploymentJob(String jobId, OffsetDateTime createdDateTime, OffsetDateTime lastUpdatedDateTime, OffsetDateTime expirationDateTime, JobStatus status, List<JobWarning> warnings, ResponseError errors, String id) 
-    public OffsetDateTime getCreatedDateTime() 
-    public ResponseError getErrors() 
-    public OffsetDateTime getExpirationDateTime() 
-    public String getId() 
-    public String getJobId() 
-    public OffsetDateTime getLastUpdatedDateTime() 
-    public JobStatus getStatus() 
-    public List<JobWarning> getWarnings() 
+    public DeploymentJob(String jobId, OffsetDateTime createdDateTime, OffsetDateTime lastUpdatedDateTime, OffsetDateTime expirationDateTime, JobStatus status, List<JobWarning> warnings, ResponseError errors, String id)
+    public OffsetDateTime getCreatedDateTime()
+    public ResponseError getErrors()
+    public OffsetDateTime getExpirationDateTime()
+    public String getId()
+    public String getJobId()
+    public OffsetDateTime getLastUpdatedDateTime()
+    public JobStatus getStatus()
+    public List<JobWarning> getWarnings()
 }
 ```
 
 ### Pageable API
 
 #### REST API definition
+
 ```ts
 @doc("Lists the existing projects.")
 list is ResourceList<
@@ -568,33 +585,35 @@ list is ResourceList<
     }
 >;
 ```
+
 #### Generated client methods
+
 ```java
 // async
-@Generated public PagedFlux<Project> list() 
+@Generated public PagedFlux<Project> list()
 
 // sync
-@Generated public PagedIterable<Project> list() 
+@Generated public PagedIterable<Project> list()
 
 
 // Project model
 @Fluent
 public final class Project {
-    public Project(String projectName, ProjectKind projectKind, String storageInputContainerName, String language, OffsetDateTime createdDateTime, OffsetDateTime lastModifiedDateTime, OffsetDateTime lastTrainedDateTime, OffsetDateTime lastDeployedDateTime) 
-    public OffsetDateTime getCreatedDateTime() 
-    public String getDescription() 
-    public Project setDescription(String description) 
-    public String getLanguage() 
-    public OffsetDateTime getLastDeployedDateTime() 
-    public OffsetDateTime getLastModifiedDateTime() 
-    public OffsetDateTime getLastTrainedDateTime() 
-    public Boolean isMultilingual() 
-    public Project setMultilingual(Boolean multilingual) 
-    public ProjectKind getProjectKind() 
-    public String getProjectName() 
-    public Map<String, String> getSettings() 
-    public Project setSettings(Map<String, String> settings) 
-    public String getStorageInputContainerName() 
+    public Project(String projectName, ProjectKind projectKind, String storageInputContainerName, String language, OffsetDateTime createdDateTime, OffsetDateTime lastModifiedDateTime, OffsetDateTime lastTrainedDateTime, OffsetDateTime lastDeployedDateTime)
+    public OffsetDateTime getCreatedDateTime()
+    public String getDescription()
+    public Project setDescription(String description)
+    public String getLanguage()
+    public OffsetDateTime getLastDeployedDateTime()
+    public OffsetDateTime getLastModifiedDateTime()
+    public OffsetDateTime getLastTrainedDateTime()
+    public Boolean isMultilingual()
+    public Project setMultilingual(Boolean multilingual)
+    public ProjectKind getProjectKind()
+    public String getProjectName()
+    public Map<String, String> getSettings()
+    public Project setSettings(Map<String, String> settings)
+    public String getStorageInputContainerName()
 }
 ```
 

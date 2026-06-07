@@ -20,9 +20,9 @@ To set up customizations, create a Maven project with dependency:
 </dependency>
 ```
 
-Create a customization class extending from `com.azure.autorest.customization.Customization` and override the 
-`void customize(LibraryCustomization, Logger)` method. You will have access to a `LibraryCustomization` class where you 
-will be able to customize the generated Java code before it's written to the disk. Currently, the following 
+Create a customization class extending from `com.azure.autorest.customization.Customization` and override the
+`void customize(LibraryCustomization, Logger)` method. You will have access to a `LibraryCustomization` class where you
+will be able to customize the generated Java code before it's written to the disk. Currently, the following
 customizations are supported:
 
 - [Change class modifier](#change-class-modifier)
@@ -42,7 +42,7 @@ customizations are supported:
 
 ## Navigate through the packages and classes
 
-There are three primary customization classes currently available, `LibraryCustomization`, `PackageCustomization`, 
+There are three primary customization classes currently available, `LibraryCustomization`, `PackageCustomization`,
 and `ClassCustomization`. From a given `LibraryCustomization`, you can navigate through the packages and classes intuitively.
 
 ## Change class modifier
@@ -111,8 +111,8 @@ public class Foo {
 
 ## Change method return type
 
-You can change a method's return type, and pass a String formatter to transform the original return value statement. 
-If the original return type is `void`, simply pass the full return value String expression in place of the String 
+You can change a method's return type, and pass a String formatter to transform the original return value statement.
+If the original return type is `void`, simply pass the full return value String expression in place of the String
 formatter; if the new return type is `void`, simply pass `null`.
 
 A method `getId` in the `Foo` class
@@ -160,6 +160,7 @@ The `UUID` class will be automatically imported.
 ## Change class super type
 
 A class `Foo` extends `Bar`
+
 ```java readme-sample-change-class-base-type-initial
 public class Bar {
 }
@@ -168,6 +169,7 @@ public class Foo extends Bar {
 ```
 
 with customization
+
 ```java readme-sample-change-class-base-type-customization
 @Override
 public void customize(LibraryCustomization customization, Logger logger) {
@@ -182,6 +184,7 @@ public void customize(LibraryCustomization customization, Logger logger) {
 ```
 
 will generate
+
 ```java readme-sample-change-class-base-type-result
 public class Foo extends Bar1 {
 }
@@ -284,6 +287,7 @@ public void customize(LibraryCustomization customization, Logger logger) {
 ```
 
 will generate
+
 ```java readme-sample-add-a-field-default-value-result
 public class Foo {
     private String bar = "bar";
@@ -639,10 +643,12 @@ public CreateFooResponse createFoo(Foo foo) {
 The cause is that the customized Java code has syntax error.
 
 Possible root cause:
-* Bug in customization code.
-* Bug in the `customization-base` package.
+
+- Bug in customization code.
+- Bug in the `customization-base` package.
 
 Steps to diagnose and fix:
+
 1. Add `skip-formatting` flag to skip Java code formatting, and hence not checking the syntax error.
 2. Compile or inspect the generated code, find the error.
 3. Determine the root cause. If it is caused by bug in customization code, fix it. If it is caused by bug in `customization-base` package, report it in GitHub issues.

@@ -1,5 +1,4 @@
 steps:
-
   - task: PowerShell@2
     displayName: Clean up maven local cache
     inputs:

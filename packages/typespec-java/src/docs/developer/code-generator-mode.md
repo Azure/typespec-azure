@@ -108,6 +108,7 @@ This is used for 3rd-party lib that generated from TypeSpec.
 ### Client Method
 
 The client method takes the form of
+
 ```java
 Response<ResponseBody> operationWithResponse(String pathParam, EnumType requiredQueryParam, RequestBody body, RequestContext requestContext);
 

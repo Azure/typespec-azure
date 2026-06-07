@@ -1,4 +1,4 @@
-# <img align="center" src="../images/logo.png">  Initializing Your Java Client
+# <img align="center" src="../images/logo.png"> Initializing Your Java Client
 
 The first step to using your generated client in code is to import and initialize your client. Our SDKs are modelled such
 that the client is the main point of access to the generated code.
@@ -74,6 +74,7 @@ public static void main(String args[])
 Currently, we only support generating credentials of type `TokenCredential` and / or `AzureKeyCredential`.
 
 <!-- LINKS -->
+
 [multiapi_generation]: ../generate/multiapi.md
 [azure_core_library]: https://pypi.org/project/azure-core/
 [msrest_library]: https://pypi.org/project/msrest/

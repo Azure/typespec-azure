@@ -6,6 +6,7 @@ These customizations require defining classes where the code will generate in th
 different customizations.
 
 <!-- LINKS -->
+
 [main_docs]: https://github.com/Azure/autorest/tree/main/docs/generate/directives.md
 [azure_sdk_for_java]: https://github.com/Azure/azure-sdk-for-java/tree/main/sdk
-[customizations]:  ../../readme.md#customizations
+[customizations]: ../../readme.md#customizations

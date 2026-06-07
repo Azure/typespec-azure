@@ -14,10 +14,10 @@ pr:
       - release/*
   paths:
     include:
-      - '*'
+      - "*"
     exclude:
-      - 'fluent*'
-      - 'typespec*'
+      - "fluent*"
+      - "typespec*"
 
 jobs:
-- template: /eng/pipelines/jobs/build-autorest.yml
+  - template: /eng/pipelines/jobs/build-autorest.yml

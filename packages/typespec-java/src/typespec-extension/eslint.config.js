@@ -70,9 +70,7 @@ const allFilesConfig = tsEslint.config({
  */
 export function getTypeScriptProjectRules(root) {
   return tsEslint.config({
-    files: [
-      "**/src/**/*.ts",
-    ],
+    files: ["**/src/**/*.ts"],
     plugins: {},
     languageOptions: {
       parserOptions: {
@@ -98,11 +96,7 @@ export const TypeSpecCommonEslintConfigs = [
 
 export default tsEslint.config(
   {
-    ignores: [
-      "**/dist/**/*",
-      "**/temp/**/*",
-      "generator/**/*",
-    ],
+    ignores: ["**/dist/**/*", "**/temp/**/*", "generator/**/*"],
   },
   ...TypeSpecCommonEslintConfigs,
   ...getTypeScriptProjectRules(import.meta.dirname),

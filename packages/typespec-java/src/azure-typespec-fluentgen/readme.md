@@ -1,6 +1,6 @@
 #### Fluentgen
 
-``` yaml
+```yaml
 pass-thru:
   - model-deduplicator
   - subset-reducer
@@ -9,17 +9,16 @@ use-extension:
   "@autorest/modelerfour": "4.26.2"
 
 pipeline:
-
-# --- extension remodeler ---
+  # --- extension remodeler ---
 
   # "Shake the tree", and normalize the model
   modelerfour:
-    input: openapi-document/multi-api/identity     # the plugin where we get inputs from
-  
+    input: openapi-document/multi-api/identity # the plugin where we get inputs from
+
   # allow developer to do transformations on the code model.
   modelerfour/new-transform:
     input: modelerfour
-    
+
   fluentgen:
     scope: java
     input: modelerfour/identity
@@ -37,15 +36,15 @@ pipeline:
         tagname: tagName
         tagvalue: tagValue
     output-artifact: java-files
-  
+
   fluentgen/emitter:
     input: fluentgen
     scope: scope-fluentgen/emitter
 
 scope-fluentgen/emitter:
-    input-artifact: java-files
-    output-uri-expr: $key
-  
+  input-artifact: java-files
+  output-uri-expr: $key
+
 output-artifact: java-files
 
 modelerfour:

@@ -1,6 +1,6 @@
 #### Javagen
 
-``` yaml
+```yaml
 pass-thru:
   - model-deduplicator
   - subset-reducer
@@ -9,12 +9,11 @@ use-extension:
   "@autorest/modelerfour": "4.26.2"
 
 pipeline:
-
-# --- extension remodeler ---
+  # --- extension remodeler ---
 
   # "Shake the tree", and normalize the model
   modelerfour:
-    input: openapi-document/multi-api/identity     # the plugin where we get inputs from
+    input: openapi-document/multi-api/identity # the plugin where we get inputs from
 
   # allow developer to do transformations on the code model.
   modelerfour/new-transform:
@@ -24,14 +23,14 @@ pipeline:
     scope: java
     input: modelerfour/identity
     output-artifact: java-files
-  
+
   javagen/emitter:
     input: javagen
     scope: scope-javagen/emitter
 
 scope-javagen/emitter:
-    input-artifact: java-files
-    output-uri-expr: $key
+  input-artifact: java-files
+  output-uri-expr: $key
 
 output-artifact: java-files
 
