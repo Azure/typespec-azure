@@ -44,6 +44,8 @@ See [Configuring output directory for more info](https://typespec.io/docs/handbo
 
 ### `output-dir`
 
+_Deprecated: This option is deprecated._
+
 **Type:** `string`
 
 Deprecated DO NOT USE. Use built-in emitter-output-dir instead
@@ -95,6 +97,8 @@ Directory where the examples are located. Default: `{project-root}/examples`.
 
 ### `examples-directory`
 
+_Deprecated: This option is deprecated._
+
 **Type:** `string`
 
 DEPRECATED. Use examples-dir instead
@@ -119,6 +123,8 @@ Path to the common-types.json file folder. Default: '${project-root}/../../commo
 
 **Type:** `"crlf" | "lf"`
 
+**Default:** `"lf"`
+
 Set the newline character for emitting files.
 
 ### `omit-unreachable-types`
@@ -131,11 +137,15 @@ Omit unreachable types. By default all types declared under the service namespac
 
 **Type:** `string`
 
+**Default:** `"omit"`
+
 Decide how to deal with the Version enum when when `omit-unreachable-types` is not set. Default to 'omit'
 
 ### `include-x-typespec-name`
 
 **Type:** `"inline-only" | "never"`
+
+**Default:** `"never"`
 
 If the generated openapi types should have the `x-typespec-name` extension set with the name of the TypeSpec type that created it.
 This extension is meant for debugging and should not be depended on.
@@ -144,11 +154,15 @@ This extension is meant for debugging and should not be depended on.
 
 **Type:** `boolean`
 
+**Default:** `false`
+
 Create read-only property schema for lro status
 
 ### `emit-lro-options`
 
 **Type:** `"none" | "final-state-only" | "all"`
+
+**Default:** `"final-state-only"`
 
 Determine whether and how to emit x-ms-long-running-operation-options for lro resolution
 
@@ -156,11 +170,15 @@ Determine whether and how to emit x-ms-long-running-operation-options for lro re
 
 **Type:** `"never" | "for-visibility-changes"`
 
+**Default:** `"for-visibility-changes"`
+
 Determine whether and how to emit schemas for common-types rather than referencing them
 
 ### `xml-strategy`
 
 **Type:** `"xml-service" | "none"`
+
+**Default:** `"xml-service"`
 
 Strategy for applying XML serialization metadata to schemas.
 
@@ -173,6 +191,8 @@ Determines whether output should be split into multiple files. The only supporte
 ### `skip-example-copying`
 
 **Type:** `boolean`
+
+**Default:** `false`
 
 When enabled, the emitter will not copy example files to the output directory. Instead, it will reference the source example files using relative file paths.
 
