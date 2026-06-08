@@ -36,6 +36,11 @@ jobs:
         displayName: "Run Python e2e tests"
         workingDirectory: packages/typespec-python
 
+      - script: |
+          curl -s -X POST http://localhost:3000/.admin/stop || true
+          sleep 2
+        displayName: "Stop spector server (writes coverage)"
+
       - template: /eng/pipelines/templates/upload-spector-coverage.yml
         parameters:
           PackagePath: packages/typespec-python
