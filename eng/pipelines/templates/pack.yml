@@ -9,7 +9,7 @@ steps:
   - pwsh: |
       $outDir = "$(Build.ArtifactStagingDirectory)/${{ parameters.artifactName }}"
       echo "Packing npm packages into $outDir"
-      pnpm chronus pack --exclude standalone --exclude typespec-vs --pack-destination $outDir
+      pnpm chronus pack --exclude standalone --pack-destination $outDir
 
       $summaryFilePath = "$outDir/publish-summary.json"
       echo "Create manifest of unpublished packages in $summaryFilePath"
