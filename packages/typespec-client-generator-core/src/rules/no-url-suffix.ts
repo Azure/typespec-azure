@@ -30,12 +30,10 @@ export const noUrlSuffixRule = createRule({
           format: { propertyName: csharpName, suggestion },
           target: property,
           codefixes: [
-            createClientTspAugmentDecoratorCodeFix(
-              property,
-              "clientName",
-              context.program,
-              [`"${suggestion}"`, `"csharp"`],
-            ),
+            createClientTspAugmentDecoratorCodeFix(property, "clientName", context.program, [
+              `"${suggestion}"`,
+              `"csharp"`,
+            ]),
           ],
         });
       },

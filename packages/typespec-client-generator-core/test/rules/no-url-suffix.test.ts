@@ -3,10 +3,9 @@ import {
   LinterRuleTester,
   TesterInstance,
 } from "@typespec/compiler/testing";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 import { noUrlSuffixRule } from "../../src/rules/no-url-suffix.js";
 import { SimpleTester } from "../tester.js";
-import { applyClientTspCodeFix } from "./test-codefix-helpers.js";
 
 const libraryName = "@azure-tools/typespec-client-generator-core";
 
@@ -117,7 +116,7 @@ it("is valid when @clientName without language scope resolves Url to Uri", async
   await tester.expect(`model Foo { @clientName("imageUri") imageUrl: string; }`).toBeValid();
 });
 
-it("does not flag inherited properties", async () => {
+it("does not flag inherited properties when base is suppressed", async () => {
   await tester
     .expect(
       `model Base {
@@ -137,31 +136,29 @@ it("does not flag non-model-property types", async () => {
 
 describe("codefix", () => {
   it("writes @@clientName to client.tsp with imports and correct target ref", async () => {
-    const content = await applyClientTspCodeFix(
-      runner,
-      noUrlSuffixRule,
-      libraryName,
-      `model Foo { imageUrl: string; }`,
-      "add-clientName-in-client-tsp",
-    );
-    expect(content).toContain('import "@azure-tools/typespec-client-generator-core"');
-    expect(content).toContain("using Azure.ClientGenerator.Core");
-    expect(content).toContain('@@clientName(Foo.imageUrl, "imageUri", "csharp")');
-    expect(content).toMatch(/@@clientName\(\w/);
+    await tester
+      .expect({
+        "main.tsp": `model Foo { imageUrl: string; }`,
+        "client.tsp": ``,
+      })
+      .applyCodeFix("add-clientName-in-client-tsp")
+      .toEqual({
+        "client.tsp": `import "@azure-tools/typespec-client-generator-core";
+import "./main.tsp";
+
+using Azure.ClientGenerator.Core;
+
+@@clientName(Foo.imageUrl, "imageUri", "csharp");
+`,
+      });
   });
 
   it("after applying the codefix, the diagnostic disappears", async () => {
-    const content = await applyClientTspCodeFix(
-      runner,
-      noUrlSuffixRule,
-      libraryName,
-      `model Foo { imageUrl: string; }`,
-      "add-clientName-in-client-tsp",
-    );
-    const clientNameLine = content
-      .split("\n")
-      .find((l) => l.includes("@@clientName("))!
-      .trim();
-    await tester.expect(`model Foo { imageUrl: string; }\n${clientNameLine}`).toBeValid();
+    await tester
+      .expect(
+        `model Foo { imageUrl: string; }
+        @@clientName(Foo.imageUrl, "imageUri", "csharp");`,
+      )
+      .toBeValid();
   });
 });
