@@ -38,6 +38,3 @@ steps:
   - script: pnpm install
     displayName: Install JavaScript Dependencies
     retryCountOnTaskFailure: 3
-
-  - script: dotnet restore core/packages/typespec-vs
-    displayName: Restore .NET Dependencies
