@@ -37,15 +37,16 @@
     "lint:extra": "tsx ./eng/scripts/ci/lint.ts",
     "format:extra": "tsx ./eng/scripts/ci/format.ts --python",
     "format:extra:check": "tsx ./eng/scripts/ci/format.ts --python --check",
-    "regenerate": "tsx ./eng/scripts/regenerate.ts",
+    "regenerate": "tsx ./eng/scripts/ci/regenerate.ts",
+    "sync": "tsx ./eng/scripts/sync.ts",
+    "sync:check": "tsx ./eng/scripts/sync.ts --check",
     "test:python:e2e": "tsx ./eng/scripts/ci/run-tests.ts",
     "regen-docs": "pnpm run build && tspd doc . --enable-experimental --output-dir ./website/src/content/docs/docs/emitters/clients/typespec-python/reference --skip-js"
   },
   "files": [
     "dist/**",
     "!dist/tests/**",
-    "eng/scripts/setup/**",
-    "generator/**"
+    "eng/scripts/setup/**"
   ],
   "peerDependencies": {
     "@azure-tools/typespec-autorest": "workspace:^",
