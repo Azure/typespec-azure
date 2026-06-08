@@ -132,9 +132,7 @@ namespace EnumValue {
     responses: "responses",
 
     #suppress "experimental-feature" "exact"
-    @global.Azure.ClientGenerator.Core.clientName(
-      global.Azure.ClientGenerator.Core.exact("A2A")
-    )
+    @global.Azure.ClientGenerator.Core.clientName(global.Azure.ClientGenerator.Core.exact("A2A"))
     a2a: "a2a",
 
     mcp: "mcp",
@@ -161,9 +159,7 @@ namespace EnumValue {
   """)
 namespace Operation {
   #suppress "experimental-feature" "exact"
-  @global.Azure.ClientGenerator.Core.clientName(
-    global.Azure.ClientGenerator.Core.exact("myOp")
-  )
+  @global.Azure.ClientGenerator.Core.clientName(global.Azure.ClientGenerator.Core.exact("myOp"))
   @route("/operation")
   @get
   op myOp(): void;
