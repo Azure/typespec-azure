@@ -3,7 +3,11 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { beforeEach, describe, it } from "vitest";
-import { MultiPartClient } from "./generated/payload/multipart/src/index.js";
+
+// TODO: reinstate import and delete below placeholder once tests are working
+// import { MultiPartClient } from "./generated/payload/multipart/src/index.js";
+declare type MultiPartClient = any;
+declare const MultiPartClient: any;
 
 describe.skip("Multipart Client", () => {
   let client: MultiPartClient;

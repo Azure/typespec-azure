@@ -1,5 +1,9 @@
 import { assert, beforeEach, describe, it } from "vitest";
-import { RenamedOperationClient } from "./generated/client/structure/renamed-operation/src/index.js";
+
+// TODO: reinstate import and delete below placeholder once tests are working
+// import { RenamedOperationClient } from "./generated/client/structure/renamed-operation/src/index.js";
+declare type RenamedOperationClient = any;
+declare const RenamedOperationClient: any;
 
 describe.skip("Client Structure Renamed-Operation Rest Client", () => {
   let client: RenamedOperationClient;

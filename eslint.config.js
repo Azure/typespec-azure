@@ -26,7 +26,7 @@ export default defineConfig(
   },
   ...TypeSpecCommonEslintConfigs,
   {
-    // typesepc-ts has static helper files which are copied verbatim into generated output and
+    // typespec-ts has static helper files which are copied verbatim into generated output and
     // intentionally keep camelCase names to match the upstream Azure SDK sources.
     files: ["packages/typespec-ts/static/**/*.ts", "packages/typespec-ts/static/**/*.mts"],
     rules: {

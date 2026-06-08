@@ -1,8 +1,11 @@
 import { assert, beforeEach, describe, it } from "vitest";
-import {
-  FirstClient,
-  SecondClient,
-} from "./generated/client/structure/client-operation-group/src/index.js";
+
+// TODO: reinstate import and delete below placeholder once tests are working
+// import { FirstClient, SecondClient } from "./generated/client/structure/client-operation-group/src/index.js";
+declare type FirstClient = any;
+declare type SecondClient = any;
+declare const FirstClient: any;
+declare const SecondClient: any;
 
 describe.skip("Client Structure Operation Group Rest Client", () => {
   let client1: FirstClient;

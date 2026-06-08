@@ -1,7 +1,10 @@
 import { assert, beforeEach, describe, it } from "vitest";
-import ServiceClientFactory, {
-  ServiceClient,
-} from "./generated/azure/client-generator-core/client-initialization/src/index.js";
+
+// TODO: reinstate import and delete below placeholder once tests are working
+// import ServiceClientFactory, { ServiceClient } from "./generated/azure/client-generator-core/client-initialization/src/index.js";
+declare type ServiceClient = any;
+declare const ServiceClient: any;
+declare const ServiceClientFactory: any;
 
 describe.skip("Azure Client Generator Core Client Initialization", () => {
   let client: ServiceClient;

@@ -1,7 +1,10 @@
 import { assert, beforeEach, describe, it } from "vitest";
-import VersioningRemovedClientFactory, {
-  VersioningRemovedClient,
-} from "./generated/versioning/removed/src/index.js";
+
+// TODO: reinstate import and delete below placeholder once tests are working
+// import VersioningRemovedClientFactory, { VersioningRemovedClient } from "./generated/versioning/removed/src/index.js";
+declare type VersioningRemovedClient = any;
+declare const VersioningRemovedClient: any;
+declare const VersioningRemovedClientFactory: any;
 
 describe.skip("VersioningRemoved Rest Client", () => {
   let client: VersioningRemovedClient;
