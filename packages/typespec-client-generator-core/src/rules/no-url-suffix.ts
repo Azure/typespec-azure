@@ -33,8 +33,7 @@ export const noUrlSuffixRule = createRule({
             createClientTspAugmentDecoratorCodeFix(
               property,
               "clientName",
-              context.program.host,
-              context.program.projectRoot,
+              context.program,
               [`"${suggestion}"`, `"csharp"`],
             ),
           ],

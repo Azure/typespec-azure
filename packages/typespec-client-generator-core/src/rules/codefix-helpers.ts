@@ -1,10 +1,9 @@
 import type {
   CodeFix,
-  CodeFixContext,
-  CompilerHost,
   InsertTextCodeFixEdit,
   Model,
   ModelProperty,
+  Program,
   Type,
 } from "@typespec/compiler";
 import {
@@ -14,6 +13,23 @@ import {
   getSourceLocation,
   resolvePath,
 } from "@typespec/compiler";
+
+/**
+ * Get the namespace name for a target type.
+ */
+function getTargetNamespace(target: Model | ModelProperty): string {
+  if (target.kind === "ModelProperty") {
+    const model = target.model;
+    if (model?.namespace) {
+      return getNamespaceFullName(model.namespace);
+    }
+    return "";
+  }
+  if (target.namespace) {
+    return getNamespaceFullName(target.namespace);
+  }
+  return "";
+}
 
 /**
  * Build a short reference for a type target (e.g., "Model.property").
@@ -105,37 +121,44 @@ function computeRelativeImportPath(target: Type, projectRoot: string): string {
  * of the same file. It additionally handles:
  * - Creating client.tsp if it doesn't exist
  * - Adding import/using statements at the top (without duplicates)
+ * - Adding `using <namespace>` for the target's service namespace
+ * - Using short references (e.g., `Foo.imageUrl`) instead of FQN when using is in scope
+ *
+ * Assumes client.tsp is imported via tspconfig.yaml so it appears in program.sourceFiles.
  *
  * @param target The type to target with the augment decorator.
  * @param decoratorName The decorator name (e.g., "clientName").
- * @param host The compiler host for reading files.
- * @param projectRoot The project root directory (where client.tsp should be created).
+ * @param program The compiler program.
  * @param args The decorator arguments as literal strings.
  */
 export function createClientTspAugmentDecoratorCodeFix(
   target: Model | ModelProperty,
   decoratorName: string,
-  host: CompilerHost,
-  projectRoot: string,
+  program: Program,
   args?: string[],
 ): CodeFix {
-  const fqn = buildFqn(target);
+  const shortRef = buildShortRef(target);
+  const targetNamespace = getTargetNamespace(target);
   const argsStr = args && args.length > 0 ? `, ${args.join(", ")}` : "";
-  const decoratorText = `@@${decoratorName}(${fqn}${argsStr})`;
+  // Use short ref in label (cleaner display)
+  const decoratorText = `@@${decoratorName}(${shortRef}${argsStr})`;
+  const projectRoot = program.projectRoot;
 
-  return {
+  return defineCodeFix({
     id: `add-${decoratorName}-in-client-tsp`,
     label: `Add \`${decoratorText}\` in client.tsp`,
-    fix: (async (_fixContext: CodeFixContext): Promise<any> => {
+    fix: (fixContext) => {
       if (target.node === undefined) return [];
       const clientTspPath = resolvePath(projectRoot, "client.tsp");
 
+      // Look up client.tsp in program.sourceFiles (sync).
+      // Assumes client.tsp is imported via tspconfig.yaml imports.
       let existingText = "";
-      try {
-        const file = await host.readFile(clientTspPath);
-        existingText = file.text;
-      } catch {
-        // File doesn't exist yet — will be created by the language server
+      for (const [path, script] of program.sourceFiles) {
+        if (path.endsWith("client.tsp")) {
+          existingText = script.file.text;
+          break;
+        }
       }
 
       const relativePath = computeRelativeImportPath(target, projectRoot);
@@ -145,7 +168,7 @@ export function createClientTspAugmentDecoratorCodeFix(
       // Build imports/using to insert at the TOP of the file
       const tcgcImport = `import "@azure-tools/typespec-client-generator-core";`;
       const modelImport = `import "${relativePath}";`;
-      const usingLine = `using Azure.ClientGenerator.Core;`;
+      const usingTcgc = `using Azure.ClientGenerator.Core;`;
 
       let headerToInsert = "";
       if (!existingText.includes(tcgcImport)) {
@@ -154,8 +177,15 @@ export function createClientTspAugmentDecoratorCodeFix(
       if (!existingText.includes(modelImport)) {
         headerToInsert += modelImport + "\n";
       }
-      if (!existingText.includes(usingLine)) {
-        headerToInsert += "\n" + usingLine + "\n";
+      if (!existingText.includes(usingTcgc)) {
+        headerToInsert += "\n" + usingTcgc + "\n";
+      }
+      // Add using for the target's service namespace so we can use short references
+      if (targetNamespace) {
+        const usingNs = `using ${targetNamespace};`;
+        if (!existingText.includes(usingNs) && !headerToInsert.includes(usingNs)) {
+          headerToInsert += usingNs + "\n";
+        }
       }
       if (headerToInsert.length > 0) {
         edits.push({
@@ -166,15 +196,22 @@ export function createClientTspAugmentDecoratorCodeFix(
         });
       }
 
+      // Use short ref if the namespace is in scope (via using), otherwise FQN
+      const hasNamespaceUsing =
+        targetNamespace &&
+        (existingText.includes(`using ${targetNamespace};`) ||
+          headerToInsert.includes(`using ${targetNamespace};`));
+      const ref = hasNamespaceUsing ? shortRef : buildFqn(target);
+
       // Append augment decorator at the END of the file
       edits.push({
         kind: "insert-text",
         pos: existingText.length,
-        text: `${decoratorText};\n`,
+        text: `@@${decoratorName}(${ref}${argsStr});\n`,
         file: clientFile,
       });
 
       return edits;
-    }) as CodeFix["fix"],
-  };
+    },
+  });
 }

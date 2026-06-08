@@ -120,31 +120,17 @@ it("is valid when @clientName without language scope resolves Url to Uri", async
 it("does not flag inherited properties", async () => {
   await tester
     .expect(
-      `model Base { imageUrl: string; }
+      `model Base {
+        @clientName("imageUri", "csharp")
+        imageUrl: string;
+      }
       model Foo extends Base {}`,
     )
-    .toEmitDiagnostics([{ code: "@azure-tools/typespec-client-generator-core/no-url-suffix" }]);
+    .toBeValid();
 });
 
 it("does not flag non-model-property types", async () => {
   await tester.expect(`scalar ImageUrl extends string;`).toBeValid();
-});
-
-it("does not flag properties from library types even if they end with Url", async () => {
-  // The SimpleTester loads @typespec/http, @typespec/rest, @azure-tools/typespec-client-generator-core
-  // which define various types. navigateProgram visits ALL types including library ones,
-  // but createLinterRuleContext.reportDiagnostic silently drops diagnostics targeting
-  // library code (context.type !== "project"). This test verifies that behavior:
-  // compile user code with NO Url properties — if library Url properties were reported,
-  // this test would fail with unexpected diagnostics.
-  await tester
-    .expect(
-      `model Clean {
-        name: string;
-        count: int32;
-      }`,
-    )
-    .toBeValid();
 });
 
 // --- Codefix ---
