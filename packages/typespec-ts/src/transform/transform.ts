@@ -30,15 +30,15 @@ import {
   getSchemaForType,
   getTypeName,
   predictDefaultValue,
-} from "../utils/modelUtils.js";
-import { getClientLroOverload } from "../utils/operationUtil.js";
-import { transformApiVersionInfo } from "./transformApiVersionInfo.js";
-import { transformHelperFunctionDetails } from "./transformHelperFunctionDetails.js";
-import { transformToParameterTypes } from "./transformParameters.js";
-import { transformPaths } from "./transformPaths.js";
-import { transformToResponseTypes } from "./transformResponses.js";
-import { transformSchemas } from "./transformSchemas.js";
-import { transformTelemetryInfo } from "./transformTelemetryInfo.js";
+} from "../utils/model-utils.js";
+import { getClientLroOverload } from "../utils/operation-util.js";
+import { transformApiVersionInfo } from "./transform-api-version-info.js";
+import { transformHelperFunctionDetails } from "./transform-helper-function-details.js";
+import { transformToParameterTypes } from "./transform-parameters.js";
+import { transformPaths } from "./transform-paths.js";
+import { transformToResponseTypes } from "./transform-responses.js";
+import { transformSchemas } from "./transform-schemas.js";
+import { transformTelemetryInfo } from "./transform-telemetry-info.js";
 
 export async function transformRLCModel(
   client: SdkClient,
@@ -170,7 +170,7 @@ export function transformUrlInfo(
     }
   }
   // Set the default value if missing endpoint parameter
-  if (endpoint == undefined && urlParameters.length === 0) {
+  if (endpoint === undefined && urlParameters.length === 0) {
     endpoint = "{endpointParam}";
     urlParameters.push({
       name: "endpointParam",
