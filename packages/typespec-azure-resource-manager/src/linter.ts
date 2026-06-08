@@ -36,6 +36,7 @@ import { retryAfterRule } from "./rules/retry-after.js";
 import { secretProprule } from "./rules/secret-prop.js";
 import { unsupportedTypeRule } from "./rules/unsupported-type.js";
 import { versionProgressionRule } from "./rules/version-progression.js";
+import { modelNameRequestSuffixRule } from "./rules/arm-model-name-request-suffix.js";
 
 const rules = [
   armNoRecordRule,
@@ -75,6 +76,7 @@ const rules = [
   unsupportedTypeRule,
   secretProprule,
   noEmptyModel,
+  modelNameRequestSuffixRule,
 ];
 
 export const $linter = defineLinter({
