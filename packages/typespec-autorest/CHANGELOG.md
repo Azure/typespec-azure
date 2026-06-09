@@ -9,7 +9,7 @@
 ### Bug Fixes
 
 - [#4549](https://github.com/Azure/typespec-azure/pull/4549) Fix custom auth scheme models leaking into `definitions` when declared inside the service namespace. They are now emitted only under `securityDefinitions` as expected.
-- [#4421](https://github.com/Azure/typespec-azure/pull/4421) Ensure there is no examples emitted for parameters
+- [#4421](https://github.com/Azure/typespec-azure/pull/4421) Ensure there are no examples emitted for parameters
 
 
 ## 0.68.0
