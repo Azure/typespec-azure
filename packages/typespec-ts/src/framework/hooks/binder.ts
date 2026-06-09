@@ -10,7 +10,11 @@ import {
 import { provideContext, useContext } from "../../context-manager.js";
 import { generateLocallyUniqueName } from "../../modular/helpers/naming-helpers.js";
 import { ReferenceableSymbol } from "../dependency.js";
-import { SourceFileSymbol, StaticHelperMetadata } from "../load-static-helpers.js";
+import {
+  SourceFileSymbol,
+  StaticHelperMetadata,
+  getPlatformSubpathSpecifier,
+} from "../load-static-helpers.js";
 import { refkey } from "../refkey.js";
 import { provideDependencies, useDependencies } from "./use-dependencies.js";
 
@@ -190,21 +194,25 @@ class BinderImp implements Binder {
    * Returns the #platform/ subpath import specifier for a static helper file
    * that has a polyfill variant (-browser.mts or -react-native.mts sibling),
    * or undefined if subpath imports are disabled or no variant exists.
-   * e.g. "src/static-helpers/serialization/get-binary-response.ts"
-   *   -> "#platform/static-helpers/serialization/get-binary-response"
+   * The relative path is computed against the package `src` directory (since
+   * `#platform/*` maps to `./src/*`), derived from the actual `sourceRoot`
+   * (which can be e.g. `.../src`, `.../src/generated` or `.../generated`)
+   * rather than a hardcoded "/src/" segment.
+   * e.g. sourceRoot ".../src/generated", file ".../src/generated/static-helpers/serialization/get-binary-response.ts"
+   *   -> "#platform/generated/static-helpers/serialization/get-binary-response"
    */
-  private getPlatformImportSpecifier(declarationSourceFile: SourceFile): string | undefined {
+  private getPlatformImportSpecifier(
+    declarationSourceFile: SourceFile,
+    sourceRoot: string,
+  ): string | undefined {
     if (!this.useSubpathImports) return undefined;
     const filePath = declarationSourceFile.getFilePath();
-    const srcIndex = filePath.indexOf("/src/");
-    if (srcIndex === -1) return undefined;
     // Check if a -browser.mts or -react-native.mts sibling exists
     const basePath = filePath.replace(/\.ts$/, "");
     const hasBrowserVariant = this.project.getSourceFile(basePath + "-browser.mts");
     const hasReactNativeVariant = this.project.getSourceFile(basePath + "-react-native.mts");
     if (!hasBrowserVariant && !hasReactNativeVariant) return undefined;
-    const relativePath = filePath.substring(srcIndex + "/src/".length);
-    return "#platform/" + relativePath.replace(/\.ts$/, "");
+    return getPlatformSubpathSpecifier(filePath, sourceRoot);
   }
 
   /**
@@ -239,6 +247,7 @@ class BinderImp implements Binder {
           declarationByPlaceholder,
           presentPlaceholders,
           replacementMap,
+          sourceRoot,
         );
         this.resolveDependencyReferences(
           file,
@@ -300,6 +309,7 @@ class BinderImp implements Binder {
     declarationByPlaceholder: Map<string, [unknown, DeclarationInfo | StaticHelperMetadata]>,
     presentPlaceholders: Set<string>,
     replacementMap: Map<string, string>,
+    sourceRoot: string,
   ) {
     for (const [placeholderKey, [declarationKey, declaration]] of declarationByPlaceholder) {
       if (!presentPlaceholders.has(placeholderKey)) {
@@ -318,7 +328,10 @@ class BinderImp implements Binder {
       if (file !== declarationSourceFile) {
         this.trackReference(declarationKey, file);
         // Use #platform/ subpath import specifier for static helpers in warp packages
-        const platformSpecifier = this.getPlatformImportSpecifier(declarationSourceFile);
+        const platformSpecifier = this.getPlatformImportSpecifier(
+          declarationSourceFile,
+          sourceRoot,
+        );
         const importTarget = platformSpecifier ?? declarationSourceFile;
         const importDec = this.addImport(file, importTarget, name);
         name = importDec.alias ?? name;
