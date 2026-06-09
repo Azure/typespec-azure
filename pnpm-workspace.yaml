@@ -58,9 +58,9 @@ catalog:
   "@octokit/plugin-rest-endpoint-methods": ^17.0.0
   "@playwright/test": ^1.60.0
   "@pnpm/workspace.find-packages": ^1000.0.65
-  "@scalar/json-magic": ^0.12.5
-  "@scalar/openapi-parser": ^0.28.5
-  "@scalar/openapi-types": ^0.9.0
+  "@scalar/json-magic": ^0.12.15
+  "@scalar/openapi-parser": ^0.28.6
+  "@scalar/openapi-types": ^0.9.1
   "@storybook/cli": ^10.3.5
   "@storybook/react-vite": ^10.3.5
   "@testing-library/dom": ^10.4.1
@@ -94,7 +94,7 @@ catalog:
   "@typescript-eslint/rule-tester": ^8.58.1
   "@typescript-eslint/types": ^8.58.1
   "@typescript-eslint/utils": ^8.58.1
-  "@typespec/http-client-python": ^0.30.1
+  "@typespec/http-client-python": ^0.31.0
   "@typespec/ts-http-runtime": "0.3.5"
   "@vitejs/plugin-react": ^6.0.1
   "@vitest/coverage-v8": ^4.1.3

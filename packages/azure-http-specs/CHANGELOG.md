@@ -1,5 +1,13 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.42
+
+### Features
+
+- [#4535](https://github.com/Azure/typespec-azure/pull/4535) Add ARM spector test scenario for ArmResourceDeploymentScope (armResourceIdentifier with scopes)
+- [#4543](https://github.com/Azure/typespec-azure/pull/4543) Add ARM spector test scenario for management group scoped resources
+
+
 ## 0.1.0-alpha.41
 
 ### Features
