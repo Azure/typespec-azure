@@ -29,7 +29,7 @@
   },
   "scripts": {
     "clean": "rimraf ./dist ./temp",
-    "build": "tsc -p .",
+    "build": "cp ../../../../core/packages/http-client-java/generator/ ./generator && mvn install -f ../../../../core/packages/http-client-java/generator/pom.xml -Dspotless.skip=true -DskipTests=true &&  tsc -p .",
     "watch": "tsc -p . --watch",
     "test:java:e2e": "vitest run",
     "lint:extra": "eslint . --ext .ts --max-warnings=0",
