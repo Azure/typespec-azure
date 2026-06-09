@@ -100,16 +100,27 @@ def graceful_stop_server(timeout: float = 30.0) -> None:
     """Gracefully stop the mock server so it writes its coverage file.
 
     The tsp-spector server only persists spec-coverage.json from its process
-    ``exit`` handler, which is triggered by a POST to the ``/.admin/stop`` admin
-    endpoint (it then calls ``process.exit(0)``). A hard kill of the process
-    skips that handler and leaves no coverage file. Posting to the admin
-    endpoint here lets coverage be written by the test run itself, so no extra
-    pipeline step is required to flush coverage before uploading it.
+    ``exit`` handler, which is triggered by the ``tsp-spector server stop``
+    command (it posts to the ``/.admin/stop`` admin endpoint and the server then
+    calls ``process.exit(0)``). A hard kill of the process skips that handler and
+    leaves no coverage file. Stopping the server via the CLI here lets coverage
+    be written by the test run itself, so no extra pipeline step is required to
+    flush coverage before uploading it.
     """
+    env = os.environ.copy()
+    node_bin = str(ROOT / "node_modules" / ".bin")
+    env["PATH"] = f"{node_bin}{os.pathsep}{env.get('PATH', '')}"
     try:
-        req = urllib.request.Request(f"{SERVER_URL}/.admin/stop", method="POST")
-        urllib.request.urlopen(req, timeout=5)
-    except (urllib.error.URLError, OSError):
+        subprocess.run(
+            f"npx tsp-spector server stop --port {SERVER_PORT}",
+            shell=True,
+            cwd=str(ROOT),
+            env=env,
+            capture_output=True,
+            check=False,
+            timeout=30,
+        )
+    except Exception:
         # Server already stopped or never started — nothing to do.
         return
 
