@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.69.0
+
+### Bug Fixes
+
+- [#4567](https://github.com/Azure/typespec-azure/pull/4567) Move internal `EXACT_NAME_PREFIX` constant out of public exports to fix build failures when `skipLibCheck` is disabled.
+
+
 ## 0.68.4
 
 ### Bug Fixes

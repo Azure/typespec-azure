@@ -1,5 +1,12 @@
 # Changelog - @azure-tools/typespec-azure-rulesets
 
+## 0.69.0
+
+### Features
+
+- [#4384](https://github.com/Azure/typespec-azure/pull/4384) Add new linting rule `no-override-props` that warns when a model redefines a property that is already defined in one of its base models. The 'name' property of an ARM resource and properties redefined as part of a model marked with `@discriminator` are not flagged by this rule.
+
+
 ## 0.68.0
 
 ### Features
