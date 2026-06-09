@@ -2,8 +2,8 @@
 // Licensed under the MIT License.
 
 import { EmitContext, Program } from "@typespec/compiler";
-import { provideContext, useContext } from "./contextManager.js";
-import { buildRootIndex, buildSubClientIndexFile } from "./modular/buildRootIndex.js";
+import { provideContext, useContext } from "./context-manager.js";
+import { buildRootIndex, buildSubClientIndexFile } from "./modular/build-root-index.js";
 import {
   AzureCoreDependencies,
   AzureIdentityDependencies,
@@ -69,8 +69,8 @@ import {
   updatePackageFile,
   updateReadmeFile,
 } from "./rlc-common/index.js";
-import { emitContentByBuilder, emitModels } from "./utils/emitUtil.js";
-import { clearDirectory, emptyDir, pathExists } from "./utils/fileSystemUtils.js";
+import { emitContentByBuilder, emitModels } from "./utils/emit-util.js";
+import { clearDirectory, emptyDir, pathExists } from "./utils/file-system-utils.js";
 import { GenerationDirDetail, SdkContext } from "./utils/interfaces.js";
 
 import {
@@ -83,33 +83,33 @@ import { existsSync } from "fs";
 import { basename, join } from "path";
 import { Project } from "ts-morph";
 import { provideBinder } from "./framework/hooks/binder.js";
-import { provideSdkTypes } from "./framework/hooks/sdkTypes.js";
+import { provideSdkTypes } from "./framework/hooks/sdk-types.js";
 import { loadStaticHelpers } from "./framework/load-static-helpers.js";
 import { EmitterOptions } from "./lib.js";
-import { buildClassicalClient } from "./modular/buildClassicalClient.js";
-import { buildClassicOperationFiles } from "./modular/buildClassicalOperationGroups.js";
-import { buildClientContext, getClientContextPath } from "./modular/buildClientContext.js";
-import { transformModularEmitterOptions } from "./modular/buildModularOptions.js";
-import { buildOperationFiles } from "./modular/buildOperations.js";
-import { getModuleExports } from "./modular/buildProjectFiles.js";
-import { buildRestorePoller } from "./modular/buildRestorePoller.js";
-import { buildSubpathIndexFile } from "./modular/buildSubpathIndex.js";
-import { emitLoggerFile } from "./modular/emitLoggerFile.js";
-import { emitNonModelResponseTypes, emitTypes } from "./modular/emitModels.js";
-import { buildApiOptions } from "./modular/emitModelsOptions.js";
-import { emitSamples } from "./modular/emitSamples.js";
-import { emitTests } from "./modular/emitTests.js";
-import { getClassicalClientName } from "./modular/helpers/namingHelpers.js";
+import { buildClassicalClient } from "./modular/build-classical-client.js";
+import { buildClassicOperationFiles } from "./modular/build-classical-operation-groups.js";
+import { buildClientContext, getClientContextPath } from "./modular/build-client-context.js";
+import { transformModularEmitterOptions } from "./modular/build-modular-options.js";
+import { buildOperationFiles } from "./modular/build-operations.js";
+import { getModuleExports } from "./modular/build-project-files.js";
+import { buildRestorePoller } from "./modular/build-restore-poller.js";
+import { buildSubpathIndexFile } from "./modular/build-subpath-index.js";
+import { emitLoggerFile } from "./modular/emit-logger-file.js";
+import { buildApiOptions } from "./modular/emit-models-options.js";
+import { emitNonModelResponseTypes, emitTypes } from "./modular/emit-models.js";
+import { emitSamples } from "./modular/emit-samples.js";
+import { emitTests } from "./modular/emit-tests.js";
+import { getClassicalClientName } from "./modular/helpers/naming-helpers.js";
 import { ModularEmitterOptions } from "./modular/interfaces.js";
-import { packageUsesXmlSerialization } from "./modular/serialization/buildXmlSerializerFunction.js";
+import { packageUsesXmlSerialization } from "./modular/serialization/build-xml-serializer-function.js";
 import { transformRLCModel } from "./transform/transform.js";
-import { transformRLCOptions } from "./transform/transfromRLCOptions.js";
+import { transformRLCOptions } from "./transform/transfrom-rlc-options.js";
 import {
   getClientHierarchyMap,
   getModularClientOptions,
   getRLCClients,
-} from "./utils/clientUtils.js";
-import { generateCrossLanguageDefinitionFile } from "./utils/crossLanguageDef.js";
+} from "./utils/client-utils.js";
+import { generateCrossLanguageDefinitionFile } from "./utils/cross-language-def.js";
 
 export * from "./lib.js";
 

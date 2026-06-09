@@ -7,12 +7,12 @@ import {
   SourceFile,
   StructureKind,
 } from "ts-morph";
-import { provideContext, useContext } from "../../contextManager.js";
-import { generateLocallyUniqueName } from "../../modular/helpers/namingHelpers.js";
+import { provideContext, useContext } from "../../context-manager.js";
+import { generateLocallyUniqueName } from "../../modular/helpers/naming-helpers.js";
 import { ReferenceableSymbol } from "../dependency.js";
 import { SourceFileSymbol, StaticHelperMetadata } from "../load-static-helpers.js";
 import { refkey } from "../refkey.js";
-import { provideDependencies, useDependencies } from "./useDependencies.js";
+import { provideDependencies, useDependencies } from "./use-dependencies.js";
 
 export interface DeclarationInfo {
   name: string;

@@ -136,14 +136,14 @@ catalogs:
       specifier: ^1000.0.65
       version: 1000.0.65
     '@scalar/json-magic':
-      specifier: ^0.12.5
-      version: 0.12.14
+      specifier: ^0.12.15
+      version: 0.12.15
     '@scalar/openapi-parser':
-      specifier: ^0.28.5
-      version: 0.28.5
+      specifier: ^0.28.6
+      version: 0.28.6
     '@scalar/openapi-types':
-      specifier: ^0.9.0
-      version: 0.9.0
+      specifier: ^0.9.1
+      version: 0.9.1
     '@storybook/cli':
       specifier: ^10.3.5
       version: 10.4.1
@@ -219,9 +219,6 @@ catalogs:
     '@types/yargs':
       specifier: ^17.0.35
       version: 17.0.35
-    '@typescript-eslint/eslint-plugin':
-      specifier: ^8.28.0
-      version: 8.60.0
     '@typescript-eslint/parser':
       specifier: ^8.58.1
       version: 8.60.0
@@ -235,8 +232,8 @@ catalogs:
       specifier: ^8.58.1
       version: 8.60.0
     '@typespec/http-client-python':
-      specifier: ^0.30.1
-      version: 0.30.1
+      specifier: ^0.31.0
+      version: 0.31.0
     '@typespec/ts-http-runtime':
       specifier: 0.3.5
       version: 0.3.5
@@ -357,9 +354,6 @@ catalogs:
     eslint-plugin-react-hooks:
       specifier: 7.1.1
       version: 7.1.1
-    eslint-plugin-require-extensions:
-      specifier: 0.1.3
-      version: 0.1.3
     eslint-plugin-unicorn:
       specifier: ^64.0.0
       version: 64.0.0
@@ -1881,13 +1875,13 @@ importers:
     dependencies:
       '@scalar/json-magic':
         specifier: 'catalog:'
-        version: 0.12.14
+        version: 0.12.15
       '@scalar/openapi-parser':
         specifier: 'catalog:'
-        version: 0.28.5
+        version: 0.28.6
       '@scalar/openapi-types':
         specifier: 'catalog:'
-        version: 0.9.0
+        version: 0.9.1
       '@typespec/asset-emitter':
         specifier: workspace:^
         version: link:../asset-emitter
@@ -3791,7 +3785,7 @@ importers:
     dependencies:
       '@typespec/http-client-python':
         specifier: 'catalog:'
-        version: 0.30.1(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)
+        version: 0.31.0(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)
       semver:
         specifier: 'catalog:'
         version: 7.8.1
@@ -3941,12 +3935,6 @@ importers:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
         version: 7.58.7(@types/node@25.9.1)
-      '@typescript-eslint/eslint-plugin':
-        specifier: 'catalog:'
-        version: 8.60.0(@typescript-eslint/parser@8.60.0(eslint@10.4.1)(typescript@6.0.3))(eslint@10.4.1)(typescript@6.0.3)
-      '@typescript-eslint/parser':
-        specifier: 'catalog:'
-        version: 8.60.0(eslint@10.4.1)(typescript@6.0.3)
       '@typespec/compiler':
         specifier: workspace:^
         version: link:../../core/packages/compiler
@@ -3986,9 +3974,6 @@ importers:
       cross-env:
         specifier: 'catalog:'
         version: 10.1.0
-      eslint-plugin-require-extensions:
-        specifier: 'catalog:'
-        version: 0.1.3(eslint@10.4.1)
       mkdirp:
         specifier: 'catalog:'
         version: 3.0.1
@@ -7603,24 +7588,24 @@ packages:
       '@types/node':
         optional: true
 
-  '@scalar/helpers@0.8.0':
-    resolution: {integrity: sha512-gmOC6VravNB9VDl6wnt/GOj4K/hn48tj5bpW4AM4MhH8Ubil6uu7g1DSoKHwltu8Ks79KEtR6JmOrROi9R7jaQ==}
+  '@scalar/helpers@0.8.1':
+    resolution: {integrity: sha512-yuiuBCadP5bjAnIv23QvifVN/NaMi9xBF6b8Wdk4QOzwzLPJmp699MAdf33J0A5i2qKcvnu32iz/VkEJmQRe5g==}
     engines: {node: '>=22'}
 
-  '@scalar/json-magic@0.12.14':
-    resolution: {integrity: sha512-dWrCy3ew1r7OQ1pu2r4ZjiKEVy0yVd66kXdmsl41bteOG2F2I2IBlPjmPV6p8ckjImQHxtNBIntFaQfNrdBhJg==}
+  '@scalar/json-magic@0.12.15':
+    resolution: {integrity: sha512-ZYgdYZ0jSZXQeyhG2lJ20FjzvKsaDRXk4bPguF/Ytl2nGBh9a6RIIr9NvVy4zAD67a/ahm+xipXlfoR1KtB5fg==}
     engines: {node: '>=22'}
 
-  '@scalar/openapi-parser@0.28.5':
-    resolution: {integrity: sha512-W8uS5p4dR5Ri4Zqra6c/KaL54R5qkLJAwXCm/QTYvzsLw/NT4N6NdbqHQLHpJeLMG9c0dkA70S/KZKkFZgDRTg==}
+  '@scalar/openapi-parser@0.28.6':
+    resolution: {integrity: sha512-gCl4r+rpmO+CKfwmmwI+GJVFhuNut7e6beUcD/xazanH4epkLT7V9ZgMv9YKbUBE73fkrOv6NJympeEGiU8aUw==}
     engines: {node: '>=22'}
 
-  '@scalar/openapi-types@0.9.0':
-    resolution: {integrity: sha512-XGuYegItO8iJbEy5hHxS04vyxoFIuERy3D/twt1hGPya6KJljg9iO0geZ/X5vjDKmSKYAuMNkGqYO5Jjp4NLUA==}
+  '@scalar/openapi-types@0.9.1':
+    resolution: {integrity: sha512-gkGhSkxSzADaBiNg+ZAbJuwj+ZUmzP2Pg9CWZ7ZP+0fck2WjPeDDM7aAbouAm0aQQMF9xBjSPXSA9a/qTHYaTw==}
     engines: {node: '>=22'}
 
-  '@scalar/openapi-upgrader@0.2.8':
-    resolution: {integrity: sha512-/SDb3+SIFuScKwrNRTFd7bklGDkayo81cHZlajXfUaT22Oc4VUlOUvyMXBLPa0miOfZTExYTM1I0BWW7Nujugw==}
+  '@scalar/openapi-upgrader@0.2.9':
+    resolution: {integrity: sha512-D5b0rGLLZgmkO9mdW2j/ND1KBlH1u3RCpr87HPxv9P9ZSr6PtM5iLqFOJq0ACiaHjY2mikCrxgDmnUEhTzRpHQ==}
     engines: {node: '>=22'}
 
   '@scarf/scarf@1.4.0':
@@ -8251,15 +8236,15 @@ packages:
     resolution: {integrity: sha512-9WI52t8ZGLVGrPMBet25yAftqY/n95+zmoUUtJBBQTKDSKUu7OsPTroT2op7U9JatkoRccL0YkWDNMFfC4Sjxg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@typespec/http-client-python@0.30.1':
-    resolution: {integrity: sha512-fo78R2GhPjUntPwZGDHxZ/ddRQZgLRSCzO3F+u8hPrHPzmBXA0rMkeS2WKCWYmT/wcFDPAojjH9pMUl27dLQ0w==}
+  '@typespec/http-client-python@0.31.0':
+    resolution: {integrity: sha512-cG7ky7WMRfEeSp6YadVwHwgFSFLNFN82LTQziu6doNxQ0UipAIaobIELfVT5D/PDIz/Pa3w9mNG9CWF08uO7qA==}
     engines: {node: '>=22.0.0'}
     peerDependencies:
       '@azure-tools/typespec-autorest': '>=0.68.0 <1.0.0'
       '@azure-tools/typespec-azure-core': '>=0.68.0 <1.0.0'
       '@azure-tools/typespec-azure-resource-manager': '>=0.68.0 <1.0.0'
       '@azure-tools/typespec-azure-rulesets': '>=0.68.0 <1.0.0'
-      '@azure-tools/typespec-client-generator-core': '>=0.68.2 <1.0.0'
+      '@azure-tools/typespec-client-generator-core': '>=0.68.4 <1.0.0'
       '@typespec/compiler': ^1.12.0
       '@typespec/events': '>=0.82.0 <1.0.0'
       '@typespec/http': ^1.12.0
@@ -10094,12 +10079,6 @@ packages:
     engines: {node: '>=18'}
     peerDependencies:
       eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0 || ^9.0.0 || ^10.0.0
-
-  eslint-plugin-require-extensions@0.1.3:
-    resolution: {integrity: sha512-T3c1PZ9PIdI3hjV8LdunfYI8gj017UQjzAnCrxuo3wAjneDbTPHdE3oNWInOjMA+z/aBkUtlW5vC0YepYMZIug==}
-    engines: {node: '>=16'}
-    peerDependencies:
-      eslint: '*'
 
   eslint-plugin-unicorn@64.0.0:
     resolution: {integrity: sha512-rNZwalHh8i0UfPlhNwg5BTUO1CMdKNmjqe+TgzOTZnpKoi8VBgsW7u9qCHIdpxEzZ1uwrJrPF0uRb7l//K38gA==}
@@ -19676,20 +19655,20 @@ snapshots:
     optionalDependencies:
       '@types/node': 25.9.1
 
-  '@scalar/helpers@0.8.0': {}
+  '@scalar/helpers@0.8.1': {}
 
-  '@scalar/json-magic@0.12.14':
+  '@scalar/json-magic@0.12.15':
     dependencies:
-      '@scalar/helpers': 0.8.0
+      '@scalar/helpers': 0.8.1
       pathe: 2.0.3
       yaml: 2.9.0
 
-  '@scalar/openapi-parser@0.28.5':
+  '@scalar/openapi-parser@0.28.6':
     dependencies:
-      '@scalar/helpers': 0.8.0
-      '@scalar/json-magic': 0.12.14
-      '@scalar/openapi-types': 0.9.0
-      '@scalar/openapi-upgrader': 0.2.8
+      '@scalar/helpers': 0.8.1
+      '@scalar/json-magic': 0.12.15
+      '@scalar/openapi-types': 0.9.1
+      '@scalar/openapi-upgrader': 0.2.9
       ajv: 8.20.0
       ajv-draft-04: 1.0.0(ajv@8.20.0)
       ajv-formats: 3.0.1(ajv@8.20.0)
@@ -19697,11 +19676,11 @@ snapshots:
       leven: 4.1.0
       yaml: 2.9.0
 
-  '@scalar/openapi-types@0.9.0': {}
+  '@scalar/openapi-types@0.9.1': {}
 
-  '@scalar/openapi-upgrader@0.2.8':
+  '@scalar/openapi-upgrader@0.2.9':
     dependencies:
-      '@scalar/openapi-types': 0.9.0
+      '@scalar/openapi-types': 0.9.1
 
   '@scarf/scarf@1.4.0': {}
 
@@ -20485,7 +20464,7 @@ snapshots:
       '@typescript-eslint/types': 8.60.0
       eslint-visitor-keys: 5.0.1
 
-  '@typespec/http-client-python@0.30.1(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)':
+  '@typespec/http-client-python@0.31.0(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)':
     dependencies:
       '@azure-tools/typespec-autorest': link:packages/typespec-autorest
       '@azure-tools/typespec-azure-core': link:packages/typespec-azure-core
@@ -21030,7 +21009,7 @@ snapshots:
       algoliasearch: 4.27.0
       clipanion: 4.0.0-rc.4(typanion@3.14.0)
       diff: 5.2.2
-      ink: 3.2.0(@types/react@19.2.16)(react@17.0.2)
+      ink: 3.2.0(@types/react@19.2.16)(react@19.2.7)
       ink-text-input: 4.0.3(ink@3.2.0(@types/react@19.2.16)(react@17.0.2))(react@17.0.2)
       react: 17.0.2
       semver: 7.8.1
@@ -21180,7 +21159,7 @@ snapshots:
       '@yarnpkg/plugin-git': 3.2.0(@yarnpkg/core@4.8.0(typanion@3.14.0))(typanion@3.14.0)
       clipanion: 4.0.0-rc.4(typanion@3.14.0)
       es-toolkit: 1.47.0
-      ink: 3.2.0(@types/react@19.2.16)(react@19.2.7)
+      ink: 3.2.0(@types/react@19.2.16)(react@17.0.2)
       react: 17.0.2
       semver: 7.8.1
       tslib: 2.8.1
@@ -22894,10 +22873,6 @@ snapshots:
       zod-validation-error: 4.0.2(zod@4.4.3)
     transitivePeerDependencies:
       - supports-color
-
-  eslint-plugin-require-extensions@0.1.3(eslint@10.4.1):
-    dependencies:
-      eslint: 10.4.1
 
   eslint-plugin-unicorn@64.0.0(eslint@10.4.1):
     dependencies:
