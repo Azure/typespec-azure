@@ -33,11 +33,11 @@ describe("serializeRecord", () => {
 
   it("should warn and passthrough unhandled types", () => {
     const input = { a: {}, b: [] };
-    console.warn = vi.fn(); // Mock console.warn
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
     const result = serializeRecord(input);
     expect(result).toEqual(input);
-    expect(console.warn).toHaveBeenCalledWith("Don't know how to serialize [object Object]");
-    expect(console.warn).toHaveBeenCalledWith("Don't know how to serialize ");
+    expect(warnSpy).toHaveBeenCalledWith("Don't know how to serialize [object Object]");
+    expect(warnSpy).toHaveBeenCalledWith("Don't know how to serialize ");
   });
 });
 
