@@ -143,50 +143,45 @@ export function createClientTspAugmentDecoratorCodeFix(
   // Use short ref in label (cleaner display)
   const decoratorText = `@@${decoratorName}(${shortRef}${argsStr})`;
   const projectRoot = program.projectRoot;
+  const clientTspPath = resolvePath(projectRoot, "client.tsp");
+
+  // Read client.tsp content once via direct lookup (O(1)).
+  // Assumes client.tsp is imported via tspconfig.yaml imports.
+  const existingText = program.sourceFiles.get(clientTspPath)?.file.text ?? "";
 
   return defineCodeFix({
     id: `add-${decoratorName}-in-client-tsp`,
     label: `Add \`${decoratorText}\` in client.tsp`,
     fix: (fixContext) => {
       if (target.node === undefined) return [];
-      const clientTspPath = resolvePath(projectRoot, "client.tsp");
 
-      // Look up client.tsp in program.sourceFiles (sync).
-      // Assumes client.tsp is imported via tspconfig.yaml imports.
-      let existingText = "";
-      for (const [path, script] of program.sourceFiles) {
-        if (path.endsWith("client.tsp")) {
-          existingText = script.file.text;
-          break;
-        }
-      }
-
-      const relativePath = computeRelativeImportPath(target, projectRoot);
       const clientFile = createSourceFile(existingText, clientTspPath);
       const edits: InsertTextCodeFixEdit[] = [];
 
       // Build imports/using to insert at the TOP of the file
       const tcgcImport = `import "@azure-tools/typespec-client-generator-core";`;
+      const relativePath = computeRelativeImportPath(target, projectRoot);
       const modelImport = `import "${relativePath}";`;
       const usingTcgc = `using Azure.ClientGenerator.Core;`;
 
-      let headerToInsert = "";
+      const headerLines: string[] = [];
       if (!existingText.includes(tcgcImport)) {
-        headerToInsert += tcgcImport + "\n";
+        headerLines.push(tcgcImport);
       }
       if (!existingText.includes(modelImport)) {
-        headerToInsert += modelImport + "\n";
+        headerLines.push(modelImport);
       }
       if (!existingText.includes(usingTcgc)) {
-        headerToInsert += "\n" + usingTcgc + "\n";
+        headerLines.push("", usingTcgc);
       }
       // Add using for the target's service namespace so we can use short references
       if (targetNamespace) {
         const usingNs = `using ${targetNamespace};`;
-        if (!existingText.includes(usingNs) && !headerToInsert.includes(usingNs)) {
-          headerToInsert += usingNs + "\n";
+        if (!existingText.includes(usingNs) && !headerLines.includes(usingNs)) {
+          headerLines.push(usingNs);
         }
       }
+      const headerToInsert = headerLines.length > 0 ? headerLines.join("\n") + "\n" : "";
       if (headerToInsert.length > 0) {
         edits.push({
           kind: "insert-text",
