@@ -1,4 +1,4 @@
-import { NoTarget, Program } from "@typespec/compiler";
+import { normalizePath, NoTarget, Program } from "@typespec/compiler";
 import { readdir, readFile, stat } from "fs/promises";
 import * as path from "path";
 import {
@@ -16,6 +16,54 @@ import { isAzurePackage } from "../rlc-common/index.js";
 import { resolveProjectRoot } from "../utils/resolve-project-root.js";
 import { refkey } from "./refkey.js";
 export const SourceFileSymbol = Symbol("SourceFile");
+
+/**
+ * Computes the `#platform/<path>` subpath import specifier for a file, where the
+ * path is relative to the package `src` directory (since `#platform/*` maps to
+ * `./src/*` in the generated package.json).
+ *
+ * The package `src` directory is derived from the actual `sourceRoot` (which may
+ * be e.g. `.../src`, `.../src/generated` or `.../generated`) by locating its
+ * trailing `src` path segment, instead of assuming a hardcoded `/src/` segment.
+ * Returns `undefined` when no `src` segment can be found and no fallback applies.
+ */
+export function getPlatformSubpathSpecifier(
+  filePath: string,
+  sourceRoot: string,
+): string | undefined {
+  const normalizedFile = normalizePath(filePath);
+  const normalizedRoot = normalizePath(sourceRoot).replace(/\/+$/, "");
+
+  // Primary: when sourceRoot has a "src" segment and the file is located under it
+  if (normalizedRoot) {
+    const rootSegments = normalizedRoot.split("/");
+    const srcSegmentIndex = rootSegments.lastIndexOf("src");
+    if (srcSegmentIndex !== -1) {
+      const srcDir = rootSegments.slice(0, srcSegmentIndex + 1).join("/");
+      if (normalizedFile.startsWith(`${srcDir}/`)) {
+        const relativePath = normalizedFile.substring(srcDir.length + 1);
+        return `#platform/${relativePath.replace(/\.[cm]?[jt]s$/, "")}`;
+      }
+    }
+  }
+
+  // Fallback: search for a /src/ segment anywhere in the file path
+  // (handles cases where filePath is absolute but sourceRoot is a different absolute path,
+  //  e.g. in tests where sourceRoot is a mock path like "/modularPackageFolder/src")
+  const srcIndex = normalizedFile.indexOf("/src/");
+  if (srcIndex !== -1) {
+    const relativePath = normalizedFile.substring(srcIndex + "/src/".length);
+    return `#platform/${relativePath.replace(/\.[cm]?[jt]s$/, "")}`;
+  }
+
+  // Final fallback: relative paths without a /src/ segment (e.g., when sourceRoot is empty)
+  if (!normalizedFile.startsWith("/")) {
+    return `#platform/${normalizedFile.replace(/\.[cm]?[jt]s$/, "")}`;
+  }
+
+  return undefined;
+}
+
 export interface StaticHelperMetadata {
   name: string;
   kind: "function" | "interface" | "typeAlias" | "class" | "enum";
@@ -85,12 +133,20 @@ export async function loadStaticHelpers(
   return assertAllHelpersLoadedPresent(helpersMap);
 
   async function loadFiles(files: FileMetadata[], generateDir: string) {
+    const sourcePaths = new Set(files.map((f) => normalizePath(f.source)));
     for (const file of files) {
       const targetPath = path.join(generateDir, file.target);
       const contents = await readFile(file.source, "utf-8");
       const addedFile = project.createSourceFile(targetPath, contents, {
         overwrite: true,
       });
+      // A file with its own platform variant (a sibling -browser.mts /
+      // -react-native.mts) is resolved as a whole via #platform, so its
+      // internal relative platform-types imports must be kept relative.
+      const sourceBase = normalizePath(file.source).replace(/\.[cm]?ts$/, "");
+      const hasPlatformVariant =
+        sourcePaths.has(`${sourceBase}-browser.mts`) ||
+        sourcePaths.has(`${sourceBase}-react-native.mts`);
       addedFile.getImportDeclarations().map((i) => {
         if (!isAzurePackage({ options: options.options })) {
           if (i.getModuleSpecifier().getFullText().includes("@azure/core-rest-pipeline")) {
@@ -103,8 +159,9 @@ export async function loadStaticHelpers(
         // Rewrite relative platform-types imports to #platform/ specifiers
         // so that browser/react-native variants are resolved via subpath imports.
         // Only rewrite imports to the default variant (not -browser/-react-native variants
-        // which are already platform-specific direct imports).
-        if (options.options?.azureSdkForJs) {
+        // which are already platform-specific direct imports), and only when the
+        // current file does not itself have a platform variant.
+        if (options.options?.azureSdkForJs && !hasPlatformVariant) {
           const specifier = i.getModuleSpecifierValue();
           if (
             specifier.startsWith(".") &&
@@ -112,7 +169,13 @@ export async function loadStaticHelpers(
             !specifier.includes("-browser") &&
             !specifier.includes("-react-native")
           ) {
-            i.setModuleSpecifier("#platform/static-helpers/platform-types");
+            const platformTypesPath = path.posix.normalize(
+              path.posix.join(path.posix.dirname(normalizePath(targetPath)), specifier),
+            );
+            const platformSpecifier = getPlatformSubpathSpecifier(platformTypesPath, generateDir);
+            if (platformSpecifier) {
+              i.setModuleSpecifier(platformSpecifier);
+            }
           }
         }
       });
