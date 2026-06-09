@@ -43,4 +43,5 @@ interface Widgets {
   >;
   delete is ArmResourceDeleteWithoutOkAsync<Widget>;
   list is ArmResourceListByParent<Widget>;
+  listBySubscription is ArmListBySubscription<Widget>;
 }
