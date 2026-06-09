@@ -49,7 +49,8 @@ export function getPlatformSubpathSpecifier(
 
   // Fallback: search for a /src/ segment anywhere in the file path
   // (handles cases where filePath is absolute but sourceRoot is a different absolute path,
-  //  e.g. in tests where sourceRoot is a mock path like "/modularPackageFolder/src")
+  //  e.g. in tests where sourceRoot is a mock path like "/modularPackageFolder/src",
+  //  and in production where both paths share the same /src/ directory ancestry)
   const srcIndex = normalizedFile.indexOf("/src/");
   if (srcIndex !== -1) {
     const relativePath = normalizedFile.substring(srcIndex + "/src/".length);
@@ -169,6 +170,10 @@ export async function loadStaticHelpers(
             !specifier.includes("-browser") &&
             !specifier.includes("-react-native")
           ) {
+            // Resolve the relative import specifier against the target file's directory
+            // (using posix path operations since normalizePath returns forward-slash paths)
+            // to get the normalized path of the platform-types file, then compute
+            // its #platform/ subpath specifier relative to generateDir.
             const platformTypesPath = path.posix.normalize(
               path.posix.join(path.posix.dirname(normalizePath(targetPath)), specifier),
             );
