@@ -7,7 +7,7 @@ import { Buffer } from "node:buffer";
  * are coerced into UTF-8, regardless of whether the body is valid UTF-8 or not.
  */
 export async function getBinaryResponse(
-  streamableMethod: StreamableMethod
+  streamableMethod: StreamableMethod,
 ): Promise<HttpResponse & { body?: Uint8Array }> {
   const response = await streamableMethod.asNodeStream();
   if (response.body === undefined) {
@@ -20,6 +20,6 @@ export async function getBinaryResponse(
 
   return {
     ...response,
-    body: Buffer.concat(bufs)
+    body: Buffer.concat(bufs),
   };
 }

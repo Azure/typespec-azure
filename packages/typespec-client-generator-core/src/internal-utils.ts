@@ -1416,3 +1416,8 @@ export function listOrphanTypes(context: TCGCContext): (Model | Enum | Union)[] 
   context.__orphanTypesCache = result;
   return result;
 }
+
+/**
+ * Prefix used to mark a client name as exact.
+ */
+export const EXACT_NAME_PREFIX = "_exact_:";
