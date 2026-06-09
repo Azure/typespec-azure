@@ -1,23 +1,20 @@
-import {
-  BrandedSdkEmitterOptions,
-  UnbrandedSdkEmitterOptions,
-} from "@azure-tools/typespec-client-generator-core";
+import { BrandedSdkEmitterOptions, UnbrandedSdkEmitterOptions } from "@azure-tools/typespec-client-generator-core";
 import { JSONSchemaType } from "@typespec/compiler";
 
 export const LIB_NAME = "@azure-tools/typespec-java";
 
 export interface DevOptions {
   "generate-code-model"?: boolean;
-  debug?: boolean;
-  loglevel?: "off" | "debug" | "info" | "warn" | "error";
+  "debug"?: boolean;
+  "loglevel"?: "off" | "debug" | "info" | "warn" | "error";
   "java-temp-dir"?: string; // working directory for java codegen, e.g. transformed code-model file
-  profile?: boolean; // enable performance profiling
+  "profile"?: boolean; // enable performance profiling
 }
 
 // see EmitterOptionsDev in code-model-builder.ts for a full list of options
 // but many of them is not recommended to be used, except for backward-compatible or some corner cases
 export interface EmitterOptions {
-  namespace?: string;
+  "namespace"?: string;
   "service-name"?: string;
 
   "generate-samples"?: boolean;
@@ -55,8 +52,7 @@ export const EmitterOptionsSchema: JSONSchemaType<EmitterOptions> = {
     ...BrandedSdkEmitterOptions["examples-dir"],
     "generate-samples": {
       type: "boolean",
-      description:
-        "When set to `true`, the emitter will generate Java sample code. Default value is `true`.",
+      description: "When set to `true`, the emitter will generate Java sample code. Default value is `true`.",
       nullable: true,
       default: true,
     },
@@ -244,12 +240,12 @@ export const EmitterOptionsSchema: JSONSchemaType<EmitterOptions> = {
           description: "Generate intermittent 'code-model.yaml' file in output directory.",
           nullable: true,
         },
-        debug: {
+        "debug": {
           type: "boolean",
           description: "Enable Java remote debug on port 5005.",
           nullable: true,
         },
-        loglevel: {
+        "loglevel": {
           type: "string",
           description: "Log level for Java logging. Default is 'warn'.",
           nullable: true,
@@ -260,7 +256,7 @@ export const EmitterOptionsSchema: JSONSchemaType<EmitterOptions> = {
           description: "Temporary working directory for Java code generator.",
           nullable: true,
         },
-        profile: {
+        "profile": {
           type: "boolean",
           description: "Enable performance profiling.",
           nullable: true,

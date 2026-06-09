@@ -24,6 +24,7 @@ catalog:
   "@astrojs/starlight": ^0.39.2
   "@autorest/codemodel": ~4.20.1
   "@azure-rest/core-client": ^2.3.1
+  "@azure-tools/codegen": ~2.10.1
   "@azure-tools/openai-typespec": "1.11.0"
   "@azure-tools/typespec-liftr-base": "0.14.0"
   "@azure/abort-controller": ^2.1.2
