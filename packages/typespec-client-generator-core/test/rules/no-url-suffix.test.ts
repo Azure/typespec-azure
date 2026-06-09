@@ -144,7 +144,6 @@ describe("codefix", () => {
       .applyCodeFix("add-clientName-in-client-tsp")
       .toEqual({
         "client.tsp": `import "@azure-tools/typespec-client-generator-core";
-import "./main.tsp";
 
 using Azure.ClientGenerator.Core;
 

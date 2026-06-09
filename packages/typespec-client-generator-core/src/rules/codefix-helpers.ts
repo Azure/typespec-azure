@@ -4,7 +4,6 @@ import type {
   Model,
   ModelProperty,
   Program,
-  Type,
 } from "@typespec/compiler";
 import {
   createSourceFile,
@@ -101,20 +100,6 @@ export function createAugmentDecoratorCodeFix(
 }
 
 /**
- * Compute the relative import path from client.tsp (at project root) to the
- * source file where the target type is defined.
- */
-function computeRelativeImportPath(target: Type, projectRoot: string): string {
-  if (target.node === undefined) return "./main.tsp";
-  const sourcePath = getSourceLocation(target.node).file.path;
-  if (sourcePath.startsWith(projectRoot)) {
-    const subPath = sourcePath.slice(projectRoot.length).replace(/^\//, "");
-    return `./${subPath}`;
-  }
-  return `./${sourcePath.split("/").pop() ?? "main.tsp"}`;
-}
-
-/**
  * Create a codefix that writes an augment decorator (@@decorator) to client.tsp.
  *
  * This builds on `createAugmentDecoratorCodeFix` but targets client.tsp instead
@@ -160,16 +145,11 @@ export function createClientTspAugmentDecoratorCodeFix(
 
       // Build imports/using to insert at the TOP of the file
       const tcgcImport = `import "@azure-tools/typespec-client-generator-core";`;
-      const relativePath = computeRelativeImportPath(target, projectRoot);
-      const modelImport = `import "${relativePath}";`;
       const usingTcgc = `using Azure.ClientGenerator.Core;`;
 
       const headerLines: string[] = [];
       if (!existingText.includes(tcgcImport)) {
         headerLines.push(tcgcImport);
-      }
-      if (!existingText.includes(modelImport)) {
-        headerLines.push(modelImport);
       }
       if (!existingText.includes(usingTcgc)) {
         headerLines.push("", usingTcgc);
