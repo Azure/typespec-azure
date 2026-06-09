@@ -3,8 +3,8 @@
 
 import { describe, expect, it } from "vitest";
 
-import { buildSnippets } from "../../../../src/rlc-common/test/buildSnippets.js";
-import { createMockModel } from "./mockHelper.js";
+import { buildSnippets } from "../../../../src/rlc-common/test/build-snippets.js";
+import { createMockModel } from "./mock-helper.js";
 
 describe("Snippets file generation", () => {
   describe("Should generate snippets for modular", () => {
