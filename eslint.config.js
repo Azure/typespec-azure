@@ -14,6 +14,7 @@ export default defineConfig(
       "**/website/build/**/*",
       "**/.astro/**/*",
       "core/**/*", // The TypeSpec core submodule has its own ESLint config - don't lint it from here to avoid OOM
+      "packages/typespec-java/**/*", // Has its own ESLint config
       "**/venv/**/*", // Ignore python virtual env
       "**/.vscode-test-web/**/*", // Ignore VSCode test web project
       // TODO: enable
