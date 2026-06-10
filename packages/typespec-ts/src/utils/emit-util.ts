@@ -1,5 +1,4 @@
-import { CompilerHost, NoTarget, Program } from "@typespec/compiler";
-import { dirname, join } from "path";
+import { CompilerHost, NoTarget, Program, getDirectoryPath, joinPaths } from "@typespec/compiler";
 import { format } from "prettier";
 import { prettierJSONOptions, prettierTypeScriptOptions, reportDiagnostic } from "../lib.js";
 import {
@@ -58,7 +57,7 @@ async function emitFile(
     return;
   }
   const host: CompilerHost = program.host;
-  const filePath = join(emitterOutputDir ?? "", file.path);
+  const filePath = joinPaths(emitterOutputDir ?? "", file.path);
   const isJson = /\.json$/gi.test(filePath);
   const isSourceCode = /\.(ts|js)$/gi.test(filePath);
   const microsoftHeader = isAzureFlavor ? `// Copyright (c) Microsoft Corporation.\n` : "";
@@ -87,6 +86,6 @@ async function emitFile(
       // Continue with unformatted content rather than crashing
     }
   }
-  await host.mkdirp(dirname(filePath));
+  await host.mkdirp(getDirectoryPath(filePath));
   await host.writeFile(filePath, prettierFileContent);
 }

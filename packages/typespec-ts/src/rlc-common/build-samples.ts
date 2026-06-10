@@ -6,7 +6,7 @@ import { sampleTemplate } from "./static/sample-template.js";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: to fix the handlebars issue
 import hbs from "handlebars";
-import * as path from "path";
+import { joinPaths } from "@typespec/compiler";
 
 // Build sample files for the model based on the sample groups
 export function buildSamples(model: RLCModel) {
@@ -22,7 +22,7 @@ export function buildSamples(model: RLCModel) {
     const sampleGroupFileContents = hbs.compile(sampleTemplate, {
       noEscape: true,
     });
-    const filePath = path.join("samples-dev", `${sampleGroup.filename}.ts`);
+    const filePath = joinPaths("samples-dev", `${sampleGroup.filename}.ts`);
     sampleFiles.push({
       path: filePath,
       content: sampleGroupFileContents(sampleGroup),

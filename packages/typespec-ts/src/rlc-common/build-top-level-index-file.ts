@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import * as path from "path";
+import { joinPaths } from "@typespec/compiler";
 import { Project } from "ts-morph";
 import { getImportModuleName } from "./helpers/name-constructors.js";
 import { NameType, normalizeName } from "./helpers/name-utils.js";
@@ -47,7 +47,7 @@ export function buildTopLevelIndex(model: RLCModel) {
       namedExports: [...allModules],
     });
     const content = indexFile.getFullText();
-    const filePath = path.join(
+    const filePath = joinPaths(
       srcPath.substring(0, srcPath.lastIndexOf("src") + 4),
       model.options.isModularLibrary ? "rest" : "",
       `index.ts`,

@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import * as path from "path";
+import { joinPaths } from "@typespec/compiler";
 import { Project } from "ts-morph";
 import {
   buildObjectAliases,
@@ -18,9 +18,9 @@ import { RLCModel, SchemaContext } from "./interfaces.js";
 export function buildSchemaTypes(model: RLCModel) {
   const { srcPath } = model;
   const project = new Project();
-  let filePath = path.join(srcPath, `models.ts`);
+  let filePath = joinPaths(srcPath, `models.ts`);
   const inputModelFile = generateModelFiles(model, project, filePath, [SchemaContext.Input]);
-  filePath = path.join(srcPath, `outputModels.ts`);
+  filePath = joinPaths(srcPath, `outputModels.ts`);
   const outputModelFile = generateModelFiles(model, project, filePath, [
     SchemaContext.Output,
     SchemaContext.Exception,
