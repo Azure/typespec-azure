@@ -1,61 +1,55 @@
-import { NoTarget, Program, resolvePath } from "@typespec/compiler";
+import { CompilerHost, NoTarget, Program, resolvePath } from "@typespec/compiler";
 import { reportDiagnostic } from "../lib.js";
-import { mkdir, readdir, rm, stat } from "./node-host.js";
 
-export async function pathExists(targetPath: string): Promise<boolean> {
+export async function pathExists(host: CompilerHost, targetPath: string): Promise<boolean> {
   try {
-    await stat(targetPath);
+    await host.stat(targetPath);
     return true;
   } catch {
     return false;
   }
 }
 
-export async function emptyDir(dirPath: string): Promise<void> {
+export async function emptyDir(host: CompilerHost, dirPath: string): Promise<void> {
   let entries: string[];
   try {
-    entries = await readdir(dirPath);
+    entries = await host.readDir(dirPath);
   } catch {
-    await mkdir(dirPath, { recursive: true });
+    await host.mkdirp(dirPath);
     return;
   }
 
   await Promise.all(
-    entries.map((entry) => rm(resolvePath(dirPath, entry), { recursive: true, force: true })),
+    entries.map((entry) => host.rm(resolvePath(dirPath, entry), { recursive: true })),
   );
 }
 
 export async function clearDirectory(
+  host: CompilerHost,
   dirPath: string,
   excludeNames: string[] = [],
   program?: Program,
 ): Promise<void> {
-  if (!(await pathExists(dirPath))) {
+  if (!(await pathExists(host, dirPath))) {
     return;
   }
 
-  // If no exclude names, just use regular emptyDir for efficiency
   if (excludeNames.length === 0) {
-    await emptyDir(dirPath);
+    await emptyDir(host, dirPath);
     return;
   }
 
   try {
-    // Get all subdirectories and files
-    const entries = await readdir(dirPath);
-
-    // Filter entries to exclude those that should be preserved
+    const entries = await host.readDir(dirPath);
     const filteredEntries = entries.filter((entry) => {
       return !excludeNames.includes(entry);
     });
 
-    // Process each entry
     for (const entry of filteredEntries) {
       const entryPath = resolvePath(dirPath, entry);
-      await rm(entryPath, { recursive: true, force: true });
+      await host.rm(entryPath, { recursive: true });
     }
   } catch (error) {
-    // If there's an error, fall back to regular emptyDir
     if (program) {
       reportDiagnostic(program, {
         code: "directory-traversal-error",
@@ -63,6 +57,6 @@ export async function clearDirectory(
         target: NoTarget,
       });
     }
-    await emptyDir(dirPath);
+    await emptyDir(host, dirPath);
   }
 }

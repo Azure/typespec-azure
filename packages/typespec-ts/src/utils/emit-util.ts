@@ -34,7 +34,7 @@ export async function emitContentByBuilder(
   }
   const isAzureFlavor = isAzurePackage(rlcModels);
   for (const builderFn of builderFnOrList) {
-    let contentFiles: File[] | File | undefined = builderFn(rlcModels);
+    let contentFiles: File[] | File | undefined = await builderFn(rlcModels);
     if (!contentFiles) {
       continue;
     }

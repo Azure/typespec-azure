@@ -1,4 +1,8 @@
-import { dirname, relative, resolve } from "path";
+import {
+  getDirectoryPath,
+  getRelativePathFromDirectory,
+  resolvePath,
+} from "@typespec/compiler";
 import { SourceFile } from "ts-morph";
 import { useContext } from "../context-manager.js";
 
@@ -20,7 +24,7 @@ export function addImportBySymbol(symbol: string, currentFile: SourceFile) {
   }
 
   // Resolve absolute path and compute a relative path from the current file to the module.
-  const moduleAbsolutePath = resolve(modulePath);
+  const moduleAbsolutePath = resolvePath(modulePath);
   const relativeImportPath = getRelativeImportPath(currentFile.getFilePath(), moduleAbsolutePath)
     .replace(/\\/g, "/")
     .replace(/\.ts$/, ".js");
@@ -53,7 +57,7 @@ export function addImportBySymbol(symbol: string, currentFile: SourceFile) {
  * @returns {string} The relative path adjusted for import syntax.
  */
 function getRelativeImportPath(from: string, to: string) {
-  const relativePath = relative(dirname(from), to);
+  const relativePath = getRelativePathFromDirectory(getDirectoryPath(from), to, false);
   // Adjust the path format to TypeScript module syntax
   return relativePath.startsWith(".") ? relativePath : "./" + relativePath;
 }

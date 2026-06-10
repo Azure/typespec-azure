@@ -419,7 +419,7 @@ export type ResponseHeaderSchema = Schema;
 export type ResponseBodySchema = Schema;
 
 export type ContentBuilder = {
-  (model: RLCModel): File | File[] | undefined;
+  (model: RLCModel): File | File[] | undefined | Promise<File | File[] | undefined>;
 };
 
 export type SampleParameterPosition = "client" | "path" | "method";

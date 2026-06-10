@@ -1,5 +1,4 @@
-import { existsSync, rmSync } from "fs";
-import { join } from "path";
+import { joinPaths } from "@typespec/compiler";
 import { SourceFile } from "ts-morph";
 import { resolveReference } from "../framework/reference.js";
 import { NameType, normalizeName } from "../rlc-common/index.js";
@@ -24,21 +23,31 @@ import { CreateRecorderHelpers } from "./static-helpers-metadata.js";
  */
 async function cleanupTestFolder(dpgContext: SdkContext) {
   const clients = dpgContext.sdkPackage.clients;
-  const baseTestFolder = join(dpgContext.generationPathDetail?.rootDir ?? "", "test", "generated");
+  const host = dpgContext.program.host;
+  const baseTestFolder = joinPaths(
+    dpgContext.generationPathDetail?.rootDir ?? "",
+    "test",
+    "generated",
+  );
 
   // If there are multiple clients, clean up subfolders
   if (clients.length > 1) {
     for (const client of clients) {
       const subFolder = normalizeName(getClassicalClientName(client), NameType.File);
-      const clientTestFolder = join(baseTestFolder, subFolder);
-      if (existsSync(clientTestFolder)) {
-        rmSync(clientTestFolder, { recursive: true, force: true });
+      const clientTestFolder = joinPaths(baseTestFolder, subFolder);
+      try {
+        await host.stat(clientTestFolder);
+        await host.rm(clientTestFolder, { recursive: true });
+      } catch {
+        // ignore missing folders
       }
     }
   } else {
-    // Single client, clean up the entire test/generated folder
-    if (existsSync(baseTestFolder)) {
-      rmSync(baseTestFolder, { recursive: true, force: true });
+    try {
+      await host.stat(baseTestFolder);
+      await host.rm(baseTestFolder, { recursive: true });
+    } catch {
+      // ignore missing folders
     }
   }
 }

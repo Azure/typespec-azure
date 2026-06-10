@@ -1,4 +1,4 @@
-import { getDirectoryPath } from "@typespec/compiler";
+import { getDirectoryPath, NodeHost } from "@typespec/compiler";
 import path from "path";
 import { fileURLToPath } from "url";
 import { Project } from "ts-morph";
@@ -26,6 +26,7 @@ describe("loadStaticHelpers", () => {
     } as const;
     const helperDeclarations = await loadStaticHelpers(project, helpers, {
       helpersAssetDirectory,
+      host: NodeHost,
     });
     expect(
       project
@@ -50,6 +51,7 @@ describe("loadStaticHelpers", () => {
     await expect(
       loadStaticHelpers(project, helpers, {
         helpersAssetDirectory,
+        host: NodeHost,
       }),
     ).rejects.toThrowError(/not found/);
   });
@@ -66,6 +68,7 @@ describe("loadStaticHelpers", () => {
     await expect(
       loadStaticHelpers(project, helpers, {
         helpersAssetDirectory,
+        host: NodeHost,
       }),
     ).rejects.toThrowError(/invalid helper kind/);
   });
@@ -81,6 +84,7 @@ describe("loadStaticHelpers", () => {
 
     await loadStaticHelpers(project, helpers, {
       helpersAssetDirectory,
+      host: NodeHost,
       options: {
         flavor: "azure",
         azureSdkForJs: true,

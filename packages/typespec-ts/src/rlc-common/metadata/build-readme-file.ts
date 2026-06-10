@@ -1,10 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+import { CompilerHost } from "@typespec/compiler";
 import { RLCModel } from "../interfaces.js";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore: to fix the handlebars issue
-import { readFileSync } from "fs";
 import hbs from "handlebars";
 import { getClientName } from "../helpers/name-constructors.js";
 import { NameType, normalizeName } from "../helpers/name-utils.js";
@@ -363,9 +361,13 @@ export function buildReadmeFile(model: RLCModel) {
   };
 }
 
-export function hasClientNameChanged(model: RLCModel, existingReadmeFilePath: string): boolean {
+export async function hasClientNameChanged(
+  host: CompilerHost,
+  model: RLCModel,
+  existingReadmeFilePath: string,
+): Promise<boolean> {
   try {
-    const existingContent = readFileSync(existingReadmeFilePath, "utf8");
+    const existingContent = (await host.readFile(existingReadmeFilePath)).text;
     const importMatch = existingContent.match(
       /import\s*\{\s*([A-Za-z0-9_]+)\s*\}\s*from\s*["'][^"']*["']/,
     );
@@ -377,12 +379,13 @@ export function hasClientNameChanged(model: RLCModel, existingReadmeFilePath: st
   }
 }
 
-export function updateReadmeFile(
+export async function updateReadmeFile(
+  host: CompilerHost,
   model: RLCModel,
   existingReadmeFilePath: string,
-): { path: string; content: string } | undefined {
+): Promise<{ path: string; content: string } | undefined> {
   try {
-    const existingContent = readFileSync(existingReadmeFilePath, "utf8");
+    const existingContent = (await host.readFile(existingReadmeFilePath)).text;
     const metadata = createMetadata(model) ?? {};
 
     const newApiRefLink = hbs.compile(apiReferenceTemplate, { noEscape: true })(metadata).trim();

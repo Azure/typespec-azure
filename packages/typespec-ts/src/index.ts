@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { EmitContext, Program } from "@typespec/compiler";
+import { EmitContext, Program, getBaseFileName, joinPaths } from "@typespec/compiler";
 import { provideContext, useContext } from "./context-manager.js";
 import { buildRootIndex, buildSubClientIndexFile } from "./modular/build-root-index.js";
 import {
@@ -79,8 +79,6 @@ import {
   createSdkContext,
   listAllServiceNamespaces,
 } from "@azure-tools/typespec-client-generator-core";
-import { existsSync } from "fs";
-import { basename, join } from "path";
 import { Project } from "ts-morph";
 import { provideBinder } from "./framework/hooks/binder.js";
 import { provideSdkTypes } from "./framework/hooks/sdk-types.js";
@@ -120,6 +118,7 @@ export async function $onEmit(context: EmitContext) {
   /** Shared status */
   const outputProject = new Project();
   const program: Program = context.program;
+  const host = program.host;
   const emitterOptions: EmitterOptions = context.options;
   const dpgContext = await createContextWithDefaultOptions(context);
 
@@ -217,10 +216,11 @@ export async function $onEmit(context: EmitContext) {
     // clear output folder if needed
     if (options.clearOutputFolder) {
       // Clear output directory while preserving TempTypeSpecFiles
-      await clearDirectory(context.emitterOutputDir, ["TempTypeSpecFiles"], program);
+      await clearDirectory(host, context.emitterOutputDir, ["TempTypeSpecFiles"], program);
     }
     const hasTestFolder = await pathExists(
-      join(dpgContext.generationPathDetail?.metadataDir ?? "", "test"),
+      host,
+      joinPaths(dpgContext.generationPathDetail?.metadataDir ?? "", "test"),
     );
     options.generateTest =
       options.generateTest === true ||
@@ -232,15 +232,15 @@ export async function $onEmit(context: EmitContext) {
 
   async function calculateGenerationDir(): Promise<GenerationDirDetail> {
     const projectRoot = context.emitterOutputDir ?? "";
-    const customizationFolder = join(projectRoot, "generated");
-    const srcGeneratedFolder = join(projectRoot, "src", "generated");
+    const customizationFolder = joinPaths(projectRoot, "generated");
+    const srcGeneratedFolder = joinPaths(projectRoot, "src", "generated");
     // if customization folder exists, use it as sources root
-    const finalCustomizationFolder = (await pathExists(srcGeneratedFolder))
+    const finalCustomizationFolder = (await pathExists(host, srcGeneratedFolder))
       ? srcGeneratedFolder
       : customizationFolder;
-    const sourcesRoot = (await pathExists(finalCustomizationFolder))
+    const sourcesRoot = (await pathExists(host, finalCustomizationFolder))
       ? finalCustomizationFolder
-      : join(projectRoot, "src");
+      : joinPaths(projectRoot, "src");
     return {
       rootDir: projectRoot,
       metadataDir: projectRoot,
@@ -251,6 +251,7 @@ export async function $onEmit(context: EmitContext) {
 
   async function clearSrcFolder() {
     await emptyDir(
+      host,
       dpgContext.generationPathDetail?.modularSourcesDir ??
         dpgContext.generationPathDetail?.rlcSourcesDir ??
         "",
@@ -259,9 +260,12 @@ export async function $onEmit(context: EmitContext) {
 
   async function clearSamplesDevFolder() {
     if (emitterOptions["generate-sample"] === true) {
-      const samplesDevPath = join(dpgContext.generationPathDetail?.rootDir ?? "", "samples-dev");
-      if (await pathExists(samplesDevPath)) {
-        await emptyDir(samplesDevPath);
+      const samplesDevPath = joinPaths(
+        dpgContext.generationPathDetail?.rootDir ?? "",
+        "samples-dev",
+      );
+      if (await pathExists(host, samplesDevPath)) {
+        await emptyDir(host, samplesDevPath);
       }
     }
   }
@@ -316,7 +320,7 @@ export async function $onEmit(context: EmitContext) {
       // platform-types (and its browser/react-native variants); emit those
       // files directly under src/ (strip the static-helpers/ segment) to match
       // the RLC design where all generated output lives in src/.
-      if (!basename(filePath).startsWith("platform-types")) {
+      if (!getBaseFileName(filePath).startsWith("platform-types")) {
         continue;
       }
       const outputPath = filePath.replace(/\/static-helpers\//g, "/");
@@ -450,27 +454,30 @@ export async function $onEmit(context: EmitContext) {
     // to avoid unexpected modifications to files like package.json, README.md,
     // warp.config.yml, and snippets.spec.ts. metadata.json is still updated.
     const sourcesDir = dpgContext.generationPathDetail?.modularSourcesDir ?? "";
-    const hasManualConvenienceLayer = basename(sourcesDir) === "generated";
+    const hasManualConvenienceLayer = getBaseFileName(sourcesDir) === "generated";
     const isAzureFlavor = isAzurePackage({ options: option });
     // Generate metadata
-    const existingPackageFilePath = join(
+    const existingPackageFilePath = joinPaths(
       dpgContext.generationPathDetail?.metadataDir ?? "",
       "package.json",
     );
-    const hasPackageFile = await existsSync(existingPackageFilePath);
-    const existingReadmeFilePath = join(
+    const hasPackageFile = await pathExists(host, existingPackageFilePath);
+    const existingReadmeFilePath = joinPaths(
       dpgContext.generationPathDetail?.metadataDir ?? "",
       "README.md",
     );
-    const hasReadmeFile = await existsSync(existingReadmeFilePath);
-    const existingChangelogFilePath = join(
+    const hasReadmeFile = await pathExists(host, existingReadmeFilePath);
+    const existingChangelogFilePath = joinPaths(
       dpgContext.generationPathDetail?.metadataDir ?? "",
       "CHANGELOG.md",
     );
-    const hasChangelogFile = await existsSync(existingChangelogFilePath);
+    const hasChangelogFile = await pathExists(host, existingChangelogFilePath);
     const shouldGenerateMetadata = option.generateMetadata === true || !hasPackageFile;
-    const existingTestFolderPath = join(dpgContext.generationPathDetail?.metadataDir ?? "", "test");
-    const hasTestFolder = await existsSync(existingTestFolderPath);
+    const existingTestFolderPath = joinPaths(
+      dpgContext.generationPathDetail?.metadataDir ?? "",
+      "test",
+    );
+    const hasTestFolder = await pathExists(host, existingTestFolderPath);
     if (option.generateTest === undefined) {
       if (hasTestFolder) {
         option.generateTest = false;
@@ -625,11 +632,11 @@ export async function $onEmit(context: EmitContext) {
       // If the client name changed, regenerate the README and snippets completely;
       // otherwise update only the API reference link in-place.
       if (hasReadmeFile) {
-        const clientNameChanged = hasClientNameChanged(rlcClient, existingReadmeFilePath);
+        const clientNameChanged = await hasClientNameChanged(host, rlcClient, existingReadmeFilePath);
         updateBuilders.push(
           clientNameChanged
             ? buildReadmeFile
-            : (model: RLCModel) => updateReadmeFile(model, existingReadmeFilePath),
+            : (model: RLCModel) => updateReadmeFile(host, model, existingReadmeFilePath),
         );
 
         // Regenerate snippets.spec.ts only when the client name changed

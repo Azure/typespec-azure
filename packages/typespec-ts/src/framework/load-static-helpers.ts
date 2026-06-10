@@ -1,6 +1,4 @@
-import { NoTarget, Program } from "@typespec/compiler";
-import { readdir, readFile, stat } from "fs/promises";
-import * as path from "path";
+import { CompilerHost, NoTarget, Program, joinPaths } from "@typespec/compiler";
 import {
   ClassDeclaration,
   EnumDeclaration,
@@ -39,6 +37,7 @@ export interface LoadStaticHelpersOptions extends Partial<ModularEmitterOptions>
   sourcesDir?: string;
   rootDir?: string;
   program?: Program;
+  host?: CompilerHost;
   /** When true, also load test helpers from static/test-helpers/ into test/generated/util/ */
   loadTestHelpers?: boolean;
 }
@@ -53,13 +52,20 @@ export async function loadStaticHelpers(
   helpers: StaticHelpers,
   options: LoadStaticHelpersOptions = {},
 ): Promise<Map<string, StaticHelperMetadata>> {
+  const resolvedHost = options.host ?? options.program?.host;
+  if (!resolvedHost) {
+    throw new Error("loadStaticHelpers requires a host or Program.");
+  }
+  const host: CompilerHost = resolvedHost;
   const helpersMap = new Map<string, StaticHelperMetadata>();
+  const projectRoot = await resolveProjectRoot(host);
   // Load static helpers used in sources code
-  const defaultStaticHelpersPath = path.join(
-    resolveProjectRoot(),
+  const defaultStaticHelpersPath = joinPaths(
+    projectRoot,
     DEFAULT_SOURCES_STATIC_HELPERS_PATH,
   );
   const filesInSources = await traverseDirectory(
+    host,
     options.helpersAssetDirectory ?? defaultStaticHelpersPath,
     options.program,
   );
@@ -69,11 +75,12 @@ export async function loadStaticHelpers(
     options.loadTestHelpers ??
     (options.options?.generateTest && isAzurePackage({ options: options.options }))
   ) {
-    const defaultTestingHelpersPath = path.join(
-      resolveProjectRoot(),
+    const defaultTestingHelpersPath = joinPaths(
+      projectRoot,
       DEFAULT_SOURCES_TESTING_HELPERS_PATH,
     );
     const filesInTestings = await traverseDirectory(
+      host,
       defaultTestingHelpersPath,
       options.program,
       [],
@@ -86,8 +93,8 @@ export async function loadStaticHelpers(
 
   async function loadFiles(files: FileMetadata[], generateDir: string) {
     for (const file of files) {
-      const targetPath = path.join(generateDir, file.target);
-      const contents = await readFile(file.source, "utf-8");
+      const targetPath = joinPaths(generateDir, file.target);
+      const contents = (await host.readFile(file.source)).text;
       const addedFile = project.createSourceFile(targetPath, contents, {
         overwrite: true,
       });
@@ -189,6 +196,7 @@ function getDeclarationByMetadata(
 
 const _targetStaticHelpersBaseDir = "static-helpers";
 async function traverseDirectory(
+  host: CompilerHost,
   directory: string,
   program?: Program,
   result: { source: string; target: string }[] = [],
@@ -196,23 +204,24 @@ async function traverseDirectory(
   targetBaseDir: string = _targetStaticHelpersBaseDir,
 ): Promise<{ source: string; target: string }[]> {
   try {
-    const files = await readdir(directory);
+    const files = await host.readDir(directory);
 
     await Promise.all(
       files.map(async (file) => {
-        const filePath = path.join(directory, file);
-        const fileStat = await stat(filePath);
+        const filePath = joinPaths(directory, file);
+        const fileStat = await host.stat(filePath);
 
         if (fileStat.isDirectory()) {
           await traverseDirectory(
+            host,
             filePath,
             program,
             result,
-            path.join(relativePath, file),
+            joinPaths(relativePath, file),
             targetBaseDir,
           );
         } else if (fileStat.isFile() && !file.endsWith(".d.ts") && /.*\..?ts$/.test(file)) {
-          const target = path.join(targetBaseDir, relativePath, file);
+          const target = joinPaths(targetBaseDir, relativePath, file);
           result.push({ source: filePath, target });
         }
       }),
