@@ -2,11 +2,11 @@
 // Licensed under the MIT License.
 
 import { CompilerHost } from "@typespec/compiler";
-import { RLCModel } from "../interfaces.js";
 import hbs from "handlebars";
 import { getClientName } from "../helpers/name-constructors.js";
 import { NameType, normalizeName } from "../helpers/name-utils.js";
 import { isAzurePackage } from "../helpers/package-util.js";
+import { RLCModel } from "../interfaces.js";
 
 const azureReadmeRLCTemplate = `# {{ clientDescriptiveName }} library for JavaScript
 

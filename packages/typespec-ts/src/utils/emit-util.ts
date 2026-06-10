@@ -1,4 +1,4 @@
-import { CompilerHost, NoTarget, Program, getDirectoryPath, joinPaths } from "@typespec/compiler";
+import { CompilerHost, getDirectoryPath, joinPaths, NoTarget, Program } from "@typespec/compiler";
 import { format } from "prettier";
 import { prettierJSONOptions, prettierTypeScriptOptions, reportDiagnostic } from "../lib.js";
 import {

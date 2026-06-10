@@ -632,7 +632,11 @@ export async function $onEmit(context: EmitContext) {
       // If the client name changed, regenerate the README and snippets completely;
       // otherwise update only the API reference link in-place.
       if (hasReadmeFile) {
-        const clientNameChanged = await hasClientNameChanged(host, rlcClient, existingReadmeFilePath);
+        const clientNameChanged = await hasClientNameChanged(
+          host,
+          rlcClient,
+          existingReadmeFilePath,
+        );
         updateBuilders.push(
           clientNameChanged
             ? buildReadmeFile

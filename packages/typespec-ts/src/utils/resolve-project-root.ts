@@ -5,10 +5,7 @@ import { CompilerHost, getDirectoryPath, resolvePath } from "@typespec/compiler"
  * @param {string} currentDir - The directory to start searching from. Defaults to the directory of the current module.
  * @returns {string} path to the directory containing the package.json file.
  */
-export async function resolveProjectRoot(
-  host: CompilerHost,
-  currentDir?: string,
-): Promise<string> {
+export async function resolveProjectRoot(host: CompilerHost, currentDir?: string): Promise<string> {
   if (!currentDir) {
     currentDir = getDirectoryPath(host.fileURLToPath(import.meta.url));
   }

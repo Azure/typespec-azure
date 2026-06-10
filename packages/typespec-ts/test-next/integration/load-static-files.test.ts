@@ -1,7 +1,7 @@
 import { getDirectoryPath, NodeHost } from "@typespec/compiler";
 import path from "path";
-import { fileURLToPath } from "url";
 import { Project } from "ts-morph";
+import { fileURLToPath } from "url";
 import { assert, beforeEach, describe, expect, it } from "vitest";
 import { loadStaticHelpers } from "../../src/framework/load-static-helpers.js";
 import { refkey } from "../../src/framework/refkey.js";

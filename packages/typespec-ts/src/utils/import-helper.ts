@@ -1,8 +1,4 @@
-import {
-  getDirectoryPath,
-  getRelativePathFromDirectory,
-  resolvePath,
-} from "@typespec/compiler";
+import { getDirectoryPath, getRelativePathFromDirectory, resolvePath } from "@typespec/compiler";
 import { SourceFile } from "ts-morph";
 import { useContext } from "../context-manager.js";
 

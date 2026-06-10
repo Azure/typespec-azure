@@ -3,7 +3,7 @@ import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
 import { listAllServiceNamespaces } from "@azure-tools/typespec-client-generator-core";
 import { SdkTestLibrary } from "@azure-tools/typespec-client-generator-core/testing";
-import { EmitContext, Program, getDirectoryPath } from "@typespec/compiler";
+import { EmitContext, getDirectoryPath, Program } from "@typespec/compiler";
 import { createTestHost, TestHost } from "@typespec/compiler/testing";
 import { HttpTestLibrary } from "@typespec/http/testing";
 import { OpenAPITestLibrary } from "@typespec/openapi/testing";

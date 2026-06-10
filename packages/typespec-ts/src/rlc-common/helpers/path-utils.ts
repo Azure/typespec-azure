@@ -1,4 +1,3 @@
-
 export function getRelativePartFromSrcPath(srcPath: string, isModularLibrary: boolean = false) {
   const sep = "/";
   let relativePart = srcPath.substring(srcPath.indexOf(sep + "src") + 4);
