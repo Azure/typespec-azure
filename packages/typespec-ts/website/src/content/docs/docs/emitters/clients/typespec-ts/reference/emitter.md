@@ -1,12 +1,6 @@
-# @azure-tools/typespec-ts
-
-An experimental TypeSpec emitter for TypeScript RLC
-
-## Install
-
-```bash
-npm install @azure-tools/typespec-ts
-```
+---
+title: "Emitter usage"
+---
 
 ## Emitter usage
 
