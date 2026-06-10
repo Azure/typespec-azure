@@ -10,6 +10,7 @@ export const serializeRecord = withNullChecks(
           acc[key] = serializer(value);
         }
       } else {
+        // eslint-disable-next-line no-console
         console.warn(`Don't know how to serialize ${item[key]}`);
         acc[key] = item[key] as any;
       }
