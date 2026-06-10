@@ -57,7 +57,7 @@
     "unit-test": "npm-run-all --parallel unit-test:rlc unit-test:modular",
     "unit-test:rlc": "vitest run --project unit-rlc",
     "unit-test:modular": "cross-env NODE_OPTIONS=--max-old-space-size=8192 vitest run --project unit-modular",
-    "regen-docs": "npm run build && tspd doc . --enable-experimental --output-dir ./website/src/content/docs/docs/emitters/clients/typespec-ts/reference --skip-js"
+    "regen-docs": "npm run build && tspd doc . --enable-experimental --output-dir ../../website/src/content/docs/docs/emitters/clients/typespec-ts/reference --skip-js"
   },
   "author": "Jose Heredia <joheredi@microsoft.com>",
   "license": "MIT",
