@@ -1,5 +1,5 @@
-import { existsSync, rmSync } from "fs";
 import { joinPaths } from "@typespec/compiler";
+import { existsSync, rmSync } from "fs";
 import { SourceFile } from "ts-morph";
 import { resolveReference } from "../framework/reference.js";
 import { NameType, normalizeName } from "../rlc-common/index.js";

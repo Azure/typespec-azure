@@ -1,4 +1,4 @@
-import { NoTarget, Program, joinPaths } from "@typespec/compiler";
+import { joinPaths, NoTarget, Program } from "@typespec/compiler";
 import { readdir, readFile, stat } from "fs/promises";
 import {
   ClassDeclaration,
