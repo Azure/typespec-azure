@@ -12,7 +12,7 @@ export function buildRollupConfig(model: RLCModel) {
     return;
   }
 
-  const project = new Project();
+  const project = new Project({ useInMemoryFileSystem: true });
   const filePath = "rollup.config.js";
   const rollupFile = project.createSourceFile(filePath, undefined, {
     overwrite: true,

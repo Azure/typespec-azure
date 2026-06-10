@@ -66,7 +66,7 @@ export function buildPackageFile(
     packageInfo = buildAzureStandalonePackage(extendedConfig);
   }
 
-  const project = new Project();
+  const project = new Project({ useInMemoryFileSystem: true });
   const filePath = "package.json";
 
   if (!packageInfo) {

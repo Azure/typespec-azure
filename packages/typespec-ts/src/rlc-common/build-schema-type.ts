@@ -17,7 +17,7 @@ import { RLCModel, SchemaContext } from "./interfaces.js";
  */
 export function buildSchemaTypes(model: RLCModel) {
   const { srcPath } = model;
-  const project = new Project();
+  const project = new Project({ useInMemoryFileSystem: true });
   let filePath = joinPaths(srcPath, `models.ts`);
   const inputModelFile = generateModelFiles(model, project, filePath, [SchemaContext.Input]);
   filePath = joinPaths(srcPath, `outputModels.ts`);

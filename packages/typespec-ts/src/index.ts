@@ -116,7 +116,7 @@ export async function $onEmit(context: EmitContext) {
     return;
   }
   /** Shared status */
-  const outputProject = new Project();
+  const outputProject = new Project({ useInMemoryFileSystem: true });
   const program: Program = context.program;
   const host = program.host;
   const emitterOptions: EmitterOptions = context.options;
@@ -619,9 +619,20 @@ export async function $onEmit(context: EmitContext) {
       // Always update package.json for monorepo packages (adds #platform/* imports)
       // and for modular packages (adds exports, clientContextPaths, LRO deps)
       if (option.isModularLibrary || option.azureSdkForJs) {
-        updateBuilders.push((model: RLCModel) =>
-          updatePackageFile(model, existingPackageFilePath, modularPackageInfo),
-        );
+        let existingPackageContent: Record<string, any> | undefined;
+        if (hasPackageFile) {
+          try {
+            const fileContent = (await host.readFile(existingPackageFilePath)).text;
+            existingPackageContent = JSON.parse(fileContent);
+          } catch {
+            // If reading fails, skip the update
+          }
+        }
+        if (existingPackageContent) {
+          updateBuilders.push((model: RLCModel) =>
+            updatePackageFile(model, existingPackageContent, modularPackageInfo),
+          );
+        }
       }
 
       // Update warp.config.yml for Azure monorepo packages
