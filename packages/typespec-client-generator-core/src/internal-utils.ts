@@ -999,7 +999,7 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
 
   const multiService = servicesNs.size > 1;
 
-  // Explicit all API version setting for a single service, thus no versioning mutation needed
+  // Explicit `all` api version setting applies to every service, thus no versioning mutation needed
   if (context.apiVersion === "all") return globalNamespace;
 
   // Compose service mutators
@@ -1012,6 +1012,9 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
 
     // Resolve the api version that applies to this specific service
     const apiVersion = resolveApiVersionForNamespace(context, serviceNs, multiService);
+
+    // Explicit `all` api version for this service, thus no versioning mutation needed for it
+    if (apiVersion === "all") continue;
 
     // Filter versions based on the resolved `apiVersion` config
     removeVersionsLargerThanExplicitlySpecified(context, versions, apiVersion);

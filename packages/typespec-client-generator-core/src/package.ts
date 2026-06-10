@@ -24,6 +24,7 @@ import {
   filterApiVersionsWithDecorators,
   getActualClientType,
   getTypeDecorators,
+  resolveApiVersionForNamespace,
 } from "./internal-utils.js";
 import { getLicenseInfo } from "./license.js";
 import { getCrossLanguagePackageId, getNamespaceFromType } from "./public-utils.js";
@@ -41,14 +42,14 @@ export async function createSdkPackage<TServiceOperation extends SdkServiceOpera
 
   // Create apiVersions map for multiple services
   const apiVersionsMap = new Map<string, string>();
+  const multiService = versions.size > 1;
   for (const [namespace, versionList] of versions.entries()) {
     const fullName = getNamespaceFullName(namespace);
     const latestVersion = versionList.at(-1);
     if (latestVersion) {
-      // When apiVersion config is "all" for single service, store "all" in the map as well
-      const versionValue =
-        context.apiVersion === "all" && versions.size === 1 ? "all" : latestVersion;
-      apiVersionsMap.set(fullName, versionValue);
+      // When the resolved api version for the service is "all", store "all" in the map as well
+      const resolvedApiVersion = resolveApiVersionForNamespace(context, namespace, multiService);
+      apiVersionsMap.set(fullName, resolvedApiVersion === "all" ? "all" : latestVersion);
     }
   }
 
@@ -64,12 +65,7 @@ export async function createSdkPackage<TServiceOperation extends SdkServiceOpera
     namespaces: [],
     licenseInfo: getLicenseInfo(context),
     metadata: {
-      apiVersion:
-        context.apiVersion === "all" && versions.size === 1
-          ? "all"
-          : versions.size === 1
-            ? [...versions.values()][0].at(-1)
-            : undefined,
+      apiVersion: versions.size === 1 ? [...apiVersionsMap.values()][0] : undefined,
       apiVersions: apiVersionsMap,
     },
   };
