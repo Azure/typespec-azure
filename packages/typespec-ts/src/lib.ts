@@ -145,18 +145,8 @@ export const RLCOptionsSchema: JSONSchemaType<EmitterOptions> = {
     "add-credentials": {
       type: "boolean",
       nullable: true,
-      description: [
-        "We support two types of authentication: Azure Key Credential(AzureKey) and Token credential(AADToken), any other will need to be handled manually.",
-        "",
-        "There are two ways to set up our credential details",
-        "",
-        "- To use `@useAuth` decorator in TypeSpec",
-        "- To config in yaml file",
-        "",
-        "Please notice defining in TypeSpec is recommended and also has higher priority than second one.",
-        "",
-        "To enable credential in `tspconfig.yaml` and we need to provide more details to let codegen know types.",
-      ],
+      description:
+        "We support two types of authentication: Azure Key Credential(AzureKey) and Token credential(AADToken), any other will need to be handled manually.\n\nThere are two ways to set up our credential details\n\n- To use `@useAuth` decorator in TypeSpec\n- To config in yaml file\n\nPlease notice defining in TypeSpec is recommended and also has higher priority than second one.\n\nTo enable credential in `tspconfig.yaml` and we need to provide more details to let codegen know types.",
     },
     "credential-scopes": {
       type: "array",
@@ -192,13 +182,8 @@ export const RLCOptionsSchema: JSONSchemaType<EmitterOptions> = {
     "generate-test": {
       type: "boolean",
       nullable: true,
-      description: [
-        "Whether to generate test files, for basic testing of your generated sdks. Defaults to `undefined`.",
-        "other cases:",
-        "- If azure-sdk-for-js is `false`. Defaults to `false`.",
-        "- If azure-sdk-for-js is `true` but there's a test folder under package-dir. Defaults to `false`.",
-        "- If azure-sdk-for-js is `true` but there's not a test folder under package-dir. Defaults to `true`.",
-      ],
+      description:
+        "Whether to generate test files, for basic testing of your generated sdks. Defaults to `undefined`.\nother cases:\n- If azure-sdk-for-js is `false`. Defaults to `false`.\n- If azure-sdk-for-js is `true` but there's a test folder under package-dir. Defaults to `false`.\n- If azure-sdk-for-js is `true` but there's not a test folder under package-dir. Defaults to `true`.",
     },
     "generate-sample": {
       type: "boolean",
@@ -358,16 +343,8 @@ export const RLCOptionsSchema: JSONSchemaType<EmitterOptions> = {
       },
       required: [],
       nullable: true,
-      description: [
-        "Only for Modular generation",
-        "By default, code generation uses the titles specified in the `@client` and `@service` decorators in TypeSpec to name modular clients. If you need to override these names, you can configure the `typespec-title-map`. The map's keys represent the original client names from TypeSpec, and the values are the desired client names. This configuration supports renaming multiple clients.",
-        "",
-        "```yaml",
-        "typespec-title-map:",
-        "  AnomalyDetectorClient: AnomalyDetectorRest",
-        "  AnomalyDetectorClient2: AnomalyDetectorRest2",
-        "```",
-      ],
+      description:
+        "Only for Modular generation\nBy default, code generation uses the titles specified in the `@client` and `@service` decorators in TypeSpec to name modular clients. If you need to override these names, you can configure the `typespec-title-map`. The map's keys represent the original client names from TypeSpec, and the values are the desired client names. This configuration supports renaming multiple clients.\n\n```yaml\ntypespec-title-map:\n  AnomalyDetectorClient: AnomalyDetectorRest\n  AnomalyDetectorClient2: AnomalyDetectorRest2\n```",
     },
     "should-use-pnpm-dep": {
       type: "boolean",
