@@ -99,6 +99,6 @@ export default {
     "@azure-tools/typespec-client-generator-core/require-client-suffix": true,
     "@azure-tools/typespec-client-generator-core/property-name-conflict": true,
     "@azure-tools/typespec-client-generator-core/no-unnamed-types": false, // Too bad performance https://github.com/Azure/typespec-azure/issues/2803
-    "@azure-tools/typespec-client-generator-core/no-url-suffix": true,
+    "@azure-tools/typespec-client-generator-core/csharp-no-url-suffix": true,
   },
 } satisfies LinterRuleSet;

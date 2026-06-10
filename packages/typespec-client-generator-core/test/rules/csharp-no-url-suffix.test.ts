@@ -4,7 +4,7 @@ import {
   TesterInstance,
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
-import { noUrlSuffixRule } from "../../src/rules/no-url-suffix.js";
+import { csharpNoUrlSuffixRule } from "../../src/rules/csharp-no-url-suffix.js";
 import { SimpleTester } from "../tester.js";
 
 const libraryName = "@azure-tools/typespec-client-generator-core";
@@ -14,14 +14,14 @@ let tester: LinterRuleTester;
 
 beforeEach(async () => {
   runner = await SimpleTester.createInstance();
-  tester = createLinterRuleTester(runner, noUrlSuffixRule, libraryName);
+  tester = createLinterRuleTester(runner, csharpNoUrlSuffixRule, libraryName);
 });
 
 // --- Invalid cases ---
 
 it("emits warning when property name ends with Url", async () => {
   await tester.expect(`model Foo { imageUrl: string; }`).toEmitDiagnostics({
-    code: "@azure-tools/typespec-client-generator-core/no-url-suffix",
+    code: "@azure-tools/typespec-client-generator-core/csharp-no-url-suffix",
     message:
       "Property 'imageUrl' ends with 'Url'. Use 'Uri' suffix instead (e.g. 'imageUri'). Use @clientName(\"imageUri\", \"csharp\") to rename it for C#.",
   });
@@ -29,13 +29,13 @@ it("emits warning when property name ends with Url", async () => {
 
 it("emits warning for callbackUrl", async () => {
   await tester.expect(`model Webhook { callbackUrl: string; }`).toEmitDiagnostics({
-    code: "@azure-tools/typespec-client-generator-core/no-url-suffix",
+    code: "@azure-tools/typespec-client-generator-core/csharp-no-url-suffix",
   });
 });
 
 it("emits warning for property named exactly Url", async () => {
   await tester.expect(`model Link { Url: string; }`).toEmitDiagnostics({
-    code: "@azure-tools/typespec-client-generator-core/no-url-suffix",
+    code: "@azure-tools/typespec-client-generator-core/csharp-no-url-suffix",
   });
 });
 
@@ -43,7 +43,7 @@ it("emits warning when @clientName for another language does not resolve Url suf
   await tester
     .expect(`model Foo { @clientName("image_url", "python") imageUrl: string; }`)
     .toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/no-url-suffix",
+      code: "@azure-tools/typespec-client-generator-core/csharp-no-url-suffix",
     });
 });
 
@@ -51,7 +51,7 @@ it("emits warning when @clientName introduces Url suffix", async () => {
   await tester
     .expect(`model Foo { @clientName("imageUrl", "csharp") image: string; }`)
     .toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/no-url-suffix",
+      code: "@azure-tools/typespec-client-generator-core/csharp-no-url-suffix",
     });
 });
 
@@ -62,8 +62,8 @@ it("emits warning for spread property ending with Url", async () => {
       model Foo { ...Base; }`,
     )
     .toEmitDiagnostics([
-      { code: "@azure-tools/typespec-client-generator-core/no-url-suffix" },
-      { code: "@azure-tools/typespec-client-generator-core/no-url-suffix" },
+      { code: "@azure-tools/typespec-client-generator-core/csharp-no-url-suffix" },
+      { code: "@azure-tools/typespec-client-generator-core/csharp-no-url-suffix" },
     ]);
 });
 
@@ -74,8 +74,8 @@ it("emits warning for property introduced via is", async () => {
       model Foo is Base {}`,
     )
     .toEmitDiagnostics([
-      { code: "@azure-tools/typespec-client-generator-core/no-url-suffix" },
-      { code: "@azure-tools/typespec-client-generator-core/no-url-suffix" },
+      { code: "@azure-tools/typespec-client-generator-core/csharp-no-url-suffix" },
+      { code: "@azure-tools/typespec-client-generator-core/csharp-no-url-suffix" },
     ]);
 });
 

@@ -3,12 +3,12 @@ import { createTCGCContext } from "../context.js";
 import { getLibraryName } from "../public-utils.js";
 import { createClientTspAugmentDecoratorCodeFix } from "./codefix-helpers.js";
 
-export const noUrlSuffixRule = createRule({
-  name: "no-url-suffix",
+export const csharpNoUrlSuffixRule = createRule({
+  name: "csharp-no-url-suffix",
   description:
     "Properties ending with 'Url' should use 'Uri' suffix instead to follow .NET naming conventions.",
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/no-url-suffix",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-no-url-suffix",
   messages: {
     default: paramMessage`Property '${"propertyName"}' ends with 'Url'. Use 'Uri' suffix instead (e.g. '${"suggestion"}'). Use @clientName("${"suggestion"}", "csharp") to rename it for C#.`,
   },
