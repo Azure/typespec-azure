@@ -491,6 +491,44 @@ model MoveResponse {
 }
 ```
 
+### @returnTypeChangedFrom
+
+Use `@returnTypeChangedFrom` when an operation keeps the same name and route, but its return type changes starting from a specific version.
+
+- The `version` argument is the version where the return type changes.
+- The `oldType` argument is the return type used before that version.
+
+**Example: Change an operation return type only for a new preview version**
+
+For example, if `exportData` returns `ExportResult` in earlier versions and should return `DetailedExportResult` starting from `2025-05-04-preview`:
+
+```tsp
+enum Versions {
+  v2021_11_01: "2021-11-01",
+
+  @previewVersion
+  v2024_10_01_preview: "2024-10-01-preview",
+
+  @previewVersion
+  v2025_05_04_preview: "2025-05-04-preview",
+}
+
+model ExportResult {
+  data?: string;
+}
+
+model DetailedExportResult extends ExportResult {
+  format?: string;
+  exportedAt?: utcDateTime;
+}
+
+@armResourceOperations
+interface Employees {
+  @returnTypeChangedFrom(Versions.v2025_05_04_preview, ExportResult)
+  exportData is ArmResourceActionSync<Employee, ExportRequest, DetailedExportResult>;
+}
+```
+
 ### @renamedFrom
 
 Use `@renamedFrom` to rename models, properties, operations, enums, etc., in a specific version.
