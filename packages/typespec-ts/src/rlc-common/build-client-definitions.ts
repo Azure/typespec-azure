@@ -30,7 +30,7 @@ export function buildClientDefinitions(model: RLCModel) {
     importedResponses: new Set<string>(),
     clientImports: new Set<string>(),
   };
-  const project = new Project({ useInMemoryFileSystem: true });
+  const project = new Project();
   const srcPath = model.srcPath;
   const filePath = joinPaths(srcPath, `clientDefinitions.ts`);
   const clientDefinitionsFile = project.createSourceFile(filePath, undefined, {

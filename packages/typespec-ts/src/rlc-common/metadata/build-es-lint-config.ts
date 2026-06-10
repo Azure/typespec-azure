@@ -65,7 +65,7 @@ export function buildEsLintConfig(model: RLCModel) {
   if (model.options?.flavor !== "azure") {
     return;
   }
-  const project = new Project({ useInMemoryFileSystem: true });
+  const project = new Project();
   const filePath = "eslint.config.mjs";
 
   let template: string;

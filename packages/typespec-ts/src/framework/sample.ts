@@ -9,7 +9,7 @@ import { useBinder } from "./hooks/binder.js";
 import { resolveReference } from "./reference.js";
 
 // Create a new ts-morph project
-const project = new Project({ useInMemoryFileSystem: true });
+const project = new Project();
 
 // Create a source file
 const sourceFile = project.createSourceFile("test.ts", "", { overwrite: true });

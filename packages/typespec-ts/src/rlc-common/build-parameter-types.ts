@@ -27,7 +27,7 @@ import {
 } from "./interfaces.js";
 
 export function buildParameterTypes(model: RLCModel) {
-  const project = new Project({ useInMemoryFileSystem: true });
+  const project = new Project();
   const srcPath = model.srcPath;
   const filePath = joinPaths(srcPath, `parameters.ts`);
   const partialBodyTypeNames = new Set<string>();
