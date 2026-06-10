@@ -62,9 +62,14 @@ When set to `true`, the emitter will generate convenience methods for each servi
 
 ### `api-version`
 
-**Type:** `string`
+**Type:** `string | object`
 
-Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`.
+Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`. For multi-service specs, provide a mapping from service namespace to the desired version (e.g. `{ "Service.A": "v1", "Service.B": "v2" }`); services not listed default to their latest version.
+
+**Options:**
+
+- `string`
+- `object`
 
 ### `license`
 

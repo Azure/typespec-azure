@@ -24,10 +24,20 @@ export const UnbrandedSdkEmitterOptions = {
   },
   "api-version": {
     "api-version": {
-      type: "string",
+      type: ["string", "object"],
       nullable: true,
+      oneOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "object",
+          additionalProperties: { type: "string" },
+          required: [],
+        },
+      ],
       description:
-        "Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`.",
+        'Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`. For multi-service specs, provide a mapping from service namespace to the desired version (e.g. `{ "Service.A": "v1", "Service.B": "v2" }`); services not listed default to their latest version.',
     },
   },
   license: {

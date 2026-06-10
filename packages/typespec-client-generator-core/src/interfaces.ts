@@ -41,7 +41,7 @@ export interface TCGCContext {
   generateConvenienceMethods?: boolean;
   examplesDir?: string;
   namespaceFlag?: string;
-  apiVersion?: string;
+  apiVersion?: string | Record<string, string>;
   license?: {
     name: string;
     company?: string;
