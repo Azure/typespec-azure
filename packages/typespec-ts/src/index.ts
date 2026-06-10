@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import { EmitContext, Program, getBaseFileName, joinPaths } from "@typespec/compiler";
+import { existsSync } from "fs";
 import { provideContext, useContext } from "./context-manager.js";
 import { buildRootIndex, buildSubClientIndexFile } from "./modular/build-root-index.js";
 import {
@@ -118,7 +119,6 @@ export async function $onEmit(context: EmitContext) {
   /** Shared status */
   const outputProject = new Project();
   const program: Program = context.program;
-  const host = program.host;
   const emitterOptions: EmitterOptions = context.options;
   const dpgContext = await createContextWithDefaultOptions(context);
 
@@ -216,10 +216,9 @@ export async function $onEmit(context: EmitContext) {
     // clear output folder if needed
     if (options.clearOutputFolder) {
       // Clear output directory while preserving TempTypeSpecFiles
-      await clearDirectory(host, context.emitterOutputDir, ["TempTypeSpecFiles"], program);
+      await clearDirectory(context.emitterOutputDir, ["TempTypeSpecFiles"], program);
     }
     const hasTestFolder = await pathExists(
-      host,
       joinPaths(dpgContext.generationPathDetail?.metadataDir ?? "", "test"),
     );
     options.generateTest =
@@ -235,10 +234,10 @@ export async function $onEmit(context: EmitContext) {
     const customizationFolder = joinPaths(projectRoot, "generated");
     const srcGeneratedFolder = joinPaths(projectRoot, "src", "generated");
     // if customization folder exists, use it as sources root
-    const finalCustomizationFolder = (await pathExists(host, srcGeneratedFolder))
+    const finalCustomizationFolder = (await pathExists(srcGeneratedFolder))
       ? srcGeneratedFolder
       : customizationFolder;
-    const sourcesRoot = (await pathExists(host, finalCustomizationFolder))
+    const sourcesRoot = (await pathExists(finalCustomizationFolder))
       ? finalCustomizationFolder
       : joinPaths(projectRoot, "src");
     return {
@@ -251,7 +250,6 @@ export async function $onEmit(context: EmitContext) {
 
   async function clearSrcFolder() {
     await emptyDir(
-      host,
       dpgContext.generationPathDetail?.modularSourcesDir ??
         dpgContext.generationPathDetail?.rlcSourcesDir ??
         "",
@@ -264,8 +262,8 @@ export async function $onEmit(context: EmitContext) {
         dpgContext.generationPathDetail?.rootDir ?? "",
         "samples-dev",
       );
-      if (await pathExists(host, samplesDevPath)) {
-        await emptyDir(host, samplesDevPath);
+      if (await pathExists(samplesDevPath)) {
+        await emptyDir(samplesDevPath);
       }
     }
   }
@@ -461,23 +459,23 @@ export async function $onEmit(context: EmitContext) {
       dpgContext.generationPathDetail?.metadataDir ?? "",
       "package.json",
     );
-    const hasPackageFile = await pathExists(host, existingPackageFilePath);
+    const hasPackageFile = existsSync(existingPackageFilePath);
     const existingReadmeFilePath = joinPaths(
       dpgContext.generationPathDetail?.metadataDir ?? "",
       "README.md",
     );
-    const hasReadmeFile = await pathExists(host, existingReadmeFilePath);
+    const hasReadmeFile = existsSync(existingReadmeFilePath);
     const existingChangelogFilePath = joinPaths(
       dpgContext.generationPathDetail?.metadataDir ?? "",
       "CHANGELOG.md",
     );
-    const hasChangelogFile = await pathExists(host, existingChangelogFilePath);
+    const hasChangelogFile = existsSync(existingChangelogFilePath);
     const shouldGenerateMetadata = option.generateMetadata === true || !hasPackageFile;
     const existingTestFolderPath = joinPaths(
       dpgContext.generationPathDetail?.metadataDir ?? "",
       "test",
     );
-    const hasTestFolder = await pathExists(host, existingTestFolderPath);
+    const hasTestFolder = existsSync(existingTestFolderPath);
     if (option.generateTest === undefined) {
       if (hasTestFolder) {
         option.generateTest = false;
@@ -632,15 +630,11 @@ export async function $onEmit(context: EmitContext) {
       // If the client name changed, regenerate the README and snippets completely;
       // otherwise update only the API reference link in-place.
       if (hasReadmeFile) {
-        const clientNameChanged = await hasClientNameChanged(
-          host,
-          rlcClient,
-          existingReadmeFilePath,
-        );
+        const clientNameChanged = hasClientNameChanged(rlcClient, existingReadmeFilePath);
         updateBuilders.push(
           clientNameChanged
             ? buildReadmeFile
-            : (model: RLCModel) => updateReadmeFile(host, model, existingReadmeFilePath),
+            : (model: RLCModel) => updateReadmeFile(model, existingReadmeFilePath),
         );
 
         // Regenerate snippets.spec.ts only when the client name changed
