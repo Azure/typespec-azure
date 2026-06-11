@@ -38,6 +38,8 @@ export interface LoadStaticHelpersOptions extends Partial<ModularEmitterOptions>
   rootDir?: string;
   program?: Program;
   host?: CompilerHost;
+  /** The emitter package root directory (where static/ lives). */
+  packageRoot?: string;
   /** When true, also load test helpers from static/test-helpers/ into test/generated/util/ */
   loadTestHelpers?: boolean;
 }
@@ -60,9 +62,11 @@ export async function loadStaticHelpers(
     );
   }
 
+  const packageRoot = options.packageRoot ?? resolveProjectRoot();
+
   // Load static helpers used in sources code
   const defaultStaticHelpersPath = joinPaths(
-    resolveProjectRoot(),
+    packageRoot,
     DEFAULT_SOURCES_STATIC_HELPERS_PATH,
   );
   const filesInSources = await traverseDirectory(
@@ -77,7 +81,7 @@ export async function loadStaticHelpers(
     (options.options?.generateTest && isAzurePackage({ options: options.options }))
   ) {
     const defaultTestingHelpersPath = joinPaths(
-      resolveProjectRoot(),
+      packageRoot,
       DEFAULT_SOURCES_TESTING_HELPERS_PATH,
     );
     const filesInTestings = await traverseDirectory(

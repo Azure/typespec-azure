@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { EmitContext, Program, getBaseFileName, joinPaths, type CompilerHost } from "@typespec/compiler";
+import { EmitContext, Program, getBaseFileName, getDirectoryPath, joinPaths, resolvePath, type CompilerHost } from "@typespec/compiler";
 import { provideContext, useContext } from "./context-manager.js";
 import { buildRootIndex, buildSubClientIndexFile } from "./modular/build-root-index.js";
 import {
@@ -119,6 +119,14 @@ export async function $onEmit(context: EmitContext) {
   const outputProject = new Project({ useInMemoryFileSystem: true });
   const program: Program = context.program;
   const host: CompilerHost = program.host;
+  // Derive the emitter package root from the compiler's resolved emitter entry point.
+  // This works correctly in both Node.js and the browser playground VFS.
+  const emitterRef = program.emitters.find(
+    (e) => e.metadata.name === "@azure-tools/typespec-ts",
+  );
+  const emitterPackageRoot = emitterRef
+    ? resolvePath(getDirectoryPath(emitterRef.main), "../..")
+    : undefined;
   const emitterOptions: EmitterOptions = context.options;
   const dpgContext = await createContextWithDefaultOptions(context);
 
@@ -161,6 +169,7 @@ export async function $onEmit(context: EmitContext) {
       options: rlcOptions,
       program,
       host,
+      packageRoot: emitterPackageRoot,
     },
   );
   const extraDependencies = isAzurePackage({ options: rlcOptions })
