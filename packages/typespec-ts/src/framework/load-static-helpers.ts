@@ -65,10 +65,7 @@ export async function loadStaticHelpers(
   const packageRoot = options.packageRoot ?? resolveProjectRoot();
 
   // Load static helpers used in sources code
-  const defaultStaticHelpersPath = joinPaths(
-    packageRoot,
-    DEFAULT_SOURCES_STATIC_HELPERS_PATH,
-  );
+  const defaultStaticHelpersPath = joinPaths(packageRoot, DEFAULT_SOURCES_STATIC_HELPERS_PATH);
   const filesInSources = await traverseDirectory(
     options.helpersAssetDirectory ?? defaultStaticHelpersPath,
     host,
@@ -80,10 +77,7 @@ export async function loadStaticHelpers(
     options.loadTestHelpers ??
     (options.options?.generateTest && isAzurePackage({ options: options.options }))
   ) {
-    const defaultTestingHelpersPath = joinPaths(
-      packageRoot,
-      DEFAULT_SOURCES_TESTING_HELPERS_PATH,
-    );
+    const defaultTestingHelpersPath = joinPaths(packageRoot, DEFAULT_SOURCES_TESTING_HELPERS_PATH);
     const filesInTestings = await traverseDirectory(
       defaultTestingHelpersPath,
       host,

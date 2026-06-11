@@ -58,7 +58,10 @@ async function cleanupTestFolder(dpgContext: SdkContext, host: CompilerHost) {
 /**
  * Helpers to emit tests similar to samples
  */
-export async function emitTests(dpgContext: SdkContext, host?: CompilerHost): Promise<SourceFile[]> {
+export async function emitTests(
+  dpgContext: SdkContext,
+  host?: CompilerHost,
+): Promise<SourceFile[]> {
   // Clean up the test/generated folder before generating new tests
   if (host) {
     await cleanupTestFolder(dpgContext, host);

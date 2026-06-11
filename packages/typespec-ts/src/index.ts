@@ -1,7 +1,15 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { EmitContext, Program, getBaseFileName, getDirectoryPath, joinPaths, resolvePath, type CompilerHost } from "@typespec/compiler";
+import {
+  EmitContext,
+  Program,
+  getBaseFileName,
+  getDirectoryPath,
+  joinPaths,
+  resolvePath,
+  type CompilerHost,
+} from "@typespec/compiler";
 import { provideContext, useContext } from "./context-manager.js";
 import { buildRootIndex, buildSubClientIndexFile } from "./modular/build-root-index.js";
 import {
@@ -121,9 +129,7 @@ export async function $onEmit(context: EmitContext) {
   const host: CompilerHost = program.host;
   // Derive the emitter package root from the compiler's resolved emitter entry point.
   // This works correctly in both Node.js and the browser playground VFS.
-  const emitterRef = program.emitters.find(
-    (e) => e.metadata.name === "@azure-tools/typespec-ts",
-  );
+  const emitterRef = program.emitters.find((e) => e.metadata.name === "@azure-tools/typespec-ts");
   const emitterPackageRoot = emitterRef
     ? resolvePath(getDirectoryPath(emitterRef.main), "../..")
     : undefined;
