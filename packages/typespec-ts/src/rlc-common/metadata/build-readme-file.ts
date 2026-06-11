@@ -3,7 +3,6 @@
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: to fix the handlebars issue
-import { readFileSync } from "fs";
 import hbs from "handlebars";
 import { getClientName } from "../helpers/name-constructors.js";
 import { NameType, normalizeName } from "../helpers/name-utils.js";
@@ -363,10 +362,9 @@ export function buildReadmeFile(model: RLCModel) {
   };
 }
 
-export function hasClientNameChanged(model: RLCModel, existingReadmeFilePath: string): boolean {
+export function hasClientNameChanged(model: RLCModel, existingReadmeContent: string): boolean {
   try {
-    const existingContent = readFileSync(existingReadmeFilePath, "utf8");
-    const importMatch = existingContent.match(
+    const importMatch = existingReadmeContent.match(
       /import\s*\{\s*([A-Za-z0-9_]+)\s*\}\s*from\s*["'][^"']*["']/,
     );
     const existingClientName = importMatch?.[1];
@@ -379,21 +377,20 @@ export function hasClientNameChanged(model: RLCModel, existingReadmeFilePath: st
 
 export function updateReadmeFile(
   model: RLCModel,
-  existingReadmeFilePath: string,
+  existingReadmeContent: string,
 ): { path: string; content: string } | undefined {
   try {
-    const existingContent = readFileSync(existingReadmeFilePath, "utf8");
     const metadata = createMetadata(model) ?? {};
 
     const newApiRefLink = hbs.compile(apiReferenceTemplate, { noEscape: true })(metadata).trim();
 
     if (!newApiRefLink) {
-      return { path: "README.md", content: existingContent };
+      return { path: "README.md", content: existingReadmeContent };
     }
 
     const apiRefRegex =
       /^- \[API reference documentation\]\(https:\/\/learn\.microsoft\.com\/javascript\/api\/[^)]+\)$/m;
-    const updatedContent = existingContent.replace(apiRefRegex, (match) =>
+    const updatedContent = existingReadmeContent.replace(apiRefRegex, (match) =>
       match ? newApiRefLink : match,
     );
 

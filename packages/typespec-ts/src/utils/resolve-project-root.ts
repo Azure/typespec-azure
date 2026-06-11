@@ -1,26 +1,15 @@
-import { existsSync } from "fs";
-import { dirname, resolve } from "path";
-import { fileURLToPath } from "url";
+import { resolvePath } from "@typespec/compiler";
 
 /**
- * Recursively finds the nearest package.json file starting from the specified directory.
- * @param {string} currentDir - The directory to start searching from. Defaults to the directory of the current module.
- * @returns {string} path to the directory containing the package.json file.
+ * Returns the package root directory for the emitter.
+ *
+ * The compiled output lives at `dist/src/utils/resolve-project-root.js`,
+ * so the package root is 4 levels up. This avoids filesystem access,
+ * making it compatible with virtual file systems (e.g., the playground).
  */
-export function resolveProjectRoot(
-  currentDir: string = dirname(fileURLToPath(import.meta.url)),
-): string {
-  const packageJsonPath = resolve(currentDir, "package.json");
-
-  if (existsSync(packageJsonPath)) {
-    return currentDir;
-  }
-
-  const parentDir = resolve(currentDir, "..");
-
-  if (parentDir === currentDir) {
-    throw new Error("Could not find package.json");
-  }
-
-  return resolveProjectRoot(parentDir);
+export function resolveProjectRoot(): string {
+  // Use the global URL constructor (works in both Node.js and browsers)
+  const currentDir = new URL(".", import.meta.url).pathname;
+  // From dist/src/utils/ -> package root (4 levels: utils -> src -> dist -> root)
+  return resolvePath(currentDir, "../../../..");
 }
