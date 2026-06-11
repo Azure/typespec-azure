@@ -141,7 +141,7 @@ function buildRollingBaseline(
   return {
     baseline: {
       ...current,
-      commit: `rolling:${firstCommit}..${lastCommit}`,
+      commit: `rolling-baseline-${firstCommit}-${lastCommit}`,
       timestamp: new Date().toISOString(),
       specs,
     },

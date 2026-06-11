@@ -26,7 +26,7 @@ export function median(values: number[]): number {
 export function stdDev(values: number[]): number {
   if (values.length < 2) return 0;
   const avg = mean(values);
-  const variance = values.reduce((sum, value) => sum + (value - avg) ** 2, 0) / values.length;
+  const variance = values.reduce((sum, value) => sum + (value - avg) ** 2, 0) / (values.length - 1);
   return Math.sqrt(variance);
 }
 

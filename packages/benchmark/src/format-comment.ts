@@ -47,6 +47,7 @@ function formatPercent(pct: number): string {
 }
 
 function formatRef(value: string): string {
+  // Commit hashes are shortened for readability while descriptive labels are kept intact.
   if (/^[a-f0-9]{7,40}$/i.test(value)) {
     return value.slice(0, 7);
   }
