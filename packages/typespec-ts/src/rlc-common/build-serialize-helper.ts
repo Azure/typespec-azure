@@ -1,4 +1,4 @@
-import * as path from "path";
+import { joinPaths } from "@typespec/compiler";
 import { RLCModel } from "./interfaces.js";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: to fix the handlebars issue
@@ -41,7 +41,7 @@ export function buildSerializeHelper(model: RLCModel) {
     });
     const { srcPath } = model;
     return {
-      path: path.join(srcPath, "serializeHelper.ts"),
+      path: joinPaths(srcPath, "serializeHelper.ts"),
       content: readmeFileContents({}),
     };
   }

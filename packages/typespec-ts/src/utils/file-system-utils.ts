@@ -1,6 +1,5 @@
-import { NoTarget, Program } from "@typespec/compiler";
+import { NoTarget, Program, resolvePath } from "@typespec/compiler";
 import { mkdir, readdir, rm, stat } from "fs/promises";
-import { resolve } from "path";
 import { reportDiagnostic } from "../lib.js";
 
 export async function pathExists(targetPath: string): Promise<boolean> {
@@ -22,7 +21,7 @@ export async function emptyDir(dirPath: string): Promise<void> {
   }
 
   await Promise.all(
-    entries.map((entry) => rm(resolve(dirPath, entry), { recursive: true, force: true })),
+    entries.map((entry) => rm(resolvePath(dirPath, entry), { recursive: true, force: true })),
   );
 }
 
@@ -52,7 +51,7 @@ export async function clearDirectory(
 
     // Process each entry
     for (const entry of filteredEntries) {
-      const entryPath = resolve(dirPath, entry);
+      const entryPath = resolvePath(dirPath, entry);
       await rm(entryPath, { recursive: true, force: true });
     }
   } catch (error) {
