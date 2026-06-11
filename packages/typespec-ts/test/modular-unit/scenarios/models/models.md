@@ -79,12 +79,14 @@ export function _readSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-    body: streamingChatCompletionOptionsSerializer(body),
-  });
+  return context
+    .path(path)
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+      body: streamingChatCompletionOptionsSerializer(body),
+    });
 }
 
 export async function _readDeserialize(
@@ -146,12 +148,14 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    headers: { accept: "text/plain", ...options.requestOptions?.headers },
-    body: { stream: true, messages: "aaaaa", index: 123 },
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      headers: { accept: "text/plain", ...options.requestOptions?.headers },
+      body: { stream: true, messages: "aaaaa", index: 123 },
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<true> {

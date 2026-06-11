@@ -22,11 +22,13 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "text/plain",
-    body: !options?.parameters ? options?.parameters : "constantBody",
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "text/plain",
+      body: !options?.parameters ? options?.parameters : "constantBody",
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<void> {

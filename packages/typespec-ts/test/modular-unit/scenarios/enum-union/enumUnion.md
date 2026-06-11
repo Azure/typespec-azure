@@ -69,11 +69,13 @@ export function _getSend(
   body: string,
   options: GetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: contentType,
-    body: body,
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: contentType,
+      body: body,
+    });
 }
 
 export async function _getDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -545,12 +547,14 @@ export function _getSend(
   body: string,
   options: GetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "text/plain",
-    headers: { "test-header": testHeader, ...options.requestOptions?.headers },
-    body: body,
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "text/plain",
+      headers: { "test-header": testHeader, ...options.requestOptions?.headers },
+      body: body,
+    });
 }
 
 export async function _getDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -627,12 +631,14 @@ export function _getSend(
   body: string,
   options: GetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "text/plain",
-    headers: { "test-header": testHeader, ...options.requestOptions?.headers },
-    body: body,
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "text/plain",
+      headers: { "test-header": testHeader, ...options.requestOptions?.headers },
+      body: body,
+    });
 }
 
 export async function _getDeserialize(result: PathUncheckedResponse): Promise<void> {

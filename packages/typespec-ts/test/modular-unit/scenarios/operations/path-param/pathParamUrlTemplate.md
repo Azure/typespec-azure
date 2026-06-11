@@ -79,12 +79,14 @@ export function _updateKeySend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).patch({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "text/plain",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-    body: parameters,
-  });
+  return context
+    .path(path)
+    .patch({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "text/plain",
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+      body: parameters,
+    });
 }
 
 export async function _updateKeyDeserialize(result: PathUncheckedResponse): Promise<KeyBundle> {

@@ -101,10 +101,12 @@ export function _getAnySend(
   context: Client,
   options: GetAnyOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/any").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/any")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _getAnyDeserialize(

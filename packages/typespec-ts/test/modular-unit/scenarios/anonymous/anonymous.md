@@ -78,17 +78,19 @@ export function _readSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: {
-      prop1: prop1,
-      prop2: prop2,
-      prop3: prop3.toISOString(),
-      prop4: prop4,
-      prop5: barSerializer(prop5),
-    },
-  });
+  return context
+    .path(path)
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: {
+        prop1: prop1,
+        prop2: prop2,
+        prop3: prop3.toISOString(),
+        prop4: prop4,
+        prop5: barSerializer(prop5),
+      },
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -215,17 +217,19 @@ export function _readSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: {
-      prop1: prop1,
-      prop2: prop2,
-      prop3: !options?.prop3 ? options?.prop3 : options?.prop3.toISOString(),
-      prop4: prop4,
-      prop5: !options?.prop5 ? options?.prop5 : barSerializer(options?.prop5),
-    },
-  });
+  return context
+    .path(path)
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: {
+        prop1: prop1,
+        prop2: prop2,
+        prop3: !options?.prop3 ? options?.prop3 : options?.prop3.toISOString(),
+        prop4: prop4,
+        prop5: !options?.prop5 ? options?.prop5 : barSerializer(options?.prop5),
+      },
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -347,15 +351,17 @@ export function _readSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: {
-      prop2: prop2,
-      prop3: !options?.prop3 ? options?.prop3 : options?.prop3.toISOString(),
-      prop5: !options?.prop5 ? options?.prop5 : barSerializer(options?.prop5),
-    },
-  });
+  return context
+    .path(path)
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: {
+        prop2: prop2,
+        prop3: !options?.prop3 ? options?.prop3 : options?.prop3.toISOString(),
+        prop5: !options?.prop5 ? options?.prop5 : barSerializer(options?.prop5),
+      },
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -482,11 +488,13 @@ export function _readSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: fooSerializer(body),
-  });
+  return context
+    .path(path)
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: fooSerializer(body),
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -566,11 +574,13 @@ export function _readSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: _readRequestSerializer(body),
-  });
+  return context
+    .path(path)
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: _readRequestSerializer(body),
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -665,11 +675,13 @@ export function _readSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: _readRequestSerializer(test),
-  });
+  return context
+    .path(path)
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: _readRequestSerializer(test),
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -748,11 +760,13 @@ export function _readSend(
   body: Test,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: testSerializer(body),
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: testSerializer(body),
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -830,11 +844,13 @@ export function _readSend(
   body: Test,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: testSerializer(body),
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: testSerializer(body),
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -900,10 +916,12 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _readDeserialize(
@@ -971,10 +989,12 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<PublishResult> {
@@ -1059,10 +1079,12 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<{
@@ -1220,10 +1242,12 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<ReturnBody> {
@@ -1436,10 +1460,12 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<Foz> {
