@@ -294,6 +294,66 @@ describe("language-specific parsers", () => {
   });
 });
 
+describe("@azure-tools/typespec-go emitter", () => {
+  it("should derive package name from emitter-output-dir instead of module path", () => {
+    // Simulates the redisenterprise scenario where module includes version suffix (/v4)
+    // but the emitter-output-dir gives the correct package path without the suffix.
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-tools/typespec-go": {
+        module:
+          "github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/redisenterprise/armredisenterprise/v4",
+        "service-dir": "sdk/resourcemanager/redisenterprise",
+        "emitter-output-dir":
+          "c:/repos/tsp-output/sdk/resourcemanager/redisenterprise/armredisenterprise",
+        "generate-fakes": true,
+        flavor: "azure",
+      },
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "c:/repos/tsp-output");
+    const lang = result["go"][0];
+
+    // Should use output dir path (without /v4 version suffix), not module path
+    expect(lang.packageName).toBe("sdk/resourcemanager/redisenterprise/armredisenterprise");
+    expect(lang.namespace).toBe("sdk/resourcemanager/redisenterprise/armredisenterprise");
+    expect(lang.outputDir).toBe(
+      "{output-dir}/sdk/resourcemanager/redisenterprise/armredisenterprise",
+    );
+  });
+
+  it("should fall back to module path when emitter-output-dir is not under base output dir", () => {
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-tools/typespec-go": {
+        module: "github.com/Azure/azure-sdk-for-go/sdk/security/keyvault/azsecrets",
+      },
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "/repos/tsp-output");
+    const lang = result["go"][0];
+
+    // No emitter-output-dir, falls back to module path
+    expect(lang.packageName).toBe("sdk/security/keyvault/azsecrets");
+    expect(lang.namespace).toBe("sdk/security/keyvault/azsecrets");
+  });
+
+  it("should respect explicit package-name over emitter-output-dir", () => {
+    const optionMap: Record<string, Record<string, unknown>> = {
+      "@azure-tools/typespec-go": {
+        "package-name": "sdk/custom/mypackage",
+        module: "github.com/Azure/azure-sdk-for-go/sdk/some/module/v2",
+        "emitter-output-dir": "c:/repos/tsp-output/sdk/resourcemanager/redisenterprise/armredisenterprise",
+        flavor: "azure",
+      },
+    };
+
+    const result = buildLanguageMetadata(optionMap, {}, "c:/repos/tsp-output");
+    const lang = result["go"][0];
+
+    // Explicit package-name should not be overridden by emitter-output-dir
+    expect(lang.packageName).toBe("sdk/custom/mypackage");
+  });
+});
+
 describe("service-dir handling", () => {
   it("should use language-specific service-dir if present", () => {
     const languageServiceDir = "sdk/security/keyvault";
