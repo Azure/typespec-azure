@@ -27,11 +27,13 @@ export function _uploadFileViaBodySend(
   body: Uint8Array,
   options: UploadFileViaBodyOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/uploadFileViaBody").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/octet-stream",
-    body: body,
-  });
+  return context
+    .path("/uploadFileViaBody")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/octet-stream",
+      body: body,
+    });
 }
 
 export async function _uploadFileViaBodyDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -86,11 +88,13 @@ export function _uploadFileViaBodySend(
   body: Uint8Array,
   options: UploadFileViaBodyOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/uploadFileViaBody").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/octet-stream",
-    body: body,
-  });
+  return context
+    .path("/uploadFileViaBody")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/octet-stream",
+      body: body,
+    });
 }
 
 export async function _uploadFileViaBodyDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -177,11 +181,13 @@ export function _uploadFileSend(
   },
   options: UploadFileOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/uploadFile").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "multipart/form-data",
-    body: _uploadFileRequestSerializer(body),
-  });
+  return context
+    .path("/uploadFile")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "multipart/form-data",
+      body: _uploadFileRequestSerializer(body),
+    });
 }
 
 export async function _uploadFileDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -271,11 +277,13 @@ export function _uploadFilesSend(
   },
   options: UploadFilesOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/uploadFiles").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "multipart/form-data",
-    body: _uploadFilesRequestSerializer(body),
-  });
+  return context
+    .path("/uploadFiles")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "multipart/form-data",
+      body: _uploadFilesRequestSerializer(body),
+    });
 }
 
 export async function _uploadFilesDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -331,10 +339,12 @@ export function _downloadFileSend(
   context: Client,
   options: DownloadFileOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/downloadFile").post({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/octet-stream", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/downloadFile")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/octet-stream", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _downloadFileDeserialize(result: PathUncheckedResponse): Promise<Uint8Array> {
@@ -389,10 +399,12 @@ export function _downloadFileSend(
   context: Client,
   options: DownloadFileOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/downloadFile").post({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/octet-stream", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/downloadFile")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/octet-stream", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _downloadFileDeserialize(result: PathUncheckedResponse): Promise<Uint8Array> {
@@ -447,11 +459,13 @@ export function _uploadFileViaBodySend(
   body: Uint8Array,
   options: UploadFileViaBodyOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/uploadFileViaBody").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: contentType,
-    body: body,
-  });
+  return context
+    .path("/uploadFileViaBody")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: contentType,
+      body: body,
+    });
 }
 
 export async function _uploadFileViaBodyDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -513,10 +527,12 @@ export function _testSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "text/plain", ...options.requestOptions?.headers },
-  });
+  return context
+    .path(path)
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "text/plain", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _testDeserialize(result: PathUncheckedResponse): Promise<string> {
@@ -652,10 +668,12 @@ export function _testSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "text/plain", ...options.requestOptions?.headers },
-  });
+  return context
+    .path(path)
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "text/plain", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _testDeserialize(result: PathUncheckedResponse): Promise<string> {
@@ -775,10 +793,12 @@ export function _test1Send(
   context: Client,
   options: Test1OptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/test1").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "text/plain", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/test1")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "text/plain", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _test1Deserialize(result: PathUncheckedResponse): Promise<string> {
@@ -812,10 +832,12 @@ export function _testSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "text/plain", ...options.requestOptions?.headers },
-  });
+  return context
+    .path(path)
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "text/plain", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _testDeserialize(result: PathUncheckedResponse): Promise<string> {
@@ -1043,11 +1065,13 @@ export function _updateFileShareSnapshotSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).patch({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: fileShareSnapshotUpdateSerializer(properties),
-  });
+  return context
+    .path(path)
+    .patch({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: fileShareSnapshotUpdateSerializer(properties),
+    });
 }
 
 export async function _updateFileShareSnapshotDeserialize(
@@ -1105,10 +1129,12 @@ export function _listSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path(path)
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _listDeserialize(

@@ -288,12 +288,12 @@ function buildClientOperationGroups(
         clientClass.addMethods(methods);
       });
     } else {
-      // The `rawGroupName` is used to any places where we need normalized name twice so we need to keep the raw as PascalCase.
-      const rawGroupName = normalizeName(prefixes[0] ?? "", NameType.Interface);
-      const operationName = `_get${normalizeName(rawGroupName, NameType.OperationGroup)}Operations`;
-      const propertyType = `${normalizeName(rawGroupName, NameType.OperationGroup)}Operations`;
-      // The `groupName` is used to any places where we don't need normalized name again
-      const groupName = normalizeName(rawGroupName, NameType.Property);
+      // Use single normalization directly from prefixes to avoid double-normalizing $DO_NOT_NORMALIZE$ names,
+      // which would strip the marker in the first pass then re-normalize the result in the second pass.
+      const normalizedGroupName = normalizeName(prefixes[0] ?? "", NameType.Interface);
+      const operationName = `_get${normalizedGroupName}Operations`;
+      const propertyType = `${normalizedGroupName}Operations`;
+      const groupName = normalizeName(prefixes[0] ?? "", NameType.Property);
       const existProperty = clientClass.getProperties().filter((p) => {
         return p.getName() === normalizeName(groupName, NameType.Property);
       });

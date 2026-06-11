@@ -30,6 +30,7 @@ import { useContext } from "../../src/context-manager.js";
 import { useBinder } from "../../src/framework/hooks/binder.js";
 import { renameClientName } from "../../src/index.js";
 import { buildClassicalClient } from "../../src/modular/build-classical-client.js";
+import { buildClassicOperationFiles } from "../../src/modular/build-classical-operation-groups.js";
 import { buildClientContext } from "../../src/modular/build-client-context.js";
 import { transformModularEmitterOptions } from "../../src/modular/build-modular-options.js";
 import { buildOperationFiles } from "../../src/modular/build-operations.js";
@@ -614,11 +615,15 @@ export async function emitModularClientFromTypeSpec(
   const context = await rlcEmitterFor(tspContent, {
     needNamespaces: true,
     needAzureCore: false,
-    needTCGC: false,
+    needTCGC: options["need-tcgc"] === true || options["needTCGC"] === true,
     withRawContent: options.withRawContent ? true : false,
     withVersionedApiVersion: options.withVersionedApiVersion ? true : false,
   });
-  const dpgContext = await createDpgContextTestHelper(context.program);
+  const dpgContext = await createDpgContextTestHelper(context.program, false, {
+    hierarchyClient: options["hierarchyClient"] ?? options["hierarchy-client"],
+    enableOperationGroup:
+      options["enableOperationGroup"] ?? options["enable-operation-group"],
+  });
   const binder = useBinder();
   const includeResponseHeaders = options["include-headers-in-response"] === true;
   dpgContext.rlcOptions!.includeHeadersInResponse = includeResponseHeaders;
@@ -638,6 +643,7 @@ export async function emitModularClientFromTypeSpec(
     buildApiOptions(dpgContext, clientMap[0]!, modularEmitterOptions);
     buildOperationFiles(dpgContext, clientMap[0]!, modularEmitterOptions);
     const res = buildClassicalClient(dpgContext, clientMap[0]!, modularEmitterOptions);
+    buildClassicOperationFiles(dpgContext, clientMap[0]!, modularEmitterOptions);
     binder.resolveAllReferences("/");
     return res;
   }
