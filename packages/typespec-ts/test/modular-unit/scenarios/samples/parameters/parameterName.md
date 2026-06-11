@@ -272,11 +272,13 @@ export function _publishSend(
   endpointParam: DocumentBase,
   options: PublishOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/documents").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: documentBaseSerializer(endpointParam),
-  });
+  return context
+    .path("/documents")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: documentBaseSerializer(endpointParam),
+    });
 }
 
 export async function _publishDeserialize(result: PathUncheckedResponse): Promise<void> {

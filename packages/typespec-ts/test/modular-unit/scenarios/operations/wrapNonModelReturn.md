@@ -39,10 +39,12 @@ export function _getSend(
   context: Client,
   options: GetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/dns").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "text/plain", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/dns")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "text/plain", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _getDeserialize(result: PathUncheckedResponse): Promise<GetResponse> {
@@ -100,10 +102,12 @@ export function _listDomainsSend(
   context: Client,
   options: ListDomainsOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/domains").post({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/domains")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _listDomainsDeserialize(
@@ -186,10 +190,12 @@ export function _getLogsSend(
   context: Client,
   options: GetLogsOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/logs").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/octet-stream", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/logs")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/octet-stream", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _getLogsDeserialize(
@@ -247,10 +253,12 @@ export function _getSend(
   context: Client,
   options: GetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/dns").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "text/plain", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/dns")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "text/plain", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _getDeserialize(result: PathUncheckedResponse): Promise<string> {
@@ -310,10 +318,12 @@ export function _listSend(
   context: Client,
   options: ListOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/resources").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/resources")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _listDeserialize(result: PathUncheckedResponse): Promise<Resource[]> {
@@ -371,10 +381,12 @@ export function _getModelSend(
   context: Client,
   options: GetModelOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/models").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/models")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _getModelDeserialize(result: PathUncheckedResponse): Promise<MyModel> {

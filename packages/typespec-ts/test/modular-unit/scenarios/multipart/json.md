@@ -32,15 +32,15 @@ export interface RequestBody {
   person: Person;
 }
 
-export function requestBodySerializer(item: RequestBody): any {
-  return [{ name: "person", body: personSerializer(item["person"]) }];
-}
-
 /** model interface Person */
 export interface Person {
   firstName: string;
   lastName: string;
   dateOfBirth: Date;
+}
+
+export function requestBodySerializer(item: RequestBody): any {
+  return [{ name: "person", body: personSerializer(item["person"]) }];
 }
 
 export function personSerializer(item: Person): any {
@@ -88,6 +88,13 @@ export interface RequestBody {
   people: Person[];
 }
 
+/** model interface Person */
+export interface Person {
+  firstName: string;
+  lastName: string;
+  dateOfBirth: Date;
+}
+
 export function requestBodySerializer(item: RequestBody): any {
   return [{ name: "people", body: personArraySerializer(item["people"]) }];
 }
@@ -96,13 +103,6 @@ export function personArraySerializer(result: Array<Person>): any[] {
   return result.map((item) => {
     return personSerializer(item);
   });
-}
-
-/** model interface Person */
-export interface Person {
-  firstName: string;
-  lastName: string;
-  dateOfBirth: Date;
 }
 
 export function personSerializer(item: Person): any {
@@ -150,6 +150,13 @@ export interface RequestBody {
   people: Person[];
 }
 
+/** model interface Person */
+export interface Person {
+  firstName: string;
+  lastName: string;
+  dateOfBirth: Date;
+}
+
 export function requestBodySerializer(item: RequestBody): any {
   return [
     ...personArraySerializer(item["people"]).map((x: unknown) => ({ name: "people", body: x })),
@@ -160,13 +167,6 @@ export function personArraySerializer(result: Array<Person>): any[] {
   return result.map((item) => {
     return personSerializer(item);
   });
-}
-
-/** model interface Person */
-export interface Person {
-  firstName: string;
-  lastName: string;
-  dateOfBirth: Date;
 }
 
 export function personSerializer(item: Person): any {

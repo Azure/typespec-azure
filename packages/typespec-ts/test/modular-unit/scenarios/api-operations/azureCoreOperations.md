@@ -83,10 +83,12 @@ export function _getWidgetOperationStatusSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path(path)
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _getWidgetOperationStatusDeserialize(
@@ -142,6 +144,24 @@ export interface ResourceOperationStatusWidgetSuiteWidgetSuiteError {
   result?: WidgetSuite;
 }
 
+/** A widget. */
+export interface WidgetSuite {
+  /** The widget name. */
+  name: string;
+  /** The ID of the widget's manufacturer. */
+  manufacturerId: string;
+  /** The faked shared model. */
+  sharedModel?: FakedSharedModel;
+}
+
+/** Faked shared model */
+export interface FakedSharedModel {
+  /** The tag. */
+  tag: string;
+  /** The created date. */
+  createdAt: string;
+}
+
 export function resourceOperationStatusWidgetSuiteWidgetSuiteErrorDeserializer(
   item: any,
 ): ResourceOperationStatusWidgetSuiteWidgetSuiteError {
@@ -151,19 +171,6 @@ export function resourceOperationStatusWidgetSuiteWidgetSuiteErrorDeserializer(
     error: !item["error"] ? item["error"] : item["error"],
     result: !item["result"] ? item["result"] : widgetSuiteDeserializer(item["result"]),
   };
-}
-
-/** Enum describing allowed operation states. */
-export type OperationState = "NotStarted" | "Running" | "Succeeded" | "Failed" | "Canceled";
-
-/** A widget. */
-export interface WidgetSuite {
-  /** The widget name. */
-  name: string;
-  /** The ID of the widget's manufacturer. */
-  manufacturerId: string;
-  /** The faked shared model. */
-  sharedModel?: FakedSharedModel;
 }
 
 export function widgetSuiteDeserializer(item: any): WidgetSuite {
@@ -176,18 +183,13 @@ export function widgetSuiteDeserializer(item: any): WidgetSuite {
   };
 }
 
-/** Faked shared model */
-export interface FakedSharedModel {
-  /** The tag. */
-  tag: string;
-  /** The created date. */
-  createdAt: string;
-}
-
 export function fakedSharedModelDeserializer(item: any): FakedSharedModel {
   return {
     tag: item["tag"],
     createdAt: item["createdAt"],
   };
 }
+
+/** Enum describing allowed operation states. */
+export type OperationState = "NotStarted" | "Running" | "Succeeded" | "Failed" | "Canceled";
 ```

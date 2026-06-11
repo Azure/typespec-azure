@@ -74,12 +74,14 @@ export function _postSend(
   body: A,
   options: PostOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-    body: !body ? body : _postRequestSerializer(body),
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+      body: !body ? body : _postRequestSerializer(body),
+    });
 }
 
 export async function _postDeserialize(result: PathUncheckedResponse): Promise<A> {

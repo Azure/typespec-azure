@@ -78,17 +78,19 @@ export function _readSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: {
-      prop1: prop1,
-      prop2: prop2,
-      prop3: prop3.toISOString(),
-      prop4: prop4,
-      prop5: barSerializer(prop5),
-    },
-  });
+  return context
+    .path(path)
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: {
+        prop1: prop1,
+        prop2: prop2,
+        prop3: prop3.toISOString(),
+        prop4: prop4,
+        prop5: barSerializer(prop5),
+      },
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -215,17 +217,19 @@ export function _readSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: {
-      prop1: prop1,
-      prop2: prop2,
-      prop3: !options?.prop3 ? options?.prop3 : options?.prop3.toISOString(),
-      prop4: prop4,
-      prop5: !options?.prop5 ? options?.prop5 : barSerializer(options?.prop5),
-    },
-  });
+  return context
+    .path(path)
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: {
+        prop1: prop1,
+        prop2: prop2,
+        prop3: !options?.prop3 ? options?.prop3 : options?.prop3.toISOString(),
+        prop4: prop4,
+        prop5: !options?.prop5 ? options?.prop5 : barSerializer(options?.prop5),
+      },
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -347,15 +351,17 @@ export function _readSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: {
-      prop2: prop2,
-      prop3: !options?.prop3 ? options?.prop3 : options?.prop3.toISOString(),
-      prop5: !options?.prop5 ? options?.prop5 : barSerializer(options?.prop5),
-    },
-  });
+  return context
+    .path(path)
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: {
+        prop2: prop2,
+        prop3: !options?.prop3 ? options?.prop3 : options?.prop3.toISOString(),
+        prop5: !options?.prop5 ? options?.prop5 : barSerializer(options?.prop5),
+      },
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -482,11 +488,13 @@ export function _readSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: fooSerializer(body),
-  });
+  return context
+    .path(path)
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: fooSerializer(body),
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -566,11 +574,13 @@ export function _readSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: _readRequestSerializer(body),
-  });
+  return context
+    .path(path)
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: _readRequestSerializer(body),
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -665,11 +675,13 @@ export function _readSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: _readRequestSerializer(test),
-  });
+  return context
+    .path(path)
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: _readRequestSerializer(test),
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -748,11 +760,13 @@ export function _readSend(
   body: Test,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: testSerializer(body),
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: testSerializer(body),
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -830,11 +844,13 @@ export function _readSend(
   body: Test,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: testSerializer(body),
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: testSerializer(body),
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -900,10 +916,12 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _readDeserialize(
@@ -971,10 +989,12 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<PublishResult> {
@@ -1024,15 +1044,15 @@ export interface _ReadResponse {
   };
 }
 
+/** model interface _ReadResponseFoo */
+export interface _ReadResponseFoo {
+  bar: string | null;
+}
+
 export function _readResponseDeserializer(item: any): _ReadResponse {
   return {
     foo: !item["foo"] ? item["foo"] : _readResponseFooDeserializer(item["foo"]),
   };
-}
-
-/** model interface _ReadResponseFoo */
-export interface _ReadResponseFoo {
-  bar: string | null;
 }
 
 export function _readResponseFooDeserializer(item: any): _ReadResponseFoo {
@@ -1059,10 +1079,12 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<{
@@ -1127,6 +1149,18 @@ export interface ReturnBody {
   emptyModelDict: Record<string, EmptyModel>;
 }
 
+/** model interface _ReturnBodyEmptyAnomyous */
+export interface _ReturnBodyEmptyAnomyous {}
+
+/** model interface _ReturnBodyEmptyAnomyousArray */
+export interface _ReturnBodyEmptyAnomyousArray {}
+
+/** model interface _ReturnBodyEmptyAnomyousDict */
+export interface _ReturnBodyEmptyAnomyousDict {}
+
+/** model interface EmptyModel */
+export interface EmptyModel {}
+
 export function returnBodyDeserializer(item: any): ReturnBody {
   return {
     emptyAnomyous: _returnBodyEmptyAnomyousDeserializer(item["emptyAnomyous"]),
@@ -1137,9 +1171,6 @@ export function returnBodyDeserializer(item: any): ReturnBody {
     emptyModelDict: emptyModelRecordDeserializer(item["emptyModelDict"]),
   };
 }
-
-/** model interface _ReturnBodyEmptyAnomyous */
-export interface _ReturnBodyEmptyAnomyous {}
 
 export function _returnBodyEmptyAnomyousDeserializer(item: any): _ReturnBodyEmptyAnomyous {
   return item;
@@ -1152,9 +1183,6 @@ export function _returnBodyEmptyAnomyousArrayArrayDeserializer(
     return _returnBodyEmptyAnomyousArrayDeserializer(item);
   });
 }
-
-/** model interface _ReturnBodyEmptyAnomyousArray */
-export interface _ReturnBodyEmptyAnomyousArray {}
 
 export function _returnBodyEmptyAnomyousArrayDeserializer(
   item: any,
@@ -1172,15 +1200,9 @@ export function _returnBodyEmptyAnomyousDictRecordDeserializer(
   return result;
 }
 
-/** model interface _ReturnBodyEmptyAnomyousDict */
-export interface _ReturnBodyEmptyAnomyousDict {}
-
 export function _returnBodyEmptyAnomyousDictDeserializer(item: any): _ReturnBodyEmptyAnomyousDict {
   return item;
 }
-
-/** model interface EmptyModel */
-export interface EmptyModel {}
 
 export function emptyModelDeserializer(item: any): EmptyModel {
   return item;
@@ -1220,10 +1242,12 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<ReturnBody> {
@@ -1304,12 +1328,6 @@ export interface Foz {
   };
 }
 
-export function fozDeserializer(item: any): Foz {
-  return {
-    baz: _fozBazDeserializer(item["baz"]),
-  };
-}
-
 /** model interface _FozBaz */
 export interface _FozBaz {
   foo: number[];
@@ -1327,6 +1345,32 @@ export interface _FozBaz {
       c: number[];
     }
   >;
+}
+
+/** model interface SimpleModel */
+export interface SimpleModel {
+  test: string;
+}
+
+/** model interface _FozBazNonemptyAnomyous */
+export interface _FozBazNonemptyAnomyous {
+  a: string;
+}
+
+/** model interface _FozBazNonemptyAnomyousArray */
+export interface _FozBazNonemptyAnomyousArray {
+  b?: Record<string, string>;
+}
+
+/** model interface _FozBazNonemptyAnomyousDict */
+export interface _FozBazNonemptyAnomyousDict {
+  c: number[];
+}
+
+export function fozDeserializer(item: any): Foz {
+  return {
+    baz: _fozBazDeserializer(item["baz"]),
+  };
 }
 
 export function _fozBazDeserializer(item: any): _FozBaz {
@@ -1352,20 +1396,10 @@ export function simpleModelArrayDeserializer(result: Array<SimpleModel>): any[] 
   });
 }
 
-/** model interface SimpleModel */
-export interface SimpleModel {
-  test: string;
-}
-
 export function simpleModelDeserializer(item: any): SimpleModel {
   return {
     test: item["test"],
   };
-}
-
-/** model interface _FozBazNonemptyAnomyous */
-export interface _FozBazNonemptyAnomyous {
-  a: string;
 }
 
 export function _fozBazNonemptyAnomyousDeserializer(item: any): _FozBazNonemptyAnomyous {
@@ -1380,11 +1414,6 @@ export function _fozBazNonemptyAnomyousArrayArrayDeserializer(
   return result.map((item) => {
     return _fozBazNonemptyAnomyousArrayDeserializer(item);
   });
-}
-
-/** model interface _FozBazNonemptyAnomyousArray */
-export interface _FozBazNonemptyAnomyousArray {
-  b?: Record<string, string>;
 }
 
 export function _fozBazNonemptyAnomyousArrayDeserializer(item: any): _FozBazNonemptyAnomyousArray {
@@ -1403,11 +1432,6 @@ export function _fozBazNonemptyAnomyousDictRecordDeserializer(
     result[key] = !item[key] ? item[key] : _fozBazNonemptyAnomyousDictDeserializer(item[key]);
   });
   return result;
-}
-
-/** model interface _FozBazNonemptyAnomyousDict */
-export interface _FozBazNonemptyAnomyousDict {
-  c: number[];
 }
 
 export function _fozBazNonemptyAnomyousDictDeserializer(item: any): _FozBazNonemptyAnomyousDict {
@@ -1436,10 +1460,12 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<Foz> {
