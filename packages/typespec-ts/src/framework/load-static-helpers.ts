@@ -1,4 +1,5 @@
 import { type CompilerHost, joinPaths, NoTarget, Program } from "@typespec/compiler";
+import { readdir, readFile, stat } from "fs/promises";
 import {
   ClassDeclaration,
   EnumDeclaration,
@@ -55,12 +56,8 @@ export async function loadStaticHelpers(
   options: LoadStaticHelpersOptions = {},
 ): Promise<Map<string, StaticHelperMetadata>> {
   const helpersMap = new Map<string, StaticHelperMetadata>();
-  const host = options.host ?? options.program?.host;
-  if (!host) {
-    throw new Error(
-      "loadStaticHelpers requires either a host or program in options to access the file system.",
-    );
-  }
+  // Use provided host, or fall back to a minimal Node.js fs adapter for testing
+  const host: FsHost = options.host ?? options.program?.host ?? createNodeFsHost();
 
   const packageRoot = options.packageRoot ?? resolveProjectRoot();
 
@@ -194,10 +191,12 @@ function getDeclarationByMetadata(
   }
 }
 
+type FsHost = Pick<CompilerHost, "readFile" | "readDir" | "stat">;
+
 const _targetStaticHelpersBaseDir = "static-helpers";
 async function traverseDirectory(
   directory: string,
-  host: CompilerHost,
+  host: FsHost,
   program?: Program,
   result: { source: string; target: string }[] = [],
   relativePath: string = "",
@@ -238,4 +237,21 @@ async function traverseDirectory(
     }
     throw error;
   }
+}
+
+/** Minimal Node.js filesystem adapter for use in tests when no CompilerHost is available. */
+function createNodeFsHost(): FsHost {
+  return {
+    async readFile(path: string) {
+      const text = await readFile(path, "utf-8");
+      return { text, path, getLineStarts: () => [] } as any;
+    },
+    async readDir(path: string) {
+      return readdir(path);
+    },
+    async stat(path: string) {
+      const s = await stat(path);
+      return { isDirectory: () => s.isDirectory(), isFile: () => s.isFile() };
+    },
+  };
 }
