@@ -1,0 +1,6 @@
+title: Agent Base Type
+description: Sample specification for a resource implementing the Agent base type.
+
+llmstxt: true
+
+order: 8

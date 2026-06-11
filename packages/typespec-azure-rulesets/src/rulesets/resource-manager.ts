@@ -61,6 +61,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/no-override-props": true,
     "@azure-tools/typespec-azure-resource-manager/no-empty-model": true,
     "@azure-tools/typespec-azure-resource-manager/arm-common-types-version": true,
+    "@azure-tools/typespec-azure-resource-manager/arm-agent-base-type-child-resources": true,
     "@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes": true,
     "@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes": true,
     "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes": true,

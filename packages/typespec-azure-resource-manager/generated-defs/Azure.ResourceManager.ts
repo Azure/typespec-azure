@@ -17,6 +17,11 @@ export interface ResourceOperationOptions {
   readonly omitTags?: boolean;
 }
 
+export interface BaseTypeInfo {
+  readonly baseType: string;
+  readonly version: string;
+}
+
 /**
  * Marks the operation as being a collection action
  */
@@ -348,6 +353,31 @@ export type ResourceBaseTypeDecorator = (
   baseTypeIt: Type,
 ) => DecoratorValidatorCallbacks | void;
 
+/**
+ * `@azureBaseType` marks an Azure Resource Manager resource properties model as implementing
+ * one or more base types. Base types define structured constraints including required and
+ * optional properties that conforming resources must implement.
+ *
+ * The decorator attaches base type metadata to the model which can later be used for
+ * validation of the resource structure.
+ *
+ * @param baseTypes The base type specifications this resource implements.
+ * @example
+ * ```typespec
+ * @azureBaseType(#[#{ baseType: "Agent", version: "2024-06-01" }])
+ * model MyAgentProperties {
+ *   ...AgentProperties;
+ *   ...AgentToolProperty;
+ *   ...DefaultProvisioningStateProperty;
+ * }
+ * ```
+ */
+export type AzureBaseTypeDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  baseTypes: readonly BaseTypeInfo[],
+) => DecoratorValidatorCallbacks | void;
+
 export type AzureResourceManagerDecorators = {
   armResourceCollectionAction: ArmResourceCollectionActionDecorator;
   armProviderNameValue: ArmProviderNameValueDecorator;
@@ -372,4 +402,5 @@ export type AzureResourceManagerDecorators = {
   armCommonTypesVersion: ArmCommonTypesVersionDecorator;
   armVirtualResource: ArmVirtualResourceDecorator;
   resourceBaseType: ResourceBaseTypeDecorator;
+  azureBaseType: AzureBaseTypeDecorator;
 };

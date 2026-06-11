@@ -1501,6 +1501,465 @@ union FooProvisioningState {
 }
 ```
 
+## Azure.ResourceManager.BaseTypes
+
+### `BaseTypeInfo` {#Azure.ResourceManager.BaseTypes.BaseTypeInfo}
+
+An ARM-managed base type descriptor identifying the schema contract a resource conforms to.
+Used as a parameter to the `@azureBaseType` decorator to indicate which
+base types a resource conforms to.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.BaseTypeInfo
+```
+
+#### Properties
+
+| Name     | Type     | Description                                      |
+| -------- | -------- | ------------------------------------------------ |
+| baseType | `string` | The base type identifier (for example, "agent"). |
+| version  | `string` | The schema version of the base type.             |
+
+## Azure.ResourceManager.BaseTypes.Agents
+
+### `Agent` {#Azure.ResourceManager.BaseTypes.Agents.Agent}
+
+Model template for an Agent tracked resource.
+Applies the Agent base type decorator automatically.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Agents.Agent<Properties>
+```
+
+#### Template Parameters
+
+| Name       | Description                                                        |
+| ---------- | ------------------------------------------------------------------ |
+| Properties | RP-specific properties for the agent (must extend AgentProperties) |
+
+#### Properties
+
+| Name        | Type         | Description |
+| ----------- | ------------ | ----------- |
+| properties? | `Properties` |             |
+
+### `AgentConversation` {#Azure.ResourceManager.BaseTypes.Agents.AgentConversation}
+
+Model template for a Conversation child resource of an Agent.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Agents.AgentConversation<Properties, AgentResource>
+```
+
+#### Template Parameters
+
+| Name          | Description                                                                      |
+| ------------- | -------------------------------------------------------------------------------- |
+| Properties    | RP-specific properties for the conversation (must extend ConversationProperties) |
+| AgentResource | The parent Agent resource type                                                   |
+
+#### Properties
+
+| Name        | Type         | Description |
+| ----------- | ------------ | ----------- |
+| properties? | `Properties` |             |
+
+### `AgentDefinition` {#Azure.ResourceManager.BaseTypes.Agents.AgentDefinition}
+
+Inline agent definition describing the model and behavior of the agent.
+Mutability of the rp-determined fields is resolved by the deployment model.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Agents.AgentDefinition
+```
+
+#### Properties
+
+| Name                | Type     | Description                                                                                              |
+| ------------------- | -------- | -------------------------------------------------------------------------------------------------------- |
+| model               | `string` | Model identifier (RP-defined).                                                                           |
+| modelDeploymentRef? | `string` | Optional RP-specific reference to an underlying model deployment.                                        |
+| instructions?       | `string` | System prompt / behavioral instructions. Required on request when the RP exposes this field as writable. |
+
+### `AgentDefinitionAppliance` {#Azure.ResourceManager.BaseTypes.Agents.AgentDefinitionAppliance}
+
+Appliance deployment model resolution of AgentDefinition. All rp-determined fields resolve to read-only.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Agents.AgentDefinitionAppliance
+```
+
+#### Properties
+
+| Name                | Type     | Description                                                       |
+| ------------------- | -------- | ----------------------------------------------------------------- |
+| model?              | `string` | Model identifier (RP-defined).                                    |
+| modelDeploymentRef? | `string` | Optional RP-specific reference to an underlying model deployment. |
+| instructions?       | `string` | System prompt / behavioral instructions.                          |
+
+### `AgentDefinitionPlatform` {#Azure.ResourceManager.BaseTypes.Agents.AgentDefinitionPlatform}
+
+Platform deployment model resolution of AgentDefinition. All rp-determined fields resolve to writable.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Agents.AgentDefinitionPlatform
+```
+
+#### Properties
+
+| Name                | Type     | Description                                                       |
+| ------------------- | -------- | ----------------------------------------------------------------- |
+| model               | `string` | Model identifier (RP-defined).                                    |
+| modelDeploymentRef? | `string` | Optional RP-specific reference to an underlying model deployment. |
+| instructions        | `string` | System prompt / behavioral instructions.                          |
+
+### `AgentInstructionsProperty` {#Azure.ResourceManager.BaseTypes.Agents.AgentInstructionsProperty}
+
+Mix-in for agent instructions.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Agents.AgentInstructionsProperty
+```
+
+#### Properties
+
+| Name         | Type     | Description                              |
+| ------------ | -------- | ---------------------------------------- |
+| instructions | `string` | System prompt / behavioral instructions. |
+
+### `AgentProperties` {#Azure.ResourceManager.BaseTypes.Agents.AgentProperties}
+
+Required properties for an agent resource.
+Resource providers implementing the Agent base type must include these
+properties in their resource property bag.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Agents.AgentProperties
+```
+
+#### Properties
+
+| Name        | Type                                                                                        | Description                                                           |
+| ----------- | ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| baseTypes   | `Azure.ResourceManager.BaseTypes.BaseTypeInfo[]`                                            | ARM-managed. Must include the base type descriptor for this resource. |
+| displayName | `string`                                                                                    | Human-friendly name.                                                  |
+| description | `string`                                                                                    | Purpose/behavior summary.                                             |
+| definition  | [`AgentDefinition`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.AgentDefinition) | Inline agent definition.                                              |
+
+### `AgentPropertiesAppliance` {#Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesAppliance}
+
+Appliance deployment model resolution of AgentProperties.
+In the Appliance model all rp-determined fields resolve to read-only
+(the appliance owns and reports state; the client does not set these fields).
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesAppliance
+```
+
+#### Properties
+
+| Name        | Type                                                                                                          | Description                                                           |
+| ----------- | ------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| baseTypes   | `Azure.ResourceManager.BaseTypes.BaseTypeInfo[]`                                                              | ARM-managed. Must include the base type descriptor for this resource. |
+| displayName | `string`                                                                                                      | Human-friendly name.                                                  |
+| description | `string`                                                                                                      | Purpose/behavior summary.                                             |
+| definition  | [`AgentDefinitionAppliance`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.AgentDefinitionAppliance) | Inline agent definition. See the AgentDefinitionAppliance sub-schema. |
+| tools?      | `Azure.ResourceManager.BaseTypes.Agents.AgentToolTypeEntryAppliance[]`                                        | Tool bindings. See the AgentToolTypeEntryAppliance sub-schema.        |
+
+### `AgentPropertiesPlatform` {#Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesPlatform}
+
+Platform deployment model resolution of AgentProperties.
+In the Platform model all rp-determined fields resolve to writable
+(the client owns these fields). baseTypes remains ARM-managed and read-only.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesPlatform
+```
+
+#### Properties
+
+| Name        | Type                                                                                                        | Description                                                           |
+| ----------- | ----------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| baseTypes   | `Azure.ResourceManager.BaseTypes.BaseTypeInfo[]`                                                            | ARM-managed. Must include the base type descriptor for this resource. |
+| displayName | `string`                                                                                                    | Human-friendly name.                                                  |
+| description | `string`                                                                                                    | Purpose/behavior summary.                                             |
+| definition  | [`AgentDefinitionPlatform`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.AgentDefinitionPlatform) | Inline agent definition. See the AgentDefinitionPlatform sub-schema.  |
+| tools?      | `Azure.ResourceManager.BaseTypes.Agents.AgentToolTypeEntryPlatform[]`                                       | Tool bindings. See the AgentToolTypeEntryPlatform sub-schema.         |
+
+### `AgentResponse` {#Azure.ResourceManager.BaseTypes.Agents.AgentResponse}
+
+Model template for a Response child resource of an Agent.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Agents.AgentResponse<Properties, AgentResource>
+```
+
+#### Template Parameters
+
+| Name          | Description                                                              |
+| ------------- | ------------------------------------------------------------------------ |
+| Properties    | RP-specific properties for the response (must extend ResponseProperties) |
+| AgentResource | The parent Agent resource type                                           |
+
+#### Properties
+
+| Name        | Type         | Description |
+| ----------- | ------------ | ----------- |
+| properties? | `Properties` |             |
+
+### `AgentToolProperty` {#Azure.ResourceManager.BaseTypes.Agents.AgentToolProperty}
+
+Mix-in for agent tool properties.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Agents.AgentToolProperty<ToolType>
+```
+
+#### Template Parameters
+
+| Name     | Description                                               |
+| -------- | --------------------------------------------------------- |
+| ToolType | The type of tool entries. Defaults to AgentToolTypeEntry. |
+
+#### Properties
+
+| Name   | Type             | Description                  |
+| ------ | ---------------- | ---------------------------- |
+| tools? | `Array<Element>` | Tool bindings for the agent. |
+
+### `AgentToolTypeEntry` {#Azure.ResourceManager.BaseTypes.Agents.AgentToolTypeEntry}
+
+A tool binding for an agent, aligned with Azure AI Foundry-style tool bindings.
+Mutability of the fields is resolved by the deployment model.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Agents.AgentToolTypeEntry
+```
+
+#### Properties
+
+| Name | Type     | Description                                                                                  |
+| ---- | -------- | -------------------------------------------------------------------------------------------- |
+| type | `string` | Tool type discriminator. Must be one of the publicly documented Azure AI Foundry tool types. |
+| name | `string` | Tool name/identifier.                                                                        |
+
+### `AgentToolTypeEntryAppliance` {#Azure.ResourceManager.BaseTypes.Agents.AgentToolTypeEntryAppliance}
+
+Appliance deployment model resolution of AgentToolTypeEntry. All fields resolve to read-only.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Agents.AgentToolTypeEntryAppliance
+```
+
+#### Properties
+
+| Name  | Type     | Description                                                                                  |
+| ----- | -------- | -------------------------------------------------------------------------------------------- |
+| type? | `string` | Tool type discriminator. Must be one of the publicly documented Azure AI Foundry tool types. |
+| name? | `string` | Tool name/identifier.                                                                        |
+
+### `AgentToolTypeEntryPlatform` {#Azure.ResourceManager.BaseTypes.Agents.AgentToolTypeEntryPlatform}
+
+Platform deployment model resolution of AgentToolTypeEntry. All fields resolve to writable.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Agents.AgentToolTypeEntryPlatform
+```
+
+#### Properties
+
+| Name | Type     | Description                                                                                  |
+| ---- | -------- | -------------------------------------------------------------------------------------------- |
+| type | `string` | Tool type discriminator. Must be one of the publicly documented Azure AI Foundry tool types. |
+| name | `string` | Tool name/identifier.                                                                        |
+
+### `ConversationOutput` {#Azure.ResourceManager.BaseTypes.Agents.ConversationOutput}
+
+Output from a conversation.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Agents.ConversationOutput
+```
+
+#### Properties
+
+| Name | Type     | Description            |
+| ---- | -------- | ---------------------- |
+| id   | `string` | The output identifier. |
+
+### `ConversationProperties` {#Azure.ResourceManager.BaseTypes.Agents.ConversationProperties}
+
+Properties for a conversation resource holding the items and metadata
+exchanged between a client and an agent.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Agents.ConversationProperties
+```
+
+#### Properties
+
+| Name            | Type          | Description                                                                 |
+| --------------- | ------------- | --------------------------------------------------------------------------- |
+| conversationId? | `string`      | Unique conversation identifier. Read-only (set by the service on creation). |
+| createdAt?      | `utcDateTime` | Timestamp of when the conversation was created. Read-only.                  |
+
+### `InputMessage` {#Azure.ResourceManager.BaseTypes.Agents.InputMessage}
+
+A single input message provided to the model.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Agents.InputMessage
+```
+
+#### Properties
+
+| Name    | Type                                                                            | Description                                                               |
+| ------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| role    | [`AgentRole`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.AgentRole) | The role of the message author (for example, user, system, or developer). |
+| content | `string`                                                                        | The content of the input message.                                         |
+
+### `InputTypeProperty` {#Azure.ResourceManager.BaseTypes.Agents.InputTypeProperty}
+
+Mix-in for input type discriminator.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Agents.InputTypeProperty
+```
+
+#### Properties
+
+| Name  | Type     | Description                   |
+| ----- | -------- | ----------------------------- |
+| type? | `string` | The input type discriminator. |
+
+### `ModelDeploymentRefProperty` {#Azure.ResourceManager.BaseTypes.Agents.ModelDeploymentRefProperty}
+
+Mix-in for the model deployment reference property.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Agents.ModelDeploymentRefProperty
+```
+
+#### Properties
+
+| Name                | Type     | Description                                                       |
+| ------------------- | -------- | ----------------------------------------------------------------- |
+| modelDeploymentRef? | `string` | Optional RP-specific reference to an underlying model deployment. |
+
+### `PreviousResponseProperty` {#Azure.ResourceManager.BaseTypes.Agents.PreviousResponseProperty}
+
+Mix-in for the previous_response_id property.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Agents.PreviousResponseProperty
+```
+
+#### Properties
+
+| Name                  | Type     | Description                                                            |
+| --------------------- | -------- | ---------------------------------------------------------------------- |
+| previous_response_id? | `string` | ID of a previous response for multi-turn chaining. Writable on create. |
+
+### `ResponseInstructionsProperty` {#Azure.ResourceManager.BaseTypes.Agents.ResponseInstructionsProperty}
+
+Mix-in for response instructions.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Agents.ResponseInstructionsProperty
+```
+
+#### Properties
+
+| Name          | Type     | Description                                                                                                             |
+| ------------- | -------- | ----------------------------------------------------------------------------------------------------------------------- |
+| instructions? | `string` | System/developer message for this response. Writable on create; overrides agent-level instructions for this invocation. |
+
+### `ResponseOutputItem` {#Azure.ResourceManager.BaseTypes.Agents.ResponseOutputItem}
+
+An item produced in the response output, such as a message or tool call.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Agents.ResponseOutputItem
+```
+
+#### Properties
+
+| Name     | Type                                                                                      | Description                                               |
+| -------- | ----------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| id?      | `string`                                                                                  | Unique identifier of the output item.                     |
+| type?    | `string`                                                                                  | The output item type (for example, message or tool call). |
+| role?    | [`AgentRole`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.AgentRole)           | The role associated with the output item.                 |
+| status?  | [`ResponseStatus`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ResponseStatus) | The status of the output item.                            |
+| content? | `string`                                                                                  | The content of the output item.                           |
+
+### `ResponseOutputProperty` {#Azure.ResourceManager.BaseTypes.Agents.ResponseOutputProperty}
+
+Mix-in for the output property.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Agents.ResponseOutputProperty
+```
+
+#### Properties
+
+| Name   | Type                                                          | Description                                           |
+| ------ | ------------------------------------------------------------- | ----------------------------------------------------- |
+| output | `Azure.ResourceManager.BaseTypes.Agents.ResponseOutputItem[]` | Output items (messages, tool calls, etc.). Read-only. |
+
+### `ResponseProperties` {#Azure.ResourceManager.BaseTypes.Agents.ResponseProperties}
+
+Properties for a response generated by an agent for a given input,
+including its output, status, and usage.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Agents.ResponseProperties
+```
+
+#### Properties
+
+| Name        | Type                                                                                      | Description                                                                                                          |
+| ----------- | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| responseId? | `string`                                                                                  | Unique response identifier. Read-only (set by the service).                                                          |
+| createdAt?  | `utcDateTime`                                                                             | Timestamp of when the response was created. Read-only.                                                               |
+| model?      | `string`                                                                                  | Model ID used to generate the response. May be specified on request to override the agent default; read-only in GET. |
+| status?     | [`ResponseStatus`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ResponseStatus) | The status of the response. Read-only.                                                                               |
+| input       | [`InputMessage`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.InputMessage)     | Content input to the model. Required on create.                                                                      |
+
+### `AgentRole` {#Azure.ResourceManager.BaseTypes.Agents.AgentRole}
+
+Roles for agent messages.
+
+```typespec
+union Azure.ResourceManager.BaseTypes.Agents.AgentRole
+```
+
+#### Variants
+
+| Name      | Type          | Description        |
+| --------- | ------------- | ------------------ |
+| User      | `"user"`      | The user role.     |
+| Developer | `"developer"` | A developer role.  |
+| Assistant | `"assistant"` | An assistant role. |
+
+### `ResponseStatus` {#Azure.ResourceManager.BaseTypes.Agents.ResponseStatus}
+
+The status of a response.
+
+```typespec
+union Azure.ResourceManager.BaseTypes.Agents.ResponseStatus
+```
+
+#### Variants
+
+| Name       | Type            | Description                           |
+| ---------- | --------------- | ------------------------------------- |
+| Completed  | `"completed"`   | The response completed successfully.  |
+| Failed     | `"failed"`      | The response failed.                  |
+| Cancelled  | `"cancelled"`   | The response was cancelled.           |
+| Incomplete | `"incomplete"`  | The response is incomplete.           |
+| Queued     | `"queued"`      | The response is queued for execution. |
+| InProgress | `"in_progress"` | The response is in progress.          |
+
 ## Azure.ResourceManager.CommonTypes
 
 ### `AccessRule` {#Azure.ResourceManager.CommonTypes.AccessRule}

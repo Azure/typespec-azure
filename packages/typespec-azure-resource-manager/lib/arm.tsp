@@ -22,5 +22,7 @@ import "./parameters.tsp";
 import "./private-endpoints.tsp";
 import "./private-links.tsp";
 import "./network-security-perimeter.tsp";
+import "./base-types/base-types.tsp";
+import "./base-types/agent.tsp";
 
 namespace Azure.ResourceManager;

@@ -1,4 +1,5 @@
 import { defineLinter } from "@typespec/compiler";
+import { armAgentBaseTypeChildResourcesRule } from "./rules/arm-agent-base-type-child-resources.js";
 import { armCommonTypesVersionRule } from "./rules/arm-common-types-version.js";
 import { armCustomResourceNoKey } from "./rules/arm-custom-resource-no-key.js";
 import { armCustomResourceUsageDiscourage } from "./rules/arm-custom-resource-usage-discourage.js";
@@ -38,6 +39,7 @@ import { unsupportedTypeRule } from "./rules/unsupported-type.js";
 import { versionProgressionRule } from "./rules/version-progression.js";
 
 const rules = [
+  armAgentBaseTypeChildResourcesRule,
   armNoRecordRule,
   armNoPathCasingConflictsRule,
   noOverridePropsRule,

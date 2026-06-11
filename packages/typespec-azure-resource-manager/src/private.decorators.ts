@@ -532,7 +532,8 @@ export function registerArmResource(
     namespaceName === undefined ||
     namespaceName === "Azure.ResourceManager" ||
     namespaceName === "Azure.ResourceManager.Legacy" ||
-    namespaceName === "Azure.ResourceManager.CommonTypes"
+    namespaceName === "Azure.ResourceManager.CommonTypes" ||
+    namespaceName?.startsWith("Azure.ResourceManager.BaseTypes")
   ) {
     // The @armResource decorator will be evaluated on instantiations of
     // base templated resource types like TrackedResource<SomeResource>,
