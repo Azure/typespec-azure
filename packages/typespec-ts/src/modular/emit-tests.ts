@@ -1,5 +1,5 @@
+import { joinPaths } from "@typespec/compiler";
 import { existsSync, rmSync } from "fs";
-import { join } from "path";
 import { SourceFile } from "ts-morph";
 import { resolveReference } from "../framework/reference.js";
 import { NameType, normalizeName } from "../rlc-common/index.js";
@@ -24,13 +24,17 @@ import { CreateRecorderHelpers } from "./static-helpers-metadata.js";
  */
 async function cleanupTestFolder(dpgContext: SdkContext) {
   const clients = dpgContext.sdkPackage.clients;
-  const baseTestFolder = join(dpgContext.generationPathDetail?.rootDir ?? "", "test", "generated");
+  const baseTestFolder = joinPaths(
+    dpgContext.generationPathDetail?.rootDir ?? "",
+    "test",
+    "generated",
+  );
 
   // If there are multiple clients, clean up subfolders
   if (clients.length > 1) {
     for (const client of clients) {
       const subFolder = normalizeName(getClassicalClientName(client), NameType.File);
-      const clientTestFolder = join(baseTestFolder, subFolder);
+      const clientTestFolder = joinPaths(baseTestFolder, subFolder);
       if (existsSync(clientTestFolder)) {
         rmSync(clientTestFolder, { recursive: true, force: true });
       }

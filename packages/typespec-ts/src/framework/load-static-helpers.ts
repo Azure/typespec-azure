@@ -1,6 +1,5 @@
-import { NoTarget, Program } from "@typespec/compiler";
+import { joinPaths, NoTarget, Program } from "@typespec/compiler";
 import { readdir, readFile, stat } from "fs/promises";
-import * as path from "path";
 import {
   ClassDeclaration,
   EnumDeclaration,
@@ -55,7 +54,7 @@ export async function loadStaticHelpers(
 ): Promise<Map<string, StaticHelperMetadata>> {
   const helpersMap = new Map<string, StaticHelperMetadata>();
   // Load static helpers used in sources code
-  const defaultStaticHelpersPath = path.join(
+  const defaultStaticHelpersPath = joinPaths(
     resolveProjectRoot(),
     DEFAULT_SOURCES_STATIC_HELPERS_PATH,
   );
@@ -69,7 +68,7 @@ export async function loadStaticHelpers(
     options.loadTestHelpers ??
     (options.options?.generateTest && isAzurePackage({ options: options.options }))
   ) {
-    const defaultTestingHelpersPath = path.join(
+    const defaultTestingHelpersPath = joinPaths(
       resolveProjectRoot(),
       DEFAULT_SOURCES_TESTING_HELPERS_PATH,
     );
@@ -86,7 +85,7 @@ export async function loadStaticHelpers(
 
   async function loadFiles(files: FileMetadata[], generateDir: string) {
     for (const file of files) {
-      const targetPath = path.join(generateDir, file.target);
+      const targetPath = joinPaths(generateDir, file.target);
       const contents = await readFile(file.source, "utf-8");
       const addedFile = project.createSourceFile(targetPath, contents, {
         overwrite: true,
@@ -200,7 +199,7 @@ async function traverseDirectory(
 
     await Promise.all(
       files.map(async (file) => {
-        const filePath = path.join(directory, file);
+        const filePath = joinPaths(directory, file);
         const fileStat = await stat(filePath);
 
         if (fileStat.isDirectory()) {
@@ -208,11 +207,11 @@ async function traverseDirectory(
             filePath,
             program,
             result,
-            path.join(relativePath, file),
+            joinPaths(relativePath, file),
             targetBaseDir,
           );
         } else if (fileStat.isFile() && !file.endsWith(".d.ts") && /.*\..?ts$/.test(file)) {
-          const target = path.join(targetBaseDir, relativePath, file);
+          const target = joinPaths(targetBaseDir, relativePath, file);
           result.push({ source: filePath, target });
         }
       }),

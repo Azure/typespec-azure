@@ -1,7 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { EmitContext, Program } from "@typespec/compiler";
+import { EmitContext, Program, getBaseFileName, joinPaths } from "@typespec/compiler";
+import { existsSync } from "fs";
 import { provideContext, useContext } from "./context-manager.js";
 import { buildRootIndex, buildSubClientIndexFile } from "./modular/build-root-index.js";
 import {
@@ -79,8 +80,6 @@ import {
   createSdkContext,
   listAllServiceNamespaces,
 } from "@azure-tools/typespec-client-generator-core";
-import { existsSync } from "fs";
-import { basename, join } from "path";
 import { Project } from "ts-morph";
 import { provideBinder } from "./framework/hooks/binder.js";
 import { provideSdkTypes } from "./framework/hooks/sdk-types.js";
@@ -220,7 +219,7 @@ export async function $onEmit(context: EmitContext) {
       await clearDirectory(context.emitterOutputDir, ["TempTypeSpecFiles"], program);
     }
     const hasTestFolder = await pathExists(
-      join(dpgContext.generationPathDetail?.metadataDir ?? "", "test"),
+      joinPaths(dpgContext.generationPathDetail?.metadataDir ?? "", "test"),
     );
     options.generateTest =
       options.generateTest === true ||
@@ -232,15 +231,15 @@ export async function $onEmit(context: EmitContext) {
 
   async function calculateGenerationDir(): Promise<GenerationDirDetail> {
     const projectRoot = context.emitterOutputDir ?? "";
-    const customizationFolder = join(projectRoot, "generated");
-    const srcGeneratedFolder = join(projectRoot, "src", "generated");
+    const customizationFolder = joinPaths(projectRoot, "generated");
+    const srcGeneratedFolder = joinPaths(projectRoot, "src", "generated");
     // if customization folder exists, use it as sources root
     const finalCustomizationFolder = (await pathExists(srcGeneratedFolder))
       ? srcGeneratedFolder
       : customizationFolder;
     const sourcesRoot = (await pathExists(finalCustomizationFolder))
       ? finalCustomizationFolder
-      : join(projectRoot, "src");
+      : joinPaths(projectRoot, "src");
     return {
       rootDir: projectRoot,
       metadataDir: projectRoot,
@@ -259,7 +258,10 @@ export async function $onEmit(context: EmitContext) {
 
   async function clearSamplesDevFolder() {
     if (emitterOptions["generate-sample"] === true) {
-      const samplesDevPath = join(dpgContext.generationPathDetail?.rootDir ?? "", "samples-dev");
+      const samplesDevPath = joinPaths(
+        dpgContext.generationPathDetail?.rootDir ?? "",
+        "samples-dev",
+      );
       if (await pathExists(samplesDevPath)) {
         await emptyDir(samplesDevPath);
       }
@@ -316,7 +318,7 @@ export async function $onEmit(context: EmitContext) {
       // platform-types (and its browser/react-native variants); emit those
       // files directly under src/ (strip the static-helpers/ segment) to match
       // the RLC design where all generated output lives in src/.
-      if (!basename(filePath).startsWith("platform-types")) {
+      if (!getBaseFileName(filePath).startsWith("platform-types")) {
         continue;
       }
       const outputPath = filePath.replace(/\/static-helpers\//g, "/");
@@ -450,27 +452,30 @@ export async function $onEmit(context: EmitContext) {
     // to avoid unexpected modifications to files like package.json, README.md,
     // warp.config.yml, and snippets.spec.ts. metadata.json is still updated.
     const sourcesDir = dpgContext.generationPathDetail?.modularSourcesDir ?? "";
-    const hasManualConvenienceLayer = basename(sourcesDir) === "generated";
+    const hasManualConvenienceLayer = getBaseFileName(sourcesDir) === "generated";
     const isAzureFlavor = isAzurePackage({ options: option });
     // Generate metadata
-    const existingPackageFilePath = join(
+    const existingPackageFilePath = joinPaths(
       dpgContext.generationPathDetail?.metadataDir ?? "",
       "package.json",
     );
-    const hasPackageFile = await existsSync(existingPackageFilePath);
-    const existingReadmeFilePath = join(
+    const hasPackageFile = existsSync(existingPackageFilePath);
+    const existingReadmeFilePath = joinPaths(
       dpgContext.generationPathDetail?.metadataDir ?? "",
       "README.md",
     );
-    const hasReadmeFile = await existsSync(existingReadmeFilePath);
-    const existingChangelogFilePath = join(
+    const hasReadmeFile = existsSync(existingReadmeFilePath);
+    const existingChangelogFilePath = joinPaths(
       dpgContext.generationPathDetail?.metadataDir ?? "",
       "CHANGELOG.md",
     );
-    const hasChangelogFile = await existsSync(existingChangelogFilePath);
+    const hasChangelogFile = existsSync(existingChangelogFilePath);
     const shouldGenerateMetadata = option.generateMetadata === true || !hasPackageFile;
-    const existingTestFolderPath = join(dpgContext.generationPathDetail?.metadataDir ?? "", "test");
-    const hasTestFolder = await existsSync(existingTestFolderPath);
+    const existingTestFolderPath = joinPaths(
+      dpgContext.generationPathDetail?.metadataDir ?? "",
+      "test",
+    );
+    const hasTestFolder = existsSync(existingTestFolderPath);
     if (option.generateTest === undefined) {
       if (hasTestFolder) {
         option.generateTest = false;

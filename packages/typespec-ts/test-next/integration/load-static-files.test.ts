@@ -1,11 +1,12 @@
+import { getDirectoryPath } from "@typespec/compiler";
 import path from "path";
 import { Project } from "ts-morph";
+import { fileURLToPath } from "url";
 import { assert, beforeEach, describe, expect, it } from "vitest";
 import { loadStaticHelpers } from "../../src/framework/load-static-helpers.js";
 import { refkey } from "../../src/framework/refkey.js";
-import { getDirname } from "../../src/utils/dirname.js";
 
-const __dirname = getDirname(import.meta.url).__dirname;
+const __dirname = getDirectoryPath(fileURLToPath(import.meta.url));
 
 describe("loadStaticHelpers", () => {
   let project: Project;
