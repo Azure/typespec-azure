@@ -23,7 +23,7 @@ import { RLCModel } from "./interfaces.js";
 export function buildIndexFile(model: RLCModel) {
   const multiClient = Boolean(model.options?.multiClient),
     batch = model.options?.batch;
-  const project = new Project();
+  const project = new Project({ useInMemoryFileSystem: true });
   const { srcPath } = model;
   const filePath = joinPaths(srcPath, `index.ts`);
   const indexFile = project.createSourceFile(filePath, undefined, {

@@ -116,7 +116,7 @@ export async function $onEmit(context: EmitContext) {
     return;
   }
   /** Shared status */
-  const outputProject = new Project();
+  const outputProject = new Project({ useInMemoryFileSystem: true });
   const program: Program = context.program;
   const host: CompilerHost = program.host;
   const emitterOptions: EmitterOptions = context.options;

@@ -66,7 +66,7 @@ export function buildPackageFile(
     packageInfo = buildAzureStandalonePackage(extendedConfig);
   }
 
-  const project = new Project();
+  const project = new Project({ useInMemoryFileSystem: true });
   const filePath = "package.json";
 
   if (!packageInfo) {
@@ -108,7 +108,7 @@ export function updatePackageFile(
   if (typeof existingFilePathOrContent === "string") {
     let packageFile: SourceFile;
     try {
-      const project = new Project();
+      const project = new Project({ useInMemoryFileSystem: true });
       packageFile = project.addSourceFileAtPath(existingFilePathOrContent);
     } catch (_e) {
       // If the file doesn't exist, we don't need to update it.
