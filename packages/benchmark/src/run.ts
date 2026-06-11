@@ -5,8 +5,10 @@ import { readdir } from "fs/promises";
 import os from "os";
 import { join, resolve } from "path";
 import { aggregateDurations } from "./aggregate.js";
+import { summarize } from "./statistics.js";
 import type {
   BenchmarkResult,
+  NoiseGateInfo,
   RunnerInfo,
   RuntimeStats,
   SpecBenchmarkResult,
@@ -27,6 +29,12 @@ export interface RunOptions {
   specs?: string[];
   /** Git commit SHA to record. */
   commit?: string;
+  /** If set, rerun a spec when total-runtime coefficient of variation exceeds threshold. */
+  noiseCvThreshold?: number;
+  /** Max number of rerun cycles for noisy specs. */
+  maxReruns?: number;
+  /** Number of additional measured iterations on each rerun (default: iterations). */
+  rerunIterations?: number;
 }
 
 /** Discover benchmark spec directories under the given path. */
@@ -208,6 +216,9 @@ export async function runBenchmarks(options: RunOptions): Promise<BenchmarkResul
   );
 
   const specs: Record<string, SpecBenchmarkResult> = {};
+  const noiseCvThreshold = options.noiseCvThreshold;
+  const maxReruns = options.maxReruns ?? 0;
+  const rerunIterations = options.rerunIterations ?? iterations;
 
   for (const specName of specNames) {
     const specDir = join(specsDir, specName);
@@ -227,14 +238,52 @@ export async function runBenchmarks(options: RunOptions): Promise<BenchmarkResul
       rawIterations.push(stats);
     }
 
+    let rerunsPerformed = 0;
+    if (noiseCvThreshold !== undefined && maxReruns > 0 && rerunIterations > 0) {
+      for (let rerun = 0; rerun < maxReruns; rerun++) {
+        const totalSummary = summarize(rawIterations.map((x) => x.runtime.total));
+        if (totalSummary.cv <= noiseCvThreshold) {
+          break;
+        }
+
+        rerunsPerformed++;
+        console.log(
+          `    Noise gate triggered (CV ${(totalSummary.cv * 100).toFixed(1)}% > ${(noiseCvThreshold * 100).toFixed(1)}%), running ${rerunIterations} extra iteration(s)...`,
+        );
+        for (let i = 0; i < rerunIterations; i++) {
+          console.log(`    Rerun iteration ${i + 1}/${rerunIterations}...`);
+          const stats = await compileSpec(specDir);
+          rawIterations.push(stats);
+        }
+      }
+    }
+
+    const totalSummary = summarize(rawIterations.map((x) => x.runtime.total));
+    const noiseGateInfo: NoiseGateInfo | undefined =
+      noiseCvThreshold === undefined
+        ? undefined
+        : {
+            thresholdCv: noiseCvThreshold,
+            maxReruns,
+            rerunIterations,
+            rerunsPerformed,
+            triggered: rerunsPerformed > 0,
+          };
+
     specs[specName] = {
       name: specName,
-      iterations,
+      iterations: rawIterations.length,
       stats: averageStats(rawIterations),
       rawIterations,
+      variability: {
+        total: totalSummary,
+        noiseGate: noiseGateInfo,
+      },
     };
 
-    console.log(`    Total: ${specs[specName].stats.runtime.total.toFixed(1)}ms (avg)`);
+    console.log(
+      `    Total: ${specs[specName].stats.runtime.total.toFixed(1)}ms (avg), CV ${(totalSummary.cv * 100).toFixed(1)}%`,
+    );
   }
 
   const commit = getGitCommit(options.commit);

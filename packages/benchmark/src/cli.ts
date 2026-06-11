@@ -38,6 +38,11 @@ Run options:
   --specs-dir <dir>     Directory containing benchmark specs (default: built-in specs)
   --iterations <n>      Number of measured iterations (default: 5)
   --warmup <n>          Number of warmup iterations (default: 1)
+  --noise-cv-threshold <n>
+                        Rerun when total-runtime coefficient of variation is above this value (e.g. 0.08 = 8%)
+  --max-reruns <n>      Max rerun cycles when noise gate triggers (default: 0)
+  --rerun-iterations <n>
+                        Extra measured iterations per rerun (default: same as --iterations)
   --specs <name,...>    Comma-separated list of specific specs to run
   --commit <sha>        Git commit SHA to record
   --output <file>       Output file for results JSON (default: stdout)
@@ -64,6 +69,7 @@ Upload-pr-comment options:
   --pr-number <n>       Pull request number
   --output-dir <dir>    Output directory for artifacts
   --branch <name>       Branch name for fetching baseline (default: benchmark-data)
+  --baseline-window <n> Number of recent main results to build rolling baseline (default: 20)
   --threshold <n>       Percent threshold for notable changes (default: 5)
 
 Backfill options:
@@ -127,6 +133,14 @@ async function runCommand(args: Record<string, string>): Promise<void> {
   const specs = args["specs"]?.split(",");
   const commit = args["commit"];
   const outputFile = args["output"];
+  const noiseCvThreshold =
+    args["noise-cv-threshold"] !== undefined
+      ? parseFloat(args["noise-cv-threshold"])
+      : undefined;
+  const maxReruns = args["max-reruns"] ? parseInt(args["max-reruns"], 10) : undefined;
+  const rerunIterations = args["rerun-iterations"]
+    ? parseInt(args["rerun-iterations"], 10)
+    : undefined;
 
   const result = await runBenchmarks({
     specsDir,
@@ -134,6 +148,9 @@ async function runCommand(args: Record<string, string>): Promise<void> {
     warmup,
     specs,
     commit,
+    noiseCvThreshold,
+    maxReruns,
+    rerunIterations,
   });
 
   await outputResult(JSON.stringify(result, null, 2), outputFile);
@@ -205,6 +222,7 @@ function uploadPrCommentCommand(args: Record<string, string>): void {
     outputDir,
     branch: args["branch"],
     threshold: args["threshold"] ? parseFloat(args["threshold"]) : undefined,
+    baselineWindow: args["baseline-window"] ? parseInt(args["baseline-window"], 10) : undefined,
   });
 }
 

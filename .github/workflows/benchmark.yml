@@ -19,6 +19,11 @@ on:
         required: false
         type: string
         default: "benchmark-data"
+      runner:
+        description: "Runner label (for stable runs prefer self-hosted or larger dedicated runner)"
+        required: false
+        type: string
+        default: "ubuntu-latest"
 
 permissions:
   contents: write
@@ -30,7 +35,7 @@ concurrency:
 jobs:
   benchmark:
     name: Run Benchmarks
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && inputs.runner || vars.BENCHMARK_RUNNER || 'ubuntu-latest' }}
     env:
       TYPESPEC_VS_CI_BUILD: true
       TYPESPEC_SKIP_WEBSITE_BUILD: true
@@ -41,6 +46,8 @@ jobs:
           fetch-depth: 0
 
       - uses: ./.github/actions/setup
+        with:
+          node-version: 24.11.1
 
       - name: Install dependencies
         run: pnpm install
@@ -54,8 +61,8 @@ jobs:
           node packages/benchmark/dist/src/cli.js backfill \
             --from ${{ inputs.backfill_from }} \
             --specs-dir packages/benchmark/specs \
-            --iterations 15 \
-            --warmup 1 \
+            --iterations 25 \
+            --warmup 3 \
             --branch ${{ inputs.branch }} \
             --push
 
@@ -64,8 +71,11 @@ jobs:
         run: |
           node packages/benchmark/dist/src/cli.js run \
             --specs-dir packages/benchmark/specs \
-            --iterations 15 \
-            --warmup 1 \
+            --iterations 25 \
+            --warmup 3 \
+            --noise-cv-threshold 0.08 \
+            --max-reruns 1 \
+            --rerun-iterations 10 \
             --commit ${{ github.sha }} \
             --output /tmp/benchmark-results.json
 
@@ -84,6 +94,7 @@ jobs:
           node packages/benchmark/dist/src/cli.js upload-pr-comment \
             --results /tmp/benchmark-results.json \
             --pr-number ${{ github.event.number }} \
+            --baseline-window 20 \
             --output-dir /tmp/benchmark-artifacts
 
       - name: Upload benchmark comment
