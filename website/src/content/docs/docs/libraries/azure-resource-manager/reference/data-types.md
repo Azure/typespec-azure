@@ -1538,6 +1538,135 @@ model Azure.ResourceManager.CommonTypes.AccessRuleProperties
 | emailAddresses?            | `string[]`                                                                                     | Email addresses for outbound rules                     |
 | phoneNumbers?              | `string[]`                                                                                     | Phone numbers for outbound rules                       |
 
+### `AgentBaseTypePropertiesAppliance` {#Azure.ResourceManager.CommonTypes.AgentBaseTypePropertiesAppliance}
+
+Appliance deployment model resolution of AgentBaseTypeProperties. In the Appliance model all rp-determined fields resolve to read-only (the appliance owns and reports state; the client does not set these fields).
+
+```typespec
+model Azure.ResourceManager.CommonTypes.AgentBaseTypePropertiesAppliance
+```
+
+#### Properties
+
+| Name        | Type                                                                                                     | Description                                                                    |
+| ----------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| baseTypes   | `Azure.ResourceManager.CommonTypes.BaseType[]`                                                           | ARM-managed. Must include {"baseType": "agent", "version": "{schemaVersion}"}. |
+| displayName | `string`                                                                                                 | Human-friendly name.                                                           |
+| description | `string`                                                                                                 | Purpose/behavior summary.                                                      |
+| definition  | [`AgentDefinitionAppliance`](./data-types.md#Azure.ResourceManager.CommonTypes.AgentDefinitionAppliance) | Inline agent definition. See the AgentDefinitionAppliance sub-schema.          |
+| tools?      | `Azure.ResourceManager.CommonTypes.AgentToolAppliance[]`                                                 | Tool bindings. See the AgentToolAppliance sub-schema.                          |
+
+### `AgentBaseTypePropertiesPlatform` {#Azure.ResourceManager.CommonTypes.AgentBaseTypePropertiesPlatform}
+
+Platform deployment model resolution of AgentBaseTypeProperties. In the Platform model all rp-determined fields resolve to writable (the client owns these fields). baseTypes remains ARM-managed and read-only.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.AgentBaseTypePropertiesPlatform
+```
+
+#### Properties
+
+| Name        | Type                                                                                                   | Description                                                                    |
+| ----------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
+| baseTypes   | `Azure.ResourceManager.CommonTypes.BaseType[]`                                                         | ARM-managed. Must include {"baseType": "agent", "version": "{schemaVersion}"}. |
+| displayName | `string`                                                                                               | Human-friendly name.                                                           |
+| description | `string`                                                                                               | Purpose/behavior summary.                                                      |
+| definition  | [`AgentDefinitionPlatform`](./data-types.md#Azure.ResourceManager.CommonTypes.AgentDefinitionPlatform) | Inline agent definition. See the AgentDefinitionPlatform sub-schema.           |
+| tools?      | `Azure.ResourceManager.CommonTypes.AgentToolPlatform[]`                                                | Tool bindings. See the AgentToolPlatform sub-schema.                           |
+
+### `AgentDefinition` {#Azure.ResourceManager.CommonTypes.AgentDefinition}
+
+Inline agent definition describing the model and behavior of the agent. Mutability of the rp-determined fields is resolved by the deployment model.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.AgentDefinition
+```
+
+#### Properties
+
+| Name                | Type     | Description                                                                                              |
+| ------------------- | -------- | -------------------------------------------------------------------------------------------------------- |
+| model               | `string` | Model identifier (RP-defined).                                                                           |
+| modelDeploymentRef? | `string` | Optional RP-specific reference to an underlying model deployment.                                        |
+| instructions?       | `string` | System prompt / behavioral instructions. Required on request when the RP exposes this field as writable. |
+
+### `AgentDefinitionAppliance` {#Azure.ResourceManager.CommonTypes.AgentDefinitionAppliance}
+
+Appliance deployment model resolution of AgentDefinition. All rp-determined fields resolve to read-only.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.AgentDefinitionAppliance
+```
+
+#### Properties
+
+| Name                | Type     | Description                                                       |
+| ------------------- | -------- | ----------------------------------------------------------------- |
+| model?              | `string` | Model identifier (RP-defined).                                    |
+| modelDeploymentRef? | `string` | Optional RP-specific reference to an underlying model deployment. |
+| instructions?       | `string` | System prompt / behavioral instructions.                          |
+
+### `AgentDefinitionPlatform` {#Azure.ResourceManager.CommonTypes.AgentDefinitionPlatform}
+
+Platform deployment model resolution of AgentDefinition. All rp-determined fields resolve to writable.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.AgentDefinitionPlatform
+```
+
+#### Properties
+
+| Name                | Type     | Description                                                       |
+| ------------------- | -------- | ----------------------------------------------------------------- |
+| model               | `string` | Model identifier (RP-defined).                                    |
+| modelDeploymentRef? | `string` | Optional RP-specific reference to an underlying model deployment. |
+| instructions        | `string` | System prompt / behavioral instructions.                          |
+
+### `AgentTool` {#Azure.ResourceManager.CommonTypes.AgentTool}
+
+A tool binding for an agent, aligned with Azure AI Foundry-style tool bindings. Mutability of the rp-determined fields is resolved by the deployment model.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.AgentTool
+```
+
+#### Properties
+
+| Name | Type     | Description                                                                                  |
+| ---- | -------- | -------------------------------------------------------------------------------------------- |
+| type | `string` | Tool type discriminator. Must be one of the publicly documented Azure AI Foundry tool types. |
+| name | `string` | Tool name/identifier.                                                                        |
+
+### `AgentToolAppliance` {#Azure.ResourceManager.CommonTypes.AgentToolAppliance}
+
+Appliance deployment model resolution of AgentTool. All fields resolve to read-only.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.AgentToolAppliance
+```
+
+#### Properties
+
+| Name  | Type     | Description                                                                                  |
+| ----- | -------- | -------------------------------------------------------------------------------------------- |
+| type? | `string` | Tool type discriminator. Must be one of the publicly documented Azure AI Foundry tool types. |
+| name? | `string` | Tool name/identifier.                                                                        |
+
+### `AgentToolPlatform` {#Azure.ResourceManager.CommonTypes.AgentToolPlatform}
+
+Platform deployment model resolution of AgentTool. All fields resolve to writable.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.AgentToolPlatform
+```
+
+#### Properties
+
+| Name | Type     | Description                                                                                  |
+| ---- | -------- | -------------------------------------------------------------------------------------------- |
+| type | `string` | Tool type discriminator. Must be one of the publicly documented Azure AI Foundry tool types. |
+| name | `string` | Tool name/identifier.                                                                        |
+
 ### `ApiVersionParameter` {#Azure.ResourceManager.CommonTypes.ApiVersionParameter}
 
 The default api-version parameter type.
@@ -1574,6 +1703,21 @@ model Azure.ResourceManager.CommonTypes.AzureEntityResource
 | ----- | -------- | -------------- |
 | etag? | `string` | Resource Etag. |
 
+### `BaseType` {#Azure.ResourceManager.CommonTypes.BaseType}
+
+An ARM-managed base type descriptor identifying the schema contract a resource conforms to.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.BaseType
+```
+
+#### Properties
+
+| Name     | Type     | Description                                      |
+| -------- | -------- | ------------------------------------------------ |
+| baseType | `string` | The base type identifier (for example, "agent"). |
+| version  | `string` | The schema version of the base type.             |
+
 ### `CheckNameAvailabilityRequest` {#Azure.ResourceManager.CommonTypes.CheckNameAvailabilityRequest}
 
 The check availability request body.
@@ -1604,6 +1748,39 @@ model Azure.ResourceManager.CommonTypes.CheckNameAvailabilityResponse
 | nameAvailable? | `boolean`                                                                                                      | Indicates if the resource name is available.         |
 | reason?        | [`CheckNameAvailabilityReason`](./data-types.md#Azure.ResourceManager.CommonTypes.CheckNameAvailabilityReason) | The reason why the given name is not available.      |
 | message?       | `string`                                                                                                       | Detailed reason why the given name is not available. |
+
+### `Conversation` {#Azure.ResourceManager.CommonTypes.Conversation}
+
+A conversation resource holding the items and metadata exchanged between a client and an agent.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.Conversation
+```
+
+#### Properties
+
+| Name            | Type                                                   | Description                                                                                                                                                                                                          |
+| --------------- | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| conversationId? | `string`                                               | Unique conversation identifier. Read-only (set by the service on creation).                                                                                                                                          |
+| createdAt?      | `int64`                                                | Unix timestamp of when the conversation was created. Read-only.                                                                                                                                                      |
+| metadata?       | `Record<string>`                                       | Up to 16 key-value pairs (keys max 64 chars, values max 512 chars). Writable on create and update.                                                                                                                   |
+| items?          | `Azure.ResourceManager.CommonTypes.ConversationItem[]` | Conversation items (messages, tool calls, tool outputs). Each item has type, role, and content. Up to 20 items may be provided at creation. Writable on create; additional items are appended by response execution. |
+
+### `ConversationItem` {#Azure.ResourceManager.CommonTypes.ConversationItem}
+
+A conversation item such as a message, tool call, or tool output.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.ConversationItem
+```
+
+#### Properties
+
+| Name     | Type     | Description                                                                |
+| -------- | -------- | -------------------------------------------------------------------------- |
+| type?    | `string` | The item type (for example, message, tool call, or tool output).           |
+| role?    | `string` | The role associated with the item (for example, user, assistant, or tool). |
+| content? | `string` | The content of the conversation item.                                      |
 
 ### `CustomerManagedKeyEncryption` {#Azure.ResourceManager.CommonTypes.CustomerManagedKeyEncryption}
 
@@ -1798,6 +1975,21 @@ model Azure.ResourceManager.CommonTypes.IfNoneMatchHeader
 | Name        | Type     | Description                                                |
 | ----------- | -------- | ---------------------------------------------------------- |
 | ifNoneMatch | `string` | The If-None-Match header that makes a request conditional. |
+
+### `InputMessage` {#Azure.ResourceManager.CommonTypes.InputMessage}
+
+A single input message provided to the model.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.InputMessage
+```
+
+#### Properties
+
+| Name     | Type     | Description                                                               |
+| -------- | -------- | ------------------------------------------------------------------------- |
+| role?    | `string` | The role of the message author (for example, user, system, or developer). |
+| content? | `string` | The content of the input message.                                         |
 
 ### `KeyEncryptionKeyIdentity` {#Azure.ResourceManager.CommonTypes.KeyEncryptionKeyIdentity}
 
@@ -2607,6 +2799,98 @@ model Azure.ResourceManager.CommonTypes.ResourceModelWithAllowedPropertySet
 | identity?  | [`ManagedServiceIdentity`](./data-types.md#Azure.ResourceManager.CommonTypes.ManagedServiceIdentity) |                                                                                                                                                                                                                                                                                                                                                                                                                |
 | sku?       | [`Sku`](./data-types.md#Azure.ResourceManager.CommonTypes.Sku)                                       |                                                                                                                                                                                                                                                                                                                                                                                                                |
 | plan?      | [`Plan`](./data-types.md#Azure.ResourceManager.CommonTypes.Plan)                                     |                                                                                                                                                                                                                                                                                                                                                                                                                |
+
+### `Response` {#Azure.ResourceManager.CommonTypes.Response}
+
+A response generated by an agent for a given input, including its output, status, and usage.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.Response
+```
+
+#### Properties
+
+| Name                  | Type                                                                                                       | Description                                                                                                                                           |
+| --------------------- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| responseId?           | `string`                                                                                                   | Unique response identifier. Read-only (set by the service).                                                                                           |
+| createdAt?            | `int64`                                                                                                    | Unix timestamp of when the response was created. Read-only.                                                                                           |
+| model?                | `string`                                                                                                   | Model ID used to generate the response (e.g., gpt-4o-mini). May be specified on request to override the agent default; read-only in GET.              |
+| status?               | `"completed" \| "failed" \| "cancelled" \| "incomplete" \| "queued" \| "in_progress"`                      | The status of the response. Read-only.                                                                                                                |
+| input                 | `Azure.ResourceManager.CommonTypes.InputMessage[]`                                                         | Content input to the model. Required on create. May be provided as a single string or as an array of input messages; see the InputMessage sub-schema. |
+| output?               | `Azure.ResourceManager.CommonTypes.ResponseOutputItem[]`                                                   | Output items (messages, tool calls, etc.). Each item has id, type, role, status, content. Read-only.                                                  |
+| previous_response_id? | `string`                                                                                                   | ID of a previous response for multi-turn chaining (alternative to conversation). Writable on create.                                                  |
+| conversation?         | `{...}`                                                                                                    | Conversation association: { id }. Writable on create to link response to a conversation.                                                              |
+| conversation.id?      | `string`                                                                                                   |                                                                                                                                                       |
+| instructions?         | `string`                                                                                                   | System/developer message for this response. Writable on create; overrides agent-level instructions for this invocation.                               |
+| tools?                | `Azure.ResourceManager.CommonTypes.AgentTool[]`                                                            | Tools available during this response. Writable on create; overrides agent-level tools for this invocation.                                            |
+| tool_choice?          | `unknown`                                                                                                  | How the model should select tools. May be a string (e.g., auto, none) or an object. Writable on create.                                               |
+| metadata?             | `Record<string>`                                                                                           | Up to 16 key-value pairs. Writable on create and update.                                                                                              |
+| usage?                | [`ResponseUsage`](./data-types.md#Azure.ResourceManager.CommonTypes.ResponseUsage)                         | Token usage: { input_tokens, output_tokens, total_tokens }. Read-only.                                                                                |
+| error?                | [`ResponseError`](./data-types.md#Azure.ResourceManager.CommonTypes.ResponseError)                         | Error details if the response failed: { code, message }.                                                                                              |
+| incomplete_details?   | [`ResponseIncompleteDetails`](./data-types.md#Azure.ResourceManager.CommonTypes.ResponseIncompleteDetails) | Details if the response is incomplete: { reason } (e.g., max_output_tokens).                                                                          |
+
+### `ResponseError` {#Azure.ResourceManager.CommonTypes.ResponseError}
+
+Error details for a failed response.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.ResponseError
+```
+
+#### Properties
+
+| Name     | Type     | Description                     |
+| -------- | -------- | ------------------------------- |
+| code?    | `string` | A machine-readable error code.  |
+| message? | `string` | A human-readable error message. |
+
+### `ResponseIncompleteDetails` {#Azure.ResourceManager.CommonTypes.ResponseIncompleteDetails}
+
+Details explaining why a response is incomplete.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.ResponseIncompleteDetails
+```
+
+#### Properties
+
+| Name    | Type     | Description                                                             |
+| ------- | -------- | ----------------------------------------------------------------------- |
+| reason? | `string` | The reason the response is incomplete (for example, max_output_tokens). |
+
+### `ResponseOutputItem` {#Azure.ResourceManager.CommonTypes.ResponseOutputItem}
+
+An item produced in the response output, such as a message or tool call.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.ResponseOutputItem
+```
+
+#### Properties
+
+| Name     | Type     | Description                                               |
+| -------- | -------- | --------------------------------------------------------- |
+| id?      | `string` | Unique identifier of the output item.                     |
+| type?    | `string` | The output item type (for example, message or tool call). |
+| role?    | `string` | The role associated with the output item.                 |
+| status?  | `string` | The status of the output item.                            |
+| content? | `string` | The content of the output item.                           |
+
+### `ResponseUsage` {#Azure.ResourceManager.CommonTypes.ResponseUsage}
+
+Token usage information for a response.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.ResponseUsage
+```
+
+#### Properties
+
+| Name           | Type    | Description                                 |
+| -------------- | ------- | ------------------------------------------- |
+| input_tokens?  | `int32` | Number of input tokens consumed.            |
+| output_tokens? | `int32` | Number of output tokens generated.          |
+| total_tokens?  | `int32` | Total number of tokens (input plus output). |
 
 ### `ScopeParameter` {#Azure.ResourceManager.CommonTypes.ScopeParameter}
 
