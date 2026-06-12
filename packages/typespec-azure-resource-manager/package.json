@@ -28,6 +28,10 @@
     "./testing": {
       "types": "./dist/src/testing/index.d.ts",
       "default": "./dist/src/testing/index.js"
+    },
+    "./base-types": {
+      "typespec": "./lib/experimental/base-types.tsp",
+      "import": "./dist/src/experimental/base-types.js"
     }
   },
   "imports": {
