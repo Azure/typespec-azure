@@ -3,7 +3,7 @@ import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
 import { listAllServiceNamespaces } from "@azure-tools/typespec-client-generator-core";
 import { SdkTestLibrary } from "@azure-tools/typespec-client-generator-core/testing";
-import { EmitContext, Program } from "@typespec/compiler";
+import { EmitContext, getDirectoryPath, Program } from "@typespec/compiler";
 import { createTestHost, TestHost } from "@typespec/compiler/testing";
 import { HttpTestLibrary } from "@typespec/http/testing";
 import { OpenAPITestLibrary } from "@typespec/openapi/testing";
@@ -13,6 +13,7 @@ import { XmlTestLibrary } from "@typespec/xml/testing";
 import path from "path";
 import { format } from "prettier";
 import { Project } from "ts-morph";
+import { fileURLToPath } from "url";
 import { assert } from "vitest";
 import { provideContext } from "../../src/context-manager.js";
 import { provideBinder } from "../../src/framework/hooks/binder.js";
@@ -37,7 +38,6 @@ import {
   UrlTemplateHelpers,
   XmlHelpers,
 } from "../../src/modular/static-helpers-metadata.js";
-import { getDirname } from "../../src/utils/dirname.js";
 import { SdkContext } from "../../src/utils/interfaces.js";
 
 export interface ExampleJson {
@@ -45,7 +45,7 @@ export interface ExampleJson {
   rawContent: string;
 }
 
-const { __dirname } = getDirname(import.meta.url);
+const __dirname = getDirectoryPath(fileURLToPath(import.meta.url));
 
 export async function createRLCEmitterTestHost() {
   return createTestHost({

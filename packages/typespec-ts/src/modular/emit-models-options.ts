@@ -1,4 +1,4 @@
-import * as path from "path";
+import { joinPaths } from "@typespec/compiler";
 
 import { ModularEmitterOptions } from "./interfaces.js";
 
@@ -25,7 +25,7 @@ export function buildApiOptions(
   for (const [prefixKey, operations] of methodMap) {
     const prefixes = prefixKey.split("/");
     const modelOptionsFile = project.createSourceFile(
-      path.join(
+      joinPaths(
         emitterOptions.modularOptions.sourceRoot,
         subfolder ?? "",
         `api`,
