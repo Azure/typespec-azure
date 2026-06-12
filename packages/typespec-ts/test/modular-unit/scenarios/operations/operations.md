@@ -1189,6 +1189,11 @@ export interface _ListTestResult {
   next: string;
 }
 
+/** model interface Test */
+export interface Test {
+  id: string;
+}
+
 export function _listTestResultDeserializer(item: any): _ListTestResult {
   return {
     tests: testArrayDeserializer(item["tests"]),
@@ -1200,11 +1205,6 @@ export function testArrayDeserializer(result: Array<Test>): any[] {
   return result.map((item) => {
     return testDeserializer(item);
   });
-}
-
-/** model interface Test */
-export interface Test {
-  id: string;
 }
 
 export function testDeserializer(item: any): Test {
@@ -1235,10 +1235,12 @@ export function _fooSend(
   context: Client,
   options: FooOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/list-post").post({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/list-post")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _fooDeserialize(result: PathUncheckedResponse): Promise<_ListTestResult> {
@@ -1267,10 +1269,12 @@ export function _barSend(
   context: Client,
   options: BarOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/list-get").post({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/list-get")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _barDeserialize(result: PathUncheckedResponse): Promise<_ListTestResult> {

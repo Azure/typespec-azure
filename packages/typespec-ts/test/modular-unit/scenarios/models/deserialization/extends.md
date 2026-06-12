@@ -584,6 +584,20 @@ export interface Animal {
   name: string;
 }
 
+/** model interface Pet */
+export interface Pet extends Animal {
+  kind: "pet" | "dog";
+  /** Whether the pet is trained */
+  trained: boolean;
+}
+
+/** model interface Dog */
+export interface Dog extends Pet {
+  kind: "dog";
+  /** The breed of the dog */
+  breed: string;
+}
+
 export function animalSerializer(item: Animal): any {
   return { kind: item["kind"], name: item["name"] };
 }
@@ -594,9 +608,6 @@ export function animalDeserializer(item: any): Animal {
     name: item["name"],
   };
 }
-
-/** Alias for AnimalUnion */
-export type AnimalUnion = PetUnion | Animal;
 
 export function animalUnionSerializer(item: AnimalUnion): any {
   switch (item.kind) {
@@ -620,13 +631,6 @@ export function animalUnionDeserializer(item: any): AnimalUnion {
   }
 }
 
-/** model interface Pet */
-export interface Pet extends Animal {
-  kind: "pet" | "dog";
-  /** Whether the pet is trained */
-  trained: boolean;
-}
-
 export function petSerializer(item: Pet): any {
   return { kind: item["kind"], name: item["name"], trained: item["trained"] };
 }
@@ -638,9 +642,6 @@ export function petDeserializer(item: any): Pet {
     trained: item["trained"],
   };
 }
-
-/** Alias for PetUnion */
-export type PetUnion = Dog | Pet;
 
 export function petUnionSerializer(item: PetUnion): any {
   switch (item.kind) {
@@ -660,13 +661,6 @@ export function petUnionDeserializer(item: any): PetUnion {
     default:
       return petDeserializer(item);
   }
-}
-
-/** model interface Dog */
-export interface Dog extends Pet {
-  kind: "dog";
-  /** The breed of the dog */
-  breed: string;
 }
 
 export function dogSerializer(item: Dog): any {
@@ -691,4 +685,9 @@ export enum KnownVersions {
   /** 2024-08-01-preview */
   V20240801Preview = "2024-08-01-preview",
 }
+
+/** Alias for AnimalUnion */
+export type AnimalUnion = PetUnion | Animal;
+/** Alias for PetUnion */
+export type PetUnion = Dog | Pet;
 ```
