@@ -1,12 +1,31 @@
+import "@typespec/openapi";
+import "@typespec/versioning";
+
 using OpenAPI;
 using Versioning;
 
-namespace Azure.ResourceManager.CommonTypes;
+/**
+ * Experimental Azure Resource Manager agent base types.
+ *
+ * These types describe the ARM `agent` base type schema and its runtime surface
+ * (conversations and responses). This namespace is experimental and may change in a
+ * breaking way between versions.
+ */
+@versioned(Versions)
+namespace Azure.ResourceManager.BaseTypes;
+
+/**
+ * The versions of the experimental Azure Resource Manager agent base types.
+ */
+enum Versions {
+  /** Experimental version 1.0-preview.1 of the Azure Resource Manager agent base types. */
+  v1_0_Preview_1: "1.0-preview.1",
+}
 
 /**
  * An ARM-managed base type descriptor identifying the schema contract a resource conforms to.
  */
-@added(Versions.v6)
+@added(Versions.v1_0_Preview_1)
 model BaseType {
   /** The base type identifier (for example, "agent"). */
   baseType: string;
@@ -18,7 +37,7 @@ model BaseType {
 /**
  * Inline agent definition describing the model and behavior of the agent. Mutability of the rp-determined fields is resolved by the deployment model.
  */
-@added(Versions.v6)
+@added(Versions.v1_0_Preview_1)
 model AgentDefinition {
   /** Model identifier (RP-defined). */
   `model`: string;
@@ -33,7 +52,7 @@ model AgentDefinition {
 /**
  * Appliance deployment model resolution of AgentDefinition. All rp-determined fields resolve to read-only.
  */
-@added(Versions.v6)
+@added(Versions.v1_0_Preview_1)
 model AgentDefinitionAppliance {
   /** Model identifier (RP-defined). */
   @visibility(Lifecycle.Read)
@@ -51,7 +70,7 @@ model AgentDefinitionAppliance {
 /**
  * Platform deployment model resolution of AgentDefinition. All rp-determined fields resolve to writable.
  */
-@added(Versions.v6)
+@added(Versions.v1_0_Preview_1)
 model AgentDefinitionPlatform {
   /** Model identifier (RP-defined). */
   `model`: string;
@@ -66,7 +85,7 @@ model AgentDefinitionPlatform {
 /**
  * A tool binding for an agent, aligned with Azure AI Foundry-style tool bindings. Mutability of the rp-determined fields is resolved by the deployment model.
  */
-@added(Versions.v6)
+@added(Versions.v1_0_Preview_1)
 model AgentTool {
   /** Tool type discriminator. Must be one of the publicly documented Azure AI Foundry tool types. */
   type: string;
@@ -78,7 +97,7 @@ model AgentTool {
 /**
  * Appliance deployment model resolution of AgentTool. All fields resolve to read-only.
  */
-@added(Versions.v6)
+@added(Versions.v1_0_Preview_1)
 model AgentToolAppliance {
   /** Tool type discriminator. Must be one of the publicly documented Azure AI Foundry tool types. */
   @visibility(Lifecycle.Read)
@@ -92,7 +111,7 @@ model AgentToolAppliance {
 /**
  * Platform deployment model resolution of AgentTool. All fields resolve to writable.
  */
-@added(Versions.v6)
+@added(Versions.v1_0_Preview_1)
 model AgentToolPlatform {
   /** Tool type discriminator. Must be one of the publicly documented Azure AI Foundry tool types. */
   type: string;
@@ -104,11 +123,11 @@ model AgentToolPlatform {
 /**
  * Appliance deployment model resolution of AgentBaseTypeProperties. In the Appliance model all rp-determined fields resolve to read-only (the appliance owns and reports state; the client does not set these fields).
  */
-@added(Versions.v6)
+@added(Versions.v1_0_Preview_1)
 model AgentBaseTypePropertiesAppliance {
   /** ARM-managed. Must include {"baseType": "agent", "version": "{schemaVersion}"}. */
   @visibility(Lifecycle.Read)
-  @Azure.ResourceManager.identifiers(#["baseType"])
+  @extension("x-ms-identifiers", #["baseType"])
   baseTypes: BaseType[];
 
   /** Human-friendly name. */
@@ -125,18 +144,18 @@ model AgentBaseTypePropertiesAppliance {
 
   /** Tool bindings. See the AgentToolAppliance sub-schema. */
   @visibility(Lifecycle.Read)
-  @Azure.ResourceManager.identifiers(#["name"])
+  @extension("x-ms-identifiers", #["name"])
   tools?: AgentToolAppliance[];
 }
 
 /**
  * Platform deployment model resolution of AgentBaseTypeProperties. In the Platform model all rp-determined fields resolve to writable (the client owns these fields). baseTypes remains ARM-managed and read-only.
  */
-@added(Versions.v6)
+@added(Versions.v1_0_Preview_1)
 model AgentBaseTypePropertiesPlatform {
   /** ARM-managed. Must include {"baseType": "agent", "version": "{schemaVersion}"}. */
   @visibility(Lifecycle.Read)
-  @Azure.ResourceManager.identifiers(#["baseType"])
+  @extension("x-ms-identifiers", #["baseType"])
   baseTypes: BaseType[];
 
   /** Human-friendly name. */
@@ -149,14 +168,14 @@ model AgentBaseTypePropertiesPlatform {
   definition: AgentDefinitionPlatform;
 
   /** Tool bindings. See the AgentToolPlatform sub-schema. */
-  @Azure.ResourceManager.identifiers(#["name"])
+  @extension("x-ms-identifiers", #["name"])
   tools?: AgentToolPlatform[];
 }
 
 /**
  * A conversation resource holding the items and metadata exchanged between a client and an agent.
  */
-@added(Versions.v6)
+@added(Versions.v1_0_Preview_1)
 model Conversation {
   /** Unique conversation identifier. Read-only (set by the service on creation). */
   @visibility(Lifecycle.Read)
@@ -173,14 +192,14 @@ model Conversation {
 
   /** Conversation items (messages, tool calls, tool outputs). Each item has type, role, and content. Up to 20 items may be provided at creation. Writable on create; additional items are appended by response execution. */
   @maxItems(20)
-  @Azure.ResourceManager.identifiers(#[])
+  @extension("x-ms-identifiers", #[])
   items?: ConversationItem[];
 }
 
 /**
  * A conversation item such as a message, tool call, or tool output.
  */
-@added(Versions.v6)
+@added(Versions.v1_0_Preview_1)
 model ConversationItem {
   /** The item type (for example, message, tool call, or tool output). */
   type?: string;
@@ -193,9 +212,44 @@ model ConversationItem {
 }
 
 /**
+ * A reference to the conversation to associate with a response.
+ */
+@added(Versions.v1_0_Preview_1)
+model ConversationReference {
+  /** The identifier of the conversation to associate with this response. */
+  id?: string;
+}
+
+/**
+ * The status of a response.
+ */
+@added(Versions.v1_0_Preview_1)
+union ResponseStatus {
+  /** The response completed successfully. */
+  Completed: "completed",
+
+  /** The response failed. */
+  Failed: "failed",
+
+  /** The response was cancelled. */
+  Cancelled: "cancelled",
+
+  /** The response is incomplete. */
+  Incomplete: "incomplete",
+
+  /** The response is queued for execution. */
+  Queued: "queued",
+
+  /** The response is in progress. */
+  InProgress: "in_progress",
+
+  string,
+}
+
+/**
  * A response generated by an agent for a given input, including its output, status, and usage.
  */
-@added(Versions.v6)
+@added(Versions.v1_0_Preview_1)
 model Response {
   /** Unique response identifier. Read-only (set by the service). */
   @visibility(Lifecycle.Read)
@@ -210,32 +264,27 @@ model Response {
 
   /** The status of the response. Read-only. */
   @visibility(Lifecycle.Read)
-  @extension("x-ms-enum", #{ name: "ResponseStatus", modelAsString: true })
-  status?: "completed" | "failed" | "cancelled" | "incomplete" | "queued" | "in_progress";
+  status?: ResponseStatus;
 
   /** Content input to the model. Required on create. May be provided as a single string or as an array of input messages; see the InputMessage sub-schema. */
-  @Azure.ResourceManager.identifiers(#[])
+  @extension("x-ms-identifiers", #[])
   input: InputMessage[];
 
   /** Output items (messages, tool calls, etc.). Each item has id, type, role, status, content. Read-only. */
   @visibility(Lifecycle.Read)
-  @Azure.ResourceManager.identifiers(#["id"])
   output?: ResponseOutputItem[];
 
   /** ID of a previous response for multi-turn chaining (alternative to conversation). Writable on create. */
   previous_response_id?: string;
 
   /** Conversation association: { id }. Writable on create to link response to a conversation. */
-  conversation?: {
-    /** The identifier of the conversation to associate with this response. */
-    id?: string;
-  };
+  conversation?: ConversationReference;
 
   /** System/developer message for this response. Writable on create; overrides agent-level instructions for this invocation. */
   instructions?: string;
 
   /** Tools available during this response. Writable on create; overrides agent-level tools for this invocation. */
-  @Azure.ResourceManager.identifiers(#["name"])
+  @extension("x-ms-identifiers", #["name"])
   tools?: AgentTool[];
 
   /** How the model should select tools. May be a string (e.g., auto, none) or an object. Writable on create. */
@@ -261,7 +310,7 @@ model Response {
 /**
  * A single input message provided to the model.
  */
-@added(Versions.v6)
+@added(Versions.v1_0_Preview_1)
 model InputMessage {
   /** The role of the message author (for example, user, system, or developer). */
   role?: string;
@@ -273,7 +322,7 @@ model InputMessage {
 /**
  * An item produced in the response output, such as a message or tool call.
  */
-@added(Versions.v6)
+@added(Versions.v1_0_Preview_1)
 model ResponseOutputItem {
   /** Unique identifier of the output item. */
   id?: string;
@@ -285,7 +334,7 @@ model ResponseOutputItem {
   role?: string;
 
   /** The status of the output item. */
-  status?: string;
+  status?: ResponseStatus;
 
   /** The content of the output item. */
   content?: string;
@@ -294,7 +343,7 @@ model ResponseOutputItem {
 /**
  * Token usage information for a response.
  */
-@added(Versions.v6)
+@added(Versions.v1_0_Preview_1)
 model ResponseUsage {
   /** Number of input tokens consumed. */
   input_tokens?: int32;
@@ -309,7 +358,7 @@ model ResponseUsage {
 /**
  * Error details for a failed response.
  */
-@added(Versions.v6)
+@added(Versions.v1_0_Preview_1)
 model ResponseError {
   /** A machine-readable error code. */
   code?: string;
@@ -321,7 +370,7 @@ model ResponseError {
 /**
  * Details explaining why a response is incomplete.
  */
-@added(Versions.v6)
+@added(Versions.v1_0_Preview_1)
 model ResponseIncompleteDetails {
   /** The reason the response is incomplete (for example, max_output_tokens). */
   reason?: string;

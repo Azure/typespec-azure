@@ -14,7 +14,6 @@ const dir = dirname(fileURLToPath(import.meta.url));
 const outDir = resolve(dir, "openapi");
 
 await rm(outDir, { recursive: true, force: true });
-await emitCommonTypesSwagger("agent-base-types");
 await emitCommonTypesSwagger("customer-managed-keys");
 await emitCommonTypesSwagger("managed-identity");
 await emitCommonTypesSwagger("managed-identity-with-delegation");
