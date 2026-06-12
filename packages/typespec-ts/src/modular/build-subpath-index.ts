@@ -1,7 +1,7 @@
 import { SdkClientType, SdkServiceOperation } from "@azure-tools/typespec-client-generator-core";
+import { joinPaths } from "@typespec/compiler";
 import { ModularEmitterOptions } from "./interfaces.js";
 
-import { join } from "path";
 import { Node, SourceFile, StructureKind } from "ts-morph";
 import { useContext } from "../context-manager.js";
 import {
@@ -48,7 +48,7 @@ function buildSubpathIndexFileImpl(
       .getDirectories()
       .filter((dir) => {
         const formattedDir = dir.getPath().replace(/\\/g, "/");
-        const targetPath = join(srcPath, subfolder, subpath).replace(/\\/g, "/");
+        const targetPath = joinPaths(srcPath, subfolder, subpath).replace(/\\/g, "/");
         return (
           formattedDir.startsWith(targetPath) && !project.getSourceFile(`${formattedDir}/index.ts`)
         );
@@ -57,10 +57,10 @@ function buildSubpathIndexFileImpl(
         return dir.getPath().replace(/\\/g, "/");
       });
   } else {
-    folders = [join(srcPath, subfolder, subpath).replace(/\\/g, "/")];
+    folders = [joinPaths(srcPath, subfolder, subpath).replace(/\\/g, "/")];
   }
   for (const folder of folders) {
-    const apiFilePattern = subpath === "models" ? join(folder, "models.ts") : folder;
+    const apiFilePattern = subpath === "models" ? joinPaths(folder, "models.ts") : folder;
     const apiFiles = project.getSourceFiles().filter((file) => {
       if (subpath === "api" && options.recursive) {
         return file.getDirectoryPath().replace(/\\/g, "/") === apiFilePattern.replace(/\\/g, "/");

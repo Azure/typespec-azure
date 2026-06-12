@@ -1,4 +1,4 @@
-import * as path from "path";
+import { joinPaths } from "@typespec/compiler";
 import { RLCModel } from "./interfaces.js";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: to fix the handlebars issue
@@ -25,7 +25,7 @@ export function buildPaginateHelper(model: RLCModel) {
     noEscape: true,
   });
   return {
-    path: path.join(srcPath, "paginateHelper.ts"),
+    path: joinPaths(srcPath, "paginateHelper.ts"),
     content: paginateHelperContents(pagingInfo.pageDetails),
   };
 }

@@ -13,16 +13,14 @@ export function resolveProjectRoot(
   const packageJsonPath = resolve(currentDir, "package.json");
 
   if (existsSync(packageJsonPath)) {
-    return currentDir; // Return the directory containing the package.json
+    return currentDir;
   }
 
   const parentDir = resolve(currentDir, "..");
 
   if (parentDir === currentDir) {
-    // If we've reached the root directory and haven't found package.json
     throw new Error("Could not find package.json");
   }
 
-  // Recursively search the parent directory
   return resolveProjectRoot(parentDir);
 }

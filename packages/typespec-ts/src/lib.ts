@@ -145,18 +145,18 @@ export const RLCOptionsSchema: JSONSchemaType<EmitterOptions> = {
     "add-credentials": {
       type: "boolean",
       nullable: true,
-      description: `
-      We support two types of authentication: Azure Key Credential(AzureKey) and Token credential(AADToken), any other will need to be handled manually.
-
-      There are two ways to set up our credential details
-
-      - To use \`@useAuth\` decorator in TypeSpec
-      - To config in yaml file
-
-      Please notice defining in TypeSpec is recommended and also has higher priority than second one.
-
-      To enable credential in \`tspconfig.yaml\` and we need to provide more details to let codegen know types.
-      `,
+      description: [
+        "We support two types of authentication: Azure Key Credential(AzureKey) and Token credential(AADToken), any other will need to be handled manually.",
+        "",
+        "There are two ways to set up our credential details",
+        "",
+        "- To use `@useAuth` decorator in TypeSpec",
+        "- To config in yaml file",
+        "",
+        "Please notice defining in TypeSpec is recommended and also has higher priority than second one.",
+        "",
+        "To enable credential in `tspconfig.yaml` and we need to provide more details to let codegen know types.",
+      ].join("\n"),
     },
     "credential-scopes": {
       type: "array",
@@ -186,20 +186,19 @@ export const RLCOptionsSchema: JSONSchemaType<EmitterOptions> = {
     "generate-metadata": {
       type: "boolean",
       nullable: true,
-      description: `
-      Whether to generate metadata files which includes package.json, README.md and tsconfig.json etc. Defaults to \`undefined\`. If there's not a package.json under package-dir, defaults to \`true\`. but if you'd like to disable this feature you could set it as \`false\`.
-      `,
+      description:
+        "Whether to generate metadata files which includes package.json, README.md and tsconfig.json etc. Defaults to `undefined`. If there's not a package.json under package-dir, defaults to `true`. but if you'd like to disable this feature you could set it as `false`.",
     },
     "generate-test": {
       type: "boolean",
       nullable: true,
-      description: `
-      Whether to generate test files, for basic testing of your generated sdks. Defaults to \`undefined\`.
-      other cases:
-      - If azure-sdk-for-js is \`false\`. Defaults to \`false\`.
-      - If azure-sdk-for-js is \`true\` but there's a test folder under package-dir. Defaults to \`false\`.
-      - If azure-sdk-for-js is \`true\` but there's not a test folder under package-dir. Defaults to \`true\`.
-      `,
+      description: [
+        "Whether to generate test files, for basic testing of your generated sdks. Defaults to `undefined`.",
+        "other cases:",
+        "- If azure-sdk-for-js is `false`. Defaults to `false`.",
+        "- If azure-sdk-for-js is `true` but there's a test folder under package-dir. Defaults to `false`.",
+        "- If azure-sdk-for-js is `true` but there's not a test folder under package-dir. Defaults to `true`.",
+      ].join("\n"),
     },
     "generate-sample": {
       type: "boolean",
@@ -359,15 +358,16 @@ export const RLCOptionsSchema: JSONSchemaType<EmitterOptions> = {
       },
       required: [],
       nullable: true,
-      description: `Only for Modular generation
-      By default, code generation uses the titles specified in the \`@client\` and \`@service\` decorators in TypeSpec to name modular clients. If you need to override these names, you can configure the \`typespec-title-map\`. The map's keys represent the original client names from TypeSpec, and the values are the desired client names. This configuration supports renaming multiple clients.
-
-      \`\`\`yaml
-      typespec-title-map: 
-        AnomalyDetectorClient: AnomalyDetectorRest
-        AnomalyDetectorClient2: AnomalyDetectorRest2
-      \`\`\`
-      `,
+      description: [
+        "Only for Modular generation",
+        "By default, code generation uses the titles specified in the `@client` and `@service` decorators in TypeSpec to name modular clients. If you need to override these names, you can configure the `typespec-title-map`. The map's keys represent the original client names from TypeSpec, and the values are the desired client names. This configuration supports renaming multiple clients.",
+        "",
+        "```yaml",
+        "typespec-title-map:",
+        "  AnomalyDetectorClient: AnomalyDetectorRest",
+        "  AnomalyDetectorClient2: AnomalyDetectorRest2",
+        "```",
+      ].join("\n"),
     },
     "should-use-pnpm-dep": {
       type: "boolean",

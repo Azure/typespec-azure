@@ -1,5 +1,5 @@
 import { SdkClientType, SdkServiceOperation } from "@azure-tools/typespec-client-generator-core";
-import path from "path";
+import { joinPaths } from "@typespec/compiler";
 import { SourceFile } from "ts-morph";
 import { useContext } from "../context-manager.js";
 import { useDependencies } from "../framework/hooks/use-dependencies.js";
@@ -32,7 +32,7 @@ export function buildRestorePoller(
     return;
   }
   const srcPath = emitterOptions.modularOptions.sourceRoot;
-  const filePath = path.join(
+  const filePath = joinPaths(
     `${srcPath}/${subfolder && subfolder !== "" ? subfolder + "/" : ""}restorePollerHelpers.ts`,
   );
   const restorePollerFile = project.createSourceFile(filePath, undefined, {
