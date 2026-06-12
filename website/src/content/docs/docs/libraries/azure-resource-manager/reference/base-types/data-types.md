@@ -183,6 +183,20 @@ model Azure.ResourceManager.BaseTypes.ConversationItem
 | role?    | `string` | The role associated with the item (for example, user, assistant, or tool). |
 | content? | `string` | The content of the conversation item.                                      |
 
+### `ConversationReference` {#Azure.ResourceManager.BaseTypes.ConversationReference}
+
+A reference to the conversation to associate with a response.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.ConversationReference
+```
+
+#### Properties
+
+| Name | Type     | Description                                                         |
+| ---- | -------- | ------------------------------------------------------------------- |
+| id?  | `string` | The identifier of the conversation to associate with this response. |
+
 ### `InputMessage` {#Azure.ResourceManager.BaseTypes.InputMessage}
 
 A single input message provided to the model.
@@ -208,24 +222,23 @@ model Azure.ResourceManager.BaseTypes.Response
 
 #### Properties
 
-| Name                  | Type                                                                                  | Description                                                                                                                                           |
-| --------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| responseId?           | `string`                                                                              | Unique response identifier. Read-only (set by the service).                                                                                           |
-| createdAt?            | `int64`                                                                               | Unix timestamp of when the response was created. Read-only.                                                                                           |
-| model?                | `string`                                                                              | Model ID used to generate the response (e.g., gpt-4o-mini). May be specified on request to override the agent default; read-only in GET.              |
-| status?               | `"completed" \| "failed" \| "cancelled" \| "incomplete" \| "queued" \| "in_progress"` | The status of the response. Read-only.                                                                                                                |
-| input                 | `Azure.ResourceManager.BaseTypes.InputMessage[]`                                      | Content input to the model. Required on create. May be provided as a single string or as an array of input messages; see the InputMessage sub-schema. |
-| output?               | `Azure.ResourceManager.BaseTypes.ResponseOutputItem[]`                                | Output items (messages, tool calls, etc.). Each item has id, type, role, status, content. Read-only.                                                  |
-| previous_response_id? | `string`                                                                              | ID of a previous response for multi-turn chaining (alternative to conversation). Writable on create.                                                  |
-| conversation?         | `{...}`                                                                               | Conversation association: { id }. Writable on create to link response to a conversation.                                                              |
-| conversation.id?      | `string`                                                                              |                                                                                                                                                       |
-| instructions?         | `string`                                                                              | System/developer message for this response. Writable on create; overrides agent-level instructions for this invocation.                               |
-| tools?                | `Azure.ResourceManager.BaseTypes.AgentTool[]`                                         | Tools available during this response. Writable on create; overrides agent-level tools for this invocation.                                            |
-| tool_choice?          | `unknown`                                                                             | How the model should select tools. May be a string (e.g., auto, none) or an object. Writable on create.                                               |
-| metadata?             | `Record<string>`                                                                      | Up to 16 key-value pairs. Writable on create and update.                                                                                              |
-| usage?                | `Azure.ResourceManager.BaseTypes.ResponseUsage`                                       | Token usage: { input_tokens, output_tokens, total_tokens }. Read-only.                                                                                |
-| error?                | `Azure.ResourceManager.BaseTypes.ResponseError`                                       | Error details if the response failed: { code, message }.                                                                                              |
-| incomplete_details?   | `Azure.ResourceManager.BaseTypes.ResponseIncompleteDetails`                           | Details if the response is incomplete: { reason } (e.g., max_output_tokens).                                                                          |
+| Name                  | Type                                                        | Description                                                                                                                                           |
+| --------------------- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| responseId?           | `string`                                                    | Unique response identifier. Read-only (set by the service).                                                                                           |
+| createdAt?            | `int64`                                                     | Unix timestamp of when the response was created. Read-only.                                                                                           |
+| model?                | `string`                                                    | Model ID used to generate the response (e.g., gpt-4o-mini). May be specified on request to override the agent default; read-only in GET.              |
+| status?               | `Azure.ResourceManager.BaseTypes.ResponseStatus`            | The status of the response. Read-only.                                                                                                                |
+| input                 | `Azure.ResourceManager.BaseTypes.InputMessage[]`            | Content input to the model. Required on create. May be provided as a single string or as an array of input messages; see the InputMessage sub-schema. |
+| output?               | `Azure.ResourceManager.BaseTypes.ResponseOutputItem[]`      | Output items (messages, tool calls, etc.). Each item has id, type, role, status, content. Read-only.                                                  |
+| previous_response_id? | `string`                                                    | ID of a previous response for multi-turn chaining (alternative to conversation). Writable on create.                                                  |
+| conversation?         | `Azure.ResourceManager.BaseTypes.ConversationReference`     | Conversation association: { id }. Writable on create to link response to a conversation.                                                              |
+| instructions?         | `string`                                                    | System/developer message for this response. Writable on create; overrides agent-level instructions for this invocation.                               |
+| tools?                | `Azure.ResourceManager.BaseTypes.AgentTool[]`               | Tools available during this response. Writable on create; overrides agent-level tools for this invocation.                                            |
+| tool_choice?          | `unknown`                                                   | How the model should select tools. May be a string (e.g., auto, none) or an object. Writable on create.                                               |
+| metadata?             | `Record<string>`                                            | Up to 16 key-value pairs. Writable on create and update.                                                                                              |
+| usage?                | `Azure.ResourceManager.BaseTypes.ResponseUsage`             | Token usage: { input_tokens, output_tokens, total_tokens }. Read-only.                                                                                |
+| error?                | `Azure.ResourceManager.BaseTypes.ResponseError`             | Error details if the response failed: { code, message }.                                                                                              |
+| incomplete_details?   | `Azure.ResourceManager.BaseTypes.ResponseIncompleteDetails` | Details if the response is incomplete: { reason } (e.g., max_output_tokens).                                                                          |
 
 ### `ResponseError` {#Azure.ResourceManager.BaseTypes.ResponseError}
 
@@ -266,13 +279,13 @@ model Azure.ResourceManager.BaseTypes.ResponseOutputItem
 
 #### Properties
 
-| Name     | Type     | Description                                               |
-| -------- | -------- | --------------------------------------------------------- |
-| id?      | `string` | Unique identifier of the output item.                     |
-| type?    | `string` | The output item type (for example, message or tool call). |
-| role?    | `string` | The role associated with the output item.                 |
-| status?  | `string` | The status of the output item.                            |
-| content? | `string` | The content of the output item.                           |
+| Name     | Type                                             | Description                                               |
+| -------- | ------------------------------------------------ | --------------------------------------------------------- |
+| id?      | `string`                                         | Unique identifier of the output item.                     |
+| type?    | `string`                                         | The output item type (for example, message or tool call). |
+| role?    | `string`                                         | The role associated with the output item.                 |
+| status?  | `Azure.ResourceManager.BaseTypes.ResponseStatus` | The status of the output item.                            |
+| content? | `string`                                         | The content of the output item.                           |
 
 ### `ResponseUsage` {#Azure.ResourceManager.BaseTypes.ResponseUsage}
 
@@ -301,3 +314,22 @@ enum Azure.ResourceManager.BaseTypes.Versions
 | Name           | Value             | Description                                                                        |
 | -------------- | ----------------- | ---------------------------------------------------------------------------------- |
 | v1_0_Preview_1 | `"1.0-preview.1"` | Experimental version 1.0-preview.1 of the Azure Resource Manager agent base types. |
+
+### `ResponseStatus` {#Azure.ResourceManager.BaseTypes.ResponseStatus}
+
+The status of a response.
+
+```typespec
+union Azure.ResourceManager.BaseTypes.ResponseStatus
+```
+
+#### Variants
+
+| Name       | Type            | Description                           |
+| ---------- | --------------- | ------------------------------------- |
+| Completed  | `"completed"`   | The response completed successfully.  |
+| Failed     | `"failed"`      | The response failed.                  |
+| Cancelled  | `"cancelled"`   | The response was cancelled.           |
+| Incomplete | `"incomplete"`  | The response is incomplete.           |
+| Queued     | `"queued"`      | The response is queued for execution. |
+| InProgress | `"in_progress"` | The response is in progress.          |
