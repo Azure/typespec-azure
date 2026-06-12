@@ -71,7 +71,7 @@ describe("Azure Arm Resources Rest Client", () => {
 
   // managed identity tracked resource
   it("should get models commonTypes managedIdentityTrackedResources", async () => {
-    const result = await client.get(RESOURCE_GROUP_EXPECTED, "identity");
+    const result = await client.managedIdentity.get(RESOURCE_GROUP_EXPECTED, "identity");
     assert.strictEqual(result.id, validSystemAssignedManagedIdentityResource.id);
     assert.strictEqual(result.location, validSystemAssignedManagedIdentityResource.location);
     assert.strictEqual(
@@ -91,7 +91,7 @@ describe("Azure Arm Resources Rest Client", () => {
   });
 
   it("should put models commonTypes managedIdentityTrackedResources", async () => {
-    const result = await client.createWithSystemAssigned(RESOURCE_GROUP_EXPECTED, "identity", {
+    const result = await client.managedIdentity.createWithSystemAssigned(RESOURCE_GROUP_EXPECTED, "identity", {
       location: LOCATION_REGION_EXPECTED,
       identity: createExpectedIdentity,
     });
@@ -114,7 +114,7 @@ describe("Azure Arm Resources Rest Client", () => {
   });
 
   it("should patch models commonTypes managedIdentityTrackedResources", async () => {
-    const result = await client.updateWithUserAssignedAndSystemAssigned(
+    const result = await client.managedIdentity.updateWithUserAssignedAndSystemAssigned(
       RESOURCE_GROUP_EXPECTED,
       "identity",
       {
@@ -142,7 +142,7 @@ describe("Azure Arm Resources Rest Client", () => {
   describe("Error Handling", () => {
     it("should handle predefined error for resource not found (404)", async () => {
       try {
-        await client.getForPredefinedError(RESOURCE_GROUP_EXPECTED, "confidential");
+        await client.error.getForPredefinedError(RESOURCE_GROUP_EXPECTED, "confidential");
         assert.fail("Should have thrown an error for resource not found");
       } catch (error: any) {
         // Azure Modular clients use createRestError which creates errors with statusCode property
@@ -158,7 +158,7 @@ describe("Azure Arm Resources Rest Client", () => {
     // skipping this test as https://github.com/Azure/autorest.typescript/issues/2965
     it.skip("should handle user-defined error for bad request (400)", async () => {
       try {
-        await client.createForUserDefinedError(RESOURCE_GROUP_EXPECTED, "confidential", {
+        await client.error.createForUserDefinedError(RESOURCE_GROUP_EXPECTED, "confidential", {
           location: "eastus",
           properties: {
             username: "00",
