@@ -131,6 +131,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`The specified common-types version '${"version"}'  is not valid for ${"resourceName"} resources. Please use version ${"requiredVersion"} or later of common-types.`,
       },
     },
+    "no-deprecated-common-types": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`The type '${"typeName"}' is an internal Azure Resource Manager common type and should not be used directly in service specifications. Use the type '${"replacementType"}' instead.`,
+      },
+    },
   },
 });
 

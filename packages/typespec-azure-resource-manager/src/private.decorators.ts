@@ -47,6 +47,7 @@ import {
 } from "../generated-defs/Azure.ResourceManager.Extension.Private.js";
 import {
   ArmBodyRootDecorator,
+  ArmCommonDefinitionExcludedDecorator,
   ArmRenameListByOperationDecorator,
   ArmResourceInternalDecorator,
   ArmResourcePropertiesOptionalityDecorator,
@@ -200,6 +201,23 @@ export function isGenericResource(program: Program, target: Model): boolean {
   if (getGenericResourceInternal(program, target)) return true;
   if (target.baseModel) return isGenericResource(program, target.baseModel);
   return false;
+}
+
+const [getArmCommonDefinitionExcludedState, setArmCommonDefinitionExcludedState] = useStateMap<
+  Model,
+  string
+>(ArmStateKeys.armCommonDefinitionExcluded);
+
+const $armCommonDefinitionExcluded: ArmCommonDefinitionExcludedDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  replacementTypeName: string,
+) => {
+  setArmCommonDefinitionExcludedState(context.program, target, replacementTypeName);
+};
+
+export function getArmCommonDefinitionExcluded(program: Program, target: Model): string | undefined {
+  return getArmCommonDefinitionExcludedState(program, target);
 }
 
 const $omitIfEmpty: OmitIfEmptyDecorator = (
@@ -1086,6 +1104,7 @@ export const $decorators = {
     builtInResourceOperation: $builtInResourceOperation,
     validateCommonTypesVersionForResource: $validateCommonTypesVersionForResource,
     genericResourceInternal: $genericResourceInternal,
+    armCommonDefinitionExcluded: $armCommonDefinitionExcluded,
   } satisfies AzureResourceManagerPrivateDecorators,
   "Azure.ResourceManager.Extension.Private": {
     builtInResource: $builtInResource,

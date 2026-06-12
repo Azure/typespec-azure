@@ -3,6 +3,7 @@ import "@typespec/rest";
 
 import "./backcompat.tsp";
 import "./deprecation.tsp";
+import "./encryption.tsp";
 import "../common-types/common-types.tsp";
 import "../decorators.tsp";
 import "../responses.tsp";
