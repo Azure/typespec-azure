@@ -252,7 +252,8 @@ export type VerifyPropertyConfig = {
 };
 
 export async function provideBinderWithAzureDependencies(project: Project) {
-  const helpersDirectory = path.resolve(__dirname, "../../static/static-helpers");
+  const packageRoot = path.resolve(__dirname, "../..");
+  const helpersDirectory = path.resolve(packageRoot, "static/static-helpers");
 
   const extraDependencies = {
     ...AzurePollingDependencies,
@@ -277,6 +278,7 @@ export async function provideBinderWithAzureDependencies(project: Project) {
     helpersAssetDirectory: helpersDirectory,
     loadTestHelpers: true,
     host: NodeHost,
+    packageRoot,
   });
 
   const binder = provideBinder(project, {
