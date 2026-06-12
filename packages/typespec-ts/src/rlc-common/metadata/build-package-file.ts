@@ -108,7 +108,7 @@ export function updatePackageFile(
   if (typeof existingFilePathOrContent === "string") {
     let packageFile: SourceFile;
     try {
-      const project = new Project({ useInMemoryFileSystem: true });
+      const project = new Project();
       packageFile = project.addSourceFileAtPath(existingFilePathOrContent);
     } catch (_e) {
       // If the file doesn't exist, we don't need to update it.
