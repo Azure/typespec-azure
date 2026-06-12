@@ -14,14 +14,12 @@ model KeyValue {
 
 @route("/keys/{key}")
 @delete
-op deleteKeyValue(@path key: string):
-  | {
-      @statusCode statusCode: 200;
-      @body body: KeyValue;
-    }
-  | {
-      @statusCode statusCode: 204;
-    };
+op deleteKeyValue(@path key: string): {
+  @statusCode statusCode: 200;
+  @body body: KeyValue;
+} | {
+  @statusCode statusCode: 204;
+};
 ```
 
 ## Operations
@@ -52,12 +50,10 @@ export function _deleteKeyValueSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context
-    .path(path)
-    .delete({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-    });
+  return context.path(path).delete({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _deleteKeyValueDeserialize(
@@ -134,12 +130,10 @@ export function _getResourceSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context
-    .path(path)
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-    });
+  return context.path(path).get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _getResourceDeserialize(result: PathUncheckedResponse): Promise<Resource> {
@@ -188,15 +182,12 @@ model KeyValue {
 
 @route("/keys/{key}")
 @delete
-op deleteKeyValue(@path key: string):
-  | {
-      @statusCode statusCode: 200;
-      @body body: KeyValue;
-    }
-  | {
-      @statusCode statusCode: 204;
-    }
-  | ServiceError;
+op deleteKeyValue(@path key: string): {
+  @statusCode statusCode: 200;
+  @body body: KeyValue;
+} | {
+  @statusCode statusCode: 204;
+} | ServiceError;
 ```
 
 ## Operations
@@ -227,12 +218,10 @@ export function _deleteKeyValueSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context
-    .path(path)
-    .delete({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-    });
+  return context.path(path).delete({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _deleteKeyValueDeserialize(

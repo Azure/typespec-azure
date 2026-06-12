@@ -28,27 +28,23 @@ export function _readSend(
   parameters: string,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "text/plain",
-      headers: {
-        "required-header": "requiredValue",
-        ...(options?.optionalHeader !== undefined
-          ? {
-              "optional-header": !options?.optionalHeader
-                ? options?.optionalHeader
-                : "optionalValue",
-            }
-          : {}),
-        ...(options?.optionalStringHeader !== undefined
-          ? { "optional-string-header": options?.optionalStringHeader }
-          : {}),
-        ...options.requestOptions?.headers,
-      },
-      body: parameters,
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "text/plain",
+    headers: {
+      "required-header": "requiredValue",
+      ...(options?.optionalHeader !== undefined
+        ? {
+            "optional-header": !options?.optionalHeader ? options?.optionalHeader : "optionalValue",
+          }
+        : {}),
+      ...(options?.optionalStringHeader !== undefined
+        ? { "optional-string-header": options?.optionalStringHeader }
+        : {}),
+      ...options.requestOptions?.headers,
+    },
+    body: parameters,
+  });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<void> {

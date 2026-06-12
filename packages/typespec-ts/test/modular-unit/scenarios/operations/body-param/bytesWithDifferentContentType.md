@@ -36,14 +36,12 @@ export function _uploadFileSend(
   body: string,
   options: UploadFileOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "text/plain",
-      headers: { accept: "*/*", ...options.requestOptions?.headers },
-      body: body,
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "text/plain",
+    headers: { accept: "*/*", ...options.requestOptions?.headers },
+    body: body,
+  });
 }
 
 export async function _uploadFileDeserialize(
@@ -131,14 +129,12 @@ export function _uploadFileSend(
   body: Uint8Array,
   options: UploadFileOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/octet-stream",
-      headers: { accept: "application/xml", ...options.requestOptions?.headers },
-      body: body,
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/octet-stream",
+    headers: { accept: "application/xml", ...options.requestOptions?.headers },
+    body: body,
+  });
 }
 
 export async function _uploadFileDeserialize(
@@ -227,14 +223,12 @@ export function _uploadFileSend(
   body: Uint8Array,
   options: UploadFileOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/octet-stream",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: body,
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/octet-stream",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: body,
+  });
 }
 
 export async function _uploadFileDeserialize(
@@ -323,14 +317,12 @@ export function _uploadFileSend(
   body: Uint8Array,
   options: UploadFileOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/octet-stream",
-      headers: { accept: "text/plain", ...options.requestOptions?.headers },
-      body: body,
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/octet-stream",
+    headers: { accept: "text/plain", ...options.requestOptions?.headers },
+    body: body,
+  });
 }
 
 export async function _uploadFileDeserialize(
@@ -415,14 +407,12 @@ export function _uploadFileSend(
   body: Uint8Array,
   options: UploadFileOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/octet-stream",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: body,
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/octet-stream",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: body,
+  });
 }
 
 export async function _uploadFileDeserialize(
@@ -488,13 +478,11 @@ export function _uploadFileSend(
   body: Uint8Array,
   options: UploadFileOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      body: body,
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    body: body,
+  });
 }
 
 export async function _uploadFileDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -551,13 +539,11 @@ export function _uploadFileSend(
   body: Uint8Array,
   options: UploadFileOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "text/plain",
-      body: body,
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "text/plain",
+    body: body,
+  });
 }
 
 export async function _uploadFileDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -608,13 +594,11 @@ export function _uploadFileSend(
   body: Uint8Array,
   options: UploadFileOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      body: uint8ArrayToString(body, "base64"),
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    body: uint8ArrayToString(body, "base64"),
+  });
 }
 
 export async function _uploadFileDeserialize(result: PathUncheckedResponse): Promise<void> {

@@ -36,12 +36,10 @@ export function _testSend(
   context: Client,
   options: TestOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "text/plain", ...options.requestOptions?.headers },
-    });
+  return context.path("/").get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "text/plain", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _testDeserialize(result: PathUncheckedResponse): Promise<string> {
