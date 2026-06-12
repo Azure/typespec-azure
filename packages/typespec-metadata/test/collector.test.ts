@@ -339,9 +339,10 @@ describe("@azure-tools/typespec-go emitter", () => {
   it("should respect explicit package-name over emitter-output-dir", () => {
     const optionMap: Record<string, Record<string, unknown>> = {
       "@azure-tools/typespec-go": {
-        "package-name": "sdk/custom/mypackage",
+        "package-name": "sdk/custom/myPackage",
         module: "github.com/Azure/azure-sdk-for-go/sdk/some/module/v2",
-        "emitter-output-dir": "c:/repos/tsp-output/sdk/resourcemanager/redisenterprise/armredisenterprise",
+        "emitter-output-dir":
+          "c:/repos/tsp-output/sdk/resourcemanager/redisenterprise/armredisenterprise",
         flavor: "azure",
       },
     };
@@ -350,7 +351,7 @@ describe("@azure-tools/typespec-go emitter", () => {
     const lang = result["go"][0];
 
     // Explicit package-name should not be overridden by emitter-output-dir
-    expect(lang.packageName).toBe("sdk/custom/mypackage");
+    expect(lang.packageName).toBe("sdk/custom/myPackage");
   });
 });
 
