@@ -25,7 +25,7 @@ describe("loadStaticHelpers", () => {
       },
     } as const;
     const helperDeclarations = await loadStaticHelpers(project, helpers, {
-        host: NodeHost,
+      host: NodeHost,
       helpersAssetDirectory,
     });
     expect(
@@ -83,7 +83,7 @@ describe("loadStaticHelpers", () => {
     } as const;
 
     await loadStaticHelpers(project, helpers, {
-        host: NodeHost,
+      host: NodeHost,
       helpersAssetDirectory,
       options: {
         flavor: "azure",
