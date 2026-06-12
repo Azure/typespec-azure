@@ -1,5 +1,7 @@
 import { CompilerHost, getDirectoryPath, joinPaths, NoTarget, Program } from "@typespec/compiler";
 import { format } from "prettier";
+import prettierPluginEstree from "prettier/plugins/estree";
+import prettierPluginTypescript from "prettier/plugins/typescript";
 import { prettierJSONOptions, prettierTypeScriptOptions, reportDiagnostic } from "../lib.js";
 import {
   buildSchemaTypes,
@@ -70,10 +72,10 @@ async function emitFile(
   // Format the contents if necessary
   if (isJson || isSourceCode) {
     try {
-      prettierFileContent = await format(
-        prettierFileContent,
-        isJson ? prettierJSONOptions : prettierTypeScriptOptions,
-      );
+      prettierFileContent = await format(prettierFileContent, {
+        ...(isJson ? prettierJSONOptions : prettierTypeScriptOptions),
+        plugins: [prettierPluginTypescript, prettierPluginEstree],
+      });
     } catch (e) {
       reportDiagnostic(program, {
         code: "file-formatting-error",

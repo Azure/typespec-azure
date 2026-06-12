@@ -14,7 +14,7 @@ export function buildTopLevelIndex(model: RLCModel) {
   if (!model.options) {
     return undefined;
   }
-  const project = new Project();
+  const project = new Project({ useInMemoryFileSystem: true });
   const { srcPath } = model;
   const { multiClient } = model.options;
   const batch = model.options.batch;

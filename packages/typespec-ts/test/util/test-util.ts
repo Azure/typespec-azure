@@ -3,7 +3,7 @@ import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
 import { listAllServiceNamespaces } from "@azure-tools/typespec-client-generator-core";
 import { SdkTestLibrary } from "@azure-tools/typespec-client-generator-core/testing";
-import { EmitContext, getDirectoryPath, Program } from "@typespec/compiler";
+import { EmitContext, getDirectoryPath, NodeHost, Program } from "@typespec/compiler";
 import { createTestHost, TestHost } from "@typespec/compiler/testing";
 import { HttpTestLibrary } from "@typespec/http/testing";
 import { OpenAPITestLibrary } from "@typespec/openapi/testing";
@@ -252,7 +252,8 @@ export type VerifyPropertyConfig = {
 };
 
 export async function provideBinderWithAzureDependencies(project: Project) {
-  const helpersDirectory = path.resolve(__dirname, "../../static/static-helpers");
+  const packageRoot = path.resolve(__dirname, "../..");
+  const helpersDirectory = path.resolve(packageRoot, "static/static-helpers");
 
   const extraDependencies = {
     ...AzurePollingDependencies,
@@ -276,6 +277,8 @@ export async function provideBinderWithAzureDependencies(project: Project) {
   const staticHelperMap = await loadStaticHelpers(project, staticHelpers, {
     helpersAssetDirectory: helpersDirectory,
     loadTestHelpers: true,
+    host: NodeHost,
+    packageRoot,
   });
 
   const binder = provideBinder(project, {

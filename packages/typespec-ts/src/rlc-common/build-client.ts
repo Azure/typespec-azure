@@ -62,7 +62,7 @@ function getClientOptionsInterface(
 export function buildClient(model: RLCModel): File | undefined {
   const name = normalizeName(model.libraryName, NameType.File);
   const { srcPath } = model;
-  const project = new Project();
+  const project = new Project({ useInMemoryFileSystem: true });
   const filePath = joinPaths(srcPath, `${name}.ts`);
   const clientFile = project.createSourceFile(filePath, undefined, {
     overwrite: true,

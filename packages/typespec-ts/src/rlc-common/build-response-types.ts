@@ -19,7 +19,7 @@ import { ResponseHeaderSchema, ResponseMetadata, RLCModel } from "./interfaces.j
 
 let hasErrorResponse = false;
 export function buildResponseTypes(model: RLCModel) {
-  const project = new Project();
+  const project = new Project({ useInMemoryFileSystem: true });
   const srcPath = model.srcPath;
   const filePath = joinPaths(srcPath, `responses.ts`);
   hasErrorResponse = false;

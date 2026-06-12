@@ -1,4 +1,4 @@
-import { getDirectoryPath } from "@typespec/compiler";
+import { getDirectoryPath, NodeHost } from "@typespec/compiler";
 import {
   FunctionDeclarationStructure,
   InterfaceDeclarationStructure,
@@ -332,6 +332,7 @@ describe("Binder", () => {
       };
       const staticHelperMap = await loadStaticHelpers(project, staticHelpers, {
         helpersAssetDirectory: helpersDirectory,
+        host: NodeHost,
       });
       binder = provideBinder(project, { staticHelpers: staticHelperMap });
     });
