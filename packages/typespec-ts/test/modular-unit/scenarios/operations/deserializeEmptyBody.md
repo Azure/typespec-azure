@@ -14,14 +14,12 @@ model KeyValue {
 
 @route("/keys/{key}")
 @delete
-op deleteKeyValue(@path key: string):
-  | {
-      @statusCode statusCode: 200;
-      @body body: KeyValue;
-    }
-  | {
-      @statusCode statusCode: 204;
-    };
+op deleteKeyValue(@path key: string): {
+  @statusCode statusCode: 200;
+  @body body: KeyValue;
+} | {
+  @statusCode statusCode: 204;
+};
 ```
 
 ## Operations
@@ -184,15 +182,12 @@ model KeyValue {
 
 @route("/keys/{key}")
 @delete
-op deleteKeyValue(@path key: string):
-  | {
-      @statusCode statusCode: 200;
-      @body body: KeyValue;
-    }
-  | {
-      @statusCode statusCode: 204;
-    }
-  | ServiceError;
+op deleteKeyValue(@path key: string): {
+  @statusCode statusCode: 200;
+  @body body: KeyValue;
+} | {
+  @statusCode statusCode: 204;
+} | ServiceError;
 ```
 
 ## Operations

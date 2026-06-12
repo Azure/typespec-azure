@@ -102,16 +102,14 @@ model Document {
 
 @route("/documents/{id}")
 @get
-op getDocument(@path id: string):
-  | {
-      @header contentType: "application/json" | "application/xml";
-      @body body: Document;
-    }
-  | {
-      @header contentType: "application/json" | "application/xml";
-      @body body: ApiError;
-      @statusCode statusCode: 400 | 404 | 500;
-    };
+op getDocument(@path id: string): {
+  @header contentType: "application/json" | "application/xml";
+  @body body: Document;
+} | {
+  @header contentType: "application/json" | "application/xml";
+  @body body: ApiError;
+  @statusCode statusCode: 400 | 404 | 500;
+};
 ```
 
 ## Operations

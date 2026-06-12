@@ -91,8 +91,7 @@ interface SavingsPlanModels {
   >;
 }
 
-@@clientInitialization(
-  Microsoft.BillingBenefits,
+@@clientInitialization(Microsoft.BillingBenefits,
   {
     parameters: ExpandParameter,
   }
@@ -323,8 +322,7 @@ interface SavingsPlanModels {
   >;
 }
 
-@@clientInitialization(
-  Microsoft.BillingBenefits,
+@@clientInitialization(Microsoft.BillingBenefits,
   {
     parameters: ExpandParameter,
   }

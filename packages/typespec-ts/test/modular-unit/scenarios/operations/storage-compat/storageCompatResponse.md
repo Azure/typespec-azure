@@ -203,17 +203,15 @@ model StorageError {
   @header("x-ms-error-code") errorCode: string;
 }
 
-op setTags(@path id: string):
-  | {
-      @header("x-ms-request-id")
-      requestId?: string;
+op setTags(@path id: string): {
+  @header("x-ms-request-id")
+  requestId?: string;
 
-      @header("x-ms-version")
-      version: string;
+  @header("x-ms-version")
+  version: string;
 
-      @statusCode _: 204;
-    }
-  | StorageError;
+  @statusCode _: 204;
+} | StorageError;
 ```
 
 ## Operations
@@ -296,17 +294,15 @@ model Widget {
 op download(
   @header("x-request-id")
   requestId?: string,
-):
-  | {
-      @statusCode statusCode: 200 | 206;
+): {
+  @statusCode statusCode: 200 | 206;
 
-      @header("x-ms-client-request-id")
-      clientRequestId?: string;
+  @header("x-ms-client-request-id")
+  clientRequestId?: string;
 
-      @body
-      body: bytes;
-    }
-  | Error;
+  @body
+  body: bytes;
+} | Error;
 ```
 
 ## Operations

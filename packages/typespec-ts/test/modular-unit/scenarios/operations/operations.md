@@ -416,11 +416,9 @@ model Bar {
   prop1: string;
   prop2: int64;
 }
-op read():
-  | {
-      a: Bar;
-    }[]
-  | null;
+op read(): {
+  a: Bar;
+}[] | null;
 ```
 
 ## Operations

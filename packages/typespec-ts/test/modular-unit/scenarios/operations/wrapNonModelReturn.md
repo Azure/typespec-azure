@@ -415,12 +415,10 @@ model ApiError {
 
 @route("/logs")
 @get
-op getLogs():
-  | {
-      @header contentType: "application/octet-stream";
-      @body body: bytes;
-    }
-  | ApiError;
+op getLogs(): {
+  @header contentType: "application/octet-stream";
+  @body body: bytes;
+} | ApiError;
 ```
 
 ## Operations
@@ -466,12 +464,10 @@ model StorageError {
 
 @route("/blobs")
 @get
-op getBlob():
-  | {
-      @header contentType: "application/octet-stream";
-      @body body: bytes;
-    }
-  | StorageError;
+op getBlob(): {
+  @header contentType: "application/octet-stream";
+  @body body: bytes;
+} | StorageError;
 ```
 
 ## Operations

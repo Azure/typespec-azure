@@ -91,10 +91,14 @@ describe("Azure Arm Resources Rest Client", () => {
   });
 
   it("should put models commonTypes managedIdentityTrackedResources", async () => {
-    const result = await client.managedIdentity.createWithSystemAssigned(RESOURCE_GROUP_EXPECTED, "identity", {
-      location: LOCATION_REGION_EXPECTED,
-      identity: createExpectedIdentity,
-    });
+    const result = await client.managedIdentity.createWithSystemAssigned(
+      RESOURCE_GROUP_EXPECTED,
+      "identity",
+      {
+        location: LOCATION_REGION_EXPECTED,
+        identity: createExpectedIdentity,
+      },
+    );
     assert.strictEqual(result.id, validSystemAssignedManagedIdentityResource.id);
     assert.strictEqual(result.location, validSystemAssignedManagedIdentityResource.location);
     assert.strictEqual(
