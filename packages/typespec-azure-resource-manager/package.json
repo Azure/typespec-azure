@@ -30,7 +30,8 @@
       "default": "./dist/src/testing/index.js"
     },
     "./base-types": {
-      "typespec": "./lib/experimental/base-types.tsp"
+      "typespec": "./lib/experimental/base-types.tsp",
+      "import": "./dist/src/experimental/base-types.js"
     }
   },
   "imports": {
