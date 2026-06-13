@@ -972,36 +972,6 @@
         "model"
       ]
     },
-    "Azure.ResourceManager.BaseTypes.Agents.AgentRole": {
-      "type": "string",
-      "description": "Roles for agent messages.",
-      "enum": [
-        "user",
-        "developer",
-        "assistant"
-      ],
-      "x-ms-enum": {
-        "name": "AgentRole",
-        "modelAsString": true,
-        "values": [
-          {
-            "name": "User",
-            "value": "user",
-            "description": "The user role."
-          },
-          {
-            "name": "Developer",
-            "value": "developer",
-            "description": "A developer role."
-          },
-          {
-            "name": "Assistant",
-            "value": "assistant",
-            "description": "An assistant role."
-          }
-        ]
-      }
-    },
     "Azure.ResourceManager.BaseTypes.Agents.AgentToolTypeEntry": {
       "type": "object",
       "description": "A tool binding for an agent, aligned with Azure AI Foundry-style tool bindings.",
@@ -1025,7 +995,7 @@
       "description": "A single input message provided to the model.",
       "properties": {
         "role": {
-          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.AgentRole",
+          "type": "string",
           "description": "The role of the message author (for example, user, system, or developer)."
         },
         "content": {
@@ -1203,10 +1173,6 @@
             "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.AgentToolTypeEntry"
           }
         },
-        "modelDeploymentRef": {
-          "type": "string",
-          "description": "Optional RP-specific reference to an underlying model deployment."
-        },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
           "description": "The provisioning state of the resource.",
@@ -1279,8 +1245,8 @@
           "readOnly": true
         },
         "createdAt": {
-          "type": "string",
-          "format": "date-time",
+          "type": "integer",
+          "format": "int32",
           "description": "Timestamp of when the conversation was created. Read-only.",
           "readOnly": true
         },
@@ -1364,8 +1330,8 @@
           "readOnly": true
         },
         "createdAt": {
-          "type": "string",
-          "format": "date-time",
+          "type": "integer",
+          "format": "int32",
           "description": "Timestamp of when the response was created. Read-only.",
           "readOnly": true
         },

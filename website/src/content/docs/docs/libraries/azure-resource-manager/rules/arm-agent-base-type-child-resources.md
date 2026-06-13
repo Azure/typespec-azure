@@ -14,14 +14,13 @@ Resources decorated with `@azureBaseType` for the Agent base type must have both
 @armProviderNamespace
 namespace Microsoft.Contoso;
 
-model MyAgentProperties {
-  displayName: string;
-  description: string;
+model MyAgentProperties is Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesPlatform {
+  ...DefaultProvisioningStateProperty;
 }
 
-@azureBaseType(#[#{ baseType: "Agent", version: "2024-06-01" }])
+@azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
 model MyAgent is TrackedResource<MyAgentProperties> {
-  @key("myAgentName") @segment("myAgents") name: string;
+  ...ResourceNameParameter<MyAgent>;
 }
 ```
 
@@ -31,27 +30,24 @@ model MyAgent is TrackedResource<MyAgentProperties> {
 @armProviderNamespace
 namespace Microsoft.Contoso;
 
-model MyAgentProperties {
-  displayName: string;
-  description: string;
+model MyAgentProperties is Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesPlatform {
+  ...DefaultProvisioningStateProperty;
 }
 
-@azureBaseType(#[#{ baseType: "Agent", version: "2024-06-01" }])
+@azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
 model MyAgent is TrackedResource<MyAgentProperties> {
-  @key("myAgentName") @segment("myAgents") name: string;
+  ...ResourceNameParameter<MyAgent>;
 }
 
 model MyConversationProperties is Azure.ResourceManager.BaseTypes.Agents.ConversationProperties;
 
-@parentResource(MyAgent)
-model MyConversation is ProxyResource<MyConversationProperties> {
-  @key("conversationName") @segment("conversations") name: string;
+model MyConversation is AgentConversation<MyConversationProperties, MyAgent> {
+  ...ResourceNameParameter<MyConversation>;
 }
 
 model MyResponseProperties is Azure.ResourceManager.BaseTypes.Agents.ResponseProperties;
 
-@parentResource(MyAgent)
-model MyResponse is ProxyResource<MyResponseProperties> {
-  @key("responseName") @segment("responses") name: string;
+model MyResponse is AgentResponse<MyResponseProperties, MyAgent> {
+  ...ResourceNameParameter<MyResponse>;
 }
 ```

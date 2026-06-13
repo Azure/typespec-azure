@@ -117,27 +117,29 @@ model AgentProperties {
  * Appliance deployment model of AgentProperties.
  * Extends the base properties with additional read-only properties
  * (the appliance owns and reports state; the client does not set these fields).
+ * @template ToolType The type of tool entries. Must extend AgentToolTypeEntry. Defaults to AgentToolTypeEntry.
  */
 #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state" ""
-model AgentPropertiesAppliance {
+model AgentPropertiesAppliance<ToolType extends AgentToolTypeEntry = AgentToolTypeEntry> {
   ...AgentProperties;
 
   /** Tool bindings. Read-only in the Appliance deployment model. */
   @visibility(Lifecycle.Read)
-  tools?: AgentToolTypeEntry[];
+  tools?: ToolType[];
 }
 
 /**
  * Platform deployment model of AgentProperties.
  * Extends the base properties with additional writable properties
  * (the client owns these fields). baseTypes remains ARM-managed and read-only.
+ * @template ToolType The type of tool entries. Must extend AgentToolTypeEntry. Defaults to AgentToolTypeEntry.
  */
 #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state" ""
-model AgentPropertiesPlatform {
+model AgentPropertiesPlatform<ToolType extends AgentToolTypeEntry = AgentToolTypeEntry> {
   ...AgentProperties;
 
   /** Tool bindings. Writable in the Platform deployment model. */
-  tools?: AgentToolTypeEntry[];
+  tools?: ToolType[];
 }
 
 // ============================================================================
@@ -155,21 +157,7 @@ model ConversationProperties {
 
   /** Timestamp of when the conversation was created. Read-only. */
   @visibility(Lifecycle.Read)
-  createdAt?: utcDateTime;
-}
-
-/** Roles for agent messages. */
-union AgentRole {
-  /** The user role. */
-  User: "user",
-
-  /** A developer role. */
-  Developer: "developer",
-
-  /** An assistant role. */
-  Assistant: "assistant",
-
-  string,
+  createdAt?: unixTimestamp32;
 }
 
 /**
@@ -177,7 +165,7 @@ union AgentRole {
  */
 model InputMessage {
   /** The role of the message author (for example, user, system, or developer). */
-  role: AgentRole;
+  role: string;
 
   /** The content of the input message. */
   content: string;
@@ -239,7 +227,7 @@ model ResponseProperties {
 
   /** Timestamp of when the response was created. Read-only. */
   @visibility(Lifecycle.Read)
-  createdAt?: utcDateTime;
+  createdAt?: unixTimestamp32;
 
   /** Model ID used to generate the response. May be specified on request to override the agent default; read-only in GET. */
   `model`?: string;
@@ -266,7 +254,7 @@ model ResponseOutputItem {
 
   /** The role associated with the output item. */
   @visibility(Lifecycle.Read)
-  role?: AgentRole;
+  role?: string;
 
   /** The status of the output item. */
   @visibility(Lifecycle.Read)

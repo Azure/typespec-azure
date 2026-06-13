@@ -5,4 +5,40 @@ packages:
   - "@azure-tools/typespec-azure-rulesets"
 ---
 
-Add base types feature with `@azureBaseType` decorator and Agent base type definitions. Base types provide structured constraints for resources including required and optional properties in their RP-specific property bags. The `@azureBaseType` decorator accepts one or more `BaseTypeInfo` instances to attach base type metadata to resource property models for future validation.
+Adding Azure Resource Manager Base Types, including the Agent base type.
+
+Base types provide structured constraints for resources including required and optional
+properties in their RP-specific property bags. The `@azureBaseType` decorator attaches
+base type metadata to resource models for validation.
+
+Example of creating an Agent resource:
+
+```typespec
+using Azure.ResourceManager;
+using Azure.ResourceManager.BaseTypes;
+using Azure.ResourceManager.BaseTypes.Agents;
+
+model MyAgentProperties is AgentPropertiesPlatform {
+  ...DefaultProvisioningStateProperty;
+}
+
+model MyAgent is Agent<MyAgentProperties> {
+  ...ResourceNameParameter<MyAgent>;
+}
+
+model MyConversationProperties is ConversationProperties {
+  ...DefaultProvisioningStateProperty;
+}
+
+model MyConversation is AgentConversation<MyConversationProperties, MyAgent> {
+  ...ResourceNameParameter<MyConversation>;
+}
+
+model MyResponseProperties is ResponseProperties {
+  ...DefaultProvisioningStateProperty;
+}
+
+model MyResponse is AgentResponse<MyResponseProperties, MyAgent> {
+  ...ResourceNameParameter<MyResponse>;
+}
+```

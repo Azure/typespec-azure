@@ -1656,8 +1656,14 @@ Extends the base properties with additional read-only properties
 (the appliance owns and reports state; the client does not set these fields).
 
 ```typespec
-model Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesAppliance
+model Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesAppliance<ToolType>
 ```
+
+#### Template Parameters
+
+| Name     | Description                                                                               |
+| -------- | ----------------------------------------------------------------------------------------- |
+| ToolType | The type of tool entries. Must extend AgentToolTypeEntry. Defaults to AgentToolTypeEntry. |
 
 #### Properties
 
@@ -1667,7 +1673,7 @@ model Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesAppliance
 | displayName | `string`                                                                                    | Human-friendly name.                                                  |
 | description | `string`                                                                                    | Purpose/behavior summary.                                             |
 | definition  | [`AgentDefinition`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.AgentDefinition) | Inline agent definition.                                              |
-| tools?      | `Azure.ResourceManager.BaseTypes.Agents.AgentToolTypeEntry[]`                               | Tool bindings. Read-only in the Appliance deployment model.           |
+| tools?      | `Array<Element>`                                                                            | Tool bindings. Read-only in the Appliance deployment model.           |
 
 ### `AgentPropertiesPlatform` {#Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesPlatform}
 
@@ -1676,8 +1682,14 @@ Extends the base properties with additional writable properties
 (the client owns these fields). baseTypes remains ARM-managed and read-only.
 
 ```typespec
-model Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesPlatform
+model Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesPlatform<ToolType>
 ```
+
+#### Template Parameters
+
+| Name     | Description                                                                               |
+| -------- | ----------------------------------------------------------------------------------------- |
+| ToolType | The type of tool entries. Must extend AgentToolTypeEntry. Defaults to AgentToolTypeEntry. |
 
 #### Properties
 
@@ -1687,7 +1699,7 @@ model Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesPlatform
 | displayName | `string`                                                                                    | Human-friendly name.                                                  |
 | description | `string`                                                                                    | Purpose/behavior summary.                                             |
 | definition  | [`AgentDefinition`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.AgentDefinition) | Inline agent definition.                                              |
-| tools?      | `Azure.ResourceManager.BaseTypes.Agents.AgentToolTypeEntry[]`                               | Tool bindings. Writable in the Platform deployment model.             |
+| tools?      | `Array<Element>`                                                                            | Tool bindings. Writable in the Platform deployment model.             |
 
 ### `AgentResponse` {#Azure.ResourceManager.BaseTypes.Agents.AgentResponse}
 
@@ -1770,10 +1782,10 @@ model Azure.ResourceManager.BaseTypes.Agents.ConversationProperties
 
 #### Properties
 
-| Name            | Type          | Description                                                                 |
-| --------------- | ------------- | --------------------------------------------------------------------------- |
-| conversationId? | `string`      | Unique conversation identifier. Read-only (set by the service on creation). |
-| createdAt?      | `utcDateTime` | Timestamp of when the conversation was created. Read-only.                  |
+| Name            | Type              | Description                                                                 |
+| --------------- | ----------------- | --------------------------------------------------------------------------- |
+| conversationId? | `string`          | Unique conversation identifier. Read-only (set by the service on creation). |
+| createdAt?      | `unixTimestamp32` | Timestamp of when the conversation was created. Read-only.                  |
 
 ### `InputMessage` {#Azure.ResourceManager.BaseTypes.Agents.InputMessage}
 
@@ -1785,10 +1797,10 @@ model Azure.ResourceManager.BaseTypes.Agents.InputMessage
 
 #### Properties
 
-| Name    | Type                                                                            | Description                                                               |
-| ------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| role    | [`AgentRole`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.AgentRole) | The role of the message author (for example, user, system, or developer). |
-| content | `string`                                                                        | The content of the input message.                                         |
+| Name    | Type     | Description                                                               |
+| ------- | -------- | ------------------------------------------------------------------------- |
+| role    | `string` | The role of the message author (for example, user, system, or developer). |
+| content | `string` | The content of the input message.                                         |
 
 ### `InputTypeProperty` {#Azure.ResourceManager.BaseTypes.Agents.InputTypeProperty}
 
@@ -1860,7 +1872,7 @@ model Azure.ResourceManager.BaseTypes.Agents.ResponseOutputItem
 | -------- | ----------------------------------------------------------------------------------------- | --------------------------------------------------------- |
 | id?      | `string`                                                                                  | Unique identifier of the output item.                     |
 | type?    | `string`                                                                                  | The output item type (for example, message or tool call). |
-| role?    | [`AgentRole`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.AgentRole)           | The role associated with the output item.                 |
+| role?    | `string`                                                                                  | The role associated with the output item.                 |
 | status?  | [`ResponseStatus`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ResponseStatus) | The status of the output item.                            |
 | content? | `string`                                                                                  | The content of the output item.                           |
 
@@ -1892,26 +1904,10 @@ model Azure.ResourceManager.BaseTypes.Agents.ResponseProperties
 | Name        | Type                                                                                      | Description                                                                                                          |
 | ----------- | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | responseId? | `string`                                                                                  | Unique response identifier. Read-only (set by the service).                                                          |
-| createdAt?  | `utcDateTime`                                                                             | Timestamp of when the response was created. Read-only.                                                               |
+| createdAt?  | `unixTimestamp32`                                                                         | Timestamp of when the response was created. Read-only.                                                               |
 | model?      | `string`                                                                                  | Model ID used to generate the response. May be specified on request to override the agent default; read-only in GET. |
 | status?     | [`ResponseStatus`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ResponseStatus) | The status of the response. Read-only.                                                                               |
 | input       | [`InputMessage`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.InputMessage)     | Content input to the model. Required on create.                                                                      |
-
-### `AgentRole` {#Azure.ResourceManager.BaseTypes.Agents.AgentRole}
-
-Roles for agent messages.
-
-```typespec
-union Azure.ResourceManager.BaseTypes.Agents.AgentRole
-```
-
-#### Variants
-
-| Name      | Type          | Description        |
-| --------- | ------------- | ------------------ |
-| User      | `"user"`      | The user role.     |
-| Developer | `"developer"` | A developer role.  |
-| Assistant | `"assistant"` | An assistant role. |
 
 ### `ResponseStatus` {#Azure.ResourceManager.BaseTypes.Agents.ResponseStatus}
 

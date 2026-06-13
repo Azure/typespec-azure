@@ -274,5 +274,3 @@ extern dec resourceBaseType(
  * ```
  */
 extern dec identifiers(entity: ModelProperty | Array<unknown>, properties: valueof string[]);
-
-

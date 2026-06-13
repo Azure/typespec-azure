@@ -26,7 +26,6 @@ enum Versions {
 
 /** RP-specific properties for the Contoso agent (Platform deployment model) */
 model ContosoAgentProperties is AgentPropertiesPlatform {
-  ...ModelDeploymentRefProperty;
   ...DefaultProvisioningStateProperty;
 }
 
