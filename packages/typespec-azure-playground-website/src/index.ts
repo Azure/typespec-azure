@@ -20,6 +20,7 @@ export const TypeSpecPlaygroundConfig = {
     "@azure-tools/typespec-autorest",
     "@azure-tools/typespec-client-generator-core",
     "@azure-tools/typespec-azure-rulesets",
+    "@azure-tools/typespec-python",
   ],
   samples,
 } as const;
