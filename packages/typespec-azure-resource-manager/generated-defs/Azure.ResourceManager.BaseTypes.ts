@@ -7,13 +7,13 @@ export interface BaseTypeInfo {
 
 /**
  * `@azureBaseType` marks an Azure Resource Manager resource properties model as implementing
- * one or more base types. Base types define structured constraints including required and
+ * a base type. Base types define structured constraints including required and
  * optional properties that conforming resources must implement.
  *
- * The decorator attaches base type metadata to the model which can later be used for
- * validation of the resource structure.
+ * This decorator may be applied multiple times to indicate conformance to
+ * multiple base types. Duplicate entries are ignored.
  *
- * @param baseTypes The base type specifications this resource implements.
+ * @param baseType The base type specification this resource implements.
  * @example
  * ```typespec
  * @azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
@@ -27,7 +27,7 @@ export interface BaseTypeInfo {
 export type AzureBaseTypeDecorator = (
   context: DecoratorContext,
   target: Model,
-  ...baseTypes: BaseTypeInfo[]
+  baseType: BaseTypeInfo,
 ) => DecoratorValidatorCallbacks | void;
 
 export type AzureResourceManagerBaseTypesDecorators = {

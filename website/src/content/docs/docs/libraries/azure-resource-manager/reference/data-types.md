@@ -1517,7 +1517,7 @@ model Azure.ResourceManager.BaseTypes.BaseTypeInfo
 
 | Name     | Type     | Description                                      |
 | -------- | -------- | ------------------------------------------------ |
-| baseType | `string` | The base type identifier (for example, "agent"). |
+| baseType | `string` | The base type identifier (for example, "Agent"). |
 | version  | `string` | The schema version of the base type.             |
 
 ## Azure.ResourceManager.BaseTypes.Agents

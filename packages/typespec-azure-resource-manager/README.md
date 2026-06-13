@@ -578,14 +578,14 @@ This allows sharing Azure Resource Manager resource types across specifications
 #### `@azureBaseType`
 
 `@azureBaseType` marks an Azure Resource Manager resource properties model as implementing
-one or more base types. Base types define structured constraints including required and
+a base type. Base types define structured constraints including required and
 optional properties that conforming resources must implement.
 
-The decorator attaches base type metadata to the model which can later be used for
-validation of the resource structure.
+This decorator may be applied multiple times to indicate conformance to
+multiple base types. Duplicate entries are ignored.
 
 ```typespec
-@Azure.ResourceManager.BaseTypes.azureBaseType(...baseTypes: valueof Azure.ResourceManager.BaseTypes.BaseTypeInfo[])
+@Azure.ResourceManager.BaseTypes.azureBaseType(baseType: valueof Azure.ResourceManager.BaseTypes.BaseTypeInfo)
 ```
 
 ##### Target
@@ -594,9 +594,9 @@ validation of the resource structure.
 
 ##### Parameters
 
-| Name      | Type                                                     | Description                                            |
-| --------- | -------------------------------------------------------- | ------------------------------------------------------ |
-| baseTypes | `valueof Azure.ResourceManager.BaseTypes.BaseTypeInfo[]` | The base type specifications this resource implements. |
+| Name     | Type                                    | Description                                           |
+| -------- | --------------------------------------- | ----------------------------------------------------- |
+| baseType | [valueof `BaseTypeInfo`](#basetypeinfo) | The base type specification this resource implements. |
 
 ##### Examples
 

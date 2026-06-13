@@ -1093,7 +1093,7 @@
       "properties": {
         "baseType": {
           "type": "string",
-          "description": "The base type identifier (for example, \"agent\")."
+          "description": "The base type identifier (for example, \"Agent\")."
         },
         "version": {
           "type": "string",

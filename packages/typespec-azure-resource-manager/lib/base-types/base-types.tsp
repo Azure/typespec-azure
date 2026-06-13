@@ -10,7 +10,7 @@ namespace Azure.ResourceManager.BaseTypes;
  * base types a resource conforms to.
  */
 model BaseTypeInfo {
-  /** The base type identifier (for example, "agent"). */
+  /** The base type identifier (for example, "Agent"). */
   baseType: string;
 
   /** The schema version of the base type. */
@@ -19,13 +19,13 @@ model BaseTypeInfo {
 
 /**
  * `@azureBaseType` marks an Azure Resource Manager resource properties model as implementing
- * one or more base types. Base types define structured constraints including required and
+ * a base type. Base types define structured constraints including required and
  * optional properties that conforming resources must implement.
  *
- * The decorator attaches base type metadata to the model which can later be used for
- * validation of the resource structure.
+ * This decorator may be applied multiple times to indicate conformance to
+ * multiple base types. Duplicate entries are ignored.
  *
- * @param baseTypes The base type specifications this resource implements.
+ * @param baseType The base type specification this resource implements.
  *
  * @example
  *
@@ -38,4 +38,4 @@ model BaseTypeInfo {
  * }
  * ```
  */
-extern dec azureBaseType(target: Model, ...baseTypes: valueof BaseTypeInfo[]);
+extern dec azureBaseType(target: Model, baseType: valueof BaseTypeInfo);

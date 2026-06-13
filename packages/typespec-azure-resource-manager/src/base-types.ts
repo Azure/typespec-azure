@@ -16,23 +16,25 @@ export const [getAzureBaseTypes, setAzureBaseTypes] = useStateMap<Model, AzureBa
 
 /**
  * Implementation for the `@azureBaseType` decorator.
- * Stores base type metadata on the target model.
+ * Adds a single base type entry to the target model. Multiple applications
+ * accumulate entries; duplicates (same baseType + version) are ignored.
  */
 export const $azureBaseType: AzureBaseTypeDecorator = (
   context: DecoratorContext,
   target: Model,
-  ...baseTypes: { baseType: string; version: string }[]
+  baseType: { baseType: string; version: string },
 ) => {
   if (isTemplateDeclaration(target)) return;
 
   const { program } = context;
-  const infos: AzureBaseTypeInfo[] = baseTypes.map((bt) => ({
-    baseType: bt.baseType,
-    version: bt.version,
-  }));
+  const existing = getAzureBaseTypes(program, target) ?? [];
 
-  if (infos.length > 0) {
-    const existing = getAzureBaseTypes(program, target) ?? [];
-    setAzureBaseTypes(program, target, [...existing, ...infos]);
+  // Deduplicate by baseType + version
+  const isDuplicate = existing.some(
+    (entry) => entry.baseType === baseType.baseType && entry.version === baseType.version,
+  );
+
+  if (!isDuplicate) {
+    setAzureBaseTypes(program, target, [...existing, { ...baseType }]);
   }
 };
