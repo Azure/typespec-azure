@@ -1605,21 +1605,6 @@ model Azure.ResourceManager.CommonTypes.CheckNameAvailabilityResponse
 | reason?        | [`CheckNameAvailabilityReason`](./data-types.md#Azure.ResourceManager.CommonTypes.CheckNameAvailabilityReason) | The reason why the given name is not available.      |
 | message?       | `string`                                                                                                       | Detailed reason why the given name is not available. |
 
-### `CustomerManagedKeyEncryption` {#Azure.ResourceManager.CommonTypes.CustomerManagedKeyEncryption}
-
-Customer-managed key encryption properties for the resource.
-
-```typespec
-model Azure.ResourceManager.CommonTypes.CustomerManagedKeyEncryption
-```
-
-#### Properties
-
-| Name                      | Type                                                                                                     | Description                                                                                                                                                                                            |
-| ------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| keyEncryptionKeyIdentity? | [`KeyEncryptionKeyIdentity`](./data-types.md#Azure.ResourceManager.CommonTypes.KeyEncryptionKeyIdentity) | All identity configuration for Customer-managed key settings defining which identity should be used to auth to Key Vault.                                                                              |
-| keyEncryptionKeyUrl?      | `string`                                                                                                 | key encryption key Url, versioned or non-versioned. Ex: https://contosovault.vault.azure.net/keys/contosokek/562a4bb76b524a1493a6afe8e536ee78 or https://contosovault.vault.azure.net/keys/contosokek. |
-
 ### `DelegatedResource` {#Azure.ResourceManager.CommonTypes.DelegatedResource}
 
 Delegated resource properties - internal use only.
@@ -1661,10 +1646,10 @@ model Azure.ResourceManager.CommonTypes.Encryption
 
 #### Properties
 
-| Name                          | Type                                                                                                             | Description                                                      |
-| ----------------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| infrastructureEncryption?     | [`InfrastructureEncryption`](./data-types.md#Azure.ResourceManager.CommonTypes.InfrastructureEncryption)         | Values are enabled and disabled.                                 |
-| customerManagedKeyEncryption? | [`CustomerManagedKeyEncryption`](./data-types.md#Azure.ResourceManager.CommonTypes.CustomerManagedKeyEncryption) | All Customer-managed key encryption properties for the resource. |
+| Name                          | Type                                                                                                     | Description                                                      |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| infrastructureEncryption?     | [`InfrastructureEncryption`](./data-types.md#Azure.ResourceManager.CommonTypes.InfrastructureEncryption) | Values are enabled and disabled.                                 |
+| customerManagedKeyEncryption? | `Azure.ResourceManager.CommonTypes.CustomerManagedKeyEncryption`                                         | All Customer-managed key encryption properties for the resource. |
 
 ### `EncryptionProperties` {#Azure.ResourceManager.CommonTypes.EncryptionProperties}
 
@@ -1798,23 +1783,6 @@ model Azure.ResourceManager.CommonTypes.IfNoneMatchHeader
 | Name        | Type     | Description                                                |
 | ----------- | -------- | ---------------------------------------------------------- |
 | ifNoneMatch | `string` | The If-None-Match header that makes a request conditional. |
-
-### `KeyEncryptionKeyIdentity` {#Azure.ResourceManager.CommonTypes.KeyEncryptionKeyIdentity}
-
-All identity configuration for Customer-managed key settings defining which identity should be used to auth to Key Vault.
-
-```typespec
-model Azure.ResourceManager.CommonTypes.KeyEncryptionKeyIdentity
-```
-
-#### Properties
-
-| Name                            | Type                                                                                                             | Description                                                                                                                                                                                                                                                                                                                        |
-| ------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| identityType?                   | [`KeyEncryptionKeyIdentityType`](./data-types.md#Azure.ResourceManager.CommonTypes.KeyEncryptionKeyIdentityType) | The type of identity to use. Values can be systemAssignedIdentity, userAssignedIdentity, or delegatedResourceIdentity.                                                                                                                                                                                                             |
-| userAssignedIdentityResourceId? | `Azure.Core.armResourceIdentifier`                                                                               | User assigned identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity.                                          |
-| federatedClientId?              | `Azure.Core.uuid`                                                                                                | application client identity to use for accessing key encryption key Url in a different tenant. Ex: f83c6b1b-4d34-47e4-bb34-9d83df58b540                                                                                                                                                                                            |
-| delegatedIdentityClientId?      | `Azure.Core.uuid`                                                                                                | delegated identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity and userAssignedIdentity - internal use only. |
 
 ### `KeyVaultProperties` {#Azure.ResourceManager.CommonTypes.KeyVaultProperties}
 
@@ -2908,22 +2876,6 @@ union Azure.ResourceManager.CommonTypes.IssueType
 | MissingPerimeterConfiguration   | `"MissingPerimeterConfiguration"`   | A network connectivity issue is happening on the resource which could be addressed either by adding new resources to the network security perimeter (NSP) or by modifying access rules.                                                                                       |
 | MissingIdentityConfiguration    | `"MissingIdentityConfiguration"`    | An managed identity hasn't been associated with the resource. The resource will still be able to validate inbound traffic from the network security perimeter (NSP) or matching inbound access rules, but it won't be able to perform outbound access as a member of the NSP. |
 
-### `KeyEncryptionKeyIdentityType` {#Azure.ResourceManager.CommonTypes.KeyEncryptionKeyIdentityType}
-
-The type of identity to use.
-
-```typespec
-union Azure.ResourceManager.CommonTypes.KeyEncryptionKeyIdentityType
-```
-
-#### Variants
-
-| Name                      | Type                          | Description              |
-| ------------------------- | ----------------------------- | ------------------------ |
-| SystemAssignedIdentity    | `"systemAssignedIdentity"`    | System assigned identity |
-| UserAssignedIdentity      | `"userAssignedIdentity"`      | User assigned identity   |
-| DelegatedResourceIdentity | `"delegatedResourceIdentity"` | Delegated identity       |
-
 ### `ManagedServiceIdentityType` {#Azure.ResourceManager.CommonTypes.ManagedServiceIdentityType}
 
 Type of managed service identity (where both SystemAssigned and UserAssigned types are allowed).
@@ -3418,6 +3370,21 @@ model Azure.ResourceManager.Foundations.ArmTagsProperty
 | ----- | ---------------- | -------------- |
 | tags? | `Record<string>` | Resource tags. |
 
+### `CustomerManagedKeyEncryptionV4` {#Azure.ResourceManager.Foundations.CustomerManagedKeyEncryptionV4}
+
+Customer-managed key encryption properties for the resource.
+
+```typespec
+model Azure.ResourceManager.Foundations.CustomerManagedKeyEncryptionV4
+```
+
+#### Properties
+
+| Name                      | Type                                                                                                         | Description                                                                                                                                                                                            |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| keyEncryptionKeyIdentity? | [`KeyEncryptionKeyIdentityV4`](./data-types.md#Azure.ResourceManager.Foundations.KeyEncryptionKeyIdentityV4) | All identity configuration for Customer-managed key settings defining which identity should be used to auth to Key Vault.                                                                              |
+| keyEncryptionKeyUrl?      | `string`                                                                                                     | key encryption key Url, versioned or non-versioned. Ex: https://contosovault.vault.azure.net/keys/contosokek/562a4bb76b524a1493a6afe8e536ee78 or https://contosovault.vault.azure.net/keys/contosokek. |
+
 ### `DefaultBaseParameters` {#Azure.ResourceManager.Foundations.DefaultBaseParameters}
 
 Base parameters for a resource.
@@ -3478,6 +3445,23 @@ model Azure.ResourceManager.Foundations.ExtensionScope<Resource>
 | apiVersion  | `string`                         | The API version to use for this operation.                             |
 | resourceUri | `string`                         | The fully qualified Azure Resource manager identifier of the resource. |
 | provider    | `"Microsoft.ThisWillBeReplaced"` |                                                                        |
+
+### `KeyEncryptionKeyIdentityV4` {#Azure.ResourceManager.Foundations.KeyEncryptionKeyIdentityV4}
+
+All identity configuration for Customer-managed key settings defining which identity should be used to auth to Key Vault.
+
+```typespec
+model Azure.ResourceManager.Foundations.KeyEncryptionKeyIdentityV4
+```
+
+#### Properties
+
+| Name                            | Type                                                                                                                 | Description                                                                                                                                                                                                                                                                                                                        |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| identityType?                   | [`KeyEncryptionKeyIdentityTypeV4`](./data-types.md#Azure.ResourceManager.Foundations.KeyEncryptionKeyIdentityTypeV4) | The type of identity to use. Values can be systemAssignedIdentity, userAssignedIdentity, or delegatedResourceIdentity.                                                                                                                                                                                                             |
+| userAssignedIdentityResourceId? | `Azure.Core.armResourceIdentifier`                                                                                   | User assigned identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity.                                          |
+| federatedClientId?              | `Azure.Core.uuid`                                                                                                    | application client identity to use for accessing key encryption key Url in a different tenant. Ex: f83c6b1b-4d34-47e4-bb34-9d83df58b540                                                                                                                                                                                            |
+| delegatedIdentityClientId?      | `Azure.Core.uuid`                                                                                                    | delegated identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity and userAssignedIdentity - internal use only. |
 
 ### `LocationBaseParameters` {#Azure.ResourceManager.Foundations.LocationBaseParameters}
 
@@ -3731,6 +3715,22 @@ model Azure.ResourceManager.Foundations.TenantScope<Resource>
 | ---------- | -------------------------------- | ------------------------------------------ |
 | apiVersion | `string`                         | The API version to use for this operation. |
 | provider   | `"Microsoft.ThisWillBeReplaced"` |                                            |
+
+### `KeyEncryptionKeyIdentityTypeV4` {#Azure.ResourceManager.Foundations.KeyEncryptionKeyIdentityTypeV4}
+
+The type of identity to use.
+
+```typespec
+union Azure.ResourceManager.Foundations.KeyEncryptionKeyIdentityTypeV4
+```
+
+#### Variants
+
+| Name                      | Type                          | Description              |
+| ------------------------- | ----------------------------- | ------------------------ |
+| SystemAssignedIdentity    | `"systemAssignedIdentity"`    | System assigned identity |
+| UserAssignedIdentity      | `"userAssignedIdentity"`      | User assigned identity   |
+| DelegatedResourceIdentity | `"delegatedResourceIdentity"` | Delegated identity       |
 
 ## Azure.ResourceManager.Legacy
 
