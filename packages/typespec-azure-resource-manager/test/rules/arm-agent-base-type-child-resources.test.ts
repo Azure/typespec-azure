@@ -87,7 +87,7 @@ describe("arm-agent-base-type-child-resources", () => {
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-agent-base-type-child-resources",
         message:
-          "Resource decorated with @azureBaseType for the Agent base type must have both a Conversation and a Response child resource. Missing: Conversation.",
+          "Agent resources must have both a Conversation and a Response child resource. Missing: Conversation.",
       });
   });
 
@@ -120,7 +120,7 @@ describe("arm-agent-base-type-child-resources", () => {
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-agent-base-type-child-resources",
         message:
-          "Resource decorated with @azureBaseType for the Agent base type must have both a Conversation and a Response child resource. Missing: Response.",
+          "Agent resources must have both a Conversation and a Response child resource. Missing: Response.",
       });
   });
 
@@ -145,7 +145,7 @@ describe("arm-agent-base-type-child-resources", () => {
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-agent-base-type-child-resources",
         message:
-          "Resource decorated with @azureBaseType for the Agent base type must have both a Conversation and a Response child resource. Missing: Conversation, Response.",
+          "Agent resources must have both a Conversation and a Response child resource. Missing: Conversation, Response.",
       });
   });
 

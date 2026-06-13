@@ -11,7 +11,7 @@ export const armAgentBaseTypeChildResourcesRule = createRule({
     "Resources decorated with @azureBaseType for the Agent base type must have both a Conversation and a Response child resource.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-agent-base-type-child-resources",
   messages: {
-    default: paramMessage`Resource decorated with @azureBaseType for the Agent base type must have both a Conversation and a Response child resource. Missing: ${"missing"}.`,
+    default: paramMessage`Agent resources must have both a Conversation and a Response child resource. Missing: ${"missing"}.`,
   },
   create(context) {
     return {
