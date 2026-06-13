@@ -959,26 +959,17 @@
     }
   },
   "definitions": {
-    "Azure.ResourceManager.BaseTypes.Agents.AgentDefinitionPlatform": {
+    "Azure.ResourceManager.BaseTypes.Agents.AgentDefinition": {
       "type": "object",
-      "description": "Platform deployment model resolution of AgentDefinition. All rp-determined fields resolve to writable.",
+      "description": "Inline agent definition describing the model and behavior of the agent.\nContains properties shared across all deployment models.",
       "properties": {
         "model": {
           "type": "string",
           "description": "Model identifier (RP-defined)."
-        },
-        "modelDeploymentRef": {
-          "type": "string",
-          "description": "Optional RP-specific reference to an underlying model deployment."
-        },
-        "instructions": {
-          "type": "string",
-          "description": "System prompt / behavioral instructions."
         }
       },
       "required": [
-        "model",
-        "instructions"
+        "model"
       ]
     },
     "Azure.ResourceManager.BaseTypes.Agents.AgentRole": {
@@ -1011,9 +1002,9 @@
         ]
       }
     },
-    "Azure.ResourceManager.BaseTypes.Agents.AgentToolTypeEntryPlatform": {
+    "Azure.ResourceManager.BaseTypes.Agents.AgentToolTypeEntry": {
       "type": "object",
-      "description": "Platform deployment model resolution of AgentToolTypeEntry. All fields resolve to writable.",
+      "description": "A tool binding for an agent, aligned with Azure AI Foundry-style tool bindings.",
       "properties": {
         "type": {
           "type": "string",
@@ -1202,15 +1193,19 @@
           "description": "Purpose/behavior summary."
         },
         "definition": {
-          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.AgentDefinitionPlatform",
-          "description": "Inline agent definition. See the AgentDefinitionPlatform sub-schema."
+          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.AgentDefinition",
+          "description": "Inline agent definition."
         },
         "tools": {
           "type": "array",
-          "description": "Tool bindings. See the AgentToolTypeEntryPlatform sub-schema.",
+          "description": "Tool bindings. Writable in the Platform deployment model.",
           "items": {
-            "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.AgentToolTypeEntryPlatform"
+            "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.AgentToolTypeEntry"
           }
+        },
+        "modelDeploymentRef": {
+          "type": "string",
+          "description": "Optional RP-specific reference to an underlying model deployment."
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",

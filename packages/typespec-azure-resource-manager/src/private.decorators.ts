@@ -157,7 +157,8 @@ const $genericResourceInternal: GenericResourceInternalDecorator = (
     namespaceName === undefined ||
     namespaceName === "Azure.ResourceManager" ||
     namespaceName === "Azure.ResourceManager.Legacy" ||
-    namespaceName === "Azure.ResourceManager.CommonTypes"
+    namespaceName === "Azure.ResourceManager.CommonTypes" ||
+    namespaceName?.startsWith("Azure.ResourceManager.BaseTypes")
   ) {
     return;
   }

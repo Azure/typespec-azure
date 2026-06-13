@@ -1,20 +1,8 @@
-import "../../dist/src/tsp-index.js";
+import type { DecoratorContext, DecoratorValidatorCallbacks, Model } from "@typespec/compiler";
 
-using Reflection;
-
-namespace Azure.ResourceManager.BaseTypes;
-
-/**
- * An ARM-managed base type descriptor identifying the schema contract a resource conforms to.
- * Used as a parameter to the `@azureBaseType` decorator to indicate which
- * base types a resource conforms to.
- */
-model BaseTypeInfo {
-  /** The base type identifier (for example, "agent"). */
-  baseType: string;
-
-  /** The schema version of the base type. */
-  version: string;
+export interface BaseTypeInfo {
+  readonly baseType: string;
+  readonly version: string;
 }
 
 /**
@@ -26,9 +14,7 @@ model BaseTypeInfo {
  * validation of the resource structure.
  *
  * @param baseTypes The base type specifications this resource implements.
- *
  * @example
- *
  * ```typespec
  * @azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
  * model MyAgentProperties {
@@ -38,4 +24,12 @@ model BaseTypeInfo {
  * }
  * ```
  */
-extern dec azureBaseType(target: Model, ...baseTypes: valueof BaseTypeInfo[]);
+export type AzureBaseTypeDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  ...baseTypes: BaseTypeInfo[]
+) => DecoratorValidatorCallbacks | void;
+
+export type AzureResourceManagerBaseTypesDecorators = {
+  azureBaseType: AzureBaseTypeDecorator;
+};

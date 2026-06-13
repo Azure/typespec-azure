@@ -85,7 +85,6 @@ Available ruleSets:
 - [`@armResourceRead`](#@armresourceread)
 - [`@armResourceUpdate`](#@armresourceupdate)
 - [`@armVirtualResource`](#@armvirtualresource)
-- [`@azureBaseType`](#@azurebasetype)
 - [`@extensionResource`](#@extensionresource)
 - [`@identifiers`](#@identifiers)
 - [`@locationResource`](#@locationresource)
@@ -376,40 +375,6 @@ Azure.ResourceManager common types.
 | -------- | ---------------- | ------------------------------------------------------------------- |
 | provider | `valueof string` | Optional. The resource provider namespace for the virtual resource. |
 
-#### `@azureBaseType`
-
-`@azureBaseType` marks an Azure Resource Manager resource properties model as implementing
-one or more base types. Base types define structured constraints including required and
-optional properties that conforming resources must implement.
-
-The decorator attaches base type metadata to the model which can later be used for
-validation of the resource structure.
-
-```typespec
-@Azure.ResourceManager.azureBaseType(baseTypes: valueof Azure.ResourceManager.BaseTypes.BaseTypeInfo[])
-```
-
-##### Target
-
-`Model`
-
-##### Parameters
-
-| Name      | Type                                                     | Description                                            |
-| --------- | -------------------------------------------------------- | ------------------------------------------------------ |
-| baseTypes | `valueof Azure.ResourceManager.BaseTypes.BaseTypeInfo[]` | The base type specifications this resource implements. |
-
-##### Examples
-
-```typespec
-@azureBaseType(#[#{ baseType: "Agent", version: "2024-06-01" }])
-model MyAgentProperties {
-  ...AgentProperties;
-  ...AgentToolProperty;
-  ...DefaultProvisioningStateProperty;
-}
-```
-
 #### `@extensionResource`
 
 `@extensionResource` marks an Azure Resource Manager resource model as an Extension resource.
@@ -605,6 +570,44 @@ This allows sharing Azure Resource Manager resource types across specifications
 | Name       | Type          | Description                                                              |
 | ---------- | ------------- | ------------------------------------------------------------------------ |
 | namespaces | `Namespace[]` | The namespaces of Azure Resource Manager libraries used in this provider |
+
+### Azure.ResourceManager.BaseTypes
+
+- [`@azureBaseType`](#@azurebasetype)
+
+#### `@azureBaseType`
+
+`@azureBaseType` marks an Azure Resource Manager resource properties model as implementing
+one or more base types. Base types define structured constraints including required and
+optional properties that conforming resources must implement.
+
+The decorator attaches base type metadata to the model which can later be used for
+validation of the resource structure.
+
+```typespec
+@Azure.ResourceManager.BaseTypes.azureBaseType(...baseTypes: valueof Azure.ResourceManager.BaseTypes.BaseTypeInfo[])
+```
+
+##### Target
+
+`Model`
+
+##### Parameters
+
+| Name      | Type                                                     | Description                                            |
+| --------- | -------------------------------------------------------- | ------------------------------------------------------ |
+| baseTypes | `valueof Azure.ResourceManager.BaseTypes.BaseTypeInfo[]` | The base type specifications this resource implements. |
+
+##### Examples
+
+```typespec
+@azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
+model MyAgentProperties {
+  ...AgentProperties;
+  ...AgentToolProperty;
+  ...DefaultProvisioningStateProperty;
+}
+```
 
 ### Azure.ResourceManager.Legacy
 

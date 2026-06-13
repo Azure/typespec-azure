@@ -275,28 +275,4 @@ extern dec resourceBaseType(
  */
 extern dec identifiers(entity: ModelProperty | Array<unknown>, properties: valueof string[]);
 
-/**
- * `@azureBaseType` marks an Azure Resource Manager resource properties model as implementing
- * one or more base types. Base types define structured constraints including required and
- * optional properties that conforming resources must implement.
- *
- * The decorator attaches base type metadata to the model which can later be used for
- * validation of the resource structure.
- *
- * @param baseTypes The base type specifications this resource implements.
- *
- * @example
- *
- * ```typespec
- * @azureBaseType(#[#{ baseType: "Agent", version: "2024-06-01" }])
- * model MyAgentProperties {
- *   ...AgentProperties;
- *   ...AgentToolProperty;
- *   ...DefaultProvisioningStateProperty;
- * }
- * ```
- */
-extern dec azureBaseType(
-  target: Model,
-  baseTypes: valueof Azure.ResourceManager.BaseTypes.BaseTypeInfo[]
-);
+

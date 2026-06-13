@@ -1,6 +1,6 @@
 import { DecoratorContext, Model, isTemplateDeclaration } from "@typespec/compiler";
 import { useStateMap } from "@typespec/compiler/utils";
-import type { AzureBaseTypeDecorator } from "../generated-defs/Azure.ResourceManager.js";
+import type { AzureBaseTypeDecorator } from "../generated-defs/Azure.ResourceManager.BaseTypes.js";
 import { ArmStateKeys } from "./state.js";
 
 export interface AzureBaseTypeInfo {
@@ -21,7 +21,7 @@ export const [getAzureBaseTypes, setAzureBaseTypes] = useStateMap<Model, AzureBa
 export const $azureBaseType: AzureBaseTypeDecorator = (
   context: DecoratorContext,
   target: Model,
-  baseTypes: readonly { baseType: string; version: string }[],
+  ...baseTypes: { baseType: string; version: string }[]
 ) => {
   if (isTemplateDeclaration(target)) return;
 

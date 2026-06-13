@@ -1,5 +1,4 @@
 import "./base-types.tsp";
-import "../arm.tsp";
 
 using Azure.ResourceManager;
 using Azure.ResourceManager.BaseTypes;
@@ -13,33 +12,8 @@ namespace Azure.ResourceManager.BaseTypes.Agents;
 
 /**
  * A tool binding for an agent, aligned with Azure AI Foundry-style tool bindings.
- * Mutability of the fields is resolved by the deployment model.
  */
 model AgentToolTypeEntry {
-  /** Tool type discriminator. Must be one of the publicly documented Azure AI Foundry tool types. */
-  type: string;
-
-  /** Tool name/identifier. */
-  name: string;
-}
-
-/**
- * Appliance deployment model resolution of AgentToolTypeEntry. All fields resolve to read-only.
- */
-model AgentToolTypeEntryAppliance {
-  /** Tool type discriminator. Must be one of the publicly documented Azure AI Foundry tool types. */
-  @visibility(Lifecycle.Read)
-  type?: string;
-
-  /** Tool name/identifier. */
-  @visibility(Lifecycle.Read)
-  name?: string;
-}
-
-/**
- * Platform deployment model resolution of AgentToolTypeEntry. All fields resolve to writable.
- */
-model AgentToolTypeEntryPlatform {
   /** Tool type discriminator. Must be one of the publicly documented Azure AI Foundry tool types. */
   type: string;
 
@@ -62,26 +36,20 @@ model AgentToolProperty<ToolType extends AgentToolTypeEntry = AgentToolTypeEntry
 
 /**
  * Inline agent definition describing the model and behavior of the agent.
- * Mutability of the rp-determined fields is resolved by the deployment model.
+ * Contains properties shared across all deployment models.
  */
 model AgentDefinition {
   /** Model identifier (RP-defined). */
   `model`: string;
-
-  /** Optional RP-specific reference to an underlying model deployment. */
-  modelDeploymentRef?: string;
-
-  /** System prompt / behavioral instructions. Required on request when the RP exposes this field as writable. */
-  instructions?: string;
 }
 
 /**
- * Appliance deployment model resolution of AgentDefinition. All rp-determined fields resolve to read-only.
+ * Appliance deployment model of AgentDefinition.
+ * Extends the base definition with additional read-only properties
+ * (the appliance owns and reports state; the client does not set these fields).
  */
 model AgentDefinitionAppliance {
-  /** Model identifier (RP-defined). */
-  @visibility(Lifecycle.Read)
-  `model`?: string;
+  ...AgentDefinition;
 
   /** Optional RP-specific reference to an underlying model deployment. */
   @visibility(Lifecycle.Read)
@@ -93,11 +61,12 @@ model AgentDefinitionAppliance {
 }
 
 /**
- * Platform deployment model resolution of AgentDefinition. All rp-determined fields resolve to writable.
+ * Platform deployment model of AgentDefinition.
+ * Extends the base definition with additional writable properties
+ * (the client owns these fields).
  */
 model AgentDefinitionPlatform {
-  /** Model identifier (RP-defined). */
-  `model`: string;
+  ...AgentDefinition;
 
   /** Optional RP-specific reference to an underlying model deployment. */
   modelDeploymentRef?: string;
@@ -124,6 +93,7 @@ model AgentInstructionsProperty {
 
 /**
  * Required properties for an agent resource.
+ * Contains properties shared across all deployment models.
  * Resource providers implementing the Agent base type must include these
  * properties in their resource property bag.
  */
@@ -144,55 +114,30 @@ model AgentProperties {
 }
 
 /**
- * Appliance deployment model resolution of AgentProperties.
- * In the Appliance model all rp-determined fields resolve to read-only
+ * Appliance deployment model of AgentProperties.
+ * Extends the base properties with additional read-only properties
  * (the appliance owns and reports state; the client does not set these fields).
  */
 #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state" ""
 model AgentPropertiesAppliance {
-  /** ARM-managed. Must include the base type descriptor for this resource. */
-  @visibility(Lifecycle.Read)
-  baseTypes: BaseTypeInfo[];
+  ...AgentProperties;
 
-  /** Human-friendly name. */
+  /** Tool bindings. Read-only in the Appliance deployment model. */
   @visibility(Lifecycle.Read)
-  displayName: string;
-
-  /** Purpose/behavior summary. */
-  @visibility(Lifecycle.Read)
-  description: string;
-
-  /** Inline agent definition. See the AgentDefinitionAppliance sub-schema. */
-  @visibility(Lifecycle.Read)
-  definition: AgentDefinitionAppliance;
-
-  /** Tool bindings. See the AgentToolTypeEntryAppliance sub-schema. */
-  @visibility(Lifecycle.Read)
-  tools?: AgentToolTypeEntryAppliance[];
+  tools?: AgentToolTypeEntry[];
 }
 
 /**
- * Platform deployment model resolution of AgentProperties.
- * In the Platform model all rp-determined fields resolve to writable
+ * Platform deployment model of AgentProperties.
+ * Extends the base properties with additional writable properties
  * (the client owns these fields). baseTypes remains ARM-managed and read-only.
  */
 #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state" ""
 model AgentPropertiesPlatform {
-  /** ARM-managed. Must include the base type descriptor for this resource. */
-  @visibility(Lifecycle.Read)
-  baseTypes: BaseTypeInfo[];
+  ...AgentProperties;
 
-  /** Human-friendly name. */
-  displayName: string;
-
-  /** Purpose/behavior summary. */
-  description: string;
-
-  /** Inline agent definition. See the AgentDefinitionPlatform sub-schema. */
-  definition: AgentDefinitionPlatform;
-
-  /** Tool bindings. See the AgentToolTypeEntryPlatform sub-schema. */
-  tools?: AgentToolTypeEntryPlatform[];
+  /** Tool bindings. Writable in the Platform deployment model. */
+  tools?: AgentToolTypeEntry[];
 }
 
 // ============================================================================
@@ -361,7 +306,7 @@ model ResponseInstructionsProperty {
  * Applies the Agent base type decorator automatically.
  * @template Properties RP-specific properties for the agent (must extend AgentProperties)
  */
-@azureBaseType(#[#{ baseType: "Agent", version: "2024-06-01" }])
+@azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
 model Agent<Properties extends AgentProperties> is TrackedResource<Properties>;
 
 /**

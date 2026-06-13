@@ -25,6 +25,7 @@ describe("arm-agent-base-type-child-resources", () => {
     await tester
       .expect(
         `
+        using Azure.ResourceManager.BaseTypes;
         @armProviderNamespace namespace MyService;
 
         model MyAgentProperties {
@@ -32,7 +33,7 @@ describe("arm-agent-base-type-child-resources", () => {
           description: string;
         }
 
-        @azureBaseType(#[#{ baseType: "Agent", version: "2024-06-01" }])
+        @azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
         model MyAgent is TrackedResource<MyAgentProperties> {
           @key("myAgentName") @segment("myAgents") name: string;
         }
@@ -61,6 +62,7 @@ describe("arm-agent-base-type-child-resources", () => {
     await tester
       .expect(
         `
+        using Azure.ResourceManager.BaseTypes;
         @armProviderNamespace namespace MyService;
 
         model MyAgentProperties {
@@ -68,7 +70,7 @@ describe("arm-agent-base-type-child-resources", () => {
           description: string;
         }
 
-        @azureBaseType(#[#{ baseType: "Agent", version: "2024-06-01" }])
+        @azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
         model MyAgent is TrackedResource<MyAgentProperties> {
           @key("myAgentName") @segment("myAgents") name: string;
         }
@@ -93,6 +95,7 @@ describe("arm-agent-base-type-child-resources", () => {
     await tester
       .expect(
         `
+        using Azure.ResourceManager.BaseTypes;
         @armProviderNamespace namespace MyService;
 
         model MyAgentProperties {
@@ -100,7 +103,7 @@ describe("arm-agent-base-type-child-resources", () => {
           description: string;
         }
 
-        @azureBaseType(#[#{ baseType: "Agent", version: "2024-06-01" }])
+        @azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
         model MyAgent is TrackedResource<MyAgentProperties> {
           @key("myAgentName") @segment("myAgents") name: string;
         }
@@ -125,6 +128,7 @@ describe("arm-agent-base-type-child-resources", () => {
     await tester
       .expect(
         `
+        using Azure.ResourceManager.BaseTypes;
         @armProviderNamespace namespace MyService;
 
         model MyAgentProperties {
@@ -132,7 +136,7 @@ describe("arm-agent-base-type-child-resources", () => {
           description: string;
         }
 
-        @azureBaseType(#[#{ baseType: "Agent", version: "2024-06-01" }])
+        @azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
         model MyAgent is TrackedResource<MyAgentProperties> {
           @key("myAgentName") @segment("myAgents") name: string;
         }
@@ -149,13 +153,14 @@ describe("arm-agent-base-type-child-resources", () => {
     await tester
       .expect(
         `
+        using Azure.ResourceManager.BaseTypes;
         @armProviderNamespace namespace MyService;
 
         model MyProperties {
           displayName: string;
         }
 
-        @azureBaseType(#[#{ baseType: "SomethingElse", version: "2024-06-01" }])
+        @azureBaseType(#{ baseType: "SomethingElse", version: "2024-06-01" })
         model MyResource is TrackedResource<MyProperties> {
           @key("myResourceName") @segment("myResources") name: string;
         }

@@ -12,6 +12,8 @@ import "./legacy-types/arm.legacy.tsp";
 import "./common-types/common-types.tsp";
 import "./extension/extension.tsp";
 import "./backcompat.tsp";
+import "./base-types/base-types.tsp";
+import "./base-types/agent.tsp";
 import "./private.decorators.tsp";
 import "./models.tsp";
 import "./operations.tsp";
@@ -22,7 +24,5 @@ import "./parameters.tsp";
 import "./private-endpoints.tsp";
 import "./private-links.tsp";
 import "./network-security-perimeter.tsp";
-import "./base-types/base-types.tsp";
-import "./base-types/agent.tsp";
 
 namespace Azure.ResourceManager;
