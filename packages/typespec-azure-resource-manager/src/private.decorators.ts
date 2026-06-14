@@ -56,6 +56,7 @@ import {
   AssignUniqueProviderNameValueDecorator,
   AzureResourceBaseDecorator,
   AzureResourceManagerPrivateDecorators,
+  BaseTypeOptionalDecorator,
   BuiltInResourceOperationDecorator,
   DefaultResourceKeySegmentNameDecorator,
   EnforceConstraintDecorator,
@@ -719,6 +720,26 @@ const $armBodyRoot: ArmBodyRootDecorator = (
   context.call($bodyRoot, target);
 };
 
+const $baseTypeOptional: BaseTypeOptionalDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  isPresent: boolean,
+  isAppliance: boolean,
+) => {
+  const { program } = context;
+  if (!isPresent) {
+    const lifecycle = getLifecycleVisibilityEnum(program);
+    clearVisibilityModifiersForClass(program, target, lifecycle);
+    sealVisibilityModifiers(program, target, lifecycle);
+  } else if (isAppliance) {
+    const lifecycle = getLifecycleVisibilityEnum(program);
+    const readMember = lifecycle.members.get("Read");
+    if (readMember) {
+      addVisibilityModifiers(program, target, [readMember], context);
+    }
+  }
+};
+
 const $legacyType: LegacyTypeDecorator = (
   context: DecoratorContext,
   target: Model | Operation | Interface | Scalar,
@@ -1079,6 +1100,7 @@ export const $decorators = {
     armRenameListByOperation: $armRenameListByOperation,
     armResourcePropertiesOptionality: $armResourcePropertiesOptionality,
     armBodyRoot: $armBodyRoot,
+    baseTypeOptional: $baseTypeOptional,
     armResourceWithParameter: $armResourceWithParameter,
     legacyType: $legacyType,
     resourceParentType: $resourceParentType,

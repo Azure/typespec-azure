@@ -959,22 +959,9 @@
     }
   },
   "definitions": {
-    "Azure.ResourceManager.BaseTypes.Agents.AgentDefinition": {
+    "Azure.ResourceManager.BaseTypes.Agents.AgentToolTypePlatform": {
       "type": "object",
-      "description": "Inline agent definition describing the model and behavior of the agent.\nContains properties shared across all deployment models.",
-      "properties": {
-        "model": {
-          "type": "string",
-          "description": "Model identifier (RP-defined)."
-        }
-      },
-      "required": [
-        "model"
-      ]
-    },
-    "Azure.ResourceManager.BaseTypes.Agents.AgentToolTypeEntry": {
-      "type": "object",
-      "description": "A tool binding for an agent, aligned with Azure AI Foundry-style tool bindings.",
+      "description": "A tool binding for an agent (Platform deployment model).\nAll properties have default visibility (the client owns these fields).",
       "properties": {
         "type": {
           "type": "string",
@@ -1163,14 +1150,32 @@
           "description": "Purpose/behavior summary."
         },
         "definition": {
-          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.AgentDefinition",
-          "description": "Inline agent definition."
+          "type": "object",
+          "description": "Inline agent definition.",
+          "properties": {
+            "model": {
+              "type": "string",
+              "description": "Model identifier (RP-defined)."
+            },
+            "modelDeploymentRef": {
+              "type": "string",
+              "description": "Optional RP-specific reference to an underlying model deployment."
+            },
+            "instructions": {
+              "type": "string",
+              "description": "System prompt / behavioral instructions."
+            }
+          },
+          "required": [
+            "model",
+            "instructions"
+          ]
         },
         "tools": {
           "type": "array",
           "description": "Tool bindings. Writable in the Platform deployment model.",
           "items": {
-            "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.AgentToolTypeEntry"
+            "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.AgentToolTypePlatform"
           }
         },
         "provisioningState": {
@@ -1257,12 +1262,9 @@
         },
         "instructions": {
           "type": "string",
-          "description": "System prompt / behavioral instructions."
+          "description": "System prompt / behavioral instructions for this conversation."
         }
-      },
-      "required": [
-        "instructions"
-      ]
+      }
     },
     "ContosoConversationUpdate": {
       "type": "object",
@@ -1280,7 +1282,7 @@
       "properties": {
         "instructions": {
           "type": "string",
-          "description": "System prompt / behavioral instructions."
+          "description": "System prompt / behavioral instructions for this conversation."
         }
       }
     },

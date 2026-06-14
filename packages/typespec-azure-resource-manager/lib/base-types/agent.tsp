@@ -2,6 +2,7 @@ import "./base-types.tsp";
 
 using Azure.ResourceManager;
 using Azure.ResourceManager.BaseTypes;
+using Azure.ResourceManager.Private;
 using TypeSpec.Rest;
 
 namespace Azure.ResourceManager.BaseTypes.Agents;
@@ -11,23 +12,29 @@ namespace Azure.ResourceManager.BaseTypes.Agents;
 // ============================================================================
 
 /**
- * A tool binding for an agent, aligned with Azure AI Foundry-style tool bindings.
+ * A tool binding for an agent (Appliance deployment model).
+ * All properties are read-only (the appliance owns and reports state).
  */
-model AgentToolTypeEntry {
+model AgentToolTypeAppliance {
+  /** Tool type discriminator. Must be one of the publicly documented Azure AI Foundry tool types. */
+  @visibility(Lifecycle.Read)
+  type: string;
+
+  /** Tool name/identifier. */
+  @visibility(Lifecycle.Read)
+  name: string;
+}
+
+/**
+ * A tool binding for an agent (Platform deployment model).
+ * All properties have default visibility (the client owns these fields).
+ */
+model AgentToolTypePlatform {
   /** Tool type discriminator. Must be one of the publicly documented Azure AI Foundry tool types. */
   type: string;
 
   /** Tool name/identifier. */
   name: string;
-}
-
-/**
- * Mix-in for agent tool properties.
- * @template ToolType The type of tool entries. Defaults to AgentToolTypeEntry.
- */
-model AgentToolProperty<ToolType extends AgentToolTypeEntry = AgentToolTypeEntry> {
-  /** Tool bindings for the agent. */
-  tools?: ToolType[];
 }
 
 // ============================================================================
@@ -36,54 +43,57 @@ model AgentToolProperty<ToolType extends AgentToolTypeEntry = AgentToolTypeEntry
 
 /**
  * Inline agent definition describing the model and behavior of the agent.
- * Contains properties shared across all deployment models.
+ * This model is used only as a constraint for template parameters.
  */
-model AgentDefinition {
+internal model AgentDefinition {
   /** Model identifier (RP-defined). */
   `model`: string;
 }
 
 /**
  * Appliance deployment model of AgentDefinition.
- * Extends the base definition with additional read-only properties
- * (the appliance owns and reports state; the client does not set these fields).
+ * Properties controlled by `@baseTypeOptional` are invisible when the corresponding
+ * template parameter is false, or read-only when present.
+ * @template HasModelDeploymentRef Whether the modelDeploymentRef property is present.
+ * @template HasInstructions Whether the instructions property is present.
  */
-model AgentDefinitionAppliance {
-  ...AgentDefinition;
+model AgentDefinitionAppliance<
+  HasModelDeploymentRef extends valueof boolean = false,
+  HasInstructions extends valueof boolean = false
+> {
+  /** Model identifier (RP-defined). */
+  @visibility(Lifecycle.Read)
+  `model`: string;
 
   /** Optional RP-specific reference to an underlying model deployment. */
-  @visibility(Lifecycle.Read)
+  @baseTypeOptional(HasModelDeploymentRef, true)
   modelDeploymentRef?: string;
 
   /** System prompt / behavioral instructions. */
-  @visibility(Lifecycle.Read)
-  instructions?: string;
+  @baseTypeOptional(HasInstructions, true)
+  instructions: string;
 }
 
 /**
  * Platform deployment model of AgentDefinition.
- * Extends the base definition with additional writable properties
- * (the client owns these fields).
+ * Properties controlled by `@baseTypeOptional` are invisible when the corresponding
+ * template parameter is false, or have default visibility when present.
+ * @template HasModelDeploymentRef Whether the modelDeploymentRef property is present.
+ * @template HasInstructions Whether the instructions property is present.
  */
-model AgentDefinitionPlatform {
-  ...AgentDefinition;
+model AgentDefinitionPlatform<
+  HasModelDeploymentRef extends valueof boolean = false,
+  HasInstructions extends valueof boolean = false
+> {
+  /** Model identifier (RP-defined). */
+  `model`: string;
 
   /** Optional RP-specific reference to an underlying model deployment. */
+  @baseTypeOptional(HasModelDeploymentRef, false)
   modelDeploymentRef?: string;
 
   /** System prompt / behavioral instructions. */
-  instructions: string;
-}
-
-/** Mix-in for the model deployment reference property. */
-model ModelDeploymentRefProperty {
-  /** Optional RP-specific reference to an underlying model deployment. */
-  modelDeploymentRef?: string;
-}
-
-/** Mix-in for agent instructions. */
-model AgentInstructionsProperty {
-  /** System prompt / behavioral instructions. */
+  @baseTypeOptional(HasInstructions, false)
   instructions: string;
 }
 
@@ -93,12 +103,10 @@ model AgentInstructionsProperty {
 
 /**
  * Required properties for an agent resource.
- * Contains properties shared across all deployment models.
- * Resource providers implementing the Agent base type must include these
- * properties in their resource property bag.
+ * This model is used only as a constraint for template parameters.
  */
 #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state" ""
-model AgentProperties {
+internal model AgentProperties {
   /** ARM-managed. Must include the base type descriptor for this resource. */
   @visibility(Lifecycle.Read)
   baseTypes: BaseTypeInfo[];
@@ -115,31 +123,63 @@ model AgentProperties {
 
 /**
  * Appliance deployment model of AgentProperties.
- * Extends the base properties with additional read-only properties
- * (the appliance owns and reports state; the client does not set these fields).
- * @template ToolType The type of tool entries. Must extend AgentToolTypeEntry. Defaults to AgentToolTypeEntry.
+ * All properties are read-only (the appliance owns and reports state).
+ * @template HasModelDeploymentRef Whether the definition includes a modelDeploymentRef property.
+ * @template HasInstructions Whether the definition includes an instructions property.
  */
 #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state" ""
-model AgentPropertiesAppliance<ToolType extends AgentToolTypeEntry = AgentToolTypeEntry> {
-  ...AgentProperties;
+model AgentPropertiesAppliance<
+  HasModelDeploymentRef extends valueof boolean = false,
+  HasInstructions extends valueof boolean = false
+> {
+  /** ARM-managed. Must include the base type descriptor for this resource. */
+  @visibility(Lifecycle.Read)
+  baseTypes: BaseTypeInfo[];
+
+  /** Human-friendly name. */
+  @visibility(Lifecycle.Read)
+  displayName: string;
+
+  /** Purpose/behavior summary. */
+  @visibility(Lifecycle.Read)
+  description: string;
+
+  /** Inline agent definition. */
+  @visibility(Lifecycle.Read)
+  definition: AgentDefinitionAppliance<HasModelDeploymentRef, HasInstructions>;
 
   /** Tool bindings. Read-only in the Appliance deployment model. */
   @visibility(Lifecycle.Read)
-  tools?: ToolType[];
+  tools?: AgentToolTypeAppliance[];
 }
 
 /**
  * Platform deployment model of AgentProperties.
- * Extends the base properties with additional writable properties
- * (the client owns these fields). baseTypes remains ARM-managed and read-only.
- * @template ToolType The type of tool entries. Must extend AgentToolTypeEntry. Defaults to AgentToolTypeEntry.
+ * Properties have default visibility (the client owns these fields).
+ * baseTypes remains ARM-managed and read-only.
+ * @template HasModelDeploymentRef Whether the definition includes a modelDeploymentRef property.
+ * @template HasInstructions Whether the definition includes an instructions property.
  */
 #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state" ""
-model AgentPropertiesPlatform<ToolType extends AgentToolTypeEntry = AgentToolTypeEntry> {
-  ...AgentProperties;
+model AgentPropertiesPlatform<
+  HasModelDeploymentRef extends valueof boolean = false,
+  HasInstructions extends valueof boolean = false
+> {
+  /** ARM-managed. Must include the base type descriptor for this resource. */
+  @visibility(Lifecycle.Read)
+  baseTypes: BaseTypeInfo[];
+
+  /** Human-friendly name. */
+  displayName: string;
+
+  /** Purpose/behavior summary. */
+  description: string;
+
+  /** Inline agent definition. */
+  definition: AgentDefinitionPlatform<HasModelDeploymentRef, HasInstructions>;
 
   /** Tool bindings. Writable in the Platform deployment model. */
-  tools?: ToolType[];
+  tools?: AgentToolTypePlatform[];
 }
 
 // ============================================================================

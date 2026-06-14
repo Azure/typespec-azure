@@ -25,14 +25,16 @@ enum Versions {
 }
 
 /** RP-specific properties for the Contoso agent (Platform deployment model) */
-model ContosoAgentProperties is AgentPropertiesPlatform {
+model ContosoAgentProperties is AgentPropertiesPlatform<true, true> {
   ...DefaultProvisioningStateProperty;
 }
 
 /** RP-specific properties for conversations */
 model ContosoConversationProperties is ConversationProperties {
   ...DefaultProvisioningStateProperty;
-  ...AgentInstructionsProperty;
+
+  /** System prompt / behavioral instructions for this conversation. */
+  instructions?: string;
 }
 
 /** RP-specific properties for responses */
