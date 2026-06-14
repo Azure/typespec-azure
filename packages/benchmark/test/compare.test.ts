@@ -52,3 +52,16 @@ it("excludes metrics below minimum absolute threshold from regression summary", 
   expect(topSummary).toContain("| checker |");
   expect(topSummary).not.toContain("linter/noisy-rule");
 });
+
+it("keeps descriptive baseline labels in comments", () => {
+  const comparisons = [createComparison([createMetric("checker", 100, 99)])];
+  const comment = formatPrComment(
+    comparisons,
+    "rolling:abc1234..def5678 (rolling baseline (20 main runs))",
+    "1234567890abcdef",
+    { threshold: 5 },
+  );
+
+  expect(comment).toContain("rolling baseline (20 main runs)");
+  expect(comment).toContain("<code>1234567</code>");
+});
