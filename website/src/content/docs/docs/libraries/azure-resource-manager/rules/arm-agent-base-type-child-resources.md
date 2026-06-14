@@ -34,8 +34,7 @@ model MyAgentProperties is Azure.ResourceManager.BaseTypes.Agents.AgentPropertie
   ...DefaultProvisioningStateProperty;
 }
 
-@azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
-model MyAgent is TrackedResource<MyAgentProperties> {
+model MyAgent is Agent<MyAgentProperties> {
   ...ResourceNameParameter<MyAgent>;
 }
 
