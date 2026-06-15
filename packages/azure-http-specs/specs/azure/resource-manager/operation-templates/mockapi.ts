@@ -1204,3 +1204,101 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Paging_markAsPageable = passO
   },
   kind: "MockApiDefinition",
 });
+
+// Legacy template scenarios
+// RoutedOperations: GET with custom route override
+// Based on: https://github.com/Azure/azure-rest-api-specs/blob/89ff93230e/specification/web/resource-manager/Microsoft.Web/AppService/AppServiceEnvironmentResource.tsp#L30-L46
+Scenarios.Azure_ResourceManager_OperationTemplates_Legacy_routedGet = passOnSuccess({
+  uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/configurations/:configName/diagnostics/:diagnosticName",
+  method: "get",
+  request: {
+    pathParams: {
+      subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      resourceGroup: RESOURCE_GROUP_EXPECTED,
+      configName: "default",
+      diagnosticName: "memory",
+    },
+    query: {
+      "api-version": "2023-12-01-preview",
+    },
+  },
+  response: {
+    status: 200,
+    body: json({
+      name: "memory",
+      status: "healthy",
+    }),
+  },
+  kind: "MockApiDefinition",
+});
+
+// CreateOrReplaceSync with optional body
+// Based on: https://github.com/Azure/azure-rest-api-specs/blob/89ff93230e/specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace/Collection.tsp#L38-L44
+const validConfiguration = {
+  id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/configurations/default`,
+  name: "default",
+  type: "Azure.ResourceManager.OperationTemplates/configurations",
+  location: "eastus",
+  properties: {
+    configValue: "default-value",
+    provisioningState: "Succeeded",
+  },
+};
+
+const validConfigurationWithBody = {
+  ...validConfiguration,
+  properties: {
+    configValue: "custom-value",
+    provisioningState: "Succeeded",
+  },
+};
+
+Scenarios.Azure_ResourceManager_OperationTemplates_Legacy_createOrReplaceOptionalBody =
+  passOnSuccess([
+    {
+      // PUT with body
+      uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/configurations/:configName",
+      method: "put",
+      request: {
+        pathParams: {
+          subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+          resourceGroup: RESOURCE_GROUP_EXPECTED,
+          configName: "default",
+        },
+        query: {
+          "api-version": "2023-12-01-preview",
+        },
+        body: json({
+          location: "eastus",
+          properties: {
+            configValue: "custom-value",
+          },
+        }),
+      },
+      response: {
+        status: 200,
+        body: json(validConfigurationWithBody),
+      },
+      kind: "MockApiDefinition",
+    },
+    {
+      // PUT without body
+      uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/configurations/:configName",
+      method: "put",
+      request: {
+        pathParams: {
+          subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+          resourceGroup: RESOURCE_GROUP_EXPECTED,
+          configName: "default",
+        },
+        query: {
+          "api-version": "2023-12-01-preview",
+        },
+      },
+      response: {
+        status: 200,
+        body: json(validConfiguration),
+      },
+      kind: "MockApiDefinition",
+    },
+  ]);
