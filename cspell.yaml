@@ -113,23 +113,21 @@ words:
   - byval
   - petstoreopgrp
   - pypi
-  # Go emitter identifiers (typespec-go/src)
+  # Go emitter
   - addl
-  - Addl
   - azfake
   - azidentity
-  - Errorf
-  - Fatalf
+  - errorf
+  - fatalf
   - gomod
-  - GOPATH
+  - gopath
   - polymorphics
   - respr
-  - Retriable
-  - Unmarshaller
+  - retriable
+  - unmarshaller
   - unmarshallers
   - unmarshalling
   - unpopulate
-  # Go emitter carried-over identifiers/comments preserved from upstream source
   - ervices
   - lient
   - onfig
@@ -139,7 +137,6 @@ words:
   - tcgcadapter
   - uninstantiable
   - unmarshalled
-  # Go stdlib package names referenced by typespec-go/src/naming/mappings.ts
   - cmplx
   - fcgi
   - flate
