@@ -176,7 +176,7 @@ op CreateOrReplaceSync<
 >;
 
 /**
- * @dev A long-running resource CreateOrUpdate (PUT)
+ * A long-running resource CreateOrUpdate (PUT)
  * @template TargetResource the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup
  * @template ExtensionResource the resource being created or replaced
  * @template LroHeaders Optional.  Allows overriding the lro headers returned on resource create
@@ -288,7 +288,7 @@ op CustomPatchSync<
 >;
 
 /**
- * @dev Delete a resource asynchronously
+ * Delete a resource asynchronously
  * @template TargetResource The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup
  * @template ExtensionResource The resource being deleted
  * @template Response The response type for the operation
@@ -314,7 +314,7 @@ op DeleteAsyncBase<
   | Error;
 
 /**
- * @dev Delete a resource asynchronously.
+ * Delete a resource asynchronously.
  * @template TargetResource The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup
  * @template ExtensionResource The resource being deleted
  * @template LroHeaders Optional. Allows overriding the headers in the Accepted response
@@ -351,7 +351,7 @@ op DeleteAsync<
 >;
 
 /**
- * @dev Delete a resource asynchronously
+ * Delete a resource asynchronously
  * @template TargetResource The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup
  * @template ExtensionResource The resource being deleted
  * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted response
@@ -444,7 +444,7 @@ op ActionAsyncBase<
 ): Response | Error;
 
 /**
- * @dev A long-running resource action.
+ * A long-running resource action.
  * @template TargetResource The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup
  * @template ExtensionResource The resource being acted upon
  * @template Request The request model for the action
@@ -459,6 +459,7 @@ op ActionAsyncBase<
 @extensionResourceOperation(TargetResource, ExtensionResource, "action", OverrideResourceName)
 @returnsDoc("Azure operation completed successfully.")
 @enforceConstraint(ExtensionResource, Foundations.Resource)
+@doc("")
 op ActionAsync<
   TargetResource extends Foundations.SimpleResource,
   ExtensionResource extends Foundations.SimpleResource,
@@ -520,7 +521,7 @@ op ActionSync<
 ): Response | Error;
 
 /**
- * @dev A long-running resource action that returns no content.
+ * A long-running resource action that returns no content.
  * @template TargetResource The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup
  * @template ExtensionResource The resource being acted upon
  * @template Request The request model for the action
@@ -535,6 +536,7 @@ op ActionSync<
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
 @post
+@doc("")
 op ActionNoResponseContentAsync<
   TargetResource extends Foundations.SimpleResource,
   ExtensionResource extends Foundations.SimpleResource,
