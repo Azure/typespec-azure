@@ -1,5 +1,3 @@
-import "../../dist/src/tsp-index.js";
-
 using Reflection;
 
 namespace Azure.ResourceManager.BaseTypes;

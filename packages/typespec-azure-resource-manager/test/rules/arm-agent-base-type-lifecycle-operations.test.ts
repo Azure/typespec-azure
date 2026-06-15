@@ -333,4 +333,64 @@ describe("arm-agent-base-type-lifecycle-operations", () => {
       )
       .toBeValid();
   });
+
+  it("emits warning when Conversation has no operations interface", async () => {
+    await tester
+      .expect(
+        `
+        using Azure.ResourceManager.BaseTypes;
+        using Azure.ResourceManager.BaseTypes.Agents;
+        @armProviderNamespace namespace MyService;
+
+        model MyAgentProperties is AgentPropertiesPlatform<true, true> {
+          ...DefaultProvisioningStateProperty;
+        }
+
+        #suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "test"
+        model MyAgent is Agent<MyAgentProperties> {
+          ...ResourceNameParameter<MyAgent>;
+        }
+
+        model MyConversationProperties is ConversationProperties {
+          ...DefaultProvisioningStateProperty;
+        }
+
+        model MyConversation is AgentConversation<MyConversationProperties, MyAgent> {
+          ...ResourceNameParameter<MyConversation>;
+        }
+
+        model MyResponseProperties is ResponseProperties {
+          ...DefaultProvisioningStateProperty;
+        }
+
+        model MyResponse is AgentResponse<MyResponseProperties, MyAgent> {
+          ...ResourceNameParameter<MyResponse>;
+        }
+
+        interface Operations extends Azure.ResourceManager.Operations {}
+
+        @armResourceOperations
+        interface Agents {
+          get is ArmResourceRead<MyAgent>;
+          createOrUpdate is ArmResourceCreateOrReplaceAsync<MyAgent>;
+          update is ArmTagsPatchSync<MyAgent>;
+          delete is ArmResourceDeleteWithoutOkAsync<MyAgent>;
+          listByResourceGroup is ArmResourceListByParent<MyAgent>;
+        }
+
+        @armResourceOperations
+        interface Responses {
+          get is ArmResourceRead<MyResponse>;
+          createOrUpdate is ArmResourceCreateOrReplaceAsync<MyResponse>;
+          update is ArmCustomPatchSync<MyResponse, Azure.ResourceManager.Foundations.ResourceUpdateModel<MyResponse, MyResponseProperties>>;
+          delete is ArmResourceDeleteWithoutOkAsync<MyResponse>;
+          listByAgent is ArmResourceListByParent<MyResponse>;
+        }
+      `,
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/arm-agent-base-type-lifecycle-operations",
+        message: `Resource "MyConversation" is missing required lifecycle operations: create, read, update, delete.`,
+      });
+  });
 });

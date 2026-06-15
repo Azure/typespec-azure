@@ -105,7 +105,6 @@ model AgentDefinitionPlatform<
  * Required properties for an agent resource.
  * This model is used only as a constraint for template parameters.
  */
-#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state" ""
 internal model AgentProperties {
   /** ARM-managed. Must include the base type descriptor for this resource. */
   @visibility(Lifecycle.Read)
@@ -127,7 +126,6 @@ internal model AgentProperties {
  * @template HasModelDeploymentRef Whether the definition includes a modelDeploymentRef property.
  * @template HasInstructions Whether the definition includes an instructions property.
  */
-#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state" ""
 model AgentPropertiesAppliance<
   HasModelDeploymentRef extends valueof boolean = false,
   HasInstructions extends valueof boolean = false
@@ -160,7 +158,6 @@ model AgentPropertiesAppliance<
  * @template HasModelDeploymentRef Whether the definition includes a modelDeploymentRef property.
  * @template HasInstructions Whether the definition includes an instructions property.
  */
-#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state" ""
 model AgentPropertiesPlatform<
   HasModelDeploymentRef extends valueof boolean = false,
   HasInstructions extends valueof boolean = false
