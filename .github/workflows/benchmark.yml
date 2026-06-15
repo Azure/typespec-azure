@@ -47,7 +47,7 @@ jobs:
 
       - uses: ./.github/actions/setup
         with:
-          node-version: 24.11.1
+          node-version: 24.15.0
 
       - name: Install dependencies
         run: pnpm install
