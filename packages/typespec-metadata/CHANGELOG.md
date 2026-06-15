@@ -1,5 +1,12 @@
 # @azure-tools/typespec-metadata
 
+## 0.2.1
+
+### Bug Fixes
+
+- [#4616](https://github.com/Azure/typespec-azure/pull/4616) Fix incorrect Go package name parsing in `tspconfig.yaml`. The Go package name is now derived from the emitter output directory instead of the module path, which correctly excludes version suffixes (e.g., `/v4`) and uses the language-specific `service-dir` for accurate path resolution.
+
+
 ## 0.2.0
 - Group emitters by normalized language key in the `languages` output. Each language key now maps to an array of emitter configs instead of a single config, allowing multiple emitters per language (e.g. two C# emitters). Unrecognized emitters are grouped under `"unknown"`. Language is inferred by heuristic when the emitter is not in the built-in registry.
 
