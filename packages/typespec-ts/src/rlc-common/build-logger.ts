@@ -13,7 +13,7 @@ export function buildLogger(model: RLCModel) {
   if (model.options.flavor !== "azure") {
     return undefined;
   }
-  const project = new Project();
+  const project = new Project({ useInMemoryFileSystem: true });
   const { srcPath, rlcSourceDir } = model;
   const { packageDetails } = model.options;
   const filePath = joinPaths(
