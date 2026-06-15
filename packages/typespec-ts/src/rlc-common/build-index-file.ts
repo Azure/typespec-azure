@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import * as path from "path";
+import { joinPaths } from "@typespec/compiler";
 import { Project, SourceFile } from "ts-morph";
 import { getImportModuleName } from "./helpers/name-constructors.js";
 import { NameType, normalizeName } from "./helpers/name-utils.js";
@@ -25,7 +25,7 @@ export function buildIndexFile(model: RLCModel) {
     batch = model.options?.batch;
   const project = new Project();
   const { srcPath } = model;
-  const filePath = path.join(srcPath, `index.ts`);
+  const filePath = joinPaths(srcPath, `index.ts`);
   const indexFile = project.createSourceFile(filePath, undefined, {
     overwrite: true,
   });
