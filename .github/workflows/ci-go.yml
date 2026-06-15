@@ -1,0 +1,127 @@
+name: "go / test e2e"
+
+on:
+  pull_request:
+    branches:
+      - main
+      - release/*
+    paths:
+      - "packages/typespec-go/**"
+      - ".github/workflows/ci-go.yml"
+      - ".github/actions/setup-go/**"
+  merge_group:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: "Build"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - uses: ./.github/actions/setup
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm turbo run --filter "@azure-tools/typespec-go..." build
+
+  test:
+    name: "Mock API Tests (Go ${{ matrix.go-version }})"
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        go-version: ["1.26.1", "1.25.8"]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - uses: ./.github/actions/setup
+
+      - uses: ./.github/actions/setup-go
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm turbo run --filter "@azure-tools/typespec-go..." build
+
+      - name: Build spector and specs
+        run: |
+          pnpm turbo run --filter "@typespec/spector..." build
+          pnpm --filter "@typespec/http-specs" exec tsc -p ./tsconfig.build.json
+          pnpm --filter "@azure-tools/azure-http-specs" exec tsc -p ./tsconfig.build.json
+
+      - name: Install Go lint tools
+        run: |
+          go install golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow@latest
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b "$(go env GOPATH)/bin" v2.11.4
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
+      - name: Regenerate
+        run: pnpm run regenerate
+        working-directory: packages/typespec-go
+
+      - name: Lint
+        run: pnpm run lint:go
+        working-directory: packages/typespec-go
+
+      - name: Run Go e2e tests against spector
+        run: pnpm run test:go:e2e
+        working-directory: packages/typespec-go
+
+  unit:
+    name: "Unit Tests"
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - uses: ./.github/actions/setup
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm turbo run --filter "@azure-tools/typespec-go..." build
+
+      - name: Test
+        run: pnpm run test:ci
+        working-directory: packages/typespec-go
+
+  docs:
+    name: "Docs Validation"
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - uses: ./.github/actions/setup
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm turbo run --filter "@azure-tools/typespec-go..." build
+
+      - name: Regenerate emitter docs
+        run: pnpm run regen-docs
+        working-directory: packages/typespec-go
