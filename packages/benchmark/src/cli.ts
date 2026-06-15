@@ -134,9 +134,7 @@ async function runCommand(args: Record<string, string>): Promise<void> {
   const commit = args["commit"];
   const outputFile = args["output"];
   const noiseCvThreshold =
-    args["noise-cv-threshold"] !== undefined
-      ? parseFloat(args["noise-cv-threshold"])
-      : undefined;
+    args["noise-cv-threshold"] !== undefined ? parseFloat(args["noise-cv-threshold"]) : undefined;
   const maxReruns = args["max-reruns"] ? parseInt(args["max-reruns"], 10) : undefined;
   const rerunIterations = args["rerun-iterations"]
     ? parseInt(args["rerun-iterations"], 10)

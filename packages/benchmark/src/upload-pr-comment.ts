@@ -9,9 +9,9 @@ import {
   formatConsoleSummary,
   formatPrComment,
 } from "./format-comment.js";
+import type { HistoryData } from "./generate-history.js";
 import type { BenchmarkResult, RuntimeStats, SpecBenchmarkResult } from "./types.js";
 import { DEFAULT_BRANCH } from "./utils.js";
-import type { HistoryData } from "./generate-history.js";
 
 export interface UploadPrCommentOptions {
   /** Path to the current benchmark results JSON file. */
@@ -33,7 +33,7 @@ interface BaselineResult {
   label: string;
 }
 
-function unflattenRuntime(flat: Record<string, number>): RuntimeStats {
+function expandRuntimeMetrics(flat: Record<string, number>): RuntimeStats {
   const runtime: RuntimeStats = {
     total: flat["total"] ?? 0,
     loader: flat["loader"] ?? 0,
@@ -107,7 +107,7 @@ function aggregateSpecFromHistory(
     ...currentSpec,
     stats: {
       ...currentSpec.stats,
-      runtime: unflattenRuntime(aggregated),
+      runtime: expandRuntimeMetrics(aggregated),
     },
   };
 }
@@ -149,7 +149,11 @@ function buildRollingBaseline(
   };
 }
 
-function fetchBaseline(branch: string, current: BenchmarkResult, baselineWindow: number): BaselineResult | undefined {
+function fetchBaseline(
+  branch: string,
+  current: BenchmarkResult,
+  baselineWindow: number,
+): BaselineResult | undefined {
   try {
     const hasRemote = (() => {
       try {
@@ -223,9 +227,14 @@ export function uploadPrComment(options: UploadPrCommentOptions): void {
   if (baselineResult) {
     const { baseline, label } = baselineResult;
     const comparisons = compareBenchmarks(baseline, current, { threshold });
-    commentMarkdown = formatPrComment(comparisons, `${baseline.commit} (${label})`, current.commit, {
-      threshold,
-    });
+    commentMarkdown = formatPrComment(
+      comparisons,
+      `${baseline.commit} (${label})`,
+      current.commit,
+      {
+        threshold,
+      },
+    );
     githubSummary = formatComparisonSummary(
       comparisons,
       `${baseline.commit} (${label})`,
