@@ -1564,55 +1564,22 @@ model Azure.ResourceManager.BaseTypes.Agents.AgentConversation<Properties, Agent
 | ----------- | ------------ | ----------- |
 | properties? | `Properties` |             |
 
-### `AgentDefinitionAppliance` {#Azure.ResourceManager.BaseTypes.Agents.AgentDefinitionAppliance}
+### `AgentDefinition` {#Azure.ResourceManager.BaseTypes.Agents.AgentDefinition}
 
-Appliance deployment model of AgentDefinition.
-Properties controlled by `@baseTypeOptional` are invisible when the corresponding
-template parameter is false, or read-only when present.
+Base constraint for an agent definition model.
+Users must create their own definition model extending this type,
+adding any RP-specific properties (e.g., modelDeploymentRef, instructions).
 
 ```typespec
-model Azure.ResourceManager.BaseTypes.Agents.AgentDefinitionAppliance<HasModelDeploymentRef, HasInstructions>
+model Azure.ResourceManager.BaseTypes.Agents.AgentDefinition
 ```
-
-#### Template Parameters
-
-| Name                  | Description                                         |
-| --------------------- | --------------------------------------------------- |
-| HasModelDeploymentRef | Whether the modelDeploymentRef property is present. |
-| HasInstructions       | Whether the instructions property is present.       |
 
 #### Properties
 
-| Name                | Type     | Description                                                       |
-| ------------------- | -------- | ----------------------------------------------------------------- |
-| model               | `string` | Model identifier (RP-defined).                                    |
-| modelDeploymentRef? | `string` | Optional RP-specific reference to an underlying model deployment. |
-| instructions        | `string` | System prompt / behavioral instructions.                          |
-
-### `AgentDefinitionPlatform` {#Azure.ResourceManager.BaseTypes.Agents.AgentDefinitionPlatform}
-
-Platform deployment model of AgentDefinition.
-Properties controlled by `@baseTypeOptional` are invisible when the corresponding
-template parameter is false, or have default visibility when present.
-
-```typespec
-model Azure.ResourceManager.BaseTypes.Agents.AgentDefinitionPlatform<HasModelDeploymentRef, HasInstructions>
-```
-
-#### Template Parameters
-
-| Name                  | Description                                         |
-| --------------------- | --------------------------------------------------- |
-| HasModelDeploymentRef | Whether the modelDeploymentRef property is present. |
-| HasInstructions       | Whether the instructions property is present.       |
-
-#### Properties
-
-| Name                | Type     | Description                                                       |
-| ------------------- | -------- | ----------------------------------------------------------------- |
-| model               | `string` | Model identifier (RP-defined).                                    |
-| modelDeploymentRef? | `string` | Optional RP-specific reference to an underlying model deployment. |
-| instructions        | `string` | System prompt / behavioral instructions.                          |
+| Name          | Type     | Description                                            |
+| ------------- | -------- | ------------------------------------------------------ |
+| model         | `string` | Model identifier (RP-defined).                         |
+| instructions? | `string` | System prompt / behavioral instructions for the agent. |
 
 ### `AgentPropertiesAppliance` {#Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesAppliance}
 
@@ -1620,25 +1587,24 @@ Appliance deployment model of AgentProperties.
 All properties are read-only (the appliance owns and reports state).
 
 ```typespec
-model Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesAppliance<HasModelDeploymentRef, HasInstructions>
+model Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesAppliance<AgentDefinitionType>
 ```
 
 #### Template Parameters
 
-| Name                  | Description                                                    |
-| --------------------- | -------------------------------------------------------------- |
-| HasModelDeploymentRef | Whether the definition includes a modelDeploymentRef property. |
-| HasInstructions       | Whether the definition includes an instructions property.      |
+| Name                | Description                                                            |
+| ------------------- | ---------------------------------------------------------------------- |
+| AgentDefinitionType | The user-defined agent definition model (must extend AgentDefinition). |
 
 #### Properties
 
-| Name        | Type                                                                                                      | Description                                                           |
-| ----------- | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| baseTypes   | `Azure.ResourceManager.BaseTypes.BaseTypeInfo[]`                                                          | ARM-managed. Must include the base type descriptor for this resource. |
-| displayName | `string`                                                                                                  | Human-friendly name.                                                  |
-| description | `string`                                                                                                  | Purpose/behavior summary.                                             |
-| definition  | `Azure.ResourceManager.BaseTypes.Agents.AgentDefinitionAppliance<HasModelDeploymentRef, HasInstructions>` | Inline agent definition.                                              |
-| tools?      | `Azure.ResourceManager.BaseTypes.Agents.AgentToolTypeAppliance[]`                                         | Tool bindings. Read-only in the Appliance deployment model.           |
+| Name        | Type                                                              | Description                                                           |
+| ----------- | ----------------------------------------------------------------- | --------------------------------------------------------------------- |
+| baseTypes   | `Azure.ResourceManager.BaseTypes.BaseTypeInfo[]`                  | ARM-managed. Must include the base type descriptor for this resource. |
+| displayName | `string`                                                          | Human-friendly name.                                                  |
+| description | `string`                                                          | Purpose/behavior summary.                                             |
+| definition  | `AgentDefinitionType`                                             | Inline agent definition.                                              |
+| tools?      | `Azure.ResourceManager.BaseTypes.Agents.AgentToolTypeAppliance[]` | Tool bindings. Read-only in the Appliance deployment model.           |
 
 ### `AgentPropertiesPlatform` {#Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesPlatform}
 
@@ -1647,25 +1613,24 @@ Properties have default visibility (the client owns these fields).
 baseTypes remains ARM-managed and read-only.
 
 ```typespec
-model Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesPlatform<HasModelDeploymentRef, HasInstructions>
+model Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesPlatform<AgentDefinitionType>
 ```
 
 #### Template Parameters
 
-| Name                  | Description                                                    |
-| --------------------- | -------------------------------------------------------------- |
-| HasModelDeploymentRef | Whether the definition includes a modelDeploymentRef property. |
-| HasInstructions       | Whether the definition includes an instructions property.      |
+| Name                | Description                                                            |
+| ------------------- | ---------------------------------------------------------------------- |
+| AgentDefinitionType | The user-defined agent definition model (must extend AgentDefinition). |
 
 #### Properties
 
-| Name        | Type                                                                                                     | Description                                                           |
-| ----------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| baseTypes   | `Azure.ResourceManager.BaseTypes.BaseTypeInfo[]`                                                         | ARM-managed. Must include the base type descriptor for this resource. |
-| displayName | `string`                                                                                                 | Human-friendly name.                                                  |
-| description | `string`                                                                                                 | Purpose/behavior summary.                                             |
-| definition  | `Azure.ResourceManager.BaseTypes.Agents.AgentDefinitionPlatform<HasModelDeploymentRef, HasInstructions>` | Inline agent definition.                                              |
-| tools?      | `Azure.ResourceManager.BaseTypes.Agents.AgentToolTypePlatform[]`                                         | Tool bindings. Writable in the Platform deployment model.             |
+| Name        | Type                                                             | Description                                                           |
+| ----------- | ---------------------------------------------------------------- | --------------------------------------------------------------------- |
+| baseTypes   | `Azure.ResourceManager.BaseTypes.BaseTypeInfo[]`                 | ARM-managed. Must include the base type descriptor for this resource. |
+| displayName | `string`                                                         | Human-friendly name.                                                  |
+| description | `string`                                                         | Purpose/behavior summary.                                             |
+| definition  | `AgentDefinitionType`                                            | Inline agent definition.                                              |
+| tools?      | `Azure.ResourceManager.BaseTypes.Agents.AgentToolTypePlatform[]` | Tool bindings. Writable in the Platform deployment model.             |
 
 ### `AgentResponse` {#Azure.ResourceManager.BaseTypes.Agents.AgentResponse}
 

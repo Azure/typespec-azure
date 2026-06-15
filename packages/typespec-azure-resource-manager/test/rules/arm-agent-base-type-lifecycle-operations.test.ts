@@ -29,7 +29,8 @@ describe("arm-agent-base-type-lifecycle-operations", () => {
         using Azure.ResourceManager.BaseTypes.Agents;
         @armProviderNamespace namespace MyService;
 
-        model MyAgentProperties is AgentPropertiesPlatform<true, true> {
+        model MyDefinition is AgentDefinition {}
+        model MyAgentProperties is AgentPropertiesPlatform<MyDefinition> {
           ...DefaultProvisioningStateProperty;
         }
 
@@ -95,7 +96,8 @@ describe("arm-agent-base-type-lifecycle-operations", () => {
         using Azure.ResourceManager.BaseTypes.Agents;
         @armProviderNamespace namespace MyService;
 
-        model MyAgentProperties is AgentPropertiesPlatform<true, true> {
+        model MyDefinition is AgentDefinition {}
+        model MyAgentProperties is AgentPropertiesPlatform<MyDefinition> {
           ...DefaultProvisioningStateProperty;
         }
 
@@ -163,7 +165,8 @@ describe("arm-agent-base-type-lifecycle-operations", () => {
         using Azure.ResourceManager.BaseTypes.Agents;
         @armProviderNamespace namespace MyService;
 
-        model MyAgentProperties is AgentPropertiesPlatform<true, true> {
+        model MyDefinition is AgentDefinition {}
+        model MyAgentProperties is AgentPropertiesPlatform<MyDefinition> {
           ...DefaultProvisioningStateProperty;
         }
 
@@ -230,7 +233,8 @@ describe("arm-agent-base-type-lifecycle-operations", () => {
         using Azure.ResourceManager.BaseTypes.Agents;
         @armProviderNamespace namespace MyService;
 
-        model MyAgentProperties is AgentPropertiesPlatform<true, true> {
+        model MyDefinition is AgentDefinition {}
+        model MyAgentProperties is AgentPropertiesPlatform<MyDefinition> {
           ...DefaultProvisioningStateProperty;
         }
 
@@ -342,7 +346,8 @@ describe("arm-agent-base-type-lifecycle-operations", () => {
         using Azure.ResourceManager.BaseTypes.Agents;
         @armProviderNamespace namespace MyService;
 
-        model MyAgentProperties is AgentPropertiesPlatform<true, true> {
+        model MyDefinition is AgentDefinition {}
+        model MyAgentProperties is AgentPropertiesPlatform<MyDefinition> {
           ...DefaultProvisioningStateProperty;
         }
 

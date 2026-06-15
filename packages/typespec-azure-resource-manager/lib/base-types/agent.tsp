@@ -42,59 +42,16 @@ model AgentToolTypePlatform {
 // ============================================================================
 
 /**
- * Inline agent definition describing the model and behavior of the agent.
- * This model is used only as a constraint for template parameters.
+ * Base constraint for an agent definition model.
+ * Users must create their own definition model extending this type,
+ * adding any RP-specific properties (e.g., modelDeploymentRef, instructions).
  */
-internal model AgentDefinition {
-  /** Model identifier (RP-defined). */
-  `model`: string;
-}
-
-/**
- * Appliance deployment model of AgentDefinition.
- * Properties controlled by `@baseTypeOptional` are invisible when the corresponding
- * template parameter is false, or read-only when present.
- * @template HasModelDeploymentRef Whether the modelDeploymentRef property is present.
- * @template HasInstructions Whether the instructions property is present.
- */
-model AgentDefinitionAppliance<
-  HasModelDeploymentRef extends valueof boolean = false,
-  HasInstructions extends valueof boolean = false
-> {
-  /** Model identifier (RP-defined). */
-  @visibility(Lifecycle.Read)
-  `model`: string;
-
-  /** Optional RP-specific reference to an underlying model deployment. */
-  @baseTypeOptional(HasModelDeploymentRef, true)
-  modelDeploymentRef?: string;
-
-  /** System prompt / behavioral instructions. */
-  @baseTypeOptional(HasInstructions, true)
-  instructions: string;
-}
-
-/**
- * Platform deployment model of AgentDefinition.
- * Properties controlled by `@baseTypeOptional` are invisible when the corresponding
- * template parameter is false, or have default visibility when present.
- * @template HasModelDeploymentRef Whether the modelDeploymentRef property is present.
- * @template HasInstructions Whether the instructions property is present.
- */
-model AgentDefinitionPlatform<
-  HasModelDeploymentRef extends valueof boolean = false,
-  HasInstructions extends valueof boolean = false
-> {
+model AgentDefinition {
   /** Model identifier (RP-defined). */
   `model`: string;
 
-  /** Optional RP-specific reference to an underlying model deployment. */
-  @baseTypeOptional(HasModelDeploymentRef, false)
-  modelDeploymentRef?: string;
-
-  /** System prompt / behavioral instructions. */
-  @baseTypeOptional(HasInstructions, false)
-  instructions: string;
+  /** System prompt / behavioral instructions for the agent. */
+  instructions?: string;
 }
 
 // ============================================================================
@@ -116,20 +73,16 @@ internal model AgentProperties {
   /** Purpose/behavior summary. */
   description: string;
 
-  /** Inline agent definition. */
+  /** Inline agent definition (must extend AgentDefinition). */
   definition: AgentDefinition;
 }
 
 /**
  * Appliance deployment model of AgentProperties.
  * All properties are read-only (the appliance owns and reports state).
- * @template HasModelDeploymentRef Whether the definition includes a modelDeploymentRef property.
- * @template HasInstructions Whether the definition includes an instructions property.
+ * @template AgentDefinitionType The user-defined agent definition model (must extend AgentDefinition).
  */
-model AgentPropertiesAppliance<
-  HasModelDeploymentRef extends valueof boolean = false,
-  HasInstructions extends valueof boolean = false
-> {
+model AgentPropertiesAppliance<AgentDefinitionType extends AgentDefinition> {
   /** ARM-managed. Must include the base type descriptor for this resource. */
   @visibility(Lifecycle.Read)
   baseTypes: BaseTypeInfo[];
@@ -144,7 +97,7 @@ model AgentPropertiesAppliance<
 
   /** Inline agent definition. */
   @visibility(Lifecycle.Read)
-  definition: AgentDefinitionAppliance<HasModelDeploymentRef, HasInstructions>;
+  definition: AgentDefinitionType;
 
   /** Tool bindings. Read-only in the Appliance deployment model. */
   @visibility(Lifecycle.Read)
@@ -155,13 +108,9 @@ model AgentPropertiesAppliance<
  * Platform deployment model of AgentProperties.
  * Properties have default visibility (the client owns these fields).
  * baseTypes remains ARM-managed and read-only.
- * @template HasModelDeploymentRef Whether the definition includes a modelDeploymentRef property.
- * @template HasInstructions Whether the definition includes an instructions property.
+ * @template AgentDefinitionType The user-defined agent definition model (must extend AgentDefinition).
  */
-model AgentPropertiesPlatform<
-  HasModelDeploymentRef extends valueof boolean = false,
-  HasInstructions extends valueof boolean = false
-> {
+model AgentPropertiesPlatform<AgentDefinitionType extends AgentDefinition> {
   /** ARM-managed. Must include the base type descriptor for this resource. */
   @visibility(Lifecycle.Read)
   baseTypes: BaseTypeInfo[];
@@ -173,7 +122,7 @@ model AgentPropertiesPlatform<
   description: string;
 
   /** Inline agent definition. */
-  definition: AgentDefinitionPlatform<HasModelDeploymentRef, HasInstructions>;
+  definition: AgentDefinitionType;
 
   /** Tool bindings. Writable in the Platform deployment model. */
   tools?: AgentToolTypePlatform[];
