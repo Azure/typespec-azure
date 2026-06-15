@@ -98,7 +98,7 @@ export interface TCGCEmitterOptions extends BrandedSdkEmitterOptionsInterface {
 export interface UnbrandedSdkEmitterOptionsInterface {
   "generate-protocol-methods"?: boolean;
   "generate-convenience-methods"?: boolean;
-  "api-version"?: string;
+  "api-version"?: string | Record<string, string>;
   license?: {
     name: string;
     company?: string;
@@ -370,6 +370,23 @@ export function filterApiVersionsWithDecorators(
   let addedCounter = 0;
   let removeCounter = 0;
   const retval: string[] = [];
+  // Resolve the api version that applies to the service this type belongs to
+  const versioningNamespace = getVersions(context.program, type)[0];
+  const apiVersion =
+    versioningNamespace === undefined
+      ? undefined
+      : resolveApiVersionForNamespace(
+          context,
+          versioningNamespace,
+          context.getPackageVersions().size > 1,
+        );
+  // Compute the highest version index to include. An unset/`latest`/`all` config or a
+  // configured version that is not part of the service versions falls back to the latest.
+  const configuredIndex =
+    apiVersion === undefined || apiVersion === "latest" || apiVersion === "all"
+      ? -1
+      : apiVersions.indexOf(apiVersion);
+  const capIndex = configuredIndex < 0 ? apiVersions.length - 1 : configuredIndex;
   for (let i = 0; i < apiVersions.length; i++) {
     const version = apiVersions[i];
     if (addedCounter < addedOnVersions.length && version === addedOnVersions[addedCounter]) {
@@ -381,13 +398,8 @@ export function filterApiVersionsWithDecorators(
       removeCounter++;
     }
     if (added) {
-      // only add version smaller than config
-      if (
-        context.apiVersion === undefined ||
-        context.apiVersion === "latest" ||
-        context.apiVersion === "all" ||
-        apiVersions.indexOf(context.apiVersion) >= i
-      ) {
+      // only add version smaller than or equal to the configured version
+      if (i <= capIndex) {
         retval.push(version);
       }
     }
@@ -671,27 +683,53 @@ export function getHttpOperationResponseHeaders(
 export function removeVersionsLargerThanExplicitlySpecified(
   context: TCGCContext,
   versions: { value: string | number }[],
+  apiVersion: string | undefined,
 ): void {
   // filter with specific api version
-  if (
-    context.apiVersion !== undefined &&
-    context.apiVersion !== "latest" &&
-    context.apiVersion !== "all"
-  ) {
-    const index = versions.findIndex((version) => version.value === context.apiVersion);
+  if (apiVersion !== undefined && apiVersion !== "latest" && apiVersion !== "all") {
+    const index = versions.findIndex((version) => version.value === apiVersion);
     if (index >= 0) {
       versions.splice(index + 1, versions.length - index - 1);
     }
   }
 }
 
+/**
+ * Resolve the api version configured for a specific service namespace.
+ *
+ * The `api-version` option can be either:
+ *  - a plain string, which only applies when there is a single service; or
+ *  - a mapping from service namespace full name to api version, used for multi-service specs.
+ *
+ * Returns `undefined` when no api version applies to the service (in which case the latest
+ * version should be used).
+ */
+export function resolveApiVersionForNamespace(
+  context: TCGCContext,
+  namespace: Namespace,
+  multiService: boolean,
+): string | undefined {
+  const apiVersion = context.apiVersion;
+  if (apiVersion === undefined) {
+    return undefined;
+  }
+  if (typeof apiVersion === "string") {
+    // A plain string only applies to the single service scenario.
+    return multiService ? undefined : apiVersion;
+  }
+  // A mapping of service namespace full name -> api version.
+  // Services not present in the mapping fall back to the latest version.
+  return apiVersion[getNamespaceFullName(namespace)];
+}
+
 export function filterPreviewVersion(
   context: TCGCContext,
   sdkVersionsEnum: SdkEnumType,
   defaultApiVersion: string,
+  apiVersion: string | undefined,
 ): void {
   // if they explicitly set an api version, remove larger versions
-  removeVersionsLargerThanExplicitlySpecified(context, sdkVersionsEnum.values);
+  removeVersionsLargerThanExplicitlySpecified(context, sdkVersionsEnum.values, apiVersion);
   if (!context.previewStringRegex.test(defaultApiVersion)) {
     sdkVersionsEnum.values = sdkVersionsEnum.values.filter((v) => {
       if (typeof v.value !== "string") {
@@ -959,17 +997,9 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
   // No service, thus no versioning mutation needed
   if (servicesNs.size === 0) return globalNamespace;
 
-  // Multi services' client should not honor the specific api-version set in config
-  if (
-    servicesNs.size > 1 &&
-    context.apiVersion !== undefined &&
-    context.apiVersion !== "latest" &&
-    context.apiVersion !== "all"
-  ) {
-    context.apiVersion = undefined;
-  }
+  const multiService = servicesNs.size > 1;
 
-  // Explicit all API version setting, thus no versioning mutation needed
+  // Explicit `all` api version setting applies to every service, thus no versioning mutation needed
   if (context.apiVersion === "all") return globalNamespace;
 
   // Compose service mutators
@@ -980,28 +1010,29 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
     // If the service has no versioning, no mutation needed
     if (!versions || versions.length === 0) return globalNamespace;
 
-    // Single service needs to filter versions based on `apiVersion` config
-    if (servicesNs.size === 1) {
-      removeVersionsLargerThanExplicitlySpecified(context, versions);
-    }
+    // Resolve the api version that applies to this specific service
+    const apiVersion = resolveApiVersionForNamespace(context, serviceNs, multiService);
+
+    // Explicit `all` api version for this service, thus no versioning mutation needed for it
+    if (apiVersion === "all") continue;
+
+    // Filter versions based on the resolved `apiVersion` config
+    removeVersionsLargerThanExplicitlySpecified(context, versions, apiVersion);
 
     const versionsValues = versions.map((v) => v.value);
 
-    // Fix apiVersion setting problem only if there's only one service
-    if (servicesNs.size === 1) {
-      if (
-        context.apiVersion !== undefined &&
-        context.apiVersion !== "latest" &&
-        context.apiVersion !== "all" &&
-        !versionsValues.includes(context.apiVersion)
-      ) {
-        reportDiagnostic(context.program, {
-          code: "api-version-undefined",
-          format: { version: context.apiVersion },
-          target: serviceNs,
-        });
-        context.apiVersion = versionsValues[versionsValues.length - 1];
-      }
+    // Report when the configured api version does not exist for the service
+    if (
+      apiVersion !== undefined &&
+      apiVersion !== "latest" &&
+      apiVersion !== "all" &&
+      !versionsValues.includes(apiVersion)
+    ) {
+      reportDiagnostic(context.program, {
+        code: "api-version-undefined",
+        format: { version: apiVersion },
+        target: serviceNs,
+      });
     }
 
     // Get service mutator according to the version setting

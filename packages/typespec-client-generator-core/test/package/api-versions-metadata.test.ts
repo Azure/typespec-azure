@@ -216,3 +216,169 @@ it("apiVersion 'all' should populate apiVersions with 'all'", async () => {
   strictEqual(sdkPackage.metadata.apiVersions.size, 1);
   strictEqual(sdkPackage.metadata.apiVersions.get("WidgetService"), "all");
 });
+
+function createMultiServiceVersionedInput() {
+  return createClientCustomizationInput(
+    `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+      interface AI {
+        @route("/aTest")
+        aTest(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+      interface BI {
+        @route("/bTest")
+        bTest(@query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+    `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+        autoMergeService: true,
+      }
+    )
+    namespace CombineClient;
+  `,
+  );
+}
+
+it("multiple services should honor per-service api-version mapping", async () => {
+  const { program } = await SimpleBaseTester.compile(createMultiServiceVersionedInput());
+
+  // Map each service namespace to a specific version
+  const context = await createSdkContextForTester(program, {
+    "api-version": {
+      ServiceA: "av1",
+      ServiceB: "bv2",
+    },
+  });
+  const sdkPackage = context.sdkPackage;
+
+  // For multi-service, deprecated apiVersion should be undefined
+  strictEqual(sdkPackage.metadata.apiVersion, undefined);
+
+  // Each service should use the version specified in the mapping
+  ok(sdkPackage.metadata.apiVersions);
+  strictEqual(sdkPackage.metadata.apiVersions.size, 2);
+  strictEqual(sdkPackage.metadata.apiVersions.get("ServiceA"), "av1");
+  strictEqual(sdkPackage.metadata.apiVersions.get("ServiceB"), "bv2");
+
+  // Validate all clients and sub-clients have the correct apiVersions
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+
+  const aiClient = client.children!.find((c) => c.name === "AI");
+  ok(aiClient);
+  deepStrictEqual(aiClient.apiVersions, ["av1"]);
+  strictEqual(aiClient.clientInitialization.parameters[1].name, "apiVersion");
+  strictEqual(aiClient.clientInitialization.parameters[1].clientDefaultValue, "av1");
+
+  const biClient = client.children!.find((c) => c.name === "BI");
+  ok(biClient);
+  deepStrictEqual(biClient.apiVersions, ["bv1", "bv2"]);
+  strictEqual(biClient.clientInitialization.parameters[1].name, "apiVersion");
+  strictEqual(biClient.clientInitialization.parameters[1].clientDefaultValue, "bv2");
+});
+
+it("multiple services should use latest version for services missing from the mapping", async () => {
+  const { program } = await SimpleBaseTester.compile(createMultiServiceVersionedInput());
+
+  // Only configure ServiceA, ServiceB should fall back to its latest version
+  const context = await createSdkContextForTester(program, {
+    "api-version": {
+      ServiceA: "av1",
+    },
+  });
+  const sdkPackage = context.sdkPackage;
+
+  strictEqual(sdkPackage.metadata.apiVersion, undefined);
+  ok(sdkPackage.metadata.apiVersions);
+  strictEqual(sdkPackage.metadata.apiVersions.size, 2);
+  strictEqual(sdkPackage.metadata.apiVersions.get("ServiceA"), "av1");
+  strictEqual(sdkPackage.metadata.apiVersions.get("ServiceB"), "bv2");
+
+  const client = sdkPackage.clients[0];
+  const aiClient = client.children!.find((c) => c.name === "AI");
+  ok(aiClient);
+  deepStrictEqual(aiClient.apiVersions, ["av1"]);
+  strictEqual(aiClient.clientInitialization.parameters[1].clientDefaultValue, "av1");
+
+  const biClient = client.children!.find((c) => c.name === "BI");
+  ok(biClient);
+  deepStrictEqual(biClient.apiVersions, ["bv1", "bv2"]);
+  strictEqual(biClient.clientInitialization.parameters[1].clientDefaultValue, "bv2");
+});
+
+it("single service should honor api-version mapping", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service(#{
+      title: "Widget Service",
+    })
+    @versioned(WidgetService.Versions)
+    namespace WidgetService;
+    
+    enum Versions {
+      v1,
+      v2,
+      v3,
+    }
+    
+    op test(): void;
+  `);
+
+  const context = await createSdkContextForTester(program, {
+    "api-version": {
+      WidgetService: "v2",
+    },
+  });
+  const sdkPackage = context.sdkPackage;
+
+  strictEqual(sdkPackage.metadata.apiVersion, "v2");
+  ok(sdkPackage.metadata.apiVersions);
+  strictEqual(sdkPackage.metadata.apiVersions.size, 1);
+  strictEqual(sdkPackage.metadata.apiVersions.get("WidgetService"), "v2");
+});
+
+it("multiple services should honor per-service api-version mapping with `all`", async () => {
+  const { program } = await SimpleBaseTester.compile(createMultiServiceVersionedInput());
+
+  // Map ServiceA to a specific version and keep all versions for ServiceB
+  const context = await createSdkContextForTester(program, {
+    "api-version": {
+      ServiceA: "av1",
+      ServiceB: "all",
+    },
+  });
+  const sdkPackage = context.sdkPackage;
+
+  strictEqual(sdkPackage.metadata.apiVersion, undefined);
+  ok(sdkPackage.metadata.apiVersions);
+  strictEqual(sdkPackage.metadata.apiVersions.size, 2);
+  strictEqual(sdkPackage.metadata.apiVersions.get("ServiceA"), "av1");
+  strictEqual(sdkPackage.metadata.apiVersions.get("ServiceB"), "all");
+
+  const client = sdkPackage.clients[0];
+  const aiClient = client.children!.find((c) => c.name === "AI");
+  ok(aiClient);
+  deepStrictEqual(aiClient.apiVersions, ["av1"]);
+
+  const biClient = client.children!.find((c) => c.name === "BI");
+  ok(biClient);
+  deepStrictEqual(biClient.apiVersions, ["bv1", "bv2"]);
+});

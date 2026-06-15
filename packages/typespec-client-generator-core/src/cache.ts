@@ -20,6 +20,7 @@ import {
   listScopedDecoratorData,
   omitOperation,
   removeVersionsLargerThanExplicitlySpecified,
+  resolveApiVersionForNamespace,
 } from "./internal-utils.js";
 import { reportDiagnostic } from "./lib.js";
 import { getLibraryName } from "./public-utils.js";
@@ -54,10 +55,9 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
       continue;
     }
 
-    // Single service needs to filter versions based on `apiVersion` config
-    if (servicesNs.size === 1) {
-      removeVersionsLargerThanExplicitlySpecified(context, versions);
-    }
+    // Filter versions based on the api version that applies to this specific service
+    const apiVersion = resolveApiVersionForNamespace(context, serviceNs, servicesNs.size > 1);
+    removeVersionsLargerThanExplicitlySpecified(context, versions, apiVersion);
 
     context.__packageVersionEnum!.set(serviceNs, versions[0].enumMember.enum);
     context.__packageVersions!.set(
