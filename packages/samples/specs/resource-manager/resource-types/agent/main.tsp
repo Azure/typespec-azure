@@ -25,29 +25,6 @@ enum Versions {
 }
 
 // ============================================================================
-// Agent Definition models
-// ============================================================================
-
-// The AgentDefinition model defines the agent's model and behavior configuration.
-// Each RP creates its own definition model extending AgentDefinition, adding any
-// RP-specific fields (e.g., modelDeploymentRef for deployment references).
-// In the Appliance model, the definition is read-only (owned by the service).
-// In the Platform model, the definition is writable (owned by the client).
-
-// Appliance definition: read-only fields managed by the service
-model ContosoApplianceDefinition is AgentDefinition {
-  /** RP-specific reference to an underlying model deployment. */
-  @visibility(Lifecycle.Read)
-  modelDeploymentRef?: string;
-}
-
-// Platform definition: writable fields managed by the client
-model ContosoPlatformDefinition is AgentDefinition {
-  /** RP-specific reference to an underlying model deployment. */
-  modelDeploymentRef?: string;
-}
-
-// ============================================================================
 // Agent Properties models
 // ============================================================================
 
@@ -56,13 +33,21 @@ model ContosoPlatformDefinition is AgentDefinition {
 // AgentPropertiesPlatform: Use when the client owns and manages the agent configuration.
 // Properties are writable (except baseTypes, which is always ARM-managed and read-only).
 
-// Appliance agent properties: service-managed, read-only
-model ContosoApplianceAgentProperties is AgentPropertiesAppliance<ContosoApplianceDefinition> {
+// Appliance agent properties: service-managed, read-only.
+// AgentDefinitionAppliance template params control optional definition fields:
+//   HasModelDeploymentRef: include a modelDeploymentRef property
+//   HasInstructions: include an instructions property
+model ContosoApplianceAgentProperties
+  is AgentPropertiesAppliance<AgentDefinitionAppliance<true, true>> {
   ...DefaultProvisioningStateProperty;
 }
 
-// Platform agent properties: client-managed, writable
-model ContosoPlatformAgentProperties is AgentPropertiesPlatform<ContosoPlatformDefinition> {
+// Platform agent properties: client-managed, writable.
+// AgentDefinitionPlatform template params control optional definition fields:
+//   HasModelDeploymentRef: include a modelDeploymentRef property
+//   HasInstructions: include an instructions property
+model ContosoPlatformAgentProperties
+  is AgentPropertiesPlatform<AgentDefinitionPlatform<true, true>> {
   ...DefaultProvisioningStateProperty;
 }
 

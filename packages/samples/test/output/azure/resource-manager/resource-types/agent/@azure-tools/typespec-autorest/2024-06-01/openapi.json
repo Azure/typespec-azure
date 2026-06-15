@@ -2170,8 +2170,29 @@
           "readOnly": true
         },
         "definition": {
-          "$ref": "#/definitions/ContosoApplianceDefinition",
+          "type": "object",
           "description": "Inline agent definition.",
+          "properties": {
+            "model": {
+              "type": "string",
+              "description": "Model identifier (RP-defined).",
+              "readOnly": true
+            },
+            "instructions": {
+              "type": "string",
+              "description": "System prompt / behavioral instructions for the agent.",
+              "readOnly": true
+            },
+            "modelDeploymentRef": {
+              "type": "string",
+              "description": "Optional RP-specific reference to an underlying model deployment.",
+              "readOnly": true
+            }
+          },
+          "required": [
+            "model",
+            "instructions"
+          ],
           "readOnly": true
         },
         "tools": {
@@ -2207,28 +2228,6 @@
           }
         }
       }
-    },
-    "ContosoApplianceDefinition": {
-      "type": "object",
-      "description": "Base constraint for an agent definition model.\nUsers must create their own definition model extending this type,\nadding any RP-specific properties (e.g., modelDeploymentRef, instructions).",
-      "properties": {
-        "model": {
-          "type": "string",
-          "description": "Model identifier (RP-defined)."
-        },
-        "instructions": {
-          "type": "string",
-          "description": "System prompt / behavioral instructions for the agent."
-        },
-        "modelDeploymentRef": {
-          "type": "string",
-          "description": "RP-specific reference to an underlying model deployment.",
-          "readOnly": true
-        }
-      },
-      "required": [
-        "model"
-      ]
     },
     "ContosoConversationProperties": {
       "type": "object",
@@ -2313,8 +2312,26 @@
           "description": "Purpose/behavior summary."
         },
         "definition": {
-          "$ref": "#/definitions/ContosoPlatformDefinition",
-          "description": "Inline agent definition."
+          "type": "object",
+          "description": "Inline agent definition.",
+          "properties": {
+            "model": {
+              "type": "string",
+              "description": "Model identifier (RP-defined)."
+            },
+            "instructions": {
+              "type": "string",
+              "description": "System prompt / behavioral instructions for the agent."
+            },
+            "modelDeploymentRef": {
+              "type": "string",
+              "description": "Optional RP-specific reference to an underlying model deployment."
+            }
+          },
+          "required": [
+            "model",
+            "instructions"
+          ]
         },
         "tools": {
           "type": "array",
@@ -2348,27 +2365,6 @@
           }
         }
       }
-    },
-    "ContosoPlatformDefinition": {
-      "type": "object",
-      "description": "Base constraint for an agent definition model.\nUsers must create their own definition model extending this type,\nadding any RP-specific properties (e.g., modelDeploymentRef, instructions).",
-      "properties": {
-        "model": {
-          "type": "string",
-          "description": "Model identifier (RP-defined)."
-        },
-        "instructions": {
-          "type": "string",
-          "description": "System prompt / behavioral instructions for the agent."
-        },
-        "modelDeploymentRef": {
-          "type": "string",
-          "description": "RP-specific reference to an underlying model deployment."
-        }
-      },
-      "required": [
-        "model"
-      ]
     },
     "ContosoResponseProperties": {
       "type": "object",

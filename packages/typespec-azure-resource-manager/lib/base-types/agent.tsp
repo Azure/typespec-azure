@@ -42,16 +42,62 @@ model AgentToolTypePlatform {
 // ============================================================================
 
 /**
- * Base constraint for an agent definition model.
- * Users must create their own definition model extending this type,
- * adding any RP-specific properties (e.g., modelDeploymentRef, instructions).
+ * Inline agent definition describing the model and behavior of the agent.
+ * This model is used only as a constraint for template parameters.
  */
-model AgentDefinition {
+internal model AgentDefinition {
   /** Model identifier (RP-defined). */
   `model`: string;
 
   /** System prompt / behavioral instructions for the agent. */
-  instructions?: string;
+  instructions: string;
+}
+
+/**
+ * Appliance deployment model of AgentDefinition.
+ * Properties controlled by `@baseTypeOptional` are invisible when the corresponding
+ * template parameter is false, or read-only when present.
+ * @template HasModelDeploymentRef Whether the modelDeploymentRef property is present.
+ * @template HasInstructions Whether the instructions property is present.
+ */
+model AgentDefinitionAppliance<
+  HasModelDeploymentRef extends valueof boolean = false,
+  HasInstructions extends valueof boolean = false
+> {
+  /** Model identifier (RP-defined). */
+  @visibility(Lifecycle.Read)
+  `model`: string;
+
+  /** System prompt / behavioral instructions for the agent. */
+  @baseTypeOptional(HasInstructions, true)
+  instructions: string;
+
+  /** Optional RP-specific reference to an underlying model deployment. */
+  @baseTypeOptional(HasModelDeploymentRef, true)
+  modelDeploymentRef?: string;
+}
+
+/**
+ * Platform deployment model of AgentDefinition.
+ * Properties controlled by `@baseTypeOptional` are invisible when the corresponding
+ * template parameter is false, or have default visibility when present.
+ * @template HasModelDeploymentRef Whether the modelDeploymentRef property is present.
+ * @template HasInstructions Whether the instructions property is present.
+ */
+model AgentDefinitionPlatform<
+  HasModelDeploymentRef extends valueof boolean = false,
+  HasInstructions extends valueof boolean = false
+> {
+  /** Model identifier (RP-defined). */
+  `model`: string;
+
+  /** System prompt / behavioral instructions for the agent. */
+  @baseTypeOptional(HasInstructions, false)
+  instructions: string;
+
+  /** Optional RP-specific reference to an underlying model deployment. */
+  @baseTypeOptional(HasModelDeploymentRef, false)
+  modelDeploymentRef?: string;
 }
 
 // ============================================================================

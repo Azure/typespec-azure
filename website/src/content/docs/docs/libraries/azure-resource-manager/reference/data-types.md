@@ -1564,22 +1564,55 @@ model Azure.ResourceManager.BaseTypes.Agents.AgentConversation<Properties, Agent
 | ----------- | ------------ | ----------- |
 | properties? | `Properties` |             |
 
-### `AgentDefinition` {#Azure.ResourceManager.BaseTypes.Agents.AgentDefinition}
+### `AgentDefinitionAppliance` {#Azure.ResourceManager.BaseTypes.Agents.AgentDefinitionAppliance}
 
-Base constraint for an agent definition model.
-Users must create their own definition model extending this type,
-adding any RP-specific properties (e.g., modelDeploymentRef, instructions).
+Appliance deployment model of AgentDefinition.
+Properties controlled by `@baseTypeOptional` are invisible when the corresponding
+template parameter is false, or read-only when present.
 
 ```typespec
-model Azure.ResourceManager.BaseTypes.Agents.AgentDefinition
+model Azure.ResourceManager.BaseTypes.Agents.AgentDefinitionAppliance<HasModelDeploymentRef, HasInstructions>
 ```
+
+#### Template Parameters
+
+| Name                  | Description                                         |
+| --------------------- | --------------------------------------------------- |
+| HasModelDeploymentRef | Whether the modelDeploymentRef property is present. |
+| HasInstructions       | Whether the instructions property is present.       |
 
 #### Properties
 
-| Name          | Type     | Description                                            |
-| ------------- | -------- | ------------------------------------------------------ |
-| model         | `string` | Model identifier (RP-defined).                         |
-| instructions? | `string` | System prompt / behavioral instructions for the agent. |
+| Name                | Type     | Description                                                       |
+| ------------------- | -------- | ----------------------------------------------------------------- |
+| model               | `string` | Model identifier (RP-defined).                                    |
+| instructions        | `string` | System prompt / behavioral instructions for the agent.            |
+| modelDeploymentRef? | `string` | Optional RP-specific reference to an underlying model deployment. |
+
+### `AgentDefinitionPlatform` {#Azure.ResourceManager.BaseTypes.Agents.AgentDefinitionPlatform}
+
+Platform deployment model of AgentDefinition.
+Properties controlled by `@baseTypeOptional` are invisible when the corresponding
+template parameter is false, or have default visibility when present.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Agents.AgentDefinitionPlatform<HasModelDeploymentRef, HasInstructions>
+```
+
+#### Template Parameters
+
+| Name                  | Description                                         |
+| --------------------- | --------------------------------------------------- |
+| HasModelDeploymentRef | Whether the modelDeploymentRef property is present. |
+| HasInstructions       | Whether the instructions property is present.       |
+
+#### Properties
+
+| Name                | Type     | Description                                                       |
+| ------------------- | -------- | ----------------------------------------------------------------- |
+| model               | `string` | Model identifier (RP-defined).                                    |
+| instructions        | `string` | System prompt / behavioral instructions for the agent.            |
+| modelDeploymentRef? | `string` | Optional RP-specific reference to an underlying model deployment. |
 
 ### `AgentPropertiesAppliance` {#Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesAppliance}
 
