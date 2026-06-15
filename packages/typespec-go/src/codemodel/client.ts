@@ -338,7 +338,7 @@ interface HttpMethodBase extends method.Method<Client, result.ResponseEnvelope> 
   /** the complete list of successful HTTP status codes */
   httpStatusCodes: Array<number>;
 
-  /** naming info for the internal hepler methods for which this method depends */
+  /** naming info for the internal helper methods for which this method depends */
   naming: MethodNaming;
 
   /** any examples for this method */

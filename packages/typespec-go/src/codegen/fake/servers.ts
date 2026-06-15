@@ -824,7 +824,7 @@ function dispatchForOperationBody(
         } else {
           throw new CodegenError(
             "InternalError",
-            `uhandled multipart parameter array element kind ${type.elementType.kind}`,
+            `unhandled multipart parameter array element kind ${type.elementType.kind}`,
           );
         }
       } else if (type.kind === "encodedBytes") {
@@ -832,7 +832,7 @@ function dispatchForOperationBody(
         caseContent += `${indent.get()}${paramVar}, err = base64.${type.encoding}Encoding.DecodeString(string(content))\n`;
         caseContent += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
       } else {
-        throw new CodegenError("InternalError", `uhandled multipart parameter kind ${type.kind}`);
+        throw new CodegenError("InternalError", `unhandled multipart parameter kind ${type.kind}`);
       }
 
       if (assignedValue) {
@@ -888,7 +888,7 @@ function dispatchForOperationBody(
         default:
           throw new CodegenError(
             "InternalError",
-            `uhandled form parameter kind ${param.type.kind}`,
+            `unhandled form parameter kind ${param.type.kind}`,
           );
       }
       content += `${indent.push().get()}${param.name} = ${assignedValue}\n`;
@@ -937,7 +937,7 @@ function getMethodStatusCodes(method: go.MethodType): Array<number> {
     case "lroMethod":
     case "lroPageableMethod":
       if (!statusCodes.includes(200)) {
-        // pollers always include 200 as an acceptible status code so we emulate that here
+        // pollers always include 200 as an acceptable status code so we emulate that here
         statusCodes.unshift(200);
       }
       if (!method.returns.result && !statusCodes.includes(204)) {

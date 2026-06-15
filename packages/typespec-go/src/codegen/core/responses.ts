@@ -148,7 +148,7 @@ function generateUnmarshaller(
  * @param respEnv the response envelope for which to emit the definition
  * @param imports the import manager currently in scope
  * @param indent the indentation helper currently in scope
- * @returns the text for the response enveloipe type definition
+ * @returns the text for the response envelope type definition
  */
 function emit(
   respEnv: go.ResponseEnvelope,

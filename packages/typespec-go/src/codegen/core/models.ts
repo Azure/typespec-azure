@@ -835,7 +835,7 @@ function generateDiscriminatorUnmarshaller(
 ): string {
   const propertyName = field.name;
 
-  // these are the simple, non-nested cases (e.g. IterfaceType, []InterfaceType, map[string]InterfaceType)
+  // these are the simple, non-nested cases (e.g. InterfaceType, []InterfaceType, map[string]InterfaceType)
   if (field.type.kind === "interface") {
     return `${indent.get()}${receiver}.${propertyName}, err = unmarshal${field.type.name}(val)\n`;
   } else if (field.type.kind === "slice" && field.type.elementType.kind === "interface") {
@@ -1249,7 +1249,7 @@ function getXMLSerialization(field: go.ModelField): string {
   let serialization = field.serializedName;
   // default to using the serialization name
   if (field.xml?.name) {
-    // xml can specifiy its own name, prefer that if available
+    // xml can specify its own name, prefer that if available
     serialization = field.xml.name;
   } else if (field.xml?.text) {
     // type has the x-ms-text attribute applied so it should be character data, not a node (https://github.com/Azure/autorest/tree/main/docs/extensions#x-ms-text)

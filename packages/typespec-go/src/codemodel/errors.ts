@@ -5,7 +5,7 @@
 
 /** ErrorCode defines the types of errors */
 export type ErrorCode =
-  /** the emitter encounted an internal error. this is always a bug in the emitter */
+  /** the emitter encountered an internal error. this is always a bug in the emitter */
   | "InternalError"
 
   /** invalid arguments were passed to the emitter */

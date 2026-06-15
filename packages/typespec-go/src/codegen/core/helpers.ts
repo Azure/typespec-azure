@@ -379,13 +379,13 @@ export function formatValue(
   paramName: string,
   type: go.WireType,
   imports: ImportManager,
-  defef?: boolean,
+  deref?: boolean,
 ): string {
   // callers don't have enough context to know if paramName needs to be
-  // deferenced so we track that here when specified. note that not all
+  // dereferenced so we track that here when specified. note that not all
   // cases will require paramName to be dereferenced.
   let star = "";
-  if (defef === true) {
+  if (deref === true) {
     star = "*";
   }
 
@@ -927,7 +927,7 @@ export function getCommonClientParameters(
   const paramCount = new Map<string, { uses: number; param: go.ClientParameter }>();
   let numClients = 0; // track client count since we might skip some
   for (const client of pkg.clients) {
-    // special cases: some ARM clients always don't contain any parameters (OperationsClient will be depracated in the future)
+    // special cases: some ARM clients always don't contain any parameters (OperationsClient will be deprecated in the future)
     if (target === "azure-arm" && client.name.match(/^OperationsClient$/)) {
       continue;
     }

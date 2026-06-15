@@ -37,7 +37,7 @@ export function generatePolymorphicHelpers(pkg: go.FakePackage | go.PackageConte
   // we know there are polymorphic types but we don't know how they're used.
   // i.e. are they vanilla fields, elements in a slice, or values in a map.
   // polymorphic types within maps/slices will also need the scalar helpers.
-  const trackDisciminator = function (type: go.WireType) {
+  const trackDiscriminator = function (type: go.WireType) {
     switch (type.kind) {
       case "interface":
         scalars.add(type.name);
@@ -68,14 +68,14 @@ export function generatePolymorphicHelpers(pkg: go.FakePackage | go.PackageConte
     for (const client of pkg.parent.clients) {
       for (const method of client.methods) {
         for (const param of method.parameters) {
-          trackDisciminator(param.type);
+          trackDiscriminator(param.type);
         }
       }
     }
   } else {
     for (const model of pkg.models) {
       for (const field of model.fields) {
-        trackDisciminator(field.type);
+        trackDiscriminator(field.type);
       }
     }
 
@@ -84,15 +84,15 @@ export function generatePolymorphicHelpers(pkg: go.FakePackage | go.PackageConte
         case "monomorphicResult":
           switch (respEnv.result.monomorphicType.kind) {
             case "map":
-              trackDisciminator(respEnv.result.monomorphicType.valueType);
+              trackDiscriminator(respEnv.result.monomorphicType.valueType);
               break;
             case "slice":
-              trackDisciminator(respEnv.result.monomorphicType.elementType);
+              trackDiscriminator(respEnv.result.monomorphicType.elementType);
               break;
           }
           break;
         case "polymorphicResult":
-          trackDisciminator(respEnv.result.interface);
+          trackDiscriminator(respEnv.result.interface);
           break;
       }
     }

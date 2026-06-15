@@ -165,7 +165,7 @@ export class ClientAdapter {
     }
 
     /**
-     * processes a credendial, potentially adding its supporting client constructor
+     * processes a credential, potentially adding its supporting client constructor
      *
      * @param goClient the Go client for which to add the constructor
      * @param constructable the constructable for the current Go client
@@ -582,7 +582,7 @@ export class ClientAdapter {
         goMethod.finalStateVia = <go.FinalStateVia>lroOptions["finalState"];
       }
       if (sdkMethod.lroMetadata.finalResponse?.resultSegments) {
-        // 'resultSegments' is designed for furture extensibility, currently only has one segment
+        // 'resultSegments' is designed for future extensibility, currently only has one segment
         goMethod.operationLocationResultPath = sdkMethod.lroMetadata.finalResponse.resultSegments
           .map((segment) => {
             return segment.serializationOptions.json?.name;
