@@ -2468,7 +2468,7 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
       } else {
         sdkVersionsEnum = diagnostics.pipe(getSdkEnumWithDiagnostics(context, versionEnum));
       }
-      const apiVersion = resolveApiVersionForNamespace(context, service, services.size > 1);
+      const apiVersion = resolveApiVersionForNamespace(context, service);
       filterPreviewVersion(context, sdkVersionsEnum, versions?.at(-1) || "", apiVersion);
       diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum));
     }

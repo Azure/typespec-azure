@@ -78,6 +78,7 @@ export interface TCGCContext {
   __mutatedRealm?: unsafe_Realm; // the realm that contains all mutated types for this instance
   __packageVersions?: Map<Namespace, string[]>; // the package versions (for each service) from the service versioning config and api version setting in tspconfig.
   __packageVersionEnum?: Map<Namespace, Enum | undefined>; // the enum type that contains all the package versions (for each service).
+  __serviceNamespaces?: Set<Namespace>; // cached set of service namespaces (explicit clients then original services), used for consistent single/multi-service api version resolution.
   __externalPackageToVersions?: Map<string, string>;
 
   getMutatedGlobalNamespace(): Namespace;

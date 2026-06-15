@@ -75,11 +75,7 @@ export function getDefaultApiVersion(
 ): Version | undefined {
   try {
     const versions = getVersions(context.program, serviceNamespace)[1]!.getVersions();
-    const apiVersion = resolveApiVersionForNamespace(
-      context,
-      serviceNamespace,
-      context.getPackageVersions().size > 1,
-    );
+    const apiVersion = resolveApiVersionForNamespace(context, serviceNamespace);
     removeVersionsLargerThanExplicitlySpecified(context, versions, apiVersion);
     // follow versioning principals of the versioning library and return last in list
     return versions[versions.length - 1];

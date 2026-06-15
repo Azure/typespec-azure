@@ -56,7 +56,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
     }
 
     // Filter versions based on the api version that applies to this specific service
-    const apiVersion = resolveApiVersionForNamespace(context, serviceNs, servicesNs.size > 1);
+    const apiVersion = resolveApiVersionForNamespace(context, serviceNs);
     removeVersionsLargerThanExplicitlySpecified(context, versions, apiVersion);
 
     context.__packageVersionEnum!.set(serviceNs, versions[0].enumMember.enum);

@@ -42,13 +42,12 @@ export async function createSdkPackage<TServiceOperation extends SdkServiceOpera
 
   // Create apiVersions map for multiple services
   const apiVersionsMap = new Map<string, string>();
-  const multiService = versions.size > 1;
   for (const [namespace, versionList] of versions.entries()) {
     const fullName = getNamespaceFullName(namespace);
     const latestVersion = versionList.at(-1);
     if (latestVersion) {
       // When the resolved api version for the service is "all", store "all" in the map as well
-      const resolvedApiVersion = resolveApiVersionForNamespace(context, namespace, multiService);
+      const resolvedApiVersion = resolveApiVersionForNamespace(context, namespace);
       apiVersionsMap.set(fullName, resolvedApiVersion === "all" ? "all" : latestVersion);
     }
   }
