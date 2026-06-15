@@ -467,6 +467,9 @@ function generate(moduleName, input, outputDir, perTestOptions) {
         } else {
           // delete files on error so it's easy to spot codegen failures
           cleanGeneratedFiles(fullOutputDir);
+          // record the failure so the script exits non-zero; otherwise an emit
+          // error here would only surface later as a downstream lint failure.
+          process.exitCode = 1;
         }
       } catch (err) {
         console.error("An error occurred:");
