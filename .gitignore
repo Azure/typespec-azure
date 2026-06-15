@@ -232,11 +232,6 @@ packages/typespec-go/test/**/go.mod
 packages/typespec-go/test/**/go.sum
 packages/typespec-go/test/**/LICENSE.txt
 packages/typespec-go/test/**/testdata
-# Hand-authored go:generate helper required by after_generate.go (see nooptionalbody test).
-!packages/typespec-go/test/local/nooptionalbody/testdata/
-!packages/typespec-go/test/local/nooptionalbody/testdata/generate/
 !packages/typespec-go/test/local/nooptionalbody/testdata/generate/transforms.go
-# rawjson uses containing-module so its module root (go.mod/go.sum) lives one level above
-# the emitter output dir (subpkg) and must be committed for `go mod tidy` to succeed.
 !packages/typespec-go/test/local/rawjson/go.mod
 !packages/typespec-go/test/local/rawjson/go.sum
