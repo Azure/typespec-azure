@@ -46,6 +46,7 @@ model ContosoResponseProperties is ResponseProperties {
 @@visibility(ContosoResponseProperties.previous_response_id, Lifecycle.Read);
 
 /** A Contoso Agent resource */
+#suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "Experimental BaseTypes"
 model ContosoAgent is Agent<ContosoAgentProperties> {
   ...ResourceNameParameter<ContosoAgent>;
 }

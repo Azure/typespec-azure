@@ -33,6 +33,7 @@ describe("arm-agent-base-type-child-resources", () => {
           description: string;
         }
 
+        #suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "test"
         @azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
         model MyAgent is TrackedResource<MyAgentProperties> {
           @key("myAgentName") @segment("myAgents") name: string;
@@ -70,6 +71,7 @@ describe("arm-agent-base-type-child-resources", () => {
           description: string;
         }
 
+        #suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "test"
         @azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
         model MyAgent is TrackedResource<MyAgentProperties> {
           @key("myAgentName") @segment("myAgents") name: string;
@@ -103,6 +105,7 @@ describe("arm-agent-base-type-child-resources", () => {
           description: string;
         }
 
+        #suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "test"
         @azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
         model MyAgent is TrackedResource<MyAgentProperties> {
           @key("myAgentName") @segment("myAgents") name: string;
@@ -136,6 +139,7 @@ describe("arm-agent-base-type-child-resources", () => {
           description: string;
         }
 
+        #suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "test"
         @azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
         model MyAgent is TrackedResource<MyAgentProperties> {
           @key("myAgentName") @segment("myAgents") name: string;
@@ -160,6 +164,7 @@ describe("arm-agent-base-type-child-resources", () => {
           displayName: string;
         }
 
+        #suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "test"
         @azureBaseType(#{ baseType: "SomethingElse", version: "2024-06-01" })
         model MyResource is TrackedResource<MyProperties> {
           @key("myResourceName") @segment("myResources") name: string;

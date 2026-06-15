@@ -1,6 +1,12 @@
-import { DecoratorContext, Model, isTemplateDeclaration } from "@typespec/compiler";
+import {
+  DecoratorContext,
+  Model,
+  getNamespaceFullName,
+  isTemplateDeclaration,
+} from "@typespec/compiler";
 import { useStateMap } from "@typespec/compiler/utils";
 import type { AzureBaseTypeDecorator } from "../generated-defs/Azure.ResourceManager.BaseTypes.js";
+import { reportDiagnostic } from "./lib.js";
 import { ArmStateKeys } from "./state.js";
 
 export interface AzureBaseTypeInfo {
@@ -36,5 +42,14 @@ export const $azureBaseType: AzureBaseTypeDecorator = (
 
   if (!isDuplicate) {
     setAzureBaseTypes(program, target, [...existing, { ...baseType }]);
+  }
+
+  // Only emit for models in user namespaces (not library-provided templates)
+  const ns = target.namespace ? getNamespaceFullName(target.namespace) : "";
+  if (!ns.startsWith("Azure.ResourceManager")) {
+    reportDiagnostic(program, {
+      code: "basetypes-experimental",
+      target,
+    });
   }
 };
