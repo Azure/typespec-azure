@@ -1,8 +1,8 @@
-# TypeSpec Planning 2026 — Summer Vision
+# TypeSpec Planning 2026 - 2027
 
 ## Overview
 
-This document outlines the TypeSpec ecosystem's strategic direction for Summer 2026 and beyond. It extends and expands upon the existing team planning, organized into nine workstreams that collectively drive TypeSpec toward becoming the definitive API specification platform for Azure and beyond.
+This document outlines the TypeSpec ecosystem's strategic direction for 2026-2027. It extends and expands upon the existing team planning, organized into nine workstreams that collectively drive TypeSpec toward becoming the definitive API specification platform for Azure and beyond.
 
 ### Priorities Key
 
