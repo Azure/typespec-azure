@@ -1331,6 +1331,18 @@ export interface Cat extends Pet {
   meow: number;
 }
 
+/** model interface Pet */
+export interface Pet {
+  name: string;
+  weight?: number;
+}
+
+/** model interface Dog */
+export interface Dog extends Pet {
+  kind: "dog";
+  bark: string;
+}
+
 export function catDeserializer(item: any): Cat {
   return {
     name: item["name"],
@@ -1340,23 +1352,11 @@ export function catDeserializer(item: any): Cat {
   };
 }
 
-/** model interface Pet */
-export interface Pet {
-  name: string;
-  weight?: number;
-}
-
 export function petDeserializer(item: any): Pet {
   return {
     name: item["name"],
     weight: item["weight"],
   };
-}
-
-/** model interface Dog */
-export interface Dog extends Pet {
-  kind: "dog";
-  bark: string;
 }
 
 export function dogDeserializer(item: any): Dog {
@@ -1368,12 +1368,12 @@ export function dogDeserializer(item: any): Dog {
   };
 }
 
-/** Alias for _ReadResponse */
-export type _ReadResponse = Cat | Dog;
-
 export function _readResponseDeserializer(item: any): _ReadResponse {
   return item;
 }
+
+/** Alias for _ReadResponse */
+export type _ReadResponse = Cat | Dog;
 ```
 
 # should handle inheritance model in operations
@@ -1413,6 +1413,12 @@ export interface Cat extends Pet {
   meow: number;
 }
 
+/** model interface Pet */
+export interface Pet {
+  name: string;
+  weight?: number;
+}
+
 export function catDeserializer(item: any): Cat {
   return {
     name: item["name"],
@@ -1420,12 +1426,6 @@ export function catDeserializer(item: any): Cat {
     kind: item["kind"],
     meow: item["meow"],
   };
-}
-
-/** model interface Pet */
-export interface Pet {
-  name: string;
-  weight?: number;
 }
 
 export function petDeserializer(item: any): Pet {
@@ -1512,6 +1512,16 @@ export interface Cat extends Pet {
   meow: number;
 }
 
+/** model interface Pet */
+export interface Pet extends Animal {
+  weight?: number;
+}
+
+/** model interface Animal */
+export interface Animal {
+  name: string;
+}
+
 export function catDeserializer(item: any): Cat {
   return {
     weight: item["weight"],
@@ -1521,21 +1531,11 @@ export function catDeserializer(item: any): Cat {
   };
 }
 
-/** model interface Pet */
-export interface Pet extends Animal {
-  weight?: number;
-}
-
 export function petDeserializer(item: any): Pet {
   return {
     name: item["name"],
     weight: item["weight"],
   };
-}
-
-/** model interface Animal */
-export interface Animal {
-  name: string;
 }
 
 export function animalDeserializer(item: any): Animal {
@@ -1625,6 +1625,13 @@ export interface PSDog extends Pet {
   bark: string;
 }
 
+/** model interface Pet */
+export interface Pet {
+  kind: string;
+  name: string;
+  weight?: number;
+}
+
 export function psDogSerializer(item: PSDog): any {
   return { kind: item["kind"], name: item["name"], weight: item["weight"], bark: item["bark"] };
 }
@@ -1638,13 +1645,6 @@ export function psDogDeserializer(item: any): PSDog {
   };
 }
 
-/** model interface Pet */
-export interface Pet {
-  kind: string;
-  name: string;
-  weight?: number;
-}
-
 export function petSerializer(item: Pet): any {
   return { kind: item["kind"], name: item["name"], weight: item["weight"] };
 }
@@ -1656,9 +1656,6 @@ export function petDeserializer(item: any): Pet {
     weight: item["weight"],
   };
 }
-
-/** Alias for PetUnion */
-export type PetUnion = PSDog | Pet;
 
 export function petUnionSerializer(item: PetUnion): any {
   switch (item.kind) {
@@ -1679,6 +1676,9 @@ export function petUnionDeserializer(item: any): PetUnion {
       return petDeserializer(item);
   }
 }
+
+/** Alias for PetUnion */
+export type PetUnion = PSDog | Pet;
 ```
 
 ## Operations
@@ -1766,6 +1766,18 @@ export interface Pet {
   weight?: number;
 }
 
+/** model interface Cat */
+export interface Cat extends Pet {
+  kind: "cat";
+  meow: number;
+}
+
+/** model interface Dog */
+export interface Dog extends Pet {
+  kind: "dog";
+  bark: string;
+}
+
 export function petDeserializer(item: any): Pet {
   return {
     kind: item["kind"],
@@ -1773,9 +1785,6 @@ export function petDeserializer(item: any): Pet {
     weight: item["weight"],
   };
 }
-
-/** Alias for PetUnion */
-export type PetUnion = Cat | Dog | Pet;
 
 export function petUnionDeserializer(item: any): PetUnion {
   switch (item["kind"]) {
@@ -1790,12 +1799,6 @@ export function petUnionDeserializer(item: any): PetUnion {
   }
 }
 
-/** model interface Cat */
-export interface Cat extends Pet {
-  kind: "cat";
-  meow: number;
-}
-
 export function catDeserializer(item: any): Cat {
   return {
     kind: item["kind"],
@@ -1803,12 +1806,6 @@ export function catDeserializer(item: any): Cat {
     weight: item["weight"],
     meow: item["meow"],
   };
-}
-
-/** model interface Dog */
-export interface Dog extends Pet {
-  kind: "dog";
-  bark: string;
 }
 
 export function dogDeserializer(item: any): Dog {
@@ -1819,6 +1816,9 @@ export function dogDeserializer(item: any): Dog {
     bark: item["bark"],
   };
 }
+
+/** Alias for PetUnion */
+export type PetUnion = Cat | Dog | Pet;
 ```
 
 ## Operations
@@ -1908,6 +1908,25 @@ export interface Pet {
   weight?: number;
 }
 
+/** model interface Cat */
+export interface Cat extends Pet {
+  kind: "cat";
+  meow: number;
+}
+
+/** model interface Dog */
+export interface Dog extends Pet {
+  kind: "dog";
+  type: string;
+  bark: string;
+}
+
+/** model interface Gold */
+export interface Gold extends Dog {
+  type: "gold";
+  friends: PetUnion[];
+}
+
 export function petDeserializer(item: any): Pet {
   return {
     kind: item["kind"],
@@ -1915,9 +1934,6 @@ export function petDeserializer(item: any): Pet {
     weight: item["weight"],
   };
 }
-
-/** Alias for PetUnion */
-export type PetUnion = Cat | DogUnion | Pet;
 
 export function petUnionDeserializer(item: any): PetUnion {
   switch (item["kind"]) {
@@ -1932,12 +1948,6 @@ export function petUnionDeserializer(item: any): PetUnion {
   }
 }
 
-/** model interface Cat */
-export interface Cat extends Pet {
-  kind: "cat";
-  meow: number;
-}
-
 export function catDeserializer(item: any): Cat {
   return {
     kind: item["kind"],
@@ -1945,13 +1955,6 @@ export function catDeserializer(item: any): Cat {
     weight: item["weight"],
     meow: item["meow"],
   };
-}
-
-/** model interface Dog */
-export interface Dog extends Pet {
-  kind: "dog";
-  type: string;
-  bark: string;
 }
 
 export function dogDeserializer(item: any): Dog {
@@ -1964,9 +1967,6 @@ export function dogDeserializer(item: any): Dog {
   };
 }
 
-/** Alias for DogUnion */
-export type DogUnion = Gold | Dog;
-
 export function dogUnionDeserializer(item: any): DogUnion {
   switch (item["type"]) {
     case "gold":
@@ -1975,12 +1975,6 @@ export function dogUnionDeserializer(item: any): DogUnion {
     default:
       return dogDeserializer(item);
   }
-}
-
-/** model interface Gold */
-export interface Gold extends Dog {
-  type: "gold";
-  friends: PetUnion[];
 }
 
 export function goldDeserializer(item: any): Gold {
@@ -1999,6 +1993,11 @@ export function petUnionArrayDeserializer(result: Array<PetUnion>): any[] {
     return petUnionDeserializer(item);
   });
 }
+
+/** Alias for PetUnion */
+export type PetUnion = Cat | DogUnion | Pet;
+/** Alias for DogUnion */
+export type DogUnion = Gold | Dog;
 ```
 
 ## Operations
@@ -2076,17 +2075,17 @@ export interface Foo {
   bar: Bar;
 }
 
+/** model interface Bar */
+export interface Bar {
+  foo: Foo;
+}
+
 export function fooDeserializer(item: any): Foo {
   return {
     name: item["name"],
     weight: item["weight"],
     bar: barDeserializer(item["bar"]),
   };
-}
-
-/** model interface Bar */
-export interface Bar {
-  foo: Foo;
 }
 
 export function barDeserializer(item: any): Bar {
@@ -2641,9 +2640,6 @@ export function vegetablesDeserializer(item: any): Vegetables {
   };
 }
 
-/** Alias for _VegetablesAdditionalProperty */
-export type _VegetablesAdditionalProperty = number | string;
-
 export function _vegetablesAdditionalPropertySerializer(item: _VegetablesAdditionalProperty): any {
   return item;
 }
@@ -2653,6 +2649,9 @@ export function _vegetablesAdditionalPropertyDeserializer(
 ): _VegetablesAdditionalProperty {
   return item;
 }
+
+/** Alias for _VegetablesAdditionalProperty */
+export type _VegetablesAdditionalProperty = number | string;
 ```
 
 # should handle model extends with additional properties
@@ -2760,6 +2759,19 @@ export interface ServiceResourceProperties {
   servicePlacementPolicies?: ServicePlacementPolicyDescription[];
 }
 
+/** model interface ServicePlacementPolicyDescription */
+export interface ServicePlacementPolicyDescription extends Pet {
+  kind: "dog";
+  type: string;
+}
+
+/** model interface Pet */
+export interface Pet {
+  kind: string;
+  name: string;
+  weight?: number;
+}
+
 export function serviceResourcePropertiesSerializer(item: ServiceResourceProperties): any {
   return {
     servicePlacementPolicies: !item["servicePlacementPolicies"]
@@ -2792,12 +2804,6 @@ export function servicePlacementPolicyDescriptionArrayDeserializer(
   });
 }
 
-/** model interface ServicePlacementPolicyDescription */
-export interface ServicePlacementPolicyDescription extends Pet {
-  kind: "dog";
-  type: string;
-}
-
 export function servicePlacementPolicyDescriptionSerializer(
   item: ServicePlacementPolicyDescription,
 ): any {
@@ -2815,13 +2821,6 @@ export function servicePlacementPolicyDescriptionDeserializer(
   };
 }
 
-/** model interface Pet */
-export interface Pet {
-  kind: string;
-  name: string;
-  weight?: number;
-}
-
 export function petSerializer(item: Pet): any {
   return { kind: item["kind"], name: item["name"], weight: item["weight"] };
 }
@@ -2833,9 +2832,6 @@ export function petDeserializer(item: any): Pet {
     weight: item["weight"],
   };
 }
-
-/** Alias for PetUnion */
-export type PetUnion = ServicePlacementPolicyDescription | Pet;
 
 export function petUnionSerializer(item: PetUnion): any {
   switch (item.kind) {
@@ -2858,6 +2854,9 @@ export function petUnionDeserializer(item: any): PetUnion {
       return petDeserializer(item);
   }
 }
+
+/** Alias for PetUnion */
+export type PetUnion = ServicePlacementPolicyDescription | Pet;
 ```
 
 # should handle duplicate model name import between hardcode import and binder import

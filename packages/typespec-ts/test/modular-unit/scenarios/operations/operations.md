@@ -846,6 +846,11 @@ export interface TestArrayModel {
   prop: Test[];
 }
 
+/** model interface Test */
+export interface Test {
+  prop?: Test[];
+}
+
 export function testArrayModelDeserializer(item: any): TestArrayModel {
   return {
     prop: testArrayDeserializer(item["prop"]),
@@ -856,11 +861,6 @@ export function testArrayDeserializer(result: Array<Test>): any[] {
   return result.map((item) => {
     return testDeserializer(item);
   });
-}
-
-/** model interface Test */
-export interface Test {
-  prop?: Test[];
 }
 
 export function testDeserializer(item: any): Test {
@@ -939,6 +939,11 @@ export interface TestDictionary {
   prop: Record<string, Test>;
 }
 
+/** model interface Test */
+export interface Test {
+  prop?: Record<string, Test>;
+}
+
 export function testDictionaryDeserializer(item: any): TestDictionary {
   return {
     prop: testRecordDeserializer(item["prop"]),
@@ -951,11 +956,6 @@ export function testRecordDeserializer(item: Record<string, any>): Record<string
     result[key] = !item[key] ? item[key] : testDeserializer(item[key]);
   });
   return result;
-}
-
-/** model interface Test */
-export interface Test {
-  prop?: Record<string, Test>;
 }
 
 export function testDeserializer(item: any): Test {
@@ -1165,6 +1165,11 @@ export interface _ListTestResult {
   next: string;
 }
 
+/** model interface Test */
+export interface Test {
+  id: string;
+}
+
 export function _listTestResultDeserializer(item: any): _ListTestResult {
   return {
     tests: testArrayDeserializer(item["tests"]),
@@ -1176,11 +1181,6 @@ export function testArrayDeserializer(result: Array<Test>): any[] {
   return result.map((item) => {
     return testDeserializer(item);
   });
-}
-
-/** model interface Test */
-export interface Test {
-  id: string;
 }
 
 export function testDeserializer(item: any): Test {
