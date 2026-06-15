@@ -8,7 +8,6 @@ import { execSync } from "child_process";
 import { existsSync, opendirSync, readFileSync, unlinkSync } from "fs";
 import { mkdir, readFile, writeFile } from "fs/promises";
 import * as path from "path";
-import "source-map-support/register.js";
 import * as codegen from "./codegen/index.js";
 import { CodeModelError } from "./codemodel/errors.js";
 import { GoEmitterOptions, reportDiagnostic } from "./lib.js";
