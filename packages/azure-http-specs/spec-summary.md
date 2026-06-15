@@ -3619,6 +3619,54 @@ Expected response body:
 [{ "content": "order1,product1,1" }, { "content": "order2,product2,2" }]
 ```
 
+### Azure_ResourceManager_OperationTemplates_Lro_getLro
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation that returns a long-running operation.
+Uses Extension.Read with @markAsLro, which returns 200 or 202.
+
+Step 1: Initial GET Request (returns 202 Accepted)
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/costReports/report1
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 202
+Expected response header: Location={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operationResults/get_lro_location
+
+Step 2: Polling Request (returns 202 Accepted)
+Expected verb: GET
+Expected path: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operationResults/get_lro_location
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 202
+Expected response header: Location={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operationResults/get_lro_location
+
+Step 3: Final Polling Request (returns 200 OK with result)
+Expected verb: GET
+Expected path: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operationResults/get_lro_location
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 200
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/costReports/report1",
+  "name": "report1",
+  "type": "Azure.ResourceManager.OperationTemplates/costReports",
+  "properties": {
+    "downloadUrl": "https://storage.blob.core.windows.net/reports/report1.csv",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
+}
+```
+
 ### Azure_ResourceManager_OperationTemplates_LroPaging_postPagingLro
 
 - Endpoint: `post https://management.azure.com`
@@ -3665,6 +3713,91 @@ Expected response body:
 Step 4: Next Page Request
 Expected verb: GET
 Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_location/nextPage
+Expected query parameter: api-version=2023-12-01-preview
+Expected response: 200 OK with the second page of results.
+Expected response body:
+
+```json
+{
+  "value": [
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/products/product2",
+      "name": "product2",
+      "type": "Azure.ResourceManager.OperationTemplates/products",
+      "location": "eastus",
+      "properties": {
+        "provisioningState": "Succeeded",
+        "productId": "product2"
+      }
+    }
+  ]
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_LroPaging_postPagingLroWithBody
+
+- Endpoint: `post https://management.azure.com`
+
+Resource POST operation that returns a LRO with paging, using ArmResourceActionAsyncBase
+with a request body and a response that includes a body on both 200 and 202.
+Unlike postPagingLro which uses the convenience ArmResourceActionAsync with no body,
+this tests the lower-level ArmResourceActionAsyncBase pattern.
+
+Step 1: Initial Request
+Expected verb: POST
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/products/default/postPagingLroWithBody
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "vnetId": "vnet1"
+}
+```
+
+Expected response: 202 Accepted with Location and Retry-After headers.
+Expected response body:
+
+```json
+{
+  "value": []
+}
+```
+
+Step 2: Polling Request
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_body_location
+Expected query parameter: api-version=2023-12-01-preview
+Expected response: 202 Accepted with Location and Retry-After headers.
+
+Step 3: Final Result Request
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_body_location
+Expected query parameter: api-version=2023-12-01-preview
+Expected response: 200 OK with a paged result. The response body contains a "nextLink" field.
+Expected response body:
+
+```json
+{
+  "value": [
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/products/product1",
+      "name": "product1",
+      "type": "Azure.ResourceManager.OperationTemplates/products",
+      "location": "eastus",
+      "properties": {
+        "provisioningState": "Succeeded",
+        "productId": "product1"
+      }
+    }
+  ],
+  "nextLink": "..."
+}
+```
+
+Step 4: Next Page Request
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_body_location/nextPage
 Expected query parameter: api-version=2023-12-01-preview
 Expected response: 200 OK with the second page of results.
 Expected response body:
@@ -3853,6 +3986,95 @@ Expected response body (with body scenario):
 {
   "totalAllowed": 100,
   "status": "Changed to requested allowance"
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_Paging_markAsPageable
+
+- Endpoint: `get https://management.azure.com`
+
+List operation using ArmListSinglePageByParent with @markAsPageable.
+The response uses a custom list model (CollectionsList) wrapping
+the resource array.
+
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/monitors/monitor1/collections
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 200
+Expected response body:
+
+```json
+{
+  "value": [
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/monitors/monitor1/collections/collection1",
+      "name": "collection1",
+      "type": "Azure.ResourceManager.OperationTemplates/monitors/collections",
+      "properties": {
+        "displayName": "Test Collection"
+      }
+    },
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/monitors/monitor1/collections/collection2",
+      "name": "collection2",
+      "type": "Azure.ResourceManager.OperationTemplates/monitors/collections",
+      "properties": {
+        "displayName": "Another Collection"
+      }
+    }
+  ]
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_Paging_postActionPaging
+
+- Endpoint: `post https://management.azure.com`
+
+Resource POST action returning pageable results.
+This tests a POST action with @list that returns pageable results (not an LRO).
+
+Step 1: Initial POST Request (returns first page)
+Expected verb: POST
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/monitors/monitor1/postActionPaging
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "filter": "status eq 'active'"
+}
+```
+
+Expected response status code: 200
+Expected response body:
+
+```json
+{
+  "value": [
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/vm1",
+      "sendingMetrics": true
+    }
+  ],
+  "nextLink": "{endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/monitors/monitor1/postActionPaging/nextPage?api-version=2023-12-01-preview"
+}
+```
+
+Step 2: Next Page Request
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/monitors/monitor1/postActionPaging/nextPage
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 200
+Expected response body:
+
+```json
+{
+  "value": [
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/vm2",
+      "sendingMetrics": false
+    }
+  ]
 }
 ```
 
