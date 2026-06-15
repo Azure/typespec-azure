@@ -11,6 +11,21 @@
 // command is required.
 //
 // Skip with TYPESPEC_GO_SKIP_BASELINE=1 (used by CI / offline runs).
+//
+// Conflict semantics (verified):
+//  - Re-running sync while a previous mirror is still present (as untracked
+//    files) does NOT raise a git conflict. `git reset --hard FETCH_HEAD` is a
+//    no-op for purely-untracked paths and silently overwrites them when the
+//    baseline tip starts tracking the same path. In both cases the mirror
+//    runs again immediately afterwards (see tspcompile.js beforeExit hook),
+//    so the working tree is rewritten to match the latest local emit. Net
+//    effect on every successful run: working tree == baseline tip + local
+//    emit overlay.
+//  - Fetch / network failures are caught and downgraded to a WARN; the rest
+//    of regeneration continues without baseline mirroring.
+//  - Concurrent runs against the same checkout: the second invocation's
+//    `git fetch` may fail with "shallow file has changed"; this is also
+//    caught and downgraded to a WARN.
 
 import { execFileSync } from "child_process";
 import { cpSync, existsSync, mkdirSync, readdirSync, rmSync, statSync, writeFileSync } from "fs";
