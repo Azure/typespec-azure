@@ -49,17 +49,17 @@ configuration:
           - if:
               - includesModifiedFiles:
                   files:
-                    - packages/typespec-ts/**/*
-            then:
-              - addLabel:
-                  label: emitter:typescript
-          - if:
-              - includesModifiedFiles:
-                  files:
                     - packages/typespec-go/**/*
             then:
               - addLabel:
                   label: emitter:go
+          - if:
+              - includesModifiedFiles:
+                  files:
+                    - packages/typespec-ts/**/*
+            then:
+              - addLabel:
+                  label: emitter:typescript
           - if:
               - includesModifiedFiles:
                   files:
