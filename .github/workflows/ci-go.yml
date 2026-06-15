@@ -96,7 +96,7 @@ jobs:
       - uses: ./.github/actions/setup
 
       - name: Install dependencies
-        run: pnpm install --filter "@azure-tools/typespec-go..."
+        run: pnpm install
 
       - name: Build
         run: pnpm turbo run --filter "@azure-tools/typespec-go..." build
@@ -117,7 +117,7 @@ jobs:
       - uses: ./.github/actions/setup
 
       - name: Install dependencies
-        run: pnpm install --filter "@azure-tools/typespec-go..."
+        run: pnpm install
 
       - name: Build
         run: pnpm turbo run --filter "@azure-tools/typespec-go..." build
