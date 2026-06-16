@@ -1091,6 +1091,9 @@ export function compareModelProperties(
   if (aHasHttpKind && bHasHttpKind) {
     if (aIsQuery !== bIsQuery || aIsHeader !== bIsHeader || aIsPath !== bIsPath) return false;
   }
+  // Return false when one has @path but the other doesn't — path params are structural
+  // and omitting @path in an override silently breaks URL construction
+  if (aIsPath !== bIsPath) return false;
   if (
     aIsQuery &&
     bIsQuery &&
