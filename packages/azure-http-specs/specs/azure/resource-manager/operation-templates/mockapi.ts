@@ -1254,51 +1254,53 @@ const validConfigurationWithBody = {
 };
 
 Scenarios.Azure_ResourceManager_OperationTemplates_Legacy_createOrReplaceOptionalBody =
-  passOnSuccess([
-    {
-      // PUT with body
-      uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/configurations/:configName",
-      method: "put",
-      request: {
-        pathParams: {
-          subscriptionId: SUBSCRIPTION_ID_EXPECTED,
-          resourceGroup: RESOURCE_GROUP_EXPECTED,
-          configName: "default",
-        },
-        query: {
-          "api-version": "2023-12-01-preview",
-        },
-        body: json({
-          location: "eastus",
-          properties: {
-            configValue: "custom-value",
-          },
-        }),
+  withServiceKeys(["EmptyBody", "WithBody"]).pass({
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/configurations/:configName",
+    method: "put",
+    request: {
+      pathParams: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        configName: "default",
       },
-      response: {
-        status: 200,
-        body: json(validConfigurationWithBody),
+      query: {
+        "api-version": "2023-12-01-preview",
       },
-      kind: "MockApiDefinition",
     },
-    {
-      // PUT without body
-      uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/configurations/:configName",
-      method: "put",
-      request: {
-        pathParams: {
-          subscriptionId: SUBSCRIPTION_ID_EXPECTED,
-          resourceGroup: RESOURCE_GROUP_EXPECTED,
-          configName: "default",
-        },
-        query: {
-          "api-version": "2023-12-01-preview",
-        },
-      },
-      response: {
-        status: 200,
-        body: json(validConfiguration),
-      },
-      kind: "MockApiDefinition",
+    response: {
+      status: 200,
     },
-  ]);
+    handler: (req: MockRequest) => {
+      if (req.body && Object.keys(req.body).length > 0) {
+        // WithBody scenario - validate and return resource with custom values
+        const requestBody = req.body as {
+          location?: string;
+          properties?: { configValue?: string };
+        };
+        if (requestBody.properties?.configValue === "custom-value") {
+          return {
+            pass: "WithBody",
+            status: 200,
+            body: json(validConfigurationWithBody),
+          };
+        } else {
+          return {
+            pass: "WithBody",
+            status: 400,
+            body: json({
+              error:
+                "Invalid request body values. Expected properties: {configValue: 'custom-value'}",
+            }),
+          };
+        }
+      } else {
+        // EmptyBody scenario - return resource with defaults
+        return {
+          pass: "EmptyBody",
+          status: 200,
+          body: json(validConfiguration),
+        };
+      }
+    },
+    kind: "MockApiDefinition",
+  });
