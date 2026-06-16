@@ -125,7 +125,18 @@ To run `golangci-lint` (and `shadow`) against every generated Go module under `t
 pnpm lint:go
 ```
 
-`golangci-lint` and `shadow` must be available on your `PATH` (CI installs them for you).
+`golangci-lint` and `shadow` must be available on your `PATH`. CI installs them for you, but
+for local runs you need to install them yourself, matching the versions CI uses (see
+`.github/workflows/ci-go.yml`):
+
+```terminal
+go install golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow@latest
+curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b "$(go env GOPATH)/bin" v2.11.4
+```
+
+Make sure `$(go env GOPATH)/bin` is on your `PATH` so both tools are discoverable. On
+Windows, install `shadow` the same way and download the matching `golangci-lint` release from
+the [golangci-lint releases page](https://github.com/golangci/golangci-lint/releases).
 
 ### Debug
 
