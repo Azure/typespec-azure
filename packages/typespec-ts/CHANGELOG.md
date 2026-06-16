@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-ts
 
+## 0.54.2
+
+### Bug Fixes
+
+- [typespec-ts] fix body param serialize issue reported from sdk repo
+
+
 ## 0.54.1
 
 ### Bug Fixes
