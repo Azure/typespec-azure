@@ -97,6 +97,7 @@ words:
   - stac
   - strconv
   - tcgc
+  - tsgolint
   - tsmv
   - userrp
   - vnet
