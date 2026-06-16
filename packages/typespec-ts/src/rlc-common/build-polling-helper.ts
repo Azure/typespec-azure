@@ -1,4 +1,4 @@
-import * as path from "path";
+import { joinPaths } from "@typespec/compiler";
 import { OPERATION_LRO_HIGH_PRIORITY, RLCModel } from "./interfaces.js";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: to fix the handlebars issue
@@ -28,7 +28,7 @@ export function buildPollingHelper(model: RLCModel) {
   const readmeFileContents = hbs.compile(pollingContent, { noEscape: true });
   const { srcPath } = model;
   return {
-    path: path.join(srcPath, "pollingHelper.ts"),
+    path: joinPaths(srcPath, "pollingHelper.ts"),
     content: readmeFileContents(lroDetail),
   };
 }

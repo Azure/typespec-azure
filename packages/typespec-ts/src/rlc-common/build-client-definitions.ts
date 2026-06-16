@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import * as path from "path";
+import { joinPaths } from "@typespec/compiler";
 import {
   CallSignatureDeclarationStructure,
   InterfaceDeclarationStructure,
@@ -30,9 +30,9 @@ export function buildClientDefinitions(model: RLCModel) {
     importedResponses: new Set<string>(),
     clientImports: new Set<string>(),
   };
-  const project = new Project();
+  const project = new Project({ useInMemoryFileSystem: true });
   const srcPath = model.srcPath;
-  const filePath = path.join(srcPath, `clientDefinitions.ts`);
+  const filePath = joinPaths(srcPath, `clientDefinitions.ts`);
   const clientDefinitionsFile = project.createSourceFile(filePath, undefined, {
     overwrite: true,
   });

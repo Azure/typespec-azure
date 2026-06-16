@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import * as path from "path";
+import { joinPaths } from "@typespec/compiler";
 import {
   InterfaceDeclarationStructure,
   OptionalKind,
@@ -19,9 +19,9 @@ import { ResponseHeaderSchema, ResponseMetadata, RLCModel } from "./interfaces.j
 
 let hasErrorResponse = false;
 export function buildResponseTypes(model: RLCModel) {
-  const project = new Project();
+  const project = new Project({ useInMemoryFileSystem: true });
   const srcPath = model.srcPath;
-  const filePath = path.join(srcPath, `responses.ts`);
+  const filePath = joinPaths(srcPath, `responses.ts`);
   hasErrorResponse = false;
   const responsesFile = project.createSourceFile(filePath, undefined, {
     overwrite: true,

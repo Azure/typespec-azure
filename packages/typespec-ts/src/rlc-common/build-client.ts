@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import * as path from "path";
+import { joinPaths } from "@typespec/compiler";
 import {
   InterfaceDeclarationStructure,
   OptionalKind,
@@ -62,8 +62,8 @@ function getClientOptionsInterface(
 export function buildClient(model: RLCModel): File | undefined {
   const name = normalizeName(model.libraryName, NameType.File);
   const { srcPath } = model;
-  const project = new Project();
-  const filePath = path.join(srcPath, `${name}.ts`);
+  const project = new Project({ useInMemoryFileSystem: true });
+  const filePath = joinPaths(srcPath, `${name}.ts`);
   const clientFile = project.createSourceFile(filePath, undefined, {
     overwrite: true,
   });
@@ -171,7 +171,7 @@ export function buildClient(model: RLCModel): File | undefined {
   }
   clientFile.addFunction(functionStatement);
 
-  const paths = srcPath.replace(/\//g, path.sep).split(path.sep);
+  const paths = srcPath.split("/");
   while (paths.length > 0 && paths[paths.length - 1] === "") {
     paths.pop();
   }
