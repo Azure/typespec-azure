@@ -7,9 +7,6 @@ export default defineConfig(({ mode }) => {
   const useLocalLibraries = env["VITE_USE_LOCAL_LIBRARIES"] === "true";
   return definePlaygroundViteConfig({
     ...TypeSpecPlaygroundConfig,
-    links: {
-      documentationUrl: "https://azure.github.io/typespec-azure",
-    },
     skipBundleLibraries: !useLocalLibraries,
   });
 });
