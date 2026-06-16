@@ -28,6 +28,8 @@ Available ruleSets:
 
 | Name                                                                                                                                                                                                                     | Description                                                                                                                                                                                                                                           |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`@azure-tools/typespec-azure-resource-manager/arm-agent-base-type-child-resources`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-agent-base-type-child-resources)             | Resources decorated with @azureBaseType for the Agent base type must have both a Conversation and a Response child resource.                                                                                                                          |
+| [`@azure-tools/typespec-azure-resource-manager/arm-agent-base-type-lifecycle-operations`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-agent-base-type-lifecycle-operations)   | Conversation and Response child resources of an Agent must define create, read, update, and delete lifecycle operations.                                                                                                                              |
 | [`@azure-tools/typespec-azure-resource-manager/arm-no-record`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-no-record)                                                         | Don't use Record types for ARM resources.                                                                                                                                                                                                             |
 | [`@azure-tools/typespec-azure-resource-manager/arm-no-path-casing-conflicts`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-no-path-casing-conflicts)                           | Operation paths must be unique when compared case-insensitively.                                                                                                                                                                                      |
 | [`@azure-tools/typespec-azure-resource-manager/no-override-props`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-override-props)                                                 | Disallow redefining properties already defined in a base type.                                                                                                                                                                                        |
@@ -569,6 +571,44 @@ This allows sharing Azure Resource Manager resource types across specifications
 | Name       | Type          | Description                                                              |
 | ---------- | ------------- | ------------------------------------------------------------------------ |
 | namespaces | `Namespace[]` | The namespaces of Azure Resource Manager libraries used in this provider |
+
+### Azure.ResourceManager.BaseTypes
+
+- [`@azureBaseType`](#@azurebasetype)
+
+#### `@azureBaseType`
+
+`@azureBaseType` marks an Azure Resource Manager resource properties model as implementing
+a base type. Base types define structured constraints including required and
+optional properties that conforming resources must implement.
+
+This decorator may be applied multiple times to indicate conformance to
+multiple base types. Duplicate entries are ignored.
+
+```typespec
+@Azure.ResourceManager.BaseTypes.azureBaseType(baseType: valueof Azure.ResourceManager.BaseTypes.BaseTypeInfo)
+```
+
+##### Target
+
+`Model`
+
+##### Parameters
+
+| Name     | Type                                    | Description                                           |
+| -------- | --------------------------------------- | ----------------------------------------------------- |
+| baseType | [valueof `BaseTypeInfo`](#basetypeinfo) | The base type specification this resource implements. |
+
+##### Examples
+
+```typespec
+@azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
+model MyAgentProperties {
+  ...AgentProperties;
+  ...AgentToolProperty;
+  ...DefaultProvisioningStateProperty;
+}
+```
 
 ### Azure.ResourceManager.Legacy
 
