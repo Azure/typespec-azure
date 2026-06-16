@@ -36,8 +36,9 @@ import {
   getMultipartFileTypeExpression,
 } from "./type-expressions/get-model-expression.js";
 
-import { getNamespaceFullName, joinPaths, NoTarget } from "@typespec/compiler";
+import { getNamespaceFullName, NoTarget } from "@typespec/compiler";
 import { isMetadata, isOrExtendsHttpFile, Visibility } from "@typespec/http";
+import path from "path";
 import { useContext } from "../context-manager.js";
 import { addDeclaration } from "../framework/declaration.js";
 import {
@@ -303,7 +304,7 @@ export function getApiVersionEnum(context: SdkContext) {
 }
 
 export function getModelsPath(sourceRoot: string, modelNamespace: string[] = []): string {
-  return joinPaths(
+  return path.join(
     ...[
       sourceRoot,
       "models",

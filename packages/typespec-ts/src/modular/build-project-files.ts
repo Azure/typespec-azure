@@ -1,6 +1,6 @@
 import { NameType } from "../rlc-common/index.js";
 
-import { getRelativePathFromDirectory, joinPaths } from "@typespec/compiler";
+import path from "path/posix";
 import { useContext } from "../context-manager.js";
 import { getClientHierarchyMap, getModularClientOptions } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
@@ -19,10 +19,7 @@ function getSourceRootPrefix(emitterOptions: ModularEmitterOptions, context: Sdk
   const rootDir = (context.generationPathDetail?.rootDir ?? "").replace(/\\/g, "/");
 
   if (rootDir && sourceRoot.startsWith(rootDir)) {
-    const relativePath = getRelativePathFromDirectory(rootDir, sourceRoot, false).replace(
-      /\\/g,
-      "/",
-    );
+    const relativePath = path.relative(rootDir, sourceRoot).replace(/\\/g, "/");
     return `./${relativePath}`;
   }
 
@@ -98,7 +95,7 @@ export function getModuleExports(context: SdkContext, emitterOptions: ModularEmi
 function getModelSubpaths(emitterOptions: ModularEmitterOptions) {
   const outputProject = useContext("outputProject");
   const modelFiles = outputProject.getSourceFiles(
-    joinPaths(emitterOptions.modularOptions.sourceRoot.replace(/\\/g, "/"), `models/**/*.ts`),
+    path.join(emitterOptions.modularOptions.sourceRoot.replace(/\\/g, "/"), `models/**/*.ts`),
   );
   const subpath = new Set<string>();
   for (const modelFile of modelFiles) {
@@ -107,11 +104,7 @@ function getModelSubpaths(emitterOptions: ModularEmitterOptions) {
       continue;
     }
     subpath.add(
-      getRelativePathFromDirectory(
-        emitterOptions.modularOptions.sourceRoot.replace(/\\/g, "/"),
-        filepath,
-        false,
-      ),
+      path.relative(emitterOptions.modularOptions.sourceRoot.replace(/\\/g, "/"), filepath),
     );
   }
   return Array.from(subpath);

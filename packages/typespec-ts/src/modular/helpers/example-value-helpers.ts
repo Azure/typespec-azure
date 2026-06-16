@@ -8,7 +8,7 @@ import {
   SdkModelPropertyType,
   SdkServiceOperation,
 } from "@azure-tools/typespec-client-generator-core";
-import { joinPaths } from "@typespec/compiler";
+import { join } from "path";
 import { SourceFile } from "ts-morph";
 import { useContext } from "../../context-manager.js";
 import { resolveReference } from "../../framework/reference.js";
@@ -596,8 +596,8 @@ export function createSourceFile(
 ): SourceFile {
   const project = useContext("outputProject");
   const operationPrefix = `${options.classicalMethodPrefix ?? ""} ${method.oriName ?? method.name}`;
-  const baseFolder = type === "sample" ? "samples-dev" : joinPaths("test", "generated");
-  const folder = joinPaths(
+  const baseFolder = type === "sample" ? "samples-dev" : join("test", "generated");
+  const folder = join(
     dpgContext.generationPathDetail?.rootDir ?? "",
     baseFolder,
     options.subFolder ?? "",
@@ -605,7 +605,7 @@ export function createSourceFile(
   const fileExtension = type === "sample" ? ".ts" : ".spec.ts";
   const normalizedFileName = normalizeName(fileName || `${operationPrefix} ${type}`, NameType.File);
 
-  return project.createSourceFile(joinPaths(folder, `${normalizedFileName}${fileExtension}`), "", {
+  return project.createSourceFile(join(folder, `${normalizedFileName}${fileExtension}`), "", {
     overwrite: true,
   });
 }

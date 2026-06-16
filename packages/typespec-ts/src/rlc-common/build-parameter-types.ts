@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { joinPaths } from "@typespec/compiler";
+import * as path from "path";
 import {
   InterfaceDeclarationStructure,
   Project,
@@ -27,9 +27,9 @@ import {
 } from "./interfaces.js";
 
 export function buildParameterTypes(model: RLCModel) {
-  const project = new Project({ useInMemoryFileSystem: true });
+  const project = new Project();
   const srcPath = model.srcPath;
-  const filePath = joinPaths(srcPath, `parameters.ts`);
+  const filePath = path.join(srcPath, `parameters.ts`);
   const partialBodyTypeNames = new Set<string>();
   const parametersFile = project.createSourceFile(filePath, undefined, {
     overwrite: true,

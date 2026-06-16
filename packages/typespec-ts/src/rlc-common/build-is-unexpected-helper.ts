@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { joinPaths } from "@typespec/compiler";
+import * as path from "path";
 import {
   FunctionDeclarationOverloadStructure,
   OptionalKind,
@@ -15,9 +15,9 @@ export function buildIsUnexpectedHelper(model: RLCModel) {
   if (!hasUnexpectedHelper(model)) {
     return;
   }
-  const project = new Project({ useInMemoryFileSystem: true });
+  const project = new Project();
   const srcPath = model.srcPath;
-  const filePath = joinPaths(srcPath, `isUnexpected.ts`);
+  const filePath = path.join(srcPath, `isUnexpected.ts`);
   const isErrorHelper = project.createSourceFile(filePath, undefined, {
     overwrite: true,
   });

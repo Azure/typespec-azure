@@ -2,8 +2,9 @@
 // Licensed under the MIT License.
 
 import { SdkClient } from "@azure-tools/typespec-client-generator-core";
-import { getDoc, joinPaths } from "@typespec/compiler";
+import { getDoc } from "@typespec/compiler";
 import { getServers } from "@typespec/http";
+import * as path from "path";
 import {
   buildRuntimeImports,
   Imports,
@@ -46,7 +47,7 @@ export async function transformRLCModel(
   const program = dpgContext.program;
   const options: RLCOptions = dpgContext.rlcOptions!;
   const rlcSourceDir = dpgContext.generationPathDetail?.rlcSourcesDir;
-  const srcPath = joinPaths(
+  const srcPath = path.join(
     dpgContext.generationPathDetail?.rlcSourcesDir ?? "",
     options.batch && options.batch.length > 1
       ? normalizeName(client.name.replace("Client", ""), NameType.File)

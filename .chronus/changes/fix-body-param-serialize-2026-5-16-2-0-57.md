@@ -5,4 +5,4 @@ packages:
   - "@azure-tools/typespec-ts"
 ---
 
-[typespec-ts] Rename AAD / Azure Active Directory references to Microsoft Entra branding
+[typespec-ts] fix body param serialize issue reported from sdk repo

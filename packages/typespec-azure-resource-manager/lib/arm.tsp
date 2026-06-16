@@ -12,6 +12,8 @@ import "./legacy-types/arm.legacy.tsp";
 import "./common-types/common-types.tsp";
 import "./extension/extension.tsp";
 import "./backcompat.tsp";
+import "./base-types/base-types.tsp";
+import "./base-types/agent.tsp";
 import "./private.decorators.tsp";
 import "./models.tsp";
 import "./operations.tsp";

@@ -6,12 +6,12 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/src/index.d.ts",
-      "default": "./dist/src/index.js"
+      "default": "./dist/src/index.js",
+      "types": "./dist/src/index.d.ts"
     },
     "./testing": {
-      "types": "./dist/src/testing/index.d.ts",
-      "default": "./dist/src/testing/index.js"
+      "default": "./dist/src/testing/index.js",
+      "types": "./dist/src/testing/index.d.ts"
     }
   },
   "scripts": {
@@ -57,7 +57,7 @@
     "unit-test": "npm-run-all --parallel unit-test:rlc unit-test:modular",
     "unit-test:rlc": "vitest run --project unit-rlc",
     "unit-test:modular": "cross-env NODE_OPTIONS=--max-old-space-size=8192 vitest run --project unit-modular",
-    "regen-docs": "npm run build && tspd doc . --enable-experimental --output-dir ../../website/src/content/docs/docs/emitters/clients/typespec-ts/reference --skip-js"
+    "regen-docs": "npm run build && tspd doc . --enable-experimental --output-dir ./website/src/content/docs/docs/emitters/clients/typespec-ts/reference --skip-js"
   },
   "author": "Jose Heredia <joheredi@microsoft.com>",
   "license": "MIT",

@@ -6,7 +6,7 @@ import { RLCModel } from "../interfaces.js";
 
 export function buildApiExtractorConfig(model: RLCModel) {
   const { packageDetails, isModularLibrary, generateTest, azureSdkForJs } = model.options || {};
-  const project = new Project({ useInMemoryFileSystem: true });
+  const project = new Project();
 
   let mainEntryPointFilePath = "dist/esm/index.d.ts";
 

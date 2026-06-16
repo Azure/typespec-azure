@@ -14,7 +14,7 @@ export function buildTsConfig(model: RLCModel) {
   const { packageDetails, azureSdkForJs } = model.options || {};
   const { generateTest, generateSample, generateReactNativeTarget } = model.options || {};
   const clientPackageName = packageDetails?.name ?? "";
-  const project = new Project({ useInMemoryFileSystem: true });
+  const project = new Project();
 
   let tsConfig: Record<string, any>;
 

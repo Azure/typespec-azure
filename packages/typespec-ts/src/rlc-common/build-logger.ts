@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { joinPaths } from "@typespec/compiler";
+import * as path from "path";
 import { Project } from "ts-morph";
 import { RLCModel } from "./interfaces.js";
 
@@ -13,10 +13,10 @@ export function buildLogger(model: RLCModel) {
   if (model.options.flavor !== "azure") {
     return undefined;
   }
-  const project = new Project({ useInMemoryFileSystem: true });
+  const project = new Project();
   const { srcPath, rlcSourceDir } = model;
   const { packageDetails } = model.options;
-  const filePath = joinPaths(
+  const filePath = path.join(
     model.options.sourceFrom === "Swagger"
       ? srcPath.substring(
           0,

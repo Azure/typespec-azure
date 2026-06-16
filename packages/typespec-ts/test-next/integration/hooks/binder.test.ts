@@ -1,4 +1,3 @@
-import { getDirectoryPath, NodeHost } from "@typespec/compiler";
 import {
   FunctionDeclarationStructure,
   InterfaceDeclarationStructure,
@@ -6,7 +5,6 @@ import {
   StructureKind,
   TypeAliasDeclarationStructure,
 } from "ts-morph";
-import { fileURLToPath } from "url";
 import { assert, beforeEach, describe, expect, it } from "vitest";
 import { Binder, provideBinder, useBinder } from "../../../src/framework/hooks/binder.js";
 
@@ -17,6 +15,7 @@ import { useDependencies } from "../../../src/framework/hooks/use-dependencies.j
 import { loadStaticHelpers, StaticHelpers } from "../../../src/framework/load-static-helpers.js";
 import { resolveReference } from "../../../src/framework/reference.js";
 import { AzurePollingDependencies } from "../../../src/modular/external-dependencies.js";
+import { getDirname } from "../../../src/utils/dirname.js";
 import {
   assertGetFunctionDeclaration,
   assertGetFunctionParameter,
@@ -29,7 +28,7 @@ import {
   assertGetVariableDeclaration,
 } from "../../utils/tsmorph-utils.js";
 
-const __dirname = getDirectoryPath(fileURLToPath(import.meta.url));
+const __dirname = getDirname(import.meta.url).__dirname;
 
 describe("Binder", () => {
   let project: Project;
@@ -332,7 +331,6 @@ describe("Binder", () => {
       };
       const staticHelperMap = await loadStaticHelpers(project, staticHelpers, {
         helpersAssetDirectory: helpersDirectory,
-        host: NodeHost,
       });
       binder = provideBinder(project, { staticHelpers: staticHelperMap });
     });

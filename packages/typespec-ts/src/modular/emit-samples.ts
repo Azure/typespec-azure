@@ -8,7 +8,8 @@ import {
   SdkModelPropertyType,
   SdkServiceOperation,
 } from "@azure-tools/typespec-client-generator-core";
-import { joinPaths, NoTarget } from "@typespec/compiler";
+import { NoTarget } from "@typespec/compiler";
+import { join } from "path";
 import { FunctionDeclarationStructure, SourceFile, StructureKind } from "ts-morph";
 import { useContext } from "../context-manager.js";
 import { resolveReference } from "../framework/reference.js";
@@ -104,13 +105,13 @@ function emitMethodSamples(
   }
   const project = useContext("outputProject");
   const operationPrefix = `${options.classicalMethodPrefix ?? ""} ${method.oriName ?? method.name}`;
-  const sampleFolder = joinPaths(
+  const sampleFolder = join(
     dpgContext.generationPathDetail?.rootDir ?? "",
     "samples-dev",
     options.subFolder ?? "",
   );
   const fileName = normalizeName(`${operationPrefix} Sample`, NameType.File);
-  const sourceFile = project.createSourceFile(joinPaths(sampleFolder, `${fileName}.ts`), "", {
+  const sourceFile = project.createSourceFile(join(sampleFolder, `${fileName}.ts`), "", {
     overwrite: true,
   });
   const exampleFunctions = [];

@@ -1,4 +1,5 @@
-import { joinPaths, normalizePath } from "@typespec/compiler";
+import { normalizePath } from "@typespec/compiler";
+import path from "path/posix";
 import {
   ImportDeclarationStructure,
   ImportSpecifierStructure,
@@ -353,7 +354,7 @@ class BinderImp implements Binder {
 
     // Also keep files that are imported by any used helper file
     const helperFiles = this.project.getSourceFiles(
-      normalizePath(joinPaths(sourceRoot, "static-helpers/**/*.*ts")),
+      normalizePath(path.join(sourceRoot, "static-helpers/**/*.*ts")),
     );
     const usedFiles = helperFiles.filter((file) => !isFileUnused(file, usedHelperNames));
     for (const usedFile of usedFiles) {
@@ -377,7 +378,7 @@ class BinderImp implements Binder {
     }
     this.project
       //normalizae the final path to adapt to different systems
-      .getSourceFiles(normalizePath(joinPaths(testRoot, "test/generated/util/**/*.*ts")))
+      .getSourceFiles(normalizePath(path.join(testRoot, "test/generated/util/**/*.*ts")))
       .filter((file) => isFileUnused(file, usedHelperNames))
       .forEach((helperFile) => helperFile.delete());
   }

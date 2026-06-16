@@ -1,15 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import {
-  EmitContext,
-  Program,
-  getBaseFileName,
-  getDirectoryPath,
-  joinPaths,
-  resolvePath,
-  type CompilerHost,
-} from "@typespec/compiler";
+import { EmitContext, Program } from "@typespec/compiler";
 import { provideContext, useContext } from "./context-manager.js";
 import { buildRootIndex, buildSubClientIndexFile } from "./modular/build-root-index.js";
 import {
@@ -87,6 +79,8 @@ import {
   createSdkContext,
   listAllServiceNamespaces,
 } from "@azure-tools/typespec-client-generator-core";
+import { existsSync } from "fs";
+import { basename, join } from "path";
 import { Project } from "ts-morph";
 import { provideBinder } from "./framework/hooks/binder.js";
 import { provideSdkTypes } from "./framework/hooks/sdk-types.js";
@@ -124,15 +118,8 @@ export async function $onEmit(context: EmitContext) {
     return;
   }
   /** Shared status */
-  const outputProject = new Project({ useInMemoryFileSystem: true });
+  const outputProject = new Project();
   const program: Program = context.program;
-  const host: CompilerHost = program.host;
-  // Derive the emitter package root from the compiler's resolved emitter entry point.
-  // This works correctly in both Node.js and the browser playground VFS.
-  const emitterRef = program.emitters.find((e) => e.metadata.name === "@azure-tools/typespec-ts");
-  const emitterPackageRoot = emitterRef
-    ? resolvePath(getDirectoryPath(emitterRef.main), "../..")
-    : undefined;
   const emitterOptions: EmitterOptions = context.options;
   const dpgContext = await createContextWithDefaultOptions(context);
 
@@ -174,8 +161,6 @@ export async function $onEmit(context: EmitContext) {
       rootDir: dpgContext.generationPathDetail?.rootDir,
       options: rlcOptions,
       program,
-      host,
-      packageRoot: emitterPackageRoot,
     },
   );
   const extraDependencies = isAzurePackage({ options: rlcOptions })
@@ -232,11 +217,10 @@ export async function $onEmit(context: EmitContext) {
     // clear output folder if needed
     if (options.clearOutputFolder) {
       // Clear output directory while preserving TempTypeSpecFiles
-      await clearDirectory(host, context.emitterOutputDir, ["TempTypeSpecFiles"], program);
+      await clearDirectory(context.emitterOutputDir, ["TempTypeSpecFiles"], program);
     }
     const hasTestFolder = await pathExists(
-      host,
-      joinPaths(dpgContext.generationPathDetail?.metadataDir ?? "", "test"),
+      join(dpgContext.generationPathDetail?.metadataDir ?? "", "test"),
     );
     options.generateTest =
       options.generateTest === true ||
@@ -248,15 +232,15 @@ export async function $onEmit(context: EmitContext) {
 
   async function calculateGenerationDir(): Promise<GenerationDirDetail> {
     const projectRoot = context.emitterOutputDir ?? "";
-    const customizationFolder = joinPaths(projectRoot, "generated");
-    const srcGeneratedFolder = joinPaths(projectRoot, "src", "generated");
+    const customizationFolder = join(projectRoot, "generated");
+    const srcGeneratedFolder = join(projectRoot, "src", "generated");
     // if customization folder exists, use it as sources root
-    const finalCustomizationFolder = (await pathExists(host, srcGeneratedFolder))
+    const finalCustomizationFolder = (await pathExists(srcGeneratedFolder))
       ? srcGeneratedFolder
       : customizationFolder;
-    const sourcesRoot = (await pathExists(host, finalCustomizationFolder))
+    const sourcesRoot = (await pathExists(finalCustomizationFolder))
       ? finalCustomizationFolder
-      : joinPaths(projectRoot, "src");
+      : join(projectRoot, "src");
     return {
       rootDir: projectRoot,
       metadataDir: projectRoot,
@@ -267,7 +251,6 @@ export async function $onEmit(context: EmitContext) {
 
   async function clearSrcFolder() {
     await emptyDir(
-      host,
       dpgContext.generationPathDetail?.modularSourcesDir ??
         dpgContext.generationPathDetail?.rlcSourcesDir ??
         "",
@@ -276,12 +259,9 @@ export async function $onEmit(context: EmitContext) {
 
   async function clearSamplesDevFolder() {
     if (emitterOptions["generate-sample"] === true) {
-      const samplesDevPath = joinPaths(
-        dpgContext.generationPathDetail?.rootDir ?? "",
-        "samples-dev",
-      );
-      if (await pathExists(host, samplesDevPath)) {
-        await emptyDir(host, samplesDevPath);
+      const samplesDevPath = join(dpgContext.generationPathDetail?.rootDir ?? "", "samples-dev");
+      if (await pathExists(samplesDevPath)) {
+        await emptyDir(samplesDevPath);
       }
     }
   }
@@ -336,7 +316,7 @@ export async function $onEmit(context: EmitContext) {
       // platform-types (and its browser/react-native variants); emit those
       // files directly under src/ (strip the static-helpers/ segment) to match
       // the RLC design where all generated output lives in src/.
-      if (!getBaseFileName(filePath).startsWith("platform-types")) {
+      if (!basename(filePath).startsWith("platform-types")) {
         continue;
       }
       const outputPath = filePath.replace(/\/static-helpers\//g, "/");
@@ -470,30 +450,27 @@ export async function $onEmit(context: EmitContext) {
     // to avoid unexpected modifications to files like package.json, README.md,
     // warp.config.yml, and snippets.spec.ts. metadata.json is still updated.
     const sourcesDir = dpgContext.generationPathDetail?.modularSourcesDir ?? "";
-    const hasManualConvenienceLayer = getBaseFileName(sourcesDir) === "generated";
+    const hasManualConvenienceLayer = basename(sourcesDir) === "generated";
     const isAzureFlavor = isAzurePackage({ options: option });
     // Generate metadata
-    const existingPackageFilePath = joinPaths(
+    const existingPackageFilePath = join(
       dpgContext.generationPathDetail?.metadataDir ?? "",
       "package.json",
     );
-    const hasPackageFile = await pathExists(host, existingPackageFilePath);
-    const existingReadmeFilePath = joinPaths(
+    const hasPackageFile = await existsSync(existingPackageFilePath);
+    const existingReadmeFilePath = join(
       dpgContext.generationPathDetail?.metadataDir ?? "",
       "README.md",
     );
-    const hasReadmeFile = await pathExists(host, existingReadmeFilePath);
-    const existingChangelogFilePath = joinPaths(
+    const hasReadmeFile = await existsSync(existingReadmeFilePath);
+    const existingChangelogFilePath = join(
       dpgContext.generationPathDetail?.metadataDir ?? "",
       "CHANGELOG.md",
     );
-    const hasChangelogFile = await pathExists(host, existingChangelogFilePath);
+    const hasChangelogFile = await existsSync(existingChangelogFilePath);
     const shouldGenerateMetadata = option.generateMetadata === true || !hasPackageFile;
-    const existingTestFolderPath = joinPaths(
-      dpgContext.generationPathDetail?.metadataDir ?? "",
-      "test",
-    );
-    const hasTestFolder = await pathExists(host, existingTestFolderPath);
+    const existingTestFolderPath = join(dpgContext.generationPathDetail?.metadataDir ?? "", "test");
+    const hasTestFolder = await existsSync(existingTestFolderPath);
     if (option.generateTest === undefined) {
       if (hasTestFolder) {
         option.generateTest = false;
@@ -534,7 +511,7 @@ export async function $onEmit(context: EmitContext) {
         option.azureSdkForJs === true &&
         emitterOptions["generate-metadata"] === true
       ) {
-        await emitTests(dpgContext, host);
+        await emitTests(dpgContext);
       }
       let modularPackageInfo = {};
       if (option.isModularLibrary) {
@@ -635,16 +612,8 @@ export async function $onEmit(context: EmitContext) {
       // Always update package.json for monorepo packages (adds #platform/* imports)
       // and for modular packages (adds exports, clientContextPaths, LRO deps)
       if (option.isModularLibrary || option.azureSdkForJs) {
-        // Read package.json content via host and pass parsed object
-        const pkgSourceFile = await host.readFile(existingPackageFilePath);
-        let packageInfo: Record<string, any>;
-        try {
-          packageInfo = JSON.parse(pkgSourceFile.text);
-        } catch {
-          packageInfo = {};
-        }
         updateBuilders.push((model: RLCModel) =>
-          updatePackageFile(model, packageInfo, modularPackageInfo),
+          updatePackageFile(model, existingPackageFilePath, modularPackageInfo),
         );
       }
 
@@ -656,13 +625,11 @@ export async function $onEmit(context: EmitContext) {
       // If the client name changed, regenerate the README and snippets completely;
       // otherwise update only the API reference link in-place.
       if (hasReadmeFile) {
-        const readmeSourceFile = await host.readFile(existingReadmeFilePath);
-        const existingReadmeContent = readmeSourceFile.text;
-        const clientNameChanged = hasClientNameChanged(rlcClient, existingReadmeContent);
+        const clientNameChanged = hasClientNameChanged(rlcClient, existingReadmeFilePath);
         updateBuilders.push(
           clientNameChanged
             ? buildReadmeFile
-            : (model: RLCModel) => updateReadmeFile(model, existingReadmeContent),
+            : (model: RLCModel) => updateReadmeFile(model, existingReadmeFilePath),
         );
 
         // Regenerate snippets.spec.ts only when the client name changed

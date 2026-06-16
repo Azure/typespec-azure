@@ -1,5 +1,6 @@
 import { SdkClientType, SdkServiceOperation } from "@azure-tools/typespec-client-generator-core";
-import { joinPaths, NoTarget } from "@typespec/compiler";
+import { NoTarget } from "@typespec/compiler";
+import { join } from "path/posix";
 import { Project, SourceFile } from "ts-morph";
 import { useContext } from "../context-manager.js";
 import { resolveReference } from "../framework/reference.js";
@@ -297,7 +298,7 @@ function exportModules(
       .getDirectories()
       .filter((dir) => {
         const formattedDir = dir.getPath().replace(/\\/g, "/");
-        const targetPath = joinPaths(srcPath, subfolder, moduleName).replace(/\\/g, "/");
+        const targetPath = join(srcPath, subfolder, moduleName).replace(/\\/g, "/");
         return formattedDir.startsWith(targetPath);
       })
       .map((dir) => {
@@ -308,17 +309,17 @@ function exportModules(
       .getDirectories()
       .filter((dir) => {
         const formattedDir = dir.getPath().replace(/\\/g, "/");
-        const targetPath = joinPaths(srcPath, subfolder, moduleName).replace(/\\/g, "/");
+        const targetPath = join(srcPath, subfolder, moduleName).replace(/\\/g, "/");
         return formattedDir.startsWith(targetPath);
       })
       .map((dir) => {
         return dir.getPath().replace(/\\/g, "/");
       });
   } else {
-    folders = [joinPaths(srcPath, subfolder, moduleName).replace(/\\/g, "/")];
+    folders = [join(srcPath, subfolder, moduleName).replace(/\\/g, "/")];
   }
   for (const folder of folders) {
-    const apiFilePattern = joinPaths(folder, "index.ts").replace(/\\/g, "/");
+    const apiFilePattern = join(folder, "index.ts").replace(/\\/g, "/");
     const modelsFile = project.getSourceFile(apiFilePattern);
     if (!modelsFile) {
       continue;

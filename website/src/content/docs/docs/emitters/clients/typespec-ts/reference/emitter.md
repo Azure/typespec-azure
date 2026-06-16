@@ -2,7 +2,7 @@
 title: "Emitter usage"
 ---
 
-## Emitter usage
+## Usage
 
 1. Via the command line
 
@@ -36,12 +36,6 @@ options:
 Defines the emitter output directory. Defaults to `{output-dir}/@azure-tools/typespec-ts`
 See [Configuring output directory for more info](https://typespec.io/docs/handbook/configuration/configuration/#configuring-output-directory)
 
-### `include-headers-in-response`
-
-**Type:** `boolean`
-
-This option is used to indicate whether to include response headers in the generated response type. When set to true, the generated response type will include response headers as properties.
-
 ### `include-shortcuts`
 
 **Type:** `boolean`
@@ -56,45 +50,35 @@ Deprecated option for RLC legacy generation.
 
 ### `batch`
 
-**Type:** `string[]`
+**Type:** `array`
 
 Deprecated option for RLC legacy generation.
 
 ### `package-details`
 
-**Type:** `object { name, scopeName, nameWithoutScope, description, version, isVersionUserProvided }`
+**Type:** `object`
 
 This is to indicate the package information such as package name, package description etc.
-
-**Properties:**
-
-| Name                    | Type      | Default | Description |
-| ----------------------- | --------- | ------- | ----------- |
-| `name`                  | `string`  |         |             |
-| `scopeName`             | `string`  |         |             |
-| `nameWithoutScope`      | `string`  |         |             |
-| `description`           | `string`  |         |             |
-| `version`               | `string`  |         |             |
-| `isVersionUserProvided` | `boolean` |         |             |
 
 ### `add-credentials`
 
 **Type:** `boolean`
 
-We support two types of authentication: Azure Key Credential(AzureKey) and Token credential(AADToken), any other will need to be handled manually.
+      We support two types of authentication: Azure Key Credential(AzureKey) and Token credential(AADToken), any other will need to be handled manually.
 
-There are two ways to set up our credential details
+      There are two ways to set up our credential details
 
-- To use `@useAuth` decorator in TypeSpec
-- To config in yaml file
+      - To use `@useAuth` decorator in TypeSpec
+      - To config in yaml file
 
-Please notice defining in TypeSpec is recommended and also has higher priority than second one.
+      Please notice defining in TypeSpec is recommended and also has higher priority than second one.
 
-To enable credential in `tspconfig.yaml` and we need to provide more details to let codegen know types.
+      To enable credential in `tspconfig.yaml` and we need to provide more details to let codegen know types.
+
 
 ### `credential-scopes`
 
-**Type:** `string[]`
+**Type:** `array`
 
 If we enable the option `add-credentials` and specify `credential-scopes` the details we would enable the AADToken authentication.
 
@@ -120,18 +104,19 @@ This option is used for special Key Auth, when the key has a shared prefix and t
 
 **Type:** `boolean`
 
-Whether to generate metadata files which includes package.json, README.md and tsconfig.json etc. Defaults to `undefined`. If there's not a package.json under package-dir, defaults to `true`. but if you'd like to disable this feature you could set it as `false`.
+      Whether to generate metadata files which includes package.json, README.md and tsconfig.json etc. Defaults to `undefined`. If there's not a package.json under emitter-output-dir, defaults to `true`. but if you'd like to disable this feature you could set it as `false`.
+
 
 ### `generate-test`
 
 **Type:** `boolean`
 
-Whether to generate test files, for basic testing of your generated sdks. Defaults to `undefined`.
-other cases:
+      Whether to generate test files, for basic testing of your generated sdks. Defaults to `undefined`.
+      other cases:
+      - If azure-sdk-for-js is `false`. Defaults to `false`.
+      - If azure-sdk-for-js is `true` but there's a test folder under emitter-output-dir. Defaults to `false`.
+      - If azure-sdk-for-js is `true` but there's not a test folder under emitter-output-dir. Defaults to `true`.
 
-- If azure-sdk-for-js is `false`. Defaults to `false`.
-- If azure-sdk-for-js is `true` but there's a test folder under package-dir. Defaults to `false`.
-- If azure-sdk-for-js is `true` but there's not a test folder under package-dir. Defaults to `true`.
 
 ### `generate-sample`
 
@@ -165,16 +150,9 @@ Deprecated option for RLC legacy generation.
 
 ### `dependency-info`
 
-**Type:** `object { link, description }`
+**Type:** `object`
 
 Deprecated option for RLC legacy generation.
-
-**Properties:**
-
-| Name          | Type     | Default | Description |
-| ------------- | -------- | ------- | ----------- |
-| `link`        | `string` |         |             |
-| `description` | `string` |         |             |
 
 ### `product-doc-link`
 
@@ -184,16 +162,9 @@ Deprecated option for RLC legacy generation.
 
 ### `service-info`
 
-**Type:** `object { title, description }`
+**Type:** `object`
 
 Deprecated option for RLC legacy generation.
-
-**Properties:**
-
-| Name          | Type     | Default | Description |
-| ------------- | -------- | ------- | ----------- |
-| `title`       | `string` |         |             |
-| `description` | `string` |         |             |
 
 ### `azure-arm`
 
@@ -210,8 +181,6 @@ Internal option, the value is default for TypeSpec generation
 ### `is-modular-library`
 
 **Type:** `boolean`
-
-**Default:** `false`
 
 Whether to generate a Modular library. Defaults to `false`. Arm packages default to `true`.
 
@@ -247,9 +216,7 @@ The flavor of the SDK.
 
 ### `module-kind`
 
-**Type:** `"esm"`
-
-**Default:** `"esm"`
+**Type:** `"esm" | "cjs"`
 
 Internal option for test.
 
@@ -258,12 +225,6 @@ Internal option for test.
 **Type:** `boolean`
 
 Whether to affect the generation of the additional property feature for the Modular client. Defaults to `false`.
-
-### `compatibility-lro`
-
-**Type:** `boolean`
-
-[deprecated] Whether to generate the legacy LRO interface. When `true`, we will generate legacy beginXXX and beginXXXAndWait LRO methods.
 
 ### `experimental-extensible-enums`
 
@@ -308,44 +269,15 @@ Deprecated option for RLC legacy generation.
 Only for Modular generation
 By default, code generation uses the titles specified in the `@client` and `@service` decorators in TypeSpec to name modular clients. If you need to override these names, you can configure the `typespec-title-map`. The map's keys represent the original client names from TypeSpec, and the values are the desired client names. This configuration supports renaming multiple clients.
 
-```yaml
-typespec-title-map:
-  AnomalyDetectorClient: AnomalyDetectorRest
-  AnomalyDetectorClient2: AnomalyDetectorRest2
-```
+      ```yaml
+      typespec-title-map:
+        AnomalyDetectorClient: AnomalyDetectorRest
+        AnomalyDetectorClient2: AnomalyDetectorRest2
+      ```
+
 
 ### `should-use-pnpm-dep`
 
 **Type:** `boolean`
 
 Internal option for test.
-
-### `ignore-nullable-on-optional`
-
-**Type:** `boolean`
-
-If an optional property is also marked as nullable, it will be treated as just optional. Defaults to `true` for Azure services.
-
-### `wrap-non-model-return`
-
-**Type:** `boolean`
-
-When set to true (default for Azure services), non-model return types (arrays, scalars, enums, bytes with binary content type) will be wrapped in an XxxResponse type for HLC backward compatibility during TypeSpec migration.
-
-### `enable-storage-compat`
-
-**Type:** `boolean`
-
-When enabled, every regular (non-LRO, non-paging) operation return type is augmented with a `_response` property containing `rawResponse` (PathUncheckedResponse), `parsedBody`, and `parsedHeaders`. Defaults to `false`.
-
-### `treat-unknown-as-record`
-
-**Type:** `boolean`
-
-When set to true, TypeSpec `unknown` type will be translated to `Record<string, unknown>` instead of `any` in the generated Modular SDK. This is useful when migrating from HLC where `unknown` in swagger mapped to `Record<string, unknown>`. (Modular SDK only) Defaults to `false`.
-
-### `generate-react-native-target`
-
-**Type:** `boolean`
-
-When set to true, generates React Native build targets (tsconfig, warp target, package.json exports). Only applicable when azure-sdk-for-js is true. Defaults to `false`.

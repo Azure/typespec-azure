@@ -1,48 +1,49 @@
-import { NoTarget, Program, resolvePath, type CompilerHost } from "@typespec/compiler";
+import { NoTarget, Program } from "@typespec/compiler";
+import { mkdir, readdir, rm, stat } from "fs/promises";
+import { resolve } from "path";
 import { reportDiagnostic } from "../lib.js";
 
-export async function pathExists(host: CompilerHost, targetPath: string): Promise<boolean> {
+export async function pathExists(targetPath: string): Promise<boolean> {
   try {
-    await host.stat(targetPath);
+    await stat(targetPath);
     return true;
   } catch {
     return false;
   }
 }
 
-export async function emptyDir(host: CompilerHost, dirPath: string): Promise<void> {
+export async function emptyDir(dirPath: string): Promise<void> {
   let entries: string[];
   try {
-    entries = await host.readDir(dirPath);
+    entries = await readdir(dirPath);
   } catch {
-    await host.mkdirp(dirPath);
+    await mkdir(dirPath, { recursive: true });
     return;
   }
 
   await Promise.all(
-    entries.map((entry) => host.rm(resolvePath(dirPath, entry), { recursive: true })),
+    entries.map((entry) => rm(resolve(dirPath, entry), { recursive: true, force: true })),
   );
 }
 
 export async function clearDirectory(
-  host: CompilerHost,
   dirPath: string,
   excludeNames: string[] = [],
   program?: Program,
 ): Promise<void> {
-  if (!(await pathExists(host, dirPath))) {
+  if (!(await pathExists(dirPath))) {
     return;
   }
 
   // If no exclude names, just use regular emptyDir for efficiency
   if (excludeNames.length === 0) {
-    await emptyDir(host, dirPath);
+    await emptyDir(dirPath);
     return;
   }
 
   try {
     // Get all subdirectories and files
-    const entries = await host.readDir(dirPath);
+    const entries = await readdir(dirPath);
 
     // Filter entries to exclude those that should be preserved
     const filteredEntries = entries.filter((entry) => {
@@ -51,8 +52,8 @@ export async function clearDirectory(
 
     // Process each entry
     for (const entry of filteredEntries) {
-      const entryPath = resolvePath(dirPath, entry);
-      await host.rm(entryPath, { recursive: true });
+      const entryPath = resolve(dirPath, entry);
+      await rm(entryPath, { recursive: true, force: true });
     }
   } catch (error) {
     // If there's an error, fall back to regular emptyDir
@@ -63,6 +64,6 @@ export async function clearDirectory(
         target: NoTarget,
       });
     }
-    await emptyDir(host, dirPath);
+    await emptyDir(dirPath);
   }
 }

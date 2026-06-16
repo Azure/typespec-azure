@@ -1,4 +1,5 @@
-import { type CompilerHost, joinPaths } from "@typespec/compiler";
+import { existsSync, rmSync } from "fs";
+import { join } from "path";
 import { SourceFile } from "ts-morph";
 import { resolveReference } from "../framework/reference.js";
 import { NameType, normalizeName } from "../rlc-common/index.js";
@@ -21,36 +22,23 @@ import { CreateRecorderHelpers } from "./static-helpers-metadata.js";
 /**
  * Clean up the test/generated folder before generating new tests
  */
-async function cleanupTestFolder(dpgContext: SdkContext, host: CompilerHost) {
+async function cleanupTestFolder(dpgContext: SdkContext) {
   const clients = dpgContext.sdkPackage.clients;
-  const baseTestFolder = joinPaths(
-    dpgContext.generationPathDetail?.rootDir ?? "",
-    "test",
-    "generated",
-  );
-
-  async function dirExists(path: string): Promise<boolean> {
-    try {
-      const s = await host.stat(path);
-      return s.isDirectory();
-    } catch {
-      return false;
-    }
-  }
+  const baseTestFolder = join(dpgContext.generationPathDetail?.rootDir ?? "", "test", "generated");
 
   // If there are multiple clients, clean up subfolders
   if (clients.length > 1) {
     for (const client of clients) {
       const subFolder = normalizeName(getClassicalClientName(client), NameType.File);
-      const clientTestFolder = joinPaths(baseTestFolder, subFolder);
-      if (await dirExists(clientTestFolder)) {
-        await host.rm(clientTestFolder, { recursive: true });
+      const clientTestFolder = join(baseTestFolder, subFolder);
+      if (existsSync(clientTestFolder)) {
+        rmSync(clientTestFolder, { recursive: true, force: true });
       }
     }
   } else {
     // Single client, clean up the entire test/generated folder
-    if (await dirExists(baseTestFolder)) {
-      await host.rm(baseTestFolder, { recursive: true });
+    if (existsSync(baseTestFolder)) {
+      rmSync(baseTestFolder, { recursive: true, force: true });
     }
   }
 }
@@ -58,14 +46,9 @@ async function cleanupTestFolder(dpgContext: SdkContext, host: CompilerHost) {
 /**
  * Helpers to emit tests similar to samples
  */
-export async function emitTests(
-  dpgContext: SdkContext,
-  host?: CompilerHost,
-): Promise<SourceFile[]> {
+export async function emitTests(dpgContext: SdkContext): Promise<SourceFile[]> {
   // Clean up the test/generated folder before generating new tests
-  if (host) {
-    await cleanupTestFolder(dpgContext, host);
-  }
+  await cleanupTestFolder(dpgContext);
 
   return iterateClientsAndMethods(dpgContext, emitMethodTests);
 }
