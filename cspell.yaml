@@ -141,6 +141,7 @@ words:
   - fcgi
   - flate
   - gofmt
+  - golangci
   - gomodtidy
   - gosym
   - iotest
