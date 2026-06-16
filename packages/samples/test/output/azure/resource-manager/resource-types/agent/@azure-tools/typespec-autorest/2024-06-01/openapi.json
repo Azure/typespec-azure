@@ -2170,29 +2170,8 @@
           "readOnly": true
         },
         "definition": {
-          "type": "object",
+          "$ref": "#/definitions/ContosoApplianceDefinition",
           "description": "Inline agent definition.",
-          "properties": {
-            "model": {
-              "type": "string",
-              "description": "Model identifier (RP-defined).",
-              "readOnly": true
-            },
-            "instructions": {
-              "type": "string",
-              "description": "System prompt / behavioral instructions for the agent.",
-              "readOnly": true
-            },
-            "modelDeploymentRef": {
-              "type": "string",
-              "description": "Optional RP-specific reference to an underlying model deployment.",
-              "readOnly": true
-            }
-          },
-          "required": [
-            "model",
-            "instructions"
-          ],
           "readOnly": true
         },
         "tools": {
@@ -2228,6 +2207,31 @@
           }
         }
       }
+    },
+    "ContosoApplianceDefinition": {
+      "type": "object",
+      "description": "Appliance deployment model of AgentDefinition.\nProperties controlled by `@baseTypeOptional` are invisible when the corresponding\ntemplate parameter is false, or read-only when present.",
+      "properties": {
+        "model": {
+          "type": "string",
+          "description": "Model identifier (RP-defined).",
+          "readOnly": true
+        },
+        "instructions": {
+          "type": "string",
+          "description": "System prompt / behavioral instructions for the agent.",
+          "readOnly": true
+        },
+        "modelDeploymentRef": {
+          "type": "string",
+          "description": "Optional RP-specific reference to an underlying model deployment.",
+          "readOnly": true
+        }
+      },
+      "required": [
+        "model",
+        "instructions"
+      ]
     },
     "ContosoConversationProperties": {
       "type": "object",
@@ -2312,26 +2316,8 @@
           "description": "Purpose/behavior summary."
         },
         "definition": {
-          "type": "object",
-          "description": "Inline agent definition.",
-          "properties": {
-            "model": {
-              "type": "string",
-              "description": "Model identifier (RP-defined)."
-            },
-            "instructions": {
-              "type": "string",
-              "description": "System prompt / behavioral instructions for the agent."
-            },
-            "modelDeploymentRef": {
-              "type": "string",
-              "description": "Optional RP-specific reference to an underlying model deployment."
-            }
-          },
-          "required": [
-            "model",
-            "instructions"
-          ]
+          "$ref": "#/definitions/ContosoPlatformDefinition",
+          "description": "Inline agent definition."
         },
         "tools": {
           "type": "array",
@@ -2365,6 +2351,28 @@
           }
         }
       }
+    },
+    "ContosoPlatformDefinition": {
+      "type": "object",
+      "description": "Platform deployment model of AgentDefinition.\nProperties controlled by `@baseTypeOptional` are invisible when the corresponding\ntemplate parameter is false, or have default visibility when present.",
+      "properties": {
+        "model": {
+          "type": "string",
+          "description": "Model identifier (RP-defined)."
+        },
+        "instructions": {
+          "type": "string",
+          "description": "System prompt / behavioral instructions for the agent."
+        },
+        "modelDeploymentRef": {
+          "type": "string",
+          "description": "Optional RP-specific reference to an underlying model deployment."
+        }
+      },
+      "required": [
+        "model",
+        "instructions"
+      ]
     },
     "ContosoResponseProperties": {
       "type": "object",

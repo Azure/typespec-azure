@@ -18,7 +18,9 @@ using Azure.ResourceManager;
 using Azure.ResourceManager.BaseTypes;
 using Azure.ResourceManager.BaseTypes.Agents;
 
-model MyAgentProperties is AgentPropertiesPlatform {
+model MyDefinition is AgentDefinitionPlatform<true, true> {}
+
+model MyAgentProperties is AgentPropertiesPlatform<MyDefinition> {
   ...DefaultProvisioningStateProperty;
 }
 

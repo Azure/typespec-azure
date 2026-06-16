@@ -25,6 +25,24 @@ enum Versions {
 }
 
 // ============================================================================
+// Agent Definition models
+// ============================================================================
+
+// AgentDefinitionAppliance: Use for the Appliance deployment model where the service
+// owns and reports agent configuration. All definition fields are read-only.
+// AgentDefinitionPlatform: Use for the Platform deployment model where the client
+// owns and manages agent configuration. Definition fields are writable.
+// Template params control optional definition fields:
+//   HasModelDeploymentRef: include a modelDeploymentRef property
+//   HasInstructions: include an instructions property
+
+// Appliance definition: read-only fields managed by the service
+model ContosoApplianceDefinition is AgentDefinitionAppliance<true, true>;
+
+// Platform definition: writable fields managed by the client
+model ContosoPlatformDefinition is AgentDefinitionPlatform<true, true>;
+
+// ============================================================================
 // Agent Properties models
 // ============================================================================
 
@@ -33,21 +51,13 @@ enum Versions {
 // AgentPropertiesPlatform: Use when the client owns and manages the agent configuration.
 // Properties are writable (except baseTypes, which is always ARM-managed and read-only).
 
-// Appliance agent properties: service-managed, read-only.
-// AgentDefinitionAppliance template params control optional definition fields:
-//   HasModelDeploymentRef: include a modelDeploymentRef property
-//   HasInstructions: include an instructions property
-model ContosoApplianceAgentProperties
-  is AgentPropertiesAppliance<AgentDefinitionAppliance<true, true>> {
+// Appliance agent properties: service-managed, read-only
+model ContosoApplianceAgentProperties is AgentPropertiesAppliance<ContosoApplianceDefinition> {
   ...DefaultProvisioningStateProperty;
 }
 
-// Platform agent properties: client-managed, writable.
-// AgentDefinitionPlatform template params control optional definition fields:
-//   HasModelDeploymentRef: include a modelDeploymentRef property
-//   HasInstructions: include an instructions property
-model ContosoPlatformAgentProperties
-  is AgentPropertiesPlatform<AgentDefinitionPlatform<true, true>> {
+// Platform agent properties: client-managed, writable
+model ContosoPlatformAgentProperties is AgentPropertiesPlatform<ContosoPlatformDefinition> {
   ...DefaultProvisioningStateProperty;
 }
 
@@ -74,7 +84,7 @@ model ContosoPlatformAgent is Agent<ContosoPlatformAgentProperties> {
 // Conversation and Response child resources
 // ============================================================================
 
-// Conversation and Response are required child resources of an Agent.
+// Conversation and Response are required proxy child resources of an Agent.
 // Each must have full CRUD lifecycle operations (create, read, update, delete).
 // ConversationProperties and ResponseProperties provide the base fields;
 // extend them with RP-specific properties as needed.
@@ -95,24 +105,24 @@ model ContosoResponseProperties is ResponseProperties {
 
 @@visibility(ContosoResponseProperties.previous_response_id, Lifecycle.Read);
 
-// Conversation child of the Appliance agent
+// Conversation proxy child resource of the Appliance agent
 model ApplianceConversation
   is AgentConversation<ContosoConversationProperties, ContosoApplianceAgent> {
   ...ResourceNameParameter<ApplianceConversation>;
 }
 
-// Response child of the Appliance agent
+// Response proxy child resource of the Appliance agent
 model ApplianceResponse is AgentResponse<ContosoResponseProperties, ContosoApplianceAgent> {
   ...ResourceNameParameter<ApplianceResponse>;
 }
 
-// Conversation child of the Platform agent
+// Conversation proxy child resource of the Platform agent
 model PlatformConversation
   is AgentConversation<ContosoConversationProperties, ContosoPlatformAgent> {
   ...ResourceNameParameter<PlatformConversation>;
 }
 
-// Response child of the Platform agent
+// Response proxy child resource of the Platform agent
 model PlatformResponse is AgentResponse<ContosoResponseProperties, ContosoPlatformAgent> {
   ...ResourceNameParameter<PlatformResponse>;
 }
@@ -123,8 +133,8 @@ model PlatformResponse is AgentResponse<ContosoResponseProperties, ContosoPlatfo
 
 interface Operations extends Azure.ResourceManager.Operations {}
 
-// ARM resource operations for tracked and proxy resources use operation templates.
-// See: https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/reference/interfaces
+// ARM resource operations use operation templates for standard CRUD patterns.
+// See: https://azure.github.io/typespec-azure/docs/howtos/arm/resource-operations/
 
 // Appliance agent operations
 @armResourceOperations
@@ -148,10 +158,10 @@ interface PlatformAgents {
   listByResourceGroup is ArmResourceListByParent<ContosoPlatformAgent>;
 }
 
-// Conversation and Response child resources require create, read, update, and delete
-// lifecycle operations. Omitting any of these will trigger the
+// Conversation and Response proxy child resources require create, read, update, and
+// delete lifecycle operations. Omitting any of these will trigger the
 // arm-agent-base-type-lifecycle-operations linting rule.
-// See: https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/reference/interfaces
+// See: https://azure.github.io/typespec-azure/docs/howtos/arm/resource-operations/
 
 // Appliance conversation operations (CRUD required)
 @armResourceOperations
