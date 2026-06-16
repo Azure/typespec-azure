@@ -1,9 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 //
-// Runs `go test ./...` under every directory below test/local/ that contains
-// `_test.go` files. Assumes the tsp-spector mock server is already running;
-// use `pnpm spector --start`/`--stop` (see spector.js) to manage it.
+// Runs `go test ./...` under every directory below test/local/,
+// test/http-specs/ and test/azure-http-specs/ that contains `_test.go` files.
+// Assumes the tsp-spector mock server is already running; use
+// `pnpm spector --start`/`--stop` (see spector.js) to manage it.
 
 import { spawnSync } from "child_process";
 import { existsSync, readdirSync, statSync } from "fs";
@@ -12,7 +13,9 @@ import { fileURLToPath } from "url";
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const pkgRoot = resolve(scriptDir, "..");
-const testLocal = resolve(pkgRoot, "test", "local");
+const testRoots = ["test/local", "test/http-specs", "test/azure-http-specs"].map((d) =>
+  resolve(pkgRoot, d),
+);
 
 function findTestDirs(root) {
   const dirs = new Set();
@@ -28,8 +31,8 @@ function findTestDirs(root) {
   return [...dirs].sort();
 }
 
-const dirs = findTestDirs(testLocal);
-console.log(`Discovered ${dirs.length} go test directories under ${testLocal}`);
+const dirs = testRoots.flatMap((root) => findTestDirs(root));
+console.log(`Discovered ${dirs.length} go test directories under ${testRoots.join(", ")}`);
 
 let failed = false;
 for (const dir of dirs) {
