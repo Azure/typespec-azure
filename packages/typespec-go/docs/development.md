@@ -13,9 +13,6 @@ The emitter is composed of several sub-packages that live alongside it under `sr
 - `src/tcgcadapter` — adapts the [TypeSpec Client Generator Core](https://github.com/Azure/typespec-azure/tree/main/packages/typespec-client-generator-core)
   (TCGC) output into the code model.
 
-> These sub-packages were previously published from `Azure/autorest.go`. They are now vendored
-> into this package and maintained here; the copies under `Azure/autorest.go` are frozen.
-
 This guide outlines the steps to contributing to the emitter.
 
 ## Table of Contents
@@ -125,8 +122,7 @@ To run `golangci-lint` (and `shadow`) against every generated Go module under `t
 pnpm lint:go
 ```
 
-`golangci-lint` and `shadow` must be available on your `PATH`. CI installs them for you, but
-for local runs you need to install them yourself, matching the versions CI uses (see
+`golangci-lint` and `shadow` must be available on your `PATH`. For local runs you need to install them yourself, matching the versions CI uses (see
 `.github/workflows/ci-go.yml`):
 
 ```terminal
