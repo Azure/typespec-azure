@@ -103,7 +103,7 @@ model ContosoResponseProperties is ResponseProperties {
   ...DefaultProvisioningStateProperty;
 }
 
-@@visibility(ContosoResponseProperties.previous_response_id, Lifecycle.Read);
+@@visibility(ContosoResponseProperties.previousResponseId, Lifecycle.Read);
 
 // Conversation proxy child resource of the Appliance agent
 model ApplianceConversation

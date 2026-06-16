@@ -1779,7 +1779,7 @@ model Azure.ResourceManager.BaseTypes.Agents.InputTypeProperty
 
 ### `PreviousResponseProperty` {#Azure.ResourceManager.BaseTypes.Agents.PreviousResponseProperty}
 
-Mix-in for the previous_response_id property.
+Mix-in for the previousResponseId property.
 
 ```typespec
 model Azure.ResourceManager.BaseTypes.Agents.PreviousResponseProperty
@@ -1787,9 +1787,9 @@ model Azure.ResourceManager.BaseTypes.Agents.PreviousResponseProperty
 
 #### Properties
 
-| Name                  | Type     | Description                                                            |
-| --------------------- | -------- | ---------------------------------------------------------------------- |
-| previous_response_id? | `string` | ID of a previous response for multi-turn chaining. Writable on create. |
+| Name                | Type     | Description                                                            |
+| ------------------- | -------- | ---------------------------------------------------------------------- |
+| previousResponseId? | `string` | ID of a previous response for multi-turn chaining. Writable on create. |
 
 ### `ResponseInstructionsProperty` {#Azure.ResourceManager.BaseTypes.Agents.ResponseInstructionsProperty}
 

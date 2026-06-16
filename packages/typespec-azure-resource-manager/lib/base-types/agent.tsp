@@ -304,11 +304,10 @@ model ResponseOutputProperty {
   output: ResponseOutputItem[];
 }
 
-/** Mix-in for the previous_response_id property. */
+/** Mix-in for the previousResponseId property. */
 model PreviousResponseProperty {
   /** ID of a previous response for multi-turn chaining. Writable on create. */
-  #suppress "@azure-tools/typespec-azure-core/casing-style" "Wire property name"
-  previous_response_id?: string;
+  previousResponseId?: string;
 }
 
 /** Mix-in for response instructions. */

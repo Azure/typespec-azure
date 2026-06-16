@@ -2402,7 +2402,7 @@
           "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.InputMessage",
           "description": "Content input to the model. Required on create."
         },
-        "previous_response_id": {
+        "previousResponseId": {
           "type": "string",
           "description": "ID of a previous response for multi-turn chaining. Writable on create.",
           "readOnly": true
