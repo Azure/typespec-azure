@@ -2060,7 +2060,7 @@ function getSerializationExpressionForFlatten(
   );
   const optionalPrefix = property.optional
     ? `${resolveReference(SerializationHelpers.areAllPropsUndefined)}(${propertyPath}, [${validProps
-        .map((p) => `"${p.name}"`)
+        .map((p) => normalizeModelPropertyName(context, p))
         .join(", ")}]) ? undefined : `
     : "";
   return `${optionalPrefix}${serializeFunctionName}(${propertyPath})`;
