@@ -1,8 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 //
-// Runs golangci-lint and shadow against every Go module under test/local/.
-// Expects golangci-lint and `shadow` to be available on PATH (installed by CI).
+// Runs golangci-lint and shadow against every Go module (a directory containing
+// a go.mod) under test/local/, test/http-specs/ and test/azure-http-specs/.
+// Discovery is module-based so directories holding hand-written tests for specs
+// currently disabled in tspcompile.js -- which have no generated code or go.mod
+// after a fresh regenerate -- are skipped. Expects golangci-lint and `shadow`
+// to be available on PATH (installed by CI).
 
 import { spawnSync } from "child_process";
 import { existsSync, readdirSync, statSync } from "fs";
@@ -11,20 +15,23 @@ import { fileURLToPath } from "url";
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const pkgRoot = resolve(scriptDir, "..");
-const testLocal = resolve(pkgRoot, "test", "local");
+const testRoots = ["test/local", "test/http-specs", "test/azure-http-specs"].map((d) =>
+  resolve(pkgRoot, d),
+);
 
+// Finds module roots (directories containing a go.mod) under `root`. Does not
+// descend into a module once found, so nested submodules are covered by their
+// parent's `./...` invocation.
 function findModuleDirs(root) {
   const dirs = new Set();
   if (!existsSync(root)) return [];
   const walk = (dir) => {
-    for (const entry of readdirSync(dir)) {
-      const p = resolve(dir, entry);
-      if (entry === "go.mod" && !statSync(p).isDirectory()) {
-        dirs.add(dir);
-        return;
-      }
+    const entries = readdirSync(dir);
+    if (entries.some((e) => e === "go.mod" && !statSync(resolve(dir, e)).isDirectory())) {
+      dirs.add(dir);
+      return;
     }
-    for (const entry of readdirSync(dir)) {
+    for (const entry of entries) {
       const p = resolve(dir, entry);
       if (statSync(p).isDirectory()) walk(p);
     }
@@ -33,8 +40,8 @@ function findModuleDirs(root) {
   return [...dirs].sort();
 }
 
-const dirs = findModuleDirs(testLocal);
-console.log(`Linting ${dirs.length} go modules under ${testLocal}`);
+const dirs = testRoots.flatMap((root) => findModuleDirs(root));
+console.log(`Linting ${dirs.length} go modules under ${testRoots.join(", ")}`);
 
 let failed = false;
 for (const dir of dirs) {
