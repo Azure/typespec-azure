@@ -59,14 +59,15 @@ From the repo root, install all dependencies:
 pnpm install
 ```
 
-Then build the emitter. To build just this package, navigate to it first:
+Then build the emitter with Turbo. Building through Turbo (rather than calling `tsc`
+directly) ensures the package's workspace dependencies are built first and lets Turbo
+cache unchanged builds:
 
 ```terminal
-cd packages/typespec-go
-pnpm build
+npx turbo run build --filter=@azure-tools/typespec-go
 ```
 
-Use `pnpm watch` to rebuild on change while you work.
+Use `pnpm watch` from the repo root to rebuild on change while you work.
 
 ## Step 3: Regenerate tests
 
