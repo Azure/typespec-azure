@@ -25,9 +25,9 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - Support suppression comments, baseline files, and incremental linting for PR workflows
 
 **User Stories:**
-- *As a service team member*, I can run TypeSpec linting locally and get the same results as CI, so I fix issues before pushing.
+- *As a service team*, I can run TypeSpec linting locally and get the same results as CI, so I fix issues before pushing.
 - *As a spec reviewer*, I see clear, actionable lint errors in PR checks with suggested fixes, reducing back-and-forth with authors.
-- *As a service team member*, I can suppress specific lint warnings with inline comments and a justification, without disabling entire rule categories.
+- *As a service team*, I can suppress specific lint warnings with inline comments and a justification, without disabling entire rule categories.
 
 **Metrics:**
 | Metric | Baseline | Target |
@@ -46,9 +46,9 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - Integrate into CI pipelines as a required check
 
 **User Stories:**
-- *As a service team member*, I get immediate feedback when my change introduces a breaking API contract change, with an explanation of what broke and why.
+- *As a service team*, I get immediate feedback when my change introduces a breaking API contract change, with an explanation of what broke and why.
 - *As a spec reviewer*, I can see a clear diff of API surface changes (not just source changes) to assess compatibility impact.
-- *As a service team member*, I can mark intentional breaking changes with version bumps and have the tool recognize them as expected.
+- *As a service team*, I can mark intentional breaking changes with version bumps and have the tool recognize them as expected.
 
 **Metrics:**
 | Metric | Baseline | Target |
@@ -68,8 +68,8 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - New processes to identify which examples need updating when spec changes occur
 
 **User Stories:**
-- *As a service team member*, I can auto-generate valid JSON examples for my operations from TypeSpec, rather than hand-crafting them against OpenAPI output.
-- *As a service team member*, I only need to provide new/updated examples for operations that actually changed in my API version, not re-validate the entire set.
+- *As a service team*, I can auto-generate valid JSON examples for my operations from TypeSpec, rather than hand-crafting them against OpenAPI output.
+- *As a service team*, I only need to provide new/updated examples for operations that actually changed in my API version, not re-validate the entire set.
 - *As a spec reviewer*, I can validate that all submitted examples conform to the TypeSpec-defined contract with a single command.
 - *As a CI pipeline*, I can identify exactly which examples are stale after a spec change and report only those.
 
@@ -109,7 +109,7 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - Consistent formatting across all CI check types (lint, breaking changes, examples, SDK generation)
 
 **User Stories:**
-- *As a service team member*, I can quickly determine the steps needed to fix any reported CI issues without wading through verbose or cryptic log output.
+- *As a service team*, I can quickly determine the steps needed to fix any reported CI issues without wading through verbose or cryptic log output.
 
 **Metrics:**
 | Metric | Baseline | Target |
@@ -126,7 +126,7 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - Provide dashboards or reports showing suppression health across the spec repo
 
 **User Stories:**
-- *As a service team member*, I can find and correct all issues with downstream artifacts before check-in, reducing costly post-check-in discovery of issues.
+- *As a service team*, I have confidence that all CI checks are actively maintained — nothing is silently broken or permanently suppressed without accountability.
 
 **Metrics:**
 | Metric | Baseline | Target |
@@ -142,7 +142,7 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - Ensure service teams address important SDK-facing issues before check-in rather than suppressing them
 
 **User Stories:**
-- *As a service team member*, I can find and correct important SDK-facing issues before check-in rather than inadvertently suppressing them.
+- *As a service team*, I am guided to fix important SDK-facing issues before check-in rather than inadvertently suppressing them.
 - *As an SDK team*, I avoid costly spec corrections to enable SDK generation post-check-in because lint suppressions that affect SDK output are reviewed before merge.
 
 **Metrics:**
@@ -165,8 +165,8 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - Inline validation and quick-fix suggestions
 
 **User Stories:**
-- *As a service team member*, I can describe my API intent in natural language and get a correct TypeSpec scaffolding with appropriate decorators and patterns.
-- *As a service team member*, I get real-time suggestions that match Azure conventions (e.g., correct LRO patterns, proper error models) as I type.
+- *As a service team*, I can describe my API intent in natural language and get a correct TypeSpec scaffolding with appropriate decorators and patterns.
+- *As a service team*, I get real-time suggestions that match Azure conventions (e.g., correct LRO patterns, proper error models) as I type.
 - *As a new TypeSpec author*, I can ask the AI what decorator or template to use for my scenario and get a working example inline.
 
 **Metrics:**
@@ -185,9 +185,9 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - Generate version diff reports for review
 
 **User Stories:**
-- *As a service team member*, I can create a new API version by specifying what changed, and the tool generates the correct versioning decorators and structure.
+- *As a service team*, I can create a new API version by specifying what changed, and the tool generates the correct versioning decorators and structure.
 - *As a spec reviewer*, I get a clear report showing exactly what was added, removed, or changed between API versions.
-- *As a service team member*, I can promote a preview API version to GA with a single command that handles all the version bookkeeping.
+- *As a service team*, I can promote a preview API version to GA with a single command that handles all the version bookkeeping.
 
 **Metrics:**
 | Metric | Baseline | Target |
@@ -205,7 +205,7 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - Detect and suggest refactoring opportunities (e.g., migrate to newer ARM templates)
 
 **User Stories:**
-- *As a service team member*, I can run a single command to check if my spec follows all current Azure best practices, with actionable suggestions for improvements.
+- *As a service team*, I can run a single command to check if my spec follows all current Azure best practices, with actionable suggestions for improvements.
 - *As a service team maintaining legacy specs*, I get automated suggestions to simplify my spec using newer patterns, with confidence that the API contract is preserved.
 
 **Metrics:**
@@ -226,7 +226,7 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - Ensure documentation quality is sufficient to improve AI tool performance when using docs as context
 
 **User Stories:**
-- *As a new service team member*, I can find TypeSpec-first guidance in all official documentation, so I don't start with deprecated OpenAPI patterns.
+- *As a new service team*, I can find TypeSpec-first guidance in all official documentation, so I don't start with deprecated OpenAPI patterns.
 - *As a service team writing a data plane API*, I can find complete, working samples for common patterns (LRO, paging, error handling, auth) that are REST API Guideline compliant, so I don't reinvent them.
 - *As a service team writing an ARM resource*, I can find clear documentation for every common ARM pattern (CRUD, async operations, child resources, scoped resources) with copy-paste-ready templates.
 - *As an AI tool assisting spec authoring*, I can reference high-quality documentation and samples as context, producing more accurate suggestions with fewer hallucinations.
@@ -250,7 +250,7 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 
 **User Stories:**
 - *As a platform team*, I can roll out a new pattern (e.g., new error model template) across hundreds of specs automatically with a transformation rule.
-- *As a service team member*, I can run a migration tool that updates my spec to use the latest patterns while preserving my API contract and authoring style.
+- *As a service team*, I can run a migration tool that updates my spec to use the latest patterns while preserving my API contract and authoring style.
 - *As a library author*, I can deprecate an old pattern and provide an automated codemod that migrates consumers.
 
 **Metrics:**
@@ -405,7 +405,7 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - TypeSpec-native scope for versioning that goes beyond current `@added`/`@removed`
 
 **User Stories:**
-- *As a service team member*, I can express complex version evolution (e.g., "this parameter was optional in v1, required in v2, and removed in v3") cleanly in TypeSpec.
+- *As a service team*, I can express complex version evolution (e.g., "this parameter was optional in v1, required in v2, and removed in v3") cleanly in TypeSpec.
 - *As a library author*, I can version my template instantiations to easily reflect API evolution.
 - *As a spec author*, I can express "this feature is available in versions 2023-01-01 through 2024-06-01" with a single decorator.
 
@@ -448,8 +448,8 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - Provide simpler abstractions for common patterns (LRO, paging, error handling)
 
 **User Stories:**
-- *As a service team member*, I can define a long-running operation in 3-5 lines instead of 15+, using a simplified LRO function.
-- *As a service team member*, I can read my own spec 6 months later and understand it without cross-referencing template documentation.
+- *As a service team*, I can define a long-running operation in 3-5 lines instead of 15+, using a simplified LRO function.
+- *As a service team*, I can read my own spec 6 months later and understand it without cross-referencing template documentation.
 - *As a new Azure service team*, I can get started with a correct, minimal spec in under an hour using simplified patterns.
 
 **Metrics:**
@@ -469,9 +469,9 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - Make ARM-specific patterns (singleton resources, child resources, scoped resources) more intuitive
 
 **User Stories:**
-- *As a service team member*, I can define a standard ARM resource with CRUD operations in under 10 lines of TypeSpec.
-- *As a service team member*, I can use merge-patch update semantics without manually constructing the patch model.
-- *As a service team member*, I can model singleton and child resources with obvious, discoverable patterns.
+- *As a service team*, I can define a standard ARM resource with CRUD operations in under 10 lines of TypeSpec.
+- *As a service team*, I can use merge-patch update semantics without manually constructing the patch model.
+- *As a service team*, I can model singleton and child resources with obvious, discoverable patterns.
 
 **Metrics:**
 | Metric | Baseline | Target |
@@ -547,7 +547,7 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 
 ### Spec Rollout Tools
 
-- Tools for rolling out TypeSpec changes into the spec repo at scale
+- Orchestration and process tooling for rolling out TypeSpec changes into the spec repo at scale (leveraging the TypeSpec-to-TypeSpec source emitter from §2 as the transformation engine)
 - Automated PR generation for bulk migrations
 - Impact analysis before rolling out breaking changes
 
@@ -591,8 +591,8 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - Include boilerplate for auth, middleware, and observability
 
 **User Stories:**
-- *As a service team member*, I can generate a working service skeleton from my TypeSpec spec with all routes, models, and middleware scaffolded.
-- *As a service team member*, the generated stub includes correct auth, logging, and health-check boilerplate so I can focus on business logic.
+- *As a service team*, I can generate a working service skeleton from my TypeSpec spec with all routes, models, and middleware scaffolded.
+- *As a service team*, the generated stub includes correct auth, logging, and health-check boilerplate so I can focus on business logic.
 
 **Metrics:**
 | Metric | Baseline | Target |
@@ -608,8 +608,8 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - Load test scaffolding based on API shape and expected usage patterns
 
 **User Stories:**
-- *As a service team member*, I get a suite of contract tests generated from my spec that I can run against my implementation to verify conformance.
-- *As a service team member*, I can generate load test scaffolding that exercises all my endpoints with realistic payloads.
+- *As a service team*, I get a suite of contract tests generated from my spec that I can run against my implementation to verify conformance.
+- *As a service team*, I can generate load test scaffolding that exercises all my endpoints with realistic payloads.
 
 **Metrics:**
 | Metric | Baseline | Target |
@@ -625,7 +625,7 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - Integration with CI/CD for continuous conformance
 
 **User Stories:**
-- *As a service team member*, I can point a validator at my running service and get a report of where my implementation deviates from the spec.
+- *As a service team*, I can point a validator at my running service and get a report of where my implementation deviates from the spec.
 - *As a CI pipeline*, I can block deployments that don't conform to the published spec.
 
 **Metrics:**
@@ -705,7 +705,7 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
   - Potentially the REST library
 
 **User Stories:**
-- *As a service team member*, every Azure API pattern I need is supported natively—I never need custom workarounds for standard patterns.
+- *As a service team*, every Azure API pattern I need is supported natively—I never need custom workarounds for standard patterns.
 - *As a TypeSpec maintainer*, I have clear 1.0 criteria and can track progress toward release readiness.
 
 **Metrics:**
@@ -745,8 +745,8 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - Better modeling for complex resource relationships and dependencies
 
 **User Stories:**
-- *As a service team member*, I can model new ARM resource lifecycle patterns (e.g., async provisioning with dependencies) without custom workarounds.
-- *As a service team member*, common-types covers my needs so I don't redefine standard models.
+- *As a service team*, I can model new ARM resource lifecycle patterns (e.g., async provisioning with dependencies) without custom workarounds.
+- *As a service team*, common-types covers my needs so I don't redefine standard models.
 
 **Metrics:**
 | Metric | Baseline | Target |
@@ -763,7 +763,7 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 
 **User Stories:**
 - *As a service team building a streaming API*, I can model my SSE/WebSocket endpoint in TypeSpec and get correct client generation.
-- *As a service team member*, I can express streaming semantics (chunked responses, event types, connection lifecycle) directly in my spec.
+- *As a service team*, I can express streaming semantics (chunked responses, event types, connection lifecycle) directly in my spec.
 
 **Metrics:**
 | Metric | Baseline | Target |
@@ -798,8 +798,8 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - API gateway and aggregation patterns
 
 **User Stories:**
-- *As a service team member*, I can model webhooks, event subscriptions, and batch operations using standard TypeSpec patterns rather than custom extensions.
-- *As a service team member*, multi-tenant and cross-region patterns have first-class support so my spec accurately represents my service's behavior.
+- *As a service team*, I can model webhooks, event subscriptions, and batch operations using standard TypeSpec patterns rather than custom extensions.
+- *As a service team*, multi-tenant and cross-region patterns have first-class support so my spec accurately represents my service's behavior.
 
 **Metrics:**
 | Metric | Baseline | Target |
