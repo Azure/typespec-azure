@@ -842,8 +842,7 @@ export function normalizeModelName(
   }
   const namespacePrefix = context.rlcOptions?.enableModelNamespace ? segments.join("") : "";
   const internalModelPrefix =
-    (isPagedResultModel(context, type) && !pagedModelsKeptPublic.has(type)) ||
-    type.isGeneratedName
+    (isPagedResultModel(context, type) && !pagedModelsKeptPublic.has(type)) || type.isGeneratedName
       ? "_"
       : "";
   return `${internalModelPrefix}${normalizeName(namespacePrefix + type.name, nameType, true)}${unionSuffix}`;
