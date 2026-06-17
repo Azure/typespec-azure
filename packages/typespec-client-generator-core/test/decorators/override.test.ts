@@ -548,7 +548,7 @@ it("remove optional query param and add secret name", async () => {
 });
 
 it("reports diagnostic when override parameter is missing @path", async () => {
-  const [_, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+  const { program } = await SimpleBaseTester.compile(
     createClientCustomizationInput(
       `
     @service
@@ -566,7 +566,8 @@ it("reports diagnostic when override parameter is missing @path", async () => {
     `,
     ),
   );
-  expectDiagnostics(diagnostics, {
+  const context = await createSdkContextForTester(program);
+  expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/override-parameters-mismatch",
   });
 });
