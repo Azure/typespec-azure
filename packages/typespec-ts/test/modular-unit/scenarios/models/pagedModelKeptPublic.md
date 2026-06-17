@@ -8,25 +8,30 @@ import "@typespec/rest";
 import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
+
 using TypeSpec.Http;
 using TypeSpec.Rest;
 using TypeSpec.Versioning;
 using Azure.Core;
 using Azure.ResourceManager;
+
 @armProviderNamespace
 @service
 @versioned(Versions)
 @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
 namespace Microsoft.Test;
+
 enum Versions {
   v2023_12_01: "2023-12-01",
 }
+
 model TestResource is TrackedResource<TestProperties> {
   @key("testName")
   @path
   @segment("tests")
   name: string;
 }
+
 model TestProperties {
   state?: string;
 }
@@ -38,6 +43,7 @@ model UsageListResult {
   @pageItems
   value?: Usage[];
 }
+
 model Usage {
   test?: string;
 }
@@ -195,27 +201,33 @@ import "@typespec/rest";
 import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
+
 using TypeSpec.Http;
 using TypeSpec.Rest;
 using TypeSpec.Versioning;
 using Azure.Core;
 using Azure.ResourceManager;
+
 @armProviderNamespace
 @service
 @versioned(Versions)
 @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
 namespace Microsoft.Test;
+
 enum Versions {
   v2023_12_01: "2023-12-01",
 }
+
 model TestResource is TrackedResource<TestProperties> {
   @key("testName")
   @path
   @segment("tests")
   name: string;
 }
+
 model TestProperties {
   state?: string;
+
   /** List of language extensions. */
   languageExtensions?: LanguageExtensionsList;
 }
