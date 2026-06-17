@@ -6,11 +6,9 @@ import {
 } from "./internal-utils.js";
 
 // `api-version` accepts either a string (single service / `latest` / `all`) or a
-// map from service namespace full name to version (multi-service). ajv rejects a
-// top-level `nullable` next to `anyOf`, so it is declared on each branch and the
-// schema is cast to satisfy the strongly-typed options schema.
+// map from service namespace full name to version (multi-service).
 const apiVersionSchema = {
-  anyOf: [
+  oneOf: [
     {
       type: "string",
       nullable: true,
