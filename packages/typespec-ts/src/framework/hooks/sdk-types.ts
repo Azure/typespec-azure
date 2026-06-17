@@ -23,10 +23,11 @@ export const flattenPropertyModelMap: Map<SdkModelPropertyType, SdkModelType> = 
   SdkModelType
 >();
 /**
- * Set of paged result models that are also used in non-paging operations.
+ * Set of paged result models that should keep their public name (no "_" prefix).
+ * This includes models used as non-paging method responses or as model properties.
  * Precomputed during visitPackageTypes for O(1) lookups in normalizeModelName.
  */
-export const pagedModelsUsedInNonPagingOps = new Set<SdkType>();
+export const pagedModelsKeptPublic = new Set<SdkType>();
 
 export interface SdkTypeContext {
   operations: Map<Type, SdkServiceMethod<SdkHttpOperation>>;

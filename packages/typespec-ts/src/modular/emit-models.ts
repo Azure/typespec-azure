@@ -45,7 +45,7 @@ import {
   emitQueue,
   flattenPropertyModelMap,
   getAllOperationsFromClient,
-  pagedModelsUsedInNonPagingOps,
+  pagedModelsKeptPublic,
 } from "../framework/hooks/sdk-types.js";
 import { refkey } from "../framework/refkey.js";
 import { reportDiagnostic } from "../lib.js";
@@ -842,7 +842,7 @@ export function normalizeModelName(
   }
   const namespacePrefix = context.rlcOptions?.enableModelNamespace ? segments.join("") : "";
   const internalModelPrefix =
-    (isPagedResultModel(context, type) && !pagedModelsUsedInNonPagingOps.has(type)) ||
+    (isPagedResultModel(context, type) && !pagedModelsKeptPublic.has(type)) ||
     type.isGeneratedName
       ? "_"
       : "";
@@ -933,7 +933,7 @@ export function visitPackageTypes(context: SdkContext) {
   const { sdkPackage } = context;
   emitQueue.clear();
   flattenPropertyModelMap.clear();
-  pagedModelsUsedInNonPagingOps.clear();
+  pagedModelsKeptPublic.clear();
   // Add all models in the package to the emit queue
   for (const model of sdkPackage.models) {
     visitType(context, model);
@@ -1016,7 +1016,19 @@ function trackPagedModelInNonPagingMethod(
   if (method.kind !== "basic" && method.kind !== "lro") return;
   const respType = method.response.type;
   if (respType && isPagedResultModel(context, respType)) {
-    pagedModelsUsedInNonPagingOps.add(respType);
+    pagedModelsKeptPublic.add(respType);
+  }
+}
+
+/**
+ * If a paged result model is used as a model property type, mark it so that
+ * normalizeModelName keeps it public (no "_" prefix).
+ */
+function trackPagedModelUsedAsProperty(context: SdkContext, type: SdkType): void {
+  // Unwrap array types to check the element type
+  const resolved = type.kind === "array" ? type.valueType : type;
+  if (resolved && isPagedResultModel(context, resolved)) {
+    pagedModelsKeptPublic.add(resolved);
   }
 }
 
@@ -1045,6 +1057,10 @@ function visitType(context: SdkContext, type: SdkType | undefined) {
       if (property.flatten && property.type.kind === "model") {
         flattenPropertyModelMap.set(property, type);
       }
+      // If a paged result model is used as a model property (not as a paging
+      // operation response), it must stay public (no "_" prefix) because users
+      // interact with it directly through the property.
+      trackPagedModelUsedAsProperty(context, property.type);
     }
     if (type.discriminatedSubtypes) {
       for (const subType of Object.values(type.discriminatedSubtypes)) {
