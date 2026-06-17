@@ -4,18 +4,18 @@
 # license information.
 # --------------------------------------------------------------------------
 import pytest
-from parameters.query import QueryClient
+from specs.azure.clientgenerator.core.responseasbool import ResponseAsBoolClient
 
 
 @pytest.fixture
 def client():
-    with QueryClient() as client:
+    with ResponseAsBoolClient() as client:
         yield client
 
 
-def test_constant(client: QueryClient):
-    client.constant.post()
+def test_exists(client: ResponseAsBoolClient):
+    assert client.head_as_boolean.exists() is True
 
 
-def test_special_char_dollar_sign(client: QueryClient):
-    client.special_char.dollar_sign(filter="status eq 'active'")
+def test_not_exists(client: ResponseAsBoolClient):
+    assert client.head_as_boolean.not_exists() is False
