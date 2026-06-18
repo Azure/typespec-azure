@@ -28,7 +28,7 @@ The tool is designed to do the following:
 The tool is explicitly not trying to solve every compatibility problem around a service. The following are out of scope:
 
 - SDK-facing concerns such as generated client names or client-shaping behavior.
-- `operationId`, because it is not part of the HTTP wire contract and is primarily an SDK/client concern.
+- `operationId` and schema/model names, because they are not part of the HTTP wire contract and are primarily SDK/client concerns.
 - Comparison of hand-authored OpenAPI documents.
 - Long-running operation semantics.
 - Pagination semantics.
@@ -152,14 +152,15 @@ If the same version exists on both sides, it is compared directly to itself acro
 
 ### Phase B: cross-version evolution
 
-After Phase A, the tool evaluates versions that are new on the head branch.
+After Phase A, the tool evaluates versions that are new or changed on the head branch.
 
-For every new version on head, the tool compares that new version against the **previous stable** version.
+For every new or changed version on head, the tool compares that version against the **previous stable** version.
 
 That means the comparison shape is:
 
 - `head@previousStable` vs `head@newPreview`
 - `head@previousStable` vs `head@newStable`
+- `head@previousStable` vs `head@changedVersion` (if a version was modified in Phase A)
 
 Examples:
 
@@ -284,6 +285,15 @@ In Phase B, the classification follows a simple directional principle:
 - **Response narrowing** is not breaking (Ignore) — the server returns fewer outputs.
 - **Format changes** are always breaking (Error) regardless of direction.
 
+**Narrowing and widening** refer to the set of possible values a type can represent, not the presence or absence of properties (which are handled by dedicated `PropertyAdded`/`PropertyRemoved` rules). How narrowing and widening are determined depends on the type category:
+
+- **Scalars**: A more restrictive format is narrowing (e.g., `string` → `url`); a less restrictive format is widening.
+- **Enums**: Enums represent a closed value set. Adding members is widening; removing members is narrowing.
+- **Unions**: Unions can represent a closed or open value set. Moving from closed to open is widening; open to closed is narrowing.
+- **Arrays**: Determined by the item type (applied recursively).
+- **Records**: Determined by the value type (applied recursively).
+- **Models**: Narrowing/widening rules are applied recursively to each property of the model.
+
 ### Service-Level Rules
 
 | DiffKind                     | Rule                                    | Severity |
@@ -292,6 +302,8 @@ In Phase B, the classification follows a simple directional principle:
 | `AuthSchemeRemoved`          | Removing an authentication scheme       | Error    |
 | `AuthSchemeAdded` (required) | Adding a required authentication scheme | Error    |
 | `OAuthScopeAdded`            | Narrowing OAuth scopes                  | Error    |
+
+> **Note:** Changes to ARM common-types versions are handled by comparing the underlying schemas. Changing a common-types version reference is only breaking if the underlying wire shape changes.
 
 ### Operation-Level Rules
 
@@ -637,8 +649,8 @@ Metadata comparison includes the fields that matter for review, especially:
 
 The CI semantics are intentionally conservative:
 
-- **new approvals** require reviewer sign-off
-- **modified approvals** require re-review
+- **new approvals** require breaking change reviewer approval (via the appropriate PR label)
+- **modified approvals** require re-review from the breaking change reviewer
 - **existing approvals** do not require a new review
 - **removed approvals** are either cleanup or will result in unsuppressed breaking changes and do not require a separate review gate
 
