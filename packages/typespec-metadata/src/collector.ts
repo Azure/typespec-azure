@@ -51,8 +51,8 @@ function extractParameters(
   for (const [key, value] of Object.entries(optionMap)) {
     if (key === "parameters" && typeof value === "object" && value !== null) {
       for (const [paramKey, paramValue] of Object.entries(value)) {
-        if (typeof paramValue === "object" && paramValue !== null && "default" in paramValue) {
-          params[paramKey] = (paramValue as any).default;
+        if (hasDefaultValue(paramValue)) {
+          params[paramKey] = paramValue.default;
         } else {
           params[paramKey] = paramValue;
         }
@@ -102,6 +102,10 @@ type LanguageParser = (
   options: Record<string, unknown>,
   params: Record<string, unknown>,
 ) => LanguageParserResult;
+
+function hasDefaultValue(value: unknown): value is { default: unknown } {
+  return typeof value === "object" && value !== null && "default" in value;
+}
 
 /**
  * Python-specific metadata parser.
@@ -648,8 +652,8 @@ function extractParametersFromConfig(
   const params: Record<string, unknown> = {};
 
   for (const [key, value] of Object.entries(parameters ?? {})) {
-    if (typeof value === "object" && value !== null && "default" in value) {
-      params[key] = (value as any).default;
+    if (hasDefaultValue(value)) {
+      params[key] = value.default;
     } else {
       params[key] = value;
     }
@@ -660,8 +664,8 @@ function extractParametersFromConfig(
 
 function extractDefaultServiceDir(parameters: Record<string, unknown> | undefined): string | undefined {
   const serviceDirParam = parameters?.["service-dir"];
-  if (serviceDirParam && typeof serviceDirParam === "object" && "default" in serviceDirParam) {
-    return String((serviceDirParam as any).default);
+  if (hasDefaultValue(serviceDirParam)) {
+    return String(serviceDirParam.default);
   }
   return undefined;
 }

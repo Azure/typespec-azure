@@ -400,7 +400,7 @@ describe("parameter extraction", () => {
     if (typeof value === "object" && value !== null) {
       for (const [paramKey, paramValue] of Object.entries(value)) {
         if (typeof paramValue === "object" && paramValue !== null && "default" in paramValue) {
-          params[paramKey] = (paramValue as any).default;
+          params[paramKey] = paramValue.default;
         } else {
           params[paramKey] = paramValue;
         }
