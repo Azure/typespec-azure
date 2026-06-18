@@ -118,7 +118,7 @@ export async function _updateDeserialize(
     throw error;
   }
 
-  return result.body ? partnerTopicDeserializer(result.body) : undefined;
+  return result.body ? partnerTopicDeserializer(result.body) : void 0;
 }
 
 /** Update a PartnerTopic */
