@@ -23,6 +23,18 @@ emit:
   - "@azure-tools/typespec-metadata"
 ```
 
+### Config-only package parsing
+
+If your `tspconfig.yaml` defines emitter package names but the actual `main.tsp`
+files live in subdirectories, you can read language package metadata directly
+from the config file without compiling a root `main.tsp`:
+
+```ts
+import { collectLanguagePackagesFromConfigPath } from "@azure-tools/typespec-metadata";
+
+const result = await collectLanguagePackagesFromConfigPath("./specification/compute/.../tspconfig.yaml");
+```
+
 ### Options
 
 The emitter supports the following options:

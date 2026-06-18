@@ -1,6 +1,13 @@
+import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { normalizePath } from "@typespec/compiler";
 import { describe, expect, it } from "vitest";
-import { buildLanguageMetadata, inferLanguageFromEmitterName } from "../src/collector.js";
+import {
+  buildLanguageMetadata,
+  collectLanguagePackagesFromConfigPath,
+  inferLanguageFromEmitterName,
+} from "../src/collector.js";
 
 describe("outputDir path handling", () => {
   it("should replace absolute base path with {output-dir} placeholder", () => {
@@ -679,5 +686,50 @@ describe("multiple emitters per language", () => {
     expect(result["unknown"]).toHaveLength(2);
     expect(result["unknown"][0].emitterName).toBe("@typespec/openapi3");
     expect(result["unknown"][1].emitterName).toBe("@typespec/json-schema");
+  });
+});
+
+describe("config-only package collection", () => {
+  it("should collect package metadata from tspconfig without requiring a root main.tsp", async () => {
+    const fixtureRoot = await mkdtemp(join(tmpdir(), "typespec-metadata-config-"));
+
+    try {
+      await mkdir(join(fixtureRoot, "Compute"), { recursive: true });
+      await mkdir(join(fixtureRoot, "Gallery"), { recursive: true });
+      await writeFile(
+        join(fixtureRoot, "tspconfig.yaml"),
+        `parameters:
+  "service-dir":
+    default: "sdk/compute"
+options:
+  "@azure-tools/typespec-python":
+    emitter-output-dir: "{output-dir}/{service-dir}/azure-mgmt-compute"
+    namespace: "azure.mgmt.compute"
+  "@azure-tools/typespec-ts":
+    emitter-output-dir: "{output-dir}/{service-dir}/arm-compute"
+    package-details:
+      name: "@azure/arm-compute"
+  "@azure-tools/typespec-java":
+    service-dir: "sdk/compute"
+    emitter-output-dir: "{output-dir}/{service-dir}/azure-resourcemanager-compute"
+    namespace: "com.azure.resourcemanager.compute"
+    flavor: azure
+`,
+      );
+      await writeFile(join(fixtureRoot, "Compute", "main.tsp"), "namespace Compute;");
+      await writeFile(join(fixtureRoot, "Gallery", "main.tsp"), "namespace Gallery;");
+
+      const result = await collectLanguagePackagesFromConfigPath(fixtureRoot);
+
+      expect(result.sourceConfigPath).toBe(join(fixtureRoot, "tspconfig.yaml"));
+      expect(result.languages["python"][0].packageName).toBe("azure-mgmt-compute");
+      expect(result.languages["python"][0].serviceDir).toBe("sdk/compute");
+      expect(result.languages["typescript"][0].packageName).toBe("@azure/arm-compute");
+      expect(result.languages["java"][0].packageName).toBe(
+        "com.azure.resourcemanager:azure-resourcemanager-compute",
+      );
+    } finally {
+      await rm(fixtureRoot, { recursive: true, force: true });
+    }
   });
 });

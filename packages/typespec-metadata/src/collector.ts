@@ -1,3 +1,5 @@
+import { readFile, stat } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
 import {
   getDoc,
   getLocationContext,
@@ -7,10 +9,12 @@ import {
   type Namespace,
   type Program,
 } from "@typespec/compiler";
+import { parse as parseYaml } from "yaml";
 import { LanguagePackageMetadata, TypeSpecMetadata } from "./metadata.js";
 
 const PACKAGE_NAME_KEYS = ["package-name", "packageName", "package"];
 const NAMESPACE_KEYS = ["namespace", "namespace-name", "namespaceName"];
+const TSP_CONFIG_FILENAME = "tspconfig.yaml";
 
 /**
  * Replace {var} placeholders in a string with values from the data object.
@@ -318,6 +322,12 @@ export interface LanguageCollectionResult {
   sourceConfigPath?: string;
 }
 
+interface TypeSpecConfigLike {
+  extends?: string;
+  options?: Record<string, Record<string, unknown>>;
+  parameters?: Record<string, unknown>;
+}
+
 export async function collectLanguagePackages(
   program: Program,
   baseOutputDir: string,
@@ -338,6 +348,21 @@ export async function collectLanguagePackages(
   return {
     languages: buildLanguageMetadata(optionMap, params, baseOutputDir, defaultServiceDir),
     sourceConfigPath: program.compilerOptions.config,
+  };
+}
+
+export async function collectLanguagePackagesFromConfigPath(
+  configPathOrDirectory: string,
+  baseOutputDir = "{output-dir}",
+): Promise<LanguageCollectionResult> {
+  const sourceConfigPath = await resolveConfigPath(configPathOrDirectory);
+  const config = await loadTypeSpecConfig(sourceConfigPath);
+  const params = extractParametersFromConfig(config.parameters);
+  const defaultServiceDir = extractDefaultServiceDir(config.parameters);
+
+  return {
+    languages: buildLanguageMetadata(config.options ?? {}, params, baseOutputDir, defaultServiceDir),
+    sourceConfigPath,
   };
 }
 
@@ -615,6 +640,53 @@ function extractOption(options: Record<string, unknown>, candidates: string[]): 
     }
   }
   return undefined;
+}
+
+function extractParametersFromConfig(
+  parameters: Record<string, unknown> | undefined,
+): Record<string, unknown> {
+  const params: Record<string, unknown> = {};
+
+  for (const [key, value] of Object.entries(parameters ?? {})) {
+    if (typeof value === "object" && value !== null && "default" in value) {
+      params[key] = (value as any).default;
+    } else {
+      params[key] = value;
+    }
+  }
+
+  return params;
+}
+
+function extractDefaultServiceDir(parameters: Record<string, unknown> | undefined): string | undefined {
+  const serviceDirParam = parameters?.["service-dir"];
+  if (serviceDirParam && typeof serviceDirParam === "object" && "default" in serviceDirParam) {
+    return String((serviceDirParam as any).default);
+  }
+  return undefined;
+}
+
+async function resolveConfigPath(configPathOrDirectory: string): Promise<string> {
+  const resolvedPath = resolve(configPathOrDirectory);
+  const pathStat = await stat(resolvedPath);
+  return pathStat.isDirectory() ? resolve(resolvedPath, TSP_CONFIG_FILENAME) : resolvedPath;
+}
+
+async function loadTypeSpecConfig(configPath: string): Promise<TypeSpecConfigLike> {
+  const content = await readFile(configPath, "utf-8");
+  const config = (parseYaml(content) ?? {}) as TypeSpecConfigLike;
+
+  if (!config.extends) {
+    return config;
+  }
+
+  const parentConfig = await loadTypeSpecConfig(resolve(dirname(configPath), config.extends));
+  return {
+    ...parentConfig,
+    ...config,
+    options: config.options ?? parentConfig.options,
+    parameters: config.parameters ?? parentConfig.parameters,
+  };
 }
 
 function normalizeKey(key: string): string {
