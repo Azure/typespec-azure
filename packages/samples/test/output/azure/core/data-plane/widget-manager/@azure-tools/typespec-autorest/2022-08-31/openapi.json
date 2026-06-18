@@ -2288,69 +2288,6 @@
         }
       }
     },
-    "WidgetManagerApiKeyAuth": {
-      "type": "object",
-      "description": "Authenticate requests with an API key in the X-Key header.",
-      "properties": {
-        "type": {
-          "type": "string",
-          "description": "API key authentication",
-          "enum": [
-            "apiKey"
-          ]
-        },
-        "in": {
-          "type": "string",
-          "description": "location of the API key",
-          "enum": [
-            "header"
-          ]
-        },
-        "name": {
-          "type": "string",
-          "description": "name of the API key",
-          "enum": [
-            "X-Key"
-          ],
-          "x-ms-enum": {
-            "modelAsString": false
-          }
-        }
-      },
-      "required": [
-        "type",
-        "in",
-        "name"
-      ]
-    },
-    "WidgetManagerOauth2Auth": {
-      "type": "object",
-      "description": "Authenticate requests with OAuth2 using the widget service scope.",
-      "properties": {
-        "type": {
-          "type": "string",
-          "description": "OAuth2 authentication",
-          "enum": [
-            "oauth2"
-          ]
-        },
-        "flows": {
-          "type": "array",
-          "description": "Supported OAuth2 flows",
-          "items": {}
-        },
-        "defaultScopes": {
-          "type": "array",
-          "description": "Oauth2 scopes of every flow. Overridden by scope definitions in specific flows",
-          "items": {}
-        }
-      },
-      "required": [
-        "type",
-        "flows",
-        "defaultScopes"
-      ]
-    },
     "WidgetPart": {
       "type": "object",
       "description": "A widget's part.",
