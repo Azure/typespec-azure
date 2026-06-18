@@ -881,6 +881,32 @@ Expected response body:
 }
 ```
 
+### Azure_ClientGenerator_Core_ExactName_EnumValue
+
+- Endpoint: `post /azure/client-generator-core/exact-name/enum-value`
+
+This scenario tests the exact() function applied to an enum value.
+The union AgentEndpointProtocol has a member 'a2a' which is renamed using exact("A2A")
+scoped per language. Emitters should preserve the exact enum value name 'A2A' without
+applying their usual casing conventions (e.g., Python should NOT convert to 'A_2_A',
+and C# should NOT convert to 'A2A' → 'A2a' or any other transformation).
+
+Expected request body:
+
+```json
+{
+  "protocol": "a2a"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "protocol": "a2a"
+}
+```
+
 ### Azure_ClientGenerator_Core_ExactName_Model
 
 - Endpoint: `post /azure/client-generator-core/exact-name/model`
@@ -906,6 +932,33 @@ Expected response body:
   "name": "test"
 }
 ```
+
+### Azure_ClientGenerator_Core_ExactName_Operation
+
+- Endpoint: `get /azure/client-generator-core/exact-name/operation`
+
+This scenario tests the exact() function applied to an operation name.
+The operation 'myOp' is renamed using exact("myOp") scoped per language.
+Emitters should preserve the exact operation name without applying their usual
+casing conventions (e.g., Python should NOT convert to 'my_op',
+and C# should NOT convert to 'MyOp').
+
+Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_ExactName_Parameter
+
+- Endpoint: `get /azure/client-generator-core/exact-name/parameter`
+
+This scenario tests the exact() function applied to a parameter name.
+The query parameter 'myParam' is renamed using exact("myParam") scoped per language.
+Emitters should preserve the exact parameter name without applying their usual
+casing conventions (e.g., Python should NOT convert to 'my_param',
+and C# should NOT convert to 'MyParam').
+
+Expected query parameter:
+myParam: hello
+
+Expected response: 204 No Content
 
 ### Azure_ClientGenerator_Core_ExactName_Property
 
@@ -2087,6 +2140,71 @@ maxpagesize=3
 }
 ```
 
+### Azure_ResourceManager_CommonProperties_ArmResourceIdentifiers_createOrReplace
+
+- Endpoint: `put https://management.azure.com`
+
+Resource PUT operation.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.CommonProperties/armResourceIdentifierResources/armId
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "location": "eastus",
+  "properties": {
+    "simpleArmId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithType": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithTypeAndScope": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.CommonProperties/armResourceIdentifierResources/armId",
+  "location": "eastus",
+  "name": "armId",
+  "type": "Azure.ResourceManager.CommonProperties/armResourceIdentifierResources",
+  "properties": {
+    "provisioningState": "Succeeded",
+    "simpleArmId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithType": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithTypeAndScope": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm"
+  }
+}
+```
+
+### Azure_ResourceManager_CommonProperties_ArmResourceIdentifiers_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.CommonProperties/armResourceIdentifierResources/armId
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.CommonProperties/armResourceIdentifierResources/armId",
+  "location": "eastus",
+  "name": "armId",
+  "type": "Azure.ResourceManager.CommonProperties/armResourceIdentifierResources",
+  "properties": {
+    "provisioningState": "Succeeded",
+    "simpleArmId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithType": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithTypeAndScope": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm"
+  }
+}
+```
+
 ### Azure_ResourceManager_CommonProperties_Error_createForUserDefinedError
 
 - Endpoint: `put https://management.azure.com`
@@ -2327,6 +2445,157 @@ Expected response body:
 ```json
 {
   "succeeded": true
+}
+```
+
+### Azure_ResourceManager_ManagementGroup_ManagementGroupChildResources_createOrUpdate
+
+- Endpoint: `put https://management.azure.com`
+
+Resource PUT operation at management group scope.
+Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected request body:
+
+```json
+{
+  "properties": {
+    "description": "valid"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource",
+  "name": "resource",
+  "type": "Microsoft.ManagementGroupChild/managementGroupChildResources",
+  "properties":{
+    "description": "valid",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_ManagementGroup_ManagementGroupChildResources_delete
+
+- Endpoint: `delete https://management.azure.com`
+
+Resource DELETE operation at management group scope.
+Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 204
+
+### Azure_ResourceManager_ManagementGroup_ManagementGroupChildResources_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation at management group scope.
+Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "/providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource",
+  "name": "resource",
+  "type": "Microsoft.ManagementGroupChild/managementGroupChildResources",
+  "properties":{
+    "description": "valid",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_ManagementGroup_ManagementGroupChildResources_listByManagementGroup
+
+- Endpoint: `get https://management.azure.com`
+
+Resource LIST operation at management group scope.
+Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "value": [{
+    "id": "/providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource",
+    "name": "resource",
+    "type": "Microsoft.ManagementGroupChild/managementGroupChildResources",
+    "properties":{
+      "description": "valid",
+      "provisioningState": "Succeeded"
+    },
+    "systemData": {
+      "createdBy": "AzureSDK",
+      "createdByType": "User",
+      "createdAt": <any date>,
+      "lastModifiedBy": "AzureSDK",
+      "lastModifiedAt": <any date>,
+      "lastModifiedByType": "User"
+    }
+  }]
+}
+```
+
+### Azure_ResourceManager_ManagementGroup_ManagementGroupChildResources_update
+
+- Endpoint: `patch https://management.azure.com`
+
+Resource PATCH operation at management group scope.
+Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected request body:
+
+```json
+{
+  "properties": {
+    "description": "valid2"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource",
+  "name": "resource",
+  "type": "Microsoft.ManagementGroupChild/managementGroupChildResources",
+  "properties":{
+    "description": "valid2",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
 }
 ```
 

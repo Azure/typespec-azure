@@ -4,14 +4,10 @@ import {
   PollerLike,
   ResourceLocationConfig,
   RunningOperation,
-  createHttpPoller
+  createHttpPoller,
 } from "@azure/core-lro";
 
-import {
-  Client,
-  PathUncheckedResponse,
-  createRestError
-} from "@azure-rest/core-client";
+import { Client, PathUncheckedResponse, createRestError } from "@azure-rest/core-client";
 import { AbortSignalLike } from "@azure/abort-controller";
 
 export interface GetLongRunningPollerOptions<TResponse> {
@@ -43,29 +39,22 @@ export interface GetLongRunningPollerOptions<TResponse> {
    */
   apiVersion?: string;
 }
-export function getLongRunningPoller<
-  TResponse extends PathUncheckedResponse,
-  TResult = void
->(
+export function getLongRunningPoller<TResponse extends PathUncheckedResponse, TResult = void>(
   client: Client,
   processResponseBody: (result: TResponse) => Promise<TResult>,
   expectedStatuses: string[],
-  options: GetLongRunningPollerOptions<TResponse>
+  options: GetLongRunningPollerOptions<TResponse>,
 ): PollerLike<OperationState<TResult>, TResult> {
   const { restoreFrom, getInitialResponse, apiVersion } = options;
   if (!restoreFrom && !getInitialResponse) {
-    throw new Error(
-      "Either restoreFrom or getInitialResponse must be specified"
-    );
+    throw new Error("Either restoreFrom or getInitialResponse must be specified");
   }
   let initialResponse: TResponse | undefined = undefined;
   const pollAbortController = new AbortController();
   const poller: RunningOperation<TResponse> = {
     sendInitialRequest: async () => {
       if (!getInitialResponse) {
-        throw new Error(
-          "getInitialResponse is required when initializing a new poller"
-        );
+        throw new Error("getInitialResponse is required when initializing a new poller");
       }
       initialResponse = await getInitialResponse();
       return getLroResponse(initialResponse, expectedStatuses);
@@ -74,7 +63,7 @@ export function getLongRunningPoller<
       path: string,
       pollOptions?: {
         abortSignal?: AbortSignalLike;
-      }
+      },
     ) => {
       // The poll request would both listen to the user provided abort signal and the poller's own abort signal
       function abortListener(): void {
@@ -87,17 +76,15 @@ export function getLongRunningPoller<
         pollAbortController.abort();
       } else if (!abortSignal.aborted) {
         options.abortSignal?.addEventListener("abort", abortListener, {
-          once: true
+          once: true,
         });
         pollOptions?.abortSignal?.addEventListener("abort", abortListener, {
-          once: true
+          once: true,
         });
       }
       let response;
       try {
-        const pollingPath = apiVersion
-          ? addApiVersionToUrl(path, apiVersion)
-          : path;
+        const pollingPath = apiVersion ? addApiVersionToUrl(path, apiVersion) : path;
         response = await client.pathUnchecked(pollingPath).get({ abortSignal });
       } finally {
         options.abortSignal?.removeEventListener("abort", abortListener);
@@ -105,7 +92,7 @@ export function getLongRunningPoller<
       }
 
       return getLroResponse(response as TResponse, expectedStatuses);
-    }
+    },
   };
   return createHttpPoller(poller, {
     intervalInMs: options?.updateIntervalInMs,
@@ -113,7 +100,7 @@ export function getLongRunningPoller<
     restoreFrom: options?.restoreFrom,
     processResult: (result: unknown) => {
       return processResponseBody(result as TResponse);
-    }
+    },
   });
 }
 /**
@@ -124,7 +111,7 @@ export function getLongRunningPoller<
  */
 function getLroResponse<TResponse extends PathUncheckedResponse>(
   response: TResponse,
-  expectedStatuses: string[]
+  expectedStatuses: string[],
 ): OperationResponse<TResponse> {
   if (!expectedStatuses.includes(response.status)) {
     throw createRestError(response);
@@ -135,8 +122,8 @@ function getLroResponse<TResponse extends PathUncheckedResponse>(
     rawResponse: {
       ...response,
       statusCode: Number.parseInt(response.status),
-      body: response.body
-    }
+      body: response.body,
+    },
   };
 }
 

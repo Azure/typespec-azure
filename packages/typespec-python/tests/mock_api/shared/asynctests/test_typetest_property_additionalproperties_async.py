@@ -4,11 +4,12 @@
 # license information.
 # --------------------------------------------------------------------------
 import pytest
+import pytest_asyncio
 from typetest.property.additionalproperties import models
 from typetest.property.additionalproperties.aio import AdditionalPropertiesClient
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def client():
     async with AdditionalPropertiesClient() as client:
         yield client
@@ -260,22 +261,6 @@ async def test_spread_model_array(client: AdditionalPropertiesClient):
     }
     assert await client.spread_model_array.get() == body
     await client.spread_model_array.put(body)
-
-
-@pytest.mark.skip(reason="https://github.com/microsoft/typespec/pull/6425")
-@pytest.mark.asyncio
-async def test_spread_record_discriminated_union(client: AdditionalPropertiesClient):
-    body = {
-        "name": "abc",
-        "prop1": {"fooProp": "abc", "kind": "kind0"},
-        "prop2": {
-            "end": "2021-01-02T00:00:00Z",
-            "kind": "kind1",
-            "start": "2021-01-01T00:00:00Z",
-        },
-    }
-    assert await client.spread_record_discriminated_union.get() == body
-    await client.spread_record_discriminated_union.put(body)
 
 
 @pytest.mark.asyncio

@@ -190,6 +190,7 @@ The following TypeSpec linting rules enforce ARM conventions that are not explic
 | `arm/improper-subscription-list-operation`                                                              | Ensures tenant and extension resources don't define list-by-subscription operations.               |
 | [`arm/missing-x-ms-identifiers`](/docs/libraries/azure-resource-manager/rules/missing-x-ms-identifiers) | Requires array properties to describe identifying properties with `x-ms-identifiers`.              |
 | [`arm/no-empty-model`](/docs/libraries/azure-resource-manager/rules/no-empty-model)                     | Prevents ARM properties with `type: object` that don't reference a model definition.               |
+| [`arm/no-override-props`](/docs/libraries/azure-resource-manager/rules/no-override-props)               | Disallows redefining properties already defined in a base type.                                    |
 | [`arm/unsupported-type`](/docs/libraries/azure-resource-manager/rules/unsupported-type)                 | Checks for unsupported ARM types.                                                                  |
 
 ## Rules Not Enforceable Through Linting — Service Owner Responsibility

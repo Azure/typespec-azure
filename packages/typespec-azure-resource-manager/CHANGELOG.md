@@ -1,5 +1,62 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.69.1
+
+### Bug Fixes
+
+- [#4621](https://github.com/Azure/typespec-azure/pull/4621) Adding Azure Resource Manager Base Types, including the Agent base type.
+  
+  Base types provide structured constraints for resources including required and optional
+  properties in their RP-specific property bags. The `@azureBaseType` decorator attaches
+  base type metadata to resource models for validation.
+  
+  Example of creating an Agent resource:
+  
+  ```typespec
+  using Azure.ResourceManager;
+  using Azure.ResourceManager.BaseTypes;
+  using Azure.ResourceManager.BaseTypes.Agents;
+  
+  model MyDefinition is AgentDefinitionPlatform<true, true> {}
+  
+  model MyAgentProperties is AgentPropertiesPlatform<MyDefinition> {
+    ...DefaultProvisioningStateProperty;
+  }
+  
+  model MyAgent is Agent<MyAgentProperties> {
+    ...ResourceNameParameter<MyAgent>;
+  }
+  
+  model MyConversationProperties is ConversationProperties {
+    ...DefaultProvisioningStateProperty;
+  }
+  
+  model MyConversation is AgentConversation<MyConversationProperties, MyAgent> {
+    ...ResourceNameParameter<MyConversation>;
+  }
+  
+  model MyResponseProperties is ResponseProperties {
+    ...DefaultProvisioningStateProperty;
+  }
+  
+  model MyResponse is AgentResponse<MyResponseProperties, MyAgent> {
+    ...ResourceNameParameter<MyResponse>;
+  }
+  ```
+
+
+## 0.69.0
+
+### Features
+
+- [#4384](https://github.com/Azure/typespec-azure/pull/4384) Add new linting rule `no-override-props` that warns when a model redefines a property that is already defined in one of its base models. The 'name' property of an ARM resource and properties redefined as part of a model marked with `@discriminator` are not flagged by this rule.
+- [#4530](https://github.com/Azure/typespec-azure/pull/4530) Add optional `Tag` template parameter to `Azure.ResourceManager.Legacy.Operations` to allow overriding the openapi tag value.
+
+### Bug Fixes
+
+- [#4433](https://github.com/Azure/typespec-azure/pull/4433) Fix doc comment typos in ARM library: list operations incorrectly said "patched", CreateOrReplace operations said "createOrUpdate", extension operations had `>` instead of `.`, and @doc tag had malformed string interpolation.
+
+
 ## 0.68.0
 
 ### Features

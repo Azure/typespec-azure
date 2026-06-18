@@ -1,19 +1,22 @@
+import { getDirectoryPath, NodeHost } from "@typespec/compiler";
 import {
   FunctionDeclarationStructure,
   InterfaceDeclarationStructure,
   Project,
   StructureKind,
-  TypeAliasDeclarationStructure
+  TypeAliasDeclarationStructure,
 } from "ts-morph";
-import { describe, it, expect, beforeEach, assert } from "vitest";
-import {
-  useBinder,
-  provideBinder,
-  Binder
-} from "../../../src/framework/hooks/binder.js";
+import { fileURLToPath } from "url";
+import { assert, beforeEach, describe, expect, it } from "vitest";
+import { Binder, provideBinder, useBinder } from "../../../src/framework/hooks/binder.js";
 
+import path from "path";
 import { addDeclaration } from "../../../src/framework/declaration.js";
+import { ExternalDependencies } from "../../../src/framework/dependency.js";
+import { useDependencies } from "../../../src/framework/hooks/use-dependencies.js";
+import { loadStaticHelpers, StaticHelpers } from "../../../src/framework/load-static-helpers.js";
 import { resolveReference } from "../../../src/framework/reference.js";
+import { AzurePollingDependencies } from "../../../src/modular/external-dependencies.js";
 import {
   assertGetFunctionDeclaration,
   assertGetFunctionParameter,
@@ -23,19 +26,10 @@ import {
   assertGetInterfaceProperty,
   assertGetStatement,
   assertGetTypealiasDeclaration,
-  assertGetVariableDeclaration
+  assertGetVariableDeclaration,
 } from "../../utils/tsmorph-utils.js";
-import { useDependencies } from "../../../src/framework/hooks/useDependencies.js";
-import { ExternalDependencies } from "../../../src/framework/dependency.js";
-import {
-  loadStaticHelpers,
-  StaticHelpers
-} from "../../../src/framework/load-static-helpers.js";
-import path from "path";
-import { AzurePollingDependencies } from "../../../src/modular/external-dependencies.js";
-import { getDirname } from "../../../src/utils/dirname.js";
 
-const __dirname = getDirname(import.meta.url).__dirname;
+const __dirname = getDirectoryPath(fileURLToPath(import.meta.url));
 
 describe("Binder", () => {
   let project: Project;
@@ -51,19 +45,19 @@ describe("Binder", () => {
   describe("References", () => {
     it("should handle interface property reference", () => {
       const sourceFile = project.createSourceFile("test1.ts", "", {
-        overwrite: true
+        overwrite: true,
       });
 
       const interfaceDeclaration: InterfaceDeclarationStructure = {
         kind: StructureKind.Interface,
         name: "TestInterface",
-        properties: [{ name: "foo", type: "string" }]
+        properties: [{ name: "foo", type: "string" }],
       };
 
       const interfaceWithReference: InterfaceDeclarationStructure = {
         kind: StructureKind.Interface,
         name: "TestModel",
-        properties: [{ name: "bar", type: resolveReference("TestInterface") }]
+        properties: [{ name: "bar", type: resolveReference("TestInterface") }],
       };
 
       addDeclaration(sourceFile, interfaceDeclaration, "TestInterface");
@@ -73,8 +67,6 @@ describe("Binder", () => {
       assertGetInterfaceDeclaration(sourceFile, "TestInterface");
       assertGetInterfaceDeclaration(sourceFile, "TestModel");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface TestInterface {
       //   foo: string;
@@ -86,22 +78,20 @@ describe("Binder", () => {
 
     it("should handle interface property reference where referenced has type parameters", () => {
       const sourceFile = project.createSourceFile("test1.ts", "", {
-        overwrite: true
+        overwrite: true,
       });
 
       const interfaceDeclaration: InterfaceDeclarationStructure = {
         kind: StructureKind.Interface,
         name: "TestInterface",
         properties: [{ name: "foo", type: "T" }],
-        typeParameters: ["T"]
+        typeParameters: ["T"],
       };
 
       const interfaceWithReference: InterfaceDeclarationStructure = {
         kind: StructureKind.Interface,
         name: "TestModel",
-        properties: [
-          { name: "bar", type: `${resolveReference("TestInterface")}<string>` }
-        ]
+        properties: [{ name: "bar", type: `${resolveReference("TestInterface")}<string>` }],
       };
 
       addDeclaration(sourceFile, interfaceDeclaration, "TestInterface");
@@ -111,8 +101,6 @@ describe("Binder", () => {
       assertGetInterfaceDeclaration(sourceFile, "TestInterface");
       assertGetInterfaceDeclaration(sourceFile, "TestModel");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface TestInterface {
       //   foo: string;
@@ -124,19 +112,19 @@ describe("Binder", () => {
 
     it("should handle function parameter with reference", () => {
       const sourceFile = project.createSourceFile("test1.ts", "", {
-        overwrite: true
+        overwrite: true,
       });
 
       const interfaceDeclaration: InterfaceDeclarationStructure = {
         kind: StructureKind.Interface,
         name: "TestInterface",
-        properties: [{ name: "foo", type: "string" }]
+        properties: [{ name: "foo", type: "string" }],
       };
 
       const functionDeclaration: FunctionDeclarationStructure = {
         kind: StructureKind.Function,
         name: "testFunction",
-        parameters: [{ name: "param", type: resolveReference("TestInterface") }]
+        parameters: [{ name: "param", type: resolveReference("TestInterface") }],
       };
 
       addDeclaration(sourceFile, interfaceDeclaration, "TestInterface");
@@ -144,15 +132,10 @@ describe("Binder", () => {
       binder.resolveAllReferences("");
 
       assertGetInterfaceDeclaration(sourceFile, "TestInterface");
-      const functionDec = assertGetFunctionDeclaration(
-        sourceFile,
-        "testFunction"
-      );
+      const functionDec = assertGetFunctionDeclaration(sourceFile, "testFunction");
       const param = assertGetFunctionParameter(functionDec, "param");
-      expect(param.getType().getText(), "TestInterface");
+      expect(param.getType().getText()).toBe("TestInterface");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface TestInterface {
       //   foo: string;
@@ -163,14 +146,14 @@ describe("Binder", () => {
 
     it("should handle function parameter with reference where referenced has type parameters", () => {
       const sourceFile = project.createSourceFile("test1.ts", "", {
-        overwrite: true
+        overwrite: true,
       });
 
       const interfaceDeclaration: InterfaceDeclarationStructure = {
         kind: StructureKind.Interface,
         name: "TestInterface",
         properties: [{ name: "foo", type: "T" }],
-        typeParameters: ["T"]
+        typeParameters: ["T"],
       };
 
       const functionDeclaration: FunctionDeclarationStructure = {
@@ -179,9 +162,9 @@ describe("Binder", () => {
         parameters: [
           {
             name: "param",
-            type: `${resolveReference("TestInterface")}<string>`
-          }
-        ]
+            type: `${resolveReference("TestInterface")}<string>`,
+          },
+        ],
       };
 
       addDeclaration(sourceFile, interfaceDeclaration, "TestInterface");
@@ -189,15 +172,10 @@ describe("Binder", () => {
       binder.resolveAllReferences("/modularPackageFolder/src");
 
       assertGetInterfaceDeclaration(sourceFile, "TestInterface");
-      const functionDec = assertGetFunctionDeclaration(
-        sourceFile,
-        "testFunction"
-      );
+      const functionDec = assertGetFunctionDeclaration(sourceFile, "testFunction");
       const param = assertGetFunctionParameter(functionDec, "param");
-      expect(param.getType().getText(), "TestInterface");
+      expect(param.getType().getText()).toBe("TestInterface<string>");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface TestInterface {
       //   foo: string;
@@ -208,19 +186,19 @@ describe("Binder", () => {
 
     it("should handle function return type with reference", () => {
       const sourceFile = project.createSourceFile("test1.ts", "", {
-        overwrite: true
+        overwrite: true,
       });
 
       const interfaceDeclaration: InterfaceDeclarationStructure = {
         kind: StructureKind.Interface,
         name: "TestInterface",
-        properties: [{ name: "foo", type: "string" }]
+        properties: [{ name: "foo", type: "string" }],
       };
 
       const functionDeclaration: FunctionDeclarationStructure = {
         kind: StructureKind.Function,
         name: "testFunction",
-        returnType: resolveReference("TestInterface")
+        returnType: resolveReference("TestInterface"),
       };
 
       addDeclaration(sourceFile, interfaceDeclaration, "TestInterface");
@@ -228,14 +206,9 @@ describe("Binder", () => {
       binder.resolveAllReferences("/modularPackageFolder/src");
 
       assertGetInterfaceDeclaration(sourceFile, "TestInterface");
-      const fnDeclaration = assertGetFunctionDeclaration(
-        sourceFile,
-        "testFunction"
-      );
+      const fnDeclaration = assertGetFunctionDeclaration(sourceFile, "testFunction");
       assertGetFunctionReturnType(fnDeclaration, "TestInterface");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface TestInterface {
       //   foo: string;
@@ -246,20 +219,20 @@ describe("Binder", () => {
 
     it("should handle function return type with reference with type params", () => {
       const sourceFile = project.createSourceFile("test1.ts", "", {
-        overwrite: true
+        overwrite: true,
       });
 
       const interfaceDeclaration: InterfaceDeclarationStructure = {
         kind: StructureKind.Interface,
         name: "TestInterface",
         properties: [{ name: "foo", type: "T" }],
-        typeParameters: ["T"]
+        typeParameters: ["T"],
       };
 
       const functionDeclaration: FunctionDeclarationStructure = {
         kind: StructureKind.Function,
         name: "testFunction",
-        returnType: `${resolveReference("TestInterface")}<string>`
+        returnType: `${resolveReference("TestInterface")}<string>`,
       };
 
       addDeclaration(sourceFile, interfaceDeclaration, "TestInterface");
@@ -267,14 +240,9 @@ describe("Binder", () => {
       binder.resolveAllReferences("/modularPackageFolder/src");
 
       assertGetInterfaceDeclaration(sourceFile, "TestInterface");
-      const fnDeclaration = assertGetFunctionDeclaration(
-        sourceFile,
-        "testFunction"
-      );
+      const fnDeclaration = assertGetFunctionDeclaration(sourceFile, "testFunction");
       assertGetFunctionReturnType(fnDeclaration, "TestInterface<string>");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface TestInterface {
       //   foo: string;
@@ -285,19 +253,19 @@ describe("Binder", () => {
 
     it("should handle a type alias", () => {
       const sourceFile = project.createSourceFile("test1.ts", "", {
-        overwrite: true
+        overwrite: true,
       });
 
       const interfaceDeclaration: InterfaceDeclarationStructure = {
         kind: StructureKind.Interface,
         name: "TestInterface",
-        properties: [{ name: "foo", type: "string" }]
+        properties: [{ name: "foo", type: "string" }],
       };
 
       const typeDeclaration: TypeAliasDeclarationStructure = {
         kind: StructureKind.TypeAlias,
         name: "TestType",
-        type: resolveReference("TestInterface")
+        type: resolveReference("TestInterface"),
       };
 
       addDeclaration(sourceFile, interfaceDeclaration, "TestInterface");
@@ -307,8 +275,6 @@ describe("Binder", () => {
       assertGetInterfaceDeclaration(sourceFile, "TestInterface");
       assertGetTypealiasDeclaration(sourceFile, "TestType");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface TestInterface {
       //   foo: string;
@@ -319,20 +285,20 @@ describe("Binder", () => {
 
     it("should handle a type alias with interface and type parameters", () => {
       const sourceFile = project.createSourceFile("test1.ts", "", {
-        overwrite: true
+        overwrite: true,
       });
 
       const interfaceDeclaration: InterfaceDeclarationStructure = {
         kind: StructureKind.Interface,
         name: "TestInterface",
         properties: [{ name: "foo", type: "T" }],
-        typeParameters: ["T"]
+        typeParameters: ["T"],
       };
 
       const typeDeclaration: TypeAliasDeclarationStructure = {
         kind: StructureKind.TypeAlias,
         name: "TestType",
-        type: `${resolveReference("TestInterface")}<string>`
+        type: `${resolveReference("TestInterface")}<string>`,
       };
 
       addDeclaration(sourceFile, interfaceDeclaration, "TestInterface");
@@ -342,8 +308,6 @@ describe("Binder", () => {
       assertGetInterfaceDeclaration(sourceFile, "TestInterface");
       assertGetTypealiasDeclaration(sourceFile, "TestType");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface TestInterface {
       //   foo: string;
@@ -363,31 +327,28 @@ describe("Binder", () => {
         buildCsvCollection: {
           kind: "function",
           name: "buildCsvCollection",
-          location: "utils.ts"
-        }
+          location: "utils.ts",
+        },
       };
       const staticHelperMap = await loadStaticHelpers(project, staticHelpers, {
-        helpersAssetDirectory: helpersDirectory
+        helpersAssetDirectory: helpersDirectory,
+        host: NodeHost,
       });
       binder = provideBinder(project, { staticHelpers: staticHelperMap });
     });
 
     it("should resolve reference to static helper", () => {
       const sourceFile = project.createSourceFile("src/test1.ts", "", {
-        overwrite: true
+        overwrite: true,
       });
 
-      sourceFile.addStatements(
-        `${resolveReference(staticHelpers.buildCsvCollection)}();`
-      );
+      sourceFile.addStatements(`${resolveReference(staticHelpers.buildCsvCollection)}();`);
 
       binder.resolveAllReferences("/modularPackageFolder/src");
 
       assertGetImportStatements(sourceFile, "./static-helpers/utils.js");
       assertGetStatement(sourceFile, "buildCsvCollection();");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // import { buildCsvCollection } from "./static-helpers/utils.js";
       //
@@ -400,27 +361,27 @@ describe("Binder", () => {
         "src/static-helpers/serialization/get-binary-response.ts",
         "",
         {
-          overwrite: true
-        }
+          overwrite: true,
+        },
       );
       project.createSourceFile(
         "src/static-helpers/serialization/get-binary-response-browser.mts",
         "export {};",
         {
-          overwrite: true
-        }
+          overwrite: true,
+        },
       );
       addDeclaration(
         helperFile,
         {
           kind: StructureKind.Function,
-          name: "getBinaryResponse"
+          name: "getBinaryResponse",
         },
-        "getBinaryResponse"
+        "getBinaryResponse",
       );
 
       const sourceFile = project.createSourceFile("src/test-platform.ts", "", {
-        overwrite: true
+        overwrite: true,
       });
       sourceFile.addStatements(`${resolveReference("getBinaryResponse")}();`);
 
@@ -428,7 +389,7 @@ describe("Binder", () => {
 
       assertGetImportStatements(
         sourceFile,
-        "#platform/static-helpers/serialization/get-binary-response"
+        "#platform/static-helpers/serialization/get-binary-response",
       );
       assertGetStatement(sourceFile, "getBinaryResponse();");
     });
@@ -440,9 +401,9 @@ describe("Binder", () => {
         ClientOptions: {
           kind: "externalDependency",
           name: "ClientOptions",
-          module: "@azure-rest/core-client"
+          module: "@azure-rest/core-client",
         },
-        ...AzurePollingDependencies
+        ...AzurePollingDependencies,
       };
       provideBinder(project, { dependencies: customDependencies });
       binder = useBinder();
@@ -451,7 +412,7 @@ describe("Binder", () => {
 
     it("should track declarations and dependencies correctly", () => {
       const sourceFile = project.createSourceFile("test1.ts", "", {
-        overwrite: true
+        overwrite: true,
       });
       const model = {
         name: "Client",
@@ -459,9 +420,9 @@ describe("Binder", () => {
           { name: "foo", type: resolveReference(Dependencies.Client) },
           {
             name: "bar",
-            type: resolveReference(Dependencies.ClientOptions)
-          }
-        ]
+            type: resolveReference(Dependencies.ClientOptions),
+          },
+        ],
       };
 
       const interfaceDeclaration: InterfaceDeclarationStructure = {
@@ -469,40 +430,27 @@ describe("Binder", () => {
         name: model.name,
         properties: model.properties.map((p) => ({
           name: p.name,
-          type: p.type
-        }))
+          type: p.type,
+        })),
       };
 
       addDeclaration(sourceFile, interfaceDeclaration, model);
       binder.resolveAllReferences("/modularPackageFolder/src");
 
-      const ifaceDeclaration = assertGetInterfaceDeclaration(
-        sourceFile,
-        "Client"
-      );
+      const ifaceDeclaration = assertGetInterfaceDeclaration(sourceFile, "Client");
       const fooProperty = assertGetInterfaceProperty(ifaceDeclaration, "foo");
       const barProperty = assertGetInterfaceProperty(ifaceDeclaration, "bar");
 
       expect(fooProperty.getText()).toBe("foo: Client_1;");
       expect(barProperty.getText()).toBe("bar: ClientOptions;");
 
-      const customImport = assertGetImportStatements(
-        sourceFile,
-        "@azure-rest/core-client"
-      );
-      const defaultImport = assertGetImportStatements(
-        sourceFile,
-        "@typespec/ts-http-runtime"
-      );
+      const customImport = assertGetImportStatements(sourceFile, "@azure-rest/core-client");
+      const defaultImport = assertGetImportStatements(sourceFile, "@typespec/ts-http-runtime");
 
-      expect(customImport.getNamedImports()[0].getName()).equal(
-        "ClientOptions"
-      );
+      expect(customImport.getNamedImports()[0].getName()).equal("ClientOptions");
 
       expect(defaultImport.getNamedImports()[0].getName()).equal("Client");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface Client {
       //   foo: Client_1;
@@ -513,7 +461,7 @@ describe("Binder", () => {
   describe("External Dependencies", () => {
     it("should track declarations and dependencies correctly", () => {
       const sourceFile = project.createSourceFile("test1.ts", "", {
-        overwrite: true
+        overwrite: true,
       });
       const model = {
         name: "Client",
@@ -521,9 +469,9 @@ describe("Binder", () => {
           { name: "foo", type: resolveReference(Dependencies.Client) },
           {
             name: "bar",
-            type: resolveReference(Dependencies.ClientOptions)
-          }
-        ]
+            type: resolveReference(Dependencies.ClientOptions),
+          },
+        ],
       };
 
       const interfaceDeclaration: InterfaceDeclarationStructure = {
@@ -531,36 +479,26 @@ describe("Binder", () => {
         name: model.name,
         properties: model.properties.map((p) => ({
           name: p.name,
-          type: p.type
-        }))
+          type: p.type,
+        })),
       };
 
       addDeclaration(sourceFile, interfaceDeclaration, model);
       binder.resolveAllReferences("/modularPackageFolder/src");
 
-      const ifaceDeclaration = assertGetInterfaceDeclaration(
-        sourceFile,
-        "Client"
-      );
+      const ifaceDeclaration = assertGetInterfaceDeclaration(sourceFile, "Client");
       const fooProperty = assertGetInterfaceProperty(ifaceDeclaration, "foo");
       const barProperty = assertGetInterfaceProperty(ifaceDeclaration, "bar");
 
       expect(fooProperty.getText()).toBe("foo: Client_1;");
       expect(barProperty.getText()).toBe("bar: ClientOptions;");
 
-      const defaultImport = assertGetImportStatements(
-        sourceFile,
-        "@typespec/ts-http-runtime"
-      );
+      const defaultImport = assertGetImportStatements(sourceFile, "@typespec/ts-http-runtime");
 
       expect(
-        defaultImport
-          .getNamedImports()
-          .map((i) => i.getAliasNode()?.getText() ?? i.getName())
-      ).to.deep.equal(["Client_1", "ClientOptions"]);
+        defaultImport.getNamedImports().map((i) => i.getAliasNode()?.getText() ?? i.getName()),
+      ).toEqual(["Client_1", "ClientOptions"]);
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface Client {
       //   foo: Client_1;
@@ -569,11 +507,11 @@ describe("Binder", () => {
 
     it("should handle name collision with external dependency", () => {
       const sourceFile = project.createSourceFile("test1.ts", "", {
-        overwrite: true
+        overwrite: true,
       });
       const model = {
         name: "TestModel",
-        properties: [{ name: "foo", type: "string" }]
+        properties: [{ name: "foo", type: "string" }],
       };
 
       const interfaceDeclaration: InterfaceDeclarationStructure = {
@@ -581,23 +519,18 @@ describe("Binder", () => {
         name: model.name,
         properties: model.properties.map((p) => ({
           name: p.name,
-          type: resolveReference(Dependencies.Client)
-        }))
+          type: resolveReference(Dependencies.Client),
+        })),
       };
 
       addDeclaration(sourceFile, interfaceDeclaration, model);
       binder.resolveAllReferences("/modularPackageFolder/src");
 
-      const ifaceDeclaration = assertGetInterfaceDeclaration(
-        sourceFile,
-        "TestModel"
-      );
+      const ifaceDeclaration = assertGetInterfaceDeclaration(sourceFile, "TestModel");
       const fooProperty = assertGetInterfaceProperty(ifaceDeclaration, "foo");
 
       expect(fooProperty.getText()).toBe("foo: Client;");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface TestModel {
       //   foo: Client;
@@ -608,11 +541,11 @@ describe("Binder", () => {
   describe("Declarations", () => {
     it("should track declarations correctly", () => {
       const sourceFile = project.createSourceFile("test1.ts", "", {
-        overwrite: true
+        overwrite: true,
       });
       const model = {
         name: "TestModel",
-        properties: [{ name: "foo", type: "string" }]
+        properties: [{ name: "foo", type: "string" }],
       };
 
       const interfaceDeclaration: InterfaceDeclarationStructure = {
@@ -620,8 +553,8 @@ describe("Binder", () => {
         name: model.name,
         properties: model.properties.map((p) => ({
           name: p.name,
-          type: p.type
-        }))
+          type: p.type,
+        })),
       };
 
       addDeclaration(sourceFile, interfaceDeclaration, model);
@@ -629,8 +562,6 @@ describe("Binder", () => {
 
       assertGetInterfaceDeclaration(sourceFile, "TestModel");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface TestModel {
       //   foo: string;
@@ -639,15 +570,15 @@ describe("Binder", () => {
 
     it("should handle declaration name conflicts", () => {
       const sourceFile = project.createSourceFile("test1.ts", "", {
-        overwrite: true
+        overwrite: true,
       });
       const model1 = {
         name: "TestModel",
-        properties: [{ name: "foo", type: "string" }]
+        properties: [{ name: "foo", type: "string" }],
       };
       const model2 = {
         name: "TestModel",
-        properties: [{ name: "bar", type: "number" }]
+        properties: [{ name: "bar", type: "number" }],
       };
 
       const interfaceDeclaration1: InterfaceDeclarationStructure = {
@@ -655,8 +586,8 @@ describe("Binder", () => {
         name: model1.name,
         properties: model1.properties.map((p) => ({
           name: p.name,
-          type: p.type
-        }))
+          type: p.type,
+        })),
       };
 
       const interfaceDeclaration2: InterfaceDeclarationStructure = {
@@ -664,8 +595,8 @@ describe("Binder", () => {
         name: model2.name,
         properties: model2.properties.map((p) => ({
           name: p.name,
-          type: p.type
-        }))
+          type: p.type,
+        })),
       };
 
       addDeclaration(sourceFile, interfaceDeclaration1, model1);
@@ -674,9 +605,6 @@ describe("Binder", () => {
 
       assertGetInterfaceDeclaration(sourceFile, "TestModel");
       assertGetInterfaceDeclaration(sourceFile, "TestModel_1");
-
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
 
       // test1.ts
       // interface TestModel {
@@ -690,15 +618,15 @@ describe("Binder", () => {
 
     it("should defer references to declarations that don't exist", () => {
       const sourceFile = project.createSourceFile("test1.ts", "", {
-        overwrite: true
+        overwrite: true,
       });
       const modelA = {
         name: "TestModelA",
-        properties: [{ name: "foo", type: "string" }]
+        properties: [{ name: "foo", type: "string" }],
       };
       const modelB = {
         name: "TestModelB",
-        properties: [{ name: "foo", type: modelA }]
+        properties: [{ name: "foo", type: modelA }],
       };
 
       const interfaceDeclarationA: InterfaceDeclarationStructure = {
@@ -706,8 +634,8 @@ describe("Binder", () => {
         name: modelA.name,
         properties: modelA.properties.map((p) => ({
           name: p.name,
-          type: p.type
-        }))
+          type: p.type,
+        })),
       };
 
       const interfaceDeclarationB: InterfaceDeclarationStructure = {
@@ -715,8 +643,8 @@ describe("Binder", () => {
         name: modelB.name,
         properties: modelB.properties.map((p) => ({
           name: p.name,
-          type: resolveReference(p.type)
-        }))
+          type: resolveReference(p.type),
+        })),
       };
 
       addDeclaration(sourceFile, interfaceDeclarationA, modelA);
@@ -724,17 +652,12 @@ describe("Binder", () => {
       binder.resolveAllReferences("/modularPackageFolder/src");
 
       assertGetInterfaceDeclaration(sourceFile, "TestModelA");
-      const modelBInterface = assertGetInterfaceDeclaration(
-        sourceFile,
-        "TestModelB"
-      );
+      const modelBInterface = assertGetInterfaceDeclaration(sourceFile, "TestModelB");
 
       const fooProp = assertGetInterfaceProperty(modelBInterface, "foo");
 
       assert.equal(fooProp.getText(), "foo: TestModelA;");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface TestModelA {
       //   foo: string;
@@ -747,29 +670,29 @@ describe("Binder", () => {
 
     it("should handle import conflicts", () => {
       const sourceFile1 = project.createSourceFile("test1.ts", "", {
-        overwrite: true
+        overwrite: true,
       });
       const sourceFile2 = project.createSourceFile("test2.ts", "", {
-        overwrite: true
+        overwrite: true,
       });
       const sourceFile3 = project.createSourceFile("test3.ts", "", {
-        overwrite: true
+        overwrite: true,
       });
 
       const model1 = {
         name: "TestModel",
-        properties: [{ name: "foo", type: "string" }]
+        properties: [{ name: "foo", type: "string" }],
       };
       const model2 = {
         name: "TestModelB",
-        properties: [{ name: "bar", type: model1 }]
+        properties: [{ name: "bar", type: model1 }],
       };
       const model3 = {
         name: "LastModel",
         properties: [
           { name: "baz", type: model1 },
-          { name: "qux", type: model2 }
-        ]
+          { name: "qux", type: model2 },
+        ],
       };
 
       const interfaceDeclaration1: InterfaceDeclarationStructure = {
@@ -777,8 +700,8 @@ describe("Binder", () => {
         name: model1.name,
         properties: model1.properties.map((p) => ({
           name: p.name,
-          type: p.type
-        }))
+          type: p.type,
+        })),
       };
 
       const interfaceDeclaration2: InterfaceDeclarationStructure = {
@@ -786,8 +709,8 @@ describe("Binder", () => {
         name: model2.name,
         properties: model2.properties.map((p) => ({
           name: p.name,
-          type: resolveReference(p.type)
-        }))
+          type: resolveReference(p.type),
+        })),
       };
 
       const interfaceDeclaration3: InterfaceDeclarationStructure = {
@@ -795,8 +718,8 @@ describe("Binder", () => {
         name: model3.name,
         properties: model3.properties.map((p) => ({
           name: p.name,
-          type: resolveReference(p.type)
-        }))
+          type: resolveReference(p.type),
+        })),
       };
 
       addDeclaration(sourceFile1, interfaceDeclaration1, model1);
@@ -805,10 +728,7 @@ describe("Binder", () => {
 
       binder.resolveAllReferences("/modularPackageFolder/src");
 
-      const lasModelInterface = assertGetInterfaceDeclaration(
-        sourceFile3,
-        "LastModel"
-      );
+      const lasModelInterface = assertGetInterfaceDeclaration(sourceFile3, "LastModel");
 
       const bazProp = assertGetInterfaceProperty(lasModelInterface, "baz");
       const quxProp = assertGetInterfaceProperty(lasModelInterface, "qux");
@@ -818,19 +738,9 @@ describe("Binder", () => {
 
       const imports = sourceFile3
         .getImportDeclarations()
-        .flatMap((i) =>
-          i
-            .getNamedImports()
-            .map((n) => n.getAliasNode()?.getText() ?? n.getName())
-        );
+        .flatMap((i) => i.getNamedImports().map((n) => n.getAliasNode()?.getText() ?? n.getName()));
       expect(imports).toEqual(["TestModel", "TestModelB"]);
 
-      console.log("// test1.ts");
-      console.log(sourceFile1.getFullText());
-      console.log("// test2.ts");
-      console.log(sourceFile2.getFullText());
-      console.log("// test3.ts");
-      console.log(sourceFile3.getFullText());
       // test1.ts
       // interface TestModel {
       //   foo: string;
@@ -855,36 +765,32 @@ describe("Binder", () => {
 
     it("should handle non-interface types as well", () => {
       const sourceFile1 = project.createSourceFile("test1.ts", "", {
-        overwrite: true
+        overwrite: true,
       });
 
       const fnObject = {
         name: "testFn",
         returnType: "string",
-        body: `console.log("hello world!");`
+        body: `console.log("hello world!");`,
       };
 
       const funDeclaration: FunctionDeclarationStructure = {
         kind: StructureKind.Function,
         name: fnObject.name,
         returnType: fnObject.returnType,
-        statements: fnObject.body
+        statements: fnObject.body,
       };
 
       addDeclaration(sourceFile1, funDeclaration, fnObject);
 
       const sourceFile2 = project.createSourceFile("test2.ts", "", {
-        overwrite: true
+        overwrite: true,
       });
       sourceFile2.addStatements(`${resolveReference(fnObject)}();`);
 
       const binder = useBinder();
       binder.resolveAllReferences("/modularPackageFolder/src");
 
-      console.log("// test1.ts");
-      console.log(sourceFile1.getFullText());
-      console.log("// test2.ts");
-      console.log(sourceFile2.getFullText());
       // test1.ts
       // function testFn(): string {
       //   console.log("hello world!");
@@ -898,16 +804,16 @@ describe("Binder", () => {
 
     it("should track and resolve multiple types of declarations", () => {
       const sourceFile = project.createSourceFile("test1.ts", "", {
-        overwrite: true
+        overwrite: true,
       });
       const model = {
         name: "TestModel",
-        properties: [{ name: "foo", type: "string" }]
+        properties: [{ name: "foo", type: "string" }],
       };
       const functionModel = {
         name: "TestFunction",
         returnType: "void",
-        body: `console.log("Hello World");`
+        body: `console.log("Hello World");`,
       };
 
       const interfaceDeclaration: InterfaceDeclarationStructure = {
@@ -915,15 +821,15 @@ describe("Binder", () => {
         name: model.name,
         properties: model.properties.map((p) => ({
           name: p.name,
-          type: p.type
-        }))
+          type: p.type,
+        })),
       };
 
       const functionDeclaration: FunctionDeclarationStructure = {
         kind: StructureKind.Function,
         name: functionModel.name,
         returnType: functionModel.returnType,
-        statements: functionModel.body
+        statements: functionModel.body,
       };
 
       addDeclaration(sourceFile, interfaceDeclaration, model);
@@ -933,8 +839,6 @@ describe("Binder", () => {
 
       assertGetInterfaceDeclaration(sourceFile, "TestModel");
       assertGetFunctionDeclaration(sourceFile, "TestFunction");
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
 
       // test1.ts
       // interface TestModel {
@@ -948,15 +852,15 @@ describe("Binder", () => {
 
     it("should handle cyclic references", () => {
       const sourceFile = project.createSourceFile("test1.ts", "", {
-        overwrite: true
+        overwrite: true,
       });
       const modelA = {
         name: "ModelA",
-        properties: [{ name: "propA", type: "ModelB" }]
+        properties: [{ name: "propA", type: "ModelB" }],
       };
       const modelB = {
         name: "ModelB",
-        properties: [{ name: "propB", type: "ModelA" }]
+        properties: [{ name: "propB", type: "ModelA" }],
       };
 
       const interfaceDeclarationA: InterfaceDeclarationStructure = {
@@ -964,8 +868,8 @@ describe("Binder", () => {
         name: modelA.name,
         properties: modelA.properties.map((p) => ({
           name: p.name,
-          type: resolveReference(modelB)
-        }))
+          type: resolveReference(modelB),
+        })),
       };
 
       const interfaceDeclarationB: InterfaceDeclarationStructure = {
@@ -973,8 +877,8 @@ describe("Binder", () => {
         name: modelB.name,
         properties: modelB.properties.map((p) => ({
           name: p.name,
-          type: resolveReference(modelA)
-        }))
+          type: resolveReference(modelA),
+        })),
       };
 
       addDeclaration(sourceFile, interfaceDeclarationA, modelA);
@@ -989,8 +893,6 @@ describe("Binder", () => {
       expect(propA?.getType().getText()).toBe("ModelB");
       expect(propB?.getType().getText()).toBe("ModelA");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface ModelA {
       //   propA: ModelB;
@@ -1003,17 +905,17 @@ describe("Binder", () => {
 
     it("should handle mixed type declarations and references", () => {
       const sourceFile = project.createSourceFile("test1.ts", "", {
-        overwrite: true
+        overwrite: true,
       });
 
       const interfaceModel = {
         name: "MyInterface",
-        properties: [{ name: "id", type: "number" }]
+        properties: [{ name: "id", type: "number" }],
       };
       const functionModel = {
         name: "MyFunction",
         returnType: "void",
-        body: `console.log("Hello World");`
+        body: `console.log("Hello World");`,
       };
 
       const interfaceDeclaration: InterfaceDeclarationStructure = {
@@ -1021,44 +923,32 @@ describe("Binder", () => {
         name: interfaceModel.name,
         properties: interfaceModel.properties.map((p) => ({
           name: p.name,
-          type: p.type
-        }))
+          type: p.type,
+        })),
       };
 
       const functionDeclaration: FunctionDeclarationStructure = {
         kind: StructureKind.Function,
         name: functionModel.name,
         returnType: functionModel.returnType,
-        statements: functionModel.body
+        statements: functionModel.body,
       };
 
       addDeclaration(sourceFile, interfaceDeclaration, interfaceModel);
       addDeclaration(sourceFile, functionDeclaration, functionModel);
 
       const sourceFile2 = project.createSourceFile("test2.ts", "", {
-        overwrite: true
+        overwrite: true,
       });
       sourceFile2.addStatements(`${resolveReference(functionModel)}();`);
-      sourceFile2.addStatements(
-        `let obj: ${resolveReference(interfaceModel)} = { id: 1 };`
-      );
+      sourceFile2.addStatements(`let obj: ${resolveReference(interfaceModel)} = { id: 1 };`);
 
       const binder = useBinder();
       binder.resolveAllReferences("/modularPackageFolder/src");
 
-      const variableDeclaration = assertGetVariableDeclaration(
-        sourceFile2,
-        "obj"
-      );
-      assert.equal(
-        variableDeclaration.getText(),
-        "let obj: MyInterface = { id: 1 };"
-      );
+      const variableDeclaration = assertGetVariableDeclaration(sourceFile2, "obj");
+      assert.equal(variableDeclaration.getText(), "let obj: MyInterface = { id: 1 };");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
-      console.log("// test2.ts");
-      console.log(sourceFile2.getFullText());
       // test1.ts
       // interface MyInterface {
       //   id: number;
@@ -1075,18 +965,18 @@ describe("Binder", () => {
       // let obj: MyInterface = { id: 1 };
     });
 
-    it("should defer references to declarations that don't exist", () => {
+    it("should defer references to nested declarations that don't exist yet", () => {
       const sourceFile = project.createSourceFile("test1.ts", "", {
-        overwrite: true
+        overwrite: true,
       });
       const model = {
         name: "TestModel",
-        properties: [{ name: "foo", type: "string" }]
+        properties: [{ name: "foo", type: "string" }],
       };
 
       const modelB = {
         name: "TestModelB",
-        properties: [{ name: "foo", type: model }]
+        properties: [{ name: "foo", type: model }],
       };
 
       const interfaceDeclaration: InterfaceDeclarationStructure = {
@@ -1094,8 +984,8 @@ describe("Binder", () => {
         name: model.name,
         properties: model.properties.map((p) => ({
           name: p.name,
-          type: p.type
-        }))
+          type: p.type,
+        })),
       };
 
       const interfaceDeclarationB: InterfaceDeclarationStructure = {
@@ -1103,8 +993,8 @@ describe("Binder", () => {
         name: modelB.name,
         properties: modelB.properties.map((p) => ({
           name: p.name,
-          type: resolveReference(p.type)
-        }))
+          type: resolveReference(p.type),
+        })),
       };
 
       addDeclaration(sourceFile, interfaceDeclaration, model);
@@ -1114,17 +1004,12 @@ describe("Binder", () => {
       binder.resolveAllReferences("/modularPackageFolder/src");
 
       assertGetInterfaceDeclaration(sourceFile, "TestModel");
-      const modelBInterface = assertGetInterfaceDeclaration(
-        sourceFile,
-        "TestModelB"
-      );
+      const modelBInterface = assertGetInterfaceDeclaration(sourceFile, "TestModelB");
 
       const fooProp = assertGetInterfaceProperty(modelBInterface, "foo");
 
       assert.equal(fooProp.getText(), "foo: TestModel;");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface TestModel {
       //   foo: string;

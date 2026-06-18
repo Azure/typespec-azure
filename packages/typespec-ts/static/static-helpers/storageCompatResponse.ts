@@ -1,19 +1,13 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import type {
-  FullOperationResponse,
-  RawResponseCallback
-} from "@azure-rest/core-client";
+import type { FullOperationResponse, RawResponseCallback } from "@azure-rest/core-client";
 
 /**
  * Response metadata providing access to raw HTTP response details.
  * Available when the `enable-storage-compat` emitter option is enabled.
  */
-export interface StorageCompatResponseInfo<
-  TBody = unknown,
-  THeaders = Record<string, unknown>
-> {
+export interface StorageCompatResponseInfo<TBody = unknown, THeaders = Record<string, unknown>> {
   _response: {
     /** The raw FullOperationResponse from the HTTP pipeline. */
     rawResponse: FullOperationResponse;
@@ -30,9 +24,7 @@ export interface StorageCompatResponseInfo<
  * @param originalOnResponse - The user's original onResponse callback, if any.
  * @returns An object with the onResponse callback and a getter for the captured response.
  */
-export function createStorageCompatOnResponse(
-  originalOnResponse?: RawResponseCallback
-): {
+export function createStorageCompatOnResponse(originalOnResponse?: RawResponseCallback): {
   onResponse: RawResponseCallback;
   getRawResponse: () => FullOperationResponse | undefined;
 } {
@@ -42,7 +34,7 @@ export function createStorageCompatOnResponse(
       captured = rawResponse;
       originalOnResponse?.(rawResponse, error);
     },
-    getRawResponse: () => captured
+    getRawResponse: () => captured,
   };
 }
 
@@ -54,10 +46,7 @@ export function createStorageCompatOnResponse(
  * Headers and body properties are spread at the top level of the result,
  * in addition to being available under `_response.parsedHeaders` / `_response.parsedBody`.
  */
-type StorageCompatResult<TBody, THeaders> = TBody extends
-  | undefined
-  | void
-  | null
+type StorageCompatResult<TBody, THeaders> = TBody extends undefined | void | null
   ? THeaders & StorageCompatResponseInfo<TBody, THeaders>
   : THeaders & TBody & StorageCompatResponseInfo<TBody, THeaders>;
 
@@ -68,23 +57,17 @@ type StorageCompatResult<TBody, THeaders> = TBody extends
  * @param parsedHeaders - The deserialized response headers.
  * @returns The parsedBody augmented with a `_response` property.
  */
-export function addStorageCompatResponse<
-  TBody,
-  THeaders = Record<string, unknown>
->(
+export function addStorageCompatResponse<TBody, THeaders = Record<string, unknown>>(
   rawResponse: FullOperationResponse,
   parsedBody: TBody,
-  parsedHeaders: THeaders
+  parsedHeaders: THeaders,
 ): StorageCompatResult<TBody, THeaders> {
-  const base =
-    parsedBody !== undefined && parsedBody !== null
-      ? parsedBody
-      : ({} as TBody);
+  const base = parsedBody !== undefined && parsedBody !== null ? parsedBody : ({} as TBody);
   return Object.assign(base as any, parsedHeaders, {
     _response: {
       rawResponse,
       parsedBody,
-      parsedHeaders
-    }
+      parsedHeaders,
+    },
   });
 }

@@ -1,9 +1,6 @@
 import { EncodingType, uint8ArrayToString } from "@typespec/ts-http-runtime";
 export const serializeRecord = withNullChecks(
-  (
-    item: Record<string, any>,
-    serializer?: (item: any) => any
-  ): Record<string, any> => {
+  (item: Record<string, any>, serializer?: (item: any) => any): Record<string, any> => {
     return Object.keys(item).reduce((acc, key) => {
       if (isPassthroughElement(item[key])) {
         acc[key] = item[key] as any;
@@ -13,12 +10,13 @@ export const serializeRecord = withNullChecks(
           acc[key] = serializer(value);
         }
       } else {
+        // eslint-disable-next-line no-console
         console.warn(`Don't know how to serialize ${item[key]}`);
         acc[key] = item[key] as any;
       }
       return acc;
     }, {});
-  }
+  },
 );
 
 export const serializePassthrough = withNullChecks(<T>(item: T): T => item);
@@ -31,7 +29,7 @@ export const serializeArray = withNullChecks(
       }
       return serializer(item);
     });
-  }
+  },
 );
 
 export const serializeUtcDateTime = withNullChecks((date: Date): string => {
@@ -42,7 +40,7 @@ export const serializeUtcDateTime = withNullChecks((date: Date): string => {
 export const serializeBytes = withNullChecks(
   (bytes: Uint8Array, encoding: EncodingType): string => {
     return uint8ArrayToString(bytes, encoding);
-  }
+  },
 );
 
 export function withNullChecks(fn: (input: any, ...args: any) => unknown) {

@@ -1,4 +1,6 @@
 import { defineLinter } from "@typespec/compiler";
+import { armAgentBaseTypeChildResourcesRule } from "./rules/arm-agent-base-type-child-resources.js";
+import { armAgentBaseTypeLifecycleOperationsRule } from "./rules/arm-agent-base-type-lifecycle-operations.js";
 import { armCommonTypesVersionRule } from "./rules/arm-common-types-version.js";
 import { armCustomResourceNoKey } from "./rules/arm-custom-resource-no-key.js";
 import { armCustomResourceUsageDiscourage } from "./rules/arm-custom-resource-usage-discourage.js";
@@ -26,6 +28,7 @@ import { improperSubscriptionListOperationRule } from "./rules/improper-subscrip
 import { lroLocationHeaderRule } from "./rules/lro-location-header.js";
 import { missingXmsIdentifiersRule } from "./rules/missing-x-ms-identifiers.js";
 import { noEmptyModel } from "./rules/no-empty-model.js";
+import { noOverridePropsRule } from "./rules/no-override-props.js";
 import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
@@ -37,8 +40,11 @@ import { unsupportedTypeRule } from "./rules/unsupported-type.js";
 import { versionProgressionRule } from "./rules/version-progression.js";
 
 const rules = [
+  armAgentBaseTypeChildResourcesRule,
+  armAgentBaseTypeLifecycleOperationsRule,
   armNoRecordRule,
   armNoPathCasingConflictsRule,
+  noOverridePropsRule,
   armCommonTypesVersionRule,
   armDeleteResponseCodesRule,
   armPutResponseCodesRule,

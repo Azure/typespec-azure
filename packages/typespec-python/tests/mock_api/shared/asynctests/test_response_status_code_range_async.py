@@ -4,19 +4,20 @@
 # license information.
 # --------------------------------------------------------------------------
 import pytest
+import pytest_asyncio
 from response.statuscoderange.aio import StatusCodeRangeClient
 from response.statuscoderange.models import ErrorInRange, NotFoundError
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def client():
     async with StatusCodeRangeClient(endpoint="http://localhost:3000") as client:
         yield client
 
 
 @pytest.mark.asyncio
-async def test_error_response_status_code_in_range(client: StatusCodeRangeClient):
-    with pytest.raises(Exception) as exc_info:
+async def test_error_response_status_code_in_range(client: StatusCodeRangeClient, core_library):
+    with pytest.raises(core_library.exceptions.HttpResponseError) as exc_info:
         await client.error_response_status_code_in_range()
 
     error = exc_info.value.model
@@ -27,8 +28,8 @@ async def test_error_response_status_code_in_range(client: StatusCodeRangeClient
 
 
 @pytest.mark.asyncio
-async def test_error_response_status_code_404(client: StatusCodeRangeClient):
-    with pytest.raises(Exception) as exc_info:
+async def test_error_response_status_code_404(client: StatusCodeRangeClient, core_library):
+    with pytest.raises(core_library.exceptions.ResourceNotFoundError) as exc_info:
         await client.error_response_status_code404()
 
     error = exc_info.value.model

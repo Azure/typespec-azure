@@ -1,12 +1,11 @@
+/* eslint-disable no-console */
 export function createTaskLogger() {
   let entries = [];
 
   return {
     log: (message) => entries.push({ type: "log", message }),
-    error: (message) =>
-      entries.push({ type: "error", message: `ERROR: ${message}` }),
-    captureOutput: (data) =>
-      entries.push({ type: "output", message: data.toString() }),
+    error: (message) => entries.push({ type: "error", message: `ERROR: ${message}` }),
+    captureOutput: (data) => entries.push({ type: "output", message: data.toString() }),
     flush: () => {
       for (const entry of entries) {
         if (entry.type === "error") {
@@ -17,6 +16,6 @@ export function createTaskLogger() {
       }
       // Clear the buffer after flushing
       entries = [];
-    }
+    },
   };
 }

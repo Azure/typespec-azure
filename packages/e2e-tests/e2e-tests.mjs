@@ -33,7 +33,7 @@ function printInfo() {
 
 function packPackages() {
   console.log("Packing core packages...");
-  run("pnpm", ["-w", "pack:all"], { cwd: coreRepoRoot });
+  run("pnpm", ["-w", "pack:all", "--exclude", "typespec-vs"], { cwd: coreRepoRoot });
 
   console.log("Packing azure packages...");
   run("pnpm", ["-w", "pack:all"], { cwd: repoRoot });

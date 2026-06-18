@@ -1,11 +1,12 @@
-import { describe, it, beforeEach, expect, assert } from "vitest";
-import { loadStaticHelpers } from "../../src/framework/load-static-helpers.js";
-import { Project } from "ts-morph";
+import { getDirectoryPath, NodeHost } from "@typespec/compiler";
 import path from "path";
+import { Project } from "ts-morph";
+import { fileURLToPath } from "url";
+import { assert, beforeEach, describe, expect, it } from "vitest";
+import { loadStaticHelpers } from "../../src/framework/load-static-helpers.js";
 import { refkey } from "../../src/framework/refkey.js";
-import { getDirname } from "../../src/utils/dirname.js";
 
-const __dirname = getDirname(import.meta.url).__dirname;
+const __dirname = getDirectoryPath(fileURLToPath(import.meta.url));
 
 describe("loadStaticHelpers", () => {
   let project: Project;
@@ -20,19 +21,20 @@ describe("loadStaticHelpers", () => {
       buildCsvCollection: {
         kind: "function",
         name: "buildCsvCollection",
-        location: "utils.ts"
-      }
+        location: "utils.ts",
+      },
     } as const;
     const helperDeclarations = await loadStaticHelpers(project, helpers, {
-      helpersAssetDirectory
+      host: NodeHost,
+      helpersAssetDirectory,
     });
     expect(
       project
         .getSourceFiles()
-        .some((file) => file.getFilePath().endsWith("/static-helpers/utils.ts"))
+        .some((file) => file.getFilePath().endsWith("/static-helpers/utils.ts")),
     ).toBe(true);
     const buildCsvCollectionDeclaration = helperDeclarations.get(
-      refkey(helpers.buildCsvCollection)
+      refkey(helpers.buildCsvCollection),
     );
     expect(buildCsvCollectionDeclaration).toEqual(helpers.buildCsvCollection);
   });
@@ -42,14 +44,15 @@ describe("loadStaticHelpers", () => {
       buildCsvCollection: {
         kind: "function",
         name: "nonExisting",
-        location: "utils.ts"
-      }
+        location: "utils.ts",
+      },
     } as const;
 
     await expect(
       loadStaticHelpers(project, helpers, {
-        helpersAssetDirectory
-      })
+        host: NodeHost,
+        helpersAssetDirectory,
+      }),
     ).rejects.toThrowError(/not found/);
   });
 
@@ -58,14 +61,15 @@ describe("loadStaticHelpers", () => {
       buildCsvCollection: {
         kind: "invalid",
         name: "buildCsvCollection",
-        location: "utils.ts"
-      }
+        location: "utils.ts",
+      },
     } as any;
 
     await expect(
       loadStaticHelpers(project, helpers, {
-        helpersAssetDirectory
-      })
+        host: NodeHost,
+        helpersAssetDirectory,
+      }),
     ).rejects.toThrowError(/invalid helper kind/);
   });
 
@@ -74,27 +78,24 @@ describe("loadStaticHelpers", () => {
       usesPlatformImport: {
         kind: "function",
         name: "usesPlatformImport",
-        location: "platform-import.ts"
-      }
+        location: "platform-import.ts",
+      },
     } as const;
 
     await loadStaticHelpers(project, helpers, {
+      host: NodeHost,
       helpersAssetDirectory,
       options: {
         flavor: "azure",
-        azureSdkForJs: true
-      } as any
+        azureSdkForJs: true,
+      } as any,
     });
 
     const sourceFile = project
       .getSourceFiles()
-      .find((file) =>
-        file.getFilePath().endsWith("/static-helpers/platform-import.ts")
-      );
+      .find((file) => file.getFilePath().endsWith("/static-helpers/platform-import.ts"));
     assert(sourceFile);
-    const importDecl = sourceFile.getImportDeclaration(
-      "#platform/static-helpers/platform-types"
-    );
+    const importDecl = sourceFile.getImportDeclaration("#platform/static-helpers/platform-types");
     expect(importDecl).toBeDefined();
   });
 });

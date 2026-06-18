@@ -17,7 +17,7 @@ export declare interface BinaryArrayPartsRequestIdPartDescriptor {
 
 export declare interface BinaryArrayPartsRequestPicturesPartDescriptor {
     name: "pictures";
-    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream | File;
+    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeReadableStream | File;
     filename?: string;
     contentType?: string;
 }
@@ -36,7 +36,7 @@ export declare interface ComplexHttpPartsModelRequestIdPartDescriptor {
 
 export declare interface ComplexHttpPartsModelRequestPicturesPartDescriptor {
     name: "pictures";
-    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream | File;
+    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeReadableStream | File;
     filename?: string;
     contentType?: string;
 }
@@ -48,7 +48,7 @@ export declare interface ComplexHttpPartsModelRequestPreviousAddressesPartDescri
 
 export declare interface ComplexHttpPartsModelRequestProfileImagePartDescriptor {
     name: "profileImage";
-    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream | File;
+    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeReadableStream | File;
     filename: string;
     contentType: string;
 }
@@ -67,14 +67,14 @@ export declare interface ComplexPartsRequestIdPartDescriptor {
 
 export declare interface ComplexPartsRequestPicturesPartDescriptor {
     name: "pictures";
-    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream | File;
+    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeReadableStream | File;
     filename?: string;
     contentType?: string;
 }
 
 export declare interface ComplexPartsRequestProfileImagePartDescriptor {
     name: "profileImage";
-    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream | File;
+    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeReadableStream | File;
     filename?: string;
     contentType?: string;
 }
@@ -86,7 +86,7 @@ export declare type FileWithHttpPartOptionalContentTypeRequest = FormData | Arra
 
 export declare interface FileWithHttpPartOptionalContentTypeRequestProfileImagePartDescriptor {
     name: "profileImage";
-    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream | File;
+    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeReadableStream | File;
     filename: string;
     contentType?: string;
 }
@@ -95,7 +95,7 @@ export declare type FileWithHttpPartRequiredContentTypeRequest = FormData | Arra
 
 export declare interface FileWithHttpPartRequiredContentTypeRequestProfileImagePartDescriptor {
     name: "profileImage";
-    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream | File;
+    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeReadableStream | File;
     filename: string;
     contentType: string;
 }
@@ -104,7 +104,7 @@ export declare type FileWithHttpPartSpecificContentTypeRequest = FormData | Arra
 
 export declare interface FileWithHttpPartSpecificContentTypeRequestProfileImagePartDescriptor {
     name: "profileImage";
-    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream | File;
+    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeReadableStream | File;
     filename: string;
     contentType: "image/jpg";
 }
@@ -120,7 +120,7 @@ export declare interface FormDataAnonymousModel204Response extends HttpResponse 
 export declare interface FormDataAnonymousModelBodyParam {
     body: FormData | Array<{
         name: "profileImage";
-        body: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream | File;
+        body: string | Uint8Array | ReadableStream<Uint8Array> | NodeReadableStream | File;
         filename?: string;
         contentType?: string;
     }>;
@@ -215,7 +215,7 @@ export declare interface FormDataFileUploadFileArray204Response extends HttpResp
 export declare interface FormDataFileUploadFileArrayBodyParam {
     body: FormData | Array<{
         name: "files";
-        body: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream | File;
+        body: string | Uint8Array | ReadableStream<Uint8Array> | NodeReadableStream | File;
         filename?: string;
         contentType?: string;
     }>;
@@ -238,7 +238,7 @@ export declare interface FormDataFileUploadFileRequiredFilename204Response exten
 export declare interface FormDataFileUploadFileRequiredFilenameBodyParam {
     body: FormData | Array<{
         name: "file";
-        body: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream | File;
+        body: string | Uint8Array | ReadableStream<Uint8Array> | NodeReadableStream | File;
         filename?: string;
         contentType?: string;
     }>;
@@ -261,7 +261,7 @@ export declare interface FormDataFileUploadFileSpecificContentType204Response ex
 export declare interface FormDataFileUploadFileSpecificContentTypeBodyParam {
     body: FormData | Array<{
         name: "file";
-        body: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream | File;
+        body: string | Uint8Array | ReadableStream<Uint8Array> | NodeReadableStream | File;
         filename?: string;
         contentType?: string;
     }>;
@@ -447,7 +447,7 @@ export declare interface JsonPartRequestAddressPartDescriptor {
 
 export declare interface JsonPartRequestProfileImagePartDescriptor {
     name: "profileImage";
-    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream | File;
+    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeReadableStream | File;
     filename?: string;
     contentType?: string;
 }
@@ -456,14 +456,14 @@ export declare type MultiBinaryPartsRequest = FormData | Array<MultiBinaryPartsR
 
 export declare interface MultiBinaryPartsRequestPicturePartDescriptor {
     name: "picture";
-    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream | File;
+    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeReadableStream | File;
     filename?: string;
     contentType?: string;
 }
 
 export declare interface MultiBinaryPartsRequestProfileImagePartDescriptor {
     name: "profileImage";
-    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream | File;
+    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeReadableStream | File;
     filename?: string;
     contentType?: string;
 }
@@ -484,7 +484,7 @@ export declare interface MultiPartOptionalRequestIdPartDescriptor {
 
 export declare interface MultiPartOptionalRequestProfileImagePartDescriptor {
     name: "profileImage";
-    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream | File;
+    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeReadableStream | File;
     filename?: string;
     contentType?: string;
 }
@@ -498,7 +498,7 @@ export declare interface MultiPartRequestIdPartDescriptor {
 
 export declare interface MultiPartRequestProfileImagePartDescriptor {
     name: "profileImage";
-    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream | File;
+    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeReadableStream | File;
     filename?: string;
     contentType?: string;
 }
@@ -512,10 +512,12 @@ export declare interface MultiPartRequestWithWireNameIdentifierPartDescriptor {
 
 export declare interface MultiPartRequestWithWireNameImagePartDescriptor {
     name: "image";
-    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream | File;
+    body: string | Uint8Array | ReadableStream<Uint8Array> | NodeReadableStream | File;
     filename?: string;
     contentType?: string;
 }
+
+declare type NodeReadableStream = NodeJS.ReadableStream;
 
 export declare interface Routes {
     (path: "/multipart/form-data/mixed-parts"): FormDataBasic;
