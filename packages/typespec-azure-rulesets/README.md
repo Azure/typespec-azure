@@ -24,6 +24,7 @@ Available ruleSets:
 
 - `@azure-tools/typespec-azure-rulesets/data-plane`
 - `@azure-tools/typespec-azure-rulesets/resource-manager`
+- `@azure-tools/typespec-azure-rulesets/resource-manager-suppression-required`
 
 ## Rules
 
