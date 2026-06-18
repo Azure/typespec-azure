@@ -107,7 +107,7 @@ export function _updateSend(
 
 export async function _updateDeserialize(
   result: PathUncheckedResponse,
-): Promise<PartnerTopic | undefined> {
+): Promise<PartnerTopic | void> {
   const expectedStatuses = ["200", "201"];
   if (!expectedStatuses.includes(result.status)) {
     const error = createRestError(result);
@@ -129,7 +129,7 @@ export async function update(
   partnerTopicName: string,
   properties: PartnerTopicUpdateParameters,
   options: UpdateOptionalParams = { requestOptions: {} },
-): Promise<PartnerTopic | undefined> {
+): Promise<PartnerTopic | void> {
   const result = await _updateSend(
     context,
     apiVersion,
