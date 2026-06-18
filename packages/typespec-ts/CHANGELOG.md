@@ -1,5 +1,14 @@
 # Change Log - @azure-tools/typespec-ts
 
+## 0.54.2
+
+### Bug Fixes
+
+- [#4647](https://github.com/Azure/typespec-azure/pull/4647) Preserve `$DO_NOT_NORMALIZE# Change Log - @azure-tools/typespec-ts operation-group names in classical client generation to avoid double-normalization that caused unresolved placeholder references.
+- [#4627](https://github.com/Azure/typespec-azure/pull/4627) [typespec-ts] fix body param serialize issue reported from sdk repo
+- [#4627](https://github.com/Azure/typespec-azure/pull/4627) [typespec-ts] Keep paged result model public when also used as a model property
+
+
 ## 0.54.1
 
 ### Bug Fixes
