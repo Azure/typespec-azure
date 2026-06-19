@@ -63,6 +63,9 @@ export const $decorators = {
     armVirtualResource: $armVirtualResource,
     resourceBaseType: $resourceBaseType,
     identifiers: $identifiers,
+    feature: $feature,
+    features: $features,
+    featureOptions: $featureOptions,
   } satisfies AzureResourceManagerDecorators,
   "Azure.ResourceManager.BaseTypes": {
     azureBaseType: $azureBaseType,
@@ -73,8 +76,5 @@ export const $decorators = {
     armOperationRoute: $armOperationRoute,
     armExternalType: $armExternalType,
     renamePathParameter: $renamePathParameter,
-    feature: $feature,
-    features: $features,
-    featureOptions: $featureOptions,
   } satisfies AzureResourceManagerLegacyDecorators,
 };

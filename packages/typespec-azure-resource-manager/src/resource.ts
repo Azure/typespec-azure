@@ -29,10 +29,14 @@ import { $autoRoute, getParentResource, getSegment } from "@typespec/rest";
 
 import { camelCase, pascalCase } from "change-case";
 import {
+  ArmFeatureOptions,
   ArmProviderNameValueDecorator,
   ArmResourceOperationsDecorator,
   ArmVirtualResourceDecorator,
   ExtensionResourceDecorator,
+  FeatureDecorator,
+  FeatureOptionsDecorator,
+  FeaturesDecorator,
   IdentifiersDecorator,
   LocationResourceDecorator,
   ResourceBaseTypeDecorator,
@@ -44,12 +48,8 @@ import {
 } from "../generated-defs/Azure.ResourceManager.js";
 import {
   ArmExternalTypeDecorator,
-  ArmFeatureOptions,
   CustomAzureResourceDecorator,
   CustomResourceOptions,
-  FeatureDecorator,
-  FeatureOptionsDecorator,
-  FeaturesDecorator,
 } from "../generated-defs/Azure.ResourceManager.Legacy.js";
 import { reportDiagnostic } from "./lib.js";
 import {

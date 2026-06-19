@@ -1,12 +1,8 @@
 import type {
   DecoratorContext,
   DecoratorValidatorCallbacks,
-  Enum,
-  EnumMember,
-  Interface,
   Model,
   ModelProperty,
-  Namespace,
   Operation,
 } from "@typespec/compiler";
 
@@ -17,14 +13,6 @@ export interface CustomResourceOptions {
 export interface ArmOperationOptions {
   readonly useStaticRoute?: boolean;
   readonly route?: string;
-}
-
-export interface ArmFeatureOptions {
-  readonly featureName: string;
-  readonly fileName: string;
-  readonly description: string;
-  readonly title?: string;
-  readonly termsOfService?: string;
 }
 
 /**
@@ -87,49 +75,10 @@ export type RenamePathParameterDecorator = (
   targetParameterName: string,
 ) => DecoratorValidatorCallbacks | void;
 
-/**
- * Decorator to define a set of features
- *
- * @param target The service namespace
- * @param features The enum that contains the features
- */
-export type FeaturesDecorator = (
-  context: DecoratorContext,
-  target: Namespace,
-  features: Enum,
-) => DecoratorValidatorCallbacks | void;
-
-/**
- * Decorator to define options for a specific feature
- *
- * @param target The enum member that represents the feature
- * @param options The options for the feature
- */
-export type FeatureOptionsDecorator = (
-  context: DecoratorContext,
-  target: EnumMember,
-  options: ArmFeatureOptions,
-) => DecoratorValidatorCallbacks | void;
-
-/**
- * Decorator to associate a feature with a model, interface, or namespace
- *
- * @param target The target to associate the feature with
- * @param featureName The feature to associate with the target
- */
-export type FeatureDecorator = (
-  context: DecoratorContext,
-  target: Model | Operation | Interface | Namespace,
-  featureName: EnumMember,
-) => DecoratorValidatorCallbacks | void;
-
 export type AzureResourceManagerLegacyDecorators = {
   customAzureResource: CustomAzureResourceDecorator;
   externalTypeRef: ExternalTypeRefDecorator;
   armOperationRoute: ArmOperationRouteDecorator;
   armExternalType: ArmExternalTypeDecorator;
   renamePathParameter: RenamePathParameterDecorator;
-  features: FeaturesDecorator;
-  featureOptions: FeatureOptionsDecorator;
-  feature: FeatureDecorator;
 };
