@@ -31,27 +31,12 @@ export default defineConfig({
       },
       {
         test: {
-          name: "integration-rlc",
-          include: ["test/integration/*.test.ts"],
-          exclude: ["test/integration/versioningRemoved.test.ts"],
-          testTimeout: 36000,
-        },
-      },
-      {
-        test: {
           name: "integration-azure-rlc",
           include: ["test/azure-integration/*.test.ts"],
           exclude: [
             "test/azure-integration/versioningRemoved.test.ts",
             "test/azure-integration/azureClientGeneratorCoreClientInitialization.test.ts",
           ],
-          testTimeout: 36000,
-        },
-      },
-      {
-        test: {
-          name: "integration-modular",
-          include: ["test/modular-integration/*.test.ts"],
           testTimeout: 36000,
         },
       },
