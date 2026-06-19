@@ -4,7 +4,7 @@ import { Project, SourceFile } from "ts-morph";
 import { useContext } from "../context-manager.js";
 import { resolveReference } from "../framework/reference.js";
 import { reportDiagnostic } from "../lib.js";
-import { isAzurePackage, NameType, normalizeName } from "../rlc-common/index.js";
+import { NameType, normalizeName } from "../rlc-common/index.js";
 import { getModularClientOptions } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import { getMethodHierarchiesMap } from "../utils/operation-util.js";
@@ -28,7 +28,7 @@ export function buildRootIndex(
   if (!clientMap) {
     // we still need to export the models if no client is provided
     exportModels(emitterOptions, rootIndexFile);
-    exportRestErrorTypes(context, rootIndexFile);
+    exportRestErrorTypes(rootIndexFile);
     return;
   }
   const project = useContext("outputProject");
@@ -71,7 +71,7 @@ export function buildRootIndex(
   exportPagingTypes(context, rootIndexFile);
   exportFileContentsType(context, rootIndexFile);
   exportAzureCloudTypes(context, rootIndexFile);
-  exportRestErrorTypes(context, rootIndexFile);
+  exportRestErrorTypes(rootIndexFile);
 }
 
 function exportModels(
@@ -105,10 +105,7 @@ function exportAzureCloudTypes(context: SdkContext, rootIndexFile: SourceFile) {
   }
 }
 
-function exportRestErrorTypes(context: SdkContext, rootIndexFile: SourceFile) {
-  if (!isAzurePackage({ options: context.rlcOptions })) {
-    return;
-  }
+function exportRestErrorTypes(rootIndexFile: SourceFile) {
   const existingExports = getExistingExports(rootIndexFile);
   const namedExports = ["RestError", "isRestError"].filter((name) => !existingExports.has(name));
   if (namedExports.length > 0) {

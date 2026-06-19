@@ -143,7 +143,7 @@ Whether to generate sample files, for basic samples of your generated sdks. Defa
 
 **Type:** `boolean`
 
-This is used to indicate your project is generated in [azure-sdk-for-js](https://github.com/Azure/azure-sdk-for-js) repo or not. If your package is located in that repo we'll leverage `dev-tool` to accelerate our building and testing, however if not we'll remove the dependency for that tool. Defaults to `undefined`. Services with Flavor equal to 'Azure' default to 'true'.
+This is used to indicate your project is generated in [azure-sdk-for-js](https://github.com/Azure/azure-sdk-for-js) repo or not. If your package is located in that repo we'll leverage `dev-tool` to accelerate our building and testing, however if not we'll remove the dependency for that tool. Defaults to `undefined`.
 
 ### `azure-output-directory`
 
@@ -232,18 +232,6 @@ Provides an option to add the model namespace to model names in case of conflict
 **Type:** `boolean`
 
 An option to organize the client in a hierarchical way as defined by `@clientInitialization`. This is true by default.
-
-### `branded`
-
-**Type:** `boolean`
-
-A section of flavor
-
-### `flavor`
-
-**Type:** `string`
-
-The flavor of the SDK.
 
 ### `module-kind`
 

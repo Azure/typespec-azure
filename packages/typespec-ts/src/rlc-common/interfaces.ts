@@ -39,7 +39,6 @@ export type ImportType =
   | "coreUtil"
   | "coreLogger"
   // this is a fallback import if above imports are not available
-  // mainly used in non-branded scope
   | "commonFallback"
   /**azure specific imports */
   | "azureEslintPlugin"
@@ -191,11 +190,6 @@ export interface OperationLroDetail {
   precedence?: number;
 }
 
-/**
- * Flavor of the package to generate. If "azure", an Azure-branded package should be generated. If left undefined, a package without Azure branding will be generated.
- */
-export type PackageFlavor = "azure" | undefined;
-
 export interface RLCOptions {
   /**
    * Whether to include response headers in the generated response types. If true, the generated response types will include headers as properties.
@@ -242,7 +236,6 @@ export interface RLCOptions {
   isModularLibrary?: boolean;
   moduleKind?: "esm" | "cjs";
   enableOperationGroup?: boolean;
-  flavor?: PackageFlavor;
   enableModelNamespace?: boolean;
   hierarchyClient?: boolean;
   compatibilityMode?: boolean;
@@ -259,7 +252,7 @@ export interface RLCOptions {
   /**
    * When set to true, non-model return types (arrays, scalars, enums, bytes with binary content type)
    * will be wrapped in an XxxResponse type to maintain backward compatibility with HLC.
-   * This option defaults to true for Azure flavor and to false otherwise, unless explicitly set.
+   * This option defaults to true unless explicitly set.
    */
   wrapNonModelReturn?: boolean;
   /**

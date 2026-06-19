@@ -292,7 +292,6 @@ export async function emitClientFactoryFromTypeSpec(
         name: "test",
         version: "1.0.0-beta.1",
       },
-      flavor: "azure",
       ...credentialInfo,
     },
     importInfo: {

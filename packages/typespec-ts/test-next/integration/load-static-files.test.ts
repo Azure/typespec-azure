@@ -86,7 +86,6 @@ describe("loadStaticHelpers", () => {
       host: NodeHost,
       helpersAssetDirectory,
       options: {
-        flavor: "azure",
         azureSdkForJs: true,
       } as any,
     });

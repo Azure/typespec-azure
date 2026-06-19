@@ -40,10 +40,6 @@ export function getPackageCommonInfo(config: PackageCommonInfoConfig) {
   };
 }
 
-export const commonPackageDependencies = {
-  tslib: "^2.6.2",
-};
-
 export function getCommonPackageDevDependencies(config: PackageCommonInfoConfig) {
   return {
     "@types/node": "^20.0.0",

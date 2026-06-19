@@ -12,7 +12,6 @@ describe("warp.config.yml generation", () => {
       const model = createMockModel({
         moduleKind: "esm",
         isMonorepo: true,
-        flavor: "azure",
       });
 
       const result = buildWarpConfig(model);
@@ -37,7 +36,6 @@ describe("warp.config.yml generation", () => {
       const model = createMockModel({
         moduleKind: "esm",
         isMonorepo: true,
-        flavor: "azure",
         generateReactNativeTarget: true,
       });
 
@@ -53,7 +51,6 @@ describe("warp.config.yml generation", () => {
       const model = createMockModel({
         moduleKind: "esm",
         isMonorepo: true,
-        flavor: "azure",
       });
 
       const result = buildWarpConfig(model, {
@@ -74,7 +71,6 @@ describe("warp.config.yml generation", () => {
       const model = createMockModel({
         moduleKind: "cjs",
         isMonorepo: true,
-        flavor: "azure",
       });
 
       const result = buildWarpConfig(model);

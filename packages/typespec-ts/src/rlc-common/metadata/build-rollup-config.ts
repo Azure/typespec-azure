@@ -2,13 +2,12 @@
 // Licensed under the MIT License.
 
 import { Project } from "ts-morph";
-import { isAzurePackage } from "../helpers/package-util.js";
 import { RLCModel } from "../interfaces.js";
 
 export function buildRollupConfig(model: RLCModel) {
   const azureSdkForJs = Boolean(model.options?.azureSdkForJs);
   // Only generate the file when it is not in sdk repo
-  if (isAzurePackage(model) && (azureSdkForJs === true || azureSdkForJs === undefined)) {
+  if (azureSdkForJs === true || azureSdkForJs === undefined) {
     return;
   }
 
