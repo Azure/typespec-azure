@@ -1,6 +1,6 @@
-# Should generate fake api key credential in non-azure client
+# Should generate credential in api key auth client
 
-Should generate fake api key credential in non-azure client.
+Should generate credential in api key auth client.
 
 ## TypeSpec
 
@@ -29,12 +29,6 @@ op read(name: string): {
 };
 ```
 
-This is the tspconfig.yaml.
-
-```yaml
-flavor: "demo"
-```
-
 ## Example
 
 Raw json files.
@@ -61,6 +55,7 @@ Generate samples for non-hierarchy cases:
 ```ts samples
 /** This file path is /samples-dev/readSample.ts */
 import { DemoServiceClient } from "@azure/internal-test";
+import { DefaultAzureCredential } from "@azure/identity";
 
 /**
  * This sample demonstrates how to show example demo
@@ -70,7 +65,7 @@ import { DemoServiceClient } from "@azure/internal-test";
  */
 async function read(): Promise<void> {
   const endpoint = process.env.DEMO_SERVICE_ENDPOINT || "";
-  const credential = { key: "INPUT_YOUR_KEY_HERE" };
+  const credential = new DefaultAzureCredential();
   const client = new DemoServiceClient(endpoint, credential);
   const result = await client.read("test");
   console.log(result);
