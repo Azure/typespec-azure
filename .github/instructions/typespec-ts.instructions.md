@@ -72,6 +72,6 @@ So a baseline that doesn't match freshly generated output (changed, missing, or 
   intermittently fail to (re)write `src/index.d.ts` for a few specs (concurrent workers in
   gen-spector share an api-extractor temp workspace per package). The folder still
   regenerates, but the tracked rollup goes missing — which `git add -A` silently stages as
-  a deletion. Review `git status` for *unexpected* deletions/additions and stage baseline
+  a deletion. Review `git status` for _unexpected_ deletions/additions and stage baseline
   changes by explicit path before committing. If a baseline went missing this way, restore
   it from the previous commit rather than re-deleting it.
