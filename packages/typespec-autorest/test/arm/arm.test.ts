@@ -509,7 +509,7 @@ it("generates PATCH bodies for resource patch of common resource envelope mixins
 it("can split resources and operations by feature", async () => {
   const { privateLink, privateEndpoint } = await CompileOpenApiWithFeatures(
     `
-      @Azure.ResourceManager.Legacy.features(Features)
+      @Azure.ResourceManager.features(Features)
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.PrivateLinkTest;
@@ -522,7 +522,7 @@ it("can split resources and operations by feature", async () => {
       
       interface Operations extends Azure.ResourceManager.Operations {}
       
-      @Azure.ResourceManager.Legacy.feature(Features.privateEndpoint)
+      @Azure.ResourceManager.feature(Features.privateEndpoint)
       @tenantResource
       model PrivateEndpointConnectionResource is ProxyResource<PrivateEndpointConnectionProperties> {
         @path
@@ -531,7 +531,7 @@ it("can split resources and operations by feature", async () => {
         name: string;
       }
       
-      @Azure.ResourceManager.Legacy.feature(Features.privateEndpoint)
+      @Azure.ResourceManager.feature(Features.privateEndpoint)
       @armResourceOperations(PrivateEndpointConnectionResource)
       interface PrivateEndpointConnections {
         #suppress "deprecated" "PrivateLinkResourceListResultV5 validation"
@@ -539,12 +539,12 @@ it("can split resources and operations by feature", async () => {
          Response = ArmResponse<Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionListResultV5>>;
       }
 
-      @Azure.ResourceManager.Legacy.feature(Features.privateLink)
+      @Azure.ResourceManager.feature(Features.privateLink)
       model PrivateLinkResource is ProxyResource<PrivateLinkResourceProperties> {
         ...PrivateLinkResourceParameter;
       }
 
-      @Azure.ResourceManager.Legacy.feature(Features.privateLink)
+      @Azure.ResourceManager.feature(Features.privateLink)
       @armResourceOperations(PrivateLinkResource)
       interface PrivateLinkResources {
         #suppress "deprecated" "PrivateLinkResourceListResultV5 validation"
@@ -576,49 +576,49 @@ it("can represent type references within and between features", async () => {
   const { featureA, featureB, shared } = await CompileOpenApiWithFeatures(
     `
 
-@Azure.ResourceManager.Legacy.features(Features)
+@Azure.ResourceManager.features(Features)
 @armProviderNamespace("Microsoft.Test")
 namespace Microsoft.Test;
 enum Features {
-  @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "Common", fileName: "shared", description: "The data for common features"})
+  @Azure.ResourceManager.featureOptions(#{featureName: "Common", fileName: "shared", description: "The data for common features"})
   Common: "Common",
-  @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "FeatureA", fileName: "featureA", description: "The data for feature A"})
+  @Azure.ResourceManager.featureOptions(#{featureName: "FeatureA", fileName: "featureA", description: "The data for feature A"})
   FeatureA: "Feature A",
-  @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "FeatureB", fileName: "featureB", description: "The data for feature B"})
+  @Azure.ResourceManager.featureOptions(#{featureName: "FeatureB", fileName: "featureB", description: "The data for feature B"})
   FeatureB: "Feature B",
 }
       @secret
       scalar secretString extends string;
 
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureA)
+      @Azure.ResourceManager.feature(Features.FeatureA)
       model FooResource is TrackedResource<FooResourceProperties> {
          ...ResourceNameParameter<FooResource>;
       }
       
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureA)
+      @Azure.ResourceManager.feature(Features.FeatureA)
       model FooResourceProperties { 
         ...DefaultProvisioningStateProperty;
         password: secretString;
       }
 
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureB)
+      @Azure.ResourceManager.feature(Features.FeatureB)
       model BarResource is ProxyResource<BarResourceProperties> {
           ...ResourceNameParameter<BarResource>;
       }
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureB)
+      @Azure.ResourceManager.feature(Features.FeatureB)
       model BarResourceProperties { 
         ...DefaultProvisioningStateProperty;
         password: secretString;
       }
 
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureA)
+      @Azure.ResourceManager.feature(Features.FeatureA)
       @armResourceOperations
       interface Foos extends Azure.ResourceManager.TrackedResourceOperations<FooResource, FooResourceProperties> {}
 
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureB)
+      @Azure.ResourceManager.feature(Features.FeatureB)
       @armResourceOperations
       interface Bars extends Azure.ResourceManager.TrackedResourceOperations<BarResource, BarResourceProperties> {}
-      @@Azure.ResourceManager.Legacy.feature(Bars.get, Features.FeatureA);
+      @@Azure.ResourceManager.feature(Bars.get, Features.FeatureA);
       `,
     ["featureA", "featureB", "shared"],
     { preset: "azure" },

@@ -1,6 +1,7 @@
 import type {
   DecoratorContext,
   DecoratorValidatorCallbacks,
+  Enum,
   EnumMember,
   EnumValue,
   Interface,
@@ -15,6 +16,14 @@ export interface ResourceOperationOptions {
   readonly resourceType?: Record<string, unknown>;
   readonly allowStaticRoutes?: boolean;
   readonly omitTags?: boolean;
+}
+
+export interface ArmFeatureOptions {
+  readonly featureName: string;
+  readonly fileName: string;
+  readonly description: string;
+  readonly title?: string;
+  readonly termsOfService?: string;
 }
 
 /**
@@ -338,6 +347,42 @@ export type ArmVirtualResourceDecorator = (
 ) => DecoratorValidatorCallbacks | void;
 
 /**
+ * Decorator to define a set of features
+ *
+ * @param target The service namespace
+ * @param features The enum that contains the features
+ */
+export type FeaturesDecorator = (
+  context: DecoratorContext,
+  target: Namespace,
+  features: Enum,
+) => DecoratorValidatorCallbacks | void;
+
+/**
+ * Decorator to define options for a specific feature
+ *
+ * @param target The enum member that represents the feature
+ * @param options The options for the feature
+ */
+export type FeatureOptionsDecorator = (
+  context: DecoratorContext,
+  target: EnumMember,
+  options: ArmFeatureOptions,
+) => DecoratorValidatorCallbacks | void;
+
+/**
+ * Decorator to associate a feature with a model, interface, or namespace
+ *
+ * @param target The target to associate the feature with
+ * @param featureName The feature to associate with the target
+ */
+export type FeatureDecorator = (
+  context: DecoratorContext,
+  target: Model | Operation | Interface | Namespace,
+  featureName: EnumMember,
+) => DecoratorValidatorCallbacks | void;
+
+/**
  * This decorator sets the base type of the given resource.
  *
  * @param baseTypeIt The built-in parent of the resource, this can be "Tenant", "Subscription", "ResourceGroup", "Location", or "Extension"
@@ -371,5 +416,8 @@ export type AzureResourceManagerDecorators = {
   armResourceOperations: ArmResourceOperationsDecorator;
   armCommonTypesVersion: ArmCommonTypesVersionDecorator;
   armVirtualResource: ArmVirtualResourceDecorator;
+  features: FeaturesDecorator;
+  featureOptions: FeatureOptionsDecorator;
+  feature: FeatureDecorator;
   resourceBaseType: ResourceBaseTypeDecorator;
 };

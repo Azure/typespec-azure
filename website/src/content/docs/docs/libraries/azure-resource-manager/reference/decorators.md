@@ -310,6 +310,63 @@ See more details on [different Azure Resource Manager resource type here.](https
 
 None
 
+### `@feature` {#@Azure.ResourceManager.feature}
+
+Decorator to associate a feature with a model, interface, or namespace
+
+```typespec
+@Azure.ResourceManager.feature(featureName: EnumMember)
+```
+
+#### Target
+
+The target to associate the feature with
+`Model | Operation | Interface | Namespace`
+
+#### Parameters
+
+| Name        | Type         | Description                              |
+| ----------- | ------------ | ---------------------------------------- |
+| featureName | `EnumMember` | The feature to associate with the target |
+
+### `@featureOptions` {#@Azure.ResourceManager.featureOptions}
+
+Decorator to define options for a specific feature
+
+```typespec
+@Azure.ResourceManager.featureOptions(options: valueof Azure.ResourceManager.ArmFeatureOptions)
+```
+
+#### Target
+
+The enum member that represents the feature
+`EnumMember`
+
+#### Parameters
+
+| Name    | Type                                                                                   | Description                 |
+| ------- | -------------------------------------------------------------------------------------- | --------------------------- |
+| options | [valueof `ArmFeatureOptions`](./data-types.md#Azure.ResourceManager.ArmFeatureOptions) | The options for the feature |
+
+### `@features` {#@Azure.ResourceManager.features}
+
+Decorator to define a set of features
+
+```typespec
+@Azure.ResourceManager.features(features: Enum)
+```
+
+#### Target
+
+The service namespace
+`Namespace`
+
+#### Parameters
+
+| Name     | Type   | Description                         |
+| -------- | ------ | ----------------------------------- |
+| features | `Enum` | The enum that contains the features |
+
 ### `@identifiers` {#@Azure.ResourceManager.identifiers}
 
 This decorator is used to indicate the identifying properties of objects in the array, e.g. size
@@ -595,63 +652,6 @@ Specify an external reference that should be used when emitting this type.
 | Name    | Type             | Description                                                   |
 | ------- | ---------------- | ------------------------------------------------------------- |
 | jsonRef | `valueof string` | External reference(e.g. "../../common.json#/definitions/Foo") |
-
-### `@feature` {#@Azure.ResourceManager.Legacy.feature}
-
-Decorator to associate a feature with a model, interface, or namespace
-
-```typespec
-@Azure.ResourceManager.Legacy.feature(featureName: EnumMember)
-```
-
-#### Target
-
-The target to associate the feature with
-`Model | Operation | Interface | Namespace`
-
-#### Parameters
-
-| Name        | Type         | Description                              |
-| ----------- | ------------ | ---------------------------------------- |
-| featureName | `EnumMember` | The feature to associate with the target |
-
-### `@featureOptions` {#@Azure.ResourceManager.Legacy.featureOptions}
-
-Decorator to define options for a specific feature
-
-```typespec
-@Azure.ResourceManager.Legacy.featureOptions(options: valueof Azure.ResourceManager.Legacy.ArmFeatureOptions)
-```
-
-#### Target
-
-The enum member that represents the feature
-`EnumMember`
-
-#### Parameters
-
-| Name    | Type                                                                                          | Description                 |
-| ------- | --------------------------------------------------------------------------------------------- | --------------------------- |
-| options | [valueof `ArmFeatureOptions`](./data-types.md#Azure.ResourceManager.Legacy.ArmFeatureOptions) | The options for the feature |
-
-### `@features` {#@Azure.ResourceManager.Legacy.features}
-
-Decorator to define a set of features
-
-```typespec
-@Azure.ResourceManager.Legacy.features(features: Enum)
-```
-
-#### Target
-
-The service namespace
-`Namespace`
-
-#### Parameters
-
-| Name     | Type   | Description                         |
-| -------- | ------ | ----------------------------------- |
-| features | `Enum` | The enum that contains the features |
 
 ### `@renamePathParameter` {#@Azure.ResourceManager.Legacy.renamePathParameter}
 
