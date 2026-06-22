@@ -184,9 +184,6 @@ export function updatePackageFile(
   // Update Core Client dependency
   if (needsCoreClientUpdate) {
     delete deps["@azure/core-client"];
-    if (!("@azure-rest/core-client" in deps)) {
-      deps["@azure-rest/core-client"] = "^2.3.1";
-    }
     packageInfo.dependencies = deps;
   }
 
@@ -198,6 +195,12 @@ export function updatePackageFile(
       "@azure/abort-controller": "^2.1.2",
     };
   }
+
+  packageInfo.dependencies = {
+      ...packageInfo.dependencies,
+      "@azure/core-rest-pipeline": "^1.24.0",
+      "@azure-rest/core-client": "^2.7.0",
+    };
 
   // Update constantPaths metadata for Azure packages
   if (needsConstantPathsUpdate && isAzure && packageInfo["//metadata"]) {

@@ -116,20 +116,12 @@ export async function loadStaticHelpers(
   return assertAllHelpersLoadedPresent(helpersMap);
 
   async function loadFiles(files: FileMetadata[], generateDir: string) {
-    const sourcePaths = new Set(files.map((f) => normalizePath(f.source)));
     for (const file of files) {
       const targetPath = path.join(generateDir, file.target);
       const contents = await readFile(file.source, "utf-8");
       const addedFile = project.createSourceFile(targetPath, contents, {
         overwrite: true,
       });
-      // A file with its own platform variant (a sibling -browser.mts /
-      // -react-native.mts) is resolved as a whole via #platform, so its
-      // internal relative platform-types imports must be kept relative.
-      const sourceBase = normalizePath(file.source).replace(/\.[cm]?ts$/, "");
-      const hasPlatformVariant =
-        sourcePaths.has(`${sourceBase}-browser.mts`) ||
-        sourcePaths.has(`${sourceBase}-react-native.mts`);
       addedFile.getImportDeclarations().map((i) => {
         if (!isAzurePackage({ options: options.options })) {
           if (i.getModuleSpecifier().getFullText().includes("@azure/core-rest-pipeline")) {
@@ -139,12 +131,10 @@ export async function loadStaticHelpers(
             i.setModuleSpecifier("@typespec/ts-http-runtime");
           }
         }
-        // Rewrite relative platform-types imports to #platform/ specifiers
-        // so that browser/react-native variants are resolved via subpath imports.
-        // Only rewrite imports to the default variant (not -browser/-react-native variants
-        // which are already platform-specific direct imports), and only when the
-        // current file does not itself have a platform variant.
-        if (options.options?.azureSdkForJs && !hasPlatformVariant) {
+        // Rewrite relative platform-types imports to @azure/core-rest-pipeline for azure packages
+        // (NodeReadableStream is now exported directly from @azure/core-rest-pipeline).
+        // Non-azure packages keep the relative import to the local platform-types.ts.
+        if (options.options?.azureSdkForJs) {
           const specifier = i.getModuleSpecifierValue();
           if (
             specifier.startsWith(".") &&
@@ -152,13 +142,7 @@ export async function loadStaticHelpers(
             !specifier.includes("-browser") &&
             !specifier.includes("-react-native")
           ) {
-            const platformTypesPath = path.posix.normalize(
-              path.posix.join(path.posix.dirname(normalizePath(targetPath)), specifier),
-            );
-            const platformSpecifier = getPlatformSubpathSpecifier(platformTypesPath, generateDir);
-            if (platformSpecifier) {
-              i.setModuleSpecifier(platformSpecifier);
-            }
+            i.setModuleSpecifier("@azure/core-rest-pipeline");
           }
         }
       });

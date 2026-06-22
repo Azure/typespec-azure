@@ -69,7 +69,7 @@ describe("loadStaticHelpers", () => {
     ).rejects.toThrowError(/invalid helper kind/);
   });
 
-  it("should rewrite platform-types imports to #platform subpath without extension for azure monorepo", async () => {
+  it("should rewrite platform-types imports to @azure/core-rest-pipeline for azure monorepo", async () => {
     const helpers = {
       usesPlatformImport: {
         kind: "function",
@@ -90,7 +90,7 @@ describe("loadStaticHelpers", () => {
       .getSourceFiles()
       .find((file) => file.getFilePath().endsWith("/static-helpers/platform-import.ts"));
     assert(sourceFile);
-    const importDecl = sourceFile.getImportDeclaration("#platform/static-helpers/platform-types");
+    const importDecl = sourceFile.getImportDeclaration("@azure/core-rest-pipeline");
     expect(importDecl).toBeDefined();
   });
 });

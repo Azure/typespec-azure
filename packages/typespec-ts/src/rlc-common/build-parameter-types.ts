@@ -177,7 +177,7 @@ export function buildParameterTypes(model: RLCModel) {
   // union arm drops out naturally in non-Node builds.
   if (parametersFile.getFullText().includes("NodeReadableStream")) {
     const platformTypesModuleSpecifier = model.options?.azureSdkForJs
-      ? "#platform/platform-types"
+      ? "@azure/core-rest-pipeline"
       : getImportModuleName(
           {
             cjsName: `./platform-types`,
