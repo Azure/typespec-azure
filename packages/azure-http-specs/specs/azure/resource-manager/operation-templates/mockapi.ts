@@ -1021,72 +1021,54 @@ const validCostReport = {
 
 let getLroPollCount = 0;
 
-Scenarios.Azure_ResourceManager_OperationTemplates_Lro_getLro = passOnSuccess([
-  {
-    // GET LRO initial request - returns 202 Accepted
-    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/costReports/:operationId",
-    method: "get",
-    request: {
-      pathParams: {
-        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
-        resourceGroup: RESOURCE_GROUP_EXPECTED,
-        operationId: "report1",
-      },
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
+Scenarios.Azure_ResourceManager_OperationTemplates_Lro_getLro = passOnSuccess({
+  // GET LRO - Location header points back to the same URL (matches real service behavior)
+  // See: https://github.com/Azure/azure-rest-api-specs/blob/main/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/examples/2025-03-01/CostDetailsOperationResultsBySubscriptionScope.json#L41
+  uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/costReports/:operationId",
+  method: "get",
+  request: {
+    pathParams: {
+      subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      resourceGroup: RESOURCE_GROUP_EXPECTED,
+      operationId: "report1",
     },
-    response: {
-      status: 202,
-      headers: {
-        location: dyn`${dynItem("baseUrl")}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operationResults/get_lro_location`,
-      },
+    query: {
+      "api-version": "2023-12-01-preview",
     },
-    handler: (req: MockRequest) => {
-      getLroPollCount = 0;
+  },
+  response: {
+    status: 202,
+    headers: {
+      location: dyn`${dynItem("baseUrl")}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/costReports/report1`,
+    },
+  },
+  handler: (req: MockRequest) => {
+    const selfUrl = `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/costReports/report1`;
+    if (getLroPollCount > 1) {
+      return {
+        status: 200,
+        body: json(validCostReport),
+      };
+    } else if (getLroPollCount === 1) {
+      getLroPollCount += 1;
       return {
         status: 202,
         headers: {
-          location: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operationResults/get_lro_location`,
+          location: selfUrl,
         },
       };
-    },
-    kind: "MockApiDefinition",
+    } else {
+      getLroPollCount = 1;
+      return {
+        status: 202,
+        headers: {
+          location: selfUrl,
+        },
+      };
+    }
   },
-  {
-    // GET LRO poll intermediate/get final result
-    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operationResults/get_lro_location",
-    method: "get",
-    request: {
-      pathParams: {
-        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
-      },
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
-    },
-    response: {
-      status: 202,
-    },
-    handler: (req: MockRequest) => {
-      if (getLroPollCount > 0) {
-        return {
-          status: 200,
-          body: json(validCostReport),
-        };
-      } else {
-        getLroPollCount += 1;
-        return {
-          status: 202,
-          headers: {
-            location: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operationResults/get_lro_location`,
-          },
-        };
-      }
-    },
-    kind: "MockApiDefinition",
-  },
-]);
+  kind: "MockApiDefinition",
+});
 
 // POST Pageable scenarios
 // Based on: https://github.com/Azure/azure-rest-api-specs/blob/89ff93230e/specification/dynatrace/Dynatrace.Management/MonitorResource.tsp#L77-L83

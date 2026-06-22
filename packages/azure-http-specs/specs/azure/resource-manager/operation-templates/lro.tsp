@@ -349,24 +349,25 @@ interface Lro {
   @scenarioDoc("""
     Resource GET operation that returns a long-running operation.
     Uses Extension.Read with @markAsLro, which returns 200 or 202.
+    The Location header points back to the same resource URL (matches real service behavior).
     
     Step 1: Initial GET Request (returns 202 Accepted)
     Expected verb: GET
     Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/costReports/report1
     Expected query parameter: api-version=2023-12-01-preview
     Expected response status code: 202
-    Expected response header: Location={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operationResults/get_lro_location
+    Expected response header: Location={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/costReports/report1
     
     Step 2: Polling Request (returns 202 Accepted)
     Expected verb: GET
-    Expected path: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operationResults/get_lro_location
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/costReports/report1
     Expected query parameter: api-version=2023-12-01-preview
     Expected response status code: 202
-    Expected response header: Location={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operationResults/get_lro_location
+    Expected response header: Location={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/costReports/report1
     
     Step 3: Final Polling Request (returns 200 OK with result)
     Expected verb: GET
-    Expected path: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operationResults/get_lro_location
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/costReports/report1
     Expected query parameter: api-version=2023-12-01-preview
     Expected response status code: 200
     Expected response body:
