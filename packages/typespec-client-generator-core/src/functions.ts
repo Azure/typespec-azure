@@ -1,5 +1,6 @@
 import { FunctionContext, ModelProperty, Operation, Type } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
+import { EXACT_NAME_PREFIX } from "./internal-utils.js";
 import { reportDiagnostic } from "./lib.js";
 
 // Helper function to clone an operation with new parameters and/or return type
@@ -238,12 +239,6 @@ export function reorderParameters(
 
   return cloneOperation(tk, operation, { parameters: newProperties });
 }
-
-/**
- * Internal prefix used to mark a client name as exact.
- * @internal
- */
-export const EXACT_NAME_PREFIX = "_exact_:";
 
 /**
  * Mark a client name as exact, preventing language emitters from applying

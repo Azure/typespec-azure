@@ -9,7 +9,7 @@ import { dirname, join as joinPath } from "path";
 import { CompilerOptions, createProgram } from "typescript";
 import { fileURLToPath } from "url";
 import { createTaskLogger } from "./logger.js";
-import { npxCommand } from "./runCommand.js";
+import { npxCommand } from "./run-command.js";
 
 function deepMerge(target: any, source: any): any {
   const result = { ...target };
@@ -83,9 +83,9 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
       error = e;
     } finally {
       logger.flush();
-      if (error) {
-        throw error;
-      }
+    }
+    if (error) {
+      throw error;
     }
   })();
 
@@ -255,10 +255,10 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
   function outputPath() {
     const subPath = {
       standard: {
-        modular: "modularIntegration",
+        modular: "modular-integration",
         rlc: "integration",
       },
-      azure: { modular: "azureModularIntegration", rlc: "azureIntegration" },
+      azure: { modular: "azure-modular-integration", rlc: "azure-integration" },
     }[flavor()][clientType()];
 
     const outputPath = joinPath(testRoot(), subPath, "generated", env.targetFolder());

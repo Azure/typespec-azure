@@ -1,5 +1,4 @@
-import { normalizePath } from "@typespec/compiler";
-import path from "path/posix";
+import { joinPaths, normalizePath } from "@typespec/compiler";
 import {
   ImportDeclarationStructure,
   ImportSpecifierStructure,
@@ -7,12 +6,12 @@ import {
   SourceFile,
   StructureKind,
 } from "ts-morph";
-import { provideContext, useContext } from "../../contextManager.js";
-import { generateLocallyUniqueName } from "../../modular/helpers/namingHelpers.js";
+import { provideContext, useContext } from "../../context-manager.js";
+import { generateLocallyUniqueName } from "../../modular/helpers/naming-helpers.js";
 import { ReferenceableSymbol } from "../dependency.js";
 import { SourceFileSymbol, StaticHelperMetadata } from "../load-static-helpers.js";
 import { refkey } from "../refkey.js";
-import { provideDependencies, useDependencies } from "./useDependencies.js";
+import { provideDependencies, useDependencies } from "./use-dependencies.js";
 
 export interface DeclarationInfo {
   name: string;
@@ -354,7 +353,7 @@ class BinderImp implements Binder {
 
     // Also keep files that are imported by any used helper file
     const helperFiles = this.project.getSourceFiles(
-      normalizePath(path.join(sourceRoot, "static-helpers/**/*.*ts")),
+      normalizePath(joinPaths(sourceRoot, "static-helpers/**/*.*ts")),
     );
     const usedFiles = helperFiles.filter((file) => !isFileUnused(file, usedHelperNames));
     for (const usedFile of usedFiles) {
@@ -378,7 +377,7 @@ class BinderImp implements Binder {
     }
     this.project
       //normalizae the final path to adapt to different systems
-      .getSourceFiles(normalizePath(path.join(testRoot, "test/generated/util/**/*.*ts")))
+      .getSourceFiles(normalizePath(joinPaths(testRoot, "test/generated/util/**/*.*ts")))
       .filter((file) => isFileUnused(file, usedHelperNames))
       .forEach((helperFile) => helperFile.delete());
   }
