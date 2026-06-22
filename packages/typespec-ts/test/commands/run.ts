@@ -245,21 +245,15 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
     }
   }
 
-  function flavor() {
-    return env.mode().includes("azure") ? "azure" : "standard";
-  }
   function clientType() {
     return env.mode().includes("modular") ? "modular" : "rlc";
   }
 
   function outputPath() {
     const subPath = {
-      standard: {
-        modular: "modular-integration",
-        rlc: "integration",
-      },
-      azure: { modular: "azure-modular-integration", rlc: "azure-integration" },
-    }[flavor()][clientType()];
+      modular: "azure-modular-integration",
+      rlc: "azure-integration",
+    }[clientType()];
 
     const outputPath = joinPath(testRoot(), subPath, "generated", env.targetFolder());
 

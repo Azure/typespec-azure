@@ -3,7 +3,7 @@
 
 import { createTypeSpecLibrary, JSONSchemaType, paramMessage } from "@typespec/compiler";
 import { Options } from "prettier";
-import { DependencyInfo, PackageDetails, PackageFlavor, ServiceInfo } from "./rlc-common/index.js";
+import { DependencyInfo, PackageDetails, ServiceInfo } from "./rlc-common/index.js";
 
 export interface EmitterOptions {
   /**
@@ -54,7 +54,6 @@ export interface EmitterOptions {
   "is-modular-library"?: boolean;
   "module-kind"?: "esm";
   "enable-operation-group"?: boolean;
-  flavor?: PackageFlavor;
   "enable-model-namespace"?: boolean;
   "hierarchy-client"?: boolean;
   "compatibility-mode"?: boolean;
@@ -63,7 +62,6 @@ export interface EmitterOptions {
   "clear-output-folder"?: boolean;
   "ignore-property-name-normalize"?: boolean;
   "compatibility-query-multi-format"?: boolean;
-  branded?: boolean;
   "typespec-title-map"?: Record<string, string>;
   "ignore-enum-member-name-normalize"?: boolean;
   "default-value-object"?: boolean;
@@ -210,7 +208,7 @@ export const RLCOptionsSchema: JSONSchemaType<EmitterOptions> = {
       type: "boolean",
       nullable: true,
       description:
-        "This is used to indicate your project is generated in [azure-sdk-for-js](https://github.com/Azure/azure-sdk-for-js) repo or not. If your package is located in that repo we'll leverage `dev-tool` to accelerate our building and testing, however if not we'll remove the dependency for that tool. Defaults to `undefined`. Services with Flavor equal to 'Azure' default to 'true'. ",
+        "This is used to indicate your project is generated in [azure-sdk-for-js](https://github.com/Azure/azure-sdk-for-js) repo or not. If your package is located in that repo we'll leverage `dev-tool` to accelerate our building and testing, however if not we'll remove the dependency for that tool. Defaults to `undefined`. ",
     },
     "azure-output-directory": {
       type: "string",
@@ -287,16 +285,6 @@ export const RLCOptionsSchema: JSONSchemaType<EmitterOptions> = {
       nullable: true,
       description:
         "An option to organize the client in a hierarchical way as defined by `@clientInitialization`. This is true by default.",
-    },
-    branded: {
-      type: "boolean",
-      nullable: true,
-      description: "A section of flavor",
-    },
-    flavor: {
-      type: "string",
-      nullable: true,
-      description: "The flavor of the SDK.",
     },
     "module-kind": {
       type: "string",

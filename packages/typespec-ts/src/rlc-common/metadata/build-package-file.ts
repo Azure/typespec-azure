@@ -4,16 +4,11 @@
 import { Project, SourceFile } from "ts-morph";
 import { NameType, normalizeName } from "../helpers/name-utils.js";
 import { hasPollingOperations } from "../helpers/operation-helpers.js";
-import {
-  isAzureMonorepoPackage,
-  isAzurePackage,
-  isAzureStandalonePackage,
-} from "../helpers/package-util.js";
+import { isAzureMonorepoPackage } from "../helpers/package-util.js";
 import { getRelativePartFromSrcPath } from "../helpers/path-utils.js";
 import { RLCModel } from "../interfaces.js";
 import { buildAzureMonorepoPackage } from "./package-json/build-azure-monorepo-package.js";
 import { buildAzureStandalonePackage } from "./package-json/build-azure-standalone-package.js";
-import { buildFlavorlessPackage } from "./package-json/build-flavorless-package.js";
 import {
   PackageCommonInfoConfig,
   getTshyConfig,
@@ -46,8 +41,6 @@ export function buildPackageFile(
     generateReactNativeTarget: model.options?.generateReactNativeTarget,
   };
 
-  let packageInfo: Record<string, any> = buildFlavorlessPackage(config);
-
   const extendedConfig = {
     ...config,
     clientFilePaths: [getClientFilePath(model)],
@@ -58,13 +51,9 @@ export function buildPackageFile(
     clientContextPaths,
   };
 
-  if (isAzureMonorepoPackage(model)) {
-    packageInfo = buildAzureMonorepoPackage(extendedConfig);
-  }
-
-  if (isAzureStandalonePackage(model)) {
-    packageInfo = buildAzureStandalonePackage(extendedConfig);
-  }
+  const packageInfo: Record<string, any> = isAzureMonorepoPackage(model)
+    ? buildAzureMonorepoPackage(extendedConfig)
+    : buildAzureStandalonePackage(extendedConfig);
 
   const project = new Project({ useInMemoryFileSystem: true });
   const filePath = "package.json";
@@ -97,8 +86,7 @@ export function updatePackageFile(
   { exports, clientContextPaths }: PackageFileOptions = {},
 ) {
   const hasLro = hasPollingOperations(model);
-  const isAzure = isAzurePackage(model);
-  const needsLroUpdate = isAzure && hasLro;
+  const needsLroUpdate = hasLro;
   const needsExportsUpdate = exports;
   const needsConstantPathsUpdate = clientContextPaths && clientContextPaths.length > 0;
   const needsPlatformImportsUpdate =
@@ -200,7 +188,7 @@ export function updatePackageFile(
   }
 
   // Update constantPaths metadata for Azure packages
-  if (needsConstantPathsUpdate && isAzure && packageInfo["//metadata"]) {
+  if (needsConstantPathsUpdate && packageInfo["//metadata"]) {
     const metadata = packageInfo["//metadata"];
     // Filter out existing userAgentInfo entries
     const nonUserAgentPaths = (metadata.constantPaths || []).filter(

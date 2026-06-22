@@ -17,7 +17,6 @@ import {
   hasTsvCollection,
   hasUnexpectedHelper,
 } from "./helpers/operation-helpers.js";
-import { isAzurePackage } from "./helpers/package-util.js";
 import { RLCModel } from "./interfaces.js";
 
 export function buildIndexFile(model: RLCModel) {
@@ -328,14 +327,12 @@ function generateRLCIndex(file: SourceFile, model: RLCModel) {
     ]);
   }
 
-  if (isAzurePackage(model)) {
-    file.addExportDeclarations([
-      {
-        moduleSpecifier: "@azure/core-rest-pipeline",
-        namedExports: ["RestError", "isRestError"],
-      },
-    ]);
-  }
+  file.addExportDeclarations([
+    {
+      moduleSpecifier: "@azure/core-rest-pipeline",
+      namedExports: ["RestError", "isRestError"],
+    },
+  ]);
 
   file.addExportAssignment({
     expression: createClientFuncName,

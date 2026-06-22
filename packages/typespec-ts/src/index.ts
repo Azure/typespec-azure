@@ -17,7 +17,6 @@ import {
   AzureIdentityDependencies,
   AzurePollingDependencies,
   AzureTestDependencies,
-  DefaultCoreDependencies,
 } from "./modular/external-dependencies.js";
 import {
   CloudSettingHelpers,
@@ -73,7 +72,6 @@ import {
   getClientName,
   hasClientNameChanged,
   hasUnexpectedHelper,
-  isAzurePackage,
   updatePackageFile,
   updateReadmeFile,
 } from "./rlc-common/index.js";
@@ -178,14 +176,12 @@ export async function $onEmit(context: EmitContext) {
       packageRoot: emitterPackageRoot,
     },
   );
-  const extraDependencies = isAzurePackage({ options: rlcOptions })
-    ? {
-        ...AzurePollingDependencies,
-        ...AzureCoreDependencies,
-        ...AzureIdentityDependencies,
-        ...AzureTestDependencies,
-      }
-    : { ...DefaultCoreDependencies };
+  const extraDependencies = {
+    ...AzurePollingDependencies,
+    ...AzureCoreDependencies,
+    ...AzureIdentityDependencies,
+    ...AzureTestDependencies,
+  };
   const binder = provideBinder(outputProject, {
     staticHelpers,
     dependencies: {
@@ -241,8 +237,7 @@ export async function $onEmit(context: EmitContext) {
     options.generateTest =
       options.generateTest === true ||
       (options.generateTest === undefined &&
-        (!hasTestFolder || (options.azureSdkForJs && options.azureArm)) &&
-        isAzurePackage({ options: options }));
+        (!hasTestFolder || (options.azureSdkForJs && options.azureArm)));
     dpgContext.rlcOptions = options;
   }
 
@@ -471,7 +466,6 @@ export async function $onEmit(context: EmitContext) {
     // warp.config.yml, and snippets.spec.ts. metadata.json is still updated.
     const sourcesDir = dpgContext.generationPathDetail?.modularSourcesDir ?? "";
     const hasManualConvenienceLayer = getBaseFileName(sourcesDir) === "generated";
-    const isAzureFlavor = isAzurePackage({ options: option });
     // Generate metadata
     const existingPackageFilePath = joinPaths(
       dpgContext.generationPathDetail?.metadataDir ?? "",
@@ -523,9 +517,7 @@ export async function $onEmit(context: EmitContext) {
         commonBuilders.push((model) => buildTestBrowserTsConfig(model));
         commonBuilders.push((model) => buildTestNodeTsConfig(model));
       }
-      if (isAzureFlavor) {
-        commonBuilders.push(buildEsLintConfig);
-      }
+      commonBuilders.push(buildEsLintConfig);
       if (!hasChangelogFile) {
         commonBuilders.push(buildChangelogFile);
       }
@@ -543,25 +535,16 @@ export async function $onEmit(context: EmitContext) {
         };
         // Build dependencies
         const dependencies: Record<string, string> = {};
-        if (isAzureFlavor) {
-          dependencies["@azure/core-util"] = "^1.9.2";
-        }
+        dependencies["@azure/core-util"] = "^1.9.2";
         // Add fast-xml-parser if XML serialization is used
         if (packageUsesXmlSerialization(dpgContext.sdkPackage)) {
           dependencies["fast-xml-parser"] = "^4.5.0";
         }
-        if (isAzureFlavor) {
-          modularPackageInfo = {
-            ...modularPackageInfo,
-            dependencies,
-            clientContextPaths: getRelativeContextPaths(context, modularEmitterOptions),
-          };
-        } else if (Object.keys(dependencies).length > 0) {
-          modularPackageInfo = {
-            ...modularPackageInfo,
-            dependencies,
-          };
-        }
+        modularPackageInfo = {
+          ...modularPackageInfo,
+          dependencies,
+          clientContextPaths: getRelativeContextPaths(context, modularEmitterOptions),
+        };
       }
       commonBuilders.push((model) => buildPackageFile(model, modularPackageInfo));
       // Generate warp.config.yml for Azure monorepo ESM packages
@@ -579,9 +562,7 @@ export async function $onEmit(context: EmitContext) {
         if (option.generateSample) {
           commonBuilders.push(buildTsSampleConfig);
         }
-        if (isAzureFlavor) {
-          commonBuilders.push(buildTsLintConfig);
-        }
+        commonBuilders.push(buildTsLintConfig);
       }
 
       // TODO: need support snippets generation for multi-client cases. https://github.com/Azure/autorest.typescript/issues/3048
@@ -683,14 +664,12 @@ export async function $onEmit(context: EmitContext) {
         dpgContext.generationPathDetail?.metadataDir,
       );
     }
-    if (isAzureFlavor) {
-      await emitContentByBuilder(
-        program,
-        buildMetadataJson,
-        rlcClient,
-        dpgContext.generationPathDetail?.metadataDir,
-      );
-    }
+    await emitContentByBuilder(
+      program,
+      buildMetadataJson,
+      rlcClient,
+      dpgContext.generationPathDetail?.metadataDir,
+    );
 
     // Generate test relevant files
     if (option.generateTest && !hasTestFolder) {

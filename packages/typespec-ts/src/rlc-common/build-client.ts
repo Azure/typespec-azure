@@ -16,7 +16,6 @@ import { buildMethodShortcutImplementation } from "./build-method-shortcuts.js";
 import { getImportSpecifier } from "./helpers/imports-util.js";
 import { getClientName, getImportModuleName } from "./helpers/name-constructors.js";
 import { NameType, normalizeName } from "./helpers/name-utils.js";
-import { isAzurePackage } from "./helpers/package-util.js";
 import { File, PathParameter, RLCModel } from "./interfaces.js";
 
 function getClientOptionsInterface(
@@ -192,20 +191,18 @@ export function buildClient(model: RLCModel): File | undefined {
       moduleSpecifier: getImportSpecifier("restClient", model.importInfo.runtimeImports),
     },
   ]);
-  if (isAzurePackage(model)) {
-    clientFile.addImportDeclarations([
-      {
-        namedImports: ["logger"],
-        moduleSpecifier: getImportModuleName(
-          {
-            cjsName: loggerPath,
-            esModulesName: `${loggerPath}.js`,
-          },
-          model,
-        ),
-      },
-    ]);
-  }
+  clientFile.addImportDeclarations([
+    {
+      namedImports: ["logger"],
+      moduleSpecifier: getImportModuleName(
+        {
+          cjsName: loggerPath,
+          esModulesName: `${loggerPath}.js`,
+        },
+        model,
+      ),
+    },
+  ]);
 
   const includeKeyCredentialHelper =
     customHttpAuthHeaderName &&
@@ -349,12 +346,10 @@ export function getClientFactoryBody(
   const apiKeyHeaderName = credentialKeyHeaderName
     ? `apiKeyHeaderName: options.credentials?.apiKeyHeaderName ?? "${credentialKeyHeaderName}",`
     : "";
-  const loggerOptions = isAzurePackage(model)
-    ? `,
+  const loggerOptions = `,
   loggingOptions: {
     logger: options.loggingOptions?.logger ?? logger.info
-  }`
-    : "";
+  }`;
 
   const credentialsOptions =
     (scopes || apiKeyHeaderName) && addCredentials
@@ -400,16 +395,12 @@ export function getClientFactoryBody(
   }
 
   let apiVersionPolicyStatement = `client.pipeline.removePolicy({ name: "ApiVersionPolicy" });`;
-  if (isAzurePackage(model) && model.apiVersionInfo?.isCrossedVersion !== false) {
+  if (model.apiVersionInfo?.isCrossedVersion !== false) {
     apiVersionPolicyStatement += `
       if (options.apiVersion) {
         logger.warning("This client does not support client api-version, please change it at the operation level");
       }`;
-  } else if (
-    isAzurePackage(model) &&
-    !model.apiVersionInfo?.defaultValue &&
-    model.apiVersionInfo?.required
-  ) {
+  } else if (!model.apiVersionInfo?.defaultValue && model.apiVersionInfo?.required) {
     apiVersionPolicyStatement += `
       if (options.apiVersion) {
         logger.warning("This client does not support to set api-version in options, please change it at positional argument");

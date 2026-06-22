@@ -207,7 +207,6 @@ export async function createDpgContextTestHelper(
     ...context,
     program,
     rlcOptions: {
-      flavor: "azure",
       enableModelNamespace,
       ...configs,
     },

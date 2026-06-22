@@ -9,10 +9,6 @@ export function buildLogger(model: RLCModel) {
   if (!model.options) {
     return undefined;
   }
-  // Disable logger for non-Azure packages
-  if (model.options.flavor !== "azure") {
-    return undefined;
-  }
   const project = new Project({ useInMemoryFileSystem: true });
   const { srcPath, rlcSourceDir } = model;
   const { packageDetails } = model.options;

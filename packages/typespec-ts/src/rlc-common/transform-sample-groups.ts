@@ -1,6 +1,5 @@
 import { getClientName } from "./helpers/name-constructors.js";
 import { NameType, camelCase, normalizeName } from "./helpers/name-utils.js";
-import { isAzurePackage } from "./helpers/package-util.js";
 import { buildSchemaObjectMap } from "./helpers/schema-helpers.js";
 import { generateParameterTypeValue } from "./helpers/value-generation-util.js";
 import {
@@ -201,13 +200,8 @@ function convertClientLevelParameters(
     // Do not include parameters with constant values in the signature, these should go in the options bag
     (p) => p.value === undefined,
   );
-  const {
-    addCredentials,
-    credentialScopes,
-    credentialKeyHeaderName,
-    customHttpAuthHeaderName,
-    flavor,
-  } = model.options;
+  const { addCredentials, credentialScopes, credentialKeyHeaderName, customHttpAuthHeaderName } =
+    model.options;
   const hasUrlParameter = !!urlParameters,
     hasCredentials =
       addCredentials && (credentialScopes || credentialKeyHeaderName || customHttpAuthHeaderName);
@@ -227,34 +221,25 @@ function convertClientLevelParameters(
   }
   if (hasCredentials) {
     // Currently only support token credential
-    const apiKeyCredentialPackage = isAzurePackage(model)
-      ? "@azure/core-auth"
-      : "@typespec/ts-http-runtime";
-    const tokenCredentialPackage = isAzurePackage(model)
-      ? "@azure/identity"
-      : "@typespec/ts-http-runtime";
-    if (credentialKeyHeaderName && isAzurePackage(model)) {
+    const apiKeyCredentialPackage = "@azure/core-auth";
+    const tokenCredentialPackage = "@azure/identity";
+    if (credentialKeyHeaderName) {
       clientParams.push({
         name: "credential",
         assignment: `const credential = new AzureKeyCredential("{Your API key}");`,
       });
       addValueInImportedDict(apiKeyCredentialPackage, "AzureKeyCredential", importedDict);
-    } else if ((credentialKeyHeaderName && flavor !== "azure") || customHttpAuthHeaderName) {
+    } else if (customHttpAuthHeaderName) {
       clientParams.push({
         name: "credential",
         assignment: `const credential = { key: "{Your API key}"};`,
       });
-    } else if (isAzurePackage(model)) {
+    } else {
       clientParams.push({
         name: "credential",
         assignment: "const credential = new DefaultAzureCredential();",
       });
       addValueInImportedDict(tokenCredentialPackage, "DefaultAzureCredential", importedDict);
-    } else {
-      clientParams.push({
-        name: "credential",
-        assignment: `const credential = {getToken: () => Promise.resolve({ token: "{Your token}", expiresOnTimestamp: 0 })};`,
-      });
     }
   }
   return clientParams;

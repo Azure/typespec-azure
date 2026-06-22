@@ -1,17 +1,11 @@
 /* eslint-disable no-console */
 import { runTypespec } from "./run.js";
-import { azureModularTsps, azureRlcTsps, modularTsps, rlcTsps } from "./spector-list.js";
+import { azureModularTsps, azureRlcTsps } from "./spector-list.js";
 
-async function generateTypeSpecs(tag = "rlc", isDebugging, pathFilter) {
+async function generateTypeSpecs(tag = "azure-modular", isDebugging, pathFilter) {
   let list;
 
   switch (tag) {
-    case "rlc":
-      list = rlcTsps;
-      break;
-    case "modular":
-      list = modularTsps;
-      break;
     case "azure-rlc":
       list = azureRlcTsps;
       break;
@@ -19,7 +13,7 @@ async function generateTypeSpecs(tag = "rlc", isDebugging, pathFilter) {
       list = azureModularTsps;
       break;
     default:
-      list = modularTsps;
+      list = azureModularTsps;
       break;
   }
 

@@ -1,4 +1,4 @@
-import { NameType, isAzurePackage, normalizeName } from "../rlc-common/index.js";
+import { NameType, normalizeName } from "../rlc-common/index.js";
 import {
   buildGetClientCredentialParam,
   buildGetClientEndpointParam,
@@ -164,13 +164,10 @@ export function buildClientContext(
   });
 
   // TODO use binder here
-  // (for now) now logger for unbranded pkgs
-  if (isAzurePackage(emitterOptions)) {
-    clientContextFile.addImportDeclaration({
-      moduleSpecifier: "../".repeat(hierarchy.length + 1) + "logger.js",
-      namedImports: ["logger"],
-    });
-  }
+  clientContextFile.addImportDeclaration({
+    moduleSpecifier: "../".repeat(hierarchy.length + 1) + "logger.js",
+    namedImports: ["logger"],
+  });
 
   const factoryFunction = clientContextFile.addFunction({
     docs: getDocsFromDescription(client.doc),
@@ -241,15 +238,10 @@ export function buildClientContext(
     if (!apiVersionInEndpoint && apiVersionParam.clientDefaultValue) {
       apiVersionStatement += `const ${apiVersionParamName} = options.${apiVersionParamName};`;
     }
-  } else if (isAzurePackage(emitterOptions)) {
-    apiVersionStatement += `
-        if (options.apiVersion) {
-          logger.warning("This client does not support client api-version, please change it at the operation level");
-        }`;
   } else {
     apiVersionStatement += `
         if (options.apiVersion) {
-          console.warn("This client does not support client api-version, please change it at the operation level");
+          logger.warning("This client does not support client api-version, please change it at the operation level");
         }`;
   }
   factoryFunction.addStatements(apiVersionStatement);

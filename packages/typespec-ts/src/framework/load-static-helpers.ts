@@ -10,7 +10,6 @@ import {
 } from "ts-morph";
 import { reportDiagnostic } from "../lib.js";
 import { ModularEmitterOptions } from "../modular/interfaces.js";
-import { isAzurePackage } from "../rlc-common/index.js";
 import { resolveProjectRoot } from "../utils/resolve-project-root.js";
 import { refkey } from "./refkey.js";
 export const SourceFileSymbol = Symbol("SourceFile");
@@ -73,10 +72,7 @@ export async function loadStaticHelpers(
   );
   await loadFiles(filesInSources, options.sourcesDir ?? "");
   // Load static helpers used in testing code (only when loadTestHelpers is enabled)
-  if (
-    options.loadTestHelpers ??
-    (options.options?.generateTest && isAzurePackage({ options: options.options }))
-  ) {
+  if (options.loadTestHelpers ?? options.options?.generateTest) {
     const defaultTestingHelpersPath = joinPaths(packageRoot, DEFAULT_SOURCES_TESTING_HELPERS_PATH);
     const filesInTestings = await traverseDirectory(
       defaultTestingHelpersPath,
@@ -99,14 +95,6 @@ export async function loadStaticHelpers(
         overwrite: true,
       });
       addedFile.getImportDeclarations().map((i) => {
-        if (!isAzurePackage({ options: options.options })) {
-          if (i.getModuleSpecifier().getFullText().includes("@azure/core-rest-pipeline")) {
-            i.setModuleSpecifier("@typespec/ts-http-runtime");
-          }
-          if (i.getModuleSpecifier().getFullText().includes("@azure-rest/core-client")) {
-            i.setModuleSpecifier("@typespec/ts-http-runtime");
-          }
-        }
         // Rewrite relative platform-types imports to #platform/ specifiers
         // so that browser/react-native variants are resolved via subpath imports.
         // Only rewrite imports to the default variant (not -browser/-react-native variants

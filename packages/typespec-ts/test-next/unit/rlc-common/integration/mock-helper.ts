@@ -2,7 +2,7 @@ import {
   buildRuntimeImports,
   initInternalImports,
 } from "../../../../src/rlc-common/helpers/imports-util.js";
-import { PackageFlavor, RLCModel } from "../../../../src/rlc-common/interfaces.js";
+import { RLCModel } from "../../../../src/rlc-common/interfaces.js";
 
 export type TestModelConfig = {
   moduleKind?: "esm" | "cjs";
@@ -12,7 +12,6 @@ export type TestModelConfig = {
   isMonorepo?: boolean;
   libraryName?: string;
   version?: string;
-  flavor?: PackageFlavor;
   srcPath?: string;
   source?: "TypeSpec" | "Swagger";
   monorepoPackageDirectory?: string;
@@ -30,7 +29,7 @@ export type TestModelConfig = {
 export function createMockModel(config: TestModelConfig = {}): RLCModel {
   return {
     importInfo: {
-      runtimeImports: buildRuntimeImports(config.flavor),
+      runtimeImports: buildRuntimeImports(),
       internalImports: initInternalImports(),
     },
     libraryName: config.libraryName ?? "@msinternal/test",
@@ -49,7 +48,6 @@ export function createMockModel(config: TestModelConfig = {}): RLCModel {
         scopeName: config.scopeName ?? "msinternal",
       },
       azureSdkForJs: config.isMonorepo ?? false,
-      flavor: config.flavor,
       generateTest: config.withTests ?? false,
       generateSample: config.withSamples ?? false,
       moduleKind: config.moduleKind,
