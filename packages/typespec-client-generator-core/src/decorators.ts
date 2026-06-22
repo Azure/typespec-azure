@@ -751,11 +751,12 @@ export const $override = (
     }
 
     // Warn if original param has @path but override param doesn't,
-    // unless the override param has @clientLocation (intentional relocation)
+    // unless any override param has @clientLocation (indicating an intentional customization
+    // where non-path params are just pass-throughs)
     if (
       isPathParam(context.program, originalParam) &&
       !isPathParam(context.program, overrideParams[index]) &&
-      !overrideParams[index].decorators.some((d) => d.decorator.name === "$clientLocation")
+      !overrideParams.some((p) => p.decorators.some((d) => d.decorator.name === "$clientLocation"))
     ) {
       reportDiagnostic(context.program, {
         code: "override-parameters-mismatch",
