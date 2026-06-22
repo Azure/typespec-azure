@@ -32,6 +32,7 @@ import {
   getServers,
   isBody,
   isBodyRoot,
+  isPathParam,
 } from "@typespec/http";
 import { getVersion, resolveVersions, type Version } from "@typespec/versioning";
 import {
@@ -747,6 +748,23 @@ export const $override = (
       } else {
         continue;
       }
+    }
+
+    // Warn if original param has @path but override param doesn't,
+    // unless the override param has @clientLocation (intentional relocation)
+    if (
+      isPathParam(context.program, originalParam) &&
+      !isPathParam(context.program, overrideParams[index]) &&
+      !overrideParams[index].decorators.some((d) => d.decorator.name === "$clientLocation")
+    ) {
+      reportDiagnostic(context.program, {
+        code: "override-parameters-mismatch",
+        target: context.decoratorTarget,
+        format: {
+          methodName: original.name,
+          checkParameter: overrideParams[index].name,
+        },
+      });
     }
 
     // Apply the alternate type to the original parameter

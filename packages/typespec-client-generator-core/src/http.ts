@@ -32,12 +32,7 @@ import {
 } from "@typespec/http";
 import { StreamMetadata, getStreamMetadata } from "@typespec/http/experimental";
 import { camelCase } from "change-case";
-import {
-  getOverriddenClientMethod,
-  getResponseAsBool,
-  isInScope,
-  shouldOmitSlashFromEmptyRoute,
-} from "./decorators.js";
+import { getResponseAsBool, isInScope, shouldOmitSlashFromEmptyRoute } from "./decorators.js";
 import {
   CollectionFormat,
   SdkBodyParameter,
@@ -421,27 +416,6 @@ function getSdkHttpParameters(
     param.correspondingMethodParams = param.methodParameterSegments.map(
       (segment) => segment[segment.length - 1],
     );
-  }
-
-  // Check for override parameters missing @path decorator
-  if (getOverriddenClientMethod(context, httpOperation.operation)) {
-    for (const param of retval.parameters) {
-      if (param.kind === "path" && param.correspondingMethodParams.length > 0) {
-        const methodParam = param.correspondingMethodParams[0];
-        if (methodParam.__raw && !isPathParam(context.program, methodParam.__raw)) {
-          diagnostics.add(
-            createDiagnostic({
-              code: "override-parameters-mismatch",
-              target: methodParam.__raw,
-              format: {
-                methodName: httpOperation.operation.name,
-                checkParameter: methodParam.name,
-              },
-            }),
-          );
-        }
-      }
-    }
   }
 
   return diagnostics.wrap(retval);
