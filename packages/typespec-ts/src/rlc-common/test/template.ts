@@ -128,18 +128,11 @@ module.exports = function (config) {
 
 export const recordedClientContent = `
 
-{{#if isEsm}}
 import {
   Recorder,
   RecorderStartOptions,
   VitestTestContext,
 } from "@azure-tools/test-recorder";
-{{/if}}
-
-{{#if isCjs}}
-import { Context } from "mocha";
-import { Recorder, RecorderStartOptions } from "@azure-tools/test-recorder";
-{{/if}}
 
 const replaceableVariables: Record<string, string> = {
   SUBSCRIPTION_ID: "azure_subscription_id"
@@ -154,25 +147,14 @@ const recorderEnvSetup: RecorderStartOptions = {
  * Should be called first in the test suite to make sure environment variables are
  * read before they are being used.
  */
-{{#if isEsm}}
 export async function createRecorder(context: VitestTestContext): Promise<Recorder> {
   const recorder = new Recorder(context);
   await recorder.start(recorderEnvSetup);
   return recorder;
 }
-{{/if}}
-
-{{#if isCjs}}
-export async function createRecorder(context: Context): Promise<Recorder> {
-  const recorder = new Recorder(context.currentTest);
-  await recorder.start(recorderEnvSetup);
-  return recorder;
-}
-{{/if}}
 `;
 
 export const sampleTestContent = `
-{{#if isEsm}}
 // import { Recorder } from "@azure-tools/test-recorder";
 // import { createRecorder } from "./utils/recordedClient.js";
 import { assert, 
@@ -181,24 +163,12 @@ import { assert,
          it,
          describe
 } from "vitest";
-{{/if}}
-
-{{#if isCjs}}
-// import { Recorder } from "@azure-tools/test-recorder";
-import { assert } from "chai";
-// import { createRecorder } from "./utils/recordedClient{{#if isModularLibrary}}.js{{/if}}";
-// import { Context } from "mocha";
-{{/if}}
 
 describe("My test", () => {
   // let recorder: Recorder;
 
-  // beforeEach(async function({{#if isCjs}}this: Context{{else}}ctx{{/if}}) {
-    {{#if isEsm}}
+  // beforeEach(async function(ctx) {
     // recorder = await createRecorder(ctx);
-    {{else}}
-    // recorder = await createRecorder(this);
-    {{/if}}
   // });
 
   // afterEach(async function() {

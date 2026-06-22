@@ -10,11 +10,7 @@ import {
   StructureKind,
 } from "ts-morph";
 import { getImportSpecifier } from "./helpers/imports-util.js";
-import {
-  getImportModuleName,
-  getResponseBaseName,
-  getResponseTypeName,
-} from "./helpers/name-constructors.js";
+import { getResponseBaseName, getResponseTypeName } from "./helpers/name-constructors.js";
 import { ResponseHeaderSchema, ResponseMetadata, RLCModel } from "./interfaces.js";
 
 let hasErrorResponse = false;
@@ -102,13 +98,7 @@ export function buildResponseTypes(model: RLCModel) {
       {
         isTypeOnly: true,
         namedImports: modelNamedImports,
-        moduleSpecifier: getImportModuleName(
-          {
-            cjsName: `./outputModels`,
-            esModulesName: `./outputModels.js`,
-          },
-          model,
-        ),
+        moduleSpecifier: `./outputModels.js`,
       },
     ]);
   }

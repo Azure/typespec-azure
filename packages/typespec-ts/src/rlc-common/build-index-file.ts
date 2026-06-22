@@ -3,7 +3,6 @@
 
 import { joinPaths } from "@typespec/compiler";
 import { Project, SourceFile } from "ts-morph";
-import { getImportModuleName } from "./helpers/name-constructors.js";
 import { NameType, normalizeName } from "./helpers/name-utils.js";
 import {
   hasCsvCollection,
@@ -49,42 +48,24 @@ function generateRLCIndexForMultiClient(file: SourceFile, model: RLCModel) {
 
   file.addImportDeclaration({
     namespaceImport: "Parameters",
-    moduleSpecifier: getImportModuleName(
-      { cjsName: "./parameters", esModulesName: "./parameters.js" },
-      model,
-    ),
+    moduleSpecifier: "./parameters.js",
   });
 
   file.addImportDeclaration({
     namespaceImport: "Responses",
-    moduleSpecifier: getImportModuleName(
-      { cjsName: "./responses", esModulesName: "./responses.js" },
-      model,
-    ),
+    moduleSpecifier: "./responses.js",
   });
 
   file.addImportDeclaration({
     namespaceImport: "Client",
-    moduleSpecifier: getImportModuleName(
-      {
-        cjsName: "./clientDefinitions",
-        esModulesName: "./clientDefinitions.js",
-      },
-      model,
-    ),
+    moduleSpecifier: "./clientDefinitions.js",
   });
 
   const exports = ["Parameters", "Responses", "Client"];
   if (hasInputModels(model)) {
     file.addImportDeclaration({
       namespaceImport: "Models",
-      moduleSpecifier: getImportModuleName(
-        {
-          cjsName: "./models",
-          esModulesName: "./models.js",
-        },
-        model,
-      ),
+      moduleSpecifier: "./models.js",
     });
     exports.push("Models");
   }
@@ -92,13 +73,7 @@ function generateRLCIndexForMultiClient(file: SourceFile, model: RLCModel) {
   if (hasOutputModels(model)) {
     file.addImportDeclaration({
       namespaceImport: "OutputModels",
-      moduleSpecifier: getImportModuleName(
-        {
-          cjsName: "./outputModels",
-          esModulesName: "./outputModels.js",
-        },
-        model,
-      ),
+      moduleSpecifier: "./outputModels.js",
     });
     exports.push("OutputModels");
   }
@@ -106,13 +81,7 @@ function generateRLCIndexForMultiClient(file: SourceFile, model: RLCModel) {
   if (hasPagingOperations(model)) {
     file.addImportDeclaration({
       namespaceImport: "PaginateHelper",
-      moduleSpecifier: getImportModuleName(
-        {
-          cjsName: "./paginateHelper",
-          esModulesName: "./paginateHelper.js",
-        },
-        model,
-      ),
+      moduleSpecifier: "./paginateHelper.js",
     });
     exports.push("PaginateHelper");
   }
@@ -120,13 +89,7 @@ function generateRLCIndexForMultiClient(file: SourceFile, model: RLCModel) {
   if (hasUnexpectedHelper(model)) {
     file.addImportDeclaration({
       namespaceImport: "UnexpectedHelper",
-      moduleSpecifier: getImportModuleName(
-        {
-          cjsName: "./isUnexpected",
-          esModulesName: "./isUnexpected.js",
-        },
-        model,
-      ),
+      moduleSpecifier: "./isUnexpected.js",
     });
     exports.push("UnexpectedHelper");
   }
@@ -134,13 +97,7 @@ function generateRLCIndexForMultiClient(file: SourceFile, model: RLCModel) {
   if (hasPollingOperations(model)) {
     file.addImportDeclaration({
       namespaceImport: "PollingHelper",
-      moduleSpecifier: getImportModuleName(
-        {
-          cjsName: "./pollingHelper",
-          esModulesName: "./pollingHelper.js",
-        },
-        model,
-      ),
+      moduleSpecifier: "./pollingHelper.js",
     });
     exports.push("PollingHelper");
   }
@@ -154,26 +111,14 @@ function generateRLCIndexForMultiClient(file: SourceFile, model: RLCModel) {
   ) {
     file.addImportDeclaration({
       namespaceImport: "SerializeHelper",
-      moduleSpecifier: getImportModuleName(
-        {
-          cjsName: "./serializeHelper",
-          esModulesName: "./serializeHelper.js",
-        },
-        model,
-      ),
+      moduleSpecifier: "./serializeHelper.js",
     });
     exports.push("SerializeHelper");
   }
 
   file.addExportDeclarations([
     {
-      moduleSpecifier: getImportModuleName(
-        {
-          cjsName: `./${moduleName}`,
-          esModulesName: `./${moduleName}.js`,
-        },
-        model,
-      ),
+      moduleSpecifier: `./${moduleName}.js`,
       namedExports: [`${createClientFuncName}`, `${clientName}ClientOptions`],
     },
     {
@@ -188,65 +133,29 @@ function generateRLCIndex(file: SourceFile, model: RLCModel) {
   const moduleName = normalizeName(clientName, NameType.File);
 
   file.addImportDeclaration({
-    moduleSpecifier: getImportModuleName(
-      {
-        cjsName: `./${moduleName}`,
-        esModulesName: `./${moduleName}.js`,
-      },
-      model,
-    ),
+    moduleSpecifier: `./${moduleName}.js`,
     defaultImport: createClientFuncName,
   });
 
   file.addExportDeclarations([
     {
-      moduleSpecifier: getImportModuleName(
-        {
-          cjsName: `./${moduleName}`,
-          esModulesName: `./${moduleName}.js`,
-        },
-        model,
-      ),
+      moduleSpecifier: `./${moduleName}.js`,
     },
     {
-      moduleSpecifier: getImportModuleName(
-        {
-          cjsName: `./parameters`,
-          esModulesName: `./parameters.js`,
-        },
-        model,
-      ),
+      moduleSpecifier: `./parameters.js`,
     },
     {
-      moduleSpecifier: getImportModuleName(
-        {
-          cjsName: `./responses`,
-          esModulesName: `./responses.js`,
-        },
-        model,
-      ),
+      moduleSpecifier: `./responses.js`,
     },
     {
-      moduleSpecifier: getImportModuleName(
-        {
-          cjsName: `./clientDefinitions`,
-          esModulesName: `./clientDefinitions.js`,
-        },
-        model,
-      ),
+      moduleSpecifier: `./clientDefinitions.js`,
     },
   ]);
 
   if (hasUnexpectedHelper(model)) {
     file.addExportDeclarations([
       {
-        moduleSpecifier: getImportModuleName(
-          {
-            cjsName: `./isUnexpected`,
-            esModulesName: `./isUnexpected.js`,
-          },
-          model,
-        ),
+        moduleSpecifier: `./isUnexpected.js`,
       },
     ]);
   }
@@ -254,13 +163,7 @@ function generateRLCIndex(file: SourceFile, model: RLCModel) {
   if (hasInputModels(model)) {
     file.addExportDeclarations([
       {
-        moduleSpecifier: getImportModuleName(
-          {
-            cjsName: `./models`,
-            esModulesName: `./models.js`,
-          },
-          model,
-        ),
+        moduleSpecifier: `./models.js`,
       },
     ]);
   }
@@ -268,13 +171,7 @@ function generateRLCIndex(file: SourceFile, model: RLCModel) {
   if (hasOutputModels(model)) {
     file.addExportDeclarations([
       {
-        moduleSpecifier: getImportModuleName(
-          {
-            cjsName: `./outputModels`,
-            esModulesName: `./outputModels.js`,
-          },
-          model,
-        ),
+        moduleSpecifier: `./outputModels.js`,
       },
     ]);
   }
@@ -282,13 +179,7 @@ function generateRLCIndex(file: SourceFile, model: RLCModel) {
   if (hasPagingOperations(model)) {
     file.addExportDeclarations([
       {
-        moduleSpecifier: getImportModuleName(
-          {
-            cjsName: `./paginateHelper`,
-            esModulesName: `./paginateHelper.js`,
-          },
-          model,
-        ),
+        moduleSpecifier: `./paginateHelper.js`,
       },
     ]);
   }
@@ -296,13 +187,7 @@ function generateRLCIndex(file: SourceFile, model: RLCModel) {
   if (hasPollingOperations(model)) {
     file.addExportDeclarations([
       {
-        moduleSpecifier: getImportModuleName(
-          {
-            cjsName: `./pollingHelper`,
-            esModulesName: `./pollingHelper.js`,
-          },
-          model,
-        ),
+        moduleSpecifier: `./pollingHelper.js`,
       },
     ]);
   }
@@ -316,13 +201,7 @@ function generateRLCIndex(file: SourceFile, model: RLCModel) {
   ) {
     file.addExportDeclarations([
       {
-        moduleSpecifier: getImportModuleName(
-          {
-            cjsName: `./serializeHelper`,
-            esModulesName: `./serializeHelper.js`,
-          },
-          model,
-        ),
+        moduleSpecifier: `./serializeHelper.js`,
       },
     ]);
   }

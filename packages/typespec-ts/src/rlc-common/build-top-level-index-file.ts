@@ -3,7 +3,6 @@
 
 import { joinPaths } from "@typespec/compiler";
 import { Project } from "ts-morph";
-import { getImportModuleName } from "./helpers/name-constructors.js";
 import { NameType, normalizeName } from "./helpers/name-utils.js";
 import { getRelativePartFromSrcPath } from "./helpers/path-utils.js";
 import { RLCModel } from "./interfaces.js";
@@ -33,13 +32,7 @@ export function buildTopLevelIndex(model: RLCModel) {
       indexFile.addImportDeclaration({
         isTypeOnly: true,
         namespaceImport: item[1],
-        moduleSpecifier: getImportModuleName(
-          {
-            cjsName: `${item[0]}`,
-            esModulesName: `${item[0]}/index.js`,
-          },
-          model,
-        ),
+        moduleSpecifier: `${item[0]}/index.js`,
       });
       allModules.push(item[1]);
     });

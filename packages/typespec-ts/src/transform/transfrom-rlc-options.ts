@@ -42,10 +42,8 @@ function extractRLCOptions(
   const isModularLibrary = emitterOptions["is-modular-library"] !== false;
   const includeShortcuts = getIncludeShortcuts(emitterOptions);
   const packageDetails = getPackageDetails(program, emitterOptions, isModularLibrary);
-  const moduleKind = getModuleKind(emitterOptions);
   const serviceInfo = getServiceInfo(program, isModularLibrary);
   const includeHeadersInResponse = emitterOptions["include-headers-in-response"] === true;
-  const azureSdkForJs = getAzureSdkForJs(emitterOptions);
   const generateMetadata = getGenerateMetadata(emitterOptions);
   const generateTest = getGenerateTest(emitterOptions);
   const generateSample = getGenerateSample(dpgContext, emitterOptions);
@@ -82,13 +80,11 @@ function extractRLCOptions(
   return {
     ...credentialInfo,
     includeHeadersInResponse,
-    moduleKind,
     includeShortcuts,
     packageDetails,
     generateMetadata,
     generateTest,
     generateSample,
-    azureSdkForJs,
     serviceInfo,
     azureOutputDirectory,
     sourceFrom: "TypeSpec",
@@ -266,10 +262,6 @@ function getIncludeShortcuts(emitterOptions: EmitterOptions) {
   return Boolean(emitterOptions["include-shortcuts"]);
 }
 
-function getModuleKind(emitterOptions: EmitterOptions) {
-  return emitterOptions["module-kind"] ?? "esm";
-}
-
 function buildPackageDetails(
   program: Program,
   emitterOptions: EmitterOptions,
@@ -318,13 +310,6 @@ function getServiceInfo(program: Program, isModularLibrary: boolean): ServiceInf
   };
 }
 
-function getAzureSdkForJs(emitterOptions: EmitterOptions) {
-  return emitterOptions["azure-sdk-for-js"] === undefined ||
-    emitterOptions["azure-sdk-for-js"] === null
-    ? true
-    : Boolean(emitterOptions["azure-sdk-for-js"]);
-}
-
 function getGenerateMetadata(emitterOptions: EmitterOptions) {
   if (
     emitterOptions["generate-metadata"] === undefined ||
@@ -341,10 +326,6 @@ function getGenerateMetadata(emitterOptions: EmitterOptions) {
  * @returns
  */
 function getGenerateTest(emitterOptions: EmitterOptions) {
-  // Disable generateTest if azureSdkForJS is false
-  if (!getAzureSdkForJs(emitterOptions)) {
-    return false;
-  }
   return emitterOptions["generate-test"];
 }
 

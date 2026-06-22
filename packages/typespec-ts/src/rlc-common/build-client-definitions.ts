@@ -14,7 +14,7 @@ import {
 
 import { REST_CLIENT_RESERVED } from "./build-method-shortcuts.js";
 import { getImportSpecifier } from "./helpers/imports-util.js";
-import { getClientName, getImportModuleName } from "./helpers/name-constructors.js";
+import { getClientName } from "./helpers/name-constructors.js";
 import { CasingConvention, NameType, normalizeName, pascalCase } from "./helpers/name-utils.js";
 import {
   buildMethodDefinitions,
@@ -83,10 +83,7 @@ export function buildClientDefinitions(model: RLCModel) {
     clientDefinitionsFile.addImportDeclaration({
       isTypeOnly: true,
       namedImports: [...options.importedParameters],
-      moduleSpecifier: getImportModuleName(
-        { cjsName: "./parameters", esModulesName: "./parameters.js" },
-        model,
-      ),
+      moduleSpecifier: "./parameters.js",
     });
   }
 
@@ -94,10 +91,7 @@ export function buildClientDefinitions(model: RLCModel) {
     clientDefinitionsFile.addImportDeclaration({
       isTypeOnly: true,
       namedImports: [...options.importedResponses],
-      moduleSpecifier: getImportModuleName(
-        { cjsName: "./responses", esModulesName: "./responses.js" },
-        model,
-      ),
+      moduleSpecifier: "./responses.js",
     });
   }
 
@@ -105,10 +99,7 @@ export function buildClientDefinitions(model: RLCModel) {
     clientDefinitionsFile.addImportDeclaration({
       isTypeOnly: true,
       namedImports: Array.from(model.importInfo.internalImports.rlcClientDefinition.importsSet!),
-      moduleSpecifier: getImportModuleName(
-        { cjsName: "./models", esModulesName: "./models.js" },
-        model,
-      ),
+      moduleSpecifier: "./models.js",
     });
   }
 

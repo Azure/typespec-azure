@@ -11,11 +11,7 @@ import {
 } from "ts-morph";
 import { getObjectInterfaceDeclaration } from "./build-object-types.js";
 import { getImportSpecifier } from "./helpers/imports-util.js";
-import {
-  getImportModuleName,
-  getParameterBaseName,
-  getParameterTypeName,
-} from "./helpers/name-constructors.js";
+import { getParameterBaseName, getParameterTypeName } from "./helpers/name-constructors.js";
 import { getGeneratedWrapperTypes } from "./helpers/operation-helpers.js";
 import {
   ObjectSchema,
@@ -159,13 +155,7 @@ export function buildParameterTypes(model: RLCModel) {
       {
         isTypeOnly: true,
         namedImports: Array.from(model.importInfo.internalImports.parameter.importsSet!),
-        moduleSpecifier: getImportModuleName(
-          {
-            cjsName: `./models`,
-            esModulesName: `./models.js`,
-          },
-          model,
-        ),
+        moduleSpecifier: `./models.js`,
       },
     ]);
   }
@@ -176,20 +166,11 @@ export function buildParameterTypes(model: RLCModel) {
   // NodeJS.ReadableStream on Node and `never` on browser/react-native, so the
   // union arm drops out naturally in non-Node builds.
   if (parametersFile.getFullText().includes("NodeReadableStream")) {
-    const platformTypesModuleSpecifier = model.options?.azureSdkForJs
-      ? "#platform/platform-types"
-      : getImportModuleName(
-          {
-            cjsName: `./platform-types`,
-            esModulesName: `./platform-types.js`,
-          },
-          model,
-        );
     parametersFile.addImportDeclarations([
       {
         isTypeOnly: true,
         namedImports: ["NodeReadableStream"],
-        moduleSpecifier: platformTypesModuleSpecifier,
+        moduleSpecifier: "#platform/platform-types",
       },
     ]);
   }

@@ -8,7 +8,6 @@ import {
   Project,
   VariableDeclarationKind,
 } from "ts-morph";
-import { getImportModuleName } from "./helpers/name-constructors.js";
 import { hasUnexpectedHelper } from "./helpers/operation-helpers.js";
 import { RLCModel } from "./interfaces.js";
 export function buildIsUnexpectedHelper(model: RLCModel) {
@@ -94,13 +93,7 @@ export function buildIsUnexpectedHelper(model: RLCModel) {
   isErrorHelper.addImportDeclaration({
     isTypeOnly: true,
     namedImports: [...allResponseTypes],
-    moduleSpecifier: getImportModuleName(
-      {
-        cjsName: `./responses`,
-        esModulesName: `./responses.js`,
-      },
-      model,
-    ),
+    moduleSpecifier: `./responses.js`,
   });
 
   isErrorHelper.addVariableStatement({

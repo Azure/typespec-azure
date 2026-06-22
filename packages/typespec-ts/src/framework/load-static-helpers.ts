@@ -99,16 +99,14 @@ export async function loadStaticHelpers(
         // so that browser/react-native variants are resolved via subpath imports.
         // Only rewrite imports to the default variant (not -browser/-react-native variants
         // which are already platform-specific direct imports).
-        if (options.options?.azureSdkForJs) {
-          const specifier = i.getModuleSpecifierValue();
-          if (
-            specifier.startsWith(".") &&
-            specifier.includes("platform-types") &&
-            !specifier.includes("-browser") &&
-            !specifier.includes("-react-native")
-          ) {
-            i.setModuleSpecifier("#platform/static-helpers/platform-types");
-          }
+        const specifier = i.getModuleSpecifierValue();
+        if (
+          specifier.startsWith(".") &&
+          specifier.includes("platform-types") &&
+          !specifier.includes("-browser") &&
+          !specifier.includes("-react-native")
+        ) {
+          i.setModuleSpecifier("#platform/static-helpers/platform-types");
         }
       });
 
