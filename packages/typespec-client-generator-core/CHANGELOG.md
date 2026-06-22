@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.69.1
+
+### Bug Fixes
+
+- [917d2b1](https://github.com/Azure/typespec-azure/commit/917d2b12c66d0e46fa5894baaf2fed1a1950d517) Support a per-service `api-version` map for multi-service packages. The `api-version` emitter option now accepts either a string (applied to single service packages, or the `latest`/`all` keywords) or a map from each service namespace's full name to its desired version. Services not listed in the map default to their latest version.
+
+
 ## 0.69.0
 
 ### Bug Fixes
