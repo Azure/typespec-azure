@@ -23,7 +23,13 @@ Ensure that your `package.json` includes a link to the customization library, `t
 }
 ```
 
-Customization should be implemented in a file named `client.tsp`, which should be used alongside with the `main.tsp`.
+Customization should be implemented in a file named `client.tsp`, which should be used alongside with the `main.tsp`. The `main.tsp` imports `client.tsp` so that the whole specification, including client customizations, compiles from the single `main.tsp` entrypoint.
+
+```typespec
+// main.tsp
+import "./client.tsp";
+// ... rest of the service definition
+```
 
 ```typespec
 // client.tsp
@@ -35,8 +41,8 @@ using Azure.ClientGenerator.Core;
 // Add your customizations here
 ```
 
-After you've created your customization file, use the command `tsp compile client.tsp` to generate output that includes your customizations:
+After you've created your customization file, compile the project from the `main.tsp` entrypoint to generate output that includes your customizations:
 
 ```shell
-tsp compile client.tsp
+tsp compile .
 ```
