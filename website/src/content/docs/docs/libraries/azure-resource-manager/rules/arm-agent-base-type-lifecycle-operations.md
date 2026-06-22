@@ -11,9 +11,12 @@ Conversation and Response child resources of an Agent must define create, read, 
 #### ❌ Incorrect
 
 ```tsp
+using Azure.ResourceManager.BaseTypes.Agents;
+
 @armProviderNamespace
 namespace Microsoft.Contoso;
 
+#suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "Experimental BaseTypes"
 model MyAgent is Agent<MyAgentProperties> {
   ...ResourceNameParameter<MyAgent>;
 }
@@ -32,9 +35,12 @@ interface Conversations {
 #### ✅ Correct
 
 ```tsp
+using Azure.ResourceManager.BaseTypes.Agents;
+
 @armProviderNamespace
 namespace Microsoft.Contoso;
 
+#suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "Experimental BaseTypes"
 model MyAgent is Agent<MyAgentProperties> {
   ...ResourceNameParameter<MyAgent>;
 }

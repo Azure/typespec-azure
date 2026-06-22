@@ -28,6 +28,7 @@ There is a good discussion on making the choice between Tracked and Proxy Resour
 - Rarely, some resources may need to apply across a subscription, or have a single instance in a customer subscription, these are called [subscription-based resources](#subscription-based-resource).
 - Rarer still, some resources may need to apply across a specific region, or have a single instance in a region, these are called [location-based resources](#location-based-resource).
 - In some cases, there can only be one instance of a resource at a specific scope - this is rare, but happens most frequently in tenant, child, and location resources. In typespec, you will need to specify that the resource is a singleton, and the resource manager tools will automatically apply the correct pattern for singleton resources (using the recommended resource name 'default')
+- In cases where the resource represents an AI agent that follows a standard base type pattern, use the experimental [Agent resource templates](#agent-resources-experimental). Agent resources are TrackedResources that require Conversation and Response child resources.
 
 ## Modeling Resources in TypeSpec
 
@@ -261,6 +262,67 @@ model EmployeeAgreement is ProxyResource<EmployeeAgreementProperties> {
 `...ResourceNameParameter<EmployeeAgreement>`: spreads in the standard resource name parameter, which automatically defines the resource type name, parameter name, and path segment based on the resource model.
 
 You can find samples of Singleton Resources [in the Singleton sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/resource-types/singleton/main.tsp).
+
+### Agent Resources (Experimental)
+
+:::caution
+Agent base types are experimental and may be subject to breaking changes.
+:::
+
+Agent resources model AI agents that follow a standard ARM base type pattern. The `Agent` template creates a TrackedResource with the `@azureBaseType` decorator applied. Each agent resource **must** have both a `Conversation` and a `Response` child resource with full CRUD lifecycle operations.
+
+There are two deployment models:
+
+- **Appliance**: The service owns and manages the agent lifecycle. All properties are read-only.
+- **Platform**: The client owns and manages the agent configuration. Properties are writable (except `baseTypes`, which is always ARM-managed and read-only).
+
+Here is a minimal example using the Platform deployment model:
+
+```typespec
+using Azure.ResourceManager.BaseTypes;
+using Azure.ResourceManager.BaseTypes.Agents;
+
+// 1. Define the agent definition model
+model MyDefinition is AgentDefinitionPlatform<true, true>;
+
+// 2. Define the agent properties
+model MyAgentProperties is AgentPropertiesPlatform<MyDefinition> {
+  ...DefaultProvisioningStateProperty;
+}
+
+// 3. Define the agent resource
+#suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "Experimental BaseTypes"
+model MyAgent is Agent<MyAgentProperties> {
+  ...ResourceNameParameter<MyAgent>;
+}
+
+// 4. Define conversation and response child resources (required)
+model MyConversationProperties is ConversationProperties {
+  ...DefaultProvisioningStateProperty;
+}
+
+model MyConversation is AgentConversation<MyConversationProperties, MyAgent> {
+  ...ResourceNameParameter<MyConversation>;
+}
+
+model MyResponseProperties is ResponseProperties {
+  ...DefaultProvisioningStateProperty;
+}
+
+model MyResponse is AgentResponse<MyResponseProperties, MyAgent> {
+  ...ResourceNameParameter<MyResponse>;
+}
+```
+
+Key points:
+
+- `AgentDefinitionPlatform<HasModelDeploymentRef, HasInstructions>`: The boolean template parameters control whether optional fields (`modelDeploymentRef`, `instructions`) are included. Use `AgentDefinitionAppliance` for the Appliance deployment model.
+- `AgentPropertiesPlatform<DefinitionType>` / `AgentPropertiesAppliance<DefinitionType>`: Choose based on the deployment model. Both automatically include `baseTypes`, `displayName`, `description`, `definition`, and `tools` properties.
+- `Agent<Properties>`: Creates a TrackedResource and applies `@azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })` automatically.
+- `AgentConversation<Properties, AgentResource>` and `AgentResponse<Properties, AgentResource>`: Create proxy child resources with `@parentResource` set to the agent.
+- Child resources must define create, read, update, and delete operations (use `ArmCustomPatchSync` for update).
+
+You can find a full sample with both Appliance and Platform agents [in the Agent Base Type sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/resource-types/agent/main.tsp).
 
 ## Designing Resource-specific Properties
 

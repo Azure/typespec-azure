@@ -54,6 +54,7 @@ Canonical ARM samples are under `packages/samples/specs/resource-manager/`:
 - `resource-types/extension/` — ExtensionResource multi-scope
 - `resource-types/specific-extension/` — ExternalResource targets
 - `resource-types/singleton/` — @singleton
+- `resource-types/agent/` — Agent base type (Appliance and Platform)
 - `resource-types/virtual-resource/` — @armVirtualResource
 - `resource-types/location/` — ArmLocationResource parent
 - `resource-types/private-endpoints/` — PrivateEndpointConnection
@@ -100,6 +101,20 @@ All standard envelope properties (`EntityTagProperty`, `ExtendedLocationProperty
 ## ResourceNameParameter NamePattern
 
 `ResourceNameParameter` has a `NamePattern` template parameter with default value `"^[a-zA-Z0-9-]{3,24}$"`. In documentation examples, omit `NamePattern` when the value equals the default. Only show it when demonstrating a custom pattern.
+
+## Agent Base Types (Experimental)
+
+The `Azure.ResourceManager.BaseTypes` and `Azure.ResourceManager.BaseTypes.Agents` namespaces provide experimental base type support. Key points:
+
+- `Agent<Properties>` template creates a TrackedResource with `@azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })` applied automatically.
+- Two deployment models: `AgentPropertiesAppliance<Def>` (all read-only) and `AgentPropertiesPlatform<Def>` (writable except `baseTypes`).
+- `AgentDefinitionAppliance<HasModelDeploymentRef, HasInstructions>` and `AgentDefinitionPlatform<HasModelDeploymentRef, HasInstructions>` control optional fields via boolean template params.
+- Required child resources: `AgentConversation<Props, AgentResource>` and `AgentResponse<Props, AgentResource>` (ProxyResource children).
+- Child resources must have full CRUD lifecycle operations (create, read, update, delete) — enforced by linting rule `arm-agent-base-type-lifecycle-operations`.
+- Missing child resources trigger linting rule `arm-agent-base-type-child-resources`.
+- Using the Agent template emits a `basetypes-experimental` warning diagnostic on user models; suppress with `#suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "Experimental BaseTypes"`.
+- The `@baseTypeOptional` private decorator controls property visibility based on template parameters (not user-facing).
+- Canonical sample: `packages/samples/specs/resource-manager/resource-types/agent/main.tsp`.
 
 ## Feedback Corrections Applied
 
