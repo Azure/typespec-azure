@@ -1,3 +1,4 @@
+import { getDirectoryPath, NodeHost } from "@typespec/compiler";
 import {
   FunctionDeclarationStructure,
   InterfaceDeclarationStructure,
@@ -5,17 +6,17 @@ import {
   StructureKind,
   TypeAliasDeclarationStructure,
 } from "ts-morph";
+import { fileURLToPath } from "url";
 import { assert, beforeEach, describe, expect, it } from "vitest";
 import { Binder, provideBinder, useBinder } from "../../../src/framework/hooks/binder.js";
 
 import path from "path";
 import { addDeclaration } from "../../../src/framework/declaration.js";
 import { ExternalDependencies } from "../../../src/framework/dependency.js";
-import { useDependencies } from "../../../src/framework/hooks/useDependencies.js";
+import { useDependencies } from "../../../src/framework/hooks/use-dependencies.js";
 import { loadStaticHelpers, StaticHelpers } from "../../../src/framework/load-static-helpers.js";
 import { resolveReference } from "../../../src/framework/reference.js";
 import { AzurePollingDependencies } from "../../../src/modular/external-dependencies.js";
-import { getDirname } from "../../../src/utils/dirname.js";
 import {
   assertGetFunctionDeclaration,
   assertGetFunctionParameter,
@@ -28,7 +29,7 @@ import {
   assertGetVariableDeclaration,
 } from "../../utils/tsmorph-utils.js";
 
-const __dirname = getDirname(import.meta.url).__dirname;
+const __dirname = getDirectoryPath(fileURLToPath(import.meta.url));
 
 describe("Binder", () => {
   let project: Project;
@@ -66,8 +67,6 @@ describe("Binder", () => {
       assertGetInterfaceDeclaration(sourceFile, "TestInterface");
       assertGetInterfaceDeclaration(sourceFile, "TestModel");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface TestInterface {
       //   foo: string;
@@ -102,8 +101,6 @@ describe("Binder", () => {
       assertGetInterfaceDeclaration(sourceFile, "TestInterface");
       assertGetInterfaceDeclaration(sourceFile, "TestModel");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface TestInterface {
       //   foo: string;
@@ -137,10 +134,8 @@ describe("Binder", () => {
       assertGetInterfaceDeclaration(sourceFile, "TestInterface");
       const functionDec = assertGetFunctionDeclaration(sourceFile, "testFunction");
       const param = assertGetFunctionParameter(functionDec, "param");
-      expect(param.getType().getText(), "TestInterface");
+      expect(param.getType().getText()).toBe("TestInterface");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface TestInterface {
       //   foo: string;
@@ -179,10 +174,8 @@ describe("Binder", () => {
       assertGetInterfaceDeclaration(sourceFile, "TestInterface");
       const functionDec = assertGetFunctionDeclaration(sourceFile, "testFunction");
       const param = assertGetFunctionParameter(functionDec, "param");
-      expect(param.getType().getText(), "TestInterface");
+      expect(param.getType().getText()).toBe("TestInterface<string>");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface TestInterface {
       //   foo: string;
@@ -216,8 +209,6 @@ describe("Binder", () => {
       const fnDeclaration = assertGetFunctionDeclaration(sourceFile, "testFunction");
       assertGetFunctionReturnType(fnDeclaration, "TestInterface");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface TestInterface {
       //   foo: string;
@@ -252,8 +243,6 @@ describe("Binder", () => {
       const fnDeclaration = assertGetFunctionDeclaration(sourceFile, "testFunction");
       assertGetFunctionReturnType(fnDeclaration, "TestInterface<string>");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface TestInterface {
       //   foo: string;
@@ -286,8 +275,6 @@ describe("Binder", () => {
       assertGetInterfaceDeclaration(sourceFile, "TestInterface");
       assertGetTypealiasDeclaration(sourceFile, "TestType");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface TestInterface {
       //   foo: string;
@@ -321,8 +308,6 @@ describe("Binder", () => {
       assertGetInterfaceDeclaration(sourceFile, "TestInterface");
       assertGetTypealiasDeclaration(sourceFile, "TestType");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface TestInterface {
       //   foo: string;
@@ -347,6 +332,7 @@ describe("Binder", () => {
       };
       const staticHelperMap = await loadStaticHelpers(project, staticHelpers, {
         helpersAssetDirectory: helpersDirectory,
+        host: NodeHost,
       });
       binder = provideBinder(project, { staticHelpers: staticHelperMap });
     });
@@ -363,8 +349,6 @@ describe("Binder", () => {
       assertGetImportStatements(sourceFile, "./static-helpers/utils.js");
       assertGetStatement(sourceFile, "buildCsvCollection();");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // import { buildCsvCollection } from "./static-helpers/utils.js";
       //
@@ -467,8 +451,6 @@ describe("Binder", () => {
 
       expect(defaultImport.getNamedImports()[0].getName()).equal("Client");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface Client {
       //   foo: Client_1;
@@ -515,10 +497,8 @@ describe("Binder", () => {
 
       expect(
         defaultImport.getNamedImports().map((i) => i.getAliasNode()?.getText() ?? i.getName()),
-      ).to.deep.equal(["Client_1", "ClientOptions"]);
+      ).toEqual(["Client_1", "ClientOptions"]);
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface Client {
       //   foo: Client_1;
@@ -551,8 +531,6 @@ describe("Binder", () => {
 
       expect(fooProperty.getText()).toBe("foo: Client;");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface TestModel {
       //   foo: Client;
@@ -584,8 +562,6 @@ describe("Binder", () => {
 
       assertGetInterfaceDeclaration(sourceFile, "TestModel");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface TestModel {
       //   foo: string;
@@ -629,9 +605,6 @@ describe("Binder", () => {
 
       assertGetInterfaceDeclaration(sourceFile, "TestModel");
       assertGetInterfaceDeclaration(sourceFile, "TestModel_1");
-
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
 
       // test1.ts
       // interface TestModel {
@@ -685,8 +658,6 @@ describe("Binder", () => {
 
       assert.equal(fooProp.getText(), "foo: TestModelA;");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface TestModelA {
       //   foo: string;
@@ -770,12 +741,6 @@ describe("Binder", () => {
         .flatMap((i) => i.getNamedImports().map((n) => n.getAliasNode()?.getText() ?? n.getName()));
       expect(imports).toEqual(["TestModel", "TestModelB"]);
 
-      console.log("// test1.ts");
-      console.log(sourceFile1.getFullText());
-      console.log("// test2.ts");
-      console.log(sourceFile2.getFullText());
-      console.log("// test3.ts");
-      console.log(sourceFile3.getFullText());
       // test1.ts
       // interface TestModel {
       //   foo: string;
@@ -826,10 +791,6 @@ describe("Binder", () => {
       const binder = useBinder();
       binder.resolveAllReferences("/modularPackageFolder/src");
 
-      console.log("// test1.ts");
-      console.log(sourceFile1.getFullText());
-      console.log("// test2.ts");
-      console.log(sourceFile2.getFullText());
       // test1.ts
       // function testFn(): string {
       //   console.log("hello world!");
@@ -878,8 +839,6 @@ describe("Binder", () => {
 
       assertGetInterfaceDeclaration(sourceFile, "TestModel");
       assertGetFunctionDeclaration(sourceFile, "TestFunction");
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
 
       // test1.ts
       // interface TestModel {
@@ -934,8 +893,6 @@ describe("Binder", () => {
       expect(propA?.getType().getText()).toBe("ModelB");
       expect(propB?.getType().getText()).toBe("ModelA");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface ModelA {
       //   propA: ModelB;
@@ -992,10 +949,6 @@ describe("Binder", () => {
       const variableDeclaration = assertGetVariableDeclaration(sourceFile2, "obj");
       assert.equal(variableDeclaration.getText(), "let obj: MyInterface = { id: 1 };");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
-      console.log("// test2.ts");
-      console.log(sourceFile2.getFullText());
       // test1.ts
       // interface MyInterface {
       //   id: number;
@@ -1012,7 +965,7 @@ describe("Binder", () => {
       // let obj: MyInterface = { id: 1 };
     });
 
-    it("should defer references to declarations that don't exist", () => {
+    it("should defer references to nested declarations that don't exist yet", () => {
       const sourceFile = project.createSourceFile("test1.ts", "", {
         overwrite: true,
       });
@@ -1057,8 +1010,6 @@ describe("Binder", () => {
 
       assert.equal(fooProp.getText(), "foo: TestModel;");
 
-      console.log("// test1.ts");
-      console.log(sourceFile.getFullText());
       // test1.ts
       // interface TestModel {
       //   foo: string;

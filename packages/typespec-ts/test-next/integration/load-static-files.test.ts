@@ -1,11 +1,12 @@
+import { getDirectoryPath, NodeHost } from "@typespec/compiler";
 import path from "path";
 import { Project } from "ts-morph";
+import { fileURLToPath } from "url";
 import { assert, beforeEach, describe, expect, it } from "vitest";
 import { loadStaticHelpers } from "../../src/framework/load-static-helpers.js";
 import { refkey } from "../../src/framework/refkey.js";
-import { getDirname } from "../../src/utils/dirname.js";
 
-const __dirname = getDirname(import.meta.url).__dirname;
+const __dirname = getDirectoryPath(fileURLToPath(import.meta.url));
 
 describe("loadStaticHelpers", () => {
   let project: Project;
@@ -24,6 +25,7 @@ describe("loadStaticHelpers", () => {
       },
     } as const;
     const helperDeclarations = await loadStaticHelpers(project, helpers, {
+      host: NodeHost,
       helpersAssetDirectory,
     });
     expect(
@@ -48,6 +50,7 @@ describe("loadStaticHelpers", () => {
 
     await expect(
       loadStaticHelpers(project, helpers, {
+        host: NodeHost,
         helpersAssetDirectory,
       }),
     ).rejects.toThrowError(/not found/);
@@ -64,12 +67,13 @@ describe("loadStaticHelpers", () => {
 
     await expect(
       loadStaticHelpers(project, helpers, {
+        host: NodeHost,
         helpersAssetDirectory,
       }),
     ).rejects.toThrowError(/invalid helper kind/);
   });
 
-  it("should rewrite platform-types imports to #platform subpath without extension for azure monorepo", async () => {
+  it("should rewrite platform-types imports to #platform subpath without extension", async () => {
     const helpers = {
       usesPlatformImport: {
         kind: "function",
@@ -79,11 +83,8 @@ describe("loadStaticHelpers", () => {
     } as const;
 
     await loadStaticHelpers(project, helpers, {
+      host: NodeHost,
       helpersAssetDirectory,
-      options: {
-        flavor: "azure",
-        azureSdkForJs: true,
-      } as any,
     });
 
     const sourceFile = project

@@ -2,9 +2,8 @@
 // Licensed under the MIT License.
 
 import { SdkClient } from "@azure-tools/typespec-client-generator-core";
-import { getDoc } from "@typespec/compiler";
+import { getDoc, joinPaths } from "@typespec/compiler";
 import { getServers } from "@typespec/http";
-import * as path from "path";
 import {
   buildRuntimeImports,
   Imports,
@@ -30,15 +29,15 @@ import {
   getSchemaForType,
   getTypeName,
   predictDefaultValue,
-} from "../utils/modelUtils.js";
-import { getClientLroOverload } from "../utils/operationUtil.js";
-import { transformApiVersionInfo } from "./transformApiVersionInfo.js";
-import { transformHelperFunctionDetails } from "./transformHelperFunctionDetails.js";
-import { transformToParameterTypes } from "./transformParameters.js";
-import { transformPaths } from "./transformPaths.js";
-import { transformToResponseTypes } from "./transformResponses.js";
-import { transformSchemas } from "./transformSchemas.js";
-import { transformTelemetryInfo } from "./transformTelemetryInfo.js";
+} from "../utils/model-utils.js";
+import { getClientLroOverload } from "../utils/operation-util.js";
+import { transformApiVersionInfo } from "./transform-api-version-info.js";
+import { transformHelperFunctionDetails } from "./transform-helper-function-details.js";
+import { transformToParameterTypes } from "./transform-parameters.js";
+import { transformPaths } from "./transform-paths.js";
+import { transformToResponseTypes } from "./transform-responses.js";
+import { transformSchemas } from "./transform-schemas.js";
+import { transformTelemetryInfo } from "./transform-telemetry-info.js";
 
 export async function transformRLCModel(
   client: SdkClient,
@@ -47,7 +46,7 @@ export async function transformRLCModel(
   const program = dpgContext.program;
   const options: RLCOptions = dpgContext.rlcOptions!;
   const rlcSourceDir = dpgContext.generationPathDetail?.rlcSourcesDir;
-  const srcPath = path.join(
+  const srcPath = joinPaths(
     dpgContext.generationPathDetail?.rlcSourcesDir ?? "",
     options.batch && options.batch.length > 1
       ? normalizeName(client.name.replace("Client", ""), NameType.File)
@@ -73,7 +72,7 @@ export async function transformRLCModel(
     importSet,
     urlInfo?.apiVersionInfo,
   );
-  const helperDetails = transformHelperFunctionDetails(client, dpgContext, options.flavor);
+  const helperDetails = transformHelperFunctionDetails(client, dpgContext);
   // Enrich client-level annotation detail
   helperDetails.clientLroOverload = getClientLroOverload(paths);
 
@@ -92,7 +91,7 @@ export async function transformRLCModel(
     telemetryOptions,
     importInfo: {
       internalImports: importSet,
-      runtimeImports: buildRuntimeImports(options.flavor),
+      runtimeImports: buildRuntimeImports(),
     },
     rlcSourceDir,
   };
@@ -170,7 +169,7 @@ export function transformUrlInfo(
     }
   }
   // Set the default value if missing endpoint parameter
-  if (endpoint == undefined && urlParameters.length === 0) {
+  if (endpoint === undefined && urlParameters.length === 0) {
     endpoint = "{endpointParam}";
     urlParameters.push({
       name: "endpointParam",

@@ -136,14 +136,14 @@ catalogs:
       specifier: ^1000.0.65
       version: 1000.0.65
     '@scalar/json-magic':
-      specifier: ^0.12.5
-      version: 0.12.14
+      specifier: ^0.12.15
+      version: 0.12.15
     '@scalar/openapi-parser':
-      specifier: ^0.28.5
-      version: 0.28.5
+      specifier: ^0.28.6
+      version: 0.28.6
     '@scalar/openapi-types':
-      specifier: ^0.9.0
-      version: 0.9.0
+      specifier: ^0.9.1
+      version: 0.9.1
     '@storybook/cli':
       specifier: ^10.3.5
       version: 10.4.1
@@ -219,9 +219,6 @@ catalogs:
     '@types/yargs':
       specifier: ^17.0.35
       version: 17.0.35
-    '@typescript-eslint/eslint-plugin':
-      specifier: ^8.28.0
-      version: 8.60.0
     '@typescript-eslint/parser':
       specifier: ^8.58.1
       version: 8.60.0
@@ -235,8 +232,8 @@ catalogs:
       specifier: ^8.58.1
       version: 8.60.0
     '@typespec/http-client-python':
-      specifier: ^0.30.1
-      version: 0.30.1
+      specifier: '>=0.33.0 <1.0.0'
+      version: 0.33.0
     '@typespec/ts-http-runtime':
       specifier: 0.3.5
       version: 0.3.5
@@ -286,8 +283,8 @@ catalogs:
       specifier: ^3.0.1
       version: 3.0.1
     astro:
-      specifier: ^6.1.10
-      version: 6.4.2
+      specifier: ^6.4.6
+      version: 6.4.7
     astro-expressive-code:
       specifier: ^0.42.0
       version: 0.42.0
@@ -357,9 +354,6 @@ catalogs:
     eslint-plugin-react-hooks:
       specifier: 7.1.1
       version: 7.1.1
-    eslint-plugin-require-extensions:
-      specifier: 0.1.3
-      version: 0.1.3
     eslint-plugin-unicorn:
       specifier: ^64.0.0
       version: 64.0.0
@@ -406,8 +400,8 @@ catalogs:
       specifier: ^1.10.1
       version: 1.10.1
     multer:
-      specifier: ^2.1.1
-      version: 2.1.1
+      specifier: ^2.2.0
+      version: 2.2.0
     mustache:
       specifier: ^4.2.0
       version: 4.2.0
@@ -801,7 +795,7 @@ importers:
         version: 0.9.9(prettier-plugin-astro@0.14.1)(prettier@3.8.3)(typescript@6.0.3)
       '@astrojs/starlight':
         specifier: 'catalog:'
-        version: 0.39.2(astro@6.4.2(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0))(typescript@6.0.3)
+        version: 0.39.2(astro@6.4.7(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0))(typescript@6.0.3)
       '@expressive-code/core':
         specifier: 'catalog:'
         version: 0.42.0
@@ -810,7 +804,7 @@ importers:
         version: link:../playground
       astro-expressive-code:
         specifier: 'catalog:'
-        version: 0.42.0(astro@6.4.2(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0))
+        version: 0.42.0(astro@6.4.7(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0))
       pathe:
         specifier: 'catalog:'
         version: 2.0.3
@@ -826,7 +820,7 @@ importers:
         version: 19.2.16
       astro:
         specifier: 'catalog:'
-        version: 6.4.2(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0)
+        version: 6.4.7(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0)
 
   core/packages/best-practices:
     devDependencies:
@@ -1881,13 +1875,13 @@ importers:
     dependencies:
       '@scalar/json-magic':
         specifier: 'catalog:'
-        version: 0.12.14
+        version: 0.12.15
       '@scalar/openapi-parser':
         specifier: 'catalog:'
-        version: 0.28.5
+        version: 0.28.6
       '@scalar/openapi-types':
         specifier: 'catalog:'
-        version: 0.9.0
+        version: 0.9.1
       '@typespec/asset-emitter':
         specifier: workspace:^
         version: link:../asset-emitter
@@ -2629,7 +2623,7 @@ importers:
         version: 1.10.1
       multer:
         specifier: 'catalog:'
-        version: 2.1.1
+        version: 2.2.0
       picocolors:
         specifier: 'catalog:'
         version: 1.1.1
@@ -2926,15 +2920,6 @@ importers:
       vitest:
         specifier: 'catalog:'
         version: 4.1.7(@types/node@25.9.1)(@vitest/coverage-v8@4.1.7)(@vitest/ui@4.1.7)(happy-dom@20.9.0)(jsdom@25.0.1)(vite@8.0.14(@types/node@25.9.1)(esbuild@0.28.0)(tsx@4.22.3)(yaml@2.9.0))
-
-  core/packages/typespec-vs:
-    devDependencies:
-      '@typespec/internal-build-utils':
-        specifier: workspace:^
-        version: link:../internal-build-utils
-      typespec-vscode:
-        specifier: workspace:^
-        version: link:../typespec-vscode
 
   core/packages/typespec-vscode:
     devDependencies:
@@ -3446,6 +3431,9 @@ importers:
       '@azure-tools/typespec-client-generator-core':
         specifier: workspace:^
         version: link:../typespec-client-generator-core
+      '@azure-tools/typespec-ts':
+        specifier: workspace:^
+        version: link:../typespec-ts
       '@fluentui/react-components':
         specifier: 'catalog:'
         version: 9.74.1(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(scheduler@0.27.0)
@@ -3800,7 +3788,7 @@ importers:
     dependencies:
       '@typespec/http-client-python':
         specifier: 'catalog:'
-        version: 0.30.1(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)
+        version: 0.33.0(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)
       semver:
         specifier: 'catalog:'
         version: 7.8.1
@@ -3950,12 +3938,6 @@ importers:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
         version: 7.58.7(@types/node@25.9.1)
-      '@typescript-eslint/eslint-plugin':
-        specifier: 'catalog:'
-        version: 8.60.0(@typescript-eslint/parser@8.60.0(eslint@10.4.1)(typescript@6.0.3))(eslint@10.4.1)(typescript@6.0.3)
-      '@typescript-eslint/parser':
-        specifier: 'catalog:'
-        version: 8.60.0(eslint@10.4.1)(typescript@6.0.3)
       '@typespec/compiler':
         specifier: workspace:^
         version: link:../../core/packages/compiler
@@ -3995,9 +3977,6 @@ importers:
       cross-env:
         specifier: 'catalog:'
         version: 10.1.0
-      eslint-plugin-require-extensions:
-        specifier: 'catalog:'
-        version: 0.1.3(eslint@10.4.1)
       mkdirp:
         specifier: 'catalog:'
         version: 3.0.1
@@ -4027,7 +4006,7 @@ importers:
         version: 5.0.6(@types/node@25.9.1)(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(lightningcss@1.32.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(tsx@4.22.3)(yaml@2.9.0)
       '@astrojs/starlight':
         specifier: 'catalog:'
-        version: 0.39.2(astro@6.4.2(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0))(typescript@6.0.3)
+        version: 0.39.2(astro@6.4.7(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0))(typescript@6.0.3)
       '@docsearch/css':
         specifier: 'catalog:'
         version: 4.6.3
@@ -4042,7 +4021,7 @@ importers:
         version: link:../core/packages/playground
       astro:
         specifier: 'catalog:'
-        version: 6.4.2(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0)
+        version: 6.4.7(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0)
       chart.js:
         specifier: 'catalog:'
         version: 4.5.1
@@ -4112,10 +4091,10 @@ importers:
         version: link:../core/packages/spec-dashboard
       astro-expressive-code:
         specifier: 'catalog:'
-        version: 0.42.0(astro@6.4.2(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0))
+        version: 0.42.0(astro@6.4.7(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0))
       astro-rehype-relative-markdown-links:
         specifier: 'catalog:'
-        version: 0.19.0(astro@6.4.2(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0))
+        version: 0.19.0(astro@6.4.7(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0))
       hast-util-to-html:
         specifier: 'catalog:'
         version: 9.0.5
@@ -7612,24 +7591,24 @@ packages:
       '@types/node':
         optional: true
 
-  '@scalar/helpers@0.8.0':
-    resolution: {integrity: sha512-gmOC6VravNB9VDl6wnt/GOj4K/hn48tj5bpW4AM4MhH8Ubil6uu7g1DSoKHwltu8Ks79KEtR6JmOrROi9R7jaQ==}
+  '@scalar/helpers@0.8.1':
+    resolution: {integrity: sha512-yuiuBCadP5bjAnIv23QvifVN/NaMi9xBF6b8Wdk4QOzwzLPJmp699MAdf33J0A5i2qKcvnu32iz/VkEJmQRe5g==}
     engines: {node: '>=22'}
 
-  '@scalar/json-magic@0.12.14':
-    resolution: {integrity: sha512-dWrCy3ew1r7OQ1pu2r4ZjiKEVy0yVd66kXdmsl41bteOG2F2I2IBlPjmPV6p8ckjImQHxtNBIntFaQfNrdBhJg==}
+  '@scalar/json-magic@0.12.15':
+    resolution: {integrity: sha512-ZYgdYZ0jSZXQeyhG2lJ20FjzvKsaDRXk4bPguF/Ytl2nGBh9a6RIIr9NvVy4zAD67a/ahm+xipXlfoR1KtB5fg==}
     engines: {node: '>=22'}
 
-  '@scalar/openapi-parser@0.28.5':
-    resolution: {integrity: sha512-W8uS5p4dR5Ri4Zqra6c/KaL54R5qkLJAwXCm/QTYvzsLw/NT4N6NdbqHQLHpJeLMG9c0dkA70S/KZKkFZgDRTg==}
+  '@scalar/openapi-parser@0.28.6':
+    resolution: {integrity: sha512-gCl4r+rpmO+CKfwmmwI+GJVFhuNut7e6beUcD/xazanH4epkLT7V9ZgMv9YKbUBE73fkrOv6NJympeEGiU8aUw==}
     engines: {node: '>=22'}
 
-  '@scalar/openapi-types@0.9.0':
-    resolution: {integrity: sha512-XGuYegItO8iJbEy5hHxS04vyxoFIuERy3D/twt1hGPya6KJljg9iO0geZ/X5vjDKmSKYAuMNkGqYO5Jjp4NLUA==}
+  '@scalar/openapi-types@0.9.1':
+    resolution: {integrity: sha512-gkGhSkxSzADaBiNg+ZAbJuwj+ZUmzP2Pg9CWZ7ZP+0fck2WjPeDDM7aAbouAm0aQQMF9xBjSPXSA9a/qTHYaTw==}
     engines: {node: '>=22'}
 
-  '@scalar/openapi-upgrader@0.2.8':
-    resolution: {integrity: sha512-/SDb3+SIFuScKwrNRTFd7bklGDkayo81cHZlajXfUaT22Oc4VUlOUvyMXBLPa0miOfZTExYTM1I0BWW7Nujugw==}
+  '@scalar/openapi-upgrader@0.2.9':
+    resolution: {integrity: sha512-D5b0rGLLZgmkO9mdW2j/ND1KBlH1u3RCpr87HPxv9P9ZSr6PtM5iLqFOJq0ACiaHjY2mikCrxgDmnUEhTzRpHQ==}
     engines: {node: '>=22'}
 
   '@scarf/scarf@1.4.0':
@@ -8260,24 +8239,24 @@ packages:
     resolution: {integrity: sha512-9WI52t8ZGLVGrPMBet25yAftqY/n95+zmoUUtJBBQTKDSKUu7OsPTroT2op7U9JatkoRccL0YkWDNMFfC4Sjxg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@typespec/http-client-python@0.30.1':
-    resolution: {integrity: sha512-fo78R2GhPjUntPwZGDHxZ/ddRQZgLRSCzO3F+u8hPrHPzmBXA0rMkeS2WKCWYmT/wcFDPAojjH9pMUl27dLQ0w==}
+  '@typespec/http-client-python@0.33.0':
+    resolution: {integrity: sha512-tKH3p3KLN4enO9U6kpcaMzrw4Schrrvq+1XM+01drbP6JzJqjzKyxfGB5QEyfW+q5jEBWuHGuu277bjBixt/sg==}
     engines: {node: '>=22.0.0'}
     peerDependencies:
-      '@azure-tools/typespec-autorest': '>=0.68.0 <1.0.0'
-      '@azure-tools/typespec-azure-core': '>=0.68.0 <1.0.0'
-      '@azure-tools/typespec-azure-resource-manager': '>=0.68.0 <1.0.0'
-      '@azure-tools/typespec-azure-rulesets': '>=0.68.0 <1.0.0'
-      '@azure-tools/typespec-client-generator-core': '>=0.68.2 <1.0.0'
-      '@typespec/compiler': ^1.12.0
-      '@typespec/events': '>=0.82.0 <1.0.0'
-      '@typespec/http': ^1.12.0
-      '@typespec/openapi': ^1.12.0
-      '@typespec/rest': '>=0.82.0 <1.0.0'
-      '@typespec/sse': '>=0.82.0 <1.0.0'
-      '@typespec/streams': '>=0.82.0 <1.0.0'
-      '@typespec/versioning': '>=0.82.0 <1.0.0'
-      '@typespec/xml': '>=0.82.0 <1.0.0'
+      '@azure-tools/typespec-autorest': '>=0.69.1 <1.0.0'
+      '@azure-tools/typespec-azure-core': '>=0.69.0 <1.0.0'
+      '@azure-tools/typespec-azure-resource-manager': '>=0.69.1 <1.0.0'
+      '@azure-tools/typespec-azure-rulesets': '>=0.69.1 <1.0.0'
+      '@azure-tools/typespec-client-generator-core': '>=0.69.0 <1.0.0'
+      '@typespec/compiler': ^1.13.0
+      '@typespec/events': '>=0.83.0 <1.0.0'
+      '@typespec/http': ^1.13.0
+      '@typespec/openapi': ^1.13.0
+      '@typespec/rest': '>=0.83.0 <1.0.0'
+      '@typespec/sse': '>=0.83.0 <1.0.0'
+      '@typespec/streams': '>=0.83.0 <1.0.0'
+      '@typespec/versioning': '>=0.83.0 <1.0.0'
+      '@typespec/xml': '>=0.83.0 <1.0.0'
 
   '@typespec/ts-http-runtime@0.3.5':
     resolution: {integrity: sha512-yURCknZhvywvQItHMMmFSo+fq5arCUIyz/CVk7jD89MSai7dkaX8ufjCWp3NttLojoTVbcE72ri+be/TnEbMHw==}
@@ -8963,8 +8942,8 @@ packages:
     peerDependencies:
       astro: '>=2 <7'
 
-  astro@6.4.2:
-    resolution: {integrity: sha512-8H89CH2dKL5SCU99OCqdU9BGjmPkSJqaPurywj5XMo7eMFGUFD3vsNhdEKnEh4mK4LgGje3/QDTTSIIGst0G0Q==}
+  astro@6.4.7:
+    resolution: {integrity: sha512-5vsXx0H52u23Jpshs9tM81D03Tb3Oh2Vt2Zo0bpqjXN+njkAWjFyGjTfmWJLAcrCQd9Q+iWB1eqfhR1sZJEaUA==}
     engines: {node: '>=22.12.0', npm: '>=9.6.5', pnpm: '>=7.1.0'}
     hasBin: true
 
@@ -10103,12 +10082,6 @@ packages:
     engines: {node: '>=18'}
     peerDependencies:
       eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0 || ^9.0.0 || ^10.0.0
-
-  eslint-plugin-require-extensions@0.1.3:
-    resolution: {integrity: sha512-T3c1PZ9PIdI3hjV8LdunfYI8gj017UQjzAnCrxuo3wAjneDbTPHdE3oNWInOjMA+z/aBkUtlW5vC0YepYMZIug==}
-    engines: {node: '>=16'}
-    peerDependencies:
-      eslint: '*'
 
   eslint-plugin-unicorn@64.0.0:
     resolution: {integrity: sha512-rNZwalHh8i0UfPlhNwg5BTUO1CMdKNmjqe+TgzOTZnpKoi8VBgsW7u9qCHIdpxEzZ1uwrJrPF0uRb7l//K38gA==}
@@ -11988,8 +11961,8 @@ packages:
   muggle-string@0.4.1:
     resolution: {integrity: sha512-VNTrAak/KhO2i8dqqnqnAHOa3cYBwXEZe9h+D5h/1ZqFSTEFHdM65lR7RoIqq3tBBYavsOXV84NoHXZ0AkPyqQ==}
 
-  multer@2.1.1:
-    resolution: {integrity: sha512-mo+QTzKlx8R7E5ylSXxWzGoXoZbOsRMpyitcht8By2KHvMbf3tjwosZ/Mu/XYU6UuJ3VZnODIrak5ZrPiPyB6A==}
+  multer@2.2.0:
+    resolution: {integrity: sha512-6rdyFg2kLrMh9Jee7/BMPuV9lEAd7lLW2YUpF9/YxR7njyoUwwQ0ZPh3TaIY50Sw6vlyD2HW3wGOkTS4P79xrQ==}
     engines: {node: '>= 10.16.0'}
 
   mustache@4.2.0:
@@ -15259,12 +15232,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@astrojs/mdx@5.0.6(astro@6.4.2(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0))':
+  '@astrojs/mdx@5.0.6(astro@6.4.7(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0))':
     dependencies:
       '@astrojs/markdown-remark': 7.1.2
       '@mdx-js/mdx': 3.1.1
       acorn: 8.16.0
-      astro: 6.4.2(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0)
+      astro: 6.4.7(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0)
       es-module-lexer: 2.1.0
       estree-util-visit: 2.0.0
       hast-util-to-html: 9.0.5
@@ -15313,17 +15286,17 @@ snapshots:
       stream-replace-string: 2.0.0
       zod: 4.4.3
 
-  '@astrojs/starlight@0.39.2(astro@6.4.2(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0))(typescript@6.0.3)':
+  '@astrojs/starlight@0.39.2(astro@6.4.7(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0))(typescript@6.0.3)':
     dependencies:
       '@astrojs/markdown-remark': 7.2.0
-      '@astrojs/mdx': 5.0.6(astro@6.4.2(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0))
+      '@astrojs/mdx': 5.0.6(astro@6.4.7(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0))
       '@astrojs/sitemap': 3.7.3
       '@pagefind/default-ui': 1.5.2
       '@types/hast': 3.0.4
       '@types/js-yaml': 4.0.9
       '@types/mdast': 4.0.4
-      astro: 6.4.2(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0)
-      astro-expressive-code: 0.42.0(astro@6.4.2(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0))
+      astro: 6.4.7(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0)
+      astro-expressive-code: 0.42.0(astro@6.4.7(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0))
       bcp-47: 2.1.0
       hast-util-from-html: 2.0.3
       hast-util-select: 6.0.4
@@ -19685,20 +19658,20 @@ snapshots:
     optionalDependencies:
       '@types/node': 25.9.1
 
-  '@scalar/helpers@0.8.0': {}
+  '@scalar/helpers@0.8.1': {}
 
-  '@scalar/json-magic@0.12.14':
+  '@scalar/json-magic@0.12.15':
     dependencies:
-      '@scalar/helpers': 0.8.0
+      '@scalar/helpers': 0.8.1
       pathe: 2.0.3
       yaml: 2.9.0
 
-  '@scalar/openapi-parser@0.28.5':
+  '@scalar/openapi-parser@0.28.6':
     dependencies:
-      '@scalar/helpers': 0.8.0
-      '@scalar/json-magic': 0.12.14
-      '@scalar/openapi-types': 0.9.0
-      '@scalar/openapi-upgrader': 0.2.8
+      '@scalar/helpers': 0.8.1
+      '@scalar/json-magic': 0.12.15
+      '@scalar/openapi-types': 0.9.1
+      '@scalar/openapi-upgrader': 0.2.9
       ajv: 8.20.0
       ajv-draft-04: 1.0.0(ajv@8.20.0)
       ajv-formats: 3.0.1(ajv@8.20.0)
@@ -19706,11 +19679,11 @@ snapshots:
       leven: 4.1.0
       yaml: 2.9.0
 
-  '@scalar/openapi-types@0.9.0': {}
+  '@scalar/openapi-types@0.9.1': {}
 
-  '@scalar/openapi-upgrader@0.2.8':
+  '@scalar/openapi-upgrader@0.2.9':
     dependencies:
-      '@scalar/openapi-types': 0.9.0
+      '@scalar/openapi-types': 0.9.1
 
   '@scarf/scarf@1.4.0': {}
 
@@ -20494,7 +20467,7 @@ snapshots:
       '@typescript-eslint/types': 8.60.0
       eslint-visitor-keys: 5.0.1
 
-  '@typespec/http-client-python@0.30.1(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)':
+  '@typespec/http-client-python@0.33.0(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)':
     dependencies:
       '@azure-tools/typespec-autorest': link:packages/typespec-autorest
       '@azure-tools/typespec-azure-core': link:packages/typespec-azure-core
@@ -21514,14 +21487,14 @@ snapshots:
 
   astring@1.9.0: {}
 
-  astro-expressive-code@0.42.0(astro@6.4.2(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0)):
+  astro-expressive-code@0.42.0(astro@6.4.7(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0)):
     dependencies:
-      astro: 6.4.2(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0)
+      astro: 6.4.7(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0)
       rehype-expressive-code: 0.42.0
 
-  astro-rehype-relative-markdown-links@0.19.0(astro@6.4.2(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0)):
+  astro-rehype-relative-markdown-links@0.19.0(astro@6.4.7(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0)):
     dependencies:
-      astro: 6.4.2(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0)
+      astro: 6.4.7(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0)
       catch-unknown: 2.0.0
       debug: 4.4.3
       github-slugger: 2.0.0
@@ -21533,7 +21506,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  astro@6.4.2(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0):
+  astro@6.4.7(@azure/identity@4.13.1)(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(lightningcss@1.32.0)(rollup@4.49.0)(tsx@4.22.3)(yaml@2.9.0):
     dependencies:
       '@astrojs/compiler': 4.0.0
       '@astrojs/internal-helpers': 0.10.0
@@ -22903,10 +22876,6 @@ snapshots:
       zod-validation-error: 4.0.2(zod@4.4.3)
     transitivePeerDependencies:
       - supports-color
-
-  eslint-plugin-require-extensions@0.1.3(eslint@10.4.1):
-    dependencies:
-      eslint: 10.4.1
 
   eslint-plugin-unicorn@64.0.0(eslint@10.4.1):
     dependencies:
@@ -25362,7 +25331,7 @@ snapshots:
 
   muggle-string@0.4.1: {}
 
-  multer@2.1.1:
+  multer@2.2.0:
     dependencies:
       append-field: 1.0.0
       busboy: 1.6.0

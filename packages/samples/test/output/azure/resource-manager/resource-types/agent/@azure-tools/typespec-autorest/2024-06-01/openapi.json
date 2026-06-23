@@ -1,0 +1,2538 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "ContosoAgentProviderClient",
+    "version": "2024-06-01",
+    "description": "Contoso Agent Resource Provider management API.",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "host": "management.azure.com",
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "security": [
+    {
+      "azure_auth": [
+        "user_impersonation"
+      ]
+    }
+  ],
+  "securityDefinitions": {
+    "azure_auth": {
+      "type": "oauth2",
+      "description": "Azure Active Directory OAuth2 Flow.",
+      "flow": "implicit",
+      "authorizationUrl": "https://login.microsoftonline.com/common/oauth2/authorize",
+      "scopes": {
+        "user_impersonation": "impersonate your user account"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Operations"
+    },
+    {
+      "name": "ApplianceAgents"
+    },
+    {
+      "name": "PlatformAgents"
+    },
+    {
+      "name": "ApplianceConversations"
+    },
+    {
+      "name": "ApplianceResponses"
+    },
+    {
+      "name": "PlatformConversations"
+    },
+    {
+      "name": "PlatformResponses"
+    }
+  ],
+  "paths": {
+    "/providers/Microsoft.ContosoAgent/operations": {
+      "get": {
+        "operationId": "Operations_List",
+        "tags": [
+          "Operations"
+        ],
+        "description": "List the operations for the provider",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/OperationListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoAgent/contosoApplianceAgents": {
+      "get": {
+        "operationId": "ApplianceAgents_ListBySubscription",
+        "tags": [
+          "ApplianceAgents"
+        ],
+        "description": "List ContosoApplianceAgent resources by subscription ID",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/ContosoApplianceAgentListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoAgent/contosoPlatformAgents": {
+      "get": {
+        "operationId": "PlatformAgents_ListBySubscription",
+        "tags": [
+          "PlatformAgents"
+        ],
+        "description": "List ContosoPlatformAgent resources by subscription ID",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/ContosoPlatformAgentListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoAgent/contosoApplianceAgents": {
+      "get": {
+        "operationId": "ApplianceAgents_ListByResourceGroup",
+        "tags": [
+          "ApplianceAgents"
+        ],
+        "description": "List ContosoApplianceAgent resources by resource group",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/ContosoApplianceAgentListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoAgent/contosoApplianceAgents/{contosoApplianceAgentName}": {
+      "get": {
+        "operationId": "ApplianceAgents_Get",
+        "tags": [
+          "ApplianceAgents"
+        ],
+        "description": "Get a ContosoApplianceAgent",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "contosoApplianceAgentName",
+            "in": "path",
+            "description": "The name of the ContosoApplianceAgent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/ContosoApplianceAgent"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "ApplianceAgents_CreateOrUpdate",
+        "tags": [
+          "ApplianceAgents"
+        ],
+        "description": "Create a ContosoApplianceAgent",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "contosoApplianceAgentName",
+            "in": "path",
+            "description": "The name of the ContosoApplianceAgent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ContosoApplianceAgent"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource 'ContosoApplianceAgent' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/ContosoApplianceAgent"
+            }
+          },
+          "201": {
+            "description": "Resource 'ContosoApplianceAgent' create operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/ContosoApplianceAgent"
+            },
+            "headers": {
+              "Azure-AsyncOperation": {
+                "type": "string",
+                "description": "A link to the status monitor"
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "azure-async-operation"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "patch": {
+        "operationId": "ApplianceAgents_Update",
+        "tags": [
+          "ApplianceAgents"
+        ],
+        "description": "Update a ContosoApplianceAgent",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "contosoApplianceAgentName",
+            "in": "path",
+            "description": "The name of the ContosoApplianceAgent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "The resource properties to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ContosoApplianceAgentTagsUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/ContosoApplianceAgent"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "ApplianceAgents_Delete",
+        "tags": [
+          "ApplianceAgents"
+        ],
+        "description": "Delete a ContosoApplianceAgent",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "contosoApplianceAgentName",
+            "in": "path",
+            "description": "The name of the ContosoApplianceAgent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Resource deletion accepted.",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "204": {
+            "description": "Resource does not exist."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoAgent/contosoApplianceAgents/{contosoApplianceAgentName}/applianceConversations": {
+      "get": {
+        "operationId": "ApplianceConversations_ListByAgent",
+        "tags": [
+          "ApplianceConversations"
+        ],
+        "description": "List ApplianceConversation resources by ContosoApplianceAgent",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "contosoApplianceAgentName",
+            "in": "path",
+            "description": "The name of the ContosoApplianceAgent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/ApplianceConversationListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoAgent/contosoApplianceAgents/{contosoApplianceAgentName}/applianceConversations/{applianceConversationName}": {
+      "get": {
+        "operationId": "ApplianceConversations_Get",
+        "tags": [
+          "ApplianceConversations"
+        ],
+        "description": "Get a ApplianceConversation",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "contosoApplianceAgentName",
+            "in": "path",
+            "description": "The name of the ContosoApplianceAgent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "applianceConversationName",
+            "in": "path",
+            "description": "The name of the ApplianceConversation",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/ApplianceConversation"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "ApplianceConversations_CreateOrUpdate",
+        "tags": [
+          "ApplianceConversations"
+        ],
+        "description": "Create a ApplianceConversation",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "contosoApplianceAgentName",
+            "in": "path",
+            "description": "The name of the ContosoApplianceAgent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "applianceConversationName",
+            "in": "path",
+            "description": "The name of the ApplianceConversation",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ApplianceConversation"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource 'ApplianceConversation' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/ApplianceConversation"
+            }
+          },
+          "201": {
+            "description": "Resource 'ApplianceConversation' create operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/ApplianceConversation"
+            },
+            "headers": {
+              "Azure-AsyncOperation": {
+                "type": "string",
+                "description": "A link to the status monitor"
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "azure-async-operation"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "patch": {
+        "operationId": "ApplianceConversations_Update",
+        "tags": [
+          "ApplianceConversations"
+        ],
+        "description": "Update a ApplianceConversation",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "contosoApplianceAgentName",
+            "in": "path",
+            "description": "The name of the ContosoApplianceAgent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "applianceConversationName",
+            "in": "path",
+            "description": "The name of the ApplianceConversation",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "The resource properties to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ApplianceConversationUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/ApplianceConversation"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "ApplianceConversations_Delete",
+        "tags": [
+          "ApplianceConversations"
+        ],
+        "description": "Delete a ApplianceConversation",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "contosoApplianceAgentName",
+            "in": "path",
+            "description": "The name of the ContosoApplianceAgent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "applianceConversationName",
+            "in": "path",
+            "description": "The name of the ApplianceConversation",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Resource deletion accepted.",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "204": {
+            "description": "Resource does not exist."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoAgent/contosoApplianceAgents/{contosoApplianceAgentName}/applianceResponses": {
+      "get": {
+        "operationId": "ApplianceResponses_ListByAgent",
+        "tags": [
+          "ApplianceResponses"
+        ],
+        "description": "List ApplianceResponse resources by ContosoApplianceAgent",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "contosoApplianceAgentName",
+            "in": "path",
+            "description": "The name of the ContosoApplianceAgent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/ApplianceResponseListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoAgent/contosoApplianceAgents/{contosoApplianceAgentName}/applianceResponses/{applianceResponseName}": {
+      "get": {
+        "operationId": "ApplianceResponses_Get",
+        "tags": [
+          "ApplianceResponses"
+        ],
+        "description": "Get a ApplianceResponse",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "contosoApplianceAgentName",
+            "in": "path",
+            "description": "The name of the ContosoApplianceAgent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "applianceResponseName",
+            "in": "path",
+            "description": "The name of the ApplianceResponse",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/ApplianceResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "ApplianceResponses_CreateOrUpdate",
+        "tags": [
+          "ApplianceResponses"
+        ],
+        "description": "Create a ApplianceResponse",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "contosoApplianceAgentName",
+            "in": "path",
+            "description": "The name of the ContosoApplianceAgent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "applianceResponseName",
+            "in": "path",
+            "description": "The name of the ApplianceResponse",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ApplianceResponse"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource 'ApplianceResponse' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/ApplianceResponse"
+            }
+          },
+          "201": {
+            "description": "Resource 'ApplianceResponse' create operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/ApplianceResponse"
+            },
+            "headers": {
+              "Azure-AsyncOperation": {
+                "type": "string",
+                "description": "A link to the status monitor"
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "azure-async-operation"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "patch": {
+        "operationId": "ApplianceResponses_Update",
+        "tags": [
+          "ApplianceResponses"
+        ],
+        "description": "Update a ApplianceResponse",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "contosoApplianceAgentName",
+            "in": "path",
+            "description": "The name of the ContosoApplianceAgent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "applianceResponseName",
+            "in": "path",
+            "description": "The name of the ApplianceResponse",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "The resource properties to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ApplianceResponseUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/ApplianceResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "ApplianceResponses_Delete",
+        "tags": [
+          "ApplianceResponses"
+        ],
+        "description": "Delete a ApplianceResponse",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "contosoApplianceAgentName",
+            "in": "path",
+            "description": "The name of the ContosoApplianceAgent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "applianceResponseName",
+            "in": "path",
+            "description": "The name of the ApplianceResponse",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Resource deletion accepted.",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "204": {
+            "description": "Resource does not exist."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoAgent/contosoPlatformAgents": {
+      "get": {
+        "operationId": "PlatformAgents_ListByResourceGroup",
+        "tags": [
+          "PlatformAgents"
+        ],
+        "description": "List ContosoPlatformAgent resources by resource group",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/ContosoPlatformAgentListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoAgent/contosoPlatformAgents/{contosoPlatformAgentName}": {
+      "get": {
+        "operationId": "PlatformAgents_Get",
+        "tags": [
+          "PlatformAgents"
+        ],
+        "description": "Get a ContosoPlatformAgent",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "contosoPlatformAgentName",
+            "in": "path",
+            "description": "The name of the ContosoPlatformAgent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/ContosoPlatformAgent"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "PlatformAgents_CreateOrUpdate",
+        "tags": [
+          "PlatformAgents"
+        ],
+        "description": "Create a ContosoPlatformAgent",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "contosoPlatformAgentName",
+            "in": "path",
+            "description": "The name of the ContosoPlatformAgent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ContosoPlatformAgent"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource 'ContosoPlatformAgent' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/ContosoPlatformAgent"
+            }
+          },
+          "201": {
+            "description": "Resource 'ContosoPlatformAgent' create operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/ContosoPlatformAgent"
+            },
+            "headers": {
+              "Azure-AsyncOperation": {
+                "type": "string",
+                "description": "A link to the status monitor"
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "azure-async-operation"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "patch": {
+        "operationId": "PlatformAgents_Update",
+        "tags": [
+          "PlatformAgents"
+        ],
+        "description": "Update a ContosoPlatformAgent",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "contosoPlatformAgentName",
+            "in": "path",
+            "description": "The name of the ContosoPlatformAgent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "The resource properties to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ContosoPlatformAgentTagsUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/ContosoPlatformAgent"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "PlatformAgents_Delete",
+        "tags": [
+          "PlatformAgents"
+        ],
+        "description": "Delete a ContosoPlatformAgent",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "contosoPlatformAgentName",
+            "in": "path",
+            "description": "The name of the ContosoPlatformAgent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Resource deletion accepted.",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "204": {
+            "description": "Resource does not exist."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoAgent/contosoPlatformAgents/{contosoPlatformAgentName}/platformConversations": {
+      "get": {
+        "operationId": "PlatformConversations_ListByAgent",
+        "tags": [
+          "PlatformConversations"
+        ],
+        "description": "List PlatformConversation resources by ContosoPlatformAgent",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "contosoPlatformAgentName",
+            "in": "path",
+            "description": "The name of the ContosoPlatformAgent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/PlatformConversationListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoAgent/contosoPlatformAgents/{contosoPlatformAgentName}/platformConversations/{platformConversationName}": {
+      "get": {
+        "operationId": "PlatformConversations_Get",
+        "tags": [
+          "PlatformConversations"
+        ],
+        "description": "Get a PlatformConversation",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "contosoPlatformAgentName",
+            "in": "path",
+            "description": "The name of the ContosoPlatformAgent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "platformConversationName",
+            "in": "path",
+            "description": "The name of the PlatformConversation",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/PlatformConversation"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "PlatformConversations_CreateOrUpdate",
+        "tags": [
+          "PlatformConversations"
+        ],
+        "description": "Create a PlatformConversation",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "contosoPlatformAgentName",
+            "in": "path",
+            "description": "The name of the ContosoPlatformAgent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "platformConversationName",
+            "in": "path",
+            "description": "The name of the PlatformConversation",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PlatformConversation"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource 'PlatformConversation' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/PlatformConversation"
+            }
+          },
+          "201": {
+            "description": "Resource 'PlatformConversation' create operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/PlatformConversation"
+            },
+            "headers": {
+              "Azure-AsyncOperation": {
+                "type": "string",
+                "description": "A link to the status monitor"
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "azure-async-operation"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "patch": {
+        "operationId": "PlatformConversations_Update",
+        "tags": [
+          "PlatformConversations"
+        ],
+        "description": "Update a PlatformConversation",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "contosoPlatformAgentName",
+            "in": "path",
+            "description": "The name of the ContosoPlatformAgent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "platformConversationName",
+            "in": "path",
+            "description": "The name of the PlatformConversation",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "The resource properties to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PlatformConversationUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/PlatformConversation"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "PlatformConversations_Delete",
+        "tags": [
+          "PlatformConversations"
+        ],
+        "description": "Delete a PlatformConversation",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "contosoPlatformAgentName",
+            "in": "path",
+            "description": "The name of the ContosoPlatformAgent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "platformConversationName",
+            "in": "path",
+            "description": "The name of the PlatformConversation",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Resource deletion accepted.",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "204": {
+            "description": "Resource does not exist."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoAgent/contosoPlatformAgents/{contosoPlatformAgentName}/platformResponses": {
+      "get": {
+        "operationId": "PlatformResponses_ListByAgent",
+        "tags": [
+          "PlatformResponses"
+        ],
+        "description": "List PlatformResponse resources by ContosoPlatformAgent",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "contosoPlatformAgentName",
+            "in": "path",
+            "description": "The name of the ContosoPlatformAgent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/PlatformResponseListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoAgent/contosoPlatformAgents/{contosoPlatformAgentName}/platformResponses/{platformResponseName}": {
+      "get": {
+        "operationId": "PlatformResponses_Get",
+        "tags": [
+          "PlatformResponses"
+        ],
+        "description": "Get a PlatformResponse",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "contosoPlatformAgentName",
+            "in": "path",
+            "description": "The name of the ContosoPlatformAgent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "platformResponseName",
+            "in": "path",
+            "description": "The name of the PlatformResponse",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/PlatformResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "PlatformResponses_CreateOrUpdate",
+        "tags": [
+          "PlatformResponses"
+        ],
+        "description": "Create a PlatformResponse",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "contosoPlatformAgentName",
+            "in": "path",
+            "description": "The name of the ContosoPlatformAgent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "platformResponseName",
+            "in": "path",
+            "description": "The name of the PlatformResponse",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PlatformResponse"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource 'PlatformResponse' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/PlatformResponse"
+            }
+          },
+          "201": {
+            "description": "Resource 'PlatformResponse' create operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/PlatformResponse"
+            },
+            "headers": {
+              "Azure-AsyncOperation": {
+                "type": "string",
+                "description": "A link to the status monitor"
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "azure-async-operation"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "patch": {
+        "operationId": "PlatformResponses_Update",
+        "tags": [
+          "PlatformResponses"
+        ],
+        "description": "Update a PlatformResponse",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "contosoPlatformAgentName",
+            "in": "path",
+            "description": "The name of the ContosoPlatformAgent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "platformResponseName",
+            "in": "path",
+            "description": "The name of the PlatformResponse",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "The resource properties to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PlatformResponseUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/PlatformResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "PlatformResponses_Delete",
+        "tags": [
+          "PlatformResponses"
+        ],
+        "description": "Delete a PlatformResponse",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "contosoPlatformAgentName",
+            "in": "path",
+            "description": "The name of the ContosoPlatformAgent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "platformResponseName",
+            "in": "path",
+            "description": "The name of the PlatformResponse",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Resource deletion accepted.",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "204": {
+            "description": "Resource does not exist."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
+    }
+  },
+  "definitions": {
+    "ApplianceConversation": {
+      "type": "object",
+      "description": "Model template for a Conversation child resource of an Agent.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/ContosoConversationProperties",
+          "description": "The resource-specific properties for this resource."
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ProxyResource"
+        }
+      ]
+    },
+    "ApplianceConversationListResult": {
+      "type": "object",
+      "description": "The response of a ApplianceConversation list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The ApplianceConversation items on this page",
+          "items": {
+            "$ref": "#/definitions/ApplianceConversation"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "ApplianceConversationUpdate": {
+      "type": "object",
+      "description": "The type used for update operations of the ApplianceConversation.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/ApplianceConversationUpdateProperties",
+          "description": "The resource-specific properties for this resource."
+        }
+      }
+    },
+    "ApplianceConversationUpdateProperties": {
+      "type": "object",
+      "description": "The updatable properties of the ApplianceConversation.",
+      "properties": {
+        "instructions": {
+          "type": "string",
+          "description": "System prompt / behavioral instructions for this conversation."
+        }
+      }
+    },
+    "ApplianceResponse": {
+      "type": "object",
+      "description": "Model template for a Response child resource of an Agent.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/ContosoResponseProperties",
+          "description": "The resource-specific properties for this resource."
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ProxyResource"
+        }
+      ]
+    },
+    "ApplianceResponseListResult": {
+      "type": "object",
+      "description": "The response of a ApplianceResponse list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The ApplianceResponse items on this page",
+          "items": {
+            "$ref": "#/definitions/ApplianceResponse"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "ApplianceResponseUpdate": {
+      "type": "object",
+      "description": "The type used for update operations of the ApplianceResponse.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/ApplianceResponseUpdateProperties",
+          "description": "The resource-specific properties for this resource."
+        }
+      }
+    },
+    "ApplianceResponseUpdateProperties": {
+      "type": "object",
+      "description": "The updatable properties of the ApplianceResponse.",
+      "properties": {
+        "model": {
+          "type": "string",
+          "description": "Model ID used to generate the response. May be specified on request to override the agent default; read-only in GET."
+        },
+        "input": {
+          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.InputMessage",
+          "description": "Content input to the model. Required on create."
+        }
+      }
+    },
+    "Azure.ResourceManager.BaseTypes.Agents.AgentToolTypeAppliance": {
+      "type": "object",
+      "description": "A tool binding for an agent (Appliance deployment model).\nAll properties are read-only (the appliance owns and reports state).",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Tool type discriminator. Must be one of the publicly documented Azure AI Foundry tool types.",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string",
+          "description": "Tool name/identifier.",
+          "readOnly": true
+        }
+      },
+      "required": [
+        "type",
+        "name"
+      ]
+    },
+    "Azure.ResourceManager.BaseTypes.Agents.AgentToolTypePlatform": {
+      "type": "object",
+      "description": "A tool binding for an agent (Platform deployment model).\nAll properties have default visibility (the client owns these fields).",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Tool type discriminator. Must be one of the publicly documented Azure AI Foundry tool types."
+        },
+        "name": {
+          "type": "string",
+          "description": "Tool name/identifier."
+        }
+      },
+      "required": [
+        "type",
+        "name"
+      ]
+    },
+    "Azure.ResourceManager.BaseTypes.Agents.InputMessage": {
+      "type": "object",
+      "description": "A single input message provided to the model.",
+      "properties": {
+        "role": {
+          "type": "string",
+          "description": "The role of the message author (for example, user, system, or developer)."
+        },
+        "content": {
+          "type": "string",
+          "description": "The content of the input message."
+        }
+      },
+      "required": [
+        "role",
+        "content"
+      ]
+    },
+    "Azure.ResourceManager.BaseTypes.Agents.ResponseStatus": {
+      "type": "string",
+      "description": "The status of a response.",
+      "enum": [
+        "completed",
+        "failed",
+        "cancelled",
+        "incomplete",
+        "queued",
+        "in_progress"
+      ],
+      "x-ms-enum": {
+        "name": "ResponseStatus",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "Completed",
+            "value": "completed",
+            "description": "The response completed successfully."
+          },
+          {
+            "name": "Failed",
+            "value": "failed",
+            "description": "The response failed."
+          },
+          {
+            "name": "Cancelled",
+            "value": "cancelled",
+            "description": "The response was cancelled."
+          },
+          {
+            "name": "Incomplete",
+            "value": "incomplete",
+            "description": "The response is incomplete."
+          },
+          {
+            "name": "Queued",
+            "value": "queued",
+            "description": "The response is queued for execution."
+          },
+          {
+            "name": "InProgress",
+            "value": "in_progress",
+            "description": "The response is in progress."
+          }
+        ]
+      },
+      "readOnly": true
+    },
+    "Azure.ResourceManager.BaseTypes.BaseTypeInfo": {
+      "type": "object",
+      "description": "An ARM-managed base type descriptor identifying the schema contract a resource conforms to.\nUsed as a parameter to the `@azureBaseType` decorator to indicate which\nbase types a resource conforms to.",
+      "properties": {
+        "baseType": {
+          "type": "string",
+          "description": "The base type identifier (for example, \"Agent\")."
+        },
+        "version": {
+          "type": "string",
+          "description": "The schema version of the base type."
+        }
+      },
+      "required": [
+        "baseType",
+        "version"
+      ]
+    },
+    "Azure.ResourceManager.ResourceProvisioningState": {
+      "type": "string",
+      "description": "The provisioning state of a resource type.",
+      "enum": [
+        "Succeeded",
+        "Failed",
+        "Canceled"
+      ],
+      "x-ms-enum": {
+        "name": "ResourceProvisioningState",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "Succeeded",
+            "value": "Succeeded",
+            "description": "Resource has been created."
+          },
+          {
+            "name": "Failed",
+            "value": "Failed",
+            "description": "Resource creation failed."
+          },
+          {
+            "name": "Canceled",
+            "value": "Canceled",
+            "description": "Resource creation was canceled."
+          }
+        ]
+      },
+      "readOnly": true
+    },
+    "ContosoApplianceAgent": {
+      "type": "object",
+      "description": "Model template for an Agent tracked resource.\nApplies the Agent base type decorator automatically.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/ContosoApplianceAgentProperties",
+          "description": "The resource-specific properties for this resource."
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/TrackedResource"
+        }
+      ]
+    },
+    "ContosoApplianceAgentListResult": {
+      "type": "object",
+      "description": "The response of a ContosoApplianceAgent list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The ContosoApplianceAgent items on this page",
+          "items": {
+            "$ref": "#/definitions/ContosoApplianceAgent"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "ContosoApplianceAgentProperties": {
+      "type": "object",
+      "description": "Appliance deployment model of AgentProperties.\nAll properties are read-only (the appliance owns and reports state).",
+      "properties": {
+        "baseTypes": {
+          "type": "array",
+          "description": "ARM-managed. Must include the base type descriptor for this resource.",
+          "items": {
+            "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.BaseTypeInfo"
+          },
+          "readOnly": true
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Human-friendly name.",
+          "readOnly": true
+        },
+        "description": {
+          "type": "string",
+          "description": "Purpose/behavior summary.",
+          "readOnly": true
+        },
+        "definition": {
+          "$ref": "#/definitions/ContosoApplianceDefinition",
+          "description": "Inline agent definition.",
+          "readOnly": true
+        },
+        "tools": {
+          "type": "array",
+          "description": "Tool bindings. Read-only in the Appliance deployment model.",
+          "items": {
+            "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.AgentToolTypeAppliance"
+          },
+          "readOnly": true
+        },
+        "provisioningState": {
+          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
+        }
+      },
+      "required": [
+        "baseTypes",
+        "displayName",
+        "description",
+        "definition"
+      ]
+    },
+    "ContosoApplianceAgentTagsUpdate": {
+      "type": "object",
+      "description": "The type used for updating tags in ContosoApplianceAgent resources.",
+      "properties": {
+        "tags": {
+          "type": "object",
+          "description": "Resource tags.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ContosoApplianceDefinition": {
+      "type": "object",
+      "description": "Appliance deployment model of AgentDefinition.\nProperties controlled by `@baseTypeOptional` are invisible when the corresponding\ntemplate parameter is false, or read-only when present.",
+      "properties": {
+        "model": {
+          "type": "string",
+          "description": "Model identifier (RP-defined).",
+          "readOnly": true
+        },
+        "instructions": {
+          "type": "string",
+          "description": "System prompt / behavioral instructions for the agent.",
+          "readOnly": true
+        },
+        "modelDeploymentRef": {
+          "type": "string",
+          "description": "Optional RP-specific reference to an underlying model deployment.",
+          "readOnly": true
+        }
+      },
+      "required": [
+        "model",
+        "instructions"
+      ]
+    },
+    "ContosoConversationProperties": {
+      "type": "object",
+      "description": "Properties for a conversation resource holding the items and metadata\nexchanged between a client and an agent.",
+      "properties": {
+        "conversationId": {
+          "type": "string",
+          "description": "Unique conversation identifier. Read-only (set by the service on creation).",
+          "readOnly": true
+        },
+        "createdAt": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Timestamp of when the conversation was created. Read-only.",
+          "readOnly": true
+        },
+        "provisioningState": {
+          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
+        },
+        "instructions": {
+          "type": "string",
+          "description": "System prompt / behavioral instructions for this conversation."
+        }
+      }
+    },
+    "ContosoPlatformAgent": {
+      "type": "object",
+      "description": "Model template for an Agent tracked resource.\nApplies the Agent base type decorator automatically.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/ContosoPlatformAgentProperties",
+          "description": "The resource-specific properties for this resource."
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/TrackedResource"
+        }
+      ]
+    },
+    "ContosoPlatformAgentListResult": {
+      "type": "object",
+      "description": "The response of a ContosoPlatformAgent list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The ContosoPlatformAgent items on this page",
+          "items": {
+            "$ref": "#/definitions/ContosoPlatformAgent"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "ContosoPlatformAgentProperties": {
+      "type": "object",
+      "description": "Platform deployment model of AgentProperties.\nProperties have default visibility (the client owns these fields).\nbaseTypes remains ARM-managed and read-only.",
+      "properties": {
+        "baseTypes": {
+          "type": "array",
+          "description": "ARM-managed. Must include the base type descriptor for this resource.",
+          "items": {
+            "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.BaseTypeInfo"
+          },
+          "readOnly": true
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Human-friendly name."
+        },
+        "description": {
+          "type": "string",
+          "description": "Purpose/behavior summary."
+        },
+        "definition": {
+          "$ref": "#/definitions/ContosoPlatformDefinition",
+          "description": "Inline agent definition."
+        },
+        "tools": {
+          "type": "array",
+          "description": "Tool bindings. Writable in the Platform deployment model.",
+          "items": {
+            "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.AgentToolTypePlatform"
+          }
+        },
+        "provisioningState": {
+          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
+        }
+      },
+      "required": [
+        "baseTypes",
+        "displayName",
+        "description",
+        "definition"
+      ]
+    },
+    "ContosoPlatformAgentTagsUpdate": {
+      "type": "object",
+      "description": "The type used for updating tags in ContosoPlatformAgent resources.",
+      "properties": {
+        "tags": {
+          "type": "object",
+          "description": "Resource tags.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ContosoPlatformDefinition": {
+      "type": "object",
+      "description": "Platform deployment model of AgentDefinition.\nProperties controlled by `@baseTypeOptional` are invisible when the corresponding\ntemplate parameter is false, or have default visibility when present.",
+      "properties": {
+        "model": {
+          "type": "string",
+          "description": "Model identifier (RP-defined)."
+        },
+        "instructions": {
+          "type": "string",
+          "description": "System prompt / behavioral instructions for the agent."
+        },
+        "modelDeploymentRef": {
+          "type": "string",
+          "description": "Optional RP-specific reference to an underlying model deployment."
+        }
+      },
+      "required": [
+        "model",
+        "instructions"
+      ]
+    },
+    "ContosoResponseProperties": {
+      "type": "object",
+      "description": "Properties for a response generated by an agent for a given input,\nincluding its output, status, and usage.",
+      "properties": {
+        "responseId": {
+          "type": "string",
+          "description": "Unique response identifier. Read-only (set by the service).",
+          "readOnly": true
+        },
+        "createdAt": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Timestamp of when the response was created. Read-only.",
+          "readOnly": true
+        },
+        "model": {
+          "type": "string",
+          "description": "Model ID used to generate the response. May be specified on request to override the agent default; read-only in GET."
+        },
+        "status": {
+          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.ResponseStatus",
+          "description": "The status of the response. Read-only.",
+          "readOnly": true
+        },
+        "input": {
+          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.InputMessage",
+          "description": "Content input to the model. Required on create."
+        },
+        "previousResponseId": {
+          "type": "string",
+          "description": "ID of a previous response for multi-turn chaining. Writable on create.",
+          "readOnly": true
+        },
+        "provisioningState": {
+          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
+        }
+      },
+      "required": [
+        "input"
+      ]
+    },
+    "PlatformConversation": {
+      "type": "object",
+      "description": "Model template for a Conversation child resource of an Agent.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/ContosoConversationProperties",
+          "description": "The resource-specific properties for this resource."
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ProxyResource"
+        }
+      ]
+    },
+    "PlatformConversationListResult": {
+      "type": "object",
+      "description": "The response of a PlatformConversation list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The PlatformConversation items on this page",
+          "items": {
+            "$ref": "#/definitions/PlatformConversation"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "PlatformConversationUpdate": {
+      "type": "object",
+      "description": "The type used for update operations of the PlatformConversation.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/PlatformConversationUpdateProperties",
+          "description": "The resource-specific properties for this resource."
+        }
+      }
+    },
+    "PlatformConversationUpdateProperties": {
+      "type": "object",
+      "description": "The updatable properties of the PlatformConversation.",
+      "properties": {
+        "instructions": {
+          "type": "string",
+          "description": "System prompt / behavioral instructions for this conversation."
+        }
+      }
+    },
+    "PlatformResponse": {
+      "type": "object",
+      "description": "Model template for a Response child resource of an Agent.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/ContosoResponseProperties",
+          "description": "The resource-specific properties for this resource."
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ProxyResource"
+        }
+      ]
+    },
+    "PlatformResponseListResult": {
+      "type": "object",
+      "description": "The response of a PlatformResponse list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The PlatformResponse items on this page",
+          "items": {
+            "$ref": "#/definitions/PlatformResponse"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "PlatformResponseUpdate": {
+      "type": "object",
+      "description": "The type used for update operations of the PlatformResponse.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/PlatformResponseUpdateProperties",
+          "description": "The resource-specific properties for this resource."
+        }
+      }
+    },
+    "PlatformResponseUpdateProperties": {
+      "type": "object",
+      "description": "The updatable properties of the PlatformResponse.",
+      "properties": {
+        "model": {
+          "type": "string",
+          "description": "Model ID used to generate the response. May be specified on request to override the agent default; read-only in GET."
+        },
+        "input": {
+          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.InputMessage",
+          "description": "Content input to the model. Required on create."
+        }
+      }
+    }
+  },
+  "parameters": {}
+}

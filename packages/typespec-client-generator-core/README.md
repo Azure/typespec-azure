@@ -62,15 +62,30 @@ When set to `true`, the emitter will generate convenience methods for each servi
 
 ### `api-version`
 
-**Type:** `string`
+**Type:** `string | object`
 
-Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`.
+Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`. For multi-service packages, provide a map from each service namespace's full name to its desired version; services not listed default to their latest version.
+
+**Options:**
+
+- `string`
+- `object`
 
 ### `license`
 
-**Type:** `object`
+**Type:** `object { name, company, link, header, description }`
 
 License information for the generated client code.
+
+**Properties:**
+
+| Name          | Type     | Default | Description                                                                                                                                                                                                                      |
+| ------------- | -------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`        | `string` |         | License name. The config is required. Predefined license are: MIT License, Apache License 2.0, BSD 3-Clause License, MPL 2.0, GPL-3.0, LGPL-3.0. For other license, you need to configure all the other license config manually. |
+| `company`     | `string` |         | License company name. It will be used in copyright sentences.                                                                                                                                                                    |
+| `link`        | `string` |         | License link.                                                                                                                                                                                                                    |
+| `header`      | `string` |         | License header. It will be used in the header comment of generated client code.                                                                                                                                                  |
+| `description` | `string` |         | License description. The full license text.                                                                                                                                                                                      |
 
 ### `examples-dir`
 
@@ -296,10 +311,10 @@ The source type to which the alternate type will be applied.
 
 ##### Parameters
 
-| Name      | Type                                           | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| --------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| alternate | `unknown \| ClientGenerator.Core.ExternalType` | The alternate type to apply to the target. Can be a TypeSpec type or an ExternalType.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| scope     | `valueof string`                               | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
+| Name      | Type                                                 | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| --------- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| alternate | `unknown \| Azure.ClientGenerator.Core.ExternalType` | The alternate type to apply to the target. Can be a TypeSpec type or an ExternalType.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| scope     | `valueof string`                                     | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 ##### Examples
 

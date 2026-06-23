@@ -1,7 +1,8 @@
+/* eslint-disable no-console */
 import { ChildProcess, spawn } from "child_process";
 
 const onExit = (childProcess: ChildProcess): Promise<string[]> => {
-  let messages: string[] = [];
+  const messages: string[] = [];
   return new Promise((resolve, reject) => {
     if (childProcess.stdout) {
       childProcess.stdout.on("data", (message) => messages.push(message));

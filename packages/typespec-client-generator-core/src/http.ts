@@ -417,6 +417,7 @@ function getSdkHttpParameters(
       (segment) => segment[segment.length - 1],
     );
   }
+
   return diagnostics.wrap(retval);
 }
 
