@@ -4,9 +4,7 @@ import {
   emitTypes,
   getModelsPath,
 } from "../../src/modular/emit-models.js";
-import {
-  RLCOptions,
-} from "../../src/rlc-common/index.js";
+import { RLCOptions } from "../../src/rlc-common/index.js";
 import {
   compileTypeSpecFor,
   createDpgContextTestHelper,
@@ -27,7 +25,6 @@ import { buildSubpathIndexFile } from "../../src/modular/build-subpath-index.js"
 import { emitSamples } from "../../src/modular/emit-samples.js";
 import { emitTests } from "../../src/modular/emit-tests.js";
 import { getClientHierarchyMap } from "../../src/utils/client-utils.js";
-
 
 export interface ModelConfigOptions extends RLCOptions {
   needOptions?: boolean;
@@ -71,7 +68,6 @@ export async function emitModularModelsFromTypeSpec(
   let modelFile: any;
   const includeResponseHeaders = options["include-headers-in-response"] === true;
   dpgContext.rlcOptions!.includeHeadersInResponse = includeResponseHeaders;
-  dpgContext.rlcOptions!.isModularLibrary = true;
   dpgContext.rlcOptions!.compatibilityMode = options["compatibility-mode"];
   dpgContext.rlcOptions!.experimentalExtensibleEnums = options["experimental-extensible-enums"];
   dpgContext.rlcOptions!.ignoreNullableOnOptional = options["ignore-nullable-on-optional"] ?? true;
@@ -142,7 +138,6 @@ export async function emitRootIndexFromTypeSpec(
   const project = useContext("outputProject");
   const includeResponseHeaders = options["include-headers-in-response"] === true;
   dpgContext.rlcOptions!.includeHeadersInResponse = includeResponseHeaders;
-  dpgContext.rlcOptions!.isModularLibrary = true;
   dpgContext.rlcOptions!.compatibilityMode = options["compatibility-mode"];
   dpgContext.rlcOptions!.experimentalExtensibleEnums = options["experimental-extensible-enums"];
   // need to specify the root path for this case
@@ -206,7 +201,6 @@ export async function emitModularOperationsFromTypeSpec(
   const binder = useBinder();
   const includeResponseHeaders = options["include-headers-in-response"] === true;
   dpgContext.rlcOptions!.includeHeadersInResponse = includeResponseHeaders;
-  dpgContext.rlcOptions!.isModularLibrary = true;
   dpgContext.rlcOptions!.experimentalExtensibleEnums = options["experimental-extensible-enums"];
   if (options["wrap-non-model-return"] !== undefined) {
     dpgContext.rlcOptions!.wrapNonModelReturn = options["wrap-non-model-return"] === true;
@@ -255,7 +249,6 @@ export async function emitModularClientContextFromTypeSpec(
   const binder = useBinder();
   const includeResponseHeaders = options["include-headers-in-response"] === true;
   dpgContext.rlcOptions!.includeHeadersInResponse = includeResponseHeaders;
-  dpgContext.rlcOptions!.isModularLibrary = true;
   dpgContext.rlcOptions!.typespecTitleMap = options["typespec-title-map"];
   const modularEmitterOptions = transformModularEmitterOptions(dpgContext, "", {
     casing: "camel",
@@ -291,7 +284,6 @@ export async function emitModularClientFromTypeSpec(
   const binder = useBinder();
   const includeResponseHeaders = options["include-headers-in-response"] === true;
   dpgContext.rlcOptions!.includeHeadersInResponse = includeResponseHeaders;
-  dpgContext.rlcOptions!.isModularLibrary = true;
   dpgContext.rlcOptions!.typespecTitleMap = options["typespec-title-map"];
   const modularEmitterOptions = transformModularEmitterOptions(dpgContext, "", {
     casing: "camel",

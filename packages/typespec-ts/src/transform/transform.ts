@@ -52,9 +52,7 @@ export async function transformRLCModel(
       : "",
   );
   const libraryName = normalizeName(
-    options.batch
-      ? client.name
-      : (options?.title ?? client.name ?? getDefaultService(program)?.title ?? ""),
+    options.batch ? client.name : (client.name ?? getDefaultService(program)?.title ?? ""),
     NameType.Class,
   );
   const importSet = initInternalImports();

@@ -38,9 +38,6 @@ function extractRLCOptions(
   generationRootDir: string,
 ): RLCOptions {
   const program = dpgContext.program;
-  // RLC generation has been removed; the emitter always generates a Modular library.
-  const isModularLibrary = true;
-  const includeShortcuts = getIncludeShortcuts(emitterOptions);
   const packageDetails = getPackageDetails(program, emitterOptions);
   const serviceInfo = getServiceInfo(program);
   const includeHeadersInResponse = emitterOptions["include-headers-in-response"] === true;
@@ -53,11 +50,7 @@ function extractRLCOptions(
   const enableModelNamespace = getEnableModelNamespace(dpgContext, emitterOptions);
   const hierarchyClient = getHierarchyClient(emitterOptions);
   const clearOutputFolder = getClearOutputFolder(emitterOptions);
-  const multiClient = emitterOptions["multi-client"];
   const isTypeSpecTest = emitterOptions["is-typespec-test"];
-  const title = emitterOptions.title;
-  const dependencyInfo = emitterOptions["dependency-info"];
-  const productDocLink = emitterOptions["product-doc-link"];
   const compatibilityMode = emitterOptions["compatibility-mode"];
   const compatibilityLro = emitterOptions["compatibility-lro"];
   const experimentalExtensibleEnums = emitterOptions["experimental-extensible-enums"];
@@ -76,7 +69,6 @@ function extractRLCOptions(
   return {
     ...credentialInfo,
     includeHeadersInResponse,
-    includeShortcuts,
     packageDetails,
     generateMetadata,
     generateTest,
@@ -88,12 +80,7 @@ function extractRLCOptions(
     hierarchyClient,
     azureArm: dpgContext.arm,
     clearOutputFolder,
-    multiClient,
     isTypeSpecTest,
-    title,
-    dependencyInfo,
-    productDocLink,
-    isModularLibrary,
     compatibilityMode,
     compatibilityLro,
     experimentalExtensibleEnums,
@@ -249,14 +236,7 @@ function getWrapNonModelReturn(emitterOptions: EmitterOptions): boolean {
   return true;
 }
 
-function getIncludeShortcuts(emitterOptions: EmitterOptions) {
-  return Boolean(emitterOptions["include-shortcuts"]);
-}
-
-function buildPackageDetails(
-  program: Program,
-  emitterOptions: EmitterOptions,
-): PackageDetails {
+function buildPackageDetails(program: Program, emitterOptions: EmitterOptions): PackageDetails {
   const defaultDetail = {
     name: "@msinternal/unamedpackage",
     nameWithoutScope: "unamedpackage",
@@ -267,10 +247,7 @@ function buildPackageDetails(
     ...emitterOptions["package-details"],
     name:
       emitterOptions["package-details"]?.name ??
-      normalizeName(
-        emitterOptions?.title ?? getDefaultService(program)?.title ?? "",
-        NameType.Class,
-      ),
+      normalizeName(getDefaultService(program)?.title ?? "", NameType.Class),
     version: emitterOptions["package-details"]?.version ?? "1.0.0-beta.1",
     isVersionUserProvided,
   };
@@ -284,10 +261,7 @@ function buildPackageDetails(
   return packageDetails ?? defaultDetail;
 }
 
-function getPackageDetails(
-  program: Program,
-  emitterOptions: EmitterOptions,
-): PackageDetails {
+function getPackageDetails(program: Program, emitterOptions: EmitterOptions): PackageDetails {
   return buildPackageDetails(program, emitterOptions);
 }
 
@@ -376,10 +350,6 @@ function getAzureOutputDirectory(emitterOutputDir: string): string | undefined {
 }
 
 export function getSubscriptionId(dpgContext: SdkContext) {
-  //TODO Need consider multi-client cases, skip multi-client cases check for now
-  if (dpgContext.rlcOptions?.multiClient) {
-    return;
-  }
   for (const client of dpgContext.sdkPackage.clients) {
     if (
       getClientParameters(client, dpgContext)

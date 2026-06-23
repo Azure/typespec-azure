@@ -8,7 +8,6 @@ import { getClientName } from "../helpers/name-constructors.js";
 import { NameType, normalizeName } from "../helpers/name-utils.js";
 import { RLCModel } from "../interfaces.js";
 
-
 const azureReadmeModularTemplate = `# {{ clientDescriptiveName }} library for JavaScript
 
 This package contains an isomorphic SDK (runs both in Node.js and in browsers) for {{ clientDescriptiveName }}.
@@ -330,16 +329,7 @@ function createMetadata(model: RLCModel): Metadata | undefined {
     return;
   }
   // const packageDetails = model.options.packageDetails;
-  const {
-    packageDetails,
-    azureOutputDirectory,
-    productDocLink,
-    dependencyInfo,
-    multiClient,
-    batch,
-    serviceInfo,
-    isTypeSpecTest,
-  } = model.options;
+  const { packageDetails, azureOutputDirectory, serviceInfo, isTypeSpecTest } = model.options;
 
   const azureHuh =
     packageDetails?.scopeName === "azure" || packageDetails?.scopeName === "azure-rest";
@@ -369,7 +359,6 @@ function createMetadata(model: RLCModel): Metadata | undefined {
     clientPackageName: clientPackageName,
     clientDescriptiveName: `${serviceName} client`,
     description: serviceInfo?.description ?? packageDetails.description,
-    serviceDocURL: productDocLink,
     packageSourceURL: packageSourceURL,
     packageNPMURL: `https://www.npmjs.com/package/${clientPackageName}`,
     samplesURL:
@@ -377,9 +366,6 @@ function createMetadata(model: RLCModel): Metadata | undefined {
     apiRefURL: azureHuh
       ? `https://learn.microsoft.com/javascript/api/${clientPackageName}${apiRefUrlQueryParameter}`
       : undefined,
-    dependencyDescription: dependencyInfo?.description,
-    dependencyLink: dependencyInfo?.link,
-    hasMultiClients: multiClient && batch && batch.length > 1,
     azureArm: Boolean(model.options.azureArm),
     azure: azureHuh,
     isReleasablePackage: !isTypeSpecTest,
