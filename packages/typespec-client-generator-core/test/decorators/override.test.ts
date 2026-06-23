@@ -629,11 +629,7 @@ it("does not report mismatch when the override adds parameters", async () => {
     `,
     ),
   );
-  ok(
-    !diagnostics.some(
-      (d) => d.code === "@azure-tools/typespec-client-generator-core/override-parameters-mismatch",
-    ),
-  );
+  expectDiagnosticEmpty(diagnostics);
 });
 
 it("matches parameters by name when the override reorders and adds parameters", async () => {
@@ -661,11 +657,7 @@ it("matches parameters by name when the override reorders and adds parameters", 
     `,
     ),
   );
-  ok(
-    !diagnostics.some(
-      (d) => d.code === "@azure-tools/typespec-client-generator-core/override-parameters-mismatch",
-    ),
-  );
+  expectDiagnosticEmpty(diagnostics);
 });
 
 describe("@clientName", () => {
