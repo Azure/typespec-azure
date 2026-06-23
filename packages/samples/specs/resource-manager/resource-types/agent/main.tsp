@@ -106,8 +106,10 @@ model ContosoResponseProperties is ResponseProperties {
 @@visibility(ContosoResponseProperties.previousResponseId, Lifecycle.Read);
 
 // Conversation proxy child resource of the Appliance agent
-model ApplianceConversation
-  is AgentConversation<ContosoConversationProperties, ContosoApplianceAgent> {
+model ApplianceConversation is AgentConversation<
+  ContosoConversationProperties,
+  ContosoApplianceAgent
+> {
   ...ResourceNameParameter<ApplianceConversation>;
 }
 
@@ -117,8 +119,10 @@ model ApplianceResponse is AgentResponse<ContosoResponseProperties, ContosoAppli
 }
 
 // Conversation proxy child resource of the Platform agent
-model PlatformConversation
-  is AgentConversation<ContosoConversationProperties, ContosoPlatformAgent> {
+model PlatformConversation is AgentConversation<
+  ContosoConversationProperties,
+  ContosoPlatformAgent
+> {
   ...ResourceNameParameter<PlatformConversation>;
 }
 
