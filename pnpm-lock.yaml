@@ -232,7 +232,7 @@ catalogs:
       specifier: ^8.58.1
       version: 8.60.0
     '@typespec/http-client-python':
-      specifier: ^0.33.0
+      specifier: '>=0.33.0 <1.0.0'
       version: 0.33.0
     '@typespec/ts-http-runtime':
       specifier: 0.3.5
