@@ -12,6 +12,8 @@ import {
   getSourceLocation,
   resolvePath,
 } from "@typespec/compiler";
+import type { TypeSpecScriptNode } from "@typespec/compiler/ast";
+import { SyntaxKind } from "@typespec/compiler/ast";
 
 /**
  * Get the namespace name for a target type.
@@ -70,27 +72,6 @@ function getLineEnd(text: string, start: number): number {
   return newline === -1 ? text.length : newline + 1;
 }
 
-function findImportInsertPos(text: string): number {
-  let pos = 0;
-  let lastImportEnd = 0;
-
-  while (pos < text.length) {
-    const lineEnd = getLineEnd(text, pos);
-    const trimmed = text.slice(pos, lineEnd).trim();
-    if (trimmed === "") {
-      pos = lineEnd;
-      continue;
-    }
-
-    if (!trimmed.startsWith("import ")) break;
-
-    lastImportEnd = lineEnd;
-    pos = lineEnd;
-  }
-
-  return lastImportEnd;
-}
-
 function skipBlankLines(text: string, start: number): number {
   let pos = start;
   while (pos < text.length) {
@@ -101,20 +82,29 @@ function skipBlankLines(text: string, start: number): number {
   return pos;
 }
 
-function findUsingInsertPos(text: string, importInsertPos: number): number {
-  let pos = skipBlankLines(text, importInsertPos);
-  let lastUsingEnd = 0;
-
-  while (pos < text.length) {
-    const lineEnd = getLineEnd(text, pos);
-    const trimmed = text.slice(pos, lineEnd).trim();
-    if (!trimmed.startsWith("using ")) break;
-
-    lastUsingEnd = lineEnd;
-    pos = lineEnd;
+function findImportInsertPos(script: TypeSpecScriptNode | undefined, text: string): number {
+  const statements = script?.statements ?? [];
+  const lastImport = statements.filter((x) => x.kind === SyntaxKind.ImportStatement).at(-1);
+  if (lastImport) {
+    return getLineEnd(text, lastImport.end);
   }
 
-  return lastUsingEnd || importInsertPos;
+  const firstUsing = statements.find((x) => x.kind === SyntaxKind.UsingStatement);
+  return firstUsing?.pos ?? 0;
+}
+
+function findUsingInsertPos(
+  script: TypeSpecScriptNode | undefined,
+  text: string,
+  importInsertPos: number,
+): number {
+  const statements = script?.statements ?? [];
+  const lastUsing = statements.filter((x) => x.kind === SyntaxKind.UsingStatement).at(-1);
+  if (lastUsing) {
+    return getLineEnd(text, lastUsing.end);
+  }
+
+  return skipBlankLines(text, importInsertPos);
 }
 
 /**
@@ -181,10 +171,11 @@ export function createClientTspAugmentDecoratorCodeFix(
   const decoratorText = `@@${decoratorName}(${shortRef}${argsStr})`;
   const projectRoot = program.projectRoot;
   const clientTspPath = resolvePath(projectRoot, "client.tsp");
+  const clientScript = program.sourceFiles.get(clientTspPath);
 
   // Read client.tsp content once via direct lookup (O(1)).
   // Assumes client.tsp is imported via tspconfig.yaml imports.
-  const existingText = program.sourceFiles.get(clientTspPath)?.file.text ?? "";
+  const existingText = clientScript?.file.text ?? "";
 
   return defineCodeFix({
     id: `add-${decoratorName}-in-client-tsp`,
@@ -216,8 +207,8 @@ export function createClientTspAugmentDecoratorCodeFix(
         }
       }
 
-      const importInsertPos = findImportInsertPos(existingText);
-      const usingInsertPos = findUsingInsertPos(existingText, importInsertPos);
+      const importInsertPos = findImportInsertPos(clientScript, existingText);
+      const usingInsertPos = findUsingInsertPos(clientScript, existingText, importInsertPos);
 
       if (
         missingImports.length > 0 &&
