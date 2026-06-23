@@ -1,11 +1,12 @@
 import {
   createLinterRuleTester,
   LinterRuleTester,
+  t,
   TesterInstance,
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 import { csharpNoUrlSuffixRule } from "../../src/rules/csharp-no-url-suffix.js";
-import { SimpleTester } from "../tester.js";
+import { SimpleBaseTester, SimpleTester } from "../tester.js";
 
 const libraryName = "@azure-tools/typespec-client-generator-core";
 
@@ -135,6 +136,11 @@ it("does not flag non-model-property types", async () => {
 // --- Codefix ---
 
 describe("codefix", () => {
+  async function createBaseTester() {
+    const baseRunner = await SimpleBaseTester.createInstance();
+    return createLinterRuleTester(baseRunner, csharpNoUrlSuffixRule, libraryName);
+  }
+
   it("writes @@clientName to client.tsp with imports and correct target ref", async () => {
     await tester
       .expect({
@@ -152,11 +158,39 @@ using Azure.ClientGenerator.Core;
       });
   });
 
+  it("keeps usings after existing imports in client.tsp", async () => {
+    const baseTester = await createBaseTester();
+    await baseTester
+      .expect({
+        "main.tsp": `
+          import "@azure-tools/typespec-client-generator-core";
+          import "./client.tsp";
+          using Azure.ClientGenerator.Core;
+
+          namespace Azure.Storage.Tables;
+          model Foo { imageUrl: string; }
+        `,
+        "client.tsp": t.code`import "./main.tsp";
+`,
+      })
+      .applyCodeFix("add-clientName-in-client-tsp")
+      .toEqual({
+        "client.tsp": `import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+using Azure.Storage.Tables;
+
+@@clientName(Foo.imageUrl, "imageUri", "csharp");
+`,
+      });
+  });
+
   it("after applying the codefix, the diagnostic disappears", async () => {
     await tester
       .expect(
         `model Foo { imageUrl: string; }
-        @@clientName(Foo.imageUrl, "imageUri", "csharp");`,
+@@clientName(Foo.imageUrl, "imageUri", "csharp");`,
       )
       .toBeValid();
   });

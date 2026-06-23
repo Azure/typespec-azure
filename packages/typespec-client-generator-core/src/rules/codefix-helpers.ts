@@ -65,6 +65,58 @@ function buildFqn(target: Model | ModelProperty): string {
   return target.name;
 }
 
+function getLineEnd(text: string, start: number): number {
+  const newline = text.indexOf("\n", start);
+  return newline === -1 ? text.length : newline + 1;
+}
+
+function findImportInsertPos(text: string): number {
+  let pos = 0;
+  let lastImportEnd = 0;
+
+  while (pos < text.length) {
+    const lineEnd = getLineEnd(text, pos);
+    const trimmed = text.slice(pos, lineEnd).trim();
+    if (trimmed === "") {
+      pos = lineEnd;
+      continue;
+    }
+
+    if (!trimmed.startsWith("import ")) break;
+
+    lastImportEnd = lineEnd;
+    pos = lineEnd;
+  }
+
+  return lastImportEnd;
+}
+
+function skipBlankLines(text: string, start: number): number {
+  let pos = start;
+  while (pos < text.length) {
+    const lineEnd = getLineEnd(text, pos);
+    if (text.slice(pos, lineEnd).trim() !== "") break;
+    pos = lineEnd;
+  }
+  return pos;
+}
+
+function findUsingInsertPos(text: string, importInsertPos: number): number {
+  let pos = skipBlankLines(text, importInsertPos);
+  let lastUsingEnd = 0;
+
+  while (pos < text.length) {
+    const lineEnd = getLineEnd(text, pos);
+    const trimmed = text.slice(pos, lineEnd).trim();
+    if (!trimmed.startsWith("using ")) break;
+
+    lastUsingEnd = lineEnd;
+    pos = lineEnd;
+  }
+
+  return lastUsingEnd || importInsertPos;
+}
+
 /**
  * Create a codefix that adds an augment decorator (@@decorator) at the end of
  * the SAME file where the target is defined.
@@ -143,39 +195,68 @@ export function createClientTspAugmentDecoratorCodeFix(
       const clientFile = createSourceFile(existingText, clientTspPath);
       const edits: InsertTextCodeFixEdit[] = [];
 
-      // Build imports/using to insert at the TOP of the file
+      // Build imports/using without moving existing import statements after usings.
       const tcgcImport = `import "@azure-tools/typespec-client-generator-core";`;
       const usingTcgc = `using Azure.ClientGenerator.Core;`;
 
-      const headerLines: string[] = [];
+      const missingImports: string[] = [];
       if (!existingText.includes(tcgcImport)) {
-        headerLines.push(tcgcImport);
+        missingImports.push(tcgcImport);
       }
+
+      const missingUsings: string[] = [];
       if (!existingText.includes(usingTcgc)) {
-        headerLines.push("", usingTcgc);
+        missingUsings.push(usingTcgc);
       }
       // Add using for the target's service namespace so we can use short references
       if (targetNamespace) {
         const usingNs = `using ${targetNamespace};`;
-        if (!existingText.includes(usingNs) && !headerLines.includes(usingNs)) {
-          headerLines.push(usingNs);
+        if (!existingText.includes(usingNs) && !missingUsings.includes(usingNs)) {
+          missingUsings.push(usingNs);
         }
       }
-      const headerToInsert = headerLines.length > 0 ? headerLines.join("\n") + "\n" : "";
-      if (headerToInsert.length > 0) {
+
+      const importInsertPos = findImportInsertPos(existingText);
+      const usingInsertPos = findUsingInsertPos(existingText, importInsertPos);
+
+      if (
+        missingImports.length > 0 &&
+        missingUsings.length > 0 &&
+        importInsertPos === usingInsertPos
+      ) {
+        const text = [...missingImports, "", ...missingUsings].join("\n") + "\n\n";
         edits.push({
           kind: "insert-text",
-          pos: 0,
-          text: headerToInsert + (existingText.length === 0 ? "\n" : ""),
+          pos: importInsertPos,
+          text,
           file: clientFile,
         });
+      } else {
+        if (missingImports.length > 0) {
+          edits.push({
+            kind: "insert-text",
+            pos: importInsertPos,
+            text: missingImports.join("\n") + "\n",
+            file: clientFile,
+          });
+        }
+        if (missingUsings.length > 0) {
+          const needsLeadingBlank = usingInsertPos === importInsertPos && importInsertPos > 0;
+          const needsTrailingBlank = usingInsertPos === existingText.length;
+          edits.push({
+            kind: "insert-text",
+            pos: usingInsertPos,
+            text: `${needsLeadingBlank ? "\n" : ""}${missingUsings.join("\n")}\n${needsTrailingBlank ? "\n" : ""}`,
+            file: clientFile,
+          });
+        }
       }
 
       // Use short ref if the namespace is in scope (via using), otherwise FQN
       const hasNamespaceUsing =
         targetNamespace &&
         (existingText.includes(`using ${targetNamespace};`) ||
-          headerToInsert.includes(`using ${targetNamespace};`));
+          missingUsings.includes(`using ${targetNamespace};`));
       const ref = hasNamespaceUsing ? shortRef : buildFqn(target);
 
       // Append augment decorator at the END of the file
