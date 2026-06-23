@@ -4,6 +4,8 @@ description: Choosing and modeling ARM resources
 llmstxt: true
 ---
 
+import { ExampleRef } from "@components/sample";
+
 ## Introductions
 
 Introduction
@@ -45,7 +47,9 @@ model Employee is TrackedResource<EmployeeProperties> {
 
 `...ResourceNameParameter<Employee>`: spreads in the standard resource name parameter, which automatically defines the resource type name, parameter name, and path segment based on the resource model.
 
-You can find samples of Tracked Resources [in the Tracked Resource sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/resource-types/tracked/main.tsp).
+You can find a complete sample of Tracked Resources below.
+
+<ExampleRef path="resource-manager/resource-types/tracked" />
 
 ### Tenant Resources
 
@@ -61,7 +65,9 @@ model Employee is ProxyResource<EmployeeProperties> {
 `@tenantResource`: designates this resource as being a cross-tenant resource, with scope across all customer subscriptions in the tenant.
 `...ResourceNameParameter<Employee>`: spreads in the standard resource name parameter, which automatically defines the resource type name, parameter name, and path segment based on the resource model.
 
-You can find samples of Tenant Resources [in the TenantResource sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/resource-types/tenant/main.tsp).
+You can find a complete sample of Tenant Resources below.
+
+<ExampleRef path="resource-manager/resource-types/tenant" />
 
 ### Extension Resource
 
@@ -188,7 +194,9 @@ alias VirtualMachineScaleSetVm = Extension.ExternalChildResource<
 interface ScaleSetVms extends EmplOps<VirtualMachineScaleSetVm> {}
 ```
 
-You can find the complete sample of Extension Resources [in the specific-extension sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/resource-types/specific-extension/main.tsp).
+You can find the complete sample of Extension Resources below.
+
+<ExampleRef path="resource-manager/resource-types/specific-extension" />
 
 ### Child Resource
 
@@ -204,7 +212,9 @@ model Job is ProxyResource<JobProperties> {
 `@parentResource`: designates the model type for the parent of this child resource. The resource identifier for this resource will be prepended with the resource identity of the parent.
 `...ResourceNameParameter<Job>`: spreads in the standard resource name parameter, which automatically defines the resource type name, parameter name, and path segment based on the resource model.
 
-You can find samples of Child Resources [in the Proxy Resource sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/resource-types/proxy/main.tsp).
+You can find a complete sample of Child Resources below.
+
+<ExampleRef path="resource-manager/resource-types/proxy" />
 
 ### Subscription-based Resource
 
@@ -220,7 +230,9 @@ model Employee is ProxyResource<EmployeeProperties> {
 `@subscriptionResource`: designates this resource as being a cross-subscription resource, with scope across all resource groups in the subscription.
 `...ResourceNameParameter<Employee>`: spreads in the standard resource name parameter, which automatically defines the resource type name, parameter name, and path segment based on the resource model.
 
-You can find samples of Subscription Resources [in the OperationTemplates sample](/docs/samples/resource-manager/resource-types/tracked/).
+You can find a complete sample of Subscription Resources below.
+
+<ExampleRef path="resource-manager/resource-types/tracked" />
 
 ### Location-based Resource
 
@@ -242,7 +254,9 @@ model Employee is TrackedResource<EmployeeProperties> {
 The `@locationResource` decorator is deprecated. Use `@parentResource(ArmLocationResource<...>)` instead.
 :::
 
-You can find samples of Location Resources [in the Location Resource sample](/docs/samples/resource-manager/resource-types/location/).
+You can find a complete sample of Location Resources below.
+
+<ExampleRef path="resource-manager/resource-types/location" />
 
 ### Singleton Resource
 
@@ -260,7 +274,9 @@ model EmployeeAgreement is ProxyResource<EmployeeAgreementProperties> {
 `@tenantResource`: designates this resource as being a cross-tenant resource, with scope across all customer subscriptions in the tenant.
 `...ResourceNameParameter<EmployeeAgreement>`: spreads in the standard resource name parameter, which automatically defines the resource type name, parameter name, and path segment based on the resource model.
 
-You can find samples of Singleton Resources [in the Singleton sample](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/resource-manager/resource-types/singleton/main.tsp).
+You can find a complete sample of Singleton Resources below.
+
+<ExampleRef path="resource-manager/resource-types/singleton" />
 
 ## Designing Resource-specific Properties
 
