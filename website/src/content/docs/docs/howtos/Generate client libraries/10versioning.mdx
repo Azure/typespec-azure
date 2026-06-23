@@ -474,8 +474,8 @@ Services not listed in the object default to their latest version.
 options:
   "@azure-tools/typespec-python":
     api-version:
-      ServiceA: "av1"
-      ServiceB: "bv1"
+      ServiceA: "2024-01-01"
+      ServiceB: "2024-05-01"
 ```
 
 For example, given two versioned services:
@@ -491,8 +491,8 @@ using TypeSpec.Http;
 @versioned(VersionsA)
 namespace ServiceA {
   enum VersionsA {
-    av1,
-    av2,
+    v2024_01_01: "2024-01-01",
+    v2024_06_01: "2024-06-01",
   }
   @route("/aTest")
   op aTest(@query("api-version") apiVersion: VersionsA): void;
@@ -502,17 +502,17 @@ namespace ServiceA {
 @versioned(VersionsB)
 namespace ServiceB {
   enum VersionsB {
-    bv1,
-    bv2,
+    v2024_05_01: "2024-05-01",
+    v2024_09_01: "2024-09-01",
   }
   @route("/bTest")
   op bTest(@query("api-version") apiVersion: VersionsB): void;
 }
 ```
 
-With `api-version: { ServiceA: "av1", ServiceB: "bv1" }`, the generated client will use version `av1` for ServiceA operations and `bv1` for ServiceB operations.
+With `api-version: { ServiceA: "2024-01-01", ServiceB: "2024-05-01" }`, the generated client will use version `2024-01-01` for ServiceA operations and `2024-05-01` for ServiceB operations.
 
-With `api-version: { ServiceA: "av1" }` (ServiceB omitted), ServiceA will use `av1` while ServiceB will default to its latest version `bv2`.
+With `api-version: { ServiceA: "2024-01-01" }` (ServiceB omitted), ServiceA will use `2024-01-01` while ServiceB will default to its latest version `2024-09-01`.
 
 > NOTE: The special value `"all"` is **not supported** for multi-service packages. If specified (either as a top-level string or as a per-service value), it is ignored and the service falls back to its latest version. The `"latest"` value works as expected and applies to all services.
 
