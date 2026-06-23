@@ -5,9 +5,11 @@ import SampleContent from "./sample-content.astro";
 interface Props {
   /** Sample id, i.e. the directory relative to `packages/samples/specs` (e.g. `resource-manager/resource-types/tracked`). */
   path: string;
+  /** Render the sample inside a collapsed `<details>` to reduce noise on pages that inline many samples. */
+  collapsed?: boolean;
 }
 
-const { path } = Astro.props;
+const { path, collapsed } = Astro.props;
 
 const { samples } = await getSampleStructure();
 const sample = samples.find((x) => x.id === path);
@@ -23,12 +25,24 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const sampleHref = `${base}/docs/samples/${sample.id}/`;
 ---
 
-<section class="example-ref">
-  <div class="example-ref-header">
-    <a href={sampleHref}>{sample.title}</a>
-  </div>
-  <SampleContent sample={sample} />
-</section>
+{
+  collapsed ? (
+    <details class="example-ref">
+      <summary class="example-ref-header">{sample.title}</summary>
+      <a class="example-ref-link" href={sampleHref}>
+        View full sample →
+      </a>
+      <SampleContent sample={sample} />
+    </details>
+  ) : (
+    <section class="example-ref">
+      <div class="example-ref-header">
+        <a href={sampleHref}>{sample.title}</a>
+      </div>
+      <SampleContent sample={sample} />
+    </section>
+  )
+}
 
 <style>
   .example-ref {
@@ -40,5 +54,15 @@ const sampleHref = `${base}/docs/samples/${sample.id}/`;
   .example-ref-header {
     font-weight: 600;
     margin-block: 0.75rem 0.25rem;
+  }
+  summary.example-ref-header {
+    cursor: pointer;
+    margin-block: 0;
+    padding-block: 0.75rem;
+  }
+  .example-ref-link {
+    display: inline-block;
+    font-size: var(--sl-text-sm);
+    margin-block: 0.25rem 0.5rem;
   }
 </style>
