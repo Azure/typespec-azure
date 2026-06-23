@@ -271,17 +271,13 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
     }
   }
 
-  function clientType() {
-    return env.mode().includes("modular") ? "modular" : "rlc";
-  }
-
   function outputPath() {
-    const subPath = {
-      modular: "azure-modular-integration",
-      rlc: "azure-integration",
-    }[clientType()];
-
-    const outputPath = joinPath(testRoot(), subPath, "generated", env.targetFolder());
+    const outputPath = joinPath(
+      testRoot(),
+      "azure-modular-integration",
+      "generated",
+      env.targetFolder(),
+    );
 
     return outputPath;
   }

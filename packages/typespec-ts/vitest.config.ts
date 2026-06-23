@@ -11,13 +11,6 @@ export default defineConfig({
       },
       {
         test: {
-          name: "unit-rlc",
-          include: ["test/unit/**/*.test.ts"],
-          testTimeout: 36000,
-        },
-      },
-      {
-        test: {
           name: "unit-modular",
           include: ["test/modular-unit/**/*.test.ts"],
           testTimeout: 0,
@@ -27,17 +20,6 @@ export default defineConfig({
               execArgv: ["--max-old-space-size=8192"],
             },
           },
-        },
-      },
-      {
-        test: {
-          name: "integration-azure-rlc",
-          include: ["test/azure-integration/*.test.ts"],
-          exclude: [
-            "test/azure-integration/versioningRemoved.test.ts",
-            "test/azure-integration/azureClientGeneratorCoreClientInitialization.test.ts",
-          ],
-          testTimeout: 36000,
         },
       },
       {
