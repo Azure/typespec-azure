@@ -15,6 +15,17 @@ specific to the `packages/typespec-ts` emitter. Standard repo conventions still 
   `@typespec/http-client-js`. Do not reintroduce non-Azure ("standard"/"unbranded")
   code paths, options, tests, or generated baselines.
 
+## Collapsed generation defaults
+
+Several emitter options were removed because only one value was ever supported. Do not
+reintroduce these options or the branches they gated:
+
+- `module-kind` — generation always targets **ESM**; there is no CommonJS output path.
+- `azure-sdk-for-js` — generation always targets the **Azure SDK for JS monorepo**
+  layout; there is no standalone-package path.
+- `source-from` — input is always **TypeSpec**. The `sourceFrom`/`specSource` plumbing
+  and all `"Swagger"` source branches were removed.
+
 ## Test layout
 
 The package is tested through vitest projects (see `vitest.config.ts`):
