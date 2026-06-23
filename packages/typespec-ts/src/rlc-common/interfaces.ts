@@ -231,7 +231,6 @@ export interface RLCOptions {
   productDocLink?: string;
   serviceInfo?: ServiceInfo;
   azureArm?: boolean;
-  sourceFrom?: "TypeSpec" | "Swagger";
   isModularLibrary?: boolean;
   enableOperationGroup?: boolean;
   enableModelNamespace?: boolean;

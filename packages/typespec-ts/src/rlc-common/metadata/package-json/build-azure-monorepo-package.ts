@@ -74,9 +74,6 @@ export function getAzureMonorepoDependencies(config: AzureMonorepoInfoConfig) {
       eslint: "catalog:",
       prettier: "catalog:",
       rimraf: "catalog:",
-      ...(config.specSource === "Swagger" && {
-        autorest: "catalog:",
-      }),
       ...testDeps,
     },
   };
@@ -129,17 +126,6 @@ function getSampleMetadata({ name, version, withSamples }: AzureMonorepoInfoConf
   };
 }
 
-function addSwaggerMetadata(metadata: Record<string, any>, specSource: "Swagger" | "TypeSpec") {
-  if (specSource !== "Swagger") {
-    return;
-  }
-
-  metadata["constantPaths"].push({
-    path: "swagger/README.md",
-    prefix: "package-version",
-  });
-}
-
 function getAzureMonorepoScripts(config: AzureMonorepoInfoConfig) {
   const esmScripts = getEsmScripts();
   const skipLinting = config.azureArm && config.isModularLibrary;
@@ -183,7 +169,6 @@ function getMetadataInfo(config: AzureMonorepoInfoConfig) {
     constantPaths: [],
   };
   const paths = config.isModularLibrary ? config.clientContextPaths : config.clientFilePaths;
-  addSwaggerMetadata(metadata, config.specSource);
   for (const path of paths ?? []) {
     metadata["constantPaths"].push({
       path: path,

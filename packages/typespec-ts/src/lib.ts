@@ -49,7 +49,6 @@ export interface EmitterOptions {
   "product-doc-link"?: string;
   "service-info"?: ServiceInfo;
   "azure-arm"?: boolean;
-  "source-from"?: "TypeSpec" | "Swagger";
   "is-modular-library"?: boolean;
   "enable-operation-group"?: boolean;
   "enable-model-namespace"?: boolean;
@@ -245,11 +244,6 @@ export const RLCOptionsSchema: JSONSchemaType<EmitterOptions> = {
       type: "boolean",
       nullable: true,
       description: "Whether the package is an arm package.",
-    },
-    "source-from": {
-      type: "string",
-      nullable: true,
-      description: "Internal option, the value is default for TypeSpec generation",
     },
     "is-modular-library": {
       type: "boolean",

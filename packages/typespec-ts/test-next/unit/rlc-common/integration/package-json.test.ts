@@ -85,29 +85,6 @@ describe("Package file generation", () => {
       expect(packageFile["//metadata"]).toEqual(expectedMetadata);
     });
 
-    it("should have monorepo metadata when source is swagger", () => {
-      const model = createMockModel({ ...baseConfig, source: "Swagger" });
-      const packageFileContent = buildPackageFile(model);
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-
-      const expectedMetadata = {
-        constantPaths: [
-          {
-            path: "swagger/README.md",
-            prefix: "package-version",
-          },
-          {
-            path: "src/test.ts",
-            prefix: "userAgentInfo",
-          },
-        ],
-      };
-
-      // Verify monorepo specific metadata
-      expect(packageFile).to.have.property("//metadata");
-      expect(packageFile["//metadata"]).toEqual(expectedMetadata);
-    });
-
     it("should have sample metadata", () => {
       const model = createMockModel({
         ...baseConfig,

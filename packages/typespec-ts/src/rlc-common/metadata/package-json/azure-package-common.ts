@@ -5,7 +5,6 @@ import { PackageCommonInfoConfig } from "./package-common.js";
 
 export interface AzurePackageInfoConfig extends PackageCommonInfoConfig {
   hasLro: boolean;
-  specSource: "Swagger" | "TypeSpec";
 }
 
 /**

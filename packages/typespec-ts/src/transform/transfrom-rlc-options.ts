@@ -87,7 +87,6 @@ function extractRLCOptions(
     generateSample,
     serviceInfo,
     azureOutputDirectory,
-    sourceFrom: "TypeSpec",
     enableOperationGroup,
     enableModelNamespace,
     hierarchyClient,

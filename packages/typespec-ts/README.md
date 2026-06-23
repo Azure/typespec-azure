@@ -200,12 +200,6 @@ Deprecated option for RLC legacy generation.
 
 Whether the package is an arm package.
 
-### `source-from`
-
-**Type:** `string`
-
-Internal option, the value is default for TypeSpec generation
-
 ### `is-modular-library`
 
 **Type:** `boolean`

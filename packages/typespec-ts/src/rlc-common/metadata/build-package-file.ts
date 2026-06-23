@@ -38,7 +38,6 @@ export function buildPackageFile(
     clientFilePaths: [getClientFilePath(model)],
     hasLro: hasPollingOperations(model),
     monorepoPackageDirectory: model.options?.azureOutputDirectory,
-    specSource: model.options?.sourceFrom ?? "TypeSpec",
     dependencies,
     clientContextPaths,
   };

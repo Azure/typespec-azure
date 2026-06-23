@@ -11,7 +11,6 @@ export type TestModelConfig = {
   libraryName?: string;
   version?: string;
   srcPath?: string;
-  source?: "TypeSpec" | "Swagger";
   monorepoPackageDirectory?: string;
   hasLro?: boolean;
   hasPaging?: boolean;
@@ -46,7 +45,6 @@ export function createMockModel(config: TestModelConfig = {}): RLCModel {
       },
       generateTest: config.withTests ?? false,
       generateSample: config.withSamples ?? false,
-      sourceFrom: config.source ?? "TypeSpec",
       isModularLibrary: config.isModularLibrary ?? false,
       azureArm: config.azureArm ?? false,
       hasSubscriptionId: config.hasSubscriptionId ?? false,
