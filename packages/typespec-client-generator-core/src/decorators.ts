@@ -709,6 +709,28 @@ function collectParams(
   return params;
 }
 
+// Collect the names of the parameters that are realized as path parameters in
+// the resolved HTTP route of an operation. Returns `undefined` when the HTTP
+// route cannot be resolved (for example for non-HTTP operations), in which case
+// callers should fall back to inspecting the `@path` decorator directly.
+function getRealizedPathParamNames(
+  program: Program,
+  operation: Operation,
+): Set<string> | undefined {
+  try {
+    const [httpOperation] = getHttpOperation(program, operation);
+    const names = new Set<string>();
+    for (const parameter of httpOperation.parameters.parameters) {
+      if (parameter.type === "path") {
+        names.add(parameter.param.name);
+      }
+    }
+    return names;
+  } catch {
+    return undefined;
+  }
+}
+
 export const $override = (
   context: DecoratorContext,
   original: Operation,
@@ -725,6 +747,13 @@ export const $override = (
   const overrideParams = collectParams(context.program, override.parameters.properties).sort(
     (a, b) => a.name.localeCompare(b.name),
   );
+
+  // Determine which parameters are realized as path parameters in the resolved
+  // HTTP route of the original operation. Checking the `@path` decorator alone is
+  // not sufficient, because some templated parameters (for example ARM scope
+  // models) carry `@path` in the type graph without being realized as path
+  // parameters in the operation's actual route.
+  const realizedPathParamNames = getRealizedPathParamNames(context.program, original);
 
   // Check if the sorted parameter names arrays are equal, omit optional parameters
   let parametersMatch = true;
@@ -753,8 +782,11 @@ export const $override = (
     // Warn if original param has @path but override param doesn't,
     // unless any override param has @clientLocation (indicating an intentional customization
     // where non-path params are just pass-throughs)
+    const originalIsRealizedPathParam = realizedPathParamNames
+      ? realizedPathParamNames.has(originalParam.name)
+      : isPathParam(context.program, originalParam);
     if (
-      isPathParam(context.program, originalParam) &&
+      originalIsRealizedPathParam &&
       !isPathParam(context.program, overrideParams[index]) &&
       !overrideParams.some((p) => p.decorators.some((d) => d.decorator.name === "$clientLocation"))
     ) {
