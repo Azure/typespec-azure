@@ -30,7 +30,7 @@ export function getPackageCommonInfo(config: PackageCommonInfoConfig) {
     version,
     description,
     engines: {
-      node: ">=20.0.0",
+      node: ">=22.0.0",
     },
     sideEffects: false,
     autoPublish: false,
