@@ -18,7 +18,6 @@ import {
   RLCOptions,
   Schema,
   SchemaContext,
-  transformSampleGroups,
   UrlInfo,
 } from "../rlc-common/index.js";
 import { SdkContext } from "../utils/interfaces.js";
@@ -92,13 +91,9 @@ export async function transformRLCModel(
     },
     rlcSourceDir,
   };
-  model.sampleGroups = transformSampleGroups(
-    model,
-    options?.generateSample === true /* Enable mock sample content if generateSample === true */,
-  );
-  options.generateSample =
-    (options.generateSample === true || options.generateSample === undefined) &&
-    (model.sampleGroups ?? []).length > 0;
+  // RLC sample generation has been removed; modular samples are emitted separately,
+  // so the RLC model never carries sample groups.
+  options.generateSample = false;
   return model;
 }
 
