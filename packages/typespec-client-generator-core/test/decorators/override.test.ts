@@ -602,8 +602,7 @@ it("does not report missing @path when the parameter is not a realized path para
   );
   ok(
     !diagnostics.some(
-      (d) =>
-        d.code === "@azure-tools/typespec-client-generator-core/override-parameters-mismatch",
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/override-parameters-mismatch",
     ),
   );
 });
