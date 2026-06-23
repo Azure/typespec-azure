@@ -2,9 +2,7 @@
 // Licensed under the MIT License.
 
 import { Project, SourceFile } from "ts-morph";
-import { NameType, normalizeName } from "../helpers/name-utils.js";
 import { hasPollingOperations } from "../helpers/operation-helpers.js";
-import { getRelativePartFromSrcPath } from "../helpers/path-utils.js";
 import { RLCModel } from "../interfaces.js";
 import { buildAzureMonorepoPackage } from "./package-json/build-azure-monorepo-package.js";
 import { PackageCommonInfoConfig, resolveWarpExports } from "./package-json/package-common.js";
@@ -29,13 +27,11 @@ export function buildPackageFile(
     nameWithoutScope: model.options?.packageDetails?.nameWithoutScope,
     exports,
     azureArm: model.options?.azureArm,
-    isModularLibrary: model.options?.isModularLibrary ?? false,
     generateReactNativeTarget: model.options?.generateReactNativeTarget,
   };
 
   const extendedConfig = {
     ...config,
-    clientFilePaths: [getClientFilePath(model)],
     hasLro: hasPollingOperations(model),
     monorepoPackageDirectory: model.options?.azureOutputDirectory,
     dependencies,
@@ -181,13 +177,4 @@ function getDescription(model: RLCModel): string {
     return `A generated SDK for ${model.libraryName}.`;
   }
   return description;
-}
-
-function getClientFilePath(model: RLCModel) {
-  const { srcPath } = model;
-  const sdkReletivePart = getRelativePartFromSrcPath(srcPath);
-  const clientFilename = normalizeName(model.libraryName, NameType.File);
-  return sdkReletivePart
-    ? `src/${sdkReletivePart}/${clientFilename}.ts`
-    : `src/${clientFilename}.ts`;
 }

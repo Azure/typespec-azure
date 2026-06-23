@@ -8,79 +8,6 @@ import { getClientName } from "../helpers/name-constructors.js";
 import { NameType, normalizeName } from "../helpers/name-utils.js";
 import { RLCModel } from "../interfaces.js";
 
-const azureReadmeRLCTemplate = `# {{ clientDescriptiveName }} library for JavaScript
-
-{{ description }}
-
-{{#if azureArm}}
-**If you are not familiar with our REST client, please spend 5 minutes to take a look at {{#if serviceDocURL}}[the service's documentation]({{ serviceDocURL }}) and {{/if}}our [REST client docs](https://github.com/Azure/azure-sdk-for-js/blob/main/documentation/rest-clients.md) to use this library, the REST client provides a light-weighted & developer friendly way to call azure rest api
-{{else}}
-**Please rely heavily on {{#if serviceDocURL}}[the service's documentation]({{ serviceDocURL }}) and {{/if}}our [REST client docs](https://github.com/Azure/azure-sdk-for-js/blob/main/documentation/rest-clients.md) to use this library**
-{{/if}}
-
-Key links:
-
-{{#if packageSourceURL}}
-- [Source code]({{ packageSourceURL }})
-{{/if}}
-{{#if packageNPMURL}}
-- [Package (NPM)]({{ packageNPMURL }})
-{{/if}}
-{{#if apiRefURL}}
-- [API reference documentation]({{ apiRefURL }})
-{{/if}}
-{{#if serviceDocURL}}
-- [Product documentation]({{ serviceDocURL }})
-{{/if}}
-{{#if samplesURL}}
-- [Samples]({{ samplesURL }})
-{{/if}}
-
-## Getting started
-
-### Currently supported environments
-
-- LTS versions of Node.js
-
-### Prerequisites
-
-- You must have an [Azure subscription](https://azure.microsoft.com/free/){{#if dependencyLink}} and follow [these]({{ dependencyLink }}) instructions{{/if}} to use this package.
-
-### Install the \`{{ clientPackageName }}\` package
-
-Install the {{ clientDescriptiveName }} REST client library for JavaScript with \`npm\`:
-
-\`\`\`bash
-npm install {{ clientPackageName }}
-\`\`\`
-
-### Create and authenticate a \`{{ clientClassName }}\`
-
-To use a [Microsoft Entra token credential](https://github.com/Azure/azure-sdk-for-js/blob/main/sdk/identity/identity/samples/AzureIdentityExamples.md#authenticating-with-a-pre-fetched-access-token),
-provide an instance of the desired credential type obtained from the
-[@azure/identity](https://github.com/Azure/azure-sdk-for-js/tree/main/sdk/identity/identity#credentials) library.
-
-To authenticate with Microsoft Entra ID, you must first \`npm\` install [\`@azure/identity\`](https://www.npmjs.com/package/@azure/identity) {{#if dependencyLink}}and
-[{{dependencyDescription }}]({{ dependencyLink }}){{/if}}
-
-After setup, you can choose which type of [credential](https://github.com/Azure/azure-sdk-for-js/tree/main/sdk/identity/identity#credentials) from \`@azure/identity\` to use.
-As an example, [DefaultAzureCredential](https://github.com/Azure/azure-sdk-for-js/tree/main/sdk/identity/identity#defaultazurecredential)
-can be used to authenticate the client.
-
-## Troubleshooting
-
-### Logging
-
-Enabling logging may help uncover useful information about failures. In order to see a log of HTTP requests and responses, set the \`AZURE_LOG_LEVEL\` environment variable to \`info\`. Alternatively, logging can be enabled at runtime by calling \`setLogLevel\` in the \`@azure/logger\`:
-
-\`\`\`ts {{#if generateTest}}snippet:SetLogLevel{{/if}}
-import { setLogLevel } from "@azure/logger";
-
-setLogLevel("info");
-\`\`\`
-
-For more detailed instructions on how to enable logs, you can look at the [@azure/logger package docs](https://github.com/Azure/azure-sdk-for-js/tree/main/sdk/core/logger).
-`;
 
 const azureReadmeModularTemplate = `# {{ clientDescriptiveName }} library for JavaScript
 
@@ -346,11 +273,7 @@ interface Metadata {
 export function buildReadmeFile(model: RLCModel) {
   const metadata = createMetadata(model) ?? {};
   const readmeFileContents = hbs.compile(
-    model.options
-      ? model.options.isModularLibrary
-        ? azureReadmeModularTemplate
-        : azureReadmeRLCTemplate
-      : nonBrandedReadmeTemplate,
+    model.options ? azureReadmeModularTemplate : nonBrandedReadmeTemplate,
     { noEscape: true },
   );
   return {
@@ -444,9 +367,7 @@ function createMetadata(model: RLCModel): Metadata | undefined {
     serviceName,
     clientClassName,
     clientPackageName: clientPackageName,
-    clientDescriptiveName: model.options.isModularLibrary
-      ? `${serviceName} client`
-      : `${serviceName} REST client`,
+    clientDescriptiveName: `${serviceName} client`,
     description: serviceInfo?.description ?? packageDetails.description,
     serviceDocURL: productDocLink,
     packageSourceURL: packageSourceURL,
@@ -477,9 +398,7 @@ function getServiceName(model: RLCModel) {
     model?.options?.packageDetails?.scopeName === "azure" ||
     model?.options?.packageDetails?.scopeName === "azure-rest";
   const libraryName = model.libraryName;
-  const serviceTitle = model.options?.isModularLibrary
-    ? model.libraryName
-    : (model.options?.serviceInfo?.title ?? model.libraryName);
+  const serviceTitle = model.libraryName;
   const batch = model?.options?.batch,
     packageDetails = model?.options?.packageDetails;
   let simpleServiceName =
