@@ -9,7 +9,6 @@ import {
   buildPolymorphicAliases,
 } from "./build-object-types.js";
 import { getImportSpecifier } from "./helpers/imports-util.js";
-import { getImportModuleName } from "./helpers/name-constructors.js";
 import { RLCModel, SchemaContext } from "./interfaces.js";
 
 /**
@@ -66,20 +65,11 @@ export function generateModelFiles(
     // NodeJS.ReadableStream on Node and `never` on browser/react-native, so the
     // union arm drops out naturally in non-Node builds.
     if (modelsFile.getFullText().includes("NodeReadableStream")) {
-      const platformTypesModuleSpecifier = model.options?.azureSdkForJs
-        ? "#platform/platform-types"
-        : getImportModuleName(
-            {
-              cjsName: `./platform-types`,
-              esModulesName: `./platform-types.js`,
-            },
-            model,
-          );
       modelsFile.addImportDeclarations([
         {
           isTypeOnly: true,
           namedImports: ["NodeReadableStream"],
-          moduleSpecifier: platformTypesModuleSpecifier,
+          moduleSpecifier: "#platform/platform-types",
         },
       ]);
     }

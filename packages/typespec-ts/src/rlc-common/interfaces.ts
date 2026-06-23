@@ -224,7 +224,6 @@ export interface RLCOptions {
    */
   generateTest?: boolean;
   generateSample?: boolean;
-  azureSdkForJs?: boolean;
   azureOutputDirectory?: string;
   isTypeSpecTest?: boolean;
   title?: string;
@@ -232,9 +231,7 @@ export interface RLCOptions {
   productDocLink?: string;
   serviceInfo?: ServiceInfo;
   azureArm?: boolean;
-  sourceFrom?: "TypeSpec" | "Swagger";
   isModularLibrary?: boolean;
-  moduleKind?: "esm" | "cjs";
   enableOperationGroup?: boolean;
   enableModelNamespace?: boolean;
   hierarchyClient?: boolean;
@@ -268,7 +265,7 @@ export interface RLCOptions {
   treatUnknownAsRecord?: boolean;
   /**
    * When set to true, generates React Native build targets (tsconfig, warp target, package.json exports).
-   * Defaults to false. Only applicable when azureSdkForJs is true.
+   * Defaults to false.
    */
   generateReactNativeTarget?: boolean;
 }

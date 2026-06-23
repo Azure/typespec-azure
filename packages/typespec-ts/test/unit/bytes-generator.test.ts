@@ -20,7 +20,7 @@ describe("bytes", () => {
         parameters?.content!,
         `
             import type { RequestParameters } from "@azure-rest/core-client";
-            import type { NodeReadableStream } from "./platform-types.js";
+            import type { NodeReadableStream } from "#platform/platform-types";
             
             export interface UploadFileViaBodyBodyParam {
               /** Value may contain any sequence of octets */
@@ -57,7 +57,7 @@ describe("bytes", () => {
         parameters?.content!,
         `
             import type { RequestParameters } from "@azure-rest/core-client";
-            import type { NodeReadableStream } from "./platform-types.js";
+            import type { NodeReadableStream } from "#platform/platform-types";
             
             export interface UploadFileViaBodyBodyParam {
               /** Value may contain any sequence of octets */
@@ -117,7 +117,7 @@ describe("bytes", () => {
       await assertEqualContent(
         parameters?.content!,
         `import type { RequestParameters } from "@azure-rest/core-client";
-            import type { NodeReadableStream } from "./platform-types.js";
+            import type { NodeReadableStream } from "#platform/platform-types";
                   
           export interface ReadBodyParam {
             /** Value may contain any sequence of octets */
@@ -188,7 +188,7 @@ describe("bytes", () => {
           parameters?.content!,
           `
             import type { RequestParameters } from "@azure-rest/core-client";
-            import type { NodeReadableStream } from "./platform-types.js";
+            import type { NodeReadableStream } from "#platform/platform-types";
             
             export interface UploadFileBodyParam {
               /** Value may contain any sequence of octets */
@@ -251,7 +251,7 @@ describe("bytes", () => {
           parameters?.content!,
           `
             import type { RequestParameters } from "@azure-rest/core-client";
-            import type { NodeReadableStream } from "./platform-types.js";
+            import type { NodeReadableStream } from "#platform/platform-types";
             
             export interface UploadFileBodyParam {
               /** Value may contain any sequence of octets */
@@ -361,7 +361,7 @@ describe("bytes", () => {
         await assertEqualContent(
           models.inputModelFile?.content!,
           `
-          import type { NodeReadableStream } from "./platform-types.js";
+          import type { NodeReadableStream } from "#platform/platform-types";
 
           export interface FooNamePartDescriptor {
             name: "name";
@@ -529,7 +529,7 @@ describe("bytes", () => {
         `
       import type { RequestParameters } from "@azure-rest/core-client";
       import type { SchemaContentTypeValues } from "./models.js";
-      import type { NodeReadableStream } from "./platform-types.js";
+      import type { NodeReadableStream } from "#platform/platform-types";
 
       export interface ReadBodyParam {
         /** Value may contain any sequence of octets */
@@ -557,7 +557,7 @@ describe("bytes", () => {
         parameters?.content!,
         `
         import type { RequestParameters } from "@azure-rest/core-client";
-        import type { NodeReadableStream } from "./platform-types.js";
+        import type { NodeReadableStream } from "#platform/platform-types";
 
         export interface ReadBodyParam {
           /** Value may contain any sequence of octets */

@@ -5,12 +5,7 @@ import { RLCModel } from "../interfaces.js";
 import { getPackageName } from "./utils.js";
 
 function shouldGenerateTestConfig(model: RLCModel): boolean {
-  const isAzureSdkForJs = model.options?.azureSdkForJs ?? false;
-  return !(
-    model.options?.generateMetadata === false ||
-    model.options?.generateTest === false ||
-    isAzureSdkForJs !== true
-  );
+  return !(model.options?.generateMetadata === false || model.options?.generateTest === false);
 }
 
 /**

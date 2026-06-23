@@ -9,7 +9,6 @@ describe("vitest.config", () => {
     it("vitest.browser.config.ts", () => {
       const model = createMockModel({
         withTests: true,
-        isMonorepo: true,
       });
 
       const result = buildVitestConfig(model, "browser");
