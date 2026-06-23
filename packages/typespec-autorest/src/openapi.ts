@@ -262,6 +262,18 @@ export interface AutorestDocumentEmitterOptions {
    * @default false
    */
   readonly skipExampleCopying?: boolean;
+
+  /**
+   * Strategy for naming the OpenAPI names derived from TypeSpec types (definition/schema
+   * names, parameter keys, inline names, `x-typespec-name`, etc.).
+   *
+   * - `"namespaced"`: Include the namespace prefix for types outside the service namespace
+   *   (e.g. `LiftrBase.Foo`). Default.
+   * - `"name-only"`: Use only the type name without any namespace prefix (e.g. `Foo`). Conflicts are
+   *   reported as an error.
+   * @default "namespaced"
+   */
+  readonly typeNameStrategy?: "namespaced" | "name-only";
 }
 
 type HttpParameterProperties = Extract<
@@ -279,6 +291,11 @@ export async function getOpenAPIForService(
   const typeNameOptions: TypeNameOptions = {
     // shorten type names by removing TypeSpec and service namespace
     namespaceFilter(ns) {
+      // With the "name-only" strategy, strip every namespace so names are not prefixed by their
+      // namespace (e.g. `Foo` instead of `LiftrBase.Foo`).
+      if (options.typeNameStrategy === "name-only") {
+        return false;
+      }
       return !isService(program, ns);
     },
   };
