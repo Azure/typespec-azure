@@ -49,6 +49,13 @@ jobs:
             # Core packages excluded from the pnpm workspace that must be
             # built from source and injected via overrides.
             excluded-core-packages: "http-client-python"
+          - name: TypeScript
+            lang: ts
+            package-filter: "@azure-tools/typespec-ts"
+            working-directory: packages/typespec-ts
+            run-prepare: false
+            run-regenerate: false
+
     env:
       TYPESPEC_VS_CI_BUILD: true
       TYPESPEC_SKIP_WEBSITE_BUILD: true
@@ -78,7 +85,7 @@ jobs:
 
       - name: Setup language runtime
         if: matrix.mise-install-args
-        uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
+        uses: jdx/mise-action@dba19683ed58901619b14f395a24841710cb4925 # v4.1.0
         with:
           install_args: ${{ matrix.mise-install-args }}
 
@@ -148,6 +155,7 @@ jobs:
             "@azure-tools/typespec-azure-resource-manager",
             "@azure-tools/typespec-autorest",
             "@azure-tools/typespec-python",
+            "@azure-tools/typespec-ts"
           ];
           console.log("--- Dev versions (next tag on npm) ---");
           for (const pkg of packages) {

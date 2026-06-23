@@ -547,6 +547,30 @@ it("remove optional query param and add secret name", async () => {
   strictEqual(maxResultsParam.name, "maxresults");
 });
 
+it("reports diagnostic when override parameter is missing @path", async () => {
+  const [_, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace MyService;
+
+    @route("/items/{itemId}")
+    op getItem(@path itemId: string): void;
+    `,
+      `
+    namespace MyCustomizations;
+
+    op getItemOverride(itemId: string): void;
+
+    @@override(MyService.getItem, MyCustomizations.getItemOverride);
+    `,
+    ),
+  );
+  expectDiagnostics(diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/override-parameters-mismatch",
+  });
+});
+
 describe("@clientName", () => {
   it("original method", async () => {
     const { program } = await SimpleBaseTester.compile(

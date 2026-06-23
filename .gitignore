@@ -224,3 +224,4 @@ packages/samples/test/output/azure/templates-contoso/setup.*
 
 # python emitter
 packages/typespec-python/tests/generated/**
+packages/typespec-python/alpha

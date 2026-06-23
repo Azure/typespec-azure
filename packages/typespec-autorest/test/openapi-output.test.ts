@@ -3,7 +3,7 @@ import { deepStrictEqual, notStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { compileOpenAPI, diagnoseOpenApiFor, oapiForModel } from "./test-host.js";
 
-describe("typespec-autorest: definitions", () => {
+describe("definitions", () => {
   it("defines models", async () => {
     const res: any = await oapiForModel(
       "Foo",
@@ -437,7 +437,7 @@ describe("typespec-autorest: definitions", () => {
   });
 });
 
-describe("typespec-autorest: literals", () => {
+describe("literals", () => {
   const cases = [
     ["1", { type: "number", enum: [1] }],
     ['"hello"', { type: "string", enum: ["hello"], "x-ms-enum": { modelAsString: false } }],
@@ -460,7 +460,7 @@ describe("typespec-autorest: literals", () => {
   }
 });
 
-describe("typespec-autorest: operations", () => {
+describe("operations", () => {
   it("define operations with param with defaults", async () => {
     const res: any = await compileOpenAPI(`
       @get op read(@query queryWithDefault?: string = "defaultValue"): string;
@@ -653,7 +653,7 @@ describe("typespec-autorest: operations", () => {
   });
 });
 
-describe("typespec-autorest: request", () => {
+describe("request", () => {
   describe("binary request", () => {
     it("bytes request should produce byte format with application/json", async () => {
       const res: any = await compileOpenAPI(`
@@ -682,7 +682,7 @@ describe("typespec-autorest: request", () => {
   });
 });
 
-describe("typespec-autorest: extension decorator", () => {
+describe("extension decorator", () => {
   it("adds an arbitrary extension to a model", async () => {
     const oapi: any = await compileOpenAPI(`
       @extension("x-model-extension", "foobar")

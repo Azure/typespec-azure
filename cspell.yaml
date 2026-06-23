@@ -24,6 +24,8 @@ ignorePaths:
   - .editorconfig
   - .github/CODEOWNERS
   - "*.lock.yml"
+  # temp ignore typespec-ts while repo move is inflight
+  - packages/typespec-ts/**
 useGitignore: true
 enableFiletypes:
   - tsp
@@ -105,3 +107,4 @@ words:
   - byval
   - petstoreopgrp
   - pypi
+  - Tsps

@@ -29,6 +29,7 @@ import {
   getClientNameOverride,
   getLegacyHierarchyBuilding,
   getMarkAsLro,
+  isInScope,
   shouldFlattenProperty,
 } from "@azure-tools/typespec-client-generator-core";
 import {
@@ -261,6 +262,18 @@ export interface AutorestDocumentEmitterOptions {
    * @default false
    */
   readonly skipExampleCopying?: boolean;
+
+  /**
+   * Strategy for naming the OpenAPI names derived from TypeSpec types (definition/schema
+   * names, parameter keys, inline names, `x-typespec-name`, etc.).
+   *
+   * - `"namespaced"`: Include the namespace prefix for types outside the service namespace
+   *   (e.g. `LiftrBase.Foo`). Default.
+   * - `"name-only"`: Use only the type name without any namespace prefix (e.g. `Foo`). Conflicts are
+   *   reported as an error.
+   * @default "namespaced"
+   */
+  readonly typeNameStrategy?: "namespaced" | "name-only";
 }
 
 type HttpParameterProperties = Extract<
@@ -278,6 +291,11 @@ export async function getOpenAPIForService(
   const typeNameOptions: TypeNameOptions = {
     // shorten type names by removing TypeSpec and service namespace
     namespaceFilter(ns) {
+      // With the "name-only" strategy, strip every namespace so names are not prefixed by their
+      // namespace (e.g. `Foo` instead of `LiftrBase.Foo`).
+      if (options.typeNameStrategy === "name-only") {
+        return false;
+      }
       return !isService(program, ns);
     },
   };
@@ -335,12 +353,16 @@ export async function getOpenAPIForService(
   program.reportDiagnostics(diagnostics);
 
   const routes = httpService.operations;
-  reportIfNoRoutes(program, routes);
+  // Filter routes to only include operations in scope for this emitter
+  const inScopeRoutes = routes.filter((route) =>
+    isInScope(context.tcgcSdkContext, route.operation),
+  );
+  reportIfNoRoutes(program, inScopeRoutes);
 
   const xmlEnabled = xmlStrategy !== "none";
 
   // The set of produces/consumes values found in all operations
-  let allResponseContentTypes = routes
+  let allResponseContentTypes = inScopeRoutes
     .flatMap((route) => route.responses)
     .flatMap((res) => res.responses)
     .flatMap((res) => res.body?.contentTypes ?? [])
@@ -353,7 +375,7 @@ export async function getOpenAPIForService(
   if (allResponseContentTypes.length === 0) allResponseContentTypes = ["application/json"];
   const globalProduces = new Set<string>(allResponseContentTypes);
 
-  let allRequestContentTypes = routes
+  let allRequestContentTypes = inScopeRoutes
     .flatMap((route) => route.parameters)
     .flatMap((param) => param.body?.contentTypes ?? [])
     .filter(
@@ -371,7 +393,7 @@ export async function getOpenAPIForService(
     globalConsumes.size === 1 &&
     globalConsumes.has("application/xml");
 
-  routes.forEach(emitOperation);
+  inScopeRoutes.forEach(emitOperation);
 
   emitParameters();
   emitSchemas(service.type);
@@ -1012,6 +1034,9 @@ export async function getOpenAPIForService(
     const consumes: string[] = methodParams.body?.contentTypes ?? [];
 
     for (const httpProperty of methodParams.properties) {
+      if (!isInScope(context.tcgcSdkContext, httpProperty.property)) {
+        continue;
+      }
       const shared = params.get(httpProperty.property);
       if (shared) {
         currentEndpoint.parameters.push(shared);
@@ -1545,7 +1570,16 @@ export async function getOpenAPIForService(
     }
 
     function processUnreferencedSchemas() {
+      const authentication = resolveAuthentication(httpService);
+      const authSchemeModels = new Set<Type>(
+        authentication ? authentication.schemes.map((s) => s.model) : [],
+      );
       const addSchema = (type: Type) => {
+        if (authSchemeModels.has(type)) {
+          // Auth scheme models are emitted under securityDefinitions
+          // and should not also appear as payload schemas in definitions.
+          return;
+        }
         if (
           !processedSchemas.has(type) &&
           !indirectlyProcessedTypes.has(type) &&
@@ -1912,6 +1946,9 @@ export async function getOpenAPIForService(
     applyExternalDocs(model, modelSchema);
 
     for (const prop of model.properties.values()) {
+      if (!isInScope(context.tcgcSdkContext, prop)) {
+        continue;
+      }
       if (rawBaseModel && rawBaseModel.properties.has(prop.name)) {
         const baseProp = rawBaseModel.properties.get(prop.name);
         if (baseProp?.name === prop.name && baseProp.type === prop.type) {

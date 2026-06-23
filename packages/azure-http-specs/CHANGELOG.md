@@ -1,5 +1,22 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.42
+
+### Features
+
+- [#4535](https://github.com/Azure/typespec-azure/pull/4535) Add ARM spector test scenario for ArmResourceDeploymentScope (armResourceIdentifier with scopes)
+- [#4543](https://github.com/Azure/typespec-azure/pull/4543) Add ARM spector test scenario for management group scoped resources
+
+
+## 0.1.0-alpha.41
+
+### Features
+
+- [#4493](https://github.com/Azure/typespec-azure/pull/4493) Add Spector scenario for `@usage` applied to a namespace, demonstrating recursive propagation to nested models.
+- [#4577](https://github.com/Azure/typespec-azure/pull/4577) add test for `exact` enum member names
+- [#4430](https://github.com/Azure/typespec-azure/pull/4430) Add Spector spec for the `exact()` function used with `@clientName` to preserve exact naming without casing transformations.
+
+
 ## 0.1.0-alpha.40
 
 ### Features
