@@ -11,7 +11,7 @@ async function compileSpec(specDir: string): Promise<Stats> {
   });
   if (diagnostics.length > 0) {
     const msgs = diagnostics.map((d: any) => `  ${d.message}`).join("\n");
-    console.warn(`Warnings resolving options for ${specDir}:\n${msgs}`);
+    process.stderr.write(`Warnings resolving options for ${specDir}:\n${msgs}\n`);
   }
 
   const program = await compile(NodeHost, mainFile, {

@@ -54,7 +54,7 @@ const compileOncePath = fileURLToPath(new URL("./compile-once.js", import.meta.u
 
 /** Compile a single spec in an isolated process and return its stats. */
 async function compileSpec(specDir: string): Promise<Stats> {
-  return await new Promise<Stats>((resolveResult, reject) => {
+  return await new Promise<Stats>((resolve, reject) => {
     const child = spawn(process.execPath, [compileOncePath, specDir], {
       stdio: ["ignore", "pipe", "pipe"],
     });
@@ -75,7 +75,7 @@ async function compileSpec(specDir: string): Promise<Stats> {
         return;
       }
       try {
-        resolveResult(JSON.parse(stdout) as Stats);
+        resolve(JSON.parse(stdout) as Stats);
       } catch (error) {
         reject(
           new Error(
