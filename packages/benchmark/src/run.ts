@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
-import { compile, NodeHost, resolveCompilerOptions } from "@typespec/compiler";
-import { execSync } from "child_process";
+import { execSync, spawn } from "child_process";
 import { readdir } from "fs/promises";
 import os from "os";
 import { join, resolve } from "path";
+import { fileURLToPath } from "url";
 import { aggregateDurations } from "./aggregate.js";
 import { summarize } from "./statistics.js";
 import type {
@@ -50,44 +50,41 @@ async function discoverSpecs(specsDir: string, filter?: string[]): Promise<strin
   return dirs;
 }
 
-/** Compile a single spec and return its stats. */
+const compileOncePath = fileURLToPath(new URL("./compile-once.js", import.meta.url));
+
+/** Compile a single spec in an isolated process and return its stats. */
 async function compileSpec(specDir: string): Promise<Stats> {
-  const mainFile = join(specDir, "main.tsp");
-  const [options, diagnostics] = await resolveCompilerOptions(NodeHost, {
-    entrypoint: mainFile,
-    cwd: specDir,
+  return await new Promise<Stats>((resolveResult, reject) => {
+    const child = spawn(process.execPath, [compileOncePath, specDir], {
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    let stdout = "";
+    let stderr = "";
+    child.stdout.on("data", (chunk) => {
+      stdout += chunk.toString();
+    });
+    child.stderr.on("data", (chunk) => {
+      stderr += chunk.toString();
+    });
+    child.on("error", (error) => {
+      reject(error);
+    });
+    child.on("close", (code) => {
+      if (code !== 0) {
+        reject(new Error(stderr.trim() || `Compilation process exited with code ${code}`));
+        return;
+      }
+      try {
+        resolveResult(JSON.parse(stdout) as Stats);
+      } catch (error) {
+        reject(
+          new Error(
+            `Failed to parse benchmark stats output: ${error instanceof Error ? error.message : String(error)}`,
+          ),
+        );
+      }
+    });
   });
-  if (diagnostics.length > 0) {
-    const msgs = diagnostics.map((d: any) => `  ${d.message}`).join("\n");
-    console.warn(`  Warnings resolving options for ${specDir}:\n${msgs}`);
-  }
-
-  const program = await compile(NodeHost, mainFile, {
-    ...options,
-    outputDir: join(specDir, "tsp-output"),
-  });
-
-  if (program.hasError()) {
-    const errorDiags = program.diagnostics
-      .filter((d: any) => d.severity === "error")
-      .map((d: any) => `  ${d.message}`)
-      .join("\n");
-    throw new Error(`Compilation failed for ${specDir}:\n${errorDiags}`);
-  }
-
-  // program.stats is @internal but available at runtime
-  const stats = (program as any).stats as Stats;
-
-  // Recompute total without the emit stage so that adding more emitters
-  // does not inflate the "compilation" total metric.
-  stats.runtime.total =
-    (stats.runtime.loader ?? 0) +
-    (stats.runtime.resolver ?? 0) +
-    (stats.runtime.checker ?? 0) +
-    (stats.runtime.validation?.total ?? 0) +
-    (stats.runtime.linter?.total ?? 0);
-
-  return stats;
 }
 
 /** Average multiple Stats objects. */
