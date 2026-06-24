@@ -112,6 +112,13 @@ Clients, models, enums, and unions include namespace information. Emitters can u
 - A flattened structure (`SdkPackage.clients`, `SdkPackage.enums`, `SdkPackage.models`, `SdkPackage.unions`)
 - A hierarchical structure (`SdkPackage.namespaces`) requiring iteration through nested namespaces.
 
+### Package Metadata
+
+Emitters can get package metadata from `SdkPackage.metadata`. The metadata currently contains API version information:
+
+- **`apiVersion`** _(deprecated)_: A single string representing the resolved API version for single-service packages. For multi-service packages this is `undefined`. Use `apiVersions` instead.
+- **`apiVersions`**: A `Map<string, string>` where each key is a service namespace's full qualified name and each value is the resolved API version for that service. For single-service packages, the map has one entry. For multi-service packages, each service has its own entry. If the `api-version` config is set to `"all"` (single-service only), the value is the string `"all"`.
+
 ### License Information
 
 Emitters can get package license info from `SdkPackage.licenseInfo`. The [`LicenseInfo`](../reference/js-api/interfaces/licenseinfo/) contains license details for client code comments or license file generation.
