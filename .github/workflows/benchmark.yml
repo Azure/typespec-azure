@@ -58,7 +58,7 @@ jobs:
       - name: Run backfill
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.backfill_from }}
         run: |
-          node packages/benchmark/dist/src/cli.js backfill \
+          node --max-old-space-size=6144 packages/benchmark/dist/src/cli.js backfill \
             --from ${{ inputs.backfill_from }} \
             --specs-dir packages/benchmark/specs \
             --iterations 25 \
@@ -69,7 +69,7 @@ jobs:
       - name: Run benchmarks
         if: ${{ github.event_name != 'workflow_dispatch' || !inputs.backfill_from }}
         run: |
-          node packages/benchmark/dist/src/cli.js run \
+          node --max-old-space-size=6144 packages/benchmark/dist/src/cli.js run \
             --specs-dir packages/benchmark/specs \
             --iterations 25 \
             --warmup 3 \
