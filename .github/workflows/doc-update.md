@@ -19,6 +19,7 @@ timeout-minutes: 120
 
 permissions:
   contents: read
+  copilot-requests: write
 
 checkout:
   fetch-depth: 0
