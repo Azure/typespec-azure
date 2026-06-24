@@ -676,7 +676,7 @@ op ArmResourceActionAsyncBase<
  */
 @returnsDoc("Azure operation completed successfully.")
 @Private.enforceConstraint(Resource, Foundations.Resource)
-@doc("")
+@doc("A long-running resource action.")
 op ArmResourceActionAsync<
   Resource extends Foundations.SimpleResource,
   Request,
@@ -717,7 +717,7 @@ op ArmResourceActionAsync<
  */
 @returnsDoc("Azure operation completed successfully.")
 @Private.enforceConstraint(Resource, Foundations.Resource)
-@doc("")
+@doc("A long-running resource action.")
 op ActionAsync<
   Resource extends Foundations.SimpleResource,
   Request,
@@ -790,7 +790,7 @@ op ArmResourceActionSync<
  * @template Provider Optional. The provider namespace model for the resource.
  */
 @Private.enforceConstraint(Resource, Foundations.Resource)
-@doc("")
+@doc("A long-running resource action.")
 op ArmResourceActionNoContentAsync<
   Resource extends Foundations.SimpleResource,
   Request extends TypeSpec.Reflection.Model | void,
@@ -826,7 +826,7 @@ op ArmResourceActionNoContentAsync<
  * @template Provider Optional. The provider namespace model for the resource.
  */
 @Private.enforceConstraint(Resource, Foundations.Resource)
-@doc("")
+@doc("A long-running resource action.")
 op ArmResourceActionNoResponseContentAsync<
   Resource extends Foundations.SimpleResource,
   Request,

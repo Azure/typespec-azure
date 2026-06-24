@@ -336,7 +336,7 @@ export type ArmCommonTypesVersionDecorator = (
 /**
  * This decorator is used on Azure Resource Manager resources that are not based on
  * Azure.ResourceManager common types. It marks a model as an ARM virtual resource,
- * which is useful for scope resources like `ArmLocationResource` or action scope models.
+ * which is useful for defining the scope of resources used only as parents for child resources, or scopes for extension resources.
  *
  * @param provider Optional. The resource provider namespace for the virtual resource.
  */
