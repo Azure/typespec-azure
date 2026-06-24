@@ -5,6 +5,25 @@ import {
   UnbrandedSdkEmitterOptionsInterface,
 } from "./internal-utils.js";
 
+// `api-version` accepts either a string (single service / `latest` / `all`) or a
+// map from service namespace full name to version (multi-service).
+const apiVersionSchema = {
+  oneOf: [
+    {
+      type: "string",
+      nullable: true,
+    },
+    {
+      type: "object",
+      additionalProperties: { type: "string" },
+      required: [],
+      nullable: true,
+    },
+  ],
+  description:
+    "Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`. For multi-service packages, provide a map from each service namespace's full name to its desired version; services not listed default to their latest version.",
+} as any;
+
 export const UnbrandedSdkEmitterOptions = {
   "generate-protocol-methods": {
     "generate-protocol-methods": {
@@ -23,12 +42,7 @@ export const UnbrandedSdkEmitterOptions = {
     },
   },
   "api-version": {
-    "api-version": {
-      type: "string",
-      nullable: true,
-      description:
-        "Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`.",
-    },
+    "api-version": apiVersionSchema,
   },
   license: {
     license: {
@@ -128,13 +142,6 @@ const TCGCEmitterOptionsSchema: JSONSchemaType<TCGCEmitterOptions> = {
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-client-generator-core",
   diagnostics: {
-    "multiple-services": {
-      severity: "warning",
-      messages: {
-        default:
-          "Multiple services found. Only the first service will be used; others will be ignored.",
-      },
-    },
     "client-service": {
       severity: "warning",
       messages: {
@@ -186,7 +193,7 @@ export const $lib = createTypeSpecLibrary({
     "wrong-client-decorator": {
       severity: "warning",
       messages: {
-        default: "@client or @operationGroup should decorate namespace or interface in client.tsp",
+        default: "@client should decorate namespace or interface in client.tsp",
       },
     },
     "unsupported-kind": {
@@ -388,7 +395,7 @@ export const $lib = createTypeSpecLibrary({
       severity: "warning",
       messages: {
         default:
-          "When there is `@client` or `@operationGroup` decorator, `@clientLocation` decorator will be ignored.",
+          "@clientLocation with string target could not be used for multiple root clients scenario",
         operationToOperation:
           "`@clientLocation` cannot be used to move an operation to another operation. Operations can only be moved to interfaces or namespaces.",
         modelPropertyToClientInitialization: paramMessage`There is already a parameter called '${"parameterName"}' in the client initialization.`,
@@ -406,8 +413,7 @@ export const $lib = createTypeSpecLibrary({
     "legacy-hierarchy-building-conflict": {
       severity: "warning",
       messages: {
-        "property-missing": paramMessage`@hierarchyBuilding decorator conflict: Model ${"childModel"} is missing property '${"propertyName"}' that is required by parent model ${"parentModel"}.`,
-        "type-mismatch": paramMessage`@hierarchyBuilding decorator conflict: Property '${"propertyName"}' in model ${"childModel"} has a different type than parent model ${"parentModel"} expects.`,
+        "property-type-mismatch": paramMessage`@hierarchyBuilding decorator: property '${"propertyName"}' on model '${"childModel"}' has type that does not match the same-named property supplied by the new base chain (rooted at '${"parentModel"}'). The property is dropped from '${"childModel"}' to satisfy the rebase rule (own properties are filtered against the new base chain by name). Consider aligning the types or removing the property from '${"childModel"}'.`,
       },
     },
     "legacy-hierarchy-building-circular-reference": {
@@ -420,6 +426,12 @@ export const $lib = createTypeSpecLibrary({
       severity: "warning",
       messages: {
         default: paramMessage`@scope decorator should be applied with ${"decoratorName"} since it is highly likely this is language-specific`,
+      },
+    },
+    "required-parameter-scoped-out": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Required parameter "${"paramName"}" is scoped out for emitter "${"scope"}". This may cause runtime errors unless the parameter is provided through other means (e.g., custom headers).`,
       },
     },
     "external-library-version-mismatch": {
@@ -464,10 +476,10 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`The API version specified in the config: "${"version"}" is not defined in service versioning list. Fall back to the latest version.`,
       },
     },
-    "multiple-explicit-clients-multiple-services": {
+    "root-client-missing-service": {
       severity: "error",
       messages: {
-        default: "Can not define multiple explicit clients with multiple services.",
+        default: "Root namespace decorated with @client must have service config.",
       },
     },
     "invalid-client-service-multiple": {
@@ -482,6 +494,12 @@ export const $lib = createTypeSpecLibrary({
         default: "All services must have the same server and auth definitions.",
       },
     },
+    "inconsistent-multiple-service-dependency": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Services merged into client "${"clientName"}" depend on different versions of "${"dependencyName"}": ${"versions"}.`,
+      },
+    },
     "client-option": {
       severity: "warning",
       messages: {
@@ -494,6 +512,55 @@ export const $lib = createTypeSpecLibrary({
       messages: {
         default:
           "@clientOption should be applied with a specific language scope since it is highly likely this is language-specific.",
+      },
+    },
+    "replace-parameter-not-found": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Parameter "${"paramName"}" not found in operation "${"operationName"}".`,
+      },
+    },
+    "reorder-parameter-not-found": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Parameter "${"paramName"}" specified in reorder list not found in operation "${"operationName"}".`,
+      },
+    },
+    "reorder-parameter-missing": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Parameter "${"paramName"}" from operation "${"operationName"}" is missing in reorder list.`,
+      },
+    },
+    "add-parameter-duplicate": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Parameter "${"paramName"}" already exists in operation "${"operationName"}".`,
+      },
+    },
+    "reorder-parameter-duplicate": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Parameter "${"paramName"}" appears more than once in the reorder list for operation "${"operationName"}".`,
+      },
+    },
+    "remove-parameter-not-found": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Parameter "${"paramName"}" not found in operation "${"operationName"}".`,
+      },
+    },
+    "nested-client-service-not-subset": {
+      severity: "error",
+      messages: {
+        default:
+          "Nested client's services must be a subset of the parent client's services. If no service is needed, omit the `service` property to inherit from the parent.",
+      },
+    },
+    "auto-merge-service-conflict": {
+      severity: "error",
+      messages: {
+        default: "Auto-merging service client must be empty.",
       },
     },
   },

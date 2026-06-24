@@ -302,7 +302,7 @@ it("load example with @clientLocation existed interface", async () => {
   strictEqual(operation.examples?.length, 1);
 });
 
-it("load example with @clientLocation new operation group", async () => {
+it("load example with @clientLocation new sub client", async () => {
   const instance = await SimpleTester.createInstance();
   await instance.fs.addRealTypeSpecFile(
     "./examples/clientLocationNewOperationGroup.json",
@@ -347,6 +347,46 @@ it("load example with @clientLocation root client", async () => {
 
   const mainClient = context.sdkPackage.clients[0];
   const operation = (mainClient.methods[0] as SdkServiceMethod<SdkHttpOperation>).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+});
+
+it("load example with per-language @clientLocation falls back to autorest scope", async () => {
+  // Example files come from autorest and have a single canonical operationId.
+  // Per-language @clientLocation overrides (e.g. moving an op to a different group
+  // only for one language) should not break example linkage for the other languages.
+  // Here the example file references the autorest-resolved id `AnotherInterface_clientLocation`,
+  // and the JS emitter has a conflicting per-language relocation to `JsGroup`.
+  // Example matching must still succeed using the autorest scope.
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./examples/clientLocationAnotherInterface.json",
+    `${__dirname}/load/clientLocationAnotherInterface.json`,
+  );
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      interface OriginalInterface {
+        @clientLocation(AnotherInterface, "!javascript")
+        @clientLocation("JsGroup", "javascript")
+        op clientLocation(): string;
+      }
+
+      interface AnotherInterface {
+      }
+    }
+  `);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-ts",
+  });
+
+  // For the JS emitter, the operation is relocated to `JsGroup`, but the example file
+  // uses the autorest-resolved id `AnotherInterface_clientLocation`. The example should
+  // still be linked because example matching resolves under the autorest scope.
+  const mainClient = context.sdkPackage.clients[0];
+  const jsClient = mainClient.children?.find((c) => c.name === "JsGroup");
+  ok(jsClient);
+  const operation = (jsClient.methods[0] as SdkServiceMethod<SdkHttpOperation>).operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
 });
@@ -432,6 +472,7 @@ it("multiple services without versioning", async () => {
       @client({
         name: "CombineClient",
         service: [ServiceA, ServiceB],
+        autoMergeService: true,
       })
       namespace CombineClient {}
     `,
@@ -445,7 +486,7 @@ it("multiple services without versioning", async () => {
   strictEqual(client.name, "CombineClient");
   strictEqual(client.children?.length, 2);
 
-  // Check AI operation group examples
+  // Check AI sub client examples
   const aiClient = client.children?.find((c) => c.name === "AI");
   ok(aiClient);
   const aiMethod = aiClient.methods[0] as SdkServiceMethod<SdkHttpOperation>;
@@ -454,7 +495,7 @@ it("multiple services without versioning", async () => {
   strictEqual(aiMethod.operation.examples[0].filePath, "AI_aTest.json");
   strictEqual(aiMethod.operation.examples[0].name, "Test operation from ServiceA");
 
-  // Check BI operation group examples
+  // Check BI sub client examples
   const biClient = client.children?.find((c) => c.name === "BI");
   ok(biClient);
   const biMethod = biClient.methods[0] as SdkServiceMethod<SdkHttpOperation>;
@@ -487,6 +528,7 @@ it("multiple services without examples", async () => {
       @client({
         name: "CombineClient",
         service: [ServiceA, ServiceB],
+        autoMergeService: true,
       })
       namespace CombineClient {}
     `,
@@ -500,13 +542,13 @@ it("multiple services without examples", async () => {
   strictEqual(client.name, "CombineClient");
   strictEqual(client.children?.length, 2);
 
-  // Check AI operation group examples
+  // Check AI sub client examples
   const aiClient = client.children?.find((c) => c.name === "AI");
   ok(aiClient);
   const aiMethod = aiClient.methods[0] as SdkServiceMethod<SdkHttpOperation>;
   strictEqual(aiMethod.operation.examples, undefined);
 
-  // Check BI operation group examples
+  // Check BI sub client examples
   const biClient = client.children?.find((c) => c.name === "BI");
   ok(biClient);
   const biMethod = biClient.methods[0] as SdkServiceMethod<SdkHttpOperation>;

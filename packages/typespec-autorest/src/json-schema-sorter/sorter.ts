@@ -107,8 +107,17 @@ function defaultCompare(a: number | string, b: number | string) {
 
 /** Sort urls in a specific way so path with field show up before a fixed segment. */
 function compareUrl(leftPath: string, rightPath: string) {
-  const leftParts = leftPath.split("/").slice(1);
-  const rightParts = rightPath.split("/").slice(1);
+  // Separate path and query string portions to handle x-ms-paths entries starting with "?"
+  const leftQueryIndex = leftPath.indexOf("?");
+  const rightQueryIndex = rightPath.indexOf("?");
+  const leftPathPortion = leftQueryIndex >= 0 ? leftPath.substring(0, leftQueryIndex) : leftPath;
+  const rightPathPortion =
+    rightQueryIndex >= 0 ? rightPath.substring(0, rightQueryIndex) : rightPath;
+  const leftQuery = leftQueryIndex >= 0 ? leftPath.substring(leftQueryIndex) : "";
+  const rightQuery = rightQueryIndex >= 0 ? rightPath.substring(rightQueryIndex) : "";
+
+  const leftParts = leftPathPortion ? leftPathPortion.split("/").slice(1) : [];
+  const rightParts = rightPathPortion ? rightPathPortion.split("/").slice(1) : [];
 
   for (let i = 0; i < Math.max(leftParts.length, rightParts.length); i++) {
     // Have we exhausted the path parts of one of them?
@@ -137,8 +146,8 @@ function compareUrl(leftPath: string, rightPath: string) {
     }
   }
 
-  // Must be the same
-  return 0;
+  // Path portions are the same, compare query strings
+  return defaultCompare(leftQuery, rightQuery);
 }
 
 function resolveSchema(schema: JsonSchemaType, reader: JsonSchemaReader): ResolvedJsonSchemaType {

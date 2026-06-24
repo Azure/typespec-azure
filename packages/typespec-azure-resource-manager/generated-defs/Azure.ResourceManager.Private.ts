@@ -191,6 +191,23 @@ export type ArmBodyRootDecorator = (
 ) => DecoratorValidatorCallbacks | void;
 
 /**
+ * Controls visibility of a base type property based on whether the property is present
+ * and whether the deployment model is Appliance or Platform.
+ *
+ * If `isPresent` is false, the property is made invisible (removed from all lifecycle visibility).
+ * If `isAppliance` is true, the property is made read-only.
+ *
+ * @param isPresent Whether this property is present in the current template instantiation.
+ * @param isAppliance Whether the current deployment model is Appliance (true) or Platform (false).
+ */
+export type BaseTypeOptionalDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  isPresent: boolean,
+  isAppliance: boolean,
+) => DecoratorValidatorCallbacks | void;
+
+/**
  * designates a type as a legacy type and emits a warning diagnostic when used
  */
 export type LegacyTypeDecorator = (
@@ -319,6 +336,21 @@ export type ValidateCommonTypesVersionForResourceDecorator = (
   resourceName: string,
 ) => DecoratorValidatorCallbacks | void;
 
+/**
+ * This decorator is used to identify a generic Azure Resource Manager resource type
+ * that does not require name, key, or segment properties on the model itself.
+ * The resource type and path information comes from the operations (e.g. RoutedOperations).
+ *
+ * It is *not* meant to be used directly by a spec author, it instead
+ * gets implicitly applied when the spec author defines a model type in this form:
+ *
+ * `model MyResource is GenericResource;`
+ */
+export type GenericResourceInternalDecorator = (
+  context: DecoratorContext,
+  target: Model,
+) => DecoratorValidatorCallbacks | void;
+
 export type AzureResourceManagerPrivateDecorators = {
   resourceParameterBaseFor: ResourceParameterBaseForDecorator;
   resourceBaseParametersOf: ResourceBaseParametersOfDecorator;
@@ -334,6 +366,7 @@ export type AzureResourceManagerPrivateDecorators = {
   armRenameListByOperation: ArmRenameListByOperationDecorator;
   armResourcePropertiesOptionality: ArmResourcePropertiesOptionalityDecorator;
   armBodyRoot: ArmBodyRootDecorator;
+  baseTypeOptional: BaseTypeOptionalDecorator;
   legacyType: LegacyTypeDecorator;
   resourceParentType: ResourceParentTypeDecorator;
   legacyResourceOperation: LegacyResourceOperationDecorator;
@@ -341,4 +374,5 @@ export type AzureResourceManagerPrivateDecorators = {
   builtInResourceOperation: BuiltInResourceOperationDecorator;
   legacyExtensionResourceOperation: LegacyExtensionResourceOperationDecorator;
   validateCommonTypesVersionForResource: ValidateCommonTypesVersionForResourceDecorator;
+  genericResourceInternal: GenericResourceInternalDecorator;
 };

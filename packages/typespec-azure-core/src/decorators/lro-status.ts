@@ -66,8 +66,8 @@ export const $lroStatus: LroStatusDecorator = (
  */
 export function findLroStatusProperty(program: Program, target: Model): ModelProperty | undefined {
   function getProvisioningState(props: Map<string, ModelProperty>): ModelProperty | undefined {
-    let innerProps: Map<string, ModelProperty> | undefined = undefined;
-    let result: ModelProperty | undefined = undefined;
+    let innerProps: Map<string, ModelProperty> | undefined;
+    let result: ModelProperty | undefined;
     const innerProperty = props.get("properties");
     result = props.get("provisioningState");
     if (

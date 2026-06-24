@@ -31,7 +31,7 @@ export const responseSchemaMultiStatusCodeRule = createRule({
           if (body === undefined) continue;
           const bodyType = body.type;
 
-          let currResponse: Type | undefined = undefined;
+          let currResponse: Type | undefined;
           switch (bodyType.kind) {
             case "Model":
               const effModel = metadataInfo.getEffectivePayloadType(bodyType, Visibility.Read);

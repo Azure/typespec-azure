@@ -78,7 +78,6 @@ describe("@convenientAPI on interface", () => {
       @service
       namespace MyService {
         @convenientAPI(false)
-        @operationGroup
         interface MyOperations {
           @route("/test1")
           op ${t.op("test1")}(): void;
@@ -99,7 +98,6 @@ describe("@convenientAPI on interface", () => {
       @service
       namespace MyService {
         @convenientAPI(false)
-        @operationGroup
         interface MyOperations {
           @convenientAPI(true)
           @route("/test1")

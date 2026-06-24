@@ -27,13 +27,13 @@ using Spector;
 namespace Client.Structure.ClientOperationGroup {
   op one is Client.Structure.Service.one;
 
-  @operationGroup
+  @client
   interface Group3 {
     two is Client.Structure.Service.two;
     three is Client.Structure.Service.Foo.three;
   }
 
-  @operationGroup
+  @client
   interface Group4 {
     four is Client.Structure.Service.Foo.four;
   }
@@ -63,13 +63,12 @@ namespace Client.Structure.ClientOperationGroup {
     name: "SecondClient",
     service: Client.Structure.Service,
   },
-  "javascript,go,python,rust"
+  "!csharp,!java"
 )
 namespace Client.Structure.AnotherClientOperationGroup {
   op five is Client.Structure.Service.Bar.five;
 
-  #suppress "@azure-tools/typespec-client-generator-core/client-service" "issue https://github.com/Azure/typespec-azure/issues/1326"
-  @operationGroup
+  @client
   interface Group5 {
     six is Client.Structure.Service.Bar.six;
   }

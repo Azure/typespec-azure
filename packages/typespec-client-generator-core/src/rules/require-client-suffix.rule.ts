@@ -21,7 +21,7 @@ export const requireClientSuffixRule = createRule({
     return {
       namespace: (namespace: Namespace) => {
         const sdkClient = getClient(tcgcContext, namespace);
-        if (sdkClient && !sdkClient.name.endsWith("Client")) {
+        if (sdkClient && sdkClient.parent === undefined && !sdkClient.name.endsWith("Client")) {
           context.reportDiagnostic({
             target: namespace,
             format: {
@@ -32,7 +32,7 @@ export const requireClientSuffixRule = createRule({
       },
       interface: (interfaceType: Interface) => {
         const sdkClient = getClient(tcgcContext, interfaceType);
-        if (sdkClient && !sdkClient.name.endsWith("Client")) {
+        if (sdkClient && sdkClient.parent === undefined && !sdkClient.name.endsWith("Client")) {
           context.reportDiagnostic({
             target: interfaceType,
             format: {

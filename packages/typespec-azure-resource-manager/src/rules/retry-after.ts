@@ -11,6 +11,7 @@ export const retryAfterRule = createRule({
   name: "retry-after",
   severity: "warning",
   description: "Check if retry-after header appears in response body.",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/retry-after",
   messages: {
     default: `For long-running operations, the Retry-After header indicates how long the client should wait before polling the operation status, please add this header to the 201 or 202 response for this operation.`,
   },

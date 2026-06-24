@@ -1,11 +1,25 @@
 import { getCollection } from "astro:content";
+import { getSampleStructure, renderSampleAsMarkdown } from "src/utils/samples";
 
 export { markdownRoute as GET } from "@typespec/astro-utils/llmstxt";
 
 export async function getStaticPaths() {
   const docs = await getCollection("docs");
 
-  return docs
+  const { samples } = await getSampleStructure();
+  const sampleDocs = samples
+    .filter((sample) => sample.llmstxt)
+    .map((sample) => ({
+      id: `docs/samples/${sample.id}`,
+      data: {
+        title: sample.title,
+        description: sample.description,
+        llmstxt: true,
+      },
+      body: renderSampleAsMarkdown(sample),
+    }));
+
+  return [...docs, ...sampleDocs]
     .filter((doc) => {
       // Exclude release notes
       if (doc.id.includes("/release-notes/")) return false;

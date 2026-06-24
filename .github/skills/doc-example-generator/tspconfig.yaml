@@ -1,0 +1,23 @@
+emit:
+  - "@azure-tools/typespec-python"
+  - "@azure-tools/typespec-java"
+  - "@azure-typespec/http-client-csharp"
+  - "@azure-tools/typespec-ts"
+  - "@azure-tools/typespec-go"
+options:
+  "@azure-tools/typespec-python":
+    flavor: azure
+    generate-test: false
+    generate-sample: false
+  "@azure-tools/typespec-java":
+    flavor: azure
+    generate-tests: false
+    generate-samples: false
+  "@azure-tools/typespec-ts":
+    flavor: azure
+    azure-sdk-for-js: false # Required for standalone generation outside azure-sdk-for-js repo
+    generate-test: false
+    generate-sample: false
+  "@azure-tools/typespec-go":
+    module: "example" # Required: Go emitter needs a module name
+    generate-samples: false

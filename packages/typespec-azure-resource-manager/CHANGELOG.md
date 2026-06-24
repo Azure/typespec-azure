@@ -1,5 +1,119 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.69.1
+
+### Bug Fixes
+
+- [#4621](https://github.com/Azure/typespec-azure/pull/4621) Adding Azure Resource Manager Base Types, including the Agent base type.
+  
+  Base types provide structured constraints for resources including required and optional
+  properties in their RP-specific property bags. The `@azureBaseType` decorator attaches
+  base type metadata to resource models for validation.
+  
+  Example of creating an Agent resource:
+  
+  ```typespec
+  using Azure.ResourceManager;
+  using Azure.ResourceManager.BaseTypes;
+  using Azure.ResourceManager.BaseTypes.Agents;
+  
+  model MyDefinition is AgentDefinitionPlatform<true, true> {}
+  
+  model MyAgentProperties is AgentPropertiesPlatform<MyDefinition> {
+    ...DefaultProvisioningStateProperty;
+  }
+  
+  model MyAgent is Agent<MyAgentProperties> {
+    ...ResourceNameParameter<MyAgent>;
+  }
+  
+  model MyConversationProperties is ConversationProperties {
+    ...DefaultProvisioningStateProperty;
+  }
+  
+  model MyConversation is AgentConversation<MyConversationProperties, MyAgent> {
+    ...ResourceNameParameter<MyConversation>;
+  }
+  
+  model MyResponseProperties is ResponseProperties {
+    ...DefaultProvisioningStateProperty;
+  }
+  
+  model MyResponse is AgentResponse<MyResponseProperties, MyAgent> {
+    ...ResourceNameParameter<MyResponse>;
+  }
+  ```
+
+
+## 0.69.0
+
+### Features
+
+- [#4384](https://github.com/Azure/typespec-azure/pull/4384) Add new linting rule `no-override-props` that warns when a model redefines a property that is already defined in one of its base models. The 'name' property of an ARM resource and properties redefined as part of a model marked with `@discriminator` are not flagged by this rule.
+- [#4530](https://github.com/Azure/typespec-azure/pull/4530) Add optional `Tag` template parameter to `Azure.ResourceManager.Legacy.Operations` to allow overriding the openapi tag value.
+
+### Bug Fixes
+
+- [#4433](https://github.com/Azure/typespec-azure/pull/4433) Fix doc comment typos in ARM library: list operations incorrectly said "patched", CreateOrReplace operations said "createOrUpdate", extension operations had `>` instead of `.`, and @doc tag had malformed string interpolation.
+
+
+## 0.68.0
+
+### Features
+
+- [#4185](https://github.com/Azure/typespec-azure/pull/4185) Add `ArmListBySubscriptionScope` operation template for listing resources at the subscription scope with a flat path, useful for child resources that need a subscription-level list operation without parent path segments.
+- [#4347](https://github.com/Azure/typespec-azure/pull/4347) Add new `version-progression` linter rule that validates ARM service versions all use unique dates and are declared in strictly increasing chronological order. Two api-versions sharing the same `YYYY-MM-DD` date (for example, `2026-04-28` and `2026-04-28-preview`) are not allowed.
+- [#4379](https://github.com/Azure/typespec-azure/pull/4379) Add new linter rule `arm-no-path-casing-conflicts` that flags ARM operation paths which differ only by character casing. The rule is enabled in the `@azure-tools/typespec-azure-rulesets` resource-manager ruleset.
+
+### Bug Fixes
+
+- [#4322](https://github.com/Azure/typespec-azure/pull/4322) Fix `@armProviderNamespace` to inject the canonical absolute ARM scope `https://management.azure.com/.default` as the default OAuth2 scope instead of the bare relative `user_impersonation` value. For backwards compatibility with existing ARM Swagger, the `@azure-tools/typespec-autorest` emitter now rewrites this scope back to `user_impersonation` when emitting OpenAPI v2 for namespaces decorated with `@armProviderNamespace`.
+- [#4369](https://github.com/Azure/typespec-azure/pull/4369) Fix doc comment typos and errors in ARM foundations library.
+- [#4357](https://github.com/Azure/typespec-azure/pull/4357) Fix `AzureEntityResource` emitting `TrackedResource` reference in OpenAPI. It now correctly references the `AzureEntityResource` definition in the ARM common-types schema.
+
+
+## 0.67.1
+
+### Bug Fixes
+
+- [#4252](https://github.com/Azure/typespec-azure/pull/4252) Remove the type constraint on the `Properties` parameter in `Azure.ResourceManager.Legacy.GenericResource`, allowing `unknown` and `Record<unknown>` as property types.
+
+
+## 0.67.0
+
+### Deprecations
+
+- [#4132](https://github.com/Azure/typespec-azure/pull/4132) Updated `@locationResource` documentation to mark it as deprecated and recommend using `@parentResource(ArmLocationResource<...>)` instead.
+
+### Features
+
+- [#4188](https://github.com/Azure/typespec-azure/pull/4188) Add GenericResource template in Azure.ResourceManager.Legacy with new "Generic" resource kind
+- [#4004](https://github.com/Azure/typespec-azure/pull/4004) Add new templates to support operationStatus endpoints
+- [#4184](https://github.com/Azure/typespec-azure/pull/4184) Support singleton resources in `resolveArmResources`
+
+### Bug Fixes
+
+- [#4005](https://github.com/Azure/typespec-azure/pull/4005) Fix `resolveArmResources` returning duplicate resources for versioned specs.
+- [#4072](https://github.com/Azure/typespec-azure/pull/4072) Fix `resolveArmResources` incorrectly merging cross-scope `LegacyOperations` into a single resource. Operations at different scopes (e.g., subscription vs tenant) with the same model but no explicit resource name are now resolved as separate resources.
+- [#4183](https://github.com/Azure/typespec-azure/pull/4183) Fix default resource name for extension resources using `Extension.ScopeParameter` scope. Previously the name was incorrectly prefixed with "ScopeParameter", now it uses just the extension resource name.
+
+
+## 0.66.1
+
+### Bug Fixes
+
+- [#4131](https://github.com/Azure/typespec-azure/pull/4131) Add `CustomAzureProxyResource` template to `Azure.ResourceManager.Legacy` namespace for custom proxy resources that extend `Foundations.ProxyResource`.
+- [#4116](https://github.com/Azure/typespec-azure/pull/4116) Allow `unknown` type for Request and Response parameters in `ArmProviderActionSync` and `ArmProviderActionAsync` templates
+- [#4130](https://github.com/Azure/typespec-azure/pull/4130) Add settable provider to standard templates
+
+
+## 0.66.0
+
+### Bump dependencies
+
+- [#3986](https://github.com/Azure/typespec-azure/pull/3986) Upgrade dependencies
+
+
 ## 0.65.0
 
 ### Features

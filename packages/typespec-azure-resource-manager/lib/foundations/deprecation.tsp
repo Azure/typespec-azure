@@ -9,7 +9,7 @@ alias TrackedResourceBase = TrackedResource;
 #deprecated "Please use Foundations.ProxyResource instead of Foundations.ProxyResourceBase"
 alias ProxyResourceBase = ProxyResource;
 
-#deprecated "Please use Foundations.ProxyResource instead of Foundations.ExtensionResourceBase"
+#deprecated "Please use Foundations.ExtensionResource instead of Foundations.ExtensionResourceBase"
 alias ExtensionResourceBase = ExtensionResource;
 
 #deprecated "Please use Foundations.Sku instead of Foundations.ResourceSkuType"
@@ -25,6 +25,6 @@ alias ManagedIdentityProperties = ManagedServiceIdentity;
 #deprecated "Please change ManagedSystemIdentityProperties to SystemAssignedServiceIdentity."
 alias ManagedSystemIdentityProperties = SystemAssignedServiceIdentity;
 
-/** Alias of ManagedServiceIdentityType for back compatability. Please change to ManagedServiceIdentityType. */
+/** Alias of ManagedServiceIdentityType for back compatibility. Please change to ManagedServiceIdentityType. */
 #deprecated "Please change to ManagedServiceIdentityType."
 alias ManagedIdentityType = ManagedServiceIdentityType;

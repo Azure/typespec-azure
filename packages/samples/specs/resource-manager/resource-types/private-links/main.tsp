@@ -18,6 +18,7 @@ namespace Microsoft.ContosoProviderHub;
 enum Versions {
   /** 2021-10-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  @previewVersion
   `2021-10-01-preview`,
 }
 

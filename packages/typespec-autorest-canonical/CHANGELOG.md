@@ -1,5 +1,12 @@
 # Changelog - @azure-tools/typespec-autorest-canonical
 
+## 0.26.1
+
+### Bump dependencies
+
+- [#3986](https://github.com/Azure/typespec-azure/pull/3986) Upgrade dependencies
+
+
 ## 0.26.0
 
 ### Deprecations

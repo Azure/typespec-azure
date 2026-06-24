@@ -17,6 +17,7 @@ export const armResourceOperationsRule = createRule({
   name: "arm-resource-operation-response",
   severity: "warning",
   description: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-operation-response",
   messages: {
     default: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
   },

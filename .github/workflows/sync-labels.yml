@@ -8,8 +8,7 @@ on:
       - "main"
     paths:
       - "package.json"
-      - "eng/common/config/"
-      - "eng/common/labels/"
+      - "eng/config/labels.ts"
       - ".github/workflows/sync-labels.yml"
 
   workflow_dispatch: {}
@@ -21,7 +20,7 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: recursive
       - uses: ./.github/actions/setup

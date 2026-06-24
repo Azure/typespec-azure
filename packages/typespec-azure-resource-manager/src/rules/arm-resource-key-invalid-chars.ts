@@ -6,6 +6,7 @@ export const armResourceKeyInvalidCharsRule = createRule({
   name: "arm-resource-key-invalid-chars",
   severity: "warning",
   description: "Arm resource key must contain only alphanumeric characters.",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-key-invalid-chars",
   messages: {
     default: paramMessage`'${"key"}' is an invalid path parameter name. Parameters must consist of alphanumeric characters starting with a lower case letter.`,
   },

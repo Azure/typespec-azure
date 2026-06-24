@@ -10,6 +10,7 @@ export const operationsInterfaceMissingRule = createRule({
   name: "missing-operations-endpoint",
   severity: "warning",
   description: "Check for missing Operations interface.",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/missing-operations-endpoint",
   messages: {
     default: paramMessage`Arm namespace ${"namespace"} is missing the Operations interface. Add "interface Operations extends Azure.ResourceManager.Operations {}".`,
   },

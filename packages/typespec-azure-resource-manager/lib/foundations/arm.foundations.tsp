@@ -140,29 +140,37 @@ alias TenantParentScope<Resource extends Foundations.SimpleResource> = TenantSco
  * Parameter model for listing a resource at the tenant scope
  * @template Resource The type of the resource.
  */
-model TenantScope<Resource extends Foundations.SimpleResource>
-  is ResourceParentParameters<Resource, TenantBaseParameters>;
+model TenantScope<Resource extends Foundations.SimpleResource> is ResourceParentParameters<
+  Resource,
+  TenantBaseParameters
+>;
 
 /**
  * Parameter model for listing a resource at the subscription scope
  * @template Resource The type of the resource.
  */
-model SubscriptionScope<Resource extends Foundations.SimpleResource>
-  is ResourceParentParameters<Resource, SubscriptionBaseParameters>;
+model SubscriptionScope<Resource extends Foundations.SimpleResource> is ResourceParentParameters<
+  Resource,
+  SubscriptionBaseParameters
+>;
 
 /**
  * Parameter model for listing a resource at the location scope
  * @template Resource The type of the resource.
  */
-model LocationScope<Resource extends Foundations.SimpleResource>
-  is ResourceParentParameters<Resource, LocationBaseParameters>;
+model LocationScope<Resource extends Foundations.SimpleResource> is ResourceParentParameters<
+  Resource,
+  LocationBaseParameters
+>;
 
 /**
  * Parameter model for listing an extension resource
  * @template Resource The type of the resource.
  */
-model ExtensionScope<Resource extends Foundations.SimpleResource>
-  is ResourceParentParameters<Resource, ExtensionBaseParameters>;
+model ExtensionScope<Resource extends Foundations.SimpleResource> is ResourceParentParameters<
+  Resource,
+  ExtensionBaseParameters
+>;
 
 /**
  * Parameter model for listing a resource at the resource group scope
@@ -261,10 +269,9 @@ op ArmCreateOperation<
   BodyParameter extends {},
   Response extends {},
   ErrorResponse extends {}
->(
-  ...HttpParameters,
-  @doc("Resource create parameters.") @bodyRoot resource: BodyParameter,
-): Response | ErrorResponse;
+>(...HttpParameters, @doc("Resource create parameters.") @bodyRoot resource: BodyParameter):
+  | Response
+  | ErrorResponse;
 
 /**
  * @dev The base template for Azure Resource Manager PATCH Operations.
@@ -272,7 +279,6 @@ op ArmCreateOperation<
  * @template BodyParameter The body parameter
  * @template Response The response or union of responses for success.
  * @template ErrorResponse The error response.
- * @template RequestBody Optional. ENables changing the name, documentation, or optionality of the request body parameter
  */
 op ArmUpdateOperation<
   HttpParameters extends {},

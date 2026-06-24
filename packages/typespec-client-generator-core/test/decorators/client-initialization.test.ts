@@ -136,13 +136,13 @@ it("client accessor", async () => {
       @clientInitialization({parameters: clientInitModel})
       interface bumpParameter {
           @route("/op1")
-          @doc("bump parameter")
+          
           @post
           @convenientAPI(true)
           op op1(@path p1: string, @query q1: string): void;
 
           @route("/op2")
-          @doc("bump parameter")
+          
           @post
           @convenientAPI(true)
           op op2(@path p1: string): void;
@@ -413,13 +413,12 @@ it("multiple client params", async () => {
   strictEqual(containerNameOpParam.correspondingMethodParams[0], containerName);
 });
 
-it("@operationGroup with same model on parent client", async () => {
+it("Sub client with same model on parent client", async () => {
   const { program } = await SimpleTester.compile(
     `
       @service
       namespace MyService;
 
-      @operationGroup
       interface MyInterface {
         op download(@path blobName: string, @path containerName: string): void;
       }
@@ -516,7 +515,6 @@ it("redefine client structure", async () => {
       namespace ContainerClient {
         op upload is MyService.uploadContainer;
 
-
         model BlobClientInitialization {
           containerName: string;
           blobName: string;
@@ -535,7 +533,7 @@ it("redefine client structure", async () => {
   );
   const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
-  strictEqual(sdkPackage.clients.length, 2);
+  strictEqual(sdkPackage.clients.length, 1);
 
   const containerClient = sdkPackage.clients.find((x) => x.name === "ContainerClient");
   ok(containerClient);
@@ -568,9 +566,9 @@ it("redefine client structure", async () => {
   strictEqual(methods[0].operation.parameters.length, 1);
   strictEqual(methods[0].operation.parameters[0].correspondingMethodParams[0], containerName);
 
-  const blobClient = sdkPackage.clients.find((x) => x.name === "BlobClient");
+  const blobClient = containerClient.children?.find((x) => x.name === "BlobClient");
   ok(blobClient);
-  strictEqual(blobClient.clientInitialization.initializedBy, InitializedByFlags.Individually);
+  strictEqual(blobClient.clientInitialization.initializedBy, InitializedByFlags.Default);
   strictEqual(blobClient.clientInitialization.parameters.length, 3);
 
   const endpointOnBlobClient = blobClient.clientInitialization.parameters.find(
@@ -694,13 +692,13 @@ it("sub client initialized individually", async () => {
     @clientInitialization({parameters: clientInitModel, initializedBy: InitializedBy.individually | InitializedBy.parent})
     interface bumpParameter {
         @route("/op1")
-        @doc("bump parameter")
+        
         @post
         @convenientAPI(true)
         op op1(@path p1: string, @query q1: string): void;
 
         @route("/op2")
-        @doc("bump parameter")
+        
         @post
         @convenientAPI(true)
         op op2(@path p1: string): void;

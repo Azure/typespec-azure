@@ -17,6 +17,7 @@ namespace Microsoft.OperationStatusSample;
 
 enum Versions {
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  @previewVersion
   `2022-11-01-preview`,
 }
 
@@ -136,6 +137,7 @@ interface ProviderOperations {
   >;
 
   /** Operation to generate an extension resource based POST action */
+  #suppress "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch" "Extension scopes legitimately use different parameter names"
   @post
   @list
   @action("append")

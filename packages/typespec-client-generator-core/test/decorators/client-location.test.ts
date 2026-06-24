@@ -12,56 +12,6 @@ import {
 } from "../tester.js";
 
 describe("Operation", () => {
-  it("@clientLocation along with @client", async () => {
-    const [, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
-      createClientCustomizationInput(
-        `
-    @service
-    namespace MyService;
-
-    op test(): string;
-    `,
-        `
-    @client({service: MyService})
-    namespace MyServiceClient;
-
-    @clientLocation("Inner")
-    op test is MyService.test;
-    `,
-      ),
-    );
-
-    expectDiagnostics(diagnostics, {
-      code: "@azure-tools/typespec-client-generator-core/client-location-conflict",
-    });
-  });
-
-  it("@clientLocation along with @operationGroup", async () => {
-    const [, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
-      createClientCustomizationInput(
-        `
-      @service
-      namespace MyService;
-
-      op test(): string;
-      `,
-        `
-      namespace Customization;
-
-      @operationGroup
-      interface MyOperationGroup {
-        @clientLocation("Inner")
-        op test is MyService.test;
-      }
-      `,
-      ),
-    );
-
-    expectDiagnostics(diagnostics, {
-      code: "@azure-tools/typespec-client-generator-core/client-location-conflict",
-    });
-  });
-
   it("@clientLocation client-location-wrong-type", async () => {
     const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
       `
@@ -127,7 +77,7 @@ describe("Operation", () => {
     strictEqual(bClient.methods[1].name, "b");
   });
 
-  it("move an operation to another operation group", async () => {
+  it("move an operation to another sub client", async () => {
     const { program } = await SimpleTesterWithService.compile(
       `
     interface A {
@@ -162,7 +112,7 @@ describe("Operation", () => {
     strictEqual(bClient.methods[1].name, "a2");
   });
 
-  it("move an operation to another operation group and omit the original operation group", async () => {
+  it("move an operation to another sub client and omit the original sub client", async () => {
     const { program } = await SimpleTesterWithService.compile(
       `
     interface A {
@@ -219,7 +169,7 @@ describe("Operation", () => {
     strictEqual(bClient.methods[0].name, "a2");
   });
 
-  it("move an operation to a new operation group and omit the original operation group", async () => {
+  it("move an operation to a new sub client and omit the original sub client", async () => {
     const { program } = await SimpleTesterWithService.compile(
       `
     interface A {
@@ -268,7 +218,7 @@ describe("Operation", () => {
     strictEqual(rootClient.methods[0].name, "a2");
   });
 
-  it("move an operation to root client and omit the original operation group", async () => {
+  it("move an operation to root client and omit the original sub client", async () => {
     const { program } = await SimpleTesterWithService.compile(
       `
     interface A {
@@ -288,7 +238,7 @@ describe("Operation", () => {
     strictEqual(rootClient.methods[0].name, "a");
   });
 
-  it("move an operation to another operation group with api version", async () => {
+  it("move an operation to another sub client with api version", async () => {
     const { program } = await SimpleTester.compile(
       `
     @service
@@ -587,9 +537,7 @@ describe("Parameter", () => {
     @armCommonTypesVersion(CommonTypes.Versions.v5)
     namespace My.Service;
 
-    /** Api versions */
     enum Versions {
-      /** 2024-04-01-preview api version */
           V2024_04_01_PREVIEW: "2024-04-01-preview",
     }
 
@@ -643,9 +591,7 @@ describe("Parameter", () => {
     @armCommonTypesVersion(CommonTypes.Versions.v5)
     namespace My.Service;
 
-    /** Api versions */
     enum Versions {
-      /** 2024-04-01-preview api version */
           V2024_04_01_PREVIEW: "2024-04-01-preview",
     }
 
@@ -851,19 +797,15 @@ describe("Parameter", () => {
         @versioned(Versions)
         namespace Microsoft.ContosoProviderHub;
 
-        /** Contoso API versions */
         enum Versions {
-          /** 2021-10-01-preview version */
           @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
           "2021-10-01-preview",
         }
 
-        /** A ContosoProviderHub resource */
         model Employee is TrackedResource<EmployeeProperties> {
           ...ResourceNameParameter<Employee>;
         }
 
-        /** Employee properties */
         model EmployeeProperties {
           prop: string;
         }
@@ -919,7 +861,82 @@ describe("Parameter", () => {
     strictEqual(subIdParam.methodParameterSegments[0][0], subIdMethodParam);
   });
 
-  it("subscriptionId on client when clientLocation moves it to method level for some operations in nested operation groups", async () => {
+  it("with @override for listByResourceGroup when subscriptionId also exists on client", async () => {
+    const { program } = await ArmTester.compile(
+      `
+        @armProviderNamespace
+        @service(#{ title: "ContosoProviderHubClient" })
+        @versioned(Versions)
+        namespace Microsoft.ContosoProviderHub;
+
+        enum Versions {
+          @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+          "2021-10-01-preview",
+        }
+
+        model Employee is TrackedResource<EmployeeProperties> {
+          ...ResourceNameParameter<Employee>;
+        }
+
+        model EmployeeProperties {
+          prop: string;
+        }
+
+        @armResourceOperations
+        interface Employees {
+          get is ArmResourceRead<Employee>;
+          createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+          delete is ArmResourceDeleteWithoutOkAsync<Employee>;
+          listByResourceGroup is ArmResourceListByParent<Employee>;
+        }
+
+        op listByResourceGroupOverride(
+          ...ApiVersionParameter,
+
+          #suppress "@azure-tools/typespec-azure-core/documentation-required" "customization"
+          @clientLocation(listByResourceGroupOverride)
+          subscriptionId: Azure.Core.uuid,
+
+          ...ResourceGroupParameter,
+          ...Azure.ResourceManager.ProviderNamespace<Employee>,
+        ): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.ResourceListResult<Employee>>;
+
+        @@override(Employees.listByResourceGroup, listByResourceGroupOverride);
+      `,
+    );
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
+    const client = sdkPackage.clients[0];
+    ok(client);
+
+    // subscriptionId should still be on the client (for get, createOrUpdate, delete)
+    ok(client.clientInitialization.parameters.find((p) => p.name === "subscriptionId"));
+
+    const employeesClient = client.children?.[0];
+    ok(employeesClient);
+
+    const listMethod = employeesClient.methods?.find(
+      (m) => m.name === "listByResourceGroup",
+    ) as SdkServiceMethod<SdkHttpOperation>;
+    ok(listMethod);
+
+    // subscriptionId should be a method parameter for listByResourceGroup
+    const subIdMethodParam = listMethod.parameters.find((p) => p.name === "subscriptionId");
+    ok(subIdMethodParam);
+    strictEqual(subIdMethodParam.onClient, false);
+
+    const operation = listMethod.operation;
+    ok(operation);
+
+    const subIdParam = operation.parameters.find((p) => p.name === "subscriptionId");
+    ok(subIdParam);
+
+    // methodParameterSegments should point to the method-level subscriptionId, not the client-level one
+    strictEqual(subIdParam.methodParameterSegments.length, 1);
+    strictEqual(subIdParam.methodParameterSegments[0][0], subIdMethodParam);
+  });
+
+  it("subscriptionId on client when clientLocation moves it to method level for some operations in nested sub clients", async () => {
     const { program } = await ArmTester.compile(
       `
       @armProviderNamespace("Microsoft.Contoso")
@@ -929,21 +946,16 @@ describe("Parameter", () => {
       @versioned(Microsoft.Contoso.Versions)
       namespace Microsoft.Contoso;
 
-      /** The available API versions. */
       enum Versions {
-        /** 2021-10-01-preview version */
         @armCommonTypesVersion(CommonTypes.Versions.v5)
         v2021_10_01_preview: "2021-10-01-preview",
       }
 
-      /** Employee resource */
       model Employee is TrackedResource<EmployeeProperties> {
         ...ResourceNameParameter<Employee>;
       }
 
-      /** Employee properties */
       model EmployeeProperties {
-        /** Age of employee */
         age?: int32;
       }
 
@@ -976,21 +988,21 @@ describe("Parameter", () => {
     );
     ok(subIdClientParam);
 
-    // Check the AnotherLayer operation group
+    // Check the AnotherLayer sub client
     const anotherLayer = client.children?.find((c) => c.name === "AnotherLayer");
     ok(anotherLayer);
 
-    // The operation group should also have subscriptionId in its parameters
+    // The sub client should also have subscriptionId in its parameters
     const subIdNsParam = anotherLayer.clientInitialization.parameters.find(
       (p) => p.name === "subscriptionId",
     );
     ok(subIdNsParam);
 
-    // Check the Employees operation group
+    // Check the Employees sub client
     const employees = anotherLayer.children?.find((c) => c.name === "Employees");
     ok(employees);
 
-    // The operation group should also have subscriptionId in its parameters
+    // The sub client should also have subscriptionId in its parameters
     const subIdOgParam = employees.clientInitialization.parameters.find(
       (p) => p.name === "subscriptionId",
     );
@@ -1016,5 +1028,78 @@ describe("Parameter", () => {
     const getSubIdOpParam = getOperation.parameters.find((p) => p.name === "subscriptionId");
     ok(getSubIdOpParam);
     strictEqual(getSubIdOpParam.methodParameterSegments[0][0], subIdOgParam);
+  });
+
+  it("subscriptionId stays on client for foo but moves to method for bar when using ArmProviderActionSync with shared parameters", async () => {
+    const { program } = await ArmTester.compile(
+      `
+      @armProviderNamespace("My.Service")
+      @service(#{ title: "My.Service" })
+      @versioned(Versions)
+      @armCommonTypesVersion(CommonTypes.Versions.v5)
+      namespace My.Service;
+
+      enum Versions {
+        V2024_04_01_PREVIEW: "2024-04-01-preview",
+      }
+
+      @autoRoute
+      @action("foo")
+      op foo is ArmProviderActionSync<
+        Request = {},
+        Response = {},
+        Scope = SubscriptionActionScope,
+        Parameters = {},
+        OptionalRequestBody = true
+      >;
+
+      @autoRoute
+      @action("bar")
+      op bar is ArmProviderActionSync<
+        Request = {},
+        Response = {},
+        Scope = SubscriptionActionScope,
+        Parameters = {},
+        OptionalRequestBody = true
+      >;
+
+      @@clientLocation(bar::parameters.subscriptionId, bar);
+      `,
+    );
+
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
+    const client = sdkPackage.clients[0];
+    ok(client);
+
+    // The subscriptionId should exist at the client level because 'foo' operation doesn't have
+    // clientLocation specified for subscriptionId, so it should remain on the client
+    const subIdClientParam = client.clientInitialization.parameters.find(
+      (p) => p.name === "subscriptionId",
+    );
+    ok(subIdClientParam);
+
+    // The foo method should NOT have subscriptionId as a method parameter (it's on client)
+    const fooMethod = client.methods.find((m) => m.name === "foo") as
+      | SdkServiceMethod<SdkHttpOperation>
+      | undefined;
+    ok(fooMethod);
+    const fooSubIdMethodParam = fooMethod.parameters.find((p) => p.name === "subscriptionId");
+    ok(!fooSubIdMethodParam);
+
+    // The bar method SHOULD have subscriptionId as a method parameter (moved to method level)
+    const barMethod = client.methods.find((m) => m.name === "bar") as
+      | SdkServiceMethod<SdkHttpOperation>
+      | undefined;
+    ok(barMethod);
+    const barSubIdMethodParam = barMethod.parameters.find((p) => p.name === "subscriptionId");
+    ok(barSubIdMethodParam);
+
+    // The bar operation should reference the method-level subscriptionId
+    const barOperation = barMethod.operation;
+    ok(barOperation);
+    const barSubIdOpParam = barOperation.parameters.find((p) => p.name === "subscriptionId");
+    ok(barSubIdOpParam);
+    strictEqual(barSubIdOpParam.methodParameterSegments[0][0], barSubIdMethodParam);
   });
 });

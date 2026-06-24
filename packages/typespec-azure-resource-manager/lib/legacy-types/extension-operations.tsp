@@ -28,10 +28,9 @@ alias CreateOrUpdateAsync<
   LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = ExtensionResource> &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} = ArmResourceUpdatedResponse<ExtensionResource> | ArmResourceCreatedResponse<
-    ExtensionResource,
-    LroHeaders
-  >,
+  Response extends {} =
+    | ArmResourceUpdatedResponse<ExtensionResource>
+    | ArmResourceCreatedResponse<ExtensionResource, LroHeaders>,
   Error extends {} = ErrorResponse,
   OptionalRequestBody extends valueof boolean = false,
   OverrideResourceName extends valueof string = ""
@@ -77,10 +76,9 @@ op CreateOrReplaceAsync<
   LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = ExtensionResource> &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} = ArmResourceUpdatedResponse<ExtensionResource> | ArmResourceCreatedResponse<
-    ExtensionResource,
-    LroHeaders
-  >,
+  Response extends {} =
+    | ArmResourceUpdatedResponse<ExtensionResource>
+    | ArmResourceCreatedResponse<ExtensionResource, LroHeaders>,
   Error extends {} = ErrorResponse,
   OptionalRequestBody extends valueof boolean = false,
   OverrideResourceName extends valueof string = ""
@@ -120,7 +118,9 @@ op CreateOrReplaceSync<
   ExtensionResource extends Foundations.SimpleResource,
   Request extends {} | void = ExtensionResource,
   Parameters extends {} = {},
-  Response extends {} = ArmResourceUpdatedResponse<ExtensionResource> | ArmResourceCreatedSyncResponse<ExtensionResource>,
+  Response extends {} =
+    | ArmResourceUpdatedResponse<ExtensionResource>
+    | ArmResourceCreatedSyncResponse<ExtensionResource>,
   Error extends {} = ErrorResponse,
   OptionalRequestBody extends valueof boolean = false,
   OverrideResourceName extends valueof string = ""
@@ -162,10 +162,9 @@ op CustomPatchAsync<
   > &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} = ArmResponse<ExtensionResource> | ArmAcceptedLroResponse<
-    "Resource update request accepted.",
-    LroHeaders
-  >,
+  Response extends {} =
+    | ArmResponse<ExtensionResource>
+    | ArmAcceptedLroResponse<"Resource update request accepted.", LroHeaders>,
   Error extends {} = ErrorResponse,
   OptionalRequestBody extends valueof boolean = false,
   OverrideResourceName extends valueof string = ""

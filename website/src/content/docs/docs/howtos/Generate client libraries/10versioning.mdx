@@ -130,7 +130,7 @@ func (client *ServiceClient) StableFunctionality(ctx context.Context, stableMode
 
 ## Multiple api versions
 
-The configuration flag `api-version` allows you to toggle the behavior that our emitters will generate.
+The configuration flag `api-version` allows you to toggle the behavior that our emitters will generate. For single-service packages, it accepts a string value. For multi-service packages, it can also be an object mapping each service namespace's full name to a version string (see [Per-service versioning](#per-service-versioning-multi-service-packages)).
 
 We will get the versioning information from the `Versions` enum that you pass to the `@versioned` decorator from the `@typespec/versioning` library.
 
@@ -464,6 +464,58 @@ func (client *ServiceClient) StableFunctionality(ctx context.Context, stableMode
 
 </ClientTabs>
 
+### Per-service versioning (multi-service packages)
+
+When your spec defines multiple services merged into a single client (using `@client({service: [ServiceA, ServiceB]})`), you can specify a different API version for each service by passing an object instead of a string. The keys are the full namespace names of each service, and the values are the desired version strings.
+
+Services not listed in the object default to their latest version.
+
+```yaml title=tspconfig.yaml
+options:
+  "@azure-tools/typespec-python":
+    api-version:
+      ServiceA: "2024-01-01"
+      ServiceB: "2024-05-01"
+```
+
+For example, given two versioned services:
+
+```typespec
+import "@typespec/versioning";
+import "@typespec/http";
+
+using TypeSpec.Versioning;
+using TypeSpec.Http;
+
+@service
+@versioned(VersionsA)
+namespace ServiceA {
+  enum VersionsA {
+    v2024_01_01: "2024-01-01",
+    v2024_06_01: "2024-06-01",
+  }
+  @route("/aTest")
+  op aTest(@query("api-version") apiVersion: VersionsA): void;
+}
+
+@service
+@versioned(VersionsB)
+namespace ServiceB {
+  enum VersionsB {
+    v2024_05_01: "2024-05-01",
+    v2024_09_01: "2024-09-01",
+  }
+  @route("/bTest")
+  op bTest(@query("api-version") apiVersion: VersionsB): void;
+}
+```
+
+With `api-version: { ServiceA: "2024-01-01", ServiceB: "2024-05-01" }`, the generated client will use version `2024-01-01` for ServiceA operations and `2024-05-01` for ServiceB operations.
+
+With `api-version: { ServiceA: "2024-01-01" }` (ServiceB omitted), ServiceA will use `2024-01-01` while ServiceB will default to its latest version `2024-09-01`.
+
+> NOTE: The special value `"all"` is **not supported** for multi-service packages. If specified (either as a top-level string or as a per-service value), it is ignored and the service falls back to its latest version. The `"latest"` value works as expected and applies to all services.
+
 ### New model/operation added in new api version
 
 You can use `@added` decorator to indicate when a specific Api feature was first introduced.
@@ -534,7 +586,43 @@ def create_user_profile(
 ```
 
 ```csharp
-// TODO
+// The C# emitter generates both operations and a ServiceVersion enum, but does not
+// emit version guards on the newly added operation.
+namespace My.Service
+{
+  public partial class UserInfo
+  {
+    public UserInfo(string username);
+    public string Username { get; }
+  }
+
+  public partial class UserProfile
+  {
+    public UserProfile(string profileName);
+    public string ProfileName { get; }
+  }
+
+  public partial class ServiceClient
+  {
+    public ServiceClient(Uri endpoint);
+    public ServiceClient(Uri endpoint, ServiceClientOptions options);
+    public virtual Response GetUserInfo(UserInfo userInfo, CancellationToken cancellationToken = default);
+    public virtual Task<Response> GetUserInfoAsync(UserInfo userInfo, CancellationToken cancellationToken = default);
+    public virtual Response CreateUserProfile(UserProfile userProfile, CancellationToken cancellationToken = default);
+    public virtual Task<Response> CreateUserProfileAsync(UserProfile userProfile, CancellationToken cancellationToken = default);
+  }
+
+  public partial class ServiceClientOptions : ClientOptions
+  {
+    public ServiceClientOptions(ServiceVersion version = ServiceVersion.V2024_02_01);
+
+    public enum ServiceVersion
+    {
+      V2024_01_01 = 1,
+      V2024_02_01 = 2
+    }
+  }
+}
 ```
 
 ```typescript
@@ -697,7 +785,37 @@ def create_user_profile(
 ```
 
 ```csharp
-// TODO
+// The C# emitter generates the new model and property as plain members; it does not
+// emit version guards or per-version conditional shapes.
+namespace My.Service
+{
+  public partial class UserInfo
+  {
+    public UserInfo(string username);
+    public string Username { get; }
+  }
+
+  public partial class UserProfile
+  {
+    public UserProfile(string profileName, ProfileDetails profileDetails);
+    public string ProfileName { get; }
+    public ProfileDetails ProfileDetails { get; }
+  }
+
+  public partial class ProfileDetails
+  {
+    public ProfileDetails(string detailDescription);
+    public string DetailDescription { get; }
+  }
+
+  public partial class ServiceClient
+  {
+    public ServiceClient(Uri endpoint);
+    public ServiceClient(Uri endpoint, ServiceClientOptions options);
+    public virtual Response GetUserInfo(UserInfo userInfo, CancellationToken cancellationToken = default);
+    public virtual Response CreateUserProfile(UserProfile userProfile, CancellationToken cancellationToken = default);
+  }
+}
 ```
 
 ```typescript
@@ -829,7 +947,9 @@ func (client *ServiceClient) GetUserInfo(ctx context.Context, userInfo UserInfo,
 
 ## Overriding the Client Api Version Parameter
 
-By default, we find api version parameters in specs based off of names. There is special logic we do with api version parameters:
+By default, we find api version parameters in specs based off of names. Name-based detection applies to HTTP metadata parameters (header, query, path, or cookie) and server URL template parameters (declared in `@server`). A parameter named `apiVersion` or `api-version` in these positions will automatically be treated as an API version parameter.
+
+There is special logic we do with api version parameters:
 
 1. These api version parameters get elevated up to the client level (if the service is versioned)
 2. We auto-add api version information to next links when paging
@@ -944,3 +1064,175 @@ func (client *ServiceClient) Get(ctx context.Context, version Versions, options 
 ```
 
 </ClientTabs>
+
+### Keeping an Api Version Parameter on the Operation with `@apiVersion(false)`
+
+In some cases, a service may have an `api-version` query parameter on an operation that should **not** be treated as the client-level API version parameter. For example, when the parameter controls a downstream service version or has a different semantic meaning for a specific operation. You can use `@apiVersion(false)` to explicitly opt a parameter out of API version treatment.
+
+When `@apiVersion(false)` is applied to a parameter:
+
+- That parameter will **not** be treated as an API version parameter
+- It stays as a method-level parameter and is **not** elevated to the client
+- Other operations in the same client can still have their API version parameters elevated to the client normally
+
+<ClientTabs>
+
+```typespec
+import "@typespec/versioning";
+import "@typespec/http";
+import "@azure-tools/typespec-client-generator-core";
+
+using Versioning;
+using Http;
+using Azure.ClientGenerator.Core;
+
+@versioned(My.Service.Versions)
+@service
+namespace My.Service;
+
+enum Versions {
+  v2023_11_01: "2023-11-01",
+  v2024_04_01: "2024-04-01",
+}
+
+// This operation has its api-version elevated to the client as normal
+@route("/resources")
+op listResources(@query("api-version") apiVersion: string): void;
+
+// This operation has an api-version query param that should NOT be treated
+// as the API version. It stays as a method parameter.
+@route("/snapshot")
+op getSnapshot(
+  @apiVersion(false)
+  @query("api-version")
+  apiVersion: string,
+): void;
+```
+
+```python
+class ServiceClient:
+    def __init__(self, endpoint: str, **kwargs: Any) -> None: ...
+
+    def list_resources(self, **kwargs: Any) -> None: ...
+
+    def get_snapshot(self, *, api_version: str, **kwargs: Any) -> None: ...
+```
+
+```csharp
+public partial class ServiceClient
+{
+    public ServiceClient(Uri endpoint);
+    public ServiceClient(Uri endpoint, ServiceClientOptions options);
+
+    public virtual Response GetResources(CancellationToken cancellationToken = default);
+    public virtual Response GetSnapshot(string apiVersion, CancellationToken cancellationToken = default);
+}
+```
+
+```typescript
+export class ServiceClient {
+  constructor(endpoint: string, options?: ServiceClientOptionalParams);
+
+  listResources(options?: ListResourcesOptionalParams): Promise<void>;
+  getSnapshot(apiVersion: string, options?: GetSnapshotOptionalParams): Promise<void>;
+}
+```
+
+```java
+@ServiceClient(builder = ServiceClientClientBuilder.class)
+public final class ServiceClientClient {
+    public void listResources();
+
+    public void getSnapshot(String apiVersion);
+}
+```
+
+```go
+func NewServiceClientWithNoCredential(endpoint string, options *ServiceClientOptions) (*ServiceClient, error)
+
+func (client *ServiceClient) ListResources(ctx context.Context, options *ServiceClientListResourcesOptions) (ServiceClientListResourcesResponse, error)
+
+func (client *ServiceClient) GetSnapshot(ctx context.Context, apiVersion string, options *ServiceClientGetSnapshotOptions) (ServiceClientGetSnapshotResponse, error)
+```
+
+</ClientTabs>
+
+In the generated client, `listResources` will use the client-level API version parameter (defaulting to `"2024-04-01"`), while `getSnapshot` will require `apiVersion` to be passed explicitly as a method parameter.
+
+## Extending the Client API Version Enum (`@clientApiVersions`)
+
+When generating a client, you may want the API version enum to include versions beyond those defined by the service's `@versioned` decorator. This is useful when you want to generate a complete API version enum without requiring the entire specification to be annotated with versioning decorators.
+
+Use `@clientApiVersions` to specify the full set of API versions the client should support:
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/versioning";
+
+using TypeSpec.Versioning;
+
+@versioned(Versions)
+namespace Contoso;
+
+enum Versions {
+  v4,
+  v5,
+}
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+enum ClientApiVersions {
+  v1,
+  v2,
+  v3,
+  ...Contoso.Versions,
+}
+
+@@clientApiVersions(Contoso, ClientApiVersions);
+```
+
+```python
+# The generated client accepts api_version as a keyword argument.
+# The API version defaults to the latest version "v5".
+client = ContosoClient(endpoint="...", api_version="v1")
+```
+
+```csharp
+// The ServiceVersion enum includes all five versions.
+public enum ServiceVersion
+{
+    V1 = 1,
+    V2 = 2,
+    V3 = 3,
+    V4 = 4,
+    V5 = 5,
+}
+```
+
+```typescript
+export enum KnownClientApiVersions {
+  V1 = "v1",
+  V2 = "v2",
+  V3 = "v3",
+  V4 = "v4",
+  V5 = "v5",
+}
+```
+
+```java
+// NOT_SUPPORTED
+```
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabs>
+
+In this example, the generated client will expose API versions `v1` through `v5`, even though the service spec only defines `v4` and `v5`. This is particularly useful for legacy services where adding `@added`/`@removed` annotations to every type and operation is not practical.

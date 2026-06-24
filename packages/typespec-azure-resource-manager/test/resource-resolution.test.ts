@@ -348,8 +348,16 @@ describe("unit tests for resource manager helpers", () => {
   describe("isResourceOperationMatch matches operations over the same resource", () => {
     const cases: {
       title: string;
-      source: { resourceType: ResourceType; resourceInstancePath: string };
-      target: { resourceType: ResourceType; resourceInstancePath: string };
+      source: {
+        resourceType: ResourceType;
+        resourceInstancePath: string;
+        resourceNameIsExplicit?: boolean;
+      };
+      target: {
+        resourceType: ResourceType;
+        resourceInstancePath: string;
+        resourceNameIsExplicit?: boolean;
+      };
     }[] = [
       {
         title: "operations with default and parameterized names",
@@ -408,6 +416,26 @@ describe("unit tests for resource manager helpers", () => {
             "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/default",
         },
       },
+      {
+        title: "operations with different scopes but explicit resource names",
+        source: {
+          resourceType: {
+            provider: "Microsoft.Foo",
+            types: ["bars"],
+          },
+          resourceInstancePath:
+            "/subscriptions/{subscriptionId}/providers/Microsoft.Foo/bars/{barName}",
+          resourceNameIsExplicit: true,
+        },
+        target: {
+          resourceType: {
+            provider: "Microsoft.Foo",
+            types: ["bars"],
+          },
+          resourceInstancePath: "/providers/Microsoft.Foo/bars/{barName}",
+          resourceNameIsExplicit: true,
+        },
+      },
     ];
     for (const { title, source, target } of cases) {
       it(`matches ${title}`, () => {
@@ -419,8 +447,18 @@ describe("unit tests for resource manager helpers", () => {
   describe("isResourceOperationMatch does not match operations over different resources", () => {
     const cases: {
       title: string;
-      source: { resourceType: ResourceType; resourceInstancePath: string; resourceName?: string };
-      target: { resourceType: ResourceType; resourceInstancePath: string; resourceName?: string };
+      source: {
+        resourceType: ResourceType;
+        resourceInstancePath: string;
+        resourceName?: string;
+        resourceNameIsExplicit?: boolean;
+      };
+      target: {
+        resourceType: ResourceType;
+        resourceInstancePath: string;
+        resourceName?: string;
+        resourceNameIsExplicit?: boolean;
+      };
     }[] = [
       {
         title: "operations with different resource types",
@@ -481,6 +519,48 @@ describe("unit tests for resource manager helpers", () => {
           resourceName: "NotBar",
         },
       },
+      {
+        title: "operations with different scopes (subscription vs tenant) and no explicit name",
+        source: {
+          resourceType: {
+            provider: "Microsoft.Foo",
+            types: ["bars"],
+          },
+          resourceInstancePath:
+            "/subscriptions/{subscriptionId}/providers/Microsoft.Foo/bars/{barName}",
+          resourceName: "Bars",
+        },
+        target: {
+          resourceType: {
+            provider: "Microsoft.Foo",
+            types: ["bars"],
+          },
+          resourceInstancePath: "/providers/Microsoft.Foo/bars/{barName}",
+          resourceName: "Bars",
+        },
+      },
+      {
+        title:
+          "operations with different scopes (resource group vs subscription) and no explicit name",
+        source: {
+          resourceType: {
+            provider: "Microsoft.Foo",
+            types: ["bars"],
+          },
+          resourceInstancePath:
+            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Foo/bars/{barName}",
+          resourceName: "Bars",
+        },
+        target: {
+          resourceType: {
+            provider: "Microsoft.Foo",
+            types: ["bars"],
+          },
+          resourceInstancePath:
+            "/subscriptions/{subscriptionId}/providers/Microsoft.Foo/bars/{barName}",
+          resourceName: "Bars",
+        },
+      },
     ];
     for (const { title, source, target } of cases) {
       it(`does not match ${title}`, () => {
@@ -505,8 +585,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 }
 
 model EmployeeProperties {
-  age?: int32;
-
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
@@ -519,7 +597,6 @@ union ProvisioningState {
 
 model MoveRequest {
   from: string;
-
   to: string;
 }
 
@@ -538,9 +615,7 @@ interface Employees {
   delete is ArmResourceDeleteWithoutOkAsync<Employee>;
   listByResourceGroup is ArmResourceListByParent<Employee>;
   listBySubscription is ArmListBySubscription<Employee>;
-
   move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
-
   checkExistence is ArmResourceCheckExistence<Employee>;
 }
 `);
@@ -604,8 +679,6 @@ model Employee is ExtensionResource<EmployeeProperties> {
 }
 
 model EmployeeProperties {
-  age?: int32;
-
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -709,7 +782,8 @@ interface GenericOps
       {
         ...Extension.ExtensionProviderNamespace<Employee>,
         ...KeysOf<Employee>,
-      }
+      },
+      "GenericEmployee"
     > {}
 
 @armResourceOperations
@@ -1032,6 +1106,47 @@ interface GenericResources {
     ]);
   });
 
+  it("uses extension resource name as default for ScopeParameter scope", async () => {
+    const { program } = await Tester.compile(`
+      using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+model WidgetResource
+  is Azure.ResourceManager.ExtensionResource<WidgetResourceProperties> {
+  ...ResourceNameParameter<
+    Resource = WidgetResource,
+    KeyName = "widgetName",
+    SegmentName = "widgets",
+    NamePattern = ""
+  >;
+}
+
+model WidgetResourceProperties {
+  widgetId: string;
+}
+
+@armResourceOperations
+interface WidgetResources {
+  get is Extension.Read<Extension.ScopeParameter, WidgetResource>;
+}
+      `);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    ok(provider.resources);
+    const widget = provider.resources.find(
+      (r) =>
+        r.resourceInstancePath ===
+        "/{scope}/providers/Microsoft.ContosoProviderHub/widgets/{widgetName}",
+    );
+    ok(widget);
+    expect(widget.resourceName).toEqual("WidgetResource");
+  });
+
   it("allows overriding resource name for extension resources", async () => {
     const { program } = await Tester.compile(`
       using Azure.Core;
@@ -1046,8 +1161,6 @@ model Employee is ExtensionResource<EmployeeProperties> {
 }
 
 model EmployeeProperties {
-  age?: int32;
-
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -1088,7 +1201,6 @@ interface Employees extends EmplOps<Extension.ScopeParameter, "EmployeesAtScope"
 interface Tenants extends EmplOps<Extension.Tenant, "EmployeesAtTenant"> {}
 @armResourceOperations
 interface Subscriptions extends EmplOps<Extension.Subscription, "EmployeesAtSubscription"> {}
-
 
 @armResourceOperations
 interface VirtualMachines extends EmplOps<VirtualMachine, "EmployeesAtVirtualMachine"> {}
@@ -1333,8 +1445,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 }
 
 model EmployeeProperties {
-  age?: int32;
-
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -1640,8 +1750,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 }
 
 model EmployeeProperties {
-  age?: int32;
-
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -1821,8 +1929,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 }
 
 model EmployeeProperties {
-  age?: int32;
-
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -2072,8 +2178,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 }
 
 model EmployeeProperties {
-  age?: int32;
-
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -2231,58 +2335,38 @@ model MoveResponse {
 
 using Azure.Core;
 
-/** Contoso Resource Provider management API. */
 @armProviderNamespace
 @service(#{ title: "ContosoProviderHubClient" })
 @versioned(Versions)
 namespace Microsoft.ContosoProviderHub;
 
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   v2021_20_01_preview: "2021-10-01-preview",
 }
 
 // For more information about the proxy vs tracked,
 // see https://armwiki.azurewebsites.net/rp_onboarding/tracked_vs_proxy_resources.html?q=proxy%20resource
-/** A ContosoProviderHub resource */
 model Employee is ProxyResource<EmployeeProperties> {
   ...ResourceNameParameter<Employee>;
 }
 
-/** Employee properties */
 model EmployeeProperties {
-  /** Age of employee */
-  age?: int32;
 
-  /** City of employee */
-  city?: string;
-
-  /** Profile of employee */
-  @encode("base64url")
-  profile?: bytes;
-
-  /** The status of the last operation. */
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
 
-/** The provisioning state of a resource. */
 @lroStatus
 union ProvisioningState {
   ResourceProvisioningState,
 
-  /** The resource is being provisioned */
   Provisioning: "Provisioning",
 
-  /** The resource is updating */
   Updating: "Updating",
 
-  /** The resource is being deleted */
   Deleting: "Deleting",
 
-  /** The resource create request has been accepted */
   Accepted: "Accepted",
 
   string,
@@ -2297,21 +2381,18 @@ alias EmployeeRoomOps = Azure.ResourceManager.Legacy.LegacyOperations<
     ...ResourceGroupParameter;
     ...Azure.ResourceManager.Legacy.Provider;
 
-    /** The name of the API Management service. */
     @path
     @segment("buildings")
     @key
     @pattern("^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$")
     buildingName: string;
 
-    /** API identifier. Must be unique in the current API Management service instance. */
     @path
     @segment("rooms")
     @key
     roomId: string;
   },
   {
-    /** Diagnostic identifier. Must be unique in the current API Management service instance. */
     @path
     @segment("employeeResources")
     @key
@@ -2327,7 +2408,6 @@ alias EmployeeBuildingOps = Azure.ResourceManager.Legacy.LegacyOperations<
     ...ResourceGroupParameter;
     ...Azure.ResourceManager.Legacy.Provider;
 
-    /** The name of the API Management service. */
     @path
     @segment("buildings")
     @key
@@ -2335,7 +2415,6 @@ alias EmployeeBuildingOps = Azure.ResourceManager.Legacy.LegacyOperations<
     buildingName: string;
   },
   {
-    /** Diagnostic identifier. Must be unique in the current API Management service instance. */
     @path
     @segment("employeeResources")
     @key
@@ -2354,7 +2433,6 @@ interface EmployeesByBuilding {
   >;
   delete is EmployeeBuildingOps.DeleteSync<Employee>;
   list is EmployeeBuildingOps.List<Employee>;
-  /** A sample resource action that move employee to different location */
   move is EmployeeBuildingOps.ActionSync<Employee, MoveRequest, MoveResponse>;
 }
 
@@ -2368,22 +2446,16 @@ interface EmployeesByRoom {
   >;
   delete is EmployeeRoomOps.DeleteSync<Employee>;
   list is EmployeeRoomOps.List<Employee>;
-  /** A sample resource action that move employee to different location */
   move is EmployeeRoomOps.ActionSync<Employee, MoveRequest, MoveResponse>;
 }
 
-/** Employee move request */
 model MoveRequest {
-  /** The moving from location */
   from: string;
 
-  /** The moving to location */
   to: string;
 }
 
-/** Employee move response */
 model MoveResponse {
-  /** The status of the move */
   movingStatus: string;
 }
 `);
@@ -2523,58 +2595,38 @@ model MoveResponse {
 
 using Azure.Core;
 
-/** Contoso Resource Provider management API. */
 @armProviderNamespace
 @service(#{ title: "ContosoProviderHubClient" })
 @versioned(Versions)
 namespace Microsoft.ContosoProviderHub;
 
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   v2021_20_01_preview: "2021-10-01-preview",
 }
 
 // For more information about the proxy vs tracked,
 // see https://armwiki.azurewebsites.net/rp_onboarding/tracked_vs_proxy_resources.html?q=proxy%20resource
-/** A ContosoProviderHub resource */
 model Employee is ProxyResource<EmployeeProperties> {
   ...ResourceNameParameter<Employee>;
 }
 
-/** Employee properties */
 model EmployeeProperties {
-  /** Age of employee */
-  age?: int32;
 
-  /** City of employee */
-  city?: string;
-
-  /** Profile of employee */
-  @encode("base64url")
-  profile?: bytes;
-
-  /** The status of the last operation. */
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
 
-/** The provisioning state of a resource. */
 @lroStatus
 union ProvisioningState {
   ResourceProvisioningState,
 
-  /** The resource is being provisioned */
   Provisioning: "Provisioning",
 
-  /** The resource is updating */
   Updating: "Updating",
 
-  /** The resource is being deleted */
   Deleting: "Deleting",
 
-  /** The resource create request has been accepted */
   Accepted: "Accepted",
 
   string,
@@ -2589,7 +2641,6 @@ alias EmployeeBuildingOps = Azure.ResourceManager.Legacy.LegacyOperations<
     ...ResourceGroupParameter;
     ...Azure.ResourceManager.Legacy.Provider;
 
-    /** The name of the API Management service. */
     @path
     @segment("buildings")
     @key
@@ -2597,7 +2648,6 @@ alias EmployeeBuildingOps = Azure.ResourceManager.Legacy.LegacyOperations<
     buildingName: string;
   },
   {
-    /** Diagnostic identifier. Must be unique in the current API Management service instance. */
     @path
     @segment("employeeResources")
     @key
@@ -2617,22 +2667,16 @@ interface EmployeesByBuilding {
   >;
   delete is EmployeeBuildingOps.DeleteSync<Employee>;
   list is EmployeeBuildingOps.List<Employee>;
-  /** A sample resource action that move employee to different location */
   move is EmployeeBuildingOps.ActionSync<Employee, MoveRequest, MoveResponse>;
 }
 
-/** Employee move request */
 model MoveRequest {
-  /** The moving from location */
   from: string;
 
-  /** The moving to location */
   to: string;
 }
 
-/** Employee move response */
 model MoveResponse {
-  /** The status of the move */
   movingStatus: string;
 }
 `);
@@ -2710,58 +2754,38 @@ model MoveResponse {
 
 using Azure.Core;
 
-/** Contoso Resource Provider management API. */
 @armProviderNamespace
 @service(#{ title: "ContosoProviderHubClient" })
 @versioned(Versions)
 namespace Microsoft.ContosoProviderHub;
 
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   v2021_20_01_preview: "2021-10-01-preview",
 }
 
 // For more information about the proxy vs tracked,
 // see https://armwiki.azurewebsites.net/rp_onboarding/tracked_vs_proxy_resources.html?q=proxy%20resource
-/** A ContosoProviderHub resource */
 model Employee is ProxyResource<EmployeeProperties> {
   ...ResourceNameParameter<Employee>;
 }
 
-/** Employee properties */
 model EmployeeProperties {
-  /** Age of employee */
-  age?: int32;
 
-  /** City of employee */
-  city?: string;
-
-  /** Profile of employee */
-  @encode("base64url")
-  profile?: bytes;
-
-  /** The status of the last operation. */
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
 
-/** The provisioning state of a resource. */
 @lroStatus
 union ProvisioningState {
   ResourceProvisioningState,
 
-  /** The resource is being provisioned */
   Provisioning: "Provisioning",
 
-  /** The resource is updating */
   Updating: "Updating",
 
-  /** The resource is being deleted */
   Deleting: "Deleting",
 
-  /** The resource create request has been accepted */
   Accepted: "Accepted",
 
   string,
@@ -2774,7 +2798,6 @@ alias BuildingParams = {
   ...SubscriptionIdParameter;
   ...ResourceGroupParameter;
 
-  /** The name of the API Management service. */
   @path
   @segment("buildings")
   @key
@@ -2783,7 +2806,6 @@ alias BuildingParams = {
 };
 
 alias EmployeeParams = {
-  /** Diagnostic identifier. Must be unique in the current API Management service instance. */
   @path
   @segment("employeeResources")
   @key
@@ -2795,7 +2817,6 @@ alias EmployeeRoomOps = Azure.ResourceManager.Legacy.RoutedOperations<
   {
     ...BuildingParams;
 
-    /** API identifier. Must be unique in the current API Management service instance. */
     @path
     @segment("rooms")
     @key
@@ -2828,14 +2849,13 @@ interface EmployeesByBuilding {
   >;
   delete is EmployeeBuildingOps.DeleteSync<Employee>;
   list is EmployeeBuildingOps.List<Employee>;
-  /** A sample resource action that move employee to different location */
   @route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/employeeResources/{employeeId}/otherResource/thirdResource/{addedId}/move")
   move is EmployeeBuildingOps.ActionSync<
     Employee,
     MoveRequest,
     MoveResponse,
     Parameters = {
-      @doc("an additional parameter")
+      
       @path
       @key
       addedId: string;
@@ -2856,23 +2876,17 @@ interface EmployeesByRoom {
   >;
   delete is EmployeeRoomOps.DeleteSync<Employee>;
   list is EmployeeRoomOps.List<Employee>;
-  /** A sample resource action that move employee to different location */
   @route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/rooms/{roomId}/employeeResources/{employeeId}/roomMove/move")
   move is EmployeeRoomOps.ActionSync<Employee, MoveRequest, MoveResponse>;
 }
 
-/** Employee move request */
 model MoveRequest {
-  /** The moving from location */
   from: string;
 
-  /** The moving to location */
   to: string;
 }
 
-/** Employee move response */
 model MoveResponse {
-  /** The status of the move */
   movingStatus: string;
 }
 
@@ -3014,9 +3028,7 @@ using Azure.Core;
 @versioned(Versions)
 @armProviderNamespace
 namespace Microsoft.ContosoProviderHub;
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   v2025_11_19_preview: "2025-11-19-preview",
 }
@@ -3031,8 +3043,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 }
 
 model EmployeeProperties {
-  age?: int32;
-
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -3308,9 +3318,7 @@ using Azure.Core;
 @versioned(Versions)
 @armProviderNamespace
 namespace Microsoft.ContosoProviderHub;
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   v2025_11_19_preview: "2025-11-19-preview",
 }
@@ -3324,8 +3332,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 }
 
 model EmployeeProperties {
-  age?: int32;
-
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -3512,9 +3518,7 @@ using Azure.Core;
 @versioned(Versions)
 @armProviderNamespace
 namespace Microsoft.ContosoProviderHub;
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   v2025_11_19_preview: "2025-11-19-preview",
 }
@@ -3528,8 +3532,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 }
 
 model EmployeeProperties {
-  age?: int32;
-
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -3569,15 +3571,11 @@ interface Employees {
   checkExistence is ArmResourceCheckExistence<Employee>;
 }
 
-/** A reconcile request for NSP configuration */
 model ReconcileRequest {
-  /** Whether to force the reconcile */
   force: boolean;
 }
 
-/** A reconcile response for NSP configuration */
 model ReconcileResponse {
-  /** The status of the reconcile */
   status: string;
 }
 @armResourceOperations(NetworkSecurityPerimeterConfiguration)
@@ -3791,5 +3789,642 @@ model MoveResponse {
     expect(ResB.resourceInstancePath).toEqual(
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Provider.B/foos/{name}",
     );
+  });
+
+  const noProviderResourceGroupSpec = `
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.Resources;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+@subscriptionResource
+model ResourceGroup is TrackedResource<ResourceGroupProperties> {
+  @key("resourceGroupName")
+  @segment("resourceGroups")
+  @path
+  name: string;
+}
+
+model ResourceGroupProperties {
+  @visibility(Lifecycle.Read)
+  provisioningState?: ResourceProvisioningState;
+}
+
+@armResourceOperations
+interface ResourceGroups {
+  list is ArmResourceListByParent<ResourceGroup, Provider = {}>;
+  get is ArmResourceRead<ResourceGroup, Provider = {}>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<ResourceGroup, Provider = {}>;
+  update is ArmCustomPatchSync<ResourceGroup, Provider = {}>;
+  delete is ArmResourceDeleteWithoutOkAsync<ResourceGroup, Provider = {}>;
+}
+`;
+
+  it("generates correct paths for subscription resource without provider using empty Provider", async () => {
+    const { program } = await Tester.compile(noProviderResourceGroupSpec);
+
+    const provider = resolveArmResources(program);
+    const resourceGroup = provider.resources?.find((r) => r.resourceName === "ResourceGroup");
+    ok(resourceGroup, "ResourceGroup resource should be found");
+
+    // Validate path - should NOT contain /providers/Microsoft.Resources/
+    expect(resourceGroup.resourceInstancePath).toEqual(
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}",
+    );
+  });
+
+  it("resolveArmResources correctly identifies subscription resource without provider", async () => {
+    const { program } = await Tester.compile(noProviderResourceGroupSpec);
+
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    const resourceGroup = provider.resources?.find((r) => r.resourceName === "ResourceGroup");
+    ok(resourceGroup, "ResourceGroup resource should exist in resolved ARM resources");
+    expect(resourceGroup.resourceType.provider).toEqual("Microsoft.Resources");
+    expect(resourceGroup.resourceType.types).toEqual(["resourceGroups"]);
+  });
+
+  it("versioned spec with parent-child resources does not produce duplicate resources", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+@service(#{ title: "Azure Management emitter Testing" })
+@versioned(Versions)
+namespace Microsoft.ContosoProviderHub;
+
+enum Versions {
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  \`2021-10-01-preview\`,
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  \`2022-01-01\`,
+}
+
+model EmployeeParent is TrackedResource<EmployeeParentProperties> {
+  ...ResourceNameParameter<EmployeeParent>;
+}
+
+model EmployeeParentProperties {
+}
+
+@parentResource(EmployeeParent)
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+}
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+@armResourceOperations
+interface EmployeesParent {
+  get is ArmResourceRead<EmployeeParent>;
+}
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    ok(provider.resources);
+    // Should have exactly 2 resources (EmployeeParent and Employee), no duplicates
+    expect(provider.resources).toHaveLength(2);
+    const resourceNames = provider.resources.map((r) => r.resourceName);
+    expect(resourceNames).toContain("EmployeeParent");
+    expect(resourceNames).toContain("Employee");
+  });
+
+  it("separates cross-scope LegacyOperations with default resource names into distinct resources", async () => {
+    const { program } = await Tester.compile(`
+
+using Azure.Core;
+
+@armProviderNamespace
+@service(#{ title: "ContosoProviderHubClient" })
+@versioned(Versions)
+namespace Microsoft.ContosoProviderHub;
+
+enum Versions {
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  v2021_20_01_preview: "2021-10-01-preview",
+}
+
+@subscriptionResource
+model SupportTicketDetails is ProxyResource<SupportTicketProperties> {
+  ...ResourceNameParameter<
+    Resource = SupportTicketDetails,
+    KeyName = "supportTicketName",
+    SegmentName = "supportTickets",
+    NamePattern = ""
+  >;
+}
+
+model SupportTicketProperties {
+  description?: string;
+}
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+// Subscription-scoped operations (includes SubscriptionIdParameter)
+alias SubTicketOps = Azure.ResourceManager.Legacy.LegacyOperations<
+  {
+    ...ApiVersionParameter;
+    ...SubscriptionIdParameter;
+    ...Azure.ResourceManager.Legacy.Provider;
+  },
+  {
+    @segment("supportTickets")
+    @key
+    @TypeSpec.Http.path
+    supportTicketName: string;
+  }
+>;
+
+// Tenant-scoped operations (no SubscriptionIdParameter)
+alias TenantTicketOps = Azure.ResourceManager.Legacy.LegacyOperations<
+  {
+    ...ApiVersionParameter;
+    ...Azure.ResourceManager.Legacy.Provider;
+  },
+  {
+    @segment("supportTickets")
+    @key
+    @TypeSpec.Http.path
+    supportTicketName: string;
+  }
+>;
+
+@armResourceOperations
+interface SupportTickets {
+  get is SubTicketOps.Read<SupportTicketDetails>;
+  list is SubTicketOps.List<SupportTicketDetails>;
+}
+
+@armResourceOperations
+interface SupportTicketsNoSubscription {
+  get is TenantTicketOps.Read<SupportTicketDetails>;
+  list is TenantTicketOps.List<SupportTicketDetails>;
+}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    ok(provider.resources);
+    // Should produce 2 separate resources: one subscription-scoped, one tenant-scoped
+    expect(provider.resources).toHaveLength(2);
+
+    const subResource = provider.resources.find(
+      (r) =>
+        r.resourceInstancePath ===
+        "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/supportTickets/{supportTicketName}",
+    );
+    ok(subResource);
+    expect(subResource.scope).toEqual("Subscription");
+
+    checkResolvedOperations(subResource, {
+      operations: {
+        lifecycle: {
+          read: [{ operationGroup: "SupportTickets", name: "get", kind: "read" }],
+        },
+        lists: [{ operationGroup: "SupportTickets", name: "list", kind: "list" }],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["supportTickets"],
+      },
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/supportTickets/{supportTicketName}",
+    });
+
+    const tenantResource = provider.resources.find(
+      (r) =>
+        r.resourceInstancePath ===
+        "/providers/Microsoft.ContosoProviderHub/supportTickets/{supportTicketName}",
+    );
+    ok(tenantResource);
+    expect(tenantResource.scope).toEqual("Tenant");
+
+    checkResolvedOperations(tenantResource, {
+      operations: {
+        lifecycle: {
+          read: [{ operationGroup: "SupportTicketsNoSubscription", name: "get", kind: "read" }],
+        },
+        lists: [{ operationGroup: "SupportTicketsNoSubscription", name: "list", kind: "list" }],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["supportTickets"],
+      },
+      resourceInstancePath:
+        "/providers/Microsoft.ContosoProviderHub/supportTickets/{supportTicketName}",
+    });
+  });
+
+  it("merges cross-scope LegacyOperations with explicit same resource name into one resource", async () => {
+    const { program } = await Tester.compile(`
+
+using Azure.Core;
+
+@armProviderNamespace
+@service(#{ title: "ContosoProviderHubClient" })
+@versioned(Versions)
+namespace Microsoft.ContosoProviderHub;
+
+enum Versions {
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  v2021_20_01_preview: "2021-10-01-preview",
+}
+
+@subscriptionResource
+model SupportTicketDetails is ProxyResource<SupportTicketProperties> {
+  ...ResourceNameParameter<
+    Resource = SupportTicketDetails,
+    KeyName = "supportTicketName",
+    SegmentName = "supportTickets",
+    NamePattern = ""
+  >;
+}
+
+model SupportTicketProperties {
+  description?: string;
+}
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+// Subscription-scoped operations with explicit resource name
+alias SubTicketOps = Azure.ResourceManager.Legacy.LegacyOperations<
+  {
+    ...ApiVersionParameter;
+    ...SubscriptionIdParameter;
+    ...Azure.ResourceManager.Legacy.Provider;
+  },
+  {
+    @segment("supportTickets")
+    @key
+    @TypeSpec.Http.path
+    supportTicketName: string;
+  },
+  ResourceName = "SupportTickets",
+>;
+
+// Tenant-scoped operations with same explicit resource name
+alias TenantTicketOps = Azure.ResourceManager.Legacy.LegacyOperations<
+  {
+    ...ApiVersionParameter;
+    ...Azure.ResourceManager.Legacy.Provider;
+  },
+  {
+    @segment("supportTickets")
+    @key
+    @TypeSpec.Http.path
+    supportTicketName: string;
+  },
+  ResourceName = "SupportTickets",
+>;
+
+@armResourceOperations
+interface SupportTickets {
+  get is SubTicketOps.Read<SupportTicketDetails>;
+  list is SubTicketOps.List<SupportTicketDetails>;
+}
+
+@armResourceOperations
+interface SupportTicketsNoSubscription {
+  get is TenantTicketOps.Read<SupportTicketDetails>;
+  list is TenantTicketOps.List<SupportTicketDetails>;
+}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    ok(provider.resources);
+    // Should produce 1 merged resource since both have the same explicit resource name
+    expect(provider.resources).toHaveLength(1);
+
+    const resource = provider.resources[0];
+    ok(resource);
+    expect(resource.resourceName).toEqual("SupportTickets");
+
+    // Both read operations should be present
+    expect(resource.operations.lifecycle.read).toBeDefined();
+    expect(resource.operations.lifecycle.read).toHaveLength(2);
+
+    // Both list operations should be present
+    expect(resource.operations.lists).toBeDefined();
+    expect(resource.operations.lists).toHaveLength(2);
+  });
+
+  it.each([
+    { propertyType: "{}" },
+    { propertyType: "unknown" },
+    { propertyType: "Record<unknown>" },
+  ])(
+    "collects operation information for GenericResource with $propertyType properties",
+    async ({ propertyType }) => {
+      const { program } = await Tester.compile(`
+
+using Azure.Core;
+
+@armProviderNamespace
+@service(#{ title: "ContosoProviderHubClient" })
+@versioned(Versions)
+namespace Microsoft.Resources {
+  enum Versions {
+    @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+    v2021_20_01_preview: "2021-10-01-preview",
+  }
+
+  model MyGenericResource
+    is Azure.ResourceManager.Legacy.GenericResource<${propertyType}> {
+  }
+
+  alias genericOps = Azure.ResourceManager.Legacy.RoutedOperations<
+    {
+      ...ApiVersionParameter;
+
+      @path(#{ allowReserved: true })
+      @key
+      
+      resourceId: string;
+    },
+    {}
+  >;
+
+  interface Operations extends Azure.ResourceManager.Operations {}
+
+  @armResourceOperations
+  interface GenericResourceOps {
+    get is genericOps.Read<MyGenericResource>;
+    createOrUpdate is genericOps.CreateOrUpdateAsync<MyGenericResource>;
+    update is genericOps.CustomPatchSync<MyGenericResource, MyGenericResource>;
+    delete is genericOps.DeleteWithoutOkAsync<MyGenericResource>;
+    checkExistence is genericOps.CheckExistence<MyGenericResource>;
+  }
+}
+`);
+      const provider = resolveArmResources(program);
+      expect(provider).toBeDefined();
+      expect(provider.resources).toBeDefined();
+      ok(provider.resources);
+      expect(provider.resources).toHaveLength(1);
+
+      const resource = provider.resources[0];
+      ok(resource);
+      expect(resource).toMatchObject({
+        kind: "Other",
+        providerNamespace: "Microsoft.Resources",
+        type: expect.anything(),
+      });
+
+      checkResolvedOperations(resource, {
+        operations: {
+          lifecycle: {
+            createOrUpdate: [
+              {
+                operationGroup: "GenericResourceOps",
+                name: "createOrUpdate",
+                kind: "createOrUpdate",
+              },
+            ],
+            delete: [{ operationGroup: "GenericResourceOps", name: "delete", kind: "delete" }],
+            read: [{ operationGroup: "GenericResourceOps", name: "get", kind: "read" }],
+            update: [{ operationGroup: "GenericResourceOps", name: "update", kind: "update" }],
+            checkExistence: [
+              {
+                operationGroup: "GenericResourceOps",
+                name: "checkExistence",
+                kind: "checkExistence",
+              },
+            ],
+          },
+        },
+        resourceType: {
+          provider: "Microsoft.Resources",
+          types: [],
+        },
+        resourceInstancePath: "/{resourceId}",
+        resourceName: "MyGenericResource",
+      });
+    },
+  );
+
+  it.each(["default", "current"])(
+    "provides singleton information for @singleton('%s') decorated resources",
+    async (singletonKey) => {
+      const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+@singleton("${singletonKey}")
+model SingletonResource is ProxyResource<SingletonResourceProperties> {
+  ...ResourceNameParameter<SingletonResource>;
+}
+
+model SingletonResourceProperties {
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+@lroStatus
+union ProvisioningState {
+  string,
+  ResourceProvisioningState,
+}
+
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+@armResourceOperations
+interface SingletonResources {
+  get is ArmResourceRead<SingletonResource>;
+  createOrUpdate is ArmResourceCreateOrReplaceSync<SingletonResource>;
+}
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+}
+`);
+      const provider = resolveArmResources(program);
+      expect(provider).toBeDefined();
+      expect(provider.resources).toBeDefined();
+
+      const singletonResource = provider.resources!.find(
+        (r) => r.type.name === "SingletonResource",
+      );
+      ok(singletonResource);
+      expect(singletonResource.singleton).toBeDefined();
+      expect(singletonResource.singleton!.keyValue).toEqual(singletonKey);
+
+      const employee = provider.resources!.find((r) => r.type.name === "Employee");
+      ok(employee);
+      expect(employee.singleton).toBeUndefined();
+    },
+  );
+
+  it("provides singleton information for resources with union name type", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+union ExampleSingletonValues {
+  salaried: "salaried",
+  hourly: "hourly",
+  string,
+}
+
+@singleton("salaried")
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Resource = Employee, Type = ExampleSingletonValues>;
+}
+
+model EmployeeProperties {
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+@lroStatus
+union ProvisioningState {
+  string,
+  ResourceProvisioningState,
+}
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+
+    const employee = provider.resources!.find((r) => r.type.name === "Employee");
+    ok(employee);
+    expect(employee.singleton).toBeDefined();
+    expect(employee.singleton!.keyValue).toEqual(["salaried", "hourly"]);
+  });
+
+  it("collects list operations for child resource using ArmListBySubscriptionScope", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+model Test is TrackedResource<{}> {
+  ...ResourceNameParameter<Test>;
+}
+
+@parentResource(Test)
+model Employee is ProxyResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+}
+
+@armResourceOperations
+interface Tests {
+  get is ArmResourceRead<Test>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Test>;
+  delete is ArmResourceDeleteWithoutOkAsync<Test>;
+  listByResourceGroup is ArmResourceListByParent<Test>;
+  listBySubscription is ArmListBySubscription<Test>;
+}
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceSync<Employee>;
+  delete is ArmResourceDeleteSync<Employee>;
+  listByParent is ArmResourceListByParent<Employee>;
+  listBySubscription is ArmListBySubscriptionScope<Employee>;
+}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    ok(provider.resources);
+
+    // Find the Employee resource at its normal scope
+    const employee = provider.resources.find(
+      (r) =>
+        r.resourceName === "Employee" &&
+        r.resourceInstancePath ===
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/tests/{testName}/employees/{employeeName}",
+    );
+    ok(employee);
+    expect(employee).toMatchObject({
+      providerNamespace: "Microsoft.ContosoProviderHub",
+    });
+
+    // Verify the listByParent operation is correctly resolved on the main resource
+    checkResolvedOperations(employee, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            { operationGroup: "Employees", name: "createOrUpdate", kind: "createOrUpdate" },
+          ],
+          delete: [{ operationGroup: "Employees", name: "delete", kind: "delete" }],
+          read: [{ operationGroup: "Employees", name: "get", kind: "read" }],
+        },
+        lists: [
+          {
+            operationGroup: "Employees",
+            name: "listByParent",
+            kind: "list",
+          },
+        ],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["tests", "employees"],
+      },
+      resourceName: "Employee",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/tests/{testName}/employees/{employeeName}",
+    });
+
+    // Verify a subscription-scoped employee resource entry was created for the subscription list
+    const subscriptionEmployee = provider.resources.find(
+      (r) =>
+        r.resourceInstancePath ===
+        "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees/{name}",
+    );
+    ok(subscriptionEmployee);
+    expect(subscriptionEmployee.operations.lists).toHaveLength(1);
+    expect(subscriptionEmployee.operations.lists![0]).toMatchObject({
+      operationGroup: "Employees",
+      name: "listBySubscription",
+      kind: "list",
+      path: "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees",
+    });
   });
 });

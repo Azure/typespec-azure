@@ -65,22 +65,14 @@ it("emit diagnostic if identity property is missing", async () => {
         extends ResourceRead<FooResource>,ResourceCreate<FooResource> ,ResourceDelete<FooResource>{
           @autoRoute
           @armResourceUpdate(FooResource)
+          #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
           @patch(#{implicitOptionality: true}) 
           op update(...ResourceInstanceParameters<FooResource>,  
           @bodyRoot 
           properties: MyPatchModel):TrackedResource<FooResource> | ErrorResponse;
       }
 
-      enum ResourceState {
-         Succeeded,
-         Canceled,
-         Failed
-       }
-
-       model FooProperties {
-         displayName?: string = "default";
-         provisioningState: ResourceState;
-       }
+       model FooProperties {}
 
       model FooUpdateProperties {
         extra?: string ;
@@ -117,6 +109,7 @@ it("emit diagnostic when there is no request body", async () => {
       #suppress "deprecated" "test"
       interface FooResources
         extends ResourceRead<FooResource>,ResourceCreate<FooResource> ,ResourceDelete<FooResource>{
+          #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
           @autoRoute
           @armResourceUpdate(FooResource)
           @patch(#{implicitOptionality: true}) 
@@ -124,16 +117,7 @@ it("emit diagnostic when there is no request body", async () => {
           ):TrackedResource<FooResource> | ErrorResponse;
       }
 
-        enum ResourceState {
-         Succeeded,
-         Canceled,
-         Failed
-       }
-
-       model FooProperties {
-         displayName?: string = "default";
-         provisioningState: ResourceState;
-       }
+         model FooProperties {}
 
       model FooUpdateProperties {
         extra?: string ;

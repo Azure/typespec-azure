@@ -3,12 +3,14 @@ import "./main.tsp";
 
 using Azure.ClientGenerator.Core;
 
-@@global.Azure.ClientGenerator.Core.clientNamespace(_Specs_.Azure.ClientGenerator.Core.AlternateType,
+@@global.Azure.ClientGenerator.Core.clientNamespace(
+  _Specs_.Azure.ClientGenerator.Core.AlternateType,
   "azure.clientgenerator.core.alternatetype",
   "java"
 );
 
-@@alternateType(_Specs_.Azure.ClientGenerator.Core.AlternateType.ExternalType.Feature,
+@@alternateType(
+  _Specs_.Azure.ClientGenerator.Core.AlternateType.ExternalType.Feature,
   {
     identity: "geojson.Feature",
     package: "geojson",
@@ -17,7 +19,8 @@ using Azure.ClientGenerator.Core;
   "python"
 );
 
-@@alternateType(_Specs_.Azure.ClientGenerator.Core.AlternateType.ExternalType.Feature,
+@@alternateType(
+  _Specs_.Azure.ClientGenerator.Core.AlternateType.ExternalType.Feature,
   {
     identity: "com.azure.core.models.GeoObject", // cSpell:ignore GeoObject
     package: "com.azure.core",
@@ -26,7 +29,8 @@ using Azure.ClientGenerator.Core;
   "java"
 );
 
-@@alternateType(_Specs_.Azure.ClientGenerator.Core.AlternateType.ExternalType.Feature,
+@@alternateType(
+  _Specs_.Azure.ClientGenerator.Core.AlternateType.ExternalType.Feature,
   {
     identity: "NetTopologySuite.IO.GeoJSON.Feature",
     package: "NetTopologySuite.IO.GeoJSON",
@@ -35,11 +39,33 @@ using Azure.ClientGenerator.Core;
   "csharp"
 );
 
-@@alternateType(_Specs_.Azure.ClientGenerator.Core.AlternateType.ExternalType.Feature,
+@@alternateType(
+  _Specs_.Azure.ClientGenerator.Core.AlternateType.ExternalType.Feature,
   {
     identity: "NetTopologySuite.IO.GeoJSON.Feature",
     package: "@types/geojson",
     minVersion: "7946.0.0",
   },
   "typescript"
+);
+
+@@alternateType(
+  _Specs_.Azure.ClientGenerator.Core.AlternateType.ExternalType.Feature,
+  {
+    identity: "geojson::Feature",
+    package: "geojson",
+    minVersion: "0.24.2",
+  },
+  "rust"
+);
+
+// When https://github.com/microsoft/typespec/issues/9749 is fixed, the statement below is no longer needed.
+@@alternateType(
+  _Specs_.Azure.ClientGenerator.Core.AlternateType.ExternalType.Geometry,
+  {
+    identity: "geojson::Geometry",
+    package: "geojson",
+    minVersion: "0.24.2",
+  },
+  "rust"
 );

@@ -1,5 +1,6 @@
 import { populateTopicDocs, type DocEntry, type TopicProps } from "@typespec/astro-utils/llmstxt";
 import { getCollection } from "astro:content";
+import { getSampleStructure } from "src/utils/samples";
 
 export type LlmsDocsDetails = {
   docs: DocEntry[];
@@ -19,8 +20,10 @@ export async function collectLlmsDocs() {
     return true;
   });
 
+  const sampleDocs = await collectLlmsSampleDocs();
+
   return {
-    docs,
+    docs: [...docs, ...sampleDocs],
     libraryNames,
   };
 }
@@ -96,6 +99,12 @@ export function generateLlmsTopics({
       description: "Explanations of how to version Azure services",
       pathPrefix: "docs/howtos/versioning/",
     },
+    {
+      title: "Samples",
+      id: "typespec-azure-samples",
+      description: "Sample TypeSpec Azure specifications.",
+      pathPrefix: "docs/samples/",
+    },
   ];
 
   for (const libraryName of libraryNames) {
@@ -120,4 +129,19 @@ export function generateLlmsTopics({
 function getLibraryName(id: string): string | undefined {
   const match = id.match(/docs\/libraries\/([^/]+)\//);
   return match ? match[1] : undefined;
+}
+
+async function collectLlmsSampleDocs(): Promise<DocEntry[]> {
+  const { samples } = await getSampleStructure();
+
+  return samples
+    .filter((sample) => sample.llmstxt)
+    .map((sample) => ({
+      id: `docs/samples/${sample.id}`,
+      data: {
+        title: sample.title,
+        description: sample.description,
+        llmstxt: true,
+      },
+    }));
 }

@@ -16,25 +16,33 @@ namespace Microsoft.OperationStatusSample;
 
 enum Versions {
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  @Azure.Core.previewVersion
   `2022-11-01-preview`,
 }
 
 interface Operations extends Azure.ResourceManager.Operations {}
 
-/** The standard operation status */
-@parentResource(TenantLocationResource)
-model MyOpStatus is ArmOperationStatus;
-
-/** The standard operation status at the subscription level] */
-@parentResource(SubscriptionLocationResource)
-model MySubOpStatus is ArmOperationStatus;
-
-@parentResource(ArmLocationResource<"ResourceGroup">)
-model MyResourceGroupStatus is ArmOperationStatus;
-
+/**
+ * Demonstrates the four standard operation status endpoint patterns using
+ * GetResourceOperationStatus with the appropriate scope model.
+ */
 @armResourceOperations
 interface OperationStatuses {
-  getStatus is ArmResourceRead<MyOpStatus>;
-  getSubscriptionStatus is ArmResourceRead<MySubOpStatus>;
-  getRgStatus is ArmResourceRead<MyResourceGroupStatus>;
+  /** Tenant scope: GET /providers/{ns}/operationStatuses/{operationId} */
+  getTenantStatus is GetResourceOperationStatus;
+
+  /** Subscription scope: GET /subscriptions/{sub}/providers/{ns}/operationStatuses/{operationId} */
+  getSubscriptionStatus is GetResourceOperationStatus<ArmOperationStatus, SubscriptionActionScope>;
+
+  /** Tenant+Location scope: GET /providers/{ns}/locations/{loc}/operationStatuses/{operationId} */
+  getTenantLocationStatus is GetResourceOperationStatus<
+    ArmOperationStatus,
+    TenantLocationActionScope
+  >;
+
+  /** Subscription+Location scope: GET /subscriptions/{sub}/providers/{ns}/locations/{loc}/operationStatuses/{operationId} */
+  getSubscriptionLocationStatus is GetResourceOperationStatus<
+    ArmOperationStatus,
+    SubscriptionLocationActionScope
+  >;
 }

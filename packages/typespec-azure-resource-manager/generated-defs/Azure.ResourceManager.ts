@@ -149,8 +149,9 @@ export type SubscriptionResourceDecorator = (
 /**
  * `@locationResource` marks an Azure Resource Manager resource model as a location based resource.
  *
- * Location based resources have REST API paths like
- * `/subscriptions/{subscriptionId}/locations/{location}/providers/Microsoft.Contoso/employees`
+ * **Deprecated**: This decorator is deprecated. Use `@parentResource` with `ArmLocationResource` instead.
+ * See the [Location Resource sample](https://azure.github.io/typespec-azure/docs/samples/resource-manager/resource-types/location/)
+ * for the recommended approach.
  *
  * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
  */

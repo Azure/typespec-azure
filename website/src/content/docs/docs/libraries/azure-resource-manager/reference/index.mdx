@@ -28,8 +28,6 @@ npm install --save-peer @azure-tools/typespec-azure-resource-manager
 </TabItem>
 </Tabs>
 
-## Azure
-
 ## Azure.ResourceManager
 
 ### Decorators
@@ -89,6 +87,7 @@ npm install --save-peer @azure-tools/typespec-azure-resource-manager
 - [`ArmCustomPatchAsync`](./interfaces.md#Azure.ResourceManager.ArmCustomPatchAsync)
 - [`ArmCustomPatchSync`](./interfaces.md#Azure.ResourceManager.ArmCustomPatchSync)
 - [`ArmListBySubscription`](./interfaces.md#Azure.ResourceManager.ArmListBySubscription)
+- [`ArmListBySubscriptionScope`](./interfaces.md#Azure.ResourceManager.ArmListBySubscriptionScope)
 - [`ArmProviderActionAsync`](./interfaces.md#Azure.ResourceManager.ArmProviderActionAsync)
 - [`ArmProviderActionSync`](./interfaces.md#Azure.ResourceManager.ArmProviderActionSync)
 - [`ArmResourceActionAsync`](./interfaces.md#Azure.ResourceManager.ArmResourceActionAsync)
@@ -115,6 +114,7 @@ npm install --save-peer @azure-tools/typespec-azure-resource-manager
 - [`ArmTagsPatchSync`](./interfaces.md#Azure.ResourceManager.ArmTagsPatchSync)
 - [`checkGlobalNameAvailability`](./interfaces.md#Azure.ResourceManager.checkGlobalNameAvailability)
 - [`checkLocalNameAvailability`](./interfaces.md#Azure.ResourceManager.checkLocalNameAvailability)
+- [`GetResourceOperationStatus`](./interfaces.md#Azure.ResourceManager.GetResourceOperationStatus)
 
 ### Models
 
@@ -173,10 +173,45 @@ npm install --save-peer @azure-tools/typespec-azure-resource-manager
 - [`ResourceUriParameter`](./data-types.md#Azure.ResourceManager.ResourceUriParameter)
 - [`SkipTokenParameter`](./data-types.md#Azure.ResourceManager.SkipTokenParameter)
 - [`SubscriptionActionScope`](./data-types.md#Azure.ResourceManager.SubscriptionActionScope)
+- [`SubscriptionLocationActionScope`](./data-types.md#Azure.ResourceManager.SubscriptionLocationActionScope)
 - [`SubscriptionLocationResource`](./data-types.md#Azure.ResourceManager.SubscriptionLocationResource)
 - [`TenantActionScope`](./data-types.md#Azure.ResourceManager.TenantActionScope)
+- [`TenantLocationActionScope`](./data-types.md#Azure.ResourceManager.TenantLocationActionScope)
 - [`TenantLocationResource`](./data-types.md#Azure.ResourceManager.TenantLocationResource)
 - [`TrackedResource`](./data-types.md#Azure.ResourceManager.TrackedResource)
+
+## Azure.ResourceManager.BaseTypes
+
+### Decorators
+
+- [`@azureBaseType`](./decorators.md#@Azure.ResourceManager.BaseTypes.azureBaseType)
+
+### Models
+
+- [`BaseTypeInfo`](./data-types.md#Azure.ResourceManager.BaseTypes.BaseTypeInfo)
+
+## Azure.ResourceManager.BaseTypes.Agents
+
+### Models
+
+- [`Agent`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.Agent)
+- [`AgentConversation`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.AgentConversation)
+- [`AgentDefinitionAppliance`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.AgentDefinitionAppliance)
+- [`AgentDefinitionPlatform`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.AgentDefinitionPlatform)
+- [`AgentPropertiesAppliance`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesAppliance)
+- [`AgentPropertiesPlatform`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.AgentPropertiesPlatform)
+- [`AgentResponse`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.AgentResponse)
+- [`AgentToolTypeAppliance`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.AgentToolTypeAppliance)
+- [`AgentToolTypePlatform`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.AgentToolTypePlatform)
+- [`ConversationOutput`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ConversationOutput)
+- [`ConversationProperties`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ConversationProperties)
+- [`InputMessage`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.InputMessage)
+- [`InputTypeProperty`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.InputTypeProperty)
+- [`PreviousResponseProperty`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.PreviousResponseProperty)
+- [`ResponseInstructionsProperty`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ResponseInstructionsProperty)
+- [`ResponseOutputItem`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ResponseOutputItem)
+- [`ResponseOutputProperty`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ResponseOutputProperty)
+- [`ResponseProperties`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ResponseProperties)
 
 ## Azure.ResourceManager.CommonTypes
 
@@ -361,6 +396,7 @@ npm install --save-peer @azure-tools/typespec-azure-resource-manager
 
 - [`ArmFeatureOptions`](./data-types.md#Azure.ResourceManager.Legacy.ArmFeatureOptions)
 - [`ArmOperationOptions`](./data-types.md#Azure.ResourceManager.Legacy.ArmOperationOptions)
+- [`CustomAzureProxyResource`](./data-types.md#Azure.ResourceManager.Legacy.CustomAzureProxyResource)
 - [`CustomAzureResource`](./data-types.md#Azure.ResourceManager.Legacy.CustomAzureResource)
 - [`CustomResourceOptions`](./data-types.md#Azure.ResourceManager.Legacy.CustomResourceOptions)
 - [`DiscriminatedExtensionResource`](./data-types.md#Azure.ResourceManager.Legacy.DiscriminatedExtensionResource)
@@ -368,6 +404,7 @@ npm install --save-peer @azure-tools/typespec-azure-resource-manager
 - [`DiscriminatedTrackedResource`](./data-types.md#Azure.ResourceManager.Legacy.DiscriminatedTrackedResource)
 - [`ExtendedLocationOptional`](./data-types.md#Azure.ResourceManager.Legacy.ExtendedLocationOptional)
 - [`ExtendedLocationOptionalProperty`](./data-types.md#Azure.ResourceManager.Legacy.ExtendedLocationOptionalProperty)
+- [`GenericResource`](./data-types.md#Azure.ResourceManager.Legacy.GenericResource)
 - [`ManagedServiceIdentityV4`](./data-types.md#Azure.ResourceManager.Legacy.ManagedServiceIdentityV4)
 - [`ManagedServiceIdentityV4Property`](./data-types.md#Azure.ResourceManager.Legacy.ManagedServiceIdentityV4Property)
 - [`PolymorphicResourceKindProperty`](./data-types.md#Azure.ResourceManager.Legacy.PolymorphicResourceKindProperty)

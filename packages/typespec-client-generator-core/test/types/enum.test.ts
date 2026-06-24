@@ -183,7 +183,7 @@ it("union of union as enum float type", async function () {
     }
   `);
   const context = await createSdkContextForTester(program);
-  const sdkType = context.sdkPackage.enums[0];
+  const sdkType = context.sdkPackage.enums.find((e) => e.name === "ExtendedEnum");
   ok(sdkType);
   strictEqual(sdkType.isFixed, false);
   strictEqual(sdkType.name, "ExtendedEnum");
@@ -203,13 +203,13 @@ it("string fixed", async function () {
     #suppress "@azure-tools/typespec-azure-core/use-extensible-enum" "For testing"
     @usage(Usage.input | Usage.output)
     enum DaysOfWeekFixedEnum {
-      @doc("Monday") Monday,
-      @doc("Tuesday") Tuesday,
-      @doc("Wednesday") Wednesday,
-      @doc("Thursday") Thursday,
-      @doc("Friday") Friday,
-      @doc("Saturday") Saturday,
-      @doc("Sunday") Sunday,
+      Monday,
+      Tuesday,
+      Wednesday,
+      Thursday,
+      Friday,
+      Saturday,
+      Sunday,
     }
 
     @usage(Usage.input | Usage.output)

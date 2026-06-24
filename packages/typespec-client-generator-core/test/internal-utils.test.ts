@@ -152,9 +152,8 @@ describe("compareModelProperties", () => {
         prop: string;
       }
     `);
-    const context = await createSdkContextForTester(program);
     strictEqual(
-      compareModelProperties(context, A.properties.get("prop"), B.properties.get("prop")),
+      compareModelProperties(program, A.properties.get("prop"), B.properties.get("prop")),
       true,
     );
   });
@@ -169,9 +168,8 @@ describe("compareModelProperties", () => {
         propB: string;
       }
     `);
-    const context = await createSdkContextForTester(program);
     strictEqual(
-      compareModelProperties(context, A.properties.get("propA"), B.properties.get("propB")),
+      compareModelProperties(program, A.properties.get("propA"), B.properties.get("propB")),
       false,
     );
   });
@@ -186,9 +184,8 @@ describe("compareModelProperties", () => {
         prop: int32;
       }
     `);
-    const context = await createSdkContextForTester(program);
     strictEqual(
-      compareModelProperties(context, A.properties.get("prop"), B.properties.get("prop")),
+      compareModelProperties(program, A.properties.get("prop"), B.properties.get("prop")),
       false,
     );
   });
@@ -203,9 +200,56 @@ describe("compareModelProperties", () => {
         @query("bb") a: string;
       }
     `);
-    const context = await createSdkContextForTester(program);
     strictEqual(
-      compareModelProperties(context, A.properties.get("a"), B.properties.get("a")),
+      compareModelProperties(program, A.properties.get("a"), B.properties.get("a")),
+      false,
+    );
+  });
+
+  it("should return false for different header names", async () => {
+    const { program, A, B } = await SimpleTesterWithService.compile(t.code`
+      model ${t.model("A")} {
+        @header("x-a") a: string;
+      }
+
+      model ${t.model("B")} {
+        @header("x-b") a: string;
+      }
+    `);
+    strictEqual(
+      compareModelProperties(program, A.properties.get("a"), B.properties.get("a")),
+      false,
+    );
+  });
+
+  it("should return false for different path names", async () => {
+    const { program, A, B } = await SimpleTesterWithService.compile(t.code`
+      model ${t.model("A")} {
+        @path("idA") a: string;
+      }
+
+      model ${t.model("B")} {
+        @path("idB") a: string;
+      }
+    `);
+    strictEqual(
+      compareModelProperties(program, A.properties.get("a"), B.properties.get("a")),
+      false,
+    );
+  });
+
+  it("should return false for mixed HTTP parameter kinds", async () => {
+    const { program, A, B } = await SimpleTesterWithService.compile(t.code`
+      model ${t.model("A")} {
+        @query("a") a: string;
+      }
+
+      model ${t.model("B")} {
+        @header("a") a: string;
+      }
+    `);
+    strictEqual(
+      compareModelProperties(program, A.properties.get("a"), B.properties.get("a")),
       false,
     );
   });

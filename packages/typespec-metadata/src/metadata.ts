@@ -29,8 +29,8 @@ export interface MetadataSnapshot {
   generatedAt: string;
   /** TypeSpec-level metadata (namespace, documentation, type). */
   typespec: TypeSpecMetadata;
-  /** Per-language package metadata extracted from tspconfig, keyed by language. */
-  languages: Record<string, LanguagePackageMetadata>;
+  /** Per-language package metadata extracted from tspconfig, keyed by normalized language name. Each language maps to an array of emitter configs. Emitters that cannot be linked to a known language are grouped under "unknown". */
+  languages: Record<string, LanguagePackageMetadata[]>;
   /** Absolute tspconfig path when available. */
   sourceConfigPath?: string;
 }

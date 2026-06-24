@@ -3,6 +3,7 @@ import type {
   DecoratorValidatorCallbacks,
   Enum,
   EnumMember,
+  FunctionContext,
   Interface,
   Model,
   ModelProperty,
@@ -196,10 +197,13 @@ export type ClientDecorator = (
 ) => DecoratorValidatorCallbacks | void;
 
 /**
+ *
+ *
+ *
+ * @deprecated Use `@client` instead. The `@operationGroup` decorator is deprecated. Sub clients should be represented using `@client`.
  * Define the sub client generated in the client SDK.
  * If there is any `@client` definition or `@operationGroup` definition, then each `@client` is a root client and each `@operationGroup` is a sub client with hierarchy.
  * This decorator cannot be used along with `@clientLocation`. This decorator cannot be used as augmentation.
- *
  * @param target The target namespace or interface that you want to define as a sub client.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  *
@@ -615,8 +619,8 @@ export type ClientInitializationDecorator = (
  * @@clientInitialization(MyService, MyServiceClientOptions)
  * @@paramAlias(MyServiceClientOptions.blob, "blobName")
  *
- * // The generated client will have `blobName` in it. We will also
- * // elevate the existing `blob` parameter to the client level.
+ * // The `blob` property from MyServiceClientOptions will be elevated to the client level.
+ * // Because of @@paramAlias, it will be matched to the `blobName` operation parameter.
  * ```
  */
 export type ParamAliasDecorator = (
@@ -753,6 +757,9 @@ export type AlternateTypeDecorator = (
  * Define the scope of an operation or model property.
  * By default, the element will be applied to all language emitters.
  * This decorator allows you to omit the element from certain languages or apply it to specific languages.
+ * When applied to an operation parameter (which is a `ModelProperty`), the parameter will be excluded
+ * from the generated method signature for the specified languages. A warning is emitted if a required
+ * parameter is scoped out.
  *
  * @param target The target operation or model property that you want to scope.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
@@ -779,6 +786,13 @@ export type AlternateTypeDecorator = (
  *   @scope("csharp")
  *   csharpOnlyProp: string;
  * }
+ * ```
+ * @example Exclude an operation parameter from a specific language
+ * ```typespec
+ * op test(
+ *   name: string,
+ *   @header("X-Custom-Header") @scope("!python") customHeader?: string,
+ * ): void;
  * ```
  */
 export type ScopeDecorator = (
@@ -836,7 +850,7 @@ export type ApiVersionDecorator = (
  * It is particularly beneficial when generating a complete API version enum without requiring the entire specification to be annotated with versioning decorators, as the generation process does not depend on versioning details.
  *
  * @param target The target client for which you want to define additional API versions.
- * @param value If true, we will treat this parameter as an api-version parameter. If false, we will not. Default is true.
+ * @param value An enum defining the complete set of API versions the client should support, including both service-defined and additional versions.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  *
  * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
@@ -1124,4 +1138,154 @@ export type AzureClientGeneratorCoreDecorators = {
   clientLocation: ClientLocationDecorator;
   clientDoc: ClientDocDecorator;
   clientOption: ClientOptionDecorator;
+};
+
+/**
+ * Replace a parameter in an operation with a new parameter definition.
+ * This function creates a new operation with the specified parameter replaced,
+ * enabling composable transformations without mutating the original operation.
+ *
+ * @param operation The operation to transform.
+ * @param selector The parameter to replace, specified either by name (string) or by direct reference (ModelProperty).
+ * @param replacement The replacement parameter.
+ * @returns A new operation with the parameter replaced.
+ * @example Making an optional parameter required
+ * ```typespec
+ * model RequiredMaxResults {
+ *   maxResults: int32;
+ * }
+ *
+ * @@override(KeyVault.getSecrets, replaceParameter(KeyVault.getSecrets, "maxResults", RequiredMaxResults.maxResults));
+ * ```
+ * @example Chaining transformations
+ * ```typespec
+ * alias Step1 = replaceParameter(MyService.myOp, "oldParam", NewParams.newParam);
+ * @@override(MyService.myOp, replaceParameter(Step1, "anotherParam", NewParams.anotherParam));
+ * ```
+ */
+export type ReplaceParameterFunctionImplementation = (
+  context: FunctionContext,
+  operation: Operation,
+  selector: string | unknown,
+  replacement: ModelProperty,
+) => Operation;
+
+/**
+ * Remove a parameter from an operation.
+ * This function creates a new operation with the specified parameter removed,
+ * enabling composable transformations without mutating the original operation.
+ *
+ * Note: When used with `@@override`, only optional parameters can be removed. Attempting to
+ * remove a required parameter will result in an `override-parameters-mismatch` error.
+ *
+ * @param operation The operation to transform.
+ * @param selector The parameter to remove, specified either by name (string) or by direct reference (ModelProperty).
+ * @returns A new operation with the parameter removed.
+ * @example Removing an optional parameter
+ * ```typespec
+ * @@override(KeyVault.getSecrets, removeParameter(KeyVault.getSecrets, "maxResults"));
+ * ```
+ * @example Chaining with other transformations
+ * ```typespec
+ * alias Step1 = removeParameter(MyService.myOp, "unwantedParam");
+ * @@override(MyService.myOp, addParameter(Step1, NewParams.newParam));
+ * ```
+ */
+export type RemoveParameterFunctionImplementation = (
+  context: FunctionContext,
+  operation: Operation,
+  selector: string | unknown,
+) => Operation;
+
+/**
+ * Add a new parameter to an operation.
+ * This function creates a new operation with the additional parameter appended,
+ * enabling composable transformations without mutating the original operation.
+ *
+ * @param operation The operation to transform.
+ * @param parameter The parameter to add to the operation.
+ * @returns A new operation with the parameter added.
+ * @example Adding a required parameter
+ * ```typespec
+ * model ExtraParams {
+ *   @header tracingId: string;
+ * }
+ *
+ * @@override(MyService.myOp, addParameter(MyService.myOp, ExtraParams.tracingId));
+ * ```
+ * @example Chaining with replaceParameter
+ * ```typespec
+ * model NewParams {
+ *   oldParam: string;  // make required
+ *   newParam: int32;
+ * }
+ *
+ * alias Step1 = replaceParameter(MyService.myOp, "oldParam", NewParams.oldParam);
+ * @@override(MyService.myOp, addParameter(Step1, NewParams.newParam));
+ * ```
+ */
+export type AddParameterFunctionImplementation = (
+  context: FunctionContext,
+  operation: Operation,
+  parameter: ModelProperty,
+) => Operation;
+
+/**
+ * Reorder parameters of an operation according to the specified order.
+ * This function creates a new operation with parameters reordered as specified,
+ * enabling control over the parameter order in generated client SDK methods.
+ *
+ * @param operation The operation to transform.
+ * @param order An array of parameter names specifying the desired order. All parameters must be included.
+ * @returns A new operation with parameters reordered.
+ * @example Reordering parameters
+ * ```typespec
+ * @service
+ * namespace MyService;
+ *
+ * op myOp(a: string, b: string, c: string): void;
+ *
+ * // Reorder to put 'c' first, then 'a', then 'b'
+ * @@override(MyService.myOp, reorderParameters(MyService.myOp, #["c", "a", "b"]));
+ * ```
+ * @example Chaining with other transformations
+ * ```typespec
+ * alias Step1 = addParameter(MyService.myOp, NewParams.newParam);
+ * @@override(MyService.myOp, reorderParameters(Step1, #["newParam", "existingParam"]));
+ * ```
+ */
+export type ReorderParametersFunctionImplementation = (
+  context: FunctionContext,
+  operation: Operation,
+  order: readonly string[],
+) => Operation;
+
+/**
+ * Mark a client name as exact, preventing language emitters from applying
+ * their usual casing transformations (e.g., snake_case for Python, camelCase for JavaScript).
+ *
+ * Use this with `@clientName` when you want the name to be used exactly as specified,
+ * without any automatic casing conversion.
+ *
+ * @param name The exact name to use in generated client code.
+ * @returns The name with an internal marker that signals emitters to preserve it as-is.
+ * @example Preserve exact casing for a specific language
+ * ```typespec
+ * @clientName(exact("hello_world"), "python")
+ * model MyModel {}
+ * ```
+ * @example Preserve exact casing for all languages
+ * ```typespec
+ * @clientName(exact("myExactName"))
+ * op myOperation(): void;
+ * ```
+ */
+export type ExactFunctionImplementation = (context: FunctionContext, name: string) => string;
+
+export type AzureClientGeneratorCoreFunctions = {
+  replaceParameter: ReplaceParameterFunctionImplementation;
+  removeParameter: RemoveParameterFunctionImplementation;
+  addParameter: AddParameterFunctionImplementation;
+  reorderParameters: ReorderParametersFunctionImplementation;
+  exact: ExactFunctionImplementation;
 };

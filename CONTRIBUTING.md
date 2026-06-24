@@ -46,6 +46,10 @@ recommended to test a private of the change before merging.
 
 Example: https://github.com/Azure/azure-rest-api-specs/pull/26684
 
+# Breaking changes
+
+See [docs/breaking-changes.md](docs/breaking-changes.md) for guidelines on rolling out breaking changes across TypeSpec, the spec repo, and SDK repos.
+
 # Working with the core submodule
 
 This repository uses a git
@@ -176,6 +180,70 @@ git push origin featurebranch
 Note that you only need to do all of the above when your changes span both
 repos. If you are only changing one repo or the other, then just work in
 each individual repo as you would any other.
+
+## Testing, formatting, and linting
+
+Testing, formatting, and linting run at the repo root via workspace-level tools (vitest, prettier, eslint). Packages that need additional tooling define `:extra` scripts run via turbo.
+
+### Package examples
+
+**Standard package** (vitest only — most packages):
+
+```json
+{
+  "scripts": {
+    "test": "vitest run"
+  }
+}
+```
+
+The package also needs a `vitest.config.ts` — the root vitest workspace config discovers it automatically.
+
+**Package with extra tests** (vitest + another runner):
+
+```json
+{
+  "scripts": {
+    "test": "npm run test:vitest && npm run test:extra",
+    "test:vitest": "vitest run",
+    "test:extra": "dotnet test"
+  }
+}
+```
+
+`test:extra` should only contain fast unit tests. Slow end-to-end tests should use `test:e2e` instead.
+
+**Package with custom formatting**:
+
+```json
+{
+  "scripts": {
+    "format:extra": "my-formatter --write .",
+    "format:extra:check": "my-formatter --check ."
+  }
+}
+```
+
+**Package with extra linting**:
+
+```json
+{
+  "scripts": {
+    "lint:extra": "my-linter ."
+  }
+}
+```
+
+### How the top-level commands work
+
+| Command             | What runs                                         |
+| ------------------- | ------------------------------------------------- |
+| `pnpm test`         | vitest (workspace) + `turbo run test:extra`       |
+| `pnpm format`       | prettier (whole repo) + `turbo run format:extra`  |
+| `pnpm format:check` | prettier (check) + `turbo run format:extra:check` |
+| `pnpm lint`         | eslint (whole repo) + `turbo run lint:extra`      |
+
+Vitest workspace mode runs all vitest-based packages in a single process with relative error paths. Turbo handles the `:extra` tasks in parallel for packages that define them — if no package defines them, the turbo step is a no-op.
 
 ## E2E tests
 
@@ -308,6 +376,34 @@ Depending on the package where the fix needs to go do this on the `Microsoft/typ
 1. Find the backmerge branch [here](https://github.com/Azure/typespec-azure/branches) and click "New pull request".
 1. Rebase merge the new backmerge PR into main.
 
+## Creating release notes
+
+Release notes are published at each release in `website/src/content/docs/docs/release-notes/`. They follow the pattern `release-YYYY-MM-DD.mdx`.
+
+Run the following command to generate the changelog:
+
+```bash
+pnpm chronus changelog --policy typespec-azure
+```
+
+Create a new file `website/src/content/docs/docs/release-notes/release-YYYY-MM-DD.mdx` with this frontmatter and paste the command output below it, removing the `Dependencies` category (dependency updates are not user-facing and should not appear in release notes):
+
+```markdown
+---
+title: "X.Y.0"
+---
+
+import { LinkCard } from "@astrojs/starlight/components";
+
+<LinkCard
+  title="TypeSpec Core X.Y"
+  description="See changes to the TypeSpec language and core libraries"
+  href="https://typespec.io/docs/release-notes/release-YYYY-MM-DD"
+/>
+```
+
+See existing release notes for examples.
+
 ## llms.txt
 
 The website build generates `llms.txt` and `llms-full.txt` files based on 2 factors:
@@ -341,10 +437,13 @@ Area of the codebase
 | `lib:azure-resource-manager` | #957300 | Issues for @azure-tools/typespec-azure-core library                                 |
 | `lib:azure-http-specs`       | #c7aee6 | For issues/prs related to the @azure-tools/typespec-azure-http-specs package        |
 | `emitter:autorest`           | #957300 | Issues for @azure-tools/typespec-autorest emitter                                   |
+| `emitter:python`             | #957300 | Issues for @azure-tools/typespec-python emitter                                     |
+| `emitter:typescript`         | #957300 | Issues for @azure-tools/typespec-ts emitter                                         |
 | `emitter:client:all`         | #957300 | General client emitter issues that do not involve TCGC or typespec-azure-http-specs |
 | `eng`                        | #65bfff |                                                                                     |
 | `ide`                        | #846da1 | Issues for Azure specific ide features                                              |
 | `cli/psh`                    | #9EB120 | Issues for Azure CLI/PSH features                                                   |
+| `meta:website`               | #007dc8 | TypeSpec.io updates                                                                 |
 
 #### issue_kinds
 
@@ -391,10 +490,11 @@ Process labels
 
 Misc labels
 
-| Name               | Color   | Description                                        |
-| ------------------ | ------- | -------------------------------------------------- |
-| `good first issue` | #7057ff | Good for newcomers                                 |
-| `int:azure-specs`  | #0e8a16 | Run integration tests against azure-rest-api-specs |
+| Name                | Color   | Description                                        |
+| ------------------- | ------- | -------------------------------------------------- |
+| `good first issue`  | #7057ff | Good for newcomers                                 |
+| `int:azure-specs`   | #0e8a16 | Run integration tests against azure-rest-api-specs |
+| `agentic-workflows` | #000000 | Issues/PR created by github agentic workflows      |
 
 #### external
 

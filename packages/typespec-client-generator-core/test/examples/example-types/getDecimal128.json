@@ -1,0 +1,10 @@
+{
+  "operationId": "getDecimal128",
+  "title": "getDecimal128",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": 80
+    }
+  }
+}

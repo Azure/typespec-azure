@@ -3,6 +3,7 @@ import {
   compilerAssert,
   DecoratorContext,
   DecoratorFunction,
+  DiagnosticTarget,
   Enum,
   EnumMember,
   getDiscriminator,
@@ -12,8 +13,6 @@ import {
   isErrorModel,
   isList,
   isNumeric,
-  isService,
-  isTemplateDeclaration,
   Model,
   ModelProperty,
   Namespace,
@@ -33,8 +32,9 @@ import {
   getServers,
   isBody,
   isBodyRoot,
+  isPathParam,
 } from "@typespec/http";
-import { $useDependency, getVersions } from "@typespec/versioning";
+import { getVersion, resolveVersions, type Version } from "@typespec/versioning";
 import {
   AccessDecorator,
   AlternateTypeDecorator,
@@ -70,7 +70,6 @@ import {
   ExternalTypeInfo,
   LanguageScopes,
   SdkClient,
-  SdkOperationGroup,
   TCGCContext,
   UsageFlags,
 } from "./interfaces.js";
@@ -84,16 +83,16 @@ import {
   findEntriesWithTarget,
   findRootSourceProperty,
   getScopedDecoratorData,
-  hasExplicitClientOrOperationGroup,
   isSameAuth,
   isSameServers,
+  legacyHierarchyBuildingKey,
   listAllUserDefinedNamespaces,
   negationScopesKey,
   omitOperation,
-  operationGroupKey,
   overrideKey,
   parseScopes,
   scopeKey,
+  usageKey,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
@@ -170,13 +169,17 @@ export const $client: ClientDecorator = (
   let services: Namespace[];
   const serviceConfig =
     options?.kind === "Model" ? options?.properties.get("service")?.type : undefined;
+  const autoMergeServiceConfig =
+    options?.kind === "Model" ? options?.properties.get("autoMergeService")?.type : undefined;
 
   if (serviceConfig?.kind === "Namespace") {
+    // Explicit single service
     services = [serviceConfig];
   } else if (
     serviceConfig?.kind === "Tuple" &&
     serviceConfig.values.every((v) => v.kind === "Namespace")
   ) {
+    // Explicit multiple services
     if (target.kind === "Interface") {
       reportDiagnostic(context.program, {
         code: "invalid-client-service-multiple",
@@ -220,69 +223,90 @@ export const $client: ClientDecorator = (
       });
       return;
     }
-    // no explicit versioning dependency
-    if (
-      !target.decorators.some(
-        (d) =>
-          d.definition?.name === "@useDependency" &&
-          getNamespaceFullName(d.definition?.namespace) === "TypeSpec.Versioning",
-      )
-    ) {
-      const versionRecords = [];
-      // collect the latest version enum member from each service
-      for (const svc of services) {
-        const versions = getVersions(context.program, svc)[1]?.getVersions();
-        if (versions && versions.length > 0) {
-          versionRecords.push(versions[versions.length - 1].enumMember);
-        }
-      }
-      // set the versioning dependency
-      if (versionRecords.length > 0) {
-        context.call($useDependency, target, ...versionRecords);
-      }
-    }
+    // For clients merging multiple services, ensure all services agree on the
+    // version of any shared library dependency (e.g. ARM common-types).
+    // Diverging versions cause TCGC to emit duplicated/diverged models.
+    validateMultipleServiceDependencyVersions(
+      context.program,
+      name,
+      services,
+      context.decoratorTarget,
+    );
   } else {
-    const service = findClientService(context.program, target);
-    if (service === undefined) {
-      reportDiagnostic(context.program, {
-        code: "client-service",
-        format: { name },
-        target: context.decoratorTarget,
-      });
-      return;
-    }
-    services = [service];
+    // No explicit service - store empty array. Cache.ts will either:
+    // - inherit from parent client (if nested)
+    // - report an error (if root client)
+    services = [];
   }
 
   const client: SdkClient = {
     kind: "SdkClient",
     name,
-    service: services.length === 1 ? services[0] : services,
     services,
     type: target,
-    subOperationGroups: [],
+    subClients: [],
+    clientPath: name,
+    autoMergeService:
+      autoMergeServiceConfig?.kind === "Boolean" ? autoMergeServiceConfig.value : false,
   };
   setScopedDecoratorData(context, $client, clientKey, target, client, scope);
 };
 
-function judgeService(program: Program, type: Namespace): boolean {
-  return (
-    isService(program, type) ||
-    type.decorators.some(
-      (d) => d.definition?.name === "@service" && d.definition?.namespace.name === "TypeSpec",
-    )
-  );
-}
+/**
+ * Validate that all services merged into the same client agree on the version
+ * of every shared library dependency. Diverging versions silently produce
+ * duplicated/diverged models in the generated SDK.
+ */
+function validateMultipleServiceDependencyVersions(
+  program: Program,
+  clientName: string,
+  services: Namespace[],
+  target: DiagnosticTarget,
+): void {
+  // For each shared dependency namespace, collect the set of versions picked
+  // across all merged services.
+  const depVersions = new Map<Namespace, Set<string>>();
+  const serviceSet: ReadonlySet<Namespace> = new Set<Namespace>(services);
 
-function findClientService(program: Program, client: Namespace | Interface): Namespace | undefined {
-  let current: Namespace | undefined = client as any;
-  while (current) {
-    if (judgeService(program, current)) {
-      return current;
+  for (const service of services) {
+    const resolutions = resolveVersions(program, service);
+    if (resolutions.length === 0) continue;
+    // Use the latest resolved version of this service (matches what TCGC picks).
+    for (const [depNs, depVersion] of resolutions[resolutions.length - 1].versions) {
+      // Ignore versions of the merged services themselves.
+      if (serviceSet.has(depNs)) continue;
+      // When the service does not specify a version for the depended library
+      // (e.g. the latest service version has no `@useDependency` mapping for it),
+      // fall back to the latest version of the depended library, matching the
+      // behavior expected by downstream emitters.
+      let resolvedDepVersion: Version | undefined = depVersion;
+      if (resolvedDepVersion === undefined) {
+        const depVersionMap = getVersion(program, depNs);
+        const allDepVersions = depVersionMap?.getVersions();
+        if (allDepVersions && allDepVersions.length > 0) {
+          resolvedDepVersion = allDepVersions[allDepVersions.length - 1];
+        }
+      }
+      if (resolvedDepVersion === undefined) continue;
+      const versions = depVersions.get(depNs) ?? new Set<string>();
+      versions.add(resolvedDepVersion.value ?? resolvedDepVersion.name);
+      depVersions.set(depNs, versions);
     }
-    current = current.namespace;
   }
-  return undefined;
+
+  // Report any dependency that resolved to more than one version.
+  for (const [depNs, versions] of depVersions) {
+    if (versions.size <= 1) continue;
+    reportDiagnostic(program, {
+      code: "inconsistent-multiple-service-dependency",
+      format: {
+        clientName,
+        dependencyName: getNamespaceFullName(depNs),
+        versions: [...versions].map((v) => `"${v}"`).join(", "),
+      },
+      target,
+    });
+  }
 }
 
 /**
@@ -296,140 +320,83 @@ export function getClient(
   context: TCGCContext,
   type: Namespace | Interface,
 ): SdkClient | undefined {
-  for (const client of listClients(context)) {
-    if (client.type === type) {
-      return client;
-    }
-  }
-  return undefined;
+  return context.getClient(type);
 }
 
 /**
- * List all the clients.
+ * List all the root clients.
  *
  * @param context TCGCContext
- * @returns Array of clients
+ * @returns Array of root clients
  */
 export function listClients(context: TCGCContext): SdkClient[] {
-  return context.getClients();
+  return context.getRootClients();
 }
 
+/**
+ * @deprecated Use `@client` instead. The `@operationGroup` decorator is deprecated.
+ */
+// eslint-disable-next-line @typescript-eslint/no-deprecated
 export const $operationGroup: OperationGroupDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
   scope?: LanguageScopes,
 ) => {
-  if ((context.decoratorTarget as Node).kind === SyntaxKind.AugmentDecoratorStatement) {
-    reportDiagnostic(context.program, {
-      code: "wrong-client-decorator",
-      target: context.decoratorTarget,
-    });
-    return;
-  }
-
-  setScopedDecoratorData(
-    context,
-    $operationGroup,
-    operationGroupKey,
-    target,
-    {
-      kind: "SdkOperationGroup",
-      type: target,
-    },
-    scope,
-  );
+  // Delegate to $client - @operationGroup is now just an alias for @client
+  context.call($client, target, undefined, scope);
 };
 
 /**
- * Check a namespace or interface is an operation group.
- * @param context TCGCContext
- * @param type Type to check
- * @returns boolean
- */
-export function isOperationGroup(context: TCGCContext, type: Namespace | Interface): boolean {
-  if (hasExplicitClientOrOperationGroup(context)) {
-    return getScopedDecoratorData(context, operationGroupKey, type) !== undefined;
-  }
-  // if there is no explicit client, we will treat non-client namespaces and all interfaces as operation group
-  if (type.kind === "Interface" && !isTemplateDeclaration(type)) {
-    return true;
-  }
-  if (
-    type.kind === "Namespace" &&
-    !type.decorators.some(
-      (d) => d.definition?.name === "@service" && d.definition?.namespace.name === "TypeSpec",
-    )
-  ) {
-    return true;
-  }
-  return false;
-}
-
-/**
- * Return the operation group object for the given namespace or interface or undefined is not an operation group.
- * @param context TCGCContext
- * @param type Type to check
- * @returns Operation group or undefined.
- */
-export function getOperationGroup(
-  context: TCGCContext,
-  type: Namespace | Interface,
-): SdkOperationGroup | undefined {
-  const operationGroup = context.getClientOrOperationGroup(type);
-
-  return operationGroup?.kind === "SdkOperationGroup" ? operationGroup : undefined;
-}
-
-/**
- * List all the operation groups inside a client or an operation group. If ignoreHierarchy is true, the result will include all nested operation groups.
+ * List all the sub clients inside a client. If ignoreHierarchy is true, the result will include all nested sub clients.
  *
  * @param context TCGCContext
- * @param group Client or operation group to list operation groups
- * @param ignoreHierarchy Whether to get all nested operation groups
- * @returns
+ * @param group Client to list sub clients
+ * @param ignoreHierarchy Whether to get all nested sub clients
+ * @returns Array of sub clients
  */
-export function listOperationGroups(
+export function listSubClients(
   context: TCGCContext,
-  group: SdkClient | SdkOperationGroup,
+  group: SdkClient,
   ignoreHierarchy = false,
-): SdkOperationGroup[] {
-  if (!ignoreHierarchy) return group.subOperationGroups;
+): SdkClient[] {
+  if (!ignoreHierarchy) return group.subClients;
 
-  const groups: SdkOperationGroup[] = [...group.subOperationGroups];
+  const clients: SdkClient[] = [...group.subClients];
   let current = 0;
-  while (current < groups.length) {
-    const operationGroup = groups[current];
-    if (operationGroup.subOperationGroups) {
-      groups.push(...operationGroup.subOperationGroups);
+  while (current < clients.length) {
+    const subClient = clients[current];
+    if (subClient.subClients) {
+      clients.push(...subClient.subClients);
     }
     current++;
   }
 
-  return groups;
+  return clients;
 }
 
 /**
- * List operations inside a client or an operation group. If ignoreHierarchy is true, the result will include all nested operations.
- * @param program TCGCContext
- * @param group Client or operation group to list operations
+ * List operations inside a client or sub client. If ignoreHierarchy is true, the result will include all nested operations.
+ * @param context TCGCContext
+ * @param client Client to list operations
  * @param ignoreHierarchy Whether to get all nested operations
  * @returns
  */
-export function listOperationsInOperationGroup(
+export function listOperationsInClient(
   context: TCGCContext,
-  group: SdkOperationGroup | SdkClient,
+  client: SdkClient,
   ignoreHierarchy = false,
 ): Operation[] {
-  if (!ignoreHierarchy) return context.getOperationsForClient(group);
+  if (!ignoreHierarchy) return context.getOperationsForClient(client);
 
-  const groups: SdkOperationGroup[] = [...group.subOperationGroups];
-  const operations: Operation[] = [...context.getOperationsForClient(group)];
-  while (groups.length > 0) {
-    const operationGroup = groups.shift()!;
-    if (operationGroup.subOperationGroups) {
-      groups.push(...operationGroup.subOperationGroups);
+  const subClients: SdkClient[] = [...client.subClients];
+  const operations: Operation[] = [...context.getOperationsForClient(client)];
+  let groupIdx = 0;
+  while (groupIdx < subClients.length) {
+    const subClient = subClients[groupIdx++];
+    if (subClient.subClients) {
+      subClients.push(...subClient.subClients);
     }
-    operations.push(...context.getOperationsForClient(operationGroup));
+    operations.push(...context.getOperationsForClient(subClient));
   }
 
   return operations;
@@ -499,8 +466,6 @@ export function shouldGenerateConvenient(context: TCGCContext, entity: Operation
   return value ?? Boolean(context.generateConvenienceMethods);
 }
 
-const usageKey = createStateSymbol("usage");
-
 export const $usage: UsageDecorator = (
   context: DecoratorContext,
   entity: Model | Enum | Union | Namespace,
@@ -565,11 +530,11 @@ export const $usage: UsageDecorator = (
 
 export function getUsageOverride(
   context: TCGCContext,
-  entity: Model | Enum | Union,
+  entity: Model | Enum | Union | Namespace,
 ): number | undefined {
   const usageFlags = getScopedDecoratorData(context, usageKey, entity);
   if (usageFlags || entity.namespace === undefined) return usageFlags;
-  return getScopedDecoratorData(context, usageKey, entity.namespace);
+  return getUsageOverride(context, entity.namespace);
 }
 
 export function getUsage(context: TCGCContext, entity: Model | Enum | Union): UsageFlags {
@@ -726,14 +691,15 @@ export function getClientNameOverride(
 
 // Recursive function to collect parameter names
 function collectParams(
+  program: Program,
   properties: RekeyableMap<string, ModelProperty>,
   params: ModelProperty[] = [],
 ): ModelProperty[] {
   properties.forEach((value, key) => {
     // If the property is of type 'model', recurse into its properties
-    if (params.filter((x) => compareModelProperties(undefined, x, value)).length === 0) {
+    if (!params.some((x) => compareModelProperties(program, x, value))) {
       if (value.type.kind === "Model") {
-        collectParams(value.type.properties, params);
+        collectParams(program, value.type.properties, params);
       } else {
         params.push(findRootSourceProperty(value));
       }
@@ -741,6 +707,28 @@ function collectParams(
   });
 
   return params;
+}
+
+// Collect the names of the parameters that are realized as path parameters in
+// the resolved HTTP route of an operation. Returns `undefined` when the HTTP
+// route cannot be resolved (for example for non-HTTP operations), in which case
+// callers should fall back to inspecting the `@path` decorator directly.
+function getRealizedPathParamNames(
+  program: Program,
+  operation: Operation,
+): Set<string> | undefined {
+  try {
+    const [httpOperation] = getHttpOperation(program, operation);
+    const names = new Set<string>();
+    for (const parameter of httpOperation.parameters.parameters) {
+      if (parameter.type === "path") {
+        names.add(parameter.param.name);
+      }
+    }
+    return names;
+  } catch {
+    return undefined;
+  }
 }
 
 export const $override = (
@@ -752,20 +740,42 @@ export const $override = (
   // omit all override operation
   context.program.stateMap(omitOperation).set(override, true);
 
-  // Extract and sort parameter names
-  const originalParams = collectParams(original.parameters.properties).sort((a, b) =>
-    a.name.localeCompare(b.name),
-  );
-  const overrideParams = collectParams(override.parameters.properties).sort((a, b) =>
-    a.name.localeCompare(b.name),
+  // Collect the parameters of both operations. Parameters are matched by name
+  // (see below) rather than by position, so the lists do not need to be sorted.
+  const originalParams = collectParams(context.program, original.parameters.properties);
+  const overrideParams = collectParams(context.program, override.parameters.properties);
+
+  // Match override parameters to original parameters by name. Overrides are
+  // allowed to add, remove, or regroup parameters (for example wrapping several
+  // parameters in a customization model), so comparing the two lists by sorted
+  // position produces false `override-parameters-mismatch` diagnostics whenever
+  // the parameter sets differ in shape.
+  const overrideParamsByName = new Map(overrideParams.map((p) => [p.name, p]));
+
+  // Determine which parameters are realized as path parameters in the resolved
+  // HTTP route of the original operation. Checking the `@path` decorator alone is
+  // not sufficient, because some templated parameters (for example ARM scope
+  // models) carry `@path` in the type graph without being realized as path
+  // parameters in the operation's actual route.
+  const realizedPathParamNames = getRealizedPathParamNames(context.program, original);
+
+  // A `@clientLocation` on any override parameter indicates an intentional
+  // customization where non-path params are just pass-throughs, so the `@path`
+  // preservation check below is skipped in that case.
+  const overrideHasClientLocation = overrideParams.some((p) =>
+    p.decorators.some((d) => d.decorator.name === "$clientLocation"),
   );
 
-  // Check if the sorted parameter names arrays are equal, omit optional parameters
+  // Check that every required original parameter has a matching override
+  // parameter, omitting optional parameters.
   let parametersMatch = true;
   let checkParameter: ModelProperty | undefined = undefined;
-  let index = 0;
   for (const originalParam of originalParams) {
-    if (index > overrideParams.length - 1) {
+    const overrideParam = overrideParamsByName.get(originalParam.name);
+    if (
+      overrideParam === undefined ||
+      !compareModelProperties(context.program, originalParam, overrideParam)
+    ) {
       if (!originalParam.optional) {
         parametersMatch = false;
         checkParameter = originalParam;
@@ -774,18 +784,27 @@ export const $override = (
         continue;
       }
     }
-    if (!compareModelProperties(undefined, originalParam, overrideParams[index])) {
-      if (!originalParam.optional) {
-        parametersMatch = false;
-        checkParameter = originalParam;
-        break;
-      } else {
-        continue;
-      }
+
+    // Warn if original param has @path but the matching override param doesn't.
+    const originalIsRealizedPathParam = realizedPathParamNames
+      ? realizedPathParamNames.has(originalParam.name)
+      : isPathParam(context.program, originalParam);
+    if (
+      originalIsRealizedPathParam &&
+      !isPathParam(context.program, overrideParam) &&
+      !overrideHasClientLocation
+    ) {
+      reportDiagnostic(context.program, {
+        code: "override-parameters-mismatch",
+        target: context.decoratorTarget,
+        format: {
+          methodName: original.name,
+          checkParameter: overrideParam.name,
+        },
+      });
     }
 
     // Apply the alternate type to the original parameter
-    const overrideParam = overrideParams[index];
     overrideParam.decorators
       .filter(
         (d) =>
@@ -800,8 +819,6 @@ export const $override = (
           d.args[1]?.jsValue as string | undefined,
         ),
       );
-
-    index++;
   }
 
   if (!parametersMatch) {
@@ -1528,49 +1545,7 @@ export function getClientLocation(
   context: TCGCContext,
   input: Operation | ModelProperty,
 ): Namespace | Interface | Operation | string | undefined {
-  // if there is `@client` or `@operationGroup` decorator, `@clientLocation` on operation will be ignored
-  if (input.kind === "Operation" && hasExplicitClientOrOperationGroup(context)) {
-    return undefined;
-  }
   return getScopedDecoratorData(context, clientLocationKey, input);
-}
-
-const legacyHierarchyBuildingKey = createStateSymbol("legacyHierarchyBuilding");
-
-interface PropertyConflict {
-  propertyName: string;
-  reason: "missing" | "type-mismatch";
-}
-
-function isPropertySuperset(program: Program, target: Model, value: Model): PropertyConflict[] {
-  const conflicts: PropertyConflict[] = [];
-
-  // Check if all properties in value exist in target
-  for (const name of value.properties.keys()) {
-    if (!target.properties.has(name)) {
-      conflicts.push({
-        propertyName: name,
-        reason: "missing",
-      });
-      continue;
-    }
-    const targetProperty = target.properties.get(name)!;
-    const valueProperty = value.properties.get(name)!;
-    // Compare properties to handle envelope/spread semantics correctly
-    // Properties match if they come from the same source OR if they have the same type
-    // This ensures properties from envelopes (e.g., ...ArmTagsProperty) are recognized
-    // as equivalent to directly defined properties with the same name and type
-    if (targetProperty.sourceProperty !== valueProperty.sourceProperty) {
-      // Different sources - check if they have the same type
-      if (targetProperty.type !== valueProperty.type) {
-        conflicts.push({
-          propertyName: name,
-          reason: "type-mismatch",
-        });
-      }
-    }
-  }
-  return conflicts;
 }
 
 export const $legacyHierarchyBuilding: HierarchyBuildingDecorator = (
@@ -1579,37 +1554,6 @@ export const $legacyHierarchyBuilding: HierarchyBuildingDecorator = (
   value: Model,
   scope?: LanguageScopes,
 ) => {
-  // Validate that target has all properties from value
-  const conflicts = isPropertySuperset(context.program, target, value);
-  if (conflicts.length > 0) {
-    for (const conflict of conflicts) {
-      if (conflict.reason === "missing") {
-        reportDiagnostic(context.program, {
-          code: "legacy-hierarchy-building-conflict",
-          messageId: "property-missing",
-          format: {
-            childModel: target.name,
-            parentModel: value.name,
-            propertyName: conflict.propertyName,
-          },
-          target: context.decoratorTarget,
-        });
-      } else if (conflict.reason === "type-mismatch") {
-        reportDiagnostic(context.program, {
-          code: "legacy-hierarchy-building-conflict",
-          messageId: "type-mismatch",
-          format: {
-            childModel: target.name,
-            parentModel: value.name,
-            propertyName: conflict.propertyName,
-          },
-          target: context.decoratorTarget,
-        });
-      }
-    }
-    return;
-  }
-
   setScopedDecoratorData(
     context,
     $legacyHierarchyBuilding,
@@ -1891,14 +1835,14 @@ export const $clientOption: ClientOptionDecorator = (
   // Always emit warning that this is experimental
   reportDiagnostic(context.program, {
     code: "client-option",
-    target: target,
+    target: context.decoratorTarget,
   });
 
   // Emit additional warning if scope is not provided
   if (scope === undefined) {
     reportDiagnostic(context.program, {
       code: "client-option-requires-scope",
-      target: target,
+      target: context.decoratorTarget,
     });
   }
 
@@ -1906,3 +1850,53 @@ export const $clientOption: ClientOptionDecorator = (
   // The decorator info will be exposed via the decorators array on SDK types
   setScopedDecoratorData(context, $clientOption, clientOptionKey, target, { name, value }, scope);
 };
+
+/**
+ * Gets the value of a specific client option for a target.
+ * Checks the target itself and walks up the namespace/interface hierarchy.
+ */
+export function getClientOptionValue(
+  context: TCGCContext,
+  target: Operation,
+  optionName: string,
+): unknown | undefined {
+  // Check operation directly
+  const opOption = getScopedDecoratorData(context, clientOptionKey, target) as
+    | { name: string; value: unknown }
+    | undefined;
+  if (opOption?.name === optionName) {
+    return opOption.value;
+  }
+
+  // Check interface if operation is in one
+  if (target.interface) {
+    const ifaceOption = getScopedDecoratorData(context, clientOptionKey, target.interface) as
+      | { name: string; value: unknown }
+      | undefined;
+    if (ifaceOption?.name === optionName) {
+      return ifaceOption.value;
+    }
+  }
+
+  // Check namespace hierarchy
+  let ns = target.namespace;
+  while (ns) {
+    const nsOption = getScopedDecoratorData(context, clientOptionKey, ns) as
+      | { name: string; value: unknown }
+      | undefined;
+    if (nsOption?.name === optionName) {
+      return nsOption.value;
+    }
+    ns = ns.namespace;
+  }
+
+  return undefined;
+}
+
+/**
+ * Known client option: omitSlashFromEmptyRoute
+ * When set to true, operations with empty routes ("/") will have their path set to "".
+ */
+export function shouldOmitSlashFromEmptyRoute(context: TCGCContext, target: Operation): boolean {
+  return getClientOptionValue(context, target, "omitSlashFromEmptyRoute") === true;
+}

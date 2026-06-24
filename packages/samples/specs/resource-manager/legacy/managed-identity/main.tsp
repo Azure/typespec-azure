@@ -20,6 +20,7 @@ namespace Microsoft.UpdateTests;
 enum Versions {
   /** 2023-03-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v3)
+  @previewVersion
   `2023-03-01-preview`,
 }
 
@@ -53,6 +54,7 @@ model WidgetResourceProperties {
 interface Widgets {
   get is ArmResourceRead<WidgetResource>;
   create is ArmResourceCreateOrUpdateAsync<WidgetResource>;
+  #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
   update is ArmTagsPatchSync<WidgetResource>;
   delete is ArmResourceDeleteWithoutOkAsync<WidgetResource>;
   listByResourceGroup is ArmResourceListByParent<WidgetResource>;

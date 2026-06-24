@@ -59,6 +59,37 @@ describe("@clientOption diagnostics", () => {
       code: "@azure-tools/typespec-client-generator-core/client-option",
     });
   });
+
+  it("should allow suppressing client-option warning on the decorator", async () => {
+    const diagnostics = await SimpleTester.diagnose(`
+      @service
+      namespace MyService;
+
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("enableFeatureFoo", true, "python")
+      model Test {
+        id: string;
+      }
+    `);
+
+    strictEqual(diagnostics.length, 0);
+  });
+
+  it("should allow suppressing both warnings on the decorator", async () => {
+    const diagnostics = await SimpleTester.diagnose(`
+      @service
+      namespace MyService;
+
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      #suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope"
+      @clientOption("enableFeatureFoo", true)
+      model Test {
+        id: string;
+      }
+    `);
+
+    strictEqual(diagnostics.length, 0);
+  });
 });
 
 describe("@clientOption with getClientOptions getter", () => {
@@ -454,7 +485,7 @@ describe("@clientOption with getClientOptions getter", () => {
     strictEqual(getClientOptions(sdkNamespace, "namespaceFlag"), "nsValue");
   });
 
-  it("should return client option value for interface (operation group)", async () => {
+  it("should return client option value for interface (sub client)", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("interfaceFlag", true, "python")

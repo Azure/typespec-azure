@@ -26,7 +26,8 @@ import {
   getNextLinkVerb,
   getOverriddenClientMethod,
   getResponseAsBool,
-  listOperationsInOperationGroup,
+  isInScope,
+  listOperationsInClient,
   shouldGenerateConvenient,
   shouldGenerateProtocol,
 } from "./decorators.js";
@@ -48,7 +49,6 @@ import {
   SdkModelType,
   SdkNextOperationLink,
   SdkNextOperationReference,
-  SdkOperationGroup,
   SdkOperationLink,
   SdkOperationReference,
   SdkPagingServiceMethod,
@@ -80,6 +80,7 @@ import {
   getCrossLanguageDefinitionId,
   getHttpOperationWithCache,
   getLibraryName,
+  isExactClientName,
 } from "./public-utils.js";
 import {
   getClientTypeWithDiagnostics,
@@ -356,8 +357,9 @@ export function getPropertySegmentsFromModelOrParameters(
     }
   }
 
-  while (queue.length > 0) {
-    const { model, path } = queue.shift()!;
+  let queueIdx = 0;
+  while (queueIdx < queue.length) {
+    const { model, path } = queue[queueIdx++];
     for (const prop of model.properties.values()) {
       if (predicate(prop)) {
         return path.concat(prop);
@@ -460,7 +462,12 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
       case "pollingSuccessProperty": {
         return {
           kind: "pollingSuccessProperty",
-          responseModel: getSdkModel(context, step.responseModel),
+          responseModel:
+            step.responseModel.kind === "Scalar"
+              ? (diagnostics.pipe(
+                  getClientTypeWithDiagnostics(context, step.responseModel),
+                ) as SdkBuiltInType)
+              : getSdkModel(context, step.responseModel),
           target: diagnostics.pipe(getSdkModelPropertyType(context, step.target)),
           sourceProperty: step.sourceProperty
             ? diagnostics.pipe(getSdkModelPropertyType(context, step.sourceProperty))
@@ -578,11 +585,11 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     }
     const envelopeResult = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, rawMetadata.finalEnvelopeResult),
-    ) as SdkModelType | SdkArrayType | SdkBuiltInType<"unknown">;
+    ) as SdkModelType | SdkArrayType | SdkBuiltInType;
 
     const result = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, rawMetadata.finalResult),
-    ) as SdkModelType | SdkArrayType | SdkBuiltInType<"unknown">;
+    ) as SdkModelType | SdkArrayType | SdkBuiltInType;
 
     // find the property inside the envelope result using the final result path
     let sdkProperty: SdkModelPropertyType | undefined = undefined;
@@ -640,6 +647,7 @@ function getSdkMethodResponse(
         variantTypes: allResponseBodies,
         name: createGeneratedName(context, operation, "UnionResponse"),
         isGeneratedName: true,
+        isExactName: false,
         namespace: client.namespace,
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, operation)}.UnionResponse`,
         decorators: [],
@@ -651,8 +659,9 @@ function getSdkMethodResponse(
 
   // Set optional property based on whether responses have bodies
   // If type is undefined (no response), optional remains undefined
+  // For @responseAsBool, the boolean return is never optional — it's always true or false
   let optional: boolean | undefined = undefined;
-  if (type !== undefined) {
+  if (type !== undefined && !getResponseAsBool(context, operation)) {
     // If we have a response type, set optional based on whether some responses lack bodies
     optional = containsResponseWithoutBody;
   }
@@ -700,6 +709,8 @@ export function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOpe
 
   for (const param of params) {
     if (isNeverOrVoidType(param.type)) continue;
+    // Skip parameters that are not in scope for this emitter
+    if (!isInScope(context, param)) continue;
     const sdkMethodParam = diagnostics.pipe(getSdkMethodParameter(context, param, operation));
     if (sdkMethodParam.onClient) {
       // add API version and subscription ID parameters to the client parameters
@@ -726,6 +737,7 @@ export function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOpe
     __raw: operation,
     kind: "basic",
     name,
+    isExactName: isExactClientName(context, operation),
     access: getAccess(context, operation) ?? "public",
     parameters: methodParameters,
     doc: getClientDoc(context, operation),
@@ -790,12 +802,12 @@ export function getSdkMethodParameter(
 
 export function createSdkMethods<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
-  client: SdkClient | SdkOperationGroup,
+  client: SdkClient,
   sdkClientType: SdkClientType<TServiceOperation>,
 ): [SdkMethod<TServiceOperation>[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const retval: SdkMethod<TServiceOperation>[] = [];
-  for (const operation of listOperationsInOperationGroup(context, client)) {
+  for (const operation of listOperationsInClient(context, client)) {
     retval.push(
       diagnostics.pipe(getSdkServiceMethod<TServiceOperation>(context, operation, sdkClientType)),
     );

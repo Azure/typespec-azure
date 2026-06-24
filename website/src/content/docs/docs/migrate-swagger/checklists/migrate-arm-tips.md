@@ -38,6 +38,19 @@ linter:
 
 ✅ **DO** use the [standard Typespec Azure.ResourceManager and Azure.Core operation templates and data-types][standard-templates] wherever possible. Standard operation templates should be used as much as possible
 
+✅ **DO** use the `CustomAzureResource` template for ARM resources that do not follow the standard `TrackedResource` or `ProxyResource` patterns. Do not use the `@customAzureResource` decorator directly or force non-standard resources into standard ARM shapes.
+
+```tsp
+model VmSizeResource is CustomAzureResource {
+  /** The unique key for this VM size within its scope */
+  @key
+  vmSizeName: string;
+
+  /** Normal payload properties */
+  properties?: VmSizeResourceProperties;
+}
+```
+
 ✅ **DO** use `union` instead of `enum` to define Azure extensible enums. See: [Defining enums for Azure services][no-enum]. Example:
 
 ```tsp
@@ -60,7 +73,7 @@ union WidgetColor {
 
 ❌ **DON'T** import or use `@azure-tools/typespec-client-generator-core` in files other than `client.tsp` or `back-compat.tsp`
 
-❌ **DON'T** reference `client.tsp` in `main.tsp`
+✅ **DO** reference `client.tsp` in `main.tsp` (add `import "./client.tsp";` so `main.tsp` is the single entrypoint)
 
 ✅ **DO** reference `back-compat.tsp` in `main.tsp`
 

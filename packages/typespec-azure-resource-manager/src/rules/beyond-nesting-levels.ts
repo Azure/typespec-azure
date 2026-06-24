@@ -11,6 +11,7 @@ export const beyondNestingRule = createRule({
   name: "beyond-nesting-levels",
   severity: "warning",
   description: "Tracked Resources must use 3 or fewer levels of nesting.",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/beyond-nesting-levels",
   messages: {
     default: "Tracked Resources must use 3 or fewer levels of nesting.",
   },

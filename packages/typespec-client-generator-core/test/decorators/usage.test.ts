@@ -3,7 +3,12 @@ import { strictEqual } from "assert";
 import { it } from "vitest";
 import { getUsage } from "../../src/decorators.js";
 import { UsageFlags } from "../../src/interfaces.js";
-import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
+import {
+  AzureCoreTester,
+  createSdkContextForTester,
+  SimpleTester,
+  SimpleTesterWithService,
+} from "../tester.js";
 
 it("defaults calculated usage", async () => {
   const { program, Model1, Model2, Model3, Model4 } = await SimpleTester.compile(t.code`
@@ -189,10 +194,12 @@ it("patch usage", async () => {
         prop: string
       }
 
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       @patch(#{implicitOptionality: true})
       @route("/patch")
       op patchModel(@body body: PatchModel): void;
 
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       @patch(#{implicitOptionality: true})
       @route("/jsonMergePatch")
       op jsonMergePatchModel(@body body: JsonMergePatchModel, @header contentType: "application/merge-patch+json"): void;
@@ -335,6 +342,57 @@ it("usage additive from multiple sources", async () => {
   strictEqual(models[2].usage, UsageFlags.Output);
 });
 
+it("readonly property strips Input from combined usage flags", async () => {
+  const { program } = await SimpleTesterWithService.compile(t.code`
+    @usage(Usage.input | Usage.output)
+    model A {
+      @visibility(Lifecycle.Read)
+      prop: B;
+    }
+
+    model B {
+      value: string;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
+  strictEqual(models.length, 2);
+  // A has Input | Output from @usage
+  strictEqual(models.find((m) => m.name === "A")?.usage, UsageFlags.Input | UsageFlags.Output);
+  // B should have Output only (Input stripped because property is readonly)
+  strictEqual(models.find((m) => m.name === "B")?.usage, UsageFlags.Output);
+});
+
+it("readonly property does not affect non-Input flags propagation", async () => {
+  const { program } = await SimpleTesterWithService.compile(t.code`
+    model RoundTripModel {
+      @visibility(Lifecycle.Read)
+      result: ResultModel;
+    }
+
+    model ResultModel {
+      name: string;
+    }
+
+    @route("/op")
+    @put
+    op myOp(@body body: RoundTripModel): { @body body: RoundTripModel; };
+  `);
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
+  strictEqual(models.length, 2);
+  // RoundTripModel has Input + Output + Json from operation
+  strictEqual(
+    models.find((x) => x.name === "RoundTripModel")?.usage,
+    UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
+  );
+  // ResultModel gets Output + Json (no Input because readonly property)
+  strictEqual(
+    models.find((x) => x.name === "ResultModel")?.usage,
+    UsageFlags.Output | UsageFlags.Json,
+  );
+});
+
 it("usage additive from spread", async () => {
   const { program } = await SimpleTesterWithService.compile(t.code`
     model A {
@@ -388,6 +446,56 @@ it("orphan model in group", async () => {
   strictEqual(models[0].access, "public");
   strictEqual(models[1].usage, UsageFlags.Output);
   strictEqual(models[1].access, "public");
+});
+
+it("@@usage and @@access on model from imported library are honored", async () => {
+  // Regression test: previously, augment decorators applied to models in
+  // imported library namespaces (e.g. Azure.Core) were silently dropped when
+  // the target model was not also reachable from an operation.
+  const { program } = await AzureCoreTester.compile(t.code`
+    @service
+    namespace MyService;
+
+    op noop(): void;
+
+    @@usage(Azure.Core.Foundations.Error, Usage.input);
+    @@access(Azure.Core.Foundations.Error, Access.public);
+  `);
+  const context = await createSdkContextForTester(program);
+  const errorModel = context.sdkPackage.models.find((m) => m.name === "Error");
+  strictEqual(errorModel?.usage, UsageFlags.Input);
+  strictEqual(errorModel?.access, "public");
+});
+
+it("@usage on namespace propagates recursively to nested namespaces", async () => {
+  const { program } = await SimpleTesterWithService.compile(t.code`
+    @access(Access.public)
+    @usage(Usage.output)
+    namespace Models {
+      model TopLevel {
+        prop: string;
+      }
+
+      namespace Nested {
+        model NestedModel {
+          name: string;
+        }
+
+        namespace DeeplyNested {
+          model DeepModel {
+            value: int32;
+          }
+        }
+      }
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
+  strictEqual(models.length, 3);
+  for (const model of models) {
+    strictEqual(model.usage, UsageFlags.Output);
+    strictEqual(model.access, "public");
+  }
 });
 
 it("disableUsageAccessPropagationToBase true with override", async () => {

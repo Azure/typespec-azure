@@ -32,6 +32,7 @@ const args = parseArgs({
   options: {
     noCommit: { type: "boolean" },
     onlyBumpVersions: { type: "boolean" }, // Only bump version, skip any extra steps like updating the docs and regenerating samples
+    skipUpToDateCheck: { type: "boolean" }, // Skip the pre-publish state check (clean repo, changelogs present)
   },
   args: process.argv.slice(2),
 });
@@ -57,7 +58,7 @@ if (production) {
 }
 
 // Check that we have a clean slate before starting
-if (production) {
+if (production && !args.values.skipUpToDateCheck) {
   await checkPrePublishState();
 }
 
@@ -200,7 +201,7 @@ async function getProjectVersions() {
 async function rebuildAndRegenSamplesToBumpTemplateVersions() {
   await typespecAzureRunWithRetries(3, "pnpm", "install");
   await typespecAzureRunWithOptions(
-    { env: { ...process.env, TYPESPEC_SKIP_DOCUSAURUS_BUILD: true } },
+    { env: { ...process.env, TYPESPEC_SKIP_WEBSITE_BUILD: true } },
     "pnpm",
     "build",
   );

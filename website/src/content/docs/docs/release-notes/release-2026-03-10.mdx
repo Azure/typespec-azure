@@ -1,0 +1,25 @@
+---
+title: 0.66.0
+---
+
+import { LinkCard } from "@astrojs/starlight/components";
+
+<LinkCard
+  title="TypeSpec Core 1.10"
+  description="See changes to the TypeSpec language and core libraries"
+  href="https://typespec.io/docs/release-notes/release-2026-03-10"
+/>
+
+# 0.66.0
+
+## Features
+
+### @azure-tools/typespec-client-generator-core
+
+- [#3867](https://github.com/Azure/typespec-azure/pull/3867) Add `.streamMetadata` for sse events streamed in or out
+
+## Bug Fixes
+
+### @azure-tools/typespec-client-generator-core
+
+- [#3953](https://github.com/Azure/typespec-azure/pull/3953) Fix namespace duplication when `@clientNamespace` extends the namespace flag (e.g. `@clientNamespace("Azure.Search.Documents.Indexes")` with namespace flag `Azure.Search.Documents`)

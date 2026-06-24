@@ -45,7 +45,7 @@
     }
   },
   "x-ms-paths": {
-    "/typespec/things/?overload=returnString": {
+    "/typespec/things?overload=returnString": {
       "post": {
         "operationId": "Things_PostThingReturnString",
         "produces": [
@@ -71,7 +71,7 @@
         }
       }
     },
-    "/typespec/things/?overload=withParam": {
+    "/typespec/things?overload=withParam": {
       "post": {
         "operationId": "Things_PostThingWithParam",
         "parameters": [

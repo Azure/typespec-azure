@@ -1,106 +1,140 @@
 import { deepStrictEqual } from "assert";
-import { describe, it } from "vitest";
+import { it } from "vitest";
 import { sortOpenAPIDocument } from "../src/openapi.js";
 import { openApiFor } from "./test-host.js";
 
-describe("typespec-autorest: OpenAPI output should be determinstic", () => {
-  const headerDefinitions = `
-  model A_Header { @header a : string };
-  model B_Header { @header b : string };
-  model C_Header { @header c : string };
+const headerDefinitions = `
+model A_Header { @header a : string };
+model B_Header { @header b : string };
+model C_Header { @header c : string };
 `;
 
-  it("sorts root", () => {
-    const sorted = sortOpenAPIDocument({
-      info: {} as any,
-      paths: {},
-      produces: [],
-      swagger: "2.0",
-      "x-ms-paths": {},
-      consumes: [],
-    });
-
-    deepStrictEqual(Object.keys(sorted), [
-      "swagger",
-      "info",
-      "produces",
-      "consumes",
-      "paths",
-      "x-ms-paths",
-    ]);
+it("sorts root", () => {
+  const sorted = sortOpenAPIDocument({
+    info: {} as any,
+    paths: {},
+    produces: [],
+    swagger: "2.0",
+    "x-ms-paths": {},
+    consumes: [],
   });
 
-  it("sorts paths", () => {
-    const sorted = sortOpenAPIDocument({
-      swagger: "2.0",
-      info: {} as any,
-      paths: {
-        "/{things}/three": {},
-        "/foo": {},
-        "/{things}": {},
-        "/foo/{things}": {},
+  deepStrictEqual(Object.keys(sorted), [
+    "swagger",
+    "info",
+    "produces",
+    "consumes",
+    "paths",
+    "x-ms-paths",
+  ]);
+});
+
+it("sorts paths", () => {
+  const sorted = sortOpenAPIDocument({
+    swagger: "2.0",
+    info: {} as any,
+    paths: {
+      "/{things}/three": {},
+      "/foo": {},
+      "/{things}": {},
+      "/foo/{things}": {},
+    },
+  });
+
+  deepStrictEqual(Object.keys(sorted.paths), [
+    "/{things}",
+    "/{things}/three",
+    "/foo",
+    "/foo/{things}",
+  ]);
+});
+
+it("sorts path verbs", () => {
+  const sorted = sortOpenAPIDocument({
+    swagger: "2.0",
+    info: {} as any,
+    paths: {
+      "/": {
+        delete: {} as any,
+        put: {} as any,
+        parameters: {} as any,
+        post: {} as any,
+        head: {} as any,
+        options: {} as any,
+        get: {} as any,
+        patch: {} as any,
       },
-    });
-
-    deepStrictEqual(Object.keys(sorted.paths), [
-      "/{things}",
-      "/{things}/three",
-      "/foo",
-      "/foo/{things}",
-    ]);
+    },
   });
 
-  it("sorts path verbs", () => {
-    const sorted = sortOpenAPIDocument({
-      swagger: "2.0",
-      info: {} as any,
-      paths: {
-        "/": {
-          delete: {} as any,
-          put: {} as any,
-          parameters: {} as any,
-          post: {} as any,
-          head: {} as any,
-          options: {} as any,
-          get: {} as any,
-          patch: {} as any,
-        },
-      },
-    });
+  deepStrictEqual(Object.keys(sorted.paths["/"]), [
+    "parameters",
+    "get",
+    "put",
+    "post",
+    "patch",
+    "delete",
+    "options",
+    "head",
+  ]);
+});
 
-    deepStrictEqual(Object.keys(sorted.paths["/"]), [
-      "parameters",
-      "get",
-      "put",
-      "post",
-      "patch",
-      "delete",
-      "options",
-      "head",
-    ]);
+it("sorts x-ms-paths with query-only paths", () => {
+  const sorted = sortOpenAPIDocument({
+    swagger: "2.0",
+    info: {} as any,
+    paths: {},
+    "x-ms-paths": {
+      "?b=1": {},
+      "?a=1": {},
+      "?c=1": {},
+    },
   });
 
-  it("header already in lexical order", async () => {
-    const res = await openApiFor(
-      `
-      ${headerDefinitions}
-      model Headers { ...A_Header, ...B_Header, ...C_Header };
+  deepStrictEqual(Object.keys(sorted["x-ms-paths"]!), ["?a=1", "?b=1", "?c=1"]);
+});
 
-      op read(): {@statusCode _: 200, content: string, headers: Headers};
-      `,
-    );
-    deepStrictEqual(Object.keys(res.paths["/"].get.responses["200"].headers), ["a", "b", "c"]);
+it("sorts x-ms-paths with mixed path and query-only entries", () => {
+  const sorted = sortOpenAPIDocument({
+    swagger: "2.0",
+    info: {} as any,
+    paths: {},
+    "x-ms-paths": {
+      "/b?_overload=op1": {},
+      "?b=1": {},
+      "/a?_overload=op2": {},
+      "?a=1": {},
+    },
   });
 
-  it("header not in lexical order", async () => {
-    const res = await openApiFor(
-      `
-      ${headerDefinitions}
-      model Headers { ...C_Header, ...A_Header, ...B_Header };
+  deepStrictEqual(Object.keys(sorted["x-ms-paths"]!), [
+    "?a=1",
+    "?b=1",
+    "/a?_overload=op2",
+    "/b?_overload=op1",
+  ]);
+});
 
-      op read(): {@statusCode _: 200, content: string, headers: Headers};
-      `,
-    );
-    deepStrictEqual(Object.keys(res.paths["/"].get.responses["200"].headers), ["a", "b", "c"]);
-  });
+it("header already in lexical order", async () => {
+  const res = await openApiFor(
+    `
+    ${headerDefinitions}
+    model Headers { ...A_Header, ...B_Header, ...C_Header };
+
+    op read(): {@statusCode _: 200, content: string, headers: Headers};
+    `,
+  );
+  deepStrictEqual(Object.keys(res.paths["/"].get.responses["200"].headers), ["a", "b", "c"]);
+});
+
+it("header not in lexical order", async () => {
+  const res = await openApiFor(
+    `
+    ${headerDefinitions}
+    model Headers { ...C_Header, ...A_Header, ...B_Header };
+
+    op read(): {@statusCode _: 200, content: string, headers: Headers};
+    `,
+  );
+  deepStrictEqual(Object.keys(res.paths["/"].get.responses["200"].headers), ["a", "b", "c"]);
 });

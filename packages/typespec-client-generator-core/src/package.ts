@@ -4,6 +4,7 @@ import {
   getNamespaceFullName,
   ignoreDiagnostics,
 } from "@typespec/compiler";
+
 import { prepareClientAndOperationCache } from "./cache.js";
 import { createSdkClientType } from "./clients.js";
 import { listClients } from "./decorators.js";
@@ -28,9 +29,9 @@ import { getLicenseInfo } from "./license.js";
 import { getCrossLanguagePackageId, getNamespaceFromType } from "./public-utils.js";
 import { getAllReferencedTypes, handleAllTypes } from "./types.js";
 
-export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
+export async function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
-): [SdkPackage<TServiceOperation>, readonly Diagnostic[]] {
+): Promise<[SdkPackage<TServiceOperation>, readonly Diagnostic[]]> {
   const diagnostics = createDiagnosticCollector();
   populateApiVersionInformation(context);
   diagnostics.pipe(handleAllTypes(context));
@@ -59,6 +60,7 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
       (x): x is SdkUnionType | SdkNullableType => x.kind === "union" || x.kind === "nullable",
     ),
     crossLanguagePackageId,
+    crossLanguageVersion: "", // Placeholder, computed after package is fully built
     namespaces: [],
     licenseInfo: getLicenseInfo(context),
     metadata: {
@@ -72,6 +74,10 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
     },
   };
   organizeNamespaces(context, sdkPackage);
+
+  // Compute cross-language version hash from source files
+  sdkPackage.crossLanguageVersion = await computeCrossLanguageVersion(context);
+
   return diagnostics.wrap(sdkPackage);
 }
 
@@ -80,8 +86,9 @@ function organizeNamespaces<TServiceOperation extends SdkServiceOperation>(
   sdkPackage: SdkPackage<TServiceOperation>,
 ) {
   const clients = [...sdkPackage.clients];
-  while (clients.length > 0) {
-    const client = clients.shift()!;
+  let clientIdx = 0;
+  while (clientIdx < clients.length) {
+    const client = clients[clientIdx++];
     getSdkNamespace(context, sdkPackage, client).clients.push(client);
     if (client.children && client.children.length > 0) {
       clients.push(...client.children);
@@ -139,14 +146,14 @@ function getSdkNamespace<TServiceOperation extends SdkServiceOperation>(
 }
 
 function populateApiVersionInformation(context: TCGCContext): void {
-  if (context.__rawClientsOperationGroupsCache === undefined) {
+  if (context.__rawClientsCache === undefined) {
     prepareClientAndOperationCache(context);
   }
 
   // Get the package versions map once (this handles both single and multi-service scenarios)
   const packageVersions = context.getPackageVersions();
 
-  for (const client of context.__rawClientsOperationGroupsCache!.values()) {
+  for (const client of context.__rawClientsCache!.values()) {
     const clientType = getActualClientType(client);
 
     // Multiple service case. Set empty result.
@@ -164,4 +171,33 @@ function populateApiVersionInformation(context: TCGCContext): void {
       context.__clientApiVersionDefaultValueCache.set(client, versions[versions.length - 1]);
     }
   }
+}
+
+/**
+ * Computes a cross-language version hash from all API-affecting elements in the package.
+ * The hash is a SHA256 digest truncated to 12 hex characters.
+ *
+ * Creates a normalized API snapshot capturing:
+ * - Clients, methods, and parameters (with optionality and types)
+ * - Models and properties (with optionality and types)
+ * - Enums and their values
+ * - Unions
+ * - HTTP operation details (verb, path, parameter locations)
+ */
+async function computeCrossLanguageVersion(context: TCGCContext): Promise<string> {
+  // Concatenate all source file contents
+  const content = [...context.program.sourceFiles.values()]
+    .filter((script) => {
+      const locationContext = context.program.getSourceFileLocationContext(script.file);
+      return locationContext.type === "project";
+    })
+    .map((script) => script.file.text)
+    .join("");
+
+  // Hash the combined content using Web Crypto API (browser-compatible)
+  const encoded = new TextEncoder().encode(content);
+  const hashBuffer = await globalThis.crypto.subtle.digest("SHA-256", encoded);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+  return hex.substring(0, 12);
 }

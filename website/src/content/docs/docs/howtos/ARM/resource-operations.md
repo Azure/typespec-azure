@@ -147,6 +147,14 @@ resource type and your custom PATCH request type as parameters, giving you full 
 PATCH schema. The `ArmTagsPatch*` templates take the resource type as a parameter and only allow
 updating ARM tags.
 
+> **Note:** The `ArmTagsPatch*` and `ArmResourcePatch*` templates use implicit optionality, which
+> requires a suppression at the usage site:
+>
+> ```tsp
+> #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
+> update is ArmTagsPatchSync<ResourceType>;
+> ```
+
 > **Note:** The `ArmResourcePatch*` templates are **not recommended**. They rely on Lifecycle.Update
 > visibility analysis to automatically determine which properties are included in the PATCH schema,
 > but this analysis is only performed by the typespec-autorest emitter and will not be replicated in
@@ -182,11 +190,15 @@ Arm Resource list operations return a list of Tracked or Proxy Resources at a pa
   - For **Child Resources**, this is at the scope of the resource parent.
 - Tracked resources _must_ include a list operation at the Subscription level.
 
-| Operation          | TypeSpec                                                    |
-| ------------------ | ----------------------------------------------------------- |
-| ListByParent       | `listByWidget is ArmResourceListByParent<ResourceType>`     |
-| ListBySubscription | `listBySubscription is ArmListBySubscription<ResourceType>` |
-| ListAtScope        | `listAtScope is ArmResourceListAtScope<ResourceType>`       |
+| Operation          | TypeSpec                                                         |
+| ------------------ | ---------------------------------------------------------------- |
+| ListByParent       | `listByWidget is ArmResourceListByParent<ResourceType>`          |
+| ListBySubscription | `listBySubscription is ArmListBySubscriptionScope<ResourceType>` |
+| ListAtScope        | `listAtScope is ArmResourceListAtScope<ResourceType>`            |
+
+The `ArmListBySubscriptionScope` template is used for listing a resource directly at the subscription
+scope, generating a flat subscription-level path regardless of the resource's parent hierarchy.
+Use this instead of `ArmListBySubscription` when you need a subscription-level list operation for a child resource.
 
 The `ArmResourceListAtScope` template is used when the scope of the list operation is determined by
 the `BaseParameters` type parameter. This is useful for resources with custom scope requirements
@@ -363,9 +375,10 @@ building blocks.
 op ArmResourceListActionAsync<
   TResource extends Foundations.SimpleResource,
   TResponse extends object
->(
-  ...ResourceInstanceParameters<TResource>,
-): ArmResponse<TResponse> | ArmAcceptedResponse | ErrorResponse;
+>(...ResourceInstanceParameters<TResource>):
+  | ArmResponse<TResponse>
+  | ArmAcceptedResponse
+  | ErrorResponse;
 
 // Usage
 
@@ -378,5 +391,79 @@ model Widget {
 interface MyResourceOperations {
   // ResourceListResult<T> produces a Pageable list of T
   listWidgets is ArmResourceListActionAsync<MyResource, ResourceListResult<Widget>>;
+}
+```
+
+## Operation Status Endpoints
+
+ARM long-running operations (LROs) use operation status endpoints to allow clients to poll for the
+status of an async operation. The `GetResourceOperationStatus` operation template provides a
+standard way to expose these endpoints, and `ArmOperationStatus` provides the response model.
+
+### ArmOperationStatus
+
+`ArmOperationStatus` is a response model that represents the status of an async operation. The `id`
+field is not marked as a path parameter, so it is always included in the response body. This makes
+it suitable for use as both the status monitor type and as the final LRO result.
+
+```typespec
+model ArmOperationStatus<
+  Properties extends {} = never,
+  StatusValues extends TypeSpec.Reflection.Union = ResourceProvisioningState
+>
+```
+
+### GetResourceOperationStatus
+
+`GetResourceOperationStatus` is a `GET` operation template for operation status endpoints. It supports
+all four standard ARM path patterns through its `Scope` parameter. Use the appropriate scope model to
+select the desired path:
+
+| Scope                             | Path pattern                                                                              |
+| --------------------------------- | ----------------------------------------------------------------------------------------- |
+| `TenantActionScope` (default)     | `GET /providers/{ns}/operationStatuses/{operationId}`                                     |
+| `SubscriptionActionScope`         | `GET /subscriptions/{sub}/providers/{ns}/operationStatuses/{operationId}`                 |
+| `TenantLocationActionScope`       | `GET /providers/{ns}/locations/{loc}/operationStatuses/{operationId}`                     |
+| `SubscriptionLocationActionScope` | `GET /subscriptions/{sub}/providers/{ns}/locations/{loc}/operationStatuses/{operationId}` |
+
+### Example
+
+```typespec
+@armResourceOperations
+interface OperationStatuses {
+  // Tenant scope (default)
+  getTenantStatus is GetResourceOperationStatus;
+
+  // Subscription scope
+  getSubscriptionStatus is GetResourceOperationStatus<ArmOperationStatus, SubscriptionActionScope>;
+
+  // Tenant + location scope
+  getTenantLocationStatus is GetResourceOperationStatus<
+    ArmOperationStatus,
+    TenantLocationActionScope
+  >;
+
+  // Subscription + location scope
+  getSubscriptionLocationStatus is GetResourceOperationStatus<
+    ArmOperationStatus,
+    SubscriptionLocationActionScope
+  >;
+}
+```
+
+### Custom response properties
+
+To add custom properties to the operation status response, use the `ArmOperationStatus` template:
+
+```typespec
+model WidgetOperationStatus is ArmOperationStatus<WidgetOperationStatusProperties>;
+
+model WidgetOperationStatusProperties {
+  widgetId: string;
+}
+
+@armResourceOperations
+interface OperationStatuses {
+  getStatus is GetResourceOperationStatus<WidgetOperationStatus, SubscriptionActionScope>;
 }
 ```

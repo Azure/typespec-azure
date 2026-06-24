@@ -62,15 +62,30 @@ When set to `true`, the emitter will generate convenience methods for each servi
 
 ### `api-version`
 
-**Type:** `string`
+**Type:** `string | object`
 
-Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`.
+Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`. For multi-service packages, provide a map from each service namespace's full name to its desired version; services not listed default to their latest version.
+
+**Options:**
+
+- `string`
+- `object`
 
 ### `license`
 
-**Type:** `object`
+**Type:** `object { name, company, link, header, description }`
 
 License information for the generated client code.
+
+**Properties:**
+
+| Name          | Type     | Default | Description                                                                                                                                                                                                                      |
+| ------------- | -------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`        | `string` |         | License name. The config is required. Predefined license are: MIT License, Apache License 2.0, BSD 3-Clause License, MPL 2.0, GPL-3.0, LGPL-3.0. For other license, you need to configure all the other license config manually. |
+| `company`     | `string` |         | License company name. It will be used in copyright sentences.                                                                                                                                                                    |
+| `link`        | `string` |         | License link.                                                                                                                                                                                                                    |
+| `header`      | `string` |         | License header. It will be used in the header comment of generated client code.                                                                                                                                                  |
+| `description` | `string` |         | License description. The full license text.                                                                                                                                                                                      |
 
 ### `examples-dir`
 
@@ -296,10 +311,10 @@ The source type to which the alternate type will be applied.
 
 ##### Parameters
 
-| Name      | Type                                           | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| --------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| alternate | `unknown \| ClientGenerator.Core.ExternalType` | The alternate type to apply to the target. Can be a TypeSpec type or an ExternalType.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| scope     | `valueof string`                               | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
+| Name      | Type                                                 | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| --------- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| alternate | `unknown \| Azure.ClientGenerator.Core.ExternalType` | The alternate type to apply to the target. Can be a TypeSpec type or an ExternalType.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| scope     | `valueof string`                                     | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 ##### Examples
 
@@ -375,7 +390,8 @@ model MyModel {
   field: FieldType;
 }
 // This will emit a warning - external types cannot be applied to properties
-@@alternateType(MyModel.field,
+@@alternateType(
+  MyModel.field,
   {
     identity: "ExternalType",
   },
@@ -512,7 +528,7 @@ The target client for which you want to define additional API versions.
 
 | Name  | Type             | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | ----- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| value | `Enum`           | If true, we will treat this parameter as an api-version parameter. If false, we will not. Default is true.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| value | `Enum`           | An enum defining the complete set of API versions the client should support, including both service-defined and additional versions.                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 ##### Examples
@@ -973,10 +989,6 @@ model MyModel {
 
 #### `@operationGroup`
 
-Define the sub client generated in the client SDK.
-If there is any `@client` definition or `@operationGroup` definition, then each `@client` is a root client and each `@operationGroup` is a sub client with hierarchy.
-This decorator cannot be used along with `@clientLocation`. This decorator cannot be used as augmentation.
-
 ```typespec
 @Azure.ClientGenerator.Core.operationGroup(scope?: valueof string)
 ```
@@ -1103,8 +1115,8 @@ model MyServiceClientOptions {
 @@clientInitialization(MyService, MyServiceClientOptions)
 @@paramAlias(MyServiceClientOptions.blob, "blobName")
 
-// The generated client will have `blobName` in it. We will also
-// elevate the existing `blob` parameter to the client level.
+// The `blob` property from MyServiceClientOptions will be elevated to the client level.
+// Because of @@paramAlias, it will be matched to the `blobName` operation parameter.
 ```
 
 #### `@protocolAPI`
@@ -1191,6 +1203,9 @@ op headOperation(): void;
 Define the scope of an operation or model property.
 By default, the element will be applied to all language emitters.
 This decorator allows you to omit the element from certain languages or apply it to specific languages.
+When applied to an operation parameter (which is a `ModelProperty`), the parameter will be excluded
+from the generated method signature for the specified languages. A warning is emitted if a required
+parameter is scoped out.
 
 ```typespec
 @Azure.ClientGenerator.Core.scope(scope?: valueof string)
@@ -1230,6 +1245,12 @@ model TestModel {
   @scope("csharp")
   csharpOnlyProp: string;
 }
+```
+
+###### Exclude an operation parameter from a specific language
+
+```typespec
+op test(name: string, @header("X-Custom-Header") @scope("!python") customHeader?: string): void;
 ```
 
 #### `@usage`
@@ -1487,13 +1508,31 @@ model Bar {}
 
 #### `@hierarchyBuilding`
 
-Adds support for client-level multiple levels of inheritance.
+Change the base type of a model in the client SDK.
 
-This decorator will update the models returned from TCGC to include the multi-level inheritance information.
+This decorator updates the model returned from TCGC so that, in the
+generated SDK, the target model inherits from a different base than the
+one declared in the spec. The TypeSpec service definition is not
+affected — only the SDK shape changes.
 
-It could be used in the scenario where the discriminated models have multiple levels of inheritance, which is not supported by pure TypeSpec.
+Common real-world applications:
 
-This decorator is considered legacy functionality and may be deprecated in future releases.
+- **Multi-level discriminated inheritance**: when discriminated subtypes
+  need to inherit from a sibling rather than the discriminator root
+  (e.g. `SportsCar` inheriting from `Car` instead of from `Vehicle`).
+- **Brownfield base-class alignment**: when a client SDK needs to keep
+  API compatibility with a previously-generated SDK that used a
+  different base — typically rebasing onto a richer Azure resource base
+  such as `TrackedResource` instead of plain `Resource`.
+
+After the rebase, properties supplied by the new base chain are
+inherited; same-named properties on the target (or on intermediate
+ancestors that the rebase walked past) are deduplicated when their
+types are compatible, and a `legacy-hierarchy-building-conflict`
+warning is emitted when the types are unrelated.
+
+This decorator is considered legacy functionality and may be deprecated in
+future releases.
 
 ```typespec
 @Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(value: Model, scope?: valueof string)
@@ -1539,6 +1578,94 @@ model SportsCar extends Vehicle {
   topSpeed: int32;
 }
 
+```
+
+###### Replace the base class
+
+```typespec
+model C {
+  c?: string;
+}
+model B extends C {
+  b?: string;
+}
+
+@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(C)
+model A extends B {
+  a?: string;
+}
+// After: A extends C. A's own properties are { a, b } (b is lifted from
+// the removed intermediate parent B). C still supplies c.
+```
+
+###### Deduplicate spread properties that overlap with the new base
+
+```typespec
+model B {
+  propB: string;
+}
+
+model A {
+  ...B;
+  propA: string;
+}
+
+@@Legacy.hierarchyBuilding(A, B);
+// After: A extends B. Overlapping same-typed properties are dropped
+// silently, so A's own property is just { propA }.
+```
+
+###### Brownfield ARM resource rebased onto TrackedResource
+
+```typespec
+model Resource {
+  id?: string;
+  name?: string;
+  type?: string;
+}
+
+model TrackedResource extends Resource {
+  location: string;
+  tags?: Record<string>;
+}
+
+model FooProperties {
+  provisioningState?: string;
+}
+
+@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(TrackedResource)
+model Foo extends Resource {
+  properties: FooProperties;
+  location?: string;
+  tags?: Record<string>;
+}
+// After: Foo extends TrackedResource. Foo's own properties are
+// { properties }; location and tags are inherited from TrackedResource.
+```
+
+###### Brownfield ARM envelope dropping an ArmTagsProperty spread
+
+```typespec
+model ArmTagsProperty {
+  tags?: Record<string>;
+}
+
+model TrackedResource {
+  id?: string;
+  name?: string;
+  tags?: Record<string>;
+  location?: string;
+}
+
+@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(TrackedResource)
+model FooResourceWithHierarchy {
+  id?: string;
+  name?: string;
+  ...ArmTagsProperty;
+  location?: string;
+}
+// After: FooResourceWithHierarchy extends TrackedResource with no own
+// properties — every field is supplied by the new base chain.
 ```
 
 #### `@markAsLro`

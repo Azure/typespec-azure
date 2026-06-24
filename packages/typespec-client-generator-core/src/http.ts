@@ -3,6 +3,7 @@ import {
   ModelProperty,
   Operation,
   Type,
+  Union,
   compilerAssert,
   createDiagnosticCollector,
   getEncode,
@@ -31,7 +32,7 @@ import {
 } from "@typespec/http";
 import { StreamMetadata, getStreamMetadata } from "@typespec/http/experimental";
 import { camelCase } from "change-case";
-import { getResponseAsBool } from "./decorators.js";
+import { getResponseAsBool, isInScope, shouldOmitSlashFromEmptyRoute } from "./decorators.js";
 import {
   CollectionFormat,
   SdkBodyParameter,
@@ -50,6 +51,7 @@ import {
   SdkServiceResponseHeader,
   SdkStreamMetadata,
   SdkType,
+  SerializationOptions,
   TCGCContext,
 } from "./interfaces.js";
 import {
@@ -69,7 +71,7 @@ import {
   isSubscriptionId,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
-import { isMediaTypeJson, isMediaTypeOctetStream, isMediaTypeTextPlain } from "./media-types.js";
+import { isMediaTypeJson, isMediaTypeTextPlain, isMediaTypeXml } from "./media-types.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -78,12 +80,34 @@ import {
 } from "./public-utils.js";
 import {
   addEncodeInfo,
+  getClientType,
   getClientTypeWithDiagnostics,
   getSdkConstant,
   getSdkModelPropertyTypeBase,
   getTypeSpecBuiltInType,
   isReadOnly,
 } from "./types.js";
+
+/**
+ * Build serialization options from content types.
+ * This provides a consistent way for emitters to determine the serialization format
+ * for body parameters and HTTP responses, regardless of whether the type is a model or basic type.
+ * @param contentTypes - The content types to build serialization options from.
+ * @param name - The serialized name of the body parameter (for request bodies).
+ */
+function buildSerializationOptionsFromContentTypes(
+  contentTypes: string[],
+  name?: string,
+): SerializationOptions {
+  const options: SerializationOptions = {};
+  if (contentTypes.some(isMediaTypeJson)) {
+    options.json = { name: name ?? "" };
+  }
+  if (contentTypes.some(isMediaTypeXml)) {
+    options.xml = { name: name ?? "" };
+  }
+  return options;
+}
 
 function buildSdkStreamMetadata(
   context: TCGCContext,
@@ -114,33 +138,31 @@ export function getSdkHttpOperation(
   methodParameters: SdkMethodParameter[],
   client: SdkClientType<SdkHttpOperation>,
 ): [SdkHttpOperation, readonly Diagnostic[]] {
-  const tk = $(context.program);
   const diagnostics = createDiagnosticCollector();
   const { responses, exceptions } = diagnostics.pipe(
     getSdkHttpResponseAndExceptions(context, httpOperation, client),
   );
   if (getResponseAsBool(context, httpOperation.operation)) {
-    // we make sure valid responses and 404 responses are booleans
+    // HEAD operations never have a response body, so we clear response.type here.
+    // The boolean return type is a client-side concept handled at the method response level.
     for (const response of responses) {
-      // all valid responses will return boolean
-      response.type = getSdkConstant(context, tk.literal.createBoolean(true));
+      response.type = undefined;
     }
+    // Promote 404 from exception to valid response.
     const fourOFourResponse = exceptions.find((e) => e.statusCodes === 404);
     if (fourOFourResponse) {
-      fourOFourResponse.type = getSdkConstant(context, tk.literal.createBoolean(false));
       // move from exception to valid response with status code 404
       responses.push({
         ...fourOFourResponse,
+        type: undefined,
         statusCodes: 404,
       });
       exceptions.splice(exceptions.indexOf(fourOFourResponse), 1);
-      // remove the exception from the list
     } else {
       // add 404 response to the list of valid responses
       responses.push({
         kind: "http",
         statusCodes: 404,
-        type: getSdkConstant(context, tk.literal.createBoolean(false)),
         apiVersions: getAvailableApiVersions(
           context,
           httpOperation.operation,
@@ -148,6 +170,7 @@ export function getSdkHttpOperation(
         ),
         headers: [],
         __raw: (responses[0] || exceptions[0]).__raw,
+        serializationOptions: {},
       });
     }
   }
@@ -157,10 +180,17 @@ export function getSdkHttpOperation(
   );
   filterOutUselessPathParameters(context, httpOperation, methodParameters);
   filterOutReadOnlyParameters(methodParameters);
+
+  // Check if empty route should be treated as empty string
+  let path = httpOperation.path;
+  if (path === "/" && shouldOmitSlashFromEmptyRoute(context, httpOperation.operation)) {
+    path = "";
+  }
+
   return diagnostics.wrap({
     __raw: httpOperation,
     kind: "http",
-    path: httpOperation.path,
+    path,
     uriTemplate: httpOperation.uriTemplate,
     verb: httpOperation.verb,
     ...parameters,
@@ -204,11 +234,33 @@ function getSdkHttpParameters(
     }
   });
 
-  retval.parameters = httpOperation.parameters.parameters
-    .filter((x) => !isNeverOrVoidType(x.param.type))
-    .map((x) =>
-      diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type)),
-    ) as (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter | SdkCookieParameter)[];
+  // Filter parameters by type and scope, warning if required parameters are scoped out
+  const filteredParams: HttpOperationParameter[] = [];
+  for (const x of httpOperation.parameters.parameters) {
+    if (isNeverOrVoidType(x.param.type)) {
+      continue;
+    }
+    if (!isInScope(context, x.param)) {
+      // Warn if a required parameter is being scoped out
+      if (!x.param.optional) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "required-parameter-scoped-out",
+            target: x.param,
+            format: {
+              paramName: x.param.name,
+              scope: context.emitterName,
+            },
+          }),
+        );
+      }
+      continue;
+    }
+    filteredParams.push(x);
+  }
+  retval.parameters = filteredParams.map((x) =>
+    diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type)),
+  ) as (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter | SdkCookieParameter)[];
   const headerParams = retval.parameters.filter(
     (x): x is SdkHeaderParameter => x.kind === "header",
   );
@@ -243,6 +295,7 @@ function getSdkHttpParameters(
         kind: "body",
         name,
         isGeneratedName: true,
+        isExactName: false,
         serializedName: "",
         doc: getClientDoc(context, tspBody.type),
         summary: getSummary(context.program, tspBody.type),
@@ -259,6 +312,7 @@ function getSdkHttpParameters(
         decorators: diagnostics.pipe(getTypeDecorators(context, tspBody.type)),
         access: "public",
         flatten: false,
+        serializationOptions: {},
       };
     }
     if (retval.bodyParam) {
@@ -278,6 +332,12 @@ function getSdkHttpParameters(
       );
 
       addContentTypeInfoToBodyParam(context, httpOperation, retval.bodyParam);
+
+      // populate serialization options based on content types
+      retval.bodyParam.serializationOptions = buildSerializationOptionsFromContentTypes(
+        retval.bodyParam.contentTypes,
+        retval.bodyParam.serializedName,
+      );
 
       // map stream request body type to bytes, but preserve stream metadata
       const requestStreamMeta = getStreamMetadata(context.program, httpOperation.parameters);
@@ -357,6 +417,7 @@ function getSdkHttpParameters(
       (segment) => segment[segment.length - 1],
     );
   }
+
   return diagnostics.wrap(retval);
 }
 
@@ -367,33 +428,67 @@ function createContentTypeOrAcceptHeader(
 ): Omit<SdkMethodParameter, "kind"> {
   const name = bodyObject.kind === "body" ? "contentType" : "accept";
   let type: SdkType = getTypeSpecBuiltInType(context, "string");
-  // for contentType, we treat it as a constant IFF there's one value and it's one of:
-  //  - application/json
-  //  - text/plain
-  //  - application/octet-stream
-  // this is to prevent a breaking change when a service adds more content types in the future.
-  // e.g. the service accepting image/png then later image/jpeg should _not_ be a breaking change.
-  //
-  // for accept, we treat it as a constant IFF there's a single value. adding more content types
-  // for this case is considered a breaking change for SDKs so we want to surface it as such.
-  // e.g. the service returns image/png then later provides the option to return image/jpeg.
-  if (
-    bodyObject.contentTypes &&
-    bodyObject.contentTypes.length === 1 &&
-    (isMediaTypeJson(bodyObject.contentTypes[0]) ||
-      isMediaTypeTextPlain(bodyObject.contentTypes[0]) ||
-      isMediaTypeOctetStream(bodyObject.contentTypes[0]) ||
-      name === "accept")
-  ) {
-    // in this case, we just want a content type of application/json
-    type = {
-      kind: "constant",
-      value: bodyObject.contentTypes[0],
-      valueType: type,
-      name: `${httpOperation.operation.name}ContentType`,
-      isGeneratedName: true,
-      decorators: [],
-    };
+  // Honor the content types from the HTTP library result.
+  // For a single content type, create a constant.
+  // For multiple content types on a request body (`contentType`), create an enum since the
+  // caller actually picks one value to send.
+  // For multiple content types on a response (`accept`), create a single constant whose value
+  // is a comma-joined list of all response content types, with structured content types
+  // (JSON/XML/text-plain) listed first. This avoids treating the synthetic `accept` parameter
+  // as a content-negotiation parameter. Services that genuinely need content negotiation
+  // should use `@sharedRoute` to split the operation per content type.
+  // For File type bodies, the content type is constrained by the File type itself;
+  // treat it the same as a user-defined content type/accept parameter.
+  if (bodyObject.contentTypes && bodyObject.contentTypes.length > 0) {
+    const tk = $(context.program);
+    context.__namingContextPath.push({
+      name: httpOperation.operation.name,
+      type: httpOperation.operation,
+    });
+    context.__namingContextPath.push({
+      name: name === "accept" ? "Accept" : "ContentType",
+      type: undefined,
+    });
+    try {
+      if (bodyObject.contentTypes.length === 1) {
+        // Single content type → constant.
+        const literal = tk.literal.createString(bodyObject.contentTypes[0]);
+        type = getSdkConstant(context, literal, httpOperation.operation);
+      } else if (name === "accept") {
+        // Multi accept → single constant whose value is a comma-joined string. Stable
+        // partition: structured content types first, others after, preserving order.
+        const isStructured = (ct: string) =>
+          isMediaTypeJson(ct) || isMediaTypeXml(ct) || isMediaTypeTextPlain(ct);
+        const structured = bodyObject.contentTypes.filter(isStructured);
+        const others = bodyObject.contentTypes.filter((ct) => !isStructured(ct));
+        const combined = [...structured, ...others].join(", ");
+        const literal = tk.literal.createString(combined);
+        type = getSdkConstant(context, literal, httpOperation.operation);
+      } else {
+        // Multi content types on request → enum.
+        // For File bodies, reuse the File model's `contentType` property type so that the
+        // synthetic `contentType` header parameter and the File model reference the same
+        // SdkEnumType instance (the cache for that union is pre-warmed under the operation
+        // naming context in `updateTypesFromOperation`, so the enum gets a name derived
+        // from the operation, e.g. `UploadFileMultipleContentTypesContentType`).
+        const fileBody =
+          bodyObject.kind === "body" && httpOperation.parameters.body?.bodyKind === "file"
+            ? httpOperation.parameters.body
+            : undefined;
+        const contentTypePropertyType = fileBody?.contentTypeProperty.type;
+        if (contentTypePropertyType && contentTypePropertyType.kind === "Union") {
+          type = getClientType(context, contentTypePropertyType, httpOperation.operation);
+        } else {
+          const union = tk.union.create(
+            bodyObject.contentTypes.map((ct) => tk.literal.createString(ct)),
+          );
+          type = getClientType(context, union, httpOperation.operation);
+        }
+      }
+    } finally {
+      context.__namingContextPath.pop();
+      context.__namingContextPath.pop();
+    }
   }
   const optional = bodyObject.kind === "body" ? bodyObject.optional : false;
   // No need for clientDefaultValue because it's a constant, it only has one value
@@ -401,6 +496,7 @@ function createContentTypeOrAcceptHeader(
     type,
     name,
     isGeneratedName: true,
+    isExactName: false,
     apiVersions: bodyObject.apiVersions,
     isApiVersionParam: false,
     onClient: false,
@@ -491,16 +587,20 @@ export function getSdkHttpParameter(
     });
   }
   if (isBody(context.program, param) || location === "body") {
+    const serializedName = param.name === "" ? "body" : getWireName(context, param);
     return diagnostics.wrap({
       ...base,
       kind: "body",
-      serializedName: param.name === "" ? "body" : getWireName(context, param),
+      serializedName,
       contentTypes: ["application/json"],
       defaultContentType: "application/json",
       optional: param.optional,
       correspondingMethodParams: [],
       methodParameterSegments: [],
-      serializationOptions: {},
+      serializationOptions: buildSerializationOptionsFromContentTypes(
+        ["application/json"],
+        serializedName,
+      ),
     });
   }
   const headerQueryBase = {
@@ -558,10 +658,12 @@ function getSdkHttpResponseAndExceptions(
   const exceptions: SdkHttpErrorResponse[] = [];
   for (const response of httpOperation.responses) {
     const headers: SdkServiceResponseHeader[] = [];
-    let body: Type | undefined;
+    const bodyTypes: Type[] = [];
     let type: SdkType | undefined;
     let contentTypes: string[] = [];
     let streamMetadata: SdkStreamMetadata | undefined;
+    let lastBodyProperty: ModelProperty | undefined;
+    let lastDefaultContentType: string | undefined;
 
     for (const innerResponse of response.responses) {
       const defaultContentType = innerResponse.body?.contentTypes.includes("application/json")
@@ -575,12 +677,14 @@ function getSdkHttpResponseAndExceptions(
           ),
           __raw: header,
           kind: "responseheader",
-          serializedName: getHeaderFieldName(context.program, header),
+          serializedName:
+            getHeaderFieldName(context.program, header) ??
+            (header === innerResponse.body?.contentTypeProperty ? "Content-Type" : header.name),
         });
         context.__responseHeaderCache.set(header, headers[headers.length - 1]);
       }
       if (innerResponse.body && !isNeverOrVoidType(innerResponse.body.type)) {
-        if (body && body !== innerResponse.body.type) {
+        if (bodyTypes.length > 0 && !bodyTypes.includes(innerResponse.body.type)) {
           diagnostics.add(
             createDiagnostic({
               code: "multiple-response-types",
@@ -590,13 +694,13 @@ function getSdkHttpResponseAndExceptions(
               },
             }),
           );
-          body = tk.union.create([body, innerResponse.body.type]);
-        } else if (!body) {
-          body = innerResponse.body.type;
+        }
+        if (!bodyTypes.includes(innerResponse.body.type)) {
+          bodyTypes.push(innerResponse.body.type);
         }
         contentTypes = contentTypes.concat(innerResponse.body.contentTypes);
-        body =
-          body.kind === "Model" ? getEffectivePayloadType(context, body, Visibility.Read) : body;
+        lastBodyProperty = innerResponse.body.property;
+        lastDefaultContentType = defaultContentType;
         const responseStreamMeta = getStreamMetadata(context.program, innerResponse);
         if (responseStreamMeta) {
           // map stream response body type to bytes, but preserve stream metadata
@@ -604,14 +708,37 @@ function getSdkHttpResponseAndExceptions(
           streamMetadata = diagnostics.pipe(
             buildSdkStreamMetadata(context, responseStreamMeta, httpOperation.operation),
           );
-        } else {
-          type = diagnostics.pipe(
-            getClientTypeWithDiagnostics(context, body, httpOperation.operation),
-          );
-          if (innerResponse.body.property) {
-            addEncodeInfo(context, innerResponse.body.property, type, defaultContentType);
-          }
         }
+      }
+    }
+
+    // Create SDK type from collected body types after iteration
+    let body: Type | undefined;
+    if (!type && bodyTypes.length > 0) {
+      if (bodyTypes.length === 1) {
+        body = bodyTypes[0];
+      } else {
+        body = tk.union.create(bodyTypes);
+      }
+      body = body.kind === "Model" ? getEffectivePayloadType(context, body, Visibility.Read) : body;
+      if (bodyTypes.length > 1) {
+        // Push naming context for the synthetic union so it gets a proper generated name
+        context.__namingContextPath.push({
+          name: httpOperation.operation.name,
+          type: httpOperation.operation,
+        });
+        context.__namingContextPath.push({
+          name: "Response",
+          type: body as Union,
+        });
+      }
+      type = diagnostics.pipe(getClientTypeWithDiagnostics(context, body, httpOperation.operation));
+      if (bodyTypes.length > 1) {
+        context.__namingContextPath.pop();
+        context.__namingContextPath.pop();
+      }
+      if (lastBodyProperty) {
+        addEncodeInfo(context, lastBodyProperty, type, lastDefaultContentType);
       }
     }
     const sdkResponse = {
@@ -629,6 +756,7 @@ function getSdkHttpResponseAndExceptions(
       ),
       description: response.description,
       streamMetadata,
+      serializationOptions: buildSerializationOptionsFromContentTypes(contentTypes),
     };
 
     if (
@@ -773,28 +901,34 @@ function findMappingWithPath(
   if (serviceParam.__raw && methodParametersMap.has(serviceParam.__raw)) {
     return [methodParametersMap.get(serviceParam.__raw)!];
   }
-  // Use a queue of tuples: [current parameter, path to reach it]
-  const queue: [
-    SdkMethodParameter | SdkModelPropertyType,
-    (SdkMethodParameter | SdkModelPropertyType)[],
-  ][] = methodParameters.map((p) => [p, [p]]);
-  const visited: Set<SdkModelType> = new Set();
 
-  while (queue.length > 0) {
-    const [methodParam, path] = queue.shift()!;
+  // BFS with index-based traversal (O(1) dequeue) and parent pointers (avoid path copying per node)
+  const queue: (SdkMethodParameter | SdkModelPropertyType)[] = [...methodParameters];
+  const parentMap = new Map<
+    SdkMethodParameter | SdkModelPropertyType,
+    SdkMethodParameter | SdkModelPropertyType | undefined
+  >();
+  for (const p of methodParameters) {
+    parentMap.set(p, undefined);
+  }
+  const visited: Set<SdkModelType> = new Set();
+  let front = 0;
+
+  while (front < queue.length) {
+    const methodParam = queue[front++];
 
     // HTTP operation parameter/body parameter/property of body parameter could either from an operation parameter directly or from a property of an operation parameter.
     if (
       methodParam.__raw &&
       serviceParam.__raw &&
-      compareModelProperties(context, methodParam.__raw, serviceParam.__raw)
+      compareModelProperties(context.program, methodParam.__raw, serviceParam.__raw)
     ) {
-      return path;
+      return buildPathFromParentMap(methodParam, parentMap);
     }
 
     // If the service parameter is a body parameter, try to see if we could find a method parameter with same type of the body parameter.
     if (serviceParam.kind === "body" && serviceParam.type === methodParam.type) {
-      return path;
+      return buildPathFromParentMap(methodParam, parentMap);
     }
 
     // BFS to explore nested properties
@@ -803,13 +937,30 @@ function findMappingWithPath(
       let current: SdkModelType | undefined = methodParam.type;
       while (current) {
         for (const prop of current.properties) {
-          queue.push([prop, [...path, prop]]);
+          parentMap.set(prop, methodParam);
+          queue.push(prop);
         }
         current = current.baseModel;
       }
     }
   }
   return undefined;
+}
+
+function buildPathFromParentMap(
+  node: SdkMethodParameter | SdkModelPropertyType,
+  parentMap: Map<
+    SdkMethodParameter | SdkModelPropertyType,
+    SdkMethodParameter | SdkModelPropertyType | undefined
+  >,
+): (SdkMethodParameter | SdkModelPropertyType)[] {
+  const path: (SdkMethodParameter | SdkModelPropertyType)[] = [];
+  let current: SdkMethodParameter | SdkModelPropertyType | undefined = node;
+  while (current !== undefined) {
+    path.push(current);
+    current = parentMap.get(current);
+  }
+  return path.reverse();
 }
 
 function filterOutUselessPathParameters(

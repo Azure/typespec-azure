@@ -7,6 +7,7 @@ export const armResourcePathInvalidCharsRule = createRule({
   name: "arm-resource-path-segment-invalid-chars",
   severity: "warning",
   description: "Arm resource name must contain only alphanumeric characters.",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-path-segment-invalid-chars",
   messages: {
     default: paramMessage`'${"segment"}' is an invalid path segment. Segments may start with a separator must consist of alphanumeric characters or dashes, starting with a lower case letter.`,
   },

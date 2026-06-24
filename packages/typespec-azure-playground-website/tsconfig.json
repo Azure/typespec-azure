@@ -10,10 +10,9 @@
     "outDir": "dist-dev",
     "rootDir": ".",
     "tsBuildInfoFile": "temp/tsconfig.tsbuildinfo",
-    "types": ["node"],
+    "types": ["node", "vite/client"],
     "checkJs": true,
     "allowJs": true,
-    "jsxImportSource": "@emotion/react",
     "lib": ["DOM", "ES2022"],
     "skipLibCheck": true,
     "jsx": "react-jsx"

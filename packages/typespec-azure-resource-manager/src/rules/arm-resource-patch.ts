@@ -28,6 +28,7 @@ export const patchOperationsRule = createRule({
   name: "arm-resource-patch",
   severity: "warning",
   description: "Validate ARM PATCH operations.",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-patch",
   messages: {
     default: "The request body of a PATCH must be a model with a subset of resource properties",
     missingTags: "Resource PATCH must contain the 'tags' property.",

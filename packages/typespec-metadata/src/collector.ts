@@ -59,16 +59,34 @@ function extractParameters(
   return params;
 }
 
-const LANGUAGE_ALIASES: Record<string, string> = {
-  "@azure-tools/typespec-csharp": "csharp",
-  "@azure-tools/typespec-java": "java",
-  "@azure-tools/typespec-python": "python",
-  "@azure-tools/typespec-typescript": "typescript",
-  "@azure-tools/typespec-ts": "typescript",
-  "@azure-tools/typespec-js": "javascript",
-  "@azure-tools/typespec-swift": "swift",
-  "@azure-tools/typespec-go": "go",
-  "@azure-tools/typespec-rust": "rust",
+/**
+ * Heuristic patterns used to infer a normalized language key from an emitter
+ * package name.
+ *
+ * Order matters: more specific patterns (e.g. "typescript") must precede
+ * shorter ones (e.g. "java") to avoid false positives ("javascript" matching
+ * "java").
+ */
+const LANGUAGE_HEURISTICS: Array<[RegExp, string]> = [
+  [/csharp/i, "csharp"],
+  [/python/i, "python"],
+  [/typescript/i, "typescript"],
+  [/\bts\b/i, "typescript"],
+  [/javascript/i, "javascript"],
+  [/java(?!script)/i, "java"],
+  [/\brust\b/i, "rust"],
+  [/\bswift\b/i, "swift"],
+  [/\bgo\b/i, "go"],
+];
+
+/** Maps a normalized language key to its parser so heuristic matches can reuse language-specific logic. */
+const LANGUAGE_PARSERS: Record<string, LanguageParser> = {
+  csharp: parseCSharp,
+  java: parseJava,
+  python: parsePython,
+  typescript: parseTypeScript,
+  go: parseGo,
+  rust: parseRust,
 };
 
 interface LanguageParserResult {
@@ -113,23 +131,73 @@ function parsePython(
 
 /**
  * Java-specific metadata parser.
- * Strips 'com.' prefix from namespace if present for package name derivation.
+ * Derives the Maven artifact ID from namespace and prepends the appropriate
+ * Maven groupId based on the flavor and whether this is a management-plane service.
+ *
+ * GroupId prefix rules:
+ *   - data plane, no v2 flavor  → com.azure
+ *   - management plane, no v2   → com.azure.resourcemanager
+ *   - data plane, azurev2 flavor → com.azure.v2
+ *   - management plane, azurev2  → com.azure.resourcemanager.v2
+ *
+ * When flavor is azurev2, the namespace may already contain 'v2' as a path segment
+ * (e.g. com.azure.v2.security.keyvault.keys). The 'v2' segment is stripped when
+ * deriving the artifact ID to avoid duplication (azure-v2-... → azure-...).
+ *
+ * The final package name is formatted as `{groupId}:{artifactId}`.
  */
 function parseJava(
   options: Record<string, unknown>,
   params: Record<string, unknown>,
 ): LanguageParserResult {
-  let packageName = options["package-name"] ?? options["package_name"];
+  const rawPackageName = options["package-name"] ?? options["package_name"];
   const namespace = options["namespace"];
+  const flavor = options["flavor"];
+  const isV2 = flavor === "azurev2";
 
-  if (namespace && !packageName) {
+  // Derive the artifact ID (the part after the colon in Maven coordinates)
+  let artifactId: string | undefined;
+  if (rawPackageName) {
+    artifactId = String(fillVars(rawPackageName, params));
+  } else if (namespace) {
     const ns = String(namespace);
-    const stripped = ns.startsWith("com.") ? ns.substring(4) : ns;
-    packageName = stripped.replace(/\./g, "-");
+    let stripped = ns.startsWith("com.") ? ns.substring(4) : ns;
+    // When the flavor is azurev2, the namespace may contain 'v2' as a segment
+    // (e.g. com.azure.v2.security.keyvault.keys or com.azure.resourcemanager.v2.cdn).
+    // The 'v2' is already encoded in the Maven groupId, so strip it from the
+    // artifact ID portion to avoid duplication (e.g. azure-v2-security-... → azure-security-...).
+    if (isV2) {
+      stripped = stripped
+        .replace(/^(azure\.resourcemanager\.)v2\./, "$1")
+        .replace(/^(azure\.)v2\./, "$1");
+    }
+    artifactId = stripped.replace(/\./g, "-");
+  }
+
+  let packageName: string | undefined;
+  if (artifactId) {
+    // If the artifact ID already contains a colon it is already in Maven coordinate
+    // format (groupId:artifactId); use it as-is.
+    if (artifactId.includes(":")) {
+      packageName = artifactId;
+    } else {
+      const isManagement = namespace
+        ? String(namespace).startsWith("com.azure.resourcemanager")
+        : false;
+
+      let groupId: string;
+      if (isManagement) {
+        groupId = isV2 ? "com.azure.resourcemanager.v2" : "com.azure.resourcemanager";
+      } else {
+        groupId = isV2 ? "com.azure.v2" : "com.azure";
+      }
+
+      packageName = `${groupId}:${artifactId}`;
+    }
   }
 
   return {
-    packageName: packageName ? String(fillVars(packageName, params)) : undefined,
+    packageName,
     namespace: namespace ? String(fillVars(namespace, params)) : undefined,
   };
 }
@@ -189,7 +257,10 @@ function parseTypeScript(
 
 /**
  * Go-specific metadata parser.
- * Extracts from module path, looking for azure-sdk-for-go suffix.
+ * Extracts from module path, looking for azure-sdk-for-go suffix, as a fallback.
+ * The primary derivation of package name from the emitter output directory is handled
+ * by the caller (createLanguageMetadata) after the relative output path is computed,
+ * because it requires knowledge of the base output directory.
  */
 function parseGo(
   options: Record<string, unknown>,
@@ -242,21 +313,8 @@ function parseRust(
   };
 }
 
-/**
- * Map of language-specific parsers.
- */
-const LANGUAGE_PARSERS: Record<string, LanguageParser> = {
-  "@azure-tools/typespec-python": parsePython,
-  "@azure-tools/typespec-java": parseJava,
-  "@azure-tools/typespec-csharp": parseCSharp,
-  "@azure-tools/typespec-typescript": parseTypeScript,
-  "@azure-tools/typespec-ts": parseTypeScript,
-  "@azure-tools/typespec-go": parseGo,
-  "@azure-tools/typespec-rust": parseRust,
-};
-
 export interface LanguageCollectionResult {
-  languages: Record<string, LanguagePackageMetadata>;
+  languages: Record<string, LanguagePackageMetadata[]>;
   sourceConfigPath?: string;
 }
 
@@ -420,13 +478,13 @@ function checkIfManagementPlane(program: Program, ns: Namespace): boolean {
   return false;
 }
 
-function buildLanguageMetadata(
+export function buildLanguageMetadata(
   optionMap: Record<string, Record<string, unknown>>,
   params: Record<string, unknown>,
   baseOutputDir: string,
   defaultServiceDir?: string,
-): Record<string, LanguagePackageMetadata> {
-  const languagesDict: Record<string, LanguagePackageMetadata> = {};
+): Record<string, LanguagePackageMetadata[]> {
+  const languagesDict: Record<string, LanguagePackageMetadata[]> = {};
 
   for (const [emitterName, emitterOptions] of Object.entries(optionMap)) {
     const metadata = createLanguageMetadata(
@@ -437,7 +495,10 @@ function buildLanguageMetadata(
       defaultServiceDir,
     );
     const language = inferLanguageFromEmitterName(emitterName);
-    languagesDict[language] = metadata;
+    if (!languagesDict[language]) {
+      languagesDict[language] = [];
+    }
+    languagesDict[language].push(metadata);
   }
 
   return languagesDict;
@@ -465,11 +526,11 @@ function createLanguageMetadata(
   let packageName: string | undefined;
   let namespace: string | undefined;
 
-  const normalizedEmitterName = emitterName.toLowerCase();
-  const parser = LANGUAGE_PARSERS[normalizedEmitterName];
-
-  if (parser) {
-    const result = parser(normalizedOptions, params);
+  // Use heuristic language match to pick a language-specific parser
+  const heuristicLang = inferLanguageFromEmitterName(emitterName);
+  const heuristicParser = LANGUAGE_PARSERS[heuristicLang];
+  if (heuristicParser) {
+    const result = heuristicParser(normalizedOptions, params);
     packageName = result.packageName;
     namespace = result.namespace;
   } else {
@@ -494,6 +555,26 @@ function createLanguageMetadata(
     } else {
       // If it doesn't start with base, keep as-is
       relativeOutputDir = absolutePath;
+    }
+  }
+
+  // Resolve {namespace} placeholder in output directory
+  if (relativeOutputDir && namespace) {
+    relativeOutputDir = relativeOutputDir.replace(/\{namespace\}/g, namespace);
+  }
+
+  // For Go, prefer the emitter output directory over the module path for package name derivation.
+  // The output directory gives the correct repo-relative path (e.g., sdk/resourcemanager/redisenterprise/armredisenterprise)
+  // without version suffixes that may appear in the module path (e.g., /v4).
+  if (heuristicLang === "go" && relativeOutputDir?.startsWith("{output-dir}/")) {
+    const explicitPackageName =
+      normalizedOptions["package-name"] ?? normalizedOptions["package_name"];
+    if (!explicitPackageName) {
+      const outputDirPackageName = relativeOutputDir.substring("{output-dir}/".length);
+      packageName = outputDirPackageName;
+      if (!normalizedOptions["namespace"]) {
+        namespace = outputDirPackageName;
+      }
     }
   }
 
@@ -540,36 +621,17 @@ function normalizeKey(key: string): string {
   return key.replace(/[^a-z0-9]/gi, "").toLowerCase();
 }
 
-function inferLanguageFromEmitterName(emitterName: string): string {
+export function inferLanguageFromEmitterName(emitterName: string): string {
   const normalized = emitterName.toLowerCase();
-  if (LANGUAGE_ALIASES[normalized]) {
-    return LANGUAGE_ALIASES[normalized];
-  }
 
-  const basename = normalized.split(/[\\/]/).pop() ?? normalized;
-  const cadlIndex = basename.lastIndexOf("cadl-");
-  if (cadlIndex >= 0) {
-    const suffix = basename.substring(cadlIndex + "cadl-".length);
-    if (suffix) {
-      return suffix;
+  // Heuristic: scan the emitter name for known language keywords
+  for (const [pattern, language] of LANGUAGE_HEURISTICS) {
+    if (pattern.test(normalized)) {
+      return language;
     }
   }
 
-  const typespecIndex = basename.lastIndexOf("typespec-");
-  if (typespecIndex >= 0) {
-    const suffix = basename.substring(typespecIndex + "typespec-".length);
-    if (suffix) {
-      return suffix;
-    }
-  }
-
-  const lastDash = basename.lastIndexOf("-");
-  if (lastDash >= 0 && lastDash < basename.length - 1) {
-    return basename.substring(lastDash + 1);
-  }
-
-  const sanitized = basename.replace(/[^a-z]/g, "");
-  return sanitized || "unknown";
+  return "unknown";
 }
 
 function trimOrUndefined(value: string | undefined): string | undefined {

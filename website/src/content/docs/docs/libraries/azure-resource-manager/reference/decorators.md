@@ -342,8 +342,9 @@ model Pet {
 
 `@locationResource` marks an Azure Resource Manager resource model as a location based resource.
 
-Location based resources have REST API paths like
-`/subscriptions/{subscriptionId}/locations/{location}/providers/Microsoft.Contoso/employees`
+**Deprecated**: This decorator is deprecated. Use `@parentResource` with `ArmLocationResource` instead.
+See the [Location Resource sample](https://azure.github.io/typespec-azure/docs/samples/resource-manager/resource-types/location/)
+for the recommended approach.
 
 See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
 
@@ -482,6 +483,42 @@ This allows sharing Azure Resource Manager resource types across specifications
 | Name       | Type          | Description                                                              |
 | ---------- | ------------- | ------------------------------------------------------------------------ |
 | namespaces | `Namespace[]` | The namespaces of Azure Resource Manager libraries used in this provider |
+
+## Azure.ResourceManager.BaseTypes
+
+### `@azureBaseType` {#@Azure.ResourceManager.BaseTypes.azureBaseType}
+
+`@azureBaseType` marks an Azure Resource Manager resource properties model as implementing
+a base type. Base types define structured constraints including required and
+optional properties that conforming resources must implement.
+
+This decorator may be applied multiple times to indicate conformance to
+multiple base types. Duplicate entries are ignored.
+
+```typespec
+@Azure.ResourceManager.BaseTypes.azureBaseType(baseType: valueof Azure.ResourceManager.BaseTypes.BaseTypeInfo)
+```
+
+#### Target
+
+`Model`
+
+#### Parameters
+
+| Name     | Type                                                                                   | Description                                           |
+| -------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| baseType | [valueof `BaseTypeInfo`](./data-types.md#Azure.ResourceManager.BaseTypes.BaseTypeInfo) | The base type specification this resource implements. |
+
+#### Examples
+
+```typespec
+@azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
+model MyAgentProperties {
+  ...AgentProperties;
+  ...AgentToolProperty;
+  ...DefaultProvisioningStateProperty;
+}
+```
 
 ## Azure.ResourceManager.Legacy
 

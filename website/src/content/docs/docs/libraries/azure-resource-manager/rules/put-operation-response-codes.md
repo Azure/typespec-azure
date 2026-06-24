@@ -2,8 +2,8 @@
 title: put-operation-response-codes
 ---
 
-```text title=- Full name-
-@azure-tools/typespec-azure-resource-manager/put-operation-response-codes
+```text title="Full name"
+@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes
 ```
 
 Put operations should use the `ArmResourceCreateOrReplaceAsync` or `ArmResourceCreateOrReplaceSync` template. They must have 200, 201, default and no other responses.

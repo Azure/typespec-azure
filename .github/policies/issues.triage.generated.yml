@@ -28,6 +28,10 @@ configuration:
                 - hasLabel:
                     label: emitter:autorest
                 - hasLabel:
+                    label: emitter:python
+                - hasLabel:
+                    label: emitter:typescript
+                - hasLabel:
                     label: emitter:client:all
                 - hasLabel:
                     label: eng
@@ -35,6 +39,8 @@ configuration:
                     label: ide
                 - hasLabel:
                     label: cli/psh
+                - hasLabel:
+                    label: meta:website
         then:
           - addLabel:
               label: needs-area
@@ -56,6 +62,10 @@ configuration:
               - labelAdded:
                   label: emitter:autorest
               - labelAdded:
+                  label: emitter:python
+              - labelAdded:
+                  label: emitter:typescript
+              - labelAdded:
                   label: emitter:client:all
               - labelAdded:
                   label: eng
@@ -63,6 +73,8 @@ configuration:
                   label: ide
               - labelAdded:
                   label: cli/psh
+              - labelAdded:
+                  label: meta:website
         then:
           - removeLabel:
               label: needs-area
@@ -85,6 +97,10 @@ configuration:
               - labelRemoved:
                   label: emitter:autorest
               - labelRemoved:
+                  label: emitter:python
+              - labelRemoved:
+                  label: emitter:typescript
+              - labelRemoved:
                   label: emitter:client:all
               - labelRemoved:
                   label: eng
@@ -92,6 +108,8 @@ configuration:
                   label: ide
               - labelRemoved:
                   label: cli/psh
+              - labelRemoved:
+                  label: meta:website
           - not:
               or:
                 - hasLabel:
@@ -105,6 +123,10 @@ configuration:
                 - hasLabel:
                     label: emitter:autorest
                 - hasLabel:
+                    label: emitter:python
+                - hasLabel:
+                    label: emitter:typescript
+                - hasLabel:
                     label: emitter:client:all
                 - hasLabel:
                     label: eng
@@ -112,6 +134,8 @@ configuration:
                     label: ide
                 - hasLabel:
                     label: cli/psh
+                - hasLabel:
+                    label: meta:website
         then:
           - addLabel:
               label: needs-area

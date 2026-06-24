@@ -27,6 +27,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`StatusMonitor has more than one ${"resultType"} property marked with '${"decorator"}'.  Ensure that only one property in the model is marked with this decorator.`,
       },
     },
+    "lro-status-monitor-invalid-result-property-type": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Property '${"propertyName"}' used as the final result of a long-running operation has an invalid type '${"typeName"}'. The property type must be a Model, Scalar, or 'unknown'.`,
+      },
+    },
     "invalid-polling-operation-parameter": {
       severity: "error",
       messages: {
@@ -37,8 +43,16 @@ export const $lib = createTypeSpecLibrary({
       severity: "warning",
       messages: {
         badValue: paramMessage`Specified final state value '${"finalStateValue"}' is not valid. It must be one of ("operation-location", "original-uri", "location", "azure-async-operation")`,
-        notPut: "The final state value 'original-uri' can only be used in http PUT operations",
+        notPut:
+          "The final state value 'original-uri' can only be used in http PUT, PATCH, or POST operations",
         noHeader: paramMessage`There was no header corresponding to the desired final-state-via value '${"finalStateValue"}'.`,
+      },
+    },
+    "no-operation-at-original-uri": {
+      severity: "warning",
+      messages: {
+        default:
+          "The 'original-uri' final state is specified, but there is no GET operation at the original URI. The final result will be treated as 'void'.",
       },
     },
     "bad-record-type": {

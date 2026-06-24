@@ -24,11 +24,11 @@ model Azure.Core.AadOauth2Auth<Scopes, AuthUrl, TokenUrl>
 
 #### Properties
 
-| Name          | Type                                                 | Description                                                                    |
-| ------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------ |
-| type          | `TypeSpec.Http.AuthType.oauth2`                      | OAuth2 authentication                                                          |
-| flows         | `[Core.AadTokenAuthFlow<Scopes, AuthUrl, TokenUrl>]` | Supported OAuth2 flows                                                         |
-| defaultScopes | `[]`                                                 | Oauth2 scopes of every flow. Overridden by scope definitions in specific flows |
+| Name          | Type                                                       | Description                                                                    |
+| ------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| type          | `TypeSpec.Http.AuthType.oauth2`                            | OAuth2 authentication                                                          |
+| flows         | `[Azure.Core.AadTokenAuthFlow<Scopes, AuthUrl, TokenUrl>]` | Supported OAuth2 flows                                                         |
+| defaultScopes | `[]`                                                       | Oauth2 scopes of every flow. Overridden by scope definitions in specific flows |
 
 ### `AadTokenAuthFlow` {#Azure.Core.AadTokenAuthFlow}
 
@@ -66,7 +66,7 @@ model Azure.Core.ArmResourceIdentifierAllowedResource
 | Name    | Type                                             | Description                                                                                                                                                                          |
 | ------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | type    | [`armResourceType`](#Azure.Core.armResourceType) | The type of resource that is being referred to. For example Microsoft.Network/virtualNetworks or Microsoft.Network/virtualNetworks/subnets. See Example Types for more examples.     |
-| scopes? | `Core.ArmResourceDeploymentScope[]`              | An array of scopes. If not specified, the default scope is ["ResourceGroup"].<br />See [Allowed Scopes](https://github.com/Azure/autorest/tree/main/docs/extensions#allowed-scopes). |
+| scopes? | `Azure.Core.ArmResourceDeploymentScope[]`        | An array of scopes. If not specified, the default scope is ["ResourceGroup"].<br />See [Allowed Scopes](https://github.com/Azure/autorest/tree/main/docs/extensions#allowed-scopes). |
 
 ### `AzureApiKeyAuthentication` {#Azure.Core.AzureApiKeyAuthentication}
 
@@ -447,6 +447,12 @@ The available kinds of polling options
 union Azure.Core.PollingOptionKind
 ```
 
+#### Variants
+
+| Name          | Type              | Description                          |
+| ------------- | ----------------- | ------------------------------------ |
+| statusMonitor | `"statusMonitor"` | Polling options for a status monitor |
+
 ### `RepeatabilityResult` {#Azure.Core.RepeatabilityResult}
 
 Repeatability Result header options
@@ -721,7 +727,7 @@ model Azure.Core.Foundations.Error
 | code        | `string`                                                          | One of a server-defined set of error codes.                                             |
 | message     | `string`                                                          | A human-readable representation of the error.                                           |
 | target?     | `string`                                                          | The target of the error.                                                                |
-| details?    | `Core.Foundations.Error[]`                                        | An array of details about specific errors that led to this reported error.              |
+| details?    | `Azure.Core.Foundations.Error[]`                                  | An array of details about specific errors that led to this reported error.              |
 | innererror? | [`InnerError`](./data-types.md#Azure.Core.Foundations.InnerError) | An object containing more specific information than the current object about the error. |
 
 ### `ErrorResponse` {#Azure.Core.Foundations.ErrorResponse}
@@ -974,6 +980,16 @@ Enum describing allowed operation states.
 ```typespec
 union Azure.Core.Foundations.OperationState
 ```
+
+#### Variants
+
+| Name       | Type           | Description                                  |
+| ---------- | -------------- | -------------------------------------------- |
+| NotStarted | `"NotStarted"` | The operation has not started.               |
+| Running    | `"Running"`    | The operation is in progress.                |
+| Succeeded  | `"Succeeded"`  | The operation has completed successfully.    |
+| Failed     | `"Failed"`     | The operation has failed.                    |
+| Canceled   | `"Canceled"`   | The operation has been canceled by the user. |
 
 ## Azure.Core.Legacy
 

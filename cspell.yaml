@@ -14,14 +14,18 @@ ignorePaths:
   - common/scripts/*
   - packages/website/build/*
   - pnpm-lock.yaml
+  - pnpm-workspace.yaml
   - eng/feeds/**/examples/**
   - packages/samples/test/output/**
+  - eng/scripts/doc-updater/knowledge/**
   - .git/**
   - .gitignore
   - .vscode/**
   - .editorconfig
   - .github/CODEOWNERS
   - "*.lock.yml"
+  # temp ignore typespec-ts while repo move is inflight
+  - packages/typespec-ts/**
 useGitignore: true
 enableFiletypes:
   - tsp
@@ -35,8 +39,11 @@ words:
   - azsdk
   - Bazs
   - byos
+  - chartjs
   - clsx
+  - contosobenchmark
   - contosowidgetmanager
+  - Chenjie
   - DMSS
   - Donezo
   - dynatrace
@@ -44,8 +51,10 @@ words:
   - fhir
   - foos
   - français
+  - healthdataaiservices
   - horiz
   - Howtos
+  - incentivizes
   - infile
   - kvset
   - kwargs
@@ -70,12 +79,15 @@ words:
   - Onco
   - oncophenotype
   - PAYG
+  - popd
   - prismjs
   - psscriptanalyzer
+  - pushd
   - pystac
   - pytest
   - qnas
   - regionality
+  - responseasbool
   - reinjected
   - Reranker
   - rpaasoneboxacr
@@ -83,6 +95,7 @@ words:
   - SERVICERP
   - seti
   - stac
+  - strconv
   - tcgc
   - tsmv
   - userrp
@@ -93,3 +106,5 @@ words:
   - azsecrets
   - byval
   - petstoreopgrp
+  - pypi
+  - Tsps

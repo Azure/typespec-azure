@@ -27,6 +27,14 @@ export const AreaLabels = defineLabels({
     color: "957300",
     description: "Issues for @azure-tools/typespec-autorest emitter",
   },
+  "emitter:python": {
+    color: "957300",
+    description: "Issues for @azure-tools/typespec-python emitter",
+  },
+  "emitter:typescript": {
+    color: "957300",
+    description: "Issues for @azure-tools/typespec-ts emitter",
+  },
   "emitter:client:all": {
     color: "957300",
     description:
@@ -44,6 +52,10 @@ export const AreaLabels = defineLabels({
     color: "9EB120",
     description: "Issues for Azure CLI/PSH features",
   },
+  "meta:website": {
+    color: "007dc8",
+    description: "TypeSpec.io updates",
+  },
 });
 
 /**
@@ -54,11 +66,14 @@ export const AreaPaths: Record<keyof typeof AreaLabels, string[]> = {
   "lib:azure-core": ["packages/typespec-azure-core/"],
   "lib:azure-resource-manager": ["packages/typespec-azure-resource-manager/"],
   "emitter:autorest": ["packages/typespec-autorest/"],
+  "emitter:python": ["packages/typespec-python/"],
+  "emitter:typescript": ["packages/typespec-ts/"],
   "lib:tcgc": ["packages/typespec-client-generator-core/"],
-  "lib:azure-http-specs": ["packages/typespec-azure-http-specs/"],
+  "lib:azure-http-specs": ["packages/azure-http-specs/"],
   ide: [],
   "cli/psh": [],
   "emitter:client:all": [],
+  "meta:website": ["website/"],
 };
 
 export default defineConfig({
@@ -83,6 +98,10 @@ export default defineConfig({
         "int:azure-specs": {
           color: "0e8a16",
           description: "Run integration tests against azure-rest-api-specs",
+        },
+        "agentic-workflows": {
+          color: "000000",
+          description: "Issues/PR created by github agentic workflows",
         },
       },
     },

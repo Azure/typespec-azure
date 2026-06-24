@@ -1,5 +1,75 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.42
+
+### Features
+
+- [#4535](https://github.com/Azure/typespec-azure/pull/4535) Add ARM spector test scenario for ArmResourceDeploymentScope (armResourceIdentifier with scopes)
+- [#4543](https://github.com/Azure/typespec-azure/pull/4543) Add ARM spector test scenario for management group scoped resources
+
+
+## 0.1.0-alpha.41
+
+### Features
+
+- [#4493](https://github.com/Azure/typespec-azure/pull/4493) Add Spector scenario for `@usage` applied to a namespace, demonstrating recursive propagation to nested models.
+- [#4577](https://github.com/Azure/typespec-azure/pull/4577) add test for `exact` enum member names
+- [#4430](https://github.com/Azure/typespec-azure/pull/4430) Add Spector spec for the `exact()` function used with `@clientName` to preserve exact naming without casing transformations.
+
+
+## 0.1.0-alpha.40
+
+### Features
+
+- [#4323](https://github.com/Azure/typespec-azure/pull/4323) Add `@clientName` csharp-scoped renames for the nested sub-clients of `IndividuallyParentClient` in the `client-initialization/individually-parent` spec. The original names (e.g. `IndividuallyParentNestedWithParamAliasClient`) combined with the deeply-nested test project path produced generated file paths exceeding the 260-character Windows path limit in downstream csharp emitters.
+- [#4298](https://github.com/Azure/typespec-azure/pull/4298) Add `@clientName` C#-scoped renames for `Operations` and `SubNamespace` in the multiple-services spec to avoid name collisions in C# codegen.
+- [#4221](https://github.com/Azure/typespec-azure/pull/4221) Add `@clientName` Java-scoped renames for `Operations` and `SubNamespace` in the multiple-services spec to avoid name collisions in Java codegen.
+- [#4328](https://github.com/Azure/typespec-azure/pull/4328) Add Python client namespace to response-as-bool spec
+- [#4336](https://github.com/Azure/typespec-azure/pull/4336) Add test for etags with `Azure.Core.eTag` definition and non-standard wire names
+- [#4268](https://github.com/Azure/typespec-azure/pull/4268) Add Spector specs for @responseAsBool and @clientDoc decorators
+
+### Bug Fixes
+
+- [#4339](https://github.com/Azure/typespec-azure/pull/4339) Fix client customization warning.
+- [#4220](https://github.com/Azure/typespec-azure/pull/4220) Remove "!javascript" scope from @@override for GroupParameters.group
+- [#4300](https://github.com/Azure/typespec-azure/pull/4300) Fix client-default-value mock to always include client defaults in putModelProperty request body
+
+
+## 0.1.0-alpha.39
+
+### Breaking Changes
+
+- [#3997](https://github.com/Azure/typespec-azure/pull/3997) For multiple service case, remove the use of `@useDependency` to decare each service's API version, but use the latest version instead. Remove related tests.
+
+### Features
+
+- [#4158](https://github.com/Azure/typespec-azure/pull/4158) Add test for multiple services without explicit `@client` creating separate root clients.
+
+### Bug Fixes
+
+- [#3950](https://github.com/Azure/typespec-azure/pull/3950) Update the `azure/client-generator-core/alternate-type` spec for Rust.
+- [#4058](https://github.com/Azure/typespec-azure/pull/4058) Add `@clientLocation` on operations in interface `AddOptionalParam` in resiliency srv-driven specs. To keep the client hierarchy unchanged after TCGC update.
+- [#3997](https://github.com/Azure/typespec-azure/pull/3997) Migrate `@operationGroup` to `@client`
+- [#4054](https://github.com/Azure/typespec-azure/pull/4054) Add required `service:` parameter to `@client` decorators in client-initialization spec files.
+
+
+## 0.1.0-alpha.38
+
+### Features
+
+- [#3729](https://github.com/Azure/typespec-azure/pull/3729) Add test cases for flatten property with unknown type and read-only properties.
+- [#3922](https://github.com/Azure/typespec-azure/pull/3922) Add test scenario for relative nextLink URLs in pagination. Some Azure services use relative URLs instead of absolute URLs for pagination nextLink, requiring clients to resolve them against the service endpoint.
+
+### Bump dependencies
+
+- [#3986](https://github.com/Azure/typespec-azure/pull/3986) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3923](https://github.com/Azure/typespec-azure/pull/3923) Fix wrong location of clientNamespace
+- [#4006](https://github.com/Azure/typespec-azure/pull/4006) Fix test cases for flatten property with read-only properties.
+
+
 ## 0.1.0-alpha.37
 
 ### Features

@@ -1,5 +1,5 @@
 ---
-title: no-empty-model
+title: no-response-body
 ---
 
 ```text title=- Full name-
