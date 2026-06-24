@@ -7,82 +7,40 @@ import { RLCModel } from "../interfaces.js";
 /**
  * Builds the root tsconfig.json.
  *
- * For azureSdkForJs packages, emits project references pointing into the
- * `config/` subfolder (following the eng/tsconfigs pattern).
+ * Emits project references pointing into the `config/` subfolder
+ * (following the eng/tsconfigs pattern).
  */
 export function buildTsConfig(model: RLCModel) {
-  const { packageDetails, azureSdkForJs } = model.options || {};
   const { generateTest, generateSample, generateReactNativeTarget } = model.options || {};
-  const clientPackageName = packageDetails?.name ?? "";
   const project = new Project({ useInMemoryFileSystem: true });
 
-  let tsConfig: Record<string, any>;
+  const references: { path: string }[] = [
+    { path: "./config/tsconfig.src.esm.json" },
+    { path: "./config/tsconfig.src.browser.json" },
+  ];
 
-  if (azureSdkForJs) {
-    const references: { path: string }[] = [
-      { path: "./config/tsconfig.src.esm.json" },
-      { path: "./config/tsconfig.src.browser.json" },
-    ];
-
-    if (generateReactNativeTarget) {
-      references.push({ path: "./config/tsconfig.src.react-native.json" });
-    }
-
-    references.push({ path: "./config/tsconfig.src.cjs.json" });
-
-    if (generateTest) {
-      references.push(
-        { path: "./config/tsconfig.test.node.json" },
-        { path: "./config/tsconfig.test.browser.json" },
-      );
-    }
-
-    if (generateSample) {
-      references.push({ path: "./config/tsconfig.samples.json" });
-    }
-
-    if (generateTest) {
-      references.push({ path: "./config/tsconfig.snippets.json" });
-    }
-
-    tsConfig = { references, files: [] };
-  } else {
-    const { options } = model;
-    tsConfig = {
-      compilerOptions: {
-        target: "ES2017",
-        module: options?.moduleKind === "esm" ? "NodeNext" : "es6",
-        lib: [],
-        declaration: true,
-        declarationMap: true,
-        inlineSources: true,
-        sourceMap: true,
-        importHelpers: true,
-        strict: true,
-        alwaysStrict: true,
-        noUnusedLocals: true,
-        noUnusedParameters: true,
-        noImplicitReturns: true,
-        noFallthroughCasesInSwitch: true,
-        forceConsistentCasingInFileNames: true,
-        moduleResolution: options?.moduleKind === "esm" ? "NodeNext" : "node",
-        allowSyntheticDefaultImports: true,
-        esModuleInterop: true,
-        outDir: options?.moduleKind === "cjs" ? "./dist-esm" : undefined,
-        declarationDir: options?.moduleKind === "cjs" ? "./types" : undefined,
-      },
-      include: ["src/**/*.ts"],
-    };
-
-    if (generateTest) {
-      tsConfig["include"].push("test/**/*.ts");
-    }
-    if (generateSample) {
-      tsConfig["include"].push("samples-dev/**/*.ts");
-      tsConfig["compilerOptions"]["paths"] = {};
-      tsConfig["compilerOptions"]["paths"][clientPackageName] = ["./src/index"];
-    }
+  if (generateReactNativeTarget) {
+    references.push({ path: "./config/tsconfig.src.react-native.json" });
   }
+
+  references.push({ path: "./config/tsconfig.src.cjs.json" });
+
+  if (generateTest) {
+    references.push(
+      { path: "./config/tsconfig.test.node.json" },
+      { path: "./config/tsconfig.test.browser.json" },
+    );
+  }
+
+  if (generateSample) {
+    references.push({ path: "./config/tsconfig.samples.json" });
+  }
+
+  if (generateTest) {
+    references.push({ path: "./config/tsconfig.snippets.json" });
+  }
+
+  const tsConfig = { references, files: [] };
 
   const filePath = "tsconfig.json";
   const configFile = project.createSourceFile(filePath, JSON.stringify(tsConfig, null, 2), {

@@ -78,8 +78,10 @@ model ArmDeletedResponse {
  * ```
  */
 model ArmDeleteAcceptedLroResponse<LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
-  Azure.Core.Foundations.RetryAfterHeader>
-  is ArmAcceptedLroResponse<"Resource deletion accepted.", LroHeaders>;
+  Azure.Core.Foundations.RetryAfterHeader> is ArmAcceptedLroResponse<
+  "Resource deletion accepted.",
+  LroHeaders
+>;
 
 /**
  * @dev The response for synchronous Azure Resource Manager delete ACCEPTED

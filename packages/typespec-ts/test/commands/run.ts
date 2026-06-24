@@ -73,6 +73,8 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
       await emitClient();
       logger.log("=== Emitting gitignore ===");
       await emitGitignore();
+      logger.log("=== Emitting test tsconfig ===");
+      await emitTestTsconfig();
       logger.log("=== Emitting declaration files ===");
       await emitDeclarationFiles();
       logger.log("=== Emitting API summary ===");
@@ -110,6 +112,30 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
 !/tspconfig.yaml
 `,
     );
+  }
+
+  async function emitTestTsconfig(): Promise<void> {
+    // The emitter produces a monorepo-style tsconfig.json (project references into
+    // ./config/*.json that `extends` the azure-sdk-for-js repo's shared eng/tsconfigs).
+    // Those base configs don't exist in this repo, so vite/oxc can't load the config
+    // chain when it transforms the generated sources during integration tests. Overwrite
+    // the package tsconfig with a self-contained one so each generated package is
+    // transformable here. tsconfig.json is not part of the committed baseline, so this
+    // only affects local/CI test runs.
+    const tsconfigPath = joinPath(outputPath(), "tsconfig.json");
+    const tsconfig = {
+      compilerOptions: {
+        target: "es2022",
+        module: "esnext",
+        moduleResolution: "bundler",
+        verbatimModuleSyntax: false,
+        strict: true,
+        esModuleInterop: true,
+        skipLibCheck: true,
+      },
+      include: ["src/**/*.ts"],
+    };
+    await fs.writeFile(tsconfigPath, JSON.stringify(tsconfig, null, 2) + "\n");
   }
 
   async function emitDeclarationFiles(): Promise<void> {
@@ -245,23 +271,13 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
     }
   }
 
-  function flavor() {
-    return env.mode().includes("azure") ? "azure" : "standard";
-  }
-  function clientType() {
-    return env.mode().includes("modular") ? "modular" : "rlc";
-  }
-
   function outputPath() {
-    const subPath = {
-      standard: {
-        modular: "modular-integration",
-        rlc: "integration",
-      },
-      azure: { modular: "azure-modular-integration", rlc: "azure-integration" },
-    }[flavor()][clientType()];
-
-    const outputPath = joinPath(testRoot(), subPath, "generated", env.targetFolder());
+    const outputPath = joinPath(
+      testRoot(),
+      "azure-modular-integration",
+      "generated",
+      env.targetFolder(),
+    );
 
     return outputPath;
   }

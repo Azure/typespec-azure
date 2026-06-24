@@ -4,7 +4,6 @@ options:
   "@azure-tools/typespec-ts":
     generate-metadata: true
     generate-test: false
-    azure-sdk-for-js: false
     flavor: azure
     hierarchy-client: false
     emitter-output-dir: "{project-root}"

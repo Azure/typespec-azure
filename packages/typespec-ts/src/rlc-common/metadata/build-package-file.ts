@@ -2,23 +2,10 @@
 // Licensed under the MIT License.
 
 import { Project, SourceFile } from "ts-morph";
-import { NameType, normalizeName } from "../helpers/name-utils.js";
 import { hasPollingOperations } from "../helpers/operation-helpers.js";
-import {
-  isAzureMonorepoPackage,
-  isAzurePackage,
-  isAzureStandalonePackage,
-} from "../helpers/package-util.js";
-import { getRelativePartFromSrcPath } from "../helpers/path-utils.js";
 import { RLCModel } from "../interfaces.js";
 import { buildAzureMonorepoPackage } from "./package-json/build-azure-monorepo-package.js";
-import { buildAzureStandalonePackage } from "./package-json/build-azure-standalone-package.js";
-import { buildFlavorlessPackage } from "./package-json/build-flavorless-package.js";
-import {
-  PackageCommonInfoConfig,
-  getTshyConfig,
-  resolveWarpExports,
-} from "./package-json/package-common.js";
+import { PackageCommonInfoConfig, resolveWarpExports } from "./package-json/package-common.js";
 import { getPackageName } from "./utils.js";
 
 interface PackageFileOptions {
@@ -33,7 +20,6 @@ export function buildPackageFile(
 ) {
   const config: PackageCommonInfoConfig = {
     description: getDescription(model),
-    moduleKind: model.options?.moduleKind ?? "esm",
     name: getPackageName(model),
     version: getPackageVersion(model),
     withSamples: model.options?.generateSample === true,
@@ -41,30 +27,18 @@ export function buildPackageFile(
     nameWithoutScope: model.options?.packageDetails?.nameWithoutScope,
     exports,
     azureArm: model.options?.azureArm,
-    isModularLibrary: model.options?.isModularLibrary ?? false,
-    azureSdkForJs: model.options?.azureSdkForJs,
     generateReactNativeTarget: model.options?.generateReactNativeTarget,
   };
 
-  let packageInfo: Record<string, any> = buildFlavorlessPackage(config);
-
   const extendedConfig = {
     ...config,
-    clientFilePaths: [getClientFilePath(model)],
     hasLro: hasPollingOperations(model),
     monorepoPackageDirectory: model.options?.azureOutputDirectory,
-    specSource: model.options?.sourceFrom ?? "TypeSpec",
     dependencies,
     clientContextPaths,
   };
 
-  if (isAzureMonorepoPackage(model)) {
-    packageInfo = buildAzureMonorepoPackage(extendedConfig);
-  }
-
-  if (isAzureStandalonePackage(model)) {
-    packageInfo = buildAzureStandalonePackage(extendedConfig);
-  }
+  const packageInfo: Record<string, any> = buildAzureMonorepoPackage(extendedConfig);
 
   const project = new Project({ useInMemoryFileSystem: true });
   const filePath = "package.json";
@@ -97,12 +71,9 @@ export function updatePackageFile(
   { exports, clientContextPaths }: PackageFileOptions = {},
 ) {
   const hasLro = hasPollingOperations(model);
-  const isAzure = isAzurePackage(model);
-  const needsLroUpdate = isAzure && hasLro;
+  const needsLroUpdate = hasLro;
   const needsExportsUpdate = exports;
   const needsConstantPathsUpdate = clientContextPaths && clientContextPaths.length > 0;
-  const needsPlatformImportsUpdate =
-    model.options?.azureSdkForJs && model.options?.moduleKind === "esm";
 
   let packageInfo;
   if (typeof existingFilePathOrContent === "string") {
@@ -128,57 +99,33 @@ export function updatePackageFile(
     needsCoreClientUpdate = true;
   }
 
-  // Early return if nothing needs to be updated
-  if (
-    !needsLroUpdate &&
-    !needsExportsUpdate &&
-    !needsConstantPathsUpdate &&
-    !needsPlatformImportsUpdate &&
-    !needsCoreClientUpdate
-  ) {
-    return;
-  }
-
   // Ensure warp packages have #platform/* imports for polyfill resolution.
   // The `react-native` condition is only added when explicitly opted in via
   // `generateReactNativeTarget`, matching the fresh-generation path in
   // `getEsmEntrypointInformation` (packageCommon.ts).
-  if (needsPlatformImportsUpdate) {
-    const platformImports: Record<string, string> = {
-      browser: "./src/*-browser.mts",
-      default: "./src/*.ts",
+  const platformImports: Record<string, string> = {
+    browser: "./src/*-browser.mts",
+    default: "./src/*.ts",
+  };
+  if (model.options?.generateReactNativeTarget) {
+    // Insert `react-native` before `default` so Node's conditional
+    // resolution order matches the fresh-generation output.
+    packageInfo.imports = {
+      "#platform/*": {
+        browser: platformImports["browser"],
+        "react-native": "./src/*-react-native.mts",
+        default: platformImports["default"],
+      },
     };
-    if (model.options?.generateReactNativeTarget) {
-      // Insert `react-native` before `default` so Node's conditional
-      // resolution order matches the fresh-generation output.
-      packageInfo.imports = {
-        "#platform/*": {
-          browser: platformImports["browser"],
-          "react-native": "./src/*-react-native.mts",
-          default: platformImports["default"],
-        },
-      };
-    } else {
-      packageInfo.imports = {
-        "#platform/*": platformImports,
-      };
-    }
+  } else {
+    packageInfo.imports = {
+      "#platform/*": platformImports,
+    };
   }
 
-  // Update exports based on build system (warp for monorepo, tshy for others)
+  // Update exports (warp: resolved exports in package.json)
   if (needsExportsUpdate) {
-    if (model.options?.azureSdkForJs) {
-      // Warp: update resolved exports in package.json
-      packageInfo.exports = resolveWarpExports(exports, model.options?.generateReactNativeTarget);
-    } else if (packageInfo.tshy) {
-      // Tshy: update tshy.exports in package.json
-      const newTshy = getTshyConfig({
-        exports,
-        azureSdkForJs: model.options?.azureSdkForJs,
-        generateReactNativeTarget: model.options?.generateReactNativeTarget,
-      } as PackageCommonInfoConfig);
-      packageInfo.tshy["exports"] = newTshy["exports"];
-    }
+    packageInfo.exports = resolveWarpExports(exports, model.options?.generateReactNativeTarget);
   }
 
   // Update Core Client dependency
@@ -200,7 +147,7 @@ export function updatePackageFile(
   }
 
   // Update constantPaths metadata for Azure packages
-  if (needsConstantPathsUpdate && isAzure && packageInfo["//metadata"]) {
+  if (needsConstantPathsUpdate && packageInfo["//metadata"]) {
     const metadata = packageInfo["//metadata"];
     // Filter out existing userAgentInfo entries
     const nonUserAgentPaths = (metadata.constantPaths || []).filter(
@@ -230,13 +177,4 @@ function getDescription(model: RLCModel): string {
     return `A generated SDK for ${model.libraryName}.`;
   }
   return description;
-}
-
-function getClientFilePath(model: RLCModel) {
-  const { srcPath } = model;
-  const sdkReletivePart = getRelativePartFromSrcPath(srcPath);
-  const clientFilename = normalizeName(model.libraryName, NameType.File);
-  return sdkReletivePart
-    ? `src/${sdkReletivePart}/${clientFilename}.ts`
-    : `src/${clientFilename}.ts`;
 }

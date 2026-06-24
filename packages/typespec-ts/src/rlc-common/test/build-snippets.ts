@@ -5,22 +5,18 @@ import { getClientName } from "../helpers/name-constructors.js";
 import { RLCModel } from "../interfaces.js";
 import { snippetsContent } from "./template.js";
 
-export function buildSnippets(model: RLCModel, clientName?: string, azureSdkForJs?: boolean) {
-  const azureSdkForJsInfo = azureSdkForJs ? azureSdkForJs : model.options?.azureSdkForJs;
+export function buildSnippets(model: RLCModel, clientName?: string) {
   // to keep the same config for azure scope in buildReadmeFile.ts
   if (
     (model?.options?.packageDetails?.scopeName === "azure" ||
       model?.options?.packageDetails?.scopeName === "azure-rest") &&
-    model.options.addCredentials &&
-    azureSdkForJsInfo
+    model.options.addCredentials
   ) {
     return {
       path: "test/snippets.spec.ts",
       content: hbs.compile(snippetsContent, { noEscape: true })({
         clientClassName: clientName ? clientName : getClientName(model),
         azureArm: model.options?.azureArm,
-        azureSdkForJs: azureSdkForJsInfo,
-        isModularLibrary: model.options.isModularLibrary,
         hasSubscriptionId: model.options.hasSubscriptionId,
       }),
     };

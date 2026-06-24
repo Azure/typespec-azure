@@ -14,7 +14,7 @@ import { useContext } from "../context-manager.js";
 import { resolveReference } from "../framework/reference.js";
 import { reportDiagnostic } from "../index.js";
 import { AzureIdentityDependencies } from "../modular/external-dependencies.js";
-import { isAzurePackage, NameType, normalizeName } from "../rlc-common/index.js";
+import { NameType, normalizeName } from "../rlc-common/index.js";
 import { getSubscriptionId } from "../transform/transfrom-rlc-options.js";
 import { hasKeyCredential, hasTokenCredential } from "../utils/credential-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
@@ -464,7 +464,7 @@ function prepareExampleParameters(
 }
 
 function getCredentialExampleValue(
-  dpgContext: SdkContext,
+  _dpgContext: SdkContext,
   initialization: SdkClientInitializationType,
 ): ExampleValue | undefined {
   const keyCredential = hasKeyCredential(initialization),
@@ -475,26 +475,11 @@ function getCredentialExampleValue(
     name: "credential",
   };
   if (keyCredential || tokenCredential) {
-    if (isAzurePackage({ options: dpgContext.rlcOptions })) {
-      // Support DefaultAzureCredential for Azure packages
-      return {
-        ...defaultSetting,
-        value: `new ${resolveReference(AzureIdentityDependencies.DefaultAzureCredential)}()`,
-      };
-    } else if (keyCredential) {
-      // Support ApiKeyCredential for non-Azure packages
-      return {
-        ...defaultSetting,
-        value: `{ key: "INPUT_YOUR_KEY_HERE" }`,
-      };
-    } else if (tokenCredential) {
-      // Support TokenCredential for non-Azure packages
-      return {
-        ...defaultSetting,
-        value: `{ getToken: async () => {
-          return { token: "INPUT_YOUR_TOKEN_HERE", expiresOnTimestamp: now() }; } }`,
-      };
-    }
+    // Support DefaultAzureCredential for Azure packages
+    return {
+      ...defaultSetting,
+      value: `new ${resolveReference(AzureIdentityDependencies.DefaultAzureCredential)}()`,
+    };
   }
   return undefined;
 }
