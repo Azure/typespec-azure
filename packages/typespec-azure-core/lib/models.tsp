@@ -24,20 +24,6 @@ model Page<Resource extends TypeSpec.Reflection.Model> {
 }
 
 /**
- * Defines a property as a request parameter.
- * @template Name The parameter name.
- */
-@Foundations.requestParameter(Name)
-model RequestParameter<Name extends valueof string> {}
-
-/**
- * Defines a property as a response header.
- * @template Name The header name.
- */
-@Foundations.responseProperty(Name)
-model ResponseProperty<Name extends valueof string> {}
-
-/**
  * @dev Provides the status of a resource operation.
  * @template Resource The resource type.
  * @template StatusResult Model describing the status result object. If not specified, the default is the resource type.

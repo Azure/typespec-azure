@@ -3,7 +3,6 @@ import type { AzureCoreFoundationsPrivateDecorators } from "../generated-defs/Az
 import type { AzureCoreDecorators } from "../generated-defs/Azure.Core.js";
 import type { AzureCoreTraitsDecorators } from "../generated-defs/Azure.Core.Traits.js";
 import type { AzureCoreTraitsPrivateDecorators } from "../generated-defs/Azure.Core.Traits.Private.js";
-import { $requestParameter, $responseProperty } from "./decorators.js";
 import { $finalLocation } from "./decorators/final-location.js";
 import { $finalOperation } from "./decorators/final-operation.js";
 import { $omitKeyProperties } from "./decorators/foundations/omit-key-properties.js";
@@ -67,8 +66,6 @@ export const $decorators = {
 
   "Azure.Core.Foundations": {
     omitKeyProperties: $omitKeyProperties,
-    requestParameter: $requestParameter,
-    responseProperty: $responseProperty,
   } satisfies AzureCoreFoundationsDecorators,
   "Azure.Core.Foundations.Private": {
     spreadCustomParameters: $spreadCustomParameters,

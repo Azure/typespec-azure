@@ -312,24 +312,6 @@ model Azure.Core.RequestIdResponseHeader
 | ---------- | -------------------------- | ------------------------------------------------------------------------------- |
 | requestId? | [`uuid`](#Azure.Core.uuid) | An opaque, globally-unique, server-generated string identifier for the request. |
 
-### `RequestParameter` {#Azure.Core.RequestParameter}
-
-Defines a property as a request parameter.
-
-```typespec
-model Azure.Core.RequestParameter<Name>
-```
-
-#### Template Parameters
-
-| Name | Description         |
-| ---- | ------------------- |
-| Name | The parameter name. |
-
-#### Properties
-
-None
-
 ### `ResourceOperationStatus` {#Azure.Core.ResourceOperationStatus}
 
 ```typespec
@@ -352,24 +334,6 @@ model Azure.Core.ResourceOperationStatus<Resource, StatusResult, StatusError>
 | status  | [`OperationState`](./data-types.md#Azure.Core.Foundations.OperationState) |             |
 | error?  | `StatusError`                                                             |             |
 | result? | `StatusResult`                                                            |             |
-
-### `ResponseProperty` {#Azure.Core.ResponseProperty}
-
-Defines a property as a response header.
-
-```typespec
-model Azure.Core.ResponseProperty<Name>
-```
-
-#### Template Parameters
-
-| Name | Description      |
-| ---- | ---------------- |
-| Name | The header name. |
-
-#### Properties
-
-None
 
 ### `SelectQueryParameter` {#Azure.Core.SelectQueryParameter}
 
