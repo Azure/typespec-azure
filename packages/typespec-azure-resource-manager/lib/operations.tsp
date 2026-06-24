@@ -936,7 +936,6 @@ op checkLocalNameAvailability<
 @action
 @armResourceCollectionAction
 @Private.armUpdateProviderNamespace
-@doc("")
 op ArmProviderActionSync<
   Request extends {} | unknown | void = void,
   Response extends {} | unknown | void = void,
@@ -968,7 +967,6 @@ op ArmProviderActionSync<
 @action
 @armResourceCollectionAction
 @Private.armUpdateProviderNamespace
-@doc("")
 op ArmProviderActionAsync<
   Request extends {} | unknown | void = void,
   Response extends TypeSpec.Reflection.Model | unknown | void = void,
