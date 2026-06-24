@@ -129,21 +129,14 @@ Whether to generate metadata files which includes package.json, README.md and ts
 Whether to generate test files, for basic testing of your generated sdks. Defaults to `undefined`.
 other cases:
 
-- If azure-sdk-for-js is `false`. Defaults to `false`.
-- If azure-sdk-for-js is `true` but there's a test folder under package-dir. Defaults to `false`.
-- If azure-sdk-for-js is `true` but there's not a test folder under package-dir. Defaults to `true`.
+- If there's a test folder under package-dir. Defaults to `false`.
+- If there's not a test folder under package-dir. Defaults to `true`.
 
 ### `generate-sample`
 
 **Type:** `boolean`
 
 Whether to generate sample files, for basic samples of your generated sdks. Defaults to `undefined`. Management packages' default to `true`.
-
-### `azure-sdk-for-js`
-
-**Type:** `boolean`
-
-This is used to indicate your project is generated in [azure-sdk-for-js](https://github.com/Azure/azure-sdk-for-js) repo or not. If your package is located in that repo we'll leverage `dev-tool` to accelerate our building and testing, however if not we'll remove the dependency for that tool. Defaults to `undefined`.
 
 ### `azure-output-directory`
 
@@ -201,12 +194,6 @@ Deprecated option for RLC legacy generation.
 
 Whether the package is an arm package.
 
-### `source-from`
-
-**Type:** `string`
-
-Internal option, the value is default for TypeSpec generation
-
 ### `is-modular-library`
 
 **Type:** `boolean`
@@ -232,14 +219,6 @@ Provides an option to add the model namespace to model names in case of conflict
 **Type:** `boolean`
 
 An option to organize the client in a hierarchical way as defined by `@clientInitialization`. This is true by default.
-
-### `module-kind`
-
-**Type:** `"esm"`
-
-**Default:** `"esm"`
-
-Internal option for test.
 
 ### `compatibility-mode`
 
@@ -336,4 +315,4 @@ When set to true, TypeSpec `unknown` type will be translated to `Record<string, 
 
 **Type:** `boolean`
 
-When set to true, generates React Native build targets (tsconfig, warp target, package.json exports). Only applicable when azure-sdk-for-js is true. Defaults to `false`.
+When set to true, generates React Native build targets (tsconfig, warp target, package.json exports). Defaults to `false`.

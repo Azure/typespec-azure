@@ -8,7 +8,6 @@ options:
     add-credentials: false
     flavor: azure
     is-modular-library: false
-    azure-sdk-for-js: false
     is-typespec-test: true
     enable-operation-group: true
     package-details:

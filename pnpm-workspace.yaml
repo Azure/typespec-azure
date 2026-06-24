@@ -13,6 +13,9 @@ overrides:
   "cross-spawn@>=7.0.0 <7.0.5": "^7.0.5"
   rollup: 4.49.0 # Regression in 4.50.0 https://github.com/rollup/rollup/issues/6099
 
+onlyBuiltDependencies:
+  - tree-sitter
+
 # Minimum age (in minutes) for a new dependency version to be able to be used.
 minimumReleaseAge: 2880 # 2 days
 minimumReleaseAgeExclude:
@@ -95,7 +98,7 @@ catalog:
   "@typescript-eslint/rule-tester": ^8.58.1
   "@typescript-eslint/types": ^8.58.1
   "@typescript-eslint/utils": ^8.58.1
-  "@typespec/http-client-python": "^0.33.0"
+  "@typespec/http-client-python": ">=0.33.0 <1.0.0"
   "@typespec/ts-http-runtime": "0.3.5"
   "@vitejs/plugin-react": ^6.0.1
   "@vitest/coverage-v8": ^4.1.3

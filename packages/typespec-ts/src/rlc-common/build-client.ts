@@ -14,7 +14,7 @@ import {
 } from "ts-morph";
 import { buildMethodShortcutImplementation } from "./build-method-shortcuts.js";
 import { getImportSpecifier } from "./helpers/imports-util.js";
-import { getClientName, getImportModuleName } from "./helpers/name-constructors.js";
+import { getClientName } from "./helpers/name-constructors.js";
 import { NameType, normalizeName } from "./helpers/name-utils.js";
 import { File, PathParameter, RLCModel } from "./interfaces.js";
 
@@ -194,13 +194,7 @@ export function buildClient(model: RLCModel): File | undefined {
   clientFile.addImportDeclarations([
     {
       namedImports: ["logger"],
-      moduleSpecifier: getImportModuleName(
-        {
-          cjsName: loggerPath,
-          esModulesName: `${loggerPath}.js`,
-        },
-        model,
-      ),
+      moduleSpecifier: `${loggerPath}.js`,
     },
   ]);
 
@@ -233,13 +227,7 @@ export function buildClient(model: RLCModel): File | undefined {
     {
       isTypeOnly: true,
       namedImports: [`${clientInterfaceName}`],
-      moduleSpecifier: getImportModuleName(
-        {
-          cjsName: "./clientDefinitions",
-          esModulesName: "./clientDefinitions.js",
-        },
-        model,
-      ),
+      moduleSpecifier: "./clientDefinitions.js",
     },
   ]);
   if ((model.importInfo.internalImports?.rlcClientFactory?.importsSet?.size ?? 0) > 0) {
@@ -247,13 +235,7 @@ export function buildClient(model: RLCModel): File | undefined {
       {
         isTypeOnly: true,
         namedImports: Array.from(model.importInfo.internalImports.rlcClientFactory.importsSet!),
-        moduleSpecifier: getImportModuleName(
-          {
-            cjsName: `./models`,
-            esModulesName: `./models.js`,
-          },
-          model,
-        ),
+        moduleSpecifier: `./models.js`,
       },
     ]);
   }

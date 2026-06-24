@@ -5,20 +5,16 @@ import {
 import { RLCModel } from "../../../../src/rlc-common/interfaces.js";
 
 export type TestModelConfig = {
-  moduleKind?: "esm" | "cjs";
   description?: string;
   withTests?: boolean;
   withSamples?: boolean;
-  isMonorepo?: boolean;
   libraryName?: string;
   version?: string;
   srcPath?: string;
-  source?: "TypeSpec" | "Swagger";
   monorepoPackageDirectory?: string;
   hasLro?: boolean;
   hasPaging?: boolean;
   isModularLibrary?: boolean;
-  azureSdkForJs?: boolean;
   azureArm?: boolean;
   hasSubscriptionId?: boolean;
   addCredentials?: boolean;
@@ -47,11 +43,8 @@ export function createMockModel(config: TestModelConfig = {}): RLCModel {
         nameWithoutScope: "test",
         scopeName: config.scopeName ?? "msinternal",
       },
-      azureSdkForJs: config.isMonorepo ?? false,
       generateTest: config.withTests ?? false,
       generateSample: config.withSamples ?? false,
-      moduleKind: config.moduleKind,
-      sourceFrom: config.source ?? "TypeSpec",
       isModularLibrary: config.isModularLibrary ?? false,
       azureArm: config.azureArm ?? false,
       hasSubscriptionId: config.hasSubscriptionId ?? false,

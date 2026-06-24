@@ -76,21 +76,6 @@ export function getParameterTypeName(baseNameOrOperationGroup: string, operation
   return normalizeName(`${baseNameOrOperationGroup}_Parameters`, NameType.Interface);
 }
 
-export interface ModuleName {
-  esModulesName: string;
-  cjsName: string;
-}
-/**
- * This is a helper function that gets the right import module depending on the type of
- * library being generated
- */
-export function getImportModuleName(name: ModuleName, codeModel: RLCModel) {
-  if (codeModel.options?.moduleKind === "cjs") {
-    return name.cjsName;
-  }
-  return name.esModulesName;
-}
-
 export function getClientName(model: RLCModel) {
   const clientName = model.libraryName;
   const clientInterfaceName = model.options?.isModularLibrary

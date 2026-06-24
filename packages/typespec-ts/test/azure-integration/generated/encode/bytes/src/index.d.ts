@@ -2,6 +2,7 @@ import type { Client } from '@azure-rest/core-client';
 import type { ClientOptions } from '@azure-rest/core-client';
 import type { HttpResponse } from '@azure-rest/core-client';
 import { isRestError } from '@azure/core-rest-pipeline';
+import type { NodeReadableStream } from '#platform/platform-types';
 import type { RawHttpHeaders } from '@azure/core-rest-pipeline';
 import type { RawHttpHeadersInput } from '@azure/core-rest-pipeline';
 import type { RequestParameters } from '@azure-rest/core-client';
@@ -125,8 +126,6 @@ export declare interface HeaderDefaultHeaders {
 export declare type HeaderDefaultParameters = HeaderDefaultHeaderParam & RequestParameters;
 
 export { isRestError }
-
-declare type NodeReadableStream = NodeJS.ReadableStream;
 
 export declare interface PropertyBase64 {
     post(options: PropertyBase64Parameters): StreamableMethod<PropertyBase64200Response>;

@@ -571,6 +571,42 @@ it("reports diagnostic when override parameter is missing @path", async () => {
   });
 });
 
+it("does not report missing @path when the parameter is not a realized path parameter", async () => {
+  // A parameter can carry the `@path` decorator in the type graph (for example
+  // inside a body model) without being realized as a path parameter in the
+  // operation's actual route. Dropping `@path` from such a parameter in the
+  // override must not report an override-parameters-mismatch diagnostic.
+  const [_, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace MyService;
+
+    model Body {
+      @path name: string;
+      value: string;
+    }
+
+    @route("/items")
+    @post
+    op create(@body body: Body): void;
+    `,
+      `
+    namespace MyCustomizations;
+
+    op createOverride(name: string, value: string): void;
+
+    @@override(MyService.create, MyCustomizations.createOverride);
+    `,
+    ),
+  );
+  ok(
+    !diagnostics.some(
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/override-parameters-mismatch",
+    ),
+  );
+});
+
 describe("@clientName", () => {
   it("original method", async () => {
     const { program } = await SimpleBaseTester.compile(

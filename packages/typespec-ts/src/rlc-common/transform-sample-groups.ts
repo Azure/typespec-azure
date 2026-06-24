@@ -65,7 +65,6 @@ export function transformSampleGroups(model: RLCModel, allowMockValue = true) {
       const operatonConcante = getOperationConcate(
         detail.operationName,
         pathDetails.operationGroupName,
-        model.options?.sourceFrom,
       );
       const operationPrefix = normalizeName(
         camelCase(transformSpecialLetterToSpace(operatonConcante)),
@@ -373,20 +372,12 @@ function addValueInImportedDict(
 function buildMethodParamMap(model: RLCModel): Map<string, OperationParameter> {
   const map = new Map<string, OperationParameter>();
   (model.parameters ?? []).forEach((p) => {
-    const operatonConcante = getOperationConcate(
-      p.operationName,
-      p.operationGroup,
-      model.options?.sourceFrom,
-    );
+    const operatonConcante = getOperationConcate(p.operationName, p.operationGroup);
     map.set(operatonConcante, p);
   });
   return map;
 }
 
-function getOperationConcate(opName: string, opGroup: string, sourceFrom?: string) {
-  return sourceFrom === "Swagger"
-    ? opGroup === "" || opGroup === "Client"
-      ? opName
-      : `${opGroup}${opName}`
-    : `${opGroup}_${opName}`;
+function getOperationConcate(opName: string, opGroup: string) {
+  return `${opGroup}_${opName}`;
 }

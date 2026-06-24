@@ -50,7 +50,6 @@ import {
   buildReadmeFile,
   buildRecordedClientFile,
   buildResponseTypes,
-  buildRollupConfig,
   buildSampleEnvFile,
   buildSampleTest,
   buildSamples,
@@ -187,7 +186,7 @@ export async function $onEmit(context: EmitContext) {
     dependencies: {
       ...extraDependencies,
     },
-    useSubpathImports: rlcOptions.azureSdkForJs === true,
+    useSubpathImports: true,
   });
   provideSdkTypes(dpgContext);
 
@@ -236,8 +235,7 @@ export async function $onEmit(context: EmitContext) {
     );
     options.generateTest =
       options.generateTest === true ||
-      (options.generateTest === undefined &&
-        (!hasTestFolder || (options.azureSdkForJs && options.azureArm)));
+      (options.generateTest === undefined && (!hasTestFolder || options.azureArm));
     dpgContext.rlcOptions = options;
   }
 
@@ -505,7 +503,6 @@ export async function $onEmit(context: EmitContext) {
 
     if (shouldGenerateMetadata) {
       const commonBuilders = [
-        buildRollupConfig,
         buildApiExtractorConfig,
         buildReadmeFile,
         buildLicenseFile,
@@ -523,7 +520,6 @@ export async function $onEmit(context: EmitContext) {
       }
       if (
         emitterOptions["generate-test"] === true &&
-        option.azureSdkForJs === true &&
         emitterOptions["generate-metadata"] === true
       ) {
         await emitTests(dpgContext, host);
@@ -548,29 +544,23 @@ export async function $onEmit(context: EmitContext) {
       }
       commonBuilders.push((model) => buildPackageFile(model, modularPackageInfo));
       // Generate warp.config.yml for Azure monorepo ESM packages
-      if (option.azureSdkForJs) {
-        commonBuilders.push((model) => buildWarpConfig(model, modularPackageInfo));
-      }
+      commonBuilders.push((model) => buildWarpConfig(model, modularPackageInfo));
       commonBuilders.push(buildTsConfig);
-      if (option.azureSdkForJs) {
-        commonBuilders.push(buildTsSrcEsmConfig);
-        commonBuilders.push(buildTsSrcBrowserConfig);
-        if (option.generateReactNativeTarget) {
-          commonBuilders.push(buildTsSrcReactNativeConfig);
-        }
-        commonBuilders.push(buildTsSrcCjsConfig);
-        if (option.generateSample) {
-          commonBuilders.push(buildTsSampleConfig);
-        }
-        commonBuilders.push(buildTsLintConfig);
+      commonBuilders.push(buildTsSrcEsmConfig);
+      commonBuilders.push(buildTsSrcBrowserConfig);
+      if (option.generateReactNativeTarget) {
+        commonBuilders.push(buildTsSrcReactNativeConfig);
       }
+      commonBuilders.push(buildTsSrcCjsConfig);
+      if (option.generateSample) {
+        commonBuilders.push(buildTsSampleConfig);
+      }
+      commonBuilders.push(buildTsLintConfig);
 
       // TODO: need support snippets generation for multi-client cases. https://github.com/Azure/autorest.typescript/issues/3048
       if (option.generateTest) {
         for (const subClient of dpgContext.sdkPackage.clients) {
-          commonBuilders.push((model) =>
-            buildSnippets(model, subClient.name, option.azureSdkForJs),
-          );
+          commonBuilders.push((model) => buildSnippets(model, subClient.name));
         }
         commonBuilders.push(buildTsSnippetsConfig);
       }
@@ -613,9 +603,9 @@ export async function $onEmit(context: EmitContext) {
         };
       }
 
-      // Always update package.json for monorepo packages (adds #platform/* imports)
-      // and for modular packages (adds exports, clientContextPaths, LRO deps)
-      if (option.isModularLibrary || option.azureSdkForJs) {
+      // Always update package.json (adds #platform/* imports) and, for modular
+      // packages, exports, clientContextPaths and LRO deps.
+      {
         // Read package.json content via host and pass parsed object
         const pkgSourceFile = await host.readFile(existingPackageFilePath);
         let packageInfo: Record<string, any>;
@@ -630,9 +620,7 @@ export async function $onEmit(context: EmitContext) {
       }
 
       // Update warp.config.yml for Azure monorepo packages
-      if (option.azureSdkForJs) {
-        updateBuilders.push((model: RLCModel) => buildWarpConfig(model, modularPackageInfo));
-      }
+      updateBuilders.push((model: RLCModel) => buildWarpConfig(model, modularPackageInfo));
 
       // If the client name changed, regenerate the README and snippets completely;
       // otherwise update only the API reference link in-place.
@@ -647,10 +635,10 @@ export async function $onEmit(context: EmitContext) {
         );
 
         // Regenerate snippets.spec.ts only when the client name changed
-        if (clientNameChanged && option.azureSdkForJs) {
+        if (clientNameChanged) {
           for (const subClient of dpgContext.sdkPackage.clients) {
             updateBuilders.push((model: RLCModel) =>
-              buildSnippets(model, getClassicalClientName(subClient), option.azureSdkForJs),
+              buildSnippets(model, getClassicalClientName(subClient)),
             );
           }
         }

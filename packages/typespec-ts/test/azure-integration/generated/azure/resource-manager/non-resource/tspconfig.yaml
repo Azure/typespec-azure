@@ -3,7 +3,6 @@ emit:
 options:
   "@azure-tools/typespec-ts":
     emitter-output-dir: "{project-root}"
-    azure-sdk-for-js: false
     add-credentials: false
     is-modular-library: false
     title: AzureArmNonResourceClient

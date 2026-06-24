@@ -49,7 +49,6 @@ export function buildObjectInterfaces(
 
     const baseName = getObjectBaseName(objectSchema, schemaUsage);
     const interfaceDeclaration = getObjectInterfaceDeclaration(
-      model,
       baseName,
       objectSchema,
       schemaUsage,
@@ -273,7 +272,6 @@ function getPolymorphicTypeAlias(
  * root node it will suffix it with Base.
  */
 export function getObjectInterfaceDeclaration(
-  model: RLCModel,
   baseName: string,
   objectSchema: ObjectSchema,
   schemaUsage: SchemaContext[],
@@ -289,12 +287,7 @@ export function getObjectInterfaceDeclaration(
   let propertySignatures = getPropertySignatures(properties, schemaUsage, importedModels);
 
   // Add the polymorphic property if exists
-  propertySignatures = addDiscriminatorProperty(
-    model,
-    objectSchema,
-    propertySignatures,
-    schemaUsage,
-  );
+  propertySignatures = addDiscriminatorProperty(objectSchema, propertySignatures, schemaUsage);
 
   // Calculate the parents of the current object
   const extendFrom = getImmediateParentsNames(objectSchema, schemaUsage);
@@ -315,12 +308,11 @@ function isPolymorphicParent(objectSchema: ObjectSchema) {
 }
 
 function addDiscriminatorProperty(
-  model: RLCModel,
   objectSchema: ObjectSchema,
   properties: PropertySignatureStructure[],
   schemaUsage: SchemaContext[],
 ): PropertySignatureStructure[] {
-  const polymorphicProperty = getDiscriminatorProperty(model, objectSchema, schemaUsage);
+  const polymorphicProperty = getDiscriminatorProperty(objectSchema, schemaUsage);
 
   if (polymorphicProperty) {
     // It is possible that the polymorphic property needs to override an existing property.
@@ -337,7 +329,6 @@ function addDiscriminatorProperty(
  * Finds the name of the property used as discriminator and the discriminator value.
  */
 function getDiscriminatorProperty(
-  model: RLCModel,
   objectSchema: ObjectSchema,
   schemaUsage: SchemaContext[],
 ): PropertySignatureStructure | undefined {
@@ -359,12 +350,9 @@ function getDiscriminatorProperty(
     return {
       kind: StructureKind.PropertySignature,
       name: `"${discriminatorPropertyName}"`,
-      type:
-        model.options?.sourceFrom === "Swagger"
-          ? discriminators
-          : schemaUsage.includes(SchemaContext.Output)
-            ? (objectSchema.discriminator?.outputTypeName ?? inputTypeName)
-            : inputTypeName,
+      type: schemaUsage.includes(SchemaContext.Output)
+        ? (objectSchema.discriminator?.outputTypeName ?? inputTypeName)
+        : inputTypeName,
     };
   }
 
