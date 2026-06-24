@@ -232,7 +232,7 @@ op CreateOrReplaceAsync<
 @extensionResourceOperation(TargetResource, ExtensionResource, "update", OverrideResourceName)
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
-@patch(#{ implicitOptionality: false })
+@patch
 op CustomPatchAsync<
   TargetResource extends Foundations.SimpleResource,
   ExtensionResource extends Foundations.SimpleResource,
@@ -271,7 +271,7 @@ op CustomPatchAsync<
 @extensionResourceOperation(TargetResource, ExtensionResource, "update", OverrideResourceName)
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
-@patch(#{ implicitOptionality: false })
+@patch
 op CustomPatchSync<
   TargetResource extends Foundations.SimpleResource,
   ExtensionResource extends Foundations.SimpleResource,
