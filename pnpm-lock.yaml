@@ -465,6 +465,9 @@ catalogs:
     rehype:
       specifier: ^13.0.2
       version: 13.0.2
+    remark-gfm:
+      specifier: ^4.0.1
+      version: 4.0.1
     remark-heading-id:
       specifier: ^1.0.1
       version: 1.0.1
@@ -4101,6 +4104,9 @@ importers:
       rehype:
         specifier: 'catalog:'
         version: 13.0.2
+      remark-gfm:
+        specifier: 'catalog:'
+        version: 4.0.1
       remark-heading-id:
         specifier: 'catalog:'
         version: 1.0.1
