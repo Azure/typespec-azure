@@ -11,11 +11,7 @@ import {
 } from "ts-morph";
 import { getObjectInterfaceDeclaration } from "./build-object-types.js";
 import { getImportSpecifier } from "./helpers/imports-util.js";
-import {
-  getImportModuleName,
-  getParameterBaseName,
-  getParameterTypeName,
-} from "./helpers/name-constructors.js";
+import { getParameterBaseName, getParameterTypeName } from "./helpers/name-constructors.js";
 import { getGeneratedWrapperTypes } from "./helpers/operation-helpers.js";
 import {
   ObjectSchema,
@@ -62,20 +58,12 @@ export function buildParameterTypes(model: RLCModel) {
       const parameterInterfaceName =
         requestCount > 1 ? `${baseParameterName}RequestParameters${nameSuffix}` : topParamName;
       const queryParameterDefinitions = buildQueryParameterDefinition(
-        model,
         parameter,
         baseParameterName,
         internalReferences,
         i,
       );
-      const pathParameterDefinitions = buildPathParameterDefinitions(
-        model,
-        parameter,
-        baseParameterName,
-        parametersFile,
-        internalReferences,
-        i,
-      );
+      const pathParameterDefinitions = buildPathParameterDefinitions(parameter);
 
       const headerParameterDefinitions = buildHeaderParameterDefinitions(
         parameter,
@@ -159,13 +147,7 @@ export function buildParameterTypes(model: RLCModel) {
       {
         isTypeOnly: true,
         namedImports: Array.from(model.importInfo.internalImports.parameter.importsSet!),
-        moduleSpecifier: getImportModuleName(
-          {
-            cjsName: `./models`,
-            esModulesName: `./models.js`,
-          },
-          model,
-        ),
+        moduleSpecifier: `./models.js`,
       },
     ]);
   }
@@ -176,20 +158,11 @@ export function buildParameterTypes(model: RLCModel) {
   // NodeJS.ReadableStream on Node and `never` on browser/react-native, so the
   // union arm drops out naturally in non-Node builds.
   if (parametersFile.getFullText().includes("NodeReadableStream")) {
-    const platformTypesModuleSpecifier = model.options?.azureSdkForJs
-      ? "#platform/platform-types"
-      : getImportModuleName(
-          {
-            cjsName: `./platform-types`,
-            esModulesName: `./platform-types.js`,
-          },
-          model,
-        );
     parametersFile.addImportDeclarations([
       {
         isTypeOnly: true,
         namedImports: ["NodeReadableStream"],
-        moduleSpecifier: platformTypesModuleSpecifier,
+        moduleSpecifier: "#platform/platform-types",
       },
     ]);
   }
@@ -197,7 +170,6 @@ export function buildParameterTypes(model: RLCModel) {
 }
 
 function buildQueryParameterDefinition(
-  model: RLCModel,
   parameters: ParameterMetadatas,
   baseName: string,
   internalReferences: Set<string>,
@@ -218,7 +190,6 @@ function buildQueryParameterDefinition(
   // Get wrapper types for query parameters
   const wrapperTypesDefinition = getGeneratedWrapperTypes(queryParameters).map((wrapObj) => {
     return getObjectInterfaceDeclaration(
-      model,
       wrapObj.name,
       wrapObj,
       [SchemaContext.Input],
@@ -267,12 +238,7 @@ function getPropertyFromSchema(schema: Schema): PropertySignatureStructure {
 }
 
 function buildPathParameterDefinitions(
-  model: RLCModel,
   parameters: ParameterMetadatas,
-  baseName: string,
-  parametersFile: SourceFile,
-  internalReferences: Set<string>,
-  requestIndex: number,
 ): InterfaceDeclarationStructure[] | undefined {
   const pathParameters = (parameters.parameters || []).filter((p) => p.type === "path");
   if (!pathParameters.length) {
@@ -280,72 +246,12 @@ function buildPathParameterDefinitions(
   }
   const allDefinitions: InterfaceDeclarationStructure[] = [];
 
-  buildClientPathParameters();
-  buildMethodWrapParameters();
+  // we only need to build the wrapper types if the path parameters are objects
+  const wrapperTypesDefinition = getGeneratedWrapperTypes(pathParameters).map((wrap) => {
+    return getObjectInterfaceDeclaration(wrap.name, wrap, [SchemaContext.Input], new Set<string>());
+  });
+  allDefinitions.push(...wrapperTypesDefinition);
   return allDefinitions;
-  function buildClientPathParameters() {
-    // we only have client-level path parameters if the source is from swagger
-    if (model.options?.sourceFrom === "TypeSpec") {
-      return;
-    }
-    const clientPathParams = pathParameters.length > 0 ? pathParameters : [];
-    const nameSuffix = requestIndex > 0 ? `${requestIndex}` : "";
-    const pathParameterInterfaceName = `${baseName}PathParam${nameSuffix}`;
-
-    const pathInterface = getPathInterfaceDefinition(clientPathParams, baseName);
-
-    if (pathInterface) {
-      parametersFile.addInterface(pathInterface);
-    }
-
-    internalReferences.add(pathParameterInterfaceName);
-
-    allDefinitions.push({
-      isExported: true,
-      kind: StructureKind.Interface,
-      name: pathParameterInterfaceName,
-      properties: [
-        {
-          name: "pathParameters",
-          type: `${baseName}PathParameters`,
-          kind: StructureKind.PropertySignature,
-        },
-      ],
-    });
-  }
-
-  function buildMethodWrapParameters() {
-    if (model.options?.sourceFrom === "Swagger") {
-      return;
-    }
-    // we only have method-level path parameters if the source is from typespec
-    const methodPathParams = pathParameters.length > 0 ? pathParameters : [];
-
-    // we only need to build the wrapper types if the path parameters are objects
-    const wrapperTypesDefinition = getGeneratedWrapperTypes(methodPathParams).map((wrap) => {
-      return getObjectInterfaceDeclaration(
-        model,
-        wrap.name,
-        wrap,
-        [SchemaContext.Input],
-        new Set<string>(),
-      );
-    });
-    allDefinitions.push(...wrapperTypesDefinition);
-  }
-}
-
-function getPathInterfaceDefinition(
-  pathParameters: ParameterMetadata[],
-  baseName: string,
-): undefined | InterfaceDeclarationStructure {
-  const pathInterfaceName = `${baseName}PathParameters`;
-  return {
-    kind: StructureKind.Interface,
-    isExported: true,
-    name: pathInterfaceName,
-    properties: pathParameters.map((p: ParameterMetadata) => getPropertyFromSchema(p.param)),
-  };
 }
 
 function buildHeaderParameterDefinitions(

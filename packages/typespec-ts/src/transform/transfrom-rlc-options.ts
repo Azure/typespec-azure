@@ -7,7 +7,6 @@ import {
   NameType,
   normalizeName,
   PackageDetails,
-  PackageFlavor,
   pascalCase,
   RLCOptions,
   ServiceInfo,
@@ -43,13 +42,10 @@ function extractRLCOptions(
   const isModularLibrary = emitterOptions["is-modular-library"] !== false;
   const includeShortcuts = getIncludeShortcuts(emitterOptions);
   const packageDetails = getPackageDetails(program, emitterOptions, isModularLibrary);
-  const flavor = getFlavor(emitterOptions, packageDetails);
-  const moduleKind = getModuleKind(emitterOptions);
   const serviceInfo = getServiceInfo(program, isModularLibrary);
   const includeHeadersInResponse = emitterOptions["include-headers-in-response"] === true;
-  const azureSdkForJs = getAzureSdkForJs(emitterOptions, flavor);
   const generateMetadata = getGenerateMetadata(emitterOptions);
-  const generateTest = getGenerateTest(emitterOptions, flavor);
+  const generateTest = getGenerateTest(emitterOptions);
   const generateSample = getGenerateSample(dpgContext, emitterOptions);
   const credentialInfo = getCredentialInfo(program, emitterOptions, isModularLibrary);
   const azureOutputDirectory = getAzureOutputDirectory(generationRootDir);
@@ -77,24 +73,20 @@ function extractRLCOptions(
   const typespecTitleMap = emitterOptions["typespec-title-map"];
   const generateReactNativeTarget = emitterOptions["generate-react-native-target"] === true;
   const hasSubscriptionId = getSubscriptionId(dpgContext);
-  const ignoreNullableOnOptional = getIgnoreNullableOnOptional(emitterOptions, flavor);
-  const wrapNonModelReturn = getWrapNonModelReturn(emitterOptions, flavor);
+  const ignoreNullableOnOptional = getIgnoreNullableOnOptional(emitterOptions);
+  const wrapNonModelReturn = getWrapNonModelReturn(emitterOptions);
   const isMultiService = (dpgContext.allServiceNamespaces?.length ?? 0) > 1;
 
   return {
     ...credentialInfo,
     includeHeadersInResponse,
-    flavor,
-    moduleKind,
     includeShortcuts,
     packageDetails,
     generateMetadata,
     generateTest,
     generateSample,
-    azureSdkForJs,
     serviceInfo,
     azureOutputDirectory,
-    sourceFrom: "TypeSpec",
     enableOperationGroup,
     enableModelNamespace,
     hierarchyClient,
@@ -247,61 +239,28 @@ function detectIfNameConflicts(dpgContext: SdkContext, isModularLibrary: boolean
   return false;
 }
 
-function getIgnoreNullableOnOptional(
-  emitterOptions: EmitterOptions,
-  flavor: PackageFlavor,
-): boolean {
+function getIgnoreNullableOnOptional(emitterOptions: EmitterOptions): boolean {
   // If explicitly set in options, use that value
   if (emitterOptions["ignore-nullable-on-optional"] !== undefined) {
     return Boolean(emitterOptions["ignore-nullable-on-optional"]);
   }
-  // Default to true for Azure services (same as HLC behavior)
-  return flavor === "azure";
+  // Default to true (same as HLC behavior)
+  return true;
 }
 
-function getWrapNonModelReturn(emitterOptions: EmitterOptions, flavor: PackageFlavor): boolean {
+function getWrapNonModelReturn(emitterOptions: EmitterOptions): boolean {
   // If explicitly set in options, use that value
   if (emitterOptions["wrap-non-model-return"] !== undefined) {
     return Boolean(emitterOptions["wrap-non-model-return"]);
   }
-  // Default to true for Azure services to maintain HLC backward compatibility
-  return flavor === "azure";
+  // Default to true to maintain HLC backward compatibility
+  return true;
 }
 
 function getIncludeShortcuts(emitterOptions: EmitterOptions) {
   return Boolean(emitterOptions["include-shortcuts"]);
 }
 
-function getModuleKind(emitterOptions: EmitterOptions) {
-  return emitterOptions["module-kind"] ?? "esm";
-}
-
-function getFlavor(emitterOptions: EmitterOptions, packageDetails?: PackageDetails): PackageFlavor {
-  const flavor = emitterOptions.flavor;
-
-  if (flavor !== undefined) {
-    if (flavor.toLowerCase() === "azure") {
-      return "azure";
-    } else {
-      return undefined;
-    }
-  }
-
-  const branded = emitterOptions.branded;
-  if (branded !== undefined) {
-    return branded ? "azure" : undefined;
-  }
-
-  const scopeName = packageDetails?.scopeName;
-  if (
-    scopeName !== undefined &&
-    (scopeName.startsWith("azure") || scopeName.startsWith("msinternal"))
-  ) {
-    return "azure";
-  } else {
-    return undefined;
-  }
-}
 function buildPackageDetails(
   program: Program,
   emitterOptions: EmitterOptions,
@@ -350,15 +309,6 @@ function getServiceInfo(program: Program, isModularLibrary: boolean): ServiceInf
   };
 }
 
-function getAzureSdkForJs(emitterOptions: EmitterOptions, flavor: PackageFlavor) {
-  return flavor !== "azure"
-    ? false
-    : emitterOptions["azure-sdk-for-js"] === undefined ||
-        emitterOptions["azure-sdk-for-js"] === null
-      ? true
-      : Boolean(emitterOptions["azure-sdk-for-js"]);
-}
-
 function getGenerateMetadata(emitterOptions: EmitterOptions) {
   if (
     emitterOptions["generate-metadata"] === undefined ||
@@ -374,11 +324,7 @@ function getGenerateMetadata(emitterOptions: EmitterOptions) {
  * @param emitterOptions
  * @returns
  */
-function getGenerateTest(emitterOptions: EmitterOptions, flavor: PackageFlavor) {
-  // Disable generateTest if azureSdkForJS is false
-  if (!getAzureSdkForJs(emitterOptions, flavor)) {
-    return false;
-  }
+function getGenerateTest(emitterOptions: EmitterOptions) {
   return emitterOptions["generate-test"];
 }
 

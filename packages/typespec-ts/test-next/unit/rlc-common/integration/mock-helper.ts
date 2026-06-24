@@ -2,24 +2,19 @@ import {
   buildRuntimeImports,
   initInternalImports,
 } from "../../../../src/rlc-common/helpers/imports-util.js";
-import { PackageFlavor, RLCModel } from "../../../../src/rlc-common/interfaces.js";
+import { RLCModel } from "../../../../src/rlc-common/interfaces.js";
 
 export type TestModelConfig = {
-  moduleKind?: "esm" | "cjs";
   description?: string;
   withTests?: boolean;
   withSamples?: boolean;
-  isMonorepo?: boolean;
   libraryName?: string;
   version?: string;
-  flavor?: PackageFlavor;
   srcPath?: string;
-  source?: "TypeSpec" | "Swagger";
   monorepoPackageDirectory?: string;
   hasLro?: boolean;
   hasPaging?: boolean;
   isModularLibrary?: boolean;
-  azureSdkForJs?: boolean;
   azureArm?: boolean;
   hasSubscriptionId?: boolean;
   addCredentials?: boolean;
@@ -30,7 +25,7 @@ export type TestModelConfig = {
 export function createMockModel(config: TestModelConfig = {}): RLCModel {
   return {
     importInfo: {
-      runtimeImports: buildRuntimeImports(config.flavor),
+      runtimeImports: buildRuntimeImports(),
       internalImports: initInternalImports(),
     },
     libraryName: config.libraryName ?? "@msinternal/test",
@@ -48,12 +43,8 @@ export function createMockModel(config: TestModelConfig = {}): RLCModel {
         nameWithoutScope: "test",
         scopeName: config.scopeName ?? "msinternal",
       },
-      azureSdkForJs: config.isMonorepo ?? false,
-      flavor: config.flavor,
       generateTest: config.withTests ?? false,
       generateSample: config.withSamples ?? false,
-      moduleKind: config.moduleKind,
-      sourceFrom: config.source ?? "TypeSpec",
       isModularLibrary: config.isModularLibrary ?? false,
       azureArm: config.azureArm ?? false,
       hasSubscriptionId: config.hasSubscriptionId ?? false,

@@ -10,113 +10,15 @@ import {
 import { TestModelConfig, createMockModel } from "./mock-helper.js";
 
 describe("Package file generation", () => {
-  describe("Flavor agnostic config", () => {
-    it("[esm] should create a package file", () => {
-      const libraryName = "@msinternal/test";
-      const version = "1.0.0";
-      const description = "Test description";
-      const model = createMockModel({
-        libraryName,
-        moduleKind: "esm",
-        version,
-        description,
-      });
-      const packageFileContent = buildPackageFile(model);
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-
-      // Verify flavorless metadata
-      expect(packageFile).to.have.property("name", libraryName);
-      expect(packageFile).to.have.property("version", version);
-      expect(packageFile).to.have.property("description", description);
-      expect(packageFile).to.have.property("tshy");
-      expect(packageFile).to.have.property("type", "module");
-    });
-
-    it("should specify Node.js 20 as minimum engine version", () => {
-      const model = createMockModel({
-        libraryName: "@msinternal/test",
-        moduleKind: "esm",
-        version: "1.0.0",
-        description: "Test description",
-      });
-      const packageFileContent = buildPackageFile(model);
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-
-      expect(packageFile).to.have.property("engines");
-      expect(packageFile.engines).to.have.property("node", ">=20.0.0");
-    });
-
-    it("should specify @types/node version 20 in devDependencies", () => {
-      const model = createMockModel({
-        libraryName: "@msinternal/test",
-        moduleKind: "esm",
-        version: "1.0.0",
-        description: "Test description",
-      });
-      const packageFileContent = buildPackageFile(model);
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-
-      expect(packageFile).to.have.property("devDependencies");
-      expect(packageFile.devDependencies).to.have.property("@types/node", "^20.0.0");
-    });
-
-    it("[cjs] should create a package file", () => {
-      const libraryName = "@msinternal/test";
-      const nameWithoutScope = "test";
-      const version = "1.0.0";
-      const description = "Test description";
-      const model = createMockModel({
-        libraryName,
-        moduleKind: "cjs",
-        version,
-        description,
-      });
-      const packageFileContent = buildPackageFile(model);
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-
-      // Verify flavorless metadata
-      expect(packageFile).to.have.property("main", "dist/index.js");
-      expect(packageFile).to.have.property("types", `./types/${nameWithoutScope}.d.ts`);
-    });
-
-    it("[esm] should create the right export mappings", () => {
-      const libraryName = "@msinternal/test";
-      const version = "1.0.0";
-      const description = "Test description";
-      const model = createMockModel({
-        libraryName,
-        moduleKind: "esm",
-        version,
-        description,
-      });
-
-      const exports = {
-        "./package.json": "./package.json",
-        ".": "./src/index.ts",
-        "./api": "./src/api/index.ts",
-        "./models": "./src/models/index.ts",
-      };
-      const packageFileContent = buildPackageFile(model, { exports });
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-
-      expect(packageFile).to.have.property("tshy");
-      expect(packageFile.tshy).to.have.property("exports");
-      expect(packageFile.tshy.exports).toEqual(exports);
-    });
-  });
-
-  describe("Azure flavor for Azure SDK for JS Monorepo", () => {
+  describe("Azure SDK for JS Monorepo", () => {
     const libraryName = "test";
     const version = "1.0.0";
     const description = "Test description";
 
     const baseConfig: TestModelConfig = {
       libraryName,
-      moduleKind: "esm",
       version,
       description,
-      flavor: "azure",
-      isMonorepo: true,
     };
 
     it("should create a package file with repo info", () => {
@@ -183,29 +85,6 @@ describe("Package file generation", () => {
       expect(packageFile["//metadata"]).toEqual(expectedMetadata);
     });
 
-    it("should have monorepo metadata when source is swagger", () => {
-      const model = createMockModel({ ...baseConfig, source: "Swagger" });
-      const packageFileContent = buildPackageFile(model);
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-
-      const expectedMetadata = {
-        constantPaths: [
-          {
-            path: "swagger/README.md",
-            prefix: "package-version",
-          },
-          {
-            path: "src/test.ts",
-            prefix: "userAgentInfo",
-          },
-        ],
-      };
-
-      // Verify monorepo specific metadata
-      expect(packageFile).to.have.property("//metadata");
-      expect(packageFile["//metadata"]).toEqual(expectedMetadata);
-    });
-
     it("should have sample metadata", () => {
       const model = createMockModel({
         ...baseConfig,
@@ -249,7 +128,6 @@ describe("Package file generation", () => {
       const model = createMockModel({
         ...baseConfig,
         withSamples: true,
-        moduleKind: "esm",
       });
       const packageFileContent = buildPackageFile(model);
       const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
@@ -287,7 +165,6 @@ describe("Package file generation", () => {
       const model = createMockModel({
         ...baseConfig,
         withSamples: true,
-        moduleKind: "esm",
         generateReactNativeTarget: true,
       });
       const packageFileContent = buildPackageFile(model);
@@ -312,7 +189,6 @@ describe("Package file generation", () => {
     it("[esm] should include correct devDependencies", () => {
       const model = createMockModel({
         ...baseConfig,
-        moduleKind: "esm",
       });
       const packageFileContent = buildPackageFile(model);
       const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
@@ -326,7 +202,6 @@ describe("Package file generation", () => {
     it("[esm] should include correct devDependencies with tests", () => {
       const model = createMockModel({
         ...baseConfig,
-        moduleKind: "esm",
         withTests: true,
       });
       const packageFileContent = buildPackageFile(model);
@@ -341,7 +216,6 @@ describe("Package file generation", () => {
     it("[esm] should include correct scripts with tests", () => {
       const model = createMockModel({
         ...baseConfig,
-        moduleKind: "esm",
         withTests: true,
       });
       const packageFileContent = buildPackageFile(model);
@@ -379,7 +253,6 @@ describe("Package file generation", () => {
     it("[esm] should read clientContextPaths from config for modular", () => {
       const model = createMockModel({
         ...baseConfig,
-        moduleKind: "esm",
         isModularLibrary: true,
       });
 
@@ -398,7 +271,6 @@ describe("Package file generation", () => {
     it("[esm] should read clientPath from config for rlc", () => {
       const model = createMockModel({
         ...baseConfig,
-        moduleKind: "esm",
       });
       const packageFileContent = buildPackageFile(model);
       const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
@@ -467,7 +339,6 @@ describe("Package file generation", () => {
     it("[esm] should include correct scripts with pack", () => {
       const model = createMockModel({
         ...baseConfig,
-        moduleKind: "esm",
         withTests: true,
       });
       const packageFileContent = buildPackageFile(model);
@@ -505,222 +376,9 @@ describe("Package file generation", () => {
     });
   });
 
-  describe("Azure flavor for standalone library", () => {
-    it("[cjs] should have correct devDependencies", () => {
-      const model = createMockModel({
-        moduleKind: "cjs",
-        flavor: "azure",
-        isMonorepo: false,
-        withTests: false,
-      });
-      const packageFileContent = buildPackageFile(model);
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-
-      expect(packageFile.devDependencies).to.have.property("@rollup/plugin-commonjs");
-      expect(packageFile.devDependencies).to.have.property("@rollup/plugin-json");
-      expect(packageFile.devDependencies).to.have.property("@rollup/plugin-multi-entry");
-      expect(packageFile.devDependencies).to.have.property("@rollup/plugin-node-resolve");
-      expect(packageFile.devDependencies).to.have.property("rollup");
-      expect(packageFile.devDependencies).to.have.property("rollup-plugin-sourcemaps");
-    });
-
-    it("[cjs] should have correct devDependencies with test", () => {
-      const model = createMockModel({
-        moduleKind: "cjs",
-        flavor: "azure",
-        isMonorepo: false,
-        withTests: true,
-      });
-      const packageFileContent = buildPackageFile(model);
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-
-      expect(packageFile.devDependencies).to.have.property("nyc");
-      expect(packageFile.devDependencies).to.have.property("mocha");
-      expect(packageFile.devDependencies).to.have.property("@types/mocha");
-      expect(packageFile.devDependencies).to.have.property("cross-env");
-      expect(packageFile.devDependencies).to.have.property("@types/chai");
-      expect(packageFile.devDependencies).to.have.property("chai");
-      expect(packageFile.devDependencies).to.have.property("karma-chrome-launcher");
-      expect(packageFile.devDependencies).to.have.property("karma-coverage");
-      expect(packageFile.devDependencies).to.have.property("karma-env-preprocessor");
-      expect(packageFile.devDependencies).to.have.property("karma-firefox-launcher");
-      expect(packageFile.devDependencies).to.have.property("karma-junit-reporter");
-      expect(packageFile.devDependencies).to.have.property("karma-mocha-reporter");
-      expect(packageFile.devDependencies).to.have.property("karma-mocha");
-      expect(packageFile.devDependencies).to.have.property("karma-source-map-support");
-      expect(packageFile.devDependencies).to.have.property("karma-sourcemap-loader");
-      expect(packageFile.devDependencies).to.have.property("karma");
-    });
-
-    it("[esm] should have correct devDependencies", () => {
-      const model = createMockModel({
-        moduleKind: "esm",
-        flavor: "azure",
-        isMonorepo: false,
-        withTests: false,
-      });
-      const packageFileContent = buildPackageFile(model);
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-
-      expect(packageFile.devDependencies).to.have.property("tshy");
-    });
-
-    it("[esm] should have correct devDependencies with test", () => {
-      const model = createMockModel({
-        moduleKind: "esm",
-        flavor: "azure",
-        isMonorepo: false,
-        withTests: true,
-      });
-      const packageFileContent = buildPackageFile(model);
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-
-      expect(packageFile.devDependencies).to.have.property("tshy");
-      expect(packageFile.devDependencies).to.have.property("@vitest/browser-playwright");
-      expect(packageFile.devDependencies).to.have.property("@vitest/coverage-istanbul");
-      expect(packageFile.devDependencies).to.have.property("playwright");
-      expect(packageFile.devDependencies).to.have.property("vitest");
-    });
-
-    it("[esm] should have correct scripts", () => {
-      const model = createMockModel({
-        moduleKind: "esm",
-        flavor: "azure",
-        isMonorepo: false,
-      });
-      const packageFileContent = buildPackageFile(model);
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-
-      expect(packageFile.scripts).to.have.property(
-        "build",
-        "npm run clean && tshy && npm run extract-api",
-      );
-    });
-
-    it("[esm] should have correct scripts with test", () => {
-      const model = createMockModel({
-        moduleKind: "esm",
-        flavor: "azure",
-        withTests: true,
-        isMonorepo: false,
-      });
-      const packageFileContent = buildPackageFile(model);
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-
-      expect(packageFile.scripts).to.have.property(
-        "build",
-        "npm run clean && tshy && npm run extract-api",
-      );
-      expect(packageFile.scripts).to.have.property(
-        "test",
-        "npm run clean && tshy && npm run unit-test:node && npm run unit-test:browser && npm run integration-test",
-      );
-      expect(packageFile.scripts).to.have.property("test:node", "vitest -c vitest.config.ts");
-      expect(packageFile.scripts).to.have.property(
-        "test:browser",
-        "vitest -c vitest.browser.config.ts",
-      );
-    });
-
-    it("[cjs] should have correct scripts", () => {
-      const model = createMockModel({
-        moduleKind: "cjs",
-        flavor: "azure",
-        isMonorepo: false,
-      });
-      const packageFileContent = buildPackageFile(model);
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-
-      expect(packageFile.scripts).to.have.property(
-        "build",
-        "npm run clean && tsc && rollup -c 2>&1 && npm run minify && mkdirp ./review && npm run extract-api",
-      );
-
-      expect(packageFile.scripts).to.have.property(
-        "minify",
-        "uglifyjs -c -m --comments --source-map \"content='./dist/index.js.map'\" -o ./dist/index.min.js ./dist/index.js",
-      );
-    });
-
-    it("[cjs] should have correct scripts with tests", () => {
-      const model = createMockModel({
-        moduleKind: "cjs",
-        flavor: "azure",
-        isMonorepo: false,
-        withTests: true,
-      });
-      const packageFileContent = buildPackageFile(model);
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-
-      expect(packageFile.scripts).to.have.property(
-        "build",
-        "npm run clean && tsc && rollup -c 2>&1 && npm run minify && mkdirp ./review && npm run extract-api",
-      );
-
-      expect(packageFile.scripts).to.have.property(
-        "minify",
-        "uglifyjs -c -m --comments --source-map \"content='./dist/index.js.map'\" -o ./dist/index.min.js ./dist/index.js",
-      );
-
-      expect(packageFile.scripts).to.have.property("build:test", "tsc -p . && rollup -c 2>&1");
-      expect(packageFile.scripts).to.have.property(
-        "build:browser",
-        "tsc -p . && cross-env ONLY_BROWSER=true rollup -c 2>&1",
-      );
-      expect(packageFile.scripts).to.have.property(
-        "build:node",
-        "tsc -p . && cross-env ONLY_NODE=true rollup -c 2>&1",
-      );
-    });
-    it("[cjs] should update to correct lro dependencies if there are lro operations", () => {
-      const model = createMockModel({
-        moduleKind: "cjs",
-        flavor: "azure",
-        isMonorepo: false,
-        withTests: true,
-        hasLro: true,
-      });
-      const packageFileContent = updatePackageFile(
-        model,
-        "./test-next/unit/rlc-common/integration/static/package.json",
-      );
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-      expect(packageFile.dependencies).to.have.property("@azure/core-lro", "^3.1.0");
-      expect(packageFile.dependencies).to.have.property("@azure/abort-controller", "^2.1.2");
-    });
-
-    it("[cjs] should return directly if package.json is non-existing or no lro operations", () => {
-      let model = createMockModel({
-        moduleKind: "cjs",
-        flavor: "azure",
-        isMonorepo: false,
-        withTests: true,
-        hasLro: false,
-      });
-      let packageFileContent = updatePackageFile(
-        model,
-        "./test-next/unit/rlc-common/integration/static/package.json",
-      );
-      expect(packageFileContent).toBeUndefined();
-      model = createMockModel({
-        moduleKind: "cjs",
-        flavor: "azure",
-        isMonorepo: false,
-        withTests: true,
-        hasLro: true,
-      });
-      packageFileContent = updatePackageFile(
-        model,
-        "./test-next/unit/rlc-common/integration/static/package_non_existing.json",
-      );
-      expect(packageFileContent).toBeUndefined();
-    });
-
+  describe("updatePackageFile", () => {
     it("should use standard version for LRO dependencies", () => {
       const model = createMockModel({
-        moduleKind: "esm",
-        flavor: "azure",
-        isMonorepo: true,
         hasLro: true,
       });
 
@@ -741,9 +399,6 @@ describe("Package file generation", () => {
 
     it("should update warp exports when exports option is provided for monorepo", () => {
       const model = createMockModel({
-        moduleKind: "esm",
-        flavor: "azure",
-        isMonorepo: true,
         hasLro: true,
       });
 
@@ -785,9 +440,6 @@ describe("Package file generation", () => {
 
     it("should update exports for monorepo even without tshy in package.json", () => {
       const model = createMockModel({
-        moduleKind: "esm",
-        flavor: "azure",
-        isMonorepo: true,
         hasLro: true,
       });
 
@@ -820,9 +472,6 @@ describe("Package file generation", () => {
 
     it("should update constantPaths when clientContextPaths option is provided for Azure packages", () => {
       const model = createMockModel({
-        moduleKind: "esm",
-        flavor: "azure",
-        isMonorepo: true,
         hasLro: false,
       });
 
@@ -873,9 +522,6 @@ describe("Package file generation", () => {
 
     it("should not update constantPaths when clientContextPaths is empty", () => {
       const model = createMockModel({
-        moduleKind: "esm",
-        flavor: "azure",
-        isMonorepo: true,
         hasLro: false,
       });
 
@@ -899,39 +545,8 @@ describe("Package file generation", () => {
       ]);
     });
 
-    it("should not update constantPaths for non-Azure packages", () => {
-      const model = createMockModel({
-        moduleKind: "esm",
-        flavor: undefined,
-        isMonorepo: true,
-        hasLro: false,
-      });
-
-      const initialPackageInfo = {
-        name: "@test/test-package",
-        version: "1.0.0",
-        "//metadata": {
-          constantPaths: [{ path: "src/old-path.ts", prefix: "userAgentInfo" }],
-        },
-      };
-
-      const packageFileContent = updatePackageFile(model, initialPackageInfo, {
-        clientContextPaths: ["src/api/newContext.ts"],
-      });
-
-      // Should return package.json but without updating constantPaths for non-Azure packages
-      expect(packageFileContent).toBeDefined();
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-      expect(packageFile["//metadata"]["constantPaths"]).toEqual([
-        { path: "src/old-path.ts", prefix: "userAgentInfo" },
-      ]);
-    });
-
     it("should migrate @azure/core-client to @azure-rest/core-client", () => {
       const model = createMockModel({
-        moduleKind: "esm",
-        flavor: "azure",
-        isMonorepo: true,
         hasLro: false,
       });
 
@@ -956,9 +571,6 @@ describe("Package file generation", () => {
 
     it("should not add duplicate @azure-rest/core-client if already present", () => {
       const model = createMockModel({
-        moduleKind: "esm",
-        flavor: "azure",
-        isMonorepo: true,
         hasLro: false,
       });
 
@@ -983,9 +595,6 @@ describe("Package file generation", () => {
 
     it("should only add platform imports when no @azure/core-client and no other update triggers", () => {
       const model = createMockModel({
-        moduleKind: "esm",
-        flavor: "azure",
-        isMonorepo: true,
         hasLro: false,
       });
 
@@ -1021,9 +630,6 @@ describe("Package file generation", () => {
 
     it("should include react-native in platform imports when generateReactNativeTarget is true", () => {
       const model = createMockModel({
-        moduleKind: "esm",
-        flavor: "azure",
-        isMonorepo: true,
         hasLro: false,
         generateReactNativeTarget: true,
       });
@@ -1058,107 +664,6 @@ describe("Package file generation", () => {
         "react-native",
         "default",
       ]);
-    });
-
-    it("should NOT add react-native to platform imports for non-monorepo packages even if generateReactNativeTarget is true", () => {
-      // needsPlatformImportsUpdate requires azureSdkForJs (isMonorepo) to be true.
-      // For non-monorepo packages, the platform imports block must be skipped
-      // entirely regardless of generateReactNativeTarget.
-      const model = createMockModel({
-        moduleKind: "esm",
-        flavor: "azure",
-        isMonorepo: false,
-        hasLro: false,
-        generateReactNativeTarget: true,
-      });
-
-      const initialPackageInfo = {
-        name: "@azure/test-package",
-        version: "1.0.0",
-        dependencies: {
-          "@azure/core-client": "^1.9.3",
-          tslib: "^2.6.2",
-        },
-      };
-
-      const packageFileContent = updatePackageFile(model, initialPackageInfo);
-      expect(packageFileContent).toBeDefined();
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-
-      expect(packageFile).not.toHaveProperty("imports");
-    });
-
-    it("should migrate @azure/core-client for non-monorepo Azure packages", () => {
-      const model = createMockModel({
-        moduleKind: "cjs",
-        flavor: "azure",
-        isMonorepo: false,
-        hasLro: false,
-      });
-
-      const initialPackageInfo = {
-        name: "@azure/test-package",
-        version: "1.0.0",
-        dependencies: {
-          "@azure/core-client": "^1.9.3",
-          tslib: "^2.6.2",
-        },
-      };
-
-      const packageFileContent = updatePackageFile(model, initialPackageInfo);
-      expect(packageFileContent).toBeDefined();
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-
-      expect(packageFile.dependencies).not.toHaveProperty("@azure/core-client");
-      expect(packageFile.dependencies).to.have.property("@azure-rest/core-client", "^2.3.1");
-    });
-  });
-
-  describe("Flavorless lib", () => {
-    it("should have correct dependencies", () => {
-      const model = createMockModel({
-        moduleKind: "esm",
-      });
-      const packageFileContent = buildPackageFile(model);
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-
-      expect(packageFile.dependencies).to.have.property("@typespec/ts-http-runtime");
-    });
-
-    it("[esm] should have correct devDependencies", () => {
-      const model = createMockModel({
-        moduleKind: "esm",
-      });
-      const packageFileContent = buildPackageFile(model);
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-
-      expect(packageFile.devDependencies).to.have.property("tshy");
-    });
-
-    it("[esm] should have correct scripts", () => {
-      const model = createMockModel({
-        moduleKind: "esm",
-      });
-      const packageFileContent = buildPackageFile(model);
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-
-      expect(packageFile.scripts).to.have.property(
-        "build",
-        "npm run clean && tshy && npm run extract-api",
-      );
-    });
-
-    it("[cjs] should have correct scripts", () => {
-      const model = createMockModel({
-        moduleKind: "cjs",
-      });
-      const packageFileContent = buildPackageFile(model);
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-
-      expect(packageFile.scripts).to.have.property(
-        "build",
-        "npm run clean && tsc && npm run extract-api",
-      );
     });
   });
 });

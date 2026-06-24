@@ -72,7 +72,7 @@ export async function transformRLCModel(
     importSet,
     urlInfo?.apiVersionInfo,
   );
-  const helperDetails = transformHelperFunctionDetails(client, dpgContext, options.flavor);
+  const helperDetails = transformHelperFunctionDetails(client, dpgContext);
   // Enrich client-level annotation detail
   helperDetails.clientLroOverload = getClientLroOverload(paths);
 
@@ -91,7 +91,7 @@ export async function transformRLCModel(
     telemetryOptions,
     importInfo: {
       internalImports: importSet,
-      runtimeImports: buildRuntimeImports(options.flavor),
+      runtimeImports: buildRuntimeImports(),
     },
     rlcSourceDir,
   };

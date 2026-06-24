@@ -3,7 +3,7 @@
 
 import { createTypeSpecLibrary, JSONSchemaType, paramMessage } from "@typespec/compiler";
 import { Options } from "prettier";
-import { DependencyInfo, PackageDetails, PackageFlavor, ServiceInfo } from "./rlc-common/index.js";
+import { DependencyInfo, PackageDetails, ServiceInfo } from "./rlc-common/index.js";
 
 export interface EmitterOptions {
   /**
@@ -42,7 +42,6 @@ export interface EmitterOptions {
    */
   "generate-test"?: boolean;
   "generate-sample"?: boolean;
-  "azure-sdk-for-js"?: boolean;
   "azure-output-directory"?: string;
   "is-typespec-test"?: boolean;
   title?: string;
@@ -50,11 +49,8 @@ export interface EmitterOptions {
   "product-doc-link"?: string;
   "service-info"?: ServiceInfo;
   "azure-arm"?: boolean;
-  "source-from"?: "TypeSpec" | "Swagger";
   "is-modular-library"?: boolean;
-  "module-kind"?: "esm";
   "enable-operation-group"?: boolean;
-  flavor?: PackageFlavor;
   "enable-model-namespace"?: boolean;
   "hierarchy-client"?: boolean;
   "compatibility-mode"?: boolean;
@@ -63,7 +59,6 @@ export interface EmitterOptions {
   "clear-output-folder"?: boolean;
   "ignore-property-name-normalize"?: boolean;
   "compatibility-query-multi-format"?: boolean;
-  branded?: boolean;
   "typespec-title-map"?: Record<string, string>;
   "ignore-enum-member-name-normalize"?: boolean;
   "default-value-object"?: boolean;
@@ -93,7 +88,6 @@ export interface EmitterOptions {
   /**
    * When set to true, generates React Native build targets (tsconfig, warp target,
    * package.json exports). Defaults to `false`.
-   * Only applicable when `azure-sdk-for-js` is `true`.
    */
   "generate-react-native-target"?: boolean;
 }
@@ -195,9 +189,8 @@ export const RLCOptionsSchema: JSONSchemaType<EmitterOptions> = {
       description: [
         "Whether to generate test files, for basic testing of your generated sdks. Defaults to `undefined`.",
         "other cases:",
-        "- If azure-sdk-for-js is `false`. Defaults to `false`.",
-        "- If azure-sdk-for-js is `true` but there's a test folder under package-dir. Defaults to `false`.",
-        "- If azure-sdk-for-js is `true` but there's not a test folder under package-dir. Defaults to `true`.",
+        "- If there's a test folder under package-dir. Defaults to `false`.",
+        "- If there's not a test folder under package-dir. Defaults to `true`.",
       ].join("\n"),
     },
     "generate-sample": {
@@ -205,12 +198,6 @@ export const RLCOptionsSchema: JSONSchemaType<EmitterOptions> = {
       nullable: true,
       description:
         "Whether to generate sample files, for basic samples of your generated sdks. Defaults to `undefined`. Management packages' default to `true`.",
-    },
-    "azure-sdk-for-js": {
-      type: "boolean",
-      nullable: true,
-      description:
-        "This is used to indicate your project is generated in [azure-sdk-for-js](https://github.com/Azure/azure-sdk-for-js) repo or not. If your package is located in that repo we'll leverage `dev-tool` to accelerate our building and testing, however if not we'll remove the dependency for that tool. Defaults to `undefined`. Services with Flavor equal to 'Azure' default to 'true'. ",
     },
     "azure-output-directory": {
       type: "string",
@@ -258,11 +245,6 @@ export const RLCOptionsSchema: JSONSchemaType<EmitterOptions> = {
       nullable: true,
       description: "Whether the package is an arm package.",
     },
-    "source-from": {
-      type: "string",
-      nullable: true,
-      description: "Internal option, the value is default for TypeSpec generation",
-    },
     "is-modular-library": {
       type: "boolean",
       nullable: true,
@@ -287,23 +269,6 @@ export const RLCOptionsSchema: JSONSchemaType<EmitterOptions> = {
       nullable: true,
       description:
         "An option to organize the client in a hierarchical way as defined by `@clientInitialization`. This is true by default.",
-    },
-    branded: {
-      type: "boolean",
-      nullable: true,
-      description: "A section of flavor",
-    },
-    flavor: {
-      type: "string",
-      nullable: true,
-      description: "The flavor of the SDK.",
-    },
-    "module-kind": {
-      type: "string",
-      nullable: true,
-      enum: ["esm"],
-      default: "esm",
-      description: "Internal option for test.",
     },
     "compatibility-mode": {
       type: "boolean",
@@ -402,7 +367,7 @@ export const RLCOptionsSchema: JSONSchemaType<EmitterOptions> = {
       type: "boolean",
       nullable: true,
       description:
-        "When set to true, generates React Native build targets (tsconfig, warp target, package.json exports). Only applicable when azure-sdk-for-js is true. Defaults to `false`.",
+        "When set to true, generates React Native build targets (tsconfig, warp target, package.json exports). Defaults to `false`.",
     },
   },
   required: [],

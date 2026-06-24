@@ -125,6 +125,21 @@ export interface AutorestEmitterOptions {
    * @default false
    */
   "skip-example-copying"?: boolean;
+
+  /**
+   * Strategy for naming the OpenAPI names derived from TypeSpec types (definition/schema
+   * names, parameter keys, inline names, `x-typespec-name`, etc.).
+   *
+   * - `"namespaced"`: Include the namespace prefix when a type lives outside the service namespace
+   *   (e.g. `LiftrBase.Foo`). The service (and root `TypeSpec`) namespace is always stripped. This
+   *   is the current/default behavior.
+   * - `"name-only"`: Use only the type name without any namespace prefix (e.g. `Foo`). When two
+   *   types from different namespaces collapse to the same name, the conflict is reported as an
+   *   error (`@typespec/openapi/duplicate-type-name`).
+   *
+   * @default "namespaced"
+   */
+  "type-name-strategy"?: "namespaced" | "name-only";
 }
 
 const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
@@ -267,6 +282,14 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       default: false,
       description:
         "When enabled, the emitter will not copy example files to the output directory. Instead, it will reference the source example files using relative file paths.",
+    },
+    "type-name-strategy": {
+      type: "string",
+      enum: ["namespaced", "name-only"],
+      nullable: true,
+      default: "namespaced",
+      description:
+        'Strategy for naming the OpenAPI names derived from TypeSpec types. "namespaced" (default) includes the namespace prefix for types outside the service namespace (e.g. `LiftrBase.Foo`). "name-only" uses only the type name without any namespace prefix (e.g. `Foo`), reporting an error when two types collapse to the same name.',
     },
   },
   required: [],

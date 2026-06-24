@@ -2,6 +2,7 @@ import type { Client } from '@azure-rest/core-client';
 import type { ClientOptions } from '@azure-rest/core-client';
 import type { HttpResponse } from '@azure-rest/core-client';
 import { isRestError } from '@azure/core-rest-pipeline';
+import type { NodeReadableStream } from '#platform/platform-types';
 import type { RequestParameters } from '@azure-rest/core-client';
 import { RestError } from '@azure/core-rest-pipeline';
 import type { StreamableMethod } from '@azure-rest/core-client';
@@ -106,8 +107,6 @@ export declare type MediaTypesClient = Client & {
 
 export declare interface MediaTypesClientOptions extends ClientOptions {
 }
-
-declare type NodeReadableStream = NodeJS.ReadableStream;
 
 export { RestError }
 

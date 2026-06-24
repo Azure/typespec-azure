@@ -32,6 +32,7 @@ import {
   getServers,
   isBody,
   isBodyRoot,
+  isPathParam,
 } from "@typespec/http";
 import { getVersion, resolveVersions, type Version } from "@typespec/versioning";
 import {
@@ -708,6 +709,28 @@ function collectParams(
   return params;
 }
 
+// Collect the names of the parameters that are realized as path parameters in
+// the resolved HTTP route of an operation. Returns `undefined` when the HTTP
+// route cannot be resolved (for example for non-HTTP operations), in which case
+// callers should fall back to inspecting the `@path` decorator directly.
+function getRealizedPathParamNames(
+  program: Program,
+  operation: Operation,
+): Set<string> | undefined {
+  try {
+    const [httpOperation] = getHttpOperation(program, operation);
+    const names = new Set<string>();
+    for (const parameter of httpOperation.parameters.parameters) {
+      if (parameter.type === "path") {
+        names.add(parameter.param.name);
+      }
+    }
+    return names;
+  } catch {
+    return undefined;
+  }
+}
+
 export const $override = (
   context: DecoratorContext,
   original: Operation,
@@ -717,20 +740,42 @@ export const $override = (
   // omit all override operation
   context.program.stateMap(omitOperation).set(override, true);
 
-  // Extract and sort parameter names
-  const originalParams = collectParams(context.program, original.parameters.properties).sort(
-    (a, b) => a.name.localeCompare(b.name),
-  );
-  const overrideParams = collectParams(context.program, override.parameters.properties).sort(
-    (a, b) => a.name.localeCompare(b.name),
+  // Collect the parameters of both operations. Parameters are matched by name
+  // (see below) rather than by position, so the lists do not need to be sorted.
+  const originalParams = collectParams(context.program, original.parameters.properties);
+  const overrideParams = collectParams(context.program, override.parameters.properties);
+
+  // Match override parameters to original parameters by name. Overrides are
+  // allowed to add, remove, or regroup parameters (for example wrapping several
+  // parameters in a customization model), so comparing the two lists by sorted
+  // position produces false `override-parameters-mismatch` diagnostics whenever
+  // the parameter sets differ in shape.
+  const overrideParamsByName = new Map(overrideParams.map((p) => [p.name, p]));
+
+  // Determine which parameters are realized as path parameters in the resolved
+  // HTTP route of the original operation. Checking the `@path` decorator alone is
+  // not sufficient, because some templated parameters (for example ARM scope
+  // models) carry `@path` in the type graph without being realized as path
+  // parameters in the operation's actual route.
+  const realizedPathParamNames = getRealizedPathParamNames(context.program, original);
+
+  // A `@clientLocation` on any override parameter indicates an intentional
+  // customization where non-path params are just pass-throughs, so the `@path`
+  // preservation check below is skipped in that case.
+  const overrideHasClientLocation = overrideParams.some((p) =>
+    p.decorators.some((d) => d.decorator.name === "$clientLocation"),
   );
 
-  // Check if the sorted parameter names arrays are equal, omit optional parameters
+  // Check that every required original parameter has a matching override
+  // parameter, omitting optional parameters.
   let parametersMatch = true;
   let checkParameter: ModelProperty | undefined = undefined;
-  let index = 0;
   for (const originalParam of originalParams) {
-    if (index > overrideParams.length - 1) {
+    const overrideParam = overrideParamsByName.get(originalParam.name);
+    if (
+      overrideParam === undefined ||
+      !compareModelProperties(context.program, originalParam, overrideParam)
+    ) {
       if (!originalParam.optional) {
         parametersMatch = false;
         checkParameter = originalParam;
@@ -739,18 +784,27 @@ export const $override = (
         continue;
       }
     }
-    if (!compareModelProperties(context.program, originalParam, overrideParams[index])) {
-      if (!originalParam.optional) {
-        parametersMatch = false;
-        checkParameter = originalParam;
-        break;
-      } else {
-        continue;
-      }
+
+    // Warn if original param has @path but the matching override param doesn't.
+    const originalIsRealizedPathParam = realizedPathParamNames
+      ? realizedPathParamNames.has(originalParam.name)
+      : isPathParam(context.program, originalParam);
+    if (
+      originalIsRealizedPathParam &&
+      !isPathParam(context.program, overrideParam) &&
+      !overrideHasClientLocation
+    ) {
+      reportDiagnostic(context.program, {
+        code: "override-parameters-mismatch",
+        target: context.decoratorTarget,
+        format: {
+          methodName: original.name,
+          checkParameter: overrideParam.name,
+        },
+      });
     }
 
     // Apply the alternate type to the original parameter
-    const overrideParam = overrideParams[index];
     overrideParam.decorators
       .filter(
         (d) =>
@@ -765,8 +819,6 @@ export const $override = (
           d.args[1]?.jsValue as string | undefined,
         ),
       );
-
-    index++;
   }
 
   if (!parametersMatch) {

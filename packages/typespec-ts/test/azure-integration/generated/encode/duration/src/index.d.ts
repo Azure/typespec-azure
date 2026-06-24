@@ -385,6 +385,42 @@ export declare interface ISO8601DurationPropertyOutput {
 
 export { isRestError }
 
+export declare interface LossyIntMilliseconds {
+    get(options: LossyIntMillisecondsParameters): StreamableMethod<LossyIntMilliseconds204Response>;
+}
+
+export declare interface LossyIntMilliseconds204Response extends HttpResponse {
+    status: "204";
+}
+
+export declare type LossyIntMillisecondsParameters = LossyIntMillisecondsQueryParam & RequestParameters;
+
+export declare interface LossyIntMillisecondsQueryParam {
+    queryParameters: LossyIntMillisecondsQueryParamProperties;
+}
+
+export declare interface LossyIntMillisecondsQueryParamProperties {
+    input: number;
+}
+
+export declare interface LossyIntSeconds {
+    get(options: LossyIntSecondsParameters): StreamableMethod<LossyIntSeconds204Response>;
+}
+
+export declare interface LossyIntSeconds204Response extends HttpResponse {
+    status: "204";
+}
+
+export declare type LossyIntSecondsParameters = LossyIntSecondsQueryParam & RequestParameters;
+
+export declare interface LossyIntSecondsQueryParam {
+    queryParameters: LossyIntSecondsQueryParamProperties;
+}
+
+export declare interface LossyIntSecondsQueryParamProperties {
+    input: number;
+}
+
 export declare interface PropertyDefault {
     post(options: PropertyDefaultParameters): StreamableMethod<PropertyDefault200Response>;
 }
@@ -904,6 +940,8 @@ export declare interface Routes {
     (path: "/encode/duration/header/float-milliseconds-larger-unit"): HeaderFloatMillisecondsLargerUnit;
     (path: "/encode/duration/header/float64-milliseconds"): HeaderFloat64Milliseconds;
     (path: "/encode/duration/header/int32-milliseconds-array"): HeaderInt32MillisecondsArray;
+    (path: "/encode/duration/lossy/int32-seconds"): LossyIntSeconds;
+    (path: "/encode/duration/lossy/int32-milliseconds"): LossyIntMilliseconds;
 }
 
 export { }

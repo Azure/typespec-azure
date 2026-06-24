@@ -6,7 +6,6 @@
 import hbs from "handlebars";
 import { getClientName } from "../helpers/name-constructors.js";
 import { NameType, normalizeName } from "../helpers/name-utils.js";
-import { isAzurePackage } from "../helpers/package-util.js";
 import { RLCModel } from "../interfaces.js";
 
 const azureReadmeRLCTemplate = `# {{ clientDescriptiveName }} library for JavaScript
@@ -74,7 +73,7 @@ can be used to authenticate the client.
 
 Enabling logging may help uncover useful information about failures. In order to see a log of HTTP requests and responses, set the \`AZURE_LOG_LEVEL\` environment variable to \`info\`. Alternatively, logging can be enabled at runtime by calling \`setLogLevel\` in the \`@azure/logger\`:
 
-\`\`\`ts {{#if azureSdkForJs}}{{#if generateTest}}snippet:SetLogLevel{{/if}}{{/if}}
+\`\`\`ts {{#if generateTest}}snippet:SetLogLevel{{/if}}
 import { setLogLevel } from "@azure/logger";
 
 setLogLevel("info");
@@ -151,7 +150,7 @@ For more information about how to create a Microsoft Entra application check out
 {{#if azureArm}}
 Using Node.js and Node-like environments, you can use the \`DefaultAzureCredential\` class to authenticate the client.
 
-\`\`\`ts {{#if azureSdkForJs}}{{#if generateTest}}snippet:ReadmeSampleCreateClient_Node{{/if}}{{/if}}
+\`\`\`ts {{#if generateTest}}snippet:ReadmeSampleCreateClient_Node{{/if}}
 import { {{ clientClassName }} } from "{{ clientPackageName }}";
 import { DefaultAzureCredential } from "@azure/identity";
 
@@ -165,7 +164,7 @@ const client = new {{ clientClassName }}(new DefaultAzureCredential());
 
 For browser environments, use the \`InteractiveBrowserCredential\` from the \`@azure/identity\` package to authenticate.
 
-\`\`\`ts {{#if azureSdkForJs}}{{#if generateTest}}snippet:ReadmeSampleCreateClient_Browser{{/if}}{{/if}}
+\`\`\`ts {{#if generateTest}}snippet:ReadmeSampleCreateClient_Browser{{/if}}
 import { InteractiveBrowserCredential } from "@azure/identity";
 import { {{ clientClassName }} } from "{{ clientPackageName }}";
 
@@ -184,7 +183,7 @@ const client = new {{ clientClassName }}(credential);
 {{else}}
 Using Node.js and Node-like environments, you can use the \`DefaultAzureCredential\` class to authenticate the client.
 
-\`\`\`ts {{#if azureSdkForJs}}{{#if generateTest}}snippet:ReadmeSampleCreateClient_Node{{/if}}{{/if}}
+\`\`\`ts {{#if generateTest}}snippet:ReadmeSampleCreateClient_Node{{/if}}
 import { {{ clientClassName }} } from "{{ clientPackageName }}";
 import { DefaultAzureCredential } from "@azure/identity";
 
@@ -193,7 +192,7 @@ const client = new {{ clientClassName }}("<endpoint>", new DefaultAzureCredentia
 
 For browser environments, use the \`InteractiveBrowserCredential\` from the \`@azure/identity\` package to authenticate.
 
-\`\`\`ts {{#if azureSdkForJs}}{{#if generateTest}}snippet:ReadmeSampleCreateClient_Browser{{/if}}{{/if}}
+\`\`\`ts {{#if generateTest}}snippet:ReadmeSampleCreateClient_Browser{{/if}}
 import { InteractiveBrowserCredential } from "@azure/identity";
 import { {{ clientClassName }} } from "{{ clientPackageName }}";
 
@@ -222,7 +221,7 @@ To use this client library in the browser, first you need to use a bundler. For 
 
 Enabling logging may help uncover useful information about failures. In order to see a log of HTTP requests and responses, set the \`AZURE_LOG_LEVEL\` environment variable to \`info\`. Alternatively, logging can be enabled at runtime by calling \`setLogLevel\` in the \`@azure/logger\`:
 
-\`\`\`ts {{#if azureSdkForJs}}{{#if generateTest}}snippet:SetLogLevel{{/if}}{{/if}}
+\`\`\`ts {{#if generateTest}}snippet:SetLogLevel{{/if}}
 import { setLogLevel } from "@azure/logger";
 
 setLogLevel("info");
@@ -338,8 +337,6 @@ interface Metadata {
   isReleasablePackage?: boolean;
   /** The link to the contributing guide in the repository */
   contributingGuideURL?: string;
-  /** Indicates if the package is generated to azure-sdk-for-js repo */
-  azureSdkForJs?: boolean;
   /** Indicates if the package need generate test files */
   generateTest?: boolean;
   /** Indicates if the package need SubscriptionId as the client parameter */
@@ -349,7 +346,7 @@ interface Metadata {
 export function buildReadmeFile(model: RLCModel) {
   const metadata = createMetadata(model) ?? {};
   const readmeFileContents = hbs.compile(
-    model.options && isAzurePackage(model)
+    model.options
       ? model.options.isModularLibrary
         ? azureReadmeModularTemplate
         : azureReadmeRLCTemplate
@@ -470,7 +467,6 @@ function createMetadata(model: RLCModel): Metadata | undefined {
     identityPackageURL: repoURL && `${repoURL}/tree/main/sdk/identity/identity`,
     addCredentials: model.options.addCredentials,
     contributingGuideURL: repoURL && `${repoURL}/blob/main/CONTRIBUTING.md`,
-    azureSdkForJs: model.options.azureSdkForJs,
     generateTest: model.options.generateTest,
     hasSubscriptionId: model.options.hasSubscriptionId,
   };

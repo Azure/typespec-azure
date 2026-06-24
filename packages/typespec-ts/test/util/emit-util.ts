@@ -202,9 +202,7 @@ export async function emitParameterFromTypeSpec(
       internalImports: importSet,
       runtimeImports: buildRuntimeImports("azure"),
     },
-    options: {
-      sourceFrom: "TypeSpec",
-    },
+    options: {},
   });
 }
 
@@ -292,7 +290,6 @@ export async function emitClientFactoryFromTypeSpec(
         name: "test",
         version: "1.0.0-beta.1",
       },
-      flavor: "azure",
       ...credentialInfo,
     },
     importInfo: {

@@ -68,10 +68,6 @@ targets:
  * in options to include it.
  */
 export function buildWarpConfig(model: RLCModel, { exports }: WarpConfigOptions = {}) {
-  if (model.options?.moduleKind !== "esm") {
-    return;
-  }
-
   const allExports: Record<string, string> = {
     ...BASE_EXPORTS,
     ...exports,
