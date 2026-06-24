@@ -68,13 +68,15 @@ describe("Package file generation", () => {
 
     it("should have monorepo metadata", () => {
       const model = createMockModel({ ...baseConfig });
-      const packageFileContent = buildPackageFile(model);
+      const packageFileContent = buildPackageFile(model, {
+        clientContextPaths: ["src/api/testContext.ts"],
+      });
       const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
 
       const expectedMetadata = {
         constantPaths: [
           {
-            path: "src/test.ts",
+            path: "src/api/testContext.ts",
             prefix: "userAgentInfo",
           },
         ],
@@ -265,20 +267,6 @@ describe("Package file generation", () => {
         "path",
         "src/api/chatCompletionsContext.ts",
         "modular",
-      );
-    });
-
-    it("[esm] should read clientPath from config for rlc", () => {
-      const model = createMockModel({
-        ...baseConfig,
-      });
-      const packageFileContent = buildPackageFile(model);
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-      expect(packageFile).to.have.property("//metadata");
-      expect(packageFile["//metadata"]["constantPaths"][0]).to.have.property(
-        "path",
-        "src/test.ts",
-        "rlc",
       );
     });
 

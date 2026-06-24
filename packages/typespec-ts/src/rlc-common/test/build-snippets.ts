@@ -17,7 +17,6 @@ export function buildSnippets(model: RLCModel, clientName?: string) {
       content: hbs.compile(snippetsContent, { noEscape: true })({
         clientClassName: clientName ? clientName : getClientName(model),
         azureArm: model.options?.azureArm,
-        isModularLibrary: model.options.isModularLibrary,
         hasSubscriptionId: model.options.hasSubscriptionId,
       }),
     };

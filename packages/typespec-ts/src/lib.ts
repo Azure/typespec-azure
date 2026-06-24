@@ -3,7 +3,7 @@
 
 import { createTypeSpecLibrary, JSONSchemaType, paramMessage } from "@typespec/compiler";
 import { Options } from "prettier";
-import { DependencyInfo, PackageDetails, ServiceInfo } from "./rlc-common/index.js";
+import { PackageDetails } from "./rlc-common/index.js";
 
 export interface EmitterOptions {
   /**
@@ -13,9 +13,6 @@ export interface EmitterOptions {
    * currently affected by this option.
    */
   "include-headers-in-response"?: boolean;
-  "include-shortcuts"?: boolean;
-  "multi-client"?: boolean;
-  batch?: any[];
   "package-details"?: PackageDetails;
   "add-credentials"?: boolean;
   /** Three possible values:
@@ -42,14 +39,8 @@ export interface EmitterOptions {
    */
   "generate-test"?: boolean;
   "generate-sample"?: boolean;
-  "azure-output-directory"?: string;
   "is-typespec-test"?: boolean;
-  title?: string;
-  "dependency-info"?: DependencyInfo;
-  "product-doc-link"?: string;
-  "service-info"?: ServiceInfo;
   "azure-arm"?: boolean;
-  "is-modular-library"?: boolean;
   "enable-operation-group"?: boolean;
   "enable-model-namespace"?: boolean;
   "hierarchy-client"?: boolean;
@@ -61,7 +52,6 @@ export interface EmitterOptions {
   "compatibility-query-multi-format"?: boolean;
   "typespec-title-map"?: Record<string, string>;
   "ignore-enum-member-name-normalize"?: boolean;
-  "default-value-object"?: boolean;
   //TODO should remove this after finish the release tool test
   "should-use-pnpm-dep"?: boolean;
   "ignore-nullable-on-optional"?: boolean;
@@ -101,24 +91,6 @@ export const RLCOptionsSchema: JSONSchemaType<EmitterOptions> = {
       nullable: true,
       description:
         "This option is used to indicate whether to include response headers in the generated response type. When set to true, the generated response type will include response headers as properties.",
-    },
-    "include-shortcuts": {
-      type: "boolean",
-      nullable: true,
-      description: "Deprecated option for RLC legacy generation.",
-    },
-    "multi-client": {
-      type: "boolean",
-      nullable: true,
-      description: "Deprecated option for RLC legacy generation.",
-    },
-    batch: {
-      type: "array",
-      nullable: true,
-      items: {
-        type: "string",
-      },
-      description: "Deprecated option for RLC legacy generation.",
     },
     "package-details": {
       type: "object",
@@ -199,58 +171,15 @@ export const RLCOptionsSchema: JSONSchemaType<EmitterOptions> = {
       description:
         "Whether to generate sample files, for basic samples of your generated sdks. Defaults to `undefined`. Management packages' default to `true`.",
     },
-    "azure-output-directory": {
-      type: "string",
-      nullable: true,
-      description: "Deprecated option for RLC legacy generation",
-    },
     "is-typespec-test": {
       type: "boolean",
       nullable: true,
       description: "Internal option for test",
     },
-    title: {
-      type: "string",
-      nullable: true,
-      description: "Deprecated option for RLC legacy generation.",
-    },
-    "dependency-info": {
-      type: "object",
-      additionalProperties: true,
-      properties: {
-        link: { type: "string", nullable: false },
-        description: { type: "string", nullable: false },
-      },
-      required: [],
-      nullable: true,
-      description: "Deprecated option for RLC legacy generation.",
-    },
-    "product-doc-link": {
-      type: "string",
-      nullable: true,
-      description: "Deprecated option for RLC legacy generation.",
-    },
-    "service-info": {
-      type: "object",
-      additionalProperties: true,
-      properties: {
-        title: { type: "string", nullable: true },
-        description: { type: "string", nullable: true },
-      },
-      nullable: true,
-      description: "Deprecated option for RLC legacy generation.",
-    },
     "azure-arm": {
       type: "boolean",
       nullable: true,
       description: "Whether the package is an arm package.",
-    },
-    "is-modular-library": {
-      type: "boolean",
-      nullable: true,
-      default: false,
-      description:
-        "Whether to generate a Modular library. Defaults to `false`. Arm packages default to `true`.",
     },
     "enable-operation-group": {
       type: "boolean",
@@ -310,11 +239,6 @@ export const RLCOptionsSchema: JSONSchemaType<EmitterOptions> = {
       nullable: true,
       description:
         "Whether to generate the backward-compatible code for query parameter serialization for array types in RLC. Defaults to `false`",
-    },
-    "default-value-object": {
-      type: "boolean",
-      nullable: true,
-      description: "Deprecated option for RLC legacy generation.",
     },
     "typespec-title-map": {
       type: "object",

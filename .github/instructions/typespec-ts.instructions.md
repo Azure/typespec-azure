@@ -31,13 +31,11 @@ reintroduce these options or the branches they gated:
 The package is tested through vitest projects (see `vitest.config.ts`):
 
 - `test-next` — `test-next/**` (modern unit tests).
-- `unit-rlc` — `test/unit/**` (RLC unit tests; despite the `:rlc` name these are Azure).
-- `unit-modular` — `test/modular-unit/**` (Modular unit tests; also Azure).
-- `integration-azure-rlc` — `test/azure-integration/**` (RLC spector e2e).
+- `unit-modular` — `test/modular-unit/**` (Modular unit tests; Azure).
 - `integration-azure-modular` — `test/azure-modular-integration/**` (Modular spector e2e).
 
-Run them with `pnpm test-next`, `pnpm unit-test` (runs both unit projects),
-`pnpm integration-test-ci:azure-rlc`, and `pnpm integration-test-ci:azure-modular`.
+Run them with `pnpm test-next`, `pnpm unit-test` (runs the modular unit project),
+and `pnpm integration-test-ci:azure-modular`.
 There is intentionally no non-Azure integration project — coverage for those scenarios
 is a superset within the `azure-*` folders.
 
@@ -49,12 +47,11 @@ Integration (spector) tests generate real clients from specs, then assert on the
    `@azure-tools/azure-http-specs`, and the shared custom specs in
    `test/integration/typespec/` (this `typespec/` dir is shared infra — keep it even
    though the rest of `test/integration/` is gone). It also copies assets to `./temp/assets`.
-2. `test/commands/gen-spector.js --tag=<azure-rlc|azure-modular>` picks the matching list
-   from `test/commands/spector-list.js` (`azureRlcTsps` / `azureModularTsps`) and runs
+2. `test/commands/gen-spector.js --tag=azure-modular` picks the `azureModularTsps` list
+   from `test/commands/spector-list.js` and runs
    `test/commands/run.ts` for each entry, emitting into
-   `test/azure-integration/generated/<outputPath>` or
    `test/azure-modular-integration/generated/<outputPath>`.
-3. The vitest `integration-azure-*` project then runs the `*.test.ts` assertions.
+3. The vitest `integration-azure-modular` project then runs the `*.test.ts` assertions.
 
 `pnpm regen-test-baselines` (alias of `generate-tsp-only`) regenerates all Azure baselines.
 
@@ -68,7 +65,7 @@ files on disk (`src/*.ts`, `types/`, `temp/`), but git only tracks the rolled-up
 ## CI: `e2e-test` job in `.github/workflows/ci-typescript.yml`
 
 The e2e job runs `copy:typespec` → `integration-test-ci:azure-modular` →
-`integration-test-ci:azure-rlc` → `pnpm check:tree`. `check:tree`
+`pnpm check:tree`. `check:tree`
 (`test/commands/check-clean-tree.ts`) **fails if regeneration leaves the git tree dirty**.
 So a baseline that doesn't match freshly generated output (changed, missing, or added
 `src/index.d.ts`) breaks CI even when the unit tests pass.

@@ -18,14 +18,13 @@ import { ModularClientOptions } from "../modular/interfaces.js";
 import { NameType, normalizeName } from "../rlc-common/index.js";
 import { SdkContext } from "./interfaces.js";
 
-export function getRLCClients(dpgContext: SdkContext, isModularLibrary?: boolean): SdkClient[] {
-  const modular = isModularLibrary ?? dpgContext.rlcOptions?.isModularLibrary ?? false;
+export function getRLCClients(dpgContext: SdkContext): SdkClient[] {
   const clients = listClients(dpgContext);
   const rawServiceNamespaces =
     dpgContext.allServiceNamespaces ?? listAllServiceNamespaces(dpgContext);
 
-  // For one client in Modular: Return the client from listClients with multi-service support
-  if (modular && clients.length === 1) {
+  // For one client: Return the client from listClients with multi-service support
+  if (clients.length === 1) {
     return clients.map((client) => {
       const services = client.services;
       return {
@@ -35,7 +34,7 @@ export function getRLCClients(dpgContext: SdkContext, isModularLibrary?: boolean
       };
     });
   } else {
-    // For RLC and multiple clients in Modular:
+    // For multiple clients:
     // Flatten all services and return one client per service
     const services = new Set<Namespace>();
     clients.forEach((c) => {
