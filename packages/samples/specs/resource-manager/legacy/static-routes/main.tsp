@@ -117,6 +117,7 @@ alias BaseParams2 = {
 };
 
 /** Subscription operations */
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-required-operations" "Legacy static-routes sample uses custom operation templates not recognized by the standard required-operations check."
 @armResourceOperations(#{ allowStaticRoutes: true })
 interface EmployeeSubscriptions {
   get is EmplOps.Read<Employee>;
