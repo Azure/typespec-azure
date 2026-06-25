@@ -138,24 +138,6 @@ describe("Diagnostic reporting tests", () => {
     }
   });
 
-  it.skip("should throw exception if property type as void", async () => {
-    try {
-      const tspContent = `
-        model Foo {
-          param: void;
-        }
-        op read(...Foo): {};
-          `;
-
-      await emitModularOperationsFromTypeSpec(tspContent);
-      assert.fail("Should throw diagnostic errors");
-    } catch (e: any) {
-      assert.equal(e[0]?.code, "@azure-tools/typespec-ts/invalid-schema");
-      assert.equal(e[0]?.message, "Couldn't get schema for type Intrinsic with property param");
-      assert.equal(e[0]?.target?.name, "void");
-    }
-  });
-
   it("required nullable header would report diagnostic", async () => {
     try {
       const tspContent = `
