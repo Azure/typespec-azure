@@ -56,7 +56,7 @@ keep the suite fast without lowering coverage:
   Detection is deliberately over-inclusive — a false positive just keeps an unused import,
   while the exact-snapshot assertions catch any false negative as a loud compile failure.
   Keep the detectors broad if you touch them.
-- **Per-scenario `compileCache`.** Identical recompiles within a scenario are memoized and
+- **Per-scenario `compileCache`.** Identical repeat compilations within a scenario are memoized and
   the cache is cleared by the scenario runner's `afterAll` (`clearCompileCache`) to bound
   retained programs. New scenario suites should run through the scenario runner so this
   stays wired up.
