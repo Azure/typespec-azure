@@ -12,6 +12,7 @@ packages:
 overrides:
   "cross-spawn@>=7.0.0 <7.0.5": "^7.0.5"
   rollup: 4.49.0 # Regression in 4.50.0 https://github.com/rollup/rollup/issues/6099
+  vite: "<8.1.0" # vite 8.1.0 bundles rolldown 1.1.2 which regressed `export *` re-export resolution (breaks @griffel/core RESET export, fails html-program-viewer build)
 
 onlyBuiltDependencies:
   - tree-sitter
