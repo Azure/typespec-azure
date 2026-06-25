@@ -1,6 +1,6 @@
 # @azure-tools/typespec-ts
 
-An experimental TypeSpec emitter for TypeScript RLC
+An experimental TypeSpec emitter for TypeScript
 
 ## Install
 
@@ -47,24 +47,6 @@ See [Configuring output directory for more info](https://typespec.io/docs/handbo
 **Type:** `boolean`
 
 This option is used to indicate whether to include response headers in the generated response type. When set to true, the generated response type will include response headers as properties.
-
-### `include-shortcuts`
-
-**Type:** `boolean`
-
-Deprecated option for RLC legacy generation.
-
-### `multi-client`
-
-**Type:** `boolean`
-
-Deprecated option for RLC legacy generation.
-
-### `batch`
-
-**Type:** `string[]`
-
-Deprecated option for RLC legacy generation.
 
 ### `package-details`
 
@@ -144,69 +126,17 @@ other cases:
 
 Whether to generate sample files, for basic samples of your generated sdks. Defaults to `undefined`. Management packages' default to `true`.
 
-### `azure-output-directory`
-
-**Type:** `string`
-
-Deprecated option for RLC legacy generation
-
 ### `is-typespec-test`
 
 **Type:** `boolean`
 
 Internal option for test
 
-### `title`
-
-**Type:** `string`
-
-Deprecated option for RLC legacy generation.
-
-### `dependency-info`
-
-**Type:** `object { link, description }`
-
-Deprecated option for RLC legacy generation.
-
-**Properties:**
-
-| Name          | Type     | Default | Description |
-| ------------- | -------- | ------- | ----------- |
-| `link`        | `string` |         |             |
-| `description` | `string` |         |             |
-
-### `product-doc-link`
-
-**Type:** `string`
-
-Deprecated option for RLC legacy generation.
-
-### `service-info`
-
-**Type:** `object { title, description }`
-
-Deprecated option for RLC legacy generation.
-
-**Properties:**
-
-| Name          | Type     | Default | Description |
-| ------------- | -------- | ------- | ----------- |
-| `title`       | `string` |         |             |
-| `description` | `string` |         |             |
-
 ### `azure-arm`
 
 **Type:** `boolean`
 
 Whether the package is an arm package.
-
-### `is-modular-library`
-
-**Type:** `boolean`
-
-**Default:** `false`
-
-Whether to generate a Modular library. Defaults to `false`. Arm packages default to `true`.
 
 ### `enable-operation-group`
 
@@ -267,12 +197,6 @@ The emitter has a normalization logic for enum member key, to ignore this normal
 **Type:** `boolean`
 
 Whether to generate the backward-compatible code for query parameter serialization for array types in RLC. Defaults to `false`
-
-### `default-value-object`
-
-**Type:** `boolean`
-
-Deprecated option for RLC legacy generation.
 
 ### `typespec-title-map`
 
