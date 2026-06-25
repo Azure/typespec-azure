@@ -195,8 +195,6 @@ export interface RLCOptions {
    * Whether to include response headers in the generated response types. If true, the generated response types will include headers as properties.
    */
   includeHeadersInResponse?: boolean;
-  includeShortcuts?: boolean;
-  multiClient?: boolean;
   batch?: any[];
   packageDetails?: PackageDetails;
   addCredentials?: boolean;
@@ -226,12 +224,8 @@ export interface RLCOptions {
   generateSample?: boolean;
   azureOutputDirectory?: string;
   isTypeSpecTest?: boolean;
-  title?: string;
-  dependencyInfo?: DependencyInfo;
-  productDocLink?: string;
   serviceInfo?: ServiceInfo;
   azureArm?: boolean;
-  isModularLibrary?: boolean;
   enableOperationGroup?: boolean;
   enableModelNamespace?: boolean;
   hierarchyClient?: boolean;
@@ -273,11 +267,6 @@ export interface RLCOptions {
 export interface ServiceInfo {
   title?: string;
   description?: string;
-}
-
-export interface DependencyInfo {
-  link: string;
-  description: string;
 }
 
 export interface File {

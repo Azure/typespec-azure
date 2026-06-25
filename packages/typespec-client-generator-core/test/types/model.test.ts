@@ -930,16 +930,6 @@ it("no models filter core", async () => {
   strictEqual(models.length, 0);
 });
 
-it("no models don't filter core", async () => {
-  const { program } = await SimpleTester.compile(`
-    @service
-    namespace MyService { }
-  `);
-  const context = await createSdkContextForTester(program);
-  const models = context.sdkPackage.models;
-  strictEqual(models.length, 0);
-});
-
 it("input usage", async () => {
   const { program } = await SimpleTesterWithService.compile(`
     model InputModel {

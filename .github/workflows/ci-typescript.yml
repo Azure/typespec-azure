@@ -61,9 +61,6 @@ jobs:
       - name: Run Modular Spector tests
         working-directory: packages/typespec-ts
         run: pnpm integration-test-ci:azure-modular
-      - name: Run RLC Spector tests
-        working-directory: packages/typespec-ts
-        run: pnpm integration-test-ci:azure-rlc
       - name: Check git tree is clean
         working-directory: packages/typespec-ts
         run: pnpm check:tree

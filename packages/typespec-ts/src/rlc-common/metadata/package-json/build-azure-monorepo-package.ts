@@ -6,7 +6,6 @@ import { getCommonPackageScripts, getPackageCommonInfo } from "./package-common.
 
 export interface AzureMonorepoInfoConfig extends AzurePackageInfoConfig {
   monorepoPackageDirectory?: string;
-  clientFilePaths: string[];
   clientContextPaths?: string[];
 }
 
@@ -128,7 +127,7 @@ function getSampleMetadata({ name, version, withSamples }: AzureMonorepoInfoConf
 
 function getAzureMonorepoScripts(config: AzureMonorepoInfoConfig) {
   const esmScripts = getEsmScripts();
-  const skipLinting = config.azureArm && config.isModularLibrary;
+  const skipLinting = config.azureArm;
   const buildSampleScripts = config.azureArm
     ? "tsc -p config/tsconfig.samples.json && dev-tool samples publish -f"
     : "tsc -p config/tsconfig.samples.json";
@@ -168,7 +167,7 @@ function getMetadataInfo(config: AzureMonorepoInfoConfig) {
   const metadata: Record<string, any> = {
     constantPaths: [],
   };
-  const paths = config.isModularLibrary ? config.clientContextPaths : config.clientFilePaths;
+  const paths = config.clientContextPaths;
   for (const path of paths ?? []) {
     metadata["constantPaths"].push({
       path: path,

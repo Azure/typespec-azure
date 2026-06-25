@@ -11,7 +11,6 @@ export interface PackageCommonInfoConfig {
   exports?: Record<string, any>;
   dependencies?: Record<string, string>;
   azureArm?: boolean;
-  isModularLibrary?: boolean;
   /**
    * When true, generates React Native build targets (dist/react-native, exports condition).
    * Defaults to false.
@@ -30,7 +29,7 @@ export function getPackageCommonInfo(config: PackageCommonInfoConfig) {
     version,
     description,
     engines: {
-      node: ">=20.0.0",
+      node: ">=22.0.0",
     },
     sideEffects: false,
     autoPublish: false,
