@@ -75,6 +75,18 @@ export interface RLCEmitterOptions {
 }
 
 /**
+ * Phase 4 usage detectors. Each matches the decorators / namespace references
+ * that can only resolve to the corresponding library, so we can skip importing
+ * it when a scenario doesn't use it. Kept deliberately broad (over-include
+ * rather than under-include) — see `rlcEmitterFor`.
+ */
+const REST_USAGE =
+  /@(autoRoute|segmentOf|segment|actionSegment|actionSeparator|collectionAction|action|parentResource|readsResource|createsOrReplacesResource|createsOrUpdatesResource|createsResource|updatesResource|deletesResource|listsResource|copyResourceKeyParameters|resourceLocation|resourceTypeForKeyParam|validateHasKey|validateIsError|resource)\b|\bRest\./;
+const VERSIONING_USAGE =
+  /@(versioned|added|removedFrom|removed|renamedFrom|madeOptional|madeRequired|typeChangedFrom|returnTypeChangedFrom|useDependency)\b|\bVersions\b|\bVersioning\./;
+const XML_USAGE = /\bXml\b|@unwrapped\b|@attribute\b/;
+
+/**
  * Phase 2 (compile once per scenario): within a single scenario, every output
  * code block recompiles the *same* input TypeSpec. This cache memoizes the
  * compiled `TestHost` keyed by the exact compiler input (source + imports +
@@ -154,21 +166,30 @@ export async function rlcEmitterFor(
 
   namespace Azure.TypeScript.Testing;
   `;
+  // Phase 4: the TypeSpec checker cost scales with the imported library surface.
+  // Only import `@typespec/rest`, `@typespec/versioning` and `@typespec/xml` when
+  // the scenario input actually references them, instead of importing all three
+  // for every test. Detection is intentionally conservative — a false positive
+  // just keeps an unused import (slower but correct), while the snapshot
+  // assertions catch any false negative as a compile failure.
+  const needRest = needArmTemplate || REST_USAGE.test(code);
+  const needVersioning = withVersionedApiVersion || VERSIONING_USAGE.test(code);
+  const needXml = XML_USAGE.test(code);
   const content = withRawContent
     ? code
     : `
 import "@typespec/http";
-import "@typespec/rest";
-import "@typespec/versioning";
-import "@typespec/xml";
+${needRest ? 'import "@typespec/rest";' : ""}
+${needVersioning ? 'import "@typespec/versioning";' : ""}
+${needXml ? 'import "@typespec/xml";' : ""}
 ${needTCGC ? 'import "@azure-tools/typespec-client-generator-core";' : ""} 
 ${needAzureCore ? 'import "@azure-tools/typespec-azure-core";' : ""} 
 ${needArmTemplate ? 'import "@azure-tools/typespec-azure-resource-manager";' : ""}
 
-using Rest; 
 using Http;
-using Versioning;
-using Xml;
+${needRest ? "using Rest;" : ""}
+${needVersioning ? "using Versioning;" : ""}
+${needXml ? "using Xml;" : ""}
 ${needTCGC ? "using Azure.ClientGenerator.Core;" : ""}
 ${needAzureCore ? "using Azure.Core;" : ""}
 ${needNamespaces ? namespace : ""}
