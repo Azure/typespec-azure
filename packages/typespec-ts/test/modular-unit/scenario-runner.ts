@@ -1,4 +1,4 @@
-import { assert, describe, it } from "vitest";
+import { assert, afterAll, describe, it } from "vitest";
 
 import { readdirSync, readFileSync, statSync, writeFileSync } from "fs";
 import path from "path";
@@ -14,9 +14,9 @@ import {
   emitSamplesFromTypeSpec,
   emitTestsFromTypeSpec,
 } from "../util/emit-util.js";
-import { assertEqualContent, ExampleJson } from "../util/test-util.js";
+import { assertEqualContent, clearCompileCache, ExampleJson } from "../util/test-util.js";
 
-const SCENARIOS_LOCATION = "./test/modular-unit/scenarios";
+export const SCENARIOS_LOCATION = "./test/modular-unit/scenarios";
 
 const SCENARIOS_UPDATE = process.env["SCENARIOS_UPDATE"] === "true";
 
@@ -29,9 +29,6 @@ type EmitterFunction = (
 /**
  * Mapping of different snapshot types to how to get them.
  * Snapshot types can take single-word string arguments templated in curly braces {} and are otherwise regex
- *
- * TODO: trying to figure out the best syntax for this; the existing "emit" functions have a lot of positional boolean options.
- * It would be good to make it easy to specify what options you want in a clear way.
  */
 const OUTPUT_CODE_BLOCK_TYPES: Record<string, EmitterFunction> = {
   // Snapshot of a particular interface named {name} in the models file
@@ -214,21 +211,49 @@ const OUTPUT_CODE_BLOCK_TYPES: Record<string, EmitterFunction> = {
   },
 };
 
-describe("Scenarios", function () {
-  describeScenarios(SCENARIOS_LOCATION);
-});
-
-function describeScenarios(location: string): void {
-  const children = readdirSync(location);
-  for (const child of children) {
+/**
+ * Register all scenario `.md` files directly inside `location` (non-recursive).
+ *
+ * Each leaf scenario directory gets its own generated test file (see
+ * `scenario-suites/`) so that vitest distributes scenario execution across
+ * worker processes. Registration is shallow because nested directories are
+ * themselves leaf directories with their own generated test files.
+ */
+export function describeScenarioDir(location: string): void {
+  for (const child of readdirSync(location)) {
     const fullPath = path.join(location, child);
-    const stat = statSync(fullPath);
-    if (stat.isDirectory()) {
-      describeScenarios(fullPath);
-    } else {
+    if (statSync(fullPath).isFile() && child.endsWith(".md")) {
       describeScenarioFile(fullPath);
     }
   }
+}
+
+/**
+ * Discover every "leaf" scenario directory under `root` — i.e. every directory
+ * that directly contains at least one `.md` scenario file — returned as paths
+ * relative to `root`, sorted. Used by the scenario-suite generator and the
+ * coverage guard test to guarantee every scenario file is registered exactly
+ * once.
+ */
+export function getLeafScenarioDirs(root: string = SCENARIOS_LOCATION): string[] {
+  const result: string[] = [];
+  function walk(dir: string): void {
+    let hasMd = false;
+    for (const child of readdirSync(dir)) {
+      const fullPath = path.join(dir, child);
+      const stat = statSync(fullPath);
+      if (stat.isDirectory()) {
+        walk(fullPath);
+      } else if (child.endsWith(".md")) {
+        hasMd = true;
+      }
+    }
+    if (hasMd) {
+      result.push(path.relative(root, dir));
+    }
+  }
+  walk(root);
+  return result.sort();
 }
 
 function describeScenarioFile(scenarioFile: string): void {
@@ -240,6 +265,9 @@ function describeScenarioFile(scenarioFile: string): void {
         continue;
       }
       (scenario.only ? describe.only : describe)(scenario.heading, function () {
+        // Phase 2: reuse compiles within a scenario, then drop them so retained
+        // programs don't accumulate across scenarios in a worker.
+        afterAll(clearCompileCache);
         const codeBlocks = scenario.parts.filter((x) => x.kind === "code");
         const tspBlocks = codeBlocks.filter(
           (x) => x.heading.startsWith("tsp") || x.heading.startsWith("typespec"),
@@ -402,9 +430,6 @@ function writeScenarios(file: ScenarioFile): string {
 
 function parseYaml(yamlConfigs: string[]): Record<string, any> {
   // This is a simple yaml parser that assumes that there are no nested objects.
-  // It splits the yaml into lines, then splits each line by the colon and
-  // creates a record from the key-value pairs.
-  // This is a very simple parser and will not work for all yaml files.
   let record: Record<string, any> = {};
   for (const yaml of yamlConfigs) {
     const each = loadYaml(yaml) as Record<string, any>;
