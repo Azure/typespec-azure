@@ -214,10 +214,10 @@ const OUTPUT_CODE_BLOCK_TYPES: Record<string, EmitterFunction> = {
 /**
  * Register all scenario `.md` files directly inside `location` (non-recursive).
  *
- * Each leaf scenario directory gets its own generated test file (see
- * `scenario-suites/`) so that vitest distributes scenario execution across
- * worker processes. Registration is shallow because nested directories are
- * themselves leaf directories with their own generated test files.
+ * `vitest.config.ts` creates one project per leaf scenario directory and injects
+ * the directory into `scenario-suite.entry.ts`, so vitest distributes scenario
+ * execution across worker processes. Registration is shallow because nested
+ * directories are themselves leaf directories with their own project.
  */
 export function describeScenarioDir(location: string): void {
   for (const child of readdirSync(location)) {
@@ -226,34 +226,6 @@ export function describeScenarioDir(location: string): void {
       describeScenarioFile(fullPath);
     }
   }
-}
-
-/**
- * Discover every "leaf" scenario directory under `root` — i.e. every directory
- * that directly contains at least one `.md` scenario file — returned as paths
- * relative to `root`, sorted. Used by the scenario-suite generator and the
- * coverage guard test to guarantee every scenario file is registered exactly
- * once.
- */
-export function getLeafScenarioDirs(root: string = SCENARIOS_LOCATION): string[] {
-  const result: string[] = [];
-  function walk(dir: string): void {
-    let hasMd = false;
-    for (const child of readdirSync(dir)) {
-      const fullPath = path.join(dir, child);
-      const stat = statSync(fullPath);
-      if (stat.isDirectory()) {
-        walk(fullPath);
-      } else if (child.endsWith(".md")) {
-        hasMd = true;
-      }
-    }
-    if (hasMd) {
-      result.push(path.relative(root, dir));
-    }
-  }
-  walk(root);
-  return result.sort();
 }
 
 function describeScenarioFile(scenarioFile: string): void {

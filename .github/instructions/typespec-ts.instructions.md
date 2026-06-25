@@ -31,7 +31,13 @@ reintroduce these options or the branches they gated:
 The package is tested through vitest projects (see `vitest.config.ts`):
 
 - `test-next` — `test-next/**` (modern unit tests).
-- `unit-modular` — `test/modular-unit/**` (Modular unit tests; Azure).
+- `unit-modular` — `test/modular-unit/**` (Modular unit tests; Azure). Scenario `.md`
+  suites under `test/modular-unit/scenarios/` are run via one vitest project **per leaf
+  scenario directory**, computed from the directory tree at config-load time in
+  `vitest.config.ts` (each project injects its directory into the shared
+  `scenario-suite.entry.ts`). This spreads scenarios across `forks` workers without
+  committing a generated test file per directory, and stays in sync automatically as
+  scenario directories are added or removed. Run all of them with `--project 'unit-modular*'`.
 - `integration-azure-modular` — `test/azure-modular-integration/**` (Modular spector e2e).
 
 Run them with `pnpm test-next`, `pnpm unit-test` (runs the modular unit project),
@@ -72,7 +78,7 @@ Each generated package writes a `.gitignore` that ignores everything except
 `src/index.d.ts`, `.gitignore`, and `tspconfig.yaml`. So a generated folder is full of
 files on disk (`src/*.ts`, `types/`, `temp/`), but git only tracks the rolled-up
 `src/index.d.ts` (produced by the api-extractor "dtsRollup" pass in the `declarations`
-phase of `run.ts`). The `client` phase rewrites `src/` and therefore *removes*
+phase of `run.ts`). The `client` phase rewrites `src/` and therefore _removes_
 `src/index.d.ts`; the `declarations` phase restores it byte-for-byte — so both phases
 must run before `check:tree`.
 
@@ -87,7 +93,7 @@ So a baseline that doesn't match freshly generated output (changed, missing, or 
 ## Gotchas
 
 - **Command scripts run on `node`, not `tsx`.** The `test/commands/*` scripts (including
-  `copy:typespec`, `gen-spector.js`, `check:tree`, and `gen:scenario-suites`) are executed
+  `copy:typespec`, `gen-spector.js`, and `check:tree`) are executed
   directly with `node`, which strips TypeScript types natively — this requires **Node >=
   22.18**. When adding or editing one: import sibling `.ts` files with an explicit `.ts`
   specifier (node does not remap `.js` -> `.ts` the way tsx did), and use `import type` for

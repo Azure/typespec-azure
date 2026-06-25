@@ -41,8 +41,7 @@
     "integration-test:alone:azure-modular": "vitest run --project integration-azure-modular",
     "stop-test-server": "npx tsp-spector server stop",
     "unit-test": "npm run unit-test:modular",
-    "unit-test:modular": "cross-env NODE_OPTIONS=--max-old-space-size=1024 vitest run --project unit-modular",
-    "gen:scenario-suites": "node ./test/commands/gen-scenario-suites.ts",
+    "unit-test:modular": "cross-env NODE_OPTIONS=--max-old-space-size=1024 vitest run --project 'unit-modular*'",
     "regen-docs": "npm run build && tspd doc . --enable-experimental --output-dir ../../website/src/content/docs/docs/emitters/clients/typespec-ts/reference --skip-js"
   },
   "author": "Jose Heredia <joheredi@microsoft.com>",
