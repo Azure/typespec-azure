@@ -4,7 +4,9 @@ import {
   SdkClientType,
   SdkExampleValue,
   SdkHttpOperationExample,
+  SdkHttpParameter,
   SdkHttpParameterExampleValue,
+  SdkMethodParameter,
   SdkModelPropertyType,
   SdkServiceOperation,
 } from "@azure-tools/typespec-client-generator-core";
@@ -242,6 +244,45 @@ function buildParameterValueMap(example: SdkHttpOperationExample) {
   return parameterMap;
 }
 
+/**
+ * A node in a nested property tree used to reconstruct grouped (`@@override`)
+ * parameters in samples. A leaf holds the rendered example value while an inner
+ * node holds its child properties.
+ */
+type PropTreeNode =
+  | { kind: "leaf"; value: string }
+  | { kind: "node"; children: Map<string, PropTreeNode> };
+
+/**
+ * Determines whether an HTTP parameter was grouped into a wrapper method
+ * parameter via `@@override` (e.g. query params grouped under `queryOptions`).
+ * Such parameters have a single method-parameter segment path with more than one
+ * segment, where the first segment is the wrapper method parameter.
+ */
+function isGroupedOverrideParam(param: SdkHttpParameter): boolean {
+  if (param.onClient) {
+    return false;
+  }
+  const segments = param.methodParameterSegments;
+  return segments.length === 1 && (segments[0]?.length ?? 0) > 1;
+}
+
+/**
+ * Serializes a property tree into an object literal string, e.g.
+ * `{ fromParam: new Date("..."), filter: "..." }`.
+ */
+function serializePropTree(tree: Map<string, PropTreeNode>): string {
+  const entries: string[] = [];
+  for (const [key, node] of tree) {
+    if (node.kind === "leaf") {
+      entries.push(`${key}: ${node.value}`);
+    } else {
+      entries.push(`${key}: ${serializePropTree(node.children)}`);
+    }
+  }
+  return `{${entries.join(", ")}}`;
+}
+
 function prepareExampleValue(
   context: SdkContext,
   name: string,
@@ -319,6 +360,12 @@ function prepareExampleParameters(
   // required parameters
   for (const param of method.operation.parameters) {
     if (param.optional === true || param.type.kind === "constant" || param.clientDefaultValue) {
+      continue;
+    }
+
+    // Parameters grouped into a wrapper model via @@override are handled separately
+    // so their values are nested under the wrapper (e.g. `queryOptions`).
+    if (isGroupedOverrideParam(param)) {
       continue;
     }
 
@@ -445,7 +492,10 @@ function prepareExampleParameters(
   method.operation.parameters
     .filter(
       (param) =>
-        param.optional === true && parameterMap[param.serializedName] && !param.clientDefaultValue,
+        param.optional === true &&
+        parameterMap[param.serializedName] &&
+        !param.clientDefaultValue &&
+        !isGroupedOverrideParam(param),
     )
     .map((param) => parameterMap[param.serializedName]!)
     .forEach((param) => {
@@ -460,7 +510,79 @@ function prepareExampleParameters(
       );
     });
 
+  // grouped parameters (via @@override): reconstruct the wrapper method parameter
+  // (e.g. `queryOptions`) and nest each grouped value under it so the generated
+  // sample matches the method signature.
+  collectGroupedParameters(dpgContext, method, parameterMap, result);
+
   return result;
+}
+
+/**
+ * Collects HTTP parameters that were grouped into a wrapper method parameter via
+ * `@@override` and pushes one example value per wrapper, with the grouped values
+ * nested according to their `methodParameterSegments` path.
+ */
+function collectGroupedParameters(
+  dpgContext: SdkContext,
+  method: ServiceOperation,
+  parameterMap: Record<string, SdkHttpParameterExampleValue>,
+  result: ExampleValue[],
+): void {
+  const groups = new Map<string, { wrapper: SdkMethodParameter; tree: Map<string, PropTreeNode> }>();
+
+  for (const param of method.operation.parameters) {
+    if (
+      param.type.kind === "constant" ||
+      param.clientDefaultValue ||
+      !isGroupedOverrideParam(param)
+    ) {
+      continue;
+    }
+
+    const exampleValue = parameterMap[param.serializedName];
+    if (!exampleValue || !exampleValue.value) {
+      continue;
+    }
+
+    const path = param.methodParameterSegments[0]!;
+    const wrapper = path[0] as SdkMethodParameter;
+    const wrapperKey = wrapper.name;
+    let group = groups.get(wrapperKey);
+    if (!group) {
+      group = { wrapper, tree: new Map() };
+      groups.set(wrapperKey, group);
+    }
+
+    // Walk/create the intermediate nodes, then set the leaf value.
+    let node = group.tree;
+    for (let i = 1; i < path.length - 1; i++) {
+      const segName = normalizeName(path[i]!.name, NameType.Property, true);
+      let child = node.get(segName);
+      if (!child || child.kind !== "node") {
+        child = { kind: "node", children: new Map() };
+        node.set(segName, child);
+      }
+      node = child.children;
+    }
+    const leafName = normalizeName(path[path.length - 1]!.name, NameType.Property, true);
+    node.set(leafName, {
+      kind: "leaf",
+      value: getParameterValue(dpgContext, exampleValue.value),
+    });
+  }
+
+  for (const group of groups.values()) {
+    result.push(
+      prepareExampleValue(
+        dpgContext,
+        group.wrapper.name,
+        serializePropTree(group.tree),
+        group.wrapper.optional,
+        false,
+      ),
+    );
+  }
 }
 
 function getCredentialExampleValue(
