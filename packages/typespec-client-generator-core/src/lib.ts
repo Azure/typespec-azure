@@ -5,6 +5,25 @@ import {
   UnbrandedSdkEmitterOptionsInterface,
 } from "./internal-utils.js";
 
+// `api-version` accepts either a string (single service / `latest` / `all`) or a
+// map from service namespace full name to version (multi-service).
+const apiVersionSchema = {
+  oneOf: [
+    {
+      type: "string",
+      nullable: true,
+    },
+    {
+      type: "object",
+      additionalProperties: { type: "string" },
+      required: [],
+      nullable: true,
+    },
+  ],
+  description:
+    "Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`. For multi-service packages, provide a map from each service namespace's full name to its desired version; services not listed default to their latest version.",
+} as any;
+
 export const UnbrandedSdkEmitterOptions = {
   "generate-protocol-methods": {
     "generate-protocol-methods": {
@@ -23,12 +42,7 @@ export const UnbrandedSdkEmitterOptions = {
     },
   },
   "api-version": {
-    "api-version": {
-      type: "string",
-      nullable: true,
-      description:
-        "Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`.",
-    },
+    "api-version": apiVersionSchema,
   },
   license: {
     license: {

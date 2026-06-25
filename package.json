@@ -70,10 +70,5 @@
   },
   "dependencies": {
     "picocolors": "catalog:"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "tree-sitter"
-    ]
   }
 }

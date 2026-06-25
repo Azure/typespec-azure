@@ -113,6 +113,7 @@ words:
   - byval
   - petstoreopgrp
   - pypi
+  - Tsps
   # Go emitter
   - addl
   - azfake

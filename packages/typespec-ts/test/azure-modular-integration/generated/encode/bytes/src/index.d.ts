@@ -1,5 +1,6 @@
 import { ClientOptions } from '@azure-rest/core-client';
 import { isRestError } from '@azure/core-rest-pipeline';
+import { NodeReadableStream } from '#platform/static-helpers/platform-types';
 import { OperationOptions } from '@azure-rest/core-client';
 import { Pipeline } from '@azure/core-rest-pipeline';
 import { RestError } from '@azure/core-rest-pipeline';
@@ -54,8 +55,6 @@ export declare interface HeaderOperations {
 }
 
 export { isRestError }
-
-declare type NodeReadableStream = NodeJS.ReadableStream;
 
 export declare interface PropertyBase64OptionalParams extends OperationOptions {
 }

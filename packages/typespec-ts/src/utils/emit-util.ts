@@ -1,27 +1,10 @@
 import { CompilerHost, getDirectoryPath, joinPaths, NoTarget, Program } from "@typespec/compiler";
 import { format } from "prettier";
+import prettierPluginBabel from "prettier/plugins/babel";
+import prettierPluginEstree from "prettier/plugins/estree";
+import prettierPluginTypescript from "prettier/plugins/typescript";
 import { prettierJSONOptions, prettierTypeScriptOptions, reportDiagnostic } from "../lib.js";
-import {
-  buildSchemaTypes,
-  ContentBuilder,
-  File,
-  isAzurePackage,
-  RLCModel,
-} from "../rlc-common/index.js";
-
-export async function emitModels(rlcModels: RLCModel, program: Program) {
-  const schemaOutput = buildSchemaTypes(rlcModels);
-  const isAzureFlavor = isAzurePackage(rlcModels);
-  if (schemaOutput) {
-    const { inputModelFile, outputModelFile } = schemaOutput;
-    if (inputModelFile) {
-      await emitFile(inputModelFile, program, isAzureFlavor);
-    }
-    if (outputModelFile) {
-      await emitFile(outputModelFile, program, isAzureFlavor);
-    }
-  }
-}
+import { ContentBuilder, File, RLCModel } from "../rlc-common/index.js";
 
 export async function emitContentByBuilder(
   program: Program,
@@ -32,7 +15,6 @@ export async function emitContentByBuilder(
   if (!Array.isArray(builderFnOrList)) {
     builderFnOrList = [builderFnOrList];
   }
-  const isAzureFlavor = isAzurePackage(rlcModels);
   for (const builderFn of builderFnOrList) {
     let contentFiles: File[] | File | undefined = builderFn(rlcModels);
     if (!contentFiles) {
@@ -42,17 +24,12 @@ export async function emitContentByBuilder(
       contentFiles = [contentFiles];
     }
     for (const file of contentFiles) {
-      await emitFile(file, program, isAzureFlavor, emitterOutputDir);
+      await emitFile(file, program, emitterOutputDir);
     }
   }
 }
 
-async function emitFile(
-  file: File,
-  program: Program,
-  isAzureFlavor: boolean,
-  emitterOutputDir?: string,
-) {
+async function emitFile(file: File, program: Program, emitterOutputDir?: string) {
   if (program.compilerOptions.noEmit || program.hasError()) {
     return;
   }
@@ -60,8 +37,7 @@ async function emitFile(
   const filePath = joinPaths(emitterOutputDir ?? "", file.path);
   const isJson = /\.json$/gi.test(filePath);
   const isSourceCode = /\.(ts|js)$/gi.test(filePath);
-  const microsoftHeader = isAzureFlavor ? `// Copyright (c) Microsoft Corporation.\n` : "";
-  const licenseHeader = `${microsoftHeader}// Licensed under the MIT License.\n`;
+  const licenseHeader = `// Copyright (c) Microsoft Corporation.\n// Licensed under the MIT License.\n`;
   let prettierFileContent = file.content;
 
   if (isSourceCode) {
@@ -70,10 +46,10 @@ async function emitFile(
   // Format the contents if necessary
   if (isJson || isSourceCode) {
     try {
-      prettierFileContent = await format(
-        prettierFileContent,
-        isJson ? prettierJSONOptions : prettierTypeScriptOptions,
-      );
+      prettierFileContent = await format(prettierFileContent, {
+        ...(isJson ? prettierJSONOptions : prettierTypeScriptOptions),
+        plugins: [prettierPluginTypescript, prettierPluginEstree, prettierPluginBabel],
+      });
     } catch (e) {
       reportDiagnostic(program, {
         code: "file-formatting-error",

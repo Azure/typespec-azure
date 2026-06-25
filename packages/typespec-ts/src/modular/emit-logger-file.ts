@@ -3,9 +3,6 @@ import { ModularEmitterOptions } from "./interfaces.js";
 
 export function emitLoggerFile(emitterOptions: ModularEmitterOptions, srcPath: string = "src") {
   const project = useContext("outputProject");
-  if (emitterOptions.options.flavor !== "azure") {
-    return;
-  }
 
   const sourceFile = project.createSourceFile(`${srcPath}/logger.ts`, "", {
     overwrite: true,

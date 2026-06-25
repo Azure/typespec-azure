@@ -20,7 +20,7 @@ Make sure to run the following commands:
 
 ## Release Process
 
-The branded Python emitter (`@azure-tools/typespec-python`) wraps the unbranded emitter (`@typespec/http-client-python`). There is no separate release of the branded emitter; instead, the release process involves updating the dependency on the unbranded emitter.
+The branded Python emitter (`@azure-tools/typespec-python`) wraps the unbranded emitter (`@typespec/http-client-python`). There is no separate release of the branded emitter, unless there is a breaking change or the highest version value changes (ie. 0.3.0 -> 0.4.0 or 1.0.0 to 2.0.0); instead, the release process involves updating the dependency on the unbranded emitter.
 
 For the unbranded emitter release process, see the [http-client-python CONTRIBUTING.md](https://github.com/microsoft/typespec/blob/main/packages/http-client-python/CONTRIBUTING.md#release-process).
 
