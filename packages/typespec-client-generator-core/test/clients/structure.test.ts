@@ -1208,7 +1208,7 @@ it("one client from multiple services with `@clientLocation`", async () => {
   strictEqual(biOperationApiVersionParam.correspondingMethodParams[0], biApiVersionParam);
 });
 
-it("one client from multiple services with api-version set to all", async () => {
+it("one client from multiple services with api-version set to all (not supported, falls back to latest)", async () => {
   const { program } = await SimpleBaseTester.compile(
     createClientCustomizationInput(
       `
@@ -1277,14 +1277,16 @@ it("one client from multiple services with api-version set to all", async () => 
   ok(aiApiVersionParam);
   strictEqual(aiApiVersionParam.clientDefaultValue, "av3");
 
-  // With api-version all, both aTest and aTest2 should be included
-  strictEqual(aiClient.methods.length, 2);
+  // Multi-service does not support `all`; it is ignored and each service uses
+  // its latest version. ServiceA projects to av3, where aTest2 is removed.
+  strictEqual(aiClient.methods.length, 1);
   const aTest = aiClient.methods.find((m) => m.name === "aTest");
   ok(aTest);
   deepStrictEqual(aTest.apiVersions, ["av1", "av2", "av3"]);
-  const aTest2 = aiClient.methods.find((m) => m.name === "aTest2");
-  ok(aTest2);
-  deepStrictEqual(aTest2.apiVersions, ["av2"]);
+  strictEqual(
+    aiClient.methods.find((m) => m.name === "aTest2"),
+    undefined,
+  );
 
   const biClient = client.children!.find((c) => c.name === "BI");
   ok(biClient);
