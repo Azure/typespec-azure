@@ -1,4 +1,4 @@
-import { assert, afterAll, describe, it } from "vitest";
+import { afterAll, assert, describe, it } from "vitest";
 
 import { readdirSync, readFileSync, statSync, writeFileSync } from "fs";
 import path from "path";
@@ -265,7 +265,7 @@ function describeScenarioFile(scenarioFile: string): void {
         continue;
       }
       (scenario.only ? describe.only : describe)(scenario.heading, function () {
-        // Phase 2: reuse compiles within a scenario, then drop them so retained
+        // Reuse compiles within a scenario, then drop them so retained
         // programs don't accumulate across scenarios in a worker.
         afterAll(clearCompileCache);
         const codeBlocks = scenario.parts.filter((x) => x.kind === "code");

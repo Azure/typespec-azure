@@ -4,13 +4,13 @@ import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-res
 import { listAllServiceNamespaces } from "@azure-tools/typespec-client-generator-core";
 import { SdkTestLibrary } from "@azure-tools/typespec-client-generator-core/testing";
 import { EmitContext, getDirectoryPath, NodeHost, Program } from "@typespec/compiler";
-import { appendFileSync } from "fs";
 import { createTestHost, TestHost } from "@typespec/compiler/testing";
 import { HttpTestLibrary } from "@typespec/http/testing";
 import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { RestTestLibrary } from "@typespec/rest/testing";
 import { VersioningTestLibrary } from "@typespec/versioning/testing";
 import { XmlTestLibrary } from "@typespec/xml/testing";
+import { appendFileSync } from "fs";
 import path from "path";
 import { format } from "prettier";
 import { Project } from "ts-morph";
@@ -75,7 +75,7 @@ export interface RLCEmitterOptions {
 }
 
 /**
- * Phase 4 usage detectors. Each matches the decorators / namespace references
+ * Library usage detectors. Each matches the decorators / namespace references
  * that can only resolve to the corresponding library, so we can skip importing
  * it when a scenario doesn't use it. Kept deliberately broad (over-include
  * rather than under-include) — see `rlcEmitterFor`.
@@ -85,9 +85,25 @@ const REST_USAGE =
 const VERSIONING_USAGE =
   /@(versioned|added|removedFrom|removed|renamedFrom|madeOptional|madeRequired|typeChangedFrom|returnTypeChangedFrom|useDependency)\b|\bVersions\b|\bVersioning\./;
 const XML_USAGE = /\bXml\b|@unwrapped\b|@attribute\b/;
+/**
+ * Usage detectors for the heavy Azure libraries that dominate
+ * `compileTypeSpecFor`'s prefix cost (azure-core + ARM + TCGC account for
+ * ~700 ms of the ~744 ms full-prefix compile; http/rest/versioning/xml are
+ * nearly free). Each matches namespace references / decorators that can only
+ * resolve to its library. Kept deliberately broad (over-include rather than
+ * under-include) — a false positive just keeps an unused import (correct,
+ * slightly slower), while a false negative surfaces as a loud compile failure
+ * caught by the snapshot oracle.
+ */
+const AZURE_CORE_USAGE =
+  /\bAzure\.Core\b|@(pollingOperation|finalLocation|lroStatus|pollingLocation|operationLink|pagedResult|items|nextLink|useFinalStateVia|resourceOperation)\b|\b(ResourceOperations|StandardResourceOperations|ResourceCreateOrUpdate|ResourceCreateOrReplace|ResourceCreateWithServiceProvidedName|ResourceRead|ResourceDelete|ResourceList|ResourceCollectionOperations|ResourceOperationsBase|RpcOperation|LongRunningRpcOperation|TrackedResource|ProxyResource|ExtensionResource|SingletonResourceOperations)\b/;
+const ARM_USAGE =
+  /\bAzure\.ResourceManager\b|@(armResourceOperations|armResourceCreateOrUpdate|armResourceRead|armResourceDelete|armResourceList|armResourceAction|armResourceCollectionAction|tenantResource|subscriptionResource|locationResource|resourceGroupResource|armProviderNamespace|armProviderNameValue|armResourceIdentifier|armCommonTypesVersion|useLibraryNamespace|identifiers|singleton)\b/;
+const TCGC_USAGE =
+  /\bAzure\.ClientGenerator\.Core\b|@(client|clientName|operationGroup|access|usage|convenientAPI|protocolAPI|flattenProperty|clientNamespace|paramAlias|alternateType|clientLocation|clientInitialization|override|useSystemTextJsonConverter|scope|deserializeEmptyStringAsNull)\b/;
 
 /**
- * Phase 2 (compile once per scenario): within a single scenario, every output
+ * Compile-once-per-scenario cache: within a single scenario, every output
  * code block recompiles the *same* input TypeSpec. This cache memoizes the
  * compiled `TestHost` keyed by the exact compiler input (source + imports +
  * any example files), so repeated blocks reuse one compile instead of paying
@@ -166,7 +182,7 @@ export async function rlcEmitterFor(
 
   namespace Azure.TypeScript.Testing;
   `;
-  // Phase 4: the TypeSpec checker cost scales with the imported library surface.
+  // The TypeSpec checker cost scales with the imported library surface.
   // Only import `@typespec/rest`, `@typespec/versioning` and `@typespec/xml` when
   // the scenario input actually references them, instead of importing all three
   // for every test. Detection is intentionally conservative — a false positive
@@ -217,44 +233,62 @@ ${code}
 export async function compileTypeSpecFor(code: string, examples: ExampleJson[] = []) {
   let prefix = "";
   if (!code.includes("import")) {
-    prefix = prefix + importStatement();
+    prefix = prefix + importStatement(code);
     if (!code.includes("@service")) {
       prefix = prefix + serviceStatement();
     }
   }
-  return compileAndCache(`compile\u0000${prefix}${code}\u0000${JSON.stringify(examples)}`, async () => {
-    const host: TestHost = await createRLCEmitterTestHost();
-    host.addTypeSpecFile("main.tsp", `${prefix}${code}`);
-    for (const example of examples) {
-      host.addTypeSpecFile(
-        `./examples/2021-10-01-preview/${example.filename}.json`,
-        example.rawContent,
-      );
-    }
-    await host.compile("./", {
-      warningAsError: false,
-    });
-    return host;
-  });
+  return compileAndCache(
+    `compile\u0000${prefix}${code}\u0000${JSON.stringify(examples)}`,
+    async () => {
+      const host: TestHost = await createRLCEmitterTestHost();
+      host.addTypeSpecFile("main.tsp", `${prefix}${code}`);
+      for (const example of examples) {
+        host.addTypeSpecFile(
+          `./examples/2021-10-01-preview/${example.filename}.json`,
+          example.rawContent,
+        );
+      }
+      await host.compile("./", {
+        warningAsError: false,
+      });
+      return host;
+    },
+  );
 }
 
-function importStatement() {
+/**
+ * Builds the import/`using` prefix for `compileTypeSpecFor`. `@typespec/http`
+ * and `@typespec/versioning` are always included (versioning is required by the
+ * `@versioned` `serviceStatement()` and is nearly free), while the expensive
+ * Azure libraries (azure-core, ARM, TCGC) and rest/xml are imported only when
+ * the scenario input references them. azure-core/ARM build on rest, so detecting
+ * either forces rest; ARM builds on azure-core, so it forces azure-core too.
+ * See the usage detectors above for why this is safe (over-include bias +
+ * snapshot oracle).
+ */
+function importStatement(code: string) {
+  const needTCGC = TCGC_USAGE.test(code);
+  const needArm = ARM_USAGE.test(code);
+  const needAzureCore = needArm || AZURE_CORE_USAGE.test(code);
+  const needRest = needAzureCore || REST_USAGE.test(code);
+  const needXml = XML_USAGE.test(code);
   return `
 import "@typespec/http";
-import "@typespec/rest";
 import "@typespec/versioning";
-import "@azure-tools/typespec-client-generator-core";
-import "@azure-tools/typespec-azure-core";
-import "@azure-tools/typespec-azure-resource-manager";
-import "@typespec/xml";
+${needRest ? 'import "@typespec/rest";' : ""}
+${needTCGC ? 'import "@azure-tools/typespec-client-generator-core";' : ""}
+${needAzureCore ? 'import "@azure-tools/typespec-azure-core";' : ""}
+${needArm ? 'import "@azure-tools/typespec-azure-resource-manager";' : ""}
+${needXml ? 'import "@typespec/xml";' : ""}
 
-using Rest; 
 using Http;
 using Versioning;
-using Azure.ClientGenerator.Core;
-using Azure.Core;
-using Azure.ResourceManager;
-using Xml;`;
+${needRest ? "using Rest;" : ""}
+${needTCGC ? "using Azure.ClientGenerator.Core;" : ""}
+${needAzureCore ? "using Azure.Core;" : ""}
+${needArm ? "using Azure.ResourceManager;" : ""}
+${needXml ? "using Xml;" : ""}`;
 }
 
 function serviceStatement() {
