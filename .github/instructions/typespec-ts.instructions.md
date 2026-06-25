@@ -39,6 +39,28 @@ and `pnpm integration-test-ci:azure-modular`.
 There is intentionally no non-Azure integration project — coverage for those scenarios
 is a superset within the `azure-*` folders.
 
+### Modular unit test compilation
+
+`unit-modular` tests don't compile TypeSpec directly — they go through the helpers in
+`test/util/test-util.ts` (`rlcEmitterFor`, `compileTypeSpecFor`, wrapped by
+`emit-util.ts`'s `emitModular*FromTypeSpec`). Keep using these helpers; a few conventions
+keep the suite fast without lowering coverage:
+
+- **One shared `createTester`, not `createTestHost`.** A single module-level `createTester`
+  loads the ~9 libraries once and clones an in-memory filesystem per compile, instead of
+  re-reading every library from disk on each compile. Don't reintroduce `createTestHost` /
+  the `*TestLibrary` objects for new tests — compile through the helpers (or
+  `compileTypeSpecFor` for raw inline content, which is what `diagnostics.test.ts` uses).
+- **Import/`using` prefix is trimmed per scenario.** The helpers only inject the libraries a
+  scenario actually references (regex usage detectors near the top of `test-util.ts`).
+  Detection is deliberately over-inclusive — a false positive just keeps an unused import,
+  while the exact-snapshot assertions catch any false negative as a loud compile failure.
+  Keep the detectors broad if you touch them.
+- **Per-scenario `compileCache`.** Identical recompiles within a scenario are memoized and
+  the cache is cleared by the scenario runner's `afterAll` (`clearCompileCache`) to bound
+  retained programs. New scenario suites should run through the scenario runner so this
+  stays wired up.
+
 ## Spector e2e generation pipeline
 
 Integration (spector) tests generate real clients from specs, then assert on the output:

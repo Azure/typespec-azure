@@ -1,15 +1,6 @@
-import { AutorestTestLibrary } from "@azure-tools/typespec-autorest/testing";
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
 import { listAllServiceNamespaces } from "@azure-tools/typespec-client-generator-core";
-import { SdkTestLibrary } from "@azure-tools/typespec-client-generator-core/testing";
-import { EmitContext, getDirectoryPath, NodeHost, Program } from "@typespec/compiler";
-import { createTestHost, TestHost } from "@typespec/compiler/testing";
-import { HttpTestLibrary } from "@typespec/http/testing";
-import { OpenAPITestLibrary } from "@typespec/openapi/testing";
-import { RestTestLibrary } from "@typespec/rest/testing";
-import { VersioningTestLibrary } from "@typespec/versioning/testing";
-import { XmlTestLibrary } from "@typespec/xml/testing";
+import { EmitContext, getDirectoryPath, NodeHost, Program, resolvePath } from "@typespec/compiler";
+import { createTester } from "@typespec/compiler/testing";
 import { appendFileSync } from "fs";
 import path from "path";
 import { format } from "prettier";
@@ -48,20 +39,46 @@ export interface ExampleJson {
 
 const __dirname = getDirectoryPath(fileURLToPath(import.meta.url));
 
-export async function createRLCEmitterTestHost() {
-  return createTestHost({
-    libraries: [
-      HttpTestLibrary,
-      RestTestLibrary,
-      VersioningTestLibrary,
-      AzureCoreTestLibrary,
-      SdkTestLibrary,
-      XmlTestLibrary,
-      AzureResourceManagerTestLibrary,
-      OpenAPITestLibrary,
-      AutorestTestLibrary,
-    ],
+/**
+ * Shared tester for compiling test TypeSpec. Unlike the old `createTestHost` —
+ * which re-globs and re-reads every library's `.tsp`/`.json` from disk on
+ * *every* call — the tester loads the libraries once and clones an in-memory
+ * filesystem per compile, so the dominant library-load cost is amortized across
+ * all distinct compilations in a worker. The package root is the resolution
+ * base so the libraries resolve from this package's dependencies.
+ */
+const sharedTester = createTester(resolvePath(__dirname, "..", ".."), {
+  libraries: [
+    "@typespec/http",
+    "@typespec/rest",
+    "@typespec/versioning",
+    "@typespec/xml",
+    "@typespec/openapi",
+    "@azure-tools/typespec-azure-core",
+    "@azure-tools/typespec-client-generator-core",
+    "@azure-tools/typespec-azure-resource-manager",
+    "@azure-tools/typespec-autorest",
+  ],
+});
+
+/** Result of a cached TypeSpec compilation. Callers only need the `Program`. */
+export interface CompiledTypeSpec {
+  program: Program;
+}
+
+/**
+ * Compiles `main.tsp` (plus any sibling files) through the shared tester. The
+ * input already contains its own `import`/`using` statements, so we don't use
+ * the tester's `.import()`/`.using()` builders. `warningAsError: false` matches
+ * the prior `TestHost.compile` behavior; callers inspect `program.diagnostics`
+ * themselves, so we use `compileAndDiagnose` (which never throws on
+ * diagnostics).
+ */
+async function compileWithSharedTester(files: Record<string, string>): Promise<CompiledTypeSpec> {
+  const [result] = await sharedTester.compileAndDiagnose(files, {
+    compilerOptions: { warningAsError: false },
   });
+  return { program: result.program };
 }
 
 export interface RLCEmitterOptions {
@@ -105,7 +122,7 @@ const TCGC_USAGE =
 /**
  * Compile-once-per-scenario cache: within a single scenario, every output
  * code block recompiles the *same* input TypeSpec. This cache memoizes the
- * compiled `TestHost` keyed by the exact compiler input (source + imports +
+ * compiled program keyed by the exact compiler input (source + imports +
  * any example files), so repeated blocks reuse one compile instead of paying
  * the full TypeSpec checker cost each time.
  *
@@ -114,7 +131,7 @@ const TCGC_USAGE =
  * scenario's distinct compiles — important given the emitter's cross-call
  * memory retention.
  */
-const compileCache = new Map<string, TestHost>();
+const compileCache = new Map<string, CompiledTypeSpec>();
 
 const COMPILE_STATS = process.env.COMPILE_CACHE_STATS === "1";
 let compileHits = 0;
@@ -122,8 +139,8 @@ let compileMisses = 0;
 
 async function compileAndCache(
   cacheKey: string,
-  compile: () => Promise<TestHost>,
-): Promise<TestHost> {
+  compile: () => Promise<CompiledTypeSpec>,
+): Promise<CompiledTypeSpec> {
   const cached = compileCache.get(cacheKey);
   if (cached) {
     if (COMPILE_STATS) {
@@ -134,9 +151,9 @@ async function compileAndCache(
   if (COMPILE_STATS) {
     compileMisses++;
   }
-  const host = await compile();
-  compileCache.set(cacheKey, host);
-  return host;
+  const result = await compile();
+  compileCache.set(cacheKey, result);
+  return result;
 }
 
 /**
@@ -172,7 +189,7 @@ export async function rlcEmitterFor(
     needArmTemplate = false,
     exampleJson = {},
   }: RLCEmitterOptions = {},
-): Promise<TestHost> {
+): Promise<CompiledTypeSpec> {
   const namespace = `
   #suppress "@azure-tools/typespec-azure-core/auth-required" "for test"
   ${withVersionedApiVersion ? "@versioned(Versions)" : ""}
@@ -218,15 +235,11 @@ ${
 ${code}
 `;
   return compileAndCache(`rlc\u0000${content}\u0000${JSON.stringify(exampleJson)}`, async () => {
-    const host: TestHost = await createRLCEmitterTestHost();
-    host.addTypeSpecFile("main.tsp", content);
+    const files: Record<string, string> = { "main.tsp": content };
     for (const example in exampleJson) {
-      host.addTypeSpecFile(`./examples/${example}.json`, exampleJson[example]);
+      files[`./examples/${example}.json`] = exampleJson[example];
     }
-    await host.compile("./", {
-      warningAsError: false,
-    });
-    return host;
+    return compileWithSharedTester(files);
   });
 }
 
@@ -241,18 +254,11 @@ export async function compileTypeSpecFor(code: string, examples: ExampleJson[] =
   return compileAndCache(
     `compile\u0000${prefix}${code}\u0000${JSON.stringify(examples)}`,
     async () => {
-      const host: TestHost = await createRLCEmitterTestHost();
-      host.addTypeSpecFile("main.tsp", `${prefix}${code}`);
+      const files: Record<string, string> = { "main.tsp": `${prefix}${code}` };
       for (const example of examples) {
-        host.addTypeSpecFile(
-          `./examples/2021-10-01-preview/${example.filename}.json`,
-          example.rawContent,
-        );
+        files[`./examples/2021-10-01-preview/${example.filename}.json`] = example.rawContent;
       }
-      await host.compile("./", {
-        warningAsError: false,
-      });
-      return host;
+      return compileWithSharedTester(files);
     },
   );
 }

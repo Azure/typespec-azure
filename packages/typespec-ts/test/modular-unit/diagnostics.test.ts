@@ -6,7 +6,7 @@ import {
   emitModularModelsFromTypeSpec,
   emitModularOperationsFromTypeSpec,
 } from "../util/emit-util.js";
-import { createDpgContextTestHelper, createRLCEmitterTestHost } from "../util/test-util.js";
+import { compileTypeSpecFor, createDpgContextTestHelper } from "../util/test-util.js";
 
 describe("Diagnostic reporting tests", () => {
   it("should not crash when emitter encounters error conditions", async () => {
@@ -34,9 +34,7 @@ describe("Diagnostic reporting tests", () => {
   });
 
   it("should report TCGC diagnostics for duplicate client names to the program", async () => {
-    const host = await createRLCEmitterTestHost();
-    host.addTypeSpecFile(
-      "main.tsp",
+    const { program } = await compileTypeSpecFor(
       `
       import "@typespec/http";
       import "@typespec/rest";
@@ -65,8 +63,7 @@ describe("Diagnostic reporting tests", () => {
       op test(@body body: Foo): Bar;
       `,
     );
-    await host.diagnose("./", { warningAsError: false });
-    const dpgContext = await createDpgContextTestHelper(host.program);
+    const dpgContext = await createDpgContextTestHelper(program);
 
     // Verify TCGC captures duplicate-client-name diagnostics
     const duplicateNameDiagnostics = dpgContext.diagnostics.filter(
@@ -78,13 +75,13 @@ describe("Diagnostic reporting tests", () => {
     );
 
     // Simulate what $onEmit does: report TCGC diagnostics to the program
-    const initialDiagCount = host.program.diagnostics.length;
+    const initialDiagCount = program.diagnostics.length;
     if (dpgContext.diagnostics?.length > 0) {
-      host.program.reportDiagnostics(dpgContext.diagnostics);
+      program.reportDiagnostics(dpgContext.diagnostics);
     }
 
     assert.isTrue(
-      host.program.diagnostics.length > initialDiagCount,
+      program.diagnostics.length > initialDiagCount,
       "Expected TCGC diagnostics to be reported to the program",
     );
   });
