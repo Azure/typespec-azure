@@ -405,15 +405,15 @@ export function getDeserializePrivateFunction(
       }
       if (deserializeFunctionName) {
         if (needsBodyGuard) {
-          // Use ternary form: return result.body ? deserializer(result.body) : void 0
           statements.push(
-            `return ${deserializedRoot} ? ${deserializeFunctionName}(${deserializedRoot})${multipartCastSuffix} : void 0`,
-          );
-        } else {
-          statements.push(
-            `return ${deserializeFunctionName}(${deserializedRoot})${multipartCastSuffix}`,
+            `if (!${deserializedRoot}) {
+            return;
+          }`,
           );
         }
+        statements.push(
+          `return ${deserializeFunctionName}(${deserializedRoot})${multipartCastSuffix}`,
+        );
       } else if (isAzureCoreErrorType(context.program, deserializedType.__raw)) {
         statements.push(`return ${deserializedRoot}${multipartCastSuffix}`);
       } else if (isHeadAsBooleanOperation(operation)) {

@@ -118,7 +118,10 @@ export async function _updateDeserialize(
     throw error;
   }
 
-  return result.body ? partnerTopicDeserializer(result.body) : void 0;
+  if (!result.body) {
+    return;
+  }
+  return partnerTopicDeserializer(result.body);
 }
 
 /** Update a PartnerTopic */
