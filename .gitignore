@@ -225,3 +225,12 @@ packages/samples/test/output/azure/templates-contoso/setup.*
 # python emitter
 packages/typespec-python/tests/generated/**
 packages/typespec-python/alpha
+
+# java emitter
+# Emitter TS sources copied from core/packages/http-client-java/emitter at build
+# time (only src/options.ts is committed).
+packages/typespec-java/src/**
+!packages/typespec-java/src/options.ts
+packages/typespec-java/test/**
+# Java emitter.jar + assets staged from the core generator build.
+packages/typespec-java/generator/**

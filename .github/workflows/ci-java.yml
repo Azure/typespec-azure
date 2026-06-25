@@ -1,0 +1,51 @@
+name: "java / test e2e"
+
+on:
+  pull_request:
+    branches:
+      - main
+      - release/*
+    paths:
+      - "packages/typespec-java/**"
+      - ".github/workflows/ci-java.yml"
+      - ".github/actions/setup-java/**"
+  merge_group:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: "Build & Test"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - uses: ./.github/actions/setup
+
+      - uses: ./.github/actions/setup-java
+
+      - name: Install dependencies
+        run: pnpm install
+
+      # Build the unbranded peer packages (typespec-autorest, tcgc, etc.) that
+      # the emitter compiles against.
+      - name: Build dependencies
+        run: pnpm turbo run --filter "@azure-tools/typespec-java^..." build
+
+      # Build emitter.jar from core, copy emitter sources, tsc build and pack.
+      # Mirrors autorest.java's Build-TypeSpec.ps1 (without the customization patch).
+      - name: Build (jar + emitter + pack)
+        shell: pwsh
+        run: ./Build-TypeSpec.ps1
+        working-directory: packages/typespec-java
+
+      - name: Test
+        run: pnpm run test
+        working-directory: packages/typespec-java
