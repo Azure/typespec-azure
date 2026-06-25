@@ -121,6 +121,12 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - `operation-not-in-client`: REMOVED in May 2026. This diagnostic no longer exists.
 - `inconsistent-multiple-service-dependency` (warning): Emitted when services merged into the same client depend on different versions of a shared library dependency. Documented in 03client.mdx under the "One Client from Multiple Services" section and in guideline.md under "Client Detection".
 - `legacy-hierarchy-building-conflict` (warning): Now only has `property-type-mismatch` message ID (the old `property-missing` and `type-mismatch` message IDs were removed). Emitted during property reconciliation when a dropped property's type is incompatible with the same-named property on the new base chain.
+- `override-parameters-mismatch` (error): Existed since PR #2452. In June 2026 (PRs #4693 and friends) `@override` parameter validation was reworked:
+  - Override parameters are matched to original parameters **by name**, not by sorted position. Overrides may freely add, reorder, or omit optional parameters.
+  - The diagnostic is reported when a required original parameter has no matching override parameter (by name) with a compatible definition.
+  - It is also reported when the override drops `@path` from a parameter that is _realized_ as a path parameter in the operation's resolved HTTP route. A `@path` decorator present only in the type graph (e.g. on a body model property not actually in the route) does NOT count — `getRealizedPathParamNames` resolves the real route via `getHttpOperation`, falling back to `isPathParam` for non-HTTP ops.
+  - The `@path` check is skipped entirely when any override parameter carries `@clientLocation`.
+  - Documented in 04method.mdx under a new "Parameter matching rules" subsection in the `@override` section. The diagnostic is also mentioned in `lib/functions.tsp` (removeParameter doc comment).
 
 ## External Type Usage Propagation
 
@@ -233,3 +239,7 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - No Spector spec was added for this feature — it's a code-generation-time config behavior, not a wire-level behavior. The unit tests in `test/package/api-versions-metadata.test.ts` and `test/clients/structure.test.ts` thoroughly cover it.
 - The guideline.md was updated to document `SdkPackage.metadata` (both `apiVersion` and `apiVersions`).
 - The 10versioning.mdx was updated to mention the Record form and add a "Per-service versioning (multi-service packages)" section.
+
+## Feedback Lessons (PR #4683)
+
+- In versioning examples (10versioning.mdx and elsewhere), use realistic **date-based** API version strings like `"2024-01-01"` / `"2024-05-01"`, not toy names like `av1`/`bv1`. Define enum members with explicit string values, e.g. `v2024_01_01: "2024-01-01"`. Reviewers replaced toy version names with date strings, and the per-service `api-version` option maps/examples should use the same realistic values consistently.

@@ -1816,6 +1816,29 @@ The `@override` decorator takes a target operation and a custom operation that d
 
 When applied, the method parameters come from the override operation while the underlying HTTP operation remains unchanged. TCGC maps method parameters to operation parameters based on name matching.
 
+### Parameter matching rules
+
+TCGC matches the override operation's parameters to the original operation's parameters **by name** rather than by position. This gives you flexibility in how you declare the override signature, but a few rules must be respected, otherwise an `override-parameters-mismatch` error is reported:
+
+- **Required parameters must be preserved.** Every required parameter of the original operation must have a parameter with the same name and a compatible type in the override. Optional parameters may be omitted; omitting a required parameter (or changing it to an incompatible type) is an error.
+- **Parameters may be added or reordered.** Because matching is name-based, the override may list the parameters in any order and may introduce additional client-only parameters (for example a convenience parameter) without shifting how the remaining parameters are matched.
+- **Path parameters must keep `@path`.** A parameter that is realized as a path parameter in the operation's route must keep its `@path` decorator in the override, because its value is required to build the request URL. Dropping `@path` from such a parameter is an error. This check is relaxed when the override uses `@clientLocation`, which signals an intentional restructuring of where parameters live.
+
+For example, the following override drops `@path` from a path parameter and is rejected:
+
+```typespec
+@service
+namespace MyService;
+
+@route("/items/{itemId}")
+op getItem(@path itemId: string): void;
+
+// client.tsp — INVALID: `itemId` is a path parameter but the override omits `@path`
+op getItemOverride(itemId: string): void;
+
+@@override(MyService.getItem, getItemOverride); // reports override-parameters-mismatch
+```
+
 ### Simple parameter customization
 
 <ClientTabs>
