@@ -1,28 +1,12 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-export * from "./build-client-definitions.js";
-export * from "./build-client.js";
-export * from "./build-index-file.js";
-export * from "./build-is-unexpected-helper.js";
-export * from "./build-logger.js";
-export * from "./build-paginate-helper.js";
-export * from "./build-parameter-types.js";
-export * from "./build-polling-helper.js";
-export * from "./build-response-types.js";
-export * from "./build-samples.js";
-export * from "./build-schema-type.js";
-export * from "./build-serialize-helper.js";
-export * from "./build-top-level-index-file.js";
 export * from "./helpers/api-version-util.js";
 export * from "./helpers/imports-util.js";
 export * from "./helpers/name-constructors.js";
 export * from "./helpers/name-utils.js";
 export * from "./helpers/operation-helpers.js";
-export * from "./helpers/package-util.js";
 export * from "./helpers/schema-helpers.js";
-export * from "./helpers/shortcut-methods.js";
-export * from "./helpers/value-generation-util.js";
 export * from "./interfaces.js";
 export * from "./metadata/build-api-extractor-config.js";
 export * from "./metadata/build-changelog-file.js";
@@ -30,7 +14,6 @@ export * from "./metadata/build-es-lint-config.js";
 export * from "./metadata/build-license-file.js";
 export * from "./metadata/build-package-file.js";
 export * from "./metadata/build-readme-file.js";
-export * from "./metadata/build-rollup-config.js";
 export * from "./metadata/build-sample-env-file.js";
 export * from "./metadata/build-test-config.js";
 export * from "./metadata/build-ts-config.js";
@@ -40,4 +23,3 @@ export * from "./test/build-karma-config.js";
 export * from "./test/build-recorded-client.js";
 export * from "./test/build-sample-test.js";
 export * from "./test/build-snippets.js";
-export * from "./transform-sample-groups.js";

@@ -1,11 +1,10 @@
 import { SdkClientType, SdkServiceOperation } from "@azure-tools/typespec-client-generator-core";
-import { NoTarget } from "@typespec/compiler";
-import { join } from "path/posix";
+import { joinPaths, NoTarget } from "@typespec/compiler";
 import { Project, SourceFile } from "ts-morph";
 import { useContext } from "../context-manager.js";
 import { resolveReference } from "../framework/reference.js";
 import { reportDiagnostic } from "../lib.js";
-import { isAzurePackage, NameType, normalizeName } from "../rlc-common/index.js";
+import { NameType, normalizeName } from "../rlc-common/index.js";
 import { getModularClientOptions } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import { getMethodHierarchiesMap } from "../utils/operation-util.js";
@@ -29,7 +28,7 @@ export function buildRootIndex(
   if (!clientMap) {
     // we still need to export the models if no client is provided
     exportModels(emitterOptions, rootIndexFile);
-    exportRestErrorTypes(context, rootIndexFile);
+    exportRestErrorTypes(rootIndexFile);
     return;
   }
   const project = useContext("outputProject");
@@ -72,7 +71,7 @@ export function buildRootIndex(
   exportPagingTypes(context, rootIndexFile);
   exportFileContentsType(context, rootIndexFile);
   exportAzureCloudTypes(context, rootIndexFile);
-  exportRestErrorTypes(context, rootIndexFile);
+  exportRestErrorTypes(rootIndexFile);
 }
 
 function exportModels(
@@ -106,10 +105,7 @@ function exportAzureCloudTypes(context: SdkContext, rootIndexFile: SourceFile) {
   }
 }
 
-function exportRestErrorTypes(context: SdkContext, rootIndexFile: SourceFile) {
-  if (!isAzurePackage({ options: context.rlcOptions })) {
-    return;
-  }
+function exportRestErrorTypes(rootIndexFile: SourceFile) {
   const existingExports = getExistingExports(rootIndexFile);
   const namedExports = ["RestError", "isRestError"].filter((name) => !existingExports.has(name));
   if (namedExports.length > 0) {
@@ -298,7 +294,7 @@ function exportModules(
       .getDirectories()
       .filter((dir) => {
         const formattedDir = dir.getPath().replace(/\\/g, "/");
-        const targetPath = join(srcPath, subfolder, moduleName).replace(/\\/g, "/");
+        const targetPath = joinPaths(srcPath, subfolder, moduleName).replace(/\\/g, "/");
         return formattedDir.startsWith(targetPath);
       })
       .map((dir) => {
@@ -309,17 +305,17 @@ function exportModules(
       .getDirectories()
       .filter((dir) => {
         const formattedDir = dir.getPath().replace(/\\/g, "/");
-        const targetPath = join(srcPath, subfolder, moduleName).replace(/\\/g, "/");
+        const targetPath = joinPaths(srcPath, subfolder, moduleName).replace(/\\/g, "/");
         return formattedDir.startsWith(targetPath);
       })
       .map((dir) => {
         return dir.getPath().replace(/\\/g, "/");
       });
   } else {
-    folders = [join(srcPath, subfolder, moduleName).replace(/\\/g, "/")];
+    folders = [joinPaths(srcPath, subfolder, moduleName).replace(/\\/g, "/")];
   }
   for (const folder of folders) {
-    const apiFilePattern = join(folder, "index.ts").replace(/\\/g, "/");
+    const apiFilePattern = joinPaths(folder, "index.ts").replace(/\\/g, "/");
     const modelsFile = project.getSourceFile(apiFilePattern);
     if (!modelsFile) {
       continue;

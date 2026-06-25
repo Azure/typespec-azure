@@ -14,11 +14,12 @@ on:
 
 engine:
   id: copilot
-  model: claude-opus-4.6
+  model: claude-opus-4.8
 timeout-minutes: 120
 
 permissions:
   contents: read
+  copilot-requests: write
 
 checkout:
   fetch-depth: 0

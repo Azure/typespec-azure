@@ -42,5 +42,7 @@ model AadOauth2Auth<
  * Azure API Key Authentication using the "Ocp-Apim-Subscription-Key" hea
  */
 @doc("Azure API Key Authentication")
-model AzureApiKeyAuthentication
-  is TypeSpec.Http.ApiKeyAuth<ApiKeyLocation.header, "Ocp-Apim-Subscription-Key">;
+model AzureApiKeyAuthentication is TypeSpec.Http.ApiKeyAuth<
+  ApiKeyLocation.header,
+  "Ocp-Apim-Subscription-Key"
+>;

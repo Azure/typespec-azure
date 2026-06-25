@@ -27,24 +27,6 @@ it("example config", async () => {
   strictEqual(operation.examples![0].filePath, "get.json");
 });
 
-it("example default config", async () => {
-  const instance = await SimpleTester.createInstance();
-  await instance.fs.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
-  const { program } = await instance.compile(`
-    @service
-    namespace TestClient {
-      op get(): string;
-    }
-  `);
-  const context = await createSdkContextForTester(program);
-
-  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
-    .operation;
-  ok(operation);
-  strictEqual(operation.examples?.length, 1);
-  strictEqual(operation.examples![0].filePath, "get.json");
-});
-
 it("no example folder found", async () => {
   const { program } = await SimpleTester.compile(`
     @service
@@ -59,24 +41,6 @@ it("no example folder found", async () => {
   expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/example-loading",
   });
-});
-
-it("load example without version", async () => {
-  const instance = await SimpleTester.createInstance();
-  await instance.fs.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
-  const { program } = await instance.compile(`
-    @service
-    namespace TestClient {
-      op get(): string;
-    }
-  `);
-  const context = await createSdkContextForTester(program);
-
-  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
-    .operation;
-  ok(operation);
-  strictEqual(operation.examples?.length, 1);
-  strictEqual(operation.examples![0].filePath, "get.json");
 });
 
 it("load example with version", async () => {

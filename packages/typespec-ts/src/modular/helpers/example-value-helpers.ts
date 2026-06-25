@@ -8,11 +8,11 @@ import {
   SdkModelPropertyType,
   SdkServiceOperation,
 } from "@azure-tools/typespec-client-generator-core";
-import { join } from "path";
+import { joinPaths } from "@typespec/compiler";
 import { SourceFile } from "ts-morph";
 import { useContext } from "../../context-manager.js";
 import { resolveReference } from "../../framework/reference.js";
-import { isAzurePackage, NameType, normalizeName } from "../../rlc-common/index.js";
+import { NameType, normalizeName } from "../../rlc-common/index.js";
 import { getSubscriptionId } from "../../transform/transfrom-rlc-options.js";
 import { hasKeyCredential, hasTokenCredential } from "../../utils/credential-utils.js";
 import { SdkContext } from "../../utils/interfaces.js";
@@ -73,7 +73,7 @@ export function prepareCommonValue(
  * Get credential value for samples
  */
 export function getCredentialSampleValue(
-  dpgContext: SdkContext,
+  _dpgContext: SdkContext,
   initialization: SdkClientInitializationType,
 ): CommonValue | undefined {
   const keyCredential = hasKeyCredential(initialization),
@@ -84,26 +84,11 @@ export function getCredentialSampleValue(
     name: "credential",
   };
   if (keyCredential || tokenCredential) {
-    if (isAzurePackage({ options: dpgContext.rlcOptions })) {
-      // Support DefaultAzureCredential for Azure packages
-      return {
-        ...defaultSetting,
-        value: `new ${resolveReference(AzureIdentityDependencies.DefaultAzureCredential)}()`,
-      };
-    } else if (keyCredential) {
-      // Support ApiKeyCredential for non-Azure packages
-      return {
-        ...defaultSetting,
-        value: `{ key: "INPUT_YOUR_KEY_HERE" }`,
-      };
-    } else if (tokenCredential) {
-      // Support TokenCredential for non-Azure packages
-      return {
-        ...defaultSetting,
-        value: `{ getToken: async () => {
-          return { token: "INPUT_YOUR_TOKEN_HERE", expiresOnTimestamp: Date.now() }; } }`,
-      };
-    }
+    // Support DefaultAzureCredential for Azure packages
+    return {
+      ...defaultSetting,
+      value: `new ${resolveReference(AzureIdentityDependencies.DefaultAzureCredential)}()`,
+    };
   }
   return undefined;
 }
@@ -596,8 +581,8 @@ export function createSourceFile(
 ): SourceFile {
   const project = useContext("outputProject");
   const operationPrefix = `${options.classicalMethodPrefix ?? ""} ${method.oriName ?? method.name}`;
-  const baseFolder = type === "sample" ? "samples-dev" : join("test", "generated");
-  const folder = join(
+  const baseFolder = type === "sample" ? "samples-dev" : joinPaths("test", "generated");
+  const folder = joinPaths(
     dpgContext.generationPathDetail?.rootDir ?? "",
     baseFolder,
     options.subFolder ?? "",
@@ -605,7 +590,7 @@ export function createSourceFile(
   const fileExtension = type === "sample" ? ".ts" : ".spec.ts";
   const normalizedFileName = normalizeName(fileName || `${operationPrefix} ${type}`, NameType.File);
 
-  return project.createSourceFile(join(folder, `${normalizedFileName}${fileExtension}`), "", {
+  return project.createSourceFile(joinPaths(folder, `${normalizedFileName}${fileExtension}`), "", {
     overwrite: true,
   });
 }
