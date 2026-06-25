@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { runTypespec } from "./run.js";
+import { runTypespec } from "./run.ts";
 import { azureModularTsps } from "./spector-list.js";
 
 async function generateTypeSpecs(isDebugging, pathFilter, phase = "all") {

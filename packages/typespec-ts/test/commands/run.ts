@@ -1,14 +1,11 @@
-import {
-  Extractor,
-  ExtractorConfig,
-  ExtractorLogLevel,
-  IExtractorConfigPrepareOptions,
-} from "@microsoft/api-extractor";
+import type { IExtractorConfigPrepareOptions } from "@microsoft/api-extractor";
+import { Extractor, ExtractorConfig, ExtractorLogLevel } from "@microsoft/api-extractor";
 import { existsSync } from "fs";
 import * as fs from "fs/promises";
 import { createRequire } from "module";
 import { dirname, join as joinPath } from "path";
-import { CompilerOptions, createProgram } from "typescript";
+import type { CompilerOptions } from "typescript";
+import { createProgram } from "typescript";
 import { fileURLToPath } from "url";
 import { createTaskLogger } from "./logger.js";
 import { runCommand } from "./run-command.js";
