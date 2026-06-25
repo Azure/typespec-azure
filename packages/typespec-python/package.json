@@ -39,6 +39,7 @@
     "format:extra:check": "tsx ./eng/scripts/ci/format.ts --python --check",
     "regenerate": "tsx ./eng/scripts/ci/regenerate.ts",
     "sync": "tsx ./eng/scripts/sync.ts",
+    "show-diff": "pnpm regenerate && tsx ./eng/scripts/show-diff.ts",
     "sync:check": "tsx ./eng/scripts/sync.ts --check",
     "test:python:e2e": "tsx ./eng/scripts/ci/run-tests.ts",
     "regen-docs": "pnpm run build && tspd doc . --enable-experimental --output-dir ./website/src/content/docs/docs/emitters/clients/typespec-python/reference --skip-js"
