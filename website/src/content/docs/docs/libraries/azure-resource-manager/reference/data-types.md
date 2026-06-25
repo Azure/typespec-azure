@@ -404,13 +404,12 @@ model Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders>
 ```typespec
 op createOrUpdate is ArmResourceCreateOrReplaceAsync<
   Employee,
-  Response =
-    | ArmResponse<Employee>
-    | ArmResourceCreatedResponse<
-        Employee,
-        LroHeaders = ArmLroLocationHeader<FinalResult = Employee> &
-          Azure.Core.Foundations.RetryAfterHeader
-      >
+  Response = | ArmResponse<Employee>
+  | ArmResourceCreatedResponse<
+      Employee,
+      LroHeaders = ArmLroLocationHeader<FinalResult = Employee> &
+        Azure.Core.Foundations.RetryAfterHeader
+    >
 >;
 ```
 
