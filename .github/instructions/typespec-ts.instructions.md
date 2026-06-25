@@ -72,7 +72,7 @@ Each generated package writes a `.gitignore` that ignores everything except
 `src/index.d.ts`, `.gitignore`, and `tspconfig.yaml`. So a generated folder is full of
 files on disk (`src/*.ts`, `types/`, `temp/`), but git only tracks the rolled-up
 `src/index.d.ts` (produced by the api-extractor "dtsRollup" pass in the `declarations`
-phase of `run.ts`). The `client` phase rewrites `src/` and therefore *removes*
+phase of `run.ts`). The `client` phase rewrites `src/` and therefore _removes_
 `src/index.d.ts`; the `declarations` phase restores it byte-for-byte — so both phases
 must run before `check:tree`.
 
