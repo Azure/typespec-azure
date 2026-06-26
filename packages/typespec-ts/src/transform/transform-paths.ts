@@ -7,15 +7,6 @@ import {
   isApiVersion,
 } from "@azure-tools/typespec-client-generator-core";
 import { HttpOperation, HttpOperationParameters } from "@typespec/http";
-import {
-  Imports,
-  OperationMethod,
-  PathMetadata,
-  Paths,
-  SchemaContext,
-  getParameterTypeName,
-  getResponseTypeName,
-} from "../rlc-common/index.js";
 import { getImportedModelName, getSchemaForType, isBodyRequired } from "../utils/model-utils.js";
 import {
   extractOperationLroDetail,
@@ -32,6 +23,8 @@ import { getDoc } from "@typespec/compiler";
 import { listOperationsUnderRLCClient } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import { getParameterSerializationInfo } from "../utils/parameter-utils.js";
+import { Imports, OperationMethod, PathMetadata, Paths, SchemaContext } from "../interfaces.js";
+import { getParameterTypeName, getResponseTypeName } from "../utils/name-constructors.js";
 
 export function transformPaths(
   client: SdkClient,

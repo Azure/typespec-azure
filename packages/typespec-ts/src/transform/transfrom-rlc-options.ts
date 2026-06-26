@@ -3,20 +3,14 @@ import { getDoc, NoTarget, Program } from "@typespec/compiler";
 import { getAuthentication } from "@typespec/http";
 import { EmitterOptions, reportDiagnostic } from "../lib.js";
 import { getClientParameters } from "../modular/helpers/client-helpers.js";
-import {
-  NameType,
-  normalizeName,
-  PackageDetails,
-  pascalCase,
-  RLCOptions,
-  ServiceInfo,
-} from "../rlc-common/index.js";
 import { getRLCClients, listOperationsUnderRLCClient } from "../utils/client-utils.js";
 import { getSupportedHttpAuth } from "../utils/credential-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import { getDefaultService } from "../utils/model-utils.js";
 import { detectModelConflicts } from "../utils/namespace-utils.js";
 import { getOperationName } from "../utils/operation-util.js";
+import { NameType, normalizeName, pascalCase } from "../utils/name-utils.js";
+import { PackageDetails, RLCOptions, ServiceInfo } from "../interfaces.js";
 
 export function transformRLCOptions(
   emitterOptions: EmitterOptions,

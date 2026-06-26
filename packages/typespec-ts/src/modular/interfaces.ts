@@ -1,4 +1,4 @@
-import { RLCOptions } from "../rlc-common/index.js";
+import { RLCOptions } from "../interfaces.js";
 
 export interface ModularOptions {
   sourceRoot: string;

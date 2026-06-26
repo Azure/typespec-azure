@@ -28,18 +28,6 @@ import {
 import { resolveReference } from "../framework/reference.js";
 import { reportDiagnostic } from "../lib.js";
 import { SerializationHelpers } from "../modular/static-helpers-metadata.js";
-import {
-  getLroLogicalResponseName,
-  getResponseTypeName,
-  NameType,
-  normalizeName,
-  OPERATION_LRO_HIGH_PRIORITY,
-  OPERATION_LRO_LOW_PRIORITY,
-  OperationLroDetail,
-  Paths,
-  ResponseMetadata,
-  ResponseTypes,
-} from "../rlc-common/index.js";
 import { listOperationsUnderRLCClient } from "./client-utils.js";
 import { SdkContext } from "./interfaces.js";
 import {
@@ -50,6 +38,9 @@ import {
 } from "./media-types.js";
 import { isByteOrByteUnion } from "./model-utils.js";
 import { getOperationNamespaceInterfaceName } from "./namespace-utils.js";
+import { getLroLogicalResponseName, getResponseTypeName } from "./name-constructors.js";
+import { NameType, normalizeName } from "./name-utils.js";
+import { OPERATION_LRO_HIGH_PRIORITY, OPERATION_LRO_LOW_PRIORITY, OperationLroDetail, Paths, ResponseMetadata, ResponseTypes } from "../interfaces.js";
 
 // Sorts the responses by status code
 export function sortedOperationResponses(responses: HttpOperationResponse[]) {

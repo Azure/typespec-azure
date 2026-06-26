@@ -3,17 +3,11 @@ import {
   isApiVersion,
   SdkClient,
 } from "@azure-tools/typespec-client-generator-core";
-import {
-  ApiVersionInfo,
-  ApiVersionPosition,
-  extractDefinedPosition,
-  extractPathApiVersion,
-  SchemaContext,
-  UrlInfo,
-} from "../rlc-common/index.js";
 import { listOperationsUnderRLCClient } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import { getDefaultApiVersionString, getSchemaForType, trimUsage } from "../utils/model-utils.js";
+import { ApiVersionInfo, ApiVersionPosition, SchemaContext, UrlInfo } from "../interfaces.js";
+import { extractDefinedPosition, extractPathApiVersion } from "../utils/api-version-util.js";
 
 export function transformApiVersionInfo(
   client: SdkClient,

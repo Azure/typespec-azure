@@ -14,7 +14,6 @@ import { useContext } from "../context-manager.js";
 import { resolveReference } from "../framework/reference.js";
 import { reportDiagnostic } from "../index.js";
 import { AzureIdentityDependencies } from "../modular/external-dependencies.js";
-import { NameType, normalizeName } from "../rlc-common/index.js";
 import { getSubscriptionId } from "../transform/transfrom-rlc-options.js";
 import { hasKeyCredential, hasTokenCredential } from "../utils/credential-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
@@ -33,6 +32,7 @@ import { getClassicalClientName } from "./helpers/naming-helpers.js";
 import { getOperationFunction } from "./helpers/operation-helpers.js";
 import { buildPropertyNameMapper, isSpreadBodyParameter } from "./helpers/type-helpers.js";
 import { ModelOverrideOptions } from "./serialization/serialize-utils.js";
+import { NameType, normalizeName } from "../utils/name-utils.js";
 
 /**
  * Interfaces for samples generations

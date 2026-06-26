@@ -14,7 +14,6 @@ import { useContext } from "../../context-manager.js";
 import { resolveReference } from "../../framework/reference.js";
 import { refkey } from "../../framework/refkey.js";
 import { reportDiagnostic } from "../../lib.js";
-import { NameType, normalizeName } from "../../rlc-common/index.js";
 import { SdkContext } from "../../utils/interfaces.js";
 import { isAzureCoreErrorType } from "../../utils/model-utils.js";
 import { getAdditionalPropertiesName, normalizeModelName } from "../emit-models.js";
@@ -33,6 +32,7 @@ import {
   isSupportedSerializeType,
   ModelSerializeOptions,
 } from "./serialize-utils.js";
+import { NameType, normalizeName } from "../../utils/name-utils.js";
 
 export function buildPropertySerializer(
   context: SdkContext,

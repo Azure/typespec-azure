@@ -4,7 +4,6 @@ import { SourceFile } from "ts-morph";
 import { useContext } from "../context-manager.js";
 import { useDependencies } from "../framework/hooks/use-dependencies.js";
 import { resolveReference } from "../framework/reference.js";
-import { NameType, normalizeName } from "../rlc-common/index.js";
 import { getModularClientOptions } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import { getMethodHierarchiesMap } from "../utils/operation-util.js";
@@ -14,6 +13,7 @@ import { getClassicalClientName } from "./helpers/naming-helpers.js";
 import { isLroOnlyOperation } from "./helpers/operation-helpers.js";
 import { ModularEmitterOptions } from "./interfaces.js";
 import { PollingHelpers } from "./static-helpers-metadata.js";
+import { NameType, normalizeName } from "../utils/name-utils.js";
 
 export function buildRestorePoller(
   context: SdkContext,

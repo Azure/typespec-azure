@@ -3,7 +3,7 @@
 
 import { createTypeSpecLibrary, JSONSchemaType, paramMessage } from "@typespec/compiler";
 import { Options } from "prettier";
-import { PackageDetails } from "./rlc-common/index.js";
+import { PackageDetails } from "./interfaces.js";
 
 export interface EmitterOptions {
   /**

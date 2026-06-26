@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildRuntimeImports,
   getImportSpecifier,
-} from "../../../../src/rlc-common/helpers/imports-util.js";
+} from "../../../../src/utils/imports-util.js";
 
 describe("#buildRuntimeImports", () => {
   it("should return the correct import set", () => {

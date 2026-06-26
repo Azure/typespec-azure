@@ -4,8 +4,8 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: to fix the handlebars issue
 import hbs from "handlebars";
-import { getClientName } from "../helpers/name-constructors.js";
-import { NameType, normalizeName } from "../helpers/name-utils.js";
+import { getClientName } from "../utils/name-constructors.js";
+import { NameType, normalizeName } from "../utils/name-utils.js";
 import { RLCModel } from "../interfaces.js";
 
 const azureReadmeModularTemplate = `# {{ clientDescriptiveName }} library for JavaScript

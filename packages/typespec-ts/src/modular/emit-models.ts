@@ -28,7 +28,6 @@ import {
   StructureKind,
   TypeAliasDeclarationStructure,
 } from "ts-morph";
-import { fixLeadingNumber, NameType, normalizeName } from "../rlc-common/index.js";
 // import { isKey } from "@typespec/compiler";
 import {
   getExternalModel,
@@ -85,6 +84,7 @@ import {
   getTypeExpression,
   normalizeModelPropertyName,
 } from "./type-expressions/get-type-expression.js";
+import { fixLeadingNumber, NameType, normalizeName } from "../utils/name-utils.js";
 
 type InterfaceStructure = OptionalKind<InterfaceDeclarationStructure> & {
   extends?: string[];

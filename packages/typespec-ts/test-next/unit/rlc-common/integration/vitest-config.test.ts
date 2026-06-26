@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildVitestConfig } from "../../../../src/rlc-common/metadata/build-vitest-config.js";
+import { buildVitestConfig } from "../../../../src/metadata/build-vitest-config.js";
 
 import { createMockModel } from "./mock-helper.js";
 

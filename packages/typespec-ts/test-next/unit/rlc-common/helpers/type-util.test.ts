@@ -17,7 +17,7 @@ import {
   leaveStringQuotes,
   toTypeScriptTypeFromName,
   toTypeScriptTypeFromSchema,
-} from "../../../../src/rlc-common/helpers/type-util.js";
+} from "../../../../src/utils/type-util.js";
 
 describe("#isStringLiteral", () => {
   it("should return true if the string is quoted", () => {

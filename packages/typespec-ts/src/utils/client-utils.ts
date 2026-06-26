@@ -15,8 +15,8 @@ import {
   Operation,
 } from "@typespec/compiler";
 import { ModularClientOptions } from "../modular/interfaces.js";
-import { NameType, normalizeName } from "../rlc-common/index.js";
 import { SdkContext } from "./interfaces.js";
+import { NameType, normalizeName } from "./name-utils.js";
 
 export function getRLCClients(dpgContext: SdkContext): SdkClient[] {
   const clients = listClients(dpgContext);

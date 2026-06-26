@@ -4,15 +4,6 @@
 import { getHttpOperationWithCache, SdkClient } from "@azure-tools/typespec-client-generator-core";
 import { getDoc, isVoidType } from "@typespec/compiler";
 import { HttpOperation, HttpOperationResponse } from "@typespec/http";
-import {
-  getLroLogicalResponseName,
-  Imports,
-  OperationResponse,
-  ResponseHeaderSchema,
-  ResponseMetadata,
-  Schema,
-  SchemaContext,
-} from "../rlc-common/index.js";
 import { listOperationsUnderRLCClient } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import {
@@ -29,6 +20,8 @@ import {
   isBinaryPayload,
   sortedOperationResponses,
 } from "../utils/operation-util.js";
+import { getLroLogicalResponseName } from "../utils/name-constructors.js";
+import { Imports, OperationResponse, ResponseHeaderSchema, ResponseMetadata, Schema, SchemaContext } from "../interfaces.js";
 
 export function transformToResponseTypes(
   client: SdkClient,

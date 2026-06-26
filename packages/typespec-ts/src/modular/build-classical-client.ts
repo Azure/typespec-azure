@@ -5,7 +5,6 @@ import {
   SourceFile,
   StructureKind,
 } from "ts-morph";
-import { NameType, normalizeName } from "../rlc-common/index.js";
 import { buildUserAgentOptions, getClientParametersDeclaration } from "./helpers/client-helpers.js";
 import { getClassicalClientName, getClientName } from "./helpers/naming-helpers.js";
 import { ModularEmitterOptions } from "./interfaces.js";
@@ -28,6 +27,7 @@ import { getPagingLROMethodName } from "./helpers/classical-operation-helpers.js
 import { getDocsFromDescription } from "./helpers/docs-helpers.js";
 import { getOperationFunction } from "./helpers/operation-helpers.js";
 import { PagingHelpers, SimplePollerHelpers } from "./static-helpers-metadata.js";
+import { NameType, normalizeName } from "../utils/name-utils.js";
 
 export function buildClassicalClient(
   dpgContext: SdkContext,

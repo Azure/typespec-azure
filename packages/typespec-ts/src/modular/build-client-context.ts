@@ -1,4 +1,3 @@
-import { NameType, normalizeName } from "../rlc-common/index.js";
 import {
   buildGetClientCredentialParam,
   buildGetClientEndpointParam,
@@ -31,6 +30,7 @@ import { getDocsFromDescription } from "./helpers/docs-helpers.js";
 import { getClassicalClientName, getClientName } from "./helpers/naming-helpers.js";
 import { CloudSettingHelpers } from "./static-helpers-metadata.js";
 import { getTypeExpression } from "./type-expressions/get-type-expression.js";
+import { NameType, normalizeName } from "../utils/name-utils.js";
 
 /**
  * This function gets the path of the file containing the modular client context

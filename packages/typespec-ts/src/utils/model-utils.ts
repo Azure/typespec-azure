@@ -64,21 +64,14 @@ import {
   isBody,
   isStatusCode,
 } from "@typespec/http";
-import {
-  ArraySchema,
-  DictionarySchema,
-  NameType,
-  ObjectSchema,
-  Schema,
-  SchemaContext,
-  isArraySchema,
-  normalizeName,
-} from "../rlc-common/index.js";
 import { GetSchemaOptions, SdkContext } from "./interfaces.js";
 import { KnownMediaType, hasMediaType, isMediaTypeMultipartFormData } from "./media-types.js";
 
 import { reportDiagnostic } from "../lib.js";
 import { getModelNamespaceName } from "./namespace-utils.js";
+import { ArraySchema, DictionarySchema, ObjectSchema, Schema, SchemaContext } from "../interfaces.js";
+import { NameType, normalizeName } from "./name-utils.js";
+import { isArraySchema } from "./schema-helpers.js";
 
 export const BINARY_TYPE_UNION =
   "string | Uint8Array | ReadableStream<Uint8Array> | NodeReadableStream";

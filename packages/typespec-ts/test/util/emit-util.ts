@@ -4,7 +4,6 @@ import {
   emitTypes,
   getModelsPath,
 } from "../../src/modular/emit-models.js";
-import { RLCOptions } from "../../src/rlc-common/index.js";
 import {
   compileTypeSpecFor,
   createDpgContextTestHelper,
@@ -26,6 +25,7 @@ import { buildSubpathIndexFile } from "../../src/modular/build-subpath-index.js"
 import { emitSamples } from "../../src/modular/emit-samples.js";
 import { emitTests } from "../../src/modular/emit-tests.js";
 import { getClientHierarchyMap } from "../../src/utils/client-utils.js";
+import { RLCOptions } from "../../src/interfaces.js";
 
 export interface ModelConfigOptions extends RLCOptions {
   needOptions?: boolean;

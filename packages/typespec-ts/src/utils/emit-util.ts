@@ -4,7 +4,7 @@ import prettierPluginBabel from "prettier/plugins/babel";
 import prettierPluginEstree from "prettier/plugins/estree";
 import prettierPluginTypescript from "prettier/plugins/typescript";
 import { prettierJSONOptions, prettierTypeScriptOptions, reportDiagnostic } from "../lib.js";
-import { ContentBuilder, File, RLCModel } from "../rlc-common/index.js";
+import { ContentBuilder, File, RLCModel } from "../interfaces.js";
 
 export async function emitContentByBuilder(
   program: Program,

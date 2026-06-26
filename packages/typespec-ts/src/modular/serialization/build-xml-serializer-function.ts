@@ -16,7 +16,6 @@ import { useDependencies } from "../../framework/hooks/use-dependencies.js";
 import { resolveReference } from "../../framework/reference.js";
 import { refkey } from "../../framework/refkey.js";
 import { reportDiagnostic } from "../../lib.js";
-import { NameType } from "../../rlc-common/index.js";
 import { SdkContext } from "../../utils/interfaces.js";
 import { isAzureCoreErrorType } from "../../utils/model-utils.js";
 import { getAdditionalPropertiesName, normalizeModelName } from "../emit-models.js";
@@ -25,6 +24,7 @@ import { getAdditionalPropertiesType } from "../helpers/type-helpers.js";
 import { XmlHelpers } from "../static-helpers-metadata.js";
 import { normalizeModelPropertyName } from "../type-expressions/get-type-expression.js";
 import { isSupportedSerializeType, ModelSerializeOptions } from "./serialize-utils.js";
+import { NameType } from "../../utils/name-utils.js";
 
 /**
  * Checks if a model type has XML serialization options defined

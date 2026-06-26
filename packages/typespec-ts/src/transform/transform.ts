@@ -4,22 +4,6 @@
 import { SdkClient } from "@azure-tools/typespec-client-generator-core";
 import { getDoc, joinPaths } from "@typespec/compiler";
 import { getServers } from "@typespec/http";
-import {
-  buildRuntimeImports,
-  Imports,
-  initInternalImports,
-  NameType,
-  normalizeName,
-  OperationParameter,
-  OperationResponse,
-  PathParameter,
-  Paths,
-  RLCModel,
-  RLCOptions,
-  Schema,
-  SchemaContext,
-  UrlInfo,
-} from "../rlc-common/index.js";
 import { SdkContext } from "../utils/interfaces.js";
 import {
   getDefaultService,
@@ -37,6 +21,9 @@ import { transformPaths } from "./transform-paths.js";
 import { transformToResponseTypes } from "./transform-responses.js";
 import { transformSchemas } from "./transform-schemas.js";
 import { transformTelemetryInfo } from "./transform-telemetry-info.js";
+import { buildRuntimeImports, initInternalImports } from "../utils/imports-util.js";
+import { Imports, OperationParameter, OperationResponse, PathParameter, Paths, RLCModel, RLCOptions, Schema, SchemaContext, UrlInfo } from "../interfaces.js";
+import { NameType, normalizeName } from "../utils/name-utils.js";
 
 export async function transformRLCModel(
   client: SdkClient,

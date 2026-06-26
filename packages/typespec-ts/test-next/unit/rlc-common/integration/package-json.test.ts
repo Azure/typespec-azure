@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildPackageFile,
   updatePackageFile,
-} from "../../../../src/rlc-common/metadata/build-package-file.js";
+} from "../../../../src/metadata/build-package-file.js";
 import { TestModelConfig, createMockModel } from "./mock-helper.js";
 
 describe("Package file generation", () => {

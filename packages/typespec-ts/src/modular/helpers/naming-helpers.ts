@@ -1,7 +1,7 @@
 import { SdkClientType, SdkServiceOperation } from "@azure-tools/typespec-client-generator-core";
-import { NameType, normalizeName, ReservedModelNames } from "../../rlc-common/index.js";
 import { SdkContext } from "../../utils/interfaces.js";
 import { ServiceOperation } from "../../utils/operation-util.js";
+import { NameType, normalizeName, ReservedModelNames } from "../../utils/name-utils.js";
 
 export function getClientName(client: SdkClientType<SdkServiceOperation>): string {
   return client.name.replace(/Client$/, "");

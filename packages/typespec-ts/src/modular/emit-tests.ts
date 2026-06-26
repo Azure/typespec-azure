@@ -1,7 +1,6 @@
 import { type CompilerHost, joinPaths } from "@typespec/compiler";
 import { SourceFile } from "ts-morph";
 import { resolveReference } from "../framework/reference.js";
-import { NameType, normalizeName } from "../rlc-common/index.js";
 import { SdkContext } from "../utils/interfaces.js";
 import { ServiceOperation } from "../utils/operation-util.js";
 import { AzureTestDependencies } from "./external-dependencies.js";
@@ -17,6 +16,7 @@ import {
 } from "./helpers/example-value-helpers.js";
 import { getClassicalClientName } from "./helpers/naming-helpers.js";
 import { CreateRecorderHelpers } from "./static-helpers-metadata.js";
+import { NameType, normalizeName } from "../utils/name-utils.js";
 
 /**
  * Clean up the test/generated folder before generating new tests

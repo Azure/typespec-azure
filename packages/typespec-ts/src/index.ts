@@ -31,37 +31,6 @@ import {
   UrlTemplateHelpers,
   XmlHelpers,
 } from "./modular/static-helpers-metadata.js";
-import {
-  RLCModel,
-  RLCOptions,
-  buildApiExtractorConfig,
-  buildChangelogFile,
-  buildEsLintConfig,
-  buildLicenseFile,
-  buildPackageFile,
-  buildReadmeFile,
-  buildRecordedClientFile,
-  buildSampleEnvFile,
-  buildSampleTest,
-  buildSnippets,
-  buildTestBrowserTsConfig,
-  buildTestNodeTsConfig,
-  buildTsConfig,
-  buildTsLintConfig,
-  buildTsSampleConfig,
-  buildTsSnippetsConfig,
-  buildTsSrcBrowserConfig,
-  buildTsSrcCjsConfig,
-  buildTsSrcEsmConfig,
-  buildTsSrcReactNativeConfig,
-  buildVitestConfig,
-  buildWarpConfig,
-  getClientName,
-  hasClientNameChanged,
-  hasUnexpectedHelper,
-  updatePackageFile,
-  updateReadmeFile,
-} from "./rlc-common/index.js";
 import { emitContentByBuilder } from "./utils/emit-util.js";
 import { clearDirectory, emptyDir, pathExists } from "./utils/file-system-utils.js";
 import { GenerationDirDetail, SdkContext } from "./utils/interfaces.js";
@@ -101,6 +70,23 @@ import {
   getRLCClients,
 } from "./utils/client-utils.js";
 import { generateCrossLanguageDefinitionFile } from "./utils/cross-language-def.js";
+import { RLCModel, RLCOptions } from "./interfaces.js";
+import { buildApiExtractorConfig } from "./metadata/build-api-extractor-config.js";
+import { buildChangelogFile } from "./metadata/build-changelog-file.js";
+import { buildEsLintConfig } from "./metadata/build-es-lint-config.js";
+import { buildLicenseFile } from "./metadata/build-license-file.js";
+import { buildPackageFile, updatePackageFile } from "./metadata/build-package-file.js";
+import { buildReadmeFile, hasClientNameChanged, updateReadmeFile } from "./metadata/build-readme-file.js";
+import { buildRecordedClientFile } from "./metadata/test/build-recorded-client.js";
+import { buildSampleEnvFile } from "./metadata/build-sample-env-file.js";
+import { buildSampleTest } from "./metadata/test/build-sample-test.js";
+import { buildSnippets } from "./metadata/test/build-snippets.js";
+import { buildTestBrowserTsConfig, buildTestNodeTsConfig } from "./metadata/build-test-config.js";
+import { buildTsConfig, buildTsLintConfig, buildTsSampleConfig, buildTsSnippetsConfig, buildTsSrcBrowserConfig, buildTsSrcCjsConfig, buildTsSrcEsmConfig, buildTsSrcReactNativeConfig } from "./metadata/build-ts-config.js";
+import { buildVitestConfig } from "./metadata/build-vitest-config.js";
+import { buildWarpConfig } from "./metadata/build-warp-config.js";
+import { getClientName } from "./utils/name-constructors.js";
+import { hasUnexpectedHelper } from "./utils/operation-helpers.js";
 
 export * from "./lib.js";
 

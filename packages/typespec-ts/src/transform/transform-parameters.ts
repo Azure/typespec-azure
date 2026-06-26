@@ -9,16 +9,6 @@ import {
 import { NoTarget, Type, isVoidType } from "@typespec/compiler";
 import { HttpOperation, HttpOperationParameter, HttpOperationParameters } from "@typespec/http";
 import { reportDiagnostic } from "../lib.js";
-import {
-  ApiVersionInfo,
-  Imports,
-  ObjectSchema,
-  OperationParameter,
-  ParameterBodyMetadata,
-  ParameterMetadata,
-  Schema,
-  SchemaContext,
-} from "../rlc-common/index.js";
 import { listOperationsUnderRLCClient } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import {
@@ -43,6 +33,7 @@ import {
   getSpecialSerializeInfo,
 } from "../utils/operation-util.js";
 import { getParameterSerializationInfo } from "../utils/parameter-utils.js";
+import { ApiVersionInfo, Imports, ObjectSchema, OperationParameter, ParameterBodyMetadata, ParameterMetadata, Schema, SchemaContext } from "../interfaces.js";
 
 interface ParameterTransformationOptions {
   apiVersionInfo?: ApiVersionInfo;

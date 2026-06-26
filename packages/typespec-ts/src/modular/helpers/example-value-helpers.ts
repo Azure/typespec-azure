@@ -12,7 +12,6 @@ import { joinPaths } from "@typespec/compiler";
 import { SourceFile } from "ts-morph";
 import { useContext } from "../../context-manager.js";
 import { resolveReference } from "../../framework/reference.js";
-import { NameType, normalizeName } from "../../rlc-common/index.js";
 import { getSubscriptionId } from "../../transform/transfrom-rlc-options.js";
 import { hasKeyCredential, hasTokenCredential } from "../../utils/credential-utils.js";
 import { SdkContext } from "../../utils/interfaces.js";
@@ -22,6 +21,7 @@ import { getClientParametersDeclaration } from "./client-helpers.js";
 import { getClassicalClientName } from "./naming-helpers.js";
 import { getOperationFunction } from "./operation-helpers.js";
 import { isSpreadBodyParameter } from "./type-helpers.js";
+import { NameType, normalizeName } from "../../utils/name-utils.js";
 
 /**
  * Common interfaces for both samples and tests
