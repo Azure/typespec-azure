@@ -116,6 +116,7 @@ export function resolveAutorestOptions(
     xmlStrategy: resolvedOptions["xml-strategy"],
     outputSplitting: resolvedOptions["output-splitting"],
     skipExampleCopying: resolvedOptions["skip-example-copying"],
+    typeNameStrategy: resolvedOptions["type-name-strategy"],
   };
 }
 

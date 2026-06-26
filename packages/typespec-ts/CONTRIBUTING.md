@@ -75,7 +75,6 @@ Whenever you work on adding a feature/fixing a bug, this would probably be your 
        generate-metadata: true
        generate-test: true
        include-shortcuts: true
-       azure-sdk-for-js: false
        add-credentials: false
        is-typespec-test: true
        title: AuthApiKeyClient

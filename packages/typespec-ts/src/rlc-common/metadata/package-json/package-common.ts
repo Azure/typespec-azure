@@ -6,17 +6,14 @@ export interface PackageCommonInfoConfig {
   nameWithoutScope?: string;
   version: string;
   description: string;
-  moduleKind: "esm" | "cjs";
   withTests: boolean;
   withSamples: boolean;
   exports?: Record<string, any>;
   dependencies?: Record<string, string>;
   azureArm?: boolean;
-  isModularLibrary?: boolean;
-  azureSdkForJs?: boolean;
   /**
    * When true, generates React Native build targets (dist/react-native, exports condition).
-   * Defaults to false. Only applicable when azureSdkForJs is true.
+   * Defaults to false.
    */
   generateReactNativeTarget?: boolean;
 }
@@ -32,7 +29,7 @@ export function getPackageCommonInfo(config: PackageCommonInfoConfig) {
     version,
     description,
     engines: {
-      node: ">=20.0.0",
+      node: ">=22.0.0",
     },
     sideEffects: false,
     autoPublish: false,
@@ -40,106 +37,15 @@ export function getPackageCommonInfo(config: PackageCommonInfoConfig) {
   };
 }
 
-export const commonPackageDependencies = {
-  tslib: "^2.6.2",
-};
-
-export function getCommonPackageDevDependencies(config: PackageCommonInfoConfig) {
-  return {
-    "@types/node": "^20.0.0",
-    eslint: "^9.9.0",
-    typescript: "~5.8.2",
-    ...getEsmDevDependencies(config),
-  };
-}
-
-function getEsmDevDependencies({ moduleKind, azureSdkForJs }: PackageCommonInfoConfig) {
-  if (moduleKind !== "esm") {
-    return {};
-  }
-  // Azure monorepo packages use warp (invoked via dev-tool), no tshy needed
-  if (azureSdkForJs) {
-    return {};
-  }
-  return {
-    tshy: "^2.0.0",
-  };
-}
-
 function getEntryPointInformation(config: PackageCommonInfoConfig) {
-  return {
-    ...getCjsEntrypointInformation(config),
-    ...getEsmEntrypointInformation(config),
-  };
-}
-
-function getCjsEntrypointInformation({
-  name,
-  nameWithoutScope,
-  moduleKind,
-  withTests,
-  withSamples,
-}: PackageCommonInfoConfig) {
-  if (moduleKind !== "cjs") {
-    return;
-  }
-
-  const types =
-    withTests || withSamples
-      ? `./types/src/${nameWithoutScope ?? name}.d.ts`
-      : `./types/${nameWithoutScope ?? name}.d.ts`;
-  const main = withTests || withSamples ? "dist/src/index.js" : "dist/index.js";
-  return {
-    main,
-    module: withTests || withSamples ? "./dist-esm/src/index.js" : "./dist-esm/index.js",
-    types,
-  };
-}
-
-function getEsmEntrypointInformation(config: PackageCommonInfoConfig) {
-  if (config.moduleKind !== "esm") {
-    return;
-  }
-
-  // Azure monorepo packages use warp instead of tshy
-  if (config.azureSdkForJs) {
-    const result: Record<string, any> = {
-      type: "module",
-      main: "./dist/commonjs/index.js",
-      module: "./dist/esm/index.js",
-      types: "./dist/commonjs/index.d.ts",
-      browser: "./dist/browser/index.js",
-      imports: {
-        "#platform/*": {
-          browser: "./src/*-browser.mts",
-          default: "./src/*.ts",
-        } as Record<string, string>,
-      },
-      exports: resolveWarpExports(config.exports, config.generateReactNativeTarget),
-    };
-
-    if (config.generateReactNativeTarget) {
-      result["react-native"] = "./dist/react-native/index.js";
-      (result["imports"]["#platform/*"] as Record<string, string>)["react-native"] =
-        "./src/*-react-native.mts";
-      // Reorder so react-native comes before default
-      const importsEntry = result["imports"]["#platform/*"] as Record<string, string>;
-      result["imports"]["#platform/*"] = {
-        browser: importsEntry["browser"],
-        "react-native": importsEntry["react-native"],
-        default: importsEntry["default"],
-      };
-    }
-
-    return result;
-  }
-
-  // Non-monorepo packages use tshy which manages polyfill resolution
-  // via esmDialects — do NOT add imports here.
+  // Azure monorepo packages use warp.
   const result: Record<string, any> = {
-    tshy: getTshyConfig(config),
     type: "module",
+    main: "./dist/commonjs/index.js",
+    module: "./dist/esm/index.js",
+    types: "./dist/commonjs/index.d.ts",
     browser: "./dist/browser/index.js",
+    exports: resolveWarpExports(config.exports, config.generateReactNativeTarget),
   };
 
   if (config.generateReactNativeTarget) {
@@ -203,25 +109,6 @@ export function resolveWarpExports(
   }
 
   return exports;
-}
-
-export function getTshyConfig(config: PackageCommonInfoConfig) {
-  const { exports = {} } = config;
-  const esmDialects = config.generateReactNativeTarget ? ["browser", "react-native"] : ["browser"];
-  const tshyConfig: Record<string, any> = {
-    exports: {
-      "./package.json": "./package.json",
-      ".": "./src/index.ts",
-      ...exports,
-    },
-    dialects: ["esm", "commonjs"],
-    esmDialects,
-    selfLink: false,
-  };
-  if (config.azureSdkForJs) {
-    tshyConfig["project"] = "../../../tsconfig.src.build.json";
-  }
-  return tshyConfig;
 }
 
 export function getCommonPackageScripts() {

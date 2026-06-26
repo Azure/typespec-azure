@@ -2,9 +2,8 @@
 // Licensed under the MIT License.
 
 import { SdkClient } from "@azure-tools/typespec-client-generator-core";
-import { getDoc } from "@typespec/compiler";
+import { getDoc, joinPaths } from "@typespec/compiler";
 import { getServers } from "@typespec/http";
-import * as path from "path";
 import {
   buildRuntimeImports,
   Imports,
@@ -19,7 +18,6 @@ import {
   RLCOptions,
   Schema,
   SchemaContext,
-  transformSampleGroups,
   UrlInfo,
 } from "../rlc-common/index.js";
 import { SdkContext } from "../utils/interfaces.js";
@@ -47,19 +45,14 @@ export async function transformRLCModel(
   const program = dpgContext.program;
   const options: RLCOptions = dpgContext.rlcOptions!;
   const rlcSourceDir = dpgContext.generationPathDetail?.rlcSourcesDir;
-  const srcPath = path.join(
+  const srcPath = joinPaths(
     dpgContext.generationPathDetail?.rlcSourcesDir ?? "",
     options.batch && options.batch.length > 1
       ? normalizeName(client.name.replace("Client", ""), NameType.File)
       : "",
   );
   const libraryName = normalizeName(
-    options.batch && (options.isModularLibrary || options.batch.length > 1)
-      ? client.name
-      : (options?.title ??
-          client.name ??
-          getDefaultService(program, options.isModularLibrary)?.title ??
-          ""),
+    options.batch ? client.name : (client.name ?? getDefaultService(program)?.title ?? ""),
     NameType.Class,
   );
   const importSet = initInternalImports();
@@ -73,7 +66,7 @@ export async function transformRLCModel(
     importSet,
     urlInfo?.apiVersionInfo,
   );
-  const helperDetails = transformHelperFunctionDetails(client, dpgContext, options.flavor);
+  const helperDetails = transformHelperFunctionDetails(client, dpgContext);
   // Enrich client-level annotation detail
   helperDetails.clientLroOverload = getClientLroOverload(paths);
 
@@ -92,17 +85,13 @@ export async function transformRLCModel(
     telemetryOptions,
     importInfo: {
       internalImports: importSet,
-      runtimeImports: buildRuntimeImports(options.flavor),
+      runtimeImports: buildRuntimeImports(),
     },
     rlcSourceDir,
   };
-  model.sampleGroups = transformSampleGroups(
-    model,
-    options?.generateSample === true /* Enable mock sample content if generateSample === true */,
-  );
-  options.generateSample =
-    (options.generateSample === true || options.generateSample === undefined) &&
-    (model.sampleGroups ?? []).length > 0;
+  // RLC sample generation has been removed; modular samples are emitted separately,
+  // so the RLC model never carries sample groups.
+  options.generateSample = false;
   return model;
 }
 

@@ -6,7 +6,6 @@ options:
     generate-test: false
     add-credentials: false
     flavor: azure
-    azure-sdk-for-js: false
     is-typespec-test: true
     package-details:
       name: "@msinternal/parameters-query"

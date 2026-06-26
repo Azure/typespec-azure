@@ -4,12 +4,9 @@ import hbs from "handlebars";
 import { RLCModel } from "../interfaces.js";
 import { sampleTestContent } from "./template.js";
 
-export function buildSampleTest(model: RLCModel) {
+export function buildSampleTest(_model: RLCModel) {
   return {
     path: "test/public/sampleTest.spec.ts",
-    content: hbs.compile(sampleTestContent, { noEscape: true })({
-      isEsm: model.options?.moduleKind === "esm",
-      isCjs: model.options?.moduleKind === "cjs",
-    }),
+    content: hbs.compile(sampleTestContent, { noEscape: true })({}),
   };
 }

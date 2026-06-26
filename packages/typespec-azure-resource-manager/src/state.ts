@@ -43,4 +43,7 @@ export const ArmStateKeys = {
   armExternalType: azureResourceManagerCreateStateSymbol("armExternalType"),
   inlineAzureType: azureResourceManagerCreateStateSymbol("inlineAzureType"),
   genericResource: azureResourceManagerCreateStateSymbol("genericResource"),
+
+  // base-types.ts
+  azureBaseTypes: azureResourceManagerCreateStateSymbol("azureBaseTypes"),
 };

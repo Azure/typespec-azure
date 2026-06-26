@@ -1,5 +1,4 @@
-import { normalizePath } from "@typespec/compiler";
-import path from "path/posix";
+import { joinPaths, normalizePath } from "@typespec/compiler";
 import {
   ImportDeclarationStructure,
   ImportSpecifierStructure,
@@ -13,7 +12,6 @@ import { ReferenceableSymbol } from "../dependency.js";
 import {
   SourceFileSymbol,
   StaticHelperMetadata,
-  getPlatformSubpathSpecifier,
 } from "../load-static-helpers.js";
 import { refkey } from "../refkey.js";
 import { provideDependencies, useDependencies } from "./use-dependencies.js";
@@ -28,7 +26,7 @@ export interface BinderOptions {
   staticHelpers?: Map<string, StaticHelperMetadata>;
   dependencies?: Record<string, ReferenceableSymbol>;
   /** When true, use #platform/ subpath imports for static helpers with platform variants.
-   *  Should be true for warp (azureSdkForJs) packages; false for tshy packages. */
+   *  Should be true for warp packages; false for tshy packages. */
   useSubpathImports?: boolean;
 }
 
@@ -191,31 +189,6 @@ class BinderImp implements Binder {
   }
 
   /**
-   * Returns the #platform/ subpath import specifier for a static helper file
-   * that has a polyfill variant (-browser.mts or -react-native.mts sibling),
-   * or undefined if subpath imports are disabled or no variant exists.
-   * The relative path is computed against the package `src` directory (since
-   * `#platform/*` maps to `./src/*`), derived from the actual `sourceRoot`
-   * (which can be e.g. `.../src`, `.../src/generated` or `.../generated`)
-   * rather than a hardcoded "/src/" segment.
-   * e.g. sourceRoot ".../src/generated", file ".../src/generated/static-helpers/serialization/get-binary-response.ts"
-   *   -> "#platform/generated/static-helpers/serialization/get-binary-response"
-   */
-  private getPlatformImportSpecifier(
-    declarationSourceFile: SourceFile,
-    sourceRoot: string,
-  ): string | undefined {
-    if (!this.useSubpathImports) return undefined;
-    const filePath = declarationSourceFile.getFilePath();
-    // Check if a -browser.mts or -react-native.mts sibling exists
-    const basePath = filePath.replace(/\.ts$/, "");
-    const hasBrowserVariant = this.project.getSourceFile(basePath + "-browser.mts");
-    const hasReactNativeVariant = this.project.getSourceFile(basePath + "-react-native.mts");
-    if (!hasBrowserVariant && !hasReactNativeVariant) return undefined;
-    return getPlatformSubpathSpecifier(filePath, sourceRoot);
-  }
-
-  /**
    * Applies all tracked imports to their respective source files.
    */
   resolveAllReferences(sourceRoot: string, testRoot?: string): void {
@@ -327,12 +300,7 @@ class BinderImp implements Binder {
 
       if (file !== declarationSourceFile) {
         this.trackReference(declarationKey, file);
-        // Use #platform/ subpath import specifier for static helpers in warp packages
-        const platformSpecifier = this.getPlatformImportSpecifier(
-          declarationSourceFile,
-          sourceRoot,
-        );
-        const importTarget = platformSpecifier ?? declarationSourceFile;
+        const importTarget = declarationSourceFile;
         const importDec = this.addImport(file, importTarget, name);
         name = importDec.alias ?? name;
       }
@@ -367,7 +335,7 @@ class BinderImp implements Binder {
 
     // Also keep files that are imported by any used helper file
     const helperFiles = this.project.getSourceFiles(
-      normalizePath(path.join(sourceRoot, "static-helpers/**/*.*ts")),
+      normalizePath(joinPaths(sourceRoot, "static-helpers/**/*.*ts")),
     );
     const usedFiles = helperFiles.filter((file) => !isFileUnused(file, usedHelperNames));
     for (const usedFile of usedFiles) {
@@ -391,7 +359,7 @@ class BinderImp implements Binder {
     }
     this.project
       //normalizae the final path to adapt to different systems
-      .getSourceFiles(normalizePath(path.join(testRoot, "test/generated/util/**/*.*ts")))
+      .getSourceFiles(normalizePath(joinPaths(testRoot, "test/generated/util/**/*.*ts")))
       .filter((file) => isFileUnused(file, usedHelperNames))
       .forEach((helperFile) => helperFile.delete());
   }

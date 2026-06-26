@@ -8,14 +8,13 @@ import {
   SdkModelPropertyType,
   SdkServiceOperation,
 } from "@azure-tools/typespec-client-generator-core";
-import { NoTarget } from "@typespec/compiler";
-import { join } from "path";
+import { joinPaths, NoTarget } from "@typespec/compiler";
 import { FunctionDeclarationStructure, SourceFile, StructureKind } from "ts-morph";
 import { useContext } from "../context-manager.js";
 import { resolveReference } from "../framework/reference.js";
 import { reportDiagnostic } from "../index.js";
 import { AzureIdentityDependencies } from "../modular/external-dependencies.js";
-import { isAzurePackage, NameType, normalizeName } from "../rlc-common/index.js";
+import { NameType, normalizeName } from "../rlc-common/index.js";
 import { getSubscriptionId } from "../transform/transfrom-rlc-options.js";
 import { hasKeyCredential, hasTokenCredential } from "../utils/credential-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
@@ -105,13 +104,13 @@ function emitMethodSamples(
   }
   const project = useContext("outputProject");
   const operationPrefix = `${options.classicalMethodPrefix ?? ""} ${method.oriName ?? method.name}`;
-  const sampleFolder = join(
+  const sampleFolder = joinPaths(
     dpgContext.generationPathDetail?.rootDir ?? "",
     "samples-dev",
     options.subFolder ?? "",
   );
   const fileName = normalizeName(`${operationPrefix} Sample`, NameType.File);
-  const sourceFile = project.createSourceFile(join(sampleFolder, `${fileName}.ts`), "", {
+  const sourceFile = project.createSourceFile(joinPaths(sampleFolder, `${fileName}.ts`), "", {
     overwrite: true,
   });
   const exampleFunctions = [];
@@ -465,7 +464,7 @@ function prepareExampleParameters(
 }
 
 function getCredentialExampleValue(
-  dpgContext: SdkContext,
+  _dpgContext: SdkContext,
   initialization: SdkClientInitializationType,
 ): ExampleValue | undefined {
   const keyCredential = hasKeyCredential(initialization),
@@ -476,26 +475,11 @@ function getCredentialExampleValue(
     name: "credential",
   };
   if (keyCredential || tokenCredential) {
-    if (isAzurePackage({ options: dpgContext.rlcOptions })) {
-      // Support DefaultAzureCredential for Azure packages
-      return {
-        ...defaultSetting,
-        value: `new ${resolveReference(AzureIdentityDependencies.DefaultAzureCredential)}()`,
-      };
-    } else if (keyCredential) {
-      // Support ApiKeyCredential for non-Azure packages
-      return {
-        ...defaultSetting,
-        value: `{ key: "INPUT_YOUR_KEY_HERE" }`,
-      };
-    } else if (tokenCredential) {
-      // Support TokenCredential for non-Azure packages
-      return {
-        ...defaultSetting,
-        value: `{ getToken: async () => {
-          return { token: "INPUT_YOUR_TOKEN_HERE", expiresOnTimestamp: now() }; } }`,
-      };
-    }
+    // Support DefaultAzureCredential for Azure packages
+    return {
+      ...defaultSetting,
+      value: `new ${resolveReference(AzureIdentityDependencies.DefaultAzureCredential)}()`,
+    };
   }
   return undefined;
 }
