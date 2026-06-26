@@ -26,6 +26,11 @@ ignorePaths:
   - "*.lock.yml"
   # temp ignore typespec-ts while repo move is inflight
   - packages/typespec-ts/**
+  # typespec-java specs, hand-written tests and patches are synced verbatim from
+  # core / autorest.java; don't spell-check upstream-sourced content.
+  - packages/typespec-java/emitter-tests/tsp/**
+  - packages/typespec-java/emitter-tests/src/**
+  - packages/typespec-java/eng/sdk/patches/**
 useGitignore: true
 enableFiletypes:
   - tsp
@@ -105,6 +110,7 @@ words:
   - azkeys
   - azsecrets
   - byval
+  - devcenter
   - petstoreopgrp
   - pypi
   - Tsps
