@@ -23,7 +23,6 @@ import {
   CreateRecorderHelpers,
   MultipartHelpers,
   PagingHelpers,
-  PlatformTypeHelpers,
   PollingHelpers,
   SerializationHelpers,
   SimplePollerHelpers,
@@ -75,7 +74,7 @@ import {
 import { Project } from "ts-morph";
 import { provideBinder } from "./framework/hooks/binder.js";
 import { provideSdkTypes } from "./framework/hooks/sdk-types.js";
-import { loadStaticHelpers } from "./framework/load-static-helpers.js";
+import { loadStaticHelpers, type StaticHelpers } from "./framework/load-static-helpers.js";
 import { EmitterOptions } from "./lib.js";
 import { buildClassicalClient } from "./modular/build-classical-client.js";
 import { buildClassicOperationFiles } from "./modular/build-classical-operation-groups.js";
@@ -148,12 +147,11 @@ export async function $onEmit(context: EmitContext) {
       ...SimplePollerHelpers,
       ...UrlTemplateHelpers,
       ...MultipartHelpers,
-      ...PlatformTypeHelpers,
       ...CloudSettingHelpers,
       ...XmlHelpers,
       ...(rlcOptions.generateTest ? CreateRecorderHelpers : {}),
       ...(rlcOptions.enableStorageCompat ? StorageCompatHelpers : {}),
-    },
+    } as unknown as StaticHelpers,
     {
       sourcesDir: dpgContext.generationPathDetail?.modularSourcesDir,
       rootDir: dpgContext.generationPathDetail?.rootDir,
@@ -173,8 +171,7 @@ export async function $onEmit(context: EmitContext) {
     staticHelpers,
     dependencies: {
       ...extraDependencies,
-    },
-    useSubpathImports: true,
+    }
   });
   provideSdkTypes(dpgContext);
 
