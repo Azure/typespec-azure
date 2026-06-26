@@ -166,8 +166,8 @@ export async function $onEmit(context: EmitContext) {
   // 2. Clear samples-dev folder if generateSample is true
   await clearSamplesDevFolder();
 
-  // 3. Generate modular sources
-  await generateModularSources();
+  // 3. Generate sources
+  await generateSources();
 
   // 4. Generate metadata and test files
   function getTypespecTsVersion(context: EmitContext): string | undefined {
@@ -243,21 +243,21 @@ export async function $onEmit(context: EmitContext) {
     return models;
   }
 
-  async function generateModularSources() {
-    const modularSourcesRoot = dpgContext.generationPathDetail?.sourcesDir ?? "src";
+  async function generateSources() {
+    const sourcesRoot = dpgContext.generationPathDetail?.sourcesDir ?? "src";
     const project = useContext("outputProject");
-    modularEmitterOptions = transformModularEmitterOptions(dpgContext, modularSourcesRoot, {
+    modularEmitterOptions = transformModularEmitterOptions(dpgContext, sourcesRoot, {
       casing: "camel",
     });
 
-    emitLoggerFile(modularEmitterOptions, modularSourcesRoot);
+    emitLoggerFile(modularEmitterOptions, sourcesRoot);
 
-    const rootIndexFile = project.createSourceFile(`${modularSourcesRoot}/index.ts`, "", {
+    const rootIndexFile = project.createSourceFile(`${sourcesRoot}/index.ts`, "", {
       overwrite: true,
     });
 
-    emitTypes(dpgContext, { sourceRoot: modularSourcesRoot });
-    emitNonModelResponseTypes(dpgContext, { sourceRoot: modularSourcesRoot });
+    emitTypes(dpgContext, { sourceRoot: sourcesRoot });
+    emitNonModelResponseTypes(dpgContext, { sourceRoot: sourcesRoot });
     buildSubpathIndexFile(modularEmitterOptions, "models", undefined, {
       recursive: true,
     });
@@ -307,7 +307,7 @@ export async function $onEmit(context: EmitContext) {
       }
     }
 
-    binder.resolveAllReferences(modularSourcesRoot, dpgContext.generationPathDetail?.rootDir);
+    binder.resolveAllReferences(sourcesRoot, dpgContext.generationPathDetail?.rootDir);
     if (program.compilerOptions.noEmit || program.hasError()) {
       return;
     }
@@ -496,8 +496,8 @@ export async function $onEmit(context: EmitContext) {
         }),
       };
 
-      // Always update package.json (adds #platform/* imports) and, for modular
-      // packages, exports, clientContextPaths and LRO deps.
+      // Always update package.json (adds #platform/* imports) along with
+      // exports, clientContextPaths and LRO deps.
       {
         // Read package.json content via host and pass parsed object
         const pkgSourceFile = await host.readFile(existingPackageFilePath);
