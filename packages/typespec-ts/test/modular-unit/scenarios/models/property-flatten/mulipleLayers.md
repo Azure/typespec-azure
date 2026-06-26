@@ -55,6 +55,19 @@ export interface NestedFlattenModel {
   properties: ChildModel;
 }
 
+/** model interface ChildFlattenModel */
+export interface ChildFlattenModel {
+  summary: string;
+  description: string;
+  age: number;
+}
+
+/** model interface ChildModel */
+export interface ChildModel {
+  description: string;
+  age: number;
+}
+
 export function nestedFlattenModelSerializer(item: NestedFlattenModel): any {
   return { name: item["name"], properties: _nestedFlattenModelPropertiesSerializer(item) };
 }
@@ -64,13 +77,6 @@ export function nestedFlattenModelDeserializer(item: any): NestedFlattenModel {
     name: item["name"],
     ..._nestedFlattenModelPropertiesDeserializer(item["properties"]),
   };
-}
-
-/** model interface ChildFlattenModel */
-export interface ChildFlattenModel {
-  summary: string;
-  description: string;
-  age: number;
 }
 
 export function childFlattenModelSerializer(item: ChildFlattenModel): any {
@@ -84,12 +90,6 @@ export function childFlattenModelDeserializer(item: any): ChildFlattenModel {
   };
 }
 
-/** model interface ChildModel */
-export interface ChildModel {
-  description: string;
-  age: number;
-}
-
 export function childModelSerializer(item: ChildModel): any {
   return { description: item["description"], age: item["age"] };
 }
@@ -99,12 +99,6 @@ export function childModelDeserializer(item: any): ChildModel {
     description: item["description"],
     age: item["age"],
   };
-}
-
-/** Known values of {@link Versions} that the service accepts. */
-export enum KnownVersions {
-  /** 2022-05-15-preview */
-  V20220515Preview = "2022-05-15-preview",
 }
 
 export function _childFlattenModelPropertiesSerializer(item: ChildFlattenModel): any {
@@ -127,6 +121,12 @@ export function _nestedFlattenModelPropertiesDeserializer(item: any) {
     summary: item["summary"],
     properties: childModelDeserializer(item["properties"]),
   };
+}
+
+/** Known values of {@link Versions} that the service accepts. */
+export enum KnownVersions {
+  /** 2022-05-15-preview */
+  V20220515Preview = "2022-05-15-preview",
 }
 ```
 
@@ -189,6 +189,24 @@ export interface NestedFlattenModel {
   foo: Foo;
 }
 
+/** model interface ChildFlattenModel */
+export interface ChildFlattenModel {
+  summary: string;
+  foo: Foo;
+}
+
+/** model interface Foo */
+export interface Foo {
+  description: string;
+  age: number;
+}
+
+/** model interface ChildModel */
+export interface ChildModel {
+  description: string;
+  age: number;
+}
+
 export function nestedFlattenModelSerializer(item: NestedFlattenModel): any {
   return { name: item["name"], properties: _nestedFlattenModelPropertiesSerializer(item) };
 }
@@ -198,12 +216,6 @@ export function nestedFlattenModelDeserializer(item: any): NestedFlattenModel {
     name: item["name"],
     ..._nestedFlattenModelPropertiesDeserializer(item["properties"]),
   };
-}
-
-/** model interface ChildFlattenModel */
-export interface ChildFlattenModel {
-  summary: string;
-  foo: Foo;
 }
 
 export function childFlattenModelSerializer(item: ChildFlattenModel): any {
@@ -217,12 +229,6 @@ export function childFlattenModelDeserializer(item: any): ChildFlattenModel {
   };
 }
 
-/** model interface Foo */
-export interface Foo {
-  description: string;
-  age: number;
-}
-
 export function fooSerializer(item: Foo): any {
   return { properties: _fooPropertiesSerializer(item) };
 }
@@ -231,12 +237,6 @@ export function fooDeserializer(item: any): Foo {
   return {
     ..._fooPropertiesDeserializer(item["properties"]),
   };
-}
-
-/** model interface ChildModel */
-export interface ChildModel {
-  description: string;
-  age: number;
 }
 
 export function childModelSerializer(item: ChildModel): any {
@@ -248,12 +248,6 @@ export function childModelDeserializer(item: any): ChildModel {
     description: item["description"],
     age: item["age"],
   };
-}
-
-/** Known values of {@link Versions} that the service accepts. */
-export enum KnownVersions {
-  /** 2022-05-15-preview */
-  V20220515Preview = "2022-05-15-preview",
 }
 
 export function _fooPropertiesSerializer(item: Foo): any {
@@ -276,5 +270,11 @@ export function _nestedFlattenModelPropertiesDeserializer(item: any) {
     summary: item["summary"],
     foo: fooDeserializer(item["foo"]),
   };
+}
+
+/** Known values of {@link Versions} that the service accepts. */
+export enum KnownVersions {
+  /** 2022-05-15-preview */
+  V20220515Preview = "2022-05-15-preview",
 }
 ```

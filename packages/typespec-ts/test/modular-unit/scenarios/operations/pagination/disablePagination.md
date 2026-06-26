@@ -59,6 +59,11 @@ export interface ListTestResult {
   next: string;
 }
 
+/** model interface Test */
+export interface Test {
+  id: string;
+}
+
 export function listTestResultDeserializer(item: any): ListTestResult {
   return {
     tests: testArrayDeserializer(item["tests"]),
@@ -70,11 +75,6 @@ export function testArrayDeserializer(result: Array<Test>): any[] {
   return result.map((item) => {
     return testDeserializer(item);
   });
-}
-
-/** model interface Test */
-export interface Test {
-  id: string;
 }
 
 export function testDeserializer(item: any): Test {

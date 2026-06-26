@@ -238,17 +238,16 @@ withRawContent: true
  */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+export function schemaContentTypeValuesSerializer(item: SchemaContentTypeValues): any {
+  return item;
+}
+
 /** Alias for SchemaContentTypeValues */
 export type SchemaContentTypeValues =
   | JsonContentType
   | "text/plain; charset=utf-8"
   | "text/vnd.ms.protobuf"
   | string;
-
-export function schemaContentTypeValuesSerializer(item: SchemaContentTypeValues): any {
-  return item;
-}
-
 /** Type of JsonContentType */
 export type JsonContentType =
   | "application/json; serialization=Avro"
@@ -302,17 +301,16 @@ withRawContent: true
  */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+export function schemaContentTypeValuesSerializer(item: SchemaContentTypeValues): any {
+  return item;
+}
+
 /** Alias for SchemaContentTypeValues */
 export type SchemaContentTypeValues =
   | JsonContentType
   | "text/plain; charset=utf-8"
   | "text/vnd.ms.protobuf"
   | string;
-
-export function schemaContentTypeValuesSerializer(item: SchemaContentTypeValues): any {
-  return item;
-}
-
 /** Type of JsonContentType */
 export type JsonContentType =
   | "application/json; serialization=Avro"
@@ -411,17 +409,16 @@ withRawContent: true
  */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+export function schemaContentTypeValuesSerializer(item: SchemaContentTypeValues): any {
+  return item;
+}
+
 /** Alias for SchemaContentTypeValues */
 export type SchemaContentTypeValues =
   | JsonContentType
   | "text/plain; charset=utf-8"
   | "text/vnd.ms.protobuf"
   | string;
-
-export function schemaContentTypeValuesSerializer(item: SchemaContentTypeValues): any {
-  return item;
-}
-
 /** Type of JsonContentType */
 export type JsonContentType =
   | "application/json; serialization=Avro"
@@ -475,17 +472,16 @@ withRawContent: true
  */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+export function schemaContentTypeValuesSerializer(item: SchemaContentTypeValues): any {
+  return item;
+}
+
 /** Alias for SchemaContentTypeValues */
 export type SchemaContentTypeValues =
   | JsonContentType
   | "text/plain; charset=utf-8"
   | "text/vnd.ms.protobuf"
   | string;
-
-export function schemaContentTypeValuesSerializer(item: SchemaContentTypeValues): any {
-  return item;
-}
-
 /** Type of JsonContentType */
 export type JsonContentType =
   | "application/json; serialization=Avro"
@@ -868,13 +864,12 @@ export function fooSerializer(_item: Foo): any {
   return {};
 }
 
-/** Alias for MixedTypes */
-export type MixedTypes = EnumTest | string | Foo;
-
 export function mixedTypesSerializer(item: MixedTypes): any {
   return item;
 }
 
+/** Alias for MixedTypes */
+export type MixedTypes = EnumTest | string | Foo;
 /** Type of EnumTest */
 export type EnumTest = 1 | 2 | 3 | 4;
 ```

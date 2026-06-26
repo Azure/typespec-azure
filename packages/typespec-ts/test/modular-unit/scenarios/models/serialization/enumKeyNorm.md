@@ -142,9 +142,6 @@ export enum KnownExtensibleString {
   "Item-1.0" = "-2.0",
 }
 
-/** Type of ExtensibleString */
-export type ExtensibleString = string;
-
 /** Known values of {@link ExtensibleNumber} that the service accepts. */
 export enum KnownExtensibleNumber {
   /** 1 */
@@ -157,9 +154,6 @@ export enum KnownExtensibleNumber {
   ExtensibleNumber3 = 3,
 }
 
-/** Type of ExtensibleNumber */
-export type ExtensibleNumber = number;
-
 /** Known values of {@link Versions} that the service accepts. */
 export enum KnownVersions {
   /** 2024-07-01-preview */
@@ -169,4 +163,9 @@ export enum KnownVersions {
   /** 2024-08-01-preview */
   V20240801Preview = "2024-08-01-preview",
 }
+
+/** Type of ExtensibleString */
+export type ExtensibleString = string;
+/** Type of ExtensibleNumber */
+export type ExtensibleNumber = number;
 ```

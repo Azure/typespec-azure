@@ -77,19 +77,6 @@ export interface _OperationListResult {
   nextLink?: string;
 }
 
-export function _operationListResultDeserializer(item: any): _OperationListResult {
-  return {
-    value: operationArrayDeserializer(item["value"]),
-    nextLink: item["nextLink"],
-  };
-}
-
-export function operationArrayDeserializer(result: Array<Operation>): any[] {
-  return result.map((item) => {
-    return operationDeserializer(item);
-  });
-}
-
 /** Details of a REST API operation, returned from the Resource Provider Operations API */
 export interface Operation {
   /** The name of the operation, as per Resource-Based Access Control (RBAC). Examples: "Microsoft.Compute/virtualMachines/write", "Microsoft.Compute/virtualMachines/capture/action" */
@@ -104,16 +91,6 @@ export interface Operation {
   readonly actionType?: ActionType;
 }
 
-export function operationDeserializer(item: any): Operation {
-  return {
-    name: item["name"],
-    isDataAction: item["isDataAction"],
-    display: !item["display"] ? item["display"] : operationDisplayDeserializer(item["display"]),
-    origin: item["origin"],
-    actionType: item["actionType"],
-  };
-}
-
 /** Localized display information for an operation. */
 export interface OperationDisplay {
   /** The localized friendly form of the resource provider name, e.g. "Microsoft Monitoring Insights" or "Microsoft Compute". */
@@ -126,30 +103,10 @@ export interface OperationDisplay {
   readonly description?: string;
 }
 
-export function operationDisplayDeserializer(item: any): OperationDisplay {
-  return {
-    provider: item["provider"],
-    resource: item["resource"],
-    operation: item["operation"],
-    description: item["description"],
-  };
-}
-
-/** The intended executor of the operation; as in Resource Based Access Control (RBAC) and audit logs UX. Default value is "user,system" */
-export type Origin = "user" | "system" | "user,system";
-/** Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs. */
-export type ActionType = "Internal";
-
 /** Common error response for all Azure Resource Manager APIs to return error details for failed operations. */
 export interface ErrorResponse {
   /** The error object. */
   error?: ErrorDetail;
-}
-
-export function errorResponseDeserializer(item: any): ErrorResponse {
-  return {
-    error: !item["error"] ? item["error"] : errorDetailDeserializer(item["error"]),
-  };
 }
 
 /** The error detail. */
@@ -164,6 +121,101 @@ export interface ErrorDetail {
   readonly details?: ErrorDetail[];
   /** The error additional info. */
   readonly additionalInfo?: ErrorAdditionalInfo[];
+}
+
+/** The resource management error additional info. */
+export interface ErrorAdditionalInfo {
+  /** The additional info type. */
+  readonly type?: string;
+  /** The additional info. */
+  readonly info?: any;
+}
+
+/** Concrete proxy resource types can be created by aliasing this type using a specific property type. */
+export interface AvsSummary extends ProxyResource {
+  /** The resource-specific properties for this resource. */
+  properties?: AvsSummaryProperties;
+}
+
+/** model interface AvsSummaryProperties */
+export interface AvsSummaryProperties {
+  error: ErrorDetail_1;
+}
+
+/** model interface ErrorDetail */
+export interface ErrorDetail_1 {
+  code: string;
+  message: string;
+  details?: string;
+}
+
+/** The resource model definition for a Azure Resource Manager proxy resource. It will not have tags and a location */
+export interface ProxyResource extends Resource {}
+
+/** Common fields that are returned in the response for all Azure Resource Manager resources */
+export interface Resource {
+  /** Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName} */
+  readonly id?: string;
+  /** The name of the resource */
+  readonly name?: string;
+  /** The type of the resource. E.g. "Microsoft.Compute/virtualMachines" or "Microsoft.Storage/storageAccounts" */
+  readonly type?: string;
+  /** Azure Resource Manager metadata containing createdBy and modifiedBy information. */
+  readonly systemData?: SystemData;
+}
+
+/** Metadata pertaining to creation and last modification of the resource. */
+export interface SystemData {
+  /** The identity that created the resource. */
+  createdBy?: string;
+  /** The type of identity that created the resource. */
+  createdByType?: CreatedByType;
+  /** The timestamp of resource creation (UTC). */
+  createdAt?: Date;
+  /** The identity that last modified the resource. */
+  lastModifiedBy?: string;
+  /** The type of identity that last modified the resource. */
+  lastModifiedByType?: CreatedByType;
+  /** The timestamp of resource last modification (UTC) */
+  lastModifiedAt?: Date;
+}
+
+export function _operationListResultDeserializer(item: any): _OperationListResult {
+  return {
+    value: operationArrayDeserializer(item["value"]),
+    nextLink: item["nextLink"],
+  };
+}
+
+export function operationArrayDeserializer(result: Array<Operation>): any[] {
+  return result.map((item) => {
+    return operationDeserializer(item);
+  });
+}
+
+export function operationDeserializer(item: any): Operation {
+  return {
+    name: item["name"],
+    isDataAction: item["isDataAction"],
+    display: !item["display"] ? item["display"] : operationDisplayDeserializer(item["display"]),
+    origin: item["origin"],
+    actionType: item["actionType"],
+  };
+}
+
+export function operationDisplayDeserializer(item: any): OperationDisplay {
+  return {
+    provider: item["provider"],
+    resource: item["resource"],
+    operation: item["operation"],
+    description: item["description"],
+  };
+}
+
+export function errorResponseDeserializer(item: any): ErrorResponse {
+  return {
+    error: !item["error"] ? item["error"] : errorDetailDeserializer(item["error"]),
+  };
 }
 
 export function errorDetailDeserializer(item: any): ErrorDetail {
@@ -190,25 +242,11 @@ export function errorAdditionalInfoArrayDeserializer(result: Array<ErrorAddition
   });
 }
 
-/** The resource management error additional info. */
-export interface ErrorAdditionalInfo {
-  /** The additional info type. */
-  readonly type?: string;
-  /** The additional info. */
-  readonly info?: any;
-}
-
 export function errorAdditionalInfoDeserializer(item: any): ErrorAdditionalInfo {
   return {
     type: item["type"],
     info: item["info"],
   };
-}
-
-/** Concrete proxy resource types can be created by aliasing this type using a specific property type. */
-export interface AvsSummary extends ProxyResource {
-  /** The resource-specific properties for this resource. */
-  properties?: AvsSummaryProperties;
 }
 
 export function avsSummarySerializer(item: AvsSummary): any {
@@ -233,11 +271,6 @@ export function avsSummaryDeserializer(item: any): AvsSummary {
   };
 }
 
-/** model interface AvsSummaryProperties */
-export interface AvsSummaryProperties {
-  error: ErrorDetail_1;
-}
-
 export function avsSummaryPropertiesSerializer(item: AvsSummaryProperties): any {
   return { error: errorDetailSerializer(item["error"]) };
 }
@@ -246,13 +279,6 @@ export function avsSummaryPropertiesDeserializer(item: any): AvsSummaryPropertie
   return {
     error: errorDetailDeserializer_1(item["error"]),
   };
-}
-
-/** model interface ErrorDetail */
-export interface ErrorDetail_1 {
-  code: string;
-  message: string;
-  details?: string;
 }
 
 export function errorDetailSerializer(item: ErrorDetail_1): any {
@@ -267,9 +293,6 @@ export function errorDetailDeserializer_1(item: any): ErrorDetail_1 {
   };
 }
 
-/** The resource model definition for a Azure Resource Manager proxy resource. It will not have tags and a location */
-export interface ProxyResource extends Resource {}
-
 export function proxyResourceSerializer(_item: ProxyResource): any {
   return {};
 }
@@ -283,18 +306,6 @@ export function proxyResourceDeserializer(item: any): ProxyResource {
       ? item["systemData"]
       : systemDataDeserializer(item["systemData"]),
   };
-}
-
-/** Common fields that are returned in the response for all Azure Resource Manager resources */
-export interface Resource {
-  /** Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName} */
-  readonly id?: string;
-  /** The name of the resource */
-  readonly name?: string;
-  /** The type of the resource. E.g. "Microsoft.Compute/virtualMachines" or "Microsoft.Storage/storageAccounts" */
-  readonly type?: string;
-  /** Azure Resource Manager metadata containing createdBy and modifiedBy information. */
-  readonly systemData?: SystemData;
 }
 
 export function resourceSerializer(_item: Resource): any {
@@ -312,22 +323,6 @@ export function resourceDeserializer(item: any): Resource {
   };
 }
 
-/** Metadata pertaining to creation and last modification of the resource. */
-export interface SystemData {
-  /** The identity that created the resource. */
-  createdBy?: string;
-  /** The type of identity that created the resource. */
-  createdByType?: CreatedByType;
-  /** The timestamp of resource creation (UTC). */
-  createdAt?: Date;
-  /** The identity that last modified the resource. */
-  lastModifiedBy?: string;
-  /** The type of identity that last modified the resource. */
-  lastModifiedByType?: CreatedByType;
-  /** The timestamp of resource last modification (UTC) */
-  lastModifiedAt?: Date;
-}
-
 export function systemDataDeserializer(item: any): SystemData {
   return {
     createdBy: item["createdBy"],
@@ -341,14 +336,18 @@ export function systemDataDeserializer(item: any): SystemData {
   };
 }
 
-/** The kind of entity that created the resource. */
-export type CreatedByType = "User" | "Application" | "ManagedIdentity" | "Key";
-
 /** The available API versions. */
 export enum KnownVersions {
   /** 2021-10-01-preview version */
   V20211001Preview = "2021-10-01-preview",
 }
+
+/** The intended executor of the operation; as in Resource Based Access Control (RBAC) and audit logs UX. Default value is "user,system" */
+export type Origin = "user" | "system" | "user,system";
+/** Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs. */
+export type ActionType = "Internal";
+/** The kind of entity that created the resource. */
+export type CreatedByType = "User" | "Application" | "ManagedIdentity" | "Key";
 ```
 
 ## Operations
