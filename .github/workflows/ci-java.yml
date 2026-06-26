@@ -34,18 +34,56 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      # Build the unbranded peer packages (typespec-autorest, tcgc, etc.) that
-      # the emitter compiles against.
+      # Build the peer packages (typespec-autorest, tcgc, etc.) the emitter
+      # compiles against.
       - name: Build dependencies
         run: pnpm turbo run --filter "@azure-tools/typespec-java^..." build
 
-      # Build emitter.jar from core, copy emitter sources, tsc build and pack.
-      # Mirrors autorest.java's Build-TypeSpec.ps1 (without the customization patch).
-      - name: Build (jar + emitter + pack)
+      # Apply the Azure customization patch, build emitter.jar from the core
+      # generator, copy emitter sources and tsc build. Mirrors autorest.java's
+      # Build-TypeSpec.ps1.
+      - name: Build (jar + emitter)
         shell: pwsh
         run: ./Build-TypeSpec.ps1
-        working-directory: packages/typespec-java
+        working-directory: packages/typespec-java/emitter
 
-      - name: Test
+      - name: Test (emitter unit tests)
         run: pnpm run test
-        working-directory: packages/typespec-java
+        working-directory: packages/typespec-java/emitter
+
+  e2e:
+    name: "Regen & Spector Tests"
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - uses: ./.github/actions/setup
+
+      - uses: ./.github/actions/setup-java
+
+      - name: Install dependencies
+        run: pnpm install
+
+      # The emitter compiles against these peer packages; Generate.ps1 -> Setup.ps1
+      # -> Build-TypeSpec.ps1 runs `pnpm build` for the emitter, which needs them
+      # already built.
+      - name: Build dependencies
+        run: pnpm turbo run --filter "@azure-tools/typespec-java^..." build
+
+      # emitter-tests is a standalone npm+Maven project (not in the pnpm
+      # workspace). Generate.ps1 calls Setup.ps1 (builds the emitter + Azure jar,
+      # npm install) and regenerates the SDK from the spector specs into the
+      # gitignored src/main/java. Spector-Tests.ps1 then runs the JUnit tests
+      # against the Spector mock server.
+      - name: Regenerate
+        shell: pwsh
+        run: ./Generate.ps1
+        working-directory: packages/typespec-java/emitter-tests
+
+      - name: Spector tests
+        shell: pwsh
+        run: ./Spector-Tests.ps1
+        working-directory: packages/typespec-java/emitter-tests
