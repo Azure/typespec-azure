@@ -46,6 +46,14 @@ function formatPercent(pct: number): string {
   return `${sign}${pct.toFixed(1)}%`;
 }
 
+function formatRef(value: string): string {
+  // Commit hashes are shortened for readability while descriptive labels are kept intact.
+  if (/^[a-f0-9]{7,40}$/i.test(value)) {
+    return value.slice(0, 7);
+  }
+  return value;
+}
+
 // ── Metric flattening helpers ──────────────────────────────────────────────
 
 interface FlatMetric {
@@ -192,7 +200,7 @@ export function formatPrComment(
   const specNames = comparisons.map((c) => c.specName).join(", ");
   lines.push("<details>");
   lines.push(
-    `<summary>Full details – comparing <code>${currentCommit.slice(0, 7)}</code> vs baseline <code>${baselineCommit.slice(0, 7)}</code></summary>\n`,
+    `<summary>Full details – comparing <code>${formatRef(currentCommit)}</code> vs baseline <code>${formatRef(baselineCommit)}</code></summary>\n`,
   );
   lines.push("| Metric | Baseline | Current | Change |");
   lines.push("|--------|----------|---------|--------|");
@@ -273,7 +281,7 @@ export function formatConsoleSummary(
 export function formatRunSummary(result: BenchmarkResult): string {
   const lines: string[] = [];
   lines.push("## ⚡ Benchmark Results\n");
-  lines.push(`**Commit:** \`${result.commit.slice(0, 7)}\`  `);
+  lines.push(`**Commit:** \`${formatRef(result.commit)}\`  `);
   lines.push(`**Date:** ${result.timestamp}  `);
   lines.push(
     `**Runner:** ${result.runner.os}, Node ${result.runner.nodeVersion}, ${result.runner.arch}\n`,
@@ -300,6 +308,23 @@ export function formatRunSummary(result: BenchmarkResult): string {
 
   lines.push("");
   lines.push(`> Averaged across ${specs.length} specs (${specNames.join(", ")}).`);
+  const specVariability = Object.entries(result.specs)
+    .map(([specName, spec]) => ({
+      specName,
+      variability: spec.variability?.total,
+    }))
+    .filter((x) => x.variability !== undefined)
+    .sort((a, b) => (b.variability?.cv ?? 0) - (a.variability?.cv ?? 0));
+
+  if (specVariability.length > 0) {
+    lines.push("> Total runtime variability (CV) per spec:");
+    for (const entry of specVariability) {
+      const variability = entry.variability!;
+      lines.push(
+        `> - ${entry.specName}: ${(variability.cv * 100).toFixed(1)}% (n=${variability.sampleCount}, σ=${formatMs(variability.stdDev)})`,
+      );
+    }
+  }
   lines.push(LEGEND);
 
   return lines.join("\n");
@@ -315,7 +340,7 @@ export function formatComparisonSummary(
   const lines: string[] = [];
   lines.push("## ⚡ Benchmark Comparison\n");
   lines.push(
-    `Comparing [\`${currentCommit.slice(0, 7)}\`] against baseline [\`${baselineCommit.slice(0, 7)}\`]\n`,
+    `Comparing [\`${formatRef(currentCommit)}\`] against baseline [\`${formatRef(baselineCommit)}\`]\n`,
   );
 
   const averaged = averageComparisonMetrics(comparisons);
