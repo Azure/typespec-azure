@@ -1,6 +1,6 @@
 # @azure-tools/typespec-ts
 
-An experimental TypeSpec emitter for TypeScript RLC
+An experimental TypeSpec emitter for TypeScript
 
 ## Install
 
