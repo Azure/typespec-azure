@@ -17,6 +17,7 @@ import { useContext } from "../../src/context-manager.js";
 import { useBinder } from "../../src/framework/hooks/binder.js";
 import { renameClientName } from "../../src/index.js";
 import { buildClassicalClient } from "../../src/modular/build-classical-client.js";
+import { buildClassicOperationFiles } from "../../src/modular/build-classical-operation-groups.js";
 import { buildClientContext } from "../../src/modular/build-client-context.js";
 import { transformModularEmitterOptions } from "../../src/modular/build-modular-options.js";
 import { buildOperationFiles } from "../../src/modular/build-operations.js";
@@ -285,6 +286,7 @@ export async function emitModularClientFromTypeSpec(
   const includeResponseHeaders = options["include-headers-in-response"] === true;
   dpgContext.rlcOptions!.includeHeadersInResponse = includeResponseHeaders;
   dpgContext.rlcOptions!.typespecTitleMap = options["typespec-title-map"];
+  dpgContext.rlcOptions!.hierarchyClient = options["hierarchy-client"] ?? true;
   const modularEmitterOptions = transformModularEmitterOptions(dpgContext, "", {
     casing: "camel",
   });
@@ -298,6 +300,7 @@ export async function emitModularClientFromTypeSpec(
     const clientMap = Array.from(getClientHierarchyMap(dpgContext));
     buildApiOptions(dpgContext, clientMap[0]!, modularEmitterOptions);
     buildOperationFiles(dpgContext, clientMap[0]!, modularEmitterOptions);
+    buildClassicOperationFiles(dpgContext, clientMap[0]!, modularEmitterOptions);
     const res = buildClassicalClient(dpgContext, clientMap[0]!, modularEmitterOptions);
     binder.resolveAllReferences("/");
     return res;
