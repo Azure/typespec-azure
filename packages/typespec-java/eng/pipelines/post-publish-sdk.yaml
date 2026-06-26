@@ -6,6 +6,16 @@
 # (just published, or dev-built) @azure-tools/typespec-java emitter, then opens a
 # draft PR in azure-sdk-for-java with the result.
 #
+# Governance note: unlike the other typespec-azure pipelines, this one does NOT
+# extend /eng/pipelines/templates/1es-redirect.yml. It mirrors autorest.java's
+# plain-pipeline structure on purpose: the 1ES template injects an
+# SDLSourceAnalysisJob that requires every checked-out repo to be declared under
+# sdl.sourceRepositoriesToScan (https://aka.ms/1espt/multi-repo-sdl), and that
+# block lives only in the shared 1es-redirect.yml. Since this is a manual,
+# non-publishing utility that just opens a draft PR in another repo, a plain
+# pipeline avoids that coupling. If the ADO project enforces 1ES on internal
+# pipelines, switch to extending 1es-redirect.yml and declare the SDL exclusion.
+#
 # Invocation: there is no automatic trigger (trigger: none / pr: none). Run it
 # manually from the Azure DevOps "Run pipeline" UI (or via the ADO REST API)
 # after a typespec-java release. Choose the `DevPackage` runtime parameter at
@@ -45,95 +55,92 @@ resources:
       endpoint: azure
       ref: main
 
-extends:
-  template: /eng/pipelines/templates/1es-redirect.yml
-  parameters:
-    stages:
-      - stage: Generate_SDK
-        variables:
-          # With more than one repository checked out, `self` lands in a
-          # subfolder named after the repo.
-          - name: SelfRoot
-            value: $(Build.SourcesDirectory)/typespec-azure
-          - name: PackageRoot
-            value: $(Build.SourcesDirectory)/typespec-azure/packages/typespec-java/emitter
-          - name: PackageJsonPath
-            value: $(Build.SourcesDirectory)/typespec-azure/packages/typespec-java/emitter/package.json
-          - name: PullRequestTitleSuffix
-            ${{ if eq(parameters.DevPackage, 'true') }}:
-              value: " DEV"
-            ${{ else }}:
-              value: ""
+variables:
+  # Provides LINUXPOOL / LINUXVMIMAGE (normally injected by 1es-redirect.yml).
+  - template: /eng/pipelines/templates/variables/image.yml
+  # With more than one repository checked out, `self` lands in a subfolder
+  # named after the repo.
+  - name: SelfRoot
+    value: $(Build.SourcesDirectory)/typespec-azure
+  - name: PackageRoot
+    value: $(Build.SourcesDirectory)/typespec-azure/packages/typespec-java/emitter
+  - name: PackageJsonPath
+    value: $(Build.SourcesDirectory)/typespec-azure/packages/typespec-java/emitter/package.json
+  - name: PullRequestTitleSuffix
+    ${{ if eq(parameters.DevPackage, 'true') }}:
+      value: " DEV"
+    ${{ else }}:
+      value: ""
 
-        jobs:
-          - job: Generate_SDK
-            timeoutInMinutes: 120
+jobs:
+  - job: Generate_SDK
+    timeoutInMinutes: 120
 
-            pool:
-              name: $(LINUXPOOL)
-              image: $(LINUXVMIMAGE)
-              os: linux
+    pool:
+      name: $(LINUXPOOL)
+      image: $(LINUXVMIMAGE)
+      os: linux
 
-            steps:
-              - checkout: self
-                submodules: true
+    steps:
+      - checkout: self
+        submodules: true
 
-              - checkout: azure-sdk-for-java
+      - checkout: azure-sdk-for-java
 
-              - task: NodeTool@0
-                displayName: "Install Node.js"
-                inputs:
-                  versionSpec: "24.x"
-                retryCountOnTaskFailure: 3
+      - task: NodeTool@0
+        displayName: "Install Node.js"
+        inputs:
+          versionSpec: "24.x"
+        retryCountOnTaskFailure: 3
 
-              # pnpm + a workspace install are only needed to build the dev
-              # emitter; the published-package path uses tsp-client directly.
-              - script: npm install -g pnpm
-                condition: and(succeeded(), eq('${{ parameters.DevPackage }}', 'true'))
-                displayName: "Install pnpm (dev)"
+      # pnpm + a workspace install are only needed to build the dev emitter;
+      # the published-package path uses tsp-client directly.
+      - script: npm install -g pnpm
+        condition: and(succeeded(), eq('${{ parameters.DevPackage }}', 'true'))
+        displayName: "Install pnpm (dev)"
 
-              - script: pnpm install
-                condition: and(succeeded(), eq('${{ parameters.DevPackage }}', 'true'))
-                displayName: "Install workspace dependencies (dev)"
-                workingDirectory: $(SelfRoot)
+      - script: pnpm install
+        condition: and(succeeded(), eq('${{ parameters.DevPackage }}', 'true'))
+        displayName: "Install workspace dependencies (dev)"
+        workingDirectory: $(SelfRoot)
 
-              # Build the dev emitter (jar + tgz). Requires JDK 11 + Maven + the
-              # core submodule (checked out via submodules: true above).
-              - pwsh: ./Build-TypeSpec.ps1
-                condition: and(succeeded(), eq('${{ parameters.DevPackage }}', 'true'))
-                displayName: "Build dev emitter"
-                workingDirectory: $(PackageRoot)
-                env:
-                  JAVA_HOME: $(JAVA_HOME_11_X64)
+      # Build the dev emitter (jar + tgz). Requires JDK 11 + Maven + the core
+      # submodule (checked out via submodules: true above).
+      - pwsh: ./Build-TypeSpec.ps1
+        condition: and(succeeded(), eq('${{ parameters.DevPackage }}', 'true'))
+        displayName: "Build dev emitter"
+        workingDirectory: $(PackageRoot)
+        env:
+          JAVA_HOME: $(JAVA_HOME_11_X64)
 
-              - script: npm install -g @azure-tools/typespec-client-generator-cli
-                displayName: "Install tsp-client"
+      - script: npm install -g @azure-tools/typespec-client-generator-cli
+        displayName: "Install tsp-client"
 
-              - pwsh: |
-                  $PACKAGE_VERSION = node -p -e "require('$(PackageJsonPath)').version"
-                  Write-Host("##vso[task.setvariable variable=PackageVersion]$PACKAGE_VERSION")
-                displayName: "Get Package Version"
+      - pwsh: |
+          $PACKAGE_VERSION = node -p -e "require('$(PackageJsonPath)').version"
+          Write-Host("##vso[task.setvariable variable=PackageVersion]$PACKAGE_VERSION")
+        displayName: "Get Package Version"
 
-              # tsp-client runs the emitter (needs JDK 11) and the script also
-              # invokes `mvn` for code snippets, so Java/Maven must be available.
-              - script: |
-                  python3 $(SelfRoot)/packages/typespec-java/eng/sdk/sync_sdk.py \
-                    --sdk-root=$(Build.SourcesDirectory)/azure-sdk-for-java \
-                    --package-json-path=$(PackageJsonPath) \
-                    --dev-package=${{ parameters.DevPackage }}
-                displayName: "Generate SDK"
-                workingDirectory: $(SelfRoot)
-                env:
-                  JAVA_HOME: $(JAVA_HOME_11_X64)
+      # tsp-client runs the emitter (needs JDK 11) and the script also invokes
+      # `mvn` for code snippets, so Java/Maven must be available.
+      - script: |
+          python3 $(SelfRoot)/packages/typespec-java/eng/sdk/sync_sdk.py \
+            --sdk-root=$(Build.SourcesDirectory)/azure-sdk-for-java \
+            --package-json-path=$(PackageJsonPath) \
+            --dev-package=${{ parameters.DevPackage }}
+        displayName: "Generate SDK"
+        workingDirectory: $(SelfRoot)
+        env:
+          JAVA_HOME: $(JAVA_HOME_11_X64)
 
-              - template: /eng/common/pipelines/templates/steps/create-pull-request.yml@azure-sdk-for-java
-                parameters:
-                  WorkingDirectory: $(Build.SourcesDirectory)/azure-sdk-for-java
-                  ScriptDirectory: $(Build.SourcesDirectory)/azure-sdk-for-java/eng/common/scripts
-                  RepoName: azure-sdk-for-java
-                  BaseBranchName: "refs/heads/main"
-                  PRBranchName: typespec-java-generation-$(Build.BuildId)
-                  CommitMsg: "[Automation] Generate SDK based on TypeSpec $(PackageVersion)$(PullRequestTitleSuffix)"
-                  PRTitle: "[Automation] Generate SDK based on TypeSpec $(PackageVersion)$(PullRequestTitleSuffix)"
-                  PRLabels: "DPG"
-                  OpenAsDraft: "true"
+      - template: /eng/common/pipelines/templates/steps/create-pull-request.yml@azure-sdk-for-java
+        parameters:
+          WorkingDirectory: $(Build.SourcesDirectory)/azure-sdk-for-java
+          ScriptDirectory: $(Build.SourcesDirectory)/azure-sdk-for-java/eng/common/scripts
+          RepoName: azure-sdk-for-java
+          BaseBranchName: "refs/heads/main"
+          PRBranchName: typespec-java-generation-$(Build.BuildId)
+          CommitMsg: "[Automation] Generate SDK based on TypeSpec $(PackageVersion)$(PullRequestTitleSuffix)"
+          PRTitle: "[Automation] Generate SDK based on TypeSpec $(PackageVersion)$(PullRequestTitleSuffix)"
+          PRLabels: "DPG"
+          OpenAsDraft: "true"
