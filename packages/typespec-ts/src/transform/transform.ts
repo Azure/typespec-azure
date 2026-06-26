@@ -22,15 +22,15 @@ import { transformToResponseTypes } from "./transform-responses.js";
 import { transformSchemas } from "./transform-schemas.js";
 import { transformTelemetryInfo } from "./transform-telemetry-info.js";
 import { buildRuntimeImports, initInternalImports } from "../utils/imports-util.js";
-import { Imports, OperationParameter, OperationResponse, PathParameter, Paths, RLCModel, RLCOptions, Schema, SchemaContext, UrlInfo } from "../interfaces.js";
+import { Imports, OperationParameter, OperationResponse, PathParameter, Paths, ClientModel, ClientOptions, Schema, SchemaContext, UrlInfo } from "../interfaces.js";
 import { NameType, normalizeName } from "../utils/name-utils.js";
 
-export async function transformRLCModel(
+export async function transformClientModel(
   client: SdkClient,
   dpgContext: SdkContext,
-): Promise<RLCModel> {
+): Promise<ClientModel> {
   const program = dpgContext.program;
-  const options: RLCOptions = dpgContext.rlcOptions!;
+  const options: ClientOptions = dpgContext.rlcOptions!;
   const rlcSourceDir = dpgContext.generationPathDetail?.rlcSourcesDir;
   const srcPath = joinPaths(
     dpgContext.generationPathDetail?.rlcSourcesDir ?? "",
@@ -58,7 +58,7 @@ export async function transformRLCModel(
   helperDetails.clientLroOverload = getClientLroOverload(paths);
 
   const telemetryOptions = transformTelemetryInfo(client, dpgContext);
-  const model: RLCModel = {
+  const model: ClientModel = {
     srcPath,
     libraryName,
     paths,

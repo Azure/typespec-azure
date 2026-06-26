@@ -3,7 +3,7 @@ import {
   isApiVersion,
   SdkClient,
 } from "@azure-tools/typespec-client-generator-core";
-import { listOperationsUnderRLCClient } from "../utils/client-utils.js";
+import { listOperationsUnderClient } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import { getDefaultApiVersionString, getSchemaForType, trimUsage } from "../utils/model-utils.js";
 import { ApiVersionInfo, ApiVersionPosition, SchemaContext, UrlInfo } from "../interfaces.js";
@@ -50,7 +50,7 @@ export function getOperationApiVersion(
   const required = new Set<boolean>();
   dpgContext.hasApiVersionInClient = true;
   let hasApiVersionInOperation: boolean;
-  for (const op of listOperationsUnderRLCClient(client)) {
+  for (const op of listOperationsUnderClient(client)) {
     hasApiVersionInOperation = false;
     const route = getHttpOperationWithCache(dpgContext, op);
     // ignore overload base operation

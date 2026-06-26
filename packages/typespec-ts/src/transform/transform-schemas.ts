@@ -15,7 +15,7 @@ import {
 } from "../utils/model-utils.js";
 
 import { useContext } from "../context-manager.js";
-import { listOperationsUnderRLCClient } from "../utils/client-utils.js";
+import { listOperationsUnderClient } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import { SchemaContext } from "../interfaces.js";
 
@@ -27,7 +27,7 @@ export function transformSchemas(client: SdkClient, dpgContext: SdkContext) {
   const usageMap = new Map<Type, SchemaContext[]>();
   const requestBodySet = new Set<Type>();
   const contentTypeMap = new Map<Type, KnownMediaType[]>();
-  for (const op of listOperationsUnderRLCClient(client)) {
+  for (const op of listOperationsUnderClient(client)) {
     const route = getHttpOperationWithCache(dpgContext, op);
     // ignore overload base operation
     if (route.overloads && route.overloads?.length > 0) {

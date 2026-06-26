@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 import { Project } from "ts-morph";
-import { RLCModel } from "../interfaces.js";
+import { ClientModel } from "../interfaces.js";
 
 /**
  * Builds the root tsconfig.json.
@@ -10,7 +10,7 @@ import { RLCModel } from "../interfaces.js";
  * Emits project references pointing into the `config/` subfolder
  * (following the eng/tsconfigs pattern).
  */
-export function buildTsConfig(model: RLCModel) {
+export function buildTsConfig(model: ClientModel) {
   const { generateTest, generateSample, generateReactNativeTarget } = model.options || {};
   const project = new Project({ useInMemoryFileSystem: true });
 
@@ -123,7 +123,7 @@ export function buildTsSrcCjsConfig() {
 /**
  * Builds config/tsconfig.samples.json — extends eng/tsconfigs/samples.json
  */
-export function buildTsSampleConfig(model: RLCModel) {
+export function buildTsSampleConfig(model: ClientModel) {
   const { packageDetails } = model.options || {};
   const clientPackageName = packageDetails?.name ?? "";
   return {

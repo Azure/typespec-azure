@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { RLCModel } from "../interfaces.js";
+import { ClientModel } from "../interfaces.js";
 import { NameType, normalizeName } from "./name-utils.js";
 
 /**
@@ -76,7 +76,7 @@ export function getParameterTypeName(baseNameOrOperationGroup: string, operation
   return normalizeName(`${baseNameOrOperationGroup}_Parameters`, NameType.Interface);
 }
 
-export function getClientName(model: RLCModel) {
+export function getClientName(model: ClientModel) {
   return model.libraryName;
 }
 

@@ -1,13 +1,13 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { RLCModel } from "../interfaces.js";
+import { ClientModel } from "../interfaces.js";
 
-function getPackageVersion(model: RLCModel): string {
+function getPackageVersion(model: ClientModel): string {
   return model.options?.packageDetails?.version ?? "1.0.0-beta.1";
 }
 
-export function buildChangelogFile(model: RLCModel) {
+export function buildChangelogFile(model: ClientModel) {
   const version = getPackageVersion(model);
   const content = `# Release History
 

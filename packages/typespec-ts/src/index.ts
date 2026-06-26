@@ -62,15 +62,15 @@ import { emitTests } from "./modular/emit-tests.js";
 import { getClassicalClientName } from "./modular/helpers/naming-helpers.js";
 import { ModularEmitterOptions } from "./modular/interfaces.js";
 import { packageUsesXmlSerialization } from "./modular/serialization/build-xml-serializer-function.js";
-import { transformRLCModel } from "./transform/transform.js";
-import { transformRLCOptions } from "./transform/transfrom-rlc-options.js";
+import { transformClientModel } from "./transform/transform.js";
+import { transformClientOptions } from "./transform/transform-client-options.js";
 import {
   getClientHierarchyMap,
   getModularClientOptions,
-  getRLCClients,
+  getClients,
 } from "./utils/client-utils.js";
 import { generateCrossLanguageDefinitionFile } from "./utils/cross-language-def.js";
-import { RLCModel, RLCOptions } from "./interfaces.js";
+import { ClientModel, ClientOptions } from "./interfaces.js";
 import { buildApiExtractorConfig } from "./metadata/build-api-extractor-config.js";
 import { buildChangelogFile } from "./metadata/build-changelog-file.js";
 import { buildEsLintConfig } from "./metadata/build-es-lint-config.js";
@@ -117,7 +117,7 @@ export async function $onEmit(context: EmitContext) {
   const rlcOptions = dpgContext.rlcOptions ?? {};
 
   const needUnexpectedHelper: Map<string, boolean> = new Map<string, boolean>();
-  const serviceNameToRlcModelsMap: Map<string, RLCModel> = new Map<string, RLCModel>();
+  const serviceNameToRlcModelsMap: Map<string, ClientModel> = new Map<string, ClientModel>();
   provideContext("rlcMetaTree", new Map());
   provideContext("symbolMap", new Map());
   provideContext("outputProject", outputProject);
@@ -164,13 +164,13 @@ export async function $onEmit(context: EmitContext) {
   });
   provideSdkTypes(dpgContext);
 
-  const rlcCodeModels: RLCModel[] = [];
+  const clientCodeModels: ClientModel[] = [];
   let modularEmitterOptions: ModularEmitterOptions;
   // 1. Clear sources folder
   await clearSrcFolder();
   // 2. Generate RLC code model
   // TODO: skip this step in modular once modular generator is sufficiently decoupled
-  await buildRLCCodeModels();
+  await buildClientCodeModels();
   // 3. Clear samples-dev folder if generateSample is true
   await clearSamplesDevFolder();
 
@@ -191,7 +191,7 @@ export async function $onEmit(context: EmitContext) {
     const generationPathDetail: GenerationDirDetail = await calculateGenerationDir();
     dpgContext.generationPathDetail = generationPathDetail;
     dpgContext.allServiceNamespaces = listAllServiceNamespaces(dpgContext);
-    const options: RLCOptions = transformRLCOptions(emitterOptions, dpgContext);
+    const options: ClientOptions = transformClientOptions(emitterOptions, dpgContext);
     emitterOptions["generate-sample"] = options.generateSample;
     // clear output folder if needed
     if (options.clearOutputFolder) {
@@ -248,14 +248,14 @@ export async function $onEmit(context: EmitContext) {
     }
   }
 
-  async function buildRLCCodeModels() {
-    const clients = getRLCClients(dpgContext);
+  async function buildClientCodeModels() {
+    const clients = getClients(dpgContext);
     for (const client of clients) {
-      const rlcModels = await transformRLCModel(client, dpgContext);
-      rlcCodeModels.push(rlcModels);
+      const clientModels = await transformClientModel(client, dpgContext);
+      clientCodeModels.push(clientModels);
       const serviceName = client.services[0]?.name ?? "Unknown";
-      serviceNameToRlcModelsMap.set(serviceName, rlcModels);
-      needUnexpectedHelper.set(getClientName(rlcModels), hasUnexpectedHelper(rlcModels));
+      serviceNameToRlcModelsMap.set(serviceName, clientModels);
+      needUnexpectedHelper.set(getClientName(clientModels), hasUnexpectedHelper(clientModels));
     }
   }
 
@@ -368,10 +368,10 @@ export async function $onEmit(context: EmitContext) {
 
   async function generateMetadataAndTest(context: SdkContext) {
     const project = useContext("outputProject");
-    if (rlcCodeModels.length === 0 || !rlcCodeModels[0]) {
+    if (clientCodeModels.length === 0 || !clientCodeModels[0]) {
       return;
     }
-    const rlcClient: RLCModel = rlcCodeModels[0];
+    const rlcClient: ClientModel = clientCodeModels[0];
     const option = dpgContext.rlcOptions!;
     // When generateMetadata is explicitly false and the sources are generated
     // into a path ending with "generated" (e.g. src/generated), this package
@@ -522,13 +522,13 @@ export async function $onEmit(context: EmitContext) {
         } catch {
           packageInfo = {};
         }
-        updateBuilders.push((model: RLCModel) =>
+        updateBuilders.push((model: ClientModel) =>
           updatePackageFile(model, packageInfo, modularPackageInfo),
         );
       }
 
       // Update warp.config.yml for Azure monorepo packages
-      updateBuilders.push((model: RLCModel) => buildWarpConfig(model, modularPackageInfo));
+      updateBuilders.push((model: ClientModel) => buildWarpConfig(model, modularPackageInfo));
 
       // If the client name changed, regenerate the README and snippets completely;
       // otherwise update only the API reference link in-place.
@@ -539,13 +539,13 @@ export async function $onEmit(context: EmitContext) {
         updateBuilders.push(
           clientNameChanged
             ? buildReadmeFile
-            : (model: RLCModel) => updateReadmeFile(model, existingReadmeContent),
+            : (model: ClientModel) => updateReadmeFile(model, existingReadmeContent),
         );
 
         // Regenerate snippets.spec.ts only when the client name changed
         if (clientNameChanged) {
           for (const subClient of dpgContext.sdkPackage.clients) {
-            updateBuilders.push((model: RLCModel) =>
+            updateBuilders.push((model: ClientModel) =>
               buildSnippets(model, getClassicalClientName(subClient)),
             );
           }

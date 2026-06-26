@@ -2,9 +2,9 @@
 // Licensed under the MIT License.
 
 import { Project } from "ts-morph";
-import { RLCModel } from "../interfaces.js";
+import { ClientModel } from "../interfaces.js";
 
-export function buildApiExtractorConfig(_model: RLCModel) {
+export function buildApiExtractorConfig(_model: ClientModel) {
   const project = new Project({ useInMemoryFileSystem: true });
 
   const config = {

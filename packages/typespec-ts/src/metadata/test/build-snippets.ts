@@ -2,10 +2,10 @@
 // @ts-ignore: to fix the handlebars issue
 import hbs from "handlebars";
 import { getClientName } from "../../utils/name-constructors.js";
-import { RLCModel } from "../../interfaces.js";
+import { ClientModel } from "../../interfaces.js";
 import { snippetsContent } from "./template.js";
 
-export function buildSnippets(model: RLCModel, clientName?: string) {
+export function buildSnippets(model: ClientModel, clientName?: string) {
   // to keep the same config for azure scope in buildReadmeFile.ts
   if (
     (model?.options?.packageDetails?.scopeName === "azure" ||

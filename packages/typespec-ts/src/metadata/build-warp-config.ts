@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { RLCModel } from "../interfaces.js";
+import { ClientModel } from "../interfaces.js";
 
 export interface WarpConfigOptions {
   /** Source-level exports, e.g. { ".": "./src/index.ts", "./models": "./src/models/index.ts" } */
@@ -67,7 +67,7 @@ targets:
  * By default, react-native target is NOT included. Set `generateReactNativeTarget: true`
  * in options to include it.
  */
-export function buildWarpConfig(model: RLCModel, { exports }: WarpConfigOptions = {}) {
+export function buildWarpConfig(model: ClientModel, { exports }: WarpConfigOptions = {}) {
   const allExports: Record<string, string> = {
     ...BASE_EXPORTS,
     ...exports,

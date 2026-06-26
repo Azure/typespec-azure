@@ -1,17 +1,17 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { RLCModel } from "../interfaces.js";
+import { ClientModel } from "../interfaces.js";
 import { getPackageName } from "./utils.js";
 
-function shouldGenerateTestConfig(model: RLCModel): boolean {
+function shouldGenerateTestConfig(model: ClientModel): boolean {
   return !(model.options?.generateMetadata === false || model.options?.generateTest === false);
 }
 
 /**
  * Builds config/tsconfig.test.browser.json — extends eng/tsconfigs/test.browser.json
  */
-export function buildTestBrowserTsConfig(model: RLCModel) {
+export function buildTestBrowserTsConfig(model: ClientModel) {
   if (!shouldGenerateTestConfig(model)) {
     return;
   }
@@ -40,7 +40,7 @@ export function buildTestBrowserTsConfig(model: RLCModel) {
 /**
  * Builds config/tsconfig.test.node.json — extends eng/tsconfigs/test.node.json
  */
-export function buildTestNodeTsConfig(model: RLCModel) {
+export function buildTestNodeTsConfig(model: ClientModel) {
   if (!shouldGenerateTestConfig(model)) {
     return;
   }

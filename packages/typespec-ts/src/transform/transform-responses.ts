@@ -4,7 +4,7 @@
 import { getHttpOperationWithCache, SdkClient } from "@azure-tools/typespec-client-generator-core";
 import { getDoc, isVoidType } from "@typespec/compiler";
 import { HttpOperation, HttpOperationResponse } from "@typespec/http";
-import { listOperationsUnderRLCClient } from "../utils/client-utils.js";
+import { listOperationsUnderClient } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import {
   getBinaryType,
@@ -30,7 +30,7 @@ export function transformToResponseTypes(
 ): OperationResponse[] {
   const rlcResponses: OperationResponse[] = [];
   const inputImportedSet = new Set<string>();
-  for (const op of listOperationsUnderRLCClient(client)) {
+  for (const op of listOperationsUnderClient(client)) {
     const route = getHttpOperationWithCache(dpgContext, op);
     // ignore overload base operation
     if (route.overloads && route.overloads?.length > 0) {

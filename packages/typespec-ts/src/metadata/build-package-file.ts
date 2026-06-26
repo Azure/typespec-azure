@@ -3,7 +3,7 @@
 
 import { Project, SourceFile } from "ts-morph";
 import { hasPollingOperations } from "../utils/operation-helpers.js";
-import { RLCModel } from "../interfaces.js";
+import { ClientModel } from "../interfaces.js";
 import { buildAzureMonorepoPackage } from "./package-json/build-azure-monorepo-package.js";
 import { PackageCommonInfoConfig, resolveWarpExports } from "./package-json/package-common.js";
 import { getPackageName } from "./utils.js";
@@ -15,7 +15,7 @@ interface PackageFileOptions {
 }
 
 export function buildPackageFile(
-  model: RLCModel,
+  model: ClientModel,
   { exports, dependencies, clientContextPaths }: PackageFileOptions = {},
 ) {
   const config: PackageCommonInfoConfig = {
@@ -66,7 +66,7 @@ export function buildPackageFile(
  * - Updates `//metadata.constantPaths` when `clientContextPaths` is provided.
  */
 export function updatePackageFile(
-  model: RLCModel,
+  model: ClientModel,
   existingFilePathOrContent: string | Record<string, any>,
   { exports, clientContextPaths }: PackageFileOptions = {},
 ) {
@@ -167,11 +167,11 @@ export function updatePackageFile(
   };
 }
 
-function getPackageVersion(model: RLCModel): string {
+function getPackageVersion(model: ClientModel): string {
   return model.options?.packageDetails?.version ?? "1.0.0-beta.1";
 }
 
-function getDescription(model: RLCModel): string {
+function getDescription(model: ClientModel): string {
   const description = model.options?.packageDetails?.description;
   if (!description) {
     return `A generated SDK for ${model.libraryName}.`;

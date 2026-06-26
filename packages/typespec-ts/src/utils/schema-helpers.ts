@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { ArraySchema, ObjectSchema, RLCModel, Schema, SchemaContext } from "../interfaces.js";
+import { ArraySchema, ObjectSchema, ClientModel, Schema, SchemaContext } from "../interfaces.js";
 
 export interface IsDictionaryOptions {
   filterEmpty?: boolean;
@@ -34,7 +34,7 @@ export function isConstantSchema(schema: Schema) {
   return false;
 }
 
-export function buildSchemaObjectMap(model: RLCModel) {
+export function buildSchemaObjectMap(model: ClientModel) {
   // include interfaces
   const map = new Map<string, Schema>();
   const allSchemas = (model.schemas ?? []).filter(

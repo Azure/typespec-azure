@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 import { Project } from "ts-morph";
-import { RLCModel } from "../interfaces.js";
+import { ClientModel } from "../interfaces.js";
 
 const esLintConfigEsmAzureSdk = `import azsdkEslint from "@azure/eslint-plugin-azure-sdk";
 
@@ -31,7 +31,7 @@ export default [
 ];
 `;
 
-export function buildEsLintConfig(_model: RLCModel) {
+export function buildEsLintConfig(_model: ClientModel) {
   const project = new Project({ useInMemoryFileSystem: true });
   const filePath = "eslint.config.mjs";
 

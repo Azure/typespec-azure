@@ -22,7 +22,7 @@ import { addDeclaration } from "../framework/declaration.js";
 import { useDependencies } from "../framework/hooks/use-dependencies.js";
 import { resolveReference } from "../framework/reference.js";
 import { refkey } from "../framework/refkey.js";
-import { getModularClientOptions, isRLCMultiEndpoint } from "../utils/client-utils.js";
+import { getModularClientOptions, isMultiEndpointClient } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import {
   getMethodHierarchiesMap,
@@ -49,7 +49,7 @@ export function buildOperationFiles(
   const [_, client] = clientMap;
   const operationFiles: Set<SourceFile> = new Set();
   const { subfolder, rlcClientName } = getModularClientOptions(clientMap);
-  const isMultiEndpoint = isRLCMultiEndpoint(dpgContext);
+  const isMultiEndpoint = isMultiEndpointClient(dpgContext);
   const clientType = isMultiEndpoint ? `Client.${rlcClientName}` : "Client";
   const methodMap = getMethodHierarchiesMap(dpgContext, client);
   for (const [prefixKey, operations] of methodMap) {

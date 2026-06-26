@@ -19,7 +19,7 @@ import { useContext } from "../context-manager.js";
 import { useDependencies } from "../framework/hooks/use-dependencies.js";
 import { resolveReference } from "../framework/reference.js";
 import { refkey } from "../framework/refkey.js";
-import { getModularClientOptions, isRLCMultiEndpoint } from "../utils/client-utils.js";
+import { getModularClientOptions, isMultiEndpointClient } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import { getMethodHierarchiesMap, isTenantLevelOperation } from "../utils/operation-util.js";
 import { AzurePollingDependencies } from "./external-dependencies.js";
@@ -68,7 +68,7 @@ export function buildClassicalClient(
   });
 
   // Add the private client member. This will be the client context from /api
-  if (isRLCMultiEndpoint(dpgContext)) {
+  if (isMultiEndpointClient(dpgContext)) {
     clientClass.addProperty({
       name: "_client",
       type: `Client.${rlcClientName}`,

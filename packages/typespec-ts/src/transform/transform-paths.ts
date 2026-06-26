@@ -20,7 +20,7 @@ import {
 } from "../utils/operation-util.js";
 
 import { getDoc } from "@typespec/compiler";
-import { listOperationsUnderRLCClient } from "../utils/client-utils.js";
+import { listOperationsUnderClient } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import { getParameterSerializationInfo } from "../utils/parameter-utils.js";
 import { Imports, OperationMethod, PathMetadata, Paths, SchemaContext } from "../interfaces.js";
@@ -33,7 +33,7 @@ export function transformPaths(
 ): Paths {
   const pathParamsImportedSet = new Set<string>();
   const paths: Paths = {};
-  for (const op of listOperationsUnderRLCClient(client)) {
+  for (const op of listOperationsUnderClient(client)) {
     const route = getHttpOperationWithCache(dpgContext, op);
     // ignore overload base operation
     if (route.overloads && route.overloads?.length > 0) {

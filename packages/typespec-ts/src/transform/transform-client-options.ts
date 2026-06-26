@@ -3,26 +3,26 @@ import { getDoc, NoTarget, Program } from "@typespec/compiler";
 import { getAuthentication } from "@typespec/http";
 import { EmitterOptions, reportDiagnostic } from "../lib.js";
 import { getClientParameters } from "../modular/helpers/client-helpers.js";
-import { getRLCClients, listOperationsUnderRLCClient } from "../utils/client-utils.js";
+import { getClients, listOperationsUnderClient } from "../utils/client-utils.js";
 import { getSupportedHttpAuth } from "../utils/credential-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import { getDefaultService } from "../utils/model-utils.js";
 import { detectModelConflicts } from "../utils/namespace-utils.js";
 import { getOperationName } from "../utils/operation-util.js";
 import { NameType, normalizeName, pascalCase } from "../utils/name-utils.js";
-import { PackageDetails, RLCOptions, ServiceInfo } from "../interfaces.js";
+import { PackageDetails, ClientOptions, ServiceInfo } from "../interfaces.js";
 
-export function transformRLCOptions(
+export function transformClientOptions(
   emitterOptions: EmitterOptions,
   dpgContext: SdkContext,
-): RLCOptions {
+): ClientOptions {
   // Extract the options from emitter option
   const options = extractRLCOptions(
     dpgContext,
     emitterOptions,
     dpgContext.generationPathDetail?.rootDir ?? "",
   );
-  const batch = getRLCClients(dpgContext);
+  const batch = getClients(dpgContext);
   options.batch = batch;
   return options;
 }
@@ -30,7 +30,7 @@ function extractRLCOptions(
   dpgContext: SdkContext,
   emitterOptions: EmitterOptions,
   generationRootDir: string,
-): RLCOptions {
+): ClientOptions {
   const program = dpgContext.program;
   const packageDetails = getPackageDetails(program, emitterOptions);
   const serviceInfo = getServiceInfo(program);
@@ -101,7 +101,7 @@ function processAuth(program: Program) {
   if (!authorization || !authorization.options) {
     return undefined;
   }
-  const securityInfo: RLCOptions = {};
+  const securityInfo: ClientOptions = {};
   for (const auth of getSupportedHttpAuth(program, authorization)) {
     switch (auth.type) {
       case "http":
@@ -193,11 +193,11 @@ function getClearOutputFolder(emitterOptions: EmitterOptions) {
 }
 
 function detectIfNameConflicts(dpgContext: SdkContext) {
-  const clients = getRLCClients(dpgContext);
+  const clients = getClients(dpgContext);
   for (const client of clients) {
     // only consider it's conflict when there are conflicts in the same client
     const nameSet = new Set<string>();
-    for (const op of listOperationsUnderRLCClient(client)) {
+    for (const op of listOperationsUnderClient(client)) {
       const route = getHttpOperationWithCache(dpgContext, op);
       const name = getOperationName(dpgContext, route.operation);
       if (nameSet.has(name)) {

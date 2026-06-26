@@ -7,7 +7,7 @@ import {
   ObjectSchema,
   ParameterMetadata,
   PathParameter,
-  RLCModel,
+  ClientModel,
   Schema,
   SchemaContext,
 } from "../interfaces.js";
@@ -59,35 +59,35 @@ export function getPathParamDefinitions(
   });
 }
 
-export function hasPagingOperations(model: RLCModel) {
+export function hasPagingOperations(model: ClientModel) {
   return Boolean(model.helperDetails?.hasPaging);
 }
 
-export function hasPollingOperations(model: RLCModel) {
+export function hasPollingOperations(model: ClientModel) {
   return Boolean(model.helperDetails?.hasLongRunning);
 }
 
-export function hasMultiCollection(model: RLCModel) {
+export function hasMultiCollection(model: ClientModel) {
   return Boolean(model.helperDetails?.hasMultiCollection);
 }
 
-export function hasPipeCollection(model: RLCModel) {
+export function hasPipeCollection(model: ClientModel) {
   return Boolean(model.helperDetails?.hasPipeCollection);
 }
 
-export function hasSsvCollection(model: RLCModel) {
+export function hasSsvCollection(model: ClientModel) {
   return Boolean(model.helperDetails?.hasSsvCollection);
 }
 
-export function hasTsvCollection(model: RLCModel) {
+export function hasTsvCollection(model: ClientModel) {
   return Boolean(model.helperDetails?.hasTsvCollection);
 }
 
-export function hasCsvCollection(model: RLCModel) {
+export function hasCsvCollection(model: ClientModel) {
   return Boolean(model.helperDetails?.hasCsvCollection);
 }
 
-export function hasUnexpectedHelper(model: RLCModel) {
+export function hasUnexpectedHelper(model: ClientModel) {
   const pathDictionary = model.paths;
   for (const details of Object.values(pathDictionary)) {
     for (const methodDetails of Object.values(details.methods)) {
@@ -106,14 +106,14 @@ export function hasUnexpectedHelper(model: RLCModel) {
   return false;
 }
 
-export function hasInputModels(model: RLCModel) {
+export function hasInputModels(model: ClientModel) {
   return hasSchemaContextObject(model, [SchemaContext.Input]);
 }
-export function hasOutputModels(model: RLCModel) {
+export function hasOutputModels(model: ClientModel) {
   return hasSchemaContextObject(model, [SchemaContext.Output, SchemaContext.Exception]);
 }
 
-function hasSchemaContextObject(model: RLCModel, schemaUsage: SchemaContext[]) {
+function hasSchemaContextObject(model: ClientModel, schemaUsage: SchemaContext[]) {
   const objectSchemas: ObjectSchema[] = (model.schemas ?? []).filter(
     (o) => isObjectSchema(o) && (o as ObjectSchema).usage?.some((u) => schemaUsage.includes(u)),
   );

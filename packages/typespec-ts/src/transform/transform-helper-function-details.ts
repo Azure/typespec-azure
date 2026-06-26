@@ -1,5 +1,5 @@
 import { getHttpOperationWithCache, SdkClient } from "@azure-tools/typespec-client-generator-core";
-import { listOperationsUnderRLCClient } from "../utils/client-utils.js";
+import { listOperationsUnderClient } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import { getCollectionFormat } from "../utils/model-utils.js";
 import {
@@ -34,7 +34,7 @@ function extractClientPageDetails(client: SdkClient, dpgContext: SdkContext) {
   }
   const nextLinks = new Set<string>(["nextLink"]);
   const itemNames = new Set<string>(["value"]);
-  for (const op of listOperationsUnderRLCClient(client)) {
+  for (const op of listOperationsUnderClient(client)) {
     const route = getHttpOperationWithCache(dpgContext, op);
     // ignore overload base operation
     if (route.overloads && route.overloads?.length > 0) {
@@ -61,7 +61,7 @@ function extractClientPageDetails(client: SdkClient, dpgContext: SdkContext) {
 function extractSpecialSerializeInfo(client: SdkClient, dpgContext: SdkContext) {
   let hasMultiCollection = false;
   let hasCsvCollection = false;
-  for (const op of listOperationsUnderRLCClient(client)) {
+  for (const op of listOperationsUnderClient(client)) {
     const route = getHttpOperationWithCache(dpgContext, op);
     route.parameters.parameters.forEach((parameter) => {
       const format = getCollectionFormat(dpgContext, parameter as any);

@@ -14,7 +14,7 @@ import { useContext } from "../context-manager.js";
 import { resolveReference } from "../framework/reference.js";
 import { reportDiagnostic } from "../index.js";
 import { AzureIdentityDependencies } from "../modular/external-dependencies.js";
-import { getSubscriptionId } from "../transform/transfrom-rlc-options.js";
+import { getSubscriptionId } from "../transform/transform-client-options.js";
 import { hasKeyCredential, hasTokenCredential } from "../utils/credential-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import {

@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-export interface RLCModel {
+export interface ClientModel {
   libraryName: string;
   srcPath: string;
   paths: Paths;
   importInfo: ImportInfo;
-  options?: RLCOptions;
+  options?: ClientOptions;
   schemas: Schema[];
   apiVersionInfo?: ApiVersionInfo;
   parameters?: OperationParameter[];
@@ -13,7 +13,7 @@ export interface RLCModel {
   helperDetails?: HelperFunctionDetails;
   urlInfo?: UrlInfo;
   telemetryOptions?: TelemetryInfo;
-  sampleGroups?: RLCSampleGroup[];
+  sampleGroups?: SampleGroup[];
   rlcSourceDir?: string;
 }
 
@@ -60,18 +60,18 @@ export interface ImportMetadata {
 /**
  * A group of samples in operation_id level and they are used to generate in a sample file
  */
-export interface RLCSampleGroup {
+export interface SampleGroup {
   filename: string;
   clientPackageName: string;
   defaultFactoryName: string;
-  samples: RLCSampleDetail[];
+  samples: SampleDetail[];
   importedTypes?: string[];
 }
 
 /**
  * An independent sample detail and it will be wrapped as a func
  */
-export interface RLCSampleDetail {
+export interface SampleDetail {
   /**
    * metadata for comments
    */
@@ -190,7 +190,7 @@ export interface OperationLroDetail {
   precedence?: number;
 }
 
-export interface RLCOptions {
+export interface ClientOptions {
   /**
    * Whether to include response headers in the generated response types. If true, the generated response types will include headers as properties.
    */
@@ -398,7 +398,7 @@ export type ResponseHeaderSchema = Schema;
 export type ResponseBodySchema = Schema;
 
 export type ContentBuilder = {
-  (model: RLCModel): File | File[] | undefined;
+  (model: ClientModel): File | File[] | undefined;
 };
 
 export type SampleParameterPosition = "client" | "path" | "method";

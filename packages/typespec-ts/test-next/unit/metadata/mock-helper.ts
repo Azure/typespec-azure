@@ -2,7 +2,7 @@ import {
   buildRuntimeImports,
   initInternalImports,
 } from "../../../src/utils/imports-util.js";
-import { RLCModel } from "../../../src/interfaces.js";
+import { ClientModel } from "../../../src/interfaces.js";
 
 export type TestModelConfig = {
   description?: string;
@@ -22,7 +22,7 @@ export type TestModelConfig = {
   generateReactNativeTarget?: boolean;
 };
 
-export function createMockModel(config: TestModelConfig = {}): RLCModel {
+export function createMockModel(config: TestModelConfig = {}): ClientModel {
   return {
     importInfo: {
       runtimeImports: buildRuntimeImports(),

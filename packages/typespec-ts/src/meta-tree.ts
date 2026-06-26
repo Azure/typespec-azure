@@ -1,8 +1,8 @@
 import { Type } from "@typespec/compiler";
 import { Schema as RlcType } from "./interfaces.js";
 
-export interface RlcTypeMetadata {
+export interface ClientTypeMetadata {
   rlcType: RlcType;
 }
 
-export type RlcMetaTree = Map<Type, RlcTypeMetadata>;
+export type ClientTypeMetaTree = Map<Type, ClientTypeMetadata>;

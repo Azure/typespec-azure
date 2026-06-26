@@ -82,7 +82,7 @@ export interface EmitterOptions {
   "generate-react-native-target"?: boolean;
 }
 
-export const RLCOptionsSchema: JSONSchemaType<EmitterOptions> = {
+export const EmitterOptionsSchema: JSONSchemaType<EmitterOptions> = {
   type: "object",
   additionalProperties: true,
   properties: {
@@ -561,7 +561,7 @@ const libDef = {
     },
   },
   emitter: {
-    options: RLCOptionsSchema,
+    options: EmitterOptionsSchema,
   },
 } as const;
 

@@ -9,7 +9,7 @@ import {
 import { NoTarget, Type, isVoidType } from "@typespec/compiler";
 import { HttpOperation, HttpOperationParameter, HttpOperationParameters } from "@typespec/http";
 import { reportDiagnostic } from "../lib.js";
-import { listOperationsUnderRLCClient } from "../utils/client-utils.js";
+import { listOperationsUnderClient } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import {
   KnownMediaType,
@@ -50,7 +50,7 @@ export function transformToParameterTypes(
 ): OperationParameter[] {
   const rlcParameters: OperationParameter[] = [];
   const outputImportedSet = new Set<string>();
-  for (const op of listOperationsUnderRLCClient(client)) {
+  for (const op of listOperationsUnderClient(client)) {
     const route = getHttpOperationWithCache(dpgContext, op);
     // ignore overload base operation
     if (route.overloads && route.overloads?.length > 0) {

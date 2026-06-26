@@ -1,4 +1,4 @@
-import { RLCOptions } from "../interfaces.js";
+import { ClientOptions } from "../interfaces.js";
 
 export interface ModularOptions {
   sourceRoot: string;
@@ -6,7 +6,7 @@ export interface ModularOptions {
   experimentalExtensibleEnums: boolean;
 }
 export interface ModularEmitterOptions {
-  options: RLCOptions;
+  options: ClientOptions;
   modularOptions: ModularOptions;
 }
 

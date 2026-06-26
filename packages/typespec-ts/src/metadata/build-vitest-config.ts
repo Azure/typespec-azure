@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { RLCModel } from "../interfaces.js";
+import { ClientModel } from "../interfaces.js";
 
 const nodeConfig = `import viteConfig from "../../../vitest.shared.config.ts";
 
@@ -11,7 +11,7 @@ export default viteConfig;
 const browserConfig = `export { default } from "../../../eng/vitestconfigs/browser.config.ts";
 `;
 
-export function buildVitestConfig(model: RLCModel, platform: "browser" | "node") {
+export function buildVitestConfig(model: ClientModel, platform: "browser" | "node") {
   if (model.options?.generateMetadata === false || model.options?.generateTest === false) {
     return;
   }

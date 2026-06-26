@@ -4,19 +4,19 @@ import prettierPluginBabel from "prettier/plugins/babel";
 import prettierPluginEstree from "prettier/plugins/estree";
 import prettierPluginTypescript from "prettier/plugins/typescript";
 import { prettierJSONOptions, prettierTypeScriptOptions, reportDiagnostic } from "../lib.js";
-import { ContentBuilder, File, RLCModel } from "../interfaces.js";
+import { ContentBuilder, File, ClientModel } from "../interfaces.js";
 
 export async function emitContentByBuilder(
   program: Program,
   builderFnOrList: ContentBuilder | ContentBuilder[],
-  rlcModels: RLCModel,
+  clientModels: ClientModel,
   emitterOutputDir?: string,
 ) {
   if (!Array.isArray(builderFnOrList)) {
     builderFnOrList = [builderFnOrList];
   }
   for (const builderFn of builderFnOrList) {
-    let contentFiles: File[] | File | undefined = builderFn(rlcModels);
+    let contentFiles: File[] | File | undefined = builderFn(clientModels);
     if (!contentFiles) {
       continue;
     }

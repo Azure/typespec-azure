@@ -28,7 +28,7 @@ import {
 import { resolveReference } from "../framework/reference.js";
 import { reportDiagnostic } from "../lib.js";
 import { SerializationHelpers } from "../modular/static-helpers-metadata.js";
-import { listOperationsUnderRLCClient } from "./client-utils.js";
+import { listOperationsUnderClient } from "./client-utils.js";
 import { SdkContext } from "./interfaces.js";
 import {
   isMediaTypeMultipart,
@@ -311,7 +311,7 @@ export function extractOperationLroDetail(
 
 export function hasPollingOperations(client: SdkClient, dpgContext: SdkContext) {
   const program = dpgContext.program;
-  for (const op of listOperationsUnderRLCClient(client)) {
+  for (const op of listOperationsUnderClient(client)) {
     const route = getHttpOperationWithCache(dpgContext, op);
     // ignore overload base operation
     if (route.overloads && route.overloads?.length > 0) {
@@ -428,7 +428,7 @@ function findRootSourceProperty(property: ModelProperty): ModelProperty {
 }
 
 export function hasPagingOperations(client: SdkClient, dpgContext: SdkContext) {
-  for (const op of listOperationsUnderRLCClient(client)) {
+  for (const op of listOperationsUnderClient(client)) {
     const route = getHttpOperationWithCache(dpgContext, op);
     // ignore overload base operation
     if (route.overloads && route.overloads?.length > 0) {

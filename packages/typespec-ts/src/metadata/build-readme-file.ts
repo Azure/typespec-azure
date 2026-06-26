@@ -6,7 +6,7 @@
 import hbs from "handlebars";
 import { getClientName } from "../utils/name-constructors.js";
 import { NameType, normalizeName } from "../utils/name-utils.js";
-import { RLCModel } from "../interfaces.js";
+import { ClientModel } from "../interfaces.js";
 
 const azureReadmeModularTemplate = `# {{ clientDescriptiveName }} library for JavaScript
 
@@ -269,7 +269,7 @@ interface Metadata {
   hasSubscriptionId?: boolean;
 }
 
-export function buildReadmeFile(model: RLCModel) {
+export function buildReadmeFile(model: ClientModel) {
   const metadata = createMetadata(model) ?? {};
   const readmeFileContents = hbs.compile(
     model.options ? azureReadmeModularTemplate : nonBrandedReadmeTemplate,
@@ -281,7 +281,7 @@ export function buildReadmeFile(model: RLCModel) {
   };
 }
 
-export function hasClientNameChanged(model: RLCModel, existingReadmeContent: string): boolean {
+export function hasClientNameChanged(model: ClientModel, existingReadmeContent: string): boolean {
   try {
     const importMatch = existingReadmeContent.match(
       /import\s*\{\s*([A-Za-z0-9_]+)\s*\}\s*from\s*["'][^"']*["']/,
@@ -295,7 +295,7 @@ export function hasClientNameChanged(model: RLCModel, existingReadmeContent: str
 }
 
 export function updateReadmeFile(
-  model: RLCModel,
+  model: ClientModel,
   existingReadmeContent: string,
 ): { path: string; content: string } | undefined {
   try {
@@ -324,7 +324,7 @@ export function updateReadmeFile(
  * @param codeModel - include the client details
  * @returns inferred metadata about the service, the package, and the client
  */
-function createMetadata(model: RLCModel): Metadata | undefined {
+function createMetadata(model: ClientModel): Metadata | undefined {
   if (!model.options || !model.options.packageDetails) {
     return;
   }
@@ -379,7 +379,7 @@ function createMetadata(model: RLCModel): Metadata | undefined {
   };
 }
 
-function getServiceName(model: RLCModel) {
+function getServiceName(model: ClientModel) {
   const azureHuh =
     model?.options?.packageDetails?.scopeName === "azure" ||
     model?.options?.packageDetails?.scopeName === "azure-rest";

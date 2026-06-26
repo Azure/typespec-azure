@@ -12,7 +12,7 @@ import { joinPaths } from "@typespec/compiler";
 import { SourceFile } from "ts-morph";
 import { useContext } from "../../context-manager.js";
 import { resolveReference } from "../../framework/reference.js";
-import { getSubscriptionId } from "../../transform/transfrom-rlc-options.js";
+import { getSubscriptionId } from "../../transform/transform-client-options.js";
 import { hasKeyCredential, hasTokenCredential } from "../../utils/credential-utils.js";
 import { SdkContext } from "../../utils/interfaces.js";
 import { getMethodHierarchiesMap, ServiceOperation } from "../../utils/operation-util.js";

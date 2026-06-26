@@ -25,9 +25,9 @@ import { buildSubpathIndexFile } from "../../src/modular/build-subpath-index.js"
 import { emitSamples } from "../../src/modular/emit-samples.js";
 import { emitTests } from "../../src/modular/emit-tests.js";
 import { getClientHierarchyMap } from "../../src/utils/client-utils.js";
-import { RLCOptions } from "../../src/interfaces.js";
+import { ClientOptions } from "../../src/interfaces.js";
 
-export interface ModelConfigOptions extends RLCOptions {
+export interface ModelConfigOptions extends ClientOptions {
   needOptions?: boolean;
   withRawContent?: boolean;
   needAzureCore?: boolean;

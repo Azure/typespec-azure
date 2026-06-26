@@ -18,7 +18,7 @@ import { ModularClientOptions } from "../modular/interfaces.js";
 import { SdkContext } from "./interfaces.js";
 import { NameType, normalizeName } from "./name-utils.js";
 
-export function getRLCClients(dpgContext: SdkContext): SdkClient[] {
+export function getClients(dpgContext: SdkContext): SdkClient[] {
   const clients = listClients(dpgContext);
   const rawServiceNamespaces =
     dpgContext.allServiceNamespaces ?? listAllServiceNamespaces(dpgContext);
@@ -79,7 +79,7 @@ export function getRLCClients(dpgContext: SdkContext): SdkClient[] {
   });
 }
 
-export function listOperationsUnderRLCClient(client: SdkClient): Operation[] {
+export function listOperationsUnderClient(client: SdkClient): Operation[] {
   const operations = [];
   const serviceArray = client.services;
   const queue: (Namespace | Interface)[] = [...serviceArray];
@@ -110,8 +110,8 @@ export function listOperationsUnderRLCClient(client: SdkClient): Operation[] {
   return operations;
 }
 
-export function isRLCMultiEndpoint(dpgContext: SdkContext): boolean {
-  return getRLCClients(dpgContext).length > 1;
+export function isMultiEndpointClient(dpgContext: SdkContext): boolean {
+  return getClients(dpgContext).length > 1;
 }
 
 export function getModularClientOptions(clientMap: [string[], SdkClientType<SdkServiceOperation>]) {
