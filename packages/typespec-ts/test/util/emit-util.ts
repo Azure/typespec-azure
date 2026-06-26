@@ -14,7 +14,9 @@ import {
 
 import { expectDiagnosticEmpty } from "@typespec/compiler/testing";
 import { useContext } from "../../src/context-manager.js";
+import { makeClientReaderLayer, runClientContextSync } from "../../src/framework/effect-context.js";
 import { useBinder } from "../../src/framework/hooks/binder.js";
+import { useDependencies } from "../../src/framework/hooks/use-dependencies.js";
 import { renameClientName } from "../../src/index.js";
 import { buildClassicalClient } from "../../src/modular/build-classical-client.js";
 import { buildClientContext } from "../../src/modular/build-client-context.js";
@@ -261,7 +263,14 @@ export async function emitModularClientContextFromTypeSpec(
     emitTypes(dpgContext, { sourceRoot: "" });
     renameClientName(dpgContext.sdkPackage.clients[0], modularEmitterOptions);
     const clientMap = Array.from(getClientHierarchyMap(dpgContext));
-    const res = buildClientContext(dpgContext, clientMap[0]!, modularEmitterOptions);
+    
+    const project = useContext("outputProject");
+    const dependencies = useDependencies();
+    const effectReaderLayer = makeClientReaderLayer({ project, dependencies });
+    const res = runClientContextSync(
+      buildClientContext(dpgContext, clientMap[0]!, modularEmitterOptions),
+      effectReaderLayer
+    );
     binder.resolveAllReferences("/");
     return res;
   }

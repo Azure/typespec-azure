@@ -74,6 +74,8 @@ import {
 } from "@azure-tools/typespec-client-generator-core";
 import { Project } from "ts-morph";
 import { provideBinder } from "./framework/hooks/binder.js";
+import { useDependencies } from "./framework/hooks/use-dependencies.js";
+import { makeClientReaderLayer, runClientContextSync } from "./framework/effect-context.js";
 import { provideSdkTypes } from "./framework/hooks/sdk-types.js";
 import { loadStaticHelpers } from "./framework/load-static-helpers.js";
 import { EmitterOptions } from "./lib.js";
@@ -276,6 +278,8 @@ export async function $onEmit(context: EmitContext) {
   async function generateModularSources() {
     const modularSourcesRoot = dpgContext.generationPathDetail?.modularSourcesDir ?? "src";
     const project = useContext("outputProject");
+    const dependencies = useDependencies();
+    const effectReaderLayer = makeClientReaderLayer({ project, dependencies });
     modularEmitterOptions = transformModularEmitterOptions(dpgContext, modularSourcesRoot, {
       casing: "camel",
     });
@@ -300,7 +304,10 @@ export async function $onEmit(context: EmitContext) {
       await renameClientName(subClient[1], modularEmitterOptions);
       buildApiOptions(dpgContext, subClient, modularEmitterOptions);
       buildOperationFiles(dpgContext, subClient, modularEmitterOptions);
-      buildClientContext(dpgContext, subClient, modularEmitterOptions);
+      runClientContextSync(
+        buildClientContext(dpgContext, subClient, modularEmitterOptions),
+        effectReaderLayer
+      );
       buildRestorePoller(dpgContext, subClient, modularEmitterOptions);
       if (dpgContext.rlcOptions?.hierarchyClient) {
         buildSubpathIndexFile(modularEmitterOptions, "api", subClient, {

@@ -1,10 +1,5 @@
 import { Effect } from "effect";
-import {
-  Dependencies,
-  OutputProject,
-  makeClientReaderLayer,
-  runClientContextSync,
-} from "../framework/effect-context.js";
+import { Dependencies, OutputProject } from "../framework/effect-context.js";
 import { NameType, normalizeName } from "../rlc-common/index.js";
 import {
   buildGetClientCredentialParam,
@@ -26,8 +21,6 @@ import {
 } from "@azure-tools/typespec-client-generator-core";
 import { NoTarget } from "@typespec/compiler";
 import { SourceFile } from "ts-morph";
-import { useContext } from "../context-manager.js";
-import { useDependencies } from "../framework/hooks/use-dependencies.js";
 import { resolveReference } from "../framework/reference.js";
 import { refkey } from "../framework/refkey.js";
 import { reportDiagnostic } from "../lib.js";
@@ -63,10 +56,7 @@ export function buildClientContext(
   dpgContext: SdkContext,
   clientMap: [string[], SdkClientType<SdkServiceOperation>],
   emitterOptions: ModularEmitterOptions,
-): SourceFile {
-  const project = useContext("outputProject");
-  const dependencies = useDependencies();
-
+): Effect.Effect<SourceFile, never, OutputProject | Dependencies> {
   const effect = Effect.gen(function* () {
     const project = yield* OutputProject;
     const dependencies = yield* Dependencies;
@@ -309,7 +299,7 @@ export function buildClientContext(
   return clientContextFile;
   });
 
-  return runClientContextSync(effect, makeClientReaderLayer({ project, dependencies }));
+  return effect;
 }
 
 function getDocsWithKnownVersion(
