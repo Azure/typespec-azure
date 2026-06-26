@@ -132,6 +132,7 @@ catalog:
   decimal.js: ^10.6.0
   dotenv: ^17.2.3
   ecmarkup: ~23.0.2
+  effect: ^3.21.4
   env-paths: ^4.0.0
   es-module-shims: ^2.8.0
   esbuild: ^0.28.0
