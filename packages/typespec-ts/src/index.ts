@@ -137,7 +137,7 @@ export async function $onEmit(context: EmitContext) {
       ...(resolvedEmitterOptions.enableStorageCompat ? StorageCompatHelpers : {}),
     },
     {
-      sourcesDir: dpgContext.generationPathDetail?.modularSourcesDir,
+      sourcesDir: dpgContext.generationPathDetail?.sourcesDir,
       rootDir: dpgContext.generationPathDetail?.rootDir,
       options: resolvedEmitterOptions,
       program,
@@ -215,17 +215,11 @@ export async function $onEmit(context: EmitContext) {
       rootDir: projectRoot,
       metadataDir: projectRoot,
       sourcesDir: sourcesRoot,
-      modularSourcesDir: sourcesRoot,
     };
   }
 
   async function clearSrcFolder() {
-    await emptyDir(
-      host,
-      dpgContext.generationPathDetail?.modularSourcesDir ??
-        dpgContext.generationPathDetail?.sourcesDir ??
-        "",
-    );
+    await emptyDir(host, dpgContext.generationPathDetail?.sourcesDir ?? "");
   }
 
   async function clearSamplesDevFolder() {
@@ -250,7 +244,7 @@ export async function $onEmit(context: EmitContext) {
   }
 
   async function generateModularSources() {
-    const modularSourcesRoot = dpgContext.generationPathDetail?.modularSourcesDir ?? "src";
+    const modularSourcesRoot = dpgContext.generationPathDetail?.sourcesDir ?? "src";
     const project = useContext("outputProject");
     modularEmitterOptions = transformModularEmitterOptions(dpgContext, modularSourcesRoot, {
       casing: "camel",
@@ -369,7 +363,7 @@ export async function $onEmit(context: EmitContext) {
     // has a manual convenience layer. Skip all metadata/test file generation
     // to avoid unexpected modifications to files like package.json, README.md,
     // warp.config.yml, and snippets.spec.ts. metadata.json is still updated.
-    const sourcesDir = dpgContext.generationPathDetail?.modularSourcesDir ?? "";
+    const sourcesDir = dpgContext.generationPathDetail?.sourcesDir ?? "";
     const hasManualConvenienceLayer = getBaseFileName(sourcesDir) === "generated";
     // Generate metadata
     const existingPackageFilePath = joinPaths(

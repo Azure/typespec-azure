@@ -13,7 +13,6 @@ export interface SdkContext extends TCGCSdkContext {
 export interface GenerationDirDetail {
   rootDir: string;
   sourcesDir: string;
-  modularSourcesDir?: string;
   metadataDir: string;
 }
 

@@ -11,7 +11,7 @@ export function generateCrossLanguageDefinitionFile(dpgContext: SdkContext): {
   CrossLanguagePackageId: string;
   CrossLanguageDefinitionId: Record<string, string>;
 } {
-  const modularSourcesRoot = dpgContext.generationPathDetail?.modularSourcesDir ?? "src";
+  const modularSourcesRoot = dpgContext.generationPathDetail?.sourcesDir ?? "src";
   const emitterOptions = transformModularEmitterOptions(dpgContext, modularSourcesRoot, {
     casing: "camel",
   });
