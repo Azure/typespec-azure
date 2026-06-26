@@ -18,6 +18,21 @@
     <dependency>
       <groupId>com.azure</groupId>
       <artifactId>azure-core</artifactId>
+      <!-- Pinned to match core/http-client-generator-test; the emitter (built from
+           the core submodule) generates code against this azure-core (e.g.
+           com.azure.core.util.ExpandableEnum). The azure-autorest-parent default
+           is too old. -->
+      <version>1.57.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.azure</groupId>
+      <artifactId>azure-json</artifactId>
+      <version>1.5.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.azure</groupId>
+      <artifactId>azure-xml</artifactId>
+      <version>1.2.1</version>
     </dependency>
     <dependency>
       <groupId>com.azure</groupId>
