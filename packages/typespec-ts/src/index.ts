@@ -171,8 +171,7 @@ export async function $onEmit(context: EmitContext) {
     staticHelpers,
     dependencies: {
       ...extraDependencies,
-    },
-    useSubpathImports: true,
+    }
   });
   provideSdkTypes(dpgContext);
 

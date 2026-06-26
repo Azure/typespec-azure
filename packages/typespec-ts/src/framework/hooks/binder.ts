@@ -53,7 +53,6 @@ class BinderImp implements Binder {
   private project: Project;
   private dependencies: Record<string, ReferenceableSymbol>;
   private staticHelpers: Map<string, StaticHelperMetadata>;
-  private useSubpathImports: boolean;
 
   constructor(project: Project, options: BinderOptions = {}) {
     this.project = project;
@@ -61,7 +60,6 @@ class BinderImp implements Binder {
     provideDependencies(options.dependencies);
     this.staticHelpers = options.staticHelpers ?? new Map();
     this.dependencies = useDependencies();
-    this.useSubpathImports = options.useSubpathImports ?? false;
   }
 
   trackDeclaration(refkey: unknown, name: string, sourceFile: SourceFile): string {
