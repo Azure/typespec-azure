@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-ts",
-  "version": "0.54.2",
+  "version": "0.55.0",
   "description": "An experimental TypeSpec emitter for TypeScript",
   "main": "dist/src/index.js",
   "type": "module",
