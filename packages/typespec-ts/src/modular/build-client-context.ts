@@ -1,3 +1,10 @@
+import { Effect } from "effect";
+import {
+  Dependencies,
+  OutputProject,
+  makeClientReaderLayer,
+  runClientContextSync,
+} from "../framework/effect-context.js";
 import { NameType, normalizeName } from "../rlc-common/index.js";
 import {
   buildGetClientCredentialParam,
@@ -59,7 +66,11 @@ export function buildClientContext(
 ): SourceFile {
   const project = useContext("outputProject");
   const dependencies = useDependencies();
-  const [hierarchy, client] = clientMap;
+
+  const effect = Effect.gen(function* () {
+    const project = yield* OutputProject;
+    const dependencies = yield* Dependencies;
+    const [hierarchy, client] = clientMap;
   const name = getClientName(client);
   const { rlcClientName } = getModularClientOptions(clientMap);
   const requiredParams = getClientParametersDeclaration(client, dpgContext, {
@@ -296,6 +307,9 @@ export function buildClientContext(
 
   clientContextFile.fixUnusedIdentifiers();
   return clientContextFile;
+  });
+
+  return runClientContextSync(effect, makeClientReaderLayer({ project, dependencies }));
 }
 
 function getDocsWithKnownVersion(
