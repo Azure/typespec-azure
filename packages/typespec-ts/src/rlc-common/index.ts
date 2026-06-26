@@ -19,7 +19,6 @@ export * from "./metadata/build-test-config.js";
 export * from "./metadata/build-ts-config.js";
 export * from "./metadata/build-vitest-config.js";
 export * from "./metadata/build-warp-config.js";
-export * from "./test/build-karma-config.js";
 export * from "./test/build-recorded-client.js";
 export * from "./test/build-sample-test.js";
 export * from "./test/build-snippets.js";
