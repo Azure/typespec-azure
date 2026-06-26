@@ -141,7 +141,10 @@ jobs:
       # --- Install & Build ---
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        # When deps were bumped to @next, those versions are newer than pnpm's
+        # minimumReleaseAge window (set in pnpm-workspace.yaml) and would be
+        # rejected. Disable the age check for those nightly runs only.
+        run: pnpm install --no-frozen-lockfile ${{ matrix.bump-deps-files && '--config.minimumReleaseAge=0' || '' }}
 
       - name: Build
         run: pnpm turbo run --filter "${{ matrix.package-filter }}..." build
