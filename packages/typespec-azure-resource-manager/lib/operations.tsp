@@ -676,7 +676,7 @@ op ArmResourceActionAsyncBase<
  */
 @returnsDoc("Azure operation completed successfully.")
 @Private.enforceConstraint(Resource, Foundations.Resource)
-@doc("A long-running resource action.")
+@doc("")
 op ArmResourceActionAsync<
   Resource extends Foundations.SimpleResource,
   Request,
@@ -717,7 +717,7 @@ op ArmResourceActionAsync<
  */
 @returnsDoc("Azure operation completed successfully.")
 @Private.enforceConstraint(Resource, Foundations.Resource)
-@doc("A long-running resource action.")
+@doc("")
 op ActionAsync<
   Resource extends Foundations.SimpleResource,
   Request,
@@ -790,7 +790,7 @@ op ArmResourceActionSync<
  * @template Provider Optional. The provider namespace model for the resource.
  */
 @Private.enforceConstraint(Resource, Foundations.Resource)
-@doc("A long-running resource action.")
+@doc("")
 op ArmResourceActionNoContentAsync<
   Resource extends Foundations.SimpleResource,
   Request extends TypeSpec.Reflection.Model | void,
@@ -826,7 +826,7 @@ op ArmResourceActionNoContentAsync<
  * @template Provider Optional. The provider namespace model for the resource.
  */
 @Private.enforceConstraint(Resource, Foundations.Resource)
-@doc("A long-running resource action.")
+@doc("")
 op ArmResourceActionNoResponseContentAsync<
   Resource extends Foundations.SimpleResource,
   Request,
@@ -936,6 +936,7 @@ op checkLocalNameAvailability<
 @action
 @armResourceCollectionAction
 @Private.armUpdateProviderNamespace
+@doc("")
 op ArmProviderActionSync<
   Request extends {} | unknown | void = void,
   Response extends {} | unknown | void = void,
@@ -967,6 +968,7 @@ op ArmProviderActionSync<
 @action
 @armResourceCollectionAction
 @Private.armUpdateProviderNamespace
+@doc("")
 op ArmProviderActionAsync<
   Request extends {} | unknown | void = void,
   Response extends TypeSpec.Reflection.Model | unknown | void = void,

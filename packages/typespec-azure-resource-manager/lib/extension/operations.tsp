@@ -459,7 +459,7 @@ op ActionAsyncBase<
 @extensionResourceOperation(TargetResource, ExtensionResource, "action", OverrideResourceName)
 @returnsDoc("Azure operation completed successfully.")
 @enforceConstraint(ExtensionResource, Foundations.Resource)
-@doc("A long-running resource action.")
+@doc("")
 op ActionAsync<
   TargetResource extends Foundations.SimpleResource,
   ExtensionResource extends Foundations.SimpleResource,
@@ -536,7 +536,7 @@ op ActionSync<
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
 @post
-@doc("A long-running resource action.")
+@doc("")
 op ActionNoResponseContentAsync<
   TargetResource extends Foundations.SimpleResource,
   ExtensionResource extends Foundations.SimpleResource,
