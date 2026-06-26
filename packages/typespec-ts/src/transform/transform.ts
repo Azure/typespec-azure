@@ -76,9 +76,6 @@ export async function transformClientModel(
     },
     sourceDir,
   };
-  // Legacy sample generation has been removed; modular samples are emitted separately,
-  // so the client model never carries sample groups.
-  options.generateSample = false;
   return model;
 }
 

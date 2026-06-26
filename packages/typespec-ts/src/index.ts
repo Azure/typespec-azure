@@ -85,8 +85,6 @@ import { buildTestBrowserTsConfig, buildTestNodeTsConfig } from "./metadata/buil
 import { buildTsConfig, buildTsLintConfig, buildTsSampleConfig, buildTsSnippetsConfig, buildTsSrcBrowserConfig, buildTsSrcCjsConfig, buildTsSrcEsmConfig, buildTsSrcReactNativeConfig } from "./metadata/build-ts-config.js";
 import { buildVitestConfig } from "./metadata/build-vitest-config.js";
 import { buildWarpConfig } from "./metadata/build-warp-config.js";
-import { getClientName } from "./utils/name-constructors.js";
-import { hasUnexpectedHelper } from "./utils/operation-helpers.js";
 
 export * from "./lib.js";
 
@@ -116,8 +114,6 @@ export async function $onEmit(context: EmitContext) {
   await enrichDpgContext();
   const resolvedEmitterOptions = dpgContext.emitterOptions ?? {};
 
-  const needUnexpectedHelper: Map<string, boolean> = new Map<string, boolean>();
-  const serviceNameToClientModelsMap: Map<string, ClientModel> = new Map<string, ClientModel>();
   provideContext("clientTypeMetaTree", new Map());
   provideContext("symbolMap", new Map());
   provideContext("outputProject", outputProject);
@@ -164,20 +160,16 @@ export async function $onEmit(context: EmitContext) {
   });
   provideSdkTypes(dpgContext);
 
-  const clientCodeModels: ClientModel[] = [];
   let modularEmitterOptions: ModularEmitterOptions;
   // 1. Clear sources folder
   await clearSrcFolder();
-  // 2. Generate client code model
-  // TODO: skip this step in modular once modular generator is sufficiently decoupled
-  await buildClientCodeModels();
-  // 3. Clear samples-dev folder if generateSample is true
+  // 2. Clear samples-dev folder if generateSample is true
   await clearSamplesDevFolder();
 
-  // 4. Generate sources
+  // 3. Generate modular sources
   await generateModularSources();
 
-  // 5. Generate metadata and test files
+  // 4. Generate metadata and test files
   function getTypespecTsVersion(context: EmitContext): string | undefined {
     const emitterMetadata = context.program.emitters.find(
       (emitter) => emitter.metadata.name === "@azure-tools/typespec-ts",
@@ -248,15 +240,13 @@ export async function $onEmit(context: EmitContext) {
     }
   }
 
-  async function buildClientCodeModels() {
+  async function buildClientCodeModels(): Promise<ClientModel[]> {
+    const models: ClientModel[] = [];
     const clients = getClients(dpgContext);
     for (const client of clients) {
-      const clientModels = await transformClientModel(client, dpgContext);
-      clientCodeModels.push(clientModels);
-      const serviceName = client.services[0]?.name ?? "Unknown";
-      serviceNameToClientModelsMap.set(serviceName, clientModels);
-      needUnexpectedHelper.set(getClientName(clientModels), hasUnexpectedHelper(clientModels));
+      models.push(await transformClientModel(client, dpgContext));
     }
+    return models;
   }
 
   async function generateModularSources() {
@@ -313,10 +303,11 @@ export async function $onEmit(context: EmitContext) {
       }
       buildRootIndex(dpgContext, modularEmitterOptions, rootIndexFile, subClient);
     }
-    // Enable modular sample generation when explicitly set to true or MPG
+    // Sample generation is enabled only when the modular generator actually emits
+    // samples. Reset the baseline here, then re-enable it below if any are emitted.
+    dpgContext.emitterOptions!.generateSample = false;
     if (emitterOptions["generate-sample"] === true) {
       const samples = emitSamples(dpgContext);
-      // Mark sample generation as enabled when modular samples were emitted.
       if (samples.length > 0) {
         dpgContext.emitterOptions!.generateSample = true;
       }
@@ -367,6 +358,7 @@ export async function $onEmit(context: EmitContext) {
 
   async function generateMetadataAndTest(context: SdkContext) {
     const project = useContext("outputProject");
+    const clientCodeModels = await buildClientCodeModels();
     if (clientCodeModels.length === 0 || !clientCodeModels[0]) {
       return;
     }
