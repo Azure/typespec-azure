@@ -220,7 +220,6 @@ class BinderImp implements Binder {
           declarationByPlaceholder,
           presentPlaceholders,
           replacementMap,
-          sourceRoot,
         );
         this.resolveDependencyReferences(
           file,
@@ -282,7 +281,6 @@ class BinderImp implements Binder {
     declarationByPlaceholder: Map<string, [unknown, DeclarationInfo | StaticHelperMetadata]>,
     presentPlaceholders: Set<string>,
     replacementMap: Map<string, string>,
-    sourceRoot: string,
   ) {
     for (const [placeholderKey, [declarationKey, declaration]] of declarationByPlaceholder) {
       if (!presentPlaceholders.has(placeholderKey)) {
