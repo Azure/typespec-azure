@@ -28,7 +28,9 @@
 #   1. A GitHub service connection named `azure` (see resources.repositories
 #      endpoint below) with access to Azure/azure-sdk-for-java. Rename if the
 #      typespec-azure project uses a different endpoint name.
-#   2. A token with push rights so create-pull-request.yml can open the draft PR.
+#   2. The `AzureSDKEngKeyVault Secrets` service connection (used by the
+#      create-pull-request step via login-to-github.yml to mint a GitHub App
+#      token). This already backs typespec-azure's create-github-release.yml.
 #   3. The pipeline itself must be registered in Azure DevOps (a YAML file alone
 #      does not create a runnable pipeline).
 
@@ -135,6 +137,11 @@ jobs:
 
       - template: /eng/common/pipelines/templates/steps/create-pull-request.yml@azure-sdk-for-java
         parameters:
+          # Empty AuthToken triggers login-to-github.yml (GitHub App auth via the
+          # AzureSDKEngKeyVault Secrets service connection) instead of the
+          # azuresdk-github-pat variable group. Without this the rate-limit /
+          # push / PR steps run with an unresolved token and fail with HTTP 401.
+          AuthToken: ""
           WorkingDirectory: $(Build.SourcesDirectory)/azure-sdk-for-java
           ScriptDirectory: $(Build.SourcesDirectory)/azure-sdk-for-java/eng/common/scripts
           RepoName: azure-sdk-for-java
