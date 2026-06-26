@@ -1,67 +1,83 @@
-# Install and Test on TypeSpec-Java
+# Test @azure-tools/typespec-java
 
-## Install TypeSpec
+This project regenerates and tests `@azure-tools/typespec-java` (the branded Java emitter built in
+the sibling [`emitter/`](../emitter) folder) against the [http-specs] and [azure-http-specs] Spector
+suites and a set of local TypeSpec sources under [`tsp/`](./tsp).
 
-Install Node.js and [TypeSpec](https://github.com/microsoft/typespec/).
+It is a standalone npm + Maven project and is intentionally **not** part of the pnpm workspace. It
+consumes the emitter via the packed `.tgz` produced by `emitter/Build-TypeSpec.ps1`.
+
+## Prerequisite
+
+Install [Node.js](https://nodejs.org/en/download/) 20 or above. (Verify by running `node --version`)
+
+Install [Java](https://docs.microsoft.com/java/openjdk/download) 11 or above. (Verify by running `java --version`)
+
+Install [Maven](https://maven.apache.org/download.cgi). (Verify by running `mvn --version`)
+
+## Build emitter, install, and generate code
+
+Run from this (`emitter-tests`) folder:
+
+```pwsh
+pwsh ./Generate.ps1
+```
+
+`Generate.ps1` calls `Setup.ps1` (which builds the emitter jar + `.tgz` via
+`emitter/Build-TypeSpec.ps1` and `npm install`s it here), then regenerates the SDK from the local
+`tsp/` sources and the [http-specs]/[azure-http-specs] specs into the (gitignored) `src/main/java`
+folder. This takes a while.
+
+To only (re)build and install the emitter without regenerating, run `pwsh ./Setup.ps1`.
+
+## Run the Spector tests
+
+```pwsh
+pwsh ./Spector-Tests.ps1
+```
+
+This starts the `tsp-spector` mock server, runs the JUnit tests (`mvn clean test`) against the
+generated SDK, then stops the server. It also writes `tsp-spector-coverage-java.json`.
+
+To start/stop the mock server manually (for example to run individual tests from your IDE):
 
 ```shell
-npm install -g @typespec/compiler
+npm run spector-start   # or: npm run spector-serve  (foreground)
+npm run spector-stop
 ```
 
-## Build JAR, Build and Install TypeSpec-Java
+## Sync hand-written tests and specs from core
 
-`pwsh Setup.ps1 -RebuildJar` in `./typespec-tests` folder.
+The hand-written JUnit tests under `src/test/java` and the local specs under `tsp/` are synced from
+the unbranded test project in the `core/` submodule
+(`core/packages/http-client-java/http-client-generator-test`). Refresh them with:
 
-It builds JAR and makes the npm package in `./typespec-extension`, then install it to `./typespec-tests` folder.
-
-## Generate Code
-
-`pwsh Generate.ps1` in `./typespec-tests` folder.
-
-It takes time.
-
-The existing code is already in sync. Run this if you have changed the code of TypeSpec-Java.
-
-## Run Test
-
-Start tsp-spector Test Server
-
-`npm run spector-serve`
-
-Then, run the tests in `typespec-tests` module as usual Java Tests.
-
-## Generate Code for TypeSpec Source
-
-`tsp compile <target.tsp>` in `./typespec-tests` folder.
-
-This is usually to do a quick check whether the modified TypeSpec-Java works as expected.
-
-Generated code will be at `./typespec-tests/tsp-output/` folder for inspect.
-
-## Debugging Java code
-
-`tspconfig.yaml` already configured
-```yaml
-    dev-options:
-      generate-code-model: true
+```pwsh
+pwsh ./SyncTests.ps1
 ```
 
-With this option, a `code-model.yaml` file is kept in `./typespec-tests/tsp-output/` folder after `tsp compile <target.tsp>`.
+The Azure-specific customization classes under `customization/` are hand-maintained here and are
+**not** synced from core.
 
-`Main.java` under `./typespec-extension` would load this `code-model.yaml` file as default, and run the Java code to generate the code.
-At this stage, one can modify or debug the Java code (`./typespec-extension/src/main/java/`) in IDE. The code generated in `./typespec-tests/tsp-output/` would reflect the modified Java code.
+## Generate code for a single TypeSpec source
 
-Notice:
-- Add `--add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED` to VM options.
-- There may be some difference of other option between `tspconfig.yaml` and `EmitterOptions.java`. Remember to temporarily modify `EmitterOptions.java` to reflect the option in `tspconfig.yaml` when running `Main.java` this way. For example, set `flavor` to `azure`.
+```shell
+npx tsp compile <target.tsp>
+```
+
+Useful for a quick check that a change to the emitter behaves as expected. Generated code is written
+to `tsp-output/` for inspection.
 
 ## Troubleshooting
 
 ### New version of `@typespec/compiler` etc.
 
-Force an installation of new version via deleting `package-lock.json` and `node_modules` in `./typespec-extension` folder.
+Force a clean install by deleting `node_modules` and `package-lock.json`, then re-run `Setup.ps1`:
 
 ```shell
 rm -rf node_modules
 rm package-lock.json
 ```
+
+[http-specs]: https://github.com/microsoft/typespec/tree/main/packages/http-specs
+[azure-http-specs]: https://github.com/Azure/typespec-azure/tree/main/packages/azure-http-specs
