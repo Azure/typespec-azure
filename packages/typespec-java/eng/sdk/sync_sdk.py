@@ -216,7 +216,13 @@ def apply_patches() -> None:
     failed_patches = []
     for patch_file in glob.glob(os.path.join(script_root, "patches/*.patch")):
         try:
-            subprocess.check_call(["git", "apply", patch_file, "--ignore-whitespace"], cwd=sdk_root)
+            # --whitespace=nowarn: some patches intentionally re-introduce trailing
+            # whitespace (they revert a regen). Without this, a build agent whose
+            # git is configured with apply.whitespace=error fails the apply.
+            subprocess.check_call(
+                ["git", "apply", patch_file, "--ignore-whitespace", "--whitespace=nowarn"],
+                cwd=sdk_root,
+            )
         except subprocess.CalledProcessError:
             logging.error(f"Failed to apply patch {patch_file}")
             failed_patches.append(patch_file)
