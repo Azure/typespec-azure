@@ -6,6 +6,8 @@
     "format": "npm run -s prettier -- --write",
     "check-format": "npm run prettier -- --check",
     "prettier": "prettier --config ./.prettierrc.yaml **/*.tsp",
+    "regenerate": "pwsh ./Generate.ps1",
+    "test:java:e2e": "pwsh ./Spector-Tests.ps1",
     "spector-serve": "tsp-spector serve ./node_modules/@typespec/http-specs/specs ./node_modules/@azure-tools/azure-http-specs/specs --coverageFile ./tsp-spector-coverage-java.json",
     "spector-start": "tsp-spector server start ./node_modules/@typespec/http-specs/specs ./node_modules/@azure-tools/azure-http-specs/specs --coverageFile ./tsp-spector-coverage-java.json",
     "spector-stop": "tsp-spector server stop"
