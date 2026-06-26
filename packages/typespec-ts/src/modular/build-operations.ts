@@ -22,7 +22,7 @@ import { addDeclaration } from "../framework/declaration.js";
 import { useDependencies } from "../framework/hooks/use-dependencies.js";
 import { resolveReference } from "../framework/reference.js";
 import { refkey } from "../framework/refkey.js";
-import { getModularClientOptions, isMultiEndpointClient } from "../utils/client-utils.js";
+import { getClientModuleInfo, isMultiEndpointClient } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import {
   getMethodHierarchiesMap,
@@ -48,7 +48,7 @@ export function buildOperationFiles(
   const project = useContext("outputProject");
   const [_, client] = clientMap;
   const operationFiles: Set<SourceFile> = new Set();
-  const { subfolder, clientName } = getModularClientOptions(clientMap);
+  const { subfolder, clientName } = getClientModuleInfo(clientMap);
   const isMultiEndpoint = isMultiEndpointClient(dpgContext);
   const clientType = isMultiEndpoint ? `Client.${clientName}` : "Client";
   const methodMap = getMethodHierarchiesMap(dpgContext, client);

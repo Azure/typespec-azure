@@ -23,7 +23,7 @@ import { useDependencies } from "../framework/hooks/use-dependencies.js";
 import { resolveReference } from "../framework/reference.js";
 import { refkey } from "../framework/refkey.js";
 import { reportDiagnostic } from "../lib.js";
-import { getModularClientOptions } from "../utils/client-utils.js";
+import { getClientModuleInfo } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import { buildEnumTypes, getApiVersionEnum } from "./emit-models.js";
 import { getDocsFromDescription } from "./helpers/docs-helpers.js";
@@ -40,7 +40,7 @@ export function getClientContextPath(
   emitterOptions: ModularEmitterOptions,
 ): string {
   const [_, client] = clientMap;
-  const { subfolder } = getModularClientOptions(clientMap);
+  const { subfolder } = getClientModuleInfo(clientMap);
   const name = getClientName(client);
   const srcPath = emitterOptions.modularOptions.sourceRoot;
   const contentPath = `${srcPath}/${
@@ -61,7 +61,7 @@ export function buildClientContext(
   const dependencies = useDependencies();
   const [hierarchy, client] = clientMap;
   const name = getClientName(client);
-  const { clientName } = getModularClientOptions(clientMap);
+  const { clientName } = getClientModuleInfo(clientMap);
   const requiredParams = getClientParametersDeclaration(client, dpgContext, {
     onClientOnly: false,
     requiredOnly: true,

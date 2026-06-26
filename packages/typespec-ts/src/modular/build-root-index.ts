@@ -4,7 +4,7 @@ import { Project, SourceFile } from "ts-morph";
 import { useContext } from "../context-manager.js";
 import { resolveReference } from "../framework/reference.js";
 import { reportDiagnostic } from "../lib.js";
-import { getModularClientOptions } from "../utils/client-utils.js";
+import { getClientModuleInfo } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import { getMethodHierarchiesMap } from "../utils/operation-util.js";
 import { partitionAndEmitExports } from "./build-subpath-index.js";
@@ -34,7 +34,7 @@ export function buildRootIndex(
   const project = useContext("outputProject");
   const [_, client] = clientMap;
   const srcPath = emitterOptions.modularOptions.sourceRoot;
-  const { subfolder } = getModularClientOptions(clientMap);
+  const { subfolder } = getClientModuleInfo(clientMap);
   const clientName = `${getClassicalClientName(client)}`;
   const clientFile = project.getSourceFile(
     `${srcPath}/${subfolder && subfolder !== "" ? subfolder + "/" : ""}${normalizeName(
@@ -365,7 +365,7 @@ export function buildSubClientIndexFile(
 ) {
   const project = useContext("outputProject");
   const [_, client] = clientMap;
-  const { subfolder } = getModularClientOptions(clientMap);
+  const { subfolder } = getClientModuleInfo(clientMap);
   const srcPath = emitterOptions.modularOptions.sourceRoot;
   const subClientIndexFile = project.createSourceFile(
     `${srcPath}/${subfolder && subfolder !== "" ? subfolder + "/" : ""}index.ts`,

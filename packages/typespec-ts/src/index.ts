@@ -66,7 +66,7 @@ import { transformClientModel } from "./transform/transform.js";
 import { transformClientOptions } from "./transform/transform-client-options.js";
 import {
   getClientHierarchyMap,
-  getModularClientOptions,
+  getClientModuleInfo,
   getClients,
 } from "./utils/client-utils.js";
 import { generateCrossLanguageDefinitionFile } from "./utils/cross-language-def.js";
@@ -290,7 +290,7 @@ export async function $onEmit(context: EmitContext) {
         exportIndex: true,
         interfaceOnly: true,
       });
-      const { subfolder } = getModularClientOptions(subClient);
+      const { subfolder } = getClientModuleInfo(subClient);
       // Generate index file for clients with subfolders (multi-client scenarios and nested clients)
       if (subfolder) {
         buildSubClientIndexFile(dpgContext, subClient, modularEmitterOptions);

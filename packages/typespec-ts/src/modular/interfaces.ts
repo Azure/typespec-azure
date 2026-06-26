@@ -10,7 +10,7 @@ export interface ModularEmitterOptions {
   modularOptions: ModularOptions;
 }
 
-export interface ModularClientOptions {
+export interface ClientModuleInfo {
   subfolder?: string;
   clientName: string;
 }

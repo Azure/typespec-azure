@@ -19,7 +19,7 @@ import { useContext } from "../context-manager.js";
 import { useDependencies } from "../framework/hooks/use-dependencies.js";
 import { resolveReference } from "../framework/reference.js";
 import { refkey } from "../framework/refkey.js";
-import { getModularClientOptions, isMultiEndpointClient } from "../utils/client-utils.js";
+import { getClientModuleInfo, isMultiEndpointClient } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import { getMethodHierarchiesMap, isTenantLevelOperation } from "../utils/operation-util.js";
 import { AzurePollingDependencies } from "./external-dependencies.js";
@@ -47,7 +47,7 @@ export function buildClassicalClient(
     requiredOnly: true,
   });
   const srcPath = emitterOptions.modularOptions.sourceRoot;
-  const { subfolder, clientName } = getModularClientOptions(clientMap);
+  const { subfolder, clientName } = getClientModuleInfo(clientMap);
 
   const clientFile = project.createSourceFile(
     `${srcPath}/${subfolder && subfolder !== "" ? subfolder + "/" : ""}${normalizeName(
@@ -274,7 +274,7 @@ function buildClientOperationGroups(
 ) {
   let clientType = "Client";
   const [_hierarchy, client] = clientMap;
-  const { subfolder } = getModularClientOptions(clientMap);
+  const { subfolder } = getClientModuleInfo(clientMap);
   if (subfolder && subfolder !== "") {
     clientType = `Client.${clientClass.getName()}`;
   }

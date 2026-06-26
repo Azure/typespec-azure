@@ -1,6 +1,6 @@
 import { getRelativePathFromDirectory, joinPaths } from "@typespec/compiler";
 import { useContext } from "../context-manager.js";
-import { getClientHierarchyMap, getModularClientOptions } from "../utils/client-utils.js";
+import { getClientHierarchyMap, getClientModuleInfo } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import { getMethodHierarchiesMap } from "../utils/operation-util.js";
 import { getClassicalLayerPrefix } from "./helpers/naming-helpers.js";
@@ -41,7 +41,7 @@ function buildExportsForMultiClient(
     if (hierarchy.length === 0) {
       hasTopLevelClient = true;
     }
-    const { subfolder } = getModularClientOptions([hierarchy, client]);
+    const { subfolder } = getClientModuleInfo([hierarchy, client]);
     if (subfolder !== "" && methodMap.size > 0) {
       packageInfo.exports[`./${subfolder}`] = `${srcPrefix}/${subfolder}/index.ts`;
 
@@ -55,7 +55,7 @@ function buildExportsForMultiClient(
     // TODO: support api subpath exports for multi-service. Skip for now. https://github.com/Azure/autorest.typescript/issues/3717
     if (!emitterOptions.options.isMultiService) {
       for (const flattenedClient of clientMap) {
-        const { subfolder } = getModularClientOptions(flattenedClient);
+        const { subfolder } = getClientModuleInfo(flattenedClient);
         const client = flattenedClient[1];
         const methodMap = getMethodHierarchiesMap(context, client);
         for (const [prefixKey, _] of methodMap) {

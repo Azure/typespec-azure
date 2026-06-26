@@ -10,7 +10,7 @@ import {
 import { addDeclaration } from "../../framework/declaration.js";
 import { resolveReference } from "../../framework/reference.js";
 import { refkey } from "../../framework/refkey.js";
-import { getModularClientOptions } from "../../utils/client-utils.js";
+import { getClientModuleInfo } from "../../utils/client-utils.js";
 import { SdkContext } from "../../utils/interfaces.js";
 import { ServiceOperation } from "../../utils/operation-util.js";
 import { AzurePollingDependencies } from "../external-dependencies.js";
@@ -55,7 +55,7 @@ export function getClassicalOperation(
 ) {
   const prefixes = operationGroup[0];
   const operations = operationGroup[1];
-  const { clientName } = getModularClientOptions(clientMap);
+  const { clientName } = getClientModuleInfo(clientMap);
   const hasClientContextImport = classicFile.getImportDeclarations().filter((i) => {
     return (
       i.getModuleSpecifierValue() ===

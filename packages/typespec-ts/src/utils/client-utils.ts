@@ -14,7 +14,7 @@ import {
   Namespace,
   Operation,
 } from "@typespec/compiler";
-import { ModularClientOptions } from "../modular/interfaces.js";
+import { ClientModuleInfo } from "../modular/interfaces.js";
 import { SdkContext } from "./interfaces.js";
 import { NameType, normalizeName } from "./name-utils.js";
 
@@ -114,13 +114,13 @@ export function isMultiEndpointClient(dpgContext: SdkContext): boolean {
   return getClients(dpgContext).length > 1;
 }
 
-export function getModularClientOptions(clientMap: [string[], SdkClientType<SdkServiceOperation>]) {
+export function getClientModuleInfo(clientMap: [string[], SdkClientType<SdkServiceOperation>]) {
   const [hierarchy, client] = clientMap;
-  const clientOptions: ModularClientOptions = {
+  const clientModuleInfo: ClientModuleInfo = {
     clientName: `${client.name.replace(/Client$/, "")}Context`,
   };
-  clientOptions.subfolder = hierarchy.join("/");
-  return clientOptions;
+  clientModuleInfo.subfolder = hierarchy.join("/");
+  return clientModuleInfo;
 }
 
 export function getClientHierarchyMap(
