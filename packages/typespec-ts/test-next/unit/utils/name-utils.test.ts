@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { NameType, normalizeName } from "../../../../src/utils/name-utils.js";
+import { NameType, normalizeName } from "../../../src/utils/name-utils.js";
 
 describe("#normalizeName", () => {
   describe("general cases", () => {

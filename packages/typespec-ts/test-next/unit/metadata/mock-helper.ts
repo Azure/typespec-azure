@@ -1,8 +1,8 @@
 import {
   buildRuntimeImports,
   initInternalImports,
-} from "../../../../src/utils/imports-util.js";
-import { RLCModel } from "../../../../src/interfaces.js";
+} from "../../../src/utils/imports-util.js";
+import { RLCModel } from "../../../src/interfaces.js";
 
 export type TestModelConfig = {
   description?: string;

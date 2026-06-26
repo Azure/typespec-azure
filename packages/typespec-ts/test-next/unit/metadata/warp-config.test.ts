@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { buildWarpConfig } from "../../../../src/metadata/build-warp-config.js";
+import { buildWarpConfig } from "../../../src/metadata/build-warp-config.js";
 import { createMockModel } from "./mock-helper.js";
 
 describe("warp.config.yml generation", () => {

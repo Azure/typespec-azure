@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { buildSnippets } from "../../../../src/metadata/test/build-snippets.js";
+import { buildSnippets } from "../../../src/metadata/test/build-snippets.js";
 import { createMockModel } from "./mock-helper.js";
 
 describe("Snippets file generation", () => {
