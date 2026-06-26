@@ -10,7 +10,6 @@ describe("Snippets file generation", () => {
   describe("Should generate snippets for modular", () => {
     it("should create snippets with subscriptionId", () => {
       const clientName = "testClient";
-      const azureSdkForJs = true;
       const model = createMockModel({
         scopeName: "azure",
         hasSubscriptionId: true,
@@ -18,7 +17,7 @@ describe("Snippets file generation", () => {
         azureArm: true,
         addCredentials: true,
       });
-      const snippetsFile = buildSnippets(model, clientName, azureSdkForJs);
+      const snippetsFile = buildSnippets(model, clientName);
 
       expect(snippetsFile?.content).includes(
         `const subscriptionId = "00000000-0000-0000-0000-000000000000";`,
@@ -30,14 +29,13 @@ describe("Snippets file generation", () => {
 
     it("should create snippets without subscriptionId", () => {
       const clientName = "testClient";
-      const azureSdkForJs = true;
       const model = createMockModel({
         scopeName: "azure",
         isModularLibrary: true,
         azureArm: true,
         addCredentials: true,
       });
-      const snippetsFile = buildSnippets(model, clientName, azureSdkForJs);
+      const snippetsFile = buildSnippets(model, clientName);
 
       expect(snippetsFile?.content).includes(
         "const client = new testClient(new DefaultAzureCredential());",

@@ -170,6 +170,15 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - Multiple request content types: enum with one value per content type.
 - Multiple response content types: single constant with comma-joined string (structured types first).
 - Constants and enums get proper generated names via the naming context path (e.g., `DownloadFileMultipleContentTypesAccept`).
+- For file bodies with multiple content types, TCGC reuses the File model's `contentType` property's union type so that the synthesized `contentType` header parameter and the File model's property reference the same `SdkEnumType` instance.
+
+## Example Matching (June 2026)
+
+- Example file operation IDs are resolved under the `autorest` scope (not the per-language scope) to avoid per-language `@clientLocation`/`@clientName` overrides breaking example linkage. This ensures the same example file matches regardless of which language emitter is consuming TCGC.
+
+## BinarySerializationOptions (June 2026)
+
+- The `filename` property on `BinarySerializationOptions` is of type `SdkModelPropertyType` (not the raw TypeSpec `ModelProperty`). This was corrected from the original implementation to use TCGC's own type system consistently.
 
 ## Usage Flag Propagation
 
@@ -205,3 +214,22 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - `listOrphanTypes` no longer iterates only user-defined namespaces. It now uses `listScopedDecoratorData` to find all types and namespaces with an explicit `@usage` decorator, including types in imported libraries (e.g., `@@usage(Azure.Core.Foundations.Error, Usage.input)`).
 - When `@usage` is applied to a namespace, the function recursively descends into sub-namespaces to collect all models, enums, and unions.
 - Types with `@hierarchyBuilding` are also collected separately (only when legacy hierarchy building is enabled).
+- **Ordering**: `listOrphanTypes` returns types in a stable order: models first, then enums, then unions. This ensures anonymous types (e.g., anonymous model variants inside unions) get their generated name from the model property context rather than the union context, producing stable names like `OuterWithNullableValue` instead of `RecursiveNullableType1`.
+
+## Feedback Lessons (PR #4430)
+
+- Only ONE `#suppress "experimental-feature" "exact"` directive is needed per property — it covers all subsequent `@clientName(exact(...))` decorators on that property.
+- When creating exact-name Spector specs, the namespace needs `@clientNamespace` for BOTH Java (`"azure.clientgenerator.core.exactname"`) AND Python (`"specs.azure.clientgenerator.core.exactname"`) so tests pass in both language emitter test suites.
+- The @clientNamespace for python should be formatted multi-line if it exceeds a reasonable line length.
+
+## Per-Service API Version (June 2026)
+
+- The `api-version` emitter option now accepts `string | Record<string, string>`. The Record form maps service namespace full names to version strings, enabling per-service API version control in multi-service packages.
+- `resolveApiVersionForService` in `src/internal-utils.ts` is the central resolution function (internal, not exported). It handles string vs Record config dispatch.
+- For multi-service packages, `"all"` is NOT supported — it falls back to `undefined` (latest version). This applies in both the string and Record forms.
+- `"latest"` is a global keyword that applies regardless of single/multi-service.
+- In the Record form, services not listed in the map return `undefined` (latest version).
+- `SdkPackage.metadata.apiVersions` (Map) stores the resolved version per service. `metadata.apiVersion` (string, deprecated) is `undefined` for multi-service.
+- No Spector spec was added for this feature — it's a code-generation-time config behavior, not a wire-level behavior. The unit tests in `test/package/api-versions-metadata.test.ts` and `test/clients/structure.test.ts` thoroughly cover it.
+- The guideline.md was updated to document `SdkPackage.metadata` (both `apiVersion` and `apiVersions`).
+- The 10versioning.mdx was updated to mention the Record form and add a "Per-service versioning (multi-service packages)" section.

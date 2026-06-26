@@ -257,7 +257,10 @@ function parseTypeScript(
 
 /**
  * Go-specific metadata parser.
- * Extracts from module path, looking for azure-sdk-for-go suffix.
+ * Extracts from module path, looking for azure-sdk-for-go suffix, as a fallback.
+ * The primary derivation of package name from the emitter output directory is handled
+ * by the caller (createLanguageMetadata) after the relative output path is computed,
+ * because it requires knowledge of the base output directory.
  */
 function parseGo(
   options: Record<string, unknown>,
@@ -558,6 +561,21 @@ function createLanguageMetadata(
   // Resolve {namespace} placeholder in output directory
   if (relativeOutputDir && namespace) {
     relativeOutputDir = relativeOutputDir.replace(/\{namespace\}/g, namespace);
+  }
+
+  // For Go, prefer the emitter output directory over the module path for package name derivation.
+  // The output directory gives the correct repo-relative path (e.g., sdk/resourcemanager/redisenterprise/armredisenterprise)
+  // without version suffixes that may appear in the module path (e.g., /v4).
+  if (heuristicLang === "go" && relativeOutputDir?.startsWith("{output-dir}/")) {
+    const explicitPackageName =
+      normalizedOptions["package-name"] ?? normalizedOptions["package_name"];
+    if (!explicitPackageName) {
+      const outputDirPackageName = relativeOutputDir.substring("{output-dir}/".length);
+      packageName = outputDirPackageName;
+      if (!normalizedOptions["namespace"]) {
+        namespace = outputDirPackageName;
+      }
+    }
   }
 
   return {

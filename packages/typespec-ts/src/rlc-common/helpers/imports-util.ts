@@ -1,64 +1,52 @@
 import { SourceFile } from "ts-morph";
-import { ImportType, Imports, PackageFlavor } from "../interfaces.js";
+import { ImportType, Imports } from "../interfaces.js";
 
 /**
- * Build the common imports for generated SDK
- * @param flavor flavor of SDK to generate, if any. When set to "azure", Azure Core packages will be used. When unset, the generic `ts-http-runtime` package will be used.
+ * Build the common imports for generated SDK. Azure Core packages are always used.
  * @returns
  */
-export function buildRuntimeImports(flavor?: PackageFlavor): Imports {
-  if (flavor === "azure") {
-    return {
-      restClient: {
-        type: "restClient",
-        specifier: "@azure-rest/core-client",
-        version: "^2.0.0",
-      },
-      coreAuth: {
-        type: "coreAuth",
-        specifier: "@azure/core-auth",
-        version: "^1.6.0",
-      },
-      restPipeline: {
-        type: "restPipeline",
-        specifier: "@azure/core-rest-pipeline",
-        version: "^1.14.0",
-      },
-      coreUtil: {
-        type: "coreUtil",
-        specifier: "@azure/core-util",
-        version: "^1.4.0",
-      },
-      coreLogger: {
-        type: "coreLogger",
-        specifier: "@azure/logger",
-        version: "^1.0.4",
-      },
-      azureEslintPlugin: {
-        type: "azureEslintPlugin",
-        specifier: "@azure/eslint-plugin-azure-sdk",
-        version: "^3.0.0",
-      },
-      azureTestRecorder: {
-        type: "azureTestRecorder",
-        specifier: "@azure-tools/test-recorder",
-        version: "^3.0.0",
-      },
-      azureCoreLro: {
-        type: "azureCoreLro",
-        specifier: "@azure/core-lro",
-      },
-    } as Imports;
-  } else {
-    // In non-azure branded scope we only have one dependency that is ts-http-runtime
-    return {
-      commonFallback: {
-        type: "commonFallback",
-        specifier: "@typespec/ts-http-runtime",
-        version: "0.1.0",
-      },
-    } as Imports;
-  }
+export function buildRuntimeImports(): Imports {
+  return {
+    restClient: {
+      type: "restClient",
+      specifier: "@azure-rest/core-client",
+      version: "^2.0.0",
+    },
+    coreAuth: {
+      type: "coreAuth",
+      specifier: "@azure/core-auth",
+      version: "^1.6.0",
+    },
+    restPipeline: {
+      type: "restPipeline",
+      specifier: "@azure/core-rest-pipeline",
+      version: "^1.14.0",
+    },
+    coreUtil: {
+      type: "coreUtil",
+      specifier: "@azure/core-util",
+      version: "^1.4.0",
+    },
+    coreLogger: {
+      type: "coreLogger",
+      specifier: "@azure/logger",
+      version: "^1.0.4",
+    },
+    azureEslintPlugin: {
+      type: "azureEslintPlugin",
+      specifier: "@azure/eslint-plugin-azure-sdk",
+      version: "^3.0.0",
+    },
+    azureTestRecorder: {
+      type: "azureTestRecorder",
+      specifier: "@azure-tools/test-recorder",
+      version: "^3.0.0",
+    },
+    azureCoreLro: {
+      type: "azureCoreLro",
+      specifier: "@azure/core-lro",
+    },
+  } as Imports;
 }
 
 /**

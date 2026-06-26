@@ -1,5 +1,5 @@
 import { getHttpOperationWithCache, SdkClient } from "@azure-tools/typespec-client-generator-core";
-import { HelperFunctionDetails, PackageFlavor } from "../rlc-common/index.js";
+import { HelperFunctionDetails } from "../rlc-common/index.js";
 import { listOperationsUnderRLCClient } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import { getCollectionFormat } from "../utils/model-utils.js";
@@ -13,17 +13,8 @@ import {
 export function transformHelperFunctionDetails(
   client: SdkClient,
   dpgContext: SdkContext,
-  flavor?: PackageFlavor,
 ): HelperFunctionDetails {
   const serializeInfo = extractSpecialSerializeInfo(client, dpgContext);
-  // Disable paging and long running for non-Azure clients.
-  if (flavor !== "azure") {
-    return {
-      hasLongRunning: false,
-      hasPaging: false,
-      ...serializeInfo,
-    };
-  }
 
   const annotationDetails = {
     hasLongRunning: hasPollingOperations(client, dpgContext),

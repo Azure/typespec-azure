@@ -1,6 +1,4 @@
-import { NoTarget, Program } from "@typespec/compiler";
-import { readdir, readFile, stat } from "fs/promises";
-import * as path from "path";
+import { type CompilerHost, joinPaths, NoTarget, Program } from "@typespec/compiler";
 import {
   ClassDeclaration,
   EnumDeclaration,
@@ -12,7 +10,6 @@ import {
 } from "ts-morph";
 import { reportDiagnostic } from "../lib.js";
 import { ModularEmitterOptions } from "../modular/interfaces.js";
-import { isAzurePackage } from "../rlc-common/index.js";
 import { resolveProjectRoot } from "../utils/resolve-project-root.js";
 import { refkey } from "./refkey.js";
 export const SourceFileSymbol = Symbol("SourceFile");
@@ -39,6 +36,9 @@ export interface LoadStaticHelpersOptions extends Partial<ModularEmitterOptions>
   sourcesDir?: string;
   rootDir?: string;
   program?: Program;
+  host?: CompilerHost;
+  /** The emitter package root directory (where static/ lives). */
+  packageRoot?: string;
   /** When true, also load test helpers from static/test-helpers/ into test/generated/util/ */
   loadTestHelpers?: boolean;
 }
@@ -54,27 +54,29 @@ export async function loadStaticHelpers(
   options: LoadStaticHelpersOptions = {},
 ): Promise<Map<string, StaticHelperMetadata>> {
   const helpersMap = new Map<string, StaticHelperMetadata>();
+  const host = options.host ?? options.program?.host;
+  if (!host) {
+    throw new Error(
+      "loadStaticHelpers requires either a host or program in options to access the file system.",
+    );
+  }
+
+  const packageRoot = options.packageRoot ?? resolveProjectRoot();
+
   // Load static helpers used in sources code
-  const defaultStaticHelpersPath = path.join(
-    resolveProjectRoot(),
-    DEFAULT_SOURCES_STATIC_HELPERS_PATH,
-  );
+  const defaultStaticHelpersPath = joinPaths(packageRoot, DEFAULT_SOURCES_STATIC_HELPERS_PATH);
   const filesInSources = await traverseDirectory(
     options.helpersAssetDirectory ?? defaultStaticHelpersPath,
+    host,
     options.program,
   );
   await loadFiles(filesInSources, options.sourcesDir ?? "");
   // Load static helpers used in testing code (only when loadTestHelpers is enabled)
-  if (
-    options.loadTestHelpers ??
-    (options.options?.generateTest && isAzurePackage({ options: options.options }))
-  ) {
-    const defaultTestingHelpersPath = path.join(
-      resolveProjectRoot(),
-      DEFAULT_SOURCES_TESTING_HELPERS_PATH,
-    );
+  if (options.loadTestHelpers ?? options.options?.generateTest) {
+    const defaultTestingHelpersPath = joinPaths(packageRoot, DEFAULT_SOURCES_TESTING_HELPERS_PATH);
     const filesInTestings = await traverseDirectory(
       defaultTestingHelpersPath,
+      host,
       options.program,
       [],
       "",
@@ -86,34 +88,25 @@ export async function loadStaticHelpers(
 
   async function loadFiles(files: FileMetadata[], generateDir: string) {
     for (const file of files) {
-      const targetPath = path.join(generateDir, file.target);
-      const contents = await readFile(file.source, "utf-8");
+      const targetPath = joinPaths(generateDir, file.target);
+      const sourceFile = await host!.readFile(file.source);
+      const contents = sourceFile.text;
       const addedFile = project.createSourceFile(targetPath, contents, {
         overwrite: true,
       });
       addedFile.getImportDeclarations().map((i) => {
-        if (!isAzurePackage({ options: options.options })) {
-          if (i.getModuleSpecifier().getFullText().includes("@azure/core-rest-pipeline")) {
-            i.setModuleSpecifier("@typespec/ts-http-runtime");
-          }
-          if (i.getModuleSpecifier().getFullText().includes("@azure-rest/core-client")) {
-            i.setModuleSpecifier("@typespec/ts-http-runtime");
-          }
-        }
         // Rewrite relative platform-types imports to #platform/ specifiers
         // so that browser/react-native variants are resolved via subpath imports.
         // Only rewrite imports to the default variant (not -browser/-react-native variants
         // which are already platform-specific direct imports).
-        if (options.options?.azureSdkForJs) {
-          const specifier = i.getModuleSpecifierValue();
-          if (
-            specifier.startsWith(".") &&
-            specifier.includes("platform-types") &&
-            !specifier.includes("-browser") &&
-            !specifier.includes("-react-native")
-          ) {
-            i.setModuleSpecifier("#platform/static-helpers/platform-types");
-          }
+        const specifier = i.getModuleSpecifierValue();
+        if (
+          specifier.startsWith(".") &&
+          specifier.includes("platform-types") &&
+          !specifier.includes("-browser") &&
+          !specifier.includes("-react-native")
+        ) {
+          i.setModuleSpecifier("#platform/static-helpers/platform-types");
         }
       });
 
@@ -187,32 +180,36 @@ function getDeclarationByMetadata(
   }
 }
 
+type FsHost = Pick<CompilerHost, "readFile" | "readDir" | "stat">;
+
 const _targetStaticHelpersBaseDir = "static-helpers";
 async function traverseDirectory(
   directory: string,
+  host: FsHost,
   program?: Program,
   result: { source: string; target: string }[] = [],
   relativePath: string = "",
   targetBaseDir: string = _targetStaticHelpersBaseDir,
 ): Promise<{ source: string; target: string }[]> {
   try {
-    const files = await readdir(directory);
+    const files = await host.readDir(directory);
 
     await Promise.all(
       files.map(async (file) => {
-        const filePath = path.join(directory, file);
-        const fileStat = await stat(filePath);
+        const filePath = joinPaths(directory, file);
+        const fileStat = await host.stat(filePath);
 
         if (fileStat.isDirectory()) {
           await traverseDirectory(
             filePath,
+            host,
             program,
             result,
-            path.join(relativePath, file),
+            joinPaths(relativePath, file),
             targetBaseDir,
           );
         } else if (fileStat.isFile() && !file.endsWith(".d.ts") && /.*\..?ts$/.test(file)) {
-          const target = path.join(targetBaseDir, relativePath, file);
+          const target = joinPaths(targetBaseDir, relativePath, file);
           result.push({ source: filePath, target });
         }
       }),
