@@ -14,7 +14,7 @@
 *.lock.yml
 
 # Auto-generated agentic workflow maintenance file
-.github/workflows/agentics-maintenance.yml
+**/.github/workflows/agentics-maintenance.yml
 
 # Coverage report directory
 **/coverage/

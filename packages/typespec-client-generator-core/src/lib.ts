@@ -401,6 +401,7 @@ export const $lib = createTypeSpecLibrary({
         modelPropertyToClientInitialization: paramMessage`There is already a parameter called '${"parameterName"}' in the client initialization.`,
         modelPropertyToString:
           "`@clientLocation` can only move model properties to interfaces or namespaces.",
+        parameterTypeConflict: paramMessage`@clientLocation cannot move multiple parameters named '${"parameterName"}' with different types to the same client. This often happens when @clientLocation is applied to a templated parameter that is instantiated with different types. Move the parameter on each operation instead, so that it has a consistent type on the client.`,
       },
     },
     "client-location-wrong-type": {
