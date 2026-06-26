@@ -95,15 +95,7 @@ export async function loadStaticHelpers(
       const addedFile = project.createSourceFile(targetPath, contents, {
         overwrite: true,
       });
-      addedFile.getImportDeclarations().map((i) => {
-        
-          if (i.getModuleSpecifier().getFullText().includes("@azure/core-rest-pipeline")) {
-            i.setModuleSpecifier("@typespec/ts-http-runtime");
-          }
-          if (i.getModuleSpecifier().getFullText().includes("@azure-rest/core-client")) {
-            i.setModuleSpecifier("@typespec/ts-http-runtime");
-          }
-        
+      addedFile.getImportDeclarations().map((i) => {      
         // Rewrite relative platform-types imports to @azure/core-rest-pipeline for azure packages
         // (NodeReadableStream is now exported directly from @azure/core-rest-pipeline).
         // Non-azure packages keep the relative import to the local platform-types.ts.
