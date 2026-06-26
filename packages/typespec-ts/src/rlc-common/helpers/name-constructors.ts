@@ -77,14 +77,7 @@ export function getParameterTypeName(baseNameOrOperationGroup: string, operation
 }
 
 export function getClientName(model: RLCModel) {
-  const clientName = model.libraryName;
-  const clientInterfaceName = model.options?.isModularLibrary
-    ? model.libraryName
-    : clientName.endsWith("Client")
-      ? `${clientName}`
-      : `${clientName}Client`;
-
-  return clientInterfaceName;
+  return model.libraryName;
 }
 
 export function getMultipartPartTypeName(schemaName: string, partName: string) {

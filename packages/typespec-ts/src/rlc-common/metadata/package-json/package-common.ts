@@ -11,7 +11,6 @@ export interface PackageCommonInfoConfig {
   exports?: Record<string, any>;
   dependencies?: Record<string, string>;
   azureArm?: boolean;
-  isModularLibrary?: boolean;
   /**
    * When true, generates React Native build targets (dist/react-native, exports condition).
    * Defaults to false.

@@ -804,9 +804,8 @@ op ArmResourceActionNoContentAsync<
 > is ArmResourceActionAsyncBase<
   Resource,
   Request,
-
-    | ArmAcceptedLroResponse<"Resource operation accepted.", LroHeaders>
-    | ArmNoContentResponse<"Action completed successfully.">,
+  | ArmAcceptedLroResponse<"Resource operation accepted.", LroHeaders>
+  | ArmNoContentResponse<"Action completed successfully.">,
   BaseParameters,
   Parameters,
   Error,

@@ -1,15 +1,36 @@
-import {
-  Extractor,
-  ExtractorConfig,
-  ExtractorLogLevel,
-  IExtractorConfigPrepareOptions,
-} from "@microsoft/api-extractor";
+import type { IExtractorConfigPrepareOptions } from "@microsoft/api-extractor";
+import { Extractor, ExtractorConfig, ExtractorLogLevel } from "@microsoft/api-extractor";
+import { existsSync } from "fs";
 import * as fs from "fs/promises";
+import { createRequire } from "module";
 import { dirname, join as joinPath } from "path";
-import { CompilerOptions, createProgram } from "typescript";
+import type { CompilerOptions } from "typescript";
+import { createProgram } from "typescript";
 import { fileURLToPath } from "url";
 import { createTaskLogger } from "./logger.js";
-import { npxCommand } from "./run-command.js";
+import { runCommand } from "./run-command.js";
+
+// Resolve the TypeSpec compiler CLI entry (cmd/tsp.js) once per process and invoke it
+// directly with `node`. Spawning `npx tsp` re-resolves the package on every call, which
+// adds ~5s of pure boot overhead per spec; `node <entry>` keeps the same subprocess
+// isolation (one fresh process per compile) without that tax.
+let cachedTspCliPath: string | undefined;
+function resolveTspCliPath(): string {
+  if (cachedTspCliPath) {
+    return cachedTspCliPath;
+  }
+  const require = createRequire(import.meta.url);
+  let dir = dirname(require.resolve("@typespec/compiler"));
+  for (let i = 0; i < 8; i++) {
+    const candidate = joinPath(dir, "cmd", "tsp.js");
+    if (existsSync(candidate)) {
+      cachedTspCliPath = candidate;
+      return candidate;
+    }
+    dir = dirname(dir);
+  }
+  throw new Error("Could not resolve @typespec/compiler CLI entry (cmd/tsp.js)");
+}
 
 function deepMerge(target: any, source: any): any {
   const result = { ...target };
@@ -30,16 +51,25 @@ function deepMerge(target: any, source: any): any {
   return result;
 }
 
+// Which generation steps to run for a spec.
+// - "client": emit the client sources the integration tests import (steps the test
+//   suite needs: emitClient + gitignore + test tsconfig).
+// - "declarations": emit the public-surface baseline (tsc .d.ts + api-extractor rollup
+//   into src/index.d.ts). Only `check:tree` consumes these, so they can run off the
+//   test critical path.
+// - "all": run everything (used by regen-test-baselines and any single-pass caller).
+export type GenPhase = "client" | "declarations" | "all";
+
 interface GenEnv {
   readonly logger: () => any;
-  readonly mode: () => any;
+  readonly phase: () => GenPhase;
   readonly sourceTypespec: () => any;
   readonly targetFolder: () => any;
   readonly scriptDir: () => string;
   readonly declarationSubpath: () => string;
 }
 
-function genEnv(config: any, mode: any): GenEnv {
+function genEnv(config: any, phase: GenPhase): GenEnv {
   const { inputPath: sourceTypespec, outputPath: targetFolder } = config;
 
   const __filename = fileURLToPath(import.meta.url);
@@ -51,7 +81,7 @@ function genEnv(config: any, mode: any): GenEnv {
 
   return {
     logger: () => logger,
-    mode: () => mode,
+    phase: () => phase,
     sourceTypespec: () => sourceTypespec,
     targetFolder: () => targetFolder,
     scriptDir: () => testRoot,
@@ -59,8 +89,8 @@ function genEnv(config: any, mode: any): GenEnv {
   } as const;
 }
 
-export async function runTypespec(config: any, mode: any) {
-  const env = genEnv(config, mode);
+export async function runTypespec(config: any, phase: GenPhase = "all") {
+  const env = genEnv(config, phase);
   await runTypespecHelper(env);
 }
 
@@ -68,17 +98,24 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
   await (async () => {
     let error;
     const logger = env.logger();
-    logger.log(`=== Start ${env.targetFolder()} ===`);
+    const phase = env.phase();
+    const runClient = phase === "client" || phase === "all";
+    const runDeclarations = phase === "declarations" || phase === "all";
+    logger.log(`=== Start ${env.targetFolder()} (${phase}) ===`);
     try {
-      await emitClient();
-      logger.log("=== Emitting gitignore ===");
-      await emitGitignore();
-      logger.log("=== Emitting test tsconfig ===");
-      await emitTestTsconfig();
-      logger.log("=== Emitting declaration files ===");
-      await emitDeclarationFiles();
-      logger.log("=== Emitting API summary ===");
-      await emitDeclarationRollup();
+      if (runClient) {
+        await emitClient();
+        logger.log("=== Emitting gitignore ===");
+        await emitGitignore();
+        logger.log("=== Emitting test tsconfig ===");
+        await emitTestTsconfig();
+      }
+      if (runDeclarations) {
+        logger.log("=== Emitting declaration files ===");
+        await emitDeclarationFiles();
+        logger.log("=== Emitting API summary ===");
+        await emitDeclarationRollup();
+      }
       logger.log(`=== End ${env.targetFolder()} ===`);
     } catch (e: any) {
       logger.error(e.toString());
@@ -95,9 +132,14 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
     const logger = env.logger();
 
     const workingDir = outputPath();
-    const commandArguments = ["compile", `${await entryPath()}`, "--config tspconfig.yaml "];
+    const commandArguments = [
+      resolveTspCliPath(),
+      "compile",
+      `${await entryPath()}`,
+      "--config tspconfig.yaml ",
+    ];
 
-    await npxCommand("tsp", commandArguments, workingDir, logger);
+    await runCommand("node", commandArguments, workingDir, logger);
   }
 
   async function emitGitignore(): Promise<void> {
@@ -271,17 +313,13 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
     }
   }
 
-  function clientType() {
-    return env.mode().includes("modular") ? "modular" : "rlc";
-  }
-
   function outputPath() {
-    const subPath = {
-      modular: "azure-modular-integration",
-      rlc: "azure-integration",
-    }[clientType()];
-
-    const outputPath = joinPath(testRoot(), subPath, "generated", env.targetFolder());
+    const outputPath = joinPath(
+      testRoot(),
+      "azure-modular-integration",
+      "generated",
+      env.targetFolder(),
+    );
 
     return outputPath;
   }

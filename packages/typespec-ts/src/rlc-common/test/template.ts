@@ -182,15 +182,12 @@ describe("My test", () => {
 `;
 
 export const snippetsContent = `
-{{#if isModularLibrary}}
 import { {{ clientClassName }} } from "../src/index.js";
 import { DefaultAzureCredential, InteractiveBrowserCredential } from "@azure/identity";
-{{/if}}
 import { setLogLevel } from "@azure/logger";
 import { describe, it } from "vitest";
 
 describe("snippets", () => {
-{{#if isModularLibrary}}
   it("ReadmeSampleCreateClient_Node", async () => {
     {{#if azureArm}}
     {{#if hasSubscriptionId}}
@@ -224,7 +221,6 @@ describe("snippets", () => {
     const client = new {{ clientClassName }}("<endpoint>", credential);
     {{/if}}
   });
-  {{/if}}
 
   it("SetLogLevel", async () => {
     setLogLevel("info");
