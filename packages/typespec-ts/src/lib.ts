@@ -49,7 +49,6 @@ export interface EmitterOptions {
   "experimental-extensible-enums"?: boolean;
   "clear-output-folder"?: boolean;
   "ignore-property-name-normalize"?: boolean;
-  "compatibility-query-multi-format"?: boolean;
   "typespec-title-map"?: Record<string, string>;
   "ignore-enum-member-name-normalize"?: boolean;
   //TODO should remove this after finish the release tool test
@@ -233,12 +232,6 @@ export const EmitterOptionsSchema: JSONSchemaType<EmitterOptions> = {
       nullable: true,
       description:
         "The emitter has a normalization logic for enum member key, to ignore this normalization, you can set this option to true",
-    },
-    "compatibility-query-multi-format": {
-      type: "boolean",
-      nullable: true,
-      description:
-        "Whether to generate the backward-compatible code for query parameter serialization for array types. Defaults to `false`",
     },
     "typespec-title-map": {
       type: "object",

@@ -122,7 +122,7 @@ function getParameterMetadata(
   let description = getFormattedPropertyDoc(program, parameter.param, schema) ?? "";
   const format = getCollectionFormat(dpgContext, parameter as any);
   if (isArrayType(schema) && format) {
-    const serializeInfo = getSpecialSerializeInfo(dpgContext, parameter.type, format);
+    const serializeInfo = getSpecialSerializeInfo(parameter.type, format);
     if (serializeInfo.hasMultiCollection || serializeInfo.hasCsvCollection) {
       description += `${description ? "\n" : ""}This parameter could be formatted as ${serializeInfo.collectionInfo.join(
         ", ",

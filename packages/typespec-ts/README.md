@@ -192,12 +192,6 @@ The emitter will use camel case to normalize the property name, to ignore this n
 
 The emitter has a normalization logic for enum member key, to ignore this normalization, you can set this option to true
 
-### `compatibility-query-multi-format`
-
-**Type:** `boolean`
-
-Whether to generate the backward-compatible code for query parameter serialization for array types. Defaults to `false`
-
 ### `typespec-title-map`
 
 **Type:** `object`

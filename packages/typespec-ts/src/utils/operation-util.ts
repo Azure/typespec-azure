@@ -443,7 +443,7 @@ export function hasPagingOperations(client: SdkClient, dpgContext: SdkContext) {
 
 export function hasCollectionFormatInfo(paramType: string, paramFormat: string) {
   return (
-    getHasMultiCollection(paramType, paramFormat, false) ||
+    getHasMultiCollection(paramType, paramFormat) ||
     getHasSsvCollection(paramType, paramFormat) ||
     getHasTsvCollection(paramType, paramFormat) ||
     getHasCsvCollection(paramType, paramFormat) ||
@@ -452,17 +452,8 @@ export function hasCollectionFormatInfo(paramType: string, paramFormat: string) 
   );
 }
 
-export function getSpecialSerializeInfo(
-  dpgContext: SdkContext,
-  paramType: string,
-  paramFormat: string,
-) {
-  const hasMultiCollection = getHasMultiCollection(
-    paramType,
-    paramFormat,
-    // Include query multi support in compatibility mode
-    dpgContext.emitterOptions?.compatibilityQueryMultiFormat ?? false,
-  );
+export function getSpecialSerializeInfo(paramType: string, paramFormat: string) {
+  const hasMultiCollection = getHasMultiCollection(paramType, paramFormat);
   const hasCsvCollection = getHasCsvCollection(paramType, paramFormat);
   const descriptions = [];
   const collectionInfo = [];
@@ -483,11 +474,8 @@ export function getSpecialSerializeInfo(
   };
 }
 
-function getHasMultiCollection(paramType: string, paramFormat: string, includeQuery = true) {
-  return (
-    ((includeQuery && paramType === "query") || paramType === "header") &&
-    paramFormat === KnownCollectionFormat.Multi
-  );
+function getHasMultiCollection(paramType: string, paramFormat: string) {
+  return paramType === "header" && paramFormat === KnownCollectionFormat.Multi;
 }
 function getHasSsvCollection(paramType: string, paramFormat: string) {
   return (

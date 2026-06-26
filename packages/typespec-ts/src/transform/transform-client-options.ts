@@ -50,7 +50,6 @@ function extractClientOptions(
   const experimentalExtensibleEnums = emitterOptions["experimental-extensible-enums"];
   const ignorePropertyNameNormalize = emitterOptions["ignore-property-name-normalize"];
   const ignoreEnumMemberNameNormalize = emitterOptions["ignore-enum-member-name-normalize"];
-  const compatibilityQueryMultiFormat = emitterOptions["compatibility-query-multi-format"];
   const enableStorageCompat = emitterOptions["enable-storage-compat"] === true;
   const treatUnknownAsRecord = emitterOptions["treat-unknown-as-record"] === true;
   const typespecTitleMap = emitterOptions["typespec-title-map"];
@@ -79,7 +78,6 @@ function extractClientOptions(
     compatibilityLro,
     experimentalExtensibleEnums,
     ignorePropertyNameNormalize,
-    compatibilityQueryMultiFormat,
     typespecTitleMap,
     ignoreEnumMemberNameNormalize,
     hasSubscriptionId,

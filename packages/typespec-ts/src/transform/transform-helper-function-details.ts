@@ -65,7 +65,7 @@ function extractSpecialSerializeInfo(client: SdkClient, dpgContext: SdkContext) 
     const route = getHttpOperationWithCache(dpgContext, op);
     route.parameters.parameters.forEach((parameter) => {
       const format = getCollectionFormat(dpgContext, parameter as any);
-      const serializeInfo = getSpecialSerializeInfo(dpgContext, parameter.type, format!);
+      const serializeInfo = getSpecialSerializeInfo(parameter.type, format!);
       hasMultiCollection = hasMultiCollection
         ? hasMultiCollection
         : serializeInfo.hasMultiCollection;

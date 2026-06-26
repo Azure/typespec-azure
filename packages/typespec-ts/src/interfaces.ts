@@ -234,7 +234,6 @@ export interface ClientOptions {
   clearOutputFolder?: boolean;
   ignorePropertyNameNormalize?: boolean;
   ignoreEnumMemberNameNormalize?: boolean;
-  compatibilityQueryMultiFormat?: boolean;
   typespecTitleMap?: Record<string, string>;
   hasSubscriptionId?: boolean;
   compatibilityLro?: boolean;
