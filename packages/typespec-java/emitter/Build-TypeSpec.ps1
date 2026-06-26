@@ -4,7 +4,7 @@
 # customization patch (core.patch) so the jar uses Azure's
 # com.azure.tools:azure-autorest-customization instead of the unbranded one.
 #
-# Requires JDK 17+ and Apache Maven on PATH.
+# Requires JDK 11+ and Apache Maven on PATH.
 #
 # WARNING: this script runs `git checkout .` inside the ./core submodule before
 # applying the patch. Stage/commit any local changes there first.

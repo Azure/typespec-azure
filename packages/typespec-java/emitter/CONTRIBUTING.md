@@ -40,7 +40,7 @@ if its context no longer applies.
 # Copy emitter sources from core and compile TypeScript (no jar; fast, what turbo runs)
 pnpm build
 
-# Full build: apply patch, build the Java emitter.jar (requires JDK 17+ and Maven),
+# Full build: apply patch, build the Java emitter.jar (requires JDK 11+ and Maven),
 # stage it, copy sources, compile and pack.
 pnpm build:full
 ```

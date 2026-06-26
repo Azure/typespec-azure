@@ -25,6 +25,14 @@ try {
 finally {
     Write-Host "Stopping the Spector server"
     npm run spector-stop
+
+    # Stage the coverage report where the ADO upload-spector-coverage.yml template
+    # expects it: <package>/node_modules/@azure-tools/azure-http-specs/spec-coverage.json.
+    $coverageSource = "./tsp-spector-coverage-java.json"
+    $coverageDest = "./node_modules/@azure-tools/azure-http-specs/spec-coverage.json"
+    if (Test-Path $coverageSource) {
+        Copy-Item $coverageSource $coverageDest -Force
+    }
 }
 
 Write-Host "Finished running the Spector tests"
