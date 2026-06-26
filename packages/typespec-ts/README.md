@@ -1,6 +1,6 @@
 # @azure-tools/typespec-ts
 
-An experimental TypeSpec emitter for TypeScript
+A TypeSpec emitter for TypeScript
 
 ## Install
 
@@ -196,7 +196,7 @@ The emitter has a normalization logic for enum member key, to ignore this normal
 
 **Type:** `boolean`
 
-Whether to generate the backward-compatible code for query parameter serialization for array types in RLC. Defaults to `false`
+Whether to generate the backward-compatible code for query parameter serialization for array types. Defaults to `false`
 
 ### `typespec-title-map`
 
