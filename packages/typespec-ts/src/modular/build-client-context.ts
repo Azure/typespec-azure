@@ -61,7 +61,7 @@ export function buildClientContext(
   const dependencies = useDependencies();
   const [hierarchy, client] = clientMap;
   const name = getClientName(client);
-  const { rlcClientName } = getModularClientOptions(clientMap);
+  const { clientName } = getModularClientOptions(clientMap);
   const requiredParams = getClientParametersDeclaration(client, dpgContext, {
     onClientOnly: false,
     requiredOnly: true,
@@ -116,7 +116,7 @@ export function buildClientContext(
 
   clientContextFile.addInterface({
     isExported: true,
-    name: `${rlcClientName}`,
+    name: `${clientName}`,
     extends: [resolveReference(dependencies.Client)],
     docs: getDocsFromDescription(client.doc),
     properties: [...requiredInterfaceProperties, ...optionalInterfaceProperties],
@@ -172,7 +172,7 @@ export function buildClientContext(
   const factoryFunction = clientContextFile.addFunction({
     docs: getDocsFromDescription(client.doc),
     name: `create${name}`,
-    returnType: `${rlcClientName}`,
+    returnType: `${clientName}`,
     parameters: getClientParametersDeclaration(client, dpgContext, {
       onClientOnly: false,
       requiredOnly: true,
@@ -286,7 +286,7 @@ export function buildClientContext(
 
   if (allContextParams.length) {
     factoryFunction.addStatements(
-      `return { ...clientContext, ${allContextParams.join(", ")}} as ${rlcClientName};`,
+      `return { ...clientContext, ${allContextParams.join(", ")}} as ${clientName};`,
     );
   } else {
     factoryFunction.addStatements(`return clientContext;`);

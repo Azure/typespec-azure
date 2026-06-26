@@ -126,7 +126,7 @@ export function getOperationGroupName(
   dpgContext: SdkContext,
   operationOrRoute?: Operation | HttpOperation,
 ) {
-  if (!dpgContext.rlcOptions?.enableOperationGroup || !operationOrRoute) {
+  if (!dpgContext.emitterOptions?.enableOperationGroup || !operationOrRoute) {
     return "";
   }
   // If this is a HttpOperation
@@ -461,7 +461,7 @@ export function getSpecialSerializeInfo(
     paramType,
     paramFormat,
     // Include query multi support in compatibility mode
-    dpgContext.rlcOptions?.compatibilityQueryMultiFormat ?? false,
+    dpgContext.emitterOptions?.compatibilityQueryMultiFormat ?? false,
   );
   const hasCsvCollection = getHasCsvCollection(paramType, paramFormat);
   const descriptions = [];
@@ -635,8 +635,8 @@ export function getMethodHierarchiesMap(
       continue;
     }
     const prefixes =
-      context.rlcOptions?.hierarchyClient === false &&
-      context.rlcOptions?.enableOperationGroup &&
+      context.emitterOptions?.hierarchyClient === false &&
+      context.emitterOptions?.enableOperationGroup &&
       method[0].length > 0
         ? [method[0][method[0].length - 1] as string]
         : method[0];
@@ -659,13 +659,13 @@ export function getMethodHierarchiesMap(
       }
     } else {
       const prefixKey =
-        context.rlcOptions?.hierarchyClient || context.rlcOptions?.enableOperationGroup
+        context.emitterOptions?.hierarchyClient || context.emitterOptions?.enableOperationGroup
           ? prefixes.join("/")
           : "";
       const groupName = prefixes.map((p) => normalizeName(p, NameType.OperationGroup)).join("");
       if (
-        context.rlcOptions?.hierarchyClient === false &&
-        context.rlcOptions?.enableOperationGroup &&
+        context.emitterOptions?.hierarchyClient === false &&
+        context.emitterOptions?.enableOperationGroup &&
         groupName !== "" &&
         !operationOrGroup.name.startsWith(groupName + "_")
       ) {

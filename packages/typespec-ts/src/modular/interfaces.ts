@@ -12,7 +12,7 @@ export interface ModularEmitterOptions {
 
 export interface ModularClientOptions {
   subfolder?: string;
-  rlcClientName: string;
+  clientName: string;
 }
 
 export interface OperationPathAndDeserDetails {

@@ -30,10 +30,10 @@ export async function transformClientModel(
   dpgContext: SdkContext,
 ): Promise<ClientModel> {
   const program = dpgContext.program;
-  const options: ClientOptions = dpgContext.rlcOptions!;
-  const rlcSourceDir = dpgContext.generationPathDetail?.rlcSourcesDir;
+  const options: ClientOptions = dpgContext.emitterOptions!;
+  const sourceDir = dpgContext.generationPathDetail?.sourcesDir;
   const srcPath = joinPaths(
-    dpgContext.generationPathDetail?.rlcSourcesDir ?? "",
+    dpgContext.generationPathDetail?.sourcesDir ?? "",
     options.batch && options.batch.length > 1
       ? normalizeName(client.name.replace("Client", ""), NameType.File)
       : "",
@@ -74,10 +74,10 @@ export async function transformClientModel(
       internalImports: importSet,
       runtimeImports: buildRuntimeImports(),
     },
-    rlcSourceDir,
+    sourceDir,
   };
-  // RLC sample generation has been removed; modular samples are emitted separately,
-  // so the RLC model never carries sample groups.
+  // Legacy sample generation has been removed; modular samples are emitted separately,
+  // so the client model never carries sample groups.
   options.generateSample = false;
   return model;
 }
@@ -132,7 +132,7 @@ export function transformUrlInfo(
     }
   }
   if (importedModels.size > 0) {
-    importDetails.rlcClientFactory.importsSet = importedModels;
+    importDetails.clientFactory.importsSet = importedModels;
   }
   if (endpoint && urlParameters.length > 0) {
     for (const param of urlParameters) {

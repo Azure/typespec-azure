@@ -67,7 +67,7 @@ export function getParameterSerializationInfo(
           });
         }
 
-        if (dpgContext.rlcOptions?.compatibilityQueryMultiFormat) {
+        if (dpgContext.emitterOptions?.compatibilityQueryMultiFormat) {
           wrapperType = buildUnionType([wrapperType, { type: "string", name: "string" }]);
         }
         return buildSerializationInfo(wrapperType);

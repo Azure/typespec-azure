@@ -238,7 +238,7 @@ export const EmitterOptionsSchema: JSONSchemaType<EmitterOptions> = {
       type: "boolean",
       nullable: true,
       description:
-        "Whether to generate the backward-compatible code for query parameter serialization for array types in RLC. Defaults to `false`",
+        "Whether to generate the backward-compatible code for query parameter serialization for array types. Defaults to `false`",
     },
     "typespec-title-map": {
       type: "object",

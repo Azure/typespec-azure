@@ -447,7 +447,7 @@ function getAdditionalPropertiesStatement(
   if (typeof deserializerFunction === "string") {
     params.push(deserializerFunction);
   }
-  return context.rlcOptions?.compatibilityMode === true
+  return context.emitterOptions?.compatibilityMode === true
     ? "...item,"
     : `${getAdditionalPropertiesName(context, type)}: ${resolveReference(SerializationHelpers.serializeRecord)}(${params.join(",")}),`;
 }

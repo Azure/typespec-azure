@@ -48,7 +48,7 @@ export function transformToParameterTypes(
   importDetails: Imports,
   apiVersionInfo?: ApiVersionInfo,
 ): OperationParameter[] {
-  const rlcParameters: OperationParameter[] = [];
+  const clientParameters: OperationParameter[] = [];
   const outputImportedSet = new Set<string>();
   for (const op of listOperationsUnderClient(client)) {
     const route = getHttpOperationWithCache(dpgContext, op);
@@ -64,15 +64,15 @@ export function transformToParameterTypes(
   }
   function transformToParameterTypesForRoute(route: HttpOperation) {
     const parameters = route.parameters;
-    const rlcParameter: OperationParameter = {
+    const clientParameter: OperationParameter = {
       operationGroup: getOperationGroupName(dpgContext, route),
       operationName: getOperationName(dpgContext, route.operation),
       parameters: [],
     };
     const options = {
       apiVersionInfo,
-      operationGroupName: rlcParameter.operationGroup,
-      operationName: rlcParameter.operationName,
+      operationGroupName: clientParameter.operationGroup,
+      operationName: clientParameter.operationName,
       importModels: outputImportedSet,
     };
     // transform query param
@@ -95,13 +95,13 @@ export function transformToParameterTypes(
         bodyType,
       );
     }
-    rlcParameter.parameters.push({
+    clientParameter.parameters.push({
       parameters: [...queryParams, ...pathParams, ...headerParams],
       body: bodyParameter,
     });
-    rlcParameters.push(rlcParameter);
+    clientParameters.push(clientParameter);
   }
-  return rlcParameters;
+  return clientParameters;
 }
 
 function getParameterMetadata(

@@ -24,7 +24,7 @@ export function generateCrossLanguageDefinitionFile(dpgContext: SdkContext): {
   }
   for (const enm of dpgContext.sdkPackage.enums) {
     // Skip api version enum for multi-service scenarios since each service may have different versions
-    if (dpgContext.rlcOptions?.isMultiService && enm.usage === UsageFlags.ApiVersionEnum) {
+    if (dpgContext.emitterOptions?.isMultiService && enm.usage === UsageFlags.ApiVersionEnum) {
       continue;
     }
     CrossLanguageDefinitionId[`${packageName}!Known${enm.name}:enum`] =

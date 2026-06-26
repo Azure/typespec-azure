@@ -20,7 +20,7 @@ import { ClientTypeMetaTree } from "./meta-tree.js";
  * Remember, adding too many contexts can lead to complex dependencies and harder-to-maintain code. Always evaluate if the context is truly necessary or if there are better alternatives such as localized state management or passing props for simpler scenarios.
  */
 type Contexts = {
-  rlcMetaTree: ClientTypeMetaTree; // Context for RLC types metadata.
+  clientTypeMetaTree: ClientTypeMetaTree; // Context for client type metadata.
   outputProject: Project; // The TS-Morph root project context for code generation.
   symbolMap: Map<string, SourceFile>; // Mapping of symbols to their corresponding source files.
   sdkTypes: SdkTypeContext;

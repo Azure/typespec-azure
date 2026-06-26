@@ -63,20 +63,20 @@ export function initInternalImports(): Imports {
       type: "response",
       importsSet: new Set<string>(),
     },
-    rlcIndex: {
-      type: "rlcIndex",
+    index: {
+      type: "index",
       importsSet: new Set<string>(),
     },
     modularModel: {
       type: "modularModel",
       importsSet: new Set<string>(),
     },
-    rlcClientFactory: {
-      type: "rlcClientFactory",
+    clientFactory: {
+      type: "clientFactory",
       importsSet: new Set<string>(),
     },
-    rlcClientDefinition: {
-      type: "rlcClientDefinition",
+    clientDefinition: {
+      type: "clientDefinition",
       importsSet: new Set<string>(),
     },
     serializerHelpers: {

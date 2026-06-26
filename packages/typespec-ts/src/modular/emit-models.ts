@@ -245,7 +245,7 @@ function emitType(context: SdkContext, type: SdkType, sourceFile: SourceFile) {
     }
     const apiVersionEnumOnly = type.usage === UsageFlags.ApiVersionEnum;
     // Skip known api version enums for multi-service scenarios as users are not allowed to set api versions
-    if (apiVersionEnumOnly && context.rlcOptions?.isMultiService) {
+    if (apiVersionEnumOnly && context.emitterOptions?.isMultiService) {
       return;
     }
     const inputUsage = (type.usage & UsageFlags.Input) === UsageFlags.Input;
@@ -290,7 +290,7 @@ function emitType(context: SdkContext, type: SdkType, sourceFile: SourceFile) {
 
 export function getApiVersionEnum(context: SdkContext) {
   // Skip api version enum for multi-service scenarios since each service may have different versions
-  if (context.rlcOptions?.isMultiService) {
+  if (context.emitterOptions?.isMultiService) {
     return;
   }
   const apiVersionEnum = context.sdkPackage.enums.find(
@@ -325,7 +325,7 @@ export function getModelNamespaces(context: SdkContext, model: SdkType): string[
     }
     const segments = model.namespace.split(".");
     // Keep full namespace segments if multiple services are present because there isn't a root namespace to trim
-    if (context.rlcOptions?.isMultiService) {
+    if (context.emitterOptions?.isMultiService) {
       return segments;
     }
 
@@ -603,7 +603,7 @@ function emitEnumMember(
 ): EnumMemberStructure {
   const shouldNormalizeName = !member.name.startsWith("$DO_NOT_NORMALIZE$");
   const enumTypeName = normalizeName(member.enumType.name, NameType.Interface, true);
-  let normalizedMemberName = context.rlcOptions?.ignoreEnumMemberNameNormalize
+  let normalizedMemberName = context.emitterOptions?.ignoreEnumMemberNameNormalize
     ? fixLeadingNumber(member.name, NameType.EnumMemberName) // need to fix the leading number also for enum member
     : normalizeName(member.name, NameType.EnumMemberName, true);
   // If the member name starts with _ due to a leading digit (not because the original has _),
@@ -744,7 +744,7 @@ function addExtendedDictInfo(
   const additionalPropertiesType = model.additionalProperties
     ? getTypeExpression(context, model.additionalProperties)
     : undefined;
-  if (context.rlcOptions?.compatibilityMode) {
+  if (context.emitterOptions?.compatibilityMode) {
     const ancestors = getAllAncestors(model);
     const properties = getAllProperties(context, model, ancestors);
     let anyType: boolean;
@@ -839,7 +839,7 @@ export function normalizeModelName(
       unionSuffix = "Union";
     }
   }
-  const namespacePrefix = context.rlcOptions?.enableModelNamespace ? segments.join("") : "";
+  const namespacePrefix = context.emitterOptions?.enableModelNamespace ? segments.join("") : "";
   const internalModelPrefix =
     (isPagedResultModel(context, type) && !pagedModelsKeptPublic.has(type)) || type.isGeneratedName
       ? "_"
@@ -883,7 +883,7 @@ function buildModelProperty(
 ): PropertySignatureStructure {
   const normalizedPropName = normalizeModelPropertyName(context, property);
   if (
-    !context.rlcOptions?.ignorePropertyNameNormalize &&
+    !context.emitterOptions?.ignorePropertyNameNormalize &&
     normalizedPropName !== `"${property.name}"`
   ) {
     reportDiagnostic(context.program, {

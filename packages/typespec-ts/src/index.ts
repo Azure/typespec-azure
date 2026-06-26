@@ -114,11 +114,11 @@ export async function $onEmit(context: EmitContext) {
 
   // Enrich the dpg context with path detail and common options
   await enrichDpgContext();
-  const rlcOptions = dpgContext.rlcOptions ?? {};
+  const resolvedEmitterOptions = dpgContext.emitterOptions ?? {};
 
   const needUnexpectedHelper: Map<string, boolean> = new Map<string, boolean>();
-  const serviceNameToRlcModelsMap: Map<string, ClientModel> = new Map<string, ClientModel>();
-  provideContext("rlcMetaTree", new Map());
+  const serviceNameToClientModelsMap: Map<string, ClientModel> = new Map<string, ClientModel>();
+  provideContext("clientTypeMetaTree", new Map());
   provideContext("symbolMap", new Map());
   provideContext("outputProject", outputProject);
   provideContext("emitContext", {
@@ -137,13 +137,13 @@ export async function $onEmit(context: EmitContext) {
       ...PlatformTypeHelpers,
       ...CloudSettingHelpers,
       ...XmlHelpers,
-      ...(rlcOptions.generateTest ? CreateRecorderHelpers : {}),
-      ...(rlcOptions.enableStorageCompat ? StorageCompatHelpers : {}),
+      ...(resolvedEmitterOptions.generateTest ? CreateRecorderHelpers : {}),
+      ...(resolvedEmitterOptions.enableStorageCompat ? StorageCompatHelpers : {}),
     },
     {
       sourcesDir: dpgContext.generationPathDetail?.modularSourcesDir,
       rootDir: dpgContext.generationPathDetail?.rootDir,
-      options: rlcOptions,
+      options: resolvedEmitterOptions,
       program,
       host,
       packageRoot: emitterPackageRoot,
@@ -168,7 +168,7 @@ export async function $onEmit(context: EmitContext) {
   let modularEmitterOptions: ModularEmitterOptions;
   // 1. Clear sources folder
   await clearSrcFolder();
-  // 2. Generate RLC code model
+  // 2. Generate client code model
   // TODO: skip this step in modular once modular generator is sufficiently decoupled
   await buildClientCodeModels();
   // 3. Clear samples-dev folder if generateSample is true
@@ -205,7 +205,7 @@ export async function $onEmit(context: EmitContext) {
     options.generateTest =
       options.generateTest === true ||
       (options.generateTest === undefined && (!hasTestFolder || options.azureArm));
-    dpgContext.rlcOptions = options;
+    dpgContext.emitterOptions = options;
   }
 
   async function calculateGenerationDir(): Promise<GenerationDirDetail> {
@@ -222,7 +222,7 @@ export async function $onEmit(context: EmitContext) {
     return {
       rootDir: projectRoot,
       metadataDir: projectRoot,
-      rlcSourcesDir: sourcesRoot,
+      sourcesDir: sourcesRoot,
       modularSourcesDir: sourcesRoot,
     };
   }
@@ -231,7 +231,7 @@ export async function $onEmit(context: EmitContext) {
     await emptyDir(
       host,
       dpgContext.generationPathDetail?.modularSourcesDir ??
-        dpgContext.generationPathDetail?.rlcSourcesDir ??
+        dpgContext.generationPathDetail?.sourcesDir ??
         "",
     );
   }
@@ -254,7 +254,7 @@ export async function $onEmit(context: EmitContext) {
       const clientModels = await transformClientModel(client, dpgContext);
       clientCodeModels.push(clientModels);
       const serviceName = client.services[0]?.name ?? "Unknown";
-      serviceNameToRlcModelsMap.set(serviceName, clientModels);
+      serviceNameToClientModelsMap.set(serviceName, clientModels);
       needUnexpectedHelper.set(getClientName(clientModels), hasUnexpectedHelper(clientModels));
     }
   }
@@ -288,7 +288,7 @@ export async function $onEmit(context: EmitContext) {
       buildOperationFiles(dpgContext, subClient, modularEmitterOptions);
       buildClientContext(dpgContext, subClient, modularEmitterOptions);
       buildRestorePoller(dpgContext, subClient, modularEmitterOptions);
-      if (dpgContext.rlcOptions?.hierarchyClient) {
+      if (dpgContext.emitterOptions?.hierarchyClient) {
         buildSubpathIndexFile(modularEmitterOptions, "api", subClient, {
           exportIndex: false,
           recursive: true,
@@ -316,10 +316,9 @@ export async function $onEmit(context: EmitContext) {
     // Enable modular sample generation when explicitly set to true or MPG
     if (emitterOptions["generate-sample"] === true) {
       const samples = emitSamples(dpgContext);
-      // Refine the rlc sample generation logic
-      // TODO: remember to remove this out when RLC is splitted from Modular
+      // Mark sample generation as enabled when modular samples were emitted.
       if (samples.length > 0) {
-        dpgContext.rlcOptions!.generateSample = true;
+        dpgContext.emitterOptions!.generateSample = true;
       }
     }
 
@@ -371,8 +370,8 @@ export async function $onEmit(context: EmitContext) {
     if (clientCodeModels.length === 0 || !clientCodeModels[0]) {
       return;
     }
-    const rlcClient: ClientModel = clientCodeModels[0];
-    const option = dpgContext.rlcOptions!;
+    const clientModel: ClientModel = clientCodeModels[0];
+    const option = dpgContext.emitterOptions!;
     // When generateMetadata is explicitly false and the sources are generated
     // into a path ending with "generated" (e.g. src/generated), this package
     // has a manual convenience layer. Skip all metadata/test file generation
@@ -412,7 +411,7 @@ export async function $onEmit(context: EmitContext) {
 
     //TODO Need consider multi-client cases
     for (const subClient of dpgContext.sdkPackage.clients) {
-      rlcClient.libraryName = subClient.name;
+      clientModel.libraryName = subClient.name;
     }
 
     if (shouldGenerateMetadata) {
@@ -482,7 +481,7 @@ export async function $onEmit(context: EmitContext) {
       await emitContentByBuilder(
         program,
         commonBuilders,
-        rlcClient,
+        clientModel,
         dpgContext.generationPathDetail?.metadataDir,
       );
 
@@ -535,7 +534,7 @@ export async function $onEmit(context: EmitContext) {
       if (hasReadmeFile) {
         const readmeSourceFile = await host.readFile(existingReadmeFilePath);
         const existingReadmeContent = readmeSourceFile.text;
-        const clientNameChanged = hasClientNameChanged(rlcClient, existingReadmeContent);
+        const clientNameChanged = hasClientNameChanged(clientModel, existingReadmeContent);
         updateBuilders.push(
           clientNameChanged
             ? buildReadmeFile
@@ -556,14 +555,14 @@ export async function $onEmit(context: EmitContext) {
       await emitContentByBuilder(
         program,
         updateBuilders,
-        rlcClient,
+        clientModel,
         dpgContext.generationPathDetail?.metadataDir,
       );
     }
     await emitContentByBuilder(
       program,
       buildMetadataJson,
-      rlcClient,
+      clientModel,
       dpgContext.generationPathDetail?.metadataDir,
     );
 
@@ -572,7 +571,7 @@ export async function $onEmit(context: EmitContext) {
       await emitContentByBuilder(
         program,
         [buildRecordedClientFile, buildSampleTest],
-        rlcClient,
+        clientModel,
         dpgContext.generationPathDetail?.metadataDir,
       );
     }

@@ -21,7 +21,7 @@ import { SchemaContext } from "../interfaces.js";
 
 export function transformSchemas(client: SdkClient, dpgContext: SdkContext) {
   const program = dpgContext.program;
-  const metatree = useContext("rlcMetaTree");
+  const metatree = useContext("clientTypeMetaTree");
   const schemas: Map<string, SchemaContext[]> = new Map<string, SchemaContext[]>();
   const schemaMap: Map<any, any> = new Map<any, any>();
   const usageMap = new Map<Type, SchemaContext[]>();
@@ -103,7 +103,7 @@ export function transformSchemas(client: SdkClient, dpgContext: SdkContext) {
     if (model) {
       model.usage = context;
     }
-    metatree.set(tspModel, { rlcType: model });
+    metatree.set(tspModel, { clientType: model });
     if (model.name === "") {
       return;
     }

@@ -21,7 +21,7 @@ export function getOperationName(
   dpgContext?: SdkContext,
 ): GuardedName {
   const norm = normalizeName(operation.name, NameType.Method, true);
-  const isDataplane = dpgContext !== undefined && !dpgContext.rlcOptions?.azureArm;
+  const isDataplane = dpgContext !== undefined && !dpgContext.emitterOptions?.azureArm;
   if (isReservedName(operation.name, NameType.Method) && isDataplane) {
     return {
       name: norm,

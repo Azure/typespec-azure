@@ -48,9 +48,9 @@ export function buildOperationFiles(
   const project = useContext("outputProject");
   const [_, client] = clientMap;
   const operationFiles: Set<SourceFile> = new Set();
-  const { subfolder, rlcClientName } = getModularClientOptions(clientMap);
+  const { subfolder, clientName } = getModularClientOptions(clientMap);
   const isMultiEndpoint = isMultiEndpointClient(dpgContext);
-  const clientType = isMultiEndpoint ? `Client.${rlcClientName}` : "Client";
+  const clientType = isMultiEndpoint ? `Client.${clientName}` : "Client";
   const methodMap = getMethodHierarchiesMap(dpgContext, client);
   for (const [prefixKey, operations] of methodMap) {
     const prefixes = prefixKey.split("/");
@@ -102,7 +102,7 @@ export function buildOperationFiles(
 
     const indexPathPrefix = "../".repeat(prefixKey === "" ? 0 : prefixes.length) || "./";
     operationGroupFile.addImportDeclaration({
-      namedImports: [`${rlcClientName} as Client`],
+      namedImports: [`${clientName} as Client`],
       moduleSpecifier: `${indexPathPrefix}index.js`,
     });
     operationGroupFile.fixUnusedIdentifiers();

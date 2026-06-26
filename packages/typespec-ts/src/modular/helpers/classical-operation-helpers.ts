@@ -55,18 +55,18 @@ export function getClassicalOperation(
 ) {
   const prefixes = operationGroup[0];
   const operations = operationGroup[1];
-  const { rlcClientName } = getModularClientOptions(clientMap);
+  const { clientName } = getModularClientOptions(clientMap);
   const hasClientContextImport = classicFile.getImportDeclarations().filter((i) => {
     return (
       i.getModuleSpecifierValue() ===
-      `${"../".repeat(layer + 2)}api/${normalizeName(rlcClientName, NameType.File)}.js`
+      `${"../".repeat(layer + 2)}api/${normalizeName(clientName, NameType.File)}.js`
     );
   });
   if (!hasClientContextImport || hasClientContextImport.length === 0) {
     classicFile.addImportDeclaration({
-      namedImports: [rlcClientName],
+      namedImports: [clientName],
       moduleSpecifier: `${"../".repeat(layer + 2)}api/${normalizeName(
-        rlcClientName,
+        clientName,
         NameType.File,
       )}.js`,
     });
@@ -78,7 +78,7 @@ export function getClassicalOperation(
   >();
   const operationDeclarations: OptionalKind<FunctionDeclarationStructure>[] = operations.map(
     (operation) => {
-      const declaration = getOperationFunction(dpgContext, [prefixes, operation], rlcClientName);
+      const declaration = getOperationFunction(dpgContext, [prefixes, operation], clientName);
       operationDeclarationMap.set(declaration, {
         declaration,
         oriName: operation.oriName,
@@ -141,7 +141,7 @@ export function getClassicalOperation(
       });
       // add LRO helper methods if applicable
       if (
-        dpgContext.rlcOptions?.compatibilityLro &&
+        dpgContext.emitterOptions?.compatibilityLro &&
         (operationInfo?.isLro || operationInfo?.isLroPaging)
       ) {
         const operationStateReference = resolveReference(AzurePollingDependencies.OperationState);
@@ -207,7 +207,7 @@ export function getClassicalOperation(
       parameters: [
         {
           name: "context",
-          type: rlcClientName,
+          type: clientName,
         },
       ],
       statements: `return {
@@ -237,7 +237,7 @@ export function getClassicalOperation(
             ];
             // add LRO helper methods if applicable
             if (
-              dpgContext.rlcOptions?.compatibilityLro &&
+              dpgContext.emitterOptions?.compatibilityLro &&
               (operationInfo?.isLro || operationInfo?.isLroPaging)
             ) {
               const getSimplePollerReference = resolveReference(
@@ -336,7 +336,7 @@ export function getClassicalOperation(
       parameters: [
         {
           name: "context",
-          type: rlcClientName,
+          type: clientName,
         },
       ],
       returnType: resolveReference(refkey(interfaceName, layer, "classicOperations")),

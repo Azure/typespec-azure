@@ -28,7 +28,7 @@ export function transformToResponseTypes(
   dpgContext: SdkContext,
   importDetails: Imports,
 ): OperationResponse[] {
-  const rlcResponses: OperationResponse[] = [];
+  const clientResponses: OperationResponse[] = [];
   const inputImportedSet = new Set<string>();
   for (const op of listOperationsUnderClient(client)) {
     const route = getHttpOperationWithCache(dpgContext, op);
@@ -42,7 +42,7 @@ export function transformToResponseTypes(
     importDetails.response.importsSet = inputImportedSet;
   }
   function transformToResponseTypesForRoute(route: HttpOperation) {
-    const rlcOperationUnit: OperationResponse = {
+    const operationUnit: OperationResponse = {
       operationGroup: getOperationGroupName(dpgContext, route),
       operationName: getOperationName(dpgContext, route.operation),
       path: route.path,
@@ -52,7 +52,7 @@ export function transformToResponseTypes(
       nonDefaultSchemas: Schema[] = [];
     for (const resp of sortedOperationResponses(route.responses)) {
       const statusCode = getOperationStatuscode(resp);
-      const rlcResponseUnit: ResponseMetadata = {
+      const responseUnit: ResponseMetadata = {
         statusCode,
         description: resp.description,
       };
@@ -60,8 +60,8 @@ export function transformToResponseTypes(
       const headers = transformHeaders(dpgContext, resp, inputImportedSet);
       // transform body
       const [body, schemas] = transformBody(dpgContext, resp, inputImportedSet) ?? [undefined, []];
-      rlcOperationUnit.responses.push({
-        ...rlcResponseUnit,
+      operationUnit.responses.push({
+        ...responseUnit,
         headers,
         body,
       });
@@ -75,20 +75,20 @@ export function transformToResponseTypes(
       dpgContext,
       route,
       getOperationGroupName(dpgContext, route),
-      rlcOperationUnit.responses,
+      operationUnit.responses,
     );
     if (lroLogicalResponse) {
-      rlcOperationUnit.responses.push(lroLogicalResponse);
+      operationUnit.responses.push(lroLogicalResponse);
     }
-    rlcResponses.push(rlcOperationUnit);
+    clientResponses.push(operationUnit);
   }
-  return rlcResponses;
+  return clientResponses;
 }
 
 /**
  * Return undefined if no valid header param
  * @param response response detail
- * @returns rlc header schema
+ * @returns the response header schema
  */
 function transformHeaders(
   dpgContext: SdkContext,
@@ -99,8 +99,8 @@ function transformHeaders(
     return;
   }
 
-  const rlcHeaders: Map<string, ResponseHeaderSchema> = new Map();
-  // Current RLC client can't represent different headers per content type.
+  const responseHeaders: Map<string, ResponseHeaderSchema> = new Map();
+  // The client can't represent different headers per content type.
   // So we merge headers here, and report any duplicates.
   // It may be possible in principle to not error for identically declared
   // headers.
@@ -132,11 +132,11 @@ function transformHeaders(
         required: !value?.optional,
         description: getDoc(dpgContext.program, value!),
       };
-      rlcHeaders.set(header.name, header);
+      responseHeaders.set(header.name, header);
     }
   }
 
-  return rlcHeaders.size ? Array.from(rlcHeaders.values()) : undefined;
+  return responseHeaders.size ? Array.from(responseHeaders.values()) : undefined;
 }
 
 function transformBody(
@@ -147,7 +147,7 @@ function transformBody(
   if (!response.responses.length) {
     return;
   }
-  // Currently RLC response only have one header and body defined
+  // Currently a response only has one header and body defined
   // So we'll union all body shapes together with "|"
   const typeSet = new Set<string>();
   const descriptions = new Set<string>();

@@ -4,7 +4,7 @@ import { KnownMediaType } from "./media-types.js";
 import { ClientOptions, SchemaContext } from "../interfaces.js";
 
 export interface SdkContext extends TCGCSdkContext {
-  rlcOptions?: ClientOptions;
+  emitterOptions?: ClientOptions;
   generationPathDetail?: GenerationDirDetail;
   hasApiVersionInClient?: boolean;
   allServiceNamespaces?: Namespace[];
@@ -12,7 +12,7 @@ export interface SdkContext extends TCGCSdkContext {
 
 export interface GenerationDirDetail {
   rootDir: string;
-  rlcSourcesDir: string;
+  sourcesDir: string;
   modularSourcesDir?: string;
   metadataDir: string;
 }

@@ -498,7 +498,7 @@ function getAdditionalPropertiesStatement(
     params.push("undefined");
     params.push(deserializerFunction);
   }
-  return context.rlcOptions?.compatibilityMode === true
+  return context.emitterOptions?.compatibilityMode === true
     ? "...item"
     : `...${resolveReference(SerializationHelpers.serializeRecord)}(${params.join(",")})`;
 }

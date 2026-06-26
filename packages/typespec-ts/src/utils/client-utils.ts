@@ -117,7 +117,7 @@ export function isMultiEndpointClient(dpgContext: SdkContext): boolean {
 export function getModularClientOptions(clientMap: [string[], SdkClientType<SdkServiceOperation>]) {
   const [hierarchy, client] = clientMap;
   const clientOptions: ModularClientOptions = {
-    rlcClientName: `${client.name.replace(/Client$/, "")}Context`,
+    clientName: `${client.name.replace(/Client$/, "")}Context`,
   };
   clientOptions.subfolder = hierarchy.join("/");
   return clientOptions;

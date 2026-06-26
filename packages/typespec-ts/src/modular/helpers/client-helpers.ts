@@ -87,10 +87,10 @@ export function getClientParameters(
   const armSpecific = (p: SdkParameter) => !(p.kind === "endpoint" && dpgContext.arm);
   // Skip apiVersion parameter when it's multi-service (each service has its own default apiVersion)
   const skipApiVersionOnMultiService = (p: SdkParameter) =>
-    !(dpgContext.rlcOptions?.isMultiService && p.isApiVersionParam);
+    !(dpgContext.emitterOptions?.isMultiService && p.isApiVersionParam);
   const filters = [
     options.requiredOnly ? isRequired : undefined,
-    dpgContext.rlcOptions?.addCredentials === false ? skipCredentials : undefined,
+    dpgContext.emitterOptions?.addCredentials === false ? skipCredentials : undefined,
     options.optionalOnly ? isOptional : undefined,
     options.onClientOnly ? skipMethodParam : undefined,
     options.skipArmSpecific ? undefined : armSpecific,

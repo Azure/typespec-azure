@@ -14,7 +14,7 @@ export interface ClientModel {
   urlInfo?: UrlInfo;
   telemetryOptions?: TelemetryInfo;
   sampleGroups?: SampleGroup[];
-  rlcSourceDir?: string;
+  sourceDir?: string;
 }
 
 export interface ImportInfo {
@@ -28,10 +28,10 @@ export type ImportType =
   /**inner models' imports for parameter and response */
   | "parameter"
   | "response"
-  | "rlcIndex"
+  | "index"
   | "modularModel"
-  | "rlcClientFactory"
-  | "rlcClientDefinition"
+  | "clientFactory"
+  | "clientDefinition"
   /**common third party imports */
   | "restClient"
   | "coreAuth"
@@ -357,8 +357,8 @@ export interface ParameterMetadatas {
 export interface ParameterBodyMetadata {
   /**
    * In case of formData we'd get multiple properties in body marked as partialBody
-   * If yes, rlc-common would prepare the whole part shape;
-   * usually false in typespec source because rlc-common doesn't have to prepare the whole part shape
+   * If yes, the emitter would prepare the whole part shape;
+   * usually false in typespec source because the emitter doesn't have to prepare the whole part shape
    */
   isPartialBody?: boolean;
   body?: ParameterBodySchema[];

@@ -47,7 +47,7 @@ export function buildClassicalClient(
     requiredOnly: true,
   });
   const srcPath = emitterOptions.modularOptions.sourceRoot;
-  const { subfolder, rlcClientName } = getModularClientOptions(clientMap);
+  const { subfolder, clientName } = getModularClientOptions(clientMap);
 
   const clientFile = project.createSourceFile(
     `${srcPath}/${subfolder && subfolder !== "" ? subfolder + "/" : ""}${normalizeName(
@@ -71,13 +71,13 @@ export function buildClassicalClient(
   if (isMultiEndpointClient(dpgContext)) {
     clientClass.addProperty({
       name: "_client",
-      type: `Client.${rlcClientName}`,
+      type: `Client.${clientName}`,
       scope: Scope.Private,
     });
   } else {
     clientClass.addProperty({
       name: "_client",
-      type: `${rlcClientName}`,
+      type: `${clientName}`,
       scope: Scope.Private,
     });
   }
@@ -214,7 +214,7 @@ function generateMethod(
   });
 
   // add LRO helper methods if applicable
-  if (context.rlcOptions?.compatibilityLro && declaration?.isLro && !declaration?.isLroPaging) {
+  if (context.emitterOptions?.compatibilityLro && declaration?.isLro && !declaration?.isLroPaging) {
     const operationStateReference = resolveReference(AzurePollingDependencies.OperationState);
     const simplePollerLikeReference = resolveReference(SimplePollerHelpers.SimplePollerLike);
     const getSimplePollerReference = resolveReference(SimplePollerHelpers.getSimplePoller);
@@ -244,7 +244,7 @@ function generateMethod(
       statements: `return await ${declarationRefKey}(${methodParamStr});`,
     });
   } // For LRO+Paging operations, use different return types and implementation
-  else if (context.rlcOptions?.compatibilityLro && declaration?.isLroPaging) {
+  else if (context.emitterOptions?.compatibilityLro && declaration?.isLroPaging) {
     const returnType = declaration?.lropagingFinalReturnType ?? "void";
     const pagedAsyncIterableIteratorReference = resolveReference(
       PagingHelpers.PagedAsyncIterableIterator,

@@ -43,7 +43,7 @@ export function transformPaths(
   }
 
   if (pathParamsImportedSet.size > 0) {
-    importDetails.rlcClientDefinition.importsSet = pathParamsImportedSet;
+    importDetails.clientDefinition.importsSet = pathParamsImportedSet;
   }
 
   return paths;

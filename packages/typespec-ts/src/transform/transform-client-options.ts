@@ -17,7 +17,7 @@ export function transformClientOptions(
   dpgContext: SdkContext,
 ): ClientOptions {
   // Extract the options from emitter option
-  const options = extractRLCOptions(
+  const options = extractClientOptions(
     dpgContext,
     emitterOptions,
     dpgContext.generationPathDetail?.rootDir ?? "",
@@ -26,7 +26,7 @@ export function transformClientOptions(
   options.batch = batch;
   return options;
 }
-function extractRLCOptions(
+function extractClientOptions(
   dpgContext: SdkContext,
   emitterOptions: EmitterOptions,
   generationRootDir: string,

@@ -208,7 +208,7 @@ function exportSimplePollerLike(
   const hasLro = Array.from(methodMap.values()).some((operations) => {
     return operations.some(isLroOnlyOperation);
   });
-  if (!hasLro || context.rlcOptions?.compatibilityLro !== true) {
+  if (!hasLro || context.emitterOptions?.compatibilityLro !== true) {
     return;
   }
   const helperFile = project.getSourceFile(

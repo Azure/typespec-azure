@@ -852,7 +852,7 @@ function getModelName(dpgContext: SdkContext, model: Model) {
     fullNamespacePrefix = "";
   }
   // 5. check if this model should be namespaced
-  return dpgContext.rlcOptions?.enableModelNamespace ? `${fullNamespacePrefix}${name}` : name;
+  return dpgContext.emitterOptions?.enableModelNamespace ? `${fullNamespacePrefix}${name}` : name;
 }
 
 // Map an typespec type to an OA schema. Returns undefined when the resulting
