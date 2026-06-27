@@ -3805,6 +3805,9 @@ importers:
       '@azure-tools/typespec-client-generator-core':
         specifier: 0.69.0
         version: 0.69.0(1c7bca31f4807dd83f2823b577ee4665)
+      '@azure-tools/typespec-liftr-base':
+        specifier: 0.14.0
+        version: 0.14.0
       '@types/js-yaml':
         specifier: 'catalog:'
         version: 4.0.9
@@ -4535,6 +4538,9 @@ packages:
       '@typespec/streams': ^0.83.0
       '@typespec/versioning': ^0.83.0
       '@typespec/xml': ^0.83.0
+
+  '@azure-tools/typespec-liftr-base@0.14.0':
+    resolution: {integrity: sha512-q9pEaOiIaE2VF+BsnaDG98zrj0sZ7/8AD8aBrwXtHbzH+id3sWprl8rRF0qagDSVchslfrHcGFhXs2bM6Hie0g==}
 
   '@azure/abort-controller@2.1.2':
     resolution: {integrity: sha512-nBrLsEWm4J2u5LpAPjxADTlq3trDgVZZXHNKabeXZtpq3d3AbN/KGO82R87rdDz5/lYB024rtEf10/q0urNgsA==}
@@ -15923,6 +15929,8 @@ snapshots:
       change-case: 5.4.4
       pluralize: 8.0.0
       yaml: 2.9.0
+
+  '@azure-tools/typespec-liftr-base@0.14.0': {}
 
   '@azure/abort-controller@2.1.2':
     dependencies:
