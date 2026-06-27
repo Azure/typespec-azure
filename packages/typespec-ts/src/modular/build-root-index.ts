@@ -6,6 +6,7 @@ import { resolveReference } from "../framework/reference.js";
 import { reportDiagnostic } from "../lib.js";
 import { getClientModuleInfo } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
+import { NameType, normalizeName } from "../utils/name-utils.js";
 import { getMethodHierarchiesMap } from "../utils/operation-util.js";
 import { partitionAndEmitExports } from "./build-subpath-index.js";
 import { getClassicalClientName } from "./helpers/naming-helpers.js";
@@ -17,7 +18,6 @@ import {
   PagingHelpers,
   PlatformTypeHelpers,
 } from "./static-helpers-metadata.js";
-import { NameType, normalizeName } from "../utils/name-utils.js";
 
 export function buildRootIndex(
   context: SdkContext,

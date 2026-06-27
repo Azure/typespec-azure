@@ -3,11 +3,11 @@
 
 import { MethodSignatureStructure, OptionalKind, ParameterDeclarationStructure } from "ts-morph";
 import {
+  ClientModel,
   Methods,
   ObjectSchema,
   ParameterMetadata,
   PathParameter,
-  ClientModel,
   Schema,
   SchemaContext,
 } from "../interfaces.js";

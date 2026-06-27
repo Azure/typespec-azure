@@ -67,10 +67,16 @@ import {
 import { GetSchemaOptions, SdkContext } from "./interfaces.js";
 import { KnownMediaType, hasMediaType, isMediaTypeMultipartFormData } from "./media-types.js";
 
+import {
+  ArraySchema,
+  DictionarySchema,
+  ObjectSchema,
+  Schema,
+  SchemaContext,
+} from "../interfaces.js";
 import { reportDiagnostic } from "../lib.js";
-import { getModelNamespaceName } from "./namespace-utils.js";
-import { ArraySchema, DictionarySchema, ObjectSchema, Schema, SchemaContext } from "../interfaces.js";
 import { NameType, normalizeName } from "./name-utils.js";
+import { getModelNamespaceName } from "./namespace-utils.js";
 import { isArraySchema } from "./schema-helpers.js";
 
 export const BINARY_TYPE_UNION =

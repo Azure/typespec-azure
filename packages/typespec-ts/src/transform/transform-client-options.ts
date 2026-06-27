@@ -1,16 +1,16 @@
 import { getHttpOperationWithCache } from "@azure-tools/typespec-client-generator-core";
 import { getDoc, NoTarget, Program } from "@typespec/compiler";
 import { getAuthentication } from "@typespec/http";
+import { ClientOptions, PackageDetails, ServiceInfo } from "../interfaces.js";
 import { EmitterOptions, reportDiagnostic } from "../lib.js";
 import { getClientParameters } from "../modular/helpers/client-helpers.js";
 import { getClients, listOperationsUnderClient } from "../utils/client-utils.js";
 import { getSupportedHttpAuth } from "../utils/credential-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import { getDefaultService } from "../utils/model-utils.js";
+import { NameType, normalizeName, pascalCase } from "../utils/name-utils.js";
 import { detectModelConflicts } from "../utils/namespace-utils.js";
 import { getOperationName } from "../utils/operation-util.js";
-import { NameType, normalizeName, pascalCase } from "../utils/name-utils.js";
-import { PackageDetails, ClientOptions, ServiceInfo } from "../interfaces.js";
 
 export function transformClientOptions(
   emitterOptions: EmitterOptions,

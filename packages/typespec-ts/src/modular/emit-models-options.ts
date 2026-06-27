@@ -6,9 +6,9 @@ import { SdkClientType, SdkServiceOperation } from "@azure-tools/typespec-client
 import { useContext } from "../context-manager.js";
 import { getClientModuleInfo } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
+import { NameType, normalizeName } from "../utils/name-utils.js";
 import { getMethodHierarchiesMap } from "../utils/operation-util.js";
 import { buildOperationOptions } from "./build-operations.js";
-import { NameType, normalizeName } from "../utils/name-utils.js";
 
 // ====== UTILITIES ======
 

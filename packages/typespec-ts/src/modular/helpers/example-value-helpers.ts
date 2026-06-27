@@ -15,13 +15,13 @@ import { resolveReference } from "../../framework/reference.js";
 import { getSubscriptionId } from "../../transform/transform-client-options.js";
 import { hasKeyCredential, hasTokenCredential } from "../../utils/credential-utils.js";
 import { SdkContext } from "../../utils/interfaces.js";
+import { NameType, normalizeName } from "../../utils/name-utils.js";
 import { getMethodHierarchiesMap, ServiceOperation } from "../../utils/operation-util.js";
 import { AzureIdentityDependencies, AzureTestDependencies } from "../external-dependencies.js";
 import { getClientParametersDeclaration } from "./client-helpers.js";
 import { getClassicalClientName } from "./naming-helpers.js";
 import { getOperationFunction } from "./operation-helpers.js";
 import { isSpreadBodyParameter } from "./type-helpers.js";
-import { NameType, normalizeName } from "../../utils/name-utils.js";
 
 /**
  * Common interfaces for both samples and tests

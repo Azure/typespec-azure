@@ -11,11 +11,11 @@ import { ModularEmitterOptions } from "../interfaces.js";
 
 import { resolveReference } from "../../framework/reference.js";
 import { SdkContext } from "../../utils/interfaces.js";
+import { NameType, normalizeName } from "../../utils/name-utils.js";
 import { CloudSettingHelpers } from "../static-helpers-metadata.js";
 import { getTypeExpression } from "../type-expressions/get-type-expression.js";
 import { getClassicalClientName } from "./naming-helpers.js";
 import { isCredentialType } from "./type-helpers.js";
-import { NameType, normalizeName } from "../../utils/name-utils.js";
 
 interface ClientParameterOptions {
   onClientOnly?: boolean;

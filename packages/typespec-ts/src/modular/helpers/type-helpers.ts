@@ -7,12 +7,12 @@ import {
   SdkType,
 } from "@azure-tools/typespec-client-generator-core";
 import { SdkContext } from "../../utils/interfaces.js";
+import { NameType, normalizeName } from "../../utils/name-utils.js";
 import {
   getPropertyWithOverrides,
   ModelOverrideOptions,
 } from "../serialization/serialize-utils.js";
 import { getAllAncestors, getAllProperties } from "./operation-helpers.js";
-import { NameType, normalizeName } from "../../utils/name-utils.js";
 
 export function getDirectSubtypes(type: SdkModelType) {
   if (!type.discriminatedSubtypes) {

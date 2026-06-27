@@ -17,6 +17,7 @@ import { AzureIdentityDependencies } from "../modular/external-dependencies.js";
 import { getSubscriptionId } from "../transform/transform-client-options.js";
 import { hasKeyCredential, hasTokenCredential } from "../utils/credential-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
+import { NameType, normalizeName } from "../utils/name-utils.js";
 import {
   getMethodHierarchiesMap,
   isTenantLevelOperation,
@@ -32,7 +33,6 @@ import { getClassicalClientName } from "./helpers/naming-helpers.js";
 import { getOperationFunction } from "./helpers/operation-helpers.js";
 import { buildPropertyNameMapper, isSpreadBodyParameter } from "./helpers/type-helpers.js";
 import { ModelOverrideOptions } from "./serialization/serialize-utils.js";
-import { NameType, normalizeName } from "../utils/name-utils.js";
 
 /**
  * Interfaces for samples generations

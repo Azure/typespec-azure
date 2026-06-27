@@ -12,12 +12,12 @@ import { resolveReference } from "../../framework/reference.js";
 import { refkey } from "../../framework/refkey.js";
 import { getClientModuleInfo } from "../../utils/client-utils.js";
 import { SdkContext } from "../../utils/interfaces.js";
+import { NameType, normalizeName } from "../../utils/name-utils.js";
 import { ServiceOperation } from "../../utils/operation-util.js";
 import { AzurePollingDependencies } from "../external-dependencies.js";
 import { PagingHelpers, SimplePollerHelpers } from "../static-helpers-metadata.js";
 import { getClassicalLayerPrefix } from "./naming-helpers.js";
 import { getOperationFunction } from "./operation-helpers.js";
-import { NameType, normalizeName } from "../../utils/name-utils.js";
 
 interface OperationDeclarationInfo {
   // the operation function

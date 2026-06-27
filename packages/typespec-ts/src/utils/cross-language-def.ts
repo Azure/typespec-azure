@@ -4,8 +4,8 @@
 import { UsageFlags } from "@azure-tools/typespec-client-generator-core";
 import { transformModularEmitterOptions } from "../modular/build-modular-options.js";
 import { SdkContext } from "./interfaces.js";
-import { getMethodHierarchiesMap } from "./operation-util.js";
 import { NameType, normalizeName } from "./name-utils.js";
+import { getMethodHierarchiesMap } from "./operation-util.js";
 
 export function generateCrossLanguageDefinitionFile(dpgContext: SdkContext): {
   CrossLanguagePackageId: string;

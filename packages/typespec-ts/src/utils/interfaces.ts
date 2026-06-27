@@ -1,7 +1,7 @@
 import { SdkContext as TCGCSdkContext } from "@azure-tools/typespec-client-generator-core";
 import { ModelProperty, Namespace } from "@typespec/compiler";
-import { KnownMediaType } from "./media-types.js";
 import { ClientOptions, SchemaContext } from "../interfaces.js";
+import { KnownMediaType } from "./media-types.js";
 
 export interface SdkContext extends TCGCSdkContext {
   emitterOptions?: ClientOptions;

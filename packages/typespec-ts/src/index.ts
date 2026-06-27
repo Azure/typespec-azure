@@ -45,7 +45,35 @@ import { Project } from "ts-morph";
 import { provideBinder } from "./framework/hooks/binder.js";
 import { provideSdkTypes } from "./framework/hooks/sdk-types.js";
 import { loadStaticHelpers } from "./framework/load-static-helpers.js";
+import { ClientModel, ClientOptions } from "./interfaces.js";
 import { EmitterOptions } from "./lib.js";
+import { buildApiExtractorConfig } from "./metadata/build-api-extractor-config.js";
+import { buildChangelogFile } from "./metadata/build-changelog-file.js";
+import { buildEsLintConfig } from "./metadata/build-es-lint-config.js";
+import { buildLicenseFile } from "./metadata/build-license-file.js";
+import { buildPackageFile, updatePackageFile } from "./metadata/build-package-file.js";
+import {
+  buildReadmeFile,
+  hasClientNameChanged,
+  updateReadmeFile,
+} from "./metadata/build-readme-file.js";
+import { buildSampleEnvFile } from "./metadata/build-sample-env-file.js";
+import { buildTestBrowserTsConfig, buildTestNodeTsConfig } from "./metadata/build-test-config.js";
+import {
+  buildTsConfig,
+  buildTsLintConfig,
+  buildTsSampleConfig,
+  buildTsSnippetsConfig,
+  buildTsSrcBrowserConfig,
+  buildTsSrcCjsConfig,
+  buildTsSrcEsmConfig,
+  buildTsSrcReactNativeConfig,
+} from "./metadata/build-ts-config.js";
+import { buildVitestConfig } from "./metadata/build-vitest-config.js";
+import { buildWarpConfig } from "./metadata/build-warp-config.js";
+import { buildRecordedClientFile } from "./metadata/test/build-recorded-client.js";
+import { buildSampleTest } from "./metadata/test/build-sample-test.js";
+import { buildSnippets } from "./metadata/test/build-snippets.js";
 import { buildClassicalClient } from "./modular/build-classical-client.js";
 import { buildClassicOperationFiles } from "./modular/build-classical-operation-groups.js";
 import { buildClientContext, getClientContextPath } from "./modular/build-client-context.js";
@@ -62,29 +90,10 @@ import { emitTests } from "./modular/emit-tests.js";
 import { getClassicalClientName } from "./modular/helpers/naming-helpers.js";
 import { ModularEmitterOptions } from "./modular/interfaces.js";
 import { packageUsesXmlSerialization } from "./modular/serialization/build-xml-serializer-function.js";
-import { transformClientModel } from "./transform/transform.js";
 import { transformClientOptions } from "./transform/transform-client-options.js";
-import {
-  getClientHierarchyMap,
-  getClientModuleInfo,
-  getClients,
-} from "./utils/client-utils.js";
+import { transformClientModel } from "./transform/transform.js";
+import { getClientHierarchyMap, getClientModuleInfo, getClients } from "./utils/client-utils.js";
 import { generateCrossLanguageDefinitionFile } from "./utils/cross-language-def.js";
-import { ClientModel, ClientOptions } from "./interfaces.js";
-import { buildApiExtractorConfig } from "./metadata/build-api-extractor-config.js";
-import { buildChangelogFile } from "./metadata/build-changelog-file.js";
-import { buildEsLintConfig } from "./metadata/build-es-lint-config.js";
-import { buildLicenseFile } from "./metadata/build-license-file.js";
-import { buildPackageFile, updatePackageFile } from "./metadata/build-package-file.js";
-import { buildReadmeFile, hasClientNameChanged, updateReadmeFile } from "./metadata/build-readme-file.js";
-import { buildRecordedClientFile } from "./metadata/test/build-recorded-client.js";
-import { buildSampleEnvFile } from "./metadata/build-sample-env-file.js";
-import { buildSampleTest } from "./metadata/test/build-sample-test.js";
-import { buildSnippets } from "./metadata/test/build-snippets.js";
-import { buildTestBrowserTsConfig, buildTestNodeTsConfig } from "./metadata/build-test-config.js";
-import { buildTsConfig, buildTsLintConfig, buildTsSampleConfig, buildTsSnippetsConfig, buildTsSrcBrowserConfig, buildTsSrcCjsConfig, buildTsSrcEsmConfig, buildTsSrcReactNativeConfig } from "./metadata/build-ts-config.js";
-import { buildVitestConfig } from "./metadata/build-vitest-config.js";
-import { buildWarpConfig } from "./metadata/build-warp-config.js";
 
 export * from "./lib.js";
 

@@ -5,12 +5,12 @@ import {
   SdkType,
 } from "@azure-tools/typespec-client-generator-core";
 import { SdkContext } from "../../utils/interfaces.js";
+import { NameType, normalizeName } from "../../utils/name-utils.js";
 import { getCredentialExpression } from "./get-credential-expression.js";
 import { getEnumExpression } from "./get-enum-expression.js";
 import { getModelExpression } from "./get-model-expression.js";
 import { getNullableExpression } from "./get-nullable-expression.js";
 import { getUnionExpression } from "./get-union-expression.js";
-import { NameType, normalizeName } from "../../utils/name-utils.js";
 
 export interface EmitTypeOptions {
   emitInline?: boolean;

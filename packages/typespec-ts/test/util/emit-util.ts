@@ -15,6 +15,7 @@ import { expectDiagnosticEmpty } from "@typespec/compiler/testing";
 import { useContext } from "../../src/context-manager.js";
 import { useBinder } from "../../src/framework/hooks/binder.js";
 import { renameClientName } from "../../src/index.js";
+import { ClientOptions } from "../../src/interfaces.js";
 import { buildClassicalClient } from "../../src/modular/build-classical-client.js";
 import { buildClassicOperationFiles } from "../../src/modular/build-classical-operation-groups.js";
 import { buildClientContext } from "../../src/modular/build-client-context.js";
@@ -25,7 +26,6 @@ import { buildSubpathIndexFile } from "../../src/modular/build-subpath-index.js"
 import { emitSamples } from "../../src/modular/emit-samples.js";
 import { emitTests } from "../../src/modular/emit-tests.js";
 import { getClientHierarchyMap } from "../../src/utils/client-utils.js";
-import { ClientOptions } from "../../src/interfaces.js";
 
 export interface ModelConfigOptions extends ClientOptions {
   needOptions?: boolean;
@@ -71,7 +71,8 @@ export async function emitModularModelsFromTypeSpec(
   dpgContext.emitterOptions!.includeHeadersInResponse = includeResponseHeaders;
   dpgContext.emitterOptions!.compatibilityMode = options["compatibility-mode"];
   dpgContext.emitterOptions!.experimentalExtensibleEnums = options["experimental-extensible-enums"];
-  dpgContext.emitterOptions!.ignoreNullableOnOptional = options["ignore-nullable-on-optional"] ?? true;
+  dpgContext.emitterOptions!.ignoreNullableOnOptional =
+    options["ignore-nullable-on-optional"] ?? true;
   if (options["wrap-non-model-return"] !== undefined) {
     dpgContext.emitterOptions!.wrapNonModelReturn = options["wrap-non-model-return"] === true;
   }
@@ -325,7 +326,8 @@ export async function emitSamplesFromTypeSpec(
     },
     ...configs,
   });
-  dpgContext.emitterOptions!.ignoreNullableOnOptional = configs["ignore-nullable-on-optional"] ?? true;
+  dpgContext.emitterOptions!.ignoreNullableOnOptional =
+    configs["ignore-nullable-on-optional"] ?? true;
   const modularEmitterOptions = transformModularEmitterOptions(dpgContext, "", {
     casing: "camel",
   });

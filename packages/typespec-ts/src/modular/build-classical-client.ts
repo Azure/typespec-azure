@@ -21,13 +21,13 @@ import { resolveReference } from "../framework/reference.js";
 import { refkey } from "../framework/refkey.js";
 import { getClientModuleInfo, isMultiEndpointClient } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
+import { NameType, normalizeName } from "../utils/name-utils.js";
 import { getMethodHierarchiesMap, isTenantLevelOperation } from "../utils/operation-util.js";
 import { AzurePollingDependencies } from "./external-dependencies.js";
 import { getPagingLROMethodName } from "./helpers/classical-operation-helpers.js";
 import { getDocsFromDescription } from "./helpers/docs-helpers.js";
 import { getOperationFunction } from "./helpers/operation-helpers.js";
 import { PagingHelpers, SimplePollerHelpers } from "./static-helpers-metadata.js";
-import { NameType, normalizeName } from "../utils/name-utils.js";
 
 export function buildClassicalClient(
   dpgContext: SdkContext,

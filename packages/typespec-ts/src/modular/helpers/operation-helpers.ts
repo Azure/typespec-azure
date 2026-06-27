@@ -35,6 +35,7 @@ import { refkey } from "../../framework/refkey.js";
 import { reportDiagnostic } from "../../lib.js";
 import { SdkContext } from "../../utils/interfaces.js";
 import { isAzureCoreErrorType } from "../../utils/model-utils.js";
+import { NameType, normalizeName } from "../../utils/name-utils.js";
 import {
   getCollectionFormatFromArrayEncoding,
   getCollectionFormatHelper,
@@ -91,7 +92,6 @@ import {
   getOperationName,
 } from "./naming-helpers.js";
 import { getNullableValidType, isSpreadBodyParameter, isTypeNullable } from "./type-helpers.js";
-import { NameType, normalizeName } from "../../utils/name-utils.js";
 
 /**
  * Checks whether a header should be skipped during serialization/deserialization.

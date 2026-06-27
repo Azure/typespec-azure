@@ -2,8 +2,8 @@
 // Licensed under the MIT License.
 
 import { Project, SourceFile } from "ts-morph";
-import { hasPollingOperations } from "../utils/operation-helpers.js";
 import { ClientModel } from "../interfaces.js";
+import { hasPollingOperations } from "../utils/operation-helpers.js";
 import { buildAzureMonorepoPackage } from "./package-json/build-azure-monorepo-package.js";
 import { PackageCommonInfoConfig, resolveWarpExports } from "./package-json/package-common.js";
 import { getPackageName } from "./utils.js";

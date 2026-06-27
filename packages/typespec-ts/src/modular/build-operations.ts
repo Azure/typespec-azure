@@ -24,6 +24,7 @@ import { resolveReference } from "../framework/reference.js";
 import { refkey } from "../framework/refkey.js";
 import { getClientModuleInfo, isMultiEndpointClient } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
+import { NameType, normalizeName } from "../utils/name-utils.js";
 import {
   getMethodHierarchiesMap,
   hasDualFormatSupport,
@@ -33,7 +34,6 @@ import { getDocsFromDescription } from "./helpers/docs-helpers.js";
 import { getOperationName } from "./helpers/naming-helpers.js";
 import { OperationPathAndDeserDetails } from "./interfaces.js";
 import { getTypeExpression } from "./type-expressions/get-type-expression.js";
-import { NameType, normalizeName } from "../utils/name-utils.js";
 
 /**
  * This function creates a file under /api for each operation group.

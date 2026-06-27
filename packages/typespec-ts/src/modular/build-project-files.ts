@@ -2,10 +2,10 @@ import { getRelativePathFromDirectory, joinPaths } from "@typespec/compiler";
 import { useContext } from "../context-manager.js";
 import { getClientHierarchyMap, getClientModuleInfo } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
+import { NameType } from "../utils/name-utils.js";
 import { getMethodHierarchiesMap } from "../utils/operation-util.js";
 import { getClassicalLayerPrefix } from "./helpers/naming-helpers.js";
 import { ModularEmitterOptions } from "./interfaces.js";
-import { NameType } from "../utils/name-utils.js";
 
 /**
  * Computes the relative path prefix (e.g. `./src` or `./src/generated`) from

@@ -3,10 +3,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import {
-  buildPackageFile,
-  updatePackageFile,
-} from "../../../src/metadata/build-package-file.js";
+import { buildPackageFile, updatePackageFile } from "../../../src/metadata/build-package-file.js";
 import { TestModelConfig, createMockModel } from "./mock-helper.js";
 
 describe("Package file generation", () => {

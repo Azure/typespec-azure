@@ -36,10 +36,10 @@ the required tooling (Node.js and `pnpm`). The command scripts under `test/comma
 
 The package is tested through three vitest projects (configured in `vitest.config.ts`):
 
-| Project | Location | Covers | Command |
-| --- | --- | --- | --- |
-| `test-next` | `test-next/**` | Modern unit tests | `pnpm test-next` |
-| `unit-modular` | `test/modular-unit/**` | Modular unit tests | `pnpm unit-test` |
+| Project                     | Location                            | Covers                           | Command                                  |
+| --------------------------- | ----------------------------------- | -------------------------------- | ---------------------------------------- |
+| `test-next`                 | `test-next/**`                      | Modern unit tests                | `pnpm test-next`                         |
+| `unit-modular`              | `test/modular-unit/**`              | Modular unit tests               | `pnpm unit-test`                         |
 | `integration-azure-modular` | `test/azure-modular-integration/**` | Modular spector end-to-end tests | `pnpm integration-test-ci:azure-modular` |
 
 `pnpm lint` runs ESLint with `--max-warnings=0`.
@@ -49,9 +49,9 @@ test server; `pnpm integration-test-ci:azure-modular` starts the server, generat
 assertions for you. To (re)generate the tracked baselines without running the tests:
 
 ```bash
-pnpm copy:typespec        # assemble ./temp/specs from the http-specs packages
-pnpm generate-tsp-only    # regenerate all Azure modular baselines (client + declarations)
-pnpm check:tree           # fails if regeneration left the git tree dirty
+pnpm copy:typespec     # assemble ./temp/specs from the http-specs packages
+pnpm generate-tsp-only # regenerate all Azure modular baselines (client + declarations)
+pnpm check:tree        # fails if regeneration left the git tree dirty
 ```
 
 > Only `src/index.d.ts` is tracked per generated package, so `check:tree` is what guards the

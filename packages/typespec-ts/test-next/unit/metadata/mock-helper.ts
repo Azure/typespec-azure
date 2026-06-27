@@ -1,8 +1,5 @@
-import {
-  buildRuntimeImports,
-  initInternalImports,
-} from "../../../src/utils/imports-util.js";
 import { ClientModel } from "../../../src/interfaces.js";
+import { buildRuntimeImports, initInternalImports } from "../../../src/utils/imports-util.js";
 
 export type TestModelConfig = {
   description?: string;

@@ -26,6 +26,14 @@ import {
   HttpStatusCodesEntry,
 } from "@typespec/http";
 import { resolveReference } from "../framework/reference.js";
+import {
+  OPERATION_LRO_HIGH_PRIORITY,
+  OPERATION_LRO_LOW_PRIORITY,
+  OperationLroDetail,
+  Paths,
+  ResponseMetadata,
+  ResponseTypes,
+} from "../interfaces.js";
 import { reportDiagnostic } from "../lib.js";
 import { SerializationHelpers } from "../modular/static-helpers-metadata.js";
 import { listOperationsUnderClient } from "./client-utils.js";
@@ -37,10 +45,9 @@ import {
   knownMediaType,
 } from "./media-types.js";
 import { isByteOrByteUnion } from "./model-utils.js";
-import { getOperationNamespaceInterfaceName } from "./namespace-utils.js";
 import { getLroLogicalResponseName, getResponseTypeName } from "./name-constructors.js";
 import { NameType, normalizeName } from "./name-utils.js";
-import { OPERATION_LRO_HIGH_PRIORITY, OPERATION_LRO_LOW_PRIORITY, OperationLroDetail, Paths, ResponseMetadata, ResponseTypes } from "../interfaces.js";
+import { getOperationNamespaceInterfaceName } from "./namespace-utils.js";
 
 // Sorts the responses by status code
 export function sortedOperationResponses(responses: HttpOperationResponse[]) {

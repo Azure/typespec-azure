@@ -15,9 +15,9 @@ import {
 } from "../utils/model-utils.js";
 
 import { useContext } from "../context-manager.js";
+import { SchemaContext } from "../interfaces.js";
 import { listOperationsUnderClient } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
-import { SchemaContext } from "../interfaces.js";
 
 export function transformSchemas(client: SdkClient, dpgContext: SdkContext) {
   const program = dpgContext.program;

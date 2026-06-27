@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  buildRuntimeImports,
-  getImportSpecifier,
-} from "../../../src/utils/imports-util.js";
+import { buildRuntimeImports, getImportSpecifier } from "../../../src/utils/imports-util.js";
 
 describe("#buildRuntimeImports", () => {
   it("should return the correct import set", () => {

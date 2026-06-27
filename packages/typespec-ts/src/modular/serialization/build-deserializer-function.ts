@@ -15,6 +15,7 @@ import { refkey } from "../../framework/refkey.js";
 import { reportDiagnostic } from "../../lib.js";
 import { SdkContext } from "../../utils/interfaces.js";
 import { isAzureCoreErrorType } from "../../utils/model-utils.js";
+import { NameType, normalizeName } from "../../utils/name-utils.js";
 import { getAdditionalPropertiesName, normalizeModelName } from "../emit-models.js";
 import {
   getAllAncestors,
@@ -30,7 +31,6 @@ import {
   isSupportedSerializeType,
   ModelSerializeOptions,
 } from "./serialize-utils.js";
-import { NameType, normalizeName } from "../../utils/name-utils.js";
 
 export function buildPropertyDeserializer(
   context: SdkContext,

@@ -1,8 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: to fix the handlebars issue
 import hbs from "handlebars";
-import { getClientName } from "../../utils/name-constructors.js";
 import { ClientModel } from "../../interfaces.js";
+import { getClientName } from "../../utils/name-constructors.js";
 import { snippetsContent } from "./template.js";
 
 export function buildSnippets(model: ClientModel, clientName?: string) {

@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { ArraySchema, ObjectSchema, ClientModel, Schema, SchemaContext } from "../interfaces.js";
+import { ArraySchema, ClientModel, ObjectSchema, Schema, SchemaContext } from "../interfaces.js";
 
 export interface IsDictionaryOptions {
   filterEmpty?: boolean;

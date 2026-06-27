@@ -3,8 +3,8 @@ import { format } from "prettier";
 import prettierPluginBabel from "prettier/plugins/babel";
 import prettierPluginEstree from "prettier/plugins/estree";
 import prettierPluginTypescript from "prettier/plugins/typescript";
+import { ClientModel, ContentBuilder, File } from "../interfaces.js";
 import { prettierJSONOptions, prettierTypeScriptOptions, reportDiagnostic } from "../lib.js";
-import { ContentBuilder, File, ClientModel } from "../interfaces.js";
 
 export async function emitContentByBuilder(
   program: Program,

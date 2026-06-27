@@ -20,11 +20,11 @@ import {
 } from "../utils/operation-util.js";
 
 import { getDoc } from "@typespec/compiler";
+import { Imports, OperationMethod, PathMetadata, Paths, SchemaContext } from "../interfaces.js";
 import { listOperationsUnderClient } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
-import { getParameterSerializationInfo } from "../utils/parameter-utils.js";
-import { Imports, OperationMethod, PathMetadata, Paths, SchemaContext } from "../interfaces.js";
 import { getParameterTypeName, getResponseTypeName } from "../utils/name-constructors.js";
+import { getParameterSerializationInfo } from "../utils/parameter-utils.js";
 
 export function transformPaths(
   client: SdkClient,

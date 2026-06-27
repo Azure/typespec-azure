@@ -1,4 +1,5 @@
 import { getHttpOperationWithCache, SdkClient } from "@azure-tools/typespec-client-generator-core";
+import { HelperFunctionDetails } from "../interfaces.js";
 import { listOperationsUnderClient } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import { getCollectionFormat } from "../utils/model-utils.js";
@@ -8,7 +9,6 @@ import {
   hasPagingOperations,
   hasPollingOperations,
 } from "../utils/operation-util.js";
-import { HelperFunctionDetails } from "../interfaces.js";
 
 export function transformHelperFunctionDetails(
   client: SdkClient,

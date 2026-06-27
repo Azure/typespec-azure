@@ -4,6 +4,19 @@
 import { SdkClient } from "@azure-tools/typespec-client-generator-core";
 import { getDoc, joinPaths } from "@typespec/compiler";
 import { getServers } from "@typespec/http";
+import {
+  ClientModel,
+  ClientOptions,
+  Imports,
+  OperationParameter,
+  OperationResponse,
+  PathParameter,
+  Paths,
+  Schema,
+  SchemaContext,
+  UrlInfo,
+} from "../interfaces.js";
+import { buildRuntimeImports, initInternalImports } from "../utils/imports-util.js";
 import { SdkContext } from "../utils/interfaces.js";
 import {
   getDefaultService,
@@ -13,6 +26,7 @@ import {
   getTypeName,
   predictDefaultValue,
 } from "../utils/model-utils.js";
+import { NameType, normalizeName } from "../utils/name-utils.js";
 import { getClientLroOverload } from "../utils/operation-util.js";
 import { transformApiVersionInfo } from "./transform-api-version-info.js";
 import { transformHelperFunctionDetails } from "./transform-helper-function-details.js";
@@ -21,9 +35,6 @@ import { transformPaths } from "./transform-paths.js";
 import { transformToResponseTypes } from "./transform-responses.js";
 import { transformSchemas } from "./transform-schemas.js";
 import { transformTelemetryInfo } from "./transform-telemetry-info.js";
-import { buildRuntimeImports, initInternalImports } from "../utils/imports-util.js";
-import { Imports, OperationParameter, OperationResponse, PathParameter, Paths, ClientModel, ClientOptions, Schema, SchemaContext, UrlInfo } from "../interfaces.js";
-import { NameType, normalizeName } from "../utils/name-utils.js";
 
 export async function transformClientModel(
   client: SdkClient,

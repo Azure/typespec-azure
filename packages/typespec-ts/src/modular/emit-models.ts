@@ -50,6 +50,7 @@ import { reportDiagnostic } from "../lib.js";
 import { getClientHierarchyMap } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import { isAzureCoreErrorType } from "../utils/model-utils.js";
+import { fixLeadingNumber, NameType, normalizeName } from "../utils/name-utils.js";
 import { getMethodHierarchiesMap } from "../utils/operation-util.js";
 import { getHeaderClientOptions } from "./helpers/client-option-helpers.js";
 import {
@@ -84,7 +85,6 @@ import {
   getTypeExpression,
   normalizeModelPropertyName,
 } from "./type-expressions/get-type-expression.js";
-import { fixLeadingNumber, NameType, normalizeName } from "../utils/name-utils.js";
 
 type InterfaceStructure = OptionalKind<InterfaceDeclarationStructure> & {
   extends?: string[];
