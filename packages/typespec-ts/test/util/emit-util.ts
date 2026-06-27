@@ -266,7 +266,7 @@ export async function emitModularClientContextFromTypeSpec(
     
     const project = useContext("outputProject");
     const dependencies = useDependencies();
-    const effectReaderLayer = makeClientReaderLayer({ project, dependencies });
+    const effectReaderLayer = makeClientReaderLayer({ project, dependencies, binder });
     const res = runClientContextSync(
       buildClientContext(dpgContext, clientMap[0]!, modularEmitterOptions),
       effectReaderLayer

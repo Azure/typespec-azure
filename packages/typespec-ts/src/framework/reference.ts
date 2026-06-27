@@ -1,10 +1,10 @@
 import { ReferenceableSymbol } from "./dependency.js";
-import { useBinder } from "./hooks/binder.js";
+import { Binder, useBinder } from "./hooks/binder.js";
 import { SourceFileSymbol, StaticHelperMetadata } from "./load-static-helpers.js";
 import { refkey as getRefkey } from "./refkey.js";
 
-export function resolveReference(refkey: unknown): string {
-  const binder = useBinder();
+export function resolveReference(refkey: unknown, providedBinder?: Binder): string {
+  const binder = providedBinder ?? useBinder();
 
   let key = refkey;
 

@@ -279,7 +279,7 @@ export async function $onEmit(context: EmitContext) {
     const modularSourcesRoot = dpgContext.generationPathDetail?.modularSourcesDir ?? "src";
     const project = useContext("outputProject");
     const dependencies = useDependencies();
-    const effectReaderLayer = makeClientReaderLayer({ project, dependencies });
+    const effectReaderLayer = makeClientReaderLayer({ project, dependencies, binder });
     modularEmitterOptions = transformModularEmitterOptions(dpgContext, modularSourcesRoot, {
       casing: "camel",
     });
