@@ -1,5 +1,6 @@
 import { Effect } from "effect";
-import { Dependencies, OutputProject } from "../framework/effect-context.js";
+import { BinderTag, Dependencies, OutputProject } from "../framework/effect-context.js";
+import { Binder } from "../framework/hooks/binder.js";
 import { NameType, normalizeName } from "../rlc-common/index.js";
 import {
   buildGetClientCredentialParam,
@@ -56,10 +57,11 @@ export function buildClientContext(
   dpgContext: SdkContext,
   clientMap: [string[], SdkClientType<SdkServiceOperation>],
   emitterOptions: ModularEmitterOptions,
-): Effect.Effect<SourceFile, never, OutputProject | Dependencies> {
+): Effect.Effect<SourceFile, never, OutputProject | Dependencies | BinderTag> {
   const effect = Effect.gen(function* () {
     const project = yield* OutputProject;
     const dependencies = yield* Dependencies;
+    const binder = yield* BinderTag;
     const [hierarchy, client] = clientMap;
   const name = getClientName(client);
   const { rlcClientName } = getModularClientOptions(clientMap);
@@ -86,7 +88,7 @@ export function buildClientContext(
         name: getClientParameterName(p),
         type: getTypeExpression(dpgContext, p.type),
         hasQuestionToken: false,
-        docs: getDocsWithKnownVersion(dpgContext, p),
+        docs: getDocsWithKnownVersion(dpgContext, p, binder),
       };
     });
 
@@ -111,14 +113,14 @@ export function buildClientContext(
         name: getClientParameterName(p),
         type: getTypeExpression(dpgContext, p.type),
         hasQuestionToken: true,
-        docs: getDocsWithKnownVersion(dpgContext, p),
+        docs: getDocsWithKnownVersion(dpgContext, p, binder),
       };
     });
 
   clientContextFile.addInterface({
     isExported: true,
     name: `${rlcClientName}`,
-    extends: [resolveReference(dependencies.Client)],
+    extends: [resolveReference(dependencies.Client, binder)],
     docs: getDocsFromDescription(client.doc),
     properties: [...requiredInterfaceProperties, ...optionalInterfaceProperties],
   });
@@ -133,13 +135,13 @@ export function buildClientContext(
         type:
           p.name.toLowerCase() === "apiversion" ? "string" : getTypeExpression(dpgContext, p.type),
         hasQuestionToken: true,
-        docs: getDocsWithKnownVersion(dpgContext, p),
+        docs: getDocsWithKnownVersion(dpgContext, p, binder),
       };
     });
   if (dpgContext.arm) {
     propertiesInOptions.push({
       name: "cloudSetting",
-      type: `${resolveReference(CloudSettingHelpers.AzureSupportedClouds)}`,
+      type: `${resolveReference(CloudSettingHelpers.AzureSupportedClouds, binder)}`,
       hasQuestionToken: true,
       docs: [`Specifies the Azure cloud environment for the client.`],
     });
@@ -159,7 +161,7 @@ export function buildClientContext(
   clientContextFile.addInterface({
     name: `${getClassicalClientName(client)}OptionalParams`,
     isExported: true,
-    extends: [resolveReference(dependencies.ClientOptions)],
+    extends: [resolveReference(dependencies.ClientOptions, binder)],
     properties: propertiesInOptions,
     docs: ["Optional parameters for the client."],
   });
@@ -202,6 +204,7 @@ export function buildClientContext(
   factoryFunction.addStatements(
     `const clientContext = ${resolveReference(
       dependencies.getClient,
+      binder
     )}(${endpointParam}, ${credentialParam}, ${optionsParam});`,
   );
 
@@ -209,7 +212,7 @@ export function buildClientContext(
 
   if (customHttpAuthHeaderName && customHttpAuthSharedKeyPrefix) {
     factoryFunction.addStatements(`
-      if(${resolveReference(dependencies.isKeyCredential)}(credential)) {
+      if(${resolveReference(dependencies.isKeyCredential, binder)}(credential)) {
         clientContext.pipeline.addPolicy({ 
           name: "customKeyCredentialPolicy",
           sendRequest(request, next) {
@@ -305,6 +308,7 @@ export function buildClientContext(
 function getDocsWithKnownVersion(
   dpgContext: SdkContext,
   param: SdkMethodParameter | SdkEndpointParameter | SdkCredentialParameter | SdkHttpParameter,
+  binder: Binder,
 ) {
   const docs = getDocsFromDescription(param.doc);
   if (param.name.toLowerCase() !== "apiversion") {
@@ -314,7 +318,7 @@ function getDocsWithKnownVersion(
   if (apiVersionEnum) {
     const [_, knownValuesEnum] = buildEnumTypes(dpgContext, apiVersionEnum, true);
     docs.push(
-      `Known values of {@link ${resolveReference(refkey(knownValuesEnum.name, "knownValues"))}} that the service accepts.`,
+      `Known values of {@link ${resolveReference(refkey(knownValuesEnum.name, "knownValues"), binder)}} that the service accepts.`,
     );
   }
   return docs;
