@@ -55,6 +55,17 @@ jobs:
             working-directory: packages/typespec-ts
             run-prepare: false
             run-regenerate: false
+          - name: Java
+            lang: java
+            package-filter: "@azure-tools/typespec-java"
+            working-directory: packages/typespec-java/emitter-tests
+            mise-install-args: "java maven"
+            run-prepare: false
+            run-regenerate: true
+            # The Java emitter pins published @typespec/@azure-tools versions
+            # (resolved from npm, not the workspace), so bump these package.json
+            # files to the dev (@next) versions to test against latest typespec.
+            bump-deps-files: "packages/typespec-java/emitter/package.json packages/typespec-java/emitter-tests/package.json"
 
     env:
       TYPESPEC_VS_CI_BUILD: true
@@ -117,10 +128,23 @@ jobs:
             "
           done
 
+      # --- Bump TypeSpec deps to dev (@next) ---
+      # For emitters that pin published @typespec/@azure-tools versions (e.g.
+      # Java), updating the core submodule alone does not exercise the latest dev
+      # packages. Bump the listed package.json files to @next so install resolves
+      # dev versions. Mirrors autorest.java's "Bump TypeSpec Dependencies to dev".
+
+      - name: Bump TypeSpec dependencies to dev
+        if: matrix.bump-deps-files
+        run: npx -y @azure-tools/typespec-bump-deps ${{ matrix.bump-deps-files }} --add-npm-overrides
+
       # --- Install & Build ---
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        # When deps were bumped to @next, those versions are newer than pnpm's
+        # minimumReleaseAge window (set in pnpm-workspace.yaml) and would be
+        # rejected. Disable the age check for those nightly runs only.
+        run: pnpm install --no-frozen-lockfile ${{ matrix.bump-deps-files && '--config.minimumReleaseAge=0' || '' }}
 
       - name: Build
         run: pnpm turbo run --filter "${{ matrix.package-filter }}..." build
@@ -155,6 +179,7 @@ jobs:
             "@azure-tools/typespec-azure-resource-manager",
             "@azure-tools/typespec-autorest",
             "@azure-tools/typespec-python",
+            "@azure-tools/typespec-java",
             "@azure-tools/typespec-ts"
           ];
           console.log("--- Dev versions (next tag on npm) ---");

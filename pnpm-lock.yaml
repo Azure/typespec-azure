@@ -39,6 +39,9 @@ catalogs:
     '@astrojs/starlight':
       specifier: ^0.40.0
       version: 0.40.0
+    '@autorest/codemodel':
+      specifier: ~4.20.1
+      version: 4.20.1
     '@azure-rest/core-client':
       specifier: ^2.3.1
       version: 2.7.0
@@ -174,6 +177,12 @@ catalogs:
     '@types/hast':
       specifier: ^3.0.4
       version: 3.0.4
+    '@types/js-yaml':
+      specifier: ~4.0.9
+      version: 4.0.9
+    '@types/lodash':
+      specifier: ~4.17.24
+      version: 4.17.24
     '@types/micromatch':
       specifier: ^4.0.10
       version: 4.0.10
@@ -378,6 +387,12 @@ catalogs:
     is-unicode-supported:
       specifier: ^2.1.0
       version: 2.1.0
+    js-yaml:
+      specifier: ~4.2.0
+      version: 4.2.0
+    lodash:
+      specifier: ~4.18.1
+      version: 4.18.1
     log-symbols:
       specifier: ^7.0.1
       version: 7.0.1
@@ -3760,6 +3775,88 @@ importers:
         specifier: 'catalog:'
         version: 4.1.9(@types/node@26.0.0)(@vitest/coverage-v8@4.1.9)(@vitest/ui@4.1.9)(happy-dom@20.10.6)(jsdom@25.0.1)(vite@8.1.0(@types/node@26.0.0)(esbuild@0.28.1)(tsx@4.22.4)(yaml@2.9.0))
 
+  packages/typespec-java/emitter:
+    dependencies:
+      '@autorest/codemodel':
+        specifier: 'catalog:'
+        version: 4.20.1
+      '@azure-tools/codegen':
+        specifier: ~2.10.1
+        version: 2.10.1
+      js-yaml:
+        specifier: 'catalog:'
+        version: 4.2.0
+      lodash:
+        specifier: 'catalog:'
+        version: 4.18.1
+    devDependencies:
+      '@azure-tools/typespec-autorest':
+        specifier: 0.69.1
+        version: 0.69.1(810501a1c14da19544bc9fe0c5f08e83)
+      '@azure-tools/typespec-azure-core':
+        specifier: 0.69.0
+        version: 0.69.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))))(@typespec/rest@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0)))))
+      '@azure-tools/typespec-azure-resource-manager':
+        specifier: 0.69.1
+        version: 0.69.1(92ee4c7cc75d87272dd11b441ccbeb66)
+      '@azure-tools/typespec-azure-rulesets':
+        specifier: 0.69.1
+        version: 0.69.1(@azure-tools/typespec-azure-core@0.69.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))))(@typespec/rest@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))))))(@azure-tools/typespec-azure-resource-manager@0.69.1(92ee4c7cc75d87272dd11b441ccbeb66))(@azure-tools/typespec-client-generator-core@0.69.0(1c7bca31f4807dd83f2823b577ee4665))(@typespec/compiler@1.13.0(@types/node@26.0.0))
+      '@azure-tools/typespec-client-generator-core':
+        specifier: 0.69.0
+        version: 0.69.0(1c7bca31f4807dd83f2823b577ee4665)
+      '@azure-tools/typespec-liftr-base':
+        specifier: 0.14.0
+        version: 0.14.0
+      '@types/js-yaml':
+        specifier: 'catalog:'
+        version: 4.0.9
+      '@types/lodash':
+        specifier: 'catalog:'
+        version: 4.17.24
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.0.0
+      '@typespec/compiler':
+        specifier: 1.13.0
+        version: 1.13.0(@types/node@26.0.0)
+      '@typespec/events':
+        specifier: 0.83.0
+        version: 0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))
+      '@typespec/http':
+        specifier: 1.13.0
+        version: 1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0)))
+      '@typespec/openapi':
+        specifier: 1.13.0
+        version: 1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))))
+      '@typespec/rest':
+        specifier: 0.83.0
+        version: 0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))))
+      '@typespec/sse':
+        specifier: 0.83.0
+        version: 0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/events@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0)))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0)))
+      '@typespec/streams':
+        specifier: 0.83.0
+        version: 0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))
+      '@typespec/tspd':
+        specifier: 0.75.0
+        version: 0.75.0(@types/node@26.0.0)(typescript@6.0.3)
+      '@typespec/versioning':
+        specifier: 0.83.0
+        version: 0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))
+      '@typespec/xml':
+        specifier: 0.83.0
+        version: 0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))
+      rimraf:
+        specifier: 'catalog:'
+        version: 6.1.3
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.9(@types/node@26.0.0)(@vitest/coverage-v8@4.1.9)(@vitest/ui@4.1.9)(happy-dom@20.10.6)(jsdom@25.0.1)(vite@8.1.0(@types/node@26.0.0)(esbuild@0.28.1)(tsx@4.22.4)(yaml@2.9.0))
+
   packages/typespec-metadata:
     dependencies:
       yaml:
@@ -4183,11 +4280,17 @@ packages:
     engines: {node: '>=18.0.0'}
     hasBin: true
 
+  '@alloy-js/core@0.23.1':
+    resolution: {integrity: sha512-zbPXbiWjF3BvgO+a6dyDiA9uI19x5cHKDy5iC3U2/DIimIB0/j1/ObT9BNIzcM69h5pYt7ADDGXx5eNyb8j7bw==}
+
   '@alloy-js/core@0.24.1':
     resolution: {integrity: sha512-cye97/HGo0/G8XIc8UnS0PaSoSOj9DDPEiuKsXsn7xQgR1sbL+Nf0oTMZnL2fFb7mRnmULO84x5wK8R/YtReTg==}
 
   '@alloy-js/csharp@0.24.0':
     resolution: {integrity: sha512-TR+VAAnwbFV7YWnGSlyqL2X2/lrS3UBZ8JBKxszn7z+yk4Y5Sgs6dag3xPZMR5CsQXbxkN3gY/c4G3vqgKZf9A==}
+
+  '@alloy-js/markdown@0.23.0':
+    resolution: {integrity: sha512-tap9rYtEyxasdl8vQuBj3HHnI7DraSkBppcFOMoPzg7XJyHnZiO+/4CHWiWepMN49UDxk3br0k34+THM1A3H3w==}
 
   '@alloy-js/markdown@0.24.0':
     resolution: {integrity: sha512-gubCVcqm9OVVBBofADxy5eUS2LYNt1qo0oMvUR8ANyh0+2lKP7zx9D9Q9OXbF5TB9f+vod3OeTuX2F6QLtLKiQ==}
@@ -4201,6 +4304,9 @@ packages:
   '@alloy-js/rollup-plugin@0.1.2':
     resolution: {integrity: sha512-7jDdnePI+GA8UemsQEStdJ6XYNhs1rvv+yO5O/2jJqaoc0mYDchC+vwylljy2wUqGKDbFUXFX4xJktqtBZtyBg==}
     engines: {node: '>=18.0.0'}
+
+  '@alloy-js/typescript@0.23.0':
+    resolution: {integrity: sha512-aqZpW3+Pd/dgMkqAF+/KMELKqJppIKe1xO1LdcNgXA7p71DuogBvlj2UVzFtHRtP221Ewn/vFSJ+ZpPFv8FLDQ==}
 
   '@alloy-js/typescript@0.24.0':
     resolution: {integrity: sha512-xpnWUa5gaPRg4eeTFp4Xg8GRXzUghIpOzAWuGujvihgksIAH92lLTvEcPL1JTICup8Jv2us0JHndc4a8LWG+Ow==}
@@ -4347,6 +4453,10 @@ packages:
   '@astrojs/yaml2ts@0.2.4':
     resolution: {integrity: sha512-8oddpOae35pJsXPQXhTkM0ypfKPskVsh2bCxRtbf7e+/Epw2nReakFYpLKjZMEr75CsoF203PMnCocpfz0s69A==}
 
+  '@autorest/codemodel@4.20.1':
+    resolution: {integrity: sha512-MdI4G0EdQ8yOxGzgT1rCOXxXkCrUQLjVykOvdAyByIgHbnpRop1UzUQuuKmXO8gQPSy7xwYhnfVSgETbHIJZgg==}
+    engines: {node: '>=12.0.0'}
+
   '@azu/format-text@1.0.2':
     resolution: {integrity: sha512-Swi4N7Edy1Eqq82GxgEECXSSLyn6GOb5htRFPzBDdUkECGXtlf12ynO5oJSpWKPwCaUssOu7NfhDcCWpIC6Ywg==}
 
@@ -4356,6 +4466,81 @@ packages:
   '@azure-rest/core-client@2.7.0':
     resolution: {integrity: sha512-rL0lJqh1E8HLXNgjIw8cRyGAV/v+m6p1xRu/8OhsnmN8XHhwkyYJkAoGM+zrew96v7jZYPmVfy7pv7v4Iccfsg==}
     engines: {node: '>=20.0.0'}
+
+  '@azure-tools/async-io@3.0.254':
+    resolution: {integrity: sha512-X1C7XdyCuo50ch9FzKtTvmK18FgDxxf1Bbt3cSoknQqeDaRegHSSCO+zByq2YA4NvUzKXeZ1engh29IDxZXgpQ==}
+    engines: {node: '>=10.12.0'}
+
+  '@azure-tools/codegen@2.10.1':
+    resolution: {integrity: sha512-fZfREKjQnBTscjObgK4LuyZNFaofoCNQDNz0jl1i8fYNwCM5EOF9BXwtEtobuEyCpPUNDxQ/KKO65eWzirqk4w==}
+    engines: {node: '>=12.0.0'}
+
+  '@azure-tools/tasks@3.0.255':
+    resolution: {integrity: sha512-GjALNLz7kWMEdRVbaN5g0cJHNAr3XVTbP0611Mv2UzMgGL6FOhNZJK+oPHJKLDR8EEDZNnkwPlyi7B+INXUSQA==}
+    engines: {node: '>=10.12.0'}
+
+  '@azure-tools/typespec-autorest@0.69.1':
+    resolution: {integrity: sha512-nbAsTagr4pyBO0ajlRnE5TW4tAXrYKFYSoWD+8bevXpe23bkVIJkDUJCZPSgWE7CBf3kxfw53lAb70a50oJmRA==}
+    engines: {node: '>=22.0.0'}
+    peerDependencies:
+      '@azure-tools/typespec-azure-core': ^0.69.0
+      '@azure-tools/typespec-azure-resource-manager': ^0.69.1
+      '@azure-tools/typespec-client-generator-core': ^0.69.0
+      '@typespec/compiler': ^1.13.0
+      '@typespec/http': ^1.13.0
+      '@typespec/openapi': ^1.13.0
+      '@typespec/rest': ^0.83.0
+      '@typespec/versioning': ^0.83.0
+      '@typespec/xml': ^0.83.0
+    peerDependenciesMeta:
+      '@typespec/xml':
+        optional: true
+
+  '@azure-tools/typespec-azure-core@0.69.0':
+    resolution: {integrity: sha512-UNdPb/DgMvXqwWk9hb54QOAumCJ6u6GGy+bj3RIIT1Sht6FR9rIn8AQ/UQ7WtrhbJBoqvQo5dxtS565a9/VRZw==}
+    engines: {node: '>=22.0.0'}
+    peerDependencies:
+      '@typespec/compiler': ^1.13.0
+      '@typespec/http': ^1.13.0
+      '@typespec/rest': ^0.83.0
+
+  '@azure-tools/typespec-azure-resource-manager@0.69.1':
+    resolution: {integrity: sha512-NF7fqmPwaQbywcxGhH+v9qPYtIrPRR5MncXmeml6Kf9WLeqQj0rJt76KZCsZ8zwj58ZVbTNFPKcjsTQ00yQupA==}
+    engines: {node: '>=22.0.0'}
+    peerDependencies:
+      '@azure-tools/typespec-azure-core': ^0.69.0
+      '@typespec/compiler': ^1.13.0
+      '@typespec/http': ^1.13.0
+      '@typespec/openapi': ^1.13.0
+      '@typespec/rest': ^0.83.0
+      '@typespec/versioning': ^0.83.0
+
+  '@azure-tools/typespec-azure-rulesets@0.69.1':
+    resolution: {integrity: sha512-vRvO8MoO4dwHdOKCFUB0IZkwf5AFGW92PP+48GKDYSNVFA7mwKVlbAlRa0rU6yURsUppAT6BPEurtau3FR+N0Q==}
+    engines: {node: '>=22.0.0'}
+    peerDependencies:
+      '@azure-tools/typespec-azure-core': ^0.69.0
+      '@azure-tools/typespec-azure-resource-manager': ^0.69.1
+      '@azure-tools/typespec-client-generator-core': ^0.69.0
+      '@typespec/compiler': ^1.13.0
+
+  '@azure-tools/typespec-client-generator-core@0.69.0':
+    resolution: {integrity: sha512-ro8zzOeiN/74r0wM19R77gzLtbfjIFgKgr1Rusii/vhCfJIoVC7IcqLxhbJl0RVkjyhRFKt4GCRAw4iurnrDnw==}
+    engines: {node: '>=22.0.0'}
+    peerDependencies:
+      '@azure-tools/typespec-azure-core': ^0.69.0
+      '@typespec/compiler': ^1.13.0
+      '@typespec/events': ^0.83.0
+      '@typespec/http': ^1.13.0
+      '@typespec/openapi': ^1.13.0
+      '@typespec/rest': ^0.83.0
+      '@typespec/sse': ^0.83.0
+      '@typespec/streams': ^0.83.0
+      '@typespec/versioning': ^0.83.0
+      '@typespec/xml': ^0.83.0
+
+  '@azure-tools/typespec-liftr-base@0.14.0':
+    resolution: {integrity: sha512-q9pEaOiIaE2VF+BsnaDG98zrj0sZ7/8AD8aBrwXtHbzH+id3sWprl8rRF0qagDSVchslfrHcGFhXs2bM6Hie0g==}
 
   '@azure/abort-controller@2.1.2':
     resolution: {integrity: sha512-nBrLsEWm4J2u5LpAPjxADTlq3trDgVZZXHNKabeXZtpq3d3AbN/KGO82R87rdDz5/lYB024rtEf10/q0urNgsA==}
@@ -8181,6 +8366,9 @@ packages:
   '@types/keyv@3.1.4':
     resolution: {integrity: sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==}
 
+  '@types/lodash@4.17.24':
+    resolution: {integrity: sha512-gIW7lQLZbue7lRSWEFql49QJJWThrTFFeIMJdp3eH4tKoxm1OvEPg02rm4wCCSHS0cL3/Fizimb35b7k8atwsQ==}
+
   '@types/mdast@4.0.4':
     resolution: {integrity: sha512-kGaNbPh1k7AFzgpud/gMdvIm5xuECykRR+JnWKQno9TAXVa6WIVCGTPvYGekIDL4uwCZQSYbUxNBSb1aUo79oA==}
 
@@ -8369,6 +8557,17 @@ packages:
     resolution: {integrity: sha512-CY3uyFSRbcQv3nnSv8S0+lDftMVz6P963PoRlxrV7ew/Md564g9ut60PYzdLM5qW4jFn93GBF+Soi90ISAN+GQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
+  '@typespec/compiler@1.13.0':
+    resolution: {integrity: sha512-DonoHiyAMx0UjSmssqTrFtya+v97wny1aHcTLU5QF2wFzLATtcwUU9hbPC+eXhepuTunMOCHf8yk3pEsH6PZYA==}
+    engines: {node: '>=22.0.0'}
+    hasBin: true
+
+  '@typespec/events@0.83.0':
+    resolution: {integrity: sha512-3EP1EIjdLgwStgd2rGWaF/QqY7YRAt+DIYnnYG2VsdPwa8s2t6K6eJ9YJDXveeHImAkHs+cpFuwxnjKMl4hOyw==}
+    engines: {node: '>=22.0.0'}
+    peerDependencies:
+      '@typespec/compiler': ^1.13.0
+
   '@typespec/http-client-python@0.33.0':
     resolution: {integrity: sha512-tKH3p3KLN4enO9U6kpcaMzrw4Schrrvq+1XM+01drbP6JzJqjzKyxfGB5QEyfW+q5jEBWuHGuu277bjBixt/sg==}
     engines: {node: '>=22.0.0'}
@@ -8388,9 +8587,65 @@ packages:
       '@typespec/versioning': '>=0.83.0 <1.0.0'
       '@typespec/xml': '>=0.83.0 <1.0.0'
 
+  '@typespec/http@1.13.0':
+    resolution: {integrity: sha512-tf8XFddU6g1MZSAVCLC/0Xa4fNfUO0CcHe6PWpmC3bvUojxMnpRcERI2DdoRJ+aycB9Q+Z8wN8bJO3up6u+sCw==}
+    engines: {node: '>=22.0.0'}
+    peerDependencies:
+      '@typespec/compiler': ^1.13.0
+      '@typespec/streams': ^0.83.0
+    peerDependenciesMeta:
+      '@typespec/streams':
+        optional: true
+
+  '@typespec/openapi@1.13.0':
+    resolution: {integrity: sha512-omPc9n+LM2WvjYwnIf31RCxmG17fFUOVLBRsWg4T1mbcsNCj4grnNP7Lwt+irIZCiKtmLKxq3ViE7jYixCkZ3g==}
+    engines: {node: '>=22.0.0'}
+    peerDependencies:
+      '@typespec/compiler': ^1.13.0
+      '@typespec/http': ^1.13.0
+
+  '@typespec/rest@0.83.0':
+    resolution: {integrity: sha512-WMEwEe1kdaOdZ0c+ct5BVmTSBXkrPniUYDWCz3K52T4in2dNc7J6YGP6tL8bXgQz5B0CsP0VNO12N+UysQDsLw==}
+    engines: {node: '>=22.0.0'}
+    peerDependencies:
+      '@typespec/compiler': ^1.13.0
+      '@typespec/http': ^1.13.0
+
+  '@typespec/sse@0.83.0':
+    resolution: {integrity: sha512-04WNaju2rwBbcF5pG+HrKQtdcrmSGuTVziLHNA9XOqj1qM7Uon3+wo2g+ZZ3Z6tngfqQoTCPyDcRHqZtGRdNuw==}
+    engines: {node: '>=22.0.0'}
+    peerDependencies:
+      '@typespec/compiler': ^1.13.0
+      '@typespec/events': ^0.83.0
+      '@typespec/http': ^1.13.0
+      '@typespec/streams': ^0.83.0
+
+  '@typespec/streams@0.83.0':
+    resolution: {integrity: sha512-wbO6sdH1Uf+UwjxxsWdHQkjJ3wwiYsAKI+L66qnDYVXAFe02sUdMKd0mxH5o9ipGXE52MZ+yvZ52vHAD+g3RFQ==}
+    engines: {node: '>=22.0.0'}
+    peerDependencies:
+      '@typespec/compiler': ^1.13.0
+
   '@typespec/ts-http-runtime@0.3.6':
     resolution: {integrity: sha512-jIXhD0eWQ1JA6ln/5Dltyx22UxWNrw0hZmhy2rlv6m6KgF7kplHx3g0fzi09lNmTJQRR91OlemYp3xFnvDK9og==}
     engines: {node: '>=20.0.0'}
+
+  '@typespec/tspd@0.75.0':
+    resolution: {integrity: sha512-lGCpN5aM1O8utVH+6c7UMv9IZtEKlxc4O5blxp06TdnYWjOxyOEm+R9BBzaY7aq6Jtj/YamdDnMvzV42y/F10Q==}
+    engines: {node: '>=22.0.0'}
+    hasBin: true
+
+  '@typespec/versioning@0.83.0':
+    resolution: {integrity: sha512-nE66ta0ixpHB6FQpSzqnj8QnVfgFsxeK/4Xv+DxYx2nB/w18f6VjkF+hW+A/zs1tZIYvBZVbCNa/Rcr8zM6fhg==}
+    engines: {node: '>=22.0.0'}
+    peerDependencies:
+      '@typespec/compiler': ^1.13.0
+
+  '@typespec/xml@0.83.0':
+    resolution: {integrity: sha512-2/dtAD8jGPkIdwpQ1G1P+5+qdMPeafQiIKCd8NdAnOo0w9OZ59Io52jINm9HdN8+FcbOrqK8+B2N9rlPRj7PqA==}
+    engines: {node: '>=22.0.0'}
+    peerDependencies:
+      '@typespec/compiler': ^1.13.0
 
   '@ungap/structured-clone@1.3.2':
     resolution: {integrity: sha512-5jsZFwgR5rTdKwidH9Qmat75RKwqfpKlWWB1frDkljN127mwqBu8K0PYo7/hFpF03IEJpfVPpCQDY/eDx3iHvA==}
@@ -12870,6 +13125,10 @@ packages:
     resolution: {integrity: sha512-NxNv/kLguCA7p3jE8oL2aEBsrJWgAakBpgmgK6lpPWV+WuOmY6r2/zbAVnP+T8bQlA0nzHXSJSJW0Hq7ylaD2Q==}
     engines: {node: '>= 6'}
 
+  proper-lockfile@2.0.1:
+    resolution: {integrity: sha512-rjaeGbsmhNDcDInmwi4MuI6mRwJu6zq8GjYCLuSuE7GF+4UjgzkL69sVKKJ2T2xH61kK7rXvGYpvaTu909oXaQ==}
+    engines: {node: '>=4.0.0'}
+
   proper-lockfile@4.1.2:
     resolution: {integrity: sha512-TjNPblN4BwAWMXU8s9AEz4JmQxnD1NNL7bNOY/AKUzyamc379FWASUhc/K1pL2noVb+XmZKLL68cjzLsiOAMaA==}
 
@@ -13222,6 +13481,9 @@ packages:
 
   retext@9.0.0:
     resolution: {integrity: sha512-sbMDcpHCNjvlheSgMfEcVrZko3cDzdbe1x/e7G66dFp0Ff7Mldvi2uv6JkJQzdRcvLYE8CA8Oe8siQx8ZOgTcA==}
+
+  retry@0.10.1:
+    resolution: {integrity: sha512-ZXUSQYTHdl3uS7IuCehYfMzKyIDBNoAuUblvy5oGO5UJSUTmStUUVPXbA9Qxd173Bgre53yCQczQuHgRWAdvJQ==}
 
   retry@0.12.0:
     resolution: {integrity: sha512-9LkiTwjUh6rT555DtE9rTX+BKByPfrMzEAtnlEtdEwr3Nkffwiihqe2bWADg+OQRjt9gl6ICdmB/ZFDCGAtSow==}
@@ -13881,8 +14143,14 @@ packages:
     resolution: {integrity: sha512-s0ZZzd0BzYv5tLSptZooSjK8oj6C+c19p7Vqta9+6NPOf7r+fxq0cJe6/oN4LTC79sy5NY8ucOJNgwsKCSbfqg==}
     engines: {node: '>=6.0.0'}
 
+  temporal-polyfill@0.3.2:
+    resolution: {integrity: sha512-TzHthD/heRK947GNiSu3Y5gSPpeUDH34+LESnfsq8bqpFhsB79HFBX8+Z834IVX68P3EUyRPZK5bL/1fh437Eg==}
+
   temporal-polyfill@1.0.1:
     resolution: {integrity: sha512-N2SoI9olnW7BUsU8RosDphZQl9s+WJ8O7PoJMFCr/e5/1rFkVI4GNOWaSeySG+UoP04foPYsnLWbJmbXOiShZg==}
+
+  temporal-spec@0.3.1:
+    resolution: {integrity: sha512-B4TUhezh9knfSIMwt7RVggApDRJZo73uZdj8AacL2mZ8RP5KtLianh2MXxL06GN9ESYiIsiuoLQhgVfwe55Yhw==}
 
   temporal-spec@1.0.0:
     resolution: {integrity: sha512-00Ahj1e1ifaERTMOIIGpOCdOo9IEk2m6GGSMedsn9a2SIsGLdOTbmME1Htv6IM82b6VHrzSUTIVc7YHy6hdhFQ==}
@@ -15224,6 +15492,20 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@alloy-js/core@0.23.1':
+    dependencies:
+      '@types/ws': 8.18.1
+      '@vue/reactivity': 3.5.38
+      cli-table3: 0.6.5
+      devalue: 5.8.1
+      pathe: 2.0.3
+      picocolors: 1.1.1
+      prettier: 3.8.4
+      ws: 8.21.0
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
   '@alloy-js/core@0.24.1':
     dependencies:
       '@types/ws': 8.18.1
@@ -15244,6 +15526,14 @@ snapshots:
       change-case: 5.4.4
       marked: 18.0.5
       pathe: 2.0.3
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
+  '@alloy-js/markdown@0.23.0':
+    dependencies:
+      '@alloy-js/core': 0.23.1
+      yaml: 2.9.0
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -15285,6 +15575,15 @@ snapshots:
       - '@types/babel__core'
       - rollup
       - supports-color
+
+  '@alloy-js/typescript@0.23.0':
+    dependencies:
+      '@alloy-js/core': 0.23.1
+      change-case: 5.4.4
+      pathe: 2.0.3
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
 
   '@alloy-js/typescript@0.24.0':
     dependencies:
@@ -15543,6 +15842,11 @@ snapshots:
     dependencies:
       yaml: 2.9.0
 
+  '@autorest/codemodel@4.20.1':
+    dependencies:
+      '@azure-tools/codegen': 2.10.1
+      js-yaml: 4.1.1
+
   '@azu/format-text@1.0.2': {}
 
   '@azu/style-format@1.0.1':
@@ -15559,6 +15863,74 @@ snapshots:
       tslib: 2.8.1
     transitivePeerDependencies:
       - supports-color
+
+  '@azure-tools/async-io@3.0.254':
+    dependencies:
+      '@azure-tools/tasks': 3.0.255
+      proper-lockfile: 2.0.1
+
+  '@azure-tools/codegen@2.10.1':
+    dependencies:
+      '@azure-tools/async-io': 3.0.254
+      js-yaml: 4.1.1
+      semver: 7.8.5
+
+  '@azure-tools/tasks@3.0.255': {}
+
+  '@azure-tools/typespec-autorest@0.69.1(810501a1c14da19544bc9fe0c5f08e83)':
+    dependencies:
+      '@azure-tools/typespec-azure-core': 0.69.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))))(@typespec/rest@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0)))))
+      '@azure-tools/typespec-azure-resource-manager': 0.69.1(92ee4c7cc75d87272dd11b441ccbeb66)
+      '@azure-tools/typespec-client-generator-core': 0.69.0(1c7bca31f4807dd83f2823b577ee4665)
+      '@typespec/compiler': 1.13.0(@types/node@26.0.0)
+      '@typespec/http': 1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0)))
+      '@typespec/openapi': 1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))))
+      '@typespec/rest': 0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))))
+      '@typespec/versioning': 0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))
+    optionalDependencies:
+      '@typespec/xml': 0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))
+
+  '@azure-tools/typespec-azure-core@0.69.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))))(@typespec/rest@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0)))))':
+    dependencies:
+      '@typespec/compiler': 1.13.0(@types/node@26.0.0)
+      '@typespec/http': 1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0)))
+      '@typespec/rest': 0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))))
+
+  '@azure-tools/typespec-azure-resource-manager@0.69.1(92ee4c7cc75d87272dd11b441ccbeb66)':
+    dependencies:
+      '@azure-tools/typespec-azure-core': 0.69.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))))(@typespec/rest@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0)))))
+      '@typespec/compiler': 1.13.0(@types/node@26.0.0)
+      '@typespec/http': 1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0)))
+      '@typespec/openapi': 1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))))
+      '@typespec/rest': 0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))))
+      '@typespec/versioning': 0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))
+      change-case: 5.4.4
+      pluralize: 8.0.0
+
+  '@azure-tools/typespec-azure-rulesets@0.69.1(@azure-tools/typespec-azure-core@0.69.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))))(@typespec/rest@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))))))(@azure-tools/typespec-azure-resource-manager@0.69.1(92ee4c7cc75d87272dd11b441ccbeb66))(@azure-tools/typespec-client-generator-core@0.69.0(1c7bca31f4807dd83f2823b577ee4665))(@typespec/compiler@1.13.0(@types/node@26.0.0))':
+    dependencies:
+      '@azure-tools/typespec-azure-core': 0.69.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))))(@typespec/rest@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0)))))
+      '@azure-tools/typespec-azure-resource-manager': 0.69.1(92ee4c7cc75d87272dd11b441ccbeb66)
+      '@azure-tools/typespec-client-generator-core': 0.69.0(1c7bca31f4807dd83f2823b577ee4665)
+      '@typespec/compiler': 1.13.0(@types/node@26.0.0)
+
+  '@azure-tools/typespec-client-generator-core@0.69.0(1c7bca31f4807dd83f2823b577ee4665)':
+    dependencies:
+      '@azure-tools/typespec-azure-core': 0.69.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))))(@typespec/rest@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0)))))
+      '@typespec/compiler': 1.13.0(@types/node@26.0.0)
+      '@typespec/events': 0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))
+      '@typespec/http': 1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0)))
+      '@typespec/openapi': 1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))))
+      '@typespec/rest': 0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))))
+      '@typespec/sse': 0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/events@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0)))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0)))
+      '@typespec/streams': 0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))
+      '@typespec/versioning': 0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))
+      '@typespec/xml': 0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))
+      change-case: 5.4.4
+      pluralize: 8.0.0
+      yaml: 2.9.0
+
+  '@azure-tools/typespec-liftr-base@0.14.0': {}
 
   '@azure/abort-controller@2.1.2':
     dependencies:
@@ -20545,6 +20917,8 @@ snapshots:
     dependencies:
       '@types/node': 26.0.0
 
+  '@types/lodash@4.17.24': {}
+
   '@types/mdast@4.0.4':
     dependencies:
       '@types/unist': 3.0.3
@@ -20613,7 +20987,7 @@ snapshots:
 
   '@types/sax@1.2.7':
     dependencies:
-      '@types/node': 24.13.2
+      '@types/node': 26.0.0
 
   '@types/semver@7.7.1': {}
 
@@ -20771,6 +21145,31 @@ snapshots:
       '@typescript-eslint/types': 8.62.0
       eslint-visitor-keys: 5.0.1
 
+  '@typespec/compiler@1.13.0(@types/node@26.0.0)':
+    dependencies:
+      '@babel/code-frame': 7.29.7
+      '@inquirer/prompts': 8.5.2(@types/node@26.0.0)
+      ajv: 8.20.0
+      change-case: 5.4.4
+      env-paths: 4.0.0
+      is-unicode-supported: 2.1.0
+      mustache: 4.2.0
+      picocolors: 1.1.1
+      prettier: 3.8.4
+      semver: 7.8.5
+      tar: 7.5.16
+      temporal-polyfill: 0.3.2
+      vscode-languageserver: 9.0.1
+      vscode-languageserver-textdocument: 1.0.12
+      yaml: 2.9.0
+      yargs: 18.0.0
+    transitivePeerDependencies:
+      - '@types/node'
+
+  '@typespec/events@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))':
+    dependencies:
+      '@typespec/compiler': 1.13.0(@types/node@26.0.0)
+
   '@typespec/http-client-python@0.33.0(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)':
     dependencies:
       '@azure-tools/typespec-autorest': link:packages/typespec-autorest
@@ -20796,6 +21195,33 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
+  '@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0)))':
+    dependencies:
+      '@typespec/compiler': 1.13.0(@types/node@26.0.0)
+    optionalDependencies:
+      '@typespec/streams': 0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))
+
+  '@typespec/openapi@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))))':
+    dependencies:
+      '@typespec/compiler': 1.13.0(@types/node@26.0.0)
+      '@typespec/http': 1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0)))
+
+  '@typespec/rest@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))))':
+    dependencies:
+      '@typespec/compiler': 1.13.0(@types/node@26.0.0)
+      '@typespec/http': 1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0)))
+
+  '@typespec/sse@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/events@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0)))(@typespec/http@1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0)))':
+    dependencies:
+      '@typespec/compiler': 1.13.0(@types/node@26.0.0)
+      '@typespec/events': 0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))
+      '@typespec/http': 1.13.0(@typespec/compiler@1.13.0(@types/node@26.0.0))(@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0)))
+      '@typespec/streams': 0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))
+
+  '@typespec/streams@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))':
+    dependencies:
+      '@typespec/compiler': 1.13.0(@types/node@26.0.0)
+
   '@typespec/ts-http-runtime@0.3.6':
     dependencies:
       http-proxy-agent: 7.0.2
@@ -20803,6 +21229,36 @@ snapshots:
       tslib: 2.8.1
     transitivePeerDependencies:
       - supports-color
+
+  '@typespec/tspd@0.75.0(@types/node@26.0.0)(typescript@6.0.3)':
+    dependencies:
+      '@alloy-js/core': 0.23.1
+      '@alloy-js/markdown': 0.23.0
+      '@alloy-js/typescript': 0.23.0
+      '@microsoft/api-extractor': 7.58.9(@types/node@26.0.0)
+      '@microsoft/api-extractor-model': 7.33.8(@types/node@26.0.0)
+      '@microsoft/tsdoc': 0.16.0
+      '@microsoft/tsdoc-config': 0.18.1
+      '@typespec/compiler': 1.13.0(@types/node@26.0.0)
+      picocolors: 1.1.1
+      prettier: 3.8.4
+      typedoc: 0.28.19(typescript@6.0.3)
+      typedoc-plugin-markdown: 4.12.0(typedoc@0.28.19(typescript@6.0.3))
+      yaml: 2.9.0
+      yargs: 18.0.0
+    transitivePeerDependencies:
+      - '@types/node'
+      - bufferutil
+      - typescript
+      - utf-8-validate
+
+  '@typespec/versioning@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))':
+    dependencies:
+      '@typespec/compiler': 1.13.0(@types/node@26.0.0)
+
+  '@typespec/xml@0.83.0(@typespec/compiler@1.13.0(@types/node@26.0.0))':
+    dependencies:
+      '@typespec/compiler': 1.13.0(@types/node@26.0.0)
 
   '@ungap/structured-clone@1.3.2': {}
 
@@ -26482,6 +26938,11 @@ snapshots:
       kleur: 3.0.3
       sisteransi: 1.0.5
 
+  proper-lockfile@2.0.1:
+    dependencies:
+      graceful-fs: 4.2.11
+      retry: 0.10.1
+
   proper-lockfile@4.1.2:
     dependencies:
       graceful-fs: 4.2.11
@@ -26985,6 +27446,8 @@ snapshots:
       retext-latin: 4.0.0
       retext-stringify: 4.0.0
       unified: 11.0.5
+
+  retry@0.10.1: {}
 
   retry@0.12.0: {}
 
@@ -27863,10 +28326,16 @@ snapshots:
     dependencies:
       rimraf: 2.6.3
 
+  temporal-polyfill@0.3.2:
+    dependencies:
+      temporal-spec: 0.3.1
+
   temporal-polyfill@1.0.1:
     dependencies:
       temporal-spec: 1.0.0
       temporal-utils: 1.0.1
+
+  temporal-spec@0.3.1: {}
 
   temporal-spec@1.0.0: {}
 

@@ -43,8 +43,11 @@ export default defineConfig(
     },
   },
   {
-    // Disable these project-aware rules for typespec-ts to prevent OOM
-    files: ["packages/!(typespec-ts)/src/**/*.ts", "packages/!(typespec-ts)/src/**/*.tsx"],
+    // Disable these project-aware rules for typespec-ts and typespec-java to prevent OOM
+    files: [
+      "packages/!(typespec-ts|typespec-java)/src/**/*.ts",
+      "packages/!(typespec-ts|typespec-java)/src/**/*.tsx",
+    ],
     languageOptions: {
       parserOptions: {
         projectService: {
