@@ -36,7 +36,7 @@
     "format": "npm run -s prettier -- --write",
     "check-format": "npm run prettier -- --check",
     "prettier": "prettier --config ./.prettierrc.yaml **/*.ts",
-    "regen-docs": "npm run build && tspd doc . --enable-experimental --output-dir ./website/src/content/docs/docs/emitters/clients/typespec-java/reference --skip-js"
+    "regen-docs": "tspd doc . --enable-experimental --output-dir ./website/src/content/docs/docs/emitters/clients/typespec-java/reference --skip-js"
   },
   "files": [
     "lib/*.tsp",
@@ -78,8 +78,6 @@
     "@types/js-yaml": "catalog:",
     "@types/lodash": "catalog:",
     "@types/node": "catalog:",
-    "@typescript-eslint/eslint-plugin": "catalog:",
-    "@typescript-eslint/parser": "catalog:",
     "@typespec/compiler": "workspace:^",
     "@typespec/events": "workspace:^",
     "@typespec/http": "workspace:^",
