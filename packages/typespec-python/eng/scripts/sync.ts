@@ -99,11 +99,6 @@ const INCLUDES: readonly string[] = [
   "tests/data/",
   "tests/mock_api/",
   "tests/requirements/",
-
-  // Shared test driver/helper file. Treated as the upstream source of truth
-  // (DATA_FOLDER, server-launch logic, etc.) and kept aligned with
-  // http-client-python.
-  "tests/conftest.py",
 ];
 
 /**

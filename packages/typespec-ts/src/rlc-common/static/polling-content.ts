@@ -17,7 +17,7 @@ import type {
   {{#each importedResponses}}
   {{this}},
   {{/each}}
-} from "./responses{{#if isEsm}}.js{{/if}}";
+} from "./responses.js";
 {{/if}}
 
 /**

@@ -191,3 +191,10 @@ words:
   - westcentralus
   - WINDOWSVMIMAGE
   - Xcognitive
+  - azcore
+  - azkeys
+  - azsecrets
+  - byval
+  - petstoreopgrp
+  - pypi
+  - Tsps

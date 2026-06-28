@@ -50,6 +50,7 @@
     "astro-rehype-relative-markdown-links": "catalog:",
     "hast-util-to-html": "catalog:",
     "rehype": "catalog:",
+    "remark-gfm": "catalog:",
     "remark-heading-id": "catalog:",
     "unist-util-visit": "catalog:",
     "yaml": "catalog:"

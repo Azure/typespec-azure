@@ -18,6 +18,29 @@ export declare interface ApiErrorBase {
     message?: string;
 }
 
+export declare interface ArmResourceIdentifierResource extends TrackedResource {
+    properties?: ArmResourceIdentifierResourceProperties;
+}
+
+export declare interface ArmResourceIdentifierResourceProperties {
+    readonly provisioningState: ResourceProvisioningState;
+    simpleArmId: string;
+    armIdWithType: string;
+    armIdWithTypeAndScope: string;
+    armIdWithAllScopes: string;
+}
+
+export declare interface ArmResourceIdentifiersCreateOrReplaceOptionalParams extends OperationOptions {
+}
+
+export declare interface ArmResourceIdentifiersGetOptionalParams extends OperationOptions {
+}
+
+export declare interface ArmResourceIdentifiersOperations {
+    createOrReplace: (resourceGroupName: string, armResourceIdentifierResourceName: string, resource: ArmResourceIdentifierResource, options?: ArmResourceIdentifiersCreateOrReplaceOptionalParams) => Promise<ArmResourceIdentifierResource>;
+    get: (resourceGroupName: string, armResourceIdentifierResourceName: string, options?: ArmResourceIdentifiersGetOptionalParams) => Promise<ArmResourceIdentifierResource>;
+}
+
 export declare enum AzureClouds {
     AZURE_PUBLIC_CLOUD = "AZURE_PUBLIC_CLOUD",
     AZURE_CHINA_CLOUD = "AZURE_CHINA_CLOUD",
@@ -34,11 +57,9 @@ export declare class CommonPropertiesClient {
     private _client;
     readonly pipeline: Pipeline;
     constructor(subscriptionId: string, options?: CommonPropertiesClientOptionalParams);
-    createForUserDefinedError(resourceGroupName: string, confidentialResourceName: string, resource: ConfidentialResource, options?: CreateForUserDefinedErrorOptionalParams): Promise<ConfidentialResource>;
-    getForPredefinedError(resourceGroupName: string, confidentialResourceName: string, options?: GetForPredefinedErrorOptionalParams): Promise<ConfidentialResource>;
-    updateWithUserAssignedAndSystemAssigned(resourceGroupName: string, managedIdentityTrackedResourceName: string, properties: ManagedIdentityTrackedResource, options?: UpdateWithUserAssignedAndSystemAssignedOptionalParams): Promise<ManagedIdentityTrackedResource>;
-    createWithSystemAssigned(resourceGroupName: string, managedIdentityTrackedResourceName: string, resource: ManagedIdentityTrackedResource, options?: CreateWithSystemAssignedOptionalParams): Promise<ManagedIdentityTrackedResource>;
-    get(resourceGroupName: string, managedIdentityTrackedResourceName: string, options?: GetOptionalParams): Promise<ManagedIdentityTrackedResource>;
+    readonly armResourceIdentifiers: ArmResourceIdentifiersOperations;
+    readonly error: ErrorOperations;
+    readonly managedIdentity: ManagedIdentityOperations;
 }
 
 export declare interface CommonPropertiesClientOptionalParams extends ClientOptions {
@@ -57,15 +78,12 @@ export declare interface ConfidentialResourceProperties {
 
 export declare type CreatedByType = string;
 
-export declare interface CreateForUserDefinedErrorOptionalParams extends OperationOptions {
-}
-
-export declare interface CreateWithSystemAssignedOptionalParams extends OperationOptions {
-}
-
 export declare interface ErrorAdditionalInfo {
     readonly type?: string;
     readonly info?: any;
+}
+
+export declare interface ErrorCreateForUserDefinedErrorOptionalParams extends OperationOptions {
 }
 
 export declare interface ErrorDetail {
@@ -76,14 +94,16 @@ export declare interface ErrorDetail {
     readonly additionalInfo?: ErrorAdditionalInfo[];
 }
 
+export declare interface ErrorGetForPredefinedErrorOptionalParams extends OperationOptions {
+}
+
+export declare interface ErrorOperations {
+    createForUserDefinedError: (resourceGroupName: string, confidentialResourceName: string, resource: ConfidentialResource, options?: ErrorCreateForUserDefinedErrorOptionalParams) => Promise<ConfidentialResource>;
+    getForPredefinedError: (resourceGroupName: string, confidentialResourceName: string, options?: ErrorGetForPredefinedErrorOptionalParams) => Promise<ConfidentialResource>;
+}
+
 export declare interface ErrorResponse {
     error?: ErrorDetail;
-}
-
-export declare interface GetForPredefinedErrorOptionalParams extends OperationOptions {
-}
-
-export declare interface GetOptionalParams extends OperationOptions {
 }
 
 export declare interface InnerError {
@@ -107,8 +127,26 @@ export declare enum KnownManagedServiceIdentityType {
     SystemAssignedUserAssigned = "SystemAssigned,UserAssigned"
 }
 
+export declare enum KnownResourceProvisioningState {
+    Succeeded = "Succeeded",
+    Failed = "Failed",
+    Canceled = "Canceled"
+}
+
 export declare enum KnownVersions {
     V20231201Preview = "2023-12-01-preview"
+}
+
+export declare interface ManagedIdentityCreateWithSystemAssignedOptionalParams extends OperationOptions {
+}
+
+export declare interface ManagedIdentityGetOptionalParams extends OperationOptions {
+}
+
+export declare interface ManagedIdentityOperations {
+    updateWithUserAssignedAndSystemAssigned: (resourceGroupName: string, managedIdentityTrackedResourceName: string, properties: ManagedIdentityTrackedResource, options?: ManagedIdentityUpdateWithUserAssignedAndSystemAssignedOptionalParams) => Promise<ManagedIdentityTrackedResource>;
+    createWithSystemAssigned: (resourceGroupName: string, managedIdentityTrackedResourceName: string, resource: ManagedIdentityTrackedResource, options?: ManagedIdentityCreateWithSystemAssignedOptionalParams) => Promise<ManagedIdentityTrackedResource>;
+    get: (resourceGroupName: string, managedIdentityTrackedResourceName: string, options?: ManagedIdentityGetOptionalParams) => Promise<ManagedIdentityTrackedResource>;
 }
 
 export declare interface ManagedIdentityTrackedResource extends TrackedResource {
@@ -118,6 +156,9 @@ export declare interface ManagedIdentityTrackedResource extends TrackedResource 
 
 export declare interface ManagedIdentityTrackedResourceProperties {
     readonly provisioningState: string;
+}
+
+export declare interface ManagedIdentityUpdateWithUserAssignedAndSystemAssignedOptionalParams extends OperationOptions {
 }
 
 export declare interface ManagedServiceIdentity {
@@ -136,6 +177,8 @@ export declare interface Resource {
     readonly systemData?: SystemData;
 }
 
+export declare type ResourceProvisioningState = string;
+
 export { RestError }
 
 export declare interface SystemData {
@@ -150,9 +193,6 @@ export declare interface SystemData {
 export declare interface TrackedResource extends Resource {
     tags?: Record<string, string>;
     location: string;
-}
-
-export declare interface UpdateWithUserAssignedAndSystemAssignedOptionalParams extends OperationOptions {
 }
 
 export declare interface UserAssignedIdentity {
