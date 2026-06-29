@@ -1,9 +1,10 @@
 import { getEncode, NoTarget, Program } from "@typespec/compiler";
 import { HttpOperationParameter } from "@typespec/http";
+import { Schema, SchemaContext } from "../interfaces.js";
 import { reportDiagnostic } from "../lib.js";
-import { NameType, normalizeName, Schema, SchemaContext } from "../rlc-common/index.js";
 import { SdkContext } from "./interfaces.js";
 import { getTypeName, isArrayType, isObjectOrDictType } from "./model-utils.js";
+import { NameType, normalizeName } from "./name-utils.js";
 
 export interface ParameterSerializationInfo {
   typeName: string;
@@ -66,9 +67,6 @@ export function getParameterSerializationInfo(
           });
         }
 
-        if (dpgContext.rlcOptions?.compatibilityQueryMultiFormat) {
-          wrapperType = buildUnionType([wrapperType, { type: "string", name: "string" }]);
-        }
         return buildSerializationInfo(wrapperType);
       }
 

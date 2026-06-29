@@ -42,7 +42,7 @@ jobs:
       matrix: ${{ steps.resolve.outputs.matrix }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Resolve config matrix
         id: resolve
