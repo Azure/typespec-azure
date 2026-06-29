@@ -1,6 +1,5 @@
 packages:
   - packages/*
-  - packages/typespec-java/emitter # branded Java emitter (nested; not matched by packages/*)
   - core/ # Install core workspace dependencies too. Needed for prettier plugins
   - website/
   - eng/feeds/

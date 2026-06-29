@@ -65,9 +65,9 @@ variables:
   - name: SelfRoot
     value: $(Build.SourcesDirectory)/typespec-azure
   - name: PackageRoot
-    value: $(Build.SourcesDirectory)/typespec-azure/packages/typespec-java/emitter
+    value: $(Build.SourcesDirectory)/typespec-azure/packages/typespec-java
   - name: PackageJsonPath
-    value: $(Build.SourcesDirectory)/typespec-azure/packages/typespec-java/emitter/package.json
+    value: $(Build.SourcesDirectory)/typespec-azure/packages/typespec-java/package.json
   - name: PullRequestTitleSuffix
     ${{ if eq(parameters.DevPackage, 'true') }}:
       value: " DEV"
@@ -151,3 +151,4 @@ jobs:
           PRTitle: "[Automation] Generate SDK based on TypeSpec $(PackageVersion)$(PullRequestTitleSuffix)"
           PRLabels: "DPG"
           OpenAsDraft: "true"
+

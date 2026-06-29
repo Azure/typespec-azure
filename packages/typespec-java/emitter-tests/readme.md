@@ -1,11 +1,11 @@
 # Test @azure-tools/typespec-java
 
 This project regenerates and tests `@azure-tools/typespec-java` (the branded Java emitter built in
-the sibling [`emitter/`](../emitter) folder) against the [http-specs] and [azure-http-specs] Spector
+the parent `@azure-tools/typespec-java` package (`..`)) against the [http-specs] and [azure-http-specs] Spector
 suites and a set of local TypeSpec sources under [`tsp/`](./tsp).
 
 It is a standalone npm + Maven project and is intentionally **not** part of the pnpm workspace. It
-consumes the emitter via the packed `.tgz` produced by `emitter/Build-TypeSpec.ps1`.
+consumes the emitter via the packed `.tgz` produced by `../Build-TypeSpec.ps1`.
 
 ## Prerequisite
 
@@ -24,7 +24,7 @@ pwsh ./Generate.ps1
 ```
 
 `Generate.ps1` calls `Setup.ps1` (which builds the emitter jar + `.tgz` via
-`emitter/Build-TypeSpec.ps1` and `npm install`s it here), then regenerates the SDK from the local
+`../Build-TypeSpec.ps1` and `npm install`s it here), then regenerates the SDK from the local
 `tsp/` sources and the [http-specs]/[azure-http-specs] specs into the (gitignored) `src/main/java`
 folder. This takes a while.
 
@@ -81,3 +81,4 @@ rm package-lock.json
 
 [http-specs]: https://github.com/microsoft/typespec/tree/main/packages/http-specs
 [azure-http-specs]: https://github.com/Azure/typespec-azure/tree/main/packages/azure-http-specs
+

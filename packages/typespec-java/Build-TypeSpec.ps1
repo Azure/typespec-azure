@@ -12,7 +12,7 @@
 $ErrorActionPreference = "Stop"
 
 $packageRoot = $PSScriptRoot
-$repoRoot = Resolve-Path (Join-Path $packageRoot ".." ".." "..")
+$repoRoot = Resolve-Path (Join-Path $packageRoot ".." "..")
 $coreRoot = Join-Path $repoRoot "core"
 $generatorRoot = Join-Path $coreRoot "packages" "http-client-java" "generator"
 $generatorPom = Join-Path $generatorRoot "pom.xml"

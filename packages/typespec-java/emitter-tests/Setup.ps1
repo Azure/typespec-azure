@@ -5,7 +5,7 @@ param (
 
 Set-Location $PSScriptRoot
 
-Push-Location ../emitter
+Push-Location ..
 try {
   ./Build-TypeSpec.ps1
 } finally {

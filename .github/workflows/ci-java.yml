@@ -45,11 +45,11 @@ jobs:
       - name: Build (jar + emitter)
         shell: pwsh
         run: ./Build-TypeSpec.ps1
-        working-directory: packages/typespec-java/emitter
+        working-directory: packages/typespec-java
 
       - name: Test (emitter unit tests)
         run: pnpm run test
-        working-directory: packages/typespec-java/emitter
+        working-directory: packages/typespec-java
 
   e2e:
     name: "Regen & Spector Tests"
@@ -87,3 +87,5 @@ jobs:
         shell: pwsh
         run: ./Spector-Tests.ps1
         working-directory: packages/typespec-java/emitter-tests
+
+

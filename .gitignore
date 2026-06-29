@@ -229,13 +229,13 @@ packages/typespec-python/alpha
 # java emitter
 # Emitter TS sources copied from core/packages/http-client-java/emitter at build
 # time (only src/options.ts is committed).
-packages/typespec-java/emitter/src/**
-!packages/typespec-java/emitter/src/options.ts
-packages/typespec-java/emitter/test/**
+packages/typespec-java/src/**
+!packages/typespec-java/src/options.ts
+packages/typespec-java/test/**
 # Java emitter.jar + assets staged from the core generator build.
-packages/typespec-java/emitter/generator/**
+packages/typespec-java/generator/**
 # Packed tarball produced by Build-TypeSpec.ps1 (consumed by emitter-tests).
-packages/typespec-java/emitter/*.tgz
+packages/typespec-java/*.tgz
 
 # java emitter-tests (standalone Maven+npm spector suite)
 # Generated SDK + generated tests are regenerated, never committed; only
@@ -247,3 +247,4 @@ packages/typespec-java/emitter-tests/specs/**
 packages/typespec-java/emitter-tests/node_modules/**
 packages/typespec-java/emitter-tests/package-lock.json
 packages/typespec-java/emitter-tests/tsp-spector-coverage-*.json
+
