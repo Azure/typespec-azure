@@ -1814,7 +1814,11 @@ The `@override` decorator takes a target operation and a custom operation that d
 @@override(OriginalOperation, CustomOperation, "python"); // Language-specific
 ```
 
-When applied, the method parameters come from the override operation while the underlying HTTP operation remains unchanged. TCGC maps method parameters to operation parameters based on name matching.
+When applied, the method parameters come from the override operation while the underlying HTTP operation remains unchanged. TCGC maps method parameters to operation parameters based on name matching. Because matching is by name, the override operation may add, remove, or reorder parameters relative to the original — the order in which parameters are declared does not need to match.
+
+:::caution[Diagnostic: `override-parameters-mismatch`]
+The override operation must keep every required parameter from the original operation, and parameters that are realized as path parameters in the route must remain `@path` in the override. Dropping `@path` from a route path parameter (without also adding `@clientLocation` to elevate it elsewhere) reports `override-parameters-mismatch`. Optional parameters may be omitted.
+:::
 
 ### Simple parameter customization
 

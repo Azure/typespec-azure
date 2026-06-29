@@ -731,6 +731,12 @@ petStoreClient.Pet(context.Background(), &PetStoreClientPetOptions{})
 
 </ClientTabs>
 
+`@clientLocation` can also move a single parameter (model property) up to the client level. When you elevate the same-named parameter from multiple operations to the same client, every occurrence must resolve to the same type.
+
+:::caution[Diagnostic: `client-location-conflict`]
+Moving multiple parameters that share a name but have different types to the same client reports `client-location-conflict`. This commonly happens when `@clientLocation` is applied to a templated parameter that is instantiated with different types across operations. Move the parameter on each operation individually so it keeps a consistent type on the client.
+:::
+
 ### Renaming the Client Name
 
 This can be achieved with the augment decorator: `@clientName` from `typespec-client-generator-core`.

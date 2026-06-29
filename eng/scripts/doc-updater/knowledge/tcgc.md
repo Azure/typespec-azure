@@ -121,6 +121,8 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - `operation-not-in-client`: REMOVED in May 2026. This diagnostic no longer exists.
 - `inconsistent-multiple-service-dependency` (warning): Emitted when services merged into the same client depend on different versions of a shared library dependency. Documented in 03client.mdx under the "One Client from Multiple Services" section and in guideline.md under "Client Detection".
 - `legacy-hierarchy-building-conflict` (warning): Now only has `property-type-mismatch` message ID (the old `property-missing` and `type-mismatch` message IDs were removed). Emitted during property reconciliation when a dropped property's type is incompatible with the same-named property on the new base chain.
+- `override-parameters-mismatch` (error): For `@override`, override params are matched to original params by name (not position), so add/remove/reorder is allowed and optional params can be omitted. New (June 2026): also fires when an original param realized as a path param drops `@path` in the override — unless any override param has `@clientLocation`. "Realized" path params are computed from the resolved HTTP route, not just the `@path` decorator (templated/ARM-scope params may carry `@path` without being route path params). Documented in 04method.mdx `@override` Basic usage caution.
+- `client-location-conflict` / `parameterTypeConflict` (warning): New (June 2026). `@clientLocation` cannot move multiple same-named params with different types to the same client (common with templated params instantiated differently). Move per-operation instead. Documented in 03client.mdx after the move-operations example.
 
 ## External Type Usage Propagation
 
@@ -233,3 +235,12 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - No Spector spec was added for this feature — it's a code-generation-time config behavior, not a wire-level behavior. The unit tests in `test/package/api-versions-metadata.test.ts` and `test/clients/structure.test.ts` thoroughly cover it.
 - The guideline.md was updated to document `SdkPackage.metadata` (both `apiVersion` and `apiVersions`).
 - The 10versioning.mdx was updated to mention the Record form and add a "Per-service versioning (multi-service packages)" section.
+
+## Feedback Lessons (PR #4498)
+
+- Example api-version values must be realistic. In versioning examples, use real date-style version strings (e.g. enum members `v2024_01_01: "2024-01-01"` and config values `"2024-01-01"`), not placeholders like `av1`/`bv1`. Reviewers replaced placeholder versions with dated ones in 10versioning.mdx.
+
+## Override / clientLocation Diagnostics (June 2026)
+
+- `@override` parameter matching is by name, not position; lists do not need sorting. Required original params must be present (optional may be omitted); path params must stay `@path` unless an override param uses `@clientLocation`. See Diagnostics section for `override-parameters-mismatch`.
+- `@clientLocation` parameter type conflict is enforced via `validateClientLocationParameterTypes` in `src/validations/types.ts`. Pure config/diagnostic change — no Spector spec needed; covered by unit tests in `test/decorators/override.test.ts` and `test/decorators/client-location.test.ts`.
