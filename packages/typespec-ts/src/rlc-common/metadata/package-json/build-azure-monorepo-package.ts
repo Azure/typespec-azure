@@ -43,7 +43,7 @@ export function getAzureMonorepoDependencies(config: AzureMonorepoInfoConfig) {
     "@azure/core-rest-pipeline": "^1.20.0",
     "@azure/core-util": "^1.12.0",
     "@azure/logger": "^1.2.0",
-    tslib: "^2.8.1",
+    tslib: "catalog:",
   };
 
   const testDeps = withTests
