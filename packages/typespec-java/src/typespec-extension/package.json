@@ -32,7 +32,6 @@
     "build": "cp -r ../../../../core/packages/http-client-java/generator/ ./generator && mvn install -f ../../../../core/packages/http-client-java/generator/pom.xml -Dspotless.skip=true -DskipTests=true &&  tsc -p .",
     "watch": "tsc -p . --watch",
     "test:java:e2e": "vitest run",
-    "lint:extra": "eslint . --ext .ts --max-warnings=0",
     "format": "npm run -s prettier -- --write",
     "check-format": "npm run prettier -- --check",
     "prettier": "prettier --config ./.prettierrc.yaml **/*.ts",
