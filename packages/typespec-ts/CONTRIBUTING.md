@@ -36,11 +36,11 @@ the required tooling (Node.js and `pnpm`). The command scripts under `test/comma
 
 The package is tested through three vitest projects (configured in `vitest.config.ts`):
 
-| Project                     | Location                            | Covers                           | Command                                  |
-| --------------------------- | ----------------------------------- | -------------------------------- | ---------------------------------------- |
-| `test-next`                 | `test-next/**`                      | Modern unit tests                | `pnpm test-next`                         |
-| `unit-modular`              | `test/modular-unit/**`              | Modular unit tests               | `pnpm unit-test`                         |
-| `integration-azure-modular` | `test/azure-modular-integration/**` | Modular spector end-to-end tests | `pnpm integration-test-ci`               |
+| Project                     | Location                            | Covers                           | Command                    |
+| --------------------------- | ----------------------------------- | -------------------------------- | -------------------------- |
+| `test-next`                 | `test-next/**`                      | Modern unit tests                | `pnpm test-next`           |
+| `unit-modular`              | `test/modular-unit/**`              | Modular unit tests               | `pnpm unit-test`           |
+| `integration-azure-modular` | `test/azure-modular-integration/**` | Modular spector end-to-end tests | `pnpm integration-test-ci` |
 
 `pnpm lint` runs ESLint with `--max-warnings=0`.
 
