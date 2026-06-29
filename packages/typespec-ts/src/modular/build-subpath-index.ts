@@ -4,7 +4,7 @@ import { ModularEmitterOptions } from "./interfaces.js";
 
 import { Node, SourceFile } from "ts-morph";
 import { useContext } from "../context-manager.js";
-import { getModularClientOptions } from "../utils/client-utils.js";
+import { getClientModuleInfo } from "../utils/client-utils.js";
 
 export interface buildSubpathIndexFileOptions {
   exportIndex?: boolean;
@@ -19,7 +19,7 @@ export function buildSubpathIndexFile(
   options: buildSubpathIndexFileOptions = {},
 ) {
   const project = useContext("outputProject");
-  const subfolder = clientMap ? (getModularClientOptions(clientMap).subfolder ?? "") : "";
+  const subfolder = clientMap ? (getClientModuleInfo(clientMap).subfolder ?? "") : "";
   const srcPath = emitterOptions.modularOptions.sourceRoot;
   // Skip to export these files because they are used internally.
   const skipFiles = ["pagingHelpers.ts", "pollingHelpers.ts"];
