@@ -2,19 +2,26 @@
 /**
  * Renders an HTML diff between the **assets baseline** (the last accepted
  * regeneration output, restored from the assets repo) and the **current**
- * `tests/generated` output (produced by `npm run regenerate` beforehand).
+ * generated output (produced by the package's regenerate step beforehand).
  *
- * Output (default `temp/diff-site/`):
- *   - index.html      A self-contained, side-by-side HTML diff (diff2html).
- *   - summary.json    { changed, filesChanged, additions, deletions } for the
- *                     PR-comment step to consume.
+ * This is the shared, language-agnostic renderer. The per-language specifics
+ * (generated dir, flavor folders, title, transient files to prune) come from
+ * the package's `regen-diff.config.json`; the baseline pointer comes from its
+ * `assets.json`.
+ *
+ * Output (default `<package>/temp/diff-site/`):
+ *   - index.html      A folder-grouped, searchable tree of changed files.
+ *   - files/NN.html   One side-by-side page per changed file (diff2html).
+ *   - summary.json    { slug, title, changed, filesChanged, additions,
+ *                       deletions, baselineTag, note } for the publish step.
  *
  * Restoring the baseline is an anonymous clone of the public assets repo, so
  * this needs no token. If assets.json has no Tag yet (not bootstrapped), the
  * whole current output is treated as "added".
  *
  * Usage:
- *   tsx ./eng/scripts/ci/render-diff.ts [--output <dir>] [--generated <dir>] [--title <t>]
+ *   render-diff --package <dir> [--output <dir>] [--title <t>] [--open]
+ *               [--vscode] [--max <n>]
  */
 
 import { execFileSync, execSync } from "child_process";
@@ -27,70 +34,33 @@ import {
   writeFileSync,
 } from "fs";
 import { cp, mkdtemp } from "fs/promises";
-import { createRequire } from "module";
 import { tmpdir } from "os";
-import { dirname, join, resolve } from "path";
+import { join, resolve } from "path";
 import pc from "picocolors";
-import { fileURLToPath, pathToFileURL } from "url";
-import { parseArgs } from "util";
+import { pathToFileURL } from "url";
 
-import { FLAVORS, readAssetsConfig, restoreFullBaseline } from "./assets.js";
+import { readAssetsConfig, restoreFullBaseline } from "./assets.js";
+import { readRegenDiffConfig, type RegenDiffConfig } from "./config.js";
 
-// diff2html is CommonJS; load via createRequire for ESM.
-const require = createRequire(import.meta.url);
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { html: diff2html } = require("diff2html") as typeof import("diff2html");
 
-const argv = parseArgs({
-  args: process.argv.slice(2),
-  options: {
-    output: { type: "string", short: "o" },
-    generated: { type: "string", short: "g" },
-    title: { type: "string", short: "t" },
-    open: { type: "boolean" },
-    vscode: { type: "boolean" },
-    max: { type: "string" },
-    help: { type: "boolean", short: "h" },
-  },
-});
-
-if (argv.values.help) {
-  console.log(`
-${pc.bold("Usage:")} tsx render-diff.ts [options]
-
-Renders an HTML diff of the current tests/generated output vs the assets baseline.
-
-${pc.bold("Options:")}
-  -o, --output <dir>     Output directory (default: temp/diff-site).
-  -g, --generated <dir>  Current generated dir (default: tests/generated).
-  -t, --title <text>     Title shown on the diff page.
-      --open             Open the rendered diff in your default browser.
-      --vscode           Open each changed file as a native VS Code editor diff
-                         (baseline vs current) and keep both trees on disk at
-                         temp/diff-trees/ for use with a folder-compare extension.
-      --max <n>          Max number of files to open in VS Code (default 40).
-  -h, --help             Show this help.
-`);
-  process.exit(0);
+export interface RenderOptions {
+  packageRoot: string;
+  output?: string;
+  generated?: string;
+  title?: string;
+  open?: boolean;
+  vscode?: boolean;
+  max?: number;
 }
-
-const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
-const PACKAGE_ROOT = resolve(SCRIPT_DIR, "../../../");
-const GENERATED_DIR = argv.values.generated
-  ? resolve(argv.values.generated)
-  : resolve(PACKAGE_ROOT, "tests/generated");
-const OUTPUT_DIR = argv.values.output
-  ? resolve(argv.values.output)
-  : resolve(PACKAGE_ROOT, "temp/diff-site");
-const TITLE = argv.values.title ?? "Python emitter — generated test diff";
 
 // Each changed file is rendered as its own page, so we never build one giant
 // HTML string (which throws `RangeError: Invalid string length` past ~512MB).
-// A single file whose diff exceeds this is shown as a raw <pre> instead of a
-// rich side-by-side render, to bound per-page memory/size.
+// A single file whose diff exceeds this is shown as a raw <pre> instead.
 const MAX_FILE_DIFF_BYTES = 2 * 1024 * 1024;
 
 interface DiffSummary {
+  slug: string;
+  title: string;
   changed: boolean;
   filesChanged: number;
   additions: number;
@@ -98,6 +68,12 @@ interface DiffSummary {
   baselineTag: string;
   note?: string;
 }
+
+// Resolved once per run from options + config; read by the render helpers.
+let CONFIG: RegenDiffConfig;
+let GENERATED_DIR: string;
+let OUTPUT_DIR: string;
+let TITLE: string;
 
 function git(args: string[], cwd: string, allowFail = false): string {
   try {
@@ -124,7 +100,7 @@ function stripCr(text: string): string {
 /**
  * Recursively rewrites every text file under `dir` with all `\r` bytes removed,
  * so line endings are pure LF. The baseline may have been generated on Windows,
- * where Python writing `\r\n` to a text-mode file yields `\r\r\n` (double CR);
+ * where writing `\r\n` to a text-mode file yields `\r\r\n` (double CR);
  * `git diff --ignore-cr-at-eol` only ignores a *single* trailing CR, so without
  * this those lines show as spurious changes. Normalizing both trees to LF makes
  * the comparison truly line-ending agnostic. Files containing a NUL byte are
@@ -146,17 +122,17 @@ function normalizeEol(dir: string): void {
 }
 
 /**
- * Removes transient codegen handoff files (`.tsp-codegen-*.json`) from a tree.
- * These are written by the TypeSpec emit step for the Python batch step; they
- * embed absolute machine-local paths and are not real generated output, so they
- * would otherwise show up as noise in the diff.
+ * Removes transient codegen handoff files (configured via `pruneFilePrefixes`)
+ * from a tree. These embed absolute machine-local paths and are not real
+ * generated output, so they would otherwise show up as noise in the diff.
  */
 function pruneIntermediates(dir: string): void {
+  if (CONFIG.pruneFilePrefixes.length === 0) return;
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name);
     if (entry.isDirectory()) {
       pruneIntermediates(full);
-    } else if (entry.isFile() && entry.name.startsWith(".tsp-codegen-")) {
+    } else if (entry.isFile() && CONFIG.pruneFilePrefixes.some((p) => entry.name.startsWith(p))) {
       rmSync(full, { force: true });
     }
   }
@@ -179,20 +155,27 @@ function parseNumstat(numstat: string): { files: number; additions: number; dele
   return { files, additions, deletions };
 }
 
-async function main(): Promise<void> {
+/** Renders the HTML diff for one package. Returns the produced summary. */
+export async function render(options: RenderOptions): Promise<DiffSummary> {
+  CONFIG = readRegenDiffConfig(options.packageRoot);
+  GENERATED_DIR = options.generated
+    ? resolve(options.generated)
+    : resolve(CONFIG.packageRoot, CONFIG.generatedDir);
+  OUTPUT_DIR = options.output
+    ? resolve(options.output)
+    : resolve(CONFIG.packageRoot, "temp/diff-site");
+  TITLE = options.title ?? CONFIG.title;
+
   // Validate current output exists.
-  for (const flavor of FLAVORS) {
+  for (const flavor of CONFIG.flavors) {
     if (!existsSync(join(GENERATED_DIR, flavor))) {
-      console.error(
-        pc.red(
-          `Missing ${join(GENERATED_DIR, flavor)}. Run "npm run regenerate" before render-diff.`,
-        ),
+      throw new Error(
+        `Missing ${join(GENERATED_DIR, flavor)}. Run the package's regenerate step before render-diff.`,
       );
-      process.exit(1);
     }
   }
 
-  const config = readAssetsConfig(PACKAGE_ROOT);
+  const config = readAssetsConfig(CONFIG.packageRoot);
   const baselineTag = config?.tag ?? "";
 
   const workDir = await mkdtemp(join(tmpdir(), "typespec-diff-"));
@@ -208,15 +191,15 @@ async function main(): Promise<void> {
     let note: string | undefined;
     if (config && config.tag) {
       console.log(pc.cyan(`Restoring baseline ${config.assetsRepo}@${config.tag}...`));
-      await restoreFullBaseline(config, baselineDir);
+      await restoreFullBaseline(config, baselineDir, CONFIG.flavors);
     } else {
       note =
         "No baseline tag is configured in assets.json yet; the entire current output is shown as added.";
       console.warn(pc.yellow(note));
     }
 
-    // Normalize line endings to LF on both sides so EOL artifacts (e.g. a
-    // Windows-generated baseline with `\r\r\n`) don't masquerade as real diffs.
+    // Normalize line endings to LF on both sides so EOL artifacts don't
+    // masquerade as real diffs.
     normalizeEol(currentDir);
     normalizeEol(baselineDir);
 
@@ -225,44 +208,25 @@ async function main(): Promise<void> {
     pruneIntermediates(baselineDir);
 
     // git diff --no-index returns exit code 1 when there are differences.
-    // --ignore-cr-at-eol makes the diff line-ending agnostic: the baseline may
-    // have been pushed from Windows (CRLF) while CI regenerates on Linux (LF),
-    // and without this every line shows as changed (pure line-ending noise).
-    const diffText = stripCr(
-      git(
-        [
-          "-c",
-          "core.quotepath=false",
-          "diff",
-          "--no-index",
-          "--no-color",
-          "--ignore-cr-at-eol",
-          "--",
-          "baseline",
-          "current",
-        ],
-        workDir,
-        true,
-      ),
-    );
-    const numstat = git(
-      [
-        "-c",
-        "core.quotepath=false",
-        "diff",
-        "--no-index",
-        "--numstat",
-        "--ignore-cr-at-eol",
-        "--",
-        "baseline",
-        "current",
-      ],
-      workDir,
-      true,
-    );
+    // --ignore-cr-at-eol makes the diff line-ending agnostic.
+    const diffArgs = (extra: string[]) => [
+      "-c",
+      "core.quotepath=false",
+      "diff",
+      "--no-index",
+      ...extra,
+      "--ignore-cr-at-eol",
+      "--",
+      "baseline",
+      "current",
+    ];
+    const diffText = stripCr(git(diffArgs(["--no-color"]), workDir, true));
+    const numstat = git(diffArgs(["--numstat"]), workDir, true);
     const counts = parseNumstat(numstat);
 
     const summary: DiffSummary = {
+      slug: CONFIG.slug,
+      title: TITLE,
       changed: diffText.trim().length > 0,
       filesChanged: counts.files,
       additions: counts.additions,
@@ -283,28 +247,27 @@ async function main(): Promise<void> {
           `(${summary.filesChanged} files, +${summary.additions}/-${summary.deletions}).`,
       ),
     );
-    // Print a clickable file:// URL so the page is one click away locally, and
-    // optionally pop it open in the default browser.
     console.log(pc.cyan(`View it at ${pathToFileURL(indexPath).href}`));
-    if (argv.values.open) {
+    if (options.open) {
       openInBrowser(indexPath);
     }
 
     // Open the diff natively in VS Code: persist both normalized trees to a
-    // stable path and pop a side-by-side editor for each changed file. This is
-    // the "VS Code changes" experience — the generated output is git-ignored, so
-    // it never shows up in Source Control on its own.
-    if (argv.values.vscode) {
-      const treesDir = resolve(PACKAGE_ROOT, "temp/diff-trees");
+    // stable path and pop a side-by-side editor for each changed file. The
+    // generated output is git-ignored, so it never shows in Source Control.
+    if (options.vscode) {
+      const treesDir = resolve(CONFIG.packageRoot, "temp/diff-trees");
       const baselineOut = join(treesDir, "baseline");
       const currentOut = join(treesDir, "current");
       rmSync(treesDir, { recursive: true, force: true });
       mkdirSync(treesDir, { recursive: true });
       await cp(baselineDir, baselineOut, { recursive: true });
       await cp(currentDir, currentOut, { recursive: true });
-      const max = Number(argv.values.max) > 0 ? Number(argv.values.max) : 40;
+      const max = options.max && options.max > 0 ? options.max : 40;
       openInVscode(diffText, baselineOut, currentOut, summary.filesChanged, max);
     }
+
+    return summary;
   } finally {
     rmSync(workDir, { recursive: true, force: true });
   }
@@ -314,8 +277,6 @@ async function main(): Promise<void> {
 function openInBrowser(target: string): void {
   try {
     if (process.platform === "win32") {
-      // `start` is a cmd builtin; the empty first arg is the window title so a
-      // path with spaces isn't mistaken for one.
       execFileSync("cmd", ["/c", "start", "", target], { stdio: "ignore" });
     } else if (process.platform === "darwin") {
       execFileSync("open", [target], { stdio: "ignore" });
@@ -343,8 +304,7 @@ function changedRelPaths(diffText: string): string[] {
 /**
  * Opens each changed file as a native VS Code editor diff (`code --diff
  * <baseline> <current>`). Added/removed files (one side missing) are opened on
- * their own. Capped at `max` tabs; for larger sets the persisted folder pair is
- * printed so a folder-compare extension or the HTML page can show the rest.
+ * their own. Capped at `max` tabs.
  */
 function openInVscode(
   diffText: string,
@@ -365,8 +325,7 @@ function openInVscode(
 
   // `code` is a shell script / .cmd on most platforms, so it must be launched
   // through a shell (Node refuses to execFile a .cmd directly). Compose a single
-  // quoted command string so the shell parses paths with spaces correctly
-  // (passing an args array with shell:true is deprecated, DEP0190).
+  // quoted command string so the shell parses paths with spaces correctly.
   const q = (p: string) => `"${p.replace(/"/g, '\\"')}"`;
   const code = (parts: string[]) => execSync(["code", ...parts].join(" "), { stdio: "ignore" });
 
@@ -375,8 +334,7 @@ function openInVscode(
     console.warn(
       pc.yellow(
         `${filesChanged} files changed; opening the first ${max} in VS Code. ` +
-          `Use --max <n> to open more, the HTML page for all of them, or a ` +
-          `folder-compare extension (e.g. "Compare Folders") on the two trees above.`,
+          `Use --max <n> to open more, or the HTML page for all of them.`,
       ),
     );
   }
@@ -425,8 +383,8 @@ interface FileDiff {
  * The diff comes from `git diff --no-index baseline current`, so every header
  * reads `a/baseline/<path>` vs `b/current/<path>`. Because those two paths
  * differ only by the temp-dir prefix, diff2html mistakes every file for a
- * RENAME (showing `{baseline → current}`). Stripping the `baseline/`/`current/`
- * prefixes makes old === new path, so it renders as a normal modification.
+ * RENAME. Stripping the `baseline/`/`current/` prefixes makes old === new path,
+ * so it renders as a normal modification.
  */
 function normalizeChunkHeader(chunk: string): string {
   const lines = chunk.split("\n");
@@ -451,7 +409,6 @@ function normalizeChunkHeader(chunk: string): string {
 /** Splits a `git diff --no-index` blob into one chunk per file. */
 function splitDiffByFile(diffText: string): FileDiff[] {
   const files: FileDiff[] = [];
-  // Each file section begins with a line `diff --git a/... b/...`.
   const sections = diffText.split(/(?=^diff --git )/m).filter((s) => s.startsWith("diff --git "));
   for (const chunk of sections) {
     const lines = chunk.split("\n");
@@ -494,9 +451,7 @@ function splitDiffByFile(diffText: string): FileDiff[] {
 
 /** Writes the full multi-page diff site to OUTPUT_DIR. */
 function writeSite(diffText: string, summary: DiffSummary): void {
-  const cssPath = require.resolve("diff2html/bundles/css/diff2html.min.css");
-  const sharedCss = readFileSync(cssPath, "utf8") + "\n" + SITE_CSS;
-  writeFileSync(join(OUTPUT_DIR, "diff2html.css"), sharedCss);
+  writeFileSync(join(OUTPUT_DIR, "styles.css"), SITE_CSS);
 
   if (!summary.changed) {
     writeFileSync(
@@ -624,11 +579,7 @@ ${renderTreeChildren(node, depth + 1)}
 </details>`;
 }
 
-function renderFileRow(
-  name: string,
-  href: string,
-  file: FileDiff,
-): string {
+function renderFileRow(name: string, href: string, file: FileDiff): string {
   const badge =
     file.status === "added"
       ? `<span class="st added">A</span>`
@@ -640,11 +591,63 @@ function renderFileRow(
 </div>`;
 }
 
-/** One page per changed file: rich side-by-side diff with prev/next nav. */
+/**
+ * Renders a unified-diff chunk as line-numbered, colorized HTML rows.
+ * Replaces the former diff2html dependency with a small self-contained renderer
+ * so the tool has zero runtime rendering dependencies.
+ */
+function renderUnifiedDiff(chunk: string): string {
+  const rows: string[] = [];
+  let oldLn = 0;
+  let newLn = 0;
+  const row = (cls: string, oldNo: string, newNo: string, text: string): string =>
+    `<div class="dl ${cls}"><span class="ln">${oldNo}</span><span class="ln">${newNo}</span>` +
+    `<span class="tx">${escapeHtml(text.length ? text : " ")}</span></div>`;
+
+  for (const raw of chunk.split("\n")) {
+    const line = raw.replace(/\r$/, "");
+    if (line.startsWith("@@")) {
+      const m = /^@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@/.exec(line);
+      if (m) {
+        oldLn = Number(m[1]);
+        newLn = Number(m[2]);
+      }
+      rows.push(row("hunk", "", "", line));
+      continue;
+    }
+    if (
+      line.startsWith("diff ") ||
+      line.startsWith("index ") ||
+      line.startsWith("--- ") ||
+      line.startsWith("+++ ") ||
+      line.startsWith("new file") ||
+      line.startsWith("deleted file") ||
+      line.startsWith("rename ") ||
+      line.startsWith("similarity ") ||
+      line.startsWith("old mode") ||
+      line.startsWith("new mode") ||
+      line.startsWith("\\")
+    ) {
+      rows.push(row("meta", "", "", line));
+      continue;
+    }
+    if (line.startsWith("+")) {
+      rows.push(row("add", "", String(newLn++), line));
+    } else if (line.startsWith("-")) {
+      rows.push(row("del", String(oldLn++), "", line));
+    } else {
+      rows.push(row("ctx", String(oldLn++), String(newLn++), line));
+    }
+  }
+  return `<div class="udiff">${rows.join("")}</div>`;
+}
+
+/** One page per changed file: line-numbered colorized diff with prev/next nav. */
 function renderFilePage(file: FileDiff, files: FileDiff[], index: number): string {
   const pad = String(files.length).length;
   const fileName = (i: number): string => `${String(i + 1).padStart(pad, "0")}.html`;
-  const prev = index > 0 ? `<a href="${fileName(index - 1)}">← Prev</a>` : `<span class="muted">← Prev</span>`;
+  const prev =
+    index > 0 ? `<a href="${fileName(index - 1)}">← Prev</a>` : `<span class="muted">← Prev</span>`;
   const next =
     index < files.length - 1
       ? `<a href="${fileName(index + 1)}">Next →</a>`
@@ -658,16 +661,7 @@ function renderFilePage(file: FileDiff, files: FileDiff[], index: number): strin
       (1024 * 1024)
     ).toFixed(1)} MB). <a href="../diff.txt">View it in the raw diff</a>.</div>`;
   } else {
-    try {
-      diffBody = diff2html(file.chunk, {
-        drawFileList: false,
-        matching: "lines",
-        outputFormat: "side-by-side",
-      });
-    } catch (err) {
-      console.warn(pc.yellow(`Rendering ${file.path} failed (${err}); showing raw chunk.`));
-      diffBody = `<pre class="raw">${escapeHtml(file.chunk)}</pre>`;
-    }
+    diffBody = renderUnifiedDiff(file.chunk);
   }
 
   const nav = `<nav class="filenav">
@@ -709,7 +703,7 @@ function pageShell(
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>${escapeHtml(title)}</title>
-<link rel="stylesheet" href="${cssBase}/diff2html.css" />
+<link rel="stylesheet" href="${cssBase}/styles.css" />
 </head>
 <body>
 ${headerAndNav}
@@ -762,6 +756,18 @@ nav.filenav a { color: #0969da; text-decoration: none; }
 nav.filenav .muted { color: #8c959f; }
 nav.filenav .counter { color: #57606a; }
 pre.raw { white-space: pre-wrap; word-break: break-all; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; background: #f6f8fa; padding: 12px; border-radius: 6px; }
+.udiff { border: 1px solid #d0d7de; border-radius: 6px; overflow-x: auto; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; line-height: 20px; background: #fff; }
+.dl { display: flex; white-space: pre; }
+.dl .ln { flex: 0 0 auto; width: 3.5em; padding: 0 8px; text-align: right; color: #6e7781; background: #f6f8fa; border-right: 1px solid #eaeef2; user-select: none; -webkit-user-select: none; font-variant-numeric: tabular-nums; }
+.dl .tx { flex: 1 1 auto; padding: 0 10px; }
+.dl.add { background: #e6ffec; }
+.dl.add .ln { background: #ccffd8; color: #1a7f37; }
+.dl.del { background: #ffebe9; }
+.dl.del .ln { background: #ffd7d5; color: #cf222e; }
+.dl.hunk { background: #ddf4ff; color: #0550ae; }
+.dl.hunk .ln { background: #ddf4ff; }
+.dl.hunk .tx { color: #0550ae; }
+.dl.meta { color: #6e7781; background: #fbfbfb; }
 `;
 
 function escapeHtml(value: string): string {
@@ -771,8 +777,3 @@ function escapeHtml(value: string): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
 }
-
-main().catch((err) => {
-  console.error(pc.red(`Fatal error: ${err?.stack ?? err}`));
-  process.exit(1);
-});

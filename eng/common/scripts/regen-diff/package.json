@@ -1,0 +1,20 @@
+{
+  "name": "@typespec/internal-regen-diff",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared tool to render generated-test diffs against an external assets baseline and publish new baselines. Used by the TypeSpec emitter languages.",
+  "type": "module",
+  "scripts": {
+    "regen-diff": "tsx ./src/cli.ts",
+    "build": "tsc -p .",
+    "test:tsc": "tsc -p ."
+  },
+  "dependencies": {
+    "picocolors": "~1.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "~25.0.2",
+    "tsx": "^4.21.0",
+    "typescript": "~5.9.2"
+  }
+}

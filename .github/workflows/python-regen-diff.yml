@@ -1,10 +1,10 @@
 name: Python Regen Diff
 
 # Regenerates the typespec-python emitter test output for a PR and renders an
-# HTML diff against the assets baseline (assets.json -> Azure/azure-sdk-assets).
-# This workflow runs with the (possibly fork) pull_request token, which is
-# read-only, so it only *builds* the diff and uploads it as an artifact. A
-# companion workflow (python-regen-diff-publish.yml) runs via workflow_run with
+# HTML diff against the assets baseline (assets.json -> the configured assets
+# repo). This workflow runs with the (possibly fork) pull_request token, which
+# is read-only, so it only *builds* the diff and uploads it as an artifact. The
+# shared companion workflow (regen-diff-publish.yml) runs via workflow_run with
 # write permissions to publish the HTML to GitHub Pages and post the PR comment.
 # No PAT / extra secret is required.
 
@@ -47,6 +47,10 @@ jobs:
       - name: Build
         run: pnpm turbo run --filter "@azure-tools/typespec-python..." build
 
+      - name: Install regen-diff tool
+        working-directory: eng/common/scripts/regen-diff
+        run: npm install --no-package-lock
+
       - name: Prepare Python environment
         run: pnpm run prepare
         working-directory: packages/typespec-python
@@ -67,6 +71,6 @@ jobs:
       - name: Upload diff site
         uses: actions/upload-artifact@v7
         with:
-          name: python-regen-diff
+          name: regen-diff-site
           path: ${{ runner.temp }}/diff-site
           retention-days: 7

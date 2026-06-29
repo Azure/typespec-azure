@@ -1,28 +1,28 @@
 /* eslint-disable no-console */
 /**
- * Test-proxy-style baseline assets helpers for the Python emitter.
+ * Test-proxy-style baseline assets helpers, shared across emitter languages.
  *
  * The generated-test baseline ("the last accepted regeneration output") is
  * stored in an external, public assets repo and pinned by a tag, following the
  * Azure SDK test-proxy `assets.json` convention. Restoring the baseline is an
  * anonymous clone of that public repo, so it needs **no token**.
  *
- * `assets.json` (next to this package's `package.json`) looks like:
+ * `assets.json` (next to a package's `package.json`) looks like:
  *   {
- *     "AssetsRepo": "l0lawrence/typespec-assets",
- *     "AssetsRepoPrefixPath": "python",
- *     "TagPrefix": "python/tests",
- *     "Tag": "python/tests_<sha>"
+ *     "AssetsRepo": "Azure/azure-sdk-assets",
+ *     "AssetsRepoPrefixPath": "typespec/python",
+ *     "TagPrefix": "typespec/python/tests",
+ *     "Tag": "typespec/python/tests_<sha>"
  *   }
  *
  * In the assets repo the baseline lives under
- *   <AssetsRepoPrefixPath>/{azure,unbranded}
- * at the commit pointed to by <Tag>.
+ *   <AssetsRepoPrefixPath>/<flavor>
+ * at the commit pointed to by <Tag>, one folder per configured flavor.
  */
 
 import { execSync } from "child_process";
 import { existsSync, readFileSync, rmSync } from "fs";
-import { cp, mkdir, mkdtemp, readdir } from "fs/promises";
+import { cp, mkdir, mkdtemp } from "fs/promises";
 import { tmpdir } from "os";
 import { join, resolve } from "path";
 import pc from "picocolors";
@@ -33,7 +33,7 @@ export interface AssetsConfig {
   assetsRepo: string;
   /** Subdirectory in the assets repo that contains the language baseline. */
   prefixPath: string;
-  /** Tag namespace, e.g. "python/tests". */
+  /** Tag namespace, e.g. "typespec/python/tests". */
   tagPrefix: string;
   /** Concrete tag the baseline is pinned to (empty until first bootstrap). */
   tag: string;
@@ -41,12 +41,9 @@ export interface AssetsConfig {
   configPath: string;
 }
 
-/** The two SDK flavors whose generated output makes up the baseline. */
-export const FLAVORS = ["azure", "unbranded"] as const;
-
 /**
  * Reads `assets.json` from `packageRoot`. Returns `undefined` if the file does
- * not exist, so callers can fall back to legacy behavior.
+ * not exist or has no `AssetsRepo`, so callers can treat that as "no baseline".
  */
 export function readAssetsConfig(packageRoot: string): AssetsConfig | undefined {
   const configPath = resolve(packageRoot, "assets.json");
@@ -89,7 +86,7 @@ export async function withBaselineCheckout<T>(
   if (!config.tag) {
     throw new Error(
       `assets.json has an empty "Tag"; bootstrap the baseline first ` +
-        `(see eng/scripts/ci/push-assets.ts).`,
+        `(run "<your package> regenerate:push-assets").`,
     );
   }
 
@@ -123,13 +120,17 @@ export async function withBaselineCheckout<T>(
 }
 
 /**
- * Restores the **full** baseline (every flavor folder) from the assets repo into
- * `destDir` as `destDir/{azure,unbranded}`. `destDir` is wiped for each flavor
+ * Restores the **full** baseline (every configured flavor folder) from the
+ * assets repo into `destDir` as `destDir/<flavor>`. `destDir/<flavor>` is wiped
  * before copying. Used by the diff renderer to obtain the "before" snapshot.
  */
-export async function restoreFullBaseline(config: AssetsConfig, destDir: string): Promise<void> {
+export async function restoreFullBaseline(
+  config: AssetsConfig,
+  destDir: string,
+  flavors: string[],
+): Promise<void> {
   await withBaselineCheckout(config, async (baselineRoot) => {
-    for (const flavor of FLAVORS) {
+    for (const flavor of flavors) {
       const src = join(baselineRoot, flavor);
       const dest = join(destDir, flavor);
       if (!existsSync(src)) {
@@ -141,49 +142,4 @@ export async function restoreFullBaseline(config: AssetsConfig, destDir: string)
       await cp(src, dest, { recursive: true });
     }
   });
-}
-
-/**
- * Restores only the given `subPaths` (e.g. `azure/authentication-api-key`) from
- * the assets repo into `destDir`, preserving the relative layout. Used by the
- * regeneration smoke-test fixture, which only needs a handful of legacy folders.
- *
- * Missing source folders are warned about and skipped (not fatal).
- */
-export async function restoreBaselineSubPaths(
-  config: AssetsConfig,
-  destDir: string,
-  subPaths: string[],
-): Promise<void> {
-  await withBaselineCheckout(config, async (baselineRoot) => {
-    for (const subPath of subPaths) {
-      const segments = subPath.split("/");
-      const src = join(baselineRoot, ...segments);
-      const dest = join(destDir, ...segments);
-      if (!existsSync(src)) {
-        console.warn(pc.yellow(`Baseline folder not found: ${subPath}`));
-        continue;
-      }
-      console.log(pc.dim(`Copying ${subPath} -> ${dest}`));
-      await mkdir(resolve(dest, ".."), { recursive: true });
-      await cp(src, dest, { recursive: true });
-    }
-  });
-}
-
-/** Lists the flavor folders present under a checked-out baseline root. */
-export async function listBaselineFlavors(baselineRoot: string): Promise<string[]> {
-  const present: string[] = [];
-  for (const flavor of FLAVORS) {
-    if (existsSync(join(baselineRoot, flavor))) {
-      present.push(flavor);
-    }
-  }
-  if (present.length === 0) {
-    // Fall back to whatever directories exist.
-    for (const entry of await readdir(baselineRoot, { withFileTypes: true })) {
-      if (entry.isDirectory()) present.push(entry.name);
-    }
-  }
-  return present;
 }

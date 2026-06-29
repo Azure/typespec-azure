@@ -1,0 +1,7 @@
+{
+  "slug": "python",
+  "title": "typespec-python emitter — generated test diff",
+  "generatedDir": "tests/generated",
+  "flavors": ["azure", "unbranded"],
+  "pruneFilePrefixes": [".tsp-codegen-"]
+}

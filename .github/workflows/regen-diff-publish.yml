@@ -1,0 +1,206 @@
+name: Regen Diff Publish
+
+# Shared, language-agnostic companion to the per-language *-regen-diff.yml
+# workflows. Runs after a diff workflow finishes, in the base-repo context (so
+# GITHUB_TOKEN has write access even for fork PRs), then:
+#   1. downloads the rendered diff-site artifact,
+#   2. publishes it to GitHub Pages under pr/<num>/<slug>/,
+#   3. upserts a sticky PR comment linking to the preview,
+#   4. sets a `regen-diff/<slug>` commit status (failure when output differs).
+# The language slug is read from the artifact's summary.json, so one publish
+# workflow serves every emitter. Uses only the built-in GITHUB_TOKEN.
+#
+# To onboard a new language, add its diff workflow's `name:` to the list below.
+
+on:
+  workflow_run:
+    workflows: ["Python Regen Diff"]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  statuses: write
+  actions: read
+
+concurrency:
+  group: regen-diff-publish-${{ github.event.workflow_run.id }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: "Publish diff preview"
+    runs-on: ubuntu-latest
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
+    steps:
+      - name: Download diff site artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: regen-diff-site
+          path: diff-site
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+
+      - name: Read & validate metadata
+        id: meta
+        run: |
+          set -euo pipefail
+          # PR number comes from the (fork-built) artifact, so treat it as
+          # untrusted: it must be a plain positive integer before it is ever
+          # used in a path or shell command.
+          if [ ! -f diff-site/pr.txt ]; then
+            echo "No pr.txt in artifact; nothing to publish."
+            echo "pr=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          PR="$(tr -d '[:space:]' < diff-site/pr.txt)"
+          if ! printf '%s' "$PR" | grep -Eq '^[0-9]+$'; then
+            echo "::error::pr.txt is not a positive integer: '$PR'"
+            exit 1
+          fi
+          # The language slug namespaces the Pages folder and status context.
+          SLUG="$(node -e "process.stdout.write((require('./diff-site/summary.json').slug||'').toString())" 2>/dev/null || true)"
+          if ! printf '%s' "$SLUG" | grep -Eq '^[a-z0-9][a-z0-9-]*$'; then
+            echo "::error::summary.json slug is missing or invalid: '$SLUG'"
+            exit 1
+          fi
+          echo "pr=$PR" >> "$GITHUB_OUTPUT"
+          echo "slug=$SLUG" >> "$GITHUB_OUTPUT"
+          echo "sha=${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_OUTPUT"
+
+      - name: Publish to GitHub Pages
+        if: steps.meta.outputs.pr != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ steps.meta.outputs.pr }}
+          SLUG: ${{ steps.meta.outputs.slug }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          url="https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git"
+          tmp="$(mktemp -d)"
+          if ! git clone --depth 1 --branch gh-pages "$url" "$tmp" 2>/dev/null; then
+            git clone --depth 1 "$url" "$tmp"
+            git -C "$tmp" checkout --orphan gh-pages
+            git -C "$tmp" rm -rf . >/dev/null 2>&1 || true
+            printf '<!doctype html><meta charset="utf-8"><title>TypeSpec diff previews</title><h1>TypeSpec generated-diff previews</h1>' > "$tmp/index.html"
+          fi
+          dest="$tmp/pr/${PR}/${SLUG}"
+          rm -rf "$dest"
+          mkdir -p "$dest"
+          # Allowlist the rendered output (no arbitrary files from the artifact)
+          # so a fork PR cannot host unexpected content on the *.github.io origin.
+          cp diff-site/index.html "$dest/" 2>/dev/null || true
+          cp diff-site/styles.css "$dest/" 2>/dev/null || true
+          cp diff-site/summary.json "$dest/" 2>/dev/null || true
+          cp diff-site/diff.txt "$dest/" 2>/dev/null || true
+          if [ -d diff-site/files ]; then
+            mkdir -p "$dest/files"
+            cp diff-site/files/*.html "$dest/files/" 2>/dev/null || true
+          fi
+          git -C "$tmp" config user.name "github-actions[bot]"
+          git -C "$tmp" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C "$tmp" add -A
+          if git -C "$tmp" commit -m "Update ${SLUG} regen diff preview for PR #${PR}"; then
+            git -C "$tmp" push origin gh-pages
+          else
+            echo "No changes to publish."
+          fi
+
+      - name: Set commit status
+        if: steps.meta.outputs.pr != ''
+        uses: actions/github-script@v7
+        env:
+          SHA: ${{ steps.meta.outputs.sha }}
+          SLUG: ${{ steps.meta.outputs.slug }}
+          PR: ${{ steps.meta.outputs.pr }}
+        with:
+          script: |
+            const fs = require('fs');
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const slug = process.env.SLUG;
+            const prNumber = Number(process.env.PR);
+            const target = `https://${owner}.github.io/${repo}/pr/${prNumber}/${slug}/?v=${process.env.SHA.slice(0, 7)}`;
+            let summary = { changed: false, filesChanged: 0 };
+            try { summary = JSON.parse(fs.readFileSync('diff-site/summary.json', 'utf8')); } catch {}
+            const files = Number(summary.filesChanged) || 0;
+            await github.rest.repos.createCommitStatus({
+              owner, repo, sha: process.env.SHA,
+              context: `regen-diff/${slug}`,
+              state: summary.changed ? 'failure' : 'success',
+              target_url: target,
+              description: summary.changed
+                ? `${files} file(s) differ — regenerate and bump assets.json`
+                : 'Generated output matches the baseline',
+            });
+
+      - name: Upsert PR comment
+        if: steps.meta.outputs.pr != ''
+        uses: actions/github-script@v7
+        env:
+          PR: ${{ steps.meta.outputs.pr }}
+          SLUG: ${{ steps.meta.outputs.slug }}
+          SHA: ${{ steps.meta.outputs.sha }}
+        with:
+          script: |
+            const fs = require('fs');
+            const prNumber = Number(process.env.PR);
+            const slug = process.env.SLUG;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const v = process.env.SHA.slice(0, 7);
+            const pagesUrl = `https://${owner}.github.io/${repo}/pr/${prNumber}/${slug}/?v=${v}`;
+
+            let summary = { changed: true, filesChanged: 0, additions: 0, deletions: 0, baselineTag: '', note: undefined, title: `${slug} generated test diff` };
+            try {
+              summary = JSON.parse(fs.readFileSync('diff-site/summary.json', 'utf8'));
+            } catch (e) {
+              core.warning(`Could not read summary.json: ${e}`);
+            }
+
+            // Sanitize tainted (artifact-sourced) fields before embedding them.
+            const files = Number(summary.filesChanged) || 0;
+            const adds = Number(summary.additions) || 0;
+            const dels = Number(summary.deletions) || 0;
+            const title = String(summary.title || `${slug} generated test diff`)
+              .replace(/[\r\n]+/g, ' ').slice(0, 160);
+            const tag = /^[\w./-]{1,128}$/.test(summary.baselineTag || '') ? summary.baselineTag : '';
+            const note = summary.note
+              ? String(summary.note).replace(/[\r\n]+/g, ' ').replace(/[<>[\]()]/g, '').slice(0, 280)
+              : '';
+
+            const marker = `<!-- regen-diff:${slug} -->`;
+            const statsLine = summary.changed
+              ? `**${files}** files changed · \`+${adds}\` / \`-${dels}\``
+              : '✅ No differences from the baseline.';
+            const tagLine = tag
+              ? `Baseline tag: \`${tag}\``
+              : '_Baseline not bootstrapped yet — entire output shown as added._';
+            const noteLine = note ? `\n> ⚠️ ${note}\n` : '';
+
+            const body = [
+              marker,
+              `### ${title}`,
+              '',
+              statsLine,
+              '',
+              `👉 **[View the rendered HTML diff](${pagesUrl})**`,
+              noteLine,
+              `<sub>${tagLine} · updated for the latest commit. Re-runs of CI refresh this preview.</sub>`,
+            ].join('\n');
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner, repo, issue_number: prNumber, per_page: 100,
+            });
+            const existing = comments.find((c) => c.body && c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+              core.info(`Updated comment ${existing.id}`);
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number: prNumber, body });
+              core.info('Created new diff comment');
+            }
