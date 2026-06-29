@@ -7,7 +7,6 @@ options:
     generate-test: false
     add-credentials: false
     flavor: azure
-    is-typespec-test: true
     hierarchy-client: false
     package-details:
       name: "@msinternal/azure-core-page"

@@ -40,7 +40,6 @@ See our [support policy](https://github.com/Azure/azure-sdk-for-js/blob/main/SUP
 
 - An [Azure subscription][azure_sub].
 
-{{#if isReleasablePackage}}
 ### Install the \`{{ clientPackageName }}\` package
 
 Install the {{ clientDescriptiveName }} library for JavaScript with \`npm\`:
@@ -48,7 +47,6 @@ Install the {{ clientDescriptiveName }} library for JavaScript with \`npm\`:
 \`\`\`bash
 npm install {{ clientPackageName }}
 \`\`\`
-{{/if}}
 
 {{#if addCredentials}}
 ### Create and authenticate a \`{{ clientClassName}}\`
@@ -201,8 +199,6 @@ interface Metadata {
   apiRefURL?: string;
   /** Check if the rp is management plane */
   azureArm?: boolean;
-  /** Indicates if the package is a test/releasable package. */
-  isReleasablePackage?: boolean;
   /** Indicates if the package need generate test files */
   generateTest?: boolean;
   /** Indicates if the package need SubscriptionId as the client parameter */
@@ -269,7 +265,7 @@ function createMetadata(model: ClientModel): Metadata | undefined {
     return;
   }
   // const packageDetails = model.options.packageDetails;
-  const { packageDetails, azureOutputDirectory, serviceInfo, isTypeSpecTest } = model.options;
+  const { packageDetails, azureOutputDirectory, serviceInfo } = model.options;
 
   const repoURL = "https://github.com/Azure/azure-sdk-for-js";
   const relativePackageSourcePath = azureOutputDirectory;
@@ -303,7 +299,6 @@ function createMetadata(model: ClientModel): Metadata | undefined {
       model.options.generateSample && packageSourceURL ? `${packageSourceURL}/samples` : undefined,
     apiRefURL: `https://learn.microsoft.com/javascript/api/${clientPackageName}${apiRefUrlQueryParameter}`,
     azureArm: Boolean(model.options.azureArm),
-    isReleasablePackage: !isTypeSpecTest,
     addCredentials: model.options.addCredentials,
     generateTest: model.options.generateTest,
     hasSubscriptionId: model.options.hasSubscriptionId,

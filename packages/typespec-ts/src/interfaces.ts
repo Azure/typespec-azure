@@ -223,7 +223,6 @@ export interface ClientOptions {
   generateTest?: boolean;
   generateSample?: boolean;
   azureOutputDirectory?: string;
-  isTypeSpecTest?: boolean;
   serviceInfo?: ServiceInfo;
   azureArm?: boolean;
   enableOperationGroup?: boolean;

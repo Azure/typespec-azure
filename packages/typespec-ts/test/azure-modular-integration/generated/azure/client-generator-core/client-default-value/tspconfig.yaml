@@ -6,7 +6,6 @@ options:
     generate-test: false
     add-credentials: false
     flavor: azure
-    is-typespec-test: true
     package-details:
       name: "@msinternal/azure-cgc-client-default-value"
       description: "Azure ClientGeneratorCore ClientDefaultValue Test Service"
