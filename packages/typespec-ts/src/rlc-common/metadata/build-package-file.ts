@@ -144,10 +144,10 @@ export function updatePackageFile(
   }
 
   packageInfo.dependencies = {
-      ...packageInfo.dependencies,
-      "@azure/core-rest-pipeline": "^1.24.0",
-      "@azure-rest/core-client": "^2.7.0",
-    };
+    ...packageInfo.dependencies,
+    "@azure/core-rest-pipeline": "^1.24.0",
+    "@azure-rest/core-client": "^2.7.0",
+  };
 
   // Update constantPaths metadata for Azure packages
   if (needsConstantPathsUpdate && packageInfo["//metadata"]) {

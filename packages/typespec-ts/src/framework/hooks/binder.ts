@@ -9,10 +9,7 @@ import {
 import { provideContext, useContext } from "../../context-manager.js";
 import { generateLocallyUniqueName } from "../../modular/helpers/naming-helpers.js";
 import { ReferenceableSymbol } from "../dependency.js";
-import {
-  SourceFileSymbol,
-  StaticHelperMetadata,
-} from "../load-static-helpers.js";
+import { SourceFileSymbol, StaticHelperMetadata } from "../load-static-helpers.js";
 import { refkey } from "../refkey.js";
 import { provideDependencies, useDependencies } from "./use-dependencies.js";
 

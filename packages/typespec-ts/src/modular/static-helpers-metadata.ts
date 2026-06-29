@@ -1,5 +1,3 @@
-import { AzureCoreDependencies } from "./external-dependencies.js";
-
 export const SerializationHelpers = {
   buildMultiCollection: {
     kind: "function",
@@ -61,7 +59,6 @@ export const SerializationHelpers = {
     name: "getBinaryResponse",
     location: "serialization/get-binary-response.ts",
   },
-  getBinaryStreamResponse: AzureCoreDependencies["getBinaryStreamResponse"],
   areAllPropsUndefined: {
     kind: "function",
     name: "areAllPropsUndefined",
@@ -146,10 +143,6 @@ export const MultipartHelpers = {
     name: "createFilePartDescriptor",
     location: "multipartHelpers.ts",
   },
-} as const;
-
-export const PlatformTypeHelpers = {
-  NodeReadableStream: AzureCoreDependencies["NodeReadableStream"],
 } as const;
 
 export const CloudSettingHelpers = {
