@@ -55,6 +55,12 @@ configuration:
                   label: emitter:typescript
           - if:
               - includesModifiedFiles:
+                  files: []
+            then:
+              - addLabel:
+                  label: emitter:go
+          - if:
+              - includesModifiedFiles:
                   files:
                     - packages/typespec-client-generator-core/**/*
             then:
@@ -92,3 +98,9 @@ configuration:
             then:
               - addLabel:
                   label: meta:website
+          - if:
+              - includesModifiedFiles:
+                  files: []
+            then:
+              - addLabel:
+                  label: linter
