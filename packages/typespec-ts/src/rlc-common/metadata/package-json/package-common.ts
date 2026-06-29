@@ -45,26 +45,11 @@ function getEntryPointInformation(config: PackageCommonInfoConfig) {
     module: "./dist/esm/index.js",
     types: "./dist/commonjs/index.d.ts",
     browser: "./dist/browser/index.js",
-    imports: {
-      "#platform/*": {
-        browser: "./src/*-browser.mts",
-        default: "./src/*.ts",
-      } as Record<string, string>,
-    },
     exports: resolveWarpExports(config.exports, config.generateReactNativeTarget),
   };
 
   if (config.generateReactNativeTarget) {
     result["react-native"] = "./dist/react-native/index.js";
-    (result["imports"]["#platform/*"] as Record<string, string>)["react-native"] =
-      "./src/*-react-native.mts";
-    // Reorder so react-native comes before default
-    const importsEntry = result["imports"]["#platform/*"] as Record<string, string>;
-    result["imports"]["#platform/*"] = {
-      browser: importsEntry["browser"],
-      "react-native": importsEntry["react-native"],
-      default: importsEntry["default"],
-    };
   }
 
   return result;

@@ -9,15 +9,11 @@ import { getModularClientOptions } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import { getMethodHierarchiesMap } from "../utils/operation-util.js";
 import { partitionAndEmitExports } from "./build-subpath-index.js";
+import { AzureCoreDependencies } from "./external-dependencies.js";
 import { getClassicalClientName } from "./helpers/naming-helpers.js";
 import { isLroOnlyOperation } from "./helpers/operation-helpers.js";
 import { ModularEmitterOptions } from "./interfaces.js";
-import {
-  CloudSettingHelpers,
-  MultipartHelpers,
-  PagingHelpers,
-  PlatformTypeHelpers,
-} from "./static-helpers-metadata.js";
+import { CloudSettingHelpers, MultipartHelpers, PagingHelpers } from "./static-helpers-metadata.js";
 
 export function buildRootIndex(
   context: SdkContext,
@@ -157,7 +153,7 @@ function exportFileContentsType(context: SdkContext, rootIndexFile: SourceFile) 
       rootIndexFile,
       [
         resolveReference(MultipartHelpers.FileContents),
-        resolveReference(PlatformTypeHelpers.NodeReadableStream),
+        resolveReference(AzureCoreDependencies["NodeReadableStream"]),
       ],
       true,
     );

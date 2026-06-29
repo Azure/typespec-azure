@@ -59,11 +59,6 @@ export const SerializationHelpers = {
     name: "getBinaryResponse",
     location: "serialization/get-binary-response.ts",
   },
-  getBinaryStreamResponse: {
-    kind: "function",
-    name: "getBinaryStreamResponse",
-    location: "serialization/get-binary-stream-response.ts",
-  },
   areAllPropsUndefined: {
     kind: "function",
     name: "areAllPropsUndefined",
@@ -147,14 +142,6 @@ export const MultipartHelpers = {
     kind: "function",
     name: "createFilePartDescriptor",
     location: "multipartHelpers.ts",
-  },
-} as const;
-
-export const PlatformTypeHelpers = {
-  NodeReadableStream: {
-    kind: "typeAlias",
-    name: "NodeReadableStream",
-    location: "platform-types.ts",
   },
 } as const;
 

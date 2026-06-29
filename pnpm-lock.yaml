@@ -40,7 +40,7 @@ catalogs:
       specifier: ^0.40.0
       version: 0.40.0
     '@azure-rest/core-client':
-      specifier: ^2.3.1
+      specifier: ^2.7.0
       version: 2.7.0
     '@azure/abort-controller':
       specifier: ^2.1.2
@@ -55,7 +55,7 @@ catalogs:
       specifier: ^1.5.0
       version: 1.6.2
     '@azure/core-rest-pipeline':
-      specifier: ^1.14.0
+      specifier: ^1.24.0
       version: 1.24.0
     '@azure/core-util':
       specifier: ^1.4.0
@@ -20613,7 +20613,7 @@ snapshots:
 
   '@types/sax@1.2.7':
     dependencies:
-      '@types/node': 24.13.2
+      '@types/node': 26.0.0
 
   '@types/semver@7.7.1': {}
 
