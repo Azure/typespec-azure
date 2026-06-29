@@ -58,9 +58,9 @@ jobs:
       - name: Copy TypeSpec files
         working-directory: packages/typespec-ts
         run: pnpm copy:typespec
-      - name: Run Modular Spector tests
+      - name: Run Spector tests
         working-directory: packages/typespec-ts
-        run: pnpm integration-test-ci:azure-modular
+        run: pnpm spector-test
       - name: Check git tree is clean
         working-directory: packages/typespec-ts
         run: pnpm check:tree

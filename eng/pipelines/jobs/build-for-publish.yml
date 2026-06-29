@@ -44,7 +44,7 @@ jobs:
       # TypeScript (typespec-ts) e2e tests and spector coverage upload.
       # The emitter was migrated here from Azure/autorest.typescript; this replaces
       # the coverage upload that previously ran in that (now deprecated) repo.
-      - script: pnpm run test:ts:e2e
+      - script: pnpm run integration-test-ci
         displayName: "Run TypeScript e2e tests"
         workingDirectory: packages/typespec-ts
 
