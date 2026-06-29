@@ -2,11 +2,16 @@ import { checkForChangedFiles, coreRepoRoot, repoRoot, run } from "./helpers.js"
 
 const ignoredCorePaths = new Set(["packages/typespec-vscode/ThirdPartyNotices.txt"]);
 
+function getChangedPath(line) {
+  const match = line.match(/^(.{2}) (.+)$/);
+  return match ? match[2] : line;
+}
+
 function getRelevantChangedFiles(output, ignoredPaths = new Set()) {
   return (output ?? "")
     .split(/\r?\n/)
     .filter(Boolean)
-    .filter((line) => !ignoredPaths.has(line.slice(3)));
+    .filter((line) => !ignoredPaths.has(getChangedPath(line)));
 }
 
 function logChangedFiles(comment, lines) {
@@ -23,11 +28,11 @@ function logChangedFiles(comment, lines) {
 
 const coreStatus = await checkForChangedFiles(coreRepoRoot, undefined, { silent: true });
 const coreChangedFiles = getRelevantChangedFiles(coreStatus, ignoredCorePaths);
-const ignoredCoreOnly =
+const hasOnlyIgnoredCoreChanges =
   (coreStatus ?? "").split(/\r?\n/).filter(Boolean).length > 0 && coreChangedFiles.length === 0;
 const repoChangedFiles = getRelevantChangedFiles(
   await checkForChangedFiles(repoRoot, undefined, { silent: true }),
-  ignoredCoreOnly ? new Set(["core"]) : undefined,
+  hasOnlyIgnoredCoreChanges ? new Set(["core"]) : undefined,
 );
 
 if (logChangedFiles("## typespec ##", coreChangedFiles) || logChangedFiles("## typespec-azure ##", repoChangedFiles)) {
