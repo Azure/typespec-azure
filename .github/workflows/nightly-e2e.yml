@@ -62,10 +62,6 @@ jobs:
             mise-install-args: "java maven"
             run-prepare: false
             run-regenerate: true
-            # The Java emitter pins published @typespec/@azure-tools versions
-            # (resolved from npm, not the workspace), so bump these package.json
-            # files to the dev (@next) versions to test against latest typespec.
-            bump-deps-files: "packages/typespec-java/emitter/package.json packages/typespec-java/emitter-tests/package.json"
 
     env:
       TYPESPEC_VS_CI_BUILD: true
@@ -128,23 +124,10 @@ jobs:
             "
           done
 
-      # --- Bump TypeSpec deps to dev (@next) ---
-      # For emitters that pin published @typespec/@azure-tools versions (e.g.
-      # Java), updating the core submodule alone does not exercise the latest dev
-      # packages. Bump the listed package.json files to @next so install resolves
-      # dev versions. Mirrors autorest.java's "Bump TypeSpec Dependencies to dev".
-
-      - name: Bump TypeSpec dependencies to dev
-        if: matrix.bump-deps-files
-        run: npx -y @azure-tools/typespec-bump-deps ${{ matrix.bump-deps-files }} --add-npm-overrides
-
       # --- Install & Build ---
 
       - name: Install dependencies
-        # When deps were bumped to @next, those versions are newer than pnpm's
-        # minimumReleaseAge window (set in pnpm-workspace.yaml) and would be
-        # rejected. Disable the age check for those nightly runs only.
-        run: pnpm install --no-frozen-lockfile ${{ matrix.bump-deps-files && '--config.minimumReleaseAge=0' || '' }}
+        run: pnpm install --no-frozen-lockfile
 
       - name: Build
         run: pnpm turbo run --filter "${{ matrix.package-filter }}..." build

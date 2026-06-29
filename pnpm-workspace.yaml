@@ -37,6 +37,8 @@ catalog:
   "@astrojs/starlight": ^0.40.0
   "@autorest/codemodel": ~4.20.1
   "@azure-rest/core-client": ^2.3.1
+  "@azure-tools/codegen": ~2.10.1
+  "@azure-tools/typespec-liftr-base": ">=0.14.0 <1.0.0"
   "@azure/abort-controller": ^2.1.2
   "@azure/core-auth": ^1.6.0
   "@azure/core-lro": ^3.1.0
