@@ -1,0 +1,6 @@
+{
+  "AssetsRepo": "Azure/azure-sdk-assets",
+  "AssetsRepoPrefixPath": "typespec/python",
+  "TagPrefix": "typespec/python/tests",
+  "Tag": ""
+}

@@ -1,0 +1,68 @@
+name: Python Regen Diff Cleanup
+
+# Removes a PR's published diff preview from GitHub Pages when the PR is closed.
+# Uses pull_request_target (closed) so it runs in the base-repo context with a
+# write token even for fork PRs. It does NOT check out or run any PR code — it
+# only deletes the pr/<num>/ folder from gh-pages and updates the sticky comment.
+
+on:
+  pull_request_target:
+    types: [closed]
+    paths:
+      - "packages/typespec-python/**"
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  cleanup:
+    name: "Remove diff preview"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Remove PR folder from GitHub Pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          url="https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git"
+          tmp="$(mktemp -d)"
+          if ! git clone --depth 1 --branch gh-pages "$url" "$tmp" 2>/dev/null; then
+            echo "No gh-pages branch; nothing to clean up."
+            exit 0
+          fi
+          if [ ! -d "$tmp/pr/${PR}" ]; then
+            echo "No preview folder for PR #${PR}; nothing to clean up."
+            exit 0
+          fi
+          git -C "$tmp" rm -r "pr/${PR}" >/dev/null
+          git -C "$tmp" config user.name "github-actions[bot]"
+          git -C "$tmp" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C "$tmp" commit -m "Remove diff preview for closed PR #${PR}"
+          git -C "$tmp" push origin gh-pages
+
+      - name: Update PR comment
+        uses: actions/github-script@v7
+        env:
+          PR: ${{ github.event.pull_request.number }}
+        with:
+          script: |
+            const prNumber = Number(process.env.PR);
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const marker = '<!-- python-regen-diff -->';
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner, repo, issue_number: prNumber, per_page: 100,
+            });
+            const existing = comments.find((c) => c.body && c.body.includes(marker));
+            if (!existing) return;
+            const body = [
+              marker,
+              '### 🐍 Python emitter — generated test diff',
+              '',
+              '_The diff preview for this PR was removed because the PR is now closed._',
+            ].join('\n');
+            await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });

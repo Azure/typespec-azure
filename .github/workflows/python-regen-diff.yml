@@ -1,0 +1,72 @@
+name: Python Regen Diff
+
+# Regenerates the typespec-python emitter test output for a PR and renders an
+# HTML diff against the assets baseline (assets.json -> Azure/azure-sdk-assets).
+# This workflow runs with the (possibly fork) pull_request token, which is
+# read-only, so it only *builds* the diff and uploads it as an artifact. A
+# companion workflow (python-regen-diff-publish.yml) runs via workflow_run with
+# write permissions to publish the HTML to GitHub Pages and post the PR comment.
+# No PAT / extra secret is required.
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "packages/typespec-python/**"
+      - ".github/workflows/python-regen-diff.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  render:
+    name: "Render generated-test diff"
+    runs-on: ubuntu-latest
+    if: |
+      !startsWith(github.head_ref, 'dependabot/') &&
+      !startsWith(github.head_ref, 'publish/') &&
+      !startsWith(github.head_ref, 'backmerge/') &&
+      !startsWith(github.head_ref, 'revert-')
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - uses: ./.github/actions/setup
+
+      - uses: ./.github/actions/setup-python
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm turbo run --filter "@azure-tools/typespec-python..." build
+
+      - name: Prepare Python environment
+        run: pnpm run prepare
+        working-directory: packages/typespec-python
+
+      - name: Regenerate
+        run: pnpm run regenerate
+        working-directory: packages/typespec-python
+
+      - name: Render HTML diff
+        working-directory: packages/typespec-python
+        env:
+          DIFF_TITLE: "typespec-python generated test diff (PR #${{ github.event.pull_request.number || 'manual' }})"
+        run: pnpm run regenerate:render-diff -- --output "${{ runner.temp }}/diff-site" --title "$DIFF_TITLE"
+
+      - name: Record PR metadata
+        run: echo "${{ github.event.pull_request.number }}" > "${{ runner.temp }}/diff-site/pr.txt"
+
+      - name: Upload diff site
+        uses: actions/upload-artifact@v7
+        with:
+          name: python-regen-diff
+          path: ${{ runner.temp }}/diff-site
+          retention-days: 7
