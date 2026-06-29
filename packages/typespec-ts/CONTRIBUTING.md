@@ -36,16 +36,16 @@ the required tooling (Node.js and `pnpm`). The command scripts under `test/comma
 
 The package is tested through three vitest projects (configured in `vitest.config.ts`):
 
-| Project                     | Location                            | Covers                           | Command                                  |
-| --------------------------- | ----------------------------------- | -------------------------------- | ---------------------------------------- |
-| `test-next`                 | `test-next/**`                      | Modern unit tests                | `pnpm test-next`                         |
-| `unit-modular`              | `test/modular-unit/**`              | Modular unit tests               | `pnpm unit-test`                         |
-| `integration-azure-modular` | `test/azure-modular-integration/**` | Modular spector end-to-end tests | `pnpm integration-test-ci:azure-modular` |
+| Project                     | Location                            | Covers                           | Command                    |
+| --------------------------- | ----------------------------------- | -------------------------------- | -------------------------- |
+| `test-next`                 | `test-next/**`                      | Modern unit tests                | `pnpm test-next`           |
+| `unit-modular`              | `test/modular-unit/**`              | Modular unit tests               | `pnpm unit-test`           |
+| `integration-azure-modular` | `test/azure-modular-integration/**` | Modular spector end-to-end tests | `pnpm integration-test-ci` |
 
 `pnpm lint` runs ESLint with `--max-warnings=0`.
 
 The integration suite generates real clients from specs and runs them against a local spector
-test server; `pnpm integration-test-ci:azure-modular` starts the server, generates, and runs the
+test server; `pnpm integration-test-ci` starts the server, generates, and runs the
 assertions for you. To (re)generate the tracked baselines without running the tests:
 
 ```bash
@@ -96,7 +96,7 @@ pnpm check:tree        # fails if regeneration left the git tree dirty
 
    ```bash
    pnpm copy:typespec
-   pnpm generate-tsp-only:azure-modular:client
+   pnpm generate-tsp-only:client
    ```
 
    Once your change is complete, regenerate the whole suite and verify there are no unexpected
