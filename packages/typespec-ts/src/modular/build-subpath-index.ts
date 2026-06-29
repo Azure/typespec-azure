@@ -9,7 +9,7 @@ import {
   enqueueStatement,
   flushSourceFileBatch,
 } from "../framework/source-file-batch.js";
-import { getModularClientOptions } from "../utils/client-utils.js";
+import { getClientModuleInfo } from "../utils/client-utils.js";
 
 export interface buildSubpathIndexFileOptions {
   exportIndex?: boolean;
@@ -38,7 +38,7 @@ function buildSubpathIndexFileImpl(
   options: buildSubpathIndexFileOptions = {},
 ) {
   const project = useContext("outputProject");
-  const subfolder = clientMap ? (getModularClientOptions(clientMap).subfolder ?? "") : "";
+  const subfolder = clientMap ? (getClientModuleInfo(clientMap).subfolder ?? "") : "";
   const srcPath = emitterOptions.modularOptions.sourceRoot;
   // Skip to export these files because they are used internally.
   const skipFiles = ["pagingHelpers.ts", "pollingHelpers.ts"];

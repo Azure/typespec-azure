@@ -64,21 +64,20 @@ import {
   isBody,
   isStatusCode,
 } from "@typespec/http";
-import {
-  ArraySchema,
-  DictionarySchema,
-  NameType,
-  ObjectSchema,
-  Schema,
-  SchemaContext,
-  isArraySchema,
-  normalizeName,
-} from "../rlc-common/index.js";
 import { GetSchemaOptions, SdkContext } from "./interfaces.js";
 import { KnownMediaType, hasMediaType, isMediaTypeMultipartFormData } from "./media-types.js";
 
+import {
+  ArraySchema,
+  DictionarySchema,
+  ObjectSchema,
+  Schema,
+  SchemaContext,
+} from "../interfaces.js";
 import { reportDiagnostic } from "../lib.js";
+import { NameType, normalizeName } from "./name-utils.js";
 import { getModelNamespaceName } from "./namespace-utils.js";
+import { isArraySchema } from "./schema-helpers.js";
 
 export const BINARY_TYPE_UNION =
   "string | Uint8Array | ReadableStream<Uint8Array> | NodeReadableStream";
@@ -859,7 +858,7 @@ function getModelName(dpgContext: SdkContext, model: Model) {
     fullNamespacePrefix = "";
   }
   // 5. check if this model should be namespaced
-  return dpgContext.rlcOptions?.enableModelNamespace ? `${fullNamespacePrefix}${name}` : name;
+  return dpgContext.emitterOptions?.enableModelNamespace ? `${fullNamespacePrefix}${name}` : name;
 }
 
 // Map an typespec type to an OA schema. Returns undefined when the resulting
@@ -1492,10 +1491,7 @@ export function predictDefaultValue(dpgContext: SdkContext, param?: ModelPropert
     }
     return specificDefault;
   }
-  const serviceNamespace = getDefaultService(
-    program,
-    dpgContext.rlcOptions?.isModularLibrary,
-  )?.type;
+  const serviceNamespace = getDefaultService(program)?.type;
   if (!serviceNamespace) {
     return;
   }
@@ -1506,20 +1502,11 @@ export function predictDefaultValue(dpgContext: SdkContext, param?: ModelPropert
   return;
 }
 
-export function getDefaultService(
-  program: Program,
-  isModularLibrary: boolean = true,
-): Service | undefined {
+export function getDefaultService(program: Program): Service | undefined {
   const services = listServices(program);
   if (!services || services.length === 0) {
     reportDiagnostic(program, {
       code: "no-service-defined",
-      target: NoTarget,
-    });
-  }
-  if (services.length > 1 && !isModularLibrary) {
-    reportDiagnostic(program, {
-      code: "more-than-one-service",
       target: NoTarget,
     });
   }
@@ -1530,9 +1517,8 @@ export function getDefaultService(
  */
 export function getDefaultApiVersionString(dpgContext: SdkContext): string | undefined {
   const program = dpgContext.program;
-  const isModularLibrary = dpgContext.rlcOptions?.isModularLibrary;
-  return getDefaultService(program, isModularLibrary)
-    ? getDefaultApiVersion(dpgContext, getDefaultService(program, isModularLibrary)!.type)?.value
+  return getDefaultService(program)
+    ? getDefaultApiVersion(dpgContext, getDefaultService(program)!.type)?.value
     : undefined;
 }
 

@@ -11,60 +11,21 @@ export default defineConfig({
       },
       {
         test: {
-          name: "unit-rlc",
-          include: ["test/unit/**/*.test.ts"],
-          testTimeout: 36000,
-        },
-      },
-      {
-        test: {
           name: "unit-modular",
           include: ["test/modular-unit/**/*.test.ts"],
           testTimeout: 0,
           pool: "forks",
           poolOptions: {
             forks: {
-              execArgv: ["--max-old-space-size=8192"],
+              execArgv: ["--max-old-space-size=1024"],
             },
           },
         },
       },
       {
         test: {
-          name: "integration-rlc",
-          include: ["test/integration/*.test.ts"],
-          exclude: ["test/integration/versioningRemoved.test.ts"],
-          testTimeout: 36000,
-        },
-      },
-      {
-        test: {
-          name: "integration-azure-rlc",
-          include: ["test/azure-integration/*.test.ts"],
-          exclude: [
-            "test/azure-integration/versioningRemoved.test.ts",
-            "test/azure-integration/azureClientGeneratorCoreClientInitialization.test.ts",
-          ],
-          testTimeout: 36000,
-        },
-      },
-      {
-        test: {
-          name: "integration-modular",
-          include: ["test/modular-integration/*.test.ts"],
-          testTimeout: 36000,
-        },
-      },
-      {
-        test: {
           name: "integration-azure-modular",
           include: ["test/azure-modular-integration/*.test.ts"],
-          exclude: [
-            "test/azure-modular-integration/clientStructureOperationGroup.test.ts",
-            "test/azure-modular-integration/clientStructureRenamed.test.ts",
-            "test/azure-modular-integration/clientStructureTwoGroup.test.ts",
-            "test/azure-modular-integration/payloadMultipart.test.ts",
-          ],
           testTimeout: 36000,
         },
       },

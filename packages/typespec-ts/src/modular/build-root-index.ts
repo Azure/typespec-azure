@@ -11,9 +11,9 @@ import {
   getQueuedExportNames,
 } from "../framework/source-file-batch.js";
 import { reportDiagnostic } from "../lib.js";
-import { isAzurePackage, NameType, normalizeName } from "../rlc-common/index.js";
-import { getModularClientOptions } from "../utils/client-utils.js";
+import { getClientModuleInfo } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
+import { NameType, normalizeName } from "../utils/name-utils.js";
 import { getMethodHierarchiesMap } from "../utils/operation-util.js";
 import { partitionAndEmitExports } from "./build-subpath-index.js";
 import { getClassicalClientName } from "./helpers/naming-helpers.js";
@@ -49,13 +49,13 @@ function buildRootIndexImpl(
   if (!clientMap) {
     // we still need to export the models if no client is provided
     exportModels(emitterOptions, rootIndexFile);
-    exportRestErrorTypes(context, rootIndexFile);
+    exportRestErrorTypes(rootIndexFile);
     return;
   }
   const project = useContext("outputProject");
   const [_, client] = clientMap;
   const srcPath = emitterOptions.modularOptions.sourceRoot;
-  const { subfolder } = getModularClientOptions(clientMap);
+  const { subfolder } = getClientModuleInfo(clientMap);
   const clientName = `${getClassicalClientName(client)}`;
   const clientFile = project.getSourceFile(
     `${srcPath}/${subfolder && subfolder !== "" ? subfolder + "/" : ""}${normalizeName(
@@ -92,7 +92,7 @@ function buildRootIndexImpl(
   exportPagingTypes(context, rootIndexFile);
   exportFileContentsType(context, rootIndexFile);
   exportAzureCloudTypes(context, rootIndexFile);
-  exportRestErrorTypes(context, rootIndexFile);
+  exportRestErrorTypes(rootIndexFile);
 }
 
 function exportModels(
@@ -126,10 +126,7 @@ function exportAzureCloudTypes(context: SdkContext, rootIndexFile: SourceFile) {
   }
 }
 
-function exportRestErrorTypes(context: SdkContext, rootIndexFile: SourceFile) {
-  if (!isAzurePackage({ options: context.rlcOptions })) {
-    return;
-  }
+function exportRestErrorTypes(rootIndexFile: SourceFile) {
   const existingExports = getExistingExports(rootIndexFile);
   const namedExports = ["RestError", "isRestError"].filter((name) => !existingExports.has(name));
   if (namedExports.length > 0) {
@@ -228,7 +225,7 @@ function exportSimplePollerLike(
   const hasLro = Array.from(methodMap.values()).some((operations) => {
     return operations.some(isLroOnlyOperation);
   });
-  if (!hasLro || context.rlcOptions?.compatibilityLro !== true) {
+  if (!hasLro || context.emitterOptions?.compatibilityLro !== true) {
     return;
   }
   const helperFile = project.getSourceFile(
@@ -406,7 +403,7 @@ function buildSubClientIndexFileImpl(
 ) {
   const project = useContext("outputProject");
   const [_, client] = clientMap;
-  const { subfolder } = getModularClientOptions(clientMap);
+  const { subfolder } = getClientModuleInfo(clientMap);
   const srcPath = emitterOptions.modularOptions.sourceRoot;
   const subClientIndexFile = project.createSourceFile(
     `${srcPath}/${subfolder && subfolder !== "" ? subfolder + "/" : ""}index.ts`,

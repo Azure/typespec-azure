@@ -10,8 +10,8 @@ import { OptionalKind, ParameterDeclarationStructure, StatementedNode } from "ts
 import { ModularEmitterOptions } from "../interfaces.js";
 
 import { resolveReference } from "../../framework/reference.js";
-import { NameType, normalizeName, PackageFlavor } from "../../rlc-common/index.js";
 import { SdkContext } from "../../utils/interfaces.js";
+import { NameType, normalizeName } from "../../utils/name-utils.js";
 import { CloudSettingHelpers } from "../static-helpers-metadata.js";
 import { getTypeExpression } from "../type-expressions/get-type-expression.js";
 import { getClassicalClientName } from "./naming-helpers.js";
@@ -87,10 +87,10 @@ export function getClientParameters(
   const armSpecific = (p: SdkParameter) => !(p.kind === "endpoint" && dpgContext.arm);
   // Skip apiVersion parameter when it's multi-service (each service has its own default apiVersion)
   const skipApiVersionOnMultiService = (p: SdkParameter) =>
-    !(dpgContext.rlcOptions?.isMultiService && p.isApiVersionParam);
+    !(dpgContext.emitterOptions?.isMultiService && p.isApiVersionParam);
   const filters = [
     options.requiredOnly ? isRequired : undefined,
-    dpgContext.rlcOptions?.addCredentials === false ? skipCredentials : undefined,
+    dpgContext.emitterOptions?.addCredentials === false ? skipCredentials : undefined,
     options.optionalOnly ? isOptional : undefined,
     options.onClientOnly ? skipMethodParam : undefined,
     options.skipArmSpecific ? undefined : armSpecific,
@@ -169,16 +169,10 @@ export function buildGetClientEndpointParam(
   client: SdkClientType<SdkServiceOperation>,
 ): { endpointParamName: string; assignedOptionalParams?: Set<string> } {
   const assignedOptionalParams = new Set<string>();
-  let coreEndpointParam: string;
-  if (dpgContext.rlcOptions?.flavor === "azure") {
-    const cloudSettingSuffix = dpgContext.arm
-      ? ` ?? ${resolveReference(CloudSettingHelpers.getArmEndpoint)}(options.cloudSetting)`
-      : "";
-    coreEndpointParam = `options.endpoint${cloudSettingSuffix}`;
-  } else {
-    // unbranded does not have the deprecated baseUrl parameter
-    coreEndpointParam = `options.endpoint`;
-  }
+  const cloudSettingSuffix = dpgContext.arm
+    ? ` ?? ${resolveReference(CloudSettingHelpers.getArmEndpoint)}(options.cloudSetting)`
+    : "";
+  const coreEndpointParam = `options.endpoint${cloudSettingSuffix}`;
   // Special case: endpoint URL not defined
   const endpointParam = getClientParameters(client, dpgContext, {
     onClientOnly: true,
@@ -248,7 +242,7 @@ export function buildGetClientOptionsParam(
   apiVersionParamName?: string,
 ): string {
   const userAgentOptions = buildUserAgentOptions(context, emitterOptions, "azsdk-js-api");
-  const loggingOptions = buildLoggingOptions(emitterOptions.options.flavor);
+  const loggingOptions = buildLoggingOptions();
   const credentials = buildCredentials(emitterOptions, endpointParam);
 
   // Use the actual api version parameter name for destructuring, defaulting to "apiVersion"
@@ -315,11 +309,7 @@ function buildCredentials(
   return `{ ${scopes}${apiKeyHeaderName} }`;
 }
 
-function buildLoggingOptions(flavor?: PackageFlavor): string | undefined {
-  if (flavor !== "azure") {
-    return undefined;
-  }
-
+function buildLoggingOptions(): string | undefined {
   return `{ logger: options.loggingOptions?.logger ?? logger.info }`;
 }
 

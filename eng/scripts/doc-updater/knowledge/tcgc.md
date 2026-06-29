@@ -221,3 +221,15 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - Only ONE `#suppress "experimental-feature" "exact"` directive is needed per property — it covers all subsequent `@clientName(exact(...))` decorators on that property.
 - When creating exact-name Spector specs, the namespace needs `@clientNamespace` for BOTH Java (`"azure.clientgenerator.core.exactname"`) AND Python (`"specs.azure.clientgenerator.core.exactname"`) so tests pass in both language emitter test suites.
 - The @clientNamespace for python should be formatted multi-line if it exceeds a reasonable line length.
+
+## Per-Service API Version (June 2026)
+
+- The `api-version` emitter option now accepts `string | Record<string, string>`. The Record form maps service namespace full names to version strings, enabling per-service API version control in multi-service packages.
+- `resolveApiVersionForService` in `src/internal-utils.ts` is the central resolution function (internal, not exported). It handles string vs Record config dispatch.
+- For multi-service packages, `"all"` is NOT supported — it falls back to `undefined` (latest version). This applies in both the string and Record forms.
+- `"latest"` is a global keyword that applies regardless of single/multi-service.
+- In the Record form, services not listed in the map return `undefined` (latest version).
+- `SdkPackage.metadata.apiVersions` (Map) stores the resolved version per service. `metadata.apiVersion` (string, deprecated) is `undefined` for multi-service.
+- No Spector spec was added for this feature — it's a code-generation-time config behavior, not a wire-level behavior. The unit tests in `test/package/api-versions-metadata.test.ts` and `test/clients/structure.test.ts` thoroughly cover it.
+- The guideline.md was updated to document `SdkPackage.metadata` (both `apiVersion` and `apiVersions`).
+- The 10versioning.mdx was updated to mention the Record form and add a "Per-service versioning (multi-service packages)" section.

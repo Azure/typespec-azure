@@ -140,29 +140,37 @@ alias TenantParentScope<Resource extends Foundations.SimpleResource> = TenantSco
  * Parameter model for listing a resource at the tenant scope
  * @template Resource The type of the resource.
  */
-model TenantScope<Resource extends Foundations.SimpleResource>
-  is ResourceParentParameters<Resource, TenantBaseParameters>;
+model TenantScope<Resource extends Foundations.SimpleResource> is ResourceParentParameters<
+  Resource,
+  TenantBaseParameters
+>;
 
 /**
  * Parameter model for listing a resource at the subscription scope
  * @template Resource The type of the resource.
  */
-model SubscriptionScope<Resource extends Foundations.SimpleResource>
-  is ResourceParentParameters<Resource, SubscriptionBaseParameters>;
+model SubscriptionScope<Resource extends Foundations.SimpleResource> is ResourceParentParameters<
+  Resource,
+  SubscriptionBaseParameters
+>;
 
 /**
  * Parameter model for listing a resource at the location scope
  * @template Resource The type of the resource.
  */
-model LocationScope<Resource extends Foundations.SimpleResource>
-  is ResourceParentParameters<Resource, LocationBaseParameters>;
+model LocationScope<Resource extends Foundations.SimpleResource> is ResourceParentParameters<
+  Resource,
+  LocationBaseParameters
+>;
 
 /**
  * Parameter model for listing an extension resource
  * @template Resource The type of the resource.
  */
-model ExtensionScope<Resource extends Foundations.SimpleResource>
-  is ResourceParentParameters<Resource, ExtensionBaseParameters>;
+model ExtensionScope<Resource extends Foundations.SimpleResource> is ResourceParentParameters<
+  Resource,
+  ExtensionBaseParameters
+>;
 
 /**
  * Parameter model for listing a resource at the resource group scope
