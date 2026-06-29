@@ -326,8 +326,7 @@ interface ResourceUpdateSync<
    * @template Properties RP-specific property bag for the resource
    * @template BaseParameters The http parameters that are part of the request
    */
-  #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
-  @patch(#{ implicitOptionality: true })
+  @patch
   update is ArmCustomPatchSync<Resource, ResourceUpdateModel<Resource, Properties>, BaseParameters>;
 }
 
