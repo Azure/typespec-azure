@@ -1,8 +1,6 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore: to fix the handlebars issue
-import hbs from "handlebars";
 import { ClientModel } from "../../interfaces.js";
 import { getClientName } from "../../utils/name-constructors.js";
+import { renderTemplate } from "../render-template.js";
 import { snippetsContent } from "./template.js";
 
 export function buildSnippets(model: ClientModel, clientName?: string) {
@@ -14,7 +12,7 @@ export function buildSnippets(model: ClientModel, clientName?: string) {
   ) {
     return {
       path: "test/snippets.spec.ts",
-      content: hbs.compile(snippetsContent, { noEscape: true })({
+      content: renderTemplate(snippetsContent, {
         clientClassName: clientName ? clientName : getClientName(model),
         azureArm: model.options?.azureArm,
         hasSubscriptionId: model.options.hasSubscriptionId,

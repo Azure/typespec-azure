@@ -1,12 +1,10 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore: to fix the handlebars issue
-import hbs from "handlebars";
 import { ClientModel } from "../interfaces.js";
 import { getClientName } from "../utils/name-constructors.js";
 import { NameType, normalizeName } from "../utils/name-utils.js";
+import { renderTemplate } from "./render-template.js";
 
 const azureReadmeModularTemplate = `# {{ clientDescriptiveName }} library for JavaScript
 
@@ -176,43 +174,6 @@ If you'd like to contribute to this library, please read the [contributing guide
 {{/if}}
 `;
 
-const nonBrandedReadmeTemplate = `# {{ clientDescriptiveName }} library for JavaScript
-
-{{ description }}
-
-Key links:
-
-{{#if packageSourceURL}}
-- [Source code]({{ packageSourceURL }})
-{{/if}}
-{{#if packageNPMURL}}
-- [Package (NPM)]({{ packageNPMURL }})
-{{/if}}
-{{#if apiRefURL}}
-- [API reference documentation]({{ apiRefURL }})
-{{/if}}
-{{#if serviceDocURL}}
-- [Product documentation]({{ serviceDocURL }})
-{{/if}}
-{{#if samplesURL}}
-- [Samples]({{ samplesURL }})
-{{/if}}
-
-## Getting started
-
-### Currently supported environments
-
-- LTS versions of Node.js
-
-### Install the \`{{ clientPackageName }}\` package
-
-Install the {{ clientDescriptiveName }} library for JavaScript with \`npm\`:
-
-\`\`\`bash
-npm install {{ clientPackageName }}
-\`\`\`
-`;
-
 const apiReferenceTemplate = `{{#if apiRefURL}}
 - [API reference documentation]({{ apiRefURL }})
 {{/if}}
@@ -246,8 +207,6 @@ interface Metadata {
   addCredentials?: boolean;
   /** The link to the identity package in the repository */
   identityPackageURL?: string;
-  /** The URL for the service document */
-  serviceDocURL?: string;
   /** The dependency info for this service */
   dependencyDescription?: string;
   dependencyLink?: string;
@@ -271,13 +230,10 @@ interface Metadata {
 
 export function buildReadmeFile(model: ClientModel) {
   const metadata = createMetadata(model) ?? {};
-  const readmeFileContents = hbs.compile(
-    model.options ? azureReadmeModularTemplate : nonBrandedReadmeTemplate,
-    { noEscape: true },
-  );
+  const content = renderTemplate(azureReadmeModularTemplate, metadata as Record<string, unknown>);
   return {
     path: "README.md",
-    content: readmeFileContents(metadata),
+    content,
   };
 }
 
@@ -301,7 +257,10 @@ export function updateReadmeFile(
   try {
     const metadata = createMetadata(model) ?? {};
 
-    const newApiRefLink = hbs.compile(apiReferenceTemplate, { noEscape: true })(metadata).trim();
+    const newApiRefLink = renderTemplate(
+      apiReferenceTemplate,
+      metadata as Record<string, unknown>,
+    ).trim();
 
     if (!newApiRefLink) {
       return { path: "README.md", content: existingReadmeContent };
