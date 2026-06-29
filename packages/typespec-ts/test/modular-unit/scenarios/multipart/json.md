@@ -21,7 +21,7 @@ op doThing(@header contentType: "multipart/form-data", @multipartBody bodyParam:
 The part should get generated correctly. The generated serializer should be used so that the date of birth is encoded correctly.
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -32,15 +32,15 @@ export interface RequestBody {
   person: Person;
 }
 
+export function requestBodySerializer(item: RequestBody): any {
+  return [{ name: "person", body: personSerializer(item["person"]) }];
+}
+
 /** model interface Person */
 export interface Person {
   firstName: string;
   lastName: string;
   dateOfBirth: Date;
-}
-
-export function requestBodySerializer(item: RequestBody): any {
-  return [{ name: "person", body: personSerializer(item["person"]) }];
 }
 
 export function personSerializer(item: Person): any {
@@ -77,7 +77,7 @@ op doThing(@header contentType: "multipart/form-data", @multipartBody bodyParam:
 In this case one part is constructed from the serialized array.
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -88,13 +88,6 @@ export interface RequestBody {
   people: Person[];
 }
 
-/** model interface Person */
-export interface Person {
-  firstName: string;
-  lastName: string;
-  dateOfBirth: Date;
-}
-
 export function requestBodySerializer(item: RequestBody): any {
   return [{ name: "people", body: personArraySerializer(item["people"]) }];
 }
@@ -103,6 +96,13 @@ export function personArraySerializer(result: Array<Person>): any[] {
   return result.map((item) => {
     return personSerializer(item);
   });
+}
+
+/** model interface Person */
+export interface Person {
+  firstName: string;
+  lastName: string;
+  dateOfBirth: Date;
 }
 
 export function personSerializer(item: Person): any {
@@ -139,7 +139,7 @@ op doThing(@header contentType: "multipart/form-data", @multipartBody bodyParam:
 In this case each element in the serialized array is converted to a part descriptor.
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -148,13 +148,6 @@ In this case each element in the serialized array is converted to a part descrip
 /** model interface RequestBody */
 export interface RequestBody {
   people: Person[];
-}
-
-/** model interface Person */
-export interface Person {
-  firstName: string;
-  lastName: string;
-  dateOfBirth: Date;
 }
 
 export function requestBodySerializer(item: RequestBody): any {
@@ -167,6 +160,13 @@ export function personArraySerializer(result: Array<Person>): any[] {
   return result.map((item) => {
     return personSerializer(item);
   });
+}
+
+/** model interface Person */
+export interface Person {
+  firstName: string;
+  lastName: string;
+  dateOfBirth: Date;
 }
 
 export function personSerializer(item: Person): any {

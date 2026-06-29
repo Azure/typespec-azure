@@ -19,7 +19,7 @@ op post(@body body: A): {
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -74,12 +74,14 @@ export function _postSend(
   body: A,
   options: PostOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-    body: !body ? body : _postRequestSerializer(body),
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+      body: !body ? body : _postRequestSerializer(body),
+    });
 }
 
 export async function _postDeserialize(result: PathUncheckedResponse): Promise<A> {
@@ -94,7 +96,6 @@ export async function _postDeserialize(result: PathUncheckedResponse): Promise<A
     propA: !["propA"] ? ["propA"] : _postRequestDeserializer(["propA"]),
   };
 }
-
 export async function post(
   context: Client,
   body: A,

@@ -37,7 +37,7 @@ withRawContent: true
 Generate as normal enums.
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -65,13 +65,15 @@ export function _fooSend(
   context: Client,
   options: FooOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: {
-      "api-version": context.apiVersion ?? "2021-10-01-preview",
-      ...options.requestOptions?.headers,
-    },
-  });
+  return context
+    .path("/")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: {
+        "api-version": context.apiVersion ?? "2021-10-01-preview",
+        ...options.requestOptions?.headers,
+      },
+    });
 }
 
 export async function _fooDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -82,7 +84,6 @@ export async function _fooDeserialize(result: PathUncheckedResponse): Promise<vo
 
   return;
 }
-
 export async function foo(
   context: Client,
   options: FooOptionalParams = { requestOptions: {} },

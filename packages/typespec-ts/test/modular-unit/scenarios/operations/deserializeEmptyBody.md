@@ -52,10 +52,12 @@ export function _deleteKeyValueSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).delete({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path(path)
+    .delete({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _deleteKeyValueDeserialize(
@@ -68,7 +70,6 @@ export async function _deleteKeyValueDeserialize(
 
   return result.body ? keyValueDeserializer(result.body) : undefined;
 }
-
 export async function deleteKeyValue(
   context: Client,
   key: string,
@@ -132,10 +133,12 @@ export function _getResourceSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path(path)
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _getResourceDeserialize(result: PathUncheckedResponse): Promise<Resource> {
@@ -151,7 +154,6 @@ export async function _getResourceDeserialize(result: PathUncheckedResponse): Pr
 
   return resourceDeserializer(result.body);
 }
-
 export async function getResource(
   context: Client,
   id: string,
@@ -223,10 +225,12 @@ export function _deleteKeyValueSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).delete({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path(path)
+    .delete({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _deleteKeyValueDeserialize(
@@ -244,7 +248,6 @@ export async function _deleteKeyValueDeserialize(
 
   return result.body ? keyValueDeserializer(result.body) : undefined;
 }
-
 export async function deleteKeyValue(
   context: Client,
   key: string,

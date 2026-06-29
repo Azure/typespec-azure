@@ -77,7 +77,7 @@ withRawContent: true
 ## ts models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -87,39 +87,6 @@ withRawContent: true
 export interface UsageListResult {
   nextLink?: string;
   value?: Usage[];
-}
-
-/** model interface Usage */
-export interface Usage {
-  test?: string;
-}
-
-/** Common error response for all Azure Resource Manager APIs to return error details for failed operations. */
-export interface ErrorResponse {
-  /** The error object. */
-  error?: ErrorDetail;
-}
-
-/** The error detail. */
-export interface ErrorDetail {
-  /** The error code. */
-  readonly code?: string;
-  /** The error message. */
-  readonly message?: string;
-  /** The error target. */
-  readonly target?: string;
-  /** The error details. */
-  readonly details?: ErrorDetail[];
-  /** The error additional info. */
-  readonly additionalInfo?: ErrorAdditionalInfo[];
-}
-
-/** The resource management error additional info. */
-export interface ErrorAdditionalInfo {
-  /** The additional info type. */
-  readonly type?: string;
-  /** The additional info. */
-  readonly info?: any;
 }
 
 export function usageListResultDeserializer(item: any): UsageListResult {
@@ -135,16 +102,41 @@ export function usageArrayDeserializer(result: Array<Usage>): any[] {
   });
 }
 
+/** model interface Usage */
+export interface Usage {
+  test?: string;
+}
+
 export function usageDeserializer(item: any): Usage {
   return {
     test: item["test"],
   };
 }
 
+/** Common error response for all Azure Resource Manager APIs to return error details for failed operations. */
+export interface ErrorResponse {
+  /** The error object. */
+  error?: ErrorDetail;
+}
+
 export function errorResponseDeserializer(item: any): ErrorResponse {
   return {
     error: !item["error"] ? item["error"] : errorDetailDeserializer(item["error"]),
   };
+}
+
+/** The error detail. */
+export interface ErrorDetail {
+  /** The error code. */
+  readonly code?: string;
+  /** The error message. */
+  readonly message?: string;
+  /** The error target. */
+  readonly target?: string;
+  /** The error details. */
+  readonly details?: ErrorDetail[];
+  /** The error additional info. */
+  readonly additionalInfo?: ErrorAdditionalInfo[];
 }
 
 export function errorDetailDeserializer(item: any): ErrorDetail {
@@ -169,6 +161,14 @@ export function errorAdditionalInfoArrayDeserializer(result: Array<ErrorAddition
   return result.map((item) => {
     return errorAdditionalInfoDeserializer(item);
   });
+}
+
+/** The resource management error additional info. */
+export interface ErrorAdditionalInfo {
+  /** The additional info type. */
+  readonly type?: string;
+  /** The additional info. */
+  readonly info?: any;
 }
 
 export function errorAdditionalInfoDeserializer(item: any): ErrorAdditionalInfo {

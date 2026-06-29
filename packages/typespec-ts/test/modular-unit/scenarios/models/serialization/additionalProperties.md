@@ -37,7 +37,7 @@ compatibility-mode: true
 Generated Models.
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -49,14 +49,12 @@ export interface SimpleModel extends Record<string, number | string> {
   propB: string;
 }
 
-/** model interface ComplexModel */
-export interface ComplexModel extends Record<string, SimpleModel> {
-  propA: SimpleModel;
-}
-
 export function simpleModelSerializer(item: SimpleModel): any {
   return { ...item, propA: item["propA"], propB: item["propB"] };
 }
+
+/** Alias for _SimpleModelAdditionalProperty */
+export type _SimpleModelAdditionalProperty = number | string;
 
 export function _simpleModelAdditionalPropertySerializer(
   item: _SimpleModelAdditionalProperty,
@@ -64,12 +62,14 @@ export function _simpleModelAdditionalPropertySerializer(
   return item;
 }
 
+/** model interface ComplexModel */
+export interface ComplexModel extends Record<string, SimpleModel> {
+  propA: SimpleModel;
+}
+
 export function complexModelSerializer(item: ComplexModel): any {
   return { ...item, propA: simpleModelSerializer(item["propA"]) };
 }
-
-/** Alias for _SimpleModelAdditionalProperty */
-export type _SimpleModelAdditionalProperty = number | string;
 ```
 
 # Should treat a property named with `additionalProperties` as normal property with legacy code
@@ -102,7 +102,7 @@ compatibility-mode: true
 Generated Models.
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -162,14 +162,14 @@ compatibility-mode: false
 Generated Models.
 
 ```ts models
-import { serializeRecord } from "../static-helpers/serialization/serialize-record.js";
-
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import { serializeRecord } from "../static-helpers/serialization/serialize-record.js";
+
 /** model interface SimpleModel */
 export interface SimpleModel {
   propA: string;
@@ -178,19 +178,19 @@ export interface SimpleModel {
   additionalProperties?: Record<string, string>;
 }
 
-/** model interface ComplexModel */
-export interface ComplexModel {
-  propA: SimpleModel;
-  /** Additional properties */
-  additionalProperties?: Record<string, SimpleModel>;
-}
-
 export function simpleModelSerializer(item: SimpleModel): any {
   return {
     ...serializeRecord(item.additionalProperties ?? {}),
     propA: item["propA"],
     propB: item["propB"],
   };
+}
+
+/** model interface ComplexModel */
+export interface ComplexModel {
+  propA: SimpleModel;
+  /** Additional properties */
+  additionalProperties?: Record<string, SimpleModel>;
 }
 
 export function complexModelSerializer(item: ComplexModel): any {
@@ -295,14 +295,14 @@ compatibility-mode: false
 Generated Models.
 
 ```ts models
-import { serializeRecord } from "../static-helpers/serialization/serialize-record.js";
-
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import { serializeRecord } from "../static-helpers/serialization/serialize-record.js";
+
 /** model interface SimpleModel */
 export interface SimpleModel {
   propA: string;
@@ -323,14 +323,14 @@ export function simpleModelSerializer(item: SimpleModel): any {
   };
 }
 
+/** Alias for _SimpleModelAdditionalProperty */
+export type _SimpleModelAdditionalProperty = string | number | boolean;
+
 export function _simpleModelAdditionalPropertySerializer(
   item: _SimpleModelAdditionalProperty,
 ): any {
   return item;
 }
-
-/** Alias for _SimpleModelAdditionalProperty */
-export type _SimpleModelAdditionalProperty = string | number | boolean;
 ```
 
 # Should generate `additionalProperties` bag if we have another same name property as `additionalProperties`
@@ -378,14 +378,14 @@ mustEmptyDiagnostic: false
 Generated Models.
 
 ```ts models
-import { serializeRecord } from "../static-helpers/serialization/serialize-record.js";
-
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import { serializeRecord } from "../static-helpers/serialization/serialize-record.js";
+
 /** model interface SimpleModel */
 export interface SimpleModel {
   additionalProperties: Record<string, number>;
@@ -393,19 +393,6 @@ export interface SimpleModel {
   propB: string;
   /** Additional properties */
   additionalPropertiesBag?: Record<string, string>;
-}
-
-/** model interface FooModel */
-export interface FooModel extends BarModel {
-  propA: string;
-  propB: string;
-  /** Additional properties */
-  additionalPropertiesBag?: Record<string, string>;
-}
-
-/** model interface BarModel */
-export interface BarModel {
-  additionalProperties: Record<string, number>;
 }
 
 export function simpleModelSerializer(item: SimpleModel): any {
@@ -417,6 +404,14 @@ export function simpleModelSerializer(item: SimpleModel): any {
   };
 }
 
+/** model interface FooModel */
+export interface FooModel extends BarModel {
+  propA: string;
+  propB: string;
+  /** Additional properties */
+  additionalPropertiesBag?: Record<string, string>;
+}
+
 export function fooModelSerializer(item: FooModel): any {
   return {
     ...serializeRecord(item.additionalPropertiesBag ?? {}),
@@ -424,6 +419,11 @@ export function fooModelSerializer(item: FooModel): any {
     propA: item["propA"],
     propB: item["propB"],
   };
+}
+
+/** model interface BarModel */
+export interface BarModel {
+  additionalProperties: Record<string, number>;
 }
 
 export function barModelSerializer(item: BarModel): any {

@@ -30,6 +30,12 @@ interface WidgetOperations {
 ## Models
 
 ```ts models
+/*
+ * This file contains only generated model types and their (de)serializers.
+ * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
+ */
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { buildCsvCollection } from "../static-helpers/serialization/build-csv-collection.js";
 import { buildNewlineCollection } from "../static-helpers/serialization/build-newline-collection.js";
 import { buildPipeCollection } from "../static-helpers/serialization/build-pipe-collection.js";
@@ -39,12 +45,6 @@ import { parseNewlineCollection } from "../static-helpers/serialization/parse-ne
 import { parsePipeCollection } from "../static-helpers/serialization/parse-pipe-collection.js";
 import { parseSsvCollection } from "../static-helpers/serialization/parse-ssv-collection.js";
 
-/**
- * This file contains only generated model types and their (de)serializers.
- * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
- */
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /** model interface Widget */
 export interface Widget {
   colors: string[];
@@ -145,28 +145,22 @@ interface ContainerOperations {
 ## Models
 
 ```ts models
-import { buildCsvCollection } from "../static-helpers/serialization/build-csv-collection.js";
-import { buildPipeCollection } from "../static-helpers/serialization/build-pipe-collection.js";
-import { parseCsvCollection } from "../static-helpers/serialization/parse-csv-collection.js";
-import { parsePipeCollection } from "../static-helpers/serialization/parse-pipe-collection.js";
-
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import { buildCsvCollection } from "../static-helpers/serialization/build-csv-collection.js";
+import { buildPipeCollection } from "../static-helpers/serialization/build-pipe-collection.js";
+import { parseCsvCollection } from "../static-helpers/serialization/parse-csv-collection.js";
+import { parsePipeCollection } from "../static-helpers/serialization/parse-pipe-collection.js";
+
 /** model interface ContainerWidget */
 export interface ContainerWidget {
   name: string;
   nested: NestedWidget;
   optionalNested?: NestedWidget;
-}
-
-/** model interface NestedWidget */
-export interface NestedWidget {
-  tags: string[];
-  categories?: string[];
 }
 
 export function containerWidgetSerializer(item: ContainerWidget): any {
@@ -187,6 +181,12 @@ export function containerWidgetDeserializer(item: any): ContainerWidget {
       ? item["optionalNested"]
       : nestedWidgetDeserializer(item["optionalNested"]),
   };
+}
+
+/** model interface NestedWidget */
+export interface NestedWidget {
+  tags: string[];
+  categories?: string[];
 }
 
 export function nestedWidgetSerializer(item: NestedWidget): any {
@@ -267,6 +267,12 @@ experimental-extensible-enums: true
 ## Models
 
 ```ts models
+/*
+ * This file contains only generated model types and their (de)serializers.
+ * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
+ */
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { buildCsvCollection } from "../static-helpers/serialization/build-csv-collection.js";
 import { buildNewlineCollection } from "../static-helpers/serialization/build-newline-collection.js";
 import { buildPipeCollection } from "../static-helpers/serialization/build-pipe-collection.js";
@@ -276,12 +282,6 @@ import { parseNewlineCollection } from "../static-helpers/serialization/parse-ne
 import { parsePipeCollection } from "../static-helpers/serialization/parse-pipe-collection.js";
 import { parseSsvCollection } from "../static-helpers/serialization/parse-ssv-collection.js";
 
-/**
- * This file contains only generated model types and their (de)serializers.
- * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
- */
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /** model interface Widget */
 export interface Widget {
   requiredCsvColors: Color[];
@@ -334,6 +334,9 @@ export function widgetDeserializer(item: any): Widget {
   };
 }
 
+/** Type of Color */
+export type Color = "red" | "blue" | "green";
+
 /** Known values of {@link ColorsUnion} that the service accepts. */
 export enum KnownColorsUnion {
   /** red */
@@ -344,8 +347,6 @@ export enum KnownColorsUnion {
   Green = "green",
 }
 
-/** Type of Color */
-export type Color = "red" | "blue" | "green";
 /** Type of ColorsUnion */
 export type ColorsUnion = string;
 ```

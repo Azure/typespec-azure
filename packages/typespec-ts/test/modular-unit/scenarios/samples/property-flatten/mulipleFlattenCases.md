@@ -68,19 +68,23 @@ Raw json files.
 Model generated.
 
 ```ts models
-import { areAllPropsUndefined } from "../static-helpers/serialization/check-prop-undefined.js";
-
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import { areAllPropsUndefined } from "../static-helpers/serialization/check-prop-undefined.js";
+
 /** This is a simple model. */
 export interface BodyParameter {
   name: string;
   bar?: A;
   baz?: string;
+}
+
+export function bodyParameterSerializer(item: BodyParameter): any {
+  return { name: item["name"], properties: _bodyParameterPropertiesSerializer(item) };
 }
 
 /** model interface FooProperties */
@@ -90,16 +94,6 @@ export interface FooProperties {
   y?: string;
 }
 
-/** model interface A */
-export interface A {
-  x: string;
-  y: string;
-}
-
-export function bodyParameterSerializer(item: BodyParameter): any {
-  return { name: item["name"], properties: _bodyParameterPropertiesSerializer(item) };
-}
-
 export function fooPropertiesSerializer(item: FooProperties): any {
   return {
     bar: areAllPropsUndefined(item, ["x", "y"]) ? undefined : _fooPropertiesBarSerializer(item),
@@ -107,8 +101,20 @@ export function fooPropertiesSerializer(item: FooProperties): any {
   };
 }
 
+/** model interface A */
+export interface A {
+  x: string;
+  y: string;
+}
+
 export function aSerializer(item: A): any {
   return { x: item["x"], y: item["y"] };
+}
+
+/** Known values of {@link Versions} that the service accepts. */
+export enum KnownVersions {
+  /** 2022-05-15-preview */
+  V20220515Preview = "2022-05-15-preview",
 }
 
 export function _fooPropertiesBarSerializer(item: FooProperties): any {
@@ -117,12 +123,6 @@ export function _fooPropertiesBarSerializer(item: FooProperties): any {
 
 export function _bodyParameterPropertiesSerializer(item: BodyParameter): any {
   return { bar: !item["bar"] ? item["bar"] : aSerializer(item["bar"]), baz: item["baz"] };
-}
-
-/** Known values of {@link Versions} that the service accepts. */
-export enum KnownVersions {
-  /** 2022-05-15-preview */
-  V20220515Preview = "2022-05-15-preview",
 }
 ```
 

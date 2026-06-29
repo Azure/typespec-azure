@@ -68,14 +68,14 @@ withRawContent: true
 ## Models
 
 ```ts models
-import { ErrorResponse } from "@azure-rest/core-client";
-
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import { ErrorResponse } from "@azure-rest/core-client";
+
 /** Response for the asset chain summary. */
 export interface AssetChainSummaryResult {
   errors?: ErrorResponse[];
@@ -115,10 +115,12 @@ export function _getAssetChainSummarySend(
   context: Client,
   options: GetAssetChainSummaryOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/assetChainSummary").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/assetChainSummary")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _getAssetChainSummaryDeserialize(
@@ -131,7 +133,6 @@ export async function _getAssetChainSummaryDeserialize(
 
   return assetChainSummaryResultDeserializer(result.body);
 }
-
 export async function getAssetChainSummary(
   context: Client,
   options: GetAssetChainSummaryOptionalParams = { requestOptions: {} },

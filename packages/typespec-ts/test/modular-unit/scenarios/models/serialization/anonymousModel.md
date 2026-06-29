@@ -28,7 +28,7 @@ interface D {
 Generated Models.
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -45,6 +45,10 @@ export interface SimpleModel {
   };
 }
 
+export function simpleModelSerializer(item: SimpleModel): any {
+  return { prop: _simpleModelPropSerializer(item["prop"]) };
+}
+
 /** model interface _SimpleModelProp */
 export interface _SimpleModelProp {
   propA: string;
@@ -54,18 +58,14 @@ export interface _SimpleModelProp {
   };
 }
 
+export function _simpleModelPropSerializer(item: _SimpleModelProp): any {
+  return { propA: item["propA"], propB: _simpleModelPropPropBSerializer(item["propB"]) };
+}
+
 /** model interface _SimpleModelPropPropB */
 export interface _SimpleModelPropPropB {
   propAA: string;
   propBB: boolean;
-}
-
-export function simpleModelSerializer(item: SimpleModel): any {
-  return { prop: _simpleModelPropSerializer(item["prop"]) };
-}
-
-export function _simpleModelPropSerializer(item: _SimpleModelProp): any {
-  return { propA: item["propA"], propB: _simpleModelPropPropBSerializer(item["propB"]) };
 }
 
 export function _simpleModelPropPropBSerializer(item: _SimpleModelPropPropB): any {

@@ -14,7 +14,7 @@ op doThing(@header contentType: "multipart/form-data", @multipartBody bodyParam:
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -52,11 +52,13 @@ export function _doThingSend(
   bodyParam: RequestBody,
   options: DoThingOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "multipart/form-data",
-    body: requestBodySerializer(bodyParam),
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "multipart/form-data",
+      body: requestBodySerializer(bodyParam),
+    });
 }
 
 export async function _doThingDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -67,7 +69,6 @@ export async function _doThingDeserialize(result: PathUncheckedResponse): Promis
 
   return;
 }
-
 export async function doThing(
   context: Client,
   bodyParam: RequestBody,
@@ -93,7 +94,7 @@ op doThing(@header contentType: "multipart/form-data", @multipartBody bodyParam:
 If a part is optional, not specifying a value should cause no part to be sent in the request.
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -126,7 +127,7 @@ op doThing(@header contentType: "multipart/form-data", @multipartBody bodyParam:
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */

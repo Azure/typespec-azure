@@ -27,7 +27,7 @@ model ApiError {
 Generated Models.
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -38,6 +38,12 @@ export interface Foo {
   name: string;
 }
 
+export function fooDeserializer(item: any): Foo {
+  return {
+    name: item["name"],
+  };
+}
+
 /** model interface ApiError */
 export interface ApiError {
   /** A machine readable error code */
@@ -45,23 +51,17 @@ export interface ApiError {
   detail?: ErrorDetail;
 }
 
-/** model interface ErrorDetail */
-export interface ErrorDetail {
-  /** A human readable message */
-  message: string;
-}
-
-export function fooDeserializer(item: any): Foo {
-  return {
-    name: item["name"],
-  };
-}
-
 export function apiErrorDeserializer(item: any): ApiError {
   return {
     code: item["code"],
     detail: !item["detail"] ? item["detail"] : errorDetailDeserializer(item["detail"]),
   };
+}
+
+/** model interface ErrorDetail */
+export interface ErrorDetail {
+  /** A human readable message */
+  message: string;
 }
 
 export function errorDetailDeserializer(item: any): ErrorDetail {
@@ -101,7 +101,7 @@ model ApiError {
 Generated Models.
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -113,19 +113,6 @@ export interface Foo {
   options: ErrorDetail;
 }
 
-/** model interface ErrorDetail */
-export interface ErrorDetail {
-  /** A human readable message */
-  message: string;
-}
-
-/** model interface ApiError */
-export interface ApiError {
-  /** A machine readable error code */
-  code: string;
-  detail?: ErrorDetail;
-}
-
 export function fooDeserializer(item: any): Foo {
   return {
     name: item["name"],
@@ -133,10 +120,23 @@ export function fooDeserializer(item: any): Foo {
   };
 }
 
+/** model interface ErrorDetail */
+export interface ErrorDetail {
+  /** A human readable message */
+  message: string;
+}
+
 export function errorDetailDeserializer(item: any): ErrorDetail {
   return {
     message: item["message"],
   };
+}
+
+/** model interface ApiError */
+export interface ApiError {
+  /** A machine readable error code */
+  code: string;
+  detail?: ErrorDetail;
 }
 
 export function apiErrorDeserializer(item: any): ApiError {

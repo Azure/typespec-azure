@@ -186,14 +186,16 @@ export function _getSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).get({
-    ...operationOptionsToRequestParameters(options),
-    headers: {
-      ...(context.expand !== undefined ? { $expand: context.expand } : {}),
-      accept: "application/json",
-      ...options.requestOptions?.headers,
-    },
-  });
+  return context
+    .path(path)
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: {
+        ...(context.expand !== undefined ? { $expand: context.expand } : {}),
+        accept: "application/json",
+        ...options.requestOptions?.headers,
+      },
+    });
 }
 
 export async function _getDeserialize(result: PathUncheckedResponse): Promise<SavingsPlanModel> {
@@ -209,7 +211,6 @@ export async function _getDeserialize(result: PathUncheckedResponse): Promise<Sa
 
   return savingsPlanModelDeserializer(result.body);
 }
-
 /** Get savings plan. */
 export async function get(
   context: Client,
@@ -419,14 +420,16 @@ export function _getSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).get({
-    ...operationOptionsToRequestParameters(options),
-    headers: {
-      ...(context.expand !== undefined ? { $expand: context.expand } : {}),
-      accept: "application/json",
-      ...options.requestOptions?.headers,
-    },
-  });
+  return context
+    .path(path)
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: {
+        ...(context.expand !== undefined ? { $expand: context.expand } : {}),
+        accept: "application/json",
+        ...options.requestOptions?.headers,
+      },
+    });
 }
 
 export async function _getDeserialize(result: PathUncheckedResponse): Promise<SavingsPlanModel> {
@@ -442,7 +445,6 @@ export async function _getDeserialize(result: PathUncheckedResponse): Promise<Sa
 
   return savingsPlanModelDeserializer(result.body);
 }
-
 /** Get savings plan. */
 export async function get(
   context: Client,

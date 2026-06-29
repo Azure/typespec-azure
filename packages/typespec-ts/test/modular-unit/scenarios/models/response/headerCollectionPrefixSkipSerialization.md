@@ -49,7 +49,7 @@ op getBlob(@path name: string, ...CommonHeaders): {
 The model interface still includes the metadata property, it is only excluded from ser/deser.
 
 ```ts models interface BlobProperties
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -82,14 +82,16 @@ export function _getBlobSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).get({
-    ...operationOptionsToRequestParameters(options),
-    headers: {
-      ...(options?.requestId !== undefined ? { "x-ms-request-id": options?.requestId } : {}),
-      accept: "application/json",
-      ...options.requestOptions?.headers,
-    },
-  });
+  return context
+    .path(path)
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: {
+        ...(options?.requestId !== undefined ? { "x-ms-request-id": options?.requestId } : {}),
+        accept: "application/json",
+        ...options.requestOptions?.headers,
+      },
+    });
 }
 ```
 

@@ -64,7 +64,7 @@ experimental-extensible-enums: false
 Model generated.
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -79,16 +79,6 @@ export function _fooRequestBodySerializer(item: _FooRequestBody): any {
   return { status: provisioningStateSerializer(item["status"]) };
 }
 
-export function provisioningStateSerializer(item: ProvisioningState): any {
-  return item;
-}
-
-/** The available API versions. */
-export enum KnownVersions {
-  /** 2021-10-01-preview version */
-  V20211001Preview = "2021-10-01-preview",
-}
-
 /** The resource provisioning state. */
 export type ProvisioningState =
   | ResourceProvisioningState
@@ -97,6 +87,17 @@ export type ProvisioningState =
   | "Deleting"
   | "Accepted"
   | string;
+
+export function provisioningStateSerializer(item: ProvisioningState): any {
+  return item;
+}
+
 /** The provisioning state of a resource type. */
 export type ResourceProvisioningState = "Succeeded" | "Failed" | "Canceled";
+
+/** The available API versions. */
+export enum KnownVersions {
+  /** 2021-10-01-preview version */
+  V20211001Preview = "2021-10-01-preview",
+}
 ```

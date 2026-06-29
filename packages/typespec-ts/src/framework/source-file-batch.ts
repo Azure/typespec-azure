@@ -1,14 +1,8 @@
 import {
-  ClassDeclarationStructure,
-  EnumDeclarationStructure,
   ExportDeclarationStructure,
-  FunctionDeclarationStructure,
-  ImportDeclarationStructure,
-  InterfaceDeclarationStructure,
   SourceFile,
   StatementStructures,
   StructureKind,
-  TypeAliasDeclarationStructure,
 } from "ts-morph";
 
 /**
@@ -17,13 +11,11 @@ import {
  * Each individual `sourceFile.addInterface/addFunction/addExportDeclaration/...`
  * call re-parses the entire source file in ts-morph. Calling them in a loop
  * therefore grows as O(N × file_size). This module collects structures while
- * a batch is open and, on flush, issues one bulk call per `StructureKind`
- * (e.g. `addExportDeclarations([...])`), collapsing N re-parses into ≤7.
+ * a batch is open and, on flush, issues a single `addStatements` call per file,
+ * collapsing N re-parses into 1.
  *
  * The batch is reference-counted so nested begin/flush pairs compose safely.
- * Single-kind queues (e.g. only export declarations) flush in insertion order
- * and produce byte-identical output. Mixed-kind queues are grouped by kind on
- * flush, which preserves correctness but reorders statements within the file.
+ * Statements flush in insertion order and produce byte-identical output.
  */
 
 let batchDepth = 0;
@@ -54,7 +46,7 @@ export function flushSourceFileBatch(): void {
       if (statements.length === 0) {
         continue;
       }
-      writeBatched(sourceFile, statements);
+      sourceFile.addStatements(statements);
     }
   } finally {
     pendingByFile.clear();
@@ -77,7 +69,7 @@ export function enqueueStatement(sourceFile: SourceFile, structure: StatementStr
     pending.push(structure);
     return;
   }
-  writeOne(sourceFile, structure);
+  sourceFile.addStatements([structure]);
 }
 
 /**
@@ -144,94 +136,5 @@ function collectNamedExportNames(
     } else if (item) {
       into.add(item.alias ?? item.name);
     }
-  }
-}
-
-function writeBatched(sourceFile: SourceFile, statements: StatementStructures[]): void {
-  // Mixed-structure `addStatements` has an iterator-overrun bug in ts-morph
-  // 23 (`RangeParentHandler`). Split by kind and use the per-kind bulk APIs;
-  // each performs a single re-parse.
-  const interfaces: InterfaceDeclarationStructure[] = [];
-  const functions: FunctionDeclarationStructure[] = [];
-  const enums: EnumDeclarationStructure[] = [];
-  const typeAliases: TypeAliasDeclarationStructure[] = [];
-  const classes: ClassDeclarationStructure[] = [];
-  const exports: ExportDeclarationStructure[] = [];
-  const imports: ImportDeclarationStructure[] = [];
-  for (const s of statements) {
-    switch (s.kind) {
-      case StructureKind.Interface:
-        interfaces.push(s);
-        break;
-      case StructureKind.Function:
-        functions.push(s);
-        break;
-      case StructureKind.Enum:
-        enums.push(s);
-        break;
-      case StructureKind.TypeAlias:
-        typeAliases.push(s);
-        break;
-      case StructureKind.Class:
-        classes.push(s);
-        break;
-      case StructureKind.ExportDeclaration:
-        exports.push(s);
-        break;
-      case StructureKind.ImportDeclaration:
-        imports.push(s);
-        break;
-      default:
-        throw new Error(`Unsupported pending statement kind ${(s as any).kind}`);
-    }
-  }
-  if (imports.length > 0) {
-    sourceFile.addImportDeclarations(imports);
-  }
-  if (interfaces.length > 0) {
-    sourceFile.addInterfaces(interfaces);
-  }
-  if (functions.length > 0) {
-    sourceFile.addFunctions(functions);
-  }
-  if (enums.length > 0) {
-    sourceFile.addEnums(enums);
-  }
-  if (typeAliases.length > 0) {
-    sourceFile.addTypeAliases(typeAliases);
-  }
-  if (classes.length > 0) {
-    sourceFile.addClasses(classes);
-  }
-  if (exports.length > 0) {
-    sourceFile.addExportDeclarations(exports);
-  }
-}
-
-function writeOne(sourceFile: SourceFile, structure: StatementStructures): void {
-  switch (structure.kind) {
-    case StructureKind.Interface:
-      sourceFile.addInterface(structure);
-      break;
-    case StructureKind.Function:
-      sourceFile.addFunction(structure);
-      break;
-    case StructureKind.Enum:
-      sourceFile.addEnum(structure);
-      break;
-    case StructureKind.TypeAlias:
-      sourceFile.addTypeAlias(structure);
-      break;
-    case StructureKind.Class:
-      sourceFile.addClass(structure);
-      break;
-    case StructureKind.ExportDeclaration:
-      sourceFile.addExportDeclaration(structure);
-      break;
-    case StructureKind.ImportDeclaration:
-      sourceFile.addImportDeclaration(structure);
-      break;
-    default:
-      throw new Error(`Unsupported statement kind ${(structure as any).kind}`);
   }
 }

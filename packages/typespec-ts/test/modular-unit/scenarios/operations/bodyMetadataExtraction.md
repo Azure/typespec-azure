@@ -21,7 +21,7 @@ op bodyRootWithHeader(@bodyRoot body: RequestBody): void;
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -68,12 +68,14 @@ export function _bodyRootWithHeaderSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    headers: { foo: body.foo, ...options.requestOptions?.headers },
-    body: requestBodySerializer(body),
-  });
+  return context
+    .path(path)
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      headers: { foo: body.foo, ...options.requestOptions?.headers },
+      body: requestBodySerializer(body),
+    });
 }
 
 export async function _bodyRootWithHeaderDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -84,7 +86,6 @@ export async function _bodyRootWithHeaderDeserialize(result: PathUncheckedRespon
 
   return;
 }
-
 export async function bodyRootWithHeader(
   context: Client,
   body: RequestBody,
@@ -117,7 +118,7 @@ op createResource(body: ResourceBody): void;
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -163,11 +164,13 @@ export function _createResourceSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: { body: resourceBodySerializer(body) },
-  });
+  return context
+    .path(path)
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: { body: resourceBodySerializer(body) },
+    });
 }
 
 export async function _createResourceDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -178,7 +181,6 @@ export async function _createResourceDeserialize(result: PathUncheckedResponse):
 
   return;
 }
-
 export async function createResource(
   context: Client,
   body: ResourceBody,
@@ -211,7 +213,7 @@ op bodyRootWithOptionalHeader(@bodyRoot body: OptionalHeaderBody): void;
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -258,15 +260,17 @@ export function _bodyRootWithOptionalHeaderSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    headers: {
-      ...(body.foo !== undefined ? { foo: body.foo } : {}),
-      ...options.requestOptions?.headers,
-    },
-    body: optionalHeaderBodySerializer(body),
-  });
+  return context
+    .path(path)
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      headers: {
+        ...(body.foo !== undefined ? { foo: body.foo } : {}),
+        ...options.requestOptions?.headers,
+      },
+      body: optionalHeaderBodySerializer(body),
+    });
 }
 
 export async function _bodyRootWithOptionalHeaderDeserialize(
@@ -279,7 +283,6 @@ export async function _bodyRootWithOptionalHeaderDeserialize(
 
   return;
 }
-
 export async function bodyRootWithOptionalHeader(
   context: Client,
   body: OptionalHeaderBody,
@@ -311,7 +314,7 @@ op createOptionalPathResource(body: OptionalPathBody): void;
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -357,11 +360,13 @@ export function _createOptionalPathResourceSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: { body: optionalPathBodySerializer(body) },
-  });
+  return context
+    .path(path)
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: { body: optionalPathBodySerializer(body) },
+    });
 }
 
 export async function _createOptionalPathResourceDeserialize(
@@ -374,7 +379,6 @@ export async function _createOptionalPathResourceDeserialize(
 
   return;
 }
-
 export async function createOptionalPathResource(
   context: Client,
   body: OptionalPathBody,
@@ -407,7 +411,7 @@ op createOptionalPathResource(body?: OptionalBodyWithHeader): void;
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -453,17 +457,19 @@ export function _createOptionalPathResourceSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    headers: {
-      ...(options?.body?.foo !== undefined ? { foo: options?.body?.foo } : {}),
-      ...options.requestOptions?.headers,
-    },
-    body: {
-      body: !options?.body ? options?.body : optionalBodyWithHeaderSerializer(options?.body),
-    },
-  });
+  return context
+    .path(path)
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      headers: {
+        ...(options?.body?.foo !== undefined ? { foo: options?.body?.foo } : {}),
+        ...options.requestOptions?.headers,
+      },
+      body: {
+        body: !options?.body ? options?.body : optionalBodyWithHeaderSerializer(options?.body),
+      },
+    });
 }
 
 export async function _createOptionalPathResourceDeserialize(
@@ -476,7 +482,6 @@ export async function _createOptionalPathResourceDeserialize(
 
   return;
 }
-
 export async function createOptionalPathResource(
   context: Client,
   options: CreateOptionalPathResourceOptionalParams = { requestOptions: {} },

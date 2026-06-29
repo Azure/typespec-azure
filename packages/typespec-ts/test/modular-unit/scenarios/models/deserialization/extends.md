@@ -34,7 +34,7 @@ interface D {
 Generated Models.
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -45,24 +45,14 @@ export interface AWidgetData {
   kind: string;
 }
 
-/** model interface AoaiModelConfig */
-export interface AoaiModelConfig extends AWidgetData {
-  kind: "kind0";
-  fooProp: string;
-}
-
-/** model interface MaasModelConfig */
-export interface MaasModelConfig extends AWidgetData {
-  kind: "kind1";
-  start: Date;
-  end?: Date;
-}
-
 export function aWidgetDataDeserializer(item: any): AWidgetData {
   return {
     kind: item["kind"],
   };
 }
+
+/** Alias for AWidgetDataUnion */
+export type AWidgetDataUnion = AoaiModelConfig | MaasModelConfig | AWidgetData;
 
 export function aWidgetDataUnionDeserializer(item: any): AWidgetDataUnion {
   switch (item["kind"]) {
@@ -77,11 +67,24 @@ export function aWidgetDataUnionDeserializer(item: any): AWidgetDataUnion {
   }
 }
 
+/** model interface AoaiModelConfig */
+export interface AoaiModelConfig extends AWidgetData {
+  kind: "kind0";
+  fooProp: string;
+}
+
 export function aoaiModelConfigDeserializer(item: any): AoaiModelConfig {
   return {
     kind: item["kind"],
     fooProp: item["fooProp"],
   };
+}
+
+/** model interface MaasModelConfig */
+export interface MaasModelConfig extends AWidgetData {
+  kind: "kind1";
+  start: Date;
+  end?: Date;
 }
 
 export function maasModelConfigDeserializer(item: any): MaasModelConfig {
@@ -91,9 +94,6 @@ export function maasModelConfigDeserializer(item: any): MaasModelConfig {
     end: !item["end"] ? item["end"] : new Date(item["end"]),
   };
 }
-
-/** Alias for AWidgetDataUnion */
-export type AWidgetDataUnion = AoaiModelConfig | MaasModelConfig | AWidgetData;
 ```
 
 # Should generate discriminator property with union type
@@ -169,7 +169,7 @@ interface D {
 Generated Models.
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -181,33 +181,19 @@ export interface DiscountTypeProperties {
   discountPercentage?: number;
 }
 
-/** model interface DiscountTypeProductFamily */
-export interface DiscountTypeProductFamily extends DiscountTypeProperties {
-  productFamilyName?: string;
-  discountType: "ProductFamily";
-}
-
-/** model interface DiscountTypeProduct */
-export interface DiscountTypeProduct extends DiscountTypeProperties {
-  productFamilyName?: string;
-  productId?: string;
-  discountType: "Product";
-}
-
-/** model interface DiscountTypeProductSku */
-export interface DiscountTypeProductSku extends DiscountTypeProperties {
-  productFamilyName?: string;
-  productId?: string;
-  skuId?: string;
-  discountType: "Sku";
-}
-
 export function discountTypePropertiesDeserializer(item: any): DiscountTypeProperties {
   return {
     discountType: item["discountType"],
     discountPercentage: item["discountPercentage"],
   };
 }
+
+/** Alias for DiscountTypePropertiesUnion */
+export type DiscountTypePropertiesUnion =
+  | DiscountTypeProductFamily
+  | DiscountTypeProduct
+  | DiscountTypeProductSku
+  | DiscountTypeProperties;
 
 export function discountTypePropertiesUnionDeserializer(item: any): DiscountTypePropertiesUnion {
   switch (item["discountType"]) {
@@ -225,12 +211,33 @@ export function discountTypePropertiesUnionDeserializer(item: any): DiscountType
   }
 }
 
+/** Type of DiscountType */
+export type DiscountType =
+  | "ProductFamily"
+  | "Product"
+  | "Sku"
+  | "CustomPrice"
+  | "CustomPriceMultiCurrency";
+
+/** model interface DiscountTypeProductFamily */
+export interface DiscountTypeProductFamily extends DiscountTypeProperties {
+  productFamilyName?: string;
+  discountType: "ProductFamily";
+}
+
 export function discountTypeProductFamilyDeserializer(item: any): DiscountTypeProductFamily {
   return {
     discountType: item["discountType"],
     discountPercentage: item["discountPercentage"],
     productFamilyName: item["productFamilyName"],
   };
+}
+
+/** model interface DiscountTypeProduct */
+export interface DiscountTypeProduct extends DiscountTypeProperties {
+  productFamilyName?: string;
+  productId?: string;
+  discountType: "Product";
 }
 
 export function discountTypeProductDeserializer(item: any): DiscountTypeProduct {
@@ -242,6 +249,14 @@ export function discountTypeProductDeserializer(item: any): DiscountTypeProduct 
   };
 }
 
+/** model interface DiscountTypeProductSku */
+export interface DiscountTypeProductSku extends DiscountTypeProperties {
+  productFamilyName?: string;
+  productId?: string;
+  skuId?: string;
+  discountType: "Sku";
+}
+
 export function discountTypeProductSkuDeserializer(item: any): DiscountTypeProductSku {
   return {
     discountType: item["discountType"],
@@ -251,20 +266,6 @@ export function discountTypeProductSkuDeserializer(item: any): DiscountTypeProdu
     skuId: item["skuId"],
   };
 }
-
-/** Alias for DiscountTypePropertiesUnion */
-export type DiscountTypePropertiesUnion =
-  | DiscountTypeProductFamily
-  | DiscountTypeProduct
-  | DiscountTypeProductSku
-  | DiscountTypeProperties;
-/** Type of DiscountType */
-export type DiscountType =
-  | "ProductFamily"
-  | "Product"
-  | "Sku"
-  | "CustomPrice"
-  | "CustomPriceMultiCurrency";
 ```
 
 # Should correctly handle PascalCase discriminator property names
@@ -323,7 +324,7 @@ mustEmptyDiagnostic: false
 Generated Models.
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -334,20 +335,6 @@ export interface DocumentIngress {
   documentType: DocumentType;
   documentStreamIds?: string[];
   properties?: string[];
-}
-
-/** model interface Request */
-export interface Request extends DocumentIngress {
-  documentType: "Request";
-  name?: string;
-  url?: string;
-}
-
-/** model interface Exception */
-export interface Exception extends DocumentIngress {
-  documentType: "Exception";
-  exceptionType?: string;
-  exceptionMessage?: string;
 }
 
 export function documentIngressSerializer(item: DocumentIngress): any {
@@ -382,6 +369,9 @@ export function documentIngressDeserializer(item: any): DocumentIngress {
   };
 }
 
+/** Alias for DocumentIngressUnion */
+export type DocumentIngressUnion = Request | Exception | DocumentIngress;
+
 export function documentIngressUnionSerializer(item: DocumentIngressUnion): any {
   switch (item.documentType) {
     case "Request":
@@ -406,6 +396,22 @@ export function documentIngressUnionDeserializer(item: any): DocumentIngressUnio
     default:
       return documentIngressDeserializer(item);
   }
+}
+
+/** Document type */
+export type DocumentType =
+  | "Request"
+  | "RemoteDependency"
+  | "Exception"
+  | "Event"
+  | "Trace"
+  | "Unknown";
+
+/** model interface Request */
+export interface Request extends DocumentIngress {
+  documentType: "Request";
+  name?: string;
+  url?: string;
 }
 
 export function requestSerializer(item: Request): any {
@@ -444,6 +450,13 @@ export function requestDeserializer(item: any): Request {
   };
 }
 
+/** model interface Exception */
+export interface Exception extends DocumentIngress {
+  documentType: "Exception";
+  exceptionType?: string;
+  exceptionMessage?: string;
+}
+
 export function exceptionSerializer(item: Exception): any {
   return {
     DocumentType: item["documentType"],
@@ -479,17 +492,6 @@ export function exceptionDeserializer(item: any): Exception {
     exceptionMessage: item["ExceptionMessage"],
   };
 }
-
-/** Alias for DocumentIngressUnion */
-export type DocumentIngressUnion = Request | Exception | DocumentIngress;
-/** Document type */
-export type DocumentType =
-  | "Request"
-  | "RemoteDependency"
-  | "Exception"
-  | "Event"
-  | "Trace"
-  | "Unknown";
 ```
 
 # Should generate serializers for TCGC `@hierarchyBuilding` with discriminator property
@@ -569,7 +571,7 @@ mustEmptyDiagnostic: false
 Generated Models.
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -584,20 +586,6 @@ export interface Animal {
   name: string;
 }
 
-/** model interface Pet */
-export interface Pet extends Animal {
-  kind: "pet" | "dog";
-  /** Whether the pet is trained */
-  trained: boolean;
-}
-
-/** model interface Dog */
-export interface Dog extends Pet {
-  kind: "dog";
-  /** The breed of the dog */
-  breed: string;
-}
-
 export function animalSerializer(item: Animal): any {
   return { kind: item["kind"], name: item["name"] };
 }
@@ -608,6 +596,9 @@ export function animalDeserializer(item: any): Animal {
     name: item["name"],
   };
 }
+
+/** Alias for AnimalUnion */
+export type AnimalUnion = PetUnion | Animal;
 
 export function animalUnionSerializer(item: AnimalUnion): any {
   switch (item.kind) {
@@ -631,6 +622,13 @@ export function animalUnionDeserializer(item: any): AnimalUnion {
   }
 }
 
+/** model interface Pet */
+export interface Pet extends Animal {
+  kind: "pet" | "dog";
+  /** Whether the pet is trained */
+  trained: boolean;
+}
+
 export function petSerializer(item: Pet): any {
   return { kind: item["kind"], name: item["name"], trained: item["trained"] };
 }
@@ -642,6 +640,9 @@ export function petDeserializer(item: any): Pet {
     trained: item["trained"],
   };
 }
+
+/** Alias for PetUnion */
+export type PetUnion = Dog | Pet;
 
 export function petUnionSerializer(item: PetUnion): any {
   switch (item.kind) {
@@ -661,6 +662,13 @@ export function petUnionDeserializer(item: any): PetUnion {
     default:
       return petDeserializer(item);
   }
+}
+
+/** model interface Dog */
+export interface Dog extends Pet {
+  kind: "dog";
+  /** The breed of the dog */
+  breed: string;
 }
 
 export function dogSerializer(item: Dog): any {
@@ -685,9 +693,4 @@ export enum KnownVersions {
   /** 2024-08-01-preview */
   V20240801Preview = "2024-08-01-preview",
 }
-
-/** Alias for AnimalUnion */
-export type AnimalUnion = PetUnion | Animal;
-/** Alias for PetUnion */
-export type PetUnion = Dog | Pet;
 ```

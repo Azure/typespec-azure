@@ -45,11 +45,13 @@ export function _readSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "text/plain",
-    body: parameters,
-  });
+  return context
+    .path(path)
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "text/plain",
+      body: parameters,
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -60,7 +62,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
-
 export async function read(
   context: Client,
   pathParam: string,

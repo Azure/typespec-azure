@@ -25,7 +25,7 @@ op stopTest(
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -38,17 +38,17 @@ export interface StopParameters {
   wasSuccessful?: boolean;
 }
 
-/** model interface _StopTestParameterBody */
-export interface _StopTestParameterBody {
-  stopParameters: StopParameters;
-}
-
 export function stopParametersSerializer(item: StopParameters): any {
   return {
     category: item["category"],
     linkType: item["linkType"],
     wasSuccessful: item["wasSuccessful"],
   };
+}
+
+/** model interface _StopTestParameterBody */
+export interface _StopTestParameterBody {
+  stopParameters: StopParameters;
 }
 
 export function _stopTestParameterBodySerializer(item: _StopTestParameterBody): any {
@@ -76,11 +76,13 @@ export function _stopTestSend(
   },
   options: StopTestOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/stop").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: stopParametersSerializer(body.stopParameters),
-  });
+  return context
+    .path("/stop")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: stopParametersSerializer(body.stopParameters),
+    });
 }
 
 export async function _stopTestDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -91,7 +93,6 @@ export async function _stopTestDeserialize(result: PathUncheckedResponse): Promi
 
   return;
 }
-
 export async function stopTest(
   context: Client,
   body: {
@@ -144,13 +145,15 @@ export function _stopOptionalWrapperTestSend(
   context: Client,
   options: StopOptionalWrapperTestOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/stop-optional-wrapper").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: !options?.body?.stopParameters
-      ? options?.body?.stopParameters
-      : stopParametersSerializer(options?.body?.stopParameters),
-  });
+  return context
+    .path("/stop-optional-wrapper")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: !options?.body?.stopParameters
+        ? options?.body?.stopParameters
+        : stopParametersSerializer(options?.body?.stopParameters),
+    });
 }
 
 export async function _stopOptionalWrapperTestDeserialize(
@@ -163,7 +166,6 @@ export async function _stopOptionalWrapperTestDeserialize(
 
   return;
 }
-
 export async function stopOptionalWrapperTest(
   context: Client,
   options: StopOptionalWrapperTestOptionalParams = { requestOptions: {} },
@@ -216,13 +218,15 @@ export function _stopOptionalPropTestSend(
   },
   options: StopOptionalPropTestOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/stop-optional-prop").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: !body.stopParameters
-      ? body.stopParameters
-      : stopParametersSerializer(body.stopParameters),
-  });
+  return context
+    .path("/stop-optional-prop")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: !body.stopParameters
+        ? body.stopParameters
+        : stopParametersSerializer(body.stopParameters),
+    });
 }
 
 export async function _stopOptionalPropTestDeserialize(
@@ -235,7 +239,6 @@ export async function _stopOptionalPropTestDeserialize(
 
   return;
 }
-
 export async function stopOptionalPropTest(
   context: Client,
   body: {
@@ -288,13 +291,15 @@ export function _stopBothOptionalTestSend(
   context: Client,
   options: StopBothOptionalTestOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/stop-both-optional").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: !options?.body?.stopParameters
-      ? options?.body?.stopParameters
-      : stopParametersSerializer(options?.body?.stopParameters),
-  });
+  return context
+    .path("/stop-both-optional")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: !options?.body?.stopParameters
+        ? options?.body?.stopParameters
+        : stopParametersSerializer(options?.body?.stopParameters),
+    });
 }
 
 export async function _stopBothOptionalTestDeserialize(
@@ -307,7 +312,6 @@ export async function _stopBothOptionalTestDeserialize(
 
   return;
 }
-
 export async function stopBothOptionalTest(
   context: Client,
   options: StopBothOptionalTestOptionalParams = { requestOptions: {} },

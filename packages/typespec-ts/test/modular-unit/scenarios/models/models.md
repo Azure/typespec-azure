@@ -16,7 +16,7 @@ op read(@path id: string, @body body: StreamingChatCompletionOptions): {
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -79,12 +79,14 @@ export function _readSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-    body: streamingChatCompletionOptionsSerializer(body),
-  });
+  return context
+    .path(path)
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+      body: streamingChatCompletionOptionsSerializer(body),
+    });
 }
 
 export async function _readDeserialize(
@@ -97,7 +99,6 @@ export async function _readDeserialize(
 
   return streamingChatCompletionOptionsDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   id: string,
@@ -146,12 +147,14 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    headers: { accept: "text/plain", ...options.requestOptions?.headers },
-    body: { stream: true, messages: "aaaaa", index: 123 },
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      headers: { accept: "text/plain", ...options.requestOptions?.headers },
+      body: { stream: true, messages: "aaaaa", index: 123 },
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<true> {
@@ -162,7 +165,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<t
 
   return result.body;
 }
-
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },

@@ -26,10 +26,12 @@ export function _$continueSend(
   context: Client,
   options: ContinueOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _$continueDeserialize(result: PathUncheckedResponse): Promise<Test> {
@@ -40,7 +42,6 @@ export async function _$continueDeserialize(result: PathUncheckedResponse): Prom
 
   return testDeserializer(result.body);
 }
-
 /**
  *  @fixme continue is a reserved word that cannot be used as an operation name.
  *         Please add @clientName("clientName") or @clientName("<JS-Specific-Name>", "javascript")
@@ -83,10 +84,12 @@ export function _$returnSend(
   context: Client,
   options: ReturnOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _$returnDeserialize(result: PathUncheckedResponse): Promise<Test> {
@@ -97,7 +100,6 @@ export async function _$returnDeserialize(result: PathUncheckedResponse): Promis
 
   return testDeserializer(result.body);
 }
-
 /**
  *  @fixme return is a reserved word that cannot be used as an operation name.
  *         Please add @clientName("clientName") or @clientName("<JS-Specific-Name>", "javascript")
@@ -140,10 +142,12 @@ export function _globalSend(
   context: Client,
   options: GlobalOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _globalDeserialize(result: PathUncheckedResponse): Promise<Test> {
@@ -154,7 +158,6 @@ export async function _globalDeserialize(result: PathUncheckedResponse): Promise
 
   return testDeserializer(result.body);
 }
-
 export async function global(
   context: Client,
   options: GlobalOptionalParams = { requestOptions: {} },

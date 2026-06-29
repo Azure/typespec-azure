@@ -74,7 +74,7 @@ experimental-extensible-enums: true
 Generated Models.
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -242,19 +242,31 @@ export function simpleModelDeserializer(item: any): SimpleModel {
   };
 }
 
+/** Alias for _SimpleModelPropNumericUnion */
+export type _SimpleModelPropNumericUnion = string | number;
+
 export function _simpleModelPropNumericUnionDeserializer(item: any): _SimpleModelPropNumericUnion {
   return item;
 }
 
+/** Alias for _SimpleModelPropSimpleUnion */
+export type _SimpleModelPropSimpleUnion = string | boolean | number;
+
 export function _simpleModelPropSimpleUnionDeserializer(item: any): _SimpleModelPropSimpleUnion {
   return item;
 }
+
+/** Alias for _SimpleModelPropSimpleUnionOptional */
+export type _SimpleModelPropSimpleUnionOptional = string | boolean | number;
 
 export function _simpleModelPropSimpleUnionOptionalDeserializer(
   item: any,
 ): _SimpleModelPropSimpleUnionOptional {
   return item;
 }
+
+/** Alias for _SimpleModelPropMixedTypeLiteral */
+export type _SimpleModelPropMixedTypeLiteral = "A" | false | 1;
 
 export function _simpleModelPropMixedTypeLiteralDeserializer(
   item: any,
@@ -270,6 +282,9 @@ export function _simpleModelPropSimpleUnionArrayArrayDeserializer(
   });
 }
 
+/** Alias for _SimpleModelPropSimpleUnionArray */
+export type _SimpleModelPropSimpleUnionArray = string | boolean | number;
+
 export function _simpleModelPropSimpleUnionArrayDeserializer(
   item: any,
 ): _SimpleModelPropSimpleUnionArray {
@@ -283,6 +298,9 @@ export function _simpleModelPropSimpleUnionArrayOptionalArrayDeserializer(
     return _simpleModelPropSimpleUnionArrayOptionalDeserializer(item);
   });
 }
+
+/** Alias for _SimpleModelPropSimpleUnionArrayOptional */
+export type _SimpleModelPropSimpleUnionArrayOptional = string | boolean | number;
 
 export function _simpleModelPropSimpleUnionArrayOptionalDeserializer(
   item: any,
@@ -301,6 +319,9 @@ export function _simpleModelPropRecordOfSimpleUnionRecordDeserializer(
   });
   return result;
 }
+
+/** Alias for _SimpleModelPropRecordOfSimpleUnion */
+export type _SimpleModelPropRecordOfSimpleUnion = string | boolean | number;
 
 export function _simpleModelPropRecordOfSimpleUnionDeserializer(
   item: any,
@@ -328,6 +349,9 @@ export function _simpleModelPropRecordOfUnionArrayArrayDeserializer(
   });
 }
 
+/** Alias for _SimpleModelPropRecordOfUnionArray */
+export type _SimpleModelPropRecordOfUnionArray = string | boolean | number;
+
 export function _simpleModelPropRecordOfUnionArrayDeserializer(
   item: any,
 ): _SimpleModelPropRecordOfUnionArray {
@@ -353,6 +377,9 @@ export function _simpleModelPropRecordOfUnionArrayOptionalArrayDeserializer(
     return _simpleModelPropRecordOfUnionArrayOptionalDeserializer(item);
   });
 }
+
+/** Alias for _SimpleModelPropRecordOfUnionArrayOptional */
+export type _SimpleModelPropRecordOfUnionArrayOptional = string | boolean | number;
 
 export function _simpleModelPropRecordOfUnionArrayOptionalDeserializer(
   item: any,
@@ -380,6 +407,9 @@ export function _simpleModelPropArrayOfRecordOfUnionRecordDeserializer(
   return result;
 }
 
+/** Alias for _SimpleModelPropArrayOfRecordOfUnion */
+export type _SimpleModelPropArrayOfRecordOfUnion = string | boolean | number;
+
 export function _simpleModelPropArrayOfRecordOfUnionDeserializer(
   item: any,
 ): _SimpleModelPropArrayOfRecordOfUnion {
@@ -406,32 +436,12 @@ export function _simpleModelPropArrayOfRecordOfUnionOptionalRecordDeserializer(
   return result;
 }
 
+/** Alias for _SimpleModelPropArrayOfRecordOfUnionOptional */
+export type _SimpleModelPropArrayOfRecordOfUnionOptional = string | boolean | number;
+
 export function _simpleModelPropArrayOfRecordOfUnionOptionalDeserializer(
   item: any,
 ): _SimpleModelPropArrayOfRecordOfUnionOptional {
   return item;
 }
-
-/** Alias for _SimpleModelPropNumericUnion */
-export type _SimpleModelPropNumericUnion = string | number;
-/** Alias for _SimpleModelPropSimpleUnion */
-export type _SimpleModelPropSimpleUnion = string | boolean | number;
-/** Alias for _SimpleModelPropSimpleUnionOptional */
-export type _SimpleModelPropSimpleUnionOptional = string | boolean | number;
-/** Alias for _SimpleModelPropMixedTypeLiteral */
-export type _SimpleModelPropMixedTypeLiteral = "A" | false | 1;
-/** Alias for _SimpleModelPropSimpleUnionArray */
-export type _SimpleModelPropSimpleUnionArray = string | boolean | number;
-/** Alias for _SimpleModelPropSimpleUnionArrayOptional */
-export type _SimpleModelPropSimpleUnionArrayOptional = string | boolean | number;
-/** Alias for _SimpleModelPropRecordOfSimpleUnion */
-export type _SimpleModelPropRecordOfSimpleUnion = string | boolean | number;
-/** Alias for _SimpleModelPropRecordOfUnionArray */
-export type _SimpleModelPropRecordOfUnionArray = string | boolean | number;
-/** Alias for _SimpleModelPropRecordOfUnionArrayOptional */
-export type _SimpleModelPropRecordOfUnionArrayOptional = string | boolean | number;
-/** Alias for _SimpleModelPropArrayOfRecordOfUnion */
-export type _SimpleModelPropArrayOfRecordOfUnion = string | boolean | number;
-/** Alias for _SimpleModelPropArrayOfRecordOfUnionOptional */
-export type _SimpleModelPropArrayOfRecordOfUnionOptional = string | boolean | number;
 ```

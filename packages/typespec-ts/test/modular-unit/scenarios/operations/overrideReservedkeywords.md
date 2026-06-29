@@ -84,11 +84,13 @@ export function _checkNameAvailabilitySend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: { name: name, type: typeParam },
-  });
+  return context
+    .path(path)
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: { name: name, type: typeParam },
+    });
 }
 
 export async function _checkNameAvailabilityDeserialize(
@@ -106,7 +108,6 @@ export async function _checkNameAvailabilityDeserialize(
 
   return;
 }
-
 export async function checkNameAvailability(
   context: Client,
   apiVersion: string,

@@ -84,7 +84,6 @@ export async function _getSecretOriginalDeserialize(result: PathUncheckedRespons
 
   return;
 }
-
 export async function getSecretOriginal(
   context: Client,
   secretName: string,
@@ -138,7 +137,7 @@ withRawContent: true
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -206,7 +205,6 @@ export async function _groupOriginalDeserialize(result: PathUncheckedResponse): 
 
   return;
 }
-
 export async function groupOriginal(
   context: Client,
   options: GroupParametersOptions,
@@ -303,13 +301,15 @@ export function _removeOptionalOriginalSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).get({
-    ...operationOptionsToRequestParameters(options),
-    headers: {
-      ...(options?.param4 !== undefined ? { param4: options?.param4 } : {}),
-      ...options.requestOptions?.headers,
-    },
-  });
+  return context
+    .path(path)
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: {
+        ...(options?.param4 !== undefined ? { param4: options?.param4 } : {}),
+        ...options.requestOptions?.headers,
+      },
+    });
 }
 
 export async function _removeOptionalOriginalDeserialize(
@@ -322,7 +322,6 @@ export async function _removeOptionalOriginalDeserialize(
 
   return;
 }
-
 export async function removeOptionalOriginal(
   context: Client,
   param1: string,
@@ -418,15 +417,17 @@ export function _changeOptionalityOriginalSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).get({
-    ...operationOptionsToRequestParameters(options),
-    headers: {
-      ...(options?.requiredHeader !== undefined
-        ? { "required-header": options?.requiredHeader }
-        : {}),
-      ...options.requestOptions?.headers,
-    },
-  });
+  return context
+    .path(path)
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: {
+        ...(options?.requiredHeader !== undefined
+          ? { "required-header": options?.requiredHeader }
+          : {}),
+        ...options.requestOptions?.headers,
+      },
+    });
 }
 
 export async function _changeOptionalityOriginalDeserialize(
@@ -439,7 +440,6 @@ export async function _changeOptionalityOriginalDeserialize(
 
   return;
 }
-
 export async function changeOptionalityOriginal(
   context: Client,
   param1: string,

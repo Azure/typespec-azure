@@ -83,10 +83,12 @@ export function _getWidgetOperationStatusSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path(path)
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _getWidgetOperationStatusDeserialize(
@@ -99,7 +101,6 @@ export async function _getWidgetOperationStatusDeserialize(
 
   return resourceOperationStatusWidgetSuiteWidgetSuiteErrorDeserializer(result.body);
 }
-
 /** Get the status of a long-running operation on widgets. */
 export async function getWidgetOperationStatus(
   context: Client,
@@ -122,14 +123,14 @@ export async function getWidgetOperationStatus(
 Generate the models
 
 ```ts models
-import { ErrorModel } from "@azure-rest/core-client";
-
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import { ErrorModel } from "@azure-rest/core-client";
+
 /** Provides status details for long running operations. */
 export interface ResourceOperationStatusWidgetSuiteWidgetSuiteError {
   /** The unique ID of the operation. */
@@ -140,24 +141,6 @@ export interface ResourceOperationStatusWidgetSuiteWidgetSuiteError {
   error?: ErrorModel;
   /** The result of the operation. */
   result?: WidgetSuite;
-}
-
-/** A widget. */
-export interface WidgetSuite {
-  /** The widget name. */
-  name: string;
-  /** The ID of the widget's manufacturer. */
-  manufacturerId: string;
-  /** The faked shared model. */
-  sharedModel?: FakedSharedModel;
-}
-
-/** Faked shared model */
-export interface FakedSharedModel {
-  /** The tag. */
-  tag: string;
-  /** The created date. */
-  createdAt: string;
 }
 
 export function resourceOperationStatusWidgetSuiteWidgetSuiteErrorDeserializer(
@@ -171,6 +154,19 @@ export function resourceOperationStatusWidgetSuiteWidgetSuiteErrorDeserializer(
   };
 }
 
+/** Enum describing allowed operation states. */
+export type OperationState = "NotStarted" | "Running" | "Succeeded" | "Failed" | "Canceled";
+
+/** A widget. */
+export interface WidgetSuite {
+  /** The widget name. */
+  name: string;
+  /** The ID of the widget's manufacturer. */
+  manufacturerId: string;
+  /** The faked shared model. */
+  sharedModel?: FakedSharedModel;
+}
+
 export function widgetSuiteDeserializer(item: any): WidgetSuite {
   return {
     name: item["name"],
@@ -181,13 +177,18 @@ export function widgetSuiteDeserializer(item: any): WidgetSuite {
   };
 }
 
+/** Faked shared model */
+export interface FakedSharedModel {
+  /** The tag. */
+  tag: string;
+  /** The created date. */
+  createdAt: string;
+}
+
 export function fakedSharedModelDeserializer(item: any): FakedSharedModel {
   return {
     tag: item["tag"],
     createdAt: item["createdAt"],
   };
 }
-
-/** Enum describing allowed operation states. */
-export type OperationState = "NotStarted" | "Running" | "Succeeded" | "Failed" | "Canceled";
 ```

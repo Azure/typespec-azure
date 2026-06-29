@@ -76,17 +76,19 @@ export function _postSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    headers: {
-      ...(options?.headerParam !== undefined ? { header_param: options?.headerParam } : {}),
-      ...options.requestOptions?.headers,
-    },
-    body: !options?.listCredentialsRequest
-      ? options?.listCredentialsRequest
-      : listCredentialsRequestSerializer(options?.listCredentialsRequest),
-  });
+  return context
+    .path(path)
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      headers: {
+        ...(options?.headerParam !== undefined ? { header_param: options?.headerParam } : {}),
+        ...options.requestOptions?.headers,
+      },
+      body: !options?.listCredentialsRequest
+        ? options?.listCredentialsRequest
+        : listCredentialsRequestSerializer(options?.listCredentialsRequest),
+    });
 }
 
 export async function _postDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -97,7 +99,6 @@ export async function _postDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
-
 /** show example demo */
 export async function post(
   context: Client,

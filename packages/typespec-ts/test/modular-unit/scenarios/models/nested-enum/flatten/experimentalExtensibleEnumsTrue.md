@@ -64,7 +64,7 @@ experimental-extensible-enums: true
 Model generated.
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -97,12 +97,6 @@ export enum KnownProvisioningState {
   Accepted = "Accepted",
 }
 
-/** The available API versions. */
-export enum KnownVersions {
-  /** 2021-10-01-preview version */
-  V20211001Preview = "2021-10-01-preview",
-}
-
 /**
  * The resource provisioning state. \
  * {@link KnownProvisioningState} can be used interchangeably with ProvisioningState,
@@ -117,4 +111,10 @@ export enum KnownVersions {
  * **Accepted**: The resource create request has been accepted
  */
 export type ProvisioningState = string;
+
+/** The available API versions. */
+export enum KnownVersions {
+  /** 2021-10-01-preview version */
+  V20211001Preview = "2021-10-01-preview",
+}
 ```

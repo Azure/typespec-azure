@@ -38,7 +38,7 @@ needTCGC: true
 Model generated.
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -51,17 +51,6 @@ export interface Test {
   baz: A[];
 }
 
-/** model interface FooProperties */
-export interface FooProperties {
-  bar?: A[];
-  baz: A[];
-}
-
-/** model interface A */
-export interface A {
-  x: string;
-}
-
 export function testSerializer(item: Test): any {
   return { result: item["result"], properties: _testPropertiesSerializer(item) };
 }
@@ -71,6 +60,12 @@ export function testDeserializer(item: any): Test {
     result: item["result"],
     ..._testPropertiesDeserializer(item["properties"]),
   };
+}
+
+/** model interface FooProperties */
+export interface FooProperties {
+  bar?: A[];
+  baz: A[];
 }
 
 export function fooPropertiesSerializer(item: FooProperties): any {
@@ -99,6 +94,11 @@ export function aArrayDeserializer(result: Array<A>): any[] {
   });
 }
 
+/** model interface A */
+export interface A {
+  x: string;
+}
+
 export function aSerializer(item: A): any {
   return { x: item["x"] };
 }
@@ -107,6 +107,12 @@ export function aDeserializer(item: any): A {
   return {
     x: item["x"],
   };
+}
+
+/** Known values of {@link Versions} that the service accepts. */
+export enum KnownVersions {
+  /** 2022-05-15-preview */
+  V20220515Preview = "2022-05-15-preview",
 }
 
 export function _testPropertiesSerializer(item: Test): any {
@@ -121,12 +127,6 @@ export function _testPropertiesDeserializer(item: any) {
     bar: !item["bar"] ? item["bar"] : aArrayDeserializer(item["bar"]),
     baz: aArrayDeserializer(item["baz"]),
   };
-}
-
-/** Known values of {@link Versions} that the service accepts. */
-export enum KnownVersions {
-  /** 2022-05-15-preview */
-  V20220515Preview = "2022-05-15-preview",
 }
 ```
 
@@ -170,30 +170,19 @@ needTCGC: true
 Model generated.
 
 ```ts models
-import { areAllPropsUndefined } from "../static-helpers/serialization/check-prop-undefined.js";
-
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import { areAllPropsUndefined } from "../static-helpers/serialization/check-prop-undefined.js";
+
 /** model interface Test */
 export interface Test {
   result: string;
   bar?: A[];
   baz?: A[];
-}
-
-/** model interface FooProperties */
-export interface FooProperties {
-  bar?: A[];
-  baz: A[];
-}
-
-/** model interface A */
-export interface A {
-  x: string;
 }
 
 export function testSerializer(item: Test): any {
@@ -210,6 +199,12 @@ export function testDeserializer(item: any): Test {
     result: item["result"],
     ...(!item["properties"] ? item["properties"] : _testPropertiesDeserializer(item["properties"])),
   };
+}
+
+/** model interface FooProperties */
+export interface FooProperties {
+  bar?: A[];
+  baz: A[];
 }
 
 export function fooPropertiesSerializer(item: FooProperties): any {
@@ -238,6 +233,11 @@ export function aArrayDeserializer(result: Array<A>): any[] {
   });
 }
 
+/** model interface A */
+export interface A {
+  x: string;
+}
+
 export function aSerializer(item: A): any {
   return { x: item["x"] };
 }
@@ -246,6 +246,12 @@ export function aDeserializer(item: any): A {
   return {
     x: item["x"],
   };
+}
+
+/** Known values of {@link Versions} that the service accepts. */
+export enum KnownVersions {
+  /** 2022-05-15-preview */
+  V20220515Preview = "2022-05-15-preview",
 }
 
 export function _testPropertiesSerializer(item: Test): any {
@@ -260,12 +266,6 @@ export function _testPropertiesDeserializer(item: any) {
     bar: !item["bar"] ? item["bar"] : aArrayDeserializer(item["bar"]),
     baz: !item["baz"] ? item["baz"] : aArrayDeserializer(item["baz"]),
   };
-}
-
-/** Known values of {@link Versions} that the service accepts. */
-export enum KnownVersions {
-  /** 2022-05-15-preview */
-  V20220515Preview = "2022-05-15-preview",
 }
 ```
 
@@ -309,7 +309,7 @@ needTCGC: true
 Model generated.
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -321,10 +321,18 @@ export interface Test {
   foo: TestFoo;
 }
 
+export function testSerializer(item: Test): any {
+  return { result: item["result"], foo: testFooSerializer(item["foo"]) };
+}
+
 /** model interface TestFoo */
 export interface TestFoo {
   bar?: string;
   baz: string;
+}
+
+export function testFooSerializer(item: TestFoo): any {
+  return { properties: _testFooPropertiesSerializer(item) };
 }
 
 /** model interface FooProperties */
@@ -333,19 +341,7 @@ export interface FooProperties {
   baz: string;
 }
 
-export function testSerializer(item: Test): any {
-  return { result: item["result"], foo: testFooSerializer(item["foo"]) };
-}
-
-export function testFooSerializer(item: TestFoo): any {
-  return { properties: _testFooPropertiesSerializer(item) };
-}
-
 export function fooPropertiesSerializer(item: FooProperties): any {
-  return { bar: item["bar"], baz: item["baz"] };
-}
-
-export function _testFooPropertiesSerializer(item: TestFoo): any {
   return { bar: item["bar"], baz: item["baz"] };
 }
 
@@ -353,6 +349,10 @@ export function _testFooPropertiesSerializer(item: TestFoo): any {
 export enum KnownVersions {
   /** 2022-05-15-preview */
   V20220515Preview = "2022-05-15-preview",
+}
+
+export function _testFooPropertiesSerializer(item: TestFoo): any {
+  return { bar: item["bar"], baz: item["baz"] };
 }
 ```
 
@@ -400,32 +400,20 @@ needTCGC: true
 Model generated.
 
 ```ts models
-import { areAllPropsUndefined } from "../static-helpers/serialization/check-prop-undefined.js";
-
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import { areAllPropsUndefined } from "../static-helpers/serialization/check-prop-undefined.js";
+
 /** model interface Test */
 export interface Test {
   result: string;
   readonly readOnlyProp?: string;
   baz?: "baz";
   bar?: string;
-}
-
-/** model interface FooProperties */
-export interface FooProperties extends Baz {
-  bar?: string;
-  baz: "baz";
-}
-
-/** model interface Baz */
-export interface Baz {
-  readonly readOnlyProp: string;
-  baz: string;
 }
 
 export function testSerializer(item: Test): any {
@@ -444,6 +432,12 @@ export function testDeserializer(item: any): Test {
   };
 }
 
+/** model interface FooProperties */
+export interface FooProperties extends Baz {
+  bar?: string;
+  baz: "baz";
+}
+
 export function fooPropertiesSerializer(item: FooProperties): any {
   return { baz: item["baz"], bar: item["bar"] };
 }
@@ -454,6 +448,12 @@ export function fooPropertiesDeserializer(item: any): FooProperties {
     baz: item["baz"],
     bar: item["bar"],
   };
+}
+
+/** model interface Baz */
+export interface Baz {
+  readonly readOnlyProp: string;
+  baz: string;
 }
 
 export function bazSerializer(item: Baz): any {
@@ -467,6 +467,12 @@ export function bazDeserializer(item: any): Baz {
   };
 }
 
+/** Known values of {@link Versions} that the service accepts. */
+export enum KnownVersions {
+  /** 2022-05-15-preview */
+  V20220515Preview = "2022-05-15-preview",
+}
+
 export function _testPropertiesSerializer(item: Test): any {
   return { baz: item["baz"], bar: item["bar"] };
 }
@@ -477,12 +483,6 @@ export function _testPropertiesDeserializer(item: any) {
     baz: item["baz"],
     bar: item["bar"],
   };
-}
-
-/** Known values of {@link Versions} that the service accepts. */
-export enum KnownVersions {
-  /** 2022-05-15-preview */
-  V20220515Preview = "2022-05-15-preview",
 }
 ```
 
@@ -538,14 +538,14 @@ needTCGC: true
 Model generated.
 
 ```ts models
-import { areAllPropsUndefined } from "../static-helpers/serialization/check-prop-undefined.js";
-
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import { areAllPropsUndefined } from "../static-helpers/serialization/check-prop-undefined.js";
+
 /** model interface Test */
 export interface Test {
   result: string;
@@ -554,24 +554,6 @@ export interface Test {
   bar?: string;
   id: string;
   location?: string;
-}
-
-/** model interface FooProperties */
-export interface FooProperties extends Baz {
-  bar?: string;
-  baz: "baz";
-}
-
-/** model interface TestIdentifiers */
-export interface TestIdentifiers {
-  id: string;
-  location?: string;
-}
-
-/** model interface Baz */
-export interface Baz {
-  readonly readOnlyProp: string;
-  baz: string;
 }
 
 export function testSerializer(item: Test): any {
@@ -592,6 +574,12 @@ export function testDeserializer(item: any): Test {
   };
 }
 
+/** model interface FooProperties */
+export interface FooProperties extends Baz {
+  bar?: string;
+  baz: "baz";
+}
+
 export function fooPropertiesSerializer(item: FooProperties): any {
   return { baz: item["baz"], bar: item["bar"] };
 }
@@ -602,6 +590,12 @@ export function fooPropertiesDeserializer(item: any): FooProperties {
     baz: item["baz"],
     bar: item["bar"],
   };
+}
+
+/** model interface TestIdentifiers */
+export interface TestIdentifiers {
+  id: string;
+  location?: string;
 }
 
 export function testIdentifiersSerializer(item: TestIdentifiers): any {
@@ -615,6 +609,12 @@ export function testIdentifiersDeserializer(item: any): TestIdentifiers {
   };
 }
 
+/** model interface Baz */
+export interface Baz {
+  readonly readOnlyProp: string;
+  baz: string;
+}
+
 export function bazSerializer(item: Baz): any {
   return { baz: item["baz"] };
 }
@@ -624,6 +624,12 @@ export function bazDeserializer(item: any): Baz {
     readOnlyProp: item["readOnlyProp"],
     baz: item["baz"],
   };
+}
+
+/** Known values of {@link Versions} that the service accepts. */
+export enum KnownVersions {
+  /** 2022-05-15-preview */
+  V20220515Preview = "2022-05-15-preview",
 }
 
 export function _testPropertiesSerializer(item: Test): any {
@@ -647,12 +653,6 @@ export function _testIdentifiersDeserializer(item: any) {
     id: item["id"],
     location: item["location"],
   };
-}
-
-/** Known values of {@link Versions} that the service accepts. */
-export enum KnownVersions {
-  /** 2022-05-15-preview */
-  V20220515Preview = "2022-05-15-preview",
 }
 ```
 
@@ -698,7 +698,7 @@ needTCGC: true
 Model generated.
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -708,12 +708,6 @@ Model generated.
 export interface Test {
   result: string;
   name: string;
-  prop1: string;
-  prop2: string;
-}
-
-/** model interface FooProperties */
-export interface FooProperties {
   prop1: string;
   prop2: string;
 }
@@ -734,6 +728,12 @@ export function testDeserializer(item: any): Test {
   };
 }
 
+/** model interface FooProperties */
+export interface FooProperties {
+  prop1: string;
+  prop2: string;
+}
+
 export function fooPropertiesSerializer(item: FooProperties): any {
   return { prop1: item["prop1"], prop2: item["prop2"] };
 }
@@ -745,6 +745,12 @@ export function fooPropertiesDeserializer(item: any): FooProperties {
   };
 }
 
+/** Known values of {@link Versions} that the service accepts. */
+export enum KnownVersions {
+  /** 2022-05-15-preview */
+  V20220515Preview = "2022-05-15-preview",
+}
+
 export function _testPropertiesSerializer(item: Test): any {
   return { prop1: item["prop1"], prop2: item["prop2"] };
 }
@@ -754,11 +760,5 @@ export function _testPropertiesDeserializer(item: any) {
     prop1: item["prop1"],
     prop2: item["prop2"],
   };
-}
-
-/** Known values of {@link Versions} that the service accepts. */
-export enum KnownVersions {
-  /** 2022-05-15-preview */
-  V20220515Preview = "2022-05-15-preview",
 }
 ```

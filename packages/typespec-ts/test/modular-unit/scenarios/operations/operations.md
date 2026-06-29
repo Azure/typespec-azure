@@ -35,7 +35,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
-
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -82,7 +81,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
-
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -211,7 +209,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
-
 export async function read(
   context: Client,
   requiredHeader: string,
@@ -269,13 +266,15 @@ export function _readSend(
   nullableRequiredHeader: string | null,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: {
-      "nullable-required-header": nullableRequiredHeader,
-      ...options.requestOptions?.headers,
-    },
-  });
+  return context
+    .path("/")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: {
+        "nullable-required-header": nullableRequiredHeader,
+        ...options.requestOptions?.headers,
+      },
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -286,7 +285,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
-
 export async function read(
   context: Client,
   nullableRequiredHeader: string | null,
@@ -326,11 +324,13 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: !options?.bars ? options?.bars : barArraySerializer(options?.bars),
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: !options?.bars ? options?.bars : barArraySerializer(options?.bars),
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -341,7 +341,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
-
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -381,11 +380,13 @@ export function _readSend(
   bars: Bar[],
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: barArraySerializer(bars),
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: barArraySerializer(bars),
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -396,7 +397,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
-
 export async function read(
   context: Client,
   bars: Bar[],
@@ -440,10 +440,12 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<
@@ -458,7 +460,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<
 
   return _readResponseArrayDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -501,12 +502,14 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-    body: !options?.bars ? options?.bars : barArraySerializer(options?.bars),
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+      body: !options?.bars ? options?.bars : barArraySerializer(options?.bars),
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<Bar[]> {
@@ -517,7 +520,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<B
 
   return barArrayDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -563,11 +565,13 @@ export function _readSend(
   body: Foo,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: fooSerializer(body),
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: fooSerializer(body),
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -578,7 +582,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
-
 export async function read(
   context: Client,
   body: Foo,
@@ -624,10 +627,12 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<Foo> {
@@ -638,7 +643,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -695,10 +699,12 @@ export function _testSend(
   context: Client,
   options: TestOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _testDeserialize(result: PathUncheckedResponse): Promise<_Bar> {
@@ -714,7 +720,6 @@ export async function _testDeserialize(result: PathUncheckedResponse): Promise<_
 
   return _barDeserializer(result.body);
 }
-
 export function test(
   context: Client,
   options: TestOptionalParams = { requestOptions: {} },
@@ -784,10 +789,12 @@ export function _testSend(
   context: Client,
   options: TestOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _testDeserialize(result: PathUncheckedResponse): Promise<_Child> {
@@ -803,7 +810,6 @@ export async function _testDeserialize(result: PathUncheckedResponse): Promise<_
 
   return _childDeserializer(result.body);
 }
-
 export function test(
   context: Client,
   options: TestOptionalParams = { requestOptions: {} },
@@ -835,7 +841,7 @@ op get(): TestArrayModel;
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -844,11 +850,6 @@ op get(): TestArrayModel;
 /** model interface TestArrayModel */
 export interface TestArrayModel {
   prop: Test[];
-}
-
-/** model interface Test */
-export interface Test {
-  prop?: Test[];
 }
 
 export function testArrayModelDeserializer(item: any): TestArrayModel {
@@ -861,6 +862,11 @@ export function testArrayDeserializer(result: Array<Test>): any[] {
   return result.map((item) => {
     return testDeserializer(item);
   });
+}
+
+/** model interface Test */
+export interface Test {
+  prop?: Test[];
 }
 
 export function testDeserializer(item: any): Test {
@@ -887,10 +893,12 @@ export function _getSend(
   context: Client,
   options: GetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _getDeserialize(result: PathUncheckedResponse): Promise<TestArrayModel> {
@@ -901,7 +909,6 @@ export async function _getDeserialize(result: PathUncheckedResponse): Promise<Te
 
   return testArrayModelDeserializer(result.body);
 }
-
 export async function get(
   context: Client,
   options: GetOptionalParams = { requestOptions: {} },
@@ -928,7 +935,7 @@ op get(): TestDictionary;
 ## models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -937,11 +944,6 @@ op get(): TestDictionary;
 /** model interface TestDictionary */
 export interface TestDictionary {
   prop: Record<string, Test>;
-}
-
-/** model interface Test */
-export interface Test {
-  prop?: Record<string, Test>;
 }
 
 export function testDictionaryDeserializer(item: any): TestDictionary {
@@ -956,6 +958,11 @@ export function testRecordDeserializer(item: Record<string, any>): Record<string
     result[key] = !item[key] ? item[key] : testDeserializer(item[key]);
   });
   return result;
+}
+
+/** model interface Test */
+export interface Test {
+  prop?: Record<string, Test>;
 }
 
 export function testDeserializer(item: any): Test {
@@ -982,10 +989,12 @@ export function _getSend(
   context: Client,
   options: GetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _getDeserialize(result: PathUncheckedResponse): Promise<TestDictionary> {
@@ -996,7 +1005,6 @@ export async function _getDeserialize(result: PathUncheckedResponse): Promise<Te
 
   return testDictionaryDeserializer(result.body);
 }
-
 export async function get(
   context: Client,
   options: GetOptionalParams = { requestOptions: {} },
@@ -1023,7 +1031,7 @@ op createOrUpdateEndpoint(@path endpointName: string, @body endpoint: Endpoint):
 ## models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -1076,12 +1084,14 @@ export function _createOrUpdateEndpointSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-    body: endpointSerializer(endpointParam),
-  });
+  return context
+    .path(path)
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+      body: endpointSerializer(endpointParam),
+    });
 }
 
 export async function _createOrUpdateEndpointDeserialize(
@@ -1094,7 +1104,6 @@ export async function _createOrUpdateEndpointDeserialize(
 
   return endpointDeserializer(result.body);
 }
-
 export async function createOrUpdateEndpoint(
   context: Client,
   endpointName: string,
@@ -1153,7 +1162,7 @@ withRawContent: true
 ## models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -1163,11 +1172,6 @@ withRawContent: true
 export interface _ListTestResult {
   tests: Test[];
   next: string;
-}
-
-/** model interface Test */
-export interface Test {
-  id: string;
 }
 
 export function _listTestResultDeserializer(item: any): _ListTestResult {
@@ -1181,6 +1185,11 @@ export function testArrayDeserializer(result: Array<Test>): any[] {
   return result.map((item) => {
     return testDeserializer(item);
   });
+}
+
+/** model interface Test */
+export interface Test {
+  id: string;
 }
 
 export function testDeserializer(item: any): Test {
@@ -1211,10 +1220,12 @@ export function _fooSend(
   context: Client,
   options: FooOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/list-post").post({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/list-post")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _fooDeserialize(result: PathUncheckedResponse): Promise<_ListTestResult> {
@@ -1225,7 +1236,6 @@ export async function _fooDeserialize(result: PathUncheckedResponse): Promise<_L
 
   return _listTestResultDeserializer(result.body);
 }
-
 export function foo(
   context: Client,
   options: FooOptionalParams = { requestOptions: {} },
@@ -1243,10 +1253,12 @@ export function _barSend(
   context: Client,
   options: BarOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/list-get").post({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/list-get")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _barDeserialize(result: PathUncheckedResponse): Promise<_ListTestResult> {
@@ -1257,7 +1269,6 @@ export async function _barDeserialize(result: PathUncheckedResponse): Promise<_L
 
   return _listTestResultDeserializer(result.body);
 }
-
 export function bar(
   context: Client,
   options: BarOptionalParams = { requestOptions: {} },

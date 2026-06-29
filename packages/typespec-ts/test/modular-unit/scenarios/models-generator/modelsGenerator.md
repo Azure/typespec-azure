@@ -40,7 +40,7 @@ needTCGC: true
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -104,7 +104,7 @@ withRawContent: true
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -165,7 +165,7 @@ withRawContent: true
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -226,7 +226,7 @@ withRawContent: true
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -295,7 +295,7 @@ withRawContent: true
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -351,11 +351,13 @@ export function _createStreamingSend(
   context: Client,
   options: CreateStreamingOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/createStreaming").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    body: { stream: true },
-  });
+  return context
+    .path("/createStreaming")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: { stream: true },
+    });
 }
 
 export async function _createStreamingDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -366,7 +368,6 @@ export async function _createStreamingDeserialize(result: PathUncheckedResponse)
 
   return;
 }
-
 export async function createStreaming(
   context: Client,
   options: CreateStreamingOptionalParams = { requestOptions: {} },
@@ -395,7 +396,7 @@ op read(@body body: Foo): {
 ## Models interface Foo
 
 ```ts models interface Foo
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -454,12 +455,14 @@ export function _readSend(
   body: Foo,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-    body: fooSerializer(body),
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+      body: fooSerializer(body),
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<Foo> {
@@ -470,7 +473,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   body: Foo,
@@ -506,10 +508,12 @@ export function _readSend(
   prop: Date,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { prop: prop.toUTCString(), ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { prop: prop.toUTCString(), ...options.requestOptions?.headers },
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -520,7 +524,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
-
 export async function read(
   context: Client,
   prop: Date,
@@ -551,7 +554,7 @@ op read(@body body: Foo): {
 ## Models Foo
 
 ```ts models interface Foo
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -590,12 +593,14 @@ export function _readSend(
   body: Foo,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-    body: fooSerializer(body),
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+      body: fooSerializer(body),
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<Foo> {
@@ -606,7 +611,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   body: Foo,
@@ -637,7 +641,7 @@ op read(@body body: Foo): {
 ## Models Foo
 
 ```ts models interface Foo
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -676,12 +680,14 @@ export function _readSend(
   body: Foo,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-    body: fooSerializer(body),
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+      body: fooSerializer(body),
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<Foo> {
@@ -692,7 +698,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   body: Foo,
@@ -720,7 +725,7 @@ op read(@body body: Foo): {
 ## Models Foo
 
 ```ts models interface Foo
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -758,12 +763,14 @@ export function _readSend(
   body: Foo,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-    body: fooSerializer(body),
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+      body: fooSerializer(body),
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<Foo> {
@@ -774,7 +781,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   body: Foo,
@@ -801,7 +807,7 @@ op read(@body body: Foo): {
 ## Models Foo
 
 ```ts models interface Foo
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -831,12 +837,14 @@ export function _readSend(
   body: Foo,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-    body: fooSerializer(body),
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+      body: fooSerializer(body),
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<Foo> {
@@ -847,7 +855,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   body: Foo,
@@ -875,7 +882,7 @@ op read(@body body: Foo): {
 ## Models Foo
 
 ```ts models interface Foo
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -905,12 +912,14 @@ export function _readSend(
   body: Foo,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-    body: fooSerializer(body),
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+      body: fooSerializer(body),
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<Foo> {
@@ -921,7 +930,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   body: Foo,
@@ -952,7 +960,7 @@ op read(@body body: Foo): {
 ## Models Foo
 
 ```ts models interface Foo
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -983,12 +991,14 @@ export function _readSend(
   body: Foo,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-    body: fooSerializer(body),
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+      body: fooSerializer(body),
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<Foo> {
@@ -999,7 +1009,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   body: Foo,
@@ -1026,12 +1035,6 @@ op read(@body body: Foo): {
 ## Models Foo
 
 ```ts models interface Foo
-/**
- * This file contains only generated model types and their (de)serializers.
- * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
- */
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /** model interface Foo */
 export interface Foo {
   prop1: Uint8Array;
@@ -1077,12 +1080,14 @@ export function _readSend(
   body: Foo,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-    body: fooSerializer(body),
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+      body: fooSerializer(body),
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<Foo> {
@@ -1093,7 +1098,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   body: Foo,
@@ -1121,12 +1125,6 @@ op read(@body body: Foo): {
 ## Models Foo
 
 ```ts models interface Foo
-/**
- * This file contains only generated model types and their (de)serializers.
- * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
- */
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /** model interface Foo */
 export interface Foo {
   prop1: Uint8Array;
@@ -1172,12 +1170,14 @@ export function _readSend(
   body: Foo,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-    body: fooSerializer(body),
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+      body: fooSerializer(body),
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<Foo> {
@@ -1188,7 +1188,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   body: Foo,
@@ -1216,12 +1215,6 @@ op read(@body body: Foo): {
 ## Models Foo
 
 ```ts models interface Foo
-/**
- * This file contains only generated model types and their (de)serializers.
- * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
- */
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /** model interface Foo */
 export interface Foo {
   prop1: Uint8Array;
@@ -1267,12 +1260,14 @@ export function _readSend(
   body: Foo,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-    body: fooSerializer(body),
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+      body: fooSerializer(body),
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<Foo> {
@@ -1283,7 +1278,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   body: Foo,
@@ -1319,7 +1313,7 @@ op read(): {
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -1331,18 +1325,6 @@ export interface Cat extends Pet {
   meow: number;
 }
 
-/** model interface Pet */
-export interface Pet {
-  name: string;
-  weight?: number;
-}
-
-/** model interface Dog */
-export interface Dog extends Pet {
-  kind: "dog";
-  bark: string;
-}
-
 export function catDeserializer(item: any): Cat {
   return {
     name: item["name"],
@@ -1352,11 +1334,23 @@ export function catDeserializer(item: any): Cat {
   };
 }
 
+/** model interface Pet */
+export interface Pet {
+  name: string;
+  weight?: number;
+}
+
 export function petDeserializer(item: any): Pet {
   return {
     name: item["name"],
     weight: item["weight"],
   };
+}
+
+/** model interface Dog */
+export interface Dog extends Pet {
+  kind: "dog";
+  bark: string;
 }
 
 export function dogDeserializer(item: any): Dog {
@@ -1368,12 +1362,12 @@ export function dogDeserializer(item: any): Dog {
   };
 }
 
+/** Alias for _ReadResponse */
+export type _ReadResponse = Cat | Dog;
+
 export function _readResponseDeserializer(item: any): _ReadResponse {
   return item;
 }
-
-/** Alias for _ReadResponse */
-export type _ReadResponse = Cat | Dog;
 ```
 
 # should handle inheritance model in operations
@@ -1401,7 +1395,7 @@ op read(): {
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -1413,12 +1407,6 @@ export interface Cat extends Pet {
   meow: number;
 }
 
-/** model interface Pet */
-export interface Pet {
-  name: string;
-  weight?: number;
-}
-
 export function catDeserializer(item: any): Cat {
   return {
     name: item["name"],
@@ -1426,6 +1414,12 @@ export function catDeserializer(item: any): Cat {
     kind: item["kind"],
     meow: item["meow"],
   };
+}
+
+/** model interface Pet */
+export interface Pet {
+  name: string;
+  weight?: number;
 }
 
 export function petDeserializer(item: any): Pet {
@@ -1453,10 +1447,12 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<Cat> {
@@ -1467,7 +1463,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<C
 
   return catDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -1500,7 +1495,7 @@ op read(): {
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -1512,16 +1507,6 @@ export interface Cat extends Pet {
   meow: number;
 }
 
-/** model interface Pet */
-export interface Pet extends Animal {
-  weight?: number;
-}
-
-/** model interface Animal */
-export interface Animal {
-  name: string;
-}
-
 export function catDeserializer(item: any): Cat {
   return {
     weight: item["weight"],
@@ -1531,11 +1516,21 @@ export function catDeserializer(item: any): Cat {
   };
 }
 
+/** model interface Pet */
+export interface Pet extends Animal {
+  weight?: number;
+}
+
 export function petDeserializer(item: any): Pet {
   return {
     name: item["name"],
     weight: item["weight"],
   };
+}
+
+/** model interface Animal */
+export interface Animal {
+  name: string;
 }
 
 export function animalDeserializer(item: any): Animal {
@@ -1562,10 +1557,12 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<Cat> {
@@ -1576,7 +1573,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<C
 
   return catDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -1613,7 +1609,7 @@ op read(@body body: PSDog): {
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -1623,13 +1619,6 @@ op read(@body body: PSDog): {
 export interface PSDog extends Pet {
   kind: "dog";
   bark: string;
-}
-
-/** model interface Pet */
-export interface Pet {
-  kind: string;
-  name: string;
-  weight?: number;
 }
 
 export function psDogSerializer(item: PSDog): any {
@@ -1645,6 +1634,13 @@ export function psDogDeserializer(item: any): PSDog {
   };
 }
 
+/** model interface Pet */
+export interface Pet {
+  kind: string;
+  name: string;
+  weight?: number;
+}
+
 export function petSerializer(item: Pet): any {
   return { kind: item["kind"], name: item["name"], weight: item["weight"] };
 }
@@ -1656,6 +1652,9 @@ export function petDeserializer(item: any): Pet {
     weight: item["weight"],
   };
 }
+
+/** Alias for PetUnion */
+export type PetUnion = PSDog | Pet;
 
 export function petUnionSerializer(item: PetUnion): any {
   switch (item.kind) {
@@ -1676,9 +1675,6 @@ export function petUnionDeserializer(item: any): PetUnion {
       return petDeserializer(item);
   }
 }
-
-/** Alias for PetUnion */
-export type PetUnion = PSDog | Pet;
 ```
 
 ## Operations
@@ -1699,12 +1695,14 @@ export function _readSend(
   body: PSDog,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-    body: psDogSerializer(body),
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+      body: psDogSerializer(body),
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<PSDog> {
@@ -1715,7 +1713,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<P
 
   return psDogDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   body: PSDog,
@@ -1753,7 +1750,7 @@ op read(): {
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -1766,18 +1763,6 @@ export interface Pet {
   weight?: number;
 }
 
-/** model interface Cat */
-export interface Cat extends Pet {
-  kind: "cat";
-  meow: number;
-}
-
-/** model interface Dog */
-export interface Dog extends Pet {
-  kind: "dog";
-  bark: string;
-}
-
 export function petDeserializer(item: any): Pet {
   return {
     kind: item["kind"],
@@ -1785,6 +1770,9 @@ export function petDeserializer(item: any): Pet {
     weight: item["weight"],
   };
 }
+
+/** Alias for PetUnion */
+export type PetUnion = Cat | Dog | Pet;
 
 export function petUnionDeserializer(item: any): PetUnion {
   switch (item["kind"]) {
@@ -1799,6 +1787,12 @@ export function petUnionDeserializer(item: any): PetUnion {
   }
 }
 
+/** model interface Cat */
+export interface Cat extends Pet {
+  kind: "cat";
+  meow: number;
+}
+
 export function catDeserializer(item: any): Cat {
   return {
     kind: item["kind"],
@@ -1806,6 +1800,12 @@ export function catDeserializer(item: any): Cat {
     weight: item["weight"],
     meow: item["meow"],
   };
+}
+
+/** model interface Dog */
+export interface Dog extends Pet {
+  kind: "dog";
+  bark: string;
 }
 
 export function dogDeserializer(item: any): Dog {
@@ -1816,9 +1816,6 @@ export function dogDeserializer(item: any): Dog {
     bark: item["bark"],
   };
 }
-
-/** Alias for PetUnion */
-export type PetUnion = Cat | Dog | Pet;
 ```
 
 ## Operations
@@ -1838,10 +1835,12 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<PetUnion> {
@@ -1852,7 +1851,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<P
 
   return petUnionDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -1895,7 +1893,7 @@ op read(): {
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -1908,25 +1906,6 @@ export interface Pet {
   weight?: number;
 }
 
-/** model interface Cat */
-export interface Cat extends Pet {
-  kind: "cat";
-  meow: number;
-}
-
-/** model interface Dog */
-export interface Dog extends Pet {
-  kind: "dog";
-  type: string;
-  bark: string;
-}
-
-/** model interface Gold */
-export interface Gold extends Dog {
-  type: "gold";
-  friends: PetUnion[];
-}
-
 export function petDeserializer(item: any): Pet {
   return {
     kind: item["kind"],
@@ -1934,6 +1913,9 @@ export function petDeserializer(item: any): Pet {
     weight: item["weight"],
   };
 }
+
+/** Alias for PetUnion */
+export type PetUnion = Cat | DogUnion | Pet;
 
 export function petUnionDeserializer(item: any): PetUnion {
   switch (item["kind"]) {
@@ -1948,6 +1930,12 @@ export function petUnionDeserializer(item: any): PetUnion {
   }
 }
 
+/** model interface Cat */
+export interface Cat extends Pet {
+  kind: "cat";
+  meow: number;
+}
+
 export function catDeserializer(item: any): Cat {
   return {
     kind: item["kind"],
@@ -1955,6 +1943,13 @@ export function catDeserializer(item: any): Cat {
     weight: item["weight"],
     meow: item["meow"],
   };
+}
+
+/** model interface Dog */
+export interface Dog extends Pet {
+  kind: "dog";
+  type: string;
+  bark: string;
 }
 
 export function dogDeserializer(item: any): Dog {
@@ -1967,6 +1962,9 @@ export function dogDeserializer(item: any): Dog {
   };
 }
 
+/** Alias for DogUnion */
+export type DogUnion = Gold | Dog;
+
 export function dogUnionDeserializer(item: any): DogUnion {
   switch (item["type"]) {
     case "gold":
@@ -1975,6 +1973,12 @@ export function dogUnionDeserializer(item: any): DogUnion {
     default:
       return dogDeserializer(item);
   }
+}
+
+/** model interface Gold */
+export interface Gold extends Dog {
+  type: "gold";
+  friends: PetUnion[];
 }
 
 export function goldDeserializer(item: any): Gold {
@@ -1993,11 +1997,6 @@ export function petUnionArrayDeserializer(result: Array<PetUnion>): any[] {
     return petUnionDeserializer(item);
   });
 }
-
-/** Alias for PetUnion */
-export type PetUnion = Cat | DogUnion | Pet;
-/** Alias for DogUnion */
-export type DogUnion = Gold | Dog;
 ```
 
 ## Operations
@@ -2017,10 +2016,12 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<PetUnion> {
@@ -2031,7 +2032,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<P
 
   return petUnionDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -2062,7 +2062,7 @@ op read(): {
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -2075,17 +2075,17 @@ export interface Foo {
   bar: Bar;
 }
 
-/** model interface Bar */
-export interface Bar {
-  foo: Foo;
-}
-
 export function fooDeserializer(item: any): Foo {
   return {
     name: item["name"],
     weight: item["weight"],
     bar: barDeserializer(item["bar"]),
   };
+}
+
+/** model interface Bar */
+export interface Bar {
+  foo: Foo;
 }
 
 export function barDeserializer(item: any): Bar {
@@ -2112,10 +2112,12 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-  });
+  return context
+    .path("/")
+    .get({
+      ...operationOptionsToRequestParameters(options),
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<Foo> {
@@ -2126,7 +2128,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -2174,7 +2175,7 @@ needAzureCore: false
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -2207,11 +2208,13 @@ export function _getSend(
   body: string,
   options: GetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: contentType,
-    body: body,
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: contentType,
+      body: body,
+    });
 }
 
 export async function _getDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -2222,7 +2225,6 @@ export async function _getDeserialize(result: PathUncheckedResponse): Promise<vo
 
   return;
 }
-
 export async function get(
   context: Client,
   contentType: SchemaContentTypeValues,
@@ -2271,7 +2273,7 @@ withRawContent: true
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -2339,12 +2341,14 @@ export function _getSend(
   body: string,
   options: GetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "text/plain",
-    headers: { "test-header": testHeader, ...options.requestOptions?.headers },
-    body: body,
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "text/plain",
+      headers: { "test-header": testHeader, ...options.requestOptions?.headers },
+      body: body,
+    });
 }
 
 export async function _getDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -2355,7 +2359,6 @@ export async function _getDeserialize(result: PathUncheckedResponse): Promise<vo
 
   return;
 }
-
 export async function get(
   context: Client,
   testHeader: "A" | "B",
@@ -2386,7 +2389,7 @@ op read(@bodyRoot body: A): void;
 ## Model interface A
 
 ```ts models interface A
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -2445,7 +2448,7 @@ export function bSerializer(item: B): any {
 ## Model interface A
 
 ```ts models interface A
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -2480,7 +2483,7 @@ op read(@body body: A): void;
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -2511,7 +2514,7 @@ op read(@body body: A): void;
 ## Model interface A
 
 ```ts models interface A
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -2555,7 +2558,7 @@ compatibility-mode: true
 ## Model interface Vegetables
 
 ```ts models interface Vegetables
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -2600,14 +2603,14 @@ mustEmptyDiagnostic: true
 ## Models
 
 ```ts models
-import { serializeRecord } from "../static-helpers/serialization/serialize-record.js";
-
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import { serializeRecord } from "../static-helpers/serialization/serialize-record.js";
+
 /** model interface Vegetables */
 export interface Vegetables {
   carrots: number;
@@ -2640,6 +2643,9 @@ export function vegetablesDeserializer(item: any): Vegetables {
   };
 }
 
+/** Alias for _VegetablesAdditionalProperty */
+export type _VegetablesAdditionalProperty = number | string;
+
 export function _vegetablesAdditionalPropertySerializer(item: _VegetablesAdditionalProperty): any {
   return item;
 }
@@ -2649,9 +2655,6 @@ export function _vegetablesAdditionalPropertyDeserializer(
 ): _VegetablesAdditionalProperty {
   return item;
 }
-
-/** Alias for _VegetablesAdditionalProperty */
-export type _VegetablesAdditionalProperty = number | string;
 ```
 
 # should handle model extends with additional properties
@@ -2680,7 +2683,7 @@ compatibility-mode: true
 ## Model interface A
 
 ```ts models interface A
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -2748,7 +2751,7 @@ op createService(@body body: ServiceResourceProperties): ServiceResourceProperti
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -2757,19 +2760,6 @@ op createService(@body body: ServiceResourceProperties): ServiceResourceProperti
 /** model interface ServiceResourceProperties */
 export interface ServiceResourceProperties {
   servicePlacementPolicies?: ServicePlacementPolicyDescription[];
-}
-
-/** model interface ServicePlacementPolicyDescription */
-export interface ServicePlacementPolicyDescription extends Pet {
-  kind: "dog";
-  type: string;
-}
-
-/** model interface Pet */
-export interface Pet {
-  kind: string;
-  name: string;
-  weight?: number;
 }
 
 export function serviceResourcePropertiesSerializer(item: ServiceResourceProperties): any {
@@ -2804,6 +2794,12 @@ export function servicePlacementPolicyDescriptionArrayDeserializer(
   });
 }
 
+/** model interface ServicePlacementPolicyDescription */
+export interface ServicePlacementPolicyDescription extends Pet {
+  kind: "dog";
+  type: string;
+}
+
 export function servicePlacementPolicyDescriptionSerializer(
   item: ServicePlacementPolicyDescription,
 ): any {
@@ -2821,6 +2817,13 @@ export function servicePlacementPolicyDescriptionDeserializer(
   };
 }
 
+/** model interface Pet */
+export interface Pet {
+  kind: string;
+  name: string;
+  weight?: number;
+}
+
 export function petSerializer(item: Pet): any {
   return { kind: item["kind"], name: item["name"], weight: item["weight"] };
 }
@@ -2832,6 +2835,9 @@ export function petDeserializer(item: any): Pet {
     weight: item["weight"],
   };
 }
+
+/** Alias for PetUnion */
+export type PetUnion = ServicePlacementPolicyDescription | Pet;
 
 export function petUnionSerializer(item: PetUnion): any {
   switch (item.kind) {
@@ -2854,9 +2860,6 @@ export function petUnionDeserializer(item: any): PetUnion {
       return petDeserializer(item);
   }
 }
-
-/** Alias for PetUnion */
-export type PetUnion = ServicePlacementPolicyDescription | Pet;
 ```
 
 # should handle duplicate model name import between hardcode import and binder import
@@ -2875,7 +2878,7 @@ op read(@body body: Client): Client;
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -2917,12 +2920,14 @@ export function _readSend(
   body: Client_1,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-    body: clientSerializer(body),
-  });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+      body: clientSerializer(body),
+    });
 }
 
 export async function _readDeserialize(result: PathUncheckedResponse): Promise<Client_1> {
@@ -2933,7 +2938,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<C
 
   return clientDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   body: Client_1,

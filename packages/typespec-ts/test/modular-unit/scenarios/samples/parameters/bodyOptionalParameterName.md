@@ -167,14 +167,16 @@ export function _backupSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
-    contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
-    body: !options?.backupRequestProperties
-      ? options?.backupRequestProperties
-      : backupRequestPropertiesSerializer(options?.backupRequestProperties),
-  });
+  return context
+    .path(path)
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      headers: { accept: "application/json", ...options.requestOptions?.headers },
+      body: !options?.backupRequestProperties
+        ? options?.backupRequestProperties
+        : backupRequestPropertiesSerializer(options?.backupRequestProperties),
+    });
 }
 
 export async function _backupDeserialize(result: PathUncheckedResponse): Promise<BackupResult> {
@@ -190,7 +192,6 @@ export async function _backupDeserialize(result: PathUncheckedResponse): Promise
 
   return backupResultDeserializer(result.body);
 }
-
 /** A long-running resource action. */
 export function backup(
   context: Client,
