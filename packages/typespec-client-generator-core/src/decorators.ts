@@ -740,17 +740,13 @@ export const $override = (
   // omit all override operation
   context.program.stateMap(omitOperation).set(override, true);
 
-  // Collect the parameters of both operations. Parameters are matched by name
-  // (see below) rather than by position, so the lists do not need to be sorted.
-  const originalParams = collectParams(context.program, original.parameters.properties);
-  const overrideParams = collectParams(context.program, override.parameters.properties);
-
-  // Match override parameters to original parameters by name. Overrides are
-  // allowed to add, remove, or regroup parameters (for example wrapping several
-  // parameters in a customization model), so comparing the two lists by sorted
-  // position produces false `override-parameters-mismatch` diagnostics whenever
-  // the parameter sets differ in shape.
-  const overrideParamsByName = new Map(overrideParams.map((p) => [p.name, p]));
+  // Extract and sort parameter names
+  const originalParams = collectParams(context.program, original.parameters.properties).sort(
+    (a, b) => a.name.localeCompare(b.name),
+  );
+  const overrideParams = collectParams(context.program, override.parameters.properties).sort(
+    (a, b) => a.name.localeCompare(b.name),
+  );
 
   // Determine which parameters are realized as path parameters in the resolved
   // HTTP route of the original operation. Checking the `@path` decorator alone is
@@ -759,23 +755,21 @@ export const $override = (
   // parameters in the operation's actual route.
   const realizedPathParamNames = getRealizedPathParamNames(context.program, original);
 
-  // A `@clientLocation` on any override parameter indicates an intentional
-  // customization where non-path params are just pass-throughs, so the `@path`
-  // preservation check below is skipped in that case.
-  const overrideHasClientLocation = overrideParams.some((p) =>
-    p.decorators.some((d) => d.decorator.name === "$clientLocation"),
-  );
-
-  // Check that every required original parameter has a matching override
-  // parameter, omitting optional parameters.
+  // Check if the sorted parameter names arrays are equal, omit optional parameters
   let parametersMatch = true;
   let checkParameter: ModelProperty | undefined = undefined;
+  let index = 0;
   for (const originalParam of originalParams) {
-    const overrideParam = overrideParamsByName.get(originalParam.name);
-    if (
-      overrideParam === undefined ||
-      !compareModelProperties(context.program, originalParam, overrideParam)
-    ) {
+    if (index > overrideParams.length - 1) {
+      if (!originalParam.optional) {
+        parametersMatch = false;
+        checkParameter = originalParam;
+        break;
+      } else {
+        continue;
+      }
+    }
+    if (!compareModelProperties(context.program, originalParam, overrideParams[index])) {
       if (!originalParam.optional) {
         parametersMatch = false;
         checkParameter = originalParam;
@@ -785,26 +779,29 @@ export const $override = (
       }
     }
 
-    // Warn if original param has @path but the matching override param doesn't.
+    // Warn if original param has @path but override param doesn't,
+    // unless any override param has @clientLocation (indicating an intentional customization
+    // where non-path params are just pass-throughs)
     const originalIsRealizedPathParam = realizedPathParamNames
       ? realizedPathParamNames.has(originalParam.name)
       : isPathParam(context.program, originalParam);
     if (
       originalIsRealizedPathParam &&
-      !isPathParam(context.program, overrideParam) &&
-      !overrideHasClientLocation
+      !isPathParam(context.program, overrideParams[index]) &&
+      !overrideParams.some((p) => p.decorators.some((d) => d.decorator.name === "$clientLocation"))
     ) {
       reportDiagnostic(context.program, {
         code: "override-parameters-mismatch",
         target: context.decoratorTarget,
         format: {
           methodName: original.name,
-          checkParameter: overrideParam.name,
+          checkParameter: overrideParams[index].name,
         },
       });
     }
 
     // Apply the alternate type to the original parameter
+    const overrideParam = overrideParams[index];
     overrideParam.decorators
       .filter(
         (d) =>
@@ -819,6 +816,8 @@ export const $override = (
           d.args[1]?.jsValue as string | undefined,
         ),
       );
+
+    index++;
   }
 
   if (!parametersMatch) {
