@@ -35,7 +35,7 @@ The package is tested through vitest projects (see `vitest.config.ts`):
 - `integration-azure-modular` — `test/azure-modular-integration/**` (Modular spector e2e).
 
 Run them with `pnpm test-next`, `pnpm unit-test` (runs the modular unit project),
-and `pnpm integration-test-ci:azure-modular`.
+and `pnpm integration-test-ci`.
 There is intentionally no non-Azure integration project — coverage for those scenarios
 is a superset within the `azure-*` folders.
 
@@ -81,7 +81,7 @@ Integration (spector) tests generate real clients from specs, then assert on the
      subprocess per compile.
    - `--phase=declarations` emits the tracked `src/index.d.ts` baseline (tsc `.d.ts` +
      api-extractor rollup). Only `check:tree` consumes these, so the e2e script
-     `generate-and-run:azure-modular` runs the vitest suite in parallel with the
+     `generate-and-run` runs the vitest suite in parallel with the
      declaration regen, keeping the (slow) api-extractor work off the test critical path.
 3. The vitest `integration-azure-modular` project then runs the `*.test.ts` assertions.
 
@@ -100,7 +100,7 @@ must run before `check:tree`.
 
 ## CI: `e2e-test` job in `.github/workflows/ci-typescript.yml`
 
-The e2e job runs `copy:typespec` → `integration-test-ci:azure-modular` →
+The e2e job runs `copy:typespec` → `spector-test` →
 `pnpm check:tree`. `check:tree`
 (`test/commands/check-clean-tree.ts`) **fails if regeneration leaves the git tree dirty**.
 So a baseline that doesn't match freshly generated output (changed, missing, or added
