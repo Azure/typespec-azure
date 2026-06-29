@@ -36,11 +36,9 @@ Key links:
 
 See our [support policy](https://github.com/Azure/azure-sdk-for-js/blob/main/SUPPORT.md) for more details.
 
-{{#if azure}}
 ### Prerequisites
 
 - An [Azure subscription][azure_sub].
-{{/if}}
 
 {{#if isReleasablePackage}}
 ### Install the \`{{ clientPackageName }}\` package
@@ -52,7 +50,6 @@ npm install {{ clientPackageName }}
 \`\`\`
 {{/if}}
 
-{{#if azure}}
 {{#if addCredentials}}
 ### Create and authenticate a \`{{ clientClassName}}\`
 
@@ -127,7 +124,8 @@ const credential = new InteractiveBrowserCredential({
 const client = new {{ clientClassName }}("<endpoint>", credential);
 \`\`\`
 {{/if}}
-{{/if}}{{/if}}
+{{/if}}
+
 
 ### JavaScript Bundle
 To use this client library in the browser, first you need to use a bundler. For details on how to do this, please refer to our [bundling documentation](https://aka.ms/AzureSDKBundling).
@@ -138,7 +136,6 @@ To use this client library in the browser, first you need to use a bundler. For 
 
 \`{{ clientClassName }}\` is the primary interface for developers using the {{ clientDescriptiveName }} library. Explore the methods on this client object to understand the different features of the {{ serviceName }} service that you can access.
 
-{{#if azure}}
 ## Troubleshooting
 
 ### Logging
@@ -151,7 +148,7 @@ import { setLogLevel } from "@azure/logger";
 setLogLevel("info");
 \`\`\`
 
-For more detailed instructions on how to enable logs, you can look at the [@azure/logger package docs]({{ repoURL }}/tree/main/sdk/core/logger).
+For more detailed instructions on how to enable logs, you can look at the [@azure/logger package docs](https://github.com/Azure/azure-sdk-for-js/tree/main/sdk/core/logger).
 
 {{#if samplesURL}}
 ## Next steps
@@ -161,17 +158,16 @@ Please take a look at the [samples]({{ samplesURL }}) directory for detailed exa
 
 ## Contributing
 
-If you'd like to contribute to this library, please read the [contributing guide]({{ contributingGuideURL }}) to learn more about how to build and test the code.
+If you'd like to contribute to this library, please read the [contributing guide](https://github.com/Azure/azure-sdk-for-js/blob/main/CONTRIBUTING.md) to learn more about how to build and test the code.
 
 ## Related projects
 
-- [{{ projectName }}]({{ repoURL }})
+- [Microsoft Azure SDK for JavaScript](https://github.com/Azure/azure-sdk-for-js)
 
 [azure_sub]: https://azure.microsoft.com/free/
 [azure_portal]: https://portal.azure.com
-{{#if identityPackageURL}}[azure_identity]: {{ identityPackageURL }}
-{{/if}}[defaultazurecredential]: {{ identityPackageURL }}#defaultazurecredential
-{{/if}}
+[azure_identity]: https://github.com/Azure/azure-sdk-for-js/tree/main/sdk/identity/identity
+[defaultazurecredential]: https://github.com/Azure/azure-sdk-for-js/tree/main/sdk/identity/identity#defaultazurecredential
 `;
 
 const apiReferenceTemplate = `{{#if apiRefURL}}
@@ -189,8 +185,6 @@ interface Metadata {
   clientPackageName: string;
   /** The name of the client class */
   clientClassName: string;
-  /** The URL of the repository the package lives in */
-  repoURL?: string;
   /** The URL to the package directory in the repository */
   packageSourceURL?: string;
   /** The URL to the package's samples */
@@ -201,27 +195,14 @@ interface Metadata {
   description?: string;
   /** The URL to the package on npmjs.org */
   packageNPMURL?: string;
-  /** The name of the project that lives in the repository */
-  projectName?: string;
   /** whether the client accepts standard credentials */
   addCredentials?: boolean;
-  /** The link to the identity package in the repository */
-  identityPackageURL?: string;
-  /** The dependency info for this service */
-  dependencyDescription?: string;
-  dependencyLink?: string;
-  /** Indicates if the package is a multi-client */
-  hasMultiClients?: boolean;
   /** The URL to the API reference */
   apiRefURL?: string;
   /** Check if the rp is management plane */
   azureArm?: boolean;
-  /** Whether the package being generated is for an Azure service */
-  azure: boolean;
   /** Indicates if the package is a test/releasable package. */
   isReleasablePackage?: boolean;
-  /** The link to the contributing guide in the repository */
-  contributingGuideURL?: string;
   /** Indicates if the package need generate test files */
   generateTest?: boolean;
   /** Indicates if the package need SubscriptionId as the client parameter */
@@ -290,12 +271,10 @@ function createMetadata(model: ClientModel): Metadata | undefined {
   // const packageDetails = model.options.packageDetails;
   const { packageDetails, azureOutputDirectory, serviceInfo, isTypeSpecTest } = model.options;
 
-  const azureHuh =
-    packageDetails?.scopeName === "azure" || packageDetails?.scopeName === "azure-rest";
   const repoURL = "https://github.com/Azure/azure-sdk-for-js";
   const relativePackageSourcePath = azureOutputDirectory;
   const packageSourceURL =
-    relativePackageSourcePath && repoURL && `${repoURL}/tree/main/${relativePackageSourcePath}`;
+    relativePackageSourcePath && `${repoURL}/tree/main/${relativePackageSourcePath}`;
 
   const clientPackageName = packageDetails?.name;
   const clientClassName = getClientName(model);
@@ -322,17 +301,10 @@ function createMetadata(model: ClientModel): Metadata | undefined {
     packageNPMURL: `https://www.npmjs.com/package/${clientPackageName}`,
     samplesURL:
       model.options.generateSample && packageSourceURL ? `${packageSourceURL}/samples` : undefined,
-    apiRefURL: azureHuh
-      ? `https://learn.microsoft.com/javascript/api/${clientPackageName}${apiRefUrlQueryParameter}`
-      : undefined,
+    apiRefURL: `https://learn.microsoft.com/javascript/api/${clientPackageName}${apiRefUrlQueryParameter}`,
     azureArm: Boolean(model.options.azureArm),
-    azure: azureHuh,
     isReleasablePackage: !isTypeSpecTest,
-    repoURL: repoURL,
-    projectName: azureHuh ? "Microsoft Azure SDK for JavaScript" : undefined,
-    identityPackageURL: repoURL && `${repoURL}/tree/main/sdk/identity/identity`,
     addCredentials: model.options.addCredentials,
-    contributingGuideURL: repoURL && `${repoURL}/blob/main/CONTRIBUTING.md`,
     generateTest: model.options.generateTest,
     hasSubscriptionId: model.options.hasSubscriptionId,
   };
