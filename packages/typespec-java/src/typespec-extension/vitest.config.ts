@@ -1,21 +1,4 @@
-import { defineConfig } from "vitest/config";
+import { defineConfig, mergeConfig } from "vitest/config";
+import { defaultTypeSpecVitestConfig } from "../../../../core/vitest.config.js";
 
-export default defineConfig({
-  test: {
-    environment: "node",
-    isolate: false,
-    coverage: {
-      reporter: ["cobertura", "json", "text"],
-    },
-    outputFile: {
-      junit: "./test-results.xml",
-    },
-    include: ["test/**/*.test.ts"],
-    exclude: ["node_modules", "dist/test"],
-  },
-  server: {
-    watch: {
-      ignored: [],
-    },
-  },
-});
+export default mergeConfig(defaultTypeSpecVitestConfig, defineConfig({}));
