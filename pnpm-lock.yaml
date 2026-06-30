@@ -345,6 +345,9 @@ catalogs:
     decimal.js:
       specifier: ^10.6.0
       version: 10.6.0
+    diff2html:
+      specifier: ^3.4.48
+      version: 3.4.56
     dotenv:
       specifier: ^17.2.3
       version: 17.4.2
@@ -3090,7 +3093,7 @@ importers:
   eng/emitter-diff:
     dependencies:
       diff2html:
-        specifier: ^3.4.48
+        specifier: 'catalog:'
         version: 3.4.56
     devDependencies:
       '@types/node':
