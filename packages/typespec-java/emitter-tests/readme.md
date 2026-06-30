@@ -9,7 +9,7 @@ consumes the emitter via the packed `.tgz` produced by `../Build-TypeSpec.ps1`.
 
 ## Prerequisite
 
-Install [Node.js](https://nodejs.org/en/download/) 20 or above. (Verify by running `node --version`)
+Install [Node.js](https://nodejs.org/en/download/) 22 or above. (Verify by running `node --version`)
 
 Install [Java](https://docs.microsoft.com/java/openjdk/download) 11 or above. (Verify by running `java --version`)
 
