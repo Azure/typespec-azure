@@ -38,11 +38,9 @@ export function _getResultFileSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context
-    .path(path_1)
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "text/plain", ...options.requestOptions?.headers },
-    });
+  return context.path(path_1).get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "text/plain", ...options.requestOptions?.headers },
+  });
 }
 ```

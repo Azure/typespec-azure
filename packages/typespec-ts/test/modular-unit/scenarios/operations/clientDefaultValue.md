@@ -73,14 +73,12 @@ export function _createSend(
   context: Client,
   options: CreateOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/api/create")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "text/plain",
-      headers: { accept: "text/plain", ...options.requestOptions?.headers },
-      body: options?.body ?? "default-body",
-    });
+  return context.path("/api/create").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "text/plain",
+    headers: { accept: "text/plain", ...options.requestOptions?.headers },
+    body: options?.body ?? "default-body",
+  });
 }
 
 export async function _createDeserialize(result: PathUncheckedResponse): Promise<string> {
@@ -116,16 +114,14 @@ export function _testQuerySend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context
-    .path(path)
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: {
-        "custom-header": options?.customHeader ?? "application/json",
-        accept: "application/json",
-        ...options.requestOptions?.headers,
-      },
-    });
+  return context.path(path).get({
+    ...operationOptionsToRequestParameters(options),
+    headers: {
+      "custom-header": options?.customHeader ?? "application/json",
+      accept: "application/json",
+      ...options.requestOptions?.headers,
+    },
+  });
 }
 
 export async function _testQueryDeserialize(result: PathUncheckedResponse): Promise<Configuration> {
@@ -204,14 +200,12 @@ export function _createRequiredSend(
   body: string,
   options: CreateRequiredOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/api/createRequired")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "text/plain",
-      headers: { accept: "text/plain", ...options.requestOptions?.headers },
-      body: body,
-    });
+  return context.path("/api/createRequired").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "text/plain",
+    headers: { accept: "text/plain", ...options.requestOptions?.headers },
+    body: body,
+  });
 }
 
 export async function _createRequiredDeserialize(result: PathUncheckedResponse): Promise<string> {
@@ -248,16 +242,14 @@ export function _testRequiredSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context
-    .path(path)
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: {
-        "custom-header": customHeader,
-        accept: "application/json",
-        ...options.requestOptions?.headers,
-      },
-    });
+  return context.path(path).get({
+    ...operationOptionsToRequestParameters(options),
+    headers: {
+      "custom-header": customHeader,
+      accept: "application/json",
+      ...options.requestOptions?.headers,
+    },
+  });
 }
 
 export async function _testRequiredDeserialize(

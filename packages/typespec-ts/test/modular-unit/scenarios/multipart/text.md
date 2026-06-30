@@ -52,13 +52,11 @@ export function _doThingSend(
   bodyParam: RequestBody,
   options: DoThingOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "multipart/form-data",
-      body: requestBodySerializer(bodyParam),
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "multipart/form-data",
+    body: requestBodySerializer(bodyParam),
+  });
 }
 
 export async function _doThingDeserialize(result: PathUncheckedResponse): Promise<void> {

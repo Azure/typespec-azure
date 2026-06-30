@@ -301,15 +301,13 @@ export function _removeOptionalOriginalSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context
-    .path(path)
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: {
-        ...(options?.param4 !== undefined ? { param4: options?.param4 } : {}),
-        ...options.requestOptions?.headers,
-      },
-    });
+  return context.path(path).get({
+    ...operationOptionsToRequestParameters(options),
+    headers: {
+      ...(options?.param4 !== undefined ? { param4: options?.param4 } : {}),
+      ...options.requestOptions?.headers,
+    },
+  });
 }
 
 export async function _removeOptionalOriginalDeserialize(
@@ -417,17 +415,15 @@ export function _changeOptionalityOriginalSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context
-    .path(path)
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: {
-        ...(options?.requiredHeader !== undefined
-          ? { "required-header": options?.requiredHeader }
-          : {}),
-        ...options.requestOptions?.headers,
-      },
-    });
+  return context.path(path).get({
+    ...operationOptionsToRequestParameters(options),
+    headers: {
+      ...(options?.requiredHeader !== undefined
+        ? { "required-header": options?.requiredHeader }
+        : {}),
+      ...options.requestOptions?.headers,
+    },
+  });
 }
 
 export async function _changeOptionalityOriginalDeserialize(
