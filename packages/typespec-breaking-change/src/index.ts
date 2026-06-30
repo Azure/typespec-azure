@@ -16,3 +16,10 @@ export type {
   VersionedView,
 } from "./types.js";
 export { isOperationIdentity, isServiceIdentity } from "./types.js";
+export { compileService, type CompileOptions } from "./compile.js";
+export {
+  enumerateVersions,
+  createVersionedView,
+  buildComparisonPairs,
+  type ServiceVersionInfo,
+} from "./versions.js";

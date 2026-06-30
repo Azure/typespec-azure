@@ -1,4 +1,4 @@
-import type { Program, SourceLocation, Type, Value } from "@typespec/compiler";
+import type { Namespace, Program, SourceLocation, Type, Value } from "@typespec/compiler";
 import type { DiffKind } from "./diff-kind.js";
 
 /**
@@ -187,8 +187,10 @@ export interface VersionPair {
 export interface VersionedView {
   /** The api-version string this view represents. */
   version: string;
-  /** The TypeSpec Program for this version (after mutators applied). */
+  /** The TypeSpec Program (shared across versions — mutators produce subgraphs, not new programs). */
   program: Program;
+  /** The namespace projected to this specific version (after mutators applied). */
+  versionedNamespace: Namespace;
 }
 
 /**
