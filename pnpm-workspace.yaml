@@ -1,6 +1,7 @@
 packages:
   - packages/*
-  - core/ # Install core workspace dependencies too. Needed for prettier plugins
+  - packages/typespec-java/src/*
+  - core/
   - website/
   - eng/feeds/
   - core/packages/*
@@ -35,7 +36,11 @@ catalog:
   "@astrojs/check": ^0.9.8
   "@astrojs/react": ^6.0.0
   "@astrojs/starlight": ^0.40.0
+  "@autorest/codemodel": ~4.20.1
   "@azure-rest/core-client": ^2.3.1
+  "@azure-tools/codegen": ~2.10.1
+  "@azure-tools/openai-typespec": "1.11.0"
+  "@azure-tools/typespec-liftr-base": "0.14.0"
   "@azure/abort-controller": ^2.1.2
   "@azure/core-auth": ^1.6.0
   "@azure/core-lro": ^3.1.0
@@ -80,6 +85,8 @@ catalog:
   "@types/debounce": ^1.2.4
   "@types/express": ^5.0.6
   "@types/hast": ^3.0.4
+  "@types/js-yaml": ~4.0.9
+  "@types/lodash": ~4.17.24
   "@types/micromatch": ^4.0.10
   "@types/morgan": ^1.9.10
   "@types/multer": ^2.1.0
@@ -148,6 +155,8 @@ catalog:
   happy-dom: ^20.9.0
   hast-util-to-html: ^9.0.5
   is-unicode-supported: ^2.1.0
+  js-yaml: ~4.1.1
+  lodash: ~4.18.1
   log-symbols: ^7.0.1
   lzutf8: "0.6.3"
   micromatch: ^4.0.8

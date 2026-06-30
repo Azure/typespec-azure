@@ -10,11 +10,11 @@ export function transformModularEmitterOptions(
 ): ModularEmitterOptions {
   CASING = options.casing ?? CASING;
   const emitterOptions: ModularEmitterOptions = {
-    options: dpgContext.rlcOptions ?? {},
+    options: dpgContext.emitterOptions ?? {},
     modularOptions: {
       sourceRoot: modularSourcesRoot,
-      compatibilityMode: !!dpgContext.rlcOptions?.compatibilityMode,
-      experimentalExtensibleEnums: !!dpgContext.rlcOptions?.experimentalExtensibleEnums,
+      compatibilityMode: !!dpgContext.emitterOptions?.compatibilityMode,
+      experimentalExtensibleEnums: !!dpgContext.emitterOptions?.experimentalExtensibleEnums,
     },
   };
 

@@ -3,15 +3,15 @@
 
 import { UsageFlags } from "@azure-tools/typespec-client-generator-core";
 import { transformModularEmitterOptions } from "../modular/build-modular-options.js";
-import { NameType, normalizeName } from "../rlc-common/index.js";
 import { SdkContext } from "./interfaces.js";
+import { NameType, normalizeName } from "./name-utils.js";
 import { getMethodHierarchiesMap } from "./operation-util.js";
 
 export function generateCrossLanguageDefinitionFile(dpgContext: SdkContext): {
   CrossLanguagePackageId: string;
   CrossLanguageDefinitionId: Record<string, string>;
 } {
-  const modularSourcesRoot = dpgContext.generationPathDetail?.modularSourcesDir ?? "src";
+  const modularSourcesRoot = dpgContext.generationPathDetail?.sourcesDir ?? "src";
   const emitterOptions = transformModularEmitterOptions(dpgContext, modularSourcesRoot, {
     casing: "camel",
   });
@@ -24,7 +24,7 @@ export function generateCrossLanguageDefinitionFile(dpgContext: SdkContext): {
   }
   for (const enm of dpgContext.sdkPackage.enums) {
     // Skip api version enum for multi-service scenarios since each service may have different versions
-    if (dpgContext.rlcOptions?.isMultiService && enm.usage === UsageFlags.ApiVersionEnum) {
+    if (dpgContext.emitterOptions?.isMultiService && enm.usage === UsageFlags.ApiVersionEnum) {
       continue;
     }
     CrossLanguageDefinitionId[`${packageName}!Known${enm.name}:enum`] =
