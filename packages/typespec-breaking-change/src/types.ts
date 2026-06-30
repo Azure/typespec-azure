@@ -7,17 +7,31 @@ import type { DiffKind } from "./diff-kind.js";
 export type DiffComponent = "request" | "response";
 
 /**
+ * Version-independent operation identity: HTTP method + normalized path.
+ * Path parameters are normalized (names stripped), structure preserved.
+ * Example: { method: "GET", path: "/subscriptions/{}/resourceGroups/{}/providers/Microsoft.Foo/bars/{}" }
+ */
+export interface OperationIdentity {
+  /** HTTP method. */
+  method: string;
+  /** Normalized path (parameter names replaced with {}). */
+  path: string;
+  /** Operation name in TypeSpec source (for display/debugging). */
+  name?: string;
+}
+
+/**
  * Operation-relative identity — locates a diff within an operation's wire contract.
  * Always the primary identity for operation-level diffs.
  *
  * Examples:
- * - `{ operation: "GET /widgets/{widgetId}", component: "request", element: "query.filter" }`
- * - `{ operation: "PUT /widgets/{widgetId}", component: "request", element: "body.properties.tags" }`
- * - `{ operation: "GET /widgets/{widgetId}", component: "response", statusCode: "200", element: "body.properties.name" }`
+ * - `{ operation: { method: "GET", path: "/widgets/{}" }, component: "request", element: "query.filter" }`
+ * - `{ operation: { method: "PUT", path: "/widgets/{}" }, component: "request", element: "body.properties.tags" }`
+ * - `{ operation: { method: "GET", path: "/widgets/{}" }, component: "response", statusCode: "200", element: "body.properties.name" }`
  */
 export interface OperationDiffIdentity {
-  /** Operation wire identity (HTTP method + normalized path). */
-  operation: string;
+  /** The operation this diff belongs to. */
+  operation: OperationIdentity;
   /** Whether the diff is in the request or response direction. */
   component: DiffComponent;
   /** For response diffs — which status code (e.g., "200", "404", "*"). */
@@ -44,20 +58,6 @@ export interface ServiceDiffIdentity {
 
 /** Primary identity for a diff — either operation-relative or service-level. */
 export type DiffIdentity = OperationDiffIdentity | ServiceDiffIdentity;
-
-/**
- * Declaration identity — supplemental identity tracing a diff back to a named TypeSpec declaration.
- * Used for suppression matching (decorator on the named type) and deduplication
- * (same model property changed across multiple operations = one finding).
- *
- * Examples:
- * - `{ declarationPath: "Microsoft.Foo.Models.Widget.tags" }`
- * - `{ declarationPath: "Microsoft.Foo.Models.WidgetProperties.legacyStatus" }`
- */
-export interface DeclarationIdentity {
-  /** Fully-qualified TypeSpec declaration path (namespace.model.property). */
-  declarationPath: string;
-}
 
 /** Type guard: is this an operation-relative identity? */
 export function isOperationIdentity(id: DiffIdentity): id is OperationDiffIdentity {
@@ -136,20 +136,6 @@ export interface OriginDeclaration {
   type: Type;
   /** Source location of the declaration (for error reporting). */
   sourceLocation: SourceLocation;
-}
-
-/**
- * Version-independent operation identity: HTTP method + normalized path.
- * Path parameters are normalized (names stripped), structure preserved.
- * Example: "GET /subscriptions/{}/resourceGroups/{}/providers/Microsoft.Foo/bars/{}"
- */
-export interface OperationIdentity {
-  /** HTTP method. */
-  method: string;
-  /** Normalized path (parameter names replaced with {}). */
-  path: string;
-  /** Operation name in TypeSpec source. */
-  name?: string;
 }
 
 /**
