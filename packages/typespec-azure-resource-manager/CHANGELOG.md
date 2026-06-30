@@ -1,5 +1,19 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.69.2
+
+### Bug Fixes
+
+- [#4627](https://github.com/Azure/typespec-azure/pull/4627) Remove `@armCommonDefinition` decorators from `CustomerManagedKeyEncryption` and `Encryption` types so they are emitted inline rather than as common-types `$ref` entries in OpenAPI output.
+  
+  ```tsp
+  // These types are now emitted inline in specs that reference them:
+  model MyEncryptionConfig {
+    customerManagedKeyEncryption?: Azure.ResourceManager.CommonTypes.CustomerManagedKeyEncryption;
+  }
+  ```
+
+
 ## 0.69.1
 
 ### Bug Fixes
