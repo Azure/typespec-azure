@@ -29,7 +29,7 @@
   },
   "scripts": {
     "clean": "rimraf ./dist ./temp",
-    "build": "cp -r ../../../../core/packages/http-client-java/generator/ ./generator && mvn install -f ../../../../core/packages/http-client-java/generator/pom.xml -Dspotless.skip=true -DskipTests=true &&  tsc -p .",
+    "build": "rsync -a --exclude='options.ts' ../../../../core/packages/http-client-java/emitter/src/ ./src/ && mvn install -f ../../../../core/packages/http-client-java/generator/pom.xml -Dspotless.skip=true -DskipTests=true && cp -r ../../../../core/packages/http-client-java/generator/http-client-generator/target/ ./generator/http-client-generator/target/ && tsc -p .",
     "watch": "tsc -p . --watch",
     "test:java:e2e": "vitest run",
     "format": "npm run -s prettier -- --write",
