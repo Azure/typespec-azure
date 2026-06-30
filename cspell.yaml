@@ -180,7 +180,6 @@ words:
   - subscriptionidapiversion
   - supportsnetworkacls
   - tcgc
-  - tsgolint
   - testcmk
   - tofile
   - tsmv
