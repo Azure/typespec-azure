@@ -56,6 +56,13 @@ configuration:
           - if:
               - includesModifiedFiles:
                   files:
+                    - packages/typespec-java/**/*
+            then:
+              - addLabel:
+                  label: emitter:java
+          - if:
+              - includesModifiedFiles:
+                  files:
                     - packages/typespec-client-generator-core/**/*
             then:
               - addLabel:
