@@ -28,6 +28,7 @@ describe("expect all rules to be defined", () => {
   describe.each([
     ["data-plane", [linters.azureCore]],
     ["resource-manager", [linters.azureCore, linters.resourceManager]],
+    ["resource-manager-suppression-required", [linters.azureCore, linters.resourceManager]],
   ])("%s ruleset", (rulesetName, linters: DependingLinter[]) => {
     it.each(linters)("rules from $name", ({ name, linter }) => {
       const ruleset = $linter.ruleSets?.[rulesetName];
