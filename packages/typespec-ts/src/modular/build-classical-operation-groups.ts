@@ -1,9 +1,9 @@
 import { SdkClientType, SdkServiceOperation } from "@azure-tools/typespec-client-generator-core";
 import { SourceFile } from "ts-morph";
 import { useContext } from "../context-manager.js";
-import { NameType } from "../rlc-common/index.js";
-import { getModularClientOptions } from "../utils/client-utils.js";
+import { getClientModuleInfo } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
+import { NameType } from "../utils/name-utils.js";
 import { getMethodHierarchiesMap } from "../utils/operation-util.js";
 import { getClassicalOperation } from "./helpers/classical-operation-helpers.js";
 import { getClassicalLayerPrefix } from "./helpers/naming-helpers.js";
@@ -17,7 +17,7 @@ export function buildClassicOperationFiles(
   // const sdkPackage = dpgContext.sdkPackage;
   const project = useContext("outputProject");
   const [_hierarchy, client] = clientMap;
-  const { subfolder } = getModularClientOptions(clientMap);
+  const { subfolder } = getClientModuleInfo(clientMap);
   const classicOperationFiles: Map<string, SourceFile> = new Map<string, SourceFile>();
   const methodMap = getMethodHierarchiesMap(dpgContext, client);
   for (const [prefixKey, operations] of methodMap) {
