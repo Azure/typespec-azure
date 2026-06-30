@@ -29,7 +29,7 @@
   },
   "scripts": {
     "clean": "rimraf ./dist ./temp",
-    "build": "rsync -a --exclude='options.ts' ../../../../core/packages/http-client-java/emitter/src/ ./src/ && mvn install -f ../../../../core/packages/http-client-java/generator/pom.xml -Dspotless.skip=true -DskipTests=true && cp -r ../../../../core/packages/http-client-java/generator/http-client-generator/target/ ./target/ && tsc -p .",
+    "build": "node -e \"const{cpSync}=require('fs');cpSync('../../../../core/packages/http-client-java/emitter/src','./src',{recursive:true,filter:(s)=>!s.endsWith('options.ts')})\" && mvn install -f ../../../../core/packages/http-client-java/generator/pom.xml -Dspotless.skip=true -DskipTests=true && cp -r ../../../../core/packages/http-client-java/generator/http-client-generator/target/ ./target/ && tsc -p .",
     "watch": "tsc -p . --watch",
     "test:java:e2e": "vitest run",
     "format": "npm run -s prettier -- --write",
@@ -45,6 +45,7 @@
     "target/classes/PerfAutomation.jfc"
   ],
   "peerDependencies": {
+    "@azure-tools/codegen": "catalog:",
     "@azure-tools/openai-typespec": "catalog:",
     "@azure-tools/typespec-autorest": "workspace:^",
     "@azure-tools/typespec-azure-core": "workspace:^",
@@ -66,6 +67,7 @@
     "lodash": "catalog:"
   },
   "devDependencies": {
+    "@azure-tools/codegen": "catalog:",
     "@azure-tools/openai-typespec": "catalog:",
     "@azure-tools/typespec-autorest": "workspace:^",
     "@azure-tools/typespec-azure-core": "workspace:^",
