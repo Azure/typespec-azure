@@ -205,6 +205,13 @@ export async function openInVsCode(
     rmSync(join(repo, entry), { recursive: true, force: true });
   }
   cpSync(headDir, repo, { recursive: true });
+  // Drop all index entries first, then re-add. A plain `git add -A` decides a
+  // file is unchanged from (size, mtime) and skips re-hashing it; because the
+  // baseline commit and the head overlay are written within the same second,
+  // a same-size content edit would be treated as clean and never staged (so it
+  // would silently not appear in VS Code). Clearing the index forces git to
+  // re-hash every file's content, surfacing every real modification.
+  await git(["rm", "-r", "--cached", "-q", "--", "."]);
   await git(["add", "-A"]);
 
   const result = await run("code", [repo]);
