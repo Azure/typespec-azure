@@ -79,6 +79,49 @@ node eng/emitter-diff/src/cli.ts --emitter python \
   --run-tests --test-env test,mypy,pyright --opt flavor=azure
 ```
 
+## Viewing the diff in VS Code
+
+`--open` gives you a native, side-by-side source diff of the two generated trees. VS Code has
+no CLI to diff two *folders* (`code --diff` only compares two files), so the tool stages the
+comparison as a throwaway git working tree under `<work-dir>/vscode-diff`: the **baseline** tree
+is committed, the **head** tree is overlaid on top and left staged. Opening that folder shows
+every changed generated file in the **Source Control** panel with red/green diffs — click any
+file for the side-by-side view.
+
+```bash
+# Keep the scratch dir so it survives the run, and open the diff in VS Code:
+node eng/emitter-diff/src/cli.ts --emitter python \
+  --baseline npm:0.60.0 --opt flavor=azure --name encode/duration \
+  --work-dir ./emitter-diff-out --open -- --use-pyodide
+```
+
+If you generated the trees without `--open` (or want to reopen later), build the same view by
+hand from the `baseline/` and `head/` folders under your `--work-dir` and open it in VS Code:
+
+```bash
+cd ./emitter-diff-out
+git init -q vscode-diff
+cp -r baseline/. vscode-diff/
+git -C vscode-diff add -A && git -C vscode-diff commit -qm baseline
+# overlay head on top, keeping .git
+find vscode-diff -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+cp -r head/. vscode-diff/
+git -C vscode-diff add -A
+code vscode-diff   # browse changes in the Source Control panel
+```
+
+```powershell
+# PowerShell equivalent of the overlay step:
+cd .\emitter-diff-out
+git init -q vscode-diff
+Copy-Item -Recurse -Force .\baseline\* .\vscode-diff
+git -C vscode-diff add -A; git -C vscode-diff commit -qm baseline
+Get-ChildItem .\vscode-diff -Force | Where-Object Name -ne ".git" | Remove-Item -Recurse -Force
+Copy-Item -Recurse -Force .\head\* .\vscode-diff
+git -C vscode-diff add -A
+code vscode-diff
+```
+
 ## Adding a new language adapter
 
 1. Implement `EmitterAdapter` (`src/types.ts`) — `prepareEmitter`, `generate`, optional `runTests` —

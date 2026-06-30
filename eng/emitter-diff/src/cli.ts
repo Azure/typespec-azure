@@ -184,7 +184,7 @@ async function main(): Promise<number> {
   const diff = await diffDirs(baselineOut, headOut, log);
   printDiff(diff, log);
 
-  if (values.open) await openInVsCode(baselineOut, headOut, log);
+  if (values.open) await openInVsCode(baselineOut, headOut, workDir, log);
   if (values.html) await writeHtml(diff, values.html, log);
 
   // Optionally run test suites.

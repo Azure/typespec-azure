@@ -5,11 +5,11 @@
  *  - local `--open`: VS Code folder diff
  *  - CI `--html`: rendered via diff2html (optional dependency, lazily loaded)
  */
-import { writeFileSync } from "node:fs";
-import { basename, dirname } from "node:path";
+import { cpSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { basename, dirname, join } from "node:path";
 
 import type { Logger } from "./types.ts";
-import { color, run } from "./util.ts";
+import { color, run, runChecked } from "./util.ts";
 
 export interface DiffResult {
   /** The unified patch text (empty when there are no differences). */
@@ -145,18 +145,65 @@ ${body}
   log.success(`Wrote HTML diff to ${outFile}`);
 }
 
-/** Open a folder comparison in VS Code (`code --diff <baseline> <head>`). */
+/**
+ * Open a native side-by-side diff of the two generated trees in VS Code.
+ *
+ * VS Code has no CLI to diff two folders (`code --diff` only compares two
+ * files), so we materialize the comparison as a throwaway git working-tree
+ * change: commit the baseline tree, then overlay the head tree on top and leave
+ * it unstaged. Opening that folder surfaces every changed generated file in the
+ * Source Control view with red/green side-by-side diffs.
+ */
 export async function openInVsCode(
   baselineDir: string,
   headDir: string,
+  workDir: string,
   log: Logger,
 ): Promise<void> {
-  log.step("Opening diff in VS Code");
-  const result = await run("code", ["--diff", baselineDir, headDir]);
+  log.step("Preparing VS Code diff");
+  const repo = join(workDir, "vscode-diff");
+  rmSync(repo, { recursive: true, force: true });
+  mkdirSync(repo, { recursive: true });
+
+  const git = (args: string[]) =>
+    runChecked("git", [
+      "-C",
+      repo,
+      "-c",
+      "user.email=emitter-diff@local",
+      "-c",
+      "user.name=emitter-diff",
+      "-c",
+      "commit.gpgsign=false",
+      "-c",
+      "core.autocrlf=false",
+      ...args,
+    ]);
+
+  await git(["init", "-q"]);
+  // Commit the baseline tree as the starting point.
+  cpSync(baselineDir, repo, { recursive: true });
+  await git(["add", "-A"]);
+  await git(["commit", "-q", "-m", "baseline", "--allow-empty"]);
+
+  // Overlay the head tree (keeping .git), then stage so VS Code shows the diff.
+  for (const entry of readdirSync(repo)) {
+    if (entry === ".git") continue;
+    rmSync(join(repo, entry), { recursive: true, force: true });
+  }
+  cpSync(headDir, repo, { recursive: true });
+  await git(["add", "-A"]);
+
+  const result = await run("code", [repo]);
   if (result.code !== 0) {
     log.warn(
-      "Could not launch VS Code (`code` not on PATH?). " +
-        `Compare manually: ${baselineDir} vs ${headDir}`,
+      "Could not launch VS Code (`code` not on PATH?). Open the folder manually " +
+        `and use the Source Control view to browse the diff: ${repo}`,
     );
+    return;
   }
+  log.success(
+    `Opened ${repo} in VS Code — use the Source Control panel to browse the diff ` +
+      "(baseline = last commit, head = working tree).",
+  );
 }
