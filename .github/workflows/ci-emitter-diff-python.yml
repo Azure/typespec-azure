@@ -67,7 +67,7 @@ jobs:
         id: diff
         run: |
           set +e
-          node eng/emitter-diff/src/cli.ts \
+          npx tsx eng/emitter-diff/src/cli.ts \
             --emitter python \
             --baseline "${{ steps.baseline.outputs.ref }}" \
             --work-dir "${{ runner.temp }}/emitter-diff" \

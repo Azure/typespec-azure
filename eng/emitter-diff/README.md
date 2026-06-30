@@ -22,7 +22,7 @@ contains no language-specific logic.
 
 - The **adapter** wraps the emitter's existing commands. For python that is
   `eng/scripts/regenerate.ts` (generation) and `eng/scripts/ci/run-tests.ts` (suites).
-- The regenerate *driver* always comes from the current checkout; only the emitter build it points
+- The regenerate _driver_ always comes from the current checkout; only the emitter build it points
   at (`--emitter-dir`) changes between baseline and head, isolating the diff to emitter behavior.
 
 ## Usage
@@ -32,17 +32,17 @@ contains no language-specific logic.
 pnpm --filter @azure-tools/emitter-diff exec tsx src/cli.ts --emitter python --baseline 0.61.2
 
 # Or directly with Node 22+ (native TS):
-node eng/emitter-diff/src/cli.ts --emitter python --baseline 0.61.2
+npx tsx eng/emitter-diff/src/cli.ts --emitter python --baseline 0.61.2
 ```
 
 ### Refs (`--baseline`, `--head`, `--specs`)
 
-| Syntax | Meaning |
-| --- | --- |
-| `npm:1.2.3` or `1.2.3` | a published package version (prebuilt) |
-| `local:/path` or `./path` | a local source folder |
-| `github:owner/repo@<sha\|branch>` | a GitHub source at a ref |
-| `gh:<sha\|branch>` | the current repo at a ref |
+| Syntax                            | Meaning                                |
+| --------------------------------- | -------------------------------------- |
+| `npm:1.2.3` or `1.2.3`            | a published package version (prebuilt) |
+| `local:/path` or `./path`         | a local source folder                  |
+| `github:owner/repo@<sha\|branch>` | a GitHub source at a ref               |
+| `gh:<sha\|branch>`                | the current repo at a ref              |
 
 `--head` defaults to the **current checkout**. `--specs` defaults to **all** repo specs.
 
@@ -52,19 +52,19 @@ By default the tool writes a **clickable HTML report** (`emitter-diff.html`) int
 prints a `file://` link to it. Use `--vscode` for a live VS Code diff, `--terminal` for the full
 patch in your shell, or `--patch`/`--html` to write to a specific file.
 
-| Option | Description |
-| --- | --- |
-| `--name <pattern>` | Filter which specs/packages are generated |
-| `--html <file>` | Write the rendered HTML report to this path (default: `<work-dir>/emitter-diff.html`) |
-| `--vscode` | Open the diff in VS Code instead of writing HTML |
-| `--terminal` | Print the full colored patch to the terminal instead |
-| `--patch <file>` | Write the raw unified diff to a file |
-| `--fail-on-diff` | Exit non-zero when output differs (CI gating) |
-| `--run-tests` | Run the adapter's test suites on the output |
-| `--test-env <csv>` | Suites to run, e.g. `test,lint,mypy,pyright` |
-| `--test-target <which>` | `head` (default) \| `baseline` \| `both` |
-| `--opt key=value` | Repeatable adapter-specific option (e.g. `--opt flavor=azure`) |
-| `-- <args>` | Everything after `--` is forwarded to the adapter |
+| Option                  | Description                                                                           |
+| ----------------------- | ------------------------------------------------------------------------------------- |
+| `--name <pattern>`      | Filter which specs/packages are generated                                             |
+| `--html <file>`         | Write the rendered HTML report to this path (default: `<work-dir>/emitter-diff.html`) |
+| `--vscode`              | Open the diff in VS Code instead of writing HTML                                      |
+| `--terminal`            | Print the full colored patch to the terminal instead                                  |
+| `--patch <file>`        | Write the raw unified diff to a file                                                  |
+| `--fail-on-diff`        | Exit non-zero when output differs (CI gating)                                         |
+| `--run-tests`           | Run the adapter's test suites on the output                                           |
+| `--test-env <csv>`      | Suites to run, e.g. `test,lint,mypy,pyright`                                          |
+| `--test-target <which>` | `head` (default) \| `baseline` \| `both`                                              |
+| `--opt key=value`       | Repeatable adapter-specific option (e.g. `--opt flavor=azure`)                        |
+| `-- <args>`             | Everything after `--` is forwarded to the adapter                                     |
 
 > `--open` is kept as an alias for `--vscode`.
 
@@ -72,29 +72,29 @@ patch in your shell, or `--patch`/`--html` to write to a specific file.
 
 ```bash
 # Default: writes a clickable emitter-diff.html and prints a file:// link.
-node eng/emitter-diff/src/cli.ts --emitter python --baseline 0.61.2 \
+npx tsx eng/emitter-diff/src/cli.ts --emitter python --baseline 0.61.2 \
   --opt flavor=azure --name authentication-api-key
 
 # Open the diff live in VS Code instead:
-node eng/emitter-diff/src/cli.ts --emitter python --baseline 0.61.2 \
+npx tsx eng/emitter-diff/src/cli.ts --emitter python --baseline 0.61.2 \
   --opt flavor=azure --name authentication-api-key --vscode
 
 # Compare two source folders and write an HTML report to a specific path:
-node eng/emitter-diff/src/cli.ts --emitter python \
+npx tsx eng/emitter-diff/src/cli.ts --emitter python \
   --baseline local:/path/to/old/typespec-python \
-  --head    local:/path/to/new/typespec-python \
+  --head local:/path/to/new/typespec-python \
   --html diff.html
 
 # Diff against a GitHub sha and run pytest + type checks on the head output:
-node eng/emitter-diff/src/cli.ts --emitter python \
-  --baseline github:Azure/typespec-azure@<sha> \
-  --run-tests --test-env test,mypy,pyright --opt flavor=azure
+npx tsx eng/emitter-diff/src/cli.ts --emitter python \
+  --baseline github:Azure/typespec-azure@ \
+  --test-env test,mypy,pyright --opt flavor=azure < sha > --run-tests
 ```
 
 ## Viewing the diff in VS Code
 
 `--vscode` gives you a native, side-by-side source diff of the two generated trees. VS Code has
-no CLI to diff two *folders* (`code --diff` only compares two files), so the tool stages the
+no CLI to diff two _folders_ (`code --diff` only compares two files), so the tool stages the
 comparison as a throwaway git working tree under `<work-dir>/vscode-diff`: the **baseline** tree
 is committed, the **head** tree is overlaid on top and left staged. Opening that folder shows
 every changed generated file in the **Source Control** panel with red/green diffs — click any
@@ -102,7 +102,7 @@ file for the side-by-side view.
 
 ```bash
 # Keep the scratch dir so it survives the run, and open the diff in VS Code:
-node eng/emitter-diff/src/cli.ts --emitter python \
+npx tsx eng/emitter-diff/src/cli.ts --emitter python \
   --baseline npm:0.60.0 --opt flavor=azure --name encode/duration \
   --work-dir ./emitter-diff-out --vscode
 ```
@@ -119,7 +119,7 @@ git -C vscode-diff add -A && git -C vscode-diff commit -qm baseline
 find vscode-diff -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
 cp -r head/. vscode-diff/
 git -C vscode-diff add -A
-code vscode-diff   # browse changes in the Source Control panel
+code vscode-diff # browse changes in the Source Control panel
 ```
 
 ```powershell
@@ -170,4 +170,3 @@ The core needs no changes.
   faster natively). Override with `--opt pyodide=true|false`, or forward `-- --use-pyodide` to the
   driver explicitly, e.g.
   `emitter-diff --emitter python --baseline npm:latest --opt pyodide=true`.
-

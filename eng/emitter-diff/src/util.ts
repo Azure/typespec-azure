@@ -5,7 +5,7 @@
 import { spawn, type SpawnOptions } from "node:child_process";
 import { mkdirSync } from "node:fs";
 
-import type { Logger } from "./types.ts";
+import type { Logger } from "./types.js";
 
 // ---- Minimal ANSI colors (no picocolors dependency) ----
 
@@ -61,8 +61,7 @@ export function run(
     // Only route through a shell for Windows .cmd shims (npm/pnpm/npx/code/yarn).
     // Native binaries like git/node are spawned directly to avoid the shell
     // argument-escaping deprecation and quoting pitfalls.
-    const needsShell =
-      process.platform === "win32" && /^(npm|pnpm|npx|yarn|code)$/.test(cmd);
+    const needsShell = process.platform === "win32" && /^(npm|pnpm|npx|yarn|code)$/.test(cmd);
     const spawnOpts: SpawnOptions = {
       cwd: opts.cwd,
       env: opts.env ?? process.env,

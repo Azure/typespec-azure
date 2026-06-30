@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env -S npx tsx
 /**
  * emitter-diff — language-agnostic CLI.
  *
@@ -9,16 +9,16 @@
 import { join } from "node:path";
 import { parseArgs } from "node:util";
 
-import { diffDirs, openInVsCode, printDiff, printSummary, writeHtml, writePatch } from "./diff.ts";
-import { getAdapter, listAdapters } from "./registry.ts";
+import { diffDirs, openInVsCode, printDiff, printSummary, writeHtml, writePatch } from "./diff.js";
+import { getAdapter, listAdapters } from "./registry.js";
 import {
   classifyRef,
   defaultWorkDir,
   installNpmPackage as installNpm,
   resolveSource as resolveSrc,
-} from "./resolver.ts";
-import type { AdapterContext, ClassifiedRef } from "./types.ts";
-import { color, createLogger, ensureDir, runChecked } from "./util.ts";
+} from "./resolver.js";
+import type { AdapterContext, ClassifiedRef } from "./types.js";
+import { color, createLogger, ensureDir, runChecked } from "./util.js";
 
 const HELP = `${color.bold("emitter-diff")} — diff generated code across emitter versions
 
@@ -102,17 +102,13 @@ async function main(): Promise<number> {
   }
 
   if (!listAdapters().includes(values.emitter)) {
-    log.error(
-      `Unknown emitter '${values.emitter}'. Available: ${listAdapters().join(", ")}`,
-    );
+    log.error(`Unknown emitter '${values.emitter}'. Available: ${listAdapters().join(", ")}`);
     return 2;
   }
   const adapter = getAdapter(values.emitter);
 
   // Repo root = current git working tree.
-  const repoRoot = (
-    await runChecked("git", ["rev-parse", "--show-toplevel"])
-  ).stdout.trim();
+  const repoRoot = (await runChecked("git", ["rev-parse", "--show-toplevel"])).stdout.trim();
 
   const workDir = ensureDir(values["work-dir"] ? join(values["work-dir"]) : defaultWorkDir());
   log.info(`${color.dim("work dir:")} ${workDir}`);
@@ -122,8 +118,7 @@ async function main(): Promise<number> {
     workDir,
     log,
     resolveSource: (ref, _packageName) => resolveSrc(ref, workDir, log),
-    installNpmPackage: (packageName, version) =>
-      installNpm(packageName, version, workDir, log),
+    installNpmPackage: (packageName, version) => installNpm(packageName, version, workDir, log),
   };
 
   // Parse adapter options (--opt key=value).
@@ -217,7 +212,10 @@ async function main(): Promise<number> {
     if (!adapter.runTests) {
       log.warn(`Adapter '${adapter.name}' does not support --run-tests yet.`);
     } else {
-      const envs = values["test-env"]?.split(",").map((s) => s.trim()).filter(Boolean);
+      const envs = values["test-env"]
+        ?.split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
       const target = values["test-target"] ?? "head";
       const targets: Array<{ label: string; dir: string }> = [];
       if (target === "head" || target === "both") targets.push({ label: "head", dir: headOut });

@@ -9,8 +9,8 @@ import { cpSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
-import type { Logger } from "./types.ts";
-import { color, run, runChecked } from "./util.ts";
+import type { Logger } from "./types.js";
+import { color, run, runChecked } from "./util.js";
 
 export interface DiffResult {
   /** The unified patch text (empty when there are no differences). */
@@ -89,8 +89,10 @@ export function printDiff(diff: DiffResult, log: Logger): void {
     return;
   }
   for (const line of diff.patch.split("\n")) {
-    if (line.startsWith("+") && !line.startsWith("+++")) process.stdout.write(color.green(line) + "\n");
-    else if (line.startsWith("-") && !line.startsWith("---")) process.stdout.write(color.red(line) + "\n");
+    if (line.startsWith("+") && !line.startsWith("+++"))
+      process.stdout.write(color.green(line) + "\n");
+    else if (line.startsWith("-") && !line.startsWith("---"))
+      process.stdout.write(color.red(line) + "\n");
     else if (line.startsWith("@@")) process.stdout.write(color.cyan(line) + "\n");
     else if (line.startsWith("diff ") || line.startsWith("index "))
       process.stdout.write(color.bold(line) + "\n");
@@ -110,7 +112,9 @@ export function printSummary(diff: DiffResult, log: Logger): void {
 export function writePatch(diff: DiffResult, outFile: string, log: Logger): void {
   writeFileSync(outFile, diff.patch, "utf8");
   if (!diff.hasChanges) {
-    log.success(`No differences between baseline and head output (wrote empty patch to ${outFile}).`);
+    log.success(
+      `No differences between baseline and head output (wrote empty patch to ${outFile}).`,
+    );
     return;
   }
   log.success(`Wrote unified diff to ${outFile}`);
@@ -120,11 +124,7 @@ export function writePatch(diff: DiffResult, outFile: string, log: Logger): void
  * Render the patch to a self-contained HTML file via diff2html. diff2html is an
  * optional dependency loaded lazily so the core runs without it installed.
  */
-export async function writeHtml(
-  diff: DiffResult,
-  outFile: string,
-  log: Logger,
-): Promise<void> {
+export async function writeHtml(diff: DiffResult, outFile: string, log: Logger): Promise<void> {
   let html: (typeof import("diff2html"))["html"];
   try {
     ({ html } = await import("diff2html"));

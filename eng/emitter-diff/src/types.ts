@@ -98,10 +98,7 @@ export interface EmitterAdapter {
    * built emitter. `npm` versions ship prebuilt; `local`/`github`/`current`
    * may need a build, which is the adapter's responsibility.
    */
-  prepareEmitter(
-    ref: ClassifiedRef | "current",
-    ctx: AdapterContext,
-  ): Promise<ResolvedEmitter>;
+  prepareEmitter(ref: ClassifiedRef | "current", ctx: AdapterContext): Promise<ResolvedEmitter>;
 
   /** Generate code into `request.outputDir` using `request.emitter`. */
   generate(request: GenerateRequest, ctx: AdapterContext): Promise<void>;
