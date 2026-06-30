@@ -3,17 +3,20 @@
  *
  * This is the only python-aware code in the tool. It satisfies the generic
  * {@link EmitterAdapter} contract by wrapping the python package's own scripts:
- *  - generation → `eng/scripts/regenerate.ts` (driven with `--emitter-dir` +
- *    `--output-dir` overrides so any emitter build can target any output dir).
+ *  - generation → `eng/scripts/ci/regenerate.ts` (driven with `--pluginDir`
+ *    (emitter build) + `--generatedFolder` (output root) overrides so any
+ *    emitter build can target any output dir).
  *  - test suites → `eng/scripts/ci/run-tests.ts` (pytest/lint/mypy/pyright...).
  *
  * The regenerate *driver* always comes from the current checkout; only the
- * `--emitter-dir` it points at changes between baseline and head. That isolates
- * the diff to emitter behavior rather than driver/spec-mapping differences.
+ * `--pluginDir` it points at changes between baseline and head. Specs are also
+ * pinned to the current checkout so the diff isolates emitter behavior rather
+ * than driver/spec differences.
  */
 import { cpSync, existsSync, rmSync } from "node:fs";
 import { join } from "node:path";
 
+import { describeRef } from "../resolver.ts";
 import type {
   AdapterContext,
   ClassifiedRef,
@@ -22,7 +25,6 @@ import type {
   ResolvedEmitter,
   RunTestsRequest,
 } from "../types.ts";
-import { describeRef } from "../resolver.ts";
 import { run, runChecked } from "../util.ts";
 
 const PACKAGE_NAME = "@azure-tools/typespec-python";
@@ -92,11 +94,17 @@ export const pythonAdapter: EmitterAdapter = {
   },
 
   async generate(request: GenerateRequest, ctx: AdapterContext): Promise<void> {
+    // The new in-process regenerate driver anchors generated output at
+    // `<generatedFolder>/../tests/generated/...`. Point generatedFolder at a
+    // `generator` subdir of the requested output dir so files land directly
+    // under request.outputDir/tests/generated, which the diff engine compares.
     const args = [
-      "--emitter-dir",
+      "--pluginDir",
       request.emitter.dir,
-      "--output-dir",
-      request.outputDir,
+      "--generatedFolder",
+      join(request.outputDir, "generator"),
+      // Emit only fresh codegen — skip the azure-sdk-for-python baseline clone.
+      "--no-baseline",
     ];
 
     const flavor = request.options.flavor;
@@ -116,34 +124,31 @@ export const pythonAdapter: EmitterAdapter = {
         : process.platform === "win32";
     if (usePyodide && !passthroughHasPyodide) args.push("--use-pyodide");
 
-    if (request.specsDir) {
-      // External specs must mirror the http-specs / azure-http-specs layout.
-      const httpSpecs = firstExisting([
-        join(request.specsDir, "http-specs", "specs"),
-        join(request.specsDir, "specs"),
-        request.specsDir,
-      ]);
-      const azureSpecs = firstExisting([
-        join(request.specsDir, "azure-http-specs", "specs"),
-        join(request.specsDir, "azure", "specs"),
-      ]);
-      if (httpSpecs) args.push("--http-specs-dir", httpSpecs);
-      if (azureSpecs) args.push("--azure-specs-dir", azureSpecs);
-    }
+    // Specs are pinned to the current checkout so only the emitter differs
+    // between baseline and head. External specs (--specs) override that.
+    const httpSpecs = resolveHttpSpecs(request, ctx);
+    const azureSpecs = resolveAzureSpecs(request, ctx);
+    if (httpSpecs) args.push("--httpSpecsDir", httpSpecs);
+    if (azureSpecs) args.push("--azureSpecsDir", azureSpecs);
 
     args.push(...request.passthrough);
 
     ctx.log.step(`Generating with ${request.emitter.label} → ${request.outputDir}`);
-    await runScript(ctx, "eng/scripts/regenerate.ts", args);
+    await runScript(ctx, "eng/scripts/ci/regenerate.ts", args);
   },
 
   async runTests(request: RunTestsRequest, ctx: AdapterContext): Promise<void> {
-    // The python test harness is wired to <package>/tests/generated. Sync the
-    // output tree there, then run the existing runner unchanged.
+    // The python test harness is wired to <package>/tests/generated. The diff
+    // tool's output dir holds the generated tree under `tests/generated`
+    // (see generate()), so sync that subtree there, then run the runner.
     const generatedRoot = join(pkgDir(ctx), "tests", "generated");
-    ctx.log.step(`Syncing output into ${generatedRoot} for test run`);
+    const source = firstExisting([
+      join(request.outputDir, "tests", "generated"),
+      request.outputDir,
+    ])!;
+    ctx.log.step(`Syncing ${source} into ${generatedRoot} for test run`);
     rmSync(generatedRoot, { recursive: true, force: true });
-    cpSync(request.outputDir, generatedRoot, { recursive: true });
+    cpSync(source, generatedRoot, { recursive: true });
 
     const args: string[] = [];
     if (request.envs && request.envs.length > 0) {
@@ -161,4 +166,35 @@ export const pythonAdapter: EmitterAdapter = {
 
 function firstExisting(paths: string[]): string | undefined {
   return paths.find((p) => existsSync(p));
+}
+
+/** Default http-specs dir inside the current checkout's python package. */
+function defaultHttpSpecs(ctx: AdapterContext): string {
+  return join(pkgDir(ctx), "node_modules", "@typespec", "http-specs", "specs");
+}
+
+/** Default azure-http-specs dir inside the current checkout's python package. */
+function defaultAzureSpecs(ctx: AdapterContext): string {
+  return join(pkgDir(ctx), "node_modules", "@azure-tools", "azure-http-specs", "specs");
+}
+
+function resolveHttpSpecs(request: GenerateRequest, ctx: AdapterContext): string | undefined {
+  if (request.specsDir) {
+    return firstExisting([
+      join(request.specsDir, "http-specs", "specs"),
+      join(request.specsDir, "specs"),
+      request.specsDir,
+    ]);
+  }
+  return firstExisting([defaultHttpSpecs(ctx)]);
+}
+
+function resolveAzureSpecs(request: GenerateRequest, ctx: AdapterContext): string | undefined {
+  if (request.specsDir) {
+    return firstExisting([
+      join(request.specsDir, "azure-http-specs", "specs"),
+      join(request.specsDir, "azure", "specs"),
+    ]);
+  }
+  return firstExisting([defaultAzureSpecs(ctx)]);
 }
