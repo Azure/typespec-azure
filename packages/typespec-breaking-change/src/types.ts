@@ -2,37 +2,71 @@ import type { Program, SourceLocation, Type, Value } from "@typespec/compiler";
 import type { DiffKind } from "./diff-kind.js";
 
 /**
- * The direction component of a diff — request, response, or service-level.
+ * The direction component of a diff — request or response.
  */
-export type DiffComponent = "request" | "response" | "service";
+export type DiffComponent = "request" | "response";
 
 /**
- * Version-independent identity for where in the API surface a change occurred.
- * This is the same path format used in `@approvedBreakingChange` `path:` values
- * for suppression matching.
+ * Operation-relative identity — locates a diff within an operation's wire contract.
+ * Always the primary identity for operation-level diffs.
  *
- * For operation-relative diffs:
+ * Examples:
  * - `{ operation: "GET /widgets/{widgetId}", component: "request", element: "query.filter" }`
  * - `{ operation: "PUT /widgets/{widgetId}", component: "request", element: "body.properties.tags" }`
  * - `{ operation: "GET /widgets/{widgetId}", component: "response", statusCode: "200", element: "body.properties.name" }`
- *
- * For diffs on named model declarations (shared across operations):
- * - `{ declarationPath: "Microsoft.Foo.Models.BarProperties.legacyStatus", element: "properties.legacyStatus" }`
- *
- * For service-level diffs:
- * - `{ component: "service", element: "authSchemes.Bearer" }`
  */
-export interface DiffPath {
-  /** Operation wire identity (e.g., "GET /widgets/{widgetId}"). Absent for service-level and model-level diffs. */
-  operation?: string;
-  /** TypeSpec declaration path for diffs on named types (e.g., "Microsoft.Foo.Models.BarProperties.legacyStatus"). */
-  declarationPath?: string;
-  /** Direction component. Absent for operation-level diffs (added/removed). */
-  component?: DiffComponent;
-  /** For response diffs — which status code. */
+export interface OperationDiffIdentity {
+  /** Operation wire identity (HTTP method + normalized path). */
+  operation: string;
+  /** Whether the diff is in the request or response direction. */
+  component: DiffComponent;
+  /** For response diffs — which status code (e.g., "200", "404", "*"). */
   statusCode?: string;
-  /** The specific element (parameter name, property path, status code, etc.). */
+  /**
+   * The specific element path within the operation.
+   * Keywords: path.<name>, query.<name>, headers.<name>, body, body.properties.<name>,
+   * contentTypes.<type>, properties.<name> (nested).
+   */
   element: string;
+}
+
+/**
+ * Service-level identity — for diffs affecting the entire service (auth, versioning, endpoints).
+ *
+ * Examples:
+ * - `{ element: "authSchemes.Bearer" }`
+ * - `{ element: "versions.2024-01-01" }`
+ */
+export interface ServiceDiffIdentity {
+  /** The specific service-level element. */
+  element: string;
+}
+
+/** Primary identity for a diff — either operation-relative or service-level. */
+export type DiffIdentity = OperationDiffIdentity | ServiceDiffIdentity;
+
+/**
+ * Declaration identity — supplemental identity tracing a diff back to a named TypeSpec declaration.
+ * Used for suppression matching (decorator on the named type) and deduplication
+ * (same model property changed across multiple operations = one finding).
+ *
+ * Examples:
+ * - `{ declarationPath: "Microsoft.Foo.Models.Widget.tags" }`
+ * - `{ declarationPath: "Microsoft.Foo.Models.WidgetProperties.legacyStatus" }`
+ */
+export interface DeclarationIdentity {
+  /** Fully-qualified TypeSpec declaration path (namespace.model.property). */
+  declarationPath: string;
+}
+
+/** Type guard: is this an operation-relative identity? */
+export function isOperationIdentity(id: DiffIdentity): id is OperationDiffIdentity {
+  return "operation" in id;
+}
+
+/** Type guard: is this a service-level identity? */
+export function isServiceIdentity(id: DiffIdentity): id is ServiceDiffIdentity {
+  return !("operation" in id);
 }
 
 /**
@@ -46,10 +80,17 @@ export interface ApiDiff {
   kind: DiffKind;
 
   /**
-   * Version-independent path identifying where the change occurred.
-   * Used for suppression matching and deduplication.
+   * Primary identity — where in the API surface this change occurred.
+   * Always present. Either operation-relative or service-level.
    */
-  path: DiffPath;
+  identity: DiffIdentity;
+
+  /**
+   * Supplemental declaration identity — present when the diff element traces
+   * back to a named TypeSpec declaration. Used for suppression matching
+   * (decorator on the named type) and deduplication across operations.
+   */
+  declarationIdentity?: DeclarationIdentity;
 
   /** Value in base (e.g., default value). Undefined if element was added. */
   baseValue?: Value;

@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import type { ApiDiff, DiffKind, DiffPath, Finding, OperationIdentity } from "../src/index.js";
+import type {
+  ApiDiff,
+  DeclarationIdentity,
+  DiffKind,
+  Finding,
+  OperationDiffIdentity,
+  OperationIdentity,
+  ServiceDiffIdentity,
+} from "../src/index.js";
+import { isOperationIdentity, isServiceIdentity } from "../src/index.js";
 
 describe("core types", () => {
   it("DiffKind can be assigned from string literals", () => {
@@ -7,8 +16,8 @@ describe("core types", () => {
     expect(kind).toBe("RequestPropertyRemoved");
   });
 
-  it("DiffPath represents version-independent identity for operation-relative diffs", () => {
-    const pathParam: DiffPath = {
+  it("OperationDiffIdentity represents operation-relative diffs", () => {
+    const pathParam: OperationDiffIdentity = {
       operation: "GET /widgets/{widgetId}",
       component: "request",
       element: "path.widgetId",
@@ -17,7 +26,7 @@ describe("core types", () => {
     expect(pathParam.component).toBe("request");
     expect(pathParam.element).toBe("path.widgetId");
 
-    const responseProperty: DiffPath = {
+    const responseProperty: OperationDiffIdentity = {
       operation: "GET /widgets/{widgetId}",
       component: "response",
       statusCode: "200",
@@ -26,23 +35,32 @@ describe("core types", () => {
     expect(responseProperty.statusCode).toBe("200");
   });
 
-  it("DiffPath supports named model declaration paths", () => {
-    const modelDiff: DiffPath = {
-      declarationPath: "Microsoft.Foo.Models.BarProperties.legacyStatus",
-      component: "response",
-      element: "properties.legacyStatus",
-    };
-    expect(modelDiff.declarationPath).toBe("Microsoft.Foo.Models.BarProperties.legacyStatus");
-    expect(modelDiff.operation).toBeUndefined();
-  });
-
-  it("DiffPath supports service-level diffs", () => {
-    const serviceLevelDiff: DiffPath = {
-      component: "service",
+  it("ServiceDiffIdentity represents service-level diffs", () => {
+    const serviceDiff: ServiceDiffIdentity = {
       element: "authSchemes.Bearer",
     };
-    expect(serviceLevelDiff.operation).toBeUndefined();
-    expect(serviceLevelDiff.declarationPath).toBeUndefined();
+    expect(serviceDiff.element).toBe("authSchemes.Bearer");
+  });
+
+  it("DeclarationIdentity represents named type paths", () => {
+    const declId: DeclarationIdentity = {
+      declarationPath: "Microsoft.Foo.Models.BarProperties.legacyStatus",
+    };
+    expect(declId.declarationPath).toBe("Microsoft.Foo.Models.BarProperties.legacyStatus");
+  });
+
+  it("type guards distinguish identity types", () => {
+    const opId: OperationDiffIdentity = {
+      operation: "GET /widgets",
+      component: "request",
+      element: "query.filter",
+    };
+    const svcId: ServiceDiffIdentity = { element: "authSchemes.Bearer" };
+
+    expect(isOperationIdentity(opId)).toBe(true);
+    expect(isServiceIdentity(opId)).toBe(false);
+    expect(isOperationIdentity(svcId)).toBe(false);
+    expect(isServiceIdentity(svcId)).toBe(true);
   });
 
   it("OperationIdentity uses normalized path", () => {
@@ -55,15 +73,17 @@ describe("core types", () => {
     expect(id.path).toContain("Microsoft.Foo/bars/{}");
   });
 
-  it("ApiDiff structure matches diff-taxonomy.md spec", () => {
+  it("ApiDiff structure with operation-relative identity", () => {
     const diff: ApiDiff = {
       kind: "ResponsePropertyRemoved",
-      path: {
+      identity: {
         operation: "GET /things/{thingId}",
-        declarationPath: "TestService.Models.BarProperties.legacyStatus",
         component: "response",
         statusCode: "200",
         element: "body.properties.legacyStatus",
+      },
+      declarationIdentity: {
+        declarationPath: "TestService.Models.BarProperties.legacyStatus",
       },
       baseSourceLocation: { file: {} as any, pos: 100, end: 120 },
       headSourceLocation: undefined,
@@ -83,9 +103,13 @@ describe("core types", () => {
     };
 
     expect(diff.kind).toBe("ResponsePropertyRemoved");
-    expect(diff.path.element).toBe("body.properties.legacyStatus");
-    expect(diff.path.declarationPath).toBe("TestService.Models.BarProperties.legacyStatus");
-    expect(diff.path.component).toBe("response");
+    expect(isOperationIdentity(diff.identity)).toBe(true);
+    const opId = diff.identity as OperationDiffIdentity;
+    expect(opId.element).toBe("body.properties.legacyStatus");
+    expect(opId.component).toBe("response");
+    expect(diff.declarationIdentity?.declarationPath).toBe(
+      "TestService.Models.BarProperties.legacyStatus",
+    );
     expect(diff.affectedOperations).toHaveLength(2);
     expect(diff.origin.declarationName).toBe("legacyStatus");
     expect(diff.baseType).toBeDefined();
@@ -97,11 +121,13 @@ describe("core types", () => {
   it("ApiDiff with default value change uses Value types", () => {
     const diff: ApiDiff = {
       kind: "DefaultValueChanged",
-      path: {
+      identity: {
         operation: "PUT /widgets/{id}",
-        declarationPath: "TestService.Models.Widget.retryCount",
         component: "request",
         element: "body.properties.retryCount",
+      },
+      declarationIdentity: {
+        declarationPath: "TestService.Models.Widget.retryCount",
       },
       baseValue: {
         entityKind: "Value",
@@ -132,11 +158,27 @@ describe("core types", () => {
     expect(diff.headValue).toBeDefined();
   });
 
+  it("ApiDiff with service-level identity", () => {
+    const diff: ApiDiff = {
+      kind: "AuthSchemeRemoved",
+      identity: { element: "authSchemes.Bearer" },
+      message: "Auth scheme 'Bearer' was removed",
+      origin: {
+        sourceLocation: { file: {} as any, pos: 10, end: 30 },
+        declarationName: "Bearer",
+      },
+      affectedOperations: [],
+    };
+
+    expect(isServiceIdentity(diff.identity)).toBe(true);
+    expect(diff.declarationIdentity).toBeUndefined();
+  });
+
   it("Finding structure wraps ApiDiff with classification", () => {
     const finding: Finding = {
       diff: {
         kind: "RequestParameterMadeRequired",
-        path: {
+        identity: {
           operation: "PUT /widgets/{id}",
           component: "request",
           element: "query.filter",
@@ -168,6 +210,7 @@ describe("core types", () => {
     expect(finding.phase).toBe("cross-version");
     expect(finding.suppressed).toBe(false);
     expect(finding.versionPair.baseVersion).toBe("2024-01-01");
-    expect(finding.diff.path.element).toBe("query.filter");
+    const opId = finding.diff.identity as OperationDiffIdentity;
+    expect(opId.element).toBe("query.filter");
   });
 });

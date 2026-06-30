@@ -4,12 +4,16 @@ export type {
   ApiDiff,
   ComparisonPair,
   ComparisonPhase,
+  DeclarationIdentity,
   DiffComponent,
-  DiffPath,
+  DiffIdentity,
   Finding,
+  OperationDiffIdentity,
   OperationIdentity,
   OriginDeclaration,
+  ServiceDiffIdentity,
   TimingInfo,
   VersionPair,
   VersionedView,
 } from "./types.js";
+export { isOperationIdentity, isServiceIdentity } from "./types.js";
