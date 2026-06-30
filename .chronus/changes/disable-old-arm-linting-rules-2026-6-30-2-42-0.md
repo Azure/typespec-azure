@@ -2,6 +2,7 @@
 changeKind: feature
 packages:
   - "@azure-tools/typespec-azure-rulesets"
+  - "@azure-tools/typespec-azure-resource-manager"
 ---
 
-Disabled `missing-x-ms-identifiers` and `arm-resource-interface-requires-decorator` rules from the resource-manager ruleset as they are no longer applicable.
+Removed `missing-x-ms-identifiers` and `arm-resource-interface-requires-decorator` linter rules as they are no longer applicable.
