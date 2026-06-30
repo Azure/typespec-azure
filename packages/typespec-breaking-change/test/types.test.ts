@@ -7,7 +7,7 @@ describe("core types", () => {
     expect(kind).toBe("RequestPropertyRemoved");
   });
 
-  it("DiffPath represents version-independent identity", () => {
+  it("DiffPath represents version-independent identity for operation-relative diffs", () => {
     const pathParam: DiffPath = {
       operation: "GET /widgets/{widgetId}",
       component: "request",
@@ -24,12 +24,25 @@ describe("core types", () => {
       element: "body.properties.name",
     };
     expect(responseProperty.statusCode).toBe("200");
+  });
 
+  it("DiffPath supports named model declaration paths", () => {
+    const modelDiff: DiffPath = {
+      declarationPath: "Microsoft.Foo.Models.BarProperties.legacyStatus",
+      component: "response",
+      element: "properties.legacyStatus",
+    };
+    expect(modelDiff.declarationPath).toBe("Microsoft.Foo.Models.BarProperties.legacyStatus");
+    expect(modelDiff.operation).toBeUndefined();
+  });
+
+  it("DiffPath supports service-level diffs", () => {
     const serviceLevelDiff: DiffPath = {
       component: "service",
       element: "authSchemes.Bearer",
     };
     expect(serviceLevelDiff.operation).toBeUndefined();
+    expect(serviceLevelDiff.declarationPath).toBeUndefined();
   });
 
   it("OperationIdentity uses normalized path", () => {
@@ -47,13 +60,11 @@ describe("core types", () => {
       kind: "ResponsePropertyRemoved",
       path: {
         operation: "GET /things/{thingId}",
+        declarationPath: "TestService.Models.BarProperties.legacyStatus",
         component: "response",
         statusCode: "200",
         element: "body.properties.legacyStatus",
       },
-      component: "response",
-      baseValue: { type: "string" },
-      headValue: undefined,
       baseSourceLocation: { file: {} as any, pos: 100, end: 120 },
       headSourceLocation: undefined,
       baseType: {} as any,
@@ -73,11 +84,52 @@ describe("core types", () => {
 
     expect(diff.kind).toBe("ResponsePropertyRemoved");
     expect(diff.path.element).toBe("body.properties.legacyStatus");
-    expect(diff.component).toBe("response");
+    expect(diff.path.declarationPath).toBe("TestService.Models.BarProperties.legacyStatus");
+    expect(diff.path.component).toBe("response");
     expect(diff.affectedOperations).toHaveLength(2);
     expect(diff.origin.declarationName).toBe("legacyStatus");
-    expect(diff.baseValue).toBeDefined();
+    expect(diff.baseType).toBeDefined();
+    expect(diff.headType).toBeUndefined();
+    expect(diff.baseValue).toBeUndefined();
     expect(diff.headValue).toBeUndefined();
+  });
+
+  it("ApiDiff with default value change uses Value types", () => {
+    const diff: ApiDiff = {
+      kind: "DefaultValueChanged",
+      path: {
+        operation: "PUT /widgets/{id}",
+        declarationPath: "TestService.Models.Widget.retryCount",
+        component: "request",
+        element: "body.properties.retryCount",
+      },
+      baseValue: {
+        entityKind: "Value",
+        valueKind: "NumericValue",
+        value: { isInteger: true },
+      } as any,
+      headValue: {
+        entityKind: "Value",
+        valueKind: "NumericValue",
+        value: { isInteger: true },
+      } as any,
+      baseSourceLocation: { file: {} as any, pos: 200, end: 210 },
+      headSourceLocation: { file: {} as any, pos: 205, end: 215 },
+      baseType: {} as any,
+      headType: {} as any,
+      details: { propertyPath: "properties.retryCount", baseDefault: 3, headDefault: 5 },
+      message: "Default value of 'retryCount' changed from 3 to 5",
+      origin: {
+        sourceLocation: { file: {} as any, pos: 200, end: 210 },
+        type: {} as any,
+        declarationName: "retryCount",
+      },
+      affectedOperations: [{ method: "PUT", path: "/widgets/{}", name: "createWidget" }],
+    };
+
+    expect(diff.kind).toBe("DefaultValueChanged");
+    expect(diff.baseValue).toBeDefined();
+    expect(diff.headValue).toBeDefined();
   });
 
   it("Finding structure wraps ApiDiff with classification", () => {
@@ -89,11 +141,10 @@ describe("core types", () => {
           component: "request",
           element: "query.filter",
         },
-        component: "request",
-        baseValue: { required: false },
-        headValue: { required: true },
         baseSourceLocation: { file: {} as any, pos: 50, end: 80 },
         headSourceLocation: { file: {} as any, pos: 55, end: 85 },
+        baseType: {} as any,
+        headType: {} as any,
         details: { name: "filter" },
         message: "Parameter 'filter' made required",
         origin: {

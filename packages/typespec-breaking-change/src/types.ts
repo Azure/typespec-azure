@@ -1,4 +1,4 @@
-import type { SourceLocation, Type } from "@typespec/compiler";
+import type { Program, SourceLocation, Type, Value } from "@typespec/compiler";
 import type { DiffKind } from "./diff-kind.js";
 
 /**
@@ -11,17 +11,22 @@ export type DiffComponent = "request" | "response" | "service";
  * This is the same path format used in `@approvedBreakingChange` `path:` values
  * for suppression matching.
  *
- * Examples:
- * - Operation identity: `{ operation: "GET /widgets/{widgetId}" }`
- * - Request query param: `{ operation: "GET /widgets", component: "request", element: "query.filter" }`
- * - Request body property: `{ operation: "PUT /widgets/{widgetId}", component: "request", element: "body.properties.tags" }`
- * - Response property: `{ operation: "GET /widgets/{widgetId}", component: "response", statusCode: "200", element: "body.properties.name" }`
- * - Response header: `{ operation: "GET /widgets/{widgetId}", component: "response", statusCode: "200", element: "headers.ETag" }`
- * - Service-level: `{ component: "service", element: "authSchemes.Bearer" }`
+ * For operation-relative diffs:
+ * - `{ operation: "GET /widgets/{widgetId}", component: "request", element: "query.filter" }`
+ * - `{ operation: "PUT /widgets/{widgetId}", component: "request", element: "body.properties.tags" }`
+ * - `{ operation: "GET /widgets/{widgetId}", component: "response", statusCode: "200", element: "body.properties.name" }`
+ *
+ * For diffs on named model declarations (shared across operations):
+ * - `{ declarationPath: "Microsoft.Foo.Models.BarProperties.legacyStatus", element: "properties.legacyStatus" }`
+ *
+ * For service-level diffs:
+ * - `{ component: "service", element: "authSchemes.Bearer" }`
  */
 export interface DiffPath {
-  /** Operation wire identity (e.g., "GET /widgets/{widgetId}"). Absent for service-level diffs. */
+  /** Operation wire identity (e.g., "GET /widgets/{widgetId}"). Absent for service-level and model-level diffs. */
   operation?: string;
+  /** TypeSpec declaration path for diffs on named types (e.g., "Microsoft.Foo.Models.BarProperties.legacyStatus"). */
+  declarationPath?: string;
   /** Direction component. Absent for operation-level diffs (added/removed). */
   component?: DiffComponent;
   /** For response diffs — which status code. */
@@ -46,14 +51,11 @@ export interface ApiDiff {
    */
   path: DiffPath;
 
-  /** Direction context (convenience derived from path.component). */
-  component?: DiffComponent;
+  /** Value in base (e.g., default value). Undefined if element was added. */
+  baseValue?: Value;
 
-  /** Value in base (undefined if element was added). */
-  baseValue: unknown;
-
-  /** Value in head (undefined if element was removed). */
-  headValue: unknown;
+  /** Value in head (e.g., default value). Undefined if element was removed. */
+  headValue?: Value;
 
   /** Source location in the base compilation (for the affected declaration). */
   baseSourceLocation?: SourceLocation;
@@ -162,7 +164,7 @@ export interface VersionedView {
   /** The api-version string this view represents. */
   version: string;
   /** The TypeSpec Program for this version (after mutators applied). */
-  program: unknown;
+  program: Program;
 }
 
 /**
