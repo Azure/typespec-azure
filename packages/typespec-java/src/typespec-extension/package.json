@@ -29,7 +29,7 @@
   },
   "scripts": {
     "clean": "rimraf ./dist ./temp",
-    "build": "rsync -a --exclude='options.ts' ../../../../core/packages/http-client-java/emitter/src/ ./src/ && mvn install -f ../../../../core/packages/http-client-java/generator/pom.xml -Dspotless.skip=true -DskipTests=true && cp -r ../../../../core/packages/http-client-java/generator/http-client-generator/target/ ./generator/http-client-generator/target/ && tsc -p .",
+    "build": "rsync -a --exclude='options.ts' ../../../../core/packages/http-client-java/emitter/src/ ./src/ && mvn install -f ../../../../core/packages/http-client-java/generator/pom.xml -Dspotless.skip=true -DskipTests=true && cp -r ../../../../core/packages/http-client-java/generator/http-client-generator/target/ ./target/ && tsc -p .",
     "watch": "tsc -p . --watch",
     "test:java:e2e": "vitest run",
     "format": "npm run -s prettier -- --write",
@@ -41,8 +41,8 @@
     "lib/*.tsp",
     "dist/**",
     "!dist/test/**",
-    "generator/http-client-generator/target/emitter.jar",
-    "generator/http-client-generator/target/classes/PerfAutomation.jfc"
+    "target/emitter.jar",
+    "target/classes/PerfAutomation.jfc"
   ],
   "peerDependencies": {
     "@azure-tools/openai-typespec": "catalog:",
