@@ -1,76 +1,115 @@
-import type { DiagnosticTarget, SourceFile, Type } from "@typespec/compiler";
+import type { SourceLocation, Type } from "@typespec/compiler";
 import type { DiffKind } from "./diff-kind.js";
 
 /**
- * Source location tracing back to a TypeSpec declaration.
- * Every diff carries this so findings can be reported with file:line:col
- * and suppressions can be matched by declaration identity.
+ * The direction component of a diff — request, response, or service-level.
  */
-export interface SourcePath {
-  /** The source file containing the declaration. */
-  file: SourceFile;
-  /** Start position (character offset) in the source file. */
-  pos: number;
-  /** End position (character offset) in the source file. */
-  end: number;
-  /** Name of the declaration (model, property, operation, etc.) for display. */
-  declarationName?: string;
-}
+export type DiffComponent = "request" | "response" | "service";
 
 /**
- * The origin declaration for deduplication and suppression matching.
- * Resolved via the origin resolution algorithm:
- * 1. If property's parent model is a named declaration → the property itself
- * 2. If parent is anonymous but sourceProperty exists → follow to named declaration
- * 3. Otherwise → the operation parameter
+ * Version-independent identity for where in the API surface a change occurred.
+ * This is the same path format used in `@approvedBreakingChange` `path:` values
+ * for suppression matching.
+ *
+ * Examples:
+ * - Operation identity: `{ operation: "GET /widgets/{widgetId}" }`
+ * - Request query param: `{ operation: "GET /widgets", component: "request", element: "query.filter" }`
+ * - Request body property: `{ operation: "PUT /widgets/{widgetId}", component: "request", element: "body.properties.tags" }`
+ * - Response property: `{ operation: "GET /widgets/{widgetId}", component: "response", statusCode: "200", element: "body.properties.name" }`
+ * - Response header: `{ operation: "GET /widgets/{widgetId}", component: "response", statusCode: "200", element: "headers.ETag" }`
+ * - Service-level: `{ component: "service", element: "authSchemes.Bearer" }`
  */
-export interface OriginDeclaration {
-  /** The resolved TypeSpec diagnostic target that is the canonical origin. */
-  target: DiagnosticTarget;
-  /** Source location of the origin. */
-  sourcePath: SourcePath;
+export interface DiffPath {
+  /** Operation wire identity (e.g., "GET /widgets/{widgetId}"). Absent for service-level diffs. */
+  operation?: string;
+  /** Direction component. Absent for operation-level diffs (added/removed). */
+  component?: DiffComponent;
+  /** For response diffs — which status code. */
+  statusCode?: string;
+  /** The specific element (parameter name, property path, status code, etc.). */
+  element: string;
 }
 
 /**
  * A single structural difference detected by the diff engine.
  * Context-neutral — the policy engine determines severity.
+ *
+ * Corresponds to the `ApiDiff` interface in diff-taxonomy.md.
  */
 export interface ApiDiff {
   /** What kind of difference was detected. */
   kind: DiffKind;
 
-  /** Source location of the affected declaration (for reporting and suppression matching). */
-  sourcePath: SourcePath;
+  /**
+   * Version-independent path identifying where the change occurred.
+   * Used for suppression matching and deduplication.
+   */
+  path: DiffPath;
 
-  /** The resolved origin declaration (for deduplication across operations). */
-  origin: OriginDeclaration;
+  /** Direction context (convenience derived from path.component). */
+  component?: DiffComponent;
 
-  /** The base type (before the change), if applicable. */
+  /** Value in base (undefined if element was added). */
+  baseValue: unknown;
+
+  /** Value in head (undefined if element was removed). */
+  headValue: unknown;
+
+  /** Source location in the base compilation (for the affected declaration). */
+  baseSourceLocation?: SourceLocation;
+
+  /** Source location in the head compilation (for the affected declaration). */
+  headSourceLocation?: SourceLocation;
+
+  /** Reference to the TypeSpec type in base (for suppression lookup, walking type chain). */
   baseType?: Type;
 
-  /** The head type (after the change), if applicable. */
+  /** Reference to the TypeSpec type in head (for suppression lookup, walking type chain). */
   headType?: Type;
+
+  /** Structured details specific to this DiffKind (e.g., { name, isRequired }, { propertyPath, baseType, headType }). */
+  details?: Record<string, unknown>;
 
   /** Human-readable description of the diff. */
   message: string;
 
-  /** The direction context: was this found in a request or response position? */
-  direction: "request" | "response" | "service";
+  /**
+   * The resolved origin declaration for deduplication across operations.
+   * Resolution algorithm:
+   * 1. Property's parent model is a named declaration → the property itself
+   * 2. Parent is anonymous but sourceProperty exists → follow to named declaration
+   * 3. Otherwise → the operation parameter
+   */
+  origin: OriginDeclaration;
 
   /** Operation(s) affected by this diff (populated during deduplication). */
-  affectedOperations: OperationReference[];
+  affectedOperations: OperationIdentity[];
 }
 
 /**
- * A reference to an operation for reporting purposes.
+ * The origin declaration for deduplication and suppression matching.
  */
-export interface OperationReference {
+export interface OriginDeclaration {
+  /** Source location of the canonical origin declaration. */
+  sourceLocation: SourceLocation;
+  /** The TypeSpec type at the origin (for identity comparison and suppression lookup). */
+  type?: Type;
+  /** Display name of the declaration (model name, property name, etc.). */
+  declarationName?: string;
+}
+
+/**
+ * Version-independent operation identity: HTTP method + normalized path.
+ * Path parameters are normalized (names stripped), structure preserved.
+ * Example: "GET /subscriptions/{}/resourceGroups/{}/providers/Microsoft.Foo/bars/{}"
+ */
+export interface OperationIdentity {
   /** HTTP method. */
   method: string;
-  /** Normalized path. */
+  /** Normalized path (parameter names replaced with {}). */
   path: string;
   /** Operation name in TypeSpec source. */
-  name: string;
+  name?: string;
 }
 
 /**
@@ -94,7 +133,7 @@ export interface Finding {
   /** Which comparison phase produced this finding. */
   phase: ComparisonPhase;
 
-  /** Whether this finding was suppressed by an @approvedBreakingChange or @approvedUnversionedChange decorator. */
+  /** Whether this finding was suppressed by a decorator. */
   suppressed: boolean;
 
   /** If suppressed, the reason provided in the suppression decorator. */
@@ -123,7 +162,6 @@ export interface VersionedView {
   /** The api-version string this view represents. */
   version: string;
   /** The TypeSpec Program for this version (after mutators applied). */
-  // Program type imported from @typespec/compiler at usage site
   program: unknown;
 }
 

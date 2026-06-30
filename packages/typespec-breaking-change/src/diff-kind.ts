@@ -1,6 +1,8 @@
 /**
  * All detectable diff kinds produced by the diff engine.
  * These are context-neutral — the policy engine determines severity.
+ *
+ * Organized by the taxonomy in diff-taxonomy.md.
  */
 export type DiffKind =
   // Service-level
@@ -21,45 +23,66 @@ export type DiffKind =
   | "RequestQueryParameterRemoved"
   | "RequestHeaderAdded"
   | "RequestHeaderRemoved"
-  // Request body
+  | "RequestParameterRenamed"
+  | "RequestParameterMadeRequired"
+  | "RequestParameterMadeOptional"
+  | "RequestParameterDefaultChanged"
+  | "RequestParameterLocationChanged"
+  // Request body properties
   | "RequestPropertyAdded"
   | "RequestPropertyRemoved"
+  | "RequestPropertyRenamed"
   | "RequestPropertyTypeChanged"
   | "RequestPropertyTypeNarrowed"
   | "RequestPropertyTypeWidened"
   | "RequestPropertyMadeRequired"
   | "RequestPropertyMadeOptional"
-  // Response
-  | "ResponseStatusCodeAdded"
-  | "ResponseStatusCodeRemoved"
-  | "ResponseHeaderAdded"
-  | "ResponseHeaderRemoved"
+  | "RequestPropertyDefaultChanged"
+  // Request type/encoding/constraint
+  | "RequestTypeChanged"
+  | "RequestTypeNarrowed"
+  | "RequestTypeWidened"
+  | "RequestTypeKindChanged"
+  | "RequestEncodingChanged"
+  | "RequestConstraintStrengthened"
+  | "RequestConstraintRelaxed"
+  // Request content type
+  | "RequestContentTypeAdded"
+  | "RequestContentTypeRemoved"
+  // Response properties
   | "ResponsePropertyAdded"
   | "ResponsePropertyRemoved"
+  | "ResponsePropertyRenamed"
   | "ResponsePropertyTypeChanged"
   | "ResponsePropertyTypeNarrowed"
   | "ResponsePropertyTypeWidened"
   | "ResponsePropertyMadeRequired"
   | "ResponsePropertyMadeOptional"
-  // Content type
-  | "RequestContentTypeAdded"
-  | "RequestContentTypeRemoved"
+  // Response type/encoding/constraint
+  | "ResponseTypeChanged"
+  | "ResponseTypeNarrowed"
+  | "ResponseTypeWidened"
+  | "ResponseTypeKindChanged"
+  | "ResponseEncodingChanged"
+  | "ResponseConstraintStrengthened"
+  | "ResponseConstraintRelaxed"
+  // Response structure
+  | "ResponseStatusCodeAdded"
+  | "ResponseStatusCodeRemoved"
   | "ResponseContentTypeAdded"
   | "ResponseContentTypeRemoved"
-  // Type transitions (narrowing/widening)
-  | "EnumMemberAdded"
-  | "EnumMemberRemoved"
-  | "UnionVariantAdded"
-  | "UnionVariantRemoved"
-  | "ClosedToOpen"
-  | "OpenToClosed"
-  // Format/encoding
-  | "EncodingChanged"
-  // Error responses
+  | "ResponseHeaderAdded"
+  | "ResponseHeaderRemoved"
   | "ErrorResponseAdded"
   | "ErrorResponseRemoved"
-  // Constraints
-  | "RequestConstraintStrengthened"
-  | "RequestConstraintRelaxed"
-  | "ResponseConstraintStrengthened"
-  | "ResponseConstraintRelaxed";
+  // Model / type kind diffs
+  | "TypeKindChanged"
+  | "EnumerationMemberAdded"
+  | "EnumerationMemberRemoved"
+  | "EnumerationOpened"
+  | "EnumerationClosed"
+  | "DiscriminatorChanged"
+  // Default values (generic, applies to params and properties)
+  | "DefaultValueAdded"
+  | "DefaultValueRemoved"
+  | "DefaultValueChanged";
