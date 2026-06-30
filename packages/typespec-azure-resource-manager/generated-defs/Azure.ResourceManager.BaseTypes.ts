@@ -16,11 +16,14 @@ export interface BaseTypeInfo {
  * @param baseType The base type specification this resource implements.
  * @example
  * ```typespec
- * @azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
  * model MyAgentProperties {
- *   ...AgentProperties;
- *   ...AgentToolProperty;
- *   ...DefaultProvisioningStateProperty;
+ *   displayName: string;
+ *   description: string;
+ * }
+ *
+ * @azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
+ * model MyAgent is TrackedResource<MyAgentProperties> {
+ *   @key("myAgentName") @segment("myAgents") name: string;
  * }
  * ```
  */
