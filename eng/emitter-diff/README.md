@@ -134,6 +134,21 @@ git -C vscode-diff add -A
 code vscode-diff
 ```
 
+## CI integration
+
+`.github/workflows/ci-emitter-diff-python.yml` runs on PRs that touch the python emitter or this
+tool. It diffs the PR's checkout against the latest published emitter version and then:
+
+- uploads the rendered **`emitter-diff-html`** artifact (full side-by-side diff; downloadable from
+  the workflow run — GitHub artifacts are zip downloads, so they can't be rendered inline in a
+  comment),
+- writes a job-summary with the diff totals, and
+- posts a **sticky PR comment** (updated in place on each push) listing the changed files and
+  `+`/`-` counts with a link to download the artifact.
+
+The comment step needs `pull-requests: write`. PRs **from forks** get a read-only token, so the
+comment is best-effort there (`continue-on-error`) — the artifact and job-summary still work.
+
 ## Adding a new language adapter
 
 1. Implement `EmitterAdapter` (`src/types.ts`) — `prepareEmitter`, `generate`, optional `runTests` —
