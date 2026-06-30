@@ -14,8 +14,8 @@ import { reportDiagnostic } from "../../lib.js";
 import { visitPackageTypes } from "../../modular/emit-models.js";
 import { getAllAncestors, getAllProperties } from "../../modular/helpers/operation-helpers.js";
 import { normalizeModelPropertyName } from "../../modular/type-expressions/get-type-expression.js";
-import { NameType, normalizeName } from "../../rlc-common/index.js";
 import { SdkContext } from "../../utils/interfaces.js";
+import { NameType, normalizeName } from "../../utils/name-utils.js";
 
 export const emitQueue: Set<SdkType> = new Set<SdkType>();
 export const flattenPropertyModelMap: Map<SdkModelPropertyType, SdkModelType> = new Map<

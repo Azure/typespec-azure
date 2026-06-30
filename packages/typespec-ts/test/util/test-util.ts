@@ -331,7 +331,7 @@ export async function createDpgContextTestHelper(
   const sdkContext = {
     ...context,
     program,
-    rlcOptions: {
+    emitterOptions: {
       enableModelNamespace,
       ...configs,
     },

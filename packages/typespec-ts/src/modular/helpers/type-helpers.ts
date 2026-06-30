@@ -6,8 +6,8 @@ import {
   SdkModelType,
   SdkType,
 } from "@azure-tools/typespec-client-generator-core";
-import { NameType, normalizeName } from "../../rlc-common/index.js";
 import { SdkContext } from "../../utils/interfaces.js";
+import { NameType, normalizeName } from "../../utils/name-utils.js";
 import {
   getPropertyWithOverrides,
   ModelOverrideOptions,

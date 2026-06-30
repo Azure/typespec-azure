@@ -4,7 +4,6 @@ import {
   emitTypes,
   getModelsPath,
 } from "../../src/modular/emit-models.js";
-import { RLCOptions } from "../../src/rlc-common/index.js";
 import {
   compileTypeSpecFor,
   createDpgContextTestHelper,
@@ -16,6 +15,7 @@ import { expectDiagnosticEmpty } from "@typespec/compiler/testing";
 import { useContext } from "../../src/context-manager.js";
 import { useBinder } from "../../src/framework/hooks/binder.js";
 import { renameClientName } from "../../src/index.js";
+import { ClientOptions } from "../../src/interfaces.js";
 import { buildClassicalClient } from "../../src/modular/build-classical-client.js";
 import { buildClassicOperationFiles } from "../../src/modular/build-classical-operation-groups.js";
 import { buildClientContext } from "../../src/modular/build-client-context.js";
@@ -27,7 +27,7 @@ import { emitSamples } from "../../src/modular/emit-samples.js";
 import { emitTests } from "../../src/modular/emit-tests.js";
 import { getClientHierarchyMap } from "../../src/utils/client-utils.js";
 
-export interface ModelConfigOptions extends RLCOptions {
+export interface ModelConfigOptions extends ClientOptions {
   needOptions?: boolean;
   withRawContent?: boolean;
   needAzureCore?: boolean;
@@ -68,15 +68,16 @@ export async function emitModularModelsFromTypeSpec(
   const binder = useBinder();
   let modelFile: any;
   const includeResponseHeaders = options["include-headers-in-response"] === true;
-  dpgContext.rlcOptions!.includeHeadersInResponse = includeResponseHeaders;
-  dpgContext.rlcOptions!.compatibilityMode = options["compatibility-mode"];
-  dpgContext.rlcOptions!.experimentalExtensibleEnums = options["experimental-extensible-enums"];
-  dpgContext.rlcOptions!.ignoreNullableOnOptional = options["ignore-nullable-on-optional"] ?? true;
+  dpgContext.emitterOptions!.includeHeadersInResponse = includeResponseHeaders;
+  dpgContext.emitterOptions!.compatibilityMode = options["compatibility-mode"];
+  dpgContext.emitterOptions!.experimentalExtensibleEnums = options["experimental-extensible-enums"];
+  dpgContext.emitterOptions!.ignoreNullableOnOptional =
+    options["ignore-nullable-on-optional"] ?? true;
   if (options["wrap-non-model-return"] !== undefined) {
-    dpgContext.rlcOptions!.wrapNonModelReturn = options["wrap-non-model-return"] === true;
+    dpgContext.emitterOptions!.wrapNonModelReturn = options["wrap-non-model-return"] === true;
   }
   if (options["treat-unknown-as-record"] !== undefined) {
-    dpgContext.rlcOptions!.treatUnknownAsRecord = options["treat-unknown-as-record"] === true;
+    dpgContext.emitterOptions!.treatUnknownAsRecord = options["treat-unknown-as-record"] === true;
   }
   const modularEmitterOptions = transformModularEmitterOptions(dpgContext, "", {
     casing: "camel",
@@ -138,9 +139,9 @@ export async function emitRootIndexFromTypeSpec(
   const binder = useBinder();
   const project = useContext("outputProject");
   const includeResponseHeaders = options["include-headers-in-response"] === true;
-  dpgContext.rlcOptions!.includeHeadersInResponse = includeResponseHeaders;
-  dpgContext.rlcOptions!.compatibilityMode = options["compatibility-mode"];
-  dpgContext.rlcOptions!.experimentalExtensibleEnums = options["experimental-extensible-enums"];
+  dpgContext.emitterOptions!.includeHeadersInResponse = includeResponseHeaders;
+  dpgContext.emitterOptions!.compatibilityMode = options["compatibility-mode"];
+  dpgContext.emitterOptions!.experimentalExtensibleEnums = options["experimental-extensible-enums"];
   // need to specify the root path for this case
   const modularEmitterOptions = transformModularEmitterOptions(dpgContext, "/any/path", {
     casing: "camel",
@@ -201,14 +202,14 @@ export async function emitModularOperationsFromTypeSpec(
   const dpgContext = await createDpgContextTestHelper(context.program);
   const binder = useBinder();
   const includeResponseHeaders = options["include-headers-in-response"] === true;
-  dpgContext.rlcOptions!.includeHeadersInResponse = includeResponseHeaders;
-  dpgContext.rlcOptions!.experimentalExtensibleEnums = options["experimental-extensible-enums"];
+  dpgContext.emitterOptions!.includeHeadersInResponse = includeResponseHeaders;
+  dpgContext.emitterOptions!.experimentalExtensibleEnums = options["experimental-extensible-enums"];
   if (options["wrap-non-model-return"] !== undefined) {
-    dpgContext.rlcOptions!.wrapNonModelReturn = options["wrap-non-model-return"] === true;
+    dpgContext.emitterOptions!.wrapNonModelReturn = options["wrap-non-model-return"] === true;
   }
-  dpgContext.rlcOptions!.enableStorageCompat = options["enable-storage-compat"] === true;
+  dpgContext.emitterOptions!.enableStorageCompat = options["enable-storage-compat"] === true;
   if (options["treat-unknown-as-record"] !== undefined) {
-    dpgContext.rlcOptions!.treatUnknownAsRecord = options["treat-unknown-as-record"] === true;
+    dpgContext.emitterOptions!.treatUnknownAsRecord = options["treat-unknown-as-record"] === true;
   }
   const modularEmitterOptions = transformModularEmitterOptions(dpgContext, "", {
     casing: "camel",
@@ -249,8 +250,8 @@ export async function emitModularClientContextFromTypeSpec(
   const dpgContext = await createDpgContextTestHelper(context.program);
   const binder = useBinder();
   const includeResponseHeaders = options["include-headers-in-response"] === true;
-  dpgContext.rlcOptions!.includeHeadersInResponse = includeResponseHeaders;
-  dpgContext.rlcOptions!.typespecTitleMap = options["typespec-title-map"];
+  dpgContext.emitterOptions!.includeHeadersInResponse = includeResponseHeaders;
+  dpgContext.emitterOptions!.typespecTitleMap = options["typespec-title-map"];
   const modularEmitterOptions = transformModularEmitterOptions(dpgContext, "", {
     casing: "camel",
   });
@@ -284,9 +285,9 @@ export async function emitModularClientFromTypeSpec(
   const dpgContext = await createDpgContextTestHelper(context.program);
   const binder = useBinder();
   const includeResponseHeaders = options["include-headers-in-response"] === true;
-  dpgContext.rlcOptions!.includeHeadersInResponse = includeResponseHeaders;
-  dpgContext.rlcOptions!.typespecTitleMap = options["typespec-title-map"];
-  dpgContext.rlcOptions!.hierarchyClient = options["hierarchy-client"] ?? true;
+  dpgContext.emitterOptions!.includeHeadersInResponse = includeResponseHeaders;
+  dpgContext.emitterOptions!.typespecTitleMap = options["typespec-title-map"];
+  dpgContext.emitterOptions!.hierarchyClient = options["hierarchy-client"] ?? true;
   const modularEmitterOptions = transformModularEmitterOptions(dpgContext, "", {
     casing: "camel",
   });
@@ -325,7 +326,8 @@ export async function emitSamplesFromTypeSpec(
     },
     ...configs,
   });
-  dpgContext.rlcOptions!.ignoreNullableOnOptional = configs["ignore-nullable-on-optional"] ?? true;
+  dpgContext.emitterOptions!.ignoreNullableOnOptional =
+    configs["ignore-nullable-on-optional"] ?? true;
   const modularEmitterOptions = transformModularEmitterOptions(dpgContext, "", {
     casing: "camel",
   });

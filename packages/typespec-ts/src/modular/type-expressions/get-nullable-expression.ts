@@ -11,7 +11,7 @@ export function getNullableExpression(
 ): string {
   if (shouldEmitInline(type, options)) {
     // Check if we should ignore null for optional properties
-    const ignoreNullableOnOptional = context.rlcOptions?.ignoreNullableOnOptional ?? false;
+    const ignoreNullableOnOptional = context.emitterOptions?.ignoreNullableOnOptional ?? false;
     const isOptional = options.isOptional ?? false;
 
     const nonNullableType = getTypeExpression(context, type.type, options);

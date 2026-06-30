@@ -8,7 +8,6 @@ import {
 } from "@azure-tools/typespec-client-generator-core";
 import { NoTarget, Type, isVoidType } from "@typespec/compiler";
 import { HttpOperation, HttpOperationParameter, HttpOperationParameters } from "@typespec/http";
-import { reportDiagnostic } from "../lib.js";
 import {
   ApiVersionInfo,
   Imports,
@@ -18,8 +17,9 @@ import {
   ParameterMetadata,
   Schema,
   SchemaContext,
-} from "../rlc-common/index.js";
-import { listOperationsUnderRLCClient } from "../utils/client-utils.js";
+} from "../interfaces.js";
+import { reportDiagnostic } from "../lib.js";
+import { listOperationsUnderClient } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import {
   KnownMediaType,
@@ -57,9 +57,9 @@ export function transformToParameterTypes(
   importDetails: Imports,
   apiVersionInfo?: ApiVersionInfo,
 ): OperationParameter[] {
-  const rlcParameters: OperationParameter[] = [];
+  const clientParameters: OperationParameter[] = [];
   const outputImportedSet = new Set<string>();
-  for (const op of listOperationsUnderRLCClient(client)) {
+  for (const op of listOperationsUnderClient(client)) {
     const route = getHttpOperationWithCache(dpgContext, op);
     // ignore overload base operation
     if (route.overloads && route.overloads?.length > 0) {
@@ -73,15 +73,15 @@ export function transformToParameterTypes(
   }
   function transformToParameterTypesForRoute(route: HttpOperation) {
     const parameters = route.parameters;
-    const rlcParameter: OperationParameter = {
+    const clientParameter: OperationParameter = {
       operationGroup: getOperationGroupName(dpgContext, route),
       operationName: getOperationName(dpgContext, route.operation),
       parameters: [],
     };
     const options = {
       apiVersionInfo,
-      operationGroupName: rlcParameter.operationGroup,
-      operationName: rlcParameter.operationName,
+      operationGroupName: clientParameter.operationGroup,
+      operationName: clientParameter.operationName,
       importModels: outputImportedSet,
     };
     // transform query param
@@ -104,13 +104,13 @@ export function transformToParameterTypes(
         bodyType,
       );
     }
-    rlcParameter.parameters.push({
+    clientParameter.parameters.push({
       parameters: [...queryParams, ...pathParams, ...headerParams],
       body: bodyParameter,
     });
-    rlcParameters.push(rlcParameter);
+    clientParameters.push(clientParameter);
   }
-  return rlcParameters;
+  return clientParameters;
 }
 
 function getParameterMetadata(
@@ -131,7 +131,7 @@ function getParameterMetadata(
   let description = getFormattedPropertyDoc(program, parameter.param, schema) ?? "";
   const format = getCollectionFormat(dpgContext, parameter as any);
   if (isArrayType(schema) && format) {
-    const serializeInfo = getSpecialSerializeInfo(dpgContext, parameter.type, format);
+    const serializeInfo = getSpecialSerializeInfo(parameter.type, format);
     if (serializeInfo.hasMultiCollection || serializeInfo.hasCsvCollection) {
       description += `${description ? "\n" : ""}This parameter could be formatted as ${serializeInfo.collectionInfo.join(
         ", ",
