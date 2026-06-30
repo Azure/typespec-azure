@@ -39,7 +39,6 @@ export interface EmitterOptions {
    */
   "generate-test"?: boolean;
   "generate-sample"?: boolean;
-  "is-typespec-test"?: boolean;
   "azure-arm"?: boolean;
   "enable-operation-group"?: boolean;
   "enable-model-namespace"?: boolean;
@@ -169,11 +168,6 @@ export const EmitterOptionsSchema: JSONSchemaType<EmitterOptions> = {
       nullable: true,
       description:
         "Whether to generate sample files, for basic samples of your generated sdks. Defaults to `undefined`. Management packages' default to `true`.",
-    },
-    "is-typespec-test": {
-      type: "boolean",
-      nullable: true,
-      description: "Internal option for test",
     },
     "azure-arm": {
       type: "boolean",

@@ -120,12 +120,6 @@ other cases:
 
 Whether to generate sample files, for basic samples of your generated sdks. Defaults to `undefined`. Management packages' default to `true`.
 
-### `is-typespec-test`
-
-**Type:** `boolean`
-
-Internal option for test
-
 ### `azure-arm`
 
 **Type:** `boolean`
