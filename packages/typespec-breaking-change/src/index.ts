@@ -4,7 +4,6 @@ export type {
   ApiDiff,
   ComparisonPair,
   ComparisonPhase,
-  DeclarationIdentity,
   DiffComponent,
   DiffIdentity,
   Finding,

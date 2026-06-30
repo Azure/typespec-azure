@@ -82,15 +82,22 @@ export interface ApiDiff {
   /**
    * Primary identity — where in the API surface this change occurred.
    * Always present. Either operation-relative or service-level.
+   * Also used for operation-scoped suppression matching.
    */
   identity: DiffIdentity;
 
   /**
-   * Supplemental declaration identity — present when the diff element traces
-   * back to a named TypeSpec declaration. Used for suppression matching
-   * (decorator on the named type) and deduplication across operations.
+   * Resolved origin declaration — present when the diff element traces back to
+   * a named TypeSpec declaration. Serves two purposes:
+   * 1. Declaration-scoped suppression (decorator on the named type suppresses globally)
+   * 2. Deduplication (same {origin, kind} across operations = same diff, keep one)
+   *
+   * Resolution algorithm:
+   * 1. Property's parent model is a named declaration → the property itself
+   * 2. Parent is anonymous but sourceProperty exists → follow to named declaration
+   * 3. Otherwise → absent (diff is operation-specific, no shared origin)
    */
-  declarationIdentity?: DeclarationIdentity;
+  origin?: OriginDeclaration;
 
   /** Value in base (e.g., default value). Undefined if element was added. */
   baseValue?: Value;
@@ -115,30 +122,20 @@ export interface ApiDiff {
 
   /** Human-readable description of the diff. */
   message: string;
-
-  /**
-   * The resolved origin declaration for deduplication across operations.
-   * Resolution algorithm:
-   * 1. Property's parent model is a named declaration → the property itself
-   * 2. Parent is anonymous but sourceProperty exists → follow to named declaration
-   * 3. Otherwise → the operation parameter
-   */
-  origin: OriginDeclaration;
-
-  /** Operation(s) affected by this diff (populated during deduplication). */
-  affectedOperations: OperationIdentity[];
 }
 
 /**
- * The origin declaration for deduplication and suppression matching.
+ * The resolved origin declaration for deduplication and declaration-scoped suppression.
+ * Contains both a string path (for suppression pattern matching) and compiler
+ * references (for identity comparison during dedup and decorator lookup).
  */
 export interface OriginDeclaration {
-  /** Source location of the canonical origin declaration. */
+  /** Fully-qualified declaration path (e.g., "Microsoft.Foo.Models.Widget.tags"). */
+  declarationPath: string;
+  /** The TypeSpec type at the origin (for reference equality during dedup, decorator lookup). */
+  type: Type;
+  /** Source location of the declaration (for error reporting). */
   sourceLocation: SourceLocation;
-  /** The TypeSpec type at the origin (for identity comparison and suppression lookup). */
-  type?: Type;
-  /** Display name of the declaration (model name, property name, etc.). */
-  declarationName?: string;
 }
 
 /**
