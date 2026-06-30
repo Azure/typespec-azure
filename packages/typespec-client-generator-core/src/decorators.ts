@@ -689,7 +689,8 @@ export function getClientNameOverride(
   return getScopedDecoratorData(context, clientNameKey, entity, languageScope);
 }
 
-// Recursive function to collect parameter names
+// Recursive function to collect all (possibly nested) leaf parameters of an operation,
+// used to structurally compare the original and override parameter lists.
 function collectParams(
   program: Program,
   properties: RekeyableMap<string, ModelProperty>,
@@ -709,26 +710,22 @@ function collectParams(
   return params;
 }
 
-// Collect the names of the parameters that are realized as path parameters in
-// the resolved HTTP route of an operation. Returns `undefined` when the HTTP
-// route cannot be resolved (for example for non-HTTP operations), in which case
-// callers should fall back to inspecting the `@path` decorator directly.
-function getRealizedPathParamNames(
-  program: Program,
-  operation: Operation,
-): Set<string> | undefined {
-  try {
-    const [httpOperation] = getHttpOperation(program, operation);
-    const names = new Set<string>();
-    for (const parameter of httpOperation.parameters.parameters) {
-      if (parameter.type === "path") {
-        names.add(parameter.param.name);
-      }
+// Collect the names of the parameters that are realized as `path` parameters in the
+// operation's actual HTTP route. This is the ground truth for "is a path parameter":
+// a `@path` decorator in the type graph (isPathParam) is not sufficient because a
+// parameter can carry `@path` without being part of the realized route (for example an
+// ARM key surfaced by a templated provider action), and conversely a `@path` nested
+// inside a plain model or `@bodyRoot` is realized. Resolving the HTTP route handles
+// both cases correctly.
+function getRealizedPathParamNames(program: Program, operation: Operation): Set<string> {
+  const result = new Set<string>();
+  const httpOperation = ignoreDiagnostics(getHttpOperation(program, operation));
+  for (const parameter of httpOperation.parameters.parameters) {
+    if (parameter.type === "path") {
+      result.add(parameter.param.name);
     }
-    return names;
-  } catch {
-    return undefined;
   }
+  return result;
 }
 
 export const $override = (
@@ -740,38 +737,47 @@ export const $override = (
   // omit all override operation
   context.program.stateMap(omitOperation).set(override, true);
 
-  // Collect the parameters of both operations. Parameters are matched by name
-  // (see below) rather than by position, so the lists do not need to be sorted.
+  // Collect the parameters of both operations. Parameters are matched by name (see
+  // below) rather than by position: overrides are allowed to add, remove, or regroup
+  // parameters (for example wrapping several parameters in a customization model), so
+  // comparing the two lists by sorted position produces false mismatches whenever the
+  // parameter sets differ in shape.
   const originalParams = collectParams(context.program, original.parameters.properties);
   const overrideParams = collectParams(context.program, override.parameters.properties);
+  // Group override parameters by name so that parameters can be matched by name
+  // rather than by position (overrides may add or reorder parameters). Parameters
+  // that share a name (for example a realized path parameter and a body property of
+  // the same name) are matched in declaration order.
+  const overrideParamsByName = new Map<string, ModelProperty[]>();
+  for (const param of overrideParams) {
+    const existing = overrideParamsByName.get(param.name);
+    if (existing) {
+      existing.push(param);
+    } else {
+      overrideParamsByName.set(param.name, [param]);
+    }
+  }
+  const consumedOverrideParams = new Map<string, number>();
 
-  // Match override parameters to original parameters by name. Overrides are
-  // allowed to add, remove, or regroup parameters (for example wrapping several
-  // parameters in a customization model), so comparing the two lists by sorted
-  // position produces false `override-parameters-mismatch` diagnostics whenever
-  // the parameter sets differ in shape.
-  const overrideParamsByName = new Map(overrideParams.map((p) => [p.name, p]));
-
-  // Determine which parameters are realized as path parameters in the resolved
-  // HTTP route of the original operation. Checking the `@path` decorator alone is
-  // not sufficient, because some templated parameters (for example ARM scope
-  // models) carry `@path` in the type graph without being realized as path
-  // parameters in the operation's actual route.
-  const realizedPathParamNames = getRealizedPathParamNames(context.program, original);
-
-  // A `@clientLocation` on any override parameter indicates an intentional
-  // customization where non-path params are just pass-throughs, so the `@path`
-  // preservation check below is skipped in that case.
+  // A `@clientLocation` on any override parameter indicates an intentional customization
+  // where non-path params are just pass-throughs, so the `@path` preservation check is
+  // skipped in that case.
   const overrideHasClientLocation = overrideParams.some((p) =>
     p.decorators.some((d) => d.decorator.name === "$clientLocation"),
   );
 
-  // Check that every required original parameter has a matching override
-  // parameter, omitting optional parameters.
+  // Check that every required original parameter has a matching override parameter,
+  // omitting optional parameters. While matching, collect the parameters that carry
+  // `@path` in the original but lost it in the override; these are the only candidates
+  // for an `override-parameters-mismatch`, and only they require resolving the (more
+  // expensive) HTTP route to confirm they are realized path parameters.
   let parametersMatch = true;
   let checkParameter: ModelProperty | undefined = undefined;
+  const droppedPathParamNames: string[] = [];
   for (const originalParam of originalParams) {
-    const overrideParam = overrideParamsByName.get(originalParam.name);
+    const candidates = overrideParamsByName.get(originalParam.name);
+    const consumed = consumedOverrideParams.get(originalParam.name) ?? 0;
+    const overrideParam = candidates?.[consumed];
     if (
       overrideParam === undefined ||
       !compareModelProperties(context.program, originalParam, overrideParam)
@@ -784,24 +790,18 @@ export const $override = (
         continue;
       }
     }
+    consumedOverrideParams.set(originalParam.name, consumed + 1);
 
-    // Warn if original param has @path but the matching override param doesn't.
-    const originalIsRealizedPathParam = realizedPathParamNames
-      ? realizedPathParamNames.has(originalParam.name)
-      : isPathParam(context.program, originalParam);
+    // Gating on `isPathParam(originalParam)` selects the realized path parameter over a
+    // body property that shares its name. The realized-route confirmation is deferred
+    // (see below) so the HTTP route is only resolved when an override actually drops a
+    // `@path`.
     if (
-      originalIsRealizedPathParam &&
+      isPathParam(context.program, originalParam) &&
       !isPathParam(context.program, overrideParam) &&
       !overrideHasClientLocation
     ) {
-      reportDiagnostic(context.program, {
-        code: "override-parameters-mismatch",
-        target: context.decoratorTarget,
-        format: {
-          methodName: original.name,
-          checkParameter: overrideParam.name,
-        },
-      });
+      droppedPathParamNames.push(overrideParam.name);
     }
 
     // Apply the alternate type to the original parameter
@@ -819,6 +819,28 @@ export const $override = (
           d.args[1]?.jsValue as string | undefined,
         ),
       );
+  }
+
+  // Only resolve the original operation's HTTP route (which is comparatively expensive)
+  // when at least one parameter dropped its `@path`, and report the ones that are
+  // actually realized path parameters of the route. A `@path` decorator in the type
+  // graph is not sufficient on its own: it can be carried by a parameter that is not
+  // part of the realized route (for example an ARM key surfaced by a templated provider
+  // action), which must not be reported.
+  if (droppedPathParamNames.length > 0) {
+    const originalRealizedPathParamNames = getRealizedPathParamNames(context.program, original);
+    for (const name of droppedPathParamNames) {
+      if (originalRealizedPathParamNames.has(name)) {
+        reportDiagnostic(context.program, {
+          code: "override-parameters-mismatch",
+          target: context.decoratorTarget,
+          format: {
+            methodName: original.name,
+            checkParameter: name,
+          },
+        });
+      }
+    }
   }
 
   if (!parametersMatch) {
