@@ -44,7 +44,6 @@ function extractClientOptions(
   const enableModelNamespace = getEnableModelNamespace(dpgContext, emitterOptions);
   const hierarchyClient = getHierarchyClient(emitterOptions);
   const clearOutputFolder = getClearOutputFolder(emitterOptions);
-  const isTypeSpecTest = emitterOptions["is-typespec-test"];
   const compatibilityMode = emitterOptions["compatibility-mode"];
   const compatibilityLro = emitterOptions["compatibility-lro"];
   const experimentalExtensibleEnums = emitterOptions["experimental-extensible-enums"];
@@ -73,7 +72,6 @@ function extractClientOptions(
     hierarchyClient,
     azureArm: dpgContext.arm,
     clearOutputFolder,
-    isTypeSpecTest,
     compatibilityMode,
     compatibilityLro,
     experimentalExtensibleEnums,

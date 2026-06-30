@@ -84,7 +84,6 @@ pnpm check:tree        # fails if regeneration left the git tree dirty
        emitter-output-dir: "{project-root}"
        generate-metadata: true
        generate-test: false
-       is-typespec-test: true
        hierarchy-client: false
        package-details:
          name: "@msinternal/auth-apikey"
