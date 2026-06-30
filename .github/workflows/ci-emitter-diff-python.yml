@@ -1,0 +1,97 @@
+name: "python / emitter diff"
+
+# Generates code with the current checkout's emitter and with the latest published
+# emitter version, then diffs the two. The rendered HTML diff is uploaded as a
+# per-PR artifact so reviewers can see exactly how an emitter change affects
+# generated SDKs. Powered by the language-agnostic eng/emitter-diff tool.
+
+on:
+  pull_request:
+    branches:
+      - main
+      - release/*
+    paths:
+      - "packages/typespec-python/**"
+      - "eng/emitter-diff/**"
+      - ".github/workflows/ci-emitter-diff-python.yml"
+  workflow_dispatch:
+    inputs:
+      baseline:
+        description: "Baseline emitter ref (npm version, local path, or github ref). Defaults to latest published."
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  emitter-diff:
+    name: "Generate & Diff"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - uses: ./.github/actions/setup
+
+      - uses: ./.github/actions/setup-python
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build emitter
+        run: pnpm turbo run --filter "@azure-tools/typespec-python..." build
+
+      - name: Prepare Python environment
+        run: pnpm run prepare
+        working-directory: packages/typespec-python
+
+      - name: Determine baseline
+        id: baseline
+        run: |
+          input="${{ github.event.inputs.baseline }}"
+          if [ -z "$input" ]; then
+            input="npm:$(npm view @azure-tools/typespec-python version)"
+          fi
+          echo "ref=$input" >> "$GITHUB_OUTPUT"
+          echo "Baseline: $input"
+
+      - name: Run emitter diff
+        id: diff
+        run: |
+          set +e
+          node eng/emitter-diff/src/cli.ts \
+            --emitter python \
+            --baseline "${{ steps.baseline.outputs.ref }}" \
+            --work-dir "${{ runner.temp }}/emitter-diff" \
+            --html "${{ runner.temp }}/emitter-diff.html" \
+            | tee "${{ runner.temp }}/emitter-diff.log"
+          echo "status=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Write job summary
+        if: always()
+        run: |
+          {
+            echo "## Emitter diff"
+            echo ""
+            echo "Baseline: \`${{ steps.baseline.outputs.ref }}\` vs current checkout."
+            echo ""
+            echo '```'
+            grep -E "Diff summary:" "${{ runner.temp }}/emitter-diff.log" || echo "No summary captured."
+            echo '```'
+            echo ""
+            echo "Download the **emitter-diff-html** artifact for the full rendered diff."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload HTML diff
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: emitter-diff-html
+          path: ${{ runner.temp }}/emitter-diff.html
+          retention-days: 7

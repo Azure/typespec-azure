@@ -91,6 +91,12 @@ const argv = parseArgs({
     debug: { type: "boolean", short: "d" },
     jobs: { type: "string", short: "j" },
     help: { type: "boolean", short: "h" },
+    // Overrides used by the emitter-diff tool (defaults preserve normal behavior):
+    "emitter-dir": { type: "string" },
+    "output-dir": { type: "string" },
+    "http-specs-dir": { type: "string" },
+    "azure-specs-dir": { type: "string" },
+    "use-pyodide": { type: "boolean" },
   },
 });
 
@@ -115,6 +121,20 @@ ${pc.bold("Options:")}
   ${pc.cyan("-j, --jobs <n>")}
       Number of parallel compilation tasks (default: 30 on Linux/Mac, 10 on Windows).
 
+  ${pc.cyan("--emitter-dir <path>")}
+      Override the emitter build used for compilation (the directory passed as the
+      TypeSpec emitter). Defaults to this package. Used by the emitter-diff tool to
+      generate with an older/baseline emitter version.
+
+  ${pc.cyan("--output-dir <path>")}
+      Override the root output directory. Generated code is written to
+      <output-dir>/<flavor>/<package> instead of ./tests/generated/<flavor>/<package>.
+
+  ${pc.cyan("--use-pyodide")}
+      Force the emitter to run the Python generator via Pyodide (WASM) instead of a
+      native Python venv. Useful on environments where the native toolchain (e.g. the
+      black formatter) cannot run, such as Windows paths exceeding the 260-char limit.
+
   ${pc.cyan("-h, --help")}
       Show this help message.
 
@@ -134,9 +154,24 @@ ${pc.bold("Examples:")}
 // Get paths
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const PLUGIN_DIR = resolve(SCRIPT_DIR, "../../");
-const AZURE_HTTP_SPECS = resolve(PLUGIN_DIR, "node_modules/@azure-tools/azure-http-specs/specs");
-const HTTP_SPECS = resolve(PLUGIN_DIR, "node_modules/@typespec/http-specs/specs");
+const AZURE_HTTP_SPECS = argv.values["azure-specs-dir"]
+  ? resolve(argv.values["azure-specs-dir"])
+  : resolve(PLUGIN_DIR, "node_modules/@azure-tools/azure-http-specs/specs");
+const HTTP_SPECS = argv.values["http-specs-dir"]
+  ? resolve(argv.values["http-specs-dir"])
+  : resolve(PLUGIN_DIR, "node_modules/@typespec/http-specs/specs");
 const EMITTER_NAME = "@azure-tools/typespec-python";
+
+// Emitter build to compile with. Defaults to this package; the emitter-diff tool
+// overrides this to point at a baseline/older emitter version.
+const EMITTER_DIR = argv.values["emitter-dir"]
+  ? resolve(argv.values["emitter-dir"])
+  : PLUGIN_DIR;
+
+// Root directory generated code is written under. Defaults to ./tests/generated.
+const OUTPUT_ROOT = argv.values["output-dir"]
+  ? resolve(argv.values["output-dir"])
+  : toPosix(`${PLUGIN_DIR}/tests/generated`);
 
 function isAzureSpec(specPath: string): boolean {
   return specPath.startsWith(AZURE_HTTP_SPECS);
@@ -463,16 +498,21 @@ function buildTaskGroups(specs: string[], flags: RegenerateFlags): TaskGroup[] {
         options[k] = v;
       }
 
-      // Set output directory - use tests/generated/<flavor>/<package> structure
+      // Set output directory - use <root>/<flavor>/<package> structure
       const packageName = (options["package-name"] as string) || defaultPackageName(spec);
       const outputDir =
         (options["emitter-output-dir"] as string) ||
-        toPosix(`${PLUGIN_DIR}/tests/generated/${flags.flavor}/${packageName}`);
+        toPosix(`${OUTPUT_ROOT}/${flags.flavor}/${packageName}`);
       options["emitter-output-dir"] = outputDir;
 
       // Debug mode
       if (flags.debug) {
         options["debug"] = true;
+      }
+
+      // Force Pyodide (WASM) generation when requested (see --use-pyodide).
+      if (argv.values["use-pyodide"]) {
+        options["use-pyodide"] = true;
       }
 
       // Examples directory
@@ -493,7 +533,7 @@ async function compileSpec(task: CompileTask): Promise<{ success: boolean; error
   try {
     // Build compiler options
     const compilerOptions = {
-      emit: [PLUGIN_DIR],
+      emit: [EMITTER_DIR],
       options: {
         [EMITTER_NAME]: options,
       },
@@ -570,7 +610,7 @@ async function runParallel(groups: TaskGroup[], maxJobs: number): Promise<Map<st
 // Preprocess: create files that should be deleted after regeneration (for testing)
 async function preprocess(flavor: string): Promise<void> {
   if (flavor === "azure") {
-    const generalParts = [PLUGIN_DIR, "tests", "generated", "azure"];
+    const generalParts = [OUTPUT_ROOT, "azure"];
     const authFile = join(
       ...generalParts,
       "authentication-api-key",
