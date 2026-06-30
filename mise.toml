@@ -2,4 +2,4 @@
 python = "3.12"
 uv = "latest"
 java = "microsoft-11"
-maven = "latest"
+maven = "3.9.16"
