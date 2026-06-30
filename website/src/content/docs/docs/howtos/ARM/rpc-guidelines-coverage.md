@@ -180,16 +180,16 @@ The following sections provide a more detailed breakdown of coverage organized b
 
 The following TypeSpec linting rules enforce ARM conventions that are not explicitly called out as individual RPC guidelines but support overall ARM compliance:
 
-| TypeSpec Rule                                                                                           | Description                                                                                        |
-| ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| `arm/arm-common-types-version`                                                                          | Requires specifying the ARM common-types version using `@armCommonTypesVersion`.                   |
-| [`arm/arm-no-record`](/docs/libraries/azure-resource-manager/rules/arm-no-record)                       | Prevents use of `Record` types for ARM resources, which produce `additionalProperties` in OpenAPI. |
-| `arm/arm-resource-duplicate-property`                                                                   | Warns about duplicate properties in resource definitions.                                          |
-| [`arm/arm-resource-name-pattern`](/docs/libraries/azure-resource-manager/rules/resource-name-pattern)   | Requires a `pattern` restriction on resource name parameters.                                      |
-| `arm/improper-subscription-list-operation`                                                              | Ensures tenant and extension resources don't define list-by-subscription operations.               |
-| [`arm/no-empty-model`](/docs/libraries/azure-resource-manager/rules/no-empty-model)                     | Prevents ARM properties with `type: object` that don't reference a model definition.               |
-| [`arm/no-override-props`](/docs/libraries/azure-resource-manager/rules/no-override-props)               | Disallows redefining properties already defined in a base type.                                    |
-| [`arm/unsupported-type`](/docs/libraries/azure-resource-manager/rules/unsupported-type)                 | Checks for unsupported ARM types.                                                                  |
+| TypeSpec Rule                                                                                         | Description                                                                                        |
+| ----------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `arm/arm-common-types-version`                                                                        | Requires specifying the ARM common-types version using `@armCommonTypesVersion`.                   |
+| [`arm/arm-no-record`](/docs/libraries/azure-resource-manager/rules/arm-no-record)                     | Prevents use of `Record` types for ARM resources, which produce `additionalProperties` in OpenAPI. |
+| `arm/arm-resource-duplicate-property`                                                                 | Warns about duplicate properties in resource definitions.                                          |
+| [`arm/arm-resource-name-pattern`](/docs/libraries/azure-resource-manager/rules/resource-name-pattern) | Requires a `pattern` restriction on resource name parameters.                                      |
+| `arm/improper-subscription-list-operation`                                                            | Ensures tenant and extension resources don't define list-by-subscription operations.               |
+| [`arm/no-empty-model`](/docs/libraries/azure-resource-manager/rules/no-empty-model)                   | Prevents ARM properties with `type: object` that don't reference a model definition.               |
+| [`arm/no-override-props`](/docs/libraries/azure-resource-manager/rules/no-override-props)             | Disallows redefining properties already defined in a base type.                                    |
+| [`arm/unsupported-type`](/docs/libraries/azure-resource-manager/rules/unsupported-type)               | Checks for unsupported ARM types.                                                                  |
 
 ## Rules Not Enforceable Through Linting — Service Owner Responsibility
 
