@@ -87,5 +87,3 @@ jobs:
         shell: pwsh
         run: ./Spector-Tests.ps1
         working-directory: packages/typespec-java/emitter-tests
-
-

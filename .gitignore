@@ -247,4 +247,3 @@ packages/typespec-java/emitter-tests/specs/**
 packages/typespec-java/emitter-tests/node_modules/**
 packages/typespec-java/emitter-tests/package-lock.json
 packages/typespec-java/emitter-tests/tsp-spector-coverage-*.json
-

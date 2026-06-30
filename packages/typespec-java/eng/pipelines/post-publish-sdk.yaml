@@ -151,4 +151,3 @@ jobs:
           PRTitle: "[Automation] Generate SDK based on TypeSpec $(PackageVersion)$(PullRequestTitleSuffix)"
           PRLabels: "DPG"
           OpenAsDraft: "true"
-

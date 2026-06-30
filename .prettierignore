@@ -111,4 +111,3 @@ packages/typespec-java/emitter-tests/
 packages/typespec-java/src/**
 !packages/typespec-java/src/options.ts
 packages/typespec-java/test/
-
