@@ -9,7 +9,7 @@
 import { join } from "node:path";
 import { parseArgs } from "node:util";
 
-import { diffDirs, openInVsCode, printDiff, writeHtml } from "./diff.ts";
+import { diffDirs, openInVsCode, printDiff, writeHtml, writePatch } from "./diff.ts";
 import { getAdapter, listAdapters } from "./registry.ts";
 import {
   classifyRef,
@@ -41,6 +41,7 @@ ${color.bold("Options:")}
   --name <pattern>        Filter which specs/packages are generated.
   --work-dir <dir>        Scratch dir (default: a temp dir).
   --open                  Open the diff in VS Code (local).
+  --patch <file>          Write the raw unified diff to a file instead of the terminal.
   --html <file>           Write a rendered HTML diff (CI).
   --fail-on-diff          Exit non-zero when output differs (CI gating).
   --run-tests             Run the adapter's test suites on the output.
@@ -69,6 +70,7 @@ async function main(): Promise<number> {
       name: { type: "string" },
       "work-dir": { type: "string" },
       open: { type: "boolean" },
+      patch: { type: "string" },
       html: { type: "string" },
       "fail-on-diff": { type: "boolean" },
       "run-tests": { type: "boolean" },
@@ -182,7 +184,8 @@ async function main(): Promise<number> {
 
   // Diff.
   const diff = await diffDirs(baselineOut, headOut, log);
-  printDiff(diff, log);
+  if (values.patch) writePatch(diff, values.patch, log);
+  else printDiff(diff, log);
 
   if (values.open) await openInVsCode(baselineOut, headOut, workDir, log);
   if (values.html) await writeHtml(diff, values.html, log);

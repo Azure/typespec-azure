@@ -52,6 +52,7 @@ node eng/emitter-diff/src/cli.ts --emitter python --baseline 0.61.2
 | --- | --- |
 | `--name <pattern>` | Filter which specs/packages are generated |
 | `--open` | Open the diff in VS Code (local) |
+| `--patch <file>` | Write the raw unified diff to a file instead of the terminal |
 | `--html <file>` | Write a rendered HTML diff (CI artifact) |
 | `--fail-on-diff` | Exit non-zero when output differs (CI gating) |
 | `--run-tests` | Run the adapter's test suites on the output |

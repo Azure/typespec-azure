@@ -69,7 +69,12 @@ export function run(
       stdio: opts.inherit ? "inherit" : "pipe",
       shell: needsShell,
     };
-    const child = spawn(cmd, args, spawnOpts);
+    // With `shell: true`, passing an args array triggers a Node deprecation
+    // (DEP0190). Build a single quoted command line instead; spawn directly
+    // with the args array when no shell is involved.
+    const child = needsShell
+      ? spawn([cmd, ...args.map(quoteForShell)].join(" "), spawnOpts)
+      : spawn(cmd, args, spawnOpts);
     let stdout = "";
     let stderr = "";
     child.stdout?.on("data", (d) => (stdout += d.toString()));
@@ -77,6 +82,12 @@ export function run(
     child.on("error", reject);
     child.on("close", (code) => resolve({ code: code ?? 0, stdout, stderr }));
   });
+}
+
+/** Quote an argument for cmd.exe when running through a shell. */
+function quoteForShell(s: string): string {
+  if (s.length > 0 && /^[A-Za-z0-9_.:\\/=@^-]+$/.test(s)) return s;
+  return `"${s.replace(/"/g, '""')}"`;
 }
 
 /** Run a command and throw if it exits non-zero. */

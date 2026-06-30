@@ -105,6 +105,17 @@ export function printSummary(diff: DiffResult, log: Logger): void {
   );
 }
 
+/** Write the raw unified patch to a file instead of dumping it to the terminal. */
+export function writePatch(diff: DiffResult, outFile: string, log: Logger): void {
+  writeFileSync(outFile, diff.patch, "utf8");
+  if (!diff.hasChanges) {
+    log.success(`No differences between baseline and head output (wrote empty patch to ${outFile}).`);
+    return;
+  }
+  log.success(`Wrote unified diff to ${outFile}`);
+  printSummary(diff, log);
+}
+
 /**
  * Render the patch to a self-contained HTML file via diff2html. diff2html is an
  * optional dependency loaded lazily so the core runs without it installed.
