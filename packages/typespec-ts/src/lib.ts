@@ -3,7 +3,7 @@
 
 import { createTypeSpecLibrary, JSONSchemaType, paramMessage } from "@typespec/compiler";
 import { Options } from "prettier";
-import { DependencyInfo, PackageDetails, PackageFlavor, ServiceInfo } from "./rlc-common/index.js";
+import { PackageDetails } from "./interfaces.js";
 
 export interface EmitterOptions {
   /**
@@ -13,9 +13,6 @@ export interface EmitterOptions {
    * currently affected by this option.
    */
   "include-headers-in-response"?: boolean;
-  "include-shortcuts"?: boolean;
-  "multi-client"?: boolean;
-  batch?: any[];
   "package-details"?: PackageDetails;
   "add-credentials"?: boolean;
   /** Three possible values:
@@ -42,19 +39,9 @@ export interface EmitterOptions {
    */
   "generate-test"?: boolean;
   "generate-sample"?: boolean;
-  "azure-sdk-for-js"?: boolean;
-  "azure-output-directory"?: string;
   "is-typespec-test"?: boolean;
-  title?: string;
-  "dependency-info"?: DependencyInfo;
-  "product-doc-link"?: string;
-  "service-info"?: ServiceInfo;
   "azure-arm"?: boolean;
-  "source-from"?: "TypeSpec" | "Swagger";
-  "is-modular-library"?: boolean;
-  "module-kind"?: "esm";
   "enable-operation-group"?: boolean;
-  flavor?: PackageFlavor;
   "enable-model-namespace"?: boolean;
   "hierarchy-client"?: boolean;
   "compatibility-mode"?: boolean;
@@ -62,11 +49,8 @@ export interface EmitterOptions {
   "experimental-extensible-enums"?: boolean;
   "clear-output-folder"?: boolean;
   "ignore-property-name-normalize"?: boolean;
-  "compatibility-query-multi-format"?: boolean;
-  branded?: boolean;
   "typespec-title-map"?: Record<string, string>;
   "ignore-enum-member-name-normalize"?: boolean;
-  "default-value-object"?: boolean;
   //TODO should remove this after finish the release tool test
   "should-use-pnpm-dep"?: boolean;
   "ignore-nullable-on-optional"?: boolean;
@@ -93,12 +77,11 @@ export interface EmitterOptions {
   /**
    * When set to true, generates React Native build targets (tsconfig, warp target,
    * package.json exports). Defaults to `false`.
-   * Only applicable when `azure-sdk-for-js` is `true`.
    */
   "generate-react-native-target"?: boolean;
 }
 
-export const RLCOptionsSchema: JSONSchemaType<EmitterOptions> = {
+export const EmitterOptionsSchema: JSONSchemaType<EmitterOptions> = {
   type: "object",
   additionalProperties: true,
   properties: {
@@ -107,24 +90,6 @@ export const RLCOptionsSchema: JSONSchemaType<EmitterOptions> = {
       nullable: true,
       description:
         "This option is used to indicate whether to include response headers in the generated response type. When set to true, the generated response type will include response headers as properties.",
-    },
-    "include-shortcuts": {
-      type: "boolean",
-      nullable: true,
-      description: "Deprecated option for RLC legacy generation.",
-    },
-    "multi-client": {
-      type: "boolean",
-      nullable: true,
-      description: "Deprecated option for RLC legacy generation.",
-    },
-    batch: {
-      type: "array",
-      nullable: true,
-      items: {
-        type: "string",
-      },
-      description: "Deprecated option for RLC legacy generation.",
     },
     "package-details": {
       type: "object",
@@ -145,18 +110,18 @@ export const RLCOptionsSchema: JSONSchemaType<EmitterOptions> = {
     "add-credentials": {
       type: "boolean",
       nullable: true,
-      description: `
-      We support two types of authentication: Azure Key Credential(AzureKey) and Token credential(AADToken), any other will need to be handled manually.
-
-      There are two ways to set up our credential details
-
-      - To use \`@useAuth\` decorator in TypeSpec
-      - To config in yaml file
-
-      Please notice defining in TypeSpec is recommended and also has higher priority than second one.
-
-      To enable credential in \`tspconfig.yaml\` and we need to provide more details to let codegen know types.
-      `,
+      description: [
+        "We support two types of authentication: Azure Key Credential(AzureKey) and Token credential(AADToken), any other will need to be handled manually.",
+        "",
+        "There are two ways to set up our credential details",
+        "",
+        "- To use `@useAuth` decorator in TypeSpec",
+        "- To config in yaml file",
+        "",
+        "Please notice defining in TypeSpec is recommended and also has higher priority than second one.",
+        "",
+        "To enable credential in `tspconfig.yaml` and we need to provide more details to let codegen know types.",
+      ].join("\n"),
     },
     "credential-scopes": {
       type: "array",
@@ -186,20 +151,18 @@ export const RLCOptionsSchema: JSONSchemaType<EmitterOptions> = {
     "generate-metadata": {
       type: "boolean",
       nullable: true,
-      description: `
-      Whether to generate metadata files which includes package.json, README.md and tsconfig.json etc. Defaults to \`undefined\`. If there's not a package.json under package-dir, defaults to \`true\`. but if you'd like to disable this feature you could set it as \`false\`.
-      `,
+      description:
+        "Whether to generate metadata files which includes package.json, README.md and tsconfig.json etc. Defaults to `undefined`. If there's not a package.json under package-dir, defaults to `true`. but if you'd like to disable this feature you could set it as `false`.",
     },
     "generate-test": {
       type: "boolean",
       nullable: true,
-      description: `
-      Whether to generate test files, for basic testing of your generated sdks. Defaults to \`undefined\`.
-      other cases:
-      - If azure-sdk-for-js is \`false\`. Defaults to \`false\`.
-      - If azure-sdk-for-js is \`true\` but there's a test folder under package-dir. Defaults to \`false\`.
-      - If azure-sdk-for-js is \`true\` but there's not a test folder under package-dir. Defaults to \`true\`.
-      `,
+      description: [
+        "Whether to generate test files, for basic testing of your generated sdks. Defaults to `undefined`.",
+        "other cases:",
+        "- If there's a test folder under package-dir. Defaults to `false`.",
+        "- If there's not a test folder under package-dir. Defaults to `true`.",
+      ].join("\n"),
     },
     "generate-sample": {
       type: "boolean",
@@ -207,69 +170,15 @@ export const RLCOptionsSchema: JSONSchemaType<EmitterOptions> = {
       description:
         "Whether to generate sample files, for basic samples of your generated sdks. Defaults to `undefined`. Management packages' default to `true`.",
     },
-    "azure-sdk-for-js": {
-      type: "boolean",
-      nullable: true,
-      description:
-        "This is used to indicate your project is generated in [azure-sdk-for-js](https://github.com/Azure/azure-sdk-for-js) repo or not. If your package is located in that repo we'll leverage `dev-tool` to accelerate our building and testing, however if not we'll remove the dependency for that tool. Defaults to `undefined`. Services with Flavor equal to 'Azure' default to 'true'. ",
-    },
-    "azure-output-directory": {
-      type: "string",
-      nullable: true,
-      description: "Deprecated option for RLC legacy generation",
-    },
     "is-typespec-test": {
       type: "boolean",
       nullable: true,
       description: "Internal option for test",
     },
-    title: {
-      type: "string",
-      nullable: true,
-      description: "Deprecated option for RLC legacy generation.",
-    },
-    "dependency-info": {
-      type: "object",
-      additionalProperties: true,
-      properties: {
-        link: { type: "string", nullable: false },
-        description: { type: "string", nullable: false },
-      },
-      required: [],
-      nullable: true,
-      description: "Deprecated option for RLC legacy generation.",
-    },
-    "product-doc-link": {
-      type: "string",
-      nullable: true,
-      description: "Deprecated option for RLC legacy generation.",
-    },
-    "service-info": {
-      type: "object",
-      additionalProperties: true,
-      properties: {
-        title: { type: "string", nullable: true },
-        description: { type: "string", nullable: true },
-      },
-      nullable: true,
-      description: "Deprecated option for RLC legacy generation.",
-    },
     "azure-arm": {
       type: "boolean",
       nullable: true,
       description: "Whether the package is an arm package.",
-    },
-    "source-from": {
-      type: "string",
-      nullable: true,
-      description: "Internal option, the value is default for TypeSpec generation",
-    },
-    "is-modular-library": {
-      type: "boolean",
-      nullable: true,
-      default: false,
-      description:
-        "Whether to generate a Modular library. Defaults to `false`. Arm packages default to `true`.",
     },
     "enable-operation-group": {
       type: "boolean",
@@ -288,23 +197,6 @@ export const RLCOptionsSchema: JSONSchemaType<EmitterOptions> = {
       nullable: true,
       description:
         "An option to organize the client in a hierarchical way as defined by `@clientInitialization`. This is true by default.",
-    },
-    branded: {
-      type: "boolean",
-      nullable: true,
-      description: "A section of flavor",
-    },
-    flavor: {
-      type: "string",
-      nullable: true,
-      description: "The flavor of the SDK.",
-    },
-    "module-kind": {
-      type: "string",
-      nullable: true,
-      enum: ["esm"],
-      default: "esm",
-      description: "Internal option for test.",
     },
     "compatibility-mode": {
       type: "boolean",
@@ -341,17 +233,6 @@ export const RLCOptionsSchema: JSONSchemaType<EmitterOptions> = {
       description:
         "The emitter has a normalization logic for enum member key, to ignore this normalization, you can set this option to true",
     },
-    "compatibility-query-multi-format": {
-      type: "boolean",
-      nullable: true,
-      description:
-        "Whether to generate the backward-compatible code for query parameter serialization for array types in RLC. Defaults to `false`",
-    },
-    "default-value-object": {
-      type: "boolean",
-      nullable: true,
-      description: "Deprecated option for RLC legacy generation.",
-    },
     "typespec-title-map": {
       type: "object",
       additionalProperties: {
@@ -359,15 +240,16 @@ export const RLCOptionsSchema: JSONSchemaType<EmitterOptions> = {
       },
       required: [],
       nullable: true,
-      description: `Only for Modular generation
-      By default, code generation uses the titles specified in the \`@client\` and \`@service\` decorators in TypeSpec to name modular clients. If you need to override these names, you can configure the \`typespec-title-map\`. The map's keys represent the original client names from TypeSpec, and the values are the desired client names. This configuration supports renaming multiple clients.
-
-      \`\`\`yaml
-      typespec-title-map: 
-        AnomalyDetectorClient: AnomalyDetectorRest
-        AnomalyDetectorClient2: AnomalyDetectorRest2
-      \`\`\`
-      `,
+      description: [
+        "Only for Modular generation",
+        "By default, code generation uses the titles specified in the `@client` and `@service` decorators in TypeSpec to name modular clients. If you need to override these names, you can configure the `typespec-title-map`. The map's keys represent the original client names from TypeSpec, and the values are the desired client names. This configuration supports renaming multiple clients.",
+        "",
+        "```yaml",
+        "typespec-title-map:",
+        "  AnomalyDetectorClient: AnomalyDetectorRest",
+        "  AnomalyDetectorClient2: AnomalyDetectorRest2",
+        "```",
+      ].join("\n"),
     },
     "should-use-pnpm-dep": {
       type: "boolean",
@@ -402,7 +284,7 @@ export const RLCOptionsSchema: JSONSchemaType<EmitterOptions> = {
       type: "boolean",
       nullable: true,
       description:
-        "When set to true, generates React Native build targets (tsconfig, warp target, package.json exports). Only applicable when azure-sdk-for-js is true. Defaults to `false`.",
+        "When set to true, generates React Native build targets (tsconfig, warp target, package.json exports). Defaults to `false`.",
     },
   },
   required: [],
@@ -672,7 +554,7 @@ const libDef = {
     },
   },
   emitter: {
-    options: RLCOptionsSchema,
+    options: EmitterOptionsSchema,
   },
 } as const;
 

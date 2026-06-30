@@ -13,6 +13,9 @@
 # Github action lock file
 *.lock.yml
 
+# Auto-generated agentic workflow maintenance file
+**/.github/workflows/agentics-maintenance.yml
+
 # Coverage report directory
 **/coverage/
 
@@ -95,6 +98,6 @@ core/packages/http-server-csharp/test/snapshots/sample-service/
 
 # generated definitions for typespec-ts
 packages/typespec-ts/test/integration/generated/
-packages/typespec-ts/test/azureIntegration/generated/
-packages/typespec-ts/test/modularIntegration/generated/
-packages/typespec-ts/test/azureModularIntegration/generated/
+packages/typespec-ts/test/azure-integration/generated/
+packages/typespec-ts/test/modular-integration/generated/
+packages/typespec-ts/test/azure-modular-integration/generated/

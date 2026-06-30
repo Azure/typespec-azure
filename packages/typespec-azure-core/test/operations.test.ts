@@ -13,153 +13,201 @@ import { type LroMetadata, getLroMetadata } from "../src/lro-helpers.js";
 import { getNamespaceName } from "../src/rules/utils.js";
 import { type SimpleHttpOperation, getOperations, getSimplifiedOperations } from "./test-host.js";
 
-describe("typespec-azure-core: operation templates", () => {
-  it("gathers metadata about ResourceCreateOrUpdate operation template", async () => {
-    const [operations, diagnostics] = await getOperations(
-      `
-      @resource("test")
-      model TestModel {
-        @key
-        name: string;
+it("gathers metadata about ResourceCreateOrUpdate operation template", async () => {
+  const [operations, diagnostics] = await getOperations(
+    `
+    @resource("test")
+    model TestModel {
+      @key
+      name: string;
 
-        data: string;
-      };
+      data: string;
+    };
 
-      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
-      @test op resourceUpsert is StandardResourceOperations.ResourceCreateOrUpdate<TestModel>;
-      `,
-    );
+    #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+    @test op resourceUpsert is StandardResourceOperations.ResourceCreateOrUpdate<TestModel>;
+    `,
+  );
 
-    ok(operations.length === 1);
-    strictEqual(operations[0].path, "/test/{name}");
-    strictEqual(operations[0].verb, "patch");
+  ok(operations.length === 1);
+  strictEqual(operations[0].path, "/test/{name}");
+  strictEqual(operations[0].verb, "patch");
 
-    const contentTypeParam = operations[0].parameters.parameters.find(
-      (p) => p.name === "Content-Type",
-    );
-    ok(contentTypeParam, "No Content-Type header was found.");
-    strictEqual(contentTypeParam!.type, "header");
-    strictEqual(contentTypeParam!.param.type.kind, "String");
-    strictEqual(
-      (contentTypeParam!.param.type as StringLiteral).value,
-      "application/merge-patch+json",
-    );
+  const contentTypeParam = operations[0].parameters.parameters.find(
+    (p) => p.name === "Content-Type",
+  );
+  ok(contentTypeParam, "No Content-Type header was found.");
+  strictEqual(contentTypeParam!.type, "header");
+  strictEqual(contentTypeParam!.param.type.kind, "String");
+  strictEqual(
+    (contentTypeParam!.param.type as StringLiteral).value,
+    "application/merge-patch+json",
+  );
 
-    expectDiagnosticEmpty(diagnostics);
-  });
+  expectDiagnosticEmpty(diagnostics);
+});
 
-  it("properly annotates long-running operations with a status monitor", async () => {
-    const [operations, diagnostics, runner] = await getOperations(
-      `
-      @resource("test")
-      model TestModel {
-        @key
-        name: string;
-      };
+it("properly annotates long-running operations with a status monitor", async () => {
+  const [operations, diagnostics, runner] = await getOperations(
+    `
+    @resource("test")
+    model TestModel {
+      @key
+      name: string;
+    };
 
-      @test op create is StandardResourceOperations.LongRunningResourceCreateWithServiceProvidedName<TestModel>;
-      @test op createReplace is StandardResourceOperations.LongRunningResourceCreateOrReplace<TestModel>;
-      @test op delete is Azure.Core.LongRunningResourceDelete<TestModel>;
+    @test op create is StandardResourceOperations.LongRunningResourceCreateWithServiceProvidedName<TestModel>;
+    @test op createReplace is StandardResourceOperations.LongRunningResourceCreateOrReplace<TestModel>;
+    @test op delete is Azure.Core.LongRunningResourceDelete<TestModel>;
 
-      #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
-      @TypeSpec.Http.route("basic")
+    #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
+    @TypeSpec.Http.route("basic")
 @test op basicOp is Azure.Core.Foundations.LongRunningOperation<{}>;
-      `,
+    `,
+  );
+
+  function hasLocationHeader(operation: HttpOperation, statusCode: number = 201): void {
+    const response = operation.responses.find((r) => r.statusCodes === statusCode);
+    ok(response);
+    const locationHeader = response.responses[0].headers?.["Location"];
+    ok(locationHeader, `No location header: ${operation.operation.name}`);
+    ok(
+      isFinalLocation(runner.program, locationHeader),
+      `@finalLocation not found: ${operation.operation.name}`,
     );
+  }
 
-    function hasLocationHeader(operation: HttpOperation, statusCode: number = 201): void {
-      const response = operation.responses.find((r) => r.statusCodes === statusCode);
-      ok(response);
-      const locationHeader = response.responses[0].headers?.["Location"];
-      ok(locationHeader, `No location header: ${operation.operation.name}`);
-      ok(
-        isFinalLocation(runner.program, locationHeader),
-        `@finalLocation not found: ${operation.operation.name}`,
-      );
+  function hasOperationLocationHeader(operation: HttpOperation, statusCode: number = 201): void {
+    const response = operation.responses.find((r) => r.statusCodes === statusCode);
+    ok(response);
+    const operationLocationHeader = response.responses[0].headers?.["Operation-Location"];
+    ok(operationLocationHeader, `No Operation-Location header: ${operation.operation.name}`);
+    ok(
+      isPollingLocation(runner.program, operationLocationHeader),
+      `@pollingLocation not found: ${operation.operation.name}`,
+    );
+  }
+
+  expectDiagnosticEmpty(diagnostics);
+
+  strictEqual(operations.length, 4);
+  const createOp = operations[0];
+  strictEqual(createOp.operation.name, "create");
+  hasLocationHeader(createOp, 202);
+
+  const createReplaceOp = operations[1];
+  strictEqual(createReplaceOp.operation.name, "createReplace");
+  hasOperationLocationHeader(createReplaceOp);
+
+  // NOTE: CreateOrUpdate does not return an LRO status!
+
+  const deleteOp = operations[2];
+  strictEqual(deleteOp.operation.name, "delete");
+  hasOperationLocationHeader(deleteOp, 202);
+
+  const basicOp = operations[3];
+  strictEqual(basicOp.operation.name, "basicOp");
+  hasOperationLocationHeader(basicOp, 202);
+});
+
+it("allows derived class to derive resource metadata from base class", async () => {
+  const [_, diagnostics] = await getOperations(`
+    @resource("foo")
+    model BaseWithKey {
+      @key
+      name: string;
     }
 
-    function hasOperationLocationHeader(operation: HttpOperation, statusCode: number = 201): void {
-      const response = operation.responses.find((r) => r.statusCodes === statusCode);
-      ok(response);
-      const operationLocationHeader = response.responses[0].headers?.["Operation-Location"];
-      ok(operationLocationHeader, `No Operation-Location header: ${operation.operation.name}`);
-      ok(
-        isPollingLocation(runner.program, operationLocationHeader),
-        `@pollingLocation not found: ${operation.operation.name}`,
-      );
+    model Derived extends BaseWithKey {
+      extra: string;
     }
 
-    expectDiagnosticEmpty(diagnostics);
+    op read is Azure.Core.StandardResourceOperations.ResourceRead<Derived>;
+  `);
+  expectDiagnosticEmpty(diagnostics);
+});
 
-    strictEqual(operations.length, 4);
-    const createOp = operations[0];
-    strictEqual(createOp.operation.name, "create");
-    hasLocationHeader(createOp, 202);
+it("emits diagnostic when invalid resource type is given", async () => {
+  const [_, diagnostics] = await getOperations(`
+    model NoKeyModel {
+      name: string;
+    }
 
-    const createReplaceOp = operations[1];
-    strictEqual(createReplaceOp.operation.name, "createReplace");
-    hasOperationLocationHeader(createReplaceOp);
+    model NoSegmentModel {
+      @key
+      name: string;
+    }
 
-    // NOTE: CreateOrUpdate does not return an LRO status!
+    op read is Azure.Core.ResourceRead<NoKeyModel>;
+    #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+    op create is StandardResourceOperations.ResourceCreateOrUpdate<NoSegmentModel>;
+  `);
 
-    const deleteOp = operations[2];
-    strictEqual(deleteOp.operation.name, "delete");
-    hasOperationLocationHeader(deleteOp, 202);
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-azure-core/invalid-resource-type",
+      message:
+        "Model type 'Azure.MyService.NoKeyModel' is not a valid resource type.  It must contain a property decorated with '@key'.",
+    },
+    {
+      code: "@azure-tools/typespec-azure-core/invalid-resource-type",
+      message:
+        "Model type 'Azure.MyService.NoSegmentModel' is not a valid resource type.  It must be decorated with the '@resource' decorator.",
+    },
+  ]);
+});
 
-    const basicOp = operations[3];
-    strictEqual(basicOp.operation.name, "basicOp");
-    hasOperationLocationHeader(basicOp, 202);
-  });
+function wrapResourceCode(code: string): string {
+  return `
+  model TestModel {
+    @key
+    @segment("test")
+    name: string;
+    value: int32;
+  }
 
-  it("allows derived class to derive resource metadata from base class", async () => {
-    const [_, diagnostics] = await getOperations(`
-      @resource("foo")
-      model BaseWithKey {
-        @key
-        name: string;
-      }
+  model CustomRequestHeaders {
+    @header
+    "x-ms-foobar": string;
+  }
 
-      model Derived extends BaseWithKey {
-        extra: string;
-      }
+  model CustomQueryParameters {
+    @query
+    nameHint: string;
+  }
 
-      op read is Azure.Core.StandardResourceOperations.ResourceRead<Derived>;
-    `);
-    expectDiagnosticEmpty(diagnostics);
-  });
+  model CustomParameters { ...CustomRequestHeaders; ...CustomQueryParameters; }
 
-  it("emits diagnostic when invalid resource type is given", async () => {
-    const [_, diagnostics] = await getOperations(`
-      model NoKeyModel {
-        name: string;
-      }
+  model CustomResponseProperties {
+    @header
+    "x-ms-response-id": int32;
+  }
 
-      model NoSegmentModel {
-        @key
-        name: string;
-      }
+  alias Customizations = Azure.Core.Traits.RequestHeadersTrait<CustomRequestHeaders> & Azure.Core.Traits.QueryParametersTrait<CustomQueryParameters> & Azure.Core.Traits.ResponseHeadersTrait<CustomResponseProperties>;
 
-      op read is Azure.Core.ResourceRead<NoKeyModel>;
-      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
-      op create is StandardResourceOperations.ResourceCreateOrUpdate<NoSegmentModel>;
-    `);
+  ${code}
+  `;
+}
 
-    expectDiagnostics(diagnostics, [
-      {
-        code: "@azure-tools/typespec-azure-core/invalid-resource-type",
-        message:
-          "Model type 'Azure.MyService.NoKeyModel' is not a valid resource type.  It must contain a property decorated with '@key'.",
-      },
-      {
-        code: "@azure-tools/typespec-azure-core/invalid-resource-type",
-        message:
-          "Model type 'Azure.MyService.NoSegmentModel' is not a valid resource type.  It must be decorated with the '@resource' decorator.",
-      },
-    ]);
-  });
+async function compileResourceOperations(code: string): Promise<SimpleHttpOperation[]> {
+  const [operations, diagnostics] = await getSimplifiedOperations(wrapResourceCode(code));
 
-  function wrapResourceCode(code: string): string {
-    return `
+  expectDiagnosticEmpty(diagnostics);
+  return operations;
+}
+
+async function compileResourceOperation(code: string): Promise<SimpleHttpOperation> {
+  const operations = await compileResourceOperations(code);
+  strictEqual(operations.length, 1);
+  return operations[0];
+}
+
+async function compileLroOperation(
+  code: string,
+  operationName?: string,
+): Promise<[HttpOperation, LroMetadata | undefined, TesterInstance]> {
+  let [operations, diagnostics, runner] = await getOperations(
+    `
     model TestModel {
       @key
       @segment("test")
@@ -187,360 +235,486 @@ describe("typespec-azure-core: operation templates", () => {
     alias Customizations = Azure.Core.Traits.RequestHeadersTrait<CustomRequestHeaders> & Azure.Core.Traits.QueryParametersTrait<CustomQueryParameters> & Azure.Core.Traits.ResponseHeadersTrait<CustomResponseProperties>;
 
     ${code}
-    `;
+    `,
+  );
+
+  expectDiagnosticEmpty(diagnostics);
+
+  if (operationName !== undefined) {
+    operations = operations.filter((o) => o.operation.name === operationName);
   }
 
-  async function compileResourceOperations(code: string): Promise<SimpleHttpOperation[]> {
-    const [operations, diagnostics] = await getSimplifiedOperations(wrapResourceCode(code));
+  strictEqual(operations.length, 1);
+  const lro = getLroMetadata(runner.program, operations[0].operation);
+  expectDiagnosticEmpty(runner.program.diagnostics);
 
-    expectDiagnosticEmpty(diagnostics);
-    return operations;
-  }
+  return [operations[0], lro, runner];
+}
 
-  async function compileResourceOperation(code: string): Promise<SimpleHttpOperation> {
-    const operations = await compileResourceOperations(code);
-    strictEqual(operations.length, 1);
-    return operations[0];
-  }
+const expectedParams = [
+  {
+    name: "api-version",
+    type: "query",
+  },
+  {
+    name: "x-ms-foobar",
+    type: "header",
+  },
+  {
+    name: "nameHint",
+    type: "query",
+  },
+];
 
-  async function compileLroOperation(
-    code: string,
-    operationName?: string,
-  ): Promise<[HttpOperation, LroMetadata | undefined, TesterInstance]> {
-    let [operations, diagnostics, runner] = await getOperations(
-      `
-      model TestModel {
-        @key
-        @segment("test")
-        name: string;
-        value: int32;
-      }
+const expectedParamsWithName = [...expectedParams];
+expectedParamsWithName.splice(1, 0, {
+  name: "name",
+  type: "path",
+});
 
-      model CustomRequestHeaders {
-        @header
-        "x-ms-foobar": string;
-      }
+it("ResourceRead", async () => {
+  const operation = await compileResourceOperation(
+    `@test op read is Azure.Core.ResourceRead<TestModel, Customizations>;`,
+  );
 
-      model CustomQueryParameters {
-        @query
-        nameHint: string;
-      }
+  deepStrictEqual(operation, {
+    name: "read",
+    verb: "get",
+    path: "/test/{name}",
+    params: {
+      body: undefined,
+      params: expectedParamsWithName,
+    },
+    responseProperties: ["name", "value", "x-ms-response-id"],
+  });
+});
 
-      model CustomParameters { ...CustomRequestHeaders; ...CustomQueryParameters; }
-
-      model CustomResponseProperties {
-        @header
-        "x-ms-response-id": int32;
-      }
-
-      alias Customizations = Azure.Core.Traits.RequestHeadersTrait<CustomRequestHeaders> & Azure.Core.Traits.QueryParametersTrait<CustomQueryParameters> & Azure.Core.Traits.ResponseHeadersTrait<CustomResponseProperties>;
-
-      ${code}
-      `,
-    );
-
-    expectDiagnosticEmpty(diagnostics);
-
-    if (operationName !== undefined) {
-      operations = operations.filter((o) => o.operation.name === operationName);
+it("emits warning if you overload a standard operation with a different verb", async () => {
+  const [_, diagnostics] = await getOperations(`
+    @resource("widgets")
+    model Widget {
+      @key
+      @visibility(Lifecycle.Read)
+      name: string;
     }
 
-    strictEqual(operations.length, 1);
-    const lro = getLroMetadata(runner.program, operations[0].operation);
-    expectDiagnosticEmpty(runner.program.diagnostics);
-
-    return [operations[0], lro, runner];
-  }
-
-  const expectedParams = [
+    @test @delete op read is Azure.Core.ResourceRead<Widget>;
+  `);
+  expectDiagnostics(diagnostics, [
     {
-      name: "api-version",
-      type: "query",
+      code: "@azure-tools/typespec-azure-core/verb-conflict",
+      severity: "warning",
+      message: "Operation template 'ResourceRead' requires HTTP verb 'GET' but found 'DELETE'.",
     },
-    {
-      name: "x-ms-foobar",
-      type: "header",
-    },
-    {
-      name: "nameHint",
-      type: "query",
-    },
-  ];
+  ]);
+});
 
-  const expectedParamsWithName = [...expectedParams];
-  expectedParamsWithName.splice(1, 0, {
-    name: "name",
-    type: "path",
+it("ResourceList", async () => {
+  const operation = await compileResourceOperation(
+    `@test op list is Azure.Core.ResourceList<TestModel, Customizations>;`,
+  );
+
+  deepStrictEqual(operation, {
+    name: "list",
+    verb: "get",
+    path: "/test",
+    params: {
+      body: undefined,
+      params: expectedParams,
+    },
+    responseProperties: ["value", "nextLink", "x-ms-response-id"],
+  });
+});
+
+it("NonPagedResourceList", async () => {
+  const operation = await compileResourceOperation(
+    `
+    #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
+    @test op list is Azure.Core.Foundations.NonPagedResourceList<TestModel, Customizations>;
+    `,
+  );
+
+  deepStrictEqual(operation, {
+    name: "list",
+    verb: "get",
+    path: "/test",
+    params: {
+      body: undefined,
+      params: expectedParams,
+    },
+    responseProperties: ["body", "x-ms-response-id"],
+  });
+});
+
+it("ResourceCreateWithServiceProvidedName", async () => {
+  const operation = await compileResourceOperation(
+    `@test op create is StandardResourceOperations.ResourceCreateWithServiceProvidedName<TestModel, Customizations>;`,
+  );
+
+  deepStrictEqual(operation, {
+    name: "create",
+    verb: "post",
+    path: "/test",
+    params: {
+      body: "resource",
+      params: expectedParams,
+    },
+    responseProperties: ["statusCode", "location", "x-ms-response-id"],
+  });
+});
+
+it("ResourceCreateOrUpdate", async () => {
+  const operation = await compileResourceOperation(
+    `#suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+    @test op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<TestModel, Customizations>;`,
+  );
+
+  const params = [...expectedParamsWithName];
+  params.splice(2, 0, {
+    name: "Content-Type",
+    type: "header",
   });
 
-  it("ResourceRead", async () => {
+  deepStrictEqual(operation, {
+    name: "createOrUpdate",
+    verb: "patch",
+    path: "/test/{name}",
+    params: {
+      body: "resource",
+      params,
+    },
+    responseProperties: ["statusCode", "name", "value", "x-ms-response-id"],
+  });
+});
+
+it("ResourceUpdate", async () => {
+  const operation = await compileResourceOperation(
+    `#suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+    @test op update is StandardResourceOperations.ResourceUpdate<TestModel, Customizations>;`,
+  );
+
+  const params = [...expectedParamsWithName];
+  params.splice(2, 0, {
+    name: "Content-Type",
+    type: "header",
+  });
+
+  deepStrictEqual(operation, {
+    name: "update",
+    verb: "patch",
+    path: "/test/{name}",
+    params: {
+      body: "resource",
+      params,
+    },
+    responseProperties: ["statusCode", "name", "value", "x-ms-response-id"],
+  });
+});
+
+it("ResourceCreateOrReplace", async () => {
+  const operation = await compileResourceOperation(
+    `@test op createOrReplace is StandardResourceOperations.ResourceCreateOrReplace<TestModel, Customizations>;`,
+  );
+
+  deepStrictEqual(operation, {
+    name: "createOrReplace",
+    verb: "put",
+    path: "/test/{name}",
+    params: {
+      body: "resource",
+      params: expectedParamsWithName,
+    },
+    responseProperties: ["statusCode", "name", "value", "x-ms-response-id"],
+  });
+});
+
+it("ResourceDelete", async () => {
+  const operation = await compileResourceOperation(
+    `@test op delete is Azure.Core.ResourceDelete<TestModel, Customizations>;`,
+  );
+
+  deepStrictEqual(operation, {
+    name: "delete",
+    verb: "delete",
+    path: "/test/{name}",
+    params: {
+      body: undefined,
+      params: expectedParamsWithName,
+    },
+    responseProperties: ["statusCode", "x-ms-response-id"],
+  });
+});
+
+it("LongRunningResourceCreateWithServiceProvidedName", async () => {
+  const operation = await compileResourceOperation(
+    `@test op create is StandardResourceOperations.LongRunningResourceCreateWithServiceProvidedName<TestModel, Customizations>;`,
+  );
+
+  deepStrictEqual(operation, {
+    name: "create",
+    verb: "post",
+    path: "/test",
+    params: {
+      body: "resource",
+      params: expectedParams,
+    },
+    responseProperties: ["statusCode", "location", "x-ms-response-id"],
+  });
+});
+
+it("LongRunningResourceCreateOrUpdate", async () => {
+  const operation = await compileResourceOperation(
+    `#suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+    @test op createOrUpdate is StandardResourceOperations.LongRunningResourceCreateOrUpdate<TestModel, Customizations>;`,
+  );
+
+  const params = [...expectedParamsWithName];
+  params.splice(2, 0, {
+    name: "Content-Type",
+    type: "header",
+  });
+
+  deepStrictEqual(operation, {
+    name: "createOrUpdate",
+    verb: "patch",
+    path: "/test/{name}",
+    params: {
+      body: "resource",
+      params,
+    },
+    responseProperties: ["statusCode", "name", "value", "x-ms-response-id", "operationLocation"],
+  });
+});
+
+it("LongRunningResourceCreateOrReplace", async () => {
+  const operation = await compileResourceOperation(
+    `@test op createOrReplace is StandardResourceOperations.LongRunningResourceCreateOrReplace<TestModel, Customizations>;`,
+  );
+
+  deepStrictEqual(operation, {
+    name: "createOrReplace",
+    verb: "put",
+    path: "/test/{name}",
+    params: {
+      body: "resource",
+      params: expectedParamsWithName,
+    },
+    responseProperties: ["statusCode", "name", "value", "x-ms-response-id", "operationLocation"],
+  });
+});
+
+it("LongRunningResourceUpdate", async () => {
+  const operation = await compileResourceOperation(
+    `#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
+     #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+     @test op update is Azure.Core.Foundations.LongRunningResourceUpdate<TestModel, Customizations>;`,
+  );
+
+  const params = [...expectedParamsWithName];
+  params.splice(2, 0, {
+    name: "Content-Type",
+    type: "header",
+  });
+
+  deepStrictEqual(operation, {
+    name: "update",
+    verb: "patch",
+    path: "/test/{name}",
+    params: {
+      body: "resource",
+      params,
+    },
+    responseProperties: ["statusCode", "name", "value", "x-ms-response-id", "operationLocation"],
+  });
+});
+
+it("LongRunningResourceDelete", async () => {
+  const operation = await compileResourceOperation(
+    `@test op delete is Azure.Core.LongRunningResourceDelete<TestModel, Customizations>;`,
+  );
+
+  deepStrictEqual(operation, {
+    name: "delete",
+    verb: "delete",
+    path: "/test/{name}",
+    params: {
+      body: undefined,
+      params: expectedParamsWithName,
+    },
+    responseProperties: [
+      "statusCode",
+      "id",
+      "status",
+      "error",
+      "result",
+      "operationLocation",
+      "x-ms-response-id",
+    ],
+  });
+});
+
+it("ResourceAction", async () => {
+  const operation = await compileResourceOperation(
+    `
+    // Reuse CustomParameters and CustomResponseProperties in the "normal" TParams and TResponse fields
+    model OpParams {
+      value: string;
+      ...CustomParameters;
+    };
+
+    model OpResponse is CustomResponseProperties {
+      message: string;
+    }
+
+    @test op customAction is Azure.Core.ResourceAction<TestModel, OpParams, OpResponse>;
+    `,
+  );
+
+  deepStrictEqual(operation, {
+    name: "customAction",
+    verb: "post",
+    path: "/test/{name}:customAction",
+    params: {
+      body: ["value"],
+      params: expectedParamsWithName,
+    },
+    responseProperties: ["x-ms-response-id", "message"],
+  });
+});
+
+it("ResourceAction customizations", async () => {
+  const [operations, _] = await getOperations(
+    `
+    @TypeSpec.Rest.resource("things")
+    model Thing {
+      @key
+      id: string
+    }
+
+    @TypeSpec.Rest.actionSeparator("/")
+    @test op action2 is Azure.Core.ResourceAction<Thing, {}, {}>;
+    `,
+  );
+  strictEqual(operations[0].path, "/things/{id}/action2");
+});
+
+it("ResourceCollectionAction", async () => {
+  const operation = await compileResourceOperation(
+    `
+      // Reuse CustomParameters and CustomResponseProperties in the "normal" TParams and TResponse fields
+      model OpParams {
+        value: string;
+        ...CustomParameters;
+      };
+
+      model OpResponse is CustomResponseProperties {
+        message: string;
+      }
+
+      @test op customAction is Azure.Core.ResourceCollectionAction<TestModel, OpParams, OpResponse>;`,
+  );
+
+  deepStrictEqual(operation, {
+    name: "customAction",
+    verb: "post",
+    path: "/test:customAction",
+    params: {
+      body: ["value"],
+      params: expectedParams,
+    },
+    responseProperties: ["x-ms-response-id", "message"],
+  });
+});
+
+it("ResourceCollectionAction customizations", async () => {
+  const [operations, _] = await getOperations(
+    `
+    @TypeSpec.Rest.resource("things")
+    model Thing {
+      @key
+      id: string
+    }
+    
+    @TypeSpec.Rest.actionSeparator("/")
+    @test op customAction is Azure.Core.ResourceCollectionAction<Thing, {}, {}>;
+    `,
+  );
+  strictEqual(operations[0].path, "/things/customAction");
+});
+
+describe("RpcOperation", () => {
+  it("allows override of TraitContext", async () => {
     const operation = await compileResourceOperation(
-      `@test op read is Azure.Core.ResourceRead<TestModel, Customizations>;`,
+      `@test @route("/test") op rpcOp is Azure.Core.RpcOperation<{}, TestModel, Customizations, Azure.Core.Foundations.ErrorResponse, Azure.Core.Traits.TraitContext.Read>;`,
     );
 
     deepStrictEqual(operation, {
-      name: "read",
+      name: "rpcOp",
       verb: "get",
-      path: "/test/{name}",
+      path: "/test",
       params: {
         body: undefined,
-        params: expectedParamsWithName,
+        params: expectedParams,
       },
       responseProperties: ["name", "value", "x-ms-response-id"],
     });
   });
 
-  it("emits warning if you overload a standard operation with a different verb", async () => {
-    const [_, diagnostics] = await getOperations(`
-      @resource("widgets")
-      model Widget {
-        @key
-        @visibility(Lifecycle.Read)
-        name: string;
+  it("works with default TraitContext.Undefined", async () => {
+    const operation = await compileResourceOperation(
+      `@test @route("/test") op rpcOp is Azure.Core.RpcOperation<{}, TestModel>;`,
+    );
+
+    deepStrictEqual(operation, {
+      name: "rpcOp",
+      verb: "get",
+      path: "/test",
+      params: {
+        body: undefined,
+        params: [
+          {
+            name: "api-version",
+            type: "query",
+          },
+        ],
+      },
+      responseProperties: ["name", "value"],
+    });
+  });
+});
+
+describe("LongRunningRpcOperation", () => {
+  it("allows override of TraitContext", async () => {
+    const operations = await compileResourceOperations(
+      `
+      @route("/lrRpcOp/{operationId}")
+      @get op getStatus(@path operationId: string): PollingStatus;
+
+      model PollingStatus {
+        @header location?: ResourceLocation<PollingStatus>;
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
       }
 
-      @test @delete op read is Azure.Core.ResourceRead<Widget>;
-    `);
-    expectDiagnostics(diagnostics, [
-      {
-        code: "@azure-tools/typespec-azure-core/verb-conflict",
-        severity: "warning",
-        message: "Operation template 'ResourceRead' requires HTTP verb 'GET' but found 'DELETE'.",
-      },
-    ]);
-  });
-
-  it("ResourceList", async () => {
-    const operation = await compileResourceOperation(
-      `@test op list is Azure.Core.ResourceList<TestModel, Customizations>;`,
+      model StatusError { message: string; }
+      @test @pollingOperation(getStatus) @route("/lrRpcOp") op lrRpcOp is Azure.Core.LongRunningRpcOperation<{}, TestModel, PollingStatus, StatusError, Customizations, Azure.Core.Foundations.ErrorResponse, Azure.Core.Traits.TraitContext.Read>;
+    `,
     );
 
-    deepStrictEqual(operation, {
-      name: "list",
-      verb: "get",
-      path: "/test",
-      params: {
-        body: undefined,
-        params: expectedParams,
-      },
-      responseProperties: ["value", "nextLink", "x-ms-response-id"],
-    });
-  });
+    const statusOp = operations[0];
+    const lroOp = operations[1];
 
-  it("NonPagedResourceList", async () => {
-    const operation = await compileResourceOperation(
-      `
-      #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
-      @test op list is Azure.Core.Foundations.NonPagedResourceList<TestModel, Customizations>;
-      `,
-    );
-
-    deepStrictEqual(operation, {
-      name: "list",
-      verb: "get",
-      path: "/test",
-      params: {
-        body: undefined,
-        params: expectedParams,
-      },
-      responseProperties: ["body", "x-ms-response-id"],
-    });
-  });
-
-  it("ResourceCreateWithServiceProvidedName", async () => {
-    const operation = await compileResourceOperation(
-      `@test op create is StandardResourceOperations.ResourceCreateWithServiceProvidedName<TestModel, Customizations>;`,
-    );
-
-    deepStrictEqual(operation, {
-      name: "create",
+    deepStrictEqual(lroOp, {
+      name: "lrRpcOp",
       verb: "post",
-      path: "/test",
-      params: {
-        body: "resource",
-        params: expectedParams,
-      },
-      responseProperties: ["statusCode", "location", "x-ms-response-id"],
-    });
-  });
-
-  it("ResourceCreateOrUpdate", async () => {
-    const operation = await compileResourceOperation(
-      `#suppress "@typespec/http/deprecated-implicit-optionality" "For test"
-      @test op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<TestModel, Customizations>;`,
-    );
-
-    const params = [...expectedParamsWithName];
-    params.splice(2, 0, {
-      name: "Content-Type",
-      type: "header",
-    });
-
-    deepStrictEqual(operation, {
-      name: "createOrUpdate",
-      verb: "patch",
-      path: "/test/{name}",
-      params: {
-        body: "resource",
-        params,
-      },
-      responseProperties: ["statusCode", "name", "value", "x-ms-response-id"],
-    });
-  });
-
-  it("ResourceUpdate", async () => {
-    const operation = await compileResourceOperation(
-      `#suppress "@typespec/http/deprecated-implicit-optionality" "For test"
-      @test op update is StandardResourceOperations.ResourceUpdate<TestModel, Customizations>;`,
-    );
-
-    const params = [...expectedParamsWithName];
-    params.splice(2, 0, {
-      name: "Content-Type",
-      type: "header",
-    });
-
-    deepStrictEqual(operation, {
-      name: "update",
-      verb: "patch",
-      path: "/test/{name}",
-      params: {
-        body: "resource",
-        params,
-      },
-      responseProperties: ["statusCode", "name", "value", "x-ms-response-id"],
-    });
-  });
-
-  it("ResourceCreateOrReplace", async () => {
-    const operation = await compileResourceOperation(
-      `@test op createOrReplace is StandardResourceOperations.ResourceCreateOrReplace<TestModel, Customizations>;`,
-    );
-
-    deepStrictEqual(operation, {
-      name: "createOrReplace",
-      verb: "put",
-      path: "/test/{name}",
-      params: {
-        body: "resource",
-        params: expectedParamsWithName,
-      },
-      responseProperties: ["statusCode", "name", "value", "x-ms-response-id"],
-    });
-  });
-
-  it("ResourceDelete", async () => {
-    const operation = await compileResourceOperation(
-      `@test op delete is Azure.Core.ResourceDelete<TestModel, Customizations>;`,
-    );
-
-    deepStrictEqual(operation, {
-      name: "delete",
-      verb: "delete",
-      path: "/test/{name}",
+      path: "/lrRpcOp",
       params: {
         body: undefined,
-        params: expectedParamsWithName,
-      },
-      responseProperties: ["statusCode", "x-ms-response-id"],
-    });
-  });
-
-  it("LongRunningResourceCreateWithServiceProvidedName", async () => {
-    const operation = await compileResourceOperation(
-      `@test op create is StandardResourceOperations.LongRunningResourceCreateWithServiceProvidedName<TestModel, Customizations>;`,
-    );
-
-    deepStrictEqual(operation, {
-      name: "create",
-      verb: "post",
-      path: "/test",
-      params: {
-        body: "resource",
-        params: expectedParams,
-      },
-      responseProperties: ["statusCode", "location", "x-ms-response-id"],
-    });
-  });
-
-  it("LongRunningResourceCreateOrUpdate", async () => {
-    const operation = await compileResourceOperation(
-      `#suppress "@typespec/http/deprecated-implicit-optionality" "For test"
-      @test op createOrUpdate is StandardResourceOperations.LongRunningResourceCreateOrUpdate<TestModel, Customizations>;`,
-    );
-
-    const params = [...expectedParamsWithName];
-    params.splice(2, 0, {
-      name: "Content-Type",
-      type: "header",
-    });
-
-    deepStrictEqual(operation, {
-      name: "createOrUpdate",
-      verb: "patch",
-      path: "/test/{name}",
-      params: {
-        body: "resource",
-        params,
-      },
-      responseProperties: ["statusCode", "name", "value", "x-ms-response-id", "operationLocation"],
-    });
-  });
-
-  it("LongRunningResourceCreateOrReplace", async () => {
-    const operation = await compileResourceOperation(
-      `@test op createOrReplace is StandardResourceOperations.LongRunningResourceCreateOrReplace<TestModel, Customizations>;`,
-    );
-
-    deepStrictEqual(operation, {
-      name: "createOrReplace",
-      verb: "put",
-      path: "/test/{name}",
-      params: {
-        body: "resource",
-        params: expectedParamsWithName,
-      },
-      responseProperties: ["statusCode", "name", "value", "x-ms-response-id", "operationLocation"],
-    });
-  });
-
-  it("LongRunningResourceUpdate", async () => {
-    const operation = await compileResourceOperation(
-      `#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
-       #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
-       @test op update is Azure.Core.Foundations.LongRunningResourceUpdate<TestModel, Customizations>;`,
-    );
-
-    const params = [...expectedParamsWithName];
-    params.splice(2, 0, {
-      name: "Content-Type",
-      type: "header",
-    });
-
-    deepStrictEqual(operation, {
-      name: "update",
-      verb: "patch",
-      path: "/test/{name}",
-      params: {
-        body: "resource",
-        params,
-      },
-      responseProperties: ["statusCode", "name", "value", "x-ms-response-id", "operationLocation"],
-    });
-  });
-
-  it("LongRunningResourceDelete", async () => {
-    const operation = await compileResourceOperation(
-      `@test op delete is Azure.Core.LongRunningResourceDelete<TestModel, Customizations>;`,
-    );
-
-    deepStrictEqual(operation, {
-      name: "delete",
-      verb: "delete",
-      path: "/test/{name}",
-      params: {
-        body: undefined,
-        params: expectedParamsWithName,
+        params: [
+          { type: "query", name: "api-version" },
+          { type: "header", name: "x-ms-foobar" },
+          { type: "query", name: "nameHint" },
+        ],
       },
       responseProperties: [
         "statusCode",
@@ -552,10 +726,460 @@ describe("typespec-azure-core: operation templates", () => {
         "x-ms-response-id",
       ],
     });
+
+    deepStrictEqual(statusOp, {
+      name: "getStatus",
+      verb: "get",
+      path: "/lrRpcOp/{operationId}",
+      params: {
+        body: undefined,
+        params: [
+          {
+            name: "operationId",
+            type: "path",
+          },
+        ],
+      },
+      responseProperties: ["location", "statusValue"],
+    });
   });
 
-  it("ResourceAction", async () => {
-    const operation = await compileResourceOperation(
+  it("works with default TraitContext.Undefined", async () => {
+    const operations = await compileResourceOperations(
+      `
+      @route("/lrRpcOp/{operationId}")
+      @get op getStatus(@path operationId: string): PollingStatus;
+
+      model PollingStatus {
+        @header location?: ResourceLocation<PollingStatus>;
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+      }
+
+      model StatusError { message: string; }
+      @test @pollingOperation(getStatus) @route("/lrRpcOp") op lrRpcOp is Azure.Core.LongRunningRpcOperation<{}, TestModel, PollingStatus, StatusError>;
+    `,
+    );
+
+    const statusOp = operations[0];
+    const lroOp = operations[1];
+
+    deepStrictEqual(lroOp, {
+      name: "lrRpcOp",
+      verb: "post",
+      path: "/lrRpcOp",
+      params: {
+        body: undefined,
+        params: [{ type: "query", name: "api-version" }],
+      },
+      responseProperties: ["statusCode", "id", "status", "error", "result", "operationLocation"],
+    });
+
+    deepStrictEqual(statusOp, {
+      name: "getStatus",
+      verb: "get",
+      path: "/lrRpcOp/{operationId}",
+      params: {
+        body: undefined,
+        params: [
+          {
+            name: "operationId",
+            type: "path",
+          },
+        ],
+      },
+      responseProperties: ["location", "statusValue"],
+    });
+  });
+});
+
+describe("LongRunningOperation", () => {
+  it("Gets Lro for standard Async CreateOrUpdate", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `#suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+      @test op createOrUpdate is StandardResourceOperations.LongRunningResourceCreateOrUpdate<TestModel, Customizations>;`,
+    );
+    ok(metadata);
+    deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
+    deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "OperationStatus");
+
+    deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
+    deepStrictEqual(metadata.pollingInfo.responseModel.name, "OperationStatus");
+    deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "result");
+
+    deepStrictEqual(metadata.finalStateVia, "operation-location");
+    deepStrictEqual(metadata.logicalResult.name, "TestModel");
+    deepStrictEqual(metadata.envelopeResult.name, "OperationStatus");
+    deepStrictEqual(metadata.logicalPath, "result");
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "TestModel");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "OperationStatus");
+    deepStrictEqual(metadata.finalResultPath, "result");
+  });
+
+  it("Gets Lro for standard Async CreateOrUpdate with polling reference", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+      op poll is StandardResourceOperations.GetResourceOperationStatus<TestModel>;
+
+      @Azure.Core.pollingOperation(poll)
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+      @test op createOrUpdate is StandardResourceOperations.LongRunningResourceCreateOrUpdate<TestModel, Customizations>;`,
+      "createOrUpdate",
+    );
+    ok(metadata);
+    deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
+    deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "ResourceOperationStatus");
+
+    deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
+    deepStrictEqual(metadata.pollingInfo.responseModel.name, "ResourceOperationStatus");
+    deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "result");
+
+    deepStrictEqual(metadata.finalStateVia, "operation-location");
+    deepStrictEqual(metadata.logicalResult.name, "TestModel");
+    deepStrictEqual(metadata.envelopeResult.name, "ResourceOperationStatus");
+    deepStrictEqual(metadata.logicalPath, "result");
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "TestModel");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "ResourceOperationStatus");
+    deepStrictEqual(metadata.finalResultPath, "result");
+  });
+
+  it("Gets Lro for standard Async CreateOrReplace", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `@test op createOrReplace is StandardResourceOperations.LongRunningResourceCreateOrReplace<TestModel, Customizations>;`,
+    );
+
+    ok(metadata);
+    deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
+    deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "OperationStatus");
+
+    deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
+    deepStrictEqual(metadata.pollingInfo.responseModel.name, "OperationStatus");
+    deepStrictEqual(metadata.pollingInfo.resultProperty?.name, undefined);
+
+    deepStrictEqual(metadata.finalStateVia, "original-uri");
+    deepStrictEqual(metadata.logicalResult.name, "TestModel");
+    deepStrictEqual(metadata.envelopeResult.name, "OperationStatus");
+    // For createOrReplace, since the resource is returned in the 200 or 201 envelope, the status monitor will not return a results field
+    deepStrictEqual(metadata.logicalPath, undefined);
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "TestModel");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "TestModel");
+    deepStrictEqual(metadata.finalResultPath, undefined);
+  });
+
+  it("Gets Lro for standard Async CreateOrReplace with polling reference", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+      op poll is StandardResourceOperations.GetResourceOperationStatus<TestModel>;
+
+      @Azure.Core.pollingOperation(poll)
+      @test op createOrReplace is StandardResourceOperations.LongRunningResourceCreateOrReplace<TestModel, Customizations>;`,
+      "createOrReplace",
+    );
+
+    ok(metadata);
+    deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
+    deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "ResourceOperationStatus");
+
+    deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
+    deepStrictEqual(metadata.pollingInfo.responseModel.name, "ResourceOperationStatus");
+    deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "result");
+
+    deepStrictEqual(metadata.finalStateVia, "original-uri");
+    deepStrictEqual(metadata.logicalResult.name, "TestModel");
+    deepStrictEqual(metadata.envelopeResult.name, "ResourceOperationStatus");
+    deepStrictEqual(metadata.logicalPath, "result");
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "TestModel");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "ResourceOperationStatus");
+    deepStrictEqual(metadata.finalResultPath, "result");
+  });
+
+  it("Gets Lro for non-resource PUT with polling reference", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+model Job {
+@path
+@key
+@visibility(Lifecycle.Read)
+id: uuid;
+
+name: string;
+}
+
+model StartJobRequest {
+name: string;
+
+instructions: string[];
+}
+
+model JobStatus is Azure.Core.Foundations.OperationStatus<Job>;
+
+#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Non-resource operation"
+@route("/jobs/{id}")
+op getJobStatus is Foundations.GetOperationStatus<
+Rest.Resource.KeysOf<Job>,
+Job
+>;
+
+alias JobLroResponse = {
+@header("Operation-Location") operationLocation: url;
+...Azure.Core.Foundations.OperationStatus<Job>;
+};
+
+#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Non-resource operation"
+@pollingOperation(getJobStatus)
+@route("/startJob/")
+@put
+op startJobAsync(
+...Azure.Core.Foundations.ApiVersionParameter,
+
+@body _: StartJobRequest,
+): (CreatedResponse & JobLroResponse) | (OkResponse &
+JobLroResponse) | Azure.Core.Foundations.ErrorResponse;
+`,
+      "startJobAsync",
+    );
+
+    ok(metadata);
+    deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
+    deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "OperationStatus");
+
+    deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
+    deepStrictEqual(metadata.pollingInfo.responseModel.name, "OperationStatus");
+    deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "result");
+
+    deepStrictEqual(metadata.finalStateVia, "operation-location");
+    deepStrictEqual(metadata.logicalResult.name, "Job");
+    deepStrictEqual(metadata.envelopeResult.name, "OperationStatus");
+    deepStrictEqual(metadata.logicalPath, "result");
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "Job");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "OperationStatus");
+    deepStrictEqual(metadata.finalResultPath, "result");
+  });
+
+  it("Gets Lro for custom PUT with polling reference", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+      @resource("jobs")
+model Job {
+@path
+@key
+@visibility(Lifecycle.Read)
+name: string;
+
+instructions: string[];
+}
+
+model StartJobRequest {
+name: string;
+
+instructions: string[];
+}
+
+model JobStatus is Azure.Core.Foundations.OperationStatus;
+
+#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Non-resource operation"
+@route("/jobs/status/{name}")
+op getJobStatus is Foundations.GetOperationStatus<
+Rest.Resource.KeysOf<Job>,
+Job
+>;
+
+op read is StandardResourceOperations.ResourceRead<Job>;
+
+alias JobLroResponse = {
+@header("Operation-Location") operationLocation: string;
+...Azure.Core.Foundations.OperationStatus<Job>;
+};
+
+#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "test"
+@finalOperation(read)
+@pollingOperation(getJobStatus)
+@createsOrReplacesResource(Job)
+@route("/jobs/{name}")
+@put
+op createJob(
+...Azure.Core.Foundations.ApiVersionParameter,
+@path name: string,
+@bodyRoot body: Job,
+): (CreatedResponse & JobLroResponse) | (OkResponse &
+JobLroResponse) | Azure.Core.Foundations.ErrorResponse;
+`,
+      "createJob",
+    );
+
+    ok(metadata);
+    deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
+    deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "OperationStatus");
+
+    deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
+    deepStrictEqual(metadata.pollingInfo.responseModel.name, "OperationStatus");
+    deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "result");
+
+    deepStrictEqual(metadata.finalStateVia, "original-uri");
+    deepStrictEqual(metadata.logicalResult.name, "Job");
+    deepStrictEqual(metadata.envelopeResult.name, "OperationStatus");
+    deepStrictEqual(metadata.logicalPath, undefined);
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "Job");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Job");
+    deepStrictEqual(metadata.finalResultPath, undefined);
+  });
+
+  it("Gets Lro for standard Async Delete", async () => {
+    const [_, metadata, runner] = await compileLroOperation(
+      `@test op delete is Azure.Core.LongRunningResourceDelete<TestModel, Customizations>;`,
+    );
+    ok(metadata);
+    deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
+    deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "OperationStatus");
+
+    deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
+    deepStrictEqual(metadata.pollingInfo.responseModel.name, "OperationStatus");
+    deepStrictEqual(metadata.pollingInfo.resultProperty?.name, undefined);
+
+    deepStrictEqual(metadata.finalStateVia, "operation-location");
+    deepStrictEqual(metadata.logicalResult.name, "OperationStatus");
+    deepStrictEqual(
+      getNamespaceName(runner.program, metadata.logicalResult.namespace),
+      "Azure.Core.Foundations",
+    );
+    deepStrictEqual(metadata.envelopeResult.name, "OperationStatus");
+    deepStrictEqual(metadata.logicalPath, undefined);
+
+    deepStrictEqual(metadata.finalResult, "void");
+    deepStrictEqual(metadata.finalEnvelopeResult, "void");
+    deepStrictEqual(metadata.finalResultPath, undefined);
+    ok(metadata.finalStep);
+    deepStrictEqual(metadata.finalStep.kind, "noPollingResult");
+  });
+
+  it("Gets Lro for standard Async Delete with polling reference", async () => {
+    const [_, metadata, runner] = await compileLroOperation(
+      `
+      op poll is StandardResourceOperations.GetResourceOperationStatus<TestModel, never>;
+
+      @Azure.Core.pollingOperation(poll)
+      @test op delete is Azure.Core.LongRunningResourceDelete<TestModel, Customizations>;`,
+      "delete",
+    );
+    ok(metadata);
+    deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
+    deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "ResourceOperationStatus");
+
+    deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
+    deepStrictEqual(metadata.pollingInfo.responseModel.name, "ResourceOperationStatus");
+    deepStrictEqual(metadata.pollingInfo.resultProperty?.name, undefined);
+
+    deepStrictEqual(metadata.finalStateVia, "operation-location");
+    deepStrictEqual(metadata.logicalResult.name, "ResourceOperationStatus");
+    deepStrictEqual(
+      getNamespaceName(runner.program, metadata.logicalResult.namespace),
+      "Azure.Core",
+    );
+    deepStrictEqual(metadata.envelopeResult.name, "ResourceOperationStatus");
+    deepStrictEqual(metadata.logicalPath, undefined);
+
+    deepStrictEqual(metadata.finalResult, "void");
+    deepStrictEqual(metadata.finalEnvelopeResult, "void");
+    deepStrictEqual(metadata.finalResultPath, undefined);
+
+    ok(metadata.finalStep);
+    deepStrictEqual(metadata.finalStep.kind, "noPollingResult");
+  });
+
+  it("Gets Lro for standard Async Update", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
+       #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+       @test op update is Azure.Core.Foundations.LongRunningResourceUpdate<TestModel, Customizations>;`,
+    );
+    ok(metadata);
+    deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
+    deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "OperationStatus");
+
+    deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
+    deepStrictEqual(metadata.pollingInfo.responseModel.name, "OperationStatus");
+    deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "result");
+
+    deepStrictEqual(metadata.finalStateVia, "operation-location");
+    deepStrictEqual(metadata.logicalResult.name, "TestModel");
+    deepStrictEqual(metadata.envelopeResult.name, "OperationStatus");
+    deepStrictEqual(metadata.logicalPath, "result");
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "TestModel");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "OperationStatus");
+    deepStrictEqual(metadata.finalResultPath, "result");
+  });
+
+  it("Gets Lro for standard Async Update with polling reference", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+       op poll is StandardResourceOperations.GetResourceOperationStatus<TestModel>;
+
+      
+       #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
+       @Azure.Core.pollingOperation(poll)
+       #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+       @test op update is Azure.Core.Foundations.LongRunningResourceUpdate<TestModel, Customizations>;`,
+      "update",
+    );
+    ok(metadata);
+    deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
+    deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "ResourceOperationStatus");
+
+    deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
+    deepStrictEqual(metadata.pollingInfo.responseModel.name, "ResourceOperationStatus");
+    deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "result");
+
+    deepStrictEqual(metadata.finalStateVia, "operation-location");
+    deepStrictEqual(metadata.logicalResult.name, "TestModel");
+    deepStrictEqual(metadata.envelopeResult.name, "ResourceOperationStatus");
+    deepStrictEqual(metadata.logicalPath, "result");
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "TestModel");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "ResourceOperationStatus");
+    deepStrictEqual(metadata.finalResultPath, "result");
+  });
+
+  it("Gets Lro for standard Async ResourceAction", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `// Reuse CustomParameters and CustomResponseProperties in the "normal" TParams and TResponse fields
+      model OpParams {
+        value: string;
+        ...CustomParameters;
+      };
+
+      model OpResponse is CustomResponseProperties {
+        message: string;
+      }
+
+      @test op doAction is Azure.Core.LongRunningResourceAction<TestModel, OpParams, OpResponse>;`,
+    );
+    ok(metadata);
+    deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
+    deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "OperationStatus");
+
+    deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
+    deepStrictEqual(metadata.pollingInfo.responseModel.name, "OperationStatus");
+    deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "result");
+
+    deepStrictEqual(metadata.finalStateVia, "operation-location");
+    deepStrictEqual(metadata.logicalResult.name, "OpResponse");
+    deepStrictEqual(metadata.envelopeResult.name, "OperationStatus");
+    deepStrictEqual(metadata.logicalPath, "result");
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "OpResponse");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "OperationStatus");
+    deepStrictEqual(metadata.finalResultPath, "result");
+  });
+
+  it("Gets Lro for standard Async ResourceAction with polling reference", async () => {
+    const [_, metadata] = await compileLroOperation(
       `
       // Reuse CustomParameters and CustomResponseProperties in the "normal" TParams and TResponse fields
       model OpParams {
@@ -566,2753 +1190,2067 @@ describe("typespec-azure-core: operation templates", () => {
       model OpResponse is CustomResponseProperties {
         message: string;
       }
+      op poll is StandardResourceOperations.GetResourceOperationStatus<TestModel>;
 
-      @test op customAction is Azure.Core.ResourceAction<TestModel, OpParams, OpResponse>;
-      `,
+      @Azure.Core.pollingOperation(poll)
+      @test op doAction is Azure.Core.LongRunningResourceAction<TestModel, OpParams, OpResponse>;`,
+      "doAction",
     );
+    ok(metadata);
+    deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
+    deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "ResourceOperationStatus");
 
-    deepStrictEqual(operation, {
-      name: "customAction",
-      verb: "post",
-      path: "/test/{name}:customAction",
-      params: {
-        body: ["value"],
-        params: expectedParamsWithName,
-      },
-      responseProperties: ["x-ms-response-id", "message"],
-    });
+    deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
+    deepStrictEqual(metadata.pollingInfo.responseModel.name, "ResourceOperationStatus");
+    deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "result");
+
+    deepStrictEqual(metadata.finalStateVia, "operation-location");
+    deepStrictEqual(metadata.logicalResult.name, "TestModel");
+    deepStrictEqual(metadata.envelopeResult.name, "ResourceOperationStatus");
+    deepStrictEqual(metadata.logicalPath, "result");
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "TestModel");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "ResourceOperationStatus");
+    deepStrictEqual(metadata.finalResultPath, "result");
   });
 
-  it("ResourceAction customizations", async () => {
-    const [operations, _] = await getOperations(
+  it("Gets Lro for standard Async RpcOperation with polling reference", async () => {
+    const [_, metadata] = await compileLroOperation(
       `
-      @TypeSpec.Rest.resource("things")
-      model Thing {
-        @key
-        id: string
+      @route("/lrRpcOp/{operationId}")
+      @get op getStatus(@path operationId: string): PollingStatus;
+
+      model PollingStatus {
+        @header location?: ResourceLocation<TestModel>;
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+        @Azure.Core.lroResult
+        result?: TestModel;
       }
 
-      @TypeSpec.Rest.actionSeparator("/")
-      @test op action2 is Azure.Core.ResourceAction<Thing, {}, {}>;
-      `,
+      model StatusError { message: string; }
+      @test @pollingOperation(getStatus) @route("/lrRpcOp") op lrRpcOp is Azure.Core.LongRunningRpcOperation<{}, TestModel, PollingStatus, StatusError, Customizations, Azure.Core.Foundations.ErrorResponse, Azure.Core.Traits.TraitContext.Read>;`,
+      "lrRpcOp",
     );
-    strictEqual(operations[0].path, "/things/{id}/action2");
+    ok(metadata);
+    deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
+    deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "PollingStatus");
+
+    deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
+    deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
+    deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "result");
+
+    deepStrictEqual(metadata.finalStateVia, "operation-location");
+    deepStrictEqual(metadata.logicalResult.name, "TestModel");
+    deepStrictEqual(metadata.envelopeResult.name, "PollingStatus");
+    deepStrictEqual(metadata.logicalPath, "result");
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "TestModel");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "PollingStatus");
+    deepStrictEqual(metadata.finalResultPath, "result");
   });
 
-  it("ResourceCollectionAction", async () => {
-    const operation = await compileResourceOperation(
+  it("Gets Lro for polling and final reference", async () => {
+    const [_, metadata] = await compileLroOperation(
       `
-        // Reuse CustomParameters and CustomResponseProperties in the "normal" TParams and TResponse fields
-        model OpParams {
-          value: string;
-          ...CustomParameters;
-        };
-
-        model OpResponse is CustomResponseProperties {
-          message: string;
-        }
-  
-        @test op customAction is Azure.Core.ResourceCollectionAction<TestModel, OpParams, OpResponse>;`,
-    );
-
-    deepStrictEqual(operation, {
-      name: "customAction",
-      verb: "post",
-      path: "/test:customAction",
-      params: {
-        body: ["value"],
-        params: expectedParams,
-      },
-      responseProperties: ["x-ms-response-id", "message"],
-    });
-  });
-
-  it("ResourceCollectionAction customizations", async () => {
-    const [operations, _] = await getOperations(
-      `
-      @TypeSpec.Rest.resource("things")
-      model Thing {
+      model PollingStatus {
+        @header location?: ResourceLocation<PollingStatus>;
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+      }
+      model SimpleWidget {
         @key
-        id: string
+        @segment("simpleWidgets")
+        @visibility(Lifecycle.Read)
+        @path
+        id: string;
+        value: string;
+      }
+      @route("/simpleWidgets/{id}")
+      @get op getWidget(@path id: string): SimpleWidget;
+      @finalOperation(getWidget, {id: ResponseProperty<"id">})
+      @pollingOperation(getStatus, {id: ResponseProperty<"id">; operationId: ResponseProperty<"operationId">})
+      @route("/simpleWidgets/{id}")
+      @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operationId: string};
+      @route("/simpleWidgets/{id}/operations/{operationId}")
+      @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
+      `,
+      "createWidget",
+    );
+    ok(metadata);
+    deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationReference");
+    deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "PollingStatus");
+
+    deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
+    deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
+    deepStrictEqual(metadata.pollingInfo.resultProperty?.name, undefined);
+
+    deepStrictEqual(metadata.finalStateVia, "original-uri");
+    deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
+    deepStrictEqual(metadata.envelopeResult.name, "PollingStatus");
+    deepStrictEqual(metadata.logicalPath, undefined);
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual(metadata.finalResultPath, undefined);
+  });
+
+  it("Gets Lro for polling operation with custom lro template and operation reference", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+      model TLongRunningStatusLocation<TStatusResult extends TypeSpec.Reflection.Model> {
+        @pollingLocation
+        @TypeSpec.Http.header("Operation-Location")
+        operationLocation: ResourceLocation<TStatusResult>;
+      }
+
+      @post
+      op TLongRunningRpcOperation<
+        TParams,
+        TResponse extends TypeSpec.Reflection.Model
+      > is Azure.Core.Foundations.Operation<
+        TParams & RepeatabilityRequestHeaders,
+        (Foundations.AcceptedResponse<TLongRunningStatusLocation<TResponse>> &
+          Foundations.RetryAfterHeader &
+          RepeatabilityResponseHeaders),
+        RepeatabilityRequestHeaders & RepeatabilityResponseHeaders,
+        Azure.Core.Foundations.ErrorResponse
+      >;
+
+      enum JobStatus {
+        Running: "running",
+        Succeeded: "succeeded",
+        Failed: "failed",
+        Canceled: "canceled",
+      }  
+
+      alias Request = {
+        patients: string[];
+      };
+
+      model JobResults {
+        success: string;
+        error?: Azure.Core.Foundations.Error;
+      }
+
+      @resource("foo/jobs")
+      model JobResult {
+        @key
+        @format("uuid")
+        jobId: string;
+          
+        @lroStatus
+        status: JobStatus;
+
+        @lroResult
+        results?: JobResults;
+        errors?: Azure.Core.Foundations.Error[];          
+      }
+
+      interface Foo {
+        @route("/foo/jobs")
+        createJob is TLongRunningRpcOperation<{...Request}, JobResult>;
+      }
+      `,
+      "createJob",
+    );
+    ok(metadata);
+
+    deepStrictEqual(metadata.finalStep?.kind, "pollingSuccessProperty");
+    deepStrictEqual((metadata.finalStep?.target as any).name, "results");
+    deepStrictEqual((metadata.finalStep?.target as any).type.name, "JobResults");
+
+    deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
+    deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "JobResult");
+
+    deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
+    deepStrictEqual(metadata.pollingInfo.responseModel.name, "JobResult");
+    deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "results");
+
+    deepStrictEqual(metadata.finalStateVia, "operation-location");
+    deepStrictEqual(metadata.logicalResult.name, "JobResults");
+    deepStrictEqual(metadata.envelopeResult.name, "JobResult");
+    deepStrictEqual(metadata.logicalPath, "results");
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "JobResults");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "JobResult");
+    deepStrictEqual(metadata.finalResultPath, "results");
+  });
+
+  it("Gets Lro for non-standard polling in custom createOrReplace operations with finalLocation", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+      model PollingStatus {
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
       }
       
-      @TypeSpec.Rest.actionSeparator("/")
-      @test op customAction is Azure.Core.ResourceCollectionAction<Thing, {}, {}>;
+      model SimpleWidget {
+        @key
+        @segment("simpleWidgets")
+        @visibility(Lifecycle.Read)
+        @path
+        id: string;
+      
+        value: string;
+      }
+      
+      @route("/simpleWidgets/{id}/operations/{operationId}")
+      @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
+      
+      @pollingOperation(getStatus)
+      @route("/simpleWidgets/{id}")
+      @put op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
+        {
+          @statusCode statusCode: 201;
+          @header id: string,
+          @header("operation-id") operate: string,
+          @finalLocation @header("Location") location: ResourceLocation<SimpleWidget>,
+          @pollingLocation @header("Operation-Location") opLink: string,
+          @lroResult @bodyRoot body?: SimpleWidget
+        };      
       `,
+      "createWidget",
     );
-    strictEqual(operations[0].path, "/things/customAction");
+    ok(metadata);
+    deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
+    deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
+    deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
+
+    deepStrictEqual(metadata.pollingInfo?.responseModel.name, "PollingStatus");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "statusValue");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.canceledState, ["Canceled"]);
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
+
+    deepStrictEqual(metadata.finalStep?.kind, "finalOperationLink");
+    deepStrictEqual(metadata.finalStep?.target?.kind, "link");
+    deepStrictEqual((metadata.finalStep?.target as any).location, "ResponseHeader");
+    deepStrictEqual((metadata.finalStep?.target as any).property.name, "location");
+
+    deepStrictEqual(metadata.finalStateVia, "location");
+    deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
+    deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
+    deepStrictEqual(metadata?.logicalPath, undefined);
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual(metadata.finalResultPath, undefined);
   });
 
-  describe("RpcOperation", () => {
-    it("allows override of TraitContext", async () => {
-      const operation = await compileResourceOperation(
-        `@test @route("/test") op rpcOp is Azure.Core.RpcOperation<{}, TestModel, Customizations, Azure.Core.Foundations.ErrorResponse, Azure.Core.Traits.TraitContext.Read>;`,
-      );
-
-      deepStrictEqual(operation, {
-        name: "rpcOp",
-        verb: "get",
-        path: "/test",
-        params: {
-          body: undefined,
-          params: expectedParams,
-        },
-        responseProperties: ["name", "value", "x-ms-response-id"],
-      });
-    });
-
-    it("works with default TraitContext.Undefined", async () => {
-      const operation = await compileResourceOperation(
-        `@test @route("/test") op rpcOp is Azure.Core.RpcOperation<{}, TestModel>;`,
-      );
-
-      deepStrictEqual(operation, {
-        name: "rpcOp",
-        verb: "get",
-        path: "/test",
-        params: {
-          body: undefined,
-          params: [
-            {
-              name: "api-version",
-              type: "query",
-            },
-          ],
-        },
-        responseProperties: ["name", "value"],
-      });
-    });
-  });
-
-  describe("LongRunningRpcOperation", () => {
-    it("allows override of TraitContext", async () => {
-      const operations = await compileResourceOperations(
-        `
-        @route("/lrRpcOp/{operationId}")
-        @get op getStatus(@path operationId: string): PollingStatus;
-  
-        model PollingStatus {
-          @header location?: ResourceLocation<PollingStatus>;
-          @Azure.Core.lroStatus
-          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-        }
-  
-        model StatusError { message: string; }
-        @test @pollingOperation(getStatus) @route("/lrRpcOp") op lrRpcOp is Azure.Core.LongRunningRpcOperation<{}, TestModel, PollingStatus, StatusError, Customizations, Azure.Core.Foundations.ErrorResponse, Azure.Core.Traits.TraitContext.Read>;
-      `,
-      );
-
-      const statusOp = operations[0];
-      const lroOp = operations[1];
-
-      deepStrictEqual(lroOp, {
-        name: "lrRpcOp",
-        verb: "post",
-        path: "/lrRpcOp",
-        params: {
-          body: undefined,
-          params: [
-            { type: "query", name: "api-version" },
-            { type: "header", name: "x-ms-foobar" },
-            { type: "query", name: "nameHint" },
-          ],
-        },
-        responseProperties: [
-          "statusCode",
-          "id",
-          "status",
-          "error",
-          "result",
-          "operationLocation",
-          "x-ms-response-id",
-        ],
-      });
-
-      deepStrictEqual(statusOp, {
-        name: "getStatus",
-        verb: "get",
-        path: "/lrRpcOp/{operationId}",
-        params: {
-          body: undefined,
-          params: [
-            {
-              name: "operationId",
-              type: "path",
-            },
-          ],
-        },
-        responseProperties: ["location", "statusValue"],
-      });
-    });
-
-    it("works with default TraitContext.Undefined", async () => {
-      const operations = await compileResourceOperations(
-        `
-        @route("/lrRpcOp/{operationId}")
-        @get op getStatus(@path operationId: string): PollingStatus;
-  
-        model PollingStatus {
-          @header location?: ResourceLocation<PollingStatus>;
-          @Azure.Core.lroStatus
-          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-        }
-  
-        model StatusError { message: string; }
-        @test @pollingOperation(getStatus) @route("/lrRpcOp") op lrRpcOp is Azure.Core.LongRunningRpcOperation<{}, TestModel, PollingStatus, StatusError>;
-      `,
-      );
-
-      const statusOp = operations[0];
-      const lroOp = operations[1];
-
-      deepStrictEqual(lroOp, {
-        name: "lrRpcOp",
-        verb: "post",
-        path: "/lrRpcOp",
-        params: {
-          body: undefined,
-          params: [{ type: "query", name: "api-version" }],
-        },
-        responseProperties: ["statusCode", "id", "status", "error", "result", "operationLocation"],
-      });
-
-      deepStrictEqual(statusOp, {
-        name: "getStatus",
-        verb: "get",
-        path: "/lrRpcOp/{operationId}",
-        params: {
-          body: undefined,
-          params: [
-            {
-              name: "operationId",
-              type: "path",
-            },
-          ],
-        },
-        responseProperties: ["location", "statusValue"],
-      });
-    });
-  });
-
-  describe("LongRunningOperation", () => {
-    it("Gets Lro for standard Async CreateOrUpdate", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `#suppress "@typespec/http/deprecated-implicit-optionality" "For test"
-        @test op createOrUpdate is StandardResourceOperations.LongRunningResourceCreateOrUpdate<TestModel, Customizations>;`,
-      );
-      ok(metadata);
-      deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
-      deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "OperationStatus");
-
-      deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
-      deepStrictEqual(metadata.pollingInfo.responseModel.name, "OperationStatus");
-      deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "result");
-
-      deepStrictEqual(metadata.finalStateVia, "operation-location");
-      deepStrictEqual(metadata.logicalResult.name, "TestModel");
-      deepStrictEqual(metadata.envelopeResult.name, "OperationStatus");
-      deepStrictEqual(metadata.logicalPath, "result");
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "TestModel");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "OperationStatus");
-      deepStrictEqual(metadata.finalResultPath, "result");
-    });
-
-    it("Gets Lro for standard Async CreateOrUpdate with polling reference", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        op poll is StandardResourceOperations.GetResourceOperationStatus<TestModel>;
-  
-        @Azure.Core.pollingOperation(poll)
-        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
-        @test op createOrUpdate is StandardResourceOperations.LongRunningResourceCreateOrUpdate<TestModel, Customizations>;`,
-        "createOrUpdate",
-      );
-      ok(metadata);
-      deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
-      deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "ResourceOperationStatus");
-
-      deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
-      deepStrictEqual(metadata.pollingInfo.responseModel.name, "ResourceOperationStatus");
-      deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "result");
-
-      deepStrictEqual(metadata.finalStateVia, "operation-location");
-      deepStrictEqual(metadata.logicalResult.name, "TestModel");
-      deepStrictEqual(metadata.envelopeResult.name, "ResourceOperationStatus");
-      deepStrictEqual(metadata.logicalPath, "result");
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "TestModel");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "ResourceOperationStatus");
-      deepStrictEqual(metadata.finalResultPath, "result");
-    });
-
-    it("Gets Lro for standard Async CreateOrReplace", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `@test op createOrReplace is StandardResourceOperations.LongRunningResourceCreateOrReplace<TestModel, Customizations>;`,
-      );
-
-      ok(metadata);
-      deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
-      deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "OperationStatus");
-
-      deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
-      deepStrictEqual(metadata.pollingInfo.responseModel.name, "OperationStatus");
-      deepStrictEqual(metadata.pollingInfo.resultProperty?.name, undefined);
-
-      deepStrictEqual(metadata.finalStateVia, "original-uri");
-      deepStrictEqual(metadata.logicalResult.name, "TestModel");
-      deepStrictEqual(metadata.envelopeResult.name, "OperationStatus");
-      // For createOrReplace, since the resource is returned in the 200 or 201 envelope, the status monitor will not return a results field
-      deepStrictEqual(metadata.logicalPath, undefined);
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "TestModel");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "TestModel");
-      deepStrictEqual(metadata.finalResultPath, undefined);
-    });
-
-    it("Gets Lro for standard Async CreateOrReplace with polling reference", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        op poll is StandardResourceOperations.GetResourceOperationStatus<TestModel>;
-  
-        @Azure.Core.pollingOperation(poll)
-        @test op createOrReplace is StandardResourceOperations.LongRunningResourceCreateOrReplace<TestModel, Customizations>;`,
-        "createOrReplace",
-      );
-
-      ok(metadata);
-      deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
-      deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "ResourceOperationStatus");
-
-      deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
-      deepStrictEqual(metadata.pollingInfo.responseModel.name, "ResourceOperationStatus");
-      deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "result");
-
-      deepStrictEqual(metadata.finalStateVia, "original-uri");
-      deepStrictEqual(metadata.logicalResult.name, "TestModel");
-      deepStrictEqual(metadata.envelopeResult.name, "ResourceOperationStatus");
-      deepStrictEqual(metadata.logicalPath, "result");
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "TestModel");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "ResourceOperationStatus");
-      deepStrictEqual(metadata.finalResultPath, "result");
-    });
-
-    it("Gets Lro for non-resource PUT with polling reference", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-model Job {
-  @path
-  @key
-  @visibility(Lifecycle.Read)
-  id: uuid;
-
-  name: string;
-}
-
-model StartJobRequest {
-  name: string;
-
-  instructions: string[];
-}
-
-model JobStatus is Azure.Core.Foundations.OperationStatus<Job>;
-
-#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Non-resource operation"
-@route("/jobs/{id}")
-op getJobStatus is Foundations.GetOperationStatus<
-  Rest.Resource.KeysOf<Job>,
-  Job
->;
-
-alias JobLroResponse = {
-  @header("Operation-Location") operationLocation: url;
-  ...Azure.Core.Foundations.OperationStatus<Job>;
-};
-
-#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Non-resource operation"
-@pollingOperation(getJobStatus)
-@route("/startJob/")
-@put
-op startJobAsync(
-  ...Azure.Core.Foundations.ApiVersionParameter,
-
-  @body _: StartJobRequest,
-): (CreatedResponse & JobLroResponse) | (OkResponse &
-  JobLroResponse) | Azure.Core.Foundations.ErrorResponse;
-`,
-        "startJobAsync",
-      );
-
-      ok(metadata);
-      deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
-      deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "OperationStatus");
-
-      deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
-      deepStrictEqual(metadata.pollingInfo.responseModel.name, "OperationStatus");
-      deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "result");
-
-      deepStrictEqual(metadata.finalStateVia, "operation-location");
-      deepStrictEqual(metadata.logicalResult.name, "Job");
-      deepStrictEqual(metadata.envelopeResult.name, "OperationStatus");
-      deepStrictEqual(metadata.logicalPath, "result");
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "Job");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "OperationStatus");
-      deepStrictEqual(metadata.finalResultPath, "result");
-    });
-
-    it("Gets Lro for custom PUT with polling reference", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        @resource("jobs")
-model Job {
-  @path
-  @key
-  @visibility(Lifecycle.Read)
-  name: string;
-
-  instructions: string[];
-}
-
-model StartJobRequest {
-  name: string;
-
-  instructions: string[];
-}
-
-model JobStatus is Azure.Core.Foundations.OperationStatus;
-
-#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Non-resource operation"
-@route("/jobs/status/{name}")
-op getJobStatus is Foundations.GetOperationStatus<
-  Rest.Resource.KeysOf<Job>,
-  Job
->;
-
-op read is StandardResourceOperations.ResourceRead<Job>;
-
-alias JobLroResponse = {
-  @header("Operation-Location") operationLocation: string;
-  ...Azure.Core.Foundations.OperationStatus<Job>;
-};
-
-#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "test"
-@finalOperation(read)
-@pollingOperation(getJobStatus)
-@createsOrReplacesResource(Job)
-@route("/jobs/{name}")
-@put
-op createJob(
-  ...Azure.Core.Foundations.ApiVersionParameter,
-  @path name: string,
-  @bodyRoot body: Job,
-): (CreatedResponse & JobLroResponse) | (OkResponse &
-  JobLroResponse) | Azure.Core.Foundations.ErrorResponse;
-`,
-        "createJob",
-      );
-
-      ok(metadata);
-      deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
-      deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "OperationStatus");
-
-      deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
-      deepStrictEqual(metadata.pollingInfo.responseModel.name, "OperationStatus");
-      deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "result");
-
-      deepStrictEqual(metadata.finalStateVia, "original-uri");
-      deepStrictEqual(metadata.logicalResult.name, "Job");
-      deepStrictEqual(metadata.envelopeResult.name, "OperationStatus");
-      deepStrictEqual(metadata.logicalPath, undefined);
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "Job");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Job");
-      deepStrictEqual(metadata.finalResultPath, undefined);
-    });
-
-    it("Gets Lro for standard Async Delete", async () => {
-      const [_, metadata, runner] = await compileLroOperation(
-        `@test op delete is Azure.Core.LongRunningResourceDelete<TestModel, Customizations>;`,
-      );
-      ok(metadata);
-      deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
-      deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "OperationStatus");
-
-      deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
-      deepStrictEqual(metadata.pollingInfo.responseModel.name, "OperationStatus");
-      deepStrictEqual(metadata.pollingInfo.resultProperty?.name, undefined);
-
-      deepStrictEqual(metadata.finalStateVia, "operation-location");
-      deepStrictEqual(metadata.logicalResult.name, "OperationStatus");
-      deepStrictEqual(
-        getNamespaceName(runner.program, metadata.logicalResult.namespace),
-        "Azure.Core.Foundations",
-      );
-      deepStrictEqual(metadata.envelopeResult.name, "OperationStatus");
-      deepStrictEqual(metadata.logicalPath, undefined);
-
-      deepStrictEqual(metadata.finalResult, "void");
-      deepStrictEqual(metadata.finalEnvelopeResult, "void");
-      deepStrictEqual(metadata.finalResultPath, undefined);
-      ok(metadata.finalStep);
-      deepStrictEqual(metadata.finalStep.kind, "noPollingResult");
-    });
-
-    it("Gets Lro for standard Async Delete with polling reference", async () => {
-      const [_, metadata, runner] = await compileLroOperation(
-        `
-        op poll is StandardResourceOperations.GetResourceOperationStatus<TestModel, never>;
-  
-        @Azure.Core.pollingOperation(poll)
-        @test op delete is Azure.Core.LongRunningResourceDelete<TestModel, Customizations>;`,
-        "delete",
-      );
-      ok(metadata);
-      deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
-      deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "ResourceOperationStatus");
-
-      deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
-      deepStrictEqual(metadata.pollingInfo.responseModel.name, "ResourceOperationStatus");
-      deepStrictEqual(metadata.pollingInfo.resultProperty?.name, undefined);
-
-      deepStrictEqual(metadata.finalStateVia, "operation-location");
-      deepStrictEqual(metadata.logicalResult.name, "ResourceOperationStatus");
-      deepStrictEqual(
-        getNamespaceName(runner.program, metadata.logicalResult.namespace),
-        "Azure.Core",
-      );
-      deepStrictEqual(metadata.envelopeResult.name, "ResourceOperationStatus");
-      deepStrictEqual(metadata.logicalPath, undefined);
-
-      deepStrictEqual(metadata.finalResult, "void");
-      deepStrictEqual(metadata.finalEnvelopeResult, "void");
-      deepStrictEqual(metadata.finalResultPath, undefined);
-
-      ok(metadata.finalStep);
-      deepStrictEqual(metadata.finalStep.kind, "noPollingResult");
-    });
-
-    it("Gets Lro for standard Async Update", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
-         #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
-         @test op update is Azure.Core.Foundations.LongRunningResourceUpdate<TestModel, Customizations>;`,
-      );
-      ok(metadata);
-      deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
-      deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "OperationStatus");
-
-      deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
-      deepStrictEqual(metadata.pollingInfo.responseModel.name, "OperationStatus");
-      deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "result");
-
-      deepStrictEqual(metadata.finalStateVia, "operation-location");
-      deepStrictEqual(metadata.logicalResult.name, "TestModel");
-      deepStrictEqual(metadata.envelopeResult.name, "OperationStatus");
-      deepStrictEqual(metadata.logicalPath, "result");
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "TestModel");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "OperationStatus");
-      deepStrictEqual(metadata.finalResultPath, "result");
-    });
-
-    it("Gets Lro for standard Async Update with polling reference", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-         op poll is StandardResourceOperations.GetResourceOperationStatus<TestModel>;
-  
-        
-         #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
-         @Azure.Core.pollingOperation(poll)
-         #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
-         @test op update is Azure.Core.Foundations.LongRunningResourceUpdate<TestModel, Customizations>;`,
-        "update",
-      );
-      ok(metadata);
-      deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
-      deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "ResourceOperationStatus");
-
-      deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
-      deepStrictEqual(metadata.pollingInfo.responseModel.name, "ResourceOperationStatus");
-      deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "result");
-
-      deepStrictEqual(metadata.finalStateVia, "operation-location");
-      deepStrictEqual(metadata.logicalResult.name, "TestModel");
-      deepStrictEqual(metadata.envelopeResult.name, "ResourceOperationStatus");
-      deepStrictEqual(metadata.logicalPath, "result");
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "TestModel");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "ResourceOperationStatus");
-      deepStrictEqual(metadata.finalResultPath, "result");
-    });
-
-    it("Gets Lro for standard Async ResourceAction", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `// Reuse CustomParameters and CustomResponseProperties in the "normal" TParams and TResponse fields
-        model OpParams {
-          value: string;
-          ...CustomParameters;
-        };
-  
-        model OpResponse is CustomResponseProperties {
-          message: string;
-        }
-  
-        @test op doAction is Azure.Core.LongRunningResourceAction<TestModel, OpParams, OpResponse>;`,
-      );
-      ok(metadata);
-      deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
-      deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "OperationStatus");
-
-      deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
-      deepStrictEqual(metadata.pollingInfo.responseModel.name, "OperationStatus");
-      deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "result");
-
-      deepStrictEqual(metadata.finalStateVia, "operation-location");
-      deepStrictEqual(metadata.logicalResult.name, "OpResponse");
-      deepStrictEqual(metadata.envelopeResult.name, "OperationStatus");
-      deepStrictEqual(metadata.logicalPath, "result");
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "OpResponse");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "OperationStatus");
-      deepStrictEqual(metadata.finalResultPath, "result");
-    });
-
-    it("Gets Lro for standard Async ResourceAction with polling reference", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        // Reuse CustomParameters and CustomResponseProperties in the "normal" TParams and TResponse fields
-        model OpParams {
-          value: string;
-          ...CustomParameters;
-        };
-  
-        model OpResponse is CustomResponseProperties {
-          message: string;
-        }
-        op poll is StandardResourceOperations.GetResourceOperationStatus<TestModel>;
-  
-        @Azure.Core.pollingOperation(poll)
-        @test op doAction is Azure.Core.LongRunningResourceAction<TestModel, OpParams, OpResponse>;`,
-        "doAction",
-      );
-      ok(metadata);
-      deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
-      deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "ResourceOperationStatus");
-
-      deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
-      deepStrictEqual(metadata.pollingInfo.responseModel.name, "ResourceOperationStatus");
-      deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "result");
-
-      deepStrictEqual(metadata.finalStateVia, "operation-location");
-      deepStrictEqual(metadata.logicalResult.name, "TestModel");
-      deepStrictEqual(metadata.envelopeResult.name, "ResourceOperationStatus");
-      deepStrictEqual(metadata.logicalPath, "result");
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "TestModel");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "ResourceOperationStatus");
-      deepStrictEqual(metadata.finalResultPath, "result");
-    });
-
-    it("Gets Lro for standard Async RpcOperation with polling reference", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        @route("/lrRpcOp/{operationId}")
-        @get op getStatus(@path operationId: string): PollingStatus;
-  
-        model PollingStatus {
-          @header location?: ResourceLocation<TestModel>;
-          @Azure.Core.lroStatus
-          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-          @Azure.Core.lroResult
-          result?: TestModel;
-        }
-  
-        model StatusError { message: string; }
-        @test @pollingOperation(getStatus) @route("/lrRpcOp") op lrRpcOp is Azure.Core.LongRunningRpcOperation<{}, TestModel, PollingStatus, StatusError, Customizations, Azure.Core.Foundations.ErrorResponse, Azure.Core.Traits.TraitContext.Read>;`,
-        "lrRpcOp",
-      );
-      ok(metadata);
-      deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
-      deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "PollingStatus");
-
-      deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
-      deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
-      deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "result");
-
-      deepStrictEqual(metadata.finalStateVia, "operation-location");
-      deepStrictEqual(metadata.logicalResult.name, "TestModel");
-      deepStrictEqual(metadata.envelopeResult.name, "PollingStatus");
-      deepStrictEqual(metadata.logicalPath, "result");
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "TestModel");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "PollingStatus");
-      deepStrictEqual(metadata.finalResultPath, "result");
-    });
-
-    it("Gets Lro for polling and final reference", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        model PollingStatus {
-          @header location?: ResourceLocation<PollingStatus>;
-          @Azure.Core.lroStatus
-          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-        }
-        model SimpleWidget {
-          @key
-          @segment("simpleWidgets")
-          @visibility(Lifecycle.Read)
-          @path
-          id: string;
-          value: string;
-        }
-        @route("/simpleWidgets/{id}")
-        @get op getWidget(@path id: string): SimpleWidget;
-        @finalOperation(getWidget, {id: ResponseProperty<"id">})
-        @pollingOperation(getStatus, {id: ResponseProperty<"id">; operationId: ResponseProperty<"operationId">})
-        @route("/simpleWidgets/{id}")
-        @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operationId: string};
-        @route("/simpleWidgets/{id}/operations/{operationId}")
-        @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
-        `,
-        "createWidget",
-      );
-      ok(metadata);
-      deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationReference");
-      deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "PollingStatus");
-
-      deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
-      deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
-      deepStrictEqual(metadata.pollingInfo.resultProperty?.name, undefined);
-
-      deepStrictEqual(metadata.finalStateVia, "original-uri");
-      deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
-      deepStrictEqual(metadata.envelopeResult.name, "PollingStatus");
-      deepStrictEqual(metadata.logicalPath, undefined);
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual(metadata.finalResultPath, undefined);
-    });
-
-    it("Gets Lro for polling operation with custom lro template and operation reference", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        model TLongRunningStatusLocation<TStatusResult extends TypeSpec.Reflection.Model> {
-          @pollingLocation
-          @TypeSpec.Http.header("Operation-Location")
-          operationLocation: ResourceLocation<TStatusResult>;
-        }
-  
-        @post
-        op TLongRunningRpcOperation<
-          TParams,
-          TResponse extends TypeSpec.Reflection.Model
-        > is Azure.Core.Foundations.Operation<
-          TParams & RepeatabilityRequestHeaders,
-          (Foundations.AcceptedResponse<TLongRunningStatusLocation<TResponse>> &
-            Foundations.RetryAfterHeader &
-            RepeatabilityResponseHeaders),
-          RepeatabilityRequestHeaders & RepeatabilityResponseHeaders,
-          Azure.Core.Foundations.ErrorResponse
-        >;
-  
-        enum JobStatus {
-          Running: "running",
-          Succeeded: "succeeded",
-          Failed: "failed",
-          Canceled: "canceled",
-        }  
-
-        alias Request = {
-          patients: string[];
-        };
-  
-        model JobResults {
-          success: string;
-          error?: Azure.Core.Foundations.Error;
-        }
-
-        @resource("foo/jobs")
-        model JobResult {
-          @key
-          @format("uuid")
-          jobId: string;
-            
-          @lroStatus
-          status: JobStatus;
-
-          @lroResult
-          results?: JobResults;
-          errors?: Azure.Core.Foundations.Error[];          
-        }
-  
-        interface Foo {
-          @route("/foo/jobs")
-          createJob is TLongRunningRpcOperation<{...Request}, JobResult>;
-        }
-        `,
-        "createJob",
-      );
-      ok(metadata);
-
-      deepStrictEqual(metadata.finalStep?.kind, "pollingSuccessProperty");
-      deepStrictEqual((metadata.finalStep?.target as any).name, "results");
-      deepStrictEqual((metadata.finalStep?.target as any).type.name, "JobResults");
-
-      deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
-      deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "JobResult");
-
-      deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
-      deepStrictEqual(metadata.pollingInfo.responseModel.name, "JobResult");
-      deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "results");
-
-      deepStrictEqual(metadata.finalStateVia, "operation-location");
-      deepStrictEqual(metadata.logicalResult.name, "JobResults");
-      deepStrictEqual(metadata.envelopeResult.name, "JobResult");
-      deepStrictEqual(metadata.logicalPath, "results");
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "JobResults");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "JobResult");
-      deepStrictEqual(metadata.finalResultPath, "results");
-    });
-
-    it("Gets Lro for non-standard polling in custom createOrReplace operations with finalLocation", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        model PollingStatus {
-          @Azure.Core.lroStatus
-          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-        }
-        
-        model SimpleWidget {
-          @key
-          @segment("simpleWidgets")
-          @visibility(Lifecycle.Read)
-          @path
-          id: string;
-        
-          value: string;
-        }
-        
-        @route("/simpleWidgets/{id}/operations/{operationId}")
-        @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
-        
-        @pollingOperation(getStatus)
-        @route("/simpleWidgets/{id}")
-        @put op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
-          {
-            @statusCode statusCode: 201;
-            @header id: string,
-            @header("operation-id") operate: string,
-            @finalLocation @header("Location") location: ResourceLocation<SimpleWidget>,
-            @pollingLocation @header("Operation-Location") opLink: string,
-            @lroResult @bodyRoot body?: SimpleWidget
-          };      
-        `,
-        "createWidget",
-      );
-      ok(metadata);
-      deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
-      deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
-      deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
-
-      deepStrictEqual(metadata.pollingInfo?.responseModel.name, "PollingStatus");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "statusValue");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.canceledState, ["Canceled"]);
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
-
-      deepStrictEqual(metadata.finalStep?.kind, "finalOperationLink");
-      deepStrictEqual(metadata.finalStep?.target?.kind, "link");
-      deepStrictEqual((metadata.finalStep?.target as any).location, "ResponseHeader");
-      deepStrictEqual((metadata.finalStep?.target as any).property.name, "location");
-
-      deepStrictEqual(metadata.finalStateVia, "location");
-      deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
-      deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
-      deepStrictEqual(metadata?.logicalPath, undefined);
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual(metadata.finalResultPath, undefined);
-    });
-
-    it("Gets Lro for arm-style azure-async + location operation polling in createOrReplace operations", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        model PollingStatus {
-          @Azure.Core.lroStatus
-          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-        }
-        model SimpleWidget {
-          @key
-          @segment("simpleWidgets")
-          @visibility(Lifecycle.Read)
-          @path
-          id: string;
-          provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
-          value: string;
-        }
-        
-        @route("/simpleWidgets/{id}")
-        @put op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
-          {
-            @statusCode statusCode: 201;
-            @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
-            @finalLocation(SimpleWidget)
-            @header location: string;
-            @bodyRoot body?: SimpleWidget
-          };      
-        `,
-        "createWidget",
-      );
-      ok(metadata);
-      deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
-      deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
-      deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
-
-      deepStrictEqual(metadata.pollingInfo?.responseModel.name, "PollingStatus");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "statusValue");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
-
-      deepStrictEqual(metadata.finalStep?.kind, "finalOperationLink");
-      deepStrictEqual(metadata.finalStep?.target?.kind, "link");
-      deepStrictEqual((metadata.finalStep?.target as any).location, "ResponseHeader");
-      deepStrictEqual((metadata.finalStep?.target as any).property.name, "location");
-
-      deepStrictEqual(metadata.finalStateVia, "location");
-      deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
-      deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
-      deepStrictEqual(metadata?.logicalPath, undefined);
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual(metadata.finalResultPath, undefined);
-    });
-
-    it("Gets Lro for arm-style azure-async operation polling in createOrReplace operations", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        model PollingStatus {
-          @Azure.Core.lroStatus
-          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-        }
-        model SimpleWidget {
-          @key
-          @segment("simpleWidgets")
-          @visibility(Lifecycle.Read)
-          @path
-          id: string;
-          provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
-          value: string;
-        }
-        
-        @route("/simpleWidgets/{id}")
-        @createsOrReplacesResource(SimpleWidget)
-        @put op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
-          {
-            @statusCode statusCode: 201;
-            @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
-            @bodyRoot body?: SimpleWidget
-          };      
-        `,
-        "createWidget",
-      );
-      ok(metadata);
-      deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
-      deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
-      deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
-
-      deepStrictEqual(metadata.pollingInfo?.responseModel.name, "PollingStatus");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "statusValue");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
-
-      deepStrictEqual(metadata.finalStep, undefined);
-
-      deepStrictEqual(metadata.finalStateVia, "original-uri");
-      deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
-      deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
-      deepStrictEqual(metadata?.logicalPath, undefined);
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual(metadata.finalResultPath, undefined);
-    });
-
-    it("Gets Lro for arm-style location polling in createOrReplace operations", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        model SimpleWidget {
-          @key
-          @segment("simpleWidgets")
-          @visibility(Lifecycle.Read)
-          @path
-          id: string;
-          provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
-          value: string;
-        }
-        
-        @route("/simpleWidgets/{id}")
-        @createsOrUpdatesResource(SimpleWidget)
-        @put op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
-          {
-            @statusCode statusCode: 201;
-            @pollingLocation(StatusMonitorPollingOptions<SimpleWidget>) @header("location") opLink: string,
-            @bodyRoot body?: SimpleWidget
-          };      
-        `,
-        "createWidget",
-      );
-      ok(metadata);
-      deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
-      deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
-      deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
-
-      deepStrictEqual(metadata.pollingInfo?.responseModel.name, "SimpleWidget");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "provisioningState");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
-      deepStrictEqual(metadata.finalStep, undefined);
-
-      deepStrictEqual(metadata.finalStateVia, "original-uri");
-      deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
-      deepStrictEqual(metadata?.envelopeResult.name, "SimpleWidget");
-      deepStrictEqual(metadata?.logicalPath, undefined);
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual(metadata.finalResultPath, undefined);
-    });
-
-    it("Gets Lro for arm-style azure-async + location operation polling in update operations", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        model PollingStatus {
-          @Azure.Core.lroStatus
-          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-        }
-        model SimpleWidget {
-          @key
-          @segment("simpleWidgets")
-          @visibility(Lifecycle.Read)
-          @path
-          id: string;
-          provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
-          value: string;
-        }
-        
-        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
-        @route("/simpleWidgets/{id}")
-        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
-        @patch(#{implicitOptionality: true}) op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
-          {
-            @statusCode statusCode: 201;
-            @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
-            @finalLocation(SimpleWidget)
-            @header location: string;
-            @bodyRoot body?: SimpleWidget
-          };      
-        `,
-        "createWidget",
-      );
-      ok(metadata);
-      deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
-      deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
-      deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
-
-      deepStrictEqual(metadata.pollingInfo?.responseModel.name, "PollingStatus");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "statusValue");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
-
-      deepStrictEqual(metadata.finalStep?.kind, "finalOperationLink");
-      deepStrictEqual(metadata.finalStep?.target?.kind, "link");
-      deepStrictEqual((metadata.finalStep?.target as any).location, "ResponseHeader");
-      deepStrictEqual((metadata.finalStep?.target as any).property.name, "location");
-
-      deepStrictEqual(metadata.finalStateVia, "location");
-      deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
-      deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
-      deepStrictEqual(metadata?.logicalPath, undefined);
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual(metadata.finalResultPath, undefined);
-    });
-
-    it("Gets Lro for arm-style azure-async operation polling in update operations", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        model PollingStatus {
-          @Azure.Core.lroStatus
-          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+  it("Gets Lro for arm-style azure-async + location operation polling in createOrReplace operations", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+      model PollingStatus {
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+      }
+      model SimpleWidget {
+        @key
+        @segment("simpleWidgets")
+        @visibility(Lifecycle.Read)
+        @path
+        id: string;
+        provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
+        value: string;
+      }
+      
+      @route("/simpleWidgets/{id}")
+      @put op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
+        {
+          @statusCode statusCode: 201;
+          @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
           @finalLocation(SimpleWidget)
           @header location: string;
-        }
-        model SimpleWidget {
-          @key
-          @segment("simpleWidgets")
-          @visibility(Lifecycle.Read)
-          @path
-          id: string;
-          provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
-          value: string;
-        }
-        
-        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
-        @route("/simpleWidgets/{id}")
-        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
-        @patch(#{implicitOptionality: true}) op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
-          {
-            @statusCode statusCode: 201;
-            @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
-            @bodyRoot body?: SimpleWidget
-          };      
-        `,
-        "createWidget",
-      );
-      ok(metadata);
-      deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
-      deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
-      deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
-
-      deepStrictEqual(metadata.pollingInfo?.responseModel.name, "PollingStatus");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "statusValue");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
-
-      ok(metadata.finalStep);
-      deepStrictEqual(metadata.finalStep.kind, "finalOperationLink");
-      deepStrictEqual((metadata.finalStep.responseModel as Model).name, "SimpleWidget");
-      deepStrictEqual(metadata.finalStep.target?.property.name, "location");
-
-      deepStrictEqual(metadata.finalStateVia, "location");
-      deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
-      deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
-      deepStrictEqual(metadata?.logicalPath, undefined);
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual(metadata.finalResultPath, undefined);
-    });
-
-    it("Gets Lro for arm-style location polling in update operations", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        model SimpleWidget {
-          @key
-          @segment("simpleWidgets")
-          @visibility(Lifecycle.Read)
-          @path
-          id: string;
-          provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
-          value: string;
-        }
-        
-        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
-        @route("/simpleWidgets/{id}")
-        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
-        @patch(#{implicitOptionality: true}) op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
-          {
-            @statusCode statusCode: 201;
-            @finalLocation(SimpleWidget) @pollingLocation(StatusMonitorPollingOptions<SimpleWidget>) @header("location") opLink: string,
-            @bodyRoot body?: SimpleWidget
-          };      
-        `,
-        "createWidget",
-      );
-      ok(metadata);
-      deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
-      deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
-      deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
-
-      deepStrictEqual(metadata.pollingInfo?.responseModel.name, "SimpleWidget");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "provisioningState");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
-      ok(metadata.finalStep);
-      deepStrictEqual(metadata.finalStep.kind, "finalOperationLink");
-      deepStrictEqual((metadata.finalStep.responseModel as Model).name, "SimpleWidget");
-      deepStrictEqual(metadata.finalStep?.target?.kind, "link");
-      deepStrictEqual((metadata.finalStep?.target as any).location, "ResponseHeader");
-      deepStrictEqual((metadata.finalStep?.target as any).property.name, "opLink");
-
-      deepStrictEqual(metadata.finalStateVia, "location");
-      deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
-      deepStrictEqual(metadata?.envelopeResult.name, "SimpleWidget");
-      deepStrictEqual(metadata?.logicalPath, undefined);
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual(metadata.finalResultPath, undefined);
-    });
-
-    it("Gets Lro for arm-style azure-async + location operation polling in action operations", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        model PollingStatus {
-          @Azure.Core.lroStatus
-          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-        }
-        model SimpleWidget {
-          @key
-          @segment("simpleWidgets")
-          @visibility(Lifecycle.Read)
-          @path
-          id: string;
-          provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
-          value: string;
-        }
-        
-        @route("/simpleWidgets/{id}")
-        @post op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
-          {
-            @statusCode statusCode: 202;
-            @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
-            @finalLocation(SimpleWidget)
-            @header location: string;
-            @bodyRoot body?: SimpleWidget
-          };      
-        `,
-        "createWidget",
-      );
-      ok(metadata);
-      deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
-      deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
-      deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
-
-      deepStrictEqual(metadata.pollingInfo?.responseModel.name, "PollingStatus");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "statusValue");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
-
-      deepStrictEqual(metadata.finalStep?.kind, "finalOperationLink");
-      deepStrictEqual(metadata.finalStep?.target?.kind, "link");
-      deepStrictEqual((metadata.finalStep?.target as any).location, "ResponseHeader");
-      deepStrictEqual((metadata.finalStep?.target as any).property.name, "location");
-
-      deepStrictEqual(metadata.finalStateVia, "location");
-      deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
-      deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
-      deepStrictEqual(metadata?.logicalPath, undefined);
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual(metadata.finalResultPath, undefined);
-    });
-
-    it("Gets Lro for arm-style azure-async operation polling in action operations", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        model PollingStatus {
-          @Azure.Core.lroStatus
-          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-        }
-        model SimpleWidget {
-          @key
-          @segment("simpleWidgets")
-          @visibility(Lifecycle.Read)
-          @path
-          id: string;
-          provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
-          value: string;
-        }
-        
-        @route("/simpleWidgets/{id}")
-        @post op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
-          {
-            @statusCode statusCode: 202;
-            @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
-            @bodyRoot body?: SimpleWidget
-          };      
-        `,
-        "createWidget",
-      );
-      ok(metadata);
-      deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
-      deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
-      deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
-
-      deepStrictEqual(metadata.pollingInfo?.responseModel.name, "PollingStatus");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "statusValue");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
-
-      ok(metadata.finalStep);
-      deepStrictEqual(metadata.finalStep?.kind, "noPollingResult");
-
-      deepStrictEqual(metadata.finalStateVia, "azure-async-operation");
-      deepStrictEqual(metadata.logicalResult.name, "PollingStatus");
-      deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
-      deepStrictEqual(metadata?.logicalPath, undefined);
-
-      deepStrictEqual(metadata.finalResult, "void");
-      deepStrictEqual(metadata.finalEnvelopeResult, "void");
-      deepStrictEqual(metadata.finalResultPath, undefined);
-    });
-
-    it("Gets Lro for arm-style location polling in action operations", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        model SimpleWidget {
-          @key
-          @segment("simpleWidgets")
-          @visibility(Lifecycle.Read)
-          @path
-          id: string;
-          provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
-          value: string;
-        }
-        
-        @route("/simpleWidgets/{id}")
-        @post op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
-          {
-            @statusCode statusCode: 202;
-            @finalLocation(SimpleWidget) @pollingLocation(StatusMonitorPollingOptions<SimpleWidget>) @header("location") opLink: string,
-            @bodyRoot body?: SimpleWidget
-          };      
-        `,
-        "createWidget",
-      );
-      ok(metadata);
-      deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
-      deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
-      deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
-
-      deepStrictEqual(metadata.pollingInfo?.responseModel.name, "SimpleWidget");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "provisioningState");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
-      ok(metadata.finalStep);
-      deepStrictEqual(metadata.finalStep?.kind, "finalOperationLink");
-      deepStrictEqual(metadata.finalStep?.target?.kind, "link");
-      deepStrictEqual((metadata.finalStep?.target as any).location, "ResponseHeader");
-      deepStrictEqual((metadata.finalStep?.target as any).property.name, "opLink");
-
-      deepStrictEqual(metadata.finalStateVia, "location");
-      deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
-      deepStrictEqual(metadata?.envelopeResult.name, "SimpleWidget");
-      deepStrictEqual(metadata?.logicalPath, undefined);
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual(metadata.finalResultPath, undefined);
-    });
-
-    it("Gets Lro for arm-style azure-async operation polling in delete operations", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        model PollingStatus {
-          @Azure.Core.lroStatus
-          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-        }
-        
-        @route("/simpleWidgets/{id}")
-        @delete op deleteWidget(@path id: string) : {
-            @statusCode statusCode: 201;
-            @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
-          };      
-        `,
-        "deleteWidget",
-      );
-      ok(metadata);
-      deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
-      deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
-      deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
-
-      deepStrictEqual(metadata.pollingInfo?.responseModel.name, "PollingStatus");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "statusValue");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
-
-      //ok(metadata.finalStep);
-      //deepStrictEqual(metadata.finalStep?.kind, "noPollingResult");
-
-      deepStrictEqual(metadata.finalStateVia, "azure-async-operation");
-      deepStrictEqual(metadata.logicalResult.name, "PollingStatus");
-      deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
-      deepStrictEqual(metadata?.logicalPath, undefined);
-
-      deepStrictEqual(metadata.finalResult, "void");
-      deepStrictEqual(metadata.finalEnvelopeResult, "void");
-      deepStrictEqual(metadata.finalResultPath, undefined);
-    });
-
-    it("Gets Lro for arm-style location polling in delete operations", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        model PollingStatus {
-          @Azure.Core.lroStatus
-          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-        }
-        
-        @route("/simpleWidgets/{id}")
-        @delete op deleteWidget(@path id: string) : {
-            @statusCode statusCode: 201;
-            @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("location") opLink: string,
-          };      
-        `,
-        "deleteWidget",
-      );
-      ok(metadata);
-      deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
-      deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
-      deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
-
-      deepStrictEqual(metadata.pollingInfo?.responseModel.name, "PollingStatus");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "statusValue");
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
-      deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
-      //ok(metadata.finalStep);
-      //deepStrictEqual(metadata.finalStep?.kind, "noPollingResult");
-
-      deepStrictEqual(metadata.finalStateVia, "location");
-      deepStrictEqual(metadata.logicalResult.name, "PollingStatus");
-      deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
-      deepStrictEqual(metadata?.logicalPath, undefined);
-
-      deepStrictEqual(metadata.finalResult, "void");
-      deepStrictEqual(metadata.finalEnvelopeResult, "void");
-      deepStrictEqual(metadata.finalResultPath, undefined);
-    });
-
-    it("Gets Lro for non-standard polling in custom createOrReplace operations without finalLocation", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        model PollingStatus {
-          @Azure.Core.lroStatus
-          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-        }
-        
-        model SimpleWidget {
-          @key
-          @segment("simpleWidgets")
-          @visibility(Lifecycle.Read)
-          @path
-          id: string;
-        
-          value: string;
-        }
-        
-        @route("/simpleWidgets/{id}/operations/{operationId}")
-        @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
-        
-        @pollingOperation(getStatus)
-        @route("/simpleWidgets/{id}")
-        @createsOrReplacesResource(SimpleWidget)
-        @put op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
-          {
-            @statusCode statusCode: 201;
-            @header id: string,
-            @header("operation-id") operate: string,
-            @pollingLocation @header("Operation-Location") opLink: string,
-            @lroResult @bodyRoot body?: SimpleWidget
-          };      
-        `,
-        "createWidget",
-      );
-
-      ok(metadata);
-      deepStrictEqual(metadata.finalStateVia, "original-uri");
-      deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
-      deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
-      deepStrictEqual(metadata?.logicalPath, undefined);
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual(metadata?.finalResultPath, undefined);
-
-      ok(metadata.statusMonitorStep);
-      deepStrictEqual(metadata.statusMonitorStep.target.kind, "link");
-      deepStrictEqual((metadata.statusMonitorStep.target as any)?.location, "ResponseHeader");
-      deepStrictEqual((metadata.statusMonitorStep.target as any)?.property.name, "opLink");
-
-      ok(metadata.pollingInfo);
-      deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.kind, "model-property");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.property.name, "statusValue");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.canceledState, ["Canceled"]);
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.failedState, ["Failed"]);
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.succeededState, ["Succeeded"]);
-    });
-
-    it("Gets Lro for non-standard polling in custom put operations without finalLocation", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        model PollingStatus {
-          @Azure.Core.lroStatus
-          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-        }
-        
-        model SimpleWidget {
-          @key
-          @segment("simpleWidgets")
-          @visibility(Lifecycle.Read)
-          @path
-          id: string;
-        
-          value: string;
-        }
-        
-        @route("/simpleWidgets/{id}/operations/{operationId}")
-        @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
-        
-        @pollingOperation(getStatus)
-        @route("/simpleWidgets/{id}")
-        @createsOrReplacesResource(SimpleWidget)
-        @put op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
-          {
-            @statusCode statusCode: 201;
-            @header id: string,
-            @header("operation-id") operate: string,
-            @pollingLocation @header("Operation-Location") opLink: string,
-            @lroResult @bodyRoot body?: SimpleWidget
-          };      
-        `,
-        "createWidget",
-      );
-
-      ok(metadata);
-      deepStrictEqual(metadata.finalStateVia, "original-uri");
-      deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
-      deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
-      deepStrictEqual(metadata?.logicalPath, undefined);
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual(metadata?.finalResultPath, undefined);
-
-      ok(metadata.statusMonitorStep);
-      deepStrictEqual(metadata.statusMonitorStep.target.kind, "link");
-      deepStrictEqual((metadata.statusMonitorStep.target as any)?.location, "ResponseHeader");
-      deepStrictEqual((metadata.statusMonitorStep.target as any)?.property.name, "opLink");
-
-      ok(metadata.pollingInfo);
-      deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.kind, "model-property");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.property.name, "statusValue");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.canceledState, ["Canceled"]);
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.failedState, ["Failed"]);
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.succeededState, ["Succeeded"]);
-    });
-
-    it("Gets Lro for non-standard polling in post operations", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        model PollingStatus {
-          @Azure.Core.lroStatus
-          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-          result?: SimpleWidget;
-        }
-        
-        model SimpleWidget {
-          @key
-          @segment("simpleWidgets")
-          @visibility(Lifecycle.Read)
-          @path
-          id: string;
-        
-          value: string;
-        }
-        
-        @route("/simpleWidgets/{id}/operations/{operationId}")
-        @get
-        op getStatus(@path id: string, @path operationId: string): PollingStatus & {@header correlationId: string;};
-        
-        @pollingOperation(getStatus, {operationId: ResponseProperty<"operate">})
-        @route("/simpleWidgets/{id}")
-        @post
-        op mungeWidget(@path id: string, body: SimpleWidget): SimpleWidget | {
-          @statusCode statusCode: 201;
-          @header id: string;
-          @header("operation-id") operate: string;
-          @pollingLocation @header("Operation-Location") opLink: string;
-          @lroResult @bodyRoot body?: SimpleWidget;
-        };
-        `,
-        "mungeWidget",
-      );
-
-      ok(metadata);
-      deepStrictEqual(metadata.finalStateVia, "custom-operation-reference");
-      deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
-      deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
-      deepStrictEqual(metadata?.logicalPath, "result");
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "PollingStatus");
-      deepStrictEqual(metadata?.finalResultPath, "result");
-
-      ok(metadata.statusMonitorStep);
-      deepStrictEqual(metadata.statusMonitorStep.target.kind, "reference");
-
-      ok(metadata.finalStep);
-      deepStrictEqual(metadata.finalStep.kind, "pollingSuccessProperty");
-      deepStrictEqual(metadata.finalStep.target?.kind, "ModelProperty");
-
-      ok(metadata.pollingInfo);
-      deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.kind, "model-property");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.property.name, "statusValue");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.canceledState, ["Canceled"]);
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.failedState, ["Failed"]);
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.succeededState, ["Succeeded"]);
-    });
-
-    it("Gets Lro for non-standard polling with void return type", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        using Azure.Core.Traits;
-        
-        alias ServiceTraits = SupportsClientRequestId &
-        NoConditionalRequests &
-        NoRepeatableRequests;
-      
-        alias ServiceOperations = Azure.Core.ResourceOperations<ServiceTraits>;
-
-        @lroStatus
-        enum OperationStatus {
-          NotStarted,
-          Running,
-          Succeeded,
-          Failed,
-          Canceled,
-        }
-        
-        enum ImportType {
-          Devices,
-          Modules,
-          All,
-        }
-        
-        @resource("management/operations")
-        model DeviceOperation {
-          @key
-          @visibility(Lifecycle.Read)
-          operationId: string;
-          error?: Azure.Core.Foundations.Error;
-        }
-        
-        @resource("updates/operations")
-        model UpdateOperation {
-          @key
-          @visibility(Lifecycle.Read)
-          operationId: string;
-          status: OperationStatus;
-          resourceLocation?: string;
-          error?: Azure.Core.Foundations.Error;
-        }
-        
-        model IfNoneMatchParameter {
-          @TypeSpec.Http.header("If-None-Match")
-          ifNoneMatch?: string;
-        }
-        
-        op getOperationStatus is ServiceOperations.ResourceRead<
-          UpdateOperation,
-          TraitOverride<RequestHeadersTrait<
-            {
-              ...IfNoneMatchParameter;
-            },
-            TraitContext.Read
-          >>
-        >;
-        
-        @pollingOperation(getOperationStatus)
-        @route("management/devices:import")
-        @post
-        op importDevices is Azure.Core.Foundations.Operation<
-          {
-            @body
-            importType: ImportType;
-          },
-          {
-            @statusCode _: 202;
-        
-            @pollingLocation
-            @header("Operation-Location")
-            operationLocation?: ResourceLocation<DeviceOperation>;
-          }
-        >;`,
-        "importDevices",
-      );
-
-      ok(metadata);
-      deepStrictEqual(metadata.finalStateVia, "operation-location");
-      deepStrictEqual(metadata.logicalResult.name, "UpdateOperation");
-      deepStrictEqual(metadata?.envelopeResult.name, "UpdateOperation");
-      deepStrictEqual(metadata?.logicalPath, undefined);
-
-      deepStrictEqual(metadata.finalResult, "void");
-      deepStrictEqual(metadata?.finalEnvelopeResult, "void");
-      deepStrictEqual(metadata?.logicalPath, undefined);
-
-      ok(metadata.statusMonitorStep);
-      deepStrictEqual(metadata.statusMonitorStep.target.kind, "link");
-
-      ok(metadata.finalStep);
-      deepStrictEqual(metadata.finalStep.kind, "noPollingResult");
-
-      ok(metadata.pollingInfo);
-      deepStrictEqual(metadata.pollingInfo.responseModel.name, "UpdateOperation");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.kind, "model-property");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.property.name, "status");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.canceledState, ["Canceled"]);
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.failedState, ["Failed"]);
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.succeededState, ["Succeeded"]);
-    });
-
-    it("Gets Lro for status monitor with scalar result type", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        model PollingStatus {
-          @header location?: ResourceLocation<PollingStatus>;
-          @Azure.Core.lroStatus
-          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-          @Azure.Core.lroResult
-          result?: string;
-        }
-        @route("/scalarResult/operations/{operationId}")
-        @get op getScalarStatus(@path operationId: string): PollingStatus;
-        @pollingOperation(getScalarStatus, {operationId: ResponseProperty<"operationId">})
-        @route("/scalarResult")
-        @post @test op startScalarOp(@body body: {}): {
-          @statusCode _: 202;
-          @header("operation-id") operationId: string;
-        };
-        `,
-        "startScalarOp",
-      );
-      ok(metadata);
-      deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationReference");
-      deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "PollingStatus");
-
-      deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
-      deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
-      deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "result");
-
-      deepStrictEqual(metadata.envelopeResult.name, "PollingStatus");
-      deepStrictEqual(metadata.logicalPath, "result");
-
-      // The final result should be a Scalar type (string), not "void"
-      ok(metadata.finalResult !== "void");
-      ok(metadata.finalResult !== undefined);
-      strictEqual((metadata.finalResult as Scalar).kind, "Scalar");
-      strictEqual((metadata.finalResult as Scalar).name, "string");
-
-      deepStrictEqual((metadata.finalEnvelopeResult as Model).name, "PollingStatus");
-      deepStrictEqual(metadata.finalResultPath, "result");
-
-      // logicalResult should be the polling response model when the actual result is a scalar
-      strictEqual(metadata.logicalResult.name, "PollingStatus");
-
-      // finalStep should be pollingSuccessProperty with scalar responseModel
-      ok(metadata.finalStep);
-      deepStrictEqual(metadata.finalStep.kind, "pollingSuccessProperty");
-      if (metadata.finalStep.kind === "pollingSuccessProperty") {
-        strictEqual(metadata.finalStep.responseModel.kind, "Scalar");
-        strictEqual((metadata.finalStep.responseModel as Scalar).name, "string");
-      }
-    });
-
-    it("ignores bad lro operation links with Operation-Location", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        model PollingStatus {
-          @header location?: ResourceLocation<PollingStatus>;
-  
-          @Azure.Core.lroStatus
-          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-        }
-  
-        model SimpleWidget {
-          @key
-          @segment("simpleWidgets")
-          @visibility(Lifecycle.Read)
-          @path
-          id: string;
-  
-          value: string;
-        }
-  
-        @route("/simpleWidgets/{id}")
-        @get op getWidget(@path id: string): SimpleWidget;
-  
-        @finalOperation(getWidget)
-        @pollingOperation(getStatus, {id: ResponseProperty<"id">})
-        @route("/simpleWidgets/{id}")
-        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
-        @patch(#{implicitOptionality: true}) op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operate: string, @header("Operation-Location")opLink: string};
-  
-        @route("/simpleWidgets/{id}/operations/{operationId}")
-        @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
-        `,
-        "createWidget",
-      );
-
-      ok(metadata);
-      deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
-      deepStrictEqual(metadata.envelopeResult.name, "PollingStatus");
-      deepStrictEqual(metadata.finalStateVia, "original-uri");
-      ok(metadata.finalStep);
-      deepStrictEqual(metadata.finalStep.kind, "finalOperationReference");
-      deepStrictEqual(metadata.finalStep.target?.kind, "reference");
-      deepStrictEqual(metadata.finalStep.target?.operation.name, "getWidget");
-      ok(metadata.statusMonitorStep);
-      deepStrictEqual(metadata.statusMonitorStep.target.kind, "link");
-      ok(metadata.pollingInfo);
-      deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.kind, "model-property");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.property.name, "statusValue");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.canceledState, ["Canceled"]);
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.failedState, ["Failed"]);
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.succeededState, ["Succeeded"]);
-    });
-
-    it("ignores bad lro operation links with @pollingLocation", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        model PollingStatus {
-          @header location?: ResourceLocation<PollingStatus>;
-          @Azure.Core.lroStatus
-          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-        }
-        model SimpleWidget {
-          @key
-          @segment("simpleWidgets")
-          @visibility(Lifecycle.Read)
-          @path
-          id: string;
-          value: string;
-        }
-        @route("/simpleWidgets/{id}")
-        @get op getWidget(@path id: string): SimpleWidget;
-        @finalOperation(getWidget)
-        @pollingOperation(getStatus, {id: ResponseProperty<"id">})
-        @route("/simpleWidgets/{id}")
-        @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operate: string, @Azure.Core.pollingLocation opLink: string};
-        @route("/simpleWidgets/{id}/operations/{operationId}")
-        @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
-        `,
-        "createWidget",
-      );
-
-      ok(metadata);
-      deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
-      deepStrictEqual(metadata.envelopeResult.name, "PollingStatus");
-      deepStrictEqual(metadata.finalStateVia, "original-uri");
-      ok(metadata.finalStep);
-      deepStrictEqual(metadata.finalStep.kind, "finalOperationReference");
-      deepStrictEqual(metadata.finalStep.target?.kind, "reference");
-      deepStrictEqual(metadata.finalStep.target?.operation.name, "getWidget");
-      ok(metadata.statusMonitorStep);
-      deepStrictEqual(metadata.statusMonitorStep.target.kind, "link");
-      ok(metadata.pollingInfo);
-      deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.kind, "model-property");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.property.name, "statusValue");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.canceledState, ["Canceled"]);
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.failedState, ["Failed"]);
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.succeededState, ["Succeeded"]);
-    });
-
-    it("throws with bad lro operation links and no polling header", async () => {
-      const [_, diagnostics] = await getOperations(
-        `
-        model PollingStatus {
-          @header location?: ResourceLocation<PollingStatus>;
-          @Azure.Core.lroStatus
-          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-        }
-        model SimpleWidget {
-          @key
-          @segment("simpleWidgets")
-          @visibility(Lifecycle.Read)
-          @path
-          id: string;
-          value: string;
-        }
-        @route("/simpleWidgets/{id}")
-        @get op getWidget(@path id: string): SimpleWidget;
-        @finalOperation(getWidget)
-        @pollingOperation(getStatus, {id: ResponseProperty<"id">})
-        @route("/simpleWidgets/{id}")
-        @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operate: string};
-        @route("/simpleWidgets/{id}/operations/{operationId}")
-        @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
-        `,
-      );
-
-      expectDiagnostics(diagnostics, [
-        {
-          code: "@azure-tools/typespec-azure-core/polling-operation-no-ref-or-link",
-          message:
-            "An operation decorated with '@pollingOperation' must either return a response with an 'Operation-Location' header that will contain a runtime link to the polling operation, or specify parameters and return type properties to map into the polling operation parameters.  A map into polling operation parameters can be created using the '@pollingOperationParameter' decorator",
-        },
-      ]);
-    });
-
-    it("handles custom lro with polling and final links", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        model PollingStatus {
-          @header location?: ResourceLocation<PollingStatus>;
-          @Azure.Core.lroStatus
-          statusValue: "Succeeded" | "Failed" | "Canceled" | "Running" | "NotStarted";
-        }
-        model SimpleWidget {
-          @key
-          @segment("simpleWidgets")
-          @visibility(Lifecycle.Read)
-          @path
-          id: string;
-          value: string;
-        }
-        @route("/simpleWidgets/{id}")
-        @get op getWidget(@path id: string): SimpleWidget;
-        @finalOperation(getWidget)
-        @pollingOperation(getStatus, {id: ResponseProperty<"id">; operationId: ResponseProperty<"operation">})
-        @route("/simpleWidgets/{id}")
-        @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operation: string};
-        @route("/simpleWidgets/{id}/operations/{operationId}")
-        @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
-        `,
-        "createWidget",
-      );
-
-      ok(metadata);
-      deepStrictEqual(metadata.finalStateVia, "original-uri");
-      deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
-      deepStrictEqual(metadata.envelopeResult.name, "PollingStatus");
-      deepStrictEqual(metadata.logicalPath, undefined);
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual(metadata.finalResultPath, undefined);
-
-      ok(metadata.finalStep);
-      deepStrictEqual(metadata.finalStep.kind, "finalOperationReference");
-      deepStrictEqual(metadata.finalStep.target?.kind, "reference");
-      deepStrictEqual(metadata.finalStep.target?.operation.name, "getWidget");
-      ok(metadata.statusMonitorStep);
-      deepStrictEqual(metadata.statusMonitorStep.target.kind, "reference");
-      deepStrictEqual(metadata.statusMonitorStep.target.operation.name, "getStatus");
-      ok(metadata.pollingInfo);
-      deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.kind, "model-property");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.property.name, "statusValue");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.canceledState, ["Canceled"]);
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.failedState, ["Failed"]);
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.succeededState, ["Succeeded"]);
-    });
-
-    it("handles custom lro with polling using polling parameter decorators by name", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        model PollingStatus {
-          @header location?: ResourceLocation<PollingStatus>;
-  
-          @Azure.Core.lroStatus
-          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-        }
-  
-        model SimpleWidget {
-          @key
-          @segment("simpleWidgets")
-          @visibility(Lifecycle.Read)
-          @path
-          id: string;
-  
-          value: string;
-        }
-  
-        @route("/simpleWidgets/{id}")
-        @get op getWidget(@path id: string): SimpleWidget;
-  
-        @finalOperation(getWidget)
-        @pollingOperation(getStatus)
-        @route("/simpleWidgets/{id}")
-        @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @pollingOperationParameter @header id: string, @pollingOperationParameter("operationId") @header("operation-id") operation: string};
-  
-        @route("/simpleWidgets/{id}/operations/{operationId}")
-        @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
-        `,
-        "createWidget",
-      );
-
-      ok(metadata);
-      deepStrictEqual(metadata.finalStateVia, "original-uri");
-      deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
-      deepStrictEqual(metadata.envelopeResult.name, "PollingStatus");
-      deepStrictEqual(metadata.logicalPath, undefined);
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual(metadata.finalResultPath, undefined);
-
-      ok(metadata.finalStep);
-      deepStrictEqual(metadata.finalStep.kind, "finalOperationReference");
-      deepStrictEqual(metadata.finalStep.target?.kind, "reference");
-      deepStrictEqual(metadata.finalStep.target?.operation.name, "getWidget");
-      ok(metadata.statusMonitorStep);
-      deepStrictEqual(metadata.statusMonitorStep.target.kind, "reference");
-      deepStrictEqual(metadata.statusMonitorStep.target.operation.name, "getStatus");
-      ok(metadata.pollingInfo);
-      deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.kind, "model-property");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.property.name, "statusValue");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.canceledState, ["Canceled"]);
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.failedState, ["Failed"]);
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.succeededState, ["Succeeded"]);
-    });
-
-    it("handles custom lro with polling using polling parameter decorators by reference", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        model PollingStatus {
-          @header location?: ResourceLocation<PollingStatus>;
-  
-          @Azure.Core.lroStatus
-          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-        }
-  
-        model SimpleWidget {
-          @key
-          @segment("simpleWidgets")
-          @visibility(Lifecycle.Read)
-          @path
-          id: string;
-  
-          value: string;
-        }
-  
-        @route("/simpleWidgets/{id}")
-        @get op getWidget(@path id: string): SimpleWidget;
-  
-        @finalOperation(getWidget)
-        @pollingOperation(getStatus)
-        @route("/simpleWidgets/{id}")
-        @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @pollingOperationParameter(getStatus::parameters.id) @header id: string, @pollingOperationParameter(getStatus::parameters.operationId) @header("operation-id") operation: string};
-  
-        @route("/simpleWidgets/{id}/operations/{operationId}")
-        @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
-        `,
-        "createWidget",
-      );
-
-      ok(metadata);
-      deepStrictEqual(metadata.finalStateVia, "original-uri");
-      deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
-      deepStrictEqual(metadata.envelopeResult.name, "PollingStatus");
-      deepStrictEqual(metadata.logicalPath, undefined);
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual(metadata.finalResultPath, undefined);
-
-      ok(metadata.finalStep);
-      deepStrictEqual(metadata.finalStep.kind, "finalOperationReference");
-      deepStrictEqual(metadata.finalStep.target?.kind, "reference");
-      deepStrictEqual(metadata.finalStep.target?.operation.name, "getWidget");
-      ok(metadata.statusMonitorStep);
-      deepStrictEqual(metadata.statusMonitorStep.target.kind, "reference");
-      deepStrictEqual(metadata.statusMonitorStep.target.operation.name, "getStatus");
-      ok(metadata.pollingInfo);
-      deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.kind, "model-property");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.property.name, "statusValue");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.canceledState, ["Canceled"]);
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.failedState, ["Failed"]);
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.succeededState, ["Succeeded"]);
-    });
-
-    it("handles custom lro status values", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        model PollingStatus {
-          @header location?: ResourceLocation<PollingStatus>;  
-          statusValue: CustomStatus;
-        }
-        
-        @Azure.Core.lroStatus
-        enum CustomStatus {
-          @Azure.Core.lroSucceeded
-          Successful: "Successful";
-          @Azure.Core.lroCanceled
-          Cancelled: "Cancelled";
-          @Azure.Core.lroFailed
-          Faulted: "Faulted";
-          Normal: "Running";
-        }
-  
-        model SimpleWidget {
-          @key
-          @segment("simpleWidgets")
-          @visibility(Lifecycle.Read)
-          @path
-          id: string;
-  
-          value: string;
-        }
-  
-        @route("/simpleWidgets/{id}")
-        @get op getWidget(@path id: string): SimpleWidget;
-  
-        @finalOperation(getWidget)
-        @pollingOperation(getStatus, {id: ResponseProperty<"id">; operationId: ResponseProperty<"operation">})
-        @route("/simpleWidgets/{id}")
-        @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operation: string};
-  
-        @route("/simpleWidgets/{id}/operations/{operationId}")
-        @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
-        `,
-        "createWidget",
-      );
-
-      ok(metadata);
-      deepStrictEqual(metadata.finalStateVia, "original-uri");
-      deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
-      deepStrictEqual(metadata.envelopeResult.name, "PollingStatus");
-      deepStrictEqual(metadata.logicalPath, undefined);
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual(metadata.finalResultPath, undefined);
-
-      ok(metadata.finalStep);
-      deepStrictEqual(metadata.finalStep.kind, "finalOperationReference");
-      deepStrictEqual(metadata.finalStep.target?.kind, "reference");
-      deepStrictEqual(metadata.finalStep.target?.operation.name, "getWidget");
-      ok(metadata.statusMonitorStep);
-      deepStrictEqual(metadata.statusMonitorStep.target.kind, "reference");
-      deepStrictEqual(metadata.statusMonitorStep.target.operation.name, "getStatus");
-      ok(metadata.pollingInfo);
-      deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.kind, "model-property");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.property.name, "statusValue");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.canceledState, ["Cancelled"]);
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.failedState, ["Faulted"]);
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.succeededState, ["Successful"]);
-    });
-
-    it("throws for missing success value", async () => {
-      const [_, diagnostics] = await getOperations(
-        `
-        model PollingStatus {
-          @header location?: ResourceLocation<PollingStatus>;
-          status: "Successful" | "Canceled" | "Failed";
-        }
-        model SimpleWidget {
-          @key
-          @segment("simpleWidgets")
-          @visibility(Lifecycle.Read)
-          @path
-          id: string;
-          value: string;
-        }
-        @route("/simpleWidgets/{id}")
-        @get op getWidget(@path id: string): SimpleWidget;
-        @finalOperation(getWidget)
-        @pollingOperation(getStatus, {id: ResponseProperty<"id">; operationId: ResponseProperty<"operation">})
-        @route("/simpleWidgets/{id}")
-        @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operation: string};
-        @route("/simpleWidgets/{id}/operations/{operationId}")
-        @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
-        `,
-      );
-
-      expectDiagnostics(diagnostics, [
-        {
-          code: "@azure-tools/typespec-azure-core/polling-operation-no-status-monitor",
-          message:
-            "The operation linked in  @pollingOperation must return a valid status monitor.  The status monitor model must contain a 'status' property, or a property decorated with  '@lroStatus'.  The status field must be of Enum or Union type and contain terminal status values for success and failure.",
-        },
-      ]);
-    });
-
-    it("handles custom lro with non-standard status and error fields", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `
-        model PollingStatus {
-          @header location?: ResourceLocation<PollingStatus>;
-  
-          @Azure.Core.lroStatus
-          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-  
-          @Azure.Core.lroResult
-          yeah: SimpleWidget;
-  
-          @Azure.Core.lroErrorResult
-          nay: Azure.Core.Foundations.Error;
-        }
-        
-        model SimpleWidget {
-          @key
-          @segment("simpleWidgets")
-          @visibility(Lifecycle.Read)
-          @path
-          id: string;
-  
-          value: string;
-        }
-  
-        @route("/simpleWidgets/{id}")
-        @get op getWidget(@path id: string): SimpleWidget;
-  
-        @finalOperation(getWidget)
-        @pollingOperation(getStatus, {id: ResponseProperty<"id">; operationId: ResponseProperty<"operation">})
-        @route("/simpleWidgets/{id}")
-        @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operation: string};
-  
-        @route("/simpleWidgets/{id}/operations/{operationId}")
-        @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
-        `,
-        "createWidget",
-      );
-      ok(metadata);
-      deepStrictEqual(metadata.finalStateVia, "original-uri");
-      deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
-      deepStrictEqual(metadata.envelopeResult.name, "PollingStatus");
-      deepStrictEqual(metadata.logicalPath, undefined);
-
-      deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
-      deepStrictEqual(metadata.finalResultPath, undefined);
-
-      ok(metadata.finalStep);
-      deepStrictEqual(metadata.finalStep.kind, "finalOperationReference");
-      deepStrictEqual(metadata.finalStep.target?.kind, "reference");
-      deepStrictEqual(metadata.finalStep.target?.operation.name, "getWidget");
-      ok(metadata.statusMonitorStep);
-      deepStrictEqual(metadata.statusMonitorStep.target.kind, "reference");
-      deepStrictEqual(metadata.statusMonitorStep.target.operation.name, "getStatus");
-      ok(metadata.pollingInfo);
-      deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.kind, "model-property");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.property.name, "statusValue");
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.canceledState, ["Canceled"]);
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.failedState, ["Failed"]);
-      deepStrictEqual(metadata.pollingInfo.terminationStatus.succeededState, ["Succeeded"]);
-      ok(metadata.pollingInfo.resultProperty);
-      deepStrictEqual(metadata.pollingInfo.resultProperty.name, "yeah");
-      ok(metadata.pollingInfo.errorProperty);
-      deepStrictEqual(metadata.pollingInfo.errorProperty.name, "nay");
-    });
-
-    it("emits diagnostics for multiple lro result fields", async () => {
-      const [_ops, diagnostics, _runner] = await getOperations(
-        `
-        model PollingStatus {
-          @header location?: ResourceLocation<PollingStatus>;
-  
-          @Azure.Core.lroStatus
-          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-  
-          @Azure.Core.lroResult
-          yeah: SimpleWidget;
-  
-          @Azure.Core.lroResult
-          notSoYeah: SimpleWidget;
-  
-          @Azure.Core.lroErrorResult
-          nay: Azure.Core.Foundations.Error;
-  
-          @Azure.Core.lroErrorResult
-          alsoNay: Azure.Core.Foundations.Error;
-        }
-        
-        model SimpleWidget {
-          @key
-          @segment("simpleWidgets")
-          @visibility(Lifecycle.Read)
-          @path
-          id: string;
-  
-          value: string;
-        }
-  
-        @route("/simpleWidgets/{id}")
-        @get op getWidget(@path id: string): SimpleWidget;
-  
-        @finalOperation(getWidget)
-        @pollingOperation(getStatus, {id: ResponseProperty<"id">; operationId: ResponseProperty<"operation">})
-        @route("/simpleWidgets/{id}")
-        @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operation: string};
-  
-        @route("/simpleWidgets/{id}/operations/{operationId}")
-        @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
-        `,
-      );
-      ok(diagnostics.length > 1);
-      expectDiagnostics(diagnostics, [
-        {
-          code: `@azure-tools/typespec-azure-core/lro-status-monitor-invalid-result-property`,
-          message: `StatusMonitor has more than one result property marked with '@lroResult'.  Ensure that only one property in the model is marked with this decorator.`,
-        },
-        {
-          code: `@azure-tools/typespec-azure-core/lro-status-monitor-invalid-result-property`,
-          message: `StatusMonitor has more than one error property marked with '@lroErrorResult'.  Ensure that only one property in the model is marked with this decorator.`,
-        },
-      ]);
-    });
-
-    it("emits diagnostic for invalid @lroResult property type (enum)", async () => {
-      const [_ops, diagnostics, _runner] = await getOperations(
-        `
-        enum MyStatus {
-          Active,
-          Inactive,
-        }
-
-        model PollingStatus {
-          @header location?: ResourceLocation<PollingStatus>;
-
-          @Azure.Core.lroStatus
-          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-
-          @Azure.Core.lroResult
-          result?: MyStatus;
-        }
-
-        model SimpleWidget {
-          @key
-          @segment("simpleWidgets")
-          @visibility(Lifecycle.Read)
-          @path
-          id: string;
-
-          value: string;
-        }
-
-        @route("/simpleWidgets/{id}")
-        @get op getWidget(@path id: string): SimpleWidget;
-
-        @finalOperation(getWidget)
-        @pollingOperation(getStatus, {id: ResponseProperty<"id">; operationId: ResponseProperty<"operation">})
-        @route("/simpleWidgets/{id}")
-        @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operation: string};
-
-        @route("/simpleWidgets/{id}/operations/{operationId}")
-        @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
-        `,
-      );
-      expectDiagnostics(diagnostics, [
-        {
-          code: `@azure-tools/typespec-azure-core/lro-status-monitor-invalid-result-property-type`,
-          message:
-            /Property 'result' used as the final result of a long-running operation has an invalid type '.*MyStatus'. The property type must be a Model, Scalar, or 'unknown'./,
-        },
-      ]);
-    });
-
-    it("Gets Lro undefined for sync operation", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `// Reuse CustomParameters and CustomResponseProperties in the "normal" TParams and TResponse fields
-        model OpParams {
-          value: string;
-          ...CustomParameters;
-        };
-  
-        model OpResponse is CustomResponseProperties {
-          message: string;
-        }
-         @test op update is Azure.Core.ResourceAction<TestModel, OpParams, OpResponse>;`,
-      );
-      deepStrictEqual(metadata, undefined);
-    });
-
-    it("Gets Lro undefined for sync operation with status field", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `// Reuse CustomParameters and CustomResponseProperties in the "normal" TParams and TResponse fields
-        model OpParams {
-          value: string;
-          ...CustomParameters;
-        };
-  
-        model OpResponse is CustomResponseProperties {
-          message: string;
-          status: "Succeeded" | "Failed" | "Canceled";
-        }
-         @test op update is Azure.Core.ResourceAction<TestModel, OpParams, OpResponse>;`,
-      );
-      deepStrictEqual(metadata, undefined);
-    });
-
-    it("Gets Lro undefined for sync operation with provisioningState field", async () => {
-      const [_, metadata] = await compileLroOperation(
-        `// Reuse CustomParameters and CustomResponseProperties in the "normal" TParams and TResponse fields
-        model OpParams {
-          value: string;
-          ...CustomParameters;
-        };
-  
-        model OpResponse is CustomResponseProperties {
-          message: string;
-          provisioningState: "Succeeded" | "Failed" | "Canceled";
-        }
-         @test op update is Azure.Core.ResourceAction<TestModel, OpParams, OpResponse>;`,
-      );
-      deepStrictEqual(metadata, undefined);
-    });
-
-    it("signatures with customizable responses do not accept unions for TResponse", async () => {
-      const [_, diagnostics] = await getOperations(`
-        model Foo {}
-        model Bar {}
-        @resource("widgets") model Widget { @key name: string; }
-        op customAction is Azure.Core.StandardResourceOperations.ResourceAction<Widget, {}, Foo | Bar>;
-        op customCollectionAction is Azure.Core.StandardResourceOperations.ResourceCollectionAction<Widget, {}, Foo | Bar>;
-        op rpcAction is Azure.Core.RpcOperation<{}, Foo | Bar>;
-  
-        op poll is StandardResourceOperations.GetResourceOperationStatus<Widget>;
-  
-        @Azure.Core.pollingOperation(poll)
-        op lroCustomAction is Azure.Core.StandardResourceOperations.LongRunningResourceAction<Widget, {}, Bar | Foo>;
-        @Azure.Core.pollingOperation(poll)
-        op lroCustomCollectionAction is Azure.Core.StandardResourceOperations.LongRunningResourceCollectionAction<Widget, {}, Bar | Foo>;
-        @Azure.Core.pollingOperation(poll)
-        op lroRpcAction is Azure.Core.LongRunningRpcOperation<{}, Bar | Foo, {}>;
-      `);
-
-      expectDiagnostics(diagnostics, [
-        {
-          code: "invalid-argument",
-        },
-        {
-          code: "invalid-argument",
-        },
-        {
-          code: "invalid-argument",
-        },
-        {
-          code: "invalid-argument",
-        },
-        {
-          code: "invalid-argument",
-        },
-        {
-          code: "invalid-argument",
-        },
-      ]);
-    });
-
-    describe("original-uri with no GET operation", () => {
-      async function compileLroWithDiagnostics(
-        code: string,
-        operationName?: string,
-      ): Promise<[HttpOperation, LroMetadata | undefined, TesterInstance]> {
-        let [operations, , runner] = await getOperations(
-          `
-          model TestModel {
-            @key
-            @segment("test")
-            name: string;
-            value: int32;
-          }
-
-          ${code}
-          `,
-        );
-
-        if (operationName !== undefined) {
-          operations = operations.filter((o) => o.operation.name === operationName);
-        }
-
-        strictEqual(operations.length, 1);
-        const lro = getLroMetadata(runner.program, operations[0].operation);
-        return [operations[0], lro, runner];
-      }
-
-      it("emits no-operation-at-original-uri for PUT with original-uri and no GET", async () => {
-        const [_, metadata, runner] = await compileLroWithDiagnostics(
-          `
-          model PollingStatus {
-            @Azure.Core.lroStatus
-            statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-          }
-
-          @route("/widgets/{id}/operations/{operationId}")
-          @get
-          op getStatus(@path id: string, @path operationId: string): PollingStatus;
-
-          @pollingOperation(getStatus, {operationId: ResponseProperty<"opId">})
-          @useFinalStateVia("original-uri")
-          @route("/widgets/{id}")
-          @put
-          op createWidget(@path id: string, @body body: TestModel): TestModel | {
-            @statusCode statusCode: 201;
-            @header opId: string;
-            @pollingLocation @header("Operation-Location") opLink: string;
-          };
-          `,
-          "createWidget",
-        );
-
-        ok(metadata);
-        expectDiagnostics(runner.program.diagnostics, [
-          {
-            code: "@azure-tools/typespec-azure-core/no-operation-at-original-uri",
-          },
-        ]);
-      });
-
-      it("emits no-operation-at-original-uri for PATCH with original-uri and no GET", async () => {
-        const [_, metadata, runner] = await compileLroWithDiagnostics(
-          `
-          model PollingStatus {
-            @Azure.Core.lroStatus
-            statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-          }
-
-          @route("/widgets/{id}/operations/{operationId}")
-          @get
-          op getStatus(@path id: string, @path operationId: string): PollingStatus;
-
-          @pollingOperation(getStatus, {operationId: ResponseProperty<"opId">})
-          @useFinalStateVia("original-uri")
-          @route("/widgets/{id}")
-          @patch
-          op updateWidget(@path id: string, @body body: TestModel): {
-            @statusCode statusCode: 200;
-            @header opId: string;
-            @pollingLocation @header("Operation-Location") opLink: string;
-            @bodyRoot body: TestModel;
-          } | {
-            @statusCode statusCode: 201;
-            @header opId: string;
-            @pollingLocation @header("Operation-Location") opLink: string;
-            @bodyRoot body: TestModel;
-          };
-          `,
-          "updateWidget",
-        );
-
-        ok(metadata);
-        expectDiagnostics(runner.program.diagnostics, [
-          {
-            code: "@azure-tools/typespec-azure-core/no-operation-at-original-uri",
-          },
-        ]);
-      });
-
-      it("emits no-operation-at-original-uri for POST with original-uri and no GET", async () => {
-        const [_, metadata, runner] = await compileLroWithDiagnostics(
-          `
-          model PollingStatus {
-            @Azure.Core.lroStatus
-            statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-          }
-
-          @route("/widgets/{id}/operations/{operationId}")
-          @get
-          op getStatus(@path id: string, @path operationId: string): PollingStatus;
-
-          @pollingOperation(getStatus, {operationId: ResponseProperty<"opId">})
-          @useFinalStateVia("original-uri")
-          @route("/widgets/{id}")
-          @post
-          op processWidget(@path id: string, @body body: TestModel): {
-            @statusCode statusCode: 202;
-            @header opId: string;
-            @pollingLocation @header("Operation-Location") opLink: string;
-          };
-          `,
-          "processWidget",
-        );
-
-        ok(metadata);
-        expectDiagnostics(runner.program.diagnostics, [
-          {
-            code: "@azure-tools/typespec-azure-core/no-operation-at-original-uri",
-          },
-        ]);
-      });
-
-      it("returns void finalResult for PUT with original-uri and no GET when diagnostic is suppressed", async () => {
-        const [_, metadata] = await compileLroWithDiagnostics(
-          `
-          model PollingStatus {
-            @Azure.Core.lroStatus
-            statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-          }
-
-          @route("/widgets/{id}/operations/{operationId}")
-          @get
-          op getStatus(@path id: string, @path operationId: string): PollingStatus;
-
-          @pollingOperation(getStatus, {operationId: ResponseProperty<"opId">})
-          #suppress "@azure-tools/typespec-azure-core/no-operation-at-original-uri" "No GET at original URI"
-          @useFinalStateVia("original-uri")
-          @route("/widgets/{id}")
-          @put
-          op createWidget(@path id: string, @body body: TestModel): TestModel | {
-            @statusCode statusCode: 201;
-            @header opId: string;
-            @pollingLocation @header("Operation-Location") opLink: string;
-          };
-          `,
-          "createWidget",
-        );
-
-        ok(metadata);
-        deepStrictEqual(metadata.finalStateVia, "original-uri");
-        deepStrictEqual(metadata.finalResult, "void");
-        deepStrictEqual(metadata.finalEnvelopeResult, "void");
-      });
-
-      it("returns void finalResult for PATCH with original-uri and no GET when diagnostic is suppressed", async () => {
-        const [_, metadata] = await compileLroWithDiagnostics(
-          `
-          model PollingStatus {
-            @Azure.Core.lroStatus
-            statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-          }
-
-          @route("/widgets/{id}/operations/{operationId}")
-          @get
-          op getStatus(@path id: string, @path operationId: string): PollingStatus;
-
-          @pollingOperation(getStatus, {operationId: ResponseProperty<"opId">})
-          #suppress "@azure-tools/typespec-azure-core/no-operation-at-original-uri" "No GET at original URI"
-          @useFinalStateVia("original-uri")
-          @route("/widgets/{id}")
-          @patch
-          op updateWidget(@path id: string, @body body: TestModel): {
-            @statusCode statusCode: 200;
-            @header opId: string;
-            @pollingLocation @header("Operation-Location") opLink: string;
-            @bodyRoot body: TestModel;
-          } | {
-            @statusCode statusCode: 201;
-            @header opId: string;
-            @pollingLocation @header("Operation-Location") opLink: string;
-            @bodyRoot body: TestModel;
-          };
-          `,
-          "updateWidget",
-        );
-
-        ok(metadata);
-        deepStrictEqual(metadata.finalStateVia, "original-uri");
-        deepStrictEqual(metadata.finalResult, "void");
-        deepStrictEqual(metadata.finalEnvelopeResult, "void");
-      });
-
-      it("returns void finalResult for POST with original-uri and no GET when diagnostic is suppressed", async () => {
-        const [_, metadata] = await compileLroWithDiagnostics(
-          `
-          model PollingStatus {
-            @Azure.Core.lroStatus
-            statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-          }
-
-          @route("/widgets/{id}/operations/{operationId}")
-          @get
-          op getStatus(@path id: string, @path operationId: string): PollingStatus;
-
-          @pollingOperation(getStatus, {operationId: ResponseProperty<"opId">})
-          #suppress "@azure-tools/typespec-azure-core/no-operation-at-original-uri" "No GET at original URI"
-          @useFinalStateVia("original-uri")
-          @route("/widgets/{id}")
-          @post
-          op processWidget(@path id: string, @body body: TestModel): {
-            @statusCode statusCode: 202;
-            @header opId: string;
-            @pollingLocation @header("Operation-Location") opLink: string;
-          };
-          `,
-          "processWidget",
-        );
-
-        ok(metadata);
-        deepStrictEqual(metadata.finalStateVia, "original-uri");
-        deepStrictEqual(metadata.finalResult, "void");
-        deepStrictEqual(metadata.finalEnvelopeResult, "void");
-      });
-
-      it("does not emit no-operation-at-original-uri when GET exists at same path", async () => {
-        const [_, metadata, runner] = await compileLroWithDiagnostics(
-          `
-          model PollingStatus {
-            @Azure.Core.lroStatus
-            statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
-          }
-
-          @route("/widgets/{id}/operations/{operationId}")
-          @get
-          op getStatus(@path id: string, @path operationId: string): PollingStatus;
-
-          @route("/widgets/{id}")
-          @get
-          op getWidget(@path id: string): TestModel;
-
-          @pollingOperation(getStatus, {operationId: ResponseProperty<"opId">})
-          @useFinalStateVia("original-uri")
-          @route("/widgets/{id}")
-          @put
-          op createWidget(@path id: string, @body body: TestModel): TestModel | {
-            @statusCode statusCode: 201;
-            @header opId: string;
-            @pollingLocation @header("Operation-Location") opLink: string;
-          };
-          `,
-          "createWidget",
-        );
-
-        ok(metadata);
-        deepStrictEqual(metadata.finalStateVia, "original-uri");
-        expectDiagnosticEmpty(
-          runner.program.diagnostics.filter(
-            (d) => d.code === "@azure-tools/typespec-azure-core/no-operation-at-original-uri",
-          ),
-        );
-      });
-    });
-  });
-
-  // Regression test for https://github.com/Azure/typespec-azure/issues/332
-  it("doesn't crash when passing non model to ServiceTraits", async () => {
-    const [_, diagnostics] = await getOperations(`
-      alias Operations = Azure.Core.ResourceOperations<abc>;
-    `);
-    expectDiagnostics(
-      diagnostics.filter((x) => x.severity === "error"),
-      [
-        {
-          code: "invalid-ref",
-          message: "Unknown identifier abc",
-        },
-        {
-          code: "invalid-argument",
-        },
-      ],
+          @bodyRoot body?: SimpleWidget
+        };      
+      `,
+      "createWidget",
     );
+    ok(metadata);
+    deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
+    deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
+    deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
+
+    deepStrictEqual(metadata.pollingInfo?.responseModel.name, "PollingStatus");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "statusValue");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
+
+    deepStrictEqual(metadata.finalStep?.kind, "finalOperationLink");
+    deepStrictEqual(metadata.finalStep?.target?.kind, "link");
+    deepStrictEqual((metadata.finalStep?.target as any).location, "ResponseHeader");
+    deepStrictEqual((metadata.finalStep?.target as any).property.name, "location");
+
+    deepStrictEqual(metadata.finalStateVia, "location");
+    deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
+    deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
+    deepStrictEqual(metadata?.logicalPath, undefined);
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual(metadata.finalResultPath, undefined);
   });
+
+  it("Gets Lro for arm-style azure-async operation polling in createOrReplace operations", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+      model PollingStatus {
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+      }
+      model SimpleWidget {
+        @key
+        @segment("simpleWidgets")
+        @visibility(Lifecycle.Read)
+        @path
+        id: string;
+        provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
+        value: string;
+      }
+      
+      @route("/simpleWidgets/{id}")
+      @createsOrReplacesResource(SimpleWidget)
+      @put op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
+        {
+          @statusCode statusCode: 201;
+          @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
+          @bodyRoot body?: SimpleWidget
+        };      
+      `,
+      "createWidget",
+    );
+    ok(metadata);
+    deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
+    deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
+    deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
+
+    deepStrictEqual(metadata.pollingInfo?.responseModel.name, "PollingStatus");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "statusValue");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
+
+    deepStrictEqual(metadata.finalStep, undefined);
+
+    deepStrictEqual(metadata.finalStateVia, "original-uri");
+    deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
+    deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
+    deepStrictEqual(metadata?.logicalPath, undefined);
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual(metadata.finalResultPath, undefined);
+  });
+
+  it("Gets Lro for arm-style location polling in createOrReplace operations", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+      model SimpleWidget {
+        @key
+        @segment("simpleWidgets")
+        @visibility(Lifecycle.Read)
+        @path
+        id: string;
+        provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
+        value: string;
+      }
+      
+      @route("/simpleWidgets/{id}")
+      @createsOrUpdatesResource(SimpleWidget)
+      @put op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
+        {
+          @statusCode statusCode: 201;
+          @pollingLocation(StatusMonitorPollingOptions<SimpleWidget>) @header("location") opLink: string,
+          @bodyRoot body?: SimpleWidget
+        };      
+      `,
+      "createWidget",
+    );
+    ok(metadata);
+    deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
+    deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
+    deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
+
+    deepStrictEqual(metadata.pollingInfo?.responseModel.name, "SimpleWidget");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "provisioningState");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
+    deepStrictEqual(metadata.finalStep, undefined);
+
+    deepStrictEqual(metadata.finalStateVia, "original-uri");
+    deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
+    deepStrictEqual(metadata?.envelopeResult.name, "SimpleWidget");
+    deepStrictEqual(metadata?.logicalPath, undefined);
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual(metadata.finalResultPath, undefined);
+  });
+
+  it("Gets Lro for arm-style azure-async + location operation polling in update operations", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+      model PollingStatus {
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+      }
+      model SimpleWidget {
+        @key
+        @segment("simpleWidgets")
+        @visibility(Lifecycle.Read)
+        @path
+        id: string;
+        provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
+        value: string;
+      }
+      
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+      @route("/simpleWidgets/{id}")
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+      @patch(#{implicitOptionality: true}) op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
+        {
+          @statusCode statusCode: 201;
+          @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
+          @finalLocation(SimpleWidget)
+          @header location: string;
+          @bodyRoot body?: SimpleWidget
+        };      
+      `,
+      "createWidget",
+    );
+    ok(metadata);
+    deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
+    deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
+    deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
+
+    deepStrictEqual(metadata.pollingInfo?.responseModel.name, "PollingStatus");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "statusValue");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
+
+    deepStrictEqual(metadata.finalStep?.kind, "finalOperationLink");
+    deepStrictEqual(metadata.finalStep?.target?.kind, "link");
+    deepStrictEqual((metadata.finalStep?.target as any).location, "ResponseHeader");
+    deepStrictEqual((metadata.finalStep?.target as any).property.name, "location");
+
+    deepStrictEqual(metadata.finalStateVia, "location");
+    deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
+    deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
+    deepStrictEqual(metadata?.logicalPath, undefined);
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual(metadata.finalResultPath, undefined);
+  });
+
+  it("Gets Lro for arm-style azure-async operation polling in update operations", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+      model PollingStatus {
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+        @finalLocation(SimpleWidget)
+        @header location: string;
+      }
+      model SimpleWidget {
+        @key
+        @segment("simpleWidgets")
+        @visibility(Lifecycle.Read)
+        @path
+        id: string;
+        provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
+        value: string;
+      }
+      
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+      @route("/simpleWidgets/{id}")
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+      @patch(#{implicitOptionality: true}) op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
+        {
+          @statusCode statusCode: 201;
+          @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
+          @bodyRoot body?: SimpleWidget
+        };      
+      `,
+      "createWidget",
+    );
+    ok(metadata);
+    deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
+    deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
+    deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
+
+    deepStrictEqual(metadata.pollingInfo?.responseModel.name, "PollingStatus");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "statusValue");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
+
+    ok(metadata.finalStep);
+    deepStrictEqual(metadata.finalStep.kind, "finalOperationLink");
+    deepStrictEqual((metadata.finalStep.responseModel as Model).name, "SimpleWidget");
+    deepStrictEqual(metadata.finalStep.target?.property.name, "location");
+
+    deepStrictEqual(metadata.finalStateVia, "location");
+    deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
+    deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
+    deepStrictEqual(metadata?.logicalPath, undefined);
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual(metadata.finalResultPath, undefined);
+  });
+
+  it("Gets Lro for arm-style location polling in update operations", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+      model SimpleWidget {
+        @key
+        @segment("simpleWidgets")
+        @visibility(Lifecycle.Read)
+        @path
+        id: string;
+        provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
+        value: string;
+      }
+      
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+      @route("/simpleWidgets/{id}")
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+      @patch(#{implicitOptionality: true}) op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
+        {
+          @statusCode statusCode: 201;
+          @finalLocation(SimpleWidget) @pollingLocation(StatusMonitorPollingOptions<SimpleWidget>) @header("location") opLink: string,
+          @bodyRoot body?: SimpleWidget
+        };      
+      `,
+      "createWidget",
+    );
+    ok(metadata);
+    deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
+    deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
+    deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
+
+    deepStrictEqual(metadata.pollingInfo?.responseModel.name, "SimpleWidget");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "provisioningState");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
+    ok(metadata.finalStep);
+    deepStrictEqual(metadata.finalStep.kind, "finalOperationLink");
+    deepStrictEqual((metadata.finalStep.responseModel as Model).name, "SimpleWidget");
+    deepStrictEqual(metadata.finalStep?.target?.kind, "link");
+    deepStrictEqual((metadata.finalStep?.target as any).location, "ResponseHeader");
+    deepStrictEqual((metadata.finalStep?.target as any).property.name, "opLink");
+
+    deepStrictEqual(metadata.finalStateVia, "location");
+    deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
+    deepStrictEqual(metadata?.envelopeResult.name, "SimpleWidget");
+    deepStrictEqual(metadata?.logicalPath, undefined);
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual(metadata.finalResultPath, undefined);
+  });
+
+  it("Gets Lro for arm-style azure-async + location operation polling in action operations", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+      model PollingStatus {
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+      }
+      model SimpleWidget {
+        @key
+        @segment("simpleWidgets")
+        @visibility(Lifecycle.Read)
+        @path
+        id: string;
+        provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
+        value: string;
+      }
+      
+      @route("/simpleWidgets/{id}")
+      @post op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
+        {
+          @statusCode statusCode: 202;
+          @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
+          @finalLocation(SimpleWidget)
+          @header location: string;
+          @bodyRoot body?: SimpleWidget
+        };      
+      `,
+      "createWidget",
+    );
+    ok(metadata);
+    deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
+    deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
+    deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
+
+    deepStrictEqual(metadata.pollingInfo?.responseModel.name, "PollingStatus");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "statusValue");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
+
+    deepStrictEqual(metadata.finalStep?.kind, "finalOperationLink");
+    deepStrictEqual(metadata.finalStep?.target?.kind, "link");
+    deepStrictEqual((metadata.finalStep?.target as any).location, "ResponseHeader");
+    deepStrictEqual((metadata.finalStep?.target as any).property.name, "location");
+
+    deepStrictEqual(metadata.finalStateVia, "location");
+    deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
+    deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
+    deepStrictEqual(metadata?.logicalPath, undefined);
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual(metadata.finalResultPath, undefined);
+  });
+
+  it("Gets Lro for arm-style azure-async operation polling in action operations", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+      model PollingStatus {
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+      }
+      model SimpleWidget {
+        @key
+        @segment("simpleWidgets")
+        @visibility(Lifecycle.Read)
+        @path
+        id: string;
+        provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
+        value: string;
+      }
+      
+      @route("/simpleWidgets/{id}")
+      @post op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
+        {
+          @statusCode statusCode: 202;
+          @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
+          @bodyRoot body?: SimpleWidget
+        };      
+      `,
+      "createWidget",
+    );
+    ok(metadata);
+    deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
+    deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
+    deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
+
+    deepStrictEqual(metadata.pollingInfo?.responseModel.name, "PollingStatus");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "statusValue");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
+
+    ok(metadata.finalStep);
+    deepStrictEqual(metadata.finalStep?.kind, "noPollingResult");
+
+    deepStrictEqual(metadata.finalStateVia, "azure-async-operation");
+    deepStrictEqual(metadata.logicalResult.name, "PollingStatus");
+    deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
+    deepStrictEqual(metadata?.logicalPath, undefined);
+
+    deepStrictEqual(metadata.finalResult, "void");
+    deepStrictEqual(metadata.finalEnvelopeResult, "void");
+    deepStrictEqual(metadata.finalResultPath, undefined);
+  });
+
+  it("Gets Lro for arm-style location polling in action operations", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+      model SimpleWidget {
+        @key
+        @segment("simpleWidgets")
+        @visibility(Lifecycle.Read)
+        @path
+        id: string;
+        provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
+        value: string;
+      }
+      
+      @route("/simpleWidgets/{id}")
+      @post op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
+        {
+          @statusCode statusCode: 202;
+          @finalLocation(SimpleWidget) @pollingLocation(StatusMonitorPollingOptions<SimpleWidget>) @header("location") opLink: string,
+          @bodyRoot body?: SimpleWidget
+        };      
+      `,
+      "createWidget",
+    );
+    ok(metadata);
+    deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
+    deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
+    deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
+
+    deepStrictEqual(metadata.pollingInfo?.responseModel.name, "SimpleWidget");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "provisioningState");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
+    ok(metadata.finalStep);
+    deepStrictEqual(metadata.finalStep?.kind, "finalOperationLink");
+    deepStrictEqual(metadata.finalStep?.target?.kind, "link");
+    deepStrictEqual((metadata.finalStep?.target as any).location, "ResponseHeader");
+    deepStrictEqual((metadata.finalStep?.target as any).property.name, "opLink");
+
+    deepStrictEqual(metadata.finalStateVia, "location");
+    deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
+    deepStrictEqual(metadata?.envelopeResult.name, "SimpleWidget");
+    deepStrictEqual(metadata?.logicalPath, undefined);
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual(metadata.finalResultPath, undefined);
+  });
+
+  it("Gets Lro for arm-style azure-async operation polling in delete operations", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+      model PollingStatus {
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+      }
+      
+      @route("/simpleWidgets/{id}")
+      @delete op deleteWidget(@path id: string) : {
+          @statusCode statusCode: 201;
+          @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
+        };      
+      `,
+      "deleteWidget",
+    );
+    ok(metadata);
+    deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
+    deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
+    deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
+
+    deepStrictEqual(metadata.pollingInfo?.responseModel.name, "PollingStatus");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "statusValue");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
+
+    //ok(metadata.finalStep);
+    //deepStrictEqual(metadata.finalStep?.kind, "noPollingResult");
+
+    deepStrictEqual(metadata.finalStateVia, "azure-async-operation");
+    deepStrictEqual(metadata.logicalResult.name, "PollingStatus");
+    deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
+    deepStrictEqual(metadata?.logicalPath, undefined);
+
+    deepStrictEqual(metadata.finalResult, "void");
+    deepStrictEqual(metadata.finalEnvelopeResult, "void");
+    deepStrictEqual(metadata.finalResultPath, undefined);
+  });
+
+  it("Gets Lro for arm-style location polling in delete operations", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+      model PollingStatus {
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+      }
+      
+      @route("/simpleWidgets/{id}")
+      @delete op deleteWidget(@path id: string) : {
+          @statusCode statusCode: 201;
+          @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("location") opLink: string,
+        };      
+      `,
+      "deleteWidget",
+    );
+    ok(metadata);
+    deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
+    deepStrictEqual((metadata.statusMonitorStep?.target as any).location, "ResponseHeader");
+    deepStrictEqual((metadata.statusMonitorStep?.target as any).property.name, "opLink");
+
+    deepStrictEqual(metadata.pollingInfo?.responseModel.name, "PollingStatus");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.kind, "model-property");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.property.name, "statusValue");
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus?.canceledState, ["Canceled"]);
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.failedState, ["Failed"]);
+    deepStrictEqual(metadata.pollingInfo?.terminationStatus.succeededState, ["Succeeded"]);
+    //ok(metadata.finalStep);
+    //deepStrictEqual(metadata.finalStep?.kind, "noPollingResult");
+
+    deepStrictEqual(metadata.finalStateVia, "location");
+    deepStrictEqual(metadata.logicalResult.name, "PollingStatus");
+    deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
+    deepStrictEqual(metadata?.logicalPath, undefined);
+
+    deepStrictEqual(metadata.finalResult, "void");
+    deepStrictEqual(metadata.finalEnvelopeResult, "void");
+    deepStrictEqual(metadata.finalResultPath, undefined);
+  });
+
+  it("Gets Lro for non-standard polling in custom createOrReplace operations without finalLocation", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+      model PollingStatus {
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+      }
+      
+      model SimpleWidget {
+        @key
+        @segment("simpleWidgets")
+        @visibility(Lifecycle.Read)
+        @path
+        id: string;
+      
+        value: string;
+      }
+      
+      @route("/simpleWidgets/{id}/operations/{operationId}")
+      @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
+      
+      @pollingOperation(getStatus)
+      @route("/simpleWidgets/{id}")
+      @createsOrReplacesResource(SimpleWidget)
+      @put op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
+        {
+          @statusCode statusCode: 201;
+          @header id: string,
+          @header("operation-id") operate: string,
+          @pollingLocation @header("Operation-Location") opLink: string,
+          @lroResult @bodyRoot body?: SimpleWidget
+        };      
+      `,
+      "createWidget",
+    );
+
+    ok(metadata);
+    deepStrictEqual(metadata.finalStateVia, "original-uri");
+    deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
+    deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
+    deepStrictEqual(metadata?.logicalPath, undefined);
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual(metadata?.finalResultPath, undefined);
+
+    ok(metadata.statusMonitorStep);
+    deepStrictEqual(metadata.statusMonitorStep.target.kind, "link");
+    deepStrictEqual((metadata.statusMonitorStep.target as any)?.location, "ResponseHeader");
+    deepStrictEqual((metadata.statusMonitorStep.target as any)?.property.name, "opLink");
+
+    ok(metadata.pollingInfo);
+    deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.kind, "model-property");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.property.name, "statusValue");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.canceledState, ["Canceled"]);
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.failedState, ["Failed"]);
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.succeededState, ["Succeeded"]);
+  });
+
+  it("Gets Lro for non-standard polling in post operations", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+      model PollingStatus {
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+        result?: SimpleWidget;
+      }
+      
+      model SimpleWidget {
+        @key
+        @segment("simpleWidgets")
+        @visibility(Lifecycle.Read)
+        @path
+        id: string;
+      
+        value: string;
+      }
+      
+      @route("/simpleWidgets/{id}/operations/{operationId}")
+      @get
+      op getStatus(@path id: string, @path operationId: string): PollingStatus & {@header correlationId: string;};
+      
+      @pollingOperation(getStatus, {operationId: ResponseProperty<"operate">})
+      @route("/simpleWidgets/{id}")
+      @post
+      op mungeWidget(@path id: string, body: SimpleWidget): SimpleWidget | {
+        @statusCode statusCode: 201;
+        @header id: string;
+        @header("operation-id") operate: string;
+        @pollingLocation @header("Operation-Location") opLink: string;
+        @lroResult @bodyRoot body?: SimpleWidget;
+      };
+      `,
+      "mungeWidget",
+    );
+
+    ok(metadata);
+    deepStrictEqual(metadata.finalStateVia, "custom-operation-reference");
+    deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
+    deepStrictEqual(metadata?.envelopeResult.name, "PollingStatus");
+    deepStrictEqual(metadata?.logicalPath, "result");
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "PollingStatus");
+    deepStrictEqual(metadata?.finalResultPath, "result");
+
+    ok(metadata.statusMonitorStep);
+    deepStrictEqual(metadata.statusMonitorStep.target.kind, "reference");
+
+    ok(metadata.finalStep);
+    deepStrictEqual(metadata.finalStep.kind, "pollingSuccessProperty");
+    deepStrictEqual(metadata.finalStep.target?.kind, "ModelProperty");
+
+    ok(metadata.pollingInfo);
+    deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.kind, "model-property");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.property.name, "statusValue");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.canceledState, ["Canceled"]);
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.failedState, ["Failed"]);
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.succeededState, ["Succeeded"]);
+  });
+
+  it("Gets Lro for non-standard polling with void return type", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+      using Azure.Core.Traits;
+      
+      alias ServiceTraits = SupportsClientRequestId &
+      NoConditionalRequests &
+      NoRepeatableRequests;
+    
+      alias ServiceOperations = Azure.Core.ResourceOperations<ServiceTraits>;
+
+      @lroStatus
+      enum OperationStatus {
+        NotStarted,
+        Running,
+        Succeeded,
+        Failed,
+        Canceled,
+      }
+      
+      enum ImportType {
+        Devices,
+        Modules,
+        All,
+      }
+      
+      @resource("management/operations")
+      model DeviceOperation {
+        @key
+        @visibility(Lifecycle.Read)
+        operationId: string;
+        error?: Azure.Core.Foundations.Error;
+      }
+      
+      @resource("updates/operations")
+      model UpdateOperation {
+        @key
+        @visibility(Lifecycle.Read)
+        operationId: string;
+        status: OperationStatus;
+        resourceLocation?: string;
+        error?: Azure.Core.Foundations.Error;
+      }
+      
+      model IfNoneMatchParameter {
+        @TypeSpec.Http.header("If-None-Match")
+        ifNoneMatch?: string;
+      }
+      
+      op getOperationStatus is ServiceOperations.ResourceRead<
+        UpdateOperation,
+        TraitOverride<RequestHeadersTrait<
+          {
+            ...IfNoneMatchParameter;
+          },
+          TraitContext.Read
+        >>
+      >;
+      
+      @pollingOperation(getOperationStatus)
+      @route("management/devices:import")
+      @post
+      op importDevices is Azure.Core.Foundations.Operation<
+        {
+          @body
+          importType: ImportType;
+        },
+        {
+          @statusCode _: 202;
+      
+          @pollingLocation
+          @header("Operation-Location")
+          operationLocation?: ResourceLocation<DeviceOperation>;
+        }
+      >;`,
+      "importDevices",
+    );
+
+    ok(metadata);
+    deepStrictEqual(metadata.finalStateVia, "operation-location");
+    deepStrictEqual(metadata.logicalResult.name, "UpdateOperation");
+    deepStrictEqual(metadata?.envelopeResult.name, "UpdateOperation");
+    deepStrictEqual(metadata?.logicalPath, undefined);
+
+    deepStrictEqual(metadata.finalResult, "void");
+    deepStrictEqual(metadata?.finalEnvelopeResult, "void");
+    deepStrictEqual(metadata?.logicalPath, undefined);
+
+    ok(metadata.statusMonitorStep);
+    deepStrictEqual(metadata.statusMonitorStep.target.kind, "link");
+
+    ok(metadata.finalStep);
+    deepStrictEqual(metadata.finalStep.kind, "noPollingResult");
+
+    ok(metadata.pollingInfo);
+    deepStrictEqual(metadata.pollingInfo.responseModel.name, "UpdateOperation");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.kind, "model-property");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.property.name, "status");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.canceledState, ["Canceled"]);
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.failedState, ["Failed"]);
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.succeededState, ["Succeeded"]);
+  });
+
+  it("Gets Lro for status monitor with scalar result type", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+      model PollingStatus {
+        @header location?: ResourceLocation<PollingStatus>;
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+        @Azure.Core.lroResult
+        result?: string;
+      }
+      @route("/scalarResult/operations/{operationId}")
+      @get op getScalarStatus(@path operationId: string): PollingStatus;
+      @pollingOperation(getScalarStatus, {operationId: ResponseProperty<"operationId">})
+      @route("/scalarResult")
+      @post @test op startScalarOp(@body body: {}): {
+        @statusCode _: 202;
+        @header("operation-id") operationId: string;
+      };
+      `,
+      "startScalarOp",
+    );
+    ok(metadata);
+    deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationReference");
+    deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "PollingStatus");
+
+    deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
+    deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
+    deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "result");
+
+    deepStrictEqual(metadata.envelopeResult.name, "PollingStatus");
+    deepStrictEqual(metadata.logicalPath, "result");
+
+    // The final result should be a Scalar type (string), not "void"
+    ok(metadata.finalResult !== "void");
+    ok(metadata.finalResult !== undefined);
+    strictEqual((metadata.finalResult as Scalar).kind, "Scalar");
+    strictEqual((metadata.finalResult as Scalar).name, "string");
+
+    deepStrictEqual((metadata.finalEnvelopeResult as Model).name, "PollingStatus");
+    deepStrictEqual(metadata.finalResultPath, "result");
+
+    // logicalResult should be the polling response model when the actual result is a scalar
+    strictEqual(metadata.logicalResult.name, "PollingStatus");
+
+    // finalStep should be pollingSuccessProperty with scalar responseModel
+    ok(metadata.finalStep);
+    deepStrictEqual(metadata.finalStep.kind, "pollingSuccessProperty");
+    if (metadata.finalStep.kind === "pollingSuccessProperty") {
+      strictEqual(metadata.finalStep.responseModel.kind, "Scalar");
+      strictEqual((metadata.finalStep.responseModel as Scalar).name, "string");
+    }
+  });
+
+  it("ignores bad lro operation links with Operation-Location", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+      model PollingStatus {
+        @header location?: ResourceLocation<PollingStatus>;
+
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+      }
+
+      model SimpleWidget {
+        @key
+        @segment("simpleWidgets")
+        @visibility(Lifecycle.Read)
+        @path
+        id: string;
+
+        value: string;
+      }
+
+      @route("/simpleWidgets/{id}")
+      @get op getWidget(@path id: string): SimpleWidget;
+
+      @finalOperation(getWidget)
+      @pollingOperation(getStatus, {id: ResponseProperty<"id">})
+      @route("/simpleWidgets/{id}")
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+      @patch(#{implicitOptionality: true}) op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operate: string, @header("Operation-Location")opLink: string};
+
+      @route("/simpleWidgets/{id}/operations/{operationId}")
+      @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
+      `,
+      "createWidget",
+    );
+
+    ok(metadata);
+    deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
+    deepStrictEqual(metadata.envelopeResult.name, "PollingStatus");
+    deepStrictEqual(metadata.finalStateVia, "original-uri");
+    ok(metadata.finalStep);
+    deepStrictEqual(metadata.finalStep.kind, "finalOperationReference");
+    deepStrictEqual(metadata.finalStep.target?.kind, "reference");
+    deepStrictEqual(metadata.finalStep.target?.operation.name, "getWidget");
+    ok(metadata.statusMonitorStep);
+    deepStrictEqual(metadata.statusMonitorStep.target.kind, "link");
+    ok(metadata.pollingInfo);
+    deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.kind, "model-property");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.property.name, "statusValue");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.canceledState, ["Canceled"]);
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.failedState, ["Failed"]);
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.succeededState, ["Succeeded"]);
+  });
+
+  it("ignores bad lro operation links with @pollingLocation", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+      model PollingStatus {
+        @header location?: ResourceLocation<PollingStatus>;
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+      }
+      model SimpleWidget {
+        @key
+        @segment("simpleWidgets")
+        @visibility(Lifecycle.Read)
+        @path
+        id: string;
+        value: string;
+      }
+      @route("/simpleWidgets/{id}")
+      @get op getWidget(@path id: string): SimpleWidget;
+      @finalOperation(getWidget)
+      @pollingOperation(getStatus, {id: ResponseProperty<"id">})
+      @route("/simpleWidgets/{id}")
+      @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operate: string, @Azure.Core.pollingLocation opLink: string};
+      @route("/simpleWidgets/{id}/operations/{operationId}")
+      @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
+      `,
+      "createWidget",
+    );
+
+    ok(metadata);
+    deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
+    deepStrictEqual(metadata.envelopeResult.name, "PollingStatus");
+    deepStrictEqual(metadata.finalStateVia, "original-uri");
+    ok(metadata.finalStep);
+    deepStrictEqual(metadata.finalStep.kind, "finalOperationReference");
+    deepStrictEqual(metadata.finalStep.target?.kind, "reference");
+    deepStrictEqual(metadata.finalStep.target?.operation.name, "getWidget");
+    ok(metadata.statusMonitorStep);
+    deepStrictEqual(metadata.statusMonitorStep.target.kind, "link");
+    ok(metadata.pollingInfo);
+    deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.kind, "model-property");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.property.name, "statusValue");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.canceledState, ["Canceled"]);
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.failedState, ["Failed"]);
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.succeededState, ["Succeeded"]);
+  });
+
+  it("throws with bad lro operation links and no polling header", async () => {
+    const [_, diagnostics] = await getOperations(
+      `
+      model PollingStatus {
+        @header location?: ResourceLocation<PollingStatus>;
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+      }
+      model SimpleWidget {
+        @key
+        @segment("simpleWidgets")
+        @visibility(Lifecycle.Read)
+        @path
+        id: string;
+        value: string;
+      }
+      @route("/simpleWidgets/{id}")
+      @get op getWidget(@path id: string): SimpleWidget;
+      @finalOperation(getWidget)
+      @pollingOperation(getStatus, {id: ResponseProperty<"id">})
+      @route("/simpleWidgets/{id}")
+      @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operate: string};
+      @route("/simpleWidgets/{id}/operations/{operationId}")
+      @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
+      `,
+    );
+
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-azure-core/polling-operation-no-ref-or-link",
+        message:
+          "An operation decorated with '@pollingOperation' must either return a response with an 'Operation-Location' header that will contain a runtime link to the polling operation, or specify parameters and return type properties to map into the polling operation parameters.  A map into polling operation parameters can be created using the '@pollingOperationParameter' decorator",
+      },
+    ]);
+  });
+
+  it("handles custom lro with polling and final links", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+      model PollingStatus {
+        @header location?: ResourceLocation<PollingStatus>;
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Failed" | "Canceled" | "Running" | "NotStarted";
+      }
+      model SimpleWidget {
+        @key
+        @segment("simpleWidgets")
+        @visibility(Lifecycle.Read)
+        @path
+        id: string;
+        value: string;
+      }
+      @route("/simpleWidgets/{id}")
+      @get op getWidget(@path id: string): SimpleWidget;
+      @finalOperation(getWidget)
+      @pollingOperation(getStatus, {id: ResponseProperty<"id">; operationId: ResponseProperty<"operation">})
+      @route("/simpleWidgets/{id}")
+      @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operation: string};
+      @route("/simpleWidgets/{id}/operations/{operationId}")
+      @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
+      `,
+      "createWidget",
+    );
+
+    ok(metadata);
+    deepStrictEqual(metadata.finalStateVia, "original-uri");
+    deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
+    deepStrictEqual(metadata.envelopeResult.name, "PollingStatus");
+    deepStrictEqual(metadata.logicalPath, undefined);
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual(metadata.finalResultPath, undefined);
+
+    ok(metadata.finalStep);
+    deepStrictEqual(metadata.finalStep.kind, "finalOperationReference");
+    deepStrictEqual(metadata.finalStep.target?.kind, "reference");
+    deepStrictEqual(metadata.finalStep.target?.operation.name, "getWidget");
+    ok(metadata.statusMonitorStep);
+    deepStrictEqual(metadata.statusMonitorStep.target.kind, "reference");
+    deepStrictEqual(metadata.statusMonitorStep.target.operation.name, "getStatus");
+    ok(metadata.pollingInfo);
+    deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.kind, "model-property");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.property.name, "statusValue");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.canceledState, ["Canceled"]);
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.failedState, ["Failed"]);
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.succeededState, ["Succeeded"]);
+  });
+
+  it("handles custom lro with polling using polling parameter decorators by name", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+      model PollingStatus {
+        @header location?: ResourceLocation<PollingStatus>;
+
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+      }
+
+      model SimpleWidget {
+        @key
+        @segment("simpleWidgets")
+        @visibility(Lifecycle.Read)
+        @path
+        id: string;
+
+        value: string;
+      }
+
+      @route("/simpleWidgets/{id}")
+      @get op getWidget(@path id: string): SimpleWidget;
+
+      @finalOperation(getWidget)
+      @pollingOperation(getStatus)
+      @route("/simpleWidgets/{id}")
+      @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @pollingOperationParameter @header id: string, @pollingOperationParameter("operationId") @header("operation-id") operation: string};
+
+      @route("/simpleWidgets/{id}/operations/{operationId}")
+      @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
+      `,
+      "createWidget",
+    );
+
+    ok(metadata);
+    deepStrictEqual(metadata.finalStateVia, "original-uri");
+    deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
+    deepStrictEqual(metadata.envelopeResult.name, "PollingStatus");
+    deepStrictEqual(metadata.logicalPath, undefined);
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual(metadata.finalResultPath, undefined);
+
+    ok(metadata.finalStep);
+    deepStrictEqual(metadata.finalStep.kind, "finalOperationReference");
+    deepStrictEqual(metadata.finalStep.target?.kind, "reference");
+    deepStrictEqual(metadata.finalStep.target?.operation.name, "getWidget");
+    ok(metadata.statusMonitorStep);
+    deepStrictEqual(metadata.statusMonitorStep.target.kind, "reference");
+    deepStrictEqual(metadata.statusMonitorStep.target.operation.name, "getStatus");
+    ok(metadata.pollingInfo);
+    deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.kind, "model-property");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.property.name, "statusValue");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.canceledState, ["Canceled"]);
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.failedState, ["Failed"]);
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.succeededState, ["Succeeded"]);
+  });
+
+  it("handles custom lro with polling using polling parameter decorators by reference", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+      model PollingStatus {
+        @header location?: ResourceLocation<PollingStatus>;
+
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+      }
+
+      model SimpleWidget {
+        @key
+        @segment("simpleWidgets")
+        @visibility(Lifecycle.Read)
+        @path
+        id: string;
+
+        value: string;
+      }
+
+      @route("/simpleWidgets/{id}")
+      @get op getWidget(@path id: string): SimpleWidget;
+
+      @finalOperation(getWidget)
+      @pollingOperation(getStatus)
+      @route("/simpleWidgets/{id}")
+      @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @pollingOperationParameter(getStatus::parameters.id) @header id: string, @pollingOperationParameter(getStatus::parameters.operationId) @header("operation-id") operation: string};
+
+      @route("/simpleWidgets/{id}/operations/{operationId}")
+      @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
+      `,
+      "createWidget",
+    );
+
+    ok(metadata);
+    deepStrictEqual(metadata.finalStateVia, "original-uri");
+    deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
+    deepStrictEqual(metadata.envelopeResult.name, "PollingStatus");
+    deepStrictEqual(metadata.logicalPath, undefined);
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual(metadata.finalResultPath, undefined);
+
+    ok(metadata.finalStep);
+    deepStrictEqual(metadata.finalStep.kind, "finalOperationReference");
+    deepStrictEqual(metadata.finalStep.target?.kind, "reference");
+    deepStrictEqual(metadata.finalStep.target?.operation.name, "getWidget");
+    ok(metadata.statusMonitorStep);
+    deepStrictEqual(metadata.statusMonitorStep.target.kind, "reference");
+    deepStrictEqual(metadata.statusMonitorStep.target.operation.name, "getStatus");
+    ok(metadata.pollingInfo);
+    deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.kind, "model-property");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.property.name, "statusValue");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.canceledState, ["Canceled"]);
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.failedState, ["Failed"]);
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.succeededState, ["Succeeded"]);
+  });
+
+  it("handles custom lro status values", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+      model PollingStatus {
+        @header location?: ResourceLocation<PollingStatus>;  
+        statusValue: CustomStatus;
+      }
+      
+      @Azure.Core.lroStatus
+      enum CustomStatus {
+        @Azure.Core.lroSucceeded
+        Successful: "Successful";
+        @Azure.Core.lroCanceled
+        Cancelled: "Cancelled";
+        @Azure.Core.lroFailed
+        Faulted: "Faulted";
+        Normal: "Running";
+      }
+
+      model SimpleWidget {
+        @key
+        @segment("simpleWidgets")
+        @visibility(Lifecycle.Read)
+        @path
+        id: string;
+
+        value: string;
+      }
+
+      @route("/simpleWidgets/{id}")
+      @get op getWidget(@path id: string): SimpleWidget;
+
+      @finalOperation(getWidget)
+      @pollingOperation(getStatus, {id: ResponseProperty<"id">; operationId: ResponseProperty<"operation">})
+      @route("/simpleWidgets/{id}")
+      @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operation: string};
+
+      @route("/simpleWidgets/{id}/operations/{operationId}")
+      @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
+      `,
+      "createWidget",
+    );
+
+    ok(metadata);
+    deepStrictEqual(metadata.finalStateVia, "original-uri");
+    deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
+    deepStrictEqual(metadata.envelopeResult.name, "PollingStatus");
+    deepStrictEqual(metadata.logicalPath, undefined);
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual(metadata.finalResultPath, undefined);
+
+    ok(metadata.finalStep);
+    deepStrictEqual(metadata.finalStep.kind, "finalOperationReference");
+    deepStrictEqual(metadata.finalStep.target?.kind, "reference");
+    deepStrictEqual(metadata.finalStep.target?.operation.name, "getWidget");
+    ok(metadata.statusMonitorStep);
+    deepStrictEqual(metadata.statusMonitorStep.target.kind, "reference");
+    deepStrictEqual(metadata.statusMonitorStep.target.operation.name, "getStatus");
+    ok(metadata.pollingInfo);
+    deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.kind, "model-property");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.property.name, "statusValue");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.canceledState, ["Cancelled"]);
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.failedState, ["Faulted"]);
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.succeededState, ["Successful"]);
+  });
+
+  it("throws for missing success value", async () => {
+    const [_, diagnostics] = await getOperations(
+      `
+      model PollingStatus {
+        @header location?: ResourceLocation<PollingStatus>;
+        status: "Successful" | "Canceled" | "Failed";
+      }
+      model SimpleWidget {
+        @key
+        @segment("simpleWidgets")
+        @visibility(Lifecycle.Read)
+        @path
+        id: string;
+        value: string;
+      }
+      @route("/simpleWidgets/{id}")
+      @get op getWidget(@path id: string): SimpleWidget;
+      @finalOperation(getWidget)
+      @pollingOperation(getStatus, {id: ResponseProperty<"id">; operationId: ResponseProperty<"operation">})
+      @route("/simpleWidgets/{id}")
+      @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operation: string};
+      @route("/simpleWidgets/{id}/operations/{operationId}")
+      @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
+      `,
+    );
+
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-azure-core/polling-operation-no-status-monitor",
+        message:
+          "The operation linked in  @pollingOperation must return a valid status monitor.  The status monitor model must contain a 'status' property, or a property decorated with  '@lroStatus'.  The status field must be of Enum or Union type and contain terminal status values for success and failure.",
+      },
+    ]);
+  });
+
+  it("handles custom lro with non-standard status and error fields", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+      model PollingStatus {
+        @header location?: ResourceLocation<PollingStatus>;
+
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+
+        @Azure.Core.lroResult
+        yeah: SimpleWidget;
+
+        @Azure.Core.lroErrorResult
+        nay: Azure.Core.Foundations.Error;
+      }
+      
+      model SimpleWidget {
+        @key
+        @segment("simpleWidgets")
+        @visibility(Lifecycle.Read)
+        @path
+        id: string;
+
+        value: string;
+      }
+
+      @route("/simpleWidgets/{id}")
+      @get op getWidget(@path id: string): SimpleWidget;
+
+      @finalOperation(getWidget)
+      @pollingOperation(getStatus, {id: ResponseProperty<"id">; operationId: ResponseProperty<"operation">})
+      @route("/simpleWidgets/{id}")
+      @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operation: string};
+
+      @route("/simpleWidgets/{id}/operations/{operationId}")
+      @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
+      `,
+      "createWidget",
+    );
+    ok(metadata);
+    deepStrictEqual(metadata.finalStateVia, "original-uri");
+    deepStrictEqual(metadata.logicalResult.name, "SimpleWidget");
+    deepStrictEqual(metadata.envelopeResult.name, "PollingStatus");
+    deepStrictEqual(metadata.logicalPath, undefined);
+
+    deepStrictEqual((metadata.finalResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "SimpleWidget");
+    deepStrictEqual(metadata.finalResultPath, undefined);
+
+    ok(metadata.finalStep);
+    deepStrictEqual(metadata.finalStep.kind, "finalOperationReference");
+    deepStrictEqual(metadata.finalStep.target?.kind, "reference");
+    deepStrictEqual(metadata.finalStep.target?.operation.name, "getWidget");
+    ok(metadata.statusMonitorStep);
+    deepStrictEqual(metadata.statusMonitorStep.target.kind, "reference");
+    deepStrictEqual(metadata.statusMonitorStep.target.operation.name, "getStatus");
+    ok(metadata.pollingInfo);
+    deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.kind, "model-property");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.property.name, "statusValue");
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.canceledState, ["Canceled"]);
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.failedState, ["Failed"]);
+    deepStrictEqual(metadata.pollingInfo.terminationStatus.succeededState, ["Succeeded"]);
+    ok(metadata.pollingInfo.resultProperty);
+    deepStrictEqual(metadata.pollingInfo.resultProperty.name, "yeah");
+    ok(metadata.pollingInfo.errorProperty);
+    deepStrictEqual(metadata.pollingInfo.errorProperty.name, "nay");
+  });
+
+  it("emits diagnostics for multiple lro result fields", async () => {
+    const [_ops, diagnostics, _runner] = await getOperations(
+      `
+      model PollingStatus {
+        @header location?: ResourceLocation<PollingStatus>;
+
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+
+        @Azure.Core.lroResult
+        yeah: SimpleWidget;
+
+        @Azure.Core.lroResult
+        notSoYeah: SimpleWidget;
+
+        @Azure.Core.lroErrorResult
+        nay: Azure.Core.Foundations.Error;
+
+        @Azure.Core.lroErrorResult
+        alsoNay: Azure.Core.Foundations.Error;
+      }
+      
+      model SimpleWidget {
+        @key
+        @segment("simpleWidgets")
+        @visibility(Lifecycle.Read)
+        @path
+        id: string;
+
+        value: string;
+      }
+
+      @route("/simpleWidgets/{id}")
+      @get op getWidget(@path id: string): SimpleWidget;
+
+      @finalOperation(getWidget)
+      @pollingOperation(getStatus, {id: ResponseProperty<"id">; operationId: ResponseProperty<"operation">})
+      @route("/simpleWidgets/{id}")
+      @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operation: string};
+
+      @route("/simpleWidgets/{id}/operations/{operationId}")
+      @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
+      `,
+    );
+    ok(diagnostics.length > 1);
+    expectDiagnostics(diagnostics, [
+      {
+        code: `@azure-tools/typespec-azure-core/lro-status-monitor-invalid-result-property`,
+        message: `StatusMonitor has more than one result property marked with '@lroResult'.  Ensure that only one property in the model is marked with this decorator.`,
+      },
+      {
+        code: `@azure-tools/typespec-azure-core/lro-status-monitor-invalid-result-property`,
+        message: `StatusMonitor has more than one error property marked with '@lroErrorResult'.  Ensure that only one property in the model is marked with this decorator.`,
+      },
+    ]);
+  });
+
+  it("emits diagnostic for invalid @lroResult property type (enum)", async () => {
+    const [_ops, diagnostics, _runner] = await getOperations(
+      `
+      enum MyStatus {
+        Active,
+        Inactive,
+      }
+
+      model PollingStatus {
+        @header location?: ResourceLocation<PollingStatus>;
+
+        @Azure.Core.lroStatus
+        statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+
+        @Azure.Core.lroResult
+        result?: MyStatus;
+      }
+
+      model SimpleWidget {
+        @key
+        @segment("simpleWidgets")
+        @visibility(Lifecycle.Read)
+        @path
+        id: string;
+
+        value: string;
+      }
+
+      @route("/simpleWidgets/{id}")
+      @get op getWidget(@path id: string): SimpleWidget;
+
+      @finalOperation(getWidget)
+      @pollingOperation(getStatus, {id: ResponseProperty<"id">; operationId: ResponseProperty<"operation">})
+      @route("/simpleWidgets/{id}")
+      @put op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operation: string};
+
+      @route("/simpleWidgets/{id}/operations/{operationId}")
+      @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
+      `,
+    );
+    expectDiagnostics(diagnostics, [
+      {
+        code: `@azure-tools/typespec-azure-core/lro-status-monitor-invalid-result-property-type`,
+        message:
+          /Property 'result' used as the final result of a long-running operation has an invalid type '.*MyStatus'. The property type must be a Model, Scalar, or 'unknown'./,
+      },
+    ]);
+  });
+
+  it("Gets Lro undefined for sync operation", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `// Reuse CustomParameters and CustomResponseProperties in the "normal" TParams and TResponse fields
+      model OpParams {
+        value: string;
+        ...CustomParameters;
+      };
+
+      model OpResponse is CustomResponseProperties {
+        message: string;
+      }
+       @test op update is Azure.Core.ResourceAction<TestModel, OpParams, OpResponse>;`,
+    );
+    deepStrictEqual(metadata, undefined);
+  });
+
+  it("Gets Lro undefined for sync operation with status field", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `// Reuse CustomParameters and CustomResponseProperties in the "normal" TParams and TResponse fields
+      model OpParams {
+        value: string;
+        ...CustomParameters;
+      };
+
+      model OpResponse is CustomResponseProperties {
+        message: string;
+        status: "Succeeded" | "Failed" | "Canceled";
+      }
+       @test op update is Azure.Core.ResourceAction<TestModel, OpParams, OpResponse>;`,
+    );
+    deepStrictEqual(metadata, undefined);
+  });
+
+  it("Gets Lro undefined for sync operation with provisioningState field", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `// Reuse CustomParameters and CustomResponseProperties in the "normal" TParams and TResponse fields
+      model OpParams {
+        value: string;
+        ...CustomParameters;
+      };
+
+      model OpResponse is CustomResponseProperties {
+        message: string;
+        provisioningState: "Succeeded" | "Failed" | "Canceled";
+      }
+       @test op update is Azure.Core.ResourceAction<TestModel, OpParams, OpResponse>;`,
+    );
+    deepStrictEqual(metadata, undefined);
+  });
+
+  it("signatures with customizable responses do not accept unions for TResponse", async () => {
+    const [_, diagnostics] = await getOperations(`
+      model Foo {}
+      model Bar {}
+      @resource("widgets") model Widget { @key name: string; }
+      op customAction is Azure.Core.StandardResourceOperations.ResourceAction<Widget, {}, Foo | Bar>;
+      op customCollectionAction is Azure.Core.StandardResourceOperations.ResourceCollectionAction<Widget, {}, Foo | Bar>;
+      op rpcAction is Azure.Core.RpcOperation<{}, Foo | Bar>;
+
+      op poll is StandardResourceOperations.GetResourceOperationStatus<Widget>;
+
+      @Azure.Core.pollingOperation(poll)
+      op lroCustomAction is Azure.Core.StandardResourceOperations.LongRunningResourceAction<Widget, {}, Bar | Foo>;
+      @Azure.Core.pollingOperation(poll)
+      op lroCustomCollectionAction is Azure.Core.StandardResourceOperations.LongRunningResourceCollectionAction<Widget, {}, Bar | Foo>;
+      @Azure.Core.pollingOperation(poll)
+      op lroRpcAction is Azure.Core.LongRunningRpcOperation<{}, Bar | Foo, {}>;
+    `);
+
+    expectDiagnostics(diagnostics, [
+      {
+        code: "invalid-argument",
+      },
+      {
+        code: "invalid-argument",
+      },
+      {
+        code: "invalid-argument",
+      },
+      {
+        code: "invalid-argument",
+      },
+      {
+        code: "invalid-argument",
+      },
+      {
+        code: "invalid-argument",
+      },
+    ]);
+  });
+
+  describe("original-uri with no GET operation", () => {
+    async function compileLroWithDiagnostics(
+      code: string,
+      operationName?: string,
+    ): Promise<[HttpOperation, LroMetadata | undefined, TesterInstance]> {
+      let [operations, , runner] = await getOperations(
+        `
+        model TestModel {
+          @key
+          @segment("test")
+          name: string;
+          value: int32;
+        }
+
+        ${code}
+        `,
+      );
+
+      if (operationName !== undefined) {
+        operations = operations.filter((o) => o.operation.name === operationName);
+      }
+
+      strictEqual(operations.length, 1);
+      const lro = getLroMetadata(runner.program, operations[0].operation);
+      return [operations[0], lro, runner];
+    }
+
+    it("emits no-operation-at-original-uri for PUT with original-uri and no GET", async () => {
+      const [_, metadata, runner] = await compileLroWithDiagnostics(
+        `
+        model PollingStatus {
+          @Azure.Core.lroStatus
+          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+        }
+
+        @route("/widgets/{id}/operations/{operationId}")
+        @get
+        op getStatus(@path id: string, @path operationId: string): PollingStatus;
+
+        @pollingOperation(getStatus, {operationId: ResponseProperty<"opId">})
+        @useFinalStateVia("original-uri")
+        @route("/widgets/{id}")
+        @put
+        op createWidget(@path id: string, @body body: TestModel): TestModel | {
+          @statusCode statusCode: 201;
+          @header opId: string;
+          @pollingLocation @header("Operation-Location") opLink: string;
+        };
+        `,
+        "createWidget",
+      );
+
+      ok(metadata);
+      expectDiagnostics(runner.program.diagnostics, [
+        {
+          code: "@azure-tools/typespec-azure-core/no-operation-at-original-uri",
+        },
+      ]);
+    });
+
+    it("emits no-operation-at-original-uri for PATCH with original-uri and no GET", async () => {
+      const [_, metadata, runner] = await compileLroWithDiagnostics(
+        `
+        model PollingStatus {
+          @Azure.Core.lroStatus
+          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+        }
+
+        @route("/widgets/{id}/operations/{operationId}")
+        @get
+        op getStatus(@path id: string, @path operationId: string): PollingStatus;
+
+        @pollingOperation(getStatus, {operationId: ResponseProperty<"opId">})
+        @useFinalStateVia("original-uri")
+        @route("/widgets/{id}")
+        @patch
+        op updateWidget(@path id: string, @body body: TestModel): {
+          @statusCode statusCode: 200;
+          @header opId: string;
+          @pollingLocation @header("Operation-Location") opLink: string;
+          @bodyRoot body: TestModel;
+        } | {
+          @statusCode statusCode: 201;
+          @header opId: string;
+          @pollingLocation @header("Operation-Location") opLink: string;
+          @bodyRoot body: TestModel;
+        };
+        `,
+        "updateWidget",
+      );
+
+      ok(metadata);
+      expectDiagnostics(runner.program.diagnostics, [
+        {
+          code: "@azure-tools/typespec-azure-core/no-operation-at-original-uri",
+        },
+      ]);
+    });
+
+    it("emits no-operation-at-original-uri for POST with original-uri and no GET", async () => {
+      const [_, metadata, runner] = await compileLroWithDiagnostics(
+        `
+        model PollingStatus {
+          @Azure.Core.lroStatus
+          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+        }
+
+        @route("/widgets/{id}/operations/{operationId}")
+        @get
+        op getStatus(@path id: string, @path operationId: string): PollingStatus;
+
+        @pollingOperation(getStatus, {operationId: ResponseProperty<"opId">})
+        @useFinalStateVia("original-uri")
+        @route("/widgets/{id}")
+        @post
+        op processWidget(@path id: string, @body body: TestModel): {
+          @statusCode statusCode: 202;
+          @header opId: string;
+          @pollingLocation @header("Operation-Location") opLink: string;
+        };
+        `,
+        "processWidget",
+      );
+
+      ok(metadata);
+      expectDiagnostics(runner.program.diagnostics, [
+        {
+          code: "@azure-tools/typespec-azure-core/no-operation-at-original-uri",
+        },
+      ]);
+    });
+
+    it("returns void finalResult for PUT with original-uri and no GET when diagnostic is suppressed", async () => {
+      const [_, metadata] = await compileLroWithDiagnostics(
+        `
+        model PollingStatus {
+          @Azure.Core.lroStatus
+          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+        }
+
+        @route("/widgets/{id}/operations/{operationId}")
+        @get
+        op getStatus(@path id: string, @path operationId: string): PollingStatus;
+
+        @pollingOperation(getStatus, {operationId: ResponseProperty<"opId">})
+        #suppress "@azure-tools/typespec-azure-core/no-operation-at-original-uri" "No GET at original URI"
+        @useFinalStateVia("original-uri")
+        @route("/widgets/{id}")
+        @put
+        op createWidget(@path id: string, @body body: TestModel): TestModel | {
+          @statusCode statusCode: 201;
+          @header opId: string;
+          @pollingLocation @header("Operation-Location") opLink: string;
+        };
+        `,
+        "createWidget",
+      );
+
+      ok(metadata);
+      deepStrictEqual(metadata.finalStateVia, "original-uri");
+      deepStrictEqual(metadata.finalResult, "void");
+      deepStrictEqual(metadata.finalEnvelopeResult, "void");
+    });
+
+    it("returns void finalResult for PATCH with original-uri and no GET when diagnostic is suppressed", async () => {
+      const [_, metadata] = await compileLroWithDiagnostics(
+        `
+        model PollingStatus {
+          @Azure.Core.lroStatus
+          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+        }
+
+        @route("/widgets/{id}/operations/{operationId}")
+        @get
+        op getStatus(@path id: string, @path operationId: string): PollingStatus;
+
+        @pollingOperation(getStatus, {operationId: ResponseProperty<"opId">})
+        #suppress "@azure-tools/typespec-azure-core/no-operation-at-original-uri" "No GET at original URI"
+        @useFinalStateVia("original-uri")
+        @route("/widgets/{id}")
+        @patch
+        op updateWidget(@path id: string, @body body: TestModel): {
+          @statusCode statusCode: 200;
+          @header opId: string;
+          @pollingLocation @header("Operation-Location") opLink: string;
+          @bodyRoot body: TestModel;
+        } | {
+          @statusCode statusCode: 201;
+          @header opId: string;
+          @pollingLocation @header("Operation-Location") opLink: string;
+          @bodyRoot body: TestModel;
+        };
+        `,
+        "updateWidget",
+      );
+
+      ok(metadata);
+      deepStrictEqual(metadata.finalStateVia, "original-uri");
+      deepStrictEqual(metadata.finalResult, "void");
+      deepStrictEqual(metadata.finalEnvelopeResult, "void");
+    });
+
+    it("returns void finalResult for POST with original-uri and no GET when diagnostic is suppressed", async () => {
+      const [_, metadata] = await compileLroWithDiagnostics(
+        `
+        model PollingStatus {
+          @Azure.Core.lroStatus
+          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+        }
+
+        @route("/widgets/{id}/operations/{operationId}")
+        @get
+        op getStatus(@path id: string, @path operationId: string): PollingStatus;
+
+        @pollingOperation(getStatus, {operationId: ResponseProperty<"opId">})
+        #suppress "@azure-tools/typespec-azure-core/no-operation-at-original-uri" "No GET at original URI"
+        @useFinalStateVia("original-uri")
+        @route("/widgets/{id}")
+        @post
+        op processWidget(@path id: string, @body body: TestModel): {
+          @statusCode statusCode: 202;
+          @header opId: string;
+          @pollingLocation @header("Operation-Location") opLink: string;
+        };
+        `,
+        "processWidget",
+      );
+
+      ok(metadata);
+      deepStrictEqual(metadata.finalStateVia, "original-uri");
+      deepStrictEqual(metadata.finalResult, "void");
+      deepStrictEqual(metadata.finalEnvelopeResult, "void");
+    });
+
+    it("does not emit no-operation-at-original-uri when GET exists at same path", async () => {
+      const [_, metadata, runner] = await compileLroWithDiagnostics(
+        `
+        model PollingStatus {
+          @Azure.Core.lroStatus
+          statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
+        }
+
+        @route("/widgets/{id}/operations/{operationId}")
+        @get
+        op getStatus(@path id: string, @path operationId: string): PollingStatus;
+
+        @route("/widgets/{id}")
+        @get
+        op getWidget(@path id: string): TestModel;
+
+        @pollingOperation(getStatus, {operationId: ResponseProperty<"opId">})
+        @useFinalStateVia("original-uri")
+        @route("/widgets/{id}")
+        @put
+        op createWidget(@path id: string, @body body: TestModel): TestModel | {
+          @statusCode statusCode: 201;
+          @header opId: string;
+          @pollingLocation @header("Operation-Location") opLink: string;
+        };
+        `,
+        "createWidget",
+      );
+
+      ok(metadata);
+      deepStrictEqual(metadata.finalStateVia, "original-uri");
+      expectDiagnosticEmpty(
+        runner.program.diagnostics.filter(
+          (d) => d.code === "@azure-tools/typespec-azure-core/no-operation-at-original-uri",
+        ),
+      );
+    });
+  });
+});
+
+// Regression test for https://github.com/Azure/typespec-azure/issues/332
+it("doesn't crash when passing non model to ServiceTraits", async () => {
+  const [_, diagnostics] = await getOperations(`
+    alias Operations = Azure.Core.ResourceOperations<abc>;
+  `);
+  expectDiagnostics(
+    diagnostics.filter((x) => x.severity === "error"),
+    [
+      {
+        code: "invalid-ref",
+        message: "Unknown identifier abc",
+      },
+      {
+        code: "invalid-argument",
+      },
+    ],
+  );
 });

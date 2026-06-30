@@ -1,10 +1,10 @@
 import { SdkContext as TCGCSdkContext } from "@azure-tools/typespec-client-generator-core";
 import { ModelProperty, Namespace } from "@typespec/compiler";
-import { RLCOptions, SchemaContext } from "../rlc-common/index.js";
-import { KnownMediaType } from "./mediaTypes.js";
+import { ClientOptions, SchemaContext } from "../interfaces.js";
+import { KnownMediaType } from "./media-types.js";
 
 export interface SdkContext extends TCGCSdkContext {
-  rlcOptions?: RLCOptions;
+  emitterOptions?: ClientOptions;
   generationPathDetail?: GenerationDirDetail;
   hasApiVersionInClient?: boolean;
   allServiceNamespaces?: Namespace[];
@@ -12,8 +12,7 @@ export interface SdkContext extends TCGCSdkContext {
 
 export interface GenerationDirDetail {
   rootDir: string;
-  rlcSourcesDir: string;
-  modularSourcesDir?: string;
+  sourcesDir: string;
   metadataDir: string;
 }
 

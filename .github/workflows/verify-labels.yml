@@ -9,8 +9,7 @@ on:
       - "main"
     paths:
       - "package.json"
-      - "eng/common/config/"
-      - "eng/common/labels/"
+      - "eng/config/labels.ts"
       - ".github/workflows/sync-labels.yml"
       - "CONTRIBUTING.md"
 
@@ -18,7 +17,7 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - uses: ./.github/actions/setup

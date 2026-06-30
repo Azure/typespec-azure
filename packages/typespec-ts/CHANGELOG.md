@@ -1,3 +1,59 @@
+# Change Log - @azure-tools/typespec-ts
+
+## 0.55.0
+
+### Breaking Changes
+
+- [#4668](https://github.com/Azure/typespec-azure/pull/4668) Remove the `branded` and `flavor` emitter options. `@azure-tools/typespec-ts` now only generates Azure-branded packages; use `@typespec/http-client-js` for unbranded emit.
+- [#4694](https://github.com/Azure/typespec-azure/pull/4694) Remove RLC (Rest Level Client) generation support. The emitter now always generates a Modular library, so the `is-modular-library` option has been removed (it is treated as always `true`). The following deprecated RLC-legacy options have also been removed: `include-shortcuts`, `multi-client`, `batch`, `azure-output-directory`, `title`, `dependency-info`, `product-doc-link`, `service-info`, and `default-value-object`.
+- [#4682](https://github.com/Azure/typespec-azure/pull/4682) Remove the `module-kind` and `azure-sdk-for-js` emitter options. Generation now always targets ESM and the Azure SDK for JS monorepo layout. The standalone-package and CommonJS-only generation paths have been removed.
+- [#4682](https://github.com/Azure/typespec-azure/pull/4682) Remove the internal `source-from` emitter option. Generation always targets TypeSpec sources, so the option and all Swagger-specific generation branches it gated have been removed.
+
+### Features
+
+- [#4617](https://github.com/Azure/typespec-azure/pull/4617) Use CompilerHost for all filesystem operations, enabling the emitter to run in the TypeSpec playground browser environment
+
+### Bug Fixes
+
+- [#4606](https://github.com/Azure/typespec-azure/pull/4606) Update to make emitter browser compatible
+- [#4718](https://github.com/Azure/typespec-azure/pull/4718) [typespec-ts] Fix sample generation for grouped and nested method parameters by resolving every HTTP parameter through `methodParameterSegments`, so flat, nested, and grouped parameters are emitted correctly without special casing.
+- [#4624](https://github.com/Azure/typespec-azure/pull/4624) [typespec-ts] Rename AAD / Azure Active Directory references to Microsoft Entra branding
+- [#4692](https://github.com/Azure/typespec-azure/pull/4692) Update node engine requirement to `>=20.0.0` in generated package.json
+
+
+## 0.54.2
+
+### Bug Fixes
+
+- [#4647](https://github.com/Azure/typespec-azure/pull/4647) Preserve `$DO_NOT_NORMALIZE$` operation-group names in classical client generation to avoid double-normalization that caused unresolved placeholder references.
+- [#4638](https://github.com/Azure/typespec-azure/pull/4638) [typespec-ts] fix body param serialize issue reported from sdk repo
+- [#4646](https://github.com/Azure/typespec-azure/pull/4646) [typespec-ts] Keep paged result model public when also used as a model property
+
+
+## 0.54.1
+
+### Bug Fixes
+
+- [#4542](https://github.com/Azure/typespec-azure/pull/4542) Replace `NodeJS.ReadableStream` with the platform-conditional `NodeReadableStream` helper in RLC binary request body unions so generated browser builds no longer fail with TS2503 when `@types/node` is excluded.
+
+
+## 0.54.0
+
+### Features
+
+- [#4012](https://github.com/Azure/autorest.typescript/pull/4012) Bump TypeSpec dependencies to latest stable and next pre-release versions.
+- [#3989](https://github.com/Azure/autorest.typescript/pull/3989) Bump turbo from 2.6.3 to 2.9.14.
+- [#3986](https://github.com/Azure/autorest.typescript/pull/3986) Remove `head-as-boolean` emitter flag (superseded by TCGC `@responseAsBool`).
+- [#4004](https://github.com/Azure/autorest.typescript/pull/4004) Improve resolveReferences performance.
+- [#3926](https://github.com/Azure/autorest.typescript/pull/3926) Decouple typespec-ts from rlc-common.
+- [#3957](https://github.com/Azure/autorest.typescript/pull/3957) Update naming terminology: cadl-ranch → spector, HLC → AutoRest.
+
+### Bug Fixes
+
+- [#4006](https://github.com/Azure/autorest.typescript/pull/4006) Fix config/script gaps between JS emitter and SDK libraries.
+- [#3948](https://github.com/Azure/autorest.typescript/pull/3948) Fix deserializer throwing on empty response body (success and error paths).
+
+
 ## 0.53.3 (2026-05-25)
 
 - [Feature] Bump TypeSpec dependencies to latest stable. Please refer to [#4002](https://github.com/Azure/autorest.typescript/pull/4002)

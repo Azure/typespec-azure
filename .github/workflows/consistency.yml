@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0 ## Needed for Changesets to find `main` branch
           submodules: recursive
@@ -39,7 +39,8 @@ jobs:
           !startsWith(github.head_ref, 'publish/') &&
           !startsWith(github.head_ref, 'dependabot/') &&
           !startsWith(github.head_ref, 'backmerge/') &&
-          !startsWith(github.head_ref, 'revert-')
+          !startsWith(github.head_ref, 'revert-') &&
+          !contains(github.event.pull_request.title, '[skip chg]')
 
       - run: node eng/scripts/validate-core-submodule.js
         name: Check that core submodule is merged to core repo
@@ -51,7 +52,7 @@ jobs:
     name: Spell check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - uses: ./.github/actions/setup
@@ -67,7 +68,7 @@ jobs:
     name: Format
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - uses: ./.github/actions/setup
@@ -89,7 +90,7 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
 
@@ -122,7 +123,7 @@ jobs:
     name: Versions consistency
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
 
@@ -139,7 +140,7 @@ jobs:
     name: Common types up to date
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
 

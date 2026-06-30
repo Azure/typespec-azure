@@ -11,60 +11,21 @@ export default defineConfig({
       },
       {
         test: {
-          name: "unit-rlc",
-          include: ["test/unit/**/*.spec.ts"],
-          testTimeout: 36000,
-        },
-      },
-      {
-        test: {
           name: "unit-modular",
-          include: ["test/modularUnit/**/*.spec.ts"],
+          include: ["test/modular-unit/**/*.test.ts"],
           testTimeout: 0,
           pool: "forks",
           poolOptions: {
             forks: {
-              execArgv: ["--max-old-space-size=8192"],
+              execArgv: ["--max-old-space-size=1024"],
             },
           },
         },
       },
       {
         test: {
-          name: "integration-rlc",
-          include: ["test/integration/*.spec.ts"],
-          exclude: ["test/integration/versioningRemoved.spec.ts"],
-          testTimeout: 36000,
-        },
-      },
-      {
-        test: {
-          name: "integration-azure-rlc",
-          include: ["test/azureIntegration/*.spec.ts"],
-          exclude: [
-            "test/azureIntegration/versioningRemoved.spec.ts",
-            "test/azureIntegration/azureClientGeneratorCoreClientInitialization.spec.ts",
-          ],
-          testTimeout: 36000,
-        },
-      },
-      {
-        test: {
-          name: "integration-modular",
-          include: ["test/modularIntegration/*.spec.ts"],
-          testTimeout: 36000,
-        },
-      },
-      {
-        test: {
           name: "integration-azure-modular",
-          include: ["test/azureModularIntegration/*.spec.ts"],
-          exclude: [
-            "test/azureModularIntegration/clientStructureOperationGroup.spec.ts",
-            "test/azureModularIntegration/clientStructureRenamed.spec.ts",
-            "test/azureModularIntegration/clientStructureTwoGroup.spec.ts",
-            "test/azureModularIntegration/payloadMultipart.spec.ts",
-          ],
+          include: ["test/azure-modular-integration/*.test.ts"],
           testTimeout: 36000,
         },
       },
@@ -77,7 +38,7 @@ export default defineConfig({
         "src/framework/**/*.ts",
         "static/static-helpers/**/*.ts",
       ],
-      exclude: ["**/*.spec.ts", "**/*.spec.tsx", ".next/*"],
+      exclude: ["**/*.test.ts", "**/*.test.tsx", ".next/*"],
     },
   },
 });
