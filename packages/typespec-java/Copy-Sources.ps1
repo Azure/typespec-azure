@@ -7,7 +7,7 @@
 
 $ErrorActionPreference = "Stop"
 
-$packageRoot = Resolve-Path (Join-Path $PSScriptRoot ".." "..")
+$packageRoot = $PSScriptRoot
 $emitterRoot = Resolve-Path (Join-Path $packageRoot ".." ".." "core" "packages" "http-client-java" "emitter")
 
 Copy-Item -Path (Join-Path $emitterRoot "src") -Destination $packageRoot -Exclude "options.ts" -Recurse -Force

@@ -29,7 +29,7 @@
   },
   "scripts": {
     "clean": "rimraf ./dist ./temp ./generator",
-    "build": "pwsh -NoProfile -File eng/scripts/Copy-Sources.ps1 && tsc -p .",
+    "build": "pwsh -NoProfile -File Copy-Sources.ps1 && tsc -p .",
     "build:full": "pwsh -NoProfile -File ./Build-TypeSpec.ps1",
     "watch": "tsc -p . --watch",
     "test": "vitest run",

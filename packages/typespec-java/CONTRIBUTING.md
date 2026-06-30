@@ -20,7 +20,7 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 
 Only `src/options.ts` (the Azure-specific emitter options) is committed in this package. The rest of
 the emitter TypeScript (and tests) is copied from `core/packages/http-client-java/emitter/{src,test}`
-at build time by `eng/scripts/Copy-Sources.ps1` (excluding `options.ts`). The Java `emitter.jar` is
+at build time by `Copy-Sources.ps1` (excluding `options.ts`). The Java `emitter.jar` is
 built from `core/packages/http-client-java/generator` by `Build-TypeSpec.ps1` and staged into
 `generator/http-client-generator/target/`.
 
