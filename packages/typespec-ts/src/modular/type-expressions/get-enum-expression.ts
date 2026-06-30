@@ -19,5 +19,5 @@ export function getEnumExpression(
 }
 
 export function isExtensibleEnum(context: SdkContext, type: SdkEnumType): boolean {
-  return !type.isFixed && context.rlcOptions?.experimentalExtensibleEnums === true;
+  return !type.isFixed && context.emitterOptions?.experimentalExtensibleEnums === true;
 }

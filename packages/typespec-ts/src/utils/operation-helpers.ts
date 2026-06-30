@@ -1,0 +1,138 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
+import { MethodSignatureStructure, OptionalKind, ParameterDeclarationStructure } from "ts-morph";
+import {
+  ClientModel,
+  Methods,
+  ObjectSchema,
+  ParameterMetadata,
+  PathParameter,
+  Schema,
+  SchemaContext,
+} from "../interfaces.js";
+import { NameType, normalizeName, pascalCase } from "./name-utils.js";
+import { isObjectSchema } from "./schema-helpers.js";
+
+export function buildMethodDefinitions(
+  methods: Methods,
+  pathParams: PathParameter[] = [],
+): OptionalKind<MethodSignatureStructure>[] {
+  const methodDefinitions: OptionalKind<MethodSignatureStructure>[] = [];
+  for (const key of Object.keys(methods)) {
+    const verbMethods = methods[key];
+    if (!verbMethods) {
+      continue;
+    }
+    for (const method of verbMethods) {
+      const description = method.description;
+      const areAllOptional = method.hasOptionalOptions;
+
+      methodDefinitions.push({
+        name: key,
+        ...(description && { docs: [{ description }] }),
+        parameters: [
+          ...getPathParamDefinitions(pathParams),
+          {
+            name: "options",
+            hasQuestionToken: areAllOptional,
+            type: pascalCase(method.optionsName),
+          },
+        ],
+        returnType: `StreamableMethod<${method.returnType}>`,
+      });
+    }
+  }
+
+  return methodDefinitions;
+}
+
+export function getPathParamDefinitions(
+  pathParams: PathParameter[],
+): OptionalKind<ParameterDeclarationStructure>[] {
+  return pathParams.map(({ name, type, description }) => {
+    return {
+      name: normalizeName(name, NameType.Parameter),
+      type,
+      description,
+    };
+  });
+}
+
+export function hasPagingOperations(model: ClientModel) {
+  return Boolean(model.helperDetails?.hasPaging);
+}
+
+export function hasPollingOperations(model: ClientModel) {
+  return Boolean(model.helperDetails?.hasLongRunning);
+}
+
+export function hasMultiCollection(model: ClientModel) {
+  return Boolean(model.helperDetails?.hasMultiCollection);
+}
+
+export function hasPipeCollection(model: ClientModel) {
+  return Boolean(model.helperDetails?.hasPipeCollection);
+}
+
+export function hasSsvCollection(model: ClientModel) {
+  return Boolean(model.helperDetails?.hasSsvCollection);
+}
+
+export function hasTsvCollection(model: ClientModel) {
+  return Boolean(model.helperDetails?.hasTsvCollection);
+}
+
+export function hasCsvCollection(model: ClientModel) {
+  return Boolean(model.helperDetails?.hasCsvCollection);
+}
+
+export function hasUnexpectedHelper(model: ClientModel) {
+  const pathDictionary = model.paths;
+  for (const details of Object.values(pathDictionary)) {
+    for (const methodDetails of Object.values(details.methods)) {
+      const firstMethod = methodDetails[0];
+      if (!firstMethod) {
+        continue;
+      }
+      const successTypes = firstMethod.responseTypes.success;
+      const errorTypes = firstMethod.responseTypes.error;
+
+      if (successTypes.length > 0 && errorTypes.length > 0 && !!errorTypes[0]) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+export function hasInputModels(model: ClientModel) {
+  return hasSchemaContextObject(model, [SchemaContext.Input]);
+}
+export function hasOutputModels(model: ClientModel) {
+  return hasSchemaContextObject(model, [SchemaContext.Output, SchemaContext.Exception]);
+}
+
+function hasSchemaContextObject(model: ClientModel, schemaUsage: SchemaContext[]) {
+  const objectSchemas: ObjectSchema[] = (model.schemas ?? []).filter(
+    (o) => isObjectSchema(o) && (o as ObjectSchema).usage?.some((u) => schemaUsage.includes(u)),
+  );
+
+  return objectSchemas.length > 0;
+}
+
+export function getGeneratedWrapperTypes(params: ParameterMetadata[] | PathParameter[]): Schema[] {
+  const wrapperTypes = params
+    .map((qp) => (isParameterMetadata(qp) ? qp.param.wrapperType : qp.wrapperType))
+    .filter((v) => v !== undefined);
+  const wrapperFromObjects = wrapperTypes.filter((wrap) => wrap.type === "object");
+  const wrapperFromUnions = wrapperTypes
+    .filter((wrap) => wrap.type === "union")
+    .flatMap((wrapperType) => wrapperType?.enum ?? [])
+    .filter((v) => v.type === "object");
+  return [...wrapperFromUnions, ...wrapperFromObjects];
+}
+
+function isParameterMetadata(param: ParameterMetadata | PathParameter): param is ParameterMetadata {
+  return (param as any).param !== undefined;
+}
