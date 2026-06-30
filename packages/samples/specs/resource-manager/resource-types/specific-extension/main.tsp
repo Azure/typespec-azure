@@ -219,7 +219,6 @@ alias ParentParameters = {
   ...ParentKeysOf<Employee>;
 };
 
-#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator"
 interface GenericOps
   extends Azure.ResourceManager.Legacy.ExtensionOperations<
       GenericResourceParameters,
