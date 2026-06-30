@@ -42,7 +42,7 @@ pnpm build
 
 # Full build: apply patch, build the Java emitter.jar (requires JDK 11+ and Maven),
 # stage it, copy sources, compile and pack.
-pnpm build:full
+pwsh ./Build-TypeSpec.ps1
 ```
 
 ## Before making a Pull request
