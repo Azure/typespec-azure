@@ -103,6 +103,19 @@ export const pythonAdapter: EmitterAdapter = {
     if (flavor) args.push("--flavor", flavor);
     if (request.nameFilter) args.push("--name", request.nameFilter);
 
+    // Formatting runs `black`, whose native build fails on Windows under the
+    // deep pnpm venv path (exceeds MAX_PATH). Default to running codegen +
+    // formatting in Pyodide (WASM) there; elsewhere (e.g. Linux CI) native is
+    // faster so default off. Override with `--opt pyodide=true|false`, or pass
+    // `-- --use-pyodide` through to the driver explicitly.
+    const passthroughHasPyodide = request.passthrough.includes("--use-pyodide");
+    const pyodideOpt = request.options.pyodide;
+    const usePyodide =
+      pyodideOpt !== undefined
+        ? /^(1|true|yes|on)$/i.test(pyodideOpt)
+        : process.platform === "win32";
+    if (usePyodide && !passthroughHasPyodide) args.push("--use-pyodide");
+
     if (request.specsDir) {
       // External specs must mirror the http-specs / azure-http-specs layout.
       const httpSpecs = firstExisting([

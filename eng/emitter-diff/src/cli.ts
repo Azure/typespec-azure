@@ -9,7 +9,7 @@
 import { join } from "node:path";
 import { parseArgs } from "node:util";
 
-import { diffDirs, openInVsCode, printDiff, writeHtml, writePatch } from "./diff.ts";
+import { diffDirs, openInVsCode, printDiff, printSummary, writeHtml, writePatch } from "./diff.ts";
 import { getAdapter, listAdapters } from "./registry.ts";
 import {
   classifyRef,
@@ -40,9 +40,11 @@ ${color.bold("Options:")}
   --specs <ref>           Spec inputs: all (default) | local | github.
   --name <pattern>        Filter which specs/packages are generated.
   --work-dir <dir>        Scratch dir (default: a temp dir).
-  --open                  Open the diff in VS Code (local).
-  --patch <file>          Write the raw unified diff to a file instead of the terminal.
-  --html <file>           Write a rendered HTML diff (CI).
+  --html <file>           Write the rendered HTML diff to this path.
+                          Default output: a clickable HTML report in the work dir.
+  --vscode                Open the diff in VS Code instead of writing HTML.
+  --terminal              Print the full colored patch to the terminal instead.
+  --patch <file>          Write the raw unified diff to a file.
   --fail-on-diff          Exit non-zero when output differs (CI gating).
   --run-tests             Run the adapter's test suites on the output.
   --test-env <csv>        Suites to run (adapter-defined), e.g. test,lint,mypy.
@@ -70,6 +72,8 @@ async function main(): Promise<number> {
       name: { type: "string" },
       "work-dir": { type: "string" },
       open: { type: "boolean" },
+      vscode: { type: "boolean" },
+      terminal: { type: "boolean" },
       patch: { type: "string" },
       html: { type: "string" },
       "fail-on-diff": { type: "boolean" },
@@ -184,11 +188,29 @@ async function main(): Promise<number> {
 
   // Diff.
   const diff = await diffDirs(baselineOut, headOut, log);
-  if (values.patch) writePatch(diff, values.patch, log);
-  else printDiff(diff, log);
 
-  if (values.open) await openInVsCode(baselineOut, headOut, workDir, log);
-  if (values.html) await writeHtml(diff, values.html, log);
+  // Decide how to present the diff. Explicit flags win; otherwise the default
+  // is a clickable HTML report written to the work dir.
+  const wantsVsCode = Boolean(values.vscode || values.open);
+  const wantsTerminal = Boolean(values.terminal);
+  const wantsPatch = Boolean(values.patch);
+  const htmlTarget =
+    values.html ??
+    (!wantsVsCode && !wantsTerminal && !wantsPatch
+      ? join(workDir, "emitter-diff.html")
+      : undefined);
+
+  if (!diff.hasChanges) {
+    log.success("No differences between baseline and head output.");
+  } else if (wantsTerminal) {
+    printDiff(diff, log);
+  } else {
+    printSummary(diff, log);
+  }
+
+  if (wantsPatch) writePatch(diff, values.patch as string, log);
+  if (htmlTarget && diff.hasChanges) await writeHtml(diff, htmlTarget, log);
+  if (wantsVsCode) await openInVsCode(baselineOut, headOut, workDir, log);
 
   // Optionally run test suites.
   if (values["run-tests"]) {

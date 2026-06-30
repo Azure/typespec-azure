@@ -48,12 +48,17 @@ node eng/emitter-diff/src/cli.ts --emitter python --baseline 0.61.2
 
 ### Common options
 
+By default the tool writes a **clickable HTML report** (`emitter-diff.html`) into the work dir and
+prints a `file://` link to it. Use `--vscode` for a live VS Code diff, `--terminal` for the full
+patch in your shell, or `--patch`/`--html` to write to a specific file.
+
 | Option | Description |
 | --- | --- |
 | `--name <pattern>` | Filter which specs/packages are generated |
-| `--open` | Open the diff in VS Code (local) |
-| `--patch <file>` | Write the raw unified diff to a file instead of the terminal |
-| `--html <file>` | Write a rendered HTML diff (CI artifact) |
+| `--html <file>` | Write the rendered HTML report to this path (default: `<work-dir>/emitter-diff.html`) |
+| `--vscode` | Open the diff in VS Code instead of writing HTML |
+| `--terminal` | Print the full colored patch to the terminal instead |
+| `--patch <file>` | Write the raw unified diff to a file |
 | `--fail-on-diff` | Exit non-zero when output differs (CI gating) |
 | `--run-tests` | Run the adapter's test suites on the output |
 | `--test-env <csv>` | Suites to run, e.g. `test,lint,mypy,pyright` |
@@ -61,14 +66,20 @@ node eng/emitter-diff/src/cli.ts --emitter python --baseline 0.61.2
 | `--opt key=value` | Repeatable adapter-specific option (e.g. `--opt flavor=azure`) |
 | `-- <args>` | Everything after `--` is forwarded to the adapter |
 
+> `--open` is kept as an alias for `--vscode`.
+
 ### Examples
 
 ```bash
-# Diff the current checkout against the published 0.61.2, azure flavor, one package:
+# Default: writes a clickable emitter-diff.html and prints a file:// link.
 node eng/emitter-diff/src/cli.ts --emitter python --baseline 0.61.2 \
-  --opt flavor=azure --name authentication-api-key --open
+  --opt flavor=azure --name authentication-api-key
 
-# Compare two source folders and write an HTML report:
+# Open the diff live in VS Code instead:
+node eng/emitter-diff/src/cli.ts --emitter python --baseline 0.61.2 \
+  --opt flavor=azure --name authentication-api-key --vscode
+
+# Compare two source folders and write an HTML report to a specific path:
 node eng/emitter-diff/src/cli.ts --emitter python \
   --baseline local:/path/to/old/typespec-python \
   --head    local:/path/to/new/typespec-python \
@@ -82,7 +93,7 @@ node eng/emitter-diff/src/cli.ts --emitter python \
 
 ## Viewing the diff in VS Code
 
-`--open` gives you a native, side-by-side source diff of the two generated trees. VS Code has
+`--vscode` gives you a native, side-by-side source diff of the two generated trees. VS Code has
 no CLI to diff two *folders* (`code --diff` only compares two files), so the tool stages the
 comparison as a throwaway git working tree under `<work-dir>/vscode-diff`: the **baseline** tree
 is committed, the **head** tree is overlaid on top and left staged. Opening that folder shows
@@ -93,10 +104,10 @@ file for the side-by-side view.
 # Keep the scratch dir so it survives the run, and open the diff in VS Code:
 node eng/emitter-diff/src/cli.ts --emitter python \
   --baseline npm:0.60.0 --opt flavor=azure --name encode/duration \
-  --work-dir ./emitter-diff-out --open -- --use-pyodide
+  --work-dir ./emitter-diff-out --vscode
 ```
 
-If you generated the trees without `--open` (or want to reopen later), build the same view by
+If you generated the trees without `--vscode` (or want to reopen later), build the same view by
 hand from the `baseline/` and `head/` folders under your `--work-dir` and open it in VS Code:
 
 ```bash
@@ -139,7 +150,9 @@ The core needs no changes.
 - `--html` uses the optional `diff2html` dependency (declared in this package's `package.json`).
 - **Windows / constrained Python toolchain:** the python emitter formats output with native
   `black`, which can fail to load on Windows when the package path exceeds the 260-char limit
-  (`DLL load failed ... filename or extension is too long`). Forward `-- --use-pyodide` to the
-  python adapter to run generation via Pyodide (WASM) instead, e.g.
-  `emitter-diff --emitter python --baseline npm:latest -- --use-pyodide`.
+  (`DLL load failed ... filename or extension is too long`). To avoid this, the **python adapter
+  defaults to Pyodide (WASM) generation on Windows** and native generation elsewhere (Linux CI is
+  faster natively). Override with `--opt pyodide=true|false`, or forward `-- --use-pyodide` to the
+  driver explicitly, e.g.
+  `emitter-diff --emitter python --baseline npm:latest --opt pyodide=true`.
 

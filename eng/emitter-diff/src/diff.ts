@@ -6,7 +6,8 @@
  *  - CI `--html`: rendered via diff2html (optional dependency, lazily loaded)
  */
 import { cpSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
-import { basename, dirname, join } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 
 import type { Logger } from "./types.ts";
 import { color, run, runChecked } from "./util.ts";
@@ -113,7 +114,6 @@ export function writePatch(diff: DiffResult, outFile: string, log: Logger): void
     return;
   }
   log.success(`Wrote unified diff to ${outFile}`);
-  printSummary(diff, log);
 }
 
 /**
@@ -153,7 +153,9 @@ ${body}
 </body>
 </html>`;
   writeFileSync(outFile, doc, "utf8");
-  log.success(`Wrote HTML diff to ${outFile}`);
+  const abs = resolve(outFile);
+  log.success(`Wrote HTML diff to ${abs}`);
+  log.info(`${color.bold("Open it:")} ${pathToFileURL(abs).href}`);
 }
 
 /**
