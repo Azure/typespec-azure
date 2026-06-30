@@ -27,6 +27,7 @@ import { reportDiagnostic } from "../lib.js";
 
 export function validateTypes(context: TCGCContext) {
   validateClientNames(context);
+  validateClientLocationParameterTypes(context);
 }
 
 /**
@@ -89,6 +90,83 @@ function validateClientNames(tcgcContext: TCGCContext) {
     [...newClients.values()].map((operations) => {
       validateClientNamesCore(tcgcContext, scope, operations);
     });
+  }
+}
+
+/**
+ * Validate that `@clientLocation` does not move parameters with the same name but
+ * different types to the same client.
+ *
+ * When `@clientLocation` is applied to a templated parameter (e.g. on an alias), each
+ * operation can instantiate the template with a different type. Moving all of them to the
+ * same client produces conflicting client parameters that share a name but differ in type,
+ * which results in a broken SDK. We forbid this so the user moves the parameter on each
+ * operation instead, keeping a consistent type on the client.
+ *
+ * @param tcgcContext The context for the TypeSpec Client Generator.
+ */
+function validateClientLocationParameterTypes(tcgcContext: TCGCContext) {
+  const languageScopes = getDefinedLanguageScopes(tcgcContext.program);
+
+  for (const scope of languageScopes) {
+    // For each target client (namespace/interface), track the parameters moved under each name.
+    const movedByTarget = new Map<Namespace | Interface, Map<string, ModelProperty[]>>();
+
+    for (const [type, target] of listScopedDecoratorData(
+      tcgcContext,
+      clientLocationKey,
+      scope,
+    ).entries()) {
+      if (unsafe_Realm.realmForType.has(type)) {
+        // Skip `@clientLocation` on versioning types
+        continue;
+      }
+      // Only parameters (model properties) moved to an existing client (namespace/interface).
+      if (
+        type.kind !== "ModelProperty" ||
+        typeof target === "string" ||
+        (target.kind !== "Namespace" && target.kind !== "Interface")
+      ) {
+        continue;
+      }
+
+      let byName = movedByTarget.get(target);
+      if (!byName) {
+        byName = new Map<string, ModelProperty[]>();
+        movedByTarget.set(target, byName);
+      }
+      let params = byName.get(type.name);
+      if (!params) {
+        params = [];
+        byName.set(type.name, params);
+      }
+      params.push(type);
+    }
+
+    for (const byName of movedByTarget.values()) {
+      for (const [name, params] of byName.entries()) {
+        const distinctTypes = new Set<Type>(params.map((p) => p.type));
+        if (distinctTypes.size <= 1) {
+          continue;
+        }
+        // Same parameter name moved to the client with conflicting types. Report once per
+        // distinct syntax node so a templated parameter that produces several internal copies
+        // does not generate duplicate diagnostics.
+        const reportedNodes = new Set<unknown>();
+        for (const param of params) {
+          if (param.node && reportedNodes.has(param.node)) {
+            continue;
+          }
+          reportedNodes.add(param.node);
+          reportDiagnostic(tcgcContext.program, {
+            code: "client-location-conflict",
+            messageId: "parameterTypeConflict",
+            format: { parameterName: name },
+            target: param,
+          });
+        }
+      }
+    }
   }
 }
 

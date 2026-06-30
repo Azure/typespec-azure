@@ -1,5 +1,34 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.69.1
+
+### Bug Fixes
+
+- Add support for the `@scope` TCGC decorator. Operations, model properties, and parameters that are scoped out of the autorest emitter are now omitted from the generated swagger output.
+
+
+## 0.69.0
+
+### Features
+
+- [#4190](https://github.com/Azure/typespec-azure/pull/4190) Added `skip-example-copying` emitter option. When enabled, example files are not copied to the output directory and `x-ms-examples` `$ref` values point directly to the source example files via relative paths.
+
+### Bug Fixes
+
+- [#4549](https://github.com/Azure/typespec-azure/pull/4549) Fix custom auth scheme models leaking into `definitions` when declared inside the service namespace. They are now emitted only under `securityDefinitions` as expected.
+- [#4421](https://github.com/Azure/typespec-azure/pull/4421) Ensure there are no examples emitted for parameters
+
+
+## 0.68.0
+
+### Bug Fixes
+
+- [#4397](https://github.com/Azure/typespec-azure/pull/4397) Add an autorest emitter warning when multiple operations resolve to the same OpenAPI `operationId`, and report the warning on each conflicting operation.
+- [#4322](https://github.com/Azure/typespec-azure/pull/4322) Fix `@armProviderNamespace` to inject the canonical absolute ARM scope `https://management.azure.com/.default` as the default OAuth2 scope instead of the bare relative `user_impersonation` value. For backwards compatibility with existing ARM Swagger, the `@azure-tools/typespec-autorest` emitter now rewrites this scope back to `user_impersonation` when emitting OpenAPI v2 for namespaces decorated with `@armProviderNamespace`.
+- [#4357](https://github.com/Azure/typespec-azure/pull/4357) Fix crash in autorest emitter when no `@service` is declared but a spec references a model from a versioned namespace (e.g. `CommonTypes.AzureEntityResource`).
+- [#4393](https://github.com/Azure/typespec-azure/pull/4393) Emit intrinsic `@TypeSpec.example(...)` on model properties in the autorest OpenAPI2 emitter so property `example` values are preserved in generated definitions.
+
+
 ## 0.67.0
 
 ### Bug Fixes

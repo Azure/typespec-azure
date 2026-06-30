@@ -208,7 +208,10 @@ export const $armProviderNamespace: ArmProviderNamespaceDecorator = (
                     type: "implicit",
                     authorizationUrl: "https://login.microsoftonline.com/common/oauth2/authorize",
                     scopes: [
-                      { value: "user_impersonation", description: "impersonate your user account" },
+                      {
+                        value: "https://management.azure.com/.default",
+                        description: "Default scope for management APIs",
+                      },
                     ],
                   },
                 ],

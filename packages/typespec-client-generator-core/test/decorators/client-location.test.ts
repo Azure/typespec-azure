@@ -512,6 +512,128 @@ describe("Parameter", () => {
     ]);
   });
 
+  it("detect type conflict when moving templated parameter to client", async () => {
+    const diagnostics = await SimpleTester.diagnose(
+      `
+      @service
+      namespace Default;
+
+      union FeatureOptInKeys {
+        insights_v1_preview: "Insights.V1Preview",
+        schedules_v1_preview: "Schedules.V1Preview",
+      }
+
+      alias WithPreviewHeader<T extends FeatureOptInKeys> = {
+        @clientLocation(Default)
+        @header("x-preview-features")
+        previewFeatures: T;
+      };
+
+      @route("/insights")
+      op getInsights(...WithPreviewHeader<FeatureOptInKeys.insights_v1_preview>): void;
+
+      @route("/schedules")
+      op getSchedules(...WithPreviewHeader<FeatureOptInKeys.schedules_v1_preview>): void;
+      `,
+    );
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-client-generator-core/client-location-conflict",
+        message: /different types/,
+      },
+    ]);
+  });
+
+  it("templated parameter type conflict reproduces broken client/method parameters", async () => {
+    // This characterizes the broken behavior the validation guards against (issue #4671):
+    // `@clientLocation` on a templated parameter that is instantiated with different types
+    // collapses, by name, into a single client parameter typed as the *last* method's
+    // instantiation. As a result the last method loses its parameter, while other methods
+    // keep a method-level parameter with their own type.
+    const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
+      `
+      @service
+      namespace Default;
+
+      union FeatureOptInKeys {
+        insights_v1_preview: "Insights.V1Preview",
+        schedules_v1_preview: "Schedules.V1Preview",
+      }
+
+      alias WithPreviewHeader<T extends FeatureOptInKeys> = {
+        @clientLocation(Default)
+        @header("x-preview-features")
+        previewFeatures: T;
+      };
+
+      @route("/insights")
+      op getInsights(...WithPreviewHeader<FeatureOptInKeys.insights_v1_preview>): void;
+
+      @route("/schedules")
+      op getSchedules(...WithPreviewHeader<FeatureOptInKeys.schedules_v1_preview>): void;
+      `,
+    );
+    // The validation still only warns, so the broken SDK output below is produced.
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-client-generator-core/client-location-conflict",
+        message: /different types/,
+      },
+    ]);
+
+    const context = await createSdkContextForTester(program);
+    const client = context.sdkPackage.clients[0];
+    ok(client);
+
+    // The single elevated client parameter is typed as the *last* method's instantiation.
+    const clientPreviewParam = client.clientInitialization.parameters.find(
+      (p) => p.name === "previewFeatures",
+    );
+    ok(clientPreviewParam);
+    strictEqual(clientPreviewParam.type.kind, "enumvalue");
+    strictEqual((clientPreviewParam.type as { name: string }).name, "schedules_v1_preview");
+
+    const getInsights = client.methods.find((m) => m.name === "getInsights");
+    const getSchedules = client.methods.find((m) => m.name === "getSchedules");
+    ok(getInsights);
+    ok(getSchedules);
+
+    // The non-last method keeps a method-level parameter with its own type ...
+    const insightsParam = getInsights.parameters.find((p) => p.name === "previewFeatures");
+    ok(insightsParam);
+    strictEqual(insightsParam.onClient, false);
+    strictEqual(insightsParam.type.kind, "enumvalue");
+    strictEqual((insightsParam.type as { name: string }).name, "insights_v1_preview");
+
+    // ... while the last method loses its parameter entirely.
+    strictEqual(
+      getSchedules.parameters.find((p) => p.name === "previewFeatures"),
+      undefined,
+    );
+  });
+
+  it("no type conflict when moving same-typed parameter to client from multiple operations", async () => {
+    const diagnostics = await SimpleTester.diagnose(
+      `
+      @service
+      namespace Default;
+
+      alias WithPreviewHeader = {
+        @clientLocation(Default)
+        @header("x-preview-features")
+        previewFeatures: string;
+      };
+
+      @route("/insights")
+      op getInsights(...WithPreviewHeader): void;
+
+      @route("/schedules")
+      op getSchedules(...WithPreviewHeader): void;
+      `,
+    );
+    expectDiagnostics(diagnostics, []);
+  });
+
   it("can not move model properties to string", async () => {
     const diagnostics = await SimpleTester.diagnose(
       `
@@ -537,9 +659,7 @@ describe("Parameter", () => {
     @armCommonTypesVersion(CommonTypes.Versions.v5)
     namespace My.Service;
 
-    /** Api versions */
     enum Versions {
-      /** 2024-04-01-preview api version */
           V2024_04_01_PREVIEW: "2024-04-01-preview",
     }
 
@@ -593,9 +713,7 @@ describe("Parameter", () => {
     @armCommonTypesVersion(CommonTypes.Versions.v5)
     namespace My.Service;
 
-    /** Api versions */
     enum Versions {
-      /** 2024-04-01-preview api version */
           V2024_04_01_PREVIEW: "2024-04-01-preview",
     }
 
@@ -801,19 +919,15 @@ describe("Parameter", () => {
         @versioned(Versions)
         namespace Microsoft.ContosoProviderHub;
 
-        /** Contoso API versions */
         enum Versions {
-          /** 2021-10-01-preview version */
           @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
           "2021-10-01-preview",
         }
 
-        /** A ContosoProviderHub resource */
         model Employee is TrackedResource<EmployeeProperties> {
           ...ResourceNameParameter<Employee>;
         }
 
-        /** Employee properties */
         model EmployeeProperties {
           prop: string;
         }
@@ -869,6 +983,81 @@ describe("Parameter", () => {
     strictEqual(subIdParam.methodParameterSegments[0][0], subIdMethodParam);
   });
 
+  it("with @override for listByResourceGroup when subscriptionId also exists on client", async () => {
+    const { program } = await ArmTester.compile(
+      `
+        @armProviderNamespace
+        @service(#{ title: "ContosoProviderHubClient" })
+        @versioned(Versions)
+        namespace Microsoft.ContosoProviderHub;
+
+        enum Versions {
+          @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+          "2021-10-01-preview",
+        }
+
+        model Employee is TrackedResource<EmployeeProperties> {
+          ...ResourceNameParameter<Employee>;
+        }
+
+        model EmployeeProperties {
+          prop: string;
+        }
+
+        @armResourceOperations
+        interface Employees {
+          get is ArmResourceRead<Employee>;
+          createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+          delete is ArmResourceDeleteWithoutOkAsync<Employee>;
+          listByResourceGroup is ArmResourceListByParent<Employee>;
+        }
+
+        op listByResourceGroupOverride(
+          ...ApiVersionParameter,
+
+          #suppress "@azure-tools/typespec-azure-core/documentation-required" "customization"
+          @clientLocation(listByResourceGroupOverride)
+          subscriptionId: Azure.Core.uuid,
+
+          ...ResourceGroupParameter,
+          ...Azure.ResourceManager.ProviderNamespace<Employee>,
+        ): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.ResourceListResult<Employee>>;
+
+        @@override(Employees.listByResourceGroup, listByResourceGroupOverride);
+      `,
+    );
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
+    const client = sdkPackage.clients[0];
+    ok(client);
+
+    // subscriptionId should still be on the client (for get, createOrUpdate, delete)
+    ok(client.clientInitialization.parameters.find((p) => p.name === "subscriptionId"));
+
+    const employeesClient = client.children?.[0];
+    ok(employeesClient);
+
+    const listMethod = employeesClient.methods?.find(
+      (m) => m.name === "listByResourceGroup",
+    ) as SdkServiceMethod<SdkHttpOperation>;
+    ok(listMethod);
+
+    // subscriptionId should be a method parameter for listByResourceGroup
+    const subIdMethodParam = listMethod.parameters.find((p) => p.name === "subscriptionId");
+    ok(subIdMethodParam);
+    strictEqual(subIdMethodParam.onClient, false);
+
+    const operation = listMethod.operation;
+    ok(operation);
+
+    const subIdParam = operation.parameters.find((p) => p.name === "subscriptionId");
+    ok(subIdParam);
+
+    // methodParameterSegments should point to the method-level subscriptionId, not the client-level one
+    strictEqual(subIdParam.methodParameterSegments.length, 1);
+    strictEqual(subIdParam.methodParameterSegments[0][0], subIdMethodParam);
+  });
+
   it("subscriptionId on client when clientLocation moves it to method level for some operations in nested sub clients", async () => {
     const { program } = await ArmTester.compile(
       `
@@ -879,21 +1068,16 @@ describe("Parameter", () => {
       @versioned(Microsoft.Contoso.Versions)
       namespace Microsoft.Contoso;
 
-      /** The available API versions. */
       enum Versions {
-        /** 2021-10-01-preview version */
         @armCommonTypesVersion(CommonTypes.Versions.v5)
         v2021_10_01_preview: "2021-10-01-preview",
       }
 
-      /** Employee resource */
       model Employee is TrackedResource<EmployeeProperties> {
         ...ResourceNameParameter<Employee>;
       }
 
-      /** Employee properties */
       model EmployeeProperties {
-        /** Age of employee */
         age?: int32;
       }
 
@@ -977,9 +1161,7 @@ describe("Parameter", () => {
       @armCommonTypesVersion(CommonTypes.Versions.v5)
       namespace My.Service;
 
-      /** Api versions */
       enum Versions {
-        /** 2024-04-01-preview api version */
         V2024_04_01_PREVIEW: "2024-04-01-preview",
       }
 

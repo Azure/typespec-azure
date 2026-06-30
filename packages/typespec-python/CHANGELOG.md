@@ -1,5 +1,34 @@
 # Release
 
+## 0.63.2
+
+- Bump @typespec/http-client-python to 0.33.0
+
+## 0.63.1
+
+- Bump @typespec/http-client-python to 0.30.1
+
+## 0.63.0
+
+- [#4503](https://github.com/Azure/typespec-azure/pull/4503) Bump @typespec/http-client-python to 0.30.0
+
+## 0.62.1
+
+### Bump dependencies
+
+- [#4418](https://github.com/Azure/typespec-azure/pull/4418) Bump @typespec/http-client-python to 0.29.1
+
+## 0.62.0
+
+### Features
+
+- [#4263](https://github.com/Azure/typespec-azure/pull/4263) Add `@azure-tools/typespec-python` to `typespec-azure` repo
+
+### Bug Fixes
+
+- [#4305](https://github.com/Azure/typespec-azure/pull/4305) Fix DEP0190 deprecation warning in Python emitter setup script
+
+
 ## 0.61.2
 
 ### Bug Fixes

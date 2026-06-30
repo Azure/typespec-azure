@@ -1,5 +1,40 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.42
+
+### Features
+
+- [#4535](https://github.com/Azure/typespec-azure/pull/4535) Add ARM spector test scenario for ArmResourceDeploymentScope (armResourceIdentifier with scopes)
+- [#4543](https://github.com/Azure/typespec-azure/pull/4543) Add ARM spector test scenario for management group scoped resources
+
+
+## 0.1.0-alpha.41
+
+### Features
+
+- [#4493](https://github.com/Azure/typespec-azure/pull/4493) Add Spector scenario for `@usage` applied to a namespace, demonstrating recursive propagation to nested models.
+- [#4577](https://github.com/Azure/typespec-azure/pull/4577) add test for `exact` enum member names
+- [#4430](https://github.com/Azure/typespec-azure/pull/4430) Add Spector spec for the `exact()` function used with `@clientName` to preserve exact naming without casing transformations.
+
+
+## 0.1.0-alpha.40
+
+### Features
+
+- [#4323](https://github.com/Azure/typespec-azure/pull/4323) Add `@clientName` csharp-scoped renames for the nested sub-clients of `IndividuallyParentClient` in the `client-initialization/individually-parent` spec. The original names (e.g. `IndividuallyParentNestedWithParamAliasClient`) combined with the deeply-nested test project path produced generated file paths exceeding the 260-character Windows path limit in downstream csharp emitters.
+- [#4298](https://github.com/Azure/typespec-azure/pull/4298) Add `@clientName` C#-scoped renames for `Operations` and `SubNamespace` in the multiple-services spec to avoid name collisions in C# codegen.
+- [#4221](https://github.com/Azure/typespec-azure/pull/4221) Add `@clientName` Java-scoped renames for `Operations` and `SubNamespace` in the multiple-services spec to avoid name collisions in Java codegen.
+- [#4328](https://github.com/Azure/typespec-azure/pull/4328) Add Python client namespace to response-as-bool spec
+- [#4336](https://github.com/Azure/typespec-azure/pull/4336) Add test for etags with `Azure.Core.eTag` definition and non-standard wire names
+- [#4268](https://github.com/Azure/typespec-azure/pull/4268) Add Spector specs for @responseAsBool and @clientDoc decorators
+
+### Bug Fixes
+
+- [#4339](https://github.com/Azure/typespec-azure/pull/4339) Fix client customization warning.
+- [#4220](https://github.com/Azure/typespec-azure/pull/4220) Remove "!javascript" scope from @@override for GroupParameters.group
+- [#4300](https://github.com/Azure/typespec-azure/pull/4300) Fix client-default-value mock to always include client defaults in putModelProperty request body
+
+
 ## 0.1.0-alpha.39
 
 ### Breaking Changes

@@ -1,0 +1,110 @@
+{
+  "name": "@azure-tools/typespec-ts",
+  "version": "0.55.0",
+  "description": "A TypeSpec emitter for TypeScript",
+  "main": "dist/src/index.js",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    },
+    "./testing": {
+      "types": "./dist/src/testing/index.d.ts",
+      "default": "./dist/src/testing/index.js"
+    }
+  },
+  "scripts": {
+    "test-next": "vitest run --project test-next",
+    "test-next:coverage": "vitest run --project test-next --coverage",
+    "clean": "rimraf ./dist ./typespec-output",
+    "build": "tsc -p .",
+    "test": "npm run test-next && npm run unit-test && npm run integration-test-ci",
+    "lint": "eslint . --ext .ts --max-warnings=0",
+    "lint:fix": "eslint . --fix --ext .ts",
+    "check:tree": "node ./test/commands/check-clean-tree.ts",
+    "integration-test-ci": "npm-run-all copy:typespec spector-test",
+    "spector-test": "npm-run-all --silent -p start-test-server --race generate-and-run",
+    "start-test-server": "mkdirp -p coverage && npx tsp-spector serve ./node_modules/@azure-tools/azure-http-specs/specs ./node_modules/@typespec/http-specs/specs --port 3002  --coverageFile ./coverage/spector-coverage-typescript-azure.json",
+    "copy:typespec": "node ./test/commands/copy-typespec.ts",
+    "generate-and-run": "npm run generate-tsp-only:client && npm-run-all -p integration-test:alone generate-tsp-only:declarations && npm run stop-test-server -- -p 3002",
+    "generate-tsp-only": "node ./test/commands/gen-spector.js",
+    "generate-tsp-only:client": "node ./test/commands/gen-spector.js --phase=client",
+    "generate-tsp-only:declarations": "node ./test/commands/gen-spector.js --phase=declarations",
+    "regen-test-baselines": "npm run generate-tsp-only",
+    "integration-test:alone": "vitest run --project integration-azure-modular",
+    "stop-test-server": "npx tsp-spector server stop",
+    "unit-test": "cross-env NODE_OPTIONS=--max-old-space-size=1024 vitest run --project unit-modular",
+    "gen:scenario-suites": "node ./test/commands/gen-scenario-suites.ts",
+    "regen-docs": "npm run build && tspd doc . --enable-experimental --output-dir ../../website/src/content/docs/docs/emitters/clients/typespec-ts/reference --skip-js"
+  },
+  "author": "Jose Heredia <joheredi@microsoft.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@azure-rest/core-client": "catalog:",
+    "@typespec/http-specs": "workspace:^",
+    "@typespec/spector": "workspace:^",
+    "@typespec/spec-api": "workspace:^",
+    "@typespec/tspd": "workspace:^",
+    "@azure-tools/azure-http-specs": "workspace:^",
+    "@azure-tools/typespec-autorest": "workspace:^",
+    "@azure-tools/typespec-azure-core": "workspace:^",
+    "@azure-tools/typespec-azure-resource-manager": "workspace:^",
+    "@azure-tools/typespec-client-generator-core": "workspace:^",
+    "@azure/abort-controller": "catalog:",
+    "@azure/core-auth": "catalog:",
+    "@azure/core-lro": "catalog:",
+    "@azure/core-paging": "catalog:",
+    "@azure/core-rest-pipeline": "catalog:",
+    "@azure/core-util": "catalog:",
+    "@azure/logger": "catalog:",
+    "@typespec/compiler": "workspace:^",
+    "@typespec/http": "workspace:^",
+    "@typespec/openapi": "workspace:^",
+    "@typespec/rest": "workspace:^",
+    "@typespec/versioning": "workspace:^",
+    "@typespec/xml": "workspace:^",
+    "@typespec/ts-http-runtime": "catalog:",
+    "cross-env": "catalog:",
+    "mkdirp": "catalog:",
+    "npm-run-all": "catalog:",
+    "prettier": "catalog:",
+    "vitest": "catalog:",
+    "vite": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "@microsoft/api-extractor": "catalog:",
+    "yaml": "catalog:"
+  },
+  "peerDependencies": {
+    "@azure-tools/typespec-azure-core": "workspace:^",
+    "@azure-tools/typespec-client-generator-core": "workspace:^",
+    "@typespec/compiler": "workspace:^",
+    "@typespec/http": "workspace:^",
+    "@typespec/rest": "workspace:^",
+    "@typespec/versioning": "workspace:^",
+    "@typespec/xml": "workspace:^"
+  },
+  "dependencies": {
+    "fast-xml-parser": "catalog:",
+    "handlebars": "catalog:",
+    "prettier": "catalog:",
+    "ts-morph": "catalog:",
+    "tslib": "catalog:"
+  },
+  "files": [
+    "src",
+    "dist/**",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "static/**"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Azure/typespec-azure.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Azure/typespec-azure/issues"
+  },
+  "homepage": "https://github.com/Azure/typespec-azure/tree/main/packages/typespec-ts/"
+}

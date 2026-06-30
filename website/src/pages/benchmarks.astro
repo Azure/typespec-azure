@@ -1,0 +1,20 @@
+---
+import BaseLayout from "../layouts/base-layout.astro";
+import { BenchmarkDashboard } from "../components/benchmarks/benchmark-dashboard";
+---
+
+<BaseLayout>
+  <div style="max-width: 1200px; margin: 0 auto; padding: 2rem 1rem;">
+    <h1 style="margin-bottom: 0.25rem;">Benchmarks</h1>
+    <p style="color: gray; margin-top: 0;">
+      Performance tracking for the TypeSpec Azure compilation pipeline. Data is collected on every
+      push to <code>main</code> and stored on the
+      <a
+        href="https://github.com/Azure/typespec-azure/tree/benchmark-data"
+        target="_blank"
+        rel="noopener noreferrer"><code>benchmark-data</code></a
+      > branch.
+    </p>
+    <BenchmarkDashboard client:load />
+  </div>
+</BaseLayout>

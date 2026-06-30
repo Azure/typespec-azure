@@ -254,7 +254,7 @@ describe("data plane LRO templates", () => {
     it("LongRunningRpcOperation", async () => {
       const { program } = await LroVersionedServiceTester.compile(`
         model GenerationOptions {
-          @doc("Prompt.")
+          
           prompt: string;
         }
 
@@ -263,7 +263,7 @@ describe("data plane LRO templates", () => {
         @@visibility(global.Azure.Core.Foundations.OperationStatus.id, Lifecycle.Read);
 
         model GenerationResult {
-          @doc("The data.")
+          
           data: string;
         }
 
@@ -369,7 +369,7 @@ describe("data plane LRO templates", () => {
 
         // no "result" property
         model OperationDetails {
-          @doc("Operation ID")
+          
           @key
           @visibility(Lifecycle.Read, Lifecycle.Create)
           id: uuid;
@@ -383,7 +383,7 @@ describe("data plane LRO templates", () => {
           result?: Resource;
         }
 
-        @doc("Response")
+        
         @route("/response")
         interface ResponseOp {
 
@@ -632,23 +632,23 @@ describe("data plane LRO templates", () => {
 @service
 namespace DocumentIntelligence;
   @lroStatus
-  @doc("Operation status.")
+  
   union DocumentIntelligenceOperationStatus {
     string,
-    @doc("The operation has not started yet.")
+    
     notStarted: "notStarted",
-    @doc("The operation is in progress.")
+    
     running: "running",
-    @doc("The operation has failed.")
+    
     @lroFailed
     failed: "failed",
-    @doc("The operation has succeeded.")
+    
     @lroSucceeded
     succeeded: "succeeded",
-    @doc("The operation has been canceled.")
+    
     @lroCanceled
     canceled: "canceled",
-    @doc("The operation has been skipped.")
+    
     @lroCanceled
     skipped: "skipped",
   }
@@ -659,7 +659,7 @@ namespace DocumentIntelligence;
   > is Foundations.Operation<
     {
       ...TParams,
-      @doc("Unique document model name.")
+      
       @path
       @pattern("^[a-zA-Z0-9][a-zA-Z0-9._~-]{1,63}$")
       @maxLength(64)
@@ -683,40 +683,40 @@ namespace DocumentIntelligence;
     {},
     {}
   >;
-  @doc("Document analysis result.")
+  
   model AnalyzeResult {
-    @doc("API version used to produce this result.")
+    
     apiVersion: string;
-    @doc("Document model ID used to produce this result.")
+    
     @pattern("^[a-zA-Z0-9][a-zA-Z0-9._~-]{1,63}$")
     modelId: string;
   }
-  @doc("Status and result of the analyze operation.")
+  
   model AnalyzeOperation {
-    @doc("Operation status.  notStarted, running, succeeded, or failed")
+    
     status: DocumentIntelligenceOperationStatus;
-    @doc("Date and time (UTC) when the analyze operation was submitted.")
+    
     createdDateTime: utcDateTime;
-    @doc("Date and time (UTC) when the status was last updated.")
+    
     lastUpdatedDateTime: utcDateTime;
-    @doc("Encountered error during document analysis.")
+    
     error?: {};
     @lroResult
-    @doc("Document analysis result.")
+    
     analyzeResult?: AnalyzeResult;
   }
   #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Doesn't fit standard ops"
-  @doc("Analyzes document with document model.")
+  
   @post
   @pollingOperation(getAnalyzeResult)
   @sharedRoute
   @route("/documentModels/{modelId}:analyze")
   op analyzeDocument is DocumentIntelligenceLongRunningOperation<
     {
-      @doc("Input content type.")
+      
       @header
       contentType: "application/json";
-      @doc("Analyze request parameters.")
+      
       @bodyRoot
       @clientName("body", "python")
       analyzeRequest?: {};
@@ -724,17 +724,17 @@ namespace DocumentIntelligence;
     AnalyzeOperation
   >;
   #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Doesn't fit standard ops"
-  @doc("Gets the result of document analysis.")
+  
   @route("/documentModels/{modelId}/analyzeResults/{resultId}")
   @get
   op getAnalyzeResult is DocumentIntelligenceOperation<
     {
-      @doc("Unique document model name.")
+      
       @path
       @pattern("^[a-zA-Z0-9][a-zA-Z0-9._~-]{1,63}$")
       @maxLength(64)
       modelId: string;
-      @doc("Analyze operation result ID.")
+      
       @path
       resultId: uuid;
     },
@@ -823,10 +823,11 @@ interface DocumentIntelligenceClient {
 
       alias apiOperations = Azure.Core.ResourceOperations<ServiceTraits>;
 
-      @doc("Create an instruction.")
+      
       @pollingOperation(
         OperationProgress.getOperationResult
       )
+      #suppress "@typespec/http/deprecated-implicit-optionality" "For testing"
       op update is apiOperations.LongRunningResourceCreateOrUpdate<Instruction>;
 
       @resource("instruction")
@@ -839,19 +840,15 @@ interface DocumentIntelligenceClient {
         instructionId: string;
       }
 
-      @doc("Operation Response Model")
       @resource("operation")
       model OperationResultQuery {
-        @doc("The operation status.")
         @visibility(Lifecycle.Read)
         status: Foundations.OperationState;
 
-        @doc("The operation id.")
         @key("operationId")
         @visibility(Lifecycle.Read)
         operationId: string;
 
-        @doc("The error message.")
         @visibility(Lifecycle.Read)
         errorMessage: string[];
       }
@@ -861,9 +858,9 @@ interface DocumentIntelligenceClient {
         id2: string;
       }
 
-      @doc("Get operation progress")
+      
       interface OperationProgress {
-        @doc("Get operation progress")
+        
         getOperationResult is apiOperations.ResourceRead<OperationResultQuery>;
       }
     `);
@@ -1033,7 +1030,6 @@ describe("Arm LRO templates", () => {
       }
 
       model EmployeeProperties {
-        /** Age of employee */
         age?: int32;
       }
 
@@ -1091,7 +1087,6 @@ describe("Arm LRO templates", () => {
       }
 
       model EmployeeProperties {
-        /** Age of employee */
         age?: int32;
       }
 
@@ -1177,37 +1172,37 @@ describe("getLroMetadata", () => {
     NoRepeatableRequests &
     NoClientRequestId>;
 
-    @doc("The API version.")
+    
     enum Versions {
-      @doc("The 2022-12-01-preview version.")
+      
           v2022_12_01_preview: "2022-12-01-preview",
     }
 
     @resource("users")
-    @doc("Details about a user.")
+    
     model User {
     @key
     @visibility(Lifecycle.Read)
-    @doc("The name of user.")
+    
     name: string;
 
-    @doc("The role of user")
+    
     role: string;
     }
 
-    @doc("The parameters for exporting a user.")
+    
     model UserExportParams {
     @query
-    @doc("The format of the data.")
+    
     format: string;
     }
 
-    @doc("The exported user data.")
+    
     model ExportedUser {
-    @doc("The name of user.")
+    
     name: string;
 
-    @doc("The exported URI.")
+    
     resourceUri: string;
     }
 

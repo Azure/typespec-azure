@@ -1,43 +1,41 @@
 import { Tester } from "#test/test-host.js";
 import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
-import { beforeEach, describe, it } from "vitest";
+import { beforeEach, it } from "vitest";
 import { byosRule } from "../../src/rules/byos.js";
 
-describe("typespec-azure-core: byos rule", () => {
-  let tester: LinterRuleTester;
+let tester: LinterRuleTester;
 
-  beforeEach(async () => {
-    const runner = await Tester.createInstance();
-    tester = createLinterRuleTester(runner, byosRule, "@azure-tools/typespec-azure-core");
-  });
+beforeEach(async () => {
+  const runner = await Tester.createInstance();
+  tester = createLinterRuleTester(runner, byosRule, "@azure-tools/typespec-azure-core");
+});
 
-  it("emit warning if content type is application/octet-stream ", async () => {
-    await tester
-      .expect(`op uploadFile(data: bytes, @header contentType: "application/octet-stream"): void;`)
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-core/byos",
-      });
-  });
+it("emit warning if content type is application/octet-stream ", async () => {
+  await tester
+    .expect(`op uploadFile(data: bytes, @header contentType: "application/octet-stream"): void;`)
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-core/byos",
+    });
+});
 
-  it("emit warning if content type is multipart/form-data (explicit)", async () => {
-    await tester
-      .expect(
-        `op uploadFile(@multipartBody data: {data: HttpPart<bytes>}, @header contentType: "multipart/form-data"): void;`,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-core/byos",
-      });
-  });
+it("emit warning if content type is multipart/form-data (explicit)", async () => {
+  await tester
+    .expect(
+      `op uploadFile(@multipartBody data: {data: HttpPart<bytes>}, @header contentType: "multipart/form-data"): void;`,
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-core/byos",
+    });
+});
 
-  it("is ok if requesting json data", async () => {
-    await tester
-      .expect(`op sendJsonBase64(data: bytes, @header contentType: "application/json"): void;`)
-      .toBeValid();
-  });
+it("is ok if requesting json data", async () => {
+  await tester
+    .expect(`op sendJsonBase64(data: bytes, @header contentType: "application/json"): void;`)
+    .toBeValid();
+});
 
-  it("is ok if returning binary data", async () => {
-    await tester
-      .expect(`op download(): {data: bytes, @header contentType: "application/octet-stream"};`)
-      .toBeValid();
-  });
+it("is ok if returning binary data", async () => {
+  await tester
+    .expect(`op download(): {data: bytes, @header contentType: "application/octet-stream"};`)
+    .toBeValid();
 });

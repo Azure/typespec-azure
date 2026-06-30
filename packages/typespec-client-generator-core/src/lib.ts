@@ -5,6 +5,25 @@ import {
   UnbrandedSdkEmitterOptionsInterface,
 } from "./internal-utils.js";
 
+// `api-version` accepts either a string (single service / `latest` / `all`) or a
+// map from service namespace full name to version (multi-service).
+const apiVersionSchema = {
+  oneOf: [
+    {
+      type: "string",
+      nullable: true,
+    },
+    {
+      type: "object",
+      additionalProperties: { type: "string" },
+      required: [],
+      nullable: true,
+    },
+  ],
+  description:
+    "Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`. For multi-service packages, provide a map from each service namespace's full name to its desired version; services not listed default to their latest version.",
+} as any;
+
 export const UnbrandedSdkEmitterOptions = {
   "generate-protocol-methods": {
     "generate-protocol-methods": {
@@ -23,12 +42,7 @@ export const UnbrandedSdkEmitterOptions = {
     },
   },
   "api-version": {
-    "api-version": {
-      type: "string",
-      nullable: true,
-      description:
-        "Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`.",
-    },
+    "api-version": apiVersionSchema,
   },
   license: {
     license: {
@@ -387,6 +401,7 @@ export const $lib = createTypeSpecLibrary({
         modelPropertyToClientInitialization: paramMessage`There is already a parameter called '${"parameterName"}' in the client initialization.`,
         modelPropertyToString:
           "`@clientLocation` can only move model properties to interfaces or namespaces.",
+        parameterTypeConflict: paramMessage`@clientLocation cannot move multiple parameters named '${"parameterName"}' with different types to the same client. This often happens when @clientLocation is applied to a templated parameter that is instantiated with different types. Move the parameter on each operation instead, so that it has a consistent type on the client.`,
       },
     },
     "client-location-wrong-type": {
@@ -399,8 +414,7 @@ export const $lib = createTypeSpecLibrary({
     "legacy-hierarchy-building-conflict": {
       severity: "warning",
       messages: {
-        "property-missing": paramMessage`@hierarchyBuilding decorator conflict: Model ${"childModel"} is missing property '${"propertyName"}' that is required by parent model ${"parentModel"}.`,
-        "type-mismatch": paramMessage`@hierarchyBuilding decorator conflict: Property '${"propertyName"}' in model ${"childModel"} has a different type than parent model ${"parentModel"} expects.`,
+        "property-type-mismatch": paramMessage`@hierarchyBuilding decorator: property '${"propertyName"}' on model '${"childModel"}' has type that does not match the same-named property supplied by the new base chain (rooted at '${"parentModel"}'). The property is dropped from '${"childModel"}' to satisfy the rebase rule (own properties are filtered against the new base chain by name). Consider aligning the types or removing the property from '${"childModel"}'.`,
       },
     },
     "legacy-hierarchy-building-circular-reference": {
@@ -481,6 +495,12 @@ export const $lib = createTypeSpecLibrary({
         default: "All services must have the same server and auth definitions.",
       },
     },
+    "inconsistent-multiple-service-dependency": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Services merged into client "${"clientName"}" depend on different versions of "${"dependencyName"}": ${"versions"}.`,
+      },
+    },
     "client-option": {
       severity: "warning",
       messages: {
@@ -542,12 +562,6 @@ export const $lib = createTypeSpecLibrary({
       severity: "error",
       messages: {
         default: "Auto-merging service client must be empty.",
-      },
-    },
-    "operation-not-in-client": {
-      severity: "warning",
-      messages: {
-        default: paramMessage`Operation "${"operationName"}" under namespace "${"namespaceName"}" is not included in any @client definition.`,
       },
     },
   },

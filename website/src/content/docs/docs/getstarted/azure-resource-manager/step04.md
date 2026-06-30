@@ -19,7 +19,16 @@ model NotificationDetails {
 }
 
 @armResourceOperations
-interface Users extends TrackedResourceOperations<User, UserProperties> {
+interface Users {
+  get is ArmResourceRead<User>;
+  create is ArmResourceCreateOrReplaceAsync<User>;
+  update is ArmCustomPatchSync<
+    User,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<User, UserProperties>
+  >;
+  delete is ArmResourceDeleteSync<User>;
+  listByResourceGroup is ArmResourceListByParent<User>;
+  listBySubscription is ArmListBySubscription<User>;
   /** Send a notification to the user */
   @segment("notify")
   NotifyUser is ArmResourceActionNoContentSync<User, NotificationDetails>;
@@ -46,10 +55,9 @@ In a custom operation, you define the operation parameters, responses, http verb
 /** Send a notification to the user */
 @post
 @segment("notify")
-op NotifyUser(
-  ...ResourceInstanceParameters<User>,
-  @body notification: NotificationDetails,
-): ArmResponse<string> | ErrorResponse;
+op NotifyUser(...ResourceInstanceParameters<User>, @body notification: NotificationDetails):
+  | ArmResponse<string>
+  | ErrorResponse;
 ```
 
 ### ARM Response Types

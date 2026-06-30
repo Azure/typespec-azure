@@ -1,44 +1,42 @@
 import { Tester } from "#test/test-host.js";
 import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
-import { beforeEach, describe, it } from "vitest";
+import { beforeEach, it } from "vitest";
 import { preventRestLibraryInterfaces } from "../../src/rules/prevent-rest-library.js";
 
-describe("typespec-azure-core: no-rest-library-interfaces rule", () => {
-  let tester: LinterRuleTester;
+let tester: LinterRuleTester;
 
-  beforeEach(async () => {
-    const runner = await Tester.createInstance();
-    tester = createLinterRuleTester(
-      runner,
-      preventRestLibraryInterfaces,
-      "@azure-tools/typespec-azure-core",
-    );
-  });
+beforeEach(async () => {
+  const runner = await Tester.createInstance();
+  tester = createLinterRuleTester(
+    runner,
+    preventRestLibraryInterfaces,
+    "@azure-tools/typespec-azure-core",
+  );
+});
 
-  it("emits an error diagnostic for interfaces that extend one from TypeSpec.Rest.Resource", async () => {
-    await tester
-      .expect(
-        `
-      @resource("widgets")
-      model Widget { @key name: string; }
+it("emits an error diagnostic for interfaces that extend one from TypeSpec.Rest.Resource", async () => {
+  await tester
+    .expect(
+      `
+    @resource("widgets")
+    model Widget { @key name: string; }
 
-      interface MyResourceOperations<TResource extends TypeSpec.Reflection.Model> {
-        read is ResourceRead<TResource>;
-      }
+    interface MyResourceOperations<TResource extends TypeSpec.Reflection.Model> {
+      read is ResourceRead<TResource>;
+    }
 
-      @TypeSpec.Http.route("bad")
-      interface Widgets extends TypeSpec.Rest.Resource.ResourceOperations<Widget, Foundations.ErrorResponse> {};
+    @TypeSpec.Http.route("bad")
+    interface Widgets extends TypeSpec.Rest.Resource.ResourceOperations<Widget, Foundations.ErrorResponse> {};
 
-      @TypeSpec.Http.route("good")
-      interface WidgetsAlt extends MyResourceOperations<Widget> {};
+    @TypeSpec.Http.route("good")
+    interface WidgetsAlt extends MyResourceOperations<Widget> {};
 `,
-      )
-      .toEmitDiagnostics([
-        {
-          code: "@azure-tools/typespec-azure-core/no-rest-library-interfaces",
-          message:
-            "Resource interfaces from the TypeSpec.Rest.Resource library are incompatible with Azure.Core.",
-        },
-      ]);
-  });
+    )
+    .toEmitDiagnostics([
+      {
+        code: "@azure-tools/typespec-azure-core/no-rest-library-interfaces",
+        message:
+          "Resource interfaces from the TypeSpec.Rest.Resource library are incompatible with Azure.Core.",
+      },
+    ]);
 });

@@ -1,5 +1,27 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.69.0
+
+No changes, version bump only.
+
+## 0.68.0
+
+### Features
+
+- [#4144](https://github.com/Azure/typespec-azure/pull/4144) Add `no-route-parameter-name-mismatch` linting rule that detects when two operation routes differ only by path parameter name.
+
+### Bug Fixes
+
+- [#4394](https://github.com/Azure/typespec-azure/pull/4394) Make `@useFinalStateVia` validation decorator-order independent for PUT operations.
+
+
+## 0.67.1
+
+### Bug Fixes
+
+- [#4277](https://github.com/Azure/typespec-azure/pull/4277) Allow `@useFinalStateVia("original-uri")` for long-running POST operations, even when there is no GET operation modeled at the POST url.
+
+
 ## 0.67.0
 
 No changes, version bump only.

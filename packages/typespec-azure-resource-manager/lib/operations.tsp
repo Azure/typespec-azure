@@ -9,7 +9,7 @@ namespace Azure.ResourceManager;
 
 /**
  * A resource list operation, at the subscription scope
- * @template Resource the resource being patched
+ * @template Resource the resource being listed
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the list operation
  * @template Error Optional. The error response, if non-standard.
@@ -58,7 +58,7 @@ op ArmListBySubscriptionScope<
 
 /**
  * A resource list operation, at the scope of the resource's parent
- * @template Resource the resource being patched
+ * @template Resource the resource being listed
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template ParentName Optional. The name of the parent resource
  * @template ParentFriendlyName Optional. The friendly name of the parent resource
@@ -92,7 +92,7 @@ op ArmResourceListByParent<
 
 /**
  * A resource list operation, with scope determined by BaseParameters
- * @template Resource the resource being patched
+ * @template Resource the resource being listed
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the list operation
@@ -230,10 +230,9 @@ op ArmResourceCreateOrUpdateAsync<
   LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = Resource> &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
-    Resource,
-    LroHeaders
-  >,
+  Response extends {} =
+    | ArmResourceUpdatedResponse<Resource>
+    | ArmResourceCreatedResponse<Resource, LroHeaders>,
   Error extends {} = ErrorResponse,
   Provider extends {} = ProviderNamespace<Resource>
 > is ArmCreateOperation<
@@ -277,7 +276,7 @@ op ArmResourceCreateOrUpdateSync<
  * @template Resource the resource being created or replaced
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template Parameters Optional. Additional parameters after the path parameters
- * @template Response Optional. The success response for the createOrUpdate operation
+ * @template Response Optional. The success response for the createOrReplace operation
  * @template Error Optional. The error response, if non-standard.
  * @template Provider Optional. The provider namespace model for the resource.
  */
@@ -290,7 +289,9 @@ op ArmResourceCreateOrReplaceSync<
   Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
-  Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedSyncResponse<Resource>,
+  Response extends {} =
+    | ArmResourceUpdatedResponse<Resource>
+    | ArmResourceCreatedSyncResponse<Resource>,
   Error extends {} = ErrorResponse,
   Provider extends {} = ProviderNamespace<Resource>
 > is ArmCreateOperation<
@@ -317,10 +318,9 @@ op ArmResourceCreateOrReplaceAsync<
   LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = Resource> &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
-    Resource,
-    LroHeaders
-  >,
+  Response extends {} =
+    | ArmResourceUpdatedResponse<Resource>
+    | ArmResourceCreatedResponse<Resource, LroHeaders>,
   Error extends {} = ErrorResponse,
   Provider extends {} = ProviderNamespace<Resource>
 > is ArmResourceCreateOrUpdateAsync<
@@ -342,6 +342,7 @@ op ArmResourceCreateOrReplaceAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Provider Optional. The provider namespace model for the resource.
  */
+#suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
 @patch(#{ implicitOptionality: true })
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmTagsPatchAsync<
@@ -376,6 +377,7 @@ op ArmTagsPatchAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Provider Optional. The provider namespace model for the resource.
  */
+#suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
 @patch(#{ implicitOptionality: true })
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourcePatchAsync<
@@ -428,10 +430,9 @@ op ArmCustomPatchAsync<
   > &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} = ArmResponse<Resource> | ArmAcceptedLroResponse<
-    "Resource update request accepted.",
-    LroHeaders
-  >,
+  Response extends {} =
+    | ArmResponse<Resource>
+    | ArmAcceptedLroResponse<"Resource update request accepted.", LroHeaders>,
   Error extends {} = ErrorResponse,
   Provider extends {} = ProviderNamespace<Resource>
 > is ArmUpdateOperation<
@@ -448,6 +449,7 @@ op ArmCustomPatchAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Provider Optional. The provider namespace model for the resource.
  */
+#suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
 @patch(#{ implicitOptionality: true })
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmTagsPatchSync<
@@ -473,6 +475,7 @@ op ArmTagsPatchSync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Provider Optional. The provider namespace model for the resource.
  */
+#suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
 @patch(#{ implicitOptionality: true })
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourcePatchSync<
@@ -542,10 +545,9 @@ op ArmResourceDeleteAsyncBase<
   Parameters extends {} = {},
   Error extends {} = ErrorResponse,
   Provider extends {} = ProviderNamespace<Resource>
->(
-  ...ResourceInstanceParameters<Resource, BaseParameters, Provider>,
-  ...Parameters,
-): Response | Error;
+>(...ResourceInstanceParameters<Resource, BaseParameters, Provider>, ...Parameters):
+  | Response
+  | Error;
 
 /**
  * @dev Delete a resource asynchronously.  DEPRECATED: Use ArmResourceDeleteWithoutOkAsync instead
@@ -565,7 +567,10 @@ op ArmResourceDeleteAsync<
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} = ArmDeletedResponse | ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
+  Response extends {} =
+    | ArmDeletedResponse
+    | ArmDeleteAcceptedLroResponse<LroHeaders>
+    | ArmDeletedNoContentResponse,
   Error extends {} = ErrorResponse,
   Provider extends {} = ProviderNamespace<Resource>
 > is ArmResourceDeleteAsyncBase<Resource, Response, BaseParameters, Parameters, Error, Provider>;
@@ -613,10 +618,9 @@ op ArmResourceDeleteSync<
   Response extends {} = ArmDeletedResponse | ArmDeletedNoContentResponse,
   Error = ErrorResponse,
   Provider extends {} = ProviderNamespace<Resource>
->(
-  ...ResourceInstanceParameters<Resource, BaseParameters, Provider>,
-  ...Parameters,
-): Response | Error;
+>(...ResourceInstanceParameters<Resource, BaseParameters, Provider>, ...Parameters):
+  | Response
+  | Error;
 
 /**
  * A long-running resource action.
@@ -790,10 +794,8 @@ op ArmResourceActionNoContentAsync<
 > is ArmResourceActionAsyncBase<
   Resource,
   Request,
-  ArmAcceptedLroResponse<
-    "Resource operation accepted.",
-    LroHeaders
-  > | ArmNoContentResponse<"Action completed successfully.">,
+  | ArmAcceptedLroResponse<"Resource operation accepted.", LroHeaders>
+  | ArmNoContentResponse<"Action completed successfully.">,
   BaseParameters,
   Parameters,
   Error,

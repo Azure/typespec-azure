@@ -22,8 +22,10 @@
     "@fluentui/react-components": "catalog:",
     "@typespec/playground": "workspace:^",
     "astro": "catalog:",
+    "chart.js": "catalog:",
     "es-module-shims": "catalog:",
     "react": "catalog:",
+    "react-chartjs-2": "catalog:",
     "react-dom": "catalog:",
     "sharp": "catalog:",
     "typescript": "catalog:"
@@ -48,6 +50,7 @@
     "astro-rehype-relative-markdown-links": "catalog:",
     "hast-util-to-html": "catalog:",
     "rehype": "catalog:",
+    "remark-gfm": "catalog:",
     "remark-heading-id": "catalog:",
     "unist-util-visit": "catalog:",
     "yaml": "catalog:"

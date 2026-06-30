@@ -14,7 +14,8 @@ async function runPython3(...args: string[]) {
     version: ">=3.9",
     environmentVariable: "AUTOREST_PYTHON_EXE",
   });
-  cp.execSync(command.join(" "), {
+  const [cmd, ...cmdArgs] = command;
+  cp.execFileSync(cmd, cmdArgs, {
     stdio: [0, 1, 2],
   });
 }

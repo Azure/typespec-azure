@@ -15,7 +15,7 @@ extends:
           - job: publish_playground
             displayName: Publish playground & website
             variables:
-              TYPESPEC_WEBSITE_BASE_PATH: "typespec-azure/prs/$(System.PullRequest.PullRequestNumber)/"
+              TYPESPEC_WEBSITE_BASE_PATH: "/typespec-azure/prs/$(System.PullRequest.PullRequestNumber)/"
             pool:
               name: $(LINUXPOOL)
               image: $(LINUXVMIMAGE)
@@ -60,10 +60,12 @@ extends:
                       --source "./website/dist/" \
                       --overwrite
 
+              - template: /eng/common/pipelines/templates/steps/login-to-github.yml
+
               - script: npx tsx core/eng/tsp-core/scripts/create-tryit-comment.ts "typespec-azure"
                 displayName: Check already commented
                 env:
-                  GH_TOKEN: $(azuresdk-github-pat)
+                  GH_TOKEN: $(GH_TOKEN)
           - job: change_comment
             displayName: Describe changes on PR
             condition: and(succeeded(), eq(startsWith(variables['System.PullRequest.SourceBranch'], 'publish/'), false))
@@ -74,7 +76,9 @@ extends:
             steps:
               - checkout: self
 
+              - template: /eng/common/pipelines/templates/steps/login-to-github.yml
+
               - script: npx -p @chronus/github-pr-commenter@0.5.0 chronus-github-pr-commenter
                 displayName: Make comment about changes
                 env:
-                  GITHUB_TOKEN: $(azuresdk-github-pat)
+                  GITHUB_TOKEN: $(GH_TOKEN)

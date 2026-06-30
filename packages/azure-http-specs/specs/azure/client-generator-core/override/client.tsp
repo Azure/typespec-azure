@@ -8,14 +8,16 @@ using global.Azure.ClientGenerator.Core;
 @clientNamespace("azure.clientgenerator.core.methodoverride", "java")
 namespace Customization;
 
-@@clientNamespace(_Specs_.Azure.ClientGenerator.Core.Override,
+@@clientNamespace(
+  _Specs_.Azure.ClientGenerator.Core.Override,
   "azure.clientgenerator.core.methodoverride",
   "java"
 );
 
 op reorderCustomized(@path param1: string, @path param2: string): void;
 
-@@override(_Specs_.Azure.ClientGenerator.Core.Override.ReorderParameters.reorder,
+@@override(
+  _Specs_.Azure.ClientGenerator.Core.Override.ReorderParameters.reorder,
   reorderCustomized
 );
 
@@ -30,12 +32,14 @@ op groupCustomized(options: GroupParametersOptions): void;
 
 op requireOptionalCustomized(@path param1: string, @path param2: string): void;
 
-@@override(_Specs_.Azure.ClientGenerator.Core.Override.RequireOptionalParameter.requireOptional,
+@@override(
+  _Specs_.Azure.ClientGenerator.Core.Override.RequireOptionalParameter.requireOptional,
   requireOptionalCustomized
 );
 
 op removeOptionalCustomized(@path param1: string, @query param2?: string): void;
 
-@@override(_Specs_.Azure.ClientGenerator.Core.Override.RemoveOptionalParameter.removeOptional,
+@@override(
+  _Specs_.Azure.ClientGenerator.Core.Override.RemoveOptionalParameter.removeOptional,
   removeOptionalCustomized
 );

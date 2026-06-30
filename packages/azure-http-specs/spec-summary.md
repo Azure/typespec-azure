@@ -881,6 +881,116 @@ Expected response body:
 }
 ```
 
+### Azure_ClientGenerator_Core_ExactName_EnumValue
+
+- Endpoint: `post /azure/client-generator-core/exact-name/enum-value`
+
+This scenario tests the exact() function applied to an enum value.
+The union AgentEndpointProtocol has a member 'a2a' which is renamed using exact("A2A")
+scoped per language. Emitters should preserve the exact enum value name 'A2A' without
+applying their usual casing conventions (e.g., Python should NOT convert to 'A_2_A',
+and C# should NOT convert to 'A2A' → 'A2a' or any other transformation).
+
+Expected request body:
+
+```json
+{
+  "protocol": "a2a"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "protocol": "a2a"
+}
+```
+
+### Azure_ClientGenerator_Core_ExactName_Model
+
+- Endpoint: `post /azure/client-generator-core/exact-name/model`
+
+This scenario tests the exact() function which prevents language emitters from applying
+casing transformations to client names. The model 'ExactModel' is renamed to 'my_model'
+using exact(), meaning all languages should preserve the name 'my_model' without any
+casing conversion (e.g., Python should NOT convert to 'MyModel' class name,
+and C# should NOT convert to 'MyModel').
+
+Expected request body:
+
+```json
+{
+  "name": "test"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "name": "test"
+}
+```
+
+### Azure_ClientGenerator_Core_ExactName_Operation
+
+- Endpoint: `get /azure/client-generator-core/exact-name/operation`
+
+This scenario tests the exact() function applied to an operation name.
+The operation 'myOp' is renamed using exact("myOp") scoped per language.
+Emitters should preserve the exact operation name without applying their usual
+casing conventions (e.g., Python should NOT convert to 'my_op',
+and C# should NOT convert to 'MyOp').
+
+Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_ExactName_Parameter
+
+- Endpoint: `get /azure/client-generator-core/exact-name/parameter`
+
+This scenario tests the exact() function applied to a parameter name.
+The query parameter 'myParam' is renamed using exact("myParam") scoped per language.
+Emitters should preserve the exact parameter name without applying their usual
+casing conventions (e.g., Python should NOT convert to 'my_param',
+and C# should NOT convert to 'MyParam').
+
+Expected query parameter:
+myParam: hello
+
+Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_ExactName_Property
+
+- Endpoint: `post /azure/client-generator-core/exact-name/property`
+
+This scenario tests the exact() function applied to a model property with language scoping.
+The property 'name' on ScopedModel is renamed using exact() scoped to each language,
+with names that include an underscore prefix to verify that language naming logic does not apply:
+
+- Python: '\_my_name' (should not be converted to 'my_name' or other casing)
+- Java: '\_myName' (should not be converted to remove the underscore prefix)
+- C#: '\_MyName' (should not be converted to remove the underscore prefix)
+- JavaScript: '\_myName' (should not be converted to remove the underscore prefix)
+- Go: '\_MyName' (should not be converted to remove the underscore prefix)
+  Each language should preserve the specified exact name as-is without any further casing conversion.
+
+Expected request body:
+
+```json
+{
+  "name": "test"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "name": "test"
+}
+```
+
 ### Azure_ClientGenerator_Core_FlattenProperty_putFlattenModel
 
 - Endpoint: `put /azure/client-generator-core/flatten-property/flattenModel`
@@ -1259,6 +1369,16 @@ Expected calls:
 This scenario contains 4 public operations. All should be generated and exported.
 'OrphanModel' is not used but specified as 'public' and 'input', so it should be generated in SDK. The 'orphanModelSerializable' operation verifies that the model can be serialized to JSON.
 The other models' usage is additive to roundtrip, so they should be generated and exported as well.
+
+### Azure_ClientGenerator_Core_Usage_NamespaceUsage
+
+- Endpoint: `put /azure/client-generator-core/usage/namespaceModelSerializable`
+
+This scenario tests @usage applied to a namespace.
+All models within the namespace (including nested sub-namespaces) inherit the usage.
+'NamespaceModel' and 'NestedNamespaceModel' are orphan models that should be generated
+because their parent namespace has @usage(Usage.input | Usage.json) applied.
+The 'namespaceModelSerializable' operation verifies that models from the namespace can be serialized.
 
 ### Azure_Core_Basic_createOrReplace
 
@@ -2020,6 +2140,71 @@ maxpagesize=3
 }
 ```
 
+### Azure_ResourceManager_CommonProperties_ArmResourceIdentifiers_createOrReplace
+
+- Endpoint: `put https://management.azure.com`
+
+Resource PUT operation.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.CommonProperties/armResourceIdentifierResources/armId
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "location": "eastus",
+  "properties": {
+    "simpleArmId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithType": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithTypeAndScope": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.CommonProperties/armResourceIdentifierResources/armId",
+  "location": "eastus",
+  "name": "armId",
+  "type": "Azure.ResourceManager.CommonProperties/armResourceIdentifierResources",
+  "properties": {
+    "provisioningState": "Succeeded",
+    "simpleArmId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithType": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithTypeAndScope": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm"
+  }
+}
+```
+
+### Azure_ResourceManager_CommonProperties_ArmResourceIdentifiers_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.CommonProperties/armResourceIdentifierResources/armId
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.CommonProperties/armResourceIdentifierResources/armId",
+  "location": "eastus",
+  "name": "armId",
+  "type": "Azure.ResourceManager.CommonProperties/armResourceIdentifierResources",
+  "properties": {
+    "provisioningState": "Succeeded",
+    "simpleArmId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithType": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithTypeAndScope": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
+    "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm"
+  }
+}
+```
+
 ### Azure_ResourceManager_CommonProperties_Error_createForUserDefinedError
 
 - Endpoint: `put https://management.azure.com`
@@ -2260,6 +2445,157 @@ Expected response body:
 ```json
 {
   "succeeded": true
+}
+```
+
+### Azure_ResourceManager_ManagementGroup_ManagementGroupChildResources_createOrUpdate
+
+- Endpoint: `put https://management.azure.com`
+
+Resource PUT operation at management group scope.
+Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected request body:
+
+```json
+{
+  "properties": {
+    "description": "valid"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource",
+  "name": "resource",
+  "type": "Microsoft.ManagementGroupChild/managementGroupChildResources",
+  "properties":{
+    "description": "valid",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_ManagementGroup_ManagementGroupChildResources_delete
+
+- Endpoint: `delete https://management.azure.com`
+
+Resource DELETE operation at management group scope.
+Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 204
+
+### Azure_ResourceManager_ManagementGroup_ManagementGroupChildResources_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation at management group scope.
+Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "/providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource",
+  "name": "resource",
+  "type": "Microsoft.ManagementGroupChild/managementGroupChildResources",
+  "properties":{
+    "description": "valid",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_ManagementGroup_ManagementGroupChildResources_listByManagementGroup
+
+- Endpoint: `get https://management.azure.com`
+
+Resource LIST operation at management group scope.
+Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "value": [{
+    "id": "/providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource",
+    "name": "resource",
+    "type": "Microsoft.ManagementGroupChild/managementGroupChildResources",
+    "properties":{
+      "description": "valid",
+      "provisioningState": "Succeeded"
+    },
+    "systemData": {
+      "createdBy": "AzureSDK",
+      "createdByType": "User",
+      "createdAt": <any date>,
+      "lastModifiedBy": "AzureSDK",
+      "lastModifiedAt": <any date>,
+      "lastModifiedByType": "User"
+    }
+  }]
+}
+```
+
+### Azure_ResourceManager_ManagementGroup_ManagementGroupChildResources_update
+
+- Endpoint: `patch https://management.azure.com`
+
+Resource PATCH operation at management group scope.
+Expected path: /providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected request body:
+
+```json
+{
+  "properties": {
+    "description": "valid2"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/providers/Microsoft.Management/managementGroups/test-mg/providers/Microsoft.ManagementGroupChild/managementGroupChildResources/resource",
+  "name": "resource",
+  "type": "Microsoft.ManagementGroupChild/managementGroupChildResources",
+  "properties":{
+    "description": "valid2",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
 }
 ```
 
@@ -4715,6 +5051,42 @@ Expected response body:
   }
 }
 ```
+
+### Azure_SpecialHeaders_ConditionalRequest_postCustomIfMatch
+
+- Endpoint: `post /azure/special-headers/conditional-request/custom-if-match`
+
+Check when custom If-Match header name is used with eTag type for conditional requests.
+Expected header parameters:
+
+- x-ms-blob-if-match="valid"
+
+### Azure_SpecialHeaders_ConditionalRequest_postCustomIfNoneMatch
+
+- Endpoint: `post /azure/special-headers/conditional-request/custom-if-none-match`
+
+Check when custom If-None-Match header name is used with eTag type for conditional requests.
+Expected header parameters:
+
+- x-ms-blob-if-none-match="invalid"
+
+### Azure_SpecialHeaders_ConditionalRequest_postIfMatch
+
+- Endpoint: `post /azure/special-headers/conditional-request/if-match`
+
+Check when only If-Match in header is defined with eTag type.
+Expected header parameters:
+
+- if-match="valid"
+
+### Azure_SpecialHeaders_ConditionalRequest_postIfNoneMatch
+
+- Endpoint: `post /azure/special-headers/conditional-request/if-none-match`
+
+Check when only If-None-Match in header is defined with eTag type.
+Expected header parameters:
+
+- if-none-match="invalid"
 
 ### Azure_SpecialHeaders_XmsClientRequestId
 

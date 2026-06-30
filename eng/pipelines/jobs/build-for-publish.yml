@@ -17,6 +17,54 @@ jobs:
         displayName: Test
 
       - template: /eng/pipelines/templates/upload-coverage.yml
+
+      # Python e2e tests and spector coverage upload
+      - task: UsePythonVersion@0
+        displayName: "Use Python 3.12"
+        inputs:
+          versionSpec: "3.12"
+
+      - script: pnpm run prepare
+        displayName: "Prepare Python environment"
+        workingDirectory: packages/typespec-python
+
+      - script: pnpm run regenerate
+        displayName: "Regenerate Python test code"
+        workingDirectory: packages/typespec-python
+
+      - script: pnpm run test:python:e2e
+        displayName: "Run Python e2e tests"
+        workingDirectory: packages/typespec-python
+
+      - template: /eng/pipelines/templates/upload-spector-coverage.yml
+        parameters:
+          PackagePath: packages/typespec-python
+          GeneratorName: "@azure-tools/typespec-python"
+
+      # TypeScript (typespec-ts) e2e tests and spector coverage upload.
+      # The emitter was migrated here from Azure/autorest.typescript; this replaces
+      # the coverage upload that previously ran in that (now deprecated) repo.
+      - script: pnpm run integration-test-ci
+        displayName: "Run TypeScript e2e tests"
+        workingDirectory: packages/typespec-ts
+
+      - task: AzureCLI@2
+        displayName: "Upload spector coverage (typespec-ts, azure)"
+        continueOnError: true
+        inputs:
+          azureSubscription: "TypeSpec Storage"
+          scriptType: "bash"
+          scriptLocation: "inlineScript"
+          inlineScript: >-
+            npx tsp-spector upload-coverage
+            --coverageFile ./coverage/spector-coverage-typescript-azure.json
+            --generatorName "@azure-tools/typespec-ts"
+            --storageAccountName typespec
+            --containerName coverages
+            --generatorVersion $(node -p -e "require('./package.json').version")
+            --generatorMode azure
+          workingDirectory: packages/typespec-ts
+
       - template: /eng/pipelines/templates/pack.yml
         parameters:
           artifactName: npm-packages-stable

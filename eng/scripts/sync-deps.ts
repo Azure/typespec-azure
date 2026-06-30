@@ -39,14 +39,24 @@ function parseCatalog(filePath: string): Record<string, string> {
   return catalog;
 }
 
+/**
+ * Determines whether a catalog version value must be quoted to be a valid YAML
+ * plain scalar. Safe plain scalars are caret/tilde ranges (e.g. `^1.2.3`) or tag
+ * names starting with a letter (e.g. `latest`). Anything else — values starting
+ * with a digit (parsed as a number) or containing YAML indicator characters such
+ * as whitespace, `>`, `<`, `:` or `*` (e.g. `>=0.33.0 <1.0.0`) — must be quoted.
+ */
+function needsQuoting(version: string): boolean {
+  return !/^[\^~]?[A-Za-z0-9][A-Za-z0-9.\-]*$/.test(version) || /^\d/.test(version);
+}
+
 /** Serializes a catalog object into YAML. */
 function serializeCatalog(catalog: Record<string, string>): string {
   const lines = ["catalog:"];
   const sorted = Object.entries(catalog).sort(([a], [b]) => a.localeCompare(b));
   for (const [dep, version] of sorted) {
     const key = dep.startsWith("@") ? `"${dep}"` : dep;
-    // Quote versions that start with a digit so YAML doesn't parse them as numbers
-    const val = /^\d/.test(version) ? `"${version}"` : version;
+    const val = needsQuoting(version) ? `"${version}"` : version;
     lines.push(`  ${key}: ${val}`);
   }
   return lines.join("\n") + "\n";

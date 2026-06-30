@@ -1,0 +1,13 @@
+emit:
+  - "@azure-tools/typespec-ts"
+options:
+  "@azure-tools/typespec-ts":
+    emitter-output-dir: "{project-root}"
+    generate-metadata: true
+    generate-test: false
+    flavor: azure
+    is-typespec-test: true
+    hierarchy-client: false
+    package-details:
+      name: "@msinternal/azure-oauth2"
+      description: "Azure Oauth2 Test Service"
