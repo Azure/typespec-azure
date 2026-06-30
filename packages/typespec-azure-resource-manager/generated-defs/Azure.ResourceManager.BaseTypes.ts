@@ -16,14 +16,17 @@ export interface BaseTypeInfo {
  * @param baseType The base type specification this resource implements.
  * @example
  * ```typespec
- * model MyAgentProperties {
- *   displayName: string;
- *   description: string;
+ * // Agent definition and properties using the Appliance deployment model
+ * model ContosoApplianceDefinition is AgentDefinitionAppliance<true, true>;
+ * model ContosoApplianceProperties is AgentPropertiesAppliance<ContosoApplianceDefinition> {
+ *   ...DefaultProvisioningStateProperty;
  * }
  *
+ * // The @azureBaseType decorator marks the resource as conforming to the Agent base type.
+ * // (The Agent template applies this automatically, but it can also be applied directly.)
  * @azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
- * model MyAgent is TrackedResource<MyAgentProperties> {
- *   @key("myAgentName") @segment("myAgents") name: string;
+ * model ContosoApplianceAgent is TrackedResource<ContosoApplianceProperties> {
+ *   ...ResourceNameParameter<ContosoApplianceAgent>;
  * }
  * ```
  */
