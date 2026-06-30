@@ -1541,7 +1541,7 @@ export const $clientLocation = (
 };
 
 /**
- * Gets the amespace`, `Interface` or name of client where an operation changes location to.
+ * Gets the `Namespace`, `Interface` or name of client where an operation changes location to.
  */
 export function getClientLocation(
   context: TCGCContext,
@@ -1549,7 +1549,7 @@ export function getClientLocation(
 ): Namespace | Interface | string | undefined;
 
 /**
- * Gets the amespace`, `Interface`, `Operation` where a parameter changes location to.
+ * Gets the `Namespace`, `Interface`, `Operation` where a parameter changes location to.
  */
 export function getClientLocation(
   context: TCGCContext,
@@ -1557,11 +1557,11 @@ export function getClientLocation(
 ): Namespace | Interface | Operation | undefined;
 
 /**
- * Gets the amespace`, `Interface`, `Operation` or name of client where an operation / parameter change the location to.
+ * Gets the `Namespace`, `Interface`, `Operation` or name of client where an operation / parameter change the location to.
  *
  * @param context TCGCContext
  * @param input Operation or parameter to be moved
- * @returns amespace`, `Interface`, `Operation`, `string` target or undefined if no location change.
+ * @returns `Namespace`, `Interface`, `Operation`, `string` target or undefined if no location change.
  */
 export function getClientLocation(
   context: TCGCContext,
