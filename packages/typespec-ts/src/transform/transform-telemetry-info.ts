@@ -3,8 +3,8 @@ import {
   SdkClient,
   SdkContext,
 } from "@azure-tools/typespec-client-generator-core";
-import { TelemetryInfo } from "../rlc-common/index.js";
-import { listOperationsUnderRLCClient } from "../utils/client-utils.js";
+import { TelemetryInfo } from "../interfaces.js";
+import { listOperationsUnderClient } from "../utils/client-utils.js";
 import { getCustomRequestHeaderNameForOperation } from "../utils/operation-util.js";
 
 export function transformTelemetryInfo(
@@ -21,7 +21,7 @@ export function transformTelemetryInfo(
 }
 
 function getCustomRequestHeaderNameForClient(dpgContext: SdkContext, client: SdkClient) {
-  for (const op of listOperationsUnderRLCClient(client)) {
+  for (const op of listOperationsUnderClient(client)) {
     const headerName = getCustomRequestHeaderNameForOperation(
       getHttpOperationWithCache(dpgContext, op),
     );

@@ -1,27 +1,9 @@
 /* eslint-disable no-console */
-import { runTypespec } from "./run.js";
-import { azureModularTsps, azureRlcTsps, modularTsps, rlcTsps } from "./spector-list.js";
+import { runTypespec } from "./run.ts";
+import { azureModularTsps } from "./spector-list.js";
 
-async function generateTypeSpecs(tag = "rlc", isDebugging, pathFilter) {
-  let list;
-
-  switch (tag) {
-    case "rlc":
-      list = rlcTsps;
-      break;
-    case "modular":
-      list = modularTsps;
-      break;
-    case "azure-rlc":
-      list = azureRlcTsps;
-      break;
-    case "azure-modular":
-      list = azureModularTsps;
-      break;
-    default:
-      list = modularTsps;
-      break;
-  }
+async function generateTypeSpecs(isDebugging, pathFilter, phase = "all") {
+  let list = azureModularTsps;
 
   if (pathFilter) {
     list = list.filter((tsp) => tsp.outputPath === pathFilter);
@@ -33,7 +15,7 @@ async function generateTypeSpecs(tag = "rlc", isDebugging, pathFilter) {
     if (isDebugging === true && tsp.debug !== true) {
       continue;
     }
-    const generatePromise = runTypespec(tsp, tag)
+    const generatePromise = runTypespec(tsp, phase)
       .then((result) => {
         activePromises = activePromises.filter((p) => p !== generatePromise);
         return result;
@@ -55,11 +37,11 @@ async function generateTypeSpecs(tag = "rlc", isDebugging, pathFilter) {
 
 async function main() {
   const isDebugging = process.argv.indexOf("--debug") !== -1;
-  const tagOptions = process.argv.filter((s) => s.startsWith("--tag="));
   const nameFilter = process.argv.filter((s) => s.startsWith("--filter="));
-  const tag = tagOptions[0]?.split("=")[1];
+  const phaseOptions = process.argv.filter((s) => s.startsWith("--phase="));
   const filter = nameFilter[0]?.split("=")[1];
-  await generateTypeSpecs(tag, isDebugging, filter);
+  const phase = phaseOptions[0]?.split("=")[1] ?? "all";
+  await generateTypeSpecs(isDebugging, filter, phase);
 }
 
 let exitCode = 0;
