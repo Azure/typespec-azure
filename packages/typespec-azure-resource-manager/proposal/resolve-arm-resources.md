@@ -91,7 +91,15 @@ interface ArmResourceLifecycleOperations {
 
 interface ArmResourceOperation {
   name: string;
-  kind: "read" | "createOrUpdate" | "update" | "delete" | "checkExistence" | "list" | "action" | "other";
+  kind:
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "checkExistence"
+    | "list"
+    | "action"
+    | "other";
   operationGroup: string;
   operation: Operation;
   path: string;
@@ -117,18 +125,18 @@ interface SingletonResourceInfo {
 
 Each `ResolvedResource` describes one concrete ARM resource path in one provider version.
 
-| Property | Description |
-| --- | --- |
-| `type` | The TypeSpec `Model` that declares or owns the resource. For operation-discovered auxiliary resources, this may be the closest owning resource model. |
-| `kind` | The public resource category. Recommended values are `Tracked`, `Proxy`, `Extension`, and `Other`. Unsupported or synthetic resources should use `Other` rather than leaking internal implementation kinds. |
-| `providerNamespace` | The ARM provider namespace that owns this resolved resource. For extension resources, this is the extension provider namespace, not necessarily the namespace of the target resource. |
-| `resourceType` | The ARM resource type split into provider and type segments. For `Microsoft.Foo/widgets/extensions`, `provider` is `Microsoft.Foo` and `types` is `["widgets", "extensions"]`. |
-| `resourceName` | The logical resource name used by operation grouping and downstream emitters. This may come from the resource model name, a template-provided `ResourceName`, or operation metadata. |
+| Property               | Description                                                                                                                                                                                                        |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `type`                 | The TypeSpec `Model` that declares or owns the resource. For operation-discovered auxiliary resources, this may be the closest owning resource model.                                                              |
+| `kind`                 | The public resource category. Recommended values are `Tracked`, `Proxy`, `Extension`, and `Other`. Unsupported or synthetic resources should use `Other` rather than leaking internal implementation kinds.        |
+| `providerNamespace`    | The ARM provider namespace that owns this resolved resource. For extension resources, this is the extension provider namespace, not necessarily the namespace of the target resource.                              |
+| `resourceType`         | The ARM resource type split into provider and type segments. For `Microsoft.Foo/widgets/extensions`, `provider` is `Microsoft.Foo` and `types` is `["widgets", "extensions"]`.                                     |
+| `resourceName`         | The logical resource name used by operation grouping and downstream emitters. This may come from the resource model name, a template-provided `ResourceName`, or operation metadata.                               |
 | `resourceInstancePath` | The canonical instance path for this resource in this version, including scope, provider namespace, type segments, and name segments. List operations should resolve to the same instance path as item operations. |
-| `operations` | Resource lifecycle, list, and action operations grouped by operation kind. These are the operations that directly operate on this resource path. |
-| `parent` | A reference to the parent resource when this resource is a child resource. The parent may be declared directly or synthesized from the path. |
-| `scope` | The scope where this resource exists. This can be a well-known ARM scope string or a structured reference to another resource used as the extension target. |
-| `singleton` | Singleton metadata when the resource has a fixed name segment, such as `default`, or a fixed set of allowed singleton names. |
+| `operations`           | Resource lifecycle, list, and action operations grouped by operation kind. These are the operations that directly operate on this resource path.                                                                   |
+| `parent`               | A reference to the parent resource when this resource is a child resource. The parent may be declared directly or synthesized from the path.                                                                       |
+| `scope`                | The scope where this resource exists. This can be a well-known ARM scope string or a structured reference to another resource used as the extension target.                                                        |
+| `singleton`            | Singleton metadata when the resource has a fixed name segment, such as `default`, or a fixed set of allowed singleton names.                                                                                       |
 
 ## High-level flow
 

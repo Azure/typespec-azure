@@ -46,13 +46,13 @@ This is important because the proposed resolver can use `CreateOrUpdate` as a re
 
 Every registered lifecycle operation kind should use the expected HTTP verb:
 
-| Lifecycle kind | Expected HTTP verb |
-| --- | --- |
-| `read` | `GET` |
-| `createOrUpdate` | `PUT` |
-| `update` | `PATCH` |
-| `delete` | `DELETE` |
-| `checkExistence` | `HEAD` |
+| Lifecycle kind   | Expected HTTP verb |
+| ---------------- | ------------------ |
+| `read`           | `GET`              |
+| `createOrUpdate` | `PUT`              |
+| `update`         | `PATCH`            |
+| `delete`         | `DELETE`           |
+| `checkExistence` | `HEAD`             |
 
 This lets `resolveArmResources` attach lifecycle operations by their registered ARM operation kind without re-validating protocol shape during resource graph construction.
 
