@@ -8,6 +8,7 @@ on:
     paths:
       - "packages/typespec-ts/**"
       - "packages/typespec-client-generator-core/**"
+      - "packages/typespec-azure-resource-manager/**"
       - ".github/workflows/ci-typescript.yml"
   merge_group:
 
