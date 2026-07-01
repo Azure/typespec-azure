@@ -29,6 +29,20 @@ export const flattenPropertyModelMap: Map<SdkModelPropertyType, SdkModelType> = 
  */
 export const pagedModelsKeptPublic = new Set<SdkType>();
 
+/**
+ * Releases the module-level state that accumulates while visiting a package's
+ * types. These collections are cleared at the start of every
+ * {@link visitPackageTypes} call, but because they live at module scope they
+ * otherwise keep the most recently emitted program's SDK types reachable until
+ * the next emit runs. Call this once an emit has fully finished so that state
+ * can be garbage collected.
+ */
+export function resetSdkTypesState(): void {
+  emitQueue.clear();
+  flattenPropertyModelMap.clear();
+  pagedModelsKeptPublic.clear();
+}
+
 export interface SdkTypeContext {
   operations: Map<Type, SdkServiceMethod<SdkHttpOperation>>;
   types: Map<Type, SdkType>;
