@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-python"
 ---
 
-Update http-client-python dependency and sync upstream tests
+Update http-client-python dependency and sync upstream tests.
