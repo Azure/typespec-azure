@@ -1,22 +1,21 @@
 import { defineConfig } from "vitest/config";
 
-// `include` only lists the unit suites (`test-next` + `unit-modular`). When this
-// package is run on its own (`pnpm test-next`, `pnpm unit-test`,
-// `pnpm integration-test:alone`) the named `projects` below take over and this
-// top-level config is ignored. When the repo-wide run picks up this file as a
-// single project via the root `vitest.config.ts`/`vitest.config.fast.ts`, vitest
-// ignores the nested `projects` and uses these top-level options instead — so only
-// the unit suites run there, with the same timeout/pool settings the
-// `unit-modular` project relies on. The Spector end-to-end
-// `integration-azure-modular` project needs generated clients and a running test
-// server, so it is intentionally left out of `include` and runs via its own
-// script / the dedicated e2e CI job.
-const unitTestInclude = ["test-next/**/*.test.ts", "test/modular-unit/**/*.test.ts"];
+// The repo-wide run (root `vitest.config.ts` / `vitest.config.fast.ts`) picks up
+// this file as a single project and — in Vitest 4 — ignores the nested `projects`,
+// using only these top-level `test` options. We deliberately include ONLY the fast
+// `test-next` suite there: it is a quick cross-package smoke net (~14s). The heavy
+// `unit-modular` suite (~150s of TypeSpec compiles) is intentionally excluded from
+// the repo-wide run to keep it fast; it still runs in full via `pnpm unit-test`
+// locally and in the dedicated `ci-typescript.yml` job — which also triggers on
+// `typespec-client-generator-core` (tcgc) changes, so cross-package emit
+// regressions are still caught. The Spector end-to-end `integration-azure-modular`
+// project needs generated clients and a running test server, so it too is excluded
+// here and runs via its own script / the dedicated e2e CI job.
+const repoWideInclude = ["test-next/**/*.test.ts"];
 
-// Settings the `unit-modular` suites need (heavy TypeSpec compiles). Applied at
-// the top level so they also take effect in the single-project repo-wide run.
-// In Vitest 4 `poolOptions` was removed — its sub-options (here `execArgv`) are
-// now top-level `test.*` fields, and can additionally be set per-project.
+// Settings the `unit-modular` suites need (heavy TypeSpec compiles): no per-test
+// timeout and a raised heap. In Vitest 4 `poolOptions` was removed — its
+// sub-options (here `execArgv`) are now top-level `test.*` fields, set per-project.
 const unitModularPool = {
   testTimeout: 0,
   pool: "forks" as const,
@@ -25,8 +24,7 @@ const unitModularPool = {
 
 export default defineConfig({
   test: {
-    include: unitTestInclude,
-    ...unitModularPool,
+    include: repoWideInclude,
     projects: [
       {
         test: {
