@@ -3775,6 +3775,91 @@ importers:
         specifier: 'catalog:'
         version: 4.1.9(@types/node@26.0.0)(@vitest/coverage-v8@4.1.9)(@vitest/ui@4.1.9)(happy-dom@20.10.6)(jsdom@25.0.1)(vite@8.1.0(@types/node@26.0.0)(esbuild@0.28.1)(tsx@4.22.4)(yaml@2.9.0))
 
+  packages/typespec-go:
+    dependencies:
+      semver:
+        specifier: 'catalog:'
+        version: 7.8.5
+    devDependencies:
+      '@azure-tools/azure-http-specs':
+        specifier: workspace:^
+        version: link:../azure-http-specs
+      '@azure-tools/typespec-autorest':
+        specifier: workspace:^
+        version: link:../typespec-autorest
+      '@azure-tools/typespec-azure-core':
+        specifier: workspace:^
+        version: link:../typespec-azure-core
+      '@azure-tools/typespec-azure-resource-manager':
+        specifier: workspace:^
+        version: link:../typespec-azure-resource-manager
+      '@azure-tools/typespec-azure-rulesets':
+        specifier: workspace:^
+        version: link:../typespec-azure-rulesets
+      '@azure-tools/typespec-client-generator-core':
+        specifier: workspace:^
+        version: link:../typespec-client-generator-core
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.0.0
+      '@types/semver':
+        specifier: 'catalog:'
+        version: 7.7.1
+      '@typespec/compiler':
+        specifier: workspace:^
+        version: link:../../core/packages/compiler
+      '@typespec/events':
+        specifier: workspace:^
+        version: link:../../core/packages/events
+      '@typespec/http':
+        specifier: workspace:^
+        version: link:../../core/packages/http
+      '@typespec/http-specs':
+        specifier: workspace:^
+        version: link:../../core/packages/http-specs
+      '@typespec/openapi':
+        specifier: workspace:^
+        version: link:../../core/packages/openapi
+      '@typespec/rest':
+        specifier: workspace:^
+        version: link:../../core/packages/rest
+      '@typespec/spec-api':
+        specifier: workspace:^
+        version: link:../../core/packages/spec-api
+      '@typespec/spector':
+        specifier: workspace:^
+        version: link:../../core/packages/spector
+      '@typespec/sse':
+        specifier: workspace:^
+        version: link:../../core/packages/sse
+      '@typespec/streams':
+        specifier: workspace:^
+        version: link:../../core/packages/streams
+      '@typespec/tspd':
+        specifier: workspace:^
+        version: link:../../core/packages/tspd
+      '@typespec/versioning':
+        specifier: workspace:^
+        version: link:../../core/packages/versioning
+      '@typespec/xml':
+        specifier: workspace:^
+        version: link:../../core/packages/xml
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 4.1.9(vitest@4.1.9)
+      '@vitest/ui':
+        specifier: 'catalog:'
+        version: 4.1.9(vitest@4.1.9)
+      rimraf:
+        specifier: 'catalog:'
+        version: 6.1.3
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.9(@types/node@26.0.0)(@vitest/coverage-v8@4.1.9)(@vitest/ui@4.1.9)(happy-dom@20.10.6)(jsdom@25.0.1)(vite@8.1.0(@types/node@26.0.0)(esbuild@0.28.1)(tsx@4.22.4)(yaml@2.9.0))
+
   packages/typespec-java/src/typespec-extension:
     dependencies:
       '@autorest/codemodel':

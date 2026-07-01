@@ -26,6 +26,12 @@ ignorePaths:
   - "*.lock.yml"
   # temp ignore typespec-ts while repo move is inflight
   - packages/typespec-ts/**
+  # Go emitter generated test outputs, synced upstream specs, and build scripts
+  # contain many Go package / Azure service names that aren't worth maintaining
+  # in the global dictionary.
+  - packages/typespec-go/test/**
+  - packages/typespec-go/temp/**
+  - packages/typespec-go/.scripts/**
 useGitignore: true
 enableFiletypes:
   - tsp
@@ -198,3 +204,38 @@ words:
   - petstoreopgrp
   - pypi
   - Tsps
+  # Go emitter
+  - addl
+  - azfake
+  - azidentity
+  - errorf
+  - fatalf
+  - gomod
+  - gopath
+  - polymorphics
+  - respr
+  - retriable
+  - unmarshaller
+  - unmarshallers
+  - unmarshalling
+  - unpopulate
+  - ervices
+  - lient
+  - onfig
+  - ossible
+  - pchars
+  - sliceof
+  - tcgcadapter
+  - uninstantiable
+  - unmarshalled
+  - cmplx
+  - fcgi
+  - flate
+  - gofmt
+  - golangci
+  - gomodtidy
+  - gosym
+  - iotest
+  - mbcs
+  - msan
+  - pkix

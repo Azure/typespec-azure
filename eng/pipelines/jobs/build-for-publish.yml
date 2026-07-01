@@ -41,6 +41,25 @@ jobs:
           PackagePath: packages/typespec-python
           GeneratorName: "@azure-tools/typespec-python"
 
+      # Go e2e tests and spector coverage upload
+      - task: GoTool@0
+        displayName: "Use Go 1.26.1"
+        inputs:
+          version: "1.26.1"
+
+      - script: pnpm run regenerate
+        displayName: "Regenerate Go test code"
+        workingDirectory: packages/typespec-go
+
+      - script: pnpm run test:go:e2e
+        displayName: "Run Go e2e tests"
+        workingDirectory: packages/typespec-go
+
+      - template: /eng/pipelines/templates/upload-spector-coverage.yml
+        parameters:
+          PackagePath: packages/typespec-go
+          GeneratorName: "@azure-tools/typespec-go"
+
       # TypeScript (typespec-ts) e2e tests and spector coverage upload.
       # The emitter was migrated here from Azure/autorest.typescript; this replaces
       # the coverage upload that previously ran in that (now deprecated) repo.
