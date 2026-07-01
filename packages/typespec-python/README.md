@@ -97,13 +97,13 @@ License information for the generated client code.
 
 **Properties:**
 
-| Name          | Type     | Default | Description                                                                                                                                                                                                                      |
-| ------------- | -------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Name          | Type     | Default | Description                                                                                                                                                                                                                       |
+| ------------- | -------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `name`        | `string` |         | License name. The config is required. Predefined licenses are: MIT License, Apache License 2.0, BSD 3-Clause License, MPL 2.0, GPL-3.0, LGPL-3.0. For other license, you need to configure all the other license config manually. |
-| `company`     | `string` |         | License company name. It will be used in copyright sentences.                                                                                                                                                                    |
-| `link`        | `string` |         | License link.                                                                                                                                                                                                                    |
-| `header`      | `string` |         | License header. It will be used in the header comment of generated client code.                                                                                                                                                  |
-| `description` | `string` |         | License description. The full license text.                                                                                                                                                                                      |
+| `company`     | `string` |         | License company name. It will be used in copyright sentences.                                                                                                                                                                     |
+| `link`        | `string` |         | License link.                                                                                                                                                                                                                     |
+| `header`      | `string` |         | License header. It will be used in the header comment of generated client code.                                                                                                                                                   |
+| `description` | `string` |         | License description. The full license text.                                                                                                                                                                                       |
 
 ### `package-version`
 
