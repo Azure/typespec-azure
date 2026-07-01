@@ -14,10 +14,10 @@ import { useContext } from "../context-manager.js";
 import { resolveReference } from "../framework/reference.js";
 import { reportDiagnostic } from "../index.js";
 import { AzureIdentityDependencies } from "../modular/external-dependencies.js";
-import { NameType, normalizeName } from "../rlc-common/index.js";
-import { getSubscriptionId } from "../transform/transfrom-rlc-options.js";
+import { getSubscriptionId } from "../transform/transform-client-options.js";
 import { hasKeyCredential, hasTokenCredential } from "../utils/credential-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
+import { NameType, normalizeName } from "../utils/name-utils.js";
 import {
   getMethodHierarchiesMap,
   isTenantLevelOperation,
@@ -115,9 +115,9 @@ function emitMethodSamples(
   });
   const exampleFunctions = [];
   // TODO: remove hard-coded for package
-  if (dpgContext.rlcOptions?.packageDetails?.name) {
+  if (dpgContext.emitterOptions?.packageDetails?.name) {
     sourceFile.addImportDeclaration({
-      moduleSpecifier: dpgContext.rlcOptions?.packageDetails?.name,
+      moduleSpecifier: dpgContext.emitterOptions?.packageDetails?.name,
       namedImports: [getClassicalClientName(options.topLevelClient)],
     });
   }
@@ -606,7 +606,7 @@ function getParameterValue(
       retValue = `${JSON.stringify(value.value)}`;
       break;
     case "null": {
-      const ignoreNullableOnOptional = context.rlcOptions?.ignoreNullableOnOptional ?? false;
+      const ignoreNullableOnOptional = context.emitterOptions?.ignoreNullableOnOptional ?? false;
       if (ignoreNullableOnOptional) {
         // When ignore-nullable-on-optional is true, the TypeScript type won't include
         // | null for optional properties, so we convert null to a type-appropriate default

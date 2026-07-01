@@ -1,0 +1,339 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
+import { ClientModel } from "../interfaces.js";
+import { getClientName } from "../utils/name-constructors.js";
+import { NameType, normalizeName } from "../utils/name-utils.js";
+import { renderTemplate } from "./render-template.js";
+
+const azureReadmeModularTemplate = `# {{ clientDescriptiveName }} library for JavaScript
+
+This package contains an isomorphic SDK (runs both in Node.js and in browsers) for {{ clientDescriptiveName }}.
+
+{{ description }}
+
+Key links:
+
+{{#if packageSourceURL}}
+- [Source code]({{ packageSourceURL }})
+{{/if}}
+{{#if packageNPMURL}}
+- [Package (NPM)]({{ packageNPMURL }})
+{{/if}}
+{{#if apiRefURL}}
+- [API reference documentation]({{ apiRefURL }})
+{{/if}}
+{{#if samplesURL}}
+- [Samples]({{samplesURL}})
+{{/if}}
+
+## Getting started
+
+### Currently supported environments
+
+- [LTS versions of Node.js](https://github.com/nodejs/release#release-schedule)
+- Latest versions of Safari, Chrome, Edge and Firefox.
+
+See our [support policy](https://github.com/Azure/azure-sdk-for-js/blob/main/SUPPORT.md) for more details.
+
+### Prerequisites
+
+- An [Azure subscription][azure_sub].
+
+### Install the \`{{ clientPackageName }}\` package
+
+Install the {{ clientDescriptiveName }} library for JavaScript with \`npm\`:
+
+\`\`\`bash
+npm install {{ clientPackageName }}
+\`\`\`
+
+{{#if addCredentials}}
+### Create and authenticate a \`{{ clientClassName}}\`
+
+To create a client object to access the {{ serviceName }} API, you will need the \`endpoint\` of your {{ serviceName }} resource and a \`credential\`. The {{ clientDescriptiveName }} can use Microsoft Entra credentials to authenticate.
+You can find the endpoint for your {{ serviceName }} resource in the [Azure Portal][azure_portal].
+
+You can authenticate with Microsoft Entra ID using a credential from the [@azure/identity][azure_identity] library or [an existing Microsoft Entra token](https://github.com/Azure/azure-sdk-for-js/blob/main/sdk/identity/identity/samples/AzureIdentityExamples.md#authenticating-with-a-pre-fetched-access-token).
+
+To use the [DefaultAzureCredential][defaultazurecredential] provider shown below, or other credential providers provided with the Azure SDK, please install the \`@azure/identity\` package:
+
+\`\`\`bash
+npm install @azure/identity
+\`\`\`
+
+You will also need to **register a new Microsoft Entra application and grant access to {{ serviceName}}** by assigning the suitable role to your service principal (note: roles such as \`"Owner"\` will not grant the necessary permissions).
+
+For more information about how to create a Microsoft Entra application check out [this guide](https://learn.microsoft.com/entra/identity-platform/howto-create-service-principal-portal).
+
+{{#if azureArm}}
+Using Node.js and Node-like environments, you can use the \`DefaultAzureCredential\` class to authenticate the client.
+
+\`\`\`ts {{#if generateTest}}snippet:ReadmeSampleCreateClient_Node{{/if}}
+import { {{ clientClassName }} } from "{{ clientPackageName }}";
+import { DefaultAzureCredential } from "@azure/identity";
+
+{{#if hasSubscriptionId}}
+const subscriptionId = "00000000-0000-0000-0000-000000000000";
+const client = new {{ clientClassName }}(new DefaultAzureCredential(), subscriptionId);
+{{else}}
+const client = new {{ clientClassName }}(new DefaultAzureCredential());
+{{/if}}
+\`\`\`
+
+For browser environments, use the \`InteractiveBrowserCredential\` from the \`@azure/identity\` package to authenticate.
+
+\`\`\`ts {{#if generateTest}}snippet:ReadmeSampleCreateClient_Browser{{/if}}
+import { InteractiveBrowserCredential } from "@azure/identity";
+import { {{ clientClassName }} } from "{{ clientPackageName }}";
+
+const credential = new InteractiveBrowserCredential({
+  tenantId: "<YOUR_TENANT_ID>",
+  clientId: "<YOUR_CLIENT_ID>",
+ });
+
+{{#if hasSubscriptionId}}
+const subscriptionId = "00000000-0000-0000-0000-000000000000";
+const client = new {{ clientClassName }}(credential, subscriptionId);
+{{else}}
+const client = new {{ clientClassName }}(credential);
+{{/if}}
+\`\`\`
+{{else}}
+Using Node.js and Node-like environments, you can use the \`DefaultAzureCredential\` class to authenticate the client.
+
+\`\`\`ts {{#if generateTest}}snippet:ReadmeSampleCreateClient_Node{{/if}}
+import { {{ clientClassName }} } from "{{ clientPackageName }}";
+import { DefaultAzureCredential } from "@azure/identity";
+
+const client = new {{ clientClassName }}("<endpoint>", new DefaultAzureCredential());
+\`\`\`
+
+For browser environments, use the \`InteractiveBrowserCredential\` from the \`@azure/identity\` package to authenticate.
+
+\`\`\`ts {{#if generateTest}}snippet:ReadmeSampleCreateClient_Browser{{/if}}
+import { InteractiveBrowserCredential } from "@azure/identity";
+import { {{ clientClassName }} } from "{{ clientPackageName }}";
+
+const credential = new InteractiveBrowserCredential({
+  tenantId: "<YOUR_TENANT_ID>",
+  clientId: "<YOUR_CLIENT_ID>"
+ });
+const client = new {{ clientClassName }}("<endpoint>", credential);
+\`\`\`
+{{/if}}
+{{/if}}
+
+
+### JavaScript Bundle
+To use this client library in the browser, first you need to use a bundler. For details on how to do this, please refer to our [bundling documentation](https://aka.ms/AzureSDKBundling).
+
+## Key concepts
+
+### {{ clientClassName }}
+
+\`{{ clientClassName }}\` is the primary interface for developers using the {{ clientDescriptiveName }} library. Explore the methods on this client object to understand the different features of the {{ serviceName }} service that you can access.
+
+## Troubleshooting
+
+### Logging
+
+Enabling logging may help uncover useful information about failures. In order to see a log of HTTP requests and responses, set the \`AZURE_LOG_LEVEL\` environment variable to \`info\`. Alternatively, logging can be enabled at runtime by calling \`setLogLevel\` in the \`@azure/logger\`:
+
+\`\`\`ts {{#if generateTest}}snippet:SetLogLevel{{/if}}
+import { setLogLevel } from "@azure/logger";
+
+setLogLevel("info");
+\`\`\`
+
+For more detailed instructions on how to enable logs, you can look at the [@azure/logger package docs](https://github.com/Azure/azure-sdk-for-js/tree/main/sdk/core/logger).
+
+{{#if samplesURL}}
+## Next steps
+
+Please take a look at the [samples]({{ samplesURL }}) directory for detailed examples on how to use this library.
+{{/if}}
+
+## Contributing
+
+If you'd like to contribute to this library, please read the [contributing guide](https://github.com/Azure/azure-sdk-for-js/blob/main/CONTRIBUTING.md) to learn more about how to build and test the code.
+
+## Related projects
+
+- [Microsoft Azure SDK for JavaScript](https://github.com/Azure/azure-sdk-for-js)
+
+[azure_sub]: https://azure.microsoft.com/free/
+[azure_portal]: https://portal.azure.com
+[azure_identity]: https://github.com/Azure/azure-sdk-for-js/tree/main/sdk/identity/identity
+[defaultazurecredential]: https://github.com/Azure/azure-sdk-for-js/tree/main/sdk/identity/identity#defaultazurecredential
+`;
+
+const apiReferenceTemplate = `{{#if apiRefURL}}
+- [API reference documentation]({{ apiRefURL }})
+{{/if}}
+`;
+
+/**
+ * Meta data information about the service, the package, and the client.
+ */
+interface Metadata {
+  /** The name of the service */
+  serviceName: string;
+  /** The name of the package */
+  clientPackageName: string;
+  /** The name of the client class */
+  clientClassName: string;
+  /** The URL to the package directory in the repository */
+  packageSourceURL?: string;
+  /** The URL to the package's samples */
+  samplesURL?: string;
+  /** A descriptive name for the client extracted from the swagger */
+  clientDescriptiveName?: string;
+  /** A description for the service extracted from the swagger */
+  description?: string;
+  /** The URL to the package on npmjs.org */
+  packageNPMURL?: string;
+  /** whether the client accepts standard credentials */
+  addCredentials?: boolean;
+  /** The URL to the API reference */
+  apiRefURL?: string;
+  /** Check if the rp is management plane */
+  azureArm?: boolean;
+  /** Indicates if the package need generate test files */
+  generateTest?: boolean;
+  /** Indicates if the package need SubscriptionId as the client parameter */
+  hasSubscriptionId?: boolean;
+}
+
+export function buildReadmeFile(model: ClientModel) {
+  const metadata = createMetadata(model) ?? {};
+  const content = renderTemplate(azureReadmeModularTemplate, metadata as Record<string, unknown>);
+  return {
+    path: "README.md",
+    content,
+  };
+}
+
+export function hasClientNameChanged(model: ClientModel, existingReadmeContent: string): boolean {
+  try {
+    const importMatch = existingReadmeContent.match(
+      /import\s*\{\s*([A-Za-z0-9_]+)\s*\}\s*from\s*["'][^"']*["']/,
+    );
+    const existingClientName = importMatch?.[1];
+    const newClientName = getClientName(model);
+    return !!existingClientName && existingClientName !== newClientName;
+  } catch {
+    return false;
+  }
+}
+
+export function updateReadmeFile(
+  model: ClientModel,
+  existingReadmeContent: string,
+): { path: string; content: string } | undefined {
+  try {
+    const metadata = createMetadata(model) ?? {};
+
+    const newApiRefLink = renderTemplate(
+      apiReferenceTemplate,
+      metadata as Record<string, unknown>,
+    ).trim();
+
+    if (!newApiRefLink) {
+      return { path: "README.md", content: existingReadmeContent };
+    }
+
+    const apiRefRegex =
+      /^- \[API reference documentation\]\(https:\/\/learn\.microsoft\.com\/javascript\/api\/[^)]+\)$/m;
+    const updatedContent = existingReadmeContent.replace(apiRefRegex, (match) =>
+      match ? newApiRefLink : match,
+    );
+
+    return { path: "README.md", content: updatedContent };
+  } catch {
+    return;
+  }
+}
+
+/**
+ * Returns meta data information about the service, the package, and the client.
+ * @param codeModel - include the client details
+ * @returns inferred metadata about the service, the package, and the client
+ */
+function createMetadata(model: ClientModel): Metadata | undefined {
+  if (!model.options || !model.options.packageDetails) {
+    return;
+  }
+  // const packageDetails = model.options.packageDetails;
+  const { packageDetails, azureOutputDirectory, serviceInfo } = model.options;
+
+  const repoURL = "https://github.com/Azure/azure-sdk-for-js";
+  const relativePackageSourcePath = azureOutputDirectory;
+  const packageSourceURL =
+    relativePackageSourcePath && `${repoURL}/tree/main/${relativePackageSourcePath}`;
+
+  const clientPackageName = packageDetails?.name;
+  const clientClassName = getClientName(model);
+  const serviceName = getServiceName(model);
+  let apiRefUrlQueryParameter: string = "";
+  if (!packageDetails?.isVersionUserProvided && model.apiVersionInfo?.defaultValue) {
+    if (model.apiVersionInfo?.defaultValue?.toLowerCase().includes("preview")) {
+      apiRefUrlQueryParameter = "?view=azure-node-preview";
+    }
+  } else {
+    packageDetails.version = packageDetails.version ?? "1.0.0-beta.1";
+    if (packageDetails?.version.includes("beta")) {
+      apiRefUrlQueryParameter = "?view=azure-node-preview";
+    }
+  }
+
+  return {
+    serviceName,
+    clientClassName,
+    clientPackageName: clientPackageName,
+    clientDescriptiveName: `${serviceName} client`,
+    description: serviceInfo?.description ?? packageDetails.description,
+    packageSourceURL: packageSourceURL,
+    packageNPMURL: `https://www.npmjs.com/package/${clientPackageName}`,
+    samplesURL:
+      model.options.generateSample && packageSourceURL ? `${packageSourceURL}/samples` : undefined,
+    apiRefURL: `https://learn.microsoft.com/javascript/api/${clientPackageName}${apiRefUrlQueryParameter}`,
+    azureArm: Boolean(model.options.azureArm),
+    addCredentials: model.options.addCredentials,
+    generateTest: model.options.generateTest,
+    hasSubscriptionId: model.options.hasSubscriptionId,
+  };
+}
+
+function getServiceName(model: ClientModel) {
+  const azureHuh =
+    model?.options?.packageDetails?.scopeName === "azure" ||
+    model?.options?.packageDetails?.scopeName === "azure-rest";
+  const libraryName = model.libraryName;
+  const serviceTitle = model.libraryName;
+  const batch = model?.options?.batch,
+    packageDetails = model?.options?.packageDetails;
+  let simpleServiceName =
+    batch && batch.length > 1
+      ? normalizeName(
+          packageDetails!.nameWithoutScope ?? packageDetails?.name ?? "",
+          NameType.Class,
+        )
+      : normalizeName(serviceTitle, NameType.Class);
+  simpleServiceName =
+    /**
+     * It is a required convention in Azure swaggers for their titles to end with
+     * "Client".
+     */
+    serviceTitle.match(/(.*) Client/)?.[1] ??
+    serviceTitle.match(/(.*)Client/)?.[1] ??
+    libraryName.match(/(.*)Client/)?.[1] ??
+    serviceTitle.match(/(.*) Service/)?.[1] ??
+    simpleServiceName;
+
+  return azureHuh
+    ? simpleServiceName.startsWith("Azure")
+      ? simpleServiceName
+      : `Azure ${simpleServiceName}`
+    : simpleServiceName;
+}

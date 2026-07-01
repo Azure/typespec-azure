@@ -5,21 +5,18 @@ import { SdkClient } from "@azure-tools/typespec-client-generator-core";
 import { getDoc, joinPaths } from "@typespec/compiler";
 import { getServers } from "@typespec/http";
 import {
-  buildRuntimeImports,
+  ClientModel,
+  ClientOptions,
   Imports,
-  initInternalImports,
-  NameType,
-  normalizeName,
   OperationParameter,
   OperationResponse,
   PathParameter,
   Paths,
-  RLCModel,
-  RLCOptions,
   Schema,
   SchemaContext,
   UrlInfo,
-} from "../rlc-common/index.js";
+} from "../interfaces.js";
+import { buildRuntimeImports, initInternalImports } from "../utils/imports-util.js";
 import { SdkContext } from "../utils/interfaces.js";
 import {
   getDefaultService,
@@ -29,6 +26,7 @@ import {
   getTypeName,
   predictDefaultValue,
 } from "../utils/model-utils.js";
+import { NameType, normalizeName } from "../utils/name-utils.js";
 import { getClientLroOverload } from "../utils/operation-util.js";
 import { transformApiVersionInfo } from "./transform-api-version-info.js";
 import { transformHelperFunctionDetails } from "./transform-helper-function-details.js";
@@ -38,15 +36,15 @@ import { transformToResponseTypes } from "./transform-responses.js";
 import { transformSchemas } from "./transform-schemas.js";
 import { transformTelemetryInfo } from "./transform-telemetry-info.js";
 
-export async function transformRLCModel(
+export async function transformClientModel(
   client: SdkClient,
   dpgContext: SdkContext,
-): Promise<RLCModel> {
+): Promise<ClientModel> {
   const program = dpgContext.program;
-  const options: RLCOptions = dpgContext.rlcOptions!;
-  const rlcSourceDir = dpgContext.generationPathDetail?.rlcSourcesDir;
+  const options: ClientOptions = dpgContext.emitterOptions!;
+  const sourceDir = dpgContext.generationPathDetail?.sourcesDir;
   const srcPath = joinPaths(
-    dpgContext.generationPathDetail?.rlcSourcesDir ?? "",
+    dpgContext.generationPathDetail?.sourcesDir ?? "",
     options.batch && options.batch.length > 1
       ? normalizeName(client.name.replace("Client", ""), NameType.File)
       : "",
@@ -71,7 +69,7 @@ export async function transformRLCModel(
   helperDetails.clientLroOverload = getClientLroOverload(paths);
 
   const telemetryOptions = transformTelemetryInfo(client, dpgContext);
-  const model: RLCModel = {
+  const model: ClientModel = {
     srcPath,
     libraryName,
     paths,
@@ -87,11 +85,8 @@ export async function transformRLCModel(
       internalImports: importSet,
       runtimeImports: buildRuntimeImports(),
     },
-    rlcSourceDir,
+    sourceDir,
   };
-  // RLC sample generation has been removed; modular samples are emitted separately,
-  // so the RLC model never carries sample groups.
-  options.generateSample = false;
   return model;
 }
 
@@ -145,7 +140,7 @@ export function transformUrlInfo(
     }
   }
   if (importedModels.size > 0) {
-    importDetails.rlcClientFactory.importsSet = importedModels;
+    importDetails.clientFactory.importsSet = importedModels;
   }
   if (endpoint && urlParameters.length > 0) {
     for (const param of urlParameters) {

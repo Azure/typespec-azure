@@ -5,7 +5,6 @@ import {
   SourceFile,
   StructureKind,
 } from "ts-morph";
-import { NameType, normalizeName } from "../rlc-common/index.js";
 import { buildUserAgentOptions, getClientParametersDeclaration } from "./helpers/client-helpers.js";
 import { getClassicalClientName, getClientName } from "./helpers/naming-helpers.js";
 import { ModularEmitterOptions } from "./interfaces.js";
@@ -20,8 +19,9 @@ import { useContext } from "../context-manager.js";
 import { useDependencies } from "../framework/hooks/use-dependencies.js";
 import { resolveReference } from "../framework/reference.js";
 import { refkey } from "../framework/refkey.js";
-import { getModularClientOptions, isRLCMultiEndpoint } from "../utils/client-utils.js";
+import { getClientModuleInfo, isMultiEndpointClient } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
+import { NameType, normalizeName } from "../utils/name-utils.js";
 import { getMethodHierarchiesMap, isTenantLevelOperation } from "../utils/operation-util.js";
 import { AzurePollingDependencies } from "./external-dependencies.js";
 import { getPagingLROMethodName } from "./helpers/classical-operation-helpers.js";
@@ -47,7 +47,7 @@ export function buildClassicalClient(
     requiredOnly: true,
   });
   const srcPath = emitterOptions.modularOptions.sourceRoot;
-  const { subfolder, rlcClientName } = getModularClientOptions(clientMap);
+  const { subfolder, clientName } = getClientModuleInfo(clientMap);
 
   const clientFile = project.createSourceFile(
     `${srcPath}/${subfolder && subfolder !== "" ? subfolder + "/" : ""}${normalizeName(
@@ -68,16 +68,16 @@ export function buildClassicalClient(
   });
 
   // Add the private client member. This will be the client context from /api
-  if (isRLCMultiEndpoint(dpgContext)) {
+  if (isMultiEndpointClient(dpgContext)) {
     clientClass.addProperty({
       name: "_client",
-      type: `Client.${rlcClientName}`,
+      type: `Client.${clientName}`,
       scope: Scope.Private,
     });
   } else {
     clientClass.addProperty({
       name: "_client",
-      type: `${rlcClientName}`,
+      type: `${clientName}`,
       scope: Scope.Private,
     });
   }
@@ -214,7 +214,7 @@ function generateMethod(
   });
 
   // add LRO helper methods if applicable
-  if (context.rlcOptions?.compatibilityLro && declaration?.isLro && !declaration?.isLroPaging) {
+  if (context.emitterOptions?.compatibilityLro && declaration?.isLro && !declaration?.isLroPaging) {
     const operationStateReference = resolveReference(AzurePollingDependencies.OperationState);
     const simplePollerLikeReference = resolveReference(SimplePollerHelpers.SimplePollerLike);
     const getSimplePollerReference = resolveReference(SimplePollerHelpers.getSimplePoller);
@@ -244,7 +244,7 @@ function generateMethod(
       statements: `return await ${declarationRefKey}(${methodParamStr});`,
     });
   } // For LRO+Paging operations, use different return types and implementation
-  else if (context.rlcOptions?.compatibilityLro && declaration?.isLroPaging) {
+  else if (context.emitterOptions?.compatibilityLro && declaration?.isLroPaging) {
     const returnType = declaration?.lropagingFinalReturnType ?? "void";
     const pagedAsyncIterableIteratorReference = resolveReference(
       PagingHelpers.PagedAsyncIterableIterator,
@@ -274,7 +274,7 @@ function buildClientOperationGroups(
 ) {
   let clientType = "Client";
   const [_hierarchy, client] = clientMap;
-  const { subfolder } = getModularClientOptions(clientMap);
+  const { subfolder } = getClientModuleInfo(clientMap);
   if (subfolder && subfolder !== "") {
     clientType = `Client.${clientClass.getName()}`;
   }

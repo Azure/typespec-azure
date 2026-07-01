@@ -4,9 +4,9 @@ import { Project, SourceFile } from "ts-morph";
 import { useContext } from "../context-manager.js";
 import { resolveReference } from "../framework/reference.js";
 import { reportDiagnostic } from "../lib.js";
-import { NameType, normalizeName } from "../rlc-common/index.js";
-import { getModularClientOptions } from "../utils/client-utils.js";
+import { getClientModuleInfo } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
+import { NameType, normalizeName } from "../utils/name-utils.js";
 import { getMethodHierarchiesMap } from "../utils/operation-util.js";
 import { partitionAndEmitExports } from "./build-subpath-index.js";
 import { getClassicalClientName } from "./helpers/naming-helpers.js";
@@ -34,7 +34,7 @@ export function buildRootIndex(
   const project = useContext("outputProject");
   const [_, client] = clientMap;
   const srcPath = emitterOptions.modularOptions.sourceRoot;
-  const { subfolder } = getModularClientOptions(clientMap);
+  const { subfolder } = getClientModuleInfo(clientMap);
   const clientName = `${getClassicalClientName(client)}`;
   const clientFile = project.getSourceFile(
     `${srcPath}/${subfolder && subfolder !== "" ? subfolder + "/" : ""}${normalizeName(
@@ -208,7 +208,7 @@ function exportSimplePollerLike(
   const hasLro = Array.from(methodMap.values()).some((operations) => {
     return operations.some(isLroOnlyOperation);
   });
-  if (!hasLro || context.rlcOptions?.compatibilityLro !== true) {
+  if (!hasLro || context.emitterOptions?.compatibilityLro !== true) {
     return;
   }
   const helperFile = project.getSourceFile(
@@ -365,7 +365,7 @@ export function buildSubClientIndexFile(
 ) {
   const project = useContext("outputProject");
   const [_, client] = clientMap;
-  const { subfolder } = getModularClientOptions(clientMap);
+  const { subfolder } = getClientModuleInfo(clientMap);
   const srcPath = emitterOptions.modularOptions.sourceRoot;
   const subClientIndexFile = project.createSourceFile(
     `${srcPath}/${subfolder && subfolder !== "" ? subfolder + "/" : ""}index.ts`,

@@ -120,12 +120,6 @@ other cases:
 
 Whether to generate sample files, for basic samples of your generated sdks. Defaults to `undefined`. Management packages' default to `true`.
 
-### `is-typespec-test`
-
-**Type:** `boolean`
-
-Internal option for test
-
 ### `azure-arm`
 
 **Type:** `boolean`
@@ -185,12 +179,6 @@ The emitter will use camel case to normalize the property name, to ignore this n
 **Type:** `boolean`
 
 The emitter has a normalization logic for enum member key, to ignore this normalization, you can set this option to true
-
-### `compatibility-query-multi-format`
-
-**Type:** `boolean`
-
-Whether to generate the backward-compatible code for query parameter serialization for array types in RLC. Defaults to `false`
 
 ### `typespec-title-map`
 

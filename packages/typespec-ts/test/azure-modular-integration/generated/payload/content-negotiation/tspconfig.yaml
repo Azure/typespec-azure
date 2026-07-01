@@ -7,7 +7,6 @@ options:
     generate-test: false
     add-credentials: false
     flavor: azure
-    is-typespec-test: true
     package-details:
       name: "@msinternal/payload-content-negotiation"
       description: "Payload Content Negotiation Test Service"

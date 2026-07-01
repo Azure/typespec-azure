@@ -34,6 +34,8 @@ configuration:
                 - hasLabel:
                     label: emitter:go
                 - hasLabel:
+                    label: emitter:java
+                - hasLabel:
                     label: emitter:client:all
                 - hasLabel:
                     label: eng
@@ -71,6 +73,8 @@ configuration:
                   label: emitter:typescript
               - labelAdded:
                   label: emitter:go
+              - labelAdded:
+                  label: emitter:java
               - labelAdded:
                   label: emitter:client:all
               - labelAdded:
@@ -111,6 +115,8 @@ configuration:
               - labelRemoved:
                   label: emitter:go
               - labelRemoved:
+                  label: emitter:java
+              - labelRemoved:
                   label: emitter:client:all
               - labelRemoved:
                   label: eng
@@ -140,6 +146,8 @@ configuration:
                     label: emitter:typescript
                 - hasLabel:
                     label: emitter:go
+                - hasLabel:
+                    label: emitter:java
                 - hasLabel:
                     label: emitter:client:all
                 - hasLabel:
