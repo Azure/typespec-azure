@@ -15,14 +15,12 @@ const unitTestInclude = ["test-next/**/*.test.ts", "test/modular-unit/**/*.test.
 
 // Settings the `unit-modular` suites need (heavy TypeSpec compiles). Applied at
 // the top level so they also take effect in the single-project repo-wide run.
+// In Vitest 4 `poolOptions` was removed — its sub-options (here `execArgv`) are
+// now top-level `test.*` fields, and can additionally be set per-project.
 const unitModularPool = {
   testTimeout: 0,
   pool: "forks" as const,
-  poolOptions: {
-    forks: {
-      execArgv: ["--max-old-space-size=1024"],
-    },
-  },
+  execArgv: ["--max-old-space-size=1024"],
 };
 
 export default defineConfig({
