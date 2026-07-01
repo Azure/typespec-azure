@@ -62,9 +62,9 @@ The flavor of the SDK.
 
 ### `models-mode`
 
-**Type:** `"dpg" | "none"`
+**Type:** `"dpg" | "none" | "typeddict"`
 
-What kind of models to generate. If you pass in `none`, we won't generate models. `dpg` models are the default models we generate.
+What kind of models to generate. If you pass in `none`, we won't generate models. `dpg` models are the default models we generate. If you pass in `typeddict`, we will generate models as typed dictionaries.
 
 ### `generate-sample`
 
