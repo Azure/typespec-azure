@@ -85,11 +85,8 @@ export const AreaPaths: Record<keyof typeof AreaLabels, string[]> = {
   "meta:website": ["website/"],
   linter: [
     "packages/typespec-azure-core/src/rules/",
-    "packages/typespec-azure-core/test/rules/",
     "packages/typespec-azure-resource-manager/src/rules/",
-    "packages/typespec-azure-resource-manager/test/rules/",
     "packages/typespec-client-generator-core/src/rules/",
-    "packages/typespec-client-generator-core/test/rules/",
   ],
 };
 
