@@ -46,6 +46,7 @@ The config would be like:
 needTCGC: true
 needAzureCore: true
 withRawContent: true
+hierarchy-client: false
 ```
 
 ## Client Constructor

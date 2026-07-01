@@ -6,7 +6,6 @@ options:
     generate-metadata: true
     generate-test: false
     flavor: azure
-    is-typespec-test: true
     hierarchy-client: false
     package-details:
       name: "@msinternal/azure-http-custom"

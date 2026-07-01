@@ -235,3 +235,9 @@ packages/typespec-go/test/**/testdata
 !packages/typespec-go/test/local/nooptionalbody/testdata/generate/transforms.go
 !packages/typespec-go/test/local/rawjson/go.mod
 !packages/typespec-go/test/local/rawjson/go.sum
+# java emitter
+packages/typespec-java/src/typespec-extension/generator/**
+packages/typespec-java/src/typespec-extension/test
+packages/typespec-java/src/typespec-extension/src/*
+packages/typespec-java/src/typespec-extension/generator/**
+!packages/typespec-java/src/typespec-extension/options.ts
