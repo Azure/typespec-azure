@@ -48,6 +48,9 @@ catalogs:
     '@azure-tools/codegen':
       specifier: ~2.10.1
       version: 2.10.1
+    '@azure-tools/openai-typespec':
+      specifier: 1.21.0
+      version: 1.21.0
     '@azure-tools/typespec-liftr-base':
       specifier: '>=0.14.0 <1.0.0'
       version: 0.14.0
@@ -394,7 +397,7 @@ catalogs:
       specifier: ^2.1.0
       version: 2.1.0
     js-yaml:
-      specifier: ~4.2.0
+      specifier: ^4.2.0
       version: 4.2.0
     lodash:
       specifier: ~4.18.1
@@ -3796,6 +3799,9 @@ importers:
         specifier: 'catalog:'
         version: 4.18.1
     devDependencies:
+      '@azure-tools/openai-typespec':
+        specifier: 'catalog:'
+        version: 1.21.0(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)
       '@azure-tools/typespec-autorest':
         specifier: workspace:^
         version: link:../typespec-autorest
@@ -4471,6 +4477,12 @@ packages:
   '@azure-tools/codegen@2.10.1':
     resolution: {integrity: sha512-fZfREKjQnBTscjObgK4LuyZNFaofoCNQDNz0jl1i8fYNwCM5EOF9BXwtEtobuEyCpPUNDxQ/KKO65eWzirqk4w==}
     engines: {node: '>=12.0.0'}
+
+  '@azure-tools/openai-typespec@1.21.0':
+    resolution: {integrity: sha512-wKHNsyXii+/ZJn/mqKC/ey+/Y+RoW7XGBQD5yNRhGKA3VRibLNIhn/0PGLEIZhWWsFp3okTvifhPDs/b0DmOTA==}
+    peerDependencies:
+      '@typespec/http': ^1.13.0
+      '@typespec/openapi': ^1.13.0
 
   '@azure-tools/tasks@3.0.255':
     resolution: {integrity: sha512-GjALNLz7kWMEdRVbaN5g0cJHNAr3XVTbP0611Mv2UzMgGL6FOhNZJK+oPHJKLDR8EEDZNnkwPlyi7B+INXUSQA==}
@@ -15707,6 +15719,11 @@ snapshots:
       '@azure-tools/async-io': 3.0.254
       js-yaml: 4.1.1
       semver: 7.8.5
+
+  '@azure-tools/openai-typespec@1.21.0(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)':
+    dependencies:
+      '@typespec/http': link:core/packages/http
+      '@typespec/openapi': link:core/packages/openapi
 
   '@azure-tools/tasks@3.0.255': {}
 

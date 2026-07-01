@@ -21,27 +21,30 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 Only `src/options.ts` (the Azure-specific emitter options) is committed in this package. The rest of
 the emitter TypeScript (and tests) is copied from `core/packages/http-client-java/emitter/{src,test}`
 at build time by `Copy-Sources.ps1` (excluding `options.ts`). The Java `emitter.jar` is
-built from `core/packages/http-client-java/generator` by `Build-TypeSpec.ps1` and staged into
+built from `core/packages/http-client-java/generator` by `Build-Generator.ps1` and staged into
 `generator/http-client-generator/target/`.
 
 ### Azure customization patch
 
-Before building the jar, `Build-TypeSpec.ps1` applies `core.patch` to the `core/` submodule.
+Before building the jar, `Build-Generator.ps1` applies `core.patch` to the `core/` submodule.
 This swaps the unbranded customization engine in `http-client-generator-core` for Azure's
 `com.azure.tools:azure-autorest-customization` (resolved from Maven Central), so the
 `customization-class` emitter option runs against the Azure customization base. The patch is applied
-transiently at build time (the script runs `git checkout .` in `core/` first), so commit/stage any
-local `core/` changes before building. When the `core/` submodule is bumped, refresh `core.patch`
-if its context no longer applies.
+transiently at build time (the script runs `git checkout .` in `core/` to apply and again to revert
+it), so commit/stage any local `core/` changes before building. When the `core/` submodule is bumped,
+refresh `core.patch` if its context no longer applies.
 
 ## Build
 
 ```bash
-# Copy emitter sources from core and compile TypeScript (no jar; fast, what turbo runs)
+# Full build: build:generator (emitter.jar via Maven + core.patch, requires JDK 11+
+# and Maven) then build:emitter (copy sources from core + tsc).
 pnpm build
 
-# Full build: apply patch, build the Java emitter.jar (requires JDK 11+ and Maven),
-# stage it, copy sources, compile and pack.
+# Just the TypeScript half (no jar; fast):
+pnpm build:emitter
+
+# Build and pack a .tgz (what emitter-tests consumes):
 pwsh ./Build-TypeSpec.ps1
 ```
 
@@ -53,9 +56,7 @@ Make sure to run the following commands:
 
 ## Release Process
 
-The branded Java emitter (`@azure-tools/typespec-java`) wraps the unbranded emitter
-(`@typespec/http-client-java`). The emitter sources and the `emitter.jar` are built from the `core/`
-submodule. To pick up a new version of the unbranded emitter, bump the `core/` submodule and rebuild.
+TODO: The post-release process for `@azure-tools/typespec-java` has not been finalized yet.
 
 ## Trademarks
 

@@ -29,10 +29,12 @@
   },
   "scripts": {
     "clean": "rimraf ./dist ./temp ./generator",
-    "build": "pwsh -NoProfile -File Copy-Sources.ps1 && tsc -p .",
+    "build": "npm run build:generator && npm run build:emitter",
+    "build:emitter": "pwsh -NoProfile -File Copy-Sources.ps1 && tsc -p .",
+    "build:generator": "pwsh -NoProfile -File Build-Generator.ps1",
     "watch": "tsc -p . --watch",
     "test": "vitest run",
-    "regen-docs": "pnpm run build && tspd doc . --enable-experimental --output-dir ../../website/src/content/docs/docs/emitters/clients/typespec-java/reference --skip-js"
+    "regen-docs": "pnpm run build:emitter && tspd doc . --enable-experimental --output-dir ../../website/src/content/docs/docs/emitters/clients/typespec-java/reference --skip-js"
   },
   "files": [
     "lib/*.tsp",
@@ -48,6 +50,7 @@
     "@azure-tools/typespec-azure-rulesets": "workspace:^",
     "@azure-tools/typespec-client-generator-core": "workspace:^",
     "@azure-tools/typespec-liftr-base": "catalog:",
+    "@azure-tools/openai-typespec": "catalog:",
     "@typespec/compiler": "workspace:^",
     "@typespec/events": "workspace:^",
     "@typespec/http": "workspace:^",
@@ -71,6 +74,7 @@
     "@azure-tools/typespec-azure-rulesets": "workspace:^",
     "@azure-tools/typespec-client-generator-core": "workspace:^",
     "@azure-tools/typespec-liftr-base": "catalog:",
+    "@azure-tools/openai-typespec": "catalog:",
     "@types/js-yaml": "catalog:",
     "@types/lodash": "catalog:",
     "@types/node": "catalog:",

@@ -23,7 +23,7 @@ jobs:
     name: "Build & Test"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
 
@@ -34,18 +34,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      # Build the peer packages (typespec-autorest, tcgc, etc.) the emitter
-      # compiles against.
-      - name: Build dependencies
-        run: pnpm turbo run --filter "@azure-tools/typespec-java^..." build
-
-      # Apply the Azure customization patch, build emitter.jar from the core
-      # generator, copy emitter sources and tsc build. Mirrors autorest.java's
-      # Build-TypeSpec.ps1.
-      - name: Build (jar + emitter)
-        shell: pwsh
-        run: ./Build-TypeSpec.ps1
-        working-directory: packages/typespec-java
+      # Build the emitter (build:generator builds emitter.jar from the core
+      # generator after applying core.patch; build:emitter copies sources + tsc)
+      # together with the peer packages it compiles against.
+      - name: Build
+        run: pnpm turbo run --filter "@azure-tools/typespec-java..." build
 
       - name: Test (emitter unit tests)
         run: pnpm run test
@@ -56,7 +49,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
 
