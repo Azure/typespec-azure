@@ -1,13 +1,13 @@
-# @azure-tools/emitter-diff
+# emitter-diff
 
 A language-agnostic tool for **diffing the generated code produced by two versions of a
-TypeSpec emitter** — and optionally running that emitter's generated-code test suites.
+TypeSpec emitter**.
 
 It generates code from the test specs twice (a **baseline** emitter and a **head** emitter),
 then shows the diff between the two outputs. Use it locally during development and in CI on PRs.
 
 Each language emitter (python, and later java/rust/go/ts) plugs in via a small **adapter** that
-wraps that emitter's own generation/test commands. The core (ref resolution, diffing, orchestration)
+wraps that emitter's own generation command. The core (ref resolution, diffing, orchestration)
 contains no language-specific logic.
 
 ## How it works
@@ -17,23 +17,23 @@ contains no language-specific logic.
                               ├─ generate (adapter) ─► <work>/baseline ─┐
    specs ─────────────────────┤                                        ├─► git diff ─► terminal / HTML
                               ├─ generate (adapter) ─► <work>/head ─────┘
-            head emitter ─────┘                                        └─► (optional) run test suites
+            head emitter ─────┘
 ```
 
 - The **adapter** wraps the emitter's existing commands. For python that is
-  `eng/scripts/regenerate.ts` (generation) and `eng/scripts/ci/run-tests.ts` (suites).
+  `eng/scripts/regenerate.ts` (generation).
 - The regenerate _driver_ always comes from the current checkout; only the emitter build it points
   at (`--emitter-dir`) changes between baseline and head, isolating the diff to emitter behavior.
 
 ## Usage
 
 ```bash
-# From the repo root, via pnpm:
-pnpm --filter @azure-tools/emitter-diff exec tsx src/cli.ts --emitter python --baseline 0.61.2
-
-# Or directly with Node 22+ (native TS):
-npx tsx eng/emitter-diff/src/cli.ts --emitter python --baseline 0.61.2
+# Run directly with Node 24+ (native TypeScript, no build step, no dependencies):
+node eng/emitter-diff/src/cli.ts --emitter python --baseline 0.61.2
 ```
+
+> This tool is a set of plain `.ts` scripts — not an installed package. Node 24 runs TypeScript
+> natively, so there is nothing to build or install. Typecheck with `npx tsc -p eng/emitter-diff`.
 
 ### Refs (`--baseline`, `--head`, `--specs`)
 
@@ -52,36 +52,33 @@ By default the tool writes a **clickable HTML report** (`emitter-diff.html`) int
 prints a `file://` link to it. Use `--terminal` for the full patch in your shell, or
 `--patch`/`--html` to write to a specific file.
 
-| Option                  | Description                                                                           |
-| ----------------------- | ------------------------------------------------------------------------------------- |
-| `--name <pattern>`      | Filter which specs/packages are generated                                             |
-| `--html <file>`         | Write the rendered HTML report to this path (default: `<work-dir>/emitter-diff.html`) |
-| `--terminal`            | Print the full colored patch to the terminal instead                                  |
-| `--patch <file>`        | Write the raw unified diff to a file                                                  |
-| `--fail-on-diff`        | Exit non-zero when output differs (CI gating)                                         |
-| `--run-tests`           | Run the adapter's test suites on the output                                           |
-| `--test-env <csv>`      | Suites to run, e.g. `test,lint,mypy,pyright`                                          |
-| `--test-target <which>` | `head` (default) \| `baseline` \| `both`                                              |
-| `--opt key=value`       | Repeatable adapter-specific option (e.g. `--opt flavor=azure`)                        |
-| `-- <args>`             | Everything after `--` is forwarded to the adapter                                     |
+| Option             | Description                                                                           |
+| ------------------ | ------------------------------------------------------------------------------------- |
+| `--name <pattern>` | Filter which specs/packages are generated                                             |
+| `--html <file>`    | Write the rendered HTML report to this path (default: `<work-dir>/emitter-diff.html`) |
+| `--terminal`       | Print the full colored patch to the terminal instead                                  |
+| `--patch <file>`   | Write the raw unified diff to a file                                                  |
+| `--fail-on-diff`   | Exit non-zero when output differs (CI gating)                                         |
+| `--opt key=value`  | Repeatable adapter-specific option (e.g. `--opt flavor=azure`)                        |
+| `--sequential`     | Generate baseline then head one at a time (default: both in parallel)                 |
+| `-- <args>`        | Everything after `--` is forwarded to the adapter                                     |
 
 ### Examples
 
 ```bash
 # Default: writes a clickable emitter-diff.html and prints a file:// link.
-npx tsx eng/emitter-diff/src/cli.ts --emitter python --baseline 0.61.2 \
+node eng/emitter-diff/src/cli.ts --emitter python --baseline 0.61.2 \
   --opt flavor=azure --name authentication-api-key
 
 # Compare two source folders and write an HTML report to a specific path:
-npx tsx eng/emitter-diff/src/cli.ts --emitter python \
+node eng/emitter-diff/src/cli.ts --emitter python \
   --baseline local:/path/to/old/typespec-python \
   --head local:/path/to/new/typespec-python \
   --html diff.html
 
-# Diff against a GitHub sha and run pytest + type checks on the head output:
-npx tsx eng/emitter-diff/src/cli.ts --emitter python \
-  --baseline github:Azure/typespec-azure@ \
-  --test-env test,mypy,pyright --opt flavor=azure < sha > --run-tests
+# Diff against a GitHub sha:
+node eng/emitter-diff/src/cli.ts --emitter python \
+  --baseline github:Azure/typespec-azure@ flavor=azure < sha > --opt
 ```
 
 ## CI integration
@@ -105,8 +102,8 @@ job-summary still work.
 
 ## Adding a new language adapter
 
-1. Implement `EmitterAdapter` (`src/types.ts`) — `prepareEmitter`, `generate`, optional `runTests` —
-   wrapping that emitter's own commands (e.g. rust's `npm run tspcompile`, ts's `gen-spector`).
+1. Implement `EmitterAdapter` (`src/types.ts`) — `prepareEmitter` and `generate` — wrapping that
+   emitter's own commands (e.g. rust's `npm run tspcompile`, ts's `gen-spector`).
 2. Register it in `src/registry.ts`.
 
 The core needs no changes.
@@ -116,7 +113,8 @@ The core needs no changes.
 - Baseline from an **npm version** is fastest (ships a prebuilt `dist`). Building a baseline from
   **source** (`local`/`github`) requires a working build of that package.
 - External `--specs` folders must mirror the `http-specs` / `azure-http-specs` layout.
-- `--html` uses the optional `diff2html` dependency (declared in this package's `package.json`).
+- `--html` renders a self-contained, GitHub-style HTML report (inline CSS, no external requests).
+  The tool has **zero runtime dependencies** — the diff itself is `git diff --no-index`.
 - **Windows / constrained Python toolchain:** the python emitter formats output with native
   `black`, which can fail to load on Windows when the package path exceeds the 260-char limit
   (`DLL load failed ... filename or extension is too long`). To avoid this, the **python adapter

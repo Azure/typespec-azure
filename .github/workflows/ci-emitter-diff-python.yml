@@ -105,7 +105,7 @@ jobs:
           RUNNER_TEMP: ${{ runner.temp }}
         run: |
           set +e
-          npx tsx eng/emitter-diff/src/cli.ts \
+          node eng/emitter-diff/src/cli.ts \
             --emitter python \
             --baseline "$BASELINE_REF" \
             --work-dir "$RUNNER_TEMP/emitter-diff" \
