@@ -10,12 +10,11 @@ namespace PageableLROs;
 op listPrivateEndPoints is ArmResourceActionAsyncBase<
   SomeResource,
   void,
-
-    | ArmResponse<SomeResourceListResult>
-    | ArmAcceptedLroResponse<
-        "Accepted. The header contains 'Azure-AsyncOperation' header which can be used to monitor the progress of the operation.",
-        ArmLroLocationHeader<FinalResult = SomeResourceListResult>
-      >,
+  | ArmResponse<SomeResourceListResult>
+  | ArmAcceptedLroResponse<
+      "Accepted. The header contains 'Azure-AsyncOperation' header which can be used to monitor the progress of the operation.",
+      ArmLroLocationHeader<FinalResult = SomeResourceListResult>
+    >,
   BaseParameters = Azure.ResourceManager.Foundations.DefaultBaseParameters<SomeResource>
 >;
 
