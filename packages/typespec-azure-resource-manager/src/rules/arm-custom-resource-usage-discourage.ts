@@ -1,6 +1,6 @@
 import { createRule, isTemplateInstance, Model, Program } from "@typespec/compiler";
 import { SyntaxKind, type Node } from "@typespec/compiler/ast";
-import { getCustomResourceOptions, isCustomAzureResource } from "../resource.js";
+import { isCustomAzureResource } from "../resource.js";
 
 const armCustomResourceUsageDiscourageCode =
   "@azure-tools/typespec-azure-resource-manager/arm-custom-resource-usage-discourage";
@@ -44,11 +44,7 @@ function hasSuppressedCustomResourceTemplate(
   }
   visited.add(model);
 
-  if (
-    getCustomResourceOptions(program, model) &&
-    isTemplateInstance(model) &&
-    hasSuppression(model.node)
-  ) {
+  if (isTemplateInstance(model) && hasSuppression(model.node)) {
     return true;
   }
 
