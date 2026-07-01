@@ -6,10 +6,10 @@
  * and diffs the output. All language specifics live behind the selected adapter;
  * this file contains zero language logic.
  */
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 
-import { diffDirs, openInVsCode, printDiff, printSummary, writeHtml, writePatch } from "./diff.js";
+import { diffDirs, printDiff, printSummary, writeHtml, writePatch } from "./diff.js";
 import { getAdapter, listAdapters } from "./registry.js";
 import {
   classifyRef,
@@ -42,14 +42,16 @@ ${color.bold("Options:")}
   --work-dir <dir>        Scratch dir (default: a temp dir).
   --html <file>           Write the rendered HTML diff to this path.
                           Default output: a clickable HTML report in the work dir.
-  --vscode                Open the diff in VS Code instead of writing HTML.
   --terminal              Print the full colored patch to the terminal instead.
   --patch <file>          Write the raw unified diff to a file.
-  --fail-on-diff          Exit non-zero when output differs (CI gating).
+  --fail-on-diff          Exit non-zero when output differs (CI gating). Exit
+                          code 2 means "diff present"; 1 means a hard error.
   --run-tests             Run the adapter's test suites on the output.
   --test-env <csv>        Suites to run (adapter-defined), e.g. test,lint,mypy.
   --test-target <which>   head | baseline | both (default: head).
   --opt key=value         Repeatable adapter-specific option (e.g. --opt flavor=azure).
+  --sequential            Generate baseline then head one at a time (default:
+                          generate both in parallel with prefixed logs).
   -- <args>               Everything after -- is forwarded to the adapter.
   -h, --help              Show this help.
 `;
@@ -71,8 +73,6 @@ async function main(): Promise<number> {
       specs: { type: "string" },
       name: { type: "string" },
       "work-dir": { type: "string" },
-      open: { type: "boolean" },
-      vscode: { type: "boolean" },
       terminal: { type: "boolean" },
       patch: { type: "string" },
       html: { type: "string" },
@@ -81,6 +81,7 @@ async function main(): Promise<number> {
       "test-env": { type: "string" },
       "test-target": { type: "string", default: "head" },
       opt: { type: "string", multiple: true },
+      sequential: { type: "boolean" },
       help: { type: "boolean", short: "h" },
     },
     allowPositionals: false,
@@ -110,14 +111,19 @@ async function main(): Promise<number> {
   // Repo root = current git working tree.
   const repoRoot = (await runChecked("git", ["rev-parse", "--show-toplevel"])).stdout.trim();
 
-  const workDir = ensureDir(values["work-dir"] ? join(values["work-dir"]) : defaultWorkDir());
+  // Absolutize the work dir. Adapters may run emitter scripts with a different
+  // cwd (python's regenerate.ts runs in packages/typespec-python), so every
+  // path handed to them — the resolved emitter dir and the baseline/head output
+  // dirs — must be absolute or outputs land in the wrong tree and the diff is
+  // silently empty (a false "no differences").
+  const workDir = ensureDir(values["work-dir"] ? resolve(values["work-dir"]) : defaultWorkDir());
   log.info(`${color.dim("work dir:")} ${workDir}`);
 
   const ctx: AdapterContext = {
     repoRoot,
     workDir,
     log,
-    resolveSource: (ref, _packageName) => resolveSrc(ref, workDir, log),
+    resolveSource: (ref, _packageName) => resolveSrc(ref, workDir, log, repoRoot),
     installNpmPackage: (packageName, version) => installNpm(packageName, version, workDir, log),
   };
 
@@ -132,6 +138,25 @@ async function main(): Promise<number> {
     options[entry.slice(0, eq)] = entry.slice(eq + 1);
   }
 
+  // Validate --test-target early so a typo fails loudly rather than silently
+  // running no suites.
+  const testTarget = values["test-target"] ?? "head";
+  if (!["head", "baseline", "both"].includes(testTarget)) {
+    log.error(`Invalid --test-target '${testTarget}'. Expected head | baseline | both.`);
+    return 2;
+  }
+
+  // Classify the specs ref up front (if any) so an invalid --specs fails fast,
+  // before the expensive emitter builds. `all`/omitted => adapter default.
+  let specsRef: ClassifiedRef | undefined;
+  if (values.specs && values.specs.toLowerCase() !== "all") {
+    specsRef = classifyRef(values.specs, repoRoot);
+    if (specsRef.kind === "npm") {
+      log.error("--specs as an npm version is not supported; use a local folder or github ref.");
+      return 2;
+    }
+  }
+
   // Resolve emitters.
   const baselineRef = classifyRef(values.baseline, repoRoot);
   const headRef: ClassifiedRef | "current" = values.head
@@ -143,57 +168,57 @@ async function main(): Promise<number> {
   log.step("Preparing head emitter");
   const headEmitter = await adapter.prepareEmitter(headRef, ctx);
 
-  // Resolve specs source (local/github). `all`/omitted => adapter default (repo).
+  // Materialize the specs source now that emitters are ready.
   let specsDir: string | undefined;
-  if (values.specs && values.specs.toLowerCase() !== "all") {
-    const specsRef = classifyRef(values.specs, repoRoot);
-    if (specsRef.kind === "npm") {
-      log.error("--specs as an npm version is not supported; use a local folder or github ref.");
-      return 2;
-    }
-    specsDir = await resolveSrc(specsRef, workDir, log);
+  if (specsRef) {
+    specsDir = await resolveSrc(specsRef, workDir, log, repoRoot);
   }
 
-  // Generate both sides.
+  // Generate both sides. By default baseline and head generate concurrently
+  // (their outputs, virtual envs, and temp YAML are isolated), roughly halving wall
+  // time at the cost of doubled peak CPU/memory and interleaved logs — so each
+  // side's output is tagged with a prefix. Use --sequential to generate one at
+  // a time (quieter logs, lower peak resource use).
   const baselineOut = ensureDir(join(workDir, "baseline"));
   const headOut = ensureDir(join(workDir, "head"));
 
-  await adapter.generate(
-    {
-      emitter: baselineEmitter,
-      specsDir,
-      outputDir: baselineOut,
-      nameFilter: values.name,
-      options,
-      passthrough,
-    },
-    ctx,
-  );
-  await adapter.generate(
-    {
-      emitter: headEmitter,
-      specsDir,
-      outputDir: headOut,
-      nameFilter: values.name,
-      options,
-      passthrough,
-    },
-    ctx,
-  );
+  const parallel = !values.sequential;
+  const baselineReq = {
+    emitter: baselineEmitter,
+    specsDir,
+    outputDir: baselineOut,
+    nameFilter: values.name,
+    options,
+    passthrough,
+    logPrefix: parallel ? color.dim("[baseline] ") : undefined,
+  };
+  const headReq = {
+    emitter: headEmitter,
+    specsDir,
+    outputDir: headOut,
+    nameFilter: values.name,
+    options,
+    passthrough,
+    logPrefix: parallel ? color.cyan("[head] ") : undefined,
+  };
+
+  if (parallel) {
+    log.step("Generating baseline + head in parallel");
+    await Promise.all([adapter.generate(baselineReq, ctx), adapter.generate(headReq, ctx)]);
+  } else {
+    await adapter.generate(baselineReq, ctx);
+    await adapter.generate(headReq, ctx);
+  }
 
   // Diff.
   const diff = await diffDirs(baselineOut, headOut, log);
 
   // Decide how to present the diff. Explicit flags win; otherwise the default
   // is a clickable HTML report written to the work dir.
-  const wantsVsCode = Boolean(values.vscode || values.open);
   const wantsTerminal = Boolean(values.terminal);
   const wantsPatch = Boolean(values.patch);
   const htmlTarget =
-    values.html ??
-    (!wantsVsCode && !wantsTerminal && !wantsPatch
-      ? join(workDir, "emitter-diff.html")
-      : undefined);
+    values.html ?? (!wantsTerminal && !wantsPatch ? join(workDir, "emitter-diff.html") : undefined);
 
   if (!diff.hasChanges) {
     log.success("No differences between baseline and head output.");
@@ -204,8 +229,7 @@ async function main(): Promise<number> {
   }
 
   if (wantsPatch) writePatch(diff, values.patch as string, log);
-  if (htmlTarget && diff.hasChanges) await writeHtml(diff, htmlTarget, log);
-  if (wantsVsCode) await openInVsCode(baselineOut, headOut, workDir, log);
+  if (htmlTarget) await writeHtml(diff, htmlTarget, log);
 
   // Optionally run test suites.
   if (values["run-tests"]) {
@@ -216,7 +240,7 @@ async function main(): Promise<number> {
         ?.split(",")
         .map((s) => s.trim())
         .filter(Boolean);
-      const target = values["test-target"] ?? "head";
+      const target = testTarget;
       const targets: Array<{ label: string; dir: string }> = [];
       if (target === "head" || target === "both") targets.push({ label: "head", dir: headOut });
       if (target === "baseline" || target === "both")
@@ -234,7 +258,9 @@ async function main(): Promise<number> {
 
   if (values["fail-on-diff"] && diff.hasChanges) {
     log.error("Differences detected and --fail-on-diff is set.");
-    return 1;
+    // Exit code 2 is reserved for "diff present" so CI can distinguish an
+    // expected-but-unapproved diff from a hard failure (exit 1).
+    return 2;
   }
   return 0;
 }

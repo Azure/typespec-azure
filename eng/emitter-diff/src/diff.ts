@@ -2,15 +2,15 @@
  * Diff engine. One canonical unified patch (`git diff --no-index`) is the
  * source of truth; it is then rendered for whichever environment is in use:
  *  - terminal: colored patch + summary
- *  - local `--open`: VS Code folder diff
  *  - CI `--html`: rendered via diff2html (optional dependency, lazily loaded)
  */
-import { cpSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
-import { basename, dirname, join, resolve } from "node:path";
+import { readFileSync, writeFileSync } from "node:fs";
+import { createRequire } from "node:module";
+import { basename, dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 import type { Logger } from "./types.js";
-import { color, run, runChecked } from "./util.js";
+import { color, run } from "./util.js";
 
 export interface DiffResult {
   /** The unified patch text (empty when there are no differences). */
@@ -125,26 +125,58 @@ export function writePatch(diff: DiffResult, outFile: string, log: Logger): void
  * optional dependency loaded lazily so the core runs without it installed.
  */
 export async function writeHtml(diff: DiffResult, outFile: string, log: Logger): Promise<void> {
-  let html: (typeof import("diff2html"))["html"];
+  // No differences: write a small standalone report so `--html <file>` always
+  // produces a file (callers and CI artifact upload can rely on its presence).
+  if (!diff.hasChanges) {
+    const doc = `<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8" /><title>Emitter diff</title>
+<style>body{margin:0;font-family:system-ui,sans-serif}.summary{padding:12px 16px;background:#f6f8fa;border-bottom:1px solid #d0d7de}</style>
+</head>
+<body><div class="summary"><strong>Emitter diff</strong> — ✅ No differences between baseline and head output.</div></body>
+</html>`;
+    writeFileSync(outFile, doc, "utf8");
+    log.success(`No differences; wrote empty HTML report to ${resolve(outFile)}`);
+    return;
+  }
+
+  // diff2html is an optional dependency, loaded lazily. Use a non-literal
+  // specifier and a local type so an aggregate typecheck that doesn't install
+  // this package's deps (e.g. the parent repo's `check:eng`, which includes
+  // `core/eng`) doesn't fail to resolve it — we validate availability at runtime.
+  type Diff2Html = { html(patch: string, options: Record<string, unknown>): string };
+  const specifier: string = "diff2html";
+  let mod: Diff2Html;
   try {
-    ({ html } = await import("diff2html"));
+    mod = (await import(specifier)) as unknown as Diff2Html;
   } catch {
     throw new Error(
       "Rendering --html requires the 'diff2html' package. Install it in eng/emitter-diff " +
         "(it is declared as a dependency) or run with `pnpm` so it is available.",
     );
   }
-  const body = html(diff.patch, {
+  const body = mod.html(diff.patch, {
     drawFileList: true,
     matching: "lines",
     outputFormat: "side-by-side",
   });
+  // Inline the diff2html stylesheet so the report renders offline (CI artifacts
+  // are downloaded and opened from disk). Fall back to the CDN link if the
+  // bundled CSS can't be located.
+  let styleTag: string;
+  try {
+    const require = createRequire(import.meta.url);
+    const cssPath = require.resolve("diff2html/bundles/css/diff2html.min.css");
+    styleTag = `<style>${readFileSync(cssPath, "utf8")}</style>`;
+  } catch {
+    styleTag = `<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/diff2html/bundles/css/diff2html.min.css" />`;
+  }
   const doc = `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <title>Emitter diff</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/diff2html/bundles/css/diff2html.min.css" />
+${styleTag}
 <style>body{margin:0;font-family:system-ui,sans-serif}.summary{padding:12px 16px;background:#f6f8fa;border-bottom:1px solid #d0d7de}</style>
 </head>
 <body>
@@ -156,74 +188,4 @@ ${body}
   const abs = resolve(outFile);
   log.success(`Wrote HTML diff to ${abs}`);
   log.info(`${color.bold("Open it:")} ${pathToFileURL(abs).href}`);
-}
-
-/**
- * Open a native side-by-side diff of the two generated trees in VS Code.
- *
- * VS Code has no CLI to diff two folders (`code --diff` only compares two
- * files), so we materialize the comparison as a throwaway git working-tree
- * change: commit the baseline tree, then overlay the head tree on top and leave
- * it unstaged. Opening that folder surfaces every changed generated file in the
- * Source Control view with red/green side-by-side diffs.
- */
-export async function openInVsCode(
-  baselineDir: string,
-  headDir: string,
-  workDir: string,
-  log: Logger,
-): Promise<void> {
-  log.step("Preparing VS Code diff");
-  const repo = join(workDir, "vscode-diff");
-  rmSync(repo, { recursive: true, force: true });
-  mkdirSync(repo, { recursive: true });
-
-  const git = (args: string[]) =>
-    runChecked("git", [
-      "-C",
-      repo,
-      "-c",
-      "user.email=emitter-diff@local",
-      "-c",
-      "user.name=emitter-diff",
-      "-c",
-      "commit.gpgsign=false",
-      "-c",
-      "core.autocrlf=false",
-      ...args,
-    ]);
-
-  await git(["init", "-q"]);
-  // Commit the baseline tree as the starting point.
-  cpSync(baselineDir, repo, { recursive: true });
-  await git(["add", "-A"]);
-  await git(["commit", "-q", "-m", "baseline", "--allow-empty"]);
-
-  // Overlay the head tree (keeping .git), then stage so VS Code shows the diff.
-  for (const entry of readdirSync(repo)) {
-    if (entry === ".git") continue;
-    rmSync(join(repo, entry), { recursive: true, force: true });
-  }
-  cpSync(headDir, repo, { recursive: true });
-  // Drop all index entries first, then re-add. A plain `git add -A` decides a
-  // file is unchanged from (size, mtime) and skips re-hashing it; because the
-  // baseline commit and the head overlay are written within the same second,
-  // a same-size content edit would be treated as clean and never staged (so it
-  // would silently not appear in VS Code). Clearing the index forces git to
-  // re-hash every file's content, surfacing every real modification.
-  await git(["rm", "-r", "--cached", "-q", "--", "."]);
-  await git(["add", "-A"]);
-
-  const result = await run("code", [repo]);
-  if (result.code !== 0) {
-    log.warn(
-      "Could not launch VS Code (`code` not on PATH?). Open the folder manually " +
-        `and use the Source Control view to browse the diff: ${repo}`,
-    );
-    return;
-  }
-  log.success(
-    `Opened ${repo} in VS Code — use the Source Control panel to browse the diff ` +
-      "(baseline = last commit, head = working tree).",
-  );
 }
