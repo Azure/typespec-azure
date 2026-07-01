@@ -6,9 +6,21 @@ TypeSpec emitter**.
 It generates code from the test specs twice (a **baseline** emitter and a **head** emitter),
 then shows the diff between the two outputs. Use it locally during development and in CI on PRs.
 
-Each language emitter (python, and later java/rust/go/ts) plugs in via a small **adapter** that
-wraps that emitter's own generation command. The core (ref resolution, diffing, orchestration)
-contains no language-specific logic.
+Each language emitter plugs in via a small **adapter** that wraps that emitter's own generation
+command. The core (ref resolution, diffing, orchestration) contains no language-specific logic.
+
+### Available adapters
+
+| `--emitter`  | Package                        | Wraps                          |
+| ------------ | ------------------------------ | ------------------------------ |
+| `python`     | `@azure-tools/typespec-python` | `eng/scripts/ci/regenerate.ts` |
+| `typescript` | `@azure-tools/typespec-ts`     | `test/commands/gen-spector.js` |
+| `rust`       | `@azure-tools/typespec-rust`   | `.scripts/tspcompile.js`       |
+
+> The `rust` adapter is ready but inert until `@azure-tools/typespec-rust` moves into this repo; it
+> fails fast with a clear message if the package is absent. See `src/adapters/rust.ts` for the two
+> small driver hooks (`--emitter-dir` / `--output-dir`) rust's `tspcompile.js` needs, mirroring
+> python and typescript.
 
 ## How it works
 
@@ -20,9 +32,8 @@ contains no language-specific logic.
             head emitter ─────┘
 ```
 
-- The **adapter** wraps the emitter's existing commands. For python that is
-  `eng/scripts/regenerate.ts` (generation).
-- The regenerate _driver_ always comes from the current checkout; only the emitter build it points
+- The **adapter** wraps the emitter's existing generation command (see the table above).
+- The generation _driver_ always comes from the current checkout; only the emitter build it points
   at (`--emitter-dir`) changes between baseline and head, isolating the diff to emitter behavior.
 
 ## Usage
@@ -79,6 +90,9 @@ node eng/emitter-diff/src/cli.ts --emitter python \
 # Diff against a GitHub sha:
 node eng/emitter-diff/src/cli.ts --emitter python \
   --baseline github:Azure/typespec-azure@ flavor=azure < sha > --opt
+
+# TypeScript emitter, scoped to one spec, against the current repo's main:
+node eng/emitter-diff/src/cli.ts --emitter typescript --baseline gh:main --name routes
 ```
 
 ## CI integration

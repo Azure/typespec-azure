@@ -2,11 +2,13 @@
 import { runTypespec } from "./run.ts";
 import { azureModularTsps } from "./spector-list.js";
 
-async function generateTypeSpecs(isDebugging, pathFilter, phase = "all") {
+async function generateTypeSpecs(isDebugging, pathFilter, phase = "all", overrides = {}) {
   let list = azureModularTsps;
 
   if (pathFilter) {
-    list = list.filter((tsp) => tsp.outputPath === pathFilter);
+    list = list.filter(
+      (tsp) => tsp.outputPath === pathFilter || tsp.outputPath.includes(pathFilter),
+    );
   }
 
   const maxConcurrentWorkers = 4;
@@ -15,7 +17,7 @@ async function generateTypeSpecs(isDebugging, pathFilter, phase = "all") {
     if (isDebugging === true && tsp.debug !== true) {
       continue;
     }
-    const generatePromise = runTypespec(tsp, phase)
+    const generatePromise = runTypespec(tsp, phase, overrides)
       .then((result) => {
         activePromises = activePromises.filter((p) => p !== generatePromise);
         return result;
@@ -35,13 +37,24 @@ async function generateTypeSpecs(isDebugging, pathFilter, phase = "all") {
   await Promise.allSettled(activePromises);
 }
 
+// Parse `--key=value` style options from argv.
+function argValue(prefix) {
+  const hit = process.argv.find((s) => s.startsWith(prefix));
+  return hit ? hit.slice(prefix.length) : undefined;
+}
+
 async function main() {
   const isDebugging = process.argv.indexOf("--debug") !== -1;
-  const nameFilter = process.argv.filter((s) => s.startsWith("--filter="));
-  const phaseOptions = process.argv.filter((s) => s.startsWith("--phase="));
-  const filter = nameFilter[0]?.split("=")[1];
-  const phase = phaseOptions[0]?.split("=")[1] ?? "all";
-  await generateTypeSpecs(isDebugging, filter, phase);
+  const filter = argValue("--filter=");
+  const phase = argValue("--phase=") ?? "all";
+  // Overrides consumed by the eng/emitter-diff tool (ignored by normal runs):
+  //   --emitter-dir=<dir>  run this emitter build instead of the workspace one
+  //   --output-dir=<dir>   write generated output under this base dir
+  const overrides = {
+    emitterDir: argValue("--emitter-dir="),
+    outputBase: argValue("--output-dir="),
+  };
+  await generateTypeSpecs(isDebugging, filter, phase, overrides);
 }
 
 let exitCode = 0;
