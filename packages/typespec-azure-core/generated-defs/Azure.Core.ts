@@ -3,6 +3,7 @@ import type {
   DecoratorValidatorCallbacks,
   Enum,
   EnumMember,
+  FunctionContext,
   Model,
   ModelProperty,
   Operation,
@@ -209,4 +210,26 @@ export type AzureCoreDecorators = {
   finalOperation: FinalOperationDecorator;
   useFinalStateVia: UseFinalStateViaDecorator;
   uniqueItems: UniqueItemsDecorator;
+};
+
+export type ApplySimplifiedMergePatchFunctionImplementation = (
+  context: FunctionContext,
+  input: Model,
+  rename: unknown,
+) => Model;
+
+export type MapRenamerFunctionImplementation = (
+  context: FunctionContext,
+  mapping: Record<string, string>,
+) => unknown;
+
+export type TemplateRenamerFunctionImplementation = (
+  context: FunctionContext,
+  template: string,
+) => unknown;
+
+export type AzureCoreFunctions = {
+  applySimplifiedMergePatch: ApplySimplifiedMergePatchFunctionImplementation;
+  mapRenamer: MapRenamerFunctionImplementation;
+  templateRenamer: TemplateRenamerFunctionImplementation;
 };

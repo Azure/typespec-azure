@@ -28,4 +28,4 @@ export { FinalStateValue } from "./state/final-state.js";
 export * from "./traits.js";
 export * from "./utils.js";
 /** @internal */
-export { $decorators } from "./tsp-index.js";
+export { $decorators, $functions } from "./tsp-index.js";

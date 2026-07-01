@@ -1,6 +1,6 @@
 import type { AzureCoreFoundationsDecorators } from "../generated-defs/Azure.Core.Foundations.js";
 import type { AzureCoreFoundationsPrivateDecorators } from "../generated-defs/Azure.Core.Foundations.Private.js";
-import type { AzureCoreDecorators } from "../generated-defs/Azure.Core.js";
+import type { AzureCoreDecorators, AzureCoreFunctions } from "../generated-defs/Azure.Core.js";
 import type { AzureCoreTraitsDecorators } from "../generated-defs/Azure.Core.Traits.js";
 import type { AzureCoreTraitsPrivateDecorators } from "../generated-defs/Azure.Core.Traits.Private.js";
 import { $requestParameter, $responseProperty } from "./decorators.js";
@@ -29,6 +29,7 @@ import { $spreadCustomParameters } from "./decorators/private/spread-custom-para
 import { $spreadCustomResponseProperties } from "./decorators/private/spread-custom-response-properties.js";
 import { $uniqueItems } from "./decorators/unique-items.js";
 import { $useFinalStateVia } from "./decorators/use-final-state-via.js";
+import { applySimplifiedMergePatch, mapRenamer, templateRenamer } from "./merge-patch.js";
 import {
   $addTraitProperties,
   $applyTraitOverride,
@@ -44,6 +45,15 @@ import {
 
 export { $lib } from "./lib.js";
 export { $onValidate } from "./validate.js";
+
+/** @internal */
+export const $functions = {
+  "Azure.Core": {
+    applySimplifiedMergePatch,
+    mapRenamer,
+    templateRenamer,
+  } satisfies AzureCoreFunctions,
+};
 
 /** @internal */
 export const $decorators = {
