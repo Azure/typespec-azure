@@ -1,5 +1,9 @@
-import { createRule, Model } from "@typespec/compiler";
-import { isCustomAzureResource } from "../resource.js";
+import { createRule, isTemplateInstance, Model, Program } from "@typespec/compiler";
+import { SyntaxKind, type Node } from "@typespec/compiler/ast";
+import { getCustomResourceOptions, isCustomAzureResource } from "../resource.js";
+
+const armCustomResourceUsageDiscourageCode =
+  "@azure-tools/typespec-azure-resource-manager/arm-custom-resource-usage-discourage";
 
 export const armCustomResourceUsageDiscourage = createRule({
   name: "arm-custom-resource-usage-discourage",
@@ -12,7 +16,10 @@ export const armCustomResourceUsageDiscourage = createRule({
   create(context) {
     return {
       model: (model: Model) => {
-        if (isCustomAzureResource(context.program, model)) {
+        if (
+          isCustomAzureResource(context.program, model) &&
+          !hasSuppressedCustomResourceTemplateBase(context.program, model)
+        ) {
           context.reportDiagnostic({
             code: "arm-custom-resource-usage-discourage",
             target: model,
@@ -22,3 +29,59 @@ export const armCustomResourceUsageDiscourage = createRule({
     };
   },
 });
+
+function hasSuppressedCustomResourceTemplateBase(program: Program, model: Model): boolean {
+  return hasSuppressedCustomResourceTemplate(program, model, new Set<Model>());
+}
+
+function hasSuppressedCustomResourceTemplate(
+  program: Program,
+  model: Model,
+  visited: Set<Model>,
+): boolean {
+  if (visited.has(model)) {
+    return false;
+  }
+  visited.add(model);
+
+  if (
+    getCustomResourceOptions(program, model) &&
+    isTemplateInstance(model) &&
+    hasSuppression(model.node)
+  ) {
+    return true;
+  }
+
+  if (model.baseModel && hasSuppressedCustomResourceTemplate(program, model.baseModel, visited)) {
+    return true;
+  }
+
+  for (const sourceModel of model.sourceModels) {
+    if (hasSuppressedCustomResourceTemplate(program, sourceModel.model, visited)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function hasSuppression(node: Node | undefined): boolean {
+  let current = node;
+  while (current) {
+    for (const directive of current.directives ?? []) {
+      const firstArgument = directive.arguments[0];
+      if (
+        directive.target.sv === "suppress" &&
+        firstArgument &&
+        ((firstArgument.kind === SyntaxKind.StringLiteral &&
+          firstArgument.value === armCustomResourceUsageDiscourageCode) ||
+          (firstArgument.kind === SyntaxKind.Identifier &&
+            firstArgument.sv === armCustomResourceUsageDiscourageCode))
+      ) {
+        return true;
+      }
+    }
+    current = current.parent;
+  }
+  return false;
+}

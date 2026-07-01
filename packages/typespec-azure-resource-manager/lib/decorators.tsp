@@ -274,3 +274,44 @@ extern dec resourceBaseType(
  * ```
  */
 extern dec identifiers(entity: ModelProperty | Array<unknown>, properties: valueof string[]);
+
+/**
+ * Options for defining a feature file and its associated output
+ */
+model ArmFeatureFileOptions {
+  /** The feature name */
+  featureName: string;
+
+  /** The associated file name for the features */
+  fileName: string;
+
+  /** The feature description in Swagger */
+  description: string;
+
+  /** The feature title in Swagger */
+  title?: string;
+
+  /** The feature terms of service in Swagger */
+  termsOfService?: string;
+}
+
+/**
+ * Decorator to define a set of feature files for splitting output
+ * @param target The service namespace
+ * @param features The enum that contains the features
+ */
+extern dec featureFiles(target: Namespace, features: Enum);
+
+/**
+ * Decorator to define options for a specific feature file
+ * @param target The enum member that represents the feature
+ * @param options The options for the feature file
+ */
+extern dec featureFileOptions(target: EnumMember, options: valueof ArmFeatureFileOptions);
+
+/**
+ * Decorator to associate a feature file with a model, interface, or namespace
+ * @param target The target to associate the feature file with
+ * @param featureName The feature to associate with the target
+ */
+extern dec featureFile(target: Model | Operation | Interface | Namespace, featureName: EnumMember);
