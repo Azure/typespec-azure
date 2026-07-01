@@ -65,6 +65,7 @@ model BackupResultProperties {
 
 @armResourceOperations
 interface CloudHsmClusters {
+  @doc("A long-running resource action.")
   backup is ArmResourceActionAsync<
     CloudHsmCluster,
     BackupRequestProperties,
