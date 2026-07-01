@@ -207,3 +207,17 @@ jobs:
             } else {
               await github.rest.issues.createComment({ owner, repo, issue_number, body });
             }
+
+      - name: Fail on tool error
+        if: always()
+        env:
+          STATUS: ${{ steps.diff.outputs.status }}
+        run: |
+          # Informational check: a generated-output diff does NOT fail the PR
+          # (the tool is run without --fail-on-diff, so a diff still exits 0).
+          # Only a real tool/build error (non-zero exit) fails the job.
+          if [ "$STATUS" != "0" ]; then
+            echo "::error::emitter-diff failed (exit $STATUS). See the log and the emitter-diff-html artifact."
+            exit 1
+          fi
+          echo "emitter-diff ran successfully (informational; diffs are reported, not enforced)."
