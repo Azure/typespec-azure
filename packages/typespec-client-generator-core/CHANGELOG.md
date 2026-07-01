@@ -2,7 +2,7 @@
 
 ## 0.69.2
 
-### Bug Fixes
+### Features
 
 - [111845d](https://github.com/Azure/typespec-azure/commit/111845d46f5cbd3c32b39f7fc89a05c2f6f7908c) Add `csharp-no-url-suffix` linter rule that flags model properties ending with `Url` and suggests using `Uri` suffix instead, following .NET SDK naming conventions. Includes auto-fix to add `@@clientName` decorator in client.tsp.
 
