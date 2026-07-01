@@ -83,7 +83,14 @@ export const AreaPaths: Record<keyof typeof AreaLabels, string[]> = {
   "cli/psh": [],
   "emitter:client:all": [],
   "meta:website": ["website/"],
-  linter: [],
+  linter: [
+    "packages/typespec-azure-core/src/rules/",
+    "packages/typespec-azure-core/test/rules/",
+    "packages/typespec-azure-resource-manager/src/rules/",
+    "packages/typespec-azure-resource-manager/test/rules/",
+    "packages/typespec-client-generator-core/src/rules/",
+    "packages/typespec-client-generator-core/test/rules/",
+  ],
 };
 
 export default defineConfig({
