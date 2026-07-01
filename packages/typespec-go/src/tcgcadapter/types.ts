@@ -3,6 +3,8 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+/* eslint-disable @typescript-eslint/no-deprecated -- uses TCGC APIs marked deprecated (serializedName) as a documented fallback when serializationOptions is empty. */
+
 import * as tcgc from "@azure-tools/typespec-client-generator-core";
 import * as tsp from "@typespec/compiler";
 import * as http from "@typespec/http";
