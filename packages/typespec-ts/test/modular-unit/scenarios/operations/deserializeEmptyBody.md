@@ -2,7 +2,7 @@
 
 When an operation can return either a body response (200) or an empty body response (204),
 the generated deserializer must not throw when the body is absent.
-The return type should include `undefined` and a body guard should be emitted.
+The return type should include `void` and a body guard should be emitted.
 
 ## TypeSpec
 
@@ -60,7 +60,7 @@ export function _deleteKeyValueSend(
 
 export async function _deleteKeyValueDeserialize(
   result: PathUncheckedResponse,
-): Promise<KeyValue | undefined> {
+): Promise<KeyValue | void> {
   const expectedStatuses = ["200", "204"];
   if (!expectedStatuses.includes(result.status)) {
     throw createRestError(result);
@@ -72,7 +72,7 @@ export async function deleteKeyValue(
   context: Client,
   key: string,
   options: DeleteKeyValueOptionalParams = { requestOptions: {} },
-): Promise<KeyValue | undefined> {
+): Promise<KeyValue | void> {
   const result = await _deleteKeyValueSend(context, key, options);
   return _deleteKeyValueDeserialize(result);
 }
@@ -229,7 +229,7 @@ export function _deleteKeyValueSend(
 
 export async function _deleteKeyValueDeserialize(
   result: PathUncheckedResponse,
-): Promise<KeyValue | undefined> {
+): Promise<KeyValue | void> {
   const expectedStatuses = ["200", "204"];
   if (!expectedStatuses.includes(result.status)) {
     const error = createRestError(result);
@@ -246,7 +246,7 @@ export async function deleteKeyValue(
   context: Client,
   key: string,
   options: DeleteKeyValueOptionalParams = { requestOptions: {} },
-): Promise<KeyValue | undefined> {
+): Promise<KeyValue | void> {
   const result = await _deleteKeyValueSend(context, key, options);
   return _deleteKeyValueDeserialize(result);
 }

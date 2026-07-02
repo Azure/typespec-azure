@@ -213,11 +213,11 @@ export function getDeserializePrivateFunction(
     };
   } else if (response.type) {
     // When response.optional is true, some HTTP responses have no body (e.g. 204), so
-    // the return type must include undefined to reflect that possibility.
+    // the return type must include void to reflect that possibility.
     const baseType = getTypeExpression(context, response.type);
     returnType = {
       name: (response as any).name ?? "",
-      type: response.optional ? `${baseType} | undefined` : baseType,
+      type: response.optional ? `${baseType} | void` : baseType,
     };
   } else if (isHeadAsBooleanOperation(operation)) {
     returnType = { name: "", type: "boolean" };
@@ -949,13 +949,13 @@ export function getOperationFunction(
       const baseCompositeType = buildCompositeResponseType(context, type, responseHeaders);
       returnType = {
         name: (type as any).name ?? "",
-        type: response.optional ? `${baseCompositeType} | undefined` : baseCompositeType,
+        type: response.optional ? `${baseCompositeType} | void` : baseCompositeType,
       };
     } else {
       const baseType = getTypeExpression(context, type!);
       returnType = {
         name: (type as any).name ?? "",
-        type: response.optional ? `${baseType} | undefined` : baseType,
+        type: response.optional ? `${baseType} | void` : baseType,
       };
     }
   } else if (hasHeaderOnlyResponse && isResponseHeadersEnabled) {
