@@ -104,11 +104,6 @@ jobs:
 
       - run: pnpm run lint
         name: Lint
-        # typespec-go adds a large emitter package to the type-aware lint pass,
-        # pushing the default ~4 GB Node heap over the limit. Raise it (runner
-        # has 16 GB) to keep type-aware linting enabled across all packages.
-        env:
-          NODE_OPTIONS: "--max-old-space-size=8192"
 
       - run: pnpm run lint:extra
         name: Lint (Extra)
