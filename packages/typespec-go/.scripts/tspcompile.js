@@ -230,10 +230,17 @@ generate("armapicenter", armapicenter, "test/local/armapicenter", [
 
 const armcognitiveservices =
   azureServiceSpecs + "specification/cognitiveservices/CognitiveServices.Management";
-generate("armcognitiveservices", armcognitiveservices, "test/local/armcognitiveservices", [
-  `examples-directory=${armcognitiveservices}/examples`,
-  "generate-samples=true",
-]);
+// Disabled: the upstream CognitiveServices.Management spec has a JavaScript-scoped
+// @override (checkSkuAvailability) whose customization operation drops @path on the
+// realized "location" path parameter. TCGC's override-parameters-mismatch validation
+// runs in the $override decorator regardless of the emitting language, so compiling
+// for Go raises an error even though the override targets "javascript" only. Re-enable
+// once TCGC scopes this validation to the current emitter (or the spec adds a suppress).
+// generate("armcognitiveservices", armcognitiveservices, "test/local/armcognitiveservices", [
+//   `examples-directory=${armcognitiveservices}/examples`,
+//   "generate-samples=true",
+// ]);
+void armcognitiveservices;
 
 const armlargeinstance =
   azureServiceSpecs +
