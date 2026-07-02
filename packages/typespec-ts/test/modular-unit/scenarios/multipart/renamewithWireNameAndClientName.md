@@ -15,14 +15,14 @@ op withWireName(
 ## Models
 
 ```ts models
-import { FileContents, createFilePartDescriptor } from "../static-helpers/multipartHelpers.js";
-
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import { FileContents, createFilePartDescriptor } from "../static-helpers/multipartHelpers.js";
+
 /** model interface MultiPartRequestWithWireName */
 export interface MultiPartRequestWithWireName {
   identifier: string;
@@ -63,14 +63,14 @@ needTCGC: true
 ## Models
 
 ```ts models
-import { FileContents, createFilePartDescriptor } from "../static-helpers/multipartHelpers.js";
-
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import { FileContents, createFilePartDescriptor } from "../static-helpers/multipartHelpers.js";
+
 /** model interface MultiPartRequest */
 export interface MultiPartRequest {
   identifier: string;

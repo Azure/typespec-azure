@@ -7,7 +7,6 @@ options:
     generate-test: false
     add-credentials: false
     flavor: azure
-    is-typespec-test: true
     package-details:
       name: "@msinternal/model-inheritance-single-discriminator"
       description: "Model Inheritance Test Service"

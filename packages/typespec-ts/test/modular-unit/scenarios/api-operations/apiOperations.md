@@ -42,7 +42,6 @@ export async function _uploadFileViaBodyDeserialize(result: PathUncheckedRespons
 
   return;
 }
-
 export async function uploadFileViaBody(
   context: Client,
   body: Uint8Array,
@@ -101,7 +100,6 @@ export async function _uploadFileViaBodyDeserialize(result: PathUncheckedRespons
 
   return;
 }
-
 export async function uploadFileViaBody(
   context: Client,
   body: Uint8Array,
@@ -131,12 +129,6 @@ op uploadFile(
 ## Models \_UploadFileRequest
 
 ```ts models interface _UploadFileRequest
-/**
- * This file contains only generated model types and their (de)serializers.
- * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
- */
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /** model interface _UploadFileRequest */
 export interface _UploadFileRequest {
   name: string;
@@ -192,7 +184,6 @@ export async function _uploadFileDeserialize(result: PathUncheckedResponse): Pro
 
   return;
 }
-
 export async function uploadFile(
   context: Client,
   body: {
@@ -226,14 +217,14 @@ op uploadFiles(
 ## Models
 
 ```ts models
-import { FileContents, createFilePartDescriptor } from "../static-helpers/multipartHelpers.js";
-
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import { FileContents, createFilePartDescriptor } from "../static-helpers/multipartHelpers.js";
+
 /** model interface _UploadFilesRequest */
 export interface _UploadFilesRequest {
   files: Array<FileContents | { contents: FileContents; contentType?: string; filename?: string }>;
@@ -286,7 +277,6 @@ export async function _uploadFilesDeserialize(result: PathUncheckedResponse): Pr
 
   return;
 }
-
 export async function uploadFiles(
   context: Client,
   body: {
@@ -345,7 +335,6 @@ export async function _downloadFileDeserialize(result: PathUncheckedResponse): P
 
   return result.body;
 }
-
 export async function downloadFile(
   context: Client,
   options: DownloadFileOptionalParams = { requestOptions: {} },
@@ -403,7 +392,6 @@ export async function _downloadFileDeserialize(result: PathUncheckedResponse): P
 
   return result.body;
 }
-
 export async function downloadFile(
   context: Client,
   options: DownloadFileOptionalParams = { requestOptions: {} },
@@ -462,7 +450,6 @@ export async function _uploadFileViaBodyDeserialize(result: PathUncheckedRespons
 
   return;
 }
-
 export async function uploadFileViaBody(
   context: Client,
   contentType: string,
@@ -527,7 +514,6 @@ export async function _testDeserialize(result: PathUncheckedResponse): Promise<s
 
   return result.body;
 }
-
 export async function test(
   context: Client,
   apiVersion: string,
@@ -666,7 +652,6 @@ export async function _testDeserialize(result: PathUncheckedResponse): Promise<s
 
   return result.body;
 }
-
 export async function test(
   context: Client,
   apiVersion: string,
@@ -789,7 +774,6 @@ export async function _test1Deserialize(result: PathUncheckedResponse): Promise<
 
   return result.body;
 }
-
 export async function test1(
   context: Client,
   options: Test1OptionalParams = { requestOptions: {} },
@@ -826,7 +810,6 @@ export async function _testDeserialize(result: PathUncheckedResponse): Promise<s
 
   return result.body;
 }
-
 export async function test(
   context: Client,
   apiVersion: string,
@@ -1065,7 +1048,6 @@ export async function _updateFileShareSnapshotDeserialize(
 
   return fileShareSnapshotDeserializer(result.body);
 }
-
 /** Update a FileShareSnapshot */
 export function updateFileShareSnapshot(
   context: Client,
@@ -1126,7 +1108,6 @@ export async function _listDeserialize(
 
   return _operationListResultDeserializer(result.body);
 }
-
 /** List the operations for the provider */
 export function list(
   context: Client,

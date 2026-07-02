@@ -6,7 +6,6 @@ options:
     generate-test: false
     add-credentials: false
     flavor: azure
-    is-typespec-test: true
     package-details:
       name: "@msinternal/azure-client-generator-core-client-doc"
       description: "Azure ClientGeneratorCore ClientDoc Test Service"

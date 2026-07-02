@@ -183,6 +183,10 @@ export const azureModularTsps = [
     inputPath: "payload/xml",
   },
   {
+    outputPath: "payload/head",
+    inputPath: "payload/head",
+  },
+  {
     outputPath: "server/versions/versioned",
     inputPath: "server/versions/versioned",
   },
