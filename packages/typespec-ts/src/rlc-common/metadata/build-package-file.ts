@@ -143,12 +143,6 @@ export function updatePackageFile(
     };
   }
 
-  packageInfo.dependencies = {
-    ...packageInfo.dependencies,
-    "@azure/core-rest-pipeline": "^1.24.0",
-    "@azure-rest/core-client": "^2.7.0",
-  };
-
   // Update constantPaths metadata for Azure packages
   if (needsConstantPathsUpdate && packageInfo["//metadata"]) {
     const metadata = packageInfo["//metadata"];
@@ -163,6 +157,14 @@ export function updatePackageFile(
     }));
     metadata.constantPaths = [...nonUserAgentPaths, ...newUserAgentPaths];
   }
+
+  // Always update @azure/core-rest-pipeline and @azure-rest/core-client to the latest
+  // versions because our imports rely on APIs from those latest package versions.
+  packageInfo.dependencies = {
+    ...packageInfo.dependencies,
+    "@azure/core-rest-pipeline": "^1.24.0",
+    "@azure-rest/core-client": "^2.7.0",
+  };
 
   return {
     path: "package.json",

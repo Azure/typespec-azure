@@ -73,7 +73,7 @@ describe("loadStaticHelpers", () => {
     ).rejects.toThrowError(/invalid helper kind/);
   });
 
-  it("should rewrite platform-types imports to @azure/core-rest-pipeline for azure monorepo", async () => {
+  it("should keep @azure/core-rest-pipeline imports in static helpers", async () => {
     const helpers = {
       usesPlatformImport: {
         kind: "function",

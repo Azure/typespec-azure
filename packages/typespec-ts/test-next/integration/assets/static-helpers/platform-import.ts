@@ -1,5 +1,5 @@
-import { platformTag } from "./platform-types";
+import { RestError } from "@azure/core-rest-pipeline";
 
 export function usesPlatformImport() {
-  return platformTag;
+  return RestError.name;
 }

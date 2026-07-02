@@ -95,21 +95,6 @@ export async function loadStaticHelpers(
       const addedFile = project.createSourceFile(targetPath, contents, {
         overwrite: true,
       });
-      addedFile.getImportDeclarations().map((i) => {
-        // Rewrite relative platform-types imports to @azure/core-rest-pipeline for azure packages
-        // (NodeReadableStream is now exported directly from @azure/core-rest-pipeline).
-        // Non-azure packages keep the relative import to the local platform-types.ts.
-
-        const specifier = i.getModuleSpecifierValue();
-        if (
-          specifier.startsWith(".") &&
-          specifier.includes("platform-types") &&
-          !specifier.includes("-browser") &&
-          !specifier.includes("-react-native")
-        ) {
-          i.setModuleSpecifier("@azure/core-rest-pipeline");
-        }
-      });
       for (const entry of Object.values(helpers)) {
         if (!addedFile.getFilePath().endsWith(entry.location)) {
           continue;
