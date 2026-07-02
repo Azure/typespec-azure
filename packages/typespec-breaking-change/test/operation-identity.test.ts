@@ -117,9 +117,9 @@ describe("matchOperations", () => {
       }
     `);
 
-    const info = enumerateVersions(program);
-    const v1 = createVersionedView(program, info!.service, "2024-01-01");
-    const v2 = createVersionedView(program, info!.service, "2025-01-01");
+    const info = enumerateVersions(program)[0];
+    const v1 = createVersionedView(program, info.service, "2024-01-01");
+    const v2 = createVersionedView(program, info.service, "2025-01-01");
 
     const baseOps = resolveOperationIdentities(program, v1.versionedNamespace);
     const headOps = resolveOperationIdentities(program, v2.versionedNamespace);
@@ -147,9 +147,9 @@ describe("matchOperations", () => {
       }
     `);
 
-    const info = enumerateVersions(program);
-    const v1 = createVersionedView(program, info!.service, "2024-01-01");
-    const v2 = createVersionedView(program, info!.service, "2025-01-01");
+    const info = enumerateVersions(program)[0];
+    const v1 = createVersionedView(program, info.service, "2024-01-01");
+    const v2 = createVersionedView(program, info.service, "2025-01-01");
 
     const baseOps = resolveOperationIdentities(program, v1.versionedNamespace);
     const headOps = resolveOperationIdentities(program, v2.versionedNamespace);
@@ -178,9 +178,9 @@ describe("matchOperations", () => {
       }
     `);
 
-    const info = enumerateVersions(program);
-    const v1 = createVersionedView(program, info!.service, "2024-01-01");
-    const v2 = createVersionedView(program, info!.service, "2025-01-01");
+    const info = enumerateVersions(program)[0];
+    const v1 = createVersionedView(program, info.service, "2024-01-01");
+    const v2 = createVersionedView(program, info.service, "2025-01-01");
 
     const baseOps = resolveOperationIdentities(program, v1.versionedNamespace);
     const headOps = resolveOperationIdentities(program, v2.versionedNamespace);
@@ -200,3 +200,4 @@ describe("matchOperations", () => {
     expect(result.removed).toHaveLength(0);
   });
 });
+

@@ -16,16 +16,14 @@ export interface ServiceVersionInfo {
 
 /**
  * Enumerate all api-versions from a compiled TypeSpec program.
- * Returns version info for the first versioned service found.
+ * Returns version info for ALL versioned services found.
  *
  * @param program - A compiled TypeSpec program
- * @returns ServiceVersionInfo with ordered version strings, or undefined if not versioned
+ * @returns Array of ServiceVersionInfo, one per versioned service. Empty if none are versioned.
  */
-export function enumerateVersions(program: Program): ServiceVersionInfo | undefined {
+export function enumerateVersions(program: Program): ServiceVersionInfo[] {
   const services = listServices(program);
-  if (services.length === 0) {
-    return undefined;
-  }
+  const results: ServiceVersionInfo[] = [];
 
   for (const service of services) {
     const mutators = getVersioningMutators(program, service.type);
@@ -35,11 +33,11 @@ export function enumerateVersions(program: Program): ServiceVersionInfo | undefi
 
     if (mutators.kind === "versioned") {
       const versions = mutators.snapshots.map((s) => s.version.value);
-      return { service: service.type, versions };
+      results.push({ service: service.type, versions });
     }
   }
 
-  return undefined;
+  return results;
 }
 
 /**

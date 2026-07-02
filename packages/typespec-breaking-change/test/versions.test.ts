@@ -25,12 +25,12 @@ describe("version enumeration", () => {
       op getWidget(): Widget;
     `);
 
-    const info = enumerateVersions(program);
-    expect(info).toBeDefined();
-    expect(info!.versions).toEqual(["2024-01-01", "2025-01-01"]);
+    const results = enumerateVersions(program);
+    expect(results).toHaveLength(1);
+    expect(results[0].versions).toEqual(["2024-01-01", "2025-01-01"]);
   });
 
-  it("returns undefined for non-versioned service", async () => {
+  it("returns empty array for non-versioned service", async () => {
     const { program } = await Tester.compile(`
       @service
       namespace TestService;
@@ -39,8 +39,8 @@ describe("version enumeration", () => {
       op getWidget(): Widget;
     `);
 
-    const info = enumerateVersions(program);
-    expect(info).toBeUndefined();
+    const results = enumerateVersions(program);
+    expect(results).toHaveLength(0);
   });
 
   it("enumerates three versions in order", async () => {
@@ -55,8 +55,33 @@ describe("version enumeration", () => {
       op getWidget(): Widget;
     `);
 
-    const info = enumerateVersions(program);
-    expect(info!.versions).toEqual(["2023-01-01", "2024-01-01", "2025-01-01"]);
+    const results = enumerateVersions(program);
+    expect(results[0].versions).toEqual(["2023-01-01", "2024-01-01", "2025-01-01"]);
+  });
+
+  it("enumerates multiple services", async () => {
+    const { program } = await Tester.compile(`
+      @versioned(WidgetVersions)
+      @service
+      namespace WidgetService {
+        enum WidgetVersions { v1: "2024-01-01", v2: "2025-01-01" }
+        model Widget { name: string; }
+        op getWidget(): Widget;
+      }
+
+      @versioned(GadgetVersions)
+      @service
+      namespace GadgetService {
+        enum GadgetVersions { v1: "2024-06-01" }
+        model Gadget { id: string; }
+        op getGadget(): Gadget;
+      }
+    `);
+
+    const results = enumerateVersions(program);
+    expect(results).toHaveLength(2);
+    expect(results[0].versions).toEqual(["2024-01-01", "2025-01-01"]);
+    expect(results[1].versions).toEqual(["2024-06-01"]);
   });
 });
 
@@ -77,10 +102,11 @@ describe("version projection", () => {
       op getWidget(): Widget;
     `);
 
-    const info = enumerateVersions(program);
+    const results = enumerateVersions(program);
+    const info = results[0];
     expect(info).toBeDefined();
 
-    const v1View = createVersionedView(program, info!.service, "2024-01-01");
+    const v1View = createVersionedView(program, info.service, "2024-01-01");
     expect(v1View.version).toBe("2024-01-01");
 
     // In v1, Widget should NOT have description
@@ -89,7 +115,7 @@ describe("version projection", () => {
     expect(v1Widget!.properties.has("description")).toBe(false);
     expect(v1Widget!.properties.has("name")).toBe(true);
 
-    const v2View = createVersionedView(program, info!.service, "2025-01-01");
+    const v2View = createVersionedView(program, info.service, "2025-01-01");
     expect(v2View.version).toBe("2025-01-01");
 
     // In v2, Widget SHOULD have description
@@ -115,9 +141,10 @@ describe("version projection", () => {
       op getWidget(): Widget;
     `);
 
-    const info = enumerateVersions(program);
-    const v1View = createVersionedView(program, info!.service, "2024-01-01");
-    const v2View = createVersionedView(program, info!.service, "2025-01-01");
+    const results = enumerateVersions(program);
+    const info = results[0];
+    const v1View = createVersionedView(program, info.service, "2024-01-01");
+    const v2View = createVersionedView(program, info.service, "2025-01-01");
 
     const v1Widget = getModelFromNamespace(v1View.versionedNamespace, "Widget");
     expect(v1Widget!.properties.has("legacyField")).toBe(true);
@@ -137,8 +164,9 @@ describe("version projection", () => {
       op getWidget(): Widget;
     `);
 
-    const info = enumerateVersions(program);
-    expect(() => createVersionedView(program, info!.service, "9999-99-99")).toThrow(
+    const results = enumerateVersions(program);
+    const info = results[0];
+    expect(() => createVersionedView(program, info.service, "9999-99-99")).toThrow(
       "Version '9999-99-99' not found",
     );
   });
