@@ -37,6 +37,10 @@ const argv = parseArgs({
     pluginDir: { type: "string" },
     emitterName: { type: "string" },
     generatedFolder: { type: "string" },
+    httpSpecsDir: { type: "string" },
+    azureSpecsDir: { type: "string" },
+    "use-pyodide": { type: "boolean" },
+    "no-baseline": { type: "boolean" },
     jobs: { type: "string", short: "j" },
     help: { type: "boolean", short: "h" },
   },
@@ -93,8 +97,12 @@ const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const PLUGIN_DIR = argv.values.pluginDir
   ? resolve(argv.values.pluginDir)
   : resolve(SCRIPT_DIR, "../../../");
-const AZURE_HTTP_SPECS = resolve(PLUGIN_DIR, "node_modules/@azure-tools/azure-http-specs/specs");
-const HTTP_SPECS = resolve(PLUGIN_DIR, "node_modules/@typespec/http-specs/specs");
+const AZURE_HTTP_SPECS = argv.values.azureSpecsDir
+  ? resolve(argv.values.azureSpecsDir)
+  : resolve(PLUGIN_DIR, "node_modules/@azure-tools/azure-http-specs/specs");
+const HTTP_SPECS = argv.values.httpSpecsDir
+  ? resolve(argv.values.httpSpecsDir)
+  : resolve(PLUGIN_DIR, "node_modules/@typespec/http-specs/specs");
 const GENERATED_FOLDER = argv.values.generatedFolder
   ? resolve(argv.values.generatedFolder)
   : resolve(PLUGIN_DIR, "generator");
@@ -113,6 +121,7 @@ async function regenerateFlavor(
   name: string | undefined,
   debug: boolean,
   jobs: number,
+  usePyodide: boolean,
 ): Promise<boolean> {
   console.log(pc.cyan(`\n${"=".repeat(60)}`));
   console.log(pc.cyan(`Regenerating ${flavor} flavor`));
@@ -127,6 +136,20 @@ async function regenerateFlavor(
   const allSpecs = [...azureSpecs, ...standardSpecs];
 
   const groups = buildTaskGroups(allSpecs, flags, ctx);
+
+  // Forward `use-pyodide` to the emitter for every task. Done here (rather than
+  // in regenerate-common.ts) so the shared file stays identical to the upstream
+  // `@typespec/http-client-python` copy synced via `pnpm sync`. Pyodide runs
+  // codegen + black in WASM, avoiding native black failing on Windows under the
+  // deep pnpm venv path (MAX_PATH).
+  if (usePyodide) {
+    for (const group of groups) {
+      for (const task of group.tasks) {
+        task.options["use-pyodide"] = true;
+      }
+    }
+  }
+
   const totalTasks = groups.reduce((sum, g) => sum + g.tasks.length, 0);
 
   console.log(pc.cyan(`Found ${allSpecs.length} specs (${totalTasks} total tasks) to compile`));
@@ -152,6 +175,7 @@ async function main(): Promise<void> {
   const flavor = argv.values.flavor;
   const name = argv.values.name;
   const debug = argv.values.debug ?? false;
+  const usePyodide = argv.values["use-pyodide"] ?? false;
   // Windows has slower file system operations and process spawning, so use
   // fewer parallel jobs to avoid I/O contention and memory pressure.
   const defaultJobs = isWindows ? 10 : 30;
@@ -161,6 +185,9 @@ async function main(): Promise<void> {
   console.log(pc.cyan(`  Platform: ${isWindows ? "Windows" : "Unix"}`));
   console.log(pc.cyan(`  Mode:     in-process compilation (single-phase)`));
   console.log(pc.cyan(`  Jobs:     ${jobs}`));
+  if (usePyodide) {
+    console.log(pc.cyan(`  Codegen:  pyodide (WASM)`));
+  }
   if (name) {
     console.log(pc.cyan(`  Filter:   ${name}`));
   }
@@ -169,13 +196,18 @@ async function main(): Promise<void> {
   const startTime = performance.now();
   let success: boolean;
 
-  await prepareBaselineOfGeneratedCode(GENERATED_FOLDER);
+  // The baseline reset clones azure-sdk-for-python and seeds tests/generated for
+  // the full-emit smoke test. The emitter-diff tool wants only freshly generated
+  // output (no network seed), so it passes --no-baseline.
+  if (!argv.values["no-baseline"]) {
+    await prepareBaselineOfGeneratedCode(GENERATED_FOLDER);
+  }
 
   if (flavor) {
-    success = await regenerateFlavor(flavor, name, debug, jobs);
+    success = await regenerateFlavor(flavor, name, debug, jobs, usePyodide);
   } else {
-    const azureSuccess = await regenerateFlavor("azure", name, debug, jobs);
-    const unbrandedSuccess = await regenerateFlavor("unbranded", name, debug, jobs);
+    const azureSuccess = await regenerateFlavor("azure", name, debug, jobs, usePyodide);
+    const unbrandedSuccess = await regenerateFlavor("unbranded", name, debug, jobs, usePyodide);
     success = azureSuccess && unbrandedSuccess;
   }
 

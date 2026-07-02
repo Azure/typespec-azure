@@ -7,8 +7,22 @@ import { dirname, join as joinPath } from "path";
 import type { CompilerOptions } from "typescript";
 import { createProgram } from "typescript";
 import { fileURLToPath } from "url";
+import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 import { createTaskLogger } from "./logger.js";
 import { runCommand } from "./run-command.js";
+
+// Optional overrides used by the eng/emitter-diff tool to generate with a
+// specific emitter build into an isolated output tree (leaving the in-repo
+// baseline untouched). When omitted, generation behaves exactly as before.
+export interface GenOverrides {
+  // Absolute path to the emitter package to run (its package.json name must be
+  // "@azure-tools/typespec-ts" so the per-spec tspconfig options still match).
+  readonly emitterDir?: string;
+  // Absolute base dir to write generated output under (in place of the in-repo
+  // test/azure-modular-integration/generated tree). Each spec's folder is
+  // created beneath it.
+  readonly outputBase?: string;
+}
 
 // Resolve the TypeSpec compiler CLI entry (cmd/tsp.js) once per process and invoke it
 // directly with `node`. Spawning `npx tsp` re-resolves the package on every call, which
@@ -67,9 +81,11 @@ interface GenEnv {
   readonly targetFolder: () => any;
   readonly scriptDir: () => string;
   readonly declarationSubpath: () => string;
+  readonly emitterDir: () => string | undefined;
+  readonly outputBase: () => string | undefined;
 }
 
-function genEnv(config: any, phase: GenPhase): GenEnv {
+function genEnv(config: any, phase: GenPhase, overrides: GenOverrides = {}): GenEnv {
   const { inputPath: sourceTypespec, outputPath: targetFolder } = config;
 
   const __filename = fileURLToPath(import.meta.url);
@@ -86,11 +102,17 @@ function genEnv(config: any, phase: GenPhase): GenEnv {
     targetFolder: () => targetFolder,
     scriptDir: () => testRoot,
     declarationSubpath: () => declarationDir,
+    emitterDir: () => overrides.emitterDir,
+    outputBase: () => overrides.outputBase,
   } as const;
 }
 
-export async function runTypespec(config: any, phase: GenPhase = "all") {
-  const env = genEnv(config, phase);
+export async function runTypespec(
+  config: any,
+  phase: GenPhase = "all",
+  overrides: GenOverrides = {},
+) {
+  const env = genEnv(config, phase, overrides);
   await runTypespecHelper(env);
 }
 
@@ -132,6 +154,29 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
     const logger = env.logger();
 
     const workingDir = outputPath();
+    const emitterDir = env.emitterDir();
+
+    // Emitter-diff mode: generate into an isolated dir with a chosen emitter
+    // build. Seed the working dir with a copy of the spec's committed tspconfig
+    // that has its `emit` list removed, then point tsp at the chosen emitter via
+    // `--emit`. The emitter's package name (@azure-tools/typespec-ts) still keys
+    // the options block, so per-spec options carry over, while stripping `emit`
+    // stops the workspace-resolved emitter from also running.
+    if (emitterDir) {
+      await fs.mkdir(workingDir, { recursive: true });
+      await seedIsolatedConfig();
+      const commandArguments = [
+        resolveTspCliPath(),
+        "compile",
+        `${await entryPath()}`,
+        "--config",
+        joinPath(workingDir, "tspconfig.yaml"),
+        `--emit=${emitterDir}`,
+      ];
+      await runCommand("node", commandArguments, workingDir, logger);
+      return;
+    }
+
     const commandArguments = [
       resolveTspCliPath(),
       "compile",
@@ -140,6 +185,24 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
     ];
 
     await runCommand("node", commandArguments, workingDir, logger);
+  }
+
+  // Copy the spec's committed tspconfig into the isolated output dir with its
+  // `emit` list removed (see emitClient). Falls back to a minimal config that
+  // only pins emitter-output-dir at the working dir when no committed config
+  // exists for the spec.
+  async function seedIsolatedConfig(): Promise<void> {
+    const sourceConfig = joinPath(inTreeGeneratedDir(), "tspconfig.yaml");
+    let config: any;
+    if (await exists(sourceConfig)) {
+      config = parseYaml(await fs.readFile(sourceConfig, "utf8")) ?? {};
+    } else {
+      config = {
+        options: { "@azure-tools/typespec-ts": { "emitter-output-dir": "{project-root}" } },
+      };
+    }
+    delete config.emit;
+    await fs.writeFile(joinPath(outputPath(), "tspconfig.yaml"), stringifyYaml(config));
   }
 
   async function emitGitignore(): Promise<void> {
@@ -313,15 +376,13 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
     }
   }
 
-  function outputPath() {
-    const outputPath = joinPath(
-      testRoot(),
-      "azure-modular-integration",
-      "generated",
-      env.targetFolder(),
-    );
+  function inTreeGeneratedDir() {
+    return joinPath(testRoot(), "azure-modular-integration", "generated", env.targetFolder());
+  }
 
-    return outputPath;
+  function outputPath() {
+    const base = env.outputBase();
+    return base ? joinPath(base, env.targetFolder()) : inTreeGeneratedDir();
   }
 
   function testRoot() {
