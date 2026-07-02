@@ -63,7 +63,7 @@ withRawContent: true
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -419,7 +419,6 @@ export async function _createOrUpdateDeserialize(
 
   return avsSummaryDeserializer(result.body);
 }
-
 /** Create a AvsSummary */
 export async function createOrUpdate(
   context: Client,
@@ -472,7 +471,6 @@ export async function _listDeserialize(
 
   return _operationListResultDeserializer(result.body);
 }
-
 /** List the operations for the provider */
 export function list(
   context: Client,

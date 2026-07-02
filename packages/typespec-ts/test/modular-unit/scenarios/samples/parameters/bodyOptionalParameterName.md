@@ -192,7 +192,6 @@ export async function _backupDeserialize(result: PathUncheckedResponse): Promise
   return backupResultDeserializer(result.body);
 }
 
-/** A long-running resource action. */
 export function backup(
   context: Client,
   resourceGroupName: string,
@@ -219,9 +218,9 @@ import { HardwareSecurityModulesClient } from "@azure/internal-test";
 import { DefaultAzureCredential } from "@azure/identity";
 
 /**
- * This sample demonstrates how to a long-running resource action.
+ * This sample demonstrates how to
  *
- * @summary a long-running resource action.
+ * @summary
  * x-ms-original-file: 2021-10-01-preview/json_for_CloudHsmClusters_backup.json
  */
 async function cloudHsmClustersBackup(): Promise<void> {

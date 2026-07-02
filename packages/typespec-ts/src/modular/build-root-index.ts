@@ -1,8 +1,15 @@
 import { SdkClientType, SdkServiceOperation } from "@azure-tools/typespec-client-generator-core";
 import { joinPaths, NoTarget } from "@typespec/compiler";
-import { Project, SourceFile } from "ts-morph";
+import { Project, SourceFile, StructureKind } from "ts-morph";
 import { useContext } from "../context-manager.js";
 import { resolveReference } from "../framework/reference.js";
+import {
+  beginSourceFileBatch,
+  enqueueStatement,
+  flushSourceFileBatch,
+  getEffectiveExportedNames,
+  getQueuedExportNames,
+} from "../framework/source-file-batch.js";
 import { reportDiagnostic } from "../lib.js";
 import { getClientModuleInfo } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
@@ -20,6 +27,20 @@ import {
 } from "./static-helpers-metadata.js";
 
 export function buildRootIndex(
+  context: SdkContext,
+  emitterOptions: ModularEmitterOptions,
+  rootIndexFile: SourceFile,
+  clientMap?: [string[], SdkClientType<SdkServiceOperation>],
+) {
+  beginSourceFileBatch();
+  try {
+    buildRootIndexImpl(context, emitterOptions, rootIndexFile, clientMap);
+  } finally {
+    flushSourceFileBatch();
+  }
+}
+
+function buildRootIndexImpl(
   context: SdkContext,
   emitterOptions: ModularEmitterOptions,
   rootIndexFile: SourceFile,
@@ -109,7 +130,8 @@ function exportRestErrorTypes(rootIndexFile: SourceFile) {
   const existingExports = getExistingExports(rootIndexFile);
   const namedExports = ["RestError", "isRestError"].filter((name) => !existingExports.has(name));
   if (namedExports.length > 0) {
-    rootIndexFile.addExportDeclaration({
+    enqueueStatement(rootIndexFile, {
+      kind: StructureKind.ExportDeclaration,
       moduleSpecifier: "@azure/core-rest-pipeline",
       namedExports,
     });
@@ -165,13 +187,7 @@ function exportFileContentsType(context: SdkContext, rootIndexFile: SourceFile) 
 }
 
 function getExistingExports(rootIndexFile: SourceFile): Set<string> {
-  return new Set(
-    rootIndexFile
-      .getExportDeclarations()
-      .flatMap((exportDecl) =>
-        exportDecl.getNamedExports().map((namedExport) => namedExport.getName()),
-      ),
-  );
+  return getEffectiveExportedNames(rootIndexFile);
 }
 
 function getNewNamedExports(namedExports: string[], existingExports: Set<string>): string[] {
@@ -186,7 +202,8 @@ function addExportsToRootIndexFile(
   const existingExports = getExistingExports(rootIndexFile);
   const newNamedExports = getNewNamedExports(namedExports, existingExports);
   if (newNamedExports.length > 0) {
-    rootIndexFile.addExportDeclaration({
+    enqueueStatement(rootIndexFile, {
+      kind: StructureKind.ExportDeclaration,
       isTypeOnly,
       namedExports: newNamedExports,
     });
@@ -222,7 +239,8 @@ function exportSimplePollerLike(
   const moduleSpecifier = `./${
     isTopLevel && subfolder && subfolder !== "" ? subfolder + "/" : ""
   }static-helpers/simplePollerHelpers.js`;
-  indexFile.addExportDeclaration({
+  enqueueStatement(indexFile, {
+    kind: StructureKind.ExportDeclaration,
     isTypeOnly: true,
     moduleSpecifier,
     namedExports: ["SimplePollerLike"],
@@ -243,7 +261,10 @@ function exportRestoreHelpers(
   if (!helperFile) {
     return;
   }
-  const exported = new Set(indexFile.getExportedDeclarations().keys());
+  const exported = new Set([
+    ...indexFile.getExportedDeclarations().keys(),
+    ...getQueuedExportNames(indexFile),
+  ]);
   const allEntries = [...helperFile.getExportedDeclarations().entries()];
   const moduleSpecifier = `./${
     isTopLevel && subfolder && subfolder !== "" ? subfolder + "/" : ""
@@ -259,7 +280,8 @@ function exportClassicalClient(
   isSubClient: boolean = false,
 ) {
   const clientName = client.name;
-  indexFile.addExportDeclaration({
+  enqueueStatement(indexFile, {
+    kind: StructureKind.ExportDeclaration,
     namedExports: [clientName],
     moduleSpecifier: `./${
       subfolder && subfolder !== "" && !isSubClient ? subfolder + "/" : ""
@@ -321,7 +343,10 @@ function exportModules(
       continue;
     }
 
-    const exported = new Set(indexFile.getExportedDeclarations().keys());
+    const exported = new Set([
+      ...indexFile.getExportedDeclarations().keys(),
+      ...getQueuedExportNames(indexFile),
+    ]);
     const serializerOrDeserializerRegex = /.*(Serializer|Deserializer)(_\d+)?$/;
     const filteredEntries = [...modelsFile.getExportedDeclarations().entries()].filter(
       (exDeclaration) => {
@@ -359,6 +384,19 @@ function exportModules(
 }
 
 export function buildSubClientIndexFile(
+  context: SdkContext,
+  clientMap: [string[], SdkClientType<SdkServiceOperation>],
+  emitterOptions: ModularEmitterOptions,
+) {
+  beginSourceFileBatch();
+  try {
+    buildSubClientIndexFileImpl(context, clientMap, emitterOptions);
+  } finally {
+    flushSourceFileBatch();
+  }
+}
+
+function buildSubClientIndexFileImpl(
   context: SdkContext,
   clientMap: [string[], SdkClientType<SdkServiceOperation>],
   emitterOptions: ModularEmitterOptions,

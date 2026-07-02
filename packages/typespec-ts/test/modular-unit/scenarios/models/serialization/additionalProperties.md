@@ -37,7 +37,7 @@ compatibility-mode: true
 Generated Models.
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -102,7 +102,7 @@ compatibility-mode: true
 Generated Models.
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -162,14 +162,14 @@ compatibility-mode: false
 Generated Models.
 
 ```ts models
-import { serializeRecord } from "../static-helpers/serialization/serialize-record.js";
-
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import { serializeRecord } from "../static-helpers/serialization/serialize-record.js";
+
 /** model interface SimpleModel */
 export interface SimpleModel {
   propA: string;
@@ -295,14 +295,14 @@ compatibility-mode: false
 Generated Models.
 
 ```ts models
-import { serializeRecord } from "../static-helpers/serialization/serialize-record.js";
-
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import { serializeRecord } from "../static-helpers/serialization/serialize-record.js";
+
 /** model interface SimpleModel */
 export interface SimpleModel {
   propA: string;
@@ -378,14 +378,14 @@ mustEmptyDiagnostic: false
 Generated Models.
 
 ```ts models
-import { serializeRecord } from "../static-helpers/serialization/serialize-record.js";
-
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import { serializeRecord } from "../static-helpers/serialization/serialize-record.js";
+
 /** model interface SimpleModel */
 export interface SimpleModel {
   additionalProperties: Record<string, number>;

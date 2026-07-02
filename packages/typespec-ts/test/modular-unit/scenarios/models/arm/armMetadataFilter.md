@@ -59,7 +59,7 @@ mustEmptyDiagnostic: false
 ## Models interface PrivateLinkParameters
 
 ```ts models interface PrivateLinkParameters
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -125,7 +125,7 @@ mustEmptyDiagnostic: false
 ## Models interface ParamBagReadCreate
 
 ```ts models interface ParamBagReadCreate
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -190,7 +190,7 @@ mustEmptyDiagnostic: false
 ## Models interface ParamBagReadOnly
 
 ```ts models interface ParamBagReadOnly
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -253,7 +253,7 @@ mustEmptyDiagnostic: false
 ## Models interface ParamBagReadUpdateCreate
 
 ```ts models interface ParamBagReadUpdateCreate
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */

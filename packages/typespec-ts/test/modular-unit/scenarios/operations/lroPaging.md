@@ -57,7 +57,7 @@ withRawContent: true
 ## models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -334,7 +334,6 @@ export async function _suspendDeserialize(
 
   return _webAppCollectionDeserializer(result.body);
 }
-
 /** A long-running resource action. */
 export function suspend(
   context: Client,
