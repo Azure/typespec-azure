@@ -65,7 +65,8 @@
     "@autorest/codemodel": "catalog:",
     "@azure-tools/codegen": "catalog:",
     "js-yaml": "catalog:",
-    "lodash": "catalog:"
+    "lodash": "catalog:",
+    "yaml": "catalog:"
   },
   "devDependencies": {
     "@azure-tools/typespec-autorest": "workspace:^",
