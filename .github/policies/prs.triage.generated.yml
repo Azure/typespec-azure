@@ -62,12 +62,6 @@ configuration:
                   label: emitter:typescript
           - if:
               - includesModifiedFiles:
-                  files: []
-            then:
-              - addLabel:
-                  label: emitter:go
-          - if:
-              - includesModifiedFiles:
                   files:
                     - packages/typespec-java/**/*
             then:

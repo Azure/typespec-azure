@@ -440,7 +440,6 @@ Area of the codebase
 | `emitter:python`             | #957300 | Issues for @azure-tools/typespec-python emitter                                     |
 | `emitter:go`                 | #957300 | Issues for @azure-tools/typespec-go emitter                                         |
 | `emitter:typescript`         | #957300 | Issues for @azure-tools/typespec-ts emitter                                         |
-| `emitter:go`                 | #957300 | Issues for @azure-tools/typespec-go emitter                                         |
 | `emitter:java`               | #0096c7 | Issues for @azure-tools/typespec-java emitter                                       |
 | `emitter:client:all`         | #957300 | General client emitter issues that do not involve TCGC or typespec-azure-http-specs |
 | `eng`                        | #65bfff |                                                                                     |
