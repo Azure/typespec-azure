@@ -2,7 +2,13 @@ import type { Namespace } from "@typespec/compiler";
 import { unsafe_mutateSubgraphWithNamespace } from "@typespec/compiler/experimental";
 import { getVersioningMutators } from "@typespec/versioning";
 import { describe, expect, it } from "vitest";
-import { buildComparisonPairs, enumerateVersions, createVersionedView } from "../src/versions.js";
+import {
+  buildComparisonPairs,
+  buildPhaseAPairs,
+  buildPhaseBPairs,
+  enumerateVersions,
+  createVersionedView,
+} from "../src/versions.js";
 import { Tester } from "./test-host.js";
 
 describe("version enumeration", () => {
@@ -139,81 +145,196 @@ describe("version projection", () => {
 });
 
 describe("comparison pair construction", () => {
-  it("builds Phase A pairs for shared versions", () => {
-    const pairs = buildComparisonPairs(
-      ["2024-01-01", "2025-01-01"],
-      ["2024-01-01", "2025-01-01"],
-    );
-
-    const phaseA = pairs.filter((p) => p.phase === "same-version");
-    expect(phaseA).toHaveLength(2);
-    expect(phaseA[0]).toEqual({
-      baseVersion: "2024-01-01",
-      headVersion: "2024-01-01",
-      phase: "same-version",
+  describe("buildPhaseAPairs", () => {
+    it("builds pairs for shared versions", () => {
+      const pairs = buildPhaseAPairs(
+        ["2024-01-01", "2025-01-01"],
+        ["2024-01-01", "2025-01-01"],
+      );
+      expect(pairs).toHaveLength(2);
+      expect(pairs[0]).toEqual({
+        baseVersion: "2024-01-01",
+        headVersion: "2024-01-01",
+        phase: "same-version",
+      });
+      expect(pairs[1]).toEqual({
+        baseVersion: "2025-01-01",
+        headVersion: "2025-01-01",
+        phase: "same-version",
+      });
     });
-    expect(phaseA[1]).toEqual({
-      baseVersion: "2025-01-01",
-      headVersion: "2025-01-01",
-      phase: "same-version",
+
+    it("only includes versions present in both", () => {
+      const pairs = buildPhaseAPairs(["2024-01-01"], ["2024-01-01", "2025-01-01"]);
+      expect(pairs).toHaveLength(1);
+      expect(pairs[0].baseVersion).toBe("2024-01-01");
     });
-  });
 
-  it("builds Phase B pairs for consecutive head versions", () => {
-    const pairs = buildComparisonPairs(
-      ["2024-01-01", "2025-01-01"],
-      ["2024-01-01", "2025-01-01"],
-    );
-
-    const phaseB = pairs.filter((p) => p.phase === "cross-version");
-    expect(phaseB).toHaveLength(1);
-    expect(phaseB[0]).toEqual({
-      baseVersion: "2024-01-01",
-      headVersion: "2025-01-01",
-      phase: "cross-version",
+    it("returns empty when no shared versions", () => {
+      const pairs = buildPhaseAPairs(["2023-01-01"], ["2025-01-01"]);
+      expect(pairs).toHaveLength(0);
     });
-  });
 
-  it("handles head having a new version not in base", () => {
-    const pairs = buildComparisonPairs(
-      ["2024-01-01"],
-      ["2024-01-01", "2025-01-01"],
-    );
-
-    const phaseA = pairs.filter((p) => p.phase === "same-version");
-    expect(phaseA).toHaveLength(1); // only 2024-01-01 is shared
-    expect(phaseA[0].baseVersion).toBe("2024-01-01");
-
-    const phaseB = pairs.filter((p) => p.phase === "cross-version");
-    expect(phaseB).toHaveLength(1);
-    expect(phaseB[0]).toEqual({
-      baseVersion: "2024-01-01",
-      headVersion: "2025-01-01",
-      phase: "cross-version",
+    it("returns empty for empty inputs", () => {
+      expect(buildPhaseAPairs([], [])).toHaveLength(0);
+      expect(buildPhaseAPairs([], ["2024-01-01"])).toHaveLength(0);
+      expect(buildPhaseAPairs(["2024-01-01"], [])).toHaveLength(0);
     });
   });
 
-  it("handles three versions", () => {
-    const pairs = buildComparisonPairs(
-      ["2023-01-01", "2024-01-01", "2025-01-01"],
-      ["2023-01-01", "2024-01-01", "2025-01-01"],
-    );
+  describe("buildPhaseBPairs", () => {
+    it("finds previous stable for a new version", () => {
+      const pairs = buildPhaseBPairs(
+        ["2024-01-01", "2025-01-01"],
+        ["2025-01-01"], // candidate: new version
+      );
+      expect(pairs).toHaveLength(1);
+      expect(pairs[0]).toEqual({
+        baseVersion: "2024-01-01",
+        headVersion: "2025-01-01",
+        phase: "cross-version",
+      });
+    });
 
-    const phaseA = pairs.filter((p) => p.phase === "same-version");
-    expect(phaseA).toHaveLength(3);
+    it("skips preview versions when finding previous stable", () => {
+      const pairs = buildPhaseBPairs(
+        ["2024-01-01", "2024-06-01-preview", "2025-01-01"],
+        ["2025-01-01"],
+      );
+      expect(pairs).toHaveLength(1);
+      expect(pairs[0].baseVersion).toBe("2024-01-01"); // skips preview
+    });
 
-    const phaseB = pairs.filter((p) => p.phase === "cross-version");
-    expect(phaseB).toHaveLength(2);
-    expect(phaseB[0].baseVersion).toBe("2023-01-01");
-    expect(phaseB[0].headVersion).toBe("2024-01-01");
-    expect(phaseB[1].baseVersion).toBe("2024-01-01");
-    expect(phaseB[1].headVersion).toBe("2025-01-01");
+    it("no pair if no previous stable version exists", () => {
+      const pairs = buildPhaseBPairs(
+        ["2024-01-01-preview", "2025-01-01"],
+        ["2025-01-01"],
+      );
+      // 2024-01-01-preview is preview, so no stable before 2025-01-01
+      expect(pairs).toHaveLength(0);
+    });
+
+    it("no pair for the first version (nothing precedes it)", () => {
+      const pairs = buildPhaseBPairs(["2024-01-01"], ["2024-01-01"]);
+      expect(pairs).toHaveLength(0);
+    });
+
+    it("handles single version with no candidates", () => {
+      const pairs = buildPhaseBPairs(["2024-01-01"], []);
+      expect(pairs).toHaveLength(0);
+    });
+
+    it("handles empty version list", () => {
+      const pairs = buildPhaseBPairs([], ["2024-01-01"]);
+      expect(pairs).toHaveLength(0);
+    });
+
+    it("handles only preview versions — no pairs produced", () => {
+      const pairs = buildPhaseBPairs(
+        ["2024-01-01-preview", "2024-06-01-preview", "2025-01-01-preview"],
+        ["2025-01-01-preview"],
+      );
+      expect(pairs).toHaveLength(0);
+    });
+
+    it("multiple previews preceded by a stable", () => {
+      const pairs = buildPhaseBPairs(
+        ["2024-01-01", "2024-06-01-preview", "2024-09-01-preview", "2025-01-01"],
+        ["2024-06-01-preview", "2024-09-01-preview", "2025-01-01"],
+      );
+      expect(pairs).toHaveLength(3);
+      // All three compare back to the same stable: 2024-01-01
+      expect(pairs[0]).toEqual({
+        baseVersion: "2024-01-01",
+        headVersion: "2024-06-01-preview",
+        phase: "cross-version",
+      });
+      expect(pairs[1]).toEqual({
+        baseVersion: "2024-01-01",
+        headVersion: "2024-09-01-preview",
+        phase: "cross-version",
+      });
+      expect(pairs[2]).toEqual({
+        baseVersion: "2024-01-01",
+        headVersion: "2025-01-01",
+        phase: "cross-version",
+      });
+    });
+
+    it("multiple stable versions — each candidate finds nearest stable", () => {
+      const pairs = buildPhaseBPairs(
+        ["2023-01-01", "2024-01-01", "2025-01-01"],
+        ["2024-01-01", "2025-01-01"],
+      );
+      expect(pairs).toHaveLength(2);
+      expect(pairs[0]).toEqual({
+        baseVersion: "2023-01-01",
+        headVersion: "2024-01-01",
+        phase: "cross-version",
+      });
+      expect(pairs[1]).toEqual({
+        baseVersion: "2024-01-01",
+        headVersion: "2025-01-01",
+        phase: "cross-version",
+      });
+    });
+
+    it("custom classifier overrides default", () => {
+      const customClassifier = (v: string) =>
+        v.includes("beta") ? ("preview" as const) : ("stable" as const);
+
+      const pairs = buildPhaseBPairs(
+        ["2024-01-01", "2024-06-01-beta", "2025-01-01"],
+        ["2025-01-01"],
+        customClassifier,
+      );
+      expect(pairs).toHaveLength(1);
+      expect(pairs[0].baseVersion).toBe("2024-01-01"); // skips beta
+    });
+
+    it("candidate not in headVersions is ignored", () => {
+      const pairs = buildPhaseBPairs(
+        ["2024-01-01", "2025-01-01"],
+        ["9999-01-01"], // not in headVersions
+      );
+      expect(pairs).toHaveLength(0);
+    });
   });
 
-  it("returns empty when no shared versions and only one head version", () => {
-    const pairs = buildComparisonPairs([], ["2025-01-01"]);
-    expect(pairs.filter((p) => p.phase === "same-version")).toHaveLength(0);
-    expect(pairs.filter((p) => p.phase === "cross-version")).toHaveLength(0);
+  describe("buildComparisonPairs (combined)", () => {
+    it("produces Phase A and Phase B for new version in head", () => {
+      const pairs = buildComparisonPairs(
+        ["2024-01-01"],
+        ["2024-01-01", "2025-01-01"],
+      );
+
+      const phaseA = pairs.filter((p) => p.phase === "same-version");
+      expect(phaseA).toHaveLength(1);
+      expect(phaseA[0].baseVersion).toBe("2024-01-01");
+
+      const phaseB = pairs.filter((p) => p.phase === "cross-version");
+      expect(phaseB).toHaveLength(1);
+      expect(phaseB[0]).toEqual({
+        baseVersion: "2024-01-01",
+        headVersion: "2025-01-01",
+        phase: "cross-version",
+      });
+    });
+
+    it("no Phase B when all versions are shared (no new versions)", () => {
+      const pairs = buildComparisonPairs(
+        ["2024-01-01", "2025-01-01"],
+        ["2024-01-01", "2025-01-01"],
+      );
+
+      const phaseB = pairs.filter((p) => p.phase === "cross-version");
+      expect(phaseB).toHaveLength(0); // no new versions = no Phase B from static analysis
+    });
+
+    it("new preview version with no preceding stable produces no Phase B", () => {
+      const pairs = buildComparisonPairs([], ["2024-01-01-preview"]);
+      expect(pairs).toHaveLength(0);
+    });
   });
 });
 

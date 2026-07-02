@@ -21,5 +21,9 @@ export {
   enumerateVersions,
   createVersionedView,
   buildComparisonPairs,
+  buildPhaseAPairs,
+  buildPhaseBPairs,
+  defaultVersionClassifier,
   type ServiceVersionInfo,
+  type VersionClassifier,
 } from "./versions.js";

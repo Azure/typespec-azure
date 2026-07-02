@@ -71,41 +71,116 @@ export function createVersionedView(
 }
 
 /**
- * Build comparison pairs for Phase A (same-version) and Phase B (cross-version).
- *
- * Phase A: Compare base@V vs head@V for each version present in BOTH base and head.
- * Phase B: For consecutive versions within head, compare head@V(n) vs head@V(n+1).
+ * Classifies a version string as "stable" or "preview".
+ */
+export type VersionClassifier = (version: string) => "stable" | "preview";
+
+/**
+ * Default version classifier: versions ending with "-preview" are preview, all others are stable.
+ */
+export const defaultVersionClassifier: VersionClassifier = (version) =>
+  version.endsWith("-preview") ? "preview" : "stable";
+
+/**
+ * Build Phase A comparison pairs: base@V vs head@V for each version present in BOTH.
+ * Detects unintentional changes within an already-released version.
  *
  * @param baseVersions - Ordered version strings from the base program
  * @param headVersions - Ordered version strings from the head program
- * @returns Array of VersionPair describing all comparisons to perform
+ * @returns Phase A VersionPairs (same-version comparisons)
  */
-export function buildComparisonPairs(
-  baseVersions: string[],
+export function buildPhaseAPairs(baseVersions: string[], headVersions: string[]): VersionPair[] {
+  const baseSet = new Set(baseVersions);
+  return headVersions
+    .filter((v) => baseSet.has(v))
+    .map((version) => ({
+      baseVersion: version,
+      headVersion: version,
+      phase: "same-version" as ComparisonPhase,
+    }));
+}
+
+/**
+ * Build Phase B comparison pairs: for each candidate version, compare it to
+ * the previous stable version in the head version list.
+ *
+ * Phase B detects breaking changes between api-versions. Candidates are:
+ * - New versions (in head but not in base)
+ * - Changed versions (Phase A detected diffs for them)
+ *
+ * If no previous stable version exists for a candidate, no pair is produced.
+ *
+ * @param headVersions - Ordered version strings from the head program
+ * @param candidates - Versions to check (new + changed)
+ * @param classifier - Classifies versions as stable or preview (defaults to "-preview" suffix check)
+ * @returns Phase B VersionPairs (cross-version comparisons)
+ */
+export function buildPhaseBPairs(
   headVersions: string[],
+  candidates: string[],
+  classifier: VersionClassifier = defaultVersionClassifier,
 ): VersionPair[] {
   const pairs: VersionPair[] = [];
+  const candidateSet = new Set(candidates);
 
-  // Phase A: same-version comparison (base@V vs head@V)
-  const baseSet = new Set(baseVersions);
-  for (const version of headVersions) {
-    if (baseSet.has(version)) {
+  for (let i = 0; i < headVersions.length; i++) {
+    const version = headVersions[i];
+    if (!candidateSet.has(version)) continue;
+
+    // Walk backwards to find the previous stable version
+    const previousStable = findPreviousStable(headVersions, i, classifier);
+    if (previousStable !== undefined) {
       pairs.push({
-        baseVersion: version,
+        baseVersion: previousStable,
         headVersion: version,
-        phase: "same-version",
+        phase: "cross-version",
       });
     }
   }
 
-  // Phase B: cross-version comparison (consecutive versions in head)
-  for (let i = 0; i < headVersions.length - 1; i++) {
-    pairs.push({
-      baseVersion: headVersions[i],
-      headVersion: headVersions[i + 1],
-      phase: "cross-version",
-    });
-  }
-
   return pairs;
+}
+
+/**
+ * Find the previous stable version before index `i` in the version list.
+ * Returns undefined if no stable version precedes this index.
+ */
+function findPreviousStable(
+  versions: string[],
+  beforeIndex: number,
+  classifier: VersionClassifier,
+): string | undefined {
+  for (let j = beforeIndex - 1; j >= 0; j--) {
+    if (classifier(versions[j]) === "stable") {
+      return versions[j];
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Build all comparison pairs (Phase A + Phase B).
+ * Phase B candidates default to new versions (in head but not base).
+ * For changed versions (detected by Phase A), call buildPhaseBPairs separately
+ * after Phase A analysis completes.
+ *
+ * @param baseVersions - Ordered version strings from the base program
+ * @param headVersions - Ordered version strings from the head program
+ * @param classifier - Version classifier (defaults to "-preview" suffix check)
+ * @returns Combined Phase A and Phase B VersionPairs
+ */
+export function buildComparisonPairs(
+  baseVersions: string[],
+  headVersions: string[],
+  classifier: VersionClassifier = defaultVersionClassifier,
+): VersionPair[] {
+  const phaseA = buildPhaseAPairs(baseVersions, headVersions);
+
+  // Phase B candidates (statically known): new versions in head
+  const baseSet = new Set(baseVersions);
+  const newVersions = headVersions.filter((v) => !baseSet.has(v));
+
+  const phaseB = buildPhaseBPairs(headVersions, newVersions, classifier);
+
+  return [...phaseA, ...phaseB];
 }
