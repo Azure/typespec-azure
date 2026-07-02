@@ -1,21 +1,12 @@
 name: "typescript / emitter diff"
 
-# Generates code with the current checkout's emitter and with the emitter as of the
-# base-branch commit this PR is based on (the merge-base), then diffs the two. The
-# rendered HTML diff is uploaded as a per-PR artifact, and a sticky PR comment
-# summarizes the change (file count, +/-) with a link to download it, so reviewers can
-# see exactly how an emitter change affects generated SDKs. Powered by the
-# language-agnostic eng/emitter-diff tool.
-#
-# This check is informational: it never fails the PR. It only reports the diff (job
-# summary + PR comment + HTML artifact) so reviewers can eyeball the generated-output
-# change.
+# Diffs generated code between this PR's emitter and the merge-base baseline.
+# Informational only: reports a sticky PR comment + HTML artifact, and fails the
+# job only on a tool/build error (never on a diff). See eng/emitter-diff.
 
 on:
   pull_request:
-    branches:
-      - main
-      - release/*
+    branches: [main, release/*]
     paths:
       - "packages/typespec-ts/**"
       - "eng/emitter-diff/**"
@@ -23,7 +14,7 @@ on:
   workflow_dispatch:
     inputs:
       baseline:
-        description: "Baseline emitter ref (npm version, local path, or github ref). Defaults to the PR's merge-base with its base branch."
+        description: "Baseline emitter ref (npm version, local path, or github ref). Defaults to the PR merge-base."
         required: false
         default: ""
 
@@ -44,20 +35,14 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
-
       - uses: ./.github/actions/setup
-
-      - name: Install dependencies
-        run: pnpm install
-
+      - run: pnpm install
       - name: Build emitter
         run: pnpm turbo run --filter "@azure-tools/typespec-ts..." build
 
       - name: Determine baseline
         id: baseline
-        # The dispatch input is untrusted; pass everything through `env` and
-        # reference only shell variables so nothing is interpolated into the
-        # script body (GitHub Actions expression injection).
+        # Dispatch input is untrusted: pass via env, reference only as "$VAR".
         env:
           BASELINE_INPUT: ${{ github.event.inputs.baseline || '' }}
           BASE_REF: ${{ github.event.pull_request.base.ref || github.event.repository.default_branch }}
@@ -65,23 +50,15 @@ jobs:
         run: |
           input="$BASELINE_INPUT"
           if [ -z "$input" ]; then
-            # Baseline = the base-branch commit this PR is based on (merge-base).
-            # It is always a real commit on the target branch, so it survives
-            # squash-merge / rebase / force-push (unlike a pinned branch SHA).
+            # merge-base = a real commit on the base branch; survives squash/rebase.
             git fetch --no-tags origin "$BASE_REF"
             base_sha="$(git merge-base FETCH_HEAD HEAD)"
-            if [ -z "$base_sha" ]; then
-              echo "::error::Could not determine a merge-base with $BASE_REF."
-              exit 1
-            fi
-            echo "Baseline (merge-base with $BASE_REF): $base_sha"
+            [ -n "$base_sha" ] || { echo "::error::No merge-base with $BASE_REF."; exit 1; }
             git worktree add "$RUNNER_TEMP/baseline" "$base_sha"
-            (
-              cd "$RUNNER_TEMP/baseline"
+            ( cd "$RUNNER_TEMP/baseline"
               git submodule update --init --recursive
               pnpm install
-              pnpm turbo run --filter "@azure-tools/typespec-ts..." build
-            )
+              pnpm turbo run --filter "@azure-tools/typespec-ts..." build )
             input="local:$RUNNER_TEMP/baseline/packages/typespec-ts"
             echo "sha=$base_sha" >> "$GITHUB_OUTPUT"
           fi
@@ -90,47 +67,22 @@ jobs:
 
       - name: Run emitter diff
         id: diff
-        # `BASELINE_REF` derives from the untrusted dispatch input, so keep it in
-        # `env` and reference it as "$BASELINE_REF" rather than interpolating it.
-        # No `--fail-on-diff`: this check is informational and never fails the PR.
         env:
           BASELINE_REF: ${{ steps.baseline.outputs.ref }}
           RUNNER_TEMP: ${{ runner.temp }}
         run: |
           set +e
+          # No --fail-on-diff: informational. A tool/build error still exits non-zero.
           node eng/emitter-diff/src/cli.ts \
-            --emitter typescript \
-            --baseline "$BASELINE_REF" \
+            --emitter typescript --baseline "$BASELINE_REF" \
             --work-dir "$RUNNER_TEMP/emitter-diff" \
             --html "$RUNNER_TEMP/emitter-diff.html" \
-            --patch "$RUNNER_TEMP/emitter-diff.patch" \
             | tee "$RUNNER_TEMP/emitter-diff.log"
-          # Capture the tool's exit code, not `tee`'s (a bare `$?` after a pipe
-          # reports the last command in the pipeline, which is always `tee` = 0).
           echo "status=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
-
-      - name: Write job summary
-        if: always()
-        env:
-          BASELINE_SHA: ${{ steps.baseline.outputs.sha }}
-          BASELINE_REF: ${{ steps.baseline.outputs.ref }}
-          RUNNER_TEMP: ${{ runner.temp }}
-        run: |
-          {
-            echo "## Emitter diff"
-            echo ""
-            if [ -n "$BASELINE_SHA" ]; then
-              echo "Baseline (merge-base): \`$BASELINE_SHA\` vs current checkout."
-            else
-              echo "Baseline: \`$BASELINE_REF\` vs current checkout."
-            fi
-            echo ""
-            echo '```'
-            grep -E "Diff summary:" "$RUNNER_TEMP/emitter-diff.log" || echo "No summary captured."
-            echo '```'
-            echo ""
-            echo "Download the **emitter-diff-html-typescript** artifact for the full rendered diff."
-          } >> "$GITHUB_STEP_SUMMARY"
+          # Reuse the tool's own summary line (strip ANSI) instead of re-parsing.
+          summary="$(sed -r 's/\x1b\[[0-9;]*m//g' "$RUNNER_TEMP/emitter-diff.log" \
+            | grep -oE 'Diff summary: [0-9]+ file\(s\), \+[0-9]+ / -[0-9]+' | head -1)"
+          echo "summary=${summary:-No changes to generated output.}" >> "$GITHUB_OUTPUT"
 
       - name: Upload HTML diff
         if: always()
@@ -148,69 +100,25 @@ jobs:
         env:
           BASELINE: ${{ steps.baseline.outputs.sha || steps.baseline.outputs.ref }}
           STATUS: ${{ steps.diff.outputs.status }}
-          PATCH_FILE: ${{ runner.temp }}/emitter-diff.patch
-          HTML_FILE: ${{ runner.temp }}/emitter-diff.html
+          SUMMARY: ${{ steps.diff.outputs.summary }}
         with:
           script: |
-            const fs = require("fs");
             const marker = "<!-- emitter-diff-typescript -->";
             const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
-            const status = process.env.STATUS;
-
-            // Parse the unified patch directly so the numbers match the tool exactly.
-            let patch = "";
-            try { patch = fs.readFileSync(process.env.PATCH_FILE, "utf8"); } catch {}
-            const lines = patch.split("\n");
-            const files = [];
-            let insertions = 0, deletions = 0;
-            for (const line of lines) {
-              const m = line.match(/^diff --git a\/(.+?) b\/(.+)$/);
-              if (m) files.push(m[2]);
-              else if (line.startsWith("+") && !line.startsWith("+++")) insertions++;
-              else if (line.startsWith("-") && !line.startsWith("---")) deletions++;
-            }
-            const hasChanges = patch.trim().length > 0;
-            const htmlExists = fs.existsSync(process.env.HTML_FILE);
-
-            let body = `${marker}\n## TypeScript emitter diff\n\n` +
-              `Baseline \`${process.env.BASELINE}\` vs this PR's checkout.\n\n`;
-            if (status !== "0") {
-              // Hard error (build/generate threw) — not a diff. Don't claim "no changes".
-              body += `**emitter-diff failed to run** (exit \`${status}\`). This is a tool/build ` +
-                `error, not a generated-output diff. See the ` +
-                `[workflow run](${runUrl}) logs` +
-                (htmlExists ? ` and the **emitter-diff-html-typescript** artifact` : "") + `.\n`;
-            } else if (!hasChanges) {
-              body += `**No changes** to generated output.\n`;
-            } else {
-              body += `**${files.length} file(s) changed** · +${insertions} / -${deletions}\n\n`;
-              if (htmlExists) {
-                body += `Download the **emitter-diff-html-typescript** artifact from the ` +
-                  `[workflow run](${runUrl}) for the full side-by-side rendered diff.\n`;
-              }
-            }
-            body += `\n_Generated by \`eng/emitter-diff\`. This check is informational and does not block the PR._`;
-
-            const { owner, repo } = context.repo;
-            const issue_number = context.issue.number;
-            const { data: comments } = await github.rest.issues.listComments({ owner, repo, issue_number });
-            const existing = comments.find((c) => c.body && c.body.includes(marker));
-            if (existing) {
-              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
-            } else {
-              await github.rest.issues.createComment({ owner, repo, issue_number, body });
-            }
+            const { STATUS, SUMMARY, BASELINE } = process.env;
+            let body = `${marker}\n### TypeScript emitter diff\nBaseline \`${BASELINE}\` vs this PR.\n\n`;
+            body += STATUS !== "0"
+              ? `⚠️ **emitter-diff failed** (exit \`${STATUS}\`) — tool/build error, not a diff. See the [run](${runUrl}).\n`
+              : `${SUMMARY}\n\nFull rendered diff: **emitter-diff-html-typescript** artifact on the [run](${runUrl}).\n`;
+            body += `\n_Informational check (eng/emitter-diff); does not block the PR._`;
+            const { owner, repo } = context.repo, issue_number = context.issue.number;
+            const { data } = await github.rest.issues.listComments({ owner, repo, issue_number });
+            const hit = data.find((c) => c.body && c.body.includes(marker));
+            if (hit) await github.rest.issues.updateComment({ owner, repo, comment_id: hit.id, body });
+            else await github.rest.issues.createComment({ owner, repo, issue_number, body });
 
       - name: Fail on tool error
         if: always()
         env:
           STATUS: ${{ steps.diff.outputs.status }}
-        run: |
-          # Informational check: a generated-output diff does NOT fail the PR
-          # (the tool is run without --fail-on-diff, so a diff still exits 0).
-          # Only a real tool/build error (non-zero exit) fails the job.
-          if [ "$STATUS" != "0" ]; then
-            echo "::error::emitter-diff failed (exit $STATUS). See the log and the emitter-diff-html-typescript artifact."
-            exit 1
-          fi
-          echo "emitter-diff ran successfully (informational; diffs are reported, not enforced)."
+        run: '[ "$STATUS" = "0" ] || { echo "::error::emitter-diff failed (exit $STATUS)."; exit 1; }'
