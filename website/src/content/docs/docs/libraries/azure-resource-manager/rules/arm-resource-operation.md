@@ -6,7 +6,12 @@ title: "arm-resource-operation"
 @azure-tools/typespec-azure-resource-manager/arm-resource-operation
 ```
 
-Validate that all ARM Resource operations are defined inside an interface, include an `api-version` parameter, and use the correct decorator for the HTTP verb.
+Validate that all ARM Resource operations are defined inside an interface declaration.
+
+See also:
+
+- [`arm-resource-operation-missing-decorator`](./arm-resource-operation-missing-decorator.md) — validates that operations use the correct decorator for the HTTP verb.
+- [`arm-resource-operation-missing-api-version`](./arm-resource-operation-missing-api-version.md) — validates that operations include an `api-version` parameter.
 
 #### ❌ Incorrect
 
@@ -17,19 +22,6 @@ Operations must be inside an interface:
 @armResourceRead(FooResource)
 @get
 op getFoos(...ApiVersionParameter): FooResource;
-```
-
-Operations must use the correct ARM resource decorator for the HTTP verb:
-
-```tsp
-@armResourceOperations
-interface FooResources {
-  // Missing @armResourceCreateOrUpdate decorator
-  @put createOrUpdate(
-    ...ResourceInstanceParameters<FooResource>,
-    @bodyRoot resource: FooResource,
-  ): ArmResponse<FooResource>;
-}
 ```
 
 #### ✅ Correct

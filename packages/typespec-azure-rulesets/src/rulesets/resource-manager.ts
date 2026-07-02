@@ -81,6 +81,8 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state": true,
     "@azure-tools/typespec-azure-resource-manager/beyond-nesting-levels": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-operation": true,
+    "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-missing-decorator": true,
+    "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-missing-api-version": true,
     "@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation": true,
     "@azure-tools/typespec-azure-resource-manager/empty-updateable-properties": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator": true,
