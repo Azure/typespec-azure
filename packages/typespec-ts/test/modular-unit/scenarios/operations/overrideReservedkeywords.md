@@ -106,7 +106,6 @@ export async function _checkNameAvailabilityDeserialize(
 
   return;
 }
-
 export async function checkNameAvailability(
   context: Client,
   apiVersion: string,
