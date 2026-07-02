@@ -1,21 +1,21 @@
 import type { Namespace, Operation, Program } from "@typespec/compiler";
 import { listHttpOperationsIn, type HttpOperation } from "@typespec/http";
-import type { OperationIdentity, VersionedView } from "./types.js";
+import type { OperationIdentity } from "./types.js";
 
 /**
- * A canonicalized view of all HTTP operations in a versioned namespace,
+ * All resolved HTTP operations in a versioned namespace,
  * keyed by their wire identity (method + normalized path).
  */
-export interface CanonicializedOperationMap {
+export interface OperationIdentityMap {
   /** Operations keyed by identity string ("GET /widgets/{}"). */
-  operations: Map<string, CanonicalizedOperation>;
+  operations: Map<string, ResolvedOperation>;
 }
 
 /**
- * A single canonicalized HTTP operation with its identity and metadata.
+ * A resolved HTTP operation with its wire identity and metadata.
  */
-export interface CanonicalizedOperation {
-  /** Version-independent identity. */
+export interface ResolvedOperation {
+  /** Version-independent wire identity. */
   identity: OperationIdentity;
   /** The resolved HTTP operation metadata from @typespec/http. */
   httpOperation: HttpOperation;
@@ -50,20 +50,19 @@ export function identityKey(identity: OperationIdentity): string {
 }
 
 /**
- * Canonicalize all HTTP operations in a versioned namespace view.
- * Returns a map keyed by operation wire identity.
+ * Resolve all HTTP operations in a versioned namespace and build an identity-keyed map.
  *
  * @param program - The compiled program
  * @param namespace - The versioned namespace to scan for operations
- * @returns Map of canonicalized operations keyed by identity string
+ * @returns Map of resolved operations keyed by identity string
  */
-export function canonicalizeOperations(
+export function resolveOperationIdentities(
   program: Program,
   namespace: Namespace,
-): CanonicializedOperationMap {
+): OperationIdentityMap {
   const [httpOps, _diagnostics] = listHttpOperationsIn(program, namespace);
 
-  const operations = new Map<string, CanonicalizedOperation>();
+  const operations = new Map<string, ResolvedOperation>();
 
   for (const httpOp of httpOps) {
     const identity = getOperationIdentity(httpOp);

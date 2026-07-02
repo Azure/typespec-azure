@@ -1,6 +1,5 @@
 import type { OperationIdentity } from "./types.js";
-import type { CanonicalizedOperation, CanonicializedOperationMap } from "./canonicalize.js";
-import { identityKey } from "./canonicalize.js";
+import type { ResolvedOperation, OperationIdentityMap } from "./operation-identity.js";
 
 /**
  * Result of matching base operations to head operations.
@@ -9,9 +8,9 @@ export interface OperationMatchResult {
   /** Operations present in both base and head, matched by identity. */
   matched: MatchedOperation[];
   /** Operations in base but not in head (removed). */
-  removed: CanonicalizedOperation[];
+  removed: ResolvedOperation[];
   /** Operations in head but not in base (added). */
-  added: CanonicalizedOperation[];
+  added: ResolvedOperation[];
 }
 
 /**
@@ -19,25 +18,25 @@ export interface OperationMatchResult {
  */
 export interface MatchedOperation {
   identity: OperationIdentity;
-  base: CanonicalizedOperation;
-  head: CanonicalizedOperation;
+  base: ResolvedOperation;
+  head: ResolvedOperation;
 }
 
 /**
  * Match operations between base and head by wire identity.
  * Identifies matched pairs, added operations, and removed operations.
  *
- * @param baseOps - Canonicalized operations from the base version
- * @param headOps - Canonicalized operations from the head version
+ * @param baseOps - Resolved operations from the base version
+ * @param headOps - Resolved operations from the head version
  * @returns Matched, added, and removed operations
  */
 export function matchOperations(
-  baseOps: CanonicializedOperationMap,
-  headOps: CanonicializedOperationMap,
+  baseOps: OperationIdentityMap,
+  headOps: OperationIdentityMap,
 ): OperationMatchResult {
   const matched: MatchedOperation[] = [];
-  const removed: CanonicalizedOperation[] = [];
-  const added: CanonicalizedOperation[] = [];
+  const removed: ResolvedOperation[] = [];
+  const added: ResolvedOperation[] = [];
 
   // Find matched and removed (in base, check if in head)
   for (const [key, baseOp] of baseOps.operations) {

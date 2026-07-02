@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
-  canonicalizeOperations,
+  resolveOperationIdentities,
   normalizePath,
   getOperationIdentity,
   identityKey,
-} from "../src/canonicalize.js";
+} from "../src/operation-identity.js";
 import { matchOperations } from "../src/match.js";
 import { enumerateVersions, createVersionedView } from "../src/versions.js";
 import { Tester } from "./test-host.js";
@@ -31,7 +31,7 @@ describe("normalizePath", () => {
   });
 });
 
-describe("canonicalizeOperations", () => {
+describe("resolveOperationIdentities", () => {
   it("extracts operations with correct identity", async () => {
     const { program } = await Tester.compile(`
       @service
@@ -48,7 +48,7 @@ describe("canonicalizeOperations", () => {
     `);
 
     const services = await import("@typespec/compiler").then((m) => m.listServices(program));
-    const ops = canonicalizeOperations(program, services[0].type);
+    const ops = resolveOperationIdentities(program, services[0].type);
 
     expect(ops.operations.size).toBe(3);
     expect(ops.operations.has("GET /widgets")).toBe(true);
@@ -68,7 +68,7 @@ describe("canonicalizeOperations", () => {
     `);
 
     const services = await import("@typespec/compiler").then((m) => m.listServices(program));
-    const ops = canonicalizeOperations(program, services[0].type);
+    const ops = resolveOperationIdentities(program, services[0].type);
 
     const key = "GET /subscriptions/{}/resourceGroups/{}/providers/Microsoft.Foo/bars/{}";
     expect(ops.operations.has(key)).toBe(true);
@@ -92,7 +92,7 @@ describe("canonicalizeOperations", () => {
     `);
 
     const services = await import("@typespec/compiler").then((m) => m.listServices(program));
-    const ops = canonicalizeOperations(program, services[0].type);
+    const ops = resolveOperationIdentities(program, services[0].type);
 
     const op = ops.operations.get("GET /things")!;
     expect(op.identity.name).toBe("listThings");
@@ -121,8 +121,8 @@ describe("matchOperations", () => {
     const v1 = createVersionedView(program, info!.service, "2024-01-01");
     const v2 = createVersionedView(program, info!.service, "2025-01-01");
 
-    const baseOps = canonicalizeOperations(program, v1.versionedNamespace);
-    const headOps = canonicalizeOperations(program, v2.versionedNamespace);
+    const baseOps = resolveOperationIdentities(program, v1.versionedNamespace);
+    const headOps = resolveOperationIdentities(program, v2.versionedNamespace);
 
     const result = matchOperations(baseOps, headOps);
     expect(result.matched).toHaveLength(2);
@@ -151,8 +151,8 @@ describe("matchOperations", () => {
     const v1 = createVersionedView(program, info!.service, "2024-01-01");
     const v2 = createVersionedView(program, info!.service, "2025-01-01");
 
-    const baseOps = canonicalizeOperations(program, v1.versionedNamespace);
-    const headOps = canonicalizeOperations(program, v2.versionedNamespace);
+    const baseOps = resolveOperationIdentities(program, v1.versionedNamespace);
+    const headOps = resolveOperationIdentities(program, v2.versionedNamespace);
 
     const result = matchOperations(baseOps, headOps);
     expect(result.matched).toHaveLength(1); // list
@@ -182,8 +182,8 @@ describe("matchOperations", () => {
     const v1 = createVersionedView(program, info!.service, "2024-01-01");
     const v2 = createVersionedView(program, info!.service, "2025-01-01");
 
-    const baseOps = canonicalizeOperations(program, v1.versionedNamespace);
-    const headOps = canonicalizeOperations(program, v2.versionedNamespace);
+    const baseOps = resolveOperationIdentities(program, v1.versionedNamespace);
+    const headOps = resolveOperationIdentities(program, v2.versionedNamespace);
 
     const result = matchOperations(baseOps, headOps);
     expect(result.matched).toHaveLength(1); // list

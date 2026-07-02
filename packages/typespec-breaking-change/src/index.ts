@@ -28,13 +28,13 @@ export {
   type VersionClassifier,
 } from "./versions.js";
 export {
-  canonicalizeOperations,
+  resolveOperationIdentities,
   normalizePath,
   getOperationIdentity,
   identityKey,
-  type CanonicializedOperationMap,
-  type CanonicalizedOperation,
-} from "./canonicalize.js";
+  type OperationIdentityMap,
+  type ResolvedOperation,
+} from "./operation-identity.js";
 export {
   matchOperations,
   type OperationMatchResult,
