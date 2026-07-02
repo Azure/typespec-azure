@@ -14,7 +14,6 @@ export default defineConfig(
       "**/website/build/**/*",
       "**/.astro/**/*",
       "core/**/*", // The TypeSpec core submodule has its own ESLint config - don't lint it from here to avoid OOM
-      "packages/typespec-java/**/*", // Has its own ESLint config
       "**/venv/**/*", // Ignore python virtual env
       "**/.vscode-test-web/**/*", // Ignore VSCode test web project
       // TODO: enable
@@ -44,8 +43,11 @@ export default defineConfig(
     },
   },
   {
-    // Disable these project-aware rules for typespec-ts to prevent OOM
-    files: ["packages/!(typespec-ts)/src/**/*.ts", "packages/!(typespec-ts)/src/**/*.tsx"],
+    // Disable these project-aware rules for typespec-ts and typespec-java to prevent OOM
+    files: [
+      "packages/!(typespec-ts|typespec-java)/src/**/*.ts",
+      "packages/!(typespec-ts|typespec-java)/src/**/*.tsx",
+    ],
     languageOptions: {
       parserOptions: {
         projectService: {
