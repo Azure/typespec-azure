@@ -16,7 +16,7 @@ op read(@path id: string, @body body: StreamingChatCompletionOptions): {
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -97,7 +97,6 @@ export async function _readDeserialize(
 
   return streamingChatCompletionOptionsDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   id: string,
@@ -162,7 +161,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<t
 
   return result.body;
 }
-
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
