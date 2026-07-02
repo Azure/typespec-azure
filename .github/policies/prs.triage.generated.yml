@@ -62,6 +62,12 @@ configuration:
                   label: emitter:typescript
           - if:
               - includesModifiedFiles:
+                  files: []
+            then:
+              - addLabel:
+                  label: emitter:go
+          - if:
+              - includesModifiedFiles:
                   files:
                     - packages/typespec-java/**/*
             then:
@@ -106,3 +112,12 @@ configuration:
             then:
               - addLabel:
                   label: meta:website
+          - if:
+              - includesModifiedFiles:
+                  files:
+                    - packages/typespec-azure-core/src/rules/**/*
+                    - packages/typespec-azure-resource-manager/src/rules/**/*
+                    - packages/typespec-client-generator-core/src/rules/**/*
+            then:
+              - addLabel:
+                  label: linter

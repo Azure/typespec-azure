@@ -53,7 +53,6 @@ export async function _getDeserialize(result: PathUncheckedResponse): Promise<Ge
 
   return { body: result.body };
 }
-
 export async function get(
   context: Client,
   options: GetOptionalParams = { requestOptions: {} },
@@ -120,7 +119,6 @@ export async function _listDomainsDeserialize(
     }),
   };
 }
-
 export async function listDomains(
   context: Client,
   options: ListDomainsOptionalParams = { requestOptions: {} },
@@ -202,7 +200,6 @@ export async function _getLogsDeserialize(
 
   return { blobBody: result.blobBody, readableStreamBody: result.readableStreamBody };
 }
-
 export async function getLogs(
   context: Client,
   options: GetLogsOptionalParams = { requestOptions: {} },
@@ -261,7 +258,6 @@ export async function _getDeserialize(result: PathUncheckedResponse): Promise<st
 
   return result.body;
 }
-
 export async function get(
   context: Client,
   options: GetOptionalParams = { requestOptions: {} },
@@ -324,7 +320,6 @@ export async function _listDeserialize(result: PathUncheckedResponse): Promise<R
 
   return resourceArrayDeserializer(result.body);
 }
-
 export async function list(
   context: Client,
   options: ListOptionalParams = { requestOptions: {} },
@@ -385,7 +380,6 @@ export async function _getModelDeserialize(result: PathUncheckedResponse): Promi
 
   return myModelDeserializer(result.body);
 }
-
 export async function getModel(
   context: Client,
   options: GetModelOptionalParams = { requestOptions: {} },
@@ -986,7 +980,6 @@ export async function _headResourceDeserialize(result: PathUncheckedResponse): P
 
   return;
 }
-
 export async function headResource(
   context: Client,
   resourceName: string,
@@ -1049,7 +1042,6 @@ export async function _headResourceDeserialize(result: PathUncheckedResponse): P
 
   return;
 }
-
 export async function headResource(
   context: Client,
   resourceName: string,

@@ -190,7 +190,6 @@ export async function _backupDeserialize(result: PathUncheckedResponse): Promise
 
   return backupResultDeserializer(result.body);
 }
-
 /** A long-running resource action. */
 export function backup(
   context: Client,
