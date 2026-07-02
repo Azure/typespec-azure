@@ -206,7 +206,6 @@ export async function _getDeserialize(result: PathUncheckedResponse): Promise<Sa
 
   return savingsPlanModelDeserializer(result.body);
 }
-
 /** Get savings plan. */
 export async function get(
   context: Client,
@@ -436,7 +435,6 @@ export async function _getDeserialize(result: PathUncheckedResponse): Promise<Sa
 
   return savingsPlanModelDeserializer(result.body);
 }
-
 /** Get savings plan. */
 export async function get(
   context: Client,

@@ -54,7 +54,6 @@ export async function _uploadFileDeserialize(
 
   return { blobBody: result.blobBody, readableStreamBody: result.readableStreamBody };
 }
-
 export async function uploadFile(
   context: Client,
   body: string,
@@ -147,7 +146,6 @@ export async function _uploadFileDeserialize(
 
   return { blobBody: result.blobBody, readableStreamBody: result.readableStreamBody };
 }
-
 export async function uploadFile(
   context: Client,
   body: Uint8Array,
@@ -241,7 +239,6 @@ export async function _uploadFileDeserialize(
 
   return { blobBody: result.blobBody, readableStreamBody: result.readableStreamBody };
 }
-
 export async function uploadFile(
   context: Client,
   body: Uint8Array,
@@ -335,7 +332,6 @@ export async function _uploadFileDeserialize(
 
   return { blobBody: result.blobBody, readableStreamBody: result.readableStreamBody };
 }
-
 export async function uploadFile(
   context: Client,
   body: Uint8Array,
@@ -427,7 +423,6 @@ export async function _uploadFileDeserialize(
     body: typeof result.body === "string" ? stringToUint8Array(result.body, "base64") : result.body,
   };
 }
-
 export async function uploadFile(
   context: Client,
   body: Uint8Array,
@@ -493,7 +488,6 @@ export async function _uploadFileDeserialize(result: PathUncheckedResponse): Pro
 
   return;
 }
-
 export async function uploadFile(
   context: Client,
   body: Uint8Array,
@@ -554,7 +548,6 @@ export async function _uploadFileDeserialize(result: PathUncheckedResponse): Pro
 
   return;
 }
-
 export async function uploadFile(
   context: Client,
   body: Uint8Array,
@@ -609,7 +602,6 @@ export async function _uploadFileDeserialize(result: PathUncheckedResponse): Pro
 
   return;
 }
-
 export async function uploadFile(
   context: Client,
   body: Uint8Array,
