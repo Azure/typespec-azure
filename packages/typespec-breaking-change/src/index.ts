@@ -27,3 +27,16 @@ export {
   type ServiceVersionInfo,
   type VersionClassifier,
 } from "./versions.js";
+export {
+  canonicalizeOperations,
+  normalizePath,
+  getOperationIdentity,
+  identityKey,
+  type CanonicializedOperationMap,
+  type CanonicalizedOperation,
+} from "./canonicalize.js";
+export {
+  matchOperations,
+  type OperationMatchResult,
+  type MatchedOperation,
+} from "./match.js";
