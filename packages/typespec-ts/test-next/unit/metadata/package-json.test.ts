@@ -550,7 +550,7 @@ describe("Package file generation", () => {
       const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
 
       expect(packageFile.dependencies).not.toHaveProperty("@azure/core-client");
-      expect(packageFile.dependencies).to.have.property("@azure-rest/core-client", "^2.3.1");
+      expect(packageFile.dependencies).to.have.property("@azure-rest/core-client", "^2.7.0");
       expect(packageFile.dependencies).to.have.property("@azure/core-rest-pipeline", "^1.19.1");
     });
 
@@ -564,7 +564,7 @@ describe("Package file generation", () => {
         version: "1.0.0",
         dependencies: {
           "@azure/core-client": "^1.9.3",
-          "@azure-rest/core-client": "^2.0.0",
+          "@azure-rest/core-client": "^2.7.0",
           tslib: "^2.6.2",
         },
       };
@@ -575,7 +575,7 @@ describe("Package file generation", () => {
 
       expect(packageFile.dependencies).not.toHaveProperty("@azure/core-client");
       // Existing version should be preserved, not overwritten
-      expect(packageFile.dependencies).to.have.property("@azure-rest/core-client", "^2.0.0");
+      expect(packageFile.dependencies).to.have.property("@azure-rest/core-client", "^2.7.0");
     });
 
     it("should only add platform imports when no @azure/core-client and no other update triggers", () => {
@@ -587,7 +587,7 @@ describe("Package file generation", () => {
         name: "@azure/test-package",
         version: "1.0.0",
         dependencies: {
-          "@azure-rest/core-client": "^2.3.1",
+          "@azure-rest/core-client": "^2.7.0",
           "@azure/core-rest-pipeline": "^1.20.0",
           tslib: "^2.8.1",
         },
@@ -599,7 +599,7 @@ describe("Package file generation", () => {
 
       // Dependencies should remain unchanged
       expect(packageFile.dependencies).not.toHaveProperty("@azure/core-client");
-      expect(packageFile.dependencies).to.have.property("@azure-rest/core-client", "^2.3.1");
+      expect(packageFile.dependencies).to.have.property("@azure-rest/core-client", "^2.7.0");
 
       // Platform imports should be added for Azure monorepo ESM packages.
       // By default (generateReactNativeTarget=false) the `react-native`
@@ -623,7 +623,7 @@ describe("Package file generation", () => {
         name: "@azure/test-package",
         version: "1.0.0",
         dependencies: {
-          "@azure-rest/core-client": "^2.3.1",
+          "@azure-rest/core-client": "^2.7.0",
           "@azure/core-rest-pipeline": "^1.20.0",
           tslib: "^2.8.1",
         },
