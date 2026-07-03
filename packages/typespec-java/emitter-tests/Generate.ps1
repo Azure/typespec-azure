@@ -6,7 +6,11 @@
 #
 # Before running this script the 'tsp' profile must be built, 'mvn install -P local,tsp'.
 param (
-  [int] $Parallelization = [Environment]::ProcessorCount
+  [int] $Parallelization = [Environment]::ProcessorCount,
+  # skip the emitter build in Setup.ps1 (only pack + install); use when the
+  # package was already built by a prior step (e.g. the repo-wide `pnpm build`
+  # in CI) to avoid a redundant second build
+  [switch] $SkipBuild = $false
 )
 
 $ExitCode = 0
@@ -151,7 +155,7 @@ $generateScript = {
 
 Push-Location $PSScriptRoot
 try {
-  ./Setup.ps1
+  ./Setup.ps1 -SkipBuild:$SkipBuild
 
   New-Item -Path ./existingcode/src/main/java/tsptest/ -ItemType Directory -Force | Out-Null
 

@@ -1,13 +1,24 @@
 param (
-  # re-build autorest.java
-  [switch] $RebuildJar = $false
+  # skip the emitter build and only pack the .tgz; use when the package was
+  # already built by a prior step (e.g. the repo-wide `pnpm build` in CI) to
+  # avoid a redundant second build. The pack step still runs because the .tgz
+  # is not produced by the regular build.
+  [switch] $SkipBuild = $false
 )
 
 Set-Location $PSScriptRoot
 
 Push-Location ..
 try {
-  ./Build-TypeSpec.ps1
+  if ($SkipBuild) {
+    # Already built; just pack the .tgz that emitter-tests installs.
+    pnpm pack --pack-destination .
+    if ($LASTEXITCODE -ne 0) {
+      exit $LASTEXITCODE
+    }
+  } else {
+    ./Build-TypeSpec.ps1
+  }
 } finally {
   Pop-Location
 }

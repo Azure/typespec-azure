@@ -42,24 +42,18 @@ jobs:
           GeneratorName: "@azure-tools/typespec-python"
 
       # Java e2e tests and spector coverage upload. The emitter-tests project is a
-      # standalone npm+Maven project (not in the pnpm workspace). Generate.ps1
-      # builds the emitter jar + tgz (Build-TypeSpec.ps1), npm installs it and
+      # standalone npm+Maven project (not in the pnpm workspace). The emitter + its
+      # dependencies are already built by the repo-wide `pnpm build` above, so pass
+      # -SkipBuild: Generate.ps1 -> Setup.ps1 only packs the .tgz, npm installs it and
       # regenerates the SDK from the spector specs; Spector-Tests.ps1 starts the
       # mock server, runs the JUnit tests and produces tsp-spector-coverage-java.json.
-      - script: pnpm turbo run --filter "@azure-tools/typespec-java^..." build
-        displayName: "Build typespec-java dependencies"
-
-      - pwsh: ./Generate.ps1
+      - pwsh: ./Generate.ps1 -SkipBuild
         displayName: "Regenerate Java test code"
         workingDirectory: packages/typespec-java/emitter-tests
-        env:
-          JAVA_HOME: $(JAVA_HOME_11_X64)
 
       - pwsh: ./Spector-Tests.ps1
         displayName: "Run Java spector tests"
         workingDirectory: packages/typespec-java/emitter-tests
-        env:
-          JAVA_HOME: $(JAVA_HOME_11_X64)
 
       - template: /eng/pipelines/templates/upload-spector-coverage.yml
         parameters:
