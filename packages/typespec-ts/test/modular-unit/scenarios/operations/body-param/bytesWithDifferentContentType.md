@@ -22,13 +22,13 @@ wrap-non-model-return: true
 ```ts operations
 import { TestingContext as Client } from "./index.js";
 import { UploadFileResponse } from "../models/models.js";
-import { getBinaryStreamResponse } from "../static-helpers/serialization/get-binary-stream-response.js";
 import { UploadFileOptionalParams } from "./options.js";
 import {
   StreamableMethod,
   PathUncheckedResponse,
   createRestError,
   operationOptionsToRequestParameters,
+  getBinaryStreamResponse,
 } from "@azure-rest/core-client";
 
 export function _uploadFileSend(
@@ -68,7 +68,7 @@ export async function uploadFile(
 ## Models
 
 ```ts models
-import { NodeReadableStream } from "../static-helpers/platform-types.js";
+import { NodeReadableStream } from "@azure/core-rest-pipeline";
 
 export type UploadFileResponse = {
   /**
@@ -114,13 +114,13 @@ wrap-non-model-return: true
 ```ts operations
 import { TestingContext as Client } from "./index.js";
 import { UploadFileResponse } from "../models/models.js";
-import { getBinaryStreamResponse } from "../static-helpers/serialization/get-binary-stream-response.js";
 import { UploadFileOptionalParams } from "./options.js";
 import {
   StreamableMethod,
   PathUncheckedResponse,
   createRestError,
   operationOptionsToRequestParameters,
+  getBinaryStreamResponse,
 } from "@azure-rest/core-client";
 
 export function _uploadFileSend(
@@ -160,7 +160,7 @@ export async function uploadFile(
 ## Models
 
 ```ts models
-import { NodeReadableStream } from "../static-helpers/platform-types.js";
+import { NodeReadableStream } from "@azure/core-rest-pipeline";
 
 export type UploadFileResponse = {
   /**
@@ -207,13 +207,13 @@ wrap-non-model-return: true
 ```ts operations
 import { TestingContext as Client } from "./index.js";
 import { UploadFileResponse } from "../models/models.js";
-import { getBinaryStreamResponse } from "../static-helpers/serialization/get-binary-stream-response.js";
 import { UploadFileOptionalParams } from "./options.js";
 import {
   StreamableMethod,
   PathUncheckedResponse,
   createRestError,
   operationOptionsToRequestParameters,
+  getBinaryStreamResponse,
 } from "@azure-rest/core-client";
 
 export function _uploadFileSend(
@@ -253,7 +253,7 @@ export async function uploadFile(
 ## Models
 
 ```ts models
-import { NodeReadableStream } from "../static-helpers/platform-types.js";
+import { NodeReadableStream } from "@azure/core-rest-pipeline";
 
 export type UploadFileResponse = {
   /**
@@ -300,13 +300,13 @@ wrap-non-model-return: true
 ```ts operations
 import { TestingContext as Client } from "./index.js";
 import { UploadFileResponse } from "../models/models.js";
-import { getBinaryStreamResponse } from "../static-helpers/serialization/get-binary-stream-response.js";
 import { UploadFileOptionalParams } from "./options.js";
 import {
   StreamableMethod,
   PathUncheckedResponse,
   createRestError,
   operationOptionsToRequestParameters,
+  getBinaryStreamResponse,
 } from "@azure-rest/core-client";
 
 export function _uploadFileSend(
@@ -346,7 +346,7 @@ export async function uploadFile(
 ## Models
 
 ```ts models
-import { NodeReadableStream } from "../static-helpers/platform-types.js";
+import { NodeReadableStream } from "@azure/core-rest-pipeline";
 
 export type UploadFileResponse = {
   /**
