@@ -37,7 +37,7 @@ withRawContent: true
 Generate as normal enums.
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -82,7 +82,6 @@ export async function _fooDeserialize(result: PathUncheckedResponse): Promise<vo
 
   return;
 }
-
 export async function foo(
   context: Client,
   options: FooOptionalParams = { requestOptions: {} },

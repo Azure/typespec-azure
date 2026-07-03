@@ -8,7 +8,6 @@ options:
     generate-test: false
     add-credentials: false
     flavor: azure
-    is-typespec-test: true
     package-details:
       name: "@msinternal/client-namespace"
       description: "Client NameSpace Test Service"

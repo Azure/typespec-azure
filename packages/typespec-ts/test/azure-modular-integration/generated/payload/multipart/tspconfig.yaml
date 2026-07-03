@@ -6,7 +6,6 @@ options:
     generate-metadata: true
     generate-test: false
     add-credentials: false
-    is-typespec-test: true
     flavor: azure
     package-details:
       name: "@msinternal/payload-multipart"

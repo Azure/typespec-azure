@@ -6,7 +6,6 @@ options:
     generate-test: false
     add-credentials: false
     flavor: azure
-    is-typespec-test: true
     package-details:
       name: "@msinternal/azure-arm-multi-service"
       description: "Azure ResourceManager MultiService Test Service"

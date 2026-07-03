@@ -97,7 +97,6 @@ export async function _postDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
-
 /** show example demo */
 export async function post(
   context: Client,

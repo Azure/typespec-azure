@@ -120,7 +120,6 @@ export async function _updateDeserialize(
 
   return result.body ? partnerTopicDeserializer(result.body) : undefined;
 }
-
 /** Update a PartnerTopic */
 export async function update(
   context: Client,

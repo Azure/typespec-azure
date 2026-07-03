@@ -28,7 +28,6 @@ import {
   StructureKind,
   TypeAliasDeclarationStructure,
 } from "ts-morph";
-import { fixLeadingNumber, NameType, normalizeName } from "../rlc-common/index.js";
 // import { isKey } from "@typespec/compiler";
 import {
   getExternalModel,
@@ -44,13 +43,15 @@ import {
   emitQueue,
   flattenPropertyModelMap,
   getAllOperationsFromClient,
-  pagedModelsUsedInNonPagingOps,
+  pagedModelsKeptPublic,
 } from "../framework/hooks/sdk-types.js";
 import { refkey } from "../framework/refkey.js";
+import { beginSourceFileBatch, flushSourceFileBatch } from "../framework/source-file-batch.js";
 import { reportDiagnostic } from "../lib.js";
 import { getClientHierarchyMap } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
 import { isAzureCoreErrorType } from "../utils/model-utils.js";
+import { fixLeadingNumber, NameType, normalizeName } from "../utils/name-utils.js";
 import { getMethodHierarchiesMap } from "../utils/operation-util.js";
 import { getHeaderClientOptions } from "./helpers/client-option-helpers.js";
 import {
@@ -117,32 +118,37 @@ export function emitTypes(context: SdkContext, { sourceRoot }: { sourceRoot: str
 
   let sourceFile;
 
-  for (const type of emitQueue) {
-    if (!isGenerableType(type)) {
-      continue;
-    }
+  beginSourceFileBatch();
+  try {
+    for (const type of emitQueue) {
+      if (!isGenerableType(type)) {
+        continue;
+      }
 
-    const namespaces = getModelNamespaces(context, type);
-    const filepath = getModelsPath(sourceRoot, namespaces);
-    sourceFile = outputProject.getSourceFile(filepath);
-    if (!sourceFile) {
-      sourceFile = outputProject.createSourceFile(filepath);
-      sourceFile.addStatements(`/**
+      const namespaces = getModelNamespaces(context, type);
+      const filepath = getModelsPath(sourceRoot, namespaces);
+      sourceFile = outputProject.getSourceFile(filepath);
+      if (!sourceFile) {
+        sourceFile = outputProject.createSourceFile(filepath);
+        sourceFile.addStatements(`/*
 * This file contains only generated model types and their (de)serializers.
 * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
 */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */`);
+      }
+      emitType(context, type, sourceFile);
     }
-    emitType(context, type, sourceFile);
-  }
 
-  // Emit serialization/deserialization functions for flattened properties
-  for (const [property, _] of flattenPropertyModelMap) {
-    const namespaces = getModelNamespaces(context, property.type);
-    const filepath = getModelsPath(sourceRoot, namespaces);
-    sourceFile = outputProject.getSourceFile(filepath);
-    addSerializationFunctions(context, property, sourceFile!);
+    // Emit serialization/deserialization functions for flattened properties
+    for (const [property, _] of flattenPropertyModelMap) {
+      const namespaces = getModelNamespaces(context, property.type);
+      const filepath = getModelsPath(sourceRoot, namespaces);
+      sourceFile = outputProject.getSourceFile(filepath);
+      addSerializationFunctions(context, property, sourceFile!);
+    }
+  } finally {
+    flushSourceFileBatch();
   }
 
   const modelFiles = outputProject.getSourceFiles(sourceRoot + "/models/**/*.ts");
@@ -245,7 +251,7 @@ function emitType(context: SdkContext, type: SdkType, sourceFile: SourceFile) {
     }
     const apiVersionEnumOnly = type.usage === UsageFlags.ApiVersionEnum;
     // Skip known api version enums for multi-service scenarios as users are not allowed to set api versions
-    if (apiVersionEnumOnly && context.rlcOptions?.isMultiService) {
+    if (apiVersionEnumOnly && context.emitterOptions?.isMultiService) {
       return;
     }
     const inputUsage = (type.usage & UsageFlags.Input) === UsageFlags.Input;
@@ -290,7 +296,7 @@ function emitType(context: SdkContext, type: SdkType, sourceFile: SourceFile) {
 
 export function getApiVersionEnum(context: SdkContext) {
   // Skip api version enum for multi-service scenarios since each service may have different versions
-  if (context.rlcOptions?.isMultiService) {
+  if (context.emitterOptions?.isMultiService) {
     return;
   }
   const apiVersionEnum = context.sdkPackage.enums.find(
@@ -325,7 +331,7 @@ export function getModelNamespaces(context: SdkContext, model: SdkType): string[
     }
     const segments = model.namespace.split(".");
     // Keep full namespace segments if multiple services are present because there isn't a root namespace to trim
-    if (context.rlcOptions?.isMultiService) {
+    if (context.emitterOptions?.isMultiService) {
       return segments;
     }
 
@@ -603,7 +609,7 @@ function emitEnumMember(
 ): EnumMemberStructure {
   const shouldNormalizeName = !member.name.startsWith("$DO_NOT_NORMALIZE$");
   const enumTypeName = normalizeName(member.enumType.name, NameType.Interface, true);
-  let normalizedMemberName = context.rlcOptions?.ignoreEnumMemberNameNormalize
+  let normalizedMemberName = context.emitterOptions?.ignoreEnumMemberNameNormalize
     ? fixLeadingNumber(member.name, NameType.EnumMemberName) // need to fix the leading number also for enum member
     : normalizeName(member.name, NameType.EnumMemberName, true);
   // If the member name starts with _ due to a leading digit (not because the original has _),
@@ -744,7 +750,7 @@ function addExtendedDictInfo(
   const additionalPropertiesType = model.additionalProperties
     ? getTypeExpression(context, model.additionalProperties)
     : undefined;
-  if (context.rlcOptions?.compatibilityMode) {
+  if (context.emitterOptions?.compatibilityMode) {
     const ancestors = getAllAncestors(model);
     const properties = getAllProperties(context, model, ancestors);
     let anyType: boolean;
@@ -839,10 +845,9 @@ export function normalizeModelName(
       unionSuffix = "Union";
     }
   }
-  const namespacePrefix = context.rlcOptions?.enableModelNamespace ? segments.join("") : "";
+  const namespacePrefix = context.emitterOptions?.enableModelNamespace ? segments.join("") : "";
   const internalModelPrefix =
-    (isPagedResultModel(context, type) && !pagedModelsUsedInNonPagingOps.has(type)) ||
-    type.isGeneratedName
+    (isPagedResultModel(context, type) && !pagedModelsKeptPublic.has(type)) || type.isGeneratedName
       ? "_"
       : "";
   return `${internalModelPrefix}${normalizeName(namespacePrefix + type.name, nameType, true)}${unionSuffix}`;
@@ -884,7 +889,7 @@ function buildModelProperty(
 ): PropertySignatureStructure {
   const normalizedPropName = normalizeModelPropertyName(context, property);
   if (
-    !context.rlcOptions?.ignorePropertyNameNormalize &&
+    !context.emitterOptions?.ignorePropertyNameNormalize &&
     normalizedPropName !== `"${property.name}"`
   ) {
     reportDiagnostic(context.program, {
@@ -932,7 +937,7 @@ export function visitPackageTypes(context: SdkContext) {
   const { sdkPackage } = context;
   emitQueue.clear();
   flattenPropertyModelMap.clear();
-  pagedModelsUsedInNonPagingOps.clear();
+  pagedModelsKeptPublic.clear();
   // Add all models in the package to the emit queue
   for (const model of sdkPackage.models) {
     visitType(context, model);
@@ -1015,7 +1020,19 @@ function trackPagedModelInNonPagingMethod(
   if (method.kind !== "basic" && method.kind !== "lro") return;
   const respType = method.response.type;
   if (respType && isPagedResultModel(context, respType)) {
-    pagedModelsUsedInNonPagingOps.add(respType);
+    pagedModelsKeptPublic.add(respType);
+  }
+}
+
+/**
+ * If a paged result model is used as a model property type, mark it so that
+ * normalizeModelName keeps it public (no "_" prefix).
+ */
+function trackPagedModelUsedAsProperty(context: SdkContext, type: SdkType): void {
+  // Unwrap array types to check the element type
+  const resolved = type.kind === "array" ? type.valueType : type;
+  if (resolved && isPagedResultModel(context, resolved)) {
+    pagedModelsKeptPublic.add(resolved);
   }
 }
 
@@ -1044,6 +1061,10 @@ function visitType(context: SdkContext, type: SdkType | undefined) {
       if (property.flatten && property.type.kind === "model") {
         flattenPropertyModelMap.set(property, type);
       }
+      // If a paged result model is used as a model property (not as a paging
+      // operation response), it must stay public (no "_" prefix) because users
+      // interact with it directly through the property.
+      trackPagedModelUsedAsProperty(context, property.type);
     }
     if (type.discriminatedSubtypes) {
       for (const subType of Object.values(type.discriminatedSubtypes)) {

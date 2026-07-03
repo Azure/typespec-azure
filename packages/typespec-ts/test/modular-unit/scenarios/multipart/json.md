@@ -21,7 +21,7 @@ op doThing(@header contentType: "multipart/form-data", @multipartBody bodyParam:
 The part should get generated correctly. The generated serializer should be used so that the date of birth is encoded correctly.
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -77,7 +77,7 @@ op doThing(@header contentType: "multipart/form-data", @multipartBody bodyParam:
 In this case one part is constructed from the serialized array.
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -139,7 +139,7 @@ op doThing(@header contentType: "multipart/form-data", @multipartBody bodyParam:
 In this case each element in the serialized array is converted to a part descriptor.
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */

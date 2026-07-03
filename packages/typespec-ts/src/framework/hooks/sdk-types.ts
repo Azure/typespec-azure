@@ -14,8 +14,8 @@ import { reportDiagnostic } from "../../lib.js";
 import { visitPackageTypes } from "../../modular/emit-models.js";
 import { getAllAncestors, getAllProperties } from "../../modular/helpers/operation-helpers.js";
 import { normalizeModelPropertyName } from "../../modular/type-expressions/get-type-expression.js";
-import { NameType, normalizeName } from "../../rlc-common/index.js";
 import { SdkContext } from "../../utils/interfaces.js";
+import { NameType, normalizeName } from "../../utils/name-utils.js";
 
 export const emitQueue: Set<SdkType> = new Set<SdkType>();
 export const flattenPropertyModelMap: Map<SdkModelPropertyType, SdkModelType> = new Map<
@@ -23,10 +23,11 @@ export const flattenPropertyModelMap: Map<SdkModelPropertyType, SdkModelType> = 
   SdkModelType
 >();
 /**
- * Set of paged result models that are also used in non-paging operations.
+ * Set of paged result models that should keep their public name (no "_" prefix).
+ * This includes models used as non-paging method responses or as model properties.
  * Precomputed during visitPackageTypes for O(1) lookups in normalizeModelName.
  */
-export const pagedModelsUsedInNonPagingOps = new Set<SdkType>();
+export const pagedModelsKeptPublic = new Set<SdkType>();
 
 export interface SdkTypeContext {
   operations: Map<Type, SdkServiceMethod<SdkHttpOperation>>;

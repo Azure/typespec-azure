@@ -33,9 +33,9 @@ import { useDependencies } from "../../framework/hooks/use-dependencies.js";
 import { resolveReference } from "../../framework/reference.js";
 import { refkey } from "../../framework/refkey.js";
 import { reportDiagnostic } from "../../lib.js";
-import { NameType, normalizeName } from "../../rlc-common/index.js";
 import { SdkContext } from "../../utils/interfaces.js";
 import { isAzureCoreErrorType } from "../../utils/model-utils.js";
+import { NameType, normalizeName } from "../../utils/name-utils.js";
 import {
   getCollectionFormatFromArrayEncoding,
   getCollectionFormatHelper,
@@ -463,8 +463,8 @@ export function getDeserializeHeadersPrivateFunction(
   operation: ServiceOperation,
 ): OptionalKind<FunctionDeclarationStructure> | undefined {
   const responseHeaders = getResponseHeaders(operation.operation.responses);
-  const isResponseHeadersEnabled = context.rlcOptions?.includeHeadersInResponse === true;
-  const isStorageCompatEnabled = context.rlcOptions?.enableStorageCompat === true;
+  const isResponseHeadersEnabled = context.emitterOptions?.includeHeadersInResponse === true;
+  const isStorageCompatEnabled = context.emitterOptions?.enableStorageCompat === true;
 
   // Only generate if headers exist and a relevant feature is enabled
   if (responseHeaders.length === 0 || (!isResponseHeadersEnabled && !isStorageCompatEnabled)) {
@@ -616,7 +616,7 @@ export function getDeserializeExceptionHeadersPrivateFunction(
   context: SdkContext,
   operation: ServiceOperation,
 ): OptionalKind<FunctionDeclarationStructure> | undefined {
-  const isResponseHeadersEnabled = context.rlcOptions?.includeHeadersInResponse === true;
+  const isResponseHeadersEnabled = context.emitterOptions?.includeHeadersInResponse === true;
   if (!isResponseHeadersEnabled) {
     return undefined;
   }
@@ -672,7 +672,7 @@ function getExceptionThrowStatement(context: SdkContext, operation: ServiceOpera
   const { customized, defaultDeserializer, defaultXmlDeserializer, defaultIsXmlOnly } =
     getExceptionDetails(context, operation);
 
-  const isResponseHeadersEnabled = context.rlcOptions?.includeHeadersInResponse === true;
+  const isResponseHeadersEnabled = context.emitterOptions?.includeHeadersInResponse === true;
 
   // Check if exception headers function exists and build the call
   const exceptionHeaders = getExceptionResponseHeaders(operation.operation.exceptions);
@@ -915,8 +915,8 @@ export function getOperationFunction(
   const response = operation.response;
   const responseHeaders = getResponseHeaders(operation.operation.responses);
   const hasHeaderOnlyResponse = !response.type && responseHeaders.length > 0;
-  const isResponseHeadersEnabled = context.rlcOptions?.includeHeadersInResponse === true;
-  const isStorageCompatEnabled = context.rlcOptions?.enableStorageCompat === true;
+  const isResponseHeadersEnabled = context.emitterOptions?.includeHeadersInResponse === true;
+  const isStorageCompatEnabled = context.emitterOptions?.enableStorageCompat === true;
 
   // Track the raw body type separately for storage-compat (before header merging)
   const hasResponseBody = !!response.type;
@@ -1403,7 +1403,7 @@ export function getOperationOptionsName(
 
 /**
  * This function build the request parameters that we will provide to the
- * RLC internally. This will translate High Level parameters into the RLC ones.
+ * REST-level request internally. This will translate high-level parameters into the REST-level ones.
  * Figuring out what goes in headers, body, path and qsp.
  */
 function getHeaderAndBodyParameters(
@@ -1631,7 +1631,7 @@ export function getParameterMap(
   // Special case for api-version parameters with default values
   if (param.isApiVersionParam && param.clientDefaultValue) {
     // For multi-service, use only the default value (don't reference context.apiVersion)
-    if (context.rlcOptions?.isMultiService) {
+    if (context.emitterOptions?.isMultiService) {
       return `"${serializedName}": "${param.clientDefaultValue}"`;
     }
     return `"${serializedName}": ${param.onClient ? "context." : ""}${param.name} ?? "${param.clientDefaultValue}"`;
@@ -2140,8 +2140,8 @@ export function getRequestModelProperties(
 
 /**
  *
- * This function helps translating an HLC request to RLC request,
- * extracting properties from body and headers and building the RLC response object
+ * This function helps translating a high-level request to a REST-level request,
+ * extracting properties from body and headers and building the REST-level request object
  */
 export function getRequestModelMapping(
   context: SdkContext,
@@ -2176,8 +2176,8 @@ function getHeaderSerializedName(param: SdkHttpParameter) {
 }
 
 /**
- * This function helps translating an RLC response to an HLC response,
- * extracting properties from body and headers and building the HLC response object
+ * This function helps translating a REST-level response to a high-level response,
+ * extracting properties from body and headers and building the high-level response object
  */
 export function getResponseMapping(
   context: SdkContext,
@@ -2323,7 +2323,7 @@ export function serializeRequestValue(
       } else if (
         isSpecialHandledUnion({
           ...type,
-          isNonExhaustive: context.rlcOptions?.experimentalExtensibleEnums ?? false,
+          isNonExhaustive: context.emitterOptions?.experimentalExtensibleEnums ?? false,
         })
       ) {
         const sdkType = getSdkType(type.__raw!);
@@ -2749,7 +2749,7 @@ function getApiVersionExpression(
     return undefined;
   }
   // For multi-service, use only the default value (don't reference context.apiVersion)
-  if (dpgContext.rlcOptions?.isMultiService) {
+  if (dpgContext.emitterOptions?.isMultiService) {
     return queryApiVersionParam.clientDefaultValue
       ? `"${queryApiVersionParam.clientDefaultValue}"`
       : undefined;
@@ -2917,7 +2917,7 @@ export function getOperationResponseTypeName(method: [string[], ServiceOperation
 function isWrappableType(context: SdkContext, type: SdkType): boolean {
   if (type.kind === "array" && type.valueType.kind === "model") return false;
   if (type.kind === "dict" || type.kind === "model") return false;
-  if (type.kind === "unknown" && context.rlcOptions?.treatUnknownAsRecord) return false;
+  if (type.kind === "unknown" && context.emitterOptions?.treatUnknownAsRecord) return false;
   return true;
 }
 
@@ -2951,7 +2951,7 @@ export function checkWrapNonModelReturn(
   }
 
   // Only if the feature flag is enabled
-  if (!context.rlcOptions?.wrapNonModelReturn) {
+  if (!context.emitterOptions?.wrapNonModelReturn) {
     return noWrap;
   }
 
