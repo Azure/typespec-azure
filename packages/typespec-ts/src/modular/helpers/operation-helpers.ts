@@ -48,7 +48,7 @@ import {
   KnownCollectionFormat,
   ServiceOperation,
 } from "../../utils/operation-util.js";
-import { AzurePollingDependencies } from "../external-dependencies.js";
+import { AzureCoreDependencies, AzurePollingDependencies } from "../external-dependencies.js";
 import {
   buildModelDeserializer,
   buildPropertyDeserializer,
@@ -70,7 +70,6 @@ import {
 } from "../serialization/serialize-utils.js";
 import {
   PagingHelpers,
-  PlatformTypeHelpers,
   PollingHelpers,
   SerializationHelpers,
   StorageCompatHelpers,
@@ -1043,7 +1042,7 @@ export function getOperationFunction(
     statements.push(`const ${streamableMethodVarName} = _${name}Send(${sendParameterList});`);
     const binaryHelper =
       wrapReturn && wrapReturnIsBinary
-        ? SerializationHelpers.getBinaryStreamResponse
+        ? AzureCoreDependencies["getBinaryStreamResponse"]
         : SerializationHelpers.getBinaryResponse;
     statements.push(
       `const ${resultVarName} = await ${resolveReference(binaryHelper)}(${streamableMethodVarName});`,
@@ -3003,7 +3002,7 @@ export function buildNonModelResponseTypeDeclaration(
   let typeBody: string;
 
   if (isBinary) {
-    const nodeReadableStreamRef = resolveReference(PlatformTypeHelpers.NodeReadableStream);
+    const nodeReadableStreamRef = resolveReference(AzureCoreDependencies["NodeReadableStream"]);
     typeBody = `{
       /**
        * BROWSER ONLY

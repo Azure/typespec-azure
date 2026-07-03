@@ -207,6 +207,16 @@ export const AzureCoreDependencies: CoreDependencies = {
     name: "ErrorResponse",
     module: "@azure-rest/core-client",
   },
+  getBinaryStreamResponse: {
+    kind: "externalDependency",
+    module: "@azure-rest/core-client",
+    name: "getBinaryStreamResponse",
+  },
+  NodeReadableStream: {
+    kind: "externalDependency",
+    module: "@azure/core-rest-pipeline",
+    name: "NodeReadableStream",
+  },
 };
 
 export const AzureIdentityDependencies = {
