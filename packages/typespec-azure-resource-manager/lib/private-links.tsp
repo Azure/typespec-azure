@@ -57,7 +57,7 @@ interface PrivateLinks<
   ResourceParameter extends {} = CommonTypes.PrivateLinkResourceParameter
 > {
   /**
-   * @dev List the private links to a resource
+   * List the private links to a resource
    * @template ParentResource the parent resource of the PrivateLink
    * @template Resource Optional. The PrivateLink resource being listed
    * @template BaseParameters Optional. Allows overriding the operation parameters
@@ -91,7 +91,7 @@ interface PrivateLinks<
   >;
 
   /**
-   * @dev List the private links to a resource - this should only be used for legacy operations
+   * List the private links to a resource - this should only be used for legacy operations
    * @template ParentResource the parent resource of the PrivateLink
    * @template Resource Optional. The PrivateLink resource being listed
    * @template BaseParameters Optional. Allows overriding the operation parameters
@@ -125,7 +125,7 @@ interface PrivateLinks<
   >;
 
   /**
-   * @dev GET the a private link to a particular resource
+   * GET the a private link to a particular resource
    * @template ParentResource the parent resource of the PrivateLink
    * @template Resource the PrivateLink resource being read
    * @template BaseParameters Optional. Allows overriding the operation parameters

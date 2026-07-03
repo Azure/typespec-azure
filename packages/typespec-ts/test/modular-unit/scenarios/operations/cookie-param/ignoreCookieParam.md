@@ -50,7 +50,6 @@ export async function _testDeserialize(result: PathUncheckedResponse): Promise<s
 
   return result.body;
 }
-
 export async function test(
   context: Client,
   options: TestOptionalParams = { requestOptions: {} },

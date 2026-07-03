@@ -439,12 +439,14 @@ Area of the codebase
 | `emitter:autorest`           | #957300 | Issues for @azure-tools/typespec-autorest emitter                                   |
 | `emitter:python`             | #957300 | Issues for @azure-tools/typespec-python emitter                                     |
 | `emitter:typescript`         | #957300 | Issues for @azure-tools/typespec-ts emitter                                         |
+| `emitter:go`                 | #957300 | Issues for @azure-tools/typespec-go emitter                                         |
 | `emitter:java`               | #0096c7 | Issues for @azure-tools/typespec-java emitter                                       |
 | `emitter:client:all`         | #957300 | General client emitter issues that do not involve TCGC or typespec-azure-http-specs |
 | `eng`                        | #65bfff |                                                                                     |
 | `ide`                        | #846da1 | Issues for Azure specific ide features                                              |
 | `cli/psh`                    | #9EB120 | Issues for Azure CLI/PSH features                                                   |
 | `meta:website`               | #007dc8 | TypeSpec.io updates                                                                 |
+| `linter`                     | #65bfff | Issues related to linter rules                                                      |
 
 #### issue_kinds
 

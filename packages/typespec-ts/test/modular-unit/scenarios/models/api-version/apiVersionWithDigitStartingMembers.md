@@ -35,7 +35,7 @@ withRawContent: true
 Should generate KnownVersions with "V" prefix for digit-starting member name.
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
