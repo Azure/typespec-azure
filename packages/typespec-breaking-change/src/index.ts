@@ -36,6 +36,14 @@ export {
   type ResolvedOperation,
 } from "./operation-identity.js";
 export {
+  canonicalizeOperations,
+  type CanonicalizationResult,
+  type CanonicalizedOperation,
+} from "./canonicalize.js";
+export * from "./diff-engine.js";
+export * from "./diff-operations.js";
+export * from "./diff-types.js";
+export {
   matchOperations,
   type OperationMatchResult,
   type MatchedOperation,
