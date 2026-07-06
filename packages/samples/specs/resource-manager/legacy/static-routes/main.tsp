@@ -74,7 +74,6 @@ union ProvisioningState {
   Deleting: "Deleting",
 }
 
-#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator"
 interface EmplOps
   extends Azure.ResourceManager.Legacy.RoutedOperations<
       BaseParams & {
@@ -96,7 +95,6 @@ alias BaseParams = {
   ...SubscriptionIdParameter;
 };
 
-#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator"
 interface EmplOps2
   extends Azure.ResourceManager.Legacy.RoutedOperations<
       BaseParams2 & {
