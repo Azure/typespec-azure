@@ -66,7 +66,10 @@ export async function _deleteKeyValueDeserialize(
     throw createRestError(result);
   }
 
-  return result.body ? keyValueDeserializer(result.body) : undefined;
+  if (!result.body) {
+    return;
+  }
+  return keyValueDeserializer(result.body);
 }
 export async function deleteKeyValue(
   context: Client,
@@ -240,7 +243,10 @@ export async function _deleteKeyValueDeserialize(
     throw error;
   }
 
-  return result.body ? keyValueDeserializer(result.body) : undefined;
+  if (!result.body) {
+    return;
+  }
+  return keyValueDeserializer(result.body);
 }
 export async function deleteKeyValue(
   context: Client,
@@ -251,3 +257,4 @@ export async function deleteKeyValue(
   return _deleteKeyValueDeserialize(result);
 }
 ```
+
