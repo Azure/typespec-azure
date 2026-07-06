@@ -1,7 +1,6 @@
 packages:
   - packages/*
-  - packages/typespec-java/src/*
-  - core/
+  - core/ # Install core workspace dependencies too. Needed for prettier plugins
   - website/
   - eng/feeds/
   - core/packages/*
@@ -9,7 +8,6 @@ packages:
   - "!core/packages/http-client-java/**"
   - "!core/packages/http-client-python/**"
   - "!core/packages/typespec-vs"
-
 overrides:
   "cross-spawn@>=7.0.0 <7.0.5": "^7.0.5"
   rollup: 4.49.0 # Regression in 4.50.0 https://github.com/rollup/rollup/issues/6099
@@ -39,8 +37,8 @@ catalog:
   "@autorest/codemodel": ~4.20.1
   "@azure-rest/core-client": ^2.3.1
   "@azure-tools/codegen": ~2.10.1
-  "@azure-tools/openai-typespec": "1.11.0"
-  "@azure-tools/typespec-liftr-base": "0.14.0"
+  "@azure-tools/openai-typespec": "1.21.0"
+  "@azure-tools/typespec-liftr-base": ">=0.14.0 <1.0.0"
   "@azure/abort-controller": ^2.1.2
   "@azure/core-auth": ^1.6.0
   "@azure/core-lro": ^3.1.0
@@ -144,7 +142,7 @@ catalog:
   happy-dom: ^20.9.0
   hast-util-to-html: ^9.0.5
   is-unicode-supported: ^2.1.0
-  js-yaml: ~4.1.1
+  js-yaml: ^4.2.0
   lodash: ~4.18.1
   log-symbols: ^7.0.1
   lzutf8: "0.6.3"

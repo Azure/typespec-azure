@@ -55,6 +55,13 @@ jobs:
             working-directory: packages/typespec-ts
             run-prepare: false
             run-regenerate: false
+          - name: Java
+            lang: java
+            package-filter: "@azure-tools/typespec-java"
+            working-directory: packages/typespec-java/emitter-tests
+            mise-install-args: "java maven"
+            run-prepare: false
+            run-regenerate: true
 
     env:
       TYPESPEC_VS_CI_BUILD: true
@@ -155,6 +162,7 @@ jobs:
             "@azure-tools/typespec-azure-resource-manager",
             "@azure-tools/typespec-autorest",
             "@azure-tools/typespec-python",
+            "@azure-tools/typespec-java",
             "@azure-tools/typespec-ts"
           ];
           console.log("--- Dev versions (next tag on npm) ---");
