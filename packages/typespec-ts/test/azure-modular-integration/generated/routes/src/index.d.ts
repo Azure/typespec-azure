@@ -4,6 +4,11 @@ import { OperationOptions } from '@azure-rest/core-client';
 import { Pipeline } from '@azure/core-rest-pipeline';
 import { RestError } from '@azure/core-rest-pipeline';
 
+export declare interface ExpandParameters {
+    field: string;
+    value: string;
+}
+
 export declare interface FixedOptionalParams extends OperationOptions {
 }
 
@@ -239,7 +244,11 @@ export declare interface QueryParametersQueryContinuationStandardRecordOptionalP
 export declare interface QueryParametersQueryExpansionExplodeArrayOptionalParams extends OperationOptions {
 }
 
+export declare interface QueryParametersQueryExpansionExplodeModelOptionalParams extends OperationOptions {
+}
+
 export declare interface QueryParametersQueryExpansionExplodeOperations {
+    model: (param: ExpandParameters, options?: QueryParametersQueryExpansionExplodeModelOptionalParams) => Promise<void>;
     record: (param: Record<string, number>, options?: QueryParametersQueryExpansionExplodeRecordOptionalParams) => Promise<void>;
     array: (param: string[], options?: QueryParametersQueryExpansionExplodeArrayOptionalParams) => Promise<void>;
     primitive: (param: string, options?: QueryParametersQueryExpansionExplodePrimitiveOptionalParams) => Promise<void>;
