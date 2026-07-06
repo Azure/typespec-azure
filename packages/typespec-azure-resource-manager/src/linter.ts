@@ -27,6 +27,7 @@ import { envelopePropertiesRules } from "./rules/envelope-properties.js";
 import { improperSubscriptionListOperationRule } from "./rules/improper-subscription-list-operation.js";
 import { lroLocationHeaderRule } from "./rules/lro-location-header.js";
 import { missingXmsIdentifiersRule } from "./rules/missing-x-ms-identifiers.js";
+import { noBillingDataInPropertiesBagRule } from "./rules/no-billing-data-in-properties-bag.js";
 import { noEmptyModel } from "./rules/no-empty-model.js";
 import { noOverridePropsRule } from "./rules/no-override-props.js";
 import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation.js";
@@ -79,6 +80,7 @@ const rules = [
   unsupportedTypeRule,
   secretProprule,
   noEmptyModel,
+  noBillingDataInPropertiesBagRule,
 ];
 
 export const $linter = defineLinter({
