@@ -241,7 +241,7 @@ export function buildGetClientOptionsParam(
   endpointParam: string,
   apiVersionParamName?: string,
 ): string {
-  const userAgentOptions = buildUserAgentOptions(context, emitterOptions, "azsdk-js-api");
+  const userAgentOptions = buildUserAgentOptions(context, emitterOptions);
   const loggingOptions = buildLoggingOptions();
   const credentials = buildCredentials(emitterOptions, endpointParam);
 
@@ -313,10 +313,19 @@ function buildLoggingOptions(): string | undefined {
   return `{ logger: options.loggingOptions?.logger ?? logger.info }`;
 }
 
+/**
+ * Builds the `userAgentOptions` for the generated client, producing a telemetry
+ * prefix of the form `[<application_id> ]azsdk-js-<package>/<version>` per the Azure
+ * Core telemetry policy: https://azure.github.io/azure-sdk/general_azurecore.html#telemetry-policy
+ *
+ * Historically (autorest.typescript PR #2616) the emitter also prepended per-layer
+ * tokens `azsdk-js-client` and `azsdk-js-api` to distinguish the classic-client,
+ * modular-API and REST layers. Those tokens have no `/version`, are not real packages,
+ * and confused service teams, so they were removed (see Azure/typespec-azure#4774).
+ */
 export function buildUserAgentOptions(
   context: StatementedNode,
   emitterOptions: ModularEmitterOptions,
-  sdkUserAgentPrefix: string,
 ): string {
   const userAgentStatements = [];
   const prefixFromOptions = "const prefixFromOptions = options?.userAgentOptions?.userAgentPrefix;";
@@ -329,21 +338,20 @@ export function buildUserAgentOptions(
   const packageVersion = emitterOptions.options.packageDetails?.version ?? "";
 
   const userAgentInfoStatement =
-    packageVersion && clientPackageName && sdkUserAgentPrefix.includes("api")
+    packageVersion && clientPackageName
       ? "const userAgentInfo = `azsdk-js-" + clientPackageName + "/" + packageVersion + "`;"
       : "";
 
-  if (userAgentInfoStatement) {
-    userAgentStatements.push(userAgentInfoStatement);
+  if (!userAgentInfoStatement) {
+    // Without package name/version we cannot build a meaningful telemetry token,
+    // so we leave the user agent untouched (the caller's userAgentOptions still flow
+    // through `...options`) and let core-rest-pipeline defaults apply.
+    return "";
   }
-  const userAgentPrefix = `const userAgentPrefix = ${
-    "prefixFromOptions ? `${prefixFromOptions} " +
-    sdkUserAgentPrefix +
-    `${userAgentInfoStatement ? " ${userAgentInfo}" : ""}` +
-    "` : `" +
-    `${sdkUserAgentPrefix}` +
-    `${userAgentInfoStatement ? " ${userAgentInfo}`" : "`"}`
-  };`;
+
+  userAgentStatements.push(userAgentInfoStatement);
+  const userAgentPrefix =
+    "const userAgentPrefix = prefixFromOptions ? `${prefixFromOptions} ${userAgentInfo}` : `${userAgentInfo}`;";
   userAgentStatements.push(userAgentPrefix);
 
   context.addStatements(userAgentStatements.join("\n"));
