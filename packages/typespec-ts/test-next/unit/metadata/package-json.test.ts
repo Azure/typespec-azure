@@ -123,7 +123,7 @@ describe("Package file generation", () => {
       expect(packageFile["//sampleConfiguration"]).toEqual(expectedSampleConfig);
     });
 
-    it("[esm] should include correct entrypoints (without react-native by default)", () => {
+    it("[esm] should include correct base entrypoints by default", () => {
       const model = createMockModel({
         ...baseConfig,
         withSamples: true,
@@ -138,20 +138,9 @@ describe("Package file generation", () => {
       expect(packageFile).to.have.property("module", "./dist/esm/index.js");
       expect(packageFile).to.have.property("types", "./dist/commonjs/index.d.ts");
       expect(packageFile).to.have.property("browser", "./dist/browser/index.js");
-      // Default: no react-native entrypoint
-      expect(packageFile).not.toHaveProperty("react-native");
       expect(packageFile).to.have.property("exports");
-      expect(packageFile).to.have.property("imports");
-      expect(packageFile.imports).toEqual({
-        "#platform/*": {
-          browser: "./src/*-browser.mts",
-          default: "./src/*.ts",
-        },
-      });
       expect(packageFile.exports["./package.json"]).to.equal("./package.json");
       expect(packageFile.exports["."]).to.have.property("browser");
-      // Default: no react-native in exports
-      expect(packageFile.exports["."]).not.toHaveProperty("react-native");
       expect(packageFile.exports["."]).to.have.property("import");
       expect(packageFile.exports["."]).to.have.property("require");
       expect(packageFile.exports["."]["import"]).toEqual({
@@ -160,28 +149,21 @@ describe("Package file generation", () => {
       });
     });
 
-    it("[esm] should include react-native entrypoints when generateReactNativeTarget is true", () => {
+    it("[esm] should include consistent export conditions", () => {
       const model = createMockModel({
         ...baseConfig,
         withSamples: true,
-        generateReactNativeTarget: true,
       });
       const packageFileContent = buildPackageFile(model);
       const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
 
-      expect(packageFile).to.have.property("react-native", "./dist/react-native/index.js");
-      expect(packageFile).to.have.property("imports");
-      expect(packageFile.imports).toEqual({
-        "#platform/*": {
-          browser: "./src/*-browser.mts",
-          "react-native": "./src/*-react-native.mts",
-          default: "./src/*.ts",
-        },
+      expect(packageFile.exports["."]["browser"]).toEqual({
+        types: "./dist/browser/index.d.ts",
+        default: "./dist/browser/index.js",
       });
-      expect(packageFile.exports["."]).to.have.property("react-native");
-      expect(packageFile.exports["."]["react-native"]).toEqual({
-        types: "./dist/react-native/index.d.ts",
-        default: "./dist/react-native/index.js",
+      expect(packageFile.exports["."]["require"]).toEqual({
+        types: "./dist/commonjs/index.d.ts",
+        default: "./dist/commonjs/index.js",
       });
     });
 
@@ -332,7 +314,7 @@ describe("Package file generation", () => {
       expect(packageFile.scripts).to.have.property("pack", "pnpm pack 2>&1");
     });
 
-    it("should include browser but not react-native entrypoints by default", () => {
+    it("should include browser entrypoint by default for modular ARM packages", () => {
       const model = createMockModel({
         ...baseConfig,
         azureArm: true,
@@ -342,22 +324,21 @@ describe("Package file generation", () => {
       const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
 
       expect(packageFile).to.have.property("browser", "./dist/browser/index.js");
-      // Default: no react-native entrypoint
-      expect(packageFile).not.toHaveProperty("react-native");
+      expect(packageFile.exports["."]).to.have.property("browser");
     });
 
-    it("should include react-native entrypoint when generateReactNativeTarget is true", () => {
+    it("should include standard export conditions for modular ARM packages", () => {
       const model = createMockModel({
         ...baseConfig,
         azureArm: true,
         isModularLibrary: true,
-        generateReactNativeTarget: true,
       });
       const packageFileContent = buildPackageFile(model);
       const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
 
       expect(packageFile).to.have.property("browser", "./dist/browser/index.js");
-      expect(packageFile).to.have.property("react-native", "./dist/react-native/index.js");
+      expect(packageFile.exports["."]).to.have.property("import");
+      expect(packageFile.exports["."]).to.have.property("require");
     });
   });
 
@@ -551,7 +532,7 @@ describe("Package file generation", () => {
 
       expect(packageFile.dependencies).not.toHaveProperty("@azure/core-client");
       expect(packageFile.dependencies).to.have.property("@azure-rest/core-client", "^2.7.0");
-      expect(packageFile.dependencies).to.have.property("@azure/core-rest-pipeline", "^1.19.1");
+      expect(packageFile.dependencies).to.have.property("@azure/core-rest-pipeline", "^1.24.0");
     });
 
     it("should not add duplicate @azure-rest/core-client if already present", () => {
@@ -578,7 +559,7 @@ describe("Package file generation", () => {
       expect(packageFile.dependencies).to.have.property("@azure-rest/core-client", "^2.7.0");
     });
 
-    it("should only add platform imports when no @azure/core-client and no other update triggers", () => {
+    it("should still normalize runtime dependencies when no other update triggers", () => {
       const model = createMockModel({
         hasLro: false,
       });
@@ -597,26 +578,15 @@ describe("Package file generation", () => {
       expect(packageFileContent).toBeDefined();
       const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
 
-      // Dependencies should remain unchanged
       expect(packageFile.dependencies).not.toHaveProperty("@azure/core-client");
       expect(packageFile.dependencies).to.have.property("@azure-rest/core-client", "^2.7.0");
-
-      // Platform imports should be added for Azure monorepo ESM packages.
-      // By default (generateReactNativeTarget=false) the `react-native`
-      // condition must NOT be emitted, matching the fresh-generation path.
-      expect(packageFile).to.have.property("imports");
-      expect(packageFile.imports).toEqual({
-        "#platform/*": {
-          browser: "./src/*-browser.mts",
-          default: "./src/*.ts",
-        },
-      });
+      expect(packageFile.dependencies).to.have.property("@azure/core-rest-pipeline", "^1.24.0");
+      expect(packageFile.dependencies).to.have.property("tslib", "^2.8.1");
     });
 
-    it("should include react-native in platform imports when generateReactNativeTarget is true", () => {
+    it("should preserve unrelated dependencies when normalizing runtime dependencies", () => {
       const model = createMockModel({
         hasLro: false,
-        generateReactNativeTarget: true,
       });
 
       const initialPackageInfo = {
@@ -625,6 +595,7 @@ describe("Package file generation", () => {
         dependencies: {
           "@azure-rest/core-client": "^2.7.0",
           "@azure/core-rest-pipeline": "^1.20.0",
+          "left-pad": "^1.3.0",
           tslib: "^2.8.1",
         },
       };
@@ -633,22 +604,10 @@ describe("Package file generation", () => {
       expect(packageFileContent).toBeDefined();
       const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
 
-      // When opted-in, the `react-native` condition is added and must be
-      // positioned before `default` so Node's conditional resolution order
-      // matches the fresh-generation output in packageCommon.ts.
-      expect(packageFile).to.have.property("imports");
-      expect(packageFile.imports).toEqual({
-        "#platform/*": {
-          browser: "./src/*-browser.mts",
-          "react-native": "./src/*-react-native.mts",
-          default: "./src/*.ts",
-        },
-      });
-      expect(Object.keys(packageFile.imports["#platform/*"])).toEqual([
-        "browser",
-        "react-native",
-        "default",
-      ]);
+      expect(packageFile.dependencies).to.have.property("@azure-rest/core-client", "^2.7.0");
+      expect(packageFile.dependencies).to.have.property("@azure/core-rest-pipeline", "^1.24.0");
+      expect(packageFile.dependencies).to.have.property("left-pad", "^1.3.0");
+      expect(packageFile.dependencies).to.have.property("tslib", "^2.8.1");
     });
   });
 });
