@@ -23,10 +23,7 @@ describe("User-Agent telemetry policy", () => {
     const text = result!.getFullText();
 
     assert.include(text, "const prefixFromOptions = options?.userAgentOptions?.userAgentPrefix;");
-    assert.include(
-      text,
-      "const userAgentInfo = `azsdk-js-foo-bar/1.2.3`;",
-    );
+    assert.include(text, "const userAgentInfo = `azsdk-js-foo-bar/1.2.3`;");
     assert.include(
       text,
       "const userAgentPrefix = prefixFromOptions ? `${prefixFromOptions} ${userAgentInfo}` : `${userAgentInfo}`;",
