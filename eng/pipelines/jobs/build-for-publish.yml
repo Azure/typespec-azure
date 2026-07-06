@@ -41,6 +41,24 @@ jobs:
           PackagePath: packages/typespec-python
           GeneratorName: "@azure-tools/typespec-python"
 
+      # Java e2e tests and spector coverage upload. The emitter-tests project is a
+      # standalone npm+Maven project (not in the pnpm workspace). The emitter + its
+      # dependencies are already built by the repo-wide `pnpm build` above, so pass
+      # -SkipBuild: Generate.ps1 -> Setup.ps1 only packs the .tgz, npm installs it and
+      # regenerates the SDK from the spector specs; Spector-Tests.ps1 starts the
+      # mock server, runs the JUnit tests and produces tsp-spector-coverage-java.json.
+      - pwsh: ./Generate.ps1 -SkipBuild
+        displayName: "Regenerate Java test code"
+        workingDirectory: packages/typespec-java/emitter-tests
+
+      - pwsh: ./Spector-Tests.ps1
+        displayName: "Run Java spector tests"
+        workingDirectory: packages/typespec-java/emitter-tests
+
+      - template: /eng/pipelines/templates/upload-spector-coverage.yml
+        parameters:
+          PackagePath: packages/typespec-java/emitter-tests
+          GeneratorName: "@azure-tools/typespec-java"
       # TypeScript (typespec-ts) e2e tests and spector coverage upload.
       # The emitter was migrated here from Azure/autorest.typescript; this replaces
       # the coverage upload that previously ran in that (now deprecated) repo.
@@ -70,10 +88,11 @@ jobs:
           artifactName: npm-packages-stable
           name: npm_packages_stable
 
-      - task: AzureCLI@1
+      - task: AzureCLI@2
         displayName: "Publish bundled packages to package storage"
         inputs:
           azureSubscription: "Azure SDK Engineering System"
+          scriptType: "bash"
           scriptLocation: inlineScript
           inlineScript: node ./eng/scripts/upload-bundler-packages.js
 
@@ -96,10 +115,11 @@ jobs:
           name: npm_packages_next
 
       # Publish Next playground
-      - task: AzureCLI@1
+      - task: AzureCLI@2
         displayName: "Publish Azure playground"
         inputs:
           azureSubscription: "Azure SDK Engineering System"
+          scriptType: "bash"
           scriptLocation: inlineScript
           inlineScript: |
             az storage blob upload-batch \
