@@ -12,7 +12,7 @@
     { "path": "packages/samples/tsconfig.build.json" },
     { "path": "packages/typespec-python/tsconfig.json" },
     { "path": "packages/typespec-go/tsconfig.json" },
-    { "path": "packages/typespec-java/typespec-extension/tsconfig.json" }
+    { "path": "packages/typespec-java/tsconfig.json" }
   ],
   "files": []
 }
