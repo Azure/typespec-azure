@@ -84,7 +84,6 @@ export async function _getSecretOriginalDeserialize(result: PathUncheckedRespons
 
   return;
 }
-
 export async function getSecretOriginal(
   context: Client,
   secretName: string,
@@ -138,7 +137,7 @@ withRawContent: true
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -206,7 +205,6 @@ export async function _groupOriginalDeserialize(result: PathUncheckedResponse): 
 
   return;
 }
-
 export async function groupOriginal(
   context: Client,
   options: GroupParametersOptions,
@@ -322,7 +320,6 @@ export async function _removeOptionalOriginalDeserialize(
 
   return;
 }
-
 export async function removeOptionalOriginal(
   context: Client,
   param1: string,
@@ -439,7 +436,6 @@ export async function _changeOptionalityOriginalDeserialize(
 
   return;
 }
-
 export async function changeOptionalityOriginal(
   context: Client,
   param1: string,

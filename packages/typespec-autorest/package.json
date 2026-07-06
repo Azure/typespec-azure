@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-autorest",
-  "version": "0.69.0",
+  "version": "0.69.1",
   "author": "Microsoft Corporation",
   "description": "TypeSpec library for emitting openapi from the TypeSpec REST protocol binding",
   "homepage": "https://azure.github.io/typespec-azure",
@@ -45,8 +45,8 @@
     "test:watch": "vitest -w",
     "test:ui": "vitest --ui",
     "test:ci": "vitest run --coverage --reporter=junit --reporter=default",
-    "lint": "eslint .  --max-warnings=0",
-    "lint:fix": "eslint . --fix ",
+    "lint": "oxlint . --deny-warnings",
+    "lint:fix": "oxlint . --fix",
     "regen-docs": "tspd doc .  --enable-experimental  --output-dir ../../website/src/content/docs/docs/emitters/typespec-autorest/reference"
   },
   "files": [

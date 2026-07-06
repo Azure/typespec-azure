@@ -29,7 +29,7 @@ op getUser(): User;
 Models do not include the headers, headers are only included in the operation response type.
 
 ```ts models interface User
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */

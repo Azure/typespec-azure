@@ -40,7 +40,7 @@ needTCGC: true
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -104,7 +104,7 @@ withRawContent: true
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -165,7 +165,7 @@ withRawContent: true
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -226,7 +226,7 @@ withRawContent: true
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -295,7 +295,7 @@ withRawContent: true
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -366,7 +366,6 @@ export async function _createStreamingDeserialize(result: PathUncheckedResponse)
 
   return;
 }
-
 export async function createStreaming(
   context: Client,
   options: CreateStreamingOptionalParams = { requestOptions: {} },
@@ -395,7 +394,7 @@ op read(@body body: Foo): {
 ## Models interface Foo
 
 ```ts models interface Foo
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -470,7 +469,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   body: Foo,
@@ -520,7 +518,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
-
 export async function read(
   context: Client,
   prop: Date,
@@ -551,7 +548,7 @@ op read(@body body: Foo): {
 ## Models Foo
 
 ```ts models interface Foo
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -606,7 +603,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   body: Foo,
@@ -637,7 +633,7 @@ op read(@body body: Foo): {
 ## Models Foo
 
 ```ts models interface Foo
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -692,7 +688,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   body: Foo,
@@ -720,7 +715,7 @@ op read(@body body: Foo): {
 ## Models Foo
 
 ```ts models interface Foo
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -774,7 +769,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   body: Foo,
@@ -801,7 +795,7 @@ op read(@body body: Foo): {
 ## Models Foo
 
 ```ts models interface Foo
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -847,7 +841,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   body: Foo,
@@ -875,7 +868,7 @@ op read(@body body: Foo): {
 ## Models Foo
 
 ```ts models interface Foo
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -921,7 +914,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   body: Foo,
@@ -952,7 +944,7 @@ op read(@body body: Foo): {
 ## Models Foo
 
 ```ts models interface Foo
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -999,7 +991,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   body: Foo,
@@ -1026,12 +1017,6 @@ op read(@body body: Foo): {
 ## Models Foo
 
 ```ts models interface Foo
-/**
- * This file contains only generated model types and their (de)serializers.
- * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
- */
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /** model interface Foo */
 export interface Foo {
   prop1: Uint8Array;
@@ -1093,7 +1078,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   body: Foo,
@@ -1121,12 +1105,6 @@ op read(@body body: Foo): {
 ## Models Foo
 
 ```ts models interface Foo
-/**
- * This file contains only generated model types and their (de)serializers.
- * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
- */
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /** model interface Foo */
 export interface Foo {
   prop1: Uint8Array;
@@ -1188,7 +1166,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   body: Foo,
@@ -1216,12 +1193,6 @@ op read(@body body: Foo): {
 ## Models Foo
 
 ```ts models interface Foo
-/**
- * This file contains only generated model types and their (de)serializers.
- * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
- */
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /** model interface Foo */
 export interface Foo {
   prop1: Uint8Array;
@@ -1283,7 +1254,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   body: Foo,
@@ -1319,7 +1289,7 @@ op read(): {
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -1401,7 +1371,7 @@ op read(): {
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -1467,7 +1437,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<C
 
   return catDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -1500,7 +1469,7 @@ op read(): {
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -1576,7 +1545,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<C
 
   return catDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -1613,7 +1581,7 @@ op read(@body body: PSDog): {
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -1715,7 +1683,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<P
 
   return psDogDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   body: PSDog,
@@ -1753,7 +1720,7 @@ op read(): {
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -1852,7 +1819,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<P
 
   return petUnionDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -1895,7 +1861,7 @@ op read(): {
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -2032,7 +1998,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<P
 
   return petUnionDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -2063,7 +2028,7 @@ op read(): {
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -2127,7 +2092,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -2175,7 +2139,7 @@ needAzureCore: false
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -2223,7 +2187,6 @@ export async function _getDeserialize(result: PathUncheckedResponse): Promise<vo
 
   return;
 }
-
 export async function get(
   context: Client,
   contentType: SchemaContentTypeValues,
@@ -2272,7 +2235,7 @@ withRawContent: true
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -2356,7 +2319,6 @@ export async function _getDeserialize(result: PathUncheckedResponse): Promise<vo
 
   return;
 }
-
 export async function get(
   context: Client,
   testHeader: "A" | "B",
@@ -2387,7 +2349,7 @@ op read(@bodyRoot body: A): void;
 ## Model interface A
 
 ```ts models interface A
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -2446,7 +2408,7 @@ export function bSerializer(item: B): any {
 ## Model interface A
 
 ```ts models interface A
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -2481,7 +2443,7 @@ op read(@body body: A): void;
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -2512,7 +2474,7 @@ op read(@body body: A): void;
 ## Model interface A
 
 ```ts models interface A
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -2556,7 +2518,7 @@ compatibility-mode: true
 ## Model interface Vegetables
 
 ```ts models interface Vegetables
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -2601,14 +2563,14 @@ mustEmptyDiagnostic: true
 ## Models
 
 ```ts models
-import { serializeRecord } from "../static-helpers/serialization/serialize-record.js";
-
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import { serializeRecord } from "../static-helpers/serialization/serialize-record.js";
+
 /** model interface Vegetables */
 export interface Vegetables {
   carrots: number;
@@ -2681,7 +2643,7 @@ compatibility-mode: true
 ## Model interface A
 
 ```ts models interface A
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -2749,7 +2711,7 @@ op createService(@body body: ServiceResourceProperties): ServiceResourceProperti
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -2876,7 +2838,7 @@ op read(@body body: Client): Client;
 ## Models
 
 ```ts models
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -2934,7 +2896,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<C
 
   return clientDeserializer(result.body);
 }
-
 export async function read(
   context: Client,
   body: Client_1,

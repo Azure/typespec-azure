@@ -7,6 +7,7 @@ import astroExpressiveCode from "astro-expressive-code";
 import rehypeAstroRelativeMarkdownLinks from "astro-rehype-relative-markdown-links";
 import { defineConfig } from "astro/config";
 import { resolve } from "path";
+import remarkGfm from "remark-gfm";
 import remarkHeadingID from "remark-heading-id";
 import current from "./src/content/current-sidebar";
 
@@ -62,7 +63,7 @@ export default defineConfig({
   ],
   markdown: {
     // @ts-expect-error wrong type
-    remarkPlugins: [remarkHeadingID],
+    remarkPlugins: [remarkHeadingID, remarkGfm],
     rehypePlugins: [
       [rehypeAstroRelativeMarkdownLinks, { base, collectionBase: false, trailingSlash: "always" }],
     ],

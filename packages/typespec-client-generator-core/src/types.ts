@@ -2467,7 +2467,7 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
       } else {
         sdkVersionsEnum = diagnostics.pipe(getSdkEnumWithDiagnostics(context, versionEnum));
       }
-      filterPreviewVersion(context, sdkVersionsEnum, versions?.at(-1) || "");
+      filterPreviewVersion(context, sdkVersionsEnum, versions?.at(-1) || "", service);
       diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum));
     }
   }

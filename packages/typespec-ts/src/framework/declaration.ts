@@ -8,12 +8,14 @@ import {
   InterfaceDeclaration,
   InterfaceDeclarationStructure,
   SourceFile,
+  StatementStructures,
   StructureKind,
   TypeAliasDeclaration,
   TypeAliasDeclarationStructure,
 } from "ts-morph";
 import { useBinder } from "./hooks/binder.js";
 import { refkey as getRefKey } from "./refkey.js";
+import { enqueueStatement } from "./source-file-batch.js";
 export type DeclarationStructures =
   | ClassDeclarationStructure
   | EnumDeclarationStructure
@@ -80,25 +82,11 @@ export function addDeclaration(
   // Update the declaration name to be unique
   const trackedDeclaration = { ...declaration, name: trackedDeclarationName };
 
-  switch (trackedDeclaration.kind) {
-    case StructureKind.Class:
-      sourceFile.addClass(trackedDeclaration);
-      break;
-    case StructureKind.Enum:
-      sourceFile.addEnum(trackedDeclaration);
-      break;
-    case StructureKind.Function:
-      sourceFile.addFunction(trackedDeclaration);
-      break;
-    case StructureKind.Interface:
-      sourceFile.addInterface(trackedDeclaration);
-      break;
-    case StructureKind.TypeAlias:
-      if (trackedDeclaration.type) {
-        sourceFile.addTypeAlias(trackedDeclaration);
-      }
-      break;
-    default:
-      throw new Error(`Unsupported declaration kind ${(trackedDeclaration as any).kind}`);
+  // Skip empty type aliases (they have no body to emit). Done before
+  // dispatching so behaviour is identical whether batching or not.
+  if (trackedDeclaration.kind === StructureKind.TypeAlias && !trackedDeclaration.type) {
+    return;
   }
+
+  enqueueStatement(sourceFile, trackedDeclaration as StatementStructures);
 }
