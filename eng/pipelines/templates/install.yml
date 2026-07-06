@@ -11,11 +11,22 @@ steps:
     inputs:
       version: 8.0.x
 
-  - task: NodeTool@0
+  - task: UseNode@1
     inputs:
-      versionSpec: ${{ parameters.nodeVersion }}
+      version: ${{ parameters.nodeVersion }}
     displayName: Install Node.js
     retryCountOnTaskFailure: 3
+
+  # typespec-java is in the pnpm workspace, so the repo-wide `pnpm build` builds
+  # its emitter.jar via Maven and therefore needs a JDK. The emitter targets
+  # JDK 11 (see mise.toml `java = microsoft-11`). Maven is preinstalled on the
+  # hosted image.
+  - task: JavaToolInstaller@0
+    displayName: "Use Java 11"
+    inputs:
+      versionSpec: "11"
+      jdkArchitectureOption: "x64"
+      jdkSourceOption: "PreInstalled"
 
   - template: /eng/common/pipelines/templates/steps/create-authenticated-npmrc.yml
 
