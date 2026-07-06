@@ -380,7 +380,10 @@ describe("Binder", () => {
 
       binder.resolveAllReferences("/modularPackageFolder/src");
 
-      assertGetImportStatements(sourceFile, "./static-helpers/serialization/get-binary-response.js");
+      assertGetImportStatements(
+        sourceFile,
+        "./static-helpers/serialization/get-binary-response.js",
+      );
       assertGetStatement(sourceFile, "getBinaryResponse();");
     });
   });
