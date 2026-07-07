@@ -587,29 +587,5 @@ describe("Package file generation", () => {
       expect(packageFile.dependencies).to.have.property("@azure/core-rest-pipeline", "^1.24.0");
       expect(packageFile.dependencies).to.have.property("tslib", "^2.8.1");
     });
-
-    it("should preserve unrelated dependencies when normalizing runtime dependencies", () => {
-      const model = createMockModel({
-        hasLro: false,
-      });
-
-      const initialPackageInfo = {
-        name: "@azure/test-package",
-        version: "1.0.0",
-        dependencies: {
-          "@azure-rest/core-client": "^2.7.0",
-          "@azure/core-rest-pipeline": "^1.20.0",
-          tslib: "^2.8.1",
-        },
-      };
-
-      const packageFileContent = updatePackageFile(model, initialPackageInfo);
-      expect(packageFileContent).toBeDefined();
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-
-      expect(packageFile.dependencies).to.have.property("@azure-rest/core-client", "^2.7.0");
-      expect(packageFile.dependencies).to.have.property("@azure/core-rest-pipeline", "^1.24.0");
-      expect(packageFile.dependencies).to.have.property("tslib", "^2.8.1");
-    });
   });
 });
