@@ -9,7 +9,7 @@ import { getProperties } from "./utils.js";
  * lowercase. Add a new entry here to reserve an additional resource property name.
  */
 const reservedProperties = new Map<string, string>([
-  ["billingdata", "platform billing integration"],
+  ["billingData", "platform billing integration"],
 ]);
 
 export const noReservedResourcePropertyRule = createRule({
