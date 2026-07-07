@@ -317,11 +317,6 @@ function buildLoggingOptions(): string | undefined {
  * Builds the `userAgentOptions` for the generated client, producing a telemetry
  * prefix of the form `[<application_id> ]azsdk-js-<package>/<version>` per the Azure
  * Core telemetry policy: https://azure.github.io/azure-sdk/general_azurecore.html#telemetry-policy
- *
- * Historically (autorest.typescript PR #2616) the emitter also prepended per-layer
- * tokens `azsdk-js-client` and `azsdk-js-api` to distinguish the classic-client,
- * modular-API and REST layers. Those tokens have no `/version`, are not real packages,
- * and confused service teams, so they were removed (see Azure/typespec-azure#4774).
  */
 export function buildUserAgentOptions(
   context: StatementedNode,
