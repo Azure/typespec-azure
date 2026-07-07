@@ -201,3 +201,11 @@ When enabled, the emitter will not copy example files to the output directory. I
 **Default:** `"namespaced"`
 
 Strategy for naming the OpenAPI names derived from TypeSpec types. "namespaced" (default) includes the namespace prefix for types outside the service namespace (e.g. `LiftrBase.Foo`). "name-only" uses only the type name without any namespace prefix (e.g. `Foo`), reporting an error when two types collapse to the same name.
+
+### `service-yaml`
+
+**Type:** `"auto" | "always" | "never"`
+
+**Default:** `"auto"`
+
+Controls emission of a `service.yaml` manifest at the project root. "auto" (default) emits it only if the file already exists, "always" always emits it, "never" disables it.

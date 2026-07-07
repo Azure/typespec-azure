@@ -5,6 +5,7 @@ import {
   emitFile,
   getDirectoryPath,
   getNamespaceFullName,
+  getRelativePathFromDirectory,
   getService,
   interpolatePath,
   listServices,
@@ -20,6 +21,7 @@ import {
 } from "@typespec/compiler/experimental";
 import { resolveInfo } from "@typespec/openapi";
 import { getVersioningMutators } from "@typespec/versioning";
+import { stringify as stringifyYaml } from "yaml";
 import { AutorestEmitterOptions, getTracer, reportDiagnostic } from "./lib.js";
 import {
   AutorestDocumentEmitterOptions,
@@ -31,6 +33,8 @@ import type {
   AutorestEmitterResult,
   AutorestServiceRecord,
   AutorestVersionedServiceRecord,
+  ServiceYaml,
+  ServiceYamlVersion,
 } from "./types.js";
 import { AutorestEmitterContext } from "./utils.js";
 
@@ -49,6 +53,12 @@ interface ResolvedAutorestEmitterOptions extends AutorestDocumentEmitterOptions 
   readonly outputDir: string;
   readonly outputFile: string;
   readonly version?: string;
+
+  /**
+   * Controls emission of a `service.yaml` manifest at the project root.
+   * @default "auto"
+   */
+  readonly serviceYaml?: "auto" | "always" | "never";
 }
 
 const defaultOptions = {
@@ -117,6 +127,7 @@ export function resolveAutorestOptions(
     outputSplitting: resolvedOptions["output-splitting"],
     skipExampleCopying: resolvedOptions["skip-example-copying"],
     typeNameStrategy: resolvedOptions["type-name-strategy"],
+    serviceYaml: resolvedOptions["service-yaml"] ?? "auto",
   };
 }
 
@@ -303,6 +314,85 @@ async function emitAllServiceAtAllVersions(
     } else {
       await emitOutput(program, serviceRecord, options);
     }
+  }
+
+  await emitServiceYaml(program, services, options);
+}
+
+/**
+ * Emits a `service.yaml` manifest at the project root (next to `tspconfig.yaml`) describing
+ * the service's API versions. Whether the file is written depends on the `service-yaml` option:
+ * `"auto"` (default) only writes when the file already exists, `"always"` always writes, and
+ * `"never"` disables emission.
+ */
+async function emitServiceYaml(
+  program: Program,
+  services: AutorestServiceRecord[],
+  options: ResolvedAutorestEmitterOptions,
+) {
+  const mode = options.serviceYaml ?? "auto";
+  if (mode === "never" || services.length === 0) {
+    return;
+  }
+
+  const path = resolvePath(program.projectRoot, "service.yaml");
+
+  if (mode === "auto" && !(await fileExists(program, path))) {
+    return;
+  }
+
+  if (services.length > 1) {
+    reportDiagnostic(program, {
+      code: "service-yaml-multiple-services",
+      target: NoTarget,
+    });
+  }
+
+  const manifest = buildServiceYaml(program, services[0]);
+
+  await emitFile(program, {
+    path,
+    content: stringifyYaml(manifest),
+    newLine: options.newLine,
+  });
+}
+
+function buildServiceYaml(program: Program, serviceRecord: AutorestServiceRecord): ServiceYaml {
+  const versions = new Map<string, ServiceYamlVersion>();
+
+  const addFile = (version: string, outputFile: string) => {
+    const absoluteOutput = resolvePath(program.projectRoot, outputFile);
+    const relativePath = getRelativePathFromDirectory(program.projectRoot, absoluteOutput, false);
+    let entry = versions.get(version);
+    if (entry === undefined) {
+      entry = { version, source: "typespec", "swagger-files": [] };
+      versions.set(version, entry);
+    }
+    if (!entry["swagger-files"].includes(relativePath)) {
+      entry["swagger-files"].push(relativePath);
+    }
+  };
+
+  if (serviceRecord.versioned) {
+    for (const documentRecord of serviceRecord.versions) {
+      addFile(documentRecord.version, documentRecord.outputFile);
+    }
+  } else {
+    const version = resolveInfo(program, serviceRecord.service.type)?.version;
+    if (version !== undefined) {
+      addFile(version, serviceRecord.outputFile);
+    }
+  }
+
+  return { versions: [...versions.values()] };
+}
+
+async function fileExists(program: Program, path: string): Promise<boolean> {
+  try {
+    const stat = await program.host.stat(path);
+    return stat.isFile();
+  } catch {
+    return false;
   }
 }
 
