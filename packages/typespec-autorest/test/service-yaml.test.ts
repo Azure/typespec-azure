@@ -95,6 +95,48 @@ describe("emission trigger option", () => {
     );
     expect(raw).toEqual("versions: []\n");
   });
+
+  it("preserves comments and unrelated keys when updating an existing file", async () => {
+    const existing = [
+      "# Manifest for MyService",
+      "versions:",
+      "  # first stable version",
+      '  - version: "2023-01-01"',
+      "    source: typespec",
+      "    swagger-files:",
+      "      - old/path.json",
+      "  # to be removed",
+      '  - version: "2020-01-01"',
+      "    source: swagger",
+      "    swagger-files:",
+      "      - legacy/openapi.json",
+      "# trailing note",
+      "custom-key: keep-me",
+      "",
+    ].join("\n");
+
+    const { raw, manifest } = await emitServiceYaml(
+      { "main.tsp": versionedService, "service.yaml": existing },
+      { "service-yaml": "auto" },
+    );
+
+    assert(raw);
+    // File-level comments and unrelated keys are preserved.
+    expect(raw).toContain("# Manifest for MyService");
+    expect(raw).toContain("# trailing note");
+    expect(raw).toContain("custom-key: keep-me");
+    // Per-version comment on a retained version is preserved.
+    expect(raw).toContain("# first stable version");
+    // Removed version and its comment are gone.
+    expect(raw).not.toContain("# to be removed");
+    expect(raw).not.toContain("2020-01-01");
+    // Generated data reflects the current @versioned enum.
+    assert(manifest);
+    expect(manifest.versions.map((v) => v.version)).toEqual(["2023-01-01", "2024-01-01-preview"]);
+    expect(manifest.versions[0]["swagger-files"]).toEqual([
+      "tsp-output/@azure-tools/typespec-autorest/stable/2023-01-01/openapi.json",
+    ]);
+  });
 });
 
 describe("multiple services", () => {

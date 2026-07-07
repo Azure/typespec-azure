@@ -210,7 +210,7 @@ Strategy for naming the OpenAPI names derived from TypeSpec types. "namespaced" 
 
 **Default:** `"auto"`
 
-Controls emission of a `service.yaml` manifest at the project root. "auto" (default) emits it only if the file already exists, "always" always emits it, "never" disables it.
+Controls emission of a `service.yaml` manifest at the project root. "auto" (default) emits it only if the file already exists, "always" always emits it, "never" disables it. When an existing file is present it is updated in place, preserving comments and unrelated keys.
 
 ## Decorators
 

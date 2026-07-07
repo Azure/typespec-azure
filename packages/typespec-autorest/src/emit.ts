@@ -21,7 +21,7 @@ import {
 } from "@typespec/compiler/experimental";
 import { resolveInfo } from "@typespec/openapi";
 import { getVersioningMutators } from "@typespec/versioning";
-import { stringify as stringifyYaml } from "yaml";
+import { isMap, isSeq, parseDocument, stringify as stringifyYaml, type YAMLMap } from "yaml";
 import { AutorestEmitterOptions, getTracer, reportDiagnostic } from "./lib.js";
 import {
   AutorestDocumentEmitterOptions,
@@ -324,6 +324,9 @@ async function emitAllServiceAtAllVersions(
  * the service's API versions. Whether the file is written depends on the `service-yaml` option:
  * `"auto"` (default) only writes when the file already exists, `"always"` always writes, and
  * `"never"` disables emission.
+ *
+ * When an existing `service.yaml` is present, its content is updated in place so that comments
+ * and any unrelated keys are preserved (see {@link updateServiceYamlDocument}).
  */
 async function emitServiceYaml(
   program: Program,
@@ -336,8 +339,9 @@ async function emitServiceYaml(
   }
 
   const path = resolvePath(program.projectRoot, "service.yaml");
+  const existingContent = await readFileIfExists(program, path);
 
-  if (mode === "auto" && !(await fileExists(program, path))) {
+  if (mode === "auto" && existingContent === undefined) {
     return;
   }
 
@@ -349,12 +353,54 @@ async function emitServiceYaml(
   }
 
   const manifest = buildServiceYaml(program, services[0]);
+  const content =
+    existingContent === undefined
+      ? stringifyYaml(manifest)
+      : updateServiceYamlDocument(existingContent, manifest);
 
   await emitFile(program, {
     path,
-    content: stringifyYaml(manifest),
+    content,
     newLine: options.newLine,
   });
+}
+
+/**
+ * Updates the `versions` list of an existing `service.yaml` document while preserving the rest
+ * of the file: document-level comments, comments on unrelated keys, and per-version comments on
+ * versions that still exist. Versions that no longer exist are removed and new ones are appended
+ * in the generated order.
+ */
+function updateServiceYamlDocument(existing: string, manifest: ServiceYaml): string {
+  const doc = parseDocument(existing);
+  const seq = doc.get("versions");
+
+  if (!isSeq(seq)) {
+    doc.set("versions", manifest.versions);
+    return doc.toString();
+  }
+
+  const existingByVersion = new Map<string, YAMLMap>();
+  for (const item of seq.items) {
+    if (isMap(item)) {
+      const version = item.get("version");
+      if (typeof version === "string") {
+        existingByVersion.set(version, item);
+      }
+    }
+  }
+
+  seq.items = manifest.versions.map((version) => {
+    const existingItem = existingByVersion.get(version.version);
+    if (existingItem !== undefined) {
+      existingItem.set("source", version.source);
+      existingItem.set("swagger-files", version["swagger-files"]);
+      return existingItem;
+    }
+    return doc.createNode(version);
+  });
+
+  return doc.toString();
 }
 
 function buildServiceYaml(program: Program, serviceRecord: AutorestServiceRecord): ServiceYaml {
@@ -387,12 +433,12 @@ function buildServiceYaml(program: Program, serviceRecord: AutorestServiceRecord
   return { versions: [...versions.values()] };
 }
 
-async function fileExists(program: Program, path: string): Promise<boolean> {
+async function readFileIfExists(program: Program, path: string): Promise<string | undefined> {
   try {
-    const stat = await program.host.stat(path);
-    return stat.isFile();
+    const file = await program.host.readFile(path);
+    return file.text;
   } catch {
-    return false;
+    return undefined;
   }
 }
 

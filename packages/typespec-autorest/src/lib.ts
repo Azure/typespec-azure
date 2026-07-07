@@ -149,6 +149,8 @@ export interface AutorestEmitterOptions {
    * - `"always"`: Always emit `service.yaml`.
    * - `"never"`: Never emit `service.yaml`.
    *
+   * When an existing file is present it is updated in place, preserving comments and unrelated keys.
+   *
    * @default "auto"
    */
   "service-yaml"?: "auto" | "always" | "never";
@@ -309,7 +311,7 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       nullable: true,
       default: "auto",
       description:
-        'Controls emission of a `service.yaml` manifest at the project root. "auto" (default) emits it only if the file already exists, "always" always emits it, "never" disables it.',
+        'Controls emission of a `service.yaml` manifest at the project root. "auto" (default) emits it only if the file already exists, "always" always emits it, "never" disables it. When an existing file is present it is updated in place, preserving comments and unrelated keys.',
     },
   },
   required: [],
