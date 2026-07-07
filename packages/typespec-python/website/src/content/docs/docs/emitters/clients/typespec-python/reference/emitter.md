@@ -1,12 +1,6 @@
-# @azure-tools/typespec-python
-
-TypeSpec emitter for Python SDKs
-
-## Install
-
-```bash
-npm install @azure-tools/typespec-python
-```
+---
+title: "Emitter usage"
+---
 
 ## Emitter usage
 
