@@ -599,7 +599,6 @@ describe("Package file generation", () => {
         dependencies: {
           "@azure-rest/core-client": "^2.7.0",
           "@azure/core-rest-pipeline": "^1.20.0",
-          "left-pad": "^1.3.0",
           tslib: "^2.8.1",
         },
       };
@@ -610,7 +609,6 @@ describe("Package file generation", () => {
 
       expect(packageFile.dependencies).to.have.property("@azure-rest/core-client", "^2.7.0");
       expect(packageFile.dependencies).to.have.property("@azure/core-rest-pipeline", "^1.24.0");
-      expect(packageFile.dependencies).to.have.property("left-pad", "^1.3.0");
       expect(packageFile.dependencies).to.have.property("tslib", "^2.8.1");
     });
   });
