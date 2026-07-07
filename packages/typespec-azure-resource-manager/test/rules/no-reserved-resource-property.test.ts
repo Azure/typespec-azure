@@ -6,12 +6,12 @@ import {
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 
-import { noBillingDataInPropertiesBagRule } from "../../src/rules/no-billing-data-in-properties-bag.js";
+import { noReservedResourcePropertyRule } from "../../src/rules/no-reserved-resource-property.js";
 
-const ruleCode = "@azure-tools/typespec-azure-resource-manager/no-billing-data-in-properties-bag";
+const ruleCode = "@azure-tools/typespec-azure-resource-manager/no-reserved-resource-property";
 
 function expectedMessage(propertyName: string): string {
-  return `Property "${propertyName}" is not allowed in the resource property bag. The "BillingData" property name is reserved for platform billing integration.`;
+  return `Property "${propertyName}" is not allowed in the resource property bag. This property name is reserved for platform billing integration.`;
 }
 
 let runner: TesterInstance;
@@ -21,13 +21,13 @@ beforeEach(async () => {
   runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    noBillingDataInPropertiesBagRule,
+    noReservedResourcePropertyRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });
 
 describe("valid cases", () => {
-  it("is valid when the property bag has no BillingData property", async () => {
+  it("is valid when the property bag has no reserved property", async () => {
     await tester
       .expect(
         `
@@ -46,7 +46,7 @@ describe("valid cases", () => {
       .toBeValid();
   });
 
-  it("is valid when a property name only contains BillingData as a substring", async () => {
+  it("is valid when a property name only contains a reserved name as a substring", async () => {
     await tester
       .expect(
         `
@@ -65,7 +65,7 @@ describe("valid cases", () => {
       .toBeValid();
   });
 
-  it("is valid when BillingData is used outside of a resource property bag", async () => {
+  it("is valid when a reserved property is used outside of a resource property bag", async () => {
     await tester
       .expect(
         `
@@ -90,7 +90,7 @@ describe("valid cases", () => {
 });
 
 describe("invalid cases", () => {
-  it("emits a warning when BillingData is a primitive type", async () => {
+  it("emits a warning when a reserved property is a primitive type", async () => {
     await tester
       .expect(
         `
@@ -111,7 +111,7 @@ describe("invalid cases", () => {
       });
   });
 
-  it("emits a warning when BillingData references a named model", async () => {
+  it("emits a warning when a reserved property references a named model", async () => {
     await tester
       .expect(
         `
@@ -136,7 +136,7 @@ describe("invalid cases", () => {
       });
   });
 
-  it("emits a warning when BillingData is an inline anonymous model", async () => {
+  it("emits a warning when a reserved property is an inline anonymous model", async () => {
     await tester
       .expect(
         `
@@ -159,7 +159,7 @@ describe("invalid cases", () => {
       });
   });
 
-  describe("matches the property name case-insensitively", () => {
+  describe("matches the reserved property name case-insensitively", () => {
     ["billingData", "billingdata", "BILLINGDATA", "BillingDATA"].forEach((name) => {
       it(name, async () => {
         await tester
@@ -184,7 +184,7 @@ describe("invalid cases", () => {
     });
   });
 
-  it("emits a warning when BillingData is inherited from a base model", async () => {
+  it("emits a warning when a reserved property is inherited from a base model", async () => {
     await tester
       .expect(
         `
@@ -210,7 +210,7 @@ describe("invalid cases", () => {
       });
   });
 
-  it("emits a warning when BillingData is spread into the property bag", async () => {
+  it("emits a warning when a reserved property is spread into the property bag", async () => {
     await tester
       .expect(
         `
