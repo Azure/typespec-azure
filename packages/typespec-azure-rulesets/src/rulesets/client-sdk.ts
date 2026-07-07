@@ -5,6 +5,6 @@ import type { LinterRuleSet } from "@typespec/compiler";
 export default {
   enable: {
     "@azure-tools/typespec-client-generator-core/csharp-no-url-suffix": true,
-    "@azure-tools/typespec-client-generator-core/single-word-model-name": true,
+    "@azure-tools/typespec-client-generator-core/csharp-no-single-word-model-name": true,
   },
 } satisfies LinterRuleSet;

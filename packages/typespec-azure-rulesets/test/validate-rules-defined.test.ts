@@ -55,6 +55,10 @@ describe("expect all rules to be defined", () => {
     const ruleset = $linter.ruleSets?.["client-sdk"];
     ok(ruleset);
     ok(ruleset.enable?.["@azure-tools/typespec-client-generator-core/csharp-no-url-suffix"]);
-    ok(ruleset.enable?.["@azure-tools/typespec-client-generator-core/single-word-model-name"]);
+    ok(
+      ruleset.enable?.[
+        "@azure-tools/typespec-client-generator-core/csharp-no-single-word-model-name"
+      ],
+    );
   });
 });

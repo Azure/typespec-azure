@@ -1,6 +1,6 @@
 import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
-import { singleWordModelNameRule } from "../../src/rules/single-word-model-name.js";
+import { csharpNoSingleWordModelNameRule } from "../../src/rules/csharp-no-single-word-model-name.js";
 import { SimpleTester } from "../tester.js";
 
 let tester: LinterRuleTester;
@@ -9,14 +9,14 @@ beforeEach(async () => {
   const runner = await SimpleTester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    singleWordModelNameRule,
+    csharpNoSingleWordModelNameRule,
     "@azure-tools/typespec-client-generator-core",
   );
 });
 
 it("emits warning for single-word model name", async () => {
   await tester.expect(`model Document { id: string; }`).toEmitDiagnostics({
-    code: "@azure-tools/typespec-client-generator-core/single-word-model-name",
+    code: "@azure-tools/typespec-client-generator-core/csharp-no-single-word-model-name",
     message: "Model name 'Document' is a single word. Use a more descriptive multi-word name.",
   });
 });
@@ -49,6 +49,6 @@ it("emits warning when @clientName is still single-word", async () => {
       model Document { id: string; }`,
     )
     .toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/single-word-model-name",
+      code: "@azure-tools/typespec-client-generator-core/csharp-no-single-word-model-name",
     });
 });

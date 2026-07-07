@@ -105,7 +105,7 @@ Suggest exactly 5 better multi-word PascalCase names. Reply with only the names,
     const result = await connection.sendRequest("custom/chatCompletion", {
       messages: [{ role: "user", message: prompt }],
       modelFamily: "claude-opus-4.6",
-      id: `single-word-model-name-${namespaceName}.${csharpName}`,
+      id: `csharp-no-single-word-model-name-${namespaceName}.${csharpName}`,
     });
     return typeof result === "string" ? parseSuggestions(result) : [];
   } catch {
@@ -150,12 +150,12 @@ function createAiClientNameCodeFix(model: Model, program: Program, csharpName: s
   return fix;
 }
 
-export const singleWordModelNameRule = createRule({
-  name: "single-word-model-name",
+export const csharpNoSingleWordModelNameRule = createRule({
+  name: "csharp-no-single-word-model-name",
   description:
     "Model names should be multi-word to avoid naming collisions with .NET platform types.",
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/single-word-model-name",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-no-single-word-model-name",
   messages: {
     default: paramMessage`Model name '${"name"}' is a single word. Use a more descriptive multi-word name.`,
   },
