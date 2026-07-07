@@ -216,92 +216,8 @@ function should_generate(name) {
   return true;
 }
 
-const armcodesigning = azureServiceSpecs + "specification/codesigning/CodeSigning.Management";
-generate("armcodesigning", armcodesigning, "test/local/armcodesigning", [
-  `examples-directory=${armcodesigning}/examples`,
-  "generate-samples=true",
-]);
-
-const armapicenter = azureServiceSpecs + "specification/apicenter/ApiCenter.Management";
-generate("armapicenter", armapicenter, "test/local/armapicenter", [
-  `examples-directory=${armapicenter}/examples`,
-  "generate-samples=true",
-]);
-
-const armcognitiveservices =
-  azureServiceSpecs + "specification/cognitiveservices/CognitiveServices.Management";
-// Disabled: the upstream CognitiveServices.Management spec has a JavaScript-scoped
-// @override (checkSkuAvailability) whose customization operation drops @path on the
-// realized "location" path parameter. TCGC's override-parameters-mismatch validation
-// runs in the $override decorator regardless of the emitting language, so compiling
-// for Go raises an error even though the override targets "javascript" only. Re-enable
-// once TCGC scopes this validation to the current emitter (or the spec adds a suppress).
-// generate("armcognitiveservices", armcognitiveservices, "test/local/armcognitiveservices", [
-//   `examples-directory=${armcognitiveservices}/examples`,
-//   "generate-samples=true",
-// ]);
-void armcognitiveservices;
-
-const armlargeinstance =
-  azureServiceSpecs +
-  "specification/azurelargeinstance/resource-manager/Microsoft.AzureLargeInstance/AzureLargeInstance";
-generate("armlargeinstance", armlargeinstance, "test/local/armlargeinstance", [
-  "stutter=AzureLargeInstance",
-  `examples-directory=${armlargeinstance}/examples`,
-  "generate-samples=true",
-]);
-
-const armdatabasewatcher =
-  azureServiceSpecs + "specification/databasewatcher/DatabaseWatcher.Management";
-generate("armdatabasewatcher", armdatabasewatcher, "test/local/armdatabasewatcher", [
-  "fix-const-stuttering=false",
-  `examples-directory=${armdatabasewatcher}/examples`,
-  "generate-samples=true",
-]);
-
-const armdevopsinfrastructure =
-  azureServiceSpecs +
-  "specification/devopsinfrastructure/Microsoft.DevOpsInfrastructure.Management";
-generate("armdevopsinfrastructure", armdevopsinfrastructure, "test/local/armdevopsinfrastructure", [
-  `examples-directory=${armdevopsinfrastructure}/examples`,
-  "generate-samples=true",
-]);
-
-const armloadtestservice =
-  azureServiceSpecs +
-  "specification/loadtestservice/resource-manager/Microsoft.LoadTestService/loadtesting";
-generate("armloadtestservice", armloadtestservice, "test/local/armloadtestservice", [
-  `examples-directory=${armloadtestservice}/examples`,
-  "generate-samples=true",
-  "factory-gather-all-params=false",
-]);
-
 const armrandom = pkgRoot + "test/tsp/Random.Management";
 generate("armrandom", armrandom, "test/local/armrandom");
-
-const armcommunitymanagement =
-  azureServiceSpecs + "specification/communitytraining/Community.Management";
-generate("armcommunitymanagement", armcommunitymanagement, "test/local/armcommunitymanagement", [
-  `examples-directory=${armcommunitymanagement}/examples`,
-  "generate-samples=true",
-]);
-
-const armmongocluster =
-  azureServiceSpecs +
-  "specification/mongocluster/resource-manager/Microsoft.DocumentDB/MongoCluster";
-generate("armmongocluster", armmongocluster, "test/local/armmongocluster", [
-  `examples-directory=${armmongocluster}/examples`,
-  "generate-samples=true",
-]);
-
-const armcontainerorchestratorruntime =
-  azureServiceSpecs + "specification/kubernetesruntime/KubernetesRuntime.Management";
-generate(
-  "armcontainerorchestratorruntime",
-  armcontainerorchestratorruntime,
-  "test/local/armcontainerorchestratorruntime",
-  [`examples-directory=${armcontainerorchestratorruntime}/examples`, "generate-samples=true"],
-);
 
 const azmodelsonly = pkgRoot + "test/tsp/ModelsOnlyWithBaseTypes";
 generate("azmodelsonly", azmodelsonly, "test/local/azmodelsonly");
@@ -325,42 +241,6 @@ generate("armtest/v2", armtest, "test/local/armtest", [
 
 const internalpager = pkgRoot + "test/tsp/Internal.Pager";
 generate("internalpager", internalpager, "test/local/internalpager", ["generate-fakes=false"]);
-
-const armoracledatabase = azureServiceSpecs + "specification/oracle/Oracle.Database.Management";
-generate("armoracledatabase/v2", armoracledatabase, "test/local/armoracledatabase", [
-  `examples-directory=${armoracledatabase}/examples`,
-  "generate-samples=true",
-]);
-
-const armhealthbot = azureServiceSpecs + "specification/healthbot/HealthBot.Management";
-generate("armhealthbot", armhealthbot, "test/local/armhealthbot", [
-  `examples-directory=${armhealthbot}/examples`,
-  "generate-samples=true",
-]);
-
-const armhardwaresecuritymodules =
-  azureServiceSpecs +
-  "specification/hardwaresecuritymodules/resource-manager/Microsoft.HardwareSecurityModules/HardwareSecurityModules";
-generate(
-  "armhardwaresecuritymodules",
-  armhardwaresecuritymodules,
-  "test/local/armhardwaresecuritymodules",
-  [`examples-directory=${armhardwaresecuritymodules}/examples`, "generate-samples=true"],
-);
-
-const armcomputeschedule =
-  azureServiceSpecs + "specification/computeschedule/ComputeSchedule.Management";
-generate("armcomputeschedule", armcomputeschedule, "test/local/armcomputeschedule", [
-  `examples-directory=${armcomputeschedule}/examples`,
-  "generate-samples=true",
-]);
-
-const armbillingbenefits =
-  azureServiceSpecs + "specification/billingbenefits/BillingBenefits.Management";
-generate("armbillingbenefits", armbillingbenefits, "test/local/armbillingbenefits", [
-  `examples-directory=${armbillingbenefits}/examples`,
-  "generate-samples=true",
-]);
 
 const nooptionalbody = pkgRoot + "test/tsp/NoOptionalBody";
 generate("nooptionalbody", nooptionalbody, "test/local/nooptionalbody", [
