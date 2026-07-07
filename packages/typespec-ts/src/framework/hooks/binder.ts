@@ -22,9 +22,6 @@ export interface DeclarationInfo {
 export interface BinderOptions {
   staticHelpers?: Map<string, StaticHelperMetadata>;
   dependencies?: Record<string, ReferenceableSymbol>;
-  /** When true, use #platform/ subpath imports for static helpers with platform variants.
-   *  Should be true for warp packages; false for tshy packages. */
-  useSubpathImports?: boolean;
 }
 
 export interface Binder {

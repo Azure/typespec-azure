@@ -99,30 +99,6 @@ export function updatePackageFile(
     needsCoreClientUpdate = true;
   }
 
-  // Ensure warp packages have #platform/* imports for polyfill resolution.
-  // The `react-native` condition is only added when explicitly opted in via
-  // `generateReactNativeTarget`, matching the fresh-generation path in
-  // `getEsmEntrypointInformation` (packageCommon.ts).
-  const platformImports: Record<string, string> = {
-    browser: "./src/*-browser.mts",
-    default: "./src/*.ts",
-  };
-  if (model.options?.generateReactNativeTarget) {
-    // Insert `react-native` before `default` so Node's conditional
-    // resolution order matches the fresh-generation output.
-    packageInfo.imports = {
-      "#platform/*": {
-        browser: platformImports["browser"],
-        "react-native": "./src/*-react-native.mts",
-        default: platformImports["default"],
-      },
-    };
-  } else {
-    packageInfo.imports = {
-      "#platform/*": platformImports,
-    };
-  }
-
   // Update exports (warp: resolved exports in package.json)
   if (needsExportsUpdate) {
     packageInfo.exports = resolveWarpExports(exports, model.options?.generateReactNativeTarget);

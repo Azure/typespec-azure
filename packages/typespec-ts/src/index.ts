@@ -502,8 +502,7 @@ export async function $onEmit(context: EmitContext) {
         }),
       };
 
-      // Always update package.json (adds #platform/* imports) along with
-      // exports, clientContextPaths and LRO deps.
+      // Always update package.json exports, clientContextPaths and LRO deps.
       {
         // Read package.json content via host and pass parsed object
         const pkgSourceFile = await host.readFile(existingPackageFilePath);
