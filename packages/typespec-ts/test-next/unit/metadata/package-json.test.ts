@@ -123,7 +123,7 @@ describe("Package file generation", () => {
       expect(packageFile["//sampleConfiguration"]).toEqual(expectedSampleConfig);
     });
 
-    it("[esm] should include correct base entrypoints by default", () => {
+    it("[esm] should include correct entrypoints (without react-native by default)", () => {
       const model = createMockModel({
         ...baseConfig,
         withSamples: true,
@@ -138,9 +138,13 @@ describe("Package file generation", () => {
       expect(packageFile).to.have.property("module", "./dist/esm/index.js");
       expect(packageFile).to.have.property("types", "./dist/commonjs/index.d.ts");
       expect(packageFile).to.have.property("browser", "./dist/browser/index.js");
+      // Default: no react-native entrypoint
+      expect(packageFile).not.toHaveProperty("react-native");
       expect(packageFile).to.have.property("exports");
       expect(packageFile.exports["./package.json"]).to.equal("./package.json");
       expect(packageFile.exports["."]).to.have.property("browser");
+      // Default: no react-native in exports
+      expect(packageFile.exports["."]).not.toHaveProperty("react-native");
       expect(packageFile.exports["."]).to.have.property("import");
       expect(packageFile.exports["."]).to.have.property("require");
       expect(packageFile.exports["."]["import"]).toEqual({
@@ -149,21 +153,20 @@ describe("Package file generation", () => {
       });
     });
 
-    it("[esm] should include consistent export conditions", () => {
+    it("[esm] should include react-native entrypoints when generateReactNativeTarget is true", () => {
       const model = createMockModel({
         ...baseConfig,
         withSamples: true,
+        generateReactNativeTarget: true,
       });
       const packageFileContent = buildPackageFile(model);
       const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
 
-      expect(packageFile.exports["."]["browser"]).toEqual({
-        types: "./dist/browser/index.d.ts",
-        default: "./dist/browser/index.js",
-      });
-      expect(packageFile.exports["."]["require"]).toEqual({
-        types: "./dist/commonjs/index.d.ts",
-        default: "./dist/commonjs/index.js",
+      expect(packageFile).to.have.property("react-native", "./dist/react-native/index.js");
+      expect(packageFile.exports["."]).to.have.property("react-native");
+      expect(packageFile.exports["."]["react-native"]).toEqual({
+        types: "./dist/react-native/index.d.ts",
+        default: "./dist/react-native/index.js",
       });
     });
 
@@ -314,7 +317,7 @@ describe("Package file generation", () => {
       expect(packageFile.scripts).to.have.property("pack", "pnpm pack 2>&1");
     });
 
-    it("should include browser entrypoint by default for modular ARM packages", () => {
+    it("should include browser but not react-native entrypoints by default", () => {
       const model = createMockModel({
         ...baseConfig,
         azureArm: true,
@@ -324,21 +327,22 @@ describe("Package file generation", () => {
       const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
 
       expect(packageFile).to.have.property("browser", "./dist/browser/index.js");
-      expect(packageFile.exports["."]).to.have.property("browser");
+      // Default: no react-native entrypoint
+      expect(packageFile).not.toHaveProperty("react-native");
     });
 
-    it("should include standard export conditions for modular ARM packages", () => {
+    it("should include react-native entrypoint when generateReactNativeTarget is true", () => {
       const model = createMockModel({
         ...baseConfig,
         azureArm: true,
         isModularLibrary: true,
+        generateReactNativeTarget: true,
       });
       const packageFileContent = buildPackageFile(model);
       const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
 
       expect(packageFile).to.have.property("browser", "./dist/browser/index.js");
-      expect(packageFile.exports["."]).to.have.property("import");
-      expect(packageFile.exports["."]).to.have.property("require");
+      expect(packageFile).to.have.property("react-native", "./dist/react-native/index.js");
     });
   });
 
