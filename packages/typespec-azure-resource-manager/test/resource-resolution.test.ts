@@ -665,6 +665,115 @@ interface Employees {
       { operationGroup: "Operations", name: "list", kind: "other" },
     ]);
   });
+
+  it("does not create resolved resource from list-only operation", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+  name: string;
+}
+
+@armResourceOperations
+interface Employees {
+  listByResourceGroup is ArmResourceListByParent<Employee>;
+}
+`);
+
+    const provider = resolveArmResources(program);
+    expect(provider.resources).toHaveLength(0);
+  });
+
+  it("does not create resolved resource from action-only operation", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+  name: string;
+}
+
+model MoveRequest {
+  from: string;
+  to: string;
+}
+
+model MoveResponse {
+  movingStatus: string;
+}
+
+@armResourceOperations
+interface Employees {
+  move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
+}
+`);
+
+    const provider = resolveArmResources(program);
+    expect(provider.resources).toHaveLength(0);
+  });
+
+  it("creates resolved resource from createOrUpdate-only operation", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+  name: string;
+}
+
+@armResourceOperations
+interface Employees {
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+}
+`);
+
+    const provider = resolveArmResources(program);
+    expect(provider.resources).toHaveLength(1);
+    const employee = provider.resources![0];
+    ok(employee);
+    checkResolvedOperations(employee, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            { operationGroup: "Employees", name: "createOrUpdate", kind: "createOrUpdate" },
+          ],
+        },
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees"],
+      },
+      resourceName: "Employee",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+    });
+  });
+
   it("collects operation information for extension resources", async () => {
     const { program } = await Tester.compile(`
       using Azure.Core;
@@ -4027,7 +4136,7 @@ interface SupportTicketsNoSubscription {
     });
   });
 
-  it("merges cross-scope LegacyOperations with explicit same resource name into one resource", async () => {
+  it("separates cross-scope LegacyOperations with explicit same resource name by path", async () => {
     const { program } = await Tester.compile(`
 
 using Azure.Core;
@@ -4105,20 +4214,28 @@ interface SupportTicketsNoSubscription {
     expect(provider).toBeDefined();
     expect(provider.resources).toBeDefined();
     ok(provider.resources);
-    // Should produce 1 merged resource since both have the same explicit resource name
-    expect(provider.resources).toHaveLength(1);
+    // Same explicit resource name should not merge resources at different paths/scopes.
+    expect(provider.resources).toHaveLength(2);
 
-    const resource = provider.resources[0];
-    ok(resource);
-    expect(resource.resourceName).toEqual("SupportTickets");
+    const subResource = provider.resources.find(
+      (r) =>
+        r.resourceInstancePath ===
+        "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/supportTickets/{supportTicketName}",
+    );
+    ok(subResource);
+    expect(subResource.resourceName).toEqual("SupportTickets");
+    expect(subResource.operations.lifecycle.read).toHaveLength(1);
+    expect(subResource.operations.lists).toHaveLength(1);
 
-    // Both read operations should be present
-    expect(resource.operations.lifecycle.read).toBeDefined();
-    expect(resource.operations.lifecycle.read).toHaveLength(2);
-
-    // Both list operations should be present
-    expect(resource.operations.lists).toBeDefined();
-    expect(resource.operations.lists).toHaveLength(2);
+    const tenantResource = provider.resources.find(
+      (r) =>
+        r.resourceInstancePath ===
+        "/providers/Microsoft.ContosoProviderHub/supportTickets/{supportTicketName}",
+    );
+    ok(tenantResource);
+    expect(tenantResource.resourceName).toEqual("SupportTickets");
+    expect(tenantResource.operations.lifecycle.read).toHaveLength(1);
+    expect(tenantResource.operations.lists).toHaveLength(1);
   });
 
   it.each([

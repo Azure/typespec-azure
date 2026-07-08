@@ -58,6 +58,7 @@ import {
   resolveProviderNamespace,
 } from "./namespace.js";
 import {
+  ArmOperationIdentifier,
   ArmOperationKind,
   ArmResolvedOperationsForResource,
   ArmResourceOperation,
@@ -700,6 +701,21 @@ function normalizePathForScopeComparison(path: string): string {
     .join("/");
 }
 
+function isPathVariableSegment(segment: string): boolean {
+  return segment.startsWith("{") && segment.endsWith("}");
+}
+
+function normalizePathForResourceIdentity(path: string): string {
+  return path
+    .split("/")
+    .map((s) => (isPathVariableSegment(s) ? "{}" : s.toLowerCase()))
+    .join("/");
+}
+
+function isResourceIdentityOperation(kind: ArmOperationKind): boolean {
+  return kind === "read" || kind === "createOrUpdate";
+}
+
 function getResourceInfo(
   program: Program,
   operation: ArmResourceOperation,
@@ -963,6 +979,38 @@ export function isResourceOperationMatch(
   return true;
 }
 
+function isResourceIdentityMatch(
+  source: {
+    resourceType: ResourceType;
+    resourceInstancePath: string;
+    resourceName?: string;
+  },
+  target: {
+    resourceType: ResourceType;
+    resourceInstancePath: string;
+    resourceName?: string;
+  },
+): boolean {
+  if (
+    source.resourceName &&
+    target.resourceName &&
+    source.resourceName.toLowerCase() !== target.resourceName.toLowerCase()
+  )
+    return false;
+  if (source.resourceType.provider.toLowerCase() !== target.resourceType.provider.toLowerCase())
+    return false;
+  if (source.resourceType.types.length !== target.resourceType.types.length) return false;
+  for (let i = 0; i < source.resourceType.types.length; i++) {
+    if (source.resourceType.types[i].toLowerCase() !== target.resourceType.types[i].toLowerCase())
+      return false;
+  }
+
+  return (
+    normalizePathForResourceIdentity(source.resourceInstancePath) ===
+    normalizePathForResourceIdentity(target.resourceInstancePath)
+  );
+}
+
 export function getUnassociatedOperations(program: Program): ArmResourceOperation[] {
   return getAllOperations(program)
     .map((op) => getResourceOperation(program, op))
@@ -1039,72 +1087,103 @@ function addUniqueOperation(operation: ArmResourceOperation, operations: ArmReso
   }
 }
 
+interface ArmResourceOperationCandidate {
+  armOperation: ArmResourceOperation;
+  resourceInfo: ResolvedResourceInfo;
+  resourceNameIsExplicit: boolean;
+}
+
+function resolveArmResourceOperationCandidate(
+  program: Program,
+  resourceType: Model,
+  operation: ArmOperationIdentifier,
+): ArmResourceOperationCandidate | undefined {
+  const armOperation: ArmResourceOperation | undefined = getResourceOperation(
+    program,
+    operation.operation,
+  );
+
+  if (armOperation === undefined) return undefined;
+  armOperation.kind = operation.kind;
+  armOperation.resourceModelName = operation.resource?.name ?? resourceType.name;
+
+  const resourceInfo = getResourceInfo(program, armOperation, operation.resource ?? resourceType);
+  if (resourceInfo === undefined) return undefined;
+
+  armOperation.name = operation.name;
+  armOperation.resourceKind = operation.resourceKind;
+  const resourceNameIsExplicit = operation.resourceName !== undefined;
+  resourceInfo.resourceName =
+    operation.resourceName ??
+    getResourceNameForOperation(program, armOperation, resourceInfo.resourceInstancePath) ??
+    armOperation.resourceModelName;
+  resourceInfo.resourceNameIsExplicit = resourceNameIsExplicit;
+  armOperation.resourceName = resourceInfo.resourceName;
+
+  return { armOperation, resourceInfo, resourceNameIsExplicit };
+}
+
+function createResolvedResourceOperations(
+  resourceInfo: ResolvedResourceInfo,
+  resourceNameIsExplicit: boolean,
+): ResolvedResourceOperations {
+  return {
+    resourceType: resourceInfo.resourceType,
+    resourceInstancePath: resourceInfo.resourceInstancePath,
+    resourceName: resourceInfo.resourceName,
+    resourceNameIsExplicit: resourceNameIsExplicit,
+    operations: {
+      lifecycle: {
+        read: undefined,
+        createOrUpdate: undefined,
+        update: undefined,
+        delete: undefined,
+        checkExistence: undefined,
+      },
+      actions: [],
+      lists: [],
+    },
+    associatedOperations: [],
+  };
+}
+
 export function resolveArmResourceOperations(
   program: Program,
   resourceType: Model,
 ): ResolvedResourceOperations[] {
   const resolvedOperations: Set<ResolvedResourceOperations> = new Set<ResolvedResourceOperations>();
-  const operations = getArmResourceOperationList(program, resourceType);
-  for (const operation of operations) {
-    const armOperation: ArmResourceOperation | undefined = getResourceOperation(
-      program,
-      operation.operation,
-    );
+  const candidates = [...getArmResourceOperationList(program, resourceType)]
+    .map((operation) => resolveArmResourceOperationCandidate(program, resourceType, operation))
+    .filter((operation) => operation !== undefined);
 
-    if (armOperation === undefined) continue;
-    armOperation.kind = operation.kind;
-
-    armOperation.resourceModelName = operation.resource?.name ?? resourceType.name;
-    const resourceInfo = getResourceInfo(program, armOperation, operation.resource ?? resourceType);
-    if (resourceInfo === undefined) continue;
-    armOperation.name = operation.name;
-    armOperation.resourceKind = operation.resourceKind;
-    const resourceNameIsExplicit = operation.resourceName !== undefined;
-    resourceInfo.resourceName =
-      operation.resourceName ??
-      getResourceNameForOperation(program, armOperation, resourceInfo.resourceInstancePath) ??
-      armOperation.resourceModelName;
-    resourceInfo.resourceNameIsExplicit = resourceNameIsExplicit;
-    armOperation.resourceName = resourceInfo.resourceName;
-
+  for (const { armOperation, resourceInfo, resourceNameIsExplicit } of candidates) {
+    if (!isResourceIdentityOperation(armOperation.kind)) continue;
     let matched = false;
-    // Check if we already have an operation for this resource
     for (const resolvedOp of resolvedOperations) {
-      if (isResourceOperationMatch(resourceInfo, resolvedOp)) {
+      if (isResourceIdentityMatch(resourceInfo, resolvedOp)) {
         matched = true;
-        if (tryAddLifecycleOperation(resourceInfo.resourceType, armOperation, resolvedOp)) {
-          continue;
-        }
-        addAssociatedOperation(armOperation, resolvedOp);
+        tryAddLifecycleOperation(resourceInfo.resourceType, armOperation, resolvedOp);
         continue;
       }
     }
 
     if (matched) continue;
-    // If we don't have an operation for this resource, create a new one
-    const newResource: ResolvedResourceOperations = {
-      resourceType: resourceInfo.resourceType,
-      resourceInstancePath: resourceInfo.resourceInstancePath,
-      resourceName: resourceInfo.resourceName,
-      resourceNameIsExplicit: resourceNameIsExplicit,
-      operations: {
-        lifecycle: {
-          read: undefined,
-          createOrUpdate: undefined,
-          update: undefined,
-          delete: undefined,
-          checkExistence: undefined,
-        },
-        actions: [],
-        lists: [],
-      },
-      associatedOperations: [],
-    };
-    if (!tryAddLifecycleOperation(resourceInfo.resourceType, armOperation, newResource)) {
-      addAssociatedOperation(armOperation, newResource);
-    }
+    const newResource = createResolvedResourceOperations(resourceInfo, resourceNameIsExplicit);
+    tryAddLifecycleOperation(resourceInfo.resourceType, armOperation, newResource);
     resolvedOperations.add(newResource);
   }
+
+  for (const { armOperation, resourceInfo } of candidates) {
+    if (isResourceIdentityOperation(armOperation.kind)) continue;
+    for (const resolvedOp of resolvedOperations) {
+      if (isResourceIdentityMatch(resourceInfo, resolvedOp)) {
+        if (!tryAddLifecycleOperation(resourceInfo.resourceType, armOperation, resolvedOp)) {
+          addAssociatedOperation(armOperation, resolvedOp);
+        }
+      }
+    }
+  }
+
   return [...resolvedOperations.values()].toSorted((a, b) => {
     // Sort by provider, type, then instance path
     if (a.resourceType.types.length < b.resourceType.types.length) return -1;
