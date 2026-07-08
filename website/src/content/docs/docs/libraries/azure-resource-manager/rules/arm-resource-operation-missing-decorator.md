@@ -38,10 +38,46 @@ interface FooResources {
 
 #### ✅ Correct
 
+Using standard ARM resource operation templates (recommended):
+
 ```tsp
 @armResourceOperations
 interface FooResources {
   get is ArmResourceRead<FooResource>;
   createOrUpdate is ArmResourceCreateOrReplaceAsync<FooResource>;
+  update is ArmResourcePatchAsync<FooResource, FooResourceProperties>;
+  delete is ArmResourceDeleteWithoutOkAsync<FooResource>;
+  list is ArmResourceListByParent<FooResource>;
+}
+```
+
+Or adding the correct decorator for each HTTP verb explicitly:
+
+```tsp
+@armResourceOperations
+interface FooResources {
+  @armResourceRead(FooResource)
+  @get
+  get(...ResourceInstanceParameters<FooResource>): ArmResponse<FooResource>;
+
+  @armResourceCreateOrUpdate(FooResource)
+  @put
+  createOrUpdate(
+    ...ResourceInstanceParameters<FooResource>,
+    @bodyRoot resource: FooResource,
+  ): ArmResponse<FooResource>;
+
+  @armResourceDelete(FooResource)
+  @delete
+  delete(...ResourceInstanceParameters<FooResource>): void;
+
+  @armResourceList(FooResource)
+  @get
+  list(...SubscriptionIdParameter, ...ResourceGroupParameter): ArmResponse<FooResourceListResult>;
+
+  @armResourceAction(FooResource)
+  @action
+  @post
+  myAction(...ResourceInstanceParameters<FooResource>): ArmResponse<FooResource>;
 }
 ```
