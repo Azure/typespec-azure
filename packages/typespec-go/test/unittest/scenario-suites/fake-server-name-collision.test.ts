@@ -2,4 +2,6 @@
 import { resolvePath } from "@typespec/compiler";
 import { describeScenarioFile } from "../scenario-runner.js";
 
-describeScenarioFile(resolvePath(import.meta.dirname, "../scenarios/fake-server-name-collision.md"));
+describeScenarioFile(
+  resolvePath(import.meta.dirname, "../scenarios/fake-server-name-collision.md"),
+);

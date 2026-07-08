@@ -2,4 +2,6 @@
 import { resolvePath } from "@typespec/compiler";
 import { describeScenarioFile } from "../scenario-runner.js";
 
-describeScenarioFile(resolvePath(import.meta.dirname, "../scenarios/client-option-preserve-content-type.md"));
+describeScenarioFile(
+  resolvePath(import.meta.dirname, "../scenarios/client-option-preserve-content-type.md"),
+);

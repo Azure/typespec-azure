@@ -78,10 +78,9 @@ interface ParameterGroupOperations {
 
   @post
   @armResourceAction(Widget)
-  queryParameterGroup(
-    ...ResourceInstanceParameters<Widget>,
-    params: `test-query-params`,
-  ): ArmResponse<Widget> | ErrorResponse;
+  queryParameterGroup(...ResourceInstanceParameters<Widget>, params: `test-query-params`):
+    | ArmResponse<Widget>
+    | ErrorResponse;
 }
 ```
 

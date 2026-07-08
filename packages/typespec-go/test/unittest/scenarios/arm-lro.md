@@ -43,15 +43,17 @@ interface LRO {
   @post
   okResponseWithAsyncHeader is ArmResourceCreateOrReplaceAsync<
     TestLROModel,
-    Response = (ArmResponse<TestLROModel> & ArmCombinedLroHeaders<FinalResult = TestLROModel>) | (ArmCreatedResponse<TestLROModel> &
-      ArmCombinedLroHeaders<FinalResult = TestLROModel>)
+    Response =
+      | (ArmResponse<TestLROModel> & ArmCombinedLroHeaders<FinalResult = TestLROModel>)
+      | (ArmCreatedResponse<TestLROModel> & ArmCombinedLroHeaders<FinalResult = TestLROModel>)
   >;
 
   scalarResult is ArmResourceActionAsync<
     TestLROModel,
     ActionRequest,
     string,
-    LroHeaders = ArmCombinedLroHeaders<FinalResult = string> & Azure.Core.Foundations.RetryAfterHeader
+    LroHeaders = ArmCombinedLroHeaders<FinalResult = string> &
+      Azure.Core.Foundations.RetryAfterHeader
   >;
 }
 ```

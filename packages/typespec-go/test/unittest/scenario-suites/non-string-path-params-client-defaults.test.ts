@@ -2,4 +2,6 @@
 import { resolvePath } from "@typespec/compiler";
 import { describeScenarioFile } from "../scenario-runner.js";
 
-describeScenarioFile(resolvePath(import.meta.dirname, "../scenarios/non-string-path-params-client-defaults.md"));
+describeScenarioFile(
+  resolvePath(import.meta.dirname, "../scenarios/non-string-path-params-client-defaults.md"),
+);

@@ -2,4 +2,6 @@
 import { resolvePath } from "@typespec/compiler";
 import { describeScenarioFile } from "../scenario-runner.js";
 
-describeScenarioFile(resolvePath(import.meta.dirname, "../scenarios/invalid-go-identifier-params.md"));
+describeScenarioFile(
+  resolvePath(import.meta.dirname, "../scenarios/invalid-go-identifier-params.md"),
+);

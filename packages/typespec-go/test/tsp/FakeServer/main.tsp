@@ -3,9 +3,13 @@ import "@typespec/http";
 using TypeSpec.Http;
 
 @service(#{ title: "Fake server runtime tests" })
-@server("{endpoint}", "Fake server endpoint", {
-  endpoint: url,
-})
+@server(
+  "{endpoint}",
+  "Fake server endpoint",
+  {
+    endpoint: url,
+  }
+)
 namespace Emitter.FakeServer;
 
 /**

@@ -53,6 +53,9 @@ function main() {
   console.log(`Generated ${names.length} scenario suite file(s) in ${SUITES_DIR}`);
 }
 
-if (import.meta.url === `file://${process.argv[1]}` || process.argv[1] === fileURLToPath(import.meta.url)) {
+if (
+  import.meta.url === `file://${process.argv[1]}` ||
+  process.argv[1] === fileURLToPath(import.meta.url)
+) {
   main();
 }

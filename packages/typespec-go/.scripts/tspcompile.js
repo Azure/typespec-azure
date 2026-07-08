@@ -216,8 +216,6 @@ function should_generate(name) {
   return true;
 }
 
-
-
 const azkeys = azureServiceSpecs + "specification/keyvault/data-plane/Keys/client.tsp";
 generate("azkeys", azkeys, "test/local/azkeys", ["single-client=true", "omit-constructors=true"]);
 
@@ -236,8 +234,6 @@ generate("gogenerate", gogenerate, "test/local/gogenerate", [
 
 const fakeserver = pkgRoot + "test/tsp/FakeServer";
 generate("fakeserver", fakeserver, "test/local/fakeserver");
-
-
 
 loopSpec(httpSpecsGroup, httpSpecs, "test/http-specs");
 loopSpec(azureHttpSpecsGroup, azureHttpSpecs, "test/azure-http-specs");

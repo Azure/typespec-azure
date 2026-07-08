@@ -16,8 +16,8 @@ import { readdirSync, readFileSync, statSync, writeFileSync } from "fs";
 import path from "path";
 import { assert, describe, it } from "vitest";
 import * as codegen from "../../src/codegen/index.js";
-import { Adapter } from "../../src/tcgcadapter/adapter.js";
 import type { GoEmitterOptions } from "../../src/lib.js";
+import { Adapter } from "../../src/tcgcadapter/adapter.js";
 
 const SCENARIOS_UPDATE = process.env["SCENARIOS_UPDATE"] === "true";
 
@@ -396,9 +396,7 @@ export function describeScenarioFile(scenarioFile: string): void {
         continue;
       }
       (scenario.only ? describe.only : describe)(scenario.heading, () => {
-        const codeBlocks = scenario.parts.filter(
-          (x): x is CodeScenarioPart => x.kind === "code",
-        );
+        const codeBlocks = scenario.parts.filter((x): x is CodeScenarioPart => x.kind === "code");
         const tspBlocks = codeBlocks.filter(
           (x) => x.heading.startsWith("tsp") || x.heading.startsWith("typespec"),
         );
