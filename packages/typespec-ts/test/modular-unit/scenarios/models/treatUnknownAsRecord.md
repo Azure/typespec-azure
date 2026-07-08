@@ -19,7 +19,7 @@ treat-unknown-as-record: true
 ## Models
 
 ```ts models interface Foo
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -49,7 +49,7 @@ op read(): Foo;
 ## Models
 
 ```ts models interface Foo
-/**
+/*
  * This file contains only generated model types and their (de)serializers.
  * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
  */
@@ -117,7 +117,6 @@ export async function _getAnyDeserialize(
 
   return result.body;
 }
-
 export async function getAny(
   context: Client,
   options: GetAnyOptionalParams = { requestOptions: {} },

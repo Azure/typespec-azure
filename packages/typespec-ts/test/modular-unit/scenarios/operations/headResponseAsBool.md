@@ -64,7 +64,6 @@ export async function _headResourceDeserialize(
 
   return { body: result.status.startsWith("2") };
 }
-
 export async function headResource(
   context: Client,
   resourceName: string,
@@ -132,7 +131,6 @@ export async function _headResourceDeserialize(result: PathUncheckedResponse): P
 
   return result.status.startsWith("2");
 }
-
 export async function headResource(
   context: Client,
   resourceName: string,

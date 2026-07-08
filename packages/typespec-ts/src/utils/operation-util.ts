@@ -26,21 +26,17 @@ import {
   HttpStatusCodesEntry,
 } from "@typespec/http";
 import { resolveReference } from "../framework/reference.js";
-import { reportDiagnostic } from "../lib.js";
-import { SerializationHelpers } from "../modular/static-helpers-metadata.js";
 import {
-  getLroLogicalResponseName,
-  getResponseTypeName,
-  NameType,
-  normalizeName,
   OPERATION_LRO_HIGH_PRIORITY,
   OPERATION_LRO_LOW_PRIORITY,
   OperationLroDetail,
   Paths,
   ResponseMetadata,
   ResponseTypes,
-} from "../rlc-common/index.js";
-import { listOperationsUnderRLCClient } from "./client-utils.js";
+} from "../interfaces.js";
+import { reportDiagnostic } from "../lib.js";
+import { SerializationHelpers } from "../modular/static-helpers-metadata.js";
+import { listOperationsUnderClient } from "./client-utils.js";
 import { SdkContext } from "./interfaces.js";
 import {
   isMediaTypeMultipart,
@@ -49,6 +45,8 @@ import {
   knownMediaType,
 } from "./media-types.js";
 import { isByteOrByteUnion } from "./model-utils.js";
+import { getLroLogicalResponseName, getResponseTypeName } from "./name-constructors.js";
+import { NameType, normalizeName } from "./name-utils.js";
 import { getOperationNamespaceInterfaceName } from "./namespace-utils.js";
 
 // Sorts the responses by status code
@@ -135,7 +133,7 @@ export function getOperationGroupName(
   dpgContext: SdkContext,
   operationOrRoute?: Operation | HttpOperation,
 ) {
-  if (!dpgContext.rlcOptions?.enableOperationGroup || !operationOrRoute) {
+  if (!dpgContext.emitterOptions?.enableOperationGroup || !operationOrRoute) {
     return "";
   }
   // If this is a HttpOperation
@@ -320,7 +318,7 @@ export function extractOperationLroDetail(
 
 export function hasPollingOperations(client: SdkClient, dpgContext: SdkContext) {
   const program = dpgContext.program;
-  for (const op of listOperationsUnderRLCClient(client)) {
+  for (const op of listOperationsUnderClient(client)) {
     const route = getHttpOperationWithCache(dpgContext, op);
     // ignore overload base operation
     if (route.overloads && route.overloads?.length > 0) {
@@ -437,7 +435,7 @@ function findRootSourceProperty(property: ModelProperty): ModelProperty {
 }
 
 export function hasPagingOperations(client: SdkClient, dpgContext: SdkContext) {
-  for (const op of listOperationsUnderRLCClient(client)) {
+  for (const op of listOperationsUnderClient(client)) {
     const route = getHttpOperationWithCache(dpgContext, op);
     // ignore overload base operation
     if (route.overloads && route.overloads?.length > 0) {
@@ -452,7 +450,7 @@ export function hasPagingOperations(client: SdkClient, dpgContext: SdkContext) {
 
 export function hasCollectionFormatInfo(paramType: string, paramFormat: string) {
   return (
-    getHasMultiCollection(paramType, paramFormat, false) ||
+    getHasMultiCollection(paramType, paramFormat) ||
     getHasSsvCollection(paramType, paramFormat) ||
     getHasTsvCollection(paramType, paramFormat) ||
     getHasCsvCollection(paramType, paramFormat) ||
@@ -461,17 +459,8 @@ export function hasCollectionFormatInfo(paramType: string, paramFormat: string) 
   );
 }
 
-export function getSpecialSerializeInfo(
-  dpgContext: SdkContext,
-  paramType: string,
-  paramFormat: string,
-) {
-  const hasMultiCollection = getHasMultiCollection(
-    paramType,
-    paramFormat,
-    // Include query multi support in compatibility mode
-    dpgContext.rlcOptions?.compatibilityQueryMultiFormat ?? false,
-  );
+export function getSpecialSerializeInfo(paramType: string, paramFormat: string) {
+  const hasMultiCollection = getHasMultiCollection(paramType, paramFormat);
   const hasCsvCollection = getHasCsvCollection(paramType, paramFormat);
   const descriptions = [];
   const collectionInfo = [];
@@ -492,11 +481,8 @@ export function getSpecialSerializeInfo(
   };
 }
 
-function getHasMultiCollection(paramType: string, paramFormat: string, includeQuery = true) {
-  return (
-    ((includeQuery && paramType === "query") || paramType === "header") &&
-    paramFormat === KnownCollectionFormat.Multi
-  );
+function getHasMultiCollection(paramType: string, paramFormat: string) {
+  return paramType === "header" && paramFormat === KnownCollectionFormat.Multi;
 }
 function getHasSsvCollection(paramType: string, paramFormat: string) {
   return (
@@ -644,8 +630,8 @@ export function getMethodHierarchiesMap(
       continue;
     }
     const prefixes =
-      context.rlcOptions?.hierarchyClient === false &&
-      context.rlcOptions?.enableOperationGroup &&
+      context.emitterOptions?.hierarchyClient === false &&
+      context.emitterOptions?.enableOperationGroup &&
       method[0].length > 0
         ? [method[0][method[0].length - 1] as string]
         : method[0];
@@ -668,13 +654,13 @@ export function getMethodHierarchiesMap(
       }
     } else {
       const prefixKey =
-        context.rlcOptions?.hierarchyClient || context.rlcOptions?.enableOperationGroup
+        context.emitterOptions?.hierarchyClient || context.emitterOptions?.enableOperationGroup
           ? prefixes.join("/")
           : "";
       const groupName = prefixes.map((p) => normalizeName(p, NameType.OperationGroup)).join("");
       if (
-        context.rlcOptions?.hierarchyClient === false &&
-        context.rlcOptions?.enableOperationGroup &&
+        context.emitterOptions?.hierarchyClient === false &&
+        context.emitterOptions?.enableOperationGroup &&
         groupName !== "" &&
         !operationOrGroup.name.startsWith(groupName + "_")
       ) {

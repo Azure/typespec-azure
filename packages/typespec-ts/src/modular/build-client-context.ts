@@ -1,4 +1,3 @@
-import { NameType, isAzurePackage, normalizeName } from "../rlc-common/index.js";
 import {
   buildGetClientCredentialParam,
   buildGetClientEndpointParam,
@@ -24,8 +23,9 @@ import { useDependencies } from "../framework/hooks/use-dependencies.js";
 import { resolveReference } from "../framework/reference.js";
 import { refkey } from "../framework/refkey.js";
 import { reportDiagnostic } from "../lib.js";
-import { getModularClientOptions } from "../utils/client-utils.js";
+import { getClientModuleInfo } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
+import { NameType, normalizeName } from "../utils/name-utils.js";
 import { buildEnumTypes, getApiVersionEnum } from "./emit-models.js";
 import { getDocsFromDescription } from "./helpers/docs-helpers.js";
 import { getClassicalClientName, getClientName } from "./helpers/naming-helpers.js";
@@ -40,7 +40,7 @@ export function getClientContextPath(
   emitterOptions: ModularEmitterOptions,
 ): string {
   const [_, client] = clientMap;
-  const { subfolder } = getModularClientOptions(clientMap);
+  const { subfolder } = getClientModuleInfo(clientMap);
   const name = getClientName(client);
   const srcPath = emitterOptions.modularOptions.sourceRoot;
   const contentPath = `${srcPath}/${
@@ -61,7 +61,7 @@ export function buildClientContext(
   const dependencies = useDependencies();
   const [hierarchy, client] = clientMap;
   const name = getClientName(client);
-  const { rlcClientName } = getModularClientOptions(clientMap);
+  const { clientName } = getClientModuleInfo(clientMap);
   const requiredParams = getClientParametersDeclaration(client, dpgContext, {
     onClientOnly: false,
     requiredOnly: true,
@@ -116,7 +116,7 @@ export function buildClientContext(
 
   clientContextFile.addInterface({
     isExported: true,
-    name: `${rlcClientName}`,
+    name: `${clientName}`,
     extends: [resolveReference(dependencies.Client)],
     docs: getDocsFromDescription(client.doc),
     properties: [...requiredInterfaceProperties, ...optionalInterfaceProperties],
@@ -164,18 +164,15 @@ export function buildClientContext(
   });
 
   // TODO use binder here
-  // (for now) now logger for unbranded pkgs
-  if (isAzurePackage(emitterOptions)) {
-    clientContextFile.addImportDeclaration({
-      moduleSpecifier: "../".repeat(hierarchy.length + 1) + "logger.js",
-      namedImports: ["logger"],
-    });
-  }
+  clientContextFile.addImportDeclaration({
+    moduleSpecifier: "../".repeat(hierarchy.length + 1) + "logger.js",
+    namedImports: ["logger"],
+  });
 
   const factoryFunction = clientContextFile.addFunction({
     docs: getDocsFromDescription(client.doc),
     name: `create${name}`,
-    returnType: `${rlcClientName}`,
+    returnType: `${clientName}`,
     parameters: getClientParametersDeclaration(client, dpgContext, {
       onClientOnly: false,
       requiredOnly: true,
@@ -241,15 +238,10 @@ export function buildClientContext(
     if (!apiVersionInEndpoint && apiVersionParam.clientDefaultValue) {
       apiVersionStatement += `const ${apiVersionParamName} = options.${apiVersionParamName};`;
     }
-  } else if (isAzurePackage(emitterOptions)) {
-    apiVersionStatement += `
-        if (options.apiVersion) {
-          logger.warning("This client does not support client api-version, please change it at the operation level");
-        }`;
   } else {
     apiVersionStatement += `
         if (options.apiVersion) {
-          console.warn("This client does not support client api-version, please change it at the operation level");
+          logger.warning("This client does not support client api-version, please change it at the operation level");
         }`;
   }
   factoryFunction.addStatements(apiVersionStatement);
@@ -294,7 +286,7 @@ export function buildClientContext(
 
   if (allContextParams.length) {
     factoryFunction.addStatements(
-      `return { ...clientContext, ${allContextParams.join(", ")}} as ${rlcClientName};`,
+      `return { ...clientContext, ${allContextParams.join(", ")}} as ${clientName};`,
     );
   } else {
     factoryFunction.addStatements(`return clientContext;`);

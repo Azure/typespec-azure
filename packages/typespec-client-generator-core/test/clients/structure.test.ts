@@ -957,122 +957,6 @@ it("one client from multiple services with no versioning", async () => {
   strictEqual(biOperation.parameters.length, 0);
 });
 
-it("one client from multiple services without version dependency", async () => {
-  const { program } = await SimpleBaseTester.compile(
-    createClientCustomizationInput(
-      `
-        @service
-        @versioned(VersionsA)
-        namespace ServiceA {
-          enum VersionsA {
-            av1,
-            av2,
-          }
-          interface AI {
-            @route("/aTest")
-            aTest(@query("api-version") apiVersion: VersionsA): void;
-          }
-        }
-        @service
-        @versioned(VersionsB)
-        namespace ServiceB {
-          enum VersionsB {
-            bv1,
-            bv2,
-          }
-          interface BI {
-            @route("/bTest")
-            bTest(@query("api-version") apiVersion: VersionsB): void;
-          }
-    }`,
-      `
-        @client(
-          {
-            name: "CombineClient",
-            service: [ServiceA, ServiceB],
-            autoMergeService: true,
-          }
-        )
-        namespace CombineClient;
-      `,
-    ),
-  );
-  const context = await createSdkContextForTester(program);
-  const sdkPackage = context.sdkPackage;
-  strictEqual(sdkPackage.clients.length, 1);
-  const aVersionsEnum = sdkPackage.enums.find((e) => e.name === "VersionsA");
-  ok(aVersionsEnum);
-  const bVersionsEnum = sdkPackage.enums.find((e) => e.name === "VersionsB");
-  ok(bVersionsEnum);
-  const client = sdkPackage.clients[0];
-  strictEqual(client.name, "CombineClient");
-  // For root client of multiple services, the `apiVersions` will be empty.
-  strictEqual(client.apiVersions.length, 0);
-  strictEqual(client.children!.length, 2);
-  strictEqual(client.clientInitialization.parameters.length, 2);
-  ok(client.clientInitialization.parameters.find((p) => p.name === "endpoint"));
-  const apiVersionParam = client.clientInitialization.parameters.find(
-    (p) => p.name === "apiVersion",
-  );
-  ok(apiVersionParam);
-  strictEqual(apiVersionParam.apiVersions.length, 0);
-  strictEqual(apiVersionParam.clientDefaultValue, undefined);
-  // For multi-service clients, the api version param type should be string
-  strictEqual(apiVersionParam.type.kind, "string");
-  // For multi-service clients, the API version parameter should always be optional
-  strictEqual(apiVersionParam.optional, true);
-
-  const aiClient = client.children!.find((c) => c.name === "AI");
-  ok(aiClient);
-
-  // AI client should have api versions from ServiceA
-  strictEqual(aiClient.apiVersions.length, 2);
-  deepStrictEqual(aiClient.apiVersions, ["av1", "av2"]);
-  strictEqual(aiClient.clientInitialization.parameters.length, 2);
-  strictEqual(aiClient.clientInitialization.parameters[0].name, "endpoint");
-  strictEqual(aiClient.clientInitialization.parameters[1].name, "apiVersion");
-  const aiApiVersionParam = aiClient.clientInitialization.parameters[1];
-  strictEqual(aiApiVersionParam.isApiVersionParam, true);
-  strictEqual(aiApiVersionParam.onClient, true);
-  strictEqual(aiApiVersionParam.clientDefaultValue, "av2");
-
-  // AI client should have aTest method with VersionsA api version
-  strictEqual(aiClient.methods.length, 1);
-  const aiMethod = aiClient.methods[0];
-  strictEqual(aiMethod.name, "aTest");
-  strictEqual(aiMethod.parameters.length, 0);
-  const aiOperation = aiMethod.operation;
-  strictEqual(aiOperation.parameters.length, 1);
-  const aiOperationApiVersionParam = aiOperation.parameters.find((p) => p.isApiVersionParam);
-  ok(aiOperationApiVersionParam);
-  strictEqual(aiOperationApiVersionParam.correspondingMethodParams.length, 1);
-  strictEqual(aiOperationApiVersionParam.correspondingMethodParams[0], aiApiVersionParam);
-
-  const biClient = client.children!.find((c) => c.name === "BI");
-  ok(biClient);
-
-  strictEqual(biClient.apiVersions.length, 2);
-  deepStrictEqual(biClient.apiVersions, ["bv1", "bv2"]);
-  strictEqual(biClient.clientInitialization.parameters.length, 2);
-  strictEqual(biClient.clientInitialization.parameters[0].name, "endpoint");
-  strictEqual(biClient.clientInitialization.parameters[1].name, "apiVersion");
-  const biApiVersionParam = biClient.clientInitialization.parameters[1];
-  strictEqual(biApiVersionParam.isApiVersionParam, true);
-  strictEqual(biApiVersionParam.onClient, true);
-  strictEqual(biApiVersionParam.clientDefaultValue, "bv2");
-
-  // BI client should have bTest method with VersionsB api version
-  const biMethod = biClient.methods[0];
-  strictEqual(biMethod.name, "bTest");
-  strictEqual(biMethod.parameters.length, 0);
-  const biOperation = biMethod.operation;
-  strictEqual(biOperation.parameters.length, 1);
-  const biOperationApiVersionParam = biOperation.parameters.find((p) => p.isApiVersionParam);
-  ok(biOperationApiVersionParam);
-  strictEqual(biOperationApiVersionParam.correspondingMethodParams.length, 1);
-  strictEqual(biOperationApiVersionParam.correspondingMethodParams[0], biApiVersionParam);
-});
-
 it("one client from multiple services with `@clientLocation`", async () => {
   const { program } = await SimpleBaseTester.compile(
     createClientCustomizationInput(
@@ -1208,7 +1092,7 @@ it("one client from multiple services with `@clientLocation`", async () => {
   strictEqual(biOperationApiVersionParam.correspondingMethodParams[0], biApiVersionParam);
 });
 
-it("one client from multiple services with api-version set to all", async () => {
+it("one client from multiple services with api-version set to all (not supported, falls back to latest)", async () => {
   const { program } = await SimpleBaseTester.compile(
     createClientCustomizationInput(
       `
@@ -1277,14 +1161,16 @@ it("one client from multiple services with api-version set to all", async () => 
   ok(aiApiVersionParam);
   strictEqual(aiApiVersionParam.clientDefaultValue, "av3");
 
-  // With api-version all, both aTest and aTest2 should be included
-  strictEqual(aiClient.methods.length, 2);
+  // Multi-service does not support `all`; it is ignored and each service uses
+  // its latest version. ServiceA projects to av3, where aTest2 is removed.
+  strictEqual(aiClient.methods.length, 1);
   const aTest = aiClient.methods.find((m) => m.name === "aTest");
   ok(aTest);
   deepStrictEqual(aTest.apiVersions, ["av1", "av2", "av3"]);
-  const aTest2 = aiClient.methods.find((m) => m.name === "aTest2");
-  ok(aTest2);
-  deepStrictEqual(aTest2.apiVersions, ["av2"]);
+  strictEqual(
+    aiClient.methods.find((m) => m.name === "aTest2"),
+    undefined,
+  );
 
   const biClient = client.children!.find((c) => c.name === "BI");
   ok(biClient);

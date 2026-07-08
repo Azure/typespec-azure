@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.69.1
+
+### Bug Fixes
+
+- Add support for the `@scope` TCGC decorator. Operations, model properties, and parameters that are scoped out of the autorest emitter are now omitted from the generated swagger output.
+
+
 ## 0.69.0
 
 ### Features

@@ -95,7 +95,6 @@ export async function _updateKeyDeserialize(result: PathUncheckedResponse): Prom
 
   return keyBundleDeserializer(result.body);
 }
-
 /** The most basic operation. */
 export async function updateKey(
   context: Client,

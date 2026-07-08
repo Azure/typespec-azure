@@ -2,9 +2,14 @@ import { SdkClientType, SdkServiceOperation } from "@azure-tools/typespec-client
 import { joinPaths } from "@typespec/compiler";
 import { ModularEmitterOptions } from "./interfaces.js";
 
-import { Node, SourceFile } from "ts-morph";
+import { Node, SourceFile, StructureKind } from "ts-morph";
 import { useContext } from "../context-manager.js";
-import { getModularClientOptions } from "../utils/client-utils.js";
+import {
+  beginSourceFileBatch,
+  enqueueStatement,
+  flushSourceFileBatch,
+} from "../framework/source-file-batch.js";
+import { getClientModuleInfo } from "../utils/client-utils.js";
 
 export interface buildSubpathIndexFileOptions {
   exportIndex?: boolean;
@@ -18,8 +23,22 @@ export function buildSubpathIndexFile(
   clientMap?: [string[], SdkClientType<SdkServiceOperation>],
   options: buildSubpathIndexFileOptions = {},
 ) {
+  beginSourceFileBatch();
+  try {
+    buildSubpathIndexFileImpl(emitterOptions, subpath, clientMap, options);
+  } finally {
+    flushSourceFileBatch();
+  }
+}
+
+function buildSubpathIndexFileImpl(
+  emitterOptions: ModularEmitterOptions,
+  subpath: string,
+  clientMap?: [string[], SdkClientType<SdkServiceOperation>],
+  options: buildSubpathIndexFileOptions = {},
+) {
   const project = useContext("outputProject");
-  const subfolder = clientMap ? (getModularClientOptions(clientMap).subfolder ?? "") : "";
+  const subfolder = clientMap ? (getClientModuleInfo(clientMap).subfolder ?? "") : "";
   const srcPath = emitterOptions.modularOptions.sourceRoot;
   // Skip to export these files because they are used internally.
   const skipFiles = ["pagingHelpers.ts", "pollingHelpers.ts"];
@@ -137,14 +156,16 @@ export function partitionAndEmitExports(
     }
   }
   if (typeOnlyExports.length > 0) {
-    indexFile.addExportDeclaration({
+    enqueueStatement(indexFile, {
+      kind: StructureKind.ExportDeclaration,
       isTypeOnly: true,
       moduleSpecifier,
       namedExports: typeOnlyExports,
     });
   }
   if (valueExports.length > 0) {
-    indexFile.addExportDeclaration({
+    enqueueStatement(indexFile, {
+      kind: StructureKind.ExportDeclaration,
       moduleSpecifier,
       namedExports: valueExports,
     });

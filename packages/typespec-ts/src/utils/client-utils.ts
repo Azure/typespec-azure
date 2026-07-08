@@ -14,18 +14,17 @@ import {
   Namespace,
   Operation,
 } from "@typespec/compiler";
-import { ModularClientOptions } from "../modular/interfaces.js";
-import { NameType, normalizeName } from "../rlc-common/index.js";
+import { ClientModuleInfo } from "../modular/interfaces.js";
 import { SdkContext } from "./interfaces.js";
+import { NameType, normalizeName } from "./name-utils.js";
 
-export function getRLCClients(dpgContext: SdkContext, isModularLibrary?: boolean): SdkClient[] {
-  const modular = isModularLibrary ?? dpgContext.rlcOptions?.isModularLibrary ?? false;
+export function getClients(dpgContext: SdkContext): SdkClient[] {
   const clients = listClients(dpgContext);
   const rawServiceNamespaces =
     dpgContext.allServiceNamespaces ?? listAllServiceNamespaces(dpgContext);
 
-  // For one client in Modular: Return the client from listClients with multi-service support
-  if (modular && clients.length === 1) {
+  // For one client: Return the client from listClients with multi-service support
+  if (clients.length === 1) {
     return clients.map((client) => {
       const services = client.services;
       return {
@@ -35,7 +34,7 @@ export function getRLCClients(dpgContext: SdkContext, isModularLibrary?: boolean
       };
     });
   } else {
-    // For RLC and multiple clients in Modular:
+    // For multiple clients:
     // Flatten all services and return one client per service
     const services = new Set<Namespace>();
     clients.forEach((c) => {
@@ -80,7 +79,7 @@ export function getRLCClients(dpgContext: SdkContext, isModularLibrary?: boolean
   });
 }
 
-export function listOperationsUnderRLCClient(client: SdkClient): Operation[] {
+export function listOperationsUnderClient(client: SdkClient): Operation[] {
   const operations = [];
   const serviceArray = client.services;
   const queue: (Namespace | Interface)[] = [...serviceArray];
@@ -111,17 +110,17 @@ export function listOperationsUnderRLCClient(client: SdkClient): Operation[] {
   return operations;
 }
 
-export function isRLCMultiEndpoint(dpgContext: SdkContext): boolean {
-  return getRLCClients(dpgContext).length > 1;
+export function isMultiEndpointClient(dpgContext: SdkContext): boolean {
+  return getClients(dpgContext).length > 1;
 }
 
-export function getModularClientOptions(clientMap: [string[], SdkClientType<SdkServiceOperation>]) {
+export function getClientModuleInfo(clientMap: [string[], SdkClientType<SdkServiceOperation>]) {
   const [hierarchy, client] = clientMap;
-  const clientOptions: ModularClientOptions = {
-    rlcClientName: `${client.name.replace(/Client$/, "")}Context`,
+  const clientModuleInfo: ClientModuleInfo = {
+    clientName: `${client.name.replace(/Client$/, "")}Context`,
   };
-  clientOptions.subfolder = hierarchy.join("/");
-  return clientOptions;
+  clientModuleInfo.subfolder = hierarchy.join("/");
+  return clientModuleInfo;
 }
 
 export function getClientHierarchyMap(
