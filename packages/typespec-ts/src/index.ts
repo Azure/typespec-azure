@@ -10,7 +10,7 @@ import {
   resolvePath,
   type CompilerHost,
 } from "@typespec/compiler";
-import { provideContext, useContext } from "./context-manager.js";
+import { clearContexts, provideContext, useContext } from "./context-manager.js";
 import { buildRootIndex, buildSubClientIndexFile } from "./modular/build-root-index.js";
 import {
   AzureCoreDependencies,
@@ -43,7 +43,7 @@ import {
 } from "@azure-tools/typespec-client-generator-core";
 import { Project } from "ts-morph";
 import { provideBinder } from "./framework/hooks/binder.js";
-import { provideSdkTypes } from "./framework/hooks/sdk-types.js";
+import { provideSdkTypes, resetSdkTypesState } from "./framework/hooks/sdk-types.js";
 import { loadStaticHelpers } from "./framework/load-static-helpers.js";
 import { ClientModel, ClientOptions } from "./interfaces.js";
 import { EmitterOptions } from "./lib.js";
@@ -187,6 +187,15 @@ export async function $onEmit(context: EmitContext) {
   }
 
   await generateMetadataAndTest(dpgContext);
+
+  // Release the emitter's process-wide singleton state now that this emit has
+  // finished writing output. Without this, the context manager keeps the whole
+  // previous program graph (compiler `EmitContext`/`Program`, TCGC `SdkContext`,
+  // ts-morph `Project`, binder, …) reachable until the next emit overwrites it.
+  // Clearing here lets it be collected between emits, which matters for hosts
+  // that run many emits in one process (test suites, benchmarks, watch mode).
+  clearContexts();
+  resetSdkTypesState();
 
   async function enrichDpgContext() {
     const generationPathDetail: GenerationDirDetail = await calculateGenerationDir();
