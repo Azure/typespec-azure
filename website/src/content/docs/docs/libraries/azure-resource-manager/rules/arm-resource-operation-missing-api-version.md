@@ -43,7 +43,7 @@ interface FooResources {
 }
 ```
 
-Or include `ApiVersionParameter` explicitly:
+Or include `ApiVersionParameter` explicitly via `ResourceInstanceParameters`:
 
 ```tsp
 @armResourceOperations
@@ -52,5 +52,25 @@ interface FooResources {
   @action
   @post
   myFooAction(...ResourceInstanceParameters<FooResource>): ArmResponse<FooResource> | ErrorResponse;
+}
+```
+
+Or spread `Azure.ResourceManager.CommonTypes.ApiVersionParameter` directly in a custom parameters model:
+
+```tsp
+model MyResourceInstanceParameters<TResource extends {}> {
+  ...SubscriptionIdParameter;
+  ...ResourceGroupParameter;
+  ...ProviderNamespace<TResource>;
+  ...KeysOf<TResource>;
+  ...CommonTypes.ApiVersionParameter;
+}
+
+@armResourceOperations
+interface FooResources {
+  @armResourceAction(FooResource)
+  @action
+  @post
+  myFooAction(...MyResourceInstanceParameters<FooResource>): ArmResponse<FooResource> | ErrorResponse;
 }
 ```
