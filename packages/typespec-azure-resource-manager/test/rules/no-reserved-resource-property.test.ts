@@ -10,8 +10,10 @@ import { noReservedResourcePropertyRule } from "../../src/rules/no-reserved-reso
 
 const ruleCode = "@azure-tools/typespec-azure-resource-manager/no-reserved-resource-property";
 
-function expectedMessage(propertyName: string): string {
-  return `Property "${propertyName}" is not allowed in the resource property bag. This property name is reserved for platform billing integration.`;
+// The diagnostic always reports the reserved property using its canonical casing ("billingData"),
+// regardless of how the property is cased in the spec.
+function expectedMessage(_propertyName: string): string {
+  return `Property "billingData" is not allowed in the resource property bag. This property name is reserved for platform billing integration.`;
 }
 
 let runner: TesterInstance;
