@@ -216,11 +216,7 @@ function should_generate(name) {
   return true;
 }
 
-const armrandom = pkgRoot + "test/tsp/Random.Management";
-generate("armrandom", armrandom, "test/local/armrandom");
 
-const azmodelsonly = pkgRoot + "test/tsp/ModelsOnlyWithBaseTypes";
-generate("azmodelsonly", azmodelsonly, "test/local/azmodelsonly");
 
 const azkeys = azureServiceSpecs + "specification/keyvault/data-plane/Keys/client.tsp";
 generate("azkeys", azkeys, "test/local/azkeys", ["single-client=true", "omit-constructors=true"]);
@@ -232,37 +228,16 @@ generate("azblob", azblob, "test/local/azblob", [
   "inject-spans=false",
 ]);
 
-const armtest = pkgRoot + "test/tsp/Test.Management";
-generate("armtest/v2", armtest, "test/local/armtest", [
-  `examples-directory=${armtest}/examples`,
-  "generate-samples=true",
-  "factory-gather-all-params=false",
-]);
-
-const internalpager = pkgRoot + "test/tsp/Internal.Pager";
-generate("internalpager", internalpager, "test/local/internalpager", ["generate-fakes=false"]);
-
-const nooptionalbody = pkgRoot + "test/tsp/NoOptionalBody";
-generate("nooptionalbody", nooptionalbody, "test/local/nooptionalbody", [
+const gogenerate = pkgRoot + "test/tsp/GoGenerate";
+generate("gogenerate", gogenerate, "test/local/gogenerate", [
   "generate-fakes=false",
   "go-generate=after_generate.go",
-  "no-optional-body=true",
 ]);
 
-const rawjson = pkgRoot + "test/tsp/RawJson";
-generate("rawjson", rawjson, "test/local/rawjson/subpkg", [
-  "containing-module=rawjson/v2",
-  "rawjson-as-bytes=true",
-]);
+const fakeserver = pkgRoot + "test/tsp/FakeServer";
+generate("fakeserver", fakeserver, "test/local/fakeserver");
 
-const azregressions = pkgRoot + "test/tsp/Regressions";
-generate("azregressions", azregressions, "test/local/azregressions");
 
-const azclientoption = pkgRoot + "test/tsp/ClientOption";
-generate("azclientoption", azclientoption, "test/local/azclientoption");
-
-const armpageablelros = pkgRoot + "test/tsp/PageableLROs";
-generate("armpageablelros", armpageablelros, "test/local/armpageablelros");
 
 loopSpec(httpSpecsGroup, httpSpecs, "test/http-specs");
 loopSpec(azureHttpSpecsGroup, azureHttpSpecs, "test/azure-http-specs");

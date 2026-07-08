@@ -22,6 +22,8 @@ This guide outlines the steps to contributing to the emitter.
 - [Step 2: Build the code](#step-2-build-the-code)
 - [Step 3: Regenerate tests](#step-3-regenerate-tests)
 - [Step 4: Test your changes](#step-4-test-your-changes)
+  - [Choosing where to add a test](#choosing-where-to-add-a-test)
+  - [Write an emitter unit test (scenario)](#write-an-emitter-unit-test-scenario)
   - [Run the Go tests](#run-the-go-tests)
   - [Lint the generated Go](#lint-the-generated-go)
   - [Debug](#debug)
@@ -90,10 +92,92 @@ when working offline), set `TYPESPEC_GO_SKIP_BASELINE=1`.
 
 ## Step 4: Test your changes
 
+### Choosing where to add a test
+
+The emitter has three kinds of tests. **Prefer the cheapest one that can verify your
+change**, and reach for a local Go test only when nothing else can:
+
+1. **Emitter unit tests (scenarios)** — `test/unittest/scenarios/*.md`. **This is the
+   default and should cover the large majority of changes.** Each scenario compiles a small
+   TypeSpec in memory and snapshots the generated Go source, so it runs in-process with no Go
+   toolchain and no mock server. Use a scenario for anything that can be verified by
+   inspecting generated code: naming/casing, models and serialization, client and options
+   shapes, request/response building, polymorphism, client customizations, sample
+   generation, emitter options, and so on.
+
+2. **External spec tests (Spector)** — `test/http-specs` and `test/azure-http-specs`.
+   Hand-written Go client tests that run against the
+   [Spector](https://github.com/microsoft/typespec/tree/main/packages/spector) mock API
+   server, driven by the upstream `@typespec/http-specs` / `@azure-tools/azure-http-specs`
+   scenarios. Use these for end-to-end client behavior that must exercise a real HTTP
+   round-trip against a shared, externally-defined spec.
+
+3. **Local spec tests (last resort — avoid adding new ones)** — a spec under
+   `test/tsp/<Name>` generated into `test/local/<name>` and verified by a hand-written
+   `_test.go`. Only use a local spec test when the behavior can **only** be verified by
+   executing the generated Go at runtime **and** cannot be expressed as a Spector case.
+   Because they require generating and compiling a dedicated Go module, they are the slowest
+   and heaviest tests to maintain. As of this writing only two remain, both testing runtime
+   behavior that has no code-to-inspect equivalent:
+
+   - `gogenerate` — verifies the post-generation `go generate` hook.
+   - `fakeserver` — verifies fake-server runtime behavior (context cancellation, dispatch
+     races, and path/query decoding).
+
+   Do **not** add a local spec test for a code-generation change; write a scenario unit test
+   instead. If you do need a local spec test, keep its spec as small as possible and don't
+   duplicate behavior already covered by a scenario.
+
+### Write an emitter unit test (scenario)
+
+Scenarios live in `test/unittest/scenarios/`, one `.md` file per behavior (keep each file
+focused on a single behavior). A scenario mixes input and expected-output fenced code blocks,
+routed by the info string after the opening fence:
+
+- ` ```tsp ` — the TypeSpec to compile (wrapped as `main.tsp`). The common Azure libraries
+  and their `using`s are already in scope; ARM specs are auto-detected and routed to an
+  ARM-enabled tester. Don't add `import`/`using` statements — put everything the spec needs
+  inline.
+- ` ```yaml ` — emitter options for the compile, as kebab-case keys (for example
+  `generate-samples: true`, `containing-module: foo/bar`, `file-prefix: zz_`).
+- ` ```json <path> ` — an extra input file written verbatim into the in-memory file system at
+  `<path>`. This is how additional compiler inputs are supplied by filename; for example
+  ` ```json examples/Foo.json ` provides the example JSON that drives sample generation.
+- ` ```go <name> ` — a snapshot of a generated Go file, matched by base name. It supports
+  subdirectories (`fake/widget_server`) and sample files (`widgets_client_example_test`).
+  Example (`*_example_test.go`) output is checked with the same `go <name>` block as any
+  other generated file.
+
+Order a scenario input-first so it reads top-to-bottom: `yaml` config, then `tsp`, then any
+`json` inputs, then the `go` output blocks.
+
+To (re)generate the expected output blocks from the current emitter, run with
+`SCENARIOS_UPDATE=true` and review the produced snapshots as part of your change:
+
+```terminal
+SCENARIOS_UPDATE=true pnpm test
+```
+
+Each `.md` is backed by a generated vitest suite under `test/unittest/scenario-suites/`.
+After adding, removing, or renaming a scenario, regenerate the suites:
+
+```terminal
+pnpm gen:scenario-suites
+```
+
+A guard test (`scenario-suites.guard.test.ts`) fails if the suites drift from the set of
+`.md` files. Run all TypeScript unit tests (scenarios plus the emitter's own tests) with:
+
+```terminal
+pnpm test
+```
+
 ### Run the Go tests
 
-The Go end-to-end tests run against the [Spector](https://github.com/microsoft/typespec/tree/main/packages/spector)
-mock server. Start it, run the tests, then stop it:
+Some tests run generated Go directly: the Spector-backed specs under `test/http-specs/` and
+`test/azure-http-specs/` exercise the [Spector](https://github.com/microsoft/typespec/tree/main/packages/spector)
+mock server, while the local Go tests under `test/local/` (for example `fakeserver` and
+`gogenerate`) run standalone. Start the mock server, run the tests, then stop it:
 
 ```terminal
 pnpm spector --start
@@ -101,17 +185,12 @@ pnpm go-test
 pnpm spector --stop
 ```
 
-`pnpm go-test` discovers and runs `go test ./...` in every directory under `test/local/`
-that contains `_test.go` files. The whole flow is also wired up as a single command:
+`pnpm go-test` discovers and runs `go test ./...` in every directory under `test/local/`,
+`test/http-specs/`, and `test/azure-http-specs/` that contains `_test.go` files. The whole
+flow is also wired up as a single command:
 
 ```terminal
 pnpm test:go:e2e
-```
-
-To run the emitter's own (TypeScript) unit tests:
-
-```terminal
-pnpm test
 ```
 
 ### Lint the generated Go

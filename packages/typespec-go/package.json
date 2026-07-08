@@ -35,6 +35,7 @@
     "build": "tsc -p .",
     "watch": "tsc -p . --watch",
     "test": "vitest run --pass-with-no-tests",
+    "gen:scenario-suites": "node test/unittest/gen-scenario-suites.mjs",
     "test:ci": "vitest run --pass-with-no-tests --coverage",
     "test:go:e2e": "pnpm spector --start && pnpm go-test && pnpm spector --stop",
     "go-test": "node .scripts/go-test.js",
