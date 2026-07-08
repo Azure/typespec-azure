@@ -8,13 +8,13 @@ title: "arm-resource-operation-missing-decorator"
 
 Validate that ARM Resource operations use the correct decorator for the HTTP verb.
 
-| HTTP Verb | Required decorator(s)                                   |
-| --------- | ------------------------------------------------------- |
-| PUT       | `@armResourceCreateOrUpdate`                            |
-| GET       | `@armResourceRead` or `@armResourceList`                |
-| PATCH     | `@armResourceUpdate`                                    |
-| DELETE    | `@armResourceDelete`                                    |
-| POST      | `@armResourceAction` or `@armResourceCollectionAction`  |
+| HTTP Verb | Required decorator(s)                                  |
+| --------- | ------------------------------------------------------ |
+| PUT       | `@armResourceCreateOrUpdate`                           |
+| GET       | `@armResourceRead` or `@armResourceList`               |
+| PATCH     | `@armResourceUpdate`                                   |
+| DELETE    | `@armResourceDelete`                                   |
+| POST      | `@armResourceAction` or `@armResourceCollectionAction` |
 
 #### ❌ Incorrect
 

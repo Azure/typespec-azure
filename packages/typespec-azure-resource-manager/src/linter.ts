@@ -17,9 +17,9 @@ import { armResourceEnvelopeProperties } from "./rules/arm-resource-invalid-enve
 import { armResourceInvalidVersionFormatRule } from "./rules/arm-resource-invalid-version-format.js";
 import { armResourceKeyInvalidCharsRule } from "./rules/arm-resource-key-invalid-chars.js";
 import { armResourceNamePatternRule } from "./rules/arm-resource-name-pattern.js";
-import { armResourceOperationsRule } from "./rules/arm-resource-operation-response.js";
 import { armResourceOperationMissingApiVersionRule } from "./rules/arm-resource-operation-missing-api-version.js";
 import { armResourceOperationMissingDecoratorRule } from "./rules/arm-resource-operation-missing-decorator.js";
+import { armResourceOperationsRule } from "./rules/arm-resource-operation-response.js";
 import { patchOperationsRule } from "./rules/arm-resource-patch.js";
 import { armResourcePathInvalidCharsRule } from "./rules/arm-resource-path-invalid-chars.js";
 import { armResourceProvisioningStateRule } from "./rules/arm-resource-provisioning-state-rule.js";

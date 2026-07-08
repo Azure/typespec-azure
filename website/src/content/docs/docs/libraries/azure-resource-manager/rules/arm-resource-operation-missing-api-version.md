@@ -28,7 +28,9 @@ interface FooResources {
   @armResourceAction(FooResource)
   @action
   @post
-  myFooAction(...MyResourceInstanceParameters<FooResource>): ArmResponse<FooResource> | ErrorResponse;
+  myFooAction(...MyResourceInstanceParameters<FooResource>):
+    | ArmResponse<FooResource>
+    | ErrorResponse;
 }
 ```
 
@@ -71,6 +73,8 @@ interface FooResources {
   @armResourceAction(FooResource)
   @action
   @post
-  myFooAction(...MyResourceInstanceParameters<FooResource>): ArmResponse<FooResource> | ErrorResponse;
+  myFooAction(...MyResourceInstanceParameters<FooResource>):
+    | ArmResponse<FooResource>
+    | ErrorResponse;
 }
 ```

@@ -7,7 +7,10 @@ import {
 } from "@typespec/compiler";
 import { HttpVerb, getOperationVerb } from "@typespec/http";
 import { getSegment } from "@typespec/rest";
-import { isSourceOperationResourceManagerInternal, isTemplatedInterfaceOperation } from "./utils.js";
+import {
+  isSourceOperationResourceManagerInternal,
+  isTemplatedInterfaceOperation,
+} from "./utils.js";
 
 export const armResourceOperationMissingDecoratorRule = createRule({
   name: "arm-resource-operation-missing-decorator",

@@ -1,6 +1,9 @@
 import { Operation, createRule, isTemplateInstance } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
-import { isSourceOperationResourceManagerInternal, isTemplatedInterfaceOperation } from "./utils.js";
+import {
+  isSourceOperationResourceManagerInternal,
+  isTemplatedInterfaceOperation,
+} from "./utils.js";
 
 export const coreOperationsRule = createRule({
   name: "arm-resource-operation",
