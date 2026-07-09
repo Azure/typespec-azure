@@ -1,9 +1,9 @@
 import { readdirSync } from "fs";
 import path from "path";
 import { assert, it } from "vitest";
-import { getLeafScenarioDirs } from "./scenario-runner.js";
+import { getLeafScenarioDirs, PACKAGE_ROOT } from "./scenario-runner.js";
 
-const SUITES_DIR = path.join("test", "modular-unit", "scenario-suites");
+const SUITES_DIR = path.resolve(PACKAGE_ROOT, "test", "modular-unit", "scenario-suites");
 
 function suiteFileName(relDir: string): string {
   return relDir.split(/[\\/]/).join("__") + ".test.ts";
