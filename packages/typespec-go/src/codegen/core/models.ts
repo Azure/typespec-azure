@@ -615,7 +615,7 @@ function generateJSONUnmarshaller(
   let unmarshaller = `func (${receiver} *${typeName}) UnmarshalJSON(data []byte) error {\n`;
   unmarshaller += `${indent.get()}var rawMsg map[string]json.RawMessage\n`;
   unmarshaller += `${indent.get()}if err := json.Unmarshal(data, &rawMsg); err != nil {\n`;
-  unmarshaller += `${indent.push().get()}return fmt.Errorf("unmarshalling type %T: %v", ${receiver}, err)\n`;
+  unmarshaller += `${indent.push().get()}return fmt.Errorf("unmarshalling type %T: %s", ${receiver}, err.Error())\n`;
   unmarshaller += `${indent.pop().get()}}\n`;
   unmarshaller += generateJSONUnmarshallerBody(modelDef, receiver, options, imports, indent);
   unmarshaller += "}\n\n";
@@ -802,7 +802,7 @@ function generateJSONUnmarshallerBody(
   unmarshalBody += switchCaseBody;
   if (needsErrCheck) {
     unmarshalBody += `${indent.get()}if err != nil {\n`;
-    unmarshalBody += `${indent.push().get()}return fmt.Errorf("unmarshalling type %T: %v", ${receiver}, err)\n`;
+    unmarshalBody += `${indent.push().get()}return fmt.Errorf("unmarshalling type %T: %s", ${receiver}, err.Error())\n`;
     unmarshalBody += `${indent.pop().get()}}\n`;
   }
   indent.pop(); // level 1
@@ -988,7 +988,7 @@ function recursivePopulateDiscriminator(
 
   text += `${indent.get()}${dest}, err = unmarshal${interfaceName}${targetType}(${rawSrc})\n`;
   text += `${indent.get()}if err != nil {\n`;
-  text += `${indent.push().get()}return fmt.Errorf("unmarshalling type %T: %v", ${receiver}, err)\n`;
+  text += `${indent.push().get()}return fmt.Errorf("unmarshalling type %T: %s", ${receiver}, err.Error())\n`;
   text += `${indent.pop().get()}}\n`;
 
   return text;
