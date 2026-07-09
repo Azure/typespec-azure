@@ -1,9 +1,9 @@
 ---
-title: "arm-resource-operation-missing-api-version"
+title: "use-api-version"
 ---
 
 ```text title="Full name"
-@azure-tools/typespec-azure-resource-manager/arm-resource-operation-missing-api-version
+@azure-tools/typespec-azure-resource-manager/use-api-version
 ```
 
 Validate that ARM Resource operations include an `api-version` parameter referencing `Azure.ResourceManager.CommonTypes.ApiVersionParameter`.

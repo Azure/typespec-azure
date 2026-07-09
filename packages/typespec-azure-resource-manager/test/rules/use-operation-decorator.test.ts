@@ -6,7 +6,7 @@ import {
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 
-import { armResourceOperationMissingDecoratorRule } from "../../src/rules/arm-resource-operation-missing-decorator.js";
+import { armResourceOperationMissingDecoratorRule } from "../../src/rules/use-operation-decorator.js";
 
 let runner: TesterInstance;
 let tester: LinterRuleTester;
@@ -44,24 +44,24 @@ it("emits diagnostics if missing armResourceOperation decorators.", async () => 
     )
     .toEmitDiagnostics([
       {
-        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-missing-decorator",
+        code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
         message: "Resource PUT operation must be decorated with @armResourceCreateOrUpdate.",
       },
       {
-        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-missing-decorator",
+        code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
         message:
           "Resource GET operation must be decorated with @armResourceRead or @armResourceList.",
       },
       {
-        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-missing-decorator",
+        code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
         message: "Resource PATCH operation must be decorated with @armResourceUpdate.",
       },
       {
-        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-missing-decorator",
+        code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
         message: "Resource DELETE operation must be decorated with @armResourceDelete.",
       },
       {
-        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-missing-decorator",
+        code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
         message:
           "Resource POST operation must be decorated with @armResourceAction or @armResourceCollectionAction.",
       },
@@ -179,7 +179,7 @@ describe("Provider operations", () => {
     );
 
     await tester.expect(content).toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-missing-decorator",
+      code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
       message:
         "Resource GET operation must be decorated with @armResourceRead or @armResourceList.",
     });

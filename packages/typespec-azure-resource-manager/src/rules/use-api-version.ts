@@ -14,11 +14,11 @@ import {
 } from "./utils.js";
 
 export const armResourceOperationMissingApiVersionRule = createRule({
-  name: "arm-resource-operation-missing-api-version",
+  name: "use-api-version",
   severity: "warning",
   description:
     "Validate ARM Resource operations include the api-version parameter referencing Azure.ResourceManager.CommonTypes.ApiVersionParameter.",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-operation-missing-api-version",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/use-api-version",
   messages: {
     default:
       "All Resource operations must use an api-version parameter. Please include Azure.ResourceManager.ApiVersionParameter in the operation parameter list using the spread (...ApiVersionParameter) operator, or using one of the common resource parameter models.",

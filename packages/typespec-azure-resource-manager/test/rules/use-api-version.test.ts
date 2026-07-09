@@ -6,7 +6,7 @@ import {
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 
-import { armResourceOperationMissingApiVersionRule } from "../../src/rules/arm-resource-operation-missing-api-version.js";
+import { armResourceOperationMissingApiVersionRule } from "../../src/rules/use-api-version.js";
 
 let runner: TesterInstance;
 let tester: LinterRuleTester;
@@ -52,7 +52,7 @@ it("Detects missing api-version parameters", async () => {
       `,
     )
     .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-missing-api-version",
+      code: "@azure-tools/typespec-azure-resource-manager/use-api-version",
       message:
         "All Resource operations must use an api-version parameter. Please include Azure.ResourceManager.ApiVersionParameter in the operation parameter list using the spread (...ApiVersionParameter) operator, or using one of the common resource parameter models.",
     });

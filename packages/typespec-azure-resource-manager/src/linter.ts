@@ -17,8 +17,6 @@ import { armResourceEnvelopeProperties } from "./rules/arm-resource-invalid-enve
 import { armResourceInvalidVersionFormatRule } from "./rules/arm-resource-invalid-version-format.js";
 import { armResourceKeyInvalidCharsRule } from "./rules/arm-resource-key-invalid-chars.js";
 import { armResourceNamePatternRule } from "./rules/arm-resource-name-pattern.js";
-import { armResourceOperationMissingApiVersionRule } from "./rules/arm-resource-operation-missing-api-version.js";
-import { armResourceOperationMissingDecoratorRule } from "./rules/arm-resource-operation-missing-decorator.js";
 import { armResourceOperationsRule } from "./rules/arm-resource-operation-response.js";
 import { patchOperationsRule } from "./rules/arm-resource-patch.js";
 import { armResourcePathInvalidCharsRule } from "./rules/arm-resource-path-invalid-chars.js";
@@ -39,6 +37,8 @@ import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
 import { secretProprule } from "./rules/secret-prop.js";
 import { unsupportedTypeRule } from "./rules/unsupported-type.js";
+import { armResourceOperationMissingApiVersionRule } from "./rules/use-api-version.js";
+import { armResourceOperationMissingDecoratorRule } from "./rules/use-operation-decorator.js";
 import { versionProgressionRule } from "./rules/version-progression.js";
 
 const rules = [

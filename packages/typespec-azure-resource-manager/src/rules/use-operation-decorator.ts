@@ -13,10 +13,10 @@ import {
 } from "./utils.js";
 
 export const armResourceOperationMissingDecoratorRule = createRule({
-  name: "arm-resource-operation-missing-decorator",
+  name: "use-operation-decorator",
   severity: "warning",
   description: "Validate ARM Resource operations use the correct decorator for the HTTP verb.",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-operation-missing-decorator",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/use-operation-decorator",
   messages: {
     default: paramMessage`Resource ${"verb"} operation must be decorated with ${"decorator"}.`,
   },

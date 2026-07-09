@@ -1,9 +1,9 @@
 ---
-title: "arm-resource-operation-missing-decorator"
+title: "use-operation-decorator"
 ---
 
 ```text title="Full name"
-@azure-tools/typespec-azure-resource-manager/arm-resource-operation-missing-decorator
+@azure-tools/typespec-azure-resource-manager/use-operation-decorator
 ```
 
 Validate that ARM Resource operations use the correct decorator for the HTTP verb.

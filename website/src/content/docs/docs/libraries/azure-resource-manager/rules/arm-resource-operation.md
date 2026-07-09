@@ -10,8 +10,8 @@ Validate that all ARM Resource operations are defined inside an interface declar
 
 See also:
 
-- [`arm-resource-operation-missing-decorator`](./arm-resource-operation-missing-decorator.md) — validates that operations use the correct decorator for the HTTP verb.
-- [`arm-resource-operation-missing-api-version`](./arm-resource-operation-missing-api-version.md) — validates that operations include an `api-version` parameter.
+- [`use-operation-decorator`](./use-operation-decorator.md) — validates that operations use the correct decorator for the HTTP verb.
+- [`use-api-version`](./use-api-version.md) — validates that operations include an `api-version` parameter.
 
 #### ❌ Incorrect
 
