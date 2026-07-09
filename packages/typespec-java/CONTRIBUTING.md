@@ -37,16 +37,36 @@ refresh `core.patch` if its context no longer applies.
 ## Build
 
 ```bash
-# Full build: build:generator (emitter.jar via Maven + core.patch, requires JDK 11+
-# and Maven) then build:emitter (copy sources from core + tsc).
-pnpm build
+# From the repo root, install workspace dependencies.
+pnpm install
+
+# From the repo root, build the dependencies first. The ^... filter builds
+# @azure-tools/typespec-java dependencies without building typespec-java itself.
+pnpm turbo run --filter "@azure-tools/typespec-java^..." build
+
+# Then build and pack @azure-tools/typespec-java. This builds the generator
+# (emitter.jar via Maven + core.patch, requires JDK 11+ and Maven), builds the
+# emitter TypeScript, and packs the .tgz consumed by emitter-tests.
+cd packages/typespec-java
+pwsh ./Build-TypeSpec.ps1
 
 # Just the TypeScript half (no jar; fast):
 pnpm build:emitter
-
-# Build and pack a .tgz (what emitter-tests consumes):
-pwsh ./Build-TypeSpec.ps1
 ```
+
+### Troubleshooting
+
+If `pnpm turbo ...` fails with `'turbo' is not recognized as an internal or external command`
+after `pnpm install`, the local install tree is missing Turbo's binary shim. From the repo root,
+force pnpm to refresh the local install state and rerun the command:
+
+```powershell
+pnpm install --force
+pnpm turbo run --filter "@azure-tools/typespec-java^..." build
+```
+
+Changing the npm registry has been observed to clear this symptom, possibly because
+pnpm re-resolves packages or relinks local binaries after the registry setting changes.
 
 ## Before making a Pull request
 
