@@ -8,6 +8,10 @@ title: "use-operation-decorator"
 
 Validate that ARM Resource operations use the correct decorator for the HTTP verb.
 
+:::note
+This rule only applies to custom operations. Operations using standard ARM resource templates (e.g. `ArmResourceRead`, `ArmResourceCreateOrReplaceAsync`) automatically satisfy this rule.
+:::
+
 | HTTP Verb | Required decorator(s)                                  |
 | --------- | ------------------------------------------------------ |
 | PUT       | `@armResourceCreateOrUpdate`                           |
@@ -76,7 +80,7 @@ interface FooResources {
   list(...SubscriptionIdParameter, ...ResourceGroupParameter): ArmResponse<FooResourceListResult>;
 
   @armResourceAction(FooResource)
-  @action
+  @action("myAction")
   @post
   myAction(...ResourceInstanceParameters<FooResource>): ArmResponse<FooResource>;
 }

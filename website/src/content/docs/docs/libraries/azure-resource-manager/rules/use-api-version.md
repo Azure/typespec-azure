@@ -57,21 +57,21 @@ interface FooResources {
 }
 ```
 
-Or spread `Azure.ResourceManager.CommonTypes.ApiVersionParameter` directly in a custom parameters model:
+Or spread `Azure.ResourceManager.ApiVersionParameter` directly in a custom parameters model. The `ApiVersionParameter` must be listed first, as ARM convention requires the api-version to be the first query parameter:
 
 ```tsp
 model MyResourceInstanceParameters<TResource extends {}> {
+  ...ApiVersionParameter;
   ...SubscriptionIdParameter;
   ...ResourceGroupParameter;
   ...ProviderNamespace<TResource>;
   ...KeysOf<TResource>;
-  ...CommonTypes.ApiVersionParameter;
 }
 
 @armResourceOperations
 interface FooResources {
   @armResourceAction(FooResource)
-  @action
+  @action("myFooAction")
   @post
   myFooAction(...MyResourceInstanceParameters<FooResource>):
     | ArmResponse<FooResource>

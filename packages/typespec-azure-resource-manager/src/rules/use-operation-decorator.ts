@@ -51,12 +51,21 @@ export const useOperationDecoratorRule = createRule({
   },
 });
 
+// These private ARM decorators cover all operation types and serve as valid alternatives
+// to the public per-verb decorators (e.g. in extension resource, legacy, and built-in operations).
+const genericArmResourceDecorators = [
+  "$extensionResourceOperation",
+  "$legacyResourceOperation",
+  "$builtInResourceOperation",
+  "$legacyExtensionResourceOperation",
+];
+
 const resourceOperationDecorators: { [verb in HttpVerb]: string[] } = {
-  put: ["$armResourceCreateOrUpdate"],
-  get: ["$armResourceRead", "$armResourceList"],
-  patch: ["$armResourceUpdate"],
-  delete: ["$armResourceDelete"],
-  post: ["$armResourceAction", "$armResourceCollectionAction"],
+  put: ["$armResourceCreateOrUpdate", ...genericArmResourceDecorators],
+  get: ["$armResourceRead", "$armResourceList", ...genericArmResourceDecorators],
+  patch: ["$armResourceUpdate", ...genericArmResourceDecorators],
+  delete: ["$armResourceDelete", ...genericArmResourceDecorators],
+  post: ["$armResourceAction", "$armResourceCollectionAction", ...genericArmResourceDecorators],
   head: [],
 };
 

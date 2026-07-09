@@ -45,25 +45,28 @@ it("emits diagnostics if missing armResourceOperation decorators.", async () => 
     .toEmitDiagnostics([
       {
         code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
-        message: "Resource PUT operation must be decorated with @armResourceCreateOrUpdate.",
+        message:
+          "Resource PUT operation must be decorated with @armResourceCreateOrUpdate or @extensionResourceOperation or @legacyResourceOperation or @builtInResourceOperation or @legacyExtensionResourceOperation.",
       },
       {
         code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
         message:
-          "Resource GET operation must be decorated with @armResourceRead or @armResourceList.",
-      },
-      {
-        code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
-        message: "Resource PATCH operation must be decorated with @armResourceUpdate.",
-      },
-      {
-        code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
-        message: "Resource DELETE operation must be decorated with @armResourceDelete.",
+          "Resource GET operation must be decorated with @armResourceRead or @armResourceList or @extensionResourceOperation or @legacyResourceOperation or @builtInResourceOperation or @legacyExtensionResourceOperation.",
       },
       {
         code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
         message:
-          "Resource POST operation must be decorated with @armResourceAction or @armResourceCollectionAction.",
+          "Resource PATCH operation must be decorated with @armResourceUpdate or @extensionResourceOperation or @legacyResourceOperation or @builtInResourceOperation or @legacyExtensionResourceOperation.",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
+        message:
+          "Resource DELETE operation must be decorated with @armResourceDelete or @extensionResourceOperation or @legacyResourceOperation or @builtInResourceOperation or @legacyExtensionResourceOperation.",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
+        message:
+          "Resource POST operation must be decorated with @armResourceAction or @armResourceCollectionAction or @extensionResourceOperation or @legacyResourceOperation or @builtInResourceOperation or @legacyExtensionResourceOperation.",
       },
     ]);
 });
@@ -105,6 +108,65 @@ it("doesn't emit diagnostic for operation templates", async () => {
     `,
     )
     .toBeValid();
+});
+
+describe("Private ARM resource decorators", () => {
+  function buildPrivateDecoratorTestSpec(operation: string = ""): string {
+    return `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+      using Azure.ResourceManager.Private;
+
+      model FooResource is TrackedResource<{}> {
+        ...ResourceNameParameter<FooResource>;
+      }
+
+      model BarResource is ExtensionResource<{}> {
+        ...ResourceNameParameter<BarResource>;
+      }
+
+      @armResourceOperations
+      interface FooResources {
+        ${operation}
+      }
+    `;
+  }
+
+  it("doesn't emit a diagnostic for operations with @extensionResourceOperation", async () => {
+    const content = buildPrivateDecoratorTestSpec(`
+      @extensionResourceOperation(FooResource, BarResource, "read")
+      @get
+      getExtension(...ResourceInstanceParameters<FooResource>): ArmResponse<BarResource> | ErrorResponse;
+    `);
+    await tester.expect(content).toBeValid();
+  });
+
+  it("doesn't emit a diagnostic for operations with @legacyResourceOperation", async () => {
+    const content = buildPrivateDecoratorTestSpec(`
+      @legacyResourceOperation(FooResource, "read")
+      @get
+      getLegacy(...ResourceInstanceParameters<FooResource>): ArmResponse<FooResource> | ErrorResponse;
+    `);
+    await tester.expect(content).toBeValid();
+  });
+
+  it("doesn't emit a diagnostic for operations with @builtInResourceOperation", async () => {
+    const content = buildPrivateDecoratorTestSpec(`
+      @builtInResourceOperation(FooResource, BarResource, "list")
+      @get
+      listBuiltIn(...ResourceInstanceParameters<FooResource>): ArmResponse<BarResource> | ErrorResponse;
+    `);
+    await tester.expect(content).toBeValid();
+  });
+
+  it("doesn't emit a diagnostic for operations with @legacyExtensionResourceOperation", async () => {
+    const content = buildPrivateDecoratorTestSpec(`
+      @legacyExtensionResourceOperation(FooResource, "read")
+      @get
+      getLegacyExtension(...ResourceInstanceParameters<FooResource>): ArmResponse<FooResource> | ErrorResponse;
+    `);
+    await tester.expect(content).toBeValid();
+  });
 });
 
 describe("Provider operations", () => {
@@ -181,7 +243,7 @@ describe("Provider operations", () => {
     await tester.expect(content).toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
       message:
-        "Resource GET operation must be decorated with @armResourceRead or @armResourceList.",
+        "Resource GET operation must be decorated with @armResourceRead or @armResourceList or @extensionResourceOperation or @legacyResourceOperation or @builtInResourceOperation or @legacyExtensionResourceOperation.",
     });
   });
 });
