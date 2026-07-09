@@ -51,7 +51,7 @@ Or include `ApiVersionParameter` explicitly via `ResourceInstanceParameters`:
 @armResourceOperations
 interface FooResources {
   @armResourceAction(FooResource)
-  @action
+  @action("myFooAction")
   @post
   myFooAction(...ResourceInstanceParameters<FooResource>): ArmResponse<FooResource> | ErrorResponse;
 }
