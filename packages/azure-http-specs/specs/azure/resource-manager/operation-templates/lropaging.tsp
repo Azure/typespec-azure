@@ -183,12 +183,11 @@ interface LroPaging {
   postPagingLroWithBody is ArmResourceActionAsyncBase<
     Product,
     VnetProfile,
-
-      | ArmResponse<ProductListResult>
-      | (ArmAcceptedLroResponse & {
-          @TypeSpec.Http.bodyRoot
-          _: ProductListResult;
-        }),
+    | ArmResponse<ProductListResult>
+    | (ArmAcceptedLroResponse & {
+        @TypeSpec.Http.bodyRoot
+        _: ProductListResult;
+      }),
     BaseParameters = Azure.ResourceManager.Foundations.DefaultBaseParameters<Product>
   >;
 }
