@@ -16,16 +16,17 @@ This guide outlines the steps to contributing to the emitter.
 - [Prerequisites](#prerequisites)
 - [Step 1: Clone the repo](#step-1-clone-the-repo)
 - [Step 2: Build the code](#step-2-build-the-code)
-- [Step 3: Regenerate tests](#step-3-regenerate-tests)
-- [Step 4: Test your changes](#step-4-test-your-changes)
-  - [Choosing where to add a test](#choosing-where-to-add-a-test)
-  - [Write an emitter unit test (scenario)](#write-an-emitter-unit-test-scenario)
+- [Step 3: Regenerate and validate the generated code](#step-3-regenerate-and-validate-the-generated-code)
+  - [Regenerate](#regenerate)
+  - [Review the generated-code diff](#review-the-generated-code-diff)
   - [Run the Go tests](#run-the-go-tests)
   - [Lint the generated Go](#lint-the-generated-go)
   - [Debug](#debug)
-- [Step 5: Review the generated-code diff](#step-5-review-the-generated-code-diff)
-- [Step 6: Update emitter documentation](#step-6-update-emitter-documentation)
-- [Step 7: Make a PR](#step-7-make-a-pr)
+- [Step 4: Add or update tests](#step-4-add-or-update-tests)
+  - [Choosing where to add a test](#choosing-where-to-add-a-test)
+  - [Write an emitter unit test (scenario)](#write-an-emitter-unit-test-scenario)
+- [Step 5: Update emitter documentation](#step-5-update-emitter-documentation)
+- [Step 6: Make a PR](#step-6-make-a-pr)
 
 ## Prerequisites
 
@@ -59,11 +60,13 @@ npx turbo run build --filter=@azure-tools/typespec-go
 
 Use `pnpm watch` from the repo root to rebuild on change while you work.
 
-## Step 3: Regenerate tests
+## Step 3: Regenerate and validate the generated code
 
-`test/` holds several kinds of tests: in-memory emitter unit tests (`test/unittest/`, see [Step 4](#step-4-test-your-changes)), hand-written local specs and their Go tests (`test/tsp/` + `test/local/`), and Go tests driven by external Spector specs (`test/http-specs/`, `test/azure-http-specs/`). `pnpm regenerate` runs the emitter over the local specs under `test/tsp/` and the external Spector specs, writing the generated Go fixtures into `test/local/`, `test/http-specs/`, and `test/azure-http-specs/`. Run it after changing the emitter to see how your change affects those generated fixtures.
+`test/` holds several kinds of tests: in-memory emitter unit tests (`test/unittest/`, covered in [Step 4](#step-4-add-or-update-tests)), hand-written local specs and their Go tests (`test/tsp/` + `test/local/`), and Go tests driven by external Spector specs (`test/http-specs/`, `test/azure-http-specs/`). This step is about the generated Go: regenerate it, review the diff, then validate it by running the Go tests and the linter. The in-memory unit tests under `test/unittest/` are not part of this step — they are authored and run in [Step 4](#step-4-add-or-update-tests).
 
-The emitter unit tests under `test/unittest/` are not affected by `pnpm regenerate` — they compile TypeSpec in memory and snapshot the result; update them with `pnpm test:update` instead (see [Step 4](#step-4-test-your-changes)).
+### Regenerate
+
+`pnpm regenerate` runs the emitter over the local specs under `test/tsp/` and the external Spector specs, writing the generated Go fixtures into `test/local/`, `test/http-specs/`, and `test/azure-http-specs/`. Run it after changing the emitter to see how your change affects those generated fixtures.
 
 From the `packages/typespec-go` directory:
 
@@ -77,9 +80,70 @@ To regenerate a single test, pass a `--filter` matching the test name (the value
 pnpm regenerate --filter=TestName
 ```
 
-The first run also syncs the Azure REST API specs and the generated-code baseline (see [Step 5](#step-5-review-the-generated-code-diff)). To skip the baseline sync (for example when working offline), set `TYPESPEC_GO_SKIP_BASELINE=1`.
+The first run also syncs the Azure REST API specs and the generated-code baseline (used by [Review the generated-code diff](#review-the-generated-code-diff)). To skip the baseline sync (for example when working offline), set `TYPESPEC_GO_SKIP_BASELINE=1`.
 
-## Step 4: Test your changes
+### Review the generated-code diff
+
+The committed test fixtures are mirrored into a baseline checkout so you can review the exact delta your emitter change produces.
+
+`pnpm regenerate` automatically:
+
+1. Syncs the generated-code baseline from the [`Azure/azure-sdk-assets`](https://github.com/Azure/azure-sdk-assets) repo (branch `typespec-go`) into `temp/baseline/`.
+2. After emit completes, mirrors the freshly generated `test/` artifacts into that checkout.
+
+You can then inspect the change against the merged baseline with normal git commands:
+
+```terminal
+cd temp/baseline
+git status
+git diff
+```
+
+Set `TYPESPEC_GO_SKIP_BASELINE=1` to skip this (it is skipped in CI).
+
+### Run the Go tests
+
+Some tests run the generated Go directly: the Spector-backed specs under `test/http-specs/` and `test/azure-http-specs/` exercise the [Spector](https://github.com/microsoft/typespec/tree/main/packages/spector) mock server, while the local Go tests under `test/local/` (for example `fakeserver` and `gogenerate`) run standalone. Start the mock server, run the tests, then stop it:
+
+```terminal
+pnpm spector --start
+pnpm go-test
+pnpm spector --stop
+```
+
+`pnpm go-test` discovers and runs `go test ./...` in every directory under `test/local/`, `test/http-specs/`, and `test/azure-http-specs/` that contains `_test.go` files. The whole flow is also wired up as a single command:
+
+```terminal
+pnpm test:go:e2e
+```
+
+### Lint the generated Go
+
+To run `golangci-lint` (and `shadow`) against every generated Go module under `test/local/`, `test/http-specs/`, and `test/azure-http-specs/`:
+
+```terminal
+pnpm lint:go
+```
+
+`golangci-lint` and `shadow` must be available on your `PATH`. For local runs you need to install them yourself, matching the versions CI uses (see `.github/workflows/ci-go.yml`):
+
+```terminal
+go install golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow@latest
+curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b "$(go env GOPATH)/bin" v2.11.4
+```
+
+Make sure `$(go env GOPATH)/bin` is on your `PATH` so both tools are discoverable. On Windows, install `shadow` the same way and download the matching `golangci-lint` release from the [golangci-lint releases page](https://github.com/golangci/golangci-lint/releases).
+
+### Debug
+
+To debug the emitter:
+
+1. Set a breakpoint in the TypeScript source.
+2. In the VS Code JavaScript Debug Terminal, run `pnpm regenerate` (optionally with `--filter`) from the [Regenerate](#regenerate) section.
+
+## Step 4: Add or update tests
+
+Make sure your change is covered by tests. Start by picking the right kind of test, then author it. For how to run each kind, see [Run the Go tests](#run-the-go-tests) (for Spector and local specs) and [Write an emitter unit test (scenario)](#write-an-emitter-unit-test-scenario) (for the in-memory scenarios).
 
 ### Choosing where to add a test
 
@@ -127,66 +191,7 @@ A guard test (`scenario-suites.guard.test.ts`) fails if the suites drift from th
 pnpm test
 ```
 
-### Run the Go tests
-
-Some tests run generated Go directly: the Spector-backed specs under `test/http-specs/` and `test/azure-http-specs/` exercise the [Spector](https://github.com/microsoft/typespec/tree/main/packages/spector) mock server, while the local Go tests under `test/local/` (for example `fakeserver` and `gogenerate`) run standalone. Start the mock server, run the tests, then stop it:
-
-```terminal
-pnpm spector --start
-pnpm go-test
-pnpm spector --stop
-```
-
-`pnpm go-test` discovers and runs `go test ./...` in every directory under `test/local/`, `test/http-specs/`, and `test/azure-http-specs/` that contains `_test.go` files. The whole flow is also wired up as a single command:
-
-```terminal
-pnpm test:go:e2e
-```
-
-### Lint the generated Go
-
-To run `golangci-lint` (and `shadow`) against every generated Go module under `test/local/`, `test/http-specs/`, and `test/azure-http-specs/`:
-
-```terminal
-pnpm lint:go
-```
-
-`golangci-lint` and `shadow` must be available on your `PATH`. For local runs you need to install them yourself, matching the versions CI uses (see `.github/workflows/ci-go.yml`):
-
-```terminal
-go install golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow@latest
-curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b "$(go env GOPATH)/bin" v2.11.4
-```
-
-Make sure `$(go env GOPATH)/bin` is on your `PATH` so both tools are discoverable. On Windows, install `shadow` the same way and download the matching `golangci-lint` release from the [golangci-lint releases page](https://github.com/golangci/golangci-lint/releases).
-
-### Debug
-
-To debug the emitter:
-
-1. Set a breakpoint in the TypeScript source.
-2. In the VS Code JavaScript Debug Terminal, run one of the regeneration commands from [Step 3](#step-3-regenerate-tests).
-
-## Step 5: Review the generated-code diff
-
-The committed test fixtures are mirrored into a baseline checkout so you can review the exact delta your emitter change produces.
-
-`pnpm regenerate` automatically:
-
-1. Syncs the generated-code baseline from the [`Azure/azure-sdk-assets`](https://github.com/Azure/azure-sdk-assets) repo (branch `typespec-go`) into `temp/baseline/`.
-2. After emit completes, mirrors the freshly generated `test/` artifacts into that checkout.
-
-You can then inspect the change against the merged baseline with normal git commands:
-
-```terminal
-cd temp/baseline
-git status
-git diff
-```
-
-Set `TYPESPEC_GO_SKIP_BASELINE=1` to skip this (it is skipped in CI).
-
-## Step 6: Update emitter documentation
+## Step 5: Update emitter documentation
 
 If you changed the emitter options, regenerate the reference documentation. From the `packages/typespec-go` directory:
 
@@ -196,7 +201,7 @@ pnpm regen-docs
 
 This writes the generated reference into the `typespec-azure` website content (`website/src/content/docs/docs/emitters/clients/typespec-go/reference`). Commit the regenerated files alongside your change.
 
-## Step 7: Make a PR
+## Step 6: Make a PR
 
 Once you're satisfied with your changes, open a PR in the [`Azure/typespec-azure`](https://github.com/Azure/typespec-azure/pulls) repo.
 
