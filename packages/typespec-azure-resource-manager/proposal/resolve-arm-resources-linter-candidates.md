@@ -56,6 +56,18 @@ Every registered lifecycle operation kind should use the expected HTTP verb:
 
 This lets `resolveArmResources` attach lifecycle operations by their registered ARM operation kind without re-validating protocol shape during resource graph construction.
 
+## Candidate: lifecycle operation path consistency
+
+Lifecycle operations in the same resource operation interface should resolve to the same ARM resource instance path.
+
+Expected checks:
+
+1. Within one resource operation interface, compare registered lifecycle operations for the same resource model.
+2. `Read`, `CreateOrUpdate`, `Update`, `Delete`, and `CheckExistence` operations should have the same normalized resource instance path.
+3. Path comparison should be case-insensitive for literal segments and should ignore variable parameter names.
+
+This protects `resolveArmResources` from treating inconsistent CRUD operation paths in the same interface as multiple resources when the author likely intended one resource.
+
 ## Candidate: resource list response shape
 
 A registered resource `List` operation should return a collection model whose item type is the candidate resource model.
