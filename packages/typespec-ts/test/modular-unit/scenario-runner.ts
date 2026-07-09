@@ -3,6 +3,7 @@ import { afterAll, assert, describe, it } from "vitest";
 import { readdirSync, readFileSync, statSync, writeFileSync } from "fs";
 import path from "path";
 import { format } from "prettier";
+import { fileURLToPath } from "url";
 import { parse as loadYaml } from "yaml";
 import { prettierTypeScriptOptions } from "../../src/lib.js";
 import {
@@ -16,7 +17,15 @@ import {
 } from "../util/emit-util.js";
 import { assertEqualContent, clearCompileCache, ExampleJson } from "../util/test-util.js";
 
-export const SCENARIOS_LOCATION = "./test/modular-unit/scenarios";
+// Anchor scenario paths to the package root (derived from this module's URL)
+// rather than process.cwd(). This keeps the modular-unit suite working both when
+// run from this package (cwd = packages/typespec-ts) and when it is picked up by
+// the repo-wide vitest run (cwd = repo root). This file lives at
+// `<package>/test/modular-unit/scenario-runner.ts`, so the package root is two
+// directories up.
+export const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
+
+export const SCENARIOS_LOCATION = path.resolve(PACKAGE_ROOT, "test/modular-unit/scenarios");
 
 const SCENARIOS_UPDATE = process.env["SCENARIOS_UPDATE"] === "true";
 
@@ -220,8 +229,11 @@ const OUTPUT_CODE_BLOCK_TYPES: Record<string, EmitterFunction> = {
  * themselves leaf directories with their own generated test files.
  */
 export function describeScenarioDir(location: string): void {
-  for (const child of readdirSync(location)) {
-    const fullPath = path.join(location, child);
+  // `location` is package-root-relative (as emitted by gen:scenario-suites);
+  // resolve it against the package root so it is independent of process.cwd().
+  const resolved = path.resolve(PACKAGE_ROOT, location);
+  for (const child of readdirSync(resolved)) {
+    const fullPath = path.join(resolved, child);
     if (statSync(fullPath).isFile() && child.endsWith(".md")) {
       describeScenarioFile(fullPath);
     }
