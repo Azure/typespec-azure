@@ -61,7 +61,9 @@ Use `pnpm watch` from the repo root to rebuild on change while you work.
 
 ## Step 3: Regenerate tests
 
-The test fixtures under `test/` are generated from TypeSpec specs. After changing the emitter, rebuild it and regenerate to see how your change affects the output.
+`test/` holds several kinds of tests: in-memory emitter unit tests (`test/unittest/`, see [Step 4](#step-4-test-your-changes)), hand-written local specs and their Go tests (`test/tsp/` + `test/local/`), and Go tests driven by external Spector specs (`test/http-specs/`, `test/azure-http-specs/`). `pnpm regenerate` runs the emitter over the local specs under `test/tsp/` and the external Spector specs, writing the generated Go fixtures into `test/local/`, `test/http-specs/`, and `test/azure-http-specs/`. Run it after changing the emitter to see how your change affects those generated fixtures.
+
+The emitter unit tests under `test/unittest/` are not affected by `pnpm regenerate` — they compile TypeSpec in memory and snapshot the result; update them with `pnpm test:update` instead (see [Step 4](#step-4-test-your-changes)).
 
 From the `packages/typespec-go` directory:
 
