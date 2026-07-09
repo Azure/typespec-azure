@@ -151,12 +151,15 @@ routed by the info string after the opening fence:
 Order a scenario input-first so it reads top-to-bottom: `yaml` config, then `tsp`, then any
 `json` inputs, then the `go` output blocks.
 
-To (re)generate the expected output blocks from the current emitter, run with
-`SCENARIOS_UPDATE=true` and review the produced snapshots as part of your change:
+To (re)generate the expected output blocks from the current emitter, run the update command
+and review the produced snapshots as part of your change:
 
 ```terminal
-SCENARIOS_UPDATE=true pnpm test
+pnpm test:update
 ```
+
+(This is `pnpm test` with `SCENARIOS_UPDATE=true`; it rewrites the output blocks in each
+`.md` in place.)
 
 Each `.md` is backed by a generated vitest suite under `test/unittest/scenario-suites/`.
 After adding, removing, or renaming a scenario, regenerate the suites:
