@@ -6,7 +6,7 @@ import {
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 
-import { armResourceOperationMissingApiVersionRule } from "../../src/rules/use-api-version.js";
+import { useApiVersionRule } from "../../src/rules/use-api-version.js";
 
 let runner: TesterInstance;
 let tester: LinterRuleTester;
@@ -15,7 +15,7 @@ beforeEach(async () => {
   runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    armResourceOperationMissingApiVersionRule,
+    useApiVersionRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });

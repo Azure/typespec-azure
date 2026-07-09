@@ -13,7 +13,7 @@ import {
   isTemplatedInterfaceOperation,
 } from "./utils.js";
 
-export const armResourceOperationMissingApiVersionRule = createRule({
+export const useApiVersionRule = createRule({
   name: "use-api-version",
   severity: "warning",
   description:

@@ -37,8 +37,8 @@ import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
 import { secretProprule } from "./rules/secret-prop.js";
 import { unsupportedTypeRule } from "./rules/unsupported-type.js";
-import { armResourceOperationMissingApiVersionRule } from "./rules/use-api-version.js";
-import { armResourceOperationMissingDecoratorRule } from "./rules/use-operation-decorator.js";
+import { useApiVersionRule } from "./rules/use-api-version.js";
+import { useOperationDecoratorRule } from "./rules/use-operation-decorator.js";
 import { versionProgressionRule } from "./rules/version-progression.js";
 
 const rules = [
@@ -58,8 +58,8 @@ const rules = [
   armResourceKeyInvalidCharsRule,
   armResourceNamePatternRule,
   armResourceOperationsRule,
-  armResourceOperationMissingApiVersionRule,
-  armResourceOperationMissingDecoratorRule,
+  useApiVersionRule,
+  useOperationDecoratorRule,
   armResourcePathInvalidCharsRule,
   armResourceProvisioningStateRule,
   versionProgressionRule,

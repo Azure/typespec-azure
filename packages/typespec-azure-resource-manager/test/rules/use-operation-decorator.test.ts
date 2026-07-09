@@ -6,7 +6,7 @@ import {
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 
-import { armResourceOperationMissingDecoratorRule } from "../../src/rules/use-operation-decorator.js";
+import { useOperationDecoratorRule } from "../../src/rules/use-operation-decorator.js";
 
 let runner: TesterInstance;
 let tester: LinterRuleTester;
@@ -15,7 +15,7 @@ beforeEach(async () => {
   runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    armResourceOperationMissingDecoratorRule,
+    useOperationDecoratorRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });

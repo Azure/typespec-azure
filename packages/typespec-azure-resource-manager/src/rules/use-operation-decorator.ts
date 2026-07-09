@@ -12,7 +12,7 @@ import {
   isTemplatedInterfaceOperation,
 } from "./utils.js";
 
-export const armResourceOperationMissingDecoratorRule = createRule({
+export const useOperationDecoratorRule = createRule({
   name: "use-operation-decorator",
   severity: "warning",
   description: "Validate ARM Resource operations use the correct decorator for the HTTP verb.",
