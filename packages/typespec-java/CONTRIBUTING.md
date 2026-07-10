@@ -51,6 +51,20 @@ cd packages/typespec-java
 pwsh ./Build-TypeSpec.ps1
 ```
 
+### Pinning the core commit (`core-commit.json`)
+
+`Copy-Sources.ps1` copies the emitter sources from the `core/` submodule's current checkout. The
+optional `core-commit.json` pins a specific upstream `core` commit to copy from instead:
+
+```json
+{ "sha": "3cb616e4e8c3d5b6954bac9832b97445450a71af" }
+```
+
+The pinned SHA is fetched if needed and used only when it is **newer** than the current checkout (the
+submodule never moves backwards). The submodule is checked out transiently for the copy, then always
+restored to its original SHA, keeping `pnpm build` and CI git-status checks clean. To advance the pin,
+update the `sha`.
+
 ### Troubleshooting
 
 If `pnpm turbo ...` fails with `'turbo' is not recognized as an internal or external command`
