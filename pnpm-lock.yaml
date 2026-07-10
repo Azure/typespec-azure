@@ -3709,19 +3709,22 @@ importers:
         specifier: 'catalog:'
         version: 1.21.0(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)
       '@azure-tools/typespec-autorest':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../typespec-azure-core
+      '@azure-tools/typespec-azure-portal-core':
+        specifier: workspace:*
+        version: link:../typespec-azure-portal-core
       '@azure-tools/typespec-azure-resource-manager':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../typespec-azure-resource-manager
       '@azure-tools/typespec-azure-rulesets':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../typespec-azure-rulesets
       '@azure-tools/typespec-client-generator-core':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../typespec-client-generator-core
       '@azure-tools/typespec-liftr-base':
         specifier: 'catalog:'
@@ -3736,34 +3739,34 @@ importers:
         specifier: 'catalog:'
         version: 26.0.0
       '@typespec/compiler':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../core/packages/compiler
       '@typespec/events':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../core/packages/events
       '@typespec/http':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../core/packages/http
       '@typespec/openapi':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../core/packages/openapi
       '@typespec/rest':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../core/packages/rest
       '@typespec/sse':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../core/packages/sse
       '@typespec/streams':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../core/packages/streams
       '@typespec/tspd':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../core/packages/tspd
       '@typespec/versioning':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../core/packages/versioning
       '@typespec/xml':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../core/packages/xml
       rimraf:
         specifier: 'catalog:'

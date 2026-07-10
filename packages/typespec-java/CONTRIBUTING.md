@@ -49,9 +49,6 @@ pnpm turbo run --filter "@azure-tools/typespec-java^..." build
 # emitter TypeScript, and packs the .tgz consumed by emitter-tests.
 cd packages/typespec-java
 pwsh ./Build-TypeSpec.ps1
-
-# Just the TypeScript half (no jar; fast):
-pnpm build:emitter
 ```
 
 ### Troubleshooting
