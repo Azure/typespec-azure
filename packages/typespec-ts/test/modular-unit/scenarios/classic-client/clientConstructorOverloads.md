@@ -53,14 +53,7 @@ export class GlobalServiceClient {
 
   /** Client.GlobalService Resource Provider management API. */
   constructor(credential: TokenCredential, options: GlobalServiceClientOptionalParams = {}) {
-    const prefixFromOptions = options?.userAgentOptions?.userAgentPrefix;
-    const userAgentPrefix = prefixFromOptions
-      ? `${prefixFromOptions} azsdk-js-client`
-      : `azsdk-js-client`;
-    this._client = createGlobalService(credential, {
-      ...options,
-      userAgentOptions: { userAgentPrefix },
-    });
+    this._client = createGlobalService(credential, options);
     this.pipeline = this._client.pipeline;
     this.operations = _getOperationsOperations(this._client);
   }
@@ -188,14 +181,7 @@ export class StandardServiceClient {
     subscriptionId: string,
     options: StandardServiceClientOptionalParams = {},
   ) {
-    const prefixFromOptions = options?.userAgentOptions?.userAgentPrefix;
-    const userAgentPrefix = prefixFromOptions
-      ? `${prefixFromOptions} azsdk-js-client`
-      : `azsdk-js-client`;
-    this._client = createStandardService(credential, subscriptionId, {
-      ...options,
-      userAgentOptions: { userAgentPrefix },
-    });
+    this._client = createStandardService(credential, subscriptionId, options);
     this.pipeline = this._client.pipeline;
   }
 
@@ -340,14 +326,7 @@ export class MixedServiceClient {
     }
 
     options = options ?? {};
-    const prefixFromOptions = options?.userAgentOptions?.userAgentPrefix;
-    const userAgentPrefix = prefixFromOptions
-      ? `${prefixFromOptions} azsdk-js-client`
-      : `azsdk-js-client`;
-    this._client = createMixedService(credential, subscriptionId ?? "", {
-      ...options,
-      userAgentOptions: { userAgentPrefix },
-    });
+    this._client = createMixedService(credential, subscriptionId ?? "", options);
     this.pipeline = this._client.pipeline;
   }
 
