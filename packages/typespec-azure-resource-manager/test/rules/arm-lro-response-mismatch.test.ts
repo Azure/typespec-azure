@@ -6,7 +6,7 @@ import {
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 
-import { armPostLroResponseMismatchRule } from "../../src/rules/arm-post-lro-response-mismatch.js";
+import { armLroResponseMismatchRule } from "../../src/rules/arm-lro-response-mismatch.js";
 
 let runner: TesterInstance;
 let tester: LinterRuleTester;
@@ -15,7 +15,7 @@ beforeEach(async () => {
   runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    armPostLroResponseMismatchRule,
+    armLroResponseMismatchRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });
@@ -56,7 +56,7 @@ describe("emits warning when 200 response body does not match finalResult", () =
       `,
       )
       .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
+        code: "@azure-tools/typespec-azure-resource-manager/lro-response-mismatch",
         message: `The final result type of a long-running POST operation does not match the response. Specify the FinalResult in the LroHeaders parameter to match the response type. For example: 'LroHeaders = ArmLroLocationHeader<FinalResult = ResponseType>'.`,
       });
   });
@@ -87,7 +87,7 @@ describe("emits warning when 200 response body does not match finalResult", () =
       `,
       )
       .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
+        code: "@azure-tools/typespec-azure-resource-manager/lro-response-mismatch",
         message: `The final result type of a long-running POST operation does not match the response. Specify the FinalResult in the LroHeaders parameter to match the response type. For example: 'LroHeaders = ArmLroLocationHeader<FinalResult = ResponseType>'.`,
       });
   });
@@ -114,7 +114,7 @@ describe("emits warning when 200 response body does not match finalResult", () =
       `,
       )
       .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
+        code: "@azure-tools/typespec-azure-resource-manager/lro-response-mismatch",
         message: `The final result type of a long-running POST operation does not match the response. Specify the FinalResult in the LroHeaders parameter to match the response type. For example: 'LroHeaders = ArmLroLocationHeader<FinalResult = ResponseType>'.`,
       });
   });
@@ -142,7 +142,7 @@ describe("emits warning when 204 response has non-void finalResult", () => {
       `,
       )
       .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
+        code: "@azure-tools/typespec-azure-resource-manager/lro-response-mismatch",
         message: `The final result type of a long-running POST operation does not match the response. Specify the FinalResult in the LroHeaders parameter to match the response type. For example: 'LroHeaders = ArmLroLocationHeader<FinalResult = ResponseType>'.`,
       });
   });
@@ -171,7 +171,7 @@ describe("emits warning for ArmResourceActionAsyncBase with 200 response body mi
       `,
       )
       .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
+        code: "@azure-tools/typespec-azure-resource-manager/lro-response-mismatch",
         message: `The final result type of a long-running POST operation does not match the response. Specify the FinalResult in the LroHeaders parameter to match the response type. For example: 'LroHeaders = ArmLroLocationHeader<FinalResult = ResponseType>'.`,
       });
   });
@@ -200,7 +200,7 @@ describe("emits warning for 202-only ActionAsync template when finalResult misma
       `,
       )
       .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
+        code: "@azure-tools/typespec-azure-resource-manager/lro-response-mismatch",
         message: `The final result type of a long-running POST operation does not match the response. Specify the FinalResult in the LroHeaders parameter to match the response type. For example: 'LroHeaders = ArmLroLocationHeader<FinalResult = ResponseType>'.`,
       });
   });
@@ -385,7 +385,7 @@ describe("does not emit warning", () => {
       `,
       )
       .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-post-lro-response-mismatch",
+        code: "@azure-tools/typespec-azure-resource-manager/lro-response-mismatch",
         message:
           "The final result type of a long-running POST operation does not match the response. Specify the FinalResult in the LroHeaders parameter to match the response type. For example: 'LroHeaders = ArmLroLocationHeader<FinalResult = ResponseType>'.",
       });
@@ -435,6 +435,145 @@ describe("does not emit warning", () => {
   });
 });
 
+describe("PUT (createOrUpdate) LRO operations", () => {
+  it("does not emit warning when standard ArmResourceCreateOrReplaceAsync is used", async () => {
+    await tester
+      .expect(
+        `
+      ${preamble}
+
+      @armResourceOperations
+      interface Employees {
+        createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+      }
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("emits warning when PUT LRO finalResult does not match resource type", async () => {
+    await tester
+      .expect(
+        `
+      ${preamble}
+
+      model OtherModel {
+        value: string;
+      }
+
+      @armResourceOperations
+      interface Employees {
+        createOrUpdate is ArmResourceCreateOrReplaceAsync<
+          Employee,
+          LroHeaders = ArmLroLocationHeader<FinalResult = OtherModel>
+        >;
+      }
+      `,
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/lro-response-mismatch",
+        message:
+          "The final result type of operation createOrUpdate does not match the resource type. Please use standard Async templates or set the FinalResult type in the 201 response.",
+      });
+  });
+});
+
+describe("PATCH (update) LRO operations", () => {
+  it("does not emit warning when standard ArmResourcePatchAsync is used", async () => {
+    await tester
+      .expect(
+        `
+      ${preamble}
+
+      model EmployeeProperties {
+        age?: int32;
+      }
+
+      @armResourceOperations
+      interface Employees {
+        update is ArmResourcePatchAsync<Employee, EmployeeProperties>;
+      }
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("emits warning when PATCH LRO finalResult does not match resource type", async () => {
+    await tester
+      .expect(
+        `
+      ${preamble}
+
+      model EmployeeProperties {
+        age?: int32;
+      }
+
+      model OtherModel {
+        value: string;
+      }
+
+      @armResourceOperations
+      interface Employees {
+        update is ArmResourcePatchAsync<
+          Employee,
+          EmployeeProperties,
+          LroHeaders = ArmLroLocationHeader<
+            Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
+            OtherModel,
+            string
+          > & Azure.Core.Foundations.RetryAfterHeader
+        >;
+      }
+      `,
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/lro-response-mismatch",
+        message:
+          "The final result type of operation update does not match the resource type. Please use standard Async templates or set the FinalResult type in the 202 response.",
+      });
+  });
+});
+
+describe("DELETE LRO operations", () => {
+  it("does not emit warning when standard ArmResourceDeleteWithoutOkAsync is used", async () => {
+    await tester
+      .expect(
+        `
+      ${preamble}
+
+      @armResourceOperations
+      interface Employees {
+        delete is ArmResourceDeleteWithoutOkAsync<Employee>;
+      }
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("emits warning when DELETE LRO finalResult is not void", async () => {
+    await tester
+      .expect(
+        `
+      ${preamble}
+
+      @armResourceOperations
+      interface Employees {
+        #suppress "deprecated" "testing"
+        delete is ArmResourceDeleteAsync<
+          Employee,
+          LroHeaders = ArmLroLocationHeader<FinalResult = Employee>
+        >;
+      }
+      `,
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/lro-response-mismatch",
+        message:
+          "The final result type of operation delete does not match the resource type. Please use standard Async templates or set the FinalResult type in the 202 response to void.",
+      });
+  });
+});
+
 describe("codefix", () => {
   it("suggests setting FinalResult in LroHeaders to match Response type", async () => {
     await tester
@@ -462,7 +601,7 @@ describe("codefix", () => {
       }
       `,
       )
-      .applyCodeFix("arm-post-lro-set-final-result")
+      .applyCodeFix("arm-lro-set-final-result")
       .toEqual(
         `
       @armProviderNamespace
@@ -515,7 +654,7 @@ describe("codefix", () => {
       }
       `,
       )
-      .applyCodeFix("arm-post-lro-set-final-result")
+      .applyCodeFix("arm-lro-set-final-result")
       .toEqual(
         `
       @armProviderNamespace

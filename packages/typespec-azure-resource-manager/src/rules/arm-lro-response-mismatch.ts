@@ -4,7 +4,9 @@ import {
   getNamespaceFullName,
   getSourceLocation,
   isVoidType,
+  Model,
   Operation,
+  paramMessage,
   Program,
   Type,
 } from "@typespec/compiler";
@@ -21,6 +23,7 @@ import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import { HttpOperationResponse, HttpPayloadBody } from "@typespec/http";
 import { ArmResourceOperation } from "../operations.js";
 import { resolveArmResources } from "../resource.js";
+import { ResolvedResource } from "../resource.js";
 
 /**
  * Check if a node is a TypeReference to ArmLroLocationHeader (with or without template arguments).
@@ -60,7 +63,7 @@ function createLroHeadersCodeFix(op: Operation, responseTypeName: string): CodeF
     const lastArg = templateArgs[templateArgs.length - 1];
     const lastArgLocation = getSourceLocation(lastArg);
     return {
-      id: "arm-post-lro-set-final-result",
+      id: "arm-lro-set-final-result",
       label: `Set FinalResult to ${responseTypeName} in LroHeaders`,
       fix(context) {
         return context.appendText(lastArgLocation, `,\n  LroHeaders = ${newValue}`);
@@ -78,7 +81,7 @@ function createLroHeadersCodeFix(op: Operation, responseTypeName: string): CodeF
     const lroHeaderOption = options.find((opt) => isArmLroLocationHeaderRef(opt));
     if (lroHeaderOption !== undefined) {
       return {
-        id: "arm-post-lro-set-final-result",
+        id: "arm-lro-set-final-result",
         label: `Set FinalResult to ${responseTypeName} in LroHeaders`,
         fix(context) {
           const optionLocation = getSourceLocation(lroHeaderOption);
@@ -91,7 +94,7 @@ function createLroHeadersCodeFix(op: Operation, responseTypeName: string): CodeF
   // If the value is a direct reference to ArmLroLocationHeader, replace it
   if (isArmLroLocationHeaderRef(argExpr)) {
     return {
-      id: "arm-post-lro-set-final-result",
+      id: "arm-lro-set-final-result",
       label: `Set FinalResult to ${responseTypeName} in LroHeaders`,
       fix(context) {
         const argValueLocation = getSourceLocation(argExpr);
@@ -102,7 +105,7 @@ function createLroHeadersCodeFix(op: Operation, responseTypeName: string): CodeF
 
   // Fallback: replace the entire LroHeaders argument value
   return {
-    id: "arm-post-lro-set-final-result",
+    id: "arm-lro-set-final-result",
     label: `Set FinalResult to ${responseTypeName} in LroHeaders`,
     fix(context) {
       const argValueLocation = getSourceLocation(argExpr);
@@ -196,17 +199,19 @@ function getTypeName(type: Type): string | undefined {
 }
 
 /**
- * Verify that the final result of an ARM LRO POST operation matches the Response parameter.
+ * Verify that the final result of an ARM LRO operation matches the expected response.
  */
-export const armPostLroResponseMismatchRule = createRule({
-  name: "arm-post-lro-response-mismatch",
+export const armLroResponseMismatchRule = createRule({
+  name: "lro-response-mismatch",
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/post-lro-response-mismatch",
-  description:
-    "Ensure that the final result of a long-running POST operation matches the response.",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/lro-response-mismatch",
+  description: "Ensure that the final result of a long-running operation matches the response.",
   messages: {
     default: `The final result type of a long-running POST operation does not match the response. Specify the FinalResult in the LroHeaders parameter to match the response type. For example: 'LroHeaders = ArmLroLocationHeader<FinalResult = ResponseType>'.`,
     conflictingResponses: `A POST operation should not contain both a 204 (NoContent) response and a 200 (OK) response with a non-empty body.`,
+    mismatchedPutOperation: paramMessage`The final result type of operation ${"operationName"} does not match the resource type. Please use standard Async templates or set the FinalResult type in the 201 response.`,
+    mismatchedPatchOperation: paramMessage`The final result type of operation ${"operationName"} does not match the resource type. Please use standard Async templates or set the FinalResult type in the 202 response.`,
+    mismatchedDeleteOperation: paramMessage`The final result type of operation ${"operationName"} does not match the resource type. Please use standard Async templates or set the FinalResult type in the 202 response to void.`,
   },
   create(context) {
     /**
@@ -252,7 +257,11 @@ export const armPostLroResponseMismatchRule = createRule({
       );
     }
 
-    function reportMismatch(op: ArmResourceOperation, responseType?: Type) {
+    function reportPostMismatch(
+      op: ArmResourceOperation,
+      messageId?: "default" | "conflictingResponses",
+      responseType?: Type,
+    ) {
       const codefixes: CodeFix[] = [];
       if (responseType !== undefined) {
         const responseTypeName = getTypeName(responseType);
@@ -265,14 +274,12 @@ export const armPostLroResponseMismatchRule = createRule({
       }
       context.reportDiagnostic({
         target: op.operation,
+        messageId: messageId ?? "default",
         codefixes,
       });
     }
 
-    function validateOperation(op: ArmResourceOperation) {
-      if (op.httpOperation.verb !== "post") {
-        return;
-      }
+    function validatePostOperation(op: ArmResourceOperation) {
       const lroMetadata = getLroMetadata(context.program, op.operation);
       if (lroMetadata === undefined) {
         return;
@@ -295,18 +302,15 @@ export const armPostLroResponseMismatchRule = createRule({
         if (bodyIsVoidOrEmpty) {
           // 200 with void/empty body (with or without 204): finalResult should be void
           if (finalResult !== "void") {
-            reportMismatch(op);
+            reportPostMismatch(op);
           }
         } else if (has204) {
           // 200 with non-void body AND 204: conflicting responses
-          context.reportDiagnostic({
-            target: op.operation,
-            messageId: "conflictingResponses",
-          });
+          reportPostMismatch(op, "conflictingResponses");
         } else {
           // 200 with non-void body, no 204: body should match finalResult
           if (!doesFinalResultMatch(finalResult, body200.type)) {
-            reportMismatch(op, body200.type);
+            reportPostMismatch(op, "default", body200.type);
           }
         }
         return;
@@ -315,7 +319,7 @@ export const armPostLroResponseMismatchRule = createRule({
       // Case 2: 204 response without 200
       if (has204) {
         if (finalResult !== "void") {
-          reportMismatch(op);
+          reportPostMismatch(op);
         }
         return;
       }
@@ -332,7 +336,7 @@ export const armPostLroResponseMismatchRule = createRule({
         ) {
           const responseType = getResponseTemplateParam(op.operation);
           if (responseType !== undefined && !doesFinalResultMatch(finalResult, responseType)) {
-            reportMismatch(op, responseType);
+            reportPostMismatch(op, "default", responseType);
           }
         }
         // Not an ActionAsync template or no Response param — skip
@@ -342,20 +346,94 @@ export const armPostLroResponseMismatchRule = createRule({
       // No recognizable response pattern — skip
     }
 
+    function validatePutOrPatchOperation(
+      op: ArmResourceOperation,
+      resource: ResolvedResource,
+      verb: "put" | "patch",
+    ) {
+      const lroMetadata = getLroMetadata(context.program, op.operation);
+      if (lroMetadata === undefined) {
+        return;
+      }
+
+      const { finalResult } = lroMetadata;
+      if (finalResult === undefined) {
+        return;
+      }
+
+      const resourceType: Model = resource.type;
+      if (!doesFinalResultMatch(finalResult, resourceType)) {
+        const messageId = verb === "put" ? "mismatchedPutOperation" : "mismatchedPatchOperation";
+        context.reportDiagnostic({
+          target: op.operation,
+          messageId,
+          format: { operationName: op.name },
+        });
+      }
+    }
+
+    function validateDeleteOperation(op: ArmResourceOperation) {
+      const lroMetadata = getLroMetadata(context.program, op.operation);
+      if (lroMetadata === undefined) {
+        return;
+      }
+
+      const { finalResult } = lroMetadata;
+      if (finalResult === undefined) {
+        return;
+      }
+
+      if (finalResult !== "void") {
+        context.reportDiagnostic({
+          target: op.operation,
+          messageId: "mismatchedDeleteOperation",
+          format: { operationName: op.name },
+        });
+      }
+    }
+
     return {
       root: (program: Program) => {
         const provider = resolveArmResources(program);
 
-        // Check resource-level actions
         for (const resource of provider.resources ?? []) {
+          // Check resource-level POST actions
           for (const op of resource.operations.actions) {
-            validateOperation(op);
+            if (op.httpOperation.verb === "post") {
+              validatePostOperation(op);
+            }
+          }
+
+          // Check PUT (createOrUpdate) lifecycle operations
+          const createOrUpdateOps = resource.operations.lifecycle.createOrUpdate;
+          if (createOrUpdateOps) {
+            for (const op of createOrUpdateOps) {
+              validatePutOrPatchOperation(op, resource, "put");
+            }
+          }
+
+          // Check PATCH (update) lifecycle operations
+          const updateOps = resource.operations.lifecycle.update;
+          if (updateOps) {
+            for (const op of updateOps) {
+              validatePutOrPatchOperation(op, resource, "patch");
+            }
+          }
+
+          // Check DELETE lifecycle operations
+          const deleteOps = resource.operations.lifecycle.delete;
+          if (deleteOps) {
+            for (const op of deleteOps) {
+              validateDeleteOperation(op);
+            }
           }
         }
 
         // Check provider-level actions
         for (const op of provider.providerOperations ?? []) {
-          validateOperation(op);
+          if (op.httpOperation.verb === "post") {
+            validatePostOperation(op);
+          }
         }
       },
     };
