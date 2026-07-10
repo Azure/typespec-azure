@@ -320,7 +320,7 @@ it("emits missingGet for a singleton tracked resource missing read", async () =>
     });
 });
 
-it("is valid when an extension resource has only a read operation", async () => {
+it("is valid for a top-level extension resource with only a read operation", async () => {
   await tester
     .expect(
       `
