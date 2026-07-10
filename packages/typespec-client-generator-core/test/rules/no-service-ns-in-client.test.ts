@@ -4,22 +4,21 @@ import {
   TesterInstance,
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
-import { noServiceNamespaceRedefinitionRule } from "../../src/rules/no-service-namespace-redefinition.js";
+import { noServiceNsInClientRule } from "../../src/rules/no-service-ns-in-client.js";
 import { createClientCustomizationInput, SimpleBaseTester } from "../tester.js";
 
 const libraryName = "@azure-tools/typespec-client-generator-core";
-const diagnosticCode =
-  "@azure-tools/typespec-client-generator-core/no-service-namespace-redefinition";
+const diagnosticCode = "@azure-tools/typespec-client-generator-core/no-service-ns-in-client";
 
 let runner: TesterInstance;
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
   runner = await SimpleBaseTester.createInstance();
-  tester = createLinterRuleTester(runner, noServiceNamespaceRedefinitionRule, libraryName);
+  tester = createLinterRuleTester(runner, noServiceNsInClientRule, libraryName);
 });
 
-describe("no-service-namespace-redefinition", () => {
+describe("no-service-ns-in-client", () => {
   it("is valid for augment decorators in client.tsp", async () => {
     await tester
       .expect(
