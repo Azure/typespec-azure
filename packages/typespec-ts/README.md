@@ -50,7 +50,7 @@ This option is used to indicate whether to include response headers in the gener
 
 ### `package-details`
 
-**Type:** `object { name, scopeName, nameWithoutScope, description, version, isVersionUserProvided }`
+**Type:** `object { name, scopeName, nameWithoutScope, description, version }`
 
 This is to indicate the package information such as package name, package description etc.
 
@@ -63,7 +63,6 @@ This is to indicate the package information such as package name, package descri
 | `nameWithoutScope`      | `string`  |         |             |
 | `description`           | `string`  |         |             |
 | `version`               | `string`  |         |             |
-| `isVersionUserProvided` | `boolean` |         |             |
 
 ### `add-credentials`
 

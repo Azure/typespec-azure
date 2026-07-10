@@ -99,7 +99,6 @@ export const EmitterOptionsSchema: JSONSchemaType<EmitterOptions> = {
         nameWithoutScope: { type: "string", nullable: true },
         description: { type: "string", nullable: true },
         version: { type: "string", nullable: true },
-        isVersionUserProvided: { type: "boolean", nullable: true },
       },
       required: ["name"],
       nullable: true,
