@@ -44,20 +44,19 @@ This option is used to indicate whether to include response headers in the gener
 
 ### `package-details`
 
-**Type:** `object { name, scopeName, nameWithoutScope, description, version, isVersionUserProvided }`
+**Type:** `object { name, scopeName, nameWithoutScope, description, version }`
 
 This is to indicate the package information such as package name, package description etc.
 
 **Properties:**
 
-| Name                    | Type      | Default | Description |
-| ----------------------- | --------- | ------- | ----------- |
-| `name`                  | `string`  |         |             |
-| `scopeName`             | `string`  |         |             |
-| `nameWithoutScope`      | `string`  |         |             |
-| `description`           | `string`  |         |             |
-| `version`               | `string`  |         |             |
-| `isVersionUserProvided` | `boolean` |         |             |
+| Name               | Type     | Default | Description |
+| ------------------ | -------- | ------- | ----------- |
+| `name`             | `string` |         |             |
+| `scopeName`        | `string` |         |             |
+| `nameWithoutScope` | `string` |         |             |
+| `description`      | `string` |         |             |
+| `version`          | `string` |         |             |
 
 ### `add-credentials`
 
