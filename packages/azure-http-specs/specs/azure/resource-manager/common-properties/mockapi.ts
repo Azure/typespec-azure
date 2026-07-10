@@ -231,3 +231,73 @@ Scenarios.Azure_ResourceManager_CommonProperties_Error_createForUserDefinedError
   },
   kind: "MockApiDefinition",
 });
+
+// armResourceIdentifier resources
+const SIMPLE_ARM_ID = `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Microsoft.Network/virtualNetworks/myVnet`;
+const ARM_ID_WITH_TYPE = `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Microsoft.Network/virtualNetworks/myVnet`;
+const ARM_ID_WITH_TYPE_AND_SCOPE = `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Microsoft.Network/virtualNetworks/myVnet`;
+const ARM_ID_WITH_ALL_SCOPES = `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Microsoft.Compute/virtualMachines/myVm`;
+
+const validArmResourceIdentifierResource = {
+  id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.CommonProperties/armResourceIdentifierResources/armId`,
+  location: `${LOCATION_REGION_EXPECTED}`,
+  name: "armId",
+  type: "Azure.ResourceManager.CommonProperties/armResourceIdentifierResources",
+  properties: {
+    provisioningState: "Succeeded",
+    simpleArmId: SIMPLE_ARM_ID,
+    armIdWithType: ARM_ID_WITH_TYPE,
+    armIdWithTypeAndScope: ARM_ID_WITH_TYPE_AND_SCOPE,
+    armIdWithAllScopes: ARM_ID_WITH_ALL_SCOPES,
+  },
+};
+
+Scenarios.Azure_ResourceManager_CommonProperties_ArmResourceIdentifiers_get = passOnSuccess({
+  uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.CommonProperties/armResourceIdentifierResources/:armResourceIdentifierResourceName",
+  method: "get",
+  request: {
+    pathParams: {
+      subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      resourceGroup: RESOURCE_GROUP_EXPECTED,
+      armResourceIdentifierResourceName: "armId",
+    },
+    query: {
+      "api-version": "2023-12-01-preview",
+    },
+  },
+  response: {
+    status: 200,
+    body: json(validArmResourceIdentifierResource),
+  },
+  kind: "MockApiDefinition",
+});
+
+Scenarios.Azure_ResourceManager_CommonProperties_ArmResourceIdentifiers_createOrReplace =
+  passOnSuccess({
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.CommonProperties/armResourceIdentifierResources/:armResourceIdentifierResourceName",
+    method: "put",
+    request: {
+      body: json({
+        location: "eastus",
+        properties: {
+          simpleArmId: SIMPLE_ARM_ID,
+          armIdWithType: ARM_ID_WITH_TYPE,
+          armIdWithTypeAndScope: ARM_ID_WITH_TYPE_AND_SCOPE,
+          armIdWithAllScopes: ARM_ID_WITH_ALL_SCOPES,
+        },
+      }),
+      pathParams: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        armResourceIdentifierResourceName: "armId",
+      },
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 200,
+      body: json(validArmResourceIdentifierResource),
+    },
+    kind: "MockApiDefinition",
+  });

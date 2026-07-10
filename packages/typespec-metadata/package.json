@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-metadata",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "TypeSpec emitter that produces structured metadata snapshots for APIView and other tooling.",
   "type": "module",
   "license": "MIT",
@@ -36,8 +36,8 @@
     "build": "tsc -p tsconfig.build.json",
     "watch": "tsc -p tsconfig.build.json --watch",
     "clean": "rimraf ./dist ./temp",
-    "lint": "eslint .  --max-warnings=0",
-    "lint:fix": "eslint . --fix ",
+    "lint": "oxlint . --deny-warnings",
+    "lint:fix": "oxlint . --fix",
     "test": "vitest run",
     "test:watch": "vitest -w",
     "test:ui": "vitest --ui",

@@ -1,0 +1,56 @@
+import { joinPaths } from "@typespec/compiler";
+
+import { ModularEmitterOptions } from "./interfaces.js";
+
+import { SdkClientType, SdkServiceOperation } from "@azure-tools/typespec-client-generator-core";
+import { useContext } from "../context-manager.js";
+import { getClientModuleInfo } from "../utils/client-utils.js";
+import { SdkContext } from "../utils/interfaces.js";
+import { NameType, normalizeName } from "../utils/name-utils.js";
+import { getMethodHierarchiesMap } from "../utils/operation-util.js";
+import { buildOperationOptions } from "./build-operations.js";
+
+// ====== UTILITIES ======
+
+export function buildApiOptions(
+  context: SdkContext,
+  clientMap: [string[], SdkClientType<SdkServiceOperation>],
+  emitterOptions: ModularEmitterOptions,
+) {
+  const project = useContext("outputProject");
+  const [_, client] = clientMap;
+  const modelOptionsFiles = [];
+  const { subfolder } = getClientModuleInfo(clientMap);
+  const methodMap = getMethodHierarchiesMap(context, client);
+  for (const [prefixKey, operations] of methodMap) {
+    const prefixes = prefixKey.split("/");
+    const modelOptionsFile = project.createSourceFile(
+      joinPaths(
+        emitterOptions.modularOptions.sourceRoot,
+        subfolder ?? "",
+        `api`,
+        ...prefixes.map((p) => normalizeName(p, NameType.File)),
+        "options.ts",
+      ),
+      undefined,
+      {
+        overwrite: true,
+      },
+    );
+    operations.forEach((o) => {
+      buildOperationOptions(context, [prefixes, o], modelOptionsFile);
+    });
+    modelOptionsFile
+      .getImportDeclarations()
+      .filter((id) => {
+        return id.isModuleSpecifierRelative() && !id.getModuleSpecifierValue().endsWith(".js");
+      })
+      .map((id) => {
+        id.setModuleSpecifier(id.getModuleSpecifierValue() + ".js");
+        return id;
+      });
+    modelOptionsFiles.push(modelOptionsFile);
+  }
+
+  return modelOptionsFiles;
+}

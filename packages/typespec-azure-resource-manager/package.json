@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-azure-resource-manager",
-  "version": "0.68.0",
+  "version": "0.69.1",
   "author": "Microsoft Corporation",
   "description": "TypeSpec Azure Resource Manager library",
   "homepage": "https://azure.github.io/typespec-azure",
@@ -47,8 +47,8 @@
     "test:watch": "vitest -w",
     "test:ui": "vitest --ui",
     "test:ci": "vitest run --coverage  --reporter=junit --reporter=default",
-    "lint": "eslint .  --max-warnings=0",
-    "lint:fix": "eslint . --fix ",
+    "lint": "oxlint . --deny-warnings",
+    "lint:fix": "oxlint . --fix",
     "regen-docs": "tspd doc .  --enable-experimental --llmstxt  --output-dir ../../website/src/content/docs/docs/libraries/azure-resource-manager/reference"
   },
   "files": [

@@ -8,7 +8,7 @@ TypeSpec emitter for Python SDKs
 npm install @azure-tools/typespec-python
 ```
 
-## Usage
+## Emitter usage
 
 1. Via the command line
 
@@ -62,9 +62,9 @@ The flavor of the SDK.
 
 ### `models-mode`
 
-**Type:** `"dpg" | "none"`
+**Type:** `"dpg" | "none" | "typeddict"`
 
-What kind of models to generate. If you pass in `none`, we won't generate models. `dpg` models are the default models we generate.
+What kind of models to generate. If you pass in `none`, we won't generate models. `dpg` models are the default models we generate. If you pass in `typeddict`, we will generate models as typed dictionaries.
 
 ### `generate-sample`
 
@@ -80,15 +80,30 @@ Whether to generate test files, for basic testing of your generated sdks. Defaul
 
 ### `api-version`
 
-**Type:** `string`
+**Type:** `string | object`
 
-Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`.
+Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`. For multi-service packages, provide a map from each service namespace's full name to its desired version; services not listed default to their latest version.
+
+**Options:**
+
+- `string`
+- `object`
 
 ### `license`
 
-**Type:** `object`
+**Type:** `object { name, company, link, header, description }`
 
 License information for the generated client code.
+
+**Properties:**
+
+| Name          | Type     | Default | Description                                                                                                                                                                                                                      |
+| ------------- | -------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`        | `string` |         | License name. The config is required. Predefined license are: MIT License, Apache License 2.0, BSD 3-Clause License, MPL 2.0, GPL-3.0, LGPL-3.0. For other license, you need to configure all the other license config manually. |
+| `company`     | `string` |         | License company name. It will be used in copyright sentences.                                                                                                                                                                    |
+| `link`        | `string` |         | License link.                                                                                                                                                                                                                    |
+| `header`      | `string` |         | License header. It will be used in the header comment of generated client code.                                                                                                                                                  |
+| `description` | `string` |         | License description. The full license text.                                                                                                                                                                                      |
 
 ### `package-version`
 
@@ -137,3 +152,58 @@ Whether to return responses from HEAD requests as boolean. Defaults to `true`.
 **Type:** `boolean`
 
 Whether to generate using `pyodide` instead of `python`. If there is no python installed on your device, we will default to using pyodide to generate the code.
+
+### `validate-versioning`
+
+**Type:** `boolean`
+
+Whether to validate the versioning of the package. Defaults to `true`. If set to `false`, we will not validate the versioning of the package.
+
+### `generation-subdir`
+
+**Type:** `string`
+
+The subdirectory (relative to the package namespace folder) to generate the code in. Use this to keep emitter-generated code separate from hand-written/customized code, so regeneration only overwrites the subdirectory and leaves your customizations untouched. If not specified, the code is generated directly in the package namespace folder. Note: if you're using this flag, you will need to add and maintain the versioning file (`_version.py`) yourself.
+
+Example: for `namespace: azure.storage.blob` with `generation-subdir: _generated`, generated code lands in `azure/storage/blob/_generated/` while your customized code lives in `azure/storage/blob/`. A typical `tspconfig.yaml` looks like:
+
+```yaml
+options:
+  "@azure-tools/typespec-python":
+    emitter-output-dir: "{output-dir}/{service-dir}/azure-storage-blob"
+    namespace: "azure.storage.blob"
+    generation-subdir: "_generated"
+```
+
+### `keep-setup-py`
+
+**Type:** `boolean`
+
+Whether to keep the existing `setup.py` when `generate-packaging-files` is `true`. If set to `false` and by default, `pyproject.toml` will be generated instead. To generate `setup.py`, use `basic-setup-py`.
+
+### `keep-pyproject-fields`
+
+**Type:** `object { authors, description, classifiers, urls }`
+
+Which manually customized `[project]` fields to preserve in an existing `pyproject.toml` instead of overwriting them on regeneration. Set a field to `true` to keep it. By default no fields are preserved.
+
+**Properties:**
+
+| Name          | Type      | Default | Description                                                         |
+| ------------- | --------- | ------- | ------------------------------------------------------------------- |
+| `authors`     | `boolean` |         | Preserve the `authors` field (e.g. a custom author name and email). |
+| `description` | `boolean` |         | Preserve the `description` field.                                   |
+| `classifiers` | `boolean` |         | Preserve the `classifiers` field.                                   |
+| `urls`        | `boolean` |         | Preserve the `[project.urls]` table.                                |
+
+### `clear-output-folder`
+
+**Type:** `boolean`
+
+Whether to clear the output folder before generating the code. Defaults to `false`.
+
+### `emit-yaml-only`
+
+**Type:** `boolean`
+
+Emit YAML code model only, without running Python generator. For batch processing.

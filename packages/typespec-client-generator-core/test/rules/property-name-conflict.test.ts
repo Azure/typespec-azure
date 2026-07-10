@@ -157,22 +157,3 @@ it("emit warning if spread property name conflicts with model name", async () =>
       message: `Property 'foo' having the same name as its enclosing model will cause problems with C# code generation. Consider renaming the property directly or using the @clientName("newName", "csharp") decorator to rename the property for C#.`,
     });
 });
-
-it("don't emit ", async () => {
-  await tester
-    .expect(
-      `
-      model Base {
-        foo: string
-      }
-
-      model Foo {
-        ...Base;
-      }
-      `,
-    )
-    .toEmitDiagnostics({
-      code: "@azure-tools/typespec-client-generator-core/property-name-conflict",
-      message: `Property 'foo' having the same name as its enclosing model will cause problems with C# code generation. Consider renaming the property directly or using the @clientName("newName", "csharp") decorator to rename the property for C#.`,
-    });
-});

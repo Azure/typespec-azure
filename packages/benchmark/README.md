@@ -7,8 +7,11 @@ Performance benchmarking tool for TypeSpec Azure compilation. Tracks compilation
 1. **Benchmark runner** compiles dedicated TypeSpec specs using the compiler's programmatic API
 2. The compiler provides built-in `Stats` data including per-stage timing and per-linter-rule breakdown
 3. Runtime metrics are aggregated with an outlier-resistant estimator (trimmed mean for 5+ samples, median for smaller sample sizes)
-4. Results are stored as JSON — on CI, they're saved to the `benchmark-data` branch
-5. PR comments show a comparison table highlighting performance changes
+4. Per-spec variability (standard deviation and coefficient of variation) is captured from raw iterations
+5. Optional noise-gating can auto-run extra iterations when variance is high
+6. PR baseline can be built from a rolling window of recent `main` results instead of only `latest.json`
+7. Results are stored as JSON — on CI, they're saved to the `benchmark-data` branch
+8. PR comments show a comparison table highlighting performance changes
 
 ## Local usage
 
@@ -25,6 +28,9 @@ node packages/benchmark/dist/src/cli.js run --output results.json
 node packages/benchmark/dist/src/cli.js run \
   --iterations 3 \
   --warmup 1 \
+  --noise-cv-threshold 0.08 \
+  --max-reruns 1 \
+  --rerun-iterations 5 \
   --specs azure-core-dataplane,azure-arm-resource-manager \
   --output results.json
 ```
@@ -78,6 +84,7 @@ The `.github/workflows/benchmark.yml` workflow:
 
 - **On push to `main`**: Runs benchmarks and stores results to the `benchmark-data` branch via the `store-results` CLI command
 - **On pull requests**: Runs benchmarks, fetches the baseline, compares, and generates a PR comment via the `upload-pr-comment` CLI command
+- Benchmark PR baselines are generated from a rolling window of recent `main` runs when `results/history.json` is available, with fallback to `results/latest.json`
 
 ### Data storage
 
