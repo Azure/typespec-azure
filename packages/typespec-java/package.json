@@ -29,7 +29,7 @@
   },
   "scripts": {
     "clean": "rimraf ./dist ./temp ./generator",
-    "build": "npm run build:generator && npm run build:emitter",
+    "build": "npm run build:emitter && npm run build:generator",
     "build:emitter": "pwsh -NoProfile -File Copy-Sources.ps1 && tsc -p .",
     "build:generator": "pwsh -NoProfile -File Build-Generator.ps1",
     "watch": "tsc -p . --watch",

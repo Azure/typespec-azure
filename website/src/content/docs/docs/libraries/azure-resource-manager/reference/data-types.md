@@ -1770,10 +1770,10 @@ model Azure.ResourceManager.BaseTypes.Agents.ConversationProperties
 
 #### Properties
 
-| Name            | Type              | Description                                                                 |
-| --------------- | ----------------- | --------------------------------------------------------------------------- |
-| conversationId? | `string`          | Unique conversation identifier. Read-only (set by the service on creation). |
-| createdAt?      | `unixTimestamp32` | Timestamp of when the conversation was created. Read-only.                  |
+| Name            | Type          | Description                                                                 |
+| --------------- | ------------- | --------------------------------------------------------------------------- |
+| conversationId? | `string`      | Unique conversation identifier. Read-only (set by the service on creation). |
+| createdAt?      | `utcDateTime` | Timestamp of when the conversation was created. Read-only.                  |
 
 ### `InputMessage` {#Azure.ResourceManager.BaseTypes.Agents.InputMessage}
 
@@ -1878,7 +1878,7 @@ model Azure.ResourceManager.BaseTypes.Agents.ResponseProperties
 | Name        | Type                                                                                      | Description                                                                                                          |
 | ----------- | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | responseId? | `string`                                                                                  | Unique response identifier. Read-only (set by the service).                                                          |
-| createdAt?  | `unixTimestamp32`                                                                         | Timestamp of when the response was created. Read-only.                                                               |
+| createdAt?  | `utcDateTime`                                                                             | Timestamp of when the response was created. Read-only.                                                               |
 | model?      | `string`                                                                                  | Model ID used to generate the response. May be specified on request to override the agent default; read-only in GET. |
 | status?     | [`ResponseStatus`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ResponseStatus) | The status of the response. Read-only.                                                                               |
 | input       | [`InputMessage`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.InputMessage)     | Content input to the model. Required on create.                                                                      |
@@ -1893,14 +1893,14 @@ union Azure.ResourceManager.BaseTypes.Agents.ResponseStatus
 
 #### Variants
 
-| Name       | Type            | Description                           |
-| ---------- | --------------- | ------------------------------------- |
-| Completed  | `"completed"`   | The response completed successfully.  |
-| Failed     | `"failed"`      | The response failed.                  |
-| Cancelled  | `"cancelled"`   | The response was cancelled.           |
-| Incomplete | `"incomplete"`  | The response is incomplete.           |
-| Queued     | `"queued"`      | The response is queued for execution. |
-| InProgress | `"in_progress"` | The response is in progress.          |
+| Name       | Type           | Description                           |
+| ---------- | -------------- | ------------------------------------- |
+| Completed  | `"Completed"`  | The response completed successfully.  |
+| Failed     | `"Failed"`     | The response failed.                  |
+| Cancelled  | `"Cancelled"`  | The response was cancelled.           |
+| Incomplete | `"Incomplete"` | The response is incomplete.           |
+| Queued     | `"Queued"`     | The response is queued for execution. |
+| InProgress | `"InProgress"` | The response is in progress.          |
 
 ## Azure.ResourceManager.CommonTypes
 

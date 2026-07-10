@@ -5,7 +5,7 @@ import {
   SourceFile,
   StructureKind,
 } from "ts-morph";
-import { buildUserAgentOptions, getClientParametersDeclaration } from "./helpers/client-helpers.js";
+import { getClientParametersDeclaration } from "./helpers/client-helpers.js";
 import { getClassicalClientName, getClientName } from "./helpers/naming-helpers.js";
 import { ModularEmitterOptions } from "./interfaces.js";
 
@@ -127,11 +127,7 @@ export function buildClassicalClient(
     .map((p) => p.name)
     .map((x) => {
       if (x === "options") {
-        return `{...options, userAgentOptions: ${buildUserAgentOptions(
-          constructor,
-          emitterOptions,
-          "azsdk-js-client",
-        )}}`;
+        return `options`;
       } else if (x.toLowerCase() === "subscriptionid" && shouldSubscriptionIdOptional) {
         return `subscriptionId ?? ""`;
       } else {
