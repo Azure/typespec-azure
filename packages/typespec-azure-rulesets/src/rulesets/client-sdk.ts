@@ -5,5 +5,9 @@ import type { LinterRuleSet } from "@typespec/compiler";
 export default {
   enable: {
     "@azure-tools/typespec-client-generator-core/csharp-no-url-suffix": true,
+    "@azure-tools/typespec-client-generator-core/csharp-no-options-suffix": true,
+    "@azure-tools/typespec-client-generator-core/csharp-no-request-suffix": true,
+    "@azure-tools/typespec-client-generator-core/csharp-no-response-suffix": true,
+    "@azure-tools/typespec-client-generator-core/csharp-use-standard-acronyms": true,
   },
 } satisfies LinterRuleSet;
