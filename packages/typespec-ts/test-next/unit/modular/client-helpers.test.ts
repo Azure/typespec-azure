@@ -25,12 +25,11 @@ function emitterOptionsWith(
 }
 
 describe("buildUserAgentOptions", () => {
-  it("reads the package version dynamically from package.json for the api context", () => {
+  it("reads the package version dynamically from package.json", () => {
     const { sourceFile, factoryFunction } = createFactoryFunction();
     const result = buildUserAgentOptions(
       factoryFunction,
       emitterOptionsWith({ name: "@azure/foo", nameWithoutScope: "foo" }),
-      "azsdk-js-api",
     );
     const text = sourceFile.getFullText();
 
@@ -43,24 +42,12 @@ describe("buildUserAgentOptions", () => {
     expect(text).not.toContain("1.0.0-beta.1");
   });
 
-  it("does not surface userAgentInfo (or import package.json) for the client prefix", () => {
-    const { sourceFile, factoryFunction } = createFactoryFunction();
-    buildUserAgentOptions(
-      factoryFunction,
-      emitterOptionsWith({ name: "@azure/foo", nameWithoutScope: "foo" }),
-      "azsdk-js-client",
-    );
-    const text = sourceFile.getFullText();
-
-    expect(text).not.toContain("userAgentInfo");
-    expect(text).not.toContain("package.json");
-  });
-
   it("does not surface userAgentInfo when no package name is available", () => {
     const { sourceFile, factoryFunction } = createFactoryFunction();
-    buildUserAgentOptions(factoryFunction, emitterOptionsWith(undefined), "azsdk-js-api");
+    const result = buildUserAgentOptions(factoryFunction, emitterOptionsWith(undefined));
     const text = sourceFile.getFullText();
 
+    expect(result).toBe("");
     expect(text).not.toContain("userAgentInfo");
     expect(text).not.toContain("package.json");
   });
@@ -70,8 +57,8 @@ describe("buildUserAgentOptions", () => {
     const secondFactory = sourceFile.addFunction({ name: "createOther", isExported: true });
     const options = emitterOptionsWith({ name: "@azure/foo", nameWithoutScope: "foo" });
 
-    buildUserAgentOptions(factoryFunction, options, "azsdk-js-api");
-    buildUserAgentOptions(secondFactory, options, "azsdk-js-api");
+    buildUserAgentOptions(factoryFunction, options);
+    buildUserAgentOptions(secondFactory, options);
 
     const importCount = sourceFile
       .getImportDeclarations()
