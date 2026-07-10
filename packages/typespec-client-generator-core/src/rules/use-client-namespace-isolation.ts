@@ -12,11 +12,11 @@ import {
   type TypeSpecScriptNode,
 } from "@typespec/compiler/ast";
 
-export const noServiceNamespaceRedefinitionRule = createRule({
-  name: "no-service-namespace-redefinition",
-  description: "Prevent client.tsp from redefining the service namespace.",
+export const useClientNamespaceIsolationRule = createRule({
+  name: "use-client-namespace-isolation",
+  description: "Keep client.tsp types in an isolated client namespace.",
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/no-service-namespace-redefinition",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/use-client-namespace-isolation",
   messages: {
     default:
       paramMessage`client.tsp must not define namespace "${"namespace"}" because it is in the service namespace "${"serviceNamespace"}". Put new types in another namespace such as "Customizations" and use augment decorators for service customizations.`,

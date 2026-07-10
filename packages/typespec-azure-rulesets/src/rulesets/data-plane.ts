@@ -48,7 +48,7 @@ export default {
     // TCGC rules
     "@azure-tools/typespec-client-generator-core/require-client-suffix": true,
     "@azure-tools/typespec-client-generator-core/property-name-conflict": true,
-    "@azure-tools/typespec-client-generator-core/no-service-namespace-redefinition": true,
+    "@azure-tools/typespec-client-generator-core/use-client-namespace-isolation": true,
     "@azure-tools/typespec-client-generator-core/no-unnamed-types": false, // Too bad performance https://github.com/Azure/typespec-azure/issues/2803
 
     // Azure core rules enabled via an optional rulesets
