@@ -23,17 +23,21 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 try {
+    # core-commit.json is optional: when present it pins the core commit to copy
+    # sources from; when absent we just use the submodule's current checkout.
     $configPath = Join-Path $packageRoot "core-commit.json"
-    if (-not (Test-Path $configPath)) {
-        Write-Error "core-commit.json not found at: $configPath"
+    $targetSha = $null
+    if (Test-Path $configPath) {
+        $targetSha = ((Get-Content -Raw $configPath | ConvertFrom-Json).sha).Trim()
+        if ([string]::IsNullOrWhiteSpace($targetSha)) {
+            Write-Error "No 'sha' found in $configPath."
+        }
     }
-    $targetSha = ((Get-Content -Raw $configPath | ConvertFrom-Json).sha).Trim()
-
-    if ([string]::IsNullOrWhiteSpace($targetSha)) {
-        Write-Error "No 'sha' found in $configPath."
+    else {
+        Write-Host "core-commit.json not found; using current core checkout $originSha."
     }
 
-    if ($targetSha -ne $originSha) {
+    if ($targetSha -and $targetSha -ne $originSha) {
         # Make sure the target commit is available locally (it may be newer than
         # what has been fetched); ignore failure if it is already present.
         git -C $coreRoot fetch --quiet origin $targetSha 2>$null
