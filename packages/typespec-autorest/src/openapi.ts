@@ -29,6 +29,7 @@ import {
   getClientNameOverride,
   getLegacyHierarchyBuilding,
   getMarkAsLro,
+  isInScope,
   shouldFlattenProperty,
 } from "@azure-tools/typespec-client-generator-core";
 import {
@@ -254,6 +255,25 @@ export interface AutorestDocumentEmitterOptions {
    * Determines whether output should be split into multiple files.  The only supported option for splitting is "legacy-feature-files",
    */
   readonly outputSplitting?: "legacy-feature-files";
+
+  /**
+   * When enabled, example files will not be copied to the output directory.
+   * Instead, the source example files will be referenced using relative file paths.
+   * @default false
+   */
+  readonly skipExampleCopying?: boolean;
+
+  /**
+   * Strategy for naming the OpenAPI names derived from TypeSpec types (definition/schema
+   * names, parameter keys, inline names, `x-typespec-name`, etc.).
+   *
+   * - `"namespaced"`: Include the namespace prefix for types outside the service namespace
+   *   (e.g. `LiftrBase.Foo`). Default.
+   * - `"name-only"`: Use only the type name without any namespace prefix (e.g. `Foo`). Conflicts are
+   *   reported as an error.
+   * @default "namespaced"
+   */
+  readonly typeNameStrategy?: "namespaced" | "name-only";
 }
 
 type HttpParameterProperties = Extract<
@@ -271,6 +291,11 @@ export async function getOpenAPIForService(
   const typeNameOptions: TypeNameOptions = {
     // shorten type names by removing TypeSpec and service namespace
     namespaceFilter(ns) {
+      // With the "name-only" strategy, strip every namespace so names are not prefixed by their
+      // namespace (e.g. `Foo` instead of `LiftrBase.Foo`).
+      if (options.typeNameStrategy === "name-only") {
+        return false;
+      }
       return !isService(program, ns);
     },
   };
@@ -317,16 +342,27 @@ export async function getOpenAPIForService(
 
   const operationIdsWithExample = new Set<string>();
 
+  // Compute the example directory for resolving source example paths
+  const exampleDir = resolveExampleDir(
+    options.examplesDirectory,
+    program.projectRoot,
+    context.version,
+  );
+
   const [exampleMap, diagnostics] = await loadExamples(program, options, context.version);
   program.reportDiagnostics(diagnostics);
 
   const routes = httpService.operations;
-  reportIfNoRoutes(program, routes);
+  // Filter routes to only include operations in scope for this emitter
+  const inScopeRoutes = routes.filter((route) =>
+    isInScope(context.tcgcSdkContext, route.operation),
+  );
+  reportIfNoRoutes(program, inScopeRoutes);
 
   const xmlEnabled = xmlStrategy !== "none";
 
   // The set of produces/consumes values found in all operations
-  let allResponseContentTypes = routes
+  let allResponseContentTypes = inScopeRoutes
     .flatMap((route) => route.responses)
     .flatMap((res) => res.responses)
     .flatMap((res) => res.body?.contentTypes ?? [])
@@ -339,7 +375,7 @@ export async function getOpenAPIForService(
   if (allResponseContentTypes.length === 0) allResponseContentTypes = ["application/json"];
   const globalProduces = new Set<string>(allResponseContentTypes);
 
-  let allRequestContentTypes = routes
+  let allRequestContentTypes = inScopeRoutes
     .flatMap((route) => route.parameters)
     .flatMap((param) => param.body?.contentTypes ?? [])
     .filter(
@@ -357,7 +393,7 @@ export async function getOpenAPIForService(
     globalConsumes.size === 1 &&
     globalConsumes.has("application/xml");
 
-  routes.forEach(emitOperation);
+  inScopeRoutes.forEach(emitOperation);
 
   emitParameters();
   emitSchemas(service.type);
@@ -610,7 +646,15 @@ export async function getOpenAPIForService(
       operationIdsWithExample.add(currentEndpoint.operationId);
       currentEndpoint["x-ms-examples"] = currentEndpoint["x-ms-examples"] || {};
       for (const [title, example] of Object.entries(autoExamples)) {
-        currentEndpoint["x-ms-examples"][title] = { $ref: `./examples/${example.relativePath}` };
+        let ref: string;
+        if (options.skipExampleCopying) {
+          const sourceExamplePath = resolvePath(exampleDir, example.relativePath);
+          const outputDir = getDirectoryPath(context.outputFile);
+          ref = getRelativePathFromDirectory(outputDir, sourceExamplePath, false);
+        } else {
+          ref = `./examples/${example.relativePath}`;
+        }
+        currentEndpoint["x-ms-examples"][title] = { $ref: ref };
       }
     }
 
@@ -990,6 +1034,9 @@ export async function getOpenAPIForService(
     const consumes: string[] = methodParams.body?.contentTypes ?? [];
 
     for (const httpProperty of methodParams.properties) {
+      if (!isInScope(context.tcgcSdkContext, httpProperty.property)) {
+        continue;
+      }
       const shared = params.get(httpProperty.property);
       if (shared) {
         currentEndpoint.parameters.push(shared);
@@ -1523,7 +1570,16 @@ export async function getOpenAPIForService(
     }
 
     function processUnreferencedSchemas() {
+      const authentication = resolveAuthentication(httpService);
+      const authSchemeModels = new Set<Type>(
+        authentication ? authentication.schemes.map((s) => s.model) : [],
+      );
       const addSchema = (type: Type) => {
+        if (authSchemeModels.has(type)) {
+          // Auth scheme models are emitted under securityDefinitions
+          // and should not also appear as payload schemas in definitions.
+          return;
+        }
         if (
           !processedSchemas.has(type) &&
           !indirectlyProcessedTypes.has(type) &&
@@ -1890,6 +1946,9 @@ export async function getOpenAPIForService(
     applyExternalDocs(model, modelSchema);
 
     for (const prop of model.properties.values()) {
+      if (!isInScope(context.tcgcSdkContext, prop)) {
+        continue;
+      }
       if (rawBaseModel && rawBaseModel.properties.has(prop.name)) {
         const baseProp = rawBaseModel.properties.get(prop.name);
         if (baseProp?.name === prop.name && baseProp.type === prop.type) {
@@ -2799,6 +2858,33 @@ export function sortOpenAPIDocument(doc: OpenAPI2Document): OpenAPI2Document {
   return sorted;
 }
 
+/**
+ * Resolves the example directory path, supporting `{version}` and `{version-status}` interpolation
+ * variables in the `examples-dir` option.
+ *
+ * When the examples-dir contains `{version}` or `{version-status}`, these are interpolated
+ * with the actual version values and the resulting path is used directly.
+ * Otherwise, the version is appended as a subdirectory (legacy behavior).
+ */
+function resolveExampleDir(
+  examplesDirectory: string | undefined,
+  projectRoot: string,
+  version: string | undefined,
+): string {
+  const rawDir = examplesDirectory ?? resolvePath(projectRoot, "examples");
+  const hasVersionInterpolation = rawDir.includes("{version}");
+
+  if (hasVersionInterpolation) {
+    const versionStatus = version && (version.includes("preview") ? "preview" : "stable");
+    return interpolatePath(rawDir, {
+      "version-status": versionStatus,
+      version: version,
+    });
+  }
+
+  return version ? resolvePath(rawDir, version) : rawDir;
+}
+
 async function checkExamplesDirExists(host: CompilerHost, dir: string) {
   try {
     return (await host.stat(dir)).isDirectory();
@@ -2841,8 +2927,7 @@ async function loadExamples(
 ): Promise<[Map<string, Record<string, LoadedExample>>, readonly Diagnostic[]]> {
   const host = program.host;
   const diagnostics = createDiagnosticCollector();
-  const examplesBaseDir = options.examplesDirectory ?? resolvePath(program.projectRoot, "examples");
-  const exampleDir = version ? resolvePath(examplesBaseDir, version) : resolvePath(examplesBaseDir);
+  const exampleDir = resolveExampleDir(options.examplesDirectory, program.projectRoot, version);
 
   if (!(await checkExamplesDirExists(host, exampleDir))) {
     if (options.examplesDirectory) {

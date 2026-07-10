@@ -87,6 +87,8 @@ union WidgetColor {
 
 ✅ **DO** make client customizations in a `client.tsp` file
 
+✅ **DO** reference `client.tsp` in `main.tsp` (add `import "./client.tsp";` so `main.tsp` is the single entrypoint)
+
 ❌ **DON'T** import or use `@azure-tools/typespec-client-generator-core` in other files aside from client.tsp.
 
 ✅ **DO** run `tsp compile .` on your specification and address all warnings

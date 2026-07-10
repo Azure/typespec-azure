@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-azure-portal-core",
-  "version": "0.68.0",
+  "version": "0.69.0",
   "author": "Microsoft Corporation",
   "description": "TypeSpec Azure Portal Core library",
   "license": "MIT",
@@ -15,8 +15,8 @@
     "test:watch": "vitest -w",
     "test:ui": "vitest --ui",
     "test:ci": "vitest run --coverage  --reporter=junit --reporter=default",
-    "lint": "eslint .  --max-warnings=0",
-    "lint:fix": "eslint . --fix ",
+    "lint": "oxlint . --deny-warnings",
+    "lint:fix": "oxlint . --fix",
     "regen-docs": "tspd doc .  --enable-experimental  --output-dir ../../website/src/content/docs/docs/libraries/azure-portal-core/reference"
   },
   "keywords": [

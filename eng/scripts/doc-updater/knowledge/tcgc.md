@@ -121,6 +121,8 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - `operation-not-in-client`: REMOVED in May 2026. This diagnostic no longer exists.
 - `inconsistent-multiple-service-dependency` (warning): Emitted when services merged into the same client depend on different versions of a shared library dependency. Documented in 03client.mdx under the "One Client from Multiple Services" section and in guideline.md under "Client Detection".
 - `legacy-hierarchy-building-conflict` (warning): Now only has `property-type-mismatch` message ID (the old `property-missing` and `type-mismatch` message IDs were removed). Emitted during property reconciliation when a dropped property's type is incompatible with the same-named property on the new base chain.
+- `override-parameters-mismatch` (error): In addition to the general "different parameters definition" case, `@override` now reports this when the override operation drops a parameter that is realized as a `@path` parameter in the original operation's HTTP route, or redeclares it without `@path` (the underlying route still needs it). The check is skipped when any override parameter carries `@clientLocation` (intentional relocation). Matching between original/override parameters is by **name**, not position (so overrides may add/remove/regroup parameters). "Realized path parameter" is resolved from `getHttpOperation(...).parameters` (route ground truth), not from the `@path` decorator alone, because templated params (e.g. ARM scope models) can carry `@path` without appearing in the route. Documented in 04method.mdx `@override` section as a `:::caution`.
+- `client-location-conflict` / `parameterTypeConflict` (warning): `@clientLocation` cannot move multiple parameters that share a name but have different types to the same client. Common when `@clientLocation` is on a templated parameter instantiated with different types across operations; the client parameter collapses to a single (last) type, breaking the SDK. Fix: move the parameter on each operation instead. Validated in `src/validations/types.ts` (`validateClientLocationParameterTypes`). Documented in 04method.mdx `@clientLocation` section as a `:::caution`.
 
 ## External Type Usage Propagation
 
@@ -170,6 +172,15 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - Multiple request content types: enum with one value per content type.
 - Multiple response content types: single constant with comma-joined string (structured types first).
 - Constants and enums get proper generated names via the naming context path (e.g., `DownloadFileMultipleContentTypesAccept`).
+- For file bodies with multiple content types, TCGC reuses the File model's `contentType` property's union type so that the synthesized `contentType` header parameter and the File model's property reference the same `SdkEnumType` instance.
+
+## Example Matching (June 2026)
+
+- Example file operation IDs are resolved under the `autorest` scope (not the per-language scope) to avoid per-language `@clientLocation`/`@clientName` overrides breaking example linkage. This ensures the same example file matches regardless of which language emitter is consuming TCGC.
+
+## BinarySerializationOptions (June 2026)
+
+- The `filename` property on `BinarySerializationOptions` is of type `SdkModelPropertyType` (not the raw TypeSpec `ModelProperty`). This was corrected from the original implementation to use TCGC's own type system consistently.
 
 ## Usage Flag Propagation
 
@@ -184,7 +195,7 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - The `isExactName: boolean` property was added to many SDK type interfaces: SdkModelType, SdkEnumType, SdkUnionType, SdkConstantType, SdkNullableType, SdkClientInitializationType, SdkModelPropertyTypeBase (base for all property types), SdkClientType, SdkEnumValueType, and SdkServiceMethodBase.
 - Set to `true` when a name is wrapped with the `exact()` function in `@clientName`.
 - The `exact()` function internally prepends `_exact_:` prefix which is stripped by `normalizeExactName()` before the name reaches the type graph.
-- Exported helpers: `EXACT_NAME_PREFIX`, `hasExactNameMarker()`, `normalizeExactName()` from the TCGC package index.
+- Exported helpers: `hasExactNameMarker()`, `normalizeExactName()` from the TCGC package index. `EXACT_NAME_PREFIX` is internal (defined in `internal-utils.ts`).
 - Public utility: `isExactClientName(context, type)` checks whether a type has exact name override.
 - Documented in guideline.md under Common Properties and in 09renaming.mdx under "Preserving exact casing".
 
@@ -205,3 +216,45 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - `listOrphanTypes` no longer iterates only user-defined namespaces. It now uses `listScopedDecoratorData` to find all types and namespaces with an explicit `@usage` decorator, including types in imported libraries (e.g., `@@usage(Azure.Core.Foundations.Error, Usage.input)`).
 - When `@usage` is applied to a namespace, the function recursively descends into sub-namespaces to collect all models, enums, and unions.
 - Types with `@hierarchyBuilding` are also collected separately (only when legacy hierarchy building is enabled).
+- **Ordering**: `listOrphanTypes` returns types in a stable order: models first, then enums, then unions. This ensures anonymous types (e.g., anonymous model variants inside unions) get their generated name from the model property context rather than the union context, producing stable names like `OuterWithNullableValue` instead of `RecursiveNullableType1`.
+
+## Feedback Lessons (PR #4430)
+
+- Only ONE `#suppress "experimental-feature" "exact"` directive is needed per property — it covers all subsequent `@clientName(exact(...))` decorators on that property.
+- When creating exact-name Spector specs, the namespace needs `@clientNamespace` for BOTH Java (`"azure.clientgenerator.core.exactname"`) AND Python (`"specs.azure.clientgenerator.core.exactname"`) so tests pass in both language emitter test suites.
+- The @clientNamespace for python should be formatted multi-line if it exceeds a reasonable line length.
+
+## Per-Service API Version (June 2026)
+
+- The `api-version` emitter option now accepts `string | Record<string, string>`. The Record form maps service namespace full names to version strings, enabling per-service API version control in multi-service packages.
+- `resolveApiVersionForService` in `src/internal-utils.ts` is the central resolution function (internal, not exported). It handles string vs Record config dispatch.
+- For multi-service packages, `"all"` is NOT supported — it falls back to `undefined` (latest version). This applies in both the string and Record forms.
+- `"latest"` is a global keyword that applies regardless of single/multi-service.
+- In the Record form, services not listed in the map return `undefined` (latest version).
+- `SdkPackage.metadata.apiVersions` (Map) stores the resolved version per service. `metadata.apiVersion` (string, deprecated) is `undefined` for multi-service.
+- No Spector spec was added for this feature — it's a code-generation-time config behavior, not a wire-level behavior. The unit tests in `test/package/api-versions-metadata.test.ts` and `test/clients/structure.test.ts` thoroughly cover it.
+- The guideline.md was updated to document `SdkPackage.metadata` (both `apiVersion` and `apiVersions`).
+- The 10versioning.mdx was updated to mention the Record form and add a "Per-service versioning (multi-service packages)" section.
+
+## Linter Rules Documentation
+
+- Linter rules live in `packages/typespec-client-generator-core/src/rules/` and are registered in `src/linter.ts` (both the general `rules` array and the `csharpRules` array for C#-specific rules).
+- Each rule has a user-facing doc page under `website/src/content/docs/docs/libraries/typespec-client-generator-core/rules/<rule-name>.md` and a row in the auto-listed `reference/linter.md` table. These are typically added by the rule's own source PR — verify they exist before adding.
+- Rule doc page format: frontmatter `title:`, a `Full name` code block with the fully-qualified rule id, a one-line description, then `#### ❌ Incorrect` and `#### ✅ Correct` `tsp` examples (no `<ClientTabs>` needed — rule docs use plain `tsp` blocks).
+
+### csharp-no-url-suffix (PR #4541)
+
+- Warning rule: flags model properties whose **C#-resolved** name ends with `Url`, suggesting `Uri` instead (.NET convention). Uses `getLibraryName(tcgcContext, property, "csharp")`, so it respects `@clientName` overrides (both directions — it can also fire when `@clientName` introduces a `Url` suffix for C#). Case-sensitive (`imageurl` is not flagged); `Urls` plural is not flagged.
+- Provides a codefix that writes `@@clientName(Model.prop, "<name>Uri", "csharp")` into `client.tsp`.
+- Codefix helpers added in `src/rules/codefix-helpers.ts` are reusable by other rules:
+  - `createAugmentDecoratorCodeFix(target, decoratorName, args?)` — appends an `@@`-augment decorator at the end of the SAME file as the target.
+  - `createClientTspAugmentDecoratorCodeFix(target, decoratorName, program, args?)` — writes the augment decorator to `client.tsp` (creates imports/usings as needed, uses short refs when the namespace `using` is in scope, else FQN). Assumes `client.tsp` is imported via tspconfig.
+
+## doc-updater Mechanics
+
+- The incremental `changes.commits[].diff` only contains `packages/typespec-client-generator-core/src/` (source) diffs — NOT the doc files those same PRs may have changed. So a source PR that adds a linter rule, reference table row, or howto section will already have those docs in the tree at checkout. Always check the current doc state before adding; the doc work may already be done, leaving only cross-cutting howto notes for you.
+- Validation/diagnostic-only changes (new warnings/errors) and linter rules do not need Spector coverage — Spector demonstrates positive wire-level client generation, not error conditions. Document them as `:::caution`/`:::note` admonitions in the relevant howto section instead of new `<ClientTabs>` blocks.
+
+## Feedback Lessons (PR #4683)
+
+- In versioning (and any API-version) examples, use realistic **date-based** api-version identifiers (e.g. `2024-01-01`, enum members like `v2024_01_01: "2024-01-01"`) — NOT placeholder names like `av1`/`bv1`. Human reviewers rewrote placeholder versions to date-based ones. Keep the enum member name and its string value consistent (e.g. `v2024_05_01: "2024-05-01"`).

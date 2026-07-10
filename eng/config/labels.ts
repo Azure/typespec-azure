@@ -31,6 +31,18 @@ export const AreaLabels = defineLabels({
     color: "957300",
     description: "Issues for @azure-tools/typespec-python emitter",
   },
+  "emitter:typescript": {
+    color: "957300",
+    description: "Issues for @azure-tools/typespec-ts emitter",
+  },
+  "emitter:go": {
+    color: "957300",
+    description: "Issues for @azure-tools/typespec-go emitter",
+  },
+  "emitter:java": {
+    color: "0096c7",
+    description: "Issues for @azure-tools/typespec-java emitter",
+  },
   "emitter:client:all": {
     color: "957300",
     description:
@@ -52,6 +64,10 @@ export const AreaLabels = defineLabels({
     color: "007dc8",
     description: "TypeSpec.io updates",
   },
+  linter: {
+    color: "65bfff",
+    description: "Issues related to linter rules",
+  },
 });
 
 /**
@@ -63,12 +79,20 @@ export const AreaPaths: Record<keyof typeof AreaLabels, string[]> = {
   "lib:azure-resource-manager": ["packages/typespec-azure-resource-manager/"],
   "emitter:autorest": ["packages/typespec-autorest/"],
   "emitter:python": ["packages/typespec-python/"],
+  "emitter:typescript": ["packages/typespec-ts/"],
+  "emitter:go": [],
+  "emitter:java": ["packages/typespec-java/"],
   "lib:tcgc": ["packages/typespec-client-generator-core/"],
   "lib:azure-http-specs": ["packages/azure-http-specs/"],
   ide: [],
   "cli/psh": [],
   "emitter:client:all": [],
   "meta:website": ["website/"],
+  linter: [
+    "packages/typespec-azure-core/src/rules/",
+    "packages/typespec-azure-resource-manager/src/rules/",
+    "packages/typespec-client-generator-core/src/rules/",
+  ],
 };
 
 export default defineConfig({

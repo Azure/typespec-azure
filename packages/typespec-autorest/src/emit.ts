@@ -115,6 +115,8 @@ export function resolveAutorestOptions(
     emitCommonTypesSchema: resolvedOptions["emit-common-types-schema"],
     xmlStrategy: resolvedOptions["xml-strategy"],
     outputSplitting: resolvedOptions["output-splitting"],
+    skipExampleCopying: resolvedOptions["skip-example-copying"],
+    typeNameStrategy: resolvedOptions["type-name-strategy"],
   };
 }
 
@@ -322,7 +324,7 @@ async function emitOutput(
   });
 
   // Copy examples to the output directory
-  if (result.operationExamples.length > 0) {
+  if (result.operationExamples.length > 0 && !options.skipExampleCopying) {
     const examplesPath = resolvePath(getDirectoryPath(result.outputFile), "examples");
     await program.host.mkdirp(examplesPath);
     for (const { examples } of result.operationExamples) {

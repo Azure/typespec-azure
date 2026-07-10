@@ -43,8 +43,8 @@
     "watch": "vite --port 5174",
     "test:e2e": "cross-env PW_EXPERIMENTAL_TS_ESM=1 playwright test -c e2e",
     "test:e2e:headed": "cross-env PW_EXPERIMENTAL_TS_ESM=1 playwright test -c e2e --headed",
-    "lint": "eslint .  --max-warnings=0",
-    "lint:fix": "eslint . --fix "
+    "lint": "oxlint . --deny-warnings",
+    "lint:fix": "oxlint . --fix"
   },
   "files": [
     "lib/*.tsp",
@@ -57,6 +57,7 @@
     "@azure-tools/typespec-azure-resource-manager": "workspace:^",
     "@azure-tools/typespec-azure-rulesets": "workspace:^",
     "@azure-tools/typespec-client-generator-core": "workspace:^",
+    "@azure-tools/typespec-ts": "workspace:^",
     "@fluentui/react-components": "catalog:",
     "@fluentui/react-icons": "catalog:",
     "@typespec/compiler": "workspace:^",

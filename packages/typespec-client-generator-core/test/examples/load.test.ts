@@ -27,24 +27,6 @@ it("example config", async () => {
   strictEqual(operation.examples![0].filePath, "get.json");
 });
 
-it("example default config", async () => {
-  const instance = await SimpleTester.createInstance();
-  await instance.fs.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
-  const { program } = await instance.compile(`
-    @service
-    namespace TestClient {
-      op get(): string;
-    }
-  `);
-  const context = await createSdkContextForTester(program);
-
-  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
-    .operation;
-  ok(operation);
-  strictEqual(operation.examples?.length, 1);
-  strictEqual(operation.examples![0].filePath, "get.json");
-});
-
 it("no example folder found", async () => {
   const { program } = await SimpleTester.compile(`
     @service
@@ -59,24 +41,6 @@ it("no example folder found", async () => {
   expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/example-loading",
   });
-});
-
-it("load example without version", async () => {
-  const instance = await SimpleTester.createInstance();
-  await instance.fs.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
-  const { program } = await instance.compile(`
-    @service
-    namespace TestClient {
-      op get(): string;
-    }
-  `);
-  const context = await createSdkContextForTester(program);
-
-  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
-    .operation;
-  ok(operation);
-  strictEqual(operation.examples?.length, 1);
-  strictEqual(operation.examples![0].filePath, "get.json");
 });
 
 it("load example with version", async () => {
@@ -347,6 +311,46 @@ it("load example with @clientLocation root client", async () => {
 
   const mainClient = context.sdkPackage.clients[0];
   const operation = (mainClient.methods[0] as SdkServiceMethod<SdkHttpOperation>).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+});
+
+it("load example with per-language @clientLocation falls back to autorest scope", async () => {
+  // Example files come from autorest and have a single canonical operationId.
+  // Per-language @clientLocation overrides (e.g. moving an op to a different group
+  // only for one language) should not break example linkage for the other languages.
+  // Here the example file references the autorest-resolved id `AnotherInterface_clientLocation`,
+  // and the JS emitter has a conflicting per-language relocation to `JsGroup`.
+  // Example matching must still succeed using the autorest scope.
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./examples/clientLocationAnotherInterface.json",
+    `${__dirname}/load/clientLocationAnotherInterface.json`,
+  );
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      interface OriginalInterface {
+        @clientLocation(AnotherInterface, "!javascript")
+        @clientLocation("JsGroup", "javascript")
+        op clientLocation(): string;
+      }
+
+      interface AnotherInterface {
+      }
+    }
+  `);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-ts",
+  });
+
+  // For the JS emitter, the operation is relocated to `JsGroup`, but the example file
+  // uses the autorest-resolved id `AnotherInterface_clientLocation`. The example should
+  // still be linked because example matching resolves under the autorest scope.
+  const mainClient = context.sdkPackage.clients[0];
+  const jsClient = mainClient.children?.find((c) => c.name === "JsGroup");
+  ok(jsClient);
+  const operation = (jsClient.methods[0] as SdkServiceMethod<SdkHttpOperation>).operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
 });

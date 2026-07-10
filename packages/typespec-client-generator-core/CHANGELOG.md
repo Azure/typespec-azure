@@ -1,5 +1,35 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.69.1
+
+### Features
+
+- [917d2b1](https://github.com/Azure/typespec-azure/commit/917d2b12c66d0e46fa5894baaf2fed1a1950d517) Support a per-service `api-version` map for multi-service packages. The `api-version` emitter option now accepts either a string (applied to single service packages, or the `latest`/`all` keywords) or a map from each service namespace's full name to its desired version. Services not listed in the map default to their latest version.
+
+
+## 0.69.0
+
+### Bug Fixes
+
+- [#4567](https://github.com/Azure/typespec-azure/pull/4567) Move internal `EXACT_NAME_PREFIX` constant out of public exports to fix build failures when `skipLibCheck` is disabled.
+
+
+## 0.68.4
+
+### Bug Fixes
+
+- [#4515](https://github.com/Azure/typespec-azure/pull/4515) Fix example matching when `@clientLocation` (or `@clientName`) is applied with per-language scope. Example files coming from the swagger/autorest output carry a single canonical `operationId`, but per-language `@clientLocation` overrides previously caused TCGC to resolve a different operation id per emitter, silently breaking example linkage for all languages whose group name didn't match the example file. Example matching now resolves operation ids under the `autorest` scope so a single example file links successfully across all language emitters.
+- [#4514](https://github.com/Azure/typespec-azure/pull/4514) Fix mismatched enum type names for `Http.File` bodies with multiple content types. The synthetic `contentType` header/method parameter now reuses the `File` model's `contentType` property type, so the enum referenced by the parameter and the enum present in `sdkPackage.enums` are the same instance (and share the same name).
+
+
+## 0.68.3
+
+### Bug Fixes
+
+- [#4508](https://github.com/Azure/typespec-azure/pull/4508) Fix orphan type ordering so that models are always processed before unions, ensuring anonymous model variants inside unions get their generated name from the model property context rather than the union context. This restores the naming behavior from 0.68.0 that was inadvertently changed in 0.68.1.
+- [#4501](https://github.com/Azure/typespec-azure/pull/4501) Fix "Cannot read properties of undefined" crash in the `inconsistent-multiple-service-dependency` validation when a service merged into a multi-service client does not specify a version for a depended library (e.g. its latest service version has no matching `@useDependency` entry). The validation now falls back to the latest version of the depended library, matching the behavior of downstream emitters.
+
+
 ## 0.68.2
 
 ### Features
