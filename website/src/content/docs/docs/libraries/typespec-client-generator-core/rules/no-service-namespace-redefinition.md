@@ -1,9 +1,9 @@
 ---
-title: "use-client-namespace-isolation"
+title: "no-service-namespace-redefinition"
 ---
 
 ```text title="Full name"
-@azure-tools/typespec-client-generator-core/use-client-namespace-isolation
+@azure-tools/typespec-client-generator-core/no-service-namespace-redefinition
 ```
 
 `client.tsp` is for client-only customization. It must not reopen the service

@@ -21,10 +21,10 @@ Available ruleSets:
 
 ## Rules
 
-| Name                                                                                                                       | Description                                                                                     |
-| -------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| [`@azure-tools/typespec-client-generator-core/require-client-suffix`](../rules/require-client-suffix.md)                   | Client names should end with 'Client'.                                                          |
-| [`@azure-tools/typespec-client-generator-core/property-name-conflict`](../rules/property-name-conflict.md)                 | Avoid naming conflicts between a property and a model of the same name.                         |
-| [`@azure-tools/typespec-client-generator-core/no-unnamed-types`](../rules/no-unnamed-types.md)                             | Requires types to be named rather than defined anonymously or inline.                           |
-| [`@azure-tools/typespec-client-generator-core/csharp-no-url-suffix`](../rules/csharp-no-url-suffix.md)                     | Properties ending with 'Url' should use 'Uri' suffix instead to follow .NET naming conventions. |
-| [`@azure-tools/typespec-client-generator-core/use-client-namespace-isolation`](../rules/use-client-namespace-isolation.md) | Keep client.tsp types in an isolated client namespace.                                          |
+| Name                                                                                                                             | Description                                                                                     |
+| -------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| [`@azure-tools/typespec-client-generator-core/require-client-suffix`](../rules/require-client-suffix.md)                         | Client names should end with 'Client'.                                                          |
+| [`@azure-tools/typespec-client-generator-core/property-name-conflict`](../rules/property-name-conflict.md)                       | Avoid naming conflicts between a property and a model of the same name.                         |
+| [`@azure-tools/typespec-client-generator-core/no-unnamed-types`](../rules/no-unnamed-types.md)                                   | Requires types to be named rather than defined anonymously or inline.                           |
+| [`@azure-tools/typespec-client-generator-core/csharp-no-url-suffix`](../rules/csharp-no-url-suffix.md)                           | Properties ending with 'Url' should use 'Uri' suffix instead to follow .NET naming conventions. |
+| [`@azure-tools/typespec-client-generator-core/no-service-namespace-redefinition`](../rules/no-service-namespace-redefinition.md) | Prevent client.tsp from redefining the service namespace.                                       |
