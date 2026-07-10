@@ -20,10 +20,9 @@ import {
 import { $ } from "@typespec/compiler/typekit";
 
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
-import { HttpOperationResponse, HttpPayloadBody } from "@typespec/http";
+import { HttpOperationResponse, HttpPayloadBody, isHeader, isStatusCode } from "@typespec/http";
 import { ArmResourceOperation } from "../operations.js";
-import { resolveArmResources } from "../resource.js";
-import { ResolvedResource } from "../resource.js";
+import { resolveArmResources, ResolvedResource } from "../resource.js";
 
 /**
  * Check if a node is a TypeReference to ArmLroLocationHeader (with or without template arguments).
@@ -182,6 +181,20 @@ function hasOnly202Response(responses: HttpOperationResponse[]): boolean {
 }
 
 /**
+ * Check if a type is a header/metadata-only model with no body-producing properties.
+ * Such models are effectively void from an HTTP response body perspective.
+ */
+function isHeaderOnlyModel(program: Program, type: Type): boolean {
+  if (type.kind !== "Model") return false;
+  for (const prop of type.properties.values()) {
+    if (!isHeader(program, prop) && !isStatusCode(program, prop)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
  * Get a printable name for a type, if available.
  * Handles Model, Scalar, and Intrinsic types (including void, unknown, etc.).
  */
@@ -301,7 +314,8 @@ export const armLroResponseMismatchRule = createRule({
 
         if (bodyIsVoidOrEmpty) {
           // 200 with void/empty body (with or without 204): finalResult should be void
-          if (finalResult !== "void") {
+          // Also accept header-only models as effectively void (no body content)
+          if (finalResult !== "void" && !isHeaderOnlyModel(context.program, finalResult as Type)) {
             reportPostMismatch(op);
           }
         } else if (has204) {
