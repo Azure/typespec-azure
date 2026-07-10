@@ -21,7 +21,6 @@ import { armResourceOperationsRule } from "./rules/arm-resource-operation-respon
 import { patchOperationsRule } from "./rules/arm-resource-patch.js";
 import { armResourcePathInvalidCharsRule } from "./rules/arm-resource-path-invalid-chars.js";
 import { armResourceProvisioningStateRule } from "./rules/arm-resource-provisioning-state-rule.js";
-import { armResourceRequiredOperationsRule } from "./rules/arm-resource-required-operations.js";
 import { beyondNestingRule } from "./rules/beyond-nesting-levels.js";
 import { coreOperationsRule } from "./rules/core-operations.js";
 import { envelopePropertiesRules } from "./rules/envelope-properties.js";
@@ -39,6 +38,7 @@ import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
 import { secretProprule } from "./rules/secret-prop.js";
 import { unsupportedTypeRule } from "./rules/unsupported-type.js";
+import { useRequiredOperationsRule } from "./rules/use-required-operations.js";
 import { versionProgressionRule } from "./rules/version-progression.js";
 
 const rules = [
@@ -60,7 +60,7 @@ const rules = [
   armResourceOperationsRule,
   armResourcePathInvalidCharsRule,
   armResourceProvisioningStateRule,
-  armResourceRequiredOperationsRule,
+  useRequiredOperationsRule,
   versionProgressionRule,
   armCustomResourceNoKey,
   armCustomResourceUsageDiscourage,

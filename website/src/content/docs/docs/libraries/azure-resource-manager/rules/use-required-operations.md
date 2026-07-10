@@ -1,9 +1,9 @@
 ---
-title: arm-resource-required-operations
+title: use-required-operations
 ---
 
 ```text title=- Full name-
-@azure-tools/typespec-azure-resource-manager/arm-resource-required-operations
+@azure-tools/typespec-azure-resource-manager/use-required-operations
 ```
 
 ARM resources must declare their required lifecycle and list operations as

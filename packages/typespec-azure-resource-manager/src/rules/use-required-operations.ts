@@ -34,10 +34,10 @@ type RequiredOperationsMessages = {
  * lifecycle and list operations for its kind. This rule is singleton-aware
  * and complements `no-resource-delete-operation`.
  */
-export const armResourceRequiredOperationsRule = createRule({
-  name: "arm-resource-required-operations",
+export const useRequiredOperationsRule = createRule({
+  name: "use-required-operations",
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-required-operations",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/use-required-operations",
   description:
     "ARM resources must define their required operations: tracked resources need the full lifecycle and list set, other resources need a read operation.",
   messages: {

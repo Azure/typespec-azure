@@ -6,7 +6,7 @@ import {
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 
-import { armResourceRequiredOperationsRule } from "../../src/rules/arm-resource-required-operations.js";
+import { useRequiredOperationsRule } from "../../src/rules/use-required-operations.js";
 
 let runner: TesterInstance;
 let tester: LinterRuleTester;
@@ -15,7 +15,7 @@ beforeEach(async () => {
   runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    armResourceRequiredOperationsRule,
+    useRequiredOperationsRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });
@@ -65,7 +65,7 @@ it("emits missingDelete when only the delete operation is missing", async () => 
       `,
     )
     .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-required-operations",
+      code: "@azure-tools/typespec-azure-resource-manager/use-required-operations",
       message: `Resource 'Foo' must have a delete operation.`,
     });
 });
@@ -91,7 +91,7 @@ it("emits missingGet when only read is missing", async () => {
       `,
     )
     .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-required-operations",
+      code: "@azure-tools/typespec-azure-resource-manager/use-required-operations",
       message: `Resource 'Foo' must have a GET (read) operation.`,
     });
 });
@@ -114,7 +114,7 @@ it("emits a single default diagnostic listing all missing operations when multip
       `,
     )
     .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-required-operations",
+      code: "@azure-tools/typespec-azure-resource-manager/use-required-operations",
       message:
         "Resource 'Foo' is missing required operations: [read, delete, list-by-parent, list-by-subscription].",
     });
@@ -141,7 +141,7 @@ it("emits missingListByParent for a tracked resource without a list-by-resource-
       `,
     )
     .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-required-operations",
+      code: "@azure-tools/typespec-azure-resource-manager/use-required-operations",
       message: `Resource 'Foo' must have a list-by-parent operation (list-by-resource-group satisfies this for tracked resources).`,
     });
 });
@@ -167,7 +167,7 @@ it("emits missingListBySubscription for a tracked resource without a list-by-sub
       `,
     )
     .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-required-operations",
+      code: "@azure-tools/typespec-azure-resource-manager/use-required-operations",
       message: `Tracked resource 'Foo' must have a list-by-subscription operation.`,
     });
 });
@@ -210,7 +210,7 @@ it("emits missingGet for an extension resource missing read", async () => {
       `,
     )
     .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-required-operations",
+      code: "@azure-tools/typespec-azure-resource-manager/use-required-operations",
       message: `Resource 'Bar' must have a GET (read) operation.`,
     });
 });
@@ -258,7 +258,7 @@ it("emits missingCreateOrUpdate when only createOrUpdate is missing", async () =
       `,
     )
     .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-required-operations",
+      code: "@azure-tools/typespec-azure-resource-manager/use-required-operations",
       message: `Resource 'Foo' must have a PUT (createOrUpdate) operation.`,
     });
 });
@@ -282,7 +282,7 @@ it("emits missingGet for a singleton tracked resource missing read", async () =>
       `,
     )
     .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-required-operations",
+      code: "@azure-tools/typespec-azure-resource-manager/use-required-operations",
       message: `Resource 'Foo' must have a GET (read) operation.`,
     });
 });
@@ -377,7 +377,7 @@ it("emits missingGet for the scope that lacks read when an extension resource is
       `,
     )
     .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-required-operations",
+      code: "@azure-tools/typespec-azure-resource-manager/use-required-operations",
       message: `Resource 'TenantEmployee' must have a GET (read) operation.`,
     });
 });
