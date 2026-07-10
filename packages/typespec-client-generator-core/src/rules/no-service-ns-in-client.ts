@@ -18,8 +18,7 @@ export const noServiceNsInClientRule = createRule({
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/no-service-ns-in-client",
   messages: {
-    default:
-      paramMessage`client.tsp must not define namespace "${"namespace"}" because it is in the service namespace "${"serviceNamespace"}". Put new types in another namespace such as "Customizations" and use augment decorators for service customizations.`,
+    default: paramMessage`client.tsp must not define namespace "${"namespace"}" because it is in the service namespace "${"serviceNamespace"}". Put new types in another namespace such as "Customizations" and use augment decorators for service customizations.`,
   },
   create(context) {
     let processed = false;
