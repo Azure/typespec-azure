@@ -160,4 +160,3 @@ function getEsmScripts() {
     test: "tsc -b --noEmit && npm run test:node && npm run test:browser",
   };
 }
-

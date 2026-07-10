@@ -56,13 +56,13 @@ This is to indicate the package information such as package name, package descri
 
 **Properties:**
 
-| Name                    | Type      | Default | Description |
-| ----------------------- | --------- | ------- | ----------- |
-| `name`                  | `string`  |         |             |
-| `scopeName`             | `string`  |         |             |
-| `nameWithoutScope`      | `string`  |         |             |
-| `description`           | `string`  |         |             |
-| `version`               | `string`  |         |             |
+| Name               | Type     | Default | Description |
+| ------------------ | -------- | ------- | ----------- |
+| `name`             | `string` |         |             |
+| `scopeName`        | `string` |         |             |
+| `nameWithoutScope` | `string` |         |             |
+| `description`      | `string` |         |             |
+| `version`          | `string` |         |             |
 
 ### `add-credentials`
 
