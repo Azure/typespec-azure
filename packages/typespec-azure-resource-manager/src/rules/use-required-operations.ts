@@ -1,9 +1,6 @@
 import {
-  CodeFix,
   createRule,
-  defineCodeFix,
   getNamespaceFullName,
-  getSourceLocation,
   Interface,
   LinterRuleContext,
   Model,
@@ -16,6 +13,7 @@ import { isInternalTypeSpec } from "./utils.js";
 type RequiredOperation =
   | "read"
   | "createOrUpdate"
+  | "update"
   | "delete"
   | "list-by-parent"
   | "list-by-subscription";
@@ -26,6 +24,7 @@ type RequiredOperationsMessages = {
   missingListByParent: ReturnType<typeof paramMessage>;
   missingGet: ReturnType<typeof paramMessage>;
   missingCreateOrUpdate: ReturnType<typeof paramMessage>;
+  missingUpdate: ReturnType<typeof paramMessage>;
   missingDelete: ReturnType<typeof paramMessage>;
 };
 
@@ -46,6 +45,7 @@ export const useRequiredOperationsRule = createRule({
     missingListByParent: paramMessage`Resource '${"name"}' must have a list-by-parent operation (list-by-resource-group satisfies this for tracked resources).`,
     missingGet: paramMessage`Resource '${"name"}' must have a GET (read) operation.`,
     missingCreateOrUpdate: paramMessage`Resource '${"name"}' must have a PUT (createOrUpdate) operation.`,
+    missingUpdate: paramMessage`Resource '${"name"}' must have a PATCH (update) operation.`,
     missingDelete: paramMessage`Resource '${"name"}' must have a delete operation.`,
   },
   create(context) {
@@ -93,14 +93,12 @@ function checkResource(
       messageId: singleMessageId(missing[0]),
       target,
       format: { name },
-      codefixes: buildCodefixes(missing, name, resourceInterface),
     });
     return;
   }
   context.reportDiagnostic({
     target,
     format: { name, operations: missing.join(", ") },
-    codefixes: buildCodefixes(missing, name, resourceInterface),
   });
 }
 
@@ -113,7 +111,13 @@ function getRequiredOperationsForResource(resource: ResolvedResource): RequiredO
     // Tracked non-singleton resources require the full set of lifecycle and
     // list operations. For resources at resource-group scope,
     // list-by-resource-group satisfies the list-by-parent requirement.
-    const required: RequiredOperation[] = ["read", "createOrUpdate", "delete", "list-by-parent"];
+    const required: RequiredOperation[] = [
+      "read",
+      "createOrUpdate",
+      "update",
+      "delete",
+      "list-by-parent",
+    ];
     // list-by-subscription is required only for top-level resource-group-scoped
     // tracked resources (the standard Azure RP pattern). Nested tracked
     // resources and tracked resources at non-RG scope (tenant, subscription,
@@ -141,6 +145,7 @@ function getPresentOperations(resource: ResolvedResource): Set<RequiredOperation
   const lifecycle = resource.operations.lifecycle;
   if (lifecycle.read?.length) present.add("read");
   if (lifecycle.createOrUpdate?.length) present.add("createOrUpdate");
+  if (lifecycle.update?.length) present.add("update");
   if (lifecycle.delete?.length) present.add("delete");
   for (const op of resource.operations.lists ?? []) {
     const path = op.path ?? "";
@@ -187,6 +192,7 @@ function singleMessageId(
 ):
   | "missingGet"
   | "missingCreateOrUpdate"
+  | "missingUpdate"
   | "missingDelete"
   | "missingListByParent"
   | "missingListBySubscription" {
@@ -195,6 +201,8 @@ function singleMessageId(
       return "missingGet";
     case "createOrUpdate":
       return "missingCreateOrUpdate";
+    case "update":
+      return "missingUpdate";
     case "delete":
       return "missingDelete";
     case "list-by-parent":
@@ -202,56 +210,6 @@ function singleMessageId(
     case "list-by-subscription":
       return "missingListBySubscription";
   }
-}
-
-function operationTemplate(op: RequiredOperation, resourceName: string): string {
-  switch (op) {
-    case "read":
-      return `read is ArmResourceRead<${resourceName}>;`;
-    case "createOrUpdate":
-      return `createOrUpdate is ArmResourceCreateOrReplaceAsync<${resourceName}>;`;
-    case "delete":
-      return `delete is ArmResourceDeleteWithoutOkAsync<${resourceName}>;`;
-    case "list-by-parent":
-      return `listByParent is ArmResourceListByParent<${resourceName}>;`;
-    case "list-by-subscription":
-      return `listBySubscription is ArmListBySubscription<${resourceName}>;`;
-  }
-}
-
-function buildCodefixes(
-  missing: RequiredOperation[],
-  resourceName: string,
-  resourceInterface: Interface | undefined,
-): CodeFix[] | undefined {
-  if (!resourceInterface || !resourceInterface.node) return undefined;
-  const node = resourceInterface.node;
-  const fixes: CodeFix[] = [];
-  for (const op of missing) {
-    fixes.push(makeAddOperationFix(op, resourceName, node));
-  }
-  return fixes;
-}
-
-function makeAddOperationFix(
-  op: RequiredOperation,
-  resourceName: string,
-  node: NonNullable<Interface["node"]>,
-): CodeFix {
-  return defineCodeFix({
-    id: `add-${op}-operation`,
-    label: `Add ${op} operation declaration`,
-    fix: (context) => {
-      const sourceLocation = getSourceLocation(node);
-      const file = sourceLocation.file;
-      // Insert just before the closing `}` of the interface body.
-      const insertPos = node.bodyRange.end - 1;
-      return context.prependText(
-        { file, pos: insertPos },
-        `  ${operationTemplate(op, resourceName)}\n`,
-      );
-    },
-  });
 }
 
 /**

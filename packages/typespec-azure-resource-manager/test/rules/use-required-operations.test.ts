@@ -35,6 +35,7 @@ it("is valid when tracked resource has the complete set of required operations",
       interface FooOperations {
         read is ArmResourceRead<Foo>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Foo>;
+        update is ArmCustomPatchSync<Foo, Foo>;
         delete is ArmResourceDeleteWithoutOkAsync<Foo>;
         listByResourceGroup is ArmResourceListByParent<Foo>;
         listBySubscription is ArmListBySubscription<Foo>;
@@ -59,6 +60,7 @@ it("emits missingDelete when only the delete operation is missing", async () => 
       interface FooOperations {
         read is ArmResourceRead<Foo>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Foo>;
+        update is ArmCustomPatchSync<Foo, Foo>;
         listByResourceGroup is ArmResourceListByParent<Foo>;
         listBySubscription is ArmListBySubscription<Foo>;
       }
@@ -67,6 +69,33 @@ it("emits missingDelete when only the delete operation is missing", async () => 
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/use-required-operations",
       message: `Resource 'Foo' must have a delete operation.`,
+    });
+});
+
+it("emits missingUpdate when only the update operation is missing", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model Foo is TrackedResource<{}> {
+        @key @path @segment("foos") name: string;
+      }
+
+      @armResourceOperations
+      interface FooOperations {
+        read is ArmResourceRead<Foo>;
+        createOrUpdate is ArmResourceCreateOrReplaceAsync<Foo>;
+        delete is ArmResourceDeleteWithoutOkAsync<Foo>;
+        listByResourceGroup is ArmResourceListByParent<Foo>;
+        listBySubscription is ArmListBySubscription<Foo>;
+      }
+      `,
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/use-required-operations",
+      message: `Resource 'Foo' must have a PATCH (update) operation.`,
     });
 });
 
@@ -84,6 +113,7 @@ it("emits missingGet when only read is missing", async () => {
       @armResourceOperations
       interface FooOperations {
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Foo>;
+        update is ArmCustomPatchSync<Foo, Foo>;
         delete is ArmResourceDeleteWithoutOkAsync<Foo>;
         listByResourceGroup is ArmResourceListByParent<Foo>;
         listBySubscription is ArmListBySubscription<Foo>;
@@ -116,7 +146,7 @@ it("emits a single default diagnostic listing all missing operations when multip
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/use-required-operations",
       message:
-        "Resource 'Foo' is missing required operations: [read, delete, list-by-parent, list-by-subscription].",
+        "Resource 'Foo' is missing required operations: [read, update, delete, list-by-parent, list-by-subscription].",
     });
 });
 
@@ -135,6 +165,7 @@ it("emits missingListByParent for a tracked resource without a list-by-resource-
       interface FooOperations {
         read is ArmResourceRead<Foo>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Foo>;
+        update is ArmCustomPatchSync<Foo, Foo>;
         delete is ArmResourceDeleteWithoutOkAsync<Foo>;
         listBySubscription is ArmListBySubscription<Foo>;
       }
@@ -161,6 +192,7 @@ it("emits missingListBySubscription for a tracked resource without a list-by-sub
       interface FooOperations {
         read is ArmResourceRead<Foo>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Foo>;
+        update is ArmCustomPatchSync<Foo, Foo>;
         delete is ArmResourceDeleteWithoutOkAsync<Foo>;
         listByResourceGroup is ArmResourceListByParent<Foo>;
       }
@@ -251,6 +283,7 @@ it("emits missingCreateOrUpdate when only createOrUpdate is missing", async () =
       @armResourceOperations
       interface FooOperations {
         read is ArmResourceRead<Foo>;
+        update is ArmCustomPatchSync<Foo, Foo>;
         delete is ArmResourceDeleteWithoutOkAsync<Foo>;
         listByResourceGroup is ArmResourceListByParent<Foo>;
         listBySubscription is ArmListBySubscription<Foo>;
@@ -424,6 +457,7 @@ it("exempts NetworkSecurityPerimeterConfiguration resources", async () => {
       interface Employees {
         get is ArmResourceRead<Employee>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+        update is ArmCustomPatchSync<Employee, Employee>;
         delete is ArmResourceDeleteWithoutOkAsync<Employee>;
         listByResourceGroup is ArmResourceListByParent<Employee>;
         listBySubscription is ArmListBySubscription<Employee>;
@@ -457,6 +491,7 @@ it("exempts PrivateLink resources", async () => {
       interface Employees {
         get is ArmResourceRead<Employee>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+        update is ArmCustomPatchSync<Employee, Employee>;
         delete is ArmResourceDeleteWithoutOkAsync<Employee>;
         listByResourceGroup is ArmResourceListByParent<Employee>;
         listBySubscription is ArmListBySubscription<Employee>;
@@ -490,6 +525,7 @@ it("exempts PrivateEndpointConnection resources", async () => {
       interface Employees {
         get is ArmResourceRead<Employee>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+        update is ArmCustomPatchSync<Employee, Employee>;
         delete is ArmResourceDeleteWithoutOkAsync<Employee>;
         listByResourceGroup is ArmResourceListByParent<Employee>;
         listBySubscription is ArmListBySubscription<Employee>;

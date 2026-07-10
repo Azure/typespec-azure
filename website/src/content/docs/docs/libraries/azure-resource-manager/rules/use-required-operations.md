@@ -11,11 +11,11 @@ defined by the [ARM RPC contract][rpc] (sections 2.2 and 2.3).
 
 The required set depends on the resource kind:
 
-| Resource kind     | Required operations                                                                                                  |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------- |
-| Tracked           | `read`, `createOrUpdate`, `delete`, `list-by-parent` (satisfied by `list-by-resource-group`), `list-by-subscription` |
-| Tracked singleton | `read`, `createOrUpdate` only                                                                                        |
-| Proxy / Extension | `read`                                                                                                               |
+| Resource kind     | Required operations                                                                                                            |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Tracked           | `read`, `createOrUpdate`, `update`, `delete`, `list-by-parent` (satisfied by `list-by-resource-group`), `list-by-subscription` |
+| Tracked singleton | `read`, `createOrUpdate` only                                                                                                  |
+| Proxy / Extension | `read`                                                                                                                         |
 
 For tracked resources, a `list-by-resource-group` operation satisfies the
 `list-by-parent` requirement (the resource group is the parent in that scope).
@@ -47,6 +47,7 @@ interface EmployeeOperations {
 interface EmployeeOperations {
   read is ArmResourceRead<Employee>;
   createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+  update is ArmCustomPatchSync<Employee, EmployeeUpdate>;
   delete is ArmResourceDeleteWithoutOkAsync<Employee>;
   listByResourceGroup is ArmResourceListByParent<Employee>;
   listBySubscription is ArmListBySubscription<Employee>;
