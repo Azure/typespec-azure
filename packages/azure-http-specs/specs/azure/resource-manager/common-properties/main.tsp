@@ -5,6 +5,7 @@ import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
 import "./managed-identity.tsp";
 import "./error.tsp";
+import "./arm-resource-identifier.tsp";
 
 using Http;
 using Rest;

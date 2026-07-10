@@ -24,6 +24,14 @@ ignorePaths:
   - .editorconfig
   - .github/CODEOWNERS
   - "*.lock.yml"
+  # temp ignore typespec-ts while repo move is inflight
+  - packages/typespec-ts/**
+  # typespec-java specs and hand-written tests are synced verbatim from
+  # core / autorest.java; don't spell-check upstream-sourced content.
+  - packages/typespec-java/emitter-tests/tsp/**
+  - packages/typespec-java/emitter-tests/src/**
+  # Developer/user docs ported verbatim from autorest.java's typespec-extension.
+  - packages/typespec-java/docs/**
 useGitignore: true
 enableFiletypes:
   - tsp
@@ -39,6 +47,7 @@ words:
   - byos
   - chartjs
   - clsx
+  - contosobenchmark
   - contosowidgetmanager
   - Chenjie
   - DMSS
@@ -51,6 +60,7 @@ words:
   - healthdataaiservices
   - horiz
   - Howtos
+  - incentivizes
   - infile
   - kvset
   - kwargs
@@ -91,6 +101,7 @@ words:
   - SERVICERP
   - seti
   - stac
+  - strconv
   - tcgc
   - tsmv
   - userrp
@@ -100,5 +111,7 @@ words:
   - azkeys
   - azsecrets
   - byval
+  - devcenter
   - petstoreopgrp
   - pypi
+  - Tsps

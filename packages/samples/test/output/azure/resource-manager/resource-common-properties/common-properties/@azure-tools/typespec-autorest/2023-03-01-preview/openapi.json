@@ -3,7 +3,7 @@
   "info": {
     "title": "Contoso.CommonEnvelopePropertiesExample",
     "version": "2023-03-01-preview",
-    "description": "An example of using some of common envelope and property bag properties in a resource type. Their names are all end with 'Property'.",
+    "description": "An example of using all recommended common envelope properties in a resource type. Their names all end with 'Property'.",
     "x-typespec-generated": [
       {
         "emitter": "@azure-tools/typespec-autorest"
@@ -84,7 +84,7 @@
         "tags": [
           "Widgets"
         ],
-        "description": "List WidgetResource resources by subscription ID",
+        "description": "List Widget resources by subscription ID",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -97,7 +97,7 @@
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "#/definitions/WidgetResourceListResult"
+              "$ref": "#/definitions/WidgetListResult"
             }
           },
           "default": {
@@ -118,7 +118,7 @@
         "tags": [
           "Widgets"
         ],
-        "description": "List WidgetResource resources by resource group",
+        "description": "List Widget resources by resource group",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -134,7 +134,7 @@
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "#/definitions/WidgetResourceListResult"
+              "$ref": "#/definitions/WidgetListResult"
             }
           },
           "default": {
@@ -155,7 +155,7 @@
         "tags": [
           "Widgets"
         ],
-        "description": "Get a WidgetResource",
+        "description": "Get a Widget",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -169,7 +169,7 @@
           {
             "name": "widgetName",
             "in": "path",
-            "description": "The name of the widget.",
+            "description": "The name of the Widget",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -179,7 +179,7 @@
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "#/definitions/WidgetResource"
+              "$ref": "#/definitions/Widget"
             }
           },
           "default": {
@@ -195,7 +195,7 @@
         "tags": [
           "Widgets"
         ],
-        "description": "Create a WidgetResource",
+        "description": "Create a Widget",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -209,7 +209,7 @@
           {
             "name": "widgetName",
             "in": "path",
-            "description": "The name of the widget.",
+            "description": "The name of the Widget",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -220,21 +220,21 @@
             "description": "Resource create parameters.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/WidgetResource"
+              "$ref": "#/definitions/Widget"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Resource 'WidgetResource' update operation succeeded",
+            "description": "Resource 'Widget' update operation succeeded",
             "schema": {
-              "$ref": "#/definitions/WidgetResource"
+              "$ref": "#/definitions/Widget"
             }
           },
           "201": {
-            "description": "Resource 'WidgetResource' create operation succeeded",
+            "description": "Resource 'Widget' create operation succeeded",
             "schema": {
-              "$ref": "#/definitions/WidgetResource"
+              "$ref": "#/definitions/Widget"
             },
             "headers": {
               "Azure-AsyncOperation": {
@@ -265,7 +265,7 @@
         "tags": [
           "Widgets"
         ],
-        "description": "Update a WidgetResource",
+        "description": "Update a Widget",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -279,7 +279,7 @@
           {
             "name": "widgetName",
             "in": "path",
-            "description": "The name of the widget.",
+            "description": "The name of the Widget",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -290,7 +290,7 @@
             "description": "The resource properties to be updated.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/WidgetResourceTagsUpdate"
+              "$ref": "#/definitions/WidgetTagsUpdate"
             }
           }
         ],
@@ -298,7 +298,7 @@
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "#/definitions/WidgetResource"
+              "$ref": "#/definitions/Widget"
             }
           },
           "default": {
@@ -314,7 +314,7 @@
         "tags": [
           "Widgets"
         ],
-        "description": "Delete a WidgetResource",
+        "description": "Delete a Widget",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -328,7 +328,7 @@
           {
             "name": "widgetName",
             "in": "path",
-            "description": "The name of the widget.",
+            "description": "The name of the Widget",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -440,13 +440,18 @@
       },
       "readOnly": true
     },
-    "WidgetResource": {
+    "Widget": {
       "type": "object",
       "description": "Widget Resource",
       "properties": {
         "properties": {
-          "$ref": "#/definitions/WidgetResourceProperties",
+          "$ref": "#/definitions/WidgetProperties",
           "description": "The resource-specific properties for this resource."
+        },
+        "eTag": {
+          "type": "string",
+          "description": "If eTag is provided in the response body, it may also be provided as a header per the normal etag convention.  Entity tags are used for comparing two or more entities from the same requested resource. HTTP/1.1 uses entity tags in the etag (section 14.19), If-Match (section 14.24), If-None-Match (section 14.26), and If-Range (section 14.27) header fields.",
+          "readOnly": true
         },
         "extendedLocation": {
           "$ref": "#/definitions/Azure.ResourceManager.CommonTypes.ExtendedLocation",
@@ -458,56 +463,10 @@
         "managedBy": {
           "type": "string",
           "description": "The fully qualified resource ID of the resource that manages this resource. Indicates if this resource is managed by another Azure resource. If this is present, complete mode deployment will not delete the resource if it is removed from the template since it is managed by another resource."
-        }
-      },
-      "allOf": [
-        {
-          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/TrackedResource"
-        }
-      ]
-    },
-    "WidgetResourceListResult": {
-      "type": "object",
-      "description": "The response of a WidgetResource list operation.",
-      "properties": {
-        "value": {
-          "type": "array",
-          "description": "The WidgetResource items on this page",
-          "items": {
-            "$ref": "#/definitions/WidgetResource"
-          }
         },
-        "nextLink": {
-          "type": "string",
-          "format": "uri",
-          "description": "The link to the next page of items"
-        }
-      },
-      "required": [
-        "value"
-      ]
-    },
-    "WidgetResourceProperties": {
-      "type": "object",
-      "description": "Widget Resource Properties.",
-      "properties": {
-        "color": {
-          "type": "string",
-          "description": "The widget color.",
-          "x-ms-mutability": [
-            "read",
-            "create"
-          ]
-        },
-        "provisioningState": {
-          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "Provisioning state",
-          "readOnly": true
-        },
-        "eTag": {
-          "type": "string",
-          "description": "If eTag is provided in the response body, it may also be provided as a header per the normal etag convention.  Entity tags are used for comparing two or more entities from the same requested resource. HTTP/1.1 uses entity tags in the etag (section 14.19), If-Match (section 14.24), If-None-Match (section 14.26), and If-Range (section 14.27) header fields.",
-          "readOnly": true
+        "identity": {
+          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/managedidentity.json#/definitions/ManagedServiceIdentity",
+          "description": "The managed service identities assigned to this resource."
         },
         "kind": {
           "type": "string",
@@ -527,13 +486,58 @@
           "description": "The SKU (Stock Keeping Unit) assigned to this resource."
         }
       },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/TrackedResource"
+        }
+      ]
+    },
+    "WidgetListResult": {
+      "type": "object",
+      "description": "The response of a Widget list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The Widget items on this page",
+          "items": {
+            "$ref": "#/definitions/Widget"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "WidgetProperties": {
+      "type": "object",
+      "description": "Widget Resource Properties.",
+      "properties": {
+        "color": {
+          "type": "string",
+          "description": "The widget color.",
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
+        },
+        "provisioningState": {
+          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+          "description": "Provisioning state",
+          "readOnly": true
+        }
+      },
       "required": [
         "color"
       ]
     },
-    "WidgetResourceTagsUpdate": {
+    "WidgetTagsUpdate": {
       "type": "object",
-      "description": "The type used for updating tags in WidgetResource resources.",
+      "description": "The type used for updating tags in Widget resources.",
       "properties": {
         "tags": {
           "type": "object",

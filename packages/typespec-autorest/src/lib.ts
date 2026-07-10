@@ -118,6 +118,28 @@ export interface AutorestEmitterOptions {
    * which uses the typespec-azure-resource-manager `@feature` decorators to split into output files based on feature.
    */
   "output-splitting"?: "legacy-feature-files";
+
+  /**
+   * When enabled, the emitter will not copy example files to the output directory.
+   * Instead, it will reference the source example files using relative file paths.
+   * @default false
+   */
+  "skip-example-copying"?: boolean;
+
+  /**
+   * Strategy for naming the OpenAPI names derived from TypeSpec types (definition/schema
+   * names, parameter keys, inline names, `x-typespec-name`, etc.).
+   *
+   * - `"namespaced"`: Include the namespace prefix when a type lives outside the service namespace
+   *   (e.g. `LiftrBase.Foo`). The service (and root `TypeSpec`) namespace is always stripped. This
+   *   is the current/default behavior.
+   * - `"name-only"`: Use only the type name without any namespace prefix (e.g. `Foo`). When two
+   *   types from different namespaces collapse to the same name, the conflict is reported as an
+   *   error (`@typespec/openapi/duplicate-type-name`).
+   *
+   * @default "namespaced"
+   */
+  "type-name-strategy"?: "namespaced" | "name-only";
 }
 
 const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
@@ -253,6 +275,21 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       nullable: true,
       description:
         'Determines whether output should be split into multiple files.  The only supported option for splitting is "legacy-feature-files", which uses the typespec-azure-resource-manager `@feature` decorators to split into output files based on feature.',
+    },
+    "skip-example-copying": {
+      type: "boolean",
+      nullable: true,
+      default: false,
+      description:
+        "When enabled, the emitter will not copy example files to the output directory. Instead, it will reference the source example files using relative file paths.",
+    },
+    "type-name-strategy": {
+      type: "string",
+      enum: ["namespaced", "name-only"],
+      nullable: true,
+      default: "namespaced",
+      description:
+        'Strategy for naming the OpenAPI names derived from TypeSpec types. "namespaced" (default) includes the namespace prefix for types outside the service namespace (e.g. `LiftrBase.Foo`). "name-only" uses only the type name without any namespace prefix (e.g. `Foo`), reporting an error when two types collapse to the same name.',
     },
   },
   required: [],

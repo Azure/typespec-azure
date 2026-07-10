@@ -340,7 +340,7 @@ model ResourceKindProperty<Type extends string = string> {
 model ResourceListResult<Resource extends Foundations.SimpleResource> is Azure.Core.Page<Resource>;
 
 /**
- * Paged response containing results
+ * Paged response containing custom result types.
  * @template Result The type of the values returned in the paged response
  */
 @doc("The custom response of a list operation.")

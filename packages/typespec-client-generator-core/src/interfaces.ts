@@ -41,7 +41,7 @@ export interface TCGCContext {
   generateConvenienceMethods?: boolean;
   examplesDir?: string;
   namespaceFlag?: string;
-  apiVersion?: string;
+  apiVersion?: string | Record<string, string>;
   license?: {
     name: string;
     company?: string;
@@ -710,12 +710,12 @@ export interface BinarySerializationOptions {
    */
   contentTypes?: string[];
   /**
-   * The ModelProperty that represents the filename in the file model.
+   * The SdkModelPropertyType that represents the filename in the file model.
    *
    * This property is only present when `isFile` is `true`. When undefined, it indicates the
    * body is not a file type.
    */
-  filename?: ModelProperty;
+  filename?: SdkModelPropertyType;
 }
 
 /**

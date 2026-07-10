@@ -1,5 +1,24 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.69.1
+
+### Bug Fixes
+
+- Add support for the `@scope` TCGC decorator. Operations, model properties, and parameters that are scoped out of the autorest emitter are now omitted from the generated swagger output.
+
+
+## 0.69.0
+
+### Features
+
+- [#4190](https://github.com/Azure/typespec-azure/pull/4190) Added `skip-example-copying` emitter option. When enabled, example files are not copied to the output directory and `x-ms-examples` `$ref` values point directly to the source example files via relative paths.
+
+### Bug Fixes
+
+- [#4549](https://github.com/Azure/typespec-azure/pull/4549) Fix custom auth scheme models leaking into `definitions` when declared inside the service namespace. They are now emitted only under `securityDefinitions` as expected.
+- [#4421](https://github.com/Azure/typespec-azure/pull/4421) Ensure there are no examples emitted for parameters
+
+
 ## 0.68.0
 
 ### Bug Fixes

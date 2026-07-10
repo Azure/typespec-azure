@@ -1,12 +1,14 @@
 /* eslint-disable no-console */
-import { compile, NodeHost, resolveCompilerOptions } from "@typespec/compiler";
-import { execSync } from "child_process";
+import { execSync, spawn } from "child_process";
 import { readdir } from "fs/promises";
 import os from "os";
 import { join, resolve } from "path";
+import { fileURLToPath } from "url";
 import { aggregateDurations } from "./aggregate.js";
+import { summarize } from "./statistics.js";
 import type {
   BenchmarkResult,
+  NoiseGateInfo,
   RunnerInfo,
   RuntimeStats,
   SpecBenchmarkResult,
@@ -27,6 +29,12 @@ export interface RunOptions {
   specs?: string[];
   /** Git commit SHA to record. */
   commit?: string;
+  /** If set, rerun a spec when total-runtime coefficient of variation exceeds threshold. */
+  noiseCvThreshold?: number;
+  /** Max number of rerun cycles for noisy specs. */
+  maxReruns?: number;
+  /** Number of additional measured iterations on each rerun (default: iterations). */
+  rerunIterations?: number;
 }
 
 /** Discover benchmark spec directories under the given path. */
@@ -42,46 +50,41 @@ async function discoverSpecs(specsDir: string, filter?: string[]): Promise<strin
   return dirs;
 }
 
-/** Compile a single spec and return its stats. */
+const compileOncePath = fileURLToPath(new URL("./compile-once.js", import.meta.url));
+
+/** Compile a single spec in an isolated process and return its stats. */
 async function compileSpec(specDir: string): Promise<Stats> {
-  const mainFile = join(specDir, "main.tsp");
-  const [options, diagnostics] = await resolveCompilerOptions(NodeHost, {
-    entrypoint: mainFile,
-    cwd: specDir,
+  return await new Promise<Stats>((resolve, reject) => {
+    const child = spawn(process.execPath, [compileOncePath, specDir], {
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    let stdout = "";
+    let stderr = "";
+    child.stdout.on("data", (chunk) => {
+      stdout += chunk.toString();
+    });
+    child.stderr.on("data", (chunk) => {
+      stderr += chunk.toString();
+    });
+    child.on("error", (error) => {
+      reject(error);
+    });
+    child.on("close", (code) => {
+      if (code !== 0) {
+        reject(new Error(stderr.trim() || `Compilation process exited with code ${code}`));
+        return;
+      }
+      try {
+        resolve(JSON.parse(stdout) as Stats);
+      } catch (error) {
+        reject(
+          new Error(
+            `Failed to parse benchmark stats output: ${error instanceof Error ? error.message : String(error)}`,
+          ),
+        );
+      }
+    });
   });
-  if (diagnostics.length > 0) {
-    const msgs = diagnostics.map((d: any) => `  ${d.message}`).join("\n");
-    console.warn(`  Warnings resolving options for ${specDir}:\n${msgs}`);
-  }
-
-  const program = await compile(NodeHost, mainFile, {
-    ...options,
-    outputDir: join(specDir, "tsp-output"),
-  });
-
-  if (program.hasError()) {
-    const errorDiags = program.diagnostics
-      .filter((d: any) => d.severity === "error")
-      .map((d: any) => `  ${d.message}`)
-      .join("\n");
-    throw new Error(`Compilation failed for ${specDir}:\n${errorDiags}`);
-  }
-
-  // program.stats is @internal but available at runtime
-  const stats = (program as any).stats as Stats;
-
-  // The compiler doesn't always set runtime.total — compute it from parts
-  if (!stats.runtime.total) {
-    stats.runtime.total =
-      (stats.runtime.loader ?? 0) +
-      (stats.runtime.resolver ?? 0) +
-      (stats.runtime.checker ?? 0) +
-      (stats.runtime.validation?.total ?? 0) +
-      (stats.runtime.linter?.total ?? 0) +
-      (stats.runtime.emit?.total ?? 0);
-  }
-
-  return stats;
 }
 
 /** Average multiple Stats objects. */
@@ -210,6 +213,9 @@ export async function runBenchmarks(options: RunOptions): Promise<BenchmarkResul
   );
 
   const specs: Record<string, SpecBenchmarkResult> = {};
+  const noiseCvThreshold = options.noiseCvThreshold;
+  const maxReruns = options.maxReruns ?? 0;
+  const rerunIterations = options.rerunIterations ?? iterations;
 
   for (const specName of specNames) {
     const specDir = join(specsDir, specName);
@@ -229,14 +235,52 @@ export async function runBenchmarks(options: RunOptions): Promise<BenchmarkResul
       rawIterations.push(stats);
     }
 
+    let rerunsPerformed = 0;
+    if (noiseCvThreshold !== undefined && maxReruns > 0 && rerunIterations > 0) {
+      for (let rerun = 0; rerun < maxReruns; rerun++) {
+        const totalSummary = summarize(rawIterations.map((x) => x.runtime.total));
+        if (totalSummary.cv <= noiseCvThreshold) {
+          break;
+        }
+
+        rerunsPerformed++;
+        console.log(
+          `    Noise gate triggered (CV ${(totalSummary.cv * 100).toFixed(1)}% > ${(noiseCvThreshold * 100).toFixed(1)}%), running ${rerunIterations} extra iteration(s)...`,
+        );
+        for (let i = 0; i < rerunIterations; i++) {
+          console.log(`    Rerun iteration ${i + 1}/${rerunIterations}...`);
+          const stats = await compileSpec(specDir);
+          rawIterations.push(stats);
+        }
+      }
+    }
+
+    const totalSummary = summarize(rawIterations.map((x) => x.runtime.total));
+    const noiseGateInfo: NoiseGateInfo | undefined =
+      noiseCvThreshold === undefined
+        ? undefined
+        : {
+            thresholdCv: noiseCvThreshold,
+            maxReruns,
+            rerunIterations,
+            rerunsPerformed,
+            triggered: rerunsPerformed > 0,
+          };
+
     specs[specName] = {
       name: specName,
-      iterations,
+      iterations: rawIterations.length,
       stats: averageStats(rawIterations),
       rawIterations,
+      variability: {
+        total: totalSummary,
+        noiseGate: noiseGateInfo,
+      },
     };
 
-    console.log(`    Total: ${specs[specName].stats.runtime.total.toFixed(1)}ms (avg)`);
+    console.log(
+      `    Total: ${specs[specName].stats.runtime.total.toFixed(1)}ms (avg), CV ${(totalSummary.cv * 100).toFixed(1)}%`,
+    );
   }
 
   const commit = getGitCommit(options.commit);

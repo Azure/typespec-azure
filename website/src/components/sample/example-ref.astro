@@ -1,0 +1,68 @@
+---
+import { getSampleStructure } from "src/utils/samples";
+import SampleContent from "./sample-content.astro";
+
+interface Props {
+  /** Sample id, i.e. the directory relative to `packages/samples/specs` (e.g. `resource-manager/resource-types/tracked`). */
+  path: string;
+  /** Render the sample inside a collapsed `<details>` to reduce noise on pages that inline many samples. */
+  collapsed?: boolean;
+}
+
+const { path, collapsed } = Astro.props;
+
+const { samples } = await getSampleStructure();
+const sample = samples.find((x) => x.id === path);
+
+if (!sample) {
+  const available = samples.map((x) => x.id).join(", ");
+  throw new Error(
+    `ExampleRef: no sample found with path "${path}". Available samples: ${available}`,
+  );
+}
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const sampleHref = `${base}/docs/samples/${sample.id}/`;
+---
+
+{
+  collapsed ? (
+    <details class="example-ref">
+      <summary class="example-ref-header">{sample.title}</summary>
+      <a class="example-ref-link" href={sampleHref}>
+        View full sample →
+      </a>
+      <SampleContent sample={sample} />
+    </details>
+  ) : (
+    <section class="example-ref">
+      <div class="example-ref-header">
+        <a href={sampleHref}>{sample.title}</a>
+      </div>
+      <SampleContent sample={sample} />
+    </section>
+  )
+}
+
+<style>
+  .example-ref {
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.5rem;
+    padding: 0 1rem 1rem;
+    margin-block: 1rem;
+  }
+  .example-ref-header {
+    font-weight: 600;
+    margin-block: 0.75rem 0.25rem;
+  }
+  summary.example-ref-header {
+    cursor: pointer;
+    margin-block: 0;
+    padding-block: 0.75rem;
+  }
+  .example-ref-link {
+    display: inline-block;
+    font-size: var(--sl-text-sm);
+    margin-block: 0.25rem 0.5rem;
+  }
+</style>
