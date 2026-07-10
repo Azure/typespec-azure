@@ -189,7 +189,7 @@ model ConversationProperties {
 
   /** Timestamp of when the conversation was created. Read-only. */
   @visibility(Lifecycle.Read)
-  createdAt?: unixTimestamp32;
+  createdAt?: utcDateTime;
 }
 
 /**
@@ -226,24 +226,24 @@ model ConversationOutput {
 union ResponseStatus {
   /** The response completed successfully. */
   @Azure.Core.lroSucceeded
-  Completed: "completed",
+  Completed: "Completed",
 
   /** The response failed. */
   @Azure.Core.lroFailed
-  Failed: "failed",
+  Failed: "Failed",
 
   /** The response was cancelled. */
   @Azure.Core.lroCanceled
-  Cancelled: "cancelled",
+  Cancelled: "Cancelled",
 
   /** The response is incomplete. */
-  Incomplete: "incomplete",
+  Incomplete: "Incomplete",
 
   /** The response is queued for execution. */
-  Queued: "queued",
+  Queued: "Queued",
 
   /** The response is in progress. */
-  InProgress: "in_progress",
+  InProgress: "InProgress",
 
   string,
 }
@@ -259,7 +259,7 @@ model ResponseProperties {
 
   /** Timestamp of when the response was created. Read-only. */
   @visibility(Lifecycle.Read)
-  createdAt?: unixTimestamp32;
+  createdAt?: utcDateTime;
 
   /** Model ID used to generate the response. May be specified on request to override the agent default; read-only in GET. */
   `model`?: string;
