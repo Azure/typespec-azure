@@ -77,11 +77,8 @@ export function createService(
 ): ServiceContext {
   const clientParam = options.clientParam ?? "default";
   const endpointUrl = options.endpoint ?? `${endpointParam}/client/structure/${clientParam}`;
-  const prefixFromOptions = options?.userAgentOptions?.userAgentPrefix;
-  const userAgentPrefix = prefixFromOptions ? `${prefixFromOptions} azsdk-js-api` : `azsdk-js-api`;
   const { apiVersion: _, ...updatedOptions } = {
     ...options,
-    userAgentOptions: { userAgentPrefix },
     loggingOptions: { logger: options.loggingOptions?.logger ?? logger.info },
   };
   const clientContext = getClient(endpointUrl, undefined, updatedOptions);
@@ -174,11 +171,8 @@ export function createService(options: ServiceClientOptionalParams = {}): Servic
   const endpointParam = options.endpointParam ?? "http://localhost:3000";
   const clientParam = options.clientParam ?? "default";
   const endpointUrl = options.endpoint ?? `${endpointParam}/client/structure/${clientParam}`;
-  const prefixFromOptions = options?.userAgentOptions?.userAgentPrefix;
-  const userAgentPrefix = prefixFromOptions ? `${prefixFromOptions} azsdk-js-api` : `azsdk-js-api`;
   const { apiVersion: _, ...updatedOptions } = {
     ...options,
-    userAgentOptions: { userAgentPrefix },
     loggingOptions: { logger: options.loggingOptions?.logger ?? logger.info },
   };
   const clientContext = getClient(endpointUrl, undefined, updatedOptions);
@@ -273,11 +267,8 @@ export function createTestService(
 ): TestServiceContext {
   const clientParam = options.clientParam ?? "default";
   const endpointUrl = options.endpoint ?? `${endpointParam}/client/structure/${clientParam}`;
-  const prefixFromOptions = options?.userAgentOptions?.userAgentPrefix;
-  const userAgentPrefix = prefixFromOptions ? `${prefixFromOptions} azsdk-js-api` : `azsdk-js-api`;
   const { apiVersion: _, ...updatedOptions } = {
     ...options,
-    userAgentOptions: { userAgentPrefix },
     loggingOptions: { logger: options.loggingOptions?.logger ?? logger.info },
   };
   const clientContext = getClient(endpointUrl, undefined, updatedOptions);
