@@ -50,14 +50,7 @@ export class TestServiceClient {
   public readonly pipeline: Pipeline;
 
   constructor(endpointParam: string, options: TestServiceClientOptionalParams = {}) {
-    const prefixFromOptions = options?.userAgentOptions?.userAgentPrefix;
-    const userAgentPrefix = prefixFromOptions
-      ? `${prefixFromOptions} azsdk-js-client`
-      : `azsdk-js-client`;
-    this._client = createTestService(endpointParam, {
-      ...options,
-      userAgentOptions: { userAgentPrefix },
-    });
+    this._client = createTestService(endpointParam, options);
     this.pipeline = this._client.pipeline;
   }
 
