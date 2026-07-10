@@ -24,6 +24,9 @@ if ($LASTEXITCODE -ne 0) {
 
 try {
     $configPath = Join-Path $packageRoot "core-commit.json"
+    if (-not (Test-Path $configPath)) {
+        Write-Error "core-commit.json not found at: $configPath"
+    }
     $targetSha = ((Get-Content -Raw $configPath | ConvertFrom-Json).sha).Trim()
 
     if ([string]::IsNullOrWhiteSpace($targetSha)) {
