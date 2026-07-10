@@ -6,7 +6,7 @@ import {
   SdkMethodParameter,
   SdkServiceOperation,
 } from "@azure-tools/typespec-client-generator-core";
-import { OptionalKind, ParameterDeclarationStructure, StatementedNode } from "ts-morph";
+import { Node, OptionalKind, ParameterDeclarationStructure, StatementedNode } from "ts-morph";
 import { ModularEmitterOptions } from "../interfaces.js";
 
 import { resolveReference } from "../../framework/reference.js";
@@ -236,7 +236,7 @@ export function buildGetClientEndpointParam(
  * @returns - an expression representing the options to be passed in to getClient
  */
 export function buildGetClientOptionsParam(
-  context: StatementedNode,
+  context: StatementedNode & Node,
   emitterOptions: ModularEmitterOptions,
   endpointParam: string,
   apiVersionParamName?: string,
@@ -314,7 +314,7 @@ function buildLoggingOptions(): string | undefined {
 }
 
 export function buildUserAgentOptions(
-  context: StatementedNode,
+  context: StatementedNode & Node,
   emitterOptions: ModularEmitterOptions,
   sdkUserAgentPrefix: string,
 ): string {
@@ -322,16 +322,31 @@ export function buildUserAgentOptions(
   const prefixFromOptions = "const prefixFromOptions = options?.userAgentOptions?.userAgentPrefix;";
   userAgentStatements.push(prefixFromOptions);
 
+  const packageName = emitterOptions.options.packageDetails?.name;
   const clientPackageName =
-    emitterOptions.options.packageDetails?.nameWithoutScope ??
-    emitterOptions.options.packageDetails?.name ??
-    "";
-  const packageVersion = emitterOptions.options.packageDetails?.version ?? "1.0.0-beta.1";
+    emitterOptions.options.packageDetails?.nameWithoutScope ?? packageName ?? "";
 
-  const userAgentInfoStatement =
-    packageVersion && clientPackageName && sdkUserAgentPrefix.includes("api")
-      ? "const userAgentInfo = `azsdk-js-" + clientPackageName + "/" + packageVersion + "`;"
-      : "";
+  // The version is read from the generated package.json at runtime rather than
+  // hardcoded here: once the package is generated, its version is owned by
+  // package.json. We import it via the package's own "./package.json" export so
+  // the specifier is identical in `src` and the built `dist` output.
+  let userAgentInfoStatement = "";
+  if (clientPackageName && packageName && sdkUserAgentPrefix.includes("api")) {
+    const packageJsonModule = `${packageName}/package.json`;
+    const sourceFile = context.getSourceFile();
+    const hasPackageJsonImport = sourceFile
+      .getImportDeclarations()
+      .some((declaration) => declaration.getModuleSpecifierValue() === packageJsonModule);
+    if (!hasPackageJsonImport) {
+      sourceFile.addImportDeclaration({
+        defaultImport: "pkgJson",
+        moduleSpecifier: packageJsonModule,
+        attributes: [{ name: "type", value: "json" }],
+      });
+    }
+    userAgentInfoStatement =
+      "const userAgentInfo = `azsdk-js-" + clientPackageName + "/${pkgJson.version}`;";
+  }
 
   if (userAgentInfoStatement) {
     userAgentStatements.push(userAgentInfoStatement);
