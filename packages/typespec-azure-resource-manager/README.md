@@ -67,6 +67,7 @@ Available ruleSets:
 | [`@azure-tools/typespec-azure-resource-manager/unsupported-type`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/unsupported-type)                                                   | Check for unsupported ARM types.                                                                                                                                                                                                                      |
 | [`@azure-tools/typespec-azure-resource-manager/secret-prop`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/secret-prop)                                                             | RPC-v1-13: Check that property with names indicating sensitive information(e.g. contains auth, password, token, secret, etc.) are marked with @secret decorator.                                                                                      |
 | [`@azure-tools/typespec-azure-resource-manager/no-empty-model`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-empty-model)                                                       | ARM Properties with type:object that don't reference a model definition are not allowed. ARM doesn't allow generic type definitions as this leads to bad customer experience.                                                                         |
+| [`@azure-tools/typespec-azure-resource-manager/no-reserved-resource-property`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-reserved-resource-property)                         | Reserved property names (for example 'billingData') must not be present in a resource's property bag. The property name is matched case-insensitively.                                                                                                |
 
 ## Decorators
 
@@ -634,11 +635,17 @@ multiple base types. Duplicate entries are ignored.
 ##### Examples
 
 ```typespec
-@azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
-model MyAgentProperties {
-  ...AgentProperties;
-  ...AgentToolProperty;
+// Agent definition and properties using the Appliance deployment model
+model ContosoApplianceDefinition is AgentDefinitionAppliance<true, true>;
+model ContosoApplianceProperties is AgentPropertiesAppliance<ContosoApplianceDefinition> {
   ...DefaultProvisioningStateProperty;
+}
+
+// The @azureBaseType decorator marks the resource as conforming to the Agent base type.
+// (The Agent template applies this automatically, but it can also be applied directly.)
+@azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
+model ContosoApplianceAgent is TrackedResource<ContosoApplianceProperties> {
+  ...ResourceNameParameter<ContosoApplianceAgent>;
 }
 ```
 
