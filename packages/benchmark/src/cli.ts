@@ -35,7 +35,8 @@ Commands:
   backfill          Backfill benchmark data for historical commits
 
 Run options:
-  --specs-dir <dir>     Directory containing benchmark specs (default: built-in specs)
+  --specs-dir <dir>     Directory of benchmark specs: subdirectories with a main.tsp (local specs)
+                        and/or with a spec.json (external specs) (default: built-in specs)
   --iterations <n>      Number of measured iterations (default: 5)
   --warmup <n>          Number of warmup iterations (default: 1)
   --noise-cv-threshold <n>
@@ -63,14 +64,18 @@ Store-results options:
   --results <file>      Path to the benchmark results JSON file
   --commit <sha>        Git commit SHA
   --branch <name>       Branch name for storing results (default: benchmark-data)
+  --results-dir <dir>   Directory on the data branch to store results/history (default: results)
 
 Upload-pr-comment options:
   --results <file>      Path to the current benchmark results JSON file
   --pr-number <n>       Pull request number
   --output-dir <dir>    Output directory for artifacts
   --branch <name>       Branch name for fetching baseline (default: benchmark-data)
+  --results-dir <dir>   Directory on the data branch holding the baseline (default: results)
   --baseline-window <n> Number of recent main results to build rolling baseline (default: 20)
   --threshold <n>       Percent threshold for notable changes (default: 5)
+  --title <text>        Heading for the comment (default: "⚡ Benchmark Results")
+  --comment-file <name> Comment markdown file name (default: benchmark-comment.md)
 
 Backfill options:
   --from <sha|n>        Start point: a commit SHA or number of recent commits (default: 100)
@@ -140,6 +145,9 @@ async function runCommand(args: Record<string, string>): Promise<void> {
     ? parseInt(args["rerun-iterations"], 10)
     : undefined;
 
+  // A spec source is either a local spec directory (with main.tsp) or an
+  // external spec directory (with spec.json). `--specs-dir` selects which set
+  // to run; both kinds run uniformly and produce a single result file.
   const result = await runBenchmarks({
     specsDir,
     iterations,
@@ -201,6 +209,7 @@ function storeResultsCommand(args: Record<string, string>): void {
     resultsFile,
     commit,
     branch: args["branch"],
+    resultsDir: args["results-dir"],
   });
 }
 
@@ -219,8 +228,11 @@ function uploadPrCommentCommand(args: Record<string, string>): void {
     prNumber,
     outputDir,
     branch: args["branch"],
+    resultsDir: args["results-dir"],
     threshold: args["threshold"] ? parseFloat(args["threshold"]) : undefined,
     baselineWindow: args["baseline-window"] ? parseInt(args["baseline-window"], 10) : undefined,
+    title: args["title"],
+    commentFile: args["comment-file"],
   });
 }
 
