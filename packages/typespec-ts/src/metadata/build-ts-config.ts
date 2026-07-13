@@ -53,15 +53,43 @@ export function buildTsConfig(model: ClientModel) {
 }
 
 /**
+ * Computes the `include` list for the `config/tsconfig.src.*.json` files.
+ *
+ * The generated `warp.config.yml` exposes every client's entry point as a
+ * separate public subpath export (e.g. `./devCenter` -> `./src/devCenter/index.ts`).
+ * warp validates those declared exports against the emitted `dist` output, so
+ * each exported source file must be a TypeScript project input; otherwise the
+ * per-client barrels are never emitted and the build fails with `DIST_MISSING`.
+ *
+ * We therefore derive the `include` list from the same `exports` map used to
+ * build `warp.config.yml`, keeping the two in sync. The root `../src/index.ts`
+ * is always included as a fallback.
+ */
+export function getSrcIncludePaths(exports?: Record<string, string>): string[] {
+  const includes = new Set<string>(["../src/index.ts"]);
+  if (exports) {
+    for (const value of Object.values(exports)) {
+      if (typeof value === "string" && value.endsWith(".ts")) {
+        // Export values are relative to the package root (e.g. "./src/foo/index.ts"),
+        // whereas tsconfig.src.*.json live in the `config/` subfolder, so they are
+        // referenced as "../src/foo/index.ts".
+        includes.add(value.replace(/^\.\//, "../"));
+      }
+    }
+  }
+  return Array.from(includes);
+}
+
+/**
  * Builds config/tsconfig.src.esm.json — extends eng/tsconfigs/src.esm.json
  */
-export function buildTsSrcEsmConfig() {
+export function buildTsSrcEsmConfig(exports?: Record<string, string>) {
   return {
     path: "config/tsconfig.src.esm.json",
     content: JSON.stringify(
       {
         extends: "../../../../eng/tsconfigs/src.esm.json",
-        include: ["../src/index.ts"],
+        include: getSrcIncludePaths(exports),
       },
       null,
       2,
@@ -72,13 +100,13 @@ export function buildTsSrcEsmConfig() {
 /**
  * Builds config/tsconfig.src.browser.json — extends eng/tsconfigs/src.browser.json
  */
-export function buildTsSrcBrowserConfig() {
+export function buildTsSrcBrowserConfig(exports?: Record<string, string>) {
   return {
     path: "config/tsconfig.src.browser.json",
     content: JSON.stringify(
       {
         extends: "../../../../eng/tsconfigs/src.browser.json",
-        include: ["../src/index.ts"],
+        include: getSrcIncludePaths(exports),
       },
       null,
       2,
@@ -89,13 +117,13 @@ export function buildTsSrcBrowserConfig() {
 /**
  * Builds config/tsconfig.src.react-native.json — extends eng/tsconfigs/src.react-native.json
  */
-export function buildTsSrcReactNativeConfig() {
+export function buildTsSrcReactNativeConfig(exports?: Record<string, string>) {
   return {
     path: "config/tsconfig.src.react-native.json",
     content: JSON.stringify(
       {
         extends: "../../../../eng/tsconfigs/src.react-native.json",
-        include: ["../src/index.ts"],
+        include: getSrcIncludePaths(exports),
       },
       null,
       2,
@@ -106,13 +134,13 @@ export function buildTsSrcReactNativeConfig() {
 /**
  * Builds config/tsconfig.src.cjs.json — extends eng/tsconfigs/src.cjs.json
  */
-export function buildTsSrcCjsConfig() {
+export function buildTsSrcCjsConfig(exports?: Record<string, string>) {
   return {
     path: "config/tsconfig.src.cjs.json",
     content: JSON.stringify(
       {
         extends: "../../../../eng/tsconfigs/src.cjs.json",
-        include: ["../src/index.ts"],
+        include: getSrcIncludePaths(exports),
       },
       null,
       2,
