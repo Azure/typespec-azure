@@ -25,18 +25,29 @@ groups:
     - "packages/typespec-client-generator-core/**"
     - "packages/typespec-azure-core/**"
     - "packages/typespec-azure-resource-manager/**"
+  # Shared CI infrastructure every target's jobs consume.
+  shared-ci:
+    - ".github/actions/setup/**"
 
 # Downstream targets. Key = short expression-safe id used for the job output.
 targets:
   python:
     self: "packages/typespec-python/**"
-    use: [core-libs]
+    use: [core-libs, shared-ci]
+    extra:
+      - ".github/workflows/ci-python.yml"
+      - ".github/actions/setup-python/**"
     core-submodule: true
   java:
     self: "packages/typespec-java/**"
-    use: [core-libs]
+    use: [core-libs, shared-ci]
+    extra:
+      - ".github/workflows/ci-java.yml"
+      - ".github/actions/setup-java/**"
     core-submodule: true
   typescript:
     self: "packages/typespec-ts/**"
-    use: [core-libs]
+    use: [core-libs, shared-ci]
+    extra:
+      - ".github/workflows/ci-typescript.yml"
     core-submodule: true
