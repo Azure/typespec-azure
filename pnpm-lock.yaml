@@ -4078,6 +4078,15 @@ importers:
       '@azure-tools/typespec-client-generator-core':
         specifier: workspace:^
         version: link:../packages/typespec-client-generator-core
+      '@azure-tools/typespec-java':
+        specifier: workspace:^
+        version: link:../packages/typespec-java
+      '@azure-tools/typespec-python':
+        specifier: workspace:^
+        version: link:../packages/typespec-python
+      '@azure-tools/typespec-ts':
+        specifier: workspace:^
+        version: link:../packages/typespec-ts
       '@types/hast':
         specifier: 'catalog:'
         version: 3.0.4
