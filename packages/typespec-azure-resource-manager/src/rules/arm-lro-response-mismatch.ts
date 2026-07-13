@@ -1,8 +1,6 @@
 import {
-  CodeFix,
   createRule,
   getNamespaceFullName,
-  getSourceLocation,
   isVoidType,
   Model,
   Operation,
@@ -10,108 +8,12 @@ import {
   Program,
   Type,
 } from "@typespec/compiler";
-import {
-  type IntersectionExpressionNode,
-  type OperationSignatureReferenceNode,
-  type OperationStatementNode,
-  SyntaxKind,
-  type TemplateArgumentNode,
-} from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
 
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import { HttpOperationResponse, HttpPayloadBody, isHeader, isStatusCode } from "@typespec/http";
 import { ArmResourceOperation } from "../operations.js";
 import { resolveArmResources, ResolvedResource } from "../resource.js";
-
-/**
- * Check if a node is a TypeReference to ArmLroLocationHeader (with or without template arguments).
- */
-function isArmLroLocationHeaderRef(node: TemplateArgumentNode["argument"]): boolean {
-  if (node.kind !== SyntaxKind.TypeReference) return false;
-  const target = node.target;
-  if (target.kind === SyntaxKind.Identifier) {
-    return target.sv === "ArmLroLocationHeader";
-  }
-  return false;
-}
-
-function createLroHeadersCodeFix(op: Operation, responseTypeName: string): CodeFix | undefined {
-  const node = op.node;
-  if (node === undefined || node.kind !== SyntaxKind.OperationStatement) {
-    return undefined;
-  }
-
-  const opNode = node as OperationStatementNode;
-  const signature = opNode.signature;
-  if (signature.kind !== SyntaxKind.OperationSignatureReference) {
-    return undefined;
-  }
-
-  const sigRef = signature as OperationSignatureReferenceNode;
-  const templateArgs: readonly TemplateArgumentNode[] = sigRef.baseOperation.arguments;
-  const lroHeadersArg = templateArgs.find((arg) => arg.name?.sv === "LroHeaders");
-
-  const newValue = `ArmLroLocationHeader<FinalResult = ${responseTypeName}>`;
-
-  if (lroHeadersArg === undefined) {
-    // No LroHeaders argument — add it after the last template argument
-    if (templateArgs.length === 0) {
-      return undefined;
-    }
-    const lastArg = templateArgs[templateArgs.length - 1];
-    const lastArgLocation = getSourceLocation(lastArg);
-    return {
-      id: "arm-lro-set-final-result",
-      label: `Set FinalResult to ${responseTypeName} in LroHeaders`,
-      fix(context) {
-        return context.appendText(lastArgLocation, `,\n  LroHeaders = ${newValue}`);
-      },
-    };
-  }
-
-  const argExpr = lroHeadersArg.argument;
-
-  // If the value is an intersection (e.g., ArmAsyncOperationHeader & ArmLroLocationHeader),
-  // find and replace just the ArmLroLocationHeader part
-  if (argExpr.kind === SyntaxKind.IntersectionExpression) {
-    const intersectionNode = argExpr as IntersectionExpressionNode;
-    const options = intersectionNode.options;
-    const lroHeaderOption = options.find((opt) => isArmLroLocationHeaderRef(opt));
-    if (lroHeaderOption !== undefined) {
-      return {
-        id: "arm-lro-set-final-result",
-        label: `Set FinalResult to ${responseTypeName} in LroHeaders`,
-        fix(context) {
-          const optionLocation = getSourceLocation(lroHeaderOption);
-          return context.replaceText(optionLocation, newValue);
-        },
-      };
-    }
-  }
-
-  // If the value is a direct reference to ArmLroLocationHeader, replace it
-  if (isArmLroLocationHeaderRef(argExpr)) {
-    return {
-      id: "arm-lro-set-final-result",
-      label: `Set FinalResult to ${responseTypeName} in LroHeaders`,
-      fix(context) {
-        const argValueLocation = getSourceLocation(argExpr);
-        return context.replaceText(argValueLocation, newValue);
-      },
-    };
-  }
-
-  // Fallback: replace the entire LroHeaders argument value
-  return {
-    id: "arm-lro-set-final-result",
-    label: `Set FinalResult to ${responseTypeName} in LroHeaders`,
-    fix(context) {
-      const argValueLocation = getSourceLocation(argExpr);
-      return context.replaceText(argValueLocation, newValue);
-    },
-  };
-}
 
 /**
  * Get the Response type from an operation's template parameter.
@@ -195,23 +97,6 @@ function isHeaderOnlyModel(program: Program, type: Type): boolean {
 }
 
 /**
- * Get a printable name for a type, if available.
- * Handles Model, Scalar, and Intrinsic types (including void, unknown, etc.).
- */
-function getTypeName(type: Type): string | undefined {
-  switch (type.kind) {
-    case "Model":
-      return type.name;
-    case "Scalar":
-      return type.name;
-    case "Intrinsic":
-      return type.name;
-    default:
-      return undefined;
-  }
-}
-
-/**
  * Verify that the final result of an ARM LRO operation matches the expected response.
  */
 export const armLroResponseMismatchRule = createRule({
@@ -273,22 +158,10 @@ export const armLroResponseMismatchRule = createRule({
     function reportPostMismatch(
       op: ArmResourceOperation,
       messageId?: "default" | "conflictingResponses",
-      responseType?: Type,
     ) {
-      const codefixes: CodeFix[] = [];
-      if (responseType !== undefined) {
-        const responseTypeName = getTypeName(responseType);
-        if (responseTypeName !== undefined) {
-          const codeFix = createLroHeadersCodeFix(op.operation, responseTypeName);
-          if (codeFix !== undefined) {
-            codefixes.push(codeFix);
-          }
-        }
-      }
       context.reportDiagnostic({
         target: op.operation,
         messageId: messageId ?? "default",
-        codefixes,
       });
     }
 
@@ -324,7 +197,7 @@ export const armLroResponseMismatchRule = createRule({
         } else {
           // 200 with non-void body, no 204: body should match finalResult
           if (!doesFinalResultMatch(finalResult, body200.type)) {
-            reportPostMismatch(op, "default", body200.type);
+            reportPostMismatch(op);
           }
         }
         return;
@@ -350,7 +223,7 @@ export const armLroResponseMismatchRule = createRule({
         ) {
           const responseType = getResponseTemplateParam(op.operation);
           if (responseType !== undefined && !doesFinalResultMatch(finalResult, responseType)) {
-            reportPostMismatch(op, "default", responseType);
+            reportPostMismatch(op);
           }
         }
         // Not an ActionAsync template or no Response param — skip
