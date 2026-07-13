@@ -89,7 +89,6 @@ using Azure.ClientGenerator.Core;
 namespace TestService;
 
 #suppress "@azure-tools/typespec-client-generator-core/client-option"
-#suppress "@azure-tools/typespec-client-generator-core/client-option"
 @clientOption("header", "x-ms-error-code:errorCode", "javascript")
 @clientOption("header", "x-ms-request-id:requestId", "javascript")
 @error
