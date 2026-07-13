@@ -1,8 +1,8 @@
-name: Benchmark Comment
+name: Benchmark Comment External
 
 on:
   workflow_run:
-    workflows: ["Benchmark"]
+    workflows: ["Benchmark External"]
     types:
       - completed
 
@@ -18,8 +18,8 @@ jobs:
     uses: ./.github/workflows/benchmark-comment-run.yml
     with:
       run-id: ${{ github.event.workflow_run.id }}
-      header: benchmark-results
-      comment-file: benchmark-comment.md
+      header: benchmark-results-external
+      comment-file: benchmark-comment.external.md
     permissions:
       actions: read
       pull-requests: write
