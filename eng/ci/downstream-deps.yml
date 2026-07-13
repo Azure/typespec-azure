@@ -37,17 +37,17 @@ targets:
     extra:
       - ".github/workflows/ci-python.yml"
       - ".github/actions/setup-python/**"
-    core-submodule: true
+    coreSubmodule: true
   java:
     self: "packages/typespec-java/**"
     use: [core-libs, shared-ci]
     extra:
       - ".github/workflows/ci-java.yml"
       - ".github/actions/setup-java/**"
-    core-submodule: true
+    coreSubmodule: true
   typescript:
     self: "packages/typespec-ts/**"
     use: [core-libs, shared-ci]
     extra:
       - ".github/workflows/ci-typescript.yml"
-    core-submodule: true
+    coreSubmodule: true

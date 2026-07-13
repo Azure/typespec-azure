@@ -1,10 +1,9 @@
-// @ts-check
+import { load } from "js-yaml";
+import { minimatch } from "minimatch";
 import { execFileSync } from "node:child_process";
 import { appendFileSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { load } from "js-yaml";
-import { minimatch } from "minimatch";
 
 /** The git path that changes when the `core` submodule pointer moves. */
 const SUBMODULE_PATH = "core";
@@ -15,7 +14,7 @@ const SUBMODULE_PATH = "core";
  * @property {string[]} [use]
  * @property {string[]} [extra]
  * @property {string[]} [ignore]
- * @property {boolean} ["core-submodule"]
+ * @property {boolean} [coreSubmodule]
  *
  * @typedef {Object} Config
  * @property {{ ignore?: string[] }} [defaults]
@@ -43,7 +42,7 @@ export function resolveTarget(config, name) {
   }
   triggers.push(...(target.extra ?? []));
   const ignore = target.ignore ?? config.defaults?.ignore ?? [];
-  return { triggers, ignore, coreSubmodule: target["core-submodule"] === true };
+  return { triggers, ignore, coreSubmodule: target.coreSubmodule === true };
 }
 
 /**

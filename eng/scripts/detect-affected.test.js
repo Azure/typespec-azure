@@ -1,17 +1,16 @@
-// @ts-check
-import test from "node:test";
 import assert from "node:assert/strict";
-import { computeAffected, resolveTarget, loadConfig } from "./detect-affected.js";
 import { dirname, join } from "node:path";
+import test from "node:test";
 import { fileURLToPath } from "node:url";
+import { computeAffected, loadConfig, resolveTarget } from "./detect-affected.js";
 
 /** @type {import("./detect-affected.js").Config} */
 const config = {
   defaults: { ignore: ["**/test/**", "**/*.md", "**/CHANGELOG.md"] },
   groups: { "core-libs": ["packages/typespec-client-generator-core/**"] },
   targets: {
-    python: { self: "packages/typespec-python/**", use: ["core-libs"], "core-submodule": true },
-    java: { self: "packages/typespec-java/**", "core-submodule": false },
+    python: { self: "packages/typespec-python/**", use: ["core-libs"], coreSubmodule: true },
+    java: { self: "packages/typespec-java/**", coreSubmodule: false },
   },
 };
 
@@ -27,10 +26,7 @@ test("upstream group change affects dependents", () => {
 });
 
 test("test-only upstream change is ignored", () => {
-  const r = computeAffected(
-    ["packages/typespec-client-generator-core/test/x.test.ts"],
-    config,
-  );
+  const r = computeAffected(["packages/typespec-client-generator-core/test/x.test.ts"], config);
   assert.equal(r.python, false);
 });
 
