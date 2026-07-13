@@ -1,0 +1,86 @@
+name: "downstream / CI"
+
+on:
+  pull_request:
+    branches:
+      - main
+      - release/*
+  merge_group:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  detect-affected:
+    name: "Detect Affected Targets"
+    runs-on: ubuntu-latest
+    outputs:
+      python: ${{ steps.detect.outputs.python }}
+      java: ${{ steps.detect.outputs.java }}
+      typescript: ${{ steps.detect.outputs.typescript }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup
+
+      - name: Install detection dependencies
+        run: npm install
+        working-directory: eng/scripts
+
+      - name: Detect affected targets
+        id: detect
+        env:
+          BASE_SHA: ${{ github.event_name == 'merge_group' && github.event.merge_group.base_sha || github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.sha }}
+        run: node eng/scripts/detect-affected.js
+
+  python:
+    name: "Python"
+    needs: detect-affected
+    if: needs.detect-affected.outputs.python == 'true'
+    uses: ./.github/workflows/ci-python.yml
+
+  java:
+    name: "Java"
+    needs: detect-affected
+    if: needs.detect-affected.outputs.java == 'true'
+    uses: ./.github/workflows/ci-java.yml
+
+  typescript:
+    name: "TypeScript"
+    needs: detect-affected
+    if: needs.detect-affected.outputs.typescript == 'true'
+    uses: ./.github/workflows/ci-typescript.yml
+
+  downstream-ci-gate:
+    name: "Downstream CI Gate"
+    needs: [detect-affected, python, java, typescript]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate downstream results
+        run: |
+          fail=0
+          for job in \
+            "detect-affected:${{ needs.detect-affected.result }}" \
+            "python:${{ needs.python.result }}" \
+            "java:${{ needs.java.result }}" \
+            "typescript:${{ needs.typescript.result }}"; do
+            name="${job%%:*}"
+            result="${job##*:}"
+            echo "$name => $result"
+            if [ "$result" = "failure" ] || [ "$result" = "cancelled" ]; then
+              fail=1
+            fi
+          done
+          if [ "$fail" = "1" ]; then
+            echo "One or more downstream checks failed or were cancelled."
+            exit 1
+          fi
+          echo "All downstream checks passed or were skipped."
