@@ -5,6 +5,7 @@ import { armCommonTypesVersionRule } from "./rules/arm-common-types-version.js";
 import { armCustomResourceNoKey } from "./rules/arm-custom-resource-no-key.js";
 import { armCustomResourceUsageDiscourage } from "./rules/arm-custom-resource-usage-discourage.js";
 import { armDeleteResponseCodesRule } from "./rules/arm-delete-response-codes.js";
+import { armFeatureFileUsageDiscourage } from "./rules/arm-feature-file-usage-discourage.js";
 import { armLroResponseMismatchRule } from "./rules/arm-lro-response-mismatch.js";
 import { armNoPathCasingConflictsRule } from "./rules/arm-no-path-casing-conflicts.js";
 import { armNoRecordRule } from "./rules/arm-no-record.js";
@@ -64,6 +65,7 @@ const rules = [
   versionProgressionRule,
   armCustomResourceNoKey,
   armCustomResourceUsageDiscourage,
+  armFeatureFileUsageDiscourage,
   beyondNestingRule,
   coreOperationsRule,
   deleteOperationMissingRule,

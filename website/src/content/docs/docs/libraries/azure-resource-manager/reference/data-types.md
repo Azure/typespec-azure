@@ -260,6 +260,24 @@ op delete(...ResourceInstanceParameters<Employee>):
 | ---------- | ----- | ---------------- |
 | statusCode | `200` | The status code. |
 
+### `ArmFeatureFileOptions` {#Azure.ResourceManager.ArmFeatureFileOptions}
+
+Options for defining a feature file and its associated output
+
+```typespec
+model Azure.ResourceManager.ArmFeatureFileOptions
+```
+
+#### Properties
+
+| Name            | Type     | Description                               |
+| --------------- | -------- | ----------------------------------------- |
+| featureName     | `string` | The feature name                          |
+| fileName        | `string` | The associated file name for the features |
+| description     | `string` | The feature description in Swagger        |
+| title?          | `string` | The feature title in Swagger              |
+| termsOfService? | `string` | The feature terms of service in Swagger   |
+
 ### `ArmFilterParameter` {#Azure.ResourceManager.ArmFilterParameter}
 
 Standard list parameter $filter, allows the user to filter the results of a list operation.
