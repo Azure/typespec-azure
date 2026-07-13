@@ -40,7 +40,7 @@ describe("models", () => {
         {
           code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
           severity: "warning",
-          message: `Anonymous model with generated name "NamedModelAnonymousModelProp" detected. Define this model separately with a proper name to improve code readability and reusability.`,
+          message: `Anonymous model detected in the client surface. Define this model separately with a proper name to improve code readability and reusability.`,
         },
       ]);
   });
@@ -67,12 +67,12 @@ describe("models", () => {
         {
           code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
           severity: "warning",
-          message: `Anonymous model with generated name "NamedModelNestedAnonymousModelProp" detected. Define this model separately with a proper name to improve code readability and reusability.`,
+          message: `Anonymous model detected in the client surface. Define this model separately with a proper name to improve code readability and reusability.`,
         },
         {
           code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
           severity: "warning",
-          message: `Anonymous model with generated name "NamedModelNestedAnonymousModelPropFirstLevelProp" detected. Define this model separately with a proper name to improve code readability and reusability.`,
+          message: `Anonymous model detected in the client surface. Define this model separately with a proper name to improve code readability and reusability.`,
         },
       ]);
   });
@@ -91,7 +91,7 @@ describe("models", () => {
         {
           code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
           severity: "warning",
-          message: `Anonymous model with generated name "FooRequestBody" detected. Define this model separately with a proper name to improve code readability and reusability.`,
+          message: `Anonymous model detected in the client surface. Define this model separately with a proper name to improve code readability and reusability.`,
         },
       ]);
   });
@@ -110,7 +110,7 @@ describe("models", () => {
         {
           code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
           severity: "warning",
-          message: `Anonymous model with generated name "FooResponse" detected. Define this model separately with a proper name to improve code readability and reusability.`,
+          message: `Anonymous model detected in the client surface. Define this model separately with a proper name to improve code readability and reusability.`,
         },
       ]);
   });
@@ -172,7 +172,7 @@ describe("models", () => {
         {
           code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
           severity: "warning",
-          message: `Anonymous model with generated name "JobModelCustomPropertiesAffectedObjectDetails" detected. Define this model separately with a proper name to improve code readability and reusability.`,
+          message: `Anonymous model detected in the client surface. Define this model separately with a proper name to improve code readability and reusability.`,
         },
       ]);
   });
@@ -200,7 +200,7 @@ describe("models", () => {
         {
           code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
           severity: "warning",
-          message: `Anonymous model with generated name "TempFoo" detected. Define this model separately with a proper name to improve code readability and reusability.`,
+          message: `Anonymous model detected in the client surface. Define this model separately with a proper name to improve code readability and reusability.`,
         },
       ]);
   });
@@ -267,9 +267,41 @@ describe("models", () => {
         {
           code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
           severity: "warning",
-          message: `Anonymous model with generated name "MoveFinalResult" detected. Define this model separately with a proper name to improve code readability and reusability.`,
+          message: `Anonymous model detected in the client surface. Define this model separately with a proper name to improve code readability and reusability.`,
         },
       ]);
+  });
+
+  it("does not flag anonymous types defined inside library operations", async () => {
+    // Standard ARM operations pull in many library-internal anonymous types
+    // (envelopes, metadata, etc.). None of those should be reported.
+    const armRunner = await ArmTester.createInstance();
+    const armTester = createLinterRuleTester(
+      armRunner,
+      noUnnamedTypesRule,
+      "@azure-tools/typespec-client-generator-core",
+    );
+    await armTester
+      .expect(
+        `
+        @armProviderNamespace
+        @service
+        @versioned(Versions)
+        namespace TestClient;
+        enum Versions {
+          @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+          v1: "v1",
+        }
+        model Employee is TrackedResource<EmployeeProperties> {
+          ...ResourceNameParameter<Employee>;
+        }
+        model EmployeeProperties {
+          age?: int32;
+        }
+        interface Employees extends Azure.ResourceManager.TrackedResourceOperations<Employee, EmployeeProperties> {}
+        `,
+      )
+      .toBeValid();
   });
 });
 
@@ -288,7 +320,7 @@ describe("unions", () => {
         {
           code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
           severity: "warning",
-          message: `Anonymous union with generated name "FooRequest" detected. Define this union separately with a proper name to improve code readability and reusability.`,
+          message: `Anonymous union detected in the client surface. Define this union separately with a proper name to improve code readability and reusability.`,
         },
       ]);
   });
@@ -313,7 +345,7 @@ describe("unions", () => {
         {
           code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
           severity: "warning",
-          message: `Anonymous union with generated name "FooRequestParam" detected. Define this union separately with a proper name to improve code readability and reusability.`,
+          message: `Anonymous union detected in the client surface. Define this union separately with a proper name to improve code readability and reusability.`,
         },
       ]);
   });
@@ -334,7 +366,7 @@ describe("unions", () => {
         {
           code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
           severity: "warning",
-          message: `Anonymous union with generated name "FooRequestParam" detected. Define this union separately with a proper name to improve code readability and reusability.`,
+          message: `Anonymous union detected in the client surface. Define this union separately with a proper name to improve code readability and reusability.`,
         },
       ]);
   });
@@ -352,7 +384,7 @@ describe("unions", () => {
         {
           code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
           severity: "warning",
-          message: `Anonymous union with generated name "FooRequestParam" detected. Define this union separately with a proper name to improve code readability and reusability.`,
+          message: `Anonymous union detected in the client surface. Define this union separately with a proper name to improve code readability and reusability.`,
         },
       ]);
   });
@@ -422,7 +454,7 @@ describe("unions", () => {
         {
           code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
           severity: "warning",
-          message: `Anonymous union with generated name "FooRequestParam" detected. Define this union separately with a proper name to improve code readability and reusability.`,
+          message: `Anonymous union detected in the client surface. Define this union separately with a proper name to improve code readability and reusability.`,
         },
       ]);
   });

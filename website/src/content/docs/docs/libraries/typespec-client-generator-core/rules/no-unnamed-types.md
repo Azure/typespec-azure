@@ -52,3 +52,9 @@ union Color {
 
 op getColor(): Color;
 ```
+
+## Reviewer advice
+
+Impacts the generated **SDKs**: anonymous inline models and unions on the public client surface receive generated names, which hurts readability and makes them hard to reuse. Ask the author to promote them to named `model` or `union` declarations. Suppression is acceptable when the anonymous type is not actually surfaced on the client, or when needed to match an existing API.
+
+> This rule favors performance over completeness: it walks the type graph directly rather than running the full client generation pass, so some anonymous types (for example those only produced by generated LRO/metadata envelopes) may not be reported.
