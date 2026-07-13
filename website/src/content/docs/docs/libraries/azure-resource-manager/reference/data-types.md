@@ -260,6 +260,24 @@ op delete(...ResourceInstanceParameters<Employee>):
 | ---------- | ----- | ---------------- |
 | statusCode | `200` | The status code. |
 
+### `ArmFeatureFileOptions` {#Azure.ResourceManager.ArmFeatureFileOptions}
+
+Options for defining a feature file and its associated output
+
+```typespec
+model Azure.ResourceManager.ArmFeatureFileOptions
+```
+
+#### Properties
+
+| Name            | Type     | Description                               |
+| --------------- | -------- | ----------------------------------------- |
+| featureName     | `string` | The feature name                          |
+| fileName        | `string` | The associated file name for the features |
+| description     | `string` | The feature description in Swagger        |
+| title?          | `string` | The feature title in Swagger              |
+| termsOfService? | `string` | The feature terms of service in Swagger   |
+
 ### `ArmFilterParameter` {#Azure.ResourceManager.ArmFilterParameter}
 
 Standard list parameter $filter, allows the user to filter the results of a list operation.
@@ -270,9 +288,9 @@ model Azure.ResourceManager.ArmFilterParameter
 
 #### Properties
 
-| Name   | Type     | Description                                                 |
-| ------ | -------- | ----------------------------------------------------------- |
-| filter | `string` | The OData filter expression to apply to the list operation. |
+| Name    | Type     | Description                                                 |
+| ------- | -------- | ----------------------------------------------------------- |
+| filter? | `string` | The OData filter expression to apply to the list operation. |
 
 ### `ArmLocationResource` {#Azure.ResourceManager.ArmLocationResource}
 
@@ -570,9 +588,9 @@ model Azure.ResourceManager.ArmSkipParameter
 
 #### Properties
 
-| Name | Type    | Description                                                            |
-| ---- | ------- | ---------------------------------------------------------------------- |
-| skip | `int64` | The number of items to skip before starting to collect the result set. |
+| Name  | Type    | Description                                                            |
+| ----- | ------- | ---------------------------------------------------------------------- |
+| skip? | `int64` | The number of items to skip before starting to collect the result set. |
 
 ### `ArmTopParameter` {#Azure.ResourceManager.ArmTopParameter}
 
@@ -586,7 +604,7 @@ model Azure.ResourceManager.ArmTopParameter
 
 | Name | Type    | Description                          |
 | ---- | ------- | ------------------------------------ |
-| top  | `int64` | The total number of items to return. |
+| top? | `int64` | The total number of items to return. |
 
 ### `AvailabilityZonesProperty` {#Azure.ResourceManager.AvailabilityZonesProperty}
 
@@ -1770,10 +1788,10 @@ model Azure.ResourceManager.BaseTypes.Agents.ConversationProperties
 
 #### Properties
 
-| Name            | Type              | Description                                                                 |
-| --------------- | ----------------- | --------------------------------------------------------------------------- |
-| conversationId? | `string`          | Unique conversation identifier. Read-only (set by the service on creation). |
-| createdAt?      | `unixTimestamp32` | Timestamp of when the conversation was created. Read-only.                  |
+| Name            | Type          | Description                                                                 |
+| --------------- | ------------- | --------------------------------------------------------------------------- |
+| conversationId? | `string`      | Unique conversation identifier. Read-only (set by the service on creation). |
+| createdAt?      | `utcDateTime` | Timestamp of when the conversation was created. Read-only.                  |
 
 ### `InputMessage` {#Azure.ResourceManager.BaseTypes.Agents.InputMessage}
 
@@ -1878,7 +1896,7 @@ model Azure.ResourceManager.BaseTypes.Agents.ResponseProperties
 | Name        | Type                                                                                      | Description                                                                                                          |
 | ----------- | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | responseId? | `string`                                                                                  | Unique response identifier. Read-only (set by the service).                                                          |
-| createdAt?  | `unixTimestamp32`                                                                         | Timestamp of when the response was created. Read-only.                                                               |
+| createdAt?  | `utcDateTime`                                                                             | Timestamp of when the response was created. Read-only.                                                               |
 | model?      | `string`                                                                                  | Model ID used to generate the response. May be specified on request to override the agent default; read-only in GET. |
 | status?     | [`ResponseStatus`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ResponseStatus) | The status of the response. Read-only.                                                                               |
 | input       | [`InputMessage`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.InputMessage)     | Content input to the model. Required on create.                                                                      |
@@ -1893,14 +1911,14 @@ union Azure.ResourceManager.BaseTypes.Agents.ResponseStatus
 
 #### Variants
 
-| Name       | Type            | Description                           |
-| ---------- | --------------- | ------------------------------------- |
-| Completed  | `"completed"`   | The response completed successfully.  |
-| Failed     | `"failed"`      | The response failed.                  |
-| Cancelled  | `"cancelled"`   | The response was cancelled.           |
-| Incomplete | `"incomplete"`  | The response is incomplete.           |
-| Queued     | `"queued"`      | The response is queued for execution. |
-| InProgress | `"in_progress"` | The response is in progress.          |
+| Name       | Type           | Description                           |
+| ---------- | -------------- | ------------------------------------- |
+| Completed  | `"Completed"`  | The response completed successfully.  |
+| Failed     | `"Failed"`     | The response failed.                  |
+| Cancelled  | `"Cancelled"`  | The response was cancelled.           |
+| Incomplete | `"Incomplete"` | The response is incomplete.           |
+| Queued     | `"Queued"`     | The response is queued for execution. |
+| InProgress | `"InProgress"` | The response is in progress.          |
 
 ## Azure.ResourceManager.CommonTypes
 
