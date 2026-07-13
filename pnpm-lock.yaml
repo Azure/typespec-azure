@@ -3196,6 +3196,9 @@ importers:
       '@typespec/xml':
         specifier: workspace:^
         version: link:../../core/packages/xml
+      yaml:
+        specifier: 'catalog:'
+        version: 2.9.0
     devDependencies:
       '@azure-tools/typespec-azure-core':
         specifier: workspace:^
