@@ -11,6 +11,8 @@ import {
   isErrorModel,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
+import { isEvents } from "@typespec/events";
+import { unsafe_getEventDefinitions as getEventDefinitions } from "@typespec/events/experimental";
 import {
   HttpOperation,
   HttpOperationHeaderParameter,
@@ -31,6 +33,7 @@ import {
   isQueryParam,
 } from "@typespec/http";
 import { StreamMetadata, getStreamMetadata } from "@typespec/http/experimental";
+import { isTerminalEvent } from "@typespec/sse";
 import { camelCase } from "change-case";
 import { getResponseAsBool, isInScope, shouldOmitSlashFromEmptyRoute } from "./decorators.js";
 import {
@@ -49,6 +52,7 @@ import {
   SdkPathParameter,
   SdkQueryParameter,
   SdkServiceResponseHeader,
+  SdkSseEventMetadata,
   SdkStreamMetadata,
   SdkType,
   SerializationOptions,
@@ -124,12 +128,44 @@ function buildSdkStreamMetadata(
   const streamType = diagnostics.pipe(
     getClientTypeWithDiagnostics(context, tspStreamMetadata.streamType, operation),
   );
+  const events = diagnostics.pipe(
+    buildSseEventMetadata(context, tspStreamMetadata.streamType, operation),
+  );
   return diagnostics.wrap({
     bodyType,
     originalType,
     streamType,
     contentTypes: [...tspStreamMetadata.contentTypes],
+    ...(events && { events }),
   });
+}
+
+/**
+ * Build per-event metadata for a server-sent event (SSE) stream. Returns `undefined`
+ * for non-event streams (e.g. JSONL), whose streamed type is not an `@events` union.
+ */
+function buildSseEventMetadata(
+  context: TCGCContext,
+  streamType: Type,
+  operation: Operation,
+): [SdkSseEventMetadata[] | undefined, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  if (streamType.kind !== "Union" || !isEvents(context.program, streamType)) {
+    return diagnostics.wrap(undefined);
+  }
+  const eventDefinitions = diagnostics.pipe(getEventDefinitions(context.program, streamType));
+  const events: SdkSseEventMetadata[] = eventDefinitions.map((event) => ({
+    eventType: event.eventType,
+    isTerminalEvent: isTerminalEvent(context.program, event.root),
+    isEventEnvelope: event.isEventEnvelope,
+    type: diagnostics.pipe(getClientTypeWithDiagnostics(context, event.type, operation)),
+    contentType: event.contentType,
+    payloadType: diagnostics.pipe(
+      getClientTypeWithDiagnostics(context, event.payloadType, operation),
+    ),
+    payloadContentType: event.payloadContentType,
+  }));
+  return diagnostics.wrap(events);
 }
 
 export function getSdkHttpOperation(

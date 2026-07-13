@@ -108,6 +108,9 @@ describe("stream request", () => {
     strictEqual(bodyMeta.streamType.name, "Thing");
     deepStrictEqual(bodyMeta.contentTypes, ["application/jsonl"]);
 
+    // JSONL is not an event stream, so no per-event metadata.
+    strictEqual(bodyMeta.events, undefined);
+
     // streamType has Input + Json usage and appears in sdkPackage.models
     strictEqual(bodyMeta.streamType.usage, UsageFlags.Input | UsageFlags.Json);
     ok(sdkPackage.models.find((m) => m.name === "Thing"));
@@ -235,6 +238,27 @@ describe("stream request", () => {
 
     // streamType union has Input usage (no Json since SSE uses text/event-stream)
     strictEqual(bodyMeta.streamType.usage, UsageFlags.Input);
+
+    // SSE event metadata: one entry per union variant
+    ok(bodyMeta.events);
+    strictEqual(bodyMeta.events.length, 4);
+
+    const userconnect = bodyMeta.events[0];
+    strictEqual(userconnect.eventType, "userconnect");
+    strictEqual(userconnect.isTerminalEvent, false);
+    strictEqual(userconnect.isEventEnvelope, false);
+    strictEqual(userconnect.type.kind, "model");
+    strictEqual(userconnect.type.name, "UserConnect");
+    strictEqual(userconnect.payloadType, userconnect.type);
+    strictEqual(userconnect.contentType, undefined);
+
+    strictEqual(bodyMeta.events[1].eventType, "usermessage");
+    strictEqual(bodyMeta.events[2].eventType, "userdisconnect");
+
+    const unsubscribe = bodyMeta.events[3];
+    strictEqual(unsubscribe.eventType, undefined);
+    strictEqual(unsubscribe.isTerminalEvent, true);
+    strictEqual(unsubscribe.contentType, "text/plain");
   });
 });
 
@@ -463,5 +487,158 @@ describe("stream response", () => {
 
     // streamType union has Output usage (no Json since SSE uses text/event-stream)
     strictEqual(responseMeta.streamType.usage, UsageFlags.Output);
+
+    // SSE event metadata: one entry per union variant, propagated to method response
+    ok(responseMeta.events);
+    strictEqual(responseMeta.events.length, 4);
+    strictEqual(responseMeta.events[0].eventType, "userconnect");
+    strictEqual(responseMeta.events[0].type.kind, "model");
+    strictEqual(responseMeta.events[0].type.name, "UserConnect");
+    strictEqual(responseMeta.events[3].eventType, undefined);
+    strictEqual(responseMeta.events[3].isTerminalEvent, true);
+    strictEqual(responseMeta.events[3].contentType, "text/plain");
+
+    ok(methodMeta.events);
+    strictEqual(methodMeta.events.length, 4);
+    strictEqual(methodMeta.events[3].isTerminalEvent, true);
+  });
+});
+
+// These mirror the SSE scenarios added to the http-specs spector suite
+// (streaming/sse): a basic unnamed `message` stream, a named-events stream with a
+// terminal event, and a POST whose response is an SSE stream.
+describe("sse scenarios (mirroring spector streaming/sse)", () => {
+  it("basic: unnamed message events", async () => {
+    const { program } = await StreamsTesterWithBuiltInService.compile(
+      `
+        model Info {
+          desc: string;
+        }
+
+        @Events.events
+        union BasicEvents {
+          @Events.contentType("application/json")
+          Info,
+        }
+
+        op receive(): SSEStream<BasicEvents>;
+      `,
+    );
+    const context = await createSdkContextForTester(program);
+    const method = getServiceMethodOfClient(context.sdkPackage);
+
+    const responseMeta = method.operation.responses[0].streamMetadata;
+    ok(responseMeta);
+    deepStrictEqual(responseMeta.contentTypes, ["text/event-stream"]);
+    ok(responseMeta.events);
+    strictEqual(responseMeta.events.length, 1);
+
+    const event = responseMeta.events[0];
+    strictEqual(event.eventType, undefined); // unnamed variant => `message` event
+    strictEqual(event.isTerminalEvent, false);
+    strictEqual(event.isEventEnvelope, false);
+    strictEqual(event.type.kind, "model");
+    strictEqual(event.type.name, "Info");
+    strictEqual(event.payloadType, event.type);
+    strictEqual(event.contentType, "application/json");
+  });
+
+  it("named events with a terminal event", async () => {
+    const { program } = await StreamsTesterWithBuiltInService.compile(
+      `
+        model ResponseCreated {
+          id: string;
+        }
+
+        model ResponseDelta {
+          delta: string;
+        }
+
+        @Events.events
+        union ResponseEvents {
+          @Events.contentType("application/json")
+          responseCreated: ResponseCreated,
+
+          @Events.contentType("application/json")
+          responseDelta: ResponseDelta,
+
+          @Events.contentType("text/plain")
+          @terminalEvent
+          "[DONE]",
+        }
+
+        op receive(): SSEStream<ResponseEvents>;
+      `,
+    );
+    const context = await createSdkContextForTester(program);
+    const method = getServiceMethodOfClient(context.sdkPackage);
+
+    const responseMeta = method.operation.responses[0].streamMetadata;
+    ok(responseMeta);
+    ok(responseMeta.events);
+    strictEqual(responseMeta.events.length, 3);
+
+    strictEqual(responseMeta.events[0].eventType, "responseCreated");
+    strictEqual(responseMeta.events[0].type.kind, "model");
+    strictEqual(responseMeta.events[0].type.name, "ResponseCreated");
+    strictEqual(responseMeta.events[0].isTerminalEvent, false);
+
+    strictEqual(responseMeta.events[1].eventType, "responseDelta");
+
+    const terminal = responseMeta.events[2];
+    strictEqual(terminal.eventType, undefined);
+    strictEqual(terminal.isTerminalEvent, true);
+    strictEqual(terminal.contentType, "text/plain");
+  });
+
+  it("POST with a request body and an SSE-streamed response", async () => {
+    const { program } = await StreamsTesterWithBuiltInService.compile(
+      `
+        model RetrievalRequest {
+          query: string;
+        }
+
+        model PartialResult {
+          text: string;
+        }
+
+        model FinalResult {
+          references: string[];
+        }
+
+        @Events.events
+        union RetrievalEvents {
+          @Events.contentType("application/json")
+          partialResult: PartialResult,
+
+          @Events.contentType("application/json")
+          finalResult: FinalResult,
+
+          @Events.contentType("text/plain")
+          @terminalEvent
+          "[DONE]",
+        }
+
+        @post
+        op stream(@body request: RetrievalRequest): SSEStream<RetrievalEvents>;
+      `,
+    );
+    const context = await createSdkContextForTester(program);
+    const method = getServiceMethodOfClient(context.sdkPackage);
+
+    // The request body is a plain model, not a stream.
+    strictEqual(method.operation.bodyParam?.type.kind, "model");
+    strictEqual(method.operation.bodyParam?.type.name, "RetrievalRequest");
+    strictEqual(method.operation.bodyParam?.streamMetadata, undefined);
+
+    // The response is the SSE stream, with per-event metadata.
+    const responseMeta = method.operation.responses[0].streamMetadata;
+    ok(responseMeta);
+    deepStrictEqual(responseMeta.contentTypes, ["text/event-stream"]);
+    ok(responseMeta.events);
+    strictEqual(responseMeta.events.length, 3);
+    strictEqual(responseMeta.events[0].eventType, "partialResult");
+    strictEqual(responseMeta.events[1].eventType, "finalResult");
+    strictEqual(responseMeta.events[2].isTerminalEvent, true);
   });
 });
