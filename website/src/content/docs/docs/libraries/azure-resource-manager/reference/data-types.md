@@ -270,9 +270,9 @@ model Azure.ResourceManager.ArmFilterParameter
 
 #### Properties
 
-| Name   | Type     | Description                                                 |
-| ------ | -------- | ----------------------------------------------------------- |
-| filter | `string` | The OData filter expression to apply to the list operation. |
+| Name    | Type     | Description                                                 |
+| ------- | -------- | ----------------------------------------------------------- |
+| filter? | `string` | The OData filter expression to apply to the list operation. |
 
 ### `ArmLocationResource` {#Azure.ResourceManager.ArmLocationResource}
 
@@ -570,9 +570,9 @@ model Azure.ResourceManager.ArmSkipParameter
 
 #### Properties
 
-| Name | Type    | Description                                                            |
-| ---- | ------- | ---------------------------------------------------------------------- |
-| skip | `int64` | The number of items to skip before starting to collect the result set. |
+| Name  | Type    | Description                                                            |
+| ----- | ------- | ---------------------------------------------------------------------- |
+| skip? | `int64` | The number of items to skip before starting to collect the result set. |
 
 ### `ArmTopParameter` {#Azure.ResourceManager.ArmTopParameter}
 
@@ -586,7 +586,7 @@ model Azure.ResourceManager.ArmTopParameter
 
 | Name | Type    | Description                          |
 | ---- | ------- | ------------------------------------ |
-| top  | `int64` | The total number of items to return. |
+| top? | `int64` | The total number of items to return. |
 
 ### `AvailabilityZonesProperty` {#Azure.ResourceManager.AvailabilityZonesProperty}
 
