@@ -132,6 +132,15 @@ The **effective trigger set** for a target is
 `self ∪ (expanded use groups) ∪ extra`, with the ignore globs applied as
 negations.
 
+> **Implementation refinements** (see the plan and the committed
+> `eng/ci/downstream-deps.yml`): (1) target **keys** are short expression-safe
+> ids (`python`, `java`, `typescript`) because GitHub Actions expressions parse
+> hyphens as subtraction; (2) each target's `extra` includes its own reusable
+> workflow file and its `setup-<lang>` action, and a shared `shared-ci` group
+> covers `.github/actions/setup/**`, so infra changes still trigger the emitter
+> (preserving the pre-existing self-trigger paths and avoiding an under-trigger
+> regression).
+
 ### Component 2 — Downstream entrypoint workflow
 
 New file: `.github/workflows/ci-downstream.yml`. Always runs (no `on.paths`):

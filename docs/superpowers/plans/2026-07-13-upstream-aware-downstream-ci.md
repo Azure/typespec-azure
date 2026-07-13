@@ -73,22 +73,39 @@ groups:
     - "packages/typespec-client-generator-core/**"
     - "packages/typespec-azure-core/**"
     - "packages/typespec-azure-resource-manager/**"
+  # Shared CI infrastructure every target's jobs consume.
+  shared-ci:
+    - ".github/actions/setup/**"
 
 # Downstream targets. Key = short expression-safe id used for the job output.
 targets:
   python:
     self: "packages/typespec-python/**"
-    use: [core-libs]
+    use: [core-libs, shared-ci]
+    extra:
+      - ".github/workflows/ci-python.yml"
+      - ".github/actions/setup-python/**"
     core-submodule: true
   java:
     self: "packages/typespec-java/**"
-    use: [core-libs]
+    use: [core-libs, shared-ci]
+    extra:
+      - ".github/workflows/ci-java.yml"
+      - ".github/actions/setup-java/**"
     core-submodule: true
   typescript:
     self: "packages/typespec-ts/**"
-    use: [core-libs]
+    use: [core-libs, shared-ci]
+    extra:
+      - ".github/workflows/ci-typescript.yml"
     core-submodule: true
 ```
+
+> **Why `extra` + `shared-ci`:** the original emitter workflows self-triggered
+> not only on their package glob but also on their own workflow file and their
+> `setup-<lang>` composite action. Preserving that (so a change to
+> `.github/actions/setup-python/**` or the reusable workflow still runs the
+> emitter) is required to avoid an under-trigger regression.
 
 - [ ] **Step 2: Verify it parses as YAML (after Task 2 installs js-yaml)**
 
