@@ -838,110 +838,39 @@ function getResourceCollectionPath(resource: { resourceInstancePath: string }): 
   return `/${segments.slice(0, -1).join("/")}`;
 }
 
-function getResourceScopePrefix(resourceInstancePath: string): string {
-  const providersIndex = resourceInstancePath.toLowerCase().lastIndexOf("/providers/");
-  if (providersIndex === -1) {
-    const segments = resourceInstancePath.split("/").filter((s) => s.length > 0);
-    if (
-      segments.length === 4 &&
-      segments[0].toLowerCase() === "subscriptions" &&
-      segments[2].toLowerCase() === "resourcegroups"
-    ) {
-      return `/${segments.slice(0, 2).join("/")}`;
-    }
-    if (segments.length === 2 && segments[0].toLowerCase() === "subscriptions") {
-      return "";
-    }
-    return "";
-  }
-  return resourceInstancePath.slice(0, providersIndex);
-}
-
-function normalizeResourceType(resourceType: ResourceType): string {
-  return `${resourceType.provider}/${resourceType.types.join("/")}`.toLowerCase();
-}
-
-function parseArmResourceCollectionPath(path: string): ResourcePathInfo | undefined {
-  const segments = path.split("/").filter((s) => s.length > 0);
-  const providerIndex = segments.findLastIndex((s) => s === "providers");
-
-  if (providerIndex === -1) {
-    if (
-      segments.length === 3 &&
-      segments[0].toLowerCase() === "subscriptions" &&
-      isPathVariableSegment(segments[1]) &&
-      segments[2].toLowerCase() === "resourcegroups"
-    ) {
-      return {
-        resourceType: {
-          provider: "Microsoft.Resources",
-          types: ["resourceGroups"],
-        },
-        resourceInstancePath: `/${segments.join("/")}`,
-      };
-    }
-    return undefined;
-  }
-
-  if (providerIndex === segments.length - 1) return undefined;
-  const provider = segments[providerIndex + 1];
-  if (isPathVariableSegment(provider)) return undefined;
-
-  const resourceSegments = segments.slice(providerIndex + 2);
-  if (resourceSegments.length === 0 || resourceSegments.length % 2 === 0) return undefined;
-
-  const typeSegments: string[] = [];
-  for (let i = 0; i < resourceSegments.length; i += 2) {
-    const typeSegment = resourceSegments[i];
-    if (typeSegment === undefined || isPathVariableSegment(typeSegment)) return undefined;
-    typeSegments.push(typeSegment);
-    if (i + 1 < resourceSegments.length && !isPathVariableSegment(resourceSegments[i + 1])) {
-      return undefined;
-    }
-  }
-
-  return {
-    resourceType: {
-      provider,
-      types: typeSegments,
-    },
-    resourceInstancePath: `/${segments.join("/")}`,
-  };
-}
-
-function isSubscriptionScopeListForResourceGroupScopedResource(
-  listCollectionPath: string,
-  resourceCollectionPath: string,
-): boolean {
-  const listScope = normalizePathForResourceIdentity(getResourceScopePrefix(listCollectionPath));
-  const resourceScope = normalizePathForResourceIdentity(
-    getResourceScopePrefix(resourceCollectionPath),
-  );
-  return (
-    listScope.startsWith("/subscriptions/") && resourceScope === `${listScope}/resourcegroups/{}`
-  );
-}
-
 function isListOperationMatch(
   operation: ArmResourceOperation,
   resource: ResolvedResourceOperations,
 ): boolean {
-  const listInfo = parseArmResourceCollectionPath(operation.httpOperation.path);
-  if (listInfo === undefined) return false;
-  if (normalizeResourceType(listInfo.resourceType) !== normalizeResourceType(resource.resourceType))
-    return false;
+  const operationPath = normalizePathForResourceIdentity(operation.httpOperation.path);
+  const resourcePath = normalizePathForResourceIdentity(resource.resourceInstancePath);
+  return resourcePath.startsWith(`${operationPath}/`);
+}
 
-  const listCollectionPath = normalizePathForResourceIdentity(listInfo.resourceInstancePath);
-  const resourceCollectionPath = normalizePathForResourceIdentity(
-    getResourceCollectionPath(resource),
-  );
-  return (
-    listCollectionPath === resourceCollectionPath ||
-    isSubscriptionScopeListForResourceGroupScopedResource(
-      listInfo.resourceInstancePath,
-      getResourceCollectionPath(resource),
-    )
-  );
+function getListMatchDistance(
+  operation: ArmResourceOperation,
+  resource: ResolvedResourceOperations,
+): number {
+  const operationPath = normalizePathForResourceIdentity(operation.httpOperation.path);
+  const resourcePath = normalizePathForResourceIdentity(resource.resourceInstancePath);
+  return resourcePath.length - operationPath.length;
+}
+
+function getBestListOperationTarget(
+  operation: ArmResourceOperation,
+  resources: Iterable<ResolvedResourceOperations>,
+): ResolvedResourceOperations | undefined {
+  let best: ResolvedResourceOperations | undefined;
+  let bestDistance = Number.POSITIVE_INFINITY;
+  for (const resource of resources) {
+    if (!isListOperationMatch(operation, resource)) continue;
+    const distance = getListMatchDistance(operation, resource);
+    if (distance < bestDistance) {
+      best = resource;
+      bestDistance = distance;
+    }
+  }
+  return best;
 }
 
 function isActionOperationMatch(
@@ -965,11 +894,6 @@ function tryAddOperationToResolvedResource(
     if (resourceInfo !== undefined && isResourceIdentityMatch(resourceInfo, target)) {
       tryAddLifecycleOperation(target.resourceType, armOperation, target);
     }
-    return;
-  }
-
-  if (armOperation.kind === "list" && isListOperationMatch(armOperation, target)) {
-    tryAddLifecycleOperation(target.resourceType, armOperation, target);
     return;
   }
 
@@ -1279,6 +1203,14 @@ export function resolveArmResourceOperations(
 
   for (const candidate of candidates) {
     if (isResourceIdentityOperation(candidate.armOperation.kind)) continue;
+    if (candidate.armOperation.kind === "list") {
+      const target = getBestListOperationTarget(candidate.armOperation, resolvedOperations);
+      if (target !== undefined) {
+        tryAddLifecycleOperation(target.resourceType, candidate.armOperation, target);
+      }
+      // TODO: Define how non-prefix list paths should map to detected resource identities.
+      continue;
+    }
     for (const resolvedOp of resolvedOperations) {
       tryAddOperationToResolvedResource(candidate, resolvedOp);
     }

@@ -204,7 +204,8 @@ For each ARM resource detail returned by `listArmResources(program)`:
    - The canonical path is also what later steps use to attach remaining operations and resolve parent/scope relationships.
 8. Append other lifecycle, list, and action operations to the detected resource.
    - Append lifecycle operations when the operation's normalized instance path matches the detected resource identity.
-   - Append list operations when the operation's normalized collection or scope path is compatible with the detected resource identity.
+   - Append list operations when the operation's normalized request path is a prefix of a detected resource identity. If multiple resources match, attach to the closest one.
+   - Non-prefix list paths need a separate design and should not create resource identities.
    - Append action operations when the operation's normalized path is under the detected resource instance path or collection path.
    - Keep protocol correctness as linting, not detection. The expected HTTP verb for each lifecycle kind should be enforced by a linter, not by the resolver.
    - Operations that cannot be associated with any detected resource should remain available for the provider-level operation pass.

@@ -549,10 +549,7 @@ interface Employees {
           ],
         },
         actions: [{ operationGroup: "Employees", name: "move", kind: "action" }],
-        lists: [
-          { operationGroup: "Employees", name: "listBySubscription", kind: "list" },
-          { operationGroup: "Employees", name: "listByResourceGroup", kind: "list" },
-        ],
+        lists: [{ operationGroup: "Employees", name: "listByResourceGroup", kind: "list" }],
       },
       resourceType: {
         provider: "Microsoft.ContosoProviderHub",
@@ -1569,10 +1566,7 @@ model DependentProperties {
           ],
         },
         actions: [{ operationGroup: "Employees", name: "move", kind: "action" }],
-        lists: [
-          { operationGroup: "Employees", name: "listBySubscription", kind: "list" },
-          { operationGroup: "Employees", name: "listByResourceGroup", kind: "list" },
-        ],
+        lists: [{ operationGroup: "Employees", name: "listByResourceGroup", kind: "list" }],
       },
       resourceType: {
         provider: "Microsoft.ContosoProviderHub",
@@ -1845,10 +1839,7 @@ model MoveResponse {
           ],
         },
         actions: [{ operationGroup: "Employees", name: "move", kind: "action" }],
-        lists: [
-          { operationGroup: "Employees", name: "listBySubscription", kind: "list" },
-          { operationGroup: "Employees", name: "listByResourceGroup", kind: "list" },
-        ],
+        lists: [{ operationGroup: "Employees", name: "listByResourceGroup", kind: "list" }],
       },
       resourceType: {
         provider: "Microsoft.ContosoProviderHub",
@@ -2052,10 +2043,7 @@ model DependentProperties {
           ],
         },
         actions: [{ operationGroup: "Employees", name: "move", kind: "action" }],
-        lists: [
-          { operationGroup: "Employees", name: "listBySubscription", kind: "list" },
-          { operationGroup: "Employees", name: "listByResourceGroup", kind: "list" },
-        ],
+        lists: [{ operationGroup: "Employees", name: "listByResourceGroup", kind: "list" }],
       },
       resourceType: {
         provider: "Microsoft.ContosoProviderHub",
@@ -3458,10 +3446,7 @@ model DependentProperties {
           ],
         },
         actions: [{ operationGroup: "Employees", name: "move", kind: "action" }],
-        lists: [
-          { operationGroup: "Employees", name: "listBySubscription", kind: "list" },
-          { operationGroup: "Employees", name: "listByResourceGroup", kind: "list" },
-        ],
+        lists: [{ operationGroup: "Employees", name: "listByResourceGroup", kind: "list" }],
       },
       resourceType: {
         provider: "Microsoft.ContosoProviderHub",
@@ -3641,10 +3626,7 @@ model MoveResponse {
           ],
         },
         actions: [{ operationGroup: "Employees", name: "move", kind: "action" }],
-        lists: [
-          { operationGroup: "Employees", name: "listBySubscription", kind: "list" },
-          { operationGroup: "Employees", name: "listByResourceGroup", kind: "list" },
-        ],
+        lists: [{ operationGroup: "Employees", name: "listByResourceGroup", kind: "list" }],
       },
       resourceType: {
         provider: "Microsoft.ContosoProviderHub",
@@ -4348,7 +4330,7 @@ interface Employees {
     expect(employee.singleton!.keyValue).toEqual(["salaried", "hourly"]);
   });
 
-  it("collects list operations for child resource using ArmListBySubscriptionScope", async () => {
+  it("does not create resource entry for non-prefix child resource list", async () => {
     const { program } = await Tester.compile(`
 using Azure.Core;
 
@@ -4431,19 +4413,12 @@ interface Employees {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/tests/{testName}/employees/{employeeName}",
     });
 
-    // Verify a subscription-scoped employee resource entry was created for the subscription list
+    // Non-prefix list paths should not create a separate resource entry.
     const subscriptionEmployee = provider.resources.find(
       (r) =>
         r.resourceInstancePath ===
         "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees/{name}",
     );
-    ok(subscriptionEmployee);
-    expect(subscriptionEmployee.operations.lists).toHaveLength(1);
-    expect(subscriptionEmployee.operations.lists![0]).toMatchObject({
-      operationGroup: "Employees",
-      name: "listBySubscription",
-      kind: "list",
-      path: "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees",
-    });
+    expect(subscriptionEmployee).toBeUndefined();
   });
 });
