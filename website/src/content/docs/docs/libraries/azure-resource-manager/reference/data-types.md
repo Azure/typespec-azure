@@ -1902,6 +1902,106 @@ union Azure.ResourceManager.BaseTypes.Agents.ResponseStatus
 | Queued     | `"Queued"`     | The response is queued for execution. |
 | InProgress | `"InProgress"` | The response is in progress.          |
 
+## Azure.ResourceManager.BaseTypes.Relationships
+
+### `Relationship` {#Azure.ResourceManager.BaseTypes.Relationships.Relationship}
+
+Model template for a Relationship extension resource.
+Applies the Relationship base type decorator automatically.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Relationships.Relationship<Properties>
+```
+
+#### Template Parameters
+
+| Name       | Description                                                                      |
+| ---------- | -------------------------------------------------------------------------------- |
+| Properties | RP-specific properties for the relationship (must extend RelationshipProperties) |
+
+#### Properties
+
+| Name        | Type         | Description |
+| ----------- | ------------ | ----------- |
+| properties? | `Properties` |             |
+
+### `RelationshipMetadata` {#Azure.ResourceManager.BaseTypes.Relationships.RelationshipMetadata}
+
+Metadata describing the source and target types of a relationship.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Relationships.RelationshipMetadata
+```
+
+#### Properties
+
+| Name       | Type     | Description                          |
+| ---------- | -------- | ------------------------------------ |
+| sourceType | `string` | The type of the relationship source. |
+| targetType | `string` | The type of the relationship target. |
+
+### `RelationshipOriginInformation` {#Azure.ResourceManager.BaseTypes.Relationships.RelationshipOriginInformation}
+
+Origin information for a relationship.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Relationships.RelationshipOriginInformation
+```
+
+#### Properties
+
+| Name                   | Type     | Description                                       |
+| ---------------------- | -------- | ------------------------------------------------- |
+| relationshipOriginType | `string` | The origin type.                                  |
+| discoveryEngine?       | `string` | The discovery engine that found the relationship. |
+
+### `RelationshipProperties` {#Azure.ResourceManager.BaseTypes.Relationships.RelationshipProperties}
+
+Required properties for a relationship resource.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Relationships.RelationshipProperties<Metadata, OriginInformation>
+```
+
+#### Template Parameters
+
+| Name              | Description                                |
+| ----------------- | ------------------------------------------ |
+| Metadata          | The relationship metadata model.           |
+| OriginInformation | The relationship origin information model. |
+
+#### Properties
+
+| Name               | Type                                                                                                                           | Description                                                           |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
+| baseTypes          | `Azure.ResourceManager.BaseTypes.BaseTypeInfo[]`                                                                               | ARM-managed. Must include the base type descriptor for this resource. |
+| sourceId           | `string`                                                                                                                       | The relationship source identifier.                                   |
+| targetId           | `string`                                                                                                                       | The relationship target identifier.                                   |
+| targetTenant       | `string`                                                                                                                       | The tenant identifier of the relationship target.                     |
+| metadata           | `Metadata`                                                                                                                     | Metadata describing the relationship source and target types.         |
+| originInformation? | `OriginInformation`                                                                                                            | Origin information for the relationship.                              |
+| provisioningState  | [`RelationshipProvisioningState`](./data-types.md#Azure.ResourceManager.BaseTypes.Relationships.RelationshipProvisioningState) | The provisioning state of the relationship.                           |
+
+### `RelationshipProvisioningState` {#Azure.ResourceManager.BaseTypes.Relationships.RelationshipProvisioningState}
+
+The provisioning state of a relationship.
+
+```typespec
+union Azure.ResourceManager.BaseTypes.Relationships.RelationshipProvisioningState
+```
+
+#### Variants
+
+| Name         | Type             | Description                                 |
+| ------------ | ---------------- | ------------------------------------------- |
+| Succeeded    | `"Succeeded"`    | The relationship operation succeeded.       |
+| Failed       | `"Failed"`       | The relationship operation failed.          |
+| Cancelled    | `"Cancelled"`    | The response was cancelled.                 |
+| NotStarted   | `"NotStarted"`   | The relationship operation has not started. |
+| Provisioning | `"Provisioning"` | The relationship is provisioning.           |
+| Updating     | `"Updating"`     | The relationship is updating.               |
+| Deleting     | `"Deleting"`     | The relationship is deleting.               |
+
 ## Azure.ResourceManager.CommonTypes
 
 ### `AccessRule` {#Azure.ResourceManager.CommonTypes.AccessRule}

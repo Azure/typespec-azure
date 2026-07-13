@@ -1,0 +1,600 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "ContosoRelationshipsClient",
+    "version": "2024-06-01",
+    "description": "Contoso Relationships Resource Provider management API.",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "host": "management.azure.com",
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "security": [
+    {
+      "azure_auth": [
+        "user_impersonation"
+      ]
+    }
+  ],
+  "securityDefinitions": {
+    "azure_auth": {
+      "type": "oauth2",
+      "description": "Azure Active Directory OAuth2 Flow.",
+      "flow": "implicit",
+      "authorizationUrl": "https://login.microsoftonline.com/common/oauth2/authorize",
+      "scopes": {
+        "user_impersonation": "impersonate your user account"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Operations"
+    },
+    {
+      "name": "DependencyOfRelationships"
+    }
+  ],
+  "paths": {
+    "/{scope}/providers/Microsoft.ContosoRelationships/dependencyOf": {
+      "get": {
+        "operationId": "DependencyOfRelationships_List",
+        "tags": [
+          "DependencyOfRelationships"
+        ],
+        "description": "List DependencyOf resources by scope",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "scope",
+            "in": "path",
+            "description": "The fully qualified Azure Resource manager identifier of the resource.",
+            "required": true,
+            "type": "string",
+            "x-ms-skip-url-encoding": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/DependencyOfListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/{scope}/providers/Microsoft.ContosoRelationships/dependencyOf/{relationshipName}": {
+      "get": {
+        "operationId": "DependencyOfRelationships_Get",
+        "tags": [
+          "DependencyOfRelationships"
+        ],
+        "description": "Get a DependencyOf",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "scope",
+            "in": "path",
+            "description": "The fully qualified Azure Resource manager identifier of the resource.",
+            "required": true,
+            "type": "string",
+            "x-ms-skip-url-encoding": true
+          },
+          {
+            "name": "relationshipName",
+            "in": "path",
+            "description": "The relationship name.",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_.-]{1,64}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/DependencyOf"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "DependencyOfRelationships_Create",
+        "tags": [
+          "DependencyOfRelationships"
+        ],
+        "description": "Create a DependencyOf",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "scope",
+            "in": "path",
+            "description": "The fully qualified Azure Resource manager identifier of the resource.",
+            "required": true,
+            "type": "string",
+            "x-ms-skip-url-encoding": true
+          },
+          {
+            "name": "relationshipName",
+            "in": "path",
+            "description": "The relationship name.",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_.-]{1,64}$"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DependencyOf"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource 'DependencyOf' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/DependencyOf"
+            }
+          },
+          "201": {
+            "description": "Resource 'DependencyOf' create operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/DependencyOf"
+            },
+            "headers": {
+              "Azure-AsyncOperation": {
+                "type": "string",
+                "description": "A link to the status monitor"
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "azure-async-operation"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "patch": {
+        "operationId": "DependencyOfRelationships_Update",
+        "tags": [
+          "DependencyOfRelationships"
+        ],
+        "description": "Update a DependencyOf",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "scope",
+            "in": "path",
+            "description": "The fully qualified Azure Resource manager identifier of the resource.",
+            "required": true,
+            "type": "string",
+            "x-ms-skip-url-encoding": true
+          },
+          {
+            "name": "relationshipName",
+            "in": "path",
+            "description": "The relationship name.",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_.-]{1,64}$"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "The resource properties to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DependencyOfUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/DependencyOf"
+            }
+          },
+          "202": {
+            "description": "Resource update request accepted.",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "delete": {
+        "operationId": "DependencyOfRelationships_Delete",
+        "tags": [
+          "DependencyOfRelationships"
+        ],
+        "description": "Delete a DependencyOf",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "scope",
+            "in": "path",
+            "description": "The fully qualified Azure Resource manager identifier of the resource.",
+            "required": true,
+            "type": "string",
+            "x-ms-skip-url-encoding": true
+          },
+          {
+            "name": "relationshipName",
+            "in": "path",
+            "description": "The relationship name.",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_.-]{1,64}$"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Resource deletion accepted.",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "204": {
+            "description": "Resource does not exist."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
+    },
+    "/providers/Microsoft.ContosoRelationships/operations": {
+      "get": {
+        "operationId": "Operations_List",
+        "tags": [
+          "Operations"
+        ],
+        "description": "List the operations for the provider",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/OperationListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Azure.ResourceManager.BaseTypes.BaseTypeInfo": {
+      "type": "object",
+      "description": "An ARM-managed base type descriptor identifying the schema contract a resource conforms to.\nUsed as a parameter to the `@azureBaseType` decorator to indicate which\nbase types a resource conforms to.",
+      "properties": {
+        "baseType": {
+          "type": "string",
+          "description": "The base type identifier (for example, \"Agent\")."
+        },
+        "version": {
+          "type": "string",
+          "description": "The schema version of the base type."
+        }
+      },
+      "required": [
+        "baseType",
+        "version"
+      ]
+    },
+    "Azure.ResourceManager.BaseTypes.Relationships.RelationshipOriginInformation": {
+      "type": "object",
+      "description": "Origin information for a relationship.",
+      "properties": {
+        "relationshipOriginType": {
+          "type": "string",
+          "description": "The origin type."
+        },
+        "discoveryEngine": {
+          "type": "string",
+          "description": "The discovery engine that found the relationship."
+        }
+      },
+      "required": [
+        "relationshipOriginType"
+      ]
+    },
+    "Azure.ResourceManager.BaseTypes.Relationships.RelationshipProvisioningState": {
+      "type": "string",
+      "description": "The provisioning state of a relationship.",
+      "enum": [
+        "Succeeded",
+        "Failed",
+        "Cancelled",
+        "NotStarted",
+        "Provisioning",
+        "Updating",
+        "Deleting"
+      ],
+      "x-ms-enum": {
+        "name": "RelationshipProvisioningState",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "Succeeded",
+            "value": "Succeeded",
+            "description": "The relationship operation succeeded."
+          },
+          {
+            "name": "Failed",
+            "value": "Failed",
+            "description": "The relationship operation failed."
+          },
+          {
+            "name": "Cancelled",
+            "value": "Cancelled",
+            "description": "The response was cancelled."
+          },
+          {
+            "name": "NotStarted",
+            "value": "NotStarted",
+            "description": "The relationship operation has not started."
+          },
+          {
+            "name": "Provisioning",
+            "value": "Provisioning",
+            "description": "The relationship is provisioning."
+          },
+          {
+            "name": "Updating",
+            "value": "Updating",
+            "description": "The relationship is updating."
+          },
+          {
+            "name": "Deleting",
+            "value": "Deleting",
+            "description": "The relationship is deleting."
+          }
+        ]
+      },
+      "readOnly": true
+    },
+    "DependencyOf": {
+      "type": "object",
+      "description": "A dependency relationship between a source scope and target entity.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/DependencyOfProperties",
+          "description": "The resource-specific properties for this resource."
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ProxyResource"
+        }
+      ]
+    },
+    "DependencyOfListResult": {
+      "type": "object",
+      "description": "The response of a DependencyOf list operation.",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "The DependencyOf items on this page",
+          "items": {
+            "$ref": "#/definitions/DependencyOf"
+          }
+        },
+        "nextLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link to the next page of items"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "DependencyOfMetadata": {
+      "type": "object",
+      "description": "Metadata for a Contoso dependency relationship.",
+      "properties": {
+        "sourceType": {
+          "type": "string",
+          "description": "The type of the relationship source."
+        },
+        "targetType": {
+          "type": "string",
+          "description": "The type of the relationship target."
+        },
+        "description": {
+          "type": "string",
+          "description": "A human-readable relationship description."
+        }
+      },
+      "required": [
+        "sourceType",
+        "targetType"
+      ]
+    },
+    "DependencyOfProperties": {
+      "type": "object",
+      "description": "Properties for a Contoso dependency relationship.",
+      "properties": {
+        "baseTypes": {
+          "type": "array",
+          "description": "ARM-managed. Must include the base type descriptor for this resource.",
+          "items": {
+            "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.BaseTypeInfo"
+          },
+          "readOnly": true
+        },
+        "sourceId": {
+          "type": "string",
+          "description": "The relationship source identifier."
+        },
+        "targetId": {
+          "type": "string",
+          "description": "The relationship target identifier."
+        },
+        "targetTenant": {
+          "type": "string",
+          "description": "The tenant identifier of the relationship target."
+        },
+        "metadata": {
+          "$ref": "#/definitions/DependencyOfMetadata",
+          "description": "Metadata describing the relationship source and target types."
+        },
+        "originInformation": {
+          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Relationships.RelationshipOriginInformation",
+          "description": "Origin information for the relationship."
+        },
+        "provisioningState": {
+          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Relationships.RelationshipProvisioningState",
+          "description": "The provisioning state of the relationship."
+        }
+      },
+      "required": [
+        "baseTypes",
+        "sourceId",
+        "targetId",
+        "targetTenant",
+        "metadata",
+        "provisioningState"
+      ]
+    },
+    "DependencyOfUpdate": {
+      "type": "object",
+      "description": "The type used for update operations of the DependencyOf.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/DependencyOfUpdateProperties",
+          "description": "The resource-specific properties for this resource."
+        }
+      }
+    },
+    "DependencyOfUpdateProperties": {
+      "type": "object",
+      "description": "The updatable properties of the DependencyOf.",
+      "properties": {
+        "sourceId": {
+          "type": "string",
+          "description": "The relationship source identifier."
+        },
+        "targetId": {
+          "type": "string",
+          "description": "The relationship target identifier."
+        },
+        "targetTenant": {
+          "type": "string",
+          "description": "The tenant identifier of the relationship target."
+        },
+        "metadata": {
+          "$ref": "#/definitions/DependencyOfMetadata",
+          "description": "Metadata describing the relationship source and target types."
+        },
+        "originInformation": {
+          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Relationships.RelationshipOriginInformation",
+          "description": "Origin information for the relationship."
+        },
+        "provisioningState": {
+          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Relationships.RelationshipProvisioningState",
+          "description": "The provisioning state of the relationship."
+        }
+      }
+    }
+  },
+  "parameters": {}
+}
