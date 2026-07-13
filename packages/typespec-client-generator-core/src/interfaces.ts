@@ -422,6 +422,12 @@ export interface SdkArrayType extends SdkTypeBase {
   valueType: SdkType;
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
+  /**
+   * Serialization options for the array model itself.
+   * Only set when the array is a named model with explicit serialization decorators,
+   * e.g. `@Xml.name("Foo") model Foo is Bar[];`.
+   */
+  serializationOptions?: SerializationOptions;
 }
 
 export interface SdkTupleType extends SdkTypeBase {
@@ -433,6 +439,12 @@ export interface SdkDictionaryType extends SdkTypeBase {
   kind: "dict";
   keyType: SdkType;
   valueType: SdkType;
+  /**
+   * Serialization options for the dictionary model itself.
+   * Only set when the dictionary is a named model with explicit serialization decorators,
+   * e.g. `@Xml.name("Foo") model Foo is Record<Bar>;`.
+   */
+  serializationOptions?: SerializationOptions;
 }
 
 export interface SdkNullableType extends SdkTypeBase {
