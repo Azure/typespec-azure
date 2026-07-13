@@ -2025,8 +2025,9 @@
           "description": "The name of the function (tool) to invoke. Applies to `FunctionCall` items."
         },
         "arguments": {
-          "type": "string",
-          "description": "JSON-encoded arguments passed to the function (tool). Applies to `FunctionCall` items."
+          "type": "object",
+          "description": "Named arguments passed to the function (tool), keyed by parameter name. Applies to `FunctionCall` items.",
+          "additionalProperties": {}
         },
         "output": {
           "type": "string",

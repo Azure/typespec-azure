@@ -252,8 +252,8 @@ model ConversationItem {
   /** The name of the function (tool) to invoke. Applies to `FunctionCall` items. */
   name?: string;
 
-  /** JSON-encoded arguments passed to the function (tool). Applies to `FunctionCall` items. */
-  arguments?: string;
+  /** Named arguments passed to the function (tool), keyed by parameter name. Applies to `FunctionCall` items. */
+  arguments?: Record<unknown>;
 
   /** The output produced by the function (tool) call. Applies to `FunctionCallOutput` items. */
   output?: string;
@@ -354,9 +354,9 @@ model ResponseItem {
   @visibility(Lifecycle.Read)
   name?: string;
 
-  /** JSON-encoded arguments passed to the function (tool). Applies to `FunctionCall` items. Read-only. */
+  /** Named arguments passed to the function (tool), keyed by parameter name. Applies to `FunctionCall` items. Read-only. */
   @visibility(Lifecycle.Read)
-  arguments?: string;
+  arguments?: Record<unknown>;
 
   /** The output produced by the function (tool) call. Applies to `FunctionCallOutput` items. Read-only. */
   @visibility(Lifecycle.Read)
