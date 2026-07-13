@@ -109,3 +109,27 @@ All standard envelope properties (`EntityTagProperty`, `ExtendedLocationProperty
 - `deprecation.tsp`: The ExtensionResourceBase deprecation message must say "Foundations.ExtensionResource" (not "ProxyResource").
 - `arm-legacy-operations-discourage` rule was removed from linter registration; its rule doc file and linter.md entry should not exist.
 - Knowledge base: The reason for using `ArmCustomPatchSync` in docs is "because that is the recommendation, based on the requirements of the ARM RPC" — NOT "to avoid the suppress complexity".
+
+## Agent Base Type (Experimental)
+
+The `Azure.ResourceManager.BaseTypes` and `Azure.ResourceManager.BaseTypes.Agents` namespaces define an experimental "base type" mechanism, declared in `lib/base-types/base-types.tsp` and `lib/base-types/agent.tsp` (imported from `lib/arm.tsp`). Reference docs are auto-generated — never edit `reference/*.md` directly; fix the source `.tsp` doc comment and run `pnpm regen-docs`.
+
+Key symbols:
+
+- `@azureBaseType(#{ baseType, version })` — decorator marking a resource (properties model or resource model) as conforming to a base type. Declared in `base-types.tsp`; implemented in `src/base-types.ts`. Emits the `basetypes-experimental` warning when applied to a model outside the `Azure.ResourceManager` namespace, so user specs must `#suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental"`.
+- `BaseTypeInfo` model — `{ baseType: string; version: string }`.
+- `Agent<Properties>` template — a `TrackedResource` with `@azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })` applied automatically. Prefer `is Agent<...>` over applying `@azureBaseType` manually.
+- `AgentConversation<Properties, AgentResource>` and `AgentResponse<Properties, AgentResource>` — required proxy child resource templates (`@parentResource(AgentResource)`).
+- Definition/properties templates come in **Appliance** (service-owned, read-only) and **Platform** (client-owned, writable) variants: `AgentDefinitionAppliance<HasModelDeploymentRef, HasInstructions>`, `AgentDefinitionPlatform<...>`, `AgentPropertiesAppliance<AgentDefinitionType>`, `AgentPropertiesPlatform<AgentDefinitionType>`.
+- `ConversationProperties` / `ResponseProperties` base property bags. `ResponseStatus` LRO union uses PascalCase values (`"Completed"`, `"Failed"`, `"Cancelled"`, `"Incomplete"`, `"Queued"`, `"InProgress"`). `createdAt` is `utcDateTime` (was previously `unixTimestamp32`).
+- `@baseTypeOptional(isPresent, isAppliance)` — private decorator (`private.decorators.tsp`) controlling per-property visibility for base-type deployment variants.
+
+The canonical sample is `packages/samples/specs/resource-manager/resource-types/agent/main.tsp`.
+
+## Agent / Reserved-Property Linting Rules
+
+These rules are manually documented under `rules/` (rule docs are NOT auto-generated); `reference/linter.md` IS auto-generated and links to them.
+
+- `arm-agent-base-type-child-resources` (warning) — an Agent resource must have both a Conversation and a Response child resource.
+- `arm-agent-base-type-lifecycle-operations` (warning) — Conversation and Response child resources must define create, read, update, and delete lifecycle operations.
+- `no-reserved-resource-property` (warning) — reserved property names must not appear in a resource's property bag. Reserved set is maintained in `src/rules/no-reserved-resource-property.ts` (currently `billingData`, reserved for platform billing integration). Matched case-insensitively.
