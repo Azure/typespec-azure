@@ -1,0 +1,172 @@
+# Emitter end-to-end tests that produce and upload spector coverage reports.
+#
+# These jobs are intentionally decoupled from the npm publish path: they run in
+# the `spector_coverage` stage which `publish_npm` does NOT depend on, so a slow
+# or failing emitter e2e run never blocks publishing. A failure here still fails
+# the overall pipeline run for visibility.
+#
+# Each job restores the turbo build cache published by the `build` stage
+# (artifact `turbo-cache`) and then runs `pnpm run build`, which is a series of
+# turbo cache hits that restore dist/** outputs instead of recompiling the repo.
+
+parameters:
+  - name: TurboCacheArtifact
+    type: string
+    default: turbo-cache
+
+jobs:
+  - job: spector_python
+    displayName: Spector Coverage (Python)
+    variables:
+      TYPESPEC_SKIP_WEBSITE_BUILD: true
+    steps:
+      - checkout: self
+        submodules: true
+
+      - template: /eng/pipelines/templates/install.yml
+
+      - task: UsePythonVersion@0
+        displayName: "Use Python 3.12"
+        inputs:
+          versionSpec: "3.12"
+
+      - task: DownloadPipelineArtifact@2
+        displayName: Restore turbo build cache
+        inputs:
+          artifact: ${{ parameters.TurboCacheArtifact }}
+          path: $(Build.SourcesDirectory)/.turbo/cache
+
+      - script: pnpm run build
+        displayName: Build (turbo cache restore)
+
+      - script: pnpm run prepare
+        displayName: "Prepare Python environment"
+        workingDirectory: packages/typespec-python
+
+      - script: pnpm run regenerate
+        displayName: "Regenerate Python test code"
+        workingDirectory: packages/typespec-python
+
+      - script: pnpm run test:python:e2e
+        displayName: "Run Python e2e tests"
+        workingDirectory: packages/typespec-python
+
+      - template: /eng/pipelines/templates/upload-spector-coverage.yml
+        parameters:
+          PackagePath: packages/typespec-python
+          GeneratorName: "@azure-tools/typespec-python"
+
+  - job: spector_go
+    displayName: Spector Coverage (Go)
+    variables:
+      TYPESPEC_SKIP_WEBSITE_BUILD: true
+    steps:
+      - checkout: self
+        submodules: true
+
+      - template: /eng/pipelines/templates/install.yml
+
+      - task: GoTool@0
+        displayName: "Use Go 1.26.1"
+        inputs:
+          version: "1.26.1"
+
+      - task: DownloadPipelineArtifact@2
+        displayName: Restore turbo build cache
+        inputs:
+          artifact: ${{ parameters.TurboCacheArtifact }}
+          path: $(Build.SourcesDirectory)/.turbo/cache
+
+      - script: pnpm run build
+        displayName: Build (turbo cache restore)
+
+      - script: pnpm run regenerate
+        displayName: "Regenerate Go test code"
+        workingDirectory: packages/typespec-go
+
+      - script: pnpm run test:go:e2e
+        displayName: "Run Go e2e tests"
+        workingDirectory: packages/typespec-go
+
+      - template: /eng/pipelines/templates/upload-spector-coverage.yml
+        parameters:
+          PackagePath: packages/typespec-go
+          GeneratorName: "@azure-tools/typespec-go"
+
+  - job: spector_java
+    displayName: Spector Coverage (Java)
+    variables:
+      TYPESPEC_SKIP_WEBSITE_BUILD: true
+    steps:
+      - checkout: self
+        submodules: true
+
+      - template: /eng/pipelines/templates/install.yml
+
+      - task: DownloadPipelineArtifact@2
+        displayName: Restore turbo build cache
+        inputs:
+          artifact: ${{ parameters.TurboCacheArtifact }}
+          path: $(Build.SourcesDirectory)/.turbo/cache
+
+      - script: pnpm run build
+        displayName: Build (turbo cache restore)
+
+      # emitter-tests is a standalone npm+Maven project (not in the pnpm
+      # workspace). The turbo cache only restores dist/** outputs, not the
+      # Maven emitter.jar, so run Generate.ps1 WITHOUT -SkipBuild: it builds the
+      # emitter jar, then regenerates the SDK from the spector specs.
+      # Spector-Tests.ps1 starts the mock server, runs the JUnit tests and
+      # produces tsp-spector-coverage-java.json.
+      - pwsh: ./Generate.ps1
+        displayName: "Regenerate Java test code"
+        workingDirectory: packages/typespec-java/emitter-tests
+
+      - pwsh: ./Spector-Tests.ps1
+        displayName: "Run Java spector tests"
+        workingDirectory: packages/typespec-java/emitter-tests
+
+      - template: /eng/pipelines/templates/upload-spector-coverage.yml
+        parameters:
+          PackagePath: packages/typespec-java/emitter-tests
+          GeneratorName: "@azure-tools/typespec-java"
+
+  - job: spector_ts
+    displayName: Spector Coverage (TypeScript)
+    variables:
+      TYPESPEC_SKIP_WEBSITE_BUILD: true
+    steps:
+      - checkout: self
+        submodules: true
+
+      - template: /eng/pipelines/templates/install.yml
+
+      - task: DownloadPipelineArtifact@2
+        displayName: Restore turbo build cache
+        inputs:
+          artifact: ${{ parameters.TurboCacheArtifact }}
+          path: $(Build.SourcesDirectory)/.turbo/cache
+
+      - script: pnpm run build
+        displayName: Build (turbo cache restore)
+
+      - script: pnpm run integration-test-ci
+        displayName: "Run TypeScript e2e tests"
+        workingDirectory: packages/typespec-ts
+
+      - task: AzureCLI@2
+        displayName: "Upload spector coverage (typespec-ts, azure)"
+        continueOnError: true
+        inputs:
+          azureSubscription: "TypeSpec Storage"
+          scriptType: "bash"
+          scriptLocation: "inlineScript"
+          inlineScript: >-
+            npx tsp-spector upload-coverage
+            --coverageFile ./coverage/spector-coverage-typescript-azure.json
+            --generatorName "@azure-tools/typespec-ts"
+            --storageAccountName typespec
+            --containerName coverages
+            --generatorVersion $(node -p -e "require('./package.json').version")
+            --generatorMode azure
+          workingDirectory: packages/typespec-ts

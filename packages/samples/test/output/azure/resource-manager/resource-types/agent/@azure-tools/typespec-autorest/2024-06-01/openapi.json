@@ -2017,12 +2017,12 @@
       "type": "string",
       "description": "The status of a response.",
       "enum": [
-        "completed",
-        "failed",
-        "cancelled",
-        "incomplete",
-        "queued",
-        "in_progress"
+        "Completed",
+        "Failed",
+        "Cancelled",
+        "Incomplete",
+        "Queued",
+        "InProgress"
       ],
       "x-ms-enum": {
         "name": "ResponseStatus",
@@ -2030,32 +2030,32 @@
         "values": [
           {
             "name": "Completed",
-            "value": "completed",
+            "value": "Completed",
             "description": "The response completed successfully."
           },
           {
             "name": "Failed",
-            "value": "failed",
+            "value": "Failed",
             "description": "The response failed."
           },
           {
             "name": "Cancelled",
-            "value": "cancelled",
+            "value": "Cancelled",
             "description": "The response was cancelled."
           },
           {
             "name": "Incomplete",
-            "value": "incomplete",
+            "value": "Incomplete",
             "description": "The response is incomplete."
           },
           {
             "name": "Queued",
-            "value": "queued",
+            "value": "Queued",
             "description": "The response is queued for execution."
           },
           {
             "name": "InProgress",
-            "value": "in_progress",
+            "value": "InProgress",
             "description": "The response is in progress."
           }
         ]
@@ -2243,8 +2243,8 @@
           "readOnly": true
         },
         "createdAt": {
-          "type": "integer",
-          "format": "int32",
+          "type": "string",
+          "format": "date-time",
           "description": "Timestamp of when the conversation was created. Read-only.",
           "readOnly": true
         },
@@ -2384,8 +2384,8 @@
           "readOnly": true
         },
         "createdAt": {
-          "type": "integer",
-          "format": "int32",
+          "type": "string",
+          "format": "date-time",
           "description": "Timestamp of when the response was created. Read-only.",
           "readOnly": true
         },

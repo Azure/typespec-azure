@@ -18,90 +18,10 @@ jobs:
 
       - template: /eng/pipelines/templates/upload-coverage.yml
 
-      # Python e2e tests and spector coverage upload
-      - task: UsePythonVersion@0
-        displayName: "Use Python 3.12"
-        inputs:
-          versionSpec: "3.12"
-
-      - script: pnpm run prepare
-        displayName: "Prepare Python environment"
-        workingDirectory: packages/typespec-python
-
-      - script: pnpm run regenerate
-        displayName: "Regenerate Python test code"
-        workingDirectory: packages/typespec-python
-
-      - script: pnpm run test:python:e2e
-        displayName: "Run Python e2e tests"
-        workingDirectory: packages/typespec-python
-
-      - template: /eng/pipelines/templates/upload-spector-coverage.yml
-        parameters:
-          PackagePath: packages/typespec-python
-          GeneratorName: "@azure-tools/typespec-python"
-
-      # Go e2e tests and spector coverage upload
-      - task: GoTool@0
-        displayName: "Use Go 1.26.1"
-        inputs:
-          version: "1.26.1"
-
-      - script: pnpm run regenerate
-        displayName: "Regenerate Go test code"
-        workingDirectory: packages/typespec-go
-
-      - script: pnpm run test:go:e2e
-        displayName: "Run Go e2e tests"
-        workingDirectory: packages/typespec-go
-
-      - template: /eng/pipelines/templates/upload-spector-coverage.yml
-        parameters:
-          PackagePath: packages/typespec-go
-          GeneratorName: "@azure-tools/typespec-go"
-
-      # Java e2e tests and spector coverage upload. The emitter-tests project is a
-      # standalone npm+Maven project (not in the pnpm workspace). The emitter + its
-      # dependencies are already built by the repo-wide `pnpm build` above, so pass
-      # -SkipBuild: Generate.ps1 -> Setup.ps1 only packs the .tgz, npm installs it and
-      # regenerates the SDK from the spector specs; Spector-Tests.ps1 starts the
-      # mock server, runs the JUnit tests and produces tsp-spector-coverage-java.json.
-      - pwsh: ./Generate.ps1 -SkipBuild
-        displayName: "Regenerate Java test code"
-        workingDirectory: packages/typespec-java/emitter-tests
-
-      - pwsh: ./Spector-Tests.ps1
-        displayName: "Run Java spector tests"
-        workingDirectory: packages/typespec-java/emitter-tests
-
-      - template: /eng/pipelines/templates/upload-spector-coverage.yml
-        parameters:
-          PackagePath: packages/typespec-java/emitter-tests
-          GeneratorName: "@azure-tools/typespec-java"
-
-      # TypeScript (typespec-ts) e2e tests and spector coverage upload.
-      # The emitter was migrated here from Azure/autorest.typescript; this replaces
-      # the coverage upload that previously ran in that (now deprecated) repo.
-      - script: pnpm run integration-test-ci
-        displayName: "Run TypeScript e2e tests"
-        workingDirectory: packages/typespec-ts
-
-      - task: AzureCLI@2
-        displayName: "Upload spector coverage (typespec-ts, azure)"
-        continueOnError: true
-        inputs:
-          azureSubscription: "TypeSpec Storage"
-          scriptType: "bash"
-          scriptLocation: "inlineScript"
-          inlineScript: >-
-            npx tsp-spector upload-coverage
-            --coverageFile ./coverage/spector-coverage-typescript-azure.json
-            --generatorName "@azure-tools/typespec-ts"
-            --storageAccountName typespec
-            --containerName coverages
-            --generatorVersion $(node -p -e "require('./package.json').version")
-            --generatorMode azure
-          workingDirectory: packages/typespec-ts
+      # The emitter e2e tests + spector coverage upload no longer run here so they
+      # don't gate npm publishing. They run in parallel in the `spector_coverage`
+      # stage, reusing the turbo build cache published below. See
+      # eng/pipelines/jobs/spector-coverage.yml.
 
       - template: /eng/pipelines/templates/pack.yml
         parameters:
@@ -164,3 +84,10 @@ jobs:
           path: $(Build.ArtifactStagingDirectory)/npm-packages-next
           artifact: npm-packages-next
           displayName: Publish npm next packages(.tgz) as pipeline artifacts
+
+        # Turbo build cache, consumed by the spector_coverage stage so its jobs
+        # restore build outputs (dist/**) instead of recompiling the repo.
+        - output: pipelineArtifact
+          path: $(Build.SourcesDirectory)/.turbo/cache
+          artifact: turbo-cache
+          displayName: Publish turbo build cache for spector coverage jobs
