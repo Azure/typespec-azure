@@ -1,10 +1,10 @@
 import { resolvePath, type Diagnostic } from "@typespec/compiler";
-import { expectDiagnostics } from "@typespec/compiler/testing";
+import { expectDiagnostics, type EmitterTester } from "@typespec/compiler/testing";
 import { assert, describe, expect, it } from "vitest";
 import { parse } from "yaml";
 import { AutorestEmitterOptions } from "../src/lib.js";
 import { ServiceYaml } from "../src/types.js";
-import { Tester } from "./test-host.js";
+import { AzureTester, Tester } from "./test-host.js";
 
 interface EmitServiceYamlResult {
   /** Parsed service.yaml, or undefined if the file was not written. */
@@ -13,11 +13,18 @@ interface EmitServiceYamlResult {
   readonly diagnostics: readonly Diagnostic[];
 }
 
+interface EmitServiceYamlOptions {
+  /** Emitter options forwarded to `@azure-tools/typespec-autorest`. */
+  readonly options?: AutorestEmitterOptions;
+  /** Tester to compile with. Defaults to the non-Azure {@link Tester}. */
+  readonly tester?: EmitterTester;
+}
+
 async function emitServiceYaml(
   files: string | Record<string, string>,
-  options: AutorestEmitterOptions = {},
+  { options = {}, tester = Tester }: EmitServiceYamlOptions = {},
 ): Promise<EmitServiceYamlResult> {
-  const instance = await Tester.createInstance();
+  const instance = await tester.createInstance();
   const [, diagnostics] = await instance.compileAndDiagnose(files, {
     compilerOptions: {
       options: { "@azure-tools/typespec-autorest": { ...options } },
@@ -46,7 +53,9 @@ const versionedService = `
 
 describe("emission from @versioned", () => {
   it("emits ordered versions with source and relative swagger-files", async () => {
-    const { manifest } = await emitServiceYaml(versionedService, { "service-yaml": "always" });
+    const { manifest } = await emitServiceYaml(versionedService, {
+      options: { "service-yaml": "always" },
+    });
     expect(manifest).toEqual({
       versions: [
         {
@@ -70,7 +79,9 @@ describe("emission from @versioned", () => {
 
 describe("emission trigger option", () => {
   it("`always` writes even when the file does not pre-exist", async () => {
-    const { manifest } = await emitServiceYaml(versionedService, { "service-yaml": "always" });
+    const { manifest } = await emitServiceYaml(versionedService, {
+      options: { "service-yaml": "always" },
+    });
     expect(manifest).toBeDefined();
   });
 
@@ -82,7 +93,7 @@ describe("emission trigger option", () => {
   it("`auto` writes/updates when the file already exists", async () => {
     const { manifest } = await emitServiceYaml(
       { "main.tsp": versionedService, "service.yaml": "versions: []\n" },
-      { "service-yaml": "auto" },
+      { options: { "service-yaml": "auto" } },
     );
     assert(manifest);
     expect(manifest.versions.map((v) => v.version)).toEqual(["2023-01-01", "2024-01-01-preview"]);
@@ -91,7 +102,7 @@ describe("emission trigger option", () => {
   it("`never` does not write even when the file already exists", async () => {
     const { raw } = await emitServiceYaml(
       { "main.tsp": versionedService, "service.yaml": "versions: []\n" },
-      { "service-yaml": "never" },
+      { options: { "service-yaml": "never" } },
     );
     expect(raw).toEqual("versions: []\n");
   });
@@ -117,7 +128,7 @@ describe("emission trigger option", () => {
 
     const { raw, manifest } = await emitServiceYaml(
       { "main.tsp": versionedService, "service.yaml": existing },
-      { "service-yaml": "auto" },
+      { options: { "service-yaml": "auto" } },
     );
 
     assert(raw);
@@ -157,7 +168,7 @@ describe("multiple services", () => {
         op pong(): void;
       }
       `,
-      { "service-yaml": "always" },
+      { options: { "service-yaml": "always" } },
     );
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-autorest/service-yaml-multiple-services",
@@ -165,5 +176,77 @@ describe("multiple services", () => {
     });
     assert(manifest);
     expect(manifest.versions.map((v) => v.version)).toEqual(["2023-01-01"]);
+  });
+});
+
+describe("multiple swagger files per version", () => {
+  // A single version can map to multiple output files when ARM legacy feature-file
+  // splitting (`output-splitting: legacy-feature-files`) emits one document per feature.
+  // The manifest must aggregate all of them under that version's `swagger-files` list.
+  const featureSplitService = `
+    @armProviderNamespace("Microsoft.Test")
+    @versioned(Versions)
+    @Azure.ResourceManager.Legacy.features(Features)
+    namespace Microsoft.Test;
+
+    enum Versions {
+      v2023_01_01: "2023-01-01",
+    }
+
+    enum Features {
+      @Azure.ResourceManager.Legacy.featureOptions(#{ featureName: "FeatureA", fileName: "featureA", description: "Feature A" })
+      FeatureA: "Feature A",
+      @Azure.ResourceManager.Legacy.featureOptions(#{ featureName: "FeatureB", fileName: "featureB", description: "Feature B" })
+      FeatureB: "Feature B",
+    }
+
+    @Azure.ResourceManager.Legacy.feature(Features.FeatureA)
+    model FooResource is TrackedResource<FooResourceProperties> {
+      ...ResourceNameParameter<FooResource>;
+    }
+    @Azure.ResourceManager.Legacy.feature(Features.FeatureA)
+    model FooResourceProperties {
+      ...DefaultProvisioningStateProperty;
+    }
+
+    @Azure.ResourceManager.Legacy.feature(Features.FeatureB)
+    model BarResource is ProxyResource<BarResourceProperties> {
+      ...ResourceNameParameter<BarResource>;
+    }
+    @Azure.ResourceManager.Legacy.feature(Features.FeatureB)
+    model BarResourceProperties {
+      ...DefaultProvisioningStateProperty;
+    }
+
+    @Azure.ResourceManager.Legacy.feature(Features.FeatureA)
+    @armResourceOperations
+    interface Foos
+      extends Azure.ResourceManager.TrackedResourceOperations<FooResource, FooResourceProperties> {}
+
+    @Azure.ResourceManager.Legacy.feature(Features.FeatureB)
+    @armResourceOperations
+    interface Bars
+      extends Azure.ResourceManager.TrackedResourceOperations<BarResource, BarResourceProperties> {}
+  `;
+
+  it("lists every feature file under the single version", async () => {
+    const { manifest } = await emitServiceYaml(featureSplitService, {
+      tester: AzureTester,
+      options: {
+        "service-yaml": "always",
+        "output-splitting": "legacy-feature-files",
+        "output-file": "{version-status}/{version}/{feature}.json",
+        // Use a relative arm-types-dir so external common-type refs stay relative.
+        "arm-types-dir": "common-types",
+      },
+    });
+
+    assert(manifest);
+    expect(manifest.versions.map((v) => v.version)).toEqual(["2023-01-01"]);
+    expect(manifest.versions[0]["swagger-files"]).toEqual([
+      "tsp-output/@azure-tools/typespec-autorest/stable/2023-01-01/featureA.json",
+      "tsp-output/@azure-tools/typespec-autorest/stable/2023-01-01/featureB.json",
+      "tsp-output/@azure-tools/typespec-autorest/stable/2023-01-01/common.json",
+    ]);
   });
 });
