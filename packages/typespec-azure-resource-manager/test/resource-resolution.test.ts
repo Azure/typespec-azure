@@ -2,8 +2,8 @@ import { ok } from "assert";
 import { describe, expect, it } from "vitest";
 import { ArmOperationKind, ArmResourceOperation } from "../src/operations.js";
 import {
-  getResourcePathElements,
   isResourceOperationMatch,
+  parseArmResourceInstancePath,
   resolveArmResources,
   ResolvedResource,
   ResourcePathInfo,
@@ -117,17 +117,15 @@ function checkResolvedOperations(operations: ResolvedResource, check: ResolvedRe
 }
 
 describe("unit tests for resource manager helpers", () => {
-  describe("getResourcePathElements handles standard resource types", () => {
+  describe("parseArmResourceInstancePath handles ARM resource IDs", () => {
     const cases: {
       title: string;
       path: string;
-      kind: ArmOperationKind;
       expected: ResourcePathInfo;
     }[] = [
       {
         title: "tracked resource path",
         path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos/{fooName}",
-        kind: "read",
         expected: {
           resourceType: {
             provider: "Microsoft.Test",
@@ -135,50 +133,11 @@ describe("unit tests for resource manager helpers", () => {
           },
           resourceInstancePath:
             "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos/{fooName}",
-        },
-      },
-      {
-        title: "tracked resource action path",
-        path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos/{fooName}/actionName",
-        kind: "action",
-        expected: {
-          resourceType: {
-            provider: "Microsoft.Test",
-            types: ["foos"],
-          },
-          resourceInstancePath:
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos/{fooName}",
-        },
-      },
-      {
-        title: "tracked resource list path",
-        path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos/",
-        kind: "list",
-        expected: {
-          resourceType: {
-            provider: "Microsoft.Test",
-            types: ["foos"],
-          },
-          resourceInstancePath:
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos/{name}",
-        },
-      },
-      {
-        title: "tenant list path",
-        path: "/providers/Microsoft.Test/foos/",
-        kind: "list",
-        expected: {
-          resourceType: {
-            provider: "Microsoft.Test",
-            types: ["foos"],
-          },
-          resourceInstancePath: "/providers/Microsoft.Test/foos/{name}",
         },
       },
       {
         title: "extension resource path",
         path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos/{fooName}/providers/Microsoft.Bar/bars/{barName}",
-        kind: "createOrUpdate",
         expected: {
           resourceType: {
             provider: "Microsoft.Bar",
@@ -189,158 +148,101 @@ describe("unit tests for resource manager helpers", () => {
         },
       },
       {
-        title: "extension resource list path",
-        path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos/{fooName}/providers/Microsoft.Bar/bars/{barName}/basses",
-        kind: "list",
+        title: "singleton resource path",
+        path: "/providers/Microsoft.Test/foos/default",
         expected: {
           resourceType: {
-            provider: "Microsoft.Bar",
-            types: ["bars", "basses"],
+            provider: "Microsoft.Test",
+            types: ["foos"],
           },
-          resourceInstancePath:
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos/{fooName}/providers/Microsoft.Bar/bars/{barName}/basses/{name}",
+          resourceInstancePath: "/providers/Microsoft.Test/foos/default",
         },
       },
       {
-        title: "extension resource action path",
-        path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos/{fooName}/providers/Microsoft.Bar/bars/{barName}/basses/{baseName}/actionName/doSomething",
-        kind: "action",
+        title: "resource group resource path",
+        path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}",
         expected: {
           resourceType: {
-            provider: "Microsoft.Bar",
-            types: ["bars", "basses"],
+            provider: "Microsoft.Resources",
+            types: ["resourceGroups"],
           },
           resourceInstancePath:
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos/{fooName}/providers/Microsoft.Bar/bars/{barName}/basses/{baseName}",
+            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}",
         },
       },
       {
-        title: "generic extension resource list path",
-        path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses",
-        kind: "list",
+        title: "subscription resource path",
+        path: "/subscriptions/{subscriptionId}",
         expected: {
           resourceType: {
-            provider: "Microsoft.Bar",
-            types: ["bars", "basses"],
+            provider: "Microsoft.Resources",
+            types: ["subscriptions"],
           },
-          resourceInstancePath:
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/{name}",
+          resourceInstancePath: "/subscriptions/{subscriptionId}",
         },
       },
       {
-        title: "generic extension resource weird action path",
-        path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/{name}/actionName/doSomething/doSomethingElse/andAnotherThing",
-        kind: "action",
+        title: "generic resource id parameter",
+        path: "/{resourceId}",
         expected: {
           resourceType: {
-            provider: "Microsoft.Bar",
-            types: ["bars", "basses"],
+            provider: "",
+            types: [],
           },
-          resourceInstancePath:
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/{name}",
-        },
-      },
-      {
-        title: "generic extension resource weird read path",
-        path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/drums/actionName/doSomething/doSomethingElse/andAnotherThing",
-        kind: "read",
-        expected: {
-          resourceType: {
-            provider: "Microsoft.Bar",
-            types: ["bars"],
-          },
-          resourceInstancePath:
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}",
-        },
-      },
-      {
-        title: "generic extension resource weird read path with default",
-        path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/default/actionName/doSomething/doSomethingElse/andAnotherThing",
-        kind: "read",
-        expected: {
-          resourceType: {
-            provider: "Microsoft.Bar",
-            types: ["bars", "basses"],
-          },
-          resourceInstancePath:
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/default",
+          resourceInstancePath: "/{resourceId}",
         },
       },
       {
         title: "handles paths with leading and trailing slashes",
-        path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/default/actionName/doSomething/doSomethingElse/andAnotherThing/",
-        kind: "read",
+        path: "/providers/Microsoft.Test/foos/default/",
         expected: {
           resourceType: {
-            provider: "Microsoft.Bar",
-            types: ["bars", "basses"],
+            provider: "Microsoft.Test",
+            types: ["foos"],
           },
-          resourceInstancePath:
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/default",
+          resourceInstancePath: "/providers/Microsoft.Test/foos/default",
         },
       },
       {
         title: "handles paths without leading and trailing slashes",
-        path: "subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/default/actionName/doSomething/doSomethingElse/andAnotherThing",
-        kind: "read",
+        path: "providers/Microsoft.Test/foos/default",
         expected: {
           resourceType: {
-            provider: "Microsoft.Bar",
-            types: ["bars", "basses"],
+            provider: "Microsoft.Test",
+            types: ["foos"],
           },
-          resourceInstancePath:
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/default",
-        },
-      },
-      {
-        title: "Read path with extra variable segments",
-        path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/drums/{actionName}/doSomething/{doSomethingElse}/andAnotherThing",
-        kind: "read",
-        expected: {
-          resourceType: {
-            provider: "Microsoft.Bar",
-            types: ["bars"],
-          },
-          resourceInstancePath:
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}",
-        },
-      },
-      {
-        title: "Action path with extra variable segments",
-        path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/drums/{actionName}/doSomething/{doSomethingElse}/andAnotherThing",
-        kind: "action",
-        expected: {
-          resourceType: {
-            provider: "Microsoft.Bar",
-            types: ["bars"],
-          },
-          resourceInstancePath:
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}",
+          resourceInstancePath: "/providers/Microsoft.Test/foos/default",
         },
       },
     ];
-    for (const { title, path, kind, expected } of cases) {
-      it(`parses path for ${title} operations correctly`, () => {
-        const result = getResourcePathElements(path, kind);
+    for (const { title, path, expected } of cases) {
+      it(`parses ${title} correctly`, () => {
+        const result = parseArmResourceInstancePath(path);
         expect(result).toEqual(expected);
       });
     }
 
-    const invalidCases: { title: string; path: string; kind: string }[] = [
+    const invalidCases: { title: string; path: string }[] = [
       {
-        title: "lifecycle operationpath with no variables",
+        title: "list path",
+        path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos",
+      },
+      {
+        title: "action path",
+        path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos/{fooName}/doSomething",
+      },
+      {
+        title: "lifecycle operation path with no variables",
         path: "/subscriptions/resourceGroups/providers/Microsoft.Foo/andAnotherThing",
-        kind: "read",
       },
       {
         title: "lifecycle operation path with no providers",
         path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/bars/{barName}/basses/drums/{actionName}/doSomething/{doSomethingElse}/andAnotherThing",
-        kind: "read",
       },
     ];
-    for (const { title, path, kind } of invalidCases) {
+    for (const { title, path } of invalidCases) {
       it(`returns undefined for ${title}`, () => {
-        const result = getResourcePathElements(path, kind as ArmOperationKind);
+        const result = parseArmResourceInstancePath(path);
         expect(result).toBeUndefined();
       });
     }

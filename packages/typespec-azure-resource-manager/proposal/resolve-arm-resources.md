@@ -189,6 +189,9 @@ For each ARM resource detail returned by `listArmResources(program)`:
    - Do not re-check HTTP verb or response model in the resolver.
    - Protocol and response-model correctness should be handled by linters.
 4. Validate and parse each candidate path as an ARM resource instance path.
+   - A normal ARM resource instance path must contain a literal `/providers/{providerNamespace}` segment.
+   - Providerless paths should be accepted only for known exceptions, such as tenant, subscription, resource group, and explicit generic resource-id parameter paths.
+   - List, action, and other non-instance operation paths should not be converted into resource IDs.
 5. Group candidate paths by normalized resource identity.
 6. Create one concrete `ResolvedResource` record for each group.
    - If `Read` and `CreateOrUpdate` share the same normalized path, they produce one resource with both operations attached.
