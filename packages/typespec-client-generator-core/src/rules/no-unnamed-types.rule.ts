@@ -1,7 +1,7 @@
 import {
   createRule,
   getNamespaceFullName,
-  isErrorModel,
+  ignoreDiagnostics,
   isNullType,
   isTemplateDeclaration,
   Model,
@@ -14,6 +14,7 @@ import {
   Union,
 } from "@typespec/compiler";
 import {
+  getHttpOperation,
   isBody,
   isBodyRoot,
   isMetadata,
@@ -123,37 +124,20 @@ export const noUnnamedTypesRule = createRule({
       }
     }
 
-    // Walk an operation's return type. For HTTP operations the return type is the
-    // response envelope, which is typically an anonymous union of status-code
-    // response models (e.g. `{@statusCode _: 200, @body body: T} | {@statusCode _: 204}`).
-    // Clients only surface the response *body*, never the status-code envelope union,
-    // so such a union must not be flagged. We still descend into each variant to catch
-    // anonymous types that appear in the actual response bodies. A return union that is
-    // NOT purely response envelopes (e.g. `"red" | "green"` or `Cat | Dog`) is a real
-    // body union and is handled normally.
-    function walkReturnType(returnType: Type | undefined): void {
-      if (returnType === undefined) {
-        return;
-      }
-      if (returnType.kind === "Union") {
-        const nonNullVariants = [...returnType.variants.values()]
-          .map((variant) => variant.type)
-          .filter((variantType) => !isNullType(variantType));
-        const isResponseEnvelopeUnion =
-          nonNullVariants.length > 0 &&
-          nonNullVariants.every(
-            (variantType) =>
-              variantType.kind === "Model" &&
-              (isHttpEnvelope(program, variantType) || isErrorModel(program, variantType)),
-          );
-        if (isResponseEnvelopeUnion) {
-          for (const variantType of nonNullVariants) {
-            enqueueAndWalk(variantType);
-          }
-          return;
+    // Walk the bodies of an operation's HTTP responses. We resolve the actual HTTP
+    // responses (via `getHttpOperation`) rather than inspecting the raw return type,
+    // because the return type is the response *envelope* (status codes, headers, and
+    // other metadata wrapped around the body). Clients only surface the response body,
+    // so walking the resolved body types avoids flagging the status-code envelope
+    // unions (e.g. `ArmResponse<T> | ErrorResponse`) that clients never expose, while
+    // still catching anonymous types that appear in the real response bodies.
+    function walkOperationResponses(operation: Operation): void {
+      const httpOperation = ignoreDiagnostics(getHttpOperation(program, operation));
+      for (const response of httpOperation.responses) {
+        for (const statusCodeResponse of response.responses) {
+          enqueueAndWalk(statusCodeResponse.body?.type);
         }
       }
-      enqueueAndWalk(returnType);
     }
 
     // Seed the walk from the client surface: user operations and any type that was
@@ -166,7 +150,7 @@ export const noUnnamedTypesRule = createRule({
         for (const parameter of operation.parameters.properties.values()) {
           enqueueAndWalk(parameter.type);
         }
-        walkReturnType(operation.returnType);
+        walkOperationResponses(operation);
       },
       model: (model: Model) => {
         if (getUsageOverride(tcgcContext, model) !== undefined) {
