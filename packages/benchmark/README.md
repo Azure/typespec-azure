@@ -132,9 +132,77 @@ The TypeSpec compiler provides built-in `Stats` covering:
   - `linter` — per-rule timing (e.g., `@azure-tools/typespec-azure-core/auth-required`)
   - `emit` — per-emitter timing with per-step breakdown
 
-## Adding a new benchmark spec
+## Benchmark specs
+
+A benchmark spec is anything the runner can compile and measure. There are two kinds, discovered from whatever directory `--specs-dir` points at:
+
+- **Local spec** — a subdirectory containing a `main.tsp` (and usually a `tspconfig.yaml`). The built-in specs under `specs/` are local specs.
+- **External spec** — a directory with a `spec.json` (and a `tspconfig.yaml`) describing a spec that lives in another repository (see below).
+
+The runner treats both kinds uniformly and writes a single results file. What to run and how to display it is decided by the caller (CI job / dashboard), not by the runner — e.g. CI runs `--specs-dir specs` and `--specs-dir external-spec` separately and stores them in separate results directories.
+
+### Adding a local spec
 
 1. Create a new directory under `specs/` (e.g., `specs/my-new-spec/`)
 2. Add a `main.tsp` file with your TypeSpec code
 3. Add a `tspconfig.yaml` with emitter and linter configuration
 4. The runner auto-discovers spec directories — no registration needed
+
+### Adding an external spec (e.g. from azure-rest-api-specs)
+
+External specs live in another repository (such as [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs)) and are not copied into this repo. They are sparse-checked-out into `packages/benchmark/.external/` (git-ignored) and compiled against **this workspace's** packages, so the measurement reflects your local source changes (e.g. to TCGC or a client emitter) rather than the published npm versions.
+
+Each external spec is **one directory** under `external-spec/` (the directory name is the benchmark name), containing two files:
+
+- `spec.json` — where to get the spec source.
+- `tspconfig.yaml` — the compiler config (emitters + linter) to measure; it is copied into the checkout, replacing the spec's own tspconfig.
+
+`external-spec/web/spec.json`:
+
+```json
+{
+  "repository": "https://github.com/Azure/azure-rest-api-specs.git",
+  "ref": "main",
+  "path": "specification/web/resource-manager/Microsoft.Web/AppService"
+}
+```
+
+- `repository` / `ref` — the repo and git ref to sparse-checkout; `ref` tracks latest (e.g. `main`), no pinning.
+- `path` — the entry directory (containing `main.tsp`) relative to the repo root. The spec's own `main.tsp` is the entrypoint (it imports `client.tsp`).
+- `checkoutPath` (optional) — directory to sparse-checkout, when the spec imports sibling folders (e.g. `../common`). Defaults to `path`.
+- `name` (optional) — overrides the benchmark name (defaults to the directory name).
+
+`external-spec/web/tspconfig.yaml` selects what to measure — e.g. TCGC plus the ARM ruleset:
+
+```yaml
+emit:
+  - "@azure-tools/typespec-client-generator-core"
+linter:
+  extends:
+    - "@azure-tools/typespec-azure-rulesets/resource-manager"
+```
+
+Run the external specs (fewer iterations, since they are heavy):
+
+```bash
+node packages/benchmark/dist/src/cli.js run \
+  --specs-dir packages/benchmark/external-spec \
+  --warmup 0 --iterations 1 \
+  --output external.json
+```
+
+To evaluate the impact of a change, rebuild the workspace at each revision and compare:
+
+```bash
+# revision A: build, then run
+node packages/benchmark/dist/src/cli.js run --specs-dir packages/benchmark/external-spec --output before.json
+# revision B: rebuild, then run
+node packages/benchmark/dist/src/cli.js run --specs-dir packages/benchmark/external-spec --output after.json
+node packages/benchmark/dist/src/cli.js compare --baseline before.json --current after.json --detailed
+```
+
+> **Notes**
+>
+> - The spec's own `tspconfig.yaml` is replaced by the one in the external-spec directory, so the emitters and linter measured are exactly what you configure there.
+> - A spec that imports a package not declared in `packages/benchmark/package.json` will fail to resolve — add the package to the benchmark's dependencies or pick a compatible spec.
+> - Per-emitter time is reported under `emit/<emitter-name>` (the top-level `total` metric excludes emit time).

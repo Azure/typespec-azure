@@ -22,10 +22,16 @@ export interface UploadPrCommentOptions {
   outputDir: string;
   /** Branch name for fetching baseline results. */
   branch?: string;
+  /** Directory on the data branch holding the baseline (default: "results"). */
+  resultsDir?: string;
   /** Percent threshold for notable changes. */
   threshold?: number;
   /** Number of latest entries to use for rolling baseline. */
   baselineWindow?: number;
+  /** Heading title for the comment (default: "⚡ Benchmark Results"). */
+  title?: string;
+  /** Comment markdown file name written to outputDir (default: "benchmark-comment.md"). */
+  commentFile?: string;
 }
 
 interface BaselineResult {
@@ -151,6 +157,7 @@ function buildRollingBaseline(
 
 function fetchBaseline(
   branch: string,
+  resultsDir: string,
   current: BenchmarkResult,
   baselineWindow: number,
 ): BaselineResult | undefined {
@@ -170,7 +177,7 @@ function fetchBaseline(
 
     execSync(`git fetch origin ${branch}`, { stdio: "ignore" });
     try {
-      const historyContent = execSync(`git show origin/${branch}:results/history.json`, {
+      const historyContent = execSync(`git show origin/${branch}:${resultsDir}/history.json`, {
         encoding: "utf-8",
         maxBuffer: 50_000_000,
       });
@@ -183,7 +190,7 @@ function fetchBaseline(
       // ignore and fallback to latest.json
     }
 
-    const latestContent = execSync(`git show origin/${branch}:results/latest.json`, {
+    const latestContent = execSync(`git show origin/${branch}:${resultsDir}/latest.json`, {
       encoding: "utf-8",
       maxBuffer: 50_000_000,
     });
@@ -196,9 +203,9 @@ function fetchBaseline(
   }
 }
 
-function generateNoBaselineComment(): string {
+function generateNoBaselineComment(title: string): string {
   return [
-    "## ⚡ Benchmark Results",
+    `## ${title}`,
     "",
     "No baseline found on the `benchmark-data` branch. Benchmark results will be stored after merging to `main`.",
     "",
@@ -209,15 +216,18 @@ function generateNoBaselineComment(): string {
 export function uploadPrComment(options: UploadPrCommentOptions): void {
   const { resultsFile, prNumber, outputDir } = options;
   const branch = options.branch ?? DEFAULT_BRANCH;
+  const resultsDir = options.resultsDir ?? "results";
   const threshold = options.threshold;
   const baselineWindow = options.baselineWindow ?? 20;
+  const title = options.title ?? "⚡ Benchmark Results";
+  const commentFile = options.commentFile ?? "benchmark-comment.md";
 
   if (!existsSync(resultsFile)) {
     throw new Error(`Results file not found: ${resultsFile}`);
   }
 
   const current = JSON.parse(readFileSync(resolve(resultsFile), "utf-8")) as BenchmarkResult;
-  const baselineResult = fetchBaseline(branch, current, baselineWindow);
+  const baselineResult = fetchBaseline(branch, resultsDir, current, baselineWindow);
 
   mkdirSync(outputDir, { recursive: true });
 
@@ -233,6 +243,7 @@ export function uploadPrComment(options: UploadPrCommentOptions): void {
       current.commit,
       {
         threshold,
+        title,
       },
     );
     githubSummary = formatComparisonSummary(
@@ -250,10 +261,10 @@ export function uploadPrComment(options: UploadPrCommentOptions): void {
     }
   } else {
     console.log("No baseline found — generating placeholder comment.");
-    commentMarkdown = generateNoBaselineComment();
+    commentMarkdown = generateNoBaselineComment(title);
   }
 
-  writeFileSync(join(outputDir, "benchmark-comment.md"), commentMarkdown);
+  writeFileSync(join(outputDir, commentFile), commentMarkdown);
   writeFileSync(join(outputDir, "benchmark-pr-number.txt"), prNumber);
 
   // Write GitHub Actions job summary if available

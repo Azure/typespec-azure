@@ -1613,7 +1613,6 @@ JobLroResponse) | Azure.Core.Foundations.ErrorResponse;
       
       #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       @route("/simpleWidgets/{id}")
-      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       @patch(#{implicitOptionality: true}) op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
         {
           @statusCode statusCode: 201;
@@ -1673,7 +1672,6 @@ JobLroResponse) | Azure.Core.Foundations.ErrorResponse;
       
       #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       @route("/simpleWidgets/{id}")
-      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       @patch(#{implicitOptionality: true}) op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
         {
           @statusCode statusCode: 201;
@@ -1725,7 +1723,6 @@ JobLroResponse) | Azure.Core.Foundations.ErrorResponse;
       
       #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       @route("/simpleWidgets/{id}")
-      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       @patch(#{implicitOptionality: true}) op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
         {
           @statusCode statusCode: 201;

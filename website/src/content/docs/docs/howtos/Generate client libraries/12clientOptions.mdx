@@ -76,7 +76,6 @@ You can apply multiple `@clientOption` decorators to the same target:
 
 ```typespec title=client.tsp
 #suppress "@azure-tools/typespec-client-generator-core/client-option"
-#suppress "@azure-tools/typespec-client-generator-core/client-option"
 @clientOption("enableFeatureFoo", true, "python")
 @clientOption("customSerializerMode", "strict", "python")
 model MyModel {
