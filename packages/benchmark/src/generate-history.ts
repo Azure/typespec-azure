@@ -25,7 +25,7 @@ export interface HistoryData {
 }
 
 /** Flatten RuntimeStats into a flat record of label → ms. */
-function flattenRuntime(rt: RuntimeStats): Record<string, number> {
+export function flattenRuntime(rt: RuntimeStats): Record<string, number> {
   const flat: Record<string, number> = {};
   flat["total"] = rt.total ?? 0;
   flat["loader"] = rt.loader ?? 0;

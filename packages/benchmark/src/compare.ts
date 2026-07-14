@@ -22,6 +22,25 @@ export function isNotableMetricChange(
   return Math.abs(metric.percentChange) >= threshold && Math.abs(metric.change) >= minChangeMs;
 }
 
+/**
+ * Compare two flat metric maps (label → ms). Labels are treated as opaque keys,
+ * so scoped names like `emit/@azure-tools/pkg` are compared as-is without being
+ * parsed into emitter/step segments. Ordering follows `current` (the logical
+ * order produced by flattenRuntime), with baseline-only labels appended.
+ */
+export function compareFlatMetrics(
+  baseline: Record<string, number>,
+  current: Record<string, number>,
+): MetricComparison[] {
+  const labels = [...Object.keys(current)];
+  for (const label of Object.keys(baseline)) {
+    if (!(label in current)) {
+      labels.push(label);
+    }
+  }
+  return labels.map((label) => createMetric(label, baseline[label] ?? 0, current[label] ?? 0));
+}
+
 function extractRuntimeMetrics(
   baselineRuntime: RuntimeStats,
   currentRuntime: RuntimeStats,

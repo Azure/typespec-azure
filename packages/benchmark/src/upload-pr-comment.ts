@@ -3,14 +3,14 @@ import { execSync } from "node:child_process";
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { aggregateDurations } from "./aggregate.js";
-import { compareBenchmarks, hasNotableChanges } from "./compare.js";
+import { compareFlatMetrics, hasNotableChanges } from "./compare.js";
 import {
   formatComparisonSummary,
   formatConsoleSummary,
   formatPrComment,
 } from "./format-comment.js";
-import type { HistoryData } from "./generate-history.js";
-import type { BenchmarkResult, RuntimeStats, SpecBenchmarkResult } from "./types.js";
+import { flattenRuntime, type HistoryData } from "./generate-history.js";
+import type { BenchmarkResult, ComparisonResult } from "./types.js";
 import { DEFAULT_BRANCH } from "./utils.js";
 
 export interface UploadPrCommentOptions {
@@ -34,58 +34,19 @@ export interface UploadPrCommentOptions {
   commentFile?: string;
 }
 
-interface BaselineResult {
-  baseline: BenchmarkResult;
+/** Baseline metrics per spec (spec name → flat label → ms) plus provenance. */
+type FlatMetrics = Record<string, number>;
+interface FlatBaseline {
+  specs: Record<string, FlatMetrics>;
+  commit: string;
   label: string;
 }
 
-function expandRuntimeMetrics(flat: Record<string, number>): RuntimeStats {
-  const runtime: RuntimeStats = {
-    total: flat["total"] ?? 0,
-    loader: flat["loader"] ?? 0,
-    resolver: flat["resolver"] ?? 0,
-    checker: flat["checker"] ?? 0,
-    validation: { total: flat["validation"] ?? 0, validators: {} },
-    linter: { total: flat["linter"] ?? 0, rules: {} },
-    emit: { total: flat["emit"] ?? 0, emitters: {} },
-  };
-
-  for (const [label, value] of Object.entries(flat)) {
-    if (label.startsWith("validation/")) {
-      runtime.validation.validators[label.replace("validation/", "")] = value;
-      continue;
-    }
-    if (label.startsWith("linter/")) {
-      runtime.linter.rules[label.replace("linter/", "")] = value;
-      continue;
-    }
-    if (!label.startsWith("emit/")) {
-      continue;
-    }
-
-    const parts = label.split("/");
-    if (parts.length < 2) {
-      continue;
-    }
-
-    const emitterName = parts[1];
-    runtime.emit.emitters[emitterName] ??= { total: 0, steps: {} };
-    if (parts.length === 2) {
-      runtime.emit.emitters[emitterName].total = value;
-    } else if (parts.length > 2) {
-      const stepName = parts.slice(2).join("/");
-      runtime.emit.emitters[emitterName].steps[stepName] = value;
-    }
-  }
-
-  return runtime;
-}
-
+/** Aggregate a spec's flat metrics across history entries (label → ms). */
 function aggregateSpecFromHistory(
   specName: string,
   entries: HistoryData["entries"],
-  currentSpec: SpecBenchmarkResult,
-): SpecBenchmarkResult | undefined {
+): FlatMetrics | undefined {
   const samplesByMetric = new Map<string, number[]>();
   for (const entry of entries) {
     const metrics = entry.specMetrics[specName];
@@ -104,38 +65,30 @@ function aggregateSpecFromHistory(
     return undefined;
   }
 
-  const aggregated: Record<string, number> = {};
+  const aggregated: FlatMetrics = {};
   for (const [label, samples] of samplesByMetric) {
     aggregated[label] = aggregateDurations(samples);
   }
-
-  return {
-    ...currentSpec,
-    stats: {
-      ...currentSpec.stats,
-      runtime: expandRuntimeMetrics(aggregated),
-    },
-  };
+  return aggregated;
 }
 
 function buildRollingBaseline(
   history: HistoryData,
   current: BenchmarkResult,
   baselineWindow: number,
-): BaselineResult | undefined {
+): FlatBaseline | undefined {
   const window = Math.max(1, baselineWindow);
   const entries = history.entries.slice(-window);
   if (entries.length === 0) {
     return undefined;
   }
 
-  const specs: Record<string, SpecBenchmarkResult> = {};
-  for (const [specName, currentSpec] of Object.entries(current.specs)) {
-    const rollingSpec = aggregateSpecFromHistory(specName, entries, currentSpec);
-    if (!rollingSpec) {
-      continue;
+  const specs: Record<string, FlatMetrics> = {};
+  for (const specName of Object.keys(current.specs)) {
+    const aggregated = aggregateSpecFromHistory(specName, entries);
+    if (aggregated) {
+      specs[specName] = aggregated;
     }
-    specs[specName] = rollingSpec;
   }
 
   if (Object.keys(specs).length === 0) {
@@ -145,12 +98,8 @@ function buildRollingBaseline(
   const firstCommit = entries[0]?.commit.slice(0, 7) ?? "unknown";
   const lastCommit = entries[entries.length - 1]?.commit.slice(0, 7) ?? "unknown";
   return {
-    baseline: {
-      ...current,
-      commit: `rolling-baseline-${firstCommit}-${lastCommit}`,
-      timestamp: new Date().toISOString(),
-      specs,
-    },
+    specs,
+    commit: `rolling-baseline-${firstCommit}-${lastCommit}`,
     label: `rolling baseline (${entries.length} main run${entries.length > 1 ? "s" : ""})`,
   };
 }
@@ -160,7 +109,7 @@ function fetchBaseline(
   resultsDir: string,
   current: BenchmarkResult,
   baselineWindow: number,
-): BaselineResult | undefined {
+): FlatBaseline | undefined {
   try {
     const hasRemote = (() => {
       try {
@@ -194,10 +143,12 @@ function fetchBaseline(
       encoding: "utf-8",
       maxBuffer: 50_000_000,
     });
-    return {
-      baseline: JSON.parse(latestContent) as BenchmarkResult,
-      label: "latest main benchmark",
-    };
+    const latest = JSON.parse(latestContent) as BenchmarkResult;
+    const specs: Record<string, FlatMetrics> = {};
+    for (const [specName, spec] of Object.entries(latest.specs)) {
+      specs[specName] = flattenRuntime(spec.stats.runtime);
+    }
+    return { specs, commit: latest.commit, label: "latest main benchmark" };
   } catch {
     return undefined;
   }
@@ -227,31 +178,45 @@ export function uploadPrComment(options: UploadPrCommentOptions): void {
   }
 
   const current = JSON.parse(readFileSync(resolve(resultsFile), "utf-8")) as BenchmarkResult;
-  const baselineResult = fetchBaseline(branch, resultsDir, current, baselineWindow);
+  const baseline = fetchBaseline(branch, resultsDir, current, baselineWindow);
 
   mkdirSync(outputDir, { recursive: true });
 
   let commentMarkdown: string;
   let githubSummary: string | undefined;
 
-  if (baselineResult) {
-    const { baseline, label } = baselineResult;
-    const comparisons = compareBenchmarks(baseline, current, { threshold });
-    commentMarkdown = formatPrComment(
-      comparisons,
-      `${baseline.commit} (${label})`,
-      current.commit,
-      {
-        threshold,
-        title,
-      },
-    );
-    githubSummary = formatComparisonSummary(
-      comparisons,
-      `${baseline.commit} (${label})`,
-      current.commit,
+  if (baseline) {
+    // Compare current vs baseline at the flat-label level: labels are opaque
+    // keys, so scoped emitter/rule names are compared as-is (no parsing).
+    const comparisons: ComparisonResult[] = [];
+    for (const specName of Object.keys(current.specs).sort()) {
+      const baselineFlat = baseline.specs[specName];
+      if (!baselineFlat) {
+        continue;
+      }
+      const currentSpec = current.specs[specName];
+      comparisons.push({
+        specName,
+        metrics: compareFlatMetrics(baselineFlat, flattenRuntime(currentSpec.stats.runtime)),
+        complexity: {
+          createdTypes: {
+            baseline: currentSpec.stats.complexity.createdTypes,
+            current: currentSpec.stats.complexity.createdTypes,
+          },
+          finishedTypes: {
+            baseline: currentSpec.stats.complexity.finishedTypes,
+            current: currentSpec.stats.complexity.finishedTypes,
+          },
+        },
+      });
+    }
+
+    const baselineLabel = `${baseline.commit} (${baseline.label})`;
+    commentMarkdown = formatPrComment(comparisons, baselineLabel, current.commit, {
       threshold,
-    );
+      title,
+    });
+    githubSummary = formatComparisonSummary(comparisons, baselineLabel, current.commit, threshold);
 
     // Also print console summary
     console.log(formatConsoleSummary(comparisons, threshold));
