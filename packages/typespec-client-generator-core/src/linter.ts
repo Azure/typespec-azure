@@ -19,7 +19,14 @@ const rules = [
   csharpUseStandardAcronymsRule,
 ];
 
-const csharpRules = [propertyNameConflictRule, csharpNoUrlSuffixRule];
+const csharpRules = [
+  propertyNameConflictRule,
+  csharpNoUrlSuffixRule,
+  csharpNoOptionsSuffixRule,
+  csharpNoRequestSuffixRule,
+  csharpNoResponseSuffixRule,
+  csharpUseStandardAcronymsRule,
+];
 
 export const $linter = defineLinter({
   rules,

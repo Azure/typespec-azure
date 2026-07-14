@@ -62,6 +62,15 @@ it("does not flag the standard Azure.ResourceManager CommonTypes ErrorResponse",
     .toBeValid();
 });
 
+it("after applying the codefix, the diagnostic disappears", async () => {
+  await tester
+    .expect(
+      `model FooResponse { id: string; }
+@@clientName(FooResponse, "FooResult", "csharp");`,
+    )
+    .toBeValid();
+});
+
 describe("codefix", () => {
   it("writes @@clientName to client.tsp", async () => {
     const baseRunner = await SimpleBaseTester.createInstance();

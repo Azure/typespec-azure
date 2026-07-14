@@ -48,6 +48,30 @@ it("is valid when C# client name fixes acronym casing", async () => {
   await tester.expect(`@clientName("IPAddress", "csharp") model IpAddress {}`).toBeValid();
 });
 
+it("does not flag words that merely start with an acronym's letters", async () => {
+  await tester
+    .expect(
+      `model Oslo {}
+      model OspfNeighbor {}
+      model Ipsum {}
+      model Osmosis {}`,
+    )
+    .toBeValid();
+});
+
+it("does not flag a property whose name embeds an acronym in a larger word", async () => {
+  await tester.expect(`model Foo { osmosis: string; }`).toBeValid();
+});
+
+it("after applying the codefix, the diagnostic disappears", async () => {
+  await tester
+    .expect(
+      `model IpAddress { value: string; }
+@@clientName(IpAddress, "IPAddress", "csharp");`,
+    )
+    .toBeValid();
+});
+
 describe("codefix", () => {
   it("writes @@clientName for model to client.tsp", async () => {
     const baseRunner = await SimpleBaseTester.createInstance();

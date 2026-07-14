@@ -42,6 +42,15 @@ it("does not flag ClientOptions", async () => {
   await tester.expect(`model WidgetClientOptions { id: string; }`).toBeValid();
 });
 
+it("after applying the codefix, the diagnostic disappears", async () => {
+  await tester
+    .expect(
+      `model FooOptions { id: string; }
+@@clientName(FooOptions, "FooConfig", "csharp");`,
+    )
+    .toBeValid();
+});
+
 describe("codefix", () => {
   it("writes @@clientName to client.tsp", async () => {
     const baseRunner = await SimpleBaseTester.createInstance();

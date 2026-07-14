@@ -11,18 +11,28 @@ import { getLibraryName } from "../public-utils.js";
 import { createClientTspAugmentDecoratorCodeFix } from "./codefix-helpers.js";
 
 const acronymMap = new Map([
-  ["Db", "DB"],
   ["db", "DB"],
-  ["Ip", "IP"],
   ["ip", "IP"],
-  ["Os", "OS"],
   ["os", "OS"],
 ]);
 
+// Match a known acronym (IP/DB/OS) only when it is a *complete word* within the
+// identifier, never a substring that merely starts a longer word. This is what
+// keeps "Oslo", "Ospf", "Ipsum" and "Osmosis" from being mangled into "OSlo" etc.
+//
+// /(?:^ip|^db|^os|Ip|Db|Os)(?![a-z])/g
+//   ^ip | ^db | ^os  → lowercase acronym at the start of the name   (e.g. "ipAddress", "osProfile")
+//   Ip  | Db  | Os   → capitalized acronym at a camelCase boundary  (e.g. "PublicIpAddress", "CosmosDb")
+//   (?![a-z])        → must NOT be followed by a lowercase letter, i.e. the acronym ends a
+//                      word (next char is uppercase or end-of-string): keeps "IpAddress"/"MacOs",
+//                      but rejects "Oslo" (Os+"lo") and "Ipsum" (Ip+"sum")
+//   /g               → fix every acronym occurrence in the identifier
+const acronymRegex = /(?:^ip|^db|^os|Ip|Db|Os)(?![a-z])/g;
+
 function getCorrectedName(name: string): string | undefined {
   const corrected = name.replace(
-    /^db|^ip|^os|Db|Ip|Os/g,
-    (match) => acronymMap.get(match) ?? match,
+    acronymRegex,
+    (match) => acronymMap.get(match.toLowerCase()) ?? match,
   );
   return corrected === name ? undefined : corrected;
 }

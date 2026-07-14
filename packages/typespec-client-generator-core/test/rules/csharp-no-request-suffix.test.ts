@@ -56,6 +56,15 @@ it("does not flag Azure.Core library body templates", async () => {
     .toBeValid();
 });
 
+it("after applying the codefix, the diagnostic disappears", async () => {
+  await tester
+    .expect(
+      `model FooRequest { id: string; }
+@@clientName(FooRequest, "FooContent", "csharp");`,
+    )
+    .toBeValid();
+});
+
 describe("codefix", () => {
   it("writes @@clientName to client.tsp", async () => {
     const baseRunner = await SimpleBaseTester.createInstance();
