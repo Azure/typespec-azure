@@ -16,7 +16,6 @@ import { generateHistoryMain } from "./generate-history.js";
 import { runBenchmarks } from "./run.js";
 import { storeResults } from "./store-results.js";
 import type { BenchmarkResult } from "./types.js";
-import { uploadPrComment } from "./upload-pr-comment.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const defaultSpecsDir = resolve(__dirname, "..", "..", "specs");
@@ -31,7 +30,6 @@ Commands:
   format            Format a comparison as a PR comment
   generate-history  Generate aggregated history.json from benchmark results
   store-results     Store benchmark results to the benchmark-data git branch
-  upload-pr-comment Fetch baseline, compare, and generate PR comment artifacts
   backfill          Backfill benchmark data for historical commits
 
 Run options:
@@ -65,17 +63,6 @@ Store-results options:
   --commit <sha>        Git commit SHA
   --branch <name>       Branch name for storing results (default: benchmark-data)
   --results-dir <dir>   Directory on the data branch to store results/history (default: results)
-
-Upload-pr-comment options:
-  --results <file>      Path to the current benchmark results JSON file
-  --pr-number <n>       Pull request number
-  --output-dir <dir>    Output directory for artifacts
-  --branch <name>       Branch name for fetching baseline (default: benchmark-data)
-  --results-dir <dir>   Directory on the data branch holding the baseline (default: results)
-  --baseline-window <n> Number of recent main results to build rolling baseline (default: 20)
-  --threshold <n>       Percent threshold for notable changes (default: 5)
-  --title <text>        Heading for the comment (default: "⚡ Benchmark Results")
-  --comment-file <name> Comment markdown file name (default: benchmark-comment.md)
 
 Backfill options:
   --from <sha|n>        Start point: a commit SHA or number of recent commits (default: 100)
@@ -213,29 +200,6 @@ function storeResultsCommand(args: Record<string, string>): void {
   });
 }
 
-function uploadPrCommentCommand(args: Record<string, string>): void {
-  const resultsFile = args["results"];
-  const prNumber = args["pr-number"];
-  const outputDir = args["output-dir"];
-  if (!resultsFile || !prNumber || !outputDir) {
-    console.error(
-      "Error: --results, --pr-number, and --output-dir are required for upload-pr-comment command",
-    );
-    process.exit(1);
-  }
-  uploadPrComment({
-    resultsFile,
-    prNumber,
-    outputDir,
-    branch: args["branch"],
-    resultsDir: args["results-dir"],
-    threshold: args["threshold"] ? parseFloat(args["threshold"]) : undefined,
-    baselineWindow: args["baseline-window"] ? parseInt(args["baseline-window"], 10) : undefined,
-    title: args["title"],
-    commentFile: args["comment-file"],
-  });
-}
-
 function backfillCommand(args: Record<string, string>): void {
   backfill({
     from: args["from"],
@@ -274,9 +238,6 @@ async function main(): Promise<void> {
       break;
     case "store-results":
       storeResultsCommand(args);
-      break;
-    case "upload-pr-comment":
-      uploadPrCommentCommand(args);
       break;
     case "backfill":
       backfillCommand(args);
