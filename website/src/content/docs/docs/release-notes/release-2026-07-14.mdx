@@ -1,0 +1,79 @@
+---
+title: 0.70.0
+---
+
+import { LinkCard } from "@astrojs/starlight/components";
+
+<LinkCard
+  title="TypeSpec Core 1.13"
+  description="See changes to the TypeSpec language and core libraries"
+  href="https://typespec.io/release-notes/typespec-1-13-0/"
+/>
+
+# 0.70.0
+
+## Features
+
+### @azure-tools/typespec-autorest
+
+- [#4846](https://github.com/Azure/typespec-azure/pull/4846) Add `service-yaml` emitter option to generate and maintain a `service.yaml` manifest from `@versioned` API versions.
+- [#4660](https://github.com/Azure/typespec-azure/pull/4660) Add `type-name-strategy` emitter option to control OpenAPI naming, including a `name-only` mode that removes namespace prefixes.
+- [#4664](https://github.com/Azure/typespec-azure/pull/4664) Add support for the new `@featureFile`, `@featureFiles`, and `@featureFileOptions` ARM decorators.
+
+### @azure-tools/typespec-azure-resource-manager
+
+- [#4842](https://github.com/Azure/typespec-azure/pull/4842) Add `no-reserved-resource-property` linting rule to flag reserved property names in ARM resource property bags.
+- [#4664](https://github.com/Azure/typespec-azure/pull/4664) Add `@featureFile`, `@featureFiles`, and `@featureFileOptions` decorators in the `Azure.ResourceManager` namespace as alternatives to legacy decorators.
+
+### @azure-tools/typespec-azure-rulesets
+
+- [#4842](https://github.com/Azure/typespec-azure/pull/4842) Add ruleset support for the new `no-reserved-resource-property` linting rule.
+- [#4541](https://github.com/Azure/typespec-azure/pull/4541) Add the `client-sdk` ruleset and enable the `csharp-no-url-suffix` rule for specs that emit client SDKs.
+- [#4664](https://github.com/Azure/typespec-azure/pull/4664) Add the `arm-feature-file-usage-discourage` linting rule to guide migration to feature-file decorators.
+
+### @azure-tools/typespec-client-generator-core
+
+- [#4541](https://github.com/Azure/typespec-azure/pull/4541) Add `csharp-no-url-suffix` linting rule and code fix to prefer `Uri` over `Url` suffixes.
+- [#4716](https://github.com/Azure/typespec-azure/pull/4716) Add `client-location-conflict` warning when `@clientLocation` moves same-name parameters with different types to a client.
+
+## Bug Fixes
+
+### @azure-tools/typespec-azure-resource-manager
+
+- [#4884](https://github.com/Azure/typespec-azure/pull/4884) Refine experimental Agent base type conversation/response items by removing redundant IDs and normalizing role/type modeling.
+- [#4855](https://github.com/Azure/typespec-azure/pull/4855) Align experimental Agent base type enum casing and timestamp typing with ARM guidelines.
+- [#4857](https://github.com/Azure/typespec-azure/pull/4857) Make `ArmTopParameter`, `ArmFilterParameter`, and `ArmSkipParameter` optional.
+
+### @azure-tools/typespec-client-generator-core
+
+- [#4878](https://github.com/Azure/typespec-azure/pull/4878) Fix false `duplicate-client-name` diagnostics when `@client` and `@clientLocation` language scopes are mixed.
+- [#4644](https://github.com/Azure/typespec-azure/pull/4644) Fix `@override` path-parameter validation to use realized HTTP route parameters instead of raw `@path` graph markers.
+
+## Internal
+
+### @azure-tools/typespec-autorest
+
+- [#4642](https://github.com/Azure/typespec-azure/pull/4642) Migrate linting from ESLint to oxlint.
+
+### @azure-tools/typespec-azure-core
+
+- [#4642](https://github.com/Azure/typespec-azure/pull/4642) Migrate linting from ESLint to oxlint.
+
+### @azure-tools/typespec-azure-portal-core
+
+- [#4642](https://github.com/Azure/typespec-azure/pull/4642) Migrate linting from ESLint to oxlint.
+
+### @azure-tools/typespec-azure-resource-manager
+
+- [#4755](https://github.com/Azure/typespec-azure/pull/4755) Fix `@azureBaseType` documentation example to reference a real resource model.
+- [#4494](https://github.com/Azure/typespec-azure/pull/4494) Update ARM library documentation.
+- [#4642](https://github.com/Azure/typespec-azure/pull/4642) Migrate linting from ESLint to oxlint.
+
+### @azure-tools/typespec-azure-rulesets
+
+- [#4642](https://github.com/Azure/typespec-azure/pull/4642) Migrate linting from ESLint to oxlint.
+
+### @azure-tools/typespec-client-generator-core
+
+- [#4811](https://github.com/Azure/typespec-azure/pull/4811) Internal dev-release maintenance updates.
+- [#4642](https://github.com/Azure/typespec-azure/pull/4642) Migrate linting from ESLint to oxlint.
