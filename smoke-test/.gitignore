@@ -1,0 +1,2 @@
+# Fetched spec-repo checkouts are reproducible from smoke-test-config.json
+.specs-cache/

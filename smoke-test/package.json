@@ -1,0 +1,30 @@
+{
+  "name": "@azure-tools/typespec-python-smoke-test",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "SDK generated-code smoke tests: shared config, spec fetch, and diff-check helpers.",
+  "exports": {
+    ".": "./smoke-test-common.ts"
+  },
+  "scripts": {
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@azure-tools/typespec-azure-core": "workspace:^",
+    "@azure-tools/typespec-azure-resource-manager": "workspace:^",
+    "@azure-tools/typespec-azure-rulesets": "workspace:^",
+    "@azure-tools/typespec-client-generator-core": "workspace:^",
+    "@azure-tools/typespec-python": "workspace:^",
+    "@typespec/compiler": "workspace:^",
+    "@typespec/http": "workspace:^",
+    "@typespec/openapi": "workspace:^",
+    "@typespec/rest": "workspace:^",
+    "@typespec/versioning": "workspace:^"
+  },
+  "devDependencies": {
+    "picocolors": "catalog:",
+    "tsx": "catalog:",
+    "vitest": "catalog:"
+  }
+}
