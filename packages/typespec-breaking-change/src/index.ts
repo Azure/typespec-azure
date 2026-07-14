@@ -3,6 +3,7 @@ export {
   type CanonicalizationResult,
   type CanonicalizedOperation,
 } from "./canonicalize.js";
+export { formatResult, main, parseArgs, type CliOptions } from "./cli.js";
 export { compileService, type CompileOptions } from "./compile.js";
 export {
   $approvedBreakingChange,
@@ -28,7 +29,11 @@ export {
   type OperationIdentityMap,
   type ResolvedOperation,
 } from "./operation-identity.js";
+export * from "./orchestrator.js";
 export * from "./policy.js";
+export * from "./reporter-console.js";
+export * from "./reporter-github.js";
+export * from "./reporter-json.js";
 export * from "./suppression.js";
 export { isOperationIdentity, isServiceIdentity } from "./types.js";
 export type {
