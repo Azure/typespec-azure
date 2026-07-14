@@ -11,7 +11,8 @@ export const armRelationshipBaseTypeRequiredPropertiesRule = createRule({
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-relationship-base-type-required-properties",
   messages: {
     missingProperties: paramMessage`Relationship resources must include required properties: ${"missing"}.`,
-    missingMetadataProperties: paramMessage`Relationship metadata must include required properties: ${"missing"}.`,
+    missingSourceProperties: paramMessage`Relationship source must include required properties: ${"missing"}.`,
+    missingTargetProperties: paramMessage`Relationship target must include required properties: ${"missing"}.`,
     missingOriginInformationProperties: paramMessage`Relationship originInformation must include required properties: ${"missing"}.`,
     notExtension: "Relationship resources must be extension resources.",
   },
@@ -35,20 +36,18 @@ export const armRelationshipBaseTypeRequiredPropertiesRule = createRule({
             context.reportDiagnostic({
               messageId: "missingProperties",
               format: {
-                missing: "sourceId, targetId, targetTenant, metadata, provisioningState",
+                missing: "source, target, provisioningState",
               },
               target: relationshipResource.typespecType,
             });
             continue;
           }
 
-          const missing = [
-            "sourceId",
-            "targetId",
-            "targetTenant",
-            "metadata",
+          const missing = getMissingRequiredProperties(properties, [
+            "source",
+            "target",
             "provisioningState",
-          ].filter((propertyName) => getProperty(properties, propertyName) === undefined);
+          ]);
 
           if (missing.length > 0) {
             context.reportDiagnostic({
@@ -58,27 +57,13 @@ export const armRelationshipBaseTypeRequiredPropertiesRule = createRule({
             });
           }
 
-          const metadata = getProperty(properties, "metadata")?.type;
-          if (metadata?.kind !== "Model") {
-            context.reportDiagnostic({
-              messageId: "missingMetadataProperties",
-              format: { missing: "sourceType, targetType" },
-              target: getProperty(properties, "metadata") ?? properties,
-            });
-            continue;
-          }
-
-          const missingMetadata = ["sourceType", "targetType"].filter(
-            (propertyName) => getProperty(metadata, propertyName) === undefined,
+          validateNestedProperties(properties, "source", ["id", "type"], "missingSourceProperties");
+          validateNestedProperties(
+            properties,
+            "target",
+            ["id", "type", "tenant"],
+            "missingTargetProperties",
           );
-
-          if (missingMetadata.length > 0) {
-            context.reportDiagnostic({
-              messageId: "missingMetadataProperties",
-              format: { missing: missingMetadata.join(", ") },
-              target: metadata,
-            });
-          }
 
           const originInformationProperty = getProperty(properties, "originInformation");
           if (originInformationProperty === undefined) continue;
@@ -93,10 +78,9 @@ export const armRelationshipBaseTypeRequiredPropertiesRule = createRule({
             continue;
           }
 
-          const missingOriginInformation = ["relationshipOriginType"].filter((propertyName) => {
-            const property = getProperty(originInformation, propertyName);
-            return property === undefined || property.optional;
-          });
+          const missingOriginInformation = getMissingRequiredProperties(originInformation, [
+            "relationshipOriginType",
+          ]);
 
           if (missingOriginInformation.length > 0) {
             context.reportDiagnostic({
@@ -108,6 +92,42 @@ export const armRelationshipBaseTypeRequiredPropertiesRule = createRule({
         }
       },
     };
+
+    function validateNestedProperties(
+      properties: Model,
+      propertyName: "source" | "target",
+      requiredProperties: string[],
+      messageId: "missingSourceProperties" | "missingTargetProperties",
+    ): void {
+      const property = getProperty(properties, propertyName);
+      if (property === undefined) return;
+
+      const propertyType = property.type;
+      if (propertyType.kind !== "Model") {
+        context.reportDiagnostic({
+          messageId,
+          format: { missing: requiredProperties.join(", ") },
+          target: property,
+        });
+        return;
+      }
+
+      const missing = getMissingRequiredProperties(propertyType, requiredProperties);
+      if (missing.length > 0) {
+        context.reportDiagnostic({
+          messageId,
+          format: { missing: missing.join(", ") },
+          target: propertyType,
+        });
+      }
+    }
+
+    function getMissingRequiredProperties(model: Model, propertyNames: string[]): string[] {
+      return propertyNames.filter((propertyName) => {
+        const property = getProperty(model, propertyName);
+        return property === undefined || property.optional;
+      });
+    }
 
     function hasRelationshipBaseType(model: Model): boolean {
       const visited = new Set<Model>();

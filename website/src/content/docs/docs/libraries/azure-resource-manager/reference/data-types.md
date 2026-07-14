@@ -1974,7 +1974,7 @@ model Azure.ResourceManager.BaseTypes.Relationships.Relationship<Properties>
 
 ### `RelationshipMetadata` {#Azure.ResourceManager.BaseTypes.Relationships.RelationshipMetadata}
 
-Metadata describing the source and target types of a relationship.
+RP-defined metadata describing the relationship.
 
 ```typespec
 model Azure.ResourceManager.BaseTypes.Relationships.RelationshipMetadata
@@ -1982,10 +1982,7 @@ model Azure.ResourceManager.BaseTypes.Relationships.RelationshipMetadata
 
 #### Properties
 
-| Name       | Type     | Description                          |
-| ---------- | -------- | ------------------------------------ |
-| sourceType | `string` | The type of the relationship source. |
-| targetType | `string` | The type of the relationship target. |
+None
 
 ### `RelationshipOriginInformation` {#Azure.ResourceManager.BaseTypes.Relationships.RelationshipOriginInformation}
 
@@ -2007,13 +2004,15 @@ model Azure.ResourceManager.BaseTypes.Relationships.RelationshipOriginInformatio
 Required properties for a relationship resource.
 
 ```typespec
-model Azure.ResourceManager.BaseTypes.Relationships.RelationshipProperties<Metadata, OriginInformation>
+model Azure.ResourceManager.BaseTypes.Relationships.RelationshipProperties<Source, Target, Metadata, OriginInformation>
 ```
 
 #### Template Parameters
 
 | Name              | Description                                |
 | ----------------- | ------------------------------------------ |
+| Source            | The relationship source model.             |
+| Target            | The relationship target model.             |
 | Metadata          | The relationship metadata model.           |
 | OriginInformation | The relationship origin information model. |
 
@@ -2022,12 +2021,42 @@ model Azure.ResourceManager.BaseTypes.Relationships.RelationshipProperties<Metad
 | Name               | Type                                                                                                                           | Description                                                           |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
 | baseTypes          | `Azure.ResourceManager.BaseTypes.BaseTypeInfo[]`                                                                               | ARM-managed. Must include the base type descriptor for this resource. |
-| sourceId           | `string`                                                                                                                       | The relationship source identifier.                                   |
-| targetId           | `string`                                                                                                                       | The relationship target identifier.                                   |
-| targetTenant       | `string`                                                                                                                       | The tenant identifier of the relationship target.                     |
-| metadata           | `Metadata`                                                                                                                     | Metadata describing the relationship source and target types.         |
+| source             | `Source`                                                                                                                       | The relationship source.                                              |
+| target             | `Target`                                                                                                                       | The relationship target.                                              |
+| metadata?          | `Metadata`                                                                                                                     | RP-defined metadata describing the relationship.                      |
 | originInformation? | `OriginInformation`                                                                                                            | Origin information for the relationship.                              |
 | provisioningState  | [`RelationshipProvisioningState`](./data-types.md#Azure.ResourceManager.BaseTypes.Relationships.RelationshipProvisioningState) | The provisioning state of the relationship.                           |
+
+### `RelationshipSource` {#Azure.ResourceManager.BaseTypes.Relationships.RelationshipSource}
+
+Source endpoint information for a relationship.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Relationships.RelationshipSource
+```
+
+#### Properties
+
+| Name | Type     | Description                                             |
+| ---- | -------- | ------------------------------------------------------- |
+| id   | `string` | The ARM resource identifier of the relationship source. |
+| type | `string` | The type of the relationship source.                    |
+
+### `RelationshipTarget` {#Azure.ResourceManager.BaseTypes.Relationships.RelationshipTarget}
+
+Target endpoint information for a relationship.
+
+```typespec
+model Azure.ResourceManager.BaseTypes.Relationships.RelationshipTarget
+```
+
+#### Properties
+
+| Name   | Type     | Description                                             |
+| ------ | -------- | ------------------------------------------------------- |
+| id     | `string` | The ARM resource identifier of the relationship target. |
+| type   | `string` | The type of the relationship target.                    |
+| tenant | `string` | The tenant identifier of the relationship target.       |
 
 ### `RelationshipProvisioningState` {#Azure.ResourceManager.BaseTypes.Relationships.RelationshipProvisioningState}
 

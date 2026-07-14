@@ -3,19 +3,38 @@ import "./base-types.tsp";
 namespace Azure.ResourceManager.BaseTypes.Relationships;
 
 // ============================================================================
-// Relationship metadata
+// Relationship endpoints and metadata
 // ============================================================================
 
 /**
- * Metadata describing the source and target types of a relationship.
+ * Source endpoint information for a relationship.
  */
-model RelationshipMetadata {
+model RelationshipSource {
+  /** The ARM resource identifier of the relationship source. */
+  id: string;
+
   /** The type of the relationship source. */
-  sourceType: string;
+  type: string;
+}
+
+/**
+ * Target endpoint information for a relationship.
+ */
+model RelationshipTarget {
+  /** The ARM resource identifier of the relationship target. */
+  id: string;
 
   /** The type of the relationship target. */
-  targetType: string;
+  type: string;
+
+  /** The tenant identifier of the relationship target. */
+  tenant: string;
 }
+
+/**
+ * RP-defined metadata describing the relationship.
+ */
+model RelationshipMetadata {}
 
 /**
  * Origin information for a relationship.
@@ -66,29 +85,29 @@ union RelationshipProvisioningState {
 
 /**
  * Required properties for a relationship resource.
+ * @template Source The relationship source model.
+ * @template Target The relationship target model.
  * @template Metadata The relationship metadata model.
  * @template OriginInformation The relationship origin information model.
  */
 model RelationshipProperties<
+  Source extends RelationshipSource = RelationshipSource,
+  Target extends RelationshipTarget = RelationshipTarget,
   Metadata extends RelationshipMetadata = RelationshipMetadata,
   OriginInformation extends RelationshipOriginInformation = RelationshipOriginInformation
-> 
-{
+> {
   /** ARM-managed. Must include the base type descriptor for this resource. */
   @visibility(Lifecycle.Read)
   baseTypes: BaseTypeInfo[];
 
-  /** The relationship source identifier. */
-  sourceId: string;
+  /** The relationship source. */
+  source: Source;
 
-  /** The relationship target identifier. */
-  targetId: string;
+  /** The relationship target. */
+  target: Target;
 
-  /** The tenant identifier of the relationship target. */
-  targetTenant: string;
-
-  /** Metadata describing the relationship source and target types. */
-  metadata: Metadata;
+  /** RP-defined metadata describing the relationship. */
+  metadata?: Metadata;
 
   /** Origin information for the relationship. */
   originInformation?: OriginInformation;

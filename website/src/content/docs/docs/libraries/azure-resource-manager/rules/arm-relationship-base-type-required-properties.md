@@ -11,12 +11,17 @@ Resources decorated with `@azureBaseType` for the Relationship base type must be
 #### ❌ Incorrect
 
 ```tsp
+using Azure.ResourceManager.BaseTypes.Relationships;
+
 @armProviderNamespace
 namespace Microsoft.Contoso;
 
 model MyRelationshipProperties {
-  sourceId: string;
-  metadata: RelationshipMetadata;
+  source: {
+    id: string;
+  };
+  target: RelationshipTarget;
+  provisioningState: RelationshipProvisioningState;
 }
 
 @azureBaseType(#{ baseType: "Relationship", version: "2024-06-01" })
