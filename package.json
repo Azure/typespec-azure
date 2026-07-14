@@ -10,6 +10,7 @@
     "build": "pnpm run-all build && pnpm check:eng",
     "deps": "tsx eng/scripts/sync-deps.ts",
     "check:eng": "tsc -p ./tsconfig.eng.json --noEmit",
+    "test:eng": "node --test eng/scripts/detect-affected.test.ts",
     "change": "chronus",
     "create:linter-rule": "tsx eng/scripts/create-linter-rule.ts",
     "validate:pr": "tsx eng/scripts/validate-pr.ts",

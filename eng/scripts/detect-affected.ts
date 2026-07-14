@@ -38,7 +38,7 @@ interface Config {
 }
 
 export const CONFIG: Config = {
-  ignore: ["**/test/**", "**/*.md"],
+  ignore: ["**/test/**", "**/tests/**", "**/*.md"],
   sharedExtra: [".github/actions/setup/**"],
   targets: {
     python: {

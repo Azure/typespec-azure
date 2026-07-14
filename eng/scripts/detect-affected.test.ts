@@ -59,6 +59,16 @@ test("filterIgnored: a test-only change leaves no meaningful files", () => {
   assert.deepEqual(filterIgnored(files, CONFIG.ignore), []);
 });
 
+test("filterIgnored: drops a plural tests/ directory too", () => {
+  const files = [
+    "packages/typespec-python/tests/foo.py",
+    "packages/typespec-python/generator/pygen/x.py",
+  ];
+  assert.deepEqual(filterIgnored(files, CONFIG.ignore), [
+    "packages/typespec-python/generator/pygen/x.py",
+  ]);
+});
+
 // --- mapFilesToPackages ----------------------------------------------------
 
 const pkgs = [
