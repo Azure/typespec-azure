@@ -29,78 +29,24 @@ permissions:
   contents: write
 
 concurrency:
-  group: benchmark-${{ github.ref }}
+  group: benchmark-main-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  benchmark:
-    name: Run Benchmarks
-    runs-on: ${{ github.event_name == 'workflow_dispatch' && inputs.runner || vars.BENCHMARK_RUNNER || 'ubuntu-latest' }}
-    env:
-      TYPESPEC_VS_CI_BUILD: true
-      TYPESPEC_SKIP_WEBSITE_BUILD: true
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          submodules: recursive
-          fetch-depth: 0
-
-      - uses: ./.github/actions/setup
-        with:
-          node-version: 24.15.0
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Build
-        run: pnpm -r --filter "@azure-tools/typespec-benchmark..." build
-
-      - name: Run backfill
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.backfill_from }}
-        run: |
-          node --max-old-space-size=6144 packages/benchmark/dist/src/cli.js backfill \
-            --from ${{ inputs.backfill_from }} \
-            --specs-dir packages/benchmark/specs \
-            --iterations 25 \
-            --warmup 3 \
-            --branch ${{ inputs.branch }} \
-            --push
-
-      - name: Run benchmarks
-        if: ${{ github.event_name != 'workflow_dispatch' || !inputs.backfill_from }}
-        run: |
-          node --max-old-space-size=6144 packages/benchmark/dist/src/cli.js run \
-            --specs-dir packages/benchmark/specs \
-            --iterations 25 \
-            --warmup 3 \
-            --noise-cv-threshold 0.08 \
-            --max-reruns 1 \
-            --rerun-iterations 10 \
-            --commit ${{ github.sha }} \
-            --output /tmp/benchmark-results.json
-
-      # On push to main: store results to benchmark-data branch
-      - name: Store benchmark results
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          node packages/benchmark/dist/src/cli.js store-results \
-            --results /tmp/benchmark-results.json \
-            --commit ${{ github.sha }}
-
-      # On PR: fetch baseline, compare, and upload as artifact for the comment workflow
-      - name: Generate PR comment
-        if: github.event_name == 'pull_request'
-        run: |
-          node packages/benchmark/dist/src/cli.js upload-pr-comment \
-            --results /tmp/benchmark-results.json \
-            --pr-number ${{ github.event.number }} \
-            --baseline-window 20 \
-            --output-dir /tmp/benchmark-artifacts
-
-      - name: Upload benchmark comment
-        if: github.event_name == 'pull_request'
-        uses: actions/upload-artifact@v7
-        with:
-          name: benchmark-comment
-          path: /tmp/benchmark-artifacts/
-          retention-days: 1
+  run:
+    uses: ./.github/workflows/benchmark-run.yml
+    with:
+      specs-dir: packages/benchmark/specs
+      results-dir: results
+      title: "⚡ Benchmark Results"
+      comment-file: benchmark-comment.md
+      iterations: 25
+      warmup: 3
+      noise-cv: 0.08
+      rerun-iterations: 10
+      runner: ${{ github.event_name == 'workflow_dispatch' && inputs.runner || vars.BENCHMARK_RUNNER || 'ubuntu-latest' }}
+      backfill_from: ${{ github.event_name == 'workflow_dispatch' && inputs.backfill_from || '' }}
+      branch: ${{ github.event_name == 'workflow_dispatch' && inputs.branch || 'benchmark-data' }}
+    permissions:
+      contents: write
+    secrets: inherit

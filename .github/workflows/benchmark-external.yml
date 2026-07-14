@@ -1,0 +1,41 @@
+name: Benchmark External
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+      - release/*
+  workflow_dispatch:
+    inputs:
+      runner:
+        description: "Runner label (for stable runs prefer self-hosted or larger dedicated runner)"
+        required: false
+        type: string
+        default: "ubuntu-latest"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: benchmark-external-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  run:
+    uses: ./.github/workflows/benchmark-run.yml
+    with:
+      specs-dir: packages/benchmark/external-spec
+      results-dir: external-results
+      title: "⚡ External Spec Benchmark Results"
+      comment-file: benchmark-comment.external.md
+      iterations: 3
+      warmup: 1
+      noise-cv: 0.1
+      rerun-iterations: 2
+      runner: ${{ github.event_name == 'workflow_dispatch' && inputs.runner || vars.BENCHMARK_RUNNER || 'ubuntu-latest' }}
+    permissions:
+      contents: write
+    secrets: inherit
