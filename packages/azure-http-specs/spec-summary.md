@@ -2156,7 +2156,8 @@ Expected request body:
     "simpleArmId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
     "armIdWithType": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
     "armIdWithTypeAndScope": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
-    "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm"
+    "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm",
+    "armIdWithGroupScope": "/providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-0000-0000-000000000000"
   }
 }
 ```
@@ -2174,7 +2175,8 @@ Expected response body:
     "simpleArmId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
     "armIdWithType": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
     "armIdWithTypeAndScope": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
-    "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm"
+    "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm",
+    "armIdWithGroupScope": "/providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-0000-0000-000000000000"
   }
 }
 ```
@@ -2200,7 +2202,8 @@ Expected response body:
     "simpleArmId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
     "armIdWithType": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
     "armIdWithTypeAndScope": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
-    "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm"
+    "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm",
+    "armIdWithGroupScope": "/providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-0000-0000-000000000000"
   }
 }
 ```
@@ -5048,6 +5051,157 @@ Expected response body:
     "lastModifiedBy": "AzureSDK",
     "lastModifiedAt": <any date>,
     "lastModifiedByType": "User",
+  }
+}
+```
+
+### Azure_ResourceManager_ServiceGroupExtension_ServiceGroupExtensionResources_createOrUpdate
+
+- Endpoint: `put https://management.azure.com`
+
+Resource PUT operation at service group scope.
+Expected path: /providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources/resource
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected request body:
+
+```json
+{
+  "properties": {
+    "description": "valid"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources/resource",
+  "name": "resource",
+  "type": "Microsoft.ServiceGroupExtension/serviceGroupExtensionResources",
+  "properties":{
+    "description": "valid",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_ServiceGroupExtension_ServiceGroupExtensionResources_delete
+
+- Endpoint: `delete https://management.azure.com`
+
+Resource DELETE operation at service group scope.
+Expected path: /providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources/resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 204
+
+### Azure_ResourceManager_ServiceGroupExtension_ServiceGroupExtensionResources_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation at service group scope.
+Expected path: /providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources/resource
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "/providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources/resource",
+  "name": "resource",
+  "type": "Microsoft.ServiceGroupExtension/serviceGroupExtensionResources",
+  "properties":{
+    "description": "valid",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_ServiceGroupExtension_ServiceGroupExtensionResources_listByServiceGroup
+
+- Endpoint: `get https://management.azure.com`
+
+Resource LIST operation at service group scope.
+Expected path: /providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "value": [{
+    "id": "/providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources/resource",
+    "name": "resource",
+    "type": "Microsoft.ServiceGroupExtension/serviceGroupExtensionResources",
+    "properties":{
+      "description": "valid",
+      "provisioningState": "Succeeded"
+    },
+    "systemData": {
+      "createdBy": "AzureSDK",
+      "createdByType": "User",
+      "createdAt": <any date>,
+      "lastModifiedBy": "AzureSDK",
+      "lastModifiedAt": <any date>,
+      "lastModifiedByType": "User"
+    }
+  }]
+}
+```
+
+### Azure_ResourceManager_ServiceGroupExtension_ServiceGroupExtensionResources_update
+
+- Endpoint: `patch https://management.azure.com`
+
+Resource PATCH operation at service group scope.
+Expected path: /providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources/resource
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected request body:
+
+```json
+{
+  "properties": {
+    "description": "valid2"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources/resource",
+  "name": "resource",
+  "type": "Microsoft.ServiceGroupExtension/serviceGroupExtensionResources",
+  "properties":{
+    "description": "valid2",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
   }
 }
 ```

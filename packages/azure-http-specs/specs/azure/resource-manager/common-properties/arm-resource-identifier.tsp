@@ -53,7 +53,15 @@ model ArmResourceIdentifierResourceProperties {
   armIdWithAllScopes: armResourceIdentifier<[
     {
       type: "Microsoft.Compute/virtualMachines";
-      scopes: ["Tenant", "Subscription", "ResourceGroup", "ManagementGroup", "Extension"];
+      scopes: ["Tenant", "Subscription", "ResourceGroup", "Extension", "ManagementGroup", "ServiceGroup"];
+    }
+  ]>;
+
+  @doc("An ARM resource identifier with group scopes.")
+  armIdWithGroupScope: armResourceIdentifier<[
+    {
+      type: "Microsoft.Authorization/roleDefinitions";
+      scopes: ["ManagementGroup", "ServiceGroup"];
     }
   ]>;
 }
@@ -78,7 +86,8 @@ interface ArmResourceIdentifiers {
         "simpleArmId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
         "armIdWithType": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
         "armIdWithTypeAndScope": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
-        "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm"
+        "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm",
+        "armIdWithGroupScope": "/providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-0000-0000-000000000000"
       }
     }
     ```
@@ -98,7 +107,8 @@ interface ArmResourceIdentifiers {
         "simpleArmId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
         "armIdWithType": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
         "armIdWithTypeAndScope": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
-        "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm"
+        "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm",
+        "armIdWithGroupScope": "/providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-0000-0000-000000000000"
       }
     }
     ```
@@ -114,7 +124,8 @@ interface ArmResourceIdentifiers {
         "simpleArmId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
         "armIdWithType": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
         "armIdWithTypeAndScope": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
-        "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm"
+        "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm",
+        "armIdWithGroupScope": "/providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-0000-0000-000000000000"
       }
     }
     ```

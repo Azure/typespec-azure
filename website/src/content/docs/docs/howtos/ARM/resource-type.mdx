@@ -144,6 +144,10 @@ interface ResourceGroups extends EmplOps<Extension.ResourceGroup> {}
 /** Management group-level operations */
 @armResourceOperations
 interface ManagementGroups extends EmplOps<Extension.ManagementGroup> {}
+
+/** Service group-level operations */
+@armResourceOperations
+interface ServiceGroups extends EmplOps<Extension.ServiceGroup> {}
 ```
 
 | Scope                       | Description                               |
@@ -153,6 +157,7 @@ interface ManagementGroups extends EmplOps<Extension.ManagementGroup> {}
 | `Extension.Subscription`    | Subscription-level scope                  |
 | `Extension.ResourceGroup`   | Resource group-level scope                |
 | `Extension.ManagementGroup` | Management group-level scope              |
+| `Extension.ServiceGroup`    | Service group-level scope                 |
 
 #### Targeting External Resources
 

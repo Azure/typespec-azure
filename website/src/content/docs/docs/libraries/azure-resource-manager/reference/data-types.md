@@ -3556,10 +3556,10 @@ model Azure.ResourceManager.Extension.ExtensionInstanceParameters<TargetResource
 
 #### Template Parameters
 
-| Name           | Description                                                                                                                                                               |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| TargetResource | The target of the extension resource (Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or another resource). |
-| Resource       | The extension resource.                                                                                                                                                   |
+| Name           | Description                                                                                                                                                                                       |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TargetResource | The target of the extension resource (Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup, Extension.ServiceGroup or another resource). |
+| Resource       | The extension resource.                                                                                                                                                                           |
 
 #### Properties
 
@@ -3581,10 +3581,10 @@ model Azure.ResourceManager.Extension.ExtensionParentParameters<TargetResource, 
 
 #### Template Parameters
 
-| Name              | Description                                                                                                                                                               |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| TargetResource    | The target of the extension resource (Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or another resource). |
-| ExtensionResource | The extension resource.                                                                                                                                                   |
+| Name              | Description                                                                                                                                                                                       |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TargetResource    | The target of the extension resource (Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup, Extension.ServiceGroup or another resource). |
+| ExtensionResource | The extension resource.                                                                                                                                                                           |
 
 #### Properties
 
@@ -3761,6 +3761,26 @@ model Employee {
 | ----- | ------ | ----------- |
 | scope | `Type` |             |
 
+### `ServiceGroup` {#Azure.ResourceManager.Extension.ServiceGroup}
+
+A service group
+
+```typespec
+model Azure.ResourceManager.Extension.ServiceGroup<ParameterName>
+```
+
+#### Template Parameters
+
+| Name          | Description                                                                                         |
+| ------------- | --------------------------------------------------------------------------------------------------- |
+| ParameterName | The name of the 'name' parameter of the service group (usually serviceGroupName or serviceGroupId). |
+
+#### Properties
+
+| Name | Type     | Description |
+| ---- | -------- | ----------- |
+| name | `string` |             |
+
 ### `Subscription` {#Azure.ResourceManager.Extension.Subscription}
 
 A subscription target for an extension resource
@@ -3783,9 +3803,9 @@ model Azure.ResourceManager.Extension.TargetBaseParameters<Resource>
 
 #### Template Parameters
 
-| Name     | Description                                                                                                                                                                                 |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Resource | The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or an external resource). |
+| Name     | Description                                                                                                                                                                                                         |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Resource | The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup, Extension.ServiceGroup or an external resource). |
 
 #### Properties
 
@@ -3806,9 +3826,9 @@ model Azure.ResourceManager.Extension.TargetParameters<Resource>
 
 #### Template Parameters
 
-| Name     | Description                                                                                                                                                                                 |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Resource | The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or an external resource). |
+| Name     | Description                                                                                                                                                                                                         |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Resource | The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup, Extension.ServiceGroup or an external resource). |
 
 #### Properties
 
@@ -3829,9 +3849,9 @@ model Azure.ResourceManager.Extension.TargetProviderNamespace<Resource>
 
 #### Template Parameters
 
-| Name     | Description                                                                                                                                                                                |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Resource | The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or an external resource) |
+| Name     | Description                                                                                                                                                                                                        |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Resource | The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup, Extension.ServiceGroup or an external resource) |
 
 #### Properties
 
