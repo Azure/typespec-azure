@@ -53,7 +53,14 @@ model ArmResourceIdentifierResourceProperties {
   armIdWithAllScopes: armResourceIdentifier<[
     {
       type: "Microsoft.Compute/virtualMachines";
-      scopes: ["Tenant", "Subscription", "ResourceGroup", "Extension", "ManagementGroup", "ServiceGroup"];
+      scopes: [
+        "Tenant",
+        "Subscription",
+        "ResourceGroup",
+        "Extension",
+        "ManagementGroup",
+        "ServiceGroup"
+      ];
     }
   ]>;
 

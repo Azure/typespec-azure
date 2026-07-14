@@ -5062,7 +5062,6 @@ Expected response body:
 Resource PUT operation at service group scope.
 Expected path: /providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources/resource
 Expected query parameter: api-version=2023-12-01-preview
-
 Expected request body:
 
 ```json
@@ -5111,7 +5110,6 @@ Expected response status code: 204
 Resource GET operation at service group scope.
 Expected path: /providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources/resource
 Expected query parameter: api-version=2023-12-01-preview
-
 Expected response body:
 
 ```json
@@ -5141,7 +5139,6 @@ Expected response body:
 Resource LIST operation at service group scope.
 Expected path: /providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources
 Expected query parameter: api-version=2023-12-01-preview
-
 Expected response body:
 
 ```json
@@ -5173,7 +5170,6 @@ Expected response body:
 Resource PATCH operation at service group scope.
 Expected path: /providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources/resource
 Expected query parameter: api-version=2023-12-01-preview
-
 Expected request body:
 
 ```json

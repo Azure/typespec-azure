@@ -1,6 +1,8 @@
 ---
 changeKind: feature
 packages:
+  - "@azure-tools/azure-http-specs"
+  - "@azure-tools/typespec-ts"
   - "@azure-tools/typespec-azure-core"
   - "@azure-tools/typespec-azure-resource-manager"
 ---
