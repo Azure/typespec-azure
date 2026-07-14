@@ -11,7 +11,7 @@ import { fileURLToPath } from "node:url";
 // graph cannot express.
 //
 // TO ADD A NEW TARGET:
-//   1. Add an entry to `TARGETS` below (key = short, expression-safe id).
+//   1. Add an entry to `CONFIG.targets` below (key = short, expression-safe id).
 //   2. Add a reusable `.github/workflows/ci-<id>.yml` (on: workflow_call).
 //   3. Add a job + gate `needs:` entry in `.github/workflows/ci-downstream.yml`.
 //
