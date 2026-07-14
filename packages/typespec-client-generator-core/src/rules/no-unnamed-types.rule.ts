@@ -1,6 +1,7 @@
 import {
   createRule,
   getNamespaceFullName,
+  isErrorModel,
   isNullType,
   isTemplateDeclaration,
   Model,
@@ -122,6 +123,39 @@ export const noUnnamedTypesRule = createRule({
       }
     }
 
+    // Walk an operation's return type. For HTTP operations the return type is the
+    // response envelope, which is typically an anonymous union of status-code
+    // response models (e.g. `{@statusCode _: 200, @body body: T} | {@statusCode _: 204}`).
+    // Clients only surface the response *body*, never the status-code envelope union,
+    // so such a union must not be flagged. We still descend into each variant to catch
+    // anonymous types that appear in the actual response bodies. A return union that is
+    // NOT purely response envelopes (e.g. `"red" | "green"` or `Cat | Dog`) is a real
+    // body union and is handled normally.
+    function walkReturnType(returnType: Type | undefined): void {
+      if (returnType === undefined) {
+        return;
+      }
+      if (returnType.kind === "Union") {
+        const nonNullVariants = [...returnType.variants.values()]
+          .map((variant) => variant.type)
+          .filter((variantType) => !isNullType(variantType));
+        const isResponseEnvelopeUnion =
+          nonNullVariants.length > 0 &&
+          nonNullVariants.every(
+            (variantType) =>
+              variantType.kind === "Model" &&
+              (isHttpEnvelope(program, variantType) || isErrorModel(program, variantType)),
+          );
+        if (isResponseEnvelopeUnion) {
+          for (const variantType of nonNullVariants) {
+            enqueueAndWalk(variantType);
+          }
+          return;
+        }
+      }
+      enqueueAndWalk(returnType);
+    }
+
     // Seed the walk from the client surface: user operations and any type that was
     // explicitly given a usage via `@usage` (which keeps orphan types reachable).
     navigateProgram(program, {
@@ -132,7 +166,7 @@ export const noUnnamedTypesRule = createRule({
         for (const parameter of operation.parameters.properties.values()) {
           enqueueAndWalk(parameter.type);
         }
-        enqueueAndWalk(operation.returnType);
+        walkReturnType(operation.returnType);
       },
       model: (model: Model) => {
         if (getUsageOverride(tcgcContext, model) !== undefined) {
