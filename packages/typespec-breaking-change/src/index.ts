@@ -48,3 +48,4 @@ export {
   type OperationMatchResult,
   type MatchedOperation,
 } from "./match.js";
+export * from "./policy.js";
