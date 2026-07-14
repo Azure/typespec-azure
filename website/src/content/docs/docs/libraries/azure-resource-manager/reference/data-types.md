@@ -2007,47 +2007,28 @@ model Azure.ResourceManager.BaseTypes.Relationships.RelationshipOriginInformatio
 Required properties for a relationship resource.
 
 ```typespec
-model Azure.ResourceManager.BaseTypes.Relationships.RelationshipProperties<Metadata, OriginInformation>
+model Azure.ResourceManager.BaseTypes.Relationships.RelationshipProperties<Metadata, OriginInformation, ProvisioningStateProperty>
 ```
 
 #### Template Parameters
 
-| Name              | Description                                |
-| ----------------- | ------------------------------------------ |
-| Metadata          | The relationship metadata model.           |
-| OriginInformation | The relationship origin information model. |
+| Name                      | Description                                                                          |
+| ------------------------- | ------------------------------------------------------------------------------------ |
+| Metadata                  | The relationship metadata model.                                                     |
+| OriginInformation         | The relationship origin information model.                                           |
+| ProvisioningStateProperty | The provisioning state property model. Defaults to DefaultProvisioningStateProperty. |
 
 #### Properties
 
-| Name               | Type                                                                                                                           | Description                                                           |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
-| baseTypes          | `Azure.ResourceManager.BaseTypes.BaseTypeInfo[]`                                                                               | ARM-managed. Must include the base type descriptor for this resource. |
-| sourceId           | `string`                                                                                                                       | The relationship source identifier.                                   |
-| targetId           | `string`                                                                                                                       | The relationship target identifier.                                   |
-| targetTenant       | `string`                                                                                                                       | The tenant identifier of the relationship target.                     |
-| metadata           | `Metadata`                                                                                                                     | Metadata describing the relationship source and target types.         |
-| originInformation? | `OriginInformation`                                                                                                            | Origin information for the relationship.                              |
-| provisioningState  | [`RelationshipProvisioningState`](./data-types.md#Azure.ResourceManager.BaseTypes.Relationships.RelationshipProvisioningState) | The provisioning state of the relationship.                           |
-
-### `RelationshipProvisioningState` {#Azure.ResourceManager.BaseTypes.Relationships.RelationshipProvisioningState}
-
-The provisioning state of a relationship.
-
-```typespec
-union Azure.ResourceManager.BaseTypes.Relationships.RelationshipProvisioningState
-```
-
-#### Variants
-
-| Name         | Type             | Description                                 |
-| ------------ | ---------------- | ------------------------------------------- |
-| Succeeded    | `"Succeeded"`    | The relationship operation succeeded.       |
-| Failed       | `"Failed"`       | The relationship operation failed.          |
-| Cancelled    | `"Cancelled"`    | The response was cancelled.                 |
-| NotStarted   | `"NotStarted"`   | The relationship operation has not started. |
-| Provisioning | `"Provisioning"` | The relationship is provisioning.           |
-| Updating     | `"Updating"`     | The relationship is updating.               |
-| Deleting     | `"Deleting"`     | The relationship is deleting.               |
+| Name               | Type                                             | Description                                                           |
+| ------------------ | ------------------------------------------------ | --------------------------------------------------------------------- |
+| baseTypes          | `Azure.ResourceManager.BaseTypes.BaseTypeInfo[]` | ARM-managed. Must include the base type descriptor for this resource. |
+| sourceId           | `string`                                         | The relationship source identifier.                                   |
+| sourceTenant       | `string`                                         | The tenant identifier of the relationship source.                     |
+| targetId           | `string`                                         | The relationship target identifier.                                   |
+| targetTenant       | `string`                                         | The tenant identifier of the relationship target.                     |
+| metadata           | `Metadata`                                       | Metadata describing the relationship source and target types.         |
+| originInformation? | `OriginInformation`                              | Origin information for the relationship.                              |
 
 ## Azure.ResourceManager.CommonTypes
 

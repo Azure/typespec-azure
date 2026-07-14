@@ -396,61 +396,6 @@
         "relationshipOriginType"
       ]
     },
-    "Azure.ResourceManager.BaseTypes.Relationships.RelationshipProvisioningState": {
-      "type": "string",
-      "description": "The provisioning state of a relationship.",
-      "enum": [
-        "Succeeded",
-        "Failed",
-        "Cancelled",
-        "NotStarted",
-        "Provisioning",
-        "Updating",
-        "Deleting"
-      ],
-      "x-ms-enum": {
-        "name": "RelationshipProvisioningState",
-        "modelAsString": true,
-        "values": [
-          {
-            "name": "Succeeded",
-            "value": "Succeeded",
-            "description": "The relationship operation succeeded."
-          },
-          {
-            "name": "Failed",
-            "value": "Failed",
-            "description": "The relationship operation failed."
-          },
-          {
-            "name": "Cancelled",
-            "value": "Cancelled",
-            "description": "The response was cancelled."
-          },
-          {
-            "name": "NotStarted",
-            "value": "NotStarted",
-            "description": "The relationship operation has not started."
-          },
-          {
-            "name": "Provisioning",
-            "value": "Provisioning",
-            "description": "The relationship is provisioning."
-          },
-          {
-            "name": "Updating",
-            "value": "Updating",
-            "description": "The relationship is updating."
-          },
-          {
-            "name": "Deleting",
-            "value": "Deleting",
-            "description": "The relationship is deleting."
-          }
-        ]
-      },
-      "readOnly": true
-    },
     "DependencyOf": {
       "type": "object",
       "description": "A dependency relationship between a source scope and target entity.",
@@ -525,6 +470,10 @@
           "type": "string",
           "description": "The relationship source identifier."
         },
+        "sourceTenant": {
+          "type": "string",
+          "description": "The tenant identifier of the relationship source."
+        },
         "targetId": {
           "type": "string",
           "description": "The relationship target identifier."
@@ -542,18 +491,79 @@
           "description": "Origin information for the relationship."
         },
         "provisioningState": {
-          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Relationships.RelationshipProvisioningState",
-          "description": "The provisioning state of the relationship."
+          "$ref": "#/definitions/DependencyOfProvisioningState",
+          "description": "The provisioning state of the dependency relationship.",
+          "readOnly": true
         }
       },
       "required": [
         "baseTypes",
         "sourceId",
+        "sourceTenant",
         "targetId",
         "targetTenant",
-        "metadata",
-        "provisioningState"
+        "metadata"
       ]
+    },
+    "DependencyOfProvisioningState": {
+      "type": "string",
+      "description": "Provisioning state values for a Contoso dependency relationship async flow.",
+      "enum": [
+        "Succeeded",
+        "Failed",
+        "Canceled",
+        "Accepted",
+        "Provisioning",
+        "Deleting"
+      ],
+      "x-ms-enum": {
+        "name": "DependencyOfProvisioningState",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "Succeeded",
+            "value": "Succeeded",
+            "description": "Resource has been created."
+          },
+          {
+            "name": "Failed",
+            "value": "Failed",
+            "description": "Resource creation failed."
+          },
+          {
+            "name": "Canceled",
+            "value": "Canceled",
+            "description": "Resource creation was canceled."
+          },
+          {
+            "name": "Accepted",
+            "value": "Accepted",
+            "description": "The dependency relationship creation has been accepted."
+          },
+          {
+            "name": "Provisioning",
+            "value": "Provisioning",
+            "description": "The dependency relationship is being provisioned."
+          },
+          {
+            "name": "Deleting",
+            "value": "Deleting",
+            "description": "The dependency relationship is being deleted."
+          }
+        ]
+      },
+      "readOnly": true
+    },
+    "DependencyOfProvisioningStateProperty": {
+      "type": "object",
+      "description": "Provisioning state property for a Contoso dependency relationship.",
+      "properties": {
+        "provisioningState": {
+          "$ref": "#/definitions/DependencyOfProvisioningState",
+          "description": "The provisioning state of the dependency relationship.",
+          "readOnly": true
+        }
+      }
     },
     "DependencyOfUpdate": {
       "type": "object",
@@ -573,6 +583,10 @@
           "type": "string",
           "description": "The relationship source identifier."
         },
+        "sourceTenant": {
+          "type": "string",
+          "description": "The tenant identifier of the relationship source."
+        },
         "targetId": {
           "type": "string",
           "description": "The relationship target identifier."
@@ -588,10 +602,6 @@
         "originInformation": {
           "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Relationships.RelationshipOriginInformation",
           "description": "Origin information for the relationship."
-        },
-        "provisioningState": {
-          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Relationships.RelationshipProvisioningState",
-          "description": "The provisioning state of the relationship."
         }
       }
     }

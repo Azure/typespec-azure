@@ -35,7 +35,8 @@ export const armRelationshipBaseTypeRequiredPropertiesRule = createRule({
             context.reportDiagnostic({
               messageId: "missingProperties",
               format: {
-                missing: "sourceId, targetId, targetTenant, metadata, provisioningState",
+                missing:
+                  "sourceId, sourceTenant, targetId, targetTenant, metadata, provisioningState",
               },
               target: relationshipResource.typespecType,
             });
@@ -44,6 +45,7 @@ export const armRelationshipBaseTypeRequiredPropertiesRule = createRule({
 
           const missing = [
             "sourceId",
+            "sourceTenant",
             "targetId",
             "targetTenant",
             "metadata",

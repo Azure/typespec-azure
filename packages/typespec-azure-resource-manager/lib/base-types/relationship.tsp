@@ -28,38 +28,6 @@ model RelationshipOriginInformation {
   discoveryEngine?: string;
 }
 
-/**
- * The provisioning state of a relationship.
- */
-@Azure.Core.lroStatus
-union RelationshipProvisioningState {
-  /** The relationship operation succeeded. */
-  @Azure.Core.lroSucceeded
-  Succeeded: "Succeeded",
-
-  /** The relationship operation failed. */
-  @Azure.Core.lroFailed
-  Failed: "Failed",
-
-  /** The response was cancelled. */
-  @Azure.Core.lroCanceled
-  Cancelled: "Cancelled",
-
-  /** The relationship operation has not started. */
-  NotStarted: "NotStarted",
-
-  /** The relationship is provisioning. */
-  Provisioning: "Provisioning",
-
-  /** The relationship is updating. */
-  Updating: "Updating",
-
-  /** The relationship is deleting. */
-  Deleting: "Deleting",
-
-  string,
-}
-
 // ============================================================================
 // Relationship Properties (resource property bag)
 // ============================================================================
@@ -68,18 +36,22 @@ union RelationshipProvisioningState {
  * Required properties for a relationship resource.
  * @template Metadata The relationship metadata model.
  * @template OriginInformation The relationship origin information model.
+ * @template ProvisioningStateProperty The provisioning state property model. Defaults to DefaultProvisioningStateProperty.
  */
 model RelationshipProperties<
   Metadata extends RelationshipMetadata = RelationshipMetadata,
-  OriginInformation extends RelationshipOriginInformation = RelationshipOriginInformation
-> 
-{
+  OriginInformation extends RelationshipOriginInformation = RelationshipOriginInformation,
+  ProvisioningStateProperty extends TypeSpec.Reflection.Model = DefaultProvisioningStateProperty
+> {
   /** ARM-managed. Must include the base type descriptor for this resource. */
   @visibility(Lifecycle.Read)
   baseTypes: BaseTypeInfo[];
 
   /** The relationship source identifier. */
   sourceId: string;
+
+  /** The tenant identifier of the relationship source. */
+  sourceTenant: string;
 
   /** The relationship target identifier. */
   targetId: string;
@@ -93,8 +65,7 @@ model RelationshipProperties<
   /** Origin information for the relationship. */
   originInformation?: OriginInformation;
 
-  /** The provisioning state of the relationship. */
-  provisioningState: RelationshipProvisioningState;
+  ...ProvisioningStateProperty;
 }
 
 // ============================================================================

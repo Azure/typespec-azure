@@ -30,8 +30,36 @@ model DependencyOfMetadata is RelationshipMetadata {
   description?: string;
 }
 
+/** Provisioning state values for a Contoso dependency relationship async flow. */
+@Azure.Core.lroStatus
+union DependencyOfProvisioningState {
+  /** Include standard terminal provisioning states. */
+  ResourceProvisioningState,
+
+  /** The dependency relationship creation has been accepted. */
+  Accepted: "Accepted",
+
+  /** The dependency relationship is being provisioned. */
+  Provisioning: "Provisioning",
+
+  /** The dependency relationship is being deleted. */
+  Deleting: "Deleting",
+
+  string,
+}
+
+/** Provisioning state property for a Contoso dependency relationship. */
+model DependencyOfProvisioningStateProperty {
+  /** The provisioning state of the dependency relationship. */
+  @visibility(Lifecycle.Read)
+  provisioningState?: DependencyOfProvisioningState;
+}
+
 /** Properties for a Contoso dependency relationship. */
-model DependencyOfProperties is RelationshipProperties<Metadata = DependencyOfMetadata>;
+model DependencyOfProperties is RelationshipProperties<
+  Metadata = DependencyOfMetadata,
+  ProvisioningStateProperty = DependencyOfProvisioningStateProperty
+>;
 
 /**
  * A dependency relationship between a source scope and target entity.

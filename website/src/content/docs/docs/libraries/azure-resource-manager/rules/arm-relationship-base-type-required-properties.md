@@ -16,6 +16,7 @@ namespace Microsoft.Contoso;
 
 model MyRelationshipProperties {
   sourceId: string;
+  sourceTenant: string;
   metadata: RelationshipMetadata;
 }
 

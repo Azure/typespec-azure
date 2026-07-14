@@ -74,7 +74,7 @@ describe("arm-relationship-base-type-required-properties", () => {
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-relationship-base-type-required-properties",
         message:
-          "Relationship resources must include required properties: targetId, targetTenant, provisioningState.",
+          "Relationship resources must include required properties: sourceTenant, targetId, targetTenant, provisioningState.",
       });
   });
 
@@ -92,10 +92,11 @@ describe("arm-relationship-base-type-required-properties", () => {
 
         model MyRelationshipProperties {
           sourceId: string;
+          sourceTenant: string;
           targetId: string;
           targetTenant: string;
           metadata: IncompleteRelationshipMetadata;
-          provisioningState: RelationshipProvisioningState;
+          provisioningState: string;
         }
 
         #suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "test"
@@ -125,11 +126,12 @@ describe("arm-relationship-base-type-required-properties", () => {
 
         model MyRelationshipProperties {
           sourceId: string;
+          sourceTenant: string;
           targetId: string;
           targetTenant: string;
           metadata: RelationshipMetadata;
           originInformation?: IncompleteOriginInformation;
-          provisioningState: RelationshipProvisioningState;
+          provisioningState: string;
         }
 
         #suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "test"
@@ -161,11 +163,12 @@ describe("arm-relationship-base-type-required-properties", () => {
 
         model MyRelationshipProperties {
           sourceId: string;
+          sourceTenant: string;
           targetId: string;
           targetTenant: string;
           metadata: RelationshipMetadata;
           originInformation?: IncompleteOriginInformation;
-          provisioningState: RelationshipProvisioningState;
+          provisioningState: string;
         }
 
         #suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "test"
