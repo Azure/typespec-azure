@@ -6,3 +6,13 @@ export const Tester = createTester(resolvePath(import.meta.dirname, ".."), {
 })
   .importLibraries()
   .using("Http", "Versioning");
+
+export const TesterWithSuppressions = createTester(resolvePath(import.meta.dirname, ".."), {
+  libraries: [
+    "@typespec/http",
+    "@typespec/versioning",
+    "@azure-tools/typespec-breaking-change",
+  ],
+})
+  .importLibraries()
+  .using("Http", "Versioning");

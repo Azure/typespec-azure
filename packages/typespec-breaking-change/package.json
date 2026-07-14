@@ -6,6 +6,7 @@
   "license": "MIT",
   "type": "module",
   "main": "dist/src/index.js",
+  "tspMain": "dist/src/tsp-index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Azure/typespec-azure.git"

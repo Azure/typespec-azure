@@ -1,4 +1,36 @@
+export {
+  canonicalizeOperations,
+  type CanonicalizationResult,
+  type CanonicalizedOperation,
+} from "./canonicalize.js";
+export { compileService, type CompileOptions } from "./compile.js";
+export {
+  $approvedBreakingChange,
+  $approvedUnversionedChange,
+  findSuppressions,
+  findUnversionedSuppressions,
+  getSuppressions,
+  getUnversionedSuppressions,
+  type ResolvedSuppression,
+  type SuppressionMetadata,
+} from "./decorators.js";
+export * from "./diff-engine.js";
 export type { DiffKind } from "./diff-kind.js";
+export * from "./diff-operations.js";
+export * from "./diff-types.js";
+export { $lib, BreakingChangeStateKeys } from "./lib.js";
+export { matchOperations, type MatchedOperation, type OperationMatchResult } from "./match.js";
+export {
+  getOperationIdentity,
+  identityKey,
+  normalizePath,
+  resolveOperationIdentities,
+  type OperationIdentityMap,
+  type ResolvedOperation,
+} from "./operation-identity.js";
+export * from "./policy.js";
+export * from "./suppression.js";
+export { isOperationIdentity, isServiceIdentity } from "./types.js";
 export type {
   AnalysisResult,
   ApiDiff,
@@ -15,37 +47,13 @@ export type {
   VersionPair,
   VersionedView,
 } from "./types.js";
-export { isOperationIdentity, isServiceIdentity } from "./types.js";
-export { compileService, type CompileOptions } from "./compile.js";
 export {
-  enumerateVersions,
-  createVersionedView,
   buildComparisonPairs,
   buildPhaseAPairs,
   buildPhaseBPairs,
+  createVersionedView,
   defaultVersionClassifier,
+  enumerateVersions,
   type ServiceVersionInfo,
   type VersionClassifier,
 } from "./versions.js";
-export {
-  resolveOperationIdentities,
-  normalizePath,
-  getOperationIdentity,
-  identityKey,
-  type OperationIdentityMap,
-  type ResolvedOperation,
-} from "./operation-identity.js";
-export {
-  canonicalizeOperations,
-  type CanonicalizationResult,
-  type CanonicalizedOperation,
-} from "./canonicalize.js";
-export * from "./diff-engine.js";
-export * from "./diff-operations.js";
-export * from "./diff-types.js";
-export {
-  matchOperations,
-  type OperationMatchResult,
-  type MatchedOperation,
-} from "./match.js";
-export * from "./policy.js";
