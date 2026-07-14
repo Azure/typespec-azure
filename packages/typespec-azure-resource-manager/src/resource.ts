@@ -33,6 +33,9 @@ import {
   ArmResourceOperationsDecorator,
   ArmVirtualResourceDecorator,
   ExtensionResourceDecorator,
+  FeatureFileDecorator,
+  FeatureFileOptionsDecorator,
+  FeatureFilesDecorator,
   IdentifiersDecorator,
   LocationResourceDecorator,
   ResourceBaseTypeDecorator,
@@ -1519,6 +1522,10 @@ export const [getResourceFeatureSet, setResourceFeatureSet] = useStateMap<
   Map<string, ArmFeatureOptions>
 >(ArmStateKeys.armFeatureSet);
 
+export const [getFeatureFileSet, setFeatureFileSet] = useStateMap<Namespace, boolean>(
+  ArmStateKeys.armFeatureFileSet,
+);
+
 export const [getResourceFeatureOptions, setResourceFeatureOptions] = useStateMap<
   EnumMember,
   ArmFeatureOptions
@@ -1659,3 +1666,16 @@ export const $featureOptions: FeatureOptionsDecorator = (
 ) => {
   setResourceFeatureOptions(context.program, entity, options);
 };
+
+// New Azure.ResourceManager namespace decorators
+export const $featureFile: FeatureFileDecorator = $feature as unknown as FeatureFileDecorator;
+export const $featureFiles: FeatureFilesDecorator = (
+  context: DecoratorContext,
+  entity: Namespace,
+  features: Enum,
+) => {
+  setFeatureFileSet(context.program, entity, true);
+  $features(context, entity, features);
+};
+export const $featureFileOptions: FeatureFileOptionsDecorator =
+  $featureOptions as unknown as FeatureFileOptionsDecorator;

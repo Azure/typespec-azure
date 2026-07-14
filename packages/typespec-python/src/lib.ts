@@ -38,9 +38,9 @@ const PythonAzureEmitterOptionsSchema: JSONSchemaType<PythonAzureEmitterOptions>
     "models-mode": {
       type: "string",
       nullable: true,
-      enum: ["dpg", "none"],
+      enum: ["dpg", "none", "typeddict"],
       description:
-        "What kind of models to generate. If you pass in `none`, we won't generate models. `dpg` models are the default models we generate.",
+        "What kind of models to generate. If you pass in `none`, we won't generate models. `dpg` models are the default models we generate. If you pass in `typeddict`, we will generate models as typed dictionaries.",
     },
     "generate-sample": {
       type: "boolean",

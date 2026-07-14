@@ -37,6 +37,24 @@ export interface RuntimeStats {
   };
 }
 
+export interface MetricVariability {
+  mean: number;
+  median: number;
+  stdDev: number;
+  cv: number;
+  min: number;
+  max: number;
+  sampleCount: number;
+}
+
+export interface NoiseGateInfo {
+  thresholdCv: number;
+  maxReruns: number;
+  rerunIterations: number;
+  rerunsPerformed: number;
+  triggered: boolean;
+}
+
 /** Benchmark result for a single spec across multiple iterations. */
 export interface SpecBenchmarkResult {
   /** The spec name (directory name). */
@@ -47,6 +65,11 @@ export interface SpecBenchmarkResult {
   stats: Stats;
   /** Per-iteration raw stats. */
   rawIterations: Stats[];
+  /** Variability summary for measured iterations. */
+  variability?: {
+    total: MetricVariability;
+    noiseGate?: NoiseGateInfo;
+  };
 }
 
 /** Complete benchmark result set. */

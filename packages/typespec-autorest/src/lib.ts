@@ -125,6 +125,35 @@ export interface AutorestEmitterOptions {
    * @default false
    */
   "skip-example-copying"?: boolean;
+
+  /**
+   * Strategy for naming the OpenAPI names derived from TypeSpec types (definition/schema
+   * names, parameter keys, inline names, `x-typespec-name`, etc.).
+   *
+   * - `"namespaced"`: Include the namespace prefix when a type lives outside the service namespace
+   *   (e.g. `LiftrBase.Foo`). The service (and root `TypeSpec`) namespace is always stripped. This
+   *   is the current/default behavior.
+   * - `"name-only"`: Use only the type name without any namespace prefix (e.g. `Foo`). When two
+   *   types from different namespaces collapse to the same name, the conflict is reported as an
+   *   error (`@typespec/openapi/duplicate-type-name`).
+   *
+   * @default "namespaced"
+   */
+  "type-name-strategy"?: "namespaced" | "name-only";
+
+  /**
+   * Controls emission of a `service.yaml` manifest (declaring the service's API versions)
+   * at the project root, next to `tspconfig.yaml`.
+   *
+   * - `"auto"`: Emit/update `service.yaml` only if the file already exists. (default)
+   * - `"always"`: Always emit `service.yaml`.
+   * - `"never"`: Never emit `service.yaml`.
+   *
+   * When an existing file is present it is updated in place, preserving comments and unrelated keys.
+   *
+   * @default "auto"
+   */
+  "service-yaml"?: "auto" | "always" | "never";
 }
 
 const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
@@ -268,6 +297,22 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       description:
         "When enabled, the emitter will not copy example files to the output directory. Instead, it will reference the source example files using relative file paths.",
     },
+    "type-name-strategy": {
+      type: "string",
+      enum: ["namespaced", "name-only"],
+      nullable: true,
+      default: "namespaced",
+      description:
+        'Strategy for naming the OpenAPI names derived from TypeSpec types. "namespaced" (default) includes the namespace prefix for types outside the service namespace (e.g. `LiftrBase.Foo`). "name-only" uses only the type name without any namespace prefix (e.g. `Foo`), reporting an error when two types collapse to the same name.',
+    },
+    "service-yaml": {
+      type: "string",
+      enum: ["auto", "always", "never"],
+      nullable: true,
+      default: "auto",
+      description:
+        'Controls emission of a `service.yaml` manifest at the project root. "auto" (default) emits it only if the file already exists, "always" always emits it, "never" disables it. When an existing file is present it is updated in place, preserving comments and unrelated keys.',
+    },
   },
   required: [],
 };
@@ -410,6 +455,13 @@ export const $lib = createTypeSpecLibrary({
       messages: {
         default:
           "The emitter did not emit any files because the specified version option does not match any versions of the service.",
+      },
+    },
+    "service-yaml-multiple-services": {
+      severity: "warning",
+      messages: {
+        default:
+          "Cannot emit service.yaml because the project defines multiple services. Only the first service will be included.",
       },
     },
   },

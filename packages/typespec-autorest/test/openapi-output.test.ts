@@ -22,33 +22,6 @@ describe("definitions", () => {
     });
   });
 
-  it("errors on duplicate model names", async () => {
-    const diagnostics = await diagnoseOpenApiFor(
-      `
-      model P {
-        p: string;
-      }
-
-      @friendlyName("P")
-      model Q {
-        q: string;
-      }
-
-      #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
-      @route("/test1")
-      @get
-      op test1(p: P): Q;
-      `,
-    );
-
-    expectDiagnostics(diagnostics, [
-      {
-        code: "@typespec/openapi/duplicate-type-name",
-        message: /type/,
-      },
-    ]);
-  });
-
   it("doesn't define anonymous or unconnected models", async () => {
     const res: any = await oapiForModel(
       "{ ... Foo }",

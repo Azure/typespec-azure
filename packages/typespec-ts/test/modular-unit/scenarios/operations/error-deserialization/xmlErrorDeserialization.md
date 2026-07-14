@@ -70,7 +70,6 @@ export async function _getWidgetDeserialize(result: PathUncheckedResponse): Prom
 
   return widgetDeserializer(result.body);
 }
-
 export async function getWidget(
   context: Client,
   id: string,
@@ -190,7 +189,6 @@ export async function _getDocumentDeserialize(result: PathUncheckedResponse): Pr
   }
   return documentDeserializer(result.body);
 }
-
 export async function getDocument(
   context: Client,
   id: string,
@@ -272,7 +270,6 @@ export async function _getItemDeserialize(result: PathUncheckedResponse): Promis
 
   return itemDeserializer(result.body);
 }
-
 export async function getItem(
   context: Client,
   id: string,

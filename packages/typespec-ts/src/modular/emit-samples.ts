@@ -14,10 +14,10 @@ import { useContext } from "../context-manager.js";
 import { resolveReference } from "../framework/reference.js";
 import { reportDiagnostic } from "../index.js";
 import { AzureIdentityDependencies } from "../modular/external-dependencies.js";
-import { isAzurePackage, NameType, normalizeName } from "../rlc-common/index.js";
-import { getSubscriptionId } from "../transform/transfrom-rlc-options.js";
+import { getSubscriptionId } from "../transform/transform-client-options.js";
 import { hasKeyCredential, hasTokenCredential } from "../utils/credential-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
+import { NameType, normalizeName } from "../utils/name-utils.js";
 import {
   getMethodHierarchiesMap,
   isTenantLevelOperation,
@@ -115,9 +115,9 @@ function emitMethodSamples(
   });
   const exampleFunctions = [];
   // TODO: remove hard-coded for package
-  if (dpgContext.rlcOptions?.packageDetails?.name) {
+  if (dpgContext.emitterOptions?.packageDetails?.name) {
     sourceFile.addImportDeclaration({
-      moduleSpecifier: dpgContext.rlcOptions?.packageDetails?.name,
+      moduleSpecifier: dpgContext.emitterOptions?.packageDetails?.name,
       namedImports: [getClassicalClientName(options.topLevelClient)],
     });
   }
@@ -316,12 +316,36 @@ function prepareExampleParameters(
 
   let subscriptionIdValue = `"00000000-0000-0000-0000-000000000000"`;
   let isSubscriptionIdAdded = false;
-  // required parameters
+
+  // Map each HTTP parameter to its method parameter via `methodParameterSegments`
+  // and place its example value at that path, yielding one argument per method
+  // parameter regardless of flat, nested, or grouped shape. Client- and
+  // body-carried roots are emitted by their own sections and skipped here.
+  const bodyParam = method.operation.bodyParam;
+  let bodyRootName: string | undefined;
+  if (
+    bodyParam &&
+    !isSpreadBodyParameter(bodyParam) &&
+    bodyParam.methodParameterSegments.length === 1 &&
+    bodyParam.methodParameterSegments[0] !== undefined &&
+    bodyParam.methodParameterSegments[0].length >= 1
+  ) {
+    bodyRootName = bodyParam.methodParameterSegments[0][0]!.name;
+  }
+
+  const methodArguments = new Map<
+    string,
+    { name: string; isOptional: boolean; value: ValueTreeNode | string }
+  >();
   for (const param of method.operation.parameters) {
-    if (param.optional === true || param.type.kind === "constant" || param.clientDefaultValue) {
+    if (param.type.kind === "constant" || param.clientDefaultValue) {
       continue;
     }
-
+    const path = param.methodParameterSegments[0];
+    if (path === undefined || path.length === 0) {
+      continue;
+    }
+    const root = path[0]!;
     const exampleValue = parameterMap[param.serializedName];
 
     // Handle subscriptionId parameter separately for ARM clients
@@ -343,28 +367,27 @@ function prepareExampleParameters(
       continue;
     }
 
-    if (!exampleValue || !exampleValue.value) {
-      // report diagnostic if required parameter is missing
-      reportDiagnostic(dpgContext.program, {
-        code: "required-sample-parameter",
-        format: {
-          exampleName: method.oriName ?? method.name,
-          paramName: param.name,
-        },
-        target: NoTarget,
-      });
+    // Roots emitted by the client and body sections.
+    if (root.onClient || (bodyRootName !== undefined && root.name === bodyRootName)) {
       continue;
     }
 
-    result.push(
-      prepareExampleValue(
-        dpgContext,
-        exampleValue.parameter.name,
-        exampleValue.value,
-        param.optional,
-        param.onClient,
-      ),
-    );
+    if (!exampleValue || !exampleValue.value) {
+      // report diagnostic if required parameter is missing
+      if (path.length === 1 && !param.optional) {
+        reportDiagnostic(dpgContext.program, {
+          code: "required-sample-parameter",
+          format: {
+            exampleName: method.oriName ?? method.name,
+            paramName: param.name,
+          },
+          target: NoTarget,
+        });
+      }
+      continue;
+    }
+
+    placeMethodArgument(methodArguments, path, getParameterValue(dpgContext, exampleValue.value));
   }
 
   // If client-level subscriptionId is needed on the client for this method, then add it
@@ -381,7 +404,6 @@ function prepareExampleParameters(
   }
 
   // required/optional body parameters
-  const bodyParam = method.operation.bodyParam;
   const bodySerializeName = bodyParam?.serializedName;
   const bodyExample = parameterMap[bodySerializeName ?? ""];
   if (bodyParam && bodyExample && bodyExample.value) {
@@ -441,30 +463,89 @@ function prepareExampleParameters(
       }
     }
   }
-  // optional parameters
-  method.operation.parameters
-    .filter(
-      (param) =>
-        param.optional === true && parameterMap[param.serializedName] && !param.clientDefaultValue,
-    )
-    .map((param) => parameterMap[param.serializedName]!)
-    .forEach((param) => {
-      result.push(
-        prepareExampleValue(
-          dpgContext,
-          param.parameter.name,
-          param.value,
-          true,
-          param.parameter.onClient,
-        ),
-      );
+  // Emit one argument per top-level method parameter. A normal parameter carries
+  // a scalar value; a parameter with nested leaves carries an object literal.
+  for (const arg of methodArguments.values()) {
+    result.push({
+      name: normalizeName(arg.name, NameType.Parameter, true),
+      value: serializeNestedValue(arg.value),
+      isOptional: arg.isOptional,
+      onClient: false,
     });
+  }
 
   return result;
 }
 
+/** A nested value tree: leaves are TypeScript value expressions, interior nodes are objects. */
+interface ValueTreeNode {
+  [key: string]: ValueTreeNode | string;
+}
+
+/**
+ * Records `leaf` for the method parameter addressed by `path`. `path[0]` is the
+ * top-level method parameter (the argument key); a single-segment path stores a
+ * scalar, a longer path stores the leaf inside a nested object merged with
+ * sibling leaves sharing the same root.
+ */
+function placeMethodArgument(
+  methodArguments: Map<
+    string,
+    { name: string; isOptional: boolean; value: ValueTreeNode | string }
+  >,
+  path: readonly { name: string; optional?: boolean }[],
+  leaf: string,
+): void {
+  const root = path[0]!;
+  let arg = methodArguments.get(root.name);
+  if (!arg) {
+    arg = { name: root.name, isOptional: Boolean(root.optional), value: {} };
+    methodArguments.set(root.name, arg);
+  }
+  if (path.length === 1) {
+    arg.value = leaf;
+    return;
+  }
+  if (typeof arg.value !== "object") {
+    arg.value = {};
+  }
+  setNestedValue(arg.value, path.slice(1), leaf);
+}
+
+/** Places `leaf` at `path` (segments after the root), creating intermediate objects as needed. */
+function setNestedValue(
+  root: ValueTreeNode,
+  path: readonly { name: string }[],
+  leaf: string,
+): void {
+  let node = root;
+  for (let i = 0; i < path.length; i++) {
+    const key = normalizeName(path[i]!.name, NameType.Property, true);
+    if (i === path.length - 1) {
+      node[key] = leaf;
+    } else {
+      const existing = node[key];
+      if (typeof existing !== "object" || existing === null) {
+        node[key] = {};
+      }
+      node = node[key] as ValueTreeNode;
+    }
+  }
+}
+
+/** Serializes a {@link ValueTreeNode} into a TypeScript object literal string. */
+function serializeNestedValue(node: ValueTreeNode | string): string {
+  if (typeof node === "string") {
+    return node;
+  }
+  const entries = Object.entries(node).map(
+    ([key, value]) => `${key}: ${serializeNestedValue(value)}`,
+  );
+  return `{ ${entries.join(", ")} }`;
+}
+
 function getCredentialExampleValue(
-  dpgContext: SdkContext,
+  _dpgContext: SdkContext,
   initialization: SdkClientInitializationType,
 ): ExampleValue | undefined {
   const keyCredential = hasKeyCredential(initialization),
@@ -475,26 +556,11 @@ function getCredentialExampleValue(
     name: "credential",
   };
   if (keyCredential || tokenCredential) {
-    if (isAzurePackage({ options: dpgContext.rlcOptions })) {
-      // Support DefaultAzureCredential for Azure packages
-      return {
-        ...defaultSetting,
-        value: `new ${resolveReference(AzureIdentityDependencies.DefaultAzureCredential)}()`,
-      };
-    } else if (keyCredential) {
-      // Support ApiKeyCredential for non-Azure packages
-      return {
-        ...defaultSetting,
-        value: `{ key: "INPUT_YOUR_KEY_HERE" }`,
-      };
-    } else if (tokenCredential) {
-      // Support TokenCredential for non-Azure packages
-      return {
-        ...defaultSetting,
-        value: `{ getToken: async () => {
-          return { token: "INPUT_YOUR_TOKEN_HERE", expiresOnTimestamp: now() }; } }`,
-      };
-    }
+    // Support DefaultAzureCredential for Azure packages
+    return {
+      ...defaultSetting,
+      value: `new ${resolveReference(AzureIdentityDependencies.DefaultAzureCredential)}()`,
+    };
   }
   return undefined;
 }
@@ -540,7 +606,7 @@ function getParameterValue(
       retValue = `${JSON.stringify(value.value)}`;
       break;
     case "null": {
-      const ignoreNullableOnOptional = context.rlcOptions?.ignoreNullableOnOptional ?? false;
+      const ignoreNullableOnOptional = context.emitterOptions?.ignoreNullableOnOptional ?? false;
       if (ignoreNullableOnOptional) {
         // When ignore-nullable-on-optional is true, the TypeScript type won't include
         // | null for optional properties, so we convert null to a type-appropriate default

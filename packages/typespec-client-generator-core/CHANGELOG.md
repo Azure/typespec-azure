@@ -1,5 +1,19 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.69.2
+
+### Features
+
+- [111845d](https://github.com/Azure/typespec-azure/commit/111845d46f5cbd3c32b39f7fc89a05c2f6f7908c) Add `csharp-no-url-suffix` linter rule that flags model properties ending with `Url` and suggests using `Uri` suffix instead, following .NET SDK naming conventions. Includes auto-fix to add `@@clientName` decorator in client.tsp.
+
+
+## 0.69.1
+
+### Features
+
+- [917d2b1](https://github.com/Azure/typespec-azure/commit/917d2b12c66d0e46fa5894baaf2fed1a1950d517) Support a per-service `api-version` map for multi-service packages. The `api-version` emitter option now accepts either a string (applied to single service packages, or the `latest`/`all` keywords) or a map from each service namespace's full name to its desired version. Services not listed in the map default to their latest version.
+
+
 ## 0.69.0
 
 ### Bug Fixes

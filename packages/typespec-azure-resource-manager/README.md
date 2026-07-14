@@ -49,6 +49,7 @@ Available ruleSets:
 | [`@azure-tools/typespec-azure-resource-manager/version-progression`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/version-progression)                                             | Validate that ARM service versions all use unique dates and are declared in strictly increasing chronological order.                                                                                                                                  |
 | [`@azure-tools/typespec-azure-resource-manager/arm-custom-resource-no-key`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-custom-resource-no-key)                               | Validate that custom resource contains a key property.                                                                                                                                                                                                |
 | [`@azure-tools/typespec-azure-resource-manager/arm-custom-resource-usage-discourage`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-custom-resource-usage-discourage)           | Verify the usage of @customAzureResource decorator.                                                                                                                                                                                                   |
+| [`@azure-tools/typespec-azure-resource-manager/arm-feature-file-usage-discourage`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-feature-file-usage-discourage)                 | Verify the usage of @featureFiles decorator.                                                                                                                                                                                                          |
 | [`@azure-tools/typespec-azure-resource-manager/beyond-nesting-levels`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/beyond-nesting-levels)                                         | Tracked Resources must use 3 or fewer levels of nesting.                                                                                                                                                                                              |
 | [`@azure-tools/typespec-azure-resource-manager/arm-resource-operation`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-operation)                                       | Validate ARM Resource operations.                                                                                                                                                                                                                     |
 | [`@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-resource-delete-operation)                           | Check for resources that must have a delete operation.                                                                                                                                                                                                |
@@ -67,6 +68,7 @@ Available ruleSets:
 | [`@azure-tools/typespec-azure-resource-manager/unsupported-type`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/unsupported-type)                                                   | Check for unsupported ARM types.                                                                                                                                                                                                                      |
 | [`@azure-tools/typespec-azure-resource-manager/secret-prop`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/secret-prop)                                                             | RPC-v1-13: Check that property with names indicating sensitive information(e.g. contains auth, password, token, secret, etc.) are marked with @secret decorator.                                                                                      |
 | [`@azure-tools/typespec-azure-resource-manager/no-empty-model`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-empty-model)                                                       | ARM Properties with type:object that don't reference a model definition are not allowed. ARM doesn't allow generic type definitions as this leads to bad customer experience.                                                                         |
+| [`@azure-tools/typespec-azure-resource-manager/no-reserved-resource-property`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-reserved-resource-property)                         | Reserved property names (for example 'billingData') must not be present in a resource's property bag. The property name is matched case-insensitively.                                                                                                |
 
 ## Decorators
 
@@ -87,6 +89,9 @@ Available ruleSets:
 - [`@armResourceUpdate`](#@armresourceupdate)
 - [`@armVirtualResource`](#@armvirtualresource)
 - [`@extensionResource`](#@extensionresource)
+- [`@featureFile`](#@featurefile)
+- [`@featureFileOptions`](#@featurefileoptions)
+- [`@featureFiles`](#@featurefiles)
 - [`@identifiers`](#@identifiers)
 - [`@locationResource`](#@locationresource)
 - [`@resourceBaseType`](#@resourcebasetype)
@@ -117,7 +122,9 @@ the version of the Azure Resource Manager common-types to use for refs in emitte
 
 #### `@armLibraryNamespace`
 
-`@armLibraryNamespace` designates a namespace as containign Azure Resource Manager Provider information.
+`@armLibraryNamespace` designates a namespace as containing Azure Resource Manager Provider information.
+This is used for library namespaces that define reusable ARM resource types that can be shared
+across multiple provider specifications.
 
 ```typespec
 @Azure.ResourceManager.armLibraryNamespace
@@ -171,8 +178,9 @@ namespace Microsoft.ContosoService;
 
 #### `@armProviderNameValue`
 
-`@armResourceType` sets the value fo the decorated string
-property to the type of the Azure Resource Manager resource.
+`@armProviderNameValue` sets the provider namespace value on operations.
+It is used internally to inject the correct provider namespace path segment
+for resource operations in auto-generated routes.
 
 ```typespec
 @Azure.ResourceManager.armProviderNameValue
@@ -187,6 +195,11 @@ property to the type of the Azure Resource Manager resource.
 None
 
 #### `@armResourceAction`
+
+Marks the operation as a custom action on a specific Azure Resource Manager resource type.
+This decorator associates a POST action operation with its resource,
+identifying the semantics of the operation as a resource action over a specific resource for documentation,
+resource validation, and use by downstream emitters.
 
 ```typespec
 @Azure.ResourceManager.armResourceAction(resourceModel: Model, resourceName?: valueof string)
@@ -224,7 +237,9 @@ Marks the operation as being a check existence (HEAD) operation
 
 #### `@armResourceCollectionAction`
 
-Marks the operation as being a collection action
+Marks the operation as being a collection action that is not associated with a specific resource instance.
+Collection actions are operations that act on a resource collection rather than a single resource,
+such as `checkNameAvailability` or provider-level actions.
 
 ```typespec
 @Azure.ResourceManager.armResourceCollectionAction
@@ -239,6 +254,10 @@ Marks the operation as being a collection action
 None
 
 #### `@armResourceCreateOrUpdate`
+
+Marks the operation as a create or update (PUT) operation for a specific Azure Resource Manager resource type.
+This decorator identifies the semantics of the operation as a CreateOrReplace lifecycle operation over a particular resource,
+for use in documentation, resource validation, and downstream emitters.
 
 ```typespec
 @Azure.ResourceManager.armResourceCreateOrUpdate(resourceModel: Model, resourceName?: valueof string)
@@ -257,6 +276,10 @@ None
 
 #### `@armResourceDelete`
 
+Marks the operation as a delete (DELETE) operation for a specific Azure Resource Manager resource type.
+This decorator identifies the operation as a Delete lifecycle operation over the resource for us in documentation,
+resource validation, and downstream emitters.
+
 ```typespec
 @Azure.ResourceManager.armResourceDelete(resourceModel: Model, resourceName?: valueof string)
 ```
@@ -273,6 +296,10 @@ None
 | resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 #### `@armResourceList`
+
+Marks the operation as a list (GET collection) operation for a specific Azure Resource Manager resource type.
+This decorator identifies the semantics of the operation as a collection list operation over a resource type and a particular scope for documentation,
+resource validation, and downstream emitters.
 
 ```typespec
 @Azure.ResourceManager.armResourceList(resourceModel: Model, resourceName?: valueof string)
@@ -325,6 +352,10 @@ individually tagged
 
 #### `@armResourceRead`
 
+Marks the operation as a read (GET) operation for a specific Azure Resource Manager resource type.
+This decorator identifies the semantics of the operation as a Read lifecycle operation over a particular resource,
+for use in documentation, resource validation, and downstream emitters.
+
 ```typespec
 @Azure.ResourceManager.armResourceRead(resourceModel: Model, resourceName?: valueof string)
 ```
@@ -341,6 +372,10 @@ individually tagged
 | resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 #### `@armResourceUpdate`
+
+Marks the operation as an update (PATCH) operation for a specific Azure Resource Manager resource type.
+This decorator identifies the operation as an Update lifecycle operation over the resource for use in documentation,
+resource validation, and downstream emitters.
 
 ```typespec
 @Azure.ResourceManager.armResourceUpdate(resourceModel: Model, resourceName?: valueof string)
@@ -360,7 +395,8 @@ individually tagged
 #### `@armVirtualResource`
 
 This decorator is used on Azure Resource Manager resources that are not based on
-Azure.ResourceManager common types.
+Azure.ResourceManager common types. It marks a model as an ARM virtual resource,
+which is useful for defining the scope of resources used only as parents for child resources, or scopes for extension resources.
 
 ```typespec
 @Azure.ResourceManager.armVirtualResource(provider?: valueof string)
@@ -397,6 +433,63 @@ See more details on [different Azure Resource Manager resource type here.](https
 ##### Parameters
 
 None
+
+#### `@featureFile`
+
+Decorator to associate a feature file with a model, interface, or namespace
+
+```typespec
+@Azure.ResourceManager.featureFile(featureName: EnumMember)
+```
+
+##### Target
+
+The target to associate the feature file with
+`Model | Operation | Interface | Namespace`
+
+##### Parameters
+
+| Name        | Type         | Description                              |
+| ----------- | ------------ | ---------------------------------------- |
+| featureName | `EnumMember` | The feature to associate with the target |
+
+#### `@featureFileOptions`
+
+Decorator to define options for a specific feature file
+
+```typespec
+@Azure.ResourceManager.featureFileOptions(options: valueof Azure.ResourceManager.ArmFeatureFileOptions)
+```
+
+##### Target
+
+The enum member that represents the feature
+`EnumMember`
+
+##### Parameters
+
+| Name    | Type                                                      | Description                      |
+| ------- | --------------------------------------------------------- | -------------------------------- |
+| options | [valueof `ArmFeatureFileOptions`](#armfeaturefileoptions) | The options for the feature file |
+
+#### `@featureFiles`
+
+Decorator to define a set of feature files for splitting output
+
+```typespec
+@Azure.ResourceManager.featureFiles(features: Enum)
+```
+
+##### Target
+
+The service namespace
+`Namespace`
+
+##### Parameters
+
+| Name     | Type   | Description                         |
+| -------- | ------ | ----------------------------------- |
+| features | `Enum` | The enum that contains the features |
 
 #### `@identifiers`
 
@@ -450,10 +543,11 @@ None
 
 #### `@resourceBaseType`
 
-This decorator sets the base type of the given resource.
+This decorator sets the base type of the given resource, indicating where in the
+Azure Resource Manager hierarchy the resource is located.
 
 ```typespec
-@Azure.ResourceManager.resourceBaseType(baseTypeIt: "Tenant" | "Subscription" | "ResourceGroup" | "Location" | "Extension")
+@Azure.ResourceManager.resourceBaseType(baseType: "Tenant" | "Subscription" | "ResourceGroup" | "Location" | "Extension")
 ```
 
 ##### Target
@@ -462,9 +556,9 @@ This decorator sets the base type of the given resource.
 
 ##### Parameters
 
-| Name       | Type                                                                         | Description                                                                                                            |
-| ---------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| baseTypeIt | `"Tenant" \| "Subscription" \| "ResourceGroup" \| "Location" \| "Extension"` | The built-in parent of the resource, this can be "Tenant", "Subscription", "ResourceGroup", "Location", or "Extension" |
+| Name     | Type                                                                         | Description                                                                                                            |
+| -------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| baseType | `"Tenant" \| "Subscription" \| "ResourceGroup" \| "Location" \| "Extension"` | The built-in parent of the resource, this can be "Tenant", "Subscription", "ResourceGroup", "Location", or "Extension" |
 
 #### `@resourceGroupResource`
 
@@ -602,11 +696,17 @@ multiple base types. Duplicate entries are ignored.
 ##### Examples
 
 ```typespec
-@azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
-model MyAgentProperties {
-  ...AgentProperties;
-  ...AgentToolProperty;
+// Agent definition and properties using the Appliance deployment model
+model ContosoApplianceDefinition is AgentDefinitionAppliance<true, true>;
+model ContosoApplianceProperties is AgentPropertiesAppliance<ContosoApplianceDefinition> {
   ...DefaultProvisioningStateProperty;
+}
+
+// The @azureBaseType decorator marks the resource as conforming to the Agent base type.
+// (The Agent template applies this automatically, but it can also be applied directly.)
+@azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
+model ContosoApplianceAgent is TrackedResource<ContosoApplianceProperties> {
+  ...ResourceNameParameter<ContosoApplianceAgent>;
 }
 ```
 

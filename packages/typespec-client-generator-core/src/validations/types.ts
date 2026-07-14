@@ -19,14 +19,17 @@ import { getClientNameOverride } from "../decorators.js";
 import { TCGCContext } from "../interfaces.js";
 import {
   AllScopes,
+  clientKey,
   clientLocationKey,
   clientNameKey,
+  getScopedDecoratorData,
   listScopedDecoratorData,
 } from "../internal-utils.js";
 import { reportDiagnostic } from "../lib.js";
 
 export function validateTypes(context: TCGCContext) {
   validateClientNames(context);
+  validateClientLocationParameterTypes(context);
 }
 
 /**
@@ -57,6 +60,15 @@ function validateClientNames(tcgcContext: TCGCContext) {
         continue;
       }
       if (type.kind === "Operation") {
+        // Skip operations that belong to an explicit `@client` scoped to a different
+        // language than the current scope. Such an operation only exists as a client
+        // operation for its own scope (e.g. an `is`-derived operation in a `@client(..., "java")`
+        // interface), so it must not be relocated by an inherited `@clientLocation` for other
+        // scopes where that client does not apply. Otherwise it would falsely collide with the
+        // original operation moved by `@clientLocation`. See https://github.com/Azure/typespec-azure/issues/4850
+        if (isClientForOtherScopeOnly(tcgcContext, type.interface ?? type.namespace, scope)) {
+          continue;
+        }
         moved.add(type);
         if (typeof target === "string") {
           // Move to new clients
@@ -90,6 +102,105 @@ function validateClientNames(tcgcContext: TCGCContext) {
       validateClientNamesCore(tcgcContext, scope, operations);
     });
   }
+}
+
+/**
+ * Validate that `@clientLocation` does not move parameters with the same name but
+ * different types to the same client.
+ *
+ * When `@clientLocation` is applied to a templated parameter (e.g. on an alias), each
+ * operation can instantiate the template with a different type. Moving all of them to the
+ * same client produces conflicting client parameters that share a name but differ in type,
+ * which results in a broken SDK. We forbid this so the user moves the parameter on each
+ * operation instead, keeping a consistent type on the client.
+ *
+ * @param tcgcContext The context for the TypeSpec Client Generator.
+ */
+function validateClientLocationParameterTypes(tcgcContext: TCGCContext) {
+  const languageScopes = getDefinedLanguageScopes(tcgcContext.program);
+
+  for (const scope of languageScopes) {
+    // For each target client (namespace/interface), track the parameters moved under each name.
+    const movedByTarget = new Map<Namespace | Interface, Map<string, ModelProperty[]>>();
+
+    for (const [type, target] of listScopedDecoratorData(
+      tcgcContext,
+      clientLocationKey,
+      scope,
+    ).entries()) {
+      if (unsafe_Realm.realmForType.has(type)) {
+        // Skip `@clientLocation` on versioning types
+        continue;
+      }
+      // Only parameters (model properties) moved to an existing client (namespace/interface).
+      if (
+        type.kind !== "ModelProperty" ||
+        typeof target === "string" ||
+        (target.kind !== "Namespace" && target.kind !== "Interface")
+      ) {
+        continue;
+      }
+
+      let byName = movedByTarget.get(target);
+      if (!byName) {
+        byName = new Map<string, ModelProperty[]>();
+        movedByTarget.set(target, byName);
+      }
+      let params = byName.get(type.name);
+      if (!params) {
+        params = [];
+        byName.set(type.name, params);
+      }
+      params.push(type);
+    }
+
+    for (const byName of movedByTarget.values()) {
+      for (const [name, params] of byName.entries()) {
+        const distinctTypes = new Set<Type>(params.map((p) => p.type));
+        if (distinctTypes.size <= 1) {
+          continue;
+        }
+        // Same parameter name moved to the client with conflicting types. Report once per
+        // distinct syntax node so a templated parameter that produces several internal copies
+        // does not generate duplicate diagnostics.
+        const reportedNodes = new Set<unknown>();
+        for (const param of params) {
+          if (param.node && reportedNodes.has(param.node)) {
+            continue;
+          }
+          reportedNodes.add(param.node);
+          reportDiagnostic(tcgcContext.program, {
+            code: "client-location-conflict",
+            messageId: "parameterTypeConflict",
+            format: { parameterName: name },
+            target: param,
+          });
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Determine whether a container is an explicit `@client` scoped to language(s) that do NOT
+ * include the current scope. Such a client (and its operations) only exists for its own scope,
+ * so it must be ignored when validating other scopes.
+ *
+ * This mirrors how the client builder resolves `@client` per scope
+ * (see `getScopedDecoratorData(context, clientKey, ...)` in cache.ts), keeping validation
+ * consistent with the clients that are actually generated.
+ */
+function isClientForOtherScopeOnly(
+  tcgcContext: TCGCContext,
+  container: Namespace | Interface | undefined,
+  scope: string | typeof AllScopes,
+): boolean {
+  // Only relevant for containers explicitly marked as a `@client` for some scope.
+  if (container === undefined || !tcgcContext.program.stateMap(clientKey).has(container)) {
+    return false;
+  }
+  // Skip it only when it is not a client for the current scope.
+  return getScopedDecoratorData(tcgcContext, clientKey, container, scope) === undefined;
 }
 
 function getDefinedLanguageScopes(program: Program): Set<string | typeof AllScopes> {

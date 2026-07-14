@@ -46,6 +46,7 @@ The config would be like:
 needTCGC: true
 needAzureCore: true
 withRawContent: true
+hierarchy-client: false
 ```
 
 ## Client Constructor
@@ -73,17 +74,13 @@ export class MachineLearningServicesClient {
     credential: TokenCredential,
     options: MachineLearningServicesClientOptionalParams = {},
   ) {
-    const prefixFromOptions = options?.userAgentOptions?.userAgentPrefix;
-    const userAgentPrefix = prefixFromOptions
-      ? `${prefixFromOptions} azsdk-js-client`
-      : `azsdk-js-client`;
     this._client = createMachineLearningServices(
       endpointParam,
       subscriptionId,
       resourceGroupName,
       workspaceName,
       credential,
-      { ...options, userAgentOptions: { userAgentPrefix } },
+      options,
     );
     this.pipeline = this._client.pipeline;
   }

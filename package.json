@@ -21,9 +21,10 @@
     "format:dir": "prettier --write",
     "format:extra": "pnpm run-all format:extra",
     "format:extra:check": "pnpm run-all format:extra:check",
-    "lint": "eslint . --max-warnings=0",
+    "lint": "oxlint . --deny-warnings && oxlint packages --type-aware --deny-warnings --ignore-pattern \"packages/typespec-ts/**\"",
+    "lint:ci": "oxlint . --format=unix --deny-warnings && oxlint packages --format=unix --type-aware --deny-warnings --ignore-pattern \"packages/typespec-ts/**\"",
     "lint:extra": "pnpm run-all lint:extra",
-    "lint:fix": "eslint . --fix",
+    "lint:fix": "oxlint . --fix",
     "pack:all": "chronus pack --pack-destination ./temp/artifacts",
     "preinstall": "npx only-allow pnpm",
     "prepare-publish": "node ./eng/scripts/prepare-publish.js",
@@ -47,15 +48,12 @@
   "devDependencies": {
     "@chronus/chronus": "catalog:",
     "@chronus/github": "catalog:",
-    "@eslint/js": "catalog:",
     "@pnpm/workspace.find-packages": "catalog:",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
-    "@vitest/eslint-plugin": "catalog:",
     "cspell": "catalog:",
-    "eslint": "catalog:",
-    "eslint-plugin-import": "catalog:",
-    "eslint-plugin-unicorn": "catalog:",
+    "oxlint": "catalog:",
+    "oxlint-tsgolint": "catalog:",
     "playwright": "catalog:",
     "prettier": "catalog:",
     "prettier-plugin-astro": "catalog:",
@@ -65,15 +63,9 @@
     "tsx": "catalog:",
     "turbo": "catalog:",
     "typescript": "catalog:",
-    "typescript-eslint": "catalog:",
     "vitest": "catalog:"
   },
   "dependencies": {
     "picocolors": "catalog:"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "tree-sitter"
-    ]
   }
 }

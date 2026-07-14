@@ -4,8 +4,8 @@ import {
   SdkServiceResponseHeader,
   SdkType,
 } from "@azure-tools/typespec-client-generator-core";
-import { NameType, normalizeName } from "../../rlc-common/index.js";
 import { SdkContext } from "../../utils/interfaces.js";
+import { NameType, normalizeName } from "../../utils/name-utils.js";
 import { getCredentialExpression } from "./get-credential-expression.js";
 import { getEnumExpression } from "./get-enum-expression.js";
 import { getModelExpression } from "./get-model-expression.js";
@@ -22,7 +22,7 @@ export function normalizeModelPropertyName(
   property: SdkModelPropertyType | SdkHttpParameter | SdkServiceResponseHeader,
 ): string {
   const normalizedPropName = normalizeName(property.name, NameType.Property);
-  return context.rlcOptions?.ignorePropertyNameNormalize
+  return context.emitterOptions?.ignorePropertyNameNormalize
     ? `"${property.name}"`
     : `"${normalizedPropName}"`;
 }
@@ -40,7 +40,7 @@ export function getTypeExpression(
     case "enum":
       return getEnumExpression(context, type);
     case "unknown":
-      return context.rlcOptions?.treatUnknownAsRecord ? "Record<string, unknown>" : "any";
+      return context.emitterOptions?.treatUnknownAsRecord ? "Record<string, unknown>" : "any";
     case "boolean":
       return "boolean";
     case "decimal":

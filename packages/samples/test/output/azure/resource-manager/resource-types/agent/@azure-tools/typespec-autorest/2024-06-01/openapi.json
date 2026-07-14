@@ -1952,7 +1952,7 @@
           "description": "Model ID used to generate the response. May be specified on request to override the agent default; read-only in GET."
         },
         "input": {
-          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.InputMessage",
+          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.ConversationItem",
           "description": "Content input to the model. Required on create."
         }
       }
@@ -1995,34 +1995,140 @@
         "name"
       ]
     },
-    "Azure.ResourceManager.BaseTypes.Agents.InputMessage": {
+    "Azure.ResourceManager.BaseTypes.Agents.ConversationItem": {
       "type": "object",
-      "description": "A single input message provided to the model.",
+      "description": "A single item exchanged within a conversation.\n\nThe `type` discriminator selects the item variant. Only the fields relevant to\nthat variant are populated, so all variant-specific fields are optional:\n- `Message`: `role`, `content`\n- `FunctionCall`: `callId`, `name`, `arguments`\n- `FunctionCallOutput`: `callId`, `output`\n- `Compaction`: `summary`",
       "properties": {
-        "role": {
+        "id": {
           "type": "string",
-          "description": "The role of the message author (for example, user, system, or developer)."
+          "description": "Unique identifier of the item. Read-only (assigned by the service).",
+          "readOnly": true
+        },
+        "type": {
+          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.ItemType",
+          "description": "The item type discriminator. Determines which variant this item represents."
+        },
+        "role": {
+          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.MessageRole",
+          "description": "The role of the message author. Applies to `Message` items."
         },
         "content": {
           "type": "string",
-          "description": "The content of the input message."
+          "description": "The text content of the message. Applies to `Message` items."
+        },
+        "callId": {
+          "type": "string",
+          "description": "Identifier correlating a function call with its output. Applies to `FunctionCall` and `FunctionCallOutput` items."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the function (tool) to invoke. Applies to `FunctionCall` items."
+        },
+        "arguments": {
+          "type": "object",
+          "description": "Named arguments passed to the function (tool), keyed by parameter name. Applies to `FunctionCall` items.",
+          "additionalProperties": {}
+        },
+        "output": {
+          "type": "string",
+          "description": "The output produced by the function (tool) call. Applies to `FunctionCallOutput` items."
+        },
+        "summary": {
+          "type": "string",
+          "description": "Summary of the compacted conversation history. Applies to `Compaction` items."
+        },
+        "status": {
+          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.ResponseStatus",
+          "description": "The status of the item. Read-only.",
+          "readOnly": true
         }
       },
       "required": [
-        "role",
-        "content"
+        "type"
       ]
+    },
+    "Azure.ResourceManager.BaseTypes.Agents.ItemType": {
+      "type": "string",
+      "description": "The type of an item exchanged within a conversation or produced in a response.",
+      "enum": [
+        "Message",
+        "FunctionCall",
+        "FunctionCallOutput",
+        "Compaction"
+      ],
+      "x-ms-enum": {
+        "name": "ItemType",
+        "modelAsString": false,
+        "values": [
+          {
+            "name": "Message",
+            "value": "Message",
+            "description": "A message authored by a developer, user, assistant, or tool."
+          },
+          {
+            "name": "FunctionCall",
+            "value": "FunctionCall",
+            "description": "A function (tool) call requested by the model."
+          },
+          {
+            "name": "FunctionCallOutput",
+            "value": "FunctionCallOutput",
+            "description": "The output produced by a function (tool) call."
+          },
+          {
+            "name": "Compaction",
+            "value": "Compaction",
+            "description": "A compaction item summarizing earlier conversation history."
+          }
+        ]
+      }
+    },
+    "Azure.ResourceManager.BaseTypes.Agents.MessageRole": {
+      "type": "string",
+      "description": "The role of the author of a message item.",
+      "enum": [
+        "Developer",
+        "User",
+        "Assistant",
+        "Tool"
+      ],
+      "x-ms-enum": {
+        "name": "MessageRole",
+        "modelAsString": false,
+        "values": [
+          {
+            "name": "Developer",
+            "value": "Developer",
+            "description": "A developer-authored instruction message."
+          },
+          {
+            "name": "User",
+            "value": "User",
+            "description": "A message authored by the end user."
+          },
+          {
+            "name": "Assistant",
+            "value": "Assistant",
+            "description": "A message generated by the assistant (agent)."
+          },
+          {
+            "name": "Tool",
+            "value": "Tool",
+            "description": "A message representing the output of a tool."
+          }
+        ]
+      }
     },
     "Azure.ResourceManager.BaseTypes.Agents.ResponseStatus": {
       "type": "string",
       "description": "The status of a response.",
       "enum": [
-        "completed",
-        "failed",
-        "cancelled",
-        "incomplete",
-        "queued",
-        "in_progress"
+        "Completed",
+        "Failed",
+        "Cancelled",
+        "Incomplete",
+        "Queued",
+        "InProgress"
       ],
       "x-ms-enum": {
         "name": "ResponseStatus",
@@ -2030,32 +2136,32 @@
         "values": [
           {
             "name": "Completed",
-            "value": "completed",
+            "value": "Completed",
             "description": "The response completed successfully."
           },
           {
             "name": "Failed",
-            "value": "failed",
+            "value": "Failed",
             "description": "The response failed."
           },
           {
             "name": "Cancelled",
-            "value": "cancelled",
+            "value": "Cancelled",
             "description": "The response was cancelled."
           },
           {
             "name": "Incomplete",
-            "value": "incomplete",
+            "value": "Incomplete",
             "description": "The response is incomplete."
           },
           {
             "name": "Queued",
-            "value": "queued",
+            "value": "Queued",
             "description": "The response is queued for execution."
           },
           {
             "name": "InProgress",
-            "value": "in_progress",
+            "value": "InProgress",
             "description": "The response is in progress."
           }
         ]
@@ -2237,14 +2343,9 @@
       "type": "object",
       "description": "Properties for a conversation resource holding the items and metadata\nexchanged between a client and an agent.",
       "properties": {
-        "conversationId": {
-          "type": "string",
-          "description": "Unique conversation identifier. Read-only (set by the service on creation).",
-          "readOnly": true
-        },
         "createdAt": {
-          "type": "integer",
-          "format": "int32",
+          "type": "string",
+          "format": "date-time",
           "description": "Timestamp of when the conversation was created. Read-only.",
           "readOnly": true
         },
@@ -2378,14 +2479,9 @@
       "type": "object",
       "description": "Properties for a response generated by an agent for a given input,\nincluding its output, status, and usage.",
       "properties": {
-        "responseId": {
-          "type": "string",
-          "description": "Unique response identifier. Read-only (set by the service).",
-          "readOnly": true
-        },
         "createdAt": {
-          "type": "integer",
-          "format": "int32",
+          "type": "string",
+          "format": "date-time",
           "description": "Timestamp of when the response was created. Read-only.",
           "readOnly": true
         },
@@ -2399,7 +2495,7 @@
           "readOnly": true
         },
         "input": {
-          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.InputMessage",
+          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.ConversationItem",
           "description": "Content input to the model. Required on create."
         },
         "previousResponseId": {
@@ -2528,7 +2624,7 @@
           "description": "Model ID used to generate the response. May be specified on request to override the agent default; read-only in GET."
         },
         "input": {
-          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.InputMessage",
+          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.ConversationItem",
           "description": "Content input to the model. Required on create."
         }
       }
