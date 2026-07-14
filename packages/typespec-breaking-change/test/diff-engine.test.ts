@@ -764,7 +764,10 @@ describe("computeDiffs", () => {
           d.identity.element === "body.properties.tags",
       );
 
-      expect(responseAdded).toHaveLength(2);
+      expect(responseAdded).toHaveLength(1);
+      // Deduplication collapses identical diffs from shared model across operations
+      expect(responseAdded[0].details?.affectedOperations).toBeDefined();
+      expect((responseAdded[0].details?.affectedOperations as any[]).length).toBe(2);
     });
 
     it("detects path parameter added as operation added", async () => {

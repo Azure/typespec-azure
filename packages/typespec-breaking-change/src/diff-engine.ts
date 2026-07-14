@@ -11,6 +11,8 @@ import type {
   VersionedView,
 } from "./types.js";
 
+import { isOperationIdentity } from "./types.js";
+
 /**
  * Result of computing diffs between two versioned views.
  */
@@ -72,7 +74,7 @@ export function computeDiffs(base: VersionedView, head: VersionedView): DiffResu
   }
 
   return {
-    diffs,
+    diffs: deduplicateDiffs(diffs),
     baseCanonicalization,
     headCanonicalization,
   };
@@ -93,4 +95,74 @@ function makeOperationDiff(kind: DiffKind, identity: OperationIdentity, message:
     identity: diffIdentity,
     message,
   };
+}
+
+/**
+ * Deduplicate diffs that share the same origin declaration and DiffKind.
+ *
+ * When a model type is used in multiple operations, the same structural change
+ * produces duplicate diffs. This groups them by {origin.declarationPath, kind}
+ * and collapses each group to a single diff, annotating it with all affected operations.
+ *
+ * Diffs without an origin (operation-specific) pass through unchanged.
+ */
+export function deduplicateDiffs(diffs: ApiDiff[]): ApiDiff[] {
+  const withOrigin: ApiDiff[] = [];
+  const withoutOrigin: ApiDiff[] = [];
+
+  for (const diff of diffs) {
+    if (diff.origin) {
+      withOrigin.push(diff);
+    } else {
+      withoutOrigin.push(diff);
+    }
+  }
+
+  if (withOrigin.length === 0) {
+    return diffs;
+  }
+
+  // Group by {declarationPath, kind}
+  const groups = new Map<string, ApiDiff[]>();
+  for (const diff of withOrigin) {
+    const key = `${diff.origin!.declarationPath}::${diff.kind}`;
+    const group = groups.get(key);
+    if (group) {
+      group.push(diff);
+    } else {
+      groups.set(key, [diff]);
+    }
+  }
+
+  const deduplicated: ApiDiff[] = [];
+  for (const [, group] of groups) {
+    const representative = group[0];
+
+    if (group.length === 1) {
+      deduplicated.push(representative);
+      continue;
+    }
+
+    // Collect all affected operations
+    const affectedOperations: OperationIdentity[] = [];
+    for (const diff of group) {
+      if (isOperationIdentity(diff.identity)) {
+        const op = diff.identity.operation;
+        if (!affectedOperations.some((a) => a.method === op.method && a.path === op.path)) {
+          affectedOperations.push(op);
+        }
+      }
+    }
+
+    deduplicated.push({
+      ...representative,
+      details: {
+        ...representative.details,
+        affectedOperations,
+        deduplicatedCount: group.length,
+      },
+    });
+  }
+
+  return [...deduplicated, ...withoutOrigin];
 }

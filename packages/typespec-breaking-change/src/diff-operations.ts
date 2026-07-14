@@ -13,6 +13,7 @@ import type {
 import type { DiffKind } from "./diff-kind.js";
 import type { DiffContext } from "./diff-types.js";
 import { compareTypes } from "./diff-types.js";
+import { resolveOrigin } from "./origin.js";
 import type { ApiDiff, DiffComponent, OperationDiffIdentity, OperationIdentity } from "./types.js";
 
 /**
@@ -541,6 +542,7 @@ function makeDiff(
   return {
     kind,
     identity,
+    origin: resolveOrigin(headType ?? baseType),
     baseType,
     headType,
     baseSourceLocation: baseType ? getSourceLocation(baseType, { locateId: true }) : undefined,

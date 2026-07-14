@@ -29,6 +29,7 @@ export {
   type OperationIdentityMap,
   type ResolvedOperation,
 } from "./operation-identity.js";
+export { resolveOrigin } from "./origin.js";
 export * from "./orchestrator.js";
 export * from "./policy.js";
 export * from "./reporter-console.js";
