@@ -1,5 +1,6 @@
 import {
   getSourceLocation,
+  isArrayModelType,
   type Enum,
   type Model,
   type ModelProperty,
@@ -74,6 +75,10 @@ export function compareTypes(baseType: Type, headType: Type, ctx: DiffContext): 
 }
 
 function compareModels(base: Model, head: Model, ctx: DiffContext): ApiDiff[] {
+  if (isArrayModelType(base) && isArrayModelType(head)) {
+    return compareTypes(base.indexer.value, head.indexer.value, ctx);
+  }
+
   const diffs: ApiDiff[] = [];
 
   for (const [name, baseProp] of base.properties) {
