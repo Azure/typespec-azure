@@ -1,5 +1,28 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.70.0
+
+### Features
+
+- [#4846](https://github.com/Azure/typespec-azure/pull/4846) Add `service-yaml` emitter option to generate a `service.yaml` manifest at the project root declaring the service's API versions (derived from the `@versioned` enum). The option controls emission: `"auto"` (default) writes the file only when it already exists, `"always"` always writes it, and `"never"` disables it. When an existing `service.yaml` is present it is updated in place, preserving comments and unrelated keys.
+  
+  ```yaml
+  versions:
+    - version: 2023-11-01
+      source: typespec
+      swagger-files:
+        - resource-manager/Contoso/stable/2023-11-01/openapi.json
+  ```
+- [#4660](https://github.com/Azure/typespec-azure/pull/4660) Add `type-name-strategy` emitter option to control how OpenAPI names are derived from TypeSpec types. The new `"name-only"` strategy removes the namespace prefix from names (e.g. `Foo` instead of `LiftrBase.Foo`), matching the names used by client emitters. The default `"namespaced"` keeps the current behavior. When two types collapse to the same name, a `duplicate-type-name` error is reported.
+  
+  ```yaml
+  options:
+    "@azure-tools/typespec-autorest":
+      type-name-strategy: "name-only"
+  ```
+- [#4664](https://github.com/Azure/typespec-azure/pull/4664) Add `@featureFile`, `@featureFiles`, and `@featureFileOptions` decorators in `Azure.ResourceManager` namespace as alternatives to the Legacy `@feature`, `@features`, and `@featureOptions` decorators. Add `arm-feature-file-usage-discourage` linting rule. Fix `arm-custom-resource-usage-discourage` rule to propagate suppressions from model templates to their instantiations.
+
+
 ## 0.69.1
 
 ### Bug Fixes
