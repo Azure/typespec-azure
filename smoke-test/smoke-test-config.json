@@ -1,0 +1,11 @@
+{
+  "specRepo": "Azure/azure-rest-api-specs",
+  "commit": "ea850a065dc8679f82dc3fdbba9ceff53eeba116",
+  "services": [
+    {
+      "name": "compute-resource-manager",
+      "specPath": "specification/compute/resource-manager/Microsoft.Compute/Compute",
+      "scenarios": ["arm", "lro", "paging", "discriminator", "large-models"]
+    }
+  ]
+}
