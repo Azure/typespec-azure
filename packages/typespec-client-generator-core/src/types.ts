@@ -2510,23 +2510,12 @@ function updateSerializationOptions(
   }
 
   if (type.kind === "array" || type.kind === "dict") {
-    // If the array/dict is itself a named model with explicit serialization decorators
-    // (e.g. `@Xml.name("Foo") model Foo is Bar[];`), capture its serialization options so
-    // the wrapping element name is not lost.
-    if (type.__raw) {
-      const needsXml =
-        !type.serializationOptions?.xml &&
-        hasExplicitlyDefinedXmlSerializationInfo(context, type.__raw);
-      const needsJson =
-        !type.serializationOptions?.json &&
-        hasExplicitlyDefinedJsonSerializationInfo(context, type.__raw);
-      if (needsXml) {
-        updateXmlSerializationOptions(context, type);
-      }
-      if (needsJson) {
-        updateJsonSerializationOptions(context, type);
-      }
-    }
+    // An array/dict only needs its own serialization options when it is a named model
+    // with explicit serialization decorators (e.g. `@Xml.name("Foo") model Foo is Bar[];`);
+    // otherwise the wrapping element name comes from the property/model that references it.
+    // Passing an empty content type list ensures only explicitly-defined info is captured,
+    // avoiding spurious names on anonymous inline arrays/dicts.
+    setSerializationOptions(context, type, []);
     updateSerializationOptions(context, type.valueType, contentTypes, options);
     return diagnostics.wrap(undefined);
   }
@@ -2613,33 +2602,33 @@ function updateSerializationOptions(
 
 function setSerializationOptions(
   context: TCGCContext,
-  type: SdkModelType | SdkModelPropertyType,
+  type: SdkModelType | SdkModelPropertyType | SdkArrayType | SdkDictionaryType,
   contentTypes: string[],
 ) {
   for (const contentType of contentTypes) {
-    if (isMediaTypeJson(contentType) && !type.serializationOptions.json) {
+    if (isMediaTypeJson(contentType) && !type.serializationOptions?.json) {
       updateJsonSerializationOptions(context, type);
     }
 
-    if (isMediaTypeXml(contentType) && !type.serializationOptions.xml) {
+    if (isMediaTypeXml(contentType) && !type.serializationOptions?.xml) {
       updateXmlSerializationOptions(context, type);
     }
   }
   if (
-    !type.serializationOptions.json &&
+    !type.serializationOptions?.json &&
     type.__raw &&
     hasExplicitlyDefinedJsonSerializationInfo(context, type.__raw)
   ) {
     updateJsonSerializationOptions(context, type);
   }
   if (
-    !type.serializationOptions.xml &&
+    !type.serializationOptions?.xml &&
     type.__raw &&
     hasExplicitlyDefinedXmlSerializationInfo(context, type.__raw)
   ) {
     updateXmlSerializationOptions(context, type);
   }
-  const defaultContentTypes = type.serializationOptions.multipart?.defaultContentTypes;
+  const defaultContentTypes = type.serializationOptions?.multipart?.defaultContentTypes;
   if (defaultContentTypes && type.kind === "property" && type.type.kind === "model") {
     for (const prop of type.type.properties) {
       if (prop.kind === "property") {
