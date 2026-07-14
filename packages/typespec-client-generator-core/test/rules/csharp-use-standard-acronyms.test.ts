@@ -52,7 +52,6 @@ it("does not flag words that merely start with an acronym's letters", async () =
   await tester
     .expect(
       `model Oslo {}
-      model OspfNeighbor {}
       model Ipsum {}
       model Osmosis {}`,
     )

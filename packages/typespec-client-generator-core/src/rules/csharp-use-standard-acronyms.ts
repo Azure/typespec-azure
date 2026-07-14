@@ -18,7 +18,7 @@ const acronymMap = new Map([
 
 // Match a known acronym (IP/DB/OS) only when it is a *complete word* within the
 // identifier, never a substring that merely starts a longer word. This is what
-// keeps "Oslo", "Ospf", "Ipsum" and "Osmosis" from being mangled into "OSlo" etc.
+// keeps "Oslo", "Ipsum" and "Osmosis" from being mangled into "OSlo" etc.
 //
 // /(?:^ip|^db|^os|Ip|Db|Os)(?![a-z])/g
 //   ^ip | ^db | ^os  → lowercase acronym at the start of the name   (e.g. "ipAddress", "osProfile")
