@@ -1,94 +1,32 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import {
-  CONFIG,
-  computeAffected,
-  filterIgnored,
-  globToRegExp,
-  mapFilesToPackages,
-  matchesAny,
-} from "./detect-affected.ts";
+import { CONFIG, computeAffected, matchesAny } from "./detect-affected.ts";
 
 const NONE = new Set<string>();
 
-// --- globToRegExp / matchesAny --------------------------------------------
+// --- matchesAny (exact path or `dir/**` prefix) ----------------------------
 
-test("globToRegExp: ** matches across path segments", () => {
-  assert.equal(globToRegExp("**/test/**").test("packages/tcgc/test/a/b.test.ts"), true);
-  assert.equal(globToRegExp("**/test/**").test("test/a.ts"), true);
-  assert.equal(globToRegExp("**/test/**").test("packages/tcgc/src/a.ts"), false);
-});
-
-test("globToRegExp: **/*.md matches markdown at any depth", () => {
-  assert.equal(globToRegExp("**/*.md").test("README.md"), true);
-  assert.equal(globToRegExp("**/*.md").test("packages/x/CHANGELOG.md"), true);
-  assert.equal(globToRegExp("**/*.md").test("packages/x/src/a.ts"), false);
-});
-
-test("globToRegExp: prefix/** matches only under that exact directory", () => {
+test("matchesAny: `dir/**` matches the dir and anything under it", () => {
   const g = ".github/actions/setup/**";
-  assert.equal(globToRegExp(g).test(".github/actions/setup/action.yml"), true);
+  assert.equal(matchesAny(".github/actions/setup", [g]), true);
+  assert.equal(matchesAny(".github/actions/setup/action.yml", [g]), true);
+  assert.equal(matchesAny(".github/actions/setup/nested/x.ts", [g]), true);
   // Must NOT leak into a sibling dir that shares the prefix.
-  assert.equal(globToRegExp(g).test(".github/actions/setup-python/action.yml"), false);
+  assert.equal(matchesAny(".github/actions/setup-python/action.yml", [g]), false);
 });
 
-test("globToRegExp: exact path (no wildcards) matches exactly", () => {
+test("matchesAny: exact path matches only that path", () => {
   const g = ".github/workflows/ci-python.yml";
-  assert.equal(globToRegExp(g).test(".github/workflows/ci-python.yml"), true);
-  assert.equal(globToRegExp(g).test(".github/workflows/ci-java.yml"), false);
+  assert.equal(matchesAny(".github/workflows/ci-python.yml", [g]), true);
+  assert.equal(matchesAny(".github/workflows/ci-java.yml", [g]), false);
+  // An exact pattern is not a prefix: a deeper path must not match.
+  assert.equal(matchesAny(".github/workflows/ci-python.yml/extra", [g]), false);
 });
 
-test("matchesAny: true if any glob matches", () => {
-  assert.equal(matchesAny("a/b.md", ["**/test/**", "**/*.md"]), true);
-  assert.equal(matchesAny("a/b.ts", ["**/test/**", "**/*.md"]), false);
-});
-
-// --- filterIgnored ---------------------------------------------------------
-
-test("filterIgnored: drops test and markdown files", () => {
-  const files = [
-    "packages/tcgc/src/index.ts",
-    "packages/tcgc/test/foo.test.ts",
-    "packages/tcgc/README.md",
-  ];
-  assert.deepEqual(filterIgnored(files, CONFIG.ignore), ["packages/tcgc/src/index.ts"]);
-});
-
-test("filterIgnored: a test-only change leaves no meaningful files", () => {
-  const files = ["packages/tcgc/test/a.test.ts", "packages/tcgc/test/b.test.ts"];
-  assert.deepEqual(filterIgnored(files, CONFIG.ignore), []);
-});
-
-test("filterIgnored: drops a plural tests/ directory too", () => {
-  const files = [
-    "packages/typespec-python/tests/foo.py",
-    "packages/typespec-python/generator/pygen/x.py",
-  ];
-  assert.deepEqual(filterIgnored(files, CONFIG.ignore), [
-    "packages/typespec-python/generator/pygen/x.py",
-  ]);
-});
-
-// --- mapFilesToPackages ----------------------------------------------------
-
-const pkgs = [
-  { name: "@root", dir: "" },
-  { name: "@tcgc", dir: "packages/typespec-client-generator-core" },
-  { name: "@python", dir: "packages/typespec-python" },
-];
-
-test("mapFilesToPackages: maps a file to its containing package (longest dir)", () => {
-  const r = mapFilesToPackages(["packages/typespec-client-generator-core/src/index.ts"], pkgs);
-  assert.deepEqual([...r], ["@tcgc"]);
-});
-
-test("mapFilesToPackages: ignores the repo-root package", () => {
-  assert.deepEqual([...mapFilesToPackages([".github/workflows/ci-python.yml"], pkgs)], []);
-  assert.deepEqual([...mapFilesToPackages(["eng/scripts/detect-affected.ts"], pkgs)], []);
-});
-
-test("mapFilesToPackages: submodule pointer maps to nothing", () => {
-  assert.deepEqual([...mapFilesToPackages(["core"], pkgs)], []);
+test("matchesAny: true if any pattern matches", () => {
+  const pats = [".github/workflows/ci-python.yml", ".github/actions/setup-python/**"];
+  assert.equal(matchesAny(".github/actions/setup-python/action.yml", pats), true);
+  assert.equal(matchesAny(".github/workflows/ci-java.yml", pats), false);
 });
 
 // --- computeAffected -------------------------------------------------------
@@ -143,7 +81,7 @@ test("shared setup action change triggers all targets", () => {
   });
 });
 
-test("core submodule bump triggers all coreSubmodule targets", () => {
+test("core submodule bump triggers all targets", () => {
   assert.deepEqual(computeAffected(NONE, ["core"], CONFIG), {
     python: true,
     java: true,
