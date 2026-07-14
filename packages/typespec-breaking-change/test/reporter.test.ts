@@ -244,4 +244,39 @@ describe("reporters", () => {
       </details>"
     `);
   });
+
+  it("formats GitHub report with no errors (only suppressed)", () => {
+    const result = createResult();
+    // Keep only the suppressed finding
+    result.findings = result.findings.filter((f) => f.suppressed);
+    const output = formatGithubReport(result);
+    expect(output).toContain("**0 breaking changes detected**");
+    expect(output).toContain("### Suppressed");
+    expect(output).not.toContain("### Errors");
+  });
+
+  it("formats GitHub report with no suppressed findings", () => {
+    const result = createResult();
+    // Keep only unsuppressed error findings
+    result.findings = result.findings.filter((f) => !f.suppressed && f.severity === "error");
+    const output = formatGithubReport(result);
+    expect(output).toContain("### Errors");
+    expect(output).not.toContain("### Suppressed");
+  });
+
+  it("formats GitHub report with service-level identity (no operation)", () => {
+    const result = createResult();
+    // Replace identity with a service-level one (no operation field)
+    result.findings = [
+      {
+        ...result.findings[0],
+        diff: {
+          ...result.findings[0].diff,
+          identity: { element: "service.operations" },
+        },
+      },
+    ];
+    const output = formatGithubReport(result);
+    expect(output).toContain("—"); // dash for non-operation identity
+  });
 });

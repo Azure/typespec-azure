@@ -151,5 +151,8 @@ function isOptionalProperty(diff: ApiDiff): boolean {
   if (type && type.kind === "ModelProperty") {
     return (type as ModelProperty).optional;
   }
+  // Defensive: in practice this is unreachable — isOptionalProperty is only called
+  // for *Added diff kinds, so headType should always be a ModelProperty.
+  // Consider replacing with an assertion if this assumption is validated.
   return false;
 }

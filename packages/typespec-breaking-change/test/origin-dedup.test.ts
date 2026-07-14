@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { computeDiffs } from "../src/diff-engine.js";
+import { resolveOrigin } from "../src/origin.js";
 import { applySuppressions } from "../src/suppression.js";
 import { classifyDiffs } from "../src/policy.js";
 import type { VersionedView } from "../src/types.js";
@@ -63,10 +64,140 @@ const preamble = `
 `;
 
 // ────────────────────────────────────────────────────────────────────────────
+// Origin Resolution — Direct Coverage
+// ────────────────────────────────────────────────────────────────────────────
+
+describe("origin resolution (direct coverage)", () => {
+  it("returns undefined when no type is provided", () => {
+    expect(resolveOrigin()).toBeUndefined();
+  });
+
+  it("resolves enum and union-variant origins in nested namespaces", async () => {
+    const { program } = await Tester.compile(`
+      @versioned(Versions)
+      @service
+      namespace Outer.Inner;
+      enum Versions { v1: "${VERSION}" }
+
+      enum Color { Red }
+      union Direction { North: "north", South: "south" }
+    `);
+
+    const outer = program.getGlobalNamespaceType().namespaces.get("Outer");
+    const inner = outer?.namespaces.get("Inner");
+
+    expect(inner).toBeDefined();
+    expect(resolveOrigin(inner!.enums.get("Color")!)?.declarationPath).toBe("Outer.Inner.Color");
+    expect(resolveOrigin(inner!.unions.get("Direction")!.variants.get("North")!)?.declarationPath).toBe(
+      "Outer.Inner.Direction",
+    );
+  });
+
+  it("returns undefined for unnamed scalar, enum-member, and union-variant declarations", () => {
+    expect(resolveOrigin({ kind: "Scalar", name: "" } as any)).toBeUndefined();
+    expect(resolveOrigin({ kind: "EnumMember", enum: { name: "", namespace: undefined } } as any)).toBeUndefined();
+    expect(resolveOrigin({ kind: "UnionVariant", union: { name: "", namespace: undefined } } as any)).toBeUndefined();
+  });
+
+  it("climbs anonymous property types when a parent property is discoverable", async () => {
+    const { program } = await Tester.compile(`
+      @versioned(Versions)
+      @service
+      namespace Outer.Inner;
+      enum Versions { v1: "${VERSION}" }
+
+      model Widget { config: string; }
+    `);
+
+    const outer = program.getGlobalNamespaceType().namespaces.get("Outer");
+    const inner = outer?.namespaces.get("Inner");
+    const widget = inner?.models.get("Widget");
+    const config = widget?.properties.get("config");
+
+    expect(config).toBeDefined();
+
+    const anonymousModel = {
+      kind: "Model",
+      name: "(anonymous model)",
+      namespace: inner,
+      node: {
+        parent: {
+          parent: {
+            symbol: { type: config },
+          },
+        },
+      },
+    } as any;
+
+    const extra = {
+      kind: "ModelProperty",
+      name: "extra",
+      model: anonymousModel,
+    } as any;
+
+    expect(resolveOrigin(extra)?.declarationPath).toBe("Outer.Inner.Widget.config");
+  });
+});
+
+// ────────────────────────────────────────────────────────────────────────────
 // Origin Resolution — Two-Spec Comparison
 // ────────────────────────────────────────────────────────────────────────────
 
 describe("origin resolution (two-spec comparison)", () => {
+  it("named model type change resolves origin to the model", async () => {
+    const { baseView, headView } = await compileTwoSpecs(
+      `
+        ${preamble}
+        model Envelope { value: string; }
+        @route("/widgets/{id}") @get op getWidget(@path id: string): Envelope;
+      `,
+      `
+        ${preamble}
+        model Widget { name: string; }
+        model Envelope { value: Widget; }
+        @route("/widgets/{id}") @get op getWidget(@path id: string): Envelope;
+      `,
+      VERSION,
+    );
+
+    const { diffs } = computeDiffs(baseView, headView);
+    const typeChange = diffs.find(
+      (d) =>
+        d.kind === "ResponsePropertyTypeChanged" &&
+        d.identity.element === "body.properties.value",
+    );
+
+    expect(typeChange).toBeDefined();
+    expect(typeChange!.origin).toBeDefined();
+    expect(typeChange!.origin!.declarationPath).toBe("TestService.Widget");
+  });
+
+  it("anonymous inline model type change has no origin", async () => {
+    const { baseView, headView } = await compileTwoSpecs(
+      `
+        ${preamble}
+        model Envelope { value: string; }
+        @route("/widgets/{id}") @get op getWidget(@path id: string): Envelope;
+      `,
+      `
+        ${preamble}
+        model Envelope { value: { name: string; }; }
+        @route("/widgets/{id}") @get op getWidget(@path id: string): Envelope;
+      `,
+      VERSION,
+    );
+
+    const { diffs } = computeDiffs(baseView, headView);
+    const typeChange = diffs.find(
+      (d) =>
+        d.kind === "ResponsePropertyTypeChanged" &&
+        d.identity.element === "body.properties.value",
+    );
+
+    expect(typeChange).toBeDefined();
+    expect(typeChange!.origin).toBeUndefined();
+  });
+
   it("resolves origin for named model property removal", async () => {
     const { baseView, headView } = await compileTwoSpecs(
       `
@@ -165,6 +296,116 @@ describe("origin resolution (two-spec comparison)", () => {
     expect(enumRemoval).toBeDefined();
     expect(enumRemoval!.origin).toBeDefined();
     expect(enumRemoval!.origin!.declarationPath).toContain("Status");
+  });
+
+  it("anonymous inline property removal has no resolved origin", async () => {
+    const { baseView, headView } = await compileTwoSpecs(
+      `
+        ${preamble}
+        model Widget {
+          config: {
+            extra?: string;
+          };
+        }
+        @route("/widgets/{id}") @get op getWidget(@path id: string): Widget;
+      `,
+      `
+        ${preamble}
+        model Widget {
+          config: {};
+        }
+        @route("/widgets/{id}") @get op getWidget(@path id: string): Widget;
+      `,
+      VERSION,
+    );
+
+    const { diffs } = computeDiffs(baseView, headView);
+    const removal = diffs.find(
+      (d) =>
+        d.kind === "ResponsePropertyRemoved" &&
+        d.identity.element === "body.properties.config.properties.extra",
+    );
+
+    expect(removal).toBeDefined();
+    expect(removal!.origin).toBeUndefined();
+  });
+
+  it("named union type change resolves origin to the union", async () => {
+    const { baseView, headView } = await compileTwoSpecs(
+      `
+        ${preamble}
+        @route("/widgets/{id}") @get op getWidget(@path id: string): string;
+      `,
+      `
+        ${preamble}
+        union Direction { North: "north", South: "south", East: "east" }
+        @route("/widgets/{id}") @get op getWidget(@path id: string): Direction;
+      `,
+      VERSION,
+    );
+
+    const { diffs } = computeDiffs(baseView, headView);
+    const typeChange = diffs.find((d) => d.kind === "ResponseTypeKindChanged");
+
+    expect(typeChange).toBeDefined();
+    expect(typeChange!.origin).toBeDefined();
+    expect(typeChange!.origin!.declarationPath).toContain("Direction");
+  });
+
+  it("named scalar type change resolves origin to the scalar", async () => {
+    const { baseView, headView } = await compileTwoSpecs(
+      `
+        ${preamble}
+        scalar WidgetId extends string;
+        model Widget { id: string; }
+        @route("/widgets/{id}") @get op getWidget(@path id: string): Widget;
+      `,
+      `
+        ${preamble}
+        scalar WidgetId extends string;
+        model Widget { id: WidgetId; }
+        @route("/widgets/{id}") @get op getWidget(@path id: string): Widget;
+      `,
+      VERSION,
+    );
+
+    const { diffs } = computeDiffs(baseView, headView);
+    const scalarChange = diffs.find(
+      (d) =>
+        d.kind === "ResponsePropertyTypeChanged" && d.identity.element === "body.properties.id",
+    );
+
+    expect(scalarChange).toBeDefined();
+    expect(scalarChange!.origin).toBeDefined();
+    expect(scalarChange!.origin!.declarationPath).toContain("WidgetId");
+  });
+
+  it("literal union variant removal falls back to no origin", async () => {
+    const { baseView, headView } = await compileTwoSpecs(
+      `
+        ${preamble}
+        union Direction { "north", "south", "east" }
+        model Widget { dir: Direction; }
+        @route("/widgets/{id}") @get op getWidget(@path id: string): Widget;
+      `,
+      `
+        ${preamble}
+        union Direction { "north", "south" }
+        model Widget { dir: Direction; }
+        @route("/widgets/{id}") @get op getWidget(@path id: string): Widget;
+      `,
+      VERSION,
+    );
+
+    const { diffs } = computeDiffs(baseView, headView);
+    const variantRemoval = diffs.find(
+      (d) =>
+        d.kind === "ResponsePropertyTypeNarrowed" &&
+        d.identity.element === 'body.properties.dir.variants."east"',
+    );
+
+    expect(variantRemoval).toBeDefined();
+    expect(variantRemoval!.origin).toBeUndefined();
   });
 
   it("operation added has no origin", async () => {

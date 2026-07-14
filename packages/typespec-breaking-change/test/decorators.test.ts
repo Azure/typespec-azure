@@ -227,6 +227,56 @@ describe("suppression decorators", () => {
       ]),
     );
   });
+
+  it("reports a warning for invalid unversioned suppression kind", async () => {
+    const { program } = await Tester.compile(`
+      namespace Test;
+      model Widget {}
+    `);
+
+    const widget = getModel(program, "Widget");
+
+    $approvedUnversionedChange(
+      { program } as DecoratorContext,
+      widget,
+      "Approved.",
+      "NotAValidKind",
+    );
+
+    expect(getUnversionedSuppressions(program, widget)).toEqual([]);
+    expect(program.diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "@azure-tools/typespec-breaking-change/invalid-suppression-kind",
+        }),
+      ]),
+    );
+  });
+
+  it("finds suppressions through operation to namespace (no interface)", async () => {
+    const { program } = await Tester.compile(`
+      namespace Test {
+        op standalone(): string;
+      }
+    `);
+
+    const namespace = getNamespace(program);
+    const operation = getOperation(namespace, "standalone");
+
+    $approvedBreakingChange(
+      { program } as DecoratorContext,
+      namespace,
+      "Namespace approval.",
+    );
+
+    const suppressions = findSuppressions(program, operation);
+    expect(suppressions).toEqual([
+      {
+        suppression: { kind: undefined, reason: "Namespace approval." },
+        target: namespace,
+      },
+    ]);
+  });
 });
 
 function getNamespace(program: Program): Namespace {
