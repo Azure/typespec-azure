@@ -4,6 +4,10 @@ import type { Finding } from "./types.js";
 
 /**
  * Apply suppression metadata to classified findings.
+ *
+ * A suppression matches if:
+ * 1. Its `kind` is undefined (wildcard) OR matches the finding's diff kind
+ * 2. Its `version` is undefined (no scope) OR the finding's head version is >= the since version
  */
 export function applySuppressions(findings: Finding[], program: Program): Finding[] {
   return findings.map((finding) => {
@@ -23,8 +27,10 @@ export function applySuppressions(findings: Finding[], program: Program): Findin
 
     const match = suppressions.find(
       (suppression) =>
-        suppression.suppression.kind === undefined ||
-        suppression.suppression.kind === finding.diff.kind,
+        (suppression.suppression.kind === undefined ||
+          suppression.suppression.kind === finding.diff.kind) &&
+        (suppression.suppression.version === undefined ||
+          finding.versionPair.headVersion >= suppression.suppression.version),
     );
 
     if (!match) {
