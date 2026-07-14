@@ -3,6 +3,7 @@ import {
   Model,
   Program,
   createRule,
+  getDoc,
   getNamespaceFullName,
   getSourceLocation,
   paramMessage,
@@ -72,6 +73,10 @@ function extractModelSource(model: Model): string {
   return location.file.text.slice(model.node.pos, model.node.end).trim();
 }
 
+function getModelDocumentation(program: Program, model: Model): string {
+  return getDoc(program, model)?.trim() ?? "";
+}
+
 function parseSuggestions(response: string): string[] {
   return [
     ...new Set(
@@ -89,13 +94,22 @@ function parseSuggestions(response: string): string[] {
   ].slice(0, 5);
 }
 
-async function fetchAiNameSuggestions(model: Model, csharpName: string): Promise<string[]> {
+async function fetchAiNameSuggestions(
+  program: Program,
+  model: Model,
+  csharpName: string,
+): Promise<string[]> {
   const connection = getLspConnection();
-  if (connection === undefined) return [];
+  if (connection === undefined) {
+    return [];
+  }
 
   const namespaceName = model.namespace ? getNamespaceFullName(model.namespace) : "";
+  const modelDocumentation = getModelDocumentation(program, model);
+  const documentationSection =
+    modelDocumentation === "" ? "" : `\nModel documentation:\n${modelDocumentation}\n`;
   const prompt = `You are a .NET naming expert. A TypeSpec model named "${csharpName}" in namespace "${namespaceName}" is a single word that may collide with .NET types.
-
+${documentationSection}
 Model definition:
 ${extractModelSource(model)}
 
@@ -137,7 +151,7 @@ function createAiClientNameCodeFix(model: Model, program: Program, csharpName: s
     label: "Suggest multi-word C# names",
     fix: () => [],
     resolveCodefixes: async () => {
-      const suggestions = await fetchAiNameSuggestions(model, csharpName);
+      const suggestions = await fetchAiNameSuggestions(program, model, csharpName);
       const names =
         suggestions.length > 0
           ? suggestions
