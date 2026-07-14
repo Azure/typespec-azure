@@ -29,16 +29,12 @@ jobs:
 
       - uses: ./.github/actions/setup
 
-      - name: Install detection dependencies
-        run: npm install
-        working-directory: eng/scripts
-
       - name: Detect affected targets
         id: detect
         env:
           BASE_SHA: ${{ github.event_name == 'merge_group' && github.event.merge_group.base_sha || github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.sha }}
-        run: node eng/scripts/detect-affected.js
+        run: node eng/scripts/detect-affected.ts
 
   python:
     name: "Python"
