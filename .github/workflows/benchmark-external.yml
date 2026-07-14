@@ -4,10 +4,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
-      - release/*
   workflow_dispatch:
     inputs:
       runner:
@@ -29,8 +25,6 @@ jobs:
     with:
       specs-dir: packages/benchmark/external-spec
       results-dir: external-results
-      title: "⚡ External Spec Benchmark Results"
-      comment-file: benchmark-comment.external.md
       iterations: 3
       warmup: 1
       noise-cv: 0.1
