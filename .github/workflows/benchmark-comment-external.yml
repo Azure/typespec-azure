@@ -1,0 +1,26 @@
+name: Benchmark Comment External
+
+on:
+  workflow_run:
+    workflows: ["Benchmark External"]
+    types:
+      - completed
+
+permissions:
+  actions: read
+  pull-requests: write
+
+jobs:
+  comment:
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
+    uses: ./.github/workflows/benchmark-comment-run.yml
+    with:
+      run-id: ${{ github.event.workflow_run.id }}
+      header: benchmark-results-external
+      comment-file: benchmark-comment.external.md
+    permissions:
+      actions: read
+      pull-requests: write
+    secrets: inherit
