@@ -21,7 +21,6 @@ minimumReleaseAge: 2880 # 2 days
 minimumReleaseAgeExclude:
   - "@alloy-js/*"
   - "@typespec/http-client-python"
-  - "@typespec/http-client-python"
 
 catalog:
   "@alloy-js/cli": ^0.24.0
