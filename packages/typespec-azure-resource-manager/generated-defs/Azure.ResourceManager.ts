@@ -1,6 +1,7 @@
 import type {
   DecoratorContext,
   DecoratorValidatorCallbacks,
+  Enum,
   EnumMember,
   EnumValue,
   Interface,
@@ -15,6 +16,14 @@ export interface ResourceOperationOptions {
   readonly resourceType?: Record<string, unknown>;
   readonly allowStaticRoutes?: boolean;
   readonly omitTags?: boolean;
+}
+
+export interface ArmFeatureFileOptions {
+  readonly featureName: string;
+  readonly fileName: string;
+  readonly description: string;
+  readonly title?: string;
+  readonly termsOfService?: string;
 }
 
 /**
@@ -358,6 +367,42 @@ export type ResourceBaseTypeDecorator = (
   baseType: Type,
 ) => DecoratorValidatorCallbacks | void;
 
+/**
+ * Decorator to define a set of feature files for splitting output
+ *
+ * @param target The service namespace
+ * @param features The enum that contains the features
+ */
+export type FeatureFilesDecorator = (
+  context: DecoratorContext,
+  target: Namespace,
+  features: Enum,
+) => DecoratorValidatorCallbacks | void;
+
+/**
+ * Decorator to define options for a specific feature file
+ *
+ * @param target The enum member that represents the feature
+ * @param options The options for the feature file
+ */
+export type FeatureFileOptionsDecorator = (
+  context: DecoratorContext,
+  target: EnumMember,
+  options: ArmFeatureFileOptions,
+) => DecoratorValidatorCallbacks | void;
+
+/**
+ * Decorator to associate a feature file with a model, interface, or namespace
+ *
+ * @param target The target to associate the feature file with
+ * @param featureName The feature to associate with the target
+ */
+export type FeatureFileDecorator = (
+  context: DecoratorContext,
+  target: Model | Operation | Interface | Namespace,
+  featureName: EnumMember,
+) => DecoratorValidatorCallbacks | void;
+
 export type AzureResourceManagerDecorators = {
   armResourceCollectionAction: ArmResourceCollectionActionDecorator;
   armProviderNameValue: ArmProviderNameValueDecorator;
@@ -382,4 +427,7 @@ export type AzureResourceManagerDecorators = {
   armCommonTypesVersion: ArmCommonTypesVersionDecorator;
   armVirtualResource: ArmVirtualResourceDecorator;
   resourceBaseType: ResourceBaseTypeDecorator;
+  featureFiles: FeatureFilesDecorator;
+  featureFileOptions: FeatureFileOptionsDecorator;
+  featureFile: FeatureFileDecorator;
 };

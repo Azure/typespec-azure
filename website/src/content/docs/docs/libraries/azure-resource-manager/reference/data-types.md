@@ -260,6 +260,24 @@ op delete(...ResourceInstanceParameters<Employee>):
 | ---------- | ----- | ---------------- |
 | statusCode | `200` | The status code. |
 
+### `ArmFeatureFileOptions` {#Azure.ResourceManager.ArmFeatureFileOptions}
+
+Options for defining a feature file and its associated output
+
+```typespec
+model Azure.ResourceManager.ArmFeatureFileOptions
+```
+
+#### Properties
+
+| Name            | Type     | Description                               |
+| --------------- | -------- | ----------------------------------------- |
+| featureName     | `string` | The feature name                          |
+| fileName        | `string` | The associated file name for the features |
+| description     | `string` | The feature description in Swagger        |
+| title?          | `string` | The feature title in Swagger              |
+| termsOfService? | `string` | The feature terms of service in Swagger   |
+
 ### `ArmFilterParameter` {#Azure.ResourceManager.ArmFilterParameter}
 
 Standard list parameter $filter, allows the user to filter the results of a list operation.
@@ -270,9 +288,9 @@ model Azure.ResourceManager.ArmFilterParameter
 
 #### Properties
 
-| Name   | Type     | Description                                                 |
-| ------ | -------- | ----------------------------------------------------------- |
-| filter | `string` | The OData filter expression to apply to the list operation. |
+| Name    | Type     | Description                                                 |
+| ------- | -------- | ----------------------------------------------------------- |
+| filter? | `string` | The OData filter expression to apply to the list operation. |
 
 ### `ArmLocationResource` {#Azure.ResourceManager.ArmLocationResource}
 
@@ -570,9 +588,9 @@ model Azure.ResourceManager.ArmSkipParameter
 
 #### Properties
 
-| Name | Type    | Description                                                            |
-| ---- | ------- | ---------------------------------------------------------------------- |
-| skip | `int64` | The number of items to skip before starting to collect the result set. |
+| Name  | Type    | Description                                                            |
+| ----- | ------- | ---------------------------------------------------------------------- |
+| skip? | `int64` | The number of items to skip before starting to collect the result set. |
 
 ### `ArmTopParameter` {#Azure.ResourceManager.ArmTopParameter}
 
@@ -586,7 +604,7 @@ model Azure.ResourceManager.ArmTopParameter
 
 | Name | Type    | Description                          |
 | ---- | ------- | ------------------------------------ |
-| top  | `int64` | The total number of items to return. |
+| top? | `int64` | The total number of items to return. |
 
 ### `AvailabilityZonesProperty` {#Azure.ResourceManager.AvailabilityZonesProperty}
 
@@ -1745,19 +1763,36 @@ model Azure.ResourceManager.BaseTypes.Agents.AgentToolTypePlatform
 | type | `string` | Tool type discriminator. Must be one of the publicly documented Azure AI Foundry tool types. |
 | name | `string` | Tool name/identifier.                                                                        |
 
-### `ConversationOutput` {#Azure.ResourceManager.BaseTypes.Agents.ConversationOutput}
+### `ConversationItem` {#Azure.ResourceManager.BaseTypes.Agents.ConversationItem}
 
-Output from a conversation.
+A single item exchanged within a conversation.
+
+The `type` discriminator selects the item variant. Only the fields relevant to
+that variant are populated, so all variant-specific fields are optional:
+
+- `Message`: `role`, `content`
+- `FunctionCall`: `callId`, `name`, `arguments`
+- `FunctionCallOutput`: `callId`, `output`
+- `Compaction`: `summary`
 
 ```typespec
-model Azure.ResourceManager.BaseTypes.Agents.ConversationOutput
+model Azure.ResourceManager.BaseTypes.Agents.ConversationItem
 ```
 
 #### Properties
 
-| Name | Type     | Description            |
-| ---- | -------- | ---------------------- |
-| id   | `string` | The output identifier. |
+| Name       | Type                                                                                      | Description                                                                                                       |
+| ---------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| id?        | `string`                                                                                  | Unique identifier of the item. Read-only (assigned by the service).                                               |
+| type       | [`ItemType`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ItemType)             | The item type discriminator. Determines which variant this item represents.                                       |
+| role?      | [`MessageRole`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.MessageRole)       | The role of the message author. Applies to `Message` items.                                                       |
+| content?   | `string`                                                                                  | The text content of the message. Applies to `Message` items.                                                      |
+| callId?    | `string`                                                                                  | Identifier correlating a function call with its output. Applies to `FunctionCall` and `FunctionCallOutput` items. |
+| name?      | `string`                                                                                  | The name of the function (tool) to invoke. Applies to `FunctionCall` items.                                       |
+| arguments? | `Record<unknown>`                                                                         | Named arguments passed to the function (tool), keyed by parameter name. Applies to `FunctionCall` items.          |
+| output?    | `string`                                                                                  | The output produced by the function (tool) call. Applies to `FunctionCallOutput` items.                           |
+| summary?   | `string`                                                                                  | Summary of the compacted conversation history. Applies to `Compaction` items.                                     |
+| status?    | [`ResponseStatus`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ResponseStatus) | The status of the item. Read-only.                                                                                |
 
 ### `ConversationProperties` {#Azure.ResourceManager.BaseTypes.Agents.ConversationProperties}
 
@@ -1770,39 +1805,9 @@ model Azure.ResourceManager.BaseTypes.Agents.ConversationProperties
 
 #### Properties
 
-| Name            | Type              | Description                                                                 |
-| --------------- | ----------------- | --------------------------------------------------------------------------- |
-| conversationId? | `string`          | Unique conversation identifier. Read-only (set by the service on creation). |
-| createdAt?      | `unixTimestamp32` | Timestamp of when the conversation was created. Read-only.                  |
-
-### `InputMessage` {#Azure.ResourceManager.BaseTypes.Agents.InputMessage}
-
-A single input message provided to the model.
-
-```typespec
-model Azure.ResourceManager.BaseTypes.Agents.InputMessage
-```
-
-#### Properties
-
-| Name    | Type     | Description                                                               |
-| ------- | -------- | ------------------------------------------------------------------------- |
-| role    | `string` | The role of the message author (for example, user, system, or developer). |
-| content | `string` | The content of the input message.                                         |
-
-### `InputTypeProperty` {#Azure.ResourceManager.BaseTypes.Agents.InputTypeProperty}
-
-Mix-in for input type discriminator.
-
-```typespec
-model Azure.ResourceManager.BaseTypes.Agents.InputTypeProperty
-```
-
-#### Properties
-
-| Name  | Type     | Description                   |
-| ----- | -------- | ----------------------------- |
-| type? | `string` | The input type discriminator. |
+| Name       | Type          | Description                                                |
+| ---------- | ------------- | ---------------------------------------------------------- |
+| createdAt? | `utcDateTime` | Timestamp of when the conversation was created. Read-only. |
 
 ### `PreviousResponseProperty` {#Azure.ResourceManager.BaseTypes.Agents.PreviousResponseProperty}
 
@@ -1832,23 +1837,36 @@ model Azure.ResourceManager.BaseTypes.Agents.ResponseInstructionsProperty
 | ------------- | -------- | ----------------------------------------------------------------------------------------------------------------------- |
 | instructions? | `string` | System/developer message for this response. Writable on create; overrides agent-level instructions for this invocation. |
 
-### `ResponseOutputItem` {#Azure.ResourceManager.BaseTypes.Agents.ResponseOutputItem}
+### `ResponseItem` {#Azure.ResourceManager.BaseTypes.Agents.ResponseItem}
 
 An item produced in the response output, such as a message or tool call.
 
+The `type` discriminator selects the item variant. Only the fields relevant to
+that variant are populated, so all variant-specific fields are optional:
+
+- `Message`: `role`, `content`
+- `FunctionCall`: `callId`, `name`, `arguments`
+- `FunctionCallOutput`: `callId`, `output`
+- `Compaction`: `summary`
+
 ```typespec
-model Azure.ResourceManager.BaseTypes.Agents.ResponseOutputItem
+model Azure.ResourceManager.BaseTypes.Agents.ResponseItem
 ```
 
 #### Properties
 
-| Name     | Type                                                                                      | Description                                               |
-| -------- | ----------------------------------------------------------------------------------------- | --------------------------------------------------------- |
-| id?      | `string`                                                                                  | Unique identifier of the output item.                     |
-| type?    | `string`                                                                                  | The output item type (for example, message or tool call). |
-| role?    | `string`                                                                                  | The role associated with the output item.                 |
-| status?  | [`ResponseStatus`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ResponseStatus) | The status of the output item.                            |
-| content? | `string`                                                                                  | The content of the output item.                           |
+| Name       | Type                                                                                      | Description                                                                                                                  |
+| ---------- | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| id?        | `string`                                                                                  | Unique identifier of the output item. Read-only.                                                                             |
+| type?      | [`ItemType`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ItemType)             | The item type discriminator. Read-only.                                                                                      |
+| role?      | [`MessageRole`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.MessageRole)       | The role of the message author. Applies to `Message` items. Read-only.                                                       |
+| content?   | `string`                                                                                  | The text content of the message. Applies to `Message` items. Read-only.                                                      |
+| callId?    | `string`                                                                                  | Identifier correlating a function call with its output. Applies to `FunctionCall` and `FunctionCallOutput` items. Read-only. |
+| name?      | `string`                                                                                  | The name of the function (tool) invoked. Applies to `FunctionCall` items. Read-only.                                         |
+| arguments? | `Record<unknown>`                                                                         | Named arguments passed to the function (tool), keyed by parameter name. Applies to `FunctionCall` items. Read-only.          |
+| output?    | `string`                                                                                  | The output produced by the function (tool) call. Applies to `FunctionCallOutput` items. Read-only.                           |
+| summary?   | `string`                                                                                  | Summary of the compacted conversation history. Applies to `Compaction` items. Read-only.                                     |
+| status?    | [`ResponseStatus`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ResponseStatus) | The status of the output item. Read-only.                                                                                    |
 
 ### `ResponseOutputProperty` {#Azure.ResourceManager.BaseTypes.Agents.ResponseOutputProperty}
 
@@ -1860,9 +1878,9 @@ model Azure.ResourceManager.BaseTypes.Agents.ResponseOutputProperty
 
 #### Properties
 
-| Name   | Type                                                          | Description                                           |
-| ------ | ------------------------------------------------------------- | ----------------------------------------------------- |
-| output | `Azure.ResourceManager.BaseTypes.Agents.ResponseOutputItem[]` | Output items (messages, tool calls, etc.). Read-only. |
+| Name   | Type                                                    | Description                                           |
+| ------ | ------------------------------------------------------- | ----------------------------------------------------- |
+| output | `Azure.ResourceManager.BaseTypes.Agents.ResponseItem[]` | Output items (messages, tool calls, etc.). Read-only. |
 
 ### `ResponseProperties` {#Azure.ResourceManager.BaseTypes.Agents.ResponseProperties}
 
@@ -1875,13 +1893,42 @@ model Azure.ResourceManager.BaseTypes.Agents.ResponseProperties
 
 #### Properties
 
-| Name        | Type                                                                                      | Description                                                                                                          |
-| ----------- | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| responseId? | `string`                                                                                  | Unique response identifier. Read-only (set by the service).                                                          |
-| createdAt?  | `unixTimestamp32`                                                                         | Timestamp of when the response was created. Read-only.                                                               |
-| model?      | `string`                                                                                  | Model ID used to generate the response. May be specified on request to override the agent default; read-only in GET. |
-| status?     | [`ResponseStatus`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ResponseStatus) | The status of the response. Read-only.                                                                               |
-| input       | [`InputMessage`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.InputMessage)     | Content input to the model. Required on create.                                                                      |
+| Name       | Type                                                                                          | Description                                                                                                          |
+| ---------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| createdAt? | `utcDateTime`                                                                                 | Timestamp of when the response was created. Read-only.                                                               |
+| model?     | `string`                                                                                      | Model ID used to generate the response. May be specified on request to override the agent default; read-only in GET. |
+| status?    | [`ResponseStatus`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ResponseStatus)     | The status of the response. Read-only.                                                                               |
+| input      | [`ConversationItem`](./data-types.md#Azure.ResourceManager.BaseTypes.Agents.ConversationItem) | Content input to the model. Required on create.                                                                      |
+
+### `ItemType` {#Azure.ResourceManager.BaseTypes.Agents.ItemType}
+
+The type of an item exchanged within a conversation or produced in a response.
+
+```typespec
+enum Azure.ResourceManager.BaseTypes.Agents.ItemType
+```
+
+| Name               | Value | Description                                                  |
+| ------------------ | ----- | ------------------------------------------------------------ |
+| Message            |       | A message authored by a developer, user, assistant, or tool. |
+| FunctionCall       |       | A function (tool) call requested by the model.               |
+| FunctionCallOutput |       | The output produced by a function (tool) call.               |
+| Compaction         |       | A compaction item summarizing earlier conversation history.  |
+
+### `MessageRole` {#Azure.ResourceManager.BaseTypes.Agents.MessageRole}
+
+The role of the author of a message item.
+
+```typespec
+enum Azure.ResourceManager.BaseTypes.Agents.MessageRole
+```
+
+| Name      | Value | Description                                   |
+| --------- | ----- | --------------------------------------------- |
+| Developer |       | A developer-authored instruction message.     |
+| User      |       | A message authored by the end user.           |
+| Assistant |       | A message generated by the assistant (agent). |
+| Tool      |       | A message representing the output of a tool.  |
 
 ### `ResponseStatus` {#Azure.ResourceManager.BaseTypes.Agents.ResponseStatus}
 
@@ -1893,14 +1940,14 @@ union Azure.ResourceManager.BaseTypes.Agents.ResponseStatus
 
 #### Variants
 
-| Name       | Type            | Description                           |
-| ---------- | --------------- | ------------------------------------- |
-| Completed  | `"completed"`   | The response completed successfully.  |
-| Failed     | `"failed"`      | The response failed.                  |
-| Cancelled  | `"cancelled"`   | The response was cancelled.           |
-| Incomplete | `"incomplete"`  | The response is incomplete.           |
-| Queued     | `"queued"`      | The response is queued for execution. |
-| InProgress | `"in_progress"` | The response is in progress.          |
+| Name       | Type           | Description                           |
+| ---------- | -------------- | ------------------------------------- |
+| Completed  | `"Completed"`  | The response completed successfully.  |
+| Failed     | `"Failed"`     | The response failed.                  |
+| Cancelled  | `"Cancelled"`  | The response was cancelled.           |
+| Incomplete | `"Incomplete"` | The response is incomplete.           |
+| Queued     | `"Queued"`     | The response is queued for execution. |
+| InProgress | `"InProgress"` | The response is in progress.          |
 
 ## Azure.ResourceManager.CommonTypes
 

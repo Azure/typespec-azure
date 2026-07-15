@@ -7,6 +7,21 @@ import { PackageDetails } from "./interfaces.js";
 
 export interface EmitterOptions {
   /**
+   * Use this flag if you would like to generate the sdk only for a specific version.
+   * Also accepts values `latest` and `all`, or a map from service namespace full name to version for multi-service packages.
+   */
+  "api-version"?: string | Record<string, string>;
+  /**
+   * Specifies the directory where the emitter will look for example files.
+   * Defaults to an `examples` directory located at the project root.
+   */
+  "examples-dir"?: string;
+  /**
+   * Specifies the namespace you want to override for namespaces set in the spec.
+   * With this config, all namespace for the spec types will default to it.
+   */
+  namespace?: string;
+  /**
    * Indicates whether to include response headers in the generated response type for modular operations.
    * When set to true, modular operation responses with model or void bodies will have their headers
    * represented as properties on the response type. Other SDK styles and response shapes are not
@@ -50,8 +65,6 @@ export interface EmitterOptions {
   "ignore-property-name-normalize"?: boolean;
   "typespec-title-map"?: Record<string, string>;
   "ignore-enum-member-name-normalize"?: boolean;
-  //TODO should remove this after finish the release tool test
-  "should-use-pnpm-dep"?: boolean;
   "ignore-nullable-on-optional"?: boolean;
   /**
    * When set to true (default for Azure services), non-model return types (arrays, scalars, enums,
@@ -84,6 +97,31 @@ export const EmitterOptionsSchema: JSONSchemaType<EmitterOptions> = {
   type: "object",
   additionalProperties: true,
   properties: {
+    "api-version": {
+      oneOf: [
+        { type: "string", nullable: true },
+        {
+          type: "object",
+          additionalProperties: { type: "string" },
+          required: [],
+          nullable: true,
+        },
+      ],
+      description:
+        "Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`. For multi-service packages, provide a map from each service namespace's full name to its desired version; services not listed default to their latest version.",
+    } as any,
+    "examples-dir": {
+      type: "string",
+      nullable: true,
+      description:
+        "Specifies the directory where the emitter will look for example files. If the flag isn't set, the emitter defaults to using an `examples` directory located at the project root.",
+    },
+    namespace: {
+      type: "string",
+      nullable: true,
+      description:
+        "Specifies the namespace you want to override for namespaces set in the spec. With this config, all namespace for the spec types will default to it.",
+    },
     "include-headers-in-response": {
       type: "boolean",
       nullable: true,
@@ -244,11 +282,6 @@ export const EmitterOptionsSchema: JSONSchemaType<EmitterOptions> = {
         "  AnomalyDetectorClient2: AnomalyDetectorRest2",
         "```",
       ].join("\n"),
-    },
-    "should-use-pnpm-dep": {
-      type: "boolean",
-      nullable: true,
-      description: "Internal option for test.",
     },
     "ignore-nullable-on-optional": {
       type: "boolean",

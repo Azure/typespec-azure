@@ -1,10 +1,16 @@
 /* eslint-disable no-console */
 import { execSync, spawn } from "child_process";
+import { existsSync } from "fs";
 import { readdir } from "fs/promises";
 import os from "os";
 import { join, resolve } from "path";
 import { fileURLToPath } from "url";
 import { aggregateDurations } from "./aggregate.js";
+import {
+  EXTERNAL_SPEC_CONFIG,
+  loadExternalSpecConfig,
+  resolveExternalSpecs,
+} from "./external-specs.js";
 import { summarize } from "./statistics.js";
 import type {
   BenchmarkResult,
@@ -37,17 +43,41 @@ export interface RunOptions {
   rerunIterations?: number;
 }
 
-/** Discover benchmark spec directories under the given path. */
-async function discoverSpecs(specsDir: string, filter?: string[]): Promise<string[]> {
-  const entries = await readdir(specsDir, { withFileTypes: true });
-  const dirs = entries
-    .filter((e) => e.isDirectory())
-    .map((e) => e.name)
-    .sort((a, b) => a.localeCompare(b));
+/** A benchmark spec source: a name and the directory containing its main.tsp. */
+interface SpecSource {
+  name: string;
+  dir: string;
+}
+
+/** Discover benchmark spec sources under the given directory.
+ *
+ * Each subdirectory is a spec: one containing a `main.tsp` is a local spec; one
+ * containing a `spec.json` is an external spec (sparse-checked-out from another
+ * repository). Both are treated uniformly as spec sources. */
+async function discoverSpecSources(specsDir: string, filter?: string[]): Promise<SpecSource[]> {
+  const dirs = (await readdir(specsDir, { withFileTypes: true })).filter((e) => e.isDirectory());
+
+  const localSources: SpecSource[] = dirs
+    .filter((e) => existsSync(join(specsDir, e.name, "main.tsp")))
+    .map((e) => ({ name: e.name, dir: join(specsDir, e.name) }));
+
+  const externalConfigs = dirs
+    .filter((e) => existsSync(join(specsDir, e.name, EXTERNAL_SPEC_CONFIG)))
+    .map((e) => loadExternalSpecConfig(join(specsDir, e.name)));
+
+  const externalSources: SpecSource[] =
+    externalConfigs.length > 0
+      ? resolveExternalSpecs(externalConfigs).map((s) => ({ name: s.name, dir: s.dir }))
+      : [];
+
+  const sources = [...localSources, ...externalSources].sort((a, b) =>
+    a.name.localeCompare(b.name),
+  );
+
   if (filter && filter.length > 0) {
-    return dirs.filter((d) => filter.includes(d));
+    return sources.filter((s) => filter.includes(s.name));
   }
-  return dirs;
+  return sources;
 }
 
 const compileOncePath = fileURLToPath(new URL("./compile-once.js", import.meta.url));
@@ -203,13 +233,13 @@ export async function runBenchmarks(options: RunOptions): Promise<BenchmarkResul
   const iterations = options.iterations ?? DEFAULT_ITERATIONS;
   const warmup = options.warmup ?? DEFAULT_WARMUP;
 
-  const specNames = await discoverSpecs(specsDir, options.specs);
-  if (specNames.length === 0) {
+  const specSources = await discoverSpecSources(specsDir, options.specs);
+  if (specSources.length === 0) {
     throw new Error(`No benchmark specs found in ${specsDir}`);
   }
 
   console.log(
-    `Running benchmarks: ${specNames.length} spec(s), ${warmup} warmup + ${iterations} iterations each`,
+    `Running benchmarks: ${specSources.length} spec(s), ${warmup} warmup + ${iterations} iterations each`,
   );
 
   const specs: Record<string, SpecBenchmarkResult> = {};
@@ -217,8 +247,9 @@ export async function runBenchmarks(options: RunOptions): Promise<BenchmarkResul
   const maxReruns = options.maxReruns ?? 0;
   const rerunIterations = options.rerunIterations ?? iterations;
 
-  for (const specName of specNames) {
-    const specDir = join(specsDir, specName);
+  for (const source of specSources) {
+    const specName = source.name;
+    const specDir = source.dir;
     console.log(`\n  Benchmarking: ${specName}`);
 
     // Warmup

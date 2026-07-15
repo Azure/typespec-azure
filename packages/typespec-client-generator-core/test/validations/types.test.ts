@@ -638,6 +638,34 @@ it("duplicate operation with @clientLocation to new clients", async () => {
   ]);
 });
 
+it("no duplicate operation when @clientLocation and @client are used on different scopes", async () => {
+  // Regression test for https://github.com/Azure/typespec-azure/issues/4850
+  // `@clientLocation` moves the operation for all scopes except `java`, while a `@client`
+  // interface re-declares it for `java` only. These never coexist in the same scope, so no
+  // duplicate should be reported.
+  const diagnostics = await SimpleTester.diagnose(
+    `
+    @service
+    namespace Contoso.WidgetManager;
+
+    namespace OpGroup {
+      @route("/a")
+      op listUpdates(): void;
+    }
+
+    @@clientLocation(OpGroup.listUpdates, "DeviceUpdate", "!java");
+
+    @client({ name: "JavaClient", service: Contoso.WidgetManager }, "java")
+    interface JavaClient {
+      @route("/java/a")
+      listUpdates is OpGroup.listUpdates;
+    }
+    `,
+  );
+
+  expectDiagnosticEmpty(diagnostics);
+});
+
 it("duplicate operation warning for .NET", async () => {
   const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
     `
