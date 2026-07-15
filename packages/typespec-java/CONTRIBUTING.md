@@ -37,16 +37,47 @@ refresh `core.patch` if its context no longer applies.
 ## Build
 
 ```bash
-# Full build: build:generator (emitter.jar via Maven + core.patch, requires JDK 11+
-# and Maven) then build:emitter (copy sources from core + tsc).
-pnpm build
+# From the repo root, install workspace dependencies.
+pnpm install
 
-# Just the TypeScript half (no jar; fast):
-pnpm build:emitter
+# From the repo root, build the dependencies first. The ^... filter builds
+# @azure-tools/typespec-java dependencies without building typespec-java itself.
+pnpm turbo run --filter "@azure-tools/typespec-java^..." build
 
-# Build and pack a .tgz (what emitter-tests consumes):
+# Then build and pack @azure-tools/typespec-java. This builds the generator
+# (emitter.jar via Maven + core.patch, requires JDK 11+ and Maven), builds the
+# emitter TypeScript, and packs the .tgz consumed by emitter-tests.
+cd packages/typespec-java
 pwsh ./Build-TypeSpec.ps1
 ```
+
+### Pinning the core commit (`core-commit.json`)
+
+`Copy-Sources.ps1` copies the emitter sources from the `core/` submodule's current checkout. The
+optional `core-commit.json` pins a specific upstream `core` commit to copy from instead:
+
+```json
+{ "sha": "3cb616e4e8c3d5b6954bac9832b97445450a71af" }
+```
+
+The pinned SHA is fetched if needed and used only when it is **newer** than the current checkout (the
+submodule never moves backwards). The submodule is checked out transiently for the copy, then always
+restored to its original SHA, keeping `pnpm build` and CI git-status checks clean. To advance the pin,
+update the `sha`.
+
+### Troubleshooting
+
+If `pnpm turbo ...` fails with `'turbo' is not recognized as an internal or external command`
+after `pnpm install`, the local install tree is missing Turbo's binary shim. From the repo root,
+force pnpm to refresh the local install state and rerun the command:
+
+```powershell
+pnpm install --force
+pnpm turbo run --filter "@azure-tools/typespec-java^..." build
+```
+
+Changing the npm registry has been observed to clear this symptom, possibly because
+pnpm re-resolves packages or relinks local binaries after the registry setting changes.
 
 ## Before making a Pull request
 
