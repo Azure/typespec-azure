@@ -4,10 +4,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
-      - release/*
   workflow_dispatch:
     inputs:
       backfill_from:
@@ -38,8 +34,6 @@ jobs:
     with:
       specs-dir: packages/benchmark/specs
       results-dir: results
-      title: "⚡ Benchmark Results"
-      comment-file: benchmark-comment.md
       iterations: 25
       warmup: 3
       noise-cv: 0.08

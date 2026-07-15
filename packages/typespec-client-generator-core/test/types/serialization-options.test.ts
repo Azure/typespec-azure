@@ -1,6 +1,11 @@
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
-import { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
+import {
+  SdkArrayType,
+  SdkHttpOperation,
+  SdkModelType,
+  SdkServiceMethod,
+} from "../../src/interfaces.js";
 import {
   createSdkContextForTester,
   SimpleTesterWithService,
@@ -867,4 +872,68 @@ it("response without body has empty serialization options", async function () {
   ok(response);
   strictEqual(response.serializationOptions.json, undefined);
   strictEqual(response.serializationOptions.xml, undefined);
+});
+
+it("array model with @Xml.name keeps its xml serialization options (#3978)", async function () {
+  const { program } = await XmlTesterWithBuiltInService.compile(`
+    @Xml.name("SignedIdentifiers")
+    model SignedIdentifiers is SignedIdentifier[];
+
+    @Xml.name("SignedIdentifier")
+    model SignedIdentifier {
+      @Xml.name("Id")
+      id: string;
+    }
+
+    op test(@header("content-type") contentType: "application/xml", @body body: SignedIdentifiers): void;
+  `);
+  const context = await createSdkContextForTester(program);
+  const method = getServiceMethodOfClient(context.sdkPackage);
+  const bodyParam = (method as SdkServiceMethod<SdkHttpOperation>).operation.bodyParam;
+  ok(bodyParam);
+  const bodyType = bodyParam.type as SdkArrayType;
+  strictEqual(bodyType.kind, "array");
+  strictEqual(bodyType.serializationOptions?.xml?.name, "SignedIdentifiers");
+  const itemType = bodyType.valueType as SdkModelType;
+  strictEqual(itemType.kind, "model");
+  strictEqual(itemType.serializationOptions.xml?.name, "SignedIdentifier");
+});
+
+it("array model with @encodedName keeps its xml serialization options", async function () {
+  const { program } = await XmlTesterWithBuiltInService.compile(`
+    @encodedName("application/xml", "XmlSignedIdentifiers")
+    model SignedIdentifiers is SignedIdentifier[];
+
+    model SignedIdentifier {
+      id: string;
+    }
+
+    op test(@header("content-type") contentType: "application/xml", @body body: SignedIdentifiers): void;
+  `);
+  const context = await createSdkContextForTester(program);
+  const method = getServiceMethodOfClient(context.sdkPackage);
+  const bodyParam = (method as SdkServiceMethod<SdkHttpOperation>).operation.bodyParam;
+  ok(bodyParam);
+  const bodyType = bodyParam.type as SdkArrayType;
+  strictEqual(bodyType.kind, "array");
+  strictEqual(bodyType.serializationOptions?.xml?.name, "XmlSignedIdentifiers");
+});
+
+it("array model without explicit serialization decorators has no serialization options", async function () {
+  const { program } = await XmlTesterWithBuiltInService.compile(`
+    model SignedIdentifiers is SignedIdentifier[];
+
+    model SignedIdentifier {
+      id: string;
+    }
+
+    op test(@header("content-type") contentType: "application/xml", @body body: SignedIdentifiers): void;
+  `);
+  const context = await createSdkContextForTester(program);
+  const method = getServiceMethodOfClient(context.sdkPackage);
+  const bodyParam = (method as SdkServiceMethod<SdkHttpOperation>).operation.bodyParam;
+  ok(bodyParam);
+  const bodyType = bodyParam.type as SdkArrayType;
+  strictEqual(bodyType.kind, "array");
+  strictEqual(bodyType.serializationOptions, undefined);
 });

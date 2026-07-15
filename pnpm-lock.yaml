@@ -183,12 +183,6 @@ catalogs:
     '@types/hast':
       specifier: ^3.0.4
       version: 3.0.4
-    '@types/js-yaml':
-      specifier: ~4.0.9
-      version: 4.0.9
-    '@types/lodash':
-      specifier: ~4.17.24
-      version: 4.17.24
     '@types/micromatch':
       specifier: ^4.0.10
       version: 4.0.10
@@ -363,12 +357,6 @@ catalogs:
     is-unicode-supported:
       specifier: ^2.1.0
       version: 2.1.0
-    js-yaml:
-      specifier: ^4.2.0
-      version: 4.2.0
-    lodash:
-      specifier: ~4.18.1
-      version: 4.18.1
     log-symbols:
       specifier: ^7.0.1
       version: 7.0.1
@@ -3698,12 +3686,6 @@ importers:
       '@azure-tools/codegen':
         specifier: 'catalog:'
         version: 2.10.1
-      js-yaml:
-        specifier: 'catalog:'
-        version: 4.2.0
-      lodash:
-        specifier: 'catalog:'
-        version: 4.18.1
       yaml:
         specifier: 'catalog:'
         version: 2.9.0
@@ -3729,12 +3711,6 @@ importers:
       '@azure-tools/typespec-liftr-base':
         specifier: 'catalog:'
         version: 0.14.0
-      '@types/js-yaml':
-        specifier: 'catalog:'
-        version: 4.0.9
-      '@types/lodash':
-        specifier: 'catalog:'
-        version: 4.17.24
       '@types/node':
         specifier: 'catalog:'
         version: 26.0.0
@@ -8363,9 +8339,6 @@ packages:
 
   '@types/keyv@3.1.4':
     resolution: {integrity: sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==}
-
-  '@types/lodash@4.17.24':
-    resolution: {integrity: sha512-gIW7lQLZbue7lRSWEFql49QJJWThrTFFeIMJdp3eH4tKoxm1OvEPg02rm4wCCSHS0cL3/Fizimb35b7k8atwsQ==}
 
   '@types/mdast@4.0.4':
     resolution: {integrity: sha512-kGaNbPh1k7AFzgpud/gMdvIm5xuECykRR+JnWKQno9TAXVa6WIVCGTPvYGekIDL4uwCZQSYbUxNBSb1aUo79oA==}
@@ -20253,8 +20226,6 @@ snapshots:
   '@types/keyv@3.1.4':
     dependencies:
       '@types/node': 26.0.0
-
-  '@types/lodash@4.17.24': {}
 
   '@types/mdast@4.0.4':
     dependencies:

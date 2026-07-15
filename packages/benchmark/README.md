@@ -80,11 +80,7 @@ Located in `specs/`:
 
 ## CI integration
 
-The `.github/workflows/benchmark.yml` workflow:
-
-- **On push to `main`**: Runs benchmarks and stores results to the `benchmark-data` branch via the `store-results` CLI command
-- **On pull requests**: Runs benchmarks, fetches the baseline, compares, and generates a PR comment via the `upload-pr-comment` CLI command
-- Benchmark PR baselines are generated from a rolling window of recent `main` runs when `results/history.json` is available, with fallback to `results/latest.json`
+Benchmarks run **on push to `main`** (via `benchmark.yml` and `benchmark-external.yml`, each instantiating the reusable `benchmark-run.yml`). Each run stores its results to the `benchmark-data` branch via the `store-results` CLI command — the built-in specs under `results/` and the external specs under `external-results/`. Changes are monitored on the [benchmarks dashboard](https://typespec.io/benchmarks); benchmarks do not run on pull requests.
 
 ### Data storage
 
