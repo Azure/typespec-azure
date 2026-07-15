@@ -215,7 +215,7 @@ export function getLibraryName(
 ): string {
   // 1. check if there's a client name
   const emitterSpecificName = getClientNameOverride(context, type, scope);
-  if (emitterSpecificName && emitterSpecificName !== type.name) {
+  if (emitterSpecificName !== undefined) {
     // Strip the exact-name prefix if present so consumers always see clean names
     return normalizeExactName(emitterSpecificName).name;
   }
@@ -270,6 +270,20 @@ export function isExactClientName(
     return normalizeExactName(emitterSpecificName).isExactName;
   }
   return false;
+}
+
+/**
+ * Check whether a type has a client name override.
+ *
+ * @param context The SDK context
+ * @param type The type to check
+ * @returns true if the client name was overridden with `@clientName`
+ */
+export function hasClientNameOverride(
+  context: TCGCContext,
+  type: Type & { name?: string | symbol },
+): boolean {
+  return getClientNameOverride(context, type) !== undefined;
 }
 
 /**

@@ -165,6 +165,7 @@ function cloneSdkClient(client: SdkClient): SdkClient {
   return {
     kind: "SdkClient",
     name: client.name,
+    ...(client.isNameOverride && { isNameOverride: true }),
     services: [...client.services],
     type: client.type,
     subClients: [],
@@ -350,6 +351,7 @@ function getRootClients(context: TCGCContext): ClientCreationResult {
         const client: SdkClient = {
           kind: "SdkClient",
           name: clientName,
+          ...(clientNameOverride !== undefined && { isNameOverride: true }),
           services: [service],
           type: service,
           subClients: [],
@@ -484,6 +486,9 @@ function handleMultipleServicesSubClientNameConflict(
         mergedSubClientTypes.set(existingSc, [existingSc.type as Namespace | Interface]);
         existingSc.type = undefined;
       }
+      if (sc.isNameOverride) {
+        existingSc.isNameOverride = true;
+      }
       // Store the merged types for later operations processing
       const types = mergedSubClientTypes.get(existingSc)!;
       if (sc.type) {
@@ -533,6 +538,9 @@ function mergeChildrenRecursively(
       if (existing.type !== undefined) {
         mergedSubClientTypes.set(existing, [existing.type as Namespace | Interface]);
         existing.type = undefined;
+      }
+      if (incoming.isNameOverride) {
+        existing.isNameOverride = true;
       }
       const types = mergedSubClientTypes.get(existing)!;
       if (incoming.type) {
@@ -608,6 +616,7 @@ function createSubClient(
   const subClient: SdkClient = {
     kind: "SdkClient",
     name: clientName,
+    ...(getClientNameOverride(context, type) !== undefined && { isNameOverride: true }),
     type,
     clientPath,
     services: [service],

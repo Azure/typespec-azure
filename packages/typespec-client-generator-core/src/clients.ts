@@ -33,7 +33,12 @@ import {
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import { createSdkMethods, getSdkMethodParameter } from "./methods.js";
-import { getCrossLanguageDefinitionId, getLibraryName, isExactClientName } from "./public-utils.js";
+import {
+  getCrossLanguageDefinitionId,
+  getLibraryName,
+  hasClientNameOverride,
+  isExactClientName,
+} from "./public-utils.js";
 import { getSdkBuiltInType, getSdkCredentialParameter, getTypeSpecBuiltInType } from "./types.js";
 
 function getEndpointTypeFromSingleServer<
@@ -52,6 +57,7 @@ function getEndpointTypeFromSingleServer<
       {
         name: "endpoint",
         isGeneratedName: true,
+        isNameOverride: false,
         isExactName: false,
         doc: "Service host",
         kind: "path",
@@ -154,6 +160,7 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
       variantTypes: types,
       name: createGeneratedName(context, service, "Endpoint"),
       isGeneratedName: true,
+      isNameOverride: false,
       isExactName: false,
       apiVersions: client.apiVersions,
       crossLanguageDefinitionId: `${client.crossLanguageDefinitionId}.Endpoint`,
@@ -168,6 +175,7 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
     type,
     name: "endpoint",
     isGeneratedName: true,
+    isNameOverride: false,
     isExactName: false,
     doc: "Service host",
     onClient: true,
@@ -198,6 +206,9 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     __raw: client,
     kind: "client",
     name,
+    isNameOverride: client.type
+      ? hasClientNameOverride(context, client.type)
+      : (client.isNameOverride ?? false),
     isExactName: client.type ? isExactClientName(context, client.type) : false,
     doc: client.type ? getClientDoc(context, client.type) : undefined,
     summary: client.type ? getSummary(context.program, client.type) : undefined,
@@ -315,6 +326,7 @@ function createSdkClientInitializationType<
     initializedBy: isRootClient ? InitializedByFlags.Individually : InitializedByFlags.Default,
     name,
     isGeneratedName: true,
+    isNameOverride: false,
     isExactName: false,
     decorators: [],
   };

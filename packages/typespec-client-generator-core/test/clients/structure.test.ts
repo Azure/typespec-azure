@@ -1414,6 +1414,8 @@ it("one client from multiple services with sub clients name conflict - merged", 
       }
     )
     namespace CombineClient;
+
+    @@clientName(ServiceA.Operations, "Operations");
   `,
     ),
   );
@@ -1428,6 +1430,7 @@ it("one client from multiple services with sub clients name conflict - merged", 
   // The merged sub client should have operations from both services
   const operations = client.children!.find((c) => c.name === "Operations");
   ok(operations);
+  strictEqual(operations.isNameOverride, true);
   // Multi-service sub client should have empty apiVersions
   strictEqual(operations.apiVersions.length, 0);
   strictEqual(operations.clientInitialization.parameters.length, 2);

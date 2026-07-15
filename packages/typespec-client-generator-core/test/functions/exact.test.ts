@@ -32,6 +32,7 @@ describe("exact", () => {
       const sdkPackage = context.sdkPackage;
       const model = sdkPackage.models[0];
       strictEqual(model.name, "hello_world");
+      strictEqual(model.isNameOverride, true);
       strictEqual(model.isExactName, true);
       strictEqual(model.isGeneratedName, false);
     });
@@ -59,6 +60,34 @@ describe("exact", () => {
       const sdkPackage = context.sdkPackage;
       const model = sdkPackage.models[0];
       strictEqual(model.name, "RenamedModel");
+      strictEqual(model.isNameOverride, true);
+      strictEqual(model.isExactName, false);
+    });
+
+    it("marks a same-name @clientName as a name override", async () => {
+      const { program } = await SimpleBaseTester.compile(
+        createClientCustomizationInput(
+          `
+          @service
+          namespace MyService;
+
+          @friendlyName("FriendlyName")
+          model TestModel {
+            prop: string;
+          }
+
+          op get(@body body: TestModel): void;
+          `,
+          `
+          @@clientName(MyService.TestModel, "TestModel");
+          `,
+        ),
+      );
+
+      const context = await createSdkContextForTester(program);
+      const model = context.sdkPackage.models[0];
+      strictEqual(model.name, "TestModel");
+      strictEqual(model.isNameOverride, true);
       strictEqual(model.isExactName, false);
     });
 
@@ -83,6 +112,7 @@ describe("exact", () => {
       const sdkPackage = context.sdkPackage;
       const model = sdkPackage.models[0];
       strictEqual(model.name, "TestModel");
+      strictEqual(model.isNameOverride, false);
       strictEqual(model.isExactName, false);
     });
   });
@@ -115,6 +145,7 @@ describe("exact", () => {
         });
         const model = context.sdkPackage.models[0];
         strictEqual(model.name, "hello_world");
+        strictEqual(model.isNameOverride, true);
         strictEqual(model.isExactName, true);
       }
 
@@ -125,6 +156,7 @@ describe("exact", () => {
         });
         const model = context.sdkPackage.models[0];
         strictEqual(model.name, "TestModel");
+        strictEqual(model.isNameOverride, false);
         strictEqual(model.isExactName, false);
       }
     });
@@ -156,6 +188,7 @@ describe("exact", () => {
       const model = sdkPackage.models[0];
       const prop = model.properties.find((p) => p.name === "my_exact_prop");
       strictEqual(prop !== undefined, true);
+      strictEqual(prop!.isNameOverride, true);
       strictEqual(prop!.isExactName, true);
     });
   });
@@ -186,6 +219,7 @@ describe("exact", () => {
       const sdkPackage = context.sdkPackage;
       const enumType = sdkPackage.enums[0];
       strictEqual(enumType.name, "my_status_enum");
+      strictEqual(enumType.isNameOverride, true);
       strictEqual(enumType.isExactName, true);
     });
   });
@@ -213,6 +247,7 @@ describe("exact", () => {
       const client = sdkPackage.clients[0];
       const method = client.methods[0];
       strictEqual(method.name, "my_exact_op");
+      strictEqual(method.isNameOverride, true);
       strictEqual(method.isExactName, true);
     });
   });
@@ -243,8 +278,10 @@ describe("exact", () => {
       const sdkPackage = context.sdkPackage;
       const enumType = sdkPackage.enums[0];
       const activeValue = enumType.values.find((v) => v.name === "my_active_value");
+      strictEqual(activeValue?.isNameOverride, true);
       strictEqual(activeValue?.isExactName, true);
       const inactiveValue = enumType.values.find((v) => v.name === "Inactive");
+      strictEqual(inactiveValue?.isNameOverride, false);
       strictEqual(inactiveValue?.isExactName, false);
     });
   });
@@ -271,6 +308,7 @@ describe("exact", () => {
       const sdkPackage = context.sdkPackage;
       const client = sdkPackage.clients[0];
       strictEqual(client.name, "my_exact_client");
+      strictEqual(client.isNameOverride, true);
       strictEqual(client.isExactName, true);
     });
   });

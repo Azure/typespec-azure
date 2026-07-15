@@ -118,6 +118,7 @@ import {
   getHttpOperationWithCache,
   getLibraryName,
   getPropertyNames,
+  hasClientNameOverride,
   isExactClientName,
 } from "./public-utils.js";
 
@@ -563,6 +564,7 @@ export function getSdkUnionWithDiagnostics(
           ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
           name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
           isGeneratedName: !type.name,
+          isNameOverride: hasClientNameOverride(context, type),
           isExactName: false,
           crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
           type: diagnostics.pipe(getUnknownType(context, type)),
@@ -594,6 +596,7 @@ export function getSdkUnionWithDiagnostics(
               ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
               name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
               isGeneratedName: !type.name,
+              isNameOverride: hasClientNameOverride(context, type),
               isExactName: false,
               crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
               type: retval,
@@ -612,6 +615,7 @@ export function getSdkUnionWithDiagnostics(
           ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "union")),
           name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
           isGeneratedName: nullOption !== undefined ? true : !type.name, // if nullable, always set inner union type as generated name
+          isNameOverride: hasClientNameOverride(context, type),
           isExactName: false,
           namespace,
           variantTypes: [],
@@ -636,6 +640,7 @@ export function getSdkUnionWithDiagnostics(
             ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
             name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
             isGeneratedName: !type.name,
+            isNameOverride: hasClientNameOverride(context, type),
             isExactName: false,
             crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
             type: retval,
@@ -672,6 +677,7 @@ function getEmptyUnionType(
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "union")),
     name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
     isGeneratedName: !type.name,
+    isNameOverride: hasClientNameOverride(context, type),
     isExactName: false,
     namespace,
     clientNamespace: namespace,
@@ -716,6 +722,7 @@ function getSdkConstantWithDiagnostics(
         valueType,
         name: getGeneratedName(context, type, operation),
         isGeneratedName: true,
+        isNameOverride: false,
         isExactName: false,
       });
   }
@@ -826,6 +833,7 @@ function addDiscriminatorToModelType(
       type: discriminatorType!,
       name,
       isGeneratedName: false,
+      isNameOverride: discriminatorProperty?.isNameOverride ?? false,
       isExactName: false,
       onClient: false,
       apiVersions: discriminatorProperty
@@ -866,6 +874,7 @@ export function getSdkModelWithDiagnostics(
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "model")),
       name: name,
       isGeneratedName: !type.name,
+      isNameOverride: hasClientNameOverride(context, type),
       isExactName: isExactClientName(context, type),
       namespace: getClientNamespace(context, type),
       properties: [],
@@ -1018,6 +1027,7 @@ function getSdkEnumValueWithDiagnostics(
   return diagnostics.wrap({
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "enumvalue")),
     name: getLibraryName(context, type),
+    isNameOverride: hasClientNameOverride(context, type),
     isExactName: isExactClientName(context, type),
     value: type.value ?? type.name,
     enumType,
@@ -1042,6 +1052,7 @@ function getSdkEnumWithDiagnostics(
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "enum")),
       name: getLibraryName(context, type),
       isGeneratedName: false,
+      isNameOverride: hasClientNameOverride(context, type),
       isExactName: isExactClientName(context, type),
       namespace: getClientNamespace(context, type),
       valueType: diagnostics.pipe(
@@ -1082,6 +1093,7 @@ function getSdkUnionEnumValues(
     values.push({
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, member.type, "enumvalue")),
       name: name ? name : `${member.value}`,
+      isNameOverride: hasClientNameOverride(context, member.type),
       isExactName: isExactClientName(context, member.type),
       value: member.value,
       valueType: enumType.valueType,
@@ -1108,6 +1120,7 @@ export function getSdkUnionEnumWithDiagnostics(
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type.union, "enum")),
     name,
     isGeneratedName: !type.union.name,
+    isNameOverride: hasClientNameOverride(context, type.union),
     isExactName: isExactClientName(context, type.union),
     namespace: getClientNamespace(context, type.union),
     valueType:
@@ -1282,6 +1295,7 @@ function getSdkCredentialType(
       variantTypes: credentialTypes,
       name: createGeneratedName(context, service, "CredentialUnion"),
       isGeneratedName: true,
+      isNameOverride: false,
       isExactName: false,
       namespace: client.namespace,
       clientNamespace: client.namespace,
@@ -1307,6 +1321,7 @@ export function getSdkCredentialParameter(
     kind: "credential",
     name: "credential",
     isGeneratedName: true,
+    isNameOverride: false,
     isExactName: false,
     doc: "Credential used to authenticate requests to the service.",
     apiVersions: client.apiVersions,
@@ -1333,6 +1348,7 @@ export function getSdkModelPropertyTypeBase(
     diagnostics.pipe(getClientTypeWithDiagnostics(context, type.type, operation));
   diagnostics.pipe(addEncodeInfo(context, type, propertyType));
   const name = getPropertyNames(context, type)[0];
+  const isNameOverride = hasClientNameOverride(context, type);
   const isExactName = isExactClientName(context, type);
   const onClient = isOnClient(context, type, operation, apiVersions.length > 0);
   let encode: ArrayKnownEncoding | undefined = undefined;
@@ -1357,6 +1373,7 @@ export function getSdkModelPropertyTypeBase(
     type: propertyType,
     name,
     isGeneratedName: false,
+    isNameOverride,
     isExactName,
     optional: type.optional,
     ...updateWithApiVersionInformation(

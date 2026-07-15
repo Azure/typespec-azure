@@ -105,6 +105,8 @@ export interface SdkContext<
 export interface SdkClient {
   kind: "SdkClient";
   name: string;
+  /** Whether the name was provided by a client name override. */
+  isNameOverride?: boolean;
   services: Namespace[];
   /** The type associated with this client. If it is created from string client location, or is a merged client, this will be undefined. */
   type?: Namespace | Interface;
@@ -208,6 +210,8 @@ export interface SdkClientType<
   kind: "client";
   /** Name of the client. */
   name: string;
+  /** Whether the name was provided by a client name override. */
+  isNameOverride: boolean;
   /** Whether name should be used exactly as-is, without casing transformations. */
   isExactName: boolean;
   /** Full qualified namespace. */
@@ -452,6 +456,8 @@ export interface SdkNullableType extends SdkTypeBase {
   name: string;
   /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
+  /** Whether the name was provided by a client name override. */
+  isNameOverride: boolean;
   /** Whether name should be used exactly as-is, without casing transformations. */
   isExactName: boolean;
   /** Unique ID for the current type. */
@@ -470,6 +476,8 @@ export interface SdkEnumType extends SdkTypeBase {
   name: string;
   /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
+  /** Whether the name was provided by a client name override. */
+  isNameOverride: boolean;
   /** Whether name should be used exactly as-is, without casing transformations. */
   isExactName: boolean;
   /** Full qualified namespace. */
@@ -494,6 +502,8 @@ export interface SdkEnumValueType<
 > extends SdkTypeBase {
   kind: "enumvalue";
   name: string;
+  /** Whether the name was provided by a client name override. */
+  isNameOverride: boolean;
   /** Whether name should be used exactly as-is, without casing transformations. */
   isExactName: boolean;
   value: string | number;
@@ -510,6 +520,8 @@ export interface SdkConstantType extends SdkTypeBase {
   name: string;
   /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
+  /** Whether the name was provided by a client name override. */
+  isNameOverride: boolean;
   /** Whether name should be used exactly as-is, without casing transformations. */
   isExactName: boolean;
 }
@@ -518,6 +530,8 @@ export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends 
   name: string;
   /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
+  /** Whether the name was provided by a client name override. */
+  isNameOverride: boolean;
   /** Whether name should be used exactly as-is, without casing transformations. */
   isExactName: boolean;
   /** Full qualified namespace. */
@@ -549,6 +563,8 @@ export interface SdkModelType extends SdkTypeBase {
   name: string;
   /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
+  /** Whether the name was provided by a client name override. */
+  isNameOverride: boolean;
   /** Whether name should be used exactly as-is, without casing transformations. */
   isExactName: boolean;
   /** Full qualified namespace. */
@@ -577,6 +593,8 @@ export interface SdkClientInitializationType extends SdkTypeBase {
   name: string;
   /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
+  /** Whether the name was provided by a client name override. */
+  isNameOverride: boolean;
   /** Whether name should be used exactly as-is, without casing transformations. */
   isExactName: boolean;
   /** Initialization parameters. */
@@ -618,6 +636,8 @@ export interface SdkModelPropertyTypeBase<
   name: string;
   /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
+  /** Whether the name was provided by a client name override. */
+  isNameOverride: boolean;
   /** Whether name should be used exactly as-is, without casing transformations. */
   isExactName: boolean;
   /** Document for the type. */
@@ -1016,6 +1036,8 @@ interface SdkServiceMethodBase<
 > extends DecoratedType {
   __raw?: Operation;
   name: string;
+  /** Whether the name was provided by a client name override. */
+  isNameOverride: boolean;
   /** Whether name should be used exactly as-is, without casing transformations. */
   isExactName: boolean;
   /** Whether the type has public or private accessibility */
