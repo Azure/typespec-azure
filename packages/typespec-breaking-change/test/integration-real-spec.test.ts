@@ -14,8 +14,12 @@ import { resolve } from "path";
  * - N4: End-to-end CLI/orchestrator pipeline with real spec
  * - Q8: Performance (should complete in <60s)
  */
-const SPEC_ROOT = resolve(
+const APP_CONFIG_ROOT = resolve(
   "C:/Users/markcowl/session2/azure-rest-api-specs/specification/appconfiguration/resource-manager/Microsoft.AppConfiguration/AppConfiguration",
+);
+
+const NETWORK_ROOT = resolve(
+  "C:/Users/markcowl/session2/azure-rest-api-specs/specification/network/resource-manager/Microsoft.Network/Network/Network",
 );
 
 describe("integration: real ARM spec (AppConfiguration)", () => {
@@ -23,7 +27,7 @@ describe("integration: real ARM spec (AppConfiguration)", () => {
 
   async function getProgram() {
     if (program) return program;
-    program = await compile(NodeHost, resolve(SPEC_ROOT, "main.tsp"), {
+    program = await compile(NodeHost, resolve(APP_CONFIG_ROOT, "main.tsp"), {
       noEmit: true,
     });
     return program;
@@ -84,9 +88,9 @@ describe("integration: real ARM spec (AppConfiguration)", () => {
     const result = analyzeProgram(prog, { phase: "cross-version" });
 
     for (const finding of result.findings) {
-      if (finding.origin) {
-        expect(finding.origin.declarationPath).toBeTruthy();
-        expect(finding.origin.declarationPath.length).toBeGreaterThan(0);
+      if (finding.diff.origin) {
+        expect(finding.diff.origin.declarationPath).toBeTruthy();
+        expect(finding.diff.origin.declarationPath.length).toBeGreaterThan(0);
       }
     }
   }, 60_000);
@@ -98,8 +102,8 @@ describe("integration: real ARM spec (AppConfiguration)", () => {
     // Check that dedup is working: no two findings share the same origin+kind
     const seen = new Set<string>();
     for (const finding of result.findings) {
-      if (finding.origin) {
-        const key = `${finding.origin.declarationPath}::${finding.kind}::${finding.versionPair.baseVersion}->${finding.versionPair.headVersion}`;
+      if (finding.diff.origin) {
+        const key = `${finding.diff.origin.declarationPath}::${finding.diff.kind}::${finding.versionPair.baseVersion}->${finding.versionPair.headVersion}`;
         // Same key can appear for different version pairs, but NOT for the same pair
         expect(seen.has(key)).toBe(false);
         seen.add(key);
@@ -120,4 +124,72 @@ describe("integration: real ARM spec (AppConfiguration)", () => {
     );
     console.log(`  Timing breakdown:`, result.timing);
   }, 60_000);
+});
+
+describe("integration: large ARM spec (Network, 739 operations)", () => {
+  let program: Awaited<ReturnType<typeof compile>> | undefined;
+
+  async function getProgram() {
+    if (program) return program;
+    program = await compile(NodeHost, resolve(NETWORK_ROOT, "main.tsp"), {
+      noEmit: true,
+    });
+    return program;
+  }
+
+  it("compiles the large network spec without errors", async () => {
+    const prog = await getProgram();
+    const errors = prog.diagnostics.filter((d) => d.severity === "error");
+    expect(errors).toHaveLength(0);
+  }, 120_000);
+
+  it("discovers 700+ operations through ARM resource patterns", async () => {
+    const prog = await getProgram();
+    const services = enumerateVersions(prog);
+    expect(services.length).toBeGreaterThanOrEqual(1);
+
+    const network = services[0];
+    const view = createVersionedView(prog, network.service, network.versions[0]);
+    const diffResult = computeDiffs(view, view);
+
+    expect(diffResult.baseCanonicalization.operations.size).toBeGreaterThanOrEqual(700);
+  }, 120_000);
+
+  it("full analysis completes in under 30 seconds", async () => {
+    const prog = await getProgram();
+    const start = Date.now();
+    const result = analyzeProgram(prog);
+    const elapsed = Date.now() - start;
+
+    expect(elapsed).toBeLessThan(30_000);
+    console.log(
+      `Network full analysis: ${elapsed}ms, ${result.findings.length} findings`,
+    );
+    console.log(`  Timing breakdown:`, result.timing);
+    console.log(`  Findings by severity:`, {
+      error: result.findings.filter((f) => f.severity === "error").length,
+      ignore: result.findings.filter((f) => f.severity === "ignore").length,
+    });
+  }, 120_000);
+
+  it("origin resolution achieves >50% coverage on large spec", async () => {
+    const prog = await getProgram();
+    const result = analyzeProgram(prog);
+
+    const withOrigin = result.findings.filter((f) => f.diff.origin).length;
+    const total = result.findings.length;
+    const pct = total > 0 ? (withOrigin / total) * 100 : 100;
+
+    console.log(`  Origin coverage: ${withOrigin}/${total} (${Math.round(pct)}%)`);
+    expect(pct).toBeGreaterThanOrEqual(50);
+  }, 120_000);
+
+  it("deduplication reduces finding count", async () => {
+    const prog = await getProgram();
+    const result = analyzeProgram(prog);
+
+    // With 739 operations and shared models, dedup should significantly reduce findings
+    // Without dedup, we'd see hundreds of duplicates for shared model changes
+    expect(result.findings.length).toBeLessThan(200);
+  }, 120_000);
 });

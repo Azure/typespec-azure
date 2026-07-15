@@ -52,6 +52,66 @@ describe("codefixes", () => {
     expect(codefix).toBeUndefined();
   });
 
+  it("falls back to headType when no origin available", async () => {
+    const { program } = await Tester.compile(`
+      @versioned(Versions)
+      @service
+      namespace TestService;
+
+      enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+      model Widget {
+        name: string;
+        @added(Versions.v2)
+        required: string;
+      }
+
+      @route("/widgets")
+      @post
+      op createWidget(@body widget: Widget): Widget;
+    `);
+
+    const result = analyzeProgram(program);
+    // Find a finding and strip origin to test fallback path
+    const finding = result.findings.find((f) => f.severity === "error");
+    if (finding) {
+      const stripped = { ...finding, diff: { ...finding.diff, origin: undefined } };
+      const codefix = createApproveBreakingChangeCodeFix(stripped);
+      expect(codefix).toBeDefined();
+    }
+  });
+
+  it("falls back to baseType for removals with no origin or headType", async () => {
+    const { program } = await Tester.compile(`
+      @versioned(Versions)
+      @service
+      namespace TestService;
+
+      enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+      model Widget {
+        name: string;
+        @removed(Versions.v2)
+        legacy: string;
+      }
+
+      @route("/widgets")
+      @get
+      op getWidget(): Widget;
+    `);
+
+    const result = analyzeProgram(program);
+    const finding = result.findings.find((f) => f.severity === "error");
+    expect(finding).toBeDefined();
+    // Strip origin and headType to test baseType fallback
+    const stripped = {
+      ...finding!,
+      diff: { ...finding!.diff, origin: undefined, headType: undefined },
+    };
+    const codefix = createApproveBreakingChangeCodeFix(stripped);
+    expect(codefix).toBeDefined();
+  });
+
   it("targets the origin type when available", async () => {
     const { program } = await Tester.compile(`
       @versioned(Versions)
@@ -190,6 +250,115 @@ describe("diagnostics", () => {
     const result = analyzeProgram(program);
     // Adding an optional response property should be severity "ignore"
     const diagnostics = emitFindingDiagnostics(program, result);
+    expect(diagnostics).toHaveLength(0);
+  });
+
+  it("emits diagnostic targeting baseType when no origin or headType", async () => {
+    const { program } = await Tester.compile(`
+      @versioned(Versions)
+      @service
+      namespace TestService;
+
+      enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+      model Widget {
+        name: string;
+        @removed(Versions.v2)
+        legacy: string;
+      }
+
+      @route("/widgets")
+      @get
+      op getWidget(): Widget;
+    `);
+
+    const result = analyzeProgram(program);
+    // Strip origin and headType from all findings to test baseType fallback
+    const modifiedResult = {
+      ...result,
+      findings: result.findings.map((f) => ({
+        ...f,
+        diff: { ...f.diff, origin: undefined, headType: undefined },
+      })),
+    };
+
+    const diagnostics = emitFindingDiagnostics(program, modifiedResult);
+    // Should still emit diagnostics via baseType fallback
+    const errorCount = modifiedResult.findings.filter(
+      (f) => f.severity === "error" && !f.suppressed && f.diff.baseType,
+    ).length;
+    expect(diagnostics.length).toBe(errorCount);
+  });
+
+  it("emits diagnostic targeting headType when no origin", async () => {
+    const { program } = await Tester.compile(`
+      @versioned(Versions)
+      @service
+      namespace TestService;
+
+      enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+      model Widget {
+        name: string;
+        @added(Versions.v2)
+        required: string;
+      }
+
+      @route("/widgets")
+      @post
+      op createWidget(@body widget: Widget): Widget;
+    `);
+
+    const result = analyzeProgram(program);
+    // Find an error finding that has headType (additions have headType)
+    const errorFindings = result.findings.filter((f) => f.severity === "error" && f.diff.headType);
+    if (errorFindings.length > 0) {
+      // Strip only origin to test headType fallback
+      const modifiedResult = {
+        ...result,
+        findings: errorFindings.map((f) => ({
+          ...f,
+          diff: { ...f.diff, origin: undefined },
+        })),
+      };
+
+      const diagnostics = emitFindingDiagnostics(program, modifiedResult);
+      expect(diagnostics.length).toBe(errorFindings.length);
+    }
+  });
+
+  it("skips findings with no targetable type", async () => {
+    const { program } = await Tester.compile(`
+      @versioned(Versions)
+      @service
+      namespace TestService;
+
+      enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+      model Widget { name: string; }
+
+      @route("/widgets")
+      @get
+      op getWidget(): Widget;
+    `);
+
+    const result = analyzeProgram(program);
+    // Strip all type references to test the undefined return path
+    const modifiedResult = {
+      ...result,
+      findings: [
+        {
+          diff: { kind: "OperationRemoved", message: "test", origin: undefined, headType: undefined, baseType: undefined, identity: { operation: { method: "GET", path: "/x" }, component: "request", statusCode: undefined, element: "" } },
+          severity: "error" as const,
+          rule: "default",
+          phase: "cross-version" as const,
+          suppressed: false,
+          versionPair: { baseVersion: "v1", headVersion: "v2", phase: "cross-version" as const },
+        },
+      ],
+    };
+
+    const diagnostics = emitFindingDiagnostics(program, modifiedResult as any);
     expect(diagnostics).toHaveLength(0);
   });
 });
