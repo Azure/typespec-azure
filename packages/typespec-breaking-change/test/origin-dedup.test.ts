@@ -380,7 +380,7 @@ describe("origin resolution (two-spec comparison)", () => {
     expect(scalarChange!.origin!.declarationPath).toContain("WidgetId");
   });
 
-  it("literal union variant removal falls back to no origin", async () => {
+  it("literal union variant removal resolves to parent union origin", async () => {
     const { baseView, headView } = await compileTwoSpecs(
       `
         ${preamble}
@@ -405,7 +405,9 @@ describe("origin resolution (two-spec comparison)", () => {
     );
 
     expect(variantRemoval).toBeDefined();
-    expect(variantRemoval!.origin).toBeUndefined();
+    // Literal variant in a named union resolves to the parent union
+    expect(variantRemoval!.origin).toBeDefined();
+    expect(variantRemoval!.origin!.declarationPath).toContain("Direction");
   });
 
   it("operation added has no origin", async () => {

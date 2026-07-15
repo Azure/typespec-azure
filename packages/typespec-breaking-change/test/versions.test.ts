@@ -233,13 +233,15 @@ describe("comparison pair construction", () => {
       expect(pairs[0].baseVersion).toBe("2024-01-01"); // skips preview
     });
 
-    it("no pair if no previous stable version exists", () => {
+    it("falls back to previous version when no stable predecessor exists", () => {
       const pairs = buildPhaseBPairs(
         ["2024-01-01-preview", "2025-01-01"],
         ["2025-01-01"],
       );
-      // 2024-01-01-preview is preview, so no stable before 2025-01-01
-      expect(pairs).toHaveLength(0);
+      // 2024-01-01-preview is preview, but we fall back to it as the predecessor
+      expect(pairs).toHaveLength(1);
+      expect(pairs[0].baseVersion).toBe("2024-01-01-preview");
+      expect(pairs[0].headVersion).toBe("2025-01-01");
     });
 
     it("no pair for the first version (nothing precedes it)", () => {
@@ -257,12 +259,15 @@ describe("comparison pair construction", () => {
       expect(pairs).toHaveLength(0);
     });
 
-    it("handles only preview versions — no pairs produced", () => {
+    it("handles only preview versions — falls back to consecutive pairs", () => {
       const pairs = buildPhaseBPairs(
         ["2024-01-01-preview", "2024-06-01-preview", "2025-01-01-preview"],
         ["2025-01-01-preview"],
       );
-      expect(pairs).toHaveLength(0);
+      // No stable versions, but falls back to 2024-06-01-preview as predecessor
+      expect(pairs).toHaveLength(1);
+      expect(pairs[0].baseVersion).toBe("2024-06-01-preview");
+      expect(pairs[0].headVersion).toBe("2025-01-01-preview");
     });
 
     it("multiple previews preceded by a stable", () => {
