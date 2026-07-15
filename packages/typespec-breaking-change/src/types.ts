@@ -215,6 +215,20 @@ export interface AnalysisResult {
   findings: Finding[];
   /** Timing information for performance validation. */
   timing: TimingInfo;
+  /** Summary of what was analyzed. */
+  summary: AnalysisSummary;
+}
+
+/**
+ * Summary of what the analysis covered.
+ */
+export interface AnalysisSummary {
+  /** Number of services found in the program(s). */
+  servicesAnalyzed: number;
+  /** Number of version pairs compared. */
+  comparisonsPerformed: number;
+  /** If no comparisons were performed, explains why. */
+  noComparisonReason?: string;
 }
 
 /**

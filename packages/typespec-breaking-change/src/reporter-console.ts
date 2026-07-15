@@ -20,6 +20,10 @@ export function formatConsoleReport(
   const visibleFindings = result.findings.filter((finding) => shouldIncludeFinding(finding, options));
   const summaryLines = [SUMMARY_SEPARATOR, formatSummary(result)];
 
+  if (result.summary.noComparisonReason) {
+    summaryLines.push(`Note: ${result.summary.noComparisonReason}`);
+  }
+
   if (options.showTiming ?? true) {
     summaryLines.push(formatTiming(result));
   }

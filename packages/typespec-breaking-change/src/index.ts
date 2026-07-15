@@ -41,6 +41,7 @@ export * from "./suppression.js";
 export { isOperationIdentity, isServiceIdentity } from "./types.js";
 export type {
   AnalysisResult,
+  AnalysisSummary,
   ApiDiff,
   ComparisonPair,
   ComparisonPhase,

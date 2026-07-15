@@ -4,6 +4,7 @@ import { classifyDiffs } from "./policy.js";
 import { applySuppressions } from "./suppression.js";
 import type {
   AnalysisResult,
+  AnalysisSummary,
   ComparisonPhase,
   Finding,
   TimingInfo,
@@ -31,11 +32,15 @@ export function analyzeProgram(program: Program, options?: AnalysisOptions): Ana
   const totalStart = Date.now();
   const timing = createEmptyTiming();
   const allFindings: Finding[] = [];
+  let servicesAnalyzed = 0;
+  let comparisonsPerformed = 0;
 
   for (const service of enumerateVersions(program)) {
     if (!shouldAnalyzeService(service.service, options)) {
       continue;
     }
+
+    servicesAnalyzed++;
 
     if (options?.phase === "same-version") {
       continue;
@@ -45,6 +50,7 @@ export function analyzeProgram(program: Program, options?: AnalysisOptions): Ana
     const pairs = buildPhaseBPairs(service.versions, service.versions);
     timing.versionMutatorsMs += Date.now() - pairStart;
 
+    comparisonsPerformed += pairs.length;
     for (const pair of pairs) {
       const baseView = timeVersionedView(program, service.service, pair.baseVersion, timing);
       const headView = timeVersionedView(program, service.service, pair.headVersion, timing);
@@ -57,7 +63,8 @@ export function analyzeProgram(program: Program, options?: AnalysisOptions): Ana
   timing.suppressMs += Date.now() - suppressStart;
   timing.totalMs = Date.now() - totalStart;
 
-  return { findings, timing };
+  const summary = buildSummary(servicesAnalyzed, comparisonsPerformed, options);
+  return { findings, timing, summary };
 }
 
 /**
@@ -71,6 +78,8 @@ export function analyzeBaseAndHead(
   const totalStart = Date.now();
   const timing = createEmptyTiming();
   const allFindings: Finding[] = [];
+  let servicesAnalyzed = 0;
+  let comparisonsPerformed = 0;
 
   const baseServices = enumerateVersions(baseProgram);
 
@@ -79,6 +88,7 @@ export function analyzeBaseAndHead(
       continue;
     }
 
+    servicesAnalyzed++;
     const baseService = baseServices.find((candidate) => candidate.service.name === headService.service.name);
     const changedVersions: string[] = [];
 
@@ -87,6 +97,7 @@ export function analyzeBaseAndHead(
       const phaseAPairs = buildPhaseAPairs(baseService?.versions ?? [], headService.versions);
       timing.versionMutatorsMs += Date.now() - pairStart;
 
+      comparisonsPerformed += phaseAPairs.length;
       for (const pair of phaseAPairs) {
         if (!baseService) {
           continue;
@@ -114,6 +125,7 @@ export function analyzeBaseAndHead(
         const phaseBPairs = buildPhaseBPairs(headService.versions, candidates);
         timing.versionMutatorsMs += Date.now() - pairStart;
 
+        comparisonsPerformed += phaseBPairs.length;
         for (const pair of phaseBPairs) {
           const baseView = timeVersionedView(headProgram, headService.service, pair.baseVersion, timing);
           const headView = timeVersionedView(headProgram, headService.service, pair.headVersion, timing);
@@ -128,7 +140,8 @@ export function analyzeBaseAndHead(
   timing.suppressMs += Date.now() - suppressStart;
   timing.totalMs = Date.now() - totalStart;
 
-  return { findings, timing };
+  const summary = buildSummary(servicesAnalyzed, comparisonsPerformed, options);
+  return { findings, timing, summary };
 }
 
 function analyzePair(
@@ -177,4 +190,29 @@ function createEmptyTiming(): TimingInfo {
     reportMs: 0,
     totalMs: 0,
   };
+}
+
+function buildSummary(
+  servicesAnalyzed: number,
+  comparisonsPerformed: number,
+  options?: AnalysisOptions,
+): AnalysisSummary {
+  const summary: AnalysisSummary = {
+    servicesAnalyzed,
+    comparisonsPerformed,
+  };
+
+  if (comparisonsPerformed === 0) {
+    if (servicesAnalyzed === 0) {
+      summary.noComparisonReason = "No versioned services found in the program.";
+    } else if (options?.phase === "same-version") {
+      summary.noComparisonReason =
+        "Phase A (same-version) requires a base program for comparison. Use analyzeBaseAndHead() instead.";
+    } else {
+      summary.noComparisonReason =
+        "No cross-version comparisons needed: all versions are preview (no stable baseline exists).";
+    }
+  }
+
+  return summary;
 }

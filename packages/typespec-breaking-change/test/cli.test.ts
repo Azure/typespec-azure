@@ -124,6 +124,7 @@ describe("CLI formatResult", () => {
       reportMs: 0,
       totalMs: 700,
     },
+    summary: { servicesAnalyzed: 1, comparisonsPerformed: 1 },
   };
 
   it("formats as JSON", () => {
@@ -184,6 +185,7 @@ describe("CLI main", () => {
         reportMs: 0,
         totalMs: 0,
       },
+      summary: { servicesAnalyzed: 1, comparisonsPerformed: 1 },
     });
 
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
@@ -240,6 +242,7 @@ describe("CLI main", () => {
         reportMs: 0,
         totalMs: 0,
       },
+      summary: { servicesAnalyzed: 1, comparisonsPerformed: 1 },
     });
 
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);

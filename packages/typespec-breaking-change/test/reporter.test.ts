@@ -104,6 +104,7 @@ function createResult(): AnalysisResult {
       reportMs: 0,
       totalMs: 1200,
     },
+    summary: { servicesAnalyzed: 1, comparisonsPerformed: 1 },
   };
 }
 

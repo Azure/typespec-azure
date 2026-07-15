@@ -141,10 +141,8 @@ export function buildPhaseBPairs(
 
 /**
  * Find the previous stable version before index `i` in the version list.
- * If no stable version precedes this index, falls back to the immediately
- * preceding version (regardless of stability). This ensures preview-only
- * services still get cross-version comparisons.
- * Returns undefined only if `beforeIndex` is 0.
+ * Returns undefined if no stable version precedes this index.
+ * Preview-to-preview transitions are NOT breaking changes (no stability guarantee).
  */
 function findPreviousStable(
   versions: string[],
@@ -155,10 +153,6 @@ function findPreviousStable(
     if (classifier(versions[j]) === "stable") {
       return versions[j];
     }
-  }
-  // No stable predecessor found — fall back to immediately preceding version
-  if (beforeIndex > 0) {
-    return versions[beforeIndex - 1];
   }
   return undefined;
 }
