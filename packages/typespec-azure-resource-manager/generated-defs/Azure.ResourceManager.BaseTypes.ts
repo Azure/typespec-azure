@@ -1,7 +1,7 @@
 import type { DecoratorContext, DecoratorValidatorCallbacks, Model } from "@typespec/compiler";
 
 export interface BaseTypeInfo {
-  readonly baseType: string;
+  readonly baseType: "Agent" | "Relationship" | string;
   readonly version: string;
 }
 
@@ -24,7 +24,7 @@ export interface BaseTypeInfo {
  *
  * // The @azureBaseType decorator marks the resource as conforming to the Agent base type.
  * // (The Agent template applies this automatically, but it can also be applied directly.)
- * @azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
+ * @azureBaseType(#{ baseType: BaseType.Agent, version: "2024-06-01" })
  * model ContosoApplianceAgent is TrackedResource<ContosoApplianceProperties> {
  *   ...ResourceNameParameter<ContosoApplianceAgent>;
  * }
