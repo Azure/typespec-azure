@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-add `.events` to stream metadata
+add `sseMetadata` with per-event information for server-sent event (SSE) streams

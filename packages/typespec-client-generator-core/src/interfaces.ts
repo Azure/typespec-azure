@@ -879,12 +879,21 @@ export interface SdkStreamMetadata {
   streamType: SdkType;
   /** Content types associated with this stream (e.g. ["application/jsonl"], ["text/event-stream"]). */
   contentTypes: string[];
+}
+
+/**
+ * Metadata about a server-sent event (SSE, `text/event-stream`) body or response.
+ *
+ * Kept separate from {@link SdkStreamMetadata} because SSE, streaming, and events are
+ * modeled by distinct TypeSpec libraries (`@typespec/sse`, `@typespec/http`, and
+ * `@typespec/events`). Present alongside `streamMetadata` when the body/response is an
+ * SSE stream; absent for non-event streams such as JSONL.
+ */
+export interface SdkSseMetadata {
   /**
-   * Per-event metadata for server-sent event (SSE) streams, one entry per variant
-   * of the `@events` union. Present only when the stream is an SSE stream
-   * (`text/event-stream`); undefined for non-event streams such as JSONL.
+   * Per-event metadata, one entry per variant of the streamed `@events` union.
    */
-  events?: SdkSseEventMetadata[];
+  events: SdkSseEventMetadata[];
 }
 
 /**
@@ -944,6 +953,8 @@ export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
   methodParameterSegments: (SdkMethodParameter | SdkModelPropertyType)[][];
   /** Stream metadata, present when the body is a streaming type (e.g. JsonlStream, SSEStream). */
   streamMetadata?: SdkStreamMetadata;
+  /** SSE metadata, present when the body is a server-sent event stream (SSEStream). */
+  sseMetadata?: SdkSseMetadata;
   /** Options to show how to serialize the body. */
   serializationOptions: SerializationOptions;
 }
@@ -979,6 +990,8 @@ export interface SdkMethodResponse {
   optional?: boolean;
   /** Stream metadata, present when the response is a streaming type (e.g. JsonlStream, SSEStream). */
   streamMetadata?: SdkStreamMetadata;
+  /** SSE metadata, present when the response is a server-sent event stream (SSEStream). */
+  sseMetadata?: SdkSseMetadata;
 }
 
 export interface SdkServiceResponse {
@@ -996,6 +1009,8 @@ interface SdkHttpResponseBase extends SdkServiceResponse {
   description?: string;
   /** Stream metadata, present when the response is a streaming type (e.g. JsonlStream, SSEStream). */
   streamMetadata?: SdkStreamMetadata;
+  /** SSE metadata, present when the response is a server-sent event stream (SSEStream). */
+  sseMetadata?: SdkSseMetadata;
   /** Options to show how to deserialize the response body. */
   serializationOptions: SerializationOptions;
 }

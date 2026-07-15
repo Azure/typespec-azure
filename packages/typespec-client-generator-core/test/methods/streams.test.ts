@@ -108,8 +108,8 @@ describe("stream request", () => {
     strictEqual(bodyMeta.streamType.name, "Thing");
     deepStrictEqual(bodyMeta.contentTypes, ["application/jsonl"]);
 
-    // JSONL is not an event stream, so no per-event metadata.
-    strictEqual(bodyMeta.events, undefined);
+    // JSONL is not an event stream, so no SSE metadata.
+    strictEqual(method.operation.bodyParam?.sseMetadata, undefined);
 
     // streamType has Input + Json usage and appears in sdkPackage.models
     strictEqual(bodyMeta.streamType.usage, UsageFlags.Input | UsageFlags.Json);
@@ -239,11 +239,12 @@ describe("stream request", () => {
     // streamType union has Input usage (no Json since SSE uses text/event-stream)
     strictEqual(bodyMeta.streamType.usage, UsageFlags.Input);
 
-    // SSE event metadata: one entry per union variant
-    ok(bodyMeta.events);
-    strictEqual(bodyMeta.events.length, 4);
+    // SSE event metadata lives on a separate sseMetadata, not on streamMetadata.
+    const sseMeta = method.operation.bodyParam?.sseMetadata;
+    ok(sseMeta);
+    strictEqual(sseMeta.events.length, 4);
 
-    const userconnect = bodyMeta.events[0];
+    const userconnect = sseMeta.events[0];
     strictEqual(userconnect.eventType, "userconnect");
     strictEqual(userconnect.isTerminalEvent, false);
     strictEqual(userconnect.isEventEnvelope, false);
@@ -252,10 +253,10 @@ describe("stream request", () => {
     strictEqual(userconnect.payloadType, userconnect.type);
     strictEqual(userconnect.contentType, undefined);
 
-    strictEqual(bodyMeta.events[1].eventType, "usermessage");
-    strictEqual(bodyMeta.events[2].eventType, "userdisconnect");
+    strictEqual(sseMeta.events[1].eventType, "usermessage");
+    strictEqual(sseMeta.events[2].eventType, "userdisconnect");
 
-    const unsubscribe = bodyMeta.events[3];
+    const unsubscribe = sseMeta.events[3];
     strictEqual(unsubscribe.eventType, undefined);
     strictEqual(unsubscribe.isTerminalEvent, true);
     strictEqual(unsubscribe.contentType, "text/plain");
@@ -488,19 +489,21 @@ describe("stream response", () => {
     // streamType union has Output usage (no Json since SSE uses text/event-stream)
     strictEqual(responseMeta.streamType.usage, UsageFlags.Output);
 
-    // SSE event metadata: one entry per union variant, propagated to method response
-    ok(responseMeta.events);
-    strictEqual(responseMeta.events.length, 4);
-    strictEqual(responseMeta.events[0].eventType, "userconnect");
-    strictEqual(responseMeta.events[0].type.kind, "model");
-    strictEqual(responseMeta.events[0].type.name, "UserConnect");
-    strictEqual(responseMeta.events[3].eventType, undefined);
-    strictEqual(responseMeta.events[3].isTerminalEvent, true);
-    strictEqual(responseMeta.events[3].contentType, "text/plain");
+    // SSE event metadata lives on a separate sseMetadata, propagated to method response
+    const responseSse = method.operation.responses[0].sseMetadata;
+    ok(responseSse);
+    strictEqual(responseSse.events.length, 4);
+    strictEqual(responseSse.events[0].eventType, "userconnect");
+    strictEqual(responseSse.events[0].type.kind, "model");
+    strictEqual(responseSse.events[0].type.name, "UserConnect");
+    strictEqual(responseSse.events[3].eventType, undefined);
+    strictEqual(responseSse.events[3].isTerminalEvent, true);
+    strictEqual(responseSse.events[3].contentType, "text/plain");
 
-    ok(methodMeta.events);
-    strictEqual(methodMeta.events.length, 4);
-    strictEqual(methodMeta.events[3].isTerminalEvent, true);
+    const methodSse = method.response.sseMetadata;
+    ok(methodSse);
+    strictEqual(methodSse.events.length, 4);
+    strictEqual(methodSse.events[3].isTerminalEvent, true);
   });
 });
 
@@ -530,10 +533,12 @@ describe("sse scenarios (mirroring spector streaming/sse)", () => {
     const responseMeta = method.operation.responses[0].streamMetadata;
     ok(responseMeta);
     deepStrictEqual(responseMeta.contentTypes, ["text/event-stream"]);
-    ok(responseMeta.events);
-    strictEqual(responseMeta.events.length, 1);
 
-    const event = responseMeta.events[0];
+    const responseSse = method.operation.responses[0].sseMetadata;
+    ok(responseSse);
+    strictEqual(responseSse.events.length, 1);
+
+    const event = responseSse.events[0];
     strictEqual(event.eventType, undefined); // unnamed variant => `message` event
     strictEqual(event.isTerminalEvent, false);
     strictEqual(event.isEventEnvelope, false);
@@ -573,19 +578,18 @@ describe("sse scenarios (mirroring spector streaming/sse)", () => {
     const context = await createSdkContextForTester(program);
     const method = getServiceMethodOfClient(context.sdkPackage);
 
-    const responseMeta = method.operation.responses[0].streamMetadata;
-    ok(responseMeta);
-    ok(responseMeta.events);
-    strictEqual(responseMeta.events.length, 3);
+    const responseSse = method.operation.responses[0].sseMetadata;
+    ok(responseSse);
+    strictEqual(responseSse.events.length, 3);
 
-    strictEqual(responseMeta.events[0].eventType, "responseCreated");
-    strictEqual(responseMeta.events[0].type.kind, "model");
-    strictEqual(responseMeta.events[0].type.name, "ResponseCreated");
-    strictEqual(responseMeta.events[0].isTerminalEvent, false);
+    strictEqual(responseSse.events[0].eventType, "responseCreated");
+    strictEqual(responseSse.events[0].type.kind, "model");
+    strictEqual(responseSse.events[0].type.name, "ResponseCreated");
+    strictEqual(responseSse.events[0].isTerminalEvent, false);
 
-    strictEqual(responseMeta.events[1].eventType, "responseDelta");
+    strictEqual(responseSse.events[1].eventType, "responseDelta");
 
-    const terminal = responseMeta.events[2];
+    const terminal = responseSse.events[2];
     strictEqual(terminal.eventType, undefined);
     strictEqual(terminal.isTerminalEvent, true);
     strictEqual(terminal.contentType, "text/plain");
@@ -630,15 +634,18 @@ describe("sse scenarios (mirroring spector streaming/sse)", () => {
     strictEqual(method.operation.bodyParam?.type.kind, "model");
     strictEqual(method.operation.bodyParam?.type.name, "RetrievalRequest");
     strictEqual(method.operation.bodyParam?.streamMetadata, undefined);
+    strictEqual(method.operation.bodyParam?.sseMetadata, undefined);
 
     // The response is the SSE stream, with per-event metadata.
     const responseMeta = method.operation.responses[0].streamMetadata;
     ok(responseMeta);
     deepStrictEqual(responseMeta.contentTypes, ["text/event-stream"]);
-    ok(responseMeta.events);
-    strictEqual(responseMeta.events.length, 3);
-    strictEqual(responseMeta.events[0].eventType, "partialResult");
-    strictEqual(responseMeta.events[1].eventType, "finalResult");
-    strictEqual(responseMeta.events[2].isTerminalEvent, true);
+
+    const responseSse = method.operation.responses[0].sseMetadata;
+    ok(responseSse);
+    strictEqual(responseSse.events.length, 3);
+    strictEqual(responseSse.events[0].eventType, "partialResult");
+    strictEqual(responseSse.events[1].eventType, "finalResult");
+    strictEqual(responseSse.events[2].isTerminalEvent, true);
   });
 });

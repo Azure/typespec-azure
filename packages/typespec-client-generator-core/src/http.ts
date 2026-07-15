@@ -53,6 +53,7 @@ import {
   SdkQueryParameter,
   SdkServiceResponseHeader,
   SdkSseEventMetadata,
+  SdkSseMetadata,
   SdkStreamMetadata,
   SdkType,
   SerializationOptions,
@@ -128,27 +129,26 @@ function buildSdkStreamMetadata(
   const streamType = diagnostics.pipe(
     getClientTypeWithDiagnostics(context, tspStreamMetadata.streamType, operation),
   );
-  const events = diagnostics.pipe(
-    buildSseEventMetadata(context, tspStreamMetadata.streamType, operation),
-  );
   return diagnostics.wrap({
     bodyType,
     originalType,
     streamType,
     contentTypes: [...tspStreamMetadata.contentTypes],
-    ...(events && { events }),
   });
 }
 
 /**
- * Build per-event metadata for a server-sent event (SSE) stream. Returns `undefined`
- * for non-event streams (e.g. JSONL), whose streamed type is not an `@events` union.
+ * Build server-sent event (SSE) metadata for a stream. Returns `undefined` for
+ * non-event streams (e.g. JSONL), whose streamed type is not an `@events` union.
+ *
+ * Kept separate from {@link buildSdkStreamMetadata} because SSE, streaming, and events
+ * are modeled by distinct TypeSpec libraries.
  */
-function buildSseEventMetadata(
+function buildSdkSseMetadata(
   context: TCGCContext,
   streamType: Type,
   operation: Operation,
-): [SdkSseEventMetadata[] | undefined, readonly Diagnostic[]] {
+): [SdkSseMetadata | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (streamType.kind !== "Union" || !isEvents(context.program, streamType)) {
     return diagnostics.wrap(undefined);
@@ -165,7 +165,7 @@ function buildSseEventMetadata(
     ),
     payloadContentType: event.payloadContentType,
   }));
-  return diagnostics.wrap(events);
+  return diagnostics.wrap({ events });
 }
 
 export function getSdkHttpOperation(
@@ -383,6 +383,9 @@ function getSdkHttpParameters(
         );
         retval.bodyParam.streamMetadata = diagnostics.pipe(
           buildSdkStreamMetadata(context, requestStreamMeta, httpOperation.operation),
+        );
+        retval.bodyParam.sseMetadata = diagnostics.pipe(
+          buildSdkSseMetadata(context, requestStreamMeta.streamType, httpOperation.operation),
         );
         // eslint-disable-next-line @typescript-eslint/no-deprecated
         retval.bodyParam.correspondingMethodParams.map((p) => (p.type = retval.bodyParam!.type));
@@ -698,6 +701,7 @@ function getSdkHttpResponseAndExceptions(
     let type: SdkType | undefined;
     let contentTypes: string[] = [];
     let streamMetadata: SdkStreamMetadata | undefined;
+    let sseMetadata: SdkSseMetadata | undefined;
     let lastBodyProperty: ModelProperty | undefined;
     let lastDefaultContentType: string | undefined;
 
@@ -743,6 +747,9 @@ function getSdkHttpResponseAndExceptions(
           type = diagnostics.pipe(getStreamAsBytes(context, innerResponse.body.type));
           streamMetadata = diagnostics.pipe(
             buildSdkStreamMetadata(context, responseStreamMeta, httpOperation.operation),
+          );
+          sseMetadata = diagnostics.pipe(
+            buildSdkSseMetadata(context, responseStreamMeta.streamType, httpOperation.operation),
           );
         }
       }
@@ -792,6 +799,7 @@ function getSdkHttpResponseAndExceptions(
       ),
       description: response.description,
       streamMetadata,
+      sseMetadata,
       serializationOptions: buildSerializationOptionsFromContentTypes(contentTypes),
     };
 
