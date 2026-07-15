@@ -399,7 +399,7 @@ model ResponseInstructionsProperty {
  * Applies the Agent base type decorator automatically.
  * @template Properties RP-specific properties for the agent (must extend AgentProperties)
  */
-@azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
+@azureBaseType(#{ baseType: BaseType.Agent, version: "2024-06-01" })
 model Agent<Properties extends AgentProperties> is TrackedResource<Properties>;
 
 /**

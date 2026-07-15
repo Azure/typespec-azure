@@ -13,7 +13,7 @@ describe("basetypes-experimental diagnostic", () => {
         description: string;
       }
 
-      @azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
+      @azureBaseType(#{ baseType: BaseType.Agent, version: "2024-06-01" })
       model MyAgent is TrackedResource<MyAgentProperties> {
         @key("myAgentName") @segment("myAgents") name: string;
       }
