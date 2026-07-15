@@ -4,6 +4,7 @@ export {
   type CanonicalizedOperation,
 } from "./canonicalize.js";
 export { formatResult, main, parseArgs, type CliOptions } from "./cli.js";
+export { createApproveBreakingChangeCodeFix } from "./codefixes.js";
 export { compileService, type CompileOptions } from "./compile.js";
 export {
   $approvedBreakingChange,
@@ -15,6 +16,7 @@ export {
   type ResolvedSuppression,
   type SuppressionMetadata,
 } from "./decorators.js";
+export { emitFindingDiagnostics } from "./diagnostics.js";
 export * from "./diff-engine.js";
 export type { DiffKind } from "./diff-kind.js";
 export * from "./diff-operations.js";

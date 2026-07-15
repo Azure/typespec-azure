@@ -1,4 +1,4 @@
-import { createTypeSpecLibrary } from "@typespec/compiler";
+import { createTypeSpecLibrary, paramMessage } from "@typespec/compiler";
 
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-breaking-change",
@@ -7,6 +7,12 @@ export const $lib = createTypeSpecLibrary({
       severity: "warning",
       messages: {
         default: "Invalid DiffKind specified in suppression decorator.",
+      },
+    },
+    "breaking-change": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Breaking change detected: ${"message"}`,
       },
     },
   },
