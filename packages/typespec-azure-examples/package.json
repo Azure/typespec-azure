@@ -1,0 +1,68 @@
+{
+  "name": "@azure-tools/typespec-azure-examples",
+  "version": "0.1.0",
+  "author": "Microsoft Corporation",
+  "description": "Tooling for the Azure unified examples format (examples.yaml): JSON Schema and the examples-validate CLI",
+  "homepage": "https://azure.github.io/typespec-azure",
+  "readme": "https://github.com/Azure/typespec-azure/blob/main/README.md",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Azure/typespec-azure.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Azure/typespec-azure/issues"
+  },
+  "keywords": [
+    "typespec",
+    "azure",
+    "examples"
+  ],
+  "type": "module",
+  "main": "dist/src/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    }
+  },
+  "bin": {
+    "examples-validate": "./dist/src/cli.js"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "clean": "rimraf ./dist ./schema/dist",
+    "build": "npm run regen-examples-yaml-schema && tsc -p tsconfig.build.json",
+    "watch": "tsc -p tsconfig.build.json --watch",
+    "regen-examples-yaml-schema": "tsp compile ./schema/examples-yaml.tsp --warn-as-error && node ./.scripts/schema-json-to-js.js",
+    "test": "vitest run",
+    "test:watch": "vitest -w",
+    "test:ci": "vitest run --coverage --reporter=junit --reporter=default",
+    "lint": "oxlint . --deny-warnings",
+    "lint:fix": "oxlint . --fix"
+  },
+  "files": [
+    "schema/dist/schema.js",
+    "schema/dist/ExamplesYaml.json",
+    "dist/**",
+    "!dist/test/**"
+  ],
+  "dependencies": {
+    "ajv": "catalog:",
+    "picocolors": "catalog:",
+    "yaml": "catalog:",
+    "yargs": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/yargs": "catalog:",
+    "@typespec/compiler": "workspace:^",
+    "@typespec/json-schema": "workspace:^",
+    "@vitest/coverage-v8": "catalog:",
+    "rimraf": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
