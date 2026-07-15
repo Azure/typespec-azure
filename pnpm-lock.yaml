@@ -229,8 +229,8 @@ catalogs:
       specifier: ^17.0.35
       version: 17.0.35
     '@typespec/http-client-python':
-      specifier: '>=0.34.1 <1.0.0'
-      version: 0.34.1
+      specifier: '>=0.34.2 <1.0.0'
+      version: 0.34.2
     '@typespec/ts-http-runtime':
       specifier: 0.3.6
       version: 0.3.6
@@ -3786,7 +3786,7 @@ importers:
     dependencies:
       '@typespec/http-client-python':
         specifier: 'catalog:'
-        version: 0.34.1(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)
+        version: 0.34.2(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)
       semver:
         specifier: 'catalog:'
         version: 7.8.5
@@ -8462,24 +8462,24 @@ packages:
   '@types/yoga-layout@1.9.2':
     resolution: {integrity: sha512-S9q47ByT2pPvD65IvrWp7qppVMpk9WGMbVq9wbWZOHg6tnXSD4vyhao6nOSBwwfDdV2p3Kx9evA9vI+XWTfDvw==}
 
-  '@typespec/http-client-python@0.34.1':
-    resolution: {integrity: sha512-ts5eI67WdDeMZEQ8SVNI1BOlU34gqTTBGZEicKqgZ99O1q61mDCbMIcC3Aphgdgvh/dmSCWU4XteQpy/gg1LAA==}
+  '@typespec/http-client-python@0.34.2':
+    resolution: {integrity: sha512-GngEovDgQlDD/+LIMsINT103t4MfxqDV6dJnJ5osRdg2sMWcNqYnCglAmIgMHsQHrvji3FIdcsD8LJ7Lqdiurg==}
     engines: {node: '>=22.0.0'}
     peerDependencies:
-      '@azure-tools/typespec-autorest': '>=0.69.1 <1.0.0'
-      '@azure-tools/typespec-azure-core': '>=0.69.0 <1.0.0'
-      '@azure-tools/typespec-azure-resource-manager': '>=0.69.1 <1.0.0'
-      '@azure-tools/typespec-azure-rulesets': '>=0.69.1 <1.0.0'
-      '@azure-tools/typespec-client-generator-core': '>=0.69.1 <1.0.0'
-      '@typespec/compiler': ^1.13.0
-      '@typespec/events': '>=0.83.0 <1.0.0'
-      '@typespec/http': ^1.13.0
-      '@typespec/openapi': ^1.13.0
-      '@typespec/rest': '>=0.83.0 <1.0.0'
-      '@typespec/sse': '>=0.83.0 <1.0.0'
-      '@typespec/streams': '>=0.83.0 <1.0.0'
-      '@typespec/versioning': '>=0.83.0 <1.0.0'
-      '@typespec/xml': '>=0.83.0 <1.0.0'
+      '@azure-tools/typespec-autorest': '>=0.70.0 <1.0.0'
+      '@azure-tools/typespec-azure-core': '>=0.70.0 <1.0.0'
+      '@azure-tools/typespec-azure-resource-manager': '>=0.70.0 <1.0.0'
+      '@azure-tools/typespec-azure-rulesets': '>=0.70.0 <1.0.0'
+      '@azure-tools/typespec-client-generator-core': '>=0.70.0 <1.0.0'
+      '@typespec/compiler': ^1.14.0
+      '@typespec/events': '>=0.84.0 <1.0.0'
+      '@typespec/http': ^1.14.0
+      '@typespec/openapi': ^1.14.0
+      '@typespec/rest': '>=0.84.0 <1.0.0'
+      '@typespec/sse': '>=0.84.0 <1.0.0'
+      '@typespec/streams': '>=0.84.0 <1.0.0'
+      '@typespec/versioning': '>=0.84.0 <1.0.0'
+      '@typespec/xml': '>=0.84.0 <1.0.0'
 
   '@typespec/ts-http-runtime@0.3.6':
     resolution: {integrity: sha512-jIXhD0eWQ1JA6ln/5Dltyx22UxWNrw0hZmhy2rlv6m6KgF7kplHx3g0fzi09lNmTJQRR91OlemYp3xFnvDK9og==}
@@ -20348,7 +20348,7 @@ snapshots:
 
   '@types/yoga-layout@1.9.2': {}
 
-  '@typespec/http-client-python@0.34.1(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)':
+  '@typespec/http-client-python@0.34.2(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)':
     dependencies:
       '@azure-tools/typespec-autorest': link:packages/typespec-autorest
       '@azure-tools/typespec-azure-core': link:packages/typespec-azure-core
