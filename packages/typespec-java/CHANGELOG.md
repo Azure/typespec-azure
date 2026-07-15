@@ -4,6 +4,7 @@
 
 Compatible with compiler 1.14.0.
 
+- Updated package dependencies to the latest versions.
 - Replaced `js-yaml` with `yaml`, and `lodash` with builtin.
 
 ## 0.45.4 (2026-06-18)
