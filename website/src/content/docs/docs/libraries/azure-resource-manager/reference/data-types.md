@@ -1560,10 +1560,27 @@ model Azure.ResourceManager.BaseTypes.BaseTypeInfo
 
 #### Properties
 
-| Name     | Type     | Description                                      |
-| -------- | -------- | ------------------------------------------------ |
-| baseType | `string` | The base type identifier (for example, "Agent"). |
-| version  | `string` | The schema version of the base type.             |
+| Name     | Type                                                                   | Description                          |
+| -------- | ---------------------------------------------------------------------- | ------------------------------------ |
+| baseType | [`BaseType`](./data-types.md#Azure.ResourceManager.BaseTypes.BaseType) | The base type identifier.            |
+| version  | `string`                                                               | The schema version of the base type. |
+
+### `BaseType` {#Azure.ResourceManager.BaseTypes.BaseType}
+
+The set of Azure base types a resource may declare conformance to via the
+`@azureBaseType` decorator. Modeled as an extensible (open) enum so additional
+base types can be introduced without a breaking change.
+
+```typespec
+union Azure.ResourceManager.BaseTypes.BaseType
+```
+
+#### Variants
+
+| Name         | Type             | Description                 |
+| ------------ | ---------------- | --------------------------- |
+| Agent        | `"Agent"`        | The Agent base type.        |
+| Relationship | `"Relationship"` | The Relationship base type. |
 
 ## Azure.ResourceManager.BaseTypes.Agents
 
