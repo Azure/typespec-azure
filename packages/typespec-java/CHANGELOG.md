@@ -1,5 +1,11 @@
 # Change Log - @azure-tools/typespec-java
 
+## 0.45.6 (2026-07-15)
+
+Compatible with compiler 1.14.0.
+
+- Replaced `js-yaml` with `yaml`, and `lodash` with builtin.
+
 ## 0.45.4 (2026-06-18)
 
 Compatible with compiler 1.13.0.
