@@ -108,7 +108,7 @@
           {
             "name": "relationshipName",
             "in": "path",
-            "description": "The relationship name.",
+            "description": "The name of the DependencyOf",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9_.-]{1,64}$"
@@ -150,7 +150,7 @@
           {
             "name": "relationshipName",
             "in": "path",
-            "description": "The relationship name.",
+            "description": "The name of the DependencyOf",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9_.-]{1,64}$"
@@ -222,7 +222,7 @@
           {
             "name": "relationshipName",
             "in": "path",
-            "description": "The relationship name.",
+            "description": "The name of the DependencyOf",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9_.-]{1,64}$"
@@ -291,7 +291,7 @@
           {
             "name": "relationshipName",
             "in": "path",
-            "description": "The relationship name.",
+            "description": "The name of the DependencyOf",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9_.-]{1,64}$"
@@ -432,28 +432,6 @@
         "value"
       ]
     },
-    "DependencyOfMetadata": {
-      "type": "object",
-      "description": "Metadata for a Contoso dependency relationship.",
-      "properties": {
-        "sourceType": {
-          "type": "string",
-          "description": "The type of the relationship source."
-        },
-        "targetType": {
-          "type": "string",
-          "description": "The type of the relationship target."
-        },
-        "description": {
-          "type": "string",
-          "description": "A human-readable relationship description."
-        }
-      },
-      "required": [
-        "sourceType",
-        "targetType"
-      ]
-    },
     "DependencyOfProperties": {
       "type": "object",
       "description": "Properties for a Contoso dependency relationship.",
@@ -483,8 +461,26 @@
           "description": "The tenant identifier of the relationship target."
         },
         "metadata": {
-          "$ref": "#/definitions/DependencyOfMetadata",
-          "description": "Metadata describing the relationship source and target types."
+          "type": "object",
+          "description": "Metadata describing the relationship source and target types.",
+          "properties": {
+            "sourceType": {
+              "type": "string",
+              "description": "The type of the relationship source."
+            },
+            "targetType": {
+              "type": "string",
+              "description": "The type of the relationship target."
+            },
+            "description": {
+              "type": "string",
+              "description": "A human-readable relationship description."
+            }
+          },
+          "required": [
+            "sourceType",
+            "targetType"
+          ]
         },
         "originInformation": {
           "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Relationships.RelationshipOriginInformation",
@@ -492,7 +488,7 @@
         },
         "provisioningState": {
           "$ref": "#/definitions/DependencyOfProvisioningState",
-          "description": "The provisioning state of the dependency relationship.",
+          "description": "The provisioning state of the relationship.",
           "readOnly": true
         }
       },
@@ -554,17 +550,6 @@
       },
       "readOnly": true
     },
-    "DependencyOfProvisioningStateProperty": {
-      "type": "object",
-      "description": "Provisioning state property for a Contoso dependency relationship.",
-      "properties": {
-        "provisioningState": {
-          "$ref": "#/definitions/DependencyOfProvisioningState",
-          "description": "The provisioning state of the dependency relationship.",
-          "readOnly": true
-        }
-      }
-    },
     "DependencyOfUpdate": {
       "type": "object",
       "description": "The type used for update operations of the DependencyOf.",
@@ -596,8 +581,26 @@
           "description": "The tenant identifier of the relationship target."
         },
         "metadata": {
-          "$ref": "#/definitions/DependencyOfMetadata",
-          "description": "Metadata describing the relationship source and target types."
+          "type": "object",
+          "description": "Metadata describing the relationship source and target types.",
+          "properties": {
+            "sourceType": {
+              "type": "string",
+              "description": "The type of the relationship source."
+            },
+            "targetType": {
+              "type": "string",
+              "description": "The type of the relationship target."
+            },
+            "description": {
+              "type": "string",
+              "description": "A human-readable relationship description."
+            }
+          },
+          "required": [
+            "sourceType",
+            "targetType"
+          ]
         },
         "originInformation": {
           "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Relationships.RelationshipOriginInformation",

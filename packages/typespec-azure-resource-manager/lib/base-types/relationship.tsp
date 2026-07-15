@@ -36,12 +36,12 @@ model RelationshipOriginInformation {
  * Required properties for a relationship resource.
  * @template Metadata The relationship metadata model.
  * @template OriginInformation The relationship origin information model.
- * @template ProvisioningStateProperty The provisioning state property model. Defaults to DefaultProvisioningStateProperty.
+ * @template ProvisioningState The relationship provisioning state values.
  */
 model RelationshipProperties<
   Metadata extends RelationshipMetadata = RelationshipMetadata,
   OriginInformation extends RelationshipOriginInformation = RelationshipOriginInformation,
-  ProvisioningStateProperty extends TypeSpec.Reflection.Model = DefaultProvisioningStateProperty
+  ProvisioningState extends string = ResourceProvisioningState
 > {
   /** ARM-managed. Must include the base type descriptor for this resource. */
   @visibility(Lifecycle.Read)
@@ -65,7 +65,9 @@ model RelationshipProperties<
   /** Origin information for the relationship. */
   originInformation?: OriginInformation;
 
-  ...ProvisioningStateProperty;
+  /** The provisioning state of the relationship. */
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
 }
 
 // ============================================================================

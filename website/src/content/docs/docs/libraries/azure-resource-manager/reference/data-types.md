@@ -2007,16 +2007,16 @@ model Azure.ResourceManager.BaseTypes.Relationships.RelationshipOriginInformatio
 Required properties for a relationship resource.
 
 ```typespec
-model Azure.ResourceManager.BaseTypes.Relationships.RelationshipProperties<Metadata, OriginInformation, ProvisioningStateProperty>
+model Azure.ResourceManager.BaseTypes.Relationships.RelationshipProperties<Metadata, OriginInformation, ProvisioningState>
 ```
 
 #### Template Parameters
 
-| Name                      | Description                                                                          |
-| ------------------------- | ------------------------------------------------------------------------------------ |
-| Metadata                  | The relationship metadata model.                                                     |
-| OriginInformation         | The relationship origin information model.                                           |
-| ProvisioningStateProperty | The provisioning state property model. Defaults to DefaultProvisioningStateProperty. |
+| Name              | Description                                 |
+| ----------------- | ------------------------------------------- |
+| Metadata          | The relationship metadata model.            |
+| OriginInformation | The relationship origin information model.  |
+| ProvisioningState | The relationship provisioning state values. |
 
 #### Properties
 
@@ -2029,6 +2029,7 @@ model Azure.ResourceManager.BaseTypes.Relationships.RelationshipProperties<Metad
 | targetTenant       | `string`                                         | The tenant identifier of the relationship target.                     |
 | metadata           | `Metadata`                                       | Metadata describing the relationship source and target types.         |
 | originInformation? | `OriginInformation`                              | Origin information for the relationship.                              |
+| provisioningState? | `ProvisioningState`                              | The provisioning state of the relationship.                           |
 
 ## Azure.ResourceManager.CommonTypes
 

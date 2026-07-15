@@ -25,10 +25,10 @@ enum Versions {
 interface Operations extends Azure.ResourceManager.Operations {}
 
 /** Metadata for a Contoso dependency relationship. */
-model DependencyOfMetadata is RelationshipMetadata {
+alias DependencyOfMetadata = RelationshipMetadata & {
   /** A human-readable relationship description. */
   description?: string;
-}
+};
 
 /** Provisioning state values for a Contoso dependency relationship async flow. */
 @Azure.Core.lroStatus
@@ -48,17 +48,10 @@ union DependencyOfProvisioningState {
   string,
 }
 
-/** Provisioning state property for a Contoso dependency relationship. */
-model DependencyOfProvisioningStateProperty {
-  /** The provisioning state of the dependency relationship. */
-  @visibility(Lifecycle.Read)
-  provisioningState?: DependencyOfProvisioningState;
-}
-
 /** Properties for a Contoso dependency relationship. */
 model DependencyOfProperties is RelationshipProperties<
   Metadata = DependencyOfMetadata,
-  ProvisioningStateProperty = DependencyOfProvisioningStateProperty
+  ProvisioningState = DependencyOfProvisioningState
 >;
 
 /**
@@ -66,13 +59,12 @@ model DependencyOfProperties is RelationshipProperties<
  */
 #suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "Experimental BaseTypes"
 model DependencyOf is Relationship<DependencyOfProperties> {
-  /** The relationship name. */
-  @key("relationshipName")
-  @path
-  @segment("dependencyOf")
-  @pattern("^[a-zA-Z0-9_.-]{1,64}$")
-  @visibility(Lifecycle.Read)
-  name: string;
+  ...ResourceNameParameter<
+    Resource = DependencyOf,
+    KeyName = "relationshipName",
+    SegmentName = "dependencyOf",
+    NamePattern = "^[a-zA-Z0-9_.-]{1,64}$"
+  >;
 }
 
 /** Defines dependency relationship operations for a source scope. */
