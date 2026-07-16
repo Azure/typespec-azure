@@ -42,7 +42,7 @@ it("Detects operations outside interfaces", async () => {
         `,
     )
     .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+      code: "@azure-tools/typespec-azure-resource-manager/use-interface",
       message: "All operations must be inside an interface declaration.",
     });
 });

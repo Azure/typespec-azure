@@ -1,9 +1,9 @@
 ---
-title: "arm-resource-operation"
+title: "use-interface"
 ---
 
 ```text title="Full name"
-@azure-tools/typespec-azure-resource-manager/arm-resource-operation
+@azure-tools/typespec-azure-resource-manager/use-interface
 ```
 
 Validate that all ARM Resource operations are defined inside an interface declaration.

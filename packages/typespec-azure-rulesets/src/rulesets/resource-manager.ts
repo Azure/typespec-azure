@@ -80,7 +80,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/arm-resource-path-segment-invalid-chars": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state": true,
     "@azure-tools/typespec-azure-resource-manager/beyond-nesting-levels": true,
-    "@azure-tools/typespec-azure-resource-manager/arm-resource-operation": true,
+    "@azure-tools/typespec-azure-resource-manager/use-interface": true,
     "@azure-tools/typespec-azure-resource-manager/use-operation-decorator": true,
     "@azure-tools/typespec-azure-resource-manager/use-api-version": true,
     "@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation": true,

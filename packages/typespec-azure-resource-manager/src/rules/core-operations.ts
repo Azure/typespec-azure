@@ -6,10 +6,10 @@ import {
 } from "./utils.js";
 
 export const coreOperationsRule = createRule({
-  name: "arm-resource-operation",
+  name: "use-interface",
   severity: "warning",
   description: "Validate ARM Resource operations are defined inside an interface declaration.",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-operation",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/use-interface",
   messages: {
     default: "All operations must be inside an interface declaration.",
   },

@@ -5,4 +5,4 @@ packages:
   - "@azure-tools/typespec-azure-rulesets"
 ---
 
-Split `arm-resource-operation` lint rule: add `use-operation-decorator` and `use-api-version` as separate rules. The original rule now only checks that operations are inside an interface declaration.
+Split `arm-resource-operation` lint rule: add `use-operation-decorator`, `use-api-version`, and `use-interface` as separate rules replacing the original combined rule.
