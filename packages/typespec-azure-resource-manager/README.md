@@ -49,6 +49,7 @@ Available ruleSets:
 | [`@azure-tools/typespec-azure-resource-manager/version-progression`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/version-progression)                                             | Validate that ARM service versions all use unique dates and are declared in strictly increasing chronological order.                                                                                                                                  |
 | [`@azure-tools/typespec-azure-resource-manager/arm-custom-resource-no-key`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-custom-resource-no-key)                               | Validate that custom resource contains a key property.                                                                                                                                                                                                |
 | [`@azure-tools/typespec-azure-resource-manager/arm-custom-resource-usage-discourage`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-custom-resource-usage-discourage)           | Verify the usage of @customAzureResource decorator.                                                                                                                                                                                                   |
+| [`@azure-tools/typespec-azure-resource-manager/arm-feature-file-usage-discourage`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-feature-file-usage-discourage)                 | Verify the usage of @featureFiles decorator.                                                                                                                                                                                                          |
 | [`@azure-tools/typespec-azure-resource-manager/beyond-nesting-levels`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/beyond-nesting-levels)                                         | Tracked Resources must use 3 or fewer levels of nesting.                                                                                                                                                                                              |
 | [`@azure-tools/typespec-azure-resource-manager/arm-resource-operation`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-operation)                                       | Validate ARM Resource operations.                                                                                                                                                                                                                     |
 | [`@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-resource-delete-operation)                           | Check for resources that must have a delete operation.                                                                                                                                                                                                |
@@ -88,6 +89,9 @@ Available ruleSets:
 - [`@armResourceUpdate`](#@armresourceupdate)
 - [`@armVirtualResource`](#@armvirtualresource)
 - [`@extensionResource`](#@extensionresource)
+- [`@featureFile`](#@featurefile)
+- [`@featureFileOptions`](#@featurefileoptions)
+- [`@featureFiles`](#@featurefiles)
 - [`@identifiers`](#@identifiers)
 - [`@locationResource`](#@locationresource)
 - [`@resourceBaseType`](#@resourcebasetype)
@@ -430,6 +434,63 @@ See more details on [different Azure Resource Manager resource type here.](https
 
 None
 
+#### `@featureFile`
+
+Decorator to associate a feature file with a model, interface, or namespace
+
+```typespec
+@Azure.ResourceManager.featureFile(featureName: EnumMember)
+```
+
+##### Target
+
+The target to associate the feature file with
+`Model | Operation | Interface | Namespace`
+
+##### Parameters
+
+| Name        | Type         | Description                              |
+| ----------- | ------------ | ---------------------------------------- |
+| featureName | `EnumMember` | The feature to associate with the target |
+
+#### `@featureFileOptions`
+
+Decorator to define options for a specific feature file
+
+```typespec
+@Azure.ResourceManager.featureFileOptions(options: valueof Azure.ResourceManager.ArmFeatureFileOptions)
+```
+
+##### Target
+
+The enum member that represents the feature
+`EnumMember`
+
+##### Parameters
+
+| Name    | Type                                                      | Description                      |
+| ------- | --------------------------------------------------------- | -------------------------------- |
+| options | [valueof `ArmFeatureFileOptions`](#armfeaturefileoptions) | The options for the feature file |
+
+#### `@featureFiles`
+
+Decorator to define a set of feature files for splitting output
+
+```typespec
+@Azure.ResourceManager.featureFiles(features: Enum)
+```
+
+##### Target
+
+The service namespace
+`Namespace`
+
+##### Parameters
+
+| Name     | Type   | Description                         |
+| -------- | ------ | ----------------------------------- |
+| features | `Enum` | The enum that contains the features |
+
 #### `@identifiers`
 
 This decorator is used to indicate the identifying properties of objects in the array, e.g. size
@@ -643,7 +704,7 @@ model ContosoApplianceProperties is AgentPropertiesAppliance<ContosoApplianceDef
 
 // The @azureBaseType decorator marks the resource as conforming to the Agent base type.
 // (The Agent template applies this automatically, but it can also be applied directly.)
-@azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
+@azureBaseType(#{ baseType: BaseType.Agent, version: "2024-06-01" })
 model ContosoApplianceAgent is TrackedResource<ContosoApplianceProperties> {
   ...ResourceNameParameter<ContosoApplianceAgent>;
 }

@@ -11,7 +11,7 @@ using Azure.ResourceManager.Private;
 /**
  * DEPRECATED: Use CreateOrReplaceAsync instead.
  * A long-running resource CreateOrUpdate (PUT)
- * @template TargetResource the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup
+ * @template TargetResource the target resource, e.g. Extension.Subscription, Extension.ManagementGroup, Extension.ServiceGroup or Extension.ResourceGroup
  * @template ExtensionResource the resource being created or updated
  * @template Request Optional. The request body for the createOrUpdate operation
  * @template LroHeaders Optional.  Allows overriding the lro headers returned on resource create
@@ -47,7 +47,7 @@ alias CreateOrUpdateAsync<
 >;
 
 /** A long-running resource CreateOrUpdate (PUT)
- * @template TargetResource the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup
+ * @template TargetResource the target resource, e.g. Extension.Subscription, Extension.ManagementGroup, Extension.ServiceGroup or Extension.ResourceGroup
  * @template ExtensionResource the resource being created or updated
  * @template Request Optional. The request body for the createOrUpdate operation
  * @template LroHeaders Optional.  Allows overriding the lro headers returned on resource create
@@ -93,7 +93,7 @@ op CreateOrReplaceAsync<
 
 /**
  * Synchronous PUT operation for Azure Resource Manager resources
- * @template TargetResource the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup
+ * @template TargetResource the target resource, e.g. Extension.Subscription, Extension.ManagementGroup, Extension.ServiceGroup or Extension.ResourceGroup
  * @template ExtensionResource the resource being created or replaced
  * @template Request Optional. The request body for the createOrUpdate operation
  * @template Parameters Optional. Additional parameters after the path parameters
@@ -135,7 +135,7 @@ op CreateOrReplaceSync<
 
 /**
  * A long-running resource update using a custom PATCH payload (Asynchronous)
- * @template TargetResource the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup
+ * @template TargetResource the target resource, e.g. Extension.Subscription, Extension.ManagementGroup, Extension.ServiceGroup or Extension.ResourceGroup
  * @template ExtensionResource the resource being patched
  * @template PatchModel The input model for the PATCH request
  * @template LroHeaders Optional.  Allows overriding the lro headers returned in the Accepted response
@@ -179,7 +179,7 @@ op CustomPatchAsync<
 
 /**
  * A resource update using a custom PATCH payload (synchronous)
- * @template TargetResource the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup
+ * @template TargetResource the target resource, e.g. Extension.Subscription, Extension.ManagementGroup, Extension.ServiceGroup or Extension.ResourceGroup
  * @template ExtensionResource the resource being patched
  * @template PatchModel The input model for the PATCH request
  * @template Parameters Optional. Additional parameters after the path parameters
