@@ -9,7 +9,6 @@ import {
 import {
   getNamespaceName,
   getSourceModel,
-  isSourceOperationResourceManagerInternal,
   isTemplatedInterfaceOperation,
 } from "./utils.js";
 
@@ -26,11 +25,7 @@ export const useApiVersionRule = createRule({
   create(context) {
     return {
       operation: (operation: Operation) => {
-        if (
-          !isSourceOperationResourceManagerInternal(operation) &&
-          !isTemplateInstance(operation) &&
-          !isTemplatedInterfaceOperation(operation)
-        ) {
+        if (!isTemplateInstance(operation) && !isTemplatedInterfaceOperation(operation)) {
           const parameters: Model = operation.parameters;
           if (
             parameters === undefined ||
