@@ -29,6 +29,7 @@ export const ArmStateKeys = {
   customAzureResource: azureResourceManagerCreateStateSymbol("azureCustomResource"),
   armFeature: azureResourceManagerCreateStateSymbol("armFeature"),
   armFeatureSet: azureResourceManagerCreateStateSymbol("armFeatureSet"),
+  armFeatureFileSet: azureResourceManagerCreateStateSymbol("armFeatureFileSet"),
   armFeatureOptions: azureResourceManagerCreateStateSymbol("armFeatureOptions"),
 
   // private.decorator.ts

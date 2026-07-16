@@ -341,6 +341,63 @@ See more details on [different Azure Resource Manager resource type here.](https
 
 None
 
+### `@featureFile` {#@Azure.ResourceManager.featureFile}
+
+Decorator to associate a feature file with a model, interface, or namespace
+
+```typespec
+@Azure.ResourceManager.featureFile(featureName: EnumMember)
+```
+
+#### Target
+
+The target to associate the feature file with
+`Model | Operation | Interface | Namespace`
+
+#### Parameters
+
+| Name        | Type         | Description                              |
+| ----------- | ------------ | ---------------------------------------- |
+| featureName | `EnumMember` | The feature to associate with the target |
+
+### `@featureFileOptions` {#@Azure.ResourceManager.featureFileOptions}
+
+Decorator to define options for a specific feature file
+
+```typespec
+@Azure.ResourceManager.featureFileOptions(options: valueof Azure.ResourceManager.ArmFeatureFileOptions)
+```
+
+#### Target
+
+The enum member that represents the feature
+`EnumMember`
+
+#### Parameters
+
+| Name    | Type                                                                                           | Description                      |
+| ------- | ---------------------------------------------------------------------------------------------- | -------------------------------- |
+| options | [valueof `ArmFeatureFileOptions`](./data-types.md#Azure.ResourceManager.ArmFeatureFileOptions) | The options for the feature file |
+
+### `@featureFiles` {#@Azure.ResourceManager.featureFiles}
+
+Decorator to define a set of feature files for splitting output
+
+```typespec
+@Azure.ResourceManager.featureFiles(features: Enum)
+```
+
+#### Target
+
+The service namespace
+`Namespace`
+
+#### Parameters
+
+| Name     | Type   | Description                         |
+| -------- | ------ | ----------------------------------- |
+| features | `Enum` | The enum that contains the features |
+
 ### `@identifiers` {#@Azure.ResourceManager.identifiers}
 
 This decorator is used to indicate the identifying properties of objects in the array, e.g. size
@@ -544,11 +601,17 @@ multiple base types. Duplicate entries are ignored.
 #### Examples
 
 ```typespec
-@azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
-model MyAgentProperties {
-  ...AgentProperties;
-  ...AgentToolProperty;
+// Agent definition and properties using the Appliance deployment model
+model ContosoApplianceDefinition is AgentDefinitionAppliance<true, true>;
+model ContosoApplianceProperties is AgentPropertiesAppliance<ContosoApplianceDefinition> {
   ...DefaultProvisioningStateProperty;
+}
+
+// The @azureBaseType decorator marks the resource as conforming to the Agent base type.
+// (The Agent template applies this automatically, but it can also be applied directly.)
+@azureBaseType(#{ baseType: BaseType.Agent, version: "2024-06-01" })
+model ContosoApplianceAgent is TrackedResource<ContosoApplianceProperties> {
+  ...ResourceNameParameter<ContosoApplianceAgent>;
 }
 ```
 
