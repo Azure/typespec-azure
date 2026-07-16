@@ -489,13 +489,15 @@ describe("stream response", () => {
     // streamType union has Output usage (no Json since SSE uses text/event-stream)
     strictEqual(responseMeta.streamType.usage, UsageFlags.Output);
 
-    // SSE event metadata lives on a separate sseMetadata, propagated to method response
+    // Event variant models also have Output usage only (no contentType set => no Json)
     const responseSse = method.operation.responses[0].sseMetadata;
     ok(responseSse);
     strictEqual(responseSse.events.length, 4);
     strictEqual(responseSse.events[0].eventType, "userconnect");
     strictEqual(responseSse.events[0].type.kind, "model");
     strictEqual(responseSse.events[0].type.name, "UserConnect");
+    // No @Events.contentType set => no Json usage, only Output from union propagation
+    strictEqual((responseSse.events[0].type as any).usage, UsageFlags.Output);
     strictEqual(responseSse.events[3].eventType, undefined);
     strictEqual(responseSse.events[3].isTerminalEvent, true);
     strictEqual(responseSse.events[3].contentType, "text/plain");
@@ -546,6 +548,9 @@ describe("sse scenarios (mirroring spector streaming/sse)", () => {
     strictEqual(event.type.name, "Info");
     strictEqual(event.payloadType, event.type);
     strictEqual(event.contentType, "application/json");
+
+    // Event model gets Json usage because its contentType is application/json
+    strictEqual((event.type as any).usage, UsageFlags.Output | UsageFlags.Json);
   });
 
   it("named events with a terminal event", async () => {
@@ -586,8 +591,11 @@ describe("sse scenarios (mirroring spector streaming/sse)", () => {
     strictEqual(responseSse.events[0].type.kind, "model");
     strictEqual(responseSse.events[0].type.name, "ResponseCreated");
     strictEqual(responseSse.events[0].isTerminalEvent, false);
+    // JSON event models get Json usage
+    strictEqual((responseSse.events[0].type as any).usage, UsageFlags.Output | UsageFlags.Json);
 
     strictEqual(responseSse.events[1].eventType, "responseDelta");
+    strictEqual((responseSse.events[1].type as any).usage, UsageFlags.Output | UsageFlags.Json);
 
     const terminal = responseSse.events[2];
     strictEqual(terminal.eventType, undefined);

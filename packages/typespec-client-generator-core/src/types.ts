@@ -30,6 +30,8 @@ import {
   isTemplateDeclaration,
   resolveEncodedName,
 } from "@typespec/compiler";
+import { isEvents } from "@typespec/events";
+import { unsafe_getEventDefinitions as getEventDefinitions } from "@typespec/events/experimental";
 import {
   Authentication,
   HttpOperationFileBody,
@@ -1537,6 +1539,36 @@ interface PropagationOptions {
   isOverride?: boolean;
 }
 
+/**
+ * Propagates `UsageFlags.Json` to individual SSE event `type` and `payloadType` based on
+ * their per-event content type. Only applies when the stream type is an `@events` union.
+ */
+function propagateSseEventUsage(
+  context: TCGCContext,
+  streamType: Type,
+  operation: Operation,
+  diagnostics: ReturnType<typeof createDiagnosticCollector>,
+): void {
+  if (streamType.kind !== "Union" || !isEvents(context.program, streamType)) {
+    return;
+  }
+  const eventDefinitions = diagnostics.pipe(getEventDefinitions(context.program, streamType));
+  for (const event of eventDefinitions) {
+    if (event.contentType && isMediaTypeJson(event.contentType)) {
+      const sdkType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, event.type, operation),
+      );
+      diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkType));
+    }
+    if (event.payloadContentType && isMediaTypeJson(event.payloadContentType)) {
+      const sdkPayloadType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, event.payloadType, operation),
+      );
+      diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkPayloadType));
+    }
+  }
+}
+
 export function updateUsageOrAccess(
   context: TCGCContext,
   value: UsageFlags | AccessFlags,
@@ -1822,6 +1854,8 @@ function updateTypesFromOperation(
       }
       const access = getAccessOverride(context, operation) ?? "public";
       diagnostics.pipe(updateUsageOrAccess(context, access, sdkStreamType));
+      // Propagate Json usage to individual SSE event types based on per-event content type
+      propagateSseEventUsage(context, requestStreamMeta.streamType, operation, diagnostics);
     }
 
     // Push "Parameter" context for operation parameters
@@ -1953,6 +1987,8 @@ function updateTypesFromOperation(
           }
           const access = getAccessOverride(context, operation) ?? "public";
           diagnostics.pipe(updateUsageOrAccess(context, access, sdkStreamType));
+          // Propagate Json usage to individual SSE event types based on per-event content type
+          propagateSseEventUsage(context, responseStreamMeta.streamType, operation, diagnostics);
         }
       }
     }
