@@ -214,8 +214,6 @@ function isHttpEnvelope(program: Program, model: Model): boolean {
 
 /** Check if the union is only there to make the type nullable */
 function isOnlyNullableUnion(union: Union): boolean {
-  const nonNullVariants = [...union.variants.values()].filter(
-    (v) => !isNullType(v.type),
-  );
+  const nonNullVariants = [...union.variants.values()].filter((v) => !isNullType(v.type));
   return nonNullVariants.length <= 1;
 }
