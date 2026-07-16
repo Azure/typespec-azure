@@ -33,7 +33,7 @@ jobs:
         run: pnpm install
 
       - name: Build
-        run: pnpm turbo run --filter "@azure-tools/typespec-go..." build
+        run: pnpm --filter "@azure-tools/typespec-go" run build:deps
 
   test:
     name: "Mock API Tests (Go ${{ matrix.go-version }})"
@@ -58,7 +58,7 @@ jobs:
         run: pnpm install
 
       - name: Build
-        run: pnpm turbo run --filter "@azure-tools/typespec-go..." build
+        run: pnpm --filter "@azure-tools/typespec-go" run build:deps
 
       - name: Build spector and specs
         run: |
@@ -99,7 +99,7 @@ jobs:
         run: pnpm install
 
       - name: Build
-        run: pnpm turbo run --filter "@azure-tools/typespec-go..." build
+        run: pnpm --filter "@azure-tools/typespec-go" run build:deps
 
       - name: Test
         run: pnpm run test:ci
@@ -120,7 +120,7 @@ jobs:
         run: pnpm install
 
       - name: Build
-        run: pnpm turbo run --filter "@azure-tools/typespec-go..." build
+        run: pnpm --filter "@azure-tools/typespec-go" run build:deps
 
       - name: Regenerate emitter docs
         run: pnpm run regen-docs

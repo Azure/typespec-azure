@@ -33,6 +33,7 @@
   "scripts": {
     "clean": "rimraf ./dist ./temp ./node_modules",
     "build": "tsc -p .",
+    "build:deps": "turbo run build --filter=@azure-tools/typespec-go...",
     "watch": "tsc -p . --watch",
     "test": "vitest run --pass-with-no-tests",
     "test:update": "node .scripts/test-update.js",

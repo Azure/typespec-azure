@@ -50,11 +50,13 @@ From the repo root, install all dependencies:
 pnpm install
 ```
 
-Then build the emitter with Turbo. Building through Turbo (rather than calling `tsc` directly) ensures the package's workspace dependencies are built first and lets Turbo cache unchanged builds:
+Then build the emitter and its workspace dependencies with Turbo (via the `build:deps` script). Building through Turbo (rather than calling `tsc` directly) ensures the package's workspace dependencies are built first and lets Turbo cache unchanged builds. From the `packages/typespec-go` directory:
 
 ```terminal
-npx turbo run build --filter=@azure-tools/typespec-go
+pnpm build:deps
 ```
+
+(`pnpm build` alone only compiles this package with `tsc` and assumes the dependencies are already built.)
 
 Use `pnpm watch` from the repo root to rebuild on change while you work.
 
