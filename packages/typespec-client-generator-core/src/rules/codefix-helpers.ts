@@ -1,9 +1,11 @@
 import type {
   CodeFix,
+  Enum,
   InsertTextCodeFixEdit,
   Model,
   ModelProperty,
   Program,
+  Union,
 } from "@typespec/compiler";
 import {
   createSourceFile,
@@ -15,10 +17,16 @@ import {
 import type { TypeSpecScriptNode } from "@typespec/compiler/ast";
 import { SyntaxKind } from "@typespec/compiler/ast";
 
+type AugmentDecoratorTarget = Model | ModelProperty | Enum | Union;
+
+function getTargetName(target: Model | Enum | Union): string {
+  return target.name ?? "";
+}
+
 /**
  * Get the namespace name for a target type.
  */
-function getTargetNamespace(target: Model | ModelProperty): string {
+function getTargetNamespace(target: AugmentDecoratorTarget): string {
   if (target.kind === "ModelProperty") {
     const model = target.model;
     if (model?.namespace) {
@@ -36,19 +44,19 @@ function getTargetNamespace(target: Model | ModelProperty): string {
  * Build a short reference for a type target (e.g., "Model.property").
  * Used for same-file augment decorators where the namespace is already in scope.
  */
-function buildShortRef(target: Model | ModelProperty): string {
+function buildShortRef(target: AugmentDecoratorTarget): string {
   if (target.kind === "ModelProperty") {
     const model = target.model;
     return model ? `${model.name}.${target.name}` : target.name;
   }
-  return target.name;
+  return getTargetName(target);
 }
 
 /**
  * Build the fully qualified name for a type target (e.g., "Azure.Service.Model.property").
  * Used for cross-file augment decorators where the namespace may not be in scope.
  */
-function buildFqn(target: Model | ModelProperty): string {
+function buildFqn(target: AugmentDecoratorTarget): string {
   if (target.kind === "ModelProperty") {
     const model = target.model;
     if (model && model.namespace) {
@@ -59,12 +67,12 @@ function buildFqn(target: Model | ModelProperty): string {
     }
     return target.name;
   }
-  // Model
   if (target.namespace) {
     const nsName = getNamespaceFullName(target.namespace);
-    return nsName ? `${nsName}.${target.name}` : target.name;
+    const targetName = getTargetName(target);
+    return nsName ? `${nsName}.${targetName}` : targetName;
   }
-  return target.name;
+  return getTargetName(target);
 }
 
 function getLineEnd(text: string, start: number): number {
@@ -119,7 +127,7 @@ function findUsingInsertPos(
  * @param args The decorator arguments as literal strings.
  */
 export function createAugmentDecoratorCodeFix(
-  target: Model | ModelProperty,
+  target: AugmentDecoratorTarget,
   decoratorName: string,
   args?: string[],
 ): CodeFix {
@@ -159,7 +167,7 @@ export function createAugmentDecoratorCodeFix(
  * @param args The decorator arguments as literal strings.
  */
 export function createClientTspAugmentDecoratorCodeFix(
-  target: Model | ModelProperty,
+  target: AugmentDecoratorTarget,
   decoratorName: string,
   program: Program,
   args?: string[],
