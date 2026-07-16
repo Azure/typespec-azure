@@ -15,11 +15,9 @@ describe("unions", () => {
     await tester
       .expect(
         `
-        @service
-        namespace TestService;
-        model Cat { meow: string; }
-        model Dog { bark: string; }
-        op foo(param: Cat | Dog): void;
+        model Request {
+          approvalStatus: "Approved" | "Rejected" | string;
+        }
         `,
       )
       .toEmitDiagnostics({
@@ -32,34 +30,37 @@ describe("unions", () => {
     await tester
       .expect(
         `
-        @service
-        namespace TestService;
-        union MyUnion { a: "a", b: "b", c: string }
-        op foo(param: MyUnion): void;
+        model Request {
+          approvalStatus: RequestApprovalStatus;
+        }
+
+        union RequestApprovalStatus {
+          Approved: "Approved",
+          Rejected: "Rejected",
+          string,
+        }
         `,
       )
       .toBeValid();
   });
 
-  it("ok when union is just | null (nullable)", async () => {
+  it("ok when union is just | null", async () => {
     await tester
       .expect(
         `
-        @service
-        namespace TestService;
-        model Status { name: string; }
-        op foo(param: Status | null): void;
+        model Status { }
+        model Request {
+          approvalStatus: Status | null;
+        }
         `,
       )
       .toBeValid();
   });
 
-  it("ok for status code union", async () => {
+  it("ok for status code", async () => {
     await tester
       .expect(
         `
-        @service
-        namespace TestService;
         op test(): {
           @statusCode _: 200 | 400 | 500;
         };
@@ -68,12 +69,10 @@ describe("unions", () => {
       .toBeValid();
   });
 
-  it("ok for content type union", async () => {
+  it("ok for content type", async () => {
     await tester
       .expect(
         `
-        @service
-        namespace TestService;
         op test(): {
           @header contentType: "application/json" | "text/plain";
           @body _: string;
@@ -83,51 +82,16 @@ describe("unions", () => {
       .toBeValid();
   });
 
-  it("flags extensible enum union expression", async () => {
-    await tester
-      .expect(
-        `
-        @service
-        namespace TestService;
-        model Request {
-          approvalStatus: "Approved" | "Rejected" | string;
-        }
-        op foo(param: Request): void;
-        `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-core/no-unnamed-types",
-        message: `Anonymous union should be defined as a named union declaration.`,
-      });
-  });
-
-  it("does not flag status-code response envelope union", async () => {
+  it("ok for operation return type union (response envelope)", async () => {
     await tester
       .expect(
         `
         @service
         namespace TestService;
 
-        model Widget {
-          id: string;
-        }
+        model Widget { id: string; }
 
         op foo(): {@statusCode _: 200; @body body: Widget} | {@statusCode _: 204};
-        `,
-      )
-      .toBeValid();
-  });
-
-  it("ok for all-scalar union (e.g. string | int32)", async () => {
-    await tester
-      .expect(
-        `
-        @service
-        namespace TestService;
-        model Request {
-          value: string | int32;
-        }
-        op foo(param: Request): void;
         `,
       )
       .toBeValid();
@@ -209,14 +173,16 @@ describe("models", () => {
       .toBeValid();
   });
 
-  it("does not flag anonymous types from standard library operations", async () => {
+  it("does not flag anonymous models not reachable from operations", async () => {
     await tester
       .expect(
         `
         @service
         namespace TestService;
-        model Widget { id: string; }
-        op foo(): Widget;
+        model Orphan {
+          nested: { foo: string; };
+        }
+        op foo(): void;
         `,
       )
       .toBeValid();

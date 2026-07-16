@@ -36,11 +36,13 @@ export const noUnnamedTypesRule = createRule({
   create(context) {
     const program = context.program;
 
-    // Anonymous models/unions reachable from the client surface that should be reported.
-    const flagged = new Set<Model | Union>();
+    // Anonymous models reachable from the client surface that should be reported.
+    const flaggedModels = new Set<Model>();
     const visited = new Set<Type>();
-    // Unions excluded by HTTP semantics (status codes, content-type headers)
+
+    // Unions: flag all unnamed unions (like old no-unnamed-union rule), with exclusions.
     const excludedUnions = new Set<Union>();
+    const invalidUnions = new Set<Union>();
 
     function enqueueAndWalk(type: Type | undefined): void {
       if (type === undefined || visited.has(type)) {
@@ -52,10 +54,9 @@ export const noUnnamedTypesRule = createRule({
           walkModel(type);
           break;
         case "Union":
-          walkUnion(type);
+          walkUnionDescendants(type);
           break;
         case "ModelProperty":
-          checkPropertyExclusions(type);
           enqueueAndWalk(type.type);
           break;
         case "Tuple":
@@ -63,21 +64,6 @@ export const noUnnamedTypesRule = createRule({
             enqueueAndWalk(value);
           }
           break;
-      }
-    }
-
-    /** Check if a property's union type should be excluded (status code, content-type) */
-    function checkPropertyExclusions(prop: ModelProperty): void {
-      const type = prop.type;
-      if (type.kind !== "Union" || type.name) {
-        return;
-      }
-      if (
-        isStatusCode(program, prop) ||
-        (isHeader(program, prop) &&
-          getHeaderFieldName(program, prop).toLowerCase() === "content-type")
-      ) {
-        excludedUnions.add(type);
       }
     }
 
@@ -94,12 +80,11 @@ export const noUnnamedTypesRule = createRule({
         model.name === "" &&
         model.properties.size > 0 &&
         !isHttpEnvelope(program, model) &&
-        !flagged.has(model)
+        !flaggedModels.has(model)
       ) {
-        flagged.add(model);
+        flaggedModels.add(model);
       }
       for (const property of model.properties.values()) {
-        checkPropertyExclusions(property);
         enqueueAndWalk(property.type);
       }
       if (model.indexer) {
@@ -113,25 +98,14 @@ export const noUnnamedTypesRule = createRule({
       }
     }
 
-    function walkUnion(union: Union): void {
+    /** Walk union descendants for model detection (does not flag the union itself here) */
+    function walkUnionDescendants(union: Union): void {
       if (isTemplateDeclaration(union)) {
         return;
       }
       const nonNullVariants = [...union.variants.values()]
         .map((variant) => variant.type)
         .filter((variantType) => !isNullType(variantType));
-      // A union with a single non-null option is a nullable type of that option and
-      // does not itself require a name. Unions where every option is a plain scalar
-      // (e.g. `string | int32`) are also left alone — these are extensible enums or
-      // simple type constraints.
-      if (
-        union.name === undefined &&
-        nonNullVariants.length >= 2 &&
-        !nonNullVariants.every((variantType) => variantType.kind === "Scalar") &&
-        !flagged.has(union)
-      ) {
-        flagged.add(union);
-      }
       for (const variantType of nonNullVariants) {
         enqueueAndWalk(variantType);
       }
@@ -153,7 +127,7 @@ export const noUnnamedTypesRule = createRule({
       }
     }
 
-    // Seed the walk from the client surface: user operations.
+    // Seed the model walk from the client surface: user operations.
     navigateProgram(program, {
       operation: (operation: Operation) => {
         if (isTemplateDeclaration(operation) || isStandardLibraryType(operation)) {
@@ -167,14 +141,42 @@ export const noUnnamedTypesRule = createRule({
     });
 
     return {
+      modelProperty: (prop) => {
+        // Exclude unions used in status code or content-type header positions.
+        const type = prop.type;
+        if (type.kind !== "Union" || type.name) {
+          return;
+        }
+        if (
+          isStatusCode(program, prop) ||
+          (isHeader(program, prop) &&
+            getHeaderFieldName(program, prop).toLowerCase() === "content-type")
+        ) {
+          excludedUnions.add(type);
+        }
+      },
+      operation: (operation) => {
+        // Exclude the top-level return type union (response envelope).
+        if (operation.returnType.kind === "Union") {
+          excludedUnions.add(operation.returnType);
+        }
+      },
+      union: (union) => {
+        // Flag all unnamed unions that aren't just nullable (like old no-unnamed-union).
+        if (union.kind === "Union" && !union.name && !isOnlyNullableUnion(union)) {
+          invalidUnions.add(union);
+        }
+      },
       model: (model: Model) => {
-        if (flagged.has(model)) {
+        if (flaggedModels.has(model)) {
           context.reportDiagnostic({ target: model, format: { type: "model" } });
         }
       },
-      union: (union: Union) => {
-        if (flagged.has(union) && !excludedUnions.has(union)) {
-          context.reportDiagnostic({ target: union, format: { type: "union" } });
+      exit: () => {
+        for (const union of invalidUnions) {
+          if (!excludedUnions.has(union)) {
+            context.reportDiagnostic({ target: union, format: { type: "union" } });
+          }
         }
       },
     };
@@ -208,4 +210,12 @@ function isHttpEnvelope(program: Program, model: Model): boolean {
     }
   }
   return false;
+}
+
+/** Check if the union is only there to make the type nullable */
+function isOnlyNullableUnion(union: Union): boolean {
+  const nonNullVariants = [...union.variants.values()].filter(
+    (v) => !isNullType(v.type),
+  );
+  return nonNullVariants.length <= 1;
 }
