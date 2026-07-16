@@ -101,6 +101,8 @@ function createNameSuggestion(
   type: NamedSdkType,
   csharpName: string,
 ): string {
+  // Prefer a service/namespace-derived prefix (for example, Billing + Operation -> BillingOperation).
+  // If that candidate is also reserved, try stable fallback suffixes before reporting the fix.
   const prefix = getContextPrefix(program, context, type);
   const basePrefix = prefix === "" ? "Custom" : prefix;
   for (const suffix of ["", "Info", "Data"]) {
