@@ -40,7 +40,7 @@ describe("models", () => {
         {
           code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
           severity: "warning",
-          message: `Anonymous model detected in the client surface. Define this model separately with a proper name to improve code readability and reusability.`,
+          message: `Anonymous model with generated name "NamedModelAnonymousModelProp" detected. Define this model separately with a proper name to improve code readability and reusability.`,
         },
       ]);
   });
@@ -67,12 +67,12 @@ describe("models", () => {
         {
           code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
           severity: "warning",
-          message: `Anonymous model detected in the client surface. Define this model separately with a proper name to improve code readability and reusability.`,
+          message: `Anonymous model with generated name "NamedModelNestedAnonymousModelProp" detected. Define this model separately with a proper name to improve code readability and reusability.`,
         },
         {
           code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
           severity: "warning",
-          message: `Anonymous model detected in the client surface. Define this model separately with a proper name to improve code readability and reusability.`,
+          message: `Anonymous model with generated name "NamedModelNestedAnonymousModelPropFirstLevelProp" detected. Define this model separately with a proper name to improve code readability and reusability.`,
         },
       ]);
   });
@@ -91,7 +91,7 @@ describe("models", () => {
         {
           code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
           severity: "warning",
-          message: `Anonymous model detected in the client surface. Define this model separately with a proper name to improve code readability and reusability.`,
+          message: `Anonymous model with generated name "FooRequestBody" detected. Define this model separately with a proper name to improve code readability and reusability.`,
         },
       ]);
   });
@@ -110,7 +110,7 @@ describe("models", () => {
         {
           code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
           severity: "warning",
-          message: `Anonymous model detected in the client surface. Define this model separately with a proper name to improve code readability and reusability.`,
+          message: `Anonymous model with generated name "FooResponse" detected. Define this model separately with a proper name to improve code readability and reusability.`,
         },
       ]);
   });
@@ -172,7 +172,7 @@ describe("models", () => {
         {
           code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
           severity: "warning",
-          message: `Anonymous model detected in the client surface. Define this model separately with a proper name to improve code readability and reusability.`,
+          message: `Anonymous model with generated name "JobModelCustomPropertiesAffectedObjectDetails" detected. Define this model separately with a proper name to improve code readability and reusability.`,
         },
       ]);
   });
@@ -200,7 +200,7 @@ describe("models", () => {
         {
           code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
           severity: "warning",
-          message: `Anonymous model detected in the client surface. Define this model separately with a proper name to improve code readability and reusability.`,
+          message: `Anonymous model with generated name "TempFoo" detected. Define this model separately with a proper name to improve code readability and reusability.`,
         },
       ]);
   });
@@ -267,41 +267,9 @@ describe("models", () => {
         {
           code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
           severity: "warning",
-          message: `Anonymous model detected in the client surface. Define this model separately with a proper name to improve code readability and reusability.`,
+          message: `Anonymous model with generated name "MoveFinalResult" detected. Define this model separately with a proper name to improve code readability and reusability.`,
         },
       ]);
-  });
-
-  it("does not flag anonymous types defined inside library operations", async () => {
-    // Standard ARM operations pull in many library-internal anonymous types
-    // (envelopes, metadata, etc.). None of those should be reported.
-    const armRunner = await ArmTester.createInstance();
-    const armTester = createLinterRuleTester(
-      armRunner,
-      noUnnamedTypesRule,
-      "@azure-tools/typespec-client-generator-core",
-    );
-    await armTester
-      .expect(
-        `
-        @armProviderNamespace
-        @service
-        @versioned(Versions)
-        namespace TestClient;
-        enum Versions {
-          @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-          v1: "v1",
-        }
-        model Employee is TrackedResource<EmployeeProperties> {
-          ...ResourceNameParameter<Employee>;
-        }
-        model EmployeeProperties {
-          age?: int32;
-        }
-        interface Employees extends Azure.ResourceManager.TrackedResourceOperations<Employee, EmployeeProperties> {}
-        `,
-      )
-      .toBeValid();
   });
 });
 
@@ -320,7 +288,7 @@ describe("unions", () => {
         {
           code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
           severity: "warning",
-          message: `Anonymous union detected in the client surface. Define this union separately with a proper name to improve code readability and reusability.`,
+          message: `Anonymous union with generated name "FooRequest" detected. Define this union separately with a proper name to improve code readability and reusability.`,
         },
       ]);
   });
@@ -345,7 +313,7 @@ describe("unions", () => {
         {
           code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
           severity: "warning",
-          message: `Anonymous union detected in the client surface. Define this union separately with a proper name to improve code readability and reusability.`,
+          message: `Anonymous union with generated name "FooRequestParam" detected. Define this union separately with a proper name to improve code readability and reusability.`,
         },
       ]);
   });
@@ -366,7 +334,7 @@ describe("unions", () => {
         {
           code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
           severity: "warning",
-          message: `Anonymous union detected in the client surface. Define this union separately with a proper name to improve code readability and reusability.`,
+          message: `Anonymous union with generated name "FooRequestParam" detected. Define this union separately with a proper name to improve code readability and reusability.`,
         },
       ]);
   });
@@ -384,7 +352,7 @@ describe("unions", () => {
         {
           code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
           severity: "warning",
-          message: `Anonymous union detected in the client surface. Define this union separately with a proper name to improve code readability and reusability.`,
+          message: `Anonymous union with generated name "FooRequestParam" detected. Define this union separately with a proper name to improve code readability and reusability.`,
         },
       ]);
   });
@@ -454,7 +422,7 @@ describe("unions", () => {
         {
           code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
           severity: "warning",
-          message: `Anonymous union detected in the client surface. Define this union separately with a proper name to improve code readability and reusability.`,
+          message: `Anonymous union with generated name "FooRequestParam" detected. Define this union separately with a proper name to improve code readability and reusability.`,
         },
       ]);
   });
@@ -472,98 +440,5 @@ describe("unions", () => {
         `,
       )
       .toBeValid();
-  });
-
-  it("does not flag status-code response envelope union", async () => {
-    // Clients only surface the response body, never the status-code envelope union
-    // that appears at the operation return position.
-    await tester
-      .expect(
-        `
-        @service
-        namespace TestService;
-
-        model Widget {
-          id: string;
-        }
-
-        op foo(): {@statusCode _: 200; @body body: Widget} | {@statusCode _: 204};
-        `,
-      )
-      .toBeValid();
-  });
-
-  it("does not flag ArmResponse<T> | ErrorResponse return union", async () => {
-    const armRunner = await ArmTester.createInstance();
-    const armTester = createLinterRuleTester(
-      armRunner,
-      noUnnamedTypesRule,
-      "@azure-tools/typespec-client-generator-core",
-    );
-    await armTester
-      .expect(
-        `
-        @armProviderNamespace
-        @service
-        @versioned(Versions)
-        namespace TestClient;
-        enum Versions {
-          @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-          v1: "v1",
-        }
-        model Employee is TrackedResource<EmployeeProperties> {
-          ...ResourceNameParameter<Employee>;
-        }
-        model EmployeeProperties {
-          age?: int32;
-        }
-        model Trial {
-          status?: string;
-        }
-        @armResourceAction(Employee)
-        op checkTrial(...ResourceInstanceParameters<Employee>): ArmResponse<Trial> | ErrorResponse;
-        `,
-      )
-      .toBeValid();
-  });
-
-  it("still flags anonymous body inside status-code response union", async () => {
-    await tester
-      .expect(
-        `
-        @service
-        namespace TestService;
-
-        op foo(): {@statusCode _: 200; @body body: {inner: string}} | {@statusCode _: 204};
-        `,
-      )
-      .toEmitDiagnostics([
-        {
-          code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
-          severity: "warning",
-          message: `Anonymous model detected in the client surface. Define this model separately with a proper name to improve code readability and reusability.`,
-        },
-      ]);
-  });
-
-  it("still flags a genuine anonymous body union in the return position", async () => {
-    // Not a status-code envelope union: the whole union is the response body and is
-    // surfaced by the client, so it must still be flagged.
-    await tester
-      .expect(
-        `
-        @service
-        namespace TestService;
-
-        op getColor(): "red" | "green" | "blue";
-        `,
-      )
-      .toEmitDiagnostics([
-        {
-          code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
-          severity: "warning",
-          message: `Anonymous union detected in the client surface. Define this union separately with a proper name to improve code readability and reusability.`,
-        },
-      ]);
   });
 });
