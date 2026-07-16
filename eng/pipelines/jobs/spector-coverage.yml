@@ -80,7 +80,7 @@ jobs:
       - script: pnpm run build
         displayName: Build (turbo cache restore)
 
-      - script: pnpm run regenerate
+      - script: pnpm run tspcompile
         displayName: "Regenerate Go test code"
         workingDirectory: packages/typespec-go
 

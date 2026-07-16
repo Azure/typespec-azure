@@ -435,6 +435,22 @@ export function describeScenarioFile(scenarioFile: string): void {
           })
           .filter((x): x is NonNullable<typeof x> => x !== undefined);
 
+        // A scenario with input (tsp) but no recognized output block would
+        // silently do nothing under `pnpm test:update` — the harness only
+        // (re)generates the content of `go <name>` output blocks. Surface that
+        // as an explicit failure so a new scenario doesn't look like it "passed"
+        // while producing no Go. Add an output block such as ```go models
+        // (its body can start empty) for each generated file you want to snapshot.
+        if (tspBlocks.length > 0 && testCases.length === 0) {
+          it("has at least one output block", () => {
+            assert.fail(
+              `Scenario "${scenario.heading}" has a tsp block but no output block. ` +
+                "Add a code block like ```go <name> (e.g. ```go models) — its body can " +
+                "start empty and `pnpm test:update` will fill it with the generated Go.",
+            );
+          });
+        }
+
         for (const testCase of testCases) {
           it(testCase.block.heading, async () => {
             const result = await testCase.fn(inputTsp, testCase.args, configs, inputFiles);

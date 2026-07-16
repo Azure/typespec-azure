@@ -41,7 +41,7 @@
     "test:go:e2e": "pnpm spector --start && pnpm go-test && pnpm spector --stop",
     "go-test": "node .scripts/go-test.js",
     "lint:go": "node .scripts/lint-go.js",
-    "regenerate": "node .scripts/tspcompile.js",
+    "tspcompile": "node .scripts/tspcompile.js",
     "spector": "node .scripts/spector.js",
     "sync-specs": "node .scripts/sync-azure-rest-api-specs.js",
     "regen-docs": "tspd doc . --enable-experimental --output-dir ../../website/src/content/docs/docs/emitters/clients/typespec-go/reference --skip-js"

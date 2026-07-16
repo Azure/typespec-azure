@@ -20,7 +20,6 @@ This guide outlines the steps to contributing to the emitter.
   - [Choosing where to add a test](#choosing-where-to-add-a-test)
   - [Write an emitter unit test (scenario)](#write-an-emitter-unit-test-scenario)
   - [Regenerate the Go fixtures](#regenerate-the-go-fixtures)
-  - [Review the generated-code diff](#review-the-generated-code-diff)
   - [Run the Go tests](#run-the-go-tests)
   - [Lint the generated Go](#lint-the-generated-go)
   - [Debug](#debug)
@@ -61,7 +60,7 @@ Use `pnpm watch` from the repo root to rebuild on change while you work.
 
 ## Step 3: Test your changes
 
-`test/` holds three kinds of tests, described in [Choosing where to add a test](#choosing-where-to-add-a-test) below. Verifying an emitter change means writing or updating the appropriate test and — for anything that runs against generated Go — regenerating the fixtures, reviewing the diff, then running the Go tests and the linter. The subsections below go from the cheapest, in-memory unit tests to the heavier tests that execute generated Go.
+`test/` holds three kinds of tests, described in [Choosing where to add a test](#choosing-where-to-add-a-test) below. Verifying an emitter change means writing or updating the appropriate test and — for anything that runs against generated Go — regenerating the fixtures, then running the Go tests and the linter. The subsections below go from the cheapest, in-memory unit tests to the heavier tests that execute generated Go.
 
 ### Choosing where to add a test
 
@@ -89,15 +88,17 @@ Scenarios live in `test/unittest/scenarios/`, one `.md` file per behavior (keep 
 
 Order a scenario input-first so it reads top-to-bottom: `yaml` config, then `tsp`, then any `json` inputs, then the `go` output blocks.
 
-To (re)generate the expected output blocks from the current emitter, run the update command and review the produced snapshots as part of your change:
+**Every scenario needs at least one ` ```go <name> ` output block** — the harness only (re)generates the content of those blocks. Add one per generated file you want to snapshot; the body can start empty (or `// (file was not generated)`) and be filled by the update command below. A scenario with only a `tsp` block produces no Go and fails with an explicit "has at least one output block" error.
+
+To fill (or refresh) the output blocks from the current emitter, run the update command and review the produced snapshots as part of your change:
 
 ```terminal
 pnpm test:update
 ```
 
-(This is `pnpm test` with `SCENARIOS_UPDATE=true`; it rewrites the output blocks in each `.md` in place.)
+(This is `pnpm test` with `SCENARIOS_UPDATE=true`; it rewrites the output blocks in each `.md` in place. It also regenerates the per-scenario vitest suites first, so a newly added `.md` is picked up automatically.)
 
-Each `.md` is backed by a generated vitest suite under `test/unittest/scenario-suites/`. After adding, removing, or renaming a scenario, regenerate the suites:
+Each `.md` is backed by a generated vitest suite under `test/unittest/scenario-suites/` (one per scenario, so each shows up as its own group in the report). `pnpm test:update` regenerates these for you; if you add, remove, or rename a scenario without running it, regenerate them explicitly:
 
 ```terminal
 pnpm gen:scenario-suites
@@ -111,40 +112,21 @@ pnpm test
 
 ### Regenerate the Go fixtures
 
-The remaining subsections work with the committed Go fixtures, which the Spector and local spec tests run against. `pnpm regenerate` runs the emitter over the local specs under `test/tsp/` and the external Spector specs, writing the generated Go into `test/local/`, `test/http-specs/`, and `test/azure-http-specs/`. Run it after changing the emitter so the fixtures (and the Go tests below) reflect your change. It does not touch the in-memory unit tests under `test/unittest/`.
+The remaining subsections work with the committed Go fixtures, which the Spector and local spec tests run against. `pnpm tspcompile` runs the emitter over the local specs under `test/tsp/` and the external Spector specs, writing the generated Go into `test/local/`, `test/http-specs/`, and `test/azure-http-specs/`. Run it after changing the emitter so the fixtures (and the Go tests below) reflect your change. It does not touch the in-memory unit tests under `test/unittest/`.
 
 From the `packages/typespec-go` directory:
 
 ```terminal
-pnpm regenerate
+pnpm tspcompile
 ```
 
 To regenerate a single test, pass a `--filter` matching the test name (the value is treated as a regular expression):
 
 ```terminal
-pnpm regenerate --filter=TestName
+pnpm tspcompile --filter=TestName
 ```
 
-The first run also syncs the Azure REST API specs and the generated-code baseline (used by [Review the generated-code diff](#review-the-generated-code-diff)). To skip the baseline sync (for example when working offline), set `TYPESPEC_GO_SKIP_BASELINE=1`.
-
-### Review the generated-code diff
-
-The committed test fixtures are mirrored into a baseline checkout so you can review the exact delta your emitter change produces.
-
-`pnpm regenerate` automatically:
-
-1. Syncs the generated-code baseline from the [`Azure/azure-sdk-assets`](https://github.com/Azure/azure-sdk-assets) repo (branch `typespec-go`) into `temp/baseline/`.
-2. After emit completes, mirrors the freshly generated `test/` artifacts into that checkout.
-
-You can then inspect the change against the merged baseline with normal git commands:
-
-```terminal
-cd temp/baseline
-git status
-git diff
-```
-
-Set `TYPESPEC_GO_SKIP_BASELINE=1` to skip this (it is skipped in CI).
+The first run also syncs the Azure REST API specs into `temp/`. The generated Go fixtures are not committed (they are `.gitignore`d), so validate your change by running the Go tests and linter below rather than by diffing the fixtures.
 
 ### Run the Go tests
 
@@ -184,7 +166,7 @@ Make sure `$(go env GOPATH)/bin` is on your `PATH` so both tools are discoverabl
 To debug the emitter:
 
 1. Set a breakpoint in the TypeScript source.
-2. In the VS Code JavaScript Debug Terminal, run `pnpm regenerate` (optionally with `--filter`) from the [Regenerate the Go fixtures](#regenerate-the-go-fixtures) section.
+2. In the VS Code JavaScript Debug Terminal, run `pnpm tspcompile` (optionally with `--filter`) from the [Regenerate the Go fixtures](#regenerate-the-go-fixtures) section.
 
 ## Step 4: Update emitter documentation
 

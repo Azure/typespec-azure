@@ -73,10 +73,8 @@ jobs:
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
 
       - name: Regenerate
-        run: pnpm run regenerate
+        run: pnpm run tspcompile
         working-directory: packages/typespec-go
-        env:
-          TYPESPEC_GO_SKIP_BASELINE: "1"
 
       - name: Lint
         run: pnpm run lint:go

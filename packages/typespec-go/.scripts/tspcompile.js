@@ -4,7 +4,6 @@ import { exec, execSync } from "child_process";
 import { existsSync, opendirSync, readFileSync, unlinkSync, writeFileSync } from "fs";
 import { semaphore } from "./semaphore.js";
 import { syncAzureRestApiSpecs } from "./sync-azure-rest-api-specs.js";
-import { mirrorIntoBaseline, syncBaseline } from "./sync-baseline.js";
 
 // limit to 8 concurrent builds
 const sem = semaphore(8);
@@ -19,27 +18,6 @@ const azureHttpSpecs = pkgRoot + "node_modules/@azure-tools/azure-http-specs/spe
 // (see .scripts/azure-rest-api-specs.json). The sync call is a no-op when
 // the cache already matches the pin.
 const azureServiceSpecs = syncAzureRestApiSpecs() + "/";
-
-// Pull the generated-test baseline from Azure/azure-sdk-assets@typespec-go
-// into temp/baseline. After all emits complete (beforeExit handler below) we
-// mirror the locally regenerated artifacts on top of the baseline so that
-// `git status` / `git diff` inside temp/baseline shows what changed.
-// Set TYPESPEC_GO_SKIP_BASELINE=1 to skip (used in CI / offline runs).
-const baselineRoot = syncBaseline();
-
-// Mirror once the regenerate work has drained. We use beforeExit instead of
-// trying to coordinate the semaphore's outstanding callbacks; beforeExit
-// fires when the event loop is empty, which is exactly when every emit's
-// exec() callback has run and the script is about to exit. Skip the mirror
-// when any emit failed (process.exitCode set) so a partial regen doesn't
-// pollute the baseline with misleading deletions.
-process.on("beforeExit", () => {
-  if (process.exitCode && process.exitCode !== 0) {
-    console.warn("Skipping baseline mirror because regeneration reported failures.");
-    return;
-  }
-  mirrorIntoBaseline(baselineRoot);
-});
 
 const compiler = pkgRoot + "node_modules/@typespec/compiler/cmd/tsp.js";
 
