@@ -18,6 +18,7 @@ namespace Contoso.WidgetManager;
 model WidgetManagerApiKeyAuth is ApiKeyAuth<ApiKeyLocation.header, "X-Key">;
 
 /** Authenticate requests with OAuth2 using the widget service scope. */
+#suppress "@azure-tools/typespec-azure-core/no-unnamed-types" "OAuth2 flow configuration"
 model WidgetManagerOauth2Auth
   is OAuth2Auth<[
     {
