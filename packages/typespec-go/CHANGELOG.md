@@ -1,5 +1,12 @@
 # Release History
 
+## 0.15.0
+
+### Features
+
+- [ce2380e](https://github.com/Azure/typespec-azure/commit/ce2380eaf2cb67dba69e2b5c9fa920eb0fdec71a) Upgrade dependency for `@azure-tools/typespec-go` package.
+
+
 ## 0.14.3 (2026-07-08)
 
 ### Bugs Fixed
