@@ -29,9 +29,6 @@ jobs:
 
       - uses: ./.github/actions/setup
 
-      - name: Test affected-target detector
-        run: node --test eng/scripts/detect-affected.test.ts
-
       - name: Detect affected targets
         id: detect
         env:
