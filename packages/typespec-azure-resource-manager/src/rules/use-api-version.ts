@@ -6,11 +6,7 @@ import {
   createRule,
   isTemplateInstance,
 } from "@typespec/compiler";
-import {
-  getNamespaceName,
-  getSourceModel,
-  isTemplatedInterfaceOperation,
-} from "./utils.js";
+import { getNamespaceName, getSourceModel, isTemplatedInterfaceOperation } from "./utils.js";
 
 export const useApiVersionRule = createRule({
   name: "use-api-version",
