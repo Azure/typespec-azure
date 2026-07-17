@@ -40,6 +40,7 @@ function gofmt(source: string): string {
       throw new Error(
         "gofmt not found on PATH. The emitter unit tests format generated Go with " +
           "`gofmt -s`, so the Go toolchain must be installed to run them.",
+        { cause: err },
       );
     }
     throw err;
