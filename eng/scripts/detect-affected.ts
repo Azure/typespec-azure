@@ -115,7 +115,7 @@ function getChangedFiles(base: string, head: string): string[] {
  * meaningful change plus all of its graph dependents. Change detection, dependent
  * expansion, and test/markdown filtering are all delegated to pnpm:
  *
- *   pnpm --filter "...[<base>]" --changed-files-ignore-pattern <glob> list --json
+ *   pnpm --filter "...[<base>]" --changed-files-ignore-pattern <glob> list --depth -1 --json
  *
  * `...[base]` diffs `base` against the working tree (in CI the checkout is HEAD,
  * so this is `base..HEAD`). Each `ignore` glob is passed as its own
