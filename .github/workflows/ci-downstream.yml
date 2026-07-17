@@ -58,7 +58,7 @@ jobs:
     uses: ./.github/workflows/ci-typescript.yml
 
   downstream-ci-gate:
-    name: "Downstream CI Gate"
+    name: "Gate"
     needs: [detect-affected, python, java, typescript]
     if: ${{ always() }}
     runs-on: ubuntu-latest
