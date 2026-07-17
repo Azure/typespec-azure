@@ -89,6 +89,9 @@ export function buildTsSrcEsmConfig(exports?: Record<string, string>) {
     content: JSON.stringify(
       {
         extends: "../../../../eng/tsconfigs/src.esm.json",
+        compilerOptions: {
+          resolveJsonModule: true,
+        },
         include: getSrcIncludePaths(exports),
       },
       null,
@@ -106,6 +109,9 @@ export function buildTsSrcBrowserConfig(exports?: Record<string, string>) {
     content: JSON.stringify(
       {
         extends: "../../../../eng/tsconfigs/src.browser.json",
+        compilerOptions: {
+          resolveJsonModule: true,
+        },
         include: getSrcIncludePaths(exports),
       },
       null,
@@ -123,6 +129,9 @@ export function buildTsSrcReactNativeConfig(exports?: Record<string, string>) {
     content: JSON.stringify(
       {
         extends: "../../../../eng/tsconfigs/src.react-native.json",
+        compilerOptions: {
+          resolveJsonModule: true,
+        },
         include: getSrcIncludePaths(exports),
       },
       null,
@@ -140,6 +149,9 @@ export function buildTsSrcCjsConfig(exports?: Record<string, string>) {
     content: JSON.stringify(
       {
         extends: "../../../../eng/tsconfigs/src.cjs.json",
+        compilerOptions: {
+          resolveJsonModule: true,
+        },
         include: getSrcIncludePaths(exports),
       },
       null,

@@ -23,7 +23,10 @@ describe("User-Agent telemetry policy", () => {
     const text = result!.getFullText();
 
     assert.include(text, "const prefixFromOptions = options?.userAgentOptions?.userAgentPrefix;");
-    assert.include(text, "const userAgentInfo = `azsdk-js-foo-bar/1.2.3`;");
+    // The version is read dynamically from the generated package.json at runtime.
+    assert.include(text, 'import pkgJson from "@azure/foo-bar/package.json"');
+    assert.include(text, "const userAgentInfo = `azsdk-js-foo-bar/${pkgJson.version}`;");
+    assert.notInclude(text, "azsdk-js-foo-bar/1.2.3");
     assert.include(
       text,
       "const userAgentPrefix = prefixFromOptions ? `${prefixFromOptions} ${userAgentInfo}` : `${userAgentInfo}`;",
