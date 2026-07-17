@@ -173,7 +173,7 @@ describe("models", () => {
       .toBeValid();
   });
 
-  it("does not flag anonymous models not reachable from operations", async () => {
+  it("flags anonymous models even when not directly used in an operation", async () => {
     await tester
       .expect(
         `
@@ -185,6 +185,9 @@ describe("models", () => {
         op foo(): void;
         `,
       )
-      .toBeValid();
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-core/no-unnamed-types",
+        message: `Anonymous model should be defined as a named model declaration.`,
+      });
   });
 });

@@ -1,21 +1,15 @@
 import {
   createRule,
   getNamespaceFullName,
-  ignoreDiagnostics,
   isNullType,
-  isTemplateDeclaration,
   Model,
   ModelProperty,
-  navigateProgram,
-  Operation,
   paramMessage,
   Program,
-  Type,
   Union,
 } from "@typespec/compiler";
 import {
   getHeaderFieldName,
-  getHttpOperation,
   isBody,
   isBodyRoot,
   isHeader,
@@ -36,123 +30,26 @@ export const noUnnamedTypesRule = createRule({
   create(context) {
     const program = context.program;
 
-    // Anonymous models reachable from the client surface that should be reported.
-    const flaggedModels = new Set<Model>();
-    const visited = new Set<Type>();
-
-    // Unions: flag all unnamed unions (like old no-unnamed-union rule), with exclusions.
+    // Unions: collect all unnamed unions, then exclude specific patterns.
     const excludedUnions = new Set<Union>();
     const invalidUnions = new Set<Union>();
 
-    function enqueueAndWalk(type: Type | undefined): void {
-      if (type === undefined || visited.has(type)) {
-        return;
-      }
-      visited.add(type);
-      switch (type.kind) {
-        case "Model":
-          walkModel(type);
-          break;
-        case "Union":
-          walkUnionDescendants(type);
-          break;
-        case "ModelProperty":
-          enqueueAndWalk(type.type);
-          break;
-        case "Tuple":
-          for (const value of type.values) {
-            enqueueAndWalk(value);
-          }
-          break;
-      }
-    }
-
-    function walkModel(model: Model): void {
-      if (isTemplateDeclaration(model)) {
-        return;
-      }
-      // Named library types are never anonymous and don't contain user-defined
-      // anonymous types worth reporting; stop descending for performance.
-      if (model.name !== "" && isStandardLibraryType(model)) {
-        return;
-      }
-      if (
-        model.name === "" &&
-        model.properties.size > 0 &&
-        !isHttpEnvelope(program, model) &&
-        !flaggedModels.has(model)
-      ) {
-        flaggedModels.add(model);
-      }
-      for (const property of model.properties.values()) {
-        enqueueAndWalk(property.type);
-      }
-      if (model.indexer) {
-        enqueueAndWalk(model.indexer.value);
-      }
-      if (model.baseModel) {
-        enqueueAndWalk(model.baseModel);
-      }
-      for (const derived of model.derivedModels) {
-        enqueueAndWalk(derived);
-      }
-    }
-
-    /** Walk union descendants for model detection (does not flag the union itself here) */
-    function walkUnionDescendants(union: Union): void {
-      if (isTemplateDeclaration(union)) {
-        return;
-      }
-      const nonNullVariants = [...union.variants.values()]
-        .map((variant) => variant.type)
-        .filter((variantType) => !isNullType(variantType));
-      for (const variantType of nonNullVariants) {
-        enqueueAndWalk(variantType);
-      }
-    }
-
-    // Walk the bodies of an operation's HTTP responses. We resolve the actual HTTP
-    // responses (via `getHttpOperation`) rather than inspecting the raw return type,
-    // because the return type is the response *envelope* (status codes, headers, and
-    // other metadata wrapped around the body). Clients only surface the response body,
-    // so walking the resolved body types avoids flagging the status-code envelope
-    // unions (e.g. `ArmResponse<T> | ErrorResponse`) that clients never expose, while
-    // still catching anonymous types that appear in the real response bodies.
-    function walkOperationResponses(operation: Operation): void {
-      const httpOperation = ignoreDiagnostics(getHttpOperation(program, operation));
-      for (const response of httpOperation.responses) {
-        for (const statusCodeResponse of response.responses) {
-          enqueueAndWalk(statusCodeResponse.body?.type);
-        }
-      }
-    }
-
-    // Seed the model walk from the client surface: user operations.
-    navigateProgram(program, {
-      operation: (operation: Operation) => {
-        if (isTemplateDeclaration(operation) || isStandardLibraryType(operation)) {
-          return;
-        }
-        for (const parameter of operation.parameters.properties.values()) {
-          enqueueAndWalk(parameter.type);
-        }
-        walkOperationResponses(operation);
-      },
-    });
+    // Models: collect all anonymous models, then exclude specific patterns.
+    const invalidModels = new Set<Model>();
+    const excludedModels = new Set<Model>();
 
     return {
       modelProperty: (prop) => {
         // Exclude unions used in status code or content-type header positions.
         const type = prop.type;
-        if (type.kind !== "Union" || type.name) {
-          return;
-        }
-        if (
-          isStatusCode(program, prop) ||
-          (isHeader(program, prop) &&
-            getHeaderFieldName(program, prop).toLowerCase() === "content-type")
-        ) {
-          excludedUnions.add(type);
+        if (type.kind === "Union" && !type.name) {
+          if (
+            isStatusCode(program, prop) ||
+            (isHeader(program, prop) &&
+              getHeaderFieldName(program, prop).toLowerCase() === "content-type")
+          ) {
+            excludedUnions.add(type);
+          }
         }
       },
       operation: (operation) => {
@@ -162,14 +59,18 @@ export const noUnnamedTypesRule = createRule({
         }
       },
       union: (union) => {
-        // Flag all unnamed unions that aren't just nullable (like old no-unnamed-union).
-        if (union.kind === "Union" && !union.name && !isOnlyNullableUnion(union)) {
+        if (!union.name && !isOnlyNullableUnion(union)) {
           invalidUnions.add(union);
         }
       },
       model: (model: Model) => {
-        if (flaggedModels.has(model)) {
-          context.reportDiagnostic({ target: model, format: { type: "model" } });
+        if (
+          model.name === "" &&
+          model.properties.size > 0 &&
+          !isStandardLibraryType(model) &&
+          !isHttpEnvelope(program, model)
+        ) {
+          invalidModels.add(model);
         }
       },
       exit: () => {
@@ -178,12 +79,17 @@ export const noUnnamedTypesRule = createRule({
             context.reportDiagnostic({ target: union, format: { type: "union" } });
           }
         }
+        for (const model of invalidModels) {
+          if (!excludedModels.has(model)) {
+            context.reportDiagnostic({ target: model, format: { type: "model" } });
+          }
+        }
       },
     };
   },
 });
 
-function isStandardLibraryType(type: Model | Union | Operation): boolean {
+function isStandardLibraryType(type: Model | Union): boolean {
   const namespace = type.namespace;
   if (namespace === undefined) {
     return false;
