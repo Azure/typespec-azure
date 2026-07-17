@@ -1,0 +1,669 @@
+# Release History
+
+## 0.14.3 (2026-07-08)
+
+### Bugs Fixed
+
+* Fixed adapting `Access.internal` operations that return a polymorphic type.
+
+### Other Changes
+
+* Updated to the latest tsp toolset.
+* Generated JSON unmarshalling errors now use `%s` with `err.Error()` instead of `%v` to avoid linters such as `errorlint` from flagging the format string.
+
+## 0.14.2 (2026-06-08)
+
+### Features Added
+
+* Honor `exact()` on `@clientName` targets: models, enums, model fields, parameters, response headers, client names, service method names, and individual enum value names. As before, when a name is marked as exact, it is preserved verbatim and not subjected to built-in naming canonization.
+* Time in `RFC7231` format now uses the `datetime.RFC7231` type in `azcore/runtime`.
+
+### Bugs Fixed
+
+* Fixed an issue where two fake server types whose names differed only by a trailing duplicate word (e.g. `AuthorizationServer` and `AuthorizationServerServer`) generated the same `TransportInterceptor` variable name, producing a duplicate declaration in the `fake` package.
+* Fixed setting the `Content-Type` header from an explicit parameter for modeled body parameters.
+
+### Other Changes
+
+* Updated to the latest TCGC.
+* Updated the minimum version of `azcore` to `v1.22.0`.
+
+## 0.14.1 (2026-05-20)
+
+### Bugs Fixed
+
+* Fixed example generation incorrectly passing required parameter group members as optional parameters instead of rendering them as struct literals.
+* Generate a mock value for client parameters in examples when the operation doesn't use the parameter.
+* Fixed error when an operation's example contained a literal `Content-Type` response header that was omitted from the response envelope.
+
+## 0.14.0 (2026-05-18)
+
+### Breaking Changes
+
+* Omit the literal `Content-Type` response header value for modeled responses.
+  * Added `preserveContentTypeHeader` as a supported `@clientOption` to override this behavior per method.
+
+## 0.13.0 (2026-05-14)
+
+### Breaking Changes
+
+* Fixed an issue causing client accessor methods to be emitted for certain ARM clients.
+
+### Bugs Fixed
+
+* Fixed a regression introduced in `4bf93f9` that can cause some service methods to use the wrong API version.
+
+## 0.12.0 (2026-05-12)
+
+### Breaking Changes
+
+* The minimum Node version has moved from `20.x` to `22.x`.
+
+### Bugs Fixed
+
+* Fixed cleanup to remove legacy autorest-generated example files during regeneration.
+* Fixed typed pointer generation for literal-typed values in generated examples (for example, `to.Ptr[int32](1)` instead of `to.Ptr(1)`).
+* Fixed example generation adding unnecessary pointer (`&`) for method parameters typed as a concrete polymorphic model.
+* Fixed example response using wrong field name and missing pointer for polymorphic result types.
+
+### Other Changes
+
+* Updated to the latest tsp toolset.
+
+## 0.11.2 (2026-05-07)
+
+### Bugs Fixed
+
+* Operations with a binary body and parameterized `Content-Type` correctly utilize the parameterized value.
+* Improved detection for operations that consume `multipart` content.
+* Encoding of query parameters replaces `+` with `%20` which is the correct URI encoding for space characters.
+
+## 0.11.1 (2026-04-29)
+
+### Bugs Fixed
+
+* Fixed handling of `multipart/form` operations.
+* Fake servers will correctly dispatch calls to all child servers, not just immediate ones.
+* Client-side default values for extensible enums that aren't in the predefined set no longer cause a crash.
+* Fixed incorrect codegen for operations that return scalar types as `text/plain`.
+
+### Other Changes
+
+* Fixed sorting of case statements in polymorphic helpers.
+* Client API version values are now emitted as a `const` instead of repeated per method.
+* The API version doc string has been moved to the client definition instead of per method.
+* Updated to the latest tsp toolset.
+
+## 0.11.0 (2026-04-24)
+
+### Breaking Changes
+
+* Removed the `iso` acronym override from the naming conversion to avoid breaking changes during typespec migration (e.g. `Iso8601` no longer becomes `ISO8601`).
+
+### Bugs Fixed
+
+* Fixed codegen for pageable operations that use a continuation token.
+* Removed incorrect empty path check for path parameters that specify `@clientDefaultValue`.
+
+### Features Added
+
+* Added support for the `@deserializeEmptyStringAsNull` decorator.
+* Model properties with the `@clientDefaultValue` decorator will have a default value set in their marshaler.
+
+### Other Changes
+
+* Updated to the latest tsp toolset.
+
+## 0.10.7 (2026-04-14)
+
+### Bugs Fixed
+
+* Fixed typo in generated LRO example error message: "failed to pull the result" is now "failed to poll the result".
+* Fixed incorrect pointer usage for model results in generated example response bodies.
+* Fixed some incorrect un/marshaling for XML payloads.
+* Fixed a race condition in fake servers.
+* Fixed incorrect parameter name when it starts with an invalid identifier character.
+* Fake servers no longer double-decode query parameters.
+
+### Other Changes
+
+* Updated to the latest tsp toolset.
+
+## 0.10.6 (2026-04-08)
+
+### Other Changes
+
+* Use `datetime` helpers when formatting `time.Time` parameters.
+* Updated to the latest tsp toolset.
+* Minor cleanup of generated code for fakes.
+
+## 0.10.5 (2026-04-01)
+
+### Bugs Fixed
+
+* Fixed example generation for operations returning streaming binary responses (`Body io.ReadCloser`).
+* Fixed incorrect field name resolution in example generation for non-model result types.
+* Fixed incorrect handling of XML tags in some cases.
+
+### Features Added
+
+* Added support for specific `@clientOption` decorators.
+  * `monomorphicResponseFieldName` on operations that return a monomorphic response to customize the response field name.
+  * `omitSerdeMethods` on models to skip emitting un/marshalers.
+  * `responseEnvelopeName` on operations to specify the name of the response envelope.
+
+### Other Changes
+
+* Updated to the latest tsp toolset.
+
+## 0.10.4 (2026-03-26)
+
+### Bugs Fixed
+
+* Fixed discriminated types without subtypes not being generated as polymorphic types.
+* Fixed some corner-cases when (un)marshaling slices in XML format.
+* Fixed missing XML unmarshaler for `map` helpers in some cases.
+
+### Other Changes
+
+* Updated the minimum version of Go to `v1.25.0`.
+* Updated to the latest tsp toolset.
+
+## 0.10.3 (2026-03-19)
+
+### Bugs Fixed
+
+* Fixed missing propagation of parent client parameters to sub-clients created via client accessor methods.
+* Fixed incorrect inclusion of literal parameters in generated example code.
+* Fixed an issue that prevented `Azure.Core.eTag` types from being used in request/response headers.
+
+### Other Changes
+
+* Updated to the latest tsp toolset.
+
+## 0.10.2 (2026-03-06)
+
+### Bugs Fixed
+
+* Fixed incorrect inclusion of response headers in the response envelope for LROs
+* Fixed generation of `x-ms-meta` and `x-ms-or` headers
+
+## 0.10.1 (2026-02-27)
+
+### Bugs Fixed
+
+* Fixed duplicate definition of `fake.initServer` that can happen in some cases.
+* Fixed incorrect propagation of parent client parameters that aren't applicable to the child client.
+
+### Features Added
+
+* Added support for multiple response types for an operation.
+
+### Other Changes
+
+* Updated to the latest tsp toolset.
+  * This includes the latest `TypeSpec.Http` lib that fixes reporting the `content-type` header for `HEAD` operations.
+
+## 0.10.0 (2026-02-12)
+
+### Breaking Changes
+
+* Fixed incorrect naming for response headers.
+
+### Other Changes
+
+* Improved diagnostic messages to include detail message for known issues.
+* Adjust the parameter group generation logic to only emit parameter groups when there is at least one required parameter in the group.
+* Allow customized datetime encoding format
+* Updated to the latest tsp toolset.
+
+## 0.9.2 (2026-01-29)
+
+### Bugs Fixed
+
+* Fixed incorrect example generation for unknown type.
+* Fixed detection logic for streaming responses.
+
+### Other Changes
+
+* Updated to the latest tsp toolset.
+
+## 0.9.1 (2026-01-15)
+
+### Bugs Fixed
+
+* Fixed name collision issue when a union type and a model type have the same name after package prefix trimming.
+
+### Other Changes
+
+* Updated to the latest tsp toolset.
+* Move time helpers to azcore.
+* Add new line at the end of metadata file.
+
+## 0.9.0 (2026-01-06)
+
+### Breaking Changes
+
+* Optional streaming bodies are no longer forced to be required.
+
+### Bugs Fixed
+
+* Fixed incorrect package name when module version is greater than v1.
+
+### Features Added
+
+* Added support for client initializers with parameters.
+
+### Other Changes
+
+* Updated to the latest TCGC to support multiple services and add related tests.
+
+## 0.8.8 (2025-12-17)
+
+### Bugs Fixed
+
+* Fixed mismatch for LRO polling headers in example generation.
+
+### Features Added
+
+* Added support for pageable LROs.
+
+## 0.8.7 (2025-12-10)
+
+### Bugs Fixed
+
+* Generate fake values for required parameters when missing example values.
+
+### Other Changes
+
+* Updated to the latest tsp toolset.
+
+## 0.8.6 (2025-11-25)
+
+### Bugs Fixed
+
+* Fixed etag example generation for escape string.
+
+### Features Added
+
+* Added support for grouped params via override.
+
+### Other Changes
+
+* Updated the minimum version of Go to `v1.24.0`.
+* Execute `gofmt -s -w .` instead of `gofmt -w .` to keep consistent with SDK repo's CI check.
+
+## 0.8.5 (2025-11-18)
+
+### Bugs Fixed
+
+* Fixed improper handling of spread params in some cases which would cause code generation to fail.
+* Fixed missing package prefix for types in spread params models used in fakes.
+* Fixed handling of supplemental endpoint data that could cause an unused import of `strings` in some cases.
+
+## 0.8.4 (2025-11-13)
+
+### Bugs Fixed
+
+* Omit client options type when `omit-constructors` is set to true
+
+### Features Added
+
+* Emit `LICENSE.txt` file (defaults to MIT license with a Microsoft Copyright).
+* Added support for `nextLinkVerb` for pageable operations.
+
+### Other Changes
+
+* Updated the minimum version of `azcore` to `v1.20.0`.
+* Updated to the latest tsp toolset.
+
+## 0.8.3 (2025-10-14)
+
+### Bugs Fixed
+
+* Fixed missing empty path param check for unencoded path params.
+* Emit empty path param check for path collection parameters.
+* Fixed incorrect handling of optional path parameters.
+
+### Features Added
+
+* Clean up all generated Go files before emitting any new files.
+
+### Other Changes
+
+* Updated to the latest tsp toolset.
+* Moved handling of templated endpoints to client constructors.
+
+## 0.8.2 (2025-09-10)
+
+### Bugs Fixed
+
+* Fixed some edge cases where a method parameter's optionality wasn't correctly handled.
+
+### Other Changes
+
+* Updated to the latest tsp toolset.
+
+## 0.8.1 (2025-09-04)
+
+### Bugs Fixed
+
+* Fix polymorphic type result of response generation.
+
+### Features Added
+
+* Emit client constructors and corresponding client options type.
+  * Note that when using switch `containing-module`, client constructors and options type are not emitted.
+  * Added switch `omit-constructors` to disable this feature.
+
+### Other Changes
+
+* Updated the minimum version of `azcore` to `v1.19.0`.
+* Report a `NameCollision` diagnostic if two `const` values have the same name.
+* Updated to the latest tsp toolset.
+
+## 0.8.0 (2025-08-12)
+
+### Breaking Changes
+
+* The `module-version` switch has been removed.
+  * For new modules, the `moduleVersion` constant will have an initial value of `v0.1.0`.
+  * For existing modules, the value of `moduleVersion` is externally maintained.
+
+### Features Added
+
+* The `module` switch now accepts a major version suffix (e.g. `module=mymodule/v2`).
+* Added switch `containing-module` for scenarios where the emitted code is a package within an existing module. No `go.mod` or `version.go` file is emitted for this scenario.
+* Support multi-layer discriminator.
+
+### Bugs Fixed
+
+* For internal enums, don't export the "possible values" helper function.
+* Fixed missing import of the `io` package in fakes when `rawjson-as-bytes` is enabled.
+* Fixed linter error in certain `UnmarshalJSON` implementations due to unused `var err error`.
+
+### Other Changes
+
+* Non-ARM clients always have an `endpoint` field.
+* Only rename the `options` parameter when it collides with another required parameter with the same name.
+* Improve generic doc comment for clients when the name is simply `Client`.
+* Updated to the latest version of TypeSpec libraries.
+
+## 0.7.0 (2025-07-17)
+
+### Breaking Changes
+
+* The `module-version` switch is now used to seed the value for the `moduleVersion` constant. It will _not_ change an existing value.
+  * If not specified, it has a default value of `0.1.0`.
+
+### Other Changes
+
+* Updated to the latest tsp toolset.
+* The `moduleName` and `moduleVersion` constants have been moved out of `constants.go` and into `version.go`.
+  * The `version.go` file is emitted for all SDK flavors.
+
+## 0.6.0 (2025-07-15)
+
+### Breaking Changes
+
+* Fixed some cases where a client name could stutter.
+* Force the body paramter to be required for `PATCH` and `PUT` operations.
+
+### Features Added
+
+* Added switch `go-generate` to invoke post-generation scripts.
+  * The value is an output-relative path to a `.go` file containing `//go:generate` directives.
+  * If Go tools are not on the path, and `go-generate` was specified, then an error is produced.
+
+### Other Changes
+
+* When Go tools are found on the path, the following steps happen after successfully generating code and any `go-generate` script is invoked.
+  * Execute `gofmt -w .` followed by `go mod tidy` in the output directory.
+  * If Go tools are not found, the above steps are skipped and a warning is displayed.
+
+## 0.5.1 (2025-06-26)
+
+### Other Changes
+
+* Updated to the latest tcgc.
+
+## 0.5.0 (2025-06-23)
+
+### Breaking Changes
+
+* Fixed field names for optional parameters and monomorphic responses to align with `autorest.go` code generator.
+
+## 0.4.12 (2025-06-11)
+
+### Features Add
+
+* Added support for qualified type in example mapping.
+
+### Bugs Fixed
+
+* Fix wrong example mapping for discriminated type.
+
+### Other Changes
+
+* Throw error when paging with re-injection parameters.
+* Moved the `_metadata.json` file to the `testdata` subdirectory.
+* Updated to the latest tsp toolset.
+
+## 0.4.11 (2025-06-09)
+
+### Other Changes
+
+* Updated to latest tcgc.
+
+## 0.4.10 (2025-05-29)
+
+### Bugs Fixed
+
+* Fix wrong example mapping for any type.
+
+## 0.4.9 (2025-05-29)
+
+### Other Changes
+
+* Updated to the latest tsp toolset.
+* Refine `NameCollision` diagnostic.
+
+## 0.4.8 (2025-05-20)
+
+### Other Changes
+
+* Generate metadata file.
+
+## 0.4.7 (2025-05-13)
+
+### Bugs Fixed
+
+* Fix wrong example type mapping for discriminated types.
+- Fix wrong nullable response type handling logic.
+- Fix example generation logic for optional method parameters.
+
+### Other Changes
+
+* Updated to latest tcgc.
+
+## 0.4.6 (2025-05-07)
+
+### Bugs Fixed
+
+* Fix dependencies
+
+### Other Changes
+
+* Updated to latest tcgc.
+
+## 0.4.5 (2025-05-07)
+
+### Other Changes
+
+* Updated to the latest tsp toolset.
+
+## 0.4.4 (2025-04-25)
+
+### Bugs Fixed
+
+* For fakes, unnecessary time helper files are no longer generated.
+
+### Other Changes
+
+* Length check for `regexp` matches includes full match.
+* Updated to latest tcgc.
+
+## 0.4.3 (2025-04-09)
+
+### Bugs Fixed
+
+* Add length check for method prameters to fix generated example test code.
+
+## 0.4.2 (2025-04-03)
+
+### Other Changes
+
+* Updated to the latest tsp toolset.
+* Changed the default value of the `--factory-gather-all-params` switch from `false` to `true`.
+
+## 0.4.1 (2025-03-25)
+
+### Bugs Fixed
+
+* Unsupported tsp constructs and other errors are now reported as a diagnostic error instead of an unhandled exception.
+
+### Other Changes
+
+* Updated to the latest tsp toolset.
+* Upgraded default `azcore` version to `v1.17.1`.
+  * NOTE: this also requires updating the `go` directive in `go.mod` files to version `1.23.0`.
+
+## 0.4.0 (2025-03-12)
+
+### Breaking Changes
+
+* The monomorphic response field will no longer have the name `Value` in some cases. This is to preserve compatibility with the behavior of the `autorest.go` code generator.
+
+## 0.3.11 (2025-03-07)
+
+### Other Changes
+
+* Added switch `generate-samples` to control example code generation.
+* Deprecated `generate-examples`, use `generate-samples` instead.
+
+## 0.3.10 (2025-03-06)
+
+### Other Changes
+
+* Updated to the latest tsp toolset.
+
+## 0.3.9 (2025-02-25)
+
+### Other Changes
+
+* Updated to the latest tsp toolset.
+
+## 0.3.8 (2025-02-21)
+
+### Bugs Fixed
+
+* Don't export `NewPager` methods when their access is internal.
+* Remove filtering Azure core model since some instances of template model is in `Azure.Core` namespace. Logic of filtering exception model could cover the filtering needs.
+
+### Other Changes
+
+* Updated to the latest tsp toolset.
+* Report tcgc diagnostics.
+* Added switch `--factory-gather-all-params` to control the `NewClientFactory` constructor parameters. This switch allows gathering either only common parameters of clients or all parameters of clients.
+
+## 0.3.7 (2025-02-11)
+
+### Bugs Fixed
+
+* When dealing with mapping of parameters, get operation's body parameter from method's parameter's property if the method's parameter is a model with property decorated with `@bodyRoot` or `@body`.
+
+## 0.3.6 (2025-01-23)
+
+### Bugs Fixed
+
+* `Operation-Location` LROs will correctly set the `OperationLocationResultPath` when constructing a `Poller[T]`.
+
+### Other Changes
+
+* Updated to the latest tsp toolset.
+* Upgraded default `azcore` version to `v1.17.0`.
+
+## 0.3.5 (2024-12-18)
+
+### Other Fixes
+
+* Updated dependencies (accounts for latest tsp toolset).
+
+## 0.3.4 (2024-12-03)
+
+### Other Fixes
+
+* Updated dependencies (fixes missing parameters in some cases).
+
+## 0.3.3 (2024-11-19)
+
+### Other Fixes
+
+* Updated dependencies (fixes incorrectly pruned base models).
+
+## 0.3.2 (2024-11-07)
+
+### Features Added
+
+* Add support for XML payloads.
+* Internal fake server request interceptor.
+
+### Bugs Fixed
+
+* Fake servers will honor the caller's context in the `*http.Request`.
+* Add missing error check when parsing multipart/form content in fakes.
+* Optional request bodies will only set the `Content-Type` header when a body is specified.
+
+### Other Fixes
+
+* Fake pollers will always include `http.StatusOK` as an acceptible status code, and `http.StatusNoContent` for operations that don't return a body.
+
+## 0.3.1 (2024-08-14)
+
+### Bugs Fixed
+
+* Don't prune base models that have been marked as output.
+
+## 0.3.0 (2024-08-06)
+
+### Features Added
+
+* Added example code generation.
+
+### Breaking Changes
+
+* Fixes in TCGC for proper handling of `@clientName`.
+
+### Bump Dependencies
+
+* TCGC 0.44.3
+* TypeSpec compiler 0.58.1
+
+## 0.2.0 (2024-07-30)
+
+### Breaking Changes
+
+* For spread params, the optional params are now placed in the options type.
+
+### Other Changes
+
+* Upgraded default azcore version to v1.13.0
+
+### Bump Dependencies
+
+* TCGC 0.44.1
+* TypeSpec tools 0.58.0
+
+## 0.1.0 (2024-07-17)
+
+* Initial release

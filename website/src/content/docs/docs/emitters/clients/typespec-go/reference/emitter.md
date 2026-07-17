@@ -1,5 +1,5 @@
 ---
-title: 'Emitter usage'
+title: "Emitter usage"
 ---
 
 ## Emitter usage
@@ -14,16 +14,16 @@ tsp compile . --emit=@azure-tools/typespec-go
 
 ```yaml
 emit:
-  - '@azure-tools/typespec-go'
+  - "@azure-tools/typespec-go"
 ```
 
 The config can be extended with options as follows:
 
 ```yaml
 emit:
-  - '@azure-tools/typespec-go'
+  - "@azure-tools/typespec-go"
 options:
-  '@azure-tools/typespec-go':
+  "@azure-tools/typespec-go":
     option: value
 ```
 
@@ -90,6 +90,12 @@ Enables generation of spans for distributed tracing. The default is false.
 
 The module identity to use in go.mod. Mutually exclusive with containing-module.
 
+### `omit-constructors`
+
+**Type:** `boolean`
+
+When true, client constructors are not emitted. The default is false.
+
 ### `rawjson-as-bytes`
 
 **Type:** `boolean`
@@ -135,5 +141,7 @@ When true, generate example tests. The default is false.
 ### `factory-gather-all-params`
 
 **Type:** `boolean`
+
+**Default:** `true`
 
 When true, the `NewClientFactory` constructor gathers all parameters. When false, it only gathers common parameters of clients. The default is true.
