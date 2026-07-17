@@ -19,8 +19,10 @@ import { getClientNameOverride } from "../decorators.js";
 import { TCGCContext } from "../interfaces.js";
 import {
   AllScopes,
+  clientKey,
   clientLocationKey,
   clientNameKey,
+  getScopedDecoratorData,
   listScopedDecoratorData,
 } from "../internal-utils.js";
 import { reportDiagnostic } from "../lib.js";
@@ -58,6 +60,15 @@ function validateClientNames(tcgcContext: TCGCContext) {
         continue;
       }
       if (type.kind === "Operation") {
+        // Skip operations that belong to an explicit `@client` scoped to a different
+        // language than the current scope. Such an operation only exists as a client
+        // operation for its own scope (e.g. an `is`-derived operation in a `@client(..., "java")`
+        // interface), so it must not be relocated by an inherited `@clientLocation` for other
+        // scopes where that client does not apply. Otherwise it would falsely collide with the
+        // original operation moved by `@clientLocation`. See https://github.com/Azure/typespec-azure/issues/4850
+        if (isClientForOtherScopeOnly(tcgcContext, type.interface ?? type.namespace, scope)) {
+          continue;
+        }
         moved.add(type);
         if (typeof target === "string") {
           // Move to new clients
@@ -168,6 +179,28 @@ function validateClientLocationParameterTypes(tcgcContext: TCGCContext) {
       }
     }
   }
+}
+
+/**
+ * Determine whether a container is an explicit `@client` scoped to language(s) that do NOT
+ * include the current scope. Such a client (and its operations) only exists for its own scope,
+ * so it must be ignored when validating other scopes.
+ *
+ * This mirrors how the client builder resolves `@client` per scope
+ * (see `getScopedDecoratorData(context, clientKey, ...)` in cache.ts), keeping validation
+ * consistent with the clients that are actually generated.
+ */
+function isClientForOtherScopeOnly(
+  tcgcContext: TCGCContext,
+  container: Namespace | Interface | undefined,
+  scope: string | typeof AllScopes,
+): boolean {
+  // Only relevant for containers explicitly marked as a `@client` for some scope.
+  if (container === undefined || !tcgcContext.program.stateMap(clientKey).has(container)) {
+    return false;
+  }
+  // Skip it only when it is not a client for the current scope.
+  return getScopedDecoratorData(tcgcContext, clientKey, container, scope) === undefined;
 }
 
 function getDefinedLanguageScopes(program: Program): Set<string | typeof AllScopes> {

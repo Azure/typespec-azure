@@ -43,16 +43,16 @@ catalogs:
       specifier: ~4.20.1
       version: 4.20.1
     '@azure-rest/core-client':
-      specifier: ^2.7.0
+      specifier: ^2.3.1
       version: 2.7.0
     '@azure-tools/codegen':
       specifier: ~2.10.1
       version: 2.10.1
     '@azure-tools/openai-typespec':
-      specifier: 1.11.0
-      version: 1.11.0
+      specifier: 1.21.0
+      version: 1.21.0
     '@azure-tools/typespec-liftr-base':
-      specifier: 0.14.0
+      specifier: '>=0.14.0 <1.0.0'
       version: 0.14.0
     '@azure/abort-controller':
       specifier: ^2.1.2
@@ -67,7 +67,7 @@ catalogs:
       specifier: ^1.5.0
       version: 1.6.2
     '@azure/core-rest-pipeline':
-      specifier: ^1.24.0
+      specifier: ^1.14.0
       version: 1.24.0
     '@azure/core-util':
       specifier: ^1.4.0
@@ -183,12 +183,6 @@ catalogs:
     '@types/hast':
       specifier: ^3.0.4
       version: 3.0.4
-    '@types/js-yaml':
-      specifier: ~4.0.9
-      version: 4.0.9
-    '@types/lodash':
-      specifier: ~4.17.24
-      version: 4.17.24
     '@types/micromatch':
       specifier: ^4.0.10
       version: 4.0.10
@@ -235,8 +229,8 @@ catalogs:
       specifier: ^17.0.35
       version: 17.0.35
     '@typespec/http-client-python':
-      specifier: '>=0.34.0 <1.0.0'
-      version: 0.34.0
+      specifier: '>=0.34.2 <1.0.0'
+      version: 0.34.2
     '@typespec/ts-http-runtime':
       specifier: 0.3.6
       version: 0.3.6
@@ -363,12 +357,6 @@ catalogs:
     is-unicode-supported:
       specifier: ^2.1.0
       version: 2.1.0
-    js-yaml:
-      specifier: ~4.1.1
-      version: 4.1.1
-    lodash:
-      specifier: ~4.18.1
-      version: 4.18.1
     log-symbols:
       specifier: ^7.0.1
       version: 7.0.1
@@ -3196,6 +3184,9 @@ importers:
       '@typespec/xml':
         specifier: workspace:^
         version: link:../../core/packages/xml
+      yaml:
+        specifier: 'catalog:'
+        version: 2.9.0
     devDependencies:
       '@azure-tools/typespec-azure-core':
         specifier: workspace:^
@@ -3687,96 +3678,157 @@ importers:
         specifier: 'catalog:'
         version: 4.1.9(@types/node@26.0.0)(@vitest/coverage-v8@4.1.9)(@vitest/ui@4.1.9)(happy-dom@20.10.6)(jsdom@25.0.1)(vite@8.1.0(@types/node@26.0.0)(esbuild@0.28.1)(tsx@4.22.4)(yaml@2.9.0))
 
-  packages/typespec-java/src/typespec-extension:
+  packages/typespec-go:
     dependencies:
-      '@autorest/codemodel':
+      semver:
         specifier: 'catalog:'
-        version: 4.20.1
-      js-yaml:
-        specifier: 'catalog:'
-        version: 4.1.1
-      lodash:
-        specifier: 'catalog:'
-        version: 4.18.1
+        version: 7.8.5
     devDependencies:
-      '@azure-tools/codegen':
-        specifier: 'catalog:'
-        version: 2.10.1
-      '@azure-tools/openai-typespec':
-        specifier: 'catalog:'
-        version: 1.11.0(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)
+      '@azure-tools/azure-http-specs':
+        specifier: workspace:^
+        version: link:../azure-http-specs
       '@azure-tools/typespec-autorest':
         specifier: workspace:^
-        version: link:../../../typespec-autorest
+        version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
         specifier: workspace:^
-        version: link:../../../typespec-azure-core
+        version: link:../typespec-azure-core
       '@azure-tools/typespec-azure-resource-manager':
         specifier: workspace:^
-        version: link:../../../typespec-azure-resource-manager
+        version: link:../typespec-azure-resource-manager
       '@azure-tools/typespec-azure-rulesets':
         specifier: workspace:^
-        version: link:../../../typespec-azure-rulesets
+        version: link:../typespec-azure-rulesets
       '@azure-tools/typespec-client-generator-core':
         specifier: workspace:^
-        version: link:../../../typespec-client-generator-core
-      '@azure-tools/typespec-liftr-base':
-        specifier: 'catalog:'
-        version: 0.14.0
-      '@microsoft/api-extractor':
-        specifier: 'catalog:'
-        version: 7.58.9(@types/node@26.0.0)
-      '@types/js-yaml':
-        specifier: 'catalog:'
-        version: 4.0.9
-      '@types/lodash':
-        specifier: 'catalog:'
-        version: 4.17.24
+        version: link:../typespec-client-generator-core
       '@types/node':
         specifier: 'catalog:'
         version: 26.0.0
+      '@types/semver':
+        specifier: 'catalog:'
+        version: 7.7.1
       '@typespec/compiler':
         specifier: workspace:^
-        version: link:../../../../core/packages/compiler
+        version: link:../../core/packages/compiler
       '@typespec/events':
         specifier: workspace:^
-        version: link:../../../../core/packages/events
+        version: link:../../core/packages/events
       '@typespec/http':
         specifier: workspace:^
-        version: link:../../../../core/packages/http
+        version: link:../../core/packages/http
+      '@typespec/http-specs':
+        specifier: workspace:^
+        version: link:../../core/packages/http-specs
       '@typespec/openapi':
         specifier: workspace:^
-        version: link:../../../../core/packages/openapi
-      '@typespec/openapi3':
-        specifier: workspace:^
-        version: link:../../../../core/packages/openapi3
+        version: link:../../core/packages/openapi
       '@typespec/rest':
         specifier: workspace:^
-        version: link:../../../../core/packages/rest
+        version: link:../../core/packages/rest
+      '@typespec/spec-api':
+        specifier: workspace:^
+        version: link:../../core/packages/spec-api
+      '@typespec/spector':
+        specifier: workspace:^
+        version: link:../../core/packages/spector
       '@typespec/sse':
         specifier: workspace:^
-        version: link:../../../../core/packages/sse
+        version: link:../../core/packages/sse
       '@typespec/streams':
         specifier: workspace:^
-        version: link:../../../../core/packages/streams
+        version: link:../../core/packages/streams
       '@typespec/tspd':
         specifier: workspace:^
-        version: link:../../../../core/packages/tspd
+        version: link:../../core/packages/tspd
       '@typespec/versioning':
         specifier: workspace:^
-        version: link:../../../../core/packages/versioning
+        version: link:../../core/packages/versioning
       '@typespec/xml':
         specifier: workspace:^
-        version: link:../../../../core/packages/xml
+        version: link:../../core/packages/xml
       '@vitest/coverage-v8':
         specifier: 'catalog:'
         version: 4.1.9(vitest@4.1.9)
       '@vitest/ui':
         specifier: 'catalog:'
         version: 4.1.9(vitest@4.1.9)
-      c8:
+      rimraf:
         specifier: 'catalog:'
-        version: 11.0.0
+        version: 6.1.3
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.9(@types/node@26.0.0)(@vitest/coverage-v8@4.1.9)(@vitest/ui@4.1.9)(happy-dom@20.10.6)(jsdom@25.0.1)(vite@8.1.0(@types/node@26.0.0)(esbuild@0.28.1)(tsx@4.22.4)(yaml@2.9.0))
+
+  packages/typespec-java:
+    dependencies:
+      '@autorest/codemodel':
+        specifier: 'catalog:'
+        version: 4.20.1
+      '@azure-tools/codegen':
+        specifier: 'catalog:'
+        version: 2.10.1
+      yaml:
+        specifier: 'catalog:'
+        version: 2.9.0
+    devDependencies:
+      '@azure-tools/openai-typespec':
+        specifier: 'catalog:'
+        version: 1.21.0(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)
+      '@azure-tools/typespec-autorest':
+        specifier: workspace:^
+        version: link:../typespec-autorest
+      '@azure-tools/typespec-azure-core':
+        specifier: workspace:^
+        version: link:../typespec-azure-core
+      '@azure-tools/typespec-azure-resource-manager':
+        specifier: workspace:^
+        version: link:../typespec-azure-resource-manager
+      '@azure-tools/typespec-azure-rulesets':
+        specifier: workspace:^
+        version: link:../typespec-azure-rulesets
+      '@azure-tools/typespec-client-generator-core':
+        specifier: workspace:^
+        version: link:../typespec-client-generator-core
+      '@azure-tools/typespec-liftr-base':
+        specifier: 'catalog:'
+        version: 0.14.0
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.0.0
+      '@typespec/compiler':
+        specifier: workspace:^
+        version: link:../../core/packages/compiler
+      '@typespec/events':
+        specifier: workspace:^
+        version: link:../../core/packages/events
+      '@typespec/http':
+        specifier: workspace:^
+        version: link:../../core/packages/http
+      '@typespec/openapi':
+        specifier: workspace:^
+        version: link:../../core/packages/openapi
+      '@typespec/rest':
+        specifier: workspace:^
+        version: link:../../core/packages/rest
+      '@typespec/sse':
+        specifier: workspace:^
+        version: link:../../core/packages/sse
+      '@typespec/streams':
+        specifier: workspace:^
+        version: link:../../core/packages/streams
+      '@typespec/tspd':
+        specifier: workspace:^
+        version: link:../../core/packages/tspd
+      '@typespec/versioning':
+        specifier: workspace:^
+        version: link:../../core/packages/versioning
+      '@typespec/xml':
+        specifier: workspace:^
+        version: link:../../core/packages/xml
       rimraf:
         specifier: 'catalog:'
         version: 6.1.3
@@ -3819,7 +3871,7 @@ importers:
     dependencies:
       '@typespec/http-client-python':
         specifier: 'catalog:'
-        version: 0.34.0(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)
+        version: 0.34.2(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)
       semver:
         specifier: 'catalog:'
         version: 7.8.5
@@ -4090,6 +4142,15 @@ importers:
       '@azure-tools/typespec-client-generator-core':
         specifier: workspace:^
         version: link:../packages/typespec-client-generator-core
+      '@azure-tools/typespec-java':
+        specifier: workspace:^
+        version: link:../packages/typespec-java
+      '@azure-tools/typespec-python':
+        specifier: workspace:^
+        version: link:../packages/typespec-python
+      '@azure-tools/typespec-ts':
+        specifier: workspace:^
+        version: link:../packages/typespec-ts
       '@types/hast':
         specifier: 'catalog:'
         version: 3.0.4
@@ -4390,11 +4451,11 @@ packages:
     resolution: {integrity: sha512-fZfREKjQnBTscjObgK4LuyZNFaofoCNQDNz0jl1i8fYNwCM5EOF9BXwtEtobuEyCpPUNDxQ/KKO65eWzirqk4w==}
     engines: {node: '>=12.0.0'}
 
-  '@azure-tools/openai-typespec@1.11.0':
-    resolution: {integrity: sha512-xxHeThd4CJZeOZ7JPV6lPj+8vSkO7V1qZ+zodQdZdlx0jDX7tTJ9VJ5ZakZ/R7g+3sfoECIuhE0TCz+Wq6nXWA==}
+  '@azure-tools/openai-typespec@1.21.0':
+    resolution: {integrity: sha512-wKHNsyXii+/ZJn/mqKC/ey+/Y+RoW7XGBQD5yNRhGKA3VRibLNIhn/0PGLEIZhWWsFp3okTvifhPDs/b0DmOTA==}
     peerDependencies:
-      '@typespec/http': '*'
-      '@typespec/openapi': '*'
+      '@typespec/http': ^1.13.0
+      '@typespec/openapi': ^1.13.0
 
   '@azure-tools/tasks@3.0.255':
     resolution: {integrity: sha512-GjALNLz7kWMEdRVbaN5g0cJHNAr3XVTbP0611Mv2UzMgGL6FOhNZJK+oPHJKLDR8EEDZNnkwPlyi7B+INXUSQA==}
@@ -8364,9 +8425,6 @@ packages:
   '@types/keyv@3.1.4':
     resolution: {integrity: sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==}
 
-  '@types/lodash@4.17.24':
-    resolution: {integrity: sha512-gIW7lQLZbue7lRSWEFql49QJJWThrTFFeIMJdp3eH4tKoxm1OvEPg02rm4wCCSHS0cL3/Fizimb35b7k8atwsQ==}
-
   '@types/mdast@4.0.4':
     resolution: {integrity: sha512-kGaNbPh1k7AFzgpud/gMdvIm5xuECykRR+JnWKQno9TAXVa6WIVCGTPvYGekIDL4uwCZQSYbUxNBSb1aUo79oA==}
 
@@ -8489,24 +8547,24 @@ packages:
   '@types/yoga-layout@1.9.2':
     resolution: {integrity: sha512-S9q47ByT2pPvD65IvrWp7qppVMpk9WGMbVq9wbWZOHg6tnXSD4vyhao6nOSBwwfDdV2p3Kx9evA9vI+XWTfDvw==}
 
-  '@typespec/http-client-python@0.34.0':
-    resolution: {integrity: sha512-JWPxy6vioNNajgWiE1FqX9BOaEqTfD5JXthpcHT/TlnT/DrOuAcBtaByxwFzTooGfObhQLRiszeXvvqls3n8Ew==}
+  '@typespec/http-client-python@0.34.2':
+    resolution: {integrity: sha512-GngEovDgQlDD/+LIMsINT103t4MfxqDV6dJnJ5osRdg2sMWcNqYnCglAmIgMHsQHrvji3FIdcsD8LJ7Lqdiurg==}
     engines: {node: '>=22.0.0'}
     peerDependencies:
-      '@azure-tools/typespec-autorest': '>=0.69.1 <1.0.0'
-      '@azure-tools/typespec-azure-core': '>=0.69.0 <1.0.0'
-      '@azure-tools/typespec-azure-resource-manager': '>=0.69.1 <1.0.0'
-      '@azure-tools/typespec-azure-rulesets': '>=0.69.1 <1.0.0'
-      '@azure-tools/typespec-client-generator-core': '>=0.69.1 <1.0.0'
-      '@typespec/compiler': ^1.13.0
-      '@typespec/events': '>=0.83.0 <1.0.0'
-      '@typespec/http': ^1.13.0
-      '@typespec/openapi': ^1.13.0
-      '@typespec/rest': '>=0.83.0 <1.0.0'
-      '@typespec/sse': '>=0.83.0 <1.0.0'
-      '@typespec/streams': '>=0.83.0 <1.0.0'
-      '@typespec/versioning': '>=0.83.0 <1.0.0'
-      '@typespec/xml': '>=0.83.0 <1.0.0'
+      '@azure-tools/typespec-autorest': '>=0.70.0 <1.0.0'
+      '@azure-tools/typespec-azure-core': '>=0.70.0 <1.0.0'
+      '@azure-tools/typespec-azure-resource-manager': '>=0.70.0 <1.0.0'
+      '@azure-tools/typespec-azure-rulesets': '>=0.70.0 <1.0.0'
+      '@azure-tools/typespec-client-generator-core': '>=0.70.0 <1.0.0'
+      '@typespec/compiler': ^1.14.0
+      '@typespec/events': '>=0.84.0 <1.0.0'
+      '@typespec/http': ^1.14.0
+      '@typespec/openapi': ^1.14.0
+      '@typespec/rest': '>=0.84.0 <1.0.0'
+      '@typespec/sse': '>=0.84.0 <1.0.0'
+      '@typespec/streams': '>=0.84.0 <1.0.0'
+      '@typespec/versioning': '>=0.84.0 <1.0.0'
+      '@typespec/xml': '>=0.84.0 <1.0.0'
 
   '@typespec/ts-http-runtime@0.3.6':
     resolution: {integrity: sha512-jIXhD0eWQ1JA6ln/5Dltyx22UxWNrw0hZmhy2rlv6m6KgF7kplHx3g0fzi09lNmTJQRR91OlemYp3xFnvDK9og==}
@@ -15179,7 +15237,7 @@ snapshots:
       js-yaml: 4.1.1
       semver: 7.8.5
 
-  '@azure-tools/openai-typespec@1.11.0(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)':
+  '@azure-tools/openai-typespec@1.21.0(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)':
     dependencies:
       '@typespec/http': link:core/packages/http
       '@typespec/openapi': link:core/packages/openapi
@@ -20254,8 +20312,6 @@ snapshots:
     dependencies:
       '@types/node': 26.0.0
 
-  '@types/lodash@4.17.24': {}
-
   '@types/mdast@4.0.4':
     dependencies:
       '@types/unist': 3.0.3
@@ -20377,7 +20433,7 @@ snapshots:
 
   '@types/yoga-layout@1.9.2': {}
 
-  '@typespec/http-client-python@0.34.0(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)':
+  '@typespec/http-client-python@0.34.2(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)':
     dependencies:
       '@azure-tools/typespec-autorest': link:packages/typespec-autorest
       '@azure-tools/typespec-azure-core': link:packages/typespec-azure-core

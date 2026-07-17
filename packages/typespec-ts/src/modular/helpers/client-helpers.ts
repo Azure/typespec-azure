@@ -6,7 +6,7 @@ import {
   SdkMethodParameter,
   SdkServiceOperation,
 } from "@azure-tools/typespec-client-generator-core";
-import { OptionalKind, ParameterDeclarationStructure, StatementedNode } from "ts-morph";
+import { Node, OptionalKind, ParameterDeclarationStructure, StatementedNode } from "ts-morph";
 import { ModularEmitterOptions } from "../interfaces.js";
 
 import { resolveReference } from "../../framework/reference.js";
@@ -236,12 +236,12 @@ export function buildGetClientEndpointParam(
  * @returns - an expression representing the options to be passed in to getClient
  */
 export function buildGetClientOptionsParam(
-  context: StatementedNode,
+  context: StatementedNode & Node,
   emitterOptions: ModularEmitterOptions,
   endpointParam: string,
   apiVersionParamName?: string,
 ): string {
-  const userAgentOptions = buildUserAgentOptions(context, emitterOptions, "azsdk-js-api");
+  const userAgentOptions = buildUserAgentOptions(context, emitterOptions);
   const loggingOptions = buildLoggingOptions();
   const credentials = buildCredentials(emitterOptions, endpointParam);
 
@@ -313,37 +313,55 @@ function buildLoggingOptions(): string | undefined {
   return `{ logger: options.loggingOptions?.logger ?? logger.info }`;
 }
 
+/**
+ * Builds the `userAgentOptions` for the generated client, producing a telemetry
+ * prefix of the form `[<application_id> ]azsdk-js-<package>/<version>` per the Azure
+ * Core telemetry policy: https://azure.github.io/azure-sdk/general_azurecore.html#telemetry-policy
+ */
 export function buildUserAgentOptions(
-  context: StatementedNode,
+  context: StatementedNode & Node,
   emitterOptions: ModularEmitterOptions,
-  sdkUserAgentPrefix: string,
 ): string {
   const userAgentStatements = [];
   const prefixFromOptions = "const prefixFromOptions = options?.userAgentOptions?.userAgentPrefix;";
   userAgentStatements.push(prefixFromOptions);
 
+  const packageName = emitterOptions.options.packageDetails?.name;
   const clientPackageName =
-    emitterOptions.options.packageDetails?.nameWithoutScope ??
-    emitterOptions.options.packageDetails?.name ??
-    "";
-  const packageVersion = emitterOptions.options.packageDetails?.version ?? "";
+    emitterOptions.options.packageDetails?.nameWithoutScope ?? packageName ?? "";
 
-  const userAgentInfoStatement =
-    packageVersion && clientPackageName && sdkUserAgentPrefix.includes("api")
-      ? "const userAgentInfo = `azsdk-js-" + clientPackageName + "/" + packageVersion + "`;"
-      : "";
-
-  if (userAgentInfoStatement) {
-    userAgentStatements.push(userAgentInfoStatement);
+  // The version is read from the generated package.json at runtime rather than
+  // hardcoded here: once the package is generated, its version is owned by
+  // package.json. We import it via the package's own "./package.json" export so
+  // the specifier is identical in `src` and the built `dist` output.
+  let userAgentInfoStatement = "";
+  if (clientPackageName && packageName) {
+    const packageJsonModule = `${packageName}/package.json`;
+    const sourceFile = context.getSourceFile();
+    const hasPackageJsonImport = sourceFile
+      .getImportDeclarations()
+      .some((declaration) => declaration.getModuleSpecifierValue() === packageJsonModule);
+    if (!hasPackageJsonImport) {
+      sourceFile.addImportDeclaration({
+        defaultImport: "pkgJson",
+        moduleSpecifier: packageJsonModule,
+        attributes: [{ name: "type", value: "json" }],
+      });
+    }
+    userAgentInfoStatement =
+      "const userAgentInfo = `azsdk-js-" + clientPackageName + "/${pkgJson.version}`;";
   }
-  const userAgentPrefix = `const userAgentPrefix = ${
-    "prefixFromOptions ? `${prefixFromOptions} " +
-    sdkUserAgentPrefix +
-    `${userAgentInfoStatement ? " ${userAgentInfo}" : ""}` +
-    "` : `" +
-    `${sdkUserAgentPrefix}` +
-    `${userAgentInfoStatement ? " ${userAgentInfo}`" : "`"}`
-  };`;
+
+  if (!userAgentInfoStatement) {
+    // Without package name/version we cannot build a meaningful telemetry token,
+    // so we leave the user agent untouched (the caller's userAgentOptions still flow
+    // through `...options`) and let core-rest-pipeline defaults apply.
+    return "";
+  }
+
+  userAgentStatements.push(userAgentInfoStatement);
+  const userAgentPrefix =
+    "const userAgentPrefix = prefixFromOptions ? `${prefixFromOptions} ${userAgentInfo}` : `${userAgentInfo}`;";
   userAgentStatements.push(userAgentPrefix);
 
   context.addStatements(userAgentStatements.join("\n"));

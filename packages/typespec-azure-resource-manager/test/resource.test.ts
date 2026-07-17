@@ -399,7 +399,7 @@ describe("ARM resource model:", () => {
     it("sets standard features and feature options", async () => {
       const [result, diagnostics] = await Tester.compileAndDiagnose(t.code`
 
-@Azure.ResourceManager.Legacy.features(Features)
+@Azure.ResourceManager.featureFiles(Features)
 @versioned(Versions)
 @armProviderNamespace("Microsoft.Test")
 namespace ${t.namespace("MSTest")};
@@ -410,7 +410,7 @@ enum Features {
   FeatureA: "FeatureA",
   FeatureB: "FeatureB",
 }
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureA)
+      @Azure.ResourceManager.featureFile(Features.FeatureA)
       model ${t.model("FooResource")} is TrackedResource<FooResourceProperties> {
          ...ResourceNameParameter<FooResource>;
       }
@@ -418,7 +418,7 @@ enum Features {
       ...DefaultProvisioningStateProperty;
       }
 
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureB)
+      @Azure.ResourceManager.featureFile(Features.FeatureB)
       model ${t.model("BarResource")} is ProxyResource<BarResourceProperties> {
           ...ResourceNameParameter<BarResource>;
       }
@@ -456,7 +456,7 @@ enum Features {
     it("allows customizing features and feature options", async () => {
       const [result, diagnostics] = await Tester.compileAndDiagnose(t.code`
 
-@Azure.ResourceManager.Legacy.features(Features)
+@Azure.ResourceManager.featureFiles(Features)
 @versioned(Versions)
 @armProviderNamespace("Microsoft.Test")
 namespace ${t.namespace("MSTest")};
@@ -464,15 +464,15 @@ enum Versions {
   v2025_11_19_preview: "2025-11-19-preview",
 }
 enum Features {
-  @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "FeatureA", fileName: "feature-a", description: "The data for feature A"})
+  @Azure.ResourceManager.featureFileOptions(#{featureName: "FeatureA", fileName: "feature-a", description: "The data for feature A"})
   FeatureA: "Feature A",
-  @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "FeatureB", fileName: "feature-b", description: "The data for feature B"})
+  @Azure.ResourceManager.featureFileOptions(#{featureName: "FeatureB", fileName: "feature-b", description: "The data for feature B"})
   FeatureB: "Feature B",
 
-  @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "Common", fileName: "common", description: "The data in common for all features", title: "Common types for FeatureA and FeatureB", termsOfService: "MIT License"})
+  @Azure.ResourceManager.featureFileOptions(#{featureName: "Common", fileName: "common", description: "The data in common for all features", title: "Common types for FeatureA and FeatureB", termsOfService: "MIT License"})
   Common: "Common",
 }
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureA)
+      @Azure.ResourceManager.featureFile(Features.FeatureA)
       model ${t.model("FooResource")} is TrackedResource<FooResourceProperties> {
          ...ResourceNameParameter<FooResource>;
       }
@@ -480,7 +480,7 @@ enum Features {
       ...DefaultProvisioningStateProperty;
       }
 
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureB)
+      @Azure.ResourceManager.featureFile(Features.FeatureB)
       model ${t.model("BarResource")} is ProxyResource<BarResourceProperties> {
           ...ResourceNameParameter<BarResource>;
       }
@@ -520,7 +520,7 @@ enum Features {
     it("reports correct features for child types", async () => {
       const [result, diagnostics] = await Tester.compileAndDiagnose(t.code`
 
-@Azure.ResourceManager.Legacy.features(Features)
+@Azure.ResourceManager.featureFiles(Features)
 @versioned(Versions)
 @armProviderNamespace("Microsoft.Test")
 namespace ${t.namespace("MSTest")};
@@ -528,26 +528,26 @@ enum Versions {
   v2025_11_19_preview: "2025-11-19-preview",
 }
 enum Features {
-  @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "FeatureA", fileName: "feature-a", description: "The data for feature A"})
+  @Azure.ResourceManager.featureFileOptions(#{featureName: "FeatureA", fileName: "feature-a", description: "The data for feature A"})
   FeatureA: "Feature A",
-  @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "FeatureB", fileName: "feature-b", description: "The data for feature B"})
+  @Azure.ResourceManager.featureFileOptions(#{featureName: "FeatureB", fileName: "feature-b", description: "The data for feature B"})
   FeatureB: "Feature B",
 }
       @secret
       scalar secretString extends string;
 
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureA)
+      @Azure.ResourceManager.featureFile(Features.FeatureA)
       model ${t.model("FooResource")} is TrackedResource<FooResourceProperties> {
          ...ResourceNameParameter<FooResource>;
       }
       
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureA)
+      @Azure.ResourceManager.featureFile(Features.FeatureA)
       model ${t.model("FooResourceProperties")} { 
         ...DefaultProvisioningStateProperty;
         password: secretString;
       }
 
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureB)
+      @Azure.ResourceManager.featureFile(Features.FeatureB)
       model ${t.model("BarResource")} is ProxyResource<BarResourceProperties> {
           ...ResourceNameParameter<BarResource>;
       }
@@ -556,11 +556,11 @@ enum Features {
         password: secretString;
       }
 
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureA)
+      @Azure.ResourceManager.featureFile(Features.FeatureA)
       @armResourceOperations
       interface ${t.interface("Foos")} extends Azure.ResourceManager.TrackedResourceOperations<FooResource, FooResourceProperties> {}
 
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureB)
+      @Azure.ResourceManager.featureFile(Features.FeatureB)
       @armResourceOperations
       interface ${t.interface("Bars")} extends Azure.ResourceManager.TrackedResourceOperations<BarResource, BarResourceProperties> {}
       `);
@@ -930,7 +930,8 @@ interface RestorePointOperations {
 });
 
 it("allows extension of foreign resources", async () => {
-  const { program, Employees, ManagementGroups, VirtualMachines } = await Tester.compile(t.code`
+  const { program, Employees, ManagementGroups, ServiceGroups, VirtualMachines } =
+    await Tester.compile(t.code`
 using Azure.Core;
 
 @armProviderNamespace
@@ -984,6 +985,8 @@ interface ${t.interface("Employees")} extends EmplOps<Extension.ScopeParameter> 
 @armResourceOperations
 interface ${t.interface("ManagementGroups")} extends EmplOps<Extension.ManagementGroup> {}
 @armResourceOperations
+interface ${t.interface("ServiceGroups")} extends EmplOps<Extension.ServiceGroup> {}
+@armResourceOperations
 interface ${t.interface("VirtualMachines")} extends EmplOps<VirtualMachine> {}
 
 model MoveRequest {
@@ -1008,6 +1011,12 @@ model MoveResponse {
   const [managementGetHttp, _m] = getHttpOperation(program, managementGet);
   expect(managementGetHttp.path).toBe(
     "/providers/Microsoft.Management/managementGroups/{managementGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+  );
+  const serviceGroupGet: Operation | undefined = ServiceGroups?.operations?.get("get");
+  ok(serviceGroupGet);
+  const [serviceGroupGetHttp, _sg] = getHttpOperation(program, serviceGroupGet);
+  expect(serviceGroupGetHttp.path).toBe(
+    "/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
   );
   const virtualMachinesGet: Operation | undefined = VirtualMachines?.operations?.get("get");
   ok(virtualMachinesGet);

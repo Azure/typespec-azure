@@ -1,0 +1,145 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+
+package azurepagegroup_test
+
+import (
+	"azurepagegroup"
+	"context"
+	"testing"
+
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
+	"github.com/stretchr/testify/require"
+)
+
+func TestPageClient_NewListWithCustomPageModelPager(t *testing.T) {
+	client, err := azurepagegroup.NewPageClientWithNoCredential("http://localhost:3000", nil)
+	require.NoError(t, err)
+	pager := client.NewListWithCustomPageModelPager(nil)
+	pages := 0
+	for pager.More() {
+		page, err := pager.NextPage(context.Background())
+		require.NoError(t, err)
+		require.EqualValues(t, []*azurepagegroup.User{
+			{
+				ID:   to.Ptr[int32](1),
+				Name: to.Ptr("Madge"),
+				Etag: to.Ptr[azcore.ETag]("11bdc430-65e8-45ad-81d9-8ffa60d55b59"),
+			},
+		}, page.Items)
+		pages++
+	}
+	require.EqualValues(t, 1, pages)
+}
+
+func TestPageClient_NewListWithPagePager(t *testing.T) {
+	client, err := azurepagegroup.NewPageClientWithNoCredential("http://localhost:3000", nil)
+	require.NoError(t, err)
+	pager := client.NewListWithPagePager(nil)
+	pages := 0
+	for pager.More() {
+		page, err := pager.NextPage(context.Background())
+		require.NoError(t, err)
+		require.EqualValues(t, []*azurepagegroup.User{
+			{
+				ID:   to.Ptr[int32](1),
+				Name: to.Ptr("Madge"),
+				Etag: to.Ptr[azcore.ETag]("11bdc430-65e8-45ad-81d9-8ffa60d55b59"),
+			},
+		}, page.Value)
+		pages++
+	}
+	require.EqualValues(t, 1, pages)
+}
+
+func TestPageClient_NewListWithParametersPager(t *testing.T) {
+	client, err := azurepagegroup.NewPageClientWithNoCredential("http://localhost:3000", nil)
+	require.NoError(t, err)
+	pager := client.NewListWithParametersPager(azurepagegroup.ListItemInputBody{
+		InputName: to.Ptr("Madge"),
+	}, &azurepagegroup.PageClientListWithParametersOptions{
+		Another: to.Ptr(azurepagegroup.ListItemInputExtensibleEnumSecond),
+	})
+	pages := 0
+	for pager.More() {
+		page, err := pager.NextPage(context.Background())
+		require.NoError(t, err)
+		require.EqualValues(t, []*azurepagegroup.User{
+			{
+				ID:   to.Ptr[int32](1),
+				Name: to.Ptr("Madge"),
+				Etag: to.Ptr[azcore.ETag]("11bdc430-65e8-45ad-81d9-8ffa60d55b59"),
+			},
+		}, page.Value)
+		pages++
+	}
+	require.EqualValues(t, 1, pages)
+}
+
+/*func TestPageClient_NewWithParameterizedNextLinkPager(t *testing.T) {
+	client, err := azurepagegroup.NewPageClient("http://localhost:3000", nil)
+	require.NoError(t, err)
+	pager := client.NewWithParameterizedNextLinkPager("name", &azurepagegroup.PageClientWithParameterizedNextLinkOptions{
+		IncludePending: to.Ptr(true),
+	})
+	pages := 0
+	for pager.More() {
+		page, err := pager.NextPage(context.Background())
+		require.NoError(t, err)
+		pages++
+		switch pages {
+		case 1:
+			require.EqualValues(t, []*azurepagegroup.User{
+				{
+					ID:   to.Ptr[int32](1),
+					Name: to.Ptr("User1"),
+				},
+			}, page.Values)
+		case 2:
+			require.EqualValues(t, []*azurepagegroup.User{
+				{
+					ID:   to.Ptr[int32](2),
+					Name: to.Ptr("User2"),
+				},
+			}, page.Values)
+		default:
+			t.Fatalf("unexpected page number %d", pages)
+		}
+	}
+	require.EqualValues(t, 2, pages)
+}*/
+
+// TODO: runtime.FetcherForNextLink doesn't support relative next link URLs
+/*func TestPageClient_NewWithRelativeNextLinkPager(t *testing.T) {
+	client, err := azurepagegroup.NewPageClientWithNoCredential("http://localhost:3000", nil)
+	require.NoError(t, err)
+	pager := client.NewWithRelativeNextLinkPager(nil)
+	pages := 0
+	for pager.More() {
+		page, err := pager.NextPage(context.Background())
+		require.NoError(t, err)
+		pages++
+		switch pages {
+		case 1:
+			require.EqualValues(t, []*azurepagegroup.User{
+				{
+					ID:   to.Ptr[int32](1),
+					Name: to.Ptr("User1"),
+					Etag: to.Ptr[azcore.ETag]("11bdc430-65e8-45ad-81d9-8ffa60d55b59"),
+				},
+			}, page.Value)
+		case 2:
+			require.EqualValues(t, []*azurepagegroup.User{
+				{
+					ID:   to.Ptr[int32](2),
+					Name: to.Ptr("User2"),
+					Etag: to.Ptr[azcore.ETag]("11bdc430-65e8-45ad-81d9-8ffa60d55b59"),
+				},
+			}, page.Value)
+		default:
+			t.Fatalf("unexpected page number %d", pages)
+		}
+	}
+	require.EqualValues(t, 2, pages)
+}*/
