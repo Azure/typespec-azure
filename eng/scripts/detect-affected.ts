@@ -1,21 +1,25 @@
 import { execFileSync } from "node:child_process";
-import { appendFileSync } from "node:fs";
+import { appendFileSync, readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
 // -----------------------------------------------------------------------------
 // Downstream CI target configuration.
 //
-// Upstream *package* dependencies are NOT listed here: they are derived from the
-// real pnpm workspace graph (`getAffectedPackages`, via `pnpm --filter "...[base]"`).
-// This config only declares what the graph cannot express.
+// The single source of truth is `detect-affected.config.json` (loaded below).
+// Upstream *package* dependencies are NOT listed there: they are derived from
+// the real pnpm workspace graph (`getAffectedPackages`, via
+// `pnpm --filter "...[base]"`). The config only declares what the graph cannot
+// express (ignore globs, shared/extra CI-infra paths, the submodule path, and
+// the target -> package mapping).
 //
-// TO ADD A NEW TARGET:
-//   1. Add an entry to `CONFIG.targets` below (key = short, expression-safe id).
+// TO ADD A NEW TARGET (e.g. `go`):
+//   1. Add an entry to `targets` in `detect-affected.config.json`.
 //   2. Add a reusable `.github/workflows/ci-<id>.yml` (on: workflow_call).
 //   3. Add a job + gate `needs:` entry in `.github/workflows/ci-downstream.yml`.
+// No changes to this file (or its test) are needed — both are config-driven.
 //
 // TO ADD A NEW UPSTREAM LIBRARY (e.g. a new typespec-azure-* package that an
-// emitter depends on): nothing to do here — the workspace graph picks it up
+// emitter depends on): nothing to do — the workspace graph picks it up
 // automatically as soon as the emitter declares the dependency.
 // -----------------------------------------------------------------------------
 
@@ -27,6 +31,8 @@ interface Target {
 }
 
 interface Config {
+  /** Git path that changes when the git-submodule pointer moves (triggers all targets). */
+  submodulePath: string;
   /** Globs whose sole change should NOT trigger anything; passed to pnpm via `--changed-files-ignore-pattern`. */
   ignore: string[];
   /** Paths that trigger every target (shared CI infrastructure). */
@@ -34,27 +40,9 @@ interface Config {
   targets: Record<string, Target>;
 }
 
-export const CONFIG: Config = {
-  ignore: ["**/test/**", "**/tests/**", "**/*.test.ts", "**/*.md"],
-  sharedExtra: [".github/actions/setup/**"],
-  targets: {
-    python: {
-      package: "@azure-tools/typespec-python",
-      extra: [".github/workflows/ci-python.yml", ".github/actions/setup-python/**"],
-    },
-    java: {
-      package: "@azure-tools/typespec-java",
-      extra: [".github/workflows/ci-java.yml", ".github/actions/setup-java/**"],
-    },
-    typescript: {
-      package: "@azure-tools/typespec-ts",
-      extra: [".github/workflows/ci-typescript.yml"],
-    },
-  },
-};
-
-/** The git path that changes when the `core` submodule pointer moves. */
-const SUBMODULE_PATH = "core";
+export const CONFIG: Config = JSON.parse(
+  readFileSync(new URL("./detect-affected.config.json", import.meta.url), "utf8"),
+);
 
 /**
  * Run pnpm and return stdout. On Windows pnpm is `pnpm.cmd`, which Node refuses
@@ -103,7 +91,7 @@ export function computeAffected(
   changedFiles: string[],
   config: Config,
 ): Record<string, boolean> {
-  const submoduleChanged = changedFiles.includes(SUBMODULE_PATH);
+  const submoduleChanged = changedFiles.includes(config.submodulePath);
   const result: Record<string, boolean> = {};
   for (const [name, target] of Object.entries(config.targets)) {
     const extra = [...config.sharedExtra, ...(target.extra ?? [])];
@@ -167,10 +155,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
 
   const outPath = process.env.GITHUB_OUTPUT;
   if (outPath) {
-    const lines =
-      Object.entries(affected)
-        .map(([key, value]) => `${key}=${value}`)
-        .join("\n") + "\n";
-    appendFileSync(outPath, lines);
+    // Single JSON output; consumers gate on `fromJSON(...).<target>` so the
+    // workflow never enumerates target names.
+    appendFileSync(outPath, `affected=${JSON.stringify(affected)}\n`);
   }
 }

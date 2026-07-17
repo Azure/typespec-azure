@@ -12,6 +12,19 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
+describe("CONFIG (loaded from detect-affected.config.json)", () => {
+  it("has a submodule path and at least one target", () => {
+    expect(CONFIG.submodulePath).toBeTruthy();
+    expect(Object.keys(CONFIG.targets).length).toBeGreaterThan(0);
+  });
+
+  it("every target declares a non-empty workspace package", () => {
+    for (const [name, target] of Object.entries(CONFIG.targets)) {
+      expect(target.package, `target "${name}" must set a package`).toBeTruthy();
+    }
+  });
+});
+
 describe("matchesAny (exact path or `dir/**` prefix)", () => {
   it("`dir/**` matches the dir and anything under it", () => {
     const g = ".github/actions/setup/**";

@@ -1,0 +1,19 @@
+{
+  "submodulePath": "core",
+  "ignore": ["**/test/**", "**/tests/**", "**/*.test.ts", "**/*.md"],
+  "sharedExtra": [".github/actions/setup/**"],
+  "targets": {
+    "python": {
+      "package": "@azure-tools/typespec-python",
+      "extra": [".github/workflows/ci-python.yml", ".github/actions/setup-python/**"]
+    },
+    "java": {
+      "package": "@azure-tools/typespec-java",
+      "extra": [".github/workflows/ci-java.yml", ".github/actions/setup-java/**"]
+    },
+    "typescript": {
+      "package": "@azure-tools/typespec-ts",
+      "extra": [".github/workflows/ci-typescript.yml"]
+    }
+  }
+}

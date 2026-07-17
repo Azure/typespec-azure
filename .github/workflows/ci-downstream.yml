@@ -19,9 +19,7 @@ jobs:
     name: "Detect Affected Targets"
     runs-on: ubuntu-latest
     outputs:
-      python: ${{ steps.detect.outputs.python }}
-      java: ${{ steps.detect.outputs.java }}
-      typescript: ${{ steps.detect.outputs.typescript }}
+      affected: ${{ steps.detect.outputs.affected }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -39,19 +37,19 @@ jobs:
   python:
     name: "Python"
     needs: detect-affected
-    if: needs.detect-affected.outputs.python == 'true'
+    if: ${{ fromJSON(needs.detect-affected.outputs.affected).python }}
     uses: ./.github/workflows/ci-python.yml
 
   java:
     name: "Java"
     needs: detect-affected
-    if: needs.detect-affected.outputs.java == 'true'
+    if: ${{ fromJSON(needs.detect-affected.outputs.affected).java }}
     uses: ./.github/workflows/ci-java.yml
 
   typescript:
     name: "TypeScript"
     needs: detect-affected
-    if: needs.detect-affected.outputs.typescript == 'true'
+    if: ${{ fromJSON(needs.detect-affected.outputs.affected).typescript }}
     uses: ./.github/workflows/ci-typescript.yml
 
   downstream-ci-gate:
@@ -61,21 +59,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Validate downstream results
+        env:
+          # All jobs this gate depends on, keyed by name with their result.
+          # Iterated generically so new emitters only need a `needs:` entry.
+          NEEDS: ${{ toJSON(needs) }}
         run: |
-          fail=0
-          for job in \
-            "detect-affected:${{ needs.detect-affected.result }}" \
-            "python:${{ needs.python.result }}" \
-            "java:${{ needs.java.result }}" \
-            "typescript:${{ needs.typescript.result }}"; do
-            name="${job%%:*}"
-            result="${job##*:}"
-            echo "$name => $result"
-            if [ "$result" = "failure" ] || [ "$result" = "cancelled" ]; then
-              fail=1
-            fi
-          done
-          if [ "$fail" = "1" ]; then
+          echo "$NEEDS" | jq -r 'to_entries[] | "\(.key) => \(.value.result)"'
+          bad=$(echo "$NEEDS" | jq '[to_entries[]
+            | select(.value.result == "failure" or .value.result == "cancelled")] | length')
+          if [ "$bad" != "0" ]; then
             echo "One or more downstream checks failed or were cancelled."
             exit 1
           fi
