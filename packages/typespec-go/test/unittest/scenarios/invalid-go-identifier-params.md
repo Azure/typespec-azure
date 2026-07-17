@@ -96,5 +96,4 @@ func (client *RegressionsClient) withExpandParamCreateRequest(ctx context.Contex
 	req.Raw().URL.RawQuery = strings.ReplaceAll(reqQP.Encode(), "+", "%20")
 	return req, nil
 }
-
 ```

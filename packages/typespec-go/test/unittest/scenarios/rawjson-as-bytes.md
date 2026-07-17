@@ -32,11 +32,10 @@ rawjson-as-bytes: true
 package testmodule
 
 type ContainsRawJSON struct {
-// REQUIRED; The contents of this field are raw JSON.
+	// REQUIRED; The contents of this field are raw JSON.
 	Anything1 []byte
 
-// REQUIRED; The contents of this field are raw JSON.
+	// REQUIRED; The contents of this field are raw JSON.
 	Anything2 []byte
 }
-
 ```

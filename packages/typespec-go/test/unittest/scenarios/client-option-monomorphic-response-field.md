@@ -32,5 +32,4 @@ package testmodule
 type ClientOptionClientListResponse struct {
 	Users []*Person
 }
-
 ```

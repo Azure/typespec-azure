@@ -39,20 +39,19 @@ op listThings(): ThingsListResult;
 package testmodule
 
 type FakeData struct {
-// REQUIRED
+	// REQUIRED
 	SomeString *string
 }
 
 type FakeInfo struct {
-// REQUIRED
+	// REQUIRED
 	SomeNumber *int32
 }
 
 type ThingsListResult struct {
-// REQUIRED
-	Value []*FakeData
+	// REQUIRED
+	Value     []*FakeData
 	MoreStuff []*FakeInfo
-	NextLink *string
+	NextLink  *string
 }
-
 ```

@@ -32,5 +32,4 @@ package testmodule
 type RenamedResponse struct {
 	PersonArray []*Person
 }
-
 ```

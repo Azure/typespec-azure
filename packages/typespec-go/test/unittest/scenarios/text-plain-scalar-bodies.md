@@ -216,5 +216,4 @@ func (client *RegressionsClient) getIntegerHandleResponse(resp *http.Response) (
 	result.Value = &parsedBody
 	return result, nil
 }
-
 ```

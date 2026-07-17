@@ -90,7 +90,9 @@ Scenarios live in `test/unittest/scenarios/`, one `.md` file per behavior (keep 
 
 Order a scenario input-first so it reads top-to-bottom: `yaml` config, then `tsp`, then any `json` inputs, then the `go` output blocks.
 
-**Every scenario needs at least one ` ```go <name> ` output block** — the harness only (re)generates the content of those blocks. Add one per generated file you want to snapshot; the body can start empty (or `// (file was not generated)`) and be filled by the update command below. A scenario with only a `tsp` block produces no Go and fails with an explicit "has at least one output block" error.
+**Every scenario needs at least one ` ```go <name> ` output block** — the harness only (re)generates the content of those blocks. Add one per generated file you want to snapshot; the body can start empty (or `// (file was not generated)`) and be filled by the update command below. A scenario with only a `tsp` block produces no Go and fails with an explicit "has at least one output block" error that lists the block names its input would produce, so you can copy one in.
+
+Snapshots are formatted with `gofmt -s` (the same formatting the emitter applies after emit), so running these unit tests requires the Go toolchain on your `PATH`.
 
 To fill (or refresh) the output blocks from the current emitter, run the update command and review the produced snapshots as part of your change:
 

@@ -155,7 +155,7 @@ import (
 // ConfigurationsClient contains the methods for the Configurations group.
 // Don't use this type directly, use NewConfigurationsClient() instead.
 type ConfigurationsClient struct {
-	internal *arm.Client
+	internal       *arm.Client
 	subscriptionID string
 }
 
@@ -170,7 +170,7 @@ func NewConfigurationsClient(subscriptionID string, credential azcore.TokenCrede
 	}
 	client := &ConfigurationsClient{
 		subscriptionID: subscriptionID,
-		internal: cl,
+		internal:       cl,
 	}
 	return client, nil
 }
@@ -407,7 +407,6 @@ func (client *ConfigurationsClient) putStreamingContentCreateRequest(ctx context
 	}
 	return req, nil
 }
-
 ```
 
 ## The generated samples exercise each streaming operation
@@ -435,7 +434,7 @@ func ExampleConfigurationsClient_GetStreamingContent() {
 		log.Fatalf("failed to obtain a credential: %v", err)
 	}
 	ctx := context.Background()
-	clientFactory, err := testmodule.NewClientFactory(	"00000000-0000-0000-0000-000000000000", cred, nil)
+	clientFactory, err := testmodule.NewClientFactory("00000000-0000-0000-0000-000000000000", cred, nil)
 	if err != nil {
 		log.Fatalf("failed to create client: %v", err)
 	}
@@ -459,7 +458,7 @@ func ExampleConfigurationsClient_GetTextContent() {
 		log.Fatalf("failed to obtain a credential: %v", err)
 	}
 	ctx := context.Background()
-	clientFactory, err := testmodule.NewClientFactory(	"00000000-0000-0000-0000-000000000000", cred, nil)
+	clientFactory, err := testmodule.NewClientFactory("00000000-0000-0000-0000-000000000000", cred, nil)
 	if err != nil {
 		log.Fatalf("failed to create client: %v", err)
 	}
@@ -482,7 +481,7 @@ func ExampleConfigurationsClient_PutStreamingContent() {
 		log.Fatalf("failed to obtain a credential: %v", err)
 	}
 	ctx := context.Background()
-	clientFactory, err := testmodule.NewClientFactory(	"00000000-0000-0000-0000-000000000000", cred, nil)
+	clientFactory, err := testmodule.NewClientFactory("00000000-0000-0000-0000-000000000000", cred, nil)
 	if err != nil {
 		log.Fatalf("failed to create client: %v", err)
 	}
@@ -491,5 +490,4 @@ func ExampleConfigurationsClient_PutStreamingContent() {
 		log.Fatalf("failed to finish the request: %v", err)
 	}
 }
-
 ```

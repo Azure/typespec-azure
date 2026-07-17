@@ -53,8 +53,8 @@ type PagerWidgetsClient struct {
 	endpoint string
 }
 
-//   - options - pagerWidgetsClientlistOptions contains the optional parameters for the PagerWidgetsClient.NewlistPager method.
-func (client *PagerWidgetsClient) newListPager(options *pagerWidgetsClientlistOptions) (*runtime.Pager[pagerWidgetsClientlistResponse]) {
+// - options - pagerWidgetsClientlistOptions contains the optional parameters for the PagerWidgetsClient.NewlistPager method.
+func (client *PagerWidgetsClient) newListPager(options *pagerWidgetsClientlistOptions) *runtime.Pager[pagerWidgetsClientlistResponse] {
 	return runtime.NewPager(runtime.PagingHandler[pagerWidgetsClientlistResponse]{
 		More: func(page pagerWidgetsClientlistResponse) bool {
 			return false
@@ -95,5 +95,4 @@ func (client *PagerWidgetsClient) listHandleResponse(resp *http.Response) (pager
 	}
 	return result, nil
 }
-
 ```

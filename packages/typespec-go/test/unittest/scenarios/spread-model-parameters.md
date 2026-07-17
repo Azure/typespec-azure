@@ -97,8 +97,8 @@ func (client *RegressionsClient) spreadWithModelCreateRequest(ctx context.Contex
 		return nil, err
 	}
 	body := struct {
-		Name string `json:"name"`
-		Color *string `json:"color"`
+		Name  string            `json:"name"`
+		Color *string           `json:"color"`
 		Inner *InnerSpreadParam `json:"inner"`
 	}{
 		Name: name,
@@ -115,5 +115,4 @@ func (client *RegressionsClient) spreadWithModelCreateRequest(ctx context.Contex
 	}
 	return req, nil
 }
-
 ```

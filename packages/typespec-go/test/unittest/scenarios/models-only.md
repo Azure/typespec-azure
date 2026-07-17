@@ -40,24 +40,23 @@ model DerivedTwo extends PreservedBaseClass {
 package testmodule
 
 type DerivedOne struct {
-// REQUIRED
+	// REQUIRED
 	ID *int32
 
-// REQUIRED
+	// REQUIRED
 	Name *string
 }
 
 type DerivedTwo struct {
-// REQUIRED
+	// REQUIRED
 	ID *int32
 
-// REQUIRED
+	// REQUIRED
 	Name *string
 }
 
 type PreservedBaseClass struct {
-// REQUIRED
+	// REQUIRED
 	ID *int32
 }
-
 ```

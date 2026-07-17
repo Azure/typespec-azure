@@ -32,7 +32,6 @@ package testmodule
 // ClientOptionClientPreserveContentTypeHeaderResponse contains the response from method ClientOptionClient.PreserveContentTypeHeader.
 type ClientOptionClientPreserveContentTypeHeaderResponse struct {
 	ContentType *string
-	Value *string
+	Value       *string
 }
-
 ```

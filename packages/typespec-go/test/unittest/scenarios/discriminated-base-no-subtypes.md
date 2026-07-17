@@ -32,16 +32,17 @@ package testmodule
 
 // DiscriminatedBaseNoSubTypes - A discriminated base type with no subtypes.
 type DiscriminatedBaseNoSubTypes struct {
-// REQUIRED; Some property.
+	// REQUIRED; Some property.
 	Name *string
 
-// REQUIRED; The discriminator type.
+	// REQUIRED; The discriminator type.
 	Type *string
 }
 
 // GetDiscriminatedBaseNoSubTypes implements the DiscriminatedBaseNoSubTypesClassification interface for type DiscriminatedBaseNoSubTypes.
-func (d *DiscriminatedBaseNoSubTypes) GetDiscriminatedBaseNoSubTypes() *DiscriminatedBaseNoSubTypes { return d }
-
+func (d *DiscriminatedBaseNoSubTypes) GetDiscriminatedBaseNoSubTypes() *DiscriminatedBaseNoSubTypes {
+	return d
+}
 ```
 
 ## The polymorphic helpers file unmarshals the base type
@@ -73,5 +74,4 @@ func unmarshalDiscriminatedBaseNoSubTypesClassification(rawMsg json.RawMessage) 
 	}
 	return b, nil
 }
-
 ```

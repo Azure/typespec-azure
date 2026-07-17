@@ -88,7 +88,6 @@ func (client *WidgetClient) getHandleResponse(resp *http.Response) (WidgetClient
 	}
 	return result, nil
 }
-
 ```
 
 ## A generated fake server lives in the subpkg/fake/ subdirectory
@@ -113,11 +112,10 @@ import (
 )
 
 // WidgetServer is a fake server for instances of the subpkg.WidgetClient type.
-type WidgetServer struct{
+type WidgetServer struct {
 	// Get is the fake for method WidgetClient.Get
 	// HTTP status codes to indicate success: http.StatusOK
 	Get func(ctx context.Context, options *subpkg.WidgetClientGetOptions) (resp azfake.Responder[subpkg.WidgetClientGetResponse], errResp azfake.ErrorResponder)
-
 }
 
 // NewWidgetServerTransport creates a new instance of WidgetServerTransport with the provided implementation.
@@ -149,14 +147,14 @@ func (w *WidgetServerTransport) dispatchToMethodFake(req *http.Request, method s
 	go func() {
 		var intercepted bool
 		var res result
-		 if widgetServerTransportInterceptor != nil {
-			 res.resp, res.err, intercepted = widgetServerTransportInterceptor.Do(req)
+		if widgetServerTransportInterceptor != nil {
+			res.resp, res.err, intercepted = widgetServerTransportInterceptor.Do(req)
 		}
 		if !intercepted {
 			switch method {
 			case "WidgetClient.Get":
 				res.resp, res.err = w.dispatchGet(req)
-				default:
+			default:
 				res.err = fmt.Errorf("unhandled API %s", method)
 			}
 

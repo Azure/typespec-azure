@@ -198,7 +198,7 @@ import (
 // BodyRootsClient contains the methods for the BodyRoots group.
 // Don't use this type directly, use NewBodyRootsClient() instead.
 type BodyRootsClient struct {
-	internal *arm.Client
+	internal       *arm.Client
 	subscriptionID string
 }
 
@@ -213,7 +213,7 @@ func NewBodyRootsClient(subscriptionID string, credential azcore.TokenCredential
 	}
 	client := &BodyRootsClient{
 		subscriptionID: subscriptionID,
-		internal: cl,
+		internal:       cl,
 	}
 	return client, nil
 }
@@ -391,7 +391,6 @@ func (client *BodyRootsClient) putHandleResponse(resp *http.Response) (BodyRoots
 	}
 	return result, nil
 }
-
 ```
 
 ## The generated samples exercise each operation
@@ -418,7 +417,7 @@ func ExampleBodyRootsClient_Action() {
 		log.Fatalf("failed to obtain a credential: %v", err)
 	}
 	ctx := context.Background()
-	clientFactory, err := testmodule.NewClientFactory(	"00000000-0000-0000-0000-000000000000", cred, nil)
+	clientFactory, err := testmodule.NewClientFactory("00000000-0000-0000-0000-000000000000", cred, nil)
 	if err != nil {
 		log.Fatalf("failed to create client: %v", err)
 	}
@@ -437,7 +436,7 @@ func ExampleBodyRootsClient_Get() {
 		log.Fatalf("failed to obtain a credential: %v", err)
 	}
 	ctx := context.Background()
-	clientFactory, err := testmodule.NewClientFactory(	"00000000-0000-0000-0000-000000000000", cred, nil)
+	clientFactory, err := testmodule.NewClientFactory("00000000-0000-0000-0000-000000000000", cred, nil)
 	if err != nil {
 		log.Fatalf("failed to create client: %v", err)
 	}
@@ -473,7 +472,7 @@ func ExampleBodyRootsClient_Put() {
 		log.Fatalf("failed to obtain a credential: %v", err)
 	}
 	ctx := context.Background()
-	clientFactory, err := testmodule.NewClientFactory(	"00000000-0000-0000-0000-000000000000", cred, nil)
+	clientFactory, err := testmodule.NewClientFactory("00000000-0000-0000-0000-000000000000", cred, nil)
 	if err != nil {
 		log.Fatalf("failed to create client: %v", err)
 	}
@@ -483,7 +482,7 @@ func ExampleBodyRootsClient_Put() {
 			Description: to.Ptr("my body root"),
 			Availability: &testmodule.AvailabilityProperties{
 				IsPreview: to.Ptr(true),
-				Status: to.Ptr[int32](1),
+				Status:    to.Ptr[int32](1),
 			},
 		},
 	}, nil)
@@ -510,5 +509,4 @@ func ExampleBodyRootsClient_Put() {
 	// 	},
 	// }
 }
-
 ```

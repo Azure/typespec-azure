@@ -120,7 +120,7 @@ import (
 // LROClient contains the methods for the LRO group.
 // Don't use this type directly, use NewLROClient() instead.
 type LROClient struct {
-	internal *arm.Client
+	internal       *arm.Client
 	subscriptionID string
 }
 
@@ -135,7 +135,7 @@ func NewLROClient(subscriptionID string, credential azcore.TokenCredential, opti
 	}
 	client := &LROClient{
 		subscriptionID: subscriptionID,
-		internal: cl,
+		internal:       cl,
 	}
 	return client, nil
 }
@@ -209,10 +209,10 @@ func (client *LROClient) okResponseWithAsyncHeaderCreateRequest(ctx context.Cont
 	return req, nil
 }
 
-//   - apiVersion - The API version to use for this operation.
-//   - resourceGroupName - The name of the resource group. The name is case insensitive.
-//   - body - The content of the action request
-//   - options - LROClientBeginScalarResultOptions contains the optional parameters for the LROClient.BeginScalarResult method.
+// - apiVersion - The API version to use for this operation.
+// - resourceGroupName - The name of the resource group. The name is case insensitive.
+// - body - The content of the action request
+// - options - LROClientBeginScalarResultOptions contains the optional parameters for the LROClient.BeginScalarResult method.
 func (client *LROClient) BeginScalarResult(ctx context.Context, apiVersion string, resourceGroupName string, lroModelName string, body ActionRequest, options *LROClientBeginScalarResultOptions) (*runtime.Poller[LROClientScalarResultResponse], error) {
 	if options == nil || options.ResumeToken == "" {
 		resp, err := client.scalarResult(ctx, apiVersion, resourceGroupName, lroModelName, body, options)
@@ -274,7 +274,6 @@ func (client *LROClient) scalarResultCreateRequest(ctx context.Context, apiVersi
 	}
 	return req, nil
 }
-
 ```
 
 ## The generated sample begins the poller and waits for completion
@@ -301,7 +300,7 @@ func ExampleLROClient_BeginOkResponseWithAsyncHeader() {
 		log.Fatalf("failed to obtain a credential: %v", err)
 	}
 	ctx := context.Background()
-	clientFactory, err := testmodule.NewClientFactory(	"00000000-0000-0000-0000-000000000000", cred, nil)
+	clientFactory, err := testmodule.NewClientFactory("00000000-0000-0000-0000-000000000000", cred, nil)
 	if err != nil {
 		log.Fatalf("failed to create client: %v", err)
 	}
@@ -309,7 +308,7 @@ func ExampleLROClient_BeginOkResponseWithAsyncHeader() {
 		Location: to.Ptr("eastus"),
 		Properties: &testmodule.LROModelProperties{
 			Description: to.Ptr("test"),
-			Value: "sample value",
+			Value:       "sample value",
 		},
 	}, nil)
 	if err != nil {
@@ -334,5 +333,4 @@ func ExampleLROClient_BeginOkResponseWithAsyncHeader() {
 	// 	},
 	// }
 }
-
 ```

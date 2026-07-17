@@ -52,11 +52,10 @@ import (
 )
 
 // AuthAuthorizationServer is a fake server for instances of the testmodule.AuthAuthorizationClient type.
-type AuthAuthorizationServer struct{
+type AuthAuthorizationServer struct {
 	// Get is the fake for method AuthAuthorizationClient.Get
 	// HTTP status codes to indicate success: http.StatusNoContent
 	Get func(ctx context.Context, options *testmodule.AuthAuthorizationClientGetOptions) (resp azfake.Responder[testmodule.AuthAuthorizationClientGetResponse], errResp azfake.ErrorResponder)
-
 }
 
 // NewAuthAuthorizationServerTransport creates a new instance of AuthAuthorizationServerTransport with the provided implementation.
@@ -88,14 +87,14 @@ func (a *AuthAuthorizationServerTransport) dispatchToMethodFake(req *http.Reques
 	go func() {
 		var intercepted bool
 		var res result
-		 if authAuthorizationServerTransportInterceptor != nil {
-			 res.resp, res.err, intercepted = authAuthorizationServerTransportInterceptor.Do(req)
+		if authAuthorizationServerTransportInterceptor != nil {
+			res.resp, res.err, intercepted = authAuthorizationServerTransportInterceptor.Do(req)
 		}
 		if !intercepted {
 			switch method {
 			case "AuthAuthorizationClient.Get":
 				res.resp, res.err = a.dispatchGet(req)
-				default:
+			default:
 				res.err = fmt.Errorf("unhandled API %s", method)
 			}
 
@@ -159,11 +158,10 @@ import (
 )
 
 // AuthAuthorizationServerServer is a fake server for instances of the testmodule.AuthAuthorizationServerClient type.
-type AuthAuthorizationServerServer struct{
+type AuthAuthorizationServerServer struct {
 	// Get is the fake for method AuthAuthorizationServerClient.Get
 	// HTTP status codes to indicate success: http.StatusNoContent
 	Get func(ctx context.Context, options *testmodule.AuthAuthorizationServerClientGetOptions) (resp azfake.Responder[testmodule.AuthAuthorizationServerClientGetResponse], errResp azfake.ErrorResponder)
-
 }
 
 // NewAuthAuthorizationServerServerTransport creates a new instance of AuthAuthorizationServerServerTransport with the provided implementation.
@@ -195,14 +193,14 @@ func (a *AuthAuthorizationServerServerTransport) dispatchToMethodFake(req *http.
 	go func() {
 		var intercepted bool
 		var res result
-		 if authAuthorizationServerServerTransportInterceptor != nil {
-			 res.resp, res.err, intercepted = authAuthorizationServerServerTransportInterceptor.Do(req)
+		if authAuthorizationServerServerTransportInterceptor != nil {
+			res.resp, res.err, intercepted = authAuthorizationServerServerTransportInterceptor.Do(req)
 		}
 		if !intercepted {
 			switch method {
 			case "AuthAuthorizationServerClient.Get":
 				res.resp, res.err = a.dispatchGet(req)
-				default:
+			default:
 				res.err = fmt.Errorf("unhandled API %s", method)
 			}
 

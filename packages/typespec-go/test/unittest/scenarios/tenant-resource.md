@@ -277,7 +277,7 @@ func (client *TenantItemsClient) getHandleResponse(resp *http.Response) (TenantI
 // NewListPager - List TenantItem resources by tenant
 //   - apiVersion - The API version to use for this operation.
 //   - options - TenantItemsClientListOptions contains the optional parameters for the TenantItemsClient.NewListPager method.
-func (client *TenantItemsClient) NewListPager(apiVersion string, options *TenantItemsClientListOptions) (*runtime.Pager[TenantItemsClientListResponse]) {
+func (client *TenantItemsClient) NewListPager(apiVersion string, options *TenantItemsClientListOptions) *runtime.Pager[TenantItemsClientListResponse] {
 	return runtime.NewPager(runtime.PagingHandler[TenantItemsClientListResponse]{
 		More: func(page TenantItemsClientListResponse) bool {
 			return page.NextLink != nil && len(*page.NextLink) > 0
@@ -320,7 +320,6 @@ func (client *TenantItemsClient) listHandleResponse(resp *http.Response) (Tenant
 	}
 	return result, nil
 }
-
 ```
 
 ## The tenant-scoped samples omit the subscription ID
@@ -346,7 +345,7 @@ func ExampleTenantItemsClient_Get() {
 		log.Fatalf("failed to obtain a credential: %v", err)
 	}
 	ctx := context.Background()
-	clientFactory, err := testmodule.NewClientFactory(	"<subscriptionID>", cred, nil)
+	clientFactory, err := testmodule.NewClientFactory("<subscriptionID>", cred, nil)
 	if err != nil {
 		log.Fatalf("failed to create client: %v", err)
 	}
@@ -377,7 +376,7 @@ func ExampleTenantItemsClient_NewListPager() {
 		log.Fatalf("failed to obtain a credential: %v", err)
 	}
 	ctx := context.Background()
-	clientFactory, err := testmodule.NewClientFactory(	"<subscriptionID>", cred, nil)
+	clientFactory, err := testmodule.NewClientFactory("<subscriptionID>", cred, nil)
 	if err != nil {
 		log.Fatalf("failed to create client: %v", err)
 	}
@@ -409,7 +408,6 @@ func ExampleTenantItemsClient_NewListPager() {
 		// }
 	}
 }
-
 ```
 
 ## The mixed-scope samples include subscription-scoped and tenant-level list operations
@@ -435,7 +433,7 @@ func ExampleMixedScopeWidgetsClient_Get() {
 		log.Fatalf("failed to obtain a credential: %v", err)
 	}
 	ctx := context.Background()
-	clientFactory, err := testmodule.NewClientFactory(	"00000000-0000-0000-0000-000000000000", cred, nil)
+	clientFactory, err := testmodule.NewClientFactory("00000000-0000-0000-0000-000000000000", cred, nil)
 	if err != nil {
 		log.Fatalf("failed to create client: %v", err)
 	}
@@ -467,7 +465,7 @@ func ExampleMixedScopeWidgetsClient_NewListAllPager() {
 		log.Fatalf("failed to obtain a credential: %v", err)
 	}
 	ctx := context.Background()
-	clientFactory, err := testmodule.NewClientFactory(	"<subscriptionID>", cred, nil)
+	clientFactory, err := testmodule.NewClientFactory("<subscriptionID>", cred, nil)
 	if err != nil {
 		log.Fatalf("failed to create client: %v", err)
 	}
@@ -500,5 +498,4 @@ func ExampleMixedScopeWidgetsClient_NewListAllPager() {
 		// }
 	}
 }
-
 ```

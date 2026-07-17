@@ -115,5 +115,4 @@ func (client *RegressionsClient) withClientDefaultValuesCreateRequest(ctx contex
 	}
 	return req, nil
 }
-
 ```

@@ -138,13 +138,13 @@ package testmodule
 import "time"
 
 type Cat struct {
-// CONSTANT; Field has constant value PetKindCat, any specified value is ignored.
+	// CONSTANT; Field has constant value PetKindCat, any specified value is ignored.
 	Kind *PetKind
 
-// REQUIRED
+	// REQUIRED
 	Name *string
 
-// REQUIRED
+	// REQUIRED
 	Purrs *bool
 }
 
@@ -157,13 +157,13 @@ func (c *Cat) GetPet() *Pet {
 }
 
 type Dog struct {
-// REQUIRED
+	// REQUIRED
 	Breed *string
 
-// CONSTANT; Field has constant value PetKindDog, any specified value is ignored.
+	// CONSTANT; Field has constant value PetKindDog, any specified value is ignored.
 	Kind *PetKind
 
-// REQUIRED
+	// REQUIRED
 	Name *string
 }
 
@@ -176,10 +176,10 @@ func (d *Dog) GetPet() *Pet {
 }
 
 type Pet struct {
-// REQUIRED
+	// REQUIRED
 	Kind *PetKind
 
-// REQUIRED
+	// REQUIRED
 	Name *string
 }
 
@@ -188,54 +188,53 @@ func (p *Pet) GetPet() *Pet { return p }
 
 // PetResource - Concrete tracked resource types can be created by aliasing this type using a specific property type.
 type PetResource struct {
-// REQUIRED; The geo-location where the resource lives
+	// REQUIRED; The geo-location where the resource lives
 	Location *string
 
-// The resource-specific properties for this resource.
+	// The resource-specific properties for this resource.
 	Properties *PetResourceProperties
 
-// Resource tags.
+	// Resource tags.
 	Tags map[string]*string
 
-// READ-ONLY; Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+	// READ-ONLY; Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
 	ID *string
 
-// READ-ONLY; The name of the resource
+	// READ-ONLY; The name of the resource
 	Name *string
 
-// READ-ONLY; Azure Resource Manager metadata containing createdBy and modifiedBy information.
+	// READ-ONLY; Azure Resource Manager metadata containing createdBy and modifiedBy information.
 	SystemData *SystemData
 
-// READ-ONLY; The type of the resource. E.g. "Microsoft.Compute/virtualMachines" or "Microsoft.Storage/storageAccounts"
+	// READ-ONLY; The type of the resource. E.g. "Microsoft.Compute/virtualMachines" or "Microsoft.Storage/storageAccounts"
 	Type *string
 }
 
 type PetResourceProperties struct {
-// READ-ONLY
+	// READ-ONLY
 	ProvisioningState *ProvisioningState
 }
 
 // SystemData - Metadata pertaining to creation and last modification of the resource.
 type SystemData struct {
-// The timestamp of resource creation (UTC).
+	// The timestamp of resource creation (UTC).
 	CreatedAt *time.Time
 
-// The identity that created the resource.
+	// The identity that created the resource.
 	CreatedBy *string
 
-// The type of identity that created the resource.
+	// The type of identity that created the resource.
 	CreatedByType *CreatedByType
 
-// The timestamp of resource last modification (UTC)
+	// The timestamp of resource last modification (UTC)
 	LastModifiedAt *time.Time
 
-// The identity that last modified the resource.
+	// The identity that last modified the resource.
 	LastModifiedBy *string
 
-// The type of identity that last modified the resource.
+	// The type of identity that last modified the resource.
 	LastModifiedByType *CreatedByType
 }
-
 ```
 
 ## The polymorphic helpers file unmarshals by discriminator
@@ -271,7 +270,6 @@ func unmarshalPetClassification(rawMsg json.RawMessage) (PetClassification, erro
 	}
 	return b, nil
 }
-
 ```
 
 ## The generated samples pass a concrete subtype and the discriminated base
@@ -298,13 +296,13 @@ func ExamplePetsClient_AdoptCat() {
 		log.Fatalf("failed to obtain a credential: %v", err)
 	}
 	ctx := context.Background()
-	clientFactory, err := testmodule.NewClientFactory(	"00000000-0000-0000-0000-000000000000", cred, nil)
+	clientFactory, err := testmodule.NewClientFactory("00000000-0000-0000-0000-000000000000", cred, nil)
 	if err != nil {
 		log.Fatalf("failed to create client: %v", err)
 	}
 	res, err := clientFactory.NewPetsClient().AdoptCat(ctx, "2025-01-01", "myResourceGroup", "myPetResource", testmodule.Cat{
-		Kind: to.Ptr(testmodule.PetKindCat),
-		Name: to.Ptr("Whiskers"),
+		Kind:  to.Ptr(testmodule.PetKindCat),
+		Name:  to.Ptr("Whiskers"),
 		Purrs: to.Ptr(true),
 	}, nil)
 	if err != nil {
@@ -329,13 +327,13 @@ func ExamplePetsClient_AdoptPet() {
 		log.Fatalf("failed to obtain a credential: %v", err)
 	}
 	ctx := context.Background()
-	clientFactory, err := testmodule.NewClientFactory(	"00000000-0000-0000-0000-000000000000", cred, nil)
+	clientFactory, err := testmodule.NewClientFactory("00000000-0000-0000-0000-000000000000", cred, nil)
 	if err != nil {
 		log.Fatalf("failed to create client: %v", err)
 	}
 	res, err := clientFactory.NewPetsClient().AdoptPet(ctx, "2025-01-01", "myResourceGroup", "myPetResource", &testmodule.Dog{
-		Kind: to.Ptr(testmodule.PetKindDog),
-		Name: to.Ptr("Buddy"),
+		Kind:  to.Ptr(testmodule.PetKindDog),
+		Name:  to.Ptr("Buddy"),
 		Breed: to.Ptr("Labrador"),
 	}, nil)
 	if err != nil {
@@ -352,5 +350,4 @@ func ExamplePetsClient_AdoptPet() {
 	// 	},
 	// }
 }
-
 ```

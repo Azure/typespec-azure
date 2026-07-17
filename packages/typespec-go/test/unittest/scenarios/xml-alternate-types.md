@@ -65,15 +65,14 @@ namespace Customizations {
 package testmodule
 
 type DequeuedMessage struct {
-// REQUIRED
+	// REQUIRED
 	MessageID *string `xml:"MessageId"`
 }
 
 type SignedIdentifier struct {
-// REQUIRED
+	// REQUIRED
 	ID *string `xml:"Id"`
 }
-
 ```
 
 ## The response envelopes use the swapped-in array types with the client renames applied
@@ -94,5 +93,4 @@ type RegressionsClientGetXMLOneResponse struct {
 type RegressionsClientGetXMLTwoResponse struct {
 	Messages []*DequeuedMessage `xml:"QueueMessage"`
 }
-
 ```

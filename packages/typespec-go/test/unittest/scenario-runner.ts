@@ -12,6 +12,7 @@
 import type { EmitContext } from "@typespec/compiler";
 import { resolvePath } from "@typespec/compiler";
 import { createTester, resolveVirtualPath } from "@typespec/compiler/testing";
+import { execFileSync } from "child_process";
 import { readdirSync, readFileSync, statSync, writeFileSync } from "fs";
 import path from "path";
 import { assert, describe, it } from "vitest";
@@ -20,6 +21,30 @@ import type { GoEmitterOptions } from "../../src/lib.js";
 import { Adapter } from "../../src/tcgcadapter/adapter.js";
 
 const SCENARIOS_UPDATE = process.env["SCENARIOS_UPDATE"] === "true";
+
+/**
+ * Formats generated Go the same way the real emitter does (`gofmt -s`) so the
+ * snapshots match the shipped, formatted code instead of the emitter's raw
+ * pre-format output. The emitter runs `gofmt -s -w .` after emit; here there is
+ * no on-disk tree, so we pipe the source through `gofmt -s` via stdin.
+ *
+ * Requires `gofmt` (part of the Go toolchain) on PATH; a clear error is thrown
+ * otherwise since the expected snapshots are formatted.
+ */
+function gofmt(source: string): string {
+  try {
+    return execFileSync("gofmt", ["-s"], { input: source, encoding: "utf8" });
+  } catch (err) {
+    const e = err as NodeJS.ErrnoException;
+    if (e.code === "ENOENT") {
+      throw new Error(
+        "gofmt not found on PATH. The emitter unit tests format generated Go with " +
+          "`gofmt -s`, so the Go toolchain must be installed to run them.",
+      );
+    }
+    throw err;
+  }
+}
 
 // Base tester for most scenarios. Kept lean (no ARM) so the common case compiles
 // quickly; ARM libraries are heavy to load and would slow every scenario.
@@ -84,8 +109,9 @@ function pickTester(code: string) {
 /**
  * Compiles the given TypeSpec with the Go emitter and returns the generated Go
  * source files keyed by file name (for example `zz_models.go`). The emit runs
- * against an in-memory file host, so no files are written and no Go tooling
- * (gofmt / go mod tidy) is invoked.
+ * against an in-memory file host, so no files are written and no `go mod tidy`
+ * is invoked. Snapshots are formatted with `gofmt -s` when resolved (see the
+ * `go {name}` handler), matching the emitter's own post-emit formatting.
  */
 export async function emitGoFor(
   code: string,
@@ -221,6 +247,24 @@ function resolveGoFile(files: Map<string, string>, name: string): string {
 }
 
 /**
+ * Converts a generated Go file name into the `go <name>` output-block heading a
+ * scenario author would write for it: drop the `zz_` prefix and `.go` suffix,
+ * keeping any subdirectory (for example `fake/zz_widget_server.go` ->
+ * `fake/widget_server`). Non-Go files (for example `go.mod`) return undefined.
+ */
+function suggestBlockName(fileName: string): string | undefined {
+  if (!fileName.endsWith(".go")) {
+    return undefined;
+  }
+  const slash = fileName.lastIndexOf("/");
+  const dir = slash >= 0 ? fileName.slice(0, slash + 1) : "";
+  const base = (slash >= 0 ? fileName.slice(slash + 1) : fileName)
+    .replace(/\.go$/, "")
+    .replace(/^zz_/, "");
+  return `go ${dir}${base}`;
+}
+
+/**
  * The parsed `yaml` config block of a scenario is passed through as emitter
  * options (kebab-case keys matching the emitter options, for example `module`,
  * `file-prefix`, `containing-module`, `emitter-output-dir`, `generate-fakes`).
@@ -241,7 +285,9 @@ const OUTPUT_CODE_BLOCK_TYPES: Record<string, EmitterFunction> = {
   // more `examples/**.json` input files are provided (see below).
   "go {name}": async (tsp, { name }, configs, inputFiles) => {
     const files = await emitGoFor(tsp, emitterOptionsFrom(configs), inputFiles);
-    return resolveGoFile(files, name ?? "");
+    const resolved = resolveGoFile(files, name ?? "");
+    // Format real generated Go like the emitter does; leave the sentinel as-is.
+    return resolved === NOT_GENERATED ? resolved : gofmt(resolved);
   },
 };
 
@@ -438,15 +484,30 @@ export function describeScenarioFile(scenarioFile: string): void {
         // A scenario with input (tsp) but no recognized output block would
         // silently do nothing under `pnpm test:update` — the harness only
         // (re)generates the content of `go <name>` output blocks. Surface that
-        // as an explicit failure so a new scenario doesn't look like it "passed"
-        // while producing no Go. Add an output block such as ```go models
-        // (its body can start empty) for each generated file you want to snapshot.
+        // as an explicit failure that lists the block names this scenario's
+        // input actually produces, so the author can copy one in.
         if (tspBlocks.length > 0 && testCases.length === 0) {
-          it("has at least one output block", () => {
+          it("has at least one output block", async () => {
+            let suggestions = "";
+            try {
+              const files = await emitGoFor(inputTsp, emitterOptionsFrom(configs), inputFiles);
+              const names = [...files.keys()]
+                .map(suggestBlockName)
+                .filter((x): x is string => x !== undefined)
+                .sort();
+              if (names.length > 0) {
+                suggestions =
+                  " Available output blocks for this scenario:\n" +
+                  names.map((n) => "  \u0060\u0060\u0060" + n).join("\n");
+              }
+            } catch {
+              // If the input can't compile we can't list names; fall back below.
+            }
             assert.fail(
               `Scenario "${scenario.heading}" has a tsp block but no output block. ` +
-                "Add a code block like ```go <name> (e.g. ```go models) — its body can " +
-                "start empty and `pnpm test:update` will fill it with the generated Go.",
+                "Add a code block like ```go <name> (its body can start empty and " +
+                "`pnpm test:update` will fill it with the generated Go)." +
+                suggestions,
             );
           });
         }

@@ -43,16 +43,15 @@ op withClientDefaultModelField(@body widget: Widget): void;
 package testmodule
 
 type Widget struct {
-// The default value is ColorGreen.
-//
-// REQUIRED
+	// The default value is ColorGreen.
+	//
+	// REQUIRED
 	Color *Color
 
-// REQUIRED
+	// REQUIRED
 	Name *string
 
-// The default value is NetworkVersion("2026-04-15-preview").
+	// The default value is NetworkVersion("2026-04-15-preview").
 	NetworkVersion *NetworkVersion
 }
-
 ```

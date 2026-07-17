@@ -177,5 +177,4 @@ func (client *NoOptionalBodyClient) putCreateRequest(ctx context.Context, body W
 	}
 	return req, nil
 }
-
 ```

@@ -41,7 +41,7 @@ op getCallerIdentity(): InboundCallerIdentity;
 package testmodule
 
 type inboundCallerIdentity struct {
-// REQUIRED
+	// REQUIRED
 	Type *inboundCallerIdentityType
 }
 
@@ -49,7 +49,7 @@ type inboundCallerIdentity struct {
 func (i *inboundCallerIdentity) GetinboundCallerIdentity() *inboundCallerIdentity { return i }
 
 type systemAssignedInboundCallerIdentity struct {
-// REQUIRED
+	// REQUIRED
 	Type *inboundCallerIdentityType
 }
 
@@ -61,10 +61,10 @@ func (s *systemAssignedInboundCallerIdentity) GetinboundCallerIdentity() *inboun
 }
 
 type userAssignedInboundCallerIdentity struct {
-// REQUIRED
+	// REQUIRED
 	Type *inboundCallerIdentityType
 
-// REQUIRED
+	// REQUIRED
 	UserAssignedIdentity *string
 }
 
@@ -74,5 +74,4 @@ func (u *userAssignedInboundCallerIdentity) GetinboundCallerIdentity() *inboundC
 		Type: u.Type,
 	}
 }
-
 ```

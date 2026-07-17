@@ -70,7 +70,7 @@ import (
 // PageableLROsClient contains the methods for the PageableLROs group.
 // Don't use this type directly, use NewPageableLROsClient() instead.
 type PageableLROsClient struct {
-	internal *arm.Client
+	internal       *arm.Client
 	subscriptionID string
 }
 
@@ -85,7 +85,7 @@ func NewPageableLROsClient(subscriptionID string, credential azcore.TokenCredent
 	}
 	client := &PageableLROsClient{
 		subscriptionID: subscriptionID,
-		internal: cl,
+		internal:       cl,
 	}
 	return client, nil
 }
@@ -179,5 +179,4 @@ func (client *PageableLROsClient) listPrivateEndPointsHandleResponse(resp *http.
 	}
 	return result, nil
 }
-
 ```

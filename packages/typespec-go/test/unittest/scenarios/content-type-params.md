@@ -189,5 +189,4 @@ func (client *RegressionsClient) payloadWithExplicitContentTypeCreateRequest(ctx
 	}
 	return req, nil
 }
-
 ```

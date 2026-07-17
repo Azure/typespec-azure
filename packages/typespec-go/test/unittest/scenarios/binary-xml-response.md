@@ -107,5 +107,4 @@ func (client *RegressionsClient) binaryResponseWithXMLContentTypeHandleResponse(
 	}
 	return result, nil
 }
-
 ```
