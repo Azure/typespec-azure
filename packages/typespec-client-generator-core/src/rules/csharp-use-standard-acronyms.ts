@@ -1,4 +1,5 @@
 import {
+  Enum,
   Model,
   ModelProperty,
   Program,
@@ -40,7 +41,7 @@ function getCorrectedName(name: string): string | undefined {
 function reportIfNeeded(
   context: LinterRuleContext<any>,
   program: Program,
-  target: Model | ModelProperty,
+  target: Enum | Model | ModelProperty,
   csharpName: string,
 ) {
   const suggestion = getCorrectedName(csharpName);
@@ -74,6 +75,15 @@ export const csharpUseStandardAcronymsRule = createRule({
     );
 
     return {
+      enum: (enumType: Enum) => {
+        if (enumType.node === undefined) return;
+        reportIfNeeded(
+          context,
+          context.program,
+          enumType,
+          getLibraryName(tcgcContext, enumType, "csharp"),
+        );
+      },
       model: (model: Model) => {
         if (model.node === undefined) return;
         reportIfNeeded(

@@ -32,6 +32,12 @@ it("emits warning for property name with Os", async () => {
   });
 });
 
+it("emits warning for enum name with Ip", async () => {
+  await tester.expect(`enum IpProtocol { tcp }`).toEmitDiagnostics({
+    code: "@azure-tools/typespec-client-generator-core/csharp-use-standard-acronyms",
+  });
+});
+
 it("emits warning when @clientName introduces non-standard acronym casing", async () => {
   await tester
     .expect(`@clientName("IpConfig", "csharp") model IPConfig { id: string; }`)
@@ -116,6 +122,30 @@ using Azure.ClientGenerator.Core;
 using Azure.ClientGenerator.Core;
 
 @@clientName(VmProfile.osProfile, "OSProfile", "csharp");
+`,
+      });
+  });
+
+  it("writes @@clientName for enum to client.tsp", async () => {
+    const baseRunner = await SimpleBaseTester.createInstance();
+    const baseTester = createLinterRuleTester(
+      baseRunner,
+      csharpUseStandardAcronymsRule,
+      libraryName,
+    );
+
+    await baseTester
+      .expect({
+        "main.tsp": `enum IpProtocol { tcp }`,
+        "client.tsp": ``,
+      })
+      .applyCodeFix("add-clientName-in-client-tsp")
+      .toEqual({
+        "client.tsp": `import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@@clientName(IpProtocol, "IPProtocol", "csharp");
 `,
       });
   });

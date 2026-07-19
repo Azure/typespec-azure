@@ -1,5 +1,6 @@
 import type {
   CodeFix,
+  Enum,
   InsertTextCodeFixEdit,
   Model,
   ModelProperty,
@@ -15,10 +16,12 @@ import {
 import type { TypeSpecScriptNode } from "@typespec/compiler/ast";
 import { SyntaxKind } from "@typespec/compiler/ast";
 
+type AugmentDecoratorTarget = Enum | Model | ModelProperty;
+
 /**
  * Get the namespace name for a target type.
  */
-function getTargetNamespace(target: Model | ModelProperty): string {
+function getTargetNamespace(target: AugmentDecoratorTarget): string {
   if (target.kind === "ModelProperty") {
     const model = target.model;
     if (model?.namespace) {
@@ -36,7 +39,7 @@ function getTargetNamespace(target: Model | ModelProperty): string {
  * Build a short reference for a type target (e.g., "Model.property").
  * Used for same-file augment decorators where the namespace is already in scope.
  */
-function buildShortRef(target: Model | ModelProperty): string {
+function buildShortRef(target: AugmentDecoratorTarget): string {
   if (target.kind === "ModelProperty") {
     const model = target.model;
     return model ? `${model.name}.${target.name}` : target.name;
@@ -48,7 +51,7 @@ function buildShortRef(target: Model | ModelProperty): string {
  * Build the fully qualified name for a type target (e.g., "Azure.Service.Model.property").
  * Used for cross-file augment decorators where the namespace may not be in scope.
  */
-function buildFqn(target: Model | ModelProperty): string {
+function buildFqn(target: AugmentDecoratorTarget): string {
   if (target.kind === "ModelProperty") {
     const model = target.model;
     if (model && model.namespace) {
@@ -59,7 +62,7 @@ function buildFqn(target: Model | ModelProperty): string {
     }
     return target.name;
   }
-  // Model
+  // Model or enum
   if (target.namespace) {
     const nsName = getNamespaceFullName(target.namespace);
     return nsName ? `${nsName}.${target.name}` : target.name;
@@ -119,7 +122,7 @@ function findUsingInsertPos(
  * @param args The decorator arguments as literal strings.
  */
 export function createAugmentDecoratorCodeFix(
-  target: Model | ModelProperty,
+  target: AugmentDecoratorTarget,
   decoratorName: string,
   args?: string[],
 ): CodeFix {
@@ -159,7 +162,7 @@ export function createAugmentDecoratorCodeFix(
  * @param args The decorator arguments as literal strings.
  */
 export function createClientTspAugmentDecoratorCodeFix(
-  target: Model | ModelProperty,
+  target: AugmentDecoratorTarget,
   decoratorName: string,
   program: Program,
   args?: string[],
