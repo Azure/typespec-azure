@@ -60,7 +60,7 @@ function checkArmOperationsHas(
 function checkResolvedOperations(operations: ResolvedResource, check: ResolvedResourceCheck) {
   expect(operations.resourceType).toEqual(check.resourceType);
   expect(operations.resourceInstancePath).toEqual(check.resourceInstancePath);
-  if (check.resourceName) {
+  if (check.resourceName !== undefined) {
     expect(operations.resourceName).toEqual(check.resourceName);
   }
   if (check.operations.actions) {
@@ -4384,11 +4384,11 @@ namespace Microsoft.Resources {
           },
         },
         resourceType: {
-          provider: "Microsoft.Resources",
+          provider: "",
           types: [],
         },
         resourceInstancePath: "/{resourceId}",
-        resourceName: "MyGenericResource",
+        resourceName: "",
       });
     },
   );
