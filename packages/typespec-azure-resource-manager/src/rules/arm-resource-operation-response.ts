@@ -9,8 +9,8 @@ import {
   isType,
 } from "@typespec/compiler";
 
-import { ArmLifecycleOperationKind, resolveResourceOperations } from "../operations.js";
-import { getArmResource } from "../resource.js";
+import { ArmLifecycleOperationKind } from "../operations.js";
+import { getArmResource, getArmResources } from "../resource.js";
 import { isInternalTypeSpec } from "./utils.js";
 
 export const armResourceOperationsRule = createRule({
@@ -22,12 +22,28 @@ export const armResourceOperationsRule = createRule({
     default: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
   },
   create(context) {
+    // Build a lookup map once using the cached ARM resources (which already
+    // have resolved HTTP operations). This avoids calling resolveResourceOperations
+    // per-model, which would redundantly call getHttpOperation for each operation.
+    let resourceMap: Map<Model, (typeof resources)[number]> | undefined;
+    const resources = getArmResources(context.program);
+
+    function getResourceMap() {
+      if (resourceMap === undefined) {
+        resourceMap = new Map();
+        for (const r of resources) {
+          resourceMap.set(r.typespecType, r);
+        }
+      }
+      return resourceMap;
+    }
+
     return {
       model: (model: Model) => {
         if (!isInternalTypeSpec(context.program, model)) {
-          const armResource = getArmResource(context.program, model);
+          const armResource = getResourceMap().get(model);
           if (armResource) {
-            const resourceOperations = resolveResourceOperations(context.program, model);
+            const resourceOperations = armResource.operations;
             const kinds: ArmLifecycleOperationKind[] = ["read", "createOrUpdate", "update"];
             kinds
               .map((k) => resourceOperations.lifecycle[k])

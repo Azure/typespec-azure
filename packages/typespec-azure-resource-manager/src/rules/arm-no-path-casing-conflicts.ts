@@ -6,8 +6,7 @@ import {
   Program,
   SemanticNodeListener,
 } from "@typespec/compiler";
-import { getAllHttpServices } from "@typespec/http";
-import { isInternalTypeSpec } from "./utils.js";
+import { getCachedHttpServices, isInternalTypeSpec } from "./utils.js";
 
 /**
  * No two ARM operation paths may differ only by casing.
@@ -23,7 +22,7 @@ export const armNoPathCasingConflictsRule = createRule({
   create(context): SemanticNodeListener {
     return {
       root: (program: Program) => {
-        const [services] = getAllHttpServices(program);
+        const services = getCachedHttpServices(program);
 
         // Bucket eligible operations by lowercased path. Path parameter names
         // are part of the comparison: `/{scope}/...` and `/{resourceUri}/...`

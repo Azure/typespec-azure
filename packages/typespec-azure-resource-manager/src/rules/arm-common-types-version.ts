@@ -1,5 +1,4 @@
-import { Program, SemanticNodeListener, createRule } from "@typespec/compiler";
-import { getAllHttpServices } from "@typespec/http";
+import { listServices, Program, SemanticNodeListener, createRule } from "@typespec/compiler";
 import { getVersion } from "@typespec/versioning";
 import { getArmProviderNamespace } from "../namespace.js";
 
@@ -19,13 +18,13 @@ export const armCommonTypesVersionRule = createRule({
   create(context): SemanticNodeListener {
     return {
       root: (program: Program) => {
-        const [services, _] = getAllHttpServices(program);
+        const services = listServices(program);
         for (const service of services) {
-          if (!getArmProviderNamespace(program, service.namespace)) {
+          if (!getArmProviderNamespace(program, service.type)) {
             continue;
           }
 
-          const versionMap = getVersion(program, service.namespace);
+          const versionMap = getVersion(program, service.type);
           // If the namespace is versioned and not all versions have the
           // common-types version and if the service namespace doesn't have a
           // common-types version, raise a diagnostic.
@@ -41,12 +40,12 @@ export const armCommonTypesVersionRule = createRule({
                     ),
                 )
             ) &&
-            !service.namespace.decorators.find(
+            !service.type.decorators.find(
               (x) => x.definition?.name === "@armCommonTypesVersion",
             )
           ) {
             context.reportDiagnostic({
-              target: service.namespace,
+              target: service.type,
             });
           }
         }

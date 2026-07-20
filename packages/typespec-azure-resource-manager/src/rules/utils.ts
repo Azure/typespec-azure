@@ -11,6 +11,7 @@ import {
   Program,
 } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
+import { getAllHttpServices, HttpService } from "@typespec/http";
 import { getResourceOperation } from "@typespec/rest";
 import { ArmResourceOperation } from "../operations.js";
 import { ArmResourceDetails, getArmResourceKind } from "../resource.js";
@@ -134,4 +135,21 @@ export function getDecoratorParam(
   if (call === undefined) return undefined;
   if (call.args && call.args.length > 2) return call.args[2];
   return undefined;
+}
+
+/**
+ * Cache for getAllHttpServices results. getAllHttpServices is expensive because it
+ * resolves HTTP operation details (paths, parameters, responses) for every operation.
+ * Multiple rules that need HTTP service data can share this cached result.
+ */
+const httpServicesCache = new WeakMap<Program, HttpService[]>();
+
+export function getCachedHttpServices(program: Program): HttpService[] {
+  let cached = httpServicesCache.get(program);
+  if (cached === undefined) {
+    const [services] = getAllHttpServices(program);
+    cached = services;
+    httpServicesCache.set(program, cached);
+  }
+  return cached;
 }
