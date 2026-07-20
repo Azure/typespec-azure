@@ -2,10 +2,13 @@
 
 ## 0.45.7
 
+### Features
+
+- [#4916](https://github.com/Azure/typespec-azure/pull/4916) Support `clientApiVersions`.
+
 ### Bug Fixes
 
 - [#4916](https://github.com/Azure/typespec-azure/pull/4916) Fix per-client `ServiceVersion` regression after migrating from js-yaml and lodash.
-- [#4916](https://github.com/Azure/typespec-azure/pull/4916) Support `clientApiVersions`.
 
 
 ## 0.45.6 (2026-07-15)
