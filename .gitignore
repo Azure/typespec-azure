@@ -226,6 +226,13 @@ packages/samples/test/output/azure/templates-contoso/setup.*
 packages/typespec-python/tests/generated/**
 packages/typespec-python/alpha
 
+# go emitter
+packages/typespec-go/test/**/zz_*.go
+packages/typespec-go/test/**/go.mod
+packages/typespec-go/test/**/go.sum
+packages/typespec-go/test/**/LICENSE.txt
+packages/typespec-go/test/**/testdata
+!packages/typespec-go/test/local/gogenerate/testdata/generate/transforms.go
 # java emitter
 # Emitter TS sources copied from core/packages/http-client-java/emitter at build
 # time (only src/options.ts is committed).

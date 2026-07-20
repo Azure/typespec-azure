@@ -48,12 +48,6 @@ catalogs:
     '@azure-tools/codegen':
       specifier: ~2.10.1
       version: 2.10.1
-    '@azure-tools/openai-typespec':
-      specifier: 1.21.0
-      version: 1.21.0
-    '@azure-tools/typespec-liftr-base':
-      specifier: '>=0.14.0 <1.0.0'
-      version: 0.14.0
     '@azure/abort-controller':
       specifier: ^2.1.2
       version: 2.1.2
@@ -138,6 +132,9 @@ catalogs:
     '@octokit/plugin-rest-endpoint-methods':
       specifier: ^17.0.0
       version: 17.0.0
+    '@pinterest/alloy-graphql':
+      specifier: ^1.1.0
+      version: 1.1.0
     '@playwright/test':
       specifier: ^1.60.0
       version: 1.61.0
@@ -229,8 +226,8 @@ catalogs:
       specifier: ^17.0.35
       version: 17.0.35
     '@typespec/http-client-python':
-      specifier: '>=0.34.1 <1.0.0'
-      version: 0.34.1
+      specifier: '>=0.34.2 <1.0.0'
+      version: 0.34.2
     '@typespec/ts-http-runtime':
       specifier: 0.3.6
       version: 0.3.6
@@ -348,6 +345,9 @@ catalogs:
     fast-xml-parser:
       specifier: ^5.7.0
       version: 5.9.3
+    graphql:
+      specifier: ^17.0.0-alpha.9
+      version: 17.0.2
     happy-dom:
       specifier: ^20.9.0
       version: 20.10.6
@@ -1069,6 +1069,61 @@ importers:
       rimraf:
         specifier: 'catalog:'
         version: 6.1.3
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.9(@types/node@26.0.0)(@vitest/coverage-v8@4.1.9)(@vitest/ui@4.1.9)(happy-dom@20.10.6)(jsdom@25.0.1)(vite@8.1.0(@types/node@26.0.0)(esbuild@0.28.1)(tsx@4.22.4)(yaml@2.9.0))
+
+  core/packages/graphql:
+    dependencies:
+      '@alloy-js/core':
+        specifier: 'catalog:'
+        version: 0.24.1
+      '@alloy-js/typescript':
+        specifier: 'catalog:'
+        version: 0.24.0
+      '@pinterest/alloy-graphql':
+        specifier: 'catalog:'
+        version: 1.1.0
+      change-case:
+        specifier: 'catalog:'
+        version: 5.4.4
+      graphql:
+        specifier: 'catalog:'
+        version: 17.0.2
+    devDependencies:
+      '@alloy-js/cli':
+        specifier: 'catalog:'
+        version: 0.24.0
+      '@alloy-js/rollup-plugin':
+        specifier: 'catalog:'
+        version: 0.1.2(@babel/core@7.29.7)(@types/babel__core@7.20.5)
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.0.0
+      '@typespec/compiler':
+        specifier: workspace:~
+        version: link:../compiler
+      '@typespec/emitter-framework':
+        specifier: workspace:~
+        version: link:../emitter-framework
+      '@typespec/http':
+        specifier: workspace:~
+        version: link:../http
+      '@typespec/mutator-framework':
+        specifier: workspace:~
+        version: link:../mutator-framework
+      '@typespec/tspd':
+        specifier: workspace:~
+        version: link:../tspd
+      rimraf:
+        specifier: 'catalog:'
+        version: 6.1.3
+      source-map-support:
+        specifier: 'catalog:'
+        version: 0.5.21
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -2056,6 +2111,9 @@ importers:
       '@typespec/events':
         specifier: workspace:^
         version: link:../events
+      '@typespec/graphql':
+        specifier: workspace:^
+        version: link:../graphql
       '@typespec/html-program-viewer':
         specifier: workspace:^
         version: link:../html-program-viewer
@@ -3678,21 +3736,15 @@ importers:
         specifier: 'catalog:'
         version: 4.1.9(@types/node@26.0.0)(@vitest/coverage-v8@4.1.9)(@vitest/ui@4.1.9)(happy-dom@20.10.6)(jsdom@25.0.1)(vite@8.1.0(@types/node@26.0.0)(esbuild@0.28.1)(tsx@4.22.4)(yaml@2.9.0))
 
-  packages/typespec-java:
+  packages/typespec-go:
     dependencies:
-      '@autorest/codemodel':
+      semver:
         specifier: 'catalog:'
-        version: 4.20.1
-      '@azure-tools/codegen':
-        specifier: 'catalog:'
-        version: 2.10.1
-      yaml:
-        specifier: 'catalog:'
-        version: 2.9.0
+        version: 7.8.5
     devDependencies:
-      '@azure-tools/openai-typespec':
-        specifier: 'catalog:'
-        version: 1.21.0(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)
+      '@azure-tools/azure-http-specs':
+        specifier: workspace:^
+        version: link:../azure-http-specs
       '@azure-tools/typespec-autorest':
         specifier: workspace:^
         version: link:../typespec-autorest
@@ -3708,9 +3760,94 @@ importers:
       '@azure-tools/typespec-client-generator-core':
         specifier: workspace:^
         version: link:../typespec-client-generator-core
-      '@azure-tools/typespec-liftr-base':
+      '@types/node':
         specifier: 'catalog:'
-        version: 0.14.0
+        version: 26.0.0
+      '@types/semver':
+        specifier: 'catalog:'
+        version: 7.7.1
+      '@typespec/compiler':
+        specifier: workspace:^
+        version: link:../../core/packages/compiler
+      '@typespec/events':
+        specifier: workspace:^
+        version: link:../../core/packages/events
+      '@typespec/http':
+        specifier: workspace:^
+        version: link:../../core/packages/http
+      '@typespec/http-specs':
+        specifier: workspace:^
+        version: link:../../core/packages/http-specs
+      '@typespec/openapi':
+        specifier: workspace:^
+        version: link:../../core/packages/openapi
+      '@typespec/rest':
+        specifier: workspace:^
+        version: link:../../core/packages/rest
+      '@typespec/spec-api':
+        specifier: workspace:^
+        version: link:../../core/packages/spec-api
+      '@typespec/spector':
+        specifier: workspace:^
+        version: link:../../core/packages/spector
+      '@typespec/sse':
+        specifier: workspace:^
+        version: link:../../core/packages/sse
+      '@typespec/streams':
+        specifier: workspace:^
+        version: link:../../core/packages/streams
+      '@typespec/tspd':
+        specifier: workspace:^
+        version: link:../../core/packages/tspd
+      '@typespec/versioning':
+        specifier: workspace:^
+        version: link:../../core/packages/versioning
+      '@typespec/xml':
+        specifier: workspace:^
+        version: link:../../core/packages/xml
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 4.1.9(vitest@4.1.9)
+      '@vitest/ui':
+        specifier: 'catalog:'
+        version: 4.1.9(vitest@4.1.9)
+      rimraf:
+        specifier: 'catalog:'
+        version: 6.1.3
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.9(@types/node@26.0.0)(@vitest/coverage-v8@4.1.9)(@vitest/ui@4.1.9)(happy-dom@20.10.6)(jsdom@25.0.1)(vite@8.1.0(@types/node@26.0.0)(esbuild@0.28.1)(tsx@4.22.4)(yaml@2.9.0))
+
+  packages/typespec-java:
+    dependencies:
+      '@autorest/codemodel':
+        specifier: 'catalog:'
+        version: 4.20.1
+      '@azure-tools/codegen':
+        specifier: 'catalog:'
+        version: 2.10.1
+      yaml:
+        specifier: 'catalog:'
+        version: 2.9.0
+    devDependencies:
+      '@azure-tools/typespec-autorest':
+        specifier: workspace:^
+        version: link:../typespec-autorest
+      '@azure-tools/typespec-azure-core':
+        specifier: workspace:^
+        version: link:../typespec-azure-core
+      '@azure-tools/typespec-azure-resource-manager':
+        specifier: workspace:^
+        version: link:../typespec-azure-resource-manager
+      '@azure-tools/typespec-azure-rulesets':
+        specifier: workspace:^
+        version: link:../typespec-azure-rulesets
+      '@azure-tools/typespec-client-generator-core':
+        specifier: workspace:^
+        version: link:../typespec-client-generator-core
       '@types/node':
         specifier: 'catalog:'
         version: 26.0.0
@@ -3786,7 +3923,7 @@ importers:
     dependencies:
       '@typespec/http-client-python':
         specifier: 'catalog:'
-        version: 0.34.1(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)
+        version: 0.34.2(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)
       semver:
         specifier: 'catalog:'
         version: 7.8.5
@@ -4366,18 +4503,9 @@ packages:
     resolution: {integrity: sha512-fZfREKjQnBTscjObgK4LuyZNFaofoCNQDNz0jl1i8fYNwCM5EOF9BXwtEtobuEyCpPUNDxQ/KKO65eWzirqk4w==}
     engines: {node: '>=12.0.0'}
 
-  '@azure-tools/openai-typespec@1.21.0':
-    resolution: {integrity: sha512-wKHNsyXii+/ZJn/mqKC/ey+/Y+RoW7XGBQD5yNRhGKA3VRibLNIhn/0PGLEIZhWWsFp3okTvifhPDs/b0DmOTA==}
-    peerDependencies:
-      '@typespec/http': ^1.13.0
-      '@typespec/openapi': ^1.13.0
-
   '@azure-tools/tasks@3.0.255':
     resolution: {integrity: sha512-GjALNLz7kWMEdRVbaN5g0cJHNAr3XVTbP0611Mv2UzMgGL6FOhNZJK+oPHJKLDR8EEDZNnkwPlyi7B+INXUSQA==}
     engines: {node: '>=10.12.0'}
-
-  '@azure-tools/typespec-liftr-base@0.14.0':
-    resolution: {integrity: sha512-q9pEaOiIaE2VF+BsnaDG98zrj0sZ7/8AD8aBrwXtHbzH+id3sWprl8rRF0qagDSVchslfrHcGFhXs2bM6Hie0g==}
 
   '@azure/abort-controller@2.1.2':
     resolution: {integrity: sha512-nBrLsEWm4J2u5LpAPjxADTlq3trDgVZZXHNKabeXZtpq3d3AbN/KGO82R87rdDz5/lYB024rtEf10/q0urNgsA==}
@@ -7030,6 +7158,9 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@pinterest/alloy-graphql@1.1.0':
+    resolution: {integrity: sha512-4HDWyHC51xl3FguYJSzwda3Lr/JxjxDM9Hr62OZ4JEQ3o/bYXd3blfbvvDtTcEvi6u23qYocgFR1jQLpvIwy2A==}
+
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
     engines: {node: '>=14'}
@@ -8462,24 +8593,24 @@ packages:
   '@types/yoga-layout@1.9.2':
     resolution: {integrity: sha512-S9q47ByT2pPvD65IvrWp7qppVMpk9WGMbVq9wbWZOHg6tnXSD4vyhao6nOSBwwfDdV2p3Kx9evA9vI+XWTfDvw==}
 
-  '@typespec/http-client-python@0.34.1':
-    resolution: {integrity: sha512-ts5eI67WdDeMZEQ8SVNI1BOlU34gqTTBGZEicKqgZ99O1q61mDCbMIcC3Aphgdgvh/dmSCWU4XteQpy/gg1LAA==}
+  '@typespec/http-client-python@0.34.2':
+    resolution: {integrity: sha512-GngEovDgQlDD/+LIMsINT103t4MfxqDV6dJnJ5osRdg2sMWcNqYnCglAmIgMHsQHrvji3FIdcsD8LJ7Lqdiurg==}
     engines: {node: '>=22.0.0'}
     peerDependencies:
-      '@azure-tools/typespec-autorest': '>=0.69.1 <1.0.0'
-      '@azure-tools/typespec-azure-core': '>=0.69.0 <1.0.0'
-      '@azure-tools/typespec-azure-resource-manager': '>=0.69.1 <1.0.0'
-      '@azure-tools/typespec-azure-rulesets': '>=0.69.1 <1.0.0'
-      '@azure-tools/typespec-client-generator-core': '>=0.69.1 <1.0.0'
-      '@typespec/compiler': ^1.13.0
-      '@typespec/events': '>=0.83.0 <1.0.0'
-      '@typespec/http': ^1.13.0
-      '@typespec/openapi': ^1.13.0
-      '@typespec/rest': '>=0.83.0 <1.0.0'
-      '@typespec/sse': '>=0.83.0 <1.0.0'
-      '@typespec/streams': '>=0.83.0 <1.0.0'
-      '@typespec/versioning': '>=0.83.0 <1.0.0'
-      '@typespec/xml': '>=0.83.0 <1.0.0'
+      '@azure-tools/typespec-autorest': '>=0.70.0 <1.0.0'
+      '@azure-tools/typespec-azure-core': '>=0.70.0 <1.0.0'
+      '@azure-tools/typespec-azure-resource-manager': '>=0.70.0 <1.0.0'
+      '@azure-tools/typespec-azure-rulesets': '>=0.70.0 <1.0.0'
+      '@azure-tools/typespec-client-generator-core': '>=0.70.0 <1.0.0'
+      '@typespec/compiler': ^1.14.0
+      '@typespec/events': '>=0.84.0 <1.0.0'
+      '@typespec/http': ^1.14.0
+      '@typespec/openapi': ^1.14.0
+      '@typespec/rest': '>=0.84.0 <1.0.0'
+      '@typespec/sse': '>=0.84.0 <1.0.0'
+      '@typespec/streams': '>=0.84.0 <1.0.0'
+      '@typespec/versioning': '>=0.84.0 <1.0.0'
+      '@typespec/xml': '>=0.84.0 <1.0.0'
 
   '@typespec/ts-http-runtime@0.3.6':
     resolution: {integrity: sha512-jIXhD0eWQ1JA6ln/5Dltyx22UxWNrw0hZmhy2rlv6m6KgF7kplHx3g0fzi09lNmTJQRR91OlemYp3xFnvDK9og==}
@@ -10615,6 +10746,10 @@ packages:
 
   grapheme-splitter@1.0.4:
     resolution: {integrity: sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ==}
+
+  graphql@17.0.2:
+    resolution: {integrity: sha512-FRWbddMxfkjiB7z+aQDWIR+E34xo9I8c9mtK2RPv8PmMzKRvrdsreHL/Ui/TmwHJfhHChEtsFPyMHKI+xuarQQ==}
+    engines: {node: ^22.0.0 || ^24.0.0 || ^25.0.0 || >=26.0.0}
 
   gray-matter@4.0.3:
     resolution: {integrity: sha512-5v6yZd4JK3eMI3FqqCouswVqwugaA9r4dNZB1wwcmrD02QkV5H0y7XBQW8QwQqEaZY1pM9aqORSORhJRdNK44Q==}
@@ -15152,14 +15287,7 @@ snapshots:
       js-yaml: 4.1.1
       semver: 7.8.5
 
-  '@azure-tools/openai-typespec@1.21.0(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)':
-    dependencies:
-      '@typespec/http': link:core/packages/http
-      '@typespec/openapi': link:core/packages/openapi
-
   '@azure-tools/tasks@3.0.255': {}
-
-  '@azure-tools/typespec-liftr-base@0.14.0': {}
 
   '@azure/abort-controller@2.1.2':
     dependencies:
@@ -18406,6 +18534,16 @@ snapshots:
   '@pagefind/windows-x64@1.5.2':
     optional: true
 
+  '@pinterest/alloy-graphql@1.1.0':
+    dependencies:
+      '@alloy-js/core': 0.24.1
+      graphql: 17.0.2
+      pathe: 2.0.3
+      pluralize: 8.0.0
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
@@ -20348,7 +20486,7 @@ snapshots:
 
   '@types/yoga-layout@1.9.2': {}
 
-  '@typespec/http-client-python@0.34.1(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)':
+  '@typespec/http-client-python@0.34.2(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)':
     dependencies:
       '@azure-tools/typespec-autorest': link:packages/typespec-autorest
       '@azure-tools/typespec-azure-core': link:packages/typespec-azure-core
@@ -23061,6 +23199,8 @@ snapshots:
       '@esfx/disposable': 1.0.0
 
   grapheme-splitter@1.0.4: {}
+
+  graphql@17.0.2: {}
 
   gray-matter@4.0.3:
     dependencies:

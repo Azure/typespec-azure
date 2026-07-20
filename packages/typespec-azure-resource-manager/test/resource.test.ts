@@ -930,7 +930,8 @@ interface RestorePointOperations {
 });
 
 it("allows extension of foreign resources", async () => {
-  const { program, Employees, ManagementGroups, VirtualMachines } = await Tester.compile(t.code`
+  const { program, Employees, ManagementGroups, ServiceGroups, VirtualMachines } =
+    await Tester.compile(t.code`
 using Azure.Core;
 
 @armProviderNamespace
@@ -984,6 +985,8 @@ interface ${t.interface("Employees")} extends EmplOps<Extension.ScopeParameter> 
 @armResourceOperations
 interface ${t.interface("ManagementGroups")} extends EmplOps<Extension.ManagementGroup> {}
 @armResourceOperations
+interface ${t.interface("ServiceGroups")} extends EmplOps<Extension.ServiceGroup> {}
+@armResourceOperations
 interface ${t.interface("VirtualMachines")} extends EmplOps<VirtualMachine> {}
 
 model MoveRequest {
@@ -1008,6 +1011,12 @@ model MoveResponse {
   const [managementGetHttp, _m] = getHttpOperation(program, managementGet);
   expect(managementGetHttp.path).toBe(
     "/providers/Microsoft.Management/managementGroups/{managementGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+  );
+  const serviceGroupGet: Operation | undefined = ServiceGroups?.operations?.get("get");
+  ok(serviceGroupGet);
+  const [serviceGroupGetHttp, _sg] = getHttpOperation(program, serviceGroupGet);
+  expect(serviceGroupGetHttp.path).toBe(
+    "/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
   );
   const virtualMachinesGet: Operation | undefined = VirtualMachines?.operations?.get("get");
   ok(virtualMachinesGet);

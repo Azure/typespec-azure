@@ -56,6 +56,43 @@ jobs:
           PackagePath: packages/typespec-python
           GeneratorName: "@azure-tools/typespec-python"
 
+  - job: spector_go
+    displayName: Spector Coverage (Go)
+    variables:
+      TYPESPEC_SKIP_WEBSITE_BUILD: true
+    steps:
+      - checkout: self
+        submodules: true
+
+      - template: /eng/pipelines/templates/install.yml
+
+      - task: GoTool@0
+        displayName: "Use Go 1.26.1"
+        inputs:
+          version: "1.26.1"
+
+      - task: DownloadPipelineArtifact@2
+        displayName: Restore turbo build cache
+        inputs:
+          artifact: ${{ parameters.TurboCacheArtifact }}
+          path: $(Build.SourcesDirectory)/.turbo/cache
+
+      - script: pnpm run build
+        displayName: Build (turbo cache restore)
+
+      - script: pnpm run tspcompile
+        displayName: "Regenerate Go test code"
+        workingDirectory: packages/typespec-go
+
+      - script: pnpm run test:go:e2e
+        displayName: "Run Go e2e tests"
+        workingDirectory: packages/typespec-go
+
+      - template: /eng/pipelines/templates/upload-spector-coverage.yml
+        parameters:
+          PackagePath: packages/typespec-go
+          GeneratorName: "@azure-tools/typespec-go"
+
   - job: spector_java
     displayName: Spector Coverage (Java)
     variables:
