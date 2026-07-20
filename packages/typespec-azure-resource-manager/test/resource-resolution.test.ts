@@ -815,9 +815,9 @@ interface GenericResources {
     });
     ok(provider.resources);
     expect(provider.resources).toHaveLength(12);
-    const employee = provider.resources[0];
-    ok(employee);
-    expect(employee).toMatchObject({
+    const employeeAtLocation = provider.resources[0];
+    ok(employeeAtLocation);
+    expect(employeeAtLocation).toMatchObject({
       kind: "Extension",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
@@ -825,7 +825,7 @@ interface GenericResources {
       parent: undefined,
     });
 
-    checkResolvedOperations(employee, {
+    checkResolvedOperations(employeeAtLocation, {
       operations: {
         lifecycle: {
           createOrUpdate: [{ operationGroup: "Tenants", name: "create", kind: "createOrUpdate" }],
@@ -2375,6 +2375,7 @@ interface Employees {
 @armResourceOperations(PrivateLinkResource)
 interface EmployeePrivateLinks {
   list is PrivateLinkOperations.ListByParent<Employee, OverrideResourceName = "PrivateLinkForEmployee">;
+  get is PrivateLinkOperations.Read<Employee, OverrideResourceName = "PrivateLinkForEmployee">;
 }
 
 model MoveRequest {
@@ -2455,6 +2456,9 @@ model MoveResponse {
 
     checkResolvedOperations(privateLink, {
       operations: {
+        lifecycle: {
+          read: [{ operationGroup: "EmployeePrivateLinks", name: "get", kind: "read" }],
+        },
         lists: [{ operationGroup: "EmployeePrivateLinks", name: "list", kind: "list" }],
       },
       resourceType: {
@@ -2463,7 +2467,7 @@ model MoveResponse {
       },
       resourceName: "PrivateLinkForEmployee",
       resourceInstancePath:
-        "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/locations/{location}/employees/{employeeName}/privateLinkResources/{name}",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/locations/{location}/employees/{employeeName}/privateLinkResources/{privateLinkResourceName}",
     });
     const location = provider.resources[2];
     ok(location);
@@ -3412,7 +3416,7 @@ model DependentProperties {
       },
       resourceName: "EmployeeNetworkSecurityPerimeterConfiguration",
       resourceInstancePath:
-        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/locations/{location}/employees/{employeeName}/networkSecurityPerimeterConfigurations/{name}",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/locations/{location}/employees/{employeeName}/networkSecurityPerimeterConfigurations/{networkSecurityPerimeterConfigurationName}",
     });
 
     const perimeterForDepInstance = provider.resources[2];
@@ -3458,7 +3462,23 @@ model DependentProperties {
       },
       resourceName: "DependentNetworkSecurityPerimeterConfiguration",
       resourceInstancePath:
-        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/locations/{location}/employees/{employeeName}/dependents/{dependentName}/networkSecurityPerimeterConfigurations/{name}",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/locations/{location}/employees/{employeeName}/dependents/{dependentName}/networkSecurityPerimeterConfigurations/{networkSecurityPerimeterConfigurationName}",
+    });
+
+    const location = provider.resources[4];
+    ok(location);
+    expect(location).toMatchObject({
+      type: expect.anything(),
+      kind: "Other",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      scope: "ResourceGroup",
+      resourceName: "Location",
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["locations"],
+      },
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/locations/{location}",
     });
 
     checkArmOperationsHas(provider.providerOperations, [
@@ -3656,7 +3676,7 @@ model DependentProperties {
       },
       resourceName: "NetworkSecurityPerimeterConfiguration",
       resourceInstancePath:
-        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/networkSecurityPerimeterConfigurations/{name}",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/networkSecurityPerimeterConfigurations/{networkSecurityPerimeterConfigurationName}",
     });
 
     checkArmOperationsHas(provider.providerOperations, [
@@ -3845,7 +3865,7 @@ model MoveResponse {
       },
       resourceName: "NetworkSecurityPerimeterConfiguration",
       resourceInstancePath:
-        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/networkSecurityPerimeterConfigurations/{name}",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/networkSecurityPerimeterConfigurations/{nspName}",
     });
 
     checkArmOperationsHas(provider.providerOperations, [
