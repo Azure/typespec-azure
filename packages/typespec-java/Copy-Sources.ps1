@@ -4,10 +4,10 @@
 # Azure-flavored `src/options.ts` (excluded from the copy).
 #
 # The desired core commit is pinned in core-commit.json; CoreCommit.ps1's
-# Enter-CoreCommit temporarily checks it out (when newer than the submodule's
-# current checkout) to copy the sources from, and Restore-CoreCommit always puts
-# the submodule back to its original SHA (repo-wide `pnpm build` runs this and CI
-# checks git status).
+# Get-CoreSourceRoot returns a directory to read the emitter/generator sources from
+# (extracted from the pinned commit via `git archive` when it is newer than the
+# submodule's current checkout), without ever mutating the core/ submodule working
+# tree. Remove-CoreSourceRoot cleans up any temporary extraction afterwards.
 #
 # Mirrors the "Copy TypeScript code" step of autorest.java's Build-TypeSpec.ps1.
 
@@ -18,9 +18,9 @@ $repoRoot = Resolve-Path (Join-Path $packageRoot ".." "..")
 $coreRoot = Join-Path $repoRoot "core"
 
 . (Join-Path $packageRoot "CoreCommit.ps1")
-$originSha = Enter-CoreCommit -CoreRoot $coreRoot -PackageRoot $packageRoot
+$core = Get-CoreSourceRoot -CoreRoot $coreRoot -PackageRoot $packageRoot
 try {
-    $emitterRoot = Resolve-Path (Join-Path $coreRoot "packages" "http-client-java" "emitter")
+    $emitterRoot = Join-Path $core.Root "emitter"
 
     Copy-Item -Path (Join-Path $emitterRoot "src") -Destination $packageRoot -Exclude "options.ts" -Recurse -Force
     Copy-Item -Path (Join-Path $emitterRoot "test") -Destination $packageRoot -Recurse -Force
@@ -29,7 +29,7 @@ try {
     # customization patch (core.patch) to the copy, so building emitter.jar
     # (Build-Generator.ps1) never mutates the core/ submodule. The patch paths are
     # relative to this generator folder.
-    $srcGenerator = Join-Path $coreRoot "packages" "http-client-java" "generator"
+    $srcGenerator = Join-Path $core.Root "generator"
     $destGenerator = Join-Path $packageRoot "generator"
     $patchFile = Join-Path $packageRoot "core.patch"
 
@@ -50,5 +50,5 @@ try {
     }
 }
 finally {
-    Restore-CoreCommit -CoreRoot $coreRoot -OriginSha $originSha
+    Remove-CoreSourceRoot $core
 }
