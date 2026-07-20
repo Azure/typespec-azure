@@ -1,5 +1,18 @@
 # Change Log - @azure-tools/typespec-java
 
+## 0.45.7
+
+Compatible with compiler 1.14.0.
+
+### Features
+
+- [#4916](https://github.com/Azure/typespec-azure/pull/4916) Support `clientApiVersions`.
+
+### Bug Fixes
+
+- [#4916](https://github.com/Azure/typespec-azure/pull/4916) Fix per-client `ServiceVersion` regression after migrating from js-yaml and lodash.
+
+
 ## 0.45.6 (2026-07-15)
 
 Compatible with compiler 1.14.0.
