@@ -5,7 +5,7 @@ import {
   isTemplatedInterfaceOperation,
 } from "./utils.js";
 
-export const coreOperationsRule = createRule({
+export const useInterfaceRule = createRule({
   name: "use-interface",
   severity: "warning",
   description: "Validate ARM Resource operations are defined inside an interface declaration.",

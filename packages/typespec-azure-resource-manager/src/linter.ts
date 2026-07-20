@@ -23,7 +23,7 @@ import { patchOperationsRule } from "./rules/arm-resource-patch.js";
 import { armResourcePathInvalidCharsRule } from "./rules/arm-resource-path-invalid-chars.js";
 import { armResourceProvisioningStateRule } from "./rules/arm-resource-provisioning-state-rule.js";
 import { beyondNestingRule } from "./rules/beyond-nesting-levels.js";
-import { coreOperationsRule } from "./rules/core-operations.js";
+import { useInterfaceRule } from "./rules/use-interface.js";
 import { envelopePropertiesRules } from "./rules/envelope-properties.js";
 import { improperSubscriptionListOperationRule } from "./rules/improper-subscription-list-operation.js";
 import { lroLocationHeaderRule } from "./rules/lro-location-header.js";
@@ -69,7 +69,7 @@ const rules = [
   armCustomResourceUsageDiscourage,
   armFeatureFileUsageDiscourage,
   beyondNestingRule,
-  coreOperationsRule,
+  useInterfaceRule,
   deleteOperationMissingRule,
   envelopePropertiesRules,
   interfacesRule,

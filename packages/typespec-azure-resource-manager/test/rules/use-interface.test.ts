@@ -6,7 +6,7 @@ import {
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 
-import { coreOperationsRule } from "../../src/rules/core-operations.js";
+import { useInterfaceRule } from "../../src/rules/use-interface.js";
 
 let runner: TesterInstance;
 let tester: LinterRuleTester;
@@ -15,7 +15,7 @@ beforeEach(async () => {
   runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    coreOperationsRule,
+    useInterfaceRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });
