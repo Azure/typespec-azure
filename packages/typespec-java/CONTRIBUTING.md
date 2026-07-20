@@ -150,9 +150,9 @@ Merging into the release branch creates a backmerge branch
 (`backmerge/release/<sprint>-<date>`). Open a PR from that branch targeting `main` and merge it so
 the version bump and changelog are reflected in `main`.
 
-### 8. Regenerate and merge the SDK PR with the released version
+### 8. (Optional) Regenerate and merge the SDK PR with the released version
 
-Finally, run the
+Optionally, run the
 [`typespec-java - sync sdk`](https://dev.azure.com/azure-sdk/internal/_build?definitionId=8274&_a=summary)
 pipeline again, this time with **Emitter Version** set to the released `@azure-tools/typespec-java`
 version (leaving PR Id or Branch as `none`). Review and merge the resulting SDK PR.
