@@ -5,7 +5,7 @@
  * run knows where to start.
  *
  * Usage:
- *   npx tsx src/update-meta.ts --config <name> --commit <hash>
+ *   pnpm exec tsx src/update-meta.ts --config <name> --commit <hash>
  */
 
 import { loadConfig } from "./config.js";
@@ -25,7 +25,7 @@ function parseArgs(): { config: string; commit: string } {
   }
 
   if (!config || !commit) {
-    console.error("Usage: npx tsx src/update-meta.ts --config <name> --commit <hash>");
+    console.error("Usage: pnpm exec tsx src/update-meta.ts --config <name> --commit <hash>");
     process.exit(1);
   }
 

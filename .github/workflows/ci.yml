@@ -105,7 +105,7 @@ jobs:
       - name: Install playwright browsers
         run: |
           sudo dpkg --configure -a
-          npx playwright install --with-deps
+          pnpm exec playwright install --with-deps
         working-directory: packages/typespec-azure-playground-website
 
       - name: Build
@@ -138,7 +138,7 @@ jobs:
         run: pnpm --filter "@typespec/internal-build-utils..." run build
 
       - name: Install autorest & script dependencies
-        run: npm install -g autorest && cd eng/scripts && npm install
+        run: pnpm add -g autorest && cd eng/scripts && pnpm install
 
       - name: Swagger - Resource Manager Linting
         run: node eng/scripts/lint-resourcemanager.js "packages/samples/test/output/azure/resource-manager"

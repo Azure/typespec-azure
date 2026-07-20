@@ -6,7 +6,7 @@
  * or root-level node module resolution.
  *
  * Usage:
- *   npx tsx eng/scripts/doc-updater/src/print-allowed-paths.ts --config <name>
+ *   pnpm exec tsx eng/scripts/doc-updater/src/print-allowed-paths.ts --config <name>
  */
 
 import { loadConfig } from "./config.js";
@@ -23,7 +23,7 @@ function parseArgs(): { config: string } {
 
   if (!config) {
     console.error(
-      "Usage: npx tsx eng/scripts/doc-updater/src/print-allowed-paths.ts --config <name>",
+      "Usage: pnpm exec tsx eng/scripts/doc-updater/src/print-allowed-paths.ts --config <name>",
     );
     process.exit(1);
   }
