@@ -2,6 +2,8 @@
 
 ## 0.45.7
 
+Compatible with compiler 1.14.0.
+
 ### Features
 
 - [#4916](https://github.com/Azure/typespec-azure/pull/4916) Support `clientApiVersions`.
