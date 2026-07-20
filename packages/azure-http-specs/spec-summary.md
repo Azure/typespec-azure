@@ -2156,7 +2156,8 @@ Expected request body:
     "simpleArmId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
     "armIdWithType": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
     "armIdWithTypeAndScope": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
-    "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm"
+    "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm",
+    "armIdWithGroupScope": "/providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-0000-0000-000000000000"
   }
 }
 ```
@@ -2174,7 +2175,8 @@ Expected response body:
     "simpleArmId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
     "armIdWithType": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
     "armIdWithTypeAndScope": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
-    "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm"
+    "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm",
+    "armIdWithGroupScope": "/providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-0000-0000-000000000000"
   }
 }
 ```
@@ -2200,7 +2202,8 @@ Expected response body:
     "simpleArmId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
     "armIdWithType": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
     "armIdWithTypeAndScope": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/myVnet",
-    "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm"
+    "armIdWithAllScopes": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/myVm",
+    "armIdWithGroupScope": "/providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-0000-0000-000000000000"
   }
 }
 ```
@@ -3304,6 +3307,88 @@ Expected response body:
   }
   ```
 
+### Azure_ResourceManager_OperationTemplates_Legacy_createOrReplaceOptionalBody
+
+- Endpoint: `put https://management.azure.com`
+
+PUT operation using Legacy.CreateOrReplaceSync with optional request body.
+Tests the pattern where a resource can be created or replaced with an optional body,
+as seen in marketplace Collections.
+
+This tests two sub-scenarios:
+
+1. With body: PUT with a resource body creates/updates the resource
+2. Without body: PUT without a body creates the resource with defaults
+
+Expected verb: PUT
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/configurations/default
+Expected query parameter: api-version=2023-12-01-preview
+
+Scenario 1 (with body) - Expected request body:
+
+```json
+{
+  "location": "eastus",
+  "properties": {
+    "configValue": "custom-value"
+  }
+}
+```
+
+Expected response status code: 200
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/configurations/default",
+  "name": "default",
+  "type": "Azure.ResourceManager.OperationTemplates/configurations",
+  "location": "eastus",
+  "properties": {
+    "configValue": "custom-value",
+    "provisioningState": "Succeeded"
+  }
+}
+```
+
+Scenario 2 (without body) - Expected request body: None (empty)
+Expected response status code: 200
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/configurations/default",
+  "name": "default",
+  "type": "Azure.ResourceManager.OperationTemplates/configurations",
+  "location": "eastus",
+  "properties": {
+    "configValue": "default-value",
+    "provisioningState": "Succeeded"
+  }
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_Legacy_routedGet
+
+- Endpoint: `get https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Azure.ResourceManager.OperationTemplates/configurations/{name}/diagnostics/{diagnosticName}`
+
+GET operation using RoutedOperations with a custom route path override.
+Tests the Legacy.RoutedOperations pattern where the resource path is overridden
+using ResourceRoute, and additional path parameters are added via @route.
+
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/configurations/default/diagnostics/memory
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 200
+Expected response body:
+
+```json
+{
+  "name": "memory",
+  "status": "healthy"
+}
+```
+
 ### Azure_ResourceManager_OperationTemplates_ListAvailableOperations
 
 - Endpoint: `get https://management.azure.com`
@@ -3619,6 +3704,55 @@ Expected response body:
 [{ "content": "order1,product1,1" }, { "content": "order2,product2,2" }]
 ```
 
+### Azure_ResourceManager_OperationTemplates_Lro_getLro
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation that returns a long-running operation.
+Uses Extension.Read with @markAsLro, which returns 200 or 202.
+The Location header points back to the same resource URL (matches real service behavior).
+
+Step 1: Initial GET Request (returns 202 Accepted)
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/costReports/report1
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 202
+Expected response header: Location={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/costReports/report1
+
+Step 2: Polling Request (returns 202 Accepted)
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/costReports/report1
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 202
+Expected response header: Location={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/costReports/report1
+
+Step 3: Final Polling Request (returns 200 OK with result)
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/costReports/report1
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 200
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/costReports/report1",
+  "name": "report1",
+  "type": "Azure.ResourceManager.OperationTemplates/costReports",
+  "properties": {
+    "downloadUrl": "https://storage.blob.core.windows.net/reports/report1.csv",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
+}
+```
+
 ### Azure_ResourceManager_OperationTemplates_LroPaging_postPagingLro
 
 - Endpoint: `post https://management.azure.com`
@@ -3665,6 +3799,91 @@ Expected response body:
 Step 4: Next Page Request
 Expected verb: GET
 Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_location/nextPage
+Expected query parameter: api-version=2023-12-01-preview
+Expected response: 200 OK with the second page of results.
+Expected response body:
+
+```json
+{
+  "value": [
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/products/product2",
+      "name": "product2",
+      "type": "Azure.ResourceManager.OperationTemplates/products",
+      "location": "eastus",
+      "properties": {
+        "provisioningState": "Succeeded",
+        "productId": "product2"
+      }
+    }
+  ]
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_LroPaging_postPagingLroWithBody
+
+- Endpoint: `post https://management.azure.com`
+
+Resource POST operation that returns a LRO with paging, using ArmResourceActionAsyncBase
+with a request body and a response that includes a body on both 200 and 202.
+Unlike postPagingLro which uses the convenience ArmResourceActionAsync with no body,
+this tests the lower-level ArmResourceActionAsyncBase pattern.
+
+Step 1: Initial Request
+Expected verb: POST
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/products/default/postPagingLroWithBody
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "vnetId": "vnet1"
+}
+```
+
+Expected response: 202 Accepted with Location and Retry-After headers.
+Expected response body:
+
+```json
+{
+  "value": []
+}
+```
+
+Step 2: Polling Request
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_body_location
+Expected query parameter: api-version=2023-12-01-preview
+Expected response: 202 Accepted with Location and Retry-After headers.
+
+Step 3: Final Result Request
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_body_location
+Expected query parameter: api-version=2023-12-01-preview
+Expected response: 200 OK with a paged result. The response body contains a "nextLink" field.
+Expected response body:
+
+```json
+{
+  "value": [
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/products/product1",
+      "name": "product1",
+      "type": "Azure.ResourceManager.OperationTemplates/products",
+      "location": "eastus",
+      "properties": {
+        "provisioningState": "Succeeded",
+        "productId": "product1"
+      }
+    }
+  ],
+  "nextLink": "..."
+}
+```
+
+Step 4: Next Page Request
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_body_location/nextPage
 Expected query parameter: api-version=2023-12-01-preview
 Expected response: 200 OK with the second page of results.
 Expected response body:
@@ -3853,6 +4072,95 @@ Expected response body (with body scenario):
 {
   "totalAllowed": 100,
   "status": "Changed to requested allowance"
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_Paging_markAsPageable
+
+- Endpoint: `get https://management.azure.com`
+
+List operation using ArmListSinglePageByParent with @markAsPageable.
+The response uses a custom list model (CollectionsList) wrapping
+the resource array.
+
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/monitors/monitor1/collections
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 200
+Expected response body:
+
+```json
+{
+  "value": [
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/monitors/monitor1/collections/collection1",
+      "name": "collection1",
+      "type": "Azure.ResourceManager.OperationTemplates/monitors/collections",
+      "properties": {
+        "displayName": "Test Collection"
+      }
+    },
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/monitors/monitor1/collections/collection2",
+      "name": "collection2",
+      "type": "Azure.ResourceManager.OperationTemplates/monitors/collections",
+      "properties": {
+        "displayName": "Another Collection"
+      }
+    }
+  ]
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_Paging_postActionPaging
+
+- Endpoint: `post https://management.azure.com`
+
+Resource POST action returning pageable results.
+This tests a POST action with @list that returns pageable results (not an LRO).
+
+Step 1: Initial POST Request (returns first page)
+Expected verb: POST
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/monitors/monitor1/postActionPaging
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "filter": "status eq 'active'"
+}
+```
+
+Expected response status code: 200
+Expected response body:
+
+```json
+{
+  "value": [
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/vm1",
+      "sendingMetrics": true
+    }
+  ],
+  "nextLink": "{endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/monitors/monitor1/postActionPaging/nextPage?api-version=2023-12-01-preview"
+}
+```
+
+Step 2: Next Page Request
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/monitors/monitor1/postActionPaging/nextPage
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 200
+Expected response body:
+
+```json
+{
+  "value": [
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/vm2",
+      "sendingMetrics": false
+    }
+  ]
 }
 ```
 
@@ -5048,6 +5356,153 @@ Expected response body:
     "lastModifiedBy": "AzureSDK",
     "lastModifiedAt": <any date>,
     "lastModifiedByType": "User",
+  }
+}
+```
+
+### Azure_ResourceManager_ServiceGroupExtension_ServiceGroupExtensionResources_createOrUpdate
+
+- Endpoint: `put https://management.azure.com`
+
+Resource PUT operation at service group scope.
+Expected path: /providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources/resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "properties": {
+    "description": "valid"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources/resource",
+  "name": "resource",
+  "type": "Microsoft.ServiceGroupExtension/serviceGroupExtensionResources",
+  "properties":{
+    "description": "valid",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_ServiceGroupExtension_ServiceGroupExtensionResources_delete
+
+- Endpoint: `delete https://management.azure.com`
+
+Resource DELETE operation at service group scope.
+Expected path: /providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources/resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 204
+
+### Azure_ResourceManager_ServiceGroupExtension_ServiceGroupExtensionResources_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation at service group scope.
+Expected path: /providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources/resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected response body:
+
+```json
+{
+  "id": "/providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources/resource",
+  "name": "resource",
+  "type": "Microsoft.ServiceGroupExtension/serviceGroupExtensionResources",
+  "properties":{
+    "description": "valid",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_ServiceGroupExtension_ServiceGroupExtensionResources_listByServiceGroup
+
+- Endpoint: `get https://management.azure.com`
+
+Resource LIST operation at service group scope.
+Expected path: /providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources
+Expected query parameter: api-version=2023-12-01-preview
+Expected response body:
+
+```json
+{
+  "value": [{
+    "id": "/providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources/resource",
+    "name": "resource",
+    "type": "Microsoft.ServiceGroupExtension/serviceGroupExtensionResources",
+    "properties":{
+      "description": "valid",
+      "provisioningState": "Succeeded"
+    },
+    "systemData": {
+      "createdBy": "AzureSDK",
+      "createdByType": "User",
+      "createdAt": <any date>,
+      "lastModifiedBy": "AzureSDK",
+      "lastModifiedAt": <any date>,
+      "lastModifiedByType": "User"
+    }
+  }]
+}
+```
+
+### Azure_ResourceManager_ServiceGroupExtension_ServiceGroupExtensionResources_update
+
+- Endpoint: `patch https://management.azure.com`
+
+Resource PATCH operation at service group scope.
+Expected path: /providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources/resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "properties": {
+    "description": "valid2"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.ServiceGroupExtension/serviceGroupExtensionResources/resource",
+  "name": "resource",
+  "type": "Microsoft.ServiceGroupExtension/serviceGroupExtensionResources",
+  "properties":{
+    "description": "valid2",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
   }
 }
 ```

@@ -26,6 +26,11 @@ model ProductProperties {
 
 model ProductListResult is Azure.Core.Page<Product>;
 
+model VnetProfile {
+  @doc("The virtual network ID.")
+  vnetId: string;
+}
+
 @armResourceOperations
 interface LroPaging {
   @scenario
@@ -93,4 +98,96 @@ interface LroPaging {
     """)
   @list
   postPagingLro is ArmResourceActionAsync<Product, void, ProductListResult>;
+
+  // Based on: https://github.com/Azure/azure-rest-api-specs/blob/89ff93230e/specification/web/resource-manager/Microsoft.Web/AppService/AppServiceEnvironmentResource.tsp#L152-L163
+  @scenario
+  @scenarioDoc("""
+    Resource POST operation that returns a LRO with paging, using ArmResourceActionAsyncBase
+    with a request body and a response that includes a body on both 200 and 202.
+    Unlike postPagingLro which uses the convenience ArmResourceActionAsync with no body,
+    this tests the lower-level ArmResourceActionAsyncBase pattern.
+    
+    Step 1: Initial Request
+    Expected verb: POST
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/products/default/postPagingLroWithBody
+    Expected query parameter: api-version=2023-12-01-preview
+    Expected request body:
+    ```json
+    {
+      "vnetId": "vnet1"
+    }
+    ```
+    Expected response: 202 Accepted with Location and Retry-After headers.
+    Expected response body:
+    ```json
+    {
+      "value": []
+    }
+    ```
+    
+    Step 2: Polling Request
+    Expected verb: GET
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_body_location
+    Expected query parameter: api-version=2023-12-01-preview
+    Expected response: 202 Accepted with Location and Retry-After headers.
+    
+    Step 3: Final Result Request
+    Expected verb: GET
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_body_location
+    Expected query parameter: api-version=2023-12-01-preview
+    Expected response: 200 OK with a paged result. The response body contains a "nextLink" field.
+    Expected response body:
+    ```json
+    {
+      "value": [
+        {
+          "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/products/product1",
+          "name": "product1",
+          "type": "Azure.ResourceManager.OperationTemplates/products",
+          "location": "eastus",
+          "properties": {
+            "provisioningState": "Succeeded",
+            "productId": "product1"
+          }
+        }
+      ],
+      "nextLink": "..."
+    }
+    ```
+    
+    Step 4: Next Page Request
+    Expected verb: GET
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_body_location/nextPage
+    Expected query parameter: api-version=2023-12-01-preview
+    Expected response: 200 OK with the second page of results.
+    Expected response body:
+    ```json
+    {
+      "value": [
+        {
+          "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/products/product2",
+          "name": "product2",
+          "type": "Azure.ResourceManager.OperationTemplates/products",
+          "location": "eastus",
+          "properties": {
+            "provisioningState": "Succeeded",
+            "productId": "product2"
+          }
+        }
+      ]
+    }
+    ```
+    """)
+  @action("postPagingLroWithBody")
+  @list
+  postPagingLroWithBody is ArmResourceActionAsyncBase<
+    Product,
+    VnetProfile,
+    | ArmResponse<ProductListResult>
+    | (ArmAcceptedLroResponse & {
+        @TypeSpec.Http.bodyRoot
+        _: ProductListResult;
+      }),
+    BaseParameters = Azure.ResourceManager.Foundations.DefaultBaseParameters<Product>
+  >;
 }
