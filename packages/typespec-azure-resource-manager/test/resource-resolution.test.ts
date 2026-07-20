@@ -1946,7 +1946,7 @@ model MoveResponse {
     ]);
   });
 
-  it("collects operation information for private links", async () => {
+  it("does not create resource entries for list-only private links", async () => {
     const { program } = await Tester.compile(`
 
 using Azure.Core;
@@ -2050,7 +2050,7 @@ model DependentProperties {
     const provider = resolveArmResources(program);
     expect(provider).toBeDefined();
     expect(provider.resources).toBeDefined();
-    expect(provider.resources).toHaveLength(4);
+    expect(provider.resources).toHaveLength(2);
     ok(provider.resources);
     const employee = provider.resources[0];
     ok(employee);
@@ -2086,7 +2086,7 @@ model DependentProperties {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const dependent = provider.resources[3];
+    const dependent = provider.resources[1];
     ok(dependent);
     expect(dependent).toMatchObject({
       kind: "Proxy",
@@ -2125,7 +2125,124 @@ model DependentProperties {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}",
     });
 
-    const privateLink = provider.resources[1];
+    expect(provider.resources.some((r) => r.resourceName === "EmployeePrivateLinkResource")).toBe(
+      false,
+    );
+    expect(provider.resources.some((r) => r.resourceName === "DependentPrivateLinkResource")).toBe(
+      false,
+    );
+
+    checkArmOperationsHas(provider.providerOperations, [
+      { operationGroup: "Operations", name: "list", kind: "other" },
+    ]);
+  });
+
+  it("collects operation information for private links with read operations", async () => {
+    const { program } = await Tester.compile(`
+
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+@lroStatus
+union ProvisioningState {
+  ResourceProvisioningState,
+  Provisioning: "Provisioning",
+  Updating: "Updating",
+  Deleting: "Deleting",
+  Accepted: "Accepted",
+  string,
+}
+
+model PrivateLinkResource is PrivateLink;
+alias PrivateLinkOperations = PrivateLinks<PrivateLinkResource>;
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+  update is ArmCustomPatchSync<
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
+  >;
+  delete is ArmResourceDeleteSync<Employee>;
+  listByResourceGroup is ArmResourceListByParent<Employee>;
+  listBySubscription is ArmListBySubscription<Employee>;
+  move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
+  checkExistence is ArmResourceCheckExistence<Employee>;
+}
+
+@armResourceOperations(PrivateLinkResource)
+interface EmployeePrivateLinks {
+  list is PrivateLinkOperations.ListByParent<Employee>;
+  get is PrivateLinkOperations.Read<Employee>;
+}
+
+model MoveRequest {
+  from: string;
+  to: string;
+}
+
+model MoveResponse {
+  movingStatus: string;
+}
+
+@armResourceOperations
+interface Dependents {
+  get is ArmResourceRead<Dependent>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Dependent>;
+  update is ArmCustomPatchSync<
+    Dependent,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Dependent, DependentProperties>
+  >;
+  delete is ArmResourceDeleteSync<Dependent>;
+  list is ArmResourceListByParent<Dependent>;
+}
+
+@armResourceOperations(PrivateLinkResource)
+interface DependentPrivateLinks {
+  list is PrivateLinkOperations.ListByParent<Dependent>;
+  get is PrivateLinkOperations.Read<Dependent>;
+}
+
+@parentResource(Employee)
+model Dependent is ProxyResource<DependentProperties> {
+  ...ResourceNameParameter<Dependent>;
+}
+
+model DependentProperties {
+  age: int32;
+  gender: string;
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    expect(provider.resources).toHaveLength(4);
+    ok(provider.resources);
+
+    const employee = provider.resources.find((r) => r.resourceName === "Employee");
+    ok(employee);
+    const dependent = provider.resources.find((r) => r.resourceName === "Dependent");
+    ok(dependent);
+
+    const privateLink = provider.resources.find(
+      (r) => r.resourceName === "EmployeePrivateLinkResource",
+    );
     ok(privateLink);
     expect(privateLink).toMatchObject({
       kind: "Other",
@@ -2144,6 +2261,9 @@ model DependentProperties {
     });
     checkResolvedOperations(privateLink, {
       operations: {
+        lifecycle: {
+          read: [{ operationGroup: "EmployeePrivateLinks", name: "get", kind: "read" }],
+        },
         lists: [{ operationGroup: "EmployeePrivateLinks", name: "list", kind: "list" }],
       },
       resourceType: {
@@ -2152,10 +2272,12 @@ model DependentProperties {
       },
       resourceName: "EmployeePrivateLinkResource",
       resourceInstancePath:
-        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/privateLinkResources/{name}",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/privateLinkResources/{privateLinkResourceName}",
     });
 
-    const privateForDepInstance = provider.resources[2];
+    const privateForDepInstance = provider.resources.find(
+      (r) => r.resourceName === "DependentPrivateLinkResource",
+    );
     ok(privateForDepInstance);
     expect(privateForDepInstance).toMatchObject({
       kind: "Other",
@@ -2175,6 +2297,9 @@ model DependentProperties {
 
     checkResolvedOperations(privateForDepInstance, {
       operations: {
+        lifecycle: {
+          read: [{ operationGroup: "DependentPrivateLinks", name: "get", kind: "read" }],
+        },
         lists: [{ operationGroup: "DependentPrivateLinks", name: "list", kind: "list" }],
       },
       resourceType: {
@@ -2183,7 +2308,7 @@ model DependentProperties {
       },
       resourceName: "DependentPrivateLinkResource",
       resourceInstancePath:
-        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}/privateLinkResources/{name}",
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}/privateLinkResources/{privateLinkResourceName}",
     });
 
     checkArmOperationsHas(provider.providerOperations, [
