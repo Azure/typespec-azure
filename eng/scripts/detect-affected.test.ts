@@ -3,6 +3,15 @@ import { CONFIG, computeAffected, matchesAny } from "./detect-affected.ts";
 
 const NONE = new Set<string>();
 
+// Expected-result helpers derived from CONFIG so these tests stay valid when a
+// new emitter is added (config-only change) without editing every assertion.
+const NONE_AFFECTED = Object.fromEntries(Object.keys(CONFIG.targets).map((k) => [k, false]));
+const ALL_AFFECTED = Object.fromEntries(Object.keys(CONFIG.targets).map((k) => [k, true]));
+const only = (...names: string[]) => ({
+  ...NONE_AFFECTED,
+  ...Object.fromEntries(names.map((n) => [n, true])),
+});
+
 // The module's CLI block is guarded by an `import.meta.url` check and never runs
 // on import, but mock console.log defensively so nothing pollutes the test UI.
 beforeEach(() => {
@@ -52,68 +61,42 @@ describe("matchesAny (exact path or `dir/**` prefix)", () => {
 
 describe("computeAffected", () => {
   it("target affected when its own package is in the affected set", () => {
-    const r = computeAffected(new Set(["@azure-tools/typespec-python"]), [], CONFIG);
-    expect(r).toEqual({ python: true, java: false, typescript: false });
+    const r = computeAffected(new Set([CONFIG.targets.python.package]), [], CONFIG);
+    expect(r).toEqual(only("python"));
   });
 
   it("all emitters affected when they appear as graph dependents", () => {
-    const all = new Set([
-      "@azure-tools/typespec-python",
-      "@azure-tools/typespec-java",
-      "@azure-tools/typespec-ts",
-    ]);
-    expect(computeAffected(all, [], CONFIG)).toEqual({
-      python: true,
-      java: true,
-      typescript: true,
-    });
+    const all = new Set(Object.values(CONFIG.targets).map((t) => t.package));
+    expect(computeAffected(all, [], CONFIG)).toEqual(ALL_AFFECTED);
   });
 
   it("nothing affected with no packages and no files", () => {
-    expect(computeAffected(NONE, [], CONFIG)).toEqual({
-      python: false,
-      java: false,
-      typescript: false,
-    });
+    expect(computeAffected(NONE, [], CONFIG)).toEqual(NONE_AFFECTED);
   });
 
   it("target CI workflow change triggers only that target", () => {
-    expect(computeAffected(NONE, [".github/workflows/ci-python.yml"], CONFIG)).toEqual({
-      python: true,
-      java: false,
-      typescript: false,
-    });
+    expect(computeAffected(NONE, [".github/workflows/ci-python.yml"], CONFIG)).toEqual(
+      only("python"),
+    );
   });
 
   it("target setup action change triggers only that target", () => {
-    expect(computeAffected(NONE, [".github/actions/setup-java/action.yml"], CONFIG)).toEqual({
-      python: false,
-      java: true,
-      typescript: false,
-    });
+    expect(computeAffected(NONE, [".github/actions/setup-java/action.yml"], CONFIG)).toEqual(
+      only("java"),
+    );
   });
 
   it("shared setup action change triggers all targets", () => {
-    expect(computeAffected(NONE, [".github/actions/setup/action.yml"], CONFIG)).toEqual({
-      python: true,
-      java: true,
-      typescript: true,
-    });
+    expect(computeAffected(NONE, [".github/actions/setup/action.yml"], CONFIG)).toEqual(
+      ALL_AFFECTED,
+    );
   });
 
   it("core submodule bump triggers all targets", () => {
-    expect(computeAffected(NONE, ["core"], CONFIG)).toEqual({
-      python: true,
-      java: true,
-      typescript: true,
-    });
+    expect(computeAffected(NONE, ["core"], CONFIG)).toEqual(ALL_AFFECTED);
   });
 
   it("unrelated root file change triggers nothing", () => {
-    expect(computeAffected(NONE, ["README.md", "package.json"], CONFIG)).toEqual({
-      python: false,
-      java: false,
-      typescript: false,
-    });
+    expect(computeAffected(NONE, ["README.md", "package.json"], CONFIG)).toEqual(NONE_AFFECTED);
   });
 });

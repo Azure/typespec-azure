@@ -52,9 +52,15 @@ jobs:
     if: ${{ fromJSON(needs.detect-affected.outputs.affected).typescript }}
     uses: ./.github/workflows/ci-typescript.yml
 
+  go:
+    name: "Go"
+    needs: detect-affected
+    if: ${{ fromJSON(needs.detect-affected.outputs.affected).go }}
+    uses: ./.github/workflows/ci-go.yml
+
   downstream-ci-gate:
     name: "Gate"
-    needs: [detect-affected, python, java, typescript]
+    needs: [detect-affected, python, java, typescript, go]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
