@@ -72,13 +72,14 @@ finally {
 
 # Point the local @azure-tools/typespec-java dependency at the .tgz produced by
 # this repo's emitter (Build-TypeSpec.ps1 runs `npm pack`, which names the file
-# azure-tools-typespec-java-<version>.tgz). Keep that version in sync with
-# packages/typespec-java/package.json so a version bump there propagates here.
-# This depends only on the local repo, not on core, so it runs outside the
-# core-commit checkout as its own read-modify-write.
+# azure-tools-typespec-java-<version>.tgz). Keep both this test project's own
+# version and that dependency in sync with packages/typespec-java/package.json so
+# a version bump there propagates here. This depends only on the local repo, not
+# on core, so it runs outside the core-commit checkout as its own read-modify-write.
 $localPackageJsonPath = Join-Path $scriptRoot "package.json"
 $emitterVersion = (Get-Content (Join-Path $packageRoot "package.json") -Raw | ConvertFrom-Json).version
 $localPackage = Get-Content $localPackageJsonPath -Raw | ConvertFrom-Json
+$localPackage.version = $emitterVersion
 if ($localPackage.dependencies.PSObject.Properties.Name -contains "@azure-tools/typespec-java") {
     $localPackage.dependencies.'@azure-tools/typespec-java' = "file:../azure-tools-typespec-java-$emitterVersion.tgz"
 }
