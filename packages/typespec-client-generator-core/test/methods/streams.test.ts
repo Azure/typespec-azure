@@ -1,51 +1,8 @@
-import { resolvePath } from "@typespec/compiler";
-import { createTester } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { UsageFlags } from "../../src/interfaces.js";
-import { createSdkContextForTester } from "../tester.js";
+import { createSdkContextForTester, StreamsTesterWithBuiltInService } from "../tester.js";
 import { getServiceMethodOfClient } from "../utils.js";
-
-const StreamsTester = createTester(resolvePath(import.meta.dirname, "../.."), {
-  libraries: [
-    "@typespec/http",
-    "@typespec/rest",
-    "@typespec/versioning",
-    "@typespec/streams",
-    "@typespec/sse",
-    "@typespec/events",
-    "@azure-tools/typespec-client-generator-core",
-  ],
-})
-  .import(
-    "@typespec/http",
-    "@typespec/rest",
-    "@typespec/versioning",
-    "@typespec/http/streams",
-    "@typespec/streams",
-    "@typespec/sse",
-    "@typespec/events",
-    "@azure-tools/typespec-client-generator-core",
-  )
-  .using(
-    "Http",
-    "Rest",
-    "Versioning",
-    "TypeSpec.Http.Streams",
-    "TypeSpec.Streams",
-    "TypeSpec.SSE",
-    "TypeSpec.Events",
-    "Azure.ClientGenerator.Core",
-  );
-
-const StreamsTesterWithBuiltInService = StreamsTester.wrap(
-  (x) => `
-@service
-namespace TestService;
-
-${x}
-`,
-);
 
 describe("stream request", () => {
   it("http stream request", async () => {

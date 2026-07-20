@@ -12,6 +12,7 @@ import {
   Namespace,
   NumericLiteral,
   Operation,
+  Program,
   Scalar,
   StringLiteral,
   Tuple,
@@ -21,6 +22,7 @@ import {
   getDiscriminator,
   getEncode,
   getLifecycleVisibilityEnum,
+  getMediaTypeHint,
   getSummary,
   getVisibilityForClass,
   ignoreDiagnostics,
@@ -1540,8 +1542,25 @@ interface PropagationOptions {
 }
 
 /**
- * Propagates `UsageFlags.Json` to individual SSE event `type` and `payloadType` based on
- * their per-event content type. Only applies when the stream type is an `@events` union.
+ * Infers the default content type for an event type, mirroring the HTTP lib behavior:
+ * - Models → "application/json"
+ * - Scalars → "text/plain"
+ * - Literals/constants → undefined (no serialization needed)
+ */
+function inferEventContentType(program: Program, type: Type): string | undefined {
+  // Use @mediaTypeHint if explicitly set on the type, otherwise fall back to kind-based default
+  const hint = getMediaTypeHint(program, type);
+  if (hint) return hint;
+  if (type.kind === "Model") return "application/json";
+  if (type.kind === "Scalar") return "text/plain";
+  return undefined;
+}
+
+/**
+ * Propagates `UsageFlags.Json` and serialization options to individual SSE event `type` and
+ * `payloadType` based on their per-event content type. When no explicit content type is set,
+ * infers a default using the same logic as the HTTP lib (model → application/json,
+ * scalar → text/plain).
  */
 function propagateSseEventUsage(
   context: TCGCContext,
@@ -1554,17 +1573,30 @@ function propagateSseEventUsage(
   }
   const eventDefinitions = diagnostics.pipe(getEventDefinitions(context.program, streamType));
   for (const event of eventDefinitions) {
-    if (event.contentType && isMediaTypeJson(event.contentType)) {
+    const effectiveContentType =
+      event.contentType ?? inferEventContentType(context.program, event.type);
+    const effectivePayloadContentType =
+      event.payloadContentType ?? inferEventContentType(context.program, event.payloadType);
+
+    if (effectiveContentType) {
       const sdkType = diagnostics.pipe(
         getClientTypeWithDiagnostics(context, event.type, operation),
       );
-      diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkType));
+      if (isMediaTypeJson(effectiveContentType)) {
+        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkType));
+      }
+      diagnostics.pipe(updateSerializationOptions(context, sdkType, [effectiveContentType]));
     }
-    if (event.payloadContentType && isMediaTypeJson(event.payloadContentType)) {
+    if (effectivePayloadContentType) {
       const sdkPayloadType = diagnostics.pipe(
         getClientTypeWithDiagnostics(context, event.payloadType, operation),
       );
-      diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkPayloadType));
+      if (isMediaTypeJson(effectivePayloadContentType)) {
+        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkPayloadType));
+      }
+      diagnostics.pipe(
+        updateSerializationOptions(context, sdkPayloadType, [effectivePayloadContentType]),
+      );
     }
   }
 }

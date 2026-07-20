@@ -1,55 +1,12 @@
-import { resolvePath } from "@typespec/compiler";
-import { createTester } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
-import { UsageFlags } from "../../../src/interfaces.js";
-import { createSdkContextForTester } from "../../tester.js";
-import { getServiceMethodOfClient } from "../../utils.js";
-
-const SseTester = createTester(resolvePath(import.meta.dirname, "../../.."), {
-  libraries: [
-    "@typespec/http",
-    "@typespec/rest",
-    "@typespec/versioning",
-    "@typespec/streams",
-    "@typespec/sse",
-    "@typespec/events",
-    "@azure-tools/typespec-client-generator-core",
-  ],
-})
-  .import(
-    "@typespec/http",
-    "@typespec/rest",
-    "@typespec/versioning",
-    "@typespec/http/streams",
-    "@typespec/streams",
-    "@typespec/sse",
-    "@typespec/events",
-    "@azure-tools/typespec-client-generator-core",
-  )
-  .using(
-    "Http",
-    "Rest",
-    "Versioning",
-    "TypeSpec.Http.Streams",
-    "TypeSpec.Streams",
-    "TypeSpec.SSE",
-    "TypeSpec.Events",
-    "Azure.ClientGenerator.Core",
-  );
-
-const SseTesterWithService = SseTester.wrap(
-  (x) => `
-@service
-namespace TestService;
-
-${x}
-`,
-);
+import { UsageFlags } from "../../src/interfaces.js";
+import { createSdkContextForTester, StreamsTesterWithBuiltInService } from "../tester.js";
+import { getServiceMethodOfClient } from "../utils.js";
 
 describe("sse request", () => {
   it("sse request with heterogeneous events", async () => {
-    const { program } = await SseTesterWithService.compile(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         model UserConnect {
           username: string;
@@ -114,21 +71,25 @@ describe("sse request", () => {
     strictEqual(userconnect.type.kind, "model");
     strictEqual(userconnect.type.name, "UserConnect");
     strictEqual(userconnect.payloadType, userconnect.type);
+    // No @Events.contentType decorator => contentType is undefined
     strictEqual(userconnect.contentType, undefined);
 
     strictEqual(sseMeta.events[1].eventType, "usermessage");
     strictEqual(sseMeta.events[2].eventType, "userdisconnect");
 
+    // Terminal event: the type is a constant representing the literal value "[unsubscribe]"
     const unsubscribe = sseMeta.events[3];
     strictEqual(unsubscribe.eventType, undefined);
     strictEqual(unsubscribe.isTerminalEvent, true);
     strictEqual(unsubscribe.contentType, "text/plain");
+    strictEqual(unsubscribe.type.kind, "constant");
+    strictEqual(unsubscribe.type.value, "[unsubscribe]");
   });
 });
 
 describe("sse response", () => {
   it("sse response with heterogeneous events and terminal event", async () => {
-    const { program } = await SseTesterWithService.compile(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         model UserConnect {
           username: string;
@@ -189,18 +150,25 @@ describe("sse response", () => {
     // streamType union has Output usage (no Json since SSE uses text/event-stream)
     strictEqual(responseMeta.streamType.usage, UsageFlags.Output);
 
-    // Event variant models also have Output usage only (no contentType set => no Json)
+    // Event variant models have Output + Json usage (model type => inferred application/json)
     const responseSse = method.operation.responses[0].sseMetadata;
     ok(responseSse);
     strictEqual(responseSse.events.length, 4);
     strictEqual(responseSse.events[0].eventType, "userconnect");
     strictEqual(responseSse.events[0].type.kind, "model");
     strictEqual(responseSse.events[0].type.name, "UserConnect");
-    // No @Events.contentType set => no Json usage, only Output from union propagation
-    strictEqual((responseSse.events[0].type as any).usage, UsageFlags.Output);
-    strictEqual(responseSse.events[3].eventType, undefined);
-    strictEqual(responseSse.events[3].isTerminalEvent, true);
-    strictEqual(responseSse.events[3].contentType, "text/plain");
+    // No @Events.contentType set => contentType is undefined, but model type => inferred Json
+    strictEqual(responseSse.events[0].contentType, undefined);
+    strictEqual((responseSse.events[0].type as any).usage, UsageFlags.Output | UsageFlags.Json);
+    ok((responseSse.events[0].type as any).serializationOptions.json);
+
+    // Terminal event has constant type with the literal value
+    const terminal = responseSse.events[3];
+    strictEqual(terminal.eventType, undefined);
+    strictEqual(terminal.isTerminalEvent, true);
+    strictEqual(terminal.contentType, "text/plain");
+    strictEqual(terminal.type.kind, "constant");
+    strictEqual(terminal.type.value, "[unsubscribe]");
 
     const methodSse = method.response.sseMetadata;
     ok(methodSse);
@@ -214,7 +182,7 @@ describe("sse response", () => {
 // terminal event, and a POST whose response is an SSE stream.
 describe("sse scenarios (mirroring spector streaming/sse)", () => {
   it("basic: unnamed message events", async () => {
-    const { program } = await SseTesterWithService.compile(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         model Info {
           desc: string;
@@ -254,7 +222,7 @@ describe("sse scenarios (mirroring spector streaming/sse)", () => {
   });
 
   it("named events with a terminal event", async () => {
-    const { program } = await SseTesterWithService.compile(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         model ResponseCreated {
           id: string;
@@ -297,14 +265,17 @@ describe("sse scenarios (mirroring spector streaming/sse)", () => {
     strictEqual(responseSse.events[1].eventType, "responseDelta");
     strictEqual((responseSse.events[1].type as any).usage, UsageFlags.Output | UsageFlags.Json);
 
+    // Terminal event: type is a constant with the "[DONE]" value
     const terminal = responseSse.events[2];
     strictEqual(terminal.eventType, undefined);
     strictEqual(terminal.isTerminalEvent, true);
     strictEqual(terminal.contentType, "text/plain");
+    strictEqual(terminal.type.kind, "constant");
+    strictEqual(terminal.type.value, "[DONE]");
   });
 
   it("POST with a request body and an SSE-streamed response", async () => {
-    const { program } = await SseTesterWithService.compile(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         model RetrievalRequest {
           query: string;
@@ -355,6 +326,9 @@ describe("sse scenarios (mirroring spector streaming/sse)", () => {
     strictEqual(responseSse.events[0].eventType, "partialResult");
     strictEqual(responseSse.events[1].eventType, "finalResult");
     strictEqual(responseSse.events[2].isTerminalEvent, true);
+    // Terminal constant is accessible via type
+    strictEqual(responseSse.events[2].type.kind, "constant");
+    strictEqual(responseSse.events[2].type.value, "[DONE]");
 
     // Request model has Input + Json usage
     strictEqual(method.operation.bodyParam?.type.usage, UsageFlags.Input | UsageFlags.Json);
@@ -366,7 +340,7 @@ describe("sse scenarios (mirroring spector streaming/sse)", () => {
 
 describe("sse event envelope", () => {
   it("event with @data payload uses envelope and payload types", async () => {
-    const { program } = await SseTesterWithService.compile(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         model ChatMessage {
           role: string;
@@ -414,7 +388,7 @@ describe("sse event envelope", () => {
 
 describe("sse usage and access propagation", () => {
   it("propagates Json usage to event models with application/json content type", async () => {
-    const { program } = await SseTesterWithService.compile(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         model EventA {
           value: string;
@@ -447,13 +421,17 @@ describe("sse usage and access propagation", () => {
     strictEqual((responseSse.events[0].type as any).usage, UsageFlags.Output | UsageFlags.Json);
     strictEqual((responseSse.events[1].type as any).usage, UsageFlags.Output | UsageFlags.Json);
 
+    // Serialization options are set on event models
+    ok((responseSse.events[0].type as any).serializationOptions.json);
+    ok((responseSse.events[1].type as any).serializationOptions.json);
+
     // They also appear in sdkPackage.models
     ok(sdkPackage.models.find((m) => m.name === "EventA"));
     ok(sdkPackage.models.find((m) => m.name === "EventB"));
   });
 
   it("does not propagate Json usage when event has non-json content type", async () => {
-    const { program } = await SseTesterWithService.compile(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         model TextEvent {
           text: string;
@@ -478,8 +456,8 @@ describe("sse usage and access propagation", () => {
     strictEqual((responseSse.events[0].type as any).usage, UsageFlags.Output);
   });
 
-  it("does not propagate Json usage when event has no content type", async () => {
-    const { program } = await SseTesterWithService.compile(
+  it("infers application/json for model events with no explicit content type", async () => {
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         model SimpleEvent {
           data: string;
@@ -499,12 +477,13 @@ describe("sse usage and access propagation", () => {
     const responseSse = method.operation.responses[0].sseMetadata;
     ok(responseSse);
 
-    // No contentType set => no Json usage, only Output
-    strictEqual((responseSse.events[0].type as any).usage, UsageFlags.Output);
+    // No explicit contentType, but model type => inferred application/json => Json usage + serialization
+    strictEqual((responseSse.events[0].type as any).usage, UsageFlags.Output | UsageFlags.Json);
+    ok((responseSse.events[0].type as any).serializationOptions.json);
   });
 
   it("propagates Json usage to @data payload type in envelope events", async () => {
-    const { program } = await SseTesterWithService.compile(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         model Payload {
           value: string;
@@ -530,10 +509,13 @@ describe("sse usage and access propagation", () => {
     // Both the envelope type and the payload type get Json usage
     strictEqual((event.type as any).usage, UsageFlags.Output | UsageFlags.Json);
     strictEqual((event.payloadType as any).usage, UsageFlags.Output | UsageFlags.Json);
+    // Serialization options set on both envelope and payload types
+    ok((event.type as any).serializationOptions.json);
+    ok((event.payloadType as any).serializationOptions.json);
   });
 
   it("propagates access to event models", async () => {
-    const { program } = await SseTesterWithService.compile(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         model PublicEvent {
           message: string;
@@ -558,7 +540,7 @@ describe("sse usage and access propagation", () => {
   });
 
   it("propagates Input + Json usage for SSE request with json content type events", async () => {
-    const { program } = await SseTesterWithService.compile(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         model InputEvent {
           data: string;
@@ -586,7 +568,7 @@ describe("sse usage and access propagation", () => {
 
 describe("sse with HttpStream", () => {
   it("HttpStream with text/event-stream content type and @events union", async () => {
-    const { program } = await SseTesterWithService.compile(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         model Notification {
           id: string;
@@ -621,6 +603,9 @@ describe("sse with HttpStream", () => {
     strictEqual(responseSse.events[0].eventType, "notification");
     strictEqual(responseSse.events[0].type.name, "Notification");
     strictEqual(responseSse.events[1].isTerminalEvent, true);
+    // Terminal constant accessible
+    strictEqual(responseSse.events[1].type.kind, "constant");
+    strictEqual(responseSse.events[1].type.value, "[END]");
 
     // Notification model gets Output + Json usage
     strictEqual((responseSse.events[0].type as any).usage, UsageFlags.Output | UsageFlags.Json);
