@@ -2,7 +2,7 @@ import { passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
-Scenarios.Client_AlternateApiVersion_Service_ClientApiVersions_sendApiVersion = passOnSuccess([
+Scenarios.Azure_ClientGenerator_Core_ApiVersion_ClientApiVersions_sendApiVersion = passOnSuccess([
   {
     uri: "/azure/client-generator-core/api-version/client-api-versions",
     method: "post",

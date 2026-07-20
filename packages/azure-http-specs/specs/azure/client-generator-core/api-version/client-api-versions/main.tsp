@@ -1,7 +1,3 @@
-/**
- * DO NOT GENERATE FROM THIS FILE USE client.tsp
- * This is just to simulate a service entrypoint
- */
 import "@typespec/http";
 import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
@@ -19,13 +15,22 @@ using Spector;
     versioned: ServiceApiVersions,
   }
 )
-namespace Client.AlternateApiVersion.Service.ClientApiVersions;
+namespace Azure.ClientGenerator.Core.ApiVersion.ClientApiVersions;
 
 @doc("Service supported api versions.")
 enum ServiceApiVersions {
   @doc("Service api version 2024-01-01.")
   v2024_01_01: "2024-01-01",
 }
+
+// Extend the client api version enum with an older version not present in the service versions.
+// The client enum includes "2022-10-01" in addition to all service versions.
+enum ClientApiVersions {
+  v2022_10_01: "2022-10-01",
+  ...ServiceApiVersions,
+}
+
+@@clientApiVersions(Azure.ClientGenerator.Core.ApiVersion.ClientApiVersions, ClientApiVersions);
 
 @scenario
 @scenarioDoc("""
