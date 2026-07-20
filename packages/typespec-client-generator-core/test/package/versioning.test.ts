@@ -1429,3 +1429,37 @@ it("version not exist", async () => {
     ["v1", "v2", "v3"],
   );
 });
+
+it("client has versionsEnum reference", async () => {
+  await runner.compile(
+    `
+    @service
+    @versioned(Versions)
+    @server(
+      "{endpoint}",
+      "Testserver endpoint",
+      {
+        endpoint: url,
+      }
+    )
+    namespace Versioning;
+    enum Versions {
+      v2023_10_01: "2023-10-01",
+      v2024_10_01: "2024-10-01",
+    }
+    op test(): void;
+    `,
+  );
+  const sdkPackage = runner.context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  ok(client.versionsEnum);
+  strictEqual(client.versionsEnum.kind, "enum");
+  strictEqual(client.versionsEnum.name, "Versions");
+  strictEqual(client.versionsEnum.usage, UsageFlags.ApiVersionEnum);
+  strictEqual(client.versionsEnum.values.length, 2);
+  strictEqual(client.versionsEnum.values[0].value, "2023-10-01");
+  strictEqual(client.versionsEnum.values[1].value, "2024-10-01");
+  // versionsEnum should be the same object as in sdkPackage.enums
+  strictEqual(client.versionsEnum, sdkPackage.enums[0]);
+});

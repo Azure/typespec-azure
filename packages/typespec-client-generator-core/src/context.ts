@@ -85,6 +85,7 @@ export function createTCGCContext(
     __httpOperationExamples: new Map(),
     __pagedResultSet: new Set(),
     __namingContextPath: [],
+    __serviceToVersionsEnum: new Map(),
 
     getMutatedGlobalNamespace(): Namespace {
       if (options?.mutateNamespace === false) {

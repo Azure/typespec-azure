@@ -2469,6 +2469,7 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
       }
       filterPreviewVersion(context, sdkVersionsEnum, versions?.at(-1) || "", service);
       diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum));
+      context.__serviceToVersionsEnum.set(client.service, sdkVersionsEnum);
     }
   }
   // update for orphan models/enums/unions
