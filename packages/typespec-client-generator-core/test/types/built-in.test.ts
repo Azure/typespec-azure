@@ -410,3 +410,37 @@ it("integer scalar encoded as string", async function () {
   strictEqual(sdkType.baseType?.kind, "int32");
   assertModelsAndEnumsHaveNames(context);
 });
+
+it("boolean model property encoded as string", async function () {
+  await runner.compileWithBuiltInService(
+    `
+      @usage(Usage.input | Usage.output)
+      model Test {
+        @encode(string)
+        value: boolean;
+      }
+      `,
+  );
+  const sdkType = getSdkTypeHelper(runner);
+  strictEqual(sdkType.kind, "boolean");
+  strictEqual(sdkType.encode, "string");
+  strictEqual(sdkType.baseType, undefined);
+});
+
+it("boolean scalar encoded as string", async function () {
+  await runner.compileWithBuiltInService(
+    `
+      @encode(string)
+      scalar boolEncodedAsString extends boolean;
+
+      @usage(Usage.input | Usage.output)
+      model Test {
+        value: boolEncodedAsString;
+      }
+    `,
+  );
+  const sdkType = getSdkTypeHelper(runner);
+  strictEqual(sdkType.kind, "boolean");
+  strictEqual(sdkType.encode, "string");
+  strictEqual(sdkType.baseType?.kind, "boolean");
+});
