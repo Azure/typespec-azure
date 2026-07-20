@@ -1,6 +1,5 @@
 import {
   createRule,
-  getNamespaceFullName,
   isNullType,
   Model,
   ModelProperty,
@@ -8,6 +7,7 @@ import {
   Program,
   Union,
 } from "@typespec/compiler";
+import { SyntaxKind } from "@typespec/compiler/ast";
 import {
   getHeaderFieldName,
   isBody,
@@ -21,7 +21,7 @@ import {
 export const noUnnamedTypesRule = createRule({
   name: "no-unnamed-types",
   description:
-    "Azure services should not have anonymous models or union expressions. Define them as named declarations.",
+    "Azure services should not have anonymous models, union expressions, enum expressions, or scalar expressions. Define them as named declarations.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-unnamed-types",
   messages: {
@@ -58,10 +58,20 @@ export const noUnnamedTypesRule = createRule({
           type.kind === "Model" &&
           type.name === "" &&
           type.properties.size > 0 &&
-          !isStandardLibraryType(type) &&
-          !isHttpEnvelope(program, type)
+          !isHttpEnvelope(program, type) &&
+          !isInsideTemplateArgument(type)
         ) {
           invalidModels.add(type);
+        }
+
+        // Flag anonymous enums used as property types.
+        if (type.kind === "Enum" && !type.name && !isInsideTemplateArgument(type)) {
+          context.reportDiagnostic({ target: type, format: { type: "enum" } });
+        }
+
+        // Flag anonymous scalars used as property types.
+        if (type.kind === "Scalar" && !type.name && !isInsideTemplateArgument(type)) {
+          context.reportDiagnostic({ target: type, format: { type: "scalar" } });
         }
       },
       operation: (operation) => {
@@ -91,18 +101,16 @@ export const noUnnamedTypesRule = createRule({
   },
 });
 
-function isStandardLibraryType(type: Model | Union): boolean {
-  const namespace = type.namespace;
-  if (namespace === undefined) {
-    return false;
+/** Check if the type's source node is inside a template argument position */
+function isInsideTemplateArgument(type: { node?: { kind: SyntaxKind; parent?: any } }): boolean {
+  let node: { kind: SyntaxKind; parent?: any } | undefined = type.node;
+  while (node) {
+    if (node.kind === SyntaxKind.TemplateArgument) {
+      return true;
+    }
+    node = node.parent;
   }
-  const fullName = getNamespaceFullName(namespace);
-  return (
-    fullName === "TypeSpec" ||
-    fullName === "Azure" ||
-    fullName.startsWith("TypeSpec.") ||
-    fullName.startsWith("Azure.")
-  );
+  return false;
 }
 
 function isHttpEnvelope(program: Program, model: Model): boolean {
