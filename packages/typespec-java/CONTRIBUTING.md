@@ -87,7 +87,75 @@ Make sure to run the following commands:
 
 ## Release Process
 
-TODO: The post-release process for `@azure-tools/typespec-java` has not been finalized yet.
+This describes how to ship a patch (hotfix) release of `@azure-tools/typespec-java` from a
+`release/*` branch.
+
+### 1. Create the release branch and bump the version
+
+The overall publishing background for this repo is documented in the root
+[`CONTRIBUTING.md` "Publishing" section](../../CONTRIBUTING.md#publishing) (the monthly
+TypeSpec-Azure release flow). For preparing the branch and bumping this package's version
+specifically, follow the [`hotfix-release` skill](../../.github/skills/hotfix-release/SKILL.md),
+which walks through creating the `publish/hotfix/<name>-<sprint>` branch off the
+`release/<sprint>` branch and running `pnpm chronus version --ignore-policies`.
+
+### 2. Pin the core commit for the patch (`core-commit.json`)
+
+Release branches do not carry `core/` submodule updates, so bump the pin instead of the
+submodule. Update the `sha` field in [`core-commit.json`](./core-commit.json) to the target
+upstream `core` commit you want this patch to build and generate from. `Build-Generator.ps1` /
+`Copy-Sources.ps1` (build) and `SyncTests.ps1` transiently check out that pinned commit — when it
+is newer than the branch's submodule checkout — and always restore the submodule afterwards, so
+the patch picks up the core changes without moving the submodule pointer.
+
+### 3. Sync tests from core
+
+Run the test sync from `packages/typespec-java/emitter-tests`:
+
+```powershell
+pwsh ./SyncTests.ps1
+```
+
+This copies the hand-written tests (`src`) and TypeSpec specs (`tsp`) from
+`http-client-generator-test` in the pinned `core/` commit, syncs shared dependency/override
+versions, and updates `emitter-tests/package.json` — both its own `version` and the
+`file:../azure-tools-typespec-java-<version>.tgz` dependency — to align with the new emitter
+version from `package.json`. Commit any resulting changes.
+
+### 4. Open the PR against the release branch
+
+Open a PR targeting `release/<sprint>` (not `main`).
+
+### 5. (Optional) Validate SDK regeneration from the PR emitter (before merging)
+
+Optionally, before merging, use the
+[`typespec-java - sync sdk`](https://dev.azure.com/azure-sdk/internal/_build?definitionId=8274&_a=summary)
+pipeline to regenerate the Azure SDKs from the emitter built out of this PR:
+
+- Leave **Emitter Version** as `none` (builds the emitter from source).
+- Set **PR Id or Branch** to this PR's ID.
+
+This produces an SDK PR generated from the PR's emitter so you can validate the regeneration
+before the emitter is released.
+
+### 6. Merge and auto-publish
+
+After the PR is merged, the emitter is automatically released by the
+[`typespec-azure - Publish`](https://dev.azure.com/azure-sdk/internal/_build?definitionId=1793)
+pipeline.
+
+### 7. Backmerge to main
+
+Merging into the release branch creates a backmerge branch
+(`backmerge/release/<sprint>-<date>`). Open a PR from that branch targeting `main` and merge it so
+the version bump and changelog are reflected in `main`.
+
+### 8. Regenerate and merge the SDK PR with the released version
+
+Finally, run the
+[`typespec-java - sync sdk`](https://dev.azure.com/azure-sdk/internal/_build?definitionId=8274&_a=summary)
+pipeline again, this time with **Emitter Version** set to the released `@azure-tools/typespec-java`
+version (leaving PR Id or Branch as `none`). Review and merge the resulting SDK PR.
 
 ## Trademarks
 
