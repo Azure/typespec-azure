@@ -59,7 +59,8 @@ export const noUnnamedTypesRule = createRule({
           type.name === "" &&
           type.properties.size > 0 &&
           !isHttpEnvelope(program, type) &&
-          !isInsideTemplateArgument(type)
+          !isInsideTemplateArgument(type) &&
+          !isMultipartBodyProperty(program, prop)
         ) {
           invalidModels.add(type);
         }
