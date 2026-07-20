@@ -54,7 +54,7 @@ steps:
 
   - name: Install doc-updater dependencies
     working-directory: eng/scripts/doc-updater
-    run: pnpm install
+    run: npm install
 
   - name: Pre-compute context
     env:
@@ -67,7 +67,7 @@ steps:
         REBUILD_FLAG="--full-rebuild"
       fi
 
-      pnpm exec tsx eng/scripts/doc-updater/src/precompute.ts \
+      npx tsx eng/scripts/doc-updater/src/precompute.ts \
         --config "$CONFIG_INPUT" \
         --output /tmp/gh-aw/agent/context.json \
         ${REBUILD_FLAG:+"$REBUILD_FLAG"}
@@ -102,7 +102,7 @@ post-steps:
       ALLOWED_FILE="eng/scripts/doc-updater/configs/${CONFIG}.yaml"
 
       # Read allowedPaths using the doc-updater config loader
-      ALLOWED_PATHS=$(pnpm exec tsx eng/scripts/doc-updater/src/print-allowed-paths.ts --config "$CONFIG")
+      ALLOWED_PATHS=$(npx tsx eng/scripts/doc-updater/src/print-allowed-paths.ts --config "$CONFIG")
 
       if [ -z "$ALLOWED_PATHS" ]; then
         echo "WARNING: No allowedPaths in config, skipping validation"
@@ -170,7 +170,7 @@ been pre-computed and is available in `/tmp/gh-aw/agent/context.json`.
 - **Do not defer work.** Fix every issue you find in this run. Do not leave "remaining gaps" or "future work" in the knowledge base or PR description — the knowledge base is for lessons learned, not a to-do list.
 - **Update the knowledge base** at `knowledgePath` as you work (see Knowledge Base Rules below).
 - **Create exactly one pull request at the very end.** Only the main agent (you) may call `create_pull_request`, and only once, after ALL steps and ALL file edits are complete. Never delegate PR creation to a sub-agent.
-- **Update metadata as your final step before creating the PR.** Run `pnpm exec tsx eng/scripts/doc-updater/src/update-meta.ts --config <config-name> --commit <checkoutCommit>` (using the config name and `checkoutCommit` from the context) via the bash tool. This records the checkout commit hash so the next incremental run knows where to start. This must be done inside the agent so the metadata file is captured by safe-outputs.
+- **Update metadata as your final step before creating the PR.** Run `npx tsx eng/scripts/doc-updater/src/update-meta.ts --config <config-name> --commit <checkoutCommit>` (using the config name and `checkoutCommit` from the context) via the bash tool. This records the checkout commit hash so the next incremental run knows where to start. This must be done inside the agent so the metadata file is captured by safe-outputs.
 
 ## Knowledge Base Rules
 

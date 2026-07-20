@@ -2,6 +2,6 @@
 steps:
   - script: |
       sudo dpkg --configure -a
-      pnpm exec playwright install --with-deps
+      npx playwright install --with-deps
     displayName: Install playwright browsers
     workingDirectory: packages/typespec-azure-playground-website

@@ -7,7 +7,7 @@
  * language instructions and thus resist prompt injection.
  *
  * Usage:
- *   pnpm exec tsx src/precompute.ts --config <name> --output <path> [--full-rebuild]
+ *   npx tsx src/precompute.ts --config <name> --output <path> [--full-rebuild]
  */
 
 import { mkdir, writeFile } from "node:fs/promises";
@@ -120,7 +120,7 @@ function parsePrecomputeArgs(): PrecomputeArgs {
 
   if (!parsed.config || !parsed.output) {
     console.error(
-      "Usage: pnpm exec tsx src/precompute.ts --config <name> --output <path> [--full-rebuild]",
+      "Usage: npx tsx src/precompute.ts --config <name> --output <path> [--full-rebuild]",
     );
     process.exit(1);
   }

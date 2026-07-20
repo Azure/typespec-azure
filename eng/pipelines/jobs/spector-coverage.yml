@@ -162,7 +162,7 @@ jobs:
           scriptType: "bash"
           scriptLocation: "inlineScript"
           inlineScript: >-
-            pnpm exec tsp-spector upload-coverage
+            npx tsp-spector upload-coverage
             --coverageFile ./coverage/spector-coverage-typescript-azure.json
             --generatorName "@azure-tools/typespec-ts"
             --storageAccountName typespec

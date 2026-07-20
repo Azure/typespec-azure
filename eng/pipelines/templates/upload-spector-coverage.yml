@@ -36,7 +36,7 @@ steps:
           scriptType: "bash"
           scriptLocation: "inlineScript"
           inlineScript: >-
-            pnpm exec tsp-spector upload-coverage
+            npx tsp-spector upload-coverage
             --coverageFile ./spec-coverage.json
             --generatorName "${{ parameters.UnbrandedGeneratorName }}"
             --storageAccountName typespec
@@ -53,7 +53,7 @@ steps:
       scriptType: "bash"
       scriptLocation: "inlineScript"
       inlineScript: >-
-        pnpm exec tsp-spector upload-coverage
+        npx tsp-spector upload-coverage
         --coverageFile ./spec-coverage.json
         --generatorName "${{ parameters.GeneratorName }}"
         --storageAccountName typespec

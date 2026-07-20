@@ -105,7 +105,7 @@ jobs:
       - name: Install playwright browsers
         run: |
           sudo dpkg --configure -a
-          pnpm exec playwright install --with-deps
+          npx playwright install --with-deps
         working-directory: packages/typespec-azure-playground-website
 
       - name: Build

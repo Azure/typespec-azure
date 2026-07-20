@@ -64,7 +64,7 @@ extends:
 
               - template: /eng/common/pipelines/templates/steps/login-to-github.yml
 
-              - script: pnpm exec tsx core/eng/tsp-core/scripts/create-tryit-comment.ts "typespec-azure"
+              - script: npx tsx core/eng/tsp-core/scripts/create-tryit-comment.ts "typespec-azure"
                 displayName: Check already commented
                 env:
                   GH_TOKEN: $(GH_TOKEN)
@@ -80,7 +80,7 @@ extends:
 
               - template: /eng/common/pipelines/templates/steps/login-to-github.yml
 
-              - script: pnpm dlx @chronus/github-pr-commenter@0.5.0 chronus-github-pr-commenter
+              - script: npx -p @chronus/github-pr-commenter@0.5.0 chronus-github-pr-commenter
                 displayName: Make comment about changes
                 env:
                   GITHUB_TOKEN: $(GH_TOKEN)
