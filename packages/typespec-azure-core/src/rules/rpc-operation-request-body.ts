@@ -1,5 +1,6 @@
 import { Operation, createRule, paramMessage } from "@typespec/compiler";
-import { getHttpOperation, isBodyIgnore } from "@typespec/http";
+import { isBodyIgnore } from "@typespec/http";
+import { getCachedHttpOperation } from "./utils.js";
 
 export const rpcOperationRequestBodyRule = createRule({
   name: "rpc-operation-request-body",
@@ -23,7 +24,7 @@ export const rpcOperationRequestBodyRule = createRule({
             operation.namespace?.name === "Core" &&
             operation.namespace?.namespace?.name === "Azure"
           ) {
-            const httpOperation = getHttpOperation(context.program, originalOperation)[0];
+            const httpOperation = getCachedHttpOperation(context.program, originalOperation);
             const bodyParam = httpOperation.parameters.properties.find(
               (p) =>
                 p.kind === "body" ||

@@ -1,6 +1,5 @@
-import { Operation, createRule, ignoreDiagnostics } from "@typespec/compiler";
-import { getHttpOperation } from "@typespec/http";
-import { isAzureSubNamespace, isExcludedCoreType } from "./utils.js";
+import { Operation, createRule } from "@typespec/compiler";
+import { getCachedHttpOperation, isAzureSubNamespace, isExcludedCoreType } from "./utils.js";
 
 export const noErrorStatusCodesRule = createRule({
   name: "no-error-status-codes",
@@ -17,7 +16,7 @@ export const noErrorStatusCodesRule = createRule({
         if (isExcludedCoreType(context.program, operation)) return;
         if (!isAzureSubNamespace(context.program, operation.namespace)) return;
 
-        const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, operation));
+        const httpOperation = getCachedHttpOperation(context.program, operation);
         if (httpOperation.responses !== undefined) {
           for (const response of httpOperation.responses) {
             const statusCode = response.statusCodes;

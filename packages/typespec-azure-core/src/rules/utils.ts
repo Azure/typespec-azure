@@ -213,3 +213,28 @@ export function isInDisallowedNamespace(
   }
   return false;
 }
+
+import { getHttpOperation as _getHttpOperation, HttpOperation } from "@typespec/http";
+import { Diagnostic, ignoreDiagnostics as _ignoreDiagnostics } from "@typespec/compiler";
+
+/**
+ * Module-level cache for `getHttpOperation` results.
+ * Uses a WeakMap keyed on Program so cache is automatically GC'd when the program is released.
+ * Rules that call `getHttpOperation` per-operation should use `getCachedHttpOperation` to avoid
+ * redundant recomputation across multiple rule invocations on the same operation.
+ */
+const httpOperationCacheByProgram = new WeakMap<Program, WeakMap<Operation, HttpOperation>>();
+
+export function getCachedHttpOperation(program: Program, operation: Operation): HttpOperation {
+  let programCache = httpOperationCacheByProgram.get(program);
+  if (programCache === undefined) {
+    programCache = new WeakMap();
+    httpOperationCacheByProgram.set(program, programCache);
+  }
+  let result = programCache.get(operation);
+  if (result === undefined) {
+    result = _ignoreDiagnostics(_getHttpOperation(program, operation));
+    programCache.set(operation, result);
+  }
+  return result;
+}

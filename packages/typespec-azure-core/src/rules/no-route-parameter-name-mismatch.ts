@@ -1,12 +1,11 @@
 import {
   createRule,
   getNamespaceFullName,
-  ignoreDiagnostics,
   Operation,
   paramMessage,
 } from "@typespec/compiler";
-import { getHttpOperation, HttpOperationPathParameter } from "@typespec/http";
-import { isExcludedCoreType, isTemplatedInterfaceOperation } from "./utils.js";
+import { HttpOperationPathParameter } from "@typespec/http";
+import { getCachedHttpOperation, isExcludedCoreType, isTemplatedInterfaceOperation } from "./utils.js";
 
 interface PathParamInfo {
   name: string;
@@ -48,7 +47,7 @@ export const noRouteParameterNameMismatchRule = createRule({
         if (isExcludedCoreType(context.program, operation)) return;
         if (isTemplatedInterfaceOperation(operation)) return;
 
-        const httpOp = ignoreDiagnostics(getHttpOperation(context.program, operation));
+        const httpOp = getCachedHttpOperation(context.program, operation);
 
         // Get path parameters
         const pathParams = httpOp.parameters.parameters.filter(

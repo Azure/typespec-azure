@@ -1,5 +1,5 @@
-import { createRule, ignoreDiagnostics, Operation } from "@typespec/compiler";
-import { getHttpOperation } from "@typespec/http";
+import { createRule, Operation } from "@typespec/compiler";
+import { getCachedHttpOperation } from "./utils.js";
 
 export const noQueryExplodeRule = createRule({
   name: "no-query-explode",
@@ -12,7 +12,7 @@ export const noQueryExplodeRule = createRule({
   create(context) {
     return {
       operation: (operation: Operation) => {
-        const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, operation));
+        const httpOperation = getCachedHttpOperation(context.program, operation);
         for (const prop of httpOperation.parameters.properties.filter((x) => x.kind === "query")) {
           if (prop.options.explode === true) {
             context.reportDiagnostic({

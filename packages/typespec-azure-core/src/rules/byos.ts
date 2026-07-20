@@ -1,11 +1,10 @@
 import {
   Operation,
   createRule,
-  ignoreDiagnostics,
   isTemplateInstance,
   paramMessage,
 } from "@typespec/compiler";
-import { getHttpOperation } from "@typespec/http";
+import { getCachedHttpOperation } from "./utils.js";
 
 const binaryContentTypes = new Set(["application/octet-stream", "multipart/form-data"]);
 export const byosRule = createRule({
@@ -23,7 +22,7 @@ export const byosRule = createRule({
           // Operation template instance are just referenced in `op is`. Main operation will be validated.
           return;
         }
-        const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, operation));
+        const httpOperation = getCachedHttpOperation(context.program, operation);
         if (httpOperation.parameters.body !== undefined) {
           for (const contentType of httpOperation.parameters.body.contentTypes) {
             if (binaryContentTypes.has(contentType)) {

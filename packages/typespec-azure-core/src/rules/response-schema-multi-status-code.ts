@@ -2,11 +2,11 @@ import {
   Operation,
   Type,
   createRule,
-  ignoreDiagnostics,
   isErrorModel,
   paramMessage,
 } from "@typespec/compiler";
-import { Visibility, createMetadataInfo, getHttpOperation } from "@typespec/http";
+import { Visibility, createMetadataInfo } from "@typespec/http";
+import { getCachedHttpOperation } from "./utils.js";
 
 export const responseSchemaMultiStatusCodeRule = createRule({
   name: "response-schema-problem",
@@ -17,13 +17,16 @@ export const responseSchemaMultiStatusCodeRule = createRule({
     multipleSuccessSchemas: paramMessage`Operation '${"name"}' has multiple non-error response schemas. Did you forget to add '@error' to one of them?`,
   },
   create(context) {
+    // Create MetadataInfo once per lint run instead of per-operation.
+    // MetadataInfo uses internal lazy caching, so reuse across operations
+    // avoids recomputing effective payload types.
+    const metadataInfo = createMetadataInfo(context.program, {
+      canonicalVisibility: Visibility.Read,
+    });
     return {
       operation: (op: Operation) => {
-        const httpOp = ignoreDiagnostics(getHttpOperation(context.program, op));
+        const httpOp = getCachedHttpOperation(context.program, op);
         const responses = httpOp.responses.flatMap((x) => x.responses);
-        const metadataInfo = createMetadataInfo(context.program, {
-          canonicalVisibility: Visibility.Read,
-        });
 
         let firstResponse: Type | undefined = undefined;
         for (const resp of responses) {

@@ -1,11 +1,10 @@
 import {
   Operation,
   createRule,
-  ignoreDiagnostics,
   isList,
   isTemplateDeclarationOrInstance,
 } from "@typespec/compiler";
-import { getHttpOperation } from "@typespec/http";
+import { getCachedHttpOperation } from "./utils.js";
 import { isListOperation } from "@typespec/rest";
 
 export const useStandardNames = createRule({
@@ -28,7 +27,7 @@ export const useStandardNames = createRule({
     return {
       operation: (op: Operation) => {
         if (isTemplateDeclarationOrInstance(op)) return;
-        const httpOp = ignoreDiagnostics(getHttpOperation(context.program, op));
+        const httpOp = getCachedHttpOperation(context.program, op);
         const verb = httpOp.verb;
         const name = op.name;
         const statusCodes = httpOp.responses.map((x) => x.statusCodes.toString());
