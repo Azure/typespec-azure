@@ -33,11 +33,23 @@ try {
     $destGenerator = Join-Path $packageRoot "generator"
     $patchFile = Join-Path $packageRoot "core.patch"
 
+    # The emitter.jar reactor (generator/pom.xml) only builds http-client-generator,
+    # http-client-generator-mgmt and http-client-generator-core. The two test modules
+    # below live in a separate (never-activated) Maven `test` profile and hold ~38MB
+    # of generated Java test sources that are not part of the emitter build, so skip
+    # copying them -- it is the bulk of the copy time. (The Azure emitter-tests
+    # project syncs http-client-generator-test straight from core via SyncTests.ps1,
+    # not from this copy.)
+    $excludedGeneratorModules = @("http-client-generator-test", "http-client-generator-clientcore-test")
+
     Write-Host "Copy generator sources from core"
     if (Test-Path $destGenerator) {
         Remove-Item $destGenerator -Recurse -Force
     }
-    Copy-Item -Path $srcGenerator -Destination $destGenerator -Recurse -Force
+    New-Item -ItemType Directory -Path $destGenerator | Out-Null
+    Get-ChildItem -Path $srcGenerator -Force |
+        Where-Object { $excludedGeneratorModules -notcontains $_.Name } |
+        ForEach-Object { Copy-Item -Path $_.FullName -Destination $destGenerator -Recurse -Force }
 
     Write-Host "Apply Azure customization patch to copied generator"
     # Run from the repo root with --directory so git apply resolves the patch's
