@@ -34,14 +34,15 @@ export const noUnnamedTypesRule = createRule({
     const excludedUnions = new Set<Union>();
     const invalidUnions = new Set<Union>();
 
-    // Models: collect all anonymous models, then exclude specific patterns.
+    // Models: only flag anonymous models used as property types (inline in model properties).
     const invalidModels = new Set<Model>();
     const excludedModels = new Set<Model>();
 
     return {
       modelProperty: (prop) => {
-        // Exclude unions used in status code or content-type header positions.
         const type = prop.type;
+
+        // Exclude unions used in status code or content-type header positions.
         if (type.kind === "Union" && !type.name) {
           if (
             isStatusCode(program, prop) ||
@@ -50,6 +51,17 @@ export const noUnnamedTypesRule = createRule({
           ) {
             excludedUnions.add(type);
           }
+        }
+
+        // Flag anonymous models used as property types.
+        if (
+          type.kind === "Model" &&
+          type.name === "" &&
+          type.properties.size > 0 &&
+          !isStandardLibraryType(type) &&
+          !isHttpEnvelope(program, type)
+        ) {
+          invalidModels.add(type);
         }
       },
       operation: (operation) => {
@@ -61,16 +73,6 @@ export const noUnnamedTypesRule = createRule({
       union: (union) => {
         if (!union.name && !isOnlyNullableUnion(union)) {
           invalidUnions.add(union);
-        }
-      },
-      model: (model: Model) => {
-        if (
-          model.name === "" &&
-          model.properties.size > 0 &&
-          !isStandardLibraryType(model) &&
-          !isHttpEnvelope(program, model)
-        ) {
-          invalidModels.add(model);
         }
       },
       exit: () => {

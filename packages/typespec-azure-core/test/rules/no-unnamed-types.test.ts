@@ -190,4 +190,18 @@ describe("models", () => {
         message: `Anonymous model should be defined as a named model declaration.`,
       });
   });
+
+  it("does not flag anonymous models used as template arguments", async () => {
+    await tester
+      .expect(
+        `
+        @service
+        namespace TestService;
+        model Template<T> { value: T; }
+        model Foo is Template<{ type: string; url: string; }>;
+        op foo(): void;
+        `,
+      )
+      .toBeValid();
+  });
 });
