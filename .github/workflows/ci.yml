@@ -138,7 +138,7 @@ jobs:
         run: pnpm --filter "@typespec/internal-build-utils..." run build
 
       - name: Install autorest & script dependencies
-        run: pnpm add -g autorest && cd eng/scripts && pnpm install
+        run: npm install -g autorest && cd eng/scripts && npm install
 
       - name: Swagger - Resource Manager Linting
         run: node eng/scripts/lint-resourcemanager.js "packages/samples/test/output/azure/resource-manager"
