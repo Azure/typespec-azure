@@ -186,6 +186,68 @@ describe("emission trigger option", () => {
 
     expect(raw).toEqual(existing);
   });
+
+  it("preserves a non-typespec (swagger) version the emitter does not produce", async () => {
+    // Requirement: entries that are not TypeSpec-generated must survive re-emission even though
+    // the emitter never produces them.
+    const existing = [
+      "versions:",
+      '  - version: "2020-01-01"',
+      "    source: swagger",
+      "    swagger-files:",
+      "      - legacy/openapi.json",
+      "",
+    ].join("\n");
+
+    const { manifest } = await emitServiceYaml(
+      { "main.tsp": versionedService, "service.yaml": existing },
+      { options: { "service-yaml": "auto" } },
+    );
+
+    assert(manifest);
+    // Legacy swagger-only version kept verbatim, alongside the current TypeSpec versions.
+    expect(manifest.versions.map((v) => v.version)).toEqual([
+      "2020-01-01",
+      "2023-01-01",
+      "2024-01-01-preview",
+    ]);
+    expect(manifest.versions.find((v) => v.version === "2020-01-01")).toEqual({
+      version: "2020-01-01",
+      source: "swagger",
+      "swagger-files": ["legacy/openapi.json"],
+    });
+  });
+
+  it("removes a `source: typespec` version the emitter no longer produces", async () => {
+    // Requirement: a version that claims to be TypeSpec-generated but is no longer in the spec is
+    // stale and must be dropped, while a legacy swagger-only version is still preserved.
+    const existing = [
+      "versions:",
+      '  - version: "2019-01-01"',
+      "    source: typespec",
+      "    swagger-files:",
+      "      - tsp-output/@azure-tools/typespec-autorest/stable/2019-01-01/openapi.json",
+      '  - version: "2020-01-01"',
+      "    source: swagger",
+      "    swagger-files:",
+      "      - legacy/openapi.json",
+      "",
+    ].join("\n");
+
+    const { manifest } = await emitServiceYaml(
+      { "main.tsp": versionedService, "service.yaml": existing },
+      { options: { "service-yaml": "auto" } },
+    );
+
+    assert(manifest);
+    // The stale TypeSpec version is gone; the legacy swagger version and current versions remain.
+    expect(manifest.versions.map((v) => v.version)).toEqual([
+      "2020-01-01",
+      "2023-01-01",
+      "2024-01-01-preview",
+    ]);
+    expect(manifest.versions.find((v) => v.version === "2019-01-01")).toBeUndefined();
+  });
 });
 
 describe("multiple services", () => {

@@ -369,10 +369,14 @@ async function emitServiceYaml(
  * Updates the `versions` list of an existing `service.yaml` document while preserving the rest
  * of the file: document-level comments, comments on unrelated keys, and per-version comments.
  *
- * Existing entries are merged rather than replaced: versions the emitter regenerated are updated
- * in place, versions the emitter no longer knows about (for example legacy swagger-only versions
- * that predate the TypeSpec migration) are preserved in their original position, and versions the
- * emitter produced that are not yet present are appended in the generated order.
+ * Existing entries are merged rather than replaced:
+ * - versions the emitter regenerated are updated in place (keeping their comments/position),
+ * - versions the emitter no longer produces but that are *not* TypeSpec-sourced (for example
+ *   legacy swagger-only versions that predate the TypeSpec migration) are preserved in place so
+ *   hand-authored or migrated history is not lost,
+ * - versions marked `source: typespec` that the emitter no longer produces are removed, since a
+ *   stale TypeSpec entry would otherwise linger after the version is dropped from the spec, and
+ * - versions the emitter produced that are not yet present are appended in the generated order.
  */
 function updateServiceYamlDocument(existing: string, manifest: ServiceYaml): string {
   const doc = parseDocument(existing);
@@ -391,18 +395,22 @@ function updateServiceYamlDocument(existing: string, manifest: ServiceYaml): str
   const seen = new Set<string>();
   const merged: (typeof seq.items)[number][] = [];
 
-  // Update regenerated versions in place; preserve any other existing entries (e.g. legacy
-  // swagger-only versions) so hand-authored or migrated history is not lost.
   for (const item of seq.items) {
     if (isMap(item)) {
       const version = item.get("version");
       if (typeof version === "string") {
-        seen.add(version);
         const regenerated = manifestByVersion.get(version);
         if (regenerated !== undefined) {
+          // Update regenerated versions in place, keeping their comments and position.
+          seen.add(version);
           item.set("source", regenerated.source);
           item.set("swagger-files", regenerated["swagger-files"]);
+        } else if (item.get("source") === "typespec") {
+          // This version claims to be TypeSpec-generated but the emitter no longer produces it,
+          // so it is stale and must be dropped.
+          continue;
         }
+        // Any other existing entry (e.g. a legacy swagger-only version) is preserved as-is.
       }
     }
     merged.push(item);
