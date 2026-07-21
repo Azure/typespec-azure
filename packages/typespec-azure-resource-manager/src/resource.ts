@@ -840,11 +840,6 @@ function parseKnownProviderlessResourcePath(
   return undefined;
 }
 
-function getResourceCollectionPath(resource: { resourceInstancePath: string }): string {
-  const segments = resource.resourceInstancePath.split("/").filter((s) => s.length > 0);
-  return `/${segments.slice(0, -1).join("/")}`;
-}
-
 function isListOperationMatch(
   operation: ArmResourceOperation,
   resource: ResolvedResourceOperations,
@@ -1113,6 +1108,62 @@ function addUniqueOperation(operation: ArmResourceOperation, operations: ArmReso
   }
 }
 
+export function resolveArmResourceOperations(
+  program: Program,
+  resourceType: Model,
+): ResolvedResourceOperations[] {
+  const resolvedOperations: Set<ResolvedResourceOperations> = new Set<ResolvedResourceOperations>();
+  const candidates = [...getArmResourceOperationList(program, resourceType)]
+    .map((operation) => resolveArmResourceOperationCandidate(program, resourceType, operation))
+    .filter((operation) => operation !== undefined);
+
+  for (const { armOperation, resourceInfo, resourceNameIsExplicit } of candidates) {
+    if (!isResourceIdentityOperation(armOperation.kind)) continue;
+    if (resourceInfo === undefined) continue;
+    let matched = false;
+    for (const resolvedOp of resolvedOperations) {
+      if (isResourceIdentityMatch(resourceInfo, resolvedOp)) {
+        matched = true;
+        tryAddLifecycleOperation(resourceInfo.resourceType, armOperation, resolvedOp);
+        continue;
+      }
+    }
+
+    if (matched) continue;
+    const newResource = createResolvedResourceOperations(resourceInfo, resourceNameIsExplicit);
+    tryAddLifecycleOperation(resourceInfo.resourceType, armOperation, newResource);
+    resolvedOperations.add(newResource);
+  }
+
+  for (const candidate of candidates) {
+    if (isResourceIdentityOperation(candidate.armOperation.kind)) continue;
+    if (candidate.armOperation.kind === "list") {
+      const target = getBestListOperationTarget(candidate.armOperation, resolvedOperations);
+      if (target !== undefined) {
+        tryAddLifecycleOperation(target.resourceType, candidate.armOperation, target);
+      }
+      // TODO: Define how non-prefix list paths should map to detected resource identities.
+      continue;
+    }
+    for (const resolvedOp of resolvedOperations) {
+      tryAddOperationToResolvedResource(candidate, resolvedOp);
+    }
+  }
+
+  return [...resolvedOperations.values()].toSorted((a, b) => {
+    // Sort by provider, type, then instance path
+    if (a.resourceType.types.length < b.resourceType.types.length) return -1;
+    if (a.resourceType.types.length > b.resourceType.types.length) return 1;
+    const aSegments = a.resourceInstancePath.split("/");
+    const bSegments = b.resourceInstancePath.split("/");
+    if (aSegments.length < bSegments.length) return -1;
+    if (aSegments.length > bSegments.length) return 1;
+    if (a.resourceInstancePath.toLowerCase() < b.resourceInstancePath.toLowerCase()) return -1;
+    if (a.resourceInstancePath.toLowerCase() > b.resourceInstancePath.toLowerCase()) return 1;
+    return 0;
+  });
+}
+
 interface ArmResourceOperationCandidate {
   armOperation: ArmResourceOperation;
   resourceInfo?: ResolvedResourceInfo;
@@ -1176,62 +1227,6 @@ function createResolvedResourceOperations(
     },
     associatedOperations: [],
   };
-}
-
-export function resolveArmResourceOperations(
-  program: Program,
-  resourceType: Model,
-): ResolvedResourceOperations[] {
-  const resolvedOperations: Set<ResolvedResourceOperations> = new Set<ResolvedResourceOperations>();
-  const candidates = [...getArmResourceOperationList(program, resourceType)]
-    .map((operation) => resolveArmResourceOperationCandidate(program, resourceType, operation))
-    .filter((operation) => operation !== undefined);
-
-  for (const { armOperation, resourceInfo, resourceNameIsExplicit } of candidates) {
-    if (!isResourceIdentityOperation(armOperation.kind)) continue;
-    if (resourceInfo === undefined) continue;
-    let matched = false;
-    for (const resolvedOp of resolvedOperations) {
-      if (isResourceIdentityMatch(resourceInfo, resolvedOp)) {
-        matched = true;
-        tryAddLifecycleOperation(resourceInfo.resourceType, armOperation, resolvedOp);
-        continue;
-      }
-    }
-
-    if (matched) continue;
-    const newResource = createResolvedResourceOperations(resourceInfo, resourceNameIsExplicit);
-    tryAddLifecycleOperation(resourceInfo.resourceType, armOperation, newResource);
-    resolvedOperations.add(newResource);
-  }
-
-  for (const candidate of candidates) {
-    if (isResourceIdentityOperation(candidate.armOperation.kind)) continue;
-    if (candidate.armOperation.kind === "list") {
-      const target = getBestListOperationTarget(candidate.armOperation, resolvedOperations);
-      if (target !== undefined) {
-        tryAddLifecycleOperation(target.resourceType, candidate.armOperation, target);
-      }
-      // TODO: Define how non-prefix list paths should map to detected resource identities.
-      continue;
-    }
-    for (const resolvedOp of resolvedOperations) {
-      tryAddOperationToResolvedResource(candidate, resolvedOp);
-    }
-  }
-
-  return [...resolvedOperations.values()].toSorted((a, b) => {
-    // Sort by provider, type, then instance path
-    if (a.resourceType.types.length < b.resourceType.types.length) return -1;
-    if (a.resourceType.types.length > b.resourceType.types.length) return 1;
-    const aSegments = a.resourceInstancePath.split("/");
-    const bSegments = b.resourceInstancePath.split("/");
-    if (aSegments.length < bSegments.length) return -1;
-    if (aSegments.length > bSegments.length) return 1;
-    if (a.resourceInstancePath.toLowerCase() < b.resourceInstancePath.toLowerCase()) return -1;
-    if (a.resourceInstancePath.toLowerCase() > b.resourceInstancePath.toLowerCase()) return 1;
-    return 0;
-  });
 }
 
 export { getArmResource } from "./private.decorators.js";
