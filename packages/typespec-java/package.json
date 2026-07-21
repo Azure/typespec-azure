@@ -30,8 +30,8 @@
   "scripts": {
     "clean": "rimraf ./dist ./temp ./generator",
     "build": "pnpm build:emitter && pnpm build:generator",
-    "build:emitter": "pwsh -NoProfile -File Copy-Sources.ps1 && tsc -p .",
-    "build:generator": "pwsh -NoProfile -File Build-Generator.ps1",
+    "build:emitter": "pwsh -NoProfile -NonInteractive -File Copy-Sources.ps1 && tsc -p .",
+    "build:generator": "pwsh -NoProfile -NonInteractive -File Build-Generator.ps1",
     "watch": "tsc -p . --watch",
     "test": "vitest run",
     "regen-docs": "pnpm run build:emitter && tspd doc . --enable-experimental --output-dir ../../website/src/content/docs/docs/emitters/clients/typespec-java/reference --skip-js"
