@@ -388,6 +388,7 @@ union ArmResourceDeploymentScope {
   "Subscription",
   "ResourceGroup",
   "ManagementGroup",
+  "ServiceGroup",
   "Extension",
 }
 
@@ -396,6 +397,7 @@ alias AllArmResourceDeploymentScopes = [
   "Subscription",
   "ResourceGroup",
   "ManagementGroup",
+  "ServiceGroup",
   "Extension"
 ];
 

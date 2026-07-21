@@ -1,6 +1,7 @@
 import {
   Operation,
   createRule,
+  fileRef,
   ignoreDiagnostics,
   isList,
   isTemplateDeclarationOrInstance,
@@ -10,6 +11,7 @@ import { isListOperation } from "@typespec/rest";
 
 export const useStandardNames = createRule({
   name: "use-standard-names",
+  docs: fileRef.fromPackageRoot("src/rules/use-standard-names.md"),
   description: "Use recommended names for operations.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/use-standard-names",

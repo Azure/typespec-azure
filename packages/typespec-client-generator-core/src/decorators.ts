@@ -1884,8 +1884,7 @@ export function getClientOptionValue(
 ): unknown | undefined {
   // Check operation directly
   const opOption = getScopedDecoratorData(context, clientOptionKey, target) as
-    | { name: string; value: unknown }
-    | undefined;
+    { name: string; value: unknown } | undefined;
   if (opOption?.name === optionName) {
     return opOption.value;
   }
@@ -1893,8 +1892,7 @@ export function getClientOptionValue(
   // Check interface if operation is in one
   if (target.interface) {
     const ifaceOption = getScopedDecoratorData(context, clientOptionKey, target.interface) as
-      | { name: string; value: unknown }
-      | undefined;
+      { name: string; value: unknown } | undefined;
     if (ifaceOption?.name === optionName) {
       return ifaceOption.value;
     }
@@ -1904,8 +1902,7 @@ export function getClientOptionValue(
   let ns = target.namespace;
   while (ns) {
     const nsOption = getScopedDecoratorData(context, clientOptionKey, ns) as
-      | { name: string; value: unknown }
-      | undefined;
+      { name: string; value: unknown } | undefined;
     if (nsOption?.name === optionName) {
       return nsOption.value;
     }

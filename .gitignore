@@ -226,6 +226,13 @@ packages/samples/test/output/azure/templates-contoso/setup.*
 packages/typespec-python/tests/generated/**
 packages/typespec-python/alpha
 
+# go emitter
+packages/typespec-go/test/**/zz_*.go
+packages/typespec-go/test/**/go.mod
+packages/typespec-go/test/**/go.sum
+packages/typespec-go/test/**/LICENSE.txt
+packages/typespec-go/test/**/testdata
+!packages/typespec-go/test/local/gogenerate/testdata/generate/transforms.go
 # java emitter
 # Emitter TS sources copied from core/packages/http-client-java/emitter at build
 # time (only src/options.ts is committed).
@@ -247,3 +254,8 @@ packages/typespec-java/emitter-tests/specs/**
 packages/typespec-java/emitter-tests/node_modules/**
 packages/typespec-java/emitter-tests/package-lock.json
 packages/typespec-java/emitter-tests/tsp-spector-coverage-*.json
+
+# Generated linter rule reference pages (produced by `tspd doc` / regen-docs via
+# each rule's `docs` field). Regenerated during the website build (build:web), so
+# they are not tracked. The rule source docs live in packages/*/src/rules/*.md.
+website/src/content/docs/docs/libraries/*/rules/

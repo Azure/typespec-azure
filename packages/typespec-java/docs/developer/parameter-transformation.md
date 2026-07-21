@@ -25,7 +25,7 @@ Sample of `VirtualParameter`:
 language:
   default:
     name: user
-    description: ''
+    description: ""
     serializedName: user
   protocol: {}
   schema: *ref_2
@@ -33,7 +33,7 @@ language:
   language:
     default:
     name: request
-    description: ''
+    description: ""
   protocol:
     http:
     in: body
