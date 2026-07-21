@@ -11,6 +11,7 @@
     "deps": "tsx eng/scripts/sync-deps.ts",
     "check:eng": "tsc -p ./tsconfig.eng.json --noEmit",
     "change": "chronus",
+    "check-lockfile": "node ./eng/scripts/check-lockfile.ts",
     "create:linter-rule": "tsx eng/scripts/create-linter-rule.ts",
     "validate:pr": "tsx eng/scripts/validate-pr.ts",
     "clean": "pnpm run-all clean",
