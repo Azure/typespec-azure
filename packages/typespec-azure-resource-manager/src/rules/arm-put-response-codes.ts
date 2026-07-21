@@ -1,4 +1,4 @@
-import { Program, createRule } from "@typespec/compiler";
+import { Program, createRule, fileRef } from "@typespec/compiler";
 
 import { getArmResources } from "../resource.js";
 
@@ -7,8 +7,9 @@ import { getArmResources } from "../resource.js";
  */
 export const armPutResponseCodesRule = createRule({
   name: "arm-put-operation-response-codes",
+  docs: fileRef.fromPackageRoot("src/rules/arm-put-operation-response-codes.md"),
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/put-operation-response-codes",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-put-operation-response-codes",
   description: "Ensure put operations have the appropriate status codes.",
   messages: {
     default: `Put operations must have 200, 201 and default responses. They must not have any other responses.`,

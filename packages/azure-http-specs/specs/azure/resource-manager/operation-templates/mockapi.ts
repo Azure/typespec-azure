@@ -894,3 +894,395 @@ Scenarios.Azure_ResourceManager_OperationTemplates_LroPaging_postPagingLro = pas
     kind: "MockApiDefinition",
   },
 ]);
+
+// LRO Paging with request body (ArmResourceActionAsyncBase)
+// Based on: https://github.com/Azure/azure-rest-api-specs/blob/89ff93230e/specification/web/resource-manager/Microsoft.Web/AppService/AppServiceEnvironmentResource.tsp#L152-L163
+let postPagingLroWithBodyPollCount = 0;
+
+Scenarios.Azure_ResourceManager_OperationTemplates_LroPaging_postPagingLroWithBody = passOnSuccess([
+  {
+    // LRO POST initial request with body - returns 202 with body
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/products/default/postPagingLroWithBody",
+    method: "post",
+    request: {
+      pathParams: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+      },
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+      body: json({
+        vnetId: "vnet1",
+      }),
+    },
+    response: {
+      status: 202,
+      headers: {
+        "retry-after": 1,
+        location: dyn`${dynItem("baseUrl")}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_body_location`,
+      },
+      body: json({
+        value: [],
+      }),
+    },
+    handler: (req: MockRequest) => {
+      postPagingLroWithBodyPollCount = 0;
+      return {
+        status: 202,
+        headers: {
+          "retry-after": 1,
+          location: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_body_location`,
+        },
+        body: json({
+          value: [],
+        }),
+      };
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    // LRO POST poll intermediate/get final result
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_body_location",
+    method: "get",
+    request: {
+      pathParams: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      },
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 200,
+    },
+    handler: (req: MockRequest) => {
+      if (postPagingLroWithBodyPollCount > 0) {
+        const response = {
+          ...validProductListResult,
+          nextLink: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_body_location/nextPage?api-version=2023-12-01-preview`,
+        };
+        return {
+          status: 200,
+          body: json(response),
+        };
+      } else {
+        postPagingLroWithBodyPollCount += 1;
+        return {
+          status: 202,
+          headers: {
+            "retry-after": 1,
+            location: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_body_location`,
+          },
+        };
+      }
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    // LRO POST paging next page
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_body_location/nextPage",
+    method: "get",
+    request: {
+      pathParams: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      },
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 200,
+      body: json(validProductListResultPage2),
+    },
+    kind: "MockApiDefinition",
+  },
+]);
+
+// GET LRO scenarios
+// Based on: https://github.com/Azure/azure-rest-api-specs/blob/89ff93230e/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/GenerateDetailedCostReportOperationResult.tsp#L33-L39
+const validCostReport = {
+  id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/costReports/report1`,
+  name: "report1",
+  type: "Azure.ResourceManager.OperationTemplates/costReports",
+  properties: {
+    downloadUrl: "https://storage.blob.core.windows.net/reports/report1.csv",
+    provisioningState: "Succeeded",
+  },
+  systemData: {
+    createdBy: "AzureSDK",
+    createdByType: "User",
+    createdAt: "2024-10-04T00:56:07.442Z",
+    lastModifiedBy: "AzureSDK",
+    lastModifiedAt: "2024-10-04T00:56:07.442Z",
+    lastModifiedByType: "User",
+  },
+};
+
+let getLroPollCount = 0;
+
+Scenarios.Azure_ResourceManager_OperationTemplates_Lro_getLro = passOnSuccess({
+  // GET LRO - Location header points back to the same URL (matches real service behavior)
+  // See: https://github.com/Azure/azure-rest-api-specs/blob/main/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/examples/2025-03-01/CostDetailsOperationResultsBySubscriptionScope.json#L41
+  uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/costReports/:operationId",
+  method: "get",
+  request: {
+    pathParams: {
+      subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      resourceGroup: RESOURCE_GROUP_EXPECTED,
+      operationId: "report1",
+    },
+    query: {
+      "api-version": "2023-12-01-preview",
+    },
+  },
+  response: {
+    status: 202,
+    headers: {
+      location: dyn`${dynItem("baseUrl")}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/costReports/report1`,
+    },
+  },
+  handler: (req: MockRequest) => {
+    const selfUrl = `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/costReports/report1`;
+    if (getLroPollCount > 1) {
+      return {
+        status: 200,
+        body: json(validCostReport),
+      };
+    } else if (getLroPollCount === 1) {
+      getLroPollCount += 1;
+      return {
+        status: 202,
+        headers: {
+          location: selfUrl,
+        },
+      };
+    } else {
+      getLroPollCount = 1;
+      return {
+        status: 202,
+        headers: {
+          location: selfUrl,
+        },
+      };
+    }
+  },
+  kind: "MockApiDefinition",
+});
+
+// POST Pageable scenarios
+// Based on: https://github.com/Azure/azure-rest-api-specs/blob/89ff93230e/specification/dynatrace/Dynatrace.Management/MonitorResource.tsp#L77-L83
+const validMonitoredResourceListPage1 = {
+  value: [
+    {
+      id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Microsoft.Compute/virtualMachines/vm1`,
+      sendingMetrics: true,
+    },
+  ],
+};
+const validMonitoredResourceListPage2 = {
+  value: [
+    {
+      id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Microsoft.Compute/virtualMachines/vm2`,
+      sendingMetrics: false,
+    },
+  ],
+};
+
+Scenarios.Azure_ResourceManager_OperationTemplates_Paging_postActionPaging = passOnSuccess([
+  {
+    // POST pageable initial request - returns first page
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/monitors/:monitorName/postActionPaging",
+    method: "post",
+    request: {
+      pathParams: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        monitorName: "monitor1",
+      },
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+      body: json({
+        filter: "status eq 'active'",
+      }),
+    },
+    response: {
+      status: 200,
+      body: json(validMonitoredResourceListPage1),
+    },
+    handler: (req: MockRequest) => {
+      return {
+        status: 200,
+        body: json({
+          ...validMonitoredResourceListPage1,
+          nextLink: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/monitors/monitor1/postActionPaging/nextPage?api-version=2023-12-01-preview`,
+        }),
+      };
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    // POST pageable next page
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/monitors/:monitorName/postActionPaging/nextPage",
+    method: "get",
+    request: {
+      pathParams: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        monitorName: "monitor1",
+      },
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 200,
+      body: json(validMonitoredResourceListPage2),
+    },
+    kind: "MockApiDefinition",
+  },
+]);
+
+// markAsPageable scenarios
+// Based on: https://github.com/Azure/azure-rest-api-specs/blob/89ff93230e/specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace/client.tsp#L286
+const validCollectionsList = {
+  value: [
+    {
+      id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/monitors/monitor1/collections/collection1`,
+      name: "collection1",
+      type: "Azure.ResourceManager.OperationTemplates/monitors/collections",
+      properties: {
+        displayName: "Test Collection",
+      },
+    },
+    {
+      id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/monitors/monitor1/collections/collection2`,
+      name: "collection2",
+      type: "Azure.ResourceManager.OperationTemplates/monitors/collections",
+      properties: {
+        displayName: "Another Collection",
+      },
+    },
+  ],
+};
+
+Scenarios.Azure_ResourceManager_OperationTemplates_Paging_markAsPageable = passOnSuccess({
+  uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/monitors/:monitorName/collections",
+  method: "get",
+  request: {
+    pathParams: {
+      subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      resourceGroup: RESOURCE_GROUP_EXPECTED,
+      monitorName: "monitor1",
+    },
+    query: {
+      "api-version": "2023-12-01-preview",
+    },
+  },
+  response: {
+    status: 200,
+    body: json(validCollectionsList),
+  },
+  kind: "MockApiDefinition",
+});
+
+// Legacy template scenarios
+// RoutedOperations: GET with custom route override
+// Based on: https://github.com/Azure/azure-rest-api-specs/blob/89ff93230e/specification/web/resource-manager/Microsoft.Web/AppService/AppServiceEnvironmentResource.tsp#L30-L46
+Scenarios.Azure_ResourceManager_OperationTemplates_Legacy_routedGet = passOnSuccess({
+  uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/configurations/:configName/diagnostics/:diagnosticName",
+  method: "get",
+  request: {
+    pathParams: {
+      subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      resourceGroup: RESOURCE_GROUP_EXPECTED,
+      configName: "default",
+      diagnosticName: "memory",
+    },
+    query: {
+      "api-version": "2023-12-01-preview",
+    },
+  },
+  response: {
+    status: 200,
+    body: json({
+      name: "memory",
+      status: "healthy",
+    }),
+  },
+  kind: "MockApiDefinition",
+});
+
+// CreateOrReplaceSync with optional body
+// Based on: https://github.com/Azure/azure-rest-api-specs/blob/89ff93230e/specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace/Collection.tsp#L38-L44
+const validConfiguration = {
+  id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/configurations/default`,
+  name: "default",
+  type: "Azure.ResourceManager.OperationTemplates/configurations",
+  location: "eastus",
+  properties: {
+    configValue: "default-value",
+    provisioningState: "Succeeded",
+  },
+};
+
+const validConfigurationWithBody = {
+  ...validConfiguration,
+  properties: {
+    configValue: "custom-value",
+    provisioningState: "Succeeded",
+  },
+};
+
+Scenarios.Azure_ResourceManager_OperationTemplates_Legacy_createOrReplaceOptionalBody =
+  withServiceKeys(["EmptyBody", "WithBody"]).pass({
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/configurations/:configName",
+    method: "put",
+    request: {
+      pathParams: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        configName: "default",
+      },
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 200,
+    },
+    handler: (req: MockRequest) => {
+      if (req.body && Object.keys(req.body).length > 0) {
+        // WithBody scenario - validate and return resource with custom values
+        const requestBody = req.body as {
+          location?: string;
+          properties?: { configValue?: string };
+        };
+        if (requestBody.properties?.configValue === "custom-value") {
+          return {
+            pass: "WithBody",
+            status: 200,
+            body: json(validConfigurationWithBody),
+          };
+        } else {
+          return {
+            pass: "WithBody",
+            status: 400,
+            body: json({
+              error:
+                "Invalid request body values. Expected properties: {configValue: 'custom-value'}",
+            }),
+          };
+        }
+      } else {
+        // EmptyBody scenario - return resource with defaults
+        return {
+          pass: "EmptyBody",
+          status: 200,
+          body: json(validConfiguration),
+        };
+      }
+    },
+    kind: "MockApiDefinition",
+  });

@@ -1,0 +1,5 @@
+{
+  "repository": "https://github.com/Azure/azure-rest-api-specs.git",
+  "ref": "main",
+  "path": "specification/web/resource-manager/Microsoft.Web/AppService"
+}

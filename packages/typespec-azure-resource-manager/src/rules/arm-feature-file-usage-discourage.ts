@@ -1,8 +1,9 @@
-import { createRule, Namespace } from "@typespec/compiler";
+import { createRule, fileRef, Namespace } from "@typespec/compiler";
 import { getFeatureFileSet } from "../resource.js";
 
 export const armFeatureFileUsageDiscourage = createRule({
   name: "arm-feature-file-usage-discourage",
+  docs: fileRef.fromPackageRoot("src/rules/arm-feature-file-usage-discourage.md"),
   severity: "warning",
   description: "Verify the usage of @featureFiles decorator.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-feature-file-usage-discourage",
