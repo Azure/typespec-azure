@@ -6,7 +6,9 @@ import { listClients, listOperationsInClient, listSubClients } from "../../src/d
 import { SdkMethodResponse, UsageFlags } from "../../src/interfaces.js";
 import {
   AzureCoreTester,
+  createClientCustomizationInput,
   createSdkContextForTester,
+  SimpleBaseTester,
   SimpleTester,
   SimpleTesterWithVersionedService,
 } from "../tester.js";
@@ -1431,7 +1433,7 @@ it("version not exist", async () => {
 });
 
 it("client has versionsEnum reference", async () => {
-  await runner.compile(
+  const { program } = await SimpleTester.compile(
     `
     @service
     @versioned(Versions)
@@ -1442,7 +1444,7 @@ it("client has versionsEnum reference", async () => {
         endpoint: url,
       }
     )
-    namespace Versioning;
+    namespace VersioningService;
     enum Versions {
       v2023_10_01: "2023-10-01",
       v2024_10_01: "2024-10-01",
@@ -1450,7 +1452,8 @@ it("client has versionsEnum reference", async () => {
     op test(): void;
     `,
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
   ok(client.versionsEnum);
@@ -1462,4 +1465,63 @@ it("client has versionsEnum reference", async () => {
   strictEqual(client.versionsEnum.values[1].value, "2024-10-01");
   // versionsEnum should be the same object as in sdkPackage.enums
   strictEqual(client.versionsEnum, sdkPackage.enums[0]);
+});
+
+it("multi-service client has no versionsEnum", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+      interface AI {
+        @route("/aTest")
+        aTest(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+      interface BI {
+        @route("/bTest")
+        bTest(@query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+      `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+        autoMergeService: true,
+      }
+    )
+    namespace CombineClient;
+  `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  // Multi-service root client should not have a versionsEnum
+  strictEqual(client.versionsEnum, undefined);
+  // Sub-clients that map to single services should have versionsEnum
+  ok(client.children);
+  strictEqual(client.children.length, 2);
+  const aiClient = client.children.find((c) => c.name === "AI");
+  ok(aiClient);
+  ok(aiClient.versionsEnum);
+  strictEqual(aiClient.versionsEnum.name, "VersionsA");
+  const biClient = client.children.find((c) => c.name === "BI");
+  ok(biClient);
+  ok(biClient.versionsEnum);
+  strictEqual(biClient.versionsEnum.name, "VersionsB");
 });

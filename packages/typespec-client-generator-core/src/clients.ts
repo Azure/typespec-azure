@@ -203,7 +203,10 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     summary: client.type ? getSummary(context.program, client.type) : undefined,
     methods: [],
     apiVersions: context.getApiVersionsForType(clientType),
-    versionsEnum: context.__serviceToVersionsEnum.get(client.services[0]),
+    versionsEnum:
+      client.services.length === 1
+        ? context.__serviceToVersionsEnum.get(client.services[0])
+        : undefined,
     namespace: getClientNamespace(context, clientType),
     clientInitialization: diagnostics.pipe(
       createSdkClientInitializationType(context, client, parent),
