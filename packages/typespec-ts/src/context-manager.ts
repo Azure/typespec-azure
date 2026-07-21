@@ -4,7 +4,7 @@ import { Project, SourceFile } from "ts-morph";
 import { ExternalDependencies } from "./framework/dependency.js";
 import { Binder } from "./framework/hooks/binder.js";
 import { SdkTypeContext } from "./framework/hooks/sdk-types.js";
-import { RlcMetaTree } from "./meta-tree.js";
+import { ClientTypeMetaTree } from "./meta-tree.js";
 
 /**
  * Contexts Object Guidelines
@@ -20,7 +20,7 @@ import { RlcMetaTree } from "./meta-tree.js";
  * Remember, adding too many contexts can lead to complex dependencies and harder-to-maintain code. Always evaluate if the context is truly necessary or if there are better alternatives such as localized state management or passing props for simpler scenarios.
  */
 type Contexts = {
-  rlcMetaTree: RlcMetaTree; // Context for RLC types metadata.
+  clientTypeMetaTree: ClientTypeMetaTree; // Context for client type metadata.
   outputProject: Project; // The TS-Morph root project context for code generation.
   symbolMap: Map<string, SourceFile>; // Mapping of symbols to their corresponding source files.
   sdkTypes: SdkTypeContext;
@@ -72,6 +72,19 @@ class ContextManager {
   public getContext<K extends ContextKey>(key: K): Contexts[K] | undefined {
     return this.contexts.get(key) as Contexts[K] | undefined;
   }
+
+  /**
+   * Clears all stored contexts.
+   *
+   * The manager is a process-wide singleton, so the values provided during an
+   * emit (the `EmitContext`/`Program`, the TCGC `SdkContext`, the ts-morph
+   * `Project`, etc.) stay reachable from this map until the next emit overwrites
+   * them. Clearing at the end of an emit lets the whole previous program graph
+   * be collected instead of being retained until the following emit.
+   */
+  public clearContexts(): void {
+    this.contexts.clear();
+  }
 }
 
 // Expose the singleton instance of the context manager.
@@ -98,4 +111,14 @@ export function useContext<K extends ContextKey>(key: K): Contexts[K] {
  */
 export function provideContext<K extends ContextKey>(key: K, value: Contexts[K]): void {
   contextManager.setContext(key, value);
+}
+
+/**
+ * Clears all contexts held by the singleton context manager. Call this once an
+ * emit has finished writing its output so the retained program graph (compiler
+ * `EmitContext`/`Program`, TCGC `SdkContext`, ts-morph `Project`, binder, …) can
+ * be garbage collected instead of lingering until the next emit overwrites it.
+ */
+export function clearContexts(): void {
+  contextManager.clearContexts();
 }

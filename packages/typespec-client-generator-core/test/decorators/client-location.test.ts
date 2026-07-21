@@ -512,6 +512,128 @@ describe("Parameter", () => {
     ]);
   });
 
+  it("detect type conflict when moving templated parameter to client", async () => {
+    const diagnostics = await SimpleTester.diagnose(
+      `
+      @service
+      namespace Default;
+
+      union FeatureOptInKeys {
+        insights_v1_preview: "Insights.V1Preview",
+        schedules_v1_preview: "Schedules.V1Preview",
+      }
+
+      alias WithPreviewHeader<T extends FeatureOptInKeys> = {
+        @clientLocation(Default)
+        @header("x-preview-features")
+        previewFeatures: T;
+      };
+
+      @route("/insights")
+      op getInsights(...WithPreviewHeader<FeatureOptInKeys.insights_v1_preview>): void;
+
+      @route("/schedules")
+      op getSchedules(...WithPreviewHeader<FeatureOptInKeys.schedules_v1_preview>): void;
+      `,
+    );
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-client-generator-core/client-location-conflict",
+        message: /different types/,
+      },
+    ]);
+  });
+
+  it("templated parameter type conflict reproduces broken client/method parameters", async () => {
+    // This characterizes the broken behavior the validation guards against (issue #4671):
+    // `@clientLocation` on a templated parameter that is instantiated with different types
+    // collapses, by name, into a single client parameter typed as the *last* method's
+    // instantiation. As a result the last method loses its parameter, while other methods
+    // keep a method-level parameter with their own type.
+    const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
+      `
+      @service
+      namespace Default;
+
+      union FeatureOptInKeys {
+        insights_v1_preview: "Insights.V1Preview",
+        schedules_v1_preview: "Schedules.V1Preview",
+      }
+
+      alias WithPreviewHeader<T extends FeatureOptInKeys> = {
+        @clientLocation(Default)
+        @header("x-preview-features")
+        previewFeatures: T;
+      };
+
+      @route("/insights")
+      op getInsights(...WithPreviewHeader<FeatureOptInKeys.insights_v1_preview>): void;
+
+      @route("/schedules")
+      op getSchedules(...WithPreviewHeader<FeatureOptInKeys.schedules_v1_preview>): void;
+      `,
+    );
+    // The validation still only warns, so the broken SDK output below is produced.
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-client-generator-core/client-location-conflict",
+        message: /different types/,
+      },
+    ]);
+
+    const context = await createSdkContextForTester(program);
+    const client = context.sdkPackage.clients[0];
+    ok(client);
+
+    // The single elevated client parameter is typed as the *last* method's instantiation.
+    const clientPreviewParam = client.clientInitialization.parameters.find(
+      (p) => p.name === "previewFeatures",
+    );
+    ok(clientPreviewParam);
+    strictEqual(clientPreviewParam.type.kind, "enumvalue");
+    strictEqual((clientPreviewParam.type as { name: string }).name, "schedules_v1_preview");
+
+    const getInsights = client.methods.find((m) => m.name === "getInsights");
+    const getSchedules = client.methods.find((m) => m.name === "getSchedules");
+    ok(getInsights);
+    ok(getSchedules);
+
+    // The non-last method keeps a method-level parameter with its own type ...
+    const insightsParam = getInsights.parameters.find((p) => p.name === "previewFeatures");
+    ok(insightsParam);
+    strictEqual(insightsParam.onClient, false);
+    strictEqual(insightsParam.type.kind, "enumvalue");
+    strictEqual((insightsParam.type as { name: string }).name, "insights_v1_preview");
+
+    // ... while the last method loses its parameter entirely.
+    strictEqual(
+      getSchedules.parameters.find((p) => p.name === "previewFeatures"),
+      undefined,
+    );
+  });
+
+  it("no type conflict when moving same-typed parameter to client from multiple operations", async () => {
+    const diagnostics = await SimpleTester.diagnose(
+      `
+      @service
+      namespace Default;
+
+      alias WithPreviewHeader = {
+        @clientLocation(Default)
+        @header("x-preview-features")
+        previewFeatures: string;
+      };
+
+      @route("/insights")
+      op getInsights(...WithPreviewHeader): void;
+
+      @route("/schedules")
+      op getSchedules(...WithPreviewHeader): void;
+      `,
+    );
+    expectDiagnostics(diagnostics, []);
+  });
+
   it("can not move model properties to string", async () => {
     const diagnostics = await SimpleTester.diagnose(
       `
@@ -1081,16 +1203,14 @@ describe("Parameter", () => {
 
     // The foo method should NOT have subscriptionId as a method parameter (it's on client)
     const fooMethod = client.methods.find((m) => m.name === "foo") as
-      | SdkServiceMethod<SdkHttpOperation>
-      | undefined;
+      SdkServiceMethod<SdkHttpOperation> | undefined;
     ok(fooMethod);
     const fooSubIdMethodParam = fooMethod.parameters.find((p) => p.name === "subscriptionId");
     ok(!fooSubIdMethodParam);
 
     // The bar method SHOULD have subscriptionId as a method parameter (moved to method level)
     const barMethod = client.methods.find((m) => m.name === "bar") as
-      | SdkServiceMethod<SdkHttpOperation>
-      | undefined;
+      SdkServiceMethod<SdkHttpOperation> | undefined;
     ok(barMethod);
     const barSubIdMethodParam = barMethod.parameters.find((p) => p.name === "subscriptionId");
     ok(barSubIdMethodParam);

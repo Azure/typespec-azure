@@ -1,7 +1,8 @@
-import { ModelProperty, createRule, isNullType } from "@typespec/compiler";
+import { ModelProperty, createRule, fileRef, isNullType } from "@typespec/compiler";
 
 export const noNullableRule = createRule({
   name: "no-nullable",
+  docs: fileRef.fromPackageRoot("src/rules/no-nullable.md"),
   description: "Use `?` for optional properties.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-nullable",

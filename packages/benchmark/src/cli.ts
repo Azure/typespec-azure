@@ -16,7 +16,6 @@ import { generateHistoryMain } from "./generate-history.js";
 import { runBenchmarks } from "./run.js";
 import { storeResults } from "./store-results.js";
 import type { BenchmarkResult } from "./types.js";
-import { uploadPrComment } from "./upload-pr-comment.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const defaultSpecsDir = resolve(__dirname, "..", "..", "specs");
@@ -31,13 +30,18 @@ Commands:
   format            Format a comparison as a PR comment
   generate-history  Generate aggregated history.json from benchmark results
   store-results     Store benchmark results to the benchmark-data git branch
-  upload-pr-comment Fetch baseline, compare, and generate PR comment artifacts
   backfill          Backfill benchmark data for historical commits
 
 Run options:
-  --specs-dir <dir>     Directory containing benchmark specs (default: built-in specs)
+  --specs-dir <dir>     Directory of benchmark specs: subdirectories with a main.tsp (local specs)
+                        and/or with a spec.json (external specs) (default: built-in specs)
   --iterations <n>      Number of measured iterations (default: 5)
   --warmup <n>          Number of warmup iterations (default: 1)
+  --noise-cv-threshold <n>
+                        Rerun when total-runtime coefficient of variation is above this value (e.g. 0.08 = 8%)
+  --max-reruns <n>      Max rerun cycles when noise gate triggers (default: 0)
+  --rerun-iterations <n>
+                        Extra measured iterations per rerun (default: same as --iterations)
   --specs <name,...>    Comma-separated list of specific specs to run
   --commit <sha>        Git commit SHA to record
   --output <file>       Output file for results JSON (default: stdout)
@@ -58,13 +62,7 @@ Store-results options:
   --results <file>      Path to the benchmark results JSON file
   --commit <sha>        Git commit SHA
   --branch <name>       Branch name for storing results (default: benchmark-data)
-
-Upload-pr-comment options:
-  --results <file>      Path to the current benchmark results JSON file
-  --pr-number <n>       Pull request number
-  --output-dir <dir>    Output directory for artifacts
-  --branch <name>       Branch name for fetching baseline (default: benchmark-data)
-  --threshold <n>       Percent threshold for notable changes (default: 5)
+  --results-dir <dir>   Directory on the data branch to store results/history (default: results)
 
 Backfill options:
   --from <sha|n>        Start point: a commit SHA or number of recent commits (default: 100)
@@ -127,13 +125,25 @@ async function runCommand(args: Record<string, string>): Promise<void> {
   const specs = args["specs"]?.split(",");
   const commit = args["commit"];
   const outputFile = args["output"];
+  const noiseCvThreshold =
+    args["noise-cv-threshold"] !== undefined ? parseFloat(args["noise-cv-threshold"]) : undefined;
+  const maxReruns = args["max-reruns"] ? parseInt(args["max-reruns"], 10) : undefined;
+  const rerunIterations = args["rerun-iterations"]
+    ? parseInt(args["rerun-iterations"], 10)
+    : undefined;
 
+  // A spec source is either a local spec directory (with main.tsp) or an
+  // external spec directory (with spec.json). `--specs-dir` selects which set
+  // to run; both kinds run uniformly and produce a single result file.
   const result = await runBenchmarks({
     specsDir,
     iterations,
     warmup,
     specs,
     commit,
+    noiseCvThreshold,
+    maxReruns,
+    rerunIterations,
   });
 
   await outputResult(JSON.stringify(result, null, 2), outputFile);
@@ -186,25 +196,7 @@ function storeResultsCommand(args: Record<string, string>): void {
     resultsFile,
     commit,
     branch: args["branch"],
-  });
-}
-
-function uploadPrCommentCommand(args: Record<string, string>): void {
-  const resultsFile = args["results"];
-  const prNumber = args["pr-number"];
-  const outputDir = args["output-dir"];
-  if (!resultsFile || !prNumber || !outputDir) {
-    console.error(
-      "Error: --results, --pr-number, and --output-dir are required for upload-pr-comment command",
-    );
-    process.exit(1);
-  }
-  uploadPrComment({
-    resultsFile,
-    prNumber,
-    outputDir,
-    branch: args["branch"],
-    threshold: args["threshold"] ? parseFloat(args["threshold"]) : undefined,
+    resultsDir: args["results-dir"],
   });
 }
 
@@ -246,9 +238,6 @@ async function main(): Promise<void> {
       break;
     case "store-results":
       storeResultsCommand(args);
-      break;
-    case "upload-pr-comment":
-      uploadPrCommentCommand(args);
       break;
     case "backfill":
       backfillCommand(args);

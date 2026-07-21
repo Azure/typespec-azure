@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-autorest",
-  "version": "0.69.0",
+  "version": "0.70.0",
   "author": "Microsoft Corporation",
   "description": "TypeSpec library for emitting openapi from the TypeSpec REST protocol binding",
   "homepage": "https://azure.github.io/typespec-azure",
@@ -36,22 +36,24 @@
   },
   "scripts": {
     "clean": "rimraf ./dist ./temp",
-    "build": "npm run gen-extern-signature && npm run regen-autorest-openapi-schema && tsc -p tsconfig.build.json && npm run lint-typespec-library",
+    "build": "pnpm gen-extern-signature && pnpm regen-autorest-openapi-schema && pnpm regen-service-yaml-schema && tsc -p tsconfig.build.json && pnpm lint-typespec-library",
     "watch": "tsc -p tsconfig.build.json --watch",
     "gen-extern-signature": "tspd --enable-experimental gen-extern-signature .",
     "lint-typespec-library": "tsp compile . --warn-as-error --import @typespec/library-linter --no-emit",
     "regen-autorest-openapi-schema": "tsp compile ./schema/autorest-openapi-schema.tsp --warn-as-error && node ./.scripts/schema-json-to-js.js",
+    "regen-service-yaml-schema": "tsp compile ./schema/service-yaml.tsp --warn-as-error",
     "test": "vitest run",
     "test:watch": "vitest -w",
     "test:ui": "vitest --ui",
     "test:ci": "vitest run --coverage --reporter=junit --reporter=default",
-    "lint": "eslint .  --max-warnings=0",
-    "lint:fix": "eslint . --fix ",
+    "lint": "oxlint . --deny-warnings",
+    "lint:fix": "oxlint . --fix",
     "regen-docs": "tspd doc .  --enable-experimental  --output-dir ../../website/src/content/docs/docs/emitters/typespec-autorest/reference"
   },
   "files": [
     "lib/*.tsp",
     "schema/dist/schema.js",
+    "schema/dist/ServiceYaml.json",
     "dist/**",
     "!dist/test/**"
   ],
@@ -70,6 +72,9 @@
     "@typespec/xml": {
       "optional": true
     }
+  },
+  "dependencies": {
+    "yaml": "catalog:"
   },
   "devDependencies": {
     "@azure-tools/typespec-azure-core": "workspace:^",

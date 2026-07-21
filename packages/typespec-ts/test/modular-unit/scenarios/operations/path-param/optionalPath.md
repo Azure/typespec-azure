@@ -47,7 +47,6 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
-
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },

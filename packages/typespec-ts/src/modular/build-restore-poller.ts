@@ -4,9 +4,9 @@ import { SourceFile } from "ts-morph";
 import { useContext } from "../context-manager.js";
 import { useDependencies } from "../framework/hooks/use-dependencies.js";
 import { resolveReference } from "../framework/reference.js";
-import { NameType, normalizeName } from "../rlc-common/index.js";
-import { getModularClientOptions } from "../utils/client-utils.js";
+import { getClientModuleInfo } from "../utils/client-utils.js";
 import { SdkContext } from "../utils/interfaces.js";
+import { NameType, normalizeName } from "../utils/name-utils.js";
 import { getMethodHierarchiesMap } from "../utils/operation-util.js";
 import { buildLroDeserDetailMap } from "./build-operations.js";
 import { AzurePollingDependencies } from "./external-dependencies.js";
@@ -23,7 +23,7 @@ export function buildRestorePoller(
   const project = useContext("outputProject");
   const [_, client] = clientMap;
   const dependencies = useDependencies();
-  const { subfolder } = getModularClientOptions(clientMap);
+  const { subfolder } = getClientModuleInfo(clientMap);
   const methodMap = getMethodHierarchiesMap(context, client);
   const hasLro = Array.from(methodMap.values()).some((operations) => {
     return operations.some(isLroOnlyOperation);

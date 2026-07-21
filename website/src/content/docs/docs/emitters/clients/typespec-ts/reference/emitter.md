@@ -36,46 +36,50 @@ options:
 Defines the emitter output directory. Defaults to `{output-dir}/@azure-tools/typespec-ts`
 See [Configuring output directory for more info](https://typespec.io/docs/handbook/configuration/configuration/#configuring-output-directory)
 
+### `api-version`
+
+**Type:** `string | object`
+
+Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`. For multi-service packages, provide a map from each service namespace's full name to its desired version; services not listed default to their latest version.
+
+**Options:**
+
+- `string`
+- `object`
+
+### `examples-dir`
+
+**Type:** `string`
+
+Specifies the directory where the emitter will look for example files. If the flag isn't set, the emitter defaults to using an `examples` directory located at the project root.
+
+### `namespace`
+
+**Type:** `string`
+
+Specifies the namespace you want to override for namespaces set in the spec. With this config, all namespace for the spec types will default to it.
+
 ### `include-headers-in-response`
 
 **Type:** `boolean`
 
 This option is used to indicate whether to include response headers in the generated response type. When set to true, the generated response type will include response headers as properties.
 
-### `include-shortcuts`
-
-**Type:** `boolean`
-
-Deprecated option for RLC legacy generation.
-
-### `multi-client`
-
-**Type:** `boolean`
-
-Deprecated option for RLC legacy generation.
-
-### `batch`
-
-**Type:** `string[]`
-
-Deprecated option for RLC legacy generation.
-
 ### `package-details`
 
-**Type:** `object { name, scopeName, nameWithoutScope, description, version, isVersionUserProvided }`
+**Type:** `object { name, scopeName, nameWithoutScope, description, version }`
 
 This is to indicate the package information such as package name, package description etc.
 
 **Properties:**
 
-| Name                    | Type      | Default | Description |
-| ----------------------- | --------- | ------- | ----------- |
-| `name`                  | `string`  |         |             |
-| `scopeName`             | `string`  |         |             |
-| `nameWithoutScope`      | `string`  |         |             |
-| `description`           | `string`  |         |             |
-| `version`               | `string`  |         |             |
-| `isVersionUserProvided` | `boolean` |         |             |
+| Name               | Type     | Default | Description |
+| ------------------ | -------- | ------- | ----------- |
+| `name`             | `string` |         |             |
+| `scopeName`        | `string` |         |             |
+| `nameWithoutScope` | `string` |         |             |
+| `description`      | `string` |         |             |
+| `version`          | `string` |         |             |
 
 ### `add-credentials`
 
@@ -129,9 +133,8 @@ Whether to generate metadata files which includes package.json, README.md and ts
 Whether to generate test files, for basic testing of your generated sdks. Defaults to `undefined`.
 other cases:
 
-- If azure-sdk-for-js is `false`. Defaults to `false`.
-- If azure-sdk-for-js is `true` but there's a test folder under package-dir. Defaults to `false`.
-- If azure-sdk-for-js is `true` but there's not a test folder under package-dir. Defaults to `true`.
+- If there's a test folder under package-dir. Defaults to `false`.
+- If there's not a test folder under package-dir. Defaults to `true`.
 
 ### `generate-sample`
 
@@ -139,81 +142,11 @@ other cases:
 
 Whether to generate sample files, for basic samples of your generated sdks. Defaults to `undefined`. Management packages' default to `true`.
 
-### `azure-sdk-for-js`
-
-**Type:** `boolean`
-
-This is used to indicate your project is generated in [azure-sdk-for-js](https://github.com/Azure/azure-sdk-for-js) repo or not. If your package is located in that repo we'll leverage `dev-tool` to accelerate our building and testing, however if not we'll remove the dependency for that tool. Defaults to `undefined`. Services with Flavor equal to 'Azure' default to 'true'.
-
-### `azure-output-directory`
-
-**Type:** `string`
-
-Deprecated option for RLC legacy generation
-
-### `is-typespec-test`
-
-**Type:** `boolean`
-
-Internal option for test
-
-### `title`
-
-**Type:** `string`
-
-Deprecated option for RLC legacy generation.
-
-### `dependency-info`
-
-**Type:** `object { link, description }`
-
-Deprecated option for RLC legacy generation.
-
-**Properties:**
-
-| Name          | Type     | Default | Description |
-| ------------- | -------- | ------- | ----------- |
-| `link`        | `string` |         |             |
-| `description` | `string` |         |             |
-
-### `product-doc-link`
-
-**Type:** `string`
-
-Deprecated option for RLC legacy generation.
-
-### `service-info`
-
-**Type:** `object { title, description }`
-
-Deprecated option for RLC legacy generation.
-
-**Properties:**
-
-| Name          | Type     | Default | Description |
-| ------------- | -------- | ------- | ----------- |
-| `title`       | `string` |         |             |
-| `description` | `string` |         |             |
-
 ### `azure-arm`
 
 **Type:** `boolean`
 
 Whether the package is an arm package.
-
-### `source-from`
-
-**Type:** `string`
-
-Internal option, the value is default for TypeSpec generation
-
-### `is-modular-library`
-
-**Type:** `boolean`
-
-**Default:** `false`
-
-Whether to generate a Modular library. Defaults to `false`. Arm packages default to `true`.
 
 ### `enable-operation-group`
 
@@ -232,26 +165,6 @@ Provides an option to add the model namespace to model names in case of conflict
 **Type:** `boolean`
 
 An option to organize the client in a hierarchical way as defined by `@clientInitialization`. This is true by default.
-
-### `branded`
-
-**Type:** `boolean`
-
-A section of flavor
-
-### `flavor`
-
-**Type:** `string`
-
-The flavor of the SDK.
-
-### `module-kind`
-
-**Type:** `"esm"`
-
-**Default:** `"esm"`
-
-Internal option for test.
 
 ### `compatibility-mode`
 
@@ -289,18 +202,6 @@ The emitter will use camel case to normalize the property name, to ignore this n
 
 The emitter has a normalization logic for enum member key, to ignore this normalization, you can set this option to true
 
-### `compatibility-query-multi-format`
-
-**Type:** `boolean`
-
-Whether to generate the backward-compatible code for query parameter serialization for array types in RLC. Defaults to `false`
-
-### `default-value-object`
-
-**Type:** `boolean`
-
-Deprecated option for RLC legacy generation.
-
 ### `typespec-title-map`
 
 **Type:** `object`
@@ -313,12 +214,6 @@ typespec-title-map:
   AnomalyDetectorClient: AnomalyDetectorRest
   AnomalyDetectorClient2: AnomalyDetectorRest2
 ```
-
-### `should-use-pnpm-dep`
-
-**Type:** `boolean`
-
-Internal option for test.
 
 ### `ignore-nullable-on-optional`
 
@@ -348,4 +243,4 @@ When set to true, TypeSpec `unknown` type will be translated to `Record<string, 
 
 **Type:** `boolean`
 
-When set to true, generates React Native build targets (tsconfig, warp target, package.json exports). Only applicable when azure-sdk-for-js is true. Defaults to `false`.
+When set to true, generates React Native build targets (tsconfig, warp target, package.json exports). Defaults to `false`.

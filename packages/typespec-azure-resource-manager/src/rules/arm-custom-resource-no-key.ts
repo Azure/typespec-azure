@@ -1,9 +1,10 @@
-import { createRule, isKey, Model } from "@typespec/compiler";
+import { createRule, fileRef, isKey, Model } from "@typespec/compiler";
 import { isCustomAzureResource } from "../resource.js";
 import { getProperties } from "./utils.js";
 
 export const armCustomResourceNoKey = createRule({
   name: "arm-custom-resource-no-key",
+  docs: fileRef.fromPackageRoot("src/rules/arm-custom-resource-no-key.md"),
   description: "Validate that custom resource contains a key property.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-custom-resource-no-key",

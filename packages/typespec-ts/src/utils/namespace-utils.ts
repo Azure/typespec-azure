@@ -22,15 +22,15 @@ export function getOperationNamespaceInterfaceName(
 ): string[] {
   const result: string[] = [];
   if (
-    dpgContext.rlcOptions?.hierarchyClient === false &&
-    dpgContext.rlcOptions?.enableOperationGroup !== true
+    dpgContext.emitterOptions?.hierarchyClient === false &&
+    dpgContext.emitterOptions?.enableOperationGroup !== true
   ) {
     return result;
   }
   if (operation.interface) {
     if (
-      dpgContext.rlcOptions?.enableOperationGroup === true &&
-      dpgContext.rlcOptions?.hierarchyClient === false
+      dpgContext.emitterOptions?.enableOperationGroup === true &&
+      dpgContext.emitterOptions?.hierarchyClient === false
     ) {
       result.push(operation.interface.name);
       return result;

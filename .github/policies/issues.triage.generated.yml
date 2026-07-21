@@ -30,7 +30,11 @@ configuration:
                 - hasLabel:
                     label: emitter:python
                 - hasLabel:
+                    label: emitter:go
+                - hasLabel:
                     label: emitter:typescript
+                - hasLabel:
+                    label: emitter:java
                 - hasLabel:
                     label: emitter:client:all
                 - hasLabel:
@@ -41,6 +45,8 @@ configuration:
                     label: cli/psh
                 - hasLabel:
                     label: meta:website
+                - hasLabel:
+                    label: linter
         then:
           - addLabel:
               label: needs-area
@@ -64,7 +70,11 @@ configuration:
               - labelAdded:
                   label: emitter:python
               - labelAdded:
+                  label: emitter:go
+              - labelAdded:
                   label: emitter:typescript
+              - labelAdded:
+                  label: emitter:java
               - labelAdded:
                   label: emitter:client:all
               - labelAdded:
@@ -75,6 +85,8 @@ configuration:
                   label: cli/psh
               - labelAdded:
                   label: meta:website
+              - labelAdded:
+                  label: linter
         then:
           - removeLabel:
               label: needs-area
@@ -99,7 +111,11 @@ configuration:
               - labelRemoved:
                   label: emitter:python
               - labelRemoved:
+                  label: emitter:go
+              - labelRemoved:
                   label: emitter:typescript
+              - labelRemoved:
+                  label: emitter:java
               - labelRemoved:
                   label: emitter:client:all
               - labelRemoved:
@@ -110,6 +126,8 @@ configuration:
                   label: cli/psh
               - labelRemoved:
                   label: meta:website
+              - labelRemoved:
+                  label: linter
           - not:
               or:
                 - hasLabel:
@@ -125,7 +143,11 @@ configuration:
                 - hasLabel:
                     label: emitter:python
                 - hasLabel:
+                    label: emitter:go
+                - hasLabel:
                     label: emitter:typescript
+                - hasLabel:
+                    label: emitter:java
                 - hasLabel:
                     label: emitter:client:all
                 - hasLabel:
@@ -136,6 +158,8 @@ configuration:
                     label: cli/psh
                 - hasLabel:
                     label: meta:website
+                - hasLabel:
+                    label: linter
         then:
           - addLabel:
               label: needs-area

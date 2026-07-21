@@ -98,7 +98,7 @@ export interface TCGCEmitterOptions extends BrandedSdkEmitterOptionsInterface {
 export interface UnbrandedSdkEmitterOptionsInterface {
   "generate-protocol-methods"?: boolean;
   "generate-convenience-methods"?: boolean;
-  "api-version"?: string;
+  "api-version"?: string | Record<string, string>;
   license?: {
     name: string;
     company?: string;
@@ -364,6 +364,16 @@ export function filterApiVersionsWithDecorators(
   type: Type,
   apiVersions: string[],
 ): string[] {
+  // The service namespace is only needed to resolve a per-service version map.
+  const isMultiService = context.getPackageVersions().size > 1;
+  const serviceNamespace =
+    typeof context.apiVersion === "object" ? getServiceNamespaceForType(context, type) : undefined;
+  const apiVersion = resolveApiVersionForService(context, serviceNamespace, isMultiService);
+  // index of the explicitly specified version in the list; -1 means latest / not found
+  const apiVersionIndex =
+    apiVersion === undefined || apiVersion === "latest" || apiVersion === "all"
+      ? -1
+      : apiVersions.indexOf(apiVersion);
   const addedOnVersions = getAddedOnVersions(context.program, type)?.map((x) => x.value) ?? [];
   const removedOnVersions = getRemovedOnVersions(context.program, type)?.map((x) => x.value) ?? [];
   let added: boolean = addedOnVersions.length ? false : true;
@@ -381,13 +391,8 @@ export function filterApiVersionsWithDecorators(
       removeCounter++;
     }
     if (added) {
-      // only add version smaller than config
-      if (
-        context.apiVersion === undefined ||
-        context.apiVersion === "latest" ||
-        context.apiVersion === "all" ||
-        apiVersions.indexOf(context.apiVersion) >= i
-      ) {
+      // only add version smaller than config (or all versions when no explicit version applies)
+      if (apiVersionIndex < 0 || apiVersionIndex >= i) {
         retval.push(version);
       }
     }
@@ -539,15 +544,7 @@ export function getTypeDecorators(
 function getDecoratorArgValue(
   context: TCGCContext,
   arg:
-    | Type
-    | Record<string, unknown>
-    | Value
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | Numeric
-    | null,
+    Type | Record<string, unknown> | Value | unknown[] | string | number | boolean | Numeric | null,
   type: Type,
   decoratorName: string,
 ): [any, readonly Diagnostic[]] {
@@ -671,14 +668,13 @@ export function getHttpOperationResponseHeaders(
 export function removeVersionsLargerThanExplicitlySpecified(
   context: TCGCContext,
   versions: { value: string | number }[],
+  serviceNamespace: Namespace | undefined,
+  isMultiService: boolean,
 ): void {
   // filter with specific api version
-  if (
-    context.apiVersion !== undefined &&
-    context.apiVersion !== "latest" &&
-    context.apiVersion !== "all"
-  ) {
-    const index = versions.findIndex((version) => version.value === context.apiVersion);
+  const apiVersion = resolveApiVersionForService(context, serviceNamespace, isMultiService);
+  if (apiVersion !== undefined && apiVersion !== "latest" && apiVersion !== "all") {
+    const index = versions.findIndex((version) => version.value === apiVersion);
     if (index >= 0) {
       versions.splice(index + 1, versions.length - index - 1);
     }
@@ -689,9 +685,15 @@ export function filterPreviewVersion(
   context: TCGCContext,
   sdkVersionsEnum: SdkEnumType,
   defaultApiVersion: string,
+  serviceNamespace?: Namespace,
 ): void {
   // if they explicitly set an api version, remove larger versions
-  removeVersionsLargerThanExplicitlySpecified(context, sdkVersionsEnum.values);
+  removeVersionsLargerThanExplicitlySpecified(
+    context,
+    sdkVersionsEnum.values,
+    serviceNamespace,
+    context.getPackageVersions().size > 1,
+  );
   if (!context.previewStringRegex.test(defaultApiVersion)) {
     sdkVersionsEnum.values = sdkVersionsEnum.values.filter((v) => {
       if (typeof v.value !== "string") {
@@ -942,16 +944,15 @@ function getVersioningMutator(
 export function handleVersioningMutationForGlobalNamespace(context: TCGCContext): Namespace {
   const globalNamespace = context.program.getGlobalNamespaceType();
 
-  // First consider explicit clients
+  // Compute the set of service namespaces the SDK targets. This runs before the
+  // client/operation cache (and thus context.getPackageVersions()) is available,
+  // so the set is derived directly from explicit `@client`s or `@service`s.
   const servicesNs = new Set<Namespace>();
   listScopedDecoratorData(context, clientKey).forEach((v, k) => {
-    // See all explicit clients that in TypeSpec program
     if (!unsafe_Realm.realmForType.has(k)) {
       (v as SdkClient).services.forEach((s) => servicesNs.add(s));
     }
   });
-
-  // Then see the original services
   if (servicesNs.size === 0) {
     listServices(context.program).map((v) => servicesNs.add(v.type));
   }
@@ -959,49 +960,38 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
   // No service, thus no versioning mutation needed
   if (servicesNs.size === 0) return globalNamespace;
 
-  // Multi services' client should not honor the specific api-version set in config
-  if (
-    servicesNs.size > 1 &&
-    context.apiVersion !== undefined &&
-    context.apiVersion !== "latest" &&
-    context.apiVersion !== "all"
-  ) {
-    context.apiVersion = undefined;
-  }
-
-  // Explicit all API version setting, thus no versioning mutation needed
-  if (context.apiVersion === "all") return globalNamespace;
+  const isMultiService = servicesNs.size > 1;
 
   // Compose service mutators
   const mutators: unsafe_MutatorWithNamespace[] = [];
 
   for (const serviceNs of servicesNs) {
-    const versions = getVersions(context.program, serviceNs)[1]?.getVersions();
-    // If the service has no versioning, no mutation needed
-    if (!versions || versions.length === 0) return globalNamespace;
+    // Resolve the api-version config that applies to this specific service.
+    const serviceApiVersion = resolveApiVersionForService(context, serviceNs, isMultiService);
 
-    // Single service needs to filter versions based on `apiVersion` config
-    if (servicesNs.size === 1) {
-      removeVersionsLargerThanExplicitlySpecified(context, versions);
-    }
+    // Explicit `all` setting for this service, keep all its versions (no mutation).
+    if (serviceApiVersion === "all") continue;
+
+    const versions = getVersions(context.program, serviceNs)[1]?.getVersions();
+    // If the service has no versioning, no mutation needed for it
+    if (!versions || versions.length === 0) continue;
+
+    // Filter versions based on the `apiVersion` config resolved for this service
+    removeVersionsLargerThanExplicitlySpecified(context, versions, serviceNs, isMultiService);
 
     const versionsValues = versions.map((v) => v.value);
 
-    // Fix apiVersion setting problem only if there's only one service
-    if (servicesNs.size === 1) {
-      if (
-        context.apiVersion !== undefined &&
-        context.apiVersion !== "latest" &&
-        context.apiVersion !== "all" &&
-        !versionsValues.includes(context.apiVersion)
-      ) {
-        reportDiagnostic(context.program, {
-          code: "api-version-undefined",
-          format: { version: context.apiVersion },
-          target: serviceNs,
-        });
-        context.apiVersion = versionsValues[versionsValues.length - 1];
-      }
+    // Report when the explicitly specified version does not exist; fall back to the latest
+    if (
+      serviceApiVersion !== undefined &&
+      serviceApiVersion !== "latest" &&
+      !versionsValues.includes(serviceApiVersion)
+    ) {
+      reportDiagnostic(context.program, {
+        code: "api-version-undefined",
+        format: { version: serviceApiVersion },
+        target: serviceNs,
+      });
     }
 
     // Get service mutator according to the version setting
@@ -1018,6 +1008,70 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
   compilerAssert(subgraph.realm !== null, "Should have a realm after mutation");
   context.__mutatedRealm = subgraph.realm;
   return subgraph.type;
+}
+
+/**
+ * Resolve the `api-version` config that applies to a specific service namespace.
+ *
+ * - When the option is a string: `latest` is a global keyword; any other string
+ *   (a specific version or `all`) applies only to the single service case and is
+ *   ignored for multi-service packages.
+ * - When the option is a record, the version is looked up by the service
+ *   namespace's full name. Services that are not listed return `undefined`
+ *   (meaning "use the latest version").
+ *
+ * Multi-service packages do not support the special `all` value (in either the
+ * string or the record form); it is ignored and treated as `undefined` (use the
+ * latest version of each service).
+ *
+ * The returned value can be a specific version, the special values `latest` /
+ * `all`, or `undefined`.
+ */
+export function resolveApiVersionForService(
+  context: TCGCContext,
+  serviceNamespace: Namespace | undefined,
+  isMultiService: boolean,
+): string | undefined {
+  const config = context.apiVersion;
+  if (config === undefined) return undefined;
+  if (typeof config === "string") {
+    // `latest` is a global keyword that applies regardless of how many services
+    // the package targets.
+    if (config === "latest") return "latest";
+    // `all` and specific version strings only apply to the single service case;
+    // multi-service packages do not support `all`.
+    return isMultiService ? undefined : config;
+  }
+  // Record case: map each service namespace's full name to a version.
+  if (serviceNamespace === undefined) return undefined;
+  const version = config[getNamespaceFullName(serviceNamespace)];
+  // Multi-service packages do not support `all`; fall back to the latest version.
+  if (version === "all" && isMultiService) return undefined;
+  return version;
+}
+
+/**
+ * Find the service namespace that owns the given type. Starts from the type's
+ * versioned namespace and walks up the enclosing namespaces until it reaches a
+ * known service namespace. Returns `undefined` if none is found.
+ *
+ * Must only be called after the client/operation cache is prepared, since the
+ * service namespaces are read from `context.getPackageVersions()`.
+ */
+function getServiceNamespaceForType(
+  context: TCGCContext,
+  type: Type | undefined,
+): Namespace | undefined {
+  if (type === undefined) return undefined;
+  const services = context.getPackageVersions();
+  if (services.size === 0) return undefined;
+
+  let current: Namespace | undefined = getVersions(context.program, type)[0];
+  while (current) {
+    if (services.has(current)) return current;
+    current = current.namespace;
+  }
+  return undefined;
 }
 
 export function resolveDuplicateGenearatedName(

@@ -6,12 +6,12 @@ import {
   SdkMethodParameter,
   SdkServiceOperation,
 } from "@azure-tools/typespec-client-generator-core";
-import { OptionalKind, ParameterDeclarationStructure, StatementedNode } from "ts-morph";
+import { Node, OptionalKind, ParameterDeclarationStructure, StatementedNode } from "ts-morph";
 import { ModularEmitterOptions } from "../interfaces.js";
 
 import { resolveReference } from "../../framework/reference.js";
-import { NameType, normalizeName, PackageFlavor } from "../../rlc-common/index.js";
 import { SdkContext } from "../../utils/interfaces.js";
+import { NameType, normalizeName } from "../../utils/name-utils.js";
 import { CloudSettingHelpers } from "../static-helpers-metadata.js";
 import { getTypeExpression } from "../type-expressions/get-type-expression.js";
 import { getClassicalClientName } from "./naming-helpers.js";
@@ -27,10 +27,7 @@ interface ClientParameterOptions {
 }
 
 type SdkParameter =
-  | SdkMethodParameter
-  | SdkEndpointParameter
-  | SdkCredentialParameter
-  | SdkHttpParameter;
+  SdkMethodParameter | SdkEndpointParameter | SdkCredentialParameter | SdkHttpParameter;
 
 export function hasDefaultValue(p: SdkParameter) {
   if (p.clientDefaultValue || p.__raw?.defaultValue || p.type.kind === "constant") {
@@ -87,10 +84,10 @@ export function getClientParameters(
   const armSpecific = (p: SdkParameter) => !(p.kind === "endpoint" && dpgContext.arm);
   // Skip apiVersion parameter when it's multi-service (each service has its own default apiVersion)
   const skipApiVersionOnMultiService = (p: SdkParameter) =>
-    !(dpgContext.rlcOptions?.isMultiService && p.isApiVersionParam);
+    !(dpgContext.emitterOptions?.isMultiService && p.isApiVersionParam);
   const filters = [
     options.requiredOnly ? isRequired : undefined,
-    dpgContext.rlcOptions?.addCredentials === false ? skipCredentials : undefined,
+    dpgContext.emitterOptions?.addCredentials === false ? skipCredentials : undefined,
     options.optionalOnly ? isOptional : undefined,
     options.onClientOnly ? skipMethodParam : undefined,
     options.skipArmSpecific ? undefined : armSpecific,
@@ -169,16 +166,10 @@ export function buildGetClientEndpointParam(
   client: SdkClientType<SdkServiceOperation>,
 ): { endpointParamName: string; assignedOptionalParams?: Set<string> } {
   const assignedOptionalParams = new Set<string>();
-  let coreEndpointParam: string;
-  if (dpgContext.rlcOptions?.flavor === "azure") {
-    const cloudSettingSuffix = dpgContext.arm
-      ? ` ?? ${resolveReference(CloudSettingHelpers.getArmEndpoint)}(options.cloudSetting)`
-      : "";
-    coreEndpointParam = `options.endpoint${cloudSettingSuffix}`;
-  } else {
-    // unbranded does not have the deprecated baseUrl parameter
-    coreEndpointParam = `options.endpoint`;
-  }
+  const cloudSettingSuffix = dpgContext.arm
+    ? ` ?? ${resolveReference(CloudSettingHelpers.getArmEndpoint)}(options.cloudSetting)`
+    : "";
+  const coreEndpointParam = `options.endpoint${cloudSettingSuffix}`;
   // Special case: endpoint URL not defined
   const endpointParam = getClientParameters(client, dpgContext, {
     onClientOnly: true,
@@ -242,13 +233,13 @@ export function buildGetClientEndpointParam(
  * @returns - an expression representing the options to be passed in to getClient
  */
 export function buildGetClientOptionsParam(
-  context: StatementedNode,
+  context: StatementedNode & Node,
   emitterOptions: ModularEmitterOptions,
   endpointParam: string,
   apiVersionParamName?: string,
 ): string {
-  const userAgentOptions = buildUserAgentOptions(context, emitterOptions, "azsdk-js-api");
-  const loggingOptions = buildLoggingOptions(emitterOptions.options.flavor);
+  const userAgentOptions = buildUserAgentOptions(context, emitterOptions);
+  const loggingOptions = buildLoggingOptions();
   const credentials = buildCredentials(emitterOptions, endpointParam);
 
   // Use the actual api version parameter name for destructuring, defaulting to "apiVersion"
@@ -315,45 +306,59 @@ function buildCredentials(
   return `{ ${scopes}${apiKeyHeaderName} }`;
 }
 
-function buildLoggingOptions(flavor?: PackageFlavor): string | undefined {
-  if (flavor !== "azure") {
-    return undefined;
-  }
-
+function buildLoggingOptions(): string | undefined {
   return `{ logger: options.loggingOptions?.logger ?? logger.info }`;
 }
 
+/**
+ * Builds the `userAgentOptions` for the generated client, producing a telemetry
+ * prefix of the form `[<application_id> ]azsdk-js-<package>/<version>` per the Azure
+ * Core telemetry policy: https://azure.github.io/azure-sdk/general_azurecore.html#telemetry-policy
+ */
 export function buildUserAgentOptions(
-  context: StatementedNode,
+  context: StatementedNode & Node,
   emitterOptions: ModularEmitterOptions,
-  sdkUserAgentPrefix: string,
 ): string {
   const userAgentStatements = [];
   const prefixFromOptions = "const prefixFromOptions = options?.userAgentOptions?.userAgentPrefix;";
   userAgentStatements.push(prefixFromOptions);
 
+  const packageName = emitterOptions.options.packageDetails?.name;
   const clientPackageName =
-    emitterOptions.options.packageDetails?.nameWithoutScope ??
-    emitterOptions.options.packageDetails?.name ??
-    "";
-  const packageVersion = emitterOptions.options.packageDetails?.version ?? "";
+    emitterOptions.options.packageDetails?.nameWithoutScope ?? packageName ?? "";
 
-  const userAgentInfoStatement =
-    packageVersion && clientPackageName && sdkUserAgentPrefix.includes("api")
-      ? "const userAgentInfo = `azsdk-js-" + clientPackageName + "/" + packageVersion + "`;"
-      : "";
-
-  if (userAgentInfoStatement) {
-    userAgentStatements.push(userAgentInfoStatement);
+  // The version is read from the generated package.json at runtime rather than
+  // hardcoded here: once the package is generated, its version is owned by
+  // package.json. We import it via the package's own "./package.json" export so
+  // the specifier is identical in `src` and the built `dist` output.
+  let userAgentInfoStatement = "";
+  if (clientPackageName && packageName) {
+    const packageJsonModule = `${packageName}/package.json`;
+    const sourceFile = context.getSourceFile();
+    const hasPackageJsonImport = sourceFile
+      .getImportDeclarations()
+      .some((declaration) => declaration.getModuleSpecifierValue() === packageJsonModule);
+    if (!hasPackageJsonImport) {
+      sourceFile.addImportDeclaration({
+        defaultImport: "pkgJson",
+        moduleSpecifier: packageJsonModule,
+        attributes: [{ name: "type", value: "json" }],
+      });
+    }
+    userAgentInfoStatement =
+      "const userAgentInfo = `azsdk-js-" + clientPackageName + "/${pkgJson.version}`;";
   }
-  const userAgentPrefix = `const userAgentPrefix = ${
-    "prefixFromOptions ? `${prefixFromOptions} " +
-    sdkUserAgentPrefix +
-    `${userAgentInfoStatement ? " ${userAgentInfo}" : ""}` +
-    "` : `" +
-    `${sdkUserAgentPrefix}` +
-    `${userAgentInfoStatement ? " ${userAgentInfo}`" : "`"}`
-  };`;
+
+  if (!userAgentInfoStatement) {
+    // Without package name/version we cannot build a meaningful telemetry token,
+    // so we leave the user agent untouched (the caller's userAgentOptions still flow
+    // through `...options`) and let core-rest-pipeline defaults apply.
+    return "";
+  }
+
+  userAgentStatements.push(userAgentInfoStatement);
+  const userAgentPrefix =
+    "const userAgentPrefix = prefixFromOptions ? `${prefixFromOptions} ${userAgentInfo}` : `${userAgentInfo}`;";
   userAgentStatements.push(userAgentPrefix);
 
   context.addStatements(userAgentStatements.join("\n"));

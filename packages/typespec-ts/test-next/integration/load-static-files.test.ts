@@ -73,7 +73,7 @@ describe("loadStaticHelpers", () => {
     ).rejects.toThrowError(/invalid helper kind/);
   });
 
-  it("should rewrite platform-types imports to #platform subpath without extension for azure monorepo", async () => {
+  it("should rewrite platform-types imports to #platform subpath without extension", async () => {
     const helpers = {
       usesPlatformImport: {
         kind: "function",
@@ -85,10 +85,6 @@ describe("loadStaticHelpers", () => {
     await loadStaticHelpers(project, helpers, {
       host: NodeHost,
       helpersAssetDirectory,
-      options: {
-        flavor: "azure",
-        azureSdkForJs: true,
-      } as any,
     });
 
     const sourceFile = project

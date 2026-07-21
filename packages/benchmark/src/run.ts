@@ -1,12 +1,20 @@
 /* eslint-disable no-console */
-import { compile, NodeHost, resolveCompilerOptions } from "@typespec/compiler";
-import { execSync } from "child_process";
+import { execSync, spawn } from "child_process";
+import { existsSync } from "fs";
 import { readdir } from "fs/promises";
 import os from "os";
 import { join, resolve } from "path";
+import { fileURLToPath } from "url";
 import { aggregateDurations } from "./aggregate.js";
+import {
+  EXTERNAL_SPEC_CONFIG,
+  loadExternalSpecConfig,
+  resolveExternalSpecs,
+} from "./external-specs.js";
+import { summarize } from "./statistics.js";
 import type {
   BenchmarkResult,
+  NoiseGateInfo,
   RunnerInfo,
   RuntimeStats,
   SpecBenchmarkResult,
@@ -27,59 +35,86 @@ export interface RunOptions {
   specs?: string[];
   /** Git commit SHA to record. */
   commit?: string;
+  /** If set, rerun a spec when total-runtime coefficient of variation exceeds threshold. */
+  noiseCvThreshold?: number;
+  /** Max number of rerun cycles for noisy specs. */
+  maxReruns?: number;
+  /** Number of additional measured iterations on each rerun (default: iterations). */
+  rerunIterations?: number;
 }
 
-/** Discover benchmark spec directories under the given path. */
-async function discoverSpecs(specsDir: string, filter?: string[]): Promise<string[]> {
-  const entries = await readdir(specsDir, { withFileTypes: true });
-  const dirs = entries
-    .filter((e) => e.isDirectory())
-    .map((e) => e.name)
-    .sort((a, b) => a.localeCompare(b));
+/** A benchmark spec source: a name and the directory containing its main.tsp. */
+interface SpecSource {
+  name: string;
+  dir: string;
+}
+
+/** Discover benchmark spec sources under the given directory.
+ *
+ * Each subdirectory is a spec: one containing a `main.tsp` is a local spec; one
+ * containing a `spec.json` is an external spec (sparse-checked-out from another
+ * repository). Both are treated uniformly as spec sources. */
+async function discoverSpecSources(specsDir: string, filter?: string[]): Promise<SpecSource[]> {
+  const dirs = (await readdir(specsDir, { withFileTypes: true })).filter((e) => e.isDirectory());
+
+  const localSources: SpecSource[] = dirs
+    .filter((e) => existsSync(join(specsDir, e.name, "main.tsp")))
+    .map((e) => ({ name: e.name, dir: join(specsDir, e.name) }));
+
+  const externalConfigs = dirs
+    .filter((e) => existsSync(join(specsDir, e.name, EXTERNAL_SPEC_CONFIG)))
+    .map((e) => loadExternalSpecConfig(join(specsDir, e.name)));
+
+  const externalSources: SpecSource[] =
+    externalConfigs.length > 0
+      ? resolveExternalSpecs(externalConfigs).map((s) => ({ name: s.name, dir: s.dir }))
+      : [];
+
+  const sources = [...localSources, ...externalSources].sort((a, b) =>
+    a.name.localeCompare(b.name),
+  );
+
   if (filter && filter.length > 0) {
-    return dirs.filter((d) => filter.includes(d));
+    return sources.filter((s) => filter.includes(s.name));
   }
-  return dirs;
+  return sources;
 }
 
-/** Compile a single spec and return its stats. */
+const compileOncePath = fileURLToPath(new URL("./compile-once.js", import.meta.url));
+
+/** Compile a single spec in an isolated process and return its stats. */
 async function compileSpec(specDir: string): Promise<Stats> {
-  const mainFile = join(specDir, "main.tsp");
-  const [options, diagnostics] = await resolveCompilerOptions(NodeHost, {
-    entrypoint: mainFile,
-    cwd: specDir,
+  return await new Promise<Stats>((resolve, reject) => {
+    const child = spawn(process.execPath, [compileOncePath, specDir], {
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    let stdout = "";
+    let stderr = "";
+    child.stdout.on("data", (chunk) => {
+      stdout += chunk.toString();
+    });
+    child.stderr.on("data", (chunk) => {
+      stderr += chunk.toString();
+    });
+    child.on("error", (error) => {
+      reject(error);
+    });
+    child.on("close", (code) => {
+      if (code !== 0) {
+        reject(new Error(stderr.trim() || `Compilation process exited with code ${code}`));
+        return;
+      }
+      try {
+        resolve(JSON.parse(stdout) as Stats);
+      } catch (error) {
+        reject(
+          new Error(
+            `Failed to parse benchmark stats output: ${error instanceof Error ? error.message : String(error)}`,
+          ),
+        );
+      }
+    });
   });
-  if (diagnostics.length > 0) {
-    const msgs = diagnostics.map((d: any) => `  ${d.message}`).join("\n");
-    console.warn(`  Warnings resolving options for ${specDir}:\n${msgs}`);
-  }
-
-  const program = await compile(NodeHost, mainFile, {
-    ...options,
-    outputDir: join(specDir, "tsp-output"),
-  });
-
-  if (program.hasError()) {
-    const errorDiags = program.diagnostics
-      .filter((d: any) => d.severity === "error")
-      .map((d: any) => `  ${d.message}`)
-      .join("\n");
-    throw new Error(`Compilation failed for ${specDir}:\n${errorDiags}`);
-  }
-
-  // program.stats is @internal but available at runtime
-  const stats = (program as any).stats as Stats;
-
-  // Recompute total without the emit stage so that adding more emitters
-  // does not inflate the "compilation" total metric.
-  stats.runtime.total =
-    (stats.runtime.loader ?? 0) +
-    (stats.runtime.resolver ?? 0) +
-    (stats.runtime.checker ?? 0) +
-    (stats.runtime.validation?.total ?? 0) +
-    (stats.runtime.linter?.total ?? 0);
-
-  return stats;
 }
 
 /** Average multiple Stats objects. */
@@ -198,19 +233,23 @@ export async function runBenchmarks(options: RunOptions): Promise<BenchmarkResul
   const iterations = options.iterations ?? DEFAULT_ITERATIONS;
   const warmup = options.warmup ?? DEFAULT_WARMUP;
 
-  const specNames = await discoverSpecs(specsDir, options.specs);
-  if (specNames.length === 0) {
+  const specSources = await discoverSpecSources(specsDir, options.specs);
+  if (specSources.length === 0) {
     throw new Error(`No benchmark specs found in ${specsDir}`);
   }
 
   console.log(
-    `Running benchmarks: ${specNames.length} spec(s), ${warmup} warmup + ${iterations} iterations each`,
+    `Running benchmarks: ${specSources.length} spec(s), ${warmup} warmup + ${iterations} iterations each`,
   );
 
   const specs: Record<string, SpecBenchmarkResult> = {};
+  const noiseCvThreshold = options.noiseCvThreshold;
+  const maxReruns = options.maxReruns ?? 0;
+  const rerunIterations = options.rerunIterations ?? iterations;
 
-  for (const specName of specNames) {
-    const specDir = join(specsDir, specName);
+  for (const source of specSources) {
+    const specName = source.name;
+    const specDir = source.dir;
     console.log(`\n  Benchmarking: ${specName}`);
 
     // Warmup
@@ -227,14 +266,52 @@ export async function runBenchmarks(options: RunOptions): Promise<BenchmarkResul
       rawIterations.push(stats);
     }
 
+    let rerunsPerformed = 0;
+    if (noiseCvThreshold !== undefined && maxReruns > 0 && rerunIterations > 0) {
+      for (let rerun = 0; rerun < maxReruns; rerun++) {
+        const totalSummary = summarize(rawIterations.map((x) => x.runtime.total));
+        if (totalSummary.cv <= noiseCvThreshold) {
+          break;
+        }
+
+        rerunsPerformed++;
+        console.log(
+          `    Noise gate triggered (CV ${(totalSummary.cv * 100).toFixed(1)}% > ${(noiseCvThreshold * 100).toFixed(1)}%), running ${rerunIterations} extra iteration(s)...`,
+        );
+        for (let i = 0; i < rerunIterations; i++) {
+          console.log(`    Rerun iteration ${i + 1}/${rerunIterations}...`);
+          const stats = await compileSpec(specDir);
+          rawIterations.push(stats);
+        }
+      }
+    }
+
+    const totalSummary = summarize(rawIterations.map((x) => x.runtime.total));
+    const noiseGateInfo: NoiseGateInfo | undefined =
+      noiseCvThreshold === undefined
+        ? undefined
+        : {
+            thresholdCv: noiseCvThreshold,
+            maxReruns,
+            rerunIterations,
+            rerunsPerformed,
+            triggered: rerunsPerformed > 0,
+          };
+
     specs[specName] = {
       name: specName,
-      iterations,
+      iterations: rawIterations.length,
       stats: averageStats(rawIterations),
       rawIterations,
+      variability: {
+        total: totalSummary,
+        noiseGate: noiseGateInfo,
+      },
     };
 
-    console.log(`    Total: ${specs[specName].stats.runtime.total.toFixed(1)}ms (avg)`);
+    console.log(
+      `    Total: ${specs[specName].stats.runtime.total.toFixed(1)}ms (avg), CV ${(totalSummary.cv * 100).toFixed(1)}%`,
+    );
   }
 
   const commit = getGitCommit(options.commit);

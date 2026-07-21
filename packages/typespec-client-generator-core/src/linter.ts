@@ -1,11 +1,11 @@
 import { defineLinter } from "@typespec/compiler";
-import { noUnnamedTypesRule } from "./rules/no-unnamed-types.rule.js";
+import { csharpNoUrlSuffixRule } from "./rules/csharp-no-url-suffix.js";
 import { propertyNameConflictRule } from "./rules/property-name-conflict.rule.js";
 import { requireClientSuffixRule } from "./rules/require-client-suffix.rule.js";
 
-const rules = [requireClientSuffixRule, propertyNameConflictRule, noUnnamedTypesRule];
+const rules = [requireClientSuffixRule, propertyNameConflictRule, csharpNoUrlSuffixRule];
 
-const csharpRules = [propertyNameConflictRule];
+const csharpRules = [propertyNameConflictRule, csharpNoUrlSuffixRule];
 
 export const $linter = defineLinter({
   rules,

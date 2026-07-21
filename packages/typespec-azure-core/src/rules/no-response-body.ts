@@ -1,9 +1,10 @@
-import { Operation, createRule } from "@typespec/compiler";
+import { Operation, createRule, fileRef } from "@typespec/compiler";
 import { getResponsesForOperation } from "@typespec/http";
 import { isAzureSubNamespace, isTemplatedInterfaceOperation } from "./utils.js";
 
 export const noResponseBodyRule = createRule({
   name: "no-response-body",
+  docs: fileRef.fromPackageRoot("src/rules/no-response-body.md"),
   description: "Ensure that the body is set correctly for the response type.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-response-body",

@@ -218,8 +218,8 @@ export function addEncodeInfo(
       innerType.encode = "bytes";
     }
   }
-  if (isSdkIntKind(innerType.kind)) {
-    // only integer type is allowed to be encoded as string
+  if (isSdkIntKind(innerType.kind) || innerType.kind === "boolean") {
+    // integer and boolean types are allowed to be encoded as string
     if (encodeData) {
       if (encodeData?.encoding) {
         (innerType as any).encode = encodeData.encoding;
@@ -935,8 +935,7 @@ export function getSdkModelWithDiagnostics(
     const rawBaseModel = getLegacyHierarchyBuilding(context, type) || type.baseModel;
     if (rawBaseModel) {
       sdkType.baseModel = context.__referencedTypeCache.get(rawBaseModel) as
-        | SdkModelType
-        | undefined;
+        SdkModelType | undefined;
 
       if (sdkType.baseModel === undefined) {
         // Use "AdditionalProperty" label for Record base models
@@ -2467,7 +2466,7 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
       } else {
         sdkVersionsEnum = diagnostics.pipe(getSdkEnumWithDiagnostics(context, versionEnum));
       }
-      filterPreviewVersion(context, sdkVersionsEnum, versions?.at(-1) || "");
+      filterPreviewVersion(context, sdkVersionsEnum, versions?.at(-1) || "", service);
       diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum));
     }
   }
@@ -2510,6 +2509,12 @@ function updateSerializationOptions(
   }
 
   if (type.kind === "array" || type.kind === "dict") {
+    // An array/dict only needs its own serialization options when it is a named model
+    // with explicit serialization decorators (e.g. `@Xml.name("Foo") model Foo is Bar[];`);
+    // otherwise the wrapping element name comes from the property/model that references it.
+    // Passing an empty content type list ensures only explicitly-defined info is captured,
+    // avoiding spurious names on anonymous inline arrays/dicts.
+    setSerializationOptions(context, type, []);
     updateSerializationOptions(context, type.valueType, contentTypes, options);
     return diagnostics.wrap(undefined);
   }
@@ -2596,33 +2601,33 @@ function updateSerializationOptions(
 
 function setSerializationOptions(
   context: TCGCContext,
-  type: SdkModelType | SdkModelPropertyType,
+  type: SdkModelType | SdkModelPropertyType | SdkArrayType | SdkDictionaryType,
   contentTypes: string[],
 ) {
   for (const contentType of contentTypes) {
-    if (isMediaTypeJson(contentType) && !type.serializationOptions.json) {
+    if (isMediaTypeJson(contentType) && !type.serializationOptions?.json) {
       updateJsonSerializationOptions(context, type);
     }
 
-    if (isMediaTypeXml(contentType) && !type.serializationOptions.xml) {
+    if (isMediaTypeXml(contentType) && !type.serializationOptions?.xml) {
       updateXmlSerializationOptions(context, type);
     }
   }
   if (
-    !type.serializationOptions.json &&
+    !type.serializationOptions?.json &&
     type.__raw &&
     hasExplicitlyDefinedJsonSerializationInfo(context, type.__raw)
   ) {
     updateJsonSerializationOptions(context, type);
   }
   if (
-    !type.serializationOptions.xml &&
+    !type.serializationOptions?.xml &&
     type.__raw &&
     hasExplicitlyDefinedXmlSerializationInfo(context, type.__raw)
   ) {
     updateXmlSerializationOptions(context, type);
   }
-  const defaultContentTypes = type.serializationOptions.multipart?.defaultContentTypes;
+  const defaultContentTypes = type.serializationOptions?.multipart?.defaultContentTypes;
   if (defaultContentTypes && type.kind === "property" && type.type.kind === "model") {
     for (const prop of type.type.properties) {
       if (prop.kind === "property") {
@@ -2634,25 +2639,31 @@ function setSerializationOptions(
 
 function updateJsonSerializationOptions(
   context: TCGCContext,
-  type: SdkModelType | SdkModelPropertyType,
+  type: SdkModelType | SdkModelPropertyType | SdkArrayType | SdkDictionaryType,
 ) {
-  type.serializationOptions.json = {
+  const serializationOptions = (type.serializationOptions ??= {});
+  serializationOptions.json = {
     name:
       type.__raw?.kind === "Model" || type.__raw?.kind === "ModelProperty"
         ? resolveEncodedName(context.program, type.__raw, "application/json")
-        : type.name,
+        : "name" in type
+          ? type.name
+          : "",
   };
 }
 
 function updateXmlSerializationOptions(
   context: TCGCContext,
-  type: SdkModelType | SdkModelPropertyType,
+  type: SdkModelType | SdkModelPropertyType | SdkArrayType | SdkDictionaryType,
 ) {
-  type.serializationOptions.xml = {
+  const serializationOptions = (type.serializationOptions ??= {});
+  serializationOptions.xml = {
     name:
       type.__raw?.kind === "Model" || type.__raw?.kind === "ModelProperty"
         ? resolveEncodedName(context.program, type.__raw, "application/xml")
-        : type.name,
+        : "name" in type
+          ? type.name
+          : "",
     attribute: type.__raw?.kind === "ModelProperty" && isAttribute(context.program, type.__raw),
     ns: type.__raw ? getNs(context.program, type.__raw) : undefined,
     unwrapped: type.__raw?.kind === "ModelProperty" && isUnwrapped(context.program, type.__raw),
@@ -2664,26 +2675,26 @@ function updateXmlSerializationOptions(
     type.__raw.type.kind === "Model" &&
     isArrayModelType(type.__raw.type)
   ) {
-    if (!type.serializationOptions.xml.unwrapped) {
+    if (!serializationOptions.xml.unwrapped) {
       // if wrapped, set itemsName and itemsNS according to the array item type
       const itemType = type.__raw.type.indexer.value;
       if ("name" in itemType) {
         // if the type has name then get the name
-        type.serializationOptions.xml.itemsName = resolveEncodedName(
+        serializationOptions.xml.itemsName = resolveEncodedName(
           context.program,
           itemType as Type & { name: string },
           "application/xml",
         );
-        type.serializationOptions.xml.itemsNs = getNs(context.program, itemType);
+        serializationOptions.xml.itemsNs = getNs(context.program, itemType);
       } else {
         // otherwise use the property name
-        type.serializationOptions.xml.itemsName = type.serializationOptions.xml.name;
-        type.serializationOptions.xml.itemsNs = type.serializationOptions.xml.ns;
+        serializationOptions.xml.itemsName = serializationOptions.xml.name;
+        serializationOptions.xml.itemsNs = serializationOptions.xml.ns;
       }
     } else {
       // if unwrapped, always set itemName to property name
-      type.serializationOptions.xml.itemsName = type.serializationOptions.xml.name;
-      type.serializationOptions.xml.itemsNs = type.serializationOptions.xml.ns;
+      serializationOptions.xml.itemsName = serializationOptions.xml.name;
+      serializationOptions.xml.itemsNs = serializationOptions.xml.ns;
     }
   }
 }

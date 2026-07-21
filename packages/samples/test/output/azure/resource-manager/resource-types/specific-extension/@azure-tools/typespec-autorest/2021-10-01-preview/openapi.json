@@ -1016,10 +1016,10 @@
           {
             "name": "serviceGroupName",
             "in": "path",
-            "description": "The name of the service fabric cluster",
+            "description": "The service group name.",
             "required": true,
             "type": "string",
-            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
+            "minLength": 1
           }
         ],
         "responses": {
@@ -1055,10 +1055,10 @@
           {
             "name": "serviceGroupName",
             "in": "path",
-            "description": "The name of the service fabric cluster",
+            "description": "The service group name.",
             "required": true,
             "type": "string",
-            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
+            "minLength": 1
           },
           {
             "name": "employeeName",
@@ -1097,10 +1097,10 @@
           {
             "name": "serviceGroupName",
             "in": "path",
-            "description": "The name of the service fabric cluster",
+            "description": "The service group name.",
             "required": true,
             "type": "string",
-            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
+            "minLength": 1
           },
           {
             "name": "employeeName",
@@ -1169,10 +1169,10 @@
           {
             "name": "serviceGroupName",
             "in": "path",
-            "description": "The name of the service fabric cluster",
+            "description": "The service group name.",
             "required": true,
             "type": "string",
-            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
+            "minLength": 1
           },
           {
             "name": "employeeName",
@@ -1220,10 +1220,10 @@
           {
             "name": "serviceGroupName",
             "in": "path",
-            "description": "The name of the service fabric cluster",
+            "description": "The service group name.",
             "required": true,
             "type": "string",
-            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
+            "minLength": 1
           },
           {
             "name": "employeeName",
@@ -1279,10 +1279,10 @@
           {
             "name": "serviceGroupName",
             "in": "path",
-            "description": "The name of the service fabric cluster",
+            "description": "The service group name.",
             "required": true,
             "type": "string",
-            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
+            "minLength": 1
           },
           {
             "name": "employeeName",

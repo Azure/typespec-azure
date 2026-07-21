@@ -56,6 +56,7 @@ import {
   AssignUniqueProviderNameValueDecorator,
   AzureResourceBaseDecorator,
   AzureResourceManagerPrivateDecorators,
+  BaseTypeOptionalDecorator,
   BuiltInResourceOperationDecorator,
   DefaultResourceKeySegmentNameDecorator,
   EnforceConstraintDecorator,
@@ -157,7 +158,8 @@ const $genericResourceInternal: GenericResourceInternalDecorator = (
     namespaceName === undefined ||
     namespaceName === "Azure.ResourceManager" ||
     namespaceName === "Azure.ResourceManager.Legacy" ||
-    namespaceName === "Azure.ResourceManager.CommonTypes"
+    namespaceName === "Azure.ResourceManager.CommonTypes" ||
+    namespaceName?.startsWith("Azure.ResourceManager.BaseTypes")
   ) {
     return;
   }
@@ -532,7 +534,8 @@ export function registerArmResource(
     namespaceName === undefined ||
     namespaceName === "Azure.ResourceManager" ||
     namespaceName === "Azure.ResourceManager.Legacy" ||
-    namespaceName === "Azure.ResourceManager.CommonTypes"
+    namespaceName === "Azure.ResourceManager.CommonTypes" ||
+    namespaceName?.startsWith("Azure.ResourceManager.BaseTypes")
   ) {
     // The @armResource decorator will be evaluated on instantiations of
     // base templated resource types like TrackedResource<SomeResource>,
@@ -717,6 +720,26 @@ const $armBodyRoot: ArmBodyRootDecorator = (
   context.call($bodyRoot, target);
 };
 
+const $baseTypeOptional: BaseTypeOptionalDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  isPresent: boolean,
+  isAppliance: boolean,
+) => {
+  const { program } = context;
+  if (!isPresent) {
+    const lifecycle = getLifecycleVisibilityEnum(program);
+    clearVisibilityModifiersForClass(program, target, lifecycle);
+    sealVisibilityModifiers(program, target, lifecycle);
+  } else if (isAppliance) {
+    const lifecycle = getLifecycleVisibilityEnum(program);
+    const readMember = lifecycle.members.get("Read");
+    if (readMember) {
+      addVisibilityModifiers(program, target, [readMember], context);
+    }
+  }
+};
+
 const $legacyType: LegacyTypeDecorator = (
   context: DecoratorContext,
   target: Model | Operation | Interface | Scalar,
@@ -745,13 +768,7 @@ function callOperationDecorator(
   resourceType: Model,
   resourceName: string,
   operationType:
-    | "read"
-    | "createOrUpdate"
-    | "update"
-    | "delete"
-    | "list"
-    | "action"
-    | "checkExistence",
+    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
 ): void {
   switch (operationType) {
     case "read":
@@ -783,13 +800,7 @@ function callLifecycleDecorator(
   target: Operation,
   resourceType: Model,
   operationType:
-    | "read"
-    | "createOrUpdate"
-    | "update"
-    | "delete"
-    | "list"
-    | "action"
-    | "checkExistence",
+    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
 ): void {
   switch (operationType) {
     case "read":
@@ -819,13 +830,7 @@ const $extensionResourceOperation: ExtensionResourceOperationDecorator = (
   targetResourceType: Model,
   extensionResourceType: Model,
   operationType:
-    | "read"
-    | "createOrUpdate"
-    | "update"
-    | "delete"
-    | "list"
-    | "action"
-    | "checkExistence",
+    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
   resourceName?: string,
 ) => {
   if (
@@ -856,13 +861,7 @@ const $builtInResourceOperation: BuiltInResourceOperationDecorator = (
   parentResourceType: Model,
   builtInResourceType: Model,
   operationType:
-    | "read"
-    | "createOrUpdate"
-    | "update"
-    | "delete"
-    | "list"
-    | "action"
-    | "checkExistence",
+    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
   resourceName?: string,
 ) => {
   if (
@@ -884,13 +883,7 @@ const $legacyResourceOperation: LegacyResourceOperationDecorator = (
   target: Operation,
   resourceType: Model,
   operationType:
-    | "read"
-    | "createOrUpdate"
-    | "update"
-    | "delete"
-    | "list"
-    | "action"
-    | "checkExistence",
+    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
   resourceName?: string,
 ) => {
   if (
@@ -956,13 +949,7 @@ const $legacyExtensionResourceOperation: LegacyExtensionResourceOperationDecorat
   target: Operation,
   resourceType: Model,
   operationType:
-    | "read"
-    | "createOrUpdate"
-    | "update"
-    | "delete"
-    | "list"
-    | "action"
-    | "checkExistence",
+    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
   resourceName?: string,
 ) => {
   if (
@@ -1077,6 +1064,7 @@ export const $decorators = {
     armRenameListByOperation: $armRenameListByOperation,
     armResourcePropertiesOptionality: $armResourcePropertiesOptionality,
     armBodyRoot: $armBodyRoot,
+    baseTypeOptional: $baseTypeOptional,
     armResourceWithParameter: $armResourceWithParameter,
     legacyType: $legacyType,
     resourceParentType: $resourceParentType,
