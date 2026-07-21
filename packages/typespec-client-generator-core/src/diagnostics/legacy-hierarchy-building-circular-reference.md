@@ -1,1 +1,3 @@
-`@hierarchyBuilding` creates a recursive base-type chain. Remove or change the decorator so the rebased hierarchy has no circular base reference.
+This diagnostic is issued when `@hierarchyBuilding` creates a recursive base-type chain.
+
+To fix this issue, remove or change the `@hierarchyBuilding` decorator so the rebased hierarchy is acyclic.

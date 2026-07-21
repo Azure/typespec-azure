@@ -1,1 +1,16 @@
-`@markAsLro` can only be applied to operations that return a non-error model response. Change the operation to return a model suitable for LRO metadata or remove `@markAsLro`.
+This diagnostic is issued when `@markAsLro` is applied to an operation that does not return a non-error model response.
+
+To fix this issue, apply `@markAsLro` only to operations that return a model, or remove the decorator.
+
+### Example
+
+```typespec
+using TypeSpec.Http;
+using Azure.ClientGenerator.Core.Legacy;
+
+@markAsLro
+@post
+op start(): string;
+```
+
+The operation returns `string`, not a model; return a model response or remove `@markAsLro`.

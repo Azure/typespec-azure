@@ -1,1 +1,3 @@
-API version values must be strings or members of a string enum. Change non-string API version values to string values.
+This diagnostic is issued when an API version value is not a string and is not a member of a string enum.
+
+To fix this issue, define API versions as strings or as enum members with string values.

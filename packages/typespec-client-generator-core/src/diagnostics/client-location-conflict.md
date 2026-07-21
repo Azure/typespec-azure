@@ -1,1 +1,25 @@
-`@clientLocation` could not be applied because the requested move conflicts with another client shape: examples include moving an operation to another operation, moving a model property to a string target, conflicting with client initialization, using a string target with multiple root clients, or moving same-named parameters with different types to one client. Move operations to interfaces or namespaces, move properties only to valid clients, and keep moved parameter names and types consistent.
+This diagnostic is issued when `@clientLocation` requests a move that conflicts with the client model TCGC is building.
+
+To fix this issue, move operations only to interfaces or namespaces, move model properties only to valid client targets, avoid `@clientInitialization` conflicts, and keep moved parameter names and types consistent.
+
+### Example
+
+Instead of moving an operation to another operation:
+
+```typespec
+using Azure.ClientGenerator.Core;
+
+op destination(): void;
+
+@clientLocation(destination)
+op source(): void;
+```
+
+Move the operation to an interface or namespace:
+
+```typespec
+interface Operations {}
+
+@clientLocation(Operations)
+op source(): void;
+```

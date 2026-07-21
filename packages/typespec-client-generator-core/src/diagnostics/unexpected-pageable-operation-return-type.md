@@ -1,1 +1,3 @@
-TCGC reports this for a pageable operation whose response is not a valid paging model. Ensure the response model is decorated correctly with `@nextLink` and `@pageItems`, or remove the pageable/list decoration.
+This diagnostic is issued when an operation marked pageable with `@list` does not return a valid paging model, or paging metadata cannot be resolved from the response.
+
+To fix this issue, update the response model to use paging decorators such as `@pageItems` and `@nextLink`, or remove the pageable/list decoration.

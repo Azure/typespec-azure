@@ -1,1 +1,3 @@
-TCGC reports this when the same model is used both as multipart/form-data input and as a regular JSON or XML body input. Create a separate form-data model, for example a `FormData` model extending the regular input model, so each wire shape has a distinct model.
+This diagnostic is issued when the same model is used as both multipart/form-data input and regular body input such as JSON or XML. Those request bodies have different wire shapes and cannot safely share one SDK model.
+
+To fix this issue, create a separate form-data model, such as `<ModelName>FormData`, and use each model only for its matching body kind.

@@ -1,1 +1,3 @@
-A nested service configuration conflicts with a parent client using `autoMergeService`. Leave the nested client's service unset so it can inherit, or remove the auto-merge service setup.
+This diagnostic is issued when a parent client uses `autoMergeService` and a nested client also specifies its own service configuration.
+
+To fix this issue, leave the nested client's `service` option unset so it inherits from the parent, or remove the parent `autoMergeService` setup.

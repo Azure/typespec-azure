@@ -1,1 +1,3 @@
-For array collection format, TCGC only supports `ArrayEncoding.pipeDelimited` and `ArrayEncoding.spaceDelimited` from `@encode`. Use one of those encodings, rely on the default CSV format, or use exploded query serialization when appropriate.
+This diagnostic is issued when an array parameter uses `@encode` with an array encoding other than `ArrayEncoding.pipeDelimited` or `ArrayEncoding.spaceDelimited` for collection format.
+
+To fix this issue, use `ArrayEncoding.pipeDelimited`, use `ArrayEncoding.spaceDelimited`, rely on the default CSV format, or use exploded query serialization.

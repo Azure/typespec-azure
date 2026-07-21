@@ -1,1 +1,3 @@
-TCGC could not parse an argument passed to a generic decorator. Use supported argument values such as strings, numbers, booleans, values, or enum members rather than unsupported TypeSpec type objects.
+This diagnostic is issued when TCGC tries to parse a generic decorator argument whose TypeSpec kind is unsupported.
+
+To fix this issue, use supported decorator argument values such as strings, numbers, booleans, values, or enum members.

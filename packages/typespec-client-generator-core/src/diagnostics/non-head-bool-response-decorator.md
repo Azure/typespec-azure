@@ -1,1 +1,24 @@
-`@responseAsBool` can only be used on operations decorated with `@head`. Add `@head` to the operation when it is a HEAD request, or remove `@responseAsBool`.
+This diagnostic is issued when `@responseAsBool` is applied to an operation that is not decorated with `@head`.
+
+To fix this issue, add `@head` when the operation is a HEAD request, or remove `@responseAsBool`.
+
+### Example
+
+Instead of:
+
+```typespec
+using TypeSpec.Http;
+using Azure.ClientGenerator.Core;
+
+@responseAsBool
+@get
+op exists(): void;
+```
+
+Use `@head` for boolean HEAD response modeling:
+
+```typespec
+@responseAsBool
+@head
+op exists(): void;
+```

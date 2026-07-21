@@ -1,1 +1,3 @@
-TCGC could not build an HTTP operation for this operation; only HTTP and HTTPS protocols are supported. Add the appropriate HTTP route and verb decorators or remove the operation from the client surface.
+This diagnostic is issued when TCGC cannot resolve an operation as an HTTP or HTTPS operation.
+
+To fix this issue, add appropriate HTTP route and verb decorators to the operation, or remove it from the TCGC-generated client surface.

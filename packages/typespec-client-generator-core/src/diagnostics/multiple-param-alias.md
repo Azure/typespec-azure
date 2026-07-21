@@ -1,1 +1,18 @@
-More than one `@paramAlias` was applied to the same parameter in the same effective scope. TCGC uses the first alias, so remove the later aliases or scope them so only one applies.
+This diagnostic is issued when more than one `@paramAlias` is applied to the same model property in the same effective scope.
+
+To fix this issue, keep only one alias for the property in a given scope, or scope the aliases so only one applies to each emitter.
+
+### Example
+
+```typespec
+using Azure.ClientGenerator.Core;
+
+model ClientOptions {
+  account: string;
+}
+
+@@paramAlias(ClientOptions.account, "accountName");
+@@paramAlias(ClientOptions.account, "storageAccountName");
+```
+
+Only the first alias is used; keep one alias per effective scope.

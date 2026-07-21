@@ -1,1 +1,3 @@
-A value in an example file could not be matched to the TypeSpec definition for the operation. Update the example payload, parameters, or response value so it follows the declared TypeSpec shape.
+This diagnostic is issued when a value from an example file cannot be matched to the TypeSpec definition for the operation.
+
+To fix this issue, update the example value or the TypeSpec operation so parameters, request bodies, and responses follow the declared shapes.

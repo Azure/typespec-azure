@@ -1,1 +1,14 @@
-`@clientNamespace` cannot be given an empty or whitespace-only value. Provide a non-empty namespace value or remove the decorator.
+This diagnostic is issued when `@clientNamespace` is given an empty or whitespace-only value.
+
+To fix this issue, provide a non-empty namespace string or remove `@clientNamespace`.
+
+### Example
+
+```typespec
+using Azure.ClientGenerator.Core;
+
+@clientNamespace(" ")
+model Widget {}
+```
+
+The namespace value is empty; provide a namespace such as `@clientNamespace("Contoso.Widgets")`.

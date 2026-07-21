@@ -1,1 +1,3 @@
-`@markAsPageable` is unnecessary because the operation is already marked pageable with `@list`. Remove `@markAsPageable` and keep the existing pageable metadata.
+This diagnostic is issued when `@markAsPageable` is applied to an operation that is already marked pageable with `@list`.
+
+To fix this issue, remove `@markAsPageable` and keep the existing `@list` pageable metadata.

@@ -1,1 +1,26 @@
-The `@usage` decorator only accepts the supported usage flags: input, output, json, or xml. Use the corresponding `Usage` enum values and remove unsupported or empty values.
+This diagnostic is issued when the value passed to the `@usage` decorator is not one of the supported usage flags.
+
+To fix this issue, pass one or more of `Usage.input`, `Usage.output`, `Usage.json`, or `Usage.xml` to `@usage`, and remove custom or empty usage values.
+
+### Example
+
+Instead of:
+
+```typespec
+using Azure.ClientGenerator.Core;
+
+enum CustomUsage {
+  custom: 8,
+}
+@usage(CustomUsage.custom)
+model Widget {}
+```
+
+Use:
+
+```typespec
+using Azure.ClientGenerator.Core;
+
+@usage(Usage.input | Usage.json)
+model Widget {}
+```

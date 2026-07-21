@@ -1,1 +1,14 @@
-`@clientName` cannot be given an empty or whitespace-only value. Provide a non-empty client name or remove the decorator.
+This diagnostic is issued when `@clientName` is given an empty or whitespace-only value.
+
+To fix this issue, provide a non-empty name to `@clientName` or remove the decorator.
+
+### Example
+
+```typespec
+using Azure.ClientGenerator.Core;
+
+@clientName(" ")
+model Widget {}
+```
+
+The `@clientName` value is whitespace only; use a non-empty value such as `@clientName("WidgetDetails")`.

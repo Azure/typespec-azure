@@ -1,1 +1,3 @@
-Server template arguments must resolve to path parameters. If a server parameter is reported as query, header, body, or another kind, mark it as a path parameter or adjust the server definition so the template argument is part of the server path.
+This diagnostic is issued when a server template argument resolves to something other than an HTTP path parameter. Server URL template variables must map to path parameters in the generated endpoint configuration.
+
+To fix this issue, make the template argument a path parameter or update the server URL so it no longer requires that argument.

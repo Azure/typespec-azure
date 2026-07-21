@@ -1,1 +1,3 @@
-TCGC skipped one or more example files because the examples directory could not be read, a file could not be parsed, or the JSON did not include both `operationId` and `title`. Fix the examples directory and example JSON metadata so the file can be loaded.
+This diagnostic is issued when TCGC skips loading examples because the examples directory cannot be read, an example file cannot be parsed, or required `operationId` or `title` metadata is missing.
+
+To fix this issue, ensure the configured examples directory exists and every example JSON file is valid and includes both `operationId` and `title`.

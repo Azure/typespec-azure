@@ -1,1 +1,3 @@
-Services merged into one client resolved different versions of the same dependency namespace. Align the service versioning or `@useDependency` mappings so each shared dependency resolves to one version.
+This diagnostic is issued when services merged into the same client resolve different versions of a shared dependency namespace.
+
+To fix this issue, align service versioning or `@useDependency` mappings so every merged service resolves the shared dependency to the same version.
