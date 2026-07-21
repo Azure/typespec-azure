@@ -31,13 +31,14 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a service team_, I can suppress specific lint warnings with inline comments and a justification, without disabling entire rule categories.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Time to resolve lint errors per PR | TBD | 50% reduction |
-| Number of PR round-trips caused by lint failures | TBD | 60% reduction |
-| CI lint check execution time | TBD | No regression vs. LintDiff |
-| False positive rate | TBD | < 5% |
-| Service team satisfaction (quarterly survey) | TBD | > 4/5 rating |
+
+| Metric                                           | Baseline | Target                     |
+| ------------------------------------------------ | -------- | -------------------------- |
+| Time to resolve lint errors per PR               | TBD      | 50% reduction              |
+| Number of PR round-trips caused by lint failures | TBD      | 60% reduction              |
+| CI lint check execution time                     | TBD      | No regression vs. LintDiff |
+| False positive rate                              | TBD      | < 5%                       |
+| Service team satisfaction (quarterly survey)     | TBD      | > 4/5 rating               |
 
 ### TypeSpec Breaking Change Detection
 
@@ -53,13 +54,14 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a service team_, I can mark intentional breaking changes with version bumps and have the tool recognize them as expected.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Time spent resolving breaking change errors | TBD | 50% reduction |
-| False positive rate for breaking change detection | TBD | < 3% |
-| Missed breaking changes (false negatives) | TBD | 0 |
-| Time from push to breaking change notification | TBD | < 2 minutes |
-| Service team satisfaction (quarterly survey) | TBD | > 4/5 rating |
+
+| Metric                                            | Baseline | Target        |
+| ------------------------------------------------- | -------- | ------------- |
+| Time spent resolving breaking change errors       | TBD      | 50% reduction |
+| False positive rate for breaking change detection | TBD      | < 3%          |
+| Missed breaking changes (false negatives)         | TBD      | 0             |
+| Time from push to breaking change notification    | TBD      | < 2 minutes   |
+| Service team satisfaction (quarterly survey)      | TBD      | > 4/5 rating  |
 
 ### TypeSpec Examples Tooling
 
@@ -77,14 +79,15 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a CI pipeline_, I can identify exactly which examples are stale after a spec change and report only those.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Time spent authoring examples per PR | TBD | 70% reduction |
-| Time spent resolving example errors | TBD | 50% reduction |
-| Number of examples required per new API version | TBD | Reduce to changed-only (est. 60% reduction) |
-| Example validation accuracy (vs. spec) | TBD | 100% |
-| Example generation correctness (valid on first attempt) | TBD | > 95% |
-| Service team satisfaction (quarterly survey) | TBD | > 4/5 rating |
+
+| Metric                                                  | Baseline | Target                                      |
+| ------------------------------------------------------- | -------- | ------------------------------------------- |
+| Time spent authoring examples per PR                    | TBD      | 70% reduction                               |
+| Time spent resolving example errors                     | TBD      | 50% reduction                               |
+| Number of examples required per new API version         | TBD      | Reduce to changed-only (est. 60% reduction) |
+| Example validation accuracy (vs. spec)                  | TBD      | 100%                                        |
+| Example generation correctness (valid on first attempt) | TBD      | > 95%                                       |
+| Service team satisfaction (quarterly survey)            | TBD      | > 4/5 rating                                |
 
 ### SDK Language Team Migration
 
@@ -99,11 +102,12 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a CLI/PowerShell/Terraform SDK team_, I can consume TypeSpec or OpenAPI 3.0 output directly, without depending on OpenAPI 2.0 conversion.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| SDK team time spent on format-conversion workarounds | TBD | Eliminate entirely by Winter 2026-27 |
-| Late failures discovered in SDK, CLI, and documentation artifacts | TBD | 80% reduction |
-| SDK generation errors caused by format conversion | TBD | Eliminate entirely |
+
+| Metric                                                            | Baseline | Target                               |
+| ----------------------------------------------------------------- | -------- | ------------------------------------ |
+| SDK team time spent on format-conversion workarounds              | TBD      | Eliminate entirely by Winter 2026-27 |
+| Late failures discovered in SDK, CLI, and documentation artifacts | TBD      | 80% reduction                        |
+| SDK generation errors caused by format conversion                 | TBD      | Eliminate entirely                   |
 
 ### CI Log Normalization and Simplification
 
@@ -117,11 +121,12 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a service team_, I can quickly determine the steps needed to fix any reported CI issues without wading through verbose or cryptic log output.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Time to identify fix steps from CI failure logs | TBD | 70% reduction |
-| Service team requests for help interpreting CI output | TBD | 80% reduction |
-| Service team satisfaction with CI output clarity (survey) | TBD | > 4/5 rating |
+
+| Metric                                                    | Baseline | Target        |
+| --------------------------------------------------------- | -------- | ------------- |
+| Time to identify fix steps from CI failure logs           | TBD      | 70% reduction |
+| Service team requests for help interpreting CI output     | TBD      | 80% reduction |
+| Service team satisfaction with CI output clarity (survey) | TBD      | > 4/5 rating  |
 
 ### CI Check Coverage and Suppression Management
 
@@ -135,11 +140,12 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a service team_, I have confidence that all CI checks are actively maintained — nothing is silently broken or permanently suppressed without accountability.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Post-check-in issue discovery rate (issues found after merge) | TBD | 80% reduction |
-| Time to resolve issues discovered post-check-in | TBD | 70% reduction |
-| Stale/unreviewed CI suppressions | TBD | 0 (within 30-day review SLA) |
+
+| Metric                                                        | Baseline | Target                       |
+| ------------------------------------------------------------- | -------- | ---------------------------- |
+| Post-check-in issue discovery rate (issues found after merge) | TBD      | 80% reduction                |
+| Time to resolve issues discovered post-check-in               | TBD      | 70% reduction                |
+| Stale/unreviewed CI suppressions                              | TBD      | 0 (within 30-day review SLA) |
 
 ### Lint Suppression Review Tooling
 
@@ -153,11 +159,12 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As an SDK team_, I avoid costly spec corrections to enable SDK generation post-check-in because lint suppressions that affect SDK output are reviewed before merge.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| SDK-facing issues discovered post-check-in | TBD | 90% reduction |
-| Time spent on post-merge spec corrections for SDK generation | TBD | 80% reduction |
-| Inappropriate lint suppressions merged without review | TBD | 0 |
+
+| Metric                                                       | Baseline | Target        |
+| ------------------------------------------------------------ | -------- | ------------- |
+| SDK-facing issues discovered post-check-in                   | TBD      | 90% reduction |
+| Time spent on post-merge spec corrections for SDK generation | TBD      | 80% reduction |
+| Inappropriate lint suppressions merged without review        | TBD      | 0             |
 
 ---
 
@@ -178,13 +185,14 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a new TypeSpec author_, I can ask the AI what decorator or template to use for my scenario and get a working example inline.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Time to author a new resource type spec | TBD | 50% reduction |
-| Manual editing time avoided by accepting AI suggestions | TBD | 30% reduction in total authoring time |
-| Spec correctness on first CI run (AI-assisted) | TBD | > 80% |
-| Time to first successful PR for new TypeSpec authors | TBD | 50% reduction |
-| Service team satisfaction (quarterly survey) | TBD | > 4/5 rating |
+
+| Metric                                                  | Baseline | Target                                |
+| ------------------------------------------------------- | -------- | ------------------------------------- |
+| Time to author a new resource type spec                 | TBD      | 50% reduction                         |
+| Manual editing time avoided by accepting AI suggestions | TBD      | 30% reduction in total authoring time |
+| Spec correctness on first CI run (AI-assisted)          | TBD      | > 80%                                 |
+| Time to first successful PR for new TypeSpec authors    | TBD      | 50% reduction                         |
+| Service team satisfaction (quarterly survey)            | TBD      | > 4/5 rating                          |
 
 ### API Version Extraction Workflow
 
@@ -199,13 +207,14 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a service team_, I can promote a preview API version to GA with a single command that handles all the version bookkeeping.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Time to create a new API version | TBD | 60% reduction |
-| Time to migrate a spec from private to public repo | TBD | 70% reduction |
-| Versioning errors caught in review | TBD | 80% reduction (caught by tool instead) |
-| Manual version decorator edits required | TBD | < 5 per version extraction |
-| Service team satisfaction (quarterly survey) | TBD | > 4/5 rating |
+
+| Metric                                             | Baseline | Target                                 |
+| -------------------------------------------------- | -------- | -------------------------------------- |
+| Time to create a new API version                   | TBD      | 60% reduction                          |
+| Time to migrate a spec from private to public repo | TBD      | 70% reduction                          |
+| Versioning errors caught in review                 | TBD      | 80% reduction (caught by tool instead) |
+| Manual version decorator edits required            | TBD      | < 5 per version extraction             |
+| Service team satisfaction (quarterly survey)       | TBD      | > 4/5 rating                           |
 
 ### Spec Validation and Simplification
 
@@ -219,11 +228,12 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a service team maintaining legacy specs_, I get automated suggestions to simplify my spec using newer patterns, with confidence that the API contract is preserved.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Review cycles reduced by catching guideline issues pre-submission | TBD | 50% fewer review round-trips |
-| Manual simplification effort saved per spec | TBD | > 2 hours per spec |
-| API contract preservation rate (after simplification) | TBD | 100% |
+
+| Metric                                                            | Baseline | Target                       |
+| ----------------------------------------------------------------- | -------- | ---------------------------- |
+| Review cycles reduced by catching guideline issues pre-submission | TBD      | 50% fewer review round-trips |
+| Manual simplification effort saved per spec                       | TBD      | > 2 hours per spec           |
+| API contract preservation rate (after simplification)             | TBD      | 100%                         |
 
 ### Best Practice Documentation and Samples
 
@@ -244,13 +254,14 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a new TypeSpec author_, I can learn by example from a comprehensive sample gallery organized by scenario rather than by API surface.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Time for service teams to find TypeSpec guidance for their scenario | TBD | < 5 minutes |
-| Time for authors to find azure-core guidance for a common scenario | TBD | < 5 minutes |
-| Time for authors to find ARM guidance for a common scenario | TBD | < 5 minutes |
-| AI tool accuracy when using docs as context | TBD | 30% improvement |
-| Service team satisfaction with documentation (survey) | TBD | > 4/5 rating |
+
+| Metric                                                              | Baseline | Target          |
+| ------------------------------------------------------------------- | -------- | --------------- |
+| Time for service teams to find TypeSpec guidance for their scenario | TBD      | < 5 minutes     |
+| Time for authors to find azure-core guidance for a common scenario  | TBD      | < 5 minutes     |
+| Time for authors to find ARM guidance for a common scenario         | TBD      | < 5 minutes     |
+| AI tool accuracy when using docs as context                         | TBD      | 30% improvement |
+| Service team satisfaction with documentation (survey)               | TBD      | > 4/5 rating    |
 
 ### TypeSpec-to-TypeSpec Source Emitter
 
@@ -266,12 +277,13 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a library author_, I can deprecate an old pattern and provide an automated codemod that migrates consumers.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Engineer-hours saved per bulk pattern rollout | 0 | > 200 hours per rollout |
-| Manual fixups required post-transformation | N/A | < 5% of transformed specs |
-| API contract preservation rate | N/A | 100% |
-| Time to roll out a pattern change across spec repo | Weeks (manual) | < 1 day |
+
+| Metric                                             | Baseline       | Target                    |
+| -------------------------------------------------- | -------------- | ------------------------- |
+| Engineer-hours saved per bulk pattern rollout      | 0              | > 200 hours per rollout   |
+| Manual fixups required post-transformation         | N/A            | < 5% of transformed specs |
+| API contract preservation rate                     | N/A            | 100%                      |
+| Time to roll out a pattern change across spec repo | Weeks (manual) | < 1 day                   |
 
 ---
 
@@ -296,13 +308,14 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a TypeSpec contributor_, I can ask the AI to fix a failing test and get a correct implementation that passes.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Time to implement a new linting rule (end-to-end) | TBD | 60% reduction |
-| Time to scaffold a new library/emitter | TBD | 80% reduction |
-| Manual rework time per AI-assisted contribution | TBD | < 30 minutes per PR |
-| Total effort (human + AI) per contribution vs. fully manual | TBD | 60% reduction |
-| Human interaction rounds per AI-assisted PR | TBD | ≤ 3 rounds |
+
+| Metric                                                      | Baseline | Target              |
+| ----------------------------------------------------------- | -------- | ------------------- |
+| Time to implement a new linting rule (end-to-end)           | TBD      | 60% reduction       |
+| Time to scaffold a new library/emitter                      | TBD      | 80% reduction       |
+| Manual rework time per AI-assisted contribution             | TBD      | < 30 minutes per PR |
+| Total effort (human + AI) per contribution vs. fully manual | TBD      | 60% reduction       |
+| Human interaction rounds per AI-assisted PR                 | TBD      | ≤ 3 rounds          |
 
 ### Website-Integrated Documentation
 
@@ -316,11 +329,12 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a library consumer_, I can ask the chatbot about a specific decorator's behavior and get accurate, up-to-date information from the source.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Documentation questions resolved without human help | TBD | > 80% |
-| User satisfaction with chatbot answers | N/A | > 4/5 rating |
-| Time to find information (chatbot vs. manual search) | TBD | 70% reduction |
+
+| Metric                                               | Baseline | Target        |
+| ---------------------------------------------------- | -------- | ------------- |
+| Documentation questions resolved without human help  | TBD      | > 80%         |
+| User satisfaction with chatbot answers               | N/A      | > 4/5 rating  |
+| Time to find information (chatbot vs. manual search) | TBD      | 70% reduction |
 
 ### Data Collection for AI PRs
 
@@ -334,11 +348,12 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As an AI skill developer_, I can use collected data to identify where skills fail most often and prioritize improvements.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Time from AI PR creation to mergeable state | TBD | < 1 hour |
-| Manual intervention time per AI-generated PR | TBD | < 15 minutes |
-| Time until users see fewer repeated AI failure modes | N/A | < 2 weeks |
+
+| Metric                                               | Baseline | Target       |
+| ---------------------------------------------------- | -------- | ------------ |
+| Time from AI PR creation to mergeable state          | TBD      | < 1 hour     |
+| Manual intervention time per AI-generated PR         | TBD      | < 15 minutes |
+| Time until users see fewer repeated AI failure modes | N/A      | < 2 weeks    |
 
 ### Azure SDK Emitter Consolidation
 
@@ -352,11 +367,12 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As an Azure SDK team member_, I can more quickly find and fix issues with TypeSpec changes because emitters are co-located with the TypeSpec libraries they depend on.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Time to identify and fix emitter issues caused by TypeSpec changes | TBD | 60% reduction |
-| Cross-repo coordination overhead for breaking changes | TBD | Eliminate entirely |
-| Time from TypeSpec change to emitter validation | TBD | < 1 hour (same CI run) |
+
+| Metric                                                             | Baseline | Target                 |
+| ------------------------------------------------------------------ | -------- | ---------------------- |
+| Time to identify and fix emitter issues caused by TypeSpec changes | TBD      | 60% reduction          |
+| Cross-repo coordination overhead for breaking changes              | TBD      | Eliminate entirely     |
+| Time from TypeSpec change to emitter validation                    | TBD      | < 1 hour (same CI run) |
 
 ---
 
@@ -385,14 +401,15 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a spec author_, I can mix and match library operations to build exactly the API pattern I need without forking templates.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Time for library authors to implement common patterns | TBD | 50% reduction |
-| Time to implement a new library template | TBD | 40% reduction |
-| Share of common tasks completable without writing custom JavaScript | TBD | > 80% |
-| Time to compose a new API pattern from existing building blocks | N/A | < 30 minutes |
-| User-facing defects caused by inconsistent template behavior | TBD | 80% reduction |
-| Time for a new contributor to make a useful library change without JS expertise | TBD | < 2 hours |
+
+| Metric                                                                          | Baseline | Target        |
+| ------------------------------------------------------------------------------- | -------- | ------------- |
+| Time for library authors to implement common patterns                           | TBD      | 50% reduction |
+| Time to implement a new library template                                        | TBD      | 40% reduction |
+| Share of common tasks completable without writing custom JavaScript             | TBD      | > 80%         |
+| Time to compose a new API pattern from existing building blocks                 | N/A      | < 30 minutes  |
+| User-facing defects caused by inconsistent template behavior                    | TBD      | 80% reduction |
+| Time for a new contributor to make a useful library change without JS expertise | TBD      | < 2 hours     |
 
 ### Meta-Language Improvements
 
@@ -409,11 +426,12 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a new contributor_, I can define simple decorators and functions declaratively without writing any JavaScript.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Time to implement or modify a library feature | TBD | 40% reduction |
-| Time for new contributor to implement first decorator | TBD | 60% reduction |
-| TypeKit API consistency (breaking edge cases) | TBD | 0 inconsistencies |
+
+| Metric                                                | Baseline | Target            |
+| ----------------------------------------------------- | -------- | ----------------- |
+| Time to implement or modify a library feature         | TBD      | 40% reduction     |
+| Time for new contributor to implement first decorator | TBD      | 60% reduction     |
+| TypeKit API consistency (breaking edge cases)         | TBD      | 0 inconsistencies |
 
 ### Complex Versioning Patterns
 
@@ -429,11 +447,12 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a spec author_, I can express "this feature is available in versions 2023-01-01 through 2024-06-01" with a single decorator.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Time to model a complex versioning scenario | TBD | 60% reduction |
-| Versioning-related spec errors in CI | TBD | 70% reduction |
-| Time to author and review a complex versioning change | TBD | 50% reduction |
+
+| Metric                                                | Baseline | Target        |
+| ----------------------------------------------------- | -------- | ------------- |
+| Time to model a complex versioning scenario           | TBD      | 60% reduction |
+| Versioning-related spec errors in CI                  | TBD      | 70% reduction |
+| Time to author and review a complex versioning change | TBD      | 50% reduction |
 
 ### Compiler and Infrastructure
 
@@ -448,11 +467,12 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a library author_, I have confidence that my linting rules meet performance standards and won't slow down CI for service teams.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Regression bugs that reach contributors or service teams | TBD | 0 per release |
-| Unexpected performance regressions experienced by users after upgrade | TBD | 0 per release |
-| Lint rule execution time (p95) | TBD | < 100ms per rule per spec |
+
+| Metric                                                                | Baseline | Target                    |
+| --------------------------------------------------------------------- | -------- | ------------------------- |
+| Regression bugs that reach contributors or service teams              | TBD      | 0 per release             |
+| Unexpected performance regressions experienced by users after upgrade | TBD      | 0 per release             |
+| Lint rule execution time (p95)                                        | TBD      | < 100ms per rule per spec |
 
 ---
 
@@ -474,13 +494,14 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a new Azure service team_, I can get started with a correct, minimal spec in under an hour using simplified patterns.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Time to author a standard resource definition | TBD | 40% reduction |
-| Time for authors to understand or modify an existing resource spec | TBD | 50% reduction |
-| Time for new team to author first correct spec | TBD | 50% reduction |
-| Time for new teams to choose the correct Azure.Core abstraction | TBD | < 10 minutes |
-| Service team satisfaction (quarterly survey) | TBD | > 4/5 rating |
+
+| Metric                                                             | Baseline | Target        |
+| ------------------------------------------------------------------ | -------- | ------------- |
+| Time to author a standard resource definition                      | TBD      | 40% reduction |
+| Time for authors to understand or modify an existing resource spec | TBD      | 50% reduction |
+| Time for new team to author first correct spec                     | TBD      | 50% reduction |
+| Time for new teams to choose the correct Azure.Core abstraction    | TBD      | < 10 minutes  |
+| Service team satisfaction (quarterly survey)                       | TBD      | > 4/5 rating  |
 
 ### Azure.ResourceManager Simplification
 
@@ -496,12 +517,13 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a service team_, I can model singleton and child resources with obvious, discoverable patterns.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Time to author a standard ARM resource with CRUD | TBD | 50% reduction |
-| Merge-patch related errors in review | TBD | 90% reduction |
-| Time to model a standard ARM resource | TBD | 50% reduction |
-| Service team satisfaction (quarterly survey) | TBD | > 4/5 rating |
+
+| Metric                                           | Baseline | Target        |
+| ------------------------------------------------ | -------- | ------------- |
+| Time to author a standard ARM resource with CRUD | TBD      | 50% reduction |
+| Merge-patch related errors in review             | TBD      | 90% reduction |
+| Time to model a standard ARM resource            | TBD      | 50% reduction |
+| Service team satisfaction (quarterly survey)     | TBD      | > 4/5 rating  |
 
 ---
 
@@ -521,12 +543,13 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a bug reporter_, my issue is quickly linked to related issues and I get faster responses because triage happens instantly.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Time from issue filed to triaged (labeled + assigned) | TBD | < 5 minutes (automated) |
-| Triage accuracy (correct labels) | N/A | > 90% |
-| Duplicate detection rate | TBD | > 80% of true duplicates caught |
-| Maintainer time spent on triage | TBD | 80% reduction |
+
+| Metric                                                | Baseline | Target                          |
+| ----------------------------------------------------- | -------- | ------------------------------- |
+| Time from issue filed to triaged (labeled + assigned) | TBD      | < 5 minutes (automated)         |
+| Triage accuracy (correct labels)                      | N/A      | > 90%                           |
+| Duplicate detection rate                              | TBD      | > 80% of true duplicates caught |
+| Maintainer time spent on triage                       | TBD      | 80% reduction                   |
 
 ### Release Management Agents
 
@@ -543,12 +566,13 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a TypeSpec maintainer_, I can create a hotfix release with a single command and the agent handles cherry-picks and version management.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Time to produce release notes | TBD | 90% reduction |
-| Release process errors (missed steps) | TBD | 0 |
-| Time from merge to release (for standard releases) | TBD | < 1 hour |
-| Human steps required per release | TBD | ≤ 1 (approval only) |
+
+| Metric                                             | Baseline | Target              |
+| -------------------------------------------------- | -------- | ------------------- |
+| Time to produce release notes                      | TBD      | 90% reduction       |
+| Release process errors (missed steps)              | TBD      | 0                   |
+| Time from merge to release (for standard releases) | TBD      | < 1 hour            |
+| Human steps required per release                   | TBD      | ≤ 1 (approval only) |
 
 ### Continuous Code Quality
 
@@ -563,12 +587,13 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a spec author_, I get automated suggestions for simplifying my spec that are verified to preserve API semantics.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Regressions that escape to users after changes merge | TBD | 0 per release |
-| Author/reviewer time saved by catching issues early | TBD | > 1 hour per PR |
-| User-reported confusion caused by outdated documentation | TBD | 0 incidents per month |
-| Review cycles eliminated by proactive quality detection | TBD | 50% fewer review rounds |
+
+| Metric                                                   | Baseline | Target                  |
+| -------------------------------------------------------- | -------- | ----------------------- |
+| Regressions that escape to users after changes merge     | TBD      | 0 per release           |
+| Author/reviewer time saved by catching issues early      | TBD      | > 1 hour per PR         |
+| User-reported confusion caused by outdated documentation | TBD      | 0 incidents per month   |
+| Review cycles eliminated by proactive quality detection  | TBD      | 50% fewer review rounds |
 
 ### Spec Rollout Tools
 
@@ -582,11 +607,12 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a platform team_, I can preview the impact of a library change on all consuming specs before releasing it.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Engineer-hours saved per spec repo rollout | 0 | > 100 hours per rollout |
-| Rollout-caused regressions | TBD | 0 |
-| Time for full spec repo rollout | Weeks | < 2 days |
+
+| Metric                                     | Baseline | Target                  |
+| ------------------------------------------ | -------- | ----------------------- |
+| Engineer-hours saved per spec repo rollout | 0        | > 100 hours per rollout |
+| Rollout-caused regressions                 | TBD      | 0                       |
+| Time for full spec repo rollout            | Weeks    | < 2 days                |
 
 ### Documentation Maintenance
 
@@ -600,10 +626,11 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a maintainer_, I get alerts when docs drift from implementation with suggested fixes.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| User-facing doc inaccuracies reported after publication | TBD | < 1 per month |
-| Users who find docs accurate on first use (survey) | TBD | > 95% |
+
+| Metric                                                  | Baseline | Target        |
+| ------------------------------------------------------- | -------- | ------------- |
+| User-facing doc inaccuracies reported after publication | TBD      | < 1 per month |
+| Users who find docs accurate on first use (survey)      | TBD      | > 95%         |
 
 ---
 
@@ -623,11 +650,12 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a service team_, the generated stub includes correct auth, logging, and health-check boilerplate so I can focus on business logic.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Time from spec to running skeleton service | TBD | < 30 minutes |
-| % of API surface correctly scaffolded | N/A | > 95% |
-| Manual boilerplate code required post-generation | N/A | < 50 lines |
+
+| Metric                                           | Baseline | Target       |
+| ------------------------------------------------ | -------- | ------------ |
+| Time from spec to running skeleton service       | TBD      | < 30 minutes |
+| % of API surface correctly scaffolded            | N/A      | > 95%        |
+| Manual boilerplate code required post-generation | N/A      | < 50 lines   |
 
 ### Test Generation
 
@@ -641,11 +669,12 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a service team_, I can generate load test scaffolding that exercises all my endpoints with realistic payloads.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Time to get a usable contract test suite for a new service | TBD | < 1 hour |
-| Time to create contract test suite | TBD | 90% reduction |
-| Spec conformance issues caught by generated tests | N/A | > 90% of deviations |
+
+| Metric                                                     | Baseline | Target              |
+| ---------------------------------------------------------- | -------- | ------------------- |
+| Time to get a usable contract test suite for a new service | TBD      | < 1 hour            |
+| Time to create contract test suite                         | TBD      | 90% reduction       |
+| Spec conformance issues caught by generated tests          | N/A      | > 90% of deviations |
 
 ### Live Service Validation
 
@@ -659,11 +688,12 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a CI pipeline_, I can block deployments that don't conform to the published spec.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Spec conformance rate (validated services) | TBD | > 99% |
-| Time from deployment to conformance report | N/A | < 5 minutes |
-| API contract violations caught before production | TBD | > 95% |
+
+| Metric                                           | Baseline | Target      |
+| ------------------------------------------------ | -------- | ----------- |
+| Spec conformance rate (validated services)       | TBD      | > 99%       |
+| Time from deployment to conformance report       | N/A      | < 5 minutes |
+| API contract violations caught before production | TBD      | > 95%       |
 
 ### ARM to RPaaS TypeSpec Transformation
 
@@ -679,11 +709,12 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a platform team_, I can batch-transform ARM specs to RPaaS TypeSpec and validate correctness automatically.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Time saved per team migrating from ARM to RPaaS TypeSpec | TBD | > 1 week per migration |
-| Manual fixups required post-transformation | N/A | < 10% of specs |
-| Time to transform (automated vs. manual) | Weeks (manual) | < 1 hour |
+
+| Metric                                                   | Baseline       | Target                 |
+| -------------------------------------------------------- | -------------- | ---------------------- |
+| Time saved per team migrating from ARM to RPaaS TypeSpec | TBD            | > 1 week per migration |
+| Manual fixups required post-transformation               | N/A            | < 10% of specs         |
+| Time to transform (automated vs. manual)                 | Weeks (manual) | < 1 hour               |
 
 ---
 
@@ -703,11 +734,12 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a TypeSpec maintainer_, I have a complete inventory of public APIs with their intended semantics, making it easy to assess breaking changes.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Time for consumers to find correct API behavior without maintainer help | TBD | < 10 minutes |
-| User confusion or misuse caused by inconsistent naming | TBD | 0 reported incidents |
-| User-reported surprises caused by undocumented behavior | TBD | 0 per quarter |
+
+| Metric                                                                  | Baseline | Target               |
+| ----------------------------------------------------------------------- | -------- | -------------------- |
+| Time for consumers to find correct API behavior without maintainer help | TBD      | < 10 minutes         |
+| User confusion or misuse caused by inconsistent naming                  | TBD      | 0 reported incidents |
+| User-reported surprises caused by undocumented behavior                 | TBD      | 0 per quarter        |
 
 ### Cleanup and Deprecation
 
@@ -721,11 +753,12 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a maintainer_, the API surface is lean—no duplicate or overlapping functionality confuses users.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Time for consumers to migrate off a deprecated API without help | TBD | < 1 hour |
-| Users choosing the wrong API due to confusing overlap | TBD | 0 reported incidents |
-| Migration effort required per consumer | N/A | < 2 hours |
+
+| Metric                                                          | Baseline | Target               |
+| --------------------------------------------------------------- | -------- | -------------------- |
+| Time for consumers to migrate off a deprecated API without help | TBD      | < 1 hour             |
+| Users choosing the wrong API due to confusing overlap           | TBD      | 0 reported incidents |
+| Migration effort required per consumer                          | N/A      | < 2 hours            |
 
 ### Completeness Assessment
 
@@ -743,11 +776,12 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a TypeSpec maintainer_, I have clear 1.0 criteria and can track progress toward release readiness.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Service teams blocked by missing pattern support | TBD | 0 teams blocked |
-| Service team requests for missing patterns | TBD | < 5 open requests per package |
-| User-reported blockers to confident 1.0 adoption | 0 | 0 remaining |
+
+| Metric                                           | Baseline | Target                        |
+| ------------------------------------------------ | -------- | ----------------------------- |
+| Service teams blocked by missing pattern support | TBD      | 0 teams blocked               |
+| Service team requests for missing patterns       | TBD      | < 5 open requests per package |
+| User-reported blockers to confident 1.0 adoption | 0        | 0 remaining                   |
 
 ### Stability Guarantees
 
@@ -761,11 +795,12 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a maintainer_, I have automated compatibility tests that catch unintentional breaking changes before release.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Unintentional breaking changes shipped | TBD | 0 |
-| Consumer breakages encountered when upgrading minor versions | TBD | 0 per release |
-| Time to assess breaking change impact | TBD | < 1 hour (automated) |
+
+| Metric                                                       | Baseline | Target               |
+| ------------------------------------------------------------ | -------- | -------------------- |
+| Unintentional breaking changes shipped                       | TBD      | 0                    |
+| Consumer breakages encountered when upgrading minor versions | TBD      | 0 per release        |
+| Time to assess breaking change impact                        | TBD      | < 1 hour (automated) |
 
 ---
 
@@ -785,11 +820,12 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a service team_, common-types covers my needs so I don't redefine standard models.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| ARM patterns requiring custom workarounds | TBD | < 5% |
-| Time saved by reusing standard models instead of redefining them | TBD | > 1 hour per resource |
-| Time to author a new ARM spec without custom workarounds | TBD | < 2 hours |
+
+| Metric                                                           | Baseline | Target                |
+| ---------------------------------------------------------------- | -------- | --------------------- |
+| ARM patterns requiring custom workarounds                        | TBD      | < 5%                  |
+| Time saved by reusing standard models instead of redefining them | TBD      | > 1 hour per resource |
+| Time to author a new ARM spec without custom workarounds         | TBD      | < 2 hours             |
 
 ### Streaming Support
 
@@ -803,11 +839,12 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a service team_, I can express streaming semantics (chunked responses, event types, connection lifecycle) directly in my spec.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Teams able to model streaming endpoints without custom extensions | 0% | > 90% |
-| Client code generation correctness (streaming) | N/A | > 95% |
-| Time to model a streaming endpoint (vs. manual) | TBD | Comparable to non-streaming |
+
+| Metric                                                            | Baseline | Target                      |
+| ----------------------------------------------------------------- | -------- | --------------------------- |
+| Teams able to model streaming endpoints without custom extensions | 0%       | > 90%                       |
+| Client code generation correctness (streaming)                    | N/A      | > 95%                       |
+| Time to model a streaming endpoint (vs. manual)                   | TBD      | Comparable to non-streaming |
 
 ### Azure AI and Foundry APIs
 
@@ -822,11 +859,12 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As an AI service team_, I can express token streaming, function calling schemas, and structured output types natively in TypeSpec.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| AI service teams able to model their APIs without custom workarounds | TBD | > 80% |
-| Time for AI service teams to produce a correct first spec | TBD | < 4 hours |
-| Time saved per AI service spec by using built-in templates | N/A | > 3 hours |
+
+| Metric                                                               | Baseline | Target    |
+| -------------------------------------------------------------------- | -------- | --------- |
+| AI service teams able to model their APIs without custom workarounds | TBD      | > 80%     |
+| Time for AI service teams to produce a correct first spec            | TBD      | < 4 hours |
+| Time saved per AI service spec by using built-in templates           | N/A      | > 3 hours |
 
 ### Additional Patterns
 
@@ -841,11 +879,12 @@ This document outlines the TypeSpec ecosystem's strategic direction for 2026-202
 - _As a service team_, multi-tenant and cross-region patterns have first-class support so my spec accurately represents my service's behavior.
 
 **Metrics:**
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Teams able to model event-driven APIs without custom extensions | TBD | > 80% |
-| Time to model batch/bulk operations using standard patterns | TBD | < 1 hour |
-| Custom-extension effort eliminated by using native patterns | TBD | > 75% reduction |
+
+| Metric                                                          | Baseline | Target          |
+| --------------------------------------------------------------- | -------- | --------------- |
+| Teams able to model event-driven APIs without custom extensions | TBD      | > 80%           |
+| Time to model batch/bulk operations using standard patterns     | TBD      | < 1 hour        |
+| Custom-extension effort eliminated by using native patterns     | TBD      | > 75% reduction |
 
 ---
 
