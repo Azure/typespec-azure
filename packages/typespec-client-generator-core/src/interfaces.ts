@@ -74,7 +74,7 @@ export interface TCGCContext {
   __pagedResultSet: Set<SdkType>;
   __namingContextPath: ContextNode[]; // Stack tracking the current traversal position for naming anonymous types.
   __orphanTypesCache?: (Model | Enum | Union)[]; // cached result of listOrphanTypes to avoid repeated namespace traversals
-  __serviceToVersionsEnum: Map<Namespace, SdkEnumType>;
+  __serviceToVersionsSdkEnum?: Map<Namespace, SdkEnumType>; // the SDK enum type for the versions enum (for each service).
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
   __mutatedRealm?: unsafe_Realm; // the realm that contains all mutated types for this instance
   __packageVersions?: Map<Namespace, string[]>; // the package versions (for each service) from the service versioning config and api version setting in tspconfig.
@@ -86,6 +86,7 @@ export interface TCGCContext {
   setApiVersionsForType(type: Type, apiVersions: string[]): void;
   getPackageVersions(): Map<Namespace, string[]>;
   getPackageVersionEnum(): Map<Namespace, Enum | undefined>;
+  getPackageVersionSdkEnum(): Map<Namespace, SdkEnumType>;
   getClients(): SdkClient[];
   getRootClients(): SdkClient[];
   getClient(type: Namespace | Interface): SdkClient | undefined;
@@ -223,8 +224,8 @@ export interface SdkClientType<
   methods: SdkMethod<TServiceOperation>[];
   /** API versions supported for current type. */
   apiVersions: string[];
-  /** Map from service namespace to the SDK versions enum for that service. */
-  versionsEnums: Map<Namespace, SdkEnumType>;
+  /** The SDK versions enum for this client's service. Undefined for unversioned services or multi-service clients. */
+  versionsEnum?: SdkEnumType;
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
   /** The parent client of this client. The structure follows the definition hierarchy. */

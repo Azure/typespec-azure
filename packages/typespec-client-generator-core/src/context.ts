@@ -85,7 +85,6 @@ export function createTCGCContext(
     __httpOperationExamples: new Map(),
     __pagedResultSet: new Set(),
     __namingContextPath: [],
-    __serviceToVersionsEnum: new Map(),
 
     getMutatedGlobalNamespace(): Namespace {
       if (options?.mutateNamespace === false) {
@@ -122,6 +121,9 @@ export function createTCGCContext(
         prepareClientAndOperationCache(this);
       }
       return this.__packageVersionEnum!;
+    },
+    getPackageVersionSdkEnum(): Map<Namespace, SdkEnumType> {
+      return this.__serviceToVersionsSdkEnum ?? new Map();
     },
     getClients(): SdkClient[] {
       if (!this.__rawClientsCache) {

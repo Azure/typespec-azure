@@ -1456,20 +1456,18 @@ it("client has versionsEnum reference", async () => {
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
-  strictEqual(client.versionsEnums.size, 1);
-  const versionsEnum = [...client.versionsEnums.values()][0];
-  ok(versionsEnum);
-  strictEqual(versionsEnum.kind, "enum");
-  strictEqual(versionsEnum.name, "Versions");
-  strictEqual(versionsEnum.usage, UsageFlags.ApiVersionEnum);
-  strictEqual(versionsEnum.values.length, 2);
-  strictEqual(versionsEnum.values[0].value, "2023-10-01");
-  strictEqual(versionsEnum.values[1].value, "2024-10-01");
+  ok(client.versionsEnum);
+  strictEqual(client.versionsEnum.kind, "enum");
+  strictEqual(client.versionsEnum.name, "Versions");
+  strictEqual(client.versionsEnum.usage, UsageFlags.ApiVersionEnum);
+  strictEqual(client.versionsEnum.values.length, 2);
+  strictEqual(client.versionsEnum.values[0].value, "2023-10-01");
+  strictEqual(client.versionsEnum.values[1].value, "2024-10-01");
   // versionsEnum should be the same object as in sdkPackage.enums
-  strictEqual(versionsEnum, sdkPackage.enums[0]);
+  strictEqual(client.versionsEnum, sdkPackage.enums[0]);
 });
 
-it("multi-service client has versionsEnums for all services", async () => {
+it("multi-service client has no versionsEnum", async () => {
   const { program } = await SimpleBaseTester.compile(
     createClientCustomizationInput(
       `
@@ -1513,19 +1511,17 @@ it("multi-service client has versionsEnums for all services", async () => {
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
-  // Multi-service root client should have versionsEnums for both services
-  strictEqual(client.versionsEnums.size, 2);
-  const enumNames = [...client.versionsEnums.values()].map((e) => e.name).sort();
-  deepStrictEqual(enumNames, ["VersionsA", "VersionsB"]);
-  // Sub-clients that map to single services should also have their versionsEnums
+  // Multi-service root client has no versionsEnum (consistent with empty apiVersions)
+  strictEqual(client.versionsEnum, undefined);
+  // Sub-clients that map to single services should have their versionsEnum
   ok(client.children);
   strictEqual(client.children.length, 2);
   const aiClient = client.children.find((c) => c.name === "AI");
   ok(aiClient);
-  strictEqual(aiClient.versionsEnums.size, 1);
-  strictEqual([...aiClient.versionsEnums.values()][0].name, "VersionsA");
+  ok(aiClient.versionsEnum);
+  strictEqual(aiClient.versionsEnum.name, "VersionsA");
   const biClient = client.children.find((c) => c.name === "BI");
   ok(biClient);
-  strictEqual(biClient.versionsEnums.size, 1);
-  strictEqual([...biClient.versionsEnums.values()][0].name, "VersionsB");
+  ok(biClient.versionsEnum);
+  strictEqual(biClient.versionsEnum.name, "VersionsB");
 });
