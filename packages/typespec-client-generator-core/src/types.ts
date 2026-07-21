@@ -935,8 +935,7 @@ export function getSdkModelWithDiagnostics(
     const rawBaseModel = getLegacyHierarchyBuilding(context, type) || type.baseModel;
     if (rawBaseModel) {
       sdkType.baseModel = context.__referencedTypeCache.get(rawBaseModel) as
-        | SdkModelType
-        | undefined;
+        SdkModelType | undefined;
 
       if (sdkType.baseModel === undefined) {
         // Use "AdditionalProperty" label for Record base models

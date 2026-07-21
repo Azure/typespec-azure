@@ -49,13 +49,12 @@ Emitter options can be configured via the `tspconfig.yaml` configuration:
 
 ```yaml
 emitters:
-  '@azure-tools/typespec-autorest':
+  "@azure-tools/typespec-autorest":
     <optionName>: <value>
-
 
 # For example
 emitters:
-  '@azure-tools/typespec-autorest':
+  "@azure-tools/typespec-autorest":
     output-file: my-custom-swagger.json
 ```
 
