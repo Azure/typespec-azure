@@ -161,6 +161,14 @@ Example input:
 
 Output: None (204/empty response)
 
+### Azure_ClientGenerator_Core_ApiVersion_ClientApiVersions_sendApiVersion
+
+- Endpoint: `post /azure/client-generator-core/api-version/client-api-versions`
+
+Test that the client sends the api-version from @clientApiVersions decorator.
+The client api version enum is extended with an older version "2022-10-01" not present in the service versions.
+The client should be able to send "2022-10-01" as the api-version query parameter.
+
 ### Azure_ClientGenerator_Core_ClientDefaultValue_getHeaderParameter
 
 - Endpoint: `get /azure/client-generator-core/client-default-value/header-parameter`

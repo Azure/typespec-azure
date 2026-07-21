@@ -84,22 +84,23 @@ function Get-CoreSourceRoot {
     Write-Host "Reading core sources from pinned commit $targetSha (was $originSha) without checking it out"
     $tempDir = Join-Path ([System.IO.Path]::GetTempPath()) ("typespec-java-core-" + [System.Guid]::NewGuid().ToString("N"))
     New-Item -ItemType Directory -Path $tempDir | Out-Null
-    $tarPath = Join-Path $tempDir "core.tar"
+    $zipPath = Join-Path $tempDir "core.zip"
     try {
-        git -C $CoreRoot archive -o $tarPath "${targetSha}:$script:CoreJavaSubtree"
+        # Produce a zip (not tar) and expand it with the built-in Expand-Archive:
+        # this keeps the whole flow inside PowerShell/.NET and avoids depending on an
+        # external `tar`, whose behavior varies by platform (notably Git for Windows'
+        # GNU tar treats a drive-letter path like C:\...\core.tar as a remote host).
+        git -C $CoreRoot archive --format=zip -o $zipPath "${targetSha}:$script:CoreJavaSubtree"
         if ($LASTEXITCODE -ne 0) {
             Write-Error "Failed to archive core commit ${targetSha}:$script:CoreJavaSubtree."
         }
-        tar -x -f $tarPath -C $tempDir
-        if ($LASTEXITCODE -ne 0) {
-            Write-Error "Failed to extract core archive $tarPath."
-        }
+        Expand-Archive -Path $zipPath -DestinationPath $tempDir -Force
     }
     catch {
         Remove-Item $tempDir -Recurse -Force -ErrorAction SilentlyContinue
         throw
     }
-    Remove-Item $tarPath -Force
+    Remove-Item $zipPath -Force
     return @{ Root = $tempDir; TempDir = $tempDir }
 }
 
