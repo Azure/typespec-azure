@@ -4,10 +4,10 @@
 # Azure-flavored `src/options.ts` (excluded from the copy).
 #
 # The desired core commit is pinned in core-commit.json; CoreCommit.ps1's
-# Enter-CoreCommit temporarily checks it out (when newer than the submodule's
-# current checkout) to copy the sources from, and Restore-CoreCommit always puts
-# the submodule back to its original SHA (repo-wide `pnpm build` runs this and CI
-# checks git status).
+# Get-CoreSourceRoot returns a directory to read the emitter/generator sources from
+# (extracted from the pinned commit via `git archive` when it is newer than the
+# submodule's current checkout), without ever mutating the core/ submodule working
+# tree. Remove-CoreSourceRoot cleans up any temporary extraction afterwards.
 #
 # Mirrors the "Copy TypeScript code" step of autorest.java's Build-TypeSpec.ps1.
 
@@ -18,9 +18,9 @@ $repoRoot = Resolve-Path (Join-Path $packageRoot ".." "..")
 $coreRoot = Join-Path $repoRoot "core"
 
 . (Join-Path $packageRoot "CoreCommit.ps1")
-$originSha = Enter-CoreCommit -CoreRoot $coreRoot -PackageRoot $packageRoot
+$core = Get-CoreSourceRoot -CoreRoot $coreRoot -PackageRoot $packageRoot
 try {
-    $emitterRoot = Resolve-Path (Join-Path $coreRoot "packages" "http-client-java" "emitter")
+    $emitterRoot = Join-Path $core.Root "emitter"
 
     Copy-Item -Path (Join-Path $emitterRoot "src") -Destination $packageRoot -Exclude "options.ts" -Recurse -Force
     Copy-Item -Path (Join-Path $emitterRoot "test") -Destination $packageRoot -Recurse -Force
@@ -29,15 +29,27 @@ try {
     # customization patch (core.patch) to the copy, so building emitter.jar
     # (Build-Generator.ps1) never mutates the core/ submodule. The patch paths are
     # relative to this generator folder.
-    $srcGenerator = Join-Path $coreRoot "packages" "http-client-java" "generator"
+    $srcGenerator = Join-Path $core.Root "generator"
     $destGenerator = Join-Path $packageRoot "generator"
     $patchFile = Join-Path $packageRoot "core.patch"
+
+    # The emitter.jar reactor (generator/pom.xml) only builds http-client-generator,
+    # http-client-generator-mgmt and http-client-generator-core. The two test modules
+    # below live in a separate (never-activated) Maven `test` profile and hold ~38MB
+    # of generated Java test sources that are not part of the emitter build, so skip
+    # copying them -- it is the bulk of the copy time. (The Azure emitter-tests
+    # project syncs http-client-generator-test straight from core via SyncTests.ps1,
+    # not from this copy.)
+    $excludedGeneratorModules = @("http-client-generator-test", "http-client-generator-clientcore-test")
 
     Write-Host "Copy generator sources from core"
     if (Test-Path $destGenerator) {
         Remove-Item $destGenerator -Recurse -Force
     }
-    Copy-Item -Path $srcGenerator -Destination $destGenerator -Recurse -Force
+    New-Item -ItemType Directory -Path $destGenerator | Out-Null
+    Get-ChildItem -Path $srcGenerator -Force |
+        Where-Object { $excludedGeneratorModules -notcontains $_.Name } |
+        ForEach-Object { Copy-Item -Path $_.FullName -Destination $destGenerator -Recurse -Force }
 
     Write-Host "Apply Azure customization patch to copied generator"
     # Run from the repo root with --directory so git apply resolves the patch's
@@ -50,5 +62,5 @@ try {
     }
 }
 finally {
-    Restore-CoreCommit -CoreRoot $coreRoot -OriginSha $originSha
+    Remove-CoreSourceRoot $core
 }
