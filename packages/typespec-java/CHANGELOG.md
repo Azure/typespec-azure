@@ -2,7 +2,7 @@
 
 ## 0.45.8
 
-### Bug Fixes
+### Features
 
 - [#4987](https://github.com/Azure/typespec-azure/pull/4987) Support XML serialization for models: generate XmlSerializer helper classes and use the XML ObjectSerializer overload of toObject/fromObject in convenience methods for XML request/response bodies.
 
