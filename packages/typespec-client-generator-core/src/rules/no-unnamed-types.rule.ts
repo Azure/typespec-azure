@@ -1,4 +1,4 @@
-import { createRule, Model, paramMessage, Union } from "@typespec/compiler";
+import { createRule, fileRef, Model, paramMessage, Union } from "@typespec/compiler";
 import { createTCGCContext } from "../context.js";
 import {
   isSdkBuiltInKind,
@@ -13,6 +13,7 @@ import { handleAllTypes } from "../types.js";
 
 export const noUnnamedTypesRule = createRule({
   name: "no-unnamed-types",
+  docs: fileRef.fromPackageRoot("src/rules/no-unnamed-types.md"),
   description: "Requires types to be named rather than defined anonymously or inline.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/no-unnamed-types",
