@@ -886,10 +886,7 @@ function isActionOperationMatch(
 ): boolean {
   const operationPath = normalizePathForResourceIdentity(operation.httpOperation.path);
   const instancePath = normalizePathForResourceIdentity(resource.resourceInstancePath);
-  const collectionPath = normalizePathForResourceIdentity(getResourceCollectionPath(resource));
-  return (
-    operationPath.startsWith(`${instancePath}/`) || operationPath.startsWith(`${collectionPath}/`)
-  );
+  return operationPath.startsWith(`${instancePath}/`);
 }
 
 function tryAddOperationToResolvedResource(
