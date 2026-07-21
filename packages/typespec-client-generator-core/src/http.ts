@@ -373,6 +373,7 @@ function getSdkHttpParameters(
       ...contentTypeBase,
       kind: "header",
       serializedName: "Content-Type",
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       correspondingMethodParams: [methodParameter],
       methodParameterSegments: [[methodParameter]],
     });
@@ -396,6 +397,7 @@ function getSdkHttpParameters(
       ...acceptBase,
       kind: "header",
       serializedName: "Accept",
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       correspondingMethodParams: [methodParameter],
       methodParameterSegments: [[methodParameter]],
     });

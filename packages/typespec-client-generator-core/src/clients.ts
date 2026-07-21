@@ -61,6 +61,7 @@ function getEndpointTypeFromSingleServer<
         allowReserved: true,
         optional: false,
         serializedName: "endpoint",
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
         correspondingMethodParams: [],
         methodParameterSegments: [],
         type: getSdkBuiltInType(context, $(context.program).builtin.url),
