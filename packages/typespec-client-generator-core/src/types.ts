@@ -218,8 +218,8 @@ export function addEncodeInfo(
       innerType.encode = "bytes";
     }
   }
-  if (isSdkIntKind(innerType.kind)) {
-    // only integer type is allowed to be encoded as string
+  if (isSdkIntKind(innerType.kind) || innerType.kind === "boolean") {
+    // integer and boolean types are allowed to be encoded as string
     if (encodeData) {
       if (encodeData?.encoding) {
         (innerType as any).encode = encodeData.encoding;
