@@ -372,8 +372,8 @@ Depending on the package where the fix needs to go do this on the `Microsoft/typ
 
 ### 3. Backmerge
 
-1. A workflow should run automatically and create a branch named `backmerge/release/xyz-YYYY-MM-DD-<run-id>-<attempt>`.
-1. Find the backmerge branch [here](https://github.com/Azure/typespec-azure/branches) and click "New pull request".
+1. A workflow should run automatically, create a branch named `backmerge/release/xyz-YYYY-MM-DD-<run-id>-<attempt>`, and open a PR targeting `main`.
+1. Review the new backmerge PR.
 1. Rebase merge the new backmerge PR into main.
 
 ## Creating release notes

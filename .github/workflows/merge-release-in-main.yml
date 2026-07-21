@@ -37,3 +37,50 @@ jobs:
         run: |
           git checkout -b "$BRANCH"
           git push --set-upstream origin "$BRANCH"
+      - name: Create pull request
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          BASE_BRANCH: main
+          BRANCH: ${{ steps.branchname.outputs.branchname }}
+          RELEASE_BRANCH: ${{ github.ref_name }}
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const base = process.env.BASE_BRANCH;
+            const branch = process.env.BRANCH;
+            const releaseBranch = process.env.RELEASE_BRANCH;
+            const head = `${owner}:${branch}`;
+            const title = `Backmerge ${releaseBranch} into ${base}`;
+            const body = [
+              "## Summary",
+              "",
+              `Automated backmerge PR for \`${releaseBranch}\` into \`${base}\`.`,
+              "",
+              `- Source branch: \`${releaseBranch}\``,
+              `- Backmerge branch: \`${branch}\``,
+            ].join("\n");
+
+            const { data: pulls } = await github.rest.pulls.list({
+              owner,
+              repo,
+              state: "open",
+              head,
+              base,
+            });
+
+            if (pulls.length > 0) {
+              core.info(`PR already exists: ${pulls[0].html_url}`);
+              return;
+            }
+
+            const { data: pull } = await github.rest.pulls.create({
+              owner,
+              repo,
+              title,
+              head,
+              base,
+              body,
+            });
+
+            core.info(`Created PR: ${pull.html_url}`);
