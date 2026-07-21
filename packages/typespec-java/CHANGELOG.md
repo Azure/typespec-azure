@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-java
 
+## 0.45.8
+
+### Features
+
+- [#4987](https://github.com/Azure/typespec-azure/pull/4987) Support XML serialization for models: generate XmlSerializer helper classes and use the XML ObjectSerializer overload of toObject/fromObject in convenience methods for XML request/response bodies.
+
+
 ## 0.45.7
 
 Compatible with compiler 1.14.0.
