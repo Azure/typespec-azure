@@ -223,7 +223,8 @@ export interface SdkClientType<
   methods: SdkMethod<TServiceOperation>[];
   /** API versions supported for current type. */
   apiVersions: string[];
-  versionsEnum?: SdkEnumType;
+  /** Map from service namespace to the SDK versions enum for that service. */
+  versionsEnums: Map<Namespace, SdkEnumType>;
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
   /** The parent client of this client. The structure follows the definition hierarchy. */

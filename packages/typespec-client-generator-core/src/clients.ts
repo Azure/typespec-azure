@@ -1,4 +1,4 @@
-import { createDiagnosticCollector, Diagnostic, getDoc, getSummary } from "@typespec/compiler";
+import { createDiagnosticCollector, Diagnostic, getDoc, getSummary, Namespace } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import { getServers, HttpServer } from "@typespec/http";
 import {
@@ -13,6 +13,7 @@ import {
   SdkClient,
   SdkClientInitializationType,
   SdkClientType,
+  SdkEnumType,
   SdkEndpointParameter,
   SdkEndpointType,
   SdkHttpOperation,
@@ -35,6 +36,17 @@ import { createDiagnostic } from "./lib.js";
 import { createSdkMethods, getSdkMethodParameter } from "./methods.js";
 import { getCrossLanguageDefinitionId, getLibraryName, isExactClientName } from "./public-utils.js";
 import { getSdkBuiltInType, getSdkCredentialParameter, getTypeSpecBuiltInType } from "./types.js";
+
+function buildVersionsEnumsMap(context: TCGCContext, client: SdkClient): Map<Namespace, SdkEnumType> {
+  const map = new Map<Namespace, SdkEnumType>();
+  for (const service of client.services) {
+    const versionsEnum = context.__serviceToVersionsEnum.get(service);
+    if (versionsEnum) {
+      map.set(service, versionsEnum);
+    }
+  }
+  return map;
+}
 
 function getEndpointTypeFromSingleServer<
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
@@ -203,10 +215,7 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     summary: client.type ? getSummary(context.program, client.type) : undefined,
     methods: [],
     apiVersions: context.getApiVersionsForType(clientType),
-    versionsEnum:
-      client.services.length === 1
-        ? context.__serviceToVersionsEnum.get(client.services[0])
-        : undefined,
+    versionsEnums: buildVersionsEnumsMap(context, client),
     namespace: getClientNamespace(context, clientType),
     clientInitialization: diagnostics.pipe(
       createSdkClientInitializationType(context, client, parent),
