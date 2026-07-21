@@ -15,7 +15,6 @@ namespace MyService {
 model ExtraParams {
   name: string;
 }
-#suppress "experimental-feature" "customizing generated parameters"
 alias Modified = addParameter(MyService.myOp, ExtraParams.name);
 ```
 

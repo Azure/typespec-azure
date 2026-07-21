@@ -17,6 +17,7 @@ import {
   Tuple,
   Type,
   Union,
+  compilerAssert,
   createDiagnosticCollector,
   getDiscriminator,
   getEncode,
@@ -755,42 +756,31 @@ function addDiscriminatorToModelType(
       for (const property of childModelSdkType.properties) {
         if (property.kind === "property") {
           if (property.__raw?.name === discriminator?.propertyName) {
-            if (property.type.kind !== "constant" && property.type.kind !== "enumvalue") {
-              diagnostics.add(
-                createDiagnostic({
-                  code: "discriminator-not-constant",
-                  target: childModel,
-                  format: { discriminator: property.name },
-                }),
-              );
-            } else if (typeof property.type.value !== "string") {
-              diagnostics.add(
-                createDiagnostic({
-                  code: "discriminator-not-string",
-                  target: type,
-                  format: {
-                    discriminator: property.name,
-                    discriminatorValue: String(property.type.value),
-                  },
-                }),
-              );
-            } else {
-              // map string value type to enum value type
-              if (property.type.kind === "constant" && discriminatorType?.kind === "enum") {
-                for (const value of discriminatorType.values) {
-                  if (value.value === property.type.value) {
-                    property.type = value;
-                  }
+            compilerAssert(
+              property.type.kind === "constant" || property.type.kind === "enumvalue",
+              `Discriminator "${property.name}" has to be constant`,
+              childModel,
+            );
+            compilerAssert(
+              typeof property.type.value === "string",
+              `Value of discriminator "${property.name}" has to be a string`,
+              type,
+            );
+            // map string value type to enum value type
+            if (property.type.kind === "constant" && discriminatorType?.kind === "enum") {
+              for (const value of discriminatorType.values) {
+                if (value.value === property.type.value) {
+                  property.type = value;
                 }
               }
-              childModelSdkType.discriminatorValue = property.type.value as string;
-              property.discriminator = true;
-              if (model.discriminatedSubtypes === undefined) {
-                model.discriminatedSubtypes = {};
-              }
-              model.discriminatedSubtypes[property.type.value as string] = childModelSdkType;
-              discriminatorProperty = property;
             }
+            childModelSdkType.discriminatorValue = property.type.value as string;
+            property.discriminator = true;
+            if (model.discriminatedSubtypes === undefined) {
+              model.discriminatedSubtypes = {};
+            }
+            model.discriminatedSubtypes[property.type.value as string] = childModelSdkType;
+            discriminatorProperty = property;
           }
         }
       }

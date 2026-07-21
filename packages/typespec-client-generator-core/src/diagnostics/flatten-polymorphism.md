@@ -1,6 +1,6 @@
-This diagnostic is issued when `@flattenProperty` is applied to a model property whose type is polymorphic through a discriminator.
+This diagnostic is issued when `@flattenProperty` is applied to a model property whose type is polymorphic (a discriminated type). Flattening a polymorphic type is not supported, because most languages cannot represent it.
 
-To fix this issue, remove `@flattenProperty` from polymorphic properties or change the property to use a non-polymorphic type.
+To fix this issue, remove `@flattenProperty` from the polymorphic property, or change the property to a non-polymorphic type.
 
 ### Example
 

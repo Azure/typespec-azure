@@ -255,12 +255,9 @@ packages/typespec-java/emitter-tests/node_modules/**
 packages/typespec-java/emitter-tests/package-lock.json
 packages/typespec-java/emitter-tests/tsp-spector-coverage-*.json
 
-# Generated linter rule reference pages (produced by `tspd doc` / regen-docs via
-# each rule's `docs` field). Regenerated during the website build (build:web), so
-# they are not tracked. The rule source docs live in packages/*/src/rules/*.md.
+# Generated linter rule and diagnostic reference pages (produced by `tspd doc` /
+# regen-docs via each rule's or diagnostic's `docs` field). Regenerated during the
+# website build (build:web), so they are not tracked. The source docs live in
+# packages/*/src/rules/*.md and packages/*/src/diagnostics/*.md.
 website/src/content/docs/docs/libraries/*/rules/
-
-# Generated diagnostic reference pages (produced by `tspd doc` / regen-docs via
-# each diagnostic's `docs` field). Regenerated during the website build (build:web),
-# so they are not tracked. The diagnostic source docs live in packages/*/src/diagnostics/*.md.
 website/src/content/docs/docs/libraries/*/reference/diagnostics/

@@ -1,20 +1,43 @@
-This diagnostic is issued when a nested `@client` specifies services that are not a subset of the parent client's services.
+This diagnostic is issued when a nested (sub) client declares services that are not a subset of its parent client's services. A sub client can only expose services that its parent client already exposes.
 
-To fix this issue, restrict the nested client's `service` option to parent services, or omit the option to inherit from the parent.
+To fix this issue, restrict the nested client's `service` to services the parent client already declares, or omit the `service` option to inherit the parent's services.
 
 ### Example
+
+Instead of referencing a service the parent client does not include:
 
 ```typespec
 using Azure.ClientGenerator.Core;
 
-@service namespace ParentService;
-@service namespace OtherService;
-
-@client({ service: ParentService })
+@client({
+  name: "ParentClient",
+  service: [ServiceOne, ServiceTwo],
+})
 namespace ParentClient {
-  @client({ service: OtherService })
-  namespace ChildClient {}
+  @client({
+    name: "ChildClient",
+    service: ServiceThree,
+  })
+  namespace Child {
+
+  }
 }
 ```
 
-`OtherService` is not part of the parent client; omit the nested `service` option or use a parent service.
+Use a subset of the parent's services (or omit `service` to inherit them):
+
+```typespec
+@client({
+  name: "ParentClient",
+  service: [ServiceOne, ServiceTwo],
+})
+namespace ParentClient {
+  @client({
+    name: "ChildClient",
+    service: ServiceOne,
+  })
+  namespace Child {
+
+  }
+}
+```

@@ -1,6 +1,6 @@
-This diagnostic is issued when a required HTTP parameter is excluded from the current emitter by `@scope`.
+This diagnostic is issued when a required HTTP parameter is scoped out of the current emitter with `@scope`, leaving the operation without a value it needs. This is usually not allowed.
 
-To fix this issue, keep required parameters in scope, make the parameter optional when appropriate, or provide it through another reliable mechanism such as a custom header policy.
+To fix this issue, keep the required parameter in scope, or — when scoping it out is intentional and the value is supplied another way — confirm the intent and suppress this diagnostic.
 
 ### Example
 
@@ -15,4 +15,4 @@ op getWidget(
 ): void;
 ```
 
-When generating for Python, the required `clientId` header is scoped out; keep it in scope, make it optional, or supply it another way.
+When generating for Python, the required `clientId` header is scoped out; keep it in scope, or confirm the intent and suppress the diagnostic if the value is supplied another way.

@@ -142,13 +142,6 @@ const TCGCEmitterOptionsSchema: JSONSchemaType<TCGCEmitterOptions> = {
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-client-generator-core",
   diagnostics: {
-    "client-service": {
-      docs: fileRef.fromPackageRoot("src/diagnostics/client-service.md"),
-      severity: "warning",
-      messages: {
-        default: paramMessage`Client "${"name"}" is not inside a service namespace. Use @client({service: MyServiceNS})`,
-      },
-    },
     "union-null": {
       docs: fileRef.fromPackageRoot("src/diagnostics/union-null.md"),
       severity: "warning",
@@ -182,20 +175,6 @@ export const $lib = createTypeSpecLibrary({
       severity: "error",
       messages: {
         default: paramMessage`Model '${"modelName"}' cannot be used as both multipart/form-data input and regular body input. You can create a separate model with name 'model ${"modelName"}FormData' extends ${"modelName"} {}`,
-      },
-    },
-    "discriminator-not-constant": {
-      docs: fileRef.fromPackageRoot("src/diagnostics/discriminator-not-constant.md"),
-      severity: "error",
-      messages: {
-        default: paramMessage`Discriminator ${"discriminator"} has to be constant`,
-      },
-    },
-    "discriminator-not-string": {
-      docs: fileRef.fromPackageRoot("src/diagnostics/discriminator-not-string.md"),
-      severity: "warning",
-      messages: {
-        default: paramMessage`Value of discriminator ${"discriminator"} has to be a string, not ${"discriminatorValue"}`,
       },
     },
     "wrong-client-decorator": {
@@ -336,13 +315,6 @@ export const $lib = createTypeSpecLibrary({
         default: `@access override conflicts with the access calculated from operation or other @access override.`,
       },
     },
-    "duplicate-decorator": {
-      docs: fileRef.fromPackageRoot("src/diagnostics/duplicate-decorator.md"),
-      severity: "warning",
-      messages: {
-        default: paramMessage`Decorator ${"decoratorName"} cannot be used twice on the same declaration with same scope.`,
-      },
-    },
     "empty-client-namespace": {
       docs: fileRef.fromPackageRoot("src/diagnostics/empty-client-namespace.md"),
       severity: "warning",
@@ -379,13 +351,6 @@ export const $lib = createTypeSpecLibrary({
       messages: {
         default:
           "@deserializeEmptyStringAsNull can only be applied to `ModelProperty` of type 'string' or a `Scalar` derived from 'string'.",
-      },
-    },
-    "api-version-not-string": {
-      docs: fileRef.fromPackageRoot("src/diagnostics/api-version-not-string.md"),
-      severity: "warning",
-      messages: {
-        default: `Api version must be a string or a string enum`,
       },
     },
     "invalid-encode-for-collection-format": {
