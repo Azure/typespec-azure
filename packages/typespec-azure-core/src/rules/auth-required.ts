@@ -1,8 +1,9 @@
-import { Namespace, createRule, getService } from "@typespec/compiler";
+import { Namespace, createRule, fileRef, getService } from "@typespec/compiler";
 import { getAuthentication } from "@typespec/http";
 
 export const authRequiredRule = createRule({
   name: "auth-required",
+  docs: fileRef.fromPackageRoot("src/rules/auth-required.md"),
   description: "Enforce service authentication.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/auth-required",

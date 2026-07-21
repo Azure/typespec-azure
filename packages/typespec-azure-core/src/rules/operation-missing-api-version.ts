@@ -1,4 +1,4 @@
-import { ModelProperty, Operation, createRule } from "@typespec/compiler";
+import { ModelProperty, Operation, createRule, fileRef } from "@typespec/compiler";
 import { getVersions } from "@typespec/versioning";
 
 function isApiVersionParam(prop: ModelProperty): boolean {
@@ -7,6 +7,7 @@ function isApiVersionParam(prop: ModelProperty): boolean {
 
 export const apiVersionRule = createRule({
   name: "operation-missing-api-version",
+  docs: fileRef.fromPackageRoot("src/rules/operation-missing-api-version.md"),
   description: "Operations need an api version parameter.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/operation-missing-api-version",
