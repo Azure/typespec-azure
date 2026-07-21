@@ -52,8 +52,8 @@ catalog:
   "@azure/identity": ^4.13.1
   "@azure/logger": ^1.0.4
   "@azure/storage-blob": ^12.31.0
-  "@babel/code-frame": ^8.0.0
-  "@babel/core": ^8.0.1
+  "@babel/code-frame": ^7.29.0
+  "@babel/core": ^7.29.0
   "@chronus/chronus": ^1.3.1
   "@chronus/github": ^1.0.6
   "@chronus/github-pr-commenter": ^1.0.6
@@ -71,6 +71,7 @@ catalog:
   "@octokit/core": ^7.0.6
   "@octokit/plugin-paginate-graphql": ^6.0.0
   "@octokit/plugin-rest-endpoint-methods": ^17.0.0
+  "@pinterest/alloy-graphql": ^1.1.0
   "@playwright/test": ^1.60.0
   "@pnpm/workspace.find-packages": ^1000.0.65
   "@scalar/json-magic": ^0.12.15
@@ -102,7 +103,7 @@ catalog:
   "@types/which": ^3.0.4
   "@types/yargs": ^17.0.35
   "@typespec/http-client-python": ">=0.34.2 <1.0.0"
-  "@typespec/ts-http-runtime": "0.3.6"
+  "@typespec/ts-http-runtime": "0.3.7"
   "@vitejs/plugin-react": ^6.0.1
   "@vitest/coverage-v8": ^4.1.3
   "@vitest/ui": ^4.1.3
@@ -115,10 +116,9 @@ catalog:
   "@yarnpkg/plugin-nm": ^4.0.8
   "@yarnpkg/plugin-npm": ^3.4.0
   "@yarnpkg/plugin-pnp": ^4.1.3
-  # Pinned to 7.0.3: "7.0.4-7.0.6 have a static-build regression (withastro/astro#17306)."
   ajv: ^8.18.0
   ajv-formats: ^3.0.1
-  astro: "7.0.3"
+  astro: ^7.0.9
   astro-expressive-code: ^0.44.0
   astro-rehype-relative-markdown-links: ^0.19.0
   autorest: ^3.7.1
@@ -142,6 +142,7 @@ catalog:
   execa: ^9.6.1
   express: ^5.2.1
   fast-xml-parser: ^5.7.0
+  graphql: ^17.0.0-alpha.9
   happy-dom: ^20.9.0
   hast-util-to-html: ^9.0.5
   is-unicode-supported: ^2.1.0
@@ -166,7 +167,7 @@ catalog:
   prettier: ^3.8.1
   prettier-plugin-astro: ^0.14.1
   prettier-plugin-organize-imports: ^4.3.0
-  prettier-plugin-sh: ^0.18.1
+  prettier-plugin-sh: ^0.19.0
   prism-react-renderer: ^2.4.1
   react: ^19.2.7
   react-chartjs-2: ^5.3.1
@@ -183,7 +184,6 @@ catalog:
   semver: ^7.7.4
   sharp: ^0.35.2
   simple-git: ^3.36.0
-  source-map-support: ^0.5.21
   storybook: ^10.3.5
   strip-json-comments: ^5.0.3
   swagger-ui-dist: ^5.32.2
@@ -198,7 +198,7 @@ catalog:
   ts-morph: ^23.0.0
   tslib: ^2.3.1
   tsx: ^4.21.0
-  turbo: "2.9.14"
+  turbo: "2.10.5"
   typedoc: ^0.28.19
   typedoc-plugin-markdown: ^4.11.0
   typescript: ~6.0.2
