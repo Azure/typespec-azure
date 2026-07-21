@@ -412,7 +412,7 @@ it("integer scalar encoded as string", async function () {
 });
 
 it("boolean model property encoded as string", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithService.compile(
     `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -421,14 +421,15 @@ it("boolean model property encoded as string", async function () {
       }
       `,
   );
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program);
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "boolean");
   strictEqual(sdkType.encode, "string");
   strictEqual(sdkType.baseType, undefined);
 });
 
 it("boolean scalar encoded as string", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithService.compile(
     `
       @encode(string)
       scalar boolEncodedAsString extends boolean;
@@ -439,7 +440,8 @@ it("boolean scalar encoded as string", async function () {
       }
     `,
   );
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program);
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "boolean");
   strictEqual(sdkType.encode, "string");
   strictEqual(sdkType.baseType?.kind, "boolean");
