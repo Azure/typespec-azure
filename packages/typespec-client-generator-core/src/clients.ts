@@ -1,4 +1,10 @@
-import { createDiagnosticCollector, Diagnostic, getDoc, getSummary, Namespace } from "@typespec/compiler";
+import {
+  createDiagnosticCollector,
+  Diagnostic,
+  getDoc,
+  getSummary,
+  Namespace,
+} from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import { getServers, HttpServer } from "@typespec/http";
 import {
@@ -13,9 +19,9 @@ import {
   SdkClient,
   SdkClientInitializationType,
   SdkClientType,
-  SdkEnumType,
   SdkEndpointParameter,
   SdkEndpointType,
+  SdkEnumType,
   SdkHttpOperation,
   SdkPathParameter,
   SdkServiceOperation,
@@ -37,7 +43,10 @@ import { createSdkMethods, getSdkMethodParameter } from "./methods.js";
 import { getCrossLanguageDefinitionId, getLibraryName, isExactClientName } from "./public-utils.js";
 import { getSdkBuiltInType, getSdkCredentialParameter, getTypeSpecBuiltInType } from "./types.js";
 
-function buildVersionsEnumsMap(context: TCGCContext, client: SdkClient): Map<Namespace, SdkEnumType> {
+function buildVersionsEnumsMap(
+  context: TCGCContext,
+  client: SdkClient,
+): Map<Namespace, SdkEnumType> {
   const map = new Map<Namespace, SdkEnumType>();
   for (const service of client.services) {
     const versionsEnum = context.__serviceToVersionsEnum.get(service);
