@@ -181,10 +181,7 @@ export function isAPIVersionParameter(param: ClientParameter): boolean {
 
 /** the possible values defining the "final state via" behavior for LROs */
 export type FinalStateVia =
-  | "azure-async-operation"
-  | "location"
-  | "operation-location"
-  | "original-uri";
+  "azure-async-operation" | "location" | "operation-location" | "original-uri";
 
 /** the supported HTTP verbs */
 export type HTTPMethod = "delete" | "get" | "head" | "patch" | "post" | "put";
