@@ -601,23 +601,23 @@ function getResourceScope(
     .slice(0, partsIndex)
     .split("/")
     .filter((s) => s.length > 0);
-  if (segments.length === 1 && isVariableSegment(segments[0])) return "Scope";
+  if (segments.length === 1 && isPathVariableSegment(segments[0])) return "Scope";
   if (
     segments.length === 2 &&
-    isVariableSegment(segments[1]) &&
+    isPathVariableSegment(segments[1]) &&
     segments[0].toLowerCase() === "subscriptions"
   )
     return "Subscription";
   if (
     segments.length === 4 &&
-    isVariableSegment(segments[3]) &&
+    isPathVariableSegment(segments[3]) &&
     segments[0].toLowerCase() === "subscriptions" &&
     segments[2].toLowerCase() === "resourcegroups"
   )
     return "ResourceGroup";
   if (
     segments.length === 4 &&
-    isVariableSegment(segments[3]) &&
+    isPathVariableSegment(segments[3]) &&
     segments[0].toLowerCase() === "providers" &&
     segments[1].toLowerCase() === "microsoft.management" &&
     segments[2].toLowerCase() === "managementgroups"
@@ -625,7 +625,7 @@ function getResourceScope(
     return "ManagementGroup";
   if (
     segments.length === 4 &&
-    isVariableSegment(segments[3]) &&
+    isPathVariableSegment(segments[3]) &&
     segments[0].toLowerCase() === "providers" &&
     segments[1].toLowerCase() === "microsoft.management" &&
     segments[2].toLowerCase() === "servicegroups"
@@ -637,7 +637,7 @@ function getResourceScope(
       return "ExternalResource";
     }
     const provider = segments[parentProviderIndex + 1];
-    if (isVariableSegment(provider)) {
+    if (isPathVariableSegment(provider)) {
       return "ExternalResource";
     }
     const typeSegments: string[] = segments.slice(parentProviderIndex + 2);
@@ -647,11 +647,11 @@ function getResourceScope(
     const types: string[] = [];
     for (let i = 0; i < typeSegments.length; i++) {
       if (i % 2 === 0) {
-        if (isVariableSegment(typeSegments[i])) {
+        if (isPathVariableSegment(typeSegments[i])) {
           return "ExternalResource";
         }
         types.push(typeSegments[i]);
-      } else if (!isVariableSegment(typeSegments[i])) {
+      } else if (!isPathVariableSegment(typeSegments[i])) {
         return "ExternalResource";
       }
     }
@@ -684,10 +684,6 @@ function getResourceScope(
   return undefined;
 }
 
-function isVariableSegment(segment: string): boolean {
-  return (segment.startsWith("{") && segment.endsWith("}")) || segment === "default";
-}
-
 /**
  * Extracts the scope prefix from a resource instance path.
  * The scope prefix is the portion of the path before the last `/providers/` occurrence.
@@ -708,7 +704,7 @@ function getScopePrefix(resourceInstancePath: string): string {
 function normalizePathForScopeComparison(path: string): string {
   return path
     .split("/")
-    .map((s) => (isVariableSegment(s) ? "{}" : s.toLowerCase()))
+    .map((s) => (isPathVariableSegment(s) ? "{}" : s.toLowerCase()))
     .join("/");
 }
 
