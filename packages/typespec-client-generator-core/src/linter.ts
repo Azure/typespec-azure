@@ -1,7 +1,5 @@
 import { defineLinter } from "@typespec/compiler";
-import { csharpNoOptionsSuffixRule } from "./rules/csharp-no-options-suffix.js";
-import { csharpNoRequestSuffixRule } from "./rules/csharp-no-request-suffix.js";
-import { csharpNoResponseSuffixRule } from "./rules/csharp-no-response-suffix.js";
+import { csharpModelSuffixRule } from "./rules/csharp-model-suffix.js";
 import { csharpNoUrlSuffixRule } from "./rules/csharp-no-url-suffix.js";
 import { csharpUseStandardAcronymsRule } from "./rules/csharp-use-standard-acronyms.js";
 import { noUnnamedTypesRule } from "./rules/no-unnamed-types.rule.js";
@@ -13,18 +11,14 @@ const rules = [
   propertyNameConflictRule,
   noUnnamedTypesRule,
   csharpNoUrlSuffixRule,
-  csharpNoOptionsSuffixRule,
-  csharpNoRequestSuffixRule,
-  csharpNoResponseSuffixRule,
+  csharpModelSuffixRule,
   csharpUseStandardAcronymsRule,
 ];
 
 const csharpRules = [
   propertyNameConflictRule,
   csharpNoUrlSuffixRule,
-  csharpNoOptionsSuffixRule,
-  csharpNoRequestSuffixRule,
-  csharpNoResponseSuffixRule,
+  csharpModelSuffixRule,
   csharpUseStandardAcronymsRule,
 ];
 

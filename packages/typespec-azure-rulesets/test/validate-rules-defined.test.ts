@@ -55,9 +55,7 @@ describe("expect all rules to be defined", () => {
     const ruleset = $linter.ruleSets?.["client-sdk"];
     ok(ruleset);
     ok(ruleset.enable?.["@azure-tools/typespec-client-generator-core/csharp-no-url-suffix"]);
-    ok(ruleset.enable?.["@azure-tools/typespec-client-generator-core/csharp-no-options-suffix"]);
-    ok(ruleset.enable?.["@azure-tools/typespec-client-generator-core/csharp-no-request-suffix"]);
-    ok(ruleset.enable?.["@azure-tools/typespec-client-generator-core/csharp-no-response-suffix"]);
+    ok(ruleset.enable?.["@azure-tools/typespec-client-generator-core/csharp-model-suffix"]);
     ok(
       ruleset.enable?.["@azure-tools/typespec-client-generator-core/csharp-use-standard-acronyms"],
     );

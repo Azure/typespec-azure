@@ -1,7 +1,7 @@
 import { createLinterRuleTester, LinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 import { csharpUseStandardAcronymsRule } from "../../src/rules/csharp-use-standard-acronyms.js";
-import { SimpleBaseTester, SimpleTester } from "../tester.js";
+import { d, SimpleBaseTester, SimpleTester } from "../tester.js";
 
 const libraryName = "@azure-tools/typespec-client-generator-core";
 
@@ -93,12 +93,13 @@ describe("codefix", () => {
       })
       .applyCodeFix("add-clientName-in-client-tsp")
       .toEqual({
-        "client.tsp": `import "@azure-tools/typespec-client-generator-core";
+        "client.tsp": d`
+          import "@azure-tools/typespec-client-generator-core";
 
-using Azure.ClientGenerator.Core;
+          using Azure.ClientGenerator.Core;
 
-@@clientName(IpAddress, "IPAddress", "csharp");
-`,
+          @@clientName(IpAddress, "IPAddress", "csharp");
+        `,
       });
   });
 
@@ -117,12 +118,13 @@ using Azure.ClientGenerator.Core;
       })
       .applyCodeFix("add-clientName-in-client-tsp")
       .toEqual({
-        "client.tsp": `import "@azure-tools/typespec-client-generator-core";
+        "client.tsp": d`
+          import "@azure-tools/typespec-client-generator-core";
 
-using Azure.ClientGenerator.Core;
+          using Azure.ClientGenerator.Core;
 
-@@clientName(VmProfile.osProfile, "OSProfile", "csharp");
-`,
+          @@clientName(VmProfile.osProfile, "OSProfile", "csharp");
+        `,
       });
   });
 
@@ -141,12 +143,13 @@ using Azure.ClientGenerator.Core;
       })
       .applyCodeFix("add-clientName-in-client-tsp")
       .toEqual({
-        "client.tsp": `import "@azure-tools/typespec-client-generator-core";
+        "client.tsp": d`
+          import "@azure-tools/typespec-client-generator-core";
 
-using Azure.ClientGenerator.Core;
+          using Azure.ClientGenerator.Core;
 
-@@clientName(IpProtocol, "IPProtocol", "csharp");
-`,
+          @@clientName(IpProtocol, "IPProtocol", "csharp");
+        `,
       });
   });
 });
