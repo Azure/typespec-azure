@@ -1,8 +1,9 @@
-import { Union, createRule, ignoreDiagnostics } from "@typespec/compiler";
+import { Union, createRule, fileRef, ignoreDiagnostics } from "@typespec/compiler";
 import { getUnionAsEnum } from "../helpers/union-enums.js";
 
 export const noClosedLiteralUnionRule = createRule({
   name: "no-closed-literal-union",
+  docs: fileRef.fromPackageRoot("src/rules/no-closed-literal-union.md"),
   description: "Unions of literals should include the base scalar type to mark them as open enum.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-closed-literal-union",

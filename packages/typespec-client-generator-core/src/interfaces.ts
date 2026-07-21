@@ -422,6 +422,12 @@ export interface SdkArrayType extends SdkTypeBase {
   valueType: SdkType;
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
+  /**
+   * Serialization options for the array model itself.
+   * Only set when the array is a named model with explicit serialization decorators,
+   * e.g. `@Xml.name("Foo") model Foo is Bar[];`.
+   */
+  serializationOptions?: SerializationOptions;
 }
 
 export interface SdkTupleType extends SdkTypeBase {
@@ -433,6 +439,12 @@ export interface SdkDictionaryType extends SdkTypeBase {
   kind: "dict";
   keyType: SdkType;
   valueType: SdkType;
+  /**
+   * Serialization options for the dictionary model itself.
+   * Only set when the dictionary is a named model with explicit serialization decorators,
+   * e.g. `@Xml.name("Foo") model Foo is Record<Bar>;`.
+   */
+  serializationOptions?: SerializationOptions;
 }
 
 export interface SdkNullableType extends SdkTypeBase {
@@ -635,10 +647,7 @@ export interface SdkModelPropertyTypeBase<
 }
 
 export type ArrayKnownEncoding =
-  | "pipeDelimited"
-  | "spaceDelimited"
-  | "commaDelimited"
-  | "newlineDelimited";
+  "pipeDelimited" | "spaceDelimited" | "commaDelimited" | "newlineDelimited";
 
 /**
  * Options to show how to serialize a model/property.
@@ -908,11 +917,7 @@ export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
 }
 
 export type SdkHttpParameter =
-  | SdkQueryParameter
-  | SdkPathParameter
-  | SdkBodyParameter
-  | SdkHeaderParameter
-  | SdkCookieParameter;
+  SdkQueryParameter | SdkPathParameter | SdkBodyParameter | SdkHeaderParameter | SdkCookieParameter;
 
 export interface SdkMethodParameter extends SdkModelPropertyTypeBase {
   kind: "method";

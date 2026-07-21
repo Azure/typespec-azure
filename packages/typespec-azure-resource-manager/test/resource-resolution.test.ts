@@ -738,6 +738,8 @@ interface Subscriptions extends EmplOps<Extension.Subscription> {}
 interface ResourceGroups extends EmplOps<Extension.ResourceGroup> {}
 @armResourceOperations
 interface ManagementGroups extends EmplOps<Extension.ManagementGroup> {}
+@armResourceOperations
+interface ServiceGroups extends EmplOps<Extension.ServiceGroup> {}
 
 @armResourceOperations
 interface VirtualMachines extends EmplOps<VirtualMachine> {}
@@ -804,7 +806,7 @@ interface GenericResources {
       providerOperations: expect.any(Array),
     });
     ok(provider.resources);
-    expect(provider.resources).toHaveLength(11);
+    expect(provider.resources).toHaveLength(12);
     const employee = provider.resources[0];
     ok(employee);
     expect(employee).toMatchObject({
@@ -921,7 +923,37 @@ interface GenericResources {
         "/providers/Microsoft.Management/managementGroups/{managementGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const resourceGroup = provider.resources[4];
+    const serviceGroups = provider.resources[4];
+    ok(serviceGroups);
+    expect(serviceGroups).toMatchObject({
+      kind: "Extension",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ServiceGroup",
+      parent: undefined,
+    });
+    checkResolvedOperations(serviceGroups, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            { operationGroup: "ServiceGroups", name: "create", kind: "createOrUpdate" },
+          ],
+          delete: [{ operationGroup: "ServiceGroups", name: "delete", kind: "delete" }],
+          read: [{ operationGroup: "ServiceGroups", name: "get", kind: "read" }],
+          update: [{ operationGroup: "ServiceGroups", name: "update", kind: "update" }],
+        },
+        actions: [{ operationGroup: "ServiceGroups", name: "move", kind: "action" }],
+        lists: [{ operationGroup: "ServiceGroups", name: "list", kind: "list" }],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees"],
+      },
+      resourceInstancePath:
+        "/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+    });
+
+    const resourceGroup = provider.resources[5];
     ok(resourceGroup);
     expect(resourceGroup).toMatchObject({
       kind: "Extension",
@@ -950,7 +982,7 @@ interface GenericResources {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const vms = provider.resources[5];
+    const vms = provider.resources[6];
     ok(vms);
     expect(vms).toMatchObject({
       kind: "Extension",
@@ -988,7 +1020,7 @@ interface GenericResources {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const scaleSetVms = provider.resources[6];
+    const scaleSetVms = provider.resources[7];
     ok(scaleSetVms);
     expect(scaleSetVms).toMatchObject({
       kind: "Extension",
@@ -1025,7 +1057,7 @@ interface GenericResources {
       resourceInstancePath:
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{scaleSetName}/virtualMachineScaleSetVms/{scaleSetVmName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
-    const generics = provider.resources[7];
+    const generics = provider.resources[8];
     ok(generics);
     expect(generics).toMatchObject({
       kind: "Extension",
@@ -1053,7 +1085,7 @@ interface GenericResources {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerNamespace}/{parentType}/{parentName}/{resourceType}/{resourceName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const vmExternal = provider.resources[8];
+    const vmExternal = provider.resources[9];
     ok(vmExternal);
     expect(vmExternal).toMatchObject({
       kind: "Other",
@@ -1069,7 +1101,7 @@ interface GenericResources {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}",
     });
 
-    const scaleSetVmExternal = provider.resources[9];
+    const scaleSetVmExternal = provider.resources[10];
     ok(scaleSetVmExternal);
     expect(scaleSetVmExternal).toMatchObject({
       kind: "Other",
@@ -1085,7 +1117,7 @@ interface GenericResources {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{scaleSetName}/virtualMachineScaleSetVms/{scaleSetVmName}",
     });
 
-    const scaleSetExternal = provider.resources[10];
+    const scaleSetExternal = provider.resources[11];
     ok(scaleSetExternal);
     expect(scaleSetExternal).toMatchObject({
       kind: "Other",

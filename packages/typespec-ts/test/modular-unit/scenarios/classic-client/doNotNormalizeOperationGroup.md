@@ -45,14 +45,7 @@ export class RelayClient {
   public readonly pipeline: Pipeline;
 
   constructor(endpointParam: string, options: RelayClientOptionalParams = {}) {
-    const prefixFromOptions = options?.userAgentOptions?.userAgentPrefix;
-    const userAgentPrefix = prefixFromOptions
-      ? `${prefixFromOptions} azsdk-js-client`
-      : `azsdk-js-client`;
-    this._client = createRelay(endpointParam, {
-      ...options,
-      userAgentOptions: { userAgentPrefix },
-    });
+    this._client = createRelay(endpointParam, options);
     this.pipeline = this._client.pipeline;
     this.wCFRelays = _getwCFRelaysOperations(this._client);
   }

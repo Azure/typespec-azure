@@ -33,6 +33,9 @@ import {
   ArmResourceOperationsDecorator,
   ArmVirtualResourceDecorator,
   ExtensionResourceDecorator,
+  FeatureFileDecorator,
+  FeatureFileOptionsDecorator,
+  FeatureFilesDecorator,
   IdentifiersDecorator,
   LocationResourceDecorator,
   ResourceBaseTypeDecorator,
@@ -71,13 +74,7 @@ import { getArmResource, listArmResources, registerArmResource } from "./private
 import { ArmStateKeys } from "./state.js";
 
 export type ArmResourceKind =
-  | "Tracked"
-  | "Proxy"
-  | "Extension"
-  | "Virtual"
-  | "Custom"
-  | "BuiltIn"
-  | "Generic";
+  "Tracked" | "Proxy" | "Extension" | "Virtual" | "Custom" | "BuiltIn" | "Generic";
 
 /**
  * The base details for all kinds of resources
@@ -619,6 +616,14 @@ function getResourceScope(
     segments[2].toLowerCase() === "managementgroups"
   )
     return "ManagementGroup";
+  if (
+    segments.length === 4 &&
+    isVariableSegment(segments[3]) &&
+    segments[0].toLowerCase() === "providers" &&
+    segments[1].toLowerCase() === "microsoft.management" &&
+    segments[2].toLowerCase() === "servicegroups"
+  )
+    return "ServiceGroup";
   if (segments.some((s) => s.toLowerCase() === "providers")) {
     const parentProviderIndex = segments.findLastIndex((s) => s.toLowerCase() === "providers");
     if (segments.length < parentProviderIndex + 2) {
@@ -1519,6 +1524,10 @@ export const [getResourceFeatureSet, setResourceFeatureSet] = useStateMap<
   Map<string, ArmFeatureOptions>
 >(ArmStateKeys.armFeatureSet);
 
+export const [getFeatureFileSet, setFeatureFileSet] = useStateMap<Namespace, boolean>(
+  ArmStateKeys.armFeatureFileSet,
+);
+
 export const [getResourceFeatureOptions, setResourceFeatureOptions] = useStateMap<
   EnumMember,
   ArmFeatureOptions
@@ -1659,3 +1668,16 @@ export const $featureOptions: FeatureOptionsDecorator = (
 ) => {
   setResourceFeatureOptions(context.program, entity, options);
 };
+
+// New Azure.ResourceManager namespace decorators
+export const $featureFile: FeatureFileDecorator = $feature as unknown as FeatureFileDecorator;
+export const $featureFiles: FeatureFilesDecorator = (
+  context: DecoratorContext,
+  entity: Namespace,
+  features: Enum,
+) => {
+  setFeatureFileSet(context.program, entity, true);
+  $features(context, entity, features);
+};
+export const $featureFileOptions: FeatureFileOptionsDecorator =
+  $featureOptions as unknown as FeatureFileOptionsDecorator;

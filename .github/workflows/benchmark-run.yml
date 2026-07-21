@@ -1,0 +1,104 @@
+name: Benchmark Run
+
+# Reusable workflow that benchmarks a single spec group. Instantiate it once per
+# spec group (see benchmark.yml and benchmark-external.yml).
+on:
+  workflow_call:
+    inputs:
+      specs-dir:
+        description: "Directory of benchmark specs to run"
+        required: true
+        type: string
+      results-dir:
+        description: "Directory on the data branch to store results/history"
+        required: true
+        type: string
+      iterations:
+        required: false
+        type: number
+        default: 25
+      warmup:
+        required: false
+        type: number
+        default: 3
+      noise-cv:
+        required: false
+        type: number
+        default: 0.08
+      rerun-iterations:
+        required: false
+        type: number
+        default: 10
+      runner:
+        required: false
+        type: string
+        default: "ubuntu-latest"
+      backfill_from:
+        description: "Backfill from: commit SHA or number of recent commits (main only)"
+        required: false
+        type: string
+        default: ""
+      branch:
+        description: "Data branch to store results"
+        required: false
+        type: string
+        default: "benchmark-data"
+
+permissions:
+  contents: write
+
+jobs:
+  benchmark:
+    name: Run Benchmarks
+    runs-on: ${{ inputs.runner }}
+    env:
+      TYPESPEC_VS_CI_BUILD: true
+      TYPESPEC_SKIP_WEBSITE_BUILD: true
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup
+        with:
+          node-version: 24.15.0
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm -r --filter "@azure-tools/typespec-benchmark..." build
+
+      - name: Run backfill
+        if: ${{ inputs.backfill_from != '' }}
+        run: |
+          node --max-old-space-size=6144 packages/benchmark/dist/src/cli.js backfill \
+            --from ${{ inputs.backfill_from }} \
+            --specs-dir ${{ inputs.specs-dir }} \
+            --iterations ${{ inputs.iterations }} \
+            --warmup ${{ inputs.warmup }} \
+            --branch ${{ inputs.branch }} \
+            --push
+
+      - name: Run benchmarks
+        if: ${{ inputs.backfill_from == '' }}
+        run: |
+          node --max-old-space-size=6144 packages/benchmark/dist/src/cli.js run \
+            --specs-dir ${{ inputs.specs-dir }} \
+            --iterations ${{ inputs.iterations }} \
+            --warmup ${{ inputs.warmup }} \
+            --noise-cv-threshold ${{ inputs.noise-cv }} \
+            --max-reruns 1 \
+            --rerun-iterations ${{ inputs.rerun-iterations }} \
+            --commit ${{ github.sha }} \
+            --output /tmp/benchmark-results.json
+
+      # On push to main: store results to the data branch.
+      - name: Store benchmark results
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          node packages/benchmark/dist/src/cli.js store-results \
+            --results /tmp/benchmark-results.json \
+            --commit ${{ github.sha }} \
+            --results-dir ${{ inputs.results-dir }}

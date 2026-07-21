@@ -10,7 +10,7 @@ import {
   resolvePath,
   type CompilerHost,
 } from "@typespec/compiler";
-import { provideContext, useContext } from "./context-manager.js";
+import { clearContexts, provideContext, useContext } from "./context-manager.js";
 import { buildRootIndex, buildSubClientIndexFile } from "./modular/build-root-index.js";
 import {
   AzureCoreDependencies,
@@ -43,7 +43,7 @@ import {
 } from "@azure-tools/typespec-client-generator-core";
 import { Project } from "ts-morph";
 import { provideBinder } from "./framework/hooks/binder.js";
-import { provideSdkTypes } from "./framework/hooks/sdk-types.js";
+import { provideSdkTypes, resetSdkTypesState } from "./framework/hooks/sdk-types.js";
 import { loadStaticHelpers } from "./framework/load-static-helpers.js";
 import { ClientModel, ClientOptions } from "./interfaces.js";
 import { EmitterOptions } from "./lib.js";
@@ -76,7 +76,7 @@ import { buildSampleTest } from "./metadata/test/build-sample-test.js";
 import { buildSnippets } from "./metadata/test/build-snippets.js";
 import { buildClassicalClient } from "./modular/build-classical-client.js";
 import { buildClassicOperationFiles } from "./modular/build-classical-operation-groups.js";
-import { buildClientContext, getClientContextPath } from "./modular/build-client-context.js";
+import { buildClientContext } from "./modular/build-client-context.js";
 import { transformModularEmitterOptions } from "./modular/build-modular-options.js";
 import { buildOperationFiles } from "./modular/build-operations.js";
 import { getModuleExports } from "./modular/build-project-files.js";
@@ -187,6 +187,15 @@ export async function $onEmit(context: EmitContext) {
   }
 
   await generateMetadataAndTest(dpgContext);
+
+  // Release the emitter's process-wide singleton state now that this emit has
+  // finished writing output. Without this, the context manager keeps the whole
+  // previous program graph (compiler `EmitContext`/`Program`, TCGC `SdkContext`,
+  // ts-morph `Project`, binder, …) reachable until the next emit overwrites it.
+  // Clearing here lets it be collected between emits, which matters for hosts
+  // that run many emits in one process (test suites, benchmarks, watch mode).
+  clearContexts();
+  resetSdkTypesState();
 
   async function enrichDpgContext() {
     const generationPathDetail: GenerationDirDetail = await calculateGenerationDir();
@@ -446,7 +455,6 @@ export async function $onEmit(context: EmitContext) {
         modularPackageInfo = {
           ...modularPackageInfo,
           dependencies,
-          clientContextPaths: getRelativeContextPaths(context, modularEmitterOptions),
         };
       }
       commonBuilders.push((model) => buildPackageFile(model, modularPackageInfo));
@@ -499,14 +507,13 @@ export async function $onEmit(context: EmitContext) {
       }
       const modularPackageInfo = {
         exports: getModuleExports(context, modularEmitterOptions),
-        clientContextPaths: getRelativeContextPaths(context, modularEmitterOptions),
         ...(Object.keys(additionalDependencies).length > 0 && {
           dependencies: additionalDependencies,
         }),
       };
 
       // Always update package.json (adds #platform/* imports) along with
-      // exports, clientContextPaths and LRO deps.
+      // exports and LRO deps.
       {
         // Read package.json content via host and pass parsed object
         const pkgSourceFile = await host.readFile(existingPackageFilePath);
@@ -570,13 +577,6 @@ export async function $onEmit(context: EmitContext) {
         dpgContext.generationPathDetail?.metadataDir,
       );
     }
-  }
-
-  function getRelativeContextPaths(context: SdkContext, options: ModularEmitterOptions) {
-    const clientMap = getClientHierarchyMap(context);
-    return Array.from(clientMap)
-      .map((subClient) => getClientContextPath(subClient, options))
-      .map((path) => path.substring(path.indexOf("src")));
   }
 }
 

@@ -1,4 +1,4 @@
-name: "typespec-java / CI"
+name: "java / test e2e"
 
 on:
   pull_request:
@@ -8,35 +8,75 @@ on:
     paths:
       - "packages/typespec-java/**"
       - ".github/workflows/ci-java.yml"
+      - ".github/actions/setup-java/**"
   merge_group:
 
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
-    name: Build
+    name: "Build & Test"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
+
       - uses: ./.github/actions/setup
+
+      - uses: ./.github/actions/setup-java
+
       - name: Install dependencies
         run: pnpm install
-      - name: Build typespec-java package
+
+      # Build the emitter (build:generator builds emitter.jar from the core
+      # generator after applying core.patch; build:emitter copies sources + tsc)
+      # together with the peer packages it compiles against.
+      - name: Build
         run: pnpm turbo run --filter "@azure-tools/typespec-java..." build
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
+
+      - name: Test (emitter unit tests)
+        run: pnpm run test
+        working-directory: packages/typespec-java
+
+  e2e:
+    name: "Regen & Spector Tests"
     needs: build
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
+
       - uses: ./.github/actions/setup
+
+      - uses: ./.github/actions/setup-java
+
       - name: Install dependencies
         run: pnpm install
-      - name: Run linters
-        working-directory: packages/typespec-java
-        run: pnpm lint
+
+      # The emitter compiles against these peer packages; Generate.ps1 -> Setup.ps1
+      # -> Build-TypeSpec.ps1 runs `pnpm build` for the emitter, which needs them
+      # already built.
+      - name: Build dependencies
+        run: pnpm turbo run --filter "@azure-tools/typespec-java^..." build
+
+      # emitter-tests is a standalone npm+Maven project (not in the pnpm
+      # workspace). Generate.ps1 calls Setup.ps1 (builds the emitter + Azure jar,
+      # npm install) and regenerates the SDK from the spector specs into the
+      # gitignored src/main/java. Spector-Tests.ps1 then runs the JUnit tests
+      # against the Spector mock server.
+      - name: Regenerate
+        shell: pwsh
+        run: ./Generate.ps1
+        working-directory: packages/typespec-java/emitter-tests
+
+      - name: Spector tests
+        shell: pwsh
+        run: ./Spector-Tests.ps1
+        working-directory: packages/typespec-java/emitter-tests
