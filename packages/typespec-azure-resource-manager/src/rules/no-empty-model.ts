@@ -1,7 +1,8 @@
-import { createRule, isRecordModelType, Model } from "@typespec/compiler";
+import { createRule, fileRef, isRecordModelType, Model } from "@typespec/compiler";
 
 export const noEmptyModel = createRule({
   name: "no-empty-model",
+  docs: fileRef.fromPackageRoot("src/rules/no-empty-model.md"),
   severity: "warning",
   description:
     "ARM Properties with type:object that don't reference a model definition are not allowed. ARM doesn't allow generic type definitions as this leads to bad customer experience.",

@@ -4,6 +4,7 @@ import {
   ModelProperty,
   Program,
   createRule,
+  fileRef,
   paramMessage,
   type LinterRuleContext,
 } from "@typespec/compiler";
@@ -61,6 +62,7 @@ function reportIfNeeded(
 
 export const csharpUseStandardAcronymsRule = createRule({
   name: "csharp-use-standard-acronyms",
+  docs: fileRef.fromPackageRoot("src/rules/csharp-use-standard-acronyms.md"),
   description: "C# SDK names should use standard acronym casing.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-use-standard-acronyms",

@@ -21,17 +21,18 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 Only `src/options.ts` (the Azure-specific emitter options) is committed in this package. The rest of
 the emitter TypeScript (and tests) is copied from `core/packages/http-client-java/emitter/{src,test}`
 at build time by `Copy-Sources.ps1` (excluding `options.ts`). The Java `emitter.jar` is
-built from `core/packages/http-client-java/generator` by `Build-Generator.ps1` and staged into
-`generator/http-client-generator/target/`.
+built by `Build-Generator.ps1` from a patched copy of `core/packages/http-client-java/generator`
+(see below) and staged into `generator/http-client-generator/target/`.
 
 ### Azure customization patch
 
-Before building the jar, `Build-Generator.ps1` applies `core.patch` to the `core/` submodule.
-This swaps the unbranded customization engine in `http-client-generator-core` for Azure's
+`Copy-Sources.ps1` copies the Java generator sources out of the `core/` submodule into this
+package's `./generator` folder and applies `core.patch` to that **copy** — never to `core/` itself.
+The patch swaps the unbranded customization engine in `http-client-generator-core` for Azure's
 `com.azure.tools:azure-autorest-customization` (resolved from Maven Central), so the
-`customization-class` emitter option runs against the Azure customization base. The patch is applied
-transiently at build time (the script runs `git checkout .` in `core/` to apply and again to revert
-it), so commit/stage any local `core/` changes before building. When the `core/` submodule is bumped,
+`customization-class` emitter option runs against the Azure customization base. `Build-Generator.ps1`
+then builds `emitter.jar` from the patched `./generator`. Because the patch is only ever applied to
+the copy, the `core/` submodule working tree stays clean. When the `core/` submodule is bumped,
 refresh `core.patch` if its context no longer applies.
 
 ## Build
@@ -53,17 +54,19 @@ pwsh ./Build-TypeSpec.ps1
 
 ### Pinning the core commit (`core-commit.json`)
 
-`Copy-Sources.ps1` copies the emitter sources from the `core/` submodule's current checkout. The
-optional `core-commit.json` pins a specific upstream `core` commit to copy from instead:
+`Copy-Sources.ps1` reads the emitter/generator sources from the `core/` submodule's current checkout.
+The optional `core-commit.json` pins a specific upstream `core` commit to read from instead:
 
 ```json
 { "sha": "3cb616e4e8c3d5b6954bac9832b97445450a71af" }
 ```
 
 The pinned SHA is fetched if needed and used only when it is **newer** than the current checkout (the
-submodule never moves backwards). The submodule is checked out transiently for the copy, then always
-restored to its original SHA, keeping `pnpm build` and CI git-status checks clean. To advance the pin,
-update the `sha`.
+submodule never moves backwards). When the pin is newer, those sources are extracted from that commit
+into a temporary directory via `git archive` — the `core/` submodule is **never** checked out or
+otherwise modified. This keeps `pnpm build` safe to run alongside the parallel monorepo build (which
+reads `core/` concurrently) and keeps CI git-status checks clean. To advance the pin, update the
+`sha`.
 
 ### Troubleshooting
 

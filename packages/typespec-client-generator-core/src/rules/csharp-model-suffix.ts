@@ -1,4 +1,4 @@
-import { Model, createRule, getNamespaceFullName, paramMessage } from "@typespec/compiler";
+import { Model, createRule, fileRef, getNamespaceFullName, paramMessage } from "@typespec/compiler";
 import { createTCGCContext } from "../context.js";
 import { getLibraryName } from "../public-utils.js";
 import { createClientTspAugmentDecoratorCodeFix } from "./codefix-helpers.js";
@@ -36,6 +36,7 @@ function getSuggestedName(name: string, convention: SuffixConvention) {
 
 export const csharpModelSuffixRule = createRule({
   name: "csharp-model-suffix",
+  docs: fileRef.fromPackageRoot("src/rules/csharp-model-suffix.md"),
   description: "Model names should use recommended suffixes for C# SDKs.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-model-suffix",
