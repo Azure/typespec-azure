@@ -1,10 +1,11 @@
-import { Model, ModelProperty, createRule, paramMessage } from "@typespec/compiler";
+import { Model, ModelProperty, createRule, fileRef, paramMessage } from "@typespec/compiler";
 
 import { getSegment } from "@typespec/rest";
 import { getDecoratorParam, isInternalTypeSpec, isResource, isValidKey } from "./utils.js";
 
 export const armResourcePathInvalidCharsRule = createRule({
   name: "arm-resource-path-segment-invalid-chars",
+  docs: fileRef.fromPackageRoot("src/rules/arm-resource-path-segment-invalid-chars.md"),
   severity: "warning",
   description: "Arm resource name must contain only alphanumeric characters.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-path-segment-invalid-chars",

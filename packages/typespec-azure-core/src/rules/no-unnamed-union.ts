@@ -1,9 +1,10 @@
-import { createRule, paramMessage, Program, Union } from "@typespec/compiler";
+import { createRule, fileRef, paramMessage, Program, Union } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import { getHeaderFieldName, isHeader, isStatusCode } from "@typespec/http";
 
 export const noUnnamedUnionRule = createRule({
   name: "no-unnamed-union",
+  docs: fileRef.fromPackageRoot("src/rules/no-unnamed-union.md"),
   description: "Azure services should not define a union expression but create a declaration.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-unnamed-union",

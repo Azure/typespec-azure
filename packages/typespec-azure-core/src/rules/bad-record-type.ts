@@ -5,6 +5,7 @@ import {
   ModelProperty,
   Type,
   createRule,
+  fileRef,
   paramMessage,
 } from "@typespec/compiler";
 
@@ -76,6 +77,7 @@ function validatePropertyRecordType(
 
 export const badRecordTypeRule = createRule({
   name: "bad-record-type",
+  docs: fileRef.fromPackageRoot("src/rules/bad-record-type.md"),
   description: "Identify bad record definitions.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/bad-record-type",
