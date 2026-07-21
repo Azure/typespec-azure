@@ -219,10 +219,10 @@ catalog:
   yargs: ^18.0.0
 
 allowBuilds:
-  '@playwright/browser-chromium': false
-  '@scarf/scarf': false
-  '@typespec/http-client-python': false
-  '@vscode/vsce-sign': false
+  "@playwright/browser-chromium": false
+  "@scarf/scarf": false
+  "@typespec/http-client-python": false
+  "@vscode/vsce-sign": false
   autorest: false
   esbuild: false
   keytar: false

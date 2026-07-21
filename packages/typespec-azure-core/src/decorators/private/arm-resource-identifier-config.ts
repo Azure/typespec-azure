@@ -8,12 +8,7 @@ export interface ArmResourceIdentifierConfig {
 }
 
 export type ArmResourceDeploymentScope =
-  | "Tenant"
-  | "Subscription"
-  | "ResourceGroup"
-  | "ManagementGroup"
-  | "ServiceGroup"
-  | "Extension";
+  "Tenant" | "Subscription" | "ResourceGroup" | "ManagementGroup" | "ServiceGroup" | "Extension";
 
 export interface ArmResourceIdentifierAllowedResource {
   /** The type of resource that is being referred to. For example Microsoft.Network/virtualNetworks or Microsoft.Network/virtualNetworks/subnets. See Example Types for more examples. */
