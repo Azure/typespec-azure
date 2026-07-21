@@ -22,7 +22,7 @@ The generated OpenAPI spec will have custom `x-ms-` extensions properties and co
 }
 ```
 
-2. Run `npm install` to install the dependency
+2. Run `pnpm install` to install the dependency
 3. Import `@azure-tools/typespec-autorest` in your `main.tsp` file
 
 ```typespec

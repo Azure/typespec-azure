@@ -1,4 +1,4 @@
-import { Model, createRule, getProperty, paramMessage } from "@typespec/compiler";
+import { Model, createRule, fileRef, getProperty, paramMessage } from "@typespec/compiler";
 
 import { getArmResource } from "../resource.js";
 import { getProperties } from "./utils.js";
@@ -23,6 +23,7 @@ const reservedPropertiesByLowerName = new Map(
 
 export const noReservedResourcePropertyRule = createRule({
   name: "no-reserved-resource-property",
+  docs: fileRef.fromPackageRoot("src/rules/no-reserved-resource-property.md"),
   description:
     "Reserved property names (for example 'billingData') must not be present in a resource's property bag. The property name is matched case-insensitively.",
   severity: "warning",

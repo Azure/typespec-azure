@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-java",
-  "version": "0.45.4",
+  "version": "0.45.7",
   "description": "TypeSpec library for emitting Java client from the TypeSpec REST protocol binding",
   "keywords": [
     "TypeSpec"
@@ -29,7 +29,7 @@
   },
   "scripts": {
     "clean": "rimraf ./dist ./temp ./generator",
-    "build": "npm run build:emitter && npm run build:generator",
+    "build": "pnpm build:emitter && pnpm build:generator",
     "build:emitter": "pwsh -NoProfile -File Copy-Sources.ps1 && tsc -p .",
     "build:generator": "pwsh -NoProfile -File Build-Generator.ps1",
     "watch": "tsc -p . --watch",
@@ -49,8 +49,6 @@
     "@azure-tools/typespec-azure-resource-manager": "workspace:^",
     "@azure-tools/typespec-azure-rulesets": "workspace:^",
     "@azure-tools/typespec-client-generator-core": "workspace:^",
-    "@azure-tools/typespec-liftr-base": "catalog:",
-    "@azure-tools/openai-typespec": "catalog:",
     "@typespec/compiler": "workspace:^",
     "@typespec/events": "workspace:^",
     "@typespec/http": "workspace:^",
@@ -72,8 +70,6 @@
     "@azure-tools/typespec-azure-resource-manager": "workspace:^",
     "@azure-tools/typespec-azure-rulesets": "workspace:^",
     "@azure-tools/typespec-client-generator-core": "workspace:^",
-    "@azure-tools/typespec-liftr-base": "catalog:",
-    "@azure-tools/openai-typespec": "catalog:",
     "@types/node": "catalog:",
     "@typespec/compiler": "workspace:^",
     "@typespec/events": "workspace:^",

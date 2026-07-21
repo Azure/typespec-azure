@@ -276,13 +276,13 @@ function createMetadata(model: ClientModel): Metadata | undefined {
   const clientClassName = getClientName(model);
   const serviceName = getServiceName(model);
   let apiRefUrlQueryParameter: string = "";
-  if (!packageDetails?.isVersionUserProvided && model.apiVersionInfo?.defaultValue) {
+  if (!packageDetails?.version && model.apiVersionInfo?.defaultValue) {
     if (model.apiVersionInfo?.defaultValue?.toLowerCase().includes("preview")) {
       apiRefUrlQueryParameter = "?view=azure-node-preview";
     }
   } else {
-    packageDetails.version = packageDetails.version ?? "1.0.0-beta.1";
-    if (packageDetails?.version.includes("beta")) {
+    const packageVersion = packageDetails.version ?? "1.0.0-beta.1";
+    if (packageVersion.includes("beta")) {
       apiRefUrlQueryParameter = "?view=azure-node-preview";
     }
   }

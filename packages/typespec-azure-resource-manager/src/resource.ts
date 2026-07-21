@@ -622,6 +622,14 @@ function getResourceScope(
     segments[2].toLowerCase() === "managementgroups"
   )
     return "ManagementGroup";
+  if (
+    segments.length === 4 &&
+    isVariableSegment(segments[3]) &&
+    segments[0].toLowerCase() === "providers" &&
+    segments[1].toLowerCase() === "microsoft.management" &&
+    segments[2].toLowerCase() === "servicegroups"
+  )
+    return "ServiceGroup";
   if (segments.some((s) => s.toLowerCase() === "providers")) {
     const parentProviderIndex = segments.findLastIndex((s) => s.toLowerCase() === "providers");
     if (segments.length < parentProviderIndex + 2) {

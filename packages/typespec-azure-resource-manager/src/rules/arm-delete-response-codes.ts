@@ -1,4 +1,4 @@
-import { Program, createRule } from "@typespec/compiler";
+import { Program, createRule, fileRef } from "@typespec/compiler";
 
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import { getArmResources } from "../resource.js";
@@ -8,8 +8,9 @@ import { getArmResources } from "../resource.js";
  */
 export const armDeleteResponseCodesRule = createRule({
   name: "arm-delete-operation-response-codes",
+  docs: fileRef.fromPackageRoot("src/rules/arm-delete-operation-response-codes.md"),
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/delete-operation-response-codes",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-delete-operation-response-codes",
   description: "Ensure delete operations have the appropriate status codes.",
   messages: {
     sync: `Synchronous delete operations must have 200, 204 and default responses. They must not have any other responses. Consider using the 'ArmResourceDeleteSync' template.`,

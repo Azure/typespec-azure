@@ -12,6 +12,7 @@ export type ArmResourceDeploymentScope =
   | "Subscription"
   | "ResourceGroup"
   | "ManagementGroup"
+  | "ServiceGroup"
   | "Extension";
 
 export interface ArmResourceIdentifierAllowedResource {
