@@ -1,0 +1,1 @@
+The enum passed to `@clientApiVersions` does not include every version defined by the service. Add the missing service versions to the client API versions enum so the client remains compatible with all service versions.

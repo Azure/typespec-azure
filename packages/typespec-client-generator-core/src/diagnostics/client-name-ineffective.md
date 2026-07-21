@@ -1,0 +1,1 @@
+TCGC reports this when a `@clientName` application will not affect the generated name. When the warning involves an override method, apply `@clientName` to the original method definition instead of the override.

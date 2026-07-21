@@ -1,0 +1,1 @@
+TCGC reports this when it encounters a TypeSpec type kind that it cannot convert to an SDK type. Replace the unsupported construct with a supported model, scalar, enum, union, operation, or property shape.

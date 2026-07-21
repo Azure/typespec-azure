@@ -1,0 +1,1 @@
+TCGC reports this when the same model is used both as multipart/form-data input and as a regular JSON or XML body input. Create a separate form-data model, for example a `FormData` model extending the regular input model, so each wire shape has a distinct model.

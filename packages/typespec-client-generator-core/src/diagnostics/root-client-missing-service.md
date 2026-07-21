@@ -1,0 +1,1 @@
+A root namespace decorated with `@client` must specify its service configuration. Add the `service` option to the root `@client`, or make the client nested so it can inherit services from a parent client.

@@ -1,0 +1,1 @@
+`@hierarchyBuilding` rebases a model hierarchy and found a same-named property whose type does not match the property supplied by the new base chain. Align the property types or remove the conflicting property from the child model.

@@ -1,0 +1,1 @@
+The `initializedBy` option in `@clientInitialization` must use valid `InitializedBy` values. Use the `InitializedBy` enum, do not combine `InitializedBy.customizeCode` with other values, require `InitializedBy.individually` for root clients, and use `InitializedBy.parent` or `InitializedBy.individually | InitializedBy.parent` for sub clients.

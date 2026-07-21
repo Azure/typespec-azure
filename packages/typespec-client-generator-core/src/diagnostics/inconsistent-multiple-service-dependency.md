@@ -1,0 +1,1 @@
+Services merged into one client resolved different versions of the same dependency namespace. Align the service versioning or `@useDependency` mappings so each shared dependency resolves to one version.

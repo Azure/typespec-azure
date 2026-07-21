@@ -1,0 +1,1 @@
+All services merged by one `@client` declaration must have matching server and authentication definitions. Make the service server and auth definitions consistent before merging them into the same client.

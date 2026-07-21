@@ -1,0 +1,1 @@
+TCGC reports this for a pageable operation whose response is not a valid paging model. Ensure the response model is decorated correctly with `@nextLink` and `@pageItems`, or remove the pageable/list decoration.

@@ -1,0 +1,1 @@
+A required HTTP parameter was excluded from the current emitter by `@scope`. Keep the required parameter in scope or ensure it is supplied through another mechanism, such as a custom header, to avoid generated client runtime failures.

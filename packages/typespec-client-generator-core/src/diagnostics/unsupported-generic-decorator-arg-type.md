@@ -1,0 +1,1 @@
+TCGC could not parse an argument passed to a generic decorator. Use supported argument values such as strings, numbers, booleans, values, or enum members rather than unsupported TypeSpec type objects.

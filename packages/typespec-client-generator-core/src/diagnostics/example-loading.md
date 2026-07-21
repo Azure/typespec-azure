@@ -1,0 +1,1 @@
+TCGC skipped one or more example files because the examples directory could not be read, a file could not be parsed, or the JSON did not include both `operationId` and `title`. Fix the examples directory and example JSON metadata so the file can be loaded.

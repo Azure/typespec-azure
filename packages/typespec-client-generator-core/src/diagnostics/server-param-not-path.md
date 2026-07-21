@@ -1,0 +1,1 @@
+Server template arguments must resolve to path parameters. If a server parameter is reported as query, header, body, or another kind, mark it as a path parameter or adjust the server definition so the template argument is part of the server path.

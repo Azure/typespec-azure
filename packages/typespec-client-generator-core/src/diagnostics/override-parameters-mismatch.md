@@ -1,0 +1,1 @@
+TCGC reports this when an `@override` operation does not preserve the required parameters of the original operation, or when a realized path parameter loses its `@path` role. Update the override signature so required parameters and path parameters match the original operation, unless the parameter is intentionally moved with `@clientLocation`.

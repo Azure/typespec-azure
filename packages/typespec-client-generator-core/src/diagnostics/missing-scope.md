@@ -1,0 +1,1 @@
+TCGC reports this when a decorator that is highly likely to be language-specific is used without `@scope`; in current code this is reported for external `@alternateType` information without a scope. Add the appropriate language scope, such as the emitter scope, or remove the language-specific customization.

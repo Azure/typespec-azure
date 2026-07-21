@@ -1,0 +1,1 @@
+`@alternateType` with external type information cannot be applied directly to a model property. Apply the external alternate type to the type definition itself, such as the scalar, model, enum, or union.

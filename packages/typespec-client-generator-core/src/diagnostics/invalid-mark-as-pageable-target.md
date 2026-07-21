@@ -1,0 +1,1 @@
+`@markAsPageable` can only be applied to operations returning a model that has a property decorated with `@pageItems` or a property named `value`. Update the response model to expose the page items or remove `@markAsPageable`.

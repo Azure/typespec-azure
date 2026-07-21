@@ -1,0 +1,1 @@
+For array collection format, TCGC only supports `ArrayEncoding.pipeDelimited` and `ArrayEncoding.spaceDelimited` from `@encode`. Use one of those encodings, rely on the default CSV format, or use exploded query serialization when appropriate.

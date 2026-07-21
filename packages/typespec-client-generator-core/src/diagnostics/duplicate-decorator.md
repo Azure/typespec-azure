@@ -1,0 +1,1 @@
+The same decorator was applied more than once to the same declaration with the same scope. Remove the duplicate decorator application or use distinct scopes when multiple applications are intentional.

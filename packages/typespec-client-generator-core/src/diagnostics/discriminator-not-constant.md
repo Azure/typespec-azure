@@ -1,0 +1,1 @@
+TCGC reports this for a discriminated model hierarchy when a derived model's discriminator property is not a constant value. Make each derived discriminator property a constant value so the discriminator can identify the subtype.

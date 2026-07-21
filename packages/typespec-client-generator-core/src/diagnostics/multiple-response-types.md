@@ -1,0 +1,1 @@
+TCGC found more than one distinct response body type for the same operation. Some emitters cannot return all of those shapes, so prefer a single response body model or otherwise simplify the operation responses.

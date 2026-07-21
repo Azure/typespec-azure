@@ -1,0 +1,1 @@
+`@deserializeEmptyStringAsNull` can only be applied to a model property whose type is `string` or a scalar derived from `string`. Move the decorator to a string-like property or change the property type.

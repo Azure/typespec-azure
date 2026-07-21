@@ -1,0 +1,1 @@
+An operation marked with `@clientLocation` was moved to a target that is not a valid client location under the root service namespace. Move the operation to an interface or namespace that belongs to the root namespace decorated with `@service`.

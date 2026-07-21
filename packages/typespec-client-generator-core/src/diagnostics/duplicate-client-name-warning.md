@@ -1,0 +1,1 @@
+Two generated SDK declarations have the same client name in a language scope where TCGC only warns, such as C# operation overload scenarios. Prefer unique names or explicit `@clientName` values when the duplicate is not intentional.

@@ -1,0 +1,1 @@
+A nested `@client` specified services that are not a subset of the parent client's services. Restrict the nested client's `service` option to parent services, or omit the option to inherit from the parent.

@@ -1,0 +1,1 @@
+Two generated SDK declarations have the same client name in the same language scope, which is an error for that scope. Rename one declaration with `@clientName`, change its scope, or otherwise make the generated names unique.

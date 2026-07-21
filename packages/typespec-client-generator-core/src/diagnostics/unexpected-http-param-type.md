@@ -1,0 +1,1 @@
+TCGC reports this when an HTTP parameter is expected in one location but resolves to a different kind. Check the parameter decorators such as `@path`, `@query`, `@header`, and `@body` so the TypeSpec parameter matches the expected HTTP location.

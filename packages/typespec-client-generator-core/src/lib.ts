@@ -1,4 +1,4 @@
-import { createTypeSpecLibrary, JSONSchemaType, paramMessage } from "@typespec/compiler";
+import { createTypeSpecLibrary, fileRef, JSONSchemaType, paramMessage } from "@typespec/compiler";
 import {
   BrandedSdkEmitterOptionsInterface,
   TCGCEmitterOptions,
@@ -143,120 +143,140 @@ export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-client-generator-core",
   diagnostics: {
     "client-service": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/client-service.md"),
       severity: "warning",
       messages: {
         default: paramMessage`Client "${"name"}" is not inside a service namespace. Use @client({service: MyServiceNS})`,
       },
     },
     "union-null": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/union-null.md"),
       severity: "warning",
       messages: {
         default: "Cannot have a union containing only null types.",
       },
     },
     "union-circular": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/union-circular.md"),
       severity: "warning",
       messages: {
         default: "Cannot have a union containing self.",
       },
     },
     "invalid-access": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/invalid-access.md"),
       severity: "error",
       messages: {
         default: `Access value must be "public" or "internal".`,
       },
     },
     "invalid-usage": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/invalid-usage.md"),
       severity: "error",
       messages: {
         default: `Usage value must be one of: 2 (input), 4 (output), 256 (json), or 512 (xml).`,
       },
     },
     "conflicting-multipart-model-usage": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/conflicting-multipart-model-usage.md"),
       severity: "error",
       messages: {
         default: paramMessage`Model '${"modelName"}' cannot be used as both multipart/form-data input and regular body input. You can create a separate model with name 'model ${"modelName"}FormData' extends ${"modelName"} {}`,
       },
     },
     "discriminator-not-constant": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/discriminator-not-constant.md"),
       severity: "error",
       messages: {
         default: paramMessage`Discriminator ${"discriminator"} has to be constant`,
       },
     },
     "discriminator-not-string": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/discriminator-not-string.md"),
       severity: "warning",
       messages: {
         default: paramMessage`Value of discriminator ${"discriminator"} has to be a string, not ${"discriminatorValue"}`,
       },
     },
     "wrong-client-decorator": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/wrong-client-decorator.md"),
       severity: "warning",
       messages: {
         default: "@client should decorate namespace or interface in client.tsp",
       },
     },
     "unsupported-kind": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/unsupported-kind.md"),
       severity: "warning",
       messages: {
         default: paramMessage`Unsupported kind ${"kind"}`,
       },
     },
     "server-param-not-path": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/server-param-not-path.md"),
       severity: "error",
       messages: {
         default: paramMessage`Template argument ${"templateArgumentName"} is not a path parameter, it is a ${"templateArgumentType"}. It has to be a path.`,
       },
     },
     "unexpected-http-param-type": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/unexpected-http-param-type.md"),
       severity: "error",
       messages: {
         default: paramMessage`Expected parameter "${"paramName"}" to be of type "${"expectedType"}", but instead it is of type "${"actualType"}"`,
       },
     },
     "multiple-response-types": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/multiple-response-types.md"),
       severity: "warning",
       messages: {
         default: paramMessage`Multiple response types found in operation ${"operation"}. Some emitters might not support returning all of these response types`,
       },
     },
     "no-corresponding-method-param": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/no-corresponding-method-param.md"),
       severity: "error",
       messages: {
         default: paramMessage`Missing HTTP operation parameter "${"paramName"}" in method "${"methodName"}". Please check the method definition.`,
       },
     },
     "unsupported-protocol": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/unsupported-protocol.md"),
       severity: "error",
       messages: {
         default: "Currently we only support HTTP and HTTPS protocols",
       },
     },
     "no-emitter-name": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/no-emitter-name.md"),
       severity: "warning",
       messages: {
         default: "Can not find name for your emitter, please check your emitter name.",
       },
     },
     "unsupported-generic-decorator-arg-type": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/unsupported-generic-decorator-arg-type.md"),
       severity: "warning",
       messages: {
         default: paramMessage`Can not parse the arg type for decorator "${"decoratorName"}".`,
       },
     },
     "empty-client-name": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/empty-client-name.md"),
       severity: "warning",
       messages: {
         default: `Cannot pass an empty value to the @clientName decorator`,
       },
     },
     "override-parameters-mismatch": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/override-parameters-mismatch.md"),
       severity: "error",
       messages: {
         default: paramMessage`Method "${"methodName"}" has different parameters definition from the override operation. Please check the parameter defined in the override operation: "${"checkParameter"}".`,
       },
     },
     "duplicate-client-name": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/duplicate-client-name.md"),
       severity: "error",
       messages: {
         default: paramMessage`Client name: "${"name"}" is duplicated in language scope: "${"scope"}"`,
@@ -264,6 +284,7 @@ export const $lib = createTypeSpecLibrary({
       },
     },
     "duplicate-client-name-warning": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/duplicate-client-name-warning.md"),
       severity: "warning",
       messages: {
         default: paramMessage`Client name: "${"name"}" is duplicated in language scope: "${"scope"}"`,
@@ -271,6 +292,7 @@ export const $lib = createTypeSpecLibrary({
       },
     },
     "client-name-ineffective": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/client-name-ineffective.md"),
       severity: "warning",
       messages: {
         default: paramMessage`Application of @clientName decorator to ${"name"} is not effective`,
@@ -278,6 +300,7 @@ export const $lib = createTypeSpecLibrary({
       },
     },
     "example-loading": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/example-loading.md"),
       severity: "warning",
       messages: {
         default: paramMessage`Skipped loading invalid example file: ${"filename"}. Error: ${"error"}`,
@@ -286,60 +309,72 @@ export const $lib = createTypeSpecLibrary({
       },
     },
     "duplicate-example-file": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/duplicate-example-file.md"),
       severity: "error",
       messages: {
         default: paramMessage`Example file ${"filename"} uses duplicate title '${"title"}' for operationId '${"operationId"}'`,
       },
     },
     "example-value-no-mapping": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/example-value-no-mapping.md"),
       severity: "warning",
       messages: {
         default: paramMessage`Value in example file '${"relativePath"}' does not follow its definition:\n${"value"}`,
       },
     },
     "flatten-polymorphism": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/flatten-polymorphism.md"),
       severity: "error",
       messages: {
         default: `Cannot flatten property of polymorphic type.`,
       },
     },
     "conflict-access-override": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/conflict-access-override.md"),
       severity: "warning",
       messages: {
         default: `@access override conflicts with the access calculated from operation or other @access override.`,
       },
     },
     "duplicate-decorator": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/duplicate-decorator.md"),
       severity: "warning",
       messages: {
         default: paramMessage`Decorator ${"decoratorName"} cannot be used twice on the same declaration with same scope.`,
       },
     },
     "empty-client-namespace": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/empty-client-namespace.md"),
       severity: "warning",
       messages: {
         default: `Cannot pass an empty value to the @clientNamespace decorator`,
       },
     },
     "unexpected-pageable-operation-return-type": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/unexpected-pageable-operation-return-type.md"),
       severity: "error",
       messages: {
         default: `The response object for the pageable operation is either not a paging model, or is not correctly decorated with @nextLink and @pageItems.`,
       },
     },
     "invalid-alternate-type": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/invalid-alternate-type.md"),
       severity: "error",
       messages: {
         default: paramMessage`Invalid alternate type. If the source type is Scalar, the alternate type must also be Scalar. Found alternate type kind: '${"kindName"}'`,
       },
     },
     "invalid-initialized-by": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/invalid-initialized-by.md"),
       severity: "error",
       messages: {
         default: paramMessage`Invalid 'initializedBy' value. ${"message"}`,
       },
     },
     "invalid-deserializeEmptyStringAsNull-target-type": {
+      docs: fileRef.fromPackageRoot(
+        "src/diagnostics/invalid-deserializeEmptyStringAsNull-target-type.md",
+      ),
       severity: "error",
       messages: {
         default:
@@ -347,12 +382,14 @@ export const $lib = createTypeSpecLibrary({
       },
     },
     "api-version-not-string": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/api-version-not-string.md"),
       severity: "warning",
       messages: {
         default: `Api version must be a string or a string enum`,
       },
     },
     "invalid-encode-for-collection-format": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/invalid-encode-for-collection-format.md"),
       severity: "warning",
       messages: {
         default:
@@ -360,12 +397,14 @@ export const $lib = createTypeSpecLibrary({
       },
     },
     "non-head-bool-response-decorator": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/non-head-bool-response-decorator.md"),
       severity: "warning",
       messages: {
         default: paramMessage`@responseAsBool decorator can only be used on HEAD operations. Will ignore decorator on ${"operationName"}.`,
       },
     },
     "require-versioned-service": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/require-versioned-service.md"),
       severity: "warning",
       description: "Require a versioned service to use this decorator",
       messages: {
@@ -373,6 +412,7 @@ export const $lib = createTypeSpecLibrary({
       },
     },
     "missing-service-versions": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/missing-service-versions.md"),
       severity: "warning",
       description: "Missing service versions",
       messages: {
@@ -380,18 +420,21 @@ export const $lib = createTypeSpecLibrary({
       },
     },
     "invalid-client-doc-mode": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/invalid-client-doc-mode.md"),
       severity: "error",
       messages: {
         default: paramMessage`Invalid mode '${"mode"}' for @clientDoc decorator. Valid values are "append" or "replace".`,
       },
     },
     "multiple-param-alias": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/multiple-param-alias.md"),
       severity: "warning",
       messages: {
         default: paramMessage`Multiple param aliases applied to '${"originalName"}'. Only the first one '${"firstParamAlias"}' will be used.`,
       },
     },
     "client-location-conflict": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/client-location-conflict.md"),
       severity: "warning",
       messages: {
         default:
@@ -405,6 +448,7 @@ export const $lib = createTypeSpecLibrary({
       },
     },
     "client-location-wrong-type": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/client-location-wrong-type.md"),
       severity: "warning",
       messages: {
         default:
@@ -412,96 +456,114 @@ export const $lib = createTypeSpecLibrary({
       },
     },
     "legacy-hierarchy-building-conflict": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/legacy-hierarchy-building-conflict.md"),
       severity: "warning",
       messages: {
         "property-type-mismatch": paramMessage`@hierarchyBuilding decorator: property '${"propertyName"}' on model '${"childModel"}' has type that does not match the same-named property supplied by the new base chain (rooted at '${"parentModel"}'). The property is dropped from '${"childModel"}' to satisfy the rebase rule (own properties are filtered against the new base chain by name). Consider aligning the types or removing the property from '${"childModel"}'.`,
       },
     },
     "legacy-hierarchy-building-circular-reference": {
+      docs: fileRef.fromPackageRoot(
+        "src/diagnostics/legacy-hierarchy-building-circular-reference.md",
+      ),
       severity: "error",
       messages: {
         default: "@hierarchyBuilding decorator causes recursive base type reference.",
       },
     },
     "missing-scope": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/missing-scope.md"),
       severity: "warning",
       messages: {
         default: paramMessage`@scope decorator should be applied with ${"decoratorName"} since it is highly likely this is language-specific`,
       },
     },
     "required-parameter-scoped-out": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/required-parameter-scoped-out.md"),
       severity: "warning",
       messages: {
         default: paramMessage`Required parameter "${"paramName"}" is scoped out for emitter "${"scope"}". This may cause runtime errors unless the parameter is provided through other means (e.g., custom headers).`,
       },
     },
     "external-library-version-mismatch": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/external-library-version-mismatch.md"),
       severity: "warning",
       messages: {
         default: paramMessage`External library version mismatch. There are multiple versions of ${"libraryName"}: ${"versionA"} and ${"versionB"}. Please unify the versions.`,
       },
     },
     "external-type-on-model-property": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/external-type-on-model-property.md"),
       severity: "warning",
       messages: {
         default: `@alternateType with external type information cannot be applied to model properties. Please apply it to the type definition itself (Scalar, Model, Enum, or Union) instead.`,
       },
     },
     "invalid-mark-as-lro-target": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/invalid-mark-as-lro-target.md"),
       severity: "warning",
       messages: {
         default: paramMessage`@markAsLro decorator can only be applied to operations that return a model. We will ignore this decorator.`,
       },
     },
     "mark-as-lro-ineffective": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/mark-as-lro-ineffective.md"),
       severity: "warning",
       messages: {
         default: paramMessage`@markAsLro decorator is ineffective since this operation already returns real LRO metadata. Please remove the @markAsLro decorator.`,
       },
     },
     "invalid-mark-as-pageable-target": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/invalid-mark-as-pageable-target.md"),
       severity: "warning",
       messages: {
         default: paramMessage`@markAsPageable decorator can only be applied to operations that return a model with a property decorated with @pageItems or a property named 'value'. We will ignore this decorator.`,
       },
     },
     "mark-as-pageable-ineffective": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/mark-as-pageable-ineffective.md"),
       severity: "warning",
       messages: {
         default: paramMessage`@markAsPageable decorator is ineffective since this operation is already marked as pageable with @list decorator. Please remove the @markAsPageable decorator.`,
       },
     },
     "api-version-undefined": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/api-version-undefined.md"),
       severity: "warning",
       messages: {
         default: paramMessage`The API version specified in the config: "${"version"}" is not defined in service versioning list. Fall back to the latest version.`,
       },
     },
     "root-client-missing-service": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/root-client-missing-service.md"),
       severity: "error",
       messages: {
         default: "Root namespace decorated with @client must have service config.",
       },
     },
     "invalid-client-service-multiple": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/invalid-client-service-multiple.md"),
       severity: "error",
       messages: {
         default: "`@client` with multiple services is only allowed on `Namespace`.",
       },
     },
     "inconsistent-multiple-service": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/inconsistent-multiple-service.md"),
       severity: "error",
       messages: {
         default: "All services must have the same server and auth definitions.",
       },
     },
     "inconsistent-multiple-service-dependency": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/inconsistent-multiple-service-dependency.md"),
       severity: "warning",
       messages: {
         default: paramMessage`Services merged into client "${"clientName"}" depend on different versions of "${"dependencyName"}": ${"versions"}.`,
       },
     },
     "client-option": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/client-option.md"),
       severity: "warning",
       messages: {
         default:
@@ -509,6 +571,7 @@ export const $lib = createTypeSpecLibrary({
       },
     },
     "client-option-requires-scope": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/client-option-requires-scope.md"),
       severity: "warning",
       messages: {
         default:
@@ -516,42 +579,49 @@ export const $lib = createTypeSpecLibrary({
       },
     },
     "replace-parameter-not-found": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/replace-parameter-not-found.md"),
       severity: "error",
       messages: {
         default: paramMessage`Parameter "${"paramName"}" not found in operation "${"operationName"}".`,
       },
     },
     "reorder-parameter-not-found": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/reorder-parameter-not-found.md"),
       severity: "error",
       messages: {
         default: paramMessage`Parameter "${"paramName"}" specified in reorder list not found in operation "${"operationName"}".`,
       },
     },
     "reorder-parameter-missing": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/reorder-parameter-missing.md"),
       severity: "error",
       messages: {
         default: paramMessage`Parameter "${"paramName"}" from operation "${"operationName"}" is missing in reorder list.`,
       },
     },
     "add-parameter-duplicate": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/add-parameter-duplicate.md"),
       severity: "error",
       messages: {
         default: paramMessage`Parameter "${"paramName"}" already exists in operation "${"operationName"}".`,
       },
     },
     "reorder-parameter-duplicate": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/reorder-parameter-duplicate.md"),
       severity: "error",
       messages: {
         default: paramMessage`Parameter "${"paramName"}" appears more than once in the reorder list for operation "${"operationName"}".`,
       },
     },
     "remove-parameter-not-found": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/remove-parameter-not-found.md"),
       severity: "error",
       messages: {
         default: paramMessage`Parameter "${"paramName"}" not found in operation "${"operationName"}".`,
       },
     },
     "nested-client-service-not-subset": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/nested-client-service-not-subset.md"),
       severity: "error",
       messages: {
         default:
@@ -559,6 +629,7 @@ export const $lib = createTypeSpecLibrary({
       },
     },
     "auto-merge-service-conflict": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/auto-merge-service-conflict.md"),
       severity: "error",
       messages: {
         default: "Auto-merging service client must be empty.",
