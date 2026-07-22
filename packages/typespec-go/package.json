@@ -45,6 +45,7 @@
     "tspcompile": "node .scripts/tspcompile.js",
     "spector": "node .scripts/spector.js",
     "sync-specs": "node .scripts/sync-azure-rest-api-specs.js",
+    "diff-regen-code": "node ../../core/eng/emitter-diff/src/cli.ts --command \"npm run tspcompile\" --emitter-path packages/typespec-go --generated-code-path test/http-specs,test/azure-http-specs,test/local --setup \"git submodule update --init --recursive\" --setup \"pnpm install\" --setup \"npm run build:deps\"",
     "regen-docs": "tspd doc . --enable-experimental --output-dir ../../website/src/content/docs/docs/emitters/clients/typespec-go/reference --skip-js"
   },
   "files": [
