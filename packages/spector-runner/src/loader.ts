@@ -11,9 +11,7 @@ import {
 } from "./types.js";
 
 function isOptionValue(value: unknown): value is SpecOptionValue {
-  return (
-    typeof value === "string" || typeof value === "number" || typeof value === "boolean"
-  );
+  return typeof value === "string" || typeof value === "number" || typeof value === "boolean";
 }
 
 function validateOptions(rawOptions: unknown, specPath: string): SpecOptions {
@@ -123,10 +121,7 @@ export function isSpecEnabled(config: SpectorConfig, specPath: string): boolean 
  * Options for a spec, or `undefined` when the spec is not enabled. For a spec
  * with multiple option-sets (a list value), every set is returned.
  */
-export function getSpecOptions(
-  config: SpectorConfig,
-  specPath: string,
-): SpecOptions[] | undefined {
+export function getSpecOptions(config: SpectorConfig, specPath: string): SpecOptions[] | undefined {
   const entry = config.specs[specPath];
   if (entry === undefined || entry === false) {
     return undefined;

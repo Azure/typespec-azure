@@ -1,18 +1,19 @@
+/* eslint-disable no-console */
 // Resolve the opt-in spector.config.yaml into a JSON list of specs to generate,
 // consumed by Generate.ps1. Each entry is { tspFile, options } where options are
 // fully-qualified @azure-tools/typespec-java emitter options (without the random
 // output-dir, which Generate.ps1 appends per run).
 //
 // Usage: node resolve-spector-specs.js <specsDir>
-/* eslint-disable no-console */
 import { existsSync } from "fs";
 import { join } from "path";
 import { fileURLToPath } from "url";
-// Imported by relative path into the sibling workspace package: emitter-tests is a
-// standalone project that installs pinned registry versions (it mimics an external
-// SDK consumer), so the unpublished @azure-tools/spector-runner cannot be a normal
-// dependency here. The repo-wide `pnpm build` builds spector-runner before this runs.
-import { loadSpectorConfig, resolveSpecs } from "../../spector-runner/dist/src/index.js";
+// Resolved from the parent packages/typespec-java/node_modules (which declares
+// @azure-tools/spector-runner as a devDependency). emitter-tests itself is a
+// standalone project that installs pinned registry versions, so it cannot declare
+// the unpublished workspace package; declaring it on the parent also makes turbo
+// build spector-runner before this runs.
+import { loadSpectorConfig, resolveSpecs } from "@azure-tools/spector-runner";
 
 const EMITTER = "@azure-tools/typespec-java";
 

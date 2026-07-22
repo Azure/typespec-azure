@@ -5,12 +5,12 @@ export {
   parseSpectorConfig,
   resolveSpecs,
 } from "./loader.js";
+export { SpectorConfigError } from "./types.js";
 export type {
   ResolvedSpec,
   SpecEntry,
   SpecEntryOptions,
-  SpecOptions,
   SpecOptionValue,
+  SpecOptions,
   SpectorConfig,
 } from "./types.js";
-export { SpectorConfigError } from "./types.js";

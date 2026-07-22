@@ -64,9 +64,9 @@ specs:
   });
 
   it("throws on a non-scalar option value", () => {
-    expect(() =>
-      parseSpectorConfig(`specs:\n  a:\n    options:\n      x: [1, 2]`),
-    ).toThrow(SpectorConfigError);
+    expect(() => parseSpectorConfig(`specs:\n  a:\n    options:\n      x: [1, 2]`)).toThrow(
+      SpectorConfigError,
+    );
   });
 });
 
