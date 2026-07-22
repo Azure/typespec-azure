@@ -15,6 +15,7 @@ import {
   SdkClientType,
   SdkEndpointParameter,
   SdkEndpointType,
+  SdkEnumType,
   SdkHttpOperation,
   SdkPathParameter,
   SdkServiceOperation,
@@ -35,6 +36,13 @@ import { createDiagnostic } from "./lib.js";
 import { createSdkMethods, getSdkMethodParameter } from "./methods.js";
 import { getCrossLanguageDefinitionId, getLibraryName, isExactClientName } from "./public-utils.js";
 import { getSdkBuiltInType, getSdkCredentialParameter, getTypeSpecBuiltInType } from "./types.js";
+
+function getVersionsEnum(context: TCGCContext, client: SdkClient): SdkEnumType | undefined {
+  if (client.services.length !== 1) {
+    return undefined;
+  }
+  return context.getPackageVersionSdkEnum().get(client.services[0]);
+}
 
 function getEndpointTypeFromSingleServer<
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
@@ -204,6 +212,7 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     summary: client.type ? getSummary(context.program, client.type) : undefined,
     methods: [],
     apiVersions: context.getApiVersionsForType(clientType),
+    versionsEnum: getVersionsEnum(context, client),
     namespace: getClientNamespace(context, clientType),
     clientInitialization: diagnostics.pipe(
       createSdkClientInitializationType(context, client, parent),
