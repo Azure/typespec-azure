@@ -14,15 +14,17 @@
 #     }
 #
 # The desired core commit is pinned in <PackageRoot>/core-commit.json. When that
-# file is present and its commit is newer than the submodule's current checkout,
+# file is present and its commit differs from the submodule's current checkout,
 # Get-CoreSourceRoot extracts that commit's `packages/http-client-java` subtree into
-# a temporary directory via `git archive`. It never checks out a different SHA or
+# a temporary directory via `git archive`. The pin is authoritative: it is used
+# whether it is newer or older than the current checkout (no ancestry check, which a
+# shallow CI clone cannot reliably evaluate). It never checks out a different SHA or
 # otherwise touches the submodule's working tree, so it is safe to run while a
 # parallel monorepo build (`pnpm build`, `regen-all-packages-docs`, ...) reads the
 # core/ submodule concurrently, and `git status` on core always stays clean.
 #
-# When core-commit.json is absent, or its commit is not newer than the current
-# checkout, the sources are read straight from the submodule's current working tree.
+# When core-commit.json is absent, or its commit equals the current checkout, the
+# sources are read straight from the submodule's current working tree.
 
 # Path (relative to the core repo root) of the subtree the Java package reads from.
 $script:CoreJavaSubtree = "packages/http-client-java"
@@ -78,31 +80,33 @@ function Get-CoreSourceRoot {
         return @{ Root = $liveRoot; TempDir = $null }
     }
 
-    # Make sure the target commit is available locally (the pin may be newer than
-    # what has been fetched). Only hit the network when the commit is genuinely
-    # missing: this code runs on EVERY emitter build and doc regen, and a `git
-    # fetch` on core/ is the only per-build network operation in the whole repo
+    # Make sure the pinned commit is available locally (the pin may be newer than
+    # what has been fetched, or may live on a different line of history than the
+    # submodule's current checkout). Only hit the network when the commit is
+    # genuinely missing: this code runs on EVERY emitter build and doc regen, and a
+    # `git fetch` on core/ is the only per-build network operation in the whole repo
     # build, so doing it unconditionally turns any transient network/credential
-    # stall into a Java-only build hang. `git cat-file -e <sha>^{commit}` is a
-    # cheap, offline existence check.
+    # stall into a Java-only build hang. `git cat-file -e <sha>^{commit}` is a cheap,
+    # offline existence check.
     git -C $CoreRoot cat-file -e "${targetSha}^{commit}" 2>$null
     if ($LASTEXITCODE -ne 0) {
         git -C $CoreRoot fetch --quiet origin $targetSha 2>$null
+        git -C $CoreRoot cat-file -e "${targetSha}^{commit}" 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error "core-commit.json pins commit $targetSha but it could not be found or fetched in the 'core' submodule at $CoreRoot."
+        }
     }
 
-    # Only move forward: use the target when it is a descendant (newer) of the
-    # current checkout. `merge-base --is-ancestor A B` exits 0 when A is an ancestor
-    # of B, i.e. B is newer than A.
-    git -C $CoreRoot merge-base --is-ancestor $originSha $targetSha
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "core-commit.json SHA $targetSha is not newer than current $originSha; using current checkout."
-        return @{ Root = $liveRoot; TempDir = $null }
-    }
-
-    # The target is newer: extract only its packages/http-client-java subtree into a
-    # temp directory with `git archive`. This never modifies the submodule's working
-    # tree, so it stays safe under a parallel monorepo build that reads core/.
-    Write-Host "Reading core sources from pinned commit $targetSha (was $originSha) without checking it out"
+    # The pin in core-commit.json is authoritative: always build from exactly that
+    # commit, regardless of whether it is an ancestor or descendant of the
+    # submodule's current checkout. We deliberately do NOT gate on
+    # `merge-base --is-ancestor`: a shallow submodule clone (as on CI) often lacks the
+    # connecting history and cannot prove ancestry, which previously caused a silent
+    # fallback to the submodule checkout and built the emitter from the wrong sources.
+    # Extract only the packages/http-client-java subtree into a temp directory with
+    # `git archive`. This never modifies the submodule's working tree, so it stays
+    # safe under a parallel monorepo build that reads core/.
+    Write-Host "Reading core sources from pinned commit $targetSha (submodule at $originSha) without checking it out"
     $tempDir = Join-Path ([System.IO.Path]::GetTempPath()) ("typespec-java-core-" + [System.Guid]::NewGuid().ToString("N"))
     New-Item -ItemType Directory -Path $tempDir | Out-Null
     $zipPath = Join-Path $tempDir "core.zip"
