@@ -1,0 +1,49 @@
+{
+  "name": "@azure-tools/spector-config",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared loader for the standardized per-emitter spector test selection config (spector.config.yaml).",
+  "type": "module",
+  "license": "MIT",
+  "author": "Microsoft Corporation",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Azure/typespec-azure.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Azure/typespec-azure/issues"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/src/index.js"
+    },
+    "./schema": "./spector.config.schema.json"
+  },
+  "files": [
+    "dist/**",
+    "!dist/test/**",
+    "spector.config.schema.json"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "watch": "tsc -p tsconfig.build.json --watch",
+    "clean": "rimraf ./dist ./temp",
+    "lint": "oxlint . --deny-warnings",
+    "lint:fix": "oxlint . --fix",
+    "test": "vitest run",
+    "test:watch": "vitest -w",
+    "test:ci": "vitest run --coverage --reporter=junit --reporter=default"
+  },
+  "dependencies": {
+    "yaml": "catalog:"
+  },
+  "devDependencies": {
+    "rimraf": "catalog:",
+    "vitest": "catalog:"
+  }
+}

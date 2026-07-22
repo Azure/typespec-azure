@@ -1,0 +1,142 @@
+# yaml-language-server: $schema=../spector-config/spector.config.schema.json
+#
+# Opt-in spec selection for @azure-tools/typespec-python.
+# See design/spector-test-selection.md.
+#
+# Selection only: per-spec emitter options remain in the upstream-synced
+# regenerate-common.ts option tables (they are flavor-aware and shared with
+# @typespec/http-client-python). regenerate.ts filters discovered specs to
+# the entries listed here, so a new upstream spec is not generated until
+# it is explicitly opted in below.
+#
+# azure/* etc. come from @azure-tools/azure-http-specs (azure flavor only);
+# the rest come from @typespec/http-specs (both flavors).
+
+specs:
+  "azure/client-generator-core/access": true
+  "azure/client-generator-core/alternate-type": true
+  "azure/client-generator-core/api-version/client-api-versions": true
+  "azure/client-generator-core/api-version/header": true
+  "azure/client-generator-core/api-version/path": true
+  "azure/client-generator-core/api-version/query": true
+  "azure/client-generator-core/client-default-value": true
+  "azure/client-generator-core/client-doc": true
+  "azure/client-generator-core/client-initialization/default": true
+  "azure/client-generator-core/client-initialization/individually": true
+  "azure/client-generator-core/client-initialization/individuallyParent": true
+  "azure/client-generator-core/client-location/move-method-parameter-to-client": true
+  "azure/client-generator-core/client-location/move-to-existing-sub-client": true
+  "azure/client-generator-core/client-location/move-to-new-sub-client": true
+  "azure/client-generator-core/client-location/move-to-root-client": true
+  "azure/client-generator-core/deserialize-empty-string-as-null": true
+  "azure/client-generator-core/exact-name": true
+  "azure/client-generator-core/flatten-property": true
+  "azure/client-generator-core/hierarchy-building": true
+  "azure/client-generator-core/next-link-verb": true
+  "azure/client-generator-core/override": true
+  "azure/client-generator-core/response-as-bool": true
+  "azure/client-generator-core/usage": true
+  "azure/core/basic": true
+  "azure/core/lro/rpc": true
+  "azure/core/lro/standard": true
+  "azure/core/model": true
+  "azure/core/page": true
+  "azure/core/scalar": true
+  "azure/core/traits": true
+  "azure/encode/duration": true
+  "azure/example/basic": true
+  "azure/payload/pageable": true
+  "azure/resource-manager/common-properties": true
+  "azure/resource-manager/large-header": true
+  "azure/resource-manager/management-group": true
+  "azure/resource-manager/method-subscription-id": true
+  "azure/resource-manager/multi-service": true
+  "azure/resource-manager/multi-service-shared-models": true
+  "azure/resource-manager/non-resource": true
+  "azure/resource-manager/operation-templates": true
+  "azure/resource-manager/resources": true
+  "azure/resource-manager/service-group": true
+  "azure/special-headers/client-request-id": true
+  "azure/special-headers/conditional-request": true
+  "azure/versioning/previewVersion": true
+  "client/namespace": true
+  "client/naming": true
+  "client/naming/enum-conflict": true
+  "client/overload": true
+  "client/structure/client-operation-group": true
+  "client/structure/default": true
+  "client/structure/multi-client": true
+  "client/structure/renamed-operation": true
+  "client/structure/two-operation-group": true
+  "resiliency/srv-driven": true
+  "resiliency/srv-driven/old.tsp": true
+  "service/multi-service": true
+  "service/multiple-services": true
+  "authentication/api-key": true
+  "authentication/http/custom": true
+  "authentication/noauth/union": true
+  "authentication/oauth2": true
+  "authentication/union": true
+  documentation: true
+  "encode/array": true
+  "encode/boolean": true
+  "encode/bytes": true
+  "encode/datetime": true
+  "encode/duration": true
+  "encode/numeric": true
+  "parameters/basic": true
+  "parameters/body-optionality": true
+  "parameters/body-root": true
+  "parameters/collection-format": true
+  "parameters/path": true
+  "parameters/query": true
+  "parameters/spread": true
+  "payload/content-negotiation": true
+  "payload/head": true
+  "payload/json-merge-patch": true
+  "payload/media-type": true
+  "payload/multipart": true
+  "payload/pageable": true
+  "payload/xml": true
+  "response/status-code-range": true
+  routes: true
+  "serialization/encoded-name/json": true
+  "server/endpoint/not-defined": true
+  "server/path/multiple": true
+  "server/path/single": true
+  "server/versions/not-versioned": true
+  "server/versions/versioned": true
+  "special-headers/conditional-request": true
+  "special-headers/repeatability": true
+  special-words: true
+  "streaming/jsonl": true
+  "streaming/sse": true
+  "type/array": true
+  "type/dictionary": true
+  "type/enum/extensible": true
+  "type/enum/fixed": true
+  "type/model/empty": true
+  "type/model/inheritance/enum-discriminator": true
+  "type/model/inheritance/nested-discriminator": true
+  "type/model/inheritance/not-discriminated": true
+  "type/model/inheritance/recursive": true
+  "type/model/inheritance/single-discriminator": true
+  "type/model/usage": true
+  "type/model/visibility": true
+  "type/property/additional-properties": true
+  "type/property/nullable": true
+  "type/property/optionality": true
+  "type/property/value-types": true
+  "type/scalar": true
+  "type/union": true
+  "type/union/discriminated": true
+  "versioning/added": true
+  "versioning/madeOptional": true
+  "versioning/removed": true
+  "versioning/renamedFrom": true
+  "versioning/returnTypeChangedFrom": true
+  "versioning/typeChangedFrom": true
+
+  # --- Tracked skips ---
+  # multi-file upload not yet supported by the Python emitter
+  type/file: false
