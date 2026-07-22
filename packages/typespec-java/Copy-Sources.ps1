@@ -47,9 +47,9 @@ try {
     # http-client-generator-mgmt and http-client-generator-core. The two test modules
     # below live in a separate (never-activated) Maven `test` profile and hold ~38MB
     # of generated Java test sources that are not part of the emitter build, so skip
-    # copying them -- it is the bulk of the copy time. (The Azure emitter-tests
-    # project syncs http-client-generator-test straight from core via SyncTests.ps1,
-    # not from this copy.)
+    # copying them -- it is the bulk of the copy time. (This package's e2e tests
+    # under emitter-tests/ sync http-client-generator-test straight from core via
+    # SyncTests.ps1, not from this copy.)
     $excludedGeneratorModules = @("http-client-generator-test", "http-client-generator-clientcore-test")
 
     Write-Host "Copy generator sources from core"

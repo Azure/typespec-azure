@@ -1,3 +1,8 @@
+# The emitter is resolved by package name via Node self-reference: this folder has no
+# package.json of its own, so the nearest package.json walking up from any spec is the
+# parent typespec-java package (name @azure-tools/typespec-java, with an exports field),
+# which resolves to the locally built emitter (dist/src/index.js). This makes
+# `npx tsp compile <target.tsp>` work directly, without a --emit argument.
 emit:
   - "@azure-tools/typespec-java"
 options:

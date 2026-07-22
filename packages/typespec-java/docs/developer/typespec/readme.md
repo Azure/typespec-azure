@@ -14,28 +14,33 @@ This repository is checked out at `core` folder as submodule.
 
 The emitter NPM package is at the `packages/typespec-java` root.
 
-The [`Build-TypeSpec.ps1` script](../../../Build-TypeSpec.ps1) builds the emitter.
-It first build the JAR using Maven, copy it into the package root, then build and pack the NPM package to a `tgz` file.
+Run `pnpm build` in `packages/typespec-java` to build the emitter: it builds the JAR
+using Maven (`Build-Generator.ps1`), then compiles the emitter TypeScript
+(`Copy-Sources.ps1` + `tsc`). The emitter and its e2e tests are a single npm package
+(no `.tgz` pack step).
 
 ### Integrated Test
 
-End-to-end test resides in the `emitter-tests` folder.
+End-to-end tests reside in the `emitter-tests` folder, which is part of the
+`@azure-tools/typespec-java` package (not a separate npm project). The hand-written
+JUnit tests and local `tsp/` specs are synced verbatim from core via
+[`SyncTests.ps1`](../../../SyncTests.ps1).
 
-At present, the tests is copied from
+From `packages/typespec-java`, run `pnpm run regenerate`: the
+[`Generate.ps1` script](../../../Generate.ps1) builds the emitter and
+generates the test code from [http-specs](https://github.com/microsoft/typespec/tree/main/packages/http-specs)
+and [azure-http-specs](https://github.com/Azure/typespec-azure/tree/main/packages/azure-http-specs)
+using the locally built emitter (resolved via `emitter-tests/tspconfig.yaml`).
 
-The [`Generate.ps1` script](../../../emitter-tests/Generate.ps1) generates the test code from [http-specs](https://github.com/microsoft/typespec/tree/main/packages/http-specs) and [azure-http-specs](https://github.com/Azure/typespec-azure/tree/main/packages/azure-http-specs).
-
-`npm run spector-serve` starts the mock server.
-
-Then standard Maven Surefire would run the tests.
+Then run `pnpm run test:java:e2e` (Spector-Tests.ps1): `pnpm run spector-start` starts
+the mock server and standard Maven Surefire runs the tests.
 
 ## Publish `@azure-tools/typespec-java` to NPM
 
 1. Update `version` in `package.json`.
-2. Update `typespec-java` `version` in `emitter-tests/package.json`.
-3. Update `CHANGELOG.md`, merge the PR.
-4. Run "typespec-java - publish" in (internal) DevOps.
-5. Update Release notes in [GitHub Releases](https://github.com/Azure/typespec-azure/releases).
+2. Update `CHANGELOG.md`, merge the PR.
+3. Run "typespec-java - publish" in (internal) DevOps.
+4. Update Release notes in [GitHub Releases](https://github.com/Azure/typespec-azure/releases).
 
 ## Debugging
 
