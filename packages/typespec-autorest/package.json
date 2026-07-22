@@ -36,7 +36,7 @@
   },
   "scripts": {
     "clean": "rimraf ./dist ./temp",
-    "build": "npm run gen-extern-signature && npm run regen-autorest-openapi-schema && npm run regen-service-yaml-schema && tsc -p tsconfig.build.json && npm run lint-typespec-library",
+    "build": "pnpm gen-extern-signature && pnpm regen-autorest-openapi-schema && pnpm regen-service-yaml-schema && tsc -p tsconfig.build.json && pnpm lint-typespec-library",
     "watch": "tsc -p tsconfig.build.json --watch",
     "gen-extern-signature": "tspd --enable-experimental gen-extern-signature .",
     "lint-typespec-library": "tsp compile . --warn-as-error --import @typespec/library-linter --no-emit",

@@ -53,6 +53,20 @@ describe("when used as ref", () => {
     });
   });
 
+  it("use with group scopes", async () => {
+    const type = await compileAsRef(
+      `armResourceIdentifier<[{type:"Microsoft.Authorization/roleDefinitions", scopes:["ManagementGroup", "ServiceGroup"]}]>`,
+    );
+    expect(getArmResourceIdentifierConfig(runner.program, type)).toEqual({
+      allowedResources: [
+        {
+          type: "Microsoft.Authorization/roleDefinitions",
+          scopes: ["ManagementGroup", "ServiceGroup"],
+        },
+      ],
+    });
+  });
+
   it("use multiple single type and scopes", async () => {
     const type = await compileAsRef(
       `armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["Tenant", "ResourceGroup"]}, {type:"Microsoft.RP/type2", scopes:["Tenant", "ResourceGroup"]}]>`,
@@ -103,6 +117,20 @@ describe("when used as scalar extends", () => {
         {
           type: "Microsoft.RP/type",
           scopes: ["Tenant", "ResourceGroup"],
+        },
+      ],
+    });
+  });
+
+  it("use with group scopes", async () => {
+    const type = await compileOnScalar(
+      `armResourceIdentifier<[{type:"Microsoft.Authorization/roleDefinitions", scopes:["ManagementGroup", "ServiceGroup"]}]>`,
+    );
+    expect(getArmResourceIdentifierConfig(runner.program, type)).toEqual({
+      allowedResources: [
+        {
+          type: "Microsoft.Authorization/roleDefinitions",
+          scopes: ["ManagementGroup", "ServiceGroup"],
         },
       ],
     });

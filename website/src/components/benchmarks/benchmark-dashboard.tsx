@@ -431,9 +431,12 @@ function EmitterSection({ data, emitterName }: { data: FilteredData; emitterName
   );
 }
 
-// ─── External specs view ──────────────────────────────────────────────────────
+// ─── Azure services view ──────────────────────────────────────────────────────
 
 type ExternalMode = "by-spec" | "by-emitter";
+
+/** Compilation stages shown per spec (in logical order). */
+const STAGE_LABELS = ["loader", "resolver", "checker", "validation", "linter"];
 
 /** Collect the union of metric labels seen across all specs' specMetrics. */
 function collectSpecMetricLabels(entries: HistoryEntry[]): string[] {
@@ -447,9 +450,9 @@ function collectSpecMetricLabels(entries: HistoryEntry[]): string[] {
 }
 
 /**
- * External-specs view: a single chart whose comparison axis is switchable.
- * - by-spec:   fix one spec, one line per emitter (cross-emitter).
- * - by-emitter: fix one emitter, one line per spec (cross-spec).
+ * Azure services view: a single chart whose comparison axis is switchable.
+ * - by-spec:   fix one spec, one line per stage and per emitter.
+ * - by-emitter: fix one emitter, one line per spec.
  */
 function ExternalView({
   data,
@@ -496,10 +499,16 @@ function ExternalView({
   const series = useMemo<Series[]>(() => {
     if (mode === "by-spec") {
       if (!selectedSpec) return [];
-      return emitterNames.map((emitter) => ({
+      // Show the per-stage breakdown plus one line per emitter for this spec.
+      const stageSeries: Series[] = STAGE_LABELS.map((label) => ({
+        label,
+        data: entries.map((e) => e.specMetrics?.[selectedSpec]?.[label] ?? null),
+      }));
+      const emitterSeries: Series[] = emitterNames.map((emitter) => ({
         label: shortLabel(`emit/${emitter}`),
         data: entries.map((e) => e.specMetrics?.[selectedSpec]?.[`emit/${emitter}`] ?? null),
       }));
+      return [...stageSeries, ...emitterSeries];
     }
     if (!selectedEmitter) return [];
     return specNames.map((spec) => ({
@@ -510,11 +519,13 @@ function ExternalView({
 
   const title =
     mode === "by-spec"
-      ? `${selectedSpec} — emitters (ms)`
+      ? `${selectedSpec} — stages & emitters (ms)`
       : `${shortLabel(`emit/${selectedEmitter}`)} — specs (ms)`;
 
   if (entries.length === 0) {
-    return <p className="meta">No external benchmark data available for the selected filters.</p>;
+    return (
+      <p className="meta">No Azure services benchmark data available for the selected filters.</p>
+    );
   }
 
   return (
@@ -525,13 +536,13 @@ function ExternalView({
             onClick={() => setMode("by-emitter")}
             className={`tab ${mode === "by-emitter" ? "tab--active" : ""}`}
           >
-            By emitter (cross-spec)
+            By emitter
           </button>
           <button
             onClick={() => setMode("by-spec")}
             className={`tab ${mode === "by-spec" ? "tab--active" : ""}`}
           >
-            By spec (cross-emitter)
+            By spec
           </button>
         </div>
 
@@ -689,7 +700,7 @@ export function BenchmarkDashboard() {
         onClick={() => setDataset("external")}
         className={`tab ${dataset === "external" ? "tab--active" : ""}`}
       >
-        External specs
+        Azure services
       </button>
     </div>
   );
@@ -708,7 +719,7 @@ export function BenchmarkDashboard() {
         <p className="errorText">Failed to load benchmark data: {error}</p>
         <p className="errorHint">
           {dataset === "external"
-            ? "External-specs results appear once the external group has run on main (external-results/history.json)."
+            ? "Azure services results appear once the benchmark has run on main (external-results/history.json)."
             : "Make sure the benchmark-data branch exists and has been pushed to the remote repository."}
         </p>
         <button className="retryButton" onClick={fetchData}>
@@ -721,7 +732,7 @@ export function BenchmarkDashboard() {
       <ExternalView data={data} timeRange={timeRange} onTimeRange={setTimeRange} />
     ) : (
       <div className="stateContainer">
-        <p>No external benchmark data available.</p>
+        <p>No Azure services benchmark data available.</p>
       </div>
     );
   } else if (!filteredData || filteredData.entries.length === 0) {

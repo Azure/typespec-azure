@@ -24,7 +24,7 @@ For TypeSpec language documentation, see https://typespec.io/docs.
 If you are team working on Azure, see TypeSpec Azure development documentation https://azure.github.io/typespec-azure. You should pre-install as well `@azure-tools/typespec-azure-core` to define Azure resources, and `@azure-tools/typespec-autorest` to export in Swagger:
 
 ```
-npm install @typespec/rest @typespec/openapi3 @azure-tools/typespec-azure-core @azure-tools/typespec-autorest
+pnpm add @typespec/rest @typespec/openapi3 @azure-tools/typespec-azure-core @azure-tools/typespec-autorest
 ```
 
 > If you plan to use the output openapi with autorest or any of the azure sdk tooling _you should use typespec-autorest_, the openapi3 emitter is not going to have any of the ms extensions (pageable, lro, client name, etc.) and so it will be losing information.
