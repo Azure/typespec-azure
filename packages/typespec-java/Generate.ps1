@@ -205,9 +205,10 @@ try {
   Copy-Item -Path ./existingcode/src/main/java/tsptest/partialupdate -Destination ./src/main/java/tsptest/partialupdate -Recurse -Force
   Remove-Item ./existingcode -Recurse -Force
 
-  # generate for http-specs/azure-http-specs test sources
-  Copy-Item -Path node_modules/@typespec/http-specs/specs -Destination ./ -Recurse -Force
-  Copy-Item -Path node_modules/@azure-tools/azure-http-specs/specs -Destination ./ -Recurse -Force
+  # generate for http-specs/azure-http-specs test sources (installed under the
+  # typespec-java package's node_modules by the workspace `pnpm install`).
+  Copy-Item -Path ../node_modules/@typespec/http-specs/specs -Destination ./ -Recurse -Force
+  Copy-Item -Path ../node_modules/@azure-tools/azure-http-specs/specs -Destination ./ -Recurse -Force
 
   $specFiles = Get-ChildItem ./specs -Include "main.tsp","old.tsp" -File -Recurse
   # ensure multi-service client specs are processed even though they do not match the default filter
