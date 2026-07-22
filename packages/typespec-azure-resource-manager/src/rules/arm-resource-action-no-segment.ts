@@ -1,8 +1,9 @@
-import { DecoratorApplication, Operation, createRule } from "@typespec/compiler";
+import { DecoratorApplication, Operation, createRule, fileRef } from "@typespec/compiler";
 import { isInternalTypeSpec } from "./utils.js";
 
 export const armResourceActionNoSegmentRule = createRule({
   name: "arm-resource-action-no-segment",
+  docs: fileRef.fromPackageRoot("src/rules/arm-resource-action-no-segment.md"),
   severity: "warning",
   description: "`@armResourceAction` should not be used with `@segment`.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-action-no-segment",

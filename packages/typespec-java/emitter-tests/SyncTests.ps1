@@ -10,8 +10,10 @@
 # hand-written tests and specs synced here are committed.
 #
 # The desired core commit is pinned in ../core-commit.json; CoreCommit.ps1's
-# Enter-CoreCommit transiently checks it out (when newer) and Restore-CoreCommit
-# restores the submodule afterwards.
+# Get-CoreSourceRoot returns a directory to read the test sources from (extracted
+# from the pinned commit via `git archive` when it is newer than the submodule's
+# current checkout), without mutating the core/ submodule working tree.
+# Remove-CoreSourceRoot cleans up any temporary extraction afterwards.
 
 $ErrorActionPreference = "Stop"
 
@@ -20,9 +22,9 @@ $packageRoot = Resolve-Path (Join-Path $scriptRoot "..")
 $coreRoot = Resolve-Path (Join-Path $scriptRoot ".." ".." ".." "core")
 
 . (Join-Path $packageRoot "CoreCommit.ps1")
-$originSha = Enter-CoreCommit -CoreRoot $coreRoot -PackageRoot $packageRoot
+$core = Get-CoreSourceRoot -CoreRoot $coreRoot -PackageRoot $packageRoot
 try {
-    $testRoot = Resolve-Path (Join-Path $coreRoot "packages" "http-client-java" "generator" "http-client-generator-test")
+    $testRoot = Join-Path $core.Root "generator" "http-client-generator-test"
 
     $localSrc = Join-Path $scriptRoot "src"
     $localTsp = Join-Path $scriptRoot "tsp"
@@ -67,7 +69,7 @@ try {
     Write-Host "Synced dependency and override versions from $corePackageJsonPath"
 }
 finally {
-    Restore-CoreCommit -CoreRoot $coreRoot -OriginSha $originSha
+    Remove-CoreSourceRoot $core
 }
 
 # Point the local @azure-tools/typespec-java dependency at the .tgz produced by
