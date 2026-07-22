@@ -8,7 +8,7 @@ rename it for the affected language.
 - **Area:** SDK generation, primarily **C#**. A property whose name collides with its enclosing model's name produces code that does not compile in C# (applies to both data-plane and management-plane).
 - **Not affected:** The service definition and the wire protocol are unchanged; the collision only affects the generated client code.
 
-#### ❌ Incorrect Example
+#### ❌ Incorrect Usage
 
 ```tsp
 model Widget {

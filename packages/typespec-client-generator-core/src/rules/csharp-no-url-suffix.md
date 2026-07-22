@@ -7,7 +7,7 @@ The rule checks the C#-resolved name (respecting `@clientName` overrides).
 - **Area:** SDK generation, **C# only**. Affects the generated property name in the C# SDK (applies to both data-plane and management-plane).
 - **Not affected:** Other language SDKs, the service definition, and the wire protocol are unchanged — the serialized name is untouched, only the C# client-surface name.
 
-#### ❌ Incorrect Example
+#### ❌ Incorrect Usage
 
 ```tsp
 model Foo {
