@@ -39,9 +39,22 @@ function resolveTspFile(key) {
   return join(specsDir, key, "main.tsp");
 }
 
-const result = resolveSpecs(config).map(({ path, options }) => ({
-  tspFile: resolveTspFile(path),
-  options: Object.entries(options).map(([k, v]) => `${EMITTER}.${k}=${v}`),
-}));
+const result = [];
+for (const { path, options } of resolveSpecs(config)) {
+  const tspFile = resolveTspFile(path);
+  // The specs come from pinned registry versions of @typespec/http-specs and
+  // @azure-tools/azure-http-specs, which may lag behind the config. Skip (with a
+  // warning) any opted-in spec whose entry file isn't present in the installed
+  // version rather than failing the whole run; it will start running once the
+  // spec package is bumped.
+  if (!existsSync(tspFile)) {
+    console.error(`warning: skipping opted-in spec not found in installed specs: ${path}`);
+    continue;
+  }
+  result.push({
+    tspFile,
+    options: Object.entries(options).map(([k, v]) => `${EMITTER}.${k}=${v}`),
+  });
+}
 
 process.stdout.write(JSON.stringify(result));
