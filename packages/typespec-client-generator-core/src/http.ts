@@ -271,20 +271,11 @@ function getSdkHttpParameters(
       const bodyParam = diagnostics.pipe(
         getSdkHttpParameter(context, tspBody.property, httpOperation.operation, undefined, "body"),
       );
-      if (bodyParam.kind !== "body") {
-        diagnostics.add(
-          createDiagnostic({
-            code: "unexpected-http-param-type",
-            target: tspBody.property,
-            format: {
-              paramName: tspBody.property.name,
-              expectedType: "body",
-              actualType: bodyParam.kind,
-            },
-          }),
-        );
-        return diagnostics.wrap(retval);
-      }
+      compilerAssert(
+        bodyParam.kind === "body",
+        `Expected parameter "${tspBody.property.name}" to be of type "body", but instead it is of type "${bodyParam.kind}"`,
+        tspBody.property,
+      );
       retval.bodyParam = bodyParam;
     } else if (!isNeverOrVoidType(tspBody.type)) {
       const type = diagnostics.pipe(
@@ -618,19 +609,11 @@ export function getSdkHttpParameter(
       explode: (httpParam as HttpOperationQueryParameter)?.explode,
     });
   }
-  if (!(isHeader(context.program, param) || location === "header")) {
-    diagnostics.add(
-      createDiagnostic({
-        code: "unexpected-http-param-type",
-        target: param,
-        format: {
-          paramName: param.name,
-          expectedType: "path, query, header, or body",
-          actualType: param.kind,
-        },
-      }),
-    );
-  }
+  compilerAssert(
+    isHeader(context.program, param) || location === "header",
+    `Expected parameter "${param.name}" to be of type "path, query, header, or body", but instead it is of type "${param.kind}"`,
+    param,
+  );
   return diagnostics.wrap({
     ...headerQueryBase,
     kind: "header",
