@@ -39,7 +39,7 @@ jobs:
       - script: pnpm run build
         displayName: Build (turbo cache restore)
 
-      - script: pnpm run prepare
+      - script: pnpm run setup:python
         displayName: "Prepare Python environment"
         workingDirectory: packages/typespec-python
 

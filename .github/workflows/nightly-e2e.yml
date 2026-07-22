@@ -28,7 +28,8 @@ concurrency:
 # 2. Add an entry to the matrix below with:
 #    - name, lang, package-filter, working-directory
 #    - mise-install-args: tools to install via mise (e.g., "java maven")
-#    - run-prepare / run-regenerate: set to true if the package has those scripts
+#    - setup-script: package script for language-specific environment setup, or empty
+#    - run-regenerate: set to true if the package has that script
 # ============================================================================
 
 jobs:
@@ -44,7 +45,7 @@ jobs:
             package-filter: "@azure-tools/typespec-python"
             working-directory: packages/typespec-python
             mise-install-args: "python uv"
-            run-prepare: true
+            setup-script: "setup:python"
             run-regenerate: true
             # Core packages excluded from the pnpm workspace that must be
             # built from source and injected via overrides.
@@ -53,14 +54,14 @@ jobs:
             lang: ts
             package-filter: "@azure-tools/typespec-ts"
             working-directory: packages/typespec-ts
-            run-prepare: false
+            setup-script: ""
             run-regenerate: false
           - name: Java
             lang: java
             package-filter: "@azure-tools/typespec-java"
             working-directory: packages/typespec-java/emitter-tests
             mise-install-args: "java maven"
-            run-prepare: false
+            setup-script: ""
             run-regenerate: true
 
     env:
@@ -179,8 +180,8 @@ jobs:
       # --- Language-specific preparation ---
 
       - name: Prepare environment
-        if: matrix.run-prepare
-        run: pnpm run prepare
+        if: matrix.setup-script != ''
+        run: pnpm run ${{ matrix.setup-script }}
         working-directory: ${{ matrix.working-directory }}
 
       - name: Regenerate

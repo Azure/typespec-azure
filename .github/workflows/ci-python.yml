@@ -26,7 +26,7 @@ jobs:
         run: pnpm turbo run --filter "@azure-tools/typespec-python..." build
 
       - name: Prepare Python environment
-        run: pnpm run prepare
+        run: pnpm run setup:python
         working-directory: packages/typespec-python
 
       - name: Regenerate
@@ -75,7 +75,7 @@ jobs:
           pnpm --filter "@azure-tools/azure-http-specs" exec tsc -p ./tsconfig.build.json
 
       - name: Prepare Python environment
-        run: pnpm run prepare
+        run: pnpm run setup:python
         working-directory: packages/typespec-python
 
       - name: Download generated artifacts
@@ -105,7 +105,7 @@ jobs:
         run: pnpm install --filter "@azure-tools/typespec-python..."
 
       - name: Prepare Python environment
-        run: pnpm run prepare
+        run: pnpm run setup:python
         working-directory: packages/typespec-python
 
       - name: Download generated artifacts
@@ -135,7 +135,7 @@ jobs:
         run: pnpm install --filter "@azure-tools/typespec-python..."
 
       - name: Prepare Python environment
-        run: pnpm run prepare
+        run: pnpm run setup:python
         working-directory: packages/typespec-python
 
       - name: Download generated artifacts
@@ -173,7 +173,7 @@ jobs:
         run: pnpm install --filter "@azure-tools/typespec-python..."
 
       - name: Prepare Python environment
-        run: pnpm run prepare
+        run: pnpm run setup:python
         working-directory: packages/typespec-python
 
       - name: Download generated artifacts

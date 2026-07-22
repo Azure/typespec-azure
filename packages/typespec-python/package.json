@@ -31,9 +31,8 @@
   "scripts": {
     "clean": "rimraf ./dist ./temp ./venv ./node_modules",
     "build": "tsc -p .",
+    "setup:python": "tsx ./eng/scripts/setup/run-python3.ts ./eng/scripts/setup/install.py && tsx ./eng/scripts/setup/run-python3.ts ./eng/scripts/setup/prepare.py",
     "watch": "tsc -p . --watch",
-    "install": "tsx ./eng/scripts/setup/run-python3.ts ./eng/scripts/setup/install.py",
-    "prepare": "tsx ./eng/scripts/setup/run-python3.ts ./eng/scripts/setup/prepare.py",
     "lint:extra": "tsx ./eng/scripts/ci/lint.ts",
     "format:extra": "tsx ./eng/scripts/ci/format.ts --python",
     "format:extra:check": "tsx ./eng/scripts/ci/format.ts --python --check",

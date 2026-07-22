@@ -64,7 +64,9 @@ function getVenvPython(): string {
   } else if (fs.existsSync(join(venvPath, "Scripts"))) {
     return join(venvPath, "Scripts", "python.exe");
   }
-  throw new Error("Virtual environment not found. Run 'pnpm run install' first.");
+  throw new Error(
+    "Virtual environment not found. Run 'pnpm run setup:python' from packages/typespec-python first.",
+  );
 }
 
 interface ToxResult {

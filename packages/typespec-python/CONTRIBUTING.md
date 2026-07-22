@@ -12,6 +12,16 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
+## Local development
+
+A repository-wide `pnpm install` does not require Python. Python is only required when developing or testing this package.
+Install the versions pinned in the repository's `mise.toml` with `mise install python uv`, or provide Python 3.9 or newer
+with either `uv` or `pip`. Then create the development virtual environment from the repository root:
+
+```bash
+pnpm --dir packages/typespec-python run setup:python
+```
+
 ## Before making a Pull request
 
 Make sure to run the following commands:
