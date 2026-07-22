@@ -280,7 +280,7 @@ export const $lib = createTypeSpecLibrary({
     },
     "client-name-ineffective": {
       ...doc("client-name-ineffective"),
-      severity: "warning",
+      severity: "error",
       messages: {
         default: paramMessage`Application of @clientName decorator to ${"name"} is not effective`,
         override: paramMessage`Application of @clientName decorator to ${"name"} is not effective because it is applied to the override method. Please apply it on the original method definition "${"originalMethodName"}" instead.`,
@@ -377,7 +377,7 @@ export const $lib = createTypeSpecLibrary({
     },
     "missing-service-versions": {
       ...doc("missing-service-versions"),
-      severity: "warning",
+      severity: "error",
       description: "Missing service versions",
       messages: {
         default: paramMessage`The @clientApiVersions decorator is missing one or more versions defined in ${"serviceName"}. Client API must support all service versions to ensure compatibility. Missing versions: ${"missingVersions"}. Please update the client API to support all required service versions.`,
@@ -435,7 +435,7 @@ export const $lib = createTypeSpecLibrary({
     },
     "missing-scope": {
       ...doc("missing-scope"),
-      severity: "warning",
+      severity: "error",
       messages: {
         default: paramMessage`@scope decorator should be applied with ${"decoratorName"} since it is highly likely this is language-specific`,
       },
@@ -470,7 +470,7 @@ export const $lib = createTypeSpecLibrary({
     },
     "mark-as-lro-ineffective": {
       ...doc("mark-as-lro-ineffective"),
-      severity: "warning",
+      severity: "error",
       messages: {
         default: paramMessage`@markAsLro decorator is ineffective since this operation already returns real LRO metadata. Please remove the @markAsLro decorator.`,
       },
@@ -519,7 +519,7 @@ export const $lib = createTypeSpecLibrary({
     },
     "inconsistent-multiple-service-dependency": {
       ...doc("inconsistent-multiple-service-dependency"),
-      severity: "warning",
+      severity: "error",
       messages: {
         default: paramMessage`Services merged into client "${"clientName"}" depend on different versions of "${"dependencyName"}": ${"versions"}.`,
       },
