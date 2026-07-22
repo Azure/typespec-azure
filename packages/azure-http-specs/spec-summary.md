@@ -976,11 +976,11 @@ This scenario tests the exact() function applied to a model property with langua
 The property 'name' on ScopedModel is renamed using exact() scoped to each language,
 with names that include an underscore prefix to verify that language naming logic does not apply:
 
-- Python: '\_my_name' (should not be converted to 'my_name' or other casing)
-- Java: '\_myName' (should not be converted to remove the underscore prefix)
-- C#: '\_MyName' (should not be converted to remove the underscore prefix)
-- JavaScript: '\_myName' (should not be converted to remove the underscore prefix)
-- Go: '\_MyName' (should not be converted to remove the underscore prefix)
+- Python: '_my_name' (should not be converted to 'my_name' or other casing)
+- Java: '_myName' (should not be converted to remove the underscore prefix)
+- C#: '_MyName' (should not be converted to remove the underscore prefix)
+- JavaScript: '_myName' (should not be converted to remove the underscore prefix)
+- Go: '_MyName' (should not be converted to remove the underscore prefix)
   Each language should preserve the specified exact name as-is without any further casing conversion.
 
 Expected request body:
@@ -1352,19 +1352,25 @@ param2: param2
 
 Expected response: 204 No Content
 
-### Azure_ClientGenerator_Core_ResponseAsBool_HeadAsBoolean
+### Azure_ClientGenerator_Core_ResponseAsBool_HeadAsBoolean_exists
 
-- Endpoints:
-  - `head /azure/client-generator-core/response-as-bool/exists`
-  - `head /azure/client-generator-core/response-as-bool/exists/not-exists`
+- Endpoint: `head /azure/client-generator-core/response-as-bool/exists`
 
-Test that a HEAD operation decorated with @responseAsBool returns a boolean.
-A successful (2xx) response should return true, and a 404 response should return false.
+Test that a HEAD operation decorated with @responseAsBool returns true for a successful (2xx) response.
 
-Expected calls:
+Expected call:
 
 - HEAD /azure/client-generator-core/response-as-bool/exists -> 204 (returns true)
-- HEAD /azure/client-generator-core/response-as-bool/not-exists -> 404 (returns false)
+
+### Azure_ClientGenerator_Core_ResponseAsBool_HeadAsBoolean_notExists
+
+- Endpoint: `head /azure/client-generator-core/response-as-bool/exists/not-exists`
+
+Test that a HEAD operation decorated with @responseAsBool returns false for a 404 response.
+
+Expected call:
+
+- HEAD /azure/client-generator-core/response-as-bool/exists/not-exists -> 404 (returns false)
 
 ### Azure_ClientGenerator_Core_Usage_ModelInOperation
 

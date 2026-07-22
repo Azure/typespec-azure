@@ -239,10 +239,7 @@ withRawContent: true
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /** Alias for SchemaContentTypeValues */
 export type SchemaContentTypeValues =
-  | JsonContentType
-  | "text/plain; charset=utf-8"
-  | "text/vnd.ms.protobuf"
-  | string;
+  JsonContentType | "text/plain; charset=utf-8" | "text/vnd.ms.protobuf" | string;
 
 export function schemaContentTypeValuesSerializer(item: SchemaContentTypeValues): any {
   return item;
@@ -250,8 +247,7 @@ export function schemaContentTypeValuesSerializer(item: SchemaContentTypeValues)
 
 /** Type of JsonContentType */
 export type JsonContentType =
-  | "application/json; serialization=Avro"
-  | "application/json; serialization=json";
+  "application/json; serialization=Avro" | "application/json; serialization=json";
 ```
 
 # union contains enum with string element
@@ -303,10 +299,7 @@ withRawContent: true
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /** Alias for SchemaContentTypeValues */
 export type SchemaContentTypeValues =
-  | JsonContentType
-  | "text/plain; charset=utf-8"
-  | "text/vnd.ms.protobuf"
-  | string;
+  JsonContentType | "text/plain; charset=utf-8" | "text/vnd.ms.protobuf" | string;
 
 export function schemaContentTypeValuesSerializer(item: SchemaContentTypeValues): any {
   return item;
@@ -314,8 +307,7 @@ export function schemaContentTypeValuesSerializer(item: SchemaContentTypeValues)
 
 /** Type of JsonContentType */
 export type JsonContentType =
-  | "application/json; serialization=Avro"
-  | "application/json; serialization=json";
+  "application/json; serialization=Avro" | "application/json; serialization=json";
 ```
 
 # union with string as extensible enum
@@ -412,10 +404,7 @@ withRawContent: true
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /** Alias for SchemaContentTypeValues */
 export type SchemaContentTypeValues =
-  | JsonContentType
-  | "text/plain; charset=utf-8"
-  | "text/vnd.ms.protobuf"
-  | string;
+  JsonContentType | "text/plain; charset=utf-8" | "text/vnd.ms.protobuf" | string;
 
 export function schemaContentTypeValuesSerializer(item: SchemaContentTypeValues): any {
   return item;
@@ -423,8 +412,7 @@ export function schemaContentTypeValuesSerializer(item: SchemaContentTypeValues)
 
 /** Type of JsonContentType */
 export type JsonContentType =
-  | "application/json; serialization=Avro"
-  | "application/json; serialization=json";
+  "application/json; serialization=Avro" | "application/json; serialization=json";
 ```
 
 # union contains enum with string element
@@ -476,10 +464,7 @@ withRawContent: true
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /** Alias for SchemaContentTypeValues */
 export type SchemaContentTypeValues =
-  | JsonContentType
-  | "text/plain; charset=utf-8"
-  | "text/vnd.ms.protobuf"
-  | string;
+  JsonContentType | "text/plain; charset=utf-8" | "text/vnd.ms.protobuf" | string;
 
 export function schemaContentTypeValuesSerializer(item: SchemaContentTypeValues): any {
   return item;
@@ -487,8 +472,7 @@ export function schemaContentTypeValuesSerializer(item: SchemaContentTypeValues)
 
 /** Type of JsonContentType */
 export type JsonContentType =
-  | "application/json; serialization=Avro"
-  | "application/json; serialization=json";
+  "application/json; serialization=Avro" | "application/json; serialization=json";
 ```
 
 # anonymous union with "|" fixed in regular headers
