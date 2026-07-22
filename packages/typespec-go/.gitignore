@@ -1,0 +1,6 @@
+# The root .gitignore ignores all test/**/go.mod and test/**/go.sum files since
+# they're normally regenerated output. containingmod is a committed fixture: its
+# go.mod carries a v2 module identity that's used to exercise the emitter's
+# go.mod discovery logic, so re-include those two files here.
+!test/local/containingmod/go.mod
+!test/local/containingmod/go.sum
