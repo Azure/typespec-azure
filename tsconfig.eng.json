@@ -1,8 +1,9 @@
 {
   "extends": "./core/tsconfig.base.json",
   "compilerOptions": {
-    "allowJs": true
+    "allowJs": true,
+    "allowImportingTsExtensions": true
   },
   "include": ["./eng", "./core/eng"],
-  "exclude": ["./core/eng/vitest.config.ts", "./eng/scripts/doc-updater"]
+  "exclude": ["./core/eng/vitest.config.ts", "./eng/vitest.config.ts", "./eng/scripts/doc-updater"]
 }

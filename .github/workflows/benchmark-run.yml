@@ -13,14 +13,6 @@ on:
         description: "Directory on the data branch to store results/history"
         required: true
         type: string
-      title:
-        description: "Heading for the PR comment"
-        required: true
-        type: string
-      comment-file:
-        description: "Comment markdown file name (must match the comment instance)"
-        required: true
-        type: string
       iterations:
         required: false
         type: number
@@ -110,24 +102,3 @@ jobs:
             --results /tmp/benchmark-results.json \
             --commit ${{ github.sha }} \
             --results-dir ${{ inputs.results-dir }}
-
-      # On PR: fetch baseline, compare, and upload as artifact for the comment workflow.
-      - name: Generate PR comment
-        if: github.event_name == 'pull_request'
-        run: |
-          node packages/benchmark/dist/src/cli.js upload-pr-comment \
-            --results /tmp/benchmark-results.json \
-            --pr-number ${{ github.event.number }} \
-            --results-dir ${{ inputs.results-dir }} \
-            --baseline-window 20 \
-            --title "${{ inputs.title }}" \
-            --comment-file ${{ inputs.comment-file }} \
-            --output-dir /tmp/benchmark-artifacts
-
-      - name: Upload benchmark comment
-        if: github.event_name == 'pull_request'
-        uses: actions/upload-artifact@v7
-        with:
-          name: benchmark-comment
-          path: /tmp/benchmark-artifacts/
-          retention-days: 1
