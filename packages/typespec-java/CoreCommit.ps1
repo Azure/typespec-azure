@@ -41,6 +41,19 @@ function Get-CoreSourceRoot {
         [string] $PackageRoot
     )
 
+    # Never let any git invocation below block on an interactive credential or
+    # host-key prompt. During a parallel `pnpm build` the emitter build runs
+    # headless (turbo captures its stdio / attaches a pseudo-terminal), so a git
+    # prompt has nowhere to read from and would hang the whole build forever --
+    # observed as an intermittent, Java-only build hang. Make git fail fast instead.
+    $env:GIT_TERMINAL_PROMPT = "0"
+
+    # Silence progress: a cmdlet rendering Write-Progress (e.g. the archive
+    # extraction below) touches the controlling terminal, and under turbo's
+    # background process group that stops this process with SIGTTIN/SIGTTOU and
+    # hangs the build. Scoped to this function so callers are unaffected.
+    $ProgressPreference = "SilentlyContinue"
+
     $originSha = (git -C $CoreRoot rev-parse HEAD).Trim()
     if ($LASTEXITCODE -ne 0) {
         Write-Error "Failed to read the current SHA of the 'core' submodule at: $CoreRoot`nMake sure it is checked out (git submodule update --init --recursive)."
@@ -65,9 +78,17 @@ function Get-CoreSourceRoot {
         return @{ Root = $liveRoot; TempDir = $null }
     }
 
-    # Make sure the target commit is available locally (it may be newer than what
-    # has been fetched); ignore failure if it is already present.
-    git -C $CoreRoot fetch --quiet origin $targetSha 2>$null
+    # Make sure the target commit is available locally (the pin may be newer than
+    # what has been fetched). Only hit the network when the commit is genuinely
+    # missing: this code runs on EVERY emitter build and doc regen, and a `git
+    # fetch` on core/ is the only per-build network operation in the whole repo
+    # build, so doing it unconditionally turns any transient network/credential
+    # stall into a Java-only build hang. `git cat-file -e <sha>^{commit}` is a
+    # cheap, offline existence check.
+    git -C $CoreRoot cat-file -e "${targetSha}^{commit}" 2>$null
+    if ($LASTEXITCODE -ne 0) {
+        git -C $CoreRoot fetch --quiet origin $targetSha 2>$null
+    }
 
     # Only move forward: use the target when it is a descendant (newer) of the
     # current checkout. `merge-base --is-ancestor A B` exits 0 when A is an ancestor
@@ -84,23 +105,32 @@ function Get-CoreSourceRoot {
     Write-Host "Reading core sources from pinned commit $targetSha (was $originSha) without checking it out"
     $tempDir = Join-Path ([System.IO.Path]::GetTempPath()) ("typespec-java-core-" + [System.Guid]::NewGuid().ToString("N"))
     New-Item -ItemType Directory -Path $tempDir | Out-Null
-    $tarPath = Join-Path $tempDir "core.tar"
+    $zipPath = Join-Path $tempDir "core.zip"
+    $extractDir = Join-Path $tempDir "src"
     try {
-        git -C $CoreRoot archive -o $tarPath "${targetSha}:$script:CoreJavaSubtree"
+        # Produce a zip (not tar) and expand it with .NET's ZipFile.ExtractToDirectory:
+        # this keeps the whole flow inside PowerShell/.NET and avoids depending on an
+        # external `tar`, whose behavior varies by platform (notably Git for Windows'
+        # GNU tar treats a drive-letter path like C:\...\core.tar as a remote host).
+        #
+        # ExtractToDirectory is used instead of Expand-Archive on purpose: the archived
+        # subtree holds several thousand files, and Expand-Archive emits a per-entry
+        # Write-Progress that makes it pathologically slow on that many files (worse when
+        # its output is captured by a parallel `pnpm build`), to the point the emitter
+        # build looks hung. ZipFile.ExtractToDirectory has no such overhead.
+        git -C $CoreRoot archive --format=zip -o $zipPath "${targetSha}:$script:CoreJavaSubtree"
         if ($LASTEXITCODE -ne 0) {
             Write-Error "Failed to archive core commit ${targetSha}:$script:CoreJavaSubtree."
         }
-        tar -x -f $tarPath -C $tempDir
-        if ($LASTEXITCODE -ne 0) {
-            Write-Error "Failed to extract core archive $tarPath."
-        }
+        Add-Type -AssemblyName System.IO.Compression.FileSystem
+        [System.IO.Compression.ZipFile]::ExtractToDirectory($zipPath, $extractDir)
     }
     catch {
         Remove-Item $tempDir -Recurse -Force -ErrorAction SilentlyContinue
         throw
     }
-    Remove-Item $tarPath -Force
-    return @{ Root = $tempDir; TempDir = $tempDir }
+    Remove-Item $zipPath -Force
+    return @{ Root = $extractDir; TempDir = $tempDir }
 }
 
 # Clean up the temporary extraction created by Get-CoreSourceRoot (no-op when the

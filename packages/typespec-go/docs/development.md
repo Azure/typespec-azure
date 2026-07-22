@@ -20,6 +20,7 @@ This guide outlines the steps to contributing to the emitter.
   - [Choosing where to add a test](#choosing-where-to-add-a-test)
   - [Write an emitter unit test (scenario)](#write-an-emitter-unit-test-scenario)
   - [Regenerate the Go fixtures](#regenerate-the-go-fixtures)
+  - [Diff the regenerated code](#diff-the-regenerated-code)
   - [Run the Go tests](#run-the-go-tests)
   - [Lint the generated Go](#lint-the-generated-go)
   - [Debug](#debug)
@@ -132,6 +133,25 @@ pnpm tspcompile --filter=TestName
 
 The first run also syncs the Azure REST API specs into `temp/`. The generated Go fixtures are not committed (they are `.gitignore`d), so validate your change by running the Go tests and linter below rather than by diffing the fixtures.
 
+### Diff the regenerated code
+
+Because the fixtures are not committed, a plain `git diff` won't show how your emitter change affects the generated Go. To review that impact, `pnpm diff-regen-code` regenerates the code twice — once from a **baseline** emitter and once from your working tree (**head**) — and renders the difference as a clickable HTML report plus a terminal summary. It wraps the language-agnostic [`emitter-diff`](https://github.com/microsoft/typespec/tree/main/eng/emitter-diff) tool that lives in the `core` submodule, running `pnpm tspcompile` in each tree and diffing `test/http-specs`, `test/azure-http-specs`, and `test/local`.
+
+Build your working tree first (`pnpm build:deps` above) — head is run as-is and never rebuilt for you. The baseline defaults to `main` and is fetched from GitHub and prepared (submodule init, install, build) automatically. From the `packages/typespec-go` directory:
+
+```terminal
+pnpm diff-regen-code
+```
+
+Everything after a `--` is forwarded to the tool; a second `--` forwards to `tspcompile`, so you can diff a subset or pick a different baseline. For example, to diff only one test, or against a specific commit:
+
+```terminal
+pnpm diff-regen-code -- -- --filter=TestName
+pnpm diff-regen-code -- --baseline gh:<sha>
+```
+
+This is the same tool the `go / emitter diff` PR check runs to post an informational diff of your emitter change; it never fails on a diff, only on a build/tool error.
+
 ### Run the Go tests
 
 The Spector-backed specs under `test/http-specs/` and `test/azure-http-specs/` exercise the [Spector](https://github.com/microsoft/typespec/tree/main/packages/spector) mock server, while the local Go tests under `test/local/` (for example `fakeserver` and `gogenerate`) run standalone. All of them run against the fixtures produced by [Regenerate the Go fixtures](#regenerate-the-go-fixtures), so regenerate first. Start the mock server, run the tests, then stop it:
@@ -190,4 +210,4 @@ Before you do, make sure to:
 
 1. Format your code (`pnpm format` from the repo root, or check with `pnpm format:check`).
 2. Rebuild and regenerate everything so the committed fixtures reflect your change.
-3. Add a changelog entry with [Chronus](https://github.com/microsoft/chronus) by running `npx chronus add` from the repo root and following the prompts. This creates a change file under `.chronus/changes/` that you should commit with your PR.
+3. Add a changelog entry with [Chronus](https://github.com/microsoft/chronus) by running `pnpm exec chronus add` from the repo root and following the prompts. This creates a change file under `.chronus/changes/` that you should commit with your PR.
