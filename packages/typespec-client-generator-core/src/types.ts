@@ -823,6 +823,7 @@ function addDiscriminatorToModelType(
       doc: `Discriminator property for ${model.name}.`,
       optional: false,
       discriminator: true,
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       serializedName: discriminatorProperty
         ? discriminatorProperty.serializedName // eslint-disable-line @typescript-eslint/no-deprecated
         : discriminator.propertyName,
@@ -836,6 +837,7 @@ function addDiscriminatorToModelType(
         ? getAvailableApiVersions(context, discriminatorProperty.__raw!, type)
         : model.apiVersions,
       isApiVersionParam: false,
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
       crossLanguageDefinitionId: `${model.crossLanguageDefinitionId}.${name}`,
