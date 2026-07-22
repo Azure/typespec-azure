@@ -1352,19 +1352,25 @@ param2: param2
 
 Expected response: 204 No Content
 
-### Azure_ClientGenerator_Core_ResponseAsBool_HeadAsBoolean
+### Azure_ClientGenerator_Core_ResponseAsBool_HeadAsBoolean_exists
 
-- Endpoints:
-  - `head /azure/client-generator-core/response-as-bool/exists`
-  - `head /azure/client-generator-core/response-as-bool/exists/not-exists`
+- Endpoint: `head /azure/client-generator-core/response-as-bool/exists`
 
-Test that a HEAD operation decorated with @responseAsBool returns a boolean.
-A successful (2xx) response should return true, and a 404 response should return false.
+Test that a HEAD operation decorated with @responseAsBool returns true for a successful (2xx) response.
 
-Expected calls:
+Expected call:
 
 - HEAD /azure/client-generator-core/response-as-bool/exists -> 204 (returns true)
-- HEAD /azure/client-generator-core/response-as-bool/not-exists -> 404 (returns false)
+
+### Azure_ClientGenerator_Core_ResponseAsBool_HeadAsBoolean_notExists
+
+- Endpoint: `head /azure/client-generator-core/response-as-bool/exists/not-exists`
+
+Test that a HEAD operation decorated with @responseAsBool returns false for a 404 response.
+
+Expected call:
+
+- HEAD /azure/client-generator-core/response-as-bool/exists/not-exists -> 404 (returns false)
 
 ### Azure_ClientGenerator_Core_Usage_ModelInOperation
 
