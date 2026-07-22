@@ -10,6 +10,7 @@
     "build": "pnpm run-all build && pnpm check:eng",
     "deps": "tsx eng/scripts/sync-deps.ts",
     "check:eng": "tsc -p ./tsconfig.eng.json --noEmit",
+    "test:eng": "vitest run --config ./vitest.config.fast.ts eng/scripts/detect-affected.test.ts",
     "change": "chronus",
     "check-lockfile": "node ./eng/scripts/check-lockfile.ts",
     "create:linter-rule": "tsx eng/scripts/create-linter-rule.ts",

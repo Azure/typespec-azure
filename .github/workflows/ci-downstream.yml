@@ -1,0 +1,80 @@
+name: "Integration"
+
+on:
+  pull_request:
+    branches:
+      - main
+      - release/*
+  merge_group:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  detect-affected:
+    name: "Detect Affected Targets"
+    runs-on: ubuntu-latest
+    outputs:
+      affected: ${{ steps.detect.outputs.affected }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup
+
+      - name: Detect affected targets
+        id: detect
+        env:
+          BASE_SHA: ${{ github.event_name == 'merge_group' && github.event.merge_group.base_sha || github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.sha }}
+        run: node eng/scripts/detect-affected.ts
+
+  python:
+    name: "Python"
+    needs: detect-affected
+    if: ${{ fromJSON(needs.detect-affected.outputs.affected).python }}
+    uses: ./.github/workflows/ci-python.yml
+
+  java:
+    name: "Java"
+    needs: detect-affected
+    if: ${{ fromJSON(needs.detect-affected.outputs.affected).java }}
+    uses: ./.github/workflows/ci-java.yml
+
+  typescript:
+    name: "TypeScript"
+    needs: detect-affected
+    if: ${{ fromJSON(needs.detect-affected.outputs.affected).typescript }}
+    uses: ./.github/workflows/ci-typescript.yml
+
+  go:
+    name: "Go"
+    needs: detect-affected
+    if: ${{ fromJSON(needs.detect-affected.outputs.affected).go }}
+    uses: ./.github/workflows/ci-go.yml
+
+  downstream-ci-gate:
+    name: "Gate"
+    needs: [detect-affected, python, java, typescript, go]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate downstream results
+        env:
+          # All jobs this gate depends on, keyed by name with their result.
+          # Iterated generically so new emitters only need a `needs:` entry.
+          NEEDS: ${{ toJSON(needs) }}
+        run: |
+          echo "$NEEDS" | jq -r 'to_entries[] | "\(.key) => \(.value.result)"'
+          bad=$(echo "$NEEDS" | jq '[to_entries[]
+            | select(.value.result == "failure" or .value.result == "cancelled")] | length')
+          if [ "$bad" != "0" ]; then
+            echo "One or more downstream checks failed or were cancelled."
+            exit 1
+          fi
+          echo "All downstream checks passed or were skipped."

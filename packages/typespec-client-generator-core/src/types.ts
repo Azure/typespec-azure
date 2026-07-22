@@ -12,6 +12,7 @@ import {
   Namespace,
   NumericLiteral,
   Operation,
+  Program,
   Scalar,
   StringLiteral,
   Tuple,
@@ -21,6 +22,7 @@ import {
   getDiscriminator,
   getEncode,
   getLifecycleVisibilityEnum,
+  getMediaTypeHint,
   getSummary,
   getVisibilityForClass,
   ignoreDiagnostics,
@@ -30,6 +32,8 @@ import {
   isTemplateDeclaration,
   resolveEncodedName,
 } from "@typespec/compiler";
+import { isEvents } from "@typespec/events";
+import { unsafe_getEventDefinitions as getEventDefinitions } from "@typespec/events/experimental";
 import {
   Authentication,
   HttpOperationFileBody,
@@ -1538,6 +1542,66 @@ interface PropagationOptions {
   isOverride?: boolean;
 }
 
+/**
+ * Infers the default content type for an event type, mirroring the HTTP lib behavior:
+ * - Models → "application/json"
+ * - Scalars → "text/plain"
+ * - Literals/constants → undefined (no serialization needed)
+ */
+function inferEventContentType(program: Program, type: Type): string | undefined {
+  // Use @mediaTypeHint if explicitly set on the type, otherwise fall back to kind-based default
+  const hint = getMediaTypeHint(program, type);
+  if (hint) return hint;
+  if (type.kind === "Model") return "application/json";
+  if (type.kind === "Scalar") return "text/plain";
+  return undefined;
+}
+
+/**
+ * Propagates `UsageFlags.Json` and serialization options to individual SSE event `type` and
+ * `payloadType` based on their per-event content type. When no explicit content type is set,
+ * infers a default using the same logic as the HTTP lib (model → application/json,
+ * scalar → text/plain).
+ */
+function propagateSseEventUsage(
+  context: TCGCContext,
+  streamType: Type,
+  operation: Operation,
+  diagnostics: ReturnType<typeof createDiagnosticCollector>,
+): void {
+  if (streamType.kind !== "Union" || !isEvents(context.program, streamType)) {
+    return;
+  }
+  const eventDefinitions = diagnostics.pipe(getEventDefinitions(context.program, streamType));
+  for (const event of eventDefinitions) {
+    const effectiveContentType =
+      event.contentType ?? inferEventContentType(context.program, event.type);
+    const effectivePayloadContentType =
+      event.payloadContentType ?? inferEventContentType(context.program, event.payloadType);
+
+    if (effectiveContentType) {
+      const sdkType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, event.type, operation),
+      );
+      if (isMediaTypeJson(effectiveContentType)) {
+        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkType));
+      }
+      diagnostics.pipe(updateSerializationOptions(context, sdkType, [effectiveContentType]));
+    }
+    if (effectivePayloadContentType) {
+      const sdkPayloadType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, event.payloadType, operation),
+      );
+      if (isMediaTypeJson(effectivePayloadContentType)) {
+        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkPayloadType));
+      }
+      diagnostics.pipe(
+        updateSerializationOptions(context, sdkPayloadType, [effectivePayloadContentType]),
+      );
+    }
+  }
+}
+
 export function updateUsageOrAccess(
   context: TCGCContext,
   value: UsageFlags | AccessFlags,
@@ -1823,6 +1887,8 @@ function updateTypesFromOperation(
       }
       const access = getAccessOverride(context, operation) ?? "public";
       diagnostics.pipe(updateUsageOrAccess(context, access, sdkStreamType));
+      // Propagate Json usage to individual SSE event types based on per-event content type
+      propagateSseEventUsage(context, requestStreamMeta.streamType, operation, diagnostics);
     }
 
     // Push "Parameter" context for operation parameters
@@ -1954,6 +2020,8 @@ function updateTypesFromOperation(
           }
           const access = getAccessOverride(context, operation) ?? "public";
           diagnostics.pipe(updateUsageOrAccess(context, access, sdkStreamType));
+          // Propagate Json usage to individual SSE event types based on per-event content type
+          propagateSseEventUsage(context, responseStreamMeta.streamType, operation, diagnostics);
         }
       }
     }
