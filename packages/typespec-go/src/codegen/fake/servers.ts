@@ -1705,11 +1705,7 @@ function getAPIParametersSig(
 // copied from generator/helpers.ts but without the XML-specific stuff
 function getResultFieldName(
   result:
-    | go.AnyResult
-    | go.BinaryResult
-    | go.MonomorphicResult
-    | go.PolymorphicResult
-    | go.ModelResult,
+    go.AnyResult | go.BinaryResult | go.MonomorphicResult | go.PolymorphicResult | go.ModelResult,
 ): string {
   switch (result.kind) {
     case "anyResult":

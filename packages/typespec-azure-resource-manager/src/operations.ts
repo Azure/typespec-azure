@@ -55,11 +55,7 @@ import {
 import { ArmStateKeys } from "./state.js";
 
 export type ArmLifecycleOperationKind =
-  | "read"
-  | "createOrUpdate"
-  | "update"
-  | "delete"
-  | "checkExistence";
+  "read" | "createOrUpdate" | "update" | "delete" | "checkExistence";
 export type ArmOperationKind = ArmLifecycleOperationKind | "list" | "action" | "other";
 
 export interface ArmResourceOperation extends ArmResourceOperationData {

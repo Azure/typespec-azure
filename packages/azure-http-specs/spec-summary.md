@@ -161,6 +161,14 @@ Example input:
 
 Output: None (204/empty response)
 
+### Azure_ClientGenerator_Core_ApiVersion_ClientApiVersions_sendApiVersion
+
+- Endpoint: `post /azure/client-generator-core/api-version/client-api-versions`
+
+Test that the client sends the api-version from @clientApiVersions decorator.
+The client api version enum is extended with an older version "2022-10-01" not present in the service versions.
+The client should be able to send "2022-10-01" as the api-version query parameter.
+
 ### Azure_ClientGenerator_Core_ClientDefaultValue_getHeaderParameter
 
 - Endpoint: `get /azure/client-generator-core/client-default-value/header-parameter`
@@ -968,11 +976,11 @@ This scenario tests the exact() function applied to a model property with langua
 The property 'name' on ScopedModel is renamed using exact() scoped to each language,
 with names that include an underscore prefix to verify that language naming logic does not apply:
 
-- Python: '\_my_name' (should not be converted to 'my_name' or other casing)
-- Java: '\_myName' (should not be converted to remove the underscore prefix)
-- C#: '\_MyName' (should not be converted to remove the underscore prefix)
-- JavaScript: '\_myName' (should not be converted to remove the underscore prefix)
-- Go: '\_MyName' (should not be converted to remove the underscore prefix)
+- Python: '_my_name' (should not be converted to 'my_name' or other casing)
+- Java: '_myName' (should not be converted to remove the underscore prefix)
+- C#: '_MyName' (should not be converted to remove the underscore prefix)
+- JavaScript: '_myName' (should not be converted to remove the underscore prefix)
+- Go: '_MyName' (should not be converted to remove the underscore prefix)
   Each language should preserve the specified exact name as-is without any further casing conversion.
 
 Expected request body:
