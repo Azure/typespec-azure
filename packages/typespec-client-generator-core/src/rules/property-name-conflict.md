@@ -45,11 +45,4 @@ model Widget {
 
 ## Suppression
 
-Although reported as a `warning`, this conflict breaks C# code generation, so it should be treated as a must-fix. Suppress it only if the affected model is never generated for C#:
-
-```tsp
-#suppress "@azure-tools/typespec-client-generator-core/property-name-conflict" "model not generated for C#"
-model Widget {
-  widget: string;
-}
-```
+This rule should not be suppressed. Although it is reported as a `warning`, the name conflict breaks C# code generation, so it must be fixed rather than suppressed.
