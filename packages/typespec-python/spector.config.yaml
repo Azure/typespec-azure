@@ -1,7 +1,7 @@
-# yaml-language-server: $schema=../spector-config/spector.config.schema.json
+# yaml-language-server: $schema=../spector-runner/schema/dist/SpectorConfig.json
 #
 # Opt-in spec selection for @azure-tools/typespec-python.
-# See design/spector-test-selection.md.
+# See Azure/typespec-azure#4997.
 #
 # Selection only: per-spec emitter options remain in the upstream-synced
 # regenerate-common.ts option tables (they are flavor-aware and shared with

@@ -1,7 +1,7 @@
-# yaml-language-server: $schema=../spector-config/spector.config.schema.json
+# yaml-language-server: $schema=../spector-runner/schema/dist/SpectorConfig.json
 #
 # Spec selection for @azure-tools/azure-http-specs (opt-in).
-# See design/spector-test-selection.md. 'module' is the Go module name;
+# See Azure/typespec-azure#4997. 'module' is the Go module name;
 # other options are @azure-tools/typespec-go emitter options.
 
 specs:

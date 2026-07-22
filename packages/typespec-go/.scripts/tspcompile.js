@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
-import { loadSpectorConfig, resolveSpecs } from "@azure-tools/spector-config";
+import { loadSpectorConfig, resolveSpecs } from "@azure-tools/spector-runner";
 import { exec, execSync } from "child_process";
 import { existsSync, opendirSync, readFileSync, unlinkSync, writeFileSync } from "fs";
 import { semaphore } from "./semaphore.js";
@@ -28,7 +28,7 @@ const compiler = pkgRoot + "node_modules/@typespec/compiler/cmd/tsp.js";
 const stubConfig = pkgRoot + ".scripts/tspconfig.yaml";
 
 // Spec selection lives in the opt-in `spector.config.*.yaml` files (see
-// design/spector-test-selection.md), parsed by the shared @azure-tools/spector-config
+// Azure/typespec-azure#4997), parsed by the shared @azure-tools/spector-runner
 // package. Each enabled spec resolves to a `module` option (the Go module name) plus any
 // per-test emitter options. We rebuild the legacy group shape below so the rest of this
 // script (loopSpec/generate) is unchanged.

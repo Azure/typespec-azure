@@ -18,7 +18,7 @@ import pc from "picocolors";
 import { fileURLToPath } from "url";
 import { parseArgs } from "util";
 
-import { isSpecEnabled, loadSpectorConfig, SpectorConfig } from "@azure-tools/spector-config";
+import { isSpecEnabled, loadSpectorConfig, SpectorConfig } from "@azure-tools/spector-runner";
 
 import {
   buildTaskGroups,
@@ -110,7 +110,7 @@ const ctx: RegenerateContext = {
   emitterName: EMITTER_NAME,
 };
 
-// Opt-in spec selection (see design/spector-test-selection.md). Only specs listed
+// Opt-in spec selection (see Azure/typespec-azure#4997). Only specs listed
 // with a truthy value in spector.config.yaml are generated; anything discovered on
 // disk but not opted in is skipped. Per-spec emitter options still come from the
 // upstream-synced option tables in regenerate-common.ts.

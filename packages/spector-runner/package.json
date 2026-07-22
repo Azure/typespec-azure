@@ -1,8 +1,8 @@
 {
-  "name": "@azure-tools/spector-config",
+  "name": "@azure-tools/spector-runner",
   "version": "0.1.0",
   "private": true,
-  "description": "Shared loader for the standardized per-emitter spector test selection config (spector.config.yaml).",
+  "description": "Shared loader and schema for the standardized per-emitter spector test selection config (spector.config.yaml).",
   "type": "module",
   "license": "MIT",
   "author": "Microsoft Corporation",
@@ -22,17 +22,18 @@
     ".": {
       "import": "./dist/src/index.js"
     },
-    "./schema": "./spector.config.schema.json"
+    "./schema": "./schema/dist/SpectorConfig.json"
   },
   "files": [
     "dist/**",
     "!dist/test/**",
-    "spector.config.schema.json"
+    "schema/dist/SpectorConfig.json"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "pnpm regen-schema && tsc -p tsconfig.build.json",
+    "regen-schema": "tsp compile ./schema/spector-config.tsp --config ./schema/tspconfig.yaml --warn-as-error",
     "watch": "tsc -p tsconfig.build.json --watch",
-    "clean": "rimraf ./dist ./temp",
+    "clean": "rimraf ./dist ./schema/dist ./temp",
     "lint": "oxlint . --deny-warnings",
     "lint:fix": "oxlint . --fix",
     "test": "vitest run",
@@ -43,6 +44,8 @@
     "yaml": "catalog:"
   },
   "devDependencies": {
+    "@typespec/compiler": "workspace:^",
+    "@typespec/json-schema": "workspace:^",
     "rimraf": "catalog:",
     "vitest": "catalog:"
   }
