@@ -8,23 +8,7 @@ rename it for the affected language.
 - **Area:** SDK generation, primarily **C#**. A property whose name collides with its enclosing model's name produces code that does not compile in C# (applies to both data-plane and management-plane).
 - **Not affected:** The service definition and the wire protocol are unchanged; the collision only affects the generated client code.
 
-## Severity
-
-`warning` — suppressible. Although reported as a warning, it should be treated as a must-fix for the C# SDK: leaving the conflict in place produces C# code that fails to compile.
-
-## Diagnostic message
-
-```text
-Property 'widget' having the same name as its enclosing model will cause problems with C# code generation. Consider renaming the property directly or using the @clientName("newName", "csharp") decorator to rename the property for C#.
-```
-
-**What it means:** A property's C#-resolved name is the same (case-insensitively) as its enclosing model's C#-resolved name.
-
-**Why it matters:** In C#, a member cannot have the same name as its containing type, so the generated model does not compile. This blocks building the C# SDK.
-
-**Recommended fix:** Rename the property, or keep the TypeSpec name and rename it for C# only with `@clientName("<newName>", "csharp")`.
-
-#### ❌ Incorrect
+#### ❌ Incorrect Example
 
 ```tsp
 model Widget {
@@ -32,7 +16,17 @@ model Widget {
 }
 ```
 
-#### ✅ Correct (rename the property)
+#### Diagnostic Message
+
+For the model above, the linter reports that the property name is the same as its enclosing model name:
+
+```text
+Property 'widget' having the same name as its enclosing model will cause problems with C# code generation. Consider renaming the property directly or using the @clientName("newName", "csharp") decorator to rename the property for C#.
+```
+
+#### ✅ How to Fix
+
+Rename the property:
 
 ```tsp
 model Widget {
@@ -40,7 +34,7 @@ model Widget {
 }
 ```
 
-#### ✅ Correct (rename only for C#)
+Or keep the TypeSpec name and rename it for C# only:
 
 ```tsp
 model Widget {
@@ -51,7 +45,7 @@ model Widget {
 
 ## Suppression
 
-Because this conflict breaks C# generation, suppressing the rule is discouraged. Only suppress it if the affected model is never generated for C#:
+Although reported as a `warning`, this conflict breaks C# code generation, so it should be treated as a must-fix. Suppress it only if the affected model is never generated for C#:
 
 ```tsp
 #suppress "@azure-tools/typespec-client-generator-core/property-name-conflict" "model not generated for C#"
