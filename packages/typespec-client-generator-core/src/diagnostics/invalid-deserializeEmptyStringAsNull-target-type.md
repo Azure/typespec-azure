@@ -1,8 +1,11 @@
 This diagnostic is issued when `@deserializeEmptyStringAsNull` is applied to a property whose type is not `string` and is not a scalar derived from `string`.
 
-To fix this issue, apply the decorator only to a `string` property or a property whose scalar type ultimately extends `string`.
+## Impact
 
-### Example
+- **Area:** SDK deserialization customization. Blocks empty-string-to-null handling on non-string-like properties.
+- **Not affected:** Other properties and the service payload schema are unchanged.
+
+#### ❌ Incorrect Usage
 
 ```typespec
 model Widget {
@@ -11,4 +14,14 @@ model Widget {
 }
 ```
 
-`count` is not string-like; apply the decorator to a `string` property or to a scalar derived from `string`.
+#### Diagnostic Message
+
+For the declaration above, TCGC reports:
+
+```text
+@deserializeEmptyStringAsNull can only be applied to `ModelProperty` of type 'string' or a `Scalar` derived from 'string'.
+```
+
+#### ✅ How to Fix
+
+Apply the decorator only to a `string` property or a property whose scalar type ultimately extends `string`.

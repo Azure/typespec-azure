@@ -1,8 +1,11 @@
 This diagnostic is issued when `@markAsPageable` is applied to an operation that does not return a model with a property decorated with `@pageItems` or named `value`.
 
-To fix this issue, apply `@markAsPageable` only to operations returning a suitable page model, or update the response model to include `@pageItems` or a `value` property.
+## Impact
 
-### Example
+- **Area:** Legacy pageable SDK metadata. Generation continues with the operation treated as a regular method because TCGC cannot identify page items.
+- **Not affected:** The operation's service response schema is unchanged.
+
+#### ❌ Incorrect Usage
 
 ```typespec
 @markAsPageable
@@ -10,4 +13,22 @@ To fix this issue, apply `@markAsPageable` only to operations returning a suitab
 op listWidgets(): string;
 ```
 
-The operation does not return a page model; return a model with `@pageItems` or a `value` property, or remove `@markAsPageable`.
+#### Diagnostic Message
+
+For the declaration above, TCGC reports:
+
+```text
+@markAsPageable decorator can only be applied to operations that return a model with a property decorated with @pageItems or a property named 'value'. We will ignore this decorator.
+```
+
+#### ✅ How to Fix
+
+Apply `@markAsPageable` only to operations returning a suitable page model, or update the response model to include `@pageItems` or a `value` property.
+
+## Suppression
+
+Suppress this warning only if the operation should remain a regular non-pageable method and the legacy `@markAsPageable` annotation is intentionally ignored.
+
+```typespec
+#suppress "@azure-tools/typespec-client-generator-core/invalid-mark-as-pageable-target" "regular operation despite pageable marker"
+```

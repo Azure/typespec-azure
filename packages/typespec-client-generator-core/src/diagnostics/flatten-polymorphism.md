@@ -1,8 +1,11 @@
 This diagnostic is issued when `@flattenProperty` is applied to a model property whose type is polymorphic (a discriminated type). Flattening a polymorphic type is not supported, because most languages cannot represent it.
 
-To fix this issue, remove `@flattenProperty` from the polymorphic property, or change the property to a non-polymorphic type.
+## Impact
 
-### Example
+- **Area:** SDK model flattening. Blocks applying `@flattenProperty` because flattening a discriminated model would break generated polymorphic model structure.
+- **Not affected:** The discriminator and inheritance described by the service model remain unchanged.
+
+#### ❌ Incorrect Usage
 
 ```typespec
 @discriminator("kind")
@@ -19,4 +22,14 @@ model Owner {
 }
 ```
 
-`pet` has a polymorphic type, so remove `@flattenProperty` or use a non-polymorphic property type.
+#### Diagnostic Message
+
+For the declaration above, TCGC reports:
+
+```text
+Cannot flatten property of polymorphic type.
+```
+
+#### ✅ How to Fix
+
+Remove `@flattenProperty` from the polymorphic property, or change the property to a non-polymorphic type.

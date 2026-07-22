@@ -1,10 +1,11 @@
 This diagnostic is issued when services merged into the same client resolve different versions of a shared dependency namespace.
 
-To fix this issue, align service versioning or `@useDependency` mappings so every merged service resolves the shared dependency to the same version.
+## Impact
 
-### Example
+- **Area:** Multi-service dependency versioning. Blocks merging services into one client when their shared versioned dependencies would generate incompatible or duplicated SDK models.
+- **Not affected:** Each service can still be generated separately with its own dependency resolution.
 
-Two services merged into one client pin a shared library to different versions:
+#### ❌ Incorrect Usage
 
 ```typespec
 @versioned(LibVersions)
@@ -43,4 +44,14 @@ namespace CombineClient {
 }
 ```
 
-`ServiceA` pins `SharedLib` to `v1` while `ServiceB` pins it to `v2`; align them to the same version.
+#### Diagnostic Message
+
+For the declaration above, TCGC reports:
+
+```text
+Services merged into client "CombineClient" depend on different versions of "SharedLib": "v1", "v2".
+```
+
+#### ✅ How to Fix
+
+Align service versioning or `@useDependency` mappings so every merged service resolves the shared dependency to the same version.

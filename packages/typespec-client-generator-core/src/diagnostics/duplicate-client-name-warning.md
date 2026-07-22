@@ -1,21 +1,55 @@
 This diagnostic is issued when two generated SDK declarations share the same client name. This is by design for languages such as C# that use the duplicated name to produce overloads.
 
-To fix this issue, confirm that the duplicated name is intentional for the target language's overloading behavior and suppress this diagnostic; otherwise give the declarations unique names, for example with `@clientName`.
+## Impact
 
-### Example
+- **Area:** C# SDK naming and overload generation. Generation continues, but the duplicate generated name should be intentional for C# overload behavior.
+- **Not affected:** Other language scopes are unaffected unless the same duplicate name applies to them.
 
-When the duplicate is an intentional overload, suppress the diagnostic:
+### Decorator-applied duplicate
+
+#### ❌ Incorrect Usage
 
 ```typespec
 interface StorageTasks {
   @route("/list")
   list(): void;
 
-  #suppress "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning" "Intentional overload for C#"
   @clientName("list", "csharp")
   @route("/listByParent")
   listByParent(parent: string): void;
 }
 ```
 
-For the C# emitter, both operations resolve to the client name `list`; suppress the diagnostic when the overload is intentional, otherwise choose a distinct `@clientName`.
+#### Diagnostic Message
+
+For the declaration above, TCGC reports:
+
+```text
+Client name: "list" is duplicated in language scope: "csharp"
+```
+
+#### ✅ How to Fix
+
+Give `listByParent` a distinct C# client name, or suppress the warning if the duplicate intentionally represents an overload.
+
+### Generated name conflict
+
+#### Diagnostic Message
+
+For the generated operation name above, TCGC reports:
+
+```text
+Client name: "list" is defined somewhere causing naming conflicts in language scope: "csharp"
+```
+
+#### ✅ How to Fix
+
+Rename one of the generated operations for the affected scope, or suppress the warning when the duplicate is an intentional overload.
+
+## Suppression
+
+Suppress this warning only when the duplicate generated name is intentional for the target emitter, such as a C# overload.
+
+```typespec
+#suppress "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning" "Intentional overload for C#"
+```

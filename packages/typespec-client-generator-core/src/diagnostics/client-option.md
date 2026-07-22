@@ -1,17 +1,35 @@
 This diagnostic is always issued when `@clientOption` is used, because client options are a temporary mechanism intended only for language emitters.
 
-To fix this issue, double-check whether the client option reflects an intended language-emitter behavior. If it does, suppress this diagnostic; otherwise remove `@clientOption`.
+## Impact
 
-### Example
+- **Area:** Targeted language-emitter options. Generation can proceed only with an explicit suppression acknowledging that `@clientOption` is a temporary emitter-specific workaround.
+- **Not affected:** The TypeSpec service model and wire protocol are unchanged.
 
-Confirm the option is intentional and suppress the diagnostic:
+#### ❌ Incorrect Usage
 
 ```typespec
-#suppress "@azure-tools/typespec-client-generator-core/client-option" "preview feature for python"
 @clientOption("enableFeatureFoo", true, "python")
 model Test {
   id: string;
 }
 ```
 
-`@clientOption` always reports this diagnostic because it is experimental; suppress it when the language behavior is intended, otherwise remove `@clientOption`.
+#### Diagnostic Message
+
+For the declaration above, TCGC reports:
+
+```text
+@clientOption is experimental and should only be used for temporary workarounds. This usage must be suppressed.
+```
+
+#### ✅ How to Fix
+
+Double-check whether the client option reflects an intended language-emitter behavior. If it does, suppress this diagnostic; otherwise remove `@clientOption`.
+
+## Suppression
+
+Suppress this warning only when `@clientOption` is a deliberate temporary workaround for a specific language emitter.
+
+```typespec
+#suppress "@azure-tools/typespec-client-generator-core/client-option" "preview feature for python"
+```

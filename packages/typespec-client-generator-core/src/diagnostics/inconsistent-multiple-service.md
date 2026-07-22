@@ -1,8 +1,11 @@
 This diagnostic is issued when multiple services merged into one `@client` declaration do not have the same server and authentication definitions.
 
-To fix this issue, make the merged services use matching server and auth definitions, or generate them as separate clients.
+## Impact
 
-### Example
+- **Area:** Multi-service client merging. Blocks a combined client when merged services do not agree on endpoint or authentication shape.
+- **Not affected:** The individual service definitions, servers, and auth settings remain unchanged.
+
+#### ❌ Incorrect Usage
 
 ```typespec
 @service
@@ -27,4 +30,14 @@ namespace CombineClient {
 }
 ```
 
-`ServiceA` and `ServiceB` have different server definitions, so they cannot be merged into one client until the server definitions match.
+#### Diagnostic Message
+
+For the declaration above, TCGC reports:
+
+```text
+All services must have the same server and auth definitions.
+```
+
+#### ✅ How to Fix
+
+Make the merged services use matching server and auth definitions, or generate them as separate clients.

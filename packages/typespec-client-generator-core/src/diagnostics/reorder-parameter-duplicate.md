@@ -1,8 +1,11 @@
 This diagnostic is issued when `reorderParameters` lists the same parameter name more than once.
 
-To fix this issue, include each parameter exactly once in the reorder list.
+## Impact
 
-### Example
+- **Area:** Client customization transformations. Blocks `reorderParameters` because a duplicated name would make the generated method parameter order ambiguous.
+- **Not affected:** The operation's actual parameters are unchanged.
+
+#### ❌ Incorrect Usage
 
 ```typespec
 @service
@@ -10,8 +13,17 @@ namespace MyService {
   op myOp(a: string, b: string): void;
 }
 
-#suppress "experimental-feature" "customizing generated parameters"
 alias Modified = reorderParameters(MyService.myOp, #["a", "a"]);
 ```
 
-List each parameter exactly once, such as `#["a", "b"]`.
+#### Diagnostic Message
+
+For the declaration above, TCGC reports:
+
+```text
+Parameter "a" appears more than once in the reorder list for operation "myOp".
+```
+
+#### ✅ How to Fix
+
+Include each parameter exactly once in the reorder list.

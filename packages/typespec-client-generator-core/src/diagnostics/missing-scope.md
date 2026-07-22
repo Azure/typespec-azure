@@ -1,10 +1,11 @@
 This diagnostic is issued when a decorator that is likely language-specific is used without a language scope; currently this is reported for external `@alternateType` metadata without a scope.
 
-To fix this issue, provide the appropriate language scope argument, such as `"python"`, `"csharp"`, or another emitter scope.
+## Impact
 
-### Example
+- **Area:** Language-specific alternate-type customization. Blocks external type metadata that lacks a target emitter scope, preventing it from being applied globally by accident.
+- **Not affected:** The TypeSpec type definition and service payload schema are unchanged.
 
-Instead of applying external type information to every emitter:
+#### ❌ Incorrect Usage
 
 ```typespec
 @alternateType({
@@ -15,7 +16,17 @@ Instead of applying external type information to every emitter:
 model ItemCollection {}
 ```
 
-Provide the language scope:
+#### Diagnostic Message
+
+For the declaration above, TCGC reports:
+
+```text
+@scope decorator should be applied with @alternateType since it is highly likely this is language-specific
+```
+
+#### ✅ How to Fix
+
+Provide the appropriate language scope argument, such as `"python"`, `"csharp"`, or another emitter scope:
 
 ```typespec
 @alternateType(

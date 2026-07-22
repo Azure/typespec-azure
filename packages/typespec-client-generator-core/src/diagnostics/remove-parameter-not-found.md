@@ -1,8 +1,11 @@
 This diagnostic is issued when `removeParameter` is called with a selector that does not match any parameter on the operation.
 
-To fix this issue, use the exact name or model property reference for an existing operation parameter.
+## Impact
 
-### Example
+- **Area:** Client customization transformations. Blocks `removeParameter` from producing the intended customized signature because the selector does not match an operation parameter.
+- **Not affected:** The original operation parameter list is unchanged.
+
+#### ❌ Incorrect Usage
 
 ```typespec
 @service
@@ -10,8 +13,17 @@ namespace MyService {
   op myOp(existingParam?: string): void;
 }
 
-#suppress "experimental-feature" "customizing generated parameters"
 alias Modified = removeParameter(MyService.myOp, "missingParam");
 ```
 
-Use the exact name of an existing parameter, such as `"existingParam"`.
+#### Diagnostic Message
+
+For the declaration above, TCGC reports:
+
+```text
+Parameter "missingParam" not found in operation "myOp".
+```
+
+#### ✅ How to Fix
+
+Use the exact name or model property reference for an existing operation parameter.

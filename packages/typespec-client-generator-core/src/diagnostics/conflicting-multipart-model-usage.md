@@ -1,8 +1,11 @@
 This diagnostic is issued when the same model is used as both multipart/form-data input and regular body input such as JSON or XML. Those request bodies have different wire shapes and cannot safely share one SDK model.
 
-To fix this issue, create a separate form-data model, such as `<ModelName>FormData`, and use each model only for its matching body kind.
+## Impact
 
-### Example
+- **Area:** Request body model generation. Blocks safe SDK input-model generation because one model would need incompatible multipart and regular-body serialization behavior.
+- **Not affected:** The individual TypeSpec operations still describe their request body content types.
+
+#### ❌ Incorrect Usage
 
 ```typespec
 @service(#{ title: "Test Service" })
@@ -23,4 +26,14 @@ op multipartUse(
 ): NoContentResponse;
 ```
 
-`MultiPartRequest` is used both as a regular JSON body and as a multipart body; split the multipart shape into a separate model.
+#### Diagnostic Message
+
+For the declaration above, TCGC reports:
+
+```text
+Model 'MultiPartRequest' cannot be used as both multipart/form-data input and regular body input. You can create a separate model with name 'model MultiPartRequestFormData' extends MultiPartRequest {}
+```
+
+#### ✅ How to Fix
+
+Create a separate form-data model, such as `<ModelName>FormData`, and use each model only for its matching body kind.

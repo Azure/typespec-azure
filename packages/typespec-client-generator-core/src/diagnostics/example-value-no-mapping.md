@@ -1,8 +1,11 @@
 This diagnostic is issued when a value from an example file cannot be matched to the TypeSpec definition.
 
-To fix this issue, update the example value or the TypeSpec definition so parameters, request bodies, and responses follow the declared shapes.
+## Impact
 
-### Example
+- **Area:** Example value conversion. Generation continues, but the mismatched example value is not mapped into SDK example data for the operation.
+- **Not affected:** The operation signature and generated client method are unchanged.
+
+#### ❌ Incorrect Usage
 
 ```typespec
 @service
@@ -17,17 +20,23 @@ namespace TestClient {
 }
 ```
 
-The example file for `parametersDiagnostic` uses a parameter named `test`, which does not map to any declared header, path, query, or body parameter:
+#### Diagnostic Message
 
-```json
-{
-  "operationId": "parametersDiagnostic",
-  "title": "parametersDiagnostic",
-  "parameters": {
-    "test": "a"
-  },
-  "responses": {}
-}
+For the declaration above, TCGC reports:
+
+```text
+Value in example file 'parametersDiagnostic.json' does not follow its definition:
+{"test":"a"}
 ```
 
-Rename `test` to one of the declared parameters (`a`, `b`, `c`, or `d`) so the example value maps to the operation.
+#### ✅ How to Fix
+
+Update the example value or the TypeSpec definition so parameters, request bodies, and responses follow the declared shapes.
+
+## Suppression
+
+Suppress this warning only if the mismatched example value is intentionally excluded from generated SDK examples or tests.
+
+```typespec
+#suppress "@azure-tools/typespec-client-generator-core/example-value-no-mapping" "example value intentionally not mapped"
+```

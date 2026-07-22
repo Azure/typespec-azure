@@ -1,8 +1,11 @@
 This diagnostic is issued when a parent client uses `autoMergeService` and a nested client also specifies its own service configuration.
 
-To fix this issue, leave the nested client's `service` option unset so it inherits from the parent, or remove the parent `autoMergeService` setup.
+## Impact
 
-### Example
+- **Area:** Multi-service client hierarchy. Blocks an auto-merged parent client from also containing a nested client with its own explicit service binding.
+- **Not affected:** The underlying service namespaces and routes remain valid independently.
+
+#### ❌ Incorrect Usage
 
 ```typespec
 @service
@@ -33,4 +36,14 @@ namespace ParentClient {
 }
 ```
 
-The parent client is auto-merging services while the child declares its own service; omit the child `service` option or remove `autoMergeService`.
+#### Diagnostic Message
+
+For the declaration above, TCGC reports:
+
+```text
+Auto-merging service client must be empty.
+```
+
+#### ✅ How to Fix
+
+Leave the nested client's `service` option unset so it inherits from the parent, or remove the parent `autoMergeService` setup.
