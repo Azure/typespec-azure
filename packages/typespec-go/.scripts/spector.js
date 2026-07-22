@@ -34,6 +34,6 @@ if (switches.length === 0) {
   throw new Error("missing arg: [--start] [--stop]");
 }
 
-const cmdLine = "npx tsp-spector " + switches.join(" ");
+const cmdLine = "pnpm exec tsp-spector " + switches.join(" ");
 console.log(cmdLine);
 execSync(cmdLine, execSyncOptions);

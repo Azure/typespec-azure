@@ -647,10 +647,7 @@ export interface SdkModelPropertyTypeBase<
 }
 
 export type ArrayKnownEncoding =
-  | "pipeDelimited"
-  | "spaceDelimited"
-  | "commaDelimited"
-  | "newlineDelimited";
+  "pipeDelimited" | "spaceDelimited" | "commaDelimited" | "newlineDelimited";
 
 /**
  * Options to show how to serialize a model/property.
@@ -920,11 +917,7 @@ export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
 }
 
 export type SdkHttpParameter =
-  | SdkQueryParameter
-  | SdkPathParameter
-  | SdkBodyParameter
-  | SdkHeaderParameter
-  | SdkCookieParameter;
+  SdkQueryParameter | SdkPathParameter | SdkBodyParameter | SdkHeaderParameter | SdkCookieParameter;
 
 export interface SdkMethodParameter extends SdkModelPropertyTypeBase {
   kind: "method";

@@ -976,11 +976,11 @@ This scenario tests the exact() function applied to a model property with langua
 The property 'name' on ScopedModel is renamed using exact() scoped to each language,
 with names that include an underscore prefix to verify that language naming logic does not apply:
 
-- Python: '\_my_name' (should not be converted to 'my_name' or other casing)
-- Java: '\_myName' (should not be converted to remove the underscore prefix)
-- C#: '\_MyName' (should not be converted to remove the underscore prefix)
-- JavaScript: '\_myName' (should not be converted to remove the underscore prefix)
-- Go: '\_MyName' (should not be converted to remove the underscore prefix)
+- Python: '_my_name' (should not be converted to 'my_name' or other casing)
+- Java: '_myName' (should not be converted to remove the underscore prefix)
+- C#: '_MyName' (should not be converted to remove the underscore prefix)
+- JavaScript: '_myName' (should not be converted to remove the underscore prefix)
+- Go: '_MyName' (should not be converted to remove the underscore prefix)
   Each language should preserve the specified exact name as-is without any further casing conversion.
 
 Expected request body:
