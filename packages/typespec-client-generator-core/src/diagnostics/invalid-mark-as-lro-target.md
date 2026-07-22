@@ -5,9 +5,6 @@ To fix this issue, apply `@markAsLro` only to operations that return a model, or
 ### Example
 
 ```typespec
-using TypeSpec.Http;
-using Azure.ClientGenerator.Core.Legacy;
-
 @markAsLro
 @post
 op start(): string;

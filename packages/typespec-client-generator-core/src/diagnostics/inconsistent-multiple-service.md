@@ -5,8 +5,6 @@ To fix this issue, make the merged services use matching server and auth definit
 ### Example
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 @service
 @server("https://servicea.example.com")
 namespace ServiceA {

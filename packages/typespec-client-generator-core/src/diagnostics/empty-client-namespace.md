@@ -5,8 +5,6 @@ To fix this issue, provide a non-empty namespace string or remove `@clientNamesp
 ### Example
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 @clientNamespace(" ")
 model Widget {}
 ```

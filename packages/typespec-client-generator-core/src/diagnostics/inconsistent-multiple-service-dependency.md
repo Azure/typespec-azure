@@ -7,8 +7,6 @@ To fix this issue, align service versioning or `@useDependency` mappings so ever
 Two services merged into one client pin a shared library to different versions:
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 @versioned(LibVersions)
 namespace SharedLib {
   enum LibVersions {

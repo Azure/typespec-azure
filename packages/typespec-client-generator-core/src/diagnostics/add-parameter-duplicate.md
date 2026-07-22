@@ -5,8 +5,6 @@ To fix this issue, choose a unique parameter name or use `replaceParameter` when
 ### Example
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 @service
 namespace MyService {
   op myOp(name: string): void;

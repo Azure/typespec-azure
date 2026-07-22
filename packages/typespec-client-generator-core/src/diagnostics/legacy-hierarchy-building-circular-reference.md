@@ -5,9 +5,6 @@ To fix this issue, remove or change the `@hierarchyBuilding` decorator so the re
 ### Example
 
 ```typespec
-using Azure.ClientGenerator.Core;
-using Azure.ClientGenerator.Core.Legacy;
-
 @usage(Usage.input)
 namespace TestService;
 

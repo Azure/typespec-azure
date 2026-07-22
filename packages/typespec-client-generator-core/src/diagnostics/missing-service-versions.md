@@ -5,9 +5,6 @@ To fix this issue, add the missing service versions to the client API versions e
 ### Example
 
 ```typespec
-using TypeSpec.Versioning;
-using Azure.ClientGenerator.Core;
-
 @service
 @versioned(Versions)
 namespace My.Service {

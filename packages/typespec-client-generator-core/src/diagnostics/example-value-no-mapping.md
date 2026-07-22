@@ -5,8 +5,6 @@ To fix this issue, update the example value or the TypeSpec definition so parame
 ### Example
 
 ```typespec
-using TypeSpec.Http;
-
 @service
 namespace TestClient {
   @route("/{b}")
@@ -19,4 +17,17 @@ namespace TestClient {
 }
 ```
 
-The test example file for `parametersDiagnostic` contains a parameter named `test`, which does not map to any declared header, path, query, or body parameter.
+The example file for `parametersDiagnostic` uses a parameter named `test`, which does not map to any declared header, path, query, or body parameter:
+
+```json
+{
+  "operationId": "parametersDiagnostic",
+  "title": "parametersDiagnostic",
+  "parameters": {
+    "test": "a"
+  },
+  "responses": {}
+}
+```
+
+Rename `test` to one of the declared parameters (`a`, `b`, `c`, or `d`) so the example value maps to the operation.

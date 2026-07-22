@@ -4,15 +4,15 @@ To fix this issue, keep the required parameter in scope, or — when scoping it 
 
 ### Example
 
-```typespec
-using TypeSpec.Http;
-using Azure.ClientGenerator.Core;
+When scoping the required parameter out is intentional and the value is supplied another way, suppress the diagnostic:
 
+```typespec
 op getWidget(
+  #suppress "@azure-tools/typespec-client-generator-core/required-parameter-scoped-out" "supplied by a custom Python policy"
   @header("x-client-id")
   @scope("!python")
   clientId: string,
 ): void;
 ```
 
-When generating for Python, the required `clientId` header is scoped out; keep it in scope, or confirm the intent and suppress the diagnostic if the value is supplied another way.
+When generating for Python, the required `clientId` header is scoped out; keep it in scope, or suppress the diagnostic when the value is supplied another way.

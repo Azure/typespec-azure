@@ -5,8 +5,6 @@ To fix this issue, align the property types between the child and the new base c
 ### Example
 
 ```typespec
-using Azure.ClientGenerator.Core.Legacy;
-
 model C {
   shared?: int32;
 }

@@ -7,8 +7,6 @@ To fix this issue, pass `Access.public` or `Access.internal` to `@access` and re
 Instead of:
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 enum CustomAccess {
   private: "private",
 }
@@ -19,8 +17,6 @@ model SecretModel {}
 Use:
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 @access(Access.internal)
 model SecretModel {}
 ```

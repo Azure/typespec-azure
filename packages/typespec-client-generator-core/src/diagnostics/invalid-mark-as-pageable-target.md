@@ -5,9 +5,6 @@ To fix this issue, apply `@markAsPageable` only to operations returning a suitab
 ### Example
 
 ```typespec
-using TypeSpec.Http;
-using Azure.ClientGenerator.Core.Legacy;
-
 @markAsPageable
 @get
 op listWidgets(): string;

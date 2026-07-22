@@ -7,8 +7,6 @@ To fix this issue, pass one or more of `Usage.input`, `Usage.output`, `Usage.jso
 Instead of:
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 enum CustomUsage {
   custom: 8,
 }
@@ -19,8 +17,6 @@ model Widget {}
 Use:
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 @usage(Usage.input | Usage.json)
 model Widget {}
 ```

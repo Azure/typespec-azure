@@ -5,8 +5,6 @@ To fix this issue, apply the decorator only to a `string` property or a property
 ### Example
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 model Widget {
   @deserializeEmptyStringAsNull
   count: int32;

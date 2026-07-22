@@ -5,8 +5,6 @@ To fix this issue, include each parameter exactly once in the reorder list.
 ### Example
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 @service
 namespace MyService {
   op myOp(a: string, b: string): void;

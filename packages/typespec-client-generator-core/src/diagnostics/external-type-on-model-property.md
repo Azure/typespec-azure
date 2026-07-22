@@ -7,8 +7,6 @@ To fix this issue, apply the external alternate type to the scalar, model, enum,
 Instead of applying external type information to a property:
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 model Widget {
   @alternateType(
     {

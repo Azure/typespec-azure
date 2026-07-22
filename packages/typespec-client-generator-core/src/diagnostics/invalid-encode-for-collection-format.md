@@ -5,8 +5,6 @@ To fix this issue, use `ArrayEncoding.pipeDelimited`, use `ArrayEncoding.spaceDe
 ### Example
 
 ```typespec
-using TypeSpec.Http;
-
 @service
 namespace My.Service;
 

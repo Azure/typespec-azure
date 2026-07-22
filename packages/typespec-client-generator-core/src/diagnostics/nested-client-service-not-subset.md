@@ -7,8 +7,6 @@ To fix this issue, restrict the nested client's `service` to services the parent
 Instead of referencing a service the parent client does not include:
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 @client({
   name: "ParentClient",
   service: [ServiceOne, ServiceTwo],

@@ -5,8 +5,6 @@ To fix this issue, provide a non-empty name to `@clientName` or remove the decor
 ### Example
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 @clientName(" ")
 model Widget {}
 ```

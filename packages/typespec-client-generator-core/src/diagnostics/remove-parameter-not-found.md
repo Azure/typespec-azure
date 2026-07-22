@@ -5,8 +5,6 @@ To fix this issue, use the exact name or model property reference for an existin
 ### Example
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 @service
 namespace MyService {
   op myOp(existingParam?: string): void;

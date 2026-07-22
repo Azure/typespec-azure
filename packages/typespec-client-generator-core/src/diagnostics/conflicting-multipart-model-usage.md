@@ -5,8 +5,6 @@ To fix this issue, create a separate form-data model, such as `<ModelName>FormDa
 ### Example
 
 ```typespec
-using TypeSpec.Http;
-
 @service(#{ title: "Test Service" })
 namespace TestService;
 

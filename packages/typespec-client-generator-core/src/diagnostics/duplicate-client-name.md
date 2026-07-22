@@ -5,8 +5,6 @@ To fix this issue, rename one declaration with `@clientName`, change the applica
 ### Example
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 @clientName("Widget")
 model WidgetResponse {}
 

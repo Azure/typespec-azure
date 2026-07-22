@@ -5,8 +5,6 @@ To fix this issue, set `api-version` to a service version that exists, or use `l
 ### Example
 
 ```typespec
-using TypeSpec.Versioning;
-
 @service(#{ title: "Contoso Widget Manager" })
 @versioned(Contoso.WidgetManager.Versions)
 namespace Contoso.WidgetManager;

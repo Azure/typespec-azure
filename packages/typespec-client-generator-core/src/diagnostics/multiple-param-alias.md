@@ -5,8 +5,6 @@ To fix this issue, keep only one alias for the property in a given scope, or sco
 ### Example
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 model ClientOptions {
   account: string;
 }

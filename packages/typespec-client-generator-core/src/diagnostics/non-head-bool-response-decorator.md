@@ -7,9 +7,6 @@ To fix this issue, add `@head` when the operation is a HEAD request, or remove `
 Instead of:
 
 ```typespec
-using TypeSpec.Http;
-using Azure.ClientGenerator.Core;
-
 @responseAsBool
 @get
 op exists(): void;

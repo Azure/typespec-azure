@@ -7,8 +7,6 @@ To fix this issue, add the `service` option to the root `@client`, or make the c
 Instead of:
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 @client
 namespace WidgetClient {
 

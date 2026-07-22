@@ -5,8 +5,6 @@ To fix this issue, use one package version for all external alternate type decla
 ### Example
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 @alternateType(
   {
     identity: "pystac.Item",

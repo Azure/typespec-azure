@@ -5,8 +5,6 @@ To fix this issue, leave the nested client's `service` option unset so it inheri
 ### Example
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 @service
 namespace ServiceA {
   @route("/aTest")
@@ -27,7 +25,7 @@ namespace ServiceB {
 namespace ParentClient {
   @client({
     name: "ChildClient",
-    service: ServiceA,
+    service: ServiceA, // conflicts with the parent's autoMergeService
   })
   namespace Child {
 

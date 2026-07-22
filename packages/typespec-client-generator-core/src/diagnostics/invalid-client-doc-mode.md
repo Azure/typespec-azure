@@ -5,8 +5,6 @@ To fix this issue, pass `DocumentationMode.append` or `DocumentationMode.replace
 ### Example
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 enum CustomDocMode {
   prepend: "prepend",
 }

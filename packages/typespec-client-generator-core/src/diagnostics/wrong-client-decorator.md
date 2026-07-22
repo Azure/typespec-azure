@@ -7,8 +7,6 @@ To fix this issue, place `@client` directly on the namespace or interface declar
 Instead of augmenting a namespace with `@@client`:
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 @service
 namespace ServiceNamespace;
 
@@ -26,8 +24,6 @@ namespace ClientNamespace {
 Place `@client` directly on the declaration:
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 @service
 namespace ServiceNamespace;
 

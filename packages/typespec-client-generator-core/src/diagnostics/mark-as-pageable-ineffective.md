@@ -5,9 +5,6 @@ To fix this issue, remove `@markAsPageable` and keep the existing `@list` pageab
 ### Example
 
 ```typespec
-using Azure.ClientGenerator.Core.Legacy;
-using Azure.ResourceManager;
-
 model Employee is TrackedResource<EmployeeProperties> {
   ...ResourceNameParameter<Employee>;
 }

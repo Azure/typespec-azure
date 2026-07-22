@@ -5,8 +5,6 @@ To fix this issue, remove `@flattenProperty` from the polymorphic property, or c
 ### Example
 
 ```typespec
-using Azure.ClientGenerator.Core.Legacy;
-
 @discriminator("kind")
 model Pet {
   kind: string;

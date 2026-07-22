@@ -4,16 +4,14 @@ To fix this issue, double-check whether the client option reflects an intended l
 
 ### Example
 
+Confirm the option is intentional and suppress the diagnostic:
+
 ```typespec
-using Azure.ClientGenerator.Core;
-
-@service
-namespace MyService;
-
+#suppress "@azure-tools/typespec-client-generator-core/client-option" "preview feature for python"
 @clientOption("enableFeatureFoo", true, "python")
 model Test {
   id: string;
 }
 ```
 
-`@clientOption` always reports this diagnostic because it is experimental; remove it or suppress the warning with a temporary-workaround justification.
+`@clientOption` always reports this diagnostic because it is experimental; suppress it when the language behavior is intended, otherwise remove `@clientOption`.

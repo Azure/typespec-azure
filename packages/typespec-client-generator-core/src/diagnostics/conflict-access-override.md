@@ -5,9 +5,6 @@ To fix this issue, align access settings so each generated type has one consiste
 ### Example
 
 ```typespec
-using TypeSpec.Http;
-using Azure.ClientGenerator.Core;
-
 @access(Access.internal)
 model A {}
 

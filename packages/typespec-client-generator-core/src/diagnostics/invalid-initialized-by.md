@@ -5,8 +5,6 @@ To fix this issue, use `InitializedBy.individually` for root clients, `Initializ
 ### Example
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 @clientInitialization({
   initializedBy: InitializedBy.customizeCode | InitializedBy.parent,
 })

@@ -10,11 +10,9 @@ To fix this issue, move operations and model properties only to interfaces or na
 
 ### Example
 
-A templated parameter moved to the same client with different instantiations resolves to conflicting types; move the parameter on each operation so it keeps a consistent type instead:
+The most common case is the last one — a templated parameter moved to the same client with different instantiations resolves to conflicting types:
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 @service
 namespace Default;
 

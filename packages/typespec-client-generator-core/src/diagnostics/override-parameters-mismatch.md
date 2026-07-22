@@ -7,8 +7,6 @@ To fix this issue, update the override operation so required parameters are pres
 Instead of omitting a required original parameter:
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 @service
 namespace MyService {
   op create(name: string, location: string): void;

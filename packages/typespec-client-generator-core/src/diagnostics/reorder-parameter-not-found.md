@@ -5,8 +5,6 @@ To fix this issue, remove the unknown name from the reorder list or add the para
 ### Example
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 @service
 namespace MyService {
   op myOp(a: string, b: string): void;

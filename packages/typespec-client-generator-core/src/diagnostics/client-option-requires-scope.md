@@ -7,8 +7,6 @@ To fix this issue, pass the intended language scope as the third argument to `@c
 Instead of:
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 #suppress "@azure-tools/typespec-client-generator-core/client-option" "temporary workaround"
 @clientOption("enableFeatureFoo", true)
 model Widget {}

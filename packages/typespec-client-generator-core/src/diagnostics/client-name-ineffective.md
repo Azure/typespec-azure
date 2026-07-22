@@ -7,8 +7,6 @@ To fix this issue, move `@clientName` to the declaration TCGC actually generates
 Instead of naming the override operation:
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 @service
 namespace KeyVault {
   op getSecret(secretName: string): void;

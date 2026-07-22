@@ -7,8 +7,6 @@ To fix this issue, provide the appropriate language scope argument, such as `"py
 Instead of applying external type information to every emitter:
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 @alternateType({
   identity: "pystac.Collection",
   package: "pystac",

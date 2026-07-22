@@ -5,8 +5,6 @@ To fix this issue, move the operation to an interface or namespace that belongs 
 ### Example
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 namespace OtherNamespace {
 
 }

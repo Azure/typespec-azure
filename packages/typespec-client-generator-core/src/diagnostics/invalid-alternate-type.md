@@ -7,8 +7,6 @@ To fix this issue, use a scalar alternate type when the source is a scalar, or a
 Instead of replacing a scalar with a model:
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 scalar storageDateTime extends utcDateTime;
 model DateWrapper {
   value: string;

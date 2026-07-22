@@ -5,8 +5,6 @@ To fix this issue, add TypeSpec versioning to the service namespace or remove `@
 ### Example
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 @service
 @clientApiVersions(ApiVersions)
 namespace My.Service {

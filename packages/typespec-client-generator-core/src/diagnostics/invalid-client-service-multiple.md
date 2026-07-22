@@ -5,8 +5,6 @@ To fix this issue, move the multi-service `@client` declaration to a namespace, 
 ### Example
 
 ```typespec
-using Azure.ClientGenerator.Core;
-
 @service namespace ServiceA;
 @service namespace ServiceB;
 
