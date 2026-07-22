@@ -16,7 +16,9 @@ function getVenvPython(): string {
   } else if (fs.existsSync(join(venvPath, "Scripts"))) {
     return join(venvPath, "Scripts", "python.exe");
   }
-  throw new Error("Virtual environment not found. Run 'pnpm run install' first.");
+  throw new Error(
+    "Virtual environment not found. Run 'pnpm run setup:python' from packages/typespec-python first.",
+  );
 }
 
 const argv = parseArgs({
@@ -31,7 +33,7 @@ const argv = parseArgs({
 
 if (argv.values.help) {
   console.log(`
-${pc.bold("Usage:")} tsx format.ts [options]
+${pc.bold("Usage:")} node format.ts [options]
 
 ${pc.bold("Description:")}
   Format code using Prettier (TypeScript) and Black (Python).
@@ -51,13 +53,13 @@ ${pc.bold("Options:")}
 
 ${pc.bold("Examples:")}
   ${pc.dim("# Format all code (default)")}
-  tsx format.ts
+  node format.ts
 
   ${pc.dim("# Format only TypeScript")}
-  tsx format.ts --typescript
+  node format.ts --typescript
 
   ${pc.dim("# Check formatting without making changes")}
-  tsx format.ts --check
+  node format.ts --check
 `);
   process.exit(0);
 }

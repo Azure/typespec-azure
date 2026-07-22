@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { ChildProcess, spawn } from "child_process";
+import { spawn, type ChildProcess } from "child_process";
 import fs from "fs";
 import { cpus } from "os";
 import { dirname, join } from "path";

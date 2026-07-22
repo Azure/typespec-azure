@@ -1,4 +1,4 @@
-import { ChildProcess, spawn, SpawnOptions } from "child_process";
+import { spawn, type ChildProcess, type SpawnOptions } from "child_process";
 import { coerce, satisfies } from "semver";
 
 /*

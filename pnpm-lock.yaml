@@ -3919,9 +3919,6 @@ importers:
       semver:
         specifier: 'catalog:'
         version: 7.8.5
-      tsx:
-        specifier: 'catalog:'
-        version: 4.23.1
     devDependencies:
       '@azure-tools/azure-http-specs':
         specifier: workspace:^

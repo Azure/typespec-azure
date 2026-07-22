@@ -1,8 +1,10 @@
 {
   "extends": "../../core/tsconfig.base.json",
   "compilerOptions": {
+    "erasableSyntaxOnly": true,
     "outDir": "dist",
     "rootDir": ".",
+    "rewriteRelativeImportExtensions": true,
     "tsBuildInfoFile": "temp/tsconfig.tsbuildinfo"
   },
   "include": ["src/**/*.ts", "eng/**/*.ts"]

@@ -15,6 +15,7 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 ## Local development
 
 A repository-wide `pnpm install` does not require Python. Python is only required when developing or testing this package.
+The development scripts require Node.js 22.18 or newer so they can execute TypeScript files directly.
 Install the versions pinned in the repository's `mise.toml` with `mise install python uv`, or provide Python 3.9 or newer
 with either `uv` or `pip`. Then create the development virtual environment from the repository root:
 
