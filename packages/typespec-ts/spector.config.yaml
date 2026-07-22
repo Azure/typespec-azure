@@ -1,0 +1,124 @@
+# yaml-language-server: $schema=../spector-runner/schema/dist/SpectorConfig.json
+#
+# Spec selection for @azure-tools/typespec-ts (opt-in).
+# See Azure/typespec-azure#4997. Keys are spec paths under temp/specs;
+# `outputPath` (when different from the key) is the generated folder.
+
+specs:
+  versioning/removed:
+    - { options: { outputPath: versioning/removed/v2preview } }
+    - { options: { outputPath: versioning/removed/v1 } }
+    - { options: { outputPath: versioning/removed/v2 } }
+  routes: true
+  azure/client-generator-core/flatten-property: true
+  azure/core/model: true
+  azure/resource-manager/resources: true
+  azure/core/lro/rpc: true
+  azure/core/lro/standard: true
+  azure/client-generator-core/access: true
+  azure/client-generator-core/usage: true
+  parameters/body-optionality: true
+  type/model/usage: true
+  client/structure/default: true
+  client/structure/multi-client: true
+  azure/special-headers/client-request-id: true
+  azure/special-headers/conditional-request: true
+  parameters/collection-format: true
+  azure/core/basic: true
+  type/dictionary: true
+  type/property/nullable: true
+  type/property/optionality: true
+  type/model/inheritance/nested-discriminator: true
+  type/model/inheritance/not-discriminated: true
+  type/model/inheritance/enum-discriminator: true
+  type/model/inheritance/single-discriminator: true
+  encode/bytes: true
+  encode/duration: true
+  encode/datetime: true
+  parameters/spread: true
+  server/path/single: true
+  authentication/api-key: true
+  authentication/http/custom: true
+  server/path/multiple: true
+  authentication/oauth2: true
+  authentication/union: true
+  special-headers/repeatability: true
+  azure/core/traits: true
+  type/model/empty: true
+  type/property/value-types: true
+  type/array: true
+  type/model/inheritance/recursive: true
+  type/union: true
+  payload/media-type: true
+  payload/xml: true
+  payload/head: true
+  server/versions/versioned: true
+  server/versions/not-versioned: true
+  type/scalar: true
+  client/naming: true
+  client/naming/enum-conflict: { options: { outputPath: client/naming-enum-conflict } }
+  serialization/encoded-name/json: true
+  azure/core/scalar: true
+  server/endpoint/not-defined: true
+  special-words: true
+  type/enum/extensible: true
+  type/enum/fixed: true
+  type/property/additional-properties: true
+  payload/content-negotiation: true
+  parameters/basic: true
+  versioning/added: true
+  versioning/madeOptional: true
+  versioning/renamedFrom: true
+  versioning/returnTypeChangedFrom: true
+  versioning/typeChangedFrom: true
+  resiliency/srv-driven/old.tsp: { options: { outputPath: resiliency/srv-driven-old } }
+  resiliency/srv-driven/main.tsp: { options: { outputPath: resiliency/srv-driven-main } }
+  azure/resource-manager/common-properties: true
+  azure/example/basic: true
+  azure/core/page: true
+  encode/numeric: true
+  encode/array: true
+  payload/pageable: true
+  azure/payload/pageable: true
+  client/namespace:
+    - { options: { outputPath: client/namespace } }
+    - { options: { outputPath: client/enableModelNamespace } }
+  parameters/path: true
+  azure/encode/duration: true
+  azure/client-generator-core/client-initialization/default: true
+  azure/client-generator-core/client-initialization/individually: true
+  azure/client-generator-core/client-initialization/individuallyParent: true
+  azure/resource-manager/non-resource: true
+  azure/client-generator-core/api-version/header: true
+  azure/client-generator-core/api-version/path: true
+  azure/client-generator-core/api-version/query: true
+  azure/resource-manager/large-header: true
+  azure/client-generator-core/deserialize-empty-string-as-null: true
+  azure/resource-manager/operation-templates: true
+  azure/client-generator-core/hierarchy-building: true
+  client/overload: true
+  azure/client-generator-core/override: true
+  azure/client-generator-core/alternate-type: true
+  azure/versioning/previewVersion: true
+  azure/client-generator-core/next-link-verb: true
+  special-headers/conditional-request: true
+  azure/resource-manager/method-subscription-id: true
+  azure/client-generator-core/client-location/move-to-existing-sub-client: true
+  azure/client-generator-core/client-location/move-to-new-sub-client: true
+  azure/client-generator-core/client-location/move-to-root-client: true
+  azure/client-generator-core/client-location/move-method-parameter-to-client: true
+  azure/client-generator-core/client-default-value: true
+  azure/resource-manager/multi-service: true
+  azure/resource-manager/multi-service-shared-models: true
+  service/multi-service: true
+  parameters/query: true
+  azure/client-generator-core/client-doc: true
+  azure/client-generator-core/response-as-bool: true
+  documentation: true
+
+  # Disabled: needs tcgc upgrade https://github.com/Azure/typespec-azure/pull/3997
+  client/structure/renamed-operation: false
+  client/structure/two-operation-group: false
+  client/structure/client-operation-group: false
+  # Disabled: multipart not yet supported
+  payload/multipart: false

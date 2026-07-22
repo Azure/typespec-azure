@@ -153,6 +153,51 @@ $generateScript = {
   }
 }
 
+# Generate from a shared http-specs/azure-http-specs spec whose selection and
+# emitter options come from the opt-in spector.config.yaml (resolved by
+# resolve-spector-specs.js). Unlike $generateScript, options are pre-resolved
+# (passed in $_.options); only the per-run random output-dir is added here.
+$generateSpecScript = {
+  $spec = $_
+  $tspFile = $spec.tspFile
+
+  $tspOptions = "--option ""@azure-tools/typespec-java.emitter-output-dir={project-root}/tsp-output/$(Get-Random)"""
+  foreach ($opt in $spec.options) {
+    $tspOptions += " --option ""$opt"""
+  }
+
+  $tspTrace = "--trace import-resolution --trace projection --trace typespec-java"
+  $tspCommand = "npx --no-install tsp compile $tspFile $tspOptions $tspTrace"
+
+  # output of "tsp compile" seems trigger powershell error or exit, hence the "2>&1"
+  $timer = [Diagnostics.Stopwatch]::StartNew()
+  $generateOutput = Invoke-Expression $tspCommand 2>&1
+  $timer.Stop()
+
+  $global:ExitCode = $global:ExitCode -bor $LASTEXITCODE
+
+  if ($LASTEXITCODE -ne 0) {
+    Write-Host "
+    ========================
+    $tspCommand
+    ========================
+    FAILED (Time elapsed: $($timer.ToString()))
+    $([String]::Join("`n", $generateOutput))
+    "
+  } else {
+    Write-Host "
+    ========================
+    $tspCommand
+    ========================
+    SUCCEEDED (Time elapsed: $($timer.ToString()))
+    "
+  }
+
+  if ($global:ExitCode -ne 0) {
+    throw "Failed to generate from tsp $tspFile"
+  }
+}
+
 Push-Location $PSScriptRoot
 try {
   ./Setup.ps1 -SkipBuild:$SkipBuild
@@ -191,12 +236,15 @@ try {
   Copy-Item -Path node_modules/@typespec/http-specs/specs -Destination ./ -Recurse -Force
   Copy-Item -Path node_modules/@azure-tools/azure-http-specs/specs -Destination ./ -Recurse -Force
 
-  $specFiles = Get-ChildItem ./specs -Include "main.tsp","old.tsp" -File -Recurse
-  # ensure multi-service client specs are processed even though they do not match the default filter
-  $specFiles += Get-Item (Join-Path ./specs "azure/resource-manager/multi-service/client.tsp")
-  $specFiles += Get-Item (Join-Path ./specs "azure/resource-manager/multi-service-shared-models/client.tsp")
+  # Spec selection + per-spec emitter options live in the opt-in spector.config.yaml
+  # (see Azure/typespec-azure#4997), resolved by the shared @azure-tools/spector-runner
+  # package. resolve-spector-specs.js maps each opted-in spec to its tsp entry file
+  # (preferring client.tsp over main.tsp) and emitter options; adding/removing a spec
+  # is a one-line config change and disabling one is `false` with a comment.
+  $specsRoot = Join-Path $PSScriptRoot "specs"
+  $specPlan = node ./resolve-spector-specs.js $specsRoot | ConvertFrom-Json
 
-  $job = $specFiles | ForEach-Object -Parallel $generateScript -ThrottleLimit $Parallelization -AsJob
+  $job = $specPlan | ForEach-Object -Parallel $generateSpecScript -ThrottleLimit $Parallelization -AsJob
 
   $job | Wait-Job -Timeout 1200
   $job | Receive-Job
