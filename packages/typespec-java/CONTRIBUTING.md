@@ -76,6 +76,41 @@ pnpm run-all --filter "@azure-tools/typespec-java..." build
 Changing the npm registry has been observed to clear this symptom, possibly because
 pnpm re-resolves packages or relinks local binaries after the registry setting changes.
 
+## Debugging
+
+### Debugging TypeScript code
+
+Build the package first, then run the TypeSpec compiler under the Node.js debugger from
+`packages/typespec-java`:
+
+```shell
+node --inspect-brk node_modules/@typespec/compiler/dist/src/core/cli/cli.js compile emitter-tests/<tsp-file>
+```
+
+Attach a debugger to port 9229 and set breakpoints in `src/emitter.ts`,
+`src/code-model-builder.ts`, or their compiled counterparts under `dist/src`.
+
+### Debugging Java code
+
+TypeScript passes the code model and emitter options to Java through the generated
+`emitter-tests/tsp-output/code-model.yaml` file. To debug the Java generator directly:
+
+1. Build the package so `Copy-Sources.ps1` creates the patched generator copy under `generator/`.
+2. Update `DEFAULT_OUTPUT_DIR` in
+   `generator/http-client-generator/src/main/java/com/microsoft/typespec/http/client/generator/Main.java`
+   to the directory containing the `code-model.yaml` to debug.
+3. Run `com.microsoft.typespec.http.client.generator.Main.main()` from an IDE with these VM options:
+
+   ```text
+   --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED
+   ```
+
+The copied generator is recreated on each build, so do not commit changes under `generator/`.
+Emitter options used by `Main` are defined in
+`generator/http-client-generator/src/main/java/com/microsoft/typespec/http/client/generator/model/EmitterOptions.java`.
+When debugging this way, temporarily align them with the options in the relevant `tspconfig.yaml`;
+for example, set `flavor` to `azure`.
+
 ## Before making a Pull request
 
 Make sure to run the following commands:
