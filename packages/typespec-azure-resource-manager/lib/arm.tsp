@@ -14,6 +14,7 @@ import "./extension/extension.tsp";
 import "./backcompat.tsp";
 import "./base-types/base-types.tsp";
 import "./base-types/agent.tsp";
+import "./base-types/relationship.tsp";
 import "./private.decorators.tsp";
 import "./models.tsp";
 import "./operations.tsp";
