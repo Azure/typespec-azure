@@ -64,6 +64,7 @@ export async function createSdkPackage<TServiceOperation extends SdkServiceOpera
     namespaces: [],
     licenseInfo: getLicenseInfo(context),
     metadata: {
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       apiVersion:
         context.apiVersion === "all" && versions.size === 1
           ? "all"
