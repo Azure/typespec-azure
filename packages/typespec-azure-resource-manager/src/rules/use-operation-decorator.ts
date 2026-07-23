@@ -83,7 +83,7 @@ const genericArmResourceDecorators = [
   "$legacyExtensionResourceOperation",
 ] as const;
 
-const genericDecoratorOperationTypeArgIndex: Record<
+const operationTypeArgIndexByDecorator: Record<
   (typeof genericArmResourceDecorators)[number],
   number
 > = {
@@ -116,11 +116,11 @@ function getGenericDecoratorOperationType(decorator: DecoratorApplication): stri
     return undefined;
   }
 
-  const operationTypeArg = decorator.args[genericDecoratorOperationTypeArgIndex[decoratorName]];
-  return getStringJsValue(operationTypeArg);
+  const operationTypeArg = decorator.args[operationTypeArgIndexByDecorator[decoratorName]];
+  return getDecoratorStringValue(operationTypeArg);
 }
 
-function getStringJsValue(arg: DecoratorArgument | undefined): string | undefined {
+function getDecoratorStringValue(arg: DecoratorArgument | undefined): string | undefined {
   return typeof arg?.jsValue === "string" ? arg.jsValue : undefined;
 }
 
