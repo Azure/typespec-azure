@@ -582,6 +582,9 @@ importers:
       '@chronus/github':
         specifier: 'catalog:'
         version: 1.0.6
+      '@chronus/github-pr-commenter':
+        specifier: 'catalog:'
+        version: 1.0.6
       '@pnpm/workspace.find-packages':
         specifier: 'catalog:'
         version: 1000.0.65(@pnpm/logger@1001.0.1)(@pnpm/worker@1000.6.11(@pnpm/logger@1001.0.1)(@types/node@26.1.1))(typanion@3.14.0)
