@@ -1,5 +1,19 @@
 ## Synchronous
 
+````
+
+## Impact
+
+- **Area:** API
+
+The POST operation returns response codes that violate the RPC contract.
+
+## LintDiff Equivalent
+
+This rule corresponds to the LintDiff rule [PostResponseCodes](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md).
+
+## Synchronous
+
 Synchronous post operations should have one of the following combinations of responses - 200 and default, or 204 and default. They must have no other responses.
 
 #### ❌ Incorrect
@@ -13,7 +27,7 @@ interface Employees {
     result: boolean;
   };
 }
-```
+````
 
 #### ✅ Correct
 
@@ -45,3 +59,7 @@ interface Employees {
   delete is ArmResourceDeleteWithoutOkAsync<Employee>;
 }
 ```
+
+## Suppression
+
+Suppress only when required to match an existing API; otherwise use the standard resource action or provider action templates.

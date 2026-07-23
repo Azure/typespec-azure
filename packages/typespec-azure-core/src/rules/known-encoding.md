@@ -8,6 +8,16 @@ Known supported encodings:
 | `duration`                       | `ISO8601`, `seconds`                  |
 | `bytes`                          | `base64`, `base64url`                 |
 
+## Impact
+
+- **Area:** API, SDK
+
+Non-standard formats are transmitted as the raw, unencoded wire type, which hurts API and SDK usability.
+
+## LintDiff Equivalent
+
+This rule corresponds to the LintDiff rule [ValidFormats](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md#r2003).
+
 #### ❌ Incorrect
 
 Unknown encoding on a model property:
@@ -43,3 +53,7 @@ Known encoding on a scalar:
 @encode("rfc3339")
 scalar myDateTime extends utcDateTime;
 ```
+
+## Suppression
+
+Suppress only when required to match an existing API; otherwise use a standard format, encoding, or type.

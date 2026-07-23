@@ -7,6 +7,12 @@ ARM operation responses with status code 202 or 204 should not contain a respons
 
 ### For 202 and 204 status codes (response body should be empty)
 
+## Impact
+
+- **Area:** API
+
+A response - usually a 202 - carries a body that should be empty.
+
 #### ❌ Incorrect
 
 ```tsp
@@ -88,3 +94,7 @@ op walk(): ArmCreatedResponse<{
   }
 }
 ```
+
+## Suppression
+
+Suppress at will for 202, but never for 204. Use the standard operation and response templates.
