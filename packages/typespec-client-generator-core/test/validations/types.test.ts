@@ -1156,8 +1156,55 @@ it("emit error when merged sub-clients have operations with the same name", asyn
   ]);
 });
 
-it("error only for the language where @clientName causes a conflict", async () => {
+it("emit error for all instances in three-way service merge with same operation name", async () => {
   const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace ServiceA {
+      @route("/a")
+      op test(): void;
+    }
+
+    @service
+    namespace ServiceB {
+      @route("/b")
+      op test(): void;
+    }
+
+    @service
+    namespace ServiceC {
+      @route("/c")
+      op test(): void;
+    }
+    `,
+      `
+    @client({service: [ServiceA, ServiceB, ServiceC]})
+    namespace MyClient {}
+    `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const duplicateDiags = context.diagnostics.filter(
+    (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+  );
+  expectDiagnostics(duplicateDiags, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      message: /test/,
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      message: /test/,
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      message: /test/,
+    },
+  ]);
+});
+
+it("error only for the language where @clientName causes a conflict", async () => {
     createClientCustomizationInput(
       `
     @service
