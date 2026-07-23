@@ -88,10 +88,29 @@ jobs:
         displayName: "Run Go e2e tests"
         workingDirectory: packages/typespec-go
 
-      - template: /eng/pipelines/templates/upload-spector-coverage.yml
-        parameters:
-          PackagePath: packages/typespec-go
-          GeneratorName: "@azure-tools/typespec-go"
+      # typespec-go is in the pnpm workspace, so its
+      # node_modules/@azure-tools/azure-http-specs is a symlink resolving to the
+      # monorepo packages/azure-http-specs. The Go e2e harness starts the mock
+      # server from packages/typespec-go, so the combined spec-coverage.json
+      # (http-specs + azure-http-specs scenarios) is written there, NOT in the
+      # specs package. Upload that file directly instead of using the shared
+      # template, which assumes the coverage file lives beside the specs.
+      - task: AzureCLI@2
+        displayName: "Upload spector coverage (typespec-go, azure)"
+        continueOnError: true
+        inputs:
+          azureSubscription: "TypeSpec Storage"
+          scriptType: "bash"
+          scriptLocation: "inlineScript"
+          inlineScript: >-
+            npx tsp-spector upload-coverage
+            --coverageFile ./spec-coverage.json
+            --generatorName "@azure-tools/typespec-go"
+            --storageAccountName typespec
+            --containerName coverages
+            --generatorVersion $(node -p -e "require('./package.json').version")
+            --generatorMode azure
+          workingDirectory: packages/typespec-go
 
   - job: spector_java
     displayName: Spector Coverage (Java)
