@@ -15,7 +15,13 @@ You can try TypeSpec on the web without installing anything.
 
 ## Prerequisites
 
-- Please install [Node.js 24 LTS](https://nodejs.org/) and ensure you are able to run the npm command in a command prompt: `npm --version`.
+- To use these libraries, install [Node.js](https://nodejs.org/) (24 LTS or later) and ensure
+  you can run `node --version` from a command prompt.
+- To develop this repository, install and activate
+  [mise](https://mise.jdx.dev/getting-started.html). From the repository root,
+  run `mise install` to install the development tools defined by `mise.toml` and
+  `mise.lock`. See the [contributing guide](CONTRIBUTING.md#prerequisites) for
+  the complete setup.
 
 ## Getting Started
 
@@ -24,7 +30,7 @@ For TypeSpec language documentation, see https://typespec.io/docs.
 If you are team working on Azure, see TypeSpec Azure development documentation https://azure.github.io/typespec-azure. You should pre-install as well `@azure-tools/typespec-azure-core` to define Azure resources, and `@azure-tools/typespec-autorest` to export in Swagger:
 
 ```
-npm install @typespec/rest @typespec/openapi3 @azure-tools/typespec-azure-core @azure-tools/typespec-autorest
+pnpm add @typespec/rest @typespec/openapi3 @azure-tools/typespec-azure-core @azure-tools/typespec-autorest
 ```
 
 > If you plan to use the output openapi with autorest or any of the azure sdk tooling _you should use typespec-autorest_, the openapi3 emitter is not going to have any of the ms extensions (pageable, lro, client name, etc.) and so it will be losing information.

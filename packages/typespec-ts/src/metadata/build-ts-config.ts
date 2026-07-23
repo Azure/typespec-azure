@@ -61,6 +61,9 @@ export function buildTsSrcEsmConfig() {
     content: JSON.stringify(
       {
         extends: "../../../../eng/tsconfigs/src.esm.json",
+        compilerOptions: {
+          resolveJsonModule: true,
+        },
         include: ["../src/index.ts"],
       },
       null,
@@ -78,6 +81,9 @@ export function buildTsSrcBrowserConfig() {
     content: JSON.stringify(
       {
         extends: "../../../../eng/tsconfigs/src.browser.json",
+        compilerOptions: {
+          resolveJsonModule: true,
+        },
         include: ["../src/index.ts"],
       },
       null,
@@ -95,6 +101,9 @@ export function buildTsSrcReactNativeConfig() {
     content: JSON.stringify(
       {
         extends: "../../../../eng/tsconfigs/src.react-native.json",
+        compilerOptions: {
+          resolveJsonModule: true,
+        },
         include: ["../src/index.ts"],
       },
       null,
@@ -112,6 +121,9 @@ export function buildTsSrcCjsConfig() {
     content: JSON.stringify(
       {
         extends: "../../../../eng/tsconfigs/src.cjs.json",
+        compilerOptions: {
+          resolveJsonModule: true,
+        },
         include: ["../src/index.ts"],
       },
       null,

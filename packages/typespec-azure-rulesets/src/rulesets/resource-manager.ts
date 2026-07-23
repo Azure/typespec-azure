@@ -27,7 +27,7 @@ export default {
     "@azure-tools/typespec-azure-core/no-multiple-discriminator": true,
     "@azure-tools/typespec-azure-core/no-rest-library-interfaces": true,
     "@azure-tools/typespec-azure-core/no-unknown": true,
-    "@azure-tools/typespec-azure-core/no-unnamed-union": true,
+    "@azure-tools/typespec-azure-core/no-unnamed-types": true,
     "@azure-tools/typespec-azure-core/documentation-required": true,
     "@azure-tools/typespec-azure-core/key-visibility-required": true,
     "@azure-tools/typespec-azure-core/response-schema-problem": true,
@@ -76,10 +76,12 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/arm-resource-name-pattern": true,
     "@azure-tools/typespec-azure-resource-manager/arm-custom-resource-no-key": true,
     "@azure-tools/typespec-azure-resource-manager/arm-custom-resource-usage-discourage": true,
+    "@azure-tools/typespec-azure-resource-manager/arm-feature-file-usage-discourage": true,
     "@azure-tools/typespec-azure-resource-manager/arm-legacy-operations-discourage": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-path-segment-invalid-chars": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state": true,
+    "@azure-tools/typespec-azure-resource-manager/no-reserved-resource-property": true,
     "@azure-tools/typespec-azure-resource-manager/beyond-nesting-levels": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-operation": true,
     "@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation": true,
@@ -101,6 +103,5 @@ export default {
     // TCGC rules
     "@azure-tools/typespec-client-generator-core/require-client-suffix": true,
     "@azure-tools/typespec-client-generator-core/property-name-conflict": true,
-    "@azure-tools/typespec-client-generator-core/no-unnamed-types": false, // Too bad performance https://github.com/Azure/typespec-azure/issues/2803
   },
 } satisfies LinterRuleSet;

@@ -121,7 +121,6 @@ it("is valid for operations that follow naming standards", async () => {
     
     #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
     @route("6")
-    #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
     @patch(#{implicitOptionality: true}) op createOrUpdateFoo(@body body: Foo): FooResponse<Foo, 201>;
     
     @route("7")

@@ -5,6 +5,7 @@ import { armCommonTypesVersionRule } from "./rules/arm-common-types-version.js";
 import { armCustomResourceNoKey } from "./rules/arm-custom-resource-no-key.js";
 import { armCustomResourceUsageDiscourage } from "./rules/arm-custom-resource-usage-discourage.js";
 import { armDeleteResponseCodesRule } from "./rules/arm-delete-response-codes.js";
+import { armFeatureFileUsageDiscourage } from "./rules/arm-feature-file-usage-discourage.js";
 import { armNoPathCasingConflictsRule } from "./rules/arm-no-path-casing-conflicts.js";
 import { armNoRecordRule } from "./rules/arm-no-record.js";
 import { armPostResponseCodesRule } from "./rules/arm-post-response-codes.js";
@@ -30,6 +31,7 @@ import { lroLocationHeaderRule } from "./rules/lro-location-header.js";
 import { missingXmsIdentifiersRule } from "./rules/missing-x-ms-identifiers.js";
 import { noEmptyModel } from "./rules/no-empty-model.js";
 import { noOverridePropsRule } from "./rules/no-override-props.js";
+import { noReservedResourcePropertyRule } from "./rules/no-reserved-resource-property.js";
 import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
@@ -63,6 +65,7 @@ const rules = [
   versionProgressionRule,
   armCustomResourceNoKey,
   armCustomResourceUsageDiscourage,
+  armFeatureFileUsageDiscourage,
   beyondNestingRule,
   coreOperationsRule,
   deleteOperationMissingRule,
@@ -81,6 +84,7 @@ const rules = [
   unsupportedTypeRule,
   secretProprule,
   noEmptyModel,
+  noReservedResourcePropertyRule,
 ];
 
 export const $linter = defineLinter({

@@ -1,8 +1,9 @@
-import { Operation, createRule, paramMessage } from "@typespec/compiler";
+import { Operation, createRule, fileRef, paramMessage } from "@typespec/compiler";
 import { getHttpOperation, isBodyIgnore } from "@typespec/http";
 
 export const rpcOperationRequestBodyRule = createRule({
   name: "rpc-operation-request-body",
+  docs: fileRef.fromPackageRoot("src/rules/rpc-operation-request-body.md"),
   description: "Warning for RPC body problems.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/rpc-operation-request-body",

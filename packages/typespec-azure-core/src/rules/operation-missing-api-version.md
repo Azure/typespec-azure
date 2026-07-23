@@ -1,0 +1,17 @@
+Ensure all operations have an `apiVersion` parameter.
+
+:::caution
+Seeing this error is also a sign that you are not using the Azure Standard templates. First double check why you cannot use them.
+:::
+
+#### ❌ Incorrect
+
+```tsp
+op createPet(pet: Pet): void;
+```
+
+### ✅ Correct
+
+```tsp
+op createPet(pet: Pet, ...Azure.Core.Foundations.ApiVersionParameter): void;
+```

@@ -12,6 +12,7 @@ import {
   Namespace,
   NumericLiteral,
   Operation,
+  Program,
   Scalar,
   StringLiteral,
   Tuple,
@@ -21,6 +22,7 @@ import {
   getDiscriminator,
   getEncode,
   getLifecycleVisibilityEnum,
+  getMediaTypeHint,
   getSummary,
   getVisibilityForClass,
   ignoreDiagnostics,
@@ -30,6 +32,8 @@ import {
   isTemplateDeclaration,
   resolveEncodedName,
 } from "@typespec/compiler";
+import { isEvents } from "@typespec/events";
+import { unsafe_getEventDefinitions as getEventDefinitions } from "@typespec/events/experimental";
 import {
   Authentication,
   HttpOperationFileBody,
@@ -218,8 +222,8 @@ export function addEncodeInfo(
       innerType.encode = "bytes";
     }
   }
-  if (isSdkIntKind(innerType.kind)) {
-    // only integer type is allowed to be encoded as string
+  if (isSdkIntKind(innerType.kind) || innerType.kind === "boolean") {
+    // integer and boolean types are allowed to be encoded as string
     if (encodeData) {
       if (encodeData?.encoding) {
         (innerType as any).encode = encodeData.encoding;
@@ -819,6 +823,7 @@ function addDiscriminatorToModelType(
       doc: `Discriminator property for ${model.name}.`,
       optional: false,
       discriminator: true,
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       serializedName: discriminatorProperty
         ? discriminatorProperty.serializedName // eslint-disable-line @typescript-eslint/no-deprecated
         : discriminator.propertyName,
@@ -832,6 +837,7 @@ function addDiscriminatorToModelType(
         ? getAvailableApiVersions(context, discriminatorProperty.__raw!, type)
         : model.apiVersions,
       isApiVersionParam: false,
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
       crossLanguageDefinitionId: `${model.crossLanguageDefinitionId}.${name}`,
@@ -935,8 +941,7 @@ export function getSdkModelWithDiagnostics(
     const rawBaseModel = getLegacyHierarchyBuilding(context, type) || type.baseModel;
     if (rawBaseModel) {
       sdkType.baseModel = context.__referencedTypeCache.get(rawBaseModel) as
-        | SdkModelType
-        | undefined;
+        SdkModelType | undefined;
 
       if (sdkType.baseModel === undefined) {
         // Use "AdditionalProperty" label for Record base models
@@ -1537,6 +1542,66 @@ interface PropagationOptions {
   isOverride?: boolean;
 }
 
+/**
+ * Infers the default content type for an event type, mirroring the HTTP lib behavior:
+ * - Models → "application/json"
+ * - Scalars → "text/plain"
+ * - Literals/constants → undefined (no serialization needed)
+ */
+function inferEventContentType(program: Program, type: Type): string | undefined {
+  // Use @mediaTypeHint if explicitly set on the type, otherwise fall back to kind-based default
+  const hint = getMediaTypeHint(program, type);
+  if (hint) return hint;
+  if (type.kind === "Model") return "application/json";
+  if (type.kind === "Scalar") return "text/plain";
+  return undefined;
+}
+
+/**
+ * Propagates `UsageFlags.Json` and serialization options to individual SSE event `type` and
+ * `payloadType` based on their per-event content type. When no explicit content type is set,
+ * infers a default using the same logic as the HTTP lib (model → application/json,
+ * scalar → text/plain).
+ */
+function propagateSseEventUsage(
+  context: TCGCContext,
+  streamType: Type,
+  operation: Operation,
+  diagnostics: ReturnType<typeof createDiagnosticCollector>,
+): void {
+  if (streamType.kind !== "Union" || !isEvents(context.program, streamType)) {
+    return;
+  }
+  const eventDefinitions = diagnostics.pipe(getEventDefinitions(context.program, streamType));
+  for (const event of eventDefinitions) {
+    const effectiveContentType =
+      event.contentType ?? inferEventContentType(context.program, event.type);
+    const effectivePayloadContentType =
+      event.payloadContentType ?? inferEventContentType(context.program, event.payloadType);
+
+    if (effectiveContentType) {
+      const sdkType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, event.type, operation),
+      );
+      if (isMediaTypeJson(effectiveContentType)) {
+        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkType));
+      }
+      diagnostics.pipe(updateSerializationOptions(context, sdkType, [effectiveContentType]));
+    }
+    if (effectivePayloadContentType) {
+      const sdkPayloadType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, event.payloadType, operation),
+      );
+      if (isMediaTypeJson(effectivePayloadContentType)) {
+        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkPayloadType));
+      }
+      diagnostics.pipe(
+        updateSerializationOptions(context, sdkPayloadType, [effectivePayloadContentType]),
+      );
+    }
+  }
+}
+
 export function updateUsageOrAccess(
   context: TCGCContext,
   value: UsageFlags | AccessFlags,
@@ -1822,6 +1887,8 @@ function updateTypesFromOperation(
       }
       const access = getAccessOverride(context, operation) ?? "public";
       diagnostics.pipe(updateUsageOrAccess(context, access, sdkStreamType));
+      // Propagate Json usage to individual SSE event types based on per-event content type
+      propagateSseEventUsage(context, requestStreamMeta.streamType, operation, diagnostics);
     }
 
     // Push "Parameter" context for operation parameters
@@ -1953,6 +2020,8 @@ function updateTypesFromOperation(
           }
           const access = getAccessOverride(context, operation) ?? "public";
           diagnostics.pipe(updateUsageOrAccess(context, access, sdkStreamType));
+          // Propagate Json usage to individual SSE event types based on per-event content type
+          propagateSseEventUsage(context, responseStreamMeta.streamType, operation, diagnostics);
         }
       }
     }
@@ -2469,6 +2538,10 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
       }
       filterPreviewVersion(context, sdkVersionsEnum, versions?.at(-1) || "", service);
       diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum));
+      if (!context.__serviceToVersionsSdkEnum) {
+        context.__serviceToVersionsSdkEnum = new Map();
+      }
+      context.__serviceToVersionsSdkEnum.set(service, sdkVersionsEnum);
     }
   }
   // update for orphan models/enums/unions
@@ -2510,6 +2583,12 @@ function updateSerializationOptions(
   }
 
   if (type.kind === "array" || type.kind === "dict") {
+    // An array/dict only needs its own serialization options when it is a named model
+    // with explicit serialization decorators (e.g. `@Xml.name("Foo") model Foo is Bar[];`);
+    // otherwise the wrapping element name comes from the property/model that references it.
+    // Passing an empty content type list ensures only explicitly-defined info is captured,
+    // avoiding spurious names on anonymous inline arrays/dicts.
+    setSerializationOptions(context, type, []);
     updateSerializationOptions(context, type.valueType, contentTypes, options);
     return diagnostics.wrap(undefined);
   }
@@ -2596,33 +2675,33 @@ function updateSerializationOptions(
 
 function setSerializationOptions(
   context: TCGCContext,
-  type: SdkModelType | SdkModelPropertyType,
+  type: SdkModelType | SdkModelPropertyType | SdkArrayType | SdkDictionaryType,
   contentTypes: string[],
 ) {
   for (const contentType of contentTypes) {
-    if (isMediaTypeJson(contentType) && !type.serializationOptions.json) {
+    if (isMediaTypeJson(contentType) && !type.serializationOptions?.json) {
       updateJsonSerializationOptions(context, type);
     }
 
-    if (isMediaTypeXml(contentType) && !type.serializationOptions.xml) {
+    if (isMediaTypeXml(contentType) && !type.serializationOptions?.xml) {
       updateXmlSerializationOptions(context, type);
     }
   }
   if (
-    !type.serializationOptions.json &&
+    !type.serializationOptions?.json &&
     type.__raw &&
     hasExplicitlyDefinedJsonSerializationInfo(context, type.__raw)
   ) {
     updateJsonSerializationOptions(context, type);
   }
   if (
-    !type.serializationOptions.xml &&
+    !type.serializationOptions?.xml &&
     type.__raw &&
     hasExplicitlyDefinedXmlSerializationInfo(context, type.__raw)
   ) {
     updateXmlSerializationOptions(context, type);
   }
-  const defaultContentTypes = type.serializationOptions.multipart?.defaultContentTypes;
+  const defaultContentTypes = type.serializationOptions?.multipart?.defaultContentTypes;
   if (defaultContentTypes && type.kind === "property" && type.type.kind === "model") {
     for (const prop of type.type.properties) {
       if (prop.kind === "property") {
@@ -2634,25 +2713,31 @@ function setSerializationOptions(
 
 function updateJsonSerializationOptions(
   context: TCGCContext,
-  type: SdkModelType | SdkModelPropertyType,
+  type: SdkModelType | SdkModelPropertyType | SdkArrayType | SdkDictionaryType,
 ) {
-  type.serializationOptions.json = {
+  const serializationOptions = (type.serializationOptions ??= {});
+  serializationOptions.json = {
     name:
       type.__raw?.kind === "Model" || type.__raw?.kind === "ModelProperty"
         ? resolveEncodedName(context.program, type.__raw, "application/json")
-        : type.name,
+        : "name" in type
+          ? type.name
+          : "",
   };
 }
 
 function updateXmlSerializationOptions(
   context: TCGCContext,
-  type: SdkModelType | SdkModelPropertyType,
+  type: SdkModelType | SdkModelPropertyType | SdkArrayType | SdkDictionaryType,
 ) {
-  type.serializationOptions.xml = {
+  const serializationOptions = (type.serializationOptions ??= {});
+  serializationOptions.xml = {
     name:
       type.__raw?.kind === "Model" || type.__raw?.kind === "ModelProperty"
         ? resolveEncodedName(context.program, type.__raw, "application/xml")
-        : type.name,
+        : "name" in type
+          ? type.name
+          : "",
     attribute: type.__raw?.kind === "ModelProperty" && isAttribute(context.program, type.__raw),
     ns: type.__raw ? getNs(context.program, type.__raw) : undefined,
     unwrapped: type.__raw?.kind === "ModelProperty" && isUnwrapped(context.program, type.__raw),
@@ -2664,26 +2749,26 @@ function updateXmlSerializationOptions(
     type.__raw.type.kind === "Model" &&
     isArrayModelType(type.__raw.type)
   ) {
-    if (!type.serializationOptions.xml.unwrapped) {
+    if (!serializationOptions.xml.unwrapped) {
       // if wrapped, set itemsName and itemsNS according to the array item type
       const itemType = type.__raw.type.indexer.value;
       if ("name" in itemType) {
         // if the type has name then get the name
-        type.serializationOptions.xml.itemsName = resolveEncodedName(
+        serializationOptions.xml.itemsName = resolveEncodedName(
           context.program,
           itemType as Type & { name: string },
           "application/xml",
         );
-        type.serializationOptions.xml.itemsNs = getNs(context.program, itemType);
+        serializationOptions.xml.itemsNs = getNs(context.program, itemType);
       } else {
         // otherwise use the property name
-        type.serializationOptions.xml.itemsName = type.serializationOptions.xml.name;
-        type.serializationOptions.xml.itemsNs = type.serializationOptions.xml.ns;
+        serializationOptions.xml.itemsName = serializationOptions.xml.name;
+        serializationOptions.xml.itemsNs = serializationOptions.xml.ns;
       }
     } else {
       // if unwrapped, always set itemName to property name
-      type.serializationOptions.xml.itemsName = type.serializationOptions.xml.name;
-      type.serializationOptions.xml.itemsNs = type.serializationOptions.xml.ns;
+      serializationOptions.xml.itemsName = serializationOptions.xml.name;
+      serializationOptions.xml.itemsNs = serializationOptions.xml.ns;
     }
   }
 }

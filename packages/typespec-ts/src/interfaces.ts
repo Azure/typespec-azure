@@ -334,7 +334,6 @@ export interface PackageDetails {
   nameWithoutScope?: string;
   description?: string;
   version?: string;
-  isVersionUserProvided?: boolean;
 }
 export interface OperationParameter {
   operationGroup: string;
