@@ -8,6 +8,12 @@ packages:
   - "!core/packages/http-client-java/**"
   - "!core/packages/http-client-python/**"
   - "!core/packages/typespec-vs"
+
+# Disable pnpm 11's "verify deps before run" (default `install`), which auto-installs
+# on every `pnpm run`. With the nested `core/` workspace this races during parallel
+# turbo builds and fails with ERR_PNPM_ENOTEMPTY.
+verifyDepsBeforeRun: false
+
 overrides:
   "cross-spawn@>=7.0.0 <7.0.5": "^7.0.5"
 
