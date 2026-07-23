@@ -100,6 +100,7 @@ export default defineConfig({
     owner: "Azure",
     repo: "typespec-azure",
   },
+  externalOwners: {},
   areaPaths: AreaPaths,
   labels: {
     area: {

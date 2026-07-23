@@ -5,7 +5,7 @@
   "type": "module",
   "packageManager": "pnpm@11.10.0",
   "scripts": {
-    "run-all": "turbo --filter=!@typespec/monorepo",
+    "run-all": "cross-env PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN=false turbo --filter=!@typespec/monorepo",
     "run-azure-only": "turbo --filter=!{./core/**}",
     "build": "pnpm run-all build && pnpm check:eng",
     "deps": "tsx eng/scripts/sync-deps.ts",
@@ -52,6 +52,7 @@
     "@pnpm/workspace.find-packages": "catalog:",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
+    "cross-env": "catalog:",
     "cspell": "catalog:",
     "oxlint": "catalog:",
     "oxlint-tsgolint": "catalog:",

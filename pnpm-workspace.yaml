@@ -8,6 +8,12 @@ packages:
   - "!core/packages/http-client-java/**"
   - "!core/packages/http-client-python/**"
   - "!core/packages/typespec-vs"
+
+# Disable pnpm 11's "verify deps before run" (default `install`), which auto-installs
+# on every `pnpm run`. With the nested `core/` workspace this races during parallel
+# turbo builds and fails with ERR_PNPM_ENOTEMPTY.
+verifyDepsBeforeRun: false
+
 overrides:
   "cross-spawn@>=7.0.0 <7.0.5": "^7.0.5"
 
@@ -190,7 +196,8 @@ catalog:
   ts-morph: ^23.0.0
   tslib: ^2.3.1
   tsx: ^4.21.0
-  turbo: "2.10.5"
+  # Pinned to 2.9.14: "turbo 2.10.1+ ships libghostty-vt built with non-baseline"
+  turbo: "2.9.14"
   typedoc: ^0.28.19
   typedoc-plugin-markdown: ^4.11.0
   typescript: ~6.0.2
