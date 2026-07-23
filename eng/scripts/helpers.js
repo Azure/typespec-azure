@@ -1,4 +1,3 @@
-import { findWorkspacePackagesNoCheck } from "@pnpm/workspace.find-packages";
 import { spawn, spawnSync } from "child_process";
 import { lstatSync, readdirSync } from "fs";
 import { dirname, resolve } from "path";
@@ -9,16 +8,6 @@ export const coreRepoRoot = resolve(repoRoot, "core");
 export const prettier = resolve(repoRoot, "core/packages/compiler/node_modules/.bin/prettier");
 export const tsc = resolve(repoRoot, "core/packages/compiler/node_modules/.bin/tsc");
 export const autorest = resolve(repoRoot, "eng/scripts/node_modules/.bin/autorest");
-
-/** @returns {Promise<import("@pnpm/workspace.find-packages").Project[]>*/
-export function listPackages() {
-  return findWorkspacePackagesNoCheck(repoRoot);
-}
-
-export async function getProjectVersion(projectName) {
-  const packages = await listPackages();
-  return packages.find((each) => each.manifest.name === projectName).version;
-}
 
 // We could use { shell: true } to let Windows find .cmd, but that causes other issues.
 // It breaks ENOENT checking for command-not-found and also handles command/args with spaces
