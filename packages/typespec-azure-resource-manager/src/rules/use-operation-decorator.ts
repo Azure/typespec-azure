@@ -83,10 +83,14 @@ const genericArmResourceDecorators = [
   "$legacyExtensionResourceOperation",
 ] as const;
 
-const operationTypeArgIndexByDecorator: Record<
-  (typeof genericArmResourceDecorators)[number],
-  number
-> = {
+type GenericArmResourceDecorator = (typeof genericArmResourceDecorators)[number];
+
+// operationType argument position per decorator signature:
+// - extensionResourceOperation(targetResourceType, extensionResourceType, operationType, ...)
+// - legacyResourceOperation(resourceType, operationType, ...)
+// - builtInResourceOperation(parentResourceType, builtInResourceType, operationType, ...)
+// - legacyExtensionResourceOperation(resourceType, operationType, ...)
+const operationTypeArgIndexByDecorator: Record<GenericArmResourceDecorator, number> = {
   $extensionResourceOperation: 2,
   $legacyResourceOperation: 1,
   $builtInResourceOperation: 2,
@@ -110,9 +114,13 @@ const operationTypesByVerb: Partial<Record<HttpVerb, readonly string[]>> = {
   post: ["action"],
 };
 
+function isGenericArmResourceDecorator(name: string): name is GenericArmResourceDecorator {
+  return genericArmResourceDecorators.includes(name as GenericArmResourceDecorator);
+}
+
 function getGenericDecoratorOperationType(decorator: DecoratorApplication): string | undefined {
-  const decoratorName = decorator.decorator.name as (typeof genericArmResourceDecorators)[number];
-  if (!genericArmResourceDecorators.includes(decoratorName)) {
+  const decoratorName = decorator.decorator.name;
+  if (!isGenericArmResourceDecorator(decoratorName)) {
     return undefined;
   }
 
