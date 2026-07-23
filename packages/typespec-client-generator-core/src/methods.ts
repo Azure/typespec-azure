@@ -56,6 +56,7 @@ import {
   SdkPropertyMap,
   SdkServiceMethod,
   SdkServiceOperation,
+  SdkSseMetadata,
   SdkStreamMetadata,
   SdkTerminationStatus,
   SdkType,
@@ -668,9 +669,11 @@ function getSdkMethodResponse(
 
   // Propagate stream metadata from HTTP responses to method response
   let streamMetadata: SdkStreamMetadata | undefined;
+  let sseMetadata: SdkSseMetadata | undefined;
   for (const response of responses) {
     if (response.streamMetadata) {
       streamMetadata = response.streamMetadata;
+      sseMetadata = response.sseMetadata;
       break;
     }
   }
@@ -680,6 +683,7 @@ function getSdkMethodResponse(
     type,
     ...(optional !== undefined && { optional }),
     ...(streamMetadata && { streamMetadata }),
+    ...(sseMetadata && { sseMetadata }),
   };
 }
 
