@@ -21,7 +21,7 @@ Here is an example of a linter warning:
 ```bash
 Diagnostics were reported during compilation:
 
-C:/typespec-samples/resource-manager/zerotrust/main.tsp:38:3 - warning @azure-tools/typespec-azure-resource-manager/arm-resource-operation-missing-decorator: Resource POST operation must be decorated with @armResourceAction.
+C:/typespec-samples/resource-manager/zerotrust/main.tsp:38:3 - warning @azure-tools/typespec-azure-resource-manager/use-operation-decorator: Resource POST operation must be decorated with @armResourceAction.
 > 38 |   /** Gets the Zero Trust URL for this resource */
      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 > 39 |   @post
@@ -36,7 +36,7 @@ Found 1 warning.
 To suppress the warning, you would use the `#suppress` directive on the type that violates the rule. The directive takes the fully-qualified name of the rule you are suppressing, and a reason for the suppression.
 
 ```typespec
-  #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-missing-decorator" "This is a sample suppression."
+  #suppress "@azure-tools/typespec-azure-resource-manager/use-operation-decorator" "This is a sample suppression."
   /** Gets the MAA URL for this resource */
   @post
   getZeroTrustUrl(...ResourceInstanceParameters<ZeroTrustResource>): ZeroTrustUrl | ErrorResponse;

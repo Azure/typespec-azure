@@ -23,7 +23,6 @@ import { patchOperationsRule } from "./rules/arm-resource-patch.js";
 import { armResourcePathInvalidCharsRule } from "./rules/arm-resource-path-invalid-chars.js";
 import { armResourceProvisioningStateRule } from "./rules/arm-resource-provisioning-state-rule.js";
 import { beyondNestingRule } from "./rules/beyond-nesting-levels.js";
-import { coreOperationsRule } from "./rules/core-operations.js";
 import { envelopePropertiesRules } from "./rules/envelope-properties.js";
 import { improperSubscriptionListOperationRule } from "./rules/improper-subscription-list-operation.js";
 import { lroLocationHeaderRule } from "./rules/lro-location-header.js";
@@ -39,6 +38,9 @@ import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
 import { secretProprule } from "./rules/secret-prop.js";
 import { unsupportedTypeRule } from "./rules/unsupported-type.js";
+import { useApiVersionRule } from "./rules/use-api-version.js";
+import { useInterfaceRule } from "./rules/use-interface.js";
+import { useOperationDecoratorRule } from "./rules/use-operation-decorator.js";
 import { versionProgressionRule } from "./rules/version-progression.js";
 
 const rules = [
@@ -58,6 +60,8 @@ const rules = [
   armResourceKeyInvalidCharsRule,
   armResourceNamePatternRule,
   armResourceOperationsRule,
+  useApiVersionRule,
+  useOperationDecoratorRule,
   armResourcePathInvalidCharsRule,
   armResourceProvisioningStateRule,
   versionProgressionRule,
@@ -65,7 +69,7 @@ const rules = [
   armCustomResourceUsageDiscourage,
   armFeatureFileUsageDiscourage,
   beyondNestingRule,
-  coreOperationsRule,
+  useInterfaceRule,
   deleteOperationMissingRule,
   envelopePropertiesRules,
   interfacesRule,
