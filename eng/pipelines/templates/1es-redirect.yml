@@ -26,6 +26,14 @@ extends:
   ${{ else }}:
     template: v1/1ES.Unofficial.PipelineTemplate.yml@1ESPipelineTemplates
   parameters:
+    # Route 'go' CLI traffic through the centralized internal Go module proxy so
+    # `go` invocations during emitter code generation (e.g. typespec-go
+    # tspcompile) can resolve public modules in network-isolated CI agents.
+    # See https://aka.ms/goproxy_for_how_to_onboard
+    featureFlags:
+      golang:
+        internalModuleProxy:
+          enabled: true
     settings:
       skipBuildTagsForGitHubPullRequests: true
       networkIsolationPolicy: Permissive, CFSClean
