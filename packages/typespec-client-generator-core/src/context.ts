@@ -41,6 +41,7 @@ import {
 } from "./interfaces.js";
 import {
   BrandedSdkEmitterOptionsInterface,
+  findServiceForOperation,
   handleVersioningMutationForGlobalNamespace,
   parseEmitterName,
   TCGCEmitterOptions,
@@ -276,12 +277,15 @@ function validateOperationNamesInClients(context: SdkContext) {
     return diagnostics.wrap(undefined);
   }
 
-  for (const [, operations] of context.__clientToOperationsCache) {
+  for (const [client, operations] of context.__clientToOperationsCache) {
     if (operations.length <= 1) continue;
-    // Only check clients whose operations come from multiple namespaces/interfaces,
-    // since same-namespace duplicates are already caught by validateClientNamesPerNamespace.
-    const containers = new Set(operations.map((op) => op.namespace ?? op.interface));
-    if (containers.size <= 1) continue;
+    // Only check clients whose operations come from multiple source services,
+    // since same-service duplicates are already caught by validateClientNamesPerNamespace.
+    const services = client.services.length > 0 ? client.services : client.parent?.services ?? [];
+    const sourceServices = new Set(
+      operations.map((op) => findServiceForOperation(services, op)),
+    );
+    if (sourceServices.size <= 1) continue;
 
     const nameTracker = new Map<string, Operation[]>();
     for (const op of operations) {
