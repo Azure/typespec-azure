@@ -3,6 +3,12 @@ Using those decorators is usually a sign that the spec is either not following t
 
 Those decorators are only meant to be read by the openapi emitters which means this might achieve the correct OpenAPI output but other emitters(client SDK, service, etc.) will not be able to understand them and will see a broken representation of the spec.
 
+## Impact
+
+- **Area:** API, SDK, Emitters
+
+Raw OpenAPI (`@openapi` and extensions) changes the OpenAPI output without informing other emitters such as SDKs, so SDKs can misrepresent the wire API.
+
 ## Decorators and their alternatives
 
 | OpenAPI Decorator                    | Alternative                                                                                                                                                     |
@@ -100,3 +106,7 @@ interface Pet {
   get(): Pet;
 }
 ```
+
+## Suppression
+
+Suppression is acceptable when the extension does not affect the API or SDK - for example `@externalDocs`, or extensions like `x-ms-identifiers`. Extensions that do affect behavior should never be suppressed: use `@list` instead of `x-ms-pageable`, the Async operation templates instead of `x-ms-long-running-operation*`, `@secret` or a password type instead of `x-ms-secret`, and `@clientLocation` or `@clientName` instead of `@operationId`.

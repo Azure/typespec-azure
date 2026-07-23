@@ -5,6 +5,12 @@ ARM service api-versions must:
 
 This rule complements [`arm-resource-invalid-version-format`](./arm-resource-invalid-version-format.md), which validates the format of each individual version string. `arm-version-progression` does not flag malformed version strings — those are reported by the format rule.
 
+## Impact
+
+- **Area:** API, SDK, Tooling
+
+Out-of-order versions, or versions with matching dates, make specs unmaintainable and cause SDK problems.
+
 #### ❌ Incorrect
 
 A preview and a stable version share the same date:
@@ -60,3 +66,7 @@ enum Versions {
   v2024_06_02_preview: "2024-06-02-preview",
 }
 ```
+
+## Suppression
+
+Do not suppress. Ensure new api-versions are unique and monotonically increasing from top to bottom in the Versions enum.
