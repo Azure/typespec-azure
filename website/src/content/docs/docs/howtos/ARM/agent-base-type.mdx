@@ -1,0 +1,162 @@
+---
+title: Agent Base Type
+description: Defining ARM Agent resources and their Conversation and Response child resources
+---
+
+:::caution
+The Agent base type is **experimental**. Its shape may change in future versions of the
+`@azure-tools/typespec-azure-resource-manager` library. Applying `@azureBaseType` (directly or
+through the `Agent` template) in a provider namespace emits the `basetypes-experimental` warning,
+which you must explicitly suppress while the feature is experimental.
+:::
+
+An _Agent_ is an ARM base type: a structured contract that a resource conforms to. The library
+provides the `Agent` tracked-resource template together with the `AgentConversation` and
+`AgentResponse` child-resource templates, plus the property models needed to describe an agent's
+definition, tools, conversations, and responses. These live in the
+`Azure.ResourceManager.BaseTypes` and `Azure.ResourceManager.BaseTypes.Agents` namespaces.
+
+```typespec
+using Azure.ResourceManager.BaseTypes;
+using Azure.ResourceManager.BaseTypes.Agents;
+```
+
+## Deployment models: Appliance vs. Platform
+
+Every agent shape comes in two variants that differ only in property visibility:
+
+- **Appliance** — the service owns and reports the agent configuration. Definition and agent
+  properties are **read-only**.
+- **Platform** — the client owns and manages the agent configuration. Definition and agent
+  properties are **writable** (except `baseTypes`, which is always ARM-managed and read-only).
+
+Pick the variant that matches how your resource provider manages agents, then use the matching
+`*Appliance` or `*Platform` models throughout.
+
+## Defining the agent definition
+
+The agent definition describes the model and behavior of the agent. Derive it from
+`AgentDefinitionAppliance` or `AgentDefinitionPlatform`. Both templates take two boolean value
+parameters that control whether the optional `modelDeploymentRef` and `instructions` properties are
+present:
+
+```typespec
+model AgentDefinitionAppliance<
+  HasModelDeploymentRef extends valueof boolean = false,
+  HasInstructions extends valueof boolean = false
+>
+```
+
+For example, to include both optional properties:
+
+```typespec
+// Appliance definition: read-only fields managed by the service
+model ContosoApplianceDefinition is AgentDefinitionAppliance<true, true>;
+
+// Platform definition: writable fields managed by the client
+model ContosoPlatformDefinition is AgentDefinitionPlatform<true, true>;
+```
+
+## Defining the agent properties
+
+The agent property bag is derived from `AgentPropertiesAppliance` or `AgentPropertiesPlatform`,
+parameterized by your definition model. Spread `DefaultProvisioningStateProperty` to add the
+standard `provisioningState`:
+
+```typespec
+// Appliance agent properties: service-managed, read-only
+model ContosoApplianceAgentProperties is AgentPropertiesAppliance<ContosoApplianceDefinition> {
+  ...DefaultProvisioningStateProperty;
+}
+
+// Platform agent properties: client-managed, writable
+model ContosoPlatformAgentProperties is AgentPropertiesPlatform<ContosoPlatformDefinition> {
+  ...DefaultProvisioningStateProperty;
+}
+```
+
+## Defining the agent resource
+
+The `Agent<Properties>` template creates an ARM `TrackedResource` and automatically applies the
+`@azureBaseType` decorator for the Agent base type. Add the usual `ResourceNameParameter` spread and
+suppress the experimental warning:
+
+```typespec
+#suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "Experimental BaseTypes"
+model ContosoApplianceAgent is Agent<ContosoApplianceAgentProperties> {
+  ...ResourceNameParameter<ContosoApplianceAgent>;
+}
+```
+
+## Conversation and Response child resources
+
+An Agent resource **must** declare both a `Conversation` and a `Response` proxy child resource;
+omitting either triggers the
+[`arm-agent-base-type-child-resources`](/docs/libraries/azure-resource-manager/rules/arm-agent-base-type-child-resources)
+rule. Use the `AgentConversation` and `AgentResponse` templates, which both take the child property
+bag and the parent `Agent` resource type:
+
+```typespec
+model ContosoConversationProperties is ConversationProperties {
+  ...DefaultProvisioningStateProperty;
+
+  /** System prompt / behavioral instructions for this conversation. */
+  instructions?: string;
+}
+
+model ContosoResponseProperties is ResponseProperties {
+  ...PreviousResponseProperty;
+  ...DefaultProvisioningStateProperty;
+}
+
+model ApplianceConversation
+  is AgentConversation<ContosoConversationProperties, ContosoApplianceAgent> {
+  ...ResourceNameParameter<ApplianceConversation>;
+}
+
+model ApplianceResponse is AgentResponse<ContosoResponseProperties, ContosoApplianceAgent> {
+  ...ResourceNameParameter<ApplianceResponse>;
+}
+```
+
+Both child resources require a full create, read, update, and delete lifecycle. Omitting any of
+these operations triggers the
+[`arm-agent-base-type-lifecycle-operations`](/docs/libraries/azure-resource-manager/rules/arm-agent-base-type-lifecycle-operations)
+rule:
+
+```typespec
+@armResourceOperations
+interface ApplianceConversations {
+  get is ArmResourceRead<ApplianceConversation>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<ApplianceConversation>;
+  update is ArmCustomPatchSync<
+    ApplianceConversation,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<
+      ApplianceConversation,
+      ContosoConversationProperties
+    >
+  >;
+  delete is ArmResourceDeleteWithoutOkAsync<ApplianceConversation>;
+  listByAgent is ArmResourceListByParent<ApplianceConversation>;
+}
+```
+
+## Applying `@azureBaseType` directly
+
+The `Agent` template applies `@azureBaseType` for you. If you need to declare base-type conformance
+on a properties model directly, apply the decorator with a `BaseTypeInfo` value. It may be applied
+multiple times to declare conformance to multiple base types; duplicate entries are ignored:
+
+```typespec
+@azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
+model MyAgentProperties {
+  ...AgentPropertiesPlatform<MyDefinition>;
+  ...DefaultProvisioningStateProperty;
+}
+```
+
+## Complete example
+
+For a full working specification covering both the Appliance and Platform deployment models with
+their Conversation and Response child resources, see the
+[Agent Base Type sample](https://github.com/Azure/typespec-azure/tree/main/packages/samples/specs/resource-manager/resource-types/agent).
