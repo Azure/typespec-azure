@@ -43,7 +43,7 @@ pnpm install
 
 # From the repo root, build typespec-java along with all its dependencies.
 # Use run-all so pnpm does not auto-install concurrently during the Turbo build.
-pnpm run-all --filter "@azure-tools/typespec-java^..." build
+pnpm run-all --filter "@azure-tools/typespec-java..." build
 ```
 
 ### Pinning the core commit (`core-commit.json`)
@@ -70,7 +70,7 @@ force pnpm to refresh the local install state and rerun the command:
 
 ```powershell
 pnpm install --force
-pnpm run-all --filter "@azure-tools/typespec-java^..." build
+pnpm run-all --filter "@azure-tools/typespec-java..." build
 ```
 
 Changing the npm registry has been observed to clear this symptom, possibly because
