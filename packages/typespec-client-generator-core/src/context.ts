@@ -274,32 +274,25 @@ function validateOperationNamesInClients(context: SdkContext) {
 
   const validateClient = (client: SdkClientType<SdkHttpOperation>) => {
     if (client.methods.length > 1) {
-      // Only check clients whose methods come from multiple source containers,
-      // since same-container duplicates are already caught by validateClientNamesPerNamespace.
-      const containers = new Set(
-        client.methods.map((m) => m.__raw?.namespace ?? m.__raw?.interface),
-      );
-      if (containers.size > 1) {
-        const nameTracker = new Map<string, SdkServiceMethod<SdkHttpOperation>[]>();
-        for (const method of client.methods) {
-          if (!nameTracker.has(method.name)) {
-            nameTracker.set(method.name, [method]);
-          } else {
-            nameTracker.get(method.name)!.push(method);
-          }
+      const nameTracker = new Map<string, SdkServiceMethod<SdkHttpOperation>[]>();
+      for (const method of client.methods) {
+        if (!nameTracker.has(method.name)) {
+          nameTracker.set(method.name, [method]);
+        } else {
+          nameTracker.get(method.name)!.push(method);
         }
-        for (const [name, methods] of nameTracker) {
-          if (methods.length > 1) {
-            for (const method of methods) {
-              diagnostics.add(
-                createDiagnostic({
-                  code: "duplicate-client-name",
-                  messageId: "nonDecorator",
-                  format: { name, scope: context.emitterName },
-                  target: method.__raw ?? context.program.getGlobalNamespaceType(),
-                }),
-              );
-            }
+      }
+      for (const [name, methods] of nameTracker) {
+        if (methods.length > 1) {
+          for (const method of methods) {
+            diagnostics.add(
+              createDiagnostic({
+                code: "duplicate-client-name",
+                messageId: "nonDecorator",
+                format: { name, scope: context.emitterName },
+                target: method.__raw ?? context.program.getGlobalNamespaceType(),
+              }),
+            );
           }
         }
       }
