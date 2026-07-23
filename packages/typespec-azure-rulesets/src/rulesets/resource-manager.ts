@@ -27,7 +27,7 @@ export default {
     "@azure-tools/typespec-azure-core/no-multiple-discriminator": true,
     "@azure-tools/typespec-azure-core/no-rest-library-interfaces": true,
     "@azure-tools/typespec-azure-core/no-unknown": true,
-    "@azure-tools/typespec-azure-core/no-unnamed-union": true,
+    "@azure-tools/typespec-azure-core/no-unnamed-types": true,
     "@azure-tools/typespec-azure-core/documentation-required": true,
     "@azure-tools/typespec-azure-core/key-visibility-required": true,
     "@azure-tools/typespec-azure-core/response-schema-problem": true,
@@ -104,6 +104,5 @@ export default {
     // TCGC rules
     "@azure-tools/typespec-client-generator-core/require-client-suffix": true,
     "@azure-tools/typespec-client-generator-core/property-name-conflict": true,
-    "@azure-tools/typespec-client-generator-core/no-unnamed-types": false, // Too bad performance https://github.com/Azure/typespec-azure/issues/2803
   },
 } satisfies LinterRuleSet;

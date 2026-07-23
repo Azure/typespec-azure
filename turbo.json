@@ -3,7 +3,8 @@
   "globalPassThroughEnv": [
     "TYPESPEC_WEBSITE_BASE_PATH",
     "TYPESPEC_SKIP_WEBSITE_BUILD",
-    "TYPESPEC_VS_CI_BUILD"
+    "TYPESPEC_VS_CI_BUILD",
+    "PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN"
   ],
   "tasks": {
     "build": {

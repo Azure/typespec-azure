@@ -12,7 +12,7 @@ function suiteFileName(relDir: string): string {
 /**
  * Guards against silent coverage loss: every leaf scenario directory must have
  * exactly one generated suite file, and vice versa. If this fails after adding
- * or moving scenarios, run `npm run gen:scenario-suites`.
+ * or moving scenarios, run `pnpm gen:scenario-suites`.
  */
 it("every scenario leaf directory has a generated suite file", () => {
   const expected = getLeafScenarioDirs().map(suiteFileName).sort();
@@ -23,6 +23,6 @@ it("every scenario leaf directory has a generated suite file", () => {
   assert.deepEqual(
     actual,
     expected,
-    "Scenario suite files are out of sync with the scenario directory tree. Run `npm run gen:scenario-suites` to regenerate them.",
+    "Scenario suite files are out of sync with the scenario directory tree. Run `pnpm gen:scenario-suites` to regenerate them.",
   );
 });

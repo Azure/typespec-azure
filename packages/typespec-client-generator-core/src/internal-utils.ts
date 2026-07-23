@@ -544,15 +544,7 @@ export function getTypeDecorators(
 function getDecoratorArgValue(
   context: TCGCContext,
   arg:
-    | Type
-    | Record<string, unknown>
-    | Value
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | Numeric
-    | null,
+    Type | Record<string, unknown> | Value | unknown[] | string | number | boolean | Numeric | null,
   type: Type,
   decoratorName: string,
 ): [any, readonly Diagnostic[]] {

@@ -61,11 +61,42 @@ export declare interface CheckNameAvailabilityResponse {
     message?: string;
 }
 
+export declare interface Collection extends ProxyResource {
+    properties?: CollectionProperties;
+}
+
+export declare interface CollectionProperties {
+    displayName?: string;
+}
+
+export declare interface Configuration extends TrackedResource {
+    properties?: ConfigurationProperties;
+}
+
+export declare interface ConfigurationProperties {
+    configValue?: string;
+    readonly provisioningState?: string;
+}
+
 export declare type ContinuablePage<TElement, TPage = TElement[]> = TPage & {
     continuationToken?: string;
 };
 
+export declare interface CostReport extends ExtensionResource {
+    properties?: CostReportProperties;
+}
+
+export declare interface CostReportProperties {
+    downloadUrl?: string;
+    readonly provisioningState?: string;
+}
+
 export declare type CreatedByType = string;
+
+export declare interface DiagnosticInfo {
+    name: string;
+    status: string;
+}
 
 export declare interface ErrorAdditionalInfo {
     readonly type?: string;
@@ -90,6 +121,9 @@ export declare interface ExportRequest {
 
 export declare interface ExportResult {
     content: string;
+}
+
+export declare interface ExtensionResource extends Resource {
 }
 
 export { isRestError }
@@ -120,6 +154,22 @@ export declare enum KnownVersions {
     V20231201Preview = "2023-12-01-preview"
 }
 
+export declare interface LegacyCreateOrReplaceOptionalBodyOptionalParams extends OperationOptions {
+    resource?: Configuration;
+}
+
+export declare interface LegacyOperations {
+    createOrReplaceOptionalBody: (resourceGroupName: string, configurationName: string, options?: LegacyCreateOrReplaceOptionalBodyOptionalParams) => Promise<Configuration>;
+    routedGet: (resourceGroupName: string, name: string, diagnosticName: string, options?: LegacyRoutedGetOptionalParams) => Promise<DiagnosticInfo>;
+}
+
+export declare interface LegacyRoutedGetOptionalParams extends OperationOptions {
+}
+
+export declare interface LogStatusRequest {
+    filter?: string;
+}
+
 export declare interface LroCreateOrReplaceOptionalParams extends OperationOptions {
     updateIntervalInMs?: number;
 }
@@ -136,7 +186,12 @@ export declare interface LroExportOptionalParams extends OperationOptions {
     updateIntervalInMs?: number;
 }
 
+export declare interface LroGetLroOptionalParams extends OperationOptions {
+    updateIntervalInMs?: number;
+}
+
 export declare interface LroOperations {
+    getLro: (scope: string, operationId: string, options?: LroGetLroOptionalParams) => PollerLike<OperationState<CostReport>, CostReport>;
     exportArray: (body: ExportRequest, options?: LroExportArrayOptionalParams) => PollerLike<OperationState<ExportResult[]>, ExportResult[]>;
     delete: (resourceGroupName: string, orderName: string, options?: LroDeleteOptionalParams) => PollerLike<OperationState<void>, void>;
     export: (resourceGroupName: string, orderName: string, body: ExportRequest, options?: LroExportOptionalParams) => PollerLike<OperationState<ExportResult>, ExportResult>;
@@ -144,11 +199,30 @@ export declare interface LroOperations {
 }
 
 export declare interface LroPagingOperations {
+    postPagingLroWithBody: (resourceGroupName: string, productName: string, body: VnetProfile, options?: LroPagingPostPagingLroWithBodyOptionalParams) => PagedAsyncIterableIterator<Product>;
     postPagingLro: (resourceGroupName: string, productName: string, options?: LroPagingPostPagingLroOptionalParams) => PagedAsyncIterableIterator<Product>;
 }
 
 export declare interface LroPagingPostPagingLroOptionalParams extends OperationOptions {
     updateIntervalInMs?: number;
+}
+
+export declare interface LroPagingPostPagingLroWithBodyOptionalParams extends OperationOptions {
+    updateIntervalInMs?: number;
+}
+
+export declare interface Monitor extends TrackedResource {
+    properties?: MonitorProperties;
+}
+
+export declare interface MonitoredResource {
+    id: string;
+    sendingMetrics?: boolean;
+}
+
+export declare interface MonitorProperties {
+    status?: string;
+    readonly provisioningState?: string;
 }
 
 export declare interface Operation {
@@ -176,8 +250,11 @@ export declare interface OperationsOperations {
 export declare class OperationTemplatesClient {
     private _client;
     readonly pipeline: Pipeline;
+    constructor(options?: OperationTemplatesClientOptionalParams);
     constructor(subscriptionId: string, options?: OperationTemplatesClientOptionalParams);
+    readonly paging: PagingOperations;
     readonly optionalBody: OptionalBodyOperations;
+    readonly legacy: LegacyOperations;
     readonly lroPaging: LroPagingOperations;
     readonly lro: LroOperations;
     readonly checkNameAvailability: CheckNameAvailabilityOperations;
@@ -233,6 +310,22 @@ export declare interface PageSettings {
     continuationToken?: string;
 }
 
+export declare interface PagingGetOptionalParams extends OperationOptions {
+}
+
+export declare interface PagingMarkAsPageableOptionalParams extends OperationOptions {
+}
+
+export declare interface PagingOperations {
+    markAsPageable: (resourceGroupName: string, monitorName: string, options?: PagingMarkAsPageableOptionalParams) => PagedAsyncIterableIterator<Collection>;
+    postActionPaging: (resourceGroupName: string, monitorName: string, options?: PagingPostActionPagingOptionalParams) => PagedAsyncIterableIterator<MonitoredResource>;
+    get: (resourceGroupName: string, monitorName: string, options?: PagingGetOptionalParams) => Promise<Monitor>;
+}
+
+export declare interface PagingPostActionPagingOptionalParams extends OperationOptions {
+    body?: LogStatusRequest;
+}
+
 export declare interface Product extends TrackedResource {
     properties?: ProductProperties;
 }
@@ -240,6 +333,9 @@ export declare interface Product extends TrackedResource {
 export declare interface ProductProperties {
     productId?: string;
     readonly provisioningState?: string;
+}
+
+export declare interface ProxyResource extends Resource {
 }
 
 export declare interface Resource {
@@ -271,6 +367,10 @@ export declare interface SystemData {
 export declare interface TrackedResource extends Resource {
     tags?: Record<string, string>;
     location: string;
+}
+
+export declare interface VnetProfile {
+    vnetId: string;
 }
 
 export declare interface Widget extends TrackedResource {

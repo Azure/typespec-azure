@@ -95,12 +95,7 @@ type InterfaceStructure = OptionalKind<InterfaceDeclarationStructure> & {
 function isGenerableType(
   type: SdkType,
 ): type is
-  | SdkModelType
-  | SdkEnumType
-  | SdkUnionType
-  | SdkDictionaryType
-  | SdkArrayType
-  | SdkNullableType {
+  SdkModelType | SdkEnumType | SdkUnionType | SdkDictionaryType | SdkArrayType | SdkNullableType {
   return (
     type.kind === "model" ||
     type.kind === "enum" ||
@@ -808,12 +803,7 @@ export function getAdditionalPropertiesName(context: SdkContext, model: SdkModel
 export function normalizeModelName(
   context: SdkContext,
   type:
-    | SdkModelType
-    | SdkEnumType
-    | SdkUnionType
-    | SdkArrayType
-    | SdkDictionaryType
-    | SdkNullableType,
+    SdkModelType | SdkEnumType | SdkUnionType | SdkArrayType | SdkDictionaryType | SdkNullableType,
   nameType: NameType = NameType.Interface,
   skipPolymorphicUnionSuffix = false,
   rawModelName?: boolean,

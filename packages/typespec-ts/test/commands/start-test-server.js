@@ -25,8 +25,8 @@ try {
 }
 
 const child = spawn(
-  "npx",
-  ["tsp-spector", "serve", ...SPEC_PATHS, "--port", PORT, "--coverageFile", COVERAGE_FILE],
+  "pnpm",
+  ["exec", "tsp-spector", "serve", ...SPEC_PATHS, "--port", PORT, "--coverageFile", COVERAGE_FILE],
   { stdio: "inherit", shell: true },
 );
 
