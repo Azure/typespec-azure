@@ -41,15 +41,9 @@ refresh `core.patch` if its context no longer applies.
 # From the repo root, install workspace dependencies.
 pnpm install
 
-# From the repo root, build the dependencies first. The ^... filter builds
-# @azure-tools/typespec-java dependencies without building typespec-java itself.
-pnpm turbo run --filter "@azure-tools/typespec-java^..." build
-
-# Then build and pack @azure-tools/typespec-java. This builds the generator
-# (emitter.jar via Maven + core.patch, requires JDK 11+ and Maven), builds the
-# emitter TypeScript, and packs the .tgz consumed by emitter-tests.
-cd packages/typespec-java
-pwsh ./Build-TypeSpec.ps1
+# From the repo root, build typespec-java along with all its dependencies.
+# Use run-all so pnpm does not auto-install concurrently during the Turbo build.
+pnpm run-all --filter "@azure-tools/typespec-java^..." build
 ```
 
 ### Pinning the core commit (`core-commit.json`)
@@ -76,7 +70,7 @@ force pnpm to refresh the local install state and rerun the command:
 
 ```powershell
 pnpm install --force
-pnpm turbo run --filter "@azure-tools/typespec-java^..." build
+pnpm run-all --filter "@azure-tools/typespec-java^..." build
 ```
 
 Changing the npm registry has been observed to clear this symptom, possibly because
