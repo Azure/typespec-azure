@@ -15,7 +15,7 @@ namespace ServiceA {
 }
 
 @service
-@server("https://serviceb.example.com") // ❌ differs from ServiceA server
+@server("https://serviceb.example.com") // differs from ServiceA server
 namespace ServiceB {
 
 }

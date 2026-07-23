@@ -13,7 +13,7 @@ namespace MyService {
   op myOp(a: string, b: string): void;
 }
 
-alias Modified = reorderParameters(MyService.myOp, #["a", "a"]); // ❌ `a` appears twice
+alias Modified = reorderParameters(MyService.myOp, #["a", "a"]); // `a` appears twice
 ```
 
 #### Diagnostic Message

@@ -13,7 +13,7 @@ model ClientOptions {
 }
 
 @@paramAlias(ClientOptions.account, "accountName");
-@@paramAlias(ClientOptions.account, "storageAccountName"); // ❌ second alias for the same parameter scope
+@@paramAlias(ClientOptions.account, "storageAccountName"); // second alias for the same parameter scope
 ```
 
 #### Diagnostic Message

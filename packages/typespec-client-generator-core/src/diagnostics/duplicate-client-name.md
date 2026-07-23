@@ -10,7 +10,7 @@ This diagnostic is issued when two generated SDK declarations have the same clie
 #### ❌ Incorrect Usage
 
 ```typespec
-@clientName("Widget") // ❌ duplicates the generated client name of `model Widget`
+@clientName("Widget") // duplicates the generated client name of `model Widget`
 model WidgetResponse {}
 
 model Widget {}

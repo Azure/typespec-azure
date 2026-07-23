@@ -13,7 +13,7 @@ namespace MyService {
   op myOp(existingParam?: string): void;
 }
 
-alias Modified = removeParameter(MyService.myOp, "missingParam"); // ❌ `missingParam` is not a parameter of `myOp`
+alias Modified = removeParameter(MyService.myOp, "missingParam"); // `missingParam` is not a parameter of `myOp`
 ```
 
 #### Diagnostic Message

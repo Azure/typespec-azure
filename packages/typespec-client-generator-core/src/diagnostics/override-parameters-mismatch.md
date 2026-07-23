@@ -13,7 +13,7 @@ namespace MyService {
   op create(name: string, location: string): void;
 }
 
-op createOverride(name: string): void; // ❌ missing required parameter `location`
+op createOverride(name: string): void; // missing required parameter `location`
 @@override(MyService.create, createOverride);
 ```
 

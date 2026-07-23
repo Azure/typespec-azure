@@ -22,7 +22,7 @@ model Item {}
   {
     identity: "pystac.Collection",
     package: "pystac",
-    minVersion: "1.13.0", // ❌ mismatches the earlier `pystac` minVersion `1.12.0`
+    minVersion: "1.13.0", // mismatches the earlier `pystac` minVersion `1.12.0`
   },
   "python"
 )

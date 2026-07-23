@@ -8,7 +8,7 @@ This diagnostic is issued when `@clientName` is given an empty or whitespace-onl
 #### ❌ Incorrect Usage
 
 ```typespec
-@clientName(" ") // ❌ client name is empty/whitespace
+@clientName(" ") // client name is empty/whitespace
 model Widget {}
 ```
 

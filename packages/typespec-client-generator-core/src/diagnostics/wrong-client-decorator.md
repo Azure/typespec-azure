@@ -14,7 +14,7 @@ namespace ServiceNamespace;
 namespace ClientNamespace {
 
 }
-@@client( // ❌ `@client` cannot be applied as an augment decorator
+@@client( // `@client` cannot be applied as an augment decorator
   ClientNamespace,
   {
     service: ServiceNamespace,

@@ -8,7 +8,7 @@ This diagnostic is issued when a root namespace decorated with `@client` does no
 #### ❌ Incorrect Usage
 
 ```typespec
-@client // ❌ root client is missing `{ service: ... }`
+@client // root client is missing `{ service: ... }`
 namespace WidgetClient {
 
 }

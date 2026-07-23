@@ -9,7 +9,7 @@ This diagnostic is issued when `@clientApiVersions` is applied to a service name
 
 ```typespec
 @service
-@clientApiVersions(ApiVersions) // ❌ namespace is not decorated with `@versioned`
+@clientApiVersions(ApiVersions) // namespace is not decorated with `@versioned`
 namespace My.Service {
   enum ApiVersions {
     v1,

@@ -8,7 +8,7 @@ This diagnostic is issued when an `@access` override conflicts with access alrea
 #### ❌ Incorrect Usage
 
 ```typespec
-@access(Access.internal) // ❌ conflicts with public access inferred from `op test`
+@access(Access.internal) // conflicts with public access inferred from `op test`
 model A {}
 
 op test(@body body: A): void;

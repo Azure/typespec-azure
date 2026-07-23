@@ -9,7 +9,7 @@ This diagnostic is issued when `@clientOption` is used without a specific langua
 
 ```typespec
 #suppress "@azure-tools/typespec-client-generator-core/client-option" "temporary workaround"
-@clientOption("enableFeatureFoo", true) // ❌ missing language scope argument
+@clientOption("enableFeatureFoo", true) // missing language scope argument
 model Widget {}
 ```
 

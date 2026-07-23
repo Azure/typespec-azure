@@ -13,7 +13,7 @@ namespace MyService {
   op myOp(a: string, b: string, c: string): void;
 }
 
-alias Modified = reorderParameters(MyService.myOp, #["c", "a"]); // ❌ missing parameter `b`
+alias Modified = reorderParameters(MyService.myOp, #["c", "a"]); // missing parameter `b`
 ```
 
 #### Diagnostic Message

@@ -12,7 +12,7 @@ scalar storageDateTime extends utcDateTime;
 model DateWrapper {
   value: string;
 }
-@@alternateType(storageDateTime, DateWrapper); // ❌ scalar source cannot use a model alternate type
+@@alternateType(storageDateTime, DateWrapper); // scalar source cannot use a model alternate type
 ```
 
 #### Diagnostic Message

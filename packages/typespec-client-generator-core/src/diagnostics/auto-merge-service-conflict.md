@@ -28,7 +28,7 @@ namespace ServiceB {
 namespace ParentClient {
   @client({
     name: "ChildClient",
-    service: ServiceA, // ❌ child service conflicts with the parent's `autoMergeService`
+    service: ServiceA, // child service conflicts with the parent's `autoMergeService`
   })
   namespace Child {
 

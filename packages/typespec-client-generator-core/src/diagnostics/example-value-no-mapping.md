@@ -12,7 +12,7 @@ This diagnostic is issued when a value from an example file cannot be matched to
 namespace TestClient {
   @route("/{b}")
   op parametersDiagnostic(
-    // ❌ example file provides unmapped parameter `test` for this operation
+    // example file provides unmapped parameter `test` for this operation
     @header a: string,
 
     @path b: string,

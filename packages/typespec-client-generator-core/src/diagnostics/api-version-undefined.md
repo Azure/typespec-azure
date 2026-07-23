@@ -12,7 +12,7 @@ This diagnostic is issued when the `api-version` emitter option names a version 
 @versioned(Contoso.WidgetManager.Versions)
 namespace Contoso.WidgetManager;
 
-enum Versions { // ❌ configured api-version `v4` is not defined here
+enum Versions { // configured api-version `v4` is not defined here
   v1,
   v2,
   v3,

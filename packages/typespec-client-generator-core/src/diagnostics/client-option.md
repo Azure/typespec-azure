@@ -8,7 +8,7 @@ This diagnostic is always issued when `@clientOption` is used, because client op
 #### ❌ Incorrect Usage
 
 ```typespec
-@clientOption("enableFeatureFoo", true, "python") // ❌ experimental client option must be suppressed
+@clientOption("enableFeatureFoo", true, "python") // experimental client option must be suppressed
 model Test {
   id: string;
 }

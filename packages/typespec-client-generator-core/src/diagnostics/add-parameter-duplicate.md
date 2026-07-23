@@ -14,7 +14,7 @@ namespace MyService {
 }
 
 model ExtraParams {
-  name: string; // ❌ duplicates existing parameter `name` on `myOp`
+  name: string; // duplicates existing parameter `name` on `myOp`
 }
 alias Modified = addParameter(MyService.myOp, ExtraParams.name);
 ```

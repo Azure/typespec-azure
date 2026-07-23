@@ -11,7 +11,7 @@ This diagnostic is issued when an array parameter uses `@encode` with an array e
 @service
 namespace My.Service;
 
-op myOp(@header @encode("tsv") header: string[]): void; // ❌ `tsv` is not a supported collection encoding
+op myOp(@header @encode("tsv") header: string[]): void; // `tsv` is not a supported collection encoding
 ```
 
 #### Diagnostic Message

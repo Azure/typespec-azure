@@ -16,7 +16,7 @@ namespace MyService {
 model NewParams {
   replacement: int32;
 }
-alias Modified = replaceParameter(MyService.myOp, "missingParam", NewParams.replacement); // ❌ `missingParam` is not a parameter of `myOp`
+alias Modified = replaceParameter(MyService.myOp, "missingParam", NewParams.replacement); // `missingParam` is not a parameter of `myOp`
 ```
 
 #### Diagnostic Message
