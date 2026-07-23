@@ -106,6 +106,13 @@ const resourceOperationDecorators: { [verb in HttpVerb]: string[] } = {
   head: [],
 };
 
+// ARM operationType conventions:
+// - PUT => createOrUpdate
+// - GET => read or list
+// - PATCH => update
+// - DELETE => delete
+// - POST => action
+// This map is used only for generic private decorators that encode operation type as an argument.
 const operationTypesByVerb: Partial<Record<HttpVerb, readonly string[]>> = {
   put: ["createOrUpdate"],
   get: ["read", "list"],
@@ -125,10 +132,10 @@ function getGenericDecoratorOperationType(decorator: DecoratorApplication): stri
   }
 
   const operationTypeArg = decorator.args[operationTypeArgIndexByDecorator[decoratorName]];
-  return getDecoratorStringValue(operationTypeArg);
+  return getDecoratorArgumentStringValue(operationTypeArg);
 }
 
-function getDecoratorStringValue(arg: DecoratorArgument | undefined): string | undefined {
+function getDecoratorArgumentStringValue(arg: DecoratorArgument | undefined): string | undefined {
   return typeof arg?.jsValue === "string" ? arg.jsValue : undefined;
 }
 
