@@ -150,39 +150,6 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
       context.__clientToOperationsCache.delete(client);
     }
   }
-
-  // Check for duplicate operation names within each client.
-  // This catches collisions when multiple services are merged into one client
-  // (via @client({service: [A, B]})) or when sub-namespaces merge into sub-clients.
-  for (const [client, operations] of context.__clientToOperationsCache) {
-    if (operations.length <= 1) continue;
-    // Only check clients whose operations come from multiple namespaces/interfaces,
-    // since same-namespace duplicates are already caught by validateClientNamesPerNamespace.
-    const containers = new Set(operations.map((op) => op.namespace ?? op.interface));
-    if (containers.size <= 1) continue;
-
-    const nameTracker = new Map<string, Operation[]>();
-    for (const op of operations) {
-      const name = getClientNameOverride(context, op, context.emitterName) ?? getLibraryName(context, op);
-      if (!nameTracker.has(name)) {
-        nameTracker.set(name, [op]);
-      } else {
-        nameTracker.get(name)!.push(op);
-      }
-    }
-    for (const [name, ops] of nameTracker) {
-      if (ops.length > 1) {
-        for (const op of ops) {
-          reportDiagnostic(context.program, {
-            code: "duplicate-client-name",
-            messageId: "nonDecorator",
-            format: { name, scope: context.emitterName },
-            target: op,
-          });
-        }
-      }
-    }
-  }
 }
 
 interface ClientCreationResult {

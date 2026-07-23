@@ -20,6 +20,7 @@ import { HttpOperation } from "@typespec/http";
 import { stringify } from "yaml";
 import { prepareClientAndOperationCache } from "./cache.js";
 import { defaultDecoratorsAllowList } from "./configs.js";
+import { getClientNameOverride } from "./decorators.js";
 import { handleClientExamples } from "./example.js";
 import {
   SdkArrayType,
@@ -47,6 +48,7 @@ import {
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import { createSdkPackage } from "./package.js";
+import { getLibraryName } from "./public-utils.js";
 
 interface CreateTCGCContextOptions {
   mutateNamespace?: boolean; // whether to mutate global namespace for versioning
@@ -222,6 +224,8 @@ export async function createSdkContext<
   }
   // Validate duplicate names within each type kind in each namespace (cross-kind duplicates are allowed).
   diagnostics.pipe(validateNamesUnderNamespaces(sdkContext));
+  // Validate duplicate operation names in clients (e.g., from multi-service merge or sub-client merge).
+  diagnostics.pipe(validateOperationNamesInClients(sdkContext));
   sdkContext.diagnostics = [...sdkContext.diagnostics, ...diagnostics.diagnostics];
 
   if (options?.exportTCGCoutput) {
@@ -260,6 +264,49 @@ function validateNamesUnderNamespaces(context: SdkContext) {
 
   for (const namespace of context.sdkPackage.namespaces) {
     validateNamespace(namespace);
+  }
+
+  return diagnostics.wrap(undefined);
+}
+
+function validateOperationNamesInClients(context: SdkContext) {
+  const diagnostics = createDiagnosticCollector();
+
+  if (!context.__clientToOperationsCache) {
+    return diagnostics.wrap(undefined);
+  }
+
+  for (const [, operations] of context.__clientToOperationsCache) {
+    if (operations.length <= 1) continue;
+    // Only check clients whose operations come from multiple namespaces/interfaces,
+    // since same-namespace duplicates are already caught by validateClientNamesPerNamespace.
+    const containers = new Set(operations.map((op) => op.namespace ?? op.interface));
+    if (containers.size <= 1) continue;
+
+    const nameTracker = new Map<string, Operation[]>();
+    for (const op of operations) {
+      const name =
+        getClientNameOverride(context, op, context.emitterName) ?? getLibraryName(context, op);
+      if (!nameTracker.has(name)) {
+        nameTracker.set(name, [op]);
+      } else {
+        nameTracker.get(name)!.push(op);
+      }
+    }
+    for (const [name, ops] of nameTracker) {
+      if (ops.length > 1) {
+        for (const op of ops) {
+          diagnostics.add(
+            createDiagnostic({
+              code: "duplicate-client-name",
+              messageId: "nonDecorator",
+              format: { name, scope: context.emitterName },
+              target: op,
+            }),
+          );
+        }
+      }
+    }
   }
 
   return diagnostics.wrap(undefined);
