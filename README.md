@@ -15,8 +15,8 @@ You can try TypeSpec on the web without installing anything.
 
 ## Prerequisites
 
-- To use these libraries, install [Node.js 24 LTS](https://nodejs.org/) and ensure
-  you can run `npm --version` from a command prompt.
+- To use these libraries, install [Node.js](https://nodejs.org/) (24 LTS or later) and ensure
+  you can run `node --version` from a command prompt.
 - To develop this repository, install and activate
   [mise](https://mise.jdx.dev/getting-started.html). From the repository root,
   run `mise install` to install the development tools defined by `mise.toml` and
