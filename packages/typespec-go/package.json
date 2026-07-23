@@ -35,8 +35,6 @@
     "build": "tsc -p .",
     "build:deps": "turbo run build --filter=@azure-tools/typespec-go...",
     "watch": "tsc -p . --watch",
-    "format": "prettier . --write --ignore-path ../../.prettierignore --ignore-path ../../.gitignore",
-    "format:check": "prettier . --check --ignore-path ../../.prettierignore --ignore-path ../../.gitignore",
     "test": "vitest run --pass-with-no-tests",
     "test:update": "node .scripts/test-update.js",
     "gen:scenario-suites": "node test/unittest/gen-scenario-suites.mjs",
