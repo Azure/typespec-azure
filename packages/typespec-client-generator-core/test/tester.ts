@@ -271,3 +271,49 @@ export function createSdkContextForTester(
     createSdkContextOption,
   );
 }
+/**
+ * Tester for streaming and SSE tests (loads @typespec/streams, @typespec/sse, @typespec/events).
+ */
+export const StreamsTester = createTester(resolvePath(import.meta.dirname, ".."), {
+  libraries: [
+    "@typespec/http",
+    "@typespec/rest",
+    "@typespec/versioning",
+    "@typespec/streams",
+    "@typespec/sse",
+    "@typespec/events",
+    "@azure-tools/typespec-client-generator-core",
+  ],
+})
+  .import(
+    "@typespec/http",
+    "@typespec/rest",
+    "@typespec/versioning",
+    "@typespec/http/streams",
+    "@typespec/streams",
+    "@typespec/sse",
+    "@typespec/events",
+    "@azure-tools/typespec-client-generator-core",
+  )
+  .using(
+    "Http",
+    "Rest",
+    "Versioning",
+    "TypeSpec.Http.Streams",
+    "TypeSpec.Streams",
+    "TypeSpec.SSE",
+    "TypeSpec.Events",
+    "Azure.ClientGenerator.Core",
+  );
+
+/**
+ * Streams/SSE tester with a built-in simple service namespace.
+ */
+export const StreamsTesterWithBuiltInService = StreamsTester.wrap(
+  (x) => `
+@service
+namespace TestService;
+
+${x}
+`,
+);
