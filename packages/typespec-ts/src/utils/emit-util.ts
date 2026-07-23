@@ -36,7 +36,7 @@ async function emitFile(file: File, program: Program, emitterOutputDir?: string)
   const host: CompilerHost = program.host;
   const filePath = joinPaths(emitterOutputDir ?? "", file.path);
   const isJson = /\.json$/gi.test(filePath);
-  const isSourceCode = /\.(ts|js)$/gi.test(filePath);
+  const isSourceCode = /\.(m|c)?(ts|js)$/gi.test(filePath);
   const licenseHeader = `// Copyright (c) Microsoft Corporation.\n// Licensed under the MIT License.\n`;
   let prettierFileContent = file.content;
 
