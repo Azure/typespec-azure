@@ -264,3 +264,6 @@ packages/typespec-java/emitter-tests/tsp-spector-coverage-*.json
 # each rule's `docs` field). Regenerated during the website build (build:web), so
 # they are not tracked. The rule source docs live in packages/*/src/rules/*.md.
 website/src/content/docs/docs/libraries/*/rules/
+
+# Empty
+prs.external-reviewers.generated.yml
