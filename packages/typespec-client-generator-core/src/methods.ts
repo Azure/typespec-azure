@@ -56,6 +56,7 @@ import {
   SdkPropertyMap,
   SdkServiceMethod,
   SdkServiceOperation,
+  SdkSseMetadata,
   SdkStreamMetadata,
   SdkTerminationStatus,
   SdkType,
@@ -212,8 +213,8 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       baseServiceMethod.response,
     );
 
-    baseServiceMethod.response.resultSegments = resultSegments?.map(
-      (resultSegment) => context.__modelPropertyCache.get(resultSegment)!,
+    baseServiceMethod.response.resultSegments = resultSegments?.map((resultSegment) =>
+      context.__modelPropertyCache.get(resultSegment)!,
     );
 
     context.__pagedResultSet.add(responseType);
@@ -254,14 +255,13 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
                   context.program,
                   pagingMetadata.output.nextLink.property.type,
                 ) ?? []
-              ).map(
-                (t: ModelProperty) =>
-                  getPropertySegmentsFromModelOrParameters(
-                    baseServiceMethod.parameters,
-                    (p) =>
-                      p.__raw?.kind === "ModelProperty" &&
-                      findRootSourceProperty(p.__raw) === findRootSourceProperty(t),
-                  )!,
+              ).map((t: ModelProperty) =>
+                getPropertySegmentsFromModelOrParameters(
+                  baseServiceMethod.parameters,
+                  (p) =>
+                    p.__raw?.kind === "ModelProperty" &&
+                    findRootSourceProperty(p.__raw) === findRootSourceProperty(t),
+                )!,
               )
             : undefined,
       },
@@ -668,9 +668,11 @@ function getSdkMethodResponse(
 
   // Propagate stream metadata from HTTP responses to method response
   let streamMetadata: SdkStreamMetadata | undefined;
+  let sseMetadata: SdkSseMetadata | undefined;
   for (const response of responses) {
     if (response.streamMetadata) {
       streamMetadata = response.streamMetadata;
+      sseMetadata = response.sseMetadata;
       break;
     }
   }
@@ -680,6 +682,7 @@ function getSdkMethodResponse(
     type,
     ...(optional !== undefined && { optional }),
     ...(streamMetadata && { streamMetadata }),
+    ...(sseMetadata && { sseMetadata }),
   };
 }
 

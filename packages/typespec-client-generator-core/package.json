@@ -37,7 +37,7 @@
   },
   "scripts": {
     "clean": "rimraf ./dist ./temp",
-    "build": "npm run gen-extern-signature && tsc -p tsconfig.build.json && npm run lint-typespec-library",
+    "build": "pnpm gen-extern-signature && tsc -p tsconfig.build.json && pnpm lint-typespec-library",
     "watch": "tsc -p tsconfig.build.json --watch",
     "gen-extern-signature": "tspd --enable-experimental gen-extern-signature .",
     "lint-typespec-library": "tsp compile . --warn-as-error --import @typespec/library-linter --no-emit",
@@ -47,7 +47,7 @@
     "test:ci": "vitest run --coverage  --reporter=junit --reporter=default",
     "lint": "oxlint . --deny-warnings",
     "lint:fix": "oxlint . --fix",
-    "regen-docs": "tspd doc .  --enable-experimental --llmstxt --output-dir ../../website/src/content/docs/docs/libraries/typespec-client-generator-core/reference"
+    "regen-docs": "tspd doc .  --enable-experimental --llmstxt --rules-dir ../rules --output-dir ../../website/src/content/docs/docs/libraries/typespec-client-generator-core/reference"
   },
   "files": [
     "lib/*.tsp",

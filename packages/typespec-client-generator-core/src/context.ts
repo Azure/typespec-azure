@@ -122,6 +122,9 @@ export function createTCGCContext(
       }
       return this.__packageVersionEnum!;
     },
+    getPackageVersionSdkEnum(): Map<Namespace, SdkEnumType> {
+      return this.__serviceToVersionsSdkEnum ?? new Map();
+    },
     getClients(): SdkClient[] {
       if (!this.__rawClientsCache) {
         prepareClientAndOperationCache(this);
@@ -277,6 +280,9 @@ async function exportTCGCOutput(context: SdkContext) {
         }
         if (k === "rawExample") {
           return undefined; // remove raw example
+        }
+        if (v instanceof Map) {
+          return Object.fromEntries(v);
         }
         return v;
       },

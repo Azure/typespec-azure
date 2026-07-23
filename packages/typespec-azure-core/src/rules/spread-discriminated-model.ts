@@ -1,8 +1,9 @@
-import { Model, createRule, getDiscriminator, paramMessage } from "@typespec/compiler";
+import { Model, createRule, fileRef, getDiscriminator, paramMessage } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
 
 export const spreadDiscriminatedModelRule = createRule({
   name: "spread-discriminated-model",
+  docs: fileRef.fromPackageRoot("src/rules/spread-discriminated-model.md"),
   description: "Check a model with a discriminator has not been used in composition.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/spread-discriminated-model",

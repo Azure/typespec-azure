@@ -4,6 +4,7 @@ import {
   Operation,
   Program,
   createRule,
+  fileRef,
   isTemplateInstance,
   paramMessage,
 } from "@typespec/compiler";
@@ -19,6 +20,7 @@ import {
 
 export const coreOperationsRule = createRule({
   name: "arm-resource-operation",
+  docs: fileRef.fromPackageRoot("src/rules/arm-resource-operation.md"),
   severity: "warning",
   description: "Validate ARM Resource operations.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-operation",

@@ -1,6 +1,7 @@
 import {
   Operation,
   createRule,
+  fileRef,
   getNamespaceFullName,
   isTemplateDeclarationOrInstance,
   paramMessage,
@@ -25,6 +26,7 @@ function derivesFromAzureCoreOperation(operation: Operation): boolean {
 
 export const useStandardOperations = createRule({
   name: "use-standard-operations",
+  docs: fileRef.fromPackageRoot("src/rules/use-standard-operations.md"),
   description: "Operations should be defined using a signature from the Azure.Core namespace.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/use-standard-operations",
