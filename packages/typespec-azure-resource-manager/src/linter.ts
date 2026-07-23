@@ -6,6 +6,7 @@ import { armCustomResourceNoKey } from "./rules/arm-custom-resource-no-key.js";
 import { armCustomResourceUsageDiscourage } from "./rules/arm-custom-resource-usage-discourage.js";
 import { armDeleteResponseCodesRule } from "./rules/arm-delete-response-codes.js";
 import { armFeatureFileUsageDiscourage } from "./rules/arm-feature-file-usage-discourage.js";
+import { armLroResponseMismatchRule } from "./rules/arm-lro-response-mismatch.js";
 import { armNoPathCasingConflictsRule } from "./rules/arm-no-path-casing-conflicts.js";
 import { armNoRecordRule } from "./rules/arm-no-record.js";
 import { armPostResponseCodesRule } from "./rules/arm-post-response-codes.js";
@@ -51,6 +52,7 @@ const rules = [
   armDeleteResponseCodesRule,
   armPutResponseCodesRule,
   armPostResponseCodesRule,
+  armLroResponseMismatchRule,
   armResourceActionNoSegmentRule,
   armResourceDuplicatePropertiesRule,
   armResourceEnvelopeProperties,
