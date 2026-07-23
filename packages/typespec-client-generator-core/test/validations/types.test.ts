@@ -1277,4 +1277,3 @@ it("@clientName fixes conflict for one language but not others", async () => {
   );
   strictEqual(javaDiags.length, 2, "java should have 2 duplicate diagnostics");
 });
-
