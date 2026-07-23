@@ -5,23 +5,12 @@ import { fileURLToPath } from "url";
 
 export const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 export const coreRepoRoot = resolve(repoRoot, "core");
-export const prettier = resolve(repoRoot, "core/packages/compiler/node_modules/.bin/prettier");
-export const tsc = resolve(repoRoot, "core/packages/compiler/node_modules/.bin/tsc");
 export const autorest = resolve(repoRoot, "eng/scripts/node_modules/.bin/autorest");
 
 // We could use { shell: true } to let Windows find .cmd, but that causes other issues.
 // It breaks ENOENT checking for command-not-found and also handles command/args with spaces
 // poorly.
-const isCmdOnWindows = [
-  "pnpm",
-  "npm",
-  "code",
-  "code-insiders",
-  "docusaurus",
-  tsc,
-  prettier,
-  autorest,
-];
+const isCmdOnWindows = ["pnpm", "npm", "code", "code-insiders", autorest];
 
 export class CommandFailedError extends Error {
   constructor(msg, proc) {
@@ -62,15 +51,6 @@ export function run(command, args, options) {
   }
 
   return proc;
-}
-
-export function clearScreen() {
-  process.stdout.write("\x1bc");
-}
-
-export function logWithTime(msg) {
-  const time = new Date().toLocaleTimeString();
-  console.log(`[${time}] ${msg}`);
 }
 
 export function scanSwaggers(root) {
