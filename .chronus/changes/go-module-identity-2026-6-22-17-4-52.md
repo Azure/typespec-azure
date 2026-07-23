@@ -1,7 +1,6 @@
 ---
 changeKind: feature
 packages:
-  - "@azure-tools/typespec-metadata"
   - "@azure-tools/typespec-go"
 ---
 
