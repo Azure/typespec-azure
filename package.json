@@ -49,6 +49,7 @@
   "devDependencies": {
     "@chronus/chronus": "catalog:",
     "@chronus/github": "catalog:",
+    "@chronus/github-pr-commenter": "catalog:",
     "@pnpm/workspace.find-packages": "catalog:",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
