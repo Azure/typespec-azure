@@ -1,0 +1,18 @@
+diff --git a/src/test/java/org/utils/FileUtils.java b/src/test/java/org/utils/FileUtils.java
+index f002da96..fae8d01b 100644
+--- a/src/test/java/org/utils/FileUtils.java
++++ b/src/test/java/org/utils/FileUtils.java
+@@ -14,11 +14,11 @@ public class FileUtils {
+     }
+ 
+     public static Path getJpgFile() {
+-        return Paths.get("node_modules/@typespec/http-specs/assets/image.jpg");
++        return Paths.get("../node_modules/@typespec/http-specs/assets/image.jpg");
+     }
+ 
+     public static Path getPngFile() {
+-        return Paths.get("node_modules/@typespec/http-specs/assets/image.png");
++        return Paths.get("../node_modules/@typespec/http-specs/assets/image.png");
+     }
+ 
+     public static byte[] getJpgBytes() {

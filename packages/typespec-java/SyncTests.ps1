@@ -6,6 +6,12 @@
 # Azure-specific port (com.azure.autorest.customization) maintained in this repo,
 # whereas core's customization uses the unbranded base.
 #
+# After syncing, core.test.patch is applied to the copied test sources to carry the
+# Azure-specific edits that must diverge from core (e.g. FileUtils.java resolves the
+# http-specs assets under ../node_modules, since here node_modules lives at the
+# typespec-java package root rather than in the test project dir). Unlike core.patch
+# (applied to a gitignored generator copy), these patched files ARE committed.
+#
 # Generated output (src/main, **/generated/**) is gitignored; only the
 # hand-written tests and specs synced here are committed.
 #
@@ -36,6 +42,19 @@ try {
     Copy-Item -Path (Join-Path $testRoot "tsp") -Destination $localTsp -Recurse -Force
 
     Write-Host "Synced src and tsp from $testRoot"
+
+    # Apply the Azure-specific test patch to the freshly synced sources. The patch
+    # paths are relative to emitter-tests/, so run git apply from the repo root with
+    # --directory (mirrors Copy-Sources.ps1's core.patch handling). Unlike core.patch,
+    # the result is committed, so re-running this sync keeps the divergence in place.
+    $repoRoot = Resolve-Path (Join-Path $packageRoot ".." "..")
+    $patchFile = Join-Path $packageRoot "core.test.patch"
+    $relEmitterTests = [System.IO.Path]::GetRelativePath($repoRoot, $emitterTestsRoot).Replace('\', '/')
+    git -C $repoRoot apply --directory=$relEmitterTests -p1 $patchFile --ignore-whitespace
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Failed to apply core.test.patch to $emitterTestsRoot."
+    }
+    Write-Host "Applied core.test.patch"
 }
 finally {
     Remove-CoreSourceRoot $core
