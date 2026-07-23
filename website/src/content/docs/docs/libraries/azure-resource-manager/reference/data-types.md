@@ -1560,10 +1560,27 @@ model Azure.ResourceManager.BaseTypes.BaseTypeInfo
 
 #### Properties
 
-| Name     | Type     | Description                                      |
-| -------- | -------- | ------------------------------------------------ |
-| baseType | `string` | The base type identifier (for example, "Agent"). |
-| version  | `string` | The schema version of the base type.             |
+| Name     | Type                                                                   | Description                          |
+| -------- | ---------------------------------------------------------------------- | ------------------------------------ |
+| baseType | [`BaseType`](./data-types.md#Azure.ResourceManager.BaseTypes.BaseType) | The base type identifier.            |
+| version  | `string`                                                               | The schema version of the base type. |
+
+### `BaseType` {#Azure.ResourceManager.BaseTypes.BaseType}
+
+The set of Azure base types a resource may declare conformance to via the
+`@azureBaseType` decorator. Modeled as an extensible (open) enum so additional
+base types can be introduced without a breaking change.
+
+```typespec
+union Azure.ResourceManager.BaseTypes.BaseType
+```
+
+#### Variants
+
+| Name         | Type             | Description                 |
+| ------------ | ---------------- | --------------------------- |
+| Agent        | `"Agent"`        | The Agent base type.        |
+| Relationship | `"Relationship"` | The Relationship base type. |
 
 ## Azure.ResourceManager.BaseTypes.Agents
 
@@ -2581,12 +2598,12 @@ model Azure.ResourceManager.CommonTypes.NspConfigurationNameParameter<KeyName, R
 
 #### Template Parameters
 
-| Name                | Description                                                                                                          |
-| ------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| KeyName             | The name of the network security perimeter configuration resource name parameter.                                    |
-| ResourceNamePattern | The regex pattern for the network security perimeter configuration resource name (default is "^[a-z][a-zA-Z0-9]\*$") |
-| MinLength           | The minimum length for the network security perimeter configuration resource name (default is 1)                     |
-| MaxLength           | The maximum length for the network security perimeter configuration resource name (default is 512)                   |
+| Name                | Description                                                                                                         |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| KeyName             | The name of the network security perimeter configuration resource name parameter.                                   |
+| ResourceNamePattern | The regex pattern for the network security perimeter configuration resource name (default is "^[a-z][a-zA-Z0-9]*$") |
+| MinLength           | The minimum length for the network security perimeter configuration resource name (default is 1)                    |
+| MaxLength           | The maximum length for the network security perimeter configuration resource name (default is 512)                  |
 
 #### Properties
 
@@ -2841,7 +2858,7 @@ model Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionNameParameter<K
 | Name                | Description                                                                                             |
 | ------------------- | ------------------------------------------------------------------------------------------------------- |
 | KeyName             | The name of the private endpoint connection name parameter (default is "privateEndpointConnectionName") |
-| ResourceNamePattern | The regex pattern for the private endpoint connection name (default is "^[a-z][a-zA-Z0-9]\*$")          |
+| ResourceNamePattern | The regex pattern for the private endpoint connection name (default is "^[a-z][a-zA-Z0-9]*$")           |
 | MinLength           | The minimum length for the private endpoint connection name (default is 3)                              |
 | MaxLength           | The maximum length for the private endpoint connection name (default is 63                              |
 
@@ -2965,12 +2982,12 @@ model Azure.ResourceManager.CommonTypes.PrivateLinkResourceNameParameter<Segment
 
 #### Template Parameters
 
-| Name                | Description                                                                              |
-| ------------------- | ---------------------------------------------------------------------------------------- |
-| Segment             | The resource type name for private links (default is privateLinkResources)               |
-| ResourceNamePattern | The regex pattern for the private link resource name (default is "^[a-z][a-zA-Z0-9]\*$") |
-| MinLength           | The minimum length for the private link resource name (default is 3)                     |
-| MaxLength           | The maximum length for the private link resource name (default is 63                     |
+| Name                | Description                                                                             |
+| ------------------- | --------------------------------------------------------------------------------------- |
+| Segment             | The resource type name for private links (default is privateLinkResources)              |
+| ResourceNamePattern | The regex pattern for the private link resource name (default is "^[a-z][a-zA-Z0-9]*$") |
+| MinLength           | The minimum length for the private link resource name (default is 3)                    |
+| MaxLength           | The maximum length for the private link resource name (default is 63                    |
 
 #### Properties
 
@@ -3638,10 +3655,10 @@ model Azure.ResourceManager.Extension.ExtensionInstanceParameters<TargetResource
 
 #### Template Parameters
 
-| Name           | Description                                                                                                                                                               |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| TargetResource | The target of the extension resource (Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or another resource). |
-| Resource       | The extension resource.                                                                                                                                                   |
+| Name           | Description                                                                                                                                                                                       |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TargetResource | The target of the extension resource (Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup, Extension.ServiceGroup or another resource). |
+| Resource       | The extension resource.                                                                                                                                                                           |
 
 #### Properties
 
@@ -3663,10 +3680,10 @@ model Azure.ResourceManager.Extension.ExtensionParentParameters<TargetResource, 
 
 #### Template Parameters
 
-| Name              | Description                                                                                                                                                               |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| TargetResource    | The target of the extension resource (Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or another resource). |
-| ExtensionResource | The extension resource.                                                                                                                                                   |
+| Name              | Description                                                                                                                                                                                       |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TargetResource    | The target of the extension resource (Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup, Extension.ServiceGroup or another resource). |
+| ExtensionResource | The extension resource.                                                                                                                                                                           |
 
 #### Properties
 
@@ -3843,6 +3860,26 @@ model Employee {
 | ----- | ------ | ----------- |
 | scope | `Type` |             |
 
+### `ServiceGroup` {#Azure.ResourceManager.Extension.ServiceGroup}
+
+A service group
+
+```typespec
+model Azure.ResourceManager.Extension.ServiceGroup<ParameterName>
+```
+
+#### Template Parameters
+
+| Name          | Description                                                                                         |
+| ------------- | --------------------------------------------------------------------------------------------------- |
+| ParameterName | The name of the 'name' parameter of the service group (usually serviceGroupName or serviceGroupId). |
+
+#### Properties
+
+| Name | Type     | Description |
+| ---- | -------- | ----------- |
+| name | `string` |             |
+
 ### `Subscription` {#Azure.ResourceManager.Extension.Subscription}
 
 A subscription target for an extension resource
@@ -3865,9 +3902,9 @@ model Azure.ResourceManager.Extension.TargetBaseParameters<Resource>
 
 #### Template Parameters
 
-| Name     | Description                                                                                                                                                                                 |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Resource | The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or an external resource). |
+| Name     | Description                                                                                                                                                                                                         |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Resource | The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup, Extension.ServiceGroup or an external resource). |
 
 #### Properties
 
@@ -3888,9 +3925,9 @@ model Azure.ResourceManager.Extension.TargetParameters<Resource>
 
 #### Template Parameters
 
-| Name     | Description                                                                                                                                                                                 |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Resource | The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or an external resource). |
+| Name     | Description                                                                                                                                                                                                         |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Resource | The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup, Extension.ServiceGroup or an external resource). |
 
 #### Properties
 
@@ -3911,9 +3948,9 @@ model Azure.ResourceManager.Extension.TargetProviderNamespace<Resource>
 
 #### Template Parameters
 
-| Name     | Description                                                                                                                                                                                |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Resource | The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or an external resource) |
+| Name     | Description                                                                                                                                                                                                        |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Resource | The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup, Extension.ServiceGroup or an external resource) |
 
 #### Properties
 

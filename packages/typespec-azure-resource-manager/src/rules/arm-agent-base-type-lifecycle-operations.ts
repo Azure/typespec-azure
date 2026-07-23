@@ -1,4 +1,11 @@
-import { Model, Program, createRule, getNamespaceFullName, paramMessage } from "@typespec/compiler";
+import {
+  Model,
+  Program,
+  createRule,
+  fileRef,
+  getNamespaceFullName,
+  paramMessage,
+} from "@typespec/compiler";
 import { getParentResource } from "@typespec/rest";
 
 import { AzureBaseTypeInfo, getAzureBaseTypes } from "../base-types.js";
@@ -6,6 +13,7 @@ import { getArmResources } from "../resource.js";
 
 export const armAgentBaseTypeLifecycleOperationsRule = createRule({
   name: "arm-agent-base-type-lifecycle-operations",
+  docs: fileRef.fromPackageRoot("src/rules/arm-agent-base-type-lifecycle-operations.md"),
   severity: "warning",
   description:
     "Conversation and Response child resources of an Agent must define create, read, update, and delete lifecycle operations.",

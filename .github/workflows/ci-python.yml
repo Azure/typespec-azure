@@ -1,22 +1,10 @@
 name: "python / test e2e"
 
 on:
-  pull_request:
-    branches:
-      - main
-      - release/*
-    paths:
-      - "packages/typespec-python/**"
-      - ".github/workflows/ci-python.yml"
-      - ".github/actions/setup-python/**"
-  merge_group:
+  workflow_call:
 
 permissions:
   contents: read
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
   build:
