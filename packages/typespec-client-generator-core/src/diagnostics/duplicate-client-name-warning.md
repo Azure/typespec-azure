@@ -14,7 +14,7 @@ interface StorageTasks {
   @route("/list")
   list(): void;
 
-  @clientName("list", "csharp")
+  @clientName("list", "csharp") // ❌ duplicates the C# client name of `list`
   @route("/listByParent")
   listByParent(parent: string): void;
 }

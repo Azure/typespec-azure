@@ -81,7 +81,7 @@ union FeatureOptInKeys {
 }
 
 alias WithPreviewHeader<T extends FeatureOptInKeys> = {
-  @clientLocation(Default)
+  @clientLocation(Default) // ❌ templated parameter moves different concrete types to the same client
   @header("x-preview-features")
   previewFeatures: T;
 };

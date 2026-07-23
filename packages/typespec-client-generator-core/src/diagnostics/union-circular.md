@@ -12,7 +12,7 @@ This diagnostic is issued when TCGC converts a union that directly or indirectly
 namespace Test {
   union Test {
     null,
-    Test,
+    Test, // ❌ union contains itself
   }
 
   op test(test: Test): void;

@@ -11,7 +11,7 @@ This diagnostic is issued when the value passed to the `@usage` decorator is not
 enum CustomUsage {
   custom: 8,
 }
-@usage(CustomUsage.custom)
+@usage(CustomUsage.custom) // ❌ `8` is not a supported Usage flag
 model Widget {}
 ```
 

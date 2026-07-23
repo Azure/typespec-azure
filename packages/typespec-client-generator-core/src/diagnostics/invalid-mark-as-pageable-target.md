@@ -10,7 +10,7 @@ This diagnostic is issued when `@markAsPageable` is applied to an operation that
 ```typespec
 @markAsPageable
 @get
-op listWidgets(): string;
+op listWidgets(): string; // ❌ pageable marker requires a page model response
 ```
 
 #### Diagnostic Message

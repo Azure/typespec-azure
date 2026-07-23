@@ -20,7 +20,7 @@ model EmployeeProperties {
 interface Employees {
   get is ArmResourceRead<Employee>;
 
-  @markAsPageable("csharp")
+  @markAsPageable("csharp") // ❌ operation is already pageable via `ArmResourceListByParent`
   listEmployees is ArmResourceListByParent<Employee>;
 }
 ```

@@ -17,7 +17,7 @@ model Cat extends Pet {
 }
 
 model Owner {
-  @flattenProperty
+  @flattenProperty // ❌ `pet` has polymorphic type `Pet`
   pet: Pet;
 }
 ```

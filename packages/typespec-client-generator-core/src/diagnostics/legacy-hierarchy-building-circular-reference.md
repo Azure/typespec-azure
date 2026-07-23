@@ -15,7 +15,7 @@ model A extends B {
   propA: string;
 }
 
-@hierarchyBuilding(A)
+@hierarchyBuilding(A) // ❌ rebasing `B` onto `A` creates a circular base chain
 model B extends C {
   propB: string;
 }

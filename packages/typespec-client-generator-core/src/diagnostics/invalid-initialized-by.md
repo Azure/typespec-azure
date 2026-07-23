@@ -9,7 +9,7 @@ This diagnostic is issued when the `initializedBy` option in `@clientInitializat
 
 ```typespec
 @clientInitialization({
-  initializedBy: InitializedBy.customizeCode | InitializedBy.parent,
+  initializedBy: InitializedBy.customizeCode | InitializedBy.parent, // ❌ `customizeCode` cannot be combined
 })
 namespace BlobClient {
 

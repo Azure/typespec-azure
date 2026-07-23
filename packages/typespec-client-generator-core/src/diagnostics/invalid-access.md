@@ -11,7 +11,7 @@ This diagnostic is issued when the value passed to the `@access` decorator is no
 enum CustomAccess {
   private: "private",
 }
-@access(CustomAccess.private)
+@access(CustomAccess.private) // ❌ `"private"` is not a valid access value
 model SecretModel {}
 ```
 

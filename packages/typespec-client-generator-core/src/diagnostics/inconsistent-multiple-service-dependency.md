@@ -29,7 +29,7 @@ namespace ServiceA {
 @versioned(VersionsB)
 namespace ServiceB {
   enum VersionsB {
-    @useDependency(SharedLib.LibVersions.v2)
+    @useDependency(SharedLib.LibVersions.v2) // ❌ differs from ServiceA's dependency on `v1`
     bv1,
   }
 }

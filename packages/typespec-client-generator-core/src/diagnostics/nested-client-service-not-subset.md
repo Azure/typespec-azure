@@ -15,7 +15,7 @@ This diagnostic is issued when a nested (sub) client declares services that are 
 namespace ParentClient {
   @client({
     name: "ChildClient",
-    service: ServiceThree,
+    service: ServiceThree, // ❌ not one of the parent's services (`ServiceOne`, `ServiceTwo`)
   })
   namespace Child {
 

@@ -14,7 +14,7 @@ namespace OtherNamespace {
 
 @service
 namespace MyService {
-  @clientLocation(OtherNamespace)
+  @clientLocation(OtherNamespace) // ❌ target is outside the `MyService` service namespace
   op list(): void;
 }
 ```

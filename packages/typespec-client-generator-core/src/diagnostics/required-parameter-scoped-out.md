@@ -10,7 +10,7 @@ This diagnostic is issued when a required HTTP parameter is scoped out of the cu
 ```typespec
 op getWidget(
   @header("x-client-id")
-  @scope("!python")
+  @scope("!python") // ❌ scopes out required parameter `clientId` for Python
   clientId: string,
 ): void;
 ```

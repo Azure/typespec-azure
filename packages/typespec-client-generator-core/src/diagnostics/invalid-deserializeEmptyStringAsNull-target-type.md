@@ -10,7 +10,7 @@ This diagnostic is issued when `@deserializeEmptyStringAsNull` is applied to a p
 ```typespec
 model Widget {
   @deserializeEmptyStringAsNull
-  count: int32;
+  count: int32; // ❌ property type is not `string` or string-derived
 }
 ```
 

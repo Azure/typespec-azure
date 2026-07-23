@@ -13,7 +13,7 @@ model C {
 }
 
 model OldBase {
-  shared?: string;
+  shared?: string; // ❌ conflicts with `C.shared` type `int32` after rebasing
 }
 
 @hierarchyBuilding(C)

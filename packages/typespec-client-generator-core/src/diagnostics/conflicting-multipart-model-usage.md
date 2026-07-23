@@ -22,7 +22,7 @@ op jsonUse(@body multipartBody: MultiPartRequest): NoContentResponse;
 @post
 op multipartUse(
   @header contentType: "multipart/form-data",
-  @multipartBody body: MultiPartRequest,
+  @multipartBody body: MultiPartRequest, // ❌ `MultiPartRequest` is also used as a regular body
 ): NoContentResponse;
 ```
 

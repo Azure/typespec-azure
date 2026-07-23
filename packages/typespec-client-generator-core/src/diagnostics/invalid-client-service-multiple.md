@@ -11,7 +11,7 @@ This diagnostic is issued when `@client` is applied to an interface with multipl
 @service namespace ServiceA;
 @service namespace ServiceB;
 
-@client({ service: [ServiceA, ServiceB] })
+@client({ service: [ServiceA, ServiceB] }) // ❌ multiple services are not allowed on an interface client
 interface CombinedClient {}
 ```
 

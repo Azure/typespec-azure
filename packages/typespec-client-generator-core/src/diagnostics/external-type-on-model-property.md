@@ -9,7 +9,7 @@ This diagnostic is issued when `@alternateType` with external type information i
 
 ```typespec
 model Widget {
-  @alternateType(
+  @alternateType( // ❌ external alternate type is applied to a model property
     {
       identity: "external.WidgetName",
     },

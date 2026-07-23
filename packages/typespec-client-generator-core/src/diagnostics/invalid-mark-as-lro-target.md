@@ -10,7 +10,7 @@ This diagnostic is issued when `@markAsLro` is applied to an operation that does
 ```typespec
 @markAsLro
 @post
-op start(): string;
+op start(): string; // ❌ LRO marker requires a model response
 ```
 
 #### Diagnostic Message

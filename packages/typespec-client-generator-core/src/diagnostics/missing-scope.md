@@ -9,7 +9,9 @@ This diagnostic is issued when a decorator that is likely language-specific is u
 
 ```typespec
 @alternateType({
+  // ❌ external alternate type is missing a language scope
   identity: "pystac.Collection",
+
   package: "pystac",
   minVersion: "1.13.0",
 })

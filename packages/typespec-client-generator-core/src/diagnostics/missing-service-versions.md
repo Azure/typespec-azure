@@ -18,7 +18,7 @@ namespace My.Service {
   }
 }
 
-enum ClientApiVersions {
+enum ClientApiVersions { // ❌ missing service version `v3`
   v1,
   v2,
 }

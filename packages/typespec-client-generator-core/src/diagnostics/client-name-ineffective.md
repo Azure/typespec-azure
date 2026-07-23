@@ -29,7 +29,7 @@ namespace KeyVault {
   op getSecret(secretName: string): void;
 }
 
-@clientName("listSecretProperties")
+@clientName("listSecretProperties") // ❌ applied to the override method instead of `KeyVault.getSecret`
 op getSecretOverride(secretName: string): void;
 @@override(KeyVault.getSecret, getSecretOverride);
 ```

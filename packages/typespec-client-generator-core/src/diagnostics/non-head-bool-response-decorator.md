@@ -9,7 +9,7 @@ This diagnostic is issued when `@responseAsBool` is applied to an operation that
 
 ```typespec
 @responseAsBool
-@get
+@get // ❌ `@responseAsBool` requires a HEAD operation
 op exists(): void;
 ```
 

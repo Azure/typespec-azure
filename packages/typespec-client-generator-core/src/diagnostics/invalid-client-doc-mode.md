@@ -12,7 +12,7 @@ enum CustomDocMode {
   prepend: "prepend",
 }
 
-@clientDoc("Client-specific text.", CustomDocMode.prepend)
+@clientDoc("Client-specific text.", CustomDocMode.prepend) // ❌ mode must be `append` or `replace`
 model Widget {}
 ```
 
