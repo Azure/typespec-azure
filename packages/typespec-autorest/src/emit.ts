@@ -21,7 +21,7 @@ import {
 } from "@typespec/compiler/experimental";
 import { resolveInfo } from "@typespec/openapi";
 import { getVersioningMutators } from "@typespec/versioning";
-import { isMap, isSeq, parseDocument, stringify as stringifyYaml, type YAMLMap } from "yaml";
+import { isMap, isSeq, parseDocument, stringify as stringifyYaml } from "yaml";
 import { AutorestEmitterOptions, getTracer, reportDiagnostic } from "./lib.js";
 import {
   AutorestDocumentEmitterOptions,
@@ -367,9 +367,16 @@ async function emitServiceYaml(
 
 /**
  * Updates the `versions` list of an existing `service.yaml` document while preserving the rest
- * of the file: document-level comments, comments on unrelated keys, and per-version comments on
- * versions that still exist. Versions that no longer exist are removed and new ones are appended
- * in the generated order.
+ * of the file: document-level comments, comments on unrelated keys, and per-version comments.
+ *
+ * Existing entries are merged rather than replaced:
+ * - versions the emitter regenerated are updated in place (keeping their comments/position),
+ * - versions the emitter no longer produces but that are *not* TypeSpec-sourced (for example
+ *   legacy swagger-only versions that predate the TypeSpec migration) are preserved in place so
+ *   hand-authored or migrated history is not lost,
+ * - versions marked `source: typespec` that the emitter no longer produces are removed, since a
+ *   stale TypeSpec entry would otherwise linger after the version is dropped from the spec, and
+ * - versions the emitter produced that are not yet present are appended in the generated order.
  */
 function updateServiceYamlDocument(existing: string, manifest: ServiceYaml): string {
   const doc = parseDocument(existing);
@@ -380,26 +387,43 @@ function updateServiceYamlDocument(existing: string, manifest: ServiceYaml): str
     return doc.toString();
   }
 
-  const existingByVersion = new Map<string, YAMLMap>();
+  const manifestByVersion = new Map<string, ServiceYamlVersion>();
+  for (const version of manifest.versions) {
+    manifestByVersion.set(version.version, version);
+  }
+
+  const seen = new Set<string>();
+  const merged: (typeof seq.items)[number][] = [];
+
   for (const item of seq.items) {
     if (isMap(item)) {
       const version = item.get("version");
       if (typeof version === "string") {
-        existingByVersion.set(version, item);
+        const regenerated = manifestByVersion.get(version);
+        if (regenerated !== undefined) {
+          // Update regenerated versions in place, keeping their comments and position.
+          seen.add(version);
+          item.set("source", regenerated.source);
+          item.set("swagger-files", regenerated["swagger-files"]);
+        } else if (item.get("source") === "typespec") {
+          // This version claims to be TypeSpec-generated but the emitter no longer produces it,
+          // so it is stale and must be dropped.
+          continue;
+        }
+        // Any other existing entry (e.g. a legacy swagger-only version) is preserved as-is.
       }
+    }
+    merged.push(item);
+  }
+
+  // Append versions produced by the emitter that were not already present.
+  for (const version of manifest.versions) {
+    if (!seen.has(version.version)) {
+      merged.push(doc.createNode(version));
     }
   }
 
-  seq.items = manifest.versions.map((version) => {
-    const existingItem = existingByVersion.get(version.version);
-    if (existingItem !== undefined) {
-      existingItem.set("source", version.source);
-      existingItem.set("swagger-files", version["swagger-files"]);
-      return existingItem;
-    }
-    return doc.createNode(version);
-  });
-
+  seq.items = merged;
   return doc.toString();
 }
 

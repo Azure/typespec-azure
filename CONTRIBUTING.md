@@ -204,7 +204,7 @@ The package also needs a `vitest.config.ts` — the root vitest workspace config
 ```json
 {
   "scripts": {
-    "test": "npm run test:vitest && npm run test:extra",
+    "test": "pnpm test:vitest && pnpm test:extra",
     "test:vitest": "vitest run",
     "test:extra": "dotnet test"
   }
@@ -287,12 +287,12 @@ Do the following to publish a new release:
    main branch (both typespec-azure and core should point to main).
 
 4. Generate release notes for TypeSpec once the full list of changes are in.
-   1. In your fork of the core (typespec) repo, run `npx chronus changelog --policy typespec > out.md`.
+   1. In your fork of the core (typespec) repo, run `pnpm exec chronus changelog --policy typespec > out.md`.
    2. Create a new entry in `./core/website/src/content/docs/docs/release-notes` for this release and paste the contents of `out.md` into the new file. Reorganize the file to have the following sections in order: _Breaking Changes_, _Deprecations_, _Features_, and _Bug Fixes_. Skip the section if there are no entries in it. Also add a blurb above these sections for any especially notable updates.
       Example PR: https://github.com/microsoft/typespec/pull/4102
 
 5. Generate release notes for TypeSpec Azure once the full list of changes are in.
-   1. In your fork of the typespec-azure repo, run `npx chronus changelog --policy typespec-azure > out.md`.
+   1. In your fork of the typespec-azure repo, run `pnpm exec chronus changelog --policy typespec-azure > out.md`.
    2. Create a new entry in `./website/src/content/docs/docs/release-notes` for this release and paste the contents of `out.md` into the new file. Reorganize the file to have the following sections in order: _Breaking Changes_, _Deprecations_, _Features_, and _Bug Fixes_. Skip the section if there are no entries in it. Also add a blurb above these sections for any especially notable updates.
       Example PR: https://github.com/Azure/typespec-azure/pull/1306
 
@@ -438,8 +438,8 @@ Area of the codebase
 | `lib:azure-http-specs`       | #c7aee6 | For issues/prs related to the @azure-tools/typespec-azure-http-specs package        |
 | `emitter:autorest`           | #957300 | Issues for @azure-tools/typespec-autorest emitter                                   |
 | `emitter:python`             | #957300 | Issues for @azure-tools/typespec-python emitter                                     |
-| `emitter:typescript`         | #957300 | Issues for @azure-tools/typespec-ts emitter                                         |
 | `emitter:go`                 | #957300 | Issues for @azure-tools/typespec-go emitter                                         |
+| `emitter:typescript`         | #957300 | Issues for @azure-tools/typespec-ts emitter                                         |
 | `emitter:java`               | #0096c7 | Issues for @azure-tools/typespec-java emitter                                       |
 | `emitter:client:all`         | #957300 | General client emitter issues that do not involve TCGC or typespec-azure-http-specs |
 | `eng`                        | #65bfff |                                                                                     |

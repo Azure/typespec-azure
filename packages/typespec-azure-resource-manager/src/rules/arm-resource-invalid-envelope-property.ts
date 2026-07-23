@@ -1,10 +1,11 @@
-import { Model, ModelProperty, createRule, isKey, paramMessage } from "@typespec/compiler";
+import { Model, ModelProperty, createRule, fileRef, isKey, paramMessage } from "@typespec/compiler";
 
 import { getArmResource } from "../resource.js";
 import { getNamespaceName, getSourceModel } from "./utils.js";
 
 export const armResourceEnvelopeProperties = createRule({
   name: "arm-resource-invalid-envelope-property",
+  docs: fileRef.fromPackageRoot("src/rules/arm-resource-invalid-envelope-property.md"),
   severity: "warning",
   description: "Check for invalid resource envelope properties.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-invalid-envelope-property",

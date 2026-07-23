@@ -17,3 +17,16 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node-version }}
+
+    # `core` is a nested pnpm workspace (git submodule). turbo runs each core package
+    # build via pnpm, which makes pnpm 11's verifyDepsBeforeRun (default `install`) kick
+    # off a full install of the core workspace. With several core packages building in
+    # parallel those installs race on `core/node_modules` and fail with
+    # `ERR_PNPM_ENOTEMPTY`. Setting this in $GITHUB_ENV disables the check job-wide for
+    # every pnpm invocation (including the nested core ones, which read `core/`'s own
+    # workspace config and so can't be reached from the repo-root config). turbo only
+    # forwards it to task processes because it is listed in `globalPassThroughEnv` in
+    # turbo.json. Locally the same var is set by the root `run-all` script (cross-env).
+    - name: Disable pnpm verify-deps-before-run
+      shell: bash
+      run: echo "PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN=false" >> "$GITHUB_ENV"

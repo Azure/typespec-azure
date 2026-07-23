@@ -1,4 +1,4 @@
-import { Operation, Program, createRule } from "@typespec/compiler";
+import { Operation, Program, createRule, fileRef } from "@typespec/compiler";
 import { getResponsesForOperation } from "@typespec/http";
 // import { getExtensions } from "@typespec/openapi";
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
@@ -9,6 +9,7 @@ import { isTemplatedInterfaceOperation } from "./utils.js";
  */
 export const retryAfterRule = createRule({
   name: "retry-after",
+  docs: fileRef.fromPackageRoot("src/rules/retry-after.md"),
   severity: "warning",
   description: "Check if retry-after header appears in response body.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/retry-after",
