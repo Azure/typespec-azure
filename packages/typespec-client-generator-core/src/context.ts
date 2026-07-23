@@ -20,11 +20,11 @@ import { HttpOperation } from "@typespec/http";
 import { stringify } from "yaml";
 import { prepareClientAndOperationCache } from "./cache.js";
 import { defaultDecoratorsAllowList } from "./configs.js";
-import { getClientNameOverride } from "./decorators.js";
 import { handleClientExamples } from "./example.js";
 import {
   SdkArrayType,
   SdkClient,
+  SdkClientType,
   SdkContext,
   SdkDictionaryType,
   SdkEnumType,
@@ -33,6 +33,7 @@ import {
   SdkModelPropertyType,
   SdkModelType,
   SdkNullableType,
+  SdkServiceMethod,
   SdkServiceOperation,
   SdkServiceResponseHeader,
   SdkUnionType,
@@ -41,7 +42,6 @@ import {
 } from "./interfaces.js";
 import {
   BrandedSdkEmitterOptionsInterface,
-  findServiceForOperation,
   handleVersioningMutationForGlobalNamespace,
   parseEmitterName,
   TCGCEmitterOptions,
@@ -49,7 +49,6 @@ import {
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import { createSdkPackage } from "./package.js";
-import { getLibraryName } from "./public-utils.js";
 
 interface CreateTCGCContextOptions {
   mutateNamespace?: boolean; // whether to mutate global namespace for versioning
@@ -273,44 +272,46 @@ function validateNamesUnderNamespaces(context: SdkContext) {
 function validateOperationNamesInClients(context: SdkContext) {
   const diagnostics = createDiagnosticCollector();
 
-  if (!context.__clientToOperationsCache) {
-    return diagnostics.wrap(undefined);
-  }
-
-  for (const [client, operations] of context.__clientToOperationsCache) {
-    if (operations.length <= 1) continue;
-    // Only check clients whose operations come from multiple source services,
-    // since same-service duplicates are already caught by validateClientNamesPerNamespace.
-    const services = client.services.length > 0 ? client.services : client.parent?.services ?? [];
-    const sourceServices = new Set(
-      operations.map((op) => findServiceForOperation(services, op)),
-    );
-    if (sourceServices.size <= 1) continue;
-
-    const nameTracker = new Map<string, Operation[]>();
-    for (const op of operations) {
-      const name =
-        getClientNameOverride(context, op, context.emitterName) ?? getLibraryName(context, op);
-      if (!nameTracker.has(name)) {
-        nameTracker.set(name, [op]);
-      } else {
-        nameTracker.get(name)!.push(op);
-      }
-    }
-    for (const [name, ops] of nameTracker) {
-      if (ops.length > 1) {
-        for (const op of ops) {
-          diagnostics.add(
-            createDiagnostic({
-              code: "duplicate-client-name",
-              messageId: "nonDecorator",
-              format: { name, scope: context.emitterName },
-              target: op,
-            }),
-          );
+  const validateClient = (client: SdkClientType<SdkHttpOperation>) => {
+    if (client.methods.length > 1) {
+      // Only check clients whose methods come from multiple source containers,
+      // since same-container duplicates are already caught by validateClientNamesPerNamespace.
+      const containers = new Set(
+        client.methods.map((m) => m.__raw?.namespace ?? m.__raw?.interface),
+      );
+      if (containers.size > 1) {
+        const nameTracker = new Map<string, SdkServiceMethod<SdkHttpOperation>[]>();
+        for (const method of client.methods) {
+          if (!nameTracker.has(method.name)) {
+            nameTracker.set(method.name, [method]);
+          } else {
+            nameTracker.get(method.name)!.push(method);
+          }
+        }
+        for (const [name, methods] of nameTracker) {
+          if (methods.length > 1) {
+            for (const method of methods) {
+              diagnostics.add(
+                createDiagnostic({
+                  code: "duplicate-client-name",
+                  messageId: "nonDecorator",
+                  format: { name, scope: context.emitterName },
+                  target: method.__raw ?? context.program.getGlobalNamespaceType(),
+                }),
+              );
+            }
+          }
         }
       }
     }
+
+    for (const child of client.children ?? []) {
+      validateClient(child);
+    }
+  };
+
+  for (const client of context.sdkPackage.clients) {
+    validateClient(client);
   }
 
   return diagnostics.wrap(undefined);
