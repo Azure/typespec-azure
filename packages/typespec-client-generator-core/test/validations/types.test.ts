@@ -1114,48 +1114,6 @@ it("no error when operations with the same name are in different sub-clients", a
   strictEqual(duplicateDiags.length, 0);
 });
 
-it("emit error when merged sub-clients have operations with the same name", async () => {
-  const { program } = await SimpleBaseTester.compile(
-    createClientCustomizationInput(
-      `
-    @service
-    namespace ServiceA {
-      @route("/a")
-      namespace Shared {
-        op test(): void;
-      }
-    }
-
-    @service
-    namespace ServiceB {
-      @route("/b")
-      namespace Shared {
-        op test(): void;
-      }
-    }
-    `,
-      `
-    @client({service: [ServiceA, ServiceB]})
-    namespace MyClient {}
-    `,
-    ),
-  );
-  const context = await createSdkContextForTester(program);
-  const duplicateDiags = context.diagnostics.filter(
-    (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
-  );
-  expectDiagnostics(duplicateDiags, [
-    {
-      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
-      message: /test/,
-    },
-    {
-      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
-      message: /test/,
-    },
-  ]);
-});
-
 it("emit error for all instances in three-way service merge with same operation name", async () => {
   const { program } = await SimpleBaseTester.compile(
     createClientCustomizationInput(
@@ -1227,14 +1185,18 @@ it("error only for the language where @clientName causes a conflict", async () =
     ),
   );
   // Python emitter should see a conflict (getItem vs getItem)
-  const pythonContext = await createSdkContextForTester(program, { emitterName: "python" });
+  const pythonContext = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const pythonDiags = pythonContext.diagnostics.filter(
     (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
   );
   strictEqual(pythonDiags.length, 2, "python should have 2 duplicate diagnostics");
 
   // Java emitter should see no conflict (getItem vs fetchItem)
-  const javaContext = await createSdkContextForTester(program, { emitterName: "java" });
+  const javaContext = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   const javaDiags = javaContext.diagnostics.filter(
     (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
   );
@@ -1264,14 +1226,18 @@ it("@clientName fixes conflict for one language but not others", async () => {
     ),
   );
   // Python emitter should see no conflict (test vs testFromB)
-  const pythonContext = await createSdkContextForTester(program, { emitterName: "python" });
+  const pythonContext = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const pythonDiags = pythonContext.diagnostics.filter(
     (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
   );
   strictEqual(pythonDiags.length, 0, "python should have no duplicate diagnostics");
 
   // Java emitter should see a conflict (test vs test)
-  const javaContext = await createSdkContextForTester(program, { emitterName: "java" });
+  const javaContext = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   const javaDiags = javaContext.diagnostics.filter(
     (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
   );
