@@ -1205,6 +1205,7 @@ it("emit error for all instances in three-way service merge with same operation 
 });
 
 it("error only for the language where @clientName causes a conflict", async () => {
+  const { program } = await SimpleBaseTester.compile(
     createClientCustomizationInput(
       `
     @service
