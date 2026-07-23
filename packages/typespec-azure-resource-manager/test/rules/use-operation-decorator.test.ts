@@ -167,6 +167,58 @@ describe("Private ARM resource decorators", () => {
     `);
     await tester.expect(content).toBeValid();
   });
+
+  it("emits diagnostic when @extensionResourceOperation operationType doesn't match the HTTP verb", async () => {
+    const content = buildPrivateDecoratorTestSpec(`
+      @extensionResourceOperation(FooResource, BarResource, "createOrUpdate")
+      @post
+      doAction(...ResourceInstanceParameters<FooResource>): ArmResponse<BarResource> | ErrorResponse;
+    `);
+    await tester.expect(content).toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
+      message:
+        'Resource POST operation decorator @extensionResourceOperation must use operationType "action".',
+    });
+  });
+
+  it("emits diagnostic when @legacyResourceOperation operationType doesn't match the HTTP verb", async () => {
+    const content = buildPrivateDecoratorTestSpec(`
+      @legacyResourceOperation(FooResource, "createOrUpdate")
+      @post
+      doAction(...ResourceInstanceParameters<FooResource>): ArmResponse<FooResource> | ErrorResponse;
+    `);
+    await tester.expect(content).toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
+      message:
+        'Resource POST operation decorator @legacyResourceOperation must use operationType "action".',
+    });
+  });
+
+  it("emits diagnostic when @builtInResourceOperation operationType doesn't match the HTTP verb", async () => {
+    const content = buildPrivateDecoratorTestSpec(`
+      @builtInResourceOperation(FooResource, BarResource, "createOrUpdate")
+      @post
+      doAction(...ResourceInstanceParameters<FooResource>): ArmResponse<BarResource> | ErrorResponse;
+    `);
+    await tester.expect(content).toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
+      message:
+        'Resource POST operation decorator @builtInResourceOperation must use operationType "action".',
+    });
+  });
+
+  it("emits diagnostic when @legacyExtensionResourceOperation operationType doesn't match the HTTP verb", async () => {
+    const content = buildPrivateDecoratorTestSpec(`
+      @legacyExtensionResourceOperation(FooResource, "createOrUpdate")
+      @post
+      doAction(...ResourceInstanceParameters<FooResource>): ArmResponse<FooResource> | ErrorResponse;
+    `);
+    await tester.expect(content).toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
+      message:
+        'Resource POST operation decorator @legacyExtensionResourceOperation must use operationType "action".',
+    });
+  });
 });
 
 describe("Provider operations", () => {

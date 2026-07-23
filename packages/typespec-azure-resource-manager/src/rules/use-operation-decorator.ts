@@ -1,4 +1,6 @@
 import {
+  DecoratorApplication,
+  DecoratorArgument,
   Operation,
   Program,
   createRule,
@@ -19,6 +21,7 @@ export const useOperationDecoratorRule = createRule({
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/use-operation-decorator",
   messages: {
     default: paramMessage`Resource ${"verb"} operation must be decorated with ${"decorator"}.`,
+    invalidOperationType: paramMessage`Resource ${"verb"} operation decorator ${"decorator"} must use operationType ${"operationType"}.`,
   },
   create(context) {
     return {
@@ -36,12 +39,32 @@ export const useOperationDecoratorRule = createRule({
               );
               if (!decorator && !isArmProviderOperation(context.program, operation)) {
                 context.reportDiagnostic({
+                  messageId: "default",
                   target: operation,
                   format: {
                     verb: verb.toUpperCase(),
                     decorator: requiredDecorators.map((d) => `@${d.substring(1)}`).join(" or "),
                   },
                 });
+              } else if (decorator) {
+                const allowedOperationTypes = operationTypesByVerb[verb];
+                const operationType = getGenericDecoratorOperationType(decorator);
+
+                if (
+                  allowedOperationTypes !== undefined &&
+                  operationType !== undefined &&
+                  !allowedOperationTypes.includes(operationType)
+                ) {
+                  context.reportDiagnostic({
+                    messageId: "invalidOperationType",
+                    target: operation,
+                    format: {
+                      verb: verb.toUpperCase(),
+                      decorator: `@${decorator.decorator.name.substring(1)}`,
+                      operationType: allowedOperationTypes.map((x) => `"${x}"`).join(" or "),
+                    },
+                  });
+                }
               }
             }
           }
@@ -58,7 +81,17 @@ const genericArmResourceDecorators = [
   "$legacyResourceOperation",
   "$builtInResourceOperation",
   "$legacyExtensionResourceOperation",
-];
+] as const;
+
+const genericDecoratorOperationTypeArgIndex: Record<
+  (typeof genericArmResourceDecorators)[number],
+  number
+> = {
+  $extensionResourceOperation: 2,
+  $legacyResourceOperation: 1,
+  $builtInResourceOperation: 2,
+  $legacyExtensionResourceOperation: 1,
+};
 
 const resourceOperationDecorators: { [verb in HttpVerb]: string[] } = {
   put: ["$armResourceCreateOrUpdate", ...genericArmResourceDecorators],
@@ -68,6 +101,28 @@ const resourceOperationDecorators: { [verb in HttpVerb]: string[] } = {
   post: ["$armResourceAction", "$armResourceCollectionAction", ...genericArmResourceDecorators],
   head: [],
 };
+
+const operationTypesByVerb: Partial<Record<HttpVerb, readonly string[]>> = {
+  put: ["createOrUpdate"],
+  get: ["read", "list"],
+  patch: ["update"],
+  delete: ["delete"],
+  post: ["action"],
+};
+
+function getGenericDecoratorOperationType(decorator: DecoratorApplication): string | undefined {
+  const decoratorName = decorator.decorator.name as (typeof genericArmResourceDecorators)[number];
+  if (!genericArmResourceDecorators.includes(decoratorName)) {
+    return undefined;
+  }
+
+  const operationTypeArg = decorator.args[genericDecoratorOperationTypeArgIndex[decoratorName]];
+  return getStringJsValue(operationTypeArg);
+}
+
+function getStringJsValue(arg: DecoratorArgument | undefined): string | undefined {
+  return typeof arg?.jsValue === "string" ? arg.jsValue : undefined;
+}
 
 function isStaticSegment(segment: string | undefined): boolean {
   return segment === undefined || segment === "locations";
