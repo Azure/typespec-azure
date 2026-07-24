@@ -1,5 +1,15 @@
 Tracked Resources must use 3 or fewer levels of nesting. Deeply nested resources make the API harder to use and are discouraged by ARM guidelines.
 
+## Impact
+
+- **Area:** API
+
+Nesting resources beyond three levels violates the RPC contract.
+
+## LintDiff Equivalent
+
+This rule corresponds to the LintDiff rule [TrackedResourceBeyondThirdLevel](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md).
+
 #### ❌ Incorrect
 
 ```tsp
@@ -48,3 +58,7 @@ model C is TrackedResource<{}> {
   ...ResourceNameParameter<C>;
 }
 ```
+
+## Suppression
+
+Suppress per the RPC guidelines; otherwise restructure so the resource layout has no more than three levels of nesting.

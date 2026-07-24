@@ -1,5 +1,11 @@
 Operations over the same resource or using the same path structure should use consistent path parameter names. When two operations resolve to the same resource or path structure but use different names for corresponding path parameters, it typically indicates an inadvertent mismatch in path parameter names.
 
+## Impact
+
+- **Area:** SDK
+
+For resource operations, a route/parameter name mismatch can produce awkward SDK operation signatures. This rule has a relatively high false-positive rate.
+
 #### ❌ Incorrect
 
 Two operations with the same path structure but different parameter names:
@@ -44,3 +50,7 @@ op getFoo(@path fooName: string): void;
 @route("/providers/Microsoft.Contoso/bars/{barName}")
 op getBar(@path barName: string): void;
 ```
+
+## Suppression
+
+Suppress when it is a false positive; otherwise use the standard resource operation templates.

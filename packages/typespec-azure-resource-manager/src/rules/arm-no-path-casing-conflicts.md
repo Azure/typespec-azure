@@ -4,6 +4,12 @@ paths differ only by character casing (for example `/foos` and `/Foos`, or
 are part of the comparison: paths whose parameter names differ (for example
 `/{resourceUri}/...` versus `/{scope}/...`) are treated as distinct.
 
+## Impact
+
+- **Area:** API, SDK
+
+Different-cased paths to the same resource can cause ARM manifest failures.
+
 #### ❌ Incorrect
 
 ```tsp
@@ -43,3 +49,7 @@ model Bar is ProxyResource<{}> {
   name: string;
 }
 ```
+
+## Suppression
+
+Do not suppress unless it is a false positive. Normalize the path casing.

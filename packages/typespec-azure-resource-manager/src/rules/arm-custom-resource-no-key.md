@@ -4,6 +4,12 @@
 
 Custom Azure resource models must define a key property using the `@key` decorator, especially if the custom resource will be used in operations. Without a key, operation paths may be duplicated.
 
+## Impact
+
+- **Area:** API, SDK
+
+Mainly a correctness issue: the resource's name property should be marked with `@key`.
+
 #### ❌ Incorrect
 
 ```tsp
@@ -22,3 +28,7 @@ model CustomResource {
   someId: string;
 }
 ```
+
+## Suppression
+
+Suppress only when required to match an existing API; otherwise add `@key` to the name parameter of the resource.

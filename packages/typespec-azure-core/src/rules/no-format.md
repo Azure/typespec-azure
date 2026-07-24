@@ -1,5 +1,11 @@
 Using the `@format` decorator is disallowed. While in OpenAPI `format:` was used to both represent a known string format and a more precise type, in TypeSpec `@format` is only meant to represent a known pattern for a string. This means that using `@format` would result in a `string` type with some validation.
 
+## Impact
+
+- **Area:** API, SDK
+
+`@format` may specify an invalid or non-standard format.
+
 ## Mapping of format to types
 
 | Format   | Type                               |
@@ -32,3 +38,7 @@ model Pet {
   id: Azure.Core.uuid;
 }
 ```
+
+## Suppression
+
+Suppression is acceptable when a valid format is used. Prefer standard types (which apply the correct wire format automatically), or `@encode` when a non-standard format such as base64url is required.

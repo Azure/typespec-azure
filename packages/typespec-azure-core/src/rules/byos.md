@@ -2,6 +2,12 @@ Operations that upload binary data (using content types like `application/octet-
 
 See the [Azure REST API Guidelines - BYOS](https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#bring-your-own-storage-byos) for more details.
 
+## Impact
+
+- **Area:** API
+
+The API transfers large artifacts through the service (upload/download) instead of using a storage account, which scales poorly and diverges from Azure guidance.
+
 #### ❌ Incorrect
 
 Uploading binary data with `application/octet-stream`:
@@ -35,3 +41,7 @@ op download(): {
   @header contentType: "application/octet-stream";
 };
 ```
+
+## Suppression
+
+Suppress when direct upload/download is appropriate for the API; otherwise use a storage account for large artifacts.
