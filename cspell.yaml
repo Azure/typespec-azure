@@ -32,6 +32,8 @@ ignorePaths:
   - packages/typespec-go/test/**
   - packages/typespec-go/temp/**
   - packages/typespec-go/.scripts/**
+  # Go spector configs carry Go module names (moved out of .scripts/tspcompile.js).
+  - packages/typespec-go/spector.config.*.yaml
   # typespec-java specs and hand-written tests are synced verbatim from
   # core / autorest.java; don't spell-check upstream-sourced content.
   - packages/typespec-java/emitter-tests/tsp/**
