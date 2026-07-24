@@ -1,6 +1,12 @@
 A model using `@discriminator` is meant to be used in a polymorphic context. It should be extended to represent the relation.
 Spreading this model is a sign that either the `@discriminator` decorator is unnecessary or that `model extends` should have been used instead.
 
+## Impact
+
+- **Area:** SDK
+
+Spreading a discriminated model silently drops the discriminator, which is usually a mistake.
+
 #### ❌ Incorrect
 
 ```tsp
@@ -39,3 +45,7 @@ model Cat extends Pet {
   meow: boolean;
 }
 ```
+
+## Suppression
+
+Suppress only when intended (unlikely); only spread non-discriminated types.

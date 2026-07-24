@@ -1,13 +1,7 @@
 import pc from "picocolors";
 import { parseArgs } from "util";
 import { runOrExit } from "../../core/packages/internal-build-utils/dist/src/common.js";
-import {
-  CommandFailedError,
-  checkForChangedFiles,
-  coreRepoRoot,
-  listPackages,
-  repoRoot,
-} from "./helpers.js";
+import { CommandFailedError, checkForChangedFiles, coreRepoRoot, repoRoot } from "./helpers.js";
 
 const columns = process.stdout.columns;
 function log(...args) {
@@ -89,8 +83,6 @@ if (production && (await checkForChangedFiles(repoRoot, undefined, { silent: tru
 }
 
 log("Bumping cross-submodule dependencies");
-// Determine project versions including any bumps from typespec publish above
-const versions = await getProjectVersions();
 
 // Stage typespec-azure publish
 await typespecAzureRun("pnpm", "change", "version");
@@ -188,14 +180,6 @@ async function typespecAzureRunWithRetries(tries, command, ...args) {
       await typespecAzureRunWithRetries(tries, command, ...args);
     } else throw err;
   }
-}
-
-async function getProjectVersions() {
-  const map = new Map();
-  for (const project of await listPackages()) {
-    map.set(project.manifest.name, project.manifest.version);
-  }
-  return map;
 }
 
 async function rebuildAndRegenSamplesToBumpTemplateVersions() {

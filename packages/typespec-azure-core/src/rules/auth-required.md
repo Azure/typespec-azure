@@ -1,5 +1,11 @@
 Ensure Azure services define their authentication requirements. See https://azure.github.io/typespec-azure/docs/reference/azure-style-guide#security-definitions
 
+## Impact
+
+- **Area:** API, SDK
+
+All ARM APIs share the same authentication, so a violation has no runtime effect on the API or SDK. It usually indicates the root namespace is missing its provider registration.
+
 #### ❌ Incorrect
 
 ```tsp
@@ -36,3 +42,7 @@ namespace Contoso.WidgetManager;
 /** The secret key for your Azure Cognitive Services subscription. */
 model AzureKey is ApiKeyAuth<ApiKeyLocation.header, "Ocp-Apim-Subscription-Key">;
 ```
+
+## Suppression
+
+This should essentially never occur. Rather than suppressing, add `@armProviderNamespace` to the root namespace.
