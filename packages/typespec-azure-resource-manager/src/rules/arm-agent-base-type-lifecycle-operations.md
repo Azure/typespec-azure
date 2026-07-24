@@ -1,4 +1,4 @@
-Conversation and Response child resources of an Agent must define create, read, update, and delete lifecycle operations.
+Implement the full lifecycle on each required child resource so Agent clients can manage conversations and responses consistently.
 
 ## Impact
 
@@ -6,7 +6,7 @@ Conversation and Response child resources of an Agent must define create, read, 
 
 Agent base types must correctly model their lifecycle operations; violations can misrepresent the resource for emitters and tooling.
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 @armProviderNamespace
@@ -27,7 +27,7 @@ interface Conversations {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 @armProviderNamespace

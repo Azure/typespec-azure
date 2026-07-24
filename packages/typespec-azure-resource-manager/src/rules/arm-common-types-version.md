@@ -1,4 +1,4 @@
-ARM services must specify the ARM common-types version using the `@armCommonTypesVersion` decorator. If the same common types version is used across all service versions, this decorator should be applied either on the service namespace or on each version enum member. If the common types version is updated in later versions, the decorator should appear on each version enum member.
+If the same common types version is used across all service versions, this decorator should be applied either on the service namespace or on each version enum member. If the common types version is updated in later versions, the decorator should appear on each version enum member.
 
 ## Impact
 
@@ -6,14 +6,14 @@ ARM services must specify the ARM common-types version using the `@armCommonType
 
 Indicates common-types are not being used, which normally surfaces as other violations too.
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 @armProviderNamespace
 namespace Microsoft.Contoso;
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 Apply `@armCommonTypesVersion` on the namespace:
 
@@ -23,7 +23,7 @@ Apply `@armCommonTypesVersion` on the namespace:
 namespace Microsoft.Contoso;
 ```
 
-#### ✅ Correct (per version)
+## ✅ Correct (per version)
 
 Apply `@armCommonTypesVersion` on each version enum member:
 

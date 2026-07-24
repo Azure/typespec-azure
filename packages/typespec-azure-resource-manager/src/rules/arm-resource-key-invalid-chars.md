@@ -1,4 +1,4 @@
-ARM resource key must contain only alphanumeric characters or dashes, starting with a lowercase letter.
+Beyond alphanumeric characters, a resource key may also contain dashes, but it must start with a lowercase letter.
 
 ## Impact
 
@@ -6,7 +6,7 @@ ARM resource key must contain only alphanumeric characters or dashes, starting w
 
 Invalid characters in a resource key produce invalid parameter names in SDKs.
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 model Employee is TrackedResource<EmployeeProperties> {
@@ -14,7 +14,7 @@ model Employee is TrackedResource<EmployeeProperties> {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 model Employee is TrackedResource<EmployeeProperties> {

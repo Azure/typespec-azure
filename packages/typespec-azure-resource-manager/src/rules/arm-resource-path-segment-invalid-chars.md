@@ -6,7 +6,7 @@ ARM resource path segments must contain only alphanumeric characters or dashes, 
 
 Invalid characters in a path segment produce an invalid ARM API and invalid parameter names.
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 model FooResource is TrackedResource<{}> {
@@ -14,7 +14,7 @@ model FooResource is TrackedResource<{}> {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 model FooResource is TrackedResource<{}> {

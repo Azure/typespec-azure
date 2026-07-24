@@ -10,7 +10,7 @@ The PUT operation returns response codes that violate the RPC contract.
 
 This rule corresponds to the LintDiff rule [PutResponseCodes](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md).
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 @armResourceOperations
@@ -23,7 +23,7 @@ interface Employees {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 @armResourceOperations

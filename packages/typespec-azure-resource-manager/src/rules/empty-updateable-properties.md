@@ -1,4 +1,4 @@
-Resources with update operations should have updateable properties. The RP-specific properties of the resource (as defined in the `properties` property) should have at least one updateable property. Properties are updateable if they do not have a `@visibility` decorator, or if they include `Lifecycle.Update` in the `@visibility` decorator arguments.
+The RP-specific properties of the resource (as defined in the `properties` property) should have at least one updateable property. Properties are updateable if they do not have a `@visibility` decorator, or if they include `Lifecycle.Update` in the `@visibility` decorator arguments.
 
 ## Impact
 
@@ -6,7 +6,7 @@ Resources with update operations should have updateable properties. The RP-speci
 
 Covered by the patch-specific rules; indicates the properties bag has no updateable properties.
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 All properties are read-only:
 
@@ -17,7 +17,7 @@ model FooResourceProperties {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 At least one property without read-only visibility:
 

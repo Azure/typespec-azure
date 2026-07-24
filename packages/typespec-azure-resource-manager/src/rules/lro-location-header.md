@@ -1,8 +1,4 @@
-```text title=- Full name-
-@azure-tools/typespec-azure-resource-manager/lro-location-header
-```
-
-Long-running (LRO) operations with 202 responses must have a "Location" response header.
+The header tells clients where to poll after a 202 response from a long-running operation.
 
 ## Impact
 
@@ -14,7 +10,7 @@ A long-running operation without the standard Location header violates the RPC c
 
 This rule corresponds to the LintDiff rule [LroLocationHeader](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md).
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 @armResourceOperations
@@ -23,7 +19,7 @@ interface Employees {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 @armResourceOperations

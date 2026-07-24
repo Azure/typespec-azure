@@ -1,7 +1,3 @@
-```text title=- Full name-
-@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation
-```
-
 Every ARM resource that provides a create operation must also provide a delete operation.
 
 ## Impact
@@ -14,7 +10,7 @@ A tracked resource without a delete operation violates the RPC contract.
 
 This rule corresponds to the LintDiff rule [AllTrackedResourcesMustHaveDelete](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md).
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 @armResourceOperations
@@ -23,7 +19,7 @@ interface EmployeeOperations {
 }
 ```
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 @armResourceOperations
@@ -33,7 +29,7 @@ interface EmployeeOperations {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 @armResourceOperations

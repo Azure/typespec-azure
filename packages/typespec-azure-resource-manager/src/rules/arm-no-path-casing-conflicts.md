@@ -1,8 +1,4 @@
-ARM operation paths must be unique case-insensitively. Two operations whose
-paths differ only by character casing (for example `/foos` and `/Foos`, or
-`/{scope}/...` and `/{Scope}/...`) violate this rule. Path parameter names
-are part of the comparison: paths whose parameter names differ (for example
-`/{resourceUri}/...` versus `/{scope}/...`) are treated as distinct.
+Two operations whose paths differ only by character casing (for example `/foos` and `/Foos`, or `/{scope}/...` and `/{Scope}/...`) violate this rule. Path parameter names are part of the comparison: paths whose parameter names differ (for example `/{resourceUri}/...` versus `/{scope}/...`) are treated as distinct.
 
 ## Impact
 
@@ -10,7 +6,7 @@ are part of the comparison: paths whose parameter names differ (for example
 
 Different-cased paths to the same resource can cause ARM manifest failures.
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 model Foo is ProxyResource<{}> {
@@ -30,7 +26,7 @@ model Bar is ProxyResource<{}> {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 model Foo is ProxyResource<{}> {

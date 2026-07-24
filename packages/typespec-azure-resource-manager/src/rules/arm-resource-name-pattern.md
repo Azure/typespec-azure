@@ -1,4 +1,4 @@
-Resource names must specify a pattern string using `@pattern`, providing a regular expression that the name must match.
+Use a regular expression that accurately describes valid resource names so invalid names can be rejected before requests are sent.
 
 ## Impact
 
@@ -10,7 +10,7 @@ The resource name lacks the required pattern restriction, violating the RPC cont
 
 This rule corresponds to the LintDiff rule [ResourceNameRestriction](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md).
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 model Employee is ProxyResource<{}> {
@@ -21,7 +21,7 @@ model Employee is ProxyResource<{}> {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 model Employee is ProxyResource<{}> {

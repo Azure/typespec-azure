@@ -1,5 +1,3 @@
-Check the ARM specification is not using types not supported in ARM.
-
 Primitive types currently unsupported in ARM:
 
 - int8
@@ -15,7 +13,7 @@ Primitive types currently unsupported in ARM:
 
 The data type cannot be modeled in SDKs.
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 model ResourceProperties {
@@ -23,7 +21,7 @@ model ResourceProperties {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 model ResourceProperties {
