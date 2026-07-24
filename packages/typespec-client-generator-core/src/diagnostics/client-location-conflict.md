@@ -13,7 +13,7 @@ This diagnostic is issued when a `@clientLocation` move conflicts with the clien
 
 ## String target with multiple root clients
 
-## Diagnostic Message
+### Diagnostic Message
 
 For the client location above, TCGC reports:
 
@@ -21,13 +21,13 @@ For the client location above, TCGC reports:
 @clientLocation with string target could not be used for multiple root clients scenario
 ```
 
-## ✅ How to Fix
+### ✅ How to Fix
 
 Use an interface or namespace target when multiple root clients exist, or define the target sub client explicitly under the intended root client.
 
 ## Operation to operation
 
-## Diagnostic Message
+### Diagnostic Message
 
 For the client location above, TCGC reports:
 
@@ -35,13 +35,13 @@ For the client location above, TCGC reports:
 `@clientLocation` cannot be used to move an operation to another operation. Operations can only be moved to interfaces or namespaces.
 ```
 
-## ✅ How to Fix
+### ✅ How to Fix
 
 Move the operation to an interface or namespace instead of another operation.
 
 ## Model property conflicts with client initialization
 
-## Diagnostic Message
+### Diagnostic Message
 
 For the client location above, TCGC reports:
 
@@ -49,13 +49,13 @@ For the client location above, TCGC reports:
 There is already a parameter called 'apiKey' in the client initialization.
 ```
 
-## ✅ How to Fix
+### ✅ How to Fix
 
 Rename one of the parameters or avoid moving the model property to a client that already has a client initialization parameter with that name.
 
 ## Model property moved to string target
 
-## Diagnostic Message
+### Diagnostic Message
 
 For the client location above, TCGC reports:
 
@@ -63,13 +63,13 @@ For the client location above, TCGC reports:
 `@clientLocation` can only move model properties to interfaces or namespaces.
 ```
 
-## ✅ How to Fix
+### ✅ How to Fix
 
 Move the model property to a concrete interface or namespace target instead of a string-named target.
 
 ## Moved parameters with conflicting types
 
-## ❌ Incorrect Usage
+### ❌ Incorrect Usage
 
 ```typespec
 @service
@@ -90,7 +90,7 @@ op getInsights(...WithPreviewHeader<FeatureOptInKeys.insights>): void;
 op getSchedules(...WithPreviewHeader<FeatureOptInKeys.schedules>): void;
 ```
 
-## Diagnostic Message
+### Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -98,7 +98,7 @@ For the declaration above, TCGC reports:
 @clientLocation cannot move multiple parameters named 'previewFeatures' with different types to the same client. This often happens when @clientLocation is applied to a templated parameter that is instantiated with different types. Move the parameter on each operation instead, so that it has a consistent type on the client.
 ```
 
-## ✅ How to Fix
+### ✅ How to Fix
 
 Move the parameter on each operation instead of on the templated alias, or ensure every moved `previewFeatures` parameter has the same type.
 

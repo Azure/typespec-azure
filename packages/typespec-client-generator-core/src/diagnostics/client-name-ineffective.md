@@ -7,7 +7,7 @@ This diagnostic is issued when a `@clientName` application will not affect the g
 
 ## Ineffective target
 
-## Diagnostic Message
+### Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -15,13 +15,13 @@ For the declaration above, TCGC reports:
 Application of @clientName decorator to WidgetName is not effective
 ```
 
-## ✅ How to Fix
+### ✅ How to Fix
 
 Move `@clientName` to the declaration that TCGC actually uses for the generated SDK name, or remove the ineffective decorator.
 
 ## Override method
 
-## ❌ Incorrect Usage
+### ❌ Incorrect Usage
 
 ```typespec
 @service
@@ -34,7 +34,7 @@ op getSecretOverride(secretName: string): void;
 @@override(KeyVault.getSecret, getSecretOverride);
 ```
 
-## Diagnostic Message
+### Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -42,7 +42,7 @@ For the declaration above, TCGC reports:
 Application of @clientName decorator to listSecretProperties is not effective because it is applied to the override method. Please apply it on the original method definition "getSecret" instead.
 ```
 
-## ✅ How to Fix
+### ✅ How to Fix
 
 Move `@clientName` to the declaration TCGC actually generates, such as the original operation when using `@override`:
 

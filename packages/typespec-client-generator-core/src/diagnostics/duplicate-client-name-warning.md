@@ -7,7 +7,7 @@ This diagnostic is issued when two generated SDK declarations share the same cli
 
 ## Decorator-applied duplicate
 
-## ❌ Incorrect Usage
+### ❌ Incorrect Usage
 
 ```typespec
 interface StorageTasks {
@@ -20,7 +20,7 @@ interface StorageTasks {
 }
 ```
 
-## Diagnostic Message
+### Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -28,7 +28,7 @@ For the declaration above, TCGC reports:
 Client name: "list" is duplicated in language scope: "csharp"
 ```
 
-## ✅ How to Fix
+### ✅ How to Fix
 
 Give `listByParent` a distinct C# client name, or suppress the warning if the duplicate intentionally represents an overload.
 
@@ -45,7 +45,7 @@ interface StorageTasks {
 
 ## Generated name conflict
 
-## Diagnostic Message
+### Diagnostic Message
 
 For the generated operation name above, TCGC reports:
 
@@ -53,7 +53,7 @@ For the generated operation name above, TCGC reports:
 Client name: "list" is defined somewhere causing naming conflicts in language scope: "csharp"
 ```
 
-## ✅ How to Fix
+### ✅ How to Fix
 
 Rename one of the generated operations for the affected scope, or suppress the warning when the duplicate is an intentional overload.
 
