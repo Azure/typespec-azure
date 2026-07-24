@@ -261,3 +261,6 @@ packages/typespec-java/emitter-tests/tsp-spector-coverage-*.json
 # packages/*/src/rules/*.md and packages/*/src/diagnostics/*.md.
 website/src/content/docs/docs/libraries/*/rules/
 website/src/content/docs/docs/libraries/*/reference/diagnostics/
+
+# Empty
+prs.external-reviewers.generated.yml

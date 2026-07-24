@@ -1,5 +1,11 @@
 Patch envelope properties should match the resource properties. If a resource defines envelope properties such as `identity`, `managedBy`, `plan`, `sku`, or `tags`, these properties must also be present in the PATCH request body so they can be updated.
 
+## Impact
+
+- **Area:** API
+
+The PATCH operation is missing updateable envelope properties.
+
 #### ❌ Incorrect
 
 ```tsp
@@ -45,3 +51,7 @@ interface FooResources {
   update is ArmCustomPatchAsync<FooResource, PatchFoo>;
 }
 ```
+
+## Suppression
+
+There are no hard-and-fast rules, but patchable envelope properties should generally be standard - include patchable versions of the envelope properties.

@@ -49,8 +49,4 @@ namespace My.Service {
 
 ## Suppression
 
-Suppress this warning only if `@clientApiVersions` is temporarily present before service versioning is added and the generated client should ignore it.
-
-```typespec
-#suppress "@azure-tools/typespec-client-generator-core/require-versioned-service" "client API versions staged before versioning"
-```
+This diagnostic should not be suppressed. Add versioning to the service (with `@versioned`), or remove `@clientApiVersions` if the service is not versioned.

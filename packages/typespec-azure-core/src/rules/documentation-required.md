@@ -1,5 +1,15 @@
 Enums, models, operations, and their members/properties should have documentation. Use doc comments (`/** */`) to provide descriptions.
 
+## Impact
+
+- **Area:** API, SDK
+
+Missing documentation produces poor SDK reference docs and API documentation.
+
+## LintDiff Equivalent
+
+This rule corresponds to the LintDiff rule [SummaryOrDescription](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md).
+
 #### ❌ Incorrect
 
 Model without documentation:
@@ -50,3 +60,7 @@ enum PetKind {
 :::note
 Version enums and discriminator enums/unions are exempt from this rule as they are considered self-documenting.
 :::
+
+## Suppression
+
+Do not suppress. Add a `/** */` doc comment or an `@doc` decorator.

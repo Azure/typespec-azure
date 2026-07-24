@@ -1,5 +1,11 @@
 Conversation and Response child resources of an Agent must define create, read, update, and delete lifecycle operations.
 
+## Impact
+
+- **Area:** API, SDK
+
+Agent base types must correctly model their lifecycle operations; violations can misrepresent the resource for emitters and tooling.
+
 #### ❌ Incorrect
 
 ```tsp
@@ -47,3 +53,7 @@ interface Conversations {
   listByAgent is ArmResourceListByParent<MyConversation>;
 }
 ```
+
+## Suppression
+
+Suppress only when required to match an existing API; otherwise use the standard agent base type patterns.

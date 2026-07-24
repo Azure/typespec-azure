@@ -813,6 +813,7 @@ function addDiscriminatorToModelType(
       doc: `Discriminator property for ${model.name}.`,
       optional: false,
       discriminator: true,
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       serializedName: discriminatorProperty
         ? discriminatorProperty.serializedName // eslint-disable-line @typescript-eslint/no-deprecated
         : discriminator.propertyName,
@@ -826,6 +827,7 @@ function addDiscriminatorToModelType(
         ? getAvailableApiVersions(context, discriminatorProperty.__raw!, type)
         : model.apiVersions,
       isApiVersionParam: false,
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
       crossLanguageDefinitionId: `${model.crossLanguageDefinitionId}.${name}`,
@@ -2526,6 +2528,10 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
       }
       filterPreviewVersion(context, sdkVersionsEnum, versions?.at(-1) || "", service);
       diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum));
+      if (!context.__serviceToVersionsSdkEnum) {
+        context.__serviceToVersionsSdkEnum = new Map();
+      }
+      context.__serviceToVersionsSdkEnum.set(service, sdkVersionsEnum);
     }
   }
   // update for orphan models/enums/unions

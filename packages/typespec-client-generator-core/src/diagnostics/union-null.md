@@ -19,8 +19,4 @@ Add at least one non-null variant to the union or remove the union from the gene
 
 ## Suppression
 
-Suppress this warning only if the null-only union is intentionally excluded from usable SDK models and you accept TCGC's fallback representation.
-
-```typespec
-#suppress "@azure-tools/typespec-client-generator-core/union-null" "null-only union intentionally not generated"
-```
+This diagnostic should not be suppressed. Fix the spec so the union has at least one non-null variant, or remove the union from the generated client surface.

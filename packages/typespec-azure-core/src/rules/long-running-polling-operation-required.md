@@ -1,5 +1,11 @@
 Long-running operations that return an `Operation-Location` header should have a linked polling operation. Use the `@pollingOperation` decorator to link a status polling operation.
 
+## Impact
+
+- **Area:** API, SDK
+
+Does not apply to ARM LROs, but flags an operation that cannot be represented as a long-running operation.
+
 #### ❌ Incorrect
 
 Operation returning `Operation-Location` header without a linked polling operation:
@@ -35,3 +41,7 @@ op readWithCustomHeader(): {
   @header("Operation-Location") location: string;
 };
 ```
+
+## Suppression
+
+Do not suppress unless it is a false positive. Use the standard Async operation templates.

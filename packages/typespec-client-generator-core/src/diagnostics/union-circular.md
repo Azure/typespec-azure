@@ -45,8 +45,4 @@ namespace Test {
 
 ## Suppression
 
-Suppress this warning only if the recursive union is intentionally left in the source and you accept that TCGC cannot produce a usable SDK union for it.
-
-```typespec
-#suppress "@azure-tools/typespec-client-generator-core/union-circular" "recursive union intentionally ignored by SDK"
-```
+This diagnostic should not be suppressed. Fix the spec to break the circular union reference, or model the recursion through a model property instead.

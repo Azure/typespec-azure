@@ -3,9 +3,9 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@10.30.2",
+  "packageManager": "pnpm@11.10.0",
   "scripts": {
-    "run-all": "turbo --filter=!@typespec/monorepo",
+    "run-all": "cross-env PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN=false turbo --filter=!@typespec/monorepo",
     "run-azure-only": "turbo --filter=!{./core/**}",
     "build": "pnpm run-all build && pnpm check:eng",
     "deps": "tsx eng/scripts/sync-deps.ts",
@@ -49,9 +49,10 @@
   "devDependencies": {
     "@chronus/chronus": "catalog:",
     "@chronus/github": "catalog:",
-    "@pnpm/workspace.find-packages": "catalog:",
+    "@chronus/github-pr-commenter": "catalog:",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
+    "cross-env": "catalog:",
     "cspell": "catalog:",
     "oxlint": "catalog:",
     "oxlint-tsgolint": "catalog:",
