@@ -10,7 +10,7 @@ are part of the comparison: paths whose parameter names differ (for example
 
 Different-cased paths to the same resource can cause ARM manifest failures.
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 model Foo is ProxyResource<{}> {
@@ -30,7 +30,7 @@ model Bar is ProxyResource<{}> {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 model Foo is ProxyResource<{}> {

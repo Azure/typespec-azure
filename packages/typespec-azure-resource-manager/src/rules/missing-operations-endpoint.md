@@ -10,14 +10,14 @@ The service is missing the standard Operations endpoint required by the RPC cont
 
 This rule corresponds to the LintDiff rule [OperationsAPIImplementation](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md#r3023).
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp title="main.tsp"
 @armProviderNamespace
 namespace MyService;
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp title="main.tsp"
 @armProviderNamespace

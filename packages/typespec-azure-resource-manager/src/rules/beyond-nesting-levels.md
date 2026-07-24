@@ -10,7 +10,7 @@ Nesting resources beyond three levels violates the RPC contract.
 
 This rule corresponds to the LintDiff rule [TrackedResourceBeyondThirdLevel](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md).
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 @armProviderNamespace
@@ -37,7 +37,7 @@ model D is TrackedResource<{}> {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 @armProviderNamespace

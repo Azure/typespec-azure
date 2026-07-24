@@ -10,7 +10,7 @@ Reusing an envelope property name inside the RP-specific property bag violates t
 
 This rule corresponds to the LintDiff rule [ArmResourcePropertiesBag](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md#r3019).
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 @armProviderNamespace
@@ -27,7 +27,7 @@ model FooProperties {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 @armProviderNamespace

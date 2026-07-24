@@ -10,7 +10,7 @@ Custom Azure resource models must define a key property using the `@key` decorat
 
 Mainly a correctness issue: the resource's name property should be marked with `@key`.
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 @Azure.ResourceManager.Legacy.customAzureResource
@@ -19,7 +19,7 @@ model CustomResource {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 @Azure.ResourceManager.Legacy.customAzureResource

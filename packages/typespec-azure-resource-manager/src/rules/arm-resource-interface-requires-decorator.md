@@ -1,12 +1,12 @@
 Each resource interface must have an `@armResourceOperations` decorator to associate the interface with its ARM resource type.
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 interface FooResources extends TrackedResourceOperations<FooResource, FooProperties> {}
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 @armResourceOperations(FooResource)

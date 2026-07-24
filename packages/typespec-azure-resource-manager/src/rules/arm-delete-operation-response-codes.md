@@ -1,7 +1,3 @@
-## Synchronous
-
-````
-
 ## Impact
 
 - **Area:** API
@@ -16,7 +12,7 @@ This rule corresponds to the LintDiff rule [DeleteResponseCodes](https://github.
 
 Synchronous delete operations should use the `ArmResourceDeleteSync` template. They must have 200, 204, default and no other responses.
 
-#### ❌ Incorrect
+### ❌ Incorrect
 
 ```tsp
 @armResourceOperations
@@ -27,9 +23,9 @@ interface Employees {
     result: boolean;
   };
 }
-````
+```
 
-#### ✅ Correct
+### ✅ Correct
 
 ```tsp
 @armResourceOperations
@@ -42,7 +38,7 @@ interface Employees {
 
 Long-running (LRO) delete operations should use the `ArmResourceDeleteWithoutOkAsync` template. They must have 202, 204, default, and no other responses.
 
-#### ❌ Incorrect
+### ❌ Incorrect
 
 ```tsp
 @armResourceOperations
@@ -51,7 +47,7 @@ interface Employees {
 }
 ```
 
-#### ✅ Correct
+### ✅ Correct
 
 ```tsp
 @armResourceOperations

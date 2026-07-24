@@ -6,7 +6,7 @@ Tenant and Extension resources should not define a list by subscription operatio
 
 Likely a modeling error - only subscription-based resources should have subscription list operations.
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 @tenantResource
@@ -20,7 +20,7 @@ interface FooResources {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 @tenantResource

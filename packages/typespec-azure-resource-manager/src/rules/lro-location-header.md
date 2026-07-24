@@ -14,7 +14,7 @@ A long-running operation without the standard Location header violates the RPC c
 
 This rule corresponds to the LintDiff rule [LroLocationHeader](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md).
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 @armResourceOperations
@@ -23,7 +23,7 @@ interface Employees {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 @armResourceOperations

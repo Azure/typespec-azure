@@ -14,7 +14,7 @@ The resource operation returns a response schema that violates the RPC contract.
 
 This rule corresponds to the LintDiff rule [PutGetPatchResponseSchema](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md#r3007) (the TypeSpec rule also covers `list`).
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 @armResourceOperations
@@ -26,7 +26,7 @@ interface FooResources {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 @armResourceOperations

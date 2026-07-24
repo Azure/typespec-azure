@@ -6,7 +6,7 @@ Avoid using the `@customAzureResource` decorator. It doesn't provide validation 
 
 The resource does not use the ARM common-types resource base types.
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 @Azure.ResourceManager.Legacy.customAzureResource
@@ -15,7 +15,7 @@ model Person {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 Use standard ARM resource types:
 

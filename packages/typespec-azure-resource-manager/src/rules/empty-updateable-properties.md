@@ -6,7 +6,7 @@ Resources with update operations should have updateable properties. The RP-speci
 
 Covered by the patch-specific rules; indicates the properties bag has no updateable properties.
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 All properties are read-only:
 
@@ -17,7 +17,7 @@ model FooResourceProperties {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 At least one property without read-only visibility:
 

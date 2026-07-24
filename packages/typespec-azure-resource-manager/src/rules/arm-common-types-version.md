@@ -6,14 +6,14 @@ ARM services must specify the ARM common-types version using the `@armCommonType
 
 Indicates common-types are not being used, which normally surfaces as other violations too.
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 @armProviderNamespace
 namespace Microsoft.Contoso;
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 Apply `@armCommonTypesVersion` on the namespace:
 
@@ -23,7 +23,7 @@ Apply `@armCommonTypesVersion` on the namespace:
 namespace Microsoft.Contoso;
 ```
 
-#### ✅ Correct (per version)
+## ✅ Correct (per version)
 
 Apply `@armCommonTypesVersion` on each version enum member:
 

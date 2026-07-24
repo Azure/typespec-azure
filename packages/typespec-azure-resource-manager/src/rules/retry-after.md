@@ -6,7 +6,7 @@ Check if the `Retry-After` header appears in the response for long-running opera
 
 Long-running or throttled operations should expose a standard Retry-After header so clients can poll correctly.
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 Custom long-running operation missing `Retry-After` header:
 
@@ -23,7 +23,7 @@ interface FooResources {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 Use ARM operation templates which include the `Retry-After` header automatically:
 

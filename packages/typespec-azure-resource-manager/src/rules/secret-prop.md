@@ -18,7 +18,7 @@ Returning a secret in a response violates the RPC contract unless the property i
 
 This rule corresponds to the LintDiff rule [XMSSecretInResponse](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md).
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 model Data {
@@ -27,7 +27,7 @@ model Data {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 model Data {

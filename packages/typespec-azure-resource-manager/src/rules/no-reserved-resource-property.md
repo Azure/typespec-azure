@@ -2,7 +2,7 @@ Certain property names are reserved and must not be present in a resource's prop
 
 The property name is matched case-insensitively (`billingData`, `BillingData`, `billingdata`, etc.) and is disallowed regardless of its type (named model reference, inline model, or primitive). The set of reserved names is maintained by the rule.
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 @armProviderNamespace
@@ -20,7 +20,7 @@ model FooProperties {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 @armProviderNamespace

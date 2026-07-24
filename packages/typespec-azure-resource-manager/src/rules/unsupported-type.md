@@ -15,7 +15,7 @@ Primitive types currently unsupported in ARM:
 
 The data type cannot be modeled in SDKs.
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 model ResourceProperties {
@@ -23,7 +23,7 @@ model ResourceProperties {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 model ResourceProperties {

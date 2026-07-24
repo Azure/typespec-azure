@@ -10,7 +10,7 @@ Inconsistent PATCH properties violate the RPC contract.
 
 This rule corresponds to the LintDiff rule [ConsistentPatchProperties](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md).
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 model FooResource is TrackedResource<FooProperties> {
@@ -24,7 +24,7 @@ model MyBadPatch {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 model FooResource is TrackedResource<FooProperties> {

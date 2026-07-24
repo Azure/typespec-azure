@@ -6,7 +6,7 @@ Patch envelope properties should match the resource properties. If a resource de
 
 The PATCH operation is missing updateable envelope properties.
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 model FooResource is TrackedResource<FooProperties> {
@@ -29,7 +29,7 @@ interface FooResources {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 model FooResource is TrackedResource<FooProperties> {

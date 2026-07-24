@@ -14,7 +14,7 @@ A resource action that does not use POST or GET produces an improper HTTP API an
 
 This rule corresponds to the LintDiff rule [InvalidVerbUsed](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md#r2044).
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 @delete op getAction is ArmProviderActionAsync<
@@ -26,7 +26,7 @@ This rule corresponds to the LintDiff rule [InvalidVerbUsed](https://github.com/
 >;
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 op postAction is ArmProviderActionAsync<
@@ -38,7 +38,7 @@ op postAction is ArmProviderActionAsync<
 >;
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 @get op getAction is ArmProviderActionSync<

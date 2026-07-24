@@ -11,7 +11,7 @@ This rule complements [`arm-resource-invalid-version-format`](./arm-resource-inv
 
 Out-of-order versions, or versions with matching dates, make specs unmaintainable and cause SDK problems.
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 A preview and a stable version share the same date:
 
@@ -39,7 +39,7 @@ enum Versions {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 @versioned(Versions)

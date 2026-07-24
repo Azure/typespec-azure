@@ -14,7 +14,7 @@ A model that accepts any schema is difficult to use from both the API and genera
 
 This rule corresponds to the LintDiff rule [MissingTypeObject](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md#r4037).
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 model Information {
@@ -22,13 +22,13 @@ model Information {
 }
 ```
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 model Empty {}
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 model Information {
@@ -44,7 +44,7 @@ model Address {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 model Information {

@@ -6,7 +6,7 @@ Check the resource name. ARM resource model names must contain only alphanumeric
 
 Invalid characters in a resource name violate the RPC contract and produce invalid client parameter names, preventing SDK generation.
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 Missing `@path` decorator on `name`:
 
@@ -18,7 +18,7 @@ model FooResource is TrackedResource<{}> {
 }
 ```
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 Underscore in model name:
 
@@ -28,7 +28,7 @@ model Foo_Resource is TrackedResource<{}> {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 model FooResource is TrackedResource<{}> {

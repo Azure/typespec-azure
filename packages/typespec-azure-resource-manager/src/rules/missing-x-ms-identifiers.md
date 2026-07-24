@@ -14,7 +14,7 @@ An old-pattern warning with no real runtime impact.
 
 This rule corresponds to the LintDiff rule [XmsIdentifierValidation](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md#r4041) (warning).
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 model Address {
@@ -27,7 +27,7 @@ model ResourceProperties {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 model ResourceProperties {

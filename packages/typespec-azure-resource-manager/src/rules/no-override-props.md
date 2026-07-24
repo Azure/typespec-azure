@@ -11,7 +11,7 @@ Overriding an inherited property is allowed when:
 
 Overridden properties can crash the breaking-change tool and are unsupported by most languages.
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 @armProviderNamespace
@@ -34,7 +34,7 @@ model Child extends Base {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 @armProviderNamespace
@@ -50,7 +50,7 @@ model Child extends Base {
 }
 ```
 
-#### ✅ Correct (compatible scalar override)
+## ✅ Correct (compatible scalar override)
 
 ```tsp
 @armProviderNamespace

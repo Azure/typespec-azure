@@ -5,15 +5,15 @@
 
 ARM operation responses with status code 202 or 204 should not contain a response body. Operation responses with other success (2xx) status codes should contain a response body.
 
-### For 202 and 204 status codes (response body should be empty)
-
 ## Impact
 
 - **Area:** API
 
+## For 202 and 204 status codes (response body should be empty)
+
 A response - usually a 202 - carries a body that should be empty.
 
-#### ❌ Incorrect
+### ❌ Incorrect
 
 ```tsp
 op walk(): ArmNoContentResponse & {
@@ -34,7 +34,7 @@ op walk(): ArmNoContentResponse & {
 }
 ```
 
-#### ✅ Correct
+### ✅ Correct
 
 ```tsp
 op walk(): ArmAcceptedResponse;
@@ -50,9 +50,9 @@ op walk(): ArmAcceptedResponse;
 }
 ```
 
-### For other success (2xx) response status codes (response body should not be empty)
+## For other success (2xx) response status codes (response body should not be empty)
 
-#### ❌ Incorrect
+### ❌ Incorrect
 
 ```tsp
 op walk(): CreatedResponse;
@@ -68,7 +68,7 @@ op walk(): CreatedResponse;
 }
 ```
 
-#### ✅ Correct
+### ✅ Correct
 
 ```tsp
 op walk(): ArmCreatedResponse<{
