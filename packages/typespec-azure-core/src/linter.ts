@@ -1,4 +1,5 @@
 import { defineLinter } from "@typespec/compiler";
+import { apiVersionDateFormatRule } from "./rules/api-version-date-format.js";
 import { authRequiredRule } from "./rules/auth-required.js";
 import { badRecordTypeRule } from "./rules/bad-record-type.js";
 import { byosRule } from "./rules/byos.js";
@@ -9,6 +10,7 @@ import { knownEncodingRule } from "./rules/known-encoding.js";
 import { longRunningOperationsRequirePollingOperation } from "./rules/lro-polling-operation.js";
 import { noCaseMismatchRule } from "./rules/no-case-mismatch.js";
 import { noClosedLiteralUnionRule } from "./rules/no-closed-literal-union.js";
+import { noDollarPrefixedQueryParamsRule } from "./rules/no-dollar-prefixed-query-params.js";
 import { noEnumRule } from "./rules/no-enum.js";
 import { noErrorStatusCodesRule } from "./rules/no-error-status-codes.js";
 import { noExplicitRoutesResourceOps } from "./rules/no-explicit-routes-resource-ops.js";
@@ -26,6 +28,7 @@ import { noRouteParameterNameMismatchRule } from "./rules/no-route-parameter-nam
 import { noRpcPathParamsRule } from "./rules/no-rpc-path-params.js";
 import { noStringDiscriminatorRule } from "./rules/no-string-discriminator.js";
 import { noUnnamedTypesRule } from "./rules/no-unnamed-types.js";
+import { noVersionInRouteRule } from "./rules/no-version-in-route.js";
 import { nonBreakingVersioningRule } from "./rules/non-breaking-versioning.js";
 import { apiVersionRule } from "./rules/operation-missing-api-version.js";
 import { preventFormatRule } from "./rules/prevent-format.js";
@@ -83,6 +86,9 @@ const rules = [
   noLegacyUsage,
   noQueryExplodeRule,
   noRouteParameterNameMismatchRule,
+  noVersionInRouteRule,
+  apiVersionDateFormatRule,
+  noDollarPrefixedQueryParamsRule,
 ];
 
 export const $linter = defineLinter({

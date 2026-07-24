@@ -41,9 +41,19 @@ export default {
     "@azure-tools/typespec-azure-core/no-query-explode": true,
     "@azure-tools/typespec-azure-core/no-header-explode": true,
     "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch": true,
+    "@azure-tools/typespec-azure-core/no-version-in-route": true,
 
     // Azure core not enable - Arm has its own conflicting rule
     "@azure-tools/typespec-azure-core/no-response-body": false,
+
+    // Azure core not enabled - Arm has its own conflicting rule which allows
+    // suffixes other than `-preview` (`arm-resource-invalid-version-format`)
+    "@azure-tools/typespec-azure-core/api-version-date-format": false,
+
+    // Azure core not enabled - ARM APIs intentionally use the OData spelling of the
+    // standard list query options (see `ArmTopParameter`, `ArmFilterParameter`,
+    // `ArmSkipParameter` in typespec-azure-resource-manager/lib/parameters.tsp)
+    "@azure-tools/typespec-azure-core/no-dollar-prefixed-query-params": false,
 
     // Not applicable for Arm
     "@azure-tools/typespec-azure-core/use-standard-names": false,
