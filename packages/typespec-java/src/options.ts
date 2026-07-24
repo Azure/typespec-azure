@@ -110,6 +110,13 @@ export const EmitterOptionsSchema: JSONSchemaType<EmitterOptions> = {
       nullable: true,
       default: true,
     },
+    // "required-fields-as-ctor-args": {
+    //   type: "boolean",
+    //   description:
+    //     "When set to `true`, required properties of the model are generated as constructor arguments; otherwise, they are generated as setter methods. Default value is `true`. This option is for backward-compatibility.",
+    //   nullable: true,
+    //   default: true,
+    // },
 
     // customization
     ...UnbrandedSdkEmitterOptions["generate-protocol-methods"],
