@@ -450,6 +450,7 @@ function getTimeValue(type: go.Time, value: any, imports?: ImportManager): strin
     PlainTime: helpers.plainTimeFormat,
     RFC1123: helpers.RFC1123Format,
     RFC3339: helpers.RFC3339Format,
+    RFC7231: helpers.RFC1123Format,
   };
 
   if (type.format in formatMap) {

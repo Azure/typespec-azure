@@ -210,4 +210,4 @@ Before you do, make sure to:
 
 1. Format your code (`pnpm format` from the repo root, or check with `pnpm format:check`).
 2. Rebuild and regenerate everything so the committed fixtures reflect your change.
-3. Add a changelog entry with [Chronus](https://github.com/microsoft/chronus) by running `pnpm exec chronus add` from the repo root and following the prompts. This creates a change file under `.chronus/changes/` that you should commit with your PR.
+3. Add a changelog entry with [Chronus](https://github.com/microsoft/chronus) by running `pnpm change add` from the repo root and following the prompts. This creates a change file under `.chronus/changes/` that you should commit with your PR.
