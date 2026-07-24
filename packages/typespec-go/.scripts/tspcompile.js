@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
+import { loadSpectorConfig, resolveSpecs } from "@azure-tools/spector-runner";
 import { exec, execSync } from "child_process";
 import { existsSync, opendirSync, readFileSync, unlinkSync, writeFileSync } from "fs";
 import { semaphore } from "./semaphore.js";
@@ -26,136 +27,32 @@ const compiler = pkgRoot + "node_modules/@typespec/compiler/cmd/tsp.js";
 // from azure-sdk-for-go into our regenerated test fixtures.
 const stubConfig = pkgRoot + ".scripts/tspconfig.yaml";
 
-// the format is as follows
-// 'moduleName': [ 'input', 'emitter option 1', 'emitter option N...' ]
+// Spec selection lives in the opt-in `spector.config.*.yaml` files (see
+// Azure/typespec-azure#4997), parsed by the shared @azure-tools/spector-runner
+// package. Each enabled spec resolves to a `module` option (the Go module name) plus any
+// per-test emitter options. We rebuild the legacy group shape below so the rest of this
+// script (loopSpec/generate) is unchanged.
+//
+// legacy group shape: { 'moduleName': [ 'input', 'emitter option 1', ... ] }
 // if no .tsp file is specified in input, it's assumed to be main.tsp
-const httpSpecsGroup = {
-  apikeygroup: ["authentication/api-key"],
-  customgroup: ["authentication/http/custom"],
-  oauth2group: ["authentication/oauth2"],
-  unionauthgroup: ["authentication/union"],
-  bytesgroup: ["encode/bytes"],
-  datetimegroup: ["encode/datetime", "slice-elements-byval=true"],
-  durationgroup: ["encode/duration"],
-  numericgroup: ["encode/numeric"],
-  basicparamsgroup: ["parameters/basic"],
-  bodyoptionalgroup: ["parameters/body-optionality"],
-  collectionfmtgroup: ["parameters/collection-format"],
-  pathgroup: ["parameters/path"],
-  querygroup: ["parameters/query"],
-  spreadgroup: ["parameters/spread"],
-  contentneggroup: ["payload/content-negotiation"],
-  jmergepatchgroup: ["payload/json-merge-patch"],
-  mediatypegroup: ["payload/media-type"],
-  multipartgroup: ["payload/multipart"],
-  pageablegroup: ["payload/pageable"], // missing support for continuation tokens: https://github.com/Azure/autorest.go/issues/1494
-  xmlgroup: ["payload/xml", "slice-elements-byval=true"],
-  //'statuscoderangegroup': ['response/status-code-range'], // TODO: https://github.com/Azure/autorest.go/issues/1606
-  //'routesgroup': ['routes'], // TODO: https://github.com/Azure/autorest.go/issues/1730
-  jsongroup: ["serialization/encoded-name/json"],
-  noendpointgroup: ["server/endpoint/not-defined"],
-  multiplegroup: ["server/path/multiple"],
-  singlegroup: ["server/path/single"],
-  unversionedgroup: ["server/versions/not-versioned"],
-  versionedgroup: ["server/versions/versioned"],
-  condreqgroup: ["special-headers/conditional-request"],
-  //'repeatabilitygroup': ['special-headers/repeatability'],   // requires union support
-  specialwordsgroup: ["special-words"],
-  //'jsonlgroup': ['streaming/jsonl'], // TODO: https://github.com/Azure/autorest.go/issues/1594
-  arraygroup: ["type/array", "slice-elements-byval=true"],
-  dictionarygroup: ["type/dictionary"],
-  extensiblegroup: ["type/enum/extensible"],
-  fixedgroup: ["type/enum/fixed"],
-  emptygroup: ["type/model/empty", "single-client=true"],
-  enumdiscgroup: ["type/model/inheritance/enum-discriminator"],
-  //'nesteddiscgroup': ['type/model/inheritance/nested-discriminator'], // not a real scenario
-  nodiscgroup: ["type/model/inheritance/not-discriminated"],
-  recursivegroup: ["type/model/inheritance/recursive", "slice-elements-byval=true"],
-  singlediscgroup: ["type/model/inheritance/single-discriminator"],
-  usagegroup: ["type/model/usage"],
-  visibilitygroup: ["type/model/visibility"],
-  //'addlpropsgroup': ['type/property/additional-properties'], // requires union support (remove hand-written client when done)
-  nullablegroup: ["type/property/nullable"],
-  optionalitygroup: ["type/property/optionality", "slice-elements-byval=true"], // missing support for plain time https://github.com/Azure/autorest.go/issues/1732
-  valuetypesgroup: ["type/property/value-types", "slice-elements-byval=true"],
-  scalargroup: ["type/scalar", "slice-elements-byval=true"],
-  //'uniondiscriminatedgroup': ['type/union/discriminated'], // requires union support
-  //'uniongroup': ['type/union'], // requires union support
-  //'addedgroup': ['versioning/added'], // requires union support
-  madeoptionalgroup: ["versioning/madeOptional"],
-  //'removedgroup': ['versioning/removed'], // requires union support
-  //'renamedfromgroup': ['versioning/renamedFrom'], // requires union support
-  rettypechangedfromgroup: ["versioning/returnTypeChangedFrom"],
-  typechangedfromgroup: ["versioning/typeChangedFrom"],
-};
+function loadGroup(configPath) {
+  const group = {};
+  for (const { path, options } of resolveSpecs(loadSpectorConfig(configPath))) {
+    const { module, ...rest } = options;
+    if (module === undefined) {
+      throw new Error(`spec "${path}" in ${configPath} is missing the required "module" option`);
+    }
+    const optionArgs = Object.entries(rest).map(([key, value]) => `${key}=${value}`);
+    if (group[module] !== undefined) {
+      throw new Error(`duplicate module "${module}" in ${configPath}`);
+    }
+    group[module] = [path, ...optionArgs];
+  }
+  return group;
+}
 
-const azureHttpSpecsGroup = {
-  accessgroup: ["azure/client-generator-core/access"],
-  //'alternatetypegroup': ['azure/client-generator-core/alternate-type'],
-  defaultvaluegroup: ["azure/client-generator-core/client-default-value"],
-  emptystringgroup: ["azure/client-generator-core/deserialize-empty-string-as-null"],
-  flattengroup: ["azure/client-generator-core/flatten-property"],
-  nextlinkverbgroup: ["azure/client-generator-core/next-link-verb", "slice-elements-byval=true"],
-  coreusagegroup: ["azure/client-generator-core/usage"],
-  overridegroup: ["azure/client-generator-core/override/client.tsp"],
-  hierarchygroup: ["azure/client-generator-core/hierarchy-building"],
-  clientinitdefaultgroup: ["azure/client-generator-core/client-initialization/default"],
-  clientinitindividuallygroup: ["azure/client-generator-core/client-initialization/individually"],
-  clientinitindividuallyparentgroup: [
-    "azure/client-generator-core/client-initialization/individuallyParent",
-  ],
-  apiversionheadergroup: ["azure/client-generator-core/api-version/header/client.tsp"],
-  apiversionpathgroup: ["azure/client-generator-core/api-version/path/client.tsp"],
-  apiversionquerygroup: ["azure/client-generator-core/api-version/query/client.tsp"],
-  basicgroup: ["azure/core/basic"],
-  lrorpcgroup: ["azure/core/lro/rpc"],
-  lrostdgroup: ["azure/core/lro/standard"],
-  azurepagegroup: ["azure/core/page/client.tsp"], // requires paging with re-injection support
-  corescalargroup: ["azure/core/scalar"],
-  coremodelgroup: ["azure/core/model"],
-  coreclientlocationmovemethodparametertoclientgroup: [
-    "azure/client-generator-core/client-location/move-method-parameter-to-client",
-  ],
-  coreclientlocationmoveexistingsubclientgroup: [
-    "azure/client-generator-core/client-location/move-to-existing-sub-client",
-  ],
-  coreclientlocationmovenewsubclientgroup: [
-    "azure/client-generator-core/client-location/move-to-new-sub-client",
-  ],
-  coreclientlocationmoverootclientgroup: [
-    "azure/client-generator-core/client-location/move-to-root-client",
-  ],
-  // 'coredeserializegroup': ['azure/client-generator-core/deserialize-empty-string-as-null'],
-  traitsgroup: ["azure/core/traits"], // requires union support
-  encodedurationgroup: ["azure/encode/duration"],
-  examplebasicgroup: ["azure/example/basic"],
-  pageablegroup: ["azure/payload/pageable"],
-  commonpropsgroup: ["azure/resource-manager/common-properties"],
-  resources: ["azure/resource-manager/resources", "factory-gather-all-params=false"],
-  nonresourcegroup: ["azure/resource-manager/non-resource"],
-  templatesgroup: ["azure/resource-manager/operation-templates"],
-  largeheadergroup: ["azure/resource-manager/large-header"],
-  methodsubscriptionidgroup: ["/azure/resource-manager/method-subscription-id/client.tsp"],
-  armmultipleservicegroup: ["/azure/resource-manager/multi-service/client.tsp"],
-  armmultisharedmodelsgroup: ["/azure/resource-manager/multi-service-shared-models/client.tsp"],
-  xmsclientreqidgroup: ["azure/special-headers/client-request-id"],
-  previewversiongroup: ["azure/versioning/previewVersion", "api-version=2024-12-01-preview"],
-  previewversiongroupspecificversion: ["azure/versioning/previewVersion", "api-version=2024-06-01"],
-  naminggroup: ["client/naming"],
-  enumconflictgroup: ["client/naming/enum-conflict/client.tsp"],
-  defaultgroup: ["client/structure/default/client.tsp"],
-  // disable operation group related tests, will re-enable after new TCGC version released
-  //'multiclientgroup': ['client/structure/multi-client/client.tsp'],
-  //'renamedopgroup': ['client/structure/renamed-operation/client.tsp'],
-  //'clientopgroup': ['client/structure/client-operation-group/client.tsp'],
-  //'twoopgroup': ['client/structure/two-operation-group/client.tsp'],
-  clientnamespacegroup: ["client/namespace"],
-  overloadgroup: ["client/overload/client.tsp"],
-  srvdrivenoldgroup: ["resiliency/srv-driven/old.tsp"],
-  srvdrivennewgroup: ["resiliency/srv-driven"],
-  multipleservicesgroup: ["/service/multiple-services"],
-  multiservicegroup: ["/service/multi-service"],
-};
+const httpSpecsGroup = loadGroup(pkgRoot + "spector.config.http.yaml");
+const azureHttpSpecsGroup = loadGroup(pkgRoot + "spector.config.azure.yaml");
 
 // default to using the locally built emitter
 let emitter = pkgRoot;
