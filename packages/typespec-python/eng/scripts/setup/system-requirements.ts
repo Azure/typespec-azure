@@ -11,7 +11,7 @@ const execute = (
   options: MoreOptions = {},
 ): Promise<ExecResult> => {
   return new Promise((resolve, reject) => {
-    const cp = spawn(command, cmdlineargs, { ...options, stdio: "pipe", shell: true });
+    const cp = spawn(command, cmdlineargs, { ...options, stdio: "pipe" });
     if (options.onCreate) {
       options.onCreate(cp);
     }
@@ -111,7 +111,7 @@ const tryPython = async (
     const result = await execute(command, [
       ...additionalArgs,
       "-c",
-      `"${PRINT_PYTHON_VERSION_SCRIPT}"`,
+      PRINT_PYTHON_VERSION_SCRIPT,
     ]);
     return validateVersionRequirement(resolution, result.stdout.trim(), requirement);
   } catch (e) {
