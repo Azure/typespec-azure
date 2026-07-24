@@ -2,6 +2,7 @@ import {
   Operation,
   Type,
   createRule,
+  fileRef,
   ignoreDiagnostics,
   isErrorModel,
   paramMessage,
@@ -10,6 +11,7 @@ import { Visibility, createMetadataInfo, getHttpOperation } from "@typespec/http
 
 export const responseSchemaMultiStatusCodeRule = createRule({
   name: "response-schema-problem",
+  docs: fileRef.fromPackageRoot("src/rules/response-schema-problem.md"),
   description: "Warn about operations having multiple non-error response schemas.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/response-schema-problem",

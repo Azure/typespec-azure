@@ -9,18 +9,20 @@ import {
   makeScaffoldingConfig,
   scaffoldNewProject,
 } from "../node_modules/@typespec/compiler/dist/src/init/scaffold.js";
+import { UriTemplateSource } from "../node_modules/@typespec/compiler/dist/src/init/template-source/uri-template-source.js";
 const __dirname = import.meta.dirname;
 const root = resolve(__dirname, "../");
 const testTempRoot = resolve(root, "temp/scaffolded-template-tests");
 const snapshotFolder = resolve(root, "__snapshots__");
 
 export const templatesDir = resolvePath(root);
-const content = JSON.parse(
-  await readFile(resolvePath(templatesDir, "azure-scaffolding.json"), "utf-8"),
-);
+const scaffoldingIndexPath = resolvePath(templatesDir, "azure-scaffolding.json");
+const content = JSON.parse(await readFile(scaffoldingIndexPath, "utf-8"));
+
+/** Reads the template files referenced by the templates relative to the scaffolding index. */
+const templateSource = new UriTemplateSource(NodeHost, scaffoldingIndexPath);
 
 export const Templates = {
-  baseUri: templatesDir,
   templates: content as Record<string, InitTemplate>,
 };
 
@@ -86,7 +88,7 @@ describe("Init templates e2e tests", () => {
       makeScaffoldingConfig(template, {
         name,
         directory: targetFolder,
-        baseUri: Templates.baseUri,
+        source: templateSource,
         parameters,
       }),
     );
