@@ -25,10 +25,25 @@ enum Versions {
 interface Operations extends Azure.ResourceManager.Operations {}
 
 /** Metadata for a Contoso dependency relationship. */
-alias DependencyOfMetadata = RelationshipMetadata & {
+model DependencyOfMetadata {
+  /** The type of the relationship source. */
+  sourceType: string;
+
+  /** The type of the relationship target. */
+  targetType: string;
+
   /** A human-readable relationship description. */
   description?: string;
-};
+}
+
+/** Origin information for a Contoso dependency relationship. */
+model DependencyOfOriginInformation {
+  /** The origin type. */
+  relationshipOriginType: string;
+
+  /** The discovery engine that found the relationship. */
+  discoveryEngine?: string;
+}
 
 /** Provisioning state values for a Contoso dependency relationship async flow. */
 @Azure.Core.lroStatus
@@ -49,10 +64,14 @@ union DependencyOfProvisioningState {
 }
 
 /** Properties for a Contoso dependency relationship. */
-model DependencyOfProperties is RelationshipProperties<
-  Metadata = DependencyOfMetadata,
-  ProvisioningState = DependencyOfProvisioningState
->;
+model DependencyOfProperties
+  is RelationshipProperties<ProvisioningState = DependencyOfProvisioningState> {
+  /** Metadata describing the relationship source and target types. */
+  metadata: DependencyOfMetadata;
+
+  /** Information about the origin of the relationship. */
+  originInformation?: DependencyOfOriginInformation;
+}
 
 /**
  * A dependency relationship between a source scope and target entity.

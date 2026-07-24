@@ -361,13 +361,37 @@
     }
   },
   "definitions": {
+    "Azure.ResourceManager.BaseTypes.BaseType": {
+      "type": "string",
+      "description": "The set of Azure base types a resource may declare conformance to via the\n`@azureBaseType` decorator. Modeled as an extensible (open) enum so additional\nbase types can be introduced without a breaking change.",
+      "enum": [
+        "Agent",
+        "Relationship"
+      ],
+      "x-ms-enum": {
+        "name": "BaseType",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "Agent",
+            "value": "Agent",
+            "description": "The Agent base type."
+          },
+          {
+            "name": "Relationship",
+            "value": "Relationship",
+            "description": "The Relationship base type."
+          }
+        ]
+      }
+    },
     "Azure.ResourceManager.BaseTypes.BaseTypeInfo": {
       "type": "object",
       "description": "An ARM-managed base type descriptor identifying the schema contract a resource conforms to.\nUsed as a parameter to the `@azureBaseType` decorator to indicate which\nbase types a resource conforms to.",
       "properties": {
         "baseType": {
-          "type": "string",
-          "description": "The base type identifier (for example, \"Agent\")."
+          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.BaseType",
+          "description": "The base type identifier."
         },
         "version": {
           "type": "string",
@@ -377,23 +401,6 @@
       "required": [
         "baseType",
         "version"
-      ]
-    },
-    "Azure.ResourceManager.BaseTypes.Relationships.RelationshipOriginInformation": {
-      "type": "object",
-      "description": "Origin information for a relationship.",
-      "properties": {
-        "relationshipOriginType": {
-          "type": "string",
-          "description": "The origin type."
-        },
-        "discoveryEngine": {
-          "type": "string",
-          "description": "The discovery engine that found the relationship."
-        }
-      },
-      "required": [
-        "relationshipOriginType"
       ]
     },
     "DependencyOf": {
@@ -432,6 +439,45 @@
         "value"
       ]
     },
+    "DependencyOfMetadata": {
+      "type": "object",
+      "description": "Metadata for a Contoso dependency relationship.",
+      "properties": {
+        "sourceType": {
+          "type": "string",
+          "description": "The type of the relationship source."
+        },
+        "targetType": {
+          "type": "string",
+          "description": "The type of the relationship target."
+        },
+        "description": {
+          "type": "string",
+          "description": "A human-readable relationship description."
+        }
+      },
+      "required": [
+        "sourceType",
+        "targetType"
+      ]
+    },
+    "DependencyOfOriginInformation": {
+      "type": "object",
+      "description": "Origin information for a Contoso dependency relationship.",
+      "properties": {
+        "relationshipOriginType": {
+          "type": "string",
+          "description": "The origin type."
+        },
+        "discoveryEngine": {
+          "type": "string",
+          "description": "The discovery engine that found the relationship."
+        }
+      },
+      "required": [
+        "relationshipOriginType"
+      ]
+    },
     "DependencyOfProperties": {
       "type": "object",
       "description": "Properties for a Contoso dependency relationship.",
@@ -460,36 +506,18 @@
           "type": "string",
           "description": "The tenant identifier of the relationship target."
         },
-        "metadata": {
-          "type": "object",
-          "description": "Metadata describing the relationship source and target types.",
-          "properties": {
-            "sourceType": {
-              "type": "string",
-              "description": "The type of the relationship source."
-            },
-            "targetType": {
-              "type": "string",
-              "description": "The type of the relationship target."
-            },
-            "description": {
-              "type": "string",
-              "description": "A human-readable relationship description."
-            }
-          },
-          "required": [
-            "sourceType",
-            "targetType"
-          ]
-        },
-        "originInformation": {
-          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Relationships.RelationshipOriginInformation",
-          "description": "Origin information for the relationship."
-        },
         "provisioningState": {
           "$ref": "#/definitions/DependencyOfProvisioningState",
           "description": "The provisioning state of the relationship.",
           "readOnly": true
+        },
+        "metadata": {
+          "$ref": "#/definitions/DependencyOfMetadata",
+          "description": "Metadata describing the relationship source and target types."
+        },
+        "originInformation": {
+          "$ref": "#/definitions/DependencyOfOriginInformation",
+          "description": "Information about the origin of the relationship."
         }
       },
       "required": [
@@ -581,30 +609,12 @@
           "description": "The tenant identifier of the relationship target."
         },
         "metadata": {
-          "type": "object",
-          "description": "Metadata describing the relationship source and target types.",
-          "properties": {
-            "sourceType": {
-              "type": "string",
-              "description": "The type of the relationship source."
-            },
-            "targetType": {
-              "type": "string",
-              "description": "The type of the relationship target."
-            },
-            "description": {
-              "type": "string",
-              "description": "A human-readable relationship description."
-            }
-          },
-          "required": [
-            "sourceType",
-            "targetType"
-          ]
+          "$ref": "#/definitions/DependencyOfMetadata",
+          "description": "Metadata describing the relationship source and target types."
         },
         "originInformation": {
-          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Relationships.RelationshipOriginInformation",
-          "description": "Origin information for the relationship."
+          "$ref": "#/definitions/DependencyOfOriginInformation",
+          "description": "Information about the origin of the relationship."
         }
       }
     }

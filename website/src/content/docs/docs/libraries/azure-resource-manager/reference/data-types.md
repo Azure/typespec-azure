@@ -1989,50 +1989,18 @@ model Azure.ResourceManager.BaseTypes.Relationships.Relationship<Properties>
 | ----------- | ------------ | ----------- |
 | properties? | `Properties` |             |
 
-### `RelationshipMetadata` {#Azure.ResourceManager.BaseTypes.Relationships.RelationshipMetadata}
-
-Metadata describing the source and target types of a relationship.
-
-```typespec
-model Azure.ResourceManager.BaseTypes.Relationships.RelationshipMetadata
-```
-
-#### Properties
-
-| Name       | Type     | Description                          |
-| ---------- | -------- | ------------------------------------ |
-| sourceType | `string` | The type of the relationship source. |
-| targetType | `string` | The type of the relationship target. |
-
-### `RelationshipOriginInformation` {#Azure.ResourceManager.BaseTypes.Relationships.RelationshipOriginInformation}
-
-Origin information for a relationship.
-
-```typespec
-model Azure.ResourceManager.BaseTypes.Relationships.RelationshipOriginInformation
-```
-
-#### Properties
-
-| Name                   | Type     | Description                                       |
-| ---------------------- | -------- | ------------------------------------------------- |
-| relationshipOriginType | `string` | The origin type.                                  |
-| discoveryEngine?       | `string` | The discovery engine that found the relationship. |
-
 ### `RelationshipProperties` {#Azure.ResourceManager.BaseTypes.Relationships.RelationshipProperties}
 
 Required properties for a relationship resource.
 
 ```typespec
-model Azure.ResourceManager.BaseTypes.Relationships.RelationshipProperties<Metadata, OriginInformation, ProvisioningState>
+model Azure.ResourceManager.BaseTypes.Relationships.RelationshipProperties<ProvisioningState>
 ```
 
 #### Template Parameters
 
 | Name              | Description                                 |
 | ----------------- | ------------------------------------------- |
-| Metadata          | The relationship metadata model.            |
-| OriginInformation | The relationship origin information model.  |
 | ProvisioningState | The relationship provisioning state values. |
 
 #### Properties
@@ -2044,8 +2012,6 @@ model Azure.ResourceManager.BaseTypes.Relationships.RelationshipProperties<Metad
 | sourceTenant       | `string`                                         | The tenant identifier of the relationship source.                     |
 | targetId           | `string`                                         | The relationship target identifier.                                   |
 | targetTenant       | `string`                                         | The tenant identifier of the relationship target.                     |
-| metadata           | `Metadata`                                       | Metadata describing the relationship source and target types.         |
-| originInformation? | `OriginInformation`                              | Origin information for the relationship.                              |
 | provisioningState? | `ProvisioningState`                              | The provisioning state of the relationship.                           |
 
 ## Azure.ResourceManager.CommonTypes

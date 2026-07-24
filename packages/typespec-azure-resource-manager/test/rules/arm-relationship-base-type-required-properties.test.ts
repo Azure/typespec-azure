@@ -29,18 +29,7 @@ describe("arm-relationship-base-type-required-properties", () => {
         using Azure.ResourceManager.BaseTypes.Relationships;
         @armProviderNamespace namespace MyService;
 
-        model MyRelationshipMetadata is RelationshipMetadata {
-          description?: string;
-        }
-
-        model MyRelationshipOriginInformation is RelationshipOriginInformation {
-          discoveryVersion?: string;
-        }
-
-        model MyRelationshipProperties is RelationshipProperties<
-          MyRelationshipMetadata,
-          MyRelationshipOriginInformation
-        > {}
+        model MyRelationshipProperties is RelationshipProperties {}
 
         #suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "test"
         model MyRelationship is Relationship<MyRelationshipProperties> {
@@ -61,7 +50,6 @@ describe("arm-relationship-base-type-required-properties", () => {
 
         model IncompleteRelationshipProperties {
           sourceId: string;
-          metadata: RelationshipMetadata;
         }
 
         #suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "test"
@@ -75,113 +63,6 @@ describe("arm-relationship-base-type-required-properties", () => {
         code: "@azure-tools/typespec-azure-resource-manager/arm-relationship-base-type-required-properties",
         message:
           "Relationship resources must include required properties: sourceTenant, targetId, targetTenant, provisioningState.",
-      });
-  });
-
-  it("emits warning when Relationship metadata is missing required properties", async () => {
-    await tester
-      .expect(
-        `
-        using Azure.ResourceManager.BaseTypes;
-        using Azure.ResourceManager.BaseTypes.Relationships;
-        @armProviderNamespace namespace MyService;
-
-        model IncompleteRelationshipMetadata {
-          sourceType: string;
-        }
-
-        model MyRelationshipProperties {
-          sourceId: string;
-          sourceTenant: string;
-          targetId: string;
-          targetTenant: string;
-          metadata: IncompleteRelationshipMetadata;
-          provisioningState: string;
-        }
-
-        #suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "test"
-        @azureBaseType(#{ baseType: "Relationship", version: "2024-06-01" })
-        model MyRelationship is ExtensionResource<MyRelationshipProperties> {
-          ...ResourceNameParameter<MyRelationship>;
-        }
-      `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-relationship-base-type-required-properties",
-        message: "Relationship metadata must include required properties: targetType.",
-      });
-  });
-
-  it("emits warning when Relationship originInformation is missing relationshipOriginType", async () => {
-    await tester
-      .expect(
-        `
-        using Azure.ResourceManager.BaseTypes;
-        using Azure.ResourceManager.BaseTypes.Relationships;
-        @armProviderNamespace namespace MyService;
-
-        model IncompleteOriginInformation {
-          discoveryEngine?: string;
-        }
-
-        model MyRelationshipProperties {
-          sourceId: string;
-          sourceTenant: string;
-          targetId: string;
-          targetTenant: string;
-          metadata: RelationshipMetadata;
-          originInformation?: IncompleteOriginInformation;
-          provisioningState: string;
-        }
-
-        #suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "test"
-        @azureBaseType(#{ baseType: "Relationship", version: "2024-06-01" })
-        model MyRelationship is ExtensionResource<MyRelationshipProperties> {
-          ...ResourceNameParameter<MyRelationship>;
-        }
-      `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-relationship-base-type-required-properties",
-        message:
-          "Relationship originInformation must include required properties: relationshipOriginType.",
-      });
-  });
-
-  it("emits warning when Relationship originInformation has optional relationshipOriginType", async () => {
-    await tester
-      .expect(
-        `
-        using Azure.ResourceManager.BaseTypes;
-        using Azure.ResourceManager.BaseTypes.Relationships;
-        @armProviderNamespace namespace MyService;
-
-        model IncompleteOriginInformation {
-          relationshipOriginType?: string;
-          discoveryEngine?: string;
-        }
-
-        model MyRelationshipProperties {
-          sourceId: string;
-          sourceTenant: string;
-          targetId: string;
-          targetTenant: string;
-          metadata: RelationshipMetadata;
-          originInformation?: IncompleteOriginInformation;
-          provisioningState: string;
-        }
-
-        #suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "test"
-        @azureBaseType(#{ baseType: "Relationship", version: "2024-06-01" })
-        model MyRelationship is ExtensionResource<MyRelationshipProperties> {
-          ...ResourceNameParameter<MyRelationship>;
-        }
-      `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-relationship-base-type-required-properties",
-        message:
-          "Relationship originInformation must include required properties: relationshipOriginType.",
       });
   });
 

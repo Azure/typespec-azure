@@ -17,7 +17,6 @@ namespace Microsoft.Contoso;
 model MyRelationshipProperties {
   sourceId: string;
   sourceTenant: string;
-  metadata: RelationshipMetadata;
 }
 
 @azureBaseType(#{ baseType: "Relationship", version: "2024-06-01" })
