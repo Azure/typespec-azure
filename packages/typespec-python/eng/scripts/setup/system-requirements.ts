@@ -1,4 +1,5 @@
-import { ChildProcess, spawn, SpawnOptions } from "child_process";
+import type { ChildProcess, SpawnOptions } from "child_process";
+import { spawn } from "cross-spawn";
 import { coerce, satisfies } from "semver";
 
 /*
@@ -17,20 +18,20 @@ const execute = (
     }
 
     if (options.onStdOutData) {
-      cp.stdout.on("data", options.onStdOutData);
+      cp.stdout?.on("data", options.onStdOutData);
     }
     if (options.onStdErrData) {
-      cp.stderr.on("data", options.onStdErrData);
+      cp.stderr?.on("data", options.onStdErrData);
     }
 
     let err = "";
     let out = "";
     let all = "";
-    cp.stderr.on("data", (chunk) => {
+    cp.stderr?.on("data", (chunk) => {
       err += chunk;
       all += chunk;
     });
-    cp.stdout.on("data", (chunk) => {
+    cp.stdout?.on("data", (chunk) => {
       out += chunk;
       all += chunk;
     });

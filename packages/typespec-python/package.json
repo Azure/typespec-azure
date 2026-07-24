@@ -66,6 +66,7 @@
   },
   "dependencies": {
     "@typespec/http-client-python": "catalog:",
+    "cross-spawn": "catalog:",
     "semver": "catalog:",
     "tsx": "catalog:"
   },
@@ -76,6 +77,7 @@
     "@azure-tools/typespec-azure-resource-manager": "workspace:^",
     "@azure-tools/typespec-azure-rulesets": "workspace:^",
     "@azure-tools/typespec-client-generator-core": "workspace:^",
+    "@types/cross-spawn": "catalog:",
     "@types/node": "catalog:",
     "@types/semver": "catalog:",
     "@types/yargs": "catalog:",
