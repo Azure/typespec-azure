@@ -213,6 +213,11 @@ generate("gogenerate", gogenerate, "test/local/gogenerate", [
 const fakeserver = pkgRoot + "test/tsp/FakeServer";
 generate("fakeserver", fakeserver, "test/local/fakeserver");
 
+const containingmod = pkgRoot + "test/tsp/ContainingMod";
+generate("containingmod", containingmod, "test/local/containingmod/subpkg", [
+  "containing-module=containingmod",
+]);
+
 loopSpec(httpSpecsGroup, httpSpecs, "test/http-specs");
 loopSpec(azureHttpSpecsGroup, azureHttpSpecs, "test/azure-http-specs");
 
