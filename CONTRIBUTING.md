@@ -385,7 +385,7 @@ Depending on the package where the fix needs to go do this on the `Microsoft/typ
 ### 2. Release the hot fix
 
 1. Make a new branch in this format `publish/hotfix/<hotfix-name>` against the `release/xyz` branch
-1. Run `pnpm chronus version --ignore-policies` to bump the versions, commit push, make PR, wait for CI and squash merge.
+1. Run `pnpm chronus version --ignore-policies --only <package-name>` to bump the version(s) of only the package(s) being hotfixed, commit push, make PR, wait for CI and squash merge. Using `--only` ensures unrelated pending change files on the `release/xyz` branch are not consumed and unrelated packages are not bumped.
 1. The package should then get published
 
 ### 3. Backmerge
