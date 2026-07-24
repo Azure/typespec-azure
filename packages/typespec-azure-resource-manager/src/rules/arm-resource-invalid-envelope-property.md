@@ -10,7 +10,7 @@ Defining non-standard top-level envelope properties violates the RPC contract.
 
 This rule corresponds to the LintDiff rule [BodyTopLevelProperties](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md#r3006).
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 @armProviderNamespace
@@ -22,7 +22,7 @@ model FooResource is TrackedResource<{}> {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 @armProviderNamespace

@@ -1,6 +1,6 @@
 Avoid using the `@featureFiles` decorator. Its usage should be limited to brownfield services migration and requires explicit approval.
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 @armProviderNamespace
@@ -12,7 +12,7 @@ enum Features {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 Do not use the `@featureFiles` decorator unless you have explicit approval for brownfield migration:
 

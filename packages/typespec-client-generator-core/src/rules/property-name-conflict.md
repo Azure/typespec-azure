@@ -8,7 +8,7 @@ rename it for the affected language.
 - **Area:** SDK generation, primarily **C#**. A property whose name collides with its enclosing model's name produces code that does not compile in C# (applies to both data-plane and management-plane).
 - **Not affected:** The service definition and the wire protocol are unchanged; the collision only affects the generated client code.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```tsp
 model Widget {
@@ -16,7 +16,7 @@ model Widget {
 }
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the model above, the linter reports that the property name is the same as its enclosing model name:
 
@@ -24,7 +24,7 @@ For the model above, the linter reports that the property name is the same as it
 Property 'widget' having the same name as its enclosing model will cause problems with C# code generation. Consider renaming the property directly or using the @clientName("newName", "csharp") decorator to rename the property for C#.
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Rename the property:
 

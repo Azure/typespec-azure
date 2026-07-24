@@ -1,7 +1,3 @@
-```text title=- Full name-
-@azure-tools/typespec-azure-resource-manager/arm-no-record
-```
-
 ARM requires Resource provider teams to define types explicitly. This is to ensure good customer experience in terms of the discoverability of concrete type definitions.
 
 ## Impact
@@ -14,7 +10,7 @@ ARM requires Resource provider teams to define types explicitly. This is to ensu
 
 This rule corresponds to the LintDiff rule [AvoidAdditionalProperties](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md).
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 model Address {
@@ -24,7 +20,7 @@ model Address {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 model Address {
@@ -36,13 +32,13 @@ model Address {
 }
 ```
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 model Address is Record<string>;
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 model Address {
@@ -54,13 +50,13 @@ model Address {
 }
 ```
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 model Address extends Record<string> {}
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 model Address {

@@ -1,4 +1,4 @@
-Resources decorated with `@azureBaseType` for the Agent base type must have both a Conversation and a Response child resource.
+Define both child resources so Agent SDKs expose the expected conversation and response surfaces together.
 
 ## Impact
 
@@ -6,7 +6,7 @@ Resources decorated with `@azureBaseType` for the Agent base type must have both
 
 Agent base types must correctly model their child resources; violations can misrepresent the resource for emitters and tooling.
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 @armProviderNamespace
@@ -22,7 +22,7 @@ model MyAgent is TrackedResource<MyAgentProperties> {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 @armProviderNamespace

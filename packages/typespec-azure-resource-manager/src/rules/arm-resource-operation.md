@@ -6,7 +6,7 @@ Validate that all ARM Resource operations are defined inside an interface, inclu
 
 Missing the resource decorators can leave operations unassociated with their resource - breaking the C# SDK and preventing resource-based reasoning, linting, and generation of resource-centric content (service generation, tests, portal).
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 Operations must be inside an interface:
 
@@ -30,7 +30,7 @@ interface FooResources {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 @armResourceOperations
