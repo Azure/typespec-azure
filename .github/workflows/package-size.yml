@@ -1,0 +1,91 @@
+name: Package Size
+
+# Measures the published npm tarball size of every publishable package and reports the
+# change introduced by the PR. This workflow only has a read-only token (it may run for
+# fork PRs); the actual PR comment is posted by the `package-size-comment.yml` workflow
+# which runs with `pull-requests: write` after this one completes.
+# See https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+
+on:
+  pull_request:
+    branches:
+      - main
+      - release/*
+    paths:
+      - "packages/**"
+      - "core/packages/**"
+      - "eng/scripts/bundle-size/**"
+      - ".github/workflows/package-size.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  size:
+    name: Measure package size
+    runs-on: ubuntu-latest
+    env:
+      TYPESPEC_VS_CI_BUILD: true
+      TYPESPEC_SKIP_WEBSITE_BUILD: true
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - uses: ./.github/actions/setup
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 8.0.x
+
+      # --- Measure the PR head (current checkout is the merge result) ---
+      - name: Install dependencies (head)
+        run: pnpm install
+
+      - name: Build (head)
+        run: pnpm run-all build
+
+      - name: Measure head sizes
+        run: pnpm tsx eng/scripts/bundle-size/measure.ts --out ./temp/bundle-size/head.json
+
+      # --- Measure the base branch ---
+      - name: Checkout base
+        run: |
+          git checkout ${{ github.event.pull_request.base.sha }}
+          git submodule update --init --recursive
+
+      # The measure/compare scripts are added by this PR, so restore them from the PR
+      # head after checking out the (possibly script-less) base commit.
+      - name: Restore size scripts from PR head
+        run: git checkout ${{ github.sha }} -- eng/scripts/bundle-size
+
+      - name: Install dependencies (base)
+        run: pnpm install
+
+      - name: Build (base)
+        run: pnpm run-all build
+
+      - name: Measure base sizes
+        run: pnpm tsx eng/scripts/bundle-size/measure.ts --out ./temp/bundle-size/base.json
+
+      # --- Compare and prepare the comment payload ---
+      - name: Compare sizes
+        run: pnpm tsx eng/scripts/bundle-size/compare.ts --base ./temp/bundle-size/base.json --head ./temp/bundle-size/head.json --out ./temp/bundle-size/comment.md
+
+      - name: Record PR number
+        run: echo "${{ github.event.pull_request.number }}" > ./temp/bundle-size/pr-number.txt
+
+      - name: Upload comment artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-size-comment
+          path: |
+            ./temp/bundle-size/comment.md
+            ./temp/bundle-size/pr-number.txt
+          retention-days: 1
