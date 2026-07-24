@@ -54,11 +54,13 @@ Before starting, confirm the following with the user:
    git submodule update --init
    ```
 
-### 3. Run the version bump command with `--ignore-policies` (required for hotfix releases since the release branch is not `main`):
+### 3. Run the version bump command with `--ignore-policies` (required for hotfix releases since the release branch is not `main`) and `--only` to scope it to the hotfixed package(s):
 
 ```bash
-pnpm chronus version --ignore-policies
+pnpm chronus version --ignore-policies --only <package-name> [--only <package-name> ...]
 ```
+
+> ⚠️ Always pass `--only <package-name>` for each package being hotfixed. The `release/*` branch often carries unrelated pending change files (e.g. tcgc, benchmark, playground, website). Without `--only`, `chronus version` consumes ALL of them and bumps unrelated packages. `--only` bumps just the target package(s) and consumes only their change files, so you don't need to know or manually remove the other pending change files.
 
 3. **IMPORTANT:** If the `core` submodule pointer was changed by the version bump, reset it — the submodule should NOT change in a hotfix:
 
