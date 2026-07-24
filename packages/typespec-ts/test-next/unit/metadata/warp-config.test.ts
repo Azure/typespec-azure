@@ -14,8 +14,6 @@ describe("warp.config.yml generation", () => {
     expect(result).toBeDefined();
     expect(result!.path).toBe("warp.config.yml");
     expect(result!.content).not.toContain("extends:");
-    // polyfillSuffix is no longer used — polyfill resolution is handled
-    // via package.json subpath imports instead.
     expect(result!.content).not.toContain("polyfillSuffix");
     // Default: three targets without react-native
     expect(result!.content).toContain("name: browser");
@@ -23,7 +21,6 @@ describe("warp.config.yml generation", () => {
     expect(result!.content).toContain("name: esm");
     expect(result!.content).toContain("name: commonjs");
     expect(result!.content).toContain("tsconfig:");
-    // Base exports should be included
     expect(result!.content).toContain('"./package.json"');
     expect(result!.content).toContain('"."');
   });

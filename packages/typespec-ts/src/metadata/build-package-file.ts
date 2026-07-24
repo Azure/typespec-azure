@@ -95,30 +95,6 @@ export function updatePackageFile(
     needsCoreClientUpdate = true;
   }
 
-  // Ensure warp packages have #platform/* imports for polyfill resolution.
-  // The `react-native` condition is only added when explicitly opted in via
-  // `generateReactNativeTarget`, matching the fresh-generation path in
-  // `getEsmEntrypointInformation` (packageCommon.ts).
-  const platformImports: Record<string, string> = {
-    browser: "./src/*-browser.mts",
-    default: "./src/*.ts",
-  };
-  if (model.options?.generateReactNativeTarget) {
-    // Insert `react-native` before `default` so Node's conditional
-    // resolution order matches the fresh-generation output.
-    packageInfo.imports = {
-      "#platform/*": {
-        browser: platformImports["browser"],
-        "react-native": "./src/*-react-native.mts",
-        default: platformImports["default"],
-      },
-    };
-  } else {
-    packageInfo.imports = {
-      "#platform/*": platformImports,
-    };
-  }
-
   // Update exports (warp: resolved exports in package.json)
   if (needsExportsUpdate) {
     packageInfo.exports = resolveWarpExports(exports, model.options?.generateReactNativeTarget);
@@ -127,9 +103,6 @@ export function updatePackageFile(
   // Update Core Client dependency
   if (needsCoreClientUpdate) {
     delete deps["@azure/core-client"];
-    if (!("@azure-rest/core-client" in deps)) {
-      deps["@azure-rest/core-client"] = "^2.3.1";
-    }
     packageInfo.dependencies = deps;
   }
 
@@ -141,6 +114,14 @@ export function updatePackageFile(
       "@azure/abort-controller": "^2.1.2",
     };
   }
+
+  // Always update @azure/core-rest-pipeline and @azure-rest/core-client to the latest
+  // versions because our imports rely on APIs from those latest package versions.
+  packageInfo.dependencies = {
+    ...packageInfo.dependencies,
+    "@azure/core-rest-pipeline": "^1.24.0",
+    "@azure-rest/core-client": "^2.7.0",
+  };
 
   return {
     path: "package.json",

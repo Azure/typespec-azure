@@ -171,13 +171,13 @@ export type GetLogsResponse = {
 ```ts operations
 import { TestingContext as Client } from "./index.js";
 import { GetLogsResponse } from "../models/models.js";
-import { getBinaryStreamResponse } from "../static-helpers/serialization/get-binary-stream-response.js";
 import { GetLogsOptionalParams } from "./options.js";
 import {
   StreamableMethod,
   PathUncheckedResponse,
   createRestError,
   operationOptionsToRequestParameters,
+  getBinaryStreamResponse,
 } from "@azure-rest/core-client";
 
 export function _getLogsSend(
