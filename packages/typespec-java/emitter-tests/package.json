@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-java-tests",
-  "version": "0.45.9",
+  "version": "0.45.10",
   "type": "module",
   "scripts": {
     "format": "npm run -s prettier -- --write",
@@ -17,7 +17,7 @@
     "@typespec/spector": "0.1.0-alpha.26",
     "@typespec/http-specs": "0.1.0-alpha.39",
     "@azure-tools/azure-http-specs": "0.1.0-alpha.43",
-    "@azure-tools/typespec-java": "file:../azure-tools-typespec-java-0.45.9.tgz"
+    "@azure-tools/typespec-java": "file:../azure-tools-typespec-java-0.45.10.tgz"
   },
   "devDependencies": {
     "@typespec/prettier-plugin-typespec": "^1.13.0",

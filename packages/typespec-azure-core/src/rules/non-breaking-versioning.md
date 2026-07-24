@@ -1,5 +1,11 @@
 Verify that only backward compatible changes are made to the API.
 
+## Impact
+
+- **Area:** API, SDK
+
+Flags versioning changes that would break existing clients across api-versions.
+
 #### ❌ Incorrect
 
 - Removed
@@ -71,3 +77,7 @@ model Foo {
   bar?: string = "default";
 }
 ```
+
+## Suppression
+
+Suppress only when the break is intentional and unavoidable; otherwise model the change in a non-breaking way.

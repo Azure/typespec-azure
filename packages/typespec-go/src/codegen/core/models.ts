@@ -162,7 +162,7 @@ export function generateModels(
     serdeTextBody += `${indent.push().get()}return nil\n`;
     serdeTextBody += `${indent.pop().get()}}\n`;
     serdeTextBody += `${indent.get()}if err := json.Unmarshal(data, v); err != nil {\n`;
-    serdeTextBody += `${indent.push().get()}return fmt.Errorf("struct field %s: %v", fn, err)\n`;
+    serdeTextBody += `${indent.push().get()}return fmt.Errorf("struct field %s: %s", fn, err.Error())\n`;
     serdeTextBody += `${indent.pop().get()}}\n`;
     serdeTextBody += `${indent.get()}return nil\n`;
     serdeTextBody += "}\n\n";
@@ -177,7 +177,7 @@ export function generateModels(
     serdeTextBody += `${indent.pop().get()}}\n`;
     serdeTextBody += `${indent.get()}var aux T\n`;
     serdeTextBody += `${indent.get()}if err := json.Unmarshal(data, &aux); err != nil {\n`;
-    serdeTextBody += `${indent.push().get()}return fmt.Errorf("struct field %s: %v", fn, err)\n`;
+    serdeTextBody += `${indent.push().get()}return fmt.Errorf("struct field %s: %s", fn, err.Error())\n`;
     serdeTextBody += `${indent.pop().get()}}\n`;
     serdeTextBody += `${indent.get()}newTime := time.Time(aux)\n`;
     serdeTextBody += `${indent.get()}*t = &newTime\n`;

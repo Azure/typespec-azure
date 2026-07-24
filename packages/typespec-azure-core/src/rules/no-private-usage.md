@@ -1,5 +1,11 @@
 Verify that a spec is not referencing items from another library using a private namespace.
 
+## Impact
+
+- **Area:** API, SDK
+
+Using private or internal declarations risks a spec break when they change.
+
 #### ❌ Incorrect
 
 ```ts
@@ -22,3 +28,7 @@ namespace Private {
   extern dec myPrivateDecorator(target);
 }
 ```
+
+## Suppression
+
+Suppress only when required to match an existing API; otherwise use the standard types and templates.

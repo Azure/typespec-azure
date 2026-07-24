@@ -42,6 +42,7 @@
   "license": "MIT",
   "devDependencies": {
     "@azure-rest/core-client": "catalog:",
+    "@azure-tools/spector-runner": "workspace:^",
     "@typespec/http-specs": "workspace:^",
     "@typespec/spector": "workspace:^",
     "@typespec/spec-api": "workspace:^",
