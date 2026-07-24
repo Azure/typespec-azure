@@ -31,6 +31,18 @@ For the declaration above, TCGC reports:
 
 Move the operation to an interface or namespace that belongs to the root service namespace, or define the intended target as a valid client under that service.
 
+```typespec
+@service
+namespace MyService {
+  namespace Operations {
+
+  }
+
+  @clientLocation(Operations)
+  op list(): void;
+}
+```
+
 ## Suppression
 
 Suppress this warning only if the invalid `@clientLocation` target is intentionally ignored and the operation should remain in its original client.

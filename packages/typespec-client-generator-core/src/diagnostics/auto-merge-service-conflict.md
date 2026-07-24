@@ -47,3 +47,31 @@ Auto-merging service client must be empty.
 #### ✅ How to Fix
 
 Leave the nested client's `service` option unset so it inherits from the parent, or remove the parent `autoMergeService` setup.
+
+```typespec
+@service
+namespace ServiceA {
+  @route("/aTest")
+  op opA(): void;
+}
+
+@service
+namespace ServiceB {
+  @route("/bTest")
+  op opB(): void;
+}
+
+@client({
+  name: "ParentClient",
+  service: [ServiceA, ServiceB],
+  autoMergeService: true,
+})
+namespace ParentClient {
+  @client({
+    name: "ChildClient",
+  })
+  namespace Child {
+
+  }
+}
+```

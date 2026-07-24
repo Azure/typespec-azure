@@ -36,3 +36,20 @@ For the declaration above, TCGC reports:
 #### ✅ How to Fix
 
 Remove or change the `@hierarchyBuilding` decorator so the rebased hierarchy is acyclic.
+
+```typespec
+@usage(Usage.input)
+namespace TestService;
+
+model A extends B {
+  propA: string;
+}
+
+model B extends C {
+  propB: string;
+}
+
+model C {
+  propC: string;
+}
+```

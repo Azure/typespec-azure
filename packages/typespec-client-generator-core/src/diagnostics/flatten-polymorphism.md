@@ -33,3 +33,17 @@ Cannot flatten property of polymorphic type.
 #### ✅ How to Fix
 
 Remove `@flattenProperty` from the polymorphic property, or change the property to a non-polymorphic type.
+
+```typespec
+@discriminator("kind")
+model Pet {
+  kind: string;
+}
+model Cat extends Pet {
+  kind: "cat";
+}
+
+model Owner {
+  pet: Pet;
+}
+```

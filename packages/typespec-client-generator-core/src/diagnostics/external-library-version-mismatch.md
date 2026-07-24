@@ -41,6 +41,28 @@ External library version mismatch. There are multiple versions of pystac: 1.12.0
 
 Use one package version for all external alternate type declarations that reference the same package.
 
+```typespec
+@alternateType(
+  {
+    identity: "pystac.Item",
+    package: "pystac",
+    minVersion: "1.12.0",
+  },
+  "python"
+)
+model Item {}
+
+@alternateType(
+  {
+    identity: "pystac.Collection",
+    package: "pystac",
+    minVersion: "1.12.0",
+  },
+  "python"
+)
+model Collection {}
+```
+
 ## Suppression
 
 Suppress this warning only if dependency version unification is handled outside TCGC and the emitter will use one compatible external package version.

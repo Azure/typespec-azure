@@ -27,3 +27,8 @@ Invalid mode 'prepend' for @clientDoc decorator. Valid values are "append" or "r
 #### ✅ How to Fix
 
 Pass `DocumentationMode.append` or `DocumentationMode.replace` to `@clientDoc`.
+
+```typespec
+@clientDoc("Client-specific text.", DocumentationMode.append)
+model Widget {}
+```

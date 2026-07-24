@@ -28,6 +28,14 @@ Multiple param aliases applied to 'account'. Only the first one 'accountName' wi
 
 Keep only one alias for the property in a given scope, or scope the aliases so only one applies to each emitter.
 
+```typespec
+model ClientOptions {
+  account: string;
+}
+
+@@paramAlias(ClientOptions.account, "accountName");
+```
+
 ## Suppression
 
 Suppress this warning only if the first `@paramAlias` is the intended alias and later aliases are deliberately ignored.

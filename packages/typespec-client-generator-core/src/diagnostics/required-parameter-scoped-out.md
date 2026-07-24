@@ -27,6 +27,13 @@ Required parameter "requiredHeader" is scoped out for emitter "python". This may
 
 Keep the required parameter in scope, or — when scoping it out is intentional and the value is supplied another way — confirm the intent and suppress this diagnostic.
 
+```typespec
+op getWidget(
+  @header("x-client-id")
+  clientId: string,
+): void;
+```
+
 ## Suppression
 
 Suppress this warning only if the scoped-out required parameter is intentionally supplied another way, such as a custom policy for that emitter.

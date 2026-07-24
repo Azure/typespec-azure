@@ -26,6 +26,14 @@ For the declaration above, TCGC reports:
 
 Align access settings so each generated type has one consistent access level, or remove the conflicting override.
 
+```typespec
+@access(Access.internal)
+model A {}
+
+@access(Access.internal)
+op test(@body body: A): void;
+```
+
 ## Suppression
 
 Suppress this warning only if the public exposure is intentional and the conflicting `@access` override is kept for another emitter or compatibility reason.

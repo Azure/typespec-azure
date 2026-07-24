@@ -25,6 +25,20 @@ For the declaration above, TCGC reports:
 
 Apply `@markAsPageable` only to operations returning a suitable page model, or update the response model to include `@pageItems` or a `value` property.
 
+```typespec
+model Widget {
+  name: string;
+}
+
+model WidgetPage {
+  value: Widget[];
+}
+
+@markAsPageable
+@get
+op listWidgets(): WidgetPage;
+```
+
 ## Suppression
 
 Suppress this warning only if the operation should remain a regular non-pageable method and the legacy `@markAsPageable` annotation is intentionally ignored.

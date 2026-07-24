@@ -35,6 +35,20 @@ Value in example file 'parametersDiagnostic.json' does not follow its definition
 
 Update the example value or the TypeSpec definition so parameters, request bodies, and responses follow the declared shapes.
 
+```typespec
+@service
+namespace TestClient {
+  @route("/{b}")
+  op parametersDiagnostic(
+    @header a: string,
+    @path b: string,
+    @query c: string,
+    @query test: string,
+    @body d: string,
+  ): void;
+}
+```
+
 ## Suppression
 
 Suppress this warning only if the mismatched example value is intentionally excluded from generated SDK examples or tests.

@@ -25,6 +25,16 @@ For the declaration above, TCGC reports:
 
 Apply `@markAsLro` only to operations that return a model, or remove the decorator.
 
+```typespec
+model StartResponse {
+  id: string;
+}
+
+@markAsLro
+@post
+op start(): StartResponse;
+```
+
 ## Suppression
 
 Suppress this warning only if the operation should remain a regular non-LRO method and the legacy `@markAsLro` annotation is intentionally ignored.

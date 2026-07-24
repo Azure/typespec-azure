@@ -28,6 +28,13 @@ Client name: "Widget" is duplicated in language scope: "AllScopes"
 
 Rename one declaration with `@clientName`, change the applicable scope, or otherwise make generated names unique.
 
+```typespec
+@clientName("WidgetResponse")
+model WidgetResponse {}
+
+model Widget {}
+```
+
 ### Generated name conflict
 
 #### Diagnostic Message

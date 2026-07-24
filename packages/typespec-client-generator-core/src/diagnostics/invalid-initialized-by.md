@@ -27,3 +27,12 @@ Invalid 'initializedBy' value. `InitializedBy.customizeCode` cannot be combined 
 #### ✅ How to Fix
 
 Use `InitializedBy.individually` for root clients, `InitializedBy.parent` or `InitializedBy.individually | InitializedBy.parent` for sub clients, or `InitializedBy.customizeCode` by itself.
+
+```typespec
+@clientInitialization({
+  initializedBy: InitializedBy.customizeCode,
+})
+namespace BlobClient {
+
+}
+```

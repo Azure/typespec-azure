@@ -27,3 +27,12 @@ Parameter "a" appears more than once in the reorder list for operation "myOp".
 #### ✅ How to Fix
 
 Include each parameter exactly once in the reorder list.
+
+```typespec
+@service
+namespace MyService {
+  op myOp(a: string, b: string): void;
+}
+
+alias Modified = reorderParameters(MyService.myOp, #["b", "a"]);
+```

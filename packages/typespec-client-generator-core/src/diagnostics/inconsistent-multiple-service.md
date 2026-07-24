@@ -41,3 +41,26 @@ All services must have the same server and auth definitions.
 #### ✅ How to Fix
 
 Make the merged services use matching server and auth definitions, or generate them as separate clients.
+
+```typespec
+@service
+@server("https://service.example.com")
+namespace ServiceA {
+
+}
+
+@service
+@server("https://service.example.com")
+namespace ServiceB {
+
+}
+
+@client({
+  name: "CombineClient",
+  service: [ServiceA, ServiceB],
+  autoMergeService: true,
+})
+namespace CombineClient {
+
+}
+```

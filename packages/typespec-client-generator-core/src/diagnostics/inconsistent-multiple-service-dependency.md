@@ -55,3 +55,40 @@ Services merged into client "CombineClient" depend on different versions of "Sha
 #### ✅ How to Fix
 
 Align service versioning or `@useDependency` mappings so every merged service resolves the shared dependency to the same version.
+
+```typespec
+@versioned(LibVersions)
+namespace SharedLib {
+  enum LibVersions {
+    v1,
+    v2,
+  }
+}
+
+@service
+@versioned(VersionsA)
+namespace ServiceA {
+  enum VersionsA {
+    @useDependency(SharedLib.LibVersions.v1)
+    av1,
+  }
+}
+
+@service
+@versioned(VersionsB)
+namespace ServiceB {
+  enum VersionsB {
+    @useDependency(SharedLib.LibVersions.v1)
+    bv1,
+  }
+}
+
+@client({
+  name: "CombineClient",
+  service: [ServiceA, ServiceB],
+  autoMergeService: true,
+})
+namespace CombineClient {
+
+}
+```

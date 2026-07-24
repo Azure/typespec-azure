@@ -26,3 +26,11 @@ For the declaration above, TCGC reports:
 #### ✅ How to Fix
 
 Move the multi-service `@client` declaration to a namespace, or use a single service for an interface client.
+
+```typespec
+@service namespace ServiceA;
+@service namespace ServiceB;
+
+@client({ service: [ServiceA, ServiceB] })
+namespace CombinedClient {}
+```

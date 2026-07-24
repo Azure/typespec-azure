@@ -24,6 +24,11 @@ Cannot pass an empty value to the @clientNamespace decorator
 
 Provide a non-empty namespace string or remove `@clientNamespace`.
 
+```typespec
+@clientNamespace("Contoso.Widgets")
+model Widget {}
+```
+
 ## Suppression
 
 Suppress this warning only if the empty `@clientNamespace` is intentionally ignored and the default namespace should be used.

@@ -12,16 +12,22 @@ This diagnostic is issued when the `api-version` emitter option names a version 
 @versioned(Contoso.WidgetManager.Versions)
 namespace Contoso.WidgetManager;
 
-enum Versions { // configured api-version `v4` is not defined here
+enum Versions {
   v1,
   v2,
   v3,
 }
 ```
 
+```yaml
+options:
+  "@azure-tools/typespec-python":
+    api-version: "v4" # v4 is not one of v1/v2/v3
+```
+
 #### Diagnostic Message
 
-For the declaration above, TCGC reports:
+For the `api-version` option above, TCGC reports:
 
 ```text
 The API version specified in the config: "v4" is not defined in service versioning list. Fall back to the latest version.
@@ -29,12 +35,14 @@ The API version specified in the config: "v4" is not defined in service versioni
 
 #### ✅ How to Fix
 
-Set `api-version` to a service version that exists, or use `latest` or `all` when those behaviors are intended.
+Set `api-version` to a service version that exists. `latest` and `all` are also valid values when those behaviors are intended.
+
+```yaml
+options:
+  "@azure-tools/typespec-python":
+    api-version: "v3"
+```
 
 ## Suppression
 
-Suppress this warning only if falling back to the latest service version is the intended behavior for the configured emitter run.
-
-```typespec
-#suppress "@azure-tools/typespec-client-generator-core/api-version-undefined" "latest version fallback is intentional"
-```
+This diagnostic should not be suppressed. Fix the configured `api-version` value in `tspconfig.yaml` so it matches the service versioning list, or use `latest` or `all` intentionally.

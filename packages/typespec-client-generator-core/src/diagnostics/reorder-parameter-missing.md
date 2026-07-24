@@ -27,3 +27,12 @@ Parameter "b" from operation "myOp" is missing in reorder list.
 #### ✅ How to Fix
 
 Include every operation parameter exactly once in the reorder list.
+
+```typespec
+@service
+namespace MyService {
+  op myOp(a: string, b: string, c: string): void;
+}
+
+alias Modified = reorderParameters(MyService.myOp, #["c", "a", "b"]);
+```

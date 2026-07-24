@@ -102,6 +102,28 @@ For the declaration above, TCGC reports:
 
 Move the parameter on each operation instead of on the templated alias, or ensure every moved `previewFeatures` parameter has the same type.
 
+```typespec
+@service
+namespace Default;
+
+union FeatureOptInKeys {
+  insights: "Insights.V1Preview",
+  schedules: "Schedules.V1Preview",
+}
+
+op getInsights(
+  @clientLocation(Default)
+  @header("x-preview-features")
+  previewFeatures: FeatureOptInKeys,
+): void;
+
+op getSchedules(
+  @clientLocation(Default)
+  @header("x-preview-features")
+  previewFeatures: FeatureOptInKeys,
+): void;
+```
+
 ## Suppression
 
 Suppress this warning only if the conflicting `@clientLocation` is intentionally ignored or handled manually by the target emitter.

@@ -27,3 +27,12 @@ Parameter "missing" specified in reorder list not found in operation "myOp".
 #### ✅ How to Fix
 
 Remove the unknown name from the reorder list or add the parameter before reordering.
+
+```typespec
+@service
+namespace MyService {
+  op myOp(a: string, b: string): void;
+}
+
+alias Modified = reorderParameters(MyService.myOp, #["b", "a"]);
+```

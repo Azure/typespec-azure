@@ -25,3 +25,10 @@ For the declaration above, TCGC reports:
 #### ✅ How to Fix
 
 Apply the decorator only to a `string` property or a property whose scalar type ultimately extends `string`.
+
+```typespec
+model Widget {
+  @deserializeEmptyStringAsNull
+  name: string;
+}
+```

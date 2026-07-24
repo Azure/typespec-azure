@@ -26,6 +26,12 @@ For the declaration above, TCGC reports:
 
 Double-check whether the client option reflects an intended language-emitter behavior. If it does, suppress this diagnostic; otherwise remove `@clientOption`.
 
+```typespec
+model Test {
+  id: string;
+}
+```
+
 ## Suppression
 
 Suppress this warning only when `@clientOption` is a deliberate temporary workaround for a specific language emitter.

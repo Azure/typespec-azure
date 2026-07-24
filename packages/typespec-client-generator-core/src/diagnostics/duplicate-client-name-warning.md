@@ -32,6 +32,17 @@ Client name: "list" is duplicated in language scope: "csharp"
 
 Give `listByParent` a distinct C# client name, or suppress the warning if the duplicate intentionally represents an overload.
 
+```typespec
+interface StorageTasks {
+  @route("/list")
+  list(): void;
+
+  @clientName("listByParent", "csharp")
+  @route("/listByParent")
+  listByParent(parent: string): void;
+}
+```
+
 ### Generated name conflict
 
 #### Diagnostic Message

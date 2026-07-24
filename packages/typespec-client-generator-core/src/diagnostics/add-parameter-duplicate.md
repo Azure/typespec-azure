@@ -30,3 +30,15 @@ Parameter "name" already exists in operation "myOp".
 #### ✅ How to Fix
 
 Choose a unique parameter name or use `replaceParameter` when the intent is to replace an existing parameter.
+
+```typespec
+@service
+namespace MyService {
+  op myOp(name: string): void;
+}
+
+model ExtraParams {
+  description: string;
+}
+alias Modified = addParameter(MyService.myOp, ExtraParams.description);
+```

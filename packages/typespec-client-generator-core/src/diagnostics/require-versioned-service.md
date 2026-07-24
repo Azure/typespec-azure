@@ -30,6 +30,23 @@ Service "My.Service" must be versioned if you want to apply the "@clientApiVersi
 
 Add TypeSpec versioning to the service namespace or remove `@clientApiVersions`.
 
+```typespec
+@service
+@versioned(Versions)
+@clientApiVersions(ApiVersions)
+namespace My.Service {
+  enum Versions {
+    v1,
+    v2,
+  }
+
+  enum ApiVersions {
+    v1,
+    v2,
+  }
+}
+```
+
 ## Suppression
 
 Suppress this warning only if `@clientApiVersions` is temporarily present before service versioning is added and the generated client should ignore it.

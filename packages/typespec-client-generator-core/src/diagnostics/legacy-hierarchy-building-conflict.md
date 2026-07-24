@@ -37,6 +37,24 @@ For the declaration above, TCGC reports:
 
 Align the property types between the child and the new base chain, or remove the conflicting property from the child model.
 
+```typespec
+model C {
+  shared?: int32;
+}
+
+model OldBase {
+  shared?: int32;
+}
+
+@hierarchyBuilding(C)
+model A extends OldBase {
+  a?: string;
+}
+
+@route("/test")
+op test(): A;
+```
+
 ## Suppression
 
 Suppress this warning only if the property dropped during legacy hierarchy rebasing is intentional and generated SDK compatibility has been verified.

@@ -37,6 +37,23 @@ For the declaration above, TCGC reports:
 
 Remove `@markAsPageable` and keep the existing `@list` pageable metadata.
 
+```typespec
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+  salary: int32;
+}
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+
+  listEmployees is ArmResourceListByParent<Employee>;
+}
+```
+
 ## Suppression
 
 Suppress this warning only if the redundant `@markAsPageable` annotation is kept for source compatibility while real `@list` metadata drives paging.

@@ -37,3 +37,29 @@ Model 'MultiPartRequest' cannot be used as both multipart/form-data input and re
 #### ✅ How to Fix
 
 Create a separate form-data model, such as `<ModelName>FormData`, and use each model only for its matching body kind.
+
+```typespec
+using TypeSpec.Http;
+
+@service(#{ title: "Test Service" })
+namespace TestService;
+
+model JsonRequest {
+  id: string;
+  profileImage: bytes;
+}
+
+model MultiPartRequestFormData {
+  id: HttpPart<string>;
+  profileImage: HttpPart<bytes>;
+}
+
+@put
+op jsonUse(@body body: JsonRequest): NoContentResponse;
+
+@post
+op multipartUse(
+  @header contentType: "multipart/form-data",
+  @multipartBody body: MultiPartRequestFormData,
+): NoContentResponse;
+```

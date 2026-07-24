@@ -31,6 +31,18 @@ Cannot have a union containing self.
 
 Break the circular union reference or model the recursive relationship through a model property instead.
 
+```typespec
+@service
+namespace Test {
+  union Test {
+    null,
+    string,
+  }
+
+  op test(test: Test): void;
+}
+```
+
 ## Suppression
 
 Suppress this warning only if the recursive union is intentionally left in the source and you accept that TCGC cannot produce a usable SDK union for it.

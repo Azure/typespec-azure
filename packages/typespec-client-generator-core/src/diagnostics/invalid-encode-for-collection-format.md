@@ -26,6 +26,13 @@ Only encode of `ArrayEncoding.pipeDelimited` and `ArrayEncoding.spaceDelimited` 
 
 Use `ArrayEncoding.pipeDelimited`, use `ArrayEncoding.spaceDelimited`, rely on the default CSV format, or use exploded query serialization.
 
+```typespec
+@service
+namespace My.Service;
+
+op myOp(@header @encode(ArrayEncoding.pipeDelimited) header: string[]): void;
+```
+
 ## Suppression
 
 Suppress this warning only if the fallback collection format, such as CSV, is the intended SDK behavior for this parameter.

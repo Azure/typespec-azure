@@ -36,3 +36,22 @@ The @clientApiVersions decorator is missing one or more versions defined in My.S
 #### ✅ How to Fix
 
 Add the missing service versions to the client API versions enum.
+
+```typespec
+@service
+@versioned(Versions)
+namespace My.Service {
+  enum Versions {
+    v1,
+    v2,
+    v3,
+  }
+}
+
+enum ClientApiVersions {
+  v1,
+  v2,
+  v3,
+}
+@@clientApiVersions(My.Service, ClientApiVersions);
+```

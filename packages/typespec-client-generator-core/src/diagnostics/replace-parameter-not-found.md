@@ -30,3 +30,15 @@ Parameter "missingParam" not found in operation "myOp".
 #### ✅ How to Fix
 
 Use the exact name or model property reference for an existing operation parameter.
+
+```typespec
+@service
+namespace MyService {
+  op myOp(existingParam: string): void;
+}
+
+model NewParams {
+  replacement: int32;
+}
+alias Modified = replaceParameter(MyService.myOp, "existingParam", NewParams.replacement);
+```

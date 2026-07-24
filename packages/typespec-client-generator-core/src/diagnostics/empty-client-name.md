@@ -24,6 +24,11 @@ Cannot pass an empty value to the @clientName decorator
 
 Provide a non-empty name to `@clientName` or remove the decorator.
 
+```typespec
+@clientName("WidgetClient")
+model Widget {}
+```
+
 ## Suppression
 
 Suppress this warning only if the empty `@clientName` is intentionally ignored and the default generated name is acceptable.
