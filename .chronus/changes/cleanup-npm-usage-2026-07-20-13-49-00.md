@@ -6,7 +6,6 @@ packages:
   - "@azure-tools/typespec-azure-portal-core"
   - "@azure-tools/typespec-azure-resource-manager"
   - "@azure-tools/typespec-client-generator-core"
-  - "@azure-tools/typespec-go"
   - "@azure-tools/typespec-java"
   - "@azure-tools/typespec-ts"
 ---

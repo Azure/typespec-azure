@@ -1,5 +1,16 @@
 # Release History
 
+## 0.16.0
+
+### Features
+
+- [#5032](https://github.com/Azure/typespec-azure/pull/5032) During SDK generation, if a go.mod file exists, its module identity is used as the source of truth, including any major version suffix. This alleviates the need to update tspconfig.yaml whenever a new major version is required.
+
+### Bug Fixes
+
+- [#4985](https://github.com/Azure/typespec-azure/pull/4985) Emit the `unpopulate` and `unpopulateTime` serde helpers using the `%s` verb with `err.Error()` instead of the non-wrapping `%v` verb, keeping the generated code `errorlint`-clean (follow-up to the earlier `unmarshalling type %T` fix).
+
+
 ## 0.15.0
 
 ### Features
