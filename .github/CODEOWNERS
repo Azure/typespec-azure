@@ -1,11 +1,11 @@
-* @bterlson @markcowl @timotheeguerin
+* @markcowl @timotheeguerin @xirzec
 
-/packages/typespec-client-generator-core @lmazuel @m-nash @iscai-msft @srnagar @joheredi
+/packages/typespec-client-generator-core @lmazuel @m-nash @iscai-msft
 /packages/typespec-ts @maorleger @qiaozha @MaryGao @JialinHuang803 @xirzec
-/packages/azure-http-specs/specs/ @iscai-msft @lmazuel @m-nash @joheredi @srnagar @weidongxu-microsoft @tadelesh @jhendrixMSFT 
+/packages/azure-http-specs/specs/ @iscai-msft @lmazuel @m-nash @srnagar @weidongxu-microsoft @tadelesh @jhendrixMSFT @xirzec
 
-/docs/howtos/DataPlane*/ @lmazuel @m-nash @iscai-msft @srnagar @joheredi
+/docs/howtos/DataPlane*/ @lmazuel @m-nash @iscai-msft @xirzec
 
-/packages/typespec-python @iscai-msft @msyyc @tadelesh @l0lawrence @ChenxiJiang333 @kashifkhan
-/packages/typespec-java @weidongxu-microsoft @haolingdong-msft @XiaofeiCao @alzimmermsft
+/packages/typespec-python @iscai-msft @msyyc @tadelesh @l0lawrence @ChenxiJiang333 @kashifkhan @xirzec
+/packages/typespec-java @weidongxu-microsoft @haolingdong-msft @XiaofeiCao @alzimmermsft @jsquire
 /packages/typespec-go @jhendrixMSFT @HeathS @xirzec @lirenhe
