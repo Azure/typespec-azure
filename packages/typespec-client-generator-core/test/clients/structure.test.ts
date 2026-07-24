@@ -1983,7 +1983,7 @@ it("error: inconsistent-multiple-service-servers auth", async () => {
   ]);
 });
 
-it("warning: inconsistent-multiple-service-dependency", async () => {
+it("error: inconsistent-multiple-service-dependency", async () => {
   const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
     createClientCustomizationInput(
       `
@@ -2029,7 +2029,7 @@ it("warning: inconsistent-multiple-service-dependency", async () => {
   expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service-dependency",
-      severity: "warning",
+      severity: "error",
       message:
         'Services merged into client "CombineClient" depend on different versions of "SharedLib": "v1", "v2".',
     },
