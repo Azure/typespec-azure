@@ -10,14 +10,14 @@ If the underlying TypeSpec name does not end with `Client`, use the
 - **Area:** SDK generation. Affects the name of the top-level client type in every emitted language SDK (both data-plane and management-plane).
 - **Not affected:** The service definition and the generated wire protocol are unchanged; this is a client-surface naming convention only.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```tsp
 @client
 namespace MyService;
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the client above, the linter reports that the client name does not end with `Client`:
 
@@ -25,7 +25,7 @@ For the client above, the linter reports that the client name does not end with 
 Client name "MyService" must end with Client. Use @client({name: "...Client"})
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Rename the namespace or interface so it ends with `Client`:
 

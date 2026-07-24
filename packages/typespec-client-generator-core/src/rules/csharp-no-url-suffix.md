@@ -7,7 +7,7 @@ The rule checks the C#-resolved name (respecting `@clientName` overrides).
 - **Area:** SDK generation, **C# only**. Affects the generated property name in the C# SDK (applies to both data-plane and management-plane).
 - **Not affected:** Other language SDKs, the service definition, and the wire protocol are unchanged — the serialized name is untouched, only the C# client-surface name.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```tsp
 model Foo {
@@ -16,7 +16,7 @@ model Foo {
 }
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the model above, the linter reports each property whose C# name ends with `Url`:
 
@@ -24,7 +24,7 @@ For the model above, the linter reports each property whose C# name ends with `U
 Property 'imageUrl' ends with 'Url'. Use 'Uri' suffix instead (e.g. 'imageUri'). Use @clientName("imageUri", "csharp") to rename it for C#.
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Rename the property to end with `Uri`:
 
