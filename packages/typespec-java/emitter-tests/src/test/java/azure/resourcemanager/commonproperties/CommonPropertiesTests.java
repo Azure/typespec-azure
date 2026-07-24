@@ -18,6 +18,7 @@ import com.azure.core.management.exception.ManagementException;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.utils.ArmUtils;
 
@@ -96,6 +97,7 @@ public class CommonPropertiesTests {
     }
 
     @Test
+    @Disabled("Requires an unreleased azure-http-specs ARM resource identifier feature")
     public void testArmResourceIdentifiers() {
         final String subscriptionId = "00000000-0000-0000-0000-000000000000";
         final String resourceGroup = "test-rg";

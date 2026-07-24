@@ -241,10 +241,8 @@ packages/typespec-java/src/**
 packages/typespec-java/test/**
 # Java emitter.jar + assets staged from the core generator build.
 packages/typespec-java/generator/**
-# Packed tarball produced by Build-TypeSpec.ps1 (consumed by emitter-tests).
-packages/typespec-java/*.tgz
 
-# java emitter-tests (standalone Maven+npm spector suite)
+# java emitter-tests (Maven+tsp spector suite, part of the typespec-java package)
 # Generated SDK + generated tests are regenerated, never committed; only
 # hand-written tests, specs, customization and the harness are tracked.
 packages/typespec-java/emitter-tests/src/main/**
@@ -252,7 +250,6 @@ packages/typespec-java/emitter-tests/**/generated/**
 packages/typespec-java/emitter-tests/tsp-output/**
 packages/typespec-java/emitter-tests/specs/**
 packages/typespec-java/emitter-tests/node_modules/**
-packages/typespec-java/emitter-tests/package-lock.json
 packages/typespec-java/emitter-tests/tsp-spector-coverage-*.json
 
 # Generated linter rule reference pages (produced by `tspd doc` / regen-docs via

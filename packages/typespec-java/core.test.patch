@@ -1,0 +1,32 @@
+diff --git a/src/test/java/org/utils/FileUtils.java b/src/test/java/org/utils/FileUtils.java
+index f002da96..fae8d01b 100644
+--- a/src/test/java/org/utils/FileUtils.java
++++ b/src/test/java/org/utils/FileUtils.java
+@@ -14,11 +14,11 @@ public class FileUtils {
+     }
+ 
+     public static Path getJpgFile() {
+-        return Paths.get("node_modules/@typespec/http-specs/assets/image.jpg");
++        return Paths.get("../node_modules/@typespec/http-specs/assets/image.jpg");
+     }
+ 
+     public static Path getPngFile() {
+-        return Paths.get("node_modules/@typespec/http-specs/assets/image.png");
++        return Paths.get("../node_modules/@typespec/http-specs/assets/image.png");
+     }
+ 
+     public static byte[] getJpgBytes() {
+diff --git a/src/test/java/azure/resourcemanager/commonproperties/CommonPropertiesTests.java b/src/test/java/azure/resourcemanager/commonproperties/CommonPropertiesTests.java
+--- a/src/test/java/azure/resourcemanager/commonproperties/CommonPropertiesTests.java
++++ b/src/test/java/azure/resourcemanager/commonproperties/CommonPropertiesTests.java
+@@ -18,5 +18,6 @@ import com.azure.core.management.exception.ManagementException;
+ import java.util.HashMap;
+ import java.util.Map;
+ import org.junit.jupiter.api.Assertions;
++import org.junit.jupiter.api.Disabled;
+ import org.junit.jupiter.api.Test;
+ import org.utils.ArmUtils;
+@@ -98,2 +99,3 @@ public class CommonPropertiesTests {
+     @Test
++    @Disabled("Requires an unreleased azure-http-specs ARM resource identifier feature")
+     public void testArmResourceIdentifiers() {
