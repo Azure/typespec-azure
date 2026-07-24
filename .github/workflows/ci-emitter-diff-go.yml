@@ -45,16 +45,6 @@ jobs:
 
       - uses: ./.github/actions/setup
 
-      - name: Use the azure-sdk npm registry
-        # Point npm/pnpm at the azure-sdk public upstream feed (a reliable
-        # npmjs mirror, same registry the ADO pipelines use) for every install
-        # in this job. Written to $HOME/.npmrc so it is inherited not only by
-        # the repo install below but also by the baseline tree the emitter-diff
-        # tool fetches into a temp dir and installs via --setup (that tree is
-        # outside the repo and would otherwise miss a repo-local .npmrc). This
-        # job does two full installs, so a reliable registry matters more here.
-        run: echo "registry=https://pkgs.dev.azure.com/azure-sdk/public/_packaging/azure-sdk-for-js/npm/registry/" >> "$HOME/.npmrc"
-
       - name: Install repo dependencies
         run: pnpm install
 
