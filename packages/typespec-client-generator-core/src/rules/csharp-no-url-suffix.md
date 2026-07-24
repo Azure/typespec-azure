@@ -1,5 +1,3 @@
-Properties ending with `Url` should use `Uri` suffix instead to follow .NET SDK naming conventions.
-
 The rule checks the C#-resolved name (respecting `@clientName` overrides).
 
 ## Impact

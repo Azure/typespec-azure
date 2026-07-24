@@ -1,4 +1,4 @@
-Tracked Resources must use 3 or fewer levels of nesting. Deeply nested resources make the API harder to use and are discouraged by ARM guidelines.
+Deeply nested resources make the API harder to use and are discouraged by ARM guidelines.
 
 ## Impact
 

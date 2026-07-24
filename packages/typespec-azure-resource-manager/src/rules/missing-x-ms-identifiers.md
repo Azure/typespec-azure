@@ -2,7 +2,7 @@
 @azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers
 ```
 
-Array of models must explicity define which keys are used as identifiers using the `@identifiers` decorator.
+Identifiers let downstream OpenAPI and SDK tooling correlate items in array-valued model properties.
 
 ## Impact
 

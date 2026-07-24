@@ -1,4 +1,4 @@
-Check for missing Operations interface. All Azure Resource Manager services must expose the operations endpoint. Add the Operations interface to your service namespace.
+All Azure Resource Manager services must expose the operations endpoint. Add the Operations interface to your service namespace.
 
 ## Impact
 

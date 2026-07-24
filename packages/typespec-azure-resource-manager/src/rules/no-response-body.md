@@ -3,7 +3,7 @@
 
 ```
 
-ARM operation responses with status code 202 or 204 should not contain a response body. Operation responses with other success (2xx) status codes should contain a response body.
+This keeps ARM response schemas aligned with how clients interpret long-running or empty success responses versus success responses that return resource data.
 
 ## Impact
 

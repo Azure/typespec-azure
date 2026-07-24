@@ -2,7 +2,7 @@
 @azure-tools/typespec-azure-resource-manager/lro-location-header
 ```
 
-Long-running (LRO) operations with 202 responses must have a "Location" response header.
+The header tells clients where to poll after a 202 response from a long-running operation.
 
 ## Impact
 

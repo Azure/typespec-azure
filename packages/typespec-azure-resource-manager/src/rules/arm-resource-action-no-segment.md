@@ -1,4 +1,4 @@
-The `@armResourceAction` decorator should not be used together with `@segment`. If you need to rename the action, use `@action(...)` instead or omit the segment entirely.
+If you need to rename the action, use `@action(...)` instead or omit the segment entirely.
 
 ## Impact
 

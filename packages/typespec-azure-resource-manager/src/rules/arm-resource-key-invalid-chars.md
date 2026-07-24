@@ -1,4 +1,4 @@
-ARM resource key must contain only alphanumeric characters or dashes, starting with a lowercase letter.
+Beyond alphanumeric characters, a resource key may also contain dashes, but it must start with a lowercase letter.
 
 ## Impact
 

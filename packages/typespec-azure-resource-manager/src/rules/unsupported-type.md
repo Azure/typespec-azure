@@ -1,5 +1,3 @@
-Check the ARM specification is not using types not supported in ARM.
-
 Primitive types currently unsupported in ARM:
 
 - int8

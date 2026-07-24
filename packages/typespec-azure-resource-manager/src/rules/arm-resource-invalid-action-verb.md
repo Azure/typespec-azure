@@ -2,7 +2,7 @@
 @azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb
 ```
 
-For ARM http operations, the action verb must be `@post` or `@get`. Any other action verb is flagged as incorrect.
+Use `@post` or `@get` for actions; model other HTTP verbs as normal resource operations instead.
 
 ## Impact
 

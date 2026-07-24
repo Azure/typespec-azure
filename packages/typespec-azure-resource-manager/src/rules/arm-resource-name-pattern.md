@@ -1,4 +1,4 @@
-Resource names must specify a pattern string using `@pattern`, providing a regular expression that the name must match.
+Use a regular expression that accurately describes valid resource names so invalid names can be rejected before requests are sent.
 
 ## Impact
 

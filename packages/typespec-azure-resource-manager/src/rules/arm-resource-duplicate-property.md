@@ -1,4 +1,4 @@
-Warns when a property defined in the resource envelope is also defined in the resource-specific properties bag. Envelope properties should not be duplicated in the `properties` model.
+Envelope properties should not be duplicated in the `properties` model.
 
 ## Impact
 

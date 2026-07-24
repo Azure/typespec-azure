@@ -1,9 +1,6 @@
-Top-level client names should end with the `Client` suffix. This convention
-makes it clear that a namespace or interface represents a generated SDK
-client and provides a consistent experience across emitted languages.
+This convention makes it clear that a namespace or interface represents a generated SDK client and provides a consistent experience across emitted languages.
 
-If the underlying TypeSpec name does not end with `Client`, use the
-`@client` decorator to provide a client-friendly name.
+If the underlying TypeSpec name does not end with `Client`, use the `@client` decorator to provide a client-friendly name.
 
 ## Impact
 

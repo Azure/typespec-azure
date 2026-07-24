@@ -1,4 +1,4 @@
-Conversation and Response child resources of an Agent must define create, read, update, and delete lifecycle operations.
+Implement the full lifecycle on each required child resource so Agent clients can manage conversations and responses consistently.
 
 ## Impact
 

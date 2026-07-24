@@ -2,7 +2,7 @@
 @azure-tools/typespec-azure-resource-manager/no-empty-model
 ```
 
-ARM Properties with type:object that don't reference a model definition are not allowed. ARM doesn't allow generic type definitions as this leads to bad customer experience.
+Define a named model with explicit properties instead of a generic object shape so clients and OpenAPI consumers see a concrete schema.
 
 ## Impact
 

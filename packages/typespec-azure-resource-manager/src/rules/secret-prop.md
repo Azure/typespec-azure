@@ -2,7 +2,7 @@
 @azure-tools/typespec-azure-resource-manager/secret-prop
 ```
 
-When defining the model returned in an ARM operation, any property that contains sensitive information (such as passwords, keys, tokens, credentials, or other secrets) must be marked with `@secret`. This ensures that secrets are properly identified and handled according to ARM security guidelines.
+Marking these fields lets ARM and SDK tooling identify sensitive values and handle them according to security guidelines.
 
 :::note
 ARM RPC rule: [`RPC-v1-13`](https://armwiki.azurewebsites.net/api_contracts/guidelines/rpc.html)
