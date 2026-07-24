@@ -2516,12 +2516,12 @@ model Azure.ResourceManager.CommonTypes.NspConfigurationNameParameter<KeyName, R
 
 #### Template Parameters
 
-| Name                | Description                                                                                                          |
-| ------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| KeyName             | The name of the network security perimeter configuration resource name parameter.                                    |
-| ResourceNamePattern | The regex pattern for the network security perimeter configuration resource name (default is "^[a-z][a-zA-Z0-9]\*$") |
-| MinLength           | The minimum length for the network security perimeter configuration resource name (default is 1)                     |
-| MaxLength           | The maximum length for the network security perimeter configuration resource name (default is 512)                   |
+| Name                | Description                                                                                                         |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| KeyName             | The name of the network security perimeter configuration resource name parameter.                                   |
+| ResourceNamePattern | The regex pattern for the network security perimeter configuration resource name (default is "^[a-z][a-zA-Z0-9]*$") |
+| MinLength           | The minimum length for the network security perimeter configuration resource name (default is 1)                    |
+| MaxLength           | The maximum length for the network security perimeter configuration resource name (default is 512)                  |
 
 #### Properties
 
@@ -2776,7 +2776,7 @@ model Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionNameParameter<K
 | Name                | Description                                                                                             |
 | ------------------- | ------------------------------------------------------------------------------------------------------- |
 | KeyName             | The name of the private endpoint connection name parameter (default is "privateEndpointConnectionName") |
-| ResourceNamePattern | The regex pattern for the private endpoint connection name (default is "^[a-z][a-zA-Z0-9]\*$")          |
+| ResourceNamePattern | The regex pattern for the private endpoint connection name (default is "^[a-z][a-zA-Z0-9]*$")           |
 | MinLength           | The minimum length for the private endpoint connection name (default is 3)                              |
 | MaxLength           | The maximum length for the private endpoint connection name (default is 63                              |
 
@@ -2900,12 +2900,12 @@ model Azure.ResourceManager.CommonTypes.PrivateLinkResourceNameParameter<Segment
 
 #### Template Parameters
 
-| Name                | Description                                                                              |
-| ------------------- | ---------------------------------------------------------------------------------------- |
-| Segment             | The resource type name for private links (default is privateLinkResources)               |
-| ResourceNamePattern | The regex pattern for the private link resource name (default is "^[a-z][a-zA-Z0-9]\*$") |
-| MinLength           | The minimum length for the private link resource name (default is 3)                     |
-| MaxLength           | The maximum length for the private link resource name (default is 63                     |
+| Name                | Description                                                                             |
+| ------------------- | --------------------------------------------------------------------------------------- |
+| Segment             | The resource type name for private links (default is privateLinkResources)              |
+| ResourceNamePattern | The regex pattern for the private link resource name (default is "^[a-z][a-zA-Z0-9]*$") |
+| MinLength           | The minimum length for the private link resource name (default is 3)                    |
+| MaxLength           | The maximum length for the private link resource name (default is 63                    |
 
 #### Properties
 

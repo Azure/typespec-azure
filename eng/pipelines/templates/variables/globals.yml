@@ -1,3 +1,8 @@
 variables:
   # Disable CodeQL by default to prevent build timeouts
   Codeql.SkipTaskAutoInjection: true
+  # Route pip through the azure-sdk PyPI proxy feed so `pip install` (triggered
+  # by the typespec-python prepare lifecycle during `pnpm install`) can resolve
+  # packages in network-isolated CI agents where pypi.org is blocked by the
+  # CFSClean network isolation policy.
+  PIP_INDEX_URL: https://pkgs.dev.azure.com/azure-sdk/public/_packaging/azure-sdk-for-python/pypi/simple/

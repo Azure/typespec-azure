@@ -1,4 +1,4 @@
-import { Model, createRule, paramMessage } from "@typespec/compiler";
+import { Model, createRule, fileRef, paramMessage } from "@typespec/compiler";
 import { getArmResources } from "../resource.js";
 import { getInterface } from "./utils.js";
 
@@ -7,6 +7,7 @@ import { getInterface } from "./utils.js";
  */
 export const deleteOperationMissingRule = createRule({
   name: "no-resource-delete-operation",
+  docs: fileRef.fromPackageRoot("src/rules/no-resource-delete-operation.md"),
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-resource-delete-operation",
   description: "Check for resources that must have a delete operation.",

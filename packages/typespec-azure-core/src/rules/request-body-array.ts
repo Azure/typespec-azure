@@ -1,8 +1,9 @@
-import { Operation, createRule } from "@typespec/compiler";
+import { Operation, createRule, fileRef } from "@typespec/compiler";
 import { isBody, isBodyRoot } from "@typespec/http";
 
 export const bodyArrayRule = createRule({
   name: "request-body-problem",
+  docs: fileRef.fromPackageRoot("src/rules/request-body-problem.md"),
   description: "Request body should not be of raw array type.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/request-body-problem",

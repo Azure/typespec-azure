@@ -1,6 +1,7 @@
 import type { Enum, Model, Namespace, Program, Union } from "@typespec/compiler";
 import {
   createRule,
+  fileRef,
   getNamespaceFullName,
   isGlobalNamespace,
   isService,
@@ -23,6 +24,7 @@ const skippedLibraryNamespaces = [
 
 export const csharpNoTypeNameConflictRule = createRule({
   name: "csharp-no-type-name-conflict",
+  docs: fileRef.fromPackageRoot("src/rules/csharp-no-type-name-conflict.md"),
   description: "C# generated type names should not conflict with reserved Azure SDK type names.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-no-type-name-conflict",
