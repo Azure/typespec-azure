@@ -24,6 +24,7 @@ import { handleClientExamples } from "./example.js";
 import {
   SdkArrayType,
   SdkClient,
+  SdkClientType,
   SdkContext,
   SdkDictionaryType,
   SdkEnumType,
@@ -32,6 +33,7 @@ import {
   SdkModelPropertyType,
   SdkModelType,
   SdkNullableType,
+  SdkServiceMethod,
   SdkServiceOperation,
   SdkServiceResponseHeader,
   SdkUnionType,
@@ -222,6 +224,8 @@ export async function createSdkContext<
   }
   // Validate duplicate names within each type kind in each namespace (cross-kind duplicates are allowed).
   diagnostics.pipe(validateNamesUnderNamespaces(sdkContext));
+  // Validate duplicate operation names in clients (e.g., from multi-service merge or sub-client merge).
+  diagnostics.pipe(validateOperationNamesInClients(sdkContext));
   sdkContext.diagnostics = [...sdkContext.diagnostics, ...diagnostics.diagnostics];
 
   if (options?.exportTCGCoutput) {
@@ -260,6 +264,53 @@ function validateNamesUnderNamespaces(context: SdkContext) {
 
   for (const namespace of context.sdkPackage.namespaces) {
     validateNamespace(namespace);
+  }
+
+  return diagnostics.wrap(undefined);
+}
+
+function validateOperationNamesInClients(context: SdkContext) {
+  const diagnostics = createDiagnosticCollector();
+
+  const validateClient = (client: SdkClientType<SdkHttpOperation>) => {
+    if (client.methods.length > 1) {
+      const seen = new Map<string, SdkServiceMethod<SdkHttpOperation>>();
+      const reported = new Set<string>();
+      for (const method of client.methods) {
+        const first = seen.get(method.name);
+        if (first) {
+          if (!reported.has(method.name)) {
+            reported.add(method.name);
+            diagnostics.add(
+              createDiagnostic({
+                code: "duplicate-client-name",
+                messageId: "nonDecorator",
+                format: { name: method.name, scope: context.emitterName },
+                target: first.__raw ?? context.program.getGlobalNamespaceType(),
+              }),
+            );
+          }
+          diagnostics.add(
+            createDiagnostic({
+              code: "duplicate-client-name",
+              messageId: "nonDecorator",
+              format: { name: method.name, scope: context.emitterName },
+              target: method.__raw ?? context.program.getGlobalNamespaceType(),
+            }),
+          );
+        } else {
+          seen.set(method.name, method);
+        }
+      }
+    }
+
+    for (const child of client.children ?? []) {
+      validateClient(child);
+    }
+  };
+
+  for (const client of context.sdkPackage.clients) {
+    validateClient(client);
   }
 
   return diagnostics.wrap(undefined);
