@@ -5,7 +5,7 @@ This diagnostic is issued when `@hierarchyBuilding` rebases a model hierarchy an
 - **Area:** Legacy SDK inheritance rebasing. Generation continues, but a conflicting same-named property is dropped from the generated rebased hierarchy.
 - **Not affected:** The service schema still contains the original property definitions.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 model C {
@@ -25,7 +25,7 @@ model A extends OldBase {
 op test(): A;
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -33,7 +33,7 @@ For the declaration above, TCGC reports:
 @hierarchyBuilding decorator: property 'shared' on model 'A' has type that does not match the same-named property supplied by the new base chain (rooted at 'C'). The property is dropped from 'A' to satisfy the rebase rule (own properties are filtered against the new base chain by name). Consider aligning the types or removing the property from 'A'.
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Align the property types between the child and the new base chain, or remove the conflicting property from the child model.
 

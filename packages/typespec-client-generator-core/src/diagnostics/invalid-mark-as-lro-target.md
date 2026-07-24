@@ -5,7 +5,7 @@ This diagnostic is issued when `@markAsLro` is applied to an operation that does
 - **Area:** Legacy LRO SDK metadata. Generation continues with the operation treated as a regular method because no model response is available for forced LRO metadata.
 - **Not affected:** The service operation's HTTP behavior and response type are unchanged.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 @markAsLro
@@ -13,7 +13,7 @@ This diagnostic is issued when `@markAsLro` is applied to an operation that does
 op start(): string; // LRO marker requires a model response
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -21,7 +21,7 @@ For the declaration above, TCGC reports:
 @markAsLro decorator can only be applied to operations that return a model. We will ignore this decorator.
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Apply `@markAsLro` only to operations that return a model, or remove the decorator.
 

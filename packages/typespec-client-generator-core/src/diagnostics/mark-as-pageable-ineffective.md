@@ -5,7 +5,7 @@ This diagnostic is issued when `@markAsPageable` is applied to an operation that
 - **Area:** Pageable SDK metadata. Generation continues using the existing `@list` paging metadata while the redundant legacy marker has no effect.
 - **Not affected:** Page item and next-link metadata already discovered from the operation remain unchanged.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 model Employee is TrackedResource<EmployeeProperties> {
@@ -25,7 +25,7 @@ interface Employees {
 }
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -33,7 +33,7 @@ For the declaration above, TCGC reports:
 @markAsPageable decorator is ineffective since this operation is already marked as pageable with @list decorator. Please remove the @markAsPageable decorator.
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Remove `@markAsPageable` and keep the existing `@list` pageable metadata.
 

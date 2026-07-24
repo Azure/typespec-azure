@@ -5,7 +5,7 @@ This diagnostic is issued when a required HTTP parameter is scoped out of the cu
 - **Area:** Target-emitter method signatures. Generation continues for that emitter without a required parameter, which can cause runtime failures unless the value is supplied another way.
 - **Not affected:** Other emitter scopes and the HTTP parameter definition are unchanged.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 op getWidget(
@@ -15,7 +15,7 @@ op getWidget(
 ): void;
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -23,7 +23,7 @@ For the declaration above, TCGC reports:
 Required parameter "requiredHeader" is scoped out for emitter "python". This may cause runtime errors unless the parameter is provided through other means (e.g., custom headers).
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Keep the required parameter in scope, or — when scoping it out is intentional and the value is supplied another way — confirm the intent and suppress this diagnostic.
 

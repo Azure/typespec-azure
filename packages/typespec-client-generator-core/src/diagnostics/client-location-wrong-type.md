@@ -5,7 +5,7 @@ This diagnostic is issued when an operation marked with `@clientLocation` points
 - **Area:** Client operation placement. Generation continues, but the operation cannot be moved to a target outside the valid service client hierarchy.
 - **Not affected:** The operation's HTTP route and protocol metadata are unchanged.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 namespace OtherNamespace {
@@ -19,7 +19,7 @@ namespace MyService {
 }
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -27,7 +27,7 @@ For the declaration above, TCGC reports:
 `@clientLocation` could only move operation to the interface or namespace belong to the root namespace with `@service`.
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Move the operation to an interface or namespace that belongs to the root service namespace, or define the intended target as a valid client under that service.
 

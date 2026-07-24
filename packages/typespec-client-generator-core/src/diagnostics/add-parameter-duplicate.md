@@ -5,7 +5,7 @@ This diagnostic is issued when `addParameter` is called with a model property wh
 - **Area:** Client customization transformations. Blocks `addParameter` from producing a valid customized SDK method signature when the added parameter name already exists.
 - **Not affected:** The original service operation remains unchanged.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 @service
@@ -19,7 +19,7 @@ model ExtraParams {
 alias Modified = addParameter(MyService.myOp, ExtraParams.name);
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -27,7 +27,7 @@ For the declaration above, TCGC reports:
 Parameter "name" already exists in operation "myOp".
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Choose a unique parameter name or use `replaceParameter` when the intent is to replace an existing parameter.
 

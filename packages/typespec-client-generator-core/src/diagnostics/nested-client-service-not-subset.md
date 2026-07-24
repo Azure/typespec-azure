@@ -5,7 +5,7 @@ This diagnostic is issued when a nested (sub) client declares services that are 
 - **Area:** Nested client service ownership. Blocks a sub-client from exposing services that its parent client does not own.
 - **Not affected:** The parent client's declared services and the standalone service namespaces remain unchanged.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 @client({
@@ -23,7 +23,7 @@ namespace ParentClient {
 }
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -31,7 +31,7 @@ For the declaration above, TCGC reports:
 Nested client's services must be a subset of the parent client's services. If no service is needed, omit the `service` property to inherit from the parent.
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Restrict the nested client's `service` to services the parent client already declares, or omit the `service` option to inherit the parent's services:
 

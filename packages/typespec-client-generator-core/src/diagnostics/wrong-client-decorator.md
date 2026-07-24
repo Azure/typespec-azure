@@ -5,7 +5,7 @@ This diagnostic is issued when `@client` is applied through an augment decorator
 - **Area:** Explicit client declaration. Generation continues, but the augmented `@client` application is ignored because clients must be declared directly.
 - **Not affected:** The namespace or interface itself remains in the TypeSpec program.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 @service
@@ -22,7 +22,7 @@ namespace ClientNamespace {
 );
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -30,7 +30,7 @@ For the declaration above, TCGC reports:
 @client should decorate namespace or interface in client.tsp
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Place `@client` directly on the namespace or interface declaration that represents the client:
 

@@ -5,7 +5,7 @@ This diagnostic is issued when one operation has multiple distinct response body
 - **Area:** SDK method response modeling. Generation continues, but some emitters may be unable to represent every distinct response body type in one method return shape.
 - **Not affected:** The service can still declare multiple wire responses.
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the case above, TCGC reports:
 
@@ -13,7 +13,7 @@ For the case above, TCGC reports:
 Multiple response types found in operation getWidget. Some emitters might not support returning all of these response types
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Prefer a single response body model or redesign the responses so all successful response bodies share one SDK shape.
 

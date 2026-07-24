@@ -5,7 +5,7 @@ This diagnostic is issued when services merged into the same client resolve diff
 - **Area:** Multi-service dependency versioning. Blocks merging services into one client when their shared versioned dependencies would generate incompatible or duplicated SDK models.
 - **Not affected:** Each service can still be generated separately with its own dependency resolution.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 @versioned(LibVersions)
@@ -44,7 +44,7 @@ namespace CombineClient {
 }
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -52,7 +52,7 @@ For the declaration above, TCGC reports:
 Services merged into client "CombineClient" depend on different versions of "SharedLib": "v1", "v2".
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Align service versioning or `@useDependency` mappings so every merged service resolves the shared dependency to the same version.
 

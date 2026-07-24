@@ -5,7 +5,7 @@ This diagnostic is issued when `@alternateType` with external type information i
 - **Area:** External alternate-type mapping. Generation continues, but property-level external type information is not applied to SDK type substitution.
 - **Not affected:** The model property remains in the service schema with its original TypeSpec type.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 model Widget {
@@ -19,7 +19,7 @@ model Widget {
 }
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -27,7 +27,7 @@ For the declaration above, TCGC reports:
 @alternateType with external type information cannot be applied to model properties. Please apply it to the type definition itself (Scalar, Model, Enum, or Union) instead.
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Apply the external alternate type to the scalar, model, enum, or union definition instead of to a model property:
 

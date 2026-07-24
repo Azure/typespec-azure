@@ -5,7 +5,7 @@ This diagnostic is issued when `@clientApiVersions` is applied to a service name
 - **Area:** API-version decorator validation. Generation continues, but `@clientApiVersions` has no service version list to extend on an unversioned namespace.
 - **Not affected:** The unversioned service operations are otherwise generated normally.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 @service
@@ -18,7 +18,7 @@ namespace My.Service {
 }
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -26,7 +26,7 @@ For the declaration above, TCGC reports:
 Service "My.Service" must be versioned if you want to apply the "@clientApiVersions" decorator
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Add TypeSpec versioning to the service namespace or remove `@clientApiVersions`.
 

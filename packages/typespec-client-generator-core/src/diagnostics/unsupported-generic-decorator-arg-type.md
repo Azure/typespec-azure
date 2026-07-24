@@ -5,7 +5,7 @@ This diagnostic is issued when TCGC tries to parse a generic decorator argument 
 - **Area:** Decorator metadata emitted for SDK types. Generation continues, but the unsupported decorator argument is omitted from the metadata available to emitters.
 - **Not affected:** The decorator's compile-time effect on the TypeSpec program has already occurred.
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the case above, TCGC reports:
 
@@ -13,7 +13,7 @@ For the case above, TCGC reports:
 Can not parse the arg type for decorator "@service".
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Use supported decorator argument values such as strings, numbers, booleans, values, or enum members.
 

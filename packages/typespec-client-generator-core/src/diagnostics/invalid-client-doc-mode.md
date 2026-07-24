@@ -5,7 +5,7 @@ This diagnostic is issued when `@clientDoc` receives a mode whose value is not `
 - **Area:** Generated SDK documentation customization. Blocks the `@clientDoc` override because TCGC cannot decide whether to append or replace documentation.
 - **Not affected:** SDK type names, operation signatures, and service behavior are unchanged.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 enum CustomDocMode {
@@ -16,7 +16,7 @@ enum CustomDocMode {
 model Widget {}
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -24,7 +24,7 @@ For the declaration above, TCGC reports:
 Invalid mode 'prepend' for @clientDoc decorator. Valid values are "append" or "replace".
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Pass `DocumentationMode.append` or `DocumentationMode.replace` to `@clientDoc`.
 

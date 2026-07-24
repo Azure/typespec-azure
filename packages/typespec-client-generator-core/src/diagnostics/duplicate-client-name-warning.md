@@ -5,9 +5,9 @@ This diagnostic is issued when two generated SDK declarations share the same cli
 - **Area:** C# SDK naming and overload generation. Generation continues, but the duplicate generated name should be intentional for C# overload behavior.
 - **Not affected:** Other language scopes are unaffected unless the same duplicate name applies to them.
 
-### Decorator-applied duplicate
+## Decorator-applied duplicate
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 interface StorageTasks {
@@ -20,7 +20,7 @@ interface StorageTasks {
 }
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -28,7 +28,7 @@ For the declaration above, TCGC reports:
 Client name: "list" is duplicated in language scope: "csharp"
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Give `listByParent` a distinct C# client name, or suppress the warning if the duplicate intentionally represents an overload.
 
@@ -43,9 +43,9 @@ interface StorageTasks {
 }
 ```
 
-### Generated name conflict
+## Generated name conflict
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the generated operation name above, TCGC reports:
 
@@ -53,7 +53,7 @@ For the generated operation name above, TCGC reports:
 Client name: "list" is defined somewhere causing naming conflicts in language scope: "csharp"
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Rename one of the generated operations for the affected scope, or suppress the warning when the duplicate is an intentional overload.
 

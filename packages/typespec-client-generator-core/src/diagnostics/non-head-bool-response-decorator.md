@@ -5,7 +5,7 @@ This diagnostic is issued when `@responseAsBool` is applied to an operation that
 - **Area:** HEAD response convenience modeling. Generation continues, but `@responseAsBool` is ignored because the operation is not a HEAD request.
 - **Not affected:** The operation's HTTP verb and response schema are unchanged.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 @responseAsBool
@@ -13,7 +13,7 @@ This diagnostic is issued when `@responseAsBool` is applied to an operation that
 op exists(): void;
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -21,7 +21,7 @@ For the declaration above, TCGC reports:
 @responseAsBool decorator can only be used on HEAD operations. Will ignore decorator on getOperation.
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Add `@head` when the operation is a HEAD request, or remove `@responseAsBool`:
 

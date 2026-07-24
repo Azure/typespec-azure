@@ -5,7 +5,7 @@ This diagnostic is issued when TCGC cannot determine the emitter's language beca
 - **Area:** TCGC host and tooling configuration. Generation falls back to an unknown emitter scope, which can make language-scoped decorators and names resolve incorrectly.
 - **Not affected:** The TypeSpec service model is not changed by the missing option.
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the case above, TCGC reports:
 
@@ -13,7 +13,7 @@ For the case above, TCGC reports:
 Can not find name for your emitter, please check your emitter name.
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Make sure the emitter is invoked with a resolvable package name (such as `@azure-tools/typespec-csharp`) so TCGC can derive the target language.
 

@@ -5,7 +5,7 @@ This diagnostic is issued when `reorderParameters` lists the same parameter name
 - **Area:** Client customization transformations. Blocks `reorderParameters` because a duplicated name would make the generated method parameter order ambiguous.
 - **Not affected:** The operation's actual parameters are unchanged.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 @service
@@ -16,7 +16,7 @@ namespace MyService {
 alias Modified = reorderParameters(MyService.myOp, #["a", "a"]); // `a` appears twice
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -24,7 +24,7 @@ For the declaration above, TCGC reports:
 Parameter "a" appears more than once in the reorder list for operation "myOp".
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Include each parameter exactly once in the reorder list.
 

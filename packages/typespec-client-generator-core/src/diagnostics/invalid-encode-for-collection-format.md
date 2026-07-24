@@ -5,7 +5,7 @@ This diagnostic is issued when an array parameter uses `@encode` with an array e
 - **Area:** Collection parameter serialization metadata. Generation continues with the fallback collection format when an unsupported array encoding is used.
 - **Not affected:** Non-array parameters and the declared parameter location are unchanged.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 @service
@@ -14,7 +14,7 @@ namespace My.Service;
 op myOp(@header @encode("tsv") header: string[]): void; // `tsv` is not a supported collection encoding
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -22,7 +22,7 @@ For the declaration above, TCGC reports:
 Only encode of `ArrayEncoding.pipeDelimited` and `ArrayEncoding.spaceDelimited` is supported for collection format.
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Use `ArrayEncoding.pipeDelimited`, use `ArrayEncoding.spaceDelimited`, rely on the default CSV format, or use exploded query serialization.
 

@@ -5,7 +5,7 @@ This diagnostic is issued when TCGC converts a union whose only possible value i
 - **Area:** SDK union type conversion. Generation continues with a fallback union shape, but a null-only union cannot become a useful SDK type.
 - **Not affected:** Other nullable unions with non-null variants are unaffected.
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the case above, TCGC reports:
 
@@ -13,7 +13,7 @@ For the case above, TCGC reports:
 Cannot have a union containing only null types.
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Add at least one non-null variant to the union or remove the union from the generated client surface.
 

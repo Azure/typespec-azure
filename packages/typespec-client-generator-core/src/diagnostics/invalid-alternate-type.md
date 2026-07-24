@@ -5,7 +5,7 @@ This diagnostic is issued when `@alternateType` is applied to a scalar source ty
 - **Area:** SDK type substitution. Blocks an invalid `@alternateType` replacement that would change a scalar into a non-scalar SDK type.
 - **Not affected:** The source scalar and its wire encoding remain unchanged.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 scalar storageDateTime extends utcDateTime;
@@ -15,7 +15,7 @@ model DateWrapper {
 @@alternateType(storageDateTime, DateWrapper); // scalar source cannot use a model alternate type
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -23,7 +23,7 @@ For the declaration above, TCGC reports:
 Invalid alternate type. If the source type is Scalar, the alternate type must also be Scalar. Found alternate type kind: 'Model'
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Use a scalar alternate type when the source is a scalar, or apply `@alternateType` to a non-scalar source when replacing it with a non-scalar shape:
 

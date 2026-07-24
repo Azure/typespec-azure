@@ -5,7 +5,7 @@ This diagnostic is issued when the `initializedBy` option in `@clientInitializat
 - **Area:** SDK client construction. Blocks invalid client initialization metadata that would produce an impossible root or sub-client creation pattern.
 - **Not affected:** Service operations and request/response payload shapes are unchanged.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 @clientInitialization({
@@ -16,7 +16,7 @@ namespace BlobClient {
 }
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -24,7 +24,7 @@ For the declaration above, TCGC reports:
 Invalid 'initializedBy' value. `InitializedBy.customizeCode` cannot be combined with other values.
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Use `InitializedBy.individually` for root clients, `InitializedBy.parent` or `InitializedBy.individually | InitializedBy.parent` for sub clients, or `InitializedBy.customizeCode` by itself.
 

@@ -5,7 +5,7 @@ This diagnostic is issued when `@deserializeEmptyStringAsNull` is applied to a p
 - **Area:** SDK deserialization customization. Blocks empty-string-to-null handling on non-string-like properties.
 - **Not affected:** Other properties and the service payload schema are unchanged.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 model Widget {
@@ -14,7 +14,7 @@ model Widget {
 }
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -22,7 +22,7 @@ For the declaration above, TCGC reports:
 @deserializeEmptyStringAsNull can only be applied to `ModelProperty` of type 'string' or a `Scalar` derived from 'string'.
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Apply the decorator only to a `string` property or a property whose scalar type ultimately extends `string`.
 

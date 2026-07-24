@@ -5,7 +5,7 @@ This diagnostic is issued when a required HTTP operation parameter cannot be map
 - **Area:** Method-to-protocol parameter mapping. Blocks generation of a service method when a required HTTP parameter cannot be supplied by the generated SDK method signature.
 - **Not affected:** The HTTP operation still declares the required parameter.
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the case above, TCGC reports:
 
@@ -13,6 +13,6 @@ For the case above, TCGC reports:
 Missing HTTP operation parameter "apiVersion" in method "getWidget". Please check the method definition.
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Keep a matching method parameter or model property path for the HTTP parameter, or make the service parameter optional when appropriate.

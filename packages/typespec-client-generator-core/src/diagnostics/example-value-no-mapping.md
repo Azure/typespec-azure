@@ -5,7 +5,7 @@ This diagnostic is issued when a value from an example file cannot be matched to
 - **Area:** Example value conversion. Generation continues, but the mismatched example value is not mapped into SDK example data for the operation.
 - **Not affected:** The operation signature and generated client method are unchanged.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 @service
@@ -22,7 +22,7 @@ namespace TestClient {
 }
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -31,7 +31,7 @@ Value in example file 'parametersDiagnostic.json' does not follow its definition
 {"test":"a"}
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Update the example value or the TypeSpec definition so parameters, request bodies, and responses follow the declared shapes.
 

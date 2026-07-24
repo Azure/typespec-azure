@@ -5,7 +5,7 @@ This diagnostic is issued when `@markAsPageable` is applied to an operation that
 - **Area:** Legacy pageable SDK metadata. Generation continues with the operation treated as a regular method because TCGC cannot identify page items.
 - **Not affected:** The operation's service response schema is unchanged.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 @markAsPageable
@@ -13,7 +13,7 @@ This diagnostic is issued when `@markAsPageable` is applied to an operation that
 op listWidgets(): string; // pageable marker requires a page model response
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -21,7 +21,7 @@ For the declaration above, TCGC reports:
 @markAsPageable decorator can only be applied to operations that return a model with a property decorated with @pageItems or a property named 'value'. We will ignore this decorator.
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Apply `@markAsPageable` only to operations returning a suitable page model, or update the response model to include `@pageItems` or a `value` property.
 

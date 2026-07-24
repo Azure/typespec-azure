@@ -5,7 +5,7 @@ This diagnostic is issued when the enum passed to `@clientApiVersions` omits one
 - **Area:** Client API-version enum generation. Blocks a client API version list that would omit service versions required for compatibility.
 - **Not affected:** The service's versioned namespace and declared service versions are unchanged.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 @service
@@ -25,7 +25,7 @@ enum ClientApiVersions { // missing service version `v3`
 @@clientApiVersions(My.Service, ClientApiVersions);
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -33,7 +33,7 @@ For the declaration above, TCGC reports:
 The @clientApiVersions decorator is missing one or more versions defined in My.Service. Client API must support all service versions to ensure compatibility. Missing versions: v3. Please update the client API to support all required service versions.
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Add the missing service versions to the client API versions enum.
 

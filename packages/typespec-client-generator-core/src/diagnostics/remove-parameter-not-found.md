@@ -5,7 +5,7 @@ This diagnostic is issued when `removeParameter` is called with a selector that 
 - **Area:** Client customization transformations. Blocks `removeParameter` from producing the intended customized signature because the selector does not match an operation parameter.
 - **Not affected:** The original operation parameter list is unchanged.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 @service
@@ -16,7 +16,7 @@ namespace MyService {
 alias Modified = removeParameter(MyService.myOp, "missingParam"); // `missingParam` is not a parameter of `myOp`
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -24,7 +24,7 @@ For the declaration above, TCGC reports:
 Parameter "missingParam" not found in operation "myOp".
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Use the exact name or model property reference for an existing operation parameter.
 

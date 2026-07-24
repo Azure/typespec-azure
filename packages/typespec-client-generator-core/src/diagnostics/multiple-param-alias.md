@@ -5,7 +5,7 @@ This diagnostic is issued when more than one `@paramAlias` is applied to the sam
 - **Area:** Client initialization parameter naming. Generation continues using the first alias, while later aliases for the same scoped parameter are ignored.
 - **Not affected:** Operation-level parameter names and wire names are unchanged.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 model ClientOptions {
@@ -16,7 +16,7 @@ model ClientOptions {
 @@paramAlias(ClientOptions.account, "storageAccountName"); // second alias for the same parameter scope
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -24,7 +24,7 @@ For the declaration above, TCGC reports:
 Multiple param aliases applied to 'account'. Only the first one 'accountName' will be used.
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Keep only one alias for the property in a given scope, or scope the aliases so only one applies to each emitter.
 

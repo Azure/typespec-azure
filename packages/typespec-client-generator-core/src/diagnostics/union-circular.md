@@ -5,7 +5,7 @@ This diagnostic is issued when TCGC converts a union that directly or indirectly
 - **Area:** SDK union type conversion. Generation continues with a fallback union shape, but the recursive union cannot become a usable SDK union.
 - **Not affected:** The TypeSpec union declaration is still accepted by the compiler.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 @service
@@ -19,7 +19,7 @@ namespace Test {
 }
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -27,7 +27,7 @@ For the declaration above, TCGC reports:
 Cannot have a union containing self.
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Break the circular union reference or model the recursive relationship through a model property instead.
 

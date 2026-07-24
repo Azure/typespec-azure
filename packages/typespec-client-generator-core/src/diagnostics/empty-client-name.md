@@ -5,14 +5,14 @@ This diagnostic is issued when `@clientName` is given an empty or whitespace-onl
 - **Area:** SDK naming customization. Generation continues, but the empty `@clientName` override is ignored and the default generated name is used.
 - **Not affected:** The target declaration's TypeSpec name and wire representation are unchanged.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 @clientName(" ") // client name is empty/whitespace
 model Widget {}
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -20,7 +20,7 @@ For the declaration above, TCGC reports:
 Cannot pass an empty value to the @clientName decorator
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Provide a non-empty name to `@clientName` or remove the decorator.
 

@@ -5,14 +5,14 @@ This diagnostic is issued when `@clientNamespace` is given an empty or whitespac
 - **Area:** SDK namespace customization. Generation continues, but the empty `@clientNamespace` override cannot place generated declarations in a custom namespace.
 - **Not affected:** Model names, operation routes, and payload serialization are unchanged.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 @clientNamespace(" ") // client namespace is empty/whitespace
 model Widget {}
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -20,7 +20,7 @@ For the declaration above, TCGC reports:
 Cannot pass an empty value to the @clientNamespace decorator
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Provide a non-empty namespace string or remove `@clientNamespace`.
 

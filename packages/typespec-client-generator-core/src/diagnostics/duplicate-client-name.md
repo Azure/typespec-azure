@@ -5,9 +5,9 @@ This diagnostic is issued when two generated SDK declarations have the same clie
 - **Area:** SDK symbol naming. Blocks generation of two declarations with the same client name in one language scope because they would collide in the emitted API.
 - **Not affected:** Wire names and service operation routes are unchanged.
 
-### Decorator-applied duplicate
+## Decorator-applied duplicate
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 @clientName("Widget") // duplicates the generated client name of `model Widget`
@@ -16,7 +16,7 @@ model WidgetResponse {}
 model Widget {}
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -24,7 +24,7 @@ For the declaration above, TCGC reports:
 Client name: "Widget" is duplicated in language scope: "AllScopes"
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Rename one declaration with `@clientName`, change the applicable scope, or otherwise make generated names unique.
 
@@ -35,9 +35,9 @@ model WidgetResponse {}
 model Widget {}
 ```
 
-### Generated name conflict
+## Generated name conflict
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -45,6 +45,6 @@ For the declaration above, TCGC reports:
 Client name: "Widget" is defined somewhere causing naming conflicts in language scope: "AllScopes"
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Rename one of the declarations or adjust the language scope so the generated client names no longer collide.

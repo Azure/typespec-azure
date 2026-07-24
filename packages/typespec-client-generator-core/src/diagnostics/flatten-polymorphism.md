@@ -5,7 +5,7 @@ This diagnostic is issued when `@flattenProperty` is applied to a model property
 - **Area:** SDK model flattening. Blocks applying `@flattenProperty` because flattening a discriminated model would break generated polymorphic model structure.
 - **Not affected:** The discriminator and inheritance described by the service model remain unchanged.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 @discriminator("kind")
@@ -22,7 +22,7 @@ model Owner {
 }
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -30,7 +30,7 @@ For the declaration above, TCGC reports:
 Cannot flatten property of polymorphic type.
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Remove `@flattenProperty` from the polymorphic property, or change the property to a non-polymorphic type.
 

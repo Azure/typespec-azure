@@ -5,7 +5,7 @@ This diagnostic is issued when `replaceParameter` is called with a selector that
 - **Area:** Client customization transformations. Blocks `replaceParameter` from producing the intended customized signature because the selector does not match an operation parameter.
 - **Not affected:** The original operation signature is unchanged.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 @service
@@ -19,7 +19,7 @@ model NewParams {
 alias Modified = replaceParameter(MyService.myOp, "missingParam", NewParams.replacement); // `missingParam` is not a parameter of `myOp`
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -27,7 +27,7 @@ For the declaration above, TCGC reports:
 Parameter "missingParam" not found in operation "myOp".
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Use the exact name or model property reference for an existing operation parameter.
 

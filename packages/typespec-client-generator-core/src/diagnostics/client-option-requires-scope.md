@@ -5,7 +5,7 @@ This diagnostic is issued when `@clientOption` is used without a specific langua
 - **Area:** Language-scoped client options. Generation continues, but an unscoped `@clientOption` may be exposed to emitters that do not understand it.
 - **Not affected:** The option name and value are unchanged; only its emitter applicability is in question.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 #suppress "@azure-tools/typespec-client-generator-core/client-option" "temporary workaround"
@@ -13,7 +13,7 @@ This diagnostic is issued when `@clientOption` is used without a specific langua
 model Widget {}
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -21,7 +21,7 @@ For the declaration above, TCGC reports:
 @clientOption should be applied with a specific language scope since it is highly likely this is language-specific.
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Pass the intended language scope as the third argument to `@clientOption`:
 

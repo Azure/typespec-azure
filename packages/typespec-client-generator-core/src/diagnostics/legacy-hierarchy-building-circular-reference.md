@@ -5,7 +5,7 @@ This diagnostic is issued when `@hierarchyBuilding` creates a recursive base-typ
 - **Area:** Legacy SDK inheritance rebasing. Blocks hierarchy rebasing because it would create a circular generated base-model chain.
 - **Not affected:** The original TypeSpec inheritance declarations are unchanged.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 @usage(Usage.input)
@@ -25,7 +25,7 @@ model C {
 }
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -33,7 +33,7 @@ For the declaration above, TCGC reports:
 @hierarchyBuilding decorator causes recursive base type reference.
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Remove or change the `@hierarchyBuilding` decorator so the rebased hierarchy is acyclic.
 

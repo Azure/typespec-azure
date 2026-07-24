@@ -5,7 +5,7 @@ This diagnostic is issued when `@client` is applied to an interface with multipl
 - **Area:** Multi-service client declaration. Blocks using an interface as the root for a client that merges multiple services; only namespaces can represent that structure.
 - **Not affected:** The referenced service namespaces remain valid.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 @service namespace ServiceA;
@@ -15,7 +15,7 @@ This diagnostic is issued when `@client` is applied to an interface with multipl
 interface CombinedClient {}
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -23,7 +23,7 @@ For the declaration above, TCGC reports:
 `@client` with multiple services is only allowed on `Namespace`.
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Move the multi-service `@client` declaration to a namespace, or use a single service for an interface client.
 

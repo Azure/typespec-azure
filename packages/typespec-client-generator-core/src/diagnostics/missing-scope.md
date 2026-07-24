@@ -5,7 +5,7 @@ This diagnostic is issued when a decorator that is likely language-specific is u
 - **Area:** Language-specific alternate-type customization. Blocks external type metadata that lacks a target emitter scope, preventing it from being applied globally by accident.
 - **Not affected:** The TypeSpec type definition and service payload schema are unchanged.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 @alternateType({
@@ -18,7 +18,7 @@ This diagnostic is issued when a decorator that is likely language-specific is u
 model ItemCollection {}
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -26,7 +26,7 @@ For the declaration above, TCGC reports:
 @scope decorator should be applied with @alternateType since it is highly likely this is language-specific
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Provide the appropriate language scope argument, such as `"python"`, `"csharp"`, or another emitter scope:
 

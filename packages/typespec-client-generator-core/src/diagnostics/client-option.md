@@ -5,7 +5,7 @@ This diagnostic is always issued when `@clientOption` is used, because client op
 - **Area:** Targeted language-emitter options. Generation can proceed only with an explicit suppression acknowledging that `@clientOption` is a temporary emitter-specific workaround.
 - **Not affected:** The TypeSpec service model and wire protocol are unchanged.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 @clientOption("enableFeatureFoo", true, "python") // experimental client option must be suppressed
@@ -14,7 +14,7 @@ model Test {
 }
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -22,7 +22,7 @@ For the declaration above, TCGC reports:
 @clientOption is experimental and should only be used for temporary workarounds. This usage must be suppressed.
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Double-check whether the client option reflects an intended language-emitter behavior. If it does, suppress this diagnostic; otherwise remove `@clientOption`.
 

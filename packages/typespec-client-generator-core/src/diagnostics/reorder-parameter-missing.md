@@ -5,7 +5,7 @@ This diagnostic is issued when `reorderParameters` omits a parameter that exists
 - **Area:** Client customization transformations. Blocks `reorderParameters` because the transformed signature would omit an existing operation parameter.
 - **Not affected:** The original method parameter set remains intact.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 @service
@@ -16,7 +16,7 @@ namespace MyService {
 alias Modified = reorderParameters(MyService.myOp, #["c", "a"]); // missing parameter `b`
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -24,7 +24,7 @@ For the declaration above, TCGC reports:
 Parameter "b" from operation "myOp" is missing in reorder list.
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Include every operation parameter exactly once in the reorder list.
 

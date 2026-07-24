@@ -5,7 +5,7 @@ This diagnostic is issued when the value passed to the `@access` decorator is no
 - **Area:** SDK visibility overrides. Blocks the invalid `@access` value from changing generated public/internal visibility.
 - **Not affected:** Model structure, operation signatures, and wire payloads are unchanged.
 
-#### ❌ Incorrect Usage
+## ❌ Incorrect Usage
 
 ```typespec
 enum CustomAccess {
@@ -15,7 +15,7 @@ enum CustomAccess {
 model SecretModel {}
 ```
 
-#### Diagnostic Message
+## Diagnostic Message
 
 For the declaration above, TCGC reports:
 
@@ -23,7 +23,7 @@ For the declaration above, TCGC reports:
 Access value must be "public" or "internal".
 ```
 
-#### ✅ How to Fix
+## ✅ How to Fix
 
 Pass `Access.public` or `Access.internal` to `@access` and remove any other enum member or literal value:
 
