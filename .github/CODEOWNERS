@@ -2,7 +2,7 @@
 
 /packages/typespec-client-generator-core @lmazuel @m-nash @iscai-msft
 /packages/typespec-ts @maorleger @qiaozha @MaryGao @JialinHuang803 @xirzec
-/packages/azure-http-specs/specs/ @iscai-msft @lmazuel @m-nash @srnagar @weidongxu-microsoft @tadelesh @jhendrixMSFT @xirzec
+/packages/azure-http-specs/specs/ @iscai-msft @lmazuel @m-nash @weidongxu-microsoft @tadelesh @jhendrixMSFT @xirzec
 
 /docs/howtos/DataPlane*/ @lmazuel @m-nash @iscai-msft @xirzec
 
