@@ -1,7 +1,3 @@
-```text title=- Full name-
-@azure-tools/typespec-azure-resource-manager/no-empty-model
-```
-
 Define a named model with explicit properties instead of a generic object shape so clients and OpenAPI consumers see a concrete schema.
 
 ## Impact

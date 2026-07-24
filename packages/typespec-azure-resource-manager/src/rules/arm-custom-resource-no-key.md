@@ -1,7 +1,3 @@
-```text title=- Full name-
-@azure-tools/typespec-azure-resource-manager/arm-custom-resource-no-key
-```
-
 Without a key, operation paths may be duplicated.
 
 ## Impact

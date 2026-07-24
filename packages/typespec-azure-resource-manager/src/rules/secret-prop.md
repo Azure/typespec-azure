@@ -1,7 +1,3 @@
-```text title=- Full name-
-@azure-tools/typespec-azure-resource-manager/secret-prop
-```
-
 Marking these fields lets ARM and SDK tooling identify sensitive values and handle them according to security guidelines.
 
 :::note

@@ -1,7 +1,3 @@
-```text title=- Full name-
-@azure-tools/typespec-azure-resource-manager/lro-location-header
-```
-
 The header tells clients where to poll after a 202 response from a long-running operation.
 
 ## Impact

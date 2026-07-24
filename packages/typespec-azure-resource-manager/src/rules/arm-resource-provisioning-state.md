@@ -1,7 +1,3 @@
-```text title=- Full name-
-@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state
-```
-
 `ProvisioningState` property of ARM resource must be:
 
 - optional

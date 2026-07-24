@@ -1,7 +1,3 @@
-```text title=- Full name-
-@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb
-```
-
 Use `@post` or `@get` for actions; model other HTTP verbs as normal resource operations instead.
 
 ## Impact

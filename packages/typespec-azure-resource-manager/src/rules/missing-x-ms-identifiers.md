@@ -1,7 +1,3 @@
-```text title=- Full name-
-@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers
-```
-
 Identifiers let downstream OpenAPI and SDK tooling correlate items in array-valued model properties.
 
 ## Impact

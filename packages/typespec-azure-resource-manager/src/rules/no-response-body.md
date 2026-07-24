@@ -1,8 +1,3 @@
-```text title=- Full name-
-@azure-tools/typespec-azure-resource-manager/no-response-body
-
-```
-
 This keeps ARM response schemas aligned with how clients interpret long-running or empty success responses versus success responses that return resource data.
 
 ## Impact

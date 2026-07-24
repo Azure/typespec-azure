@@ -1,7 +1,3 @@
-```text title=- Full name-
-@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation
-```
-
 Every ARM resource that provides a create operation must also provide a delete operation.
 
 ## Impact

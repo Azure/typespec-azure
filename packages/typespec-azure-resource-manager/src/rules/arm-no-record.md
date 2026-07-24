@@ -1,7 +1,3 @@
-```text title=- Full name-
-@azure-tools/typespec-azure-resource-manager/arm-no-record
-```
-
 ARM requires Resource provider teams to define types explicitly. This is to ensure good customer experience in terms of the discoverability of concrete type definitions.
 
 ## Impact
