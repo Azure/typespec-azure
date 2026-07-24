@@ -20,7 +20,7 @@ model ItemCollection {}
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 @scope decorator should be applied with @alternateType since it is highly likely this is language-specific

@@ -7,7 +7,7 @@ This diagnostic is issued when TCGC cannot determine the emitter's language beca
 
 ## Diagnostic Message
 
-For the case above, TCGC reports:
+TCGC reports:
 
 ```text
 Can not find name for your emitter, please check your emitter name.
@@ -19,8 +19,4 @@ Make sure the emitter is invoked with a resolvable package name (such as `@azure
 
 ## Suppression
 
-Suppress this warning only in tooling or tests that intentionally run TCGC without a real language emitter name.
-
-```typespec
-#suppress "@azure-tools/typespec-client-generator-core/no-emitter-name" "test run has no emitter name"
-```
+This diagnostic should not be suppressed. Run TCGC with a proper emitter name and check the usage so language scope can be resolved.

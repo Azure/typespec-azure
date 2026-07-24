@@ -46,7 +46,7 @@ namespace CombineClient {
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 Services merged into client "CombineClient" depend on different versions of "SharedLib": "v1", "v2".

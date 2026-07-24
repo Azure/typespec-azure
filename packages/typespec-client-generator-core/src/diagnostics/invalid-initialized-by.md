@@ -18,7 +18,7 @@ namespace BlobClient {
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 Invalid 'initializedBy' value. `InitializedBy.customizeCode` cannot be combined with other values.

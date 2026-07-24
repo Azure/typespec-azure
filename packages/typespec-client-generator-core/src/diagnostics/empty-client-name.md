@@ -14,7 +14,7 @@ model Widget {}
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 Cannot pass an empty value to the @clientName decorator
@@ -31,8 +31,4 @@ model Widget {}
 
 ## Suppression
 
-Suppress this warning only if the empty `@clientName` is intentionally ignored and the default generated name is acceptable.
-
-```typespec
-#suppress "@azure-tools/typespec-client-generator-core/empty-client-name" "default client name is intentional"
-```
+This diagnostic should not be suppressed. Give `@clientName` a non-empty name, or remove the decorator.

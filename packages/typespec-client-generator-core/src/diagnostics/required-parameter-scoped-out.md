@@ -17,7 +17,7 @@ op getWidget(
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 Required parameter "requiredHeader" is scoped out for emitter "python". This may cause runtime errors unless the parameter is provided through other means (e.g., custom headers).

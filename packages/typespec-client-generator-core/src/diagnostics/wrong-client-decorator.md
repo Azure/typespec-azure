@@ -24,7 +24,7 @@ namespace ClientNamespace {
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 @client should decorate namespace or interface in client.tsp

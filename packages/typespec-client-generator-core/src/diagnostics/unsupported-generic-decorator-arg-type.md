@@ -7,7 +7,7 @@ This diagnostic is issued when TCGC tries to parse a generic decorator argument 
 
 ## Diagnostic Message
 
-For the case above, TCGC reports:
+TCGC reports:
 
 ```text
 Can not parse the arg type for decorator "@service".

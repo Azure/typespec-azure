@@ -15,7 +15,7 @@ model Widget {}
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 @clientOption should be applied with a specific language scope since it is highly likely this is language-specific.

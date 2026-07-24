@@ -19,7 +19,7 @@ op createOverride(name: string): void; // missing required parameter `location`
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 Method "create" has different parameters definition from the override operation. Please check the parameter defined in the override operation: "location".

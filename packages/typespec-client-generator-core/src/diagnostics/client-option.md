@@ -16,7 +16,7 @@ model Test {
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 @clientOption is experimental and should only be used for temporary workarounds. This usage must be suppressed.
@@ -34,7 +34,7 @@ model Test {
 
 ## Suppression
 
-Suppress this warning only when `@clientOption` is a deliberate temporary workaround for a specific language emitter.
+Because `@clientOption` is a temporary mechanism for language emitters, this diagnostic should always be suppressed with a justification when the usage is intentional.
 
 ```typespec
 #suppress "@azure-tools/typespec-client-generator-core/client-option" "preview feature for python"

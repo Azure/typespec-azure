@@ -15,7 +15,7 @@ op listWidgets(): string; // pageable marker requires a page model response
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 @markAsPageable decorator can only be applied to operations that return a model with a property decorated with @pageItems or a property named 'value'. We will ignore this decorator.
@@ -41,8 +41,4 @@ op listWidgets(): WidgetPage;
 
 ## Suppression
 
-Suppress this warning only if the operation should remain a regular non-pageable method and the legacy `@markAsPageable` annotation is intentionally ignored.
-
-```typespec
-#suppress "@azure-tools/typespec-client-generator-core/invalid-mark-as-pageable-target" "regular operation despite pageable marker"
-```
+This diagnostic should not be suppressed. Fix the target so it is a valid pageable operation, or remove `@markAsPageable`.

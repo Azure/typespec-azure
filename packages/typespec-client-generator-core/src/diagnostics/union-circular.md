@@ -21,7 +21,7 @@ namespace Test {
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 Cannot have a union containing self.

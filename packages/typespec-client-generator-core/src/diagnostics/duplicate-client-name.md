@@ -18,7 +18,7 @@ model Widget {}
 
 ### Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 Client name: "Widget" is duplicated in language scope: "AllScopes"
@@ -39,7 +39,7 @@ model Widget {}
 
 ### Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 Client name: "Widget" is defined somewhere causing naming conflicts in language scope: "AllScopes"

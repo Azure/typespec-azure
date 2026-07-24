@@ -18,7 +18,7 @@ alias Modified = reorderParameters(MyService.myOp, #["a", "a"]); // `a` appears 
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 Parameter "a" appears more than once in the reorder list for operation "myOp".

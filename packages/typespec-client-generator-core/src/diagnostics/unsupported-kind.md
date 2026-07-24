@@ -7,7 +7,7 @@ This diagnostic is issued when TCGC encounters a TypeSpec type kind that it does
 
 ## Diagnostic Message
 
-For the case above, TCGC reports:
+TCGC reports:
 
 ```text
 Unsupported kind TemplateParameter

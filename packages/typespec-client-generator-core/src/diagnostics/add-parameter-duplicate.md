@@ -21,7 +21,7 @@ alias Modified = addParameter(MyService.myOp, ExtraParams.name);
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 Parameter "name" already exists in operation "myOp".

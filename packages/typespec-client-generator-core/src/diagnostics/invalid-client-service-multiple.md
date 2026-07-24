@@ -17,7 +17,7 @@ interface CombinedClient {}
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 `@client` with multiple services is only allowed on `Namespace`.

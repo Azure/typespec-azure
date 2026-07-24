@@ -17,7 +17,7 @@ model SecretModel {}
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 Access value must be "public" or "internal".

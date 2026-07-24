@@ -9,7 +9,7 @@ This diagnostic is issued when TCGC skips loading examples because the examples 
 
 ### Diagnostic Message
 
-For the example file above, TCGC reports:
+TCGC reports:
 
 ```text
 Skipped loading invalid example file: get.json. Error: Unexpected token
@@ -23,7 +23,7 @@ Fix the JSON syntax or contents of the example file so it can be parsed.
 
 ### Diagnostic Message
 
-For the example directory above, TCGC reports:
+TCGC reports:
 
 ```text
 Skipping example loading from ./examples because there was an error reading the directory.
@@ -37,7 +37,7 @@ Create the configured examples directory, correct the `examples-dir` option, or 
 
 ### Diagnostic Message
 
-For the example file above, TCGC reports:
+TCGC reports:
 
 ```text
 Skipping example file get.json because it does not contain an operationId and/or title.
@@ -49,8 +49,4 @@ Add both `operationId` and `title` to the example JSON file.
 
 ## Suppression
 
-Suppress this warning only if examples are optional for this run, such as local validation where the examples directory is intentionally absent.
-
-```typespec
-#suppress "@azure-tools/typespec-client-generator-core/example-loading" "examples not required for this run"
-```
+This diagnostic should not be suppressed. Fix the example directory/files so they can be loaded, including valid JSON with `operationId` and `title`.

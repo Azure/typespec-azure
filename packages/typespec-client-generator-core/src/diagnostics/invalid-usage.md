@@ -17,7 +17,7 @@ model Widget {}
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 Usage value must be one of: 2 (input), 4 (output), 256 (json), or 512 (xml).

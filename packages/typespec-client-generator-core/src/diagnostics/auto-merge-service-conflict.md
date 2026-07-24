@@ -38,7 +38,7 @@ namespace ParentClient {
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 Auto-merging service client must be empty.

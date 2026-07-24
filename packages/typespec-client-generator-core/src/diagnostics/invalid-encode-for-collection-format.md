@@ -16,7 +16,7 @@ op myOp(@header @encode("tsv") header: string[]): void; // `tsv` is not a suppor
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 Only encode of `ArrayEncoding.pipeDelimited` and `ArrayEncoding.spaceDelimited` is supported for collection format.
@@ -35,8 +35,4 @@ op myOp(@header @encode(ArrayEncoding.pipeDelimited) header: string[]): void;
 
 ## Suppression
 
-Suppress this warning only if the fallback collection format, such as CSV, is the intended SDK behavior for this parameter.
-
-```typespec
-#suppress "@azure-tools/typespec-client-generator-core/invalid-encode-for-collection-format" "CSV fallback is intentional"
-```
+This diagnostic should not be suppressed. Fix the `@encode` usage to a supported collection-format encoding.

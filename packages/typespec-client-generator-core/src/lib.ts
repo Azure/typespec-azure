@@ -282,8 +282,7 @@ export const $lib = createTypeSpecLibrary({
       ...doc("client-name-ineffective"),
       severity: "error",
       messages: {
-        default: paramMessage`Application of @clientName decorator to ${"name"} is not effective`,
-        override: paramMessage`Application of @clientName decorator to ${"name"} is not effective because it is applied to the override method. Please apply it on the original method definition "${"originalMethodName"}" instead.`,
+        default: paramMessage`Application of @clientName decorator to ${"name"} is not effective because it is applied to the override method. Please apply it on the original method definition "${"originalMethodName"}" instead.`,
       },
     },
     "example-loading": {

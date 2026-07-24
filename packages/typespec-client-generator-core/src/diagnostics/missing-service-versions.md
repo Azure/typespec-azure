@@ -27,7 +27,7 @@ enum ClientApiVersions { // missing service version `v3`
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 The @clientApiVersions decorator is missing one or more versions defined in My.Service. Client API must support all service versions to ensure compatibility. Missing versions: v3. Please update the client API to support all required service versions.

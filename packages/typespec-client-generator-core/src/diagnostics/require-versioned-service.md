@@ -20,7 +20,7 @@ namespace My.Service {
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 Service "My.Service" must be versioned if you want to apply the "@clientApiVersions" decorator

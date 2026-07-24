@@ -27,7 +27,7 @@ options:
 
 ## Diagnostic Message
 
-For the `api-version` option above, TCGC reports:
+TCGC reports:
 
 ```text
 The API version specified in the config: "v4" is not defined in service versioning list. Fall back to the latest version.

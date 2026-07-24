@@ -16,7 +16,7 @@ namespace WidgetClient {
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 Root namespace decorated with @client must have service config.

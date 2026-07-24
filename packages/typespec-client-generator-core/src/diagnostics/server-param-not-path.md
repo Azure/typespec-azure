@@ -7,7 +7,7 @@ This diagnostic is issued when a server template argument resolves to something 
 
 ## Diagnostic Message
 
-For the case above, TCGC reports:
+TCGC reports:
 
 ```text
 Template argument endpoint is not a path parameter, it is a query. It has to be a path.

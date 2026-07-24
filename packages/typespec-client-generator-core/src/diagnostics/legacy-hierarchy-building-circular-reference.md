@@ -27,7 +27,7 @@ model C {
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 @hierarchyBuilding decorator causes recursive base type reference.

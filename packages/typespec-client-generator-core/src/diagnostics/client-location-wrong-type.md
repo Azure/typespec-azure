@@ -21,7 +21,7 @@ namespace MyService {
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 `@clientLocation` could only move operation to the interface or namespace belong to the root namespace with `@service`.
@@ -45,8 +45,4 @@ namespace MyService {
 
 ## Suppression
 
-Suppress this warning only if the invalid `@clientLocation` target is intentionally ignored and the operation should remain in its original client.
-
-```typespec
-#suppress "@azure-tools/typespec-client-generator-core/client-location-wrong-type" "operation intentionally stays in original client"
-```
+This diagnostic should not be suppressed. Move the operation to an interface or namespace that belongs to the root `@service` namespace.

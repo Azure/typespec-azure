@@ -7,7 +7,7 @@ This diagnostic is issued when `@markAsLro` is applied to an operation that alre
 
 ## Diagnostic Message
 
-For the case above, TCGC reports:
+TCGC reports:
 
 ```text
 @markAsLro decorator is ineffective since this operation already returns real LRO metadata. Please remove the @markAsLro decorator.

@@ -15,7 +15,7 @@ op exists(): void;
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 @responseAsBool decorator can only be used on HEAD operations. Will ignore decorator on getOperation.

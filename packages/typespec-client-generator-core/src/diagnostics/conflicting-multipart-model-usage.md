@@ -28,7 +28,7 @@ op multipartUse(
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 Model 'MultiPartRequest' cannot be used as both multipart/form-data input and regular body input. You can create a separate model with name 'model MultiPartRequestFormData' extends MultiPartRequest {}

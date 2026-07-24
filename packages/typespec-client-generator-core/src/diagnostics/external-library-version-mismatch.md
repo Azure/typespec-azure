@@ -31,7 +31,7 @@ model Collection {}
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 External library version mismatch. There are multiple versions of pystac: 1.12.0 and 1.13.0. Please unify the versions.
@@ -65,8 +65,4 @@ model Collection {}
 
 ## Suppression
 
-Suppress this warning only if dependency version unification is handled outside TCGC and the emitter will use one compatible external package version.
-
-```typespec
-#suppress "@azure-tools/typespec-client-generator-core/external-library-version-mismatch" "external package version unified by emitter"
-```
+This diagnostic should not be suppressed. Consolidate the dependency to a single version across the referenced packages.

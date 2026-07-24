@@ -14,7 +14,7 @@ model Widget {}
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 Cannot pass an empty value to the @clientNamespace decorator
@@ -31,8 +31,4 @@ model Widget {}
 
 ## Suppression
 
-Suppress this warning only if the empty `@clientNamespace` is intentionally ignored and the default namespace should be used.
-
-```typespec
-#suppress "@azure-tools/typespec-client-generator-core/empty-client-namespace" "default namespace is intentional"
-```
+This diagnostic should not be suppressed. Give `@clientNamespace` a non-empty value, or remove the decorator.

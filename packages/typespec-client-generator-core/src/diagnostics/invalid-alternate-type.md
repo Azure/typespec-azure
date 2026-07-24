@@ -17,7 +17,7 @@ model DateWrapper {
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 Invalid alternate type. If the source type is Scalar, the alternate type must also be Scalar. Found alternate type kind: 'Model'

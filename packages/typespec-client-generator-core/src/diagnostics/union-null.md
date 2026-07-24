@@ -7,7 +7,7 @@ This diagnostic is issued when TCGC converts a union whose only possible value i
 
 ## Diagnostic Message
 
-For the case above, TCGC reports:
+TCGC reports:
 
 ```text
 Cannot have a union containing only null types.

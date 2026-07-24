@@ -18,7 +18,7 @@ model ClientOptions {
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 Multiple param aliases applied to 'account'. Only the first one 'accountName' will be used.
@@ -38,8 +38,4 @@ model ClientOptions {
 
 ## Suppression
 
-Suppress this warning only if the first `@paramAlias` is the intended alias and later aliases are deliberately ignored.
-
-```typespec
-#suppress "@azure-tools/typespec-client-generator-core/multiple-param-alias" "first parameter alias is intentional"
-```
+This diagnostic should not be suppressed. Fix the `@paramAlias` usage so each parameter has a single alias.

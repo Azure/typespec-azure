@@ -18,7 +18,7 @@ model Widget {}
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 Invalid mode 'prepend' for @clientDoc decorator. Valid values are "append" or "replace".

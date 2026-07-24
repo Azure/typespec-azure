@@ -27,7 +27,7 @@ op test(): A;
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 @hierarchyBuilding decorator: property 'shared' on model 'A' has type that does not match the same-named property supplied by the new base chain (rooted at 'C'). The property is dropped from 'A' to satisfy the rebase rule (own properties are filtered against the new base chain by name). Consider aligning the types or removing the property from 'A'.
@@ -57,8 +57,4 @@ op test(): A;
 
 ## Suppression
 
-Suppress this warning only if the property dropped during legacy hierarchy rebasing is intentional and generated SDK compatibility has been verified.
-
-```typespec
-#suppress "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict" "legacy rebase drops property intentionally"
-```
+This diagnostic should not be suppressed. Fix the `@hierarchyBuilding` usage, or remove the decorator.

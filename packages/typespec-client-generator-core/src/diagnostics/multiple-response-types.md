@@ -7,7 +7,7 @@ This diagnostic is issued when one operation has multiple distinct response body
 
 ## Diagnostic Message
 
-For the case above, TCGC reports:
+TCGC reports:
 
 ```text
 Multiple response types found in operation getWidget. Some emitters might not support returning all of these response types

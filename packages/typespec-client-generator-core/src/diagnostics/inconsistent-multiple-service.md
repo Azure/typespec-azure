@@ -32,7 +32,7 @@ namespace CombineClient {
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 All services must have the same server and auth definitions.

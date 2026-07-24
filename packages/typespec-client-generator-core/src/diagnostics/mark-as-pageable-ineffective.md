@@ -27,7 +27,7 @@ interface Employees {
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 @markAsPageable decorator is ineffective since this operation is already marked as pageable with @list decorator. Please remove the @markAsPageable decorator.
@@ -56,8 +56,4 @@ interface Employees {
 
 ## Suppression
 
-Suppress this warning only if the redundant `@markAsPageable` annotation is kept for source compatibility while real `@list` metadata drives paging.
-
-```typespec
-#suppress "@azure-tools/typespec-client-generator-core/mark-as-pageable-ineffective" "redundant pageable marker kept for compatibility"
-```
+This diagnostic should not be suppressed. Remove the redundant `@markAsPageable`, or fix the operation so the marker is needed.

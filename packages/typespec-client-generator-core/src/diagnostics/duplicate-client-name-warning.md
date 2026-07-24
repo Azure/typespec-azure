@@ -22,7 +22,7 @@ interface StorageTasks {
 
 ### Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 Client name: "list" is duplicated in language scope: "csharp"
@@ -47,7 +47,7 @@ interface StorageTasks {
 
 ### Diagnostic Message
 
-For the generated operation name above, TCGC reports:
+TCGC reports:
 
 ```text
 Client name: "list" is defined somewhere causing naming conflicts in language scope: "csharp"

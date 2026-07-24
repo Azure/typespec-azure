@@ -15,7 +15,7 @@ op start(): string; // LRO marker requires a model response
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 @markAsLro decorator can only be applied to operations that return a model. We will ignore this decorator.
@@ -37,8 +37,4 @@ op start(): StartResponse;
 
 ## Suppression
 
-Suppress this warning only if the operation should remain a regular non-LRO method and the legacy `@markAsLro` annotation is intentionally ignored.
-
-```typespec
-#suppress "@azure-tools/typespec-client-generator-core/invalid-mark-as-lro-target" "regular operation despite legacy LRO marker"
-```
+This diagnostic should not be suppressed. Fix the target so it is a valid long-running operation, or remove `@markAsLro`.

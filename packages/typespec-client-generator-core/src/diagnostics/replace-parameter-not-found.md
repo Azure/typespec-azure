@@ -21,7 +21,7 @@ alias Modified = replaceParameter(MyService.myOp, "missingParam", NewParams.repl
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 Parameter "missingParam" not found in operation "myOp".

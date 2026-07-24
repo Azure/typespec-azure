@@ -24,7 +24,7 @@ namespace TestClient {
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 Value in example file 'parametersDiagnostic.json' does not follow its definition:
@@ -51,8 +51,4 @@ namespace TestClient {
 
 ## Suppression
 
-Suppress this warning only if the mismatched example value is intentionally excluded from generated SDK examples or tests.
-
-```typespec
-#suppress "@azure-tools/typespec-client-generator-core/example-value-no-mapping" "example value intentionally not mapped"
-```
+This diagnostic should not be suppressed. Fix the example so its values map to the TypeSpec definition.

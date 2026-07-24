@@ -21,7 +21,7 @@ model Widget {
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 @alternateType with external type information cannot be applied to model properties. Please apply it to the type definition itself (Scalar, Model, Enum, or Union) instead.
@@ -47,8 +47,4 @@ model Widget {
 
 ## Suppression
 
-Suppress this warning only if the property-level external alternate type is intentionally ignored and the SDK type is handled manually.
-
-```typespec
-#suppress "@azure-tools/typespec-client-generator-core/external-type-on-model-property" "property external type handled manually"
-```
+This diagnostic should not be suppressed. Fix the external type usage so it is applied correctly.

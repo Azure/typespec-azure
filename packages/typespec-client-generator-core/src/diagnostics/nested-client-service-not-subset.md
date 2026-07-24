@@ -25,7 +25,7 @@ namespace ParentClient {
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 Nested client's services must be a subset of the parent client's services. If no service is needed, omit the `service` property to inherit from the parent.

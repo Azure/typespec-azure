@@ -7,7 +7,7 @@ This diagnostic is issued when TCGC cannot resolve an operation as an HTTP or HT
 
 ## Diagnostic Message
 
-For the case above, TCGC reports:
+TCGC reports:
 
 ```text
 Currently we only support HTTP and HTTPS protocols

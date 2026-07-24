@@ -7,7 +7,7 @@ This diagnostic is issued when a required HTTP operation parameter cannot be map
 
 ## Diagnostic Message
 
-For the case above, TCGC reports:
+TCGC reports:
 
 ```text
 Missing HTTP operation parameter "apiVersion" in method "getWidget". Please check the method definition.
@@ -15,4 +15,4 @@ Missing HTTP operation parameter "apiVersion" in method "getWidget". Please chec
 
 ## ✅ How to Fix
 
-Keep a matching method parameter or model property path for the HTTP parameter, or make the service parameter optional when appropriate.
+Check any client customization, such as `@override`, `@paramAlias`, parameter reordering, or parameter removal, that changes the method parameters, and fix it so every HTTP operation parameter still maps to a method parameter.

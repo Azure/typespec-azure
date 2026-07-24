@@ -24,7 +24,7 @@ model Owner {
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 Cannot flatten property of polymorphic type.

@@ -16,7 +16,7 @@ op test(@body body: A): void;
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 @access override conflicts with the access calculated from operation or other @access override.
@@ -36,8 +36,4 @@ op test(@body body: A): void;
 
 ## Suppression
 
-Suppress this warning only if the public exposure is intentional and the conflicting `@access` override is kept for another emitter or compatibility reason.
-
-```typespec
-#suppress "@azure-tools/typespec-client-generator-core/conflict-access-override" "public exposure is intentional"
-```
+This diagnostic should not be suppressed. Make the access settings consistent so the type has a single access level.

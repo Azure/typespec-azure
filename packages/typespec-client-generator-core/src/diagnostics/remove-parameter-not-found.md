@@ -18,7 +18,7 @@ alias Modified = removeParameter(MyService.myOp, "missingParam"); // `missingPar
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 Parameter "missingParam" not found in operation "myOp".

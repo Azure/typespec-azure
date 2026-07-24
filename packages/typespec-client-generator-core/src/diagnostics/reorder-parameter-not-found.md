@@ -18,7 +18,7 @@ alias Modified = reorderParameters(MyService.myOp, #["a", "missing"]); // `missi
 
 ## Diagnostic Message
 
-For the declaration above, TCGC reports:
+TCGC reports:
 
 ```text
 Parameter "missing" specified in reorder list not found in operation "myOp".
