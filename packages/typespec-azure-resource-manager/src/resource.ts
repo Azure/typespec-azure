@@ -61,6 +61,7 @@ import {
   resolveProviderNamespace,
 } from "./namespace.js";
 import {
+  ArmOperationIdentifier,
   ArmOperationKind,
   ArmResolvedOperationsForResource,
   ArmResourceOperation,
@@ -678,7 +679,7 @@ function getResourceScope(
 }
 
 function isVariableSegment(segment: string): boolean {
-  return (segment.startsWith("{") && segment.endsWith("}")) || segment === "default";
+  return segment.startsWith("{") && segment.endsWith("}");
 }
 
 /**
@@ -705,164 +706,66 @@ function normalizePathForScopeComparison(path: string): string {
     .join("/");
 }
 
-function getResourceInfo(
-  program: Program,
-  operation: ArmResourceOperation,
-  resourceModel?: Model,
-): ResolvedResourceInfo | undefined {
-  const pathInfo = getResourcePathElements(operation.httpOperation.path, operation.kind);
-  // First, try to get resource info from the path when it contains /providers/
-  if (pathInfo !== undefined) {
-    return {
-      ...pathInfo,
-      resourceName: operation.resourceName ?? operation.operationGroup,
-    };
-  }
+function normalizePathForResourceIdentity(path: string): string {
+  return path
+    .split("/")
+    .map((s) => (isVariableSegment(s) ? "{}" : s.toLowerCase()))
+    .join("/");
+}
 
-  // If the path does not contain /providers/, we can still identify the resource
-  // because an ARM operations decorator was executed on this operation (e.g.
-  // @armResourceRead, @armResourceCreateOrUpdate, etc.). Use the ARM provider
-  // namespace and the path structure to construct resource info.
-  const fallback = getResourceInfoFromArmOperation(
-    program,
-    operation.httpOperation.path,
-    operation.kind,
-    operation.operation,
-    resourceModel,
-  );
-  if (fallback === undefined) return undefined;
+function isResourceIdentityOperation(kind: ArmOperationKind): boolean {
+  return kind === "read" || kind === "createOrUpdate";
+}
+
+function isInstanceLifecycleOperation(kind: ArmOperationKind): boolean {
+  switch (kind) {
+    case "read":
+    case "createOrUpdate":
+    case "update":
+    case "delete":
+    case "checkExistence":
+      return true;
+    default:
+      return false;
+  }
+}
+
+function getResourceInfo(operation: ArmResourceOperation): ResolvedResourceInfo | undefined {
+  const pathInfo = parseArmResourceInstancePath(operation.httpOperation.path);
+  if (pathInfo === undefined) return undefined;
   return {
-    ...fallback,
+    ...pathInfo,
     resourceName: operation.resourceName ?? operation.operationGroup,
   };
 }
 
-export function getResourcePathElements(
-  path: string,
-  kind: ArmOperationKind,
-): ResourcePathInfo | undefined {
+export function parseArmResourceInstancePath(path: string): ResourcePathInfo | undefined {
   const segments = path.split("/").filter((s) => s.length > 0);
   const providerIndex = segments.findLastIndex((s) => s === "providers");
-  if (providerIndex === -1 || providerIndex === segments.length - 1) return undefined;
+
+  if (providerIndex === -1) {
+    return parseKnownProviderlessResourcePath(path, segments);
+  }
+
+  if (providerIndex === segments.length - 1) return undefined;
   const provider = segments[providerIndex + 1];
+  if (isVariableSegment(provider)) return undefined;
+
+  const resourceSegments = segments.slice(providerIndex + 2);
+  if (resourceSegments.length === 0 || resourceSegments.length % 2 !== 0) return undefined;
+
   const typeSegments: string[] = [];
   const instanceSegments: string[] = segments.slice(0, providerIndex + 2);
-  for (let i = providerIndex + 2; i < segments.length; i += 2) {
-    if (isVariableSegment(segments[i])) {
-      break;
-    }
 
-    if (i + 1 < segments.length && isVariableSegment(segments[i + 1])) {
-      typeSegments.push(segments[i]);
-      instanceSegments.push(segments[i]);
-      instanceSegments.push(segments[i + 1]);
-    } else if (i + 1 === segments.length) {
-      switch (kind) {
-        case "list":
-          typeSegments.push(segments[i]);
-          instanceSegments.push(segments[i]);
-          instanceSegments.push("{name}");
-          break;
-        default:
-          break;
-      }
-      break;
-    }
-  }
-  if (provider !== undefined && typeSegments.length > 0) {
-    return {
-      resourceType: {
-        provider: provider,
-        types: typeSegments,
-      },
-      resourceInstancePath: `/${instanceSegments.join("/")}`,
-    };
-  }
-  return undefined;
-}
+  for (let i = 0; i < resourceSegments.length; i += 2) {
+    const typeSegment = resourceSegments[i];
+    const nameSegment = resourceSegments[i + 1];
+    if (typeSegment === undefined || nameSegment === undefined) return undefined;
+    if (isVariableSegment(typeSegment)) return undefined;
 
-/**
- * Construct resource path info for an ARM resource operation whose path does not
- * contain a /providers/ segment. This relies on the fact that an ARM operations
- * decorator was executed on the operation, so we know it belongs to a resource.
- * The provider namespace is resolved from the operation's namespace.
- */
-function getResourceInfoFromArmOperation(
-  program: Program,
-  path: string,
-  kind: ArmOperationKind,
-  operation: Operation,
-  resourceModel?: Model,
-): ResourcePathInfo | undefined {
-  const provider = operation.namespace
-    ? getArmProviderNamespace(program, operation.namespace)
-    : undefined;
-  if (provider === undefined) return undefined;
-
-  const segments = path.split("/").filter((s) => s.length > 0);
-
-  // Find the innermost resource type segment by scanning forward.
-  // The resource type segment is a non-variable segment followed by either
-  // a variable segment (instance path) or end-of-path (list operation).
-  let resourceTypeIndex = -1;
-  for (let i = 0; i < segments.length; i++) {
-    if (!isVariableSegment(segments[i])) {
-      if (i + 1 < segments.length && isVariableSegment(segments[i + 1])) {
-        // Non-variable followed by variable: this is a resource type/instance pair
-        resourceTypeIndex = i;
-      } else if (i + 1 === segments.length && kind === "list") {
-        // Terminal non-variable segment in a list operation: this is the resource type
-        resourceTypeIndex = i;
-      }
-    }
-  }
-
-  if (resourceTypeIndex === -1) {
-    // For generic resources, the path may consist entirely of variable segments
-    // (e.g. /{resourceId}). Use the raw path as the instance path.
-    if (segments.length > 0 && segments.every((s) => isVariableSegment(s))) {
-      return {
-        resourceType: {
-          provider: provider,
-          types: [],
-        },
-        resourceInstancePath: path,
-      };
-    }
-    return undefined;
-  }
-
-  const resourceTypeName = segments[resourceTypeIndex];
-  const typeSegments = [resourceTypeName];
-
-  // Build the instance path: all segments up to and including the resource type,
-  // plus the instance variable
-  const instanceSegments = segments.slice(0, resourceTypeIndex + 1);
-
-  // For list operations (no instance variable in path), derive the variable name
-  // from the resource model's @key property
-  if (
-    resourceTypeIndex + 1 < segments.length &&
-    isVariableSegment(segments[resourceTypeIndex + 1])
-  ) {
-    instanceSegments.push(segments[resourceTypeIndex + 1]);
-  } else if (kind === "list" && resourceModel) {
-    // Derive instance path variable name from the resource model's @key property
-    let keyPropName: string | undefined;
-    for (const [, prop] of resourceModel.properties) {
-      const keyName = getKeyName(program, prop);
-      if (keyName !== undefined) {
-        keyPropName = keyName;
-        break;
-      }
-    }
-    if (keyPropName) {
-      instanceSegments.push(`{${keyPropName}}`);
-    } else {
-      instanceSegments.push("{name}");
-    }
-  } else {
-    instanceSegments.push("{name}");
+    typeSegments.push(typeSegment);
+    instanceSegments.push(typeSegment);
+    instanceSegments.push(nameSegment);
   }
 
   return {
@@ -872,6 +775,129 @@ function getResourceInfoFromArmOperation(
     },
     resourceInstancePath: `/${instanceSegments.join("/")}`,
   };
+}
+
+function parseKnownProviderlessResourcePath(
+  path: string,
+  segments: string[],
+): ResourcePathInfo | undefined {
+  if (segments.length === 0) {
+    return {
+      resourceType: {
+        provider: "Microsoft.Resources",
+        types: ["tenants"],
+      },
+      resourceInstancePath: "/",
+    };
+  }
+
+  if (
+    segments.length === 2 &&
+    segments[0].toLowerCase() === "subscriptions" &&
+    isVariableSegment(segments[1])
+  ) {
+    return {
+      resourceType: {
+        provider: "Microsoft.Resources",
+        types: ["subscriptions"],
+      },
+      resourceInstancePath: `/${segments.join("/")}`,
+    };
+  }
+
+  if (
+    segments.length === 4 &&
+    segments[0].toLowerCase() === "subscriptions" &&
+    isVariableSegment(segments[1]) &&
+    segments[2].toLowerCase() === "resourcegroups" &&
+    isVariableSegment(segments[3])
+  ) {
+    return {
+      resourceType: {
+        provider: "Microsoft.Resources",
+        types: ["resourceGroups"],
+      },
+      resourceInstancePath: `/${segments.join("/")}`,
+    };
+  }
+
+  if (segments.length === 1 && isVariableSegment(segments[0])) {
+    return {
+      resourceType: {
+        provider: "",
+        types: [],
+      },
+      resourceInstancePath: path,
+    };
+  }
+
+  return undefined;
+}
+
+function isListOperationMatch(
+  operation: ArmResourceOperation,
+  resource: ResolvedResourceOperations,
+): boolean {
+  const operationPath = normalizePathForResourceIdentity(operation.httpOperation.path);
+  const resourcePath = normalizePathForResourceIdentity(resource.resourceInstancePath);
+  return resourcePath.startsWith(`${operationPath}/`);
+}
+
+function getListMatchDistance(
+  operation: ArmResourceOperation,
+  resource: ResolvedResourceOperations,
+): number {
+  const operationPath = normalizePathForResourceIdentity(operation.httpOperation.path);
+  const resourcePath = normalizePathForResourceIdentity(resource.resourceInstancePath);
+  return resourcePath.length - operationPath.length;
+}
+
+function getBestListOperationTarget(
+  operation: ArmResourceOperation,
+  resources: Iterable<ResolvedResourceOperations>,
+): ResolvedResourceOperations | undefined {
+  let best: ResolvedResourceOperations | undefined;
+  let bestDistance = Number.POSITIVE_INFINITY;
+  for (const resource of resources) {
+    if (!isListOperationMatch(operation, resource)) continue;
+    const distance = getListMatchDistance(operation, resource);
+    if (distance < bestDistance) {
+      best = resource;
+      bestDistance = distance;
+    }
+  }
+  return best;
+}
+
+function isActionOperationMatch(
+  operation: ArmResourceOperation,
+  resource: ResolvedResourceOperations,
+): boolean {
+  const operationPath = normalizePathForResourceIdentity(operation.httpOperation.path);
+  const instancePath = normalizePathForResourceIdentity(resource.resourceInstancePath);
+  return operationPath.startsWith(`${instancePath}/`);
+}
+
+function tryAddOperationToResolvedResource(
+  candidate: ArmResourceOperationCandidate,
+  target: ResolvedResourceOperations,
+): void {
+  const { armOperation, resourceInfo } = candidate;
+  if (isInstanceLifecycleOperation(armOperation.kind)) {
+    if (resourceInfo !== undefined && isResourceIdentityMatch(resourceInfo, target)) {
+      tryAddLifecycleOperation(target.resourceType, armOperation, target);
+    }
+    return;
+  }
+
+  if (armOperation.kind === "action" && isActionOperationMatch(armOperation, target)) {
+    tryAddLifecycleOperation(target.resourceType, armOperation, target);
+    return;
+  }
+
+  if (armOperation.kind === "other") {
+    addAssociatedOperation(armOperation, target);
+  }
 }
 
 function tryAddLifecycleOperation(
@@ -968,6 +994,38 @@ export function isResourceOperationMatch(
   return true;
 }
 
+function isResourceIdentityMatch(
+  source: {
+    resourceType: ResourceType;
+    resourceInstancePath: string;
+    resourceName?: string;
+  },
+  target: {
+    resourceType: ResourceType;
+    resourceInstancePath: string;
+    resourceName?: string;
+  },
+): boolean {
+  if (
+    source.resourceName &&
+    target.resourceName &&
+    source.resourceName.toLowerCase() !== target.resourceName.toLowerCase()
+  )
+    return false;
+  if (source.resourceType.provider.toLowerCase() !== target.resourceType.provider.toLowerCase())
+    return false;
+  if (source.resourceType.types.length !== target.resourceType.types.length) return false;
+  for (let i = 0; i < source.resourceType.types.length; i++) {
+    if (source.resourceType.types[i].toLowerCase() !== target.resourceType.types[i].toLowerCase())
+      return false;
+  }
+
+  return (
+    normalizePathForResourceIdentity(source.resourceInstancePath) ===
+    normalizePathForResourceIdentity(target.resourceInstancePath)
+  );
+}
+
 export function getUnassociatedOperations(program: Program): ArmResourceOperation[] {
   return getAllOperations(program)
     .map((op) => getResourceOperation(program, op))
@@ -1049,67 +1107,43 @@ export function resolveArmResourceOperations(
   resourceType: Model,
 ): ResolvedResourceOperations[] {
   const resolvedOperations: Set<ResolvedResourceOperations> = new Set<ResolvedResourceOperations>();
-  const operations = getArmResourceOperationList(program, resourceType);
-  for (const operation of operations) {
-    const armOperation: ArmResourceOperation | undefined = getResourceOperation(
-      program,
-      operation.operation,
-    );
+  const candidates = [...getArmResourceOperationList(program, resourceType)]
+    .map((operation) => resolveArmResourceOperationCandidate(program, resourceType, operation))
+    .filter((operation) => operation !== undefined);
 
-    if (armOperation === undefined) continue;
-    armOperation.kind = operation.kind;
-
-    armOperation.resourceModelName = operation.resource?.name ?? resourceType.name;
-    const resourceInfo = getResourceInfo(program, armOperation, operation.resource ?? resourceType);
+  for (const { armOperation, resourceInfo, resourceNameIsExplicit } of candidates) {
+    if (!isResourceIdentityOperation(armOperation.kind)) continue;
     if (resourceInfo === undefined) continue;
-    armOperation.name = operation.name;
-    armOperation.resourceKind = operation.resourceKind;
-    const resourceNameIsExplicit = operation.resourceName !== undefined;
-    resourceInfo.resourceName =
-      operation.resourceName ??
-      getResourceNameForOperation(program, armOperation, resourceInfo.resourceInstancePath) ??
-      armOperation.resourceModelName;
-    resourceInfo.resourceNameIsExplicit = resourceNameIsExplicit;
-    armOperation.resourceName = resourceInfo.resourceName;
-
     let matched = false;
-    // Check if we already have an operation for this resource
     for (const resolvedOp of resolvedOperations) {
-      if (isResourceOperationMatch(resourceInfo, resolvedOp)) {
+      if (isResourceIdentityMatch(resourceInfo, resolvedOp)) {
         matched = true;
-        if (tryAddLifecycleOperation(resourceInfo.resourceType, armOperation, resolvedOp)) {
-          continue;
-        }
-        addAssociatedOperation(armOperation, resolvedOp);
+        tryAddLifecycleOperation(resourceInfo.resourceType, armOperation, resolvedOp);
         continue;
       }
     }
 
     if (matched) continue;
-    // If we don't have an operation for this resource, create a new one
-    const newResource: ResolvedResourceOperations = {
-      resourceType: resourceInfo.resourceType,
-      resourceInstancePath: resourceInfo.resourceInstancePath,
-      resourceName: resourceInfo.resourceName,
-      resourceNameIsExplicit: resourceNameIsExplicit,
-      operations: {
-        lifecycle: {
-          read: undefined,
-          createOrUpdate: undefined,
-          update: undefined,
-          delete: undefined,
-          checkExistence: undefined,
-        },
-        actions: [],
-        lists: [],
-      },
-      associatedOperations: [],
-    };
-    if (!tryAddLifecycleOperation(resourceInfo.resourceType, armOperation, newResource)) {
-      addAssociatedOperation(armOperation, newResource);
-    }
+    const newResource = createResolvedResourceOperations(resourceInfo, resourceNameIsExplicit);
+    tryAddLifecycleOperation(resourceInfo.resourceType, armOperation, newResource);
     resolvedOperations.add(newResource);
   }
+
+  for (const candidate of candidates) {
+    if (isResourceIdentityOperation(candidate.armOperation.kind)) continue;
+    if (candidate.armOperation.kind === "list") {
+      const target = getBestListOperationTarget(candidate.armOperation, resolvedOperations);
+      if (target !== undefined) {
+        tryAddLifecycleOperation(target.resourceType, candidate.armOperation, target);
+      }
+      // TODO: Define how non-prefix list paths should map to detected resource identities.
+      continue;
+    }
+    for (const resolvedOp of resolvedOperations) {
+      tryAddOperationToResolvedResource(candidate, resolvedOp);
+    }
+  }
+
   return [...resolvedOperations.values()].toSorted((a, b) => {
     // Sort by provider, type, then instance path
     if (a.resourceType.types.length < b.resourceType.types.length) return -1;
@@ -1122,6 +1156,71 @@ export function resolveArmResourceOperations(
     if (a.resourceInstancePath.toLowerCase() > b.resourceInstancePath.toLowerCase()) return 1;
     return 0;
   });
+}
+
+interface ArmResourceOperationCandidate {
+  armOperation: ArmResourceOperation;
+  resourceInfo?: ResolvedResourceInfo;
+  resourceNameIsExplicit: boolean;
+}
+
+function resolveArmResourceOperationCandidate(
+  program: Program,
+  resourceType: Model,
+  operation: ArmOperationIdentifier,
+): ArmResourceOperationCandidate | undefined {
+  const armOperation: ArmResourceOperation | undefined = getResourceOperation(
+    program,
+    operation.operation,
+  );
+
+  if (armOperation === undefined) return undefined;
+  armOperation.kind = operation.kind;
+  armOperation.resourceModelName = operation.resource?.name ?? resourceType.name;
+
+  const resourceInfo = getResourceInfo(armOperation);
+  if (resourceInfo === undefined && isInstanceLifecycleOperation(armOperation.kind))
+    return undefined;
+
+  armOperation.name = operation.name;
+  armOperation.resourceKind = operation.resourceKind;
+  const resourceNameIsExplicit = operation.resourceName !== undefined;
+  if (resourceInfo !== undefined) {
+    resourceInfo.resourceName =
+      operation.resourceName ??
+      getResourceNameForOperation(program, armOperation, resourceInfo.resourceInstancePath) ??
+      armOperation.resourceModelName;
+    resourceInfo.resourceNameIsExplicit = resourceNameIsExplicit;
+    armOperation.resourceName = resourceInfo.resourceName;
+  } else {
+    armOperation.resourceName = operation.resourceName ?? armOperation.resourceModelName;
+  }
+
+  return { armOperation, resourceInfo, resourceNameIsExplicit };
+}
+
+function createResolvedResourceOperations(
+  resourceInfo: ResolvedResourceInfo,
+  resourceNameIsExplicit: boolean,
+): ResolvedResourceOperations {
+  return {
+    resourceType: resourceInfo.resourceType,
+    resourceInstancePath: resourceInfo.resourceInstancePath,
+    resourceName: resourceInfo.resourceName,
+    resourceNameIsExplicit: resourceNameIsExplicit,
+    operations: {
+      lifecycle: {
+        read: undefined,
+        createOrUpdate: undefined,
+        update: undefined,
+        delete: undefined,
+        checkExistence: undefined,
+      },
+      actions: [],
+      lists: [],
+    },
+    associatedOperations: [],
+  };
 }
 
 export { getArmResource } from "./private.decorators.js";
