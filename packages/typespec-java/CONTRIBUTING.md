@@ -90,7 +90,49 @@ Make sure to run the following commands:
 
 ## Release Process
 
-TODO: The post-release process for `@azure-tools/typespec-java` has not been finalized yet.
+Shipping a `@azure-tools/typespec-java` patch is done as **two separate PRs**, both targeting the
+`release/<sprint>` branch. The overall publishing flow is the repo's general one — see the root
+[`CONTRIBUTING.md` "Publishing" section](../../CONTRIBUTING.md#publishing) and the
+[`hotfix-release` skill](../../.github/skills/hotfix-release/SKILL.md); only the
+`typespec-java`-specific parts are called out here.
+
+### Part A — Sync core PR
+
+Pulls the fix in from core; **no version bump**. Example:
+[#5012](https://github.com/Azure/typespec-azure/pull/5012). On a branch off `release/<sprint>`:
+
+1. **Pin the core commit.** Release branches don't carry `core/` submodule updates, so update the
+   `sha` in [`core-commit.json`](./core-commit.json) to the target microsoft/typespec commit
+   (e.g. the HEAD of core `main`). Build and sync scripts transiently check this commit out without
+   moving the submodule pointer.
+2. **Sync tests from core.** Run `pwsh ./SyncTests.ps1` in [`emitter-tests`](./emitter-tests): it
+   copies the tests/specs from the pinned core commit and aligns `emitter-tests/package.json`.
+3. **Add a `fix` changelog entry** for the fix (`pnpm change add`).
+
+Open the PR against `release/<sprint>` (not `main`) and merge it. _(Optional)_ Before merging,
+validate SDK regeneration from the PR's emitter with the
+[`typespec-java - sync sdk`](https://dev.azure.com/azure-sdk/internal/_build?definitionId=8274)
+pipeline: leave **Emitter Version** as `none` and set **PR Id or Branch** to this PR.
+
+### Part B — Release PR
+
+Bumps the version and publishes, after Part A merges. Example:
+[#4990](https://github.com/Azure/typespec-azure/pull/4990). Prepare the version bump per the
+`hotfix-release` skill (creates the `publish/hotfix/<name>-<sprint>` branch off `release/<sprint>`
+and runs `pnpm chronus version --ignore-policies`, consuming the changeset from Part A). The `core`
+submodule stays unchanged. The bump must also be reflected in `emitter-tests/package.json` (its
+`version` and the `*.tgz` dependency) — rerun `pwsh ./SyncTests.ps1` or update it manually.
+
+Open the PR against `release/<sprint>`. After it merges:
+
+- The emitter is auto-released by the
+  [`typespec-azure - Publish`](https://dev.azure.com/azure-sdk/internal/_build?definitionId=1793)
+  pipeline.
+- Backmerge the generated branch to `main`. If the backmerge branch isn't created automatically
+  (e.g. the workflow failed on a name collision), create it manually from the release branch and
+  open the PR to `main` yourself.
+- _(Optional)_ Regenerate the downstream SDKs by rerunning `typespec-java - sync sdk` with
+  **Emitter Version** set to the released version, and merge the resulting SDK PR.
 
 ## Trademarks
 
