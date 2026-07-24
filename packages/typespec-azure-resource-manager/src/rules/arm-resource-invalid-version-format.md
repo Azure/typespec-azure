@@ -10,7 +10,7 @@ The api-version does not follow the required format, violating the RPC contract.
 
 This rule corresponds to the LintDiff rule [ApiVersionPattern](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md#r3012).
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 @versioned(Versions)
@@ -22,7 +22,7 @@ enum Versions {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 @versioned(Versions)

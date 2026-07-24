@@ -1,8 +1,4 @@
-```text title=- Full name-
-@azure-tools/typespec-azure-resource-manager/arm-custom-resource-no-key
-```
-
-Custom Azure resource models must define a key property using the `@key` decorator, especially if the custom resource will be used in operations. Without a key, operation paths may be duplicated.
+Without a key, operation paths may be duplicated.
 
 ## Impact
 
@@ -10,7 +6,7 @@ Custom Azure resource models must define a key property using the `@key` decorat
 
 Mainly a correctness issue: the resource's name property should be marked with `@key`.
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 @Azure.ResourceManager.Legacy.customAzureResource
@@ -19,7 +15,7 @@ model CustomResource {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 @Azure.ResourceManager.Legacy.customAzureResource

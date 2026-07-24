@@ -1,4 +1,4 @@
-Check for missing Operations interface. All Azure Resource Manager services must expose the operations endpoint. Add the Operations interface to your service namespace.
+All Azure Resource Manager services must expose the operations endpoint. Add the Operations interface to your service namespace.
 
 ## Impact
 
@@ -10,14 +10,14 @@ The service is missing the standard Operations endpoint required by the RPC cont
 
 This rule corresponds to the LintDiff rule [OperationsAPIImplementation](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md#r3023).
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp title="main.tsp"
 @armProviderNamespace
 namespace MyService;
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp title="main.tsp"
 @armProviderNamespace

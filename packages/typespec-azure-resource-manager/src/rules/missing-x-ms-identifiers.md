@@ -1,8 +1,4 @@
-```text title=- Full name-
-@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers
-```
-
-Array of models must explicity define which keys are used as identifiers using the `@identifiers` decorator.
+Identifiers let downstream OpenAPI and SDK tooling correlate items in array-valued model properties.
 
 ## Impact
 
@@ -14,7 +10,7 @@ An old-pattern warning with no real runtime impact.
 
 This rule corresponds to the LintDiff rule [XmsIdentifierValidation](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md#r4041) (warning).
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 model Address {
@@ -27,7 +23,7 @@ model ResourceProperties {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 model ResourceProperties {

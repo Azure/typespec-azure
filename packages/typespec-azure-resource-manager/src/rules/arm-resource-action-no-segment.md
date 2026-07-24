@@ -1,4 +1,4 @@
-The `@armResourceAction` decorator should not be used together with `@segment`. If you need to rename the action, use `@action(...)` instead or omit the segment entirely.
+If you need to rename the action, use `@action(...)` instead or omit the segment entirely.
 
 ## Impact
 
@@ -10,7 +10,7 @@ May indicate a resource action path that does not follow the standard segment la
 
 This rule corresponds to the LintDiff rule [PathForResourceAction](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md) (partial).
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 @armResourceAction(MyResource)
@@ -19,7 +19,7 @@ This rule corresponds to the LintDiff rule [PathForResourceAction](https://githu
 op doAction(...ApiVersionParameter): void;
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 @armResourceAction(MyResource)
@@ -27,7 +27,7 @@ op doAction(...ApiVersionParameter): void;
 op doAction(...ApiVersionParameter): void;
 ```
 
-#### ✅ Correct (with custom action name)
+## ✅ Correct (with custom action name)
 
 ```tsp
 @armResourceAction(MyResource)

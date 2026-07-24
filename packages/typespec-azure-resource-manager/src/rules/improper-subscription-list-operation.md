@@ -1,4 +1,4 @@
-Tenant and Extension resources should not define a list by subscription operation. These resource types are not scoped to a subscription, so listing them by subscription is not appropriate.
+These resource types are not scoped to a subscription, so listing them by subscription is not appropriate.
 
 ## Impact
 
@@ -6,7 +6,7 @@ Tenant and Extension resources should not define a list by subscription operatio
 
 Likely a modeling error - only subscription-based resources should have subscription list operations.
 
-#### ❌ Incorrect
+## ❌ Incorrect
 
 ```tsp
 @tenantResource
@@ -20,7 +20,7 @@ interface FooResources {
 }
 ```
 
-#### ✅ Correct
+## ✅ Correct
 
 ```tsp
 @tenantResource
