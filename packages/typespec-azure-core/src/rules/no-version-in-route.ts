@@ -13,6 +13,19 @@ import { isExcludedCoreType, isTemplatedInterfaceOperation } from "./utils.js";
  */
 const versionSegmentPattern = /^v\d+(\.\d+)*$/i;
 
+/**
+ * Find the version segment in a resolved operation path, if any.
+ *
+ * `{name}` placeholders are skipped: they are runtime values, not literal version segments,
+ * even when the parameter happens to be named `v1`.
+ */
+function findVersionSegment(path: string): string | undefined {
+  return path.split("/").find((segment) => {
+    if (segment.startsWith("{")) return false;
+    return versionSegmentPattern.test(segment);
+  });
+}
+
 export const noVersionInRouteRule = createRule({
   name: "no-version-in-route",
   description: "Do not include an API version segment in operation routes.",
@@ -28,21 +41,24 @@ export const noVersionInRouteRule = createRule({
         if (isExcludedCoreType(context.program, operation)) return;
         if (isTemplatedInterfaceOperation(operation)) return;
 
-        const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, operation));
-        const path = httpOperation.path;
+        const path = ignoreDiagnostics(getHttpOperation(context.program, operation)).path;
+        const segment = findVersionSegment(path);
+        if (segment === undefined) return;
 
-        for (const segment of path.split("/")) {
-          // Skip path parameters. A `{name}` placeholder is a runtime value, not a literal
-          // version segment, even when the parameter happens to be named `v1`.
-          if (segment.startsWith("{")) continue;
-          if (versionSegmentPattern.test(segment)) {
-            context.reportDiagnostic({
-              format: { path, segment },
-              target: operation,
-            });
-            return;
-          }
+        // An operation declared with `is` inherits its route from the operation it aliases.
+        // Report the source declaration instead, so re-exporting an interface (a common
+        // `client.tsp` pattern) does not report the same route once per alias. If the source is
+        // excluded from linting it will never be reported itself, so keep reporting the alias.
+        const source = operation.sourceOperation;
+        if (source !== undefined && !isExcludedCoreType(context.program, source)) {
+          const sourcePath = ignoreDiagnostics(getHttpOperation(context.program, source)).path;
+          if (findVersionSegment(sourcePath) === segment) return;
         }
+
+        context.reportDiagnostic({
+          format: { path, segment },
+          target: operation,
+        });
       },
     };
   },

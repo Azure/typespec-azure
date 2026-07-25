@@ -243,4 +243,85 @@ describe("no-dollar-prefixed-query-params", () => {
       )
       .toBeValid();
   });
+  it("reports a shared parameter model once, not once per consuming operation", async () => {
+    // Mirrors a shared `common.tsp` parameter model spread into many operations.
+    await tester
+      .expect(
+        `
+        model ListOptions {
+          @query("$filter") filter?: string;
+        }
+
+        @route("/widgets")
+        @get
+        op listWidgets(...ListOptions): string;
+
+        @route("/gadgets")
+        @get
+        op listGadgets(...ListOptions): string;
+
+        @route("/doodads")
+        @get
+        op listDoodads(...ListOptions): string;
+        `,
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-azure-core/no-dollar-prefixed-query-params",
+          severity: "warning",
+          message: 'Query parameter "$filter" must not be prefixed with "$". Use "filter" instead.',
+        },
+      ]);
+  });
+
+  it("reports each distinct declaration even when they share a name", async () => {
+    await tester
+      .expect(
+        `
+        @route("/widgets")
+        @get
+        op listWidgets(@query("$filter") filter?: string): string;
+
+        @route("/gadgets")
+        @get
+        op listGadgets(@query("$filter") filter?: string): string;
+        `,
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-azure-core/no-dollar-prefixed-query-params",
+          severity: "warning",
+          message: 'Query parameter "$filter" must not be prefixed with "$". Use "filter" instead.',
+        },
+        {
+          code: "@azure-tools/typespec-azure-core/no-dollar-prefixed-query-params",
+          severity: "warning",
+          message: 'Query parameter "$filter" must not be prefixed with "$". Use "filter" instead.',
+        },
+      ]);
+  });
+
+  it("reports an `is`-alias parameter only once", async () => {
+    await tester
+      .expect(
+        `
+        namespace Service {
+          @route("/widgets")
+          @get
+          op listWidgets(@query("$top") top?: int32): string;
+        }
+
+        interface WidgetClient {
+          list is Service.listWidgets;
+        }
+        `,
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-azure-core/no-dollar-prefixed-query-params",
+          severity: "warning",
+          message: 'Query parameter "$top" must not be prefixed with "$". Use "top" instead.',
+        },
+      ]);
+  });
 });

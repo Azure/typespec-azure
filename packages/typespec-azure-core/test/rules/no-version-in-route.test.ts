@@ -204,4 +204,56 @@ describe("no-version-in-route", () => {
       )
       .toBeValid();
   });
+  it("reports an `is`-alias route only once, at the source declaration", async () => {
+    // Mirrors the `client.tsp` pattern where an interface re-declares every operation
+    // with `is`. The route is inherited, so only the source should be reported.
+    await tester
+      .expect(
+        `
+        namespace Service {
+          @route("/atlas/v2/entities")
+          @get
+          op listEntities(): string;
+        }
+
+        interface EntityClient {
+          list is Service.listEntities;
+        }
+        `,
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-azure-core/no-version-in-route",
+          severity: "warning",
+          message:
+            'Operation path "/atlas/v2/entities" contains the API version segment "v2". Express versioning with the "api-version" query parameter instead.',
+        },
+      ]);
+  });
+
+  it("still reports an `is`-alias that introduces its own version segment", async () => {
+    await tester
+      .expect(
+        `
+        namespace Service {
+          @route("/entities")
+          @get
+          op listEntities(): string;
+        }
+
+        interface EntityClient {
+          @route("/v3/entities")
+          list is Service.listEntities;
+        }
+        `,
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-azure-core/no-version-in-route",
+          severity: "warning",
+          message:
+            'Operation path "/v3/entities" contains the API version segment "v3". Express versioning with the "api-version" query parameter instead.',
+        },
+      ]);
+  });
 });

@@ -2,6 +2,7 @@ import {
   createRule,
   fileRef,
   ignoreDiagnostics,
+  ModelProperty,
   Operation,
   paramMessage,
 } from "@typespec/compiler";
@@ -22,6 +23,22 @@ const standardQueryOptions = [
   "expand",
 ];
 
+/**
+ * Resolve the property back to the declaration it was ultimately copied from.
+ *
+ * Spreading a shared parameter model into an operation (or aliasing an operation with `is`)
+ * clones the property, so a single offending declaration would otherwise be reported once for
+ * every operation that consumes it. The declaration is also where the fix, or a suppression,
+ * has to go.
+ */
+function getPropertyDeclaration(property: ModelProperty): ModelProperty {
+  let current = property;
+  while (current.sourceProperty !== undefined) {
+    current = current.sourceProperty;
+  }
+  return current;
+}
+
 export const noDollarPrefixedQueryParamsRule = createRule({
   name: "no-dollar-prefixed-query-params",
   description: "Do not prefix standard collection query parameter names with a dollar sign.",
@@ -32,6 +49,9 @@ export const noDollarPrefixedQueryParamsRule = createRule({
     default: paramMessage`Query parameter "${"name"}" must not be prefixed with "$". Use "${"suggestion"}" instead.`,
   },
   create(context) {
+    // A declaration can be reached through many operations; only report it once.
+    const reported = new Set<ModelProperty>();
+
     return {
       operation: (operation: Operation) => {
         if (isExcludedCoreType(context.program, operation)) return;
@@ -49,9 +69,13 @@ export const noDollarPrefixedQueryParamsRule = createRule({
           );
           if (suggestion === undefined) continue;
 
+          const declaration = getPropertyDeclaration(property.property);
+          if (reported.has(declaration)) continue;
+          reported.add(declaration);
+
           context.reportDiagnostic({
             format: { name, suggestion },
-            target: property.property,
+            target: declaration,
           });
         }
       },

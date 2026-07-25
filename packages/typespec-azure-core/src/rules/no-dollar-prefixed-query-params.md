@@ -4,6 +4,8 @@ See [`collections-query-options-no-dollar-sign`](https://github.com/microsoft/ap
 
 This rule inspects the query parameter's **wire name** — the value passed to `@query(...)`, or the property name when no explicit name is given — rather than the TypeSpec identifier. Only the seven standard collection query options are flagged; other `$`-prefixed names are left alone.
 
+Each offending declaration is reported once, at the declaration itself, even when it is spread into many operations. A suppression therefore belongs on the declaration, not on every operation that uses it.
+
 ## Impact
 
 - **Area:** API, SDK

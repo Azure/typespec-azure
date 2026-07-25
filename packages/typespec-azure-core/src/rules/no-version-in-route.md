@@ -4,6 +4,8 @@ See [`versioning-no-version-in-path`](https://github.com/microsoft/api-guideline
 
 This rule flags any literal path segment that looks like a version number, for example `v1`, `V2`, or `v1.0`. Segments produced by a path parameter (`{version}`) are not flagged.
 
+An operation declared with `is` inherits the route of the operation it aliases, so the alias is not reported separately — the diagnostic is raised on the source declaration, which is where the route is defined. An alias that declares its own `@route` containing a version segment is still reported.
+
 ## Impact
 
 - **Area:** API
