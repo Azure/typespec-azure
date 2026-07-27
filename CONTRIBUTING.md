@@ -6,6 +6,24 @@ https://github.com/microsoft/typespec/blob/main/CONTRIBUTING.md for most common
 day-to-day operations. The rest of this document only covers the things that
 are unique to this repo.
 
+# Prerequisites
+
+[mise](https://mise.jdx.dev/getting-started.html) is the recommended way to
+install the repository's development tools consistently across platforms.
+Install mise and [activate it for your shell](https://mise.jdx.dev/getting-started.html#activate-mise),
+then, after [cloning the repository recursively](#cloning-recursively), run:
+
+```bash
+mise install
+pnpm install
+```
+
+`mise install` installs the tool versions recorded in `mise.toml` and
+`mise.lock`, including Node.js, pnpm, Python, uv, Go, Java, and Maven. Using
+mise is recommended but not required; if you use another version manager,
+install the versions declared in `mise.toml` and the pnpm version declared by
+the `packageManager` field in `package.json`.
+
 # Testing a change in repo azure-rest-api-specs
 
 If you are proposing a change that is likely to impact existing specs, it's
