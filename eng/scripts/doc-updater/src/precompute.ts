@@ -119,9 +119,7 @@ function parsePrecomputeArgs(): PrecomputeArgs {
   }
 
   if (!parsed.config || !parsed.output) {
-    console.error(
-      "Usage: node src/precompute.ts --config <name> --output <path> [--full-rebuild]",
-    );
+    console.error("Usage: node src/precompute.ts --config <name> --output <path> [--full-rebuild]");
     process.exit(1);
   }
 

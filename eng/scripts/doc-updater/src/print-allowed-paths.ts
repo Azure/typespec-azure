@@ -22,9 +22,7 @@ function parseArgs(): { config: string } {
   }
 
   if (!config) {
-    console.error(
-      "Usage: node eng/scripts/doc-updater/src/print-allowed-paths.ts --config <name>",
-    );
+    console.error("Usage: node eng/scripts/doc-updater/src/print-allowed-paths.ts --config <name>");
     process.exit(1);
   }
 
