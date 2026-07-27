@@ -1,5 +1,6 @@
 {
   "submodulePath": "core",
+  "catalogPath": "pnpm-workspace.yaml",
   "ignore": ["**/test/**", "**/tests/**", "**/*.test.ts", "**/*.md"],
   "sharedExtra": [".github/actions/setup/**"],
   "targets": {
